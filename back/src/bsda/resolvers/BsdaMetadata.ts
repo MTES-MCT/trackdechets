@@ -1,10 +1,11 @@
 import {
   BsdaMetadata,
   BsdaMetadataResolvers,
+  BsdaSignatureType,
   BsdaStatus
 } from "../../generated/graphql/types";
 import { getBsdaOrNotFound } from "../database";
-import { validateBsda } from "../validation";
+import { parseBsda } from "../validation/validate";
 
 export const Metadata: BsdaMetadataResolvers = {
   errors: async (
@@ -16,12 +17,7 @@ export const Metadata: BsdaMetadataResolvers = {
       {
         skip: metadata.status !== "INITIAL",
         requiredFor: "EMISSION",
-        context: {
-          emissionSignature: true,
-          transportSignature: false,
-          workerSignature: false,
-          operationSignature: false
-        }
+        currentSignatureType: "EMISSION" as BsdaSignatureType
       },
       {
         skip: [
@@ -31,63 +27,33 @@ export const Metadata: BsdaMetadataResolvers = {
           "REFUSED",
           "AWAITING_CHILD"
         ].includes(metadata.status),
-        requiredFor: "WORK",
-        context: {
-          emissionSignature: true,
-          workerSignature: true,
-          transportSignature: false,
-          operationSignature: false
-        }
+        currentSignatureType: "WORK" as BsdaSignatureType
       },
       {
         skip: ["SENT", "PROCESSED", "REFUSED", "AWAITING_CHILD"].includes(
           metadata.status
         ),
-        requiredFor: "TRANSPORT",
-        context: {
-          emissionSignature: true,
-          workerSignature: true,
-          transportSignature: true,
-          operationSignature: false
-        }
+        currentSignatureType: "TRANSPORT" as BsdaSignatureType
       },
       {
         skip: ["PROCESSED", "REFUSED"].includes(metadata.status),
-        requiredFor: "OPERATION",
-        context: {
-          emissionSignature: true,
-          workerSignature: true,
-          transportSignature: true,
-          operationSignature: true
-        }
+        currentSignatureType: "OPERATION" as BsdaSignatureType
       }
     ];
 
     const filteredValidationMatrix = validationMatrix.filter(
       matrix => !matrix.skip
     );
-    for (const { context, requiredFor } of filteredValidationMatrix) {
-      const {
-        BsdaRevisionRequest,
-        groupedIn,
-        grouping,
-        forwardedIn,
-        forwarding,
-        ...bsda
-      } = prismaForm;
+    for (const { currentSignatureType } of filteredValidationMatrix) {
       try {
-        await validateBsda(
-          bsda as any,
-          { previousBsdas: [], intermediaries: [] },
-          context
-        );
+        await parseBsda(prismaForm, { currentSignatureType });
         return [];
       } catch (errors) {
         return errors.inner?.map(e => {
           return {
             message: e.message,
             path: e.path,
-            requiredFor
+            requiredFor: currentSignatureType
           };
         });
       }

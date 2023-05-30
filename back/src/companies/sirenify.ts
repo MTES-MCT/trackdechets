@@ -24,6 +24,13 @@ type CompanyInputAccessor<T> = {
   setter: (input: T, companyInput: CompanyInput) => T;
 };
 
+export function canBypassSirenify(user: Express.User) {
+  return (
+    user.auth === AuthType.Session || // data sent from TD UI is considered to be sane
+    SIRENIFY_BYPASS_USER_EMAILS.some(r => user.email?.match(r)) // by pass some users
+  );
+}
+
 /**
  * Generic sirenify function type. It takes a BSD input type T
  * and sets `name` and `address` data  from SIRENE database when a
@@ -86,6 +93,58 @@ export default function buildSirenify<T>(
         }
       }
     });
+
+    return sirenifiedInput;
+  };
+}
+
+type NextCompanyInputAccessor<T> = {
+  siret: string | null | undefined;
+  setter: (
+    input: T,
+    data: {
+      name: string | null | undefined;
+      address: string | null | undefined;
+    }
+  ) => void;
+};
+
+export function nextBuildSirenify<T>(
+  companyInputAccessors: (input: T) => NextCompanyInputAccessor<T>[]
+): (input: T) => Promise<T> {
+  return async input => {
+    const accessors = companyInputAccessors(input);
+
+    // retrieves the different companyInput included in the input
+    const sirets = accessors.map(({ siret }) => siret);
+
+    // check if we found a corresponding companySearchResult based on siret
+    const companySearchResults = await Promise.all(
+      sirets.map(siret => (siret ? searchCompanyFailFast(siret) : null))
+    );
+
+    // make a copy to avoid mutating initial data
+    const sirenifiedInput = { ...input };
+
+    for (const [idx, companySearchResult] of companySearchResults.entries()) {
+      if (
+        !companySearchResult ||
+        companySearchResult.statutDiffusionEtablissement !== "O"
+      )
+        continue;
+      if (companySearchResult.etatAdministratif === "F") {
+        throw new UserInputError(
+          `L'établissement ${companySearchResult.siret} est fermé selon le répertoire SIRENE`
+        );
+      }
+
+      const { setter } = accessors[idx];
+
+      setter(sirenifiedInput, {
+        name: companySearchResult.name,
+        address: companySearchResult.address
+      });
+    }
 
     return sirenifiedInput;
   };

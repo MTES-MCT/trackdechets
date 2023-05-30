@@ -1,9 +1,10 @@
 import { Bsda, BsdaType } from "@prisma/client";
-import { resetDatabase } from "../../../integration-tests/helper";
-import { companyFactory } from "../../__tests__/factories";
-import { bsdaSchema } from "../validation";
+import { resetDatabase } from "../../../../integration-tests/helper";
+import { companyFactory } from "../../../__tests__/factories";
 
-import { bsdaFactory } from "./factories";
+import { bsdaFactory } from "../../__tests__/factories";
+import { rawBsdaSchema } from "../schema";
+import { parseBsda } from "../validate";
 
 describe("BSDA validation", () => {
   let bsda: Bsda;
@@ -16,8 +17,8 @@ describe("BSDA validation", () => {
 
   describe("BSDA should be valid", () => {
     test("when all data is present", async () => {
-      const isValid = await bsdaSchema({}).isValid(bsda);
-      expect(isValid).toBe(true);
+      const { success } = await rawBsdaSchema.safeParseAsync(bsda);
+      expect(success).toBe(true);
     });
 
     test("when there is a foreign transporter and recepisse fields are null", async () => {
@@ -25,16 +26,15 @@ describe("BSDA validation", () => {
         orgId: "BE0541696005",
         vatNumber: "BE0541696005"
       });
-      expect(
-        await bsdaSchema({}).isValid({
-          ...bsda,
-          transporterCompanyVatNumber: foreignTransporter.vatNumber,
-          transporterCompanyName: "transporteur BE",
-          transporterRecepisseDepartment: null,
-          transporterRecepisseNumber: null,
-          transporterRecepisseIsExempted: null
-        })
-      ).toEqual(true);
+      const { success } = await rawBsdaSchema.safeParseAsync({
+        ...bsda,
+        transporterCompanyVatNumber: foreignTransporter.vatNumber,
+        transporterCompanyName: "transporteur BE",
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseIsExempted: null
+      });
+      expect(success).toEqual(true);
     });
 
     test("when a foreign transporter vat number is specified and transporter siret is null", async () => {
@@ -48,8 +48,8 @@ describe("BSDA validation", () => {
         transporterCompanyVatNumber: foreignTransporter.vatNumber
       };
 
-      const isValid = await bsdaSchema({}).isValid(data);
-      expect(isValid).toBe(true);
+      const { success } = await rawBsdaSchema.safeParseAsync(data);
+      expect(success).toBe(true);
     });
   });
 
@@ -60,9 +60,14 @@ describe("BSDA validation", () => {
         ...bsda,
         emitterCompanySiret: "1"
       };
-      const validateFn = () => bsdaSchema({}).validate(data);
-      await expect(validateFn()).rejects.toThrow(
-        "Émetteur: 1 n'est pas un numéro de SIRET valide"
+      const result = await rawBsdaSchema.safeParseAsync(data);
+
+      if (result.success) {
+        throw new Error("Expected error.");
+      }
+
+      expect(result.error.issues[0].message).toBe(
+        "1 n'est pas un numéro de SIRET valide"
       );
     });
 
@@ -71,9 +76,14 @@ describe("BSDA validation", () => {
         ...bsda,
         transporterCompanySiret: "1"
       };
-      const validateFn = () => bsdaSchema({}).validate(data);
-      await expect(validateFn()).rejects.toThrow(
-        "Transporteur: 1 n'est pas un numéro de SIRET valide"
+      const result = await rawBsdaSchema.safeParseAsync(data);
+
+      if (result.success) {
+        throw new Error("Expected error.");
+      }
+
+      expect(result.error.issues[0].message).toBe(
+        "1 n'est pas un numéro de SIRET valide"
       );
     });
 
@@ -82,9 +92,14 @@ describe("BSDA validation", () => {
         ...bsda,
         transporterCompanyVatNumber: "FR35552049447"
       };
-      const validateFn = () => bsdaSchema({}).validate(data);
-      await expect(validateFn()).rejects.toThrow(
-        "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+      const result = await rawBsdaSchema.safeParseAsync(data);
+
+      if (result.success) {
+        throw new Error("Expected error.");
+      }
+
+      expect(result.error.issues[0].message).toBe(
+        "Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
       );
     });
 
@@ -93,10 +108,14 @@ describe("BSDA validation", () => {
         ...bsda,
         transporterCompanySiret: "85001946400021"
       };
-      const validateFn = () =>
-        bsdaSchema({}).validate(data, { abortEarly: false });
-      await expect(validateFn()).rejects.toThrow(
-        "Transporteur : l'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+      const result = await rawBsdaSchema.safeParseAsync(data);
+
+      if (result.success) {
+        throw new Error("Expected error.");
+      }
+
+      expect(result.error.issues[0].message).toBe(
+        "L'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
       );
     });
 
@@ -106,8 +125,13 @@ describe("BSDA validation", () => {
         ...bsda,
         transporterCompanySiret: company.siret
       };
-      const validateFn = () => bsdaSchema({}).validate(data);
-      await expect(validateFn()).rejects.toThrow(
+      const result = await rawBsdaSchema.safeParseAsync(data);
+
+      if (result.success) {
+        throw new Error("Expected error.");
+      }
+
+      expect(result.error.issues[0].message).toBe(
         `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
           " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
           " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
@@ -120,9 +144,14 @@ describe("BSDA validation", () => {
         trasnporterCompanySiret: null,
         transporterCompanyVatNumber: "IT13029381004"
       };
-      const validateFn = () => bsdaSchema({}).validate(data);
-      await expect(validateFn()).rejects.toThrow(
-        "Transporteur : le transporteur avec le n°de TVA IT13029381004 n'est pas inscrit sur Trackdéchets"
+      const result = await rawBsdaSchema.safeParseAsync(data);
+
+      if (result.success) {
+        throw new Error("Expected error.");
+      }
+
+      expect(result.error.issues[0].message).toBe(
+        "Le transporteur avec le n°de TVA IT13029381004 n'est pas inscrit sur Trackdéchets"
       );
     });
 
@@ -136,8 +165,13 @@ describe("BSDA validation", () => {
         ...bsda,
         transporterCompanyVatNumber: company.vatNumber
       };
-      const validateFn = () => bsdaSchema({}).validate(data);
-      await expect(validateFn()).rejects.toThrow(
+      const result = await rawBsdaSchema.safeParseAsync(data);
+
+      if (result.success) {
+        throw new Error("Expected error.");
+      }
+
+      expect(result.error.issues[0].message).toBe(
         `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
           " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
           " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
@@ -149,9 +183,14 @@ describe("BSDA validation", () => {
         ...bsda,
         destinationCompanySiret: "1"
       };
-      const validateFn = () => bsdaSchema({}).validate(data);
-      await expect(validateFn()).rejects.toThrow(
-        "Destination: 1 n'est pas un numéro de SIRET valide"
+      const result = await rawBsdaSchema.safeParseAsync(data);
+
+      if (result.success) {
+        throw new Error("Expected error.");
+      }
+
+      expect(result.error.issues[0].message).toBe(
+        "1 n'est pas un numéro de SIRET valide"
       );
     });
 
@@ -160,9 +199,13 @@ describe("BSDA validation", () => {
         ...bsda,
         destinationCompanySiret: "85001946400021"
       };
-      const validateFn = () => bsdaSchema({}).validate(data);
-      await expect(validateFn()).rejects.toThrow(
-        "Destination : l'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+      const result = await rawBsdaSchema.safeParseAsync(data);
+      if (result.success) {
+        throw new Error("Expected error.");
+      }
+
+      expect(result.error.issues[0].message).toBe(
+        "L'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
       );
     });
 
@@ -172,8 +215,12 @@ describe("BSDA validation", () => {
         ...bsda,
         destinationCompanySiret: company.siret
       };
-      const validateFn = () => bsdaSchema({}).validate(data);
-      await expect(validateFn()).rejects.toThrow(
+      const result = await rawBsdaSchema.safeParseAsync(data);
+      if (result.success) {
+        throw new Error("Expected error.");
+      }
+
+      expect(result.error.issues[0].message).toBe(
         `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est pas inscrite` +
           " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc" +
           " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il" +
@@ -182,6 +229,7 @@ describe("BSDA validation", () => {
     });
 
     test("when there is a french transporter and recepisse fields are null", async () => {
+      expect.assertions(1);
       const transporterCompany = await companyFactory({
         companyTypes: ["TRANSPORTER"]
       });
@@ -194,11 +242,14 @@ describe("BSDA validation", () => {
         transporterRecepisseNumber: null,
         transporterRecepisseDepartment: null
       };
-      const validateFn = () =>
-        bsdaSchema({ transportSignature: true }).validate(data);
-      await expect(validateFn()).rejects.toThrow(
-        "Transporteur: le numéro de récépissé est obligatoire"
-      );
+
+      try {
+        await parseBsda(data, { currentSignatureType: "TRANSPORT" });
+      } catch (error) {
+        expect(error.issues[0].message).toBe(
+          "Le numéro de récépissé transporteur est obligatoire."
+        );
+      }
     });
   });
 });

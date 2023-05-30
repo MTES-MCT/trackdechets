@@ -12,7 +12,7 @@ import {
   RepositoryTransaction
 } from "../../../common/repository/types";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
-import { PARTIAL_OPERATIONS } from "../../validation";
+import { PARTIAL_OPERATIONS } from "../../validation/constants";
 import { NON_CANCELLABLE_BSDA_STATUSES } from "../../resolvers/mutations/revisionRequest/createRevisionRequest";
 import { ForbiddenError } from "apollo-server-core";
 

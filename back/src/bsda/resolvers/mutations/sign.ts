@@ -19,9 +19,9 @@ import { getBsdaHistory, getBsdaOrNotFound } from "../../database";
 import { machine } from "../../machine";
 import { getBsdaRepository } from "../../repository";
 import { runInTransaction } from "../../../common/repository/helper";
-import { validateBsda } from "../../validation";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 import { checkCanSignFor } from "../../permissions";
+import { parseBsda } from "../../validation/validate";
 
 type SignatureTypeInfos = {
   dbDateKey: keyof Bsda;
@@ -54,31 +54,16 @@ export default async function sign(
   }
 
   checkBsdaTypeSpecificRules(bsda, input);
-  const {
-    intermediaries,
-    BsdaRevisionRequest,
-    groupedIn,
-    grouping,
-    forwardedIn,
-    forwarding,
-    ...simpleBsda
-  } = bsda;
+
   // Check that all necessary fields are filled
-  await validateBsda(
-    simpleBsda as any,
-    { previousBsdas: [], intermediaries: [] },
+  await parseBsda(
     {
-      skipPreviousBsdas: true,
-      emissionSignature:
-        bsda.emitterEmissionSignatureDate != null || input.type === "EMISSION",
-      workSignature:
-        bsda.workerWorkSignatureDate != null || input.type === "WORK",
-      transportSignature:
-        bsda.transporterTransportSignatureDate != null ||
-        input.type === "TRANSPORT",
-      operationSignature:
-        bsda.destinationOperationSignatureDate != null ||
-        input.type === "OPERATION"
+      ...bsda,
+      grouping: bsda.grouping?.map(g => g.id),
+      forwarding: bsda.forwarding?.id
+    },
+    {
+      currentSignatureType: input.type
     }
   );
 
