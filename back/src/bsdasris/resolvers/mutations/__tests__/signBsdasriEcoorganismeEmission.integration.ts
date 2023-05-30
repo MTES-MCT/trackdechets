@@ -7,7 +7,11 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import { SIGN_DASRI } from "./signUtils";
-import { bsdasriFactory, initialData } from "../../../__tests__/factories";
+import {
+  bsdasriFactory,
+  initialData,
+  readyToPublishData
+} from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 
@@ -26,9 +30,11 @@ describe("Mutation.signBsdasri emission", () => {
       }
     });
     const emitterCompany = await companyFactory();
+    const destinationCompany = await companyFactory();
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         status: BsdasriStatus.INITIAL,
         ecoOrganismeSiret: ecoOrganismeCompany.siret,
         ecoOrganismeName: ecoOrganismeCompany.name

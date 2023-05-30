@@ -2,7 +2,11 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { bsdasriFactory, initialData } from "../../../__tests__/factories";
+import {
+  bsdasriFactory,
+  initialData,
+  readyToPublishData
+} from "../../../__tests__/factories";
 import { Mutation } from "../../../../generated/graphql/types";
 const PUBLISH_DASRI = `
 mutation PublishDasri($id: ID!){
@@ -45,11 +49,13 @@ describe("Mutation.publishBsdasri", () => {
 
   it("should publish a draft dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {
         isDraft: true,
-        ...initialData(company)
+        ...initialData(company),
+        ...readyToPublishData(destination)
       }
     });
 
@@ -70,10 +76,12 @@ describe("Mutation.publishBsdasri", () => {
 
   it("should not publish an already published dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company)
+        ...initialData(company),
+        ...readyToPublishData(destination)
       }
     });
 
@@ -100,11 +108,14 @@ describe("Mutation.publishBsdasri", () => {
 
   it("should not publish a draft dasri if mandatory fields are not filled", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
         isDraft: true,
         ...initialData(company),
-        emitterCompanyName: null // missing field
+        ...readyToPublishData(destination),
+        emitterCompanyName: null, // missing field
+        destinationCompanyName: null // missing field
       }
     });
     const { mutate } = makeClient(user); // emitter
@@ -120,7 +131,8 @@ describe("Mutation.publishBsdasri", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Émetteur: Le nom de l'entreprise est obligatoire",
+        message: `Destinataire: Le nom de l'entreprise est obligatoire
+Émetteur: Le nom de l'entreprise est obligatoire`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

@@ -1,5 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
+  companyFactory,
   siretify,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -10,6 +11,7 @@ import { ErrorCode } from "../../../../common/errors";
 import {
   bsdasriFactory,
   initialData,
+  readyToPublishData,
   readyToTakeOverData
 } from "../../../__tests__/factories";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -37,9 +39,12 @@ describe("Mutation.updateBsdasri", () => {
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
 
+    const destinationCompany = await companyFactory();
+
     const associated = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         status: BsdasriStatus.INITIAL
       }
@@ -53,6 +58,7 @@ describe("Mutation.updateBsdasri", () => {
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(transporterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         status: BsdasriStatus.INITIAL,
         type: BsdasriType.SYNTHESIS,
@@ -311,9 +317,12 @@ describe("Mutation.updateBsdasri", () => {
       const { user: transporter, company: transporterCompany } =
         await userWithCompanyFactory("MEMBER");
 
+      const destinationCompany = await companyFactory();
+
       const associated = await bsdasriFactory({
         opt: {
           ...initialData(emitterCompany),
+          ...readyToPublishData(destinationCompany),
           ...readyToTakeOverData(transporterCompany),
           status: status
         }
@@ -325,6 +334,7 @@ describe("Mutation.updateBsdasri", () => {
       const dasri = await bsdasriFactory({
         opt: {
           ...initialData(transporterCompany),
+          ...readyToPublishData(destinationCompany),
           ...readyToTakeOverData(transporterCompany),
           status: BsdasriStatus.SENT,
           type: BsdasriType.SYNTHESIS,

@@ -72,13 +72,13 @@ export const companyFactory = async (
         set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
       },
       name: `company_${companyIndex}`,
+      contact: "Company Contact",
       securityCode: 1234,
       verificationCode: "34567",
       address: "Champ de Mars, 5 Av. Anatole France, 75007 Paris",
       codeDepartement: "75",
       contactEmail: `contact_${companyIndex}@gmail.com`,
       contactPhone: `+${companyIndex} 606060606`,
-      contact: "Contact",
       verificationStatus: "VERIFIED",
       ...opts
     }
@@ -186,6 +186,24 @@ export const createMembershipRequest = async (
       ...opt
     }
   });
+};
+
+/**
+ * Returns the destination info for a BSD
+ */
+export const getDestinationCompanyInfo = async () => {
+  const destinationCompany = await companyFactory();
+  return {
+    destination: {
+      company: {
+        name: destinationCompany.name,
+        address: destinationCompany.address,
+        phone: destinationCompany.contactPhone,
+        siret: destinationCompany.siret,
+        contact: destinationCompany.contact
+      }
+    }
+  };
 };
 
 const formdata = {

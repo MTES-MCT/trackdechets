@@ -1,6 +1,10 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { bsdasriFactory } from "../../../__tests__/factories";
 import {
+  bsdasriFactory,
+  readyToPublishData
+} from "../../../__tests__/factories";
+import {
+  companyFactory,
   siretify,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -158,6 +162,7 @@ describe("Mutation.updateBsdasri", () => {
         set: ["COLLECTOR"]
       }
     });
+    const destinationCompany = await companyFactory();
     const emitterCompanySiret = siretify(1);
     const regrouped = await bsdasriFactory({
       opt: {
@@ -173,7 +178,8 @@ describe("Mutation.updateBsdasri", () => {
         status: BsdasriStatus.INITIAL,
         emitterCompanySiret: company.siret,
         type: "GROUPING",
-        grouping: { connect: [{ id: regrouped.id }] }
+        grouping: { connect: [{ id: regrouped.id }] },
+        ...readyToPublishData(destinationCompany)
       }
     });
     const toRegroup = await bsdasriFactory({

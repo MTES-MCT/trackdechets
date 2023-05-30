@@ -1,10 +1,17 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import { SIGN_DASRI } from "./signUtils";
-import { bsdasriFactory, initialData } from "../../../__tests__/factories";
+import {
+  bsdasriFactory,
+  initialData,
+  readyToPublishData
+} from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 
@@ -66,8 +73,13 @@ describe("Mutation.signBsdasri emission", () => {
 
   it("should put emission signature on a dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
     const dasri = await bsdasriFactory({
-      opt: { ...initialData(company), status: BsdasriStatus.INITIAL }
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination),
+        status: BsdasriStatus.INITIAL
+      }
     });
     const { mutate } = makeClient(user); // emitter
 
