@@ -22,6 +22,7 @@ import { BsdaRepository, getBsdaRepository } from "../../repository";
 import { runInTransaction } from "../../../common/repository/helper";
 import { parseBsda } from "../../validation/validate";
 import { checkCanSignFor } from "../../../permissions";
+import { InvalidTransition } from "../../../forms/errors";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,

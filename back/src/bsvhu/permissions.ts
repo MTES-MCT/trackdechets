@@ -1,7 +1,6 @@
 import { Bsvhu, BsvhuStatus, User } from "@prisma/client";
-import { BsvhuInput, SignatureTypeInput } from "../generated/graphql/types";
+import { BsvhuInput } from "../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../permissions";
-import { checkSecurityCode } from "../common/permissions";
 
 /**
  * Retrieves organisations allowed to read a BSVHU

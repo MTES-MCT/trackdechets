@@ -1,11 +1,9 @@
 import { User, Bsff, BsffFicheIntervention, BsffStatus } from "@prisma/client";
 import {
   BsffFicheInterventionInput,
-  BsffInput,
-  BsffSignatureType
+  BsffInput
 } from "../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../permissions";
-import { checkSecurityCode } from "../common/permissions";
 
 /**
  * Retrieves organisations allowed to read a BSFF
