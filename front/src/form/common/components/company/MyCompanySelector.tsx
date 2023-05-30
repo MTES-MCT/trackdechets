@@ -28,6 +28,7 @@ export const GET_ME = gql`
         contactEmail
         contactPhone
         address
+        companyTypes
       }
     }
   }
@@ -37,10 +38,12 @@ export default function MyCompanySelector({
   fieldName,
   onSelect,
   siretEditable = true,
+  filter,
 }: {
   fieldName: string;
   onSelect: (company) => void;
   siretEditable: boolean;
+  filter?: (companies: CompanyPrivate[]) => CompanyPrivate[];
 }) {
   const { setFieldValue } = useFormikContext<CreateFormInput>();
   const [field] = useField({ name: fieldName });
@@ -97,7 +100,9 @@ export default function MyCompanySelector({
   });
 
   const companies = useMemo(() => {
-    return sortCompaniesByName(data?.me.companies ?? []);
+    const allCompanies = data?.me.companies ?? [];
+    const filteredCompanies = filter ? filter(allCompanies) : allCompanies;
+    return sortCompaniesByName(filteredCompanies);
   }, [data]);
 
   if (loading) {
@@ -108,7 +113,7 @@ export default function MyCompanySelector({
     return <InlineError apolloError={error} />;
   }
 
-  if (data) {
+  if (companies) {
     return (
       <>
         {siretEditable ? (

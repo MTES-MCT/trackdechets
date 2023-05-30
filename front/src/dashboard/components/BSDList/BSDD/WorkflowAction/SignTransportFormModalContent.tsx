@@ -127,9 +127,9 @@ function SignTransportFormModalContent({
           transporterNumberPlate:
             form.stateSummary?.transporterNumberPlate ?? "",
           update: {
-            quantity: 0,
-            sampleNumber: "",
-            packagingInfos: [],
+            quantity: form.wasteDetails?.quantity ?? 0,
+            sampleNumber: form.wasteDetails?.sampleNumber ?? "",
+            packagingInfos: form.wasteDetails?.packagingInfos ?? [],
           },
         }}
         validationSchema={validationSchema}

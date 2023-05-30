@@ -1,7 +1,7 @@
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
-import { EmitterType, Form } from "generated/graphql/types";
+import { CompanyType, EmitterType, Form } from "generated/graphql/types";
 import React, { useEffect } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WorkSite from "form/common/components/work-site/WorkSite";
@@ -293,6 +293,22 @@ export default function Emitter({ disabled }) {
               if (values.emitter?.type === EmitterType.Appendix1) {
                 setFieldValue("transporter.company", company);
               }
+            }}
+            filter={companies => {
+              if (values.emitter?.type === EmitterType.Appendix1) {
+                const authorizedTypes = [
+                  CompanyType.Collector,
+                  CompanyType.Transporter,
+                  CompanyType.Wasteprocessor,
+                  CompanyType.WasteCenter,
+                ];
+                return companies.filter(company =>
+                  company.companyTypes.some(type =>
+                    authorizedTypes.includes(type)
+                  )
+                );
+              }
+              return companies;
             }}
           />
         </div>

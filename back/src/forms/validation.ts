@@ -595,6 +595,30 @@ const parcelInfos = yup.lazy(value => {
   return parcelCommonInfos.concat(parcelCoordinates);
 });
 
+function isValidPackagingInfos(infos: PackagingInfo[] | undefined) {
+  const hasCiterne = infos?.some(i => i.type === "CITERNE");
+  const hasPipeline = infos?.some(i => i.type === "PIPELINE");
+  const hasBenne = infos?.some(i => i.type === "BENNE");
+
+  if (
+    // citerne and benne together are not allowed
+    (hasCiterne && hasBenne) ||
+    // pipeline and any other Packaging is forbidden
+    (infos?.some(i => i.type !== "PIPELINE") && hasPipeline)
+  ) {
+    return false;
+  }
+
+  const hasOtherPackaging = infos?.find(
+    i => !["CITERNE", "BENNE"].includes(i.type)
+  );
+  if ((hasCiterne || hasBenne) && hasOtherPackaging) {
+    return false;
+  }
+
+  return true;
+}
+
 // 3 - Dénomination du déchet
 // 4 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 5 - Conditionnement
@@ -640,7 +664,15 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
     wasteDetailsLandIdentifiers: yup.array().of(yup.string()) as any,
     wasteDetailsConsistence: yup
       .mixed<Consistence>()
-      .requiredIf(!isDraft, "La consistance du déchet doit être précisée")
+      .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
+    wasteDetailsPackagingInfos: yup
+      .array()
+      .of(packagingInfoFn(isDraft) as any)
+      .test(
+        "is-valid-packaging-infos",
+        "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
+        isValidPackagingInfos
+      )
   });
 
 const fullWasteDetailsSchemaFn: FactorySchemaOf<
@@ -664,29 +696,7 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<
         .test(
           "is-valid-packaging-infos",
           "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
-          (infos: PackagingInfo[] | undefined) => {
-            const hasCiterne = infos?.some(i => i.type === "CITERNE");
-            const hasPipeline = infos?.some(i => i.type === "PIPELINE");
-            const hasBenne = infos?.some(i => i.type === "BENNE");
-
-            if (
-              // citerne and benne together are not allowed
-              (hasCiterne && hasBenne) ||
-              // pipeline and any other Packaging is forbidden
-              (infos?.some(i => i.type !== "PIPELINE") && hasPipeline)
-            ) {
-              return false;
-            }
-
-            const hasOtherPackaging = infos?.find(
-              i => !["CITERNE", "BENNE"].includes(i.type)
-            );
-            if ((hasCiterne || hasBenne) && hasOtherPackaging) {
-              return false;
-            }
-
-            return true;
-          }
+          isValidPackagingInfos
         ),
       wasteDetailsQuantity: weight(WeightUnits.Tonne)
         .label("Déchet")

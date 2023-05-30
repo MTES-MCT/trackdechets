@@ -10,8 +10,12 @@ import {
   MutationUpdateFormArgs,
 } from "generated/graphql/types";
 import React from "react";
-import { getInitialCompany } from "../utils/initial-state";
+import {
+  getInitialCompany,
+  getInitialEmitterWorkSite,
+} from "../utils/initial-state";
 import { CREATE_FORM, UPDATE_FORM } from "../utils/queries";
+import WorkSite from "form/common/components/work-site/WorkSite";
 
 export function Appendix1ProducerForm({
   container,
@@ -97,14 +101,16 @@ export function Appendix1ProducerForm({
                     setFieldValue("emitter.isForeignShip", false);
                   }}
                 />
-                L'émetteur est un particulier
+                L'émetteur est un particulier ou une association / copropriété
+                sans SIRET
               </label>
             </div>
             {values.emitter?.isPrivateIndividual ? (
               <div className="form__row">
                 <div className="form__row">
                   <label>
-                    Nom et prénom
+                    Nom et prénom ou Nom de l'association ou Nom de la
+                    copropriété
                     <Field
                       type="text"
                       name="emitter.company.name"
@@ -146,6 +152,13 @@ export function Appendix1ProducerForm({
             ) : (
               <CompanySelector name="emitter.company" />
             )}
+
+            <WorkSite
+              switchLabel="Je souhaite ajouter une adresse de chantier ou de collecte"
+              headingTitle="Adresse chantier"
+              designation="du chantier ou lieu de collecte"
+              getInitialEmitterWorkSiteFn={getInitialEmitterWorkSite}
+            />
 
             <div className="tw-pb-2 tw-flex tw-justify-end">
               <button
