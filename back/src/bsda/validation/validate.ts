@@ -92,7 +92,10 @@ function getSignatureHierarchy(
     ([_, details]) => details.next === targetSignature
   )?.[0];
 
-  return [targetSignature, ...getSignatureHierarchy(parent as BsdaSignatureType)];
+  return [
+    targetSignature,
+    ...getSignatureHierarchy(parent as BsdaSignatureType)
+  ];
 }
 
 async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
