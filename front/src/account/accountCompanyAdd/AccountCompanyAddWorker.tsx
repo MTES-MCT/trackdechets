@@ -1,14 +1,9 @@
 import React from "react";
 import { Field, useFormikContext } from "formik";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import {
-  Container,
-  Row,
-  Col,
-  TextInput,
-  Select,
-  Checkbox,
-} from "@dataesr/react-dsfr";
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
+import { Select } from "@codegouvfr/react-dsfr/Select";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import Tooltip from "common/components/Tooltip";
 
 import { Values } from "../AccountCompanyAdd";
@@ -20,92 +15,124 @@ export default function AccountCompanyAddBrokerReceipt() {
   const { values } = useFormikContext<Values>();
 
   return (
-    <Container fluid>
-      <Row gutters>
-        <Col n="12">
+    <div className="fr-container" style={{ paddingTop: "4px" }}>
+      <div className="fr-grid-row fr-grid-row--gutters">
+        <div className="fr-col-12">
           <Field name="hasSubSectionFour">
             {({ field }) => {
               return (
                 <Checkbox
-                  id="hasSubSectionFour"
-                  label="Travaux relevant de la sous-section 4"
-                  {...field}
-                ></Checkbox>
+                  options={[
+                    {
+                      label: "Travaux relevant de la sous-section 4",
+                      nativeInputProps: {
+                        name: field.name,
+                        checked: field.value,
+                        onChange: field.onChange,
+                        onBlur: field.onBlur,
+                      },
+                    },
+                  ]}
+                />
               );
             }}
           </Field>
-        </Col>
-      </Row>
-      <Row gutters>
-        <Col n="11">
+        </div>
+      </div>
+      <div className="fr-grid-row fr-grid-row--gutters">
+        <div className="fr-col-6">
           <Field name="hasSubSectionThree">
             {({ field }) => {
               return (
                 <Checkbox
-                  id="hasSubSectionThree"
-                  label="Travaux relevant de la sous-section 3"
-                  {...field}
-                ></Checkbox>
+                  options={[
+                    {
+                      label: "Travaux relevant de la sous-section 3",
+                      nativeInputProps: {
+                        name: field.name,
+                        checked: field.value,
+                        onChange: field.onChange,
+                        onBlur: field.onBlur,
+                      },
+                    },
+                  ]}
+                />
               );
             }}
           </Field>
-        </Col>
-        <Col n="1">
+        </div>
+        <div className="fr-col-1">
           <Tooltip msg="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)" />
-        </Col>
-      </Row>
+        </div>
+      </div>
       {values.hasSubSectionThree && (
-        <Row gutters>
-          <Col n="4">
+        <div className="fr-grid-row fr-grid-row--gutters">
+          <div className="fr-col-4">
             <Field name="certificationNumber">
               {({ field }) => {
                 return (
-                  <TextInput label="N° certification" {...field}></TextInput>
+                  <Input
+                    label="N° certification"
+                    nativeInputProps={field}
+                  ></Input>
                 );
               }}
             </Field>
             <RedErrorMessage name="certificationNumber" />
-          </Col>
-          <Col n="4">
+          </div>
+          <div className="fr-col-4">
             <Field name="validityLimit">
               {({ field }) => {
                 return (
-                  <TextInput
-                    type="date"
+                  <Input
                     label="Date de validité"
-                    {...field}
-                  ></TextInput>
+                    nativeInputProps={{ type: "date", ...field }}
+                  ></Input>
                 );
               }}
             </Field>
             <RedErrorMessage name="validityLimit" />
-          </Col>
-          <Col n="4">
+          </div>
+          <div className="fr-col-4">
             <Field name="organisation">
               {({ field }) => {
+                const options = [
+                  {
+                    value: "AFNOR Certification",
+                    label: "AFNOR Certification",
+                  },
+                  {
+                    value: "QUALIBAT",
+                    label: "QUALIBAT",
+                  },
+                ];
+
                 return (
                   <Select
                     label="Département"
-                    options={[
-                      {
-                        value: "AFNOR Certification",
-                        label: "AFNOR Certification",
-                      },
-                      {
-                        value: "QUALIBAT",
-                        label: "QUALIBAT",
-                      },
-                    ]}
-                    {...field}
-                    selected={values.organisation}
-                  ></Select>
+                    nativeSelectProps={{
+                      name: field.name,
+                      value: values.organisation || options[0].value,
+                      onChange: e => field.onChange(e),
+                    }}
+                  >
+                    {options.map((option, index) => (
+                      <option
+                        value={option.value}
+                        key={index}
+                        // selected={option.value === values.organisation}
+                      >
+                        {option.label}
+                      </option>
+                    ))}
+                  </Select>
                 );
               }}
             </Field>
             <RedErrorMessage name="organisation" />
-          </Col>
-        </Row>
+          </div>
+        </div>
       )}
-    </Container>
+    </div>
   );
 }

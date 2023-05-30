@@ -1,23 +1,17 @@
 import React from "react";
 import { Field } from "formik";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import {
-  Container,
-  Row,
-  Col,
-  TextInput,
-  Text,
-  Alert,
-} from "@dataesr/react-dsfr";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 /**
  * Transporter receipt Formik fields for company creation
  */
 export default function AccountCompanyAddTransporterReceipt() {
   return (
-    <Container fluid>
-      <Row spacing="mb-2w">
-        <Col n="12">
+    <div className="fr-container">
+      <div className="fr-grid-row fr-mb-2w">
+        <div className="fr-col-12">
           <Alert
             title=""
             description={
@@ -34,57 +28,56 @@ export default function AccountCompanyAddTransporterReceipt() {
                 .
               </>
             }
-            type="info"
+            severity="info"
           />
-        </Col>
-      </Row>
-      <Row>
-        <Col n="12">
-          <Text as="p" bold>
-            Récépissé Transporteur (optionnel)
-          </Text>
-        </Col>
-      </Row>
-      <Row gutters>
-        <Col n="4">
+        </div>
+      </div>
+      <div className="fr-grid-row">
+        <div className="fr-col-12">
+          <p className="fr-text--bold">Récépissé Transporteur (optionnel)</p>
+        </div>
+      </div>
+      <div className="fr-grid-row fr-grid-row--gutters">
+        <div className="fr-col-4">
           <Field name="transporterReceiptNumber">
             {({ field }) => {
               return (
-                <TextInput label="Numéro de récépissé" {...field}></TextInput>
+                <Input
+                  label="Numéro de récépissé"
+                  nativeInputProps={field}
+                ></Input>
               );
             }}
           </Field>
           <RedErrorMessage name="transporterReceiptNumber" />
-        </Col>
-        <Col n="4">
+        </div>
+        <div className="fr-col-4">
           <Field name="transporterReceiptValidity">
             {({ field }) => {
               return (
-                <TextInput
-                  type="date"
+                <Input
                   label="Limite de validité"
-                  {...field}
-                ></TextInput>
+                  nativeInputProps={{ type: "date", ...field }}
+                ></Input>
               );
             }}
           </Field>
           <RedErrorMessage name="transporterReceiptValidity" />
-        </Col>
-        <Col n="2">
+        </div>
+        <div className="fr-col-2">
           <Field name="transporterReceiptDepartment">
             {({ field }) => {
               return (
-                <TextInput
+                <Input
                   label="Département"
-                  placeholder="75"
-                  {...field}
-                ></TextInput>
+                  nativeInputProps={{ placeholder: "75", ...field }}
+                ></Input>
               );
             }}
           </Field>
           <RedErrorMessage name="transporterReceiptDepartment" />
-        </Col>
-      </Row>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 }

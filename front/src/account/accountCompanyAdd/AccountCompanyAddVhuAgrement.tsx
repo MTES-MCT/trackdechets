@@ -1,80 +1,82 @@
 import React from "react";
 import { Field } from "formik";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import { Container, Row, Col, TextInput, Text } from "@dataesr/react-dsfr";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 /**
  * Vhu agrement Formik fields for company creation
  */
 export default function AccountCompanyAddVhuAgrement() {
   return (
-    <Container fluid>
-      <Row>
-        <Col n="12">
-          <Text as="p" bold>
+    <div className="fr-container">
+      <div className="fr-grid-row">
+        <div className="fr-col-12">
+          <p className="fr-text--bold">
             Agrément démolisseur - casse automobile (optionnel)
-          </Text>
-        </Col>
-      </Row>
-      <Row gutters spacing="mb-2w">
-        <Col n="4">
+          </p>
+        </div>
+      </div>
+      <div className="fr-grid-row fr-grid-row--gutters fr-mb-2w">
+        <div className="fr-col-4">
           <Field name="vhuAgrementDemolisseurNumber">
             {({ field }) => {
               return (
-                <TextInput label="Numéro d'agrément" {...field}></TextInput>
+                <Input
+                  label="Numéro d'agrément"
+                  nativeInputProps={field}
+                ></Input>
               );
             }}
           </Field>
           <RedErrorMessage name="vhuAgrementDemolisseurNumber" />
-        </Col>
-        <Col n="4">
+        </div>
+        <div className="fr-col-4">
           <Field name="vhuAgrementDemolisseurDepartment">
             {({ field }) => {
               return (
-                <TextInput
-                  placeholder="75"
+                <Input
                   label="Numéro d'agrément"
-                  {...field}
-                ></TextInput>
+                  nativeInputProps={{ placeholder: "75", ...field }}
+                ></Input>
               );
             }}
           </Field>
           <RedErrorMessage name="vhuAgrementDemolisseurDepartment" />
-        </Col>
-      </Row>
-      <Row>
-        <Col n="12">
-          <Text as="p" bold>
-            Agrément broyeur (optionnel)
-          </Text>
-        </Col>
-      </Row>
-      <Row gutters>
-        <Col n="4">
+        </div>
+      </div>
+      <div className="fr-grid-row">
+        <div className="fr-col-12">
+          <p className="fr-text--bold">Agrément broyeur (optionnel)</p>
+        </div>
+      </div>
+      <div className="fr-grid-row fr-grid-row--gutters">
+        <div className="fr-col-4">
           <Field name="vhuAgrementBroyeurNumber">
             {({ field }) => {
               return (
-                <TextInput label="Numéro d'agrément" {...field}></TextInput>
+                <Input
+                  label="Numéro d'agrément"
+                  nativeInputProps={field}
+                ></Input>
               );
             }}
           </Field>
           <RedErrorMessage name="vhuAgrementBroyeurNumber" />
-        </Col>
-        <Col n="4">
+        </div>
+        <div className="fr-col-4">
           <Field name="vhuAgrementBroyeurDepartment">
             {({ field }) => {
               return (
-                <TextInput
-                  placeholder="75"
+                <Input
                   label="Numéro d'agrément"
-                  {...field}
-                ></TextInput>
+                  nativeInputProps={{ placeholder: "75", ...field }}
+                ></Input>
               );
             }}
           </Field>
           <RedErrorMessage name="vhuAgrementBroyeurDepartment" />
-        </Col>
-      </Row>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 }

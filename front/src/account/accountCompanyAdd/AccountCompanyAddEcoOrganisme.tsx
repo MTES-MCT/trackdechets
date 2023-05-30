@@ -1,70 +1,65 @@
 import React from "react";
 import { Field, FieldArray, useField } from "formik";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import {
-  Container,
-  Row,
-  Col,
-  TextInput,
-  Text,
-  Button,
-} from "@dataesr/react-dsfr";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 export default function AccountCompanyAddEcoOrganisme() {
   const fieldProps = { name: "ecoOrganismeAgreements" };
   const [field] = useField<string[]>(fieldProps);
 
   return (
-    <Container fluid>
-      <Row>
-        <Col n="12">
-          <Text as="p" bold>
-            Agréments éco-organisme
-          </Text>
+    <div className="fr-container">
+      <div className="fr-grid-row">
+        <div className="fr-col-12">
+          <p className="fr-text--bold">Agréments éco-organisme</p>
           <RedErrorMessage name="ecoOrganismeAgreements" />
-        </Col>
-      </Row>
+        </div>
+      </div>
       <FieldArray {...fieldProps}>
         {({ push, remove }) => (
           <>
             {field.value.map((url, index) => (
-              <Row gutters key="index">
-                <Col n="1">
-                  <Text as="span">URL</Text>
-                </Col>
-                <Col n="9">
+              <div className="fr-grid-row fr-grid-row--gutters" key="index">
+                <div className="fr-col-1">
+                  <span className="fr-text">URL</span>
+                </div>
+                <div className="fr-col-8">
                   <Field name={`ecoOrganismeAgreements.${index}`}>
                     {({ field }) => {
                       return (
-                        <TextInput
-                          type="text"
-                          placeholder="https://"
-                          {...field}
-                        ></TextInput>
+                        <Input
+                          label=""
+                          nativeInputProps={{
+                            type: "text",
+                            placeholder: "https://",
+                            ...field,
+                          }}
+                        ></Input>
                       );
                     }}
                   </Field>
-                </Col>
-                <Col n="2">
+                </div>
+                <div className="fr-col-3">
                   <Button
-                    icon="ri-delete-bin-line"
+                    iconId="ri-delete-bin-line"
                     onClick={() => remove(index)}
                   >
                     Supprimer
                   </Button>
-                </Col>
-              </Row>
+                </div>
+              </div>
             ))}
-            <Row spacing="pt-1w">
-              <Col n="12">
-                <Button icon="ri-add-line" onClick={() => push("")}>
+            <div className="fr-grid-row fr-pt-1w">
+              <div className="fr-col-12">
+                <Button iconId="ri-add-line" onClick={() => push("")}>
                   Ajouter un agrément
                 </Button>
-              </Col>
-            </Row>
+              </div>
+            </div>
           </>
         )}
       </FieldArray>
-    </Container>
+    </div>
   );
 }

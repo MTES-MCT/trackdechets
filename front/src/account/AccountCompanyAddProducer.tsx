@@ -13,16 +13,12 @@ import {
 } from "generated/graphql/types";
 import { isSiret, isVat } from "generated/constants/companySearchHelpers";
 
-import {
-  Container,
-  Row,
-  Col,
-  Toggle,
-  Button,
-  TextInput,
-  Checkbox,
-  Alert,
-} from "@dataesr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
+import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
+
 import {
   CREATE_COMPANY,
   CREATE_COMPANY_HOOK_OPTIONS,
@@ -64,6 +60,7 @@ export default function AccountCompanyAddProducer() {
    */
   async function onSubmit(values: Values) {
     const { isAllowed, willManageDasris, ...companyValues } = values;
+
     return createCompany({
       variables: {
         companyInput: {
@@ -75,20 +72,20 @@ export default function AccountCompanyAddProducer() {
   }
 
   return (
-    <Container fluid className={styles.container}>
-      <Row>
-        <Col n="12">
+    <div className={`fr-container-fluid ${styles.container}`}>
+      <div className="fr-grid-row">
+        <div className="fr-col-12">
           <AccountCompanyAddSiret
             showIndividualInfo
             {...{
               onCompanyInfos: companyInfos => setCompanyInfos(companyInfos),
             }}
           />
-        </Col>
-      </Row>
+        </div>
+      </div>
       {companyInfos && !companyInfos.isRegistered && (
-        <Row>
-          <Col n="12">
+        <div className="fr-grid-row">
+          <div className="fr-col-12">
             <Formik<Values>
               initialValues={{
                 siret: companyInfos?.siret ?? "",
@@ -119,16 +116,16 @@ export default function AccountCompanyAddProducer() {
               }}
               onSubmit={onSubmit}
             >
-              {({ isSubmitting, errors, touched }) => (
+              {({ isSubmitting, errors, touched, setFieldValue }) => (
                 <Form className={styles.companyAddForm}>
                   <Field name="givenName">
                     {({ field }) => {
                       return (
-                        <TextInput
+                        <Input
                           label="Nom usuel"
-                          hint="Optionnel"
-                          {...field}
-                        ></TextInput>
+                          hintText="Optionnel"
+                          nativeInputProps={field}
+                        ></Input>
                       );
                     }}
                   </Field>
@@ -145,10 +142,10 @@ export default function AccountCompanyAddProducer() {
                     <Field name="companyName">
                       {({ field }) => {
                         return (
-                          <TextInput
+                          <Input
                             label="Raison sociale"
-                            {...field}
-                          ></TextInput>
+                            nativeInputProps={field}
+                          ></Input>
                         );
                       }}
                     </Field>
@@ -166,7 +163,10 @@ export default function AccountCompanyAddProducer() {
                     <Field name="codeNaf">
                       {({ field }) => {
                         return (
-                          <TextInput label="Code NAF" {...field}></TextInput>
+                          <Input
+                            label="Code NAF"
+                            nativeInputProps={field}
+                          ></Input>
                         );
                       }}
                     </Field>
@@ -184,11 +184,11 @@ export default function AccountCompanyAddProducer() {
                     <Field name="address">
                       {({ field }) => {
                         return (
-                          <TextInput
+                          <Input
                             label="Adresse"
                             disabled={!!companyInfos?.address}
-                            {...field}
-                          ></TextInput>
+                            nativeInputProps={field}
+                          ></Input>
                         );
                       }}
                     </Field>
@@ -197,12 +197,13 @@ export default function AccountCompanyAddProducer() {
                   <Field name="willManageDasris">
                     {({ field }) => {
                       return (
-                        <Toggle
-                          onChange={field.onChange}
-                          id="willManageDasris"
-                          checked={field.value}
+                        <ToggleSwitch
+                          onChange={e => {
+                            setFieldValue(field.name, e);
+                          }}
+                          inputTitle={field.name}
                           label="Mon établissement produit des DASRI. Je dispose d'une convention avec un collecteur et j'accepte que ce collecteur prenne en charge mes DASRI sans ma signature lors de la collecte si je ne suis pas disponible. Ce choix est modifiable utérieurement."
-                          description="(DASRI, Déchets d'Acivité de Soins à Risques Infectieux, par exemple les boîtes et les containers jaunes pour les seringues.)"
+                          helperText="(DASRI, Déchets d'Acivité de Soins à Risques Infectieux, par exemple les boîtes et les containers jaunes pour les seringues.)"
                         />
                       );
                     }}
@@ -212,6 +213,7 @@ export default function AccountCompanyAddProducer() {
 
                   <div className={styles.alertWrapper}>
                     <Alert
+                      severity="info"
                       title="Information"
                       description={
                         <>
@@ -238,20 +240,28 @@ export default function AccountCompanyAddProducer() {
                     {({ field }) => {
                       return (
                         <Checkbox
-                          label="Je certifie disposer du pouvoir pour créer un compte au nom de mon entreprise."
-                          messageType={
-                            errors.isAllowed && touched.isAllowed ? "error" : ""
+                          state={
+                            errors.isAllowed && touched.isAllowed
+                              ? "error"
+                              : "default"
                           }
-                          message={
+                          stateRelatedMessage={
                             errors.isAllowed && touched.isAllowed
                               ? errors.isAllowed
                               : ""
                           }
-                          id="isAllowed"
-                          // @ts-ignore
-                          checked={field.value}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
+                          options={[
+                            {
+                              label:
+                                "Je certifie disposer du pouvoir pour créer un compte au nom de mon entreprise.",
+                              nativeInputProps: {
+                                name: field.name,
+                                checked: field.value,
+                                onChange: field.onChange,
+                                onBlur: field.onBlur,
+                              },
+                            },
+                          ]}
                         />
                       );
                     }}
@@ -259,16 +269,20 @@ export default function AccountCompanyAddProducer() {
 
                   <div className={styles["submit-form"]}>
                     <Button
-                      tertiary
+                      priority="tertiary"
                       disabled={isSubmitting}
                       onClick={() => {
                         history.goBack();
                       }}
+                      nativeButtonProps={{ type: "button" }}
                     >
                       Annuler
                     </Button>
 
-                    <Button submit disabled={isSubmitting}>
+                    <Button
+                      nativeButtonProps={{ type: "submit" }}
+                      disabled={isSubmitting}
+                    >
                       {isSubmitting ? "Création..." : "Créer"}
                     </Button>
                   </div>
@@ -278,9 +292,9 @@ export default function AccountCompanyAddProducer() {
                 </Form>
               )}
             </Formik>
-          </Col>
-        </Row>
+          </div>
+        </div>
       )}
-    </Container>
+    </div>
   );
 }

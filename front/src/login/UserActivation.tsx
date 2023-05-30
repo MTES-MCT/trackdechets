@@ -3,17 +3,8 @@ import * as queryString from "query-string";
 import { useLocation, Redirect } from "react-router-dom";
 import routes from "common/routes";
 
-import {
-  Container,
-  Row,
-  Col,
-  Title,
-  Text,
-  Button,
-  Link,
-  Alert,
-} from "@dataesr/react-dsfr";
-
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import styles from "./Login.module.scss";
 
 function getErrorMessage(errorCode: string) {
@@ -50,13 +41,13 @@ export default function UserActivation() {
   const { errorCode } = location.state || {};
 
   const alert = errorCode ? (
-    <Row spacing="mb-2w">
+    <div className="fr-grid-row fr-mb-2w">
       <Alert
         title="Erreur"
         description={getErrorMessage(errorCode)}
-        type="error"
+        severity="error"
       />
-    </Row>
+    </div>
   ) : null;
 
   return (
@@ -67,13 +58,13 @@ export default function UserActivation() {
         method="post"
         name="userActivation"
       >
-        <Container className={styles.centralContainer} spacing="pt-10w">
+        <div className={`fr-container fr-pt-10w ${styles.centralContainer}`}>
           {alert}
-          <Row justifyContent="center" spacing="mb-2w">
-            <Col spacing="m-auto">
-              <Title as="h1" look="h3" spacing="mb-3w">
+          <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
+            <div className="fr-col fr-m-auto">
+              <h1 className="fr-h3 fr-mb-3w">
                 Activation du compte utilisateur
-              </Title>
+              </h1>
               <p>
                 Dernière étape, pour accéder à Trackdéchets, activez votre
                 compte.
@@ -81,35 +72,35 @@ export default function UserActivation() {
               {queries?.hash && (
                 <input type="hidden" name="hash" value={queries.hash} />
               )}
-            </Col>
-          </Row>
-          <Row justifyContent="right">
-            <Col>
-              <Button size="md" submit={true}>
+            </div>
+          </div>
+          <div className="fr-grid-row fr-grid-row--right">
+            <div className="fr-col">
+              <Button size="medium" nativeButtonProps={{ type: "submit" }}>
                 Activer mon compte
               </Button>
-            </Col>
-          </Row>
+            </div>
+          </div>
           {errorCode && (
-            <Row spacing="pt-3w">
-              <Col>
-                <Text as="p">
+            <div className="fr-grid-row fr-pt-3w">
+              <div className="fr-col">
+                <p className="fr-text--md">
                   Vous n'avez pas encore de compte ?{" "}
-                  <Link href={routes.signup.index} isSimple>
+                  <a href={routes.signup.index} className="fr-link">
                     Inscrivez-vous
-                  </Link>
-                </Text>
-                <Text as="p">
+                  </a>
+                </p>
+                <p className="fr-text--md">
                   Vous n'avez pas reçu d'email d'activation suite à votre
                   inscription ?{" "}
-                  <Link href={routes.resendActivationEmail} isSimple>
+                  <a href={routes.resendActivationEmail} className="fr-link">
                     Renvoyer l'email d'activation
-                  </Link>
-                </Text>
-              </Col>
-            </Row>
+                  </a>
+                </p>
+              </div>
+            </div>
           )}
-        </Container>
+        </div>
       </form>
     </div>
   );
