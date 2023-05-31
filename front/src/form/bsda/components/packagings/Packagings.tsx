@@ -49,6 +49,7 @@ export default function Packagings({
                           Type
                           <select
                             name={fieldName}
+                            disabled={disabled}
                             className="td-select"
                             value={p.type}
                             onChange={event => {
@@ -82,6 +83,7 @@ export default function Packagings({
                               className="td-input"
                               name={`${name}.${idx}.other`}
                               placeholder="..."
+                              disabled={disabled}
                             />
                           </label>
                         )}
@@ -94,6 +96,7 @@ export default function Packagings({
                           name={`${name}.${idx}.quantity`}
                           placeholder="Nombre"
                           min="1"
+                          disabled={disabled}
                           onBlur={() => {
                             // Having an empty quantity is not valid in our gql schema
                             // So we forbid it with this form
@@ -109,7 +112,7 @@ export default function Packagings({
                     </div>
                     <div
                       className="tw-px-2"
-                      onClick={() => arrayHelpers.remove(idx)}
+                      onClick={() => !disabled && arrayHelpers.remove(idx)}
                     >
                       <button type="button">
                         <IconClose />

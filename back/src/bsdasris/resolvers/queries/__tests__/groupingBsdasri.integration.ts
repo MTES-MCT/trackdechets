@@ -51,7 +51,7 @@ describe("Query.Bsdasris", () => {
     const initialDasri = await bsdasriFactory({
       opt: {
         ...initialData(company),
-        ...readyToReceiveData(company),
+        ...readyToReceiveData(),
         ...readyToProcessData,
         status: "PROCESSED",
         transporterTakenOverAt: new Date()
@@ -91,7 +91,7 @@ describe("Query.Bsdasris", () => {
     const toRegroup = await bsdasriFactory({
       opt: {
         ...initialData(company),
-        ...readyToReceiveData(company),
+        ...readyToReceiveData(),
         ...readyToProcessData,
         status: "PROCESSED",
         transporterTakenOverAt
@@ -136,7 +136,7 @@ describe("Query.Bsdasris", () => {
     const toRegroup = await bsdasriFactory({
       opt: {
         ...initialData(company),
-        ...readyToReceiveData(company),
+        ...readyToReceiveData(),
         ...readyToProcessData,
         status: "PROCESSED",
         transporterTakenOverAt

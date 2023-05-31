@@ -3,9 +3,11 @@ import prisma from "../../../prisma";
 import { checkEditionRules } from "../edition";
 import {
   companyFactory,
+  siretify,
   userWithCompanyFactory
 } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
+import { UserRole } from "@prisma/client";
 
 describe("edition rules", () => {
   afterAll(resetDatabase);
@@ -19,6 +21,27 @@ describe("edition rules", () => {
     const checked = await checkEditionRules(bsda, {
       emitter: { company: { name: "ACME" } }
     });
+    expect(checked).toBe(true);
+  });
+
+  it("should be possible to update any fields when bsda status is SIGNED_BY_PRODUCER", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        workerCompanySiret: company.siret,
+        destinationCompanySiret: company.siret,
+        transporterCompanySiret: company.siret,
+        destinationOperationNextDestinationCompanySiret: siretify(2),
+        status: "SIGNED_BY_PRODUCER"
+      }
+    });
+    const checked = await checkEditionRules(
+      bsda,
+      {
+        worker: { company: { name: "ACME 2", siret: siretify(1) } }
+      },
+      user
+    );
     expect(checked).toBe(true);
   });
 

@@ -37,6 +37,7 @@ const prefillTransportMode = state => {
 
   return state;
 };
+
 export default function BsdaStepsList(props: Props) {
   const history = useHistory();
 

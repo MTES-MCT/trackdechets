@@ -103,7 +103,7 @@ export default function MyCompanySelector({
     const allCompanies = data?.me.companies ?? [];
     const filteredCompanies = filter ? filter(allCompanies) : allCompanies;
     return sortCompaniesByName(filteredCompanies);
-  }, [data]);
+  }, [data, filter]);
 
   if (loading) {
     return <div>Chargement...</div>;

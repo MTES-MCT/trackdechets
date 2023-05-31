@@ -5,7 +5,6 @@ import "react-app-polyfill/stable";
 import "./setupSentry";
 
 import * as React from "react";
-import * as ReactDOM from "react-dom";
 import { createRoot, hydrateRoot } from "react-dom/client";
 
 import App from "./App";

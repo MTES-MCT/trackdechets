@@ -677,7 +677,7 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
       .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
     wasteDetailsPackagingInfos: yup
       .array()
-      .of(packagingInfoFn(isDraft) as any)
+      .of(packagingInfoFn({ isDraft }) as any)
       .test(
         "is-valid-packaging-infos",
         "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",

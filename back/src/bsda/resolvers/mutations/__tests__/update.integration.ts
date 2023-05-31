@@ -310,6 +310,50 @@ describe("Mutation.updateBsda", () => {
     );
   });
 
+  it("should not allow the transporter to update the worker if already signed by the producer", async () => {
+    const { company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company: company2, user: user2 } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        workerCompanySiret: company2.siret,
+        destinationCompanySiret: company2.siret,
+        transporterCompanySiret: company2.siret
+      }
+    });
+
+    const { mutate } = makeClient(user2);
+
+    const input = {
+      worker: {
+        company: {
+          siret: company.siret
+        }
+      }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : workerCompanySiret"
+      })
+    ]);
+  });
+
   it("should not update transporter if they signed already", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);

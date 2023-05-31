@@ -1,15 +1,24 @@
-import React, { lazy } from "react";
+import React, { lazy, useContext } from "react";
+import { useParams } from "react-router-dom";
 import { Field, useFormikContext } from "formik";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import Packagings from "form/bsda/components/packagings/Packagings";
+import { getBsdaEditionDisabledSteps } from "form/bsda/utils/getBsdaEditionDisabledSteps";
 import Tooltip from "common/components/Tooltip";
 import { Bsda, BsdaConsistence, BsdaType } from "generated/graphql/types";
 import { FieldSwitch } from "common/components";
 import { BSDA_WASTES } from "generated/constants";
+import { BsdaContext } from "form/bsda/FormContainer";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export function WasteInfo({ disabled }) {
+  const bsdaContext = useContext(BsdaContext);
   const { values } = useFormikContext<Bsda>();
+  const { siret } = useParams<{ siret: string }>();
+  const { disabledAfterEmission } = getBsdaEditionDisabledSteps(
+    bsdaContext!,
+    siret
+  );
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
 
   if (isEntreposageProvisoire) {
@@ -23,7 +32,7 @@ export function WasteInfo({ disabled }) {
 
   return (
     <>
-      {disabled && (
+      {(disabled || disabledAfterEmission) && (
         <div className="notification notification--error">
           Les champs ci-dessous ont été scellés via signature et ne sont plus
           modifiables.
@@ -33,7 +42,12 @@ export function WasteInfo({ disabled }) {
       <h4 className="form__section-heading">Description du déchet</h4>
       <div className="form__row">
         <label>Code déchet</label>
-        <Field as="select" name="waste.code" className="td-select">
+        <Field
+          as="select"
+          name="waste.code"
+          className="td-select"
+          disabled={disabledAfterEmission}
+        >
           <option />
           {BSDA_WASTES.map(item => (
             <option value={item.code} key={item.code}>
@@ -120,6 +134,7 @@ export function WasteInfoWorker({ disabled }) {
           type="checkbox"
           component={FieldSwitch}
           name="waste.pop"
+          disabled={disabled}
           label={
             <span>
               Le déchet contient des{" "}
