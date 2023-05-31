@@ -6,7 +6,6 @@ import routes from "common/routes";
 import { GET_ME } from "../dashboard/Dashboard";
 import { NotificationError } from "../common/components/Error";
 import RedErrorMessage from "../common/components/RedErrorMessage";
-import Tooltip from "common/components/Tooltip";
 import CompanyType from "../login/CompanyType";
 import AccountCompanyAddTransporterReceipt from "./accountCompanyAdd/AccountCompanyAddTransporterReceipt";
 import AccountCompanyAddTraderReceipt from "./accountCompanyAdd/AccountCompanyAddTraderReceipt";
