@@ -33,10 +33,11 @@ const UPDATE_PHONE = gql`
 const yupSchema = object().shape({
   phone: string()
     .trim()
+    .ensure()
     .test(
       "is-valid-phone",
       "Merci de renseigner un numéro de téléphone valide",
-      validatePhoneNumber
+      value => !value || validatePhoneNumber(value)
     ),
 });
 

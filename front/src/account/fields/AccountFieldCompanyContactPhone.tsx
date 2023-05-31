@@ -41,7 +41,7 @@ const yupSchema = object().shape({
     .test(
       "is-valid-phone",
       "Merci de renseigner un numéro de téléphone valide",
-      validatePhoneNumber
+      value => !value || validatePhoneNumber(value)
     ),
 });
 
