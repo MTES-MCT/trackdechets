@@ -6,6 +6,7 @@ import routes from "common/routes";
 import { GET_ME } from "../dashboard/Dashboard";
 import { NotificationError } from "../common/components/Error";
 import RedErrorMessage from "../common/components/RedErrorMessage";
+import Tooltip from "common/components/Tooltip";
 import CompanyType from "../login/CompanyType";
 import AccountCompanyAddTransporterReceipt from "./accountCompanyAdd/AccountCompanyAddTransporterReceipt";
 import AccountCompanyAddTraderReceipt from "./accountCompanyAdd/AccountCompanyAddTraderReceipt";
@@ -799,7 +800,7 @@ export default function AccountCompanyAdd() {
                           return (
                             <Input
                               label="Identifiant GEREP"
-                              hintText="Optionnel"
+                              hintText="Toute installation de traitement classée et reconnue par l’état (ICPE) et toute entreprise produisant plus de 2 tonnes de déchets et/ou 2000 tonnes de déchets non dangereux est tenue de réaliser annuellement une déclaration d’émissions polluantes et de déchets en ligne. Elle peut le faire via l’application ministérielle web GEREP."
                               nativeInputProps={field}
                             ></Input>
                           );

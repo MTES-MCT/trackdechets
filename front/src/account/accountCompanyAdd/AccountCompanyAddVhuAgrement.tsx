@@ -17,26 +17,37 @@ export default function AccountCompanyAddVhuAgrement() {
         </div>
       </div>
       <div className="fr-grid-row fr-grid-row--gutters fr-mb-2w">
-        <div className="fr-col-4">
+        <div className="fr-col-6">
           <Field name="vhuAgrementDemolisseurNumber">
             {({ field }) => {
               return (
                 <Input
                   label="Numéro d'agrément"
-                  nativeInputProps={field}
+                  nativeInputProps={{
+                    name: field.name,
+                    checked: field.value,
+                    onChange: field.onChange,
+                    onBlur: field.onBlur,
+                  }}
                 ></Input>
               );
             }}
           </Field>
           <RedErrorMessage name="vhuAgrementDemolisseurNumber" />
         </div>
-        <div className="fr-col-4">
+        <div className="fr-col-3">
           <Field name="vhuAgrementDemolisseurDepartment">
             {({ field }) => {
               return (
                 <Input
-                  label="Numéro d'agrément"
-                  nativeInputProps={{ placeholder: "75", ...field }}
+                  label="Département"
+                  nativeInputProps={{
+                    placeholder: "75",
+                    name: field.name,
+                    checked: field.value,
+                    onChange: field.onChange,
+                    onBlur: field.onBlur,
+                  }}
                 ></Input>
               );
             }}
@@ -50,26 +61,37 @@ export default function AccountCompanyAddVhuAgrement() {
         </div>
       </div>
       <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-4">
+        <div className="fr-col-6">
           <Field name="vhuAgrementBroyeurNumber">
             {({ field }) => {
               return (
                 <Input
                   label="Numéro d'agrément"
-                  nativeInputProps={field}
+                  nativeInputProps={{
+                    name: field.name,
+                    checked: field.value,
+                    onChange: field.onChange,
+                    onBlur: field.onBlur,
+                  }}
                 ></Input>
               );
             }}
           </Field>
           <RedErrorMessage name="vhuAgrementBroyeurNumber" />
         </div>
-        <div className="fr-col-4">
+        <div className="fr-col-3">
           <Field name="vhuAgrementBroyeurDepartment">
             {({ field }) => {
               return (
                 <Input
-                  label="Numéro d'agrément"
-                  nativeInputProps={{ placeholder: "75", ...field }}
+                  label="Département"
+                  nativeInputProps={{
+                    placeholder: "75",
+                    name: field.name,
+                    checked: field.value,
+                    onChange: field.onChange,
+                    onBlur: field.onBlur,
+                  }}
                 ></Input>
               );
             }}
