@@ -21,7 +21,12 @@ export default function AccountCompanyAddTraderReceipt() {
               return (
                 <Input
                   label="Numéro de récépissé"
-                  nativeInputProps={field}
+                  nativeInputProps={{
+                    name: field.name,
+                    checked: field.value,
+                    onChange: field.onChange,
+                    onBlur: field.onBlur,
+                  }}
                 ></Input>
               );
             }}
@@ -34,7 +39,13 @@ export default function AccountCompanyAddTraderReceipt() {
               return (
                 <Input
                   label="Limite de validité"
-                  nativeInputProps={{ type: "date", ...field }}
+                  nativeInputProps={{
+                    type: "date",
+                    name: field.name,
+                    checked: field.value,
+                    onChange: field.onChange,
+                    onBlur: field.onBlur,
+                  }}
                 ></Input>
               );
             }}
@@ -47,7 +58,13 @@ export default function AccountCompanyAddTraderReceipt() {
               return (
                 <Input
                   label="Département"
-                  nativeInputProps={{ placeholder: "75", ...field }}
+                  nativeInputProps={{
+                    placeholder: "75",
+                    name: field.name,
+                    checked: field.value,
+                    onChange: field.onChange,
+                    onBlur: field.onBlur,
+                  }}
                 ></Input>
               );
             }}

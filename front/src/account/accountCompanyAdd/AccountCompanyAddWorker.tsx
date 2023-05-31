@@ -2,7 +2,7 @@ import React from "react";
 import { Field, useFormikContext } from "formik";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Tooltip from "common/components/Tooltip";
 
@@ -73,7 +73,12 @@ export default function AccountCompanyAddBrokerReceipt() {
                 return (
                   <Input
                     label="N° certification"
-                    nativeInputProps={field}
+                    nativeInputProps={{
+                      name: field.name,
+                      checked: field.value,
+                      onChange: field.onChange,
+                      onBlur: field.onBlur,
+                    }}
                   ></Input>
                 );
               }}
@@ -86,7 +91,14 @@ export default function AccountCompanyAddBrokerReceipt() {
                 return (
                   <Input
                     label="Date de validité"
-                    nativeInputProps={{ type: "date", ...field }}
+                    nativeInputProps={{
+                      type: "date",
+                      name: field.name,
+                      checked: field.value,
+                      onChange: field.onChange,
+                      onBlur: field.onBlur,
+                      max: "2999/12/31",
+                    }}
                   ></Input>
                 );
               }}
@@ -96,36 +108,30 @@ export default function AccountCompanyAddBrokerReceipt() {
           <div className="fr-col-4">
             <Field name="organisation">
               {({ field }) => {
-                const options = [
-                  {
-                    value: "AFNOR Certification",
-                    label: "AFNOR Certification",
-                  },
-                  {
-                    value: "QUALIBAT",
-                    label: "QUALIBAT",
-                  },
-                ];
-
                 return (
                   <Select
-                    label="Département"
+                    label="Organisme"
+                    placeholder="Organisme"
                     nativeSelectProps={{
                       name: field.name,
-                      value: values.organisation || options[0].value,
+                      value: values.organisation,
                       onChange: e => field.onChange(e),
                     }}
-                  >
-                    {options.map((option, index) => (
-                      <option
-                        value={option.value}
-                        key={index}
-                        // selected={option.value === values.organisation}
-                      >
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
+                    options={[
+                      {
+                        value: "AFNOR Certification",
+                        label: "AFNOR Certification",
+                      },
+                      {
+                        value: "QUALIBAT",
+                        label: "QUALIBAT",
+                      },
+                      {
+                        value: "GLOBAL CERTIFICATION",
+                        label: "GLOBAL CERTIFICATION",
+                      },
+                    ]}
+                  />
                 );
               }}
             </Field>
