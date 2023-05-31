@@ -42,10 +42,9 @@ const localizedStrings = {
   en: {
     translateButton: "Traduire en français 🇫🇷",
     vatNumber: {
-      label: "Intra-community VAT number or identification number",
+      label: "Intra-community VAT number",
       hint: "Example: BE1234567890",
-      error:
-        "Intra-community VAT number or identification number must be valid",
+      error: "Intra-community VAT number must be valid",
     },
     companyName: "Company name",
     address: "Address",
@@ -86,10 +85,9 @@ const localizedStrings = {
   fr: {
     translateButton: "Translate in English 🇬🇧",
     vatNumber: {
-      label: "N° de TVA intracommunautaire ou N° d'identification",
+      label: "N° de TVA intracommunautaire",
       hint: "Exemple : BE1234567890",
-      error:
-        "Le SIRET ou le numéro de TVA intracommunautaire doit être valide.",
+      error: "Le N° de TVA intracommunautaire doit être valide.",
     },
     companyName: "Nom de l'entreprise",
     address: "Adresse",
