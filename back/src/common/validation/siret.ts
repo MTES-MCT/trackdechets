@@ -19,7 +19,12 @@ const { VERIFY_COMPANY } = process.env;
 export const siretSchema = z
   .string({ required_error: "le N° SIRET est obligatoire" })
   .refine(
-    value => isSiret(value),
+    value => {
+      if (!value) {
+        return true;
+      }
+      return isSiret(value);
+    },
     val => ({ message: `${val} n'est pas un numéro de SIRET valide` })
   );
 
