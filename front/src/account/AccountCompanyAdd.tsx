@@ -798,7 +798,7 @@ export default function AccountCompanyAdd() {
                         {({ field }) => {
                           return (
                             <Input
-                              label="Identifiant GEREP"
+                              label="Identifiant GEREP (optionnel)"
                               hintText="Toute installation de traitement classée et reconnue par l’état (ICPE) et toute entreprise produisant plus de 2 tonnes de déchets et/ou 2000 tonnes de déchets non dangereux est tenue de réaliser annuellement une déclaration d’émissions polluantes et de déchets en ligne. Elle peut le faire via l’application ministérielle web GEREP."
                               nativeInputProps={field}
                             ></Input>
