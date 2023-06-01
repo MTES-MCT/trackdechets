@@ -1,22 +1,18 @@
-import { Bsdasri, Prisma, BsdasriStatus } from "@prisma/client";
+import { Bsdasri, BsdasriStatus } from "@prisma/client";
 import { BsdasriEvent } from "./types";
 import machine from "./machine";
 import { InvalidTransition } from "../../forms/errors";
-import { validateBsdasri, BsdasriValidationContext } from "../validation";
 
 /**
- * Transition a form from initial state (ex: SENT) to next state (ex: RECEIVED)
+ * Transition a BSDASRI from initial state (ex: SENT) to next state (ex: RECEIVED)
  * Allowed transitions are defined as a state machine using xstate
  */
-export default async function dasriTransition(
-  bsdasri: Bsdasri,
-  event: BsdasriEvent,
-  validationContext: BsdasriValidationContext,
-  extraFields?: Partial<Bsdasri>
-) {
+export async function getNextStatus(bsdasri: Bsdasri, event: BsdasriEvent) {
+  if (bsdasri.isDraft) {
+    throw new InvalidTransition();
+  }
   const currentStatus = bsdasri.status;
 
-  await validateBsdasri(bsdasri as any, validationContext);
   // Use state machine to calculate new status
   const nextState = machine.transition(currentStatus, event, bsdasri);
 
@@ -27,15 +23,5 @@ export default async function dasriTransition(
 
   const nextStatus = nextState.value as BsdasriStatus;
 
-  const dasriUpdateInput = {
-    status: nextStatus,
-    ...event.dasriUpdateInput,
-    ...extraFields
-  } as Prisma.BsdasriUpdateInput;
-
-  //  dasri update payload
-  return {
-    where: { id: bsdasri.id },
-    updateData: dasriUpdateInput
-  };
+  return nextStatus;
 }

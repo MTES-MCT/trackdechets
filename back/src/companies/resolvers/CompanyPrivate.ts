@@ -1,5 +1,8 @@
 import prisma from "../../prisma";
-import { CompanyPrivateResolvers } from "../../generated/graphql/types";
+import {
+  CompanyPrivateResolvers,
+  UserRole
+} from "../../generated/graphql/types";
 import { getCompanyUsers, getUserRole } from "../database";
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
@@ -10,7 +13,9 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
       return [
         {
           ...context.user!,
-          role: userRole,
+          // type casting is necessary here as long as we
+          // do not expose READER and DRIVER role in the API
+          role: userRole as UserRole,
           isPendingInvitation: false
         }
       ];
@@ -18,9 +23,12 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
 
     return getCompanyUsers(parent.orgId, context.dataloaders);
   },
-  userRole: (parent, _, context) => {
+  userRole: async (parent, _, context) => {
     const userId = context.user!.id;
-    return getUserRole(userId, parent.orgId);
+    const role = await getUserRole(userId, parent.orgId);
+    // type casting is necessary here as long as we
+    // do not expose READER and DRIVER role in the API
+    return role as UserRole;
   },
   transporterReceipt: parent => {
     return prisma.company

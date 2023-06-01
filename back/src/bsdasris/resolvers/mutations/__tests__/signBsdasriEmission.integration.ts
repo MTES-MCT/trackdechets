@@ -45,9 +45,11 @@ describe("Mutation.signBsdasri emission", () => {
 
   it("a draft dasri should not be signed", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(company),
+        ...readyToPublishData(destination),
         status: BsdasriStatus.INITIAL,
         isDraft: true
       }
