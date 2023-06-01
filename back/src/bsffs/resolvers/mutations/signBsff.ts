@@ -98,7 +98,7 @@ const signatures: Record<
 /**
  * Sign the emission of the BSFF
  * @param user the user who is performing the signature
- * @param bsdasri the BSFF under signature
+ * @param bsff the BSFF under signature
  * @param input the signature info
  * @returns the signed BSFF
  *
@@ -125,7 +125,7 @@ async function signEmission(
 /**
  * Sign the transport of the BSFF
  * @param user the user who is performing the signature
- * @param bsdasri the BSFF under signature
+ * @param bsff the BSFF under signature
  * @param input the signature info
  * @returns the signed BSFF
  *
@@ -152,7 +152,7 @@ async function signTransport(
 /**
  * Sign the reception of the BSFF
  * @param user the user who is performing the signature
- * @param bsdasri the BSFF under signature
+ * @param bsff the BSFF under signature
  * @param input the signature info
  * @returns the signed BSFF
  *
@@ -179,7 +179,7 @@ async function signReception(
 /**
  * Sign the acceptation of the BSFF
  * @param user the user who is performing the signature
- * @param bsdasri the BSFF under signature
+ * @param bsff the BSFF under signature
  * @param input the signature info including an optional `packagingId` to
  * perform the signature on only one packaging
  * @returns the signed BSFF
@@ -289,7 +289,7 @@ async function signAcceptation(
 /**
  * Sign the operation of the BSFF
  * @param user the user who is performing the signature
- * @param bsdasri the BSFF under signature
+ * @param bsff the BSFF under signature
  * @param input the signature info including an optional `packagingId` to
  * perform the signature on only one packaging
  * @returns the signed BSFF

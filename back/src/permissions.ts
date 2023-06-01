@@ -204,7 +204,7 @@ export async function checkCanSignFor<SignatureType>(
       user,
       orgIds,
       signatureTypeToPermission[signatureType],
-      "Vous ne pouvez pas signer ce BSDA"
+      "Vous ne pouvez pas signer ce bordereau"
     );
     return hasPerm;
   } catch (forbidenError) {
