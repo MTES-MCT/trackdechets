@@ -48,16 +48,16 @@ export const textConfig: {
 
 export type ReceivedInfoValues = {
   receivedBy: string;
-  receivedAt: string;
-  signedAt: string;
+  receivedAt: Date;
+  signedAt: Date;
   quantityReceived: number | null;
   wasteAcceptationStatus: WasteAcceptationStatus | null;
   wasteRefusalReason: string;
   quantityType?: QuantityType;
 };
 
-const validationSchema = (form: TdForm) =>
-  yup.object({
+const validationSchema = (form: TdForm, today: Date) => {
+  return yup.object({
     wasteAcceptationStatus: yup.string().nullable(),
     quantityReceived: yup
       .number()
@@ -67,12 +67,13 @@ const validationSchema = (form: TdForm) =>
       .date()
       .nullable()
       .required("La date de présentation est un champ requis")
-      // we only care about the day, not the exact time
-      .transform(value => startOfDay(parseDate(value)))
       .min(
-        startOfDay(parseDate(form.emittedAt!)),
-        "La date de réception du déchet ne peut pas être antérieure à sa date d'émission."
-      ),
+        startOfDay(parseDate(form.takenOverAt!)),
+        "La date de réception du déchet ne peut pas être antérieure à sa date d'enlèvement."
+      )
+      .max(today, "La date de réception du déchet ne peut être dans le futur")
+      // we only care about the day, not the exact time
+      .transform(value => startOfDay(parseDate(value))),
     receivedBy: yup
       .string()
       .nullable()
@@ -80,8 +81,25 @@ const validationSchema = (form: TdForm) =>
     signedAt: yup
       .date()
       .nullable()
-      .transform(value => startOfDay(parseDate(value))),
+      .required("La date d'acceptation est un champ requis")
+      .when("receivedAt", receivedAt =>
+        receivedAt
+          ? yup
+              .date()
+              .min(
+                startOfDay(parseDate(receivedAt)),
+                "La date d'acceptation ne peut pas être antérieure à la date de réception."
+              )
+          : yup.date().required("La date d'acceptation est un champ requis")
+      )
+      .max(today, "La date d'acceptation ne peut être dans le futur")
+      // we only care about the day, not the exact time
+      .transform(value => {
+        console.log("value", value);
+        startOfDay(value);
+      }),
   });
+};
 
 const MARK_AS_RECEIVED = gql`
   mutation MarkAsReceived($id: ID!, $receivedInfo: ReceivedFormInput!) {
@@ -142,13 +160,15 @@ export default function ReceivedInfo({
     },
   });
 
+  const TODAY = new Date();
+
   return (
     <>
       <Formik<ReceivedInfoValues>
         initialValues={{
           receivedBy: "",
-          receivedAt: new Date().toISOString(),
-          signedAt: new Date().toISOString(),
+          receivedAt: TODAY,
+          signedAt: TODAY,
           quantityReceived: null,
           wasteAcceptationStatus: null,
           wasteRefusalReason: "",
@@ -164,6 +184,8 @@ export default function ReceivedInfo({
                   id: form.id,
                   tempStoredInfos: {
                     ...values,
+                    receivedAt: values.receivedAt.toISOString(),
+                    signedAt: values.signedAt.toISOString(),
                     quantityType: values.quantityType ?? QuantityType.Real,
                     quantityReceived: values.quantityReceived ?? 0,
                     wasteAcceptationStatus:
@@ -175,11 +197,15 @@ export default function ReceivedInfo({
             : markAsReceived({
                 variables: {
                   id: form.id,
-                  receivedInfo: values,
+                  receivedInfo: {
+                    ...values,
+                    receivedAt: values.receivedAt.toISOString(),
+                    signedAt: values.signedAt.toISOString(),
+                  },
                 },
               })
         }
-        validationSchema={() => validationSchema(form)}
+        validationSchema={() => validationSchema(form, TODAY)}
       >
         {({ values, isSubmitting, handleReset, setFieldValue }) => (
           <Form>
@@ -188,7 +214,8 @@ export default function ReceivedInfo({
                 Date de présentation
                 <Field
                   component={DateInput}
-                  minDate={parseDate(form.takenOverAt!)}
+                  minDate={form.takenOverAt!}
+                  maxDate={TODAY}
                   name="receivedAt"
                   className="td-input"
                 />
@@ -304,10 +331,14 @@ export default function ReceivedInfo({
             </div>
             <div className="form__row">
               <label>
-                Date d'acceptation
+                {values.wasteAcceptationStatus ===
+                WasteAcceptationStatus.Refused
+                  ? "Date de refus"
+                  : "Date d'acceptation"}
                 <Field
                   component={DateInput}
-                  minDate={parseDate(values.receivedAt)}
+                  minDate={values.receivedAt}
+                  maxDate={TODAY}
                   name="signedAt"
                   className="td-input"
                 />

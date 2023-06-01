@@ -166,3 +166,9 @@ export const debounce = <F extends (...args: any) => any>(
 
   return debounced as (...args: Parameters<F>) => ReturnType<F>;
 };
+
+export const subtractMonths = (date, months) => {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() - months);
+  return d;
+};
