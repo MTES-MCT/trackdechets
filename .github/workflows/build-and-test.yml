@@ -82,17 +82,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: "16.16.x"
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
-          key: ${{ runner.os }}-website-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-website-
+          node-version: '16'
+          cache: 'yarn'
+          cache-dependency-path: doc/yarn.lock
 
       - run: yarn install --frozen-lockfile
       - name: Test Build
