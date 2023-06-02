@@ -17,10 +17,18 @@ import { SignBsff } from "./SignBsff";
 import { GET_BSDS } from "common/queries";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
+import { subtractMonths } from "common/helper";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
-    takenOverAt: yup.date().required("La date de prise en charge est requise"),
+    takenOverAt: yup
+      .date()
+      .required("La date de prise en charge est requise")
+      .max(today, "La date de prise en charge ne peut être dans le futur")
+      .min(
+        subtractMonths(today, 2),
+        "La date de prise en charge ne peut être antérieure à 2 mois"
+      ),
     signatureAuthor: yup
       .string()
       .ensure()
@@ -89,14 +97,16 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
           </p>
           <TransporterReceipt transporter={bsff.transporter!} />
           <div className="form__row">
-            <label className="tw-font-semibold">
+            <label>
               Date de prise en charge
               <div className="td-date-wrapper">
                 <Field
                   name="takenOverAt"
                   component={DateInput}
                   className="td-input"
+                  minDate={subtractMonths(TODAY, 2)}
                   maxDate={TODAY}
+                  required
                 />
               </div>
             </label>

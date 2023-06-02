@@ -15,12 +15,18 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
 import { GET_BSDS } from "common/queries";
+import { subtractMonths } from "common/helper";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
     receptionDate: yup
       .date()
-      .required("La date de prise en charge est requise"),
+      .required("La date de réception est requise")
+      .max(today, "La date de réception ne peut être dans le futur")
+      .min(
+        subtractMonths(today, 2),
+        "La date de réception ne peut être antérieure à 2 mois"
+      ),
     signatureAuthor: yup
       .string()
       .ensure()
@@ -51,8 +57,7 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
   return (
     <Formik
       initialValues={{
-        receptionDate:
-          bsff.destination?.reception?.date ?? new Date().toISOString(),
+        receptionDate: bsff.destination?.reception?.date ?? TODAY.toISOString(),
         signatureAuthor: "",
       }}
       validationSchema={validationSchema}
@@ -75,7 +80,7 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
             input: {
               type: BsffSignatureType.Reception,
               author: values.signatureAuthor,
-              date: new Date().toISOString(),
+              date: values.receptionDate,
             },
           },
         });
@@ -89,14 +94,16 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
           déclare réceptionner le déchet.
         </p>
         <div className="form__row">
-          <label className="tw-font-semibold">
+          <label>
             Date de réception
             <div className="td-date-wrapper">
               <Field
                 className="td-input"
                 name="receptionDate"
                 component={DateInput}
+                minDate={subtractMonths(TODAY, 2)}
                 maxDate={TODAY}
+                required
               />
             </div>
           </label>
