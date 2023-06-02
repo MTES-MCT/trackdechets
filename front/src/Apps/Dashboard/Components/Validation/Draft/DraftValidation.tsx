@@ -208,7 +208,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
               />
               <Link
                 to={generatePath(routes.dashboardv2.bsdas.edit, {
-                  currentSiret,
+                  siret: currentSiret,
                   id: bsd.id,
                 })}
                 className="btn btn--primary"
@@ -270,8 +270,8 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 apolloError={errorBsvhu}
               />
               <Link
-                to={generatePath(routes.dashboard.bsvhus.edit, {
-                  currentSiret,
+                to={generatePath(routes.dashboardv2.bsvhus.edit, {
+                  siret: currentSiret,
                   id: bsd.id,
                 })}
                 className="btn btn--primary"

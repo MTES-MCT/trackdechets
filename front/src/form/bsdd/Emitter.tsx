@@ -9,7 +9,7 @@ import { getInitialEmitterWorkSite } from "form/bsdd/utils/initial-state";
 import "./Emitter.scss";
 import MyCompanySelector from "form/common/components/company/MyCompanySelector";
 import { emitterTypeLabels } from "dashboard/constants";
-import { isOmi } from "generated/constants/companySearchHelpers";
+import { isForeignVat, isOmi } from "generated/constants/companySearchHelpers";
 import { RedErrorMessage } from "common/components";
 import Tooltip from "common/components/Tooltip";
 
@@ -311,10 +311,12 @@ export default function Emitter({ disabled }) {
                   CompanyType.Wasteprocessor,
                   CompanyType.WasteCenter,
                 ];
-                return companies.filter(company =>
-                  company.companyTypes.some(type =>
-                    authorizedTypes.includes(type)
-                  )
+                return companies.filter(
+                  company =>
+                    !isForeignVat(company.orgId) &&
+                    company.companyTypes.some(type =>
+                      authorizedTypes.includes(type)
+                    )
                 );
               }
               return companies;

@@ -8,12 +8,10 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import { constantCase } from "constant-case";
 import { Field, useField, useFormikContext } from "formik";
 import {
-  countries as vatCountries,
   isFRVat,
   isVat,
   isForeignVat,
 } from "generated/constants/companySearchHelpers";
-import { checkVAT } from "jsvat";
 import React, { useMemo, useRef, useState } from "react";
 
 import { debounce } from "common/helper";
@@ -167,6 +165,12 @@ export default function CompanySelector({
       clue: orgId!,
     },
     skip: !orgId,
+    onCompleted(data) {
+      setFieldValue(
+        `${field.name}.country`,
+        data.companyPrivateInfos.codePaysEtrangerEtablissement
+      );
+    },
   });
 
   function isUnknownCompanyName(companyName?: string): boolean {
@@ -210,15 +214,6 @@ export default function CompanySelector({
       mail: company.contactEmail ?? "",
       country: company.codePaysEtrangerEtablissement,
     };
-
-    // Automatiquement écraser le champ country
-    if (company.vatNumber) {
-      const vatCountryCode = checkVAT(company.vatNumber, vatCountries)?.country
-        ?.isoCode.short;
-      if (vatCountryCode) {
-        fields.country = vatCountryCode;
-      }
-    }
 
     Object.keys(fields).forEach(key => {
       setFieldValue(`${field.name}.${key}`, fields[key]);

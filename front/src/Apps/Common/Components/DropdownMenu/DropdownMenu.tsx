@@ -51,7 +51,10 @@ const DropdownMenu = ({
                     <button
                       type="button"
                       className="fr-btn fr-btn--tertiary-no-outline"
-                      onClick={link.handleClick}
+                      onClick={e => {
+                        setIsOpen(false);
+                        !!link.handleClick && link.handleClick(e);
+                      }}
                     >
                       {link.icon && (
                         <span className="dropdown-menu__content__icon">

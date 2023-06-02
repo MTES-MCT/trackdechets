@@ -195,14 +195,12 @@ export async function checkCanUpdate(
     (form.emitterType === EmitterType.APPENDIX1 && form.status === "SENT")
   ) {
     authorizedOrgIds = formContributors(fullForm);
-  } else if (
-    form.emitterType === EmitterType.APPENDIX1_PRODUCER &&
-    ["SIGNED_BY_PRODUCER"].includes(form.status)
-  ) {
-    authorizedOrgIds = [form.transporterCompanySiret].filter(Boolean);
   } else if (form.status === "SIGNED_BY_PRODUCER") {
     const updatedFields = await getUpdatedFields(form, input);
-    if (updatedFields.every(f => editionRules[f] === "TRANSPORT")) {
+    if (form.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+      // Le transporteur peut modifier les données de l'annexe 1 jusqu'à sa signature
+      authorizedOrgIds = [form.transporterCompanySiret].filter(Boolean);
+    } else if (updatedFields.every(f => editionRules[f] === "TRANSPORT")) {
       // Les infos de transport peuvent être modifiées par tous les acteurs
       // du BSDD tant que le déchet n'a pas été enlevé
       authorizedOrgIds = formContributors(fullForm);
@@ -316,7 +314,7 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
   return checkUserPermissions(
     user,
     authorizedOrgIds,
-    Permission.BsdCanSign,
+    Permission.BsdCanSignTransport,
     "Vous n'êtes pas autorisé à signer ce bordereau pour le transport"
   );
 }

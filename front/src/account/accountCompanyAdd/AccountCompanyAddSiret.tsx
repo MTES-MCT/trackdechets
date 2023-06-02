@@ -223,9 +223,21 @@ export default function AccountCompanyAddSiret({
                   };
                 }
               } else {
-                if (!isValidSiret && !/^[a-zA-Z]{2}/.test(values.siret)) {
+                if (!isValidSiret && /^[0-9]{14}/.test(values.siret)) {
                   return {
-                    siret: "Vous devez entrer un SIRET de 14 chiffres",
+                    siret: "Aucun établissement trouvé avec ce SIRET",
+                  };
+                } else if (
+                  !isValidSiret &&
+                  !/^[a-zA-Z]{2}/.test(values.siret)
+                ) {
+                  return {
+                    siret: "Vous devez entrer un SIRET composé de 14 chiffres",
+                  };
+                } else if (!isValidSiret && /^[0-9]{9}/.test(values.siret)) {
+                  return {
+                    siret:
+                      "Vous devez entrer un SIRET composé de 14 chiffres, ne pas confondre avec le SIREN",
                   };
                 } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
                   return {

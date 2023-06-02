@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Field, useFormikContext } from "formik";
 import {
+  EmitterType,
   Form,
   FormStatus,
   QuantityType,
@@ -121,7 +122,7 @@ export function FormWasteTransportSummary({
                   ? "(estimé)"
                   : ""}
               </DataListDescription>{" "}
-              {form.emitter?.type === "APPENDIX1_PRODUCER" && (
+              {form.emitter?.type === EmitterType.Appendix1Producer && (
                 <button
                   type="button"
                   onClick={() => addField("quantity")}
@@ -149,7 +150,7 @@ export function FormWasteTransportSummary({
                   .join(", ")}
               </DataListDescription>
 
-              {form.emitter?.type === "APPENDIX1_PRODUCER" && (
+              {form.emitter?.type === EmitterType.Appendix1Producer && (
                 <button
                   type="button"
                   onClick={() => addField("packagingInfos")}
@@ -173,7 +174,7 @@ export function FormWasteTransportSummary({
             </DataListDescription>
           )}
         </DataListItem>
-        {form.emitter?.type === "APPENDIX1_PRODUCER" &&
+        {form.emitter?.type === EmitterType.Appendix1Producer &&
           form.wasteDetails?.code &&
           SAMPLE_NUMBER_WASTE_CODES.includes(form.wasteDetails.code) && (
             <DataListItem>

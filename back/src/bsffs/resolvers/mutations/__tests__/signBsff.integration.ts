@@ -183,7 +183,7 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: "Vous ne pouvez pas signer ce BSFF"
+          message: "Vous ne pouvez pas signer ce bordereau"
         })
       ]);
     });
