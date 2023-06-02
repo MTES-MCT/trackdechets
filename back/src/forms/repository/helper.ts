@@ -7,7 +7,7 @@ export function sumPackagingInfos(groupOfPackagingInfos: PackagingInfo[][]) {
   );
   if (types.size > 1 && (types.has("CITERNE") || types.has("BENNE"))) {
     throw new UserInputError(
-      "Impossible de déclarer ce conditionnement sur l'annexe 1. Le bordereau chapeau a déjà des conditionnements déclarés qui sont incompatible avec celui-ci."
+      "Impossible de déclarer ce conditionnement sur l'annexe 1. Le bordereau chapeau a déjà des conditionnements déclarés qui sont incompatibles avec celui-ci."
     );
   }
 
@@ -25,7 +25,7 @@ export function sumPackagingInfos(groupOfPackagingInfos: PackagingInfo[][]) {
       if (isCiterneOrBenne) {
         // If one of the appendix has 2 bennes and the other have 1, we keep the 2.
         alreadyExistingPackagingType.quantity = Math.max(
-          alreadyExistingPackagingType.quantity,
+          Math.min(2, alreadyExistingPackagingType.quantity),
           packaging.quantity
         );
       } else {
