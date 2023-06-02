@@ -470,7 +470,10 @@ function flattenBsdaWorkerInput({ worker }: Pick<BsdaInput, "worker">) {
       chain(w.certification, c => c.validityLimit)
     ),
     workerCertificationOrganisation: chain(worker, w =>
-      chain(w.certification, c => c.organisation)
+      chain(
+        w.certification,
+        c => (c.organisation === "" ? null : c.organisation) // Empty string is considered as null as we expect an enum here
+      )
     )
   };
 }
