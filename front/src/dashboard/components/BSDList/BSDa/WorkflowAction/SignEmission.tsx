@@ -13,13 +13,24 @@ import React from "react";
 import { generatePath, Link } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsda, SIGN_BSDA } from "./SignBsda";
+import { subtractMonths } from "common/helper";
+import DateInput from "form/common/components/custom-inputs/DateInput";
 
-const validationSchema = yup.object({
-  author: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-});
+const getValidationSchema = (today: Date) =>
+  yup.object({
+    date: yup
+      .date()
+      .required("La date d'émission est requise")
+      .max(today, "La date d'émission ne peut être dans le futur")
+      .min(
+        subtractMonths(today, 2),
+        "La date d'émission ne peut être antérieure à 2 mois"
+      ),
+    author: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+  });
 
 type Props = {
   siret: string;
@@ -42,6 +53,8 @@ export function SignEmission({
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
   });
+
+  const TODAY = new Date();
 
   return (
     <SignBsda
@@ -79,9 +92,10 @@ export function SignEmission({
         ) : (
           <Formik
             initialValues={{
+              date: TODAY.toISOString(),
               author: "",
             }}
-            validationSchema={validationSchema}
+            validationSchema={getValidationSchema(TODAY)}
             onSubmit={async values => {
               await signBsda({
                 variables: {
@@ -98,8 +112,26 @@ export function SignEmission({
                   En qualité <strong>d'émetteur du déchet</strong>, j'atteste
                   que les informations ci-dessus sont correctes. En signant ce
                   document, j'autorise l'entreprise de travaux à prendre en
-                  charge le déchet. La signature est horodatée.
+                  charge le déchet.
                 </p>
+
+                <div className="form__row">
+                  <label>
+                    Date d'émission
+                    <div className="td-date-wrapper">
+                      <Field
+                        name="date"
+                        component={DateInput}
+                        minDate={subtractMonths(TODAY, 2)}
+                        maxDate={TODAY}
+                        required
+                        className="td-input"
+                      />
+                    </div>
+                  </label>
+                  <RedErrorMessage name="date" />
+                </div>
+
                 <div className="form__row">
                   <label>
                     Nom du signataire

@@ -221,10 +221,10 @@ function SignEmissionFormModalContent({
 
               <div className="form__row">
                 <label>
-                  Date de prise en charge
+                  Date d'émission
                   <div className="td-date-wrapper">
                     <Field
-                      name="takenOverAt"
+                      name="emittedAt"
                       component={DateInput}
                       minDate={subtractMonths(TODAY, 2)}
                       maxDate={TODAY}
@@ -233,7 +233,7 @@ function SignEmissionFormModalContent({
                     />
                   </div>
                 </label>
-                <RedErrorMessage name="takenOverAt" />
+                <RedErrorMessage name="emittedAt" />
               </div>
 
               <div className="form__row">

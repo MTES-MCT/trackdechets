@@ -184,8 +184,8 @@ export default function ReceivedInfo({
                   id: form.id,
                   tempStoredInfos: {
                     ...values,
-                    receivedAt: values.receivedAt.toISOString(),
-                    signedAt: values.signedAt.toISOString(),
+                    receivedAt: parseDate(values.receivedAt).toISOString(),
+                    signedAt: parseDate(values.signedAt).toISOString(),
                     quantityType: values.quantityType ?? QuantityType.Real,
                     quantityReceived: values.quantityReceived ?? 0,
                     wasteAcceptationStatus:
@@ -199,8 +199,8 @@ export default function ReceivedInfo({
                   id: form.id,
                   receivedInfo: {
                     ...values,
-                    receivedAt: values.receivedAt.toISOString(),
-                    signedAt: values.signedAt.toISOString(),
+                    receivedAt: parseDate(values.receivedAt).toISOString(),
+                    signedAt: parseDate(values.signedAt).toISOString(),
                   },
                 },
               })
@@ -214,7 +214,7 @@ export default function ReceivedInfo({
                 Date de présentation
                 <Field
                   component={DateInput}
-                  minDate={form.takenOverAt!}
+                  minDate={parseDate(form.takenOverAt!)}
                   maxDate={TODAY}
                   name="receivedAt"
                   className="td-input"
@@ -337,7 +337,7 @@ export default function ReceivedInfo({
                   : "Date d'acceptation"}
                 <Field
                   component={DateInput}
-                  minDate={values.receivedAt}
+                  minDate={parseDate(values.receivedAt)}
                   maxDate={TODAY}
                   name="signedAt"
                   className="td-input"
