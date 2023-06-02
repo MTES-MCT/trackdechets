@@ -137,9 +137,10 @@ function SignTransportFormModalContent({
           try {
             const { update } = values;
             if (
-              update.quantity ||
-              update.sampleNumber ||
-              update.packagingInfos.length > 0
+              form.emitter?.type === EmitterType.Appendix1Producer &&
+              (update.quantity ||
+                update.sampleNumber ||
+                update.packagingInfos.length > 0)
             ) {
               await updateForm({
                 variables: {
