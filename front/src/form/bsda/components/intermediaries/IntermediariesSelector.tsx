@@ -14,8 +14,8 @@ export function IntermediariesSelector({
   maxNbOfIntermediaries,
 }: FieldProps<CompanyInput[]> & { maxNbOfIntermediaries?: number }) {
   const onIntermediarySelectedCallback = useCallback(
-    (company: CompanySearchResult | CompanySearchPrivate) => {
-      if (!company.isRegistered) {
+    (company?: CompanySearchResult | CompanySearchPrivate) => {
+      if (!company?.isRegistered) {
         cogoToast.warn(
           `Intermédiaire: l'établissement sélectionné n'est pas enregistré sur Trackdéchets, le suivi du bordereau ne sera pas possible sur la plateforme`,
           {

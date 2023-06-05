@@ -12,6 +12,7 @@ import { emitterTypeLabels } from "dashboard/constants";
 import { isForeignVat, isOmi } from "generated/constants/companySearchHelpers";
 import { RedErrorMessage } from "common/components";
 import Tooltip from "common/components/Tooltip";
+import { onBsddTransporterCompanySelected } from "./utils/onBsddTransporterCompanySelected";
 
 export default function Emitter({ disabled }) {
   const ctx = useFormikContext<Form>();
@@ -301,6 +302,8 @@ export default function Emitter({ disabled }) {
               }
               if (values.emitter?.type === EmitterType.Appendix1) {
                 setFieldValue("transporter.company", company);
+                // propagate receipt
+                onBsddTransporterCompanySelected(setFieldValue)(company);
               }
             }}
             filter={companies => {

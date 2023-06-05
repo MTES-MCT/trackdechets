@@ -289,7 +289,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                       <CompanySelector
                         name="content.broker.company"
                         onCompanySelected={broker => {
-                          if (broker.brokerReceipt) {
+                          if (broker?.brokerReceipt) {
                             setFieldValue(
                               "content.broker.recepisse.number",
                               broker.brokerReceipt.receiptNumber

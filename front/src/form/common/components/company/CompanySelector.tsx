@@ -48,8 +48,10 @@ const DEBOUNCE_DELAY = 500;
 
 interface CompanySelectorProps {
   name: string;
+  // Callback for the host component
+  // Called with empty parameter to un-select a company
   onCompanySelected?: (
-    company: CompanySearchResult | CompanySearchPrivate
+    company?: CompanySearchResult | CompanySearchPrivate
   ) => void;
   allowForeignCompanies?: boolean;
   registeredOnlyCompanies?: boolean;
@@ -186,6 +188,7 @@ export default function CompanySelector({
     if (!company) {
       setFieldValue(field.name, getInitialCompany());
       setFieldTouched(`${field.name}`, true, true);
+      onCompanySelected?.();
       return;
     }
 

@@ -76,19 +76,19 @@ export const validationSchema = object().shape({
  */
 export const onCompanySelected =
   setFieldValue =>
-  (transporter: CompanySearchResult | CompanySearchPrivate) => {
-    if (transporter.transporterReceipt) {
+  (transporter?: CompanySearchResult | CompanySearchPrivate) => {
+    if (transporter?.transporterReceipt) {
       setFieldValue(
         "transporter.receipt",
-        transporter.transporterReceipt.receiptNumber
+        transporter?.transporterReceipt.receiptNumber
       );
       setFieldValue(
         "transporter.validityLimit",
-        transporter.transporterReceipt.validityLimit
+        transporter?.transporterReceipt.validityLimit
       );
       setFieldValue(
         "transporter.department",
-        transporter.transporterReceipt.department
+        transporter?.transporterReceipt.department
       );
     } else {
       setFieldValue("transporter.receipt", null);
