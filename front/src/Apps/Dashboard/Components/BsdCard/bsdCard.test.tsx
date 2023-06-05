@@ -5,6 +5,7 @@ import BsdCard from "./BsdCard";
 import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "generated/graphql/types";
 import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 import { MockedProvider } from "@apollo/client/testing";
+import { BsdaWithReview, FormWithReview } from "Apps/common/types/bsdTypes";
 
 describe("Bsd card primary action label", () => {
   const siretEmmiter = "53230142100022";
@@ -138,7 +139,7 @@ describe("Bsd card primary action label", () => {
       currentTransporterSiret: null,
       nextTransporterSiret: null,
       __typename: "Form",
-    } as unknown as Form;
+    } as unknown as FormWithReview;
 
     test("Bsdd", async () => {
       const onValidate = functionMock;
@@ -149,15 +150,19 @@ describe("Bsd card primary action label", () => {
             currentSiret={siretEmmiter}
             bsd={bsdd}
             onValidate={onValidate}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
           />
         </MockedProvider>
       );
-      const primaryActionBtn = screen.getByTestId("bsd-card-btn-primary");
-      expect(screen.getByTestId("bsd-card-btn-primary")).toHaveTextContent(
-        "Publier"
+      const primaryActionBtn = screen.getByTestId(
+        `bsd-card-btn-primary-${bsdd.readableId}`
       );
+      expect(
+        screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
+      ).toHaveTextContent("Publier");
       fireEvent.click(primaryActionBtn);
       await waitFor(() => expect(onValidate).toHaveBeenCalled());
 
@@ -181,8 +186,10 @@ describe("Bsd card primary action label", () => {
             currentSiret={siretEmmiter}
             bsd={{ ...bsdd, emitter: { type: "APPENDIX1_PRODUCER" } } as Form}
             onValidate={onValidate}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
           />
         </MockedProvider>
       );
@@ -251,7 +258,7 @@ describe("Bsd card primary action label", () => {
         forwardedIn: null,
         groupedIn: null,
         __typename: "Bsda",
-      } as unknown as Bsda;
+      } as unknown as BsdaWithReview;
       const onValidate = functionMock;
       const { queryByTestId } = render(
         <MockedProvider mocks={mocks} addTypename={false}>
@@ -259,12 +266,16 @@ describe("Bsd card primary action label", () => {
             currentSiret={siretEmmiter}
             bsd={bsda}
             onValidate={onValidate}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
           />
         </MockedProvider>
       );
-      const primaryActionBtn = screen.getByTestId("bsd-card-btn-primary");
+      const primaryActionBtn = screen.getByTestId(
+        `bsd-card-btn-primary-${bsda.id}`
+      );
       expect(primaryActionBtn).toHaveTextContent("Publier");
       fireEvent.click(primaryActionBtn);
       await waitFor(() => expect(onValidate).toHaveBeenCalled());
@@ -397,13 +408,17 @@ describe("Bsd card primary action label", () => {
             currentSiret={siretEmmiter}
             bsd={bsvhu}
             onValidate={onValidate}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
             bsdCurrentTab="actTab"
           />
         </MockedProvider>
       );
-      const primaryActionBtn = screen.getByTestId("bsd-card-btn-primary");
+      const primaryActionBtn = screen.getByTestId(
+        `bsd-card-btn-primary-${bsvhu.id}`
+      );
       expect(primaryActionBtn).toHaveTextContent("Signer");
       fireEvent.click(primaryActionBtn);
       await waitFor(() => expect(onValidate).toHaveBeenCalled());
@@ -426,8 +441,10 @@ describe("Bsd card primary action label", () => {
             currentSiret={siretEmmiter}
             bsd={bsvhuProcessed}
             onValidate={functionMock}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
           />
         </MockedProvider>
       );
@@ -444,12 +461,14 @@ describe("Bsd card primary action label", () => {
             currentSiret={siretTransporter}
             bsd={bsvhu}
             onValidate={functionMock}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
           />
         </MockedProvider>
       );
-      expect(queryByTestId("bsd-card-btn-primary")).toBeFalsy();
+      expect(queryByTestId(`bsd-card-btn-primary-${bsvhu.id}`)).toBeFalsy();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -464,13 +483,17 @@ describe("Bsd card primary action label", () => {
             bsd={bsff}
             bsdCurrentTab="actTab"
             onValidate={onValidate}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
           />
         </MockedProvider>
       );
 
-      const primaryActionBtn = screen.getByTestId("bsd-card-btn-primary");
+      const primaryActionBtn = screen.getByTestId(
+        `bsd-card-btn-primary-${bsff.id}`
+      );
       const { getByText } = within(primaryActionBtn);
       expect(getByText("Signer")).toBeInTheDocument();
 
@@ -496,13 +519,17 @@ describe("Bsd card primary action label", () => {
             bsd={bsffDifferentSiret}
             bsdCurrentTab={bsdCurrentTab}
             onValidate={functionMock}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
           />
         </MockedProvider>
       );
 
-      expect(queryByTestId("bsd-card-btn-primary")).toBeFalsy();
+      expect(
+        queryByTestId(`bsd-card-btn-primary-${bsffDifferentSiret.id}`)
+      ).toBeFalsy();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -573,13 +600,17 @@ describe("Bsd card primary action label", () => {
             currentSiret={siretEmmiter}
             bsd={bsda}
             onValidate={functionMock}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
             bsdCurrentTab="actTab"
           />
         </MockedProvider>
       );
-      const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
+      const { getByText } = within(
+        screen.getByTestId(`bsd-card-btn-primary-${bsda.id}`)
+      );
       expect(getByText("Signer")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
@@ -675,12 +706,16 @@ describe("Bsd card primary action label", () => {
             currentSiret={siretEmmiter}
             bsd={bsdd}
             onValidate={functionMock}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
           />
         </MockedProvider>
       );
-      const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
+      const { getByText } = within(
+        screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
+      );
       expect(getByText("Signer")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
@@ -800,12 +835,16 @@ describe("Bsd card primary action label", () => {
             bsd={bsdd}
             bsdCurrentTab="actTab"
             onValidate={functionMock}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
           />
         </MockedProvider>
       );
-      const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
+      const { getByText } = within(
+        screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
+      );
       expect(getByText("Valider la réception")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
@@ -888,12 +927,16 @@ describe("Bsd card primary action label", () => {
             bsd={bsdari}
             bsdCurrentTab="actTab"
             onValidate={functionMock}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
           />
         </MockedProvider>
       );
-      const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
+      const { getByText } = within(
+        screen.getByTestId(`bsd-card-btn-primary-${bsdari.id}`)
+      );
       expect(getByText("Valider la réception")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
@@ -985,7 +1028,7 @@ describe("Bsd card primary action label", () => {
         currentTransporterSiret: "",
         nextTransporterSiret: null,
         __typename: "Form",
-      } as unknown as Form;
+      } as unknown as FormWithReview;
 
       render(
         <MockedProvider mocks={mocks} addTypename={false}>
@@ -993,12 +1036,16 @@ describe("Bsd card primary action label", () => {
             currentSiret={siretEmmiter}
             bsd={bsdd}
             onValidate={functionMock}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
           />
         </MockedProvider>
       );
-      const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
+      const { getByText } = within(
+        screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
+      );
       expect(getByText("Valider le traitement")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
@@ -1026,8 +1073,10 @@ describe("Bsd card primary action label", () => {
             currentSiret={siretEmmiter}
             bsd={bsdd}
             onValidate={functionMock}
-            onUpdate={functionMock}
-            onOverview={functionMock}
+            secondaryActions={{
+              onUpdate: functionMock,
+              onOverview: functionMock,
+            }}
           />
         </MockedProvider>
       );

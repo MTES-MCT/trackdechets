@@ -5,4 +5,5 @@ export interface BadgeProps {
   status: TBsdStatusCode;
   isDraft?: boolean;
   bsdType?: BsdType;
+  reviewStatus?: TBsdStatusCode | null;
 }

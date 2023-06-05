@@ -195,24 +195,42 @@ function BsdCardList({
     },
     [redirectToPath]
   );
+  const isReviewTab = bsdCurrentTab === "reviewsTab";
 
   return (
     <>
       <ul className="bsd-card-list">
-        {bsds?.map(bsd => {
-          const { node } = bsd;
+        {bsds?.map(({ node }) => {
+          let bsdNode = node;
+          // format reviews bsdd and bsda in one list
+          if (isReviewTab) {
+            // BSDD
+            const newBsddNode = { ...node?.form };
+            const reviewBsdd = { ...node };
+            delete reviewBsdd?.form;
+            newBsddNode.review = reviewBsdd;
+            // BSDA
+            const newBsdaNode = { ...node?.bsda };
+            const reviewBsda = { ...node };
+            delete reviewBsda?.bsda;
+            newBsddNode.review = reviewBsdd;
+            bsdNode = { ...newBsddNode, ...newBsdaNode };
+          }
+
           return (
             <li className="bsd-card-list__item" key={node.id}>
               <BsdCard
-                bsd={node}
+                bsd={bsdNode}
                 currentSiret={siret}
                 bsdCurrentTab={bsdCurrentTab}
                 onValidate={onBsdValidation}
-                onUpdate={onBsdUpdate}
-                onOverview={onBsdOverview}
-                onRevision={onBsdRevision}
-                onBsdSuite={onBsdSuite}
-                onAppendix1={onAppendix1}
+                secondaryActions={{
+                  onUpdate: onBsdUpdate,
+                  onOverview: onBsdOverview,
+                  onRevision: onBsdRevision,
+                  onBsdSuite,
+                  onAppendix1,
+                }}
               />
             </li>
           );

@@ -71,6 +71,8 @@ attente d'une action extérieure. Par exemple lorsqu'en tant que
 producteur vous attendez la réception d'un déchet ou son
 traitement. La colonne STATUT vous renseignera
 sur l'état précis du bordereau.`;
+export const blankstate_reviews_desc =
+  "Vous n'avez aucune révision en attente.";
 
 // load more
 export const load_more_bsds = "Charger plus de bordereaux";
@@ -144,3 +146,8 @@ export const REVIEWS = "Révisions";
 export const TO_COLLECT = "À collecter";
 export const COLLECTED = "Collecté";
 export const REGISTER = "Registre";
+
+// Reviews
+
+export const APPROUVER_REFUSER_REVISION = "Approuver / Refuser";
+export const CONSULTER_REVISION = "Consulter";

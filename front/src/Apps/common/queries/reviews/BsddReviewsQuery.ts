@@ -6,7 +6,32 @@ const reviewFragment = gql`
     id
     form {
       id
+      status
       readableId
+      stateSummary {
+        lastActionOn
+      }
+      transporter {
+        company {
+          name
+          siret
+          orgId
+        }
+      }
+      recipient {
+        company {
+          name
+          siret
+          orgId
+        }
+      }
+      emitter {
+        company {
+          name
+          siret
+          orgId
+        }
+      }
       wasteDetails {
         code
         name

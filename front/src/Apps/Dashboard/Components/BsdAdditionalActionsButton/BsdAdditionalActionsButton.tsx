@@ -29,14 +29,17 @@ import "./bsdAdditionalActionsButton.scss";
 function BsdAdditionalActionsButton({
   bsd,
   currentSiret,
-  onOverview,
-  onDuplicate,
-  onPdf,
-  onDelete,
-  onUpdate,
-  onRevision,
-  onBsdSuite,
-  onAppendix1,
+  actionList: {
+    onOverview,
+    onDuplicate,
+    onPdf,
+    onDelete,
+    onUpdate,
+    onRevision,
+    onAppendix1,
+    onBsdSuite,
+  },
+  hideReviewCta,
 }: BsdAdditionalActionsButtonProps) {
   const [isOpen, setisOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLElement>(null);
@@ -78,11 +81,11 @@ function BsdAdditionalActionsButton({
   };
   const handlePdf = () => {
     closeMenu();
-    onPdf(bsd);
+    onPdf && onPdf(bsd);
   };
   const handleUpdate = () => {
     closeMenu();
-    onUpdate(bsd);
+    onUpdate && onUpdate(bsd);
   };
   const handleDuplicate = () => {
     closeMenu();
@@ -90,20 +93,20 @@ function BsdAdditionalActionsButton({
   };
   const handleDelete = () => {
     closeMenu();
-    onDelete(bsd);
+    onDelete && onDelete(bsd);
   };
   const handleRevision = () => {
     closeMenu();
-    onRevision(bsd);
+    onRevision && onRevision(bsd);
   };
 
   const handleBsdSuite = () => {
     closeMenu();
-    onBsdSuite!(bsd);
+    onBsdSuite && onBsdSuite(bsd);
   };
   const handleAppendix1 = () => {
     closeMenu();
-    onAppendix1!(bsd);
+    onAppendix1 && onAppendix1(bsd);
   };
 
   const tabIndex = isOpen ? 0 : -1;
@@ -221,7 +224,7 @@ function BsdAdditionalActionsButton({
               </button>
             </li>
           )}
-          {canReviewBsd(bsd, currentSiret) && (
+          {!hideReviewCta && canReviewBsd(bsd, currentSiret) && (
             <li>
               <button
                 type="button"

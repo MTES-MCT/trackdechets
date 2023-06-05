@@ -9,7 +9,8 @@ import WasteDetails from "../WasteDetails/WasteDetails";
 import {
   canPublishBsd,
   getBsdView,
-  getCtaLabelFromStatus,
+  getPrimaryActionsLabelFromBsdStatus,
+  getPrimaryActionsReviewsLabel,
   getWorkflowLabel,
 } from "../../dashboardServices";
 import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditionalActionsButton";
@@ -41,12 +42,15 @@ function BsdCard({
   bsdCurrentTab,
   currentSiret,
   onValidate,
-  onOverview,
-  onUpdate,
-  onRevision,
-  onBsdSuite,
-  onAppendix1,
+  secondaryActions: {
+    onOverview,
+    onUpdate,
+    onRevision,
+    onBsdSuite,
+    onAppendix1,
+  },
 }: BsdCardProps) {
+  const isReviewsTab = bsdCurrentTab === "reviewsTab";
   const bsdDisplay = getBsdView(bsd);
 
   const options = {
@@ -99,7 +103,15 @@ function BsdCard({
     : "";
 
   const ctaPrimaryLabel = bsdDisplay?.type
-    ? getCtaLabelFromStatus(bsdDisplay, currentSiret, bsdCurrentTab)
+    ? getPrimaryActionsLabelFromBsdStatus(
+        bsdDisplay,
+        currentSiret,
+        bsdCurrentTab
+      )
+    : "";
+
+  const ctaPrimaryReviewLabel = bsdDisplay?.type
+    ? getPrimaryActionsReviewsLabel(bsdDisplay, currentSiret)
     : "";
 
   const handleValidationClick = (
@@ -193,13 +205,15 @@ function BsdCard({
                     status={bsdDisplay.status}
                     isDraft={bsdDisplay.isDraft}
                     bsdType={bsdDisplay.type}
+                    reviewStatus={bsdDisplay?.review?.status}
                   />
-                  {Boolean(bsdDisplay.wasteDetails?.weight) && (
-                    <p className="bsd-card__content__infos__weight">
-                      <IconWeight />
-                      <span>{bsdDisplay.wasteDetails.weight} t</span>
-                    </p>
-                  )}
+                  {!isReviewsTab &&
+                    Boolean(bsdDisplay.wasteDetails?.weight) && (
+                      <p className="bsd-card__content__infos__weight">
+                        <IconWeight />
+                        <span>{bsdDisplay.wasteDetails.weight} t</span>
+                      </p>
+                    )}
                 </div>
                 <div className="bsd-card__content__infos__other">
                   <WasteDetails
@@ -216,28 +230,44 @@ function BsdCard({
                 </div>
               </div>
               <div className="bsd-card__content__cta">
-                {canPublishBsd(bsdDisplay, currentSiret) && ctaPrimaryLabel && (
+                {!isReviewsTab &&
+                  canPublishBsd(bsdDisplay, currentSiret) &&
+                  ctaPrimaryLabel && (
+                    <button
+                      data-testid={`bsd-card-btn-primary-${bsdDisplay.readableid}`}
+                      type="button"
+                      className="fr-btn fr-btn--sm"
+                      onClick={handleValidationClick}
+                    >
+                      {ctaPrimaryLabel}
+                    </button>
+                  )}
+
+                {isReviewsTab && (
                   <button
-                    data-testid="bsd-card-btn-primary"
+                    data-testid={`bsd-card-btn-review-primary-${bsdDisplay.readableid}`}
                     type="button"
                     className="fr-btn fr-btn--sm"
-                    onClick={handleValidationClick}
+                    onClick={() => {}}
                   >
-                    {ctaPrimaryLabel}
+                    {ctaPrimaryReviewLabel}
                   </button>
                 )}
 
                 <BsdAdditionalActionsButton
                   bsd={bsdDisplay}
                   currentSiret={currentSiret}
-                  onOverview={onOverview!}
-                  onDelete={onDelete}
-                  onDuplicate={onDuplicate}
-                  onUpdate={onUpdate!}
-                  onRevision={onRevision!}
-                  onPdf={onPdf}
-                  onBsdSuite={onBsdSuite}
-                  onAppendix1={onAppendix1}
+                  actionList={{
+                    onOverview,
+                    onDelete,
+                    onDuplicate,
+                    onUpdate,
+                    onRevision,
+                    onPdf,
+                    onAppendix1,
+                    onBsdSuite,
+                  }}
+                  hideReviewCta={isReviewsTab}
                 />
               </div>
             </div>
