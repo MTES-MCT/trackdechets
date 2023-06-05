@@ -16,7 +16,7 @@ import { useParams } from "react-router-dom";
 import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
 import classNames from "classnames";
 import Transport from "./Transport";
-import { Loader } from "common/components";
+import { Loader } from "Apps/common/Components";
 import companyStyles from "form/common/components/company/CompanyResult.module.scss";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";

@@ -4,7 +4,7 @@ import { gql, useMutation } from "@apollo/client";
 import React from "react";
 import styles from "./CompanyVerifyModal.module.scss";
 import { CompanyForVerification, Mutation } from "generated/graphql/types";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { isSiret } from "generated/constants/companySearchHelpers";
 
 type VerifyModalProps = {

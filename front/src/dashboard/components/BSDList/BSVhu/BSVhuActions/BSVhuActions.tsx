@@ -6,7 +6,7 @@ import {
   useRouteMatch,
 } from "react-router-dom";
 
-import routes from "common/routes";
+import routes from "Apps/routes";
 import {
   IconView,
   IconPaperWrite,
@@ -22,8 +22,8 @@ import { useDuplicate } from "./useDuplicate";
 import { useDisplayRoadControlButton } from "../../RoadControlButton";
 
 import styles from "../../BSDActions.module.scss";
-import { Loader } from "common/components";
-import DropdownMenu from "Apps/Common/Components/DropdownMenu/DropdownMenu";
+import { Loader } from "Apps/common/Components";
+import DropdownMenu from "Apps/common/Components/DropdownMenu/DropdownMenu";
 
 interface BSVhuActionsProps {
   form: Bsvhu;

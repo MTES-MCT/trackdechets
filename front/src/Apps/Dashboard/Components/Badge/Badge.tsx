@@ -2,7 +2,7 @@ import React from "react";
 import classnames from "classnames";
 import { BadgeProps } from "./badgeTypes";
 import "./badge.scss";
-import { BsdStatusCode } from "../../../Common/types/bsdTypes";
+import { BsdStatusCode } from "../../../common/types/bsdTypes";
 import { getBsdStatusLabel } from "../../dashboardServices";
 
 function Badge({ status, isDraft, bsdType }: BadgeProps): JSX.Element {

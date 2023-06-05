@@ -1,4 +1,4 @@
-import { BsdDisplay } from "Apps/Common/types/bsdTypes";
+import { BsdDisplay } from "Apps/common/types/bsdTypes";
 
 export interface BsdAdditionalActionsButtonProps {
   bsd: BsdDisplay;

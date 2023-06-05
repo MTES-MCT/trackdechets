@@ -6,7 +6,7 @@ import { Mutation, MutationUpdateBsffArgs } from "generated/graphql/types";
 import TdModal from "common/components/Modal";
 import { UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { BsffFragment } from "../types";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import Tooltip from "common/components/Tooltip";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 

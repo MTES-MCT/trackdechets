@@ -3,7 +3,7 @@ import React, { useEffect, useReducer } from "react";
 import { useQuery } from "@apollo/client";
 import { Bsdasri } from "generated/graphql/types";
 import BsdasriTableSynthesis from "./BsdasriTableSynthesis";
-import { GET_DETAIL_DASRI } from "common/queries";
+import { GET_DETAIL_DASRI } from "Apps/common/queries";
 
 import { Query, QueryBsdasriArgs } from "generated/graphql/types";
 type State = { selected: string[] };

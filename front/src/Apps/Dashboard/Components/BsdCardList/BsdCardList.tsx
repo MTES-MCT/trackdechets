@@ -19,7 +19,7 @@ import {
   getUpdatePath,
 } from "../../dashboardUtils";
 import DraftValidation from "Apps/Dashboard/Components/Validation/Draft/DraftValidation";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import ActBsddValidation from "Apps/Dashboard/Components/Validation/Act/ActBsddValidation";
 import ActBsdSuiteValidation from "Apps/Dashboard/Components/Validation/Act/ActBsdSuiteValidation";
 import ActBsdaValidation from "Apps/Dashboard/Components/Validation/Act/ActBsdaValidation";

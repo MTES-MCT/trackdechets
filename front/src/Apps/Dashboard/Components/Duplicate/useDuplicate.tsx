@@ -12,8 +12,8 @@ import {
   fullDasriFragment,
   fullFormFragment,
   vhuFragment,
-} from "common/fragments";
-import { GET_BSDS } from "common/queries";
+} from "Apps/common/queries/fragments";
+import { GET_BSDS } from "Apps/common/queries";
 
 const DUPLICATE_BSDASRI = gql`
   mutation DuplicateBsdasri($id: ID!) {

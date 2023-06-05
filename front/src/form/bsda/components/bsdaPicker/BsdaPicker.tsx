@@ -1,6 +1,5 @@
 import { useQuery } from "@apollo/client";
 import {
-  Loader,
   Table,
   TableBody,
   TableCell,
@@ -8,6 +7,7 @@ import {
   TableHeaderCell,
   TableRow,
 } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { GET_BSDAS } from "form/bsda/stepper/queries";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { FieldArray, useFormikContext } from "formik";

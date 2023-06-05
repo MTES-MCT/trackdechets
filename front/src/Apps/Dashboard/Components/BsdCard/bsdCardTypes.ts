@@ -1,4 +1,4 @@
-import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
+import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 import { Bsd } from "generated/graphql/types";
 
 export interface BsdCardProps {

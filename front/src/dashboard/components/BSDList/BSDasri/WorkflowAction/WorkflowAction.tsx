@@ -9,7 +9,7 @@ import {
   IconPaperWrite,
 } from "common/components/Icons";
 
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 import { Bsdasri, BsdasriStatus, BsdasriType } from "generated/graphql/types";
 

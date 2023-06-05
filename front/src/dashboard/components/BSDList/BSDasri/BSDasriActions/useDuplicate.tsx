@@ -4,8 +4,8 @@ import {
   Mutation,
   MutationDuplicateBsdasriArgs,
 } from "generated/graphql/types";
-import { fullDasriFragment } from "common/fragments";
-import { GET_BSDS } from "common/queries";
+import { fullDasriFragment } from "Apps/common/queries/fragments";
+import { GET_BSDS } from "Apps/common/queries";
 
 const DUPLICATE_BSDASRI = gql`
   mutation DuplicateBsdasri($id: ID!) {

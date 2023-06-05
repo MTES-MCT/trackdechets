@@ -1,12 +1,13 @@
 import React from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Loader, RedErrorMessage } from "common/components";
+import { RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
 import {
   InlineError,
   NotificationError,
   SimpleNotificationError,
-} from "common/components/Error";
-import { fullFormFragment } from "common/fragments";
+} from "Apps/common/Components/Error/Error";
+import { fullFormFragment } from "Apps/common/queries/fragments";
 import { GET_FORM } from "form/bsdd/utils/queries";
 import {
   FormStatus,

@@ -8,20 +8,17 @@ import {
   NextSegmentInfoInput,
   TransportMode,
 } from "generated/graphql/types";
-import { segmentFragment } from "common/fragments";
+import { segmentFragment } from "Apps/common/queries/fragments";
 import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { IconBusTransfer } from "common/components/Icons";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { WorkflowActionProps } from "../WorkflowAction";
 import TdSwitch from "common/components/Switch";
-import { GET_BSDS, GET_DETAIL_FORM } from "common/queries";
-import {
-  Loader,
-  FieldTransportModeSelect,
-  RedErrorMessage,
-} from "common/components";
+import { GET_BSDS, GET_DETAIL_FORM } from "Apps/common/queries";
+import { FieldTransportModeSelect, RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
 import {
   onCompanySelected,
   validationSchema,

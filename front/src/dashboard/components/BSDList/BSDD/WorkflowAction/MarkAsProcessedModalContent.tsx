@@ -1,6 +1,6 @@
 import React from "react";
 import { Formik } from "formik";
-import { Loader } from "common/components";
+import { Loader } from "Apps/common/Components";
 import {
   CompanyInput,
   FormStatus,
@@ -9,10 +9,10 @@ import {
   ProcessedFormInput,
 } from "generated/graphql/types";
 import { gql, useMutation } from "@apollo/client";
-import { statusChangeFragment } from "common/fragments";
+import { statusChangeFragment } from "Apps/common/queries/fragments";
 import ProcessedInfo from "./ProcessedInfo";
-import { NotificationError } from "common/components/Error";
-import { GET_BSDS } from "common/queries";
+import { NotificationError } from "Apps/common/Components/Error/Error";
+import { GET_BSDS } from "Apps/common/queries";
 import cogoToast from "cogo-toast";
 
 const MARK_AS_PROCESSED = gql`

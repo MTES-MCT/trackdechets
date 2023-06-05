@@ -2,7 +2,7 @@ import {
   BsdDisplay,
   BsdStatusCode,
   WorkflowDisplayType,
-} from "../Common/types/bsdTypes";
+} from "../common/types/bsdTypes";
 import { formatBsd } from "./bsdMapper";
 import {
   BsdasriType,
@@ -45,8 +45,8 @@ import {
   VALIDER_RECEPTION,
   VALIDER_TRAITEMENT,
   completer_bsd_suite,
-} from "../Common/wordings/dashboard/wordingsDashboard";
-import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
+} from "../common/wordings/dashboard/wordingsDashboard";
+import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);

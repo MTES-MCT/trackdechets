@@ -11,7 +11,7 @@ import {
 import {
   CANCEL_BSDA_REVISION_REQUEST,
   GET_BSDA_REVISION_REQUESTS,
-} from "../query";
+} from "../../../../../Apps/common/queries/reviews/BsdaReviewQuery";
 import { useParams } from "react-router-dom";
 
 type Props = {

@@ -11,7 +11,7 @@ import {
 import {
   CANCEL_FORM_REVISION_REQUEST,
   GET_FORM_REVISION_REQUESTS,
-} from "../query";
+} from "Apps/common/queries/reviews/BsddReviewsQuery";
 
 type Props = {
   review: FormRevisionRequest;

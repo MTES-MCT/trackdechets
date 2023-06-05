@@ -15,19 +15,19 @@ import {
 } from "generated/graphql/types";
 import {
   ActionButton,
-  Loader,
   Modal,
   RedErrorMessage,
   Switch,
 } from "common/components";
-import { NotificationError } from "common/components/Error";
+import { Loader } from "Apps/common/Components";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import {
   GET_BSFF_FORM,
   SIGN_BSFF,
   UPDATE_BSFF_PACKAGING,
 } from "form/bsff/utils/queries";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS } from "Apps/common/queries";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { BSFF_WASTES } from "generated/constants";
 import { IconCheckCircle1 } from "common/components/Icons";

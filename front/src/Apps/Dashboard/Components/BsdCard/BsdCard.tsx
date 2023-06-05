@@ -31,8 +31,8 @@ import {
   useBsffDuplicate,
   useBsvhuDuplicate,
 } from "Apps/Dashboard/Components/Duplicate/useDuplicate";
-import { Loader } from "common/components";
-import { BsdDisplay } from "Apps/Common/types/bsdTypes";
+import { Loader } from "Apps/common/Components";
+import { BsdDisplay } from "Apps/common/types/bsdTypes";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import { IconWeight } from "common/components/Icons";
 

@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
 import React, { useState, lazy } from "react";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { IconPaperWrite } from "common/components/Icons";
 import TdModal from "common/components/Modal";
 import Tooltip from "common/components/Tooltip";

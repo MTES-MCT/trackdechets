@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
-import { Loader } from "common/components";
-import { InlineError } from "common/components/Error";
-import { GET_DETAIL_FORM } from "common/queries";
+import { Loader } from "Apps/common/Components";
+import { InlineError } from "Apps/common/Components/Error/Error";
+import { GET_DETAIL_FORM } from "Apps/common/queries";
 import { Query, QueryFormArgs } from "generated/graphql/types";
 import React from "react";
 import { useParams } from "react-router-dom";

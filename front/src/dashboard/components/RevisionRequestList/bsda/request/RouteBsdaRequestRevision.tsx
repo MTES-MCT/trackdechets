@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
-import { Loader } from "common/components";
-import { InlineError } from "common/components/Error";
+import { Loader } from "Apps/common/Components";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import { GET_BSDA } from "form/bsda/stepper/queries";
 import { Query, QueryBsdaArgs } from "generated/graphql/types";
 import React from "react";

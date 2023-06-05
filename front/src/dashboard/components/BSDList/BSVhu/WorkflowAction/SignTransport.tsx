@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
-import { GET_BSDS } from "common/queries";
-import routes from "common/routes";
+import { GET_BSDS } from "Apps/common/queries";
+import routes from "Apps/routes";
 import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 import DateInput from "form/common/components/custom-inputs/DateInput";

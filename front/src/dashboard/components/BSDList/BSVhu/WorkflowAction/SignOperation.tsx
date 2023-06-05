@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS } from "Apps/common/queries";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import Operation from "form/bsvhu/Operation";
 import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";

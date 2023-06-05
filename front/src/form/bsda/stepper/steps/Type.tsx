@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { InlineError } from "common/components/Error";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import { BsdaPicker } from "form/bsda/components/bsdaPicker/BsdaPicker";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";

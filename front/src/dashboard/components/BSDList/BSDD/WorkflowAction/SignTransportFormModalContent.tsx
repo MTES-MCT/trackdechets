@@ -1,5 +1,5 @@
 import React from "react";
-import { fullFormFragment } from "common/fragments";
+import { fullFormFragment } from "Apps/common/queries/fragments";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
 import * as yup from "yup";
@@ -12,12 +12,13 @@ import {
   QueryFormArgs,
 } from "generated/graphql/types";
 import { GET_FORM, UPDATE_FORM } from "form/bsdd/utils/queries";
-import { Loader, RedErrorMessage } from "common/components";
+import { RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
 import {
   InlineError,
   NotificationError,
   SimpleNotificationError,
-} from "common/components/Error";
+} from "Apps/common/Components/Error/Error";
 import { FormWasteTransportSummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormWasteTransportSummary";
 import { FormJourneySummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormJourneySummary";
 import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";

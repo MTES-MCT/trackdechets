@@ -1,10 +1,10 @@
 import React from "react";
 import BsdaDetailContent from "./BsdaDetailContent";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { useQuery } from "@apollo/client";
 import { Query, QueryBsdaArgs } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
-import { InlineError } from "common/components/Error";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
 import { GET_BSDA } from "form/bsda/stepper/queries";
 

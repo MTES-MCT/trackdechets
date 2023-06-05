@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React, { ReactElement, useMemo, lazy } from "react";
 import { generatePath, useHistory, useParams } from "react-router-dom";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { getComputedState } from "form/common/getComputedState";
 import { IStepContainerProps } from "form/common/stepper/Step";
 import { formInputToastError } from "form/common/stepper/toaster";

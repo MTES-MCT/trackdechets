@@ -3,7 +3,8 @@ import { Field, Form, Formik } from "formik";
 import { startOfDay } from "date-fns";
 import { parseDate } from "common/datetime";
 import * as yup from "yup";
-import { Loader, RedErrorMessage } from "common/components";
+import { RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import {
@@ -20,9 +21,9 @@ import {
   MutationMarkAsTempStoredArgs,
 } from "generated/graphql/types";
 import { gql, useMutation } from "@apollo/client";
-import { statusChangeFragment } from "common/fragments";
-import { GET_BSDS } from "common/queries";
-import { NotificationError } from "common/components/Error";
+import { statusChangeFragment } from "Apps/common/queries/fragments";
+import { GET_BSDS } from "Apps/common/queries";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 
 export const textConfig: {
   [id: string]: {

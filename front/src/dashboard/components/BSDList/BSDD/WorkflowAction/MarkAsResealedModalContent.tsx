@@ -1,10 +1,11 @@
 import { gql, useMutation } from "@apollo/client";
-import { Loader, RedErrorMessage } from "common/components";
-import { NotificationError } from "common/components/Error";
+import { RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
-import { statusChangeFragment } from "common/fragments";
+import { statusChangeFragment } from "Apps/common/queries/fragments";
 import { mergeDefaults } from "common/helper";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS } from "Apps/common/queries";
 import Packagings from "form/bsdd/components/packagings/Packagings";
 import Transporter from "form/bsdd/Transporter";
 import CompanySelector from "form/common/components/company/CompanySelector";

@@ -12,8 +12,8 @@ import {
 } from "generated/graphql/types";
 import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
-import { GET_BSDS } from "common/queries";
-import { Loader } from "common/components";
+import { GET_BSDS } from "Apps/common/queries";
+import { Loader } from "Apps/common/Components";
 
 const DELETE_BSDA = gql`
   mutation DeleteBsda($id: ID!) {
