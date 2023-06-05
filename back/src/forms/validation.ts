@@ -119,6 +119,10 @@ type WasteDetailsCommon = Pick<
 >;
 
 type WasteDetailsAppendix1 = WasteDetailsCommon;
+type WasteDetailsAppendix1Producer = Pick<
+  Prisma.FormCreateInput,
+  "wasteDetailsPackagingInfos" | "wasteDetailsQuantity"
+>;
 
 type WasteDetails = WasteDetailsCommon &
   Pick<
@@ -703,6 +707,28 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
     })
   );
 
+// Schéma lorsque emitterType = APPENDIX1_PRODUCER
+const wasteDetailsAppendix1ProducerSchemaFn: FactorySchemaOf<
+  Pick<FormValidationContext, "isDraft">,
+  WasteDetailsAppendix1Producer
+> = ({ isDraft }) =>
+  yup.object({
+    wasteDetailsQuantity: weight(WeightUnits.Tonne)
+      .label("Déchet")
+      .when(
+        ["transporterTransportMode", "createdAt"],
+        weightConditions.transportMode(WeightUnits.Tonne)
+      ),
+    wasteDetailsPackagingInfos: yup
+      .array()
+      .of(packagingInfoFn({ isDraft }) as any)
+      .test(
+        "is-valid-packaging-infos",
+        "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
+        isValidPackagingInfos
+      )
+  });
+
 // Schéma lorsque emitterType n'est pas APPENDIX1
 const wasteDetailsNormalSchemaFn: FactorySchemaOf<
   Pick<FormValidationContext, "isDraft">,
@@ -1285,7 +1311,9 @@ export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 const baseFormSchemaFn = (context: FormValidationContext) =>
   yup.lazy(value => {
     if (value.emitterType === EmitterType.APPENDIX1_PRODUCER) {
-      return emitterSchemaFn(context).noUnknown();
+      return emitterSchemaFn(context)
+        .concat(wasteDetailsAppendix1ProducerSchemaFn(context))
+        .noUnknown();
     }
 
     const lazyWasteDetailsSchema = wasteDetailsSchemaFn(context).resolve({
