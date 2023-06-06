@@ -2,6 +2,7 @@ import {
   CompanySearchPrivate,
   CompanySearchResult,
 } from "generated/graphql/types";
+import { getInitialState } from "./initial-state";
 
 /**
  * Propagates the receipt up to the form when a company is selected or un-selected
@@ -30,10 +31,14 @@ export function onBsddTransporterCompanySelected(
         transporter?.transporterReceipt.department
       );
     } else {
+      const { transporter: initialTransporter } = getInitialState();
       // empty the receipt when transporter is undefined
-      setFieldValue("transporter.receipt", null);
-      setFieldValue("transporter.validityLimit", "");
-      setFieldValue("transporter.department", null);
+      setFieldValue("transporter.receipt", initialTransporter?.receipt);
+      setFieldValue(
+        "transporter.validityLimit",
+        initialTransporter?.validityLimit
+      );
+      setFieldValue("transporter.department", initialTransporter?.department);
     }
   };
 }
