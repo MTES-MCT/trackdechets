@@ -119,10 +119,6 @@ type WasteDetailsCommon = Pick<
 >;
 
 type WasteDetailsAppendix1 = WasteDetailsCommon;
-type WasteDetailsAppendix1Producer = Pick<
-  Prisma.FormCreateInput,
-  "wasteDetailsPackagingInfos" | "wasteDetailsQuantity"
->;
 
 type WasteDetails = WasteDetailsCommon &
   Pick<
@@ -708,10 +704,9 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
   );
 
 // Schéma lorsque emitterType = APPENDIX1_PRODUCER
-const wasteDetailsAppendix1ProducerSchemaFn: FactorySchemaOf<
-  Pick<FormValidationContext, "isDraft">,
-  WasteDetailsAppendix1Producer
-> = ({ isDraft }) =>
+// TODO: Typing as any because in schemaOf<> Yup always wraps arrays as Maybe<>.
+// and it breaks typings
+const wasteDetailsAppendix1ProducerSchemaFn: any = ({ isDraft }) =>
   yup.object({
     wasteDetailsQuantity: weight(WeightUnits.Tonne)
       .label("Déchet")
@@ -722,6 +717,7 @@ const wasteDetailsAppendix1ProducerSchemaFn: FactorySchemaOf<
     wasteDetailsPackagingInfos: yup
       .array()
       .of(packagingInfoFn({ isDraft }) as any)
+      .transform(value => !value ? [] : value)
       .test(
         "is-valid-packaging-infos",
         "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
@@ -1311,7 +1307,9 @@ export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 const baseFormSchemaFn = (context: FormValidationContext) =>
   yup.lazy(value => {
     if (value.emitterType === EmitterType.APPENDIX1_PRODUCER) {
-      return emitterSchemaFn(context)
+      return yup
+        .object()
+        .concat(emitterSchemaFn(context))
         .concat(wasteDetailsAppendix1ProducerSchemaFn(context))
         .noUnknown();
     }
