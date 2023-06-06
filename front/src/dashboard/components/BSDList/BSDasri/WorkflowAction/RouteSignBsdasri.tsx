@@ -37,6 +37,8 @@ import {
 import routes from "common/routes";
 
 import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
+import { subtractMonths } from "common/helper";
+import DateInput from "form/common/components/custom-inputs/DateInput";
 
 const forms = {
   [BsdasriSignatureType.Emission]: EmitterSignatureForm,
@@ -160,6 +162,8 @@ export function RouteSignBsdasri({
     getComputedState(getInitialState(), bsdasri)
   );
 
+  const TODAY = new Date();
+
   return (
     <div>
       <h2 className="td-modal-title">{config.getLabel(bsdasri, siret)}</h2>
@@ -167,9 +171,9 @@ export function RouteSignBsdasri({
       <Formik
         initialValues={{
           ...formState,
-          signature: { author: "" },
+          signature: { author: "", date: TODAY },
         }}
-        validationSchema={() => signatureValidationSchema(bsdasri)}
+        validationSchema={() => signatureValidationSchema(bsdasri, TODAY)}
         onSubmit={async values => {
           const { id, signature, ...rest } = values;
 
@@ -201,6 +205,24 @@ export function RouteSignBsdasri({
               </div>
 
               <UpdateForm signatureType={UIsignatureType} />
+
+              <div className="form__row">
+                <label>
+                  Date
+                  <div className="td-date-wrapper">
+                    <Field
+                      name="signature.date"
+                      component={DateInput}
+                      minDate={subtractMonths(TODAY, 2)}
+                      maxDate={TODAY}
+                      required
+                      className="td-input"
+                    />
+                  </div>
+                </label>
+                <RedErrorMessage name="signature.date" />
+              </div>
+
               <div className="form__row">
                 <label>
                   Nom du signataire

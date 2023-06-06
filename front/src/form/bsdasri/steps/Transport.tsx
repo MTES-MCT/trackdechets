@@ -10,6 +10,7 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import { BsdasriStatus, Bsdasri, BsdasriType } from "generated/graphql/types";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import { customInfoToolTip } from "./Emitter";
+import { subtractMonths } from "common/helper";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Transport({ status, editionDisabled = false }) {
@@ -32,6 +33,8 @@ export default function Transport({ status, editionDisabled = false }) {
   const showTransportePlates = values?.transporter?.transport?.mode === "ROAD";
 
   const transportEmphasis = false;
+
+  const TODAY = new Date();
 
   const disabled =
     editionDisabled ||
@@ -93,12 +96,14 @@ export default function Transport({ status, editionDisabled = false }) {
               "field-emphasis": transportEmphasis,
             })}
           >
-            <label className="tw-font-semibold">
+            <label>
               Date de prise en charge
               <div className="td-date-wrapper">
                 <Field
                   name="transporter.transport.takenOverAt"
                   component={DateInput}
+                  minDate={subtractMonths(TODAY, 2)}
+                  maxDate={TODAY}
                   className="td-input"
                   disabled={disabled}
                 />

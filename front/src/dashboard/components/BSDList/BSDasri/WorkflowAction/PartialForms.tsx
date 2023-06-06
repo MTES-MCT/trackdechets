@@ -17,6 +17,7 @@ import { getInitialWeightFn } from "form/bsdasri/utils/initial-state";
 import { Bsdasri, BsdasriType } from "generated/graphql/types";
 import Transport from "form/bsdasri/steps/Transport";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
+import { subtractMonths } from "common/helper";
 
 export function EmitterSignatureForm() {
   return (
@@ -153,6 +154,8 @@ export function ReceptionSignatureForm() {
     }
   }, [setFieldValue, values.type]);
 
+  const TODAY = new Date();
+
   return (
     <>
       <div className="form__row">
@@ -196,6 +199,8 @@ export function ReceptionSignatureForm() {
             <Field
               name="destination.reception.date"
               component={DateInput}
+              minDate={subtractMonths(TODAY, 2)}
+              maxDate={TODAY}
               className="td-input"
             />
           </div>
@@ -212,6 +217,8 @@ export function ReceptionSignatureForm() {
   );
 }
 export function OperationSignatureForm() {
+  const TODAY = new Date();
+
   return (
     <>
       <div className="form__row">
@@ -247,6 +254,8 @@ export function OperationSignatureForm() {
             <Field
               name="destination.operation.date"
               component={DateInput}
+              minDate={subtractMonths(TODAY, 2)}
+              maxDate={TODAY}
               className="td-input"
             />
           </div>

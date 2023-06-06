@@ -23,6 +23,7 @@ import { FormJourneySummary } from "dashboard/components/BSDList/BSDD/WorkflowAc
 import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subtractMonths } from "common/helper";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
@@ -68,7 +69,7 @@ interface SignTransportFormModalProps {
   formId: string;
 }
 
-function SignTransportFormModalContent({
+export default function SignTransportFormModalContent({
   title,
   siret,
   formId,
@@ -264,8 +265,4 @@ function SignTransportFormModalContent({
       </Formik>
     </>
   );
-}
-export default SignTransportFormModalContent;
-function subtractMonths(today: Date, arg1: number): unknown {
-  throw new Error("Function not implemented.");
 }
