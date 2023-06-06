@@ -168,6 +168,8 @@ export default function CompanySelector({
     },
     skip: !orgId,
     onCompleted(data) {
+      // Force update the country field
+      // TODO it's a hack to remove
       setFieldValue(
         `${field.name}.country`,
         data.companyPrivateInfos.codePaysEtrangerEtablissement

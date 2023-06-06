@@ -2,7 +2,7 @@ import CompanySelector from "form/common/components/company/CompanySelector";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
 import { CompanyType, EmitterType, Form } from "generated/graphql/types";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WorkSite from "form/common/components/work-site/WorkSite";
 import { getInitialEmitterWorkSite } from "form/bsdd/utils/initial-state";
@@ -12,6 +12,9 @@ import { emitterTypeLabels } from "dashboard/constants";
 import { isForeignVat, isOmi } from "generated/constants/companySearchHelpers";
 import { RedErrorMessage } from "common/components";
 import Tooltip from "common/components/Tooltip";
+import ApolloCompanyPrivateInfosProvider, {
+  ApolloCompanyPrivateInfosContext,
+} from "./utils/ApolloCompanyPrivateInfosProvider";
 import { onBsddTransporterCompanySelected } from "./utils/onBsddTransporterCompanySelected";
 
 export default function Emitter({ disabled }) {
@@ -60,6 +63,9 @@ export default function Emitter({ disabled }) {
     return undefined;
   }
 
+  const { queryCompanyPrivateInfos } = useContext(
+    ApolloCompanyPrivateInfosContext
+  );
   return (
     <>
       {disabled && (
@@ -291,40 +297,45 @@ export default function Emitter({ disabled }) {
       {isGrouping && (
         <div className="tw-my-6">
           <h4 className="form__section-heading">Entreprise émettrice</h4>
-          <MyCompanySelector
-            fieldName="emitter.company"
-            siretEditable={!siretNonEditable}
-            onSelect={company => {
-              if (values.grouping?.length) {
-                // make sure to empty appendix2 forms because new emitter may
-                // not be recipient of the select appendix 2 forms
-                setFieldValue("grouping", []);
-              }
-              if (values.emitter?.type === EmitterType.Appendix1) {
-                setFieldValue("transporter.company", company);
-                // propagate receipt
-                onBsddTransporterCompanySelected(setFieldValue)(company);
-              }
-            }}
-            filter={companies => {
-              if (values.emitter?.type === EmitterType.Appendix1) {
-                const authorizedTypes = [
-                  CompanyType.Collector,
-                  CompanyType.Transporter,
-                  CompanyType.Wasteprocessor,
-                  CompanyType.WasteCenter,
-                ];
-                return companies.filter(
-                  company =>
-                    !isForeignVat(company.orgId) &&
-                    company.companyTypes.some(type =>
-                      authorizedTypes.includes(type)
-                    )
-                );
-              }
-              return companies;
-            }}
-          />
+          <ApolloCompanyPrivateInfosProvider>
+            <MyCompanySelector
+              fieldName="emitter.company"
+              siretEditable={!siretNonEditable}
+              onSelect={company => {
+                if (values.grouping?.length) {
+                  // make sure to empty appendix2 forms because new emitter may
+                  // not be recipient of the select appendix 2 forms
+                  setFieldValue("grouping", []);
+                }
+                if (values.emitter?.type === EmitterType.Appendix1) {
+                  setFieldValue("transporter.company", company);
+                  // refresh CompanyPrivateInfos and propagate the receipt form values
+                  queryCompanyPrivateInfos(
+                    company.orgId,
+                    onBsddTransporterCompanySelected(setFieldValue)
+                  );
+                }
+              }}
+              filter={companies => {
+                if (values.emitter?.type === EmitterType.Appendix1) {
+                  const authorizedTypes = [
+                    CompanyType.Collector,
+                    CompanyType.Transporter,
+                    CompanyType.Wasteprocessor,
+                    CompanyType.WasteCenter,
+                  ];
+                  return companies.filter(
+                    company =>
+                      !isForeignVat(company.orgId) &&
+                      company.companyTypes.some(type =>
+                        authorizedTypes.includes(type)
+                      )
+                  );
+                }
+                return companies;
+              }}
+            />
+          </ApolloCompanyPrivateInfosProvider>
         </div>
       )}
 

@@ -7,10 +7,13 @@ import {
   Transporter as TransporterType,
   WasteDetailsInput,
 } from "generated/graphql/types";
-import React from "react";
+import React, { useContext } from "react";
 import styles from "./Transporter.module.scss";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
 import { formTransportIsPipeline } from "./utils/packagings";
+import ApolloCompanyPrivateInfosProvider, {
+  ApolloCompanyPrivateInfosContext,
+} from "./utils/ApolloCompanyPrivateInfosProvider";
 import { onBsddTransporterCompanySelected } from "./utils/onBsddTransporterCompanySelected";
 
 type Values = {
@@ -20,16 +23,26 @@ type Values = {
 
 export default function Transporter() {
   const { setFieldValue, values } = useFormikContext<Values>();
-
+  const { queryCompanyPrivateInfos } = useContext(
+    ApolloCompanyPrivateInfosContext
+  );
   return !formTransportIsPipeline(values) ? (
     <>
       <h4 className="form__section-heading">Transporteur</h4>
-      <CompanySelector
-        name="transporter.company"
-        allowForeignCompanies={true}
-        registeredOnlyCompanies={true}
-        onCompanySelected={onBsddTransporterCompanySelected(setFieldValue)}
-      />
+      <ApolloCompanyPrivateInfosProvider>
+        <CompanySelector
+          name="transporter.company"
+          allowForeignCompanies={true}
+          registeredOnlyCompanies={true}
+          onCompanySelected={() =>
+            // refresh CompanyPrivateInfos and propagate the receipt form values
+            queryCompanyPrivateInfos(
+              values.transporter.company?.orgId!,
+              onBsddTransporterCompanySelected(setFieldValue)
+            )
+          }
+        />
+      </ApolloCompanyPrivateInfosProvider>
       {!isForeignVat(values.transporter?.company?.vatNumber!) && (
         <>
           <h4 className="form__section-heading">
