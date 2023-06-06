@@ -106,7 +106,7 @@ export function SignEmission({
                   En qualité <strong>d'émetteur du déchet</strong>, j'atteste
                   que les informations ci-dessus sont correctes. En signant ce
                   document, j'autorise le transporteur à prendre en charge le
-                  déchet. La signature est horodatée.
+                  déchet.
                 </p>
 
                 <div className="form__row">

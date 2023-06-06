@@ -124,7 +124,6 @@ export function SignTransport({
                   En qualité de <strong>transporteur du déchet</strong>,
                   j'atteste que les informations ci-dessus sont correctes. En
                   signant ce document, je déclare prendre en charge le déchet.
-                  La signature est horodatée.
                 </p>
                 <TransporterReceipt transporter={bsvhu.transporter!} />
 
