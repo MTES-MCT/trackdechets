@@ -32,7 +32,7 @@ export function onBsddTransporterCompanySelected(
     } else {
       // empty the receipt when transporter is undefined
       setFieldValue("transporter.receipt", null);
-      setFieldValue("transporter.validityLimit", null);
+      setFieldValue("transporter.validityLimit", "");
       setFieldValue("transporter.department", null);
     }
   };
