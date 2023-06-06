@@ -41,6 +41,11 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
   const { destination, transporter, wasteDetails } =
     await sirenifyResealedFormInput(resealedInfos, user);
 
+  const flattenedFormInput = flattenFormInput({
+    transporter,
+    wasteDetails,
+    recipient: destination
+  });
   // copy basic info from initial BSD and overwrite it with resealedInfos
   const updateInput = {
     emitterType: EmitterType.PRODUCER,
@@ -64,13 +69,31 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     ),
     wasteDetailsAnalysisReferences: [],
     wasteDetailsLandIdentifiers: [],
-    ...flattenFormInput({ transporter, wasteDetails, recipient: destination })
+    ...flattenedFormInput
   };
+
+  // the validation schema reuses sealedFormSchema for this markAsresealed mutation
+  // sealedFormSchema check if packaging infos contains PIPELINE and apply specific rules if that's the case
+  // but packaging infos might come from the initial bsd and thus block validation fro the bsd-suite
+  // so we have cheat a little:
+  // - if current input does not contain packaging infos for the bsd suite, it is copied for update,
+  // BUT replaced by a dummy packaging info for validation
+  // - if current input contains packaging info, it is copied for update and for validation
+  const validationPackagingInfosOverride =
+    flattenedFormInput?.wasteDetailsPackagingInfos
+      ? {}
+      : {
+          wasteDetailsPackagingInfos: [
+            { type: "BENNE", other: "", quantity: 1 }
+          ]
+        };
 
   // validate input
   await sealedFormSchema.validate({
     ...forwardedIn,
-    ...updateInput
+    ...updateInput,
+
+    ...validationPackagingInfosOverride
   });
 
   await validateForwardedInCompanies(form);
