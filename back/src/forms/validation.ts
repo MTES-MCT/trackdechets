@@ -706,7 +706,9 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
 // Schéma lorsque emitterType = APPENDIX1_PRODUCER
 // TODO: Typing as any because in schemaOf<> Yup always wraps arrays as Maybe<>.
 // and it breaks typings
-const wasteDetailsAppendix1ProducerSchemaFn: any = ({ isDraft }) =>
+const wasteDetailsAppendix1ProducerSchemaFn: (
+  context: Pick<FormValidationContext, "isDraft">
+) => any = ({ isDraft }) =>
   yup.object({
     wasteDetailsQuantity: weight(WeightUnits.Tonne)
       .label("Déchet")
@@ -717,12 +719,12 @@ const wasteDetailsAppendix1ProducerSchemaFn: any = ({ isDraft }) =>
     wasteDetailsPackagingInfos: yup
       .array()
       .of(packagingInfoFn({ isDraft }) as any)
-      .transform(value => !value ? [] : value)
+      .transform(value => (!value ? [] : value))
       .test(
         "is-valid-packaging-infos",
         "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
         isValidPackagingInfos
-      )
+      ) as any
   });
 
 // Schéma lorsque emitterType n'est pas APPENDIX1
@@ -768,7 +770,7 @@ const wasteDetailsSchemaFn = (
 ) =>
   yup.lazy(value => {
     if (value.emitterType === EmitterType.APPENDIX1_PRODUCER) {
-      return yup.object();
+      return wasteDetailsAppendix1ProducerSchemaFn(context);
     }
 
     if (value.emitterType === EmitterType.APPENDIX1) {
@@ -1306,17 +1308,17 @@ export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 // validation schema for BSD before it can be sealed
 const baseFormSchemaFn = (context: FormValidationContext) =>
   yup.lazy(value => {
+    const lazyWasteDetailsSchema = wasteDetailsSchemaFn(context).resolve({
+      value
+    });
+
     if (value.emitterType === EmitterType.APPENDIX1_PRODUCER) {
       return yup
         .object()
         .concat(emitterSchemaFn(context))
-        .concat(wasteDetailsAppendix1ProducerSchemaFn(context))
+        .concat(lazyWasteDetailsSchema)
         .noUnknown();
     }
-
-    const lazyWasteDetailsSchema = wasteDetailsSchemaFn(context).resolve({
-      value
-    });
 
     if (hasPipeline(value)) {
       return yup
