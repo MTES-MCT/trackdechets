@@ -18,6 +18,7 @@ import {
   IconRenewableEnergyEarth,
   IconBSDasri,
   IconDuplicateFile,
+  IconPdf,
 } from "common/components/Icons";
 import { InitialDasris } from "./InitialDasris";
 import QRCodeIcon from "react-qr-code";
@@ -530,11 +531,13 @@ const AssociatedTo = ({ formId, label }: { formId: string; label: string }) => {
     <DetailRow
       value={
         <span>
-          {formId} (
-          <button className="link" onClick={() => downloadPdf()}>
-            PDF
+          {formId}
+          <button className="link tw-flex" onClick={() => downloadPdf()}>
+            <IconPdf size="18px" color="blueLight" />
+            <span className={classNames(styles.downloadLink, "tw-ml-1")}>
+              Pdf
+            </span>
           </button>
-          )
         </span>
       }
       label={`${label} bordereau n°`}
