@@ -29,6 +29,11 @@ export const GET_ME = gql`
         contactPhone
         address
         companyTypes
+        transporterReceipt {
+          receiptNumber
+          validityLimit
+          department
+        }
       }
     }
   }

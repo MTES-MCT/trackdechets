@@ -13,6 +13,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Correctifs BSDD Annexe 1 sur l'autocompletion des récépissés Transporteurs automatiquement sélectionné [PR 2437](https://github.com/MTES-MCT/trackdechets/pull/2437)
+- Correctifs BSDD sur l'affichage et la sauvegarde des récépissés Transporteurs par défaut (Favorites) et lors d'une dé-sélection [PR 2437](https://github.com/MTES-MCT/trackdechets/pull/2437)
+
 #### :boom: Breaking changes
 
 - Le destinataire est obligatoire pour sceller un BSDASRI [PR 2267](https://github.com/MTES-MCT/trackdechets/pull/2267)

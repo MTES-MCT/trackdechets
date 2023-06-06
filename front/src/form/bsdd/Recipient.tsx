@@ -227,7 +227,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           <CompanySelector
             name="trader.company"
             onCompanySelected={trader => {
-              if (trader.traderReceipt) {
+              if (trader?.traderReceipt) {
                 setFieldValue(
                   "trader.receipt",
                   trader.traderReceipt.receiptNumber
@@ -303,7 +303,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           <CompanySelector
             name="broker.company"
             onCompanySelected={broker => {
-              if (broker.brokerReceipt) {
+              if (broker?.brokerReceipt) {
                 setFieldValue(
                   "broker.receipt",
                   broker.brokerReceipt.receiptNumber

@@ -45,7 +45,7 @@ export const FAVORITES = gql`
   }
 `;
 
-export const COMPANY_INFOS_REGISTRATION = gql`
+export const COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA = gql`
   query CompanyInfos($siret: String!) {
     companyInfos(siret: $siret) {
       orgId
@@ -175,6 +175,8 @@ export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
     companyPrivateInfos(clue: $clue) {
       orgId
       siret
+      name
+      address
       vatNumber
       etatAdministratif
       statutDiffusionEtablissement

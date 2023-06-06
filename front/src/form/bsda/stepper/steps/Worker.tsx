@@ -58,7 +58,7 @@ export function Worker({ disabled }) {
             name="worker.company"
             heading="Entreprise de travaux"
             onCompanySelected={worker => {
-              if (worker.workerCertification?.hasSubSectionFour) {
+              if (worker?.workerCertification?.hasSubSectionFour) {
                 setFieldValue(
                   "worker.certification.hasSubSectionFour",
                   worker.workerCertification.hasSubSectionFour
@@ -67,7 +67,7 @@ export function Worker({ disabled }) {
                 setFieldValue("worker.certification.hasSubSectionFour", false);
               }
 
-              if (worker.workerCertification?.hasSubSectionThree) {
+              if (worker?.workerCertification?.hasSubSectionThree) {
                 setFieldValue(
                   "worker.certification.hasSubSectionThree",
                   worker.workerCertification.hasSubSectionThree

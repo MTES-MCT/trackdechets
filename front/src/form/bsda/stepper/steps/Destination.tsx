@@ -318,7 +318,7 @@ export function Destination({ disabled }) {
           <CompanySelector
             name="broker.company"
             onCompanySelected={broker => {
-              if (broker.brokerReceipt) {
+              if (broker?.brokerReceipt) {
                 setFieldValue(
                   "broker.recepisse.number",
                   broker.brokerReceipt.receiptNumber
