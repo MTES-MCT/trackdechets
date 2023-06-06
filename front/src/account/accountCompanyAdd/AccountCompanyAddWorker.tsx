@@ -75,7 +75,6 @@ export default function AccountCompanyAddBrokerReceipt() {
                     label="N° certification"
                     nativeInputProps={{
                       name: field.name,
-                      checked: field.value,
                       onChange: field.onChange,
                       onBlur: field.onBlur,
                     }}
@@ -94,7 +93,6 @@ export default function AccountCompanyAddBrokerReceipt() {
                     nativeInputProps={{
                       type: "date",
                       name: field.name,
-                      checked: field.value,
                       onChange: field.onChange,
                       onBlur: field.onBlur,
                       max: "2999/12/31",
