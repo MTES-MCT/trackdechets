@@ -263,7 +263,7 @@ export default function Dashboard() {
               </Route>
               <Route path={routes.dashboard.bsdasris.sign.transporter}>
                 <Modal
-                  onClose={() => history.push(actionDashboard)}
+                  onClose={() => history.push(toCollectDashboard)}
                   ariaLabel="Signature transporteur"
                   isOpen
                 >
