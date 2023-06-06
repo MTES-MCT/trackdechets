@@ -4,17 +4,19 @@ import { FieldTransportModeSelect } from "common/components";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
 import {
+  CompanySearchPrivate,
+  Query,
+  QueryCompanyPrivateInfosArgs,
   Transporter as TransporterType,
   WasteDetailsInput,
 } from "generated/graphql/types";
-import React, { useContext } from "react";
+import React from "react";
 import styles from "./Transporter.module.scss";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
 import { formTransportIsPipeline } from "./utils/packagings";
-import ApolloCompanyPrivateInfosProvider, {
-  ApolloCompanyPrivateInfosContext,
-} from "./utils/ApolloCompanyPrivateInfosProvider";
 import { onBsddTransporterCompanySelected } from "./utils/onBsddTransporterCompanySelected";
+import { useQuery } from "@apollo/client";
+import { COMPANY_SELECTOR_PRIVATE_INFOS } from "form/common/components/company/query";
 
 type Values = {
   transporter: TransporterType;
@@ -23,26 +25,46 @@ type Values = {
 
 export default function Transporter() {
   const { setFieldValue, values } = useFormikContext<Values>();
-  const { queryCompanyPrivateInfos } = useContext(
-    ApolloCompanyPrivateInfosContext
-  );
+  const [orgId, setOrgId] = React.useState<string>("");
+  const updateBsddTransporterReceipt =
+    onBsddTransporterCompanySelected(setFieldValue);
+  const { loading, error, refetch } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_SELECTOR_PRIVATE_INFOS, {
+    variables: {
+      clue: orgId!,
+    },
+    skip: !orgId,
+    onCompleted: data => {
+      console.log(data);
+      if (data && typeof updateBsddTransporterReceipt === "function") {
+        updateBsddTransporterReceipt(
+          data.companyPrivateInfos as CompanySearchPrivate
+        );
+      }
+    },
+  });
+
+  React.useCallback(() => {
+    if (!loading && !error && orgId) {
+      // fetch the data
+      refetch();
+    }
+  }, [refetch, error, loading, orgId]);
+
   return !formTransportIsPipeline(values) ? (
     <>
       <h4 className="form__section-heading">Transporteur</h4>
-      <ApolloCompanyPrivateInfosProvider>
-        <CompanySelector
-          name="transporter.company"
-          allowForeignCompanies={true}
-          registeredOnlyCompanies={true}
-          onCompanySelected={() =>
-            // refresh CompanyPrivateInfos and propagate the receipt form values
-            queryCompanyPrivateInfos(
-              values.transporter.company?.orgId!,
-              onBsddTransporterCompanySelected(setFieldValue)
-            )
-          }
-        />
-      </ApolloCompanyPrivateInfosProvider>
+      <CompanySelector
+        name="transporter.company"
+        allowForeignCompanies={true}
+        registeredOnlyCompanies={true}
+        onCompanySelected={() =>
+          // refresh CompanyPrivateInfos and propagate the receipt form values
+          setOrgId(values.transporter.company?.orgId!)
+        }
+      />
       {!isForeignVat(values.transporter?.company?.vatNumber!) && (
         <>
           <h4 className="form__section-heading">

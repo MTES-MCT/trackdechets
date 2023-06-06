@@ -4,7 +4,7 @@ import {
 } from "generated/graphql/types";
 
 /**
- * Propagates the receipt to the form when a company is selected or un-selected
+ * Propagates the receipt up to the form when a company is selected or un-selected
  * @param setFieldValue
  * @returns void
  */
@@ -30,6 +30,7 @@ export function onBsddTransporterCompanySelected(
         transporter?.transporterReceipt.department
       );
     } else {
+      // empty the receipt when transporter is undefined
       setFieldValue("transporter.receipt", null);
       setFieldValue("transporter.validityLimit", null);
       setFieldValue("transporter.department", null);

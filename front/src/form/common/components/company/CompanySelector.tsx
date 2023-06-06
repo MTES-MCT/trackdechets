@@ -186,7 +186,7 @@ export default function CompanySelector({
    */
   function selectCompany(company?: CompanySearchResult) {
     if (disabled) return;
-    // empty the  selected company when null
+    // empty the fields
     if (!company) {
       setFieldValue(field.name, getInitialCompany());
       setFieldTouched(`${field.name}`, true, true);
@@ -577,24 +577,10 @@ function favoriteToCompanySearchResult(
   company: CompanyFavorite
 ): CompanySearchResult {
   return {
-    orgId: company.orgId,
-    siret: company.siret,
-    vatNumber: company.vatNumber,
-    name: company.name,
-    address: company.address,
-    transporterReceipt: company.transporterReceipt,
-    traderReceipt: company.traderReceipt,
-    brokerReceipt: company.brokerReceipt,
-    vhuAgrementDemolisseur: company.vhuAgrementDemolisseur,
-    vhuAgrementBroyeur: company.vhuAgrementBroyeur,
-    workerCertification: company.workerCertification,
-    codePaysEtrangerEtablissement:
-      company.codePaysEtrangerEtablissement || "FR",
-    contact: company.contact,
+    ...(company as CompanySearchResult),
     contactPhone: company.phone,
     contactEmail: company.mail,
-    isRegistered: company.isRegistered,
-    companyTypes: [],
     etatAdministratif: "A",
+    companyTypes: [],
   };
 }
