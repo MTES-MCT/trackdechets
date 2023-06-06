@@ -170,16 +170,16 @@ function BsdCard({
                 {bsdDisplay?.isTempStorage && (
                   <InfoWithIcon labelCode={InfoIconCode.TempStorage} />
                 )}
+                {getWorkflowLabel(bsdDisplay.bsdWorkflowType) && (
+                  <p className="workflow-type">
+                    {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
+                  </p>
+                )}
                 {updatedAt && (
                   <InfoWithIcon
                     labelCode={InfoIconCode.LastModificationDate}
                     date={updatedAt}
                   />
-                )}
-                {getWorkflowLabel(bsdDisplay.bsdWorkflowType) && (
-                  <p className="workflow-type">
-                    {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
-                  </p>
                 )}
                 {bsdDisplay?.emittedByEcoOrganisme && (
                   <InfoWithIcon labelCode={InfoIconCode.EcoOrganism} />

@@ -1,9 +1,6 @@
 import { Form, Status } from "@prisma/client";
 import { RepositoryFnDeps } from "../../../common/repository/types";
-import { PackagingInfo } from "../../../generated/graphql/types";
 import { checkCanBeSealed } from "../../validation";
-import { sumPackagingInfos } from "../helper";
-import buildUpdateForm from "./update";
 import buildUpdateManyForms from "./updateMany";
 
 class FormFraction {
@@ -82,24 +79,6 @@ export function buildSetAppendix1({
         recipientCompanyMail: form.recipientCompanyMail,
         ecoOrganismeName: form.ecoOrganismeName,
         ecoOrganismeSiret: form.ecoOrganismeSiret
-      }
-    );
-
-    // Update container packagings
-    const updateForm = buildUpdateForm({ prisma, user });
-    await updateForm(
-      { id: form.id },
-      {
-        wasteDetailsPackagingInfos: sumPackagingInfos(
-          newAppendix1Fractions.map(
-            fraction =>
-              fraction.form.wasteDetailsPackagingInfos as PackagingInfo[]
-          )
-        ),
-        wasteDetailsQuantity: newAppendix1Fractions.reduce(
-          (sum, fraction) => sum + (fraction.form.wasteDetailsQuantity ?? 0),
-          0
-        )
       }
     );
 

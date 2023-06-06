@@ -98,7 +98,8 @@ const updateFormResolver = async (
   // So this is a 2 way constraint:
   // - casting remove keys in the input but unknown to the validator
   // - then we remove keys present in the casting result but not present in the input
-  const formUpdateInput: Prisma.FormUpdateInput = draftFormSchema.cast(form);
+  const formUpdateInput: Prisma.FormUpdateInput =
+    draftFormSchema.cast(form) ?? {};
   for (const key of Object.keys(formUpdateInput)) {
     if (!(key in form)) {
       delete formUpdateInput[key];

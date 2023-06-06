@@ -103,10 +103,11 @@ const signTransportFn = async (
       }
 
       // During transporter signature, we recompute the total packaging infos
+      // But we only use the current form + forms picked up by the transporter to compute this quantity
       const appendix1Forms = await findGroupedFormsById(appendix1ContainerId);
-      const wasteDetailsPackagingInfos = appendix1Forms.map(
-        form => form.wasteDetailsPackagingInfos as PackagingInfo[]
-      );
+      const wasteDetailsPackagingInfos = appendix1Forms
+        .filter(form => existingForm.id === form.id || form.takenOverAt)
+        .map(form => form.wasteDetailsPackagingInfos as PackagingInfo[]);
 
       await update(
         { id: appendix1ContainerId },
