@@ -100,7 +100,7 @@ function SignTransportFormModalContent({
     },
   });
 
-  const [updateForm] = useMutation<
+  const [updateForm, { error: updateError }] = useMutation<
     Pick<Mutation, "updateForm">,
     MutationUpdateFormArgs
   >(UPDATE_FORM);
@@ -236,6 +236,7 @@ function SignTransportFormModalContent({
             )}
 
             {error && <NotificationError apolloError={error} />}
+            {updateError && <NotificationError apolloError={updateError} />}
 
             <div className="td-modal-actions">
               <button
