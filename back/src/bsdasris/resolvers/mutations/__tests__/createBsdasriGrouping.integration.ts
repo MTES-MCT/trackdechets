@@ -1,6 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
+  getDestinationCompanyInfo,
   siretify,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -151,7 +152,7 @@ describe("Mutation.createDasri", () => {
       })
     ]);
   });
-  it("should build a regroupment dasri", async () => {
+  it("should build a groupment dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["COLLECTOR"]
@@ -202,7 +203,7 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-
+      ...(await getDestinationCompanyInfo()),
       grouping: [toRegroup1.id, toRegroup2.id]
     };
 
@@ -227,8 +228,17 @@ describe("Mutation.createDasri", () => {
     const grouped2 = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: toRegroup2.id }
     });
+    const created = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: data.createBsdasri.id }
+    });
     expect(grouped1.groupedInId).toEqual(data.createBsdasri.id);
 
     expect(grouped2.groupedInId).toEqual(data.createBsdasri.id);
+
+    expect(created.synthesisEmitterSirets).toEqual([]);
+    expect(created.groupingEmitterSirets).toEqual([
+      grouped1.emitterCompanySiret,
+      grouped2.emitterCompanySiret
+    ]);
   });
 });

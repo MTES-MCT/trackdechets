@@ -819,6 +819,7 @@ export async function expandInitialFormFromDb(
     emitter,
     recipient,
     transporter,
+    takenOverAt,
     signedAt,
     quantityReceived,
     processingOperationDone,
@@ -837,6 +838,7 @@ export async function expandInitialFormFromDb(
     emitterPostalCode: hasPickupSite
       ? emitter?.workSite?.postalCode
       : extractPostalCode(emitter?.company?.address),
+    takenOverAt: processDate(takenOverAt),
     signedAt: processDate(signedAt),
     recipient,
     transporter,

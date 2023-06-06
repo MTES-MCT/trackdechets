@@ -10,16 +10,13 @@ jobs:
         working-directory: front
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node
-        uses: actions/setup-node@v2.1.2
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: "14.x"
-      - uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: front/package-lock.json
+
       - name: Install dependencies
         run: npm ci
       - name: Generate files
@@ -38,16 +35,14 @@ jobs:
         working-directory: back
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node
-        uses: actions/setup-node@v2.1.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: "14.x"
-      - uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: back/package-lock.json
+
       - name: Install dependencies
         run: npm ci
       - name: Generate files
@@ -81,10 +76,14 @@ jobs:
         working-directory: doc
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: "16.16.x"
+          node-version: '16'
+          cache: 'yarn'
+          cache-dependency-path: doc/yarn.lock
+
+      - run: yarn install --frozen-lockfile
       - name: Test Build
-        run: |
-          yarn install --frozen-lockfile
-          yarn build
+        run: yarn build

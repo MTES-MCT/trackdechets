@@ -45,8 +45,16 @@
       }
     }
     .workflow-type {
-      font-weight: bold;
       margin: 0;
+      display: flex;
+      align-items: center;
+      &:before {
+        display: inline-block;
+        content: "";
+        background-image: url("/icons/dashboard/icon-bsd-workflow-type.svg");
+        width: 24px;
+        height: 24px;
+      }
     }
   }
 

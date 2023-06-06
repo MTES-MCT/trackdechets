@@ -302,7 +302,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       <CompanySelector
                         name="content.broker.company"
                         onCompanySelected={broker => {
-                          if (broker.brokerReceipt) {
+                          if (broker?.brokerReceipt) {
                             setFieldValue(
                               "content.broker.receipt",
                               broker.brokerReceipt.receiptNumber
@@ -384,7 +384,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       <CompanySelector
                         name="content.trader.company"
                         onCompanySelected={trader => {
-                          if (trader.traderReceipt) {
+                          if (trader?.traderReceipt) {
                             setFieldValue(
                               "content.trader.receipt",
                               trader.traderReceipt.receiptNumber

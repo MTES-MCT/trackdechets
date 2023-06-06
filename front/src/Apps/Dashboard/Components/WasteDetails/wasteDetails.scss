@@ -15,17 +15,20 @@
       font-size: 0.875rem; //14px
       font-weight: 700;
       line-height: 24px;
-      color: #3a3a3a;
+      color: #000091;
       width: fit-content;
     }
-    &__name {
+    &__name,
+    &__workflow {
       margin: 0;
-      padding: 0 0 5px 0;
+      padding: 0;
       font-size: 0.75rem; //12px
-      font-weight: 400;
       line-height: 20px;
       color: #3a3a3a;
       width: fit-content;
+    }
+    &__workflow {
+      font-weight: 700;
     }
   }
 }

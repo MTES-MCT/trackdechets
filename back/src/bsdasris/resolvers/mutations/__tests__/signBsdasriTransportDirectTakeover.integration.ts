@@ -1,11 +1,15 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import {
   bsdasriFactory,
   initialData,
+  readyToPublishData,
   readyToTakeOverData
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
@@ -23,10 +27,12 @@ describe("Mutation.signBsdasri transport", () => {
 
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory();
 
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         status: BsdasriStatus.INITIAL
       }
@@ -91,11 +97,13 @@ describe("Mutation.signBsdasri transport", () => {
 
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
 
     // missing onu code
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destination),
         ...readyToTakeOverData(transporterCompany),
         wasteAdr: null,
         status: BsdasriStatus.INITIAL

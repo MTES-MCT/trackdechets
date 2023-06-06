@@ -232,12 +232,8 @@ export function expandBsdaFromElastic(
   };
 }
 
-type FlattenedBsdaInput = Partial<
-  Omit<Prisma.BsdaCreateInput, "intermediariesOrgIds">
->;
-
 export function flattenBsdaInput(formInput: BsdaInput) {
-  return safeInput<FlattenedBsdaInput>({
+  return safeInput({
     type: formInput?.type ?? undefined,
     ...flattenBsdaEmitterInput(formInput),
     ...flattenBsdaEcoOrganismeInput(formInput),
@@ -250,7 +246,10 @@ export function flattenBsdaInput(formInput: BsdaInput) {
       chain(formInput, f => f.packagings),
       []
     ),
-    ...flattenBsdaWeightInput(formInput)
+    ...flattenBsdaWeightInput(formInput),
+    grouping: formInput.grouping,
+    forwarding: formInput.forwarding,
+    intermediaries: formInput.intermediaries
   });
 }
 
@@ -471,7 +470,10 @@ function flattenBsdaWorkerInput({ worker }: Pick<BsdaInput, "worker">) {
       chain(w.certification, c => c.validityLimit)
     ),
     workerCertificationOrganisation: chain(worker, w =>
-      chain(w.certification, c => c.organisation)
+      chain(
+        w.certification,
+        c => (c.organisation === "" ? null : c.organisation) // Empty string is considered as null as we expect an enum here
+      )
     )
   };
 }

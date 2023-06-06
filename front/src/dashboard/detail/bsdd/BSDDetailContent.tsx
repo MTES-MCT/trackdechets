@@ -668,6 +668,12 @@ export default function BSDDetailContent({
               <dt>Code onu</dt>
               <dd>{form?.stateSummary?.onuCode}</dd>
               <dt>POP</dt> <dd>{form.wasteDetails?.pop ? "Oui" : "Non"}</dd>
+              {form?.emitter?.type === EmitterType.Appendix1Producer && (
+                <>
+                  <dt>Numéro d'échantillon</dt>
+                  <dd>{form?.wasteDetails?.sampleNumber}</dd>
+                </>
+              )}
             </div>
 
             {form.ecoOrganisme && (

@@ -11,10 +11,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { checkCanSignFor } from "../../permissions";
 import { expandFormFromDb } from "../../converter";
-import {
-  beforeSignedByTransporterSchema,
-  wasteDetailsSchema
-} from "../../validation";
+import { wasteDetailsSchema } from "../../validation";
 import { getFormRepository } from "../../repository";
 import { prismaJsonNoNull } from "../../../common/converter";
 
@@ -82,7 +79,6 @@ const signatures: Partial<
     };
 
     await wasteDetailsSchema.validate(futureForm);
-    await beforeSignedByTransporterSchema.validate(futureForm);
 
     const updatedForm = await getFormRepository(user).update(
       { id: existingForm.id },
@@ -141,7 +137,6 @@ const signatures: Partial<
     };
 
     await wasteDetailsSchema.validate(futureFullForm.forwardedIn);
-    await beforeSignedByTransporterSchema.validate(futureFullForm.forwardedIn);
 
     const updatedForm = await getFormRepository(user).update(
       { id: existingForm.id },

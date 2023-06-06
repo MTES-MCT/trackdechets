@@ -21,7 +21,7 @@ interface CreateBsffArgs {
   previousPackagings?: BsffPackaging[];
 }
 
-export function createBsff(
+export async function createBsff(
   {
     emitter,
     transporter,
@@ -61,6 +61,18 @@ export function createBsff(
       transporterCompanyPhone: transporter.company.contactPhone,
       transporterCompanyMail: transporter.company.contactEmail
     });
+    const transporterReceipt = await prisma.company
+      .findUnique({
+        where: { id: transporter.company.id }
+      })
+      .transporterReceipt();
+    if (transporterReceipt) {
+      Object.assign(data, {
+        transporterRecepisseNumber: transporterReceipt.receiptNumber,
+        transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+        transporterRecepisseDepartment: transporterReceipt.department
+      });
+    }
   }
 
   if (destination) {

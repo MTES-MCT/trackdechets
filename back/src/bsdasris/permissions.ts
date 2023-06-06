@@ -13,7 +13,8 @@ function readers(bsdasri: Bsdasri): string[] {
     bsdasri.transporterCompanyVatNumber,
     bsdasri.destinationCompanySiret,
     bsdasri.ecoOrganismeSiret,
-    ...bsdasri.synthesisEmitterSirets
+    ...bsdasri.synthesisEmitterSirets,
+    ...bsdasri.groupingEmitterSirets
   ].filter(Boolean);
 }
 
@@ -80,7 +81,6 @@ function creators(input: BsdasriInput) {
 
 export function checkCanRead(user: User, bsdasri: Bsdasri) {
   const authorizedOrgIds = readers(bsdasri);
-
   return checkUserPermissions(
     user,
     authorizedOrgIds,

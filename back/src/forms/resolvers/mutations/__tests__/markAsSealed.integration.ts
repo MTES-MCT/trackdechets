@@ -1259,4 +1259,42 @@ describe("Mutation.markAsSealed", () => {
     expect(updatedForm.emittedAt).not.toBeNull();
     expect(updatedForm.emittedBy).toEqual("Signature auto (navire étranger)");
   });
+
+  it("should be possible to seal a form without transporter", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        transporterCompanyAddress: null,
+        transporterCompanyContact: null,
+        transporterCompanyMail: null,
+        transporterCompanyName: null,
+        transporterCompanyPhone: null,
+        transporterCompanySiret: null,
+        transporterDepartment: null,
+        transporterTransportMode: null,
+        transporterNumberPlate: null,
+        transporterReceipt: null,
+        transporterValidityLimit: null
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const sealedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+
+    expect(sealedForm.status).toEqual("SEALED");
+  });
 });

@@ -1,6 +1,7 @@
 import React from "react";
 import zxcvbn from "zxcvbn";
-import { Alert, Text } from "@dataesr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+
 type Props = {
   password: string;
 };
@@ -45,21 +46,21 @@ export default function PasswordHelper({ password }: Props) {
 export function PasswordMeter({ password }: Props) {
   if (!password) return <span />;
   const { title, hintType, message } = getPasswordHint(password);
-  return <Alert title={title} description={message} type={hintType} />;
+  return <Alert title={title} description={message} severity={hintType} />;
 }
 
 export const PassWordHints = () => (
   <div className="fr-messages-group" aria-live="assertive">
-    <Text as="p" spacing="mb-1w" className="fr-text--bold">
+    <p className="fr-mb-1w fr-text--bold">
       <span className="bold">Votre mot de passe doit </span>: <br />
-    </Text>
-    <Text as="p" spacing="mb-1w">
+    </p>
+    <p className="fr-text--md fr-mb-1w">
       - contenir {MIN_LENGTH} caractères minimum
       <br />
       - avoir une complexité suffisante
       <br />
       Nous vous recommandons d'utiliser une phrase de passe (plusieurs mots
       accolés) ou un gestionnaire de mots de passe
-    </Text>
+    </p>
   </div>
 );

@@ -1,5 +1,10 @@
 import * as React from "react";
-import { generatePath, useParams, useLocation } from "react-router-dom";
+import {
+  generatePath,
+  useParams,
+  useLocation,
+  useRouteMatch,
+} from "react-router-dom";
 import routes from "common/routes";
 import { useBsdasriDuplicate } from "./useDuplicate";
 import { DeleteBsdasriModal } from "./DeleteModal";
@@ -37,20 +42,27 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
   const canDelete =
     status === BsdasriStatus.Initial ||
     (status === BsdasriStatus.SignedByProducer && siret === emitterSiret);
+
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
+
   const links = [
     {
       title: "Contrôle routier",
-      route: generatePath(routes.dashboard.roadControl, {
-        siret,
-        id: form.id,
-      }),
+      route: {
+        pathname: generatePath(routes[dashboardRoutePrefix].roadControl, {
+          siret,
+          id: form.id,
+        }),
+        state: { background: location },
+      },
       icon: <IconQrCode color="blueLight" size="24px" />,
       isVisible: useDisplayRoadControlButton(form),
     },
     {
       title: "Aperçu",
       route: {
-        pathname: generatePath(routes.dashboard.bsdasris.view, {
+        pathname: generatePath(routes[dashboardRoutePrefix].bsdasris.view, {
           siret,
           id: form.id,
         }),
@@ -77,7 +89,7 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
     },
     {
       title: "Modifier",
-      route: generatePath(routes.dashboard.bsdasris.edit, {
+      route: generatePath(routes[dashboardRoutePrefix].bsdasris.edit, {
         siret,
         id: form.id,
       }),

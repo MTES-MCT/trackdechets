@@ -1,4 +1,5 @@
 import React, { useEffect, useReducer, useState } from "react";
+import * as Sentry from "@sentry/browser";
 import TdSwitch from "common/components/Switch";
 
 import SearchInput from "common/components/SearchInput";
@@ -60,7 +61,10 @@ export default function WorkSiteAddress({
       }
       fetch(`https://api-adresse.data.gouv.fr/search/?q=${state.searchInput}`)
         .then(res => res.json())
-        .then(res => dispatch({ type: "search_done", payload: res.features }));
+        .then(res => dispatch({ type: "search_done", payload: res.features }))
+        .catch(error => {
+          Sentry.captureException(error);
+        });
     }, 300);
 
     return () => {

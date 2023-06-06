@@ -1,57 +1,59 @@
 import React from "react";
 import { Field } from "formik";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import styles from "../AccountCompanyAdd.module.scss";
-import DateInput from "../../form/common/components/custom-inputs/DateInput";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 /**
  * Broker receipt Formik fields for company creation
  */
 export default function AccountCompanyAddBrokerReceipt() {
   return (
-    <div className={styles.field}>
-      <label className={`text-right ${styles.bold}`}>
-        Récépissé Courtier (optionnel)
-      </label>
-      <div className={styles.field__value}>
-        <table>
-          <tbody>
-            <tr>
-              <td>Numéro de récépissé</td>
-              <td>
-                <Field
-                  type="text"
-                  name="brokerReceiptNumber"
-                  className="td-input"
-                />
-                <RedErrorMessage name="brokerReceiptNumber" />
-              </td>
-            </tr>
-            <tr>
-              <td>Limite de validité</td>
-              <td>
-                <Field
-                  name="brokerReceiptValidity"
-                  component={DateInput}
-                  className="td-input"
-                />
-                <RedErrorMessage name="brokerReceiptValidity" />
-              </td>
-            </tr>
-            <tr>
-              <td>Département</td>
-              <td>
-                <Field
-                  type="text"
-                  name="brokerReceiptDepartment"
-                  placeholder="75"
-                  className="td-input"
-                />
-                <RedErrorMessage name="brokerReceiptDepartment" />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <div className="fr-container">
+      <div className="fr-grid-row">
+        <div className="fr-col-12">
+          <p className="fr-text--bold">Récépissé Courtier (optionnel)</p>
+        </div>
+      </div>
+      <div className="fr-grid-row fr-grid-row--gutters">
+        <div className="fr-col-4">
+          <Field name="brokerReceiptNumber">
+            {({ field }) => {
+              return (
+                <Input
+                  label="Numéro de récépissé"
+                  nativeInputProps={field}
+                ></Input>
+              );
+            }}
+          </Field>
+          <RedErrorMessage name="brokerReceiptNumber" />
+        </div>
+        <div className="fr-col-4">
+          <Field name="brokerReceiptValidity">
+            {({ field }) => {
+              return (
+                <Input
+                  label="Limite de validité"
+                  nativeInputProps={{ type: "date", ...field }}
+                ></Input>
+              );
+            }}
+          </Field>
+          <RedErrorMessage name="brokerReceiptValidity" />
+        </div>
+        <div className="fr-col-2">
+          <Field name="brokerReceiptDepartment">
+            {({ field }) => {
+              return (
+                <Input
+                  label="Département"
+                  nativeInputProps={{ placeholder: "75", ...field }}
+                ></Input>
+              );
+            }}
+          </Field>
+          <RedErrorMessage name="brokerReceiptDepartment" />
+        </div>
       </div>
     </div>
   );

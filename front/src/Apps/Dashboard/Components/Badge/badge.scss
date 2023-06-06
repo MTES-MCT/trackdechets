@@ -23,12 +23,12 @@
 
   &--DRAFT,
   &--INITIAL,
-  &--SEALED {
+  &--SEALED,
+  &--SIGNED_BY_PRODUCER {
     background-color: #fbf6ed;
     color: #716043;
   }
 
-  &--SIGNED_BY_PRODUCER,
   &--SIGNED_BY_WORKER,
   &--SENT,
   &--RESENT,

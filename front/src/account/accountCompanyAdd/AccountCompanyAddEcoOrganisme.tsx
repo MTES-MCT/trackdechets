@@ -1,64 +1,65 @@
 import React from "react";
 import { Field, FieldArray, useField } from "formik";
-import className from "classnames";
-import { IconTrash } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import styles from "../AccountCompanyAdd.module.scss";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 export default function AccountCompanyAddEcoOrganisme() {
   const fieldProps = { name: "ecoOrganismeAgreements" };
   const [field] = useField<string[]>(fieldProps);
 
   return (
-    <div className={styles.field}>
-      <label className={`text-right ${styles.bold}`}>
-        Agréments éco-organisme
-      </label>
-      <div className={styles.field__value}>
-        <table>
-          <tbody>
-            <tr>
-              <td>URL</td>
-              <td>
-                <FieldArray {...fieldProps}>
-                  {({ push, remove }) => (
-                    <>
-                      {field.value.map((url, index) => (
-                        <div key={index} className={styles.inputGroup}>
-                          <Field
-                            type="url"
-                            name={`ecoOrganismeAgreements.${index}`}
-                            className={className([
-                              "td-input",
-                              styles.inputGroupInput,
-                            ])}
-                          />
-                          <button
-                            type="button"
-                            className="btn btn--outline-danger"
-                            onClick={() => remove(index)}
-                            aria-label="Supprimer"
-                          >
-                            <IconTrash />
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        className="btn btn--primary"
-                        onClick={() => push("")}
-                      >
-                        Ajouter un agrément
-                      </button>
-                    </>
-                  )}
-                </FieldArray>
-                <RedErrorMessage name="ecoOrganismeAgreements" />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <div className="fr-container">
+      <div className="fr-grid-row">
+        <div className="fr-col-12">
+          <p className="fr-text--bold">Agréments éco-organisme</p>
+          <RedErrorMessage name="ecoOrganismeAgreements" />
+        </div>
       </div>
+      <FieldArray {...fieldProps}>
+        {({ push, remove }) => (
+          <>
+            {field.value.map((url, index) => (
+              <div className="fr-grid-row fr-grid-row--gutters" key="index">
+                <div className="fr-col-1">
+                  <span className="fr-text">URL</span>
+                </div>
+                <div className="fr-col-8">
+                  <Field name={`ecoOrganismeAgreements.${index}`}>
+                    {({ field }) => {
+                      return (
+                        <Input
+                          label=""
+                          nativeInputProps={{
+                            type: "text",
+                            placeholder: "https://",
+                            ...field,
+                          }}
+                        ></Input>
+                      );
+                    }}
+                  </Field>
+                </div>
+                <div className="fr-col-3">
+                  <Button
+                    iconId="ri-delete-bin-line"
+                    onClick={() => remove(index)}
+                  >
+                    Supprimer
+                  </Button>
+                </div>
+              </div>
+            ))}
+            <div className="fr-grid-row fr-pt-1w">
+              <div className="fr-col-12">
+                <Button iconId="ri-add-line" onClick={() => push("")}>
+                  Ajouter un agrément
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+      </FieldArray>
     </div>
   );
 }

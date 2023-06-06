@@ -100,7 +100,7 @@ function SignTransportFormModalContent({
     },
   });
 
-  const [updateForm] = useMutation<
+  const [updateForm, { error: updateError }] = useMutation<
     Pick<Mutation, "updateForm">,
     MutationUpdateFormArgs
   >(UPDATE_FORM);
@@ -127,9 +127,9 @@ function SignTransportFormModalContent({
           transporterNumberPlate:
             form.stateSummary?.transporterNumberPlate ?? "",
           update: {
-            quantity: 0,
-            sampleNumber: "",
-            packagingInfos: [],
+            quantity: form.wasteDetails?.quantity ?? 0,
+            sampleNumber: form.wasteDetails?.sampleNumber ?? "",
+            packagingInfos: form.wasteDetails?.packagingInfos ?? [],
           },
         }}
         validationSchema={validationSchema}
@@ -137,9 +137,10 @@ function SignTransportFormModalContent({
           try {
             const { update } = values;
             if (
-              update.quantity ||
-              update.sampleNumber ||
-              update.packagingInfos.length > 0
+              form.emitter?.type === EmitterType.Appendix1Producer &&
+              (update.quantity ||
+                update.sampleNumber ||
+                update.packagingInfos.length > 0)
             ) {
               await updateForm({
                 variables: {
@@ -235,6 +236,7 @@ function SignTransportFormModalContent({
             )}
 
             {error && <NotificationError apolloError={error} />}
+            {updateError && <NotificationError apolloError={updateError} />}
 
             <div className="td-modal-actions">
               <button

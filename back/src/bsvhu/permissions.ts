@@ -1,7 +1,6 @@
 import { Bsvhu, BsvhuStatus, User } from "@prisma/client";
 import { BsvhuInput } from "../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../permissions";
-import { checkSecurityCode } from "../common/permissions";
 
 /**
  * Retrieves organisations allowed to read a BSVHU
@@ -146,25 +145,4 @@ export async function checkCanDuplicate(user: User, bsvhu: Bsvhu) {
     Permission.BsdCanCreate,
     "Vous ne pouvez pas dupliquer un bordereau sur lequel votre entreprise n'apparait pas"
   );
-}
-
-export async function checkCanSignFor(
-  user: User,
-  orgId: string | null,
-  securityCode?: number | null
-) {
-  try {
-    const hasPerm = await checkUserPermissions(
-      user,
-      [orgId].filter(Boolean),
-      Permission.BsdCanSign,
-      "Vous ne pouvez pas signer ce BSVHU"
-    );
-    return hasPerm;
-  } catch (err) {
-    if (securityCode && orgId) {
-      return checkSecurityCode(orgId, securityCode);
-    }
-    throw err;
-  }
 }

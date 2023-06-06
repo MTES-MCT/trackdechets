@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateBsdaArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
@@ -8,11 +7,11 @@ import {
   flattenBsdaInput
 } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
-import { checkEditionRules } from "../../edition";
-import { getBsdaRepository } from "../../repository";
-import sirenify from "../../sirenify";
-import { validateBsda } from "../../validation";
+import { checkEditionRules } from "../../validation/edition";
 import { checkCanUpdate } from "../../permissions";
+import { getBsdaRepository } from "../../repository";
+import { parseBsda } from "../../validation/validate";
+import { canBypassSirenify } from "../../../companies/sirenify";
 
 export default async function edit(
   _,
@@ -24,82 +23,64 @@ export default async function edit(
     include: { intermediaries: true, grouping: true, forwarding: true }
   });
 
-  const sirenifiedInput = await sirenify(input, user);
-  const data = flattenBsdaInput(sirenifiedInput);
-  const intermediaries = input.intermediaries ?? existingBsda.intermediaries;
-
   await checkCanUpdate(user, existingBsda, input);
-
-  const bsdaRepository = getBsdaRepository(user);
-
-  const forwardedBsda = input.forwarding
-    ? await getBsdaOrNotFound(input.forwarding)
-    : existingBsda.forwarding;
-
-  const groupedBsdas =
-    input.grouping && input.grouping.length > 0
-      ? await bsdaRepository.findMany({ id: { in: input.grouping } })
-      : existingBsda.grouping;
-
-  const isForwarding = Boolean(forwardedBsda);
-  const isGrouping = groupedBsdas.length > 0;
-
-  if ([isForwarding, isGrouping].filter(b => b).length > 1) {
-    throw new UserInputError(
-      "Les opérations d'entreposage provisoire et groupement ne sont pas compatibles entre elles"
-    );
-  }
 
   await checkEditionRules(existingBsda, input, user);
 
-  const { grouping, forwarding, ...existingBsdaToValidate } = existingBsda;
-  const resultingBsda = {
-    ...existingBsdaToValidate,
-    ...data
+  const flattenedInput = flattenBsdaInput(input);
+  const unparsedBsda = {
+    ...existingBsda,
+    ...flattenedInput,
+    intermediaries: input.intermediaries ?? existingBsda.intermediaries,
+    grouping: input.grouping || existingBsda.grouping.map(bsda => bsda.id),
+    forwarding: input.forwarding || existingBsda.forwarding?.id
   };
-  const previousBsdas = [forwardedBsda, ...groupedBsdas].filter(Boolean);
-  await validateBsda(
-    resultingBsda as any,
-    { previousBsdas, intermediaries },
-    {
-      emissionSignature: existingBsda.emitterEmissionSignatureAuthor != null,
-      workSignature: existingBsda.workerWorkSignatureAuthor != null,
-      operationSignature:
-        existingBsda.destinationOperationSignatureAuthor != null,
-      transportSignature:
-        existingBsda.transporterTransportSignatureAuthor != null
-    }
-  );
+  const bsda = await parseBsda(unparsedBsda, {
+    enableSirenification: !canBypassSirenify(user),
+    enablePreviousBsdasChecks: true,
+    currentSignatureType: getCurrentSignatureType(unparsedBsda)
+  });
 
-  const shouldUpdateIntermediaries = Array.isArray(input.intermediaries);
+  const forwarding = !!bsda.forwarding
+    ? { connect: { id: bsda.forwarding } }
+    : bsda.forwarding === null
+    ? { disconnect: true }
+    : undefined;
+  const grouping =
+    bsda.grouping && bsda.grouping.length > 0
+      ? { set: bsda.grouping.map(id => ({ id })) }
+      : undefined;
+  const intermediaries =
+    bsda.intermediaries && bsda.intermediaries.length > 0
+      ? {
+          deleteMany: {},
+          createMany: {
+            data: companyToIntermediaryInput(bsda.intermediaries)
+          }
+        }
+      : undefined;
 
+  const bsdaRepository = getBsdaRepository(user);
   const updatedBsda = await bsdaRepository.update(
     { id },
     {
-      ...data,
-      ...(input.grouping &&
-        input.grouping.length > 0 && {
-          grouping: { set: input.grouping.map(id => ({ id })) }
-        }),
-      ...(input.forwarding && {
-        forwarding: { connect: { id: input.forwarding } }
-      }),
-      ...(shouldUpdateIntermediaries && {
-        intermediariesOrgIds: input
-          .intermediaries!.flatMap(intermediary => [
-            intermediary.siret,
-            intermediary.vatNumber
-          ])
-          .filter(Boolean),
-        intermediaries: {
-          deleteMany: {},
-          createMany: {
-            data: companyToIntermediaryInput(input.intermediaries!)
-          }
-        }
-      })
+      ...bsda,
+      forwarding,
+      grouping,
+      intermediaries
     }
   );
 
   return expandBsdaFromDb(updatedBsda);
+}
+
+function getCurrentSignatureType(unparsedBsda) {
+  // TODO calculate from SIGNATURES_HIERARCHY
+  if (unparsedBsda.destinationOperationSignatureAuthor != null)
+    return "OPERATION";
+  if (unparsedBsda.transporterTransportSignatureAuthor != null)
+    return "TRANSPORT";
+  if (unparsedBsda.workerWorkSignatureAuthor != null) return "WORK";
+  if (unparsedBsda.emitterEmissionSignatureAuthor != null) return "EMISSION";
+  return undefined;
 }

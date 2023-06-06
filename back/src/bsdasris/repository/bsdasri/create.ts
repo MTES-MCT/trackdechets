@@ -17,9 +17,9 @@ export function buildCreateBsdasri(deps: RepositoryFnDeps): CreateBsdasriFn {
 
     const bsdasri = await prisma.bsdasri.create({
       data,
-      include: { synthesizing: true }
+      include: { synthesizing: true, grouping: true }
     });
-
+    // denormalize synthesis emitter sirets
     if (bsdasri.type === BsdasriType.SYNTHESIS) {
       const synthesisEmitterSirets = [
         ...new Set(
@@ -30,6 +30,18 @@ export function buildCreateBsdasri(deps: RepositoryFnDeps): CreateBsdasriFn {
       await prisma.bsdasri.update({
         where: { id: bsdasri.id },
         data: { synthesisEmitterSirets }
+      });
+    }
+
+    // denormalize grouped emitter sirets
+    if (bsdasri.type === BsdasriType.GROUPING) {
+      const groupingEmitterSirets = [
+        ...new Set(bsdasri.grouping.map(grouped => grouped.emitterCompanySiret))
+      ].filter(Boolean);
+
+      await prisma.bsdasri.update({
+        where: { id: bsdasri.id },
+        data: { groupingEmitterSirets }
       });
     }
 

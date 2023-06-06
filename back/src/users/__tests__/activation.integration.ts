@@ -9,31 +9,9 @@ import supertest from "supertest";
 
 import { app } from "../../server";
 const request = supertest(app);
-const { UI_HOST } = process.env;
+
 describe("user activation", () => {
   afterEach(resetDatabase);
-
-  it("should redirect to frontend activation page", async () => {
-    const user = await userFactory({
-      email: "bruce.wayne@trackdechets.fr",
-      isActive: false
-    });
-    const userActivationHash = await createActivationHash(user);
-    const res = await request.get(
-      `/userActivation?hash=${userActivationHash.hash}`
-    );
-
-    // this linked used to activate the user but now must redirect to a frontend page
-    const refreshedUser = await prisma.user.findUniqueOrThrow({
-      where: { id: user.id }
-    });
-    expect(refreshedUser.isActive).toEqual(false);
-
-    expect(res.status).toBe(302);
-    expect(res.header.location).toBe(
-      `http://${UI_HOST}/user-activation?hash=${userActivationHash.hash}`
-    );
-  });
 
   it("should activate an user", async () => {
     const user = await userFactory({

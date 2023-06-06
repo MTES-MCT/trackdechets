@@ -13,7 +13,7 @@ import {
   BsdasriTransporter,
   BsvhuTransporter,
 } from "generated/graphql/types";
-import { Alert, Row } from "@dataesr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
 import { BsffFormTransporterInput } from "form/bsff/utils/initial-state";
 
@@ -85,10 +85,10 @@ export default function TransporterReceipt({
   };
   return !isExemptedOfReceipt &&
     !isForeignVat(transporter.company?.vatNumber!!) ? (
-    <Row spacing="mb-2w mt-2w">
+    <div className="fr-grid-row fr-mb-2w fr-mt-2w">
       <Alert
         title={"Récépissé de déclaration de transport de déchets"}
-        type={recepisse.number?.length ? "info" : "error"}
+        severity={recepisse.number?.length ? "info" : "error"}
         description={
           <>
             {recepisse.number ? (
@@ -109,7 +109,7 @@ export default function TransporterReceipt({
           </>
         }
       />
-    </Row>
+    </div>
   ) : (
     <></>
   );

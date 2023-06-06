@@ -1,6 +1,5 @@
 import { hash } from "bcrypt";
 import { faker } from "@faker-js/faker";
-import crypto from "crypto";
 import getReadableId from "../forms/readableId";
 import {
   CompanyType,
@@ -43,14 +42,16 @@ export const userFactory = async (
  * @param index numerical index
  */
 export function siretify(index: number | undefined) {
-  if (!index || typeof index !== "number" || index > 9) {
+  if (index && index <= 9) {
+    // Compatibility with an old version of siretify using
+    // a company index. This should be refactored to remove
+    // index everywhere in the function calls to siretify
     return faker.helpers.replaceCreditCardSymbols(
-      Math.floor(Number(crypto.randomBytes(1))) + "############L"
+      Math.abs(index) + "############L"
     );
   }
-  return faker.helpers.replaceCreditCardSymbols(
-    Math.abs(index) + "############L"
-  );
+
+  return faker.helpers.replaceCreditCardSymbols("#############L");
 }
 
 /**
@@ -63,15 +64,17 @@ export const companyFactory = async (
   const opts = companyOpts || {};
 
   const companyIndex = (await prisma.company.count()) + 1;
-  const siret = opts.siret ? opts.siret : siretify(companyIndex);
+
+  const siret = opts.siret ?? siretify(companyIndex);
   return prisma.company.create({
     data: {
-      orgId: !opts.vatNumber?.length ? siret : opts.vatNumber,
+      orgId: opts.vatNumber ?? siret,
       siret,
       companyTypes: {
         set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
       },
       name: `company_${companyIndex}`,
+      contact: "Company Contact",
       securityCode: 1234,
       verificationCode: "34567",
       address: "Champ de Mars, 5 Av. Anatole France, 75007 Paris",
@@ -117,7 +120,7 @@ export interface UserWithCompany {
  * @param role: user role in the company
  */
 export const userWithCompanyFactory = async (
-  role: UserRole,
+  role: UserRole = "ADMIN",
   companyOpts: Partial<Prisma.CompanyCreateInput> = {},
   userOpts: Partial<Prisma.UserCreateInput> = {},
   companyAssociationOpts: Partial<Prisma.CompanyAssociationCreateInput> = {}
@@ -185,6 +188,24 @@ export const createMembershipRequest = async (
       ...opt
     }
   });
+};
+
+/**
+ * Returns the destination info for a BSD
+ */
+export const getDestinationCompanyInfo = async () => {
+  const destinationCompany = await companyFactory();
+  return {
+    destination: {
+      company: {
+        name: destinationCompany.name,
+        address: destinationCompany.address,
+        phone: destinationCompany.contactPhone,
+        siret: destinationCompany.siret,
+        contact: destinationCompany.contact
+      }
+    }
+  };
 };
 
 const formdata = {

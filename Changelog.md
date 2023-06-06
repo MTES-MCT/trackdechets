@@ -5,6 +5,35 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.6.1] 06/06/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Généralisation au BSDD et BSFF de la possibilité de publier et signer un bordereau (par l'émetteur) avant d'avoir renseigné un transporteur. Les informations du transporteur sont modifiables jusqu'au moment dernier moment par tous les acteurs du bordereau (et non plus par l'émetteur seulement). [PR 2385](https://github.com/MTES-MCT/trackdechets/pull/2385)
+
+#### :bug: Corrections de bugs
+
+- Correctifs BSDD Annexe 1 sur l'autocompletion des récépissés Transporteurs automatiquement sélectionné [PR 2437](https://github.com/MTES-MCT/trackdechets/pull/2437)
+- Correctifs BSDD sur l'affichage et la sauvegarde des récépissés Transporteurs par défaut (Favorites) et lors d'une dé-sélection [PR 2437](https://github.com/MTES-MCT/trackdechets/pull/2437)
+
+#### :boom: Breaking changes
+
+- Le destinataire est obligatoire pour sceller un BSDASRI [PR 2267](https://github.com/MTES-MCT/trackdechets/pull/2267)
+
+#### :nail_care: Améliorations
+
+- Ajout d'un bouton de déconnexion sur la page d'autorisation OpenId Connect [PR 2386](https://github.com/MTES-MCT/trackdechets/pull/2386)
+- Les informations sur les entreprises (récépissés, raison sociale, certification) sont mises à jour lors de la duplication d'un bordereau [PR 2355](https://github.com/MTES-MCT/trackdechets/pull/2355)
+- Le producteur initial d'un DASRI a accès à la suite de la traçabilité en cas de groupement [PR 2391](https://github.com/MTES-MCT/trackdechets/pull/2391)
+- Refonte de l'interface de création d'un établissement professionnel du déchet [PR 2204](https://github.com/MTES-MCT/trackdechets/pull/2204)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Ajout des rôles "Chauffeur" et "Lecteur" en base de données. [PR 2328](https://github.com/MTES-MCT/trackdechets/pull/2328)
+- Harmonisation du code de signature entre les différents bordereaux. [PR 2328](https://github.com/MTES-MCT/trackdechets/pull/2328)
+
 # [2023.5.4] 23/05/202
 
 #### :bug: Corrections de bugs

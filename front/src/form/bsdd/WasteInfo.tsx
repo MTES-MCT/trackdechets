@@ -43,8 +43,11 @@ const SOIL_CODES = [
   "20 02 02",
 ];
 
-export default connect<{}, Values>(function WasteInfo(props) {
-  const { values, setFieldValue } = props.formik;
+export default connect<{ disabled }, Values>(function WasteInfo({
+  formik,
+  disabled,
+}) {
+  const { values, setFieldValue } = formik;
 
   if (!values.wasteDetails.packagings) {
     values.wasteDetails.packagings = [];
@@ -57,12 +60,19 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
   return (
     <>
+      {disabled && (
+        <div className="notification notification--error">
+          Les champs grisés ci-dessous ont été scellés via signature et ne sont
+          plus modifiables.
+        </div>
+      )}
       <h4 className="form__section-heading">Description du déchet</h4>
       <div className="form__row">
         <Field
           name="wasteDetails.code"
           component={WasteCodeSelect}
           validate={wasteCodeValidator}
+          disabled={disabled}
         />
       </div>
 
@@ -73,7 +83,12 @@ export default connect<{}, Values>(function WasteInfo(props) {
             msg="L'appellation du déchet est propre à votre entreprise pour vous aider
           à retrouver facilement le déchet concerné."
           />
-          <Field type="text" name="wasteDetails.name" className="td-input" />
+          <Field
+            type="text"
+            name="wasteDetails.name"
+            className="td-input"
+            disabled={disabled}
+          />
         </label>
 
         <RedErrorMessage name="wasteDetails.name" />
@@ -84,7 +99,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
           type="checkbox"
           component={FieldSwitch}
           name="wasteDetails.isDangerous"
-          disabled={isDangerous(values.wasteDetails.code)}
+          disabled={disabled || isDangerous(values.wasteDetails.code)}
           label={
             <span>
               Le déchet est{" "}
@@ -109,6 +124,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
           type="checkbox"
           component={FieldSwitch}
           name="wasteDetails.pop"
+          disabled={disabled}
           label={
             <span>
               Le déchet contient des{" "}
@@ -165,7 +181,11 @@ export default connect<{}, Values>(function WasteInfo(props) {
       <h4 className="form__section-heading">Conditionnement</h4>
 
       {values.emitter.type !== "APPENDIX1" && (
-        <Field name="wasteDetails.packagingInfos" component={Packagings} />
+        <Field
+          name="wasteDetails.packagingInfos"
+          component={Packagings}
+          disabled={disabled}
+        />
       )}
 
       <div className="form__row">
@@ -177,24 +197,28 @@ export default connect<{}, Values>(function WasteInfo(props) {
               id="SOLID"
               label="Solide"
               component={RadioButton}
+              disabled={disabled}
             />
             <Field
               name="wasteDetails.consistence"
               id="LIQUID"
               label="Liquide"
               component={RadioButton}
+              disabled={disabled}
             />
             <Field
               name="wasteDetails.consistence"
               id="GASEOUS"
               label="Gazeux"
               component={RadioButton}
+              disabled={disabled}
             />
             <Field
               name="wasteDetails.consistence"
               id="DOUGHY"
               label="Pâteux"
               component={RadioButton}
+              disabled={disabled}
             />
           </div>
         </fieldset>
@@ -214,6 +238,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
                 placeholder="En tonnes"
                 min="0"
                 step="0.001"
+                disabled={disabled}
               />
               <span className="tw-ml-2">Tonnes</span>
             </label>
@@ -226,12 +251,14 @@ export default connect<{}, Values>(function WasteInfo(props) {
                 id="REAL"
                 label="Réelle"
                 component={RadioButton}
+                disabled={disabled}
               />
               <Field
                 name="wasteDetails.quantityType"
                 id="ESTIMATED"
                 label="Estimée"
                 component={RadioButton}
+                disabled={disabled}
               />
             </fieldset>
 
@@ -244,7 +271,12 @@ export default connect<{}, Values>(function WasteInfo(props) {
         <label>
           Mentions au titre des règlements ADR, RID, ADNR, IMDG{" "}
           {!isDangerous(values.wasteDetails.code) && "(optionnel)"}
-          <Field type="text" name="wasteDetails.onuCode" className="td-input" />
+          <Field
+            type="text"
+            name="wasteDetails.onuCode"
+            className="td-input"
+            disabled={disabled}
+          />
         </label>
 
         <RedErrorMessage name="wasteDetails.onuCode" />

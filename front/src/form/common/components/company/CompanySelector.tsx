@@ -8,12 +8,10 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import { constantCase } from "constant-case";
 import { Field, useField, useFormikContext } from "formik";
 import {
-  countries as vatCountries,
   isFRVat,
   isVat,
   isForeignVat,
 } from "generated/constants/companySearchHelpers";
-import { checkVAT } from "jsvat";
 import React, { useMemo, useRef, useState } from "react";
 
 import { debounce } from "common/helper";
@@ -50,8 +48,10 @@ const DEBOUNCE_DELAY = 500;
 
 interface CompanySelectorProps {
   name: string;
+  // Callback for the host component
+  // Called with empty parameter to un-select a company
   onCompanySelected?: (
-    company: CompanySearchResult | CompanySearchPrivate
+    company?: CompanySearchResult | CompanySearchPrivate
   ) => void;
   allowForeignCompanies?: boolean;
   registeredOnlyCompanies?: boolean;
@@ -167,6 +167,14 @@ export default function CompanySelector({
       clue: orgId!,
     },
     skip: !orgId,
+    onCompleted(data) {
+      // Force update the country field
+      // TODO it's a hack to remove
+      setFieldValue(
+        `${field.name}.country`,
+        data.companyPrivateInfos.codePaysEtrangerEtablissement
+      );
+    },
   });
 
   function isUnknownCompanyName(companyName?: string): boolean {
@@ -178,10 +186,11 @@ export default function CompanySelector({
    */
   function selectCompany(company?: CompanySearchResult) {
     if (disabled) return;
-    // empty the  selected company when null
+    // empty the fields
     if (!company) {
       setFieldValue(field.name, getInitialCompany());
       setFieldTouched(`${field.name}`, true, true);
+      onCompanySelected?.();
       return;
     }
 
@@ -210,15 +219,6 @@ export default function CompanySelector({
       mail: company.contactEmail ?? "",
       country: company.codePaysEtrangerEtablissement,
     };
-
-    // Automatiquement écraser le champ country
-    if (company.vatNumber) {
-      const vatCountryCode = checkVAT(company.vatNumber, vatCountries)?.country
-        ?.isoCode.short;
-      if (vatCountryCode) {
-        fields.country = vatCountryCode;
-      }
-    }
 
     Object.keys(fields).forEach(key => {
       setFieldValue(`${field.name}.${key}`, fields[key]);
@@ -317,11 +317,14 @@ export default function CompanySelector({
 
   // Disable the name field for foreign companies whose name is filled
   const disableNameField =
-    !!selectedCompanyDetails.name && !displayForeignCompanyWithUnknownInfos;
+    disabled ||
+    (!!selectedCompanyDetails.name && !displayForeignCompanyWithUnknownInfos);
 
   // Disable the address field for foreign companies whose address is filled
   const disableAddressField =
-    !!selectedCompanyDetails.address && !displayForeignCompanyWithUnknownInfos;
+    disabled ||
+    (!!selectedCompanyDetails.address &&
+      !displayForeignCompanyWithUnknownInfos);
 
   return (
     <>
@@ -574,24 +577,10 @@ function favoriteToCompanySearchResult(
   company: CompanyFavorite
 ): CompanySearchResult {
   return {
-    orgId: company.orgId,
-    siret: company.siret,
-    vatNumber: company.vatNumber,
-    name: company.name,
-    address: company.address,
-    transporterReceipt: company.transporterReceipt,
-    traderReceipt: company.traderReceipt,
-    brokerReceipt: company.brokerReceipt,
-    vhuAgrementDemolisseur: company.vhuAgrementDemolisseur,
-    vhuAgrementBroyeur: company.vhuAgrementBroyeur,
-    workerCertification: company.workerCertification,
-    codePaysEtrangerEtablissement:
-      company.codePaysEtrangerEtablissement || "FR",
-    contact: company.contact,
+    ...(company as CompanySearchResult),
     contactPhone: company.phone,
     contactEmail: company.mail,
-    isRegistered: company.isRegistered,
-    companyTypes: [],
     etatAdministratif: "A",
+    companyTypes: [],
   };
 }

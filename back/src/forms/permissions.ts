@@ -16,6 +16,7 @@ import { getFullForm } from "./database";
 import { getReadOnlyFormRepository } from "./repository";
 import { checkSecurityCode } from "../common/permissions";
 import { FullForm } from "./types";
+import { editionRules, getUpdatedFields } from "./edition";
 
 /**
  * Retrieves companies allowed to update, delete or duplicate an existing BSDD.
@@ -194,25 +195,26 @@ export async function checkCanUpdate(
     (form.emitterType === EmitterType.APPENDIX1 && form.status === "SENT")
   ) {
     authorizedOrgIds = formContributors(fullForm);
-  } else if (
-    form.emitterType === EmitterType.APPENDIX1_PRODUCER &&
-    ["SIGNED_BY_PRODUCER"].includes(form.status)
-  ) {
-    authorizedOrgIds = [form.transporterCompanySiret].filter(Boolean);
-  } else if (
-    form.status === "SIGNED_BY_PRODUCER" &&
-    form.emittedByEcoOrganisme
-  ) {
-    authorizedOrgIds = [form.ecoOrganismeSiret].filter(Boolean);
-    errorMsg =
-      "L'éco-organisme a signé ce bordereau, il est le seul à pouvoir le mettre à jour.";
-  } else if (
-    form.status === "SIGNED_BY_PRODUCER" &&
-    !form.emittedByEcoOrganisme
-  ) {
-    authorizedOrgIds = [form.emitterCompanySiret].filter(Boolean);
-    errorMsg =
-      "Le producteur a signé ce bordereau, il est le seul à pouvoir le mettre à jour.";
+  } else if (form.status === "SIGNED_BY_PRODUCER") {
+    const updatedFields = await getUpdatedFields(form, input);
+    if (form.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+      // Le transporteur peut modifier les données de l'annexe 1 jusqu'à sa signature
+      authorizedOrgIds = [form.transporterCompanySiret].filter(Boolean);
+    } else if (updatedFields.every(f => editionRules[f] === "TRANSPORT")) {
+      // Les infos de transport peuvent être modifiées par tous les acteurs
+      // du BSDD tant que le déchet n'a pas été enlevé
+      authorizedOrgIds = formContributors(fullForm);
+    } else {
+      if (form.emittedByEcoOrganisme) {
+        authorizedOrgIds = [form.ecoOrganismeSiret].filter(Boolean);
+        errorMsg =
+          "L'éco-organisme a signé ce bordereau, seules les informations de transport peuvent être mises à jour.";
+      } else {
+        authorizedOrgIds = [form.emitterCompanySiret].filter(Boolean);
+        errorMsg =
+          "Le producteur a signé ce bordereau, seules les informations de transport peuvent être mises à jour.";
+      }
+    }
   } else {
     errorMsg =
       "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés";
@@ -312,7 +314,7 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
   return checkUserPermissions(
     user,
     authorizedOrgIds,
-    Permission.BsdCanSign,
+    Permission.BsdCanSignTransport,
     "Vous n'êtes pas autorisé à signer ce bordereau pour le transport"
   );
 }

@@ -12,7 +12,7 @@ import {
   VhuAgrementNotFound,
   WorkerCertificationNotFound
 } from "./errors";
-import { CompanyMember } from "../generated/graphql/types";
+import { CompanyMember, UserRole } from "../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
 import { AppDataloaders } from "../types";
 
@@ -156,7 +156,9 @@ export async function getCompanyActiveUsers(
   return associations.map(a => {
     return {
       ...a.user,
-      role: a.role,
+      // type casting is necessary here as long as we
+      // do not expose READER and DRIVER role in the API
+      role: a.role as UserRole,
       isPendingInvitation: false
     };
   });
@@ -177,7 +179,9 @@ export async function getCompanyInvitedUsers(
       id: h.id,
       name: "Invité",
       email: h.email,
-      role: h.role,
+      // type casting is necessary here as long as we
+      // do not expose READER and DRIVER role in the API
+      role: h.role as UserRole,
       isActive: false,
       isPendingInvitation: true
     };

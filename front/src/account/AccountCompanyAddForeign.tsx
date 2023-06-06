@@ -17,15 +17,10 @@ import {
 } from "./AccountCompanyAdd";
 import { isSiret, isVat } from "generated/constants/companySearchHelpers";
 
-import {
-  Alert,
-  Container,
-  Row,
-  Col,
-  Button,
-  TextInput,
-  Checkbox,
-} from "@dataesr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 
 interface Values extends FormikValues {
   vatNumber: string;
@@ -47,10 +42,9 @@ const localizedStrings = {
   en: {
     translateButton: "Traduire en français 🇫🇷",
     vatNumber: {
-      label: "Intra-community VAT number or identification number",
+      label: "Intra-community VAT number",
       hint: "Example: BE1234567890",
-      error:
-        "Intra-community VAT number or identification number must be valid",
+      error: "Intra-community VAT number must be valid",
     },
     companyName: "Company name",
     address: "Address",
@@ -91,10 +85,9 @@ const localizedStrings = {
   fr: {
     translateButton: "Translate in English 🇬🇧",
     vatNumber: {
-      label: "N° de TVA intracommunautaire ou N° d'identification",
+      label: "N° de TVA intracommunautaire",
       hint: "Exemple : BE1234567890",
-      error:
-        "Le SIRET ou le numéro de TVA intracommunautaire doit être valide.",
+      error: "Le N° de TVA intracommunautaire doit être valide.",
     },
     companyName: "Nom de l'entreprise",
     address: "Adresse",
@@ -184,21 +177,21 @@ export default function AccountCompanyAddForeign() {
   };
 
   return (
-    <Container fluid className={styles.container}>
-      <Row spacing="mb-2w">
-        <Col n="12">
+    <div className={`fr-container-fluid ${styles.container}`}>
+      <div className="fr-grid-row fr-mb-2w">
+        <div className="fr-col-12">
           <Button
-            tertiary
-            size="md"
+            priority="tertiary"
+            size="medium"
             title={memoizedStrings.translateButton}
             onClick={handleTranslate}
           >
             {memoizedStrings.translateButton}
           </Button>
-        </Col>
-      </Row>
-      <Row>
-        <Col n="12">
+        </div>
+      </div>
+      <div className="fr-grid-row">
+        <div className="fr-col-12">
           <AccountCompanyAddSiret
             defaultQuery={defaultVatNumber}
             onlyForeignVAT
@@ -206,11 +199,11 @@ export default function AccountCompanyAddForeign() {
               onCompanyInfos: companyInfos => setCompanyInfos(companyInfos),
             }}
           />
-        </Col>
-      </Row>
+        </div>
+      </div>
       {companyInfos && !companyInfos.isRegistered && (
-        <Row>
-          <Col n="12">
+        <div className="fr-grid-row">
+          <div className="fr-col-12">
             <Formik<Values>
               initialValues={{
                 vatNumber: companyInfos?.vatNumber ?? "",
@@ -241,14 +234,14 @@ export default function AccountCompanyAddForeign() {
                   <Field name="vatNumber">
                     {({ field }) => {
                       return (
-                        <TextInput
+                        <Input
                           label={memoizedStrings.vatNumber.label}
-                          hint={memoizedStrings.vatNumber.hint}
-                          messageType={errors.vatNumber ? "error" : ""}
-                          message={errors.vatNumber || ""}
-                          disabled={companyInfos?.vatNumber}
-                          {...field}
-                        ></TextInput>
+                          hintText={memoizedStrings.vatNumber.hint}
+                          state={errors.vatNumber ? "error" : "default"}
+                          stateRelatedMessage={errors.vatNumber || ""}
+                          disabled={!!companyInfos?.vatNumber}
+                          nativeInputProps={field}
+                        ></Input>
                       );
                     }}
                   </Field>
@@ -256,11 +249,11 @@ export default function AccountCompanyAddForeign() {
                   <Field name="companyName">
                     {({ field }) => {
                       return (
-                        <TextInput
+                        <Input
                           label={memoizedStrings.companyName}
-                          disabled={companyInfos?.name}
-                          {...field}
-                        ></TextInput>
+                          disabled={!!companyInfos?.name}
+                          nativeInputProps={field}
+                        ></Input>
                       );
                     }}
                   </Field>
@@ -268,12 +261,12 @@ export default function AccountCompanyAddForeign() {
                   <Field name="address">
                     {({ field }) => {
                       return (
-                        <TextInput
+                        <Input
                           label={memoizedStrings.address}
-                          disabled={companyInfos?.address}
-                          textarea
-                          {...field}
-                        ></TextInput>
+                          disabled={!!companyInfos?.address}
+                          textArea
+                          nativeTextAreaProps={field}
+                        ></Input>
                       );
                     }}
                   </Field>
@@ -281,10 +274,10 @@ export default function AccountCompanyAddForeign() {
                   <Field name="contact">
                     {({ field }) => {
                       return (
-                        <TextInput
+                        <Input
                           label={memoizedStrings.contact}
-                          {...field}
-                        ></TextInput>
+                          nativeInputProps={field}
+                        ></Input>
                       );
                     }}
                   </Field>
@@ -292,10 +285,10 @@ export default function AccountCompanyAddForeign() {
                   <Field name="contactEmail">
                     {({ field }) => {
                       return (
-                        <TextInput
+                        <Input
                           label={memoizedStrings.contactEmail}
-                          {...field}
-                        ></TextInput>
+                          nativeInputProps={field}
+                        ></Input>
                       );
                     }}
                   </Field>
@@ -303,17 +296,18 @@ export default function AccountCompanyAddForeign() {
                   <Field name="contactPhone">
                     {({ field }) => {
                       return (
-                        <TextInput
+                        <Input
                           label={memoizedStrings.contactPhone.label}
-                          {...field}
-                          hint={memoizedStrings.contactPhone.hint}
-                        ></TextInput>
+                          hintText={memoizedStrings.contactPhone.hint}
+                          nativeInputProps={field}
+                        ></Input>
                       );
                     }}
                   </Field>
 
                   <div className={styles.alertWrapper}>
                     <Alert
+                      severity="info"
                       title="Information"
                       description={memoizedStrings.isAllowed.disclaimer}
                     />
@@ -323,20 +317,27 @@ export default function AccountCompanyAddForeign() {
                     {({ field }) => {
                       return (
                         <Checkbox
-                          label={memoizedStrings.isAllowed.label}
-                          messageType={
-                            errors.isAllowed && touched.isAllowed ? "error" : ""
+                          state={
+                            errors.isAllowed && touched.isAllowed
+                              ? "error"
+                              : "default"
                           }
-                          message={
+                          stateRelatedMessage={
                             errors.isAllowed && touched.isAllowed
                               ? errors.isAllowed
                               : ""
                           }
-                          id="isAllowed"
-                          // @ts-ignore
-                          checked={field.value}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
+                          options={[
+                            {
+                              label: memoizedStrings.isAllowed.label,
+                              nativeInputProps: {
+                                name: field.name,
+                                checked: field.value,
+                                onChange: field.onChange,
+                                onBlur: field.onBlur,
+                              },
+                            },
+                          ]}
                         />
                       );
                     }}
@@ -344,7 +345,7 @@ export default function AccountCompanyAddForeign() {
 
                   <div className={styles["submit-form"]}>
                     <Button
-                      tertiary
+                      priority="tertiary"
                       disabled={isSubmitting}
                       onClick={() => {
                         history.goBack();
@@ -353,7 +354,10 @@ export default function AccountCompanyAddForeign() {
                       {memoizedStrings.cancel}
                     </Button>
 
-                    <Button submit disabled={isSubmitting}>
+                    <Button
+                      nativeButtonProps={{ type: "submit" }}
+                      disabled={isSubmitting}
+                    >
                       {isSubmitting
                         ? memoizedStrings.submit.submitting
                         : memoizedStrings.submit.label}
@@ -365,9 +369,9 @@ export default function AccountCompanyAddForeign() {
                 </Form>
               )}
             </Formik>
-          </Col>
-        </Row>
+          </div>
+        </div>
       )}
-    </Container>
+    </div>
   );
 }

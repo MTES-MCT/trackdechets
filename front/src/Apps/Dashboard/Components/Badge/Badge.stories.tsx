@@ -1,23 +1,15 @@
 import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-import { withDesign } from "storybook-addon-designs";
 import Badge from "./Badge";
 import { BsdStatusCode } from "../../../Common/types/bsdTypes";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCard/Blocks/Badge",
   component: Badge,
-  decorators: [withDesign],
   argTypes: {
     status: {
       control: "select",
       options: Object.values(BsdStatusCode),
-    },
-  },
-  parameters: {
-    design: {
-      type: "figma",
-      url: "https://www.figma.com/file/tyefue5qFChEpujrFU1Jiz/Librairie-TD-dashboard?node-id=1%3A2365&t=0tYb1cF2o4m4Id2g-4",
     },
   },
 } as ComponentMeta<typeof Badge>;

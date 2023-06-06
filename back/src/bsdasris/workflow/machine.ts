@@ -1,5 +1,5 @@
 import { Machine } from "xstate";
-import { BsdasriEventType, BsdasriEvent } from "./types";
+import { BsdasriEvent } from "./types";
 import { WasteAcceptationStatus, BsdasriStatus } from "@prisma/client";
 import { DASRI_GROUPING_OPERATIONS_CODES } from "../../common/constants";
 
@@ -13,27 +13,21 @@ const machine = Machine<any, BsdasriEvent>(
     states: {
       [BsdasriStatus.INITIAL]: {
         on: {
-          [BsdasriEventType.SignEmission]: [
+          ["EMISSION"]: [
             {
               target: BsdasriStatus.SIGNED_BY_PRODUCER,
               cond: "emissionNotSigned"
             }
           ],
-          [BsdasriEventType.SignTransport]: [
+          ["TRANSPORT"]: [
             { target: BsdasriStatus.SENT, cond: "acceptedByTransporter" },
             { target: BsdasriStatus.REFUSED, cond: "refusedByTransporter" }
-          ],
-          [BsdasriEventType.SignEmissionWithSecretCode]: [
-            {
-              target: BsdasriStatus.SIGNED_BY_PRODUCER,
-              cond: "emissionNotSigned"
-            }
           ]
         }
       },
       [BsdasriStatus.SIGNED_BY_PRODUCER]: {
         on: {
-          [BsdasriEventType.SignTransport]: [
+          ["TRANSPORT"]: [
             { target: BsdasriStatus.SENT, cond: "acceptedByTransporter" },
             { target: BsdasriStatus.REFUSED, cond: "refusedByTransporter" }
           ]
@@ -41,7 +35,7 @@ const machine = Machine<any, BsdasriEvent>(
       },
       [BsdasriStatus.SENT]: {
         on: {
-          [BsdasriEventType.SignReception]: [
+          ["RECEPTION"]: [
             { target: BsdasriStatus.RECEIVED, cond: "acceptedByRecipient" },
             { target: BsdasriStatus.REFUSED, cond: "refusedByRecipient" }
           ]
@@ -49,7 +43,7 @@ const machine = Machine<any, BsdasriEvent>(
       },
       [BsdasriStatus.RECEIVED]: {
         on: {
-          [BsdasriEventType.SignOperation]: [
+          ["OPERATION"]: [
             { target: BsdasriStatus.AWAITING_GROUP, cond: "hasGroupingCode" },
             { target: BsdasriStatus.PROCESSED, cond: "processNotSigned" }
           ]

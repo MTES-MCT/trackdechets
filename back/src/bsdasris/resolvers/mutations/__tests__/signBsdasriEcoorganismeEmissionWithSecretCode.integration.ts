@@ -6,7 +6,11 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
-import { bsdasriFactory, initialData } from "../../../__tests__/factories";
+import {
+  bsdasriFactory,
+  initialData,
+  readyToPublishData
+} from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 import { SIGN_DASRI_WITH_CODE } from "./signUtils";
@@ -58,9 +62,9 @@ describe("Mutation.signBsdasri emission with secret code", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Erreur, le code de sécurité est invalide",
+        message: "Le code de signature est invalide.",
         extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
+          code: ErrorCode.FORBIDDEN
         })
       })
     ]);
@@ -75,6 +79,7 @@ describe("Mutation.signBsdasri emission with secret code", () => {
       "MEMBER",
       { securityCode: 7777 }
     );
+    const destination = await companyFactory();
     await prisma.ecoOrganisme.create({
       data: {
         address: "",
@@ -90,6 +95,7 @@ describe("Mutation.signBsdasri emission with secret code", () => {
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destination),
         status: BsdasriStatus.INITIAL,
         ecoOrganismeSiret: ecoOrganismeCompany.siret,
         ecoOrganismeName: ecoOrganismeCompany.name,

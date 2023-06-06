@@ -10,11 +10,7 @@ import {
   flattenSignedByTransporterInput
 } from "../../converter";
 import { checkCanSignedByTransporter } from "../../permissions";
-import {
-  beforeSignedByTransporterSchema,
-  signingInfoSchema,
-  wasteDetailsSchema
-} from "../../validation";
+import { signingInfoSchema, validateBeforeTransport } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
@@ -68,9 +64,8 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       ...wasteDetails
     };
 
-    // check waste details override is valid
-    await wasteDetailsSchema.validate(futureForm);
-    await beforeSignedByTransporterSchema.validate(futureForm);
+    // check waste details override is valid and transporter info is filled
+    await validateBeforeTransport(futureForm);
 
     const formRepository = getFormRepository(user);
     if (form.sentAt) {

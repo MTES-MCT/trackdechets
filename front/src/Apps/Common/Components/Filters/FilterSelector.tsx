@@ -30,7 +30,7 @@ const FilterSelector = ({
         onChange={onChange}
         disabled={disabled}
       >
-        <option value="" disabled hidden>
+        <option value="" disabled>
           {filter_type_select_placeholder}
         </option>
         {filters.map(filter => (

@@ -88,6 +88,7 @@ export const wasteDetailsFragment = gql`
     }
     analysisReferences
     landIdentifiers
+    sampleNumber
   }
 `;
 

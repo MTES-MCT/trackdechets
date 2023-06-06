@@ -324,7 +324,7 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
     wasteDetailsPop: yup.boolean().nullable(),
     wasteDetailsPackagingInfos: yup
       .array()
-      .of(packagingInfoFn(false))
+      .of(packagingInfoFn({ isDraft: false }))
       .transform(v => (v === null ? Prisma.JsonNull : v)),
     quantityReceived: yup.number().min(0).nullable(),
     processingOperationDone: yup

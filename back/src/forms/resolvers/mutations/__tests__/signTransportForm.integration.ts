@@ -401,6 +401,40 @@ describe("signTransportForm", () => {
     ]);
   });
 
+  it("should throw a validation error if transporter info is not valid", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.SIGNED_BY_PRODUCER,
+        transporterCompanySiret: transporter.company.siret,
+        transporterCompanyAddress: null
+      }
+    });
+
+    const { mutate } = makeClient(transporter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          takenOverAt: takenOverAt.toISOString() as unknown as Date,
+          takenOverBy: transporter.user.name
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Transporteur: L'adresse de l'entreprise est obligatoire"
+      })
+    ]);
+  });
+
   describe("Annexe 1", () => {
     it("should forbid marking an appendix1 container as sent through signature", async () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -441,14 +475,25 @@ describe("signTransportForm", () => {
       );
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const appendix1_item = await prisma.form.create({
-        data: {
-          readableId: getReadableId(),
+      const appendix1_item = await formFactory({
+        ownerId: user.id,
+        opt: {
           status: Status.SIGNED_BY_PRODUCER,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret,
-          owner: { connect: { id: user.id } }
+          emitterCompanyName: company.name,
+          transporterCompanySiret: company.siret
+        }
+      });
+
+      await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SENT,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          emitterCompanyName: company.name,
+          transporterCompanySiret: company.siret
         }
       });
 
@@ -495,25 +540,24 @@ describe("signTransportForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       // This first item is already SENT
-      const appendix1_signed = await prisma.form.create({
-        data: {
-          readableId: getReadableId(),
+      const appendix1_signed = await formFactory({
+        ownerId: user.id,
+        opt: {
           status: Status.SENT,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret,
-          owner: { connect: { id: user.id } }
+          transporterCompanySiret: company.siret
         }
       });
+
       // This second item will be signed
-      const appendix1_item = await prisma.form.create({
-        data: {
-          readableId: getReadableId(),
+      const appendix1_item = await formFactory({
+        ownerId: user.id,
+        opt: {
           status: Status.SIGNED_BY_PRODUCER,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret,
-          owner: { connect: { id: user.id } }
+          transporterCompanySiret: company.siret
         }
       });
 
@@ -564,14 +608,13 @@ describe("signTransportForm", () => {
       );
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const appendix1_item = await prisma.form.create({
-        data: {
-          readableId: getReadableId(),
+      const appendix1_item = await formFactory({
+        ownerId: user.id,
+        opt: {
           status: Status.SIGNED_BY_PRODUCER,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret,
-          owner: { connect: { id: user.id } }
+          transporterCompanySiret: company.siret
         }
       });
 
@@ -623,14 +666,13 @@ describe("signTransportForm", () => {
         }
       });
 
-      const appendix1_item = await prisma.form.create({
-        data: {
-          readableId: getReadableId(),
+      const appendix1_item = await formFactory({
+        ownerId: user.id,
+        opt: {
           status: Status.SEALED, // Item is SEALED, not SIGNED_BY_PRODUCER
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret,
-          owner: { connect: { id: user.id } }
+          transporterCompanySiret: company.siret
         }
       });
 
@@ -677,15 +719,14 @@ describe("signTransportForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const ecoOrganisme = await userWithCompanyFactory("ADMIN");
 
-      const appendix1_item = await prisma.form.create({
-        data: {
-          readableId: getReadableId(),
+      const appendix1_item = await formFactory({
+        ownerId: user.id,
+        opt: {
           status: Status.SEALED, // Item is SEALED, not SIGNED_BY_PRODUCER
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
           transporterCompanySiret: company.siret,
-          ecoOrganismeSiret: "49337909300039", // Container has an eco organisme (copied here)
-          owner: { connect: { id: user.id } }
+          ecoOrganismeSiret: "49337909300039" // Container has an eco organisme (copied here)
         }
       });
 

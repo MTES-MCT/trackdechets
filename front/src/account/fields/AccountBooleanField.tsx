@@ -47,7 +47,7 @@ export default function AccountBooleanField({
       <span className={styles.label}>
         {title} {tooltip && <Tooltip msg={tooltip} />}
       </span>
-      {form}
+      <div className={styles.field__value}>{form}</div>
 
       {editable && (
         <div

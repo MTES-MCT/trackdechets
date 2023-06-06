@@ -7,7 +7,8 @@ import ProcessingOperationSelect from "common/components/ProcessingOperationSele
 export default function ProcessingOperation({
   field: { value, name, onChange },
   enableReuse = false,
-}: FieldProps & { enableReuse?: boolean }) {
+  disabled,
+}: FieldProps & { enableReuse?: boolean; disabled?: boolean }) {
   const operationDetail = PROCESSING_OPERATIONS.find(
     operation => operation.code === value
   );
@@ -30,6 +31,7 @@ export default function ProcessingOperation({
       </div>
       <ProcessingOperationSelect
         field={{ value: value, name: name, onChange: onChange, enableReuse }}
+        disabled={disabled}
       />
 
       {operationDetail != null && (

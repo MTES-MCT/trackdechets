@@ -1,5 +1,10 @@
 import * as React from "react";
-import { generatePath, useParams, useLocation } from "react-router-dom";
+import {
+  generatePath,
+  useParams,
+  useLocation,
+  useRouteMatch,
+} from "react-router-dom";
 
 import routes from "common/routes";
 import {
@@ -33,9 +38,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
 
-  let canDeleteAndUpdate = [FormStatus.Draft, FormStatus.Sealed].includes(
-    form.status
-  );
+  let canDelete = [FormStatus.Draft, FormStatus.Sealed].includes(form.status);
 
   if (form.status === FormStatus.SignedByProducer) {
     // if the bsd is only signed by the emitter, they can still update/delete it
@@ -44,8 +47,14 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     const signedBySiret = form.emittedByEcoOrganisme
       ? form.ecoOrganisme?.siret
       : form.emitter?.company?.siret;
-    canDeleteAndUpdate = siret === signedBySiret;
+    canDelete = siret === signedBySiret;
   }
+
+  const canUpdate = [
+    FormStatus.Draft,
+    FormStatus.Sealed,
+    FormStatus.SignedByProducer,
+  ].includes(form.status);
 
   const isAppendix1 = form.emitter?.type === EmitterType.Appendix1;
   const isAppendix1Producer =
@@ -58,20 +67,26 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
       form.status
     ) && !isAppendix1Producer;
 
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
+
   const links = [
     {
       title: "Contrôle routier",
-      route: generatePath(routes.dashboard.roadControl, {
-        siret,
-        id: form.id,
-      }),
+      route: {
+        pathname: generatePath(routes[dashboardRoutePrefix].roadControl, {
+          siret,
+          id: form.id,
+        }),
+        state: { background: location },
+      },
       icon: <IconQrCode color="blueLight" size="24px" />,
       isVisible: useDisplayRoadControlButton(form),
     },
     {
       title: "Aperçu",
       route: {
-        pathname: generatePath(routes.dashboard.bsdds.view, {
+        pathname: generatePath(routes[dashboardRoutePrefix].bsdds.view, {
           siret,
           id: form.id,
         }),
@@ -83,7 +98,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     {
       title: "Annexe 1",
       route: {
-        pathname: generatePath(routes.dashboard.bsdds.view, {
+        pathname: generatePath(routes[dashboardRoutePrefix].bsdds.view, {
           siret,
           id: form.id,
         }),
@@ -112,17 +127,17 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     },
     {
       title: "Modifier",
-      route: generatePath(routes.dashboard.bsdds.edit, {
+      route: generatePath(routes[dashboardRoutePrefix].bsdds.edit, {
         siret,
         id: form.id,
       }),
       icon: <IconPaperWrite size="24px" color="blueLight" />,
-      isVisible: canDeleteAndUpdate && !isAppendix1Producer,
+      isVisible: canUpdate && !isAppendix1Producer,
     },
     {
       title: "Révision",
       route: {
-        pathname: generatePath(routes.dashboard.bsdds.review, {
+        pathname: generatePath(routes[dashboardRoutePrefix].bsdds.review, {
           siret,
           id: form.id,
         }),
@@ -135,7 +150,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
       title: "Supprimer",
       route: "",
       icon: <IconTrash color="blueLight" size="24px" />,
-      isVisible: canDeleteAndUpdate,
+      isVisible: canDelete,
       isButton: true,
       handleClick: () => setIsDeleting(true),
     },

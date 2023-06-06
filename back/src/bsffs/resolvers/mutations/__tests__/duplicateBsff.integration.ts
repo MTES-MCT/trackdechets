@@ -8,6 +8,11 @@ import {
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { createBsff } from "../../../__tests__/factories";
+import { xDaysAgo } from "../../../../commands/onboarding.helpers";
+import prisma from "../../../../prisma";
+
+const TODAY = new Date();
+const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
 
 const DUPLICATE_BSFF = gql`
   mutation DuplicateBsff($id: ID!) {
@@ -119,5 +124,130 @@ describe("Mutation.duplicateBsff", () => {
         message: `Le BSFF n°${bsff.id} n'existe pas.`
       })
     ]);
+  });
+
+  test("duplicated BSFF should have the updated data when company info changes", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+
+    const transporter = await userWithCompanyFactory("MEMBER", {
+      transporterReceipt: {
+        create: {
+          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString(),
+          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsff = await createBsff({ emitter, transporter, destination });
+    const { mutate } = makeClient(emitter.user);
+
+    await prisma.company.update({
+      where: { id: emitter.company.id },
+      data: {
+        name: "UPDATED-EMITTER-NAME",
+        address: "UPDATED-EMITTER-ADDRESS",
+        contact: "UPDATED-EMITTER-CONTACT",
+        contactPhone: "UPDATED-EMITTER-PHONE",
+        contactEmail: "UPDATED-EMITTER-MAIL"
+      }
+    });
+
+    await prisma.company.update({
+      where: { id: transporter.company.id },
+      data: {
+        name: "UPDATED-TRANSPORTER-NAME",
+        address: "UPDATED-TRANSPORTER-ADDRESS",
+        contact: "UPDATED-TRANSPORTER-CONTACT",
+        contactPhone: "UPDATED-TRANSPORTER-PHONE",
+        contactEmail: "UPDATED-TRANSPORTER-MAIL"
+      }
+    });
+
+    await prisma.transporterReceipt.update({
+      where: { id: transporter.company.transporterReceiptId! },
+      data: {
+        receiptNumber: "UPDATED-TRANSPORTER-RECEIPT-NUMBER",
+        validityLimit: FOUR_DAYS_AGO.toISOString(),
+        department: "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
+      }
+    });
+
+    await prisma.company.update({
+      where: { id: destination.company.id },
+      data: {
+        name: "UPDATED-DESTINATION-NAME",
+        address: "UPDATED-DESTINATION-ADDRESS",
+        contact: "UPDATED-DESTINATION-CONTACT",
+        contactPhone: "UPDATED-DESTINATION-PHONE",
+        contactEmail: "UPDATED-DESTINATION-MAIL"
+      }
+    });
+
+    const { data } = await mutate<
+      Pick<Mutation, "duplicateBsff">,
+      MutationDuplicateBsffArgs
+    >(DUPLICATE_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+
+    const duplicatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: data.duplicateBsff.id }
+    });
+
+    expect(duplicatedBsff.emitterCompanyName).toEqual("UPDATED-EMITTER-NAME");
+    expect(duplicatedBsff.emitterCompanyAddress).toEqual(
+      "UPDATED-EMITTER-ADDRESS"
+    );
+    expect(duplicatedBsff.emitterCompanyContact).toEqual(
+      "UPDATED-EMITTER-CONTACT"
+    );
+    expect(duplicatedBsff.emitterCompanyMail).toEqual("UPDATED-EMITTER-MAIL");
+    expect(duplicatedBsff.emitterCompanyPhone).toEqual("UPDATED-EMITTER-PHONE");
+
+    expect(duplicatedBsff.transporterCompanyName).toEqual(
+      "UPDATED-TRANSPORTER-NAME"
+    );
+    expect(duplicatedBsff.transporterCompanyAddress).toEqual(
+      "UPDATED-TRANSPORTER-ADDRESS"
+    );
+    expect(duplicatedBsff.transporterCompanyContact).toEqual(
+      "UPDATED-TRANSPORTER-CONTACT"
+    );
+    expect(duplicatedBsff.transporterCompanyMail).toEqual(
+      "UPDATED-TRANSPORTER-MAIL"
+    );
+    expect(duplicatedBsff.transporterCompanyPhone).toEqual(
+      "UPDATED-TRANSPORTER-PHONE"
+    );
+
+    expect(duplicatedBsff.transporterRecepisseNumber).toEqual(
+      "UPDATED-TRANSPORTER-RECEIPT-NUMBER"
+    );
+    expect(duplicatedBsff.transporterRecepisseValidityLimit).toEqual(
+      FOUR_DAYS_AGO
+    );
+    expect(duplicatedBsff.transporterRecepisseDepartment).toEqual(
+      "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
+    );
+
+    expect(duplicatedBsff.destinationCompanyName).toEqual(
+      "UPDATED-DESTINATION-NAME"
+    );
+    expect(duplicatedBsff.destinationCompanyAddress).toEqual(
+      "UPDATED-DESTINATION-ADDRESS"
+    );
+    expect(duplicatedBsff.destinationCompanyContact).toEqual(
+      "UPDATED-DESTINATION-CONTACT"
+    );
+    expect(duplicatedBsff.destinationCompanyMail).toEqual(
+      "UPDATED-DESTINATION-MAIL"
+    );
+    expect(duplicatedBsff.destinationCompanyPhone).toEqual(
+      "UPDATED-DESTINATION-PHONE"
+    );
   });
 });

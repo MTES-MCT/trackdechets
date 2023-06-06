@@ -48,7 +48,7 @@ describe("Query.Bsdasris", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const initialParams = {
       opt: {
-        ...readyToReceiveData(company)
+        ...readyToReceiveData()
       }
     };
 
@@ -86,7 +86,7 @@ describe("Query.Bsdasris", () => {
     const initialParams = {
       opt: {
         ...initialData(company),
-        ...readyToReceiveData(company),
+        ...readyToReceiveData(),
         transporterTakenOverAt
       }
     };

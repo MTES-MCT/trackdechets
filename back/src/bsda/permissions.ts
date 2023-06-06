@@ -2,7 +2,6 @@ import { Bsda, BsdaStatus, User } from "@prisma/client";
 import { BsdaInput } from "../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../permissions";
 import { getPreviousBsdas } from "./database";
-import { checkSecurityCode } from "../common/permissions";
 
 /**
  * Retrieves organisations allowed to read a BSDA
@@ -201,27 +200,6 @@ export async function checkCanDuplicate(user: User, bsda: Bsda) {
     Permission.BsdCanCreate,
     "Vous ne pouvez pas dupliquer un bordereau sur lequel votre entreprise n'apparait pas"
   );
-}
-
-export async function checkCanSignFor(
-  user: User,
-  orgId: string | null,
-  securityCode?: number | null
-) {
-  try {
-    const hasPerm = await checkUserPermissions(
-      user,
-      [orgId].filter(Boolean),
-      Permission.BsdCanSign,
-      "Vous ne pouvez pas signer ce BSDA"
-    );
-    return hasPerm;
-  } catch (err) {
-    if (securityCode && orgId) {
-      return checkSecurityCode(orgId, securityCode);
-    }
-    throw err;
-  }
 }
 
 export async function checkCanRequestRevision(user: User, bsda: Bsda) {

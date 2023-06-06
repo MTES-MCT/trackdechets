@@ -28,6 +28,12 @@ export const GET_ME = gql`
         contactEmail
         contactPhone
         address
+        companyTypes
+        transporterReceipt {
+          receiptNumber
+          validityLimit
+          department
+        }
       }
     }
   }
@@ -37,10 +43,12 @@ export default function MyCompanySelector({
   fieldName,
   onSelect,
   siretEditable = true,
+  filter,
 }: {
   fieldName: string;
   onSelect: (company) => void;
   siretEditable: boolean;
+  filter?: (companies: CompanyPrivate[]) => CompanyPrivate[];
 }) {
   const { setFieldValue } = useFormikContext<CreateFormInput>();
   const [field] = useField({ name: fieldName });
@@ -97,8 +105,10 @@ export default function MyCompanySelector({
   });
 
   const companies = useMemo(() => {
-    return sortCompaniesByName(data?.me.companies ?? []);
-  }, [data]);
+    const allCompanies = data?.me.companies ?? [];
+    const filteredCompanies = filter ? filter(allCompanies) : allCompanies;
+    return sortCompaniesByName(filteredCompanies);
+  }, [data, filter]);
 
   if (loading) {
     return <div>Chargement...</div>;
@@ -108,7 +118,7 @@ export default function MyCompanySelector({
     return <InlineError apolloError={error} />;
   }
 
-  if (data) {
+  if (companies) {
     return (
       <>
         {siretEditable ? (
