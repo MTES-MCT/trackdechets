@@ -70,7 +70,7 @@ const settings: {
         : "Signature producteur",
     signatureType: BsdasriSignatureType.Emission,
     validationText:
-      "En signant, je confirme la remise du déchet au transporteur. La signature est horodatée.",
+      "En signant, je confirme la remise du déchet au transporteur.",
   },
   [ExtraSignatureType.SynthesisTakeOver]: {
     getLabel: () => "Signature bordereau de synthèse",
@@ -83,7 +83,7 @@ const settings: {
     getLabel: () => "Signature transporteur",
     signatureType: BsdasriSignatureType.Transport,
     validationText:
-      "En signant, je confirme l'emport du déchet. La signature est horodatée.",
+      "En signant, je confirme l'emport du déchet.",
   },
   [ExtraSignatureType.DirectTakeover]: {
     getLabel: () => "Emport direct transporteur",
@@ -97,14 +97,14 @@ const settings: {
     getLabel: () => "Signature réception",
     signatureType: BsdasriSignatureType.Reception,
     validationText:
-      "En signant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau. La signature est horodatée.",
+      "En signant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau.",
   },
 
   [BsdasriSignatureType.Operation]: {
     getLabel: () => "Signature traitement",
     signatureType: BsdasriSignatureType.Operation,
     validationText:
-      "En signant, je confirme le traitement des déchets pour la quantité indiquée dans ce bordereau. La signature est horodatée.",
+      "En signant, je confirme le traitement des déchets pour la quantité indiquée dans ce bordereau.",
   },
 };
 
