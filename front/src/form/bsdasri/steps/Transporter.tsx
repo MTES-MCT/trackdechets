@@ -142,7 +142,7 @@ function CurrentCompanyWidget({ disabled = false }) {
     variables: { siret },
     fetchPolicy: "no-cache",
 
-    onCompleted: () => {
+    onCompleted: data => {
       if (!values?.transporter?.company?.mail) {
         setFieldValue(
           `transporter.company.mail`,
