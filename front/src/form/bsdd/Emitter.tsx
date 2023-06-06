@@ -81,7 +81,6 @@ export default function Emitter({ disabled }) {
     },
     skip: !orgId,
     onCompleted: data => {
-      console.log(data);
       if (data && typeof updateBsddTransporterReceipt === "function") {
         updateBsddTransporterReceipt(
           data.companyPrivateInfos as CompanySearchPrivate
