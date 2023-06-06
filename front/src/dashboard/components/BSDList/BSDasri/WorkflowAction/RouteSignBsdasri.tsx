@@ -82,8 +82,7 @@ const settings: {
   [BsdasriSignatureType.Transport]: {
     getLabel: () => "Signature transporteur",
     signatureType: BsdasriSignatureType.Transport,
-    validationText:
-      "En signant, je confirme l'emport du déchet.",
+    validationText: "En signant, je confirme l'emport du déchet.",
   },
   [ExtraSignatureType.DirectTakeover]: {
     getLabel: () => "Emport direct transporteur",
