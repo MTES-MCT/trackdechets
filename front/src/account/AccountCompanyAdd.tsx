@@ -602,8 +602,15 @@ export default function AccountCompanyAdd() {
               }}
               onSubmit={onSubmit}
             >
-              {({ values, setFieldValue, isSubmitting, errors, touched }) => (
-                <Form className={styles.companyAddForm}>
+              {({
+                values,
+                setFieldValue,
+                isSubmitting,
+                errors,
+                touched,
+                handleSubmit,
+              }) => (
+                <Form className={styles.companyAddForm} onSubmit={handleSubmit}>
                   <Field name="givenName">
                     {({ field }) => {
                       return (
@@ -886,6 +893,7 @@ export default function AccountCompanyAdd() {
                   <div className={styles["submit-form"]}>
                     <Button
                       priority="tertiary"
+                      type="button"
                       disabled={isSubmitting}
                       onClick={() => {
                         history.goBack();

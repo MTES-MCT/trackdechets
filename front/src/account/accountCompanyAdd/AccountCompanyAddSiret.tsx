@@ -223,7 +223,11 @@ export default function AccountCompanyAddSiret({
                   };
                 }
               } else {
-                if (!isValidSiret && /^[0-9]{14}/.test(values.siret)) {
+                if (!isValidSiret && /^[0-9]{15,}/.test(values.siret)) {
+                  return {
+                    siret: "Vous devez entrer un SIRET composé de 14 chiffres",
+                  };
+                } else if (!isValidSiret && /^[0-9]{14}/.test(values.siret)) {
                   return {
                     siret: "Aucun établissement trouvé avec ce SIRET",
                   };
@@ -259,8 +263,8 @@ export default function AccountCompanyAddSiret({
               });
             }}
           >
-            {({ setFieldValue, errors, values }) => (
-              <Form className={styles.companyAddForm}>
+            {({ setFieldValue, errors, values, handleSubmit }) => (
+              <Form onSubmit={handleSubmit} className={styles.companyAddForm}>
                 {shouldAutoSubmit && (
                   <AutoSubmitSiret
                     defaultSiret={defaultQuery}
@@ -318,8 +322,8 @@ export default function AccountCompanyAddSiret({
                 )}
                 <div className={styles["submit-form"]}>
                   <Button
+                    type="submit"
                     disabled={loading || isDisabled || isRegistered}
-                    nativeButtonProps={{ type: "submit" }}
                   >
                     {loading ? "Chargement..." : "Valider"}
                   </Button>
