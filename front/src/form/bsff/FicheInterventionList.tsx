@@ -385,11 +385,12 @@ export function FicheInterventionList({
 
                 setIsModalOpen(true);
               })
-              .catch(() => {
-                window.alert(
-                  `Veuillez compléter les champs de l'opérateur avant l'ajout d'une fiche d'intervention.`
-                );
-                return;
+              .catch(err => {
+                console.log(err);
+                // window.alert(
+                //   `Veuillez compléter les champs de l'opérateur avant l'ajout d'une fiche d'intervention.`
+                // );
+                setIsModalOpen(true);
               });
           }}
         >
