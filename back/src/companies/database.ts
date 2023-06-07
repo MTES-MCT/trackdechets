@@ -93,26 +93,6 @@ export function getDeclarations(codeS3ic: string | null | undefined) {
 }
 
 /**
- * Returns the role (ADMIN or MEMBER) of a user
- * in a company.
- * Returns null if the user is not a member of the company.
- * There should be only one association between a user
- * and a company, so we return the first one
- * @param userId
- * @param orgId
- */
-export async function getUserRole(userId: string, orgId: string) {
-  const associations = await prisma.company
-    .findUniqueOrThrow({ where: { orgId } })
-    .companyAssociations({ where: { userId } });
-
-  if (associations.length > 0) {
-    return associations[0].role;
-  }
-  return null;
-}
-
-/**
  * Returns true if user belongs to company with either
  * MEMBER or ADMIN role, false otherwise
  * @param user
@@ -359,12 +339,14 @@ export function convertUrls<T extends Partial<Company>>(
   ecoOrganismeAgreements: URL[];
   signatureAutomations: [];
   receivedSignatureAutomations: [];
+  userPermissions: [];
 } {
   return {
     ...company,
     ecoOrganismeAgreements:
       company.ecoOrganismeAgreements?.map(a => new URL(a)) ?? [],
     signatureAutomations: [],
-    receivedSignatureAutomations: []
+    receivedSignatureAutomations: [],
+    userPermissions: []
   };
 }

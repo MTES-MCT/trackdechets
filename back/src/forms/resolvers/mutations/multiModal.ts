@@ -350,7 +350,7 @@ export async function takeOverSegment(
   await checkUserPermissions(
     user,
     authorizedOrgIds.filter(Boolean),
-    Permission.BsdCanSign,
+    Permission.BsdCanSignTransport,
     FORM_NOT_FOUND_OR_NOT_ALLOWED
   );
 
