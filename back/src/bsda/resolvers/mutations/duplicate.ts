@@ -119,6 +119,7 @@ async function duplicateBsda({
     transporterCompanyVatNumber,
     brokerCompanySiret,
     workerCompanySiret,
+    destinationCompanySiret,
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
     isDraft: true,
