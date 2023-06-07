@@ -672,6 +672,84 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.id).toBeDefined();
   });
 
+  it("should allow creating the bsda with type COLLECTION_2710 even if transporter and worker have empty strings as siret", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: ["WASTE_CENTER"] }
+    });
+
+    const input: BsdaInput = {
+      type: "COLLECTION_2710",
+      worker: {
+        company: {
+          address: "",
+          contact: "",
+          country: "",
+          mail: "",
+          name: "",
+          omiNumber: "",
+          phone: "",
+          siret: "",
+          vatNumber: ""
+        }
+      },
+      transporter: {
+        company: {
+          address: "",
+          contact: "",
+          country: "",
+          mail: "",
+          name: "",
+          omiNumber: "",
+          phone: "",
+          siret: "",
+          vatNumber: ""
+        }
+      },
+      emitter: {
+        isPrivateIndividual: true,
+        company: {
+          name: "Jean DUPONT",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      waste: {
+        code: "06 07 01*",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: company.siret,
+          name: company.name,
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(data.createBsda.id).toBeDefined();
+  });
+
   it("should disallow creating a bsda with packaging OTHER and no description", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: { set: ["WASTE_CENTER"] }
