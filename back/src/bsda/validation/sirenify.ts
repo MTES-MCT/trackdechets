@@ -41,8 +41,8 @@ const accessors = (input: ReturnType<typeof flattenBsdaInput>) => [
     setter: (input, companyInput: CompanyInput) => {
       const intermediary = input.intermediaries[idx];
 
-      intermediary.workerCompanyName = companyInput.name;
-      intermediary.workerCompanyAddress = companyInput.address;
+      intermediary.name = companyInput.name;
+      intermediary.address = companyInput.address;
     }
   }))
 ];
