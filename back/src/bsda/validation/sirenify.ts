@@ -39,9 +39,10 @@ const accessors = (input: ReturnType<typeof flattenBsdaInput>) => [
   ...(input.intermediaries ?? []).map((_, idx) => ({
     siret: input.intermediaries![idx].siret,
     setter: (input, companyInput: CompanyInput) => {
-      input.intermediaries = input.intermediaries!.map((current, i) =>
-        i === idx ? companyInput : current
-      );
+      const intermediary = input.intermediaries[idx];
+
+      intermediary.workerCompanyName = companyInput.name;
+      intermediary.workerCompanyAddress = companyInput.address;
     }
   }))
 ];
