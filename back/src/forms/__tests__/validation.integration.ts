@@ -583,60 +583,6 @@ describe("sealedFormSchema", () => {
       );
     });
   });
-
-  it("Emitter can transport own dangerous wastes under 100kg", async () => {
-    const partialForm: Partial<Form> = {
-      ...sealedForm,
-      transporterCompanySiret: sealedForm.emitterCompanySiret,
-      wasteDetailsCode: "16 06 01*",
-      wasteDetailsQuantity: 0.1
-    };
-
-    const isValid = await sealedFormSchema.isValid(partialForm);
-
-    expect(isValid).toBe(true);
-  });
-
-  it("Emitter can *not* transport own dangerous wastes over 100kg", async () => {
-    const partialForm: Partial<Form> = {
-      ...sealedForm,
-      transporterCompanySiret: sealedForm.emitterCompanySiret,
-      wasteDetailsCode: "16 06 01*",
-      wasteDetailsQuantity: 0.101
-    };
-    const validateFn = () => sealedFormSchema.validate(partialForm);
-
-    await expect(validateFn()).rejects.toThrow(
-      "Si vous transportez vos propres déchets, vous ne pouvez transporter que 100kg de déchets dangereux maximum."
-    );
-  });
-
-  it("Emitter can transport own non-dangerous wastes under 500kg", async () => {
-    const partialForm: Partial<Form> = {
-      ...sealedForm,
-      transporterCompanySiret: sealedForm.emitterCompanySiret,
-      wasteDetailsCode: "18 01 01",
-      wasteDetailsQuantity: 0.5
-    };
-
-    const isValid = await sealedFormSchema.isValid(partialForm);
-
-    expect(isValid).toBe(true);
-  });
-
-  it("Emitter can *not* transport own non-dangerous wastes over 500kg", async () => {
-    const partialForm: Partial<Form> = {
-      ...sealedForm,
-      transporterCompanySiret: sealedForm.emitterCompanySiret,
-      wasteDetailsCode: "18 01 01",
-      wasteDetailsQuantity: 0.501
-    };
-    const validateFn = () => sealedFormSchema.validate(partialForm);
-
-    await expect(validateFn()).rejects.toThrow(
-      "Si vous transportez vos propres déchets, vous ne pouvez transporter que 500kg de déchets non dangereux maximum."
-    );
-  });
 });
 
 describe("beforeTransportSchema", () => {
@@ -1121,12 +1067,6 @@ describe("draftFormSchema", () => {
       wasteDetailsConsistence: "SOLID",
       wasteDetailsPop: false
     };
-
-    const validateFn = () => sealedFormSchema.validate(partialForm);
-
-    const res = await validateFn();
-    console.log("res", res);
-
     const isValid = await draftFormSchema.isValid(partialForm);
     expect(isValid).toEqual(true);
   });

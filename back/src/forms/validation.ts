@@ -806,7 +806,11 @@ export const transporterSchemaFn: FactorySchemaOf<
         } = ctx.parent;
 
         // Emitter transports own waste
-        if (transporterCompanySiret === emitterCompanySiret) {
+        if (
+          transporterCompanySiret &&
+          emitterCompanySiret &&
+          transporterCompanySiret === emitterCompanySiret
+        ) {
           // Dangerous waste. Up to 100kg
           if (isDangerous(wasteDetailsCode)) {
             if (wasteDetailsQuantity > 0.1) {
