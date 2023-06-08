@@ -323,9 +323,8 @@ function flattenBsdaDestinationInput({
     ),
     destinationCustomInfo: chain(destination, d => d.customInfo),
     destinationCap: chain(destination, d => d.cap),
-    destinationPlannedOperationCode: chain(
-      destination,
-      d => d.plannedOperationCode
+    destinationPlannedOperationCode: chain(destination, d =>
+      noEmptyString(d.plannedOperationCode)
     ),
 
     destinationReceptionDate: chain(destination, d =>
@@ -343,7 +342,7 @@ function flattenBsdaDestinationInput({
       chain(d.reception, r => r.refusalReason)
     ),
     destinationOperationCode: chain(destination, d =>
-      chain(d.operation, o => o.code)
+      chain(d.operation, o => noEmptyString(o.code))
     ),
     destinationOperationDescription: chain(destination, d =>
       chain(d.operation, o => o.description)
