@@ -6,6 +6,7 @@ import {
   matchPath,
   RouteComponentProps,
   generatePath,
+  useRouteMatch,
 } from "react-router-dom";
 
 import { localAuthService } from "login/auth.service";
@@ -21,6 +22,7 @@ import { DEVELOPERS_DOCUMENTATION_URL, MEDIA_QUERIES } from "common/config";
 import styles from "./Header.module.scss";
 import { useMedia } from "use-media";
 import { DashboardTabs } from "dashboard/DashboardTabs";
+import { default as DashboardTabsV2 } from "Apps/Dashboard/Components/DashboardTabs/DashboardTabs";
 
 export const GET_ME = gql`
   {
@@ -44,7 +46,7 @@ export const GET_ME = gql`
  */
 function MobileSubNav({ currentSiret }) {
   const { error, data } = useQuery<Pick<Query, "me">>(GET_ME, {});
-
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   if (error) return <InlineError apolloError={error} />;
   if (data?.me == null) return <Loader />;
 
@@ -57,8 +59,10 @@ function MobileSubNav({ currentSiret }) {
     return null;
   }
 
-  return (
+  return !isV2Routes ? (
     <DashboardTabs currentCompany={currentCompany} companies={companies} />
+  ) : (
+    <DashboardTabsV2 currentCompany={currentCompany} companies={companies} />
   );
 }
 

@@ -1,6 +1,7 @@
 import {
   BsdDisplay,
   BsdStatusCode,
+  BsdWithReview,
   ReviewStatusLabel,
   WorkflowDisplayType,
 } from "../common/types/bsdTypes";
@@ -582,18 +583,33 @@ export const getSignTempStorerBtnLabel = (
   return "";
 };
 
+const getReviewCurrentApproval = (
+  bsd: BsdDisplay | BsdWithReview,
+  siret: string
+) => {
+  const { review } = bsd;
+
+  return review?.approvals?.find(approval => approval.approverSiret === siret);
+};
+
+export const canApproveOrRefuseReview = (
+  bsd: BsdDisplay | BsdWithReview,
+  siret: string
+) => {
+  const { review } = bsd;
+  const currentApproval = getReviewCurrentApproval(bsd, siret);
+
+  return (
+    review?.status === BsdStatusCode.Pending &&
+    currentApproval?.status === BsdStatusCode.Pending
+  );
+};
+
 export const getPrimaryActionsReviewsLabel = (
   bsd: BsdDisplay,
   currentSiret: string
 ) => {
-  const { review } = bsd;
-  const currentApproval = review?.approvals?.find(
-    approval => approval.approverSiret === currentSiret
-  );
-  if (
-    review?.status === BsdStatusCode.Pending &&
-    currentApproval?.status === BsdStatusCode.Pending
-  ) {
+  if (canApproveOrRefuseReview(bsd, currentSiret)) {
     return APPROUVER_REFUSER_REVISION;
   }
 

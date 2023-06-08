@@ -12,6 +12,7 @@ export interface BsdAdditionalActionsButtonProps {
     onRevision?: Function;
     onAppendix1?: Function;
     onBsdSuite?: Function;
+    onDeleteReview?: Function;
   };
   hideReviewCta?: boolean;
 }

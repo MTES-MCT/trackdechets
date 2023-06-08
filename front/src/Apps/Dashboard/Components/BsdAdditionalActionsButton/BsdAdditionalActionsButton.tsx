@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import classnames from "classnames";
 import FocusTrap from "focus-trap-react";
 import {
+  SUPRIMER_REVISION,
   VALIDER_TRAITEMENT,
   annexe1,
   apercu_action_label,
@@ -22,6 +23,7 @@ import {
   canGeneratePdf,
   hasBsdSuite,
   hasAppendix1Cta,
+  canDeleteReview,
 } from "../../dashboardServices";
 
 import "./bsdAdditionalActionsButton.scss";
@@ -38,6 +40,7 @@ function BsdAdditionalActionsButton({
     onRevision,
     onAppendix1,
     onBsdSuite,
+    onDeleteReview,
   },
   hideReviewCta,
 }: BsdAdditionalActionsButtonProps) {
@@ -81,11 +84,11 @@ function BsdAdditionalActionsButton({
   };
   const handlePdf = () => {
     closeMenu();
-    onPdf && onPdf(bsd);
+    onPdf!(bsd);
   };
   const handleUpdate = () => {
     closeMenu();
-    onUpdate && onUpdate(bsd);
+    onUpdate!(bsd);
   };
   const handleDuplicate = () => {
     closeMenu();
@@ -93,20 +96,25 @@ function BsdAdditionalActionsButton({
   };
   const handleDelete = () => {
     closeMenu();
-    onDelete && onDelete(bsd);
+    onDelete!(bsd);
   };
   const handleRevision = () => {
     closeMenu();
-    onRevision && onRevision(bsd);
+    onRevision!(bsd);
   };
 
   const handleBsdSuite = () => {
     closeMenu();
-    onBsdSuite && onBsdSuite(bsd);
+    onBsdSuite!(bsd);
   };
   const handleAppendix1 = () => {
     closeMenu();
-    onAppendix1 && onAppendix1(bsd);
+    onAppendix1!(bsd);
+  };
+
+  const handleReviewDelete = () => {
+    closeMenu();
+    onDeleteReview!(bsd);
   };
 
   const tabIndex = isOpen ? 0 : -1;
@@ -158,6 +166,19 @@ function BsdAdditionalActionsButton({
                 {!bsd?.temporaryStorageDetail
                   ? completer_bsd_suite
                   : VALIDER_TRAITEMENT}
+              </button>
+            </li>
+          )}
+          {canDeleteReview(bsd, currentSiret) && (
+            <li>
+              <button
+                type="button"
+                data-testid="review-btn"
+                className="fr-btn fr-btn--tertiary-no-outline"
+                tabIndex={tabIndex}
+                onClick={handleReviewDelete}
+              >
+                {SUPRIMER_REVISION}
               </button>
             </li>
           )}
@@ -237,7 +258,7 @@ function BsdAdditionalActionsButton({
               </button>
             </li>
           )}
-          {canDeleteBsd(bsd, currentSiret) && (
+          {!hideReviewCta && canDeleteBsd(bsd, currentSiret) && (
             <li>
               <button
                 type="button"

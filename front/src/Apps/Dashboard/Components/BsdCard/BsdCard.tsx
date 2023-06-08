@@ -48,6 +48,7 @@ function BsdCard({
     onRevision,
     onBsdSuite,
     onAppendix1,
+    onDeleteReview,
   },
 }: BsdCardProps) {
   const isReviewsTab = bsdCurrentTab === "reviewsTab";
@@ -248,7 +249,7 @@ function BsdCard({
                     data-testid={`bsd-card-btn-review-primary-${bsdDisplay.readableid}`}
                     type="button"
                     className="fr-btn fr-btn--sm"
-                    onClick={() => {}}
+                    onClick={handleValidationClick}
                   >
                     {ctaPrimaryReviewLabel}
                   </button>
@@ -266,6 +267,7 @@ function BsdCard({
                     onPdf,
                     onAppendix1,
                     onBsdSuite,
+                    onDeleteReview,
                   }}
                   hideReviewCta={isReviewsTab}
                 />

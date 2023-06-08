@@ -32,6 +32,7 @@ import {
   blankstate_history_desc,
   blankstate_history_title,
   blankstate_reviews_desc,
+  blankstate_reviews_title,
   dropdown_create_btn,
   filter_reset_btn,
   filter_show_btn,
@@ -364,6 +365,7 @@ const DashboardPage = () => {
 
   useEffect(() => {
     if (isReviewsTab) {
+      setBsdsReview([]);
       Promise.all([fetchBsddRevisions(), fetchBsdaRevisions()])
         .then(res => {
           const dataBsdd = res[0].data;
@@ -422,6 +424,9 @@ const DashboardPage = () => {
     }
     if (isArchivesTab) {
       return blankstate_history_title;
+    }
+    if (isReviewsTab) {
+      return blankstate_reviews_title;
     }
   };
 
