@@ -33,6 +33,7 @@ import {
   siret,
   siretConditions,
   siretTests,
+  testSiret,
   vatNumber,
   vatNumberTests,
   weight,
@@ -796,7 +797,52 @@ export const transporterSchemaFn: FactorySchemaOf<
       ),
     transporterCompanySiret: siret
       .label("Transporteur")
-      .test(siretTests.isRegistered("TRANSPORTER"))
+      .test(async (_, ctx) => {
+        const {
+          transporterCompanySiret,
+          emitterCompanySiret,
+          wasteDetailsCode,
+          wasteDetailsQuantity
+        } = ctx.parent;
+
+        // Emitter transports own waste
+        if (transporterCompanySiret === emitterCompanySiret) {
+          // Dangerous waste. Up to 100kg
+          if (isDangerous(wasteDetailsCode)) {
+            if (wasteDetailsQuantity > 0.1) {
+              return new yup.ValidationError(
+                "Si vous transportez vos propres déchets, vous ne pouvez transporter que 100kg de déchets dangereux maximum.",
+                true,
+                "wasteDetailsQuantity"
+              );
+            }
+          } else {
+            // Non-dangerous waste. 500kg max
+            if (wasteDetailsQuantity > 0.5) {
+              return new yup.ValidationError(
+                "Si vous transportez vos propres déchets, vous ne pouvez transporter que 500kg de déchets non dangereux maximum.",
+                true,
+                "wasteDetailsQuantity"
+              );
+            }
+          }
+
+          return true;
+        }
+
+        // Transporter is not emitter. Must be registered as transporter
+        try {
+          await testSiret(
+            "TRANSPORTER",
+            transporterCompanySiret,
+            "Transporteur"
+          );
+
+          return true;
+        } catch (e) {
+          return new yup.ValidationError(e);
+        }
+      })
       .when(
         "transporterCompanyVatNumber",
         // set siret not required when vatNumber is defined and valid
