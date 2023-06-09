@@ -59,7 +59,7 @@ export async function checkCanReadUpdateDeleteTransporterReceipt(
   receipt: TraderReceipt
 ) {
   // check associated company
-  const companies = await prisma.traderReceipt
+  const companies = await prisma.transporterReceipt
     .findUnique({
       where: { id: receipt.id }
     })
