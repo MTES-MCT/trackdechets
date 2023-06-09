@@ -333,7 +333,10 @@ describe("Mutation.Bsda.duplicate", () => {
 
     // make sure this test breaks when a new field is added to the Bsda model
     // it will ensure we think of adding necessary fields to the duplicate input
-    expect(Object.keys(rest).sort()).toEqual(expectedSkipped.sort());
+    const sortFn = (a: string, b: string) => a.localeCompare(b);
+    expect(Object.keys(rest).sort(sortFn)).toEqual(
+      expectedSkipped.sort(sortFn)
+    );
   });
 
   test("duplicated BSDD should have the updated data when company info changes", async () => {
