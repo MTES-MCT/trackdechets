@@ -326,7 +326,6 @@ function flattenBsdaDestinationInput({
     destinationPlannedOperationCode: chain(destination, d =>
       noEmptyString(d.plannedOperationCode)
     ),
-
     destinationReceptionDate: chain(destination, d =>
       chain(d.reception, r => r.date)
     ),
@@ -522,7 +521,7 @@ function flattenBsdaWeightInput({ weight }: Pick<BsdaInput, "weight">) {
 
 function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
   return {
-    wasteCode: chain(waste, w => w.code),
+    wasteCode: chain(waste, w => noEmptyString(w.code)),
     wasteAdr: chain(waste, w => w.adr),
     wasteFamilyCode: chain(waste, w => w.familyCode),
     // TODO: name is deprecated, but still supported as an input for now.
@@ -619,7 +618,7 @@ export function flattenBsdaRevisionRequestInput(
       []
     ),
     destinationOperationCode: chain(reviewContent, r =>
-      chain(r.destination, d => chain(d.operation, o => o.code))
+      chain(r.destination, d => chain(d.operation, o => noEmptyString(o.code)))
     ),
     destinationOperationDescription: chain(reviewContent, r =>
       chain(r.destination, d => chain(d.operation, o => o.description))
