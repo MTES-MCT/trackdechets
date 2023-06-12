@@ -394,7 +394,7 @@ describe("sealedFormSchema", () => {
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
-        "recipientCompanySiret : l'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+        "Destinataire : l'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
       );
     });
 

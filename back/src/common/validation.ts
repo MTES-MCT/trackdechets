@@ -163,6 +163,11 @@ export const siretConditions: SiretConditions = {
 
 const { VERIFY_COMPANY } = process.env;
 
+const readablePaths = {
+  transporterCompanySiret: "Transporteur",
+  destinationCompanySiret: "Destination",
+  recipientCompanySiret: "Destinataire"
+};
 export const testSiret = async (
   role: string | undefined,
   siret: string,
@@ -173,8 +178,10 @@ export const testSiret = async (
     where: { siret }
   });
   if (company === null) {
+    const readablePath = readablePaths[path] ?? path;
+
     throw new Error(
-      `${path} : l'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
+      `${readablePath} : l'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
     );
   }
   if (role === "DESTINATION") {
@@ -224,7 +231,7 @@ export const siretTests: SiretTests = {
         return true;
       } catch (e) {
         return ctx.createError({
-          message: e
+          message: e.message
         });
       }
     }
