@@ -226,7 +226,9 @@ export const siretTests: SiretTests = {
     name: "is-registered-with-right-profile",
     test: async (siret, ctx) => {
       try {
-        await testSiret(role, siret, ctx.path);
+        const path = ctx.path || ctx.schema.spec.label;
+
+        await testSiret(role, siret, path);
 
         return true;
       } catch (e) {
