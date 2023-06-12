@@ -844,7 +844,7 @@ export const transporterSchemaFn: FactorySchemaOf<
 
           return true;
         } catch (e) {
-          return new yup.ValidationError(e);
+          return new yup.ValidationError(e.message);
         }
       })
       .when(
