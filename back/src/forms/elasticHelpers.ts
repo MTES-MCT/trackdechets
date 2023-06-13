@@ -133,7 +133,18 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
       break;
     }
     case Status.SIGNED_BY_PRODUCER: {
-      setFieldTab("transporterCompanySiret", "isToCollectFor");
+      // Emitter is also transporter (not regroupement nor annexe 1)
+      if (
+        form.emitterType !== "APPENDIX1" && // Annexe 1
+        form.emitterType !== "APPENDIX2" && // Regroupement
+        form.transporterCompanySiret &&
+        form.emitterCompanySiret &&
+        form.emitterCompanySiret === form.transporterCompanySiret
+      ) {
+        setFieldTab("transporterCompanySiret", "isForActionFor");
+      } else {
+        setFieldTab("transporterCompanySiret", "isToCollectFor");
+      }
 
       break;
     }
