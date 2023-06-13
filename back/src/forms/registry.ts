@@ -75,6 +75,7 @@ function toGenericWaste(bsdd: Bsdd): GenericWaste {
   return {
     wasteDescription: bsdd.wasteDescription,
     wasteCode: bsdd.wasteCode,
+    wasteIsDangerous: bsdd.wasteIsDangerous,
     pop: bsdd.pop,
     id: bsdd.id,
     createdAt: bsdd.createdAt,

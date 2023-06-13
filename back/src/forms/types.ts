@@ -70,6 +70,7 @@ export type Bsdd = {
   wasteCode: string | null;
   wasteDescription: string | null;
   wasteAdr: string | null;
+  wasteIsDangerous: boolean;
   weightValue: number | null;
   weightIsEstimate: boolean | null;
   transporterCompanyName: string | null;
