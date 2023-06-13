@@ -13,6 +13,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Correctifs BSDD Annexe 1 sur l'autocompletion des récépissés Transporteurs automatiquement sélectionné [PR 2437](https://github.com/MTES-MCT/trackdechets/pull/2437)
+- Correctifs BSDD sur l'affichage et la sauvegarde des récépissés Transporteurs par défaut (Favorites) et lors d'une dé-sélection [PR 2437](https://github.com/MTES-MCT/trackdechets/pull/2437)
+
 #### :boom: Breaking changes
 
 - Le destinataire est obligatoire pour sceller un BSDASRI [PR 2267](https://github.com/MTES-MCT/trackdechets/pull/2267)
@@ -22,6 +25,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout d'un bouton de déconnexion sur la page d'autorisation OpenId Connect [PR 2386](https://github.com/MTES-MCT/trackdechets/pull/2386)
 - Les informations sur les entreprises (récépissés, raison sociale, certification) sont mises à jour lors de la duplication d'un bordereau [PR 2355](https://github.com/MTES-MCT/trackdechets/pull/2355)
 - Le producteur initial d'un DASRI a accès à la suite de la traçabilité en cas de groupement [PR 2391](https://github.com/MTES-MCT/trackdechets/pull/2391)
+- Refonte de l'interface de création d'un établissement professionnel du déchet [PR 2204](https://github.com/MTES-MCT/trackdechets/pull/2204)
 
 #### :memo: Documentation
 

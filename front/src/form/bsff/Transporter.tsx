@@ -30,7 +30,7 @@ export default function Transporter({ disabled }) {
         allowForeignCompanies={true}
         registeredOnlyCompanies={true}
         onCompanySelected={transporter => {
-          if (transporter.transporterReceipt) {
+          if (transporter?.transporterReceipt) {
             setFieldValue("transporter.recepisse", {
               number: transporter.transporterReceipt.receiptNumber,
               validityLimit: transporter.transporterReceipt.validityLimit,
