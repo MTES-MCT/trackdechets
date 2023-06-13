@@ -8,6 +8,7 @@ import { PARTIAL_OPERATIONS } from "./constants";
 import { editionRules } from "./rules";
 import { ZodBsda, rawBsdaSchema } from "./schema";
 import { capitalize } from "../../common/strings";
+import { runTransformers } from "./transformers";
 
 type BsdaValidationContext = {
   enablePreviousBsdasChecks?: boolean;
@@ -39,6 +40,8 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
       if (validationContext.enableSirenification) {
         val = await sirenify(val);
       }
+
+      val = await runTransformers(val);
 
       return val;
     })
