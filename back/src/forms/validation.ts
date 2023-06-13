@@ -799,6 +799,7 @@ export const transporterSchemaFn: FactorySchemaOf<
       .label("Transporteur")
       .test(async (_, ctx) => {
         const {
+          emitterType,
           transporterCompanySiret,
           emitterCompanySiret,
           wasteDetailsCode,
@@ -807,9 +808,11 @@ export const transporterSchemaFn: FactorySchemaOf<
 
         // Emitter transports own waste
         if (
+          emitterType !== "APPENDIX1" && // Annexe 1
+          emitterType !== "APPENDIX2" && // Regroupement
           transporterCompanySiret &&
           emitterCompanySiret &&
-          transporterCompanySiret === emitterCompanySiret
+          emitterCompanySiret === transporterCompanySiret
         ) {
           // Dangerous waste. Up to 100kg
           if (isDangerous(wasteDetailsCode)) {
