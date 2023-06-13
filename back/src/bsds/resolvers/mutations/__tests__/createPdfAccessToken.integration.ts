@@ -37,7 +37,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       ownerId: user.id,
       opt: {
         transporters: {
-          create: { transporterCompanySiret: company.siret }
+          create: { transporterCompanySiret: company.siret, number: 1 }
         }
       }
     });
@@ -67,7 +67,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       ownerId: user.id,
       opt: {
         transporters: {
-          create: { transporterCompanySiret: company.siret }
+          create: { transporterCompanySiret: company.siret, number: 1 }
         },
         status: Status.SENT
       }
@@ -98,7 +98,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       ownerId: user.id,
       opt: {
         transporters: {
-          create: { transporterCompanySiret: company.siret }
+          create: { transporterCompanySiret: company.siret, number: 1 }
         },
         status: Status.RECEIVED
       }
@@ -131,7 +131,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       ownerId: user.id,
       opt: {
         transporters: {
-          create: { transporterCompanySiret: company.siret }
+          create: { transporterCompanySiret: company.siret, number: 1 }
         },
         status: Status.SENT
       }

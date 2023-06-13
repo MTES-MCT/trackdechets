@@ -76,8 +76,10 @@ const updateFormResolver = async (
   await checkCanUpdate(user, existingForm, updateFormInput);
 
   const form = flattenFormInput(formContent);
-  let transporter: Omit<Prisma.BsddTransporterCreateInput, "form"> =
-    flattenTransporterInput(formContent);
+  let transporter: Omit<
+    Prisma.BsddTransporterCreateWithoutFormInput,
+    "number"
+  > = flattenTransporterInput(formContent);
 
   // Pipeline erases transporter EXCEPT for transporterTransportMode
   if (hasPipeline(form as any)) {

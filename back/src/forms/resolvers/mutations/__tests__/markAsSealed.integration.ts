@@ -98,7 +98,7 @@ describe("Mutation.markAsSealed", () => {
           ...(role === "transporter"
             ? {
                 transporters: {
-                  create: { transporterCompanySiret: company.siret }
+                  create: { transporterCompanySiret: company.siret, number: 1 }
                 }
               }
             : { [`${role}CompanySiret`]: company.siret }),

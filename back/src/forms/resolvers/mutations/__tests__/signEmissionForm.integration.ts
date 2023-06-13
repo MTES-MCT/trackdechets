@@ -137,7 +137,8 @@ describe("signEmissionForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
+            transporterCompanyName: transporter.company.name,
+            number: 1
           }
         }
       }
@@ -191,7 +192,8 @@ describe("signEmissionForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
+            transporterCompanyName: transporter.company.name,
+            number: 1
           }
         }
       }
@@ -284,7 +286,8 @@ describe("signEmissionForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
+            transporterCompanyName: transporter.company.name,
+            number: 1
           }
         }
       }
@@ -342,7 +345,8 @@ describe("signEmissionForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
+            transporterCompanyName: transporter.company.name,
+            number: 1
           }
         }
       }
@@ -427,7 +431,8 @@ describe("signEmissionForm", () => {
         forwardedInOpts: {
           transporters: {
             create: {
-              transporterTransportMode: "ROAD"
+              transporterTransportMode: "ROAD",
+              number: 1
             }
           }
         }
@@ -475,7 +480,8 @@ describe("signEmissionForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
+            transporterCompanyName: transporter.company.name,
+            number: 1
           }
         }
       }
@@ -528,7 +534,8 @@ describe("signEmissionForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
+            transporterCompanyName: transporter.company.name,
+            number: 1
           }
         }
       }
@@ -601,7 +608,8 @@ describe("signEmissionForm", () => {
         emitterCompanyName: company.name,
         transporters: {
           create: {
-            transporterCompanySiret: company.siret
+            transporterCompanySiret: company.siret,
+            number: 1
           }
         }
       }

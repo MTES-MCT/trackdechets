@@ -24,7 +24,9 @@ const transportSegmentResolver: FormResolvers["transportSegments"] = async (
     );
   }
 
-  return segments.map(segment => expandTransportSegmentFromDb(segment));
+  return segments
+    .sort((s1, s2) => s1.number - s2.number)
+    .map(segment => expandTransportSegmentFromDb(segment));
 };
 
 export default transportSegmentResolver;

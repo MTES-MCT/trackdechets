@@ -196,7 +196,8 @@ describe("expandFormFromDb", () => {
         transporters: {
           create: {
             transporterCompanySiret: null,
-            transporterTransportMode: "ROAD"
+            transporterTransportMode: "ROAD",
+            number: 1
           }
         }
       }
@@ -231,7 +232,8 @@ describe("expandFormFromDb", () => {
       opt: {
         transporters: {
           create: {
-            transporterTransportMode: "OTHER"
+            transporterTransportMode: "OTHER",
+            number: 1
           }
         }
       }

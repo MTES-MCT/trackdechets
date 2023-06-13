@@ -687,7 +687,7 @@ model WorkerCertification {
 
 model BsddTransporter {
   id                              String         @id @default(cuid())
-  number                          Int?
+  number                          Int
   transporterCompanySiret         String?
   transporterCompanyVatNumber     String?
   transporterCompanyName          String?

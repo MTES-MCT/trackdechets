@@ -34,7 +34,8 @@ describe("{ mutation { editSegment } }", () => {
       opt: {
         transporters: {
           create: {
-            transporterCompanySiret: transporterOrgId
+            transporterCompanySiret: transporterOrgId,
+            number: 1
           }
         },
         status: "SENT",
@@ -145,7 +146,8 @@ describe("{ mutation { editSegment } }", () => {
       opt: {
         transporters: {
           create: {
-            transporterCompanySiret: firstTransporterSiret
+            transporterCompanySiret: firstTransporterSiret,
+            number: 1
           }
         },
         status: "SENT",

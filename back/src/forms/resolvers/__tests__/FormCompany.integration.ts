@@ -55,7 +55,8 @@ describe("FormCompany resolver", () => {
         recipientCompanySiret: destination.siret,
         transporters: {
           create: {
-            transporterCompanyVatNumber: "BE0541696005"
+            transporterCompanyVatNumber: "BE0541696005",
+            number: 1
           }
         },
         quantityReceived: 1,

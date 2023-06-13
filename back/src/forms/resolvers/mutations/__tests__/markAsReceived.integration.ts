@@ -854,7 +854,8 @@ describe("Test Form reception", () => {
           owner: { connect: { id: user.id } },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -899,7 +900,8 @@ describe("Test Form reception", () => {
           owner: { connect: { id: user.id } },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -918,7 +920,8 @@ describe("Test Form reception", () => {
           },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -963,7 +966,8 @@ describe("Test Form reception", () => {
           owner: { connect: { id: user.id } },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -982,7 +986,8 @@ describe("Test Form reception", () => {
           },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -1027,7 +1032,8 @@ describe("Test Form reception", () => {
           owner: { connect: { id: user.id } },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -1042,7 +1048,8 @@ describe("Test Form reception", () => {
           owner: { connect: { id: user.id } },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -1057,7 +1064,8 @@ describe("Test Form reception", () => {
           owner: { connect: { id: user.id } },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -1082,7 +1090,8 @@ describe("Test Form reception", () => {
           },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }

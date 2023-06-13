@@ -115,7 +115,8 @@ describe("Mutation.deleteForm", () => {
             ? {
                 transporters: {
                   create: {
-                    [`${role}CompanySiret`]: company.siret
+                    [`${role}CompanySiret`]: company.siret,
+                    number: 1
                   }
                 }
               }
@@ -151,7 +152,8 @@ describe("Mutation.deleteForm", () => {
             ? {
                 transporters: {
                   create: {
-                    [`${role}CompanySiret`]: company.siret
+                    [`${role}CompanySiret`]: company.siret,
+                    number: 1
                   }
                 }
               }

@@ -1,6 +1,14 @@
 ALTER TABLE
   "default$default"."BsddTransporter" RENAME COLUMN "segmentNumber" TO "number";
 
+-- AlterTable
+ALTER TABLE
+  "BsddTransporter"
+ALTER COLUMN
+  "number"
+SET
+  NOT NULL;
+
 -- Increment transporter number to make room for first transporter
 UPDATE
   "default$default"."BsddTransporter"

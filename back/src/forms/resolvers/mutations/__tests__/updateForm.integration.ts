@@ -211,7 +211,8 @@ describe("Mutation.updateForm", () => {
             ? {
                 transporters: {
                   create: {
-                    [`${role}CompanySiret`]: company.siret
+                    [`${role}CompanySiret`]: company.siret,
+                    number: 1
                   }
                 }
               }
@@ -251,7 +252,8 @@ describe("Mutation.updateForm", () => {
             ? {
                 transporters: {
                   create: {
-                    [`${role}CompanySiret`]: company.siret
+                    [`${role}CompanySiret`]: company.siret,
+                    number: 1
                   }
                 }
               }
@@ -1300,7 +1302,8 @@ describe("Mutation.updateForm", () => {
         },
         transporters: {
           create: {
-            transporterCompanySiret: transporter.siret
+            transporterCompanySiret: transporter.siret,
+            number: 1
           }
         }
       }
@@ -2010,7 +2013,8 @@ describe("Mutation.updateForm", () => {
         wasteDetailsCode: "01 03 04*",
         transporters: {
           create: {
-            transporterTransportMode: "ROAD"
+            transporterTransportMode: "ROAD",
+            number: 1
           }
         }
       }
@@ -2121,7 +2125,8 @@ describe("Mutation.updateForm", () => {
           wasteDetailsQuantity: 50,
           transporters: {
             create: {
-              transporterTransportMode: "ROAD"
+              transporterTransportMode: "ROAD",
+              number: 1
             }
           }
         }
@@ -2285,7 +2290,8 @@ describe("Mutation.updateForm", () => {
             transporterCompanyMail: transporter.company.contactEmail,
             transporterReceipt: transporterReceipt.receiptNumber,
             transporterDepartment: transporterReceipt.department,
-            transporterValidityLimit: transporterReceipt.validityLimit
+            transporterValidityLimit: transporterReceipt.validityLimit,
+            number: 1
           }
         }
       }

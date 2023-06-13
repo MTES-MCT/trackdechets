@@ -107,7 +107,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         receivedAt: new Date(),
         transporters: {
           create: {
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       }
@@ -130,7 +131,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         receivedAt: new Date(),
         transporters: {
           create: {
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       },
@@ -156,7 +158,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         receivedAt: new Date(),
         transporters: {
           create: {
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       },
@@ -183,7 +186,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         receivedAt: null,
         transporters: {
           create: {
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       }
@@ -359,7 +363,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         signedAt: new Date(),
         transporters: {
           create: {
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       },
@@ -537,7 +542,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         sentAt: new Date(),
         transporters: {
           create: {
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       }
@@ -554,7 +560,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         sentAt: null,
         transporters: {
           create: {
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       }
@@ -573,7 +580,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         status: Status.RESENT,
         transporters: {
           create: {
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       },
@@ -583,7 +591,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         status: Status.SENT,
         transporters: {
           create: {
-            transporterCompanySiret: transporter2.company.siret
+            transporterCompanySiret: transporter2.company.siret,
+            number: 1
           }
         }
       }
@@ -795,7 +804,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         sentAt: new Date(),
         transporters: {
           create: {
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       }
@@ -866,7 +876,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         sentAt: new Date(),
         transporters: {
           create: {
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       }

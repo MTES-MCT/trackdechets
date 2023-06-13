@@ -99,7 +99,15 @@ async function updateForm(
             }
           }
         }
-      : { transporters: { create: flattenedTransporter } })
+      : {
+          transporters: {
+            create: {
+              ...flattenedTransporter,
+              number: 1,
+              readyToTakeOver: true
+            }
+          }
+        })
   };
 
   return getFormRepository(user).update(
@@ -146,7 +154,15 @@ async function createForm(input: ImportPaperFormInput, user: Express.User) {
     isImportedFromPaper: true,
     signedByTransporter: true,
     ...(input.transporter
-      ? { transporters: { create: flattenedTransporter } }
+      ? {
+          transporters: {
+            create: {
+              ...flattenedTransporter,
+              number: 1,
+              readyToTakeOver: true
+            }
+          }
+        }
       : {})
   };
 

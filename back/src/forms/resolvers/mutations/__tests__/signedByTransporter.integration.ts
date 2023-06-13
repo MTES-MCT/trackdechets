@@ -43,7 +43,8 @@ describe("Mutation.signedByTransporter", () => {
         transporters: {
           create: {
             transporterCompanyName: company.name,
-            transporterCompanySiret: company.siret
+            transporterCompanySiret: company.siret,
+            number: 1
           }
         }
       }
@@ -89,7 +90,8 @@ describe("Mutation.signedByTransporter", () => {
         transporters: {
           create: {
             transporterCompanyName: transporter.company.name,
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       }
@@ -146,7 +148,8 @@ describe("Mutation.signedByTransporter", () => {
         emitterCompanySiret: emitter.siret,
         transporters: {
           create: {
-            transporterCompanySiret: transporter.siret
+            transporterCompanySiret: transporter.siret,
+            number: 1
           }
         }
       }
@@ -197,7 +200,8 @@ describe("Mutation.signedByTransporter", () => {
         emitterCompanySiret: emitter.siret,
         transporters: {
           create: {
-            transporterCompanySiret: transporter.siret
+            transporterCompanySiret: transporter.siret,
+            number: 1
           }
         }
       }
@@ -239,7 +243,8 @@ describe("Mutation.signedByTransporter", () => {
         transporters: {
           create: {
             transporterCompanyName: company.name,
-            transporterCompanySiret: company.siret
+            transporterCompanySiret: company.siret,
+            number: 1
           }
         }
       }
@@ -287,7 +292,8 @@ describe("Mutation.signedByTransporter", () => {
         transporters: {
           create: {
             transporterCompanyName: company.name,
-            transporterCompanySiret: company.siret
+            transporterCompanySiret: company.siret,
+            number: 1
           }
         }
       }
@@ -335,7 +341,8 @@ describe("Mutation.signedByTransporter", () => {
         transporters: {
           create: {
             transporterCompanyName: company.name,
-            transporterCompanySiret: company.siret
+            transporterCompanySiret: company.siret,
+            number: 1
           }
         }
       }
@@ -384,7 +391,8 @@ describe("Mutation.signedByTransporter", () => {
         transporters: {
           create: {
             transporterCompanyName: company.name,
-            transporterCompanySiret: company.siret
+            transporterCompanySiret: company.siret,
+            number: 1
           }
         },
         intermediaries: {
@@ -444,7 +452,8 @@ describe("Mutation.signedByTransporter", () => {
         transporters: {
           create: {
             transporterCompanyName: transporter.name,
-            transporterCompanySiret: transporter.siret
+            transporterCompanySiret: transporter.siret,
+            number: 1
           }
         },
         ecoOrganismeName: ecoOrganisme.name,
@@ -512,7 +521,8 @@ describe("Mutation.signedByTransporter", () => {
             transporterReceipt: "Damned! That receipt looks good",
             transporterDepartment: "10",
             transporterValidityLimit: "2019-11-20T00:00:00.000Z",
-            transporterNumberPlate: ""
+            transporterNumberPlate: "",
+            number: 1
           }
         }
       }
@@ -576,7 +586,8 @@ describe("Mutation.signedByTransporter", () => {
           transporters: {
             create: {
               transporterCompanyName: company.name,
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -626,7 +637,8 @@ describe("Mutation.signedByTransporter", () => {
         wasteDetailsPackagingInfos: [],
         transporters: {
           create: {
-            transporterCompanySiret: transporter.siret
+            transporterCompanySiret: transporter.siret,
+            number: 1
           }
         }
       }

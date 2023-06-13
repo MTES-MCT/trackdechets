@@ -35,7 +35,8 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
       opt: {
         transporters: {
           create: {
-            transporterCompanySiret: transporterOrgId
+            transporterCompanySiret: transporterOrgId,
+            number: 1
           }
         },
         status: "SENT",
@@ -53,7 +54,8 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
         transporterCompanyMail: "john.snow@trackdechets.fr",
         transporterReceipt: "receipt",
         transporterDepartment: "13",
-        transporterCompanyContact: "John Snow"
+        transporterCompanyContact: "John Snow",
+        number: 2
       }
     });
 

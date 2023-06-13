@@ -45,7 +45,8 @@ async function transporterFormFactory(ownerId: string, siret: string) {
       sentAt: new Date(),
       transporters: {
         create: {
-          transporterCompanySiret: siret
+          transporterCompanySiret: siret,
+          number: 1
         }
       }
     }

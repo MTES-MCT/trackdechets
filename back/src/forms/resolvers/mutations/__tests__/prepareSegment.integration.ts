@@ -169,7 +169,8 @@ describe("{ mutation { prepareSegment } }", () => {
           create: {
             transporterCompanySiret: transporterOrgId,
             takenOverAt: new Date(),
-            takenOverBy: "John Snow"
+            takenOverBy: "John Snow",
+            number: 1
           }
         },
         status: "SENT",

@@ -511,7 +511,8 @@ describe("Test Form reception", () => {
           emitterCompanySiret: company.siret,
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           },
           owner: { connect: { id: user.id } }
@@ -556,7 +557,8 @@ describe("Test Form reception", () => {
           emitterCompanySiret: producerCompany.siret,
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           },
           owner: { connect: { id: user.id } }
@@ -572,7 +574,8 @@ describe("Test Form reception", () => {
           emitterCompanyName: company.name,
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           },
           recipientCompanySiret: company.siret,

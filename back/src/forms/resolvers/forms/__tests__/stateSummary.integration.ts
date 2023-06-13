@@ -66,7 +66,8 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
           create: {
             transporterCompanySiret: transporter1Company.siret,
             transporterNumberPlate: "plate 1",
-            transporterCustomInfo: "info 1"
+            transporterCustomInfo: "info 1",
+            number: 1
           }
         },
         wasteDetailsQuantity: 1,
@@ -85,7 +86,8 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
         wasteDetailsQuantity: null,
         transporters: {
           create: {
-            transporterCompanySiret: transporter2Company.siret
+            transporterCompanySiret: transporter2Company.siret,
+            number: 1
           }
         }
       }

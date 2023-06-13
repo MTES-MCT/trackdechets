@@ -55,7 +55,8 @@ describe("signTransportForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
+            transporterCompanyName: transporter.company.name,
+            number: 1
           }
         }
       }
@@ -109,7 +110,8 @@ describe("signTransportForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
+            transporterCompanyName: transporter.company.name,
+            number: 1
           }
         }
       }
@@ -164,7 +166,8 @@ describe("signTransportForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
+            transporterCompanyName: transporter.company.name,
+            number: 1
           }
         }
       }
@@ -207,7 +210,8 @@ describe("signTransportForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
+            transporterCompanyName: transporter.company.name,
+            number: 1
           }
         }
       }
@@ -261,7 +265,8 @@ describe("signTransportForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
+            transporterCompanyName: transporter.company.name,
+            number: 1
           }
         }
       }
@@ -316,7 +321,8 @@ describe("signTransportForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
+            transporterCompanyName: transporter.company.name,
+            number: 1
           }
         }
       }
@@ -359,7 +365,8 @@ describe("signTransportForm", () => {
         },
         transporters: {
           create: {
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       }
@@ -431,7 +438,8 @@ describe("signTransportForm", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            transporterCompanyAddress: null
+            transporterCompanyAddress: null,
+            number: 1
           }
         }
       }
@@ -470,7 +478,8 @@ describe("signTransportForm", () => {
           emitterCompanyName: company.name,
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -511,7 +520,8 @@ describe("signTransportForm", () => {
           emitterCompanyName: company.name,
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -526,7 +536,8 @@ describe("signTransportForm", () => {
           emitterCompanyName: company.name,
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -544,7 +555,8 @@ describe("signTransportForm", () => {
           },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -587,7 +599,8 @@ describe("signTransportForm", () => {
           emitterCompanySiret: producerCompany.siret,
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -602,7 +615,8 @@ describe("signTransportForm", () => {
           emitterCompanySiret: producerCompany.siret,
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -626,7 +640,8 @@ describe("signTransportForm", () => {
           },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -667,7 +682,8 @@ describe("signTransportForm", () => {
           emitterCompanySiret: producerCompany.siret,
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -685,7 +701,8 @@ describe("signTransportForm", () => {
           },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -733,7 +750,8 @@ describe("signTransportForm", () => {
           emitterCompanySiret: producerCompany.siret,
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -751,7 +769,8 @@ describe("signTransportForm", () => {
           },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -795,7 +814,8 @@ describe("signTransportForm", () => {
           ecoOrganismeSiret: "49337909300039", // Container has an eco organisme (copied here)
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }
@@ -815,7 +835,8 @@ describe("signTransportForm", () => {
           },
           transporters: {
             create: {
-              transporterCompanySiret: company.siret
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }

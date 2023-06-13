@@ -29,7 +29,8 @@ describe("Forms -> updateTransporterFields mutation", () => {
           status,
           transporters: {
             create: {
-              transporterCompanySiret: transporterCompany.siret
+              transporterCompanySiret: transporterCompany.siret,
+              number: 1
             }
           }
         }
@@ -68,7 +69,8 @@ describe("Forms -> updateTransporterFields mutation", () => {
           status,
           transporters: {
             create: {
-              transporterCompanySiret: transporterCompany.siret
+              transporterCompanySiret: transporterCompany.siret,
+              number: 1
             }
           }
         }
@@ -105,7 +107,8 @@ describe("Forms -> updateTransporterFields mutation", () => {
         status: "SENT",
         transporters: {
           create: {
-            transporterCompanySiret: transporterCompany.siret
+            transporterCompanySiret: transporterCompany.siret,
+            number: 1
           }
         }
       }
@@ -145,7 +148,8 @@ describe("Forms -> updateTransporterFields mutation", () => {
         status: "SEALED",
         transporters: {
           create: {
-            transporterCompanySiret: transporterCompany.siret
+            transporterCompanySiret: transporterCompany.siret,
+            number: 1
           }
         }
       }

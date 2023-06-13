@@ -59,7 +59,7 @@ async function checkTransporterPermission(
     opt: {
       status: formStatus,
       transporters: {
-        create: { transporterCompanySiret: company.siret }
+        create: { transporterCompanySiret: company.siret, number: 1 }
       }
     }
   });
@@ -169,7 +169,8 @@ async function checkMultiModalTransporterPermission(
   await prisma.bsddTransporter.create({
     data: {
       form: { connect: { id: form.id } },
-      transporterCompanySiret: company.siret
+      transporterCompanySiret: company.siret,
+      number: 2
     }
   });
   return permission(user, form);

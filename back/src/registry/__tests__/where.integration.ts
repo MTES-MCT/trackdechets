@@ -2138,7 +2138,7 @@ describe("toElasticFilter", () => {
   it("should filter BSDDs on transporterCompanySiret (exact)", async () => {
     const user = await userFactory();
 
-    const testInput_1 = { transporterCompanySiret: siretify(1) };
+    const testInput_1 = { transporterCompanySiret: siretify(1), number: 1 };
     const form1 = await formFactory({
       ownerId: user.id,
       opt: { transporters: { create: testInput_1 } }
@@ -2149,7 +2149,8 @@ describe("toElasticFilter", () => {
       opt: {
         transporters: {
           create: {
-            transporterCompanySiret: siretify(2)
+            transporterCompanySiret: siretify(2),
+            number: 1
           }
         }
       }
@@ -2160,7 +2161,8 @@ describe("toElasticFilter", () => {
       opt: {
         transporters: {
           create: {
-            transporterCompanySiret: siretify(3)
+            transporterCompanySiret: siretify(3),
+            number: 1
           }
         }
       }
@@ -2301,13 +2303,13 @@ describe("toElasticFilter", () => {
   it("should filter BSDDs on a list of transporterCompanySiret", async () => {
     const user = await userFactory();
 
-    const testInput = { transporterCompanySiret: siretify(1) };
+    const testInput = { transporterCompanySiret: siretify(1), number: 1 };
     const form1 = await formFactory({
       ownerId: user.id,
       opt: { transporters: { create: testInput } }
     });
 
-    const testInput_1 = { transporterCompanySiret: siretify(2) };
+    const testInput_1 = { transporterCompanySiret: siretify(2), number: 1 };
     const form2 = await formFactory({
       ownerId: user.id,
       opt: { transporters: { create: testInput_1 } }
@@ -2316,7 +2318,9 @@ describe("toElasticFilter", () => {
     const form3 = await formFactory({
       ownerId: user.id,
       opt: {
-        transporters: { create: { transporterCompanySiret: siretify(3) } }
+        transporters: {
+          create: { transporterCompanySiret: siretify(3), number: 1 }
+        }
       }
     });
 
@@ -2470,7 +2474,7 @@ describe("toElasticFilter", () => {
   it("should filter BSDDs on a list of transporterCompanySiret", async () => {
     const user = await userFactory();
 
-    const testInput_5 = { transporterCompanySiret: siretify(1) };
+    const testInput_5 = { transporterCompanySiret: siretify(1), number: 1 };
     const form1 = await formFactory({
       ownerId: user.id,
       opt: { transporters: { create: testInput_5 } }
@@ -2479,14 +2483,18 @@ describe("toElasticFilter", () => {
     const form2 = await formFactory({
       ownerId: user.id,
       opt: {
-        transporters: { create: { transporterCompanySiret: siretify(2) } }
+        transporters: {
+          create: { transporterCompanySiret: siretify(2), number: 1 }
+        }
       }
     });
 
     const form3 = await formFactory({
       ownerId: user.id,
       opt: {
-        transporters: { create: { transporterCompanySiret: siretify(3) } }
+        transporters: {
+          create: { transporterCompanySiret: siretify(3), number: 1 }
+        }
       }
     });
 

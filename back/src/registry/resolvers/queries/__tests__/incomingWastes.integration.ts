@@ -96,7 +96,8 @@ describe("Incoming wastes registry", () => {
         processingOperationDone: "R 1",
         transporters: {
           create: {
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
           }
         }
       }

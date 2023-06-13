@@ -833,7 +833,8 @@ describe("Integration / Forms query for transporters", () => {
         status: "SEALED",
         transporters: {
           create: {
-            transporterCompanySiret: transporter.siret
+            transporterCompanySiret: transporter.siret,
+            number: 1
           }
         }
       }
@@ -871,7 +872,8 @@ describe("Integration / Forms query for transporters", () => {
         status: "SEALED",
         transporters: {
           create: {
-            transporterCompanySiret
+            transporterCompanySiret,
+            number: 1
           }
         }
       }
@@ -915,7 +917,8 @@ describe("Integration / Forms query for transporters", () => {
         transporters: {
           create: {
             transporterCompanySiret: null,
-            transporterCompanyVatNumber: company.vatNumber
+            transporterCompanyVatNumber: company.vatNumber,
+            number: 1
           }
         }
       }

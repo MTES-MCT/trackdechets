@@ -63,8 +63,10 @@ const createFormResolver = async (
   }
 
   const form = flattenFormInput(formContent);
-  let transporter: Prisma.BsddTransporterCreateWithoutFormInput =
-    flattenTransporterInput(formContent);
+  let transporter: Omit<
+    Prisma.BsddTransporterCreateWithoutFormInput,
+    "number"
+  > = flattenTransporterInput(formContent);
   // Pipeline erases transporter EXCEPT for transporterTransportMode
   if (hasPipeline(form as any) && transporter) {
     transporter = {

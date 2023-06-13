@@ -400,7 +400,8 @@ describe("mutation / importPaperForm", () => {
             transporterCompanyAddress: "Somewhere",
             transporterCompanyPhone: "0000000000",
             transporterCompanyContact: "Mr Transporteur",
-            transporterCompanyMail: "trasnporteur@trackdechets.fr"
+            transporterCompanyMail: "trasnporteur@trackdechets.fr",
+            number: 1
           }
         }
       };

@@ -533,7 +533,8 @@ describe("Query.bsds edge cases", () => {
         emitterCompanySiret: emitter.company.siret,
         transporters: {
           create: {
-            transporterCompanySiret: recipientAndTransporter.company.siret
+            transporterCompanySiret: recipientAndTransporter.company.siret,
+            number: 1
           }
         },
         recipientCompanySiret: recipientAndTransporter.company.siret,

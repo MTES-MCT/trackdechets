@@ -55,7 +55,8 @@ describe("Query.form", () => {
           ? {
               transporters: {
                 create: {
-                  [`${type}CompanySiret`]: company.siret
+                  [`${type}CompanySiret`]: company.siret,
+                  number: 1
                 }
               }
             }

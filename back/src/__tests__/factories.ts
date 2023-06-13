@@ -349,7 +349,7 @@ export const transportSegmentFactory = async ({
   segmentPayload
 }: {
   formId: string;
-  segmentPayload: Prisma.BsddTransporterCreateWithoutFormInput;
+  segmentPayload: Omit<Prisma.BsddTransporterCreateWithoutFormInput, "number">;
 }) => {
   const count = await prisma.bsddTransporter.count({ where: { formId } });
   return prisma.bsddTransporter.create({
@@ -405,7 +405,11 @@ export const formFactory = async ({
     ...formdata,
     ...opt,
     transporters: {
-      create: { ...formdata.transporters!.create, ...opt.transporters?.create }
+      create: {
+        ...formdata.transporters!.create,
+        ...opt.transporters?.create,
+        number: 1
+      }
     }
   };
   return prisma.form.create({
@@ -441,7 +445,8 @@ export const formWithTempStorageFactory = async ({
     transporters: {
       create: {
         ...forwardedInData.transporters!.create,
-        ...forwardedInOpts?.transporters?.create
+        ...forwardedInOpts?.transporters?.create,
+        number: 1
       }
     }
   };

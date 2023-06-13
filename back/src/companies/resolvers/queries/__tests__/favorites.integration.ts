@@ -279,7 +279,7 @@ describe("query favorites", () => {
       opt: {
         emitterCompanySiret: company.siret,
         transporters: {
-          create: { transporterCompanySiret: transporter.siret }
+          create: { transporterCompanySiret: transporter.siret, number: 1 }
         },
         transportersSirets: [transporter.siret!]
       }
@@ -326,7 +326,8 @@ describe("query favorites", () => {
         emitterCompanySiret: company.siret,
         transporters: {
           create: {
-            transporterCompanyVatNumber: transporter.vatNumber
+            transporterCompanyVatNumber: transporter.vatNumber,
+            number: 1
           }
         }
       }
@@ -368,7 +369,8 @@ describe("query favorites", () => {
         emitterCompanySiret: company.siret,
         transporters: {
           create: {
-            transporterCompanySiret: siretify(1)
+            transporterCompanySiret: siretify(1),
+            number: 1
           }
         }
       }
@@ -896,7 +898,8 @@ describe("query favorites", () => {
         transporters: {
           create: {
             transporterCompanyName: "A Name",
-            transporterCompanyVatNumber: transporter.vatNumber
+            transporterCompanyVatNumber: transporter.vatNumber,
+            number: 1
           }
         },
         recipientsSirets: [company.siret!]
@@ -908,7 +911,8 @@ describe("query favorites", () => {
         transporters: {
           create: {
             transporterCompanyName: "Another Name",
-            transporterCompanyVatNumber: transporter.vatNumber
+            transporterCompanyVatNumber: transporter.vatNumber,
+            number: 1
           }
         },
         recipientsSirets: [company.siret!]

@@ -123,7 +123,8 @@ async function createForm(opt: Partial<Prisma.FormCreateInput> = {}) {
           transporterDepartment: transporterReceipt.department,
           transporterValidityLimit: transporterReceipt.validityLimit,
           transporterNumberPlate: "AB-1234-56",
-          transporterCustomInfo: "T001"
+          transporterCustomInfo: "T001",
+          number: 1
         }
       },
       ...opt

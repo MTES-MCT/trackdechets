@@ -40,7 +40,8 @@ describe("{ mutation { takeOverSegment } }", () => {
         nextTransporterOrgId: secondTransporterCompany.siret,
         transporters: {
           create: {
-            transporterCompanySiret: firstTransporterCompany.siret
+            transporterCompanySiret: firstTransporterCompany.siret,
+            number: 1
           }
         }
       }
@@ -57,8 +58,7 @@ describe("{ mutation { takeOverSegment } }", () => {
         transporterReceipt: "R2D2",
         transporterDepartment: "83",
         readyToTakeOver: true,
-        transporterTransportMode: "ROAD",
-        number: 2
+        transporterTransportMode: "ROAD"
       }
     });
     const { mutate } = makeClient(secondTransporter);
