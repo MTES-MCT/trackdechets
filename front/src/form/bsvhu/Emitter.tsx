@@ -19,7 +19,7 @@ export default function Emitter({ disabled }) {
         name="emitter.company"
         heading="Entreprise émettrice"
         onCompanySelected={emitter => {
-          if (emitter.vhuAgrementDemolisseur) {
+          if (emitter?.vhuAgrementDemolisseur) {
             setFieldValue(
               "emitter.agrementNumber",
               emitter.vhuAgrementDemolisseur.agrementNumber

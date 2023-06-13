@@ -7,7 +7,7 @@ import TransporterReceiptEditionSwitch from "form/common/components/company/Tran
 
 export const onTransporterSelected =
   (initialTransporter, setFieldValue) => transporter => {
-    if (transporter.transporterReceipt) {
+    if (transporter?.transporterReceipt) {
       setFieldValue(
         "transporter.recepisse.number",
         transporter.transporterReceipt.receiptNumber
