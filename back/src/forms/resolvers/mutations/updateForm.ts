@@ -123,7 +123,9 @@ const updateFormResolver = async (
       }
     } else {
       if (formContent.transporter !== null) {
-        formUpdateInput.transporters = { create: transporter };
+        formUpdateInput.transporters = {
+          create: { ...transporter, number: 1, readyToTakeOver: true }
+        };
       }
     }
   }

@@ -737,7 +737,7 @@ export default function BSDDetailContent({
                 <IconWarehouseDelivery size="25px" />
                 <span className={styles.detailTabCaption}>
                   Transp.
-                  {!!segment.segmentNumber && `N° ${segment.segmentNumber + 1}`}
+                  {!!segment.segmentNumber && `N° ${segment.segmentNumber}`}
                 </span>
               </Tab>
             ))}

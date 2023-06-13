@@ -806,7 +806,12 @@ export async function expandFormFromElastic(
   if (!expanded) {
     return null;
   }
-  return { ...expanded, transportSegments: form.transportSegments };
+  return {
+    ...expanded,
+    transportSegments: (form.transporters ?? []).filter(
+      t => t.number && t.number >= 2
+    )
+  };
 }
 
 export async function expandInitialFormFromDb(

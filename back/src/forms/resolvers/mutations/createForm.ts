@@ -97,7 +97,7 @@ const createFormResolver = async (
     ...(form.emitterType !== EmitterType.APPENDIX1_PRODUCER
       ? {
           transporters: {
-            create: { ...transporter, number: 1 }
+            create: { ...transporter, number: 1, readyToTakeOver: true }
           }
         }
       : {})

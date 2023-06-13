@@ -141,23 +141,19 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
     }
     case Status.SENT: {
       setFieldTab("recipientCompanySiret", "isForActionFor");
+      setFieldTab("transporterCompanySiret", "isCollectedFor");
 
-      // whether or not this BSD has been handed over by transporter n°1
-      let hasBeenHandedOver = false;
-
-      form.transporters?.forEach(segment => {
-        if (segment.readyToTakeOver) {
-          hasBeenHandedOver = hasBeenHandedOver || !!segment.takenOverAt;
-          setFieldTab(
-            segment.id,
-            segment.takenOverAt ? "isCollectedFor" : "isToCollectFor"
-          );
-        }
-      });
-
-      if (!hasBeenHandedOver) {
-        setFieldTab("transporterCompanySiret", "isCollectedFor");
-      }
+      (form.transporters ?? [])
+        .filter(t => t.number && t.number > 1)
+        .forEach(transporter => {
+          if (transporter.takenOverAt) {
+            setFieldTab(transporter.id, "isCollectedFor");
+          } else {
+            if (transporter.readyToTakeOver) {
+              setFieldTab(transporter.id, "isToCollectFor");
+            }
+          }
+        });
 
       break;
     }
