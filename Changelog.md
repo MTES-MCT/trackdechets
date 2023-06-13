@@ -4,6 +4,22 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
+# [2023.6.2] 27/06/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Masque les noms et prénoms d'une utilisateur ajouté à un établissement peandant sept jours [PR 2471](https://github.com/MTES-MCT/trackdechets/pull/2471).
+
+#### :memo: Documentation
+
+#### :house: Interne
 
 # [2023.6.1] 06/06/2023
 

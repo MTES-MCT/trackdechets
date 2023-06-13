@@ -3,7 +3,7 @@
  */
 
 import prisma from "../prisma";
-import { User, Prisma, Company } from "@prisma/client";
+import { User, Prisma, Company, CompanyAssociation } from "@prisma/client";
 import {
   CompanyNotFound,
   TraderReceiptNotFound,
@@ -15,7 +15,7 @@ import {
 import { CompanyMember, UserRole } from "../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
 import { AppDataloaders } from "../types";
-
+import { differenceInDays, differenceInMinutes } from "date-fns";
 /**
  * Retrieves a company by any unique identifier or throw a CompanyNotFound error
  */
@@ -142,6 +142,42 @@ export async function getCompanyUsers(
   return [...activeUsers, ...invitedUsers];
 }
 
+const DISPLAY_USER_NAME_AFTER = 7; // days
+const OBFUSCATED_USER_NAME = "Temporairement masqué";
+/**
+ * Display user name if association is older than DISPLAY_USER_NAME_AFTER days or not automatically accepted
+ * @param association
+ * @returns
+ */
+const userNameDisplay = (
+  association: CompanyAssociation & {
+    user: User;
+  }
+): string => {
+  const today = new Date();
+  // default createdAt was added afterwards, we have a lot of null values in db, let's ignore them
+
+  if (!association.createdAt) {
+    return association.user.name;
+  }
+
+  // when an existing user is invited, user.createdAt is way older than association.createdAt
+  const wasAutomaticallyAccepted =
+    Math.abs(
+      differenceInMinutes(association.user.createdAt, association.createdAt)
+    ) < 1;
+
+  if (!wasAutomaticallyAccepted) {
+    return association.user.name;
+  }
+  const canDisplayUserName =
+    differenceInDays(today, association.createdAt) > DISPLAY_USER_NAME_AFTER;
+  if (canDisplayUserName) {
+    return association.user.name;
+  }
+  return OBFUSCATED_USER_NAME;
+};
+
 /**
  * Returns company members that already have an account in TD
  * @param siret
@@ -156,6 +192,7 @@ export async function getCompanyActiveUsers(
   return associations.map(a => {
     return {
       ...a.user,
+      name: userNameDisplay(a),
       // type casting is necessary here as long as we
       // do not expose READER and DRIVER role in the API
       role: a.role as UserRole,
