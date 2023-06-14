@@ -1,5 +1,5 @@
 import { RedErrorMessage } from "common/components";
-import { subtractMonths } from "common/helper";
+import { subMonths } from "date-fns";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
@@ -36,7 +36,7 @@ export default function Operation({ bsda }: Props) {
           Date de réception
           <Field
             component={DateInput}
-            minDate={subtractMonths(TODAY, 2)}
+            minDate={subMonths(TODAY, 2)}
             maxDate={TODAY}
             name="destination.reception.date"
             className={`td-input td-input--small`}

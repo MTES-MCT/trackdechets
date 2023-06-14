@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { Bsdasri } from "generated/graphql/types";
-import { subtractMonths } from "common/helper";
+import { subMonths } from "date-fns";
 
 export const signatureValidationSchema = (form: Bsdasri, today: Date) =>
   yup.object({
@@ -10,7 +10,7 @@ export const signatureValidationSchema = (form: Bsdasri, today: Date) =>
         .required("La date d'émission est requise")
         .max(today, "La date d'émission ne peut être dans le futur")
         .min(
-          subtractMonths(today, 2),
+          subMonths(today, 2),
           "La date d'émission ne peut être antérieure à 2 mois"
         ),
       author: yup

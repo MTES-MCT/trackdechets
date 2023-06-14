@@ -42,8 +42,8 @@ import {
 import routes from "common/routes";
 
 import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
-import { subtractMonths } from "common/helper";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
 const forms = {
   [BsdasriSignatureType.Emission]: EmitterSignatureForm,
@@ -221,7 +221,7 @@ export function RouteSignBsdasri({
                     <Field
                       name="signature.date"
                       component={DateInput}
-                      minDate={subtractMonths(TODAY, 2)}
+                      minDate={subMonths(TODAY, 2)}
                       maxDate={TODAY}
                       required
                       className="td-input"

@@ -15,7 +15,7 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
 import { GET_BSDS } from "common/queries";
-import { subtractMonths } from "common/helper";
+import { subMonths } from "date-fns";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
@@ -24,7 +24,7 @@ const getValidationSchema = (today: Date) =>
       .required("La date de réception est requise")
       .max(today, "La date de réception ne peut être dans le futur")
       .min(
-        subtractMonths(today, 2),
+        subMonths(today, 2),
         "La date de réception ne peut être antérieure à 2 mois"
       ),
     signatureAuthor: yup
@@ -101,7 +101,7 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
                 className="td-input"
                 name="receptionDate"
                 component={DateInput}
-                minDate={subtractMonths(TODAY, 2)}
+                minDate={subMonths(TODAY, 2)}
                 maxDate={TODAY}
                 required
               />

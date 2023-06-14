@@ -6,7 +6,7 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Bsvhu, BsvhuDestinationType } from "generated/graphql/types";
-import { subtractMonths } from "common/helper";
+import { subMonths } from "date-fns";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Operation() {
@@ -24,7 +24,7 @@ export default function Operation() {
             component={DateInput}
             name="destination.reception.date"
             className="td-input td-input--small"
-            minDate={subtractMonths(TODAY, 2)}
+            minDate={subMonths(TODAY, 2)}
             maxDate={TODAY}
             required
           />

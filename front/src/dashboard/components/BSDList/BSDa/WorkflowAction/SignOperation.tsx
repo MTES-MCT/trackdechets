@@ -2,7 +2,7 @@ import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
 import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
-import { format } from "date-fns";
+import { format, subMonths } from "date-fns";
 import { UPDATE_BSDA } from "form/bsda/stepper/queries";
 import Operation from "form/bsda/stepper/steps/Operation";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
@@ -19,7 +19,6 @@ import React from "react";
 import { generatePath, Link, useRouteMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsda, SIGN_BSDA } from "./SignBsda";
-import { subtractMonths } from "common/helper";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 
 const getValidationSchema = (today: Date) =>
@@ -28,10 +27,7 @@ const getValidationSchema = (today: Date) =>
       .date()
       .required("La date est requise")
       .max(today, "La date ne peut être dans le futur")
-      .min(
-        subtractMonths(today, 2),
-        "La date ne peut être antérieure à 2 mois"
-      ),
+      .min(subMonths(today, 2), "La date ne peut être antérieure à 2 mois"),
     author: yup
       .string()
       .ensure()
@@ -163,7 +159,7 @@ export function SignOperation({
                       <Field
                         name="date"
                         component={DateInput}
-                        minDate={subtractMonths(TODAY, 2)}
+                        minDate={subMonths(TODAY, 2)}
                         maxDate={TODAY}
                         required
                         className="td-input"

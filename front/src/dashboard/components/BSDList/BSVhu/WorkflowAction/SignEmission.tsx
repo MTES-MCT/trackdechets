@@ -12,8 +12,8 @@ import React from "react";
 import { generatePath, Link, useRouteMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
-import { subtractMonths } from "common/helper";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
@@ -22,7 +22,7 @@ const getValidationSchema = (today: Date) =>
       .required("La date d'émission est requise")
       .max(today, "La date d'émission ne peut être dans le futur")
       .min(
-        subtractMonths(today, 2),
+        subMonths(today, 2),
         "La date d'émission ne peut être antérieure à 2 mois"
       ),
     author: yup
@@ -118,7 +118,7 @@ export function SignEmission({
                       <Field
                         name="date"
                         component={DateInput}
-                        minDate={subtractMonths(TODAY, 2)}
+                        minDate={subMonths(TODAY, 2)}
                         maxDate={TODAY}
                         required
                         className="td-input"

@@ -16,7 +16,7 @@ import React from "react";
 import { generatePath, Link, useRouteMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
-import { subtractMonths } from "common/helper";
+import { subMonths } from "date-fns";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
@@ -25,7 +25,7 @@ const getValidationSchema = (today: Date) =>
       .required("La date de prise en charge est requise")
       .max(today, "La date de prise en charge ne peut être dans le futur")
       .min(
-        subtractMonths(today, 2),
+        subMonths(today, 2),
         "La date de prise en charge ne peut être antérieure à 2 mois"
       ),
     author: yup
@@ -138,7 +138,7 @@ export function SignTransport({
                         name="takenOverAt"
                         component={DateInput}
                         className="td-input"
-                        minDate={subtractMonths(TODAY, 2)}
+                        minDate={subMonths(TODAY, 2)}
                         maxDate={TODAY}
                         required
                       />

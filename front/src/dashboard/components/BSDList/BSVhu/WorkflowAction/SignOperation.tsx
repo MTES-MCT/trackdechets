@@ -15,8 +15,8 @@ import {
 import React from "react";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
-import { subtractMonths } from "common/helper";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
@@ -24,10 +24,7 @@ const getValidationSchema = (today: Date) =>
       .date()
       .required("La date est requise")
       .max(today, "La date ne peut être dans le futur")
-      .min(
-        subtractMonths(today, 2),
-        "La date ne peut être antérieure à 2 mois"
-      ),
+      .min(subMonths(today, 2), "La date ne peut être antérieure à 2 mois"),
     author: yup
       .string()
       .ensure()
@@ -132,7 +129,7 @@ export function SignOperation({
                       name="date"
                       component={DateInput}
                       className="td-input"
-                      minDate={subtractMonths(TODAY, 2)}
+                      minDate={subMonths(TODAY, 2)}
                       maxDate={TODAY}
                       required
                     />

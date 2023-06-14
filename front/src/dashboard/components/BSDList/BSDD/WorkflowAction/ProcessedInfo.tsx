@@ -12,7 +12,7 @@ import {
   MutationMarkAsProcessedArgs,
 } from "generated/graphql/types";
 import Tooltip from "common/components/Tooltip";
-import { subtractMonths } from "common/helper";
+import { subMonths } from "date-fns";
 
 function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   const {
@@ -78,7 +78,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           Date de traitement
           <Field
             component={DateInput}
-            minDate={subtractMonths(TODAY, 2)}
+            minDate={subMonths(TODAY, 2)}
             maxDate={TODAY}
             name="processedAt"
             className="td-input"

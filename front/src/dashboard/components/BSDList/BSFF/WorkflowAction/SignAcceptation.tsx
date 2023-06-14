@@ -34,7 +34,7 @@ import { IconCheckCircle1 } from "common/components/Icons";
 import { BsffSummary } from "./BsffSummary";
 import TdTooltip from "common/components/Tooltip";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";
-import { subtractMonths } from "common/helper";
+import { subMonths } from "date-fns";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
@@ -46,7 +46,7 @@ const getValidationSchema = (today: Date) =>
       .required("La date d'acceptation est requise")
       .max(today, "La date d'acceptation ne peut être dans le futur")
       .min(
-        subtractMonths(today, 2),
+        subMonths(today, 2),
         "La date d'acceptation ne peut être antérieure à 2 mois"
       ),
     acceptationStatus: yup
@@ -316,7 +316,7 @@ export function SignBsffAcceptationOnePackagingModalContent({
                     name="acceptationDate"
                     component={DateInput}
                     maxDate={TODAY}
-                    minDate={subtractMonths(TODAY, 2)}
+                    minDate={subMonths(TODAY, 2)}
                   />
                 </div>
               </label>

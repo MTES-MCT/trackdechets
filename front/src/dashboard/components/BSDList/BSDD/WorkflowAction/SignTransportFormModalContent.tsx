@@ -23,7 +23,7 @@ import { FormJourneySummary } from "dashboard/components/BSDList/BSDD/WorkflowAc
 import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import { subtractMonths } from "common/helper";
+import { subMonths } from "date-fns";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
@@ -32,7 +32,7 @@ const getValidationSchema = (today: Date) =>
       .required("La date de prise en charge est requise")
       .max(today, "La date de prise en charge ne peut être dans le futur")
       .min(
-        subtractMonths(today, 2),
+        subMonths(today, 2),
         "La date de prise en charge ne peut être antérieure à 2 mois"
       ),
     takenOverBy: yup
@@ -202,7 +202,7 @@ export default function SignTransportFormModalContent({
                   <Field
                     name="takenOverAt"
                     component={DateInput}
-                    minDate={subtractMonths(TODAY, 2)}
+                    minDate={subMonths(TODAY, 2)}
                     maxDate={TODAY}
                     required
                     className="td-input"

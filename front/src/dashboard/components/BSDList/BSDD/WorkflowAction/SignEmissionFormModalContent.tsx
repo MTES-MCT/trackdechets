@@ -20,8 +20,8 @@ import { Field, Form as FormikForm, Formik } from "formik";
 import { FormWasteEmissionSummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormWasteEmissionSummary";
 import { FormJourneySummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormJourneySummary";
 import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
-import { subtractMonths } from "common/helper";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
 interface SignEmissionFormModalProps {
   title: string;
@@ -37,7 +37,7 @@ const getValidationSchema = (today: Date) =>
       .required("La date d'émission est requise")
       .max(today, "La date d'émission ne peut être dans le futur")
       .min(
-        subtractMonths(today, 2),
+        subMonths(today, 2),
         "La date d'émission ne peut être antérieure à 2 mois"
       ),
     emittedBy: yup
@@ -226,7 +226,7 @@ function SignEmissionFormModalContent({
                     <Field
                       name="emittedAt"
                       component={DateInput}
-                      minDate={subtractMonths(TODAY, 2)}
+                      minDate={subMonths(TODAY, 2)}
                       maxDate={TODAY}
                       required
                       className="td-input"
