@@ -98,6 +98,7 @@ export function Appendix1ProducerForm({
                     setFieldValue("emitter.company.name", null);
                     setFieldValue("emitter.company.address", null);
                     setFieldValue("emitter.company.country", null);
+                    setFieldValue("emitter.company.orgId", null);
                     setFieldValue("emitter.isForeignShip", false);
                   }}
                 />
