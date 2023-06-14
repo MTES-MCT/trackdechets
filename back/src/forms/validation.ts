@@ -786,7 +786,13 @@ export const transporterSchemaFn: FactorySchemaOf<
 > = ({ transporterSignature }) =>
   yup.object({
     transporterCustomInfo: yup.string().nullable(),
-    transporterNumberPlate: yup.string().nullable(),
+    transporterNumberPlate: yup
+      .string()
+      .nullable()
+      .requiredIf(
+        transporterSignature,
+        "La plaque d'immatriculation est requise"
+      ),
     transporterCompanyName: yup
       .string()
       .ensure()

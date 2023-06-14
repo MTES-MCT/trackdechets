@@ -13,10 +13,12 @@ import {
   DataListDescription,
   DataListItem,
   DataListTerm,
+  RedErrorMessage,
 } from "common/components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { IconPaperWrite } from "common/components/Icons";
 import Packagings from "form/bsdd/components/packagings/Packagings";
+import { useEffect } from "react";
 
 interface FormWasteTransportSummaryProps {
   form: Form;
@@ -44,6 +46,7 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
         Plaque d'immatriculation{" "}
         <Field name="transporterNumberPlate" className="td-input" />
       </label>
+      <RedErrorMessage name="transporterNumberPlate" />
     </div>
   ),
   quantity: () => (
@@ -87,6 +90,12 @@ export function FormWasteTransportSummary({
         .concat([name])
         .filter((name, index, fields) => fields.indexOf(name) === index)
     );
+
+  useEffect(() => {
+    if (!form.transporter?.numberPlate) {
+      addField("transporterNumberPlate");
+    }
+  }, [form]);
 
   const { temporaryStorageDetail } = form;
 
