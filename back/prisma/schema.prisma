@@ -314,18 +314,6 @@ model Form {
   recipientCompanyContact            String?
   recipientCompanyPhone              String?
   recipientCompanyMail               String?
-  // transporterCompanyName             String?
-  // transporterCompanySiret            String?
-  // transporterCompanyAddress          String?
-  // transporterCompanyContact          String?
-  // transporterCompanyPhone            String?
-  // transporterCompanyMail             String?
-  // transporterCompanyVatNumber        String?
-  // transporterReceipt                 String?
-  // transporterDepartment              String?
-  // transporterValidityLimit           DateTime?               @db.Timestamptz(6)
-  // transporterNumberPlate             String?
-  // transporterTransportMode           TransportMode?          @default(ROAD)
   wasteDetailsCode                   String?
   wasteDetailsOnuCode                String?
   wasteDetailsPackagingInfos         Json                    @default("[]")
@@ -379,7 +367,6 @@ model Form {
   processingOperationDescription     String?
   noTraceability                     Boolean?
   signedByTransporter                Boolean?
-  // transporterIsExemptedOfReceipt     Boolean?
   customId                           String?
   wasteAcceptationStatus             WasteAcceptationStatus?
   wasteRefusalReason                 String?
@@ -397,7 +384,6 @@ model Form {
   emitterWorkSiteCity                String?
   emitterWorkSitePostalCode          String?
   emitterWorkSiteInfos               String?
-  // transporterCustomInfo              String?
   recipientIsTempStorage             Boolean?                @default(false)
   signedAt                           DateTime?               @db.Timestamptz(6)
   currentTransporterOrgId            String?
@@ -432,7 +418,6 @@ model Form {
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
-  // @@index([transporterCompanySiret], map: "_FormTransporterCompanySiretIdx")
   @@index([traderCompanySiret], map: "_FormTraderCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
   @@index([ecoOrganismeSiret], map: "_FormEcoOrganismeSiretIdx")
