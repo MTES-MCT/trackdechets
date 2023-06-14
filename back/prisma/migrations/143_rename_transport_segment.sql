@@ -7,7 +7,7 @@ ALTER TABLE
 ALTER TABLE
   "default$default"."BsddTransporter"
 ADD
-  COLUMN "transporterCustomInfo" VARCHAR(100);
+  COLUMN "transporterCustomInfo" TEXT;
 
 ALTER INDEX IF EXISTS "default$default"."TransportSegment_pkey" RENAME TO "BsddTransporter_pkey";
 
