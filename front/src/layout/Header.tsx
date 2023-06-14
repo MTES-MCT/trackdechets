@@ -20,6 +20,7 @@ import { useQuery, gql } from "@apollo/client";
 import Loader from "Apps/common/Components/Loader/Loaders";
 import { InlineError } from "Apps/common/Components/Error/Error";
 import { Query } from "generated/graphql/types";
+import { usePermissions } from "common/contexts/PermissionsContext";
 
 import routes from "Apps/routes";
 import { DEVELOPERS_DOCUMENTATION_URL, MEDIA_QUERIES } from "common/config";
@@ -39,6 +40,7 @@ export const GET_ME = gql`
         givenName
         orgId
         companyTypes
+        userPermissions
       }
     }
   }
@@ -50,12 +52,27 @@ export const GET_ME = gql`
  * Contains main navigation items from the desktop top level nav (Dashboard, Account etc.)
  */
 function MobileSubNav({ currentSiret }) {
+  const { updatePermissions } = usePermissions();
   const { error, data } = useQuery<Pick<Query, "me">>(GET_ME, {});
   const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   if (error) return <InlineError apolloError={error} />;
+
+  useEffect(() => {
+    if (data) {
+      const companies = data.me.companies;
+      const currentCompany = companies.find(
+        company => company.orgId === currentSiret
+      );
+      if (currentCompany) {
+        updatePermissions(currentCompany.userPermissions);
+      }
+    }
+  }, [data, currentSiret]);
+
   if (data?.me == null) return <Loader />;
 
   const companies = data.me.companies;
+
   const currentCompany = companies.find(
     company => company.orgId === currentSiret
   );

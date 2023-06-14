@@ -1,6 +1,7 @@
 import React from "react";
 import { CompanyPrivate } from "generated/graphql/types";
 import { sortCompaniesByName } from "common/helper";
+import { usePermissions } from "common/contexts/PermissionsContext";
 
 interface IProps {
   orgId: string;
@@ -15,7 +16,14 @@ export default function DashboardCompanySelector({
   companies,
   handleCompanyChange,
 }: IProps) {
+  const { updatePermissions } = usePermissions();
+
   const handleChange = (orgId: string) => {
+    const currentCompany = companies.find(company => company.orgId === orgId);
+    if (currentCompany) {
+      updatePermissions(currentCompany?.userPermissions);
+    }
+
     handleCompanyChange(orgId);
   };
 

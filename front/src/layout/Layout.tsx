@@ -2,6 +2,7 @@ import React, { ReactNode } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { Query } from "generated/graphql/types";
 import Header from "./Header";
+import { PermissionsProvider } from "common/contexts/PermissionsContext";
 
 import sandboxIcon from "./assets/code-sandbox.svg";
 import downtimeIcon from "./assets/code-downtime.svg";
@@ -33,7 +34,7 @@ export default function Layout({
   const isIE11 = !!navigator.userAgent.match(/Trident.*rv:11\./);
 
   return (
-    <>
+    <PermissionsProvider defaultPermissions={[]}>
       {isIE11 && (
         <div
           className="notification notification--error tw-text-center"
@@ -84,6 +85,6 @@ export default function Layout({
       )}
       <Header isAuthenticated={isAuthenticated} isAdmin={isAdmin} />
       {children}
-    </>
+    </PermissionsProvider>
   );
 }
