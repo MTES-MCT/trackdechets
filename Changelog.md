@@ -24,6 +24,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Refacto transporteurs BSDD : les données du premier transporteur sont migrées dans la table `BsddTransporter` (renommage de `TransportSegment`) [PR 2418](https://github.com/MTES-MCT/trackdechets/pull/2418)
+
 # [2023.6.1] 06/06/2023
 
 #### :rocket: Nouvelles fonctionnalités
