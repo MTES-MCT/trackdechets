@@ -3,7 +3,7 @@ ALTER TABLE
 
 -- AlterTable
 ALTER TABLE
-  "BsddTransporter"
+  "default$default"."BsddTransporter"
 ALTER COLUMN
   "number"
 SET
