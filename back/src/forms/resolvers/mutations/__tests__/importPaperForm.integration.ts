@@ -71,6 +71,7 @@ describe("mutation / importPaperForm", () => {
         },
         transporter: {
           isExemptedOfReceipt: true,
+          numberPlate: "TRANSPORTER-PLATES",
           company: {
             siret: transporterCompany.siret,
             name: "Transporteur",
@@ -390,6 +391,7 @@ describe("mutation / importPaperForm", () => {
         transporterCompanyPhone: "0000000000",
         transporterCompanyContact: "Mr Transporteur",
         transporterCompanyMail: "trasnporteur@trackdechets.fr",
+        transporterNumberPlate: "TRANSPORTER-NBR-PLATE",
         wasteDetailsCode: "01 03 04*",
         wasteDetailsName: "stériles acidogènes",
         wasteDetailsQuantity: 1.0,
