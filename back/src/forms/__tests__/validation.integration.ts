@@ -737,6 +737,17 @@ describe("beforeTransportSchema", () => {
 
     expect(isValid).toBeTruthy();
   });
+
+  it("should work if transport mode is ROAD & plates are defined", async () => {
+    const testForm: Partial<Form> = {
+      ...beforeTransportForm,
+      transporterTransportMode: "ROAD",
+      transporterNumberPlate: "TRANSPORTER-PLATES"
+    };
+    const isValid = beforeTransportSchema.isValid(testForm);
+
+    expect(isValid).toBeTruthy();
+  });
 });
 
 describe("receivedInfosSchema", () => {

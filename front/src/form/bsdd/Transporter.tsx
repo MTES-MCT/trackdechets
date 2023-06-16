@@ -72,7 +72,7 @@ export default function Transporter() {
           <Field name="transporter.mode" component={FieldTransportModeSelect} />
         </label>
         <label>
-          Immatriculation
+          Immatriculation (optionnel)
           <Field
             type="text"
             className={`td-input ${styles.transporterNumberPlate}`}
