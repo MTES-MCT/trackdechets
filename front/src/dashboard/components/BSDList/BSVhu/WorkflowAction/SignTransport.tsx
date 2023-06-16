@@ -16,13 +16,18 @@ import React from "react";
 import { generatePath, Link, useRouteMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
+import { subMonths } from "date-fns";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
     takenOverAt: yup
       .date()
       .required("La date de prise en charge est requise")
-      .max(today, "La date de prise en charge ne peut être dans le futur"),
+      .max(today, "La date de prise en charge ne peut être dans le futur")
+      .min(
+        subMonths(today, 2),
+        "La date de prise en charge ne peut être antérieure à 2 mois"
+      ),
     author: yup
       .string()
       .ensure()
@@ -122,19 +127,20 @@ export function SignTransport({
                   En qualité de <strong>transporteur du déchet</strong>,
                   j'atteste que les informations ci-dessus sont correctes. En
                   signant ce document, je déclare prendre en charge le déchet.
-                  La signature est horodatée.
                 </p>
                 <TransporterReceipt transporter={bsvhu.transporter!} />
 
                 <div className="form__row">
-                  <label className="tw-font-semibold">
+                  <label>
                     Date de prise en charge
                     <div className="td-date-wrapper">
                       <Field
                         name="takenOverAt"
                         component={DateInput}
                         className="td-input"
+                        minDate={subMonths(TODAY, 2)}
                         maxDate={TODAY}
+                        required
                       />
                     </div>
                   </label>

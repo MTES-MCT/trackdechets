@@ -146,7 +146,7 @@ export async function signEmission(
 
   const updateInput: Prisma.BsdasriUpdateInput = {
     emitterEmissionSignatureAuthor: input.author,
-    emitterEmissionSignatureDate: new Date(),
+    emitterEmissionSignatureDate: new Date(input.date ?? Date.now()),
     emissionSignatory: { connect: { id: user.id } },
     emittedByEcoOrganisme,
     isEmissionTakenOverWithSecretCode: !!input.securityCode
@@ -213,7 +213,7 @@ async function signTransport(
 
   const updateInput: Prisma.BsdasriUpdateInput = {
     transporterTransportSignatureAuthor: input.author,
-    transporterTransportSignatureDate: new Date(),
+    transporterTransportSignatureDate: new Date(input.date ?? Date.now()),
     transportSignatory: { connect: { id: user.id } },
     isEmissionDirectTakenOver
   };
@@ -242,7 +242,7 @@ async function signReception(
 
   const updateInput: Prisma.BsdasriUpdateInput = {
     destinationReceptionSignatureAuthor: input.author,
-    destinationReceptionSignatureDate: new Date(),
+    destinationReceptionSignatureDate: new Date(input.date ?? Date.now()),
     receptionSignatory: { connect: { id: user.id } },
     ...(!bsdasri.handedOverToRecipientAt
       ? {
@@ -275,7 +275,7 @@ async function signOperation(
 
   const updateInput: Prisma.BsdasriUpdateInput = {
     destinationOperationSignatureAuthor: input.author,
-    destinationOperationSignatureDate: new Date(),
+    destinationOperationSignatureDate: new Date(input.date ?? Date.now()),
     operationSignatory: { connect: { id: user.id } }
   };
 
