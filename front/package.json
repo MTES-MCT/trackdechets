@@ -76,7 +76,7 @@
     "rc-tree": "^5.7.3",
     "react": "18.2.0",
     "react-app-polyfill": "^1.0.6",
-    "react-aria": "^3.24.0",
+    "react-aria": "3.25.0",
     "react-datepicker": "^3.4.1",
     "react-dom": "18.2.0",
     "react-multi-select-component": "^4.3.4",

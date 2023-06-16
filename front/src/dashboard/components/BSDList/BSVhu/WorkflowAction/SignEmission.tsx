@@ -9,7 +9,7 @@ import {
   SignatureTypeInput,
 } from "generated/graphql/types";
 import React from "react";
-import { generatePath, Link } from "react-router-dom";
+import { generatePath, Link, useRouteMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 import { subtractMonths } from "common/helper";
@@ -51,6 +51,8 @@ export function SignEmission({
   >(SIGN_BSVHU, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   const TODAY = new Date();
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
 
   return (
     <SignBsvhu
@@ -71,7 +73,7 @@ export function SignEmission({
             </p>
 
             <Link
-              to={generatePath(routes.dashboard.bsvhus.edit, {
+              to={generatePath(routes[dashboardRoutePrefix].bsvhus.edit, {
                 siret,
                 id: bsvhu.id,
               })}

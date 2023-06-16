@@ -11,6 +11,7 @@ import React from "react";
 import styles from "./Transporter.module.scss";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
 import { formTransportIsPipeline } from "./utils/packagings";
+import { onBsddTransporterCompanySelected } from "./utils/onBsddTransporterCompanySelected";
 
 type Values = {
   transporter: TransporterType;
@@ -27,26 +28,7 @@ export default function Transporter() {
         name="transporter.company"
         allowForeignCompanies={true}
         registeredOnlyCompanies={true}
-        onCompanySelected={transporter => {
-          if (transporter.transporterReceipt) {
-            setFieldValue(
-              "transporter.receipt",
-              transporter.transporterReceipt.receiptNumber
-            );
-            setFieldValue(
-              "transporter.validityLimit",
-              transporter.transporterReceipt.validityLimit
-            );
-            setFieldValue(
-              "transporter.department",
-              transporter.transporterReceipt.department
-            );
-          } else {
-            setFieldValue("transporter.receipt", "");
-            setFieldValue("transporter.validityLimit", null);
-            setFieldValue("transporter.department", "");
-          }
-        }}
+        onCompanySelected={onBsddTransporterCompanySelected(setFieldValue)}
       />
       {!isForeignVat(values.transporter?.company?.vatNumber!) && (
         <>

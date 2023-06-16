@@ -16,16 +16,10 @@ export default function AccountCompanyAddTransporterReceipt() {
             title=""
             description={
               <>
-                Ce profil comprend uniquement les professionnels avec récépissé.
-                Les exemptions de récépissé n'ont pas à utiliser ce profil.{" "}
-                <a
-                  href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000044266537/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Article R.541-50 du code de l'environnement
-                </a>
-                .
+                Ce profil comprend les entreprises de transport routier,
+                immatriculées au registre national, disposant d'un récépissé de
+                déclaration de transport de déchets ou qui répondent à
+                l'exemption de récépissé.
               </>
             }
             severity="info"
@@ -44,7 +38,11 @@ export default function AccountCompanyAddTransporterReceipt() {
               return (
                 <Input
                   label="Numéro de récépissé"
-                  nativeInputProps={field}
+                  nativeInputProps={{
+                    name: field.name,
+                    onChange: field.onChange,
+                    onBlur: field.onBlur,
+                  }}
                 ></Input>
               );
             }}
@@ -54,10 +52,17 @@ export default function AccountCompanyAddTransporterReceipt() {
         <div className="fr-col-4">
           <Field name="transporterReceiptValidity">
             {({ field }) => {
+              const minDate = new Date().toISOString().split("T")[0];
               return (
                 <Input
                   label="Limite de validité"
-                  nativeInputProps={{ type: "date", ...field }}
+                  nativeInputProps={{
+                    type: "date",
+                    min: minDate,
+                    name: field.name,
+                    onChange: field.onChange,
+                    onBlur: field.onBlur,
+                  }}
                 ></Input>
               );
             }}
@@ -70,7 +75,12 @@ export default function AccountCompanyAddTransporterReceipt() {
               return (
                 <Input
                   label="Département"
-                  nativeInputProps={{ placeholder: "75", ...field }}
+                  nativeInputProps={{
+                    placeholder: "75",
+                    name: field.name,
+                    onChange: field.onChange,
+                    onBlur: field.onBlur,
+                  }}
                 ></Input>
               );
             }}

@@ -13,7 +13,7 @@ import {
   SignatureTypeInput,
 } from "generated/graphql/types";
 import React from "react";
-import { generatePath, Link } from "react-router-dom";
+import { generatePath, Link, useRouteMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 import { subtractMonths } from "common/helper";
@@ -61,6 +61,9 @@ export function SignTransport({
 
   const loading = loadingUpdate || loadingSign;
 
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
+
   return (
     <SignBsvhu
       title="Signer l'enlèvement"
@@ -83,7 +86,7 @@ export function SignTransport({
             </p>
 
             <Link
-              to={generatePath(routes.dashboard.bsvhus.edit, {
+              to={generatePath(routes[dashboardRoutePrefix].bsvhus.edit, {
                 siret,
                 id: bsvhu.id,
               })}

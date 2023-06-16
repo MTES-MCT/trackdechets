@@ -48,8 +48,10 @@ const DEBOUNCE_DELAY = 500;
 
 interface CompanySelectorProps {
   name: string;
+  // Callback for the host component
+  // Called with empty parameter to un-select a company
   onCompanySelected?: (
-    company: CompanySearchResult | CompanySearchPrivate
+    company?: CompanySearchResult | CompanySearchPrivate
   ) => void;
   allowForeignCompanies?: boolean;
   registeredOnlyCompanies?: boolean;
@@ -166,6 +168,8 @@ export default function CompanySelector({
     },
     skip: !orgId,
     onCompleted(data) {
+      // Force update the country field
+      // TODO it's a hack to remove
       setFieldValue(
         `${field.name}.country`,
         data.companyPrivateInfos.codePaysEtrangerEtablissement
@@ -182,10 +186,11 @@ export default function CompanySelector({
    */
   function selectCompany(company?: CompanySearchResult) {
     if (disabled) return;
-    // empty the  selected company when null
+    // empty the fields
     if (!company) {
       setFieldValue(field.name, getInitialCompany());
       setFieldTouched(`${field.name}`, true, true);
+      onCompanySelected?.();
       return;
     }
 
@@ -572,24 +577,10 @@ function favoriteToCompanySearchResult(
   company: CompanyFavorite
 ): CompanySearchResult {
   return {
-    orgId: company.orgId,
-    siret: company.siret,
-    vatNumber: company.vatNumber,
-    name: company.name,
-    address: company.address,
-    transporterReceipt: company.transporterReceipt,
-    traderReceipt: company.traderReceipt,
-    brokerReceipt: company.brokerReceipt,
-    vhuAgrementDemolisseur: company.vhuAgrementDemolisseur,
-    vhuAgrementBroyeur: company.vhuAgrementBroyeur,
-    workerCertification: company.workerCertification,
-    codePaysEtrangerEtablissement:
-      company.codePaysEtrangerEtablissement || "FR",
-    contact: company.contact,
+    ...(company as CompanySearchResult),
     contactPhone: company.phone,
     contactEmail: company.mail,
-    isRegistered: company.isRegistered,
-    companyTypes: [],
     etatAdministratif: "A",
+    companyTypes: [],
   };
 }

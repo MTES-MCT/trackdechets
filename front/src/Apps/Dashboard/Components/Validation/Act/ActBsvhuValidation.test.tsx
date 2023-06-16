@@ -5,9 +5,11 @@ import { SIGN_BSVHU } from "dashboard/components/BSDList/BSVhu/WorkflowAction/Si
 import { Bsvhu, SignatureTypeInput } from "generated/graphql/types";
 import React from "react";
 import ActBsvhuValidation from "./ActBsvhuValidation";
+import { MemoryRouter } from "react-router-dom";
 
 describe("ActBsvhuValidation", () => {
   const onClose = jest.fn();
+  const v2Route = "v2/dashboard";
   const values = {
     author: "",
   };
@@ -40,12 +42,14 @@ describe("ActBsvhuValidation", () => {
     const currentSiret = "12345678901234";
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsvhuValidation
-          bsd={bsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[v2Route]}>
+          <ActBsvhuValidation
+            bsd={bsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -60,12 +64,14 @@ describe("ActBsvhuValidation", () => {
     } as Bsvhu;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsvhuValidation
-          bsd={signedByProducerBsvhu}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[v2Route]}>
+          <ActBsvhuValidation
+            bsd={signedByProducerBsvhu}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -77,12 +83,14 @@ describe("ActBsvhuValidation", () => {
     const sentBsvhu = { ...bsd, bsvhuStatus: "SENT" } as Bsvhu;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsvhuValidation
-          bsd={sentBsvhu}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[v2Route]}>
+          <ActBsvhuValidation
+            bsd={sentBsvhu}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 

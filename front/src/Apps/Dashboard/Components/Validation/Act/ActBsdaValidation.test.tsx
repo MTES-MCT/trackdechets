@@ -5,9 +5,11 @@ import { screen } from "@testing-library/dom";
 import { render } from "@testing-library/react";
 import { SIGN_BSDA } from "dashboard/components/BSDList/BSDa/WorkflowAction/SignBsda";
 import { Bsda, BsdaSignatureType } from "generated/graphql/types";
+import { MemoryRouter } from "react-router-dom";
 
 describe("ActBsdaValidation", () => {
   const onClose = jest.fn();
+  const v2Route = "v2/dashboard";
 
   const mocks = [
     {
@@ -46,12 +48,14 @@ describe("ActBsdaValidation", () => {
     } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsdaValidation
-          bsd={initialCollection2710Bsda}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[v2Route]}>
+          <ActBsdaValidation
+            bsd={initialCollection2710Bsda}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -68,12 +72,14 @@ describe("ActBsdaValidation", () => {
     };
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsdaValidation
-          bsd={initialBsdaSameTransporter}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[v2Route]}>
+          <ActBsdaValidation
+            bsd={initialBsdaSameTransporter}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -89,12 +95,14 @@ describe("ActBsdaValidation", () => {
     } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsdaValidation
-          bsd={initialBsdaSameWorker}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[v2Route]}>
+          <ActBsdaValidation
+            bsd={initialBsdaSameWorker}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -109,12 +117,14 @@ describe("ActBsdaValidation", () => {
     };
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsdaValidation
-          bsd={initialBsdaSameEmitter}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[v2Route]}>
+          <ActBsdaValidation
+            bsd={initialBsdaSameEmitter}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -131,12 +141,14 @@ describe("ActBsdaValidation", () => {
     } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsdaValidation
-          bsd={signedByProducerBsda}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[v2Route]}>
+          <ActBsdaValidation
+            bsd={signedByProducerBsda}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -153,12 +165,14 @@ describe("ActBsdaValidation", () => {
     } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsdaValidation
-          bsd={signedByProducerBsdaReshipment}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[v2Route]}>
+          <ActBsdaValidation
+            bsd={signedByProducerBsdaReshipment}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -173,12 +187,14 @@ describe("ActBsdaValidation", () => {
     } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsdaValidation
-          bsd={signedByProducerBsdaNoWorker}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[v2Route]}>
+          <ActBsdaValidation
+            bsd={signedByProducerBsdaNoWorker}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -193,12 +209,14 @@ describe("ActBsdaValidation", () => {
     } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsdaValidation
-          bsd={signedByWorkerBsda}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[v2Route]}>
+          <ActBsdaValidation
+            bsd={signedByWorkerBsda}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -210,12 +228,14 @@ describe("ActBsdaValidation", () => {
     const sentBsda = { ...bsd, bsdaStatus: "SENT" } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsdaValidation
-          bsd={sentBsda}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[v2Route]}>
+          <ActBsdaValidation
+            bsd={sentBsda}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 

@@ -1,7 +1,14 @@
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
-import { CompanyType, EmitterType, Form } from "generated/graphql/types";
+import {
+  CompanySearchPrivate,
+  CompanyType,
+  EmitterType,
+  Form,
+  Query,
+  QueryCompanyPrivateInfosArgs,
+} from "generated/graphql/types";
 import React, { useEffect } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WorkSite from "form/common/components/work-site/WorkSite";
@@ -12,6 +19,9 @@ import { emitterTypeLabels } from "dashboard/constants";
 import { isForeignVat, isOmi } from "generated/constants/companySearchHelpers";
 import { RedErrorMessage } from "common/components";
 import Tooltip from "common/components/Tooltip";
+import { onBsddTransporterCompanySelected } from "./utils/onBsddTransporterCompanySelected";
+import { useQuery } from "@apollo/client";
+import { COMPANY_SELECTOR_PRIVATE_INFOS } from "form/common/components/company/query";
 
 export default function Emitter({ disabled }) {
   const ctx = useFormikContext<Form>();
@@ -58,6 +68,33 @@ export default function Emitter({ disabled }) {
     }
     return undefined;
   }
+
+  const [orgId, setOrgId] = React.useState<string>("");
+  const updateBsddTransporterReceipt =
+    onBsddTransporterCompanySelected(setFieldValue);
+  const { loading, error, refetch } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_SELECTOR_PRIVATE_INFOS, {
+    variables: {
+      clue: orgId!,
+    },
+    skip: !orgId,
+    onCompleted: data => {
+      if (data && typeof updateBsddTransporterReceipt === "function") {
+        updateBsddTransporterReceipt(
+          data.companyPrivateInfos as CompanySearchPrivate
+        );
+      }
+    },
+  });
+
+  React.useCallback(() => {
+    if (!loading && !error && orgId) {
+      // fetch the data
+      refetch();
+    }
+  }, [refetch, error, loading, orgId]);
 
   return (
     <>
@@ -290,6 +327,7 @@ export default function Emitter({ disabled }) {
       {isGrouping && (
         <div className="tw-my-6">
           <h4 className="form__section-heading">Entreprise émettrice</h4>
+
           <MyCompanySelector
             fieldName="emitter.company"
             siretEditable={!siretNonEditable}
@@ -301,6 +339,8 @@ export default function Emitter({ disabled }) {
               }
               if (values.emitter?.type === EmitterType.Appendix1) {
                 setFieldValue("transporter.company", company);
+                // refresh CompanyPrivateInfos and propagate the receipt form values
+                setOrgId(company.orgId);
               }
             }}
             filter={companies => {

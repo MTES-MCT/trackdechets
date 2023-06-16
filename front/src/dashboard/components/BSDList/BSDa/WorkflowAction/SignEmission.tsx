@@ -10,7 +10,7 @@ import {
   SignatureTypeInput,
 } from "generated/graphql/types";
 import React from "react";
-import { generatePath, Link } from "react-router-dom";
+import { generatePath, Link, useRouteMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsda, SIGN_BSDA } from "./SignBsda";
 import { subtractMonths } from "common/helper";
@@ -55,6 +55,8 @@ export function SignEmission({
   });
 
   const TODAY = new Date();
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
 
   return (
     <SignBsda
@@ -80,7 +82,7 @@ export function SignEmission({
               ))}
             </ul>
             <Link
-              to={generatePath(routes.dashboard.bsdas.edit, {
+              to={generatePath(routes[dashboardRoutePrefix].bsdas.edit, {
                 siret,
                 id: bsda.id,
               })}

@@ -50,6 +50,9 @@ describe("mutation inviteUserToCompany", () => {
       .companyAssociations();
     expect(companyAssociations).toHaveLength(1);
     expect(companyAssociations[0].role).toEqual("MEMBER");
+
+    expect(companyAssociations[0].createdAt).toBeTruthy();
+
     const userCompany = await prisma.companyAssociation
       .findUniqueOrThrow({
         where: {
@@ -57,6 +60,7 @@ describe("mutation inviteUserToCompany", () => {
         }
       })
       .company();
+    expect(userCompany.siret).toEqual(company.siret);
     expect(userCompany.siret).toEqual(company.siret);
   });
 

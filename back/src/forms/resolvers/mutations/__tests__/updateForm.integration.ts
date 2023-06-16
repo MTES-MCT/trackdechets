@@ -2216,4 +2216,60 @@ describe("Mutation.updateForm", () => {
       );
     }
   );
+
+  it("should empty the transporter and receipt infos", async () => {
+    const TODAY = new Date();
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("MEMBER", {
+      transporterReceipt: {
+        create: {
+          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString() as any,
+          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+    const transporterReceipt =
+      await prisma.transporterReceipt.findUniqueOrThrow({
+        where: { id: transporter.company.transporterReceiptId! }
+      });
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.DRAFT,
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        emitterCompanyAddress: emitter.company.address,
+        emitterCompanyContact: emitter.company.contact,
+        emitterCompanyPhone: emitter.company.contactPhone,
+        emitterCompanyMail: emitter.company.contactEmail,
+        transporterCompanySiret: transporter.company.siret,
+        transporterCompanyName: transporter.company.name,
+        transporterCompanyAddress: transporter.company.address,
+        transporterCompanyContact: transporter.company.contact,
+        transporterCompanyPhone: transporter.company.contactPhone,
+        transporterCompanyMail: transporter.company.contactEmail,
+        transporterReceipt: transporterReceipt.receiptNumber,
+        transporterDepartment: transporterReceipt.department,
+        transporterValidityLimit: transporterReceipt.validityLimit
+      }
+    });
+    const { mutate } = makeClient(emitter.user);
+    const updateFormInput: FormInput = {
+      id: form.id,
+      transporter: null
+    };
+    const { data, errors } = await mutate<Pick<Mutation, "updateForm">>(
+      UPDATE_FORM,
+      {
+        variables: { updateFormInput }
+      }
+    );
+
+    expect(errors).toBeUndefined();
+    expect(data.updateForm.transporter?.receipt).toBeUndefined();
+    expect(data.updateForm.transporter?.department).toBeUndefined();
+    expect(data.updateForm.transporter?.validityLimit).toBeUndefined();
+    expect(data.updateForm.transporter?.company?.siret).toBeUndefined();
+  });
 });
