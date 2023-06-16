@@ -16,7 +16,12 @@ import {
 } from "dashboard/components/BSDList/BSDasri/types";
 import Loader from "common/components/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
-import { useParams, useHistory, generatePath } from "react-router-dom";
+import {
+  useParams,
+  useHistory,
+  generatePath,
+  useRouteMatch,
+} from "react-router-dom";
 import { GET_DETAIL_DASRI_WITH_METADATA, GET_BSDS } from "common/queries";
 
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
@@ -113,8 +118,12 @@ export function RouteSignBsdasri({
 }) {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const history = useHistory();
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const transporterTabRoute = !isV2Routes
+    ? routes.dashboard.transport.toCollect
+    : routes.dashboardv2.transport.toCollect;
   const transporterTab = {
-    pathname: generatePath(routes.dashboard.transport.toCollect, {
+    pathname: generatePath(transporterTabRoute, {
       siret,
     }),
   };

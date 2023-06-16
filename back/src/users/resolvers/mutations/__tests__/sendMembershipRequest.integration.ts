@@ -15,6 +15,7 @@ import {
   membershipRequest as membershipRequestMail
 } from "../../../../mailer/templates";
 import { Mutation } from "../../../../generated/graphql/types";
+import { subMinutes } from "date-fns";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -49,7 +50,10 @@ describe("mutation sendMembershipRequest", () => {
 
   it("should send a request to all admins of the company and create a MembershipRequest record. Admins emails partially hidden.", async () => {
     const requester = await userFactory();
-    const admin = await userFactory({ email: "john.snow@trackdechets.fr" });
+    const admin = await userFactory({
+      email: "john.snow@trackdechets.fr",
+      createdAt: subMinutes(new Date(), 5)
+    });
     const company = await companyFactory();
     await associateUserToCompany(admin.id, company.siret, "ADMIN");
     const { mutate } = makeClient(requester);
@@ -118,7 +122,8 @@ describe("mutation sendMembershipRequest", () => {
       email: `requester${userIndex}@trackdechets.fr`
     });
     const admin = await userFactory({
-      email: `admin${userIndex}@trackdechets.fr`
+      email: `admin${userIndex}@trackdechets.fr`,
+      createdAt: subMinutes(new Date(), 5)
     });
     const company = await companyFactory();
     await associateUserToCompany(admin.id, company.siret, "ADMIN");
