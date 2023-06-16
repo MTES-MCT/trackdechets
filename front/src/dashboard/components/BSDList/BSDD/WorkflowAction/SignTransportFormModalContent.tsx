@@ -20,16 +20,21 @@ import {
 } from "common/components/Error";
 import { FormWasteTransportSummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormWasteTransportSummary";
 import { FormJourneySummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormJourneySummary";
-import DateInput from "form/common/components/custom-inputs/DateInput";
 import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
     takenOverAt: yup
       .date()
       .required("La date de prise en charge est requise")
-      .max(today, "La date de prise en charge ne peut être dans le futur"),
+      .max(today, "La date de prise en charge ne peut être dans le futur")
+      .min(
+        subMonths(today, 2),
+        "La date de prise en charge ne peut être antérieure à 2 mois"
+      ),
     takenOverBy: yup
       .string()
       .ensure()
@@ -64,7 +69,7 @@ interface SignTransportFormModalProps {
   formId: string;
 }
 
-function SignTransportFormModalContent({
+export default function SignTransportFormModalContent({
   title,
   siret,
   formId,
@@ -191,14 +196,16 @@ function SignTransportFormModalContent({
             </p>
 
             <div className="form__row">
-              <label className="tw-font-semibold">
+              <label>
                 Date de prise en charge
                 <div className="td-date-wrapper">
                   <Field
                     name="takenOverAt"
                     component={DateInput}
-                    className="td-input"
+                    minDate={subMonths(TODAY, 2)}
                     maxDate={TODAY}
+                    required
+                    className="td-input"
                   />
                 </div>
               </label>
@@ -260,4 +267,3 @@ function SignTransportFormModalContent({
     </>
   );
 }
-export default SignTransportFormModalContent;
