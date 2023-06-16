@@ -9,6 +9,8 @@ import {
   DELETE_JOB_NAME
 } from "./jobNames";
 import { updatesQueue } from "./bsdUpdate";
+import { favoritesCompanyQueue } from "./company";
+import { allFavoriteTypes } from "../../companies/types";
 
 const { REDIS_URL, NODE_ENV } = process.env;
 export const INDEX_QUEUE_NAME = `queue_index_elastic_${NODE_ENV}`;
@@ -22,10 +24,10 @@ export const indexQueue = new Queue<string>(INDEX_QUEUE_NAME, REDIS_URL!, {
   }
 });
 
-indexQueue.on("completed", job => {
+indexQueue.on("completed", async job => {
   const id = job.data;
 
-  const { sirets, siretsBeforeUpdate } = job.returnvalue;
+  const { sirets, siretsBeforeUpdate, status } = job.returnvalue;
 
   if (
     [
@@ -36,12 +38,33 @@ indexQueue.on("completed", job => {
     ].includes(job.name)
   ) {
     // aggregate and deduplicate sirets to notify relevant recipients
-    const siretsToNotify = Array.from(
+    const orgIdsToNotify = Array.from(
       new Set([...sirets, ...(siretsBeforeUpdate ?? [])])
     );
 
-    updatesQueue.add({ sirets: siretsToNotify, id, jobName: job.name });
-    scheduleWebhook(id, siretsToNotify, job.name);
+    updatesQueue.add({ sirets: orgIdsToNotify, id, jobName: job.name });
+    scheduleWebhook(id, orgIdsToNotify, job.name);
+
+    // exclude favorites indexation for other statuses
+    if (!["SENT", "RESENT"].includes(status)) {
+      return;
+    }
+    // après qu'un BSD soit mis à jour et indexé dans l'index `bsds`
+    // on doit mettre à jour le cache des `favorites` pour chaque orgId
+    // présent dansd ce BSD afin qu'en tant qu'éditeur dans le futur on lui
+    // propose les favoris pré-calculés.
+    const uniqueOrgIds = Array.from(new Set(orgIdsToNotify));
+
+    for (const favoriteType of allFavoriteTypes) {
+      await favoritesCompanyQueue.addBulk(
+        uniqueOrgIds.map(orgId => ({
+          data: {
+            orgId,
+            type: favoriteType
+          }
+        }))
+      );
+    }
   }
 });
 

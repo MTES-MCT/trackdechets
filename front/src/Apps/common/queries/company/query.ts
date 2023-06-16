@@ -1,16 +1,24 @@
 import { gql } from "@apollo/client";
 
 export const FAVORITES = gql`
-  query Favorites($siret: String!, $type: FavoriteType!) {
-    favorites(siret: $siret, type: $type) {
+  query Favorites(
+    $orgId: String!
+    $type: FavoriteType!
+    $allowForeignCompanies: Boolean
+  ) {
+    favorites(
+      orgId: $orgId
+      type: $type
+      allowForeignCompanies: $allowForeignCompanies
+    ) {
       orgId
       siret
       vatNumber
       name
       address
       contact
-      phone
-      mail
+      contactPhone
+      contactEmail
       isRegistered
       companyTypes
       codePaysEtrangerEtablissement

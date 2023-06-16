@@ -27,12 +27,14 @@ const cleanTypeNameLink = new ApolloLink((operation, forward) => {
 
 /**
  * Automatically erase `company.orgId` from variables
- * This enable devs to use FormCompany object from the server
- * and not worry about `orgId` breaking CompanyInput
+ * This enable devs to use FormCompany object (that has orgId) from the server
+ * and not worry about `orgId` breaking CompanyInput (that misses orgId)
  */
 const cleanOrgIdLink = new ApolloLink((operation, forward) => {
   if (operation.variables) {
-    operation.variables = omitDeep(operation.variables, "orgId");
+    for (const key in Object.keys(operation.variables)) {
+      operation.variables[key] = omitDeep(operation.variables[key], "orgId");
+    }
   }
   return forward(operation);
 });

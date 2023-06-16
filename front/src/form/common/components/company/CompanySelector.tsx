@@ -26,7 +26,6 @@ import {
   BsdasriTransporterInput,
   BsdaTransporterInput,
   BsvhuTransporterInput,
-  CompanyFavorite,
   CompanySearchResult,
   CompanySearchPrivate,
   FavoriteType,
@@ -133,12 +132,13 @@ export default function CompanySelector({
     error: favoritesError,
   } = useQuery<Pick<Query, "favorites">, QueryFavoritesArgs>(FAVORITES, {
     variables: {
-      siret,
+      orgId: siret,
       type: Object.values(FavoriteType).includes(favoriteType)
         ? favoriteType
         : FavoriteType.Emitter,
+      allowForeignCompanies,
     },
-    skip: skipFavorite,
+    skip: skipFavorite || !siret,
     onCompleted: data => {
       mergeResults([], data?.favorites ?? []);
     },
@@ -279,18 +279,15 @@ export default function CompanySelector({
    */
   function mergeResults(
     searchCompanies: CompanySearchResult[],
-    favorites: CompanyFavorite[]
+    favorites: CompanySearchResult[]
   ) {
     if (disabled) return;
 
-    const reshapedFavorites =
-      favorites
-        .filter(
-          fav =>
-            !skipFavorite &&
-            !searchCompanies.some(company => company.orgId === fav.orgId)
-        )
-        .map(favorite => favoriteToCompanySearchResult(favorite)) ?? [];
+    const reshapedFavorites = favorites.filter(
+      fav =>
+        !skipFavorite &&
+        !searchCompanies.some(company => company.orgId === fav.orgId)
+    );
 
     const reshapedSearchResults =
       searchCompanies
@@ -612,16 +609,4 @@ export default function CompanySelector({
       </div>
     </>
   );
-}
-
-function favoriteToCompanySearchResult(
-  company: CompanyFavorite
-): CompanySearchResult {
-  return {
-    ...(company as CompanySearchResult),
-    contactPhone: company.phone,
-    contactEmail: company.mail,
-    etatAdministratif: "A",
-    companyTypes: company.companyTypes,
-  };
 }

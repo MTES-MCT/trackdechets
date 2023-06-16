@@ -57,9 +57,13 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Réécriture de la requête `favorites` qui renvoie désormais le type `CompanySearchResult[]` (suppression du type interne `CompanyFavorite`) et améliorations de `searchCompanies`. Ajout d'un paramètre optionnel `allowForeignCompanies` pour filtrer les entreprises étrangères des requêtes. [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
+- Ajout d'un job asynchrone de pré-calcul des `favorites` par `orgId` et par `type` d'établissement. Le job se lance automatiquement à la suite d'un job `indexBsd` [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
+
 #### :house: Interne
 
 - Ajout de filtres à la query bsds pour filtrer sur les bordereaux ayant une demande de révision en cours ou passée [PR 2598](Ajout de filtres à la query bsds pour filtrer sur les bordereaux ayant une demande de révision en cours ou passée)
+- Suppression du script `npm run queue:obliterate` [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
 
 # [2023.8.3] 29/08/2023
 
@@ -84,7 +88,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout des infos négociant à l'indexation BSDD [PR 2657](https://github.com/MTES-MCT/trackdechets/pull/2657)
 
-# [2023.8.2] 29/08/2023
+# [2023.8.2] 19/08/2023
 
 #### :rocket: Nouvelles fonctionnalités
 
