@@ -37,13 +37,17 @@ const signTransportFn = async (
     args.securityCode
   );
 
-  await validateBeforeTransport(existingForm);
+  // Add potential transporter plate to validation, as transporter can still
+  // fix this field at signature time
+  const transporterNumberPlate =
+    args.input.transporterNumberPlate ?? existingForm.transporterNumberPlate;
+
+  await validateBeforeTransport({ ...existingForm, transporterNumberPlate });
 
   const formUpdateInput = {
     takenOverAt: args.input.takenOverAt,
     takenOverBy: args.input.takenOverBy,
-    transporterNumberPlate:
-      args.input.transporterNumberPlate ?? existingForm.transporterNumberPlate,
+    transporterNumberPlate,
 
     currentTransporterOrgId: getTransporterCompanyOrgId(existingForm),
 

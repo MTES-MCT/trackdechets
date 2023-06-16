@@ -789,10 +789,21 @@ export const transporterSchemaFn: FactorySchemaOf<
     transporterNumberPlate: yup
       .string()
       .nullable()
-      .requiredIf(
-        transporterSignature,
-        "La plaque d'immatriculation est requise"
-      ),
+      .test((transporterNumberPlate, ctx) => {
+        const { transporterTransportMode } = ctx.parent;
+
+        if (
+          transporterSignature &&
+          transporterTransportMode === "ROAD" &&
+          !transporterNumberPlate
+        ) {
+          return new yup.ValidationError(
+            "La plaque d'immatriculation est requise"
+          );
+        }
+
+        return true;
+      }),
     transporterCompanyName: yup
       .string()
       .ensure()

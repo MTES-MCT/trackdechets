@@ -38,9 +38,6 @@ const getValidationSchema = (today: Date) =>
       .string()
       .nullable()
       .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
-    transporterNumberPlate: yup
-      .string()
-      .required("La plaque d'immatriculation est requise"),
   });
 interface SignTransportFormModalProps {
   title: string;

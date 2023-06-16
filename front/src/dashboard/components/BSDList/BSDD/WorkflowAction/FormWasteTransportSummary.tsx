@@ -92,7 +92,7 @@ export function FormWasteTransportSummary({
     );
 
   useEffect(() => {
-    if (!form.transporter?.numberPlate) {
+    if (form.transporter?.mode === "ROAD" && !form.transporter?.numberPlate) {
       addField("transporterNumberPlate");
     }
   }, [form]);
