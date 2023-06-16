@@ -124,6 +124,7 @@ describe("Query.bsds workflow", () => {
           type: "PRODUCER"
         },
         transporter: {
+          numberPlate: "TRANSPORTER-PLATE",
           company: {
             siret: transporter.company.siret,
             name: "JM TRANSPORT",
