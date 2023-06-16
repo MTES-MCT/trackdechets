@@ -95,7 +95,6 @@ const validationSchema = (form: TdForm, today: Date) => {
       .max(today, "La date d'acceptation ne peut être dans le futur")
       // we only care about the day, not the exact time
       .transform(value => {
-        console.log("value", value);
         startOfDay(value);
       }),
   });
