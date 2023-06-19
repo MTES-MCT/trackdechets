@@ -12,9 +12,10 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Status } from "@prisma/client";
+import { EmitterType, Status } from "@prisma/client";
 import { NON_CANCELLABLE_BSDD_STATUSES } from "../createFormRevisionRequest";
 import { MARK_AS_SEALED, SIGN_EMISSION_FORM } from "./mutations";
+import getReadableId from "../../../readableId";
 
 const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
   mutation SubmitFormRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
@@ -733,4 +734,66 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       );
     }
   );
+
+  it("should edit appendix 1 details when revision is accepted on container", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const appendix1_item = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.RECEIVED,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        transporterCompanySiret: company.siret,
+        wasteDetailsCode: "15 01 10*",
+        owner: { connect: { id: user.id } }
+      }
+    });
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.RECEIVED,
+        emitterType: EmitterType.APPENDIX1,
+        emitterCompanySiret: company.siret,
+        emitterCompanyName: company.name,
+        transporterCompanySiret: company.siret,
+        recipientCompanySiret: company.siret,
+        grouping: {
+          create: { initialFormId: appendix1_item.id, quantity: 0 }
+        }
+      }
+    });
+
+    const newWasteCode = "19 08 10*";
+    expect(appendix1_item.wasteDetailsCode).not.toBe(newWasteCode);
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        wasteDetailsCode: newWasteCode,
+        comment: "Change waste code on appendix1 container"
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedAppendix1 = await prisma.form.findUniqueOrThrow({
+      where: { id: appendix1_item.id }
+    });
+    expect(updatedAppendix1.wasteDetailsCode).toBe(newWasteCode);
+  });
 });

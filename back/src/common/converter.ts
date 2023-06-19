@@ -83,7 +83,7 @@ export function chain<T, K>(
   if (o === undefined) {
     return undefined;
   }
-  return getter(o as NonNullable<T>); // TODO remove "as" when strictNullCheck is turned on
+  return getter(o);
 }
 
 /**
