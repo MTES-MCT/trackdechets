@@ -218,61 +218,79 @@ describe("transporterSchema", () => {
     );
   });
 
-  // TODO -TODO -TODO -TODO -TODO -TODO -TODO -TODO -TODO
+  describe("Emitter transports own waste", () => {
+    it("allowed if dangerous waste <= 100kg", async () => {
+      const emitterAndTransporter = await companyFactory({
+        companyTypes: ["PRODUCER"]
+      });
 
-  // describe.only("Emitter transports own waste", () => {
-  //   it("allowed if dangerous waste <= 100kg", async () => {
-  //     const bsff = {
-  //       ...transporterData,
-  //       transporterCompanySiret: transporterData.emitterCompanySiret,
-  //       wasteDetailsCode: "16 06 01*",
-  //       wasteDetailsQuantity: 0.1
-  //     };
-  //     const isValid = transporterSchema.isValid(bsff);
+      const bsff = {
+        ...transporterData,
+        emitterCompanySiret: emitterAndTransporter.siret,
+        transporterCompanySiret: emitterAndTransporter.siret,
+        wasteDetailsCode: "16 06 01*",
+        wasteDetailsQuantity: 0.1
+      };
+      const isValid = transporterSchema.isValid(bsff);
 
-  //     expect(isValid).toBeTruthy();
-  //   });
+      expect(isValid).toBeTruthy();
+    });
 
-  //   it("allowed if non-dangerous waste <= 500kg", async () => {
-  //     const bsff = {
-  //       ...transporterData,
-  //       transporterCompanySiret: transporterData.emitterCompanySiret,
-  //       wasteDetailsCode: "18 01 01",
-  //       wasteDetailsQuantity: 0.5
-  //     };
-  //     const isValid = transporterSchema.isValid(bsff);
+    it("allowed if non-dangerous waste <= 500kg", async () => {
+      const emitterAndTransporter = await companyFactory({
+        companyTypes: ["PRODUCER"]
+      });
 
-  //     expect(isValid).toBeTruthy();
-  //   });
+      const bsff = {
+        ...transporterData,
+        emitterCompanySiret: emitterAndTransporter.siret,
+        transporterCompanySiret: emitterAndTransporter.siret,
+        wasteDetailsCode: "18 01 01",
+        wasteDetailsQuantity: 0.5
+      };
+      const isValid = transporterSchema.isValid(bsff);
 
-  //   it("not allowed if dangerous waste > 100kg", async () => {
-  //     const bsff = {
-  //       ...transporterData,
-  //       transporterCompanySiret: transporterData.emitterCompanySiret,
-  //       wasteDetailsCode: "16 06 01*",
-  //       wasteDetailsQuantity: 0.101
-  //     };
-  //     const validateFn = () => transporterSchema.validate(bsff);
+      expect(isValid).toBeTruthy();
+    });
 
-  //     await expect(validateFn()).rejects.toThrow(
-  //       "Si vous transportez vos propres déchets, vous ne pouvez transporter que 100kg de déchets dangereux maximum."
-  //     );
-  //   });
+    it("not allowed if dangerous waste > 100kg", async () => {
+      const emitterAndTransporter = await companyFactory({
+        companyTypes: ["PRODUCER"]
+      });
 
-  //   it("not allowed if non-dangerous waste > 500kg", async () => {
-  //     const bsff = {
-  //       ...transporterData,
-  //       transporterCompanySiret: transporterData.emitterCompanySiret,
-  //       wasteDetailsCode: "18 01 01",
-  //       wasteDetailsQuantity: 0.501
-  //     };
-  //     const validateFn = () => transporterSchema.validate(bsff);
+      const bsff = {
+        ...transporterData,
+        emitterCompanySiret: emitterAndTransporter.siret,
+        transporterCompanySiret: emitterAndTransporter.siret,
+        wasteDetailsCode: "16 06 01*",
+        wasteDetailsQuantity: 0.101
+      };
+      const validateFn = () => transporterSchema.validate(bsff);
 
-  //     await expect(validateFn()).rejects.toThrow(
-  //       "Si vous transportez vos propres déchets, vous ne pouvez transporter que 500kg de déchets non dangereux maximum."
-  //     );
-  //   });
-  // });
+      await expect(validateFn()).rejects.toThrow(
+        "Si vous transportez vos propres déchets, vous ne pouvez transporter que 100kg de déchets dangereux maximum."
+      );
+    });
+
+    it("not allowed if non-dangerous waste > 500kg", async () => {
+      const emitterAndTransporter = await companyFactory({
+        companyTypes: ["PRODUCER"]
+      });
+
+      const bsff = {
+        ...transporterData,
+        emitterCompanySiret: emitterAndTransporter.siret,
+        transporterCompanySiret: emitterAndTransporter.siret,
+        wasteDetailsCode: "18 01 01",
+        wasteDetailsQuantity: 0.501
+      };
+      const validateFn = () => transporterSchema.validate(bsff);
+
+      await expect(validateFn()).rejects.toThrow(
+        "Si vous transportez vos propres déchets, vous ne pouvez transporter que 500kg de déchets non dangereux maximum."
+      );
+    });
+  });
 });
 
 describe("destinationSchema", () => {

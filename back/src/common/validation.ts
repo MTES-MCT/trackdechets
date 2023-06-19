@@ -211,8 +211,13 @@ export const siretTests: SiretTests = {
           transporterCompanySiret,
           emitterCompanySiret,
           wasteDetailsCode,
-          wasteDetailsQuantity
+          wasteCode,
+          wasteDetailsQuantity,
+          wasteValue
         } = ctx.parent;
+
+        const bsdWasteCode = wasteCode ?? wasteDetailsCode;
+        const bsdWasteValue = wasteValue ?? wasteDetailsQuantity;
 
         const isTransportingOwnWastes =
           transporterCompanySiret &&
@@ -226,8 +231,8 @@ export const siretTests: SiretTests = {
         // Emitter transports own waste
         if (isTransportingOwnWastes && isEmitterTypeOk) {
           // Dangerous waste. Up to 100kg
-          if (isDangerous(wasteDetailsCode)) {
-            if (wasteDetailsQuantity > 0.1) {
+          if (isDangerous(bsdWasteCode)) {
+            if (bsdWasteValue > 0.1) {
               return ctx.createError({
                 message:
                   "Si vous transportez vos propres déchets, vous ne pouvez transporter que 100kg de déchets dangereux maximum."
@@ -235,7 +240,7 @@ export const siretTests: SiretTests = {
             }
           } else {
             // Non-dangerous waste. 500kg max
-            if (wasteDetailsQuantity > 0.5) {
+            if (bsdWasteValue > 0.5) {
               return ctx.createError({
                 message:
                   "Si vous transportez vos propres déchets, vous ne pouvez transporter que 500kg de déchets non dangereux maximum."
