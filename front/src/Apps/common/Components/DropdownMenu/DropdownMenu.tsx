@@ -34,7 +34,10 @@ const DropdownMenu = ({
             "menu-btn__iconAlone": iconAlone,
           })}
           disabled={isDisabled}
-          onClick={onClick}
+          onClick={e => {
+            setIsOpen(false);
+            onClick();
+          }}
         >
           {menuTitle}
         </button>

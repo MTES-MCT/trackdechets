@@ -111,6 +111,17 @@ export function prismaJsonNoNull<I>(value: I) {
   return value;
 }
 
+/**
+ * Returns null if the value is an empty string.
+ * Otherwise returns the value.
+ */
+export function noEmptyString(
+  value: string | null | undefined
+): string | null | undefined {
+  if (value === "") return null;
+  return value;
+}
+
 type MaybeDateParam = Date | string | undefined | null;
 /**
  *
