@@ -33,9 +33,13 @@ export default async function duplicate(
 }
 
 async function duplicateBsda({
+  // values that should not be duplicated
   id,
   createdAt,
   updatedAt,
+  isDraft,
+  isDeleted,
+  status,
   emitterEmissionSignatureAuthor,
   emitterEmissionSignatureDate,
   emitterCustomInfo,
@@ -61,23 +65,18 @@ async function duplicateBsda({
   groupedInId,
   intermediaries,
   intermediariesOrgIds,
-  emitterCompanySiret,
-  destinationCompanySiret,
-  transporterCompanySiret,
-  transporterCompanyVatNumber,
-  brokerCompanySiret,
-  workerCompanySiret,
+  // values that should be duplicated
   ...bsda
 }: Bsda & {
   intermediaries: IntermediaryBsdaAssociation[];
 }): Promise<Prisma.BsdaCreateInput> {
   const companiesOrgIds: string[] = [
-    emitterCompanySiret,
-    transporterCompanySiret,
-    transporterCompanyVatNumber,
-    brokerCompanySiret,
-    workerCompanySiret,
-    destinationCompanySiret
+    bsda.emitterCompanySiret,
+    bsda.transporterCompanySiret,
+    bsda.transporterCompanyVatNumber,
+    bsda.brokerCompanySiret,
+    bsda.workerCompanySiret,
+    bsda.destinationCompanySiret
   ].filter(Boolean);
 
   // Batch call all companies involved
@@ -95,30 +94,25 @@ async function duplicateBsda({
   });
 
   const emitter = companies.find(
-    company => company.orgId === emitterCompanySiret
+    company => company.orgId === bsda.emitterCompanySiret
   );
   const destination = companies.find(
-    company => company.orgId === destinationCompanySiret
+    company => company.orgId === bsda.destinationCompanySiret
   );
   const broker = companies.find(
-    company => company.orgId === brokerCompanySiret
+    company => company.orgId === bsda.brokerCompanySiret
   );
   const transporter = companies.find(
     company =>
-      company.orgId === transporterCompanySiret ||
-      company.orgId === transporterCompanyVatNumber
+      company.orgId === bsda.transporterCompanySiret ||
+      company.orgId === bsda.transporterCompanyVatNumber
   );
   const worker = companies.find(
-    company => company.orgId === workerCompanySiret
+    company => company.orgId === bsda.workerCompanySiret
   );
 
   return {
     ...bsda,
-    emitterCompanySiret,
-    transporterCompanySiret,
-    transporterCompanyVatNumber,
-    brokerCompanySiret,
-    workerCompanySiret,
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
     isDraft: true,
