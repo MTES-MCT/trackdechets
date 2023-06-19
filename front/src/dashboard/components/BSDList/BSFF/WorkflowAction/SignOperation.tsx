@@ -32,6 +32,7 @@ import { BsffPackagingSummary } from "./BsffPackagingSummary";
 import { OPERATION } from "form/bsff/utils/constants";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { companySchema } from "common/validation/schema";
+import { subMonths } from "date-fns";
 
 const operationCode = yup
   .string()
@@ -299,7 +300,7 @@ export function SignBsffOperationOnePackagingModalContent({
         {({ values, setValues }) => (
           <Form>
             <div className="form__row">
-              <label className="tw-font-semibold">
+              <label>
                 Date du traitement
                 <div className="td-date-wrapper">
                   <Field
@@ -307,6 +308,8 @@ export function SignBsffOperationOnePackagingModalContent({
                     name="date"
                     component={DateInput}
                     maxDate={TODAY}
+                    minDate={subMonths(TODAY, 2)}
+                    required
                   />
                 </div>
               </label>
