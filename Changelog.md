@@ -11,8 +11,13 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout du caractère dangereux du déchet au registre (champ `wasteIsDangerous` sur les différents objets `IncomingWaste`, `OutgoingWaste`, etc). Cela se traduit par l'ajout d'une colonne "Déchet Dangereux" O/N dans les exports CSV et XLXS [PR 2467](https://github.com/MTES-MCT/trackdechets/pull/2467)
 - Ajout d'un champ `userPermissions` sur l'objet `CompanyPrivate` qui permet de lister les permissions d'un utilisateur sur un établissement [PR 2554](https://github.com/MTES-MCT/trackdechets/pull/2454).
+- Ajout d'un type Annexe 1 sur le PDF de bordereaux d'annexe [PR 2472](https://github.com/MTES-MCT/trackdechets/pull/2472)
+- Après 3 jours, si une annexe 1 fait parti d'un bordereau chapeau qui a reçu des signatures, ces annexes 1 sont automatiquement supprimées [PR 2472](https://github.com/MTES-MCT/trackdechets/pull/2472)
 
 #### :bug: Corrections de bugs
+
+- Lorsqu'une révision est acceptée sur un bordereau chapeau d'annexe 1, les modifications sont répercutéres sur les annexes 1 [PR 2472](https://github.com/MTES-MCT/trackdechets/pull/2472)
+- Le mode pipeline n'est plus proposé sur les annexes 1 [PR 2472](https://github.com/MTES-MCT/trackdechets/pull/2472)
 
 #### :boom: Breaking changes
 
