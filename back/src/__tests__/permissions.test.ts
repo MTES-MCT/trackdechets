@@ -31,9 +31,37 @@ describe("roles permissions", () => {
   );
 
   test.each([UserRole.ADMIN, UserRole.MEMBER])(
-    "%p should have BsdCanSign permission",
+    "%p should have BsdCanSignEmission permission",
     async role => {
-      expect(can(role, Permission.BsdCanSign)).toEqual(true);
+      expect(can(role, Permission.BsdCanSignEmission)).toEqual(true);
+    }
+  );
+
+  test.each([UserRole.ADMIN, UserRole.MEMBER])(
+    "%p should have BsdCanSignWork permission",
+    async role => {
+      expect(can(role, Permission.BsdCanSignWork)).toEqual(true);
+    }
+  );
+
+  test.each([UserRole.ADMIN, UserRole.MEMBER])(
+    "%p should have BsdCanSignTransport permission",
+    async role => {
+      expect(can(role, Permission.BsdCanSignTransport)).toEqual(true);
+    }
+  );
+
+  test.each([UserRole.ADMIN, UserRole.MEMBER])(
+    "%p should have BsdCanSignAcceptation permission",
+    async role => {
+      expect(can(role, Permission.BsdCanSignAcceptation)).toEqual(true);
+    }
+  );
+
+  test.each([UserRole.ADMIN, UserRole.MEMBER])(
+    "%p should have BsdCanSignOperation permission",
+    async role => {
+      expect(can(role, Permission.BsdCanSignOperation)).toEqual(true);
     }
   );
 

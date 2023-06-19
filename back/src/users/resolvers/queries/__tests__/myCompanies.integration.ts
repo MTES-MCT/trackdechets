@@ -38,12 +38,15 @@ const MY_COMPANIES = gql`
         cursor
         node {
           id
+          siret
           givenName
           name
           users {
             email
             name
           }
+          userRole
+          userPermissions
         }
       }
     }
@@ -428,4 +431,27 @@ describe("query { myCompanies }", () => {
     expect(userNames?.length).toBe(1);
     expect(userNames).toStrictEqual([member.name]);
   }, 20000);
+  it("should return userRole and userPermissions", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "myCompanies">>(MY_COMPANIES);
+    expect(data.myCompanies.edges).toHaveLength(1);
+    expect(data.myCompanies.edges[0].node.siret).toEqual(company.siret);
+    expect(data.myCompanies.edges[0].node.userRole).toEqual("MEMBER");
+    expect(data.myCompanies.edges[0].node.userPermissions).toEqual([
+      "BSD_CAN_READ",
+      "BSD_CAN_LIST",
+      "COMPANY_CAN_READ",
+      "REGISTRY_CAN_READ",
+      "BSD_CAN_CREATE",
+      "BSD_CAN_UPDATE",
+      "BSD_CAN_SIGN_EMISSION",
+      "BSD_CAN_SIGN_WORK",
+      "BSD_CAN_SIGN_TRANSPORT",
+      "BSD_CAN_SIGN_ACCEPTATION",
+      "BSD_CAN_SIGN_OPERATION",
+      "BSD_CAN_DELETE",
+      "BSD_CAN_REVISE"
+    ]);
+  });
 });

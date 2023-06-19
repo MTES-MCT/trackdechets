@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout du caractère dangereux du déchet au registre (champ `wasteIsDangerous` sur les différents objets `IncomingWaste`, `OutgoingWaste`, etc). Cela se traduit par l'ajout d'une colonne "Déchet Dangereux" O/N dans les exports CSV et XLXS [PR 2467](https://github.com/MTES-MCT/trackdechets/pull/2467)
+- Ajout d'un champ `userPermissions` sur l'objet `CompanyPrivate` qui permet de lister les permissions d'un utilisateur sur un établissement [PR 2554](https://github.com/MTES-MCT/trackdechets/pull/2454).
 
 #### :bug: Corrections de bugs
 
