@@ -61,11 +61,7 @@ import {
 } from "../generated/graphql/types";
 import prisma from "../prisma";
 import { extractPostalCode } from "../utils";
-import {
-  getFirstTransporter,
-  getFirstTransporterSync,
-  getTransporters
-} from "./database";
+import { getFirstTransporterSync, getTransporters } from "./database";
 import { RawForm } from "./elastic";
 
 function flattenDestinationInput(input: {
