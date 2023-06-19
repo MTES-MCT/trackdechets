@@ -9,7 +9,12 @@ import {
 } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { client, BsdElastic, index } from "../../../common/elastic";
+import {
+  client,
+  BsdElastic,
+  index,
+  groupByBsdType
+} from "../../../common/elastic";
 import { Bsdasri } from "@prisma/client";
 import prisma from "../../../prisma";
 import { expandFormFromElastic } from "../../../forms/converter";
@@ -54,13 +59,15 @@ type PrismaBsdMap = {
  * Convert a list of BsdElastic to a mapping of prisma-like Bsds by retrieving rawBsd elastic field
  */
 async function toRawBsds(bsdsElastic: BsdElastic[]): Promise<PrismaBsdMap> {
-  return bsdsElastic.reduce<PrismaBsdMap>(
-    (acc, bsdElastic) => ({
-      ...acc,
-      [bsdElastic.type]: [...acc[bsdElastic.type], bsdElastic?.rawBsd]
-    }),
-    { bsdds: [], bsdasris: [], bsvhus: [], bsdas: [], bsffs: [] }
-  );
+  const { BSDD, BSDA, BSDASRI, BSFF, BSVHU } = groupByBsdType(bsdsElastic);
+
+  return {
+    bsdds: BSDD.map(bsdElastic => bsdElastic.rawBsd as RawForm),
+    bsdasris: BSDASRI.map(bsdsElastic => bsdsElastic.rawBsd as RawBsdasri),
+    bsvhus: BSVHU.map(bsdElastic => bsdElastic.rawBsd as RawBsvhu),
+    bsdas: BSDA.map(bsdElastic => bsdElastic.rawBsd as RawBsda),
+    bsffs: BSFF.map(bsdsElastic => bsdsElastic.rawBsd as RawBsff)
+  };
 }
 
 async function buildQuery(

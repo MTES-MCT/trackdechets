@@ -16,7 +16,6 @@ import {
   safeInput,
   undefinedOrDefault
 } from "../common/converter";
-import { BsdElastic } from "../common/elastic";
 import {
   InitialForm,
   Broker,

@@ -8,7 +8,6 @@ import {
   nullIfAllNull
 } from "../common/converter";
 import * as GraphQL from "../generated/graphql/types";
-import { BsdElastic } from "../common/elastic";
 import { BsffPackaging, BsffPackagingType } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { RawBsff } from "./elastic";

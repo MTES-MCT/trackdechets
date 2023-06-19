@@ -11,9 +11,7 @@ import {
 } from "../generated/graphql/types";
 import { GenericWaste } from "../registry/types";
 import { extractPostalCode } from "../utils";
-import { formToBsdd } from "./compat";
 import { Bsdd } from "./types";
-import { RegistryForm } from "../registry/elastic";
 
 type RegistryFields =
   | "isIncomingWasteFor"

@@ -38,7 +38,6 @@ import {
   chain,
   undefinedOrDefault
 } from "../common/converter";
-import { BsdElastic } from "../common/elastic";
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";

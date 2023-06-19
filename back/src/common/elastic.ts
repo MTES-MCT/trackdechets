@@ -3,8 +3,6 @@ import path from "path";
 import { Client, RequestParams } from "@elastic/elasticsearch";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
-import prisma from "../prisma";
-import { Bsda, Bsdasri, Bsff, Bsvhu, Form, Prisma } from "@prisma/client";
 import logger from "../logging/logger";
 import { BsdType, FormCompany } from "../generated/graphql/types";
 import { RawForm } from "../forms/elastic";
