@@ -143,9 +143,9 @@ export async function getTransporters(
   return transporters ?? [];
 }
 
-export function getTransportersSync(
-  form: Form & { transporters: BsddTransporter[] | null }
-): BsddTransporter[] {
+export function getTransportersSync(form: {
+  transporters: BsddTransporter[] | null;
+}): BsddTransporter[] {
   return form.transporters ?? [];
 }
 
@@ -157,9 +157,9 @@ export async function getFirstTransporter(
   return firstTransporter ?? null;
 }
 
-export function getFirstTransporterSync(
-  form: Form & { transporters: BsddTransporter[] | null }
-): BsddTransporter | null {
+export function getFirstTransporterSync(form: {
+  transporters: BsddTransporter[] | null;
+}): BsddTransporter | null {
   const transporters = getTransportersSync(form);
   const [firstTransporter] = transporters.filter(t => t.number === 1);
   return firstTransporter ?? null;

@@ -61,7 +61,11 @@ import {
 } from "../generated/graphql/types";
 import prisma from "../prisma";
 import { extractPostalCode } from "../utils";
-import { getFirstTransporter, getFirstTransporterSync } from "./database";
+import {
+  getFirstTransporter,
+  getFirstTransporterSync,
+  getTransporters
+} from "./database";
 import { RawForm } from "./elastic";
 
 function flattenDestinationInput(input: {
@@ -536,48 +540,59 @@ export function expandTransporterFromDb(
 }
 
 /**
- * Expand form data from db
- * Overlaoded function to handle prisma and elastic bsds
+ * Prisma form with optional computed fields
  */
-export async function expandFormFromDb(form: RawForm): Promise<GraphQLForm>;
+type PrismaFormLike = Form & { forwardedIn?: PrismaFormLike | null } & {
+  transporters?: BsddTransporter[] | null;
+};
+
+/**
+ * Expand form data from db. Depending on the calling context,
+ * certain related fields may be already computed or not. For example when
+ * this function is called on a RawForm stored in Elasticsearch.
+ * An optional data loader for `forwardedIn` may also be passed
+ */
 export async function expandFormFromDb(
-  form: PrismaForm,
-  dataloader?: DataLoader<string, Form | null, string>
-): Promise<GraphQLForm>;
-export async function expandFormFromDb(
-  form: any,
-  dataloader?: DataLoader<string, Form | null, string>
+  form: PrismaFormLike,
+  forwardedInLoader?: DataLoader<string, Form | null, string>
 ): Promise<GraphQLForm> {
-  let forwardedIn: Form | null;
+  let forwardedIn: PrismaFormLike | null;
   // if form is rawBsd, forwardedIn is already computed
-  if (form?.forwardedIn) {
+  if (form.forwardedIn) {
     forwardedIn = form.forwardedIn;
-  } else {
+  } else if (forwardedInLoader) {
     // id form is Form, get forwardedIn from db
-    forwardedIn = form.forwardedInId
-      ? dataloader
-        ? await dataloader.load(form.id)
-        : await prisma.form
-            .findUnique({ where: { id: form.id } })
-            .forwardedIn({ include: { transporters: true } })
-      : null;
+    forwardedIn = await forwardedInLoader.load(form.id);
+  } else {
+    forwardedIn = await prisma.form
+      .findUnique({ where: { id: form.id } })
+      .forwardedIn({ include: { transporters: true } });
   }
 
-  const transporter = form["transporters"]
-    ? getFirstTransporterSync(form) // avoid retrieving transporters twice if it is already passed
-    : await getFirstTransporter(form);
+  let transporters: BsddTransporter[];
 
-  let forwardedInTransporter: BsddTransporter | null = null;
+  if (form.transporters) {
+    // avoid retrieving transporters twice if it is already passed
+    transporters = form.transporters;
+  } else {
+    transporters = await getTransporters(form);
+  }
+
+  const transporter = getFirstTransporterSync({ transporters }); // avoid retrieving transporters twice if it is already passed
+
+  let forwardedInTransporters: BsddTransporter[] = [];
 
   if (forwardedIn) {
-    if (forwardedIn["transporters"]) {
-      forwardedInTransporter = await getFirstTransporterSync(
-        forwardedIn as any
-      ); // avoid retrieving transporters twice if it is already passed
+    if (forwardedIn.transporters) {
+      forwardedInTransporters = forwardedIn.transporters;
     } else {
-      forwardedInTransporter = await getFirstTransporter(forwardedIn);
+      forwardedInTransporters = await getTransporters(forwardedIn);
     }
   }
+
+  const forwardedInTransporter = getFirstTransporterSync({
+    transporters: forwardedInTransporters
+  });
 
   return {
     id: form.id,

@@ -33,9 +33,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
       ]
     },
     include: {
-      forwardedIn: {
-        select: { id: true, quantityReceived: true }
-      },
+      forwardedIn: true,
       groupedIn: true
     }
   });
