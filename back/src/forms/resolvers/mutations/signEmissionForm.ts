@@ -1,4 +1,4 @@
-import { EmitterType, Form, Status } from "@prisma/client";
+import { EmitterType, Form, Prisma, Status } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
@@ -6,7 +6,12 @@ import {
   Form as GraphQLForm
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getFormOrFormNotFound, getFullForm } from "../../database";
+import {
+  getFirstTransporter,
+  getFirstTransporterSync,
+  getFormOrFormNotFound,
+  getFullForm
+} from "../../database";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { checkCanSignFor } from "../../permissions";
@@ -57,7 +62,9 @@ const signatures: Partial<
       );
     }
 
-    const formUpdateInput = {
+    const transporter = await getFirstTransporter(existingForm);
+
+    const formUpdateInput: Prisma.FormUpdateInput = {
       wasteDetailsPackagingInfos:
         prismaJsonNoNull(args.input.packagingInfos) ??
         prismaJsonNoNull(existingForm.wasteDetailsPackagingInfos),
@@ -65,10 +72,16 @@ const signatures: Partial<
         args.input.quantity ?? existingForm.wasteDetailsQuantity,
       wasteDetailsOnuCode:
         args.input.onuCode ?? existingForm.wasteDetailsOnuCode,
-      transporterNumberPlate:
-        args.input.transporterNumberPlate ??
-        existingForm.transporterNumberPlate,
-
+      transporters: {
+        updateMany: {
+          where: { number: 1 },
+          data: {
+            transporterNumberPlate:
+              args.input.transporterNumberPlate ??
+              transporter?.transporterNumberPlate
+          }
+        }
+      },
       emittedAt: args.input.emittedAt,
       emittedBy: args.input.emittedBy,
       emittedByEcoOrganisme: args.input.emittedByEcoOrganisme ?? false,
@@ -105,7 +118,8 @@ const signatures: Partial<
     );
 
     const existingFullForm = await getFullForm(existingForm);
-    const formUpdateInput = {
+    const transporter = getFirstTransporterSync(existingFullForm.forwardedIn!);
+    const formUpdateInput: Prisma.FormUpdateInput = {
       forwardedIn: {
         update: {
           status: Status.SIGNED_BY_PRODUCER,
@@ -123,9 +137,18 @@ const signatures: Partial<
             args.input.onuCode ??
             existingFullForm.forwardedIn?.wasteDetailsOnuCode ??
             existingFullForm.wasteDetailsOnuCode,
-          transporterNumberPlate:
-            args.input.transporterNumberPlate ??
-            existingFullForm.forwardedIn?.transporterNumberPlate,
+          ...(transporter && args.input.transporterNumberPlate
+            ? {
+                transporters: {
+                  update: {
+                    where: { id: transporter.id },
+                    data: {
+                      transporterNumberPlate: args.input.transporterNumberPlate
+                    }
+                  }
+                }
+              }
+            : {}),
 
           emittedAt: args.input.emittedAt,
           emittedBy: args.input.emittedBy
@@ -136,11 +159,14 @@ const signatures: Partial<
       ...existingFullForm,
       forwardedIn: {
         ...existingFullForm.forwardedIn,
-        ...formUpdateInput.forwardedIn.update
+        ...(formUpdateInput.forwardedIn?.update ?? {})
       }
     };
 
-    await wasteDetailsSchema.validate(futureFullForm.forwardedIn);
+    await wasteDetailsSchema.validate({
+      ...futureFullForm.forwardedIn,
+      ...transporter
+    });
 
     const updatedForm = await getFormRepository(user).update(
       { id: existingForm.id },

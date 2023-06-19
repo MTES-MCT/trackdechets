@@ -3,6 +3,7 @@ import { BsdElastic } from "../common/elastic";
 import { FullForm } from "./types";
 
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getFirstTransporterSync } from "./database";
 
 /**
  * Computes which SIRET or VAT number should appear on which tab in the frontend
@@ -37,8 +38,9 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
   // we build a mapping where each key has to be unique.
   // Same siret can be used by different actors on the same form, so we can't use them as keys.
   // Instead we rely on field names and segments ids
-  const multimodalTransportersBySegmentId = form.transportSegments?.reduce(
-    (acc, segment) => {
+  const multimodalTransportersBySegmentId = (form.transporters ?? [])
+    .filter(t => t.number && t.number > 1)
+    .reduce((acc, segment) => {
       if (!!getTransporterCompanyOrgId(segment)) {
         return {
           ...acc,
@@ -46,9 +48,7 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
         };
       }
       return acc;
-    },
-    {}
-  );
+    }, {});
 
   const intermediarySiretsReducer = form.intermediaries?.reduce(
     (acc, intermediary) => {
@@ -63,12 +63,14 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
     {}
   );
 
+  const transporter = getFirstTransporterSync(form);
+
   const formSirets =
     form.emitterType === EmitterType.APPENDIX1_PRODUCER
       ? {
           // Appendix 1 only appears in the dashboard for emitters & transporters
           emitterCompanySiret: form.emitterCompanySiret,
-          transporterCompanySiret: getTransporterCompanyOrgId(form)
+          transporterCompanySiret: getTransporterCompanyOrgId(transporter)
         }
       : {
           emitterCompanySiret: form.emitterCompanySiret,
@@ -76,12 +78,12 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
           forwardedInDestinationCompanySiret:
             form.forwardedIn?.recipientCompanySiret,
           forwardedInTransporterCompanySiret: getTransporterCompanyOrgId(
-            form.forwardedIn
+            form.forwardedIn ? getFirstTransporterSync(form.forwardedIn) : null
           ),
           traderCompanySiret: form.traderCompanySiret,
           brokerCompanySiret: form.brokerCompanySiret,
           ecoOrganismeSiret: form.ecoOrganismeSiret,
-          transporterCompanySiret: getTransporterCompanyOrgId(form),
+          transporterCompanySiret: getTransporterCompanyOrgId(transporter),
           ...multimodalTransportersBySegmentId,
           ...intermediarySiretsReducer
         };
@@ -139,19 +141,20 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
     }
     case Status.SENT: {
       setFieldTab("recipientCompanySiret", "isForActionFor");
-
       // whether or not this BSD has been handed over by transporter n°1
       let hasBeenHandedOver = false;
 
-      form.transportSegments?.forEach(segment => {
-        if (segment.readyToTakeOver) {
-          hasBeenHandedOver = hasBeenHandedOver || !!segment.takenOverAt;
-          setFieldTab(
-            segment.id,
-            segment.takenOverAt ? "isCollectedFor" : "isToCollectFor"
-          );
-        }
-      });
+      form.transporters
+        ?.filter(t => t.number && t.number >= 2)
+        .forEach(segment => {
+          if (segment.readyToTakeOver) {
+            hasBeenHandedOver = hasBeenHandedOver || !!segment.takenOverAt;
+            setFieldTab(
+              segment.id,
+              segment.takenOverAt ? "isCollectedFor" : "isToCollectFor"
+            );
+          }
+        });
 
       if (!hasBeenHandedOver) {
         setFieldTab("transporterCompanySiret", "isCollectedFor");

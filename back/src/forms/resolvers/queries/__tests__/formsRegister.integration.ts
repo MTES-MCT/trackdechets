@@ -41,7 +41,15 @@ async function recipientFormFactory(ownerId: string, siret: string) {
 async function transporterFormFactory(ownerId: string, siret: string) {
   const form = await formFactory({
     ownerId,
-    opt: { transporterCompanySiret: siret, sentAt: new Date() }
+    opt: {
+      sentAt: new Date(),
+      transporters: {
+        create: {
+          transporterCompanySiret: siret,
+          number: 1
+        }
+      }
+    }
   });
   await indexForm(await getFullForm(form));
   return form;

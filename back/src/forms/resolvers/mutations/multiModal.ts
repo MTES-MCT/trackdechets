@@ -47,7 +47,7 @@ const SEGMENTS_ALREADY_PREPARED =
   "Il y a d'autres segments après le vôtre, vous ne pouvez pas ajouter de segment";
 
 const segmentSchema = yup.object<any>().shape({
-  mode: yup.string().label("Mode de transport").required(),
+  transporterTransportMode: yup.string().label("Mode de transport").required(),
   transporterCompanySiret: siret
     .label("Transporteur")
     .test(siretTests.isRegistered("TRANSPORTER"))
@@ -105,7 +105,7 @@ const formWithOwnerIdAndTransportSegments = Prisma.validator<Prisma.FormArgs>()(
   {
     include: {
       owner: { select: { id: true } },
-      transportSegments: { select: { mode: true } }
+      transporters: { select: { transporterTransportMode: true } }
     }
   }
 );
@@ -153,12 +153,12 @@ export async function prepareSegment(
   if (!form) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
-  const transportSegments = await prisma.transportSegment.findMany({
+  const transportSegments = await prisma.bsddTransporter.findMany({
     where: {
       form: { id: id }
     },
     orderBy: {
-      segmentNumber: "asc"
+      number: "asc"
     }
   });
 
@@ -194,6 +194,7 @@ export async function prepareSegment(
   const lastSegment = !!transportSegments.length
     ? transportSegments.slice(-1)[0]
     : null;
+
   if (
     !!lastSegment &&
     (!lastSegment.takenOverAt ||
@@ -204,26 +205,24 @@ export async function prepareSegment(
     throw new ForbiddenError(SEGMENTS_ALREADY_PREPARED);
   }
 
-  const segmentInput = {
+  const segmentInput: Prisma.BsddTransporterCreateWithoutFormInput = {
     ...nextSegmentPayload,
     previousTransporterCompanyOrgId: orgId,
-    segmentNumber: transportSegments.length + 1 // additional segments begin at index 1
+    number: transportSegments.length + 1 // additional segments begin at index 1
   };
   await formRepository.update(
     { id },
     {
       nextTransporterOrgId: nextSegmentPayloadOrgId,
-      transportSegments: {
-        create: {
-          ...segmentInput
-        }
+      transporters: {
+        create: segmentInput
       }
     },
     { prepareSegment: true }
   );
 
-  const segment = await prisma.transportSegment.findFirstOrThrow({
-    where: { segmentNumber: transportSegments.length + 1, form: { id: id } }
+  const segment = await prisma.bsddTransporter.findFirstOrThrow({
+    where: { number: transportSegments.length + 1, form: { id: id } }
   });
   return expandTransportSegmentFromDb(segment);
 }
@@ -234,7 +233,7 @@ export async function markSegmentAsReadyToTakeOver(
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
-  const currentSegment = await prisma.transportSegment.findUnique({
+  const currentSegment = await prisma.bsddTransporter.findUnique({
     where: { id },
     include: {
       form: {
@@ -285,7 +284,7 @@ export async function markSegmentAsReadyToTakeOver(
   await formRepository.update(
     { id: currentSegment.form.id },
     {
-      transportSegments: {
+      transporters: {
         update: { where: { id }, data: { readyToTakeOver: true } }
       }
     }
@@ -316,7 +315,7 @@ export async function takeOverSegment(
     );
   }
 
-  const currentSegment = await prisma.transportSegment.findUnique({
+  const currentSegment = await prisma.bsddTransporter.findUnique({
     where: { id },
     include: {
       form: {
@@ -371,7 +370,7 @@ export async function takeOverSegment(
     {
       currentTransporterOrgId: getTransporterCompanyOrgId(currentSegment),
       nextTransporterOrgId: "",
-      transportSegments: {
+      transporters: {
         update: {
           where: { id },
           data: takeOverInfo
@@ -402,7 +401,7 @@ export async function editSegment(
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
-  const currentSegment = await prisma.transportSegment.findUnique({
+  const currentSegment = await prisma.bsddTransporter.findUnique({
     where: { id },
     include: {
       form: {
@@ -498,7 +497,7 @@ export async function editSegment(
     { id: currentSegment.form.id },
     {
       nextTransporterOrgId: nextSegmentPayloadOrgId,
-      transportSegments: {
+      transporters: {
         update: {
           where: { id },
           data: nextSegmentPayload

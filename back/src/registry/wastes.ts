@@ -1,8 +1,7 @@
-import { toPrismaBsds } from "../common/elastic";
 import { tov1ReadableId } from "../forms/compat";
 import { WasteRegistryType } from "../generated/graphql/types";
 import { toWastes } from "./converters";
-import { searchBsds } from "./elastic";
+import { searchBsds, toPrismaBsds } from "./elastic";
 import { getElasticPaginationArgs } from "./pagination";
 import {
   QueryWastesArgs,
@@ -50,25 +49,7 @@ async function getWasteConnection<WasteType extends GenericWaste>(
   const hits = searchHits.hits.slice(0, size);
 
   const bsds = await toPrismaBsds(
-    searchHits.hits.map(hit => hit._source).filter(Boolean),
-    {
-      BSDD: {
-        forwarding: true,
-        grouping: { include: { initialForm: true } },
-        transportSegments: true
-      },
-      BSDA: { grouping: true, forwarding: true },
-      BSDASRI: { grouping: true },
-      BSFF: {
-        packagings: {
-          include: {
-            previousPackagings: {
-              include: { bsff: true }
-            }
-          }
-        }
-      }
-    }
+    searchHits.hits.map(hit => hit._source).filter(Boolean)
   );
 
   const wastes = toWastes<WasteType>(registryType, bsds);

@@ -12,10 +12,10 @@ const buildDeleteFormStaleSegments: (
 
   const staleSegments = await prisma.form
     .findUnique({ where })
-    .transportSegments({ where: { takenOverAt: null } });
+    .transporters({ where: { takenOverAt: null, number: { gte: 2 } } });
 
   if (staleSegments && staleSegments.length > 0) {
-    await prisma.transportSegment.deleteMany({
+    await prisma.bsddTransporter.deleteMany({
       where: { id: { in: staleSegments.map(s => s.id) } }
     });
   }

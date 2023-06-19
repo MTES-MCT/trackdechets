@@ -12,6 +12,10 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { xDaysAgo } from "../../../../commands/onboarding.helpers";
+import {
+  getFirstTransporter,
+  getFirstTransporterSync
+} from "../../../database";
 
 const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
@@ -27,6 +31,10 @@ const DUPLICATE_FORM = `
 
 const TODAY = new Date();
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
+
+function sortFn(a: string, b: string) {
+  return a.localeCompare(b);
+}
 
 async function createForm(opt: Partial<Prisma.FormCreateInput> = {}) {
   const emitter = await userWithCompanyFactory("MEMBER");
@@ -78,15 +86,7 @@ async function createForm(opt: Partial<Prisma.FormCreateInput> = {}) {
       emitterCompanyContact: emitter.company.contact,
       emitterCompanyPhone: emitter.company.contactPhone,
       emitterCompanyMail: emitter.company.contactEmail,
-      transporterCompanySiret: transporter.company.siret,
-      transporterCompanyName: transporter.company.name,
-      transporterCompanyAddress: transporter.company.address,
-      transporterCompanyContact: transporter.company.contact,
-      transporterCompanyPhone: transporter.company.contactPhone,
-      transporterCompanyMail: transporter.company.contactEmail,
-      transporterReceipt: transporterReceipt.receiptNumber,
-      transporterDepartment: transporterReceipt.department,
-      transporterValidityLimit: transporterReceipt.validityLimit,
+
       recipientCompanySiret: recipient.company.siret,
       recipientCompanyName: recipient.company.name,
       recipientCompanyAddress: recipient.company.address,
@@ -111,6 +111,22 @@ async function createForm(opt: Partial<Prisma.FormCreateInput> = {}) {
       traderReceipt: traderReceipt.receiptNumber,
       traderDepartment: traderReceipt.department,
       traderValidityLimit: traderReceipt.validityLimit,
+      transporters: {
+        create: {
+          transporterCompanySiret: transporter.company.siret,
+          transporterCompanyName: transporter.company.name,
+          transporterCompanyAddress: transporter.company.address,
+          transporterCompanyContact: transporter.company.contact,
+          transporterCompanyPhone: transporter.company.contactPhone,
+          transporterCompanyMail: transporter.company.contactEmail,
+          transporterReceipt: transporterReceipt.receiptNumber,
+          transporterDepartment: transporterReceipt.department,
+          transporterValidityLimit: transporterReceipt.validityLimit,
+          transporterNumberPlate: "AB-1234-56",
+          transporterCustomInfo: "T001",
+          number: 1
+        }
+      },
       ...opt
     }
   });
@@ -131,23 +147,11 @@ describe("Mutation.duplicateForm", () => {
   });
   afterEach(() => resetDatabase());
 
-  it.each([
-    [
-      "",
-      {
-        transporterNumberPlate: "AB-1234-56",
-        transporterCustomInfo: "T001"
-      }
-    ],
-    [
-      "with an eco-organisme",
-      {
-        ecoOrganismeName: "COREPILE",
-        ecoOrganismeSiret: siretify(1)
-      }
-    ]
-  ])("should duplicate a form %s", async (_, opt) => {
-    const { form, emitter } = await createForm(opt);
+  it("should duplicate a form %s", async () => {
+    const { form, emitter } = await createForm({
+      ecoOrganismeName: "COREPILE",
+      ecoOrganismeSiret: siretify(1)
+    });
 
     const {
       id,
@@ -176,18 +180,6 @@ describe("Mutation.duplicateForm", () => {
       recipientCompanyPhone,
       recipientCompanyMail,
       recipientIsTempStorage,
-      transporterCompanyName,
-      transporterCompanySiret,
-      transporterCompanyAddress,
-      transporterCompanyContact,
-      transporterCompanyPhone,
-      transporterCompanyMail,
-      transporterCompanyVatNumber,
-      transporterReceipt,
-      transporterDepartment,
-      transporterValidityLimit,
-      transporterTransportMode,
-      transporterIsExemptedOfReceipt,
       wasteDetailsCode,
       wasteDetailsOnuCode,
       wasteDetailsPackagingInfos,
@@ -224,10 +216,28 @@ describe("Mutation.duplicateForm", () => {
       ...rest
     } = form;
 
+    const transporter = await getFirstTransporter({ id });
+
+    const {
+      transporterCompanyName,
+      transporterCompanySiret,
+      transporterCompanyAddress,
+      transporterCompanyContact,
+      transporterCompanyPhone,
+      transporterCompanyMail,
+      transporterCompanyVatNumber,
+      transporterReceipt,
+      transporterDepartment,
+      transporterValidityLimit,
+      transporterTransportMode,
+      transporterIsExemptedOfReceipt,
+      number,
+      ...restTransporter
+    } = transporter!;
+
     const expectedSkipped = [
       "createdAt",
       "updatedAt",
-      "transporterNumberPlate",
       "readableId",
       "status",
       "emittedBy",
@@ -262,7 +272,6 @@ describe("Mutation.duplicateForm", () => {
       "nextDestinationCompanyCountry",
       "nextDestinationCompanyVatNumber",
       "nextDestinationNotificationNumber",
-      "transporterCustomInfo",
       "signedAt",
       "currentTransporterOrgId",
       "nextTransporterOrgId",
@@ -276,9 +285,27 @@ describe("Mutation.duplicateForm", () => {
       "forwardedIn"
     ];
 
+    const expectedSkippedTransporter = [
+      "createdAt",
+      "updatedAt",
+      "formId",
+      "id",
+      "transporterNumberPlate",
+      "previousTransporterCompanyOrgId",
+      "readyToTakeOver",
+      "takenOverAt",
+      "takenOverBy",
+      "transporterCustomInfo"
+    ];
+
     // make sure this test breaks when a new field is added to the Form model
     // it will ensure we think of adding necessary fields to the duplicate input
-    expect(Object.keys(rest).sort()).toEqual(expectedSkipped.sort());
+    expect(Object.keys(rest).sort(sortFn)).toEqual(
+      expectedSkipped.sort(sortFn)
+    );
+    expect(Object.keys(restTransporter).sort(sortFn)).toEqual(
+      expectedSkippedTransporter.sort(sortFn)
+    );
 
     const { mutate } = makeClient(emitter.user);
     const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
@@ -291,8 +318,11 @@ describe("Mutation.duplicateForm", () => {
     );
 
     const duplicatedForm = await prisma.form.findUnique({
-      where: { id: data.duplicateForm.id }
+      where: { id: data.duplicateForm.id },
+      include: { transporters: true }
     });
+
+    const duplicatedTransporter = await getFirstTransporter(duplicatedForm!);
 
     expect(duplicatedForm).toMatchObject({
       emitterType,
@@ -320,18 +350,6 @@ describe("Mutation.duplicateForm", () => {
       recipientCompanyPhone,
       recipientCompanyMail,
       recipientIsTempStorage,
-      transporterCompanyName,
-      transporterCompanySiret,
-      transporterCompanyAddress,
-      transporterCompanyContact,
-      transporterCompanyPhone,
-      transporterCompanyMail,
-      transporterCompanyVatNumber,
-      transporterReceipt,
-      transporterDepartment,
-      transporterValidityLimit,
-      transporterTransportMode,
-      transporterIsExemptedOfReceipt,
       wasteDetailsCode,
       wasteDetailsOnuCode,
       wasteDetailsPackagingInfos,
@@ -366,6 +384,22 @@ describe("Mutation.duplicateForm", () => {
       ecoOrganismeName,
       ecoOrganismeSiret
     });
+
+    expect(duplicatedTransporter).toMatchObject({
+      number,
+      transporterCompanyName,
+      transporterCompanySiret,
+      transporterCompanyAddress,
+      transporterCompanyContact,
+      transporterCompanyPhone,
+      transporterCompanyMail,
+      transporterCompanyVatNumber,
+      transporterReceipt,
+      transporterDepartment,
+      transporterValidityLimit,
+      transporterTransportMode,
+      transporterIsExemptedOfReceipt
+    });
   });
 
   it("should duplicate the temporary storage detail", async () => {
@@ -390,6 +424,9 @@ describe("Mutation.duplicateForm", () => {
         recipientCompanyMail: destination.contactEmail
       }
     });
+    const forwardedIn = await prisma.form
+      .findUniqueOrThrow({ where: { id: form.id } })
+      .forwardedIn({ include: { transporters: true } });
     const {
       emitterType,
       emitterCompanyName,
@@ -414,9 +451,7 @@ describe("Mutation.duplicateForm", () => {
       wasteDetailsName,
       wasteDetailsConsistence,
       ...rest
-    } = await prisma.form
-      .findUniqueOrThrow({ where: { id: form.id } })
-      .forwardedIn();
+    } = forwardedIn;
 
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
@@ -430,15 +465,20 @@ describe("Mutation.duplicateForm", () => {
     const duplicatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: data.duplicateForm.id }
     });
-    const duplicatedForwardedIn = await prisma.form
-      .findUnique({
+    const {
+      transporters: duplicatedForwardedInTransporters,
+      ...duplicatedForwardedIn
+    } = await prisma.form
+      .findUniqueOrThrow({
         where: {
           id: duplicatedForm.id
         }
       })
-      .forwardedIn();
+      .forwardedIn({ include: { transporters: true } });
 
     expect(duplicatedForm.recipientIsTempStorage).toBe(true);
+    // transporter after temp storage should not be duplicated
+    expect(duplicatedForwardedInTransporters).toEqual([]);
     expect(duplicatedForwardedIn).toMatchObject({
       readableId: `${duplicatedForm.readableId}-suite`,
       emitterType,
@@ -477,7 +517,6 @@ describe("Mutation.duplicateForm", () => {
       "id",
       "createdAt",
       "updatedAt",
-      "transporterNumberPlate",
       "readableId",
       "status",
       "recipientIsTempStorage",
@@ -499,18 +538,6 @@ describe("Mutation.duplicateForm", () => {
       "traderDepartment",
       "traderReceipt",
       "traderValidityLimit",
-      "transporterCompanyAddress",
-      "transporterCompanyContact",
-      "transporterCompanyMail",
-      "transporterCompanyName",
-      "transporterCompanyPhone",
-      "transporterCompanySiret",
-      "transporterCompanyVatNumber",
-      "transporterDepartment",
-      "transporterIsExemptedOfReceipt",
-      "transporterReceipt",
-      "transporterTransportMode",
-      "transporterValidityLimit",
       "wasteDetailsAnalysisReferences",
       "wasteDetailsLandIdentifiers",
       "wasteDetailsParcelNumbers",
@@ -549,7 +576,6 @@ describe("Mutation.duplicateForm", () => {
       "nextDestinationCompanyCountry",
       "nextDestinationCompanyVatNumber",
       "nextDestinationNotificationNumber",
-      "transporterCustomInfo",
       "signedAt",
       "currentTransporterOrgId",
       "nextTransporterOrgId",
@@ -570,12 +596,15 @@ describe("Mutation.duplicateForm", () => {
       "brokerReceipt",
       "brokerValidityLimit",
       "ecoOrganismeName",
-      "ecoOrganismeSiret"
+      "ecoOrganismeSiret",
+      "transporters"
     ];
 
     // make sure this test breaks when a new field is added to the Form model
     // it will ensure we think of adding necessary fields to the duplicate forwardedIn input
-    expect(Object.keys(rest).sort()).toEqual(expectedSkipped.sort());
+    expect(Object.keys(rest).sort(sortFn)).toEqual(
+      expectedSkipped.sort(sortFn)
+    );
   });
 
   it("should create a status log", async () => {
@@ -779,8 +808,11 @@ describe("Mutation.duplicateForm", () => {
       }
     );
     const duplicatedForm = await prisma.form.findUniqueOrThrow({
-      where: { id: data.duplicateForm.id }
+      where: { id: data.duplicateForm.id },
+      include: { transporters: true }
     });
+
+    const duplicatedTransporter = getFirstTransporterSync(duplicatedForm);
 
     expect(duplicatedForm.emitterCompanyName).toEqual("UPDATED-EMITTER-NAME");
     expect(duplicatedForm.emitterCompanyAddress).toEqual(
@@ -792,27 +824,29 @@ describe("Mutation.duplicateForm", () => {
     expect(duplicatedForm.emitterCompanyMail).toEqual("UPDATED-EMITTER-MAIL");
     expect(duplicatedForm.emitterCompanyPhone).toEqual("UPDATED-EMITTER-PHONE");
 
-    expect(duplicatedForm.transporterCompanyName).toEqual(
+    expect(duplicatedTransporter?.transporterCompanyName).toEqual(
       "UPDATED-TRANSPORTER-NAME"
     );
-    expect(duplicatedForm.transporterCompanyAddress).toEqual(
+    expect(duplicatedTransporter?.transporterCompanyAddress).toEqual(
       "UPDATED-TRANSPORTER-ADDRESS"
     );
-    expect(duplicatedForm.transporterCompanyContact).toEqual(
+    expect(duplicatedTransporter?.transporterCompanyContact).toEqual(
       "UPDATED-TRANSPORTER-CONTACT"
     );
-    expect(duplicatedForm.transporterCompanyMail).toEqual(
+    expect(duplicatedTransporter?.transporterCompanyMail).toEqual(
       "UPDATED-TRANSPORTER-MAIL"
     );
-    expect(duplicatedForm.transporterCompanyPhone).toEqual(
+    expect(duplicatedTransporter?.transporterCompanyPhone).toEqual(
       "UPDATED-TRANSPORTER-PHONE"
     );
 
-    expect(duplicatedForm.transporterReceipt).toEqual(
+    expect(duplicatedTransporter?.transporterReceipt).toEqual(
       "UPDATED-TRANSPORTER-RECEIPT-NUMBER"
     );
-    expect(duplicatedForm.transporterValidityLimit).toEqual(FOUR_DAYS_AGO);
-    expect(duplicatedForm.transporterDepartment).toEqual(
+    expect(duplicatedTransporter?.transporterValidityLimit).toEqual(
+      FOUR_DAYS_AGO
+    );
+    expect(duplicatedTransporter?.transporterDepartment).toEqual(
       "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
     );
 

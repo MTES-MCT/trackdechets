@@ -531,7 +531,12 @@ describe("Query.bsds edge cases", () => {
       ownerId: emitter.user.id,
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: recipientAndTransporter.company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: recipientAndTransporter.company.siret,
+            number: 1
+          }
+        },
         recipientCompanySiret: recipientAndTransporter.company.siret,
         status: "SENT"
       }

@@ -56,7 +56,12 @@ async function checkTransporterPermission(
   const { user, company } = await userWithCompanyFactory("MEMBER");
   const form = await formFactory({
     ownerId: owner.id,
-    opt: { transporterCompanySiret: company.siret, status: formStatus }
+    opt: {
+      status: formStatus,
+      transporters: {
+        create: { transporterCompanySiret: company.siret, number: 1 }
+      }
+    }
   });
   return permission(user, form);
 }
@@ -113,7 +118,16 @@ async function checkTransporterAfterTempStoragePermission(
   await prisma.form.update({
     where: { id: form.id },
     data: {
-      forwardedIn: { update: { transporterCompanySiret: company.siret } }
+      forwardedIn: {
+        update: {
+          transporters: {
+            updateMany: {
+              where: { number: 1 },
+              data: { transporterCompanySiret: company.siret }
+            }
+          }
+        }
+      }
     }
   });
   return permission(user, form);
@@ -152,10 +166,11 @@ async function checkMultiModalTransporterPermission(
       status: formStatus
     }
   });
-  await prisma.transportSegment.create({
+  await prisma.bsddTransporter.create({
     data: {
       form: { connect: { id: form.id } },
-      transporterCompanySiret: company.siret
+      transporterCompanySiret: company.siret,
+      number: 2
     }
   });
   return permission(user, form);

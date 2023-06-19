@@ -8,9 +8,9 @@ import {
   nullIfAllNull
 } from "../common/converter";
 import * as GraphQL from "../generated/graphql/types";
-import { BsdElastic } from "../common/elastic";
 import { BsffPackaging, BsffPackagingType } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { RawBsff } from "./elastic";
 
 function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter | null }) {
   return {
@@ -366,14 +366,13 @@ export function expandBsffPackagingFromDB(
   };
 }
 
-export function expandBsffFromElastic(
-  bsff: BsdElastic["rawBsd"]
-): GraphQL.Bsff {
+export function expandBsffFromElastic(bsff: RawBsff): GraphQL.Bsff {
   const expanded = expandBsffFromDB(bsff);
 
+  // pass down related field to sub-resolvers
   return {
     ...expanded,
-    packagings: bsff.packagings
+    packagings: []
   };
 }
 

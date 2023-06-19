@@ -1,4 +1,10 @@
-import { EmitterType, Form, Status, User } from "@prisma/client";
+import {
+  BsddTransporter,
+  EmitterType,
+  Form,
+  Status,
+  User
+} from "@prisma/client";
 import { ForbiddenError } from "apollo-server-core";
 import {
   CreateFormInput,
@@ -12,7 +18,11 @@ import {
   can
 } from "../permissions";
 import prisma from "../prisma";
-import { getFullForm } from "./database";
+import {
+  getFirstTransporter,
+  getFirstTransporterSync,
+  getFullForm
+} from "./database";
 import { getReadOnlyFormRepository } from "./repository";
 import { checkSecurityCode } from "../common/permissions";
 import { FullForm } from "./types";
@@ -36,6 +46,12 @@ function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
   const updateFinalDestinationCompanySiret =
     input?.temporaryStorageDetail?.destination?.company?.siret;
 
+  const transporter = getFirstTransporterSync(form);
+  let forwardedInTransporter: BsddTransporter | null = null;
+  if (form.forwardedIn) {
+    forwardedInTransporter = getFirstTransporterSync(form.forwardedIn);
+  }
+
   const emitterCompanySiret =
     updateEmitterCompanySiret !== undefined
       ? updateEmitterCompanySiret
@@ -49,12 +65,12 @@ function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
   const transporterCompanySiret =
     updateTransporterCompanySiret !== undefined
       ? updateTransporterCompanySiret
-      : form.transporterCompanySiret;
+      : transporter?.transporterCompanySiret;
 
   const transporterCompanyVatNumber =
     updateTransporterCompanyVatNumber !== undefined
       ? updateTransporterCompanyVatNumber
-      : form.transporterCompanyVatNumber;
+      : transporter?.transporterCompanyVatNumber;
 
   const traderCompanySiret =
     updateTraderCompanySiret !== undefined
@@ -73,8 +89,8 @@ function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
 
   const bsdSuiteOrgIds = form.forwardedIn
     ? [
-        form.forwardedIn.transporterCompanySiret,
-        form.forwardedIn.transporterCompanyVatNumber,
+        forwardedInTransporter?.transporterCompanySiret,
+        forwardedInTransporter?.transporterCompanyVatNumber,
         updateFinalDestinationCompanySiret !== undefined
           ? updateFinalDestinationCompanySiret
           : form.forwardedIn.recipientCompanySiret
@@ -88,7 +104,7 @@ function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
       ? form.intermediaries.flatMap(i => [i.siret, i.vatNumber])
       : [];
 
-  const multiModalTransporters = (form.transportSegments ?? []).map(
+  const multiModalTransporters = (form.transporters ?? []).map(
     s => s.transporterCompanySiret
   );
 
@@ -131,8 +147,8 @@ function formCreators(input: CreateFormInput): string[] {
 function formReaders(form: FullForm & { grouping: Form[] }): string[] {
   return [
     ...formContributors(form),
-    ...(form.transportSegments
-      ? form.transportSegments.map(s => s.transporterCompanySiret)
+    ...(form.transporters
+      ? form.transporters.map(s => s.transporterCompanySiret)
       : []),
     ...(form.grouping ? form.grouping.map(f => f.emitterCompanySiret) : [])
   ].filter(Boolean);
@@ -187,6 +203,8 @@ export async function checkCanUpdate(
 
   const fullForm = await getFullForm(form);
 
+  const transporter = getFirstTransporterSync(fullForm);
+
   let authorizedOrgIds: string[] = [];
   let errorMsg = "Vous n'êtes pas autorisé à modifier ce bordereau";
 
@@ -199,7 +217,7 @@ export async function checkCanUpdate(
     const updatedFields = await getUpdatedFields(form, input);
     if (form.emitterType === EmitterType.APPENDIX1_PRODUCER) {
       // Le transporteur peut modifier les données de l'annexe 1 jusqu'à sa signature
-      authorizedOrgIds = [form.transporterCompanySiret].filter(Boolean);
+      authorizedOrgIds = [transporter?.transporterCompanySiret].filter(Boolean);
     } else if (updatedFields.every(f => editionRules[f] === "TRANSPORT")) {
       // Les infos de transport peuvent être modifiées par tous les acteurs
       // du BSDD tant que le déchet n'a pas été enlevé
@@ -302,13 +320,17 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
     );
   }
 
-  const { forwardedIn } = await getFullForm(form);
+  const { forwardedIn, ...fullForm } = await getFullForm(form);
+  const transporter = getFirstTransporterSync(fullForm);
+  const forwardedInTransporter = forwardedIn
+    ? getFirstTransporterSync(forwardedIn)
+    : null;
 
   const authorizedOrgIds = [
-    form.transporterCompanySiret,
-    form.transporterCompanyVatNumber,
-    forwardedIn?.transporterCompanySiret,
-    forwardedIn?.transporterCompanyVatNumber
+    transporter?.transporterCompanySiret,
+    transporter?.transporterCompanyVatNumber,
+    forwardedInTransporter?.transporterCompanySiret,
+    forwardedInTransporter?.transporterCompanyVatNumber
   ].filter(Boolean);
 
   return checkUserPermissions(
@@ -339,9 +361,11 @@ export async function checkCanSignFor(
 }
 
 export async function checkCanUpdateTransporterFields(user: User, form: Form) {
+  const transporter = await getFirstTransporter(form);
+
   const authorizedOrgIds = [
-    form.transporterCompanySiret,
-    form.transporterCompanyVatNumber
+    transporter?.transporterCompanySiret,
+    transporter?.transporterCompanyVatNumber
   ].filter(Boolean);
 
   return checkUserPermissions(
