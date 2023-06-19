@@ -36,53 +36,42 @@ import TdTooltip from "common/components/Tooltip";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";
 import { subMonths } from "date-fns";
 
-const getValidationSchema = (today: Date) =>
-  yup.object({
-    numero: yup.string(),
-    analysisWasteCode: yup.string().required(),
-    analysisWasteDescription: yup.string().required(),
-    acceptationDate: yup
-      .date()
-      .required("La date d'acceptation est requise")
-      .max(today, "La date d'acceptation ne peut être dans le futur")
-      .min(
-        subMonths(today, 2),
-        "La date d'acceptation ne peut être antérieure à 2 mois"
-      ),
-    acceptationStatus: yup
-      .string()
-      .oneOf([
-        "",
-        null,
-        WasteAcceptationStatus.Accepted,
-        WasteAcceptationStatus.Refused,
-      ]),
-    acceptationWeight: yup
-      .number()
-      .required()
-      .when("acceptationStatus", {
-        is: value => value === WasteAcceptationStatus.Refused,
-        then: schema =>
-          schema.max(
-            0,
-            "La quantité reçue doit être égale à 0 en cas de refus"
-          ),
-        otherwise: schema =>
-          schema.moreThan(0, "Vous devez saisir une quantité supérieure à 0"),
-      }),
-    acceptationRefusalReason: yup.string().when("acceptationStatus", {
+const validationSchema = yup.object({
+  numero: yup.string(),
+  analysisWasteCode: yup.string().required(),
+  analysisWasteDescription: yup.string().required(),
+  acceptationDate: yup.date().required("La date d'acceptation est requise"),
+  acceptationStatus: yup
+    .string()
+    .oneOf([
+      "",
+      null,
+      WasteAcceptationStatus.Accepted,
+      WasteAcceptationStatus.Refused,
+    ]),
+  acceptationWeight: yup
+    .number()
+    .required()
+    .when("acceptationStatus", {
       is: value => value === WasteAcceptationStatus.Refused,
       then: schema =>
-        schema
-          .ensure()
-          .min(1, "Le motif du refus doit être complété en cas de refus"),
-      otherwise: schema => schema.nullable(),
+        schema.max(0, "La quantité reçue doit être égale à 0 en cas de refus"),
+      otherwise: schema =>
+        schema.moreThan(0, "Vous devez saisir une quantité supérieure à 0"),
     }),
-    signatureAuthor: yup
-      .string()
-      .ensure()
-      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-  });
+  acceptationRefusalReason: yup.string().when("acceptationStatus", {
+    is: value => value === WasteAcceptationStatus.Refused,
+    then: schema =>
+      schema
+        .ensure()
+        .min(1, "Le motif du refus doit être complété en cas de refus"),
+    otherwise: schema => schema.nullable(),
+  }),
+  signatureAuthor: yup
+    .string()
+    .ensure()
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+});
 
 interface SignBsffAcceptationOnePackagingProps {
   bsffId: string;
@@ -190,7 +179,6 @@ export function SignBsffAcceptationOnePackagingModalContent({
   >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   const TODAY = new Date();
-  const validationSchema = getValidationSchema(TODAY);
 
   const loading = updateBsffPackagingResult.loading || signBsffResult.loading;
   const error = updateBsffPackagingResult.error ?? signBsffResult.error;

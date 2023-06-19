@@ -16,21 +16,13 @@ import { GET_BSDS } from "Apps/common/queries";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 
-const getValidationSchema = (today: Date) =>
-  yup.object({
-    date: yup
-      .date()
-      .required("La date d'émission est requise")
-      .max(today, "La date d'émission ne peut être dans le futur")
-      .min(
-        subMonths(today, 2),
-        "La date d'émission ne peut être antérieure à 2 mois"
-      ),
-    signatureAuthor: yup
-      .string()
-      .ensure()
-      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-  });
+const validationSchema = yup.object({
+  date: yup.date().required("La date d'émission est requise"),
+  signatureAuthor: yup
+    .string()
+    .ensure()
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+});
 
 interface SignEmissionFormProps {
   bsff: Bsff;
@@ -51,7 +43,7 @@ function SignEmissionForm({ bsff, onCancel }: SignEmissionFormProps) {
         signatureAuthor: "",
         date: TODAY,
       }}
-      validationSchema={getValidationSchema(TODAY)}
+      validationSchema={validationSchema}
       onSubmit={async values => {
         await signBsff({
           variables: {
