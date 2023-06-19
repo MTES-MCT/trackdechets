@@ -4,7 +4,7 @@ import Packagings from "form/bsdasri/components/packagings/Packagings";
 import WeightWidget from "form/bsdasri/components/Weight";
 import { useParams, useHistory, generatePath } from "react-router-dom";
 import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
 
 import {
@@ -20,11 +20,14 @@ import getInitialState, {
   getInitialWeightFn,
 } from "form/bsdasri/utils/initial-state";
 
-import { GET_DETAIL_DASRI } from "common/queries";
-import { InlineError, NotificationError } from "common/components/Error";
+import { GET_DETAIL_DASRI } from "Apps/common/queries";
+import {
+  InlineError,
+  NotificationError,
+} from "Apps/common/Components/Error/Error";
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
 import { Formik, Field, Form } from "formik";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { removeSections } from "./PartialForms";
 import {
   SIGN_BSDASRI_EMISSION_WITH_SECRET_CODE,

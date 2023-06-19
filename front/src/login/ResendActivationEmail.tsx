@@ -4,7 +4,7 @@ import {
   Mutation,
   MutationResendActivationEmailArgs,
 } from "generated/graphql/types";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { Captcha, useCaptcha } from "common/components/captcha";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";

@@ -7,4 +7,5 @@ export type BsdCurrentTab =
   | "actTab"
   | "toCollectTab"
   | "followTab"
-  | "archivesTab";
+  | "archivesTab"
+  | "reviewsTab";

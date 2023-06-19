@@ -1,7 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { Modal } from "common/components";
 import SideMenu from "common/components/SideMenu";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { RouteControlPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/RouteControlPdf";
 import { RoutePublishBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
 import { RouteSignBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
@@ -22,7 +22,7 @@ import {
   useLocation,
   useParams,
 } from "react-router-dom";
-import Loader from "../../common/components/Loaders";
+import Loader from "../common/Components/Loader/Loaders";
 import { RouteBsdsReview } from "../../dashboard/bsds/review";
 import { ExtraSignatureType } from "../../dashboard/components/BSDList/BSDasri/types";
 import { RouteBsdaRequestRevision } from "../../dashboard/components/RevisionRequestList/bsda/request";

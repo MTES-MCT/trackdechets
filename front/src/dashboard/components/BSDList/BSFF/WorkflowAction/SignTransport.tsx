@@ -11,10 +11,10 @@ import {
   TransportMode,
 } from "generated/graphql/types";
 import { RedErrorMessage } from "common/components";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS } from "Apps/common/queries";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 import { subMonths } from "date-fns";

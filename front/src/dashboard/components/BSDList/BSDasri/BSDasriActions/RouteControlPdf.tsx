@@ -6,10 +6,10 @@ import {
 } from "generated/graphql/types";
 import QRCodeIcon from "react-qr-code";
 import { useMutation, gql } from "@apollo/client";
-import { Loader } from "common/components";
+import { Loader } from "Apps/common/Components";
 
 import { useParams, useHistory } from "react-router-dom";
-import { InlineError } from "common/components/Error";
+import { InlineError } from "Apps/common/Components/Error/Error";
 
 import cogoToast from "cogo-toast";
 

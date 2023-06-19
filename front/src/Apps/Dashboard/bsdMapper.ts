@@ -12,7 +12,7 @@ import {
   BsdStatusCode,
   BsdTypename,
   TBsdStatusCode,
-} from "../Common/types/bsdTypes";
+} from "../common/types/bsdTypes";
 
 const mapBsdStatusToBsdStatusEnum = (status: string): TBsdStatusCode => {
   const bsdStatusCode = Object.values(BsdStatusCode).find(

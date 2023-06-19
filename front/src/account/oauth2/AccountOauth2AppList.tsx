@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery } from "@apollo/client";
-import { Loader } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { Query } from "generated/graphql/types";
 import AccountOauth2App from "./AccountOauth2App";
 import { MY_APPLICATIONS } from "./queries";

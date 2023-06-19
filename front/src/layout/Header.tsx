@@ -12,11 +12,11 @@ import { localAuthService } from "login/auth.service";
 import { IconProfile, IconLeftArrow, IconClose } from "common/components/Icons";
 import { AccountMenuContent } from "account/AccountMenu";
 import { useQuery, gql } from "@apollo/client";
-import Loader from "common/components/Loaders";
-import { InlineError } from "common/components/Error";
+import Loader from "Apps/common/Components/Loader/Loaders";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import { Query } from "generated/graphql/types";
 
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { DEVELOPERS_DOCUMENTATION_URL, MEDIA_QUERIES } from "common/config";
 import styles from "./Header.module.scss";
 import { useMedia } from "use-media";

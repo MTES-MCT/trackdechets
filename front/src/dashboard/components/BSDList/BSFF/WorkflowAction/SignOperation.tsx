@@ -16,20 +16,16 @@ import {
   BsffPackagingOperationInput,
   SignatureInput,
 } from "generated/graphql/types";
-import {
-  ActionButton,
-  Loader,
-  Modal,
-  RedErrorMessage,
-} from "common/components";
-import { NotificationError } from "common/components/Error";
+import { ActionButton, Modal, RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import {
   GET_BSFF_FORM,
   SIGN_BSFF,
   UPDATE_BSFF_PACKAGING,
 } from "form/bsff/utils/queries";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS } from "Apps/common/queries";
 import { IconCheckCircle1 } from "common/components/Icons";
 import { BsffSummary } from "./BsffSummary";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";

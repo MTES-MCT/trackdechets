@@ -1,7 +1,7 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import BsdAdditionalActionsButton from "./BsdAdditionalActionsButton";
-import { BsdDisplay, BsdStatusCode } from "Apps/Common/types/bsdTypes";
+import { BsdDisplay, BsdStatusCode } from "Apps/common/types/bsdTypes";
 import { BsdType, EmitterType } from "generated/graphql/types";
 
 const bsd = {

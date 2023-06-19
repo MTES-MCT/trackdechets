@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
-import { GET_BSDS } from "common/queries";
-import routes from "common/routes";
+import { GET_BSDS } from "Apps/common/queries";
+import routes from "Apps/routes";
 import { format, subMonths } from "date-fns";
 import { UPDATE_BSDA } from "form/bsda/stepper/queries";
 import Operation from "form/bsda/stepper/steps/Operation";

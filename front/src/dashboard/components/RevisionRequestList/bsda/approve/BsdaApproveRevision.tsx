@@ -15,7 +15,7 @@ import { useMutation } from "@apollo/client";
 import {
   GET_BSDA_REVISION_REQUESTS,
   SUBMIT_BSDA_REVISION_REQUEST_APPROVAL,
-} from "../query";
+} from "../../../../../Apps/common/queries/reviews/BsdaReviewQuery";
 import { Field, Form, Formik } from "formik";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { formatDate } from "common/datetime";

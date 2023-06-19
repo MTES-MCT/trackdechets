@@ -8,7 +8,7 @@ import bsdListDraft from "../../__mocks__/bsdListDraft.json";
 import bsdListActJson from "../../__mocks__/bsdListAct.json";
 import bsdListFollowJson from "../../__mocks__/bsdListFollow.json";
 import bsdListArchiveJson from "../../__mocks__/bsdListArchive.json";
-import { BsdCurrentTab } from "../../../Common/types/commonTypes";
+import { BsdCurrentTab } from "../../../common/types/commonTypes";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCardList",

@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useParams, useRouteMatch } from "react-router-dom";
 import { useLazyQuery, useQuery } from "@apollo/client";
-import routes from "../common/routes";
-import { GET_BSDS } from "../common/queries";
+import routes from "../Apps/routes";
+import { GET_BSDS } from "../Apps/common/queries";
 import { OrderType, Query, QueryBsdsArgs } from "generated/graphql/types";
 import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 import BsdCardList from "Apps/Dashboard/Components/BsdCardList/BsdCardList";
@@ -11,7 +11,7 @@ import {
   BlankslateTitle,
   BlankslateDescription,
   Loader,
-} from "common/components";
+} from "Apps/common/Components";
 import {
   blankstate_action_desc,
   blankstate_action_title,
@@ -25,16 +25,16 @@ import {
   filter_reset_btn,
   filter_show_btn,
   load_more_bsds,
-} from "Apps/Common/wordings/dashboard/wordingsDashboard";
+} from "Apps/common/wordings/dashboard/wordingsDashboard";
 import { IconDuplicateFile } from "common/components/Icons";
-import Filters from "Apps/Common/Components/Filters/Filters";
+import Filters from "Apps/common/Components/Filters/Filters";
 import {
   filterList,
   dropdownCreateLinks,
   filterPredicates,
 } from "../Apps/Dashboard/dashboardUtils";
-import BsdCreateDropdown from "../Apps/Common/Components/DropdownMenu/DropdownMenu";
-import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
+import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
+import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 
 import "./dashboard.scss";
 
@@ -43,6 +43,7 @@ const DashboardPage = () => {
   const isDraftTab = !!useRouteMatch(routes.dashboardv2.bsds.drafts);
   const isFollowTab = !!useRouteMatch(routes.dashboardv2.bsds.follow);
   const isArchivesTab = !!useRouteMatch(routes.dashboardv2.bsds.history);
+  const isReviewsTab = !!useRouteMatch(routes.dashboardv2.bsds.reviews);
   const isToCollectTab = !!useRouteMatch(
     routes.dashboardv2.transport.toCollect
   );
@@ -60,6 +61,9 @@ const DashboardPage = () => {
     }
     if (isArchivesTab) {
       return "archivesTab";
+    }
+    if (isReviewsTab) {
+      return "reviewsTab";
     }
     if (isToCollectTab) {
       return "toCollectTab";
@@ -267,7 +271,7 @@ const DashboardPage = () => {
     setIsFiltersOpen(!isFiltersOpen);
   };
 
-  const bsds = data?.bsds.edges;
+  const bsds = !isReviewsTab ? data?.bsds.edges : null;
 
   return (
     <div className="dashboard-page">
@@ -316,7 +320,7 @@ const DashboardPage = () => {
             />
           )}
 
-          {data?.bsds.pageInfo.hasNextPage && (
+          {!isReviewsTab && data?.bsds.pageInfo.hasNextPage && (
             <div className="dashboard-page__loadmore">
               <button
                 className="fr-btn"

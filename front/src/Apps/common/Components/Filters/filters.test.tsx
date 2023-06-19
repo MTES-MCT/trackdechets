@@ -4,7 +4,7 @@ import Filters from "./Filters";
 import {
   filter_type_apply_btn,
   filter_type_select_placeholder,
-} from "Apps/Common/wordings/dashboard/wordingsDashboard";
+} from "Apps/common/wordings/dashboard/wordingsDashboard";
 import { FilterType } from "./filtersTypes";
 
 describe("Filters component", () => {

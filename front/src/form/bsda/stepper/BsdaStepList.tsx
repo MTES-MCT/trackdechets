@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React, { lazy, ReactElement, useMemo } from "react";
 import { useHistory } from "react-router-dom";
-import { Loader } from "common/components";
-import { GET_BSDS } from "common/queries";
+import { Loader } from "Apps/common/Components";
+import { GET_BSDS } from "Apps/common/queries";
 import { getComputedState } from "form/common/getComputedState";
 
 import { IStepContainerProps } from "form/common/stepper/Step";

@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { fireEvent, waitFor, within } from "@testing-library/dom";
 import BsdCard from "./BsdCard";
 import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "generated/graphql/types";
-import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
+import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 import { MockedProvider } from "@apollo/client/testing";
 
 describe("Bsd card primary action label", () => {

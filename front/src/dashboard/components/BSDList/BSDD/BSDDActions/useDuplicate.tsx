@@ -1,8 +1,8 @@
 import { gql, MutationHookOptions, useMutation } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import { Mutation, MutationDuplicateFormArgs } from "generated/graphql/types";
-import { fullFormFragment } from "common/fragments";
-import { GET_BSDS } from "common/queries";
+import { fullFormFragment } from "Apps/common/queries/fragments";
+import { GET_BSDS } from "Apps/common/queries";
 
 const DUPLICATE_FORM = gql`
   mutation DuplicateForm($id: ID!) {

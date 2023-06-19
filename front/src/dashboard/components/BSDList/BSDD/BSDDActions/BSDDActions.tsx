@@ -6,7 +6,7 @@ import {
   useRouteMatch,
 } from "react-router-dom";
 
-import routes from "common/routes";
+import routes from "Apps/routes";
 import {
   IconAddCircle,
   IconDuplicateFile,
@@ -21,9 +21,9 @@ import { DeleteModal } from "./DeleteModal";
 import { useDuplicate } from "./useDuplicate";
 import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
-import { Loader } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { useDisplayRoadControlButton } from "../../RoadControlButton";
-import DropdownMenu from "Apps/Common/Components/DropdownMenu/DropdownMenu";
+import DropdownMenu from "Apps/common/Components/DropdownMenu/DropdownMenu";
 
 interface BSDDActionsProps {
   form: Form;

@@ -3,9 +3,9 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
 import { Query, QueryBsffArgs } from "generated/graphql/types";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { GET_BSFF_FORM } from "form/bsff/utils/queries";
-import { InlineError } from "common/components/Error";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
 
 import { BsffDetailContent } from "./BsffDetailContent";

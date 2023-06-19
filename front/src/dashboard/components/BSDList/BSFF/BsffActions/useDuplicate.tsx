@@ -1,7 +1,7 @@
 import { gql, MutationHookOptions, useMutation } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import { Mutation, MutationDuplicateBsdaArgs } from "generated/graphql/types";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS } from "Apps/common/queries";
 
 const DUPLICATE_BSFF = gql`
   mutation DuplicateBsff($id: ID!) {

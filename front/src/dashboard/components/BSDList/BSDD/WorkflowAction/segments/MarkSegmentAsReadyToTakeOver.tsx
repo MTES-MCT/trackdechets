@@ -6,14 +6,14 @@ import {
   Mutation,
   MutationMarkSegmentAsReadyToTakeOverArgs,
 } from "generated/graphql/types";
-import { segmentFragment } from "common/fragments";
+import { segmentFragment } from "Apps/common/queries/fragments";
 import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 import { IconPaperWrite } from "common/components/Icons";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { WorkflowActionProps } from "../WorkflowAction";
-import { GET_BSDS } from "common/queries";
-import { Loader } from "common/components";
+import { GET_BSDS } from "Apps/common/queries";
+import { Loader } from "Apps/common/Components";
 
 const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
   mutation markSegmentAsReadyToTakeOver($id: ID!) {

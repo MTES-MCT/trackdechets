@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { companyFragment } from "common/fragments";
+import { companyFragment } from "Apps/common/queries/fragments";
 
 const reviewFragment = gql`
   fragment BsdaRevisionRequestFragment on BsdaRevisionRequest {

@@ -2,7 +2,7 @@ import React from "react";
 import { generatePath, NavLink, useHistory } from "react-router-dom";
 import { CompanyPrivate, CompanyType } from "generated/graphql/types";
 import DashboardCompanySelector from "./DashboardCompanySelector";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import "./DashboardTabs.scss";
 
 interface DashboardTabsProps {

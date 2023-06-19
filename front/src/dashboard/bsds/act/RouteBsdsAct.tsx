@@ -1,13 +1,12 @@
 import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
+import { Breadcrumb, BreadcrumbItem } from "common/components";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   Blankslate,
   BlankslateImg,
   BlankslateTitle,
   BlankslateDescription,
-} from "common/components";
+} from "Apps/common/Components";
 import { BSDList } from "../../components/BSDList";
 import illustration from "./assets/blankslateAct.svg";
 

@@ -11,7 +11,6 @@ import {
 } from "generated/graphql/types";
 import { GET_PREVIOUS_PACKAGINGS } from "../utils/queries";
 import {
-  Loader,
   Table,
   TableBody,
   TableCell,
@@ -19,6 +18,7 @@ import {
   TableHeaderCell,
   TableRow,
 } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { OPERATION } from "../utils/constants";
 import { useTable, Column, useFilters } from "react-table";
 
