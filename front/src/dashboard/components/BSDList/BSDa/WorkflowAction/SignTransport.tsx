@@ -22,18 +22,13 @@ import { SignBsda, SIGN_BSDA } from "./SignBsda";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 
-const getValidationSchema = (today: Date) =>
-  yup.object({
-    date: yup
-      .date()
-      .required("La date est requise")
-      .max(today, "La date ne peut être dans le futur")
-      .min(subMonths(today, 2), "La date ne peut être antérieure à 2 mois"),
-    author: yup
-      .string()
-      .ensure()
-      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-  });
+const validationSchema = yup.object({
+  date: yup.date().required("La date est requise"),
+  author: yup
+    .string()
+    .ensure()
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+});
 
 type Props = {
   siret: string;
@@ -119,7 +114,7 @@ export function SignTransport({
                 bsda
               ),
             }}
-            validationSchema={getValidationSchema(TODAY)}
+            validationSchema={validationSchema}
             onSubmit={async values => {
               const { id, author, date, ...update } = values;
               await updateBsda({

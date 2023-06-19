@@ -184,7 +184,7 @@ export function RouteSignBsdasri({
           ...formState,
           signature: { author: "", date: TODAY },
         }}
-        validationSchema={() => signatureValidationSchema(bsdasri, TODAY)}
+        validationSchema={() => signatureValidationSchema}
         onSubmit={async values => {
           const { id, signature, ...rest } = values;
 

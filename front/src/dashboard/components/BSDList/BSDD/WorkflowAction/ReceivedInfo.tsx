@@ -72,7 +72,6 @@ const validationSchema = (form: TdForm, today: Date) => {
         startOfDay(parseDate(form.takenOverAt!)),
         "La date de réception du déchet ne peut pas être antérieure à sa date d'enlèvement."
       )
-      .max(today, "La date de réception du déchet ne peut être dans le futur")
       // we only care about the day, not the exact time
       .transform(value => startOfDay(parseDate(value))),
     receivedBy: yup
