@@ -14,6 +14,7 @@ import { expandFormFromDb } from "../../converter";
 import { wasteDetailsSchema } from "../../validation";
 import { getFormRepository } from "../../repository";
 import { prismaJsonNoNull } from "../../../common/converter";
+import { Permission } from "../../../permissions";
 
 const signatures: Partial<
   Record<
@@ -41,6 +42,7 @@ const signatures: Partial<
       await checkCanSignFor(
         existingForm.ecoOrganismeSiret!,
         user,
+        Permission.BsdCanSignEmission,
         args.securityCode
       );
     } else if (
@@ -50,6 +52,7 @@ const signatures: Partial<
       await checkCanSignFor(
         existingForm.emitterCompanySiret!,
         user,
+        Permission.BsdCanSignEmission,
         args.securityCode
       );
     }
@@ -97,6 +100,7 @@ const signatures: Partial<
     await checkCanSignFor(
       existingForm.recipientCompanySiret!,
       user,
+      Permission.BsdCanSignEmission,
       args.securityCode
     );
 

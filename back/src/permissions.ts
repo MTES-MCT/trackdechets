@@ -7,7 +7,8 @@ import {
   BsdaSignatureType,
   BsdasriSignatureType,
   BsffSignatureType,
-  SignatureTypeInput
+  SignatureTypeInput,
+  UserPermission
 } from "./generated/graphql/types";
 import { checkSecurityCode } from "./common/permissions";
 
@@ -18,7 +19,6 @@ export enum Permission {
   BsdCanCreate = "BsdCanCreate",
   BsdCanUpdate = "BsdCanUpdate",
   BsdCanDelete = "BsdCanDelete",
-  BsdCanSign = "BsdCanSign:*",
   BsdCanSignEmission = "BsdCanSign:Emission",
   BsdCanSignWork = "BsdCanSign:Work",
   BsdCanSignTransport = "BsdCanSign:Transport",
@@ -32,6 +32,31 @@ export enum Permission {
   CompanyCanManageSignatureAutomation = "CompanyCanManageSignatureAutomation",
   CompanyCanManageMembers = "CompanyCanManageMembers",
   CompanyCanRenewSecurityCode = "CompanyCanRenewSecurityCode"
+}
+
+export function toGraphQLPermission(permission: Permission): UserPermission {
+  const mapping: { [key in Permission]: UserPermission } = {
+    [Permission.BsdCanRead]: "BSD_CAN_READ",
+    [Permission.BsdCanList]: "BSD_CAN_LIST",
+    [Permission.BsdCanCreate]: "BSD_CAN_CREATE",
+    [Permission.BsdCanUpdate]: "BSD_CAN_UPDATE",
+    [Permission.BsdCanDelete]: "BSD_CAN_DELETE",
+    [Permission.BsdCanSignEmission]: "BSD_CAN_SIGN_EMISSION",
+    [Permission.BsdCanSignWork]: "BSD_CAN_SIGN_WORK",
+    [Permission.BsdCanSignTransport]: "BSD_CAN_SIGN_TRANSPORT",
+    [Permission.BsdCanSignAcceptation]: "BSD_CAN_SIGN_ACCEPTATION",
+    [Permission.BsdCanSignOperation]: "BSD_CAN_SIGN_OPERATION",
+    [Permission.BsdCanRevise]: "BSD_CAN_REVISE",
+    [Permission.RegistryCanRead]: "REGISTRY_CAN_READ",
+    [Permission.CompanyCanRead]: "COMPANY_CAN_READ",
+    [Permission.CompanyCanUpdate]: "COMPANY_CAN_UPDATE",
+    [Permission.CompanyCanVerify]: "COMPANY_CAN_VERIFY",
+    [Permission.CompanyCanManageSignatureAutomation]:
+      "COMPANY_CAN_MANAGE_SIGNATURE_AUTOMATION",
+    [Permission.CompanyCanManageMembers]: "COMPANY_CAN_MANAGE_MEMBERS",
+    [Permission.CompanyCanRenewSecurityCode]: "COMPANY_CAN_RENEW_SECURITY_CODE"
+  };
+  return mapping[permission];
 }
 
 /**
@@ -60,7 +85,6 @@ const memberPermissions = [
   ...readerPermissions,
   Permission.BsdCanCreate,
   Permission.BsdCanUpdate,
-  Permission.BsdCanSign,
   Permission.BsdCanSignEmission,
   Permission.BsdCanSignWork,
   Permission.BsdCanSignTransport,
@@ -147,8 +171,16 @@ export async function getUserRoles(userId: string): Promise<{
   );
 }
 
+export async function getUserRole(
+  userId: string,
+  orgId: string
+): Promise<UserRole | undefined> {
+  const userRoles = await getUserRoles(userId);
+  return userRoles[orgId];
+}
+
 /**
- * Checks auser has a given permission on at least one of the
+ * Checks a user has a given permission on at least one of the
  * company whose orgId is passed in paramater
  *
  * This function bridges the gap between user roles and company

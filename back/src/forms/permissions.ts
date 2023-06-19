@@ -322,10 +322,11 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
 export async function checkCanSignFor(
   siret: string,
   user: User,
+  permission: Permission,
   securityCode?: number | null
 ) {
   const userRoles = await getUserRoles(user.id);
-  if (userRoles[siret] && can(userRoles[siret], Permission.BsdCanSign)) {
+  if (userRoles[siret] && can(userRoles[siret], permission)) {
     return true;
   }
   if (securityCode) {
@@ -366,7 +367,7 @@ export async function checkCanMarkAsAccepted(user: User, form: Form) {
   return checkUserPermissions(
     user,
     [recipientSiret].filter(Boolean),
-    Permission.BsdCanSign,
+    Permission.BsdCanSignAcceptation,
     "Vous n'êtes pas autorisé à marquer ce bordereau comme accepté"
   );
 }
@@ -386,7 +387,7 @@ export async function checkCanMarkAsReceived(user: User, form: Form) {
   return checkUserPermissions(
     user,
     [recipientSiret].filter(Boolean),
-    Permission.BsdCanSign,
+    Permission.BsdCanSignAcceptation,
     "Vous n'êtes pas autorisé à réceptionner ce bordereau"
   );
 }
@@ -401,7 +402,7 @@ export async function checkCanMarkAsTempStored(user: User, form: Form) {
   return checkUserPermissions(
     user,
     [form.recipientCompanySiret].filter(Boolean),
-    Permission.BsdCanSign,
+    Permission.BsdCanSignAcceptation,
     "Vous n'êtes pas autorisé à marquer ce bordereau comme entreposé provisoirement"
   );
 }
@@ -410,7 +411,7 @@ export async function checkCanMarkAsResealed(user: User, form: Form) {
   return checkUserPermissions(
     user,
     [form.recipientCompanySiret].filter(Boolean),
-    Permission.BsdCanSign,
+    Permission.BsdCanUpdate,
     "Vous n'êtes pas autorisé à sceller ce bordereau après entreposage provisoire"
   );
 }
@@ -437,7 +438,7 @@ export async function checkCanMarkAsProcessed(user: User, form: Form) {
   return checkUserPermissions(
     user,
     authorizedOrgIds.filter(Boolean),
-    Permission.BsdCanSign,
+    Permission.BsdCanSignOperation,
     "Vous n'êtes pas autorisé à marquer ce bordereau comme traité"
   );
 }
@@ -446,7 +447,7 @@ export async function checkCanMarkAsResent(user: User, form: Form) {
   return checkUserPermissions(
     user,
     [form.recipientCompanySiret].filter(Boolean),
-    Permission.BsdCanSign,
+    Permission.BsdCanSignEmission,
     "Vous n'êtes pas autorisé à marquer ce borderau comme envoyé après entreposage provisoire"
   );
 }

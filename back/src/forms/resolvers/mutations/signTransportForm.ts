@@ -17,6 +17,7 @@ import { getTransporterCompanyOrgId } from "../../../common/constants/companySea
 import { runInTransaction } from "../../../common/repository/helper";
 import { sumPackagingInfos } from "../../repository/helper";
 import { validateBeforeTransport } from "../../validation";
+import { Permission } from "../../../permissions";
 
 /**
  * Common function for signing
@@ -34,6 +35,7 @@ const signTransportFn = async (
   await checkCanSignFor(
     getTransporterCompanyOrgId(existingForm)!,
     user,
+    Permission.BsdCanSignTransport,
     args.securityCode
   );
 
@@ -191,6 +193,7 @@ const signatures: Partial<
     await checkCanSignFor(
       getTransporterCompanyOrgId(existingFullForm.forwardedIn)!,
       user,
+      Permission.BsdCanSignTransport,
       args.securityCode
     );
 
