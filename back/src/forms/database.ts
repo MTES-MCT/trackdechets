@@ -153,7 +153,7 @@ export async function getFirstTransporter(
   form: Pick<Form, "id">
 ): Promise<BsddTransporter | null> {
   const transporters = await getTransporters(form);
-  const [firstTransporter] = transporters.filter(t => t.number === 1);
+  const firstTransporter = transporters.find(t => t.number === 1);
   return firstTransporter ?? null;
 }
 
@@ -161,6 +161,6 @@ export function getFirstTransporterSync(form: {
   transporters: BsddTransporter[] | null;
 }): BsddTransporter | null {
   const transporters = getTransportersSync(form);
-  const [firstTransporter] = transporters.filter(t => t.number === 1);
+  const firstTransporter = transporters.find(t => t.number === 1);
   return firstTransporter ?? null;
 }
