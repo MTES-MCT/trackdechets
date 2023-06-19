@@ -109,12 +109,12 @@ export async function tempStorageDiff(
     updatedAt: _u1,
     status: _s1,
     ...expandedt1
-  } = await expandFormFromDb(t1);
+  } = await expandFormFromDb(t1 as any);
   const {
     updatedAt: _u2,
     status: _s2,
     ...expandedt2
-  } = await expandFormFromDb(t2);
+  } = await expandFormFromDb(t2 as any);
 
   const diff = objectDiff(expandedt1, expandedt2);
 

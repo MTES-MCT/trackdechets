@@ -128,7 +128,9 @@ describe("formDiff", () => {
     const diff = await formDiff(fullForm, updatedForm);
 
     const expected = {
-      temporaryStorageDetail: await expandFormFromDb(updatedForm.forwardedIn)
+      temporaryStorageDetail: await expandFormFromDb(
+        updatedForm.forwardedIn as any
+      )
     };
     expect(diff).toEqual(expected);
   });

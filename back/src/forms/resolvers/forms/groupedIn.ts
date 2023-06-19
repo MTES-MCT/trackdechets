@@ -16,7 +16,7 @@ const groupedInResolver: FormResolvers["groupedIn"] = async (
     groupements.map(async ({ quantity, nextFormId }) => {
       const nextForm = nextForms.find(f => f && f.id === nextFormId);
       return {
-        form: await expandFormFromDb(nextForm),
+        form: await expandFormFromDb(nextForm as any),
         quantity
       };
     })

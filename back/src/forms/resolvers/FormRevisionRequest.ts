@@ -57,7 +57,7 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
       ...bsdd,
       forwardedIn: fullBsdd.forwardedIn,
       transporters: fullBsdd.transporters
-    });
+    } as any);
   }
 };
 

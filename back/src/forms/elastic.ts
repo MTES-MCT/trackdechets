@@ -8,12 +8,12 @@ import { getSiretsByTab, getRecipient } from "./elasticHelpers";
 import { buildAddress } from "../companies/sirene/utils";
 import { getFirstTransporterSync } from "./database";
 
+export type RawForm = FullForm & { forwarding?: Form };
+
 /**
  * Convert a BSD from the forms table to Elastic Search's BSD model.
  */
-export function toBsdElastic(
-  form: FullForm & { forwarding?: Form }
-): BsdElastic {
+export function toBsdElastic(form: RawForm): BsdElastic {
   const siretsByTab = getSiretsByTab(form);
 
   const recipient = getRecipient(form);

@@ -63,6 +63,7 @@ import {
 import prisma from "../prisma";
 import { extractPostalCode } from "../utils";
 import { getFirstTransporter, getFirstTransporterSync } from "./database";
+import { RawForm } from "./elastic";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput | null;
@@ -539,9 +540,7 @@ export function expandTransporterFromDb(
  * Expand form data from db
  * Overlaoded function to handle prisma and elastic bsds
  */
-export async function expandFormFromDb(
-  form: BsdElastic["rawBsd"]
-): Promise<GraphQLForm>;
+export async function expandFormFromDb(form: RawForm): Promise<GraphQLForm>;
 export async function expandFormFromDb(
   form: PrismaForm,
   dataloader?: DataLoader<string, Form | null, string>
@@ -799,7 +798,7 @@ export async function expandFormFromDb(
 }
 
 export async function expandFormFromElastic(
-  form: BsdElastic["rawBsd"]
+  form: RawForm
 ): Promise<GraphQLForm | null> {
   const expanded = await expandFormFromDb(form);
 

@@ -9,13 +9,8 @@ import {
 } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  client,
-  BsdElastic,
-  index,
-  PrismaBsdMap
-} from "../../../common/elastic";
-import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "@prisma/client";
+import { client, BsdElastic, index } from "../../../common/elastic";
+import { Bsdasri } from "@prisma/client";
 import prisma from "../../../prisma";
 import { expandFormFromElastic } from "../../../forms/converter";
 import { expandBsdasriFromElastic } from "../../../bsdasris/converter";
@@ -26,6 +21,11 @@ import { bsdSearchSchema } from "../../validation";
 import { toElasticQuery } from "../../where";
 import { Permission, can, getUserRoles } from "../../../permissions";
 import { distinct } from "../../../common/arrays";
+import { RawForm } from "../../../forms/elastic";
+import { RawBsdasri } from "../../../bsdasris/elastic";
+import { RawBsvhu } from "../../../bsvhu/elastic";
+import { RawBsda } from "../../../bsda/elastic";
+import { RawBsff } from "../../../bsffs/elastic";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -42,31 +42,25 @@ export interface GetResponse<T> {
   _source: T;
 }
 
+type PrismaBsdMap = {
+  bsdds: RawForm[];
+  bsdasris: RawBsdasri[];
+  bsvhus: RawBsvhu[];
+  bsdas: RawBsda[];
+  bsffs: RawBsff[];
+};
+
 /**
  * Convert a list of BsdElastic to a mapping of prisma-like Bsds by retrieving rawBsd elastic field
  */
 async function toRawBsds(bsdsElastic: BsdElastic[]): Promise<PrismaBsdMap> {
-  const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = bsdsElastic.reduce<{
-    BSDD: Form[];
-    BSDASRI: Bsdasri[];
-    BSVHU: Bsvhu[];
-    BSDA: Bsda[];
-    BSFF: Bsff[];
-  }>(
+  return bsdsElastic.reduce<PrismaBsdMap>(
     (acc, bsdElastic) => ({
       ...acc,
       [bsdElastic.type]: [...acc[bsdElastic.type], bsdElastic?.rawBsd]
     }),
-    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
+    { bsdds: [], bsdasris: [], bsvhus: [], bsdas: [], bsffs: [] }
   );
-
-  return {
-    bsdds: BSDD,
-    bsdasris: BSDASRI,
-    bsvhus: BSVHU,
-    bsdas: BSDA,
-    bsffs: BSFF
-  };
 }
 
 async function buildQuery(

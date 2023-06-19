@@ -13,6 +13,7 @@ import { GenericWaste } from "../registry/types";
 import { extractPostalCode } from "../utils";
 import { formToBsdd } from "./compat";
 import { Bsdd } from "./types";
+import { RegistryForm } from "../registry/elastic";
 
 type RegistryFields =
   | "isIncomingWasteFor"
@@ -365,21 +366,6 @@ export function toManagedWaste(
     transporter3CompanySiret: bsdd.transporter3CompanySiret,
     transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber
   };
-}
-
-export function toManagedWastes(
-  form: Form & { forwarding: Form } & {
-    grouping: { initialForm: Form }[];
-  } & { transportSegments: BsddTransporter[] }
-): ManagedWaste[] {
-  const bsdd = formToBsdd(form);
-  if (bsdd.forwarding) {
-    // TODO check reglementation
-    // in case of temporary storage, we assume that the trader or
-    // broker has only dealt the waste from the emitter to the TTR
-    return [toManagedWaste({ ...bsdd.forwarding, forwarding: null })];
-  }
-  return [toManagedWaste(bsdd)];
 }
 
 export function toAllWaste(
