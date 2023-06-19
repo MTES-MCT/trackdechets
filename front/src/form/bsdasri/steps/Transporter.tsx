@@ -142,37 +142,37 @@ function CurrentCompanyWidget({ disabled = false }) {
     variables: { siret },
     fetchPolicy: "no-cache",
 
-    onCompleted: data => {
+    onCompleted: completed => {
       if (!values?.transporter?.company?.mail) {
         setFieldValue(
           `transporter.company.mail`,
-          data?.companyInfos?.contactEmail
+          completed?.companyInfos?.contactEmail
         );
       }
       if (!values?.transporter?.company?.contact) {
         setFieldValue(
           `transporter.company.contact`,
-          data?.companyInfos?.contact
+          completed?.companyInfos?.contact
         );
       }
       if (!values?.transporter?.company?.phone) {
         setFieldValue(
           `transporter.company.phone`,
-          data?.companyInfos?.contactPhone
+          completed?.companyInfos?.contactPhone
         );
       }
-      if (data?.companyInfos?.transporterReceipt) {
+      if (completed?.companyInfos?.transporterReceipt) {
         setFieldValue(
           "transporter.recepisse.number",
-          data?.companyInfos?.transporterReceipt.receiptNumber
+          completed?.companyInfos?.transporterReceipt.receiptNumber
         );
         setFieldValue(
           "transporter.recepisse.validityLimit",
-          data?.companyInfos?.transporterReceipt.validityLimit
+          completed?.companyInfos?.transporterReceipt.validityLimit
         );
         setFieldValue(
           "transporter.recepisse.department",
-          data?.companyInfos?.transporterReceipt.department
+          completed?.companyInfos?.transporterReceipt.department
         );
       } else {
         setFieldValue("transporter.recepisse.number", "");
