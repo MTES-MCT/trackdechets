@@ -18,7 +18,6 @@ import {
 } from "../../common/validation/siret";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { OPERATIONS, WORKER_CERTIFICATION_ORGANISM } from "./constants";
-import { noEmptyString } from "../../common/converter";
 
 const bsdaPackagingSchema = z
   .object({
@@ -238,8 +237,8 @@ export const rawBsdaSchema = z
 
     if (
       val.type === BsdaType.COLLECTION_2710 &&
-      (noEmptyString(val.transporterCompanyName) != null ||
-        noEmptyString(val.transporterCompanySiret) != null)
+      (val.transporterCompanyName != null ||
+        val.transporterCompanySiret != null)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -249,8 +248,7 @@ export const rawBsdaSchema = z
 
     if (
       val.type === BsdaType.COLLECTION_2710 &&
-      (noEmptyString(val.workerCompanyName) != null ||
-        noEmptyString(val.workerCompanySiret) != null)
+      (val.workerCompanyName != null || val.workerCompanySiret != null)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

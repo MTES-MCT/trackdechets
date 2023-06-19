@@ -69,15 +69,17 @@ export function removeEmpty<T extends Record<string, unknown>>(
 
 /**
  * Equivalent to a typescript optional chaining operator foo?.bar
- * except that it returns "null" instead of "undefined" if "null" is encountered in the chain
+ * except that :
+ * - it returns "null" instead of "undefined" if "null" is encountered in the chain
+ * - it returns "null" instead of an empty string
  * It allows to differentiate between voluntary null update and field omission that should
- * not update any data
+ * not update any data, and treats empty string as null updates
  */
 export function chain<T, K>(
   o: T,
   getter: (o: NonNullable<T>) => K
 ): K | null | undefined {
-  if (o === null) {
+  if (o === null || o === "") {
     return null;
   }
   if (o === undefined) {
@@ -108,17 +110,6 @@ export function prismaJsonNoNull<I>(value: I) {
     return Prisma.JsonNull;
   }
 
-  return value;
-}
-
-/**
- * Returns null if the value is an empty string.
- * Otherwise returns the value.
- */
-export function noEmptyString(
-  value: string | null | undefined
-): string | null | undefined {
-  if (value === "") return null;
   return value;
 }
 
