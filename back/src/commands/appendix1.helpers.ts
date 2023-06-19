@@ -1,6 +1,7 @@
-import { EmitterType, Status } from "@prisma/client";
-import prisma from "../prisma";
+import { AuthType, EmitterType, Status } from "@prisma/client";
 import { sub } from "date-fns";
+import { deleteBsd } from "../common/elastic";
+import prisma from "../prisma";
 
 /**
  * After you sign the first appendix1 on a container, you have 3 days to sign the rest.
@@ -21,9 +22,18 @@ export async function cleanUnusedAppendix1ProducerBsdds() {
     where: {
       emitterType: EmitterType.APPENDIX1,
       status: Status.SENT,
-      grouping: { some: { initialForm: { takenOverAt: { lte: limitDate } } } }
+      AND: [
+        {
+          grouping: {
+            some: { initialForm: { takenOverAt: { lte: limitDate } } }
+          }
+        },
+        { grouping: { some: { initialForm: { takenOverAt: null } } } }
+      ]
     },
-    select: { grouping: { include: { initialForm: true } } }
+    select: {
+      grouping: { include: { initialForm: { select: { status: true } } } }
+    }
   });
 
   const appendix1ProducerIds =
@@ -42,6 +52,10 @@ export async function cleanUnusedAppendix1ProducerBsdds() {
       isDeleted: true
     }
   });
+
+  for (const id in appendix1ProducerIds) {
+    await deleteBsd({ id }, { user: { auth: AuthType.BEARER } } as any);
+  }
 
   await prisma.formGroupement.deleteMany({
     where: { initialFormId: { in: appendix1ProducerIds } }
