@@ -1,9 +1,19 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useParams, useRouteMatch } from "react-router-dom";
 import { useLazyQuery, useQuery } from "@apollo/client";
-import routes from "../common/routes";
-import { GET_BSDS } from "../common/queries";
-import { OrderType, Query, QueryBsdsArgs } from "generated/graphql/types";
+import * as Sentry from "@sentry/browser";
+import routes from "../Apps/routes";
+import { GET_BSDS } from "../Apps/common/queries";
+import {
+  BsdaRevisionRequestEdge,
+  FormRevisionRequestEdge,
+  OrderType,
+  PageInfo,
+  Query,
+  QueryBsdaRevisionRequestsArgs,
+  QueryBsdsArgs,
+  QueryFormRevisionRequestsArgs,
+} from "generated/graphql/types";
 import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 import BsdCardList from "Apps/Dashboard/Components/BsdCardList/BsdCardList";
 import {
@@ -11,7 +21,7 @@ import {
   BlankslateTitle,
   BlankslateDescription,
   Loader,
-} from "common/components";
+} from "Apps/common/Components";
 import {
   blankstate_action_desc,
   blankstate_action_title,
@@ -21,28 +31,33 @@ import {
   blankstate_follow_title,
   blankstate_history_desc,
   blankstate_history_title,
+  blankstate_reviews_desc,
+  blankstate_reviews_title,
   dropdown_create_btn,
   filter_reset_btn,
   filter_show_btn,
   load_more_bsds,
-} from "Apps/Common/wordings/dashboard/wordingsDashboard";
+} from "Apps/common/wordings/dashboard/wordingsDashboard";
 import { IconDuplicateFile } from "common/components/Icons";
-import Filters from "Apps/Common/Components/Filters/Filters";
+import Filters from "Apps/common/Components/Filters/Filters";
 import {
   filterList,
   dropdownCreateLinks,
   filterPredicates,
 } from "../Apps/Dashboard/dashboardUtils";
-import BsdCreateDropdown from "../Apps/Common/Components/DropdownMenu/DropdownMenu";
-import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
+import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
+import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 
 import "./dashboard.scss";
+import { GET_BSDA_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsdaReviewQuery";
+import { GET_FORM_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsddReviewsQuery";
 
 const DashboardPage = () => {
   const isActTab = !!useRouteMatch(routes.dashboardv2.bsds.act);
   const isDraftTab = !!useRouteMatch(routes.dashboardv2.bsds.drafts);
   const isFollowTab = !!useRouteMatch(routes.dashboardv2.bsds.follow);
   const isArchivesTab = !!useRouteMatch(routes.dashboardv2.bsds.history);
+  const isReviewsTab = !!useRouteMatch(routes.dashboardv2.bsds.reviews);
   const isToCollectTab = !!useRouteMatch(
     routes.dashboardv2.transport.toCollect
   );
@@ -60,6 +75,9 @@ const DashboardPage = () => {
     }
     if (isArchivesTab) {
       return "archivesTab";
+    }
+    if (isReviewsTab) {
+      return "reviewsTab";
     }
     if (isToCollectTab) {
       return "toCollectTab";
@@ -107,6 +125,10 @@ const DashboardPage = () => {
     where: defaultWhere,
   });
 
+  const [bsdsReview, setBsdsReview] = useState<
+    FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[]
+  >([]);
+
   const [lazyFetchBsds, { data, loading, fetchMore }] = useLazyQuery<
     Pick<Query, "bsds">,
     QueryBsdsArgs
@@ -114,12 +136,22 @@ const DashboardPage = () => {
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
   });
+  const { data: cachedData } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
+    GET_BSDS,
+    {
+      variables: bsdsVariables,
+      // read from the cache only to avoid duplicate requests
+      fetchPolicy: "cache-only",
+    }
+  );
 
   const fetchBsds = React.useCallback(() => {
-    lazyFetchBsds({
-      variables: bsdsVariables,
-    });
-  }, [lazyFetchBsds, bsdsVariables]);
+    if (!isReviewsTab) {
+      lazyFetchBsds({
+        variables: bsdsVariables,
+      });
+    }
+  }, [lazyFetchBsds, bsdsVariables, isReviewsTab]);
 
   useNotifier(siret, fetchBsds);
 
@@ -138,14 +170,39 @@ const DashboardPage = () => {
     [lazyFetchBsds, defaultWhere]
   );
 
-  const { data: cachedData } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
-    GET_BSDS,
+  const [
+    fetchBsdaRevisions,
     {
-      variables: bsdsVariables,
-      // read from the cache only to avoid duplicate requests
-      fetchPolicy: "cache-only",
-    }
-  );
+      data: dataBsdaReviews,
+      loading: loadingBsdaReviews,
+      fetchMore: fetchMoreBsdaReviews,
+    },
+  ] = useLazyQuery<
+    Pick<Query, "bsdaRevisionRequests"> & { pageInfo: PageInfo },
+    QueryBsdaRevisionRequestsArgs
+  >(GET_BSDA_REVISION_REQUESTS, {
+    variables: {
+      siret,
+    },
+    fetchPolicy: "cache-and-network",
+  });
+
+  const [
+    fetchBsddRevisions,
+    {
+      data: dataBsddReviews,
+      loading: loadingBsddReviews,
+      fetchMore: fetchMoreBsddReviews,
+    },
+  ] = useLazyQuery<
+    Pick<Query, "formRevisionRequests"> & { pageInfo: PageInfo },
+    QueryFormRevisionRequestsArgs
+  >(GET_FORM_REVISION_REQUESTS, {
+    variables: {
+      siret,
+    },
+    fetchPolicy: "cache-and-network",
+  });
 
   const handleFiltersSubmit = React.useCallback(
     filterValues => {
@@ -204,29 +261,158 @@ const DashboardPage = () => {
     });
   }, [data?.bsds.pageInfo.endCursor, fetchMore]);
 
+  const loadMoreBsddReviews = React.useCallback(() => {
+    setIsFetchingMore(true);
+
+    const reqBsddName = "formRevisionRequests";
+    fetchMoreBsddReviews({
+      variables: {
+        after: dataBsddReviews?.formRevisionRequests.pageInfo.endCursor,
+      },
+
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (fetchMoreResult == null) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          [reqBsddName]: {
+            ...prev[reqBsddName],
+            ...fetchMoreResult[reqBsddName],
+            edges: prev[reqBsddName].edges.concat(
+              fetchMoreResult[reqBsddName].edges
+            ),
+          },
+        };
+      },
+    })
+      .then(() => {
+        setIsFetchingMore(false);
+      })
+      .catch(error => {
+        Sentry.captureException(error);
+      });
+  }, [
+    dataBsddReviews?.formRevisionRequests.pageInfo.endCursor,
+    fetchMoreBsddReviews,
+  ]);
+  const loadMoreBsdaReviews = React.useCallback(() => {
+    setIsFetchingMore(true);
+
+    fetchMoreBsdaReviews({
+      variables: {
+        after: dataBsdaReviews?.bsdaRevisionRequests.pageInfo.endCursor,
+      },
+
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (fetchMoreResult == null) {
+          return prev;
+        }
+        const reqBsdaName = "bsdaRevisionRequests";
+        return {
+          ...prev,
+          bsdaRevisionRequests: {
+            ...prev[reqBsdaName],
+            ...fetchMoreResult[reqBsdaName],
+            edges: prev[reqBsdaName].edges.concat(
+              fetchMoreResult[reqBsdaName].edges
+            ),
+          },
+        };
+      },
+    })
+      .then(() => {
+        setIsFetchingMore(false);
+      })
+      .catch(error => {
+        Sentry.captureException(error);
+      });
+  }, [
+    dataBsdaReviews?.bsdaRevisionRequests.pageInfo.endCursor,
+    fetchMoreBsdaReviews,
+  ]);
+
+  const loadMore = () => {
+    if (isReviewsTab) {
+      loadMoreBsddReviews();
+      loadMoreBsdaReviews();
+    } else {
+      loadMoreBsds();
+    }
+  };
+
   useEffect(() => {
-    setIsFiltersOpen(false);
-    fetchWithDefaultWhere({ where: defaultWhere });
+    if (!isReviewsTab) {
+      setIsFiltersOpen(false);
+      fetchWithDefaultWhere({ where: defaultWhere });
+    }
   }, [
     isActTab,
     isDraftTab,
     isFollowTab,
     isArchivesTab,
+    isReviewsTab,
     defaultWhere,
     fetchWithDefaultWhere,
   ]);
 
   useEffect(() => {
-    fetchBsds();
-  }, [bsdsVariables, fetchBsds]);
+    if (!isReviewsTab) {
+      fetchBsds();
+    }
+  }, [isReviewsTab, bsdsVariables, fetchBsds]);
 
   useEffect(() => {
-    if (!isFiltersOpen) {
+    if (isReviewsTab) {
+      setBsdsReview([]);
+      Promise.all([fetchBsddRevisions(), fetchBsdaRevisions()])
+        .then(res => {
+          const dataBsdd = res[0].data;
+          const dataBsda = res[1].data;
+          if (!!dataBsdd && dataBsdd["formRevisionRequests"]?.edges?.length) {
+            setBsdsReview(
+              (
+                prevState
+              ): FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[] => {
+                return [
+                  ...new Set([
+                    ...prevState,
+                    ...dataBsdd["formRevisionRequests"].edges,
+                  ]),
+                ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
+              }
+            );
+          }
+
+          if (!!dataBsda && dataBsda["bsdaRevisionRequests"]?.edges?.length) {
+            setBsdsReview(
+              (
+                prevState
+              ): FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[] => {
+                return [
+                  ...new Set([
+                    ...prevState,
+                    ...dataBsda["bsdaRevisionRequests"].edges,
+                  ]),
+                ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
+              }
+            );
+          }
+        })
+        .catch(error => {
+          Sentry.captureException(error);
+        });
+    }
+  }, [isReviewsTab, fetchBsddRevisions, fetchBsdaRevisions]);
+
+  useEffect(() => {
+    if (!isReviewsTab && !isFiltersOpen) {
       fetchWithDefaultWhere({ where: defaultWhere });
     }
-  }, [isFiltersOpen, defaultWhere, fetchWithDefaultWhere]);
+  }, [isFiltersOpen, defaultWhere, isReviewsTab, fetchWithDefaultWhere]);
 
-  const getBlankstateTitle = () => {
+  const getBlankstateTitle = (): string | undefined => {
     if (isActTab) {
       return blankstate_action_title;
     }
@@ -238,6 +424,9 @@ const DashboardPage = () => {
     }
     if (isArchivesTab) {
       return blankstate_history_title;
+    }
+    if (isReviewsTab) {
+      return blankstate_reviews_title;
     }
   };
 
@@ -261,54 +450,74 @@ const DashboardPage = () => {
     if (isArchivesTab) {
       return blankstate_history_desc;
     }
+    if (isReviewsTab) {
+      return blankstate_reviews_desc;
+    }
   };
 
   const toggleFiltersBlock = () => {
     setIsFiltersOpen(!isFiltersOpen);
   };
 
-  const bsds = data?.bsds.edges;
+  const bsds = !isReviewsTab ? data?.bsds.edges : bsdsReview;
+
+  const bsdsTotalCount = isReviewsTab
+    ? bsdsReview?.length
+    : cachedData?.bsds.totalCount;
+
+  const hasNextPage = isReviewsTab
+    ? dataBsdaReviews?.pageInfo?.hasNextPage! ||
+      dataBsddReviews?.pageInfo?.hasNextPage!
+    : data?.bsds.pageInfo.hasNextPage;
+
+  const isLoadingBsds = isReviewsTab
+    ? loadingBsdaReviews || loadingBsddReviews
+    : loading;
 
   return (
     <div className="dashboard-page">
-      <div className="dashboard-page__actions">
-        <div className="create-btn">
-          <BsdCreateDropdown
-            links={dropdownCreateLinks(siret)}
-            isDisabled={loading}
-            menuTitle={dropdown_create_btn}
-          />
+      {!isReviewsTab && (
+        <div className="dashboard-page__actions">
+          <div className="create-btn">
+            <BsdCreateDropdown
+              links={dropdownCreateLinks(siret)}
+              isDisabled={loading}
+              menuTitle={dropdown_create_btn}
+            />
+          </div>
+          <div className="filter-btn">
+            <button
+              type="button"
+              className="fr-btn fr-btn--secondary"
+              aria-expanded={isFiltersOpen}
+              onClick={toggleFiltersBlock}
+              disabled={loading}
+            >
+              {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
+            </button>
+          </div>
         </div>
-        <div className="filter-btn">
-          <button
-            type="button"
-            className="fr-btn fr-btn--secondary"
-            aria-expanded={isFiltersOpen}
-            onClick={toggleFiltersBlock}
-            disabled={loading}
-          >
-            {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
-          </button>
-        </div>
-      </div>
+      )}
       {isFiltersOpen && (
         <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
       )}
       {isFetchingMore && <Loader />}
-      {loading && !isFetchingMore ? (
+      {isLoadingBsds && !isFetchingMore ? (
         <Loader />
       ) : (
         <>
-          {cachedData?.bsds.totalCount === 0 && (
+          {!Boolean(bsdsTotalCount) && (
             <Blankslate>
-              <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
+              {getBlankstateTitle() && (
+                <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
+              )}
               <BlankslateDescription>
                 {getBlankstateDescription()}
               </BlankslateDescription>
             </Blankslate>
           )}
 
-          {!!data?.bsds.edges.length && (
+          {Boolean(bsdsTotalCount) && (
             <BsdCardList
               siret={siret}
               bsds={bsds!}
@@ -316,11 +525,11 @@ const DashboardPage = () => {
             />
           )}
 
-          {data?.bsds.pageInfo.hasNextPage && (
+          {hasNextPage && (
             <div className="dashboard-page__loadmore">
               <button
                 className="fr-btn"
-                onClick={loadMoreBsds}
+                onClick={loadMore}
                 disabled={isFetchingMore}
               >
                 {load_more_bsds}

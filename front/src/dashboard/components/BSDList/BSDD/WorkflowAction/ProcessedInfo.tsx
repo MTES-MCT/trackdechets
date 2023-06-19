@@ -12,6 +12,7 @@ import {
   MutationMarkAsProcessedArgs,
 } from "generated/graphql/types";
 import Tooltip from "common/components/Tooltip";
+import { subMonths } from "date-fns";
 
 function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   const {
@@ -48,6 +49,8 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
     }
   }, [isGroupement, nextDestination, noTraceability, setFieldValue]);
 
+  const TODAY = new Date();
+
   return (
     <Form>
       {form.status === FormStatus.TempStorerAccepted && (
@@ -75,6 +78,8 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           Date de traitement
           <Field
             component={DateInput}
+            minDate={subMonths(TODAY, 2)}
+            maxDate={TODAY}
             name="processedAt"
             className="td-input"
           />

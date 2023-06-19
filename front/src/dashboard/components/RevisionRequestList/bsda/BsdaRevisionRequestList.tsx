@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { Query, QueryBsdaRevisionRequestsArgs } from "generated/graphql/types";
-import { GET_BSDA_REVISION_REQUESTS } from "./query";
+import { GET_BSDA_REVISION_REQUESTS } from "../../../../Apps/common/queries/reviews/BsdaReviewQuery";
 import { useParams } from "react-router-dom";
-import { Loader } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { BsdaRevisionRequestTable } from "./BsdaRevisionRequestTable";
 import buildUpdateQueryFn from "../fetchMore";
 export function BsdaRevisionRequestList() {

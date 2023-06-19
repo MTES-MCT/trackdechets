@@ -12,7 +12,7 @@ import WasteTreeModal from "search/WasteTreeModal";
 import { wasteCodeValidator } from "form/bsdd/components/waste-code/waste-code.validator";
 import { ALL_WASTES, ALL_WASTES_TREE } from "generated/constants";
 import { useLazyQuery, gql } from "@apollo/client";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { sortCompaniesByName } from "common/helper";
 

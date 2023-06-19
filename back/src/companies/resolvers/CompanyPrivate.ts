@@ -9,6 +9,7 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: async (parent, _, context) => {
     const userId = context.user!.id;
     const userRole = await getUserRole(userId, parent.orgId);
+
     if (userRole !== "ADMIN") {
       return [
         {

@@ -5,10 +5,10 @@ import {
   IconLayoutModule1,
   IconRefresh,
 } from "common/components/Icons";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { MEDIA_QUERIES } from "common/config";
-import { usePersistedState } from "common/hooks/usePersistedState";
-import { GET_BSDS } from "common/queries";
+import { usePersistedState } from "Apps/common/hooks/usePersistedState";
+import { GET_BSDS } from "Apps/common/queries";
 import { BsdWhere, Query, QueryBsdsArgs } from "generated/graphql/types";
 import * as React from "react";
 import { useMedia } from "use-media";

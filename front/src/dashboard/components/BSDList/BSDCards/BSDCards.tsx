@@ -7,7 +7,7 @@ import {
   Query,
   QueryCompanyPrivateInfosArgs,
 } from "generated/graphql/types";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { IconView } from "common/components/Icons";
 import { WorkflowAction } from "../BSDD/WorkflowAction";
 import { WorkflowAction as BsdasriWorkflowAction } from "../BSDasri/WorkflowAction";

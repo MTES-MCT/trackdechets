@@ -5,7 +5,7 @@ import {
   useLocation,
   useRouteMatch,
 } from "react-router-dom";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { useBsdasriDuplicate } from "./useDuplicate";
 import { DeleteBsdasriModal } from "./DeleteModal";
 
@@ -20,8 +20,8 @@ import {
 import { Bsdasri, BsdasriStatus, BsdasriType } from "generated/graphql/types";
 import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
-import { Loader } from "common/components";
-import DropdownMenu from "Apps/Common/Components/DropdownMenu/DropdownMenu";
+import { Loader } from "Apps/common/Components";
+import DropdownMenu from "Apps/common/Components/DropdownMenu/DropdownMenu";
 import { useDisplayRoadControlButton } from "../../RoadControlButton";
 
 interface BSDAsriActionsProps {

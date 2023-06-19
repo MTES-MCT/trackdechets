@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, gql } from "@apollo/client";
-import { InlineError, NotificationError } from "common/components/Error";
-import Loader from "common/components/Loaders";
+import {
+  InlineError,
+  NotificationError,
+} from "Apps/common/Components/Error/Error";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import {
   MembershipRequestStatus,
   Mutation,

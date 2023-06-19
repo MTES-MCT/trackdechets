@@ -3,7 +3,7 @@ import { Modal } from "common/components";
 import { Application } from "generated/graphql/types";
 import { useMutation } from "@apollo/client";
 import { MY_APPLICATIONS, DELETE_APPLICATION } from "./queries";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 
 type AccountOauth2AppDeleteProps = {
   application: Application;

@@ -11,9 +11,9 @@ import {
   NextSegmentInfoInput,
   TransportSegment,
 } from "generated/graphql/types";
-import { segmentFragment } from "common/fragments";
+import { segmentFragment } from "Apps/common/queries/fragments";
 import { IconPaperWrite } from "common/components/Icons";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 import TdSwitch from "common/components/Switch";

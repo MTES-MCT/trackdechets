@@ -9,15 +9,23 @@ import {
   MutationUpdateBsdasriArgs,
   Bsdasri,
 } from "generated/graphql/types";
-import { NotificationError, InlineError } from "common/components/Error";
+import {
+  NotificationError,
+  InlineError,
+} from "Apps/common/Components/Error/Error";
 import {
   ExtraSignatureType,
   SignatureType,
 } from "dashboard/components/BSDList/BSDasri/types";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
-import { useParams, useHistory, generatePath } from "react-router-dom";
-import { GET_DETAIL_DASRI_WITH_METADATA, GET_BSDS } from "common/queries";
+import {
+  useParams,
+  useHistory,
+  generatePath,
+  useRouteMatch,
+} from "react-router-dom";
+import { GET_DETAIL_DASRI_WITH_METADATA, GET_BSDS } from "Apps/common/queries";
 
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
 import { Formik, Field, Form } from "formik";
@@ -34,9 +42,11 @@ import {
   OperationSignatureForm,
   removeSections,
 } from "./PartialForms";
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
 const forms = {
   [BsdasriSignatureType.Emission]: EmitterSignatureForm,
@@ -68,7 +78,7 @@ const settings: {
         : "Signature producteur",
     signatureType: BsdasriSignatureType.Emission,
     validationText:
-      "En signant, je confirme la remise du déchet au transporteur. La signature est horodatée.",
+      "En signant, je confirme la remise du déchet au transporteur.",
   },
   [ExtraSignatureType.SynthesisTakeOver]: {
     getLabel: () => "Signature bordereau de synthèse",
@@ -80,8 +90,7 @@ const settings: {
   [BsdasriSignatureType.Transport]: {
     getLabel: () => "Signature transporteur",
     signatureType: BsdasriSignatureType.Transport,
-    validationText:
-      "En signant, je confirme l'emport du déchet. La signature est horodatée.",
+    validationText: "En signant, je confirme l'emport du déchet.",
   },
   [ExtraSignatureType.DirectTakeover]: {
     getLabel: () => "Emport direct transporteur",
@@ -95,14 +104,14 @@ const settings: {
     getLabel: () => "Signature réception",
     signatureType: BsdasriSignatureType.Reception,
     validationText:
-      "En signant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau. La signature est horodatée.",
+      "En signant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau.",
   },
 
   [BsdasriSignatureType.Operation]: {
     getLabel: () => "Signature traitement",
     signatureType: BsdasriSignatureType.Operation,
     validationText:
-      "En signant, je confirme le traitement des déchets pour la quantité indiquée dans ce bordereau. La signature est horodatée.",
+      "En signant, je confirme le traitement des déchets pour la quantité indiquée dans ce bordereau.",
   },
 };
 
@@ -113,8 +122,12 @@ export function RouteSignBsdasri({
 }) {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const history = useHistory();
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const transporterTabRoute = !isV2Routes
+    ? routes.dashboard.transport.toCollect
+    : routes.dashboardv2.transport.toCollect;
   const transporterTab = {
-    pathname: generatePath(routes.dashboard.transport.toCollect, {
+    pathname: generatePath(transporterTabRoute, {
       siret,
     }),
   };
@@ -160,6 +173,8 @@ export function RouteSignBsdasri({
     getComputedState(getInitialState(), bsdasri)
   );
 
+  const TODAY = new Date();
+
   return (
     <div>
       <h2 className="td-modal-title">{config.getLabel(bsdasri, siret)}</h2>
@@ -167,9 +182,9 @@ export function RouteSignBsdasri({
       <Formik
         initialValues={{
           ...formState,
-          signature: { author: "" },
+          signature: { author: "", date: TODAY },
         }}
-        validationSchema={() => signatureValidationSchema(bsdasri)}
+        validationSchema={() => signatureValidationSchema(bsdasri, TODAY)}
         onSubmit={async values => {
           const { id, signature, ...rest } = values;
 
@@ -201,6 +216,24 @@ export function RouteSignBsdasri({
               </div>
 
               <UpdateForm signatureType={UIsignatureType} />
+
+              <div className="form__row">
+                <label>
+                  Date
+                  <div className="td-date-wrapper">
+                    <Field
+                      name="signature.date"
+                      component={DateInput}
+                      minDate={subMonths(TODAY, 2)}
+                      maxDate={TODAY}
+                      required
+                      className="td-input"
+                    />
+                  </div>
+                </label>
+                <RedErrorMessage name="signature.date" />
+              </div>
+
               <div className="form__row">
                 <label>
                   Nom du signataire

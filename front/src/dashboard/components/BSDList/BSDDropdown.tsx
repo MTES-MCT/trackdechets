@@ -1,6 +1,6 @@
 import React from "react";
 import { generatePath } from "react-router-dom";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import styles from "./BSDActions.module.scss";
 import {
   IconBSFF,
@@ -9,7 +9,7 @@ import {
   IconBSDD,
   IconBSDasri,
 } from "../../../common/components/Icons";
-import BsdCreateDropdown from "Apps/Common/Components/DropdownMenu/DropdownMenu";
+import BsdCreateDropdown from "Apps/common/Components/DropdownMenu/DropdownMenu";
 
 type Props = { siret: string };
 

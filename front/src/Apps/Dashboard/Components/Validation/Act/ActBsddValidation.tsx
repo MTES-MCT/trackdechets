@@ -1,9 +1,9 @@
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
-import { Loader } from "common/components";
-import { NotificationError } from "common/components/Error";
+import { Loader } from "Apps/common/Components";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import TdModal from "common/components/Modal";
-import { statusChangeFragment } from "common/fragments";
-import { GET_BSDS } from "common/queries";
+import { statusChangeFragment } from "Apps/common/queries/fragments";
+import { GET_BSDS } from "Apps/common/queries";
 import AcceptedInfo from "dashboard/components/BSDList/BSDD/WorkflowAction/AcceptedInfo";
 import ReceivedInfo from "dashboard/components/BSDList/BSDD/WorkflowAction/ReceivedInfo";
 import { MarkSegmentAsReadyToTakeOver } from "dashboard/components/BSDList/BSDD/WorkflowAction/segments/MarkSegmentAsReadyToTakeOver";

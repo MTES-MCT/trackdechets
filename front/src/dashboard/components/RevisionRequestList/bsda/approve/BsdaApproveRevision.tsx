@@ -9,30 +9,37 @@ import {
   PickupSite,
 } from "generated/graphql/types";
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton, RedErrorMessage } from "common/components";
+import { ActionButton, Modal, RedErrorMessage } from "common/components";
 import { IconCogApproved } from "common/components/Icons";
 import { useMutation } from "@apollo/client";
 import {
   GET_BSDA_REVISION_REQUESTS,
   SUBMIT_BSDA_REVISION_REQUEST_APPROVAL,
-} from "../query";
+} from "../../../../../Apps/common/queries/reviews/BsdaReviewQuery";
 import { Field, Form, Formik } from "formik";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { formatDate } from "common/datetime";
 import { RevisionField } from "../../bsdd/approve/RevisionField";
-import { useParams } from "react-router-dom";
+import { useParams, useRouteMatch } from "react-router-dom";
 import { PACKAGINGS_NAMES } from "form/bsda/components/packagings/Packagings";
 
 type Props = {
   review: BsdaRevisionRequest;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
 };
 
 const validationSchema = yup.object({
   isApproved: yup.string().required(),
 });
 
-export function BsdaApproveRevision({ review }: Props) {
+export function BsdaApproveRevision({
+  review,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+}: Props) {
   const { siret } = useParams<{ siret: string }>();
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
 
   const [submitBsdaRevisionRequestApproval, { loading }] = useMutation<
     Pick<Mutation, "submitBsdaRevisionRequestApproval">,
@@ -43,72 +50,106 @@ export function BsdaApproveRevision({ review }: Props) {
     ],
   });
 
-  return (
+  const title = "Acceptation d'une révision";
+  if (isV2Routes && isModalOpenFromParent) {
+    const formatRevisionAdapter = {
+      ...review["review"],
+      bsda: { ...review },
+    };
+    return (
+      <Modal onClose={onModalCloseFromParent!} ariaLabel={title} isOpen>
+        <DisplayModalContent
+          review={formatRevisionAdapter}
+          close={onModalCloseFromParent}
+          submitBsdaRevisionRequestApproval={submitBsdaRevisionRequestApproval}
+          loading={loading}
+        />
+      </Modal>
+    );
+  }
+
+  return !isV2Routes ? (
     <TdModalTrigger
-      ariaLabel="Acceptation d'une révision"
+      ariaLabel={title}
       trigger={open => (
         <ActionButton icon={<IconCogApproved size="24px" />} onClick={open}>
           Approuver / Refuser
         </ActionButton>
       )}
       modalContent={close => (
-        <div>
-          <DisplayRevision review={review} />
-
-          <Formik
-            initialValues={{
-              isApproved: "",
-            }}
-            onSubmit={async ({ isApproved }) => {
-              await submitBsdaRevisionRequestApproval({
-                variables: { id: review.id, isApproved: isApproved === "TRUE" },
-              });
-              close();
-            }}
-            validationSchema={validationSchema}
-          >
-            {() => (
-              <Form>
-                <div>
-                  <fieldset className="form__row">
-                    <Field
-                      name="isApproved"
-                      id="TRUE"
-                      label="J'accepte la révision"
-                      component={RadioButton}
-                    />
-                    <Field
-                      name="isApproved"
-                      id="FALSE"
-                      label="Je refuse la révision"
-                      component={RadioButton}
-                    />
-                  </fieldset>
-                  <RedErrorMessage name="isApproved" />
-                </div>
-                <div className="form__actions">
-                  <button
-                    type="button"
-                    className="btn btn--outline-primary"
-                    onClick={close}
-                  >
-                    Annuler
-                  </button>
-
-                  <button
-                    type="submit"
-                    className="btn btn--primary"
-                    disabled={loading}
-                  >
-                    Valider
-                  </button>
-                </div>
-              </Form>
-            )}
-          </Formik>
-        </div>
+        <DisplayModalContent
+          review={review}
+          close={close}
+          submitBsdaRevisionRequestApproval={submitBsdaRevisionRequestApproval}
+          loading={loading}
+        />
       )}
     />
+  ) : null;
+}
+
+function DisplayModalContent({
+  review,
+  close,
+  submitBsdaRevisionRequestApproval,
+  loading,
+}) {
+  return (
+    <div>
+      <DisplayRevision review={review} />
+
+      <Formik
+        initialValues={{
+          isApproved: "",
+        }}
+        onSubmit={async ({ isApproved }) => {
+          await submitBsdaRevisionRequestApproval({
+            variables: { id: review.id, isApproved: isApproved === "TRUE" },
+          });
+          close();
+        }}
+        validationSchema={validationSchema}
+      >
+        {() => (
+          <Form>
+            <div>
+              <fieldset className="form__row">
+                <Field
+                  name="isApproved"
+                  id="TRUE"
+                  label="J'accepte la révision"
+                  component={RadioButton}
+                />
+                <Field
+                  name="isApproved"
+                  id="FALSE"
+                  label="Je refuse la révision"
+                  component={RadioButton}
+                />
+              </fieldset>
+              <RedErrorMessage name="isApproved" />
+            </div>
+            <div className="form__actions">
+              <button
+                type="button"
+                className="btn btn--outline-primary"
+                onClick={close}
+              >
+                Annuler
+              </button>
+
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={loading}
+              >
+                Valider
+              </button>
+            </div>
+          </Form>
+        )}
+      </Formik>
+    </div>
   );
 }
 

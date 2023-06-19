@@ -1,5 +1,5 @@
 import { useMutation, gql } from "@apollo/client";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import React from "react";
 import { cleanClue } from "../../generated/constants/companySearchHelpers";
 

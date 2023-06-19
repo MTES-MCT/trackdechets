@@ -1,7 +1,7 @@
 import React from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Formik, FormikProps, Form, Field } from "formik";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { CompanyPrivate } from "generated/graphql/types";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import Tooltip from "common/components/Tooltip";

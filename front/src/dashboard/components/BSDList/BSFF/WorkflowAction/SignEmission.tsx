@@ -9,17 +9,28 @@ import {
   MutationSignBsffArgs,
 } from "generated/graphql/types";
 import { RedErrorMessage } from "common/components";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { SIGN_BSFF } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS } from "Apps/common/queries";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
-const validationSchema = yup.object({
-  signatureAuthor: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-});
+const getValidationSchema = (today: Date) =>
+  yup.object({
+    date: yup
+      .date()
+      .required("La date d'émission est requise")
+      .max(today, "La date d'émission ne peut être dans le futur")
+      .min(
+        subMonths(today, 2),
+        "La date d'émission ne peut être antérieure à 2 mois"
+      ),
+    signatureAuthor: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+  });
 
 interface SignEmissionFormProps {
   bsff: Bsff;
@@ -32,12 +43,15 @@ function SignEmissionForm({ bsff, onCancel }: SignEmissionFormProps) {
     MutationSignBsffArgs
   >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
+  const TODAY = new Date();
+
   return (
     <Formik
       initialValues={{
         signatureAuthor: "",
+        date: TODAY,
       }}
-      validationSchema={validationSchema}
+      validationSchema={getValidationSchema(TODAY)}
       onSubmit={async values => {
         await signBsff({
           variables: {
@@ -45,7 +59,7 @@ function SignEmissionForm({ bsff, onCancel }: SignEmissionFormProps) {
             input: {
               type: BsffSignatureType.Emission,
               author: values.signatureAuthor,
-              date: new Date().toISOString(),
+              date: values.date.toISOString(),
             },
           },
         });
@@ -59,6 +73,24 @@ function SignEmissionForm({ bsff, onCancel }: SignEmissionFormProps) {
             informations ci-dessus sont correctes. En signant ce document,
             j'autorise le transporteur à prendre en charge le déchet.
           </p>
+
+          <div className="form__row">
+            <label>
+              Date d'émission
+              <div className="td-date-wrapper">
+                <Field
+                  name="date"
+                  component={DateInput}
+                  minDate={subMonths(TODAY, 2)}
+                  maxDate={TODAY}
+                  required
+                  className="td-input"
+                />
+              </div>
+            </label>
+            <RedErrorMessage name="date" />
+          </div>
+
           <div className="form__row">
             <label>
               NOM et prénom du signataire

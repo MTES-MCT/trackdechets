@@ -1,5 +1,5 @@
 import React from "react";
-import { fullFormFragment } from "common/fragments";
+import { fullFormFragment } from "Apps/common/queries/fragments";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
 import * as yup from "yup";
@@ -12,24 +12,30 @@ import {
   QueryFormArgs,
 } from "generated/graphql/types";
 import { GET_FORM, UPDATE_FORM } from "form/bsdd/utils/queries";
-import { Loader, RedErrorMessage } from "common/components";
+import { RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
 import {
   InlineError,
   NotificationError,
   SimpleNotificationError,
-} from "common/components/Error";
+} from "Apps/common/Components/Error/Error";
 import { FormWasteTransportSummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormWasteTransportSummary";
 import { FormJourneySummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormJourneySummary";
-import DateInput from "form/common/components/custom-inputs/DateInput";
 import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
     takenOverAt: yup
       .date()
       .required("La date de prise en charge est requise")
-      .max(today, "La date de prise en charge ne peut être dans le futur"),
+      .max(today, "La date de prise en charge ne peut être dans le futur")
+      .min(
+        subMonths(today, 2),
+        "La date de prise en charge ne peut être antérieure à 2 mois"
+      ),
     takenOverBy: yup
       .string()
       .ensure()
@@ -64,7 +70,7 @@ interface SignTransportFormModalProps {
   formId: string;
 }
 
-function SignTransportFormModalContent({
+export default function SignTransportFormModalContent({
   title,
   siret,
   formId,
@@ -191,14 +197,16 @@ function SignTransportFormModalContent({
             </p>
 
             <div className="form__row">
-              <label className="tw-font-semibold">
+              <label>
                 Date de prise en charge
                 <div className="td-date-wrapper">
                   <Field
                     name="takenOverAt"
                     component={DateInput}
-                    className="td-input"
+                    minDate={subMonths(TODAY, 2)}
                     maxDate={TODAY}
+                    required
+                    className="td-input"
                   />
                 </div>
               </label>
@@ -260,4 +268,3 @@ function SignTransportFormModalContent({
     </>
   );
 }
-export default SignTransportFormModalContent;

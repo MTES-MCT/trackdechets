@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import Badge from "./Badge";
-import { BsdStatusCode } from "Apps/Common/types/bsdTypes";
+import { BsdStatusCode } from "Apps/common/types/bsdTypes";
 import { BsdType } from "generated/graphql/types";
 
 describe("Bsd Badge status", () => {

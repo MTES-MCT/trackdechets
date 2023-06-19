@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import {
   QueryCompaniesForVerificationArgs,
   Query,

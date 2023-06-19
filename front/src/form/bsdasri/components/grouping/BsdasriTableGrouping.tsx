@@ -1,7 +1,7 @@
 import React from "react";
 import { useQuery, gql } from "@apollo/client";
 import { useFormikContext } from "formik";
-import { InlineError } from "common/components/Error";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import {
   Bsdasri,
   Query,

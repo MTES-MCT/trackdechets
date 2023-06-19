@@ -1,7 +1,10 @@
 import {
+  Bsd,
+  Bsda,
   BsdaDestination,
   BsdaEcoOrganisme,
   BsdaEmitter,
+  BsdaRevisionRequestApproval,
   BsdasriDestination,
   BsdasriEcoOrganisme,
   BsdasriEmitter,
@@ -25,13 +28,18 @@ import {
   BsvhuTransporter,
   Emitter,
   EmitterType,
+  Form,
+  FormCompany,
   FormEcoOrganisme,
+  FormRevisionRequestApproval,
   FormStatus,
   InitialBsda,
   InitialBsdasri,
   InitialFormFraction,
   Maybe,
   Recipient,
+  RevisionRequestApprovalStatus,
+  RevisionRequestStatus,
   Scalars,
   TemporaryStorageDetail,
   Transporter,
@@ -51,7 +59,16 @@ export const BsdStatusCode = {
   ...BsffStatus,
   ...BsdasriStatus,
   ...BsvhuStatus,
+  ...RevisionRequestStatus,
+  ...RevisionRequestApprovalStatus,
 };
+
+export enum ReviewStatusLabel {
+  Pending = "En attente de révision",
+  Accepted = "Révision approuvée",
+  Refused = "Révision refusée",
+  Cancelled = "Révision annulée",
+}
 
 type TBsdStatusCodeKeys = keyof typeof BsdStatusCode;
 export type TBsdStatusCode = (typeof BsdStatusCode)[TBsdStatusCodeKeys];
@@ -104,7 +121,38 @@ export interface BsdDisplay {
     | Maybe<Array<InitialBsda>>;
   synthesizing?: Maybe<Array<InitialBsdasri>>;
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;
+  review?: {
+    approvals: FormRevisionRequestApproval[] & BsdaRevisionRequestApproval[];
+    authoringCompany: FormCompany;
+    status: TBsdStatusCode;
+    id: string;
+  };
 }
+
+export type BsdWithReview = Bsd & {
+  review: {
+    approvals: FormRevisionRequestApproval[] & BsdaRevisionRequestApproval[];
+    authoringCompany: FormCompany;
+    status: TBsdStatusCode;
+    id: string;
+  };
+};
+export type FormWithReview = Form & {
+  review: {
+    approvals: FormRevisionRequestApproval[] & BsdaRevisionRequestApproval[];
+    authoringCompany: FormCompany;
+    status: TBsdStatusCode;
+    id: string;
+  };
+};
+export type BsdaWithReview = Bsda & {
+  review: {
+    approvals: FormRevisionRequestApproval[] & BsdaRevisionRequestApproval[];
+    authoringCompany: FormCompany;
+    status: TBsdStatusCode;
+    id: string;
+  };
+};
 
 export enum WorkflowDisplayType {
   GRP = "Regroupement",

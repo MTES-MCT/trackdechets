@@ -1,12 +1,13 @@
 import React from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Loader, RedErrorMessage } from "common/components";
+import { RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
 import {
   InlineError,
   NotificationError,
   SimpleNotificationError,
-} from "common/components/Error";
-import { fullFormFragment } from "common/fragments";
+} from "Apps/common/Components/Error/Error";
+import { fullFormFragment } from "Apps/common/queries/fragments";
 import { GET_FORM } from "form/bsdd/utils/queries";
 import {
   FormStatus,
@@ -20,6 +21,8 @@ import { Field, Form as FormikForm, Formik } from "formik";
 import { FormWasteEmissionSummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormWasteEmissionSummary";
 import { FormJourneySummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormJourneySummary";
 import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
 interface SignEmissionFormModalProps {
   title: string;
@@ -28,16 +31,25 @@ interface SignEmissionFormModalProps {
   onClose: () => void;
 }
 
-const validationSchema = yup.object({
-  emittedBy: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-  securityCode: yup
-    .string()
-    .nullable()
-    .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
-});
+const getValidationSchema = (today: Date) =>
+  yup.object({
+    emittedAt: yup
+      .date()
+      .required("La date d'émission est requise")
+      .max(today, "La date d'émission ne peut être dans le futur")
+      .min(
+        subMonths(today, 2),
+        "La date d'émission ne peut être antérieure à 2 mois"
+      ),
+    emittedBy: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    securityCode: yup
+      .string()
+      .nullable()
+      .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
+  });
 
 enum EmitterType {
   Emitter = "Emitter",
@@ -94,6 +106,8 @@ function SignEmissionFormModalContent({
     },
   });
 
+  const TODAY = new Date();
+
   if (formLoading) return <Loader />;
   if (formError) return <InlineError apolloError={formError} />;
   if (!data?.form) {
@@ -103,6 +117,7 @@ function SignEmissionFormModalContent({
   }
   const form = data?.form;
   const initialValues = {
+    emittedAt: TODAY.toISOString(),
     emittedBy: "",
     emittedByType: EmitterType.Emitter,
     securityCode: "",
@@ -133,7 +148,7 @@ function SignEmissionFormModalContent({
             onuCode: values.onuCode,
             packagingInfos: values.packagingInfos,
             transporterNumberPlate: values.transporterNumberPlate,
-            emittedAt: new Date().toISOString(),
+            emittedAt: values.emittedAt,
             emittedBy: values.emittedBy,
             emittedByEcoOrganisme:
               values.emittedByType === EmitterType.EcoOrganisme,
@@ -151,7 +166,7 @@ function SignEmissionFormModalContent({
     <>
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        validationSchema={getValidationSchema(TODAY)}
         onSubmit={handlesubmit}
       >
         {({ values }) => {
@@ -204,6 +219,23 @@ function SignEmissionFormModalContent({
                 informations ci-dessus sont correctes. En signant ce document,
                 je déclare transférer le déchet.
               </p>
+
+              <div className="form__row">
+                <label>
+                  Date d'émission
+                  <div className="td-date-wrapper">
+                    <Field
+                      name="emittedAt"
+                      component={DateInput}
+                      minDate={subMonths(TODAY, 2)}
+                      maxDate={TODAY}
+                      required
+                      className="td-input"
+                    />
+                  </div>
+                </label>
+                <RedErrorMessage name="emittedAt" />
+              </div>
 
               <div className="form__row">
                 <label>

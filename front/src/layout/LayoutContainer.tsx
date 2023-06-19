@@ -10,9 +10,9 @@ import {
 } from "react-router-dom";
 import PrivateRoute from "login/PrivateRoute";
 import * as Sentry from "@sentry/browser";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import Layout from "./Layout";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { useQuery, gql } from "@apollo/client";
 import { Query } from "../generated/graphql/types";
 import ResendActivationEmail from "login/ResendActivationEmail";

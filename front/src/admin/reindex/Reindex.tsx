@@ -3,7 +3,7 @@ import { Formik, Form, Field } from "formik";
 import cogoToast from "cogo-toast";
 import { gql, useMutation } from "@apollo/client";
 import { Mutation, MutationReindexBsdArgs } from "generated/graphql/types";
-import { InlineError } from "common/components/Error";
+import { InlineError } from "Apps/common/Components/Error/Error";
 
 const REINDEX_BSD = gql`
   mutation reindexBsd($id: ID!) {

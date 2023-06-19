@@ -39,7 +39,7 @@ import {
   IconTrash,
   IconBSDD,
 } from "common/components/Icons";
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 import {
   getVerboseConsistence,
@@ -58,7 +58,8 @@ import {
 } from "dashboard/detail/common/Components";
 import { WorkflowAction } from "dashboard/components/BSDList";
 import EditSegment from "./EditSegment";
-import { Loader, Modal } from "common/components";
+import { Modal } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { isDangerous } from "generated/constants";
 import { format } from "date-fns";
 import {
