@@ -748,9 +748,14 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
         status: Status.RECEIVED,
         emitterType: EmitterType.APPENDIX1_PRODUCER,
         emitterCompanySiret: companyOfSomeoneElse.siret,
-        transporterCompanySiret: company.siret,
         wasteDetailsCode: "15 01 10*",
-        owner: { connect: { id: user.id } }
+        owner: { connect: { id: user.id } },
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: company.siret
+          }
+        }
       }
     });
 
@@ -761,10 +766,15 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
         emitterType: EmitterType.APPENDIX1,
         emitterCompanySiret: company.siret,
         emitterCompanyName: company.name,
-        transporterCompanySiret: company.siret,
         recipientCompanySiret: company.siret,
         grouping: {
           create: { initialFormId: appendix1_item.id, quantity: 0 }
+        },
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: company.siret
+          }
         }
       }
     });

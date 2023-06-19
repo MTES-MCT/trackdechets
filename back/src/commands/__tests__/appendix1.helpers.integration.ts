@@ -1,7 +1,6 @@
 import { EmitterType, Status } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { formFactory, userWithCompanyFactory } from "../../__tests__/factories";
-import getReadableId from "../../forms/readableId";
 import prisma from "../../prisma";
 import { cleanUnusedAppendix1ProducerBsdds } from "../appendix1.helpers";
 
@@ -12,37 +11,50 @@ describe("cleanUnusedAppendix1ProducerBsdds", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     // Item sent more than 3 days ago
-    const appendix1_1 = await prisma.form.create({
-      data: {
-        readableId: getReadableId(),
+    const appendix1_1 = await formFactory({
+      ownerId: user.id,
+      opt: {
         status: Status.SENT,
         emitterType: EmitterType.APPENDIX1_PRODUCER,
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: company.siret,
-        takenOverAt: new Date("2023-01-01"), // More than 3 days ago
-        owner: { connect: { id: user.id } }
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: company.siret
+          }
+        },
+        takenOverAt: new Date("2023-01-01") // More than 3 days ago
       }
     });
 
     // Then 2 unsent items (sealed)
-    const appendix1_2 = await prisma.form.create({
-      data: {
-        readableId: getReadableId(),
+    const appendix1_2 = await formFactory({
+      ownerId: user.id,
+      opt: {
         status: Status.SEALED,
         emitterType: EmitterType.APPENDIX1_PRODUCER,
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: company.siret,
-        owner: { connect: { id: user.id } }
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: company.siret
+          }
+        }
       }
     });
-    const appendix1_3 = await prisma.form.create({
-      data: {
-        readableId: getReadableId(),
+
+    const appendix1_3 = await formFactory({
+      ownerId: user.id,
+      opt: {
         status: Status.SEALED,
         emitterType: EmitterType.APPENDIX1_PRODUCER,
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: company.siret,
-        owner: { connect: { id: user.id } }
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: company.siret
+          }
+        }
       }
     });
 
@@ -54,8 +66,13 @@ describe("cleanUnusedAppendix1ProducerBsdds", () => {
         emitterType: EmitterType.APPENDIX1,
         emitterCompanySiret: company.siret,
         emitterCompanyName: company.name,
-        transporterCompanySiret: company.siret,
         recipientCompanySiret: company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: company.siret,
+            number: 1
+          }
+        },
         grouping: {
           createMany: {
             data: [
@@ -81,37 +98,50 @@ describe("cleanUnusedAppendix1ProducerBsdds", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     // Item sent now
-    const appendix1_1 = await prisma.form.create({
-      data: {
-        readableId: getReadableId(),
+    const appendix1_1 = await formFactory({
+      ownerId: user.id,
+      opt: {
         status: Status.SENT,
         emitterType: EmitterType.APPENDIX1_PRODUCER,
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: company.siret,
-        takenOverAt: new Date(),
-        owner: { connect: { id: user.id } }
+        transporters: {
+          create: {
+            transporterCompanySiret: company.siret,
+            number: 1
+          }
+        },
+        takenOverAt: new Date()
       }
     });
 
     // Then 2 unsent items (sealed)
-    const appendix1_2 = await prisma.form.create({
-      data: {
-        readableId: getReadableId(),
+    const appendix1_2 = await formFactory({
+      ownerId: user.id,
+      opt: {
         status: Status.SEALED,
         emitterType: EmitterType.APPENDIX1_PRODUCER,
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: company.siret,
-        owner: { connect: { id: user.id } }
+        transporters: {
+          create: {
+            transporterCompanySiret: company.siret,
+            number: 1
+          }
+        }
       }
     });
-    const appendix1_3 = await prisma.form.create({
-      data: {
-        readableId: getReadableId(),
+
+    const appendix1_3 = await formFactory({
+      ownerId: user.id,
+      opt: {
         status: Status.SEALED,
         emitterType: EmitterType.APPENDIX1_PRODUCER,
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: company.siret,
-        owner: { connect: { id: user.id } }
+        transporters: {
+          create: {
+            transporterCompanySiret: company.siret,
+            number: 1
+          }
+        }
       }
     });
 
@@ -123,8 +153,13 @@ describe("cleanUnusedAppendix1ProducerBsdds", () => {
         emitterType: EmitterType.APPENDIX1,
         emitterCompanySiret: company.siret,
         emitterCompanyName: company.name,
-        transporterCompanySiret: company.siret,
         recipientCompanySiret: company.siret,
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: company.siret
+          }
+        },
         grouping: {
           createMany: {
             data: [
