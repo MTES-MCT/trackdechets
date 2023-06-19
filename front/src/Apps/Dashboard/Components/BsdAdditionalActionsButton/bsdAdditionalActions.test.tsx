@@ -30,12 +30,16 @@ describe("BsdAdditionalActionsButton", () => {
       <BsdAdditionalActionsButton
         bsd={bsd}
         currentSiret={currentSiret}
-        onOverview={onOverview}
-        onDuplicate={onDuplicate}
-        onPdf={onPdf}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-        onRevision={onRevision}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
       />
     );
   });
@@ -45,12 +49,16 @@ describe("BsdAdditionalActionsButton", () => {
       <BsdAdditionalActionsButton
         bsd={bsd}
         currentSiret={currentSiret}
-        onOverview={onOverview}
-        onDuplicate={onDuplicate}
-        onPdf={onPdf}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-        onRevision={onRevision}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
       />
     );
 
@@ -80,12 +88,16 @@ describe("BsdAdditionalActionsButton", () => {
       <BsdAdditionalActionsButton
         bsd={bsd}
         currentSiret={currentSiret}
-        onOverview={onOverview}
-        onDuplicate={onDuplicate}
-        onPdf={onPdf}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-        onRevision={onRevision}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
       />
     );
 
@@ -101,12 +113,16 @@ describe("BsdAdditionalActionsButton", () => {
       <BsdAdditionalActionsButton
         bsd={bsd}
         currentSiret={currentSiret}
-        onOverview={onOverview}
-        onDuplicate={onDuplicate}
-        onPdf={onPdf}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-        onRevision={onRevision}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
       />
     );
 
@@ -122,12 +138,16 @@ describe("BsdAdditionalActionsButton", () => {
       <BsdAdditionalActionsButton
         bsd={bsd}
         currentSiret={currentSiret}
-        onOverview={onOverview}
-        onDuplicate={onDuplicate}
-        onPdf={onPdf}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-        onRevision={onRevision}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
       />
     );
 
@@ -148,12 +168,16 @@ describe("BsdAdditionalActionsButton", () => {
       <BsdAdditionalActionsButton
         bsd={bsdDelete}
         currentSiret={currentSiret}
-        onOverview={onOverview}
-        onDuplicate={onDuplicate}
-        onPdf={onPdf}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-        onRevision={onRevision}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
       />
     );
 
@@ -174,12 +198,16 @@ describe("BsdAdditionalActionsButton", () => {
       <BsdAdditionalActionsButton
         bsd={bsdUpdate}
         currentSiret={currentSiret}
-        onOverview={onOverview}
-        onDuplicate={onDuplicate}
-        onPdf={onPdf}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-        onRevision={onRevision}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
       />
     );
 
@@ -195,17 +223,21 @@ describe("BsdAdditionalActionsButton", () => {
       ...bsd,
       status: BsdStatusCode.Processed,
       type: BsdType.Bsdd,
-    };
+    } as BsdDisplay;
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsdReview}
         currentSiret={currentSiret}
-        onOverview={onOverview}
-        onDuplicate={onDuplicate}
-        onPdf={onPdf}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-        onRevision={onRevision}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
       />
     );
 
@@ -230,13 +262,16 @@ describe("BsdAdditionalActionsButton", () => {
       <BsdAdditionalActionsButton
         bsd={bsdSuite}
         currentSiret={currentSiret}
-        onOverview={onOverview}
-        onDuplicate={onDuplicate}
-        onPdf={onPdf}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-        onRevision={onRevision}
-        onBsdSuite={onBsdSuite}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
       />
     );
 
@@ -262,13 +297,16 @@ describe("BsdAdditionalActionsButton", () => {
       <BsdAdditionalActionsButton
         bsd={bsdSuite}
         currentSiret={currentSiret}
-        onOverview={onOverview}
-        onDuplicate={onDuplicate}
-        onPdf={onPdf}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-        onRevision={onRevision}
-        onBsdSuite={onBsdSuite}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
       />
     );
 
@@ -285,18 +323,21 @@ describe("BsdAdditionalActionsButton", () => {
       emitterType: EmitterType.Appendix1,
       status: BsdStatusCode.Sent,
       type: BsdType.Bsdd,
-    };
+    } as BsdDisplay;
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsdAppendix1}
         currentSiret={currentSiret}
-        onOverview={onOverview}
-        onDuplicate={onDuplicate}
-        onPdf={onPdf}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-        onRevision={onRevision}
-        onAppendix1={onAppendix1}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
       />
     );
 

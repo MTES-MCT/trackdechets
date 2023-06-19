@@ -1,16 +1,11 @@
-import {
-  Bsff,
-  Bsd,
-  Form,
-  Bsda,
-  Bsdasri,
-  Bsvhu,
-  BsdType,
-} from "../../generated/graphql/types";
+import { Bsff, Bsdasri, Bsvhu, BsdType } from "../../generated/graphql/types";
 import {
   BsdDisplay,
   BsdStatusCode,
   BsdTypename,
+  BsdWithReview,
+  BsdaWithReview,
+  FormWithReview,
   TBsdStatusCode,
 } from "../common/types/bsdTypes";
 
@@ -41,7 +36,7 @@ const mapBsdTypeNameToBsdType = (
   }
 };
 
-export const formatBsd = (bsd: Bsd): BsdDisplay | null => {
+export const formatBsd = (bsd: BsdWithReview): BsdDisplay | null => {
   switch (bsd.__typename) {
     case BsdTypename.Bsdd:
       return createBsdd(bsd);
@@ -59,7 +54,7 @@ export const formatBsd = (bsd: Bsd): BsdDisplay | null => {
   }
 };
 
-const createBsdd = (bsdd: Form): BsdDisplay => {
+const createBsdd = (bsdd: FormWithReview): BsdDisplay => {
   const bsddFormatted: BsdDisplay = {
     id: bsdd.id,
     readableid: bsdd.readableId,
@@ -82,11 +77,12 @@ const createBsdd = (bsdd: Form): BsdDisplay => {
     grouping: bsdd.grouping,
     temporaryStorageDetail: bsdd.temporaryStorageDetail,
     bsdWorkflowType: bsdd.emitter?.type,
+    review: bsdd?.review,
   } as BsdDisplay;
   return bsddFormatted;
 };
 
-const createBsda = (bsda: Bsda): BsdDisplay => {
+const createBsda = (bsda: BsdaWithReview): BsdDisplay => {
   const statusCode = bsda?.status || bsda["bsdaStatus"];
   const bsdaFormatted: BsdDisplay = {
     id: bsda.id,
@@ -103,11 +99,12 @@ const createBsda = (bsda: Bsda): BsdDisplay => {
     destination: bsda.destination || bsda["bsdaDestination"],
     transporter: bsda.transporter || bsda["bsdaTransporter"],
     ecoOrganisme: bsda.ecoOrganisme,
-    updatedAt: bsda["bsdaUpdatedAt"],
+    updatedAt: bsda.updatedAt || bsda["bsdaUpdatedAt"],
     emittedByEcoOrganisme: bsda.ecoOrganisme,
     worker: bsda.worker,
     bsdWorkflowType: bsda.type || bsda["bsdaType"],
     grouping: bsda.grouping,
+    review: bsda?.review,
   };
   return bsdaFormatted;
 };
