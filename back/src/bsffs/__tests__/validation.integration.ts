@@ -217,6 +217,62 @@ describe("transporterSchema", () => {
       "Transporteur : l'adresse email est invalide"
     );
   });
+
+  // TODO -TODO -TODO -TODO -TODO -TODO -TODO -TODO -TODO
+
+  // describe.only("Emitter transports own waste", () => {
+  //   it("allowed if dangerous waste <= 100kg", async () => {
+  //     const bsff = {
+  //       ...transporterData,
+  //       transporterCompanySiret: transporterData.emitterCompanySiret,
+  //       wasteDetailsCode: "16 06 01*",
+  //       wasteDetailsQuantity: 0.1
+  //     };
+  //     const isValid = transporterSchema.isValid(bsff);
+
+  //     expect(isValid).toBeTruthy();
+  //   });
+
+  //   it("allowed if non-dangerous waste <= 500kg", async () => {
+  //     const bsff = {
+  //       ...transporterData,
+  //       transporterCompanySiret: transporterData.emitterCompanySiret,
+  //       wasteDetailsCode: "18 01 01",
+  //       wasteDetailsQuantity: 0.5
+  //     };
+  //     const isValid = transporterSchema.isValid(bsff);
+
+  //     expect(isValid).toBeTruthy();
+  //   });
+
+  //   it("not allowed if dangerous waste > 100kg", async () => {
+  //     const bsff = {
+  //       ...transporterData,
+  //       transporterCompanySiret: transporterData.emitterCompanySiret,
+  //       wasteDetailsCode: "16 06 01*",
+  //       wasteDetailsQuantity: 0.101
+  //     };
+  //     const validateFn = () => transporterSchema.validate(bsff);
+
+  //     await expect(validateFn()).rejects.toThrow(
+  //       "Si vous transportez vos propres déchets, vous ne pouvez transporter que 100kg de déchets dangereux maximum."
+  //     );
+  //   });
+
+  //   it("not allowed if non-dangerous waste > 500kg", async () => {
+  //     const bsff = {
+  //       ...transporterData,
+  //       transporterCompanySiret: transporterData.emitterCompanySiret,
+  //       wasteDetailsCode: "18 01 01",
+  //       wasteDetailsQuantity: 0.501
+  //     };
+  //     const validateFn = () => transporterSchema.validate(bsff);
+
+  //     await expect(validateFn()).rejects.toThrow(
+  //       "Si vous transportez vos propres déchets, vous ne pouvez transporter que 500kg de déchets non dangereux maximum."
+  //     );
+  //   });
+  // });
 });
 
 describe("destinationSchema", () => {

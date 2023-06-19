@@ -21,6 +21,7 @@ import {
   isSiret,
   isVat
 } from "./constants/companySearchHelpers";
+import { isDangerous } from "./constants";
 
 // Poids maximum en tonnes tout mode de transport confondu
 const MAX_WEIGHT_TONNES = 50000;
@@ -163,79 +164,95 @@ export const siretConditions: SiretConditions = {
 
 const { VERIFY_COMPANY } = process.env;
 
-const readablePaths = {
-  transporterCompanySiret: "Transporteur",
-  destinationCompanySiret: "Destination",
-  recipientCompanySiret: "Destinataire"
-};
-export const testSiret = async (
-  role: string | undefined,
-  siret: string,
-  path: string
-): Promise<boolean> => {
-  if (!siret) return true;
-  const company = await prisma.company.findUnique({
-    where: { siret }
-  });
-  if (company === null) {
-    const readablePath = readablePaths[path] ?? path;
-
-    throw new Error(
-      `${readablePath} : l'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
-    );
-  }
-  if (role === "DESTINATION") {
-    if (
-      !(
-        isCollector(company) ||
-        isWasteProcessor(company) ||
-        isWasteCenter(company) ||
-        isWasteVehicles(company)
-      )
-    ) {
-      throw new Error(
-        `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
-          ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
-          ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
-          ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
-      );
-    }
-    if (
-      VERIFY_COMPANY === "true" &&
-      company.verificationStatus !== CompanyVerificationStatus.VERIFIED
-    ) {
-      throw new Error(
-        `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
-          ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
-      );
-    }
-  }
-  if (role === "TRANSPORTER" && !isTransporter(company)) {
-    throw new Error(
-      `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets` +
-        ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
-        ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
-        ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
-    );
-  }
-  return true;
-};
-
 export const siretTests: SiretTests = {
   isRegistered: role => ({
     name: "is-registered-with-right-profile",
+    message: ({ path, value }) =>
+      `${path} : l'établissement avec le SIRET ${value} n'est pas inscrit sur Trackdéchets`,
     test: async (siret, ctx) => {
-      try {
-        const path = ctx.path || ctx.schema.spec.label;
+      if (!siret) return true;
+      const company = await prisma.company.findUnique({
+        where: { siret }
+      });
+      if (company === null) {
+        return false;
+      }
+      if (role === "DESTINATION") {
+        if (
+          !(
+            isCollector(company) ||
+            isWasteProcessor(company) ||
+            isWasteCenter(company) ||
+            isWasteVehicles(company)
+          )
+        ) {
+          return ctx.createError({
+            message:
+              `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
+              ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
+              ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
+              ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+          });
+        }
+        if (
+          VERIFY_COMPANY === "true" &&
+          company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+        ) {
+          return ctx.createError({
+            message:
+              `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
+              ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
+          });
+        }
+      }
+      if (role === "TRANSPORTER" && !isTransporter(company)) {
+        const {
+          emitterType,
+          transporterCompanySiret,
+          emitterCompanySiret,
+          wasteDetailsCode,
+          wasteDetailsQuantity
+        } = ctx.parent;
 
-        await testSiret(role, siret, path);
+        const isTransportingOwnWastes =
+          transporterCompanySiret &&
+          emitterCompanySiret &&
+          emitterCompanySiret === transporterCompanySiret;
 
-        return true;
-      } catch (e) {
+        const isEmitterTypeOk =
+          emitterType !== "APPENDIX1" && // Annexe 1
+          emitterType !== "APPENDIX2"; // Regroupement
+
+        // Emitter transports own waste
+        if (isTransportingOwnWastes && isEmitterTypeOk) {
+          // Dangerous waste. Up to 100kg
+          if (isDangerous(wasteDetailsCode)) {
+            if (wasteDetailsQuantity > 0.1) {
+              return ctx.createError({
+                message:
+                  "Si vous transportez vos propres déchets, vous ne pouvez transporter que 100kg de déchets dangereux maximum."
+              });
+            }
+          } else {
+            // Non-dangerous waste. 500kg max
+            if (wasteDetailsQuantity > 0.5) {
+              return ctx.createError({
+                message:
+                  "Si vous transportez vos propres déchets, vous ne pouvez transporter que 500kg de déchets non dangereux maximum."
+              });
+            }
+          }
+        }
+
         return ctx.createError({
-          message: e.message
+          message:
+            `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets` +
+            ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
+            ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
+            ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
         });
       }
+      return true;
     }
   })
 };
