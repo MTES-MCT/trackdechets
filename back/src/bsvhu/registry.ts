@@ -51,6 +51,7 @@ function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
   return {
     wasteDescription: getWasteDescription(bsvhu.wasteCode),
     wasteCode: bsvhu.wasteCode,
+    wasteIsDangerous: true,
     pop: false,
     id: bsvhu.id,
     createdAt: bsvhu.createdAt,

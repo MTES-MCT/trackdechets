@@ -58,6 +58,7 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
       ? getWasteDescription(bsdasri.wasteCode)
       : "",
     wasteCode: bsdasri.wasteCode,
+    wasteIsDangerous: true,
     pop: false,
     id: bsdasri.id,
     createdAt: bsdasri.createdAt,

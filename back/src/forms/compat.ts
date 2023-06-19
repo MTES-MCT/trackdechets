@@ -25,6 +25,7 @@ export function simpleFormToBsdd(
     status: form.status,
     wasteCode: form.wasteDetailsCode,
     wasteDescription: form.wasteDetailsName,
+    wasteIsDangerous: form.wasteDetailsIsDangerous,
     pop: form.wasteDetailsPop,
     traderCompanyName: form.traderCompanyName,
     traderCompanySiret: form.traderCompanySiret,

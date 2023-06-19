@@ -61,6 +61,11 @@ const columns: Column[] = [
   { field: "status", label: "Statut du bordereau" },
   { field: "wasteDescription", label: "Dénomination usuelle" },
   { field: "wasteCode", label: "Code du déchet" },
+  {
+    field: "wasteIsDangerous",
+    label: "Déchet dangereux",
+    format: formatBoolean
+  },
   { field: "pop", label: "POP", format: formatBoolean },
   { field: "weight", label: "Quantité de déchet", format: formatNumber },
   // Origine du déchet
