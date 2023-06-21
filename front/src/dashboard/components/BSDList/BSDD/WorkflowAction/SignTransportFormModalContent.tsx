@@ -132,6 +132,7 @@ export default function SignTransportFormModalContent({
           securityCode: "",
           transporterNumberPlate:
             form.stateSummary?.transporterNumberPlate ?? "",
+          emitter: { type: form?.emitter?.type },
           update: {
             quantity: form.wasteDetails?.quantity ?? 0,
             sampleNumber: form.wasteDetails?.sampleNumber ?? "",
@@ -180,7 +181,7 @@ export default function SignTransportFormModalContent({
               },
             });
             onClose();
-          } catch (err) {}
+          } catch (err) { }
         }}
       >
         {() => (
@@ -229,19 +230,19 @@ export default function SignTransportFormModalContent({
               form.transporter?.company?.orgId,
               form.temporaryStorageDetail?.transporter?.company?.orgId,
             ].includes(siret) && (
-              <div className="form__row">
-                <label>
-                  Code de signature du transporteur
-                  <Field
-                    component={SignatureCodeInput}
-                    className="td-input"
-                    name="securityCode"
-                    placeholder="1234"
-                  />
-                </label>
-                <RedErrorMessage name="securityCode" />
-              </div>
-            )}
+                <div className="form__row">
+                  <label>
+                    Code de signature du transporteur
+                    <Field
+                      component={SignatureCodeInput}
+                      className="td-input"
+                      name="securityCode"
+                      placeholder="1234"
+                    />
+                  </label>
+                  <RedErrorMessage name="securityCode" />
+                </div>
+              )}
 
             {error && <NotificationError apolloError={error} />}
             {updateError && <NotificationError apolloError={updateError} />}

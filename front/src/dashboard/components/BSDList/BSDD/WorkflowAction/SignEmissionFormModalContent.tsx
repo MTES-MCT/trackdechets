@@ -121,6 +121,7 @@ function SignEmissionFormModalContent({
     emittedBy: "",
     emittedByType: EmitterType.Emitter,
     securityCode: "",
+    emitter: { type: form?.emitter?.type },
     ...(form.status === FormStatus.Resealed
       ? {
           packagingInfos:
@@ -159,7 +160,7 @@ function SignEmissionFormModalContent({
         },
       });
       onClose();
-    } catch (err) {}
+    } catch (err) { }
   };
 
   return (
