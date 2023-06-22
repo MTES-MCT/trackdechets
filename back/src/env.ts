@@ -34,7 +34,7 @@ export const envVariables = z
     OIDC_PRIVATE_KEY: z.string(),
     // -------
     // Various
-    REGISTRY_WHITE_LIST_IP: z.string().optional(), // TODO default array
+    REGISTRY_WHITE_LIST_IP: z.string().optional(),
     USERS_BLACKLIST: z.string().optional(),
     MAX_REQUESTS_PER_WINDOW: z.string(),
     STARTUP_FILE: z.string(),
@@ -113,7 +113,7 @@ export const envVariables = z
       .default("600")
       .refine(isNumber),
     // Companies
-    SIRENIFY_BYPASS_USER_EMAILS: z.string().optional(), // TODO default here ?
+    SIRENIFY_BYPASS_USER_EMAILS: z.string().optional(),
     TD_COMPANY_ELASTICSEARCH_INDEX: z.string(),
     TD_COMPANY_ELASTICSEARCH_CACERT: z.string().optional(),
     TD_COMPANY_ELASTICSEARCH_IGNORE_SSL: z
