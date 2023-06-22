@@ -6,7 +6,7 @@ const backends = {
   sendinblue: sendInBlueBackend
 };
 
-export const backend = backends[process.env.EMAIL_BACKEND!];
+export const backend = backends[process.env.EMAIL_BACKEND];
 
 if (!backend) {
   throw new Error("Invalid email backend configuration: EMAIL_BACKEND");

@@ -35,7 +35,7 @@ const MAX_WEIGHT_BY_ROAD_TONNES = 40;
 // une date de création de bordereau `createdAt` avant laquelle la validation de poids
 // en cas de transport routier ne s'applique pas.
 const MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER = new Date(
-  process.env.MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER ?? 0
+  process.env.MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER
 );
 
 export enum WeightUnits {

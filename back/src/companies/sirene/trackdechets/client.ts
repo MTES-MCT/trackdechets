@@ -16,7 +16,7 @@ const { ResponseError } = errors;
  * Index "stocketablissement" created thanks to
  * https://github.com/MTES-MCT/trackdechets-sirene-search
  */
-const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX!;
+const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX;
 
 /**
  * Build a company object from a search response
