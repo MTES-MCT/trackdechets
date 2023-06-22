@@ -8,5 +8,10 @@ module.exports = {
     "^src/(.*)$": "<rootDir>/$1",
     "^integration-tests/(.*)$": "<rootDir>/../integration-tests/$1"
   },
-  setupFilesAfterEnv: ["../integration-tests/jest.setup.ts"]
+  setupFilesAfterEnv: ["../integration-tests/jest.setup.ts"],
+  globals: {
+    'ts-jest': {
+      isolatedModules: true
+    }
+  }
 };
