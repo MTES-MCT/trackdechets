@@ -160,7 +160,7 @@ function SignEmissionFormModalContent({
         },
       });
       onClose();
-    } catch (err) { }
+    } catch (err) {}
   };
 
   return (
