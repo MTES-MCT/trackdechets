@@ -482,7 +482,7 @@ export async function getBsdIdentifiers(
 export async function processBsdIdentifiersByChunk(
   ids: string[],
   fn: (chunk: string[]) => Promise<any>,
-  chunkSize = parseInt(process.env.BULK_INDEX_BATCH_SIZE!, 10) || 100
+  chunkSize = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10)
 ) {
   for (let i = 0; i < ids.length; i += chunkSize) {
     const chunk = ids.slice(i, i + chunkSize);
@@ -545,7 +545,7 @@ export async function indexAllBsdTypeConcurrently({
   });
 
   // control concurrency of addBulk
-  const chunkSize = parseInt(process.env.BULK_INDEX_BATCH_ADD!, 10) || 5;
+  const chunkSize = parseInt(process.env.BULK_INDEX_BATCH_ADD, 10);
   for (let i = 0; i < data.length; i += chunkSize) {
     const chunk = data.slice(i, i + chunkSize);
     // all jobs are succesfully added in bulk or all jobs will fail

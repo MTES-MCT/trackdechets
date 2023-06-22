@@ -2,12 +2,15 @@ import { app, startApolloServer } from "./server";
 import { closeQueues } from "./queue/producers";
 import { cleanGqlCaches } from "./temp-memory";
 import { heapSnapshotToS3Router } from "./logging/heapSnapshot";
+import { envVariables } from "./env";
 
-const port = process.env.API_PORT || 80;
+envVariables.parse(process.env);
 
 async function start() {
   await startApolloServer();
-  app.listen(port, () => console.info(`Server is running on port ${port}`));
+  app.listen(process.env.API_PORT, () =>
+    console.info(`Server is running on port ${process.env.API_PORT}`)
+  );
 
   // TODO - To remove. Either completely if it doesnt work or with a better fix if it does
   cleanGqlCaches();

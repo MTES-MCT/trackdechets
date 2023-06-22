@@ -37,9 +37,7 @@ export class SetContactsUpdater implements Updater {
 
           return Promise.all(
             contactsToCreate.map(c =>
-              addContact({ email: c.email, name: c.name }).catch(err =>
-                console.error(`Error for email ${c.email}`, err)
-              )
+              addContact({ email: c.email, name: c.name })
             )
           );
         });

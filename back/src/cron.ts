@@ -10,13 +10,7 @@ import {
 import { initSentry } from "./common/sentry";
 import { cleanUnusedAppendix1ProducerBsdds } from "./commands/appendix1.helpers";
 
-const {
-  CRON_ONBOARDING_SCHEDULE,
-  FIRST_ONBOARDING_TEMPLATE_ID,
-  PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID,
-  PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID,
-  VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID
-} = process.env;
+const { CRON_ONBOARDING_SCHEDULE, TZ } = process.env;
 
 let jobs: cron.CronJob[] = [
   new cron.CronJob({
@@ -24,27 +18,12 @@ let jobs: cron.CronJob[] = [
     onTick: async () => {
       await cleanUnusedAppendix1ProducerBsdds();
     },
-    timeZone: "Europe/Paris"
+    timeZone: TZ
   })
 ];
 
 if (CRON_ONBOARDING_SCHEDULE) {
   validateOnbardingCronSchedule(CRON_ONBOARDING_SCHEDULE);
-
-  if (
-    !FIRST_ONBOARDING_TEMPLATE_ID ||
-    !PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID ||
-    !PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID ||
-    !VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID
-  ) {
-    throw new Error(
-      `Cannot start onboarding email cron job because some email templates were not configured :
-      - FIRST_ONBOARDING_TEMPLATE_ID
-      - PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID
-      - PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
-      - VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID`
-    );
-  }
 
   jobs = [
     ...jobs,
@@ -54,7 +33,7 @@ if (CRON_ONBOARDING_SCHEDULE) {
       onTick: async () => {
         await sendSecondOnboardingEmail();
       },
-      timeZone: "Europe/Paris"
+      timeZone: TZ
     }),
     // new users with no company nor membership request
     new cron.CronJob({
@@ -62,7 +41,7 @@ if (CRON_ONBOARDING_SCHEDULE) {
       onTick: async () => {
         await sendMembershipRequestDetailsEmail();
       },
-      timeZone: "Europe/Paris"
+      timeZone: TZ
     }),
     // users with no answer to their membership requests
     new cron.CronJob({
@@ -70,7 +49,7 @@ if (CRON_ONBOARDING_SCHEDULE) {
       onTick: async () => {
         await sendPendingMembershipRequestDetailsEmail();
       },
-      timeZone: "Europe/Paris"
+      timeZone: TZ
     }),
     // admins who did not answer to membership requests
     new cron.CronJob({
@@ -78,7 +57,7 @@ if (CRON_ONBOARDING_SCHEDULE) {
       onTick: async () => {
         await sendPendingMembershipRequestToAdminDetailsEmail();
       },
-      timeZone: "Europe/Paris"
+      timeZone: TZ
     }),
     // admins who did not answer to revision requests
     new cron.CronJob({
@@ -86,7 +65,7 @@ if (CRON_ONBOARDING_SCHEDULE) {
       onTick: async () => {
         await sendPendingRevisionRequestToAdminDetailsEmail();
       },
-      timeZone: "Europe/Paris"
+      timeZone: TZ
     })
   ];
 }

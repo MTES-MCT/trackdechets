@@ -10,7 +10,7 @@ import {
 } from "gotenberg-js-client";
 
 export const toPDF = pipe(
-  gotenberg(process.env.GOTENBERG_URL!),
+  gotenberg(process.env.GOTENBERG_URL),
   convert,
   html,
   to({
