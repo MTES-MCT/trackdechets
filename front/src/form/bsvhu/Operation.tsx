@@ -112,6 +112,9 @@ export default function Operation() {
             component={DateInput}
             name="destination.operation.date"
             className="td-input td-input--small"
+            minDate={subMonths(TODAY, 2)}
+            maxDate={TODAY}
+            required
           />
         </label>
 
