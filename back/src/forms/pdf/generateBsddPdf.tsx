@@ -344,18 +344,18 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               un bordereau de tournée dédiée{" "}
               <input
                 type="checkbox"
+                checked={form.emitter?.type === EmitterType.APPENDIX1_PRODUCER}
+                readOnly
+              />{" "}
+              un bordereau d'annexe 1{" "}
+              <input
+                type="checkbox"
                 checked={form.emitter?.type === EmitterType.APPENDIX2}
                 readOnly
               />{" "}
               créer un bordereau de regroupement, pour la personne ayant
               transformé ou réalisé un traitement dont la provenance des déchets
               reste identifiable (l’annexe 2 sera jointe automatiquement)
-              <input
-                type="checkbox"
-                checked={form.emitter?.type === EmitterType.APPENDIX1_PRODUCER}
-                readOnly
-              />{" "}
-              un bordereau d'annexe 1
             </p>
           </div>
         </div>

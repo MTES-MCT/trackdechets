@@ -113,6 +113,7 @@ function SignEmissionFormModalContent({
     emittedBy: "",
     emittedByType: EmitterType.Emitter,
     securityCode: "",
+    emitter: { type: form?.emitter?.type },
     ...(form.status === FormStatus.Resealed
       ? {
           packagingInfos:
