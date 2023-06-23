@@ -87,7 +87,11 @@ export function BsddRequestRevision({ bsdd }: Props) {
       </h2>
 
       <Formik
-        initialValues={{ comment: "", content: initialReview }}
+        initialValues={{
+          comment: "",
+          content: initialReview,
+          emitter: { type: bsdd?.emitter?.type },
+        }}
         validationSchema={validationSchema}
         onSubmit={async ({ content, comment }) => {
           let cleanedContent;
