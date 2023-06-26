@@ -72,13 +72,15 @@ export default withRouter(function LayoutContainer({ history }) {
     : [""];
   const { updateFeatureFlags } = useFeatureFlags();
 
-  const canAccessDashboardV2 = flagDashboardV2UserId.includes(userId);
+  const canAccessDashboardV2 =
+    isAdmin || flagDashboardV2UserId.includes(userId);
 
-  const dashboardRoutePrefixAdminCheck =
-    isAdmin || canAccessDashboardV2 ? "dashboardv2" : "dashboard";
+  const dashboardRoutePrefixAccessCheck = canAccessDashboardV2
+    ? "dashboardv2"
+    : "dashboard";
   const dashboardRoutePrefix = !isV2Routes
     ? "dashboard"
-    : dashboardRoutePrefixAdminCheck;
+    : dashboardRoutePrefixAccessCheck;
 
   const { DEV } = import.meta.env;
   const isDevelopment = DEV;
@@ -97,6 +99,7 @@ export default withRouter(function LayoutContainer({ history }) {
       enableAutoPageviews();
     }
   }
+
   useEffect(() => {
     updateFeatureFlags({
       dashboardV2: canAccessDashboardV2,
@@ -309,7 +312,7 @@ export default withRouter(function LayoutContainer({ history }) {
 
               <PrivateRoute
                 path={routes.dashboardv2.index}
-                isAuthenticated={isAdmin}
+                isAuthenticated={isAuthenticated}
               >
                 <DashboardV2Routes />
               </PrivateRoute>
