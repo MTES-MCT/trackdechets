@@ -8,10 +8,10 @@ import {
   MutationJoinWithInviteArgs,
   Query,
 } from "../generated/graphql/types";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import * as queryString from "query-string";
 import { decodeHash } from "common/helper";
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";

@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
-import { GET_BSDS } from "common/queries";
-import routes from "common/routes";
+import { GET_BSDS } from "Apps/common/queries";
+import routes from "Apps/routes";
 import { UPDATE_BSDA } from "form/bsda/stepper/queries";
 import { WasteInfoWorker } from "form/bsda/stepper/steps/WasteInfo";
 import { getComputedState } from "form/common/getComputedState";
@@ -15,11 +15,14 @@ import {
   SignatureTypeInput,
 } from "generated/graphql/types";
 import React from "react";
-import { generatePath, Link } from "react-router-dom";
+import { generatePath, Link, useRouteMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsda, SIGN_BSDA } from "./SignBsda";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
 const validationSchema = yup.object({
+  date: yup.date().required("La date est requise"),
   author: yup
     .string()
     .ensure()
@@ -49,6 +52,10 @@ export function SignWork({
     MutationSignBsdaArgs
   >(SIGN_BSDA, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
+  const TODAY = new Date();
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
+
   return (
     <SignBsda
       title="Signer en tant qu'entreprise de travaux"
@@ -68,7 +75,7 @@ export function SignWork({
             </p>
 
             <Link
-              to={generatePath(routes.dashboard.bsdas.edit, {
+              to={generatePath(routes[dashboardRoutePrefix].bsdas.edit, {
                 siret,
                 id: bsda.id,
               })}
@@ -80,6 +87,7 @@ export function SignWork({
         ) : (
           <Formik
             initialValues={{
+              date: TODAY,
               author: "",
               ...getComputedState(
                 {
@@ -101,7 +109,7 @@ export function SignWork({
             }}
             validationSchema={validationSchema}
             onSubmit={async values => {
-              const { id, author, ...update } = values;
+              const { id, author, date, ...update } = values;
               await updateBsda({
                 variables: {
                   id: bsda.id,
@@ -113,6 +121,7 @@ export function SignWork({
                   id: bsda.id,
                   input: {
                     author,
+                    date,
                     type: BsdaSignatureType.Work,
                   },
                 },
@@ -130,8 +139,26 @@ export function SignWork({
                   En qualité <strong>d'entreprise de travaux</strong>, j'atteste
                   que les informations ci-dessus sont correctes. En signant ce
                   document, j'autorise le transporteur à prendre en charge le
-                  déchet. La signature est horodatée.
+                  déchet.
                 </p>
+
+                <div className="form__row">
+                  <label>
+                    Date
+                    <div className="td-date-wrapper">
+                      <Field
+                        name="date"
+                        component={DateInput}
+                        minDate={subMonths(TODAY, 2)}
+                        maxDate={TODAY}
+                        required
+                        className="td-input"
+                      />
+                    </div>
+                  </label>
+                  <RedErrorMessage name="date" />
+                </div>
+
                 <div className="form__row">
                   <label>
                     Nom du signataire

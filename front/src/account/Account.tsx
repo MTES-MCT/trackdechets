@@ -10,8 +10,8 @@ import {
   Switch,
   Link,
 } from "react-router-dom";
-import Loader from "common/components/Loaders";
-import { InlineError } from "common/components/Error";
+import Loader from "Apps/common/Components/Loader/Loaders";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import AccountInfo from "./AccountInfo";
 import AccountAccessTokenList from "./accessTokens/AccountAccessTokenList";
 import AccountCompanyList from "./AccountCompanyList";
@@ -22,7 +22,7 @@ import AccountCompanyAddForeign from "./AccountCompanyAddForeign";
 import AccountOauth2AppList from "./oauth2/AccountOauth2AppList";
 import AccountOAuth2AppCreateUpdate from "./oauth2/AccountOauth2AppCreateUpdate";
 import { Query } from "generated/graphql/types";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import AccountAuthorizedAppList from "./apps/AccountAuthorizedAppList";
 import AccountCompanyOrientation from "./AccountCompanyOrientation";
 

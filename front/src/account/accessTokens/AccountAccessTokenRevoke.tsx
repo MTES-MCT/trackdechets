@@ -3,7 +3,7 @@ import { Modal } from "common/components";
 import { AccessToken, NewAccessToken } from "generated/graphql/types";
 import { useMutation } from "@apollo/client";
 import { ACCESS_TOKENS, REVOKE_ACCESS_TOKEN } from "./queries";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 
 type AccountAccessTokenRevokeProps = {
   accessToken: AccessToken | NewAccessToken;

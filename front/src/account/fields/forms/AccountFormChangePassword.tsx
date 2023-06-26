@@ -7,7 +7,7 @@ import styles from "./AccountForm.module.scss";
 import { object, string } from "yup";
 import { MutationChangePasswordArgs, Mutation } from "generated/graphql/types";
 import classNames from "classnames";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 
 type Props = {
   toggleEdition: () => void;

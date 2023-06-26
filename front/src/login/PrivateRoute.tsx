@@ -1,4 +1,4 @@
-import routes from "common/routes";
+import routes from "Apps/routes";
 import React from "react";
 import { Route, Redirect, RouteProps, useLocation } from "react-router-dom";
 

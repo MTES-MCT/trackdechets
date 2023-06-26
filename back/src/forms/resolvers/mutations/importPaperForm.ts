@@ -5,8 +5,12 @@ import {
   ImportPaperFormInput,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb, flattenImportPaperFormInput } from "../../converter";
+import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
+import {
+  expandFormFromDb,
+  flattenImportPaperFormInput,
+  flattenTransporterInput
+} from "../../converter";
 import { checkCanImportForm } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
@@ -45,7 +49,16 @@ async function updateForm(
   }
 
   const flattenedFormInput = flattenImportPaperFormInput(input);
-  const validationData = { ...form, ...flattenedFormInput };
+  const flattenedTransporter = flattenTransporterInput(input);
+
+  const existingTransporter = await getFirstTransporter(form);
+  const validationData = {
+    ...form,
+    ...flattenedFormInput,
+    ...existingTransporter,
+    ...flattenedTransporter,
+    isAccepted: flattenedFormInput.wasteAcceptationStatus === "ACCEPTED"
+  };
 
   await processedFormSchema.validate(validationData, { abortEarly: false });
 
@@ -53,15 +66,15 @@ async function updateForm(
   const {
     emitterCompanySiret,
     recipientCompanySiret,
-    transporterCompanySiret,
     traderCompanySiret,
-    brokerCompanySiret
+    brokerCompanySiret,
+    transporterCompanySiret
   } = validationData;
 
   if (
     emitterCompanySiret != form.emitterCompanySiret ||
     recipientCompanySiret != form.recipientCompanySiret ||
-    transporterCompanySiret != form.transporterCompanySiret ||
+    transporterCompanySiret != existingTransporter?.transporterCompanySiret ||
     traderCompanySiret != form.traderCompanySiret ||
     brokerCompanySiret != form.brokerCompanySiret
   ) {
@@ -76,7 +89,25 @@ async function updateForm(
     signedByTransporter: true,
     emittedAt: flattenedFormInput.sentAt,
     emittedBy: flattenedFormInput.sentBy,
-    takenOverAt: flattenedFormInput.sentAt
+    takenOverAt: flattenedFormInput.sentAt,
+    ...(existingTransporter
+      ? {
+          transporters: {
+            update: {
+              where: { id: existingTransporter.id },
+              data: flattenedTransporter
+            }
+          }
+        }
+      : {
+          transporters: {
+            create: {
+              ...flattenedTransporter,
+              number: 1,
+              readyToTakeOver: true
+            }
+          }
+        })
   };
 
   return getFormRepository(user).update(
@@ -97,10 +128,14 @@ async function updateForm(
  */
 async function createForm(input: ImportPaperFormInput, user: Express.User) {
   const flattenedFormInput = flattenImportPaperFormInput(input);
+  const flattenedTransporter = flattenTransporterInput(input);
 
-  await processedFormSchema.validate(flattenedFormInput, {
-    abortEarly: false
-  });
+  await processedFormSchema.validate(
+    { ...flattenedFormInput, ...flattenedTransporter },
+    {
+      abortEarly: false
+    }
+  );
 
   const noTraceability = input.processedInfo?.noTraceability === true;
   const awaitingGroup = PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
@@ -117,7 +152,18 @@ async function createForm(input: ImportPaperFormInput, user: Express.User) {
       ? Status.AWAITING_GROUP
       : Status.PROCESSED,
     isImportedFromPaper: true,
-    signedByTransporter: true
+    signedByTransporter: true,
+    ...(input.transporter
+      ? {
+          transporters: {
+            create: {
+              ...flattenedTransporter,
+              number: 1,
+              readyToTakeOver: true
+            }
+          }
+        }
+      : {})
   };
 
   const formRepository = getFormRepository(user);

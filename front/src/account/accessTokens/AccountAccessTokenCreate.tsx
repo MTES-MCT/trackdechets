@@ -6,7 +6,7 @@ import { CREATE_ACCESS_TOKEN } from "./queries";
 import {
   NotificationError,
   SimpleNotificationError,
-} from "common/components/Error";
+} from "Apps/common/Components/Error/Error";
 import { Field, Form, Formik } from "formik";
 import classNames from "classnames";
 import styles from "../fields/AccountField.module.scss";

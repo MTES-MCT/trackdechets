@@ -24,7 +24,7 @@ import { DateRow, DetailRow, YesNoRow } from "../common/Components";
 
 import styles from "../common/BSDDetailContent.module.scss";
 import { generatePath, Link, useParams } from "react-router-dom";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { WorkflowAction } from "dashboard/components/BSDList/BSFF/WorkflowAction";
 import { DeleteBsffModal } from "dashboard/components/BSDList/BSFF/BsffActions/DeleteModal";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSFF/BsffActions/useDownloadPdf";

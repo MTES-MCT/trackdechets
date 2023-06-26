@@ -3,7 +3,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { Bsdasri } from "generated/graphql/types";
 
 import BsdCard from "./BsdCard";
-import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
+import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCard",

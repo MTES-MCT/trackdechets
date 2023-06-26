@@ -33,23 +33,29 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
-        transporterCompanySiret: transporterOrgId,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterOrgId,
+            number: 1
+          }
+        },
         status: "SENT",
         currentTransporterOrgId: transporterOrgId // orgId cached to ease multimodal management
       }
     });
     // there is already one segment
-    const segment = await prisma.transportSegment.create({
+    const segment = await prisma.bsddTransporter.create({
       data: {
         form: { connect: { id: form.id } },
         transporterCompanySiret: secondTransporter.orgId,
-        mode: "ROAD",
+        transporterTransportMode: "ROAD",
         transporterCompanyAddress: "40 Boulevard Voltaire 13001 Marseille",
         transporterCompanyPhone: "01 00 00 00 00",
         transporterCompanyMail: "john.snow@trackdechets.fr",
         transporterReceipt: "receipt",
         transporterDepartment: "13",
-        transporterCompanyContact: "John Snow"
+        transporterCompanyContact: "John Snow",
+        number: 2
       }
     });
 
@@ -63,7 +69,7 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
     );
 
     const readyToTakeOverSegment =
-      await prisma.transportSegment.findUniqueOrThrow({
+      await prisma.bsddTransporter.findUniqueOrThrow({
         where: { id: segment.id }
       });
     expect(readyToTakeOverSegment.readyToTakeOver).toBe(true);

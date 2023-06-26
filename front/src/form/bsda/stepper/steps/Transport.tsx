@@ -3,12 +3,15 @@ import { Field } from "formik";
 import { FieldTransportModeSelect } from "common/components";
 import Tooltip from "common/components/Tooltip";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 type Props = { disabled: boolean };
 
 export function Transport({ disabled }: Props) {
+  const TODAY = new Date();
+
   return (
     <>
       <h4 className="form__section-heading">Détails</h4>
@@ -44,6 +47,9 @@ export function Transport({ disabled }: Props) {
             name="transporter.transport.takenOverAt"
             className={`td-input td-input--small`}
             disabled={disabled}
+            minDate={subMonths(TODAY, 2)}
+            maxDate={TODAY}
+            required
           />
         </label>
       </div>

@@ -4,7 +4,7 @@ import { Formik, Field, Form, FormikProps } from "formik";
 import CompanyTypes from "../../../login/CompanyType";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
-import { InlineError } from "common/components/Error";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import {
   CompanyPrivate,
   CompanyType,

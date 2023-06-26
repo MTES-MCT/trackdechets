@@ -63,6 +63,7 @@ import {
   MISSING_PROCESSING_OPERATION
 } from "./errors";
 import { format, sub } from "date-fns";
+import { getFirstTransporterSync } from "./database";
 // set yup default error messages
 configureYup();
 
@@ -130,7 +131,7 @@ type WasteDetails = WasteDetailsCommon &
   >;
 
 type Transporter = Pick<
-  Prisma.FormCreateInput,
+  Prisma.BsddTransporterCreateInput,
   | "transporterCompanyName"
   | "transporterCompanySiret"
   | "transporterCompanyAddress"
@@ -1424,7 +1425,9 @@ export async function checkCanBeSealed(form: Form) {
 export async function validateForwardedInCompanies(form: Form): Promise<void> {
   const forwardedIn = await prisma.form
     .findUnique({ where: { id: form.id } })
-    .forwardedIn();
+    .forwardedIn({ include: { transporters: true } });
+
+  const transporter = forwardedIn ? getFirstTransporterSync(forwardedIn) : null;
 
   if (forwardedIn?.recipientCompanySiret) {
     await siret
@@ -1432,17 +1435,17 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
       .test(siretTests.isRegistered("DESTINATION"))
       .validate(forwardedIn.recipientCompanySiret);
   }
-  if (forwardedIn?.transporterCompanySiret) {
+  if (transporter?.transporterCompanySiret) {
     await siret
       .label("Transporteur après entreposage provisoire")
       .test(siretTests.isRegistered("TRANSPORTER"))
-      .validate(forwardedIn.transporterCompanySiret);
+      .validate(transporter.transporterCompanySiret);
   }
-  if (forwardedIn?.transporterCompanyVatNumber) {
+  if (transporter?.transporterCompanyVatNumber) {
     await foreignVatNumber
       .label("Transporteur après entreposage provisoire")
       .test(vatNumberTests.isRegisteredTransporter)
-      .validate(forwardedIn?.transporterCompanyVatNumber);
+      .validate(transporter.transporterCompanyVatNumber);
   }
 }
 

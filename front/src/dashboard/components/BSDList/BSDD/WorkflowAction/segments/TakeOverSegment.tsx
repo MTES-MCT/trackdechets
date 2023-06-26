@@ -15,11 +15,11 @@ import {
   NotificationError,
   SimpleNotificationError,
   InlineError,
-} from "common/components/Error";
+} from "Apps/common/Components/Error/Error";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { WorkflowActionProps } from "../WorkflowAction";
-import { GET_BSDS } from "common/queries";
-import { Loader } from "common/components";
+import { GET_BSDS } from "Apps/common/queries";
+import { Loader } from "Apps/common/Components";
 import { GET_FORM } from "form/bsdd/utils/queries";
 
 const TAKE_OVER_SEGMENT = gql`

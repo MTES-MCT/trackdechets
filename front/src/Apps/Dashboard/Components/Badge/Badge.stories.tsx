@@ -1,7 +1,7 @@
 import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import Badge from "./Badge";
-import { BsdStatusCode } from "../../../Common/types/bsdTypes";
+import { BsdStatusCode } from "../../../common/types/bsdTypes";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCard/Blocks/Badge",

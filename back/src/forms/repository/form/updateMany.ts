@@ -9,7 +9,7 @@ import { checkIfHasPossibleSiretChange } from "./update";
 
 export type UpdateManyFormFn = (
   ids: string[],
-  data: Prisma.FormUpdateInput,
+  data: Prisma.FormUpdateManyMutationInput,
   logMetadata?: LogMetadata
 ) => Promise<Prisma.BatchPayload>;
 

@@ -4,6 +4,7 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { Field, FieldArray, FieldProps, useFormikContext } from "formik";
 import {
+  EmitterType,
   PackagingInfo,
   Packagings as PackagingsEnum,
 } from "generated/graphql/types";
@@ -20,7 +21,9 @@ export default function Packagings({
   id,
   ...props
 }: FieldProps<PackagingInfo[] | null> & InputHTMLAttributes<HTMLInputElement>) {
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue, values } = useFormikContext<{
+    emitter: { type: EmitterType | undefined } | undefined;
+  }>();
   const isAddButtonDisabled = useMemo(() => {
     if (value == null || value.length === 0) {
       return false;
@@ -30,6 +33,13 @@ export default function Packagings({
       [PackagingsEnum.Citerne, PackagingsEnum.Benne].includes(p.type)
     );
   }, [value]);
+
+  const packagings = Object.entries(PACKAGINGS_NAMES).filter(([key]) => {
+    return (
+      values.emitter?.type !== EmitterType.Appendix1Producer ||
+      key !== PackagingsEnum.Pipeline
+    );
+  }) as Array<[PackagingsEnum, string]>;
 
   if (!value) {
     return null;
@@ -72,11 +82,7 @@ export default function Packagings({
                               });
                             }}
                           >
-                            {(
-                              Object.entries(PACKAGINGS_NAMES) as Array<
-                                [keyof typeof PACKAGINGS_NAMES, string]
-                              >
-                            ).map(([optionValue, optionLabel]) => (
+                            {packagings.map(([optionValue, optionLabel]) => (
                               <option
                                 key={optionValue}
                                 value={optionValue}

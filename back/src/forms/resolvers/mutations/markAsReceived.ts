@@ -1,6 +1,6 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getFormOrFormNotFound } from "../../database";
+import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import transitionForm from "../../workflow/transitionForm";
 import { checkCanMarkAsReceived } from "../../permissions";
 import { receivedInfoSchema } from "../../validation";
@@ -31,7 +31,9 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
 
   await checkCanMarkAsReceived(user, form);
 
-  let transporterTransportMode = form.transporterTransportMode;
+  const transporter = await getFirstTransporter(form);
+
+  let transporterTransportMode = transporter?.transporterTransportMode;
 
   if (form.recipientIsTempStorage === true) {
     // this form can be mark as received only if it has been
@@ -43,7 +45,9 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
       throw new TemporaryStorageCannotReceive();
     }
 
-    transporterTransportMode = forwardedIn.transporterTransportMode;
+    const forwardedInTransporter = await getFirstTransporter(forwardedIn);
+
+    transporterTransportMode = forwardedInTransporter?.transporterTransportMode;
   }
 
   await receivedInfoSchema.validate({
@@ -86,6 +90,7 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
       removeAppendix2,
       updateAppendix1Forms
     } = getFormRepository(user, transaction);
+
     const receivedForm = await update(
       { id: form.id },
       {

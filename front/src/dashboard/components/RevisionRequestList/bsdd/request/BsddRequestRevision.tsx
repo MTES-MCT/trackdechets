@@ -26,7 +26,7 @@ import { useHistory } from "react-router";
 import { useParams } from "react-router-dom";
 import * as yup from "yup";
 import { removeEmptyKeys } from "../../../../../common/helper";
-import { CREATE_FORM_REVISION_REQUEST } from "../query";
+import { CREATE_FORM_REVISION_REQUEST } from "Apps/common/queries/reviews/BsddReviewsQuery";
 import styles from "./BsddRequestRevision.module.scss";
 import { ReviewableField } from "./ReviewableField";
 import { BsddRequestRevisionCancelationInput } from "../BsddRequestRevisionCancelationInput";
@@ -87,7 +87,11 @@ export function BsddRequestRevision({ bsdd }: Props) {
       </h2>
 
       <Formik
-        initialValues={{ comment: "", content: initialReview }}
+        initialValues={{
+          comment: "",
+          content: initialReview,
+          emitter: { type: bsdd?.emitter?.type },
+        }}
         validationSchema={validationSchema}
         onSubmit={async ({ content, comment }) => {
           let cleanedContent;

@@ -314,18 +314,6 @@ model Form {
   recipientCompanyContact            String?
   recipientCompanyPhone              String?
   recipientCompanyMail               String?
-  transporterCompanyName             String?
-  transporterCompanySiret            String?
-  transporterCompanyAddress          String?
-  transporterCompanyContact          String?
-  transporterCompanyPhone            String?
-  transporterCompanyMail             String?
-  transporterCompanyVatNumber        String?
-  transporterReceipt                 String?
-  transporterDepartment              String?
-  transporterValidityLimit           DateTime?               @db.Timestamptz(6)
-  transporterNumberPlate             String?
-  transporterTransportMode           TransportMode?          @default(ROAD)
   wasteDetailsCode                   String?
   wasteDetailsOnuCode                String?
   wasteDetailsPackagingInfos         Json                    @default("[]")
@@ -379,7 +367,6 @@ model Form {
   processingOperationDescription     String?
   noTraceability                     Boolean?
   signedByTransporter                Boolean?
-  transporterIsExemptedOfReceipt     Boolean?
   customId                           String?
   wasteAcceptationStatus             WasteAcceptationStatus?
   wasteRefusalReason                 String?
@@ -397,7 +384,6 @@ model Form {
   emitterWorkSiteCity                String?
   emitterWorkSitePostalCode          String?
   emitterWorkSiteInfos               String?
-  transporterCustomInfo              String?
   recipientIsTempStorage             Boolean?                @default(false)
   signedAt                           DateTime?               @db.Timestamptz(6)
   currentTransporterOrgId            String?
@@ -407,9 +393,9 @@ model Form {
   ecoOrganismeSiret                  String?
   signedBy                           String?
 
-  transportSegments TransportSegment[]
-  groupedIn         FormGroupement[]   @relation("GroupedIn")
-  grouping          FormGroupement[]   @relation("Grouping")
+  transporters BsddTransporter[]
+  groupedIn    FormGroupement[]  @relation("GroupedIn")
+  grouping     FormGroupement[]  @relation("Grouping")
 
   ownerId              String
   owner                User                          @relation(fields: [ownerId], references: [id])
@@ -432,7 +418,6 @@ model Form {
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
-  @@index([transporterCompanySiret], map: "_FormTransporterCompanySiretIdx")
   @@index([traderCompanySiret], map: "_FormTraderCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
   @@index([ecoOrganismeSiret], map: "_FormEcoOrganismeSiretIdx")
@@ -685,9 +670,9 @@ model WorkerCertification {
   Company             Company[]
 }
 
-model TransportSegment {
+model BsddTransporter {
   id                              String         @id @default(cuid())
-  segmentNumber                   Int?
+  number                          Int
   transporterCompanySiret         String?
   transporterCompanyVatNumber     String?
   transporterCompanyName          String?
@@ -700,7 +685,8 @@ model TransportSegment {
   transporterDepartment           String?
   transporterValidityLimit        DateTime?      @db.Timestamptz(6)
   transporterNumberPlate          String?
-  mode                            TransportMode?
+  transporterTransportMode        TransportMode?
+  transporterCustomInfo           String?
   readyToTakeOver                 Boolean?       @default(false)
   previousTransporterCompanyOrgId String?
   takenOverAt                     DateTime?      @db.Timestamptz(6)
@@ -708,11 +694,11 @@ model TransportSegment {
   createdAt                       DateTime       @default(now()) @db.Timestamptz(6)
   updatedAt                       DateTime       @updatedAt @db.Timestamptz(6)
   formId                          String
-  form                            Form           @relation(fields: [formId], references: [id])
+  form                            Form           @relation(fields: [formId], references: [id], onDelete: Cascade)
 
-  @@index([formId], map: "_TransportSegmentFormIdIdx")
-  @@index([transporterCompanySiret], map: "_TransportSegmentTransporterCompanySiretIdx")
-  @@index([transporterCompanyVatNumber], map: "_TransportSegmentTransporterCompanyVatNumberIdx")
+  @@index([formId], map: "_BsddTransporterFormIdIdx")
+  @@index([transporterCompanySiret], map: "_BsddTransporterCompanySiretIdx")
+  @@index([transporterCompanyVatNumber], map: "_BsddTransporterCompanyVatNumberIdx")
 }
 
 model User {

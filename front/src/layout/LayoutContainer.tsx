@@ -10,9 +10,9 @@ import {
 } from "react-router-dom";
 import PrivateRoute from "login/PrivateRoute";
 import * as Sentry from "@sentry/browser";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import Layout from "./Layout";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { useQuery, gql } from "@apollo/client";
 import { Query } from "../generated/graphql/types";
 import ResendActivationEmail from "login/ResendActivationEmail";
@@ -63,7 +63,13 @@ export default withRouter(function LayoutContainer({ history }) {
   const isAuthenticated = !loading && data != null;
   const isAdmin = (isAuthenticated && data?.me?.isAdmin) || false;
   const email = data?.me?.email;
+  const userId = data?.me?.id;
   const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const { VITE_FLAG_DASHBOARDV2_USERID } = import.meta.env;
+  const flagDashboardV2UserId = VITE_FLAG_DASHBOARDV2_USERID
+    ? VITE_FLAG_DASHBOARDV2_USERID.split(",")
+    : [""];
+
   const dashboardRoutePrefixAdminCheck = isAdmin ? "dashboardv2" : "dashboard";
   const dashboardRoutePrefix = !isV2Routes
     ? "dashboard"
@@ -115,7 +121,11 @@ export default withRouter(function LayoutContainer({ history }) {
           <OidcDialog />
         </PrivateRoute>
         <Route>
-          <Layout isAuthenticated={isAuthenticated} isAdmin={isAdmin}>
+          <Layout
+            isAuthenticated={isAuthenticated}
+            isAdmin={isAdmin}
+            flags={{ flagDashboardV2: flagDashboardV2UserId.includes(userId) }}
+          >
             <Switch>
               <PrivateRoute
                 path={routes.admin.index}

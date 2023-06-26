@@ -56,6 +56,7 @@ function toGenericWaste(bsda: Bsda): GenericWaste {
   return {
     wasteDescription: bsda.wasteMaterialName,
     wasteCode: bsda.wasteCode,
+    wasteIsDangerous: true,
     pop: false,
     id: bsda.id,
     createdAt: bsda.createdAt,

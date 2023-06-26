@@ -1,7 +1,8 @@
 import { gql, useMutation } from "@apollo/client";
 import React from "react";
-import { statusChangeFragment } from "common/fragments";
-import { ActionButton, Loader } from "common/components";
+import { statusChangeFragment } from "Apps/common/queries/fragments";
+import { ActionButton } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { IconPaperWrite } from "common/components/Icons";
 import {
   FormStatus,
@@ -9,10 +10,10 @@ import {
   MutationMarkAsSealedArgs,
 } from "generated/graphql/types";
 import { WorkflowActionProps } from "./WorkflowAction";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { TdModalTrigger } from "common/components/Modal";
 import cogoToast from "cogo-toast";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS } from "Apps/common/queries";
 
 const MARK_AS_SEALED = gql`
   mutation MarkAsSealed($id: ID!) {

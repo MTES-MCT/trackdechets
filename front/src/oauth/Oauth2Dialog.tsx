@@ -1,6 +1,6 @@
 import React from "react";
 import { IconCheckCircle1 } from "common/components/Icons";
-import Loader from "../common/components/Loaders";
+import Loader from "../Apps/common/Components/Loader/Loaders";
 import styles from "./Dialog.module.scss";
 import { useOAuth2, AuthorizePayload } from "./use-oauth2";
 

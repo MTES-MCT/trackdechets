@@ -3,12 +3,14 @@ import {
   CompanyPrivateResolvers,
   UserRole
 } from "../../generated/graphql/types";
-import { getCompanyUsers, getUserRole } from "../database";
+import { getCompanyUsers } from "../database";
+import { getUserRole, grants, toGraphQLPermission } from "../../permissions";
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: async (parent, _, context) => {
     const userId = context.user!.id;
     const userRole = await getUserRole(userId, parent.orgId);
+
     if (userRole !== "ADMIN") {
       return [
         {
@@ -29,6 +31,11 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     // type casting is necessary here as long as we
     // do not expose READER and DRIVER role in the API
     return role as UserRole;
+  },
+  userPermissions: async (parent, _, context) => {
+    const userId = context.user!.id;
+    const role = await getUserRole(userId, parent.orgId);
+    return role ? grants[role].map(toGraphQLPermission) : [];
   },
   transporterReceipt: parent => {
     return prisma.company

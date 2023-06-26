@@ -9,13 +9,13 @@ import {
   MutationResetPasswordArgs,
   Query,
 } from "../generated/graphql/types";
-import Loader from "common/components/Loaders";
-import { NotificationError } from "common/components/Error";
+import Loader from "Apps/common/Components/Loader/Loaders";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { Formik, Form, Field } from "formik";
 import PasswordHelper from "common/components/PasswordHelper";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { IconLock1, IconView } from "common/components/Icons";
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 const PASSWORD_RESET_REQUEST = gql`
   query PasswordResetRequest($hash: String!) {

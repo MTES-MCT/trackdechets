@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { List, ListItem } from "common/components";
 import styles from "./AccountOauth2App.module.scss";
 import { generatePath, useHistory } from "react-router";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { Application, ApplicationGoal } from "generated/graphql/types";
 import AccountOauth2AppDelete from "./AccountOauth2AppDelete";
 

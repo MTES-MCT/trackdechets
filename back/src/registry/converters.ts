@@ -35,9 +35,9 @@ import {
 } from "../forms/registry";
 
 import { GenericWaste } from "./types";
-import { PrismaBsdMap } from "../common/elastic";
 import { WasteRegistryType } from "../generated/graphql/types";
 import { formToBsdd } from "../forms/compat";
+import { RegistryBsdMap } from "./elastic";
 
 const bsdsToIncomingWastes = {
   BSDD: formToIncomingWaste,
@@ -97,7 +97,7 @@ type WasteMap<WasteType> = {
 
 export function toWastes<WasteType extends GenericWaste>(
   registryType: WasteRegistryType,
-  bsds: PrismaBsdMap
+  bsds: RegistryBsdMap
 ): WasteMap<WasteType> {
   const converter = bsdsToWastes[registryType];
   const { bsdds, bsdas, bsdasris, bsvhus, bsffs } = bsds;

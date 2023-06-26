@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { InlineError } from "common/components/Error";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import { formatDate } from "common/datetime";
 import { FieldArray, useFormikContext } from "formik";
 import {

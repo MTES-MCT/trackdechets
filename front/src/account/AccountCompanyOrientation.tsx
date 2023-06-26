@@ -1,6 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 import { CallOut } from "@codegouvfr/react-dsfr/CallOut";
 

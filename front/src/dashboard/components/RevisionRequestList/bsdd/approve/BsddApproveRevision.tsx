@@ -9,106 +9,150 @@ import {
   Trader,
 } from "generated/graphql/types";
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton, RedErrorMessage } from "common/components";
+import { ActionButton, Modal, RedErrorMessage } from "common/components";
 import { IconCogApproved } from "common/components/Icons";
 import { RevisionField } from "./RevisionField";
 import { useMutation } from "@apollo/client";
-import { SUBMIT_FORM_REVISION_REQUEST_APPROVAL } from "../query";
+import { SUBMIT_FORM_REVISION_REQUEST_APPROVAL } from "Apps/common/queries/reviews/BsddReviewsQuery";
 import { Field, Form, Formik } from "formik";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { formatDate } from "common/datetime";
 import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
+import { useRouteMatch } from "react-router-dom";
 
 type Props = {
   review: FormRevisionRequest;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
 };
 
 const validationSchema = yup.object({
   isApproved: yup.string().required(),
 });
 
-export function BsddApproveRevision({ review }: Props) {
+export function BsddApproveRevision({
+  review,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+}: Props) {
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+
   const [submitFormRevisionRequestApproval, { loading, error }] = useMutation<
     Pick<Mutation, "submitFormRevisionRequestApproval">,
     MutationSubmitFormRevisionRequestApprovalArgs
   >(SUBMIT_FORM_REVISION_REQUEST_APPROVAL);
-
-  return (
+  const title = "Acceptation d'une révision";
+  if (isV2Routes && isModalOpenFromParent) {
+    const formatRevisionAdapter = {
+      ...review["review"],
+      form: { ...review },
+    };
+    return (
+      <Modal onClose={onModalCloseFromParent!} ariaLabel={title} isOpen>
+        <DisplayModalContent
+          review={formatRevisionAdapter}
+          close={onModalCloseFromParent}
+          submitFormRevisionRequestApproval={submitFormRevisionRequestApproval}
+          error={error}
+          loading={loading}
+        />
+      </Modal>
+    );
+  }
+  return !isV2Routes ? (
     <TdModalTrigger
-      ariaLabel="Acceptation d'une révision"
+      ariaLabel={title}
       trigger={open => (
         <ActionButton icon={<IconCogApproved size="24px" />} onClick={open}>
           Approuver / Refuser
         </ActionButton>
       )}
       modalContent={close => (
-        <div>
-          <DisplayRevision review={review} />
-
-          <Formik
-            initialValues={{
-              isApproved: "",
-            }}
-            onSubmit={async ({ isApproved }) => {
-              await submitFormRevisionRequestApproval({
-                variables: { id: review.id, isApproved: isApproved === "TRUE" },
-              });
-              close();
-            }}
-            validationSchema={validationSchema}
-          >
-            {() => (
-              <Form>
-                <div>
-                  <fieldset className="form__row">
-                    <Field
-                      name="isApproved"
-                      id="TRUE"
-                      label="J'accepte la révision"
-                      component={RadioButton}
-                    />
-                    <Field
-                      name="isApproved"
-                      id="FALSE"
-                      label="Je refuse la révision"
-                      component={RadioButton}
-                    />
-                  </fieldset>
-                  <RedErrorMessage name="isApproved" />
-                </div>
-
-                {error && (
-                  <div
-                    style={{ marginTop: "2em", marginBottom: "2em" }}
-                    className="notification notification--warning"
-                  >
-                    {error.message}
-                  </div>
-                )}
-
-                <div className="form__actions">
-                  <button
-                    type="button"
-                    className="btn btn--outline-primary"
-                    onClick={close}
-                  >
-                    Annuler
-                  </button>
-
-                  <button
-                    type="submit"
-                    className="btn btn--primary"
-                    disabled={loading}
-                  >
-                    Valider
-                  </button>
-                </div>
-              </Form>
-            )}
-          </Formik>
-        </div>
+        <DisplayModalContent
+          review={review}
+          close={close}
+          submitFormRevisionRequestApproval={submitFormRevisionRequestApproval}
+          error={error}
+          loading={loading}
+        />
       )}
     />
+  ) : null;
+}
+
+function DisplayModalContent({
+  review,
+  close,
+  submitFormRevisionRequestApproval,
+  error,
+  loading,
+}) {
+  return (
+    <div>
+      <DisplayRevision review={review} />
+
+      <Formik
+        initialValues={{
+          isApproved: "",
+        }}
+        onSubmit={async ({ isApproved }) => {
+          await submitFormRevisionRequestApproval({
+            variables: { id: review.id, isApproved: isApproved === "TRUE" },
+          });
+          close();
+        }}
+        validationSchema={validationSchema}
+      >
+        {() => (
+          <Form>
+            <div>
+              <fieldset className="form__row">
+                <Field
+                  name="isApproved"
+                  id="TRUE"
+                  label="J'accepte la révision"
+                  component={RadioButton}
+                />
+                <Field
+                  name="isApproved"
+                  id="FALSE"
+                  label="Je refuse la révision"
+                  component={RadioButton}
+                />
+              </fieldset>
+              <RedErrorMessage name="isApproved" />
+            </div>
+
+            {error && (
+              <div
+                style={{ marginTop: "2em", marginBottom: "2em" }}
+                className="notification notification--warning"
+              >
+                {error.message}
+              </div>
+            )}
+
+            <div className="form__actions">
+              <button
+                type="button"
+                className="btn btn--outline-primary"
+                onClick={close}
+              >
+                Annuler
+              </button>
+
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={loading}
+              >
+                Valider
+              </button>
+            </div>
+          </Form>
+        )}
+      </Formik>
+    </div>
   );
 }
 

@@ -139,11 +139,6 @@ function dateConverter(
   update: Partial<Prisma.FormCreateInput>
 ) {
   return {
-    transporterValidityLimit: getDateField(
-      currentState,
-      update,
-      "transporterValidityLimit"
-    ),
     traderValidityLimit: getDateField(
       currentState,
       update,

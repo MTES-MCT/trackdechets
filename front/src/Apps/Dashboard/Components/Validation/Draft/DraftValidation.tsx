@@ -8,20 +8,20 @@ import {
   MutationPublishBsffArgs,
   MutationPublishBsvhuArgs,
 } from "generated/graphql/types";
-import { statusChangeFragment } from "common/fragments";
-import { GET_BSDS } from "common/queries";
+import { statusChangeFragment } from "Apps/common/queries/fragments";
+import { GET_BSDS } from "Apps/common/queries";
 import cogoToast from "cogo-toast";
-import { NotificationError } from "common/components/Error";
-import { Loader } from "common/components";
+import { NotificationError } from "Apps/common/Components/Error/Error";
+import { Loader } from "Apps/common/Components";
 import TdModal from "common/components/Modal";
 import {
   bsdaPublishDraft,
   bsddValidationDraftText,
   bsffPublishDraft,
   bsvhuPublishDraft,
-} from "Apps/Common/wordings/dashboard/wordingsDashboard";
+} from "Apps/common/wordings/dashboard/wordingsDashboard";
 import { generatePath, Link } from "react-router-dom";
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
   const MARK_AS_SEALED = gql`

@@ -1,6 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { Modal, RedErrorMessage } from "common/components";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { IconClose } from "common/components/Icons";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import CompanySelector from "form/common/components/company/CompanySelector";
@@ -16,7 +16,7 @@ import {
 } from "generated/graphql/types";
 import * as React from "react";
 import * as yup from "yup";
-import { FicheInterventionFragment } from "common/fragments";
+import { FicheInterventionFragment } from "Apps/common/queries/fragments";
 
 const CREATE_BSFF_FICHE_INTERVENTION = gql`
   mutation CreateBsffFicheIntervention($input: BsffFicheInterventionInput!) {
