@@ -15,7 +15,7 @@ function startConsumers() {
 
   indexQueue.process(
     "indexChunk",
-    parseInt(process.env.BULK_INDEX_JOB_CONCURRENCY, 10),
+    parseInt(process.env.BULK_INDEX_JOB_CONCURRENCY, 10) || 1,
     indexChunkBsdJob
   );
   indexQueue.process("indexAllInBulk", indexAllInBulk);

@@ -63,9 +63,12 @@ export async function delWebhookSetting(orgId: string): Promise<void> {
   const key = genWebhookKey(orgId);
   await redisClient.del(key);
 }
-const WEBHOOK_FAIL_ACCEPTED = parseInt(process.env.WEBHOOK_FAIL_ACCEPTED, 10); // how many failed webhook ofor a given orgId before deactivation
+const WEBHOOK_FAIL_ACCEPTED = parseInt(
+  process.env.WEBHOOK_FAIL_ACCEPTED || "5",
+  10
+); // how many failed webhook ofor a given orgId before deactivation
 const WEBHOOK_FAIL_RESET_DELAY = parseInt(
-  process.env.WEBHOOK_FAIL_RESET_DELAY,
+  process.env.WEBHOOK_FAIL_RESET_DELAY || "600",
   10
 ); // how long after the last fail the counter is reset
 
