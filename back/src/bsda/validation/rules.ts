@@ -81,13 +81,13 @@ export const editionRules: {
   ecoOrganismeSiret: { sealedBy: "TRANSPORT", isRequired: false },
   destinationCompanyName: { sealedBy: "EMISSION", isRequired: true },
   destinationCompanySiret: {
-    sealedBy: "EMISSION",
+    sealedBy: "TRANSPORT",
     isRequired: true
   },
-  destinationCompanyAddress: { sealedBy: "EMISSION", isRequired: true },
-  destinationCompanyContact: { sealedBy: "EMISSION", isRequired: true },
-  destinationCompanyPhone: { sealedBy: "EMISSION", isRequired: true },
-  destinationCompanyMail: { sealedBy: "EMISSION", isRequired: true },
+  destinationCompanyAddress: { sealedBy: "TRANSPORT", isRequired: true },
+  destinationCompanyContact: { sealedBy: "TRANSPORT", isRequired: true },
+  destinationCompanyPhone: { sealedBy: "TRANSPORT", isRequired: true },
+  destinationCompanyMail: { sealedBy: "TRANSPORT", isRequired: true },
   destinationCustomInfo: { sealedBy: "OPERATION", isRequired: false },
   destinationCap: {
     sealedBy: "EMISSION",

@@ -83,6 +83,12 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
       if (validationContext.enablePreviousBsdasChecks) {
         await validatePreviousBsdas(val, ctx);
       }
+
+      await validateDestination(
+        val,
+        validationContext.currentSignatureType,
+        ctx
+      );
     });
 }
 
@@ -221,5 +227,42 @@ async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
         fatal: true
       });
     }
+  }
+}
+
+/**
+ * Destination is editable until TRANSPORT. But afer EMISSION:
+ * - if you change the destination, the current destination must become the nextDestination
+   - if you change the nextDestination
+ * @param bsda 
+ * @param currentSignatureType 
+ * @param ctx 
+ */
+async function validateDestination(
+  bsda: ZodBsda,
+  currentSignatureType: BsdaSignatureType | undefined,
+  ctx: RefinementCtx
+) {
+  // If the bsda has no signature or is already transported, abort as the fields are not editable.
+  if (
+    currentSignatureType === undefined ||
+    currentSignatureType === "OPERATION"
+  ) {
+    return;
+  }
+
+  const { findUnique } = getReadonlyBsdaRepository();
+  const currentBsda = await findUnique({ id: bsda.id });
+
+  if (
+    currentBsda.destinationCompanySiret !== bsda.destinationCompanySiret &&
+    bsda.destinationOperationNextDestinationCompanySiret !==
+      currentBsda.destinationCompanySiret
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comment destination finale.`,
+      fatal: true
+    });
   }
 }
