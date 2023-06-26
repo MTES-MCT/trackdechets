@@ -51,6 +51,10 @@ describe("mutation inviteUserToCompany", () => {
     expect(companyAssociations).toHaveLength(1);
     expect(companyAssociations[0].role).toEqual("MEMBER");
 
+    // when invited user was already on TD, `automaticallyAccepted` is true
+    expect(companyAssociations[0].automaticallyAccepted).toEqual(true);
+    expect(companyAssociations[0].createdAt).toBeTruthy();
+
     expect(companyAssociations[0].createdAt).toBeTruthy();
 
     const userCompany = await prisma.companyAssociation

@@ -34,7 +34,9 @@ export async function inviteUserToCompanyFn(
     // there is already an user with this email
     // associate the user with the company
 
-    await associateUserToCompany(existingUser.id, siret, role);
+    await associateUserToCompany(existingUser.id, siret, role, {
+      automaticallyAccepted: true
+    });
 
     const mail = renderMail(notifyUserOfInvite, {
       to: [{ email, name: existingUser.name }],

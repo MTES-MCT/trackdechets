@@ -16,7 +16,6 @@ import {
 import prisma from "../prisma";
 import { hashToken } from "../utils";
 import { createUser } from "../users/database";
-import { subMinutes } from "date-fns";
 
 /**
  * Create a user with name and email
@@ -128,11 +127,8 @@ export const userWithCompanyFactory = async (
   companyAssociationOpts: Partial<Prisma.CompanyAssociationCreateInput> = {}
 ): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
-  // we fake a user created a few minutes ago to prevent their membership being considered as an auto-accepted invitation
-  const userCreatedAt = subMinutes(new Date(), 5);
 
   const user = await userFactory({
-    createdAt: userCreatedAt,
     ...userOpts,
     companyAssociations: {
       create: {
