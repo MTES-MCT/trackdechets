@@ -1,217 +1,40 @@
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
-import { BsdaInput, Mutation } from "../../../../generated/graphql/types";
+import { Mutation } from "../../../../generated/graphql/types";
 import { gql } from "apollo-server-core";
-import { Company } from "@prisma/client";
-import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
+import { Prisma } from "@prisma/client";
 import prisma from "../../../../prisma";
 import { xDaysAgo } from "../../../../commands/onboarding.helpers";
+import { bsdaFactory } from "../../../__tests__/factories";
 
 const TODAY = new Date();
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
 
-const CompanyFragment = gql`
-  fragment CompanyFragment on FormCompany {
-    name
-    siret
-    address
-    contact
-    phone
-    mail
-  }
-`;
-
-const CREATE_BSDA = `
-mutation CreateBsda($input: BsdaInput!) {
-  createBsda(input: $input) {
-    id
-    destination {
-      company {
-          siret
-      }
-    }
-    emitter {
-      company {
-          siret
-      }
-    }
-    transporter {
-      transport {
-        plates
-      }
-    }
-    intermediaries {
-      siret
-    }
-  }
-}
-`;
-
 export const DUPLICATE_BSDA = gql`
-  ${CompanyFragment}
-
   mutation DuplicateBsda($id: ID!) {
     duplicateBsda(id: $id) {
       id
-      status
-      emitter {
-        company {
-          ...CompanyFragment
-        }
-      }
-      transporter {
-        company {
-          ...CompanyFragment
-        }
-        recepisse {
-          isExempted
-          number
-          validityLimit
-          department
-        }
-      }
-      broker {
-        company {
-          ...CompanyFragment
-        }
-        recepisse {
-          isExempted
-          number
-          validityLimit
-          department
-        }
-      }
-      worker {
-        company {
-          ...CompanyFragment
-        }
-        certification {
-          hasSubSectionFour
-          hasSubSectionThree
-          certificationNumber
-          validityLimit
-          organisation
-        }
-      }
-      destination {
-        company {
-          ...CompanyFragment
-        }
-      }
     }
   }
 `;
 
-const buildBsdaInput = (
-  emitterCompany: Company,
-  transporterCompany: Company,
-  brokerCompany: Company,
-  workerCompany: Company,
-  destinationCompany: Company
-): BsdaInput => ({
-  emitter: {
-    isPrivateIndividual: false,
-    company: {
-      siret: emitterCompany.siret,
-      name: emitterCompany.siret,
-      address: emitterCompany.address,
-      contact: emitterCompany.contact,
-      phone: "emitterContactPhone",
-      mail: "emitter@mail.com"
-    }
-  },
-  worker: {
-    company: {
-      siret: workerCompany.siret,
-      name: workerCompany.siret,
-      address: workerCompany.address,
-      contact: workerCompany.contact,
-      phone: "workerContactPhone",
-      mail: "worker@mail.com"
-    },
-    certification: {
-      hasSubSectionFour: true,
-      hasSubSectionThree: true,
-      certificationNumber: "WORKER-CERTIFICATION-NBR",
-      validityLimit: TODAY.toISOString() as any,
-      organisation: "GLOBAL CERTIFICATION"
-    }
-  },
-  transporter: {
-    company: {
-      siret: transporterCompany.siret,
-      name: transporterCompany.siret,
-      address: transporterCompany.address,
-      contact: transporterCompany.contact,
-      phone: "transporterContactPhone",
-      mail: "transporter@mail.com"
-    },
-    recepisse: {
-      isExempted: true,
-      number: "TRANSPORTER-RECEIPT-NUMBER",
-      validityLimit: TODAY.toISOString() as any,
-      department: "TRANSPORTER-RECEIPT-DEPARTMENT"
-    }
-  },
-  broker: {
-    company: {
-      siret: brokerCompany.siret,
-      name: brokerCompany.siret,
-      address: brokerCompany.address,
-      contact: brokerCompany.contact,
-      phone: "brokerContactPhone",
-      mail: "broker@mail.com"
-    },
-    recepisse: {
-      isExempted: true,
-      number: "BROKER-RECEIPT-NUMBER",
-      validityLimit: TODAY.toISOString() as any,
-      department: "BROKER-RECEIPT-DEPARTMENT"
-    }
-  },
-  waste: {
-    code: "06 07 01*",
-    adr: "ADR",
-    pop: true,
-    consistence: "SOLIDE",
-    familyCode: "Code famille",
-    materialName: "A material",
-    sealNumbers: ["1", "2"]
-  },
-  packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
-  weight: { isEstimate: true, value: 1.2 },
-  destination: {
-    cap: "A cap",
-    plannedOperationCode: "D 9",
-    company: {
-      siret: destinationCompany.siret,
-      name: destinationCompany.siret,
-      address: destinationCompany.address,
-      contact: destinationCompany.contact,
-      phone: "destinationContactPhone",
-      mail: "destination@mail.com"
-    }
-  }
-});
-
-const createCompaniesAndBsda = async () => {
+async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
   // Companies with their initial data
-  const { user: emitter, company: emitterCompany } =
-    await userWithCompanyFactory();
-  const { company: transporterCompany } = await userWithCompanyFactory(
-    "ADMIN",
-    {
-      transporterReceipt: {
-        create: {
-          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
-          validityLimit: TODAY.toISOString() as any,
-          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
-        }
+  const emitter = await userWithCompanyFactory();
+  const transporter = await userWithCompanyFactory("ADMIN", {
+    transporterReceipt: {
+      create: {
+        receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+        validityLimit: TODAY.toISOString() as any,
+        department: "TRANSPORTER- RECEIPT-DEPARTMENT"
       }
     }
-  );
-  const { company: brokerCompany } = await userWithCompanyFactory("ADMIN", {
+  });
+  const transporterReceipt = await prisma.transporterReceipt.findUniqueOrThrow({
+    where: { id: transporter.company.transporterReceiptId! }
+  });
+  const broker = await userWithCompanyFactory("ADMIN", {
     brokerReceipt: {
       create: {
         receiptNumber: "BROKER-RECEIPT-NUMBER",
@@ -220,7 +43,10 @@ const createCompaniesAndBsda = async () => {
       }
     }
   });
-  const { company: workerCompany } = await userWithCompanyFactory("ADMIN", {
+  const brokerReceipt = await prisma.brokerReceipt.findUniqueOrThrow({
+    where: { id: broker.company.brokerReceiptId! }
+  });
+  const worker = await userWithCompanyFactory("ADMIN", {
     workerCertification: {
       create: {
         hasSubSectionFour: true,
@@ -231,73 +57,296 @@ const createCompaniesAndBsda = async () => {
       }
     }
   });
-  const { company: destinationCompany } = await userWithCompanyFactory();
+  const workerCertification =
+    await prisma.workerCertification.findUniqueOrThrow({
+      where: { id: worker.company.workerCertificationId! }
+    });
+  const destination = await userWithCompanyFactory();
 
-  const input = buildBsdaInput(
-    emitterCompany,
-    transporterCompany,
-    brokerCompany,
-    workerCompany,
-    destinationCompany
-  );
-
-  // Create the BSDA
-  const { mutate } = makeClient(emitter);
-  const { data: createBsdaData } = await mutate<Pick<Mutation, "createBsda">>(
-    CREATE_BSDA,
-    {
-      variables: {
-        input
-      }
-    }
-  );
-
-  return {
-    mutate,
-    emitterCompany,
-    transporterCompany,
-    brokerCompany,
-    workerCompany,
-    destinationCompany,
-    bsda: createBsdaData.createBsda
-  };
-};
-
-const duplicateBsda = (mutate: TestQuery, bsdaId: string) => {
-  return mutate<Pick<Mutation, "duplicateBsda">>(DUPLICATE_BSDA, {
-    variables: {
-      id: bsdaId
+  const bsda = await bsdaFactory({
+    opt: {
+      emitterCompanySiret: emitter.company.siret,
+      emitterCompanyName: emitter.company.name,
+      emitterCompanyAddress: emitter.company.address,
+      emitterCompanyContact: emitter.company.contact,
+      emitterCompanyPhone: emitter.company.contactPhone,
+      emitterCompanyMail: emitter.company.contactEmail,
+      workerCompanySiret: worker.company.siret,
+      workerCompanyName: worker.company.name,
+      workerCompanyAddress: worker.company.address,
+      workerCompanyContact: worker.company.contact,
+      workerCompanyPhone: worker.company.contactPhone,
+      workerCompanyMail: worker.company.contactEmail,
+      workerCertificationCertificationNumber:
+        workerCertification.certificationNumber,
+      workerCertificationHasSubSectionFour:
+        workerCertification.hasSubSectionFour,
+      workerCertificationOrganisation: workerCertification.organisation,
+      workerCertificationHasSubSectionThree:
+        workerCertification.hasSubSectionThree,
+      workerCertificationValidityLimit: workerCertification.validityLimit,
+      transporterCompanySiret: transporter.company.siret,
+      transporterCompanyName: transporter.company.name,
+      transporterCompanyAddress: transporter.company.address,
+      transporterCompanyContact: transporter.company.contact,
+      transporterCompanyPhone: transporter.company.contactPhone,
+      transporterCompanyMail: transporter.company.contactEmail,
+      transporterRecepisseNumber: transporterReceipt.receiptNumber,
+      transporterRecepisseDepartment: transporterReceipt.department,
+      transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+      destinationCompanySiret: destination.company.siret,
+      destinationCompanyName: destination.company.name,
+      destinationCompanyAddress: destination.company.address,
+      destinationCompanyContact: destination.company.contact,
+      destinationCompanyPhone: destination.company.contactPhone,
+      destinationCompanyMail: destination.company.contactEmail,
+      brokerCompanySiret: broker.company.siret,
+      brokerCompanyName: broker.company.name,
+      brokerCompanyAddress: broker.company.address,
+      brokerCompanyContact: broker.company.contact,
+      brokerCompanyPhone: broker.company.contactPhone,
+      brokerCompanyMail: broker.company.contactEmail,
+      brokerRecepisseNumber: brokerReceipt.receiptNumber,
+      brokerRecepisseDepartment: brokerReceipt.department,
+      brokerRecepisseValidityLimit: brokerReceipt.validityLimit,
+      ...opt
     }
   });
-};
+
+  return { bsda, emitter, transporter, broker, worker, destination };
+}
 
 describe("Mutation.Bsda.duplicate", () => {
-  afterEach(async () => {
-    await resetDatabase();
-  });
+  afterEach(resetDatabase);
 
   test("should duplicate a bsda", async () => {
     // Given
-    const { mutate, bsda } = await createCompaniesAndBsda();
+    const { emitter, bsda } = await createBsda();
+    const { mutate } = makeClient(emitter.user);
 
-    // When
-    const { errors, data: duplicateBsdaData } = await duplicateBsda(
-      mutate,
-      bsda.id
+    const { errors, data } = await mutate<Pick<Mutation, "duplicateBsda">>(
+      DUPLICATE_BSDA,
+      {
+        variables: {
+          id: bsda.id
+        }
+      }
     );
 
     // Then
     expect(errors).toBeUndefined();
-    expect(duplicateBsdaData.duplicateBsda.status).toBe("INITIAL");
+    const duplicatedBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: data.duplicateBsda.id }
+    });
+
+    const {
+      type,
+      emitterIsPrivateIndividual,
+      emitterCompanyName,
+      emitterCompanySiret,
+      emitterCompanyAddress,
+      emitterCompanyContact,
+      emitterCompanyPhone,
+      emitterCompanyMail,
+      emitterPickupSiteName,
+      emitterPickupSiteAddress,
+      emitterPickupSiteCity,
+      emitterPickupSitePostalCode,
+      emitterPickupSiteInfos,
+      ecoOrganismeName,
+      ecoOrganismeSiret,
+      wasteCode,
+      wasteFamilyCode,
+      wasteMaterialName,
+      wasteConsistence,
+      wasteAdr,
+      wastePop,
+      packagings,
+      weightIsEstimate,
+      weightValue,
+      brokerCompanyName,
+      brokerCompanySiret,
+      brokerCompanyAddress,
+      brokerCompanyContact,
+      brokerCompanyPhone,
+      brokerCompanyMail,
+      brokerRecepisseNumber,
+      brokerRecepisseDepartment,
+      brokerRecepisseValidityLimit,
+      destinationCompanyName,
+      destinationCompanySiret,
+      destinationCompanyAddress,
+      destinationCompanyContact,
+      destinationCompanyPhone,
+      destinationCompanyMail,
+      destinationCap,
+      destinationPlannedOperationCode,
+      destinationOperationNextDestinationCompanySiret,
+      destinationOperationNextDestinationCompanyVatNumber,
+      destinationOperationNextDestinationCompanyName,
+      destinationOperationNextDestinationCompanyAddress,
+      destinationOperationNextDestinationCompanyContact,
+      destinationOperationNextDestinationCompanyPhone,
+      destinationOperationNextDestinationCompanyMail,
+      destinationOperationNextDestinationCap,
+      destinationOperationNextDestinationPlannedOperationCode,
+      transporterCompanyName,
+      transporterCompanySiret,
+      transporterCompanyAddress,
+      transporterCompanyContact,
+      transporterCompanyPhone,
+      transporterCompanyMail,
+      transporterCompanyVatNumber,
+      transporterRecepisseIsExempted,
+      transporterRecepisseNumber,
+      transporterRecepisseDepartment,
+      transporterRecepisseValidityLimit,
+      transporterTransportMode,
+      workerIsDisabled,
+      workerCompanyName,
+      workerCompanySiret,
+      workerCompanyAddress,
+      workerCompanyContact,
+      workerCompanyPhone,
+      workerCompanyMail,
+      workerCertificationHasSubSectionFour,
+      workerCertificationHasSubSectionThree,
+      workerCertificationCertificationNumber,
+      workerCertificationValidityLimit,
+      workerCertificationOrganisation,
+      ...rest
+    } = bsda;
+
+    const expectedSkipped = [
+      "id",
+      "createdAt",
+      "updatedAt",
+      "isDraft",
+      "isDeleted",
+      "status",
+      "emitterEmissionSignatureAuthor",
+      "emitterEmissionSignatureDate",
+      "emitterCustomInfo",
+      "workerWorkHasEmitterPaperSignature",
+      "workerWorkSignatureAuthor",
+      "workerWorkSignatureDate",
+      "transporterTransportPlates",
+      "transporterCustomInfo",
+      "transporterTransportTakenOverAt",
+      "transporterTransportSignatureAuthor",
+      "transporterTransportSignatureDate",
+      "destinationCustomInfo",
+      "destinationReceptionWeight",
+      "destinationReceptionDate",
+      "destinationReceptionAcceptationStatus",
+      "destinationReceptionRefusalReason",
+      "destinationOperationCode",
+      "destinationOperationDescription",
+      "destinationOperationDate",
+      "destinationOperationSignatureAuthor",
+      "destinationOperationSignatureDate",
+      "wasteSealNumbers",
+      "forwardingId",
+      "groupedInId",
+      "intermediariesOrgIds"
+    ];
+
+    expect(duplicatedBsda.status).toBe("INITIAL");
+    expect(duplicatedBsda.isDraft).toBe(true);
+
+    expect(duplicatedBsda).toMatchObject({
+      type,
+      emitterIsPrivateIndividual,
+      emitterCompanyName,
+      emitterCompanySiret,
+      emitterCompanyAddress,
+      emitterCompanyContact,
+      emitterCompanyPhone,
+      emitterCompanyMail,
+      emitterPickupSiteName,
+      emitterPickupSiteAddress,
+      emitterPickupSiteCity,
+      emitterPickupSitePostalCode,
+      emitterPickupSiteInfos,
+      ecoOrganismeName,
+      ecoOrganismeSiret,
+      wasteCode,
+      wasteFamilyCode,
+      wasteMaterialName,
+      wasteConsistence,
+      wasteAdr,
+      wastePop,
+      packagings,
+      weightIsEstimate,
+      weightValue,
+      brokerCompanyName,
+      brokerCompanySiret,
+      brokerCompanyAddress,
+      brokerCompanyContact,
+      brokerCompanyPhone,
+      brokerCompanyMail,
+      brokerRecepisseNumber,
+      brokerRecepisseDepartment,
+      brokerRecepisseValidityLimit,
+      destinationCompanyName,
+      destinationCompanySiret,
+      destinationCompanyAddress,
+      destinationCompanyContact,
+      destinationCompanyPhone,
+      destinationCompanyMail,
+      destinationCap,
+      destinationPlannedOperationCode,
+      destinationOperationNextDestinationCompanySiret,
+      destinationOperationNextDestinationCompanyVatNumber,
+      destinationOperationNextDestinationCompanyName,
+      destinationOperationNextDestinationCompanyAddress,
+      destinationOperationNextDestinationCompanyContact,
+      destinationOperationNextDestinationCompanyPhone,
+      destinationOperationNextDestinationCompanyMail,
+      destinationOperationNextDestinationCap,
+      destinationOperationNextDestinationPlannedOperationCode,
+      transporterCompanyName,
+      transporterCompanySiret,
+      transporterCompanyAddress,
+      transporterCompanyContact,
+      transporterCompanyPhone,
+      transporterCompanyMail,
+      transporterCompanyVatNumber,
+      transporterRecepisseIsExempted,
+      transporterRecepisseNumber,
+      transporterRecepisseDepartment,
+      transporterRecepisseValidityLimit,
+      transporterTransportMode,
+      workerIsDisabled,
+      workerCompanyName,
+      workerCompanySiret,
+      workerCompanyAddress,
+      workerCompanyContact,
+      workerCompanyPhone,
+      workerCompanyMail,
+      workerCertificationHasSubSectionFour,
+      workerCertificationHasSubSectionThree,
+      workerCertificationCertificationNumber,
+      workerCertificationValidityLimit,
+      workerCertificationOrganisation
+    });
+
+    // make sure this test breaks when a new field is added to the Bsda model
+    // it will ensure we think of adding necessary fields to the duplicate input
+    const sortFn = (a: string, b: string) => a.localeCompare(b);
+    expect(Object.keys(rest).sort(sortFn)).toEqual(
+      expectedSkipped.sort(sortFn)
+    );
   });
 
-  test("transporter updates his company info > duplicated bsda should have the updated data", async () => {
+  test("duplicated BSDD should have the updated data when company info changes", async () => {
     // Given
-    const { mutate, transporterCompany, bsda } = await createCompaniesAndBsda();
+
+    const { bsda, transporter, emitter, worker, broker } = await createBsda();
 
     await prisma.company.update({
       where: {
-        id: transporterCompany.id
+        id: transporter.company.id
       },
       data: {
         name: "UPDATED-TRANSPORTER-NAME",
@@ -308,32 +357,9 @@ describe("Mutation.Bsda.duplicate", () => {
       }
     });
 
-    // When
-    const { errors, data: duplicateBsdaData } = await duplicateBsda(
-      mutate,
-      bsda.id
-    );
-
-    // Then
-    expect(errors).toBeUndefined();
-    expect(duplicateBsdaData.duplicateBsda.status).toBe("INITIAL");
-
-    // Check transporter info
-    const transporter = duplicateBsdaData.duplicateBsda.transporter?.company;
-    expect(transporter?.name).toEqual("UPDATED-TRANSPORTER-NAME");
-    expect(transporter?.address).toEqual("UPDATED-TRANSPORTER-ADRESS");
-    expect(transporter?.contact).toEqual("UPDATED-TRANSPORTER-CONTACT");
-    expect(transporter?.phone).toEqual("UPDATED-TRANSPORTER-PHONE");
-    expect(transporter?.mail).toEqual("UPDATED-TRANSPORTER-MAIL");
-  });
-
-  test("transporter updates his recepisse > duplicated bsda should have the updated data", async () => {
-    // Given
-    const { mutate, transporterCompany, bsda } = await createCompaniesAndBsda();
-
     await prisma.company.update({
       where: {
-        id: transporterCompany.id
+        id: transporter.company.id
       },
       data: {
         transporterReceipt: {
@@ -346,34 +372,16 @@ describe("Mutation.Bsda.duplicate", () => {
       }
     });
 
-    // When
-    const { errors, data: duplicateBsdaData } = await duplicateBsda(
-      mutate,
-      bsda.id
-    );
-
-    // Then
-    expect(errors).toBeUndefined();
-    expect(duplicateBsdaData.duplicateBsda.status).toBe("INITIAL");
-
-    // Check receipt
-    const recepisse = duplicateBsdaData.duplicateBsda.transporter?.recepisse;
-    expect(recepisse?.department).toEqual(
-      "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
-    );
-    expect(recepisse?.validityLimit).toEqual(FOUR_DAYS_AGO.toISOString());
-    expect(recepisse?.number).toEqual("UPDATED-TRANSPORTER-RECEIPT-NUMBER");
-  });
-
-  test("broker updates his recepisse > duplicated bsda should have the updated data", async () => {
-    // Given
-    const { mutate, brokerCompany, bsda } = await createCompaniesAndBsda();
-
     await prisma.company.update({
       where: {
-        id: brokerCompany.id
+        id: broker.company.id
       },
       data: {
+        name: "UPDATED-BROKER-NAME",
+        address: "UPDATED-BROKER-ADRESS",
+        contact: "UPDATED-BROKER-CONTACT",
+        contactPhone: "UPDATED-BROKER-PHONE",
+        contactEmail: "UPDATED-BROKER-MAIL",
         brokerReceipt: {
           update: {
             receiptNumber: "UPDATED-BROKER-RECEIPT-NUMBER",
@@ -384,66 +392,9 @@ describe("Mutation.Bsda.duplicate", () => {
       }
     });
 
-    // When
-    const { errors, data: duplicateBsdaData } = await duplicateBsda(
-      mutate,
-      bsda.id
-    );
-
-    // Then
-    expect(errors).toBeUndefined();
-    expect(duplicateBsdaData.duplicateBsda.status).toBe("INITIAL");
-
-    // Check receipt
-    const recepisse = duplicateBsdaData.duplicateBsda.broker?.recepisse;
-    expect(recepisse?.department).toEqual("UPDATED-BROKER-RECEIPT-DEPARTMENT");
-    expect(recepisse?.validityLimit).toEqual(FOUR_DAYS_AGO.toISOString());
-    expect(recepisse?.number).toEqual("UPDATED-BROKER-RECEIPT-NUMBER");
-  });
-
-  test("broker updates his company info > duplicated bsda should have the updated data", async () => {
-    // Given
-    const { mutate, brokerCompany, bsda } = await createCompaniesAndBsda();
-
     await prisma.company.update({
       where: {
-        id: brokerCompany.id
-      },
-      data: {
-        name: "UPDATED-BROKER-NAME",
-        address: "UPDATED-BROKER-ADRESS",
-        contact: "UPDATED-BROKER-CONTACT",
-        contactPhone: "UPDATED-BROKER-PHONE",
-        contactEmail: "UPDATED-BROKER-MAIL"
-      }
-    });
-
-    // When
-    const { errors, data: duplicateBsdaData } = await duplicateBsda(
-      mutate,
-      bsda.id
-    );
-
-    // Then
-    expect(errors).toBeUndefined();
-    expect(duplicateBsdaData.duplicateBsda.status).toBe("INITIAL");
-
-    // Check transporter info
-    const broker = duplicateBsdaData.duplicateBsda.broker?.company;
-    expect(broker?.name).toEqual("UPDATED-BROKER-NAME");
-    expect(broker?.address).toEqual("UPDATED-BROKER-ADRESS");
-    expect(broker?.contact).toEqual("UPDATED-BROKER-CONTACT");
-    expect(broker?.phone).toEqual("UPDATED-BROKER-PHONE");
-    expect(broker?.mail).toEqual("UPDATED-BROKER-MAIL");
-  });
-
-  test("emitter updates his company info > duplicated bsda should have the updated data", async () => {
-    // Given
-    const { mutate, emitterCompany, bsda } = await createCompaniesAndBsda();
-
-    await prisma.company.update({
-      where: {
-        id: emitterCompany.id
+        id: emitter.company.id
       },
       data: {
         name: "UPDATED-EMITTER-NAME",
@@ -454,70 +405,16 @@ describe("Mutation.Bsda.duplicate", () => {
       }
     });
 
-    // When
-    const { errors, data: duplicateBsdaData } = await duplicateBsda(
-      mutate,
-      bsda.id
-    );
-
-    // Then
-    expect(errors).toBeUndefined();
-    expect(duplicateBsdaData.duplicateBsda.status).toBe("INITIAL");
-
-    // Check transporter info
-    const emitter = duplicateBsdaData.duplicateBsda.emitter?.company;
-    expect(emitter?.name).toEqual("UPDATED-EMITTER-NAME");
-    expect(emitter?.address).toEqual("UPDATED-EMITTER-ADRESS");
-    expect(emitter?.contact).toEqual("UPDATED-EMITTER-CONTACT");
-    expect(emitter?.phone).toEqual("UPDATED-EMITTER-PHONE");
-    expect(emitter?.mail).toEqual("UPDATED-EMITTER-MAIL");
-  });
-
-  test("worker updates his company info > duplicated bsda should have the updated data", async () => {
-    // Given
-    const { mutate, workerCompany, bsda } = await createCompaniesAndBsda();
-
     await prisma.company.update({
       where: {
-        id: workerCompany.id
+        id: worker.company.id
       },
       data: {
         name: "UPDATED-WORKER-NAME",
         address: "UPDATED-WORKER-ADRESS",
         contact: "UPDATED-WORKER-CONTACT",
         contactPhone: "UPDATED-WORKER-PHONE",
-        contactEmail: "UPDATED-WORKER-MAIL"
-      }
-    });
-
-    // When
-    const { errors, data: duplicateBsdaData } = await duplicateBsda(
-      mutate,
-      bsda.id
-    );
-
-    // Then
-    expect(errors).toBeUndefined();
-    expect(duplicateBsdaData.duplicateBsda.status).toBe("INITIAL");
-
-    // Check transporter info
-    const worker = duplicateBsdaData.duplicateBsda.worker?.company;
-    expect(worker?.name).toEqual("UPDATED-WORKER-NAME");
-    expect(worker?.address).toEqual("UPDATED-WORKER-ADRESS");
-    expect(worker?.contact).toEqual("UPDATED-WORKER-CONTACT");
-    expect(worker?.phone).toEqual("UPDATED-WORKER-PHONE");
-    expect(worker?.mail).toEqual("UPDATED-WORKER-MAIL");
-  });
-
-  test("worker updates certification > duplicated bsda should have the updated data", async () => {
-    // Given
-    const { mutate, workerCompany, bsda } = await createCompaniesAndBsda();
-
-    await prisma.company.update({
-      where: {
-        id: workerCompany.id
-      },
-      data: {
+        contactEmail: "UPDATED-WORKER-MAIL",
         workerCertification: {
           update: {
             hasSubSectionFour: false,
@@ -530,24 +427,100 @@ describe("Mutation.Bsda.duplicate", () => {
       }
     });
 
-    // When
-    const { errors, data: duplicateBsdaData } = await duplicateBsda(
-      mutate,
-      bsda.id
+    const { mutate } = makeClient(emitter.user);
+
+    const { errors, data } = await mutate<Pick<Mutation, "duplicateBsda">>(
+      DUPLICATE_BSDA,
+      {
+        variables: {
+          id: bsda.id
+        }
+      }
     );
 
     // Then
     expect(errors).toBeUndefined();
-    expect(duplicateBsdaData.duplicateBsda.status).toBe("INITIAL");
 
-    // Check transporter info
-    const certification = duplicateBsdaData.duplicateBsda.worker?.certification;
-    expect(certification?.hasSubSectionFour).toEqual(false);
-    expect(certification?.hasSubSectionThree).toEqual(false);
-    expect(certification?.certificationNumber).toEqual(
+    const duplicatedBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: data.duplicateBsda.id }
+    });
+
+    // Check transporter info is updated
+    expect(duplicatedBsda.transporterCompanyName).toEqual(
+      "UPDATED-TRANSPORTER-NAME"
+    );
+    expect(duplicatedBsda.transporterCompanyAddress).toEqual(
+      "UPDATED-TRANSPORTER-ADRESS"
+    );
+    expect(duplicatedBsda.transporterCompanyContact).toEqual(
+      "UPDATED-TRANSPORTER-CONTACT"
+    );
+    expect(duplicatedBsda.transporterCompanyPhone).toEqual(
+      "UPDATED-TRANSPORTER-PHONE"
+    );
+    expect(duplicatedBsda.transporterCompanyMail).toEqual(
+      "UPDATED-TRANSPORTER-MAIL"
+    );
+    expect(duplicatedBsda.transporterRecepisseDepartment).toEqual(
+      "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
+    );
+    expect(duplicatedBsda.transporterRecepisseValidityLimit).toEqual(
+      FOUR_DAYS_AGO
+    );
+    expect(duplicatedBsda.transporterRecepisseNumber).toEqual(
+      "UPDATED-TRANSPORTER-RECEIPT-NUMBER"
+    );
+
+    // Check broker info is updated
+    expect(duplicatedBsda.brokerCompanyName).toEqual("UPDATED-BROKER-NAME");
+    expect(duplicatedBsda.brokerCompanyAddress).toEqual(
+      "UPDATED-BROKER-ADRESS"
+    );
+    expect(duplicatedBsda.brokerCompanyContact).toEqual(
+      "UPDATED-BROKER-CONTACT"
+    );
+    expect(duplicatedBsda.brokerCompanyPhone).toEqual("UPDATED-BROKER-PHONE");
+    expect(duplicatedBsda.brokerCompanyMail).toEqual("UPDATED-BROKER-MAIL");
+    expect(duplicatedBsda.brokerRecepisseDepartment).toEqual(
+      "UPDATED-BROKER-RECEIPT-DEPARTMENT"
+    );
+    expect(duplicatedBsda.brokerRecepisseValidityLimit).toEqual(FOUR_DAYS_AGO);
+    expect(duplicatedBsda.brokerRecepisseNumber).toEqual(
+      "UPDATED-BROKER-RECEIPT-NUMBER"
+    );
+
+    // Check emitter info is updated
+    expect(duplicatedBsda.emitterCompanyName).toEqual("UPDATED-EMITTER-NAME");
+    expect(duplicatedBsda.emitterCompanyAddress).toEqual(
+      "UPDATED-EMITTER-ADRESS"
+    );
+    expect(duplicatedBsda.emitterCompanyContact).toEqual(
+      "UPDATED-EMITTER-CONTACT"
+    );
+    expect(duplicatedBsda.emitterCompanyPhone).toEqual("UPDATED-EMITTER-PHONE");
+    expect(duplicatedBsda.emitterCompanyMail).toEqual("UPDATED-EMITTER-MAIL");
+
+    // Check worker info is updated
+    expect(duplicatedBsda.workerCompanyName).toEqual("UPDATED-WORKER-NAME");
+    expect(duplicatedBsda.workerCompanyAddress).toEqual(
+      "UPDATED-WORKER-ADRESS"
+    );
+    expect(duplicatedBsda.workerCompanyContact).toEqual(
+      "UPDATED-WORKER-CONTACT"
+    );
+    expect(duplicatedBsda.workerCompanyPhone).toEqual("UPDATED-WORKER-PHONE");
+    expect(duplicatedBsda.workerCompanyMail).toEqual("UPDATED-WORKER-MAIL");
+
+    expect(duplicatedBsda.workerCertificationHasSubSectionFour).toEqual(false);
+    expect(duplicatedBsda.workerCertificationHasSubSectionThree).toEqual(false);
+    expect(duplicatedBsda.workerCertificationCertificationNumber).toEqual(
       "UPDATED-WORKER-CERTIFICATION-NBR"
     );
-    expect(certification?.validityLimit).toEqual(FOUR_DAYS_AGO.toISOString());
-    expect(certification?.organisation).toEqual("AFNOR Certification");
+    expect(duplicatedBsda.workerCertificationValidityLimit).toEqual(
+      FOUR_DAYS_AGO
+    );
+    expect(duplicatedBsda.workerCertificationOrganisation).toEqual(
+      "AFNOR Certification"
+    );
   });
 });

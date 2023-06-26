@@ -1,7 +1,7 @@
 import * as React from "react";
 import { FilterProps } from "react-table";
 import { Bsd, BsdType } from "generated/graphql/types";
-import Select from "Apps/Common/Components/Select/Select";
+import Select from "Apps/common/Components/Select/Select";
 import "./BSDTypeFilter.scss";
 
 const OPTIONS = [

@@ -4,14 +4,15 @@ import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation } from "@apollo/client";
 
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton, Loader } from "common/components";
+import { ActionButton } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { IconPaperWrite } from "common/components/Icons";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 
 import cogoToast from "cogo-toast";
 import { generatePath, Link } from "react-router-dom";
-import routes from "common/routes";
-import { GET_BSDS } from "common/queries";
+import routes from "Apps/routes";
+import { GET_BSDS } from "Apps/common/queries";
 
 const PUBLISH_BSDA = gql`
   mutation PublishBsda($id: ID!) {

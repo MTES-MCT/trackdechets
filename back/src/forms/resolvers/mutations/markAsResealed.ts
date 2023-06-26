@@ -1,7 +1,11 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb, flattenFormInput } from "../../converter";
+import { getFirstTransporterSync, getFormOrFormNotFound } from "../../database";
+import {
+  expandFormFromDb,
+  flattenFormInput,
+  flattenTransporterInput
+} from "../../converter";
 import { checkCanMarkAsResealed } from "../../permissions";
 import {
   validateForwardedInCompanies,
@@ -36,6 +40,10 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
   const { forwardedIn } =
     (await formRepository.findFullFormById(form.id)) ?? {};
 
+  const forwardedInTransporter = forwardedIn
+    ? getFirstTransporterSync(forwardedIn)
+    : null;
+
   await checkCanMarkAsResealed(user, form);
 
   const { destination, transporter, wasteDetails } =
@@ -64,37 +72,69 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     ),
     wasteDetailsAnalysisReferences: [],
     wasteDetailsLandIdentifiers: [],
-    ...flattenFormInput({ transporter, wasteDetails, recipient: destination })
+    ...flattenFormInput({ wasteDetails, recipient: destination })
   };
+
+  const forwardedInTransporterUpdateInput = flattenTransporterInput({
+    transporter
+  });
 
   // validate input
   await sealedFormSchema.validate({
+    ...forwardedInTransporter,
+    ...forwardedInTransporterUpdateInput,
     ...forwardedIn,
     ...updateInput
   });
 
   await validateForwardedInCompanies(form);
 
-  const formUpdateInput: Prisma.FormUpdateInput =
-    forwardedIn === null
-      ? // The recipient decides to forward the BSD even if it has not been
-        // flagged as temporary storage before
-        {
-          recipientIsTempStorage: true,
-          forwardedIn: {
-            create: {
-              owner: { connect: { id: user.id } },
-              readableId: `${form.readableId}-suite`,
-              ...updateInput,
-              status: Status.SEALED
+  let formUpdateInput: Prisma.FormUpdateInput = {};
+
+  if (forwardedIn === null) {
+    // The recipient decides to forward the BSD even if it has not been
+    // flagged as temporary storage before
+    const forwardedInCreateInput: Prisma.FormCreateWithoutForwardingInput = {
+      owner: { connect: { id: user.id } },
+      readableId: `${form.readableId}-suite`,
+      ...updateInput,
+      status: Status.SEALED,
+      ...(transporter
+        ? {
+            transporters: {
+              create: { ...forwardedInTransporterUpdateInput, number: 1 }
             }
           }
-        }
-      : {
-          forwardedIn: {
-            update: { ...updateInput, status: Status.SEALED }
+        : {})
+    };
+
+    formUpdateInput = {
+      recipientIsTempStorage: true,
+      forwardedIn: { create: forwardedInCreateInput }
+    };
+  } else {
+    const forwardedInUpdateInput: Prisma.FormUpdateWithoutForwardingInput = {
+      ...updateInput,
+      status: Status.SEALED
+    };
+    if (transporter) {
+      if (forwardedInTransporter) {
+        forwardedInUpdateInput.transporters = {
+          update: {
+            where: { id: forwardedInTransporter.id },
+            data: forwardedInTransporterUpdateInput
           }
         };
+      } else {
+        forwardedInUpdateInput.transporters = {
+          create: { ...forwardedInTransporterUpdateInput, number: 1 }
+        };
+      }
+    }
+    formUpdateInput = {
+      forwardedIn: { update: forwardedInUpdateInput }
+    };
+  }
 
   let resealedForm: Form | null = null;
   if (form.status === Status.RESEALED) {

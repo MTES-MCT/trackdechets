@@ -1,7 +1,7 @@
 import { Form, Prisma, Status, User } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { getFormOrFormNotFound } from "../../database";
+import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb } from "../../converter";
 import { checkCanDuplicate } from "../../permissions";
 import getReadableId from "../../readableId";
@@ -14,13 +14,15 @@ import prisma from "../../../prisma";
  * Retrieves companies present on the form that a registered in TD
  */
 async function getFormCompanies(form: Form) {
+  const firstTransporter = await getFirstTransporter(form);
+
   const companiesOrgIds = [
     form.emitterCompanySiret,
-    form.transporterCompanySiret,
-    form.transporterCompanyVatNumber,
     form.recipientCompanySiret,
     form.brokerCompanySiret,
-    form.traderCompanySiret
+    form.traderCompanySiret,
+    firstTransporter?.transporterCompanySiret,
+    firstTransporter?.transporterCompanyVatNumber
   ].filter(Boolean);
 
   // Batch fetch all companies involved in the form
@@ -46,14 +48,21 @@ async function getFormCompanies(form: Form) {
   );
   const transporter = companies.find(
     company =>
-      company.orgId === form.transporterCompanySiret ||
-      company.orgId === form.transporterCompanyVatNumber
+      company.orgId === firstTransporter?.transporterCompanySiret ||
+      company.orgId === firstTransporter?.transporterCompanyVatNumber
   );
   const trader = companies.find(
     company => company.orgId === form.traderCompanySiret
   );
 
-  return { emitter, recipient, transporter, broker, trader };
+  return {
+    emitter,
+    recipient,
+    transporter,
+    broker,
+    trader,
+    form: { ...form, transporter: firstTransporter }
+  };
 }
 
 /**
@@ -66,8 +75,14 @@ async function getDuplicateFormInput(
   user: User,
   form: Form
 ): Promise<Prisma.FormCreateInput> {
-  const { emitter, transporter, recipient, broker, trader } =
-    await getFormCompanies(form);
+  const {
+    emitter,
+    transporter,
+    recipient,
+    broker,
+    trader,
+    form: fullForm
+  } = await getFormCompanies(form);
 
   return {
     readableId: getReadableId(),
@@ -99,26 +114,6 @@ async function getDuplicateFormInput(
       recipient?.contactPhone ?? form.recipientCompanyPhone,
     recipientCompanyMail: recipient?.contactEmail ?? form.recipientCompanyMail,
     recipientIsTempStorage: form.recipientIsTempStorage,
-    transporterCompanyName: transporter?.name ?? form.transporterCompanyName,
-    transporterCompanySiret: form.transporterCompanySiret,
-    transporterCompanyAddress:
-      transporter?.address ?? form.transporterCompanyAddress,
-    transporterCompanyContact:
-      transporter?.contact ?? form.transporterCompanyContact,
-    transporterCompanyPhone:
-      transporter?.contactPhone ?? form.transporterCompanyPhone,
-    transporterCompanyMail:
-      transporter?.contactEmail ?? form.transporterCompanyMail,
-    transporterCompanyVatNumber: form.transporterCompanyVatNumber,
-    transporterReceipt:
-      transporter?.transporterReceipt?.receiptNumber ?? form.transporterReceipt,
-    transporterDepartment:
-      transporter?.transporterReceipt?.department ?? form.transporterDepartment,
-    transporterValidityLimit:
-      transporter?.transporterReceipt?.validityLimit ??
-      form.transporterValidityLimit,
-    transporterTransportMode: form.transporterTransportMode,
-    transporterIsExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
     wasteDetailsCode: form.wasteDetailsCode,
     wasteDetailsOnuCode: form.wasteDetailsOnuCode,
     wasteDetailsPackagingInfos: prismaJsonNoNull(
@@ -157,7 +152,42 @@ async function getDuplicateFormInput(
     brokerValidityLimit:
       broker?.brokerReceipt?.validityLimit ?? form.brokerValidityLimit,
     ecoOrganismeName: form.ecoOrganismeName,
-    ecoOrganismeSiret: form.ecoOrganismeSiret
+    ecoOrganismeSiret: form.ecoOrganismeSiret,
+    transporters: {
+      create: {
+        transporterCompanyName:
+          transporter?.name ?? fullForm.transporter?.transporterCompanyName,
+        transporterCompanySiret: fullForm.transporter?.transporterCompanySiret,
+        transporterCompanyAddress:
+          transporter?.address ??
+          fullForm.transporter?.transporterCompanyAddress,
+        transporterCompanyContact:
+          transporter?.contact ??
+          fullForm.transporter?.transporterCompanyContact,
+        transporterCompanyPhone:
+          transporter?.contactPhone ??
+          fullForm.transporter?.transporterCompanyPhone,
+        transporterCompanyMail:
+          transporter?.contactEmail ??
+          fullForm.transporter?.transporterCompanyMail,
+        transporterCompanyVatNumber:
+          fullForm.transporter?.transporterCompanyVatNumber,
+        transporterReceipt:
+          transporter?.transporterReceipt?.receiptNumber ??
+          fullForm.transporter?.transporterReceipt,
+        transporterDepartment:
+          transporter?.transporterReceipt?.department ??
+          fullForm.transporter?.transporterDepartment,
+        transporterValidityLimit:
+          transporter?.transporterReceipt?.validityLimit ??
+          fullForm.transporter?.transporterValidityLimit,
+        transporterTransportMode:
+          fullForm.transporter?.transporterTransportMode,
+        transporterIsExemptedOfReceipt:
+          fullForm.transporter?.transporterIsExemptedOfReceipt,
+        number: 1
+      }
+    }
   };
 }
 

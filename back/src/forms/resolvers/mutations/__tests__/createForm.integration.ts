@@ -21,6 +21,7 @@ import {
 import { EmitterType, Status, UserRole } from "@prisma/client";
 import getReadableId from "../../../readableId";
 import * as sirenify from "../../../sirenify";
+import { getFirstTransporterSync } from "../../../database";
 
 const sirenifyMock = jest
   .spyOn(sirenify, "sirenifyFormInput")
@@ -795,9 +796,11 @@ describe("Mutation.createForm", () => {
         }
       });
       const form = await prisma.form.findUniqueOrThrow({
-        where: { id: data.createForm.id }
+        where: { id: data.createForm.id },
+        include: { transporters: true }
       });
-      expect(form.transporterValidityLimit).toEqual(validityLimit);
+      const transporter = getFirstTransporterSync(form);
+      expect(transporter!.transporterValidityLimit).toEqual(validityLimit);
       expect(form.traderValidityLimit).toEqual(validityLimit);
     }
   );

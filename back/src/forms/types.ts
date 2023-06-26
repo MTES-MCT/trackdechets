@@ -1,6 +1,6 @@
 import {
   Form,
-  TransportSegment,
+  BsddTransporter,
   Prisma,
   TransportMode,
   WasteAcceptationStatus,
@@ -12,33 +12,10 @@ import { FormStatus } from "../generated/graphql/types";
  * A Prisma Form with linked objects
  */
 export interface FullForm extends Form {
-  forwardedIn: Form | null;
-  transportSegments: TransportSegment[] | null;
+  forwardedIn: (Form & { transporters: BsddTransporter[] | null }) | null;
+  transporters: BsddTransporter[] | null;
   intermediaries: IntermediaryFormAssociation[] | null;
 }
-
-export type FormCompanies = Pick<
-  Form,
-  | "emitterCompanySiret"
-  | "recipientCompanySiret"
-  | "transporterCompanySiret"
-  | "transporterCompanyVatNumber"
-  | "traderCompanySiret"
-  | "brokerCompanySiret"
-  | "ecoOrganismeSiret"
-> & {
-  forwardedIn?: Pick<
-    Form,
-    | "transporterCompanySiret"
-    | "recipientCompanySiret"
-    | "transporterCompanyVatNumber"
-  > | null;
-} & {
-  transportSegments?: Pick<TransportSegment, "transporterCompanySiret">[];
-} & {
-  intermediariesVatNumbers?: string[];
-  intermediariesSirets?: string[];
-};
 
 // shape of a BSDD v2
 export type Bsdd = {
@@ -70,6 +47,7 @@ export type Bsdd = {
   wasteCode: string | null;
   wasteDescription: string | null;
   wasteAdr: string | null;
+  wasteIsDangerous: boolean;
   weightValue: number | null;
   weightIsEstimate: boolean | null;
   transporterCompanyName: string | null;

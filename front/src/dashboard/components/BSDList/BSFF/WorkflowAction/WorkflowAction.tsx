@@ -9,7 +9,7 @@ import { SignBsffOperationOnePackaging } from "./SignOperation";
 import { SignBsffAcceptationOnePackaging } from "./SignAcceptation";
 import { SignPackagings } from "./SignPackagings";
 import { useParams, useRouteMatch } from "react-router-dom";
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 export interface WorkflowActionProps {
   form: BsffFragment;

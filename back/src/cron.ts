@@ -8,6 +8,7 @@ import {
   sendSecondOnboardingEmail
 } from "./commands/onboarding.helpers";
 import { initSentry } from "./common/sentry";
+import { cleanUnusedAppendix1ProducerBsdds } from "./commands/appendix1.helpers";
 
 const {
   CRON_ONBOARDING_SCHEDULE,
@@ -17,7 +18,15 @@ const {
   VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID
 } = process.env;
 
-let jobs: cron.CronJob[] = [];
+let jobs: cron.CronJob[] = [
+  new cron.CronJob({
+    cronTime: "30 0 * * *", // Every day at 00:30
+    onTick: async () => {
+      await cleanUnusedAppendix1ProducerBsdds();
+    },
+    timeZone: "Europe/Paris"
+  })
+];
 
 if (CRON_ONBOARDING_SCHEDULE) {
   validateOnbardingCronSchedule(CRON_ONBOARDING_SCHEDULE);

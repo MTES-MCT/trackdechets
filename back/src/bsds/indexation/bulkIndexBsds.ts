@@ -6,7 +6,8 @@ import {
   client,
   BsdIndex,
   indexBsds,
-  index as defaultIndexConfig
+  index as defaultIndexConfig,
+  BsdElastic
 } from "../../common/elastic";
 import { BsdType } from "../../generated/graphql/types";
 import { toBsdElastic as bsdaToBsdElastic } from "../../bsda/elastic";
@@ -41,7 +42,11 @@ export type FindManyAndIndexBsdsFnSignature = {
   ids: string[];
 };
 
-const bsdNameToBsdElasticFns = {
+type ToBsdElasticFunction = (bsd: any) => BsdElastic;
+
+const bsdNameToBsdElasticFns: {
+  [key: string]: ToBsdElasticFunction;
+} = {
   bsff: bsffToBsdElastic,
   bsvhu: bsvhuToBsdElastic,
   bsda: bsdaToBsdElastic,
@@ -79,7 +84,7 @@ const prismaFindManyOptions = {
     include: {
       forwarding: true,
       forwardedIn: true,
-      transportSegments: true,
+      transporters: true,
       intermediaries: true
     }
   }

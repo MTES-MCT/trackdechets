@@ -1,6 +1,6 @@
 import React from "react";
 import { CompanySearchResult } from "generated/graphql/types";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { COMPANY_CONSTANTS } from "login/CompanyType";
 
 type Props = Pick<

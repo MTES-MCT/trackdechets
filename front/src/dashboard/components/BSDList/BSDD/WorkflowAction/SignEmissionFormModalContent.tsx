@@ -1,12 +1,13 @@
 import React from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Loader, RedErrorMessage } from "common/components";
+import { RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
 import {
   InlineError,
   NotificationError,
   SimpleNotificationError,
-} from "common/components/Error";
-import { fullFormFragment } from "common/fragments";
+} from "Apps/common/Components/Error/Error";
+import { fullFormFragment } from "Apps/common/queries/fragments";
 import { GET_FORM } from "form/bsdd/utils/queries";
 import {
   FormStatus,
@@ -30,25 +31,17 @@ interface SignEmissionFormModalProps {
   onClose: () => void;
 }
 
-const getValidationSchema = (today: Date) =>
-  yup.object({
-    emittedAt: yup
-      .date()
-      .required("La date d'émission est requise")
-      .max(today, "La date d'émission ne peut être dans le futur")
-      .min(
-        subMonths(today, 2),
-        "La date d'émission ne peut être antérieure à 2 mois"
-      ),
-    emittedBy: yup
-      .string()
-      .ensure()
-      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-    securityCode: yup
-      .string()
-      .nullable()
-      .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
-  });
+const validationSchema = yup.object({
+  emittedAt: yup.date().required("La date d'émission est requise"),
+  emittedBy: yup
+    .string()
+    .ensure()
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+  securityCode: yup
+    .string()
+    .nullable()
+    .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
+});
 
 enum EmitterType {
   Emitter = "Emitter",
@@ -165,7 +158,7 @@ function SignEmissionFormModalContent({
     <>
       <Formik
         initialValues={initialValues}
-        validationSchema={getValidationSchema(TODAY)}
+        validationSchema={validationSchema}
         onSubmit={handlesubmit}
       >
         {({ values }) => {

@@ -2,7 +2,8 @@ import React from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { Formik, Form, Field, FieldArray } from "formik";
 import * as yup from "yup";
-import { Label, Loader, RedErrorMessage } from "common/components";
+import { Label, RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { IconTrash } from "common/components/Icons";
 import {
   ApplicationGoal,
@@ -14,11 +15,11 @@ import {
 } from "generated/graphql/types";
 import styles from "./AccountOauth2AppCreateUpdate.module.scss";
 import { useHistory } from "react-router";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import {
   NotificationError,
   SimpleNotificationError,
-} from "common/components/Error";
+} from "Apps/common/Components/Error/Error";
 import Tooltip from "common/components/Tooltip";
 import {
   APPLICATION,

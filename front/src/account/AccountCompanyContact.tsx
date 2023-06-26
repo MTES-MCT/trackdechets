@@ -8,7 +8,7 @@ import AccountFieldCompanyWebsite from "./fields/AccountFieldCompanyWebsite";
 import AccountFieldCompanyAgreements from "./fields/AccountFieldCompanyAgreements";
 import { CompanyPrivate, CompanyType } from "../generated/graphql/types";
 import { generatePath } from "react-router-dom";
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 type Props = {
   company: CompanyPrivate;

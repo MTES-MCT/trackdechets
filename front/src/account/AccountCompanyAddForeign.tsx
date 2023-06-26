@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
 import { useHistory, useLocation } from "react-router-dom";
-import { NotificationError } from "../common/components/Error";
+import { NotificationError } from "../Apps/common/Components/Error/Error";
 import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import styles from "./AccountCompanyAdd.module.scss";
 import {

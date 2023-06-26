@@ -83,7 +83,7 @@ export function chain<T, K>(
   if (o === undefined) {
     return undefined;
   }
-  return getter(o as NonNullable<T>); // TODO remove "as" when strictNullCheck is turned on
+  return getter(o);
 }
 
 /**
@@ -108,6 +108,17 @@ export function prismaJsonNoNull<I>(value: I) {
     return Prisma.JsonNull;
   }
 
+  return value;
+}
+
+/**
+ * Returns null if the value is an empty string.
+ * Otherwise returns the value.
+ */
+export function noEmptyString(
+  value: string | null | undefined
+): string | null | undefined {
+  if (value === "") return null;
   return value;
 }
 

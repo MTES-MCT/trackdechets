@@ -1,6 +1,6 @@
 import React from "react";
 import { generatePath } from "react-router-dom";
-import routes from "../../common/routes";
+import routes from "../routes";
 import {
   bsd_type_option_bsda,
   bsd_type_option_bsdasri,
@@ -21,9 +21,9 @@ import {
   filter_immat_number,
   filter_siret,
   filter_waste_code,
-} from "../Common/wordings/dashboard/wordingsDashboard";
+} from "../common/wordings/dashboard/wordingsDashboard";
 import { BsdType, BsdWhere } from "../../generated/graphql/types";
-import { Filter, FilterType } from "../Common/Components/Filters/filtersTypes";
+import { Filter, FilterType } from "../common/Components/Filters/filtersTypes";
 import {
   IconBSFFMedium as IconBSFF,
   IconBSDaThin as IconBSDa,

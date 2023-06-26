@@ -6,7 +6,7 @@ import {
   REVOKE_AUTHORIZED_APPLICATION,
   AUTHORIZED_APPLICATIONS,
 } from "./queries";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 
 type AccountAuthorizedAppRevokeProps = {
   authorizedApplication: AuthorizedApplication;

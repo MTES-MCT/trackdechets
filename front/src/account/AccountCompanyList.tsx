@@ -4,9 +4,9 @@ import { filter } from "graphql-anywhere";
 import AccountCompany from "./AccountCompany";
 import { useHistory } from "react-router-dom";
 import { Query } from "generated/graphql/types";
-import { Loader } from "common/components";
-import { NotificationError } from "common/components/Error";
-import routes from "common/routes";
+import { Loader } from "Apps/common/Components";
+import { NotificationError } from "Apps/common/Components/Error/Error";
+import routes from "Apps/routes";
 import { debounce } from "common/helper";
 import {
   MIN_MY_COMPANIES_SEARCH,

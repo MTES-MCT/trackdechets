@@ -109,7 +109,19 @@ describe("Mutation.deleteForm", () => {
       const owner = await userFactory();
       const form = await formFactory({
         ownerId: owner.id,
-        opt: { [`${role}CompanySiret`]: company.siret, status: "DRAFT" }
+        opt: {
+          status: "DRAFT",
+          ...(role === "transporter"
+            ? {
+                transporters: {
+                  create: {
+                    [`${role}CompanySiret`]: company.siret,
+                    number: 1
+                  }
+                }
+              }
+            : { [`${role}CompanySiret`]: company.siret })
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -131,9 +143,22 @@ describe("Mutation.deleteForm", () => {
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const owner = await userFactory();
+
       const form = await formFactory({
         ownerId: owner.id,
-        opt: { [`${role}CompanySiret`]: company.siret, status: "SEALED" }
+        opt: {
+          status: "SEALED",
+          ...(role === "transporter"
+            ? {
+                transporters: {
+                  create: {
+                    [`${role}CompanySiret`]: company.siret,
+                    number: 1
+                  }
+                }
+              }
+            : { [`${role}CompanySiret`]: company.siret })
+        }
       });
 
       const { mutate } = makeClient(user);

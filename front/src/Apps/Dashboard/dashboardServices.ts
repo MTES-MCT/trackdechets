@@ -1,8 +1,10 @@
 import {
   BsdDisplay,
   BsdStatusCode,
+  BsdWithReview,
+  ReviewStatusLabel,
   WorkflowDisplayType,
-} from "../Common/types/bsdTypes";
+} from "../common/types/bsdTypes";
 import { formatBsd } from "./bsdMapper";
 import {
   BsdasriType,
@@ -16,9 +18,11 @@ import {
   ACCEPTE,
   ANNEXE_BORDEREAU_SUITE,
   ANNULE,
+  APPROUVER_REFUSER_REVISION,
   ARRIVE_ENTREPOS_PROVISOIRE,
   BROUILLON,
   BSD_SUITE_PREPARE,
+  CONSULTER_REVISION,
   ENTREPOS_TEMPORAIREMENT,
   EN_ATTENTE_BSD_SUITE,
   FAIRE_SIGNER,
@@ -45,8 +49,8 @@ import {
   VALIDER_RECEPTION,
   VALIDER_TRAITEMENT,
   completer_bsd_suite,
-} from "../Common/wordings/dashboard/wordingsDashboard";
-import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
+} from "../common/wordings/dashboard/wordingsDashboard";
+import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
@@ -131,6 +135,22 @@ export const getBsdStatusLabel = (
 
     default:
       return "unknown status";
+  }
+};
+
+export const getRevisionStatusLabel = (status: string) => {
+  switch (status) {
+    case BsdStatusCode.Canceled:
+      return ReviewStatusLabel.Cancelled;
+    case BsdStatusCode.Refused:
+      return ReviewStatusLabel.Refused;
+    case BsdStatusCode.Accepted:
+      return ReviewStatusLabel.Accepted;
+    case BsdStatusCode.Pending:
+      return ReviewStatusLabel.Pending;
+
+    default:
+      break;
   }
 };
 
@@ -563,7 +583,48 @@ export const getSignTempStorerBtnLabel = (
   return "";
 };
 
-export const getCtaLabelFromStatus = (
+const getReviewCurrentApproval = (
+  bsd: BsdDisplay | BsdWithReview,
+  siret: string
+) => {
+  const { review } = bsd;
+
+  return review?.approvals?.find(approval => approval.approverSiret === siret);
+};
+
+export const canApproveOrRefuseReview = (
+  bsd: BsdDisplay | BsdWithReview,
+  siret: string
+) => {
+  const { review } = bsd;
+  const currentApproval = getReviewCurrentApproval(bsd, siret);
+
+  return (
+    review?.status === BsdStatusCode.Pending &&
+    currentApproval?.status === BsdStatusCode.Pending
+  );
+};
+
+export const getPrimaryActionsReviewsLabel = (
+  bsd: BsdDisplay,
+  currentSiret: string
+) => {
+  if (canApproveOrRefuseReview(bsd, currentSiret)) {
+    return APPROUVER_REFUSER_REVISION;
+  }
+
+  return CONSULTER_REVISION;
+};
+
+export const canDeleteReview = (bsd: BsdDisplay, currentSiret: string) => {
+  const { review } = bsd;
+  return (
+    review?.authoringCompany.siret === currentSiret &&
+    review?.status === BsdStatusCode.Pending
+  );
+};
+
+export const getPrimaryActionsLabelFromBsdStatus = (
   bsd: BsdDisplay,
   currentSiret: string,
   bsdCurrentTab?: BsdCurrentTab

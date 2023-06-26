@@ -9,12 +9,15 @@ import {
   MutationUpdateBsdasriArgs,
   Bsdasri,
 } from "generated/graphql/types";
-import { NotificationError, InlineError } from "common/components/Error";
+import {
+  NotificationError,
+  InlineError,
+} from "Apps/common/Components/Error/Error";
 import {
   ExtraSignatureType,
   SignatureType,
 } from "dashboard/components/BSDList/BSDasri/types";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
 import {
   useParams,
@@ -22,7 +25,7 @@ import {
   generatePath,
   useRouteMatch,
 } from "react-router-dom";
-import { GET_DETAIL_DASRI_WITH_METADATA, GET_BSDS } from "common/queries";
+import { GET_DETAIL_DASRI_WITH_METADATA, GET_BSDS } from "Apps/common/queries";
 
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
 import { Formik, Field, Form } from "formik";
@@ -39,7 +42,7 @@ import {
   OperationSignatureForm,
   removeSections,
 } from "./PartialForms";
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
 import DateInput from "form/common/components/custom-inputs/DateInput";
@@ -181,7 +184,7 @@ export function RouteSignBsdasri({
           ...formState,
           signature: { author: "", date: TODAY },
         }}
-        validationSchema={() => signatureValidationSchema(bsdasri, TODAY)}
+        validationSchema={() => signatureValidationSchema}
         onSubmit={async values => {
           const { id, signature, ...rest } = values;
 

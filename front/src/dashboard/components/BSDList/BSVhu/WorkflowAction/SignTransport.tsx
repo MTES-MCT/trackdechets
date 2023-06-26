@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
-import { GET_BSDS } from "common/queries";
-import routes from "common/routes";
+import { GET_BSDS } from "Apps/common/queries";
+import routes from "Apps/routes";
 import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 import DateInput from "form/common/components/custom-inputs/DateInput";
@@ -18,21 +18,13 @@ import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 import { subMonths } from "date-fns";
 
-const getValidationSchema = (today: Date) =>
-  yup.object({
-    takenOverAt: yup
-      .date()
-      .required("La date de prise en charge est requise")
-      .max(today, "La date de prise en charge ne peut être dans le futur")
-      .min(
-        subMonths(today, 2),
-        "La date de prise en charge ne peut être antérieure à 2 mois"
-      ),
-    author: yup
-      .string()
-      .ensure()
-      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-  });
+const validationSchema = yup.object({
+  takenOverAt: yup.date().required("La date de prise en charge est requise"),
+  author: yup
+    .string()
+    .ensure()
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+});
 
 type Props = {
   siret: string;
@@ -74,7 +66,6 @@ export function SignTransport({
     >
       {({ bsvhu, onClose }) => {
         const TODAY = new Date();
-        const validationSchema = getValidationSchema(TODAY);
 
         return bsvhu.metadata?.errors.some(
           error => error.requiredFor === SignatureTypeInput.Transport

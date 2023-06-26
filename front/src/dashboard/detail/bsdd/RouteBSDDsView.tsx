@@ -1,11 +1,11 @@
 import React from "react";
 import BSDDetailContent from "./BSDDetailContent";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { useQuery } from "@apollo/client";
 import { Query, QueryFormArgs } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
-import { GET_DETAIL_FORM } from "common/queries";
-import { InlineError } from "common/components/Error";
+import { GET_DETAIL_FORM } from "Apps/common/queries";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
 
 export function RouteBSDDsView() {

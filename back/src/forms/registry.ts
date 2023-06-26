@@ -1,4 +1,4 @@
-import { Form, TransportSegment } from "@prisma/client";
+import { Form, BsddTransporter } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
@@ -11,7 +11,6 @@ import {
 } from "../generated/graphql/types";
 import { GenericWaste } from "../registry/types";
 import { extractPostalCode } from "../utils";
-import { formToBsdd } from "./compat";
 import { Bsdd } from "./types";
 
 type RegistryFields =
@@ -22,7 +21,7 @@ type RegistryFields =
 
 export function getRegistryFields(
   form: Form & {
-    transportSegments: TransportSegment[] | null;
+    transporters: BsddTransporter[] | null;
   }
 ): Pick<BsdElastic, RegistryFields> {
   const registryFields: Record<RegistryFields, string[]> = {
@@ -36,35 +35,26 @@ export function getRegistryFields(
     if (form.recipientCompanySiret) {
       registryFields.isIncomingWasteFor.push(form.recipientCompanySiret);
     }
-
-    const transporterCompanyOrgId = getTransporterCompanyOrgId(form);
-    if (transporterCompanyOrgId) {
-      registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
-    }
-
-    if (form.transportSegments?.length) {
-      for (const transportSegment of form.transportSegments) {
-        if (transportSegment.transporterCompanySiret) {
-          registryFields.isTransportedWasteFor.push(
-            transportSegment.transporterCompanySiret
-          );
-        }
-      }
-    }
   }
 
   if (form.sentAt) {
     if (form.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(form.emitterCompanySiret);
     }
-    if (form.transporterCompanySiret) {
-      registryFields.isTransportedWasteFor.push(form.transporterCompanySiret);
-    }
     if (form.traderCompanySiret) {
       registryFields.isManagedWasteFor.push(form.traderCompanySiret);
     }
     if (form.brokerCompanySiret) {
       registryFields.isManagedWasteFor.push(form.brokerCompanySiret);
+    }
+
+    if (form.transporters?.length) {
+      for (const transporter of form.transporters) {
+        const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+        if (transporterCompanyOrgId) {
+          registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+        }
+      }
     }
   }
 
@@ -75,6 +65,7 @@ function toGenericWaste(bsdd: Bsdd): GenericWaste {
   return {
     wasteDescription: bsdd.wasteDescription,
     wasteCode: bsdd.wasteCode,
+    wasteIsDangerous: bsdd.wasteIsDangerous,
     pop: bsdd.pop,
     id: bsdd.id,
     createdAt: bsdd.createdAt,
@@ -373,21 +364,6 @@ export function toManagedWaste(
     transporter3CompanySiret: bsdd.transporter3CompanySiret,
     transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber
   };
-}
-
-export function toManagedWastes(
-  form: Form & { forwarding: Form } & {
-    grouping: { initialForm: Form }[];
-  } & { transportSegments: TransportSegment[] }
-): ManagedWaste[] {
-  const bsdd = formToBsdd(form);
-  if (bsdd.forwarding) {
-    // TODO check reglementation
-    // in case of temporary storage, we assume that the trader or
-    // broker has only dealt the waste from the emitter to the TTR
-    return [toManagedWaste({ ...bsdd.forwarding, forwarding: null })];
-  }
-  return [toManagedWaste(bsdd)];
 }
 
 export function toAllWaste(

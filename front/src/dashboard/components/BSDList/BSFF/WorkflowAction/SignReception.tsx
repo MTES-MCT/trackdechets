@@ -10,28 +10,20 @@ import {
   MutationUpdateBsffArgs,
 } from "generated/graphql/types";
 import { RedErrorMessage } from "common/components";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS } from "Apps/common/queries";
 import { subMonths } from "date-fns";
 
-const getValidationSchema = (today: Date) =>
-  yup.object({
-    receptionDate: yup
-      .date()
-      .required("La date de réception est requise")
-      .max(today, "La date de réception ne peut être dans le futur")
-      .min(
-        subMonths(today, 2),
-        "La date de réception ne peut être antérieure à 2 mois"
-      ),
-    signatureAuthor: yup
-      .string()
-      .ensure()
-      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-  });
+const validationSchema = yup.object({
+  receptionDate: yup.date().required("La date de réception est requise"),
+  signatureAuthor: yup
+    .string()
+    .ensure()
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+});
 
 interface SignReceptionModalProps {
   bsff: Bsff;
@@ -49,7 +41,6 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
   >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   const TODAY = new Date();
-  const validationSchema = getValidationSchema(TODAY);
 
   const loading = updateBsffResult.loading || signBsffResult.loading;
   const error = updateBsffResult.error ?? signBsffResult.error;

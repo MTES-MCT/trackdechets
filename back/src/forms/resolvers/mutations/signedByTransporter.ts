@@ -4,7 +4,11 @@ import {
   checkSecurityCode
 } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { getFormOrFormNotFound } from "../../database";
+import {
+  getFirstTransporterSync,
+  getFormOrFormNotFound,
+  getFullForm
+} from "../../database";
 import {
   expandFormFromDb,
   flattenSignedByTransporterInput
@@ -24,6 +28,10 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
     const { id, signingInfo } = args;
 
     const form = await getFormOrFormNotFound({ id });
+
+    const fullForm = await getFullForm(form);
+
+    const transporter = await getFirstTransporterSync(fullForm);
 
     await checkCanSignedByTransporter(user, form);
 
@@ -60,6 +68,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
     };
 
     const futureForm = {
+      ...transporter,
       ...form,
       ...wasteDetails
     };
@@ -68,7 +77,13 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
     await validateBeforeTransport(futureForm);
 
     const formRepository = getFormRepository(user);
-    if (form.sentAt) {
+
+    const transporterUpdate: Prisma.BsddTransporterUpdateWithoutFormInput = {
+      takenOverAt: infos.sentAt, // takenOverAt is duplicated between Form and BsddTransporter
+      takenOverBy: user.name // takenOverBy is duplicated between Form and BsddTransporter
+    };
+
+    if (form.takenOverAt && fullForm.forwardedIn) {
       // BSD has already been sent, it must be a signature for frame 18
 
       // check security code is temp storer's
@@ -78,6 +93,10 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
         (await getFormRepository(user).findFullFormById(id)) ?? {};
 
       const hasWasteDetailsOverride = !!forwardedIn?.wasteDetailsQuantity;
+
+      const forwardedInTransporter = getFirstTransporterSync(
+        fullForm.forwardedIn
+      );
 
       const formUpdateInput: Prisma.FormUpdateInput = {
         ...(!hasWasteDetailsOverride && wasteDetails),
@@ -96,7 +115,15 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
             // We don't have this information so we're doing our best:
             takenOverBy: user.name,
 
-            ...(hasWasteDetailsOverride && wasteDetails)
+            ...(hasWasteDetailsOverride && wasteDetails),
+            ...(forwardedInTransporter && {
+              transporters: {
+                update: {
+                  where: { id: forwardedInTransporter.id },
+                  data: transporterUpdate
+                }
+              }
+            })
           }
         }
       };
@@ -130,7 +157,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       );
     }
 
-    const formUpdateInput = {
+    const formUpdateInput: Prisma.FormUpdateInput = {
       // The following fields are deprecated but what this mutation used to fill
       // so we need to continue doing so until the mutation is completely removed
       signedByTransporter: true,
@@ -147,7 +174,15 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       takenOverBy: user.name,
 
       ...wasteDetails,
-      currentTransporterOrgId: getTransporterCompanyOrgId(form)
+      currentTransporterOrgId: getTransporterCompanyOrgId(transporter),
+      ...(transporter && {
+        transporters: {
+          update: {
+            where: { id: transporter.id },
+            data: transporterUpdate
+          }
+        }
+      })
     };
 
     const sentForm = await formRepository.update(

@@ -15,6 +15,35 @@ describe("BSDA validation", () => {
 
   afterEach(resetDatabase);
 
+  describe("BSDA should be valid - transitory empty strings", () => {
+    test("when type is COLLECTION_2710 and unused company fields are empty strings", async () => {
+      // on COLLECTION_2710 Bsdas worker and trasporter fields are not used
+      const { success } = await rawBsdaSchema.safeParseAsync({
+        ...bsda,
+        type: BsdaType.COLLECTION_2710,
+        transporterCompanySiret: "",
+        transporterCompanyName: "",
+        workerCompanyName: "",
+        workerCompanySiret: ""
+      });
+
+      expect(success).toEqual(true);
+    });
+    test("when type is COLLECTION_2710 and unused company fields are  empty nulls", async () => {
+      // on COLLECTION_2710 Bsdas worker and trasporter fields are not used
+      const { success } = await rawBsdaSchema.safeParseAsync({
+        ...bsda,
+        type: BsdaType.COLLECTION_2710,
+        transporterCompanySiret: null,
+        transporterCompanyName: null,
+        workerCompanyName: null,
+        workerCompanySiret: null
+      });
+
+      expect(success).toEqual(true);
+    });
+  });
+
   describe("BSDA should be valid", () => {
     test("when all data is present", async () => {
       const { success } = await rawBsdaSchema.safeParseAsync(bsda);

@@ -8,7 +8,7 @@ import {
 } from "../generated/graphql/types";
 import AccountField from "./fields/AccountField";
 import { MY_COMPANIES } from "./AccountCompanyList";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { useHistory } from "react-router-dom";
 
 AccountCompanyAdvanced.fragments = {

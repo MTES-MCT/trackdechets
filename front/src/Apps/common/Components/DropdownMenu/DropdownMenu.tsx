@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import FocusTrap from "focus-trap-react";
-import useOnClickOutsideRefTarget from "common/hooks/useOnClickOutsideRefTarget";
+import useOnClickOutsideRefTarget from "Apps/common/hooks/useOnClickOutsideRefTarget";
 import { DropdownMenuProps } from "./dropdownMenuTypes";
 import classNames from "classnames";
 
@@ -34,7 +34,10 @@ const DropdownMenu = ({
             "menu-btn__iconAlone": iconAlone,
           })}
           disabled={isDisabled}
-          onClick={onClick}
+          onClick={e => {
+            setIsOpen(false);
+            onClick();
+          }}
         >
           {menuTitle}
         </button>

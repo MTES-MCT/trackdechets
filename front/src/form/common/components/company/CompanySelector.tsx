@@ -2,7 +2,7 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import {
   NotificationError,
   SimpleNotificationError,
-} from "common/components/Error";
+} from "Apps/common/Components/Error/Error";
 import { IconLoading, IconSearch } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { constantCase } from "constant-case";
@@ -12,7 +12,7 @@ import {
   isVat,
   isForeignVat,
 } from "generated/constants/companySearchHelpers";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { debounce } from "common/helper";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
@@ -158,7 +158,7 @@ export default function CompanySelector({
    * CompanyPrivateInfos pour completer les informations
    * de la Company courante enregistrée dans le BSD à son ouverture
    */
-  const { data: selectedData } = useQuery<
+  const { data: companyPrivateData } = useQuery<
     Pick<Query, "companyPrivateInfos">,
     QueryCompanyPrivateInfosArgs
   >(COMPANY_SELECTOR_PRIVATE_INFOS, {
@@ -167,15 +167,22 @@ export default function CompanySelector({
       clue: orgId!,
     },
     skip: !orgId,
-    onCompleted(data) {
-      // Force update the country field
-      // TODO it's a hack to remove
+  });
+
+  /**
+   * Update the current form value when companyPrivateInfos changes
+   * Hack to fix country data when needed.
+   */
+  useEffect(() => {
+    if (
+      companyPrivateData?.companyPrivateInfos?.codePaysEtrangerEtablissement
+    ) {
       setFieldValue(
         `${field.name}.country`,
-        data.companyPrivateInfos.codePaysEtrangerEtablissement
+        companyPrivateData.companyPrivateInfos.codePaysEtrangerEtablissement
       );
-    },
-  });
+    }
+  }, [field.name, setFieldValue, companyPrivateData]);
 
   function isUnknownCompanyName(companyName?: string): boolean {
     return companyName === "---" || companyName === "";
@@ -475,10 +482,11 @@ export default function CompanySelector({
               address: field.value?.address,
               codePaysEtrangerEtablissement: field.value?.country,
               // complete with companyPrivateInfos data
-              ...(selectedData?.companyPrivateInfos && {
-                isRegistered: selectedData?.companyPrivateInfos.isRegistered,
+              ...(companyPrivateData?.companyPrivateInfos && {
+                isRegistered:
+                  companyPrivateData?.companyPrivateInfos.isRegistered,
                 codePaysEtrangerEtablissement:
-                  selectedData?.companyPrivateInfos
+                  companyPrivateData?.companyPrivateInfos
                     .codePaysEtrangerEtablissement,
               }),
             } as CompanySearchResult

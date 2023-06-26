@@ -3,7 +3,8 @@ import {
   safeInput,
   processDate,
   chain,
-  undefinedOrDefault
+  undefinedOrDefault,
+  noEmptyString
 } from "../common/converter";
 
 import {
@@ -44,9 +45,9 @@ import {
   Bsda as PrismaBsda,
   BsdaRevisionRequest
 } from "@prisma/client";
-import { BsdElastic } from "../common/elastic";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { Decimal } from "decimal.js-light";
+import { RawBsda } from "./elastic";
 
 export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
   return {
@@ -220,15 +221,15 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
   };
 }
 export function expandBsdaFromElastic(
-  bsda: BsdElastic["rawBsd"]
+  bsda: RawBsda
 ): GraphqlBsda & { groupedIn?: string; forwardedIn?: string } {
   const expanded = expandBsdaFromDb(bsda);
 
   // pass down related field to sub-resolvers
   return {
     ...expanded,
-    groupedIn: bsda?.groupedIn,
-    forwardedIn: bsda?.forwardedIn
+    groupedIn: undefined,
+    forwardedIn: undefined
   };
 }
 
@@ -256,8 +257,12 @@ export function flattenBsdaInput(formInput: BsdaInput) {
 function flattenBsdaEmitterInput({ emitter }: Pick<BsdaInput, "emitter">) {
   return {
     emitterIsPrivateIndividual: chain(emitter, e => e.isPrivateIndividual),
-    emitterCompanyName: chain(emitter, e => chain(e.company, c => c.name)),
-    emitterCompanySiret: chain(emitter, e => chain(e.company, c => c.siret)),
+    emitterCompanyName: chain(emitter, e =>
+      chain(e.company, c => noEmptyString(c.name))
+    ),
+    emitterCompanySiret: chain(emitter, e =>
+      chain(e.company, c => noEmptyString(c.siret))
+    ),
     emitterCompanyAddress: chain(emitter, e =>
       chain(e.company, c => c.address)
     ),
@@ -299,10 +304,10 @@ function flattenBsdaDestinationInput({
 }: Pick<BsdaInput, "destination">) {
   return {
     destinationCompanyName: chain(destination, d =>
-      chain(d.company, c => c.name)
+      chain(d.company, c => noEmptyString(c.name))
     ),
     destinationCompanySiret: chain(destination, d =>
-      chain(d.company, c => c.siret)
+      chain(d.company, c => noEmptyString(c.siret))
     ),
     destinationCompanyAddress: chain(destination, d =>
       chain(d.company, c => c.address)
@@ -318,11 +323,9 @@ function flattenBsdaDestinationInput({
     ),
     destinationCustomInfo: chain(destination, d => d.customInfo),
     destinationCap: chain(destination, d => d.cap),
-    destinationPlannedOperationCode: chain(
-      destination,
-      d => d.plannedOperationCode
+    destinationPlannedOperationCode: chain(destination, d =>
+      noEmptyString(d.plannedOperationCode)
     ),
-
     destinationReceptionDate: chain(destination, d =>
       chain(d.reception, r => r.date)
     ),
@@ -338,7 +341,7 @@ function flattenBsdaDestinationInput({
       chain(d.reception, r => r.refusalReason)
     ),
     destinationOperationCode: chain(destination, d =>
-      chain(d.operation, o => o.code)
+      chain(d.operation, o => noEmptyString(o.code))
     ),
     destinationOperationDescription: chain(destination, d =>
       chain(d.operation, o => o.description)
@@ -348,12 +351,16 @@ function flattenBsdaDestinationInput({
     ),
     destinationOperationNextDestinationCompanyName: chain(destination, d =>
       chain(d.operation, o =>
-        chain(o.nextDestination, nd => chain(nd.company, c => c.name))
+        chain(o.nextDestination, nd =>
+          chain(nd.company, c => noEmptyString(c.name))
+        )
       )
     ),
     destinationOperationNextDestinationCompanySiret: chain(destination, d =>
       chain(d.operation, o =>
-        chain(o.nextDestination, nd => chain(nd.company, c => c.siret))
+        chain(o.nextDestination, nd =>
+          chain(nd.company, c => noEmptyString(c.siret))
+        )
       )
     ),
     destinationOperationNextDestinationCompanyVatNumber: chain(destination, d =>
@@ -399,10 +406,10 @@ function flattenBsdaTransporterInput({
 }: Pick<BsdaInput, "transporter">) {
   return {
     transporterCompanyName: chain(transporter, t =>
-      chain(t.company, c => c.name)
+      chain(t.company, c => noEmptyString(c.name))
     ),
     transporterCompanySiret: chain(transporter, t =>
-      chain(t.company, c => c.siret)
+      chain(t.company, c => noEmptyString(c.siret))
     ),
     transporterCompanyAddress: chain(transporter, t =>
       chain(t.company, c => c.address)
@@ -448,8 +455,12 @@ function flattenBsdaTransporterInput({
 function flattenBsdaWorkerInput({ worker }: Pick<BsdaInput, "worker">) {
   return {
     workerIsDisabled: chain(worker, w => Boolean(w.isDisabled)),
-    workerCompanyName: chain(worker, w => chain(w.company, c => c.name)),
-    workerCompanySiret: chain(worker, w => chain(w.company, c => c.siret)),
+    workerCompanyName: chain(worker, w =>
+      chain(w.company, c => noEmptyString(c.name))
+    ),
+    workerCompanySiret: chain(worker, w =>
+      chain(w.company, c => noEmptyString(c.siret))
+    ),
     workerCompanyAddress: chain(worker, w => chain(w.company, c => c.address)),
     workerCompanyContact: chain(worker, w => chain(w.company, c => c.contact)),
     workerCompanyPhone: chain(worker, w => chain(w.company, c => c.phone)),
@@ -470,18 +481,19 @@ function flattenBsdaWorkerInput({ worker }: Pick<BsdaInput, "worker">) {
       chain(w.certification, c => c.validityLimit)
     ),
     workerCertificationOrganisation: chain(worker, w =>
-      chain(
-        w.certification,
-        c => (c.organisation === "" ? null : c.organisation) // Empty string is considered as null as we expect an enum here
-      )
+      chain(w.certification, c => noEmptyString(c.organisation))
     )
   };
 }
 
 function flattenBsdaBrokerInput({ broker }: Pick<BsdaInput, "broker">) {
   return {
-    brokerCompanyName: chain(broker, b => chain(b.company, c => c.name)),
-    brokerCompanySiret: chain(broker, b => chain(b.company, c => c.siret)),
+    brokerCompanyName: chain(broker, b =>
+      chain(b.company, c => noEmptyString(c.name))
+    ),
+    brokerCompanySiret: chain(broker, b =>
+      chain(b.company, c => noEmptyString(c.siret))
+    ),
     brokerCompanyAddress: chain(broker, b => chain(b.company, c => c.address)),
     brokerCompanyContact: chain(broker, b => chain(b.company, c => c.contact)),
     brokerCompanyPhone: chain(broker, b => chain(b.company, c => c.phone)),
@@ -509,7 +521,7 @@ function flattenBsdaWeightInput({ weight }: Pick<BsdaInput, "weight">) {
 
 function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
   return {
-    wasteCode: chain(waste, w => w.code),
+    wasteCode: chain(waste, w => noEmptyString(w.code)),
     wasteAdr: chain(waste, w => w.adr),
     wasteFamilyCode: chain(waste, w => w.familyCode),
     // TODO: name is deprecated, but still supported as an input for now.
@@ -560,13 +572,13 @@ export function flattenBsdaRevisionRequestInput(
       chain(r.broker, b => chain(b.company, c => c.mail))
     ),
     brokerCompanyName: chain(reviewContent, r =>
-      chain(r.broker, b => chain(b.company, c => c.name))
+      chain(r.broker, b => chain(b.company, c => noEmptyString(c.name)))
     ),
     brokerCompanyPhone: chain(reviewContent, r =>
       chain(r.broker, b => chain(b.company, c => c.phone))
     ),
     brokerCompanySiret: chain(reviewContent, r =>
-      chain(r.broker, b => chain(b.company, c => c.siret))
+      chain(r.broker, b => chain(b.company, c => noEmptyString(c.siret)))
     ),
     brokerRecepisseNumber: chain(reviewContent, r =>
       chain(r.broker, b => chain(b.recepisse, re => re.number))
@@ -606,7 +618,7 @@ export function flattenBsdaRevisionRequestInput(
       []
     ),
     destinationOperationCode: chain(reviewContent, r =>
-      chain(r.destination, d => chain(d.operation, o => o.code))
+      chain(r.destination, d => chain(d.operation, o => noEmptyString(o.code)))
     ),
     destinationOperationDescription: chain(reviewContent, r =>
       chain(r.destination, d => chain(d.operation, o => o.description))

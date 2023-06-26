@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { generatePath, NavLink, useHistory } from "react-router-dom";
 import { CompanyPrivate, CompanyType } from "generated/graphql/types";
 import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import "./DashboardTabs.scss";
 import {
   ACTS,
@@ -13,7 +13,7 @@ import {
   REGISTER,
   REVIEWS,
   TO_COLLECT,
-} from "Apps/Common/wordings/dashboard/wordingsDashboard";
+} from "Apps/common/wordings/dashboard/wordingsDashboard";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;

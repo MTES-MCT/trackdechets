@@ -1,6 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { Modal, RedErrorMessage } from "common/components";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { IconClose } from "common/components/Icons";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import CompanySelector from "form/common/components/company/CompanySelector";
@@ -15,9 +15,8 @@ import {
   MutationCreateFicheInterventionBsffArgs,
 } from "generated/graphql/types";
 import * as React from "react";
-import countries from "world-countries";
 import * as yup from "yup";
-import { FicheInterventionFragment } from "common/fragments";
+import { FicheInterventionFragment } from "Apps/common/queries/fragments";
 
 const CREATE_BSFF_FICHE_INTERVENTION = gql`
   mutation CreateBsffFicheIntervention($input: BsffFicheInterventionInput!) {
@@ -38,10 +37,7 @@ const companySchema: yup.SchemaOf<CompanyInput> = yup.object({
     .required("Le numéro de téléphone de l'établissement est requis"),
   siret: yup.string().required("Le numéro SIRET de l'établissement est requis"),
   vatNumber: yup.string().nullable(),
-  country: yup
-    .string()
-    .oneOf([...countries.map(country => country.cca2), null])
-    .nullable(),
+  country: yup.string().notRequired().nullable(),
   omiNumber: yup.string().nullable(),
   orgId: yup.string().nullable(),
 });
@@ -385,7 +381,7 @@ export function FicheInterventionList({
 
                 setIsModalOpen(true);
               })
-              .catch(() => {
+              .catch(e => {
                 window.alert(
                   `Veuillez compléter les champs de l'opérateur avant l'ajout d'une fiche d'intervention.`
                 );

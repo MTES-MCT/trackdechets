@@ -12,9 +12,9 @@ import {
   useParams,
 } from "react-router-dom";
 import { Location } from "history";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { Modal } from "common/components";
-import Loader from "../common/components/Loaders";
+import Loader from "../Apps/common/Components/Loader/Loaders";
 import "./Dashboard.scss";
 import Exports from "./exports/Exports";
 import { OnboardingSlideshow } from "./components/OnboardingSlideshow";
@@ -263,7 +263,7 @@ export default function Dashboard() {
               </Route>
               <Route path={routes.dashboard.bsdasris.sign.transporter}>
                 <Modal
-                  onClose={() => history.push(actionDashboard)}
+                  onClose={() => history.push(toCollectDashboard)}
                   ariaLabel="Signature transporteur"
                   isOpen
                 >

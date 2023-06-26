@@ -1,5 +1,5 @@
 import { isDate, isEqual } from "date-fns";
-import { Form } from "@prisma/client";
+import { BsddTransporter, Form } from "@prisma/client";
 import { expandFormFromDb } from "../converter";
 
 export function isArray(obj) {
@@ -109,23 +109,27 @@ export async function tempStorageDiff(
     updatedAt: _u1,
     status: _s1,
     ...expandedt1
-  } = await expandFormFromDb(t1);
+  } = await expandFormFromDb(t1!);
   const {
     updatedAt: _u2,
     status: _s2,
     ...expandedt2
-  } = await expandFormFromDb(t2);
+  } = await expandFormFromDb(t2!);
 
   const diff = objectDiff(expandedt1, expandedt2);
 
   return isEmpty(diff) ? {} : { temporaryStorageDetail: diff };
 }
 
+type FormWithTransporters = Form & { transporters: BsddTransporter[] | null };
+
 /**
  * Calculates expanded diff between two forms
  */
 export async function formDiff(
-  f1: Form & { forwardedIn?: Form | null },
+  f1: FormWithTransporters & {
+    forwardedIn?: FormWithTransporters | null;
+  },
   f2: Form & { forwardedIn?: Form | null }
 ) {
   const {

@@ -1,6 +1,6 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { getFormOrFormNotFound } from "../../database";
+import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb } from "../../converter";
 import { checkCanMarkAsSealed } from "../../permissions";
 import {
@@ -27,8 +27,9 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   const form = await getFormOrFormNotFound({ id });
   await checkCanMarkAsSealed(user, form);
 
+  const transporter = await getFirstTransporter(form);
   // validate form data
-  await checkCanBeSealed(form);
+  await checkCanBeSealed({ ...form, ...transporter });
 
   await validateForwardedInCompanies(form);
   let formUpdateInput;

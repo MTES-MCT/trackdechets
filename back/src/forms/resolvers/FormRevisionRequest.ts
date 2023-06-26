@@ -39,7 +39,7 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
   ) => {
     const fullBsdd = await prisma.bsddRevisionRequest
       .findUnique({ where: { id: parent.id } })
-      .bsdd({ include: { forwardedIn: true } });
+      .bsdd({ include: { forwardedIn: true, transporters: true } });
 
     if (!fullBsdd) {
       throw new Error(`FormRevisionRequest ${parent.id} has no form.`);
@@ -55,7 +55,8 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
     return expandFormFromDb({
       ...fullBsdd,
       ...bsdd,
-      forwardedIn: fullBsdd.forwardedIn
+      forwardedIn: fullBsdd.forwardedIn,
+      transporters: fullBsdd.transporters
     });
   }
 };

@@ -70,7 +70,6 @@ describe("Managed wastes registry", () => {
       ownerId: emitter.user.id,
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         recipientCompanySiret: destination.company.siret,
         traderCompanySiret: trader.company.siret,
         brokerCompanySiret: broker.company.siret,
@@ -81,7 +80,13 @@ describe("Managed wastes registry", () => {
         sentAt: new Date("2021-04-01"),
         receivedAt: new Date("2021-04-01"),
         processedAt: new Date("2021-04-01"),
-        processingOperationDone: "R 1"
+        processingOperationDone: "R 1",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
+          }
+        }
       }
     });
     bsd2 = await bsdaFactory({

@@ -8,7 +8,7 @@ import {
   Mutation,
   MutationCreateAnonymousCompanyArgs,
 } from "generated/graphql/types";
-import { InlineError } from "common/components/Error";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import { RedErrorMessage } from "common/components";
 import {
   isFRVat,

@@ -1,11 +1,12 @@
 import React from "react";
 import { gql, useMutation } from "@apollo/client";
 import { Mutation, MutationPublishBsffArgs } from "generated/graphql/types";
-import { ActionButton, Loader } from "common/components";
+import { ActionButton } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { TdModalTrigger } from "common/components/Modal";
 import { IconPaperWrite } from "common/components/Icons";
-import { GET_BSDS } from "common/queries";
-import { NotificationError } from "common/components/Error";
+import { GET_BSDS } from "Apps/common/queries";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 
 const PUBLISH_BSFF = gql`
   mutation PublishBsff($id: ID!) {

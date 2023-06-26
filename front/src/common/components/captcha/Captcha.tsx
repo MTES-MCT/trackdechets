@@ -3,7 +3,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import classNames from "classnames";
 import "./Captcha.scss";
-import { Loader } from "common/components";
+import { Loader } from "Apps/common/Components";
 
 const { VITE_API_ENDPOINT } = import.meta.env;
 

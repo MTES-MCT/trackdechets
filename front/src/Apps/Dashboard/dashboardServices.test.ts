@@ -2,7 +2,7 @@ import {
   BsdDisplay,
   BsdStatusCode,
   WorkflowDisplayType,
-} from "Apps/Common/types/bsdTypes";
+} from "Apps/common/types/bsdTypes";
 import {
   canPublishBsd,
   canReviewBsdd,
@@ -33,7 +33,7 @@ import {
   BsdaType,
 } from "generated/graphql/types";
 
-import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
+import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 import {
   FAIRE_SIGNER,
   PUBLIER,
@@ -47,7 +47,7 @@ import {
   VALIDER_RECEPTION,
   VALIDER_TRAITEMENT,
   completer_bsd_suite,
-} from "Apps/Common/wordings/dashboard/wordingsDashboard";
+} from "Apps/common/wordings/dashboard/wordingsDashboard";
 
 describe("dashboardServices", () => {
   describe("isBsdaSign", () => {
