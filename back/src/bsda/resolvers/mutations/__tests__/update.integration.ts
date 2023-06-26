@@ -718,4 +718,91 @@ describe("Mutation.updateBsda", () => {
       "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : intermediaries"
     );
   });
+
+  it("should allow updating destination if the planned destination becomes the nextDestination", async () => {
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_WORKER",
+        destinationCompanySiret: destination.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        emitterEmissionSignatureAuthor: "Emit",
+        workerWorkSignatureAuthor: "Work"
+      }
+    });
+
+    const { mutate } = makeClient(transporter.user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: transporter.company.siret
+        },
+        operation: {
+          nextDestination: {
+            company: { siret: destination.company.siret }
+          }
+        }
+      }
+    };
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    const updatedBsda = await prisma.bsda.findUnique({
+      where: { id: data.updateBsda.id }
+    });
+
+    expect(updatedBsda?.destinationCompanySiret).toBe(
+      transporter.company.siret
+    );
+    expect(updatedBsda?.destinationOperationNextDestinationCompanySiret).toBe(
+      destination.company.siret
+    );
+  });
+
+  it("should disallow updating destination if the planned destination disappears", async () => {
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_WORKER",
+        destinationCompanySiret: destination.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        emitterEmissionSignatureAuthor: "Emit",
+        workerWorkSignatureAuthor: "Work"
+      }
+    });
+
+    const { mutate } = makeClient(transporter.user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: transporter.company.siret
+        }
+      }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comment destination finale."
+    );
+  });
 });
