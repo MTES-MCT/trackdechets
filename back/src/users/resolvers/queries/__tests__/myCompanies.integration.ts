@@ -397,6 +397,7 @@ describe("query { myCompanies }", () => {
       createdAt: subDays(new Date(), 2)
     });
 
+    // requesting user is not the invited user, their name is obfuscated during several days
     const { query } = makeClient(user);
     const { data: page1 } = await query<Pick<Query, "myCompanies">>(
       MY_COMPANIES
@@ -409,6 +410,32 @@ describe("query { myCompanies }", () => {
       .map(u => u.name);
     expect(userNames?.length).toBe(1);
     expect(userNames).toStrictEqual(["Temporairement masqué"]);
+  }, 20000);
+
+  it("should not obfuscate user name for themselves", async () => {
+    const user = await userFactory();
+    const member = await userFactory();
+    const company = await companyFactory();
+
+    await associateUserToCompany(user.id, company.orgId, "ADMIN");
+    // association created 2 days ago - name obfuscation
+    await associateUserToCompany(member.id, company.orgId, "MEMBER", {
+      automaticallyAccepted: true,
+      createdAt: subDays(new Date(), 2)
+    });
+
+    const { query } = makeClient(member);
+    const { data: page1 } = await query<Pick<Query, "myCompanies">>(
+      MY_COMPANIES
+    );
+
+    expect(page1!.myCompanies.totalCount).toEqual(1);
+
+    const userNames = page1!.myCompanies.edges[0].node.users
+      ?.filter(u => u.email !== user.email)
+      .map(u => u.name);
+    expect(userNames?.length).toBe(1);
+    expect(userNames).toStrictEqual([member.name]);
   }, 20000);
 
   it("should return userRole and userPermissions", async () => {
