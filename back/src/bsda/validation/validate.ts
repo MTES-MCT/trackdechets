@@ -271,6 +271,7 @@ async function validateDestination(
   const currentBsda = await findUnique({ id: bsda.id });
 
   if (
+    currentBsda &&
     currentBsda.destinationCompanySiret !== bsda.destinationCompanySiret &&
     bsda.destinationOperationNextDestinationCompanySiret !==
       currentBsda.destinationCompanySiret
