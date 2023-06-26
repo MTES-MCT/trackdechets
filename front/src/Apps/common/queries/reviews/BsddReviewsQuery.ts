@@ -26,6 +26,7 @@ const reviewFragment = gql`
         }
       }
       emitter {
+        type
         company {
           name
           siret
