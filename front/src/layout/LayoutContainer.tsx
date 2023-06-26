@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect } from "react";
+import React, { lazy, Suspense, useContext, useEffect } from "react";
 import {
   Route,
   withRouter,
@@ -17,6 +17,7 @@ import { useQuery, gql } from "@apollo/client";
 import { Query } from "../generated/graphql/types";
 import ResendActivationEmail from "login/ResendActivationEmail";
 import Login from "login/Login";
+import { useFeatureFlags } from "common/contexts/FeatureFlagsContext";
 
 import Plausible from "plausible-tracker";
 
@@ -69,6 +70,7 @@ export default withRouter(function LayoutContainer({ history }) {
   const flagDashboardV2UserId = VITE_FLAG_DASHBOARDV2_USERID
     ? VITE_FLAG_DASHBOARDV2_USERID.split(",")
     : [""];
+  const { updateFeatureFlags } = useFeatureFlags();
 
   const dashboardRoutePrefixAdminCheck = isAdmin ? "dashboardv2" : "dashboard";
   const dashboardRoutePrefix = !isV2Routes
@@ -92,6 +94,11 @@ export default withRouter(function LayoutContainer({ history }) {
       enableAutoPageviews();
     }
   }
+  useEffect(() => {
+    updateFeatureFlags({
+      dashboardV2: flagDashboardV2UserId.includes(userId),
+    });
+  }, [userId]);
 
   useEffect(() => {
     if (import.meta.env.VITE_SENTRY_DSN && email) {
@@ -121,11 +128,7 @@ export default withRouter(function LayoutContainer({ history }) {
           <OidcDialog />
         </PrivateRoute>
         <Route>
-          <Layout
-            isAuthenticated={isAuthenticated}
-            isAdmin={isAdmin}
-            flags={{ flagDashboardV2: flagDashboardV2UserId.includes(userId) }}
-          >
+          <Layout isAuthenticated={isAuthenticated} isAdmin={isAdmin}>
             <Switch>
               <PrivateRoute
                 path={routes.admin.index}

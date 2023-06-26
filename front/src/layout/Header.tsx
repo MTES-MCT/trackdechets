@@ -23,6 +23,7 @@ import styles from "./Header.module.scss";
 import { useMedia } from "use-media";
 import { DashboardTabs } from "dashboard/DashboardTabs";
 import { default as DashboardTabsV2 } from "Apps/Dashboard/Components/DashboardTabs/DashboardTabs";
+import { useFeatureFlags } from "common/contexts/FeatureFlagsContext";
 
 export const GET_ME = gql`
   {
@@ -70,7 +71,8 @@ const getMenuEntries = (
   isAuthenticated,
   isAdmin,
   currentSiret,
-  isProduction
+  isProduction,
+  featureFlags
 ) => {
   const common = [
     {
@@ -131,11 +133,14 @@ const getMenuEntries = (
       navlink: true,
     },
   ];
+
+  const canAccessDashboardV2 = isAdmin || featureFlags.dashboardV2;
+
   return [
     ...common,
     ...(isAuthenticated ? connected : []),
     ...(isAdmin ? admin : []),
-    ...(!isProduction && isAdmin ? dashboardV2 : []),
+    ...(canAccessDashboardV2 ? dashboardV2 : []),
   ];
 };
 
@@ -195,6 +200,8 @@ export default withRouter(function Header({
   const { VITE_API_ENDPOINT, NODE_ENV } = import.meta.env;
   const isProduction = NODE_ENV === "production";
 
+  const { featureFlags } = useFeatureFlags();
+
   const [menuHidden, toggleMenu] = useState(true);
 
   const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
@@ -242,7 +249,8 @@ export default withRouter(function Header({
     isAuthenticated,
     isAdmin,
     currentSiret,
-    isProduction
+    isProduction,
+    featureFlags
   );
 
   const mobileNav = () => {
