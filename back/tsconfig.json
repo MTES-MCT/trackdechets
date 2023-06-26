@@ -23,5 +23,5 @@
     "inlineSources": true,
     "sourceRoot": "/"
   },
-  "include": ["src/**/*", "prisma/**/*"]
+  "include": ["src/**/*", "prisma/**/*", "integration-tests/**/*"]
 }
