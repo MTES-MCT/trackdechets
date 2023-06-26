@@ -1,6 +1,5 @@
 import { hash } from "bcrypt";
 import { faker } from "@faker-js/faker";
-import crypto from "crypto";
 import getReadableId from "../forms/readableId";
 import {
   CompanyType,
@@ -17,6 +16,8 @@ import {
 import prisma from "../prisma";
 import { hashToken } from "../utils";
 import { createUser } from "../users/database";
+import { subMinutes } from "date-fns";
+
 /**
  * Create a user with name and email
  * @param opt: extra parameters
@@ -43,14 +44,16 @@ export const userFactory = async (
  * @param index numerical index
  */
 export function siretify(index: number | undefined) {
-  if (!index || index > 9) {
+  if (index && index <= 9) {
+    // Compatibility with an old version of siretify using
+    // a company index. This should be refactored to remove
+    // index everywhere in the function calls to siretify
     return faker.helpers.replaceCreditCardSymbols(
-      Math.floor(Number(crypto.randomBytes(1))) + "############L"
+      Math.abs(index) + "############L"
     );
   }
-  return faker.helpers.replaceCreditCardSymbols(
-    Math.abs(index) + "############L"
-  );
+
+  return faker.helpers.replaceCreditCardSymbols("#############L");
 }
 
 /**
@@ -63,15 +66,17 @@ export const companyFactory = async (
   const opts = companyOpts || {};
 
   const companyIndex = (await prisma.company.count()) + 1;
-  const siret = opts.siret ? opts.siret : siretify(companyIndex);
+
+  const siret = opts.siret ?? siretify(companyIndex);
   return prisma.company.create({
     data: {
-      orgId: !opts.vatNumber?.length ? siret : opts.vatNumber,
+      orgId: opts.vatNumber ?? siret,
       siret,
       companyTypes: {
         set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
       },
       name: `company_${companyIndex}`,
+      contact: "Company Contact",
       securityCode: 1234,
       verificationCode: "34567",
       address: "Champ de Mars, 5 Av. Anatole France, 75007 Paris",
@@ -117,18 +122,23 @@ export interface UserWithCompany {
  * @param role: user role in the company
  */
 export const userWithCompanyFactory = async (
-  role: UserRole,
+  role: UserRole = "ADMIN",
   companyOpts: Partial<Prisma.CompanyCreateInput> = {},
-  userOpts: Partial<Prisma.UserCreateInput> = {}
+  userOpts: Partial<Prisma.UserCreateInput> = {},
+  companyAssociationOpts: Partial<Prisma.CompanyAssociationCreateInput> = {}
 ): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
+  // we fake a user created a few minutes ago to prevent their membership being considered as an auto-accepted invitation
+  const userCreatedAt = subMinutes(new Date(), 5);
 
   const user = await userFactory({
+    createdAt: userCreatedAt,
     ...userOpts,
     companyAssociations: {
       create: {
         company: { connect: { id: company.id } },
-        role: role as UserRole
+        role: role as UserRole,
+        ...companyAssociationOpts
       }
     }
   });
@@ -185,7 +195,25 @@ export const createMembershipRequest = async (
   });
 };
 
-const formdata = {
+/**
+ * Returns the destination info for a BSD
+ */
+export const getDestinationCompanyInfo = async () => {
+  const destinationCompany = await companyFactory();
+  return {
+    destination: {
+      company: {
+        name: destinationCompany.name,
+        address: destinationCompany.address,
+        phone: destinationCompany.contactPhone,
+        siret: destinationCompany.siret,
+        contact: destinationCompany.contact
+      }
+    }
+  };
+};
+
+const formdata: Partial<Prisma.FormCreateInput> = {
   brokerCompanyAddress: "",
   brokerCompanyContact: "",
   brokerCompanyMail: "",
@@ -242,18 +270,23 @@ const formdata = {
   traderDepartment: "",
   traderReceipt: "",
   traderValidityLimit: null,
-  transporterCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
-  transporterCompanyContact: "transporter",
-  transporterCompanyMail: "transporter@td.io",
-  transporterCompanyName: "WASTE TRANSPORTER",
-  transporterCompanyPhone: "06 18 76 02 66",
-  transporterCompanySiret: siretify(1),
-  transporterDepartment: "86",
-  transporterIsExemptedOfReceipt: false,
-  transporterTransportMode: TransportMode.ROAD,
-  transporterNumberPlate: "aa22",
-  transporterReceipt: "33AA",
-  transporterValidityLimit: "2019-11-27T00:00:00.000Z",
+  transporters: {
+    create: {
+      number: 1,
+      transporterCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
+      transporterCompanyContact: "transporter",
+      transporterCompanyMail: "transporter@td.io",
+      transporterCompanyName: "WASTE TRANSPORTER",
+      transporterCompanyPhone: "06 18 76 02 66",
+      transporterCompanySiret: siretify(1),
+      transporterDepartment: "86",
+      transporterIsExemptedOfReceipt: false,
+      transporterTransportMode: TransportMode.ROAD,
+      transporterNumberPlate: "aa22",
+      transporterReceipt: "33AA",
+      transporterValidityLimit: "2019-11-27T00:00:00.000Z"
+    }
+  },
   wasteAcceptationStatus: null,
   wasteDetailsCode: "05 01 04*",
   wasteDetailsConsistence: "SOLID" as Consistence,
@@ -283,31 +316,46 @@ export const forwardedInData: Partial<Prisma.FormCreateInput> = {
   recipientCap: "CAP",
   recipientProcessingOperation: "R 1",
   wasteDetailsCode: "05 01 04*",
+  wasteDetailsName: "Déchets divers",
   wasteDetailsIsDangerous: true,
   wasteDetailsOnuCode: "2003",
   wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
   wasteDetailsQuantity: 1,
   wasteDetailsConsistence: "SOLID" as Consistence,
   wasteDetailsQuantityType: "ESTIMATED",
-  transporterCompanyName: "Transporteur",
-  transporterCompanySiret: siretify(4),
-  transporterCompanyAddress: "6 chemin des pneus, 07100 Bourg d'ici",
-  transporterCompanyContact: "Mathieu O'connor",
-  transporterCompanyPhone: "0700000000",
-  transporterCompanyMail: "mathieu@transporteur.org",
-  transporterIsExemptedOfReceipt: false,
-  transporterReceipt: "xxxxxx",
-  transporterDepartment: "07",
-  transporterValidityLimit: "2019-11-27T00:00:00.000Z",
-  transporterNumberPlate: "AD-007-XX",
+  transporters: {
+    create: {
+      number: 1,
+      transporterCompanyName: "Transporteur",
+      transporterCompanySiret: siretify(4),
+      transporterCompanyAddress: "6 chemin des pneus, 07100 Bourg d'ici",
+      transporterCompanyContact: "Mathieu O'connor",
+      transporterCompanyPhone: "0700000000",
+      transporterCompanyMail: "mathieu@transporteur.org",
+      transporterIsExemptedOfReceipt: false,
+      transporterReceipt: "xxxxxx",
+      transporterDepartment: "07",
+      transporterValidityLimit: "2019-11-27T00:00:00.000Z",
+      transporterNumberPlate: "AD-007-XX"
+    }
+  },
+
   signedByTransporter: true,
   signedBy: "Mathieu O'connor"
 };
 
-export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
-  return prisma.transportSegment.create({
+export const transportSegmentFactory = async ({
+  formId,
+  segmentPayload
+}: {
+  formId: string;
+  segmentPayload: Omit<Prisma.BsddTransporterCreateWithoutFormInput, "number">;
+}) => {
+  const count = await prisma.bsddTransporter.count({ where: { formId } });
+  return prisma.bsddTransporter.create({
     data: {
       form: { connect: { id: formId } },
+      number: count + 1,
       ...segmentPayload
     }
   });
@@ -348,12 +396,21 @@ export const formFactory = async ({
   opt?: Partial<Prisma.FormCreateInput>;
 }) => {
   // Those sirets are required for the form to be updatable
-  await upsertBaseSiret(formdata.transporterCompanySiret);
+  await upsertBaseSiret(
+    (formdata.transporters!.create! as any).transporterCompanySiret as any
+  );
   await upsertBaseSiret(formdata.recipientCompanySiret);
 
-  const formParams = {
+  const formParams: Omit<Prisma.FormCreateInput, "readableId" | "owner"> = {
     ...formdata,
-    ...opt
+    ...opt,
+    transporters: {
+      create: {
+        ...formdata.transporters!.create,
+        ...opt.transporters?.create,
+        number: 1
+      }
+    }
   };
   return prisma.form.create({
     data: {
@@ -374,8 +431,25 @@ export const formWithTempStorageFactory = async ({
   opt?: Partial<Prisma.FormCreateInput>;
   forwardedInOpts?: Partial<Prisma.FormCreateInput>;
 }) => {
-  await upsertBaseSiret(forwardedInData.transporterCompanySiret);
+  await upsertBaseSiret(
+    (forwardedInData.transporters?.create as any).transporterCompanySiret
+  );
   await upsertBaseSiret(forwardedInData.recipientCompanySiret);
+
+  const forwardedCreateInput: Omit<
+    Prisma.FormCreateInput,
+    "readableId" | "owner"
+  > = {
+    ...forwardedInData,
+    ...forwardedInOpts,
+    transporters: {
+      create: {
+        ...forwardedInData.transporters!.create,
+        ...forwardedInOpts?.transporters?.create,
+        number: 1
+      }
+    }
+  };
 
   return formFactory({
     ownerId,
@@ -385,8 +459,7 @@ export const formWithTempStorageFactory = async ({
         create: {
           readableId: getReadableId(),
           owner: { connect: { id: ownerId } },
-          ...forwardedInData,
-          ...forwardedInOpts
+          ...forwardedCreateInput
         }
       },
       ...opt

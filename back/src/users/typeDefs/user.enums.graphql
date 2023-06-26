@@ -1,21 +1,67 @@
 """
-Liste les différents rôles d'un utilisateur au sein
-d'un établissement.
-Les admins peuvent:
-* consulter/éditer les bordereaux
-* gérer les utilisateurs de l'établissement
-* éditer les informations de la fiche entreprise
-* demander le renouvellement du code de signature
-* Éditer les informations de la fiche entreprise
-Les membres peuvent:
-* consulter/éditer les bordereaux
-* consulter le reste des informations
-Vous pouvez consulter [cette page](https://docs.google.com/spreadsheets/d/12K9Bd2k5l4uqXhS0h5uI00lNEzW7C-1t-NDOyxy8aKk/edit#gid=0)
-pour le détail de chacun des rôles
+Rôle d'un utilisateur au sein d'un établissement. Châque rôle est lié
+à un ensemble de permissions (voir l'objet UserPermission).
+
+Liste des permissions lié au rôle `MEMBER` :
+- Accéder à un BSD de l'établissement en lecture.
+- Lister les BSD de l'établissement.
+- Créer un BSD pour l'établissement.
+- Modifier un BSD de l'établissement.
+- Supprimer un BSD de l'établissement.
+- Signer un BSD pour le compte de l'établissement.
+- Proposer une demande de révision pour l'établissement.
+- Accepter / refuser les demandes de révision pour l'établissement.
+- Exporter le registre de l'établissement.
+- Accéder aux informations de l'établissements en lecture.
+
+Le rôle `ADMIN` a les mêmes permissions que le rôle `MEMBER` avec en plus :
+- Modifier les informations de l'établissement.
+- Gérer la liste des utilisateurs de l'établissement.
+- Gérer les signatures automatiques.
+- Renouveler le code de signature
 """
 enum UserRole {
   MEMBER
   ADMIN
+}
+
+enum UserPermission {
+  "Lire un BSD."
+  BSD_CAN_READ
+  "Lister les BSDs."
+  BSD_CAN_LIST
+  "Créer un BSD."
+  BSD_CAN_CREATE
+  "Modifier un BSD."
+  BSD_CAN_UPDATE
+  "Supprimer un BSD."
+  BSD_CAN_DELETE
+  "Signer l'émission d'un BSD."
+  BSD_CAN_SIGN_EMISSION
+  "Signer l'étape de travaux d'un BSDA."
+  BSD_CAN_SIGN_WORK
+  "Signer l'enlèvement d'un BSD."
+  BSD_CAN_SIGN_TRANSPORT
+  "Signer la réception et l'acceptation d'un BSD."
+  BSD_CAN_SIGN_ACCEPTATION
+  "Signer l'opération d'un BSD."
+  BSD_CAN_SIGN_OPERATION
+  "Demander une demande révision. Accepter / refuser une demande de révision."
+  BSD_CAN_REVISE
+  "Exporter le registre"
+  REGISTRY_CAN_READ
+  "Lire les informations de l'établissement"
+  COMPANY_CAN_READ
+  "Modifier les informations de l'établissement"
+  COMPANY_CAN_UPDATE
+  "Vérifier l'établissement à partir du code envoyé par courrier"
+  COMPANY_CAN_VERIFY
+  "Gérer les signatures automatiques"
+  COMPANY_CAN_MANAGE_SIGNATURE_AUTOMATION
+  "Gérer la liste des utilisateurs de l'établissement"
+  COMPANY_CAN_MANAGE_MEMBERS
+  "Renouveler le code de signature"
+  COMPANY_CAN_RENEW_SECURITY_CODE
 }
 
 """

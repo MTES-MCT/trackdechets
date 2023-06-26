@@ -8,7 +8,19 @@ import formsRegister from "./queries/formsRegister";
 import stats from "./queries/stats";
 import formRevisionRequests from "./queries/formRevisionRequests";
 
-const Query: QueryResolvers = {
+export type FormQueryResolvers = Pick<
+  QueryResolvers,
+  | "form"
+  | "forms"
+  | "formPdf"
+  | "appendixForms"
+  | "formsLifeCycle"
+  | "formsRegister"
+  | "stats"
+  | "formRevisionRequests"
+>;
+
+const Query: FormQueryResolvers = {
   form,
   forms,
   formPdf,

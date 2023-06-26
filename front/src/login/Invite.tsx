@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import { useMutation, useQuery, gql } from "@apollo/client";
 import { Formik, Form, Field } from "formik";
@@ -8,21 +8,15 @@ import {
   MutationJoinWithInviteArgs,
   Query,
 } from "../generated/graphql/types";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import * as queryString from "query-string";
 import { decodeHash } from "common/helper";
-import routes from "common/routes";
+import routes from "Apps/routes";
 
-import {
-  Container,
-  Row,
-  Col,
-  Title,
-  Text,
-  Alert,
-  Button,
-  TextInput,
-} from "@dataesr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { PasswordInput } from "@codegouvfr/react-dsfr/blocks/PasswordInput";
 import styles from "./Login.module.scss";
 
 const INVITATION = gql`
@@ -53,7 +47,6 @@ const JOIN_WITH_INVITE = gql`
 `;
 
 export default function Invite() {
-  const [showPassword, setShowPassword] = useState(false);
   // Extract invitation hash from URL
   const location = useLocation();
   const history = useHistory();
@@ -87,22 +80,22 @@ export default function Invite() {
   const pageContent = content => {
     return (
       <div className={styles.onboardingWrapper}>
-        <Container className={styles.centralContainer} spacing="pt-10w">
+        <div className={`fr-container fr-pt-10w ${styles.centralContainer}`}>
           {content}
-        </Container>
+        </div>
       </div>
     );
   };
 
   if (mutationError) {
     return pageContent(
-      <Row justifyContent="center" spacing="mb-2w">
+      <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
         <Alert
           title="Erreur"
           description={mutationError.message}
-          type="error"
+          severity="error"
         />
-      </Row>
+      </div>
     );
   }
 
@@ -111,15 +104,15 @@ export default function Invite() {
 
     return pageContent(
       <>
-        <Row justifyContent="center" spacing="mb-2w">
-          <Col spacing="m-auto">
-            <Title as="h2" look="h3" spacing="mb-1w">
+        <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
+          <div className="fr-col fr-m-auto">
+            <h2 className="fr-h3 fr-mb-1w">
               Confirmation de création de compte
-            </Title>
-            <Text as="p" spacing="mb-1w">
+            </h2>
+            <p className="fr-text--md fr-mb-1w">
               Votre compte <strong>{user.email}</strong> a bien été crée et vous
               êtes désormais membre des établissements suivants:
-            </Text>
+            </p>
             <ul className="bullets">
               {user.companies?.map(company => (
                 <li key={company.orgId}>
@@ -127,16 +120,16 @@ export default function Invite() {
                 </li>
               ))}
             </ul>
-            <Text as="p" spacing="mb-1w">
+            <p className="fr-text--md fr-mb-1w">
               Connectez-vous à votre compte pour accéder à votre tableau de bord
               et accéder aux bordereaux de ces établissements.
-            </Text>
-          </Col>
-        </Row>
-        <Row justifyContent="right">
-          <Col className={styles.resetFlexCol}>
+            </p>
+          </div>
+        </div>
+        <div className="fr-grid-row fr-grid-row--right">
+          <div className={`fr-col ${styles.resetFlexCol}`}>
             <Button
-              size="md"
+              size="medium"
               onClick={() => {
                 history.push({
                   pathname: routes.login,
@@ -145,17 +138,21 @@ export default function Invite() {
             >
               Se connecter
             </Button>
-          </Col>
-        </Row>
+          </div>
+        </div>
       </>
     );
   }
 
   if (queryError) {
     return pageContent(
-      <Row justifyContent="center" spacing="mb-2w">
-        <Alert title="Erreur" description={queryError.message} type="error" />
-      </Row>
+      <div className="fr-grid-row fr-grid-row--center mb-2w">
+        <Alert
+          title="Erreur"
+          description={queryError.message}
+          severity="error"
+        />
+      </div>
     );
   }
 
@@ -165,26 +162,26 @@ export default function Invite() {
     if (acceptedAt) {
       return pageContent(
         <>
-          <Row justifyContent="center" spacing="mb-2w">
-            <Col spacing="m-auto">
-              <Title as="h2" look="h3" spacing="mb-1w">
+          <div className="fr-grid-row fr-grid-row--center mb-2w">
+            <div className="fr-col fr-m-auto">
+              <h2 className="fr-h3 fr-mb-1w">
                 Cette invitation n'est plus valide
-              </Title>
-              <Text as="p" spacing="mb-1w">
+              </h2>
+              <p className="fr-text--md fr-mb-1w">
                 Votre compte <strong>{email}</strong> a déjà été crée et le
                 rattachement à l'établissement dont le SIRET est{" "}
                 <strong>{companySiret}</strong> est effectif.
-              </Text>
-              <Text as="p" spacing="mb-1w">
+              </p>
+              <p className="fr-text--md fr-mb-1w">
                 Connectez-vous à votre compte pour accéder à votre tableau de
                 bord et accéder aux bordereaux de ces établissements.
-              </Text>
-            </Col>
-          </Row>
-          <Row justifyContent="right">
-            <Col className={styles.resetFlexCol}>
+              </p>
+            </div>
+          </div>
+          <div className="fr-grid-row fr-grid-row--right">
+            <div className={`fr-col ${styles.resetFlexCol}`}>
               <Button
-                size="md"
+                size="medium"
                 onClick={() => {
                   history.push({
                     pathname: routes.login,
@@ -193,8 +190,8 @@ export default function Invite() {
               >
                 Se connecter
               </Button>
-            </Col>
-          </Row>
+            </div>
+          </div>
         </>
       );
     }
@@ -223,28 +220,30 @@ export default function Invite() {
       >
         {({ isSubmitting, errors, touched, isValid, submitForm }) => (
           <Form>
-            <Row justifyContent="center" spacing="mb-2w">
-              <Col spacing="m-auto">
-                <Title as="h1" look="h3" spacing="mb-1w">
-                  Validez votre inscription
-                </Title>
-                <Text as="p" spacing="mb-1w">
+            <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
+              <div className="fr-col fr-m-auto">
+                <h1 className="fr-h3 fr-mb-1w">Validez votre inscription</h1>
+                <p className="fr-text--md fr-mb-1w">
                   Vous avez été invité à rejoindre Trackdéchets. Pour valider
                   votre inscription, veuillez compléter le formulaire
                   ci-dessous.
-                </Text>
-                <Text as="p" className="fr-text--bold">
-                  Vos informations :
-                </Text>
+                </p>
+                <p className="fr-text--bold">Vos informations :</p>
                 <Field name="name">
                   {({ field }) => {
                     return (
-                      <TextInput
-                        {...field}
-                        required
+                      <Input
                         label="Nom et prénom"
-                        messageType={errors.name && touched.name ? "error" : ""}
-                        message={errors.name && touched.name ? errors.name : ""}
+                        state={
+                          errors.name && touched.name ? "error" : "default"
+                        }
+                        stateRelatedMessage={
+                          errors.name && touched.name ? errors.name : ""
+                        }
+                        nativeInputProps={{
+                          required: true,
+                          ...field,
+                        }}
                       />
                     );
                   }}
@@ -252,47 +251,51 @@ export default function Invite() {
                 <Field name="email">
                   {({ field }) => {
                     return (
-                      <TextInput {...field} readOnly required label="Email" />
+                      <Input
+                        label="Email"
+                        nativeInputProps={{
+                          required: true,
+                          readOnly: true,
+                          ...field,
+                        }}
+                      />
                     );
                   }}
                 </Field>
                 <Field name="password">
                   {({ field }) => {
                     return (
-                      <TextInput
-                        type={showPassword ? "text" : "password"}
-                        {...field}
-                        required
+                      <PasswordInput
                         label="Mot de passe"
-                        messageType={
-                          errors.password && touched.password ? "error" : ""
-                        }
-                        message={
-                          errors.password && touched.password
-                            ? errors.password
-                            : ""
-                        }
+                        messages={[
+                          {
+                            severity: "info",
+                            message: "8 caractères minimum",
+                          },
+                          {
+                            severity:
+                              errors.password && touched.password
+                                ? "error"
+                                : "info",
+                            message:
+                              errors.password && touched.password
+                                ? errors.password
+                                : "",
+                          },
+                        ]}
+                        nativeInputProps={{ required: true, ...field }}
                       />
                     );
                   }}
                 </Field>
+              </div>
+            </div>
+            <div className="fr-grid-row fr-grid-row--right">
+              <div className={`fr-col ${styles.resetFlexCol}`}>
                 <Button
-                  tertiary
-                  hasBorder={false}
-                  icon={showPassword ? "ri-eye-off-line" : "ri-eye-line"}
-                  iconPosition="left"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  Afficher le mot de passe
-                </Button>
-              </Col>
-            </Row>
-            <Row justifyContent="right">
-              <Col className={styles.resetFlexCol}>
-                <Button
-                  icon="ri-arrow-right-line"
+                  iconId="ri-arrow-right-line"
                   iconPosition="right"
-                  size="md"
+                  size="medium"
                   onClick={submitForm}
                   disabled={!isValid}
                   title={
@@ -301,8 +304,8 @@ export default function Invite() {
                 >
                   Créer mon compte
                 </Button>
-              </Col>
-            </Row>
+              </div>
+            </div>
           </Form>
         )}
       </Formik>

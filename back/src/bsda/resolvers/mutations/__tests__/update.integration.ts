@@ -11,11 +11,6 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../__tests__/factories";
-import * as sirenify from "../../../sirenify";
-
-const sirenifyMock = jest
-  .spyOn(sirenify, "default")
-  .mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_BSDA = `
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
@@ -52,7 +47,6 @@ const UPDATE_BSDA = `
 describe("Mutation.updateBsda", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
   });
 
   it("should allow user to update a bsda", async () => {
@@ -81,8 +75,6 @@ describe("Mutation.updateBsda", () => {
     });
 
     expect(data.updateBsda.id).toBeTruthy();
-    // check input is sirenified
-    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("should disallow unauthenticated user from updating a bsda", async () => {
@@ -316,6 +308,50 @@ describe("Mutation.updateBsda", () => {
     expect(data.updateBsda.transporter!.recepisse!.number).toEqual(
       "Num recepisse"
     );
+  });
+
+  it("should not allow the transporter to update the worker if already signed by the producer", async () => {
+    const { company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company: company2, user: user2 } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        workerCompanySiret: company2.siret,
+        destinationCompanySiret: company2.siret,
+        transporterCompanySiret: company2.siret
+      }
+    });
+
+    const { mutate } = makeClient(user2);
+
+    const input = {
+      worker: {
+        company: {
+          siret: company.siret
+        }
+      }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : workerCompanySiret"
+      })
+    ]);
   });
 
   it("should not update transporter if they signed already", async () => {

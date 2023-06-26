@@ -7,7 +7,12 @@ import {
   PackagingInfo
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getFormOrFormNotFound, getFullForm } from "../../database";
+import {
+  getFirstTransporter,
+  getFirstTransporterSync,
+  getFormOrFormNotFound,
+  getFullForm
+} from "../../database";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { checkCanSignFor, hasSignatureAutomation } from "../../permissions";
@@ -16,11 +21,13 @@ import { getFormRepository } from "../../repository";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 import { runInTransaction } from "../../../common/repository/helper";
 import { sumPackagingInfos } from "../../repository/helper";
+import { validateBeforeTransport } from "../../validation";
+import { Permission } from "../../../permissions";
 
 /**
  * Common function for signing
  */
-const signedByTransporterFn = async (
+const signTransportFn = async (
   user: Express.User,
   args: MutationSignTransportFormArgs,
   existingForm: Form
@@ -30,19 +37,41 @@ const signedByTransporterFn = async (
       "Impossible de signer le transport d'un bordereau chapeau. C'est en signant les bordereaux d'annexe 1 que le statut de ce bordereau évoluera."
     );
   }
+  const transporter = await getFirstTransporter(existingForm);
+
   await checkCanSignFor(
-    getTransporterCompanyOrgId(existingForm),
+    getTransporterCompanyOrgId(transporter)!,
     user,
+    Permission.BsdCanSignTransport,
     args.securityCode
   );
-  const formUpdateInput = {
+
+  await validateBeforeTransport({ ...existingForm, ...transporter });
+
+  const transporterUpdate: Prisma.BsddTransporterUpdateWithoutFormInput = {
+    takenOverAt: args.input.takenOverAt, // takenOverAt is duplicated between Form and BsddTransporter
+    takenOverBy: args.input.takenOverBy, // takenOverBy is duplicated between Form and BsddTransporter
+    ...(args.input.transporterNumberPlate
+      ? {
+          transporterNumberPlate: args.input.transporterNumberPlate
+        }
+      : {})
+  };
+
+  const formUpdateInput: Prisma.FormUpdateInput = {
     takenOverAt: args.input.takenOverAt,
     takenOverBy: args.input.takenOverBy,
-    transporterNumberPlate:
-      args.input.transporterNumberPlate ?? existingForm.transporterNumberPlate,
-
-    currentTransporterSiret: getTransporterCompanyOrgId(existingForm),
-
+    ...(transporter
+      ? {
+          transporters: {
+            update: {
+              where: { id: transporter.id },
+              data: transporterUpdate
+            }
+          }
+        }
+      : {}),
+    currentTransporterOrgId: getTransporterCompanyOrgId(transporter),
     // The following fields are deprecated
     // but we need to fill them until we remove them completely
     signedByTransporter: true,
@@ -99,10 +128,15 @@ const signedByTransporterFn = async (
       }
 
       // During transporter signature, we recompute the total packaging infos
+      // But we only use the current form + forms picked up by the transporter to compute this quantity
       const appendix1Forms = await findGroupedFormsById(appendix1ContainerId);
-      const wasteDetailsPackagingInfos = appendix1Forms.map(
-        form => form.wasteDetailsPackagingInfos as PackagingInfo[]
-      );
+      const wasteDetailsPackagingInfos = appendix1Forms
+        .filter(form => existingForm.id === form.id || form.takenOverAt)
+        .map(form => form.wasteDetailsPackagingInfos as PackagingInfo[]);
+
+      const appendix1ContainerTransporter = await getFirstTransporter({
+        id: appendix1ContainerId
+      });
 
       await update(
         { id: appendix1ContainerId },
@@ -115,10 +149,22 @@ const signedByTransporterFn = async (
           sentAt: formUpdateInput.sentAt,
           takenOverAt: formUpdateInput.takenOverAt,
           takenOverBy: formUpdateInput.takenOverBy,
-          transporterNumberPlate: formUpdateInput.transporterNumberPlate,
+          ...(appendix1ContainerTransporter
+            ? {
+                transporters: {
+                  update: {
+                    where: { id: appendix1ContainerTransporter.id },
+                    data: transporterUpdate
+                  }
+                }
+              }
+            : {}),
           wasteDetailsPackagingInfos: sumPackagingInfos(
             wasteDetailsPackagingInfos
-          )
+          ),
+          wasteDetailsQuantity: appendix1Forms
+            .map(form => form.wasteDetailsQuantity ?? 0)
+            .reduce((sum, quantity) => sum + quantity, 0)
         }
       );
     }
@@ -149,13 +195,14 @@ const signatures: Partial<
     const isForeignShip =
       existingForm.emitterIsForeignShip === true &&
       existingForm.emitterCompanyOmiNumber;
+    const transporter = await getFirstTransporter(existingForm);
     const isAppendix1WithAutomaticSignature =
       existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER &&
       (existingForm.ecoOrganismeSiret ||
-        (existingForm.transporterCompanySiret &&
+        (transporter?.transporterCompanySiret &&
           existingForm.emitterCompanySiret &&
           (await hasSignatureAutomation({
-            signedBy: existingForm.transporterCompanySiret,
+            signedBy: transporter?.transporterCompanySiret,
             signedFor: existingForm.emitterCompanySiret
           }))));
 
@@ -168,7 +215,7 @@ const signatures: Partial<
       isForeignShip ||
       isAppendix1WithAutomaticSignature
     ) {
-      return signedByTransporterFn(user, args, existingForm);
+      return signTransportFn(user, args, existingForm);
     } else {
       throw new ForbiddenError(
         "Vous n'êtes pas autorisé à signer ce bordereau"
@@ -176,13 +223,15 @@ const signatures: Partial<
     }
   },
   [Status.SIGNED_BY_PRODUCER]: async (user, args, existingForm) =>
-    signedByTransporterFn(user, args, existingForm),
+    signTransportFn(user, args, existingForm),
   [Status.SIGNED_BY_TEMP_STORER]: async (user, args, existingForm) => {
     const existingFullForm = await getFullForm(existingForm);
 
+    const transporter = getFirstTransporterSync(existingFullForm.forwardedIn!);
     await checkCanSignFor(
-      getTransporterCompanyOrgId(existingFullForm.forwardedIn),
+      getTransporterCompanyOrgId(transporter)!,
       user,
+      Permission.BsdCanSignTransport,
       args.securityCode
     );
 
@@ -192,10 +241,16 @@ const signatures: Partial<
           status: Status.SENT,
           takenOverAt: args.input.takenOverAt,
           takenOverBy: args.input.takenOverBy,
-          transporterNumberPlate:
-            args.input.transporterNumberPlate ??
-            existingFullForm.forwardedIn?.transporterNumberPlate,
-
+          transporters: {
+            updateMany: {
+              data: {
+                transporterNumberPlate:
+                  args.input.transporterNumberPlate ??
+                  transporter?.transporterNumberPlate
+              },
+              where: { number: 1 }
+            }
+          },
           // The following fields are deprecated
           // but we need to fill them until we remove them completely
           signedByTransporter: true,

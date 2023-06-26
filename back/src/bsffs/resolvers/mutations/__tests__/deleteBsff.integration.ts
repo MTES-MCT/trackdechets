@@ -84,8 +84,7 @@ describe("Mutation.deleteBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
+        message: "Vous ne pouvez pas supprimer ce BSFF"
       })
     ]);
   });

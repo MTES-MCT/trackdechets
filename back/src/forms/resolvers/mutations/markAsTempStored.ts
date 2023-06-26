@@ -1,7 +1,7 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import transitionForm from "../../workflow/transitionForm";
-import { getFormOrFormNotFound } from "../../database";
+import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import { checkCanMarkAsTempStored } from "../../permissions";
 import { receivedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
@@ -29,9 +29,11 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
     throw new DestinationCannotTempStore();
   }
 
+  const transporter = await getFirstTransporter(form);
+
   await receivedInfoSchema.validate({
     ...tempStoredInfos,
-    transporterTransportMode: form.transporterTransportMode
+    transporterTransportMode: transporter?.transporterTransportMode
   });
 
   const { quantityType, ...tmpStoredInfos } = tempStoredInfos;
@@ -40,7 +42,7 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
     ...tmpStoredInfos,
     // quantity type can be estimated in case of temporary storage
     quantityReceivedType: quantityType,
-    currentTransporterSiret: "",
+    currentTransporterOrgId: "",
     ...(tmpStoredInfos.wasteAcceptationStatus &&
     ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
       tmpStoredInfos.wasteAcceptationStatus

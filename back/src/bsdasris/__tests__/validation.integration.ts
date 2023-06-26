@@ -3,15 +3,19 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { validateBsdasri } from "../validation";
 
-import { initialData, readyToTakeOverData } from "./factories";
+import {
+  initialData,
+  readyToPublishData,
+  readyToTakeOverData
+} from "./factories";
 
 describe("Mutation.signBsdasri emission", () => {
-  afterAll(resetDatabase);
+  afterEach(resetDatabase);
 
   let bsdasri: Partial<Bsdasri>;
   let foreignTransporter: Company;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const emitter = await companyFactory();
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
     foreignTransporter = await companyFactory({
@@ -19,8 +23,10 @@ describe("Mutation.signBsdasri emission", () => {
       orgId: "IT13029381004",
       vatNumber: "IT13029381004"
     });
+    const destination = await companyFactory();
     bsdasri = {
       ...initialData(emitter),
+      ...readyToPublishData(destination),
       ...readyToTakeOverData({
         siret: transporter.siret,
         name: "transporteur"
@@ -31,7 +37,10 @@ describe("Mutation.signBsdasri emission", () => {
   describe("BSDASRI should be valid", () => {
     test("before emission", async () => {
       const validated = await validateBsdasri(
-        initialData(await companyFactory()),
+        {
+          ...initialData(await companyFactory()),
+          ...readyToPublishData(await companyFactory())
+        },
         {
           emissionSignature: true
         }
@@ -41,9 +50,12 @@ describe("Mutation.signBsdasri emission", () => {
 
     test("before transport", async () => {
       const validated = await validateBsdasri(
-        readyToTakeOverData(
-          await companyFactory({ companyTypes: ["TRANSPORTER"] })
-        ),
+        {
+          ...readyToPublishData(await companyFactory()),
+          ...readyToTakeOverData(
+            await companyFactory({ companyTypes: ["TRANSPORTER"] })
+          )
+        },
         { transportSignature: true }
       );
       expect(validated).toBeDefined();
@@ -83,12 +95,28 @@ describe("Mutation.signBsdasri emission", () => {
       });
       expect(validated).toBeDefined();
     });
+    test("when transporter is french and exemption of recepisse is true", async () => {
+      const data = {
+        ...bsdasri,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null
+      };
+      const validated = await validateBsdasri(data as any, {
+        transportSignature: true
+      });
+      expect(validated).toBeDefined();
+    });
   });
 
   describe("BSDASRI should not be valid", () => {
+    afterEach(resetDatabase);
+
     test("when transporter is FR and recepisse fields are null", async () => {
       const data = {
         ...bsdasri,
+        transporterRecepisseIsExempted: false,
         transporterRecepisseNumber: null,
         transporterRecepisseDepartment: null,
         transporterRecepisseValidityLimit: null
@@ -102,9 +130,9 @@ describe("Mutation.signBsdasri emission", () => {
         });
       } catch (err) {
         expect(err.errors).toEqual([
-          "Transporteur: le numéro de récépissé est obligatoire",
           "Transporteur: le département associé au récépissé est obligatoire",
-          "La date de validité du récépissé est obligatoire"
+          "Transporteur: le numéro de récépissé est obligatoire",
+          "Transporteur: la date limite de validité du récépissé est obligatoire"
         ]);
       }
     });

@@ -20,11 +20,11 @@ import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 import { bsffVerboseStatuses } from "form/bsff/utils/constants";
-import { DateRow, DetailRow } from "../common/Components";
+import { DateRow, DetailRow, YesNoRow } from "../common/Components";
 
 import styles from "../common/BSDDetailContent.module.scss";
 import { generatePath, Link, useParams } from "react-router-dom";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { WorkflowAction } from "dashboard/components/BSDList/BSFF/WorkflowAction";
 import { DeleteBsffModal } from "dashboard/components/BSDList/BSFF/BsffActions/DeleteModal";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSFF/BsffActions/useDownloadPdf";
@@ -39,6 +39,7 @@ import {
 } from "common/components";
 import { formatDate } from "common/datetime";
 import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -236,6 +237,7 @@ export function BsffDetailContent({ form: bsff }: Props) {
               },
               bsffTransporter: {
                 company: {
+                  orgId: bsff.transporter?.company?.orgId!,
                   siret: bsff.transporter?.company?.orgId ?? undefined,
                   name: bsff.transporter?.company?.name ?? undefined,
                 },
@@ -315,18 +317,32 @@ function Transporter({ form }: { form: Bsff }) {
         <Company label="Raison sociale" company={form.transporter?.company} />
       </div>
       <div className={styles.detailGrid}>
-        <DetailRow
-          value={form.transporter?.recepisse?.number}
-          label="Numéro de récépissé"
-        />
-        <DetailRow
-          value={form.transporter?.recepisse?.department}
-          label="Département"
-        />
-        <DateRow
-          value={form.transporter?.recepisse?.validityLimit}
-          label="Date de validité"
-        />
+        {!isForeignVat(form?.transporter?.company?.vatNumber!!) && (
+          <>
+            <YesNoRow
+              value={!form?.transporter?.recepisse}
+              label="Exemption de récépissé"
+            />
+            {form?.transporter?.recepisse !== null && (
+              <>
+                <DetailRow
+                  value={form.transporter?.recepisse?.number}
+                  label="Numéro de récépissé"
+                  showEmpty={true}
+                />
+                <DetailRow
+                  value={form.transporter?.recepisse?.department}
+                  label="Département"
+                  showEmpty={true}
+                />
+                <DateRow
+                  value={form.transporter?.recepisse?.validityLimit}
+                  label="Date de validité"
+                />
+              </>
+            )}
+          </>
+        )}
         <DetailRow
           value={
             form.transporter?.transport?.mode

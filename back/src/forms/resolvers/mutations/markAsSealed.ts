@@ -1,14 +1,12 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { getFormOrFormNotFound } from "../../database";
+import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb } from "../../converter";
 import { checkCanMarkAsSealed } from "../../permissions";
 import {
-  beforeSignedByTransporterSchema,
   checkCanBeSealed,
   validateForwardedInCompanies,
-  wasteDetailsSchema,
-  checkForClosedCompanies
+  wasteDetailsSchema
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
@@ -29,8 +27,9 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   const form = await getFormOrFormNotFound({ id });
   await checkCanMarkAsSealed(user, form);
 
+  const transporter = await getFirstTransporter(form);
   // validate form data
-  await checkCanBeSealed(form);
+  await checkCanBeSealed({ ...form, ...transporter });
 
   await validateForwardedInCompanies(form);
   let formUpdateInput;
@@ -42,7 +41,9 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     // pre-validate when signature by producer will be by-passed at the end of this mutation
     formUpdateInput = {
       emittedAt: new Date(),
-      emittedBy: user.name,
+      emittedBy: form.emitterIsPrivateIndividual
+        ? "Signature auto (particulier)"
+        : "Signature auto (navire étranger)",
       emittedByEcoOrganisme: false,
       // required for machine to authorize signature
       emitterIsForeignShip: form.emitterIsForeignShip,
@@ -53,7 +54,6 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       ...formUpdateInput
     };
     await wasteDetailsSchema.validate(futureForm);
-    await beforeSignedByTransporterSchema.validate(futureForm);
   }
 
   const emitterCompanyExists = form.emitterCompanySiret
@@ -61,13 +61,6 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
         where: { siret: form.emitterCompanySiret }
       })) > 0
     : false;
-
-  /**
-   * Check for closed companies or throw an exception
-   */
-  if (process.env.VERIFY_COMPANY === "true") {
-    await checkForClosedCompanies(form.id);
-  }
 
   const resultingForm = await runInTransaction(async transaction => {
     const formRepository = getFormRepository(user, transaction);
@@ -92,6 +85,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       await mailToNonExistentEmitter(sealedForm, formRepository);
     }
 
+    // by-pass producer signature
     if (
       formUpdateInput &&
       (sealedForm.emitterIsForeignShip === true ||

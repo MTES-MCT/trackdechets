@@ -14,14 +14,9 @@ import {
   isForeignVat,
 } from "generated/constants/companySearchHelpers";
 
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  TextInput,
-  Alert,
-} from "@dataesr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 type IProps = {
   onCompanyInfos: (companyInfos) => void;
@@ -40,6 +35,7 @@ const individualInfo = (
   <div className={styles.alertWrapper}>
     <Alert
       closable
+      severity="info"
       title="Vous rencontrez des difficultés dans la création d'un établissement ?"
       description="Si vous êtes un particulier, vous n'avez pas à créer d'établissement, ni de compte Trackdéchets."
     />
@@ -50,7 +46,7 @@ const closedCompanyError = (
   <div className={styles.alertWrapper}>
     <Alert
       title="Cet établissement est fermé"
-      type="error"
+      severity="error"
       description={
         <>
           <p>
@@ -87,7 +83,7 @@ const nonDiffusibleError = (
   <div className={styles.alertWrapper}>
     <Alert
       title="Etablissement non diffusible"
-      type="error"
+      severity="error"
       description={
         <>
           <span>
@@ -198,11 +194,15 @@ export default function AccountCompanyAddSiret({
   const shouldAutoSubmit = !isPreloaded && defaultQuery !== "" && !loading;
 
   return (
-    <Container fluid>
-      <Row>
-        <Col n="12">
+    <div className="fr-container-fluid">
+      <div className="fr-grid-row">
+        <div className="fr-col-12">
           {error && (
-            <Alert type="error" title="Erreur" description={error.message} />
+            <Alert
+              severity="error"
+              title="Erreur"
+              description={error.message}
+            />
           )}
           <Formik
             initialValues={{ siret: defaultQuery }}
@@ -223,9 +223,25 @@ export default function AccountCompanyAddSiret({
                   };
                 }
               } else {
-                if (!isValidSiret && !/^[a-zA-Z]{2}/.test(values.siret)) {
+                if (!isValidSiret && /^[0-9]{15,}/.test(values.siret)) {
                   return {
-                    siret: "Vous devez entrer un SIRET de 14 chiffres",
+                    siret: "Vous devez entrer un SIRET composé de 14 chiffres",
+                  };
+                } else if (!isValidSiret && /^[0-9]{14}/.test(values.siret)) {
+                  return {
+                    siret: "Aucun établissement trouvé avec ce SIRET",
+                  };
+                } else if (
+                  !isValidSiret &&
+                  !/^[a-zA-Z]{2}/.test(values.siret)
+                ) {
+                  return {
+                    siret: "Vous devez entrer un SIRET composé de 14 chiffres",
+                  };
+                } else if (!isValidSiret && /^[0-9]{9}/.test(values.siret)) {
+                  return {
+                    siret:
+                      "Vous devez entrer un SIRET composé de 14 chiffres, ne pas confondre avec le SIREN",
                   };
                 } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
                   return {
@@ -247,8 +263,8 @@ export default function AccountCompanyAddSiret({
               });
             }}
           >
-            {({ setFieldValue, errors, values }) => (
-              <Form className={styles.companyAddForm}>
+            {({ setFieldValue, errors, values, handleSubmit }) => (
+              <Form onSubmit={handleSubmit} className={styles.companyAddForm}>
                 {shouldAutoSubmit && (
                   <AutoSubmitSiret
                     defaultSiret={defaultQuery}
@@ -260,21 +276,23 @@ export default function AccountCompanyAddSiret({
                 <Field name="siret">
                   {({ field }) => {
                     return (
-                      <TextInput
-                        {...field}
+                      <Input
                         label="SIRET"
-                        hint="ou numéro TVA pour un transporteur de l'UE"
-                        messageType={errors.siret ? "error" : ""}
-                        message={errors.siret || ""}
-                        onChange={e => {
-                          const siret = e.target.value
-                            .split(" ")
-                            .join("")
-                            .toUpperCase();
-                          setIsRegistered(false);
-                          setFieldValue("siret", siret);
-                        }}
+                        hintText="ou numéro TVA pour un transporteur de l'UE"
+                        state={errors.siret ? "error" : "default"}
+                        stateRelatedMessage={errors.siret || ""}
                         disabled={isDisabled}
+                        nativeInputProps={{
+                          onChange: e => {
+                            const siret = e.target.value
+                              .split(" ")
+                              .join("")
+                              .toUpperCase();
+                            setIsRegistered(false);
+                            setFieldValue("siret", siret);
+                          },
+                          ...field,
+                        }}
                       />
                     );
                   }}
@@ -283,7 +301,7 @@ export default function AccountCompanyAddSiret({
                 {import.meta.env.VITE_ALLOW_TEST_COMPANY === "true" &&
                   !onlyForeignVAT && (
                     <Button
-                      tertiary
+                      priority="tertiary"
                       disabled={loading || isDisabled}
                       title="Génère un n°SIRET unique permettant la création d'un établissement factice pour la réalisation de vos tests"
                       onClick={() =>
@@ -304,8 +322,8 @@ export default function AccountCompanyAddSiret({
                 )}
                 <div className={styles["submit-form"]}>
                   <Button
+                    type="submit"
                     disabled={loading || isDisabled || isRegistered}
-                    submit
                   >
                     {loading ? "Chargement..." : "Valider"}
                   </Button>
@@ -316,8 +334,8 @@ export default function AccountCompanyAddSiret({
           {isNonDiffusible && nonDiffusibleError}
           {isClosed && closedCompanyError}
           {showIndividualInfo && !isDisabled && individualInfo}
-        </Col>
-      </Row>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 }

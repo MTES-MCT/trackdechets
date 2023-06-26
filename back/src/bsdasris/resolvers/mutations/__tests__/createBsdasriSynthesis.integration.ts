@@ -1,6 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 
 import {
+  getDestinationCompanyInfo,
   siretify,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -84,7 +85,7 @@ describe("Mutation.createDasri", () => {
           validityLimit: new Date().toISOString()
         }
       },
-
+      ...(await getDestinationCompanyInfo()),
       synthesizing: [toAssociate1.id, toAssociate2.id]
     };
 
@@ -138,6 +139,7 @@ describe("Mutation.createDasri", () => {
       toAssociate1.emitterCompanySiret,
       toAssociate2.emitterCompanySiret
     ]);
+    expect(created.groupingEmitterSirets).toEqual([]);
   });
 
   it("should forbid to mix grouping and synthesis arguments", async () => {

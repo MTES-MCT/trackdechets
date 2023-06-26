@@ -36,6 +36,8 @@ type BsdasriDestination {
 }
 
 type BsdasriRecepisse {
+  "Exemption de récépissé"
+  isExempted: Boolean
   "Numéro de récépissé"
   number: String
   "Département"

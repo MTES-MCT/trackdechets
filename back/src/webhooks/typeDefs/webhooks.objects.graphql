@@ -1,0 +1,19 @@
+"Configuration wehook"
+type WebhookSetting {
+  id: ID!
+  createdAt: DateTime!
+  endpointUri: String!
+  orgId: String!
+  activated: Boolean!
+}
+
+type WebhookSettingConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [WebhookSettingEdge!]!
+}
+
+type WebhookSettingEdge {
+  cursor: String!
+  node: WebhookSetting!
+}

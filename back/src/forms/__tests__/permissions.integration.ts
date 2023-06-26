@@ -12,17 +12,15 @@ import {
 import {
   checkCanRead,
   checkCanDuplicate,
-  checkCanUpdate,
   checkCanDelete,
   checkCanMarkAsProcessed,
   checkCanMarkAsReceived,
   checkCanMarkAsResent,
   checkCanMarkAsSealed,
   checkCanMarkAsTempStored,
-  checkCanSignedByTransporter,
-  checkSecurityCode
+  checkCanSignedByTransporter
 } from "../permissions";
-import { AuthType } from "../../auth";
+import { checkSecurityCode } from "../../common/permissions";
 
 async function checkEmitterPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
@@ -58,7 +56,12 @@ async function checkTransporterPermission(
   const { user, company } = await userWithCompanyFactory("MEMBER");
   const form = await formFactory({
     ownerId: owner.id,
-    opt: { transporterCompanySiret: company.siret, status: formStatus }
+    opt: {
+      status: formStatus,
+      transporters: {
+        create: { transporterCompanySiret: company.siret, number: 1 }
+      }
+    }
   });
   return permission(user, form);
 }
@@ -115,7 +118,16 @@ async function checkTransporterAfterTempStoragePermission(
   await prisma.form.update({
     where: { id: form.id },
     data: {
-      forwardedIn: { update: { transporterCompanySiret: company.siret } }
+      forwardedIn: {
+        update: {
+          transporters: {
+            updateMany: {
+              where: { number: 1 },
+              data: { transporterCompanySiret: company.siret }
+            }
+          }
+        }
+      }
     }
   });
   return permission(user, form);
@@ -154,10 +166,11 @@ async function checkMultiModalTransporterPermission(
       status: formStatus
     }
   });
-  await prisma.transportSegment.create({
+  await prisma.bsddTransporter.create({
     data: {
       form: { connect: { id: form.id } },
-      transporterCompanySiret: company.siret
+      transporterCompanySiret: company.siret,
+      number: 2
     }
   });
   return permission(user, form);
@@ -181,7 +194,7 @@ async function checkRandomUserPermission(
 describe.each([
   checkCanRead,
   checkCanDuplicate,
-  checkCanUpdate,
+  //checkCanUpdate,
   checkCanDelete,
   checkCanMarkAsSealed
 ])("%p", permission => {
@@ -357,7 +370,7 @@ describe("checkSecurityCode", () => {
 
   test("securityCode is valid", async () => {
     const company = await companyFactory();
-    const check = await checkSecurityCode(company.siret, company.securityCode);
+    const check = await checkSecurityCode(company.siret!, company.securityCode);
     expect(check).toEqual(true);
   });
 
@@ -372,7 +385,7 @@ describe("checkSecurityCode", () => {
 
   test("securityCode is invalid", async () => {
     const company = await companyFactory();
-    const checkFn = () => checkSecurityCode(company.siret, 1258478956);
+    const checkFn = () => checkSecurityCode(company.siret!, 1258478956);
     expect(checkFn).rejects.toThrow("Le code de signature est invalide.");
   });
 });
@@ -409,10 +422,7 @@ describe("checkCanRed", () => {
       }
     });
 
-    const check = await checkCanRead(
-      { ...initialEmitter, auth: AuthType.Session },
-      groupementForm
-    );
+    const check = await checkCanRead(initialEmitter, groupementForm);
     expect(check).toBe(true);
   });
 });

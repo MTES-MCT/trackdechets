@@ -11,31 +11,52 @@ import {
 
 const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
   approvals: async parent => {
-    return prisma.bsddRevisionRequest
-      .findUniqueOrThrow({ where: { id: parent.id } })
+    const approvals = await prisma.bsddRevisionRequest
+      .findUnique({ where: { id: parent.id } })
       .approvals();
+
+    return approvals ?? [];
   },
   content: parent => {
     return expandBsddRevisionRequestContent(parent as any);
   },
-  authoringCompany: parent => {
-    return prisma.bsddRevisionRequest
-      .findUniqueOrThrow({ where: { id: parent.id } })
+  authoringCompany: async parent => {
+    const authoringCompany = await prisma.bsddRevisionRequest
+      .findUnique({ where: { id: parent.id } })
       .authoringCompany();
+
+    if (!authoringCompany) {
+      throw new Error(
+        `FormRevisionRequest ${parent.id} has no authoring company.`
+      );
+    }
+    return authoringCompany;
   },
-  form: async (parent: FormRevisionRequest & { bsddId: string }) => {
+  form: async (
+    parent: FormRevisionRequest & { bsddId: string },
+    _,
+    { dataloaders }
+  ) => {
     const fullBsdd = await prisma.bsddRevisionRequest
-      .findUniqueOrThrow({ where: { id: parent.id } })
-      .bsdd({ include: { forwardedIn: true } });
+      .findUnique({ where: { id: parent.id } })
+      .bsdd({ include: { forwardedIn: true, transporters: true } });
+
+    if (!fullBsdd) {
+      throw new Error(`FormRevisionRequest ${parent.id} has no form.`);
+    }
     const bsdd = await getBsddFromActivityEvents(
-      parent.bsddId,
-      parent.createdAt
+      {
+        bsddId: parent.bsddId,
+        at: parent.createdAt
+      },
+      { dataloader: dataloaders.events }
     );
 
     return expandFormFromDb({
       ...fullBsdd,
       ...bsdd,
-      forwardedIn: fullBsdd.forwardedIn
+      forwardedIn: fullBsdd.forwardedIn,
+      transporters: fullBsdd.transporters
     });
   }
 };

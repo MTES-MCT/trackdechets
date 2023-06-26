@@ -125,7 +125,8 @@ describe("ActivityEvent.Bsda", () => {
           waste: {
             code: "06 07 01*",
             consistence: "SOLIDE",
-            materialName: "Amiante"
+            materialName: "Amiante",
+            familyCode: "Code famille"
           }
         }
       }
@@ -136,7 +137,9 @@ describe("ActivityEvent.Bsda", () => {
     const bsdaAfterCreate = await prisma.bsda.findUnique({
       where: { id: bsdaId }
     });
-    const bsdaFromEventsAfterCreate = await getBsdaFromActivityEvents(bsdaId);
+    const bsdaFromEventsAfterCreate = await getBsdaFromActivityEvents({
+      bsdaId
+    });
     expect(bsdaAfterCreate).toMatchObject(bsdaFromEventsAfterCreate);
     expect(bsdaFromEventsAfterCreate.emitterCompanyName).toBe(company.name);
 
@@ -161,7 +164,9 @@ describe("ActivityEvent.Bsda", () => {
     const bsdaAfterUpdate = await prisma.bsda.findUnique({
       where: { id: bsdaId }
     });
-    const bsdaFromEventsAfterUpdate = await getBsdaFromActivityEvents(bsdaId);
+    const bsdaFromEventsAfterUpdate = await getBsdaFromActivityEvents({
+      bsdaId
+    });
     expect(bsdaAfterUpdate).toMatchObject(bsdaFromEventsAfterUpdate);
     expect(bsdaFromEventsAfterUpdate.wasteCode).toBe("06 13 04*");
 
@@ -179,7 +184,9 @@ describe("ActivityEvent.Bsda", () => {
     const bsdaAfterSealed = await prisma.bsda.findUnique({
       where: { id: bsdaId }
     });
-    const bsdaFromEventsAfterSealed = await getBsdaFromActivityEvents(bsdaId);
+    const bsdaFromEventsAfterSealed = await getBsdaFromActivityEvents({
+      bsdaId
+    });
     expect(bsdaAfterSealed).toMatchObject(bsdaFromEventsAfterSealed);
     expect(bsdaFromEventsAfterSealed.status).toBe("SIGNED_BY_PRODUCER");
 
@@ -296,7 +303,8 @@ describe("ActivityEvent.Bsda", () => {
           waste: {
             code: "06 07 01*",
             consistence: "SOLIDE",
-            materialName: "Amiante"
+            materialName: "Amiante",
+            familyCode: "Code famille"
           }
         }
       }
@@ -322,10 +330,10 @@ describe("ActivityEvent.Bsda", () => {
     const bsdaAfterUpdate = await prisma.bsda.findUnique({
       where: { id: bsdaId }
     });
-    const bsdaFromEventsAfterCreate = await getBsdaFromActivityEvents(
+    const bsdaFromEventsAfterCreate = await getBsdaFromActivityEvents({
       bsdaId,
-      now
-    );
+      at: now
+    });
     expect(bsdaFromEventsAfterCreate.wasteCode).toBe("06 07 01*");
     expect(bsdaAfterUpdate!.wasteCode).toBe("06 13 04*");
   });

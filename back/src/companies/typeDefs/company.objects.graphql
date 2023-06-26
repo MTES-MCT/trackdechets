@@ -30,8 +30,11 @@ type CompanyPrivate {
   "Liste des utilisateurs appartenant à cet établissement"
   users: [CompanyMember!]
 
-  "Rôle de l'utilisateur authentifié cau sein de cet établissement"
+  "Rôle de l'utilisateur authentifié au sein de cet établissement"
   userRole: UserRole
+
+  "Liste des permissions de l'utilisateur authentifié au sein de cet établissement"
+  userPermissions: [UserPermission!]!
 
   """
   Nom d'usage de l'entreprise qui permet de différencier
@@ -108,6 +111,11 @@ type CompanyPrivate {
   Liste des automatisations de signature accordées par l'entreprise
   """
   signatureAutomations: [SignatureAutomation!]!
+
+  """
+  Liste des automatisations de signature reçues par l'entreprise
+  """
+  receivedSignatureAutomations: [SignatureAutomation!]!
 }
 
 type CompanyPrivateEdge {

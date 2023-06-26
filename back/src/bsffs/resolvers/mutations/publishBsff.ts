@@ -1,7 +1,7 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
-import { checkCanWriteBsff } from "../../permissions";
+import { checkCanUpdate } from "../../permissions";
 import { expandBsffFromDB } from "../../converter";
 import {
   validateBsff,
@@ -34,7 +34,7 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
       where: { id: existingBsff.id }
     })) ?? [];
 
-  await checkCanWriteBsff(user, existingBsff);
+  await checkCanUpdate(user, existingBsff);
 
   const previousPackagings = await findPreviousPackagings(
     existingBsff.packagings.map(p => p.id),
@@ -58,7 +58,7 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
 
   const fullBsff = { ...existingBsff, packagings, isDraft: false };
 
-  await validateBsff(fullBsff);
+  await validateBsff(fullBsff, { isDraft: false, transporterSignature: false });
   await validateFicheInterventions(fullBsff, ficheInterventions);
   await validatePreviousPackagings(fullBsff, previousPackagingsIds);
 

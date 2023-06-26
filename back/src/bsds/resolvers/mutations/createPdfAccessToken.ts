@@ -3,15 +3,11 @@ import { addMinutes } from "date-fns";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { ForbiddenError } from "apollo-server-core";
 import { ReadableIdPrefix } from "../../../forms/readableId";
-
 import { getUid, getAPIBaseURL } from "../../../utils";
-
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkCanReadBsdasri } from "../../../bsdasris/permissions";
-import { checkIsBsdaContributor } from "../../../bsda/permissions";
-import { checkCanReadBsff } from "../../../bsffs/permissions";
-import { checkIsBsvhuContributor } from "../../../bsvhu/permissions";
-import { checkIsFormContributor } from "../../../forms/permissions";
+import { checkCanRead as checkCanReadBsda } from "../../../bsda/permissions";
+import { checkCanRead as checkCanReadBsff } from "../../../bsffs/permissions";
+import { checkCanRead as checkCanReadBsvhu } from "../../../bsvhu/permissions";
 import { getFormOrFormNotFound } from "../../../forms/database";
 import { getBsdasriOrNotFound } from "../../../bsdasris/database";
 import { getBsdaOrNotFound } from "../../../bsda/database";
@@ -26,6 +22,8 @@ import {
   Status
 } from "@prisma/client";
 import { ROAD_CONTROL_SLUG } from "../../../common/constants";
+import { checkCanRead as checkCanReadForm } from "../../../forms/permissions";
+import { checkCanRead as checkCanReadBsdasri } from "../../../bsdasris/permissions";
 
 const accessors = {
   [BsdType.BSDD]: id => getFormOrFormNotFound({ id }),
@@ -43,16 +41,12 @@ const checkStatus = {
   [BsdType.BSVHU]: bsd => bsd.status === BsvhuStatus.SENT
 };
 
-const deniedAccessMessage = "Vous n'êtes pas autorisé à accéder à ce bordereau";
 const permissions = {
-  [BsdType.BSDD]: (user, bsdd) =>
-    checkIsFormContributor(user, bsdd, deniedAccessMessage),
-  [BsdType.BSDA]: (user, bsda) =>
-    checkIsBsdaContributor(user, bsda, deniedAccessMessage),
+  [BsdType.BSDD]: (user, bsdd) => checkCanReadForm(user, bsdd),
+  [BsdType.BSDA]: (user, bsda) => checkCanReadBsda(user, bsda),
   [BsdType.BSDASRI]: (user, bsdasri) => checkCanReadBsdasri(user, bsdasri),
   [BsdType.BSFF]: (user, bsff) => checkCanReadBsff(user, bsff),
-  [BsdType.BSVHU]: (user, bsvhu) =>
-    checkIsBsvhuContributor(user, bsvhu, deniedAccessMessage)
+  [BsdType.BSVHU]: (user, bsvhu) => checkCanReadBsvhu(user, bsvhu)
 };
 
 const getBsdType = (id: string): BsdType => {

@@ -10,7 +10,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
-import { Status } from "@prisma/client";
+import { EmitterType, Status } from "@prisma/client";
 import {
   CANCELLABLE_BSDD_STATUSES,
   NON_CANCELLABLE_BSDD_STATUSES
@@ -65,7 +65,7 @@ describe("Mutation.createFormRevisionRequest", () => {
     );
   });
 
-  it("should fail if current user is neither emitter or recipient of the bsdd", async () => {
+  it("should fail if current user is neither emitter, eco-organisme or  recipient of the bsdd", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
@@ -191,7 +191,7 @@ describe("Mutation.createFormRevisionRequest", () => {
     );
   });
 
-  it("should create a revisionRequest and identifying current user as the requester", async () => {
+  it("should create a revisionRequest and identifying current user as the requester (emitter)", async () => {
     const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
@@ -221,8 +221,105 @@ describe("Mutation.createFormRevisionRequest", () => {
     expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
       company.siret
     );
+    // one approval is created
+    expect(data.createFormRevisionRequest.approvals).toStrictEqual([
+      { approverSiret: recipientCompany.siret, status: "PENDING" }
+    ]);
   });
+  it("should create a revisionRequest and identifying current user as the requester (eco-organisme)", async () => {
+    const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
 
+    const { user, company: ecoOrganismeCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        ecoOrganismeSiret: ecoOrganismeCompany.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { wasteDetails: { code: "01 03 08" } },
+          comment: "A comment",
+          authoringCompanySiret: ecoOrganismeCompany.siret!
+        }
+      }
+    });
+
+    expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+      ecoOrganismeCompany.siret
+    );
+
+    expect(data.createFormRevisionRequest.approvals.length).toBe(1);
+    expect(data.createFormRevisionRequest.approvals[0].approverSiret).toBe(
+      recipientCompany.siret
+    );
+    expect(data.createFormRevisionRequest.approvals[0].status).toBe("PENDING");
+    // one approval is created
+    expect(data.createFormRevisionRequest.approvals).toStrictEqual([
+      { approverSiret: recipientCompany.siret, status: "PENDING" }
+    ]);
+  });
+  it("should create a revisionRequest and identifying current user as the requester (recipient) when an eco-organisme is on the bsdd", async () => {
+    // when an eco-org is on the bsdd, revision requested by the recipient should trigger approvals creation for emitter and ecoorg
+    const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const { company: ecoOrganismeCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        ecoOrganismeSiret: ecoOrganismeCompany.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { wasteDetails: { code: "01 03 08" } },
+          comment: "A comment",
+          authoringCompanySiret: recipientCompany.siret!
+        }
+      }
+    });
+
+    expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+      recipientCompany.siret
+    );
+
+    expect(data.createFormRevisionRequest.approvals.length).toBe(2);
+    const approvalsSirets = data.createFormRevisionRequest.approvals.map(
+      approval => approval.approverSiret
+    );
+    expect(approvalsSirets.includes(emitterCompany.siret!)).toBe(true);
+    expect(approvalsSirets.includes(ecoOrganismeCompany.siret!)).toBe(true);
+    expect(data.createFormRevisionRequest.approvals[0].status).toBe("PENDING");
+    expect(data.createFormRevisionRequest.approvals[1].status).toBe("PENDING");
+  });
   it("should create a revisionRequest and identifying current user as the requester (temporary storage) ", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
@@ -243,13 +340,18 @@ describe("Mutation.createFormRevisionRequest", () => {
             recipientCompanySiret: company.siret,
             recipientCap: "",
             recipientProcessingOperation: "R 6",
-            transporterCompanyName: "Transporter",
-            transporterCompanySiret: siretify(4),
-            transporterIsExemptedOfReceipt: false,
-            transporterReceipt: "Dabcd",
-            transporterDepartment: "10",
-            transporterValidityLimit: "2054-11-20T00:00:00.000Z",
-            transporterNumberPlate: ""
+            transporters: {
+              create: {
+                transporterCompanyName: "Transporter",
+                transporterCompanySiret: siretify(4),
+                transporterIsExemptedOfReceipt: false,
+                transporterReceipt: "Dabcd",
+                transporterDepartment: "10",
+                transporterValidityLimit: "2054-11-20T00:00:00.000Z",
+                transporterNumberPlate: "",
+                number: 1
+              }
+            }
           }
         }
       }
@@ -529,4 +631,38 @@ describe("Mutation.createFormRevisionRequest", () => {
       expect(errors.length).toBeGreaterThan(0);
     }
   );
+
+  it("should fail if trying to use a forbidden waste code on EmitterType.APPENDIX1 bsdd", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterType: EmitterType.APPENDIX1,
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { wasteDetails: { code: "06 01 01*" } },
+          comment: "I want to use a forbidden waste code",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "Impossible d'utiliser ce code déchet sur un bordereau de tournée d'annexe 1."
+    );
+  });
 });

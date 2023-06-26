@@ -1,16 +1,23 @@
 import prisma from "../../prisma";
-import { CompanyPrivateResolvers } from "../../generated/graphql/types";
-import { getCompanyUsers, getUserRole } from "../database";
+import {
+  CompanyPrivateResolvers,
+  UserRole
+} from "../../generated/graphql/types";
+import { getCompanyUsers } from "../database";
+import { getUserRole, grants, toGraphQLPermission } from "../../permissions";
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: async (parent, _, context) => {
     const userId = context.user!.id;
     const userRole = await getUserRole(userId, parent.orgId);
+
     if (userRole !== "ADMIN") {
       return [
         {
           ...context.user!,
-          role: userRole,
+          // type casting is necessary here as long as we
+          // do not expose READER and DRIVER role in the API
+          role: userRole as UserRole,
           isPendingInvitation: false
         }
       ];
@@ -18,9 +25,17 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
 
     return getCompanyUsers(parent.orgId, context.dataloaders);
   },
-  userRole: (parent, _, context) => {
+  userRole: async (parent, _, context) => {
     const userId = context.user!.id;
-    return getUserRole(userId, parent.orgId);
+    const role = await getUserRole(userId, parent.orgId);
+    // type casting is necessary here as long as we
+    // do not expose READER and DRIVER role in the API
+    return role as UserRole;
+  },
+  userPermissions: async (parent, _, context) => {
+    const userId = context.user!.id;
+    const role = await getUserRole(userId, parent.orgId);
+    return role ? grants[role].map(toGraphQLPermission) : [];
   },
   transporterReceipt: parent => {
     return prisma.company
@@ -59,6 +74,13 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     return prisma.company
       .findUnique({ where: { id: parent.id } })
       .givenSignatureAutomations({ include: { from: true, to: true } }) as any;
+  },
+  receivedSignatureAutomations: parent => {
+    return prisma.company
+      .findUnique({ where: { id: parent.id } })
+      .receivedSignatureAutomations({
+        include: { from: true, to: true }
+      }) as any;
   }
 };
 

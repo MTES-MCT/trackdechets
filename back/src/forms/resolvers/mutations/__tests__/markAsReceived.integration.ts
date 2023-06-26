@@ -21,6 +21,7 @@ import {
 } from "../../../../generated/graphql/types";
 import * as generateBsddPdf from "../../../pdf/generateBsddPdf";
 import getReadableId from "../../../readableId";
+import { getFirstTransporter } from "../../../database";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -55,7 +56,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: siretify(3) }
+      data: { currentTransporterOrgId: siretify(3) }
     });
     await prepareRedis({
       emitterCompany,
@@ -81,8 +82,8 @@ describe("Test Form reception", () => {
     expect(frm.receivedBy).toBe("Bill");
     expect(frm.quantityReceived).toBe(null);
 
-    // when form is received, we clean up currentTransporterSiret
-    expect(frm.currentTransporterSiret).toEqual("");
+    // when form is received, we clean up currentTransporterOrgId
+    expect(frm.currentTransporterOrgId).toEqual("");
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -101,7 +102,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: siretify(3) }
+      data: { currentTransporterOrgId: siretify(3) }
     });
     await prepareRedis({
       emitterCompany,
@@ -139,7 +140,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: siretify(3) }
+      data: { currentTransporterOrgId: siretify(3) }
     });
     await prepareRedis({
       emitterCompany,
@@ -168,8 +169,8 @@ describe("Test Form reception", () => {
     expect(frm.receivedBy).toBe("Bill");
     expect(frm.quantityReceived).toBe(11);
 
-    // when form is received, we clean up currentTransporterSiret
-    expect(frm.currentTransporterSiret).toEqual("");
+    // when form is received, we clean up currentTransporterOrgId
+    expect(frm.currentTransporterOrgId).toEqual("");
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -458,7 +459,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: siretify(3) }
+      data: { currentTransporterOrgId: siretify(3) }
     });
 
     // a taken over segment
@@ -498,8 +499,8 @@ describe("Test Form reception", () => {
     expect(frm.receivedBy).toBe("Bill");
     expect(frm.quantityReceived).toBe(11);
 
-    // when form is received, we clean up currentTransporterSiret
-    expect(frm.currentTransporterSiret).toEqual("");
+    // when form is received, we clean up currentTransporterOrgId
+    expect(frm.currentTransporterOrgId).toEqual("");
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -518,7 +519,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: siretify(3) }
+      data: { currentTransporterOrgId: siretify(3) }
     });
 
     // a taken over segment
@@ -564,10 +565,10 @@ describe("Test Form reception", () => {
 
     expect(frm.status).toBe("ACCEPTED");
 
-    // currentTransporterSiret was cleaned up
-    expect(frm.currentTransporterSiret).toEqual("");
+    // currentTransporterOrgId was cleaned up
+    expect(frm.currentTransporterOrgId).toEqual("");
 
-    const deleted = await prisma.transportSegment.findFirst({
+    const deleted = await prisma.bsddTransporter.findFirst({
       where: { id: staleSegment.id }
     });
     expect(deleted).toEqual(null);
@@ -773,7 +774,9 @@ describe("Test Form reception", () => {
     const { emitterCompany, recipient, recipientCompany, form } =
       await prepareDB();
 
-    expect(form.transporterTransportMode).toEqual("ROAD");
+    const transporter = await getFirstTransporter(form);
+
+    expect(transporter!.transporterTransportMode).toEqual("ROAD");
 
     await prepareRedis({
       emitterCompany,
@@ -807,7 +810,9 @@ describe("Test Form reception", () => {
     const { emitterCompany, recipient, recipientCompany, form } =
       await prepareDB({ status: Status.CANCELED });
 
-    expect(form.transporterTransportMode).toEqual("ROAD");
+    const transporter = await getFirstTransporter(form);
+
+    expect(transporter!.transporterTransportMode).toEqual("ROAD");
 
     await prepareRedis({
       emitterCompany,
@@ -846,8 +851,13 @@ describe("Test Form reception", () => {
           status: Status.SENT,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: company.siret,
-          transporterCompanySiret: company.siret,
-          owner: { connect: { id: user.id } }
+          owner: { connect: { id: user.id } },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
+          }
         }
       });
 
@@ -887,8 +897,13 @@ describe("Test Form reception", () => {
           status: Status.SENT,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret,
-          owner: { connect: { id: user.id } }
+          owner: { connect: { id: user.id } },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
+          }
         }
       });
 
@@ -899,10 +914,15 @@ describe("Test Form reception", () => {
           emitterType: EmitterType.APPENDIX1,
           emitterCompanySiret: company.siret,
           emitterCompanyName: company.name,
-          transporterCompanySiret: company.siret,
           recipientCompanySiret: company.siret,
           grouping: {
             create: { initialFormId: appendix1_item.id, quantity: 0 }
+          },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
           }
         }
       });
@@ -943,8 +963,13 @@ describe("Test Form reception", () => {
           status: Status.SENT,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret,
-          owner: { connect: { id: user.id } }
+          owner: { connect: { id: user.id } },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
+          }
         }
       });
 
@@ -955,10 +980,15 @@ describe("Test Form reception", () => {
           emitterType: EmitterType.APPENDIX1,
           emitterCompanySiret: company.siret,
           emitterCompanyName: company.name,
-          transporterCompanySiret: company.siret,
           recipientCompanySiret: company.siret,
           grouping: {
             create: { initialFormId: appendix1_item.id, quantity: 0 }
+          },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
           }
         }
       });
@@ -999,8 +1029,13 @@ describe("Test Form reception", () => {
           status: Status.SENT,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret,
-          owner: { connect: { id: user.id } }
+          owner: { connect: { id: user.id } },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
+          }
         }
       });
       // This one hasnt been signed by the transporter
@@ -1010,8 +1045,13 @@ describe("Test Form reception", () => {
           status: Status.SIGNED_BY_PRODUCER,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret,
-          owner: { connect: { id: user.id } }
+          owner: { connect: { id: user.id } },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
+          }
         }
       });
       // This one hasnt been signed at all
@@ -1021,8 +1061,13 @@ describe("Test Form reception", () => {
           status: Status.SEALED,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret,
-          owner: { connect: { id: user.id } }
+          owner: { connect: { id: user.id } },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
+          }
         }
       });
 
@@ -1033,7 +1078,6 @@ describe("Test Form reception", () => {
           emitterType: EmitterType.APPENDIX1,
           emitterCompanySiret: company.siret,
           emitterCompanyName: company.name,
-          transporterCompanySiret: company.siret,
           recipientCompanySiret: company.siret,
           grouping: {
             createMany: {
@@ -1042,6 +1086,12 @@ describe("Test Form reception", () => {
                 { initialFormId: appendix1_2.id, quantity: 0 },
                 { initialFormId: appendix1_3.id, quantity: 0 }
               ]
+            }
+          },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
             }
           }
         }

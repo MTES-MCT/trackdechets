@@ -1,6 +1,5 @@
 import { Bsvhu } from "@prisma/client";
 import {
-  BsdaRecepisseInput,
   BsvhuDestinationInput,
   BsvhuDestinationType,
   BsvhuEmitterInput,
@@ -8,6 +7,7 @@ import {
   BsvhuInput,
   BsvhuNextDestinationInput,
   BsvhuOperationInput,
+  BsvhuRecepisseInput,
   BsvhuReceptionInput,
   BsvhuTransporterInput,
   BsvhuTransportInput,
@@ -35,7 +35,7 @@ describe("edition", () => {
       omiNumber: ""
     };
 
-    const recepisse: Required<BsdaRecepisseInput> = {
+    const recepisse: Required<BsvhuRecepisseInput> = {
       isExempted: true,
       number: "",
       department: "",

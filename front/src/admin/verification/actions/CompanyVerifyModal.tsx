@@ -9,7 +9,7 @@ import {
   Mutation,
   MutationVerifyCompanyByAdminArgs,
 } from "generated/graphql/types";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 
 type VerifyModalProps = {
   isOpen: boolean;

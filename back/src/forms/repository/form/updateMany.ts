@@ -3,13 +3,13 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { checkIfHasPossibleSiretChange } from "./update";
 
 export type UpdateManyFormFn = (
   ids: string[],
-  data: Prisma.FormUpdateInput,
+  data: Prisma.FormUpdateManyMutationInput,
   logMetadata?: LogMetadata
 ) => Promise<Prisma.BatchPayload>;
 
@@ -55,7 +55,7 @@ const buildUpdateManyForms: (deps: RepositoryFnDeps) => UpdateManyFormFn =
     });
 
     for (const { readableId } of forms) {
-      prisma.addAfterCommitCallback(() => enqueueBsdToIndex(readableId));
+      prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(readableId));
     }
 
     return update;

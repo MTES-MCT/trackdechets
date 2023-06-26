@@ -149,3 +149,32 @@ export function escapeRegExp(string) {
     ? string.replace(reRegExpChar, "\\$&")
     : string || "";
 }
+
+const ALGO = "aes-256-gcm";
+// symetric encription
+const ENCRYPTION_KEY = process.env.WEBHOOK_TOKEN_ENCRYPTION_KEY;
+const IV_LENGTH = 12;
+
+export const aesEncrypt = (text: string): string => {
+  const iv = crypto.randomBytes(IV_LENGTH);
+  const cipher = crypto.createCipheriv(ALGO, ENCRYPTION_KEY!, iv);
+
+  const enc1 = cipher.update(text, "utf8");
+  const enc2 = cipher.final();
+  return Buffer.concat([enc1, enc2, iv, cipher.getAuthTag()]).toString(
+    "base64"
+  );
+};
+
+export const aesDecrypt = encrypted => {
+  encrypted = Buffer.from(encrypted, "base64");
+  const length = encrypted.length;
+  const iv = encrypted.slice(length - 28, length - 16);
+  const tag = encrypted.slice(length - 16);
+  const content = encrypted.slice(0, length - 28);
+  const decipher = crypto.createDecipheriv(ALGO, ENCRYPTION_KEY!, iv);
+  decipher.setAuthTag(tag);
+  let decrypted = decipher.update(content, undefined, "utf8");
+  decrypted += decipher.final("utf8");
+  return decrypted;
+};

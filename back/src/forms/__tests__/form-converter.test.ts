@@ -136,17 +136,6 @@ describe("flattenFormInput", () => {
       recipientCompanyContact: input.recipient!.company!.contact,
       recipientCompanyPhone: input.recipient!.company!.phone,
       recipientCompanyMail: input.recipient!.company!.mail,
-      transporterCompanyName: null,
-      transporterCompanySiret: null,
-      transporterCompanyVatNumber: null,
-      transporterCompanyAddress: null,
-      transporterCompanyContact: null,
-      transporterCompanyPhone: null,
-      transporterCompanyMail: null,
-      transporterReceipt: input.transporter!.receipt,
-      transporterDepartment: input.transporter!.department,
-      transporterValidityLimit: input.transporter!.validityLimit,
-      transporterNumberPlate: input.transporter!.numberPlate,
       wasteDetailsCode: null,
       wasteDetailsName: null,
       wasteDetailsOnuCode: null,
@@ -158,7 +147,8 @@ describe("flattenFormInput", () => {
       wasteDetailsIsDangerous: false,
       wasteDetailsAnalysisReferences: [],
       wasteDetailsParcelNumbers: Prisma.JsonNull,
-      wasteDetailsLandIdentifiers: []
+      wasteDetailsLandIdentifiers: [],
+      wasteDetailsSampleNumber: null
     };
 
     expect(flattened).toEqual(expected);
@@ -183,7 +173,8 @@ describe("flattenFormInput", () => {
       wasteDetailsQuantityType: null,
       wasteDetailsParcelNumbers: Prisma.JsonNull,
       wasteDetailsAnalysisReferences: [],
-      wasteDetailsLandIdentifiers: []
+      wasteDetailsLandIdentifiers: [],
+      wasteDetailsSampleNumber: null
     });
   });
 

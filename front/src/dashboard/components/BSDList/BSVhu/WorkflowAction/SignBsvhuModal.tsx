@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/client";
-import { Loader, Modal } from "common/components";
+import { Modal } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { GET_VHU_FORM } from "form/bsvhu/utils/queries";
 import { Query, QueryBsvhuArgs } from "generated/graphql/types";
 import React from "react";

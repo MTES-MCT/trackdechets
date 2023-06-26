@@ -1,10 +1,9 @@
 import { Form, Status } from "@prisma/client";
 import { RepositoryFnDeps } from "../../../common/repository/types";
-import { PackagingInfo } from "../../../generated/graphql/types";
 import { checkCanBeSealed } from "../../validation";
-import { sumPackagingInfos } from "../helper";
 import buildUpdateForm from "./update";
 import buildUpdateManyForms from "./updateMany";
+import { getFirstTransporter } from "../../database";
 
 class FormFraction {
   form: Form;
@@ -32,6 +31,7 @@ export function buildSetAppendix1({
     currentAppendix1Forms
   }) => {
     const updateManyForms = buildUpdateManyForms({ prisma, user });
+    const updateForm = buildUpdateForm({ prisma, user });
 
     // First, seal all drafts
     const draftAppendix1Forms = newAppendix1Fractions
@@ -45,55 +45,61 @@ export function buildSetAppendix1({
       { status: Status.SEALED }
     );
 
+    const transporter = await getFirstTransporter(form);
+
     // Then we automatically set:
     // - the transporter
     // - the destination
     // - the waste infos (code & name)
-    await updateManyForms(
-      newAppendix1Fractions.map(a => a.form.id),
-      {
-        // Most data are copied from the container form and not editable:
-        // - waste infos
-        // - transporter
-        // - recipient
-        // - if its emitted by an eco organisme or not
-        wasteDetailsCode: form.wasteDetailsCode,
-        wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
-        wasteDetailsName: form.wasteDetailsName,
-        transporterCompanySiret: form.transporterCompanySiret,
-        transporterCompanyName: form.transporterCompanyName,
-        transporterCompanyAddress: form.transporterCompanyAddress,
-        transporterCompanyContact: form.transporterCompanyContact,
-        transporterCompanyVatNumber: form.transporterCompanyVatNumber,
-        transporterCompanyPhone: form.transporterCompanyPhone,
-        transporterCompanyMail: form.transporterCompanyMail,
-        recipientCompanySiret: form.recipientCompanySiret,
-        recipientCompanyName: form.recipientCompanyName,
-        recipientCompanyAddress: form.recipientCompanyAddress,
-        recipientCompanyContact: form.recipientCompanyContact,
-        recipientCompanyPhone: form.recipientCompanyPhone,
-        recipientCompanyMail: form.recipientCompanyMail,
-        ecoOrganismeName: form.ecoOrganismeName,
-        ecoOrganismeSiret: form.ecoOrganismeSiret
-      }
-    );
+    await Promise.all(
+      newAppendix1Fractions.map(({ form: appendix1Form }) =>
+        updateForm(
+          { id: appendix1Form.id },
+          {
+            // Most data are copied from the container form and not editable:
+            // - waste infos
+            // - transporter
+            // - recipient
+            // - if its emitted by an eco organisme or not
+            wasteDetailsCode: form.wasteDetailsCode,
+            wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
+            wasteDetailsName: form.wasteDetailsName,
 
-    // Update container packagings
-    const updateForm = buildUpdateForm({ prisma, user });
-    await updateForm(
-      { id: form.id },
-      {
-        wasteDetailsPackagingInfos: sumPackagingInfos(
-          newAppendix1Fractions.map(
-            fraction =>
-              fraction.form.wasteDetailsPackagingInfos as PackagingInfo[]
-          )
-        ),
-        wasteDetailsQuantity: newAppendix1Fractions.reduce(
-          (sum, fraction) => sum + (fraction.form.wasteDetailsQuantity ?? 0),
-          0
+            recipientCompanySiret: form.recipientCompanySiret,
+            recipientCompanyName: form.recipientCompanyName,
+            recipientCompanyAddress: form.recipientCompanyAddress,
+            recipientCompanyContact: form.recipientCompanyContact,
+            recipientCompanyPhone: form.recipientCompanyPhone,
+            recipientCompanyMail: form.recipientCompanyMail,
+            ecoOrganismeName: form.ecoOrganismeName,
+            ecoOrganismeSiret: form.ecoOrganismeSiret,
+            transporters: {
+              deleteMany: {},
+              create: {
+                number: 1,
+                transporterCompanySiret: transporter?.transporterCompanySiret,
+                transporterCompanyName: transporter?.transporterCompanyName,
+                transporterCompanyAddress:
+                  transporter?.transporterCompanyAddress,
+                transporterCompanyContact:
+                  transporter?.transporterCompanyContact,
+                transporterCompanyVatNumber:
+                  transporter?.transporterCompanyVatNumber,
+                transporterCompanyPhone: transporter?.transporterCompanyPhone,
+                transporterCompanyMail: transporter?.transporterCompanyMail,
+                transporterIsExemptedOfReceipt:
+                  transporter?.transporterIsExemptedOfReceipt,
+                transporterReceipt: transporter?.transporterReceipt,
+                transporterDepartment: transporter?.transporterDepartment,
+                transporterValidityLimit: transporter?.transporterValidityLimit,
+                transporterTransportMode: transporter?.transporterTransportMode,
+                transporterNumberPlate: transporter?.transporterNumberPlate,
+                transporterCustomInfo: transporter?.transporterCustomInfo
+              }
+            }
+          }
         )
-      }
+      )
     );
 
     // Lastly, manage groups...

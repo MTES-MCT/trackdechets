@@ -38,6 +38,7 @@ describe("edition", () => {
     };
 
     const recepisse: Required<BsdasriRecepisseInput> = {
+      isExempted: false,
       number: "",
       department: "",
       validityLimit: new Date("2022-01-01")

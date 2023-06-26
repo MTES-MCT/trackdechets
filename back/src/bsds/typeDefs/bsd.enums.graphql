@@ -13,4 +13,5 @@ enum TransportMode {
   AIR
   RIVER
   SEA
+  OTHER
 }

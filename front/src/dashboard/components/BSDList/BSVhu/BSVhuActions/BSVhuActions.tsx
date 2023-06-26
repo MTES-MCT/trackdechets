@@ -1,32 +1,29 @@
 import * as React from "react";
-import { Link, generatePath, useParams, useLocation } from "react-router-dom";
 import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuLink,
-  MenuItem,
-} from "@reach/menu-button";
-import "@reach/menu-button/styles.css";
-import classNames from "classnames";
-import routes from "common/routes";
+  generatePath,
+  useParams,
+  useLocation,
+  useRouteMatch,
+} from "react-router-dom";
+
+import routes from "Apps/routes";
 import {
-  IconChevronDown,
-  IconChevronUp,
   IconView,
   IconPaperWrite,
   IconPdf,
   IconDuplicateFile,
   IconTrash,
+  IconQrCode,
 } from "common/components/Icons";
 import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
 import { DeleteBsvhuModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
 import { useDuplicate } from "./useDuplicate";
-import { TableRoadControlButton } from "../../RoadControlButton";
+import { useDisplayRoadControlButton } from "../../RoadControlButton";
 
 import styles from "../../BSDActions.module.scss";
-import { Loader } from "common/components";
+import { Loader } from "Apps/common/Components";
+import DropdownMenu from "Apps/common/Components/DropdownMenu/DropdownMenu";
 
 interface BSVhuActionsProps {
   form: Bsvhu;
@@ -50,83 +47,78 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
     status === BsvhuStatus.Initial ||
     (status === BsvhuStatus.SignedByProducer && siret === emitterSiret);
 
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
+
+  const links = [
+    {
+      title: "Contrôle routier",
+      route: {
+        pathname: generatePath(routes[dashboardRoutePrefix].roadControl, {
+          siret,
+          id: form.id,
+        }),
+        state: { background: location },
+      },
+      icon: <IconQrCode color="blueLight" size="24px" />,
+      isVisible: useDisplayRoadControlButton(form),
+    },
+    {
+      title: "Aperçu",
+      route: {
+        pathname: generatePath(routes[dashboardRoutePrefix].bsvhus.view, {
+          siret,
+          id: form.id,
+        }),
+        state: { background: location },
+      },
+      icon: <IconView color="blueLight" size="24px" />,
+      isVisible: true,
+    },
+    {
+      title: "Pdf",
+      route: "",
+      icon: <IconPdf size="24px" color="blueLight" />,
+      isVisible: !form.isDraft,
+      isButton: true,
+      handleClick: () => downloadPdf(),
+    },
+    {
+      title: "Dupliquer",
+      route: "",
+      icon: <IconDuplicateFile size="24px" color="blueLight" />,
+      isVisible: true,
+      isButton: true,
+      handleClick: () => duplicateBsvhu(),
+    },
+    {
+      title: "Modifier",
+      route: generatePath(routes[dashboardRoutePrefix].bsvhus.edit, {
+        siret,
+        id: form.id,
+      }),
+      icon: <IconPaperWrite size="24px" color="blueLight" />,
+      isVisible: ![BsvhuStatus.Processed, BsvhuStatus.Refused].includes(status),
+    },
+    {
+      title: "Supprimer",
+      route: "",
+      icon: <IconTrash color="blueLight" size="24px" />,
+      isVisible: canDelete,
+      isButton: true,
+      handleClick: () => setIsDeleting(true),
+    },
+  ];
   return (
     <>
-      <Menu>
-        {({ isExpanded }) => (
-          <>
-            <MenuButton
-              className={classNames(
-                "btn btn--outline-primary",
-                styles.BSDDActionsToggle
-              )}
-            >
-              Actions
-              {isExpanded ? (
-                <IconChevronUp size="14px" color="blueLight" />
-              ) : (
-                <IconChevronDown size="14px" color="blueLight" />
-              )}
-            </MenuButton>
-            <MenuList
-              className={classNames(
-                "fr-raw-link fr-raw-list",
-                styles.BSDDActionsMenu
-              )}
-            >
-              <TableRoadControlButton siret={siret} form={form} />
+      <div className={styles.BSDActions}>
+        <DropdownMenu
+          menuTitle="Actions"
+          links={links.filter(f => f.isVisible)}
+          iconAlone
+        />
+      </div>
 
-              <MenuLink
-                as={Link}
-                to={{
-                  pathname: generatePath(routes.dashboard.bsvhus.view, {
-                    siret,
-                    id: form.id,
-                  }),
-                  state: { background: location },
-                }}
-              >
-                <IconView color="blueLight" size="24px" />
-                Aperçu
-              </MenuLink>
-
-              {!form.isDraft && (
-                <MenuItem onSelect={() => downloadPdf()}>
-                  <IconPdf size="24px" color="blueLight" />
-                  Pdf
-                </MenuItem>
-              )}
-              <MenuItem onSelect={() => duplicateBsvhu()}>
-                <IconDuplicateFile size="24px" color="blueLight" />
-                Dupliquer
-              </MenuItem>
-              {![BsvhuStatus.Processed, BsvhuStatus.Refused].includes(
-                status
-              ) && (
-                <>
-                  <MenuLink
-                    as={Link}
-                    to={generatePath(routes.dashboard.bsvhus.edit, {
-                      siret,
-                      id: form.id,
-                    })}
-                  >
-                    <IconPaperWrite size="24px" color="blueLight" />
-                    Modifier
-                  </MenuLink>
-                </>
-              )}
-
-              {canDelete && (
-                <MenuItem onSelect={() => setIsDeleting(true)}>
-                  <IconTrash color="blueLight" size="24px" />
-                  Supprimer
-                </MenuItem>
-              )}
-            </MenuList>
-          </>
-        )}
-      </Menu>
       {isDeleting && (
         <DeleteBsvhuModal
           isOpen

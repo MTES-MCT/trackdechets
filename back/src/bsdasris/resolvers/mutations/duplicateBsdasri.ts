@@ -5,12 +5,12 @@ import {
   MutationDuplicateBsdasriArgs,
   MutationResolvers
 } from "../../../generated/graphql/types";
-
 import { expandBsdasriFromDB } from "../../converter";
 import { getBsdasriOrNotFound } from "../../database";
-import { checkIsBsdasriContributor } from "../../permissions";
 import { ForbiddenError } from "apollo-server-express";
 import { getBsdasriRepository } from "../../repository";
+import { checkCanDuplicate } from "../../permissions";
+import prisma from "../../../prisma";
 
 /**
  *
@@ -37,19 +37,15 @@ const duplicateBsdasriResolver: MutationResolvers["duplicateBsdasri"] = async (
       "Les dasris de synthèse ou de groupement ne sont pas duplicables"
     );
   }
-  await checkIsBsdasriContributor(
-    user,
-    bsdasri,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas."
-  );
+
+  await checkCanDuplicate(user, bsdasri);
 
   const newBsdasri = await duplicateBsdasri(user, bsdasri);
   return expandBsdasriFromDB(newBsdasri);
 };
 
-function duplicateBsdasri(
-  user: Express.User,
-  {
+async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
+  const {
     id,
     createdAt,
     updatedAt,
@@ -95,10 +91,15 @@ function duplicateBsdasri(
     synthesizedInId,
     identificationNumbers,
     synthesisEmitterSirets,
+    groupingEmitterSirets,
     ...fieldsToCopy
-  }: Bsdasri
-) {
+  } = bsdasri;
+
   const bsdasriRepository = getBsdasriRepository(user);
+
+  const { emitter, transporter, destination } = await getBsdasriCompanies(
+    bsdasri
+  );
 
   return bsdasriRepository.create({
     ...fieldsToCopy,
@@ -108,8 +109,79 @@ function duplicateBsdasri(
         : fieldsToCopy.emitterWastePackagings,
     id: getReadableId(ReadableIdPrefix.DASRI),
     status: BsdasriStatus.INITIAL,
-    isDraft: true
+    isDraft: true,
+    // Emitter company info
+    emitterCompanyAddress: emitter?.address ?? bsdasri.emitterCompanyAddress,
+    emitterCompanyMail: emitter?.contactEmail ?? bsdasri.emitterCompanyMail,
+    emitterCompanyPhone: emitter?.contactPhone ?? bsdasri.emitterCompanyPhone,
+    emitterCompanyName: emitter?.name ?? bsdasri.emitterCompanyName,
+    emitterCompanyContact: emitter?.contact ?? bsdasri.emitterCompanyContact,
+    // Destination company info
+    destinationCompanyAddress:
+      destination?.address ?? bsdasri.destinationCompanyAddress,
+    destinationCompanyMail:
+      destination?.contactEmail ?? bsdasri.destinationCompanyMail,
+    destinationCompanyPhone:
+      destination?.contactPhone ?? bsdasri.destinationCompanyPhone,
+    destinationCompanyName: destination?.name ?? bsdasri.destinationCompanyName,
+    destinationCompanyContact:
+      destination?.contact ?? bsdasri.destinationCompanyContact,
+    // Transporter company info
+    transporterCompanyAddress:
+      transporter?.address ?? bsdasri.transporterCompanyAddress,
+    transporterCompanyMail:
+      transporter?.contactEmail ?? bsdasri.transporterCompanyMail,
+    transporterCompanyPhone:
+      transporter?.contactPhone ?? bsdasri.transporterCompanyPhone,
+    transporterCompanyName: transporter?.name ?? bsdasri.transporterCompanyName,
+    transporterCompanyContact:
+      transporter?.contact ?? bsdasri.transporterCompanyContact,
+    // Transporter recepisse
+    transporterRecepisseNumber:
+      transporter?.transporterReceipt?.receiptNumber ??
+      bsdasri.transporterRecepisseNumber,
+    transporterRecepisseValidityLimit:
+      transporter?.transporterReceipt?.validityLimit ??
+      bsdasri.transporterRecepisseValidityLimit,
+    transporterRecepisseDepartment:
+      transporter?.transporterReceipt?.department ??
+      bsdasri.transporterRecepisseDepartment
   });
+}
+
+async function getBsdasriCompanies(bsdasri: Bsdasri) {
+  const companiesOrgIds: string[] = [
+    bsdasri.emitterCompanySiret,
+    bsdasri.transporterCompanySiret,
+    bsdasri.transporterCompanyVatNumber,
+    bsdasri.destinationCompanySiret
+  ].filter(Boolean);
+
+  // Batch call all companies involved
+  const companies = await prisma.company.findMany({
+    where: {
+      siret: {
+        in: companiesOrgIds
+      }
+    },
+    include: {
+      transporterReceipt: true
+    }
+  });
+
+  const emitter = companies.find(
+    company => company.orgId === bsdasri.emitterCompanySiret
+  );
+  const transporter = companies.find(
+    company =>
+      company.orgId === bsdasri.transporterCompanySiret ||
+      company.orgId === bsdasri.transporterCompanyVatNumber
+  );
+  const destination = companies.find(
+    company => company.orgId === bsdasri.destinationCompanySiret
+  );
+
+  return { emitter, transporter, destination };
 }
 
 export default duplicateBsdasriResolver;

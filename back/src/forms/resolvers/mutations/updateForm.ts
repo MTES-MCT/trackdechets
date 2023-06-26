@@ -1,4 +1,4 @@
-import { EmitterType, Prisma } from "@prisma/client";
+import { EmitterType, Prisma, TransportMode } from "@prisma/client";
 import { isDangerous, BSDD_WASTE_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -6,22 +6,19 @@ import {
   ResolversParentTypes
 } from "../../../generated/graphql/types";
 import { InvalidWasteCode, MissingTempStorageFlag } from "../../errors";
-import {
-  checkCanUpdate,
-  checkIsFormContributor,
-  formToCompanies
-} from "../../permissions";
+import { checkCanUpdate } from "../../permissions";
 import { GraphQLContext } from "../../../types";
-import { getFormOrFormNotFound } from "../../database";
+import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import {
   expandFormFromDb,
   flattenFormInput,
-  flattenTemporaryStorageDetailInput
+  flattenTemporaryStorageDetailInput,
+  flattenTransporterInput
 } from "../../converter";
 import { getFormRepository } from "../../repository";
-import { FormCompanies } from "../../types";
 import {
   draftFormSchema,
+  hasPipeline,
   sealedFormSchema,
   validateGroupement
 } from "../../validation";
@@ -74,12 +71,31 @@ const updateFormResolver = async (
   }
 
   const existingForm = await getFormOrFormNotFound({ id });
+  const existingTransporter = await getFirstTransporter(existingForm);
 
-  await checkCanUpdate(user, existingForm);
+  await checkCanUpdate(user, existingForm, updateFormInput);
 
   const form = flattenFormInput(formContent);
-  const futureForm = { ...existingForm, ...form };
+  let transporter: Omit<
+    Prisma.BsddTransporterCreateWithoutFormInput,
+    "number"
+  > = flattenTransporterInput(formContent);
 
+  // Pipeline erases transporter EXCEPT for transporterTransportMode
+  if (hasPipeline(form as any)) {
+    if (existingTransporter || Object.keys(transporter).length > 0)
+      transporter = {
+        ...flattenTransporterInput({ transporter: null }),
+        transporterTransportMode: TransportMode.OTHER
+      };
+  }
+
+  const futureForm = {
+    ...existingTransporter, // make sure not to move this after `existingForm` to prevent overwriting `id` and `createdAt`
+    ...transporter,
+    ...existingForm,
+    ...form
+  };
   // Construct form update payload
   // This bit is a bit confusing. We are NOT in strict mode, so Yup doesnt complain if we pass unknown values.
   // To remove those unknown values, we cast the object. This makes sure our input has a shape that fits our validator
@@ -88,10 +104,31 @@ const updateFormResolver = async (
   // So this is a 2 way constraint:
   // - casting remove keys in the input but unknown to the validator
   // - then we remove keys present in the casting result but not present in the input
-  const formUpdateInput: Prisma.FormUpdateInput = draftFormSchema.cast(form);
+  const formUpdateInput: Prisma.FormUpdateInput =
+    draftFormSchema.cast(form) ?? {};
   for (const key of Object.keys(formUpdateInput)) {
     if (!(key in form)) {
       delete formUpdateInput[key];
+    }
+  }
+
+  if (Object.keys(transporter).length > 0) {
+    if (existingTransporter) {
+      if (formContent.transporter === null) {
+        formUpdateInput.transporters = {
+          delete: { id: existingTransporter.id }
+        };
+      } else {
+        formUpdateInput.transporters = {
+          update: { data: transporter, where: { id: existingTransporter.id } }
+        };
+      }
+    } else {
+      if (formContent.transporter !== null) {
+        formUpdateInput.transporters = {
+          create: { ...transporter, number: 1, readyToTakeOver: true }
+        };
+      }
     }
   }
 
@@ -113,50 +150,6 @@ const updateFormResolver = async (
     })
     .forwardedIn();
 
-  const formCompanies = await formToCompanies(existingForm);
-  const nextFormCompanies: FormCompanies = {
-    emitterCompanySiret:
-      form.emitterCompanySiret ?? formCompanies.emitterCompanySiret,
-    recipientCompanySiret:
-      form.recipientCompanySiret ?? formCompanies.recipientCompanySiret,
-    transporterCompanySiret:
-      form.transporterCompanySiret ?? formCompanies.transporterCompanySiret,
-    transporterCompanyVatNumber:
-      form.transporterCompanyVatNumber ??
-      formCompanies.transporterCompanyVatNumber,
-    traderCompanySiret:
-      form.traderCompanySiret ?? formCompanies.traderCompanySiret,
-    brokerCompanySiret:
-      form.brokerCompanySiret ?? formCompanies.brokerCompanySiret,
-    ecoOrganismeSiret:
-      form.ecoOrganismeSiret ?? formCompanies.ecoOrganismeSiret,
-    ...(intermediaries?.length
-      ? {
-          intermediariesVatNumbers: intermediaries
-            ?.map(intermediary => intermediary.vatNumber)
-            .filter(Boolean),
-          intermediariesSirets: intermediaries
-            ?.map(intermediary => intermediary.siret)
-            .filter(Boolean)
-        }
-      : {
-          intermediariesVatNumbers: formCompanies.intermediariesVatNumbers,
-          intermediariesSirets: formCompanies.intermediariesSirets
-        })
-  };
-
-  if (temporaryStorageDetail || forwardedIn) {
-    nextFormCompanies.forwardedIn = {
-      recipientCompanySiret:
-        temporaryStorageDetail?.destination?.company?.siret ??
-        forwardedIn?.recipientCompanySiret ??
-        null,
-      transporterCompanySiret: forwardedIn?.transporterCompanySiret ?? null,
-      transporterCompanyVatNumber:
-        forwardedIn?.transporterCompanyVatNumber ?? null
-    };
-  }
-
   if (isOrWillBeTempStorage && !(forwardedIn || temporaryStorageDetail)) {
     formUpdateInput.forwardedIn = {
       create: {
@@ -165,11 +158,6 @@ const updateFormResolver = async (
       }
     };
   }
-  await checkIsFormContributor(
-    user,
-    nextFormCompanies,
-    "Vous ne pouvez pas enlever votre établissement du bordereau"
-  );
 
   // Delete temporaryStorageDetail
   if (
@@ -289,7 +277,7 @@ const updateFormResolver = async (
     ? appendix2toFormFractions(appendix2Forms)
     : existingFormFractionsInput;
   const formFractions = isGroupementUpdated
-    ? await validateGroupement(futureForm, formFractionsInput)
+    ? await validateGroupement(futureForm as any, formFractionsInput!)
     : null;
 
   const updatedForm = await runInTransaction(async transaction => {

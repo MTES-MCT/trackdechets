@@ -196,6 +196,8 @@ input BsdasriTransportInput {
 }
 
 input BsdasriRecepisseInput {
+  "Exemption de récépissé"
+  isExempted: Boolean
   "Numéro de récépissé"
   number: String
   "Département"
@@ -290,6 +292,8 @@ input BsdasriSignatureInput {
   type: BsdasriSignatureType!
   "Nom et prénom du signataire"
   author: String!
+  "Date de la signature"
+  date: DateTime
 }
 
 input BsdasriSignatureWithSecretCodeInput {

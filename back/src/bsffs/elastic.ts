@@ -12,13 +12,13 @@ import { toBsffDestination } from "./compat";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { getReadonlyBsffRepository } from "./repository";
 
-export function toBsdElastic(
-  bsff: Bsff & {
-    packagings: BsffPackaging[];
-  } & {
-    ficheInterventions: BsffFicheIntervention[];
-  }
-): BsdElastic {
+export type RawBsff = Bsff & {
+  packagings: BsffPackaging[];
+} & {
+  ficheInterventions: BsffFicheIntervention[];
+};
+
+export function toBsdElastic(bsff: RawBsff): BsdElastic {
   const bsffDestination = toBsffDestination(bsff.packagings);
 
   const bsd = {
@@ -101,12 +101,7 @@ export function toBsdElastic(
       ...bsff.detenteurCompanySirets
     ].filter(Boolean),
     ...getRegistryFields(bsff),
-    rawBsd: {
-      ...bsff,
-      packagings: bsff.packagings.map(packaging => ({
-        numero: packaging.numero
-      }))
-    }
+    rawBsd: bsff
   };
 
   const transporterCompanyOrgId = getTransporterCompanyOrgId(bsff);

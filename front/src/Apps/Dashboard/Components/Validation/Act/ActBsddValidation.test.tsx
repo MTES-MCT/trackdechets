@@ -6,6 +6,7 @@ import ActBsddValidation from "./ActBsddValidation";
 import { GET_FORM } from "form/bsdd/utils/queries";
 import ActBsdSuiteValidation from "./ActBsdSuiteValidation";
 import { MemoryRouter } from "react-router-dom";
+import { Form } from "generated/graphql/types";
 
 describe("ActBsddValidation", () => {
   const onClose = jest.fn();
@@ -29,15 +30,15 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is Resealed and user is emitter", () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const resealedBsd = {
       id: "1",
       status: "RESEALED",
       recipient: { company: { siret: "12345678901235" } },
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={resealedBsd}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -52,11 +53,11 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is Sealed and user is emitter and emitter type is Appendix1", async () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const sealedBsd = {
       id: "1",
       status: "SEALED",
       emitter: { company: { siret: "12345678901234" }, type: "APPENDIX1" },
-    };
+    } as Form;
 
     const mocksSealed = [
       {
@@ -86,7 +87,7 @@ describe("ActBsddValidation", () => {
     render(
       <MockedProvider mocks={mocksSealed} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={sealedBsd}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -104,18 +105,18 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is Sealed and user is emitter and emitter type is Appendix1Producer and there is no ecoOrganisme", () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const appendix1ProducerSealedBsd = {
       id: "1",
       status: "SEALED",
       emitter: {
         company: { siret: "12345678901234" },
         type: "APPENDIX1_PRODUCER",
       },
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={appendix1ProducerSealedBsd}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -128,7 +129,7 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is Sealed and user is emitter and emitter type is Appendix1Producer and there is an ecoOrganisme", () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const appendix1ProducerSealedBsdEcoOrg = {
       id: "1",
       status: "SEALED",
       ecoOrganisme: { siret: "12345678901234" },
@@ -136,11 +137,11 @@ describe("ActBsddValidation", () => {
         company: { siret: "12345678901234" },
         type: "APPENDIX1_PRODUCER",
       },
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={appendix1ProducerSealedBsdEcoOrg}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -153,10 +154,10 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is Resent", async () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const resentBsd = {
       id: "1",
       status: "RESENT",
-    };
+    } as Form;
 
     const mocksResent = [
       {
@@ -183,7 +184,7 @@ describe("ActBsddValidation", () => {
     render(
       <MockedProvider mocks={mocksResent} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={resentBsd}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -200,15 +201,15 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is SignedByProducer", async () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const signedByProducerBsd = {
       id: "1",
       status: "SIGNED_BY_PRODUCER",
       transporter: { company: { orgId: "12345678901234" } },
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={signedByProducerBsd}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -226,14 +227,14 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is TempStored", async () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const tempStoredBsd = {
       id: "1",
       status: "TEMP_STORED",
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={tempStoredBsd}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -253,15 +254,15 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is Sent", async () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const sentBsd = {
       id: "1",
       status: "SENT",
       recipient: { company: { siret: "12345678901234" } },
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={sentBsd}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -279,15 +280,15 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is Sent with temp storage", async () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const sentBsdTempStorage = {
       id: "1",
       status: "SENT",
       recipient: { company: { siret: "12345678901234" }, isTempStorage: true },
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={sentBsdTempStorage}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -305,7 +306,7 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is Sent with segments still a draft", async () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const sentBsdSegmentDraft = {
       id: "1",
       status: "SENT",
       currentTransporterSiret: "12345678901234",
@@ -318,11 +319,11 @@ describe("ActBsddValidation", () => {
           __typename: "TransportSegment",
         },
       ],
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={sentBsdSegmentDraft}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -339,7 +340,7 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is Sent with segments taken over at", async () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const sentBsdSegmetnTakenOverAt = {
       id: "1",
       status: "SENT",
       currentTransporterSiret: "12345678901234",
@@ -351,11 +352,11 @@ describe("ActBsddValidation", () => {
           __typename: "TransportSegment",
         },
       ],
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={sentBsdSegmetnTakenOverAt}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -374,7 +375,7 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is Sent with segments ready to take over", async () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const sentBsdSegmentReadyToTakenOver = {
       id: "1",
       status: "SENT",
       currentTransporterSiret: "12345678901234",
@@ -388,11 +389,11 @@ describe("ActBsddValidation", () => {
           __typename: "TransportSegment",
         },
       ],
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={sentBsdSegmentReadyToTakenOver}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -409,15 +410,15 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is TempStorerAccepted", () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const tempStorerAcceptedBsd = {
       id: "1",
       status: "TEMP_STORER_ACCEPTED",
       recipient: { company: { siret: "12345678901235" } },
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={tempStorerAcceptedBsd}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -430,15 +431,15 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is SignedByTempStorer", () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const signedByTempStorerBsd = {
       id: "1",
       status: "SIGNED_BY_TEMP_STORER",
       recipient: { company: { siret: "12345678901235" } },
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={signedByTempStorerBsd}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -452,14 +453,14 @@ describe("ActBsddValidation", () => {
   it("renders with expected text when status is Received", async () => {
     const currentSiret = "12345678901234";
 
-    const bsd = {
+    const receivedBsd = {
       id: "1",
       status: "RECEIVED",
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={receivedBsd}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -476,14 +477,14 @@ describe("ActBsddValidation", () => {
 
   it("renders with expected text when status is Accepted", () => {
     const currentSiret = "12345678901234";
-    const bsd = {
+    const acceptedBsd = {
       id: "1",
       status: "ACCEPTED",
-    };
+    } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsddValidation
-          bsd={bsd}
+          bsd={acceptedBsd}
           currentSiret={currentSiret}
           isOpen
           onClose={onClose}
@@ -495,7 +496,7 @@ describe("ActBsddValidation", () => {
   });
 
   it("renders bsd suite modal", () => {
-    const bsd = {
+    const tempStorerAcceptedBsd = {
       id: "1",
       status: "TEMP_STORER_ACCEPTED",
       destination: { company: { siret: "12345678901235" } },
@@ -505,7 +506,11 @@ describe("ActBsddValidation", () => {
     render(
       <MockedProvider mocks={[]} addTypename={false}>
         <MemoryRouter initialEntries={[route]}>
-          <ActBsdSuiteValidation bsd={bsd} isOpen onClose={onClose} />
+          <ActBsdSuiteValidation
+            bsd={tempStorerAcceptedBsd}
+            isOpen
+            onClose={onClose}
+          />
         </MemoryRouter>
       </MockedProvider>
     );

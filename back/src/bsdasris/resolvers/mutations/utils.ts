@@ -8,7 +8,7 @@ import { CompanyInput } from "../../../generated/graphql/types";
 export const getEligibleDasrisForSynthesis = async (
   synthesizingIds: string[],
   bsdasri: Bsdasri | null,
-  company?: CompanyInput
+  company?: CompanyInput | null
 ): Promise<Bsdasri[]> => {
   if (!synthesizingIds) {
     return [];

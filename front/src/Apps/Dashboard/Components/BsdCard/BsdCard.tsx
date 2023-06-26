@@ -9,7 +9,8 @@ import WasteDetails from "../WasteDetails/WasteDetails";
 import {
   canPublishBsd,
   getBsdView,
-  getCtaLabelFromStatus,
+  getPrimaryActionsLabelFromBsdStatus,
+  getPrimaryActionsReviewsLabel,
   getWorkflowLabel,
 } from "../../dashboardServices";
 import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditionalActionsButton";
@@ -31,8 +32,8 @@ import {
   useBsffDuplicate,
   useBsvhuDuplicate,
 } from "Apps/Dashboard/Components/Duplicate/useDuplicate";
-import { Loader } from "common/components";
-import { BsdDisplay } from "Apps/Common/types/bsdTypes";
+import { Loader } from "Apps/common/Components";
+import { BsdDisplay } from "Apps/common/types/bsdTypes";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import { IconWeight } from "common/components/Icons";
 
@@ -41,12 +42,16 @@ function BsdCard({
   bsdCurrentTab,
   currentSiret,
   onValidate,
-  onOverview,
-  onUpdate,
-  onRevision,
-  onBsdSuite,
-  onAppendix1,
+  secondaryActions: {
+    onOverview,
+    onUpdate,
+    onRevision,
+    onBsdSuite,
+    onAppendix1,
+    onDeleteReview,
+  },
 }: BsdCardProps) {
+  const isReviewsTab = bsdCurrentTab === "reviewsTab";
   const bsdDisplay = getBsdView(bsd);
 
   const options = {
@@ -99,7 +104,15 @@ function BsdCard({
     : "";
 
   const ctaPrimaryLabel = bsdDisplay?.type
-    ? getCtaLabelFromStatus(bsdDisplay, currentSiret, bsdCurrentTab)
+    ? getPrimaryActionsLabelFromBsdStatus(
+        bsdDisplay,
+        currentSiret,
+        bsdCurrentTab
+      )
+    : "";
+
+  const ctaPrimaryReviewLabel = bsdDisplay?.type
+    ? getPrimaryActionsReviewsLabel(bsdDisplay, currentSiret)
     : "";
 
   const handleValidationClick = (
@@ -170,6 +183,11 @@ function BsdCard({
                 {bsdDisplay?.isTempStorage && (
                   <InfoWithIcon labelCode={InfoIconCode.TempStorage} />
                 )}
+                {getWorkflowLabel(bsdDisplay.bsdWorkflowType) && (
+                  <p className="workflow-type">
+                    {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
+                  </p>
+                )}
                 {updatedAt && (
                   <InfoWithIcon
                     labelCode={InfoIconCode.LastModificationDate}
@@ -179,9 +197,6 @@ function BsdCard({
                 {bsdDisplay?.emittedByEcoOrganisme && (
                   <InfoWithIcon labelCode={InfoIconCode.EcoOrganism} />
                 )}
-                <p className="workflow-type">
-                  {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
-                </p>
               </div>
             </div>
             <div className="bsd-card__content">
@@ -191,13 +206,15 @@ function BsdCard({
                     status={bsdDisplay.status}
                     isDraft={bsdDisplay.isDraft}
                     bsdType={bsdDisplay.type}
+                    reviewStatus={bsdDisplay?.review?.status}
                   />
-                  {Boolean(bsdDisplay.wasteDetails?.weight) && (
-                    <p className="bsd-card__content__infos__weight">
-                      <IconWeight />
-                      <span>{bsdDisplay.wasteDetails.weight} t</span>
-                    </p>
-                  )}
+                  {!isReviewsTab &&
+                    Boolean(bsdDisplay.wasteDetails?.weight) && (
+                      <p className="bsd-card__content__infos__weight">
+                        <IconWeight />
+                        <span>{bsdDisplay.wasteDetails.weight} t</span>
+                      </p>
+                    )}
                 </div>
                 <div className="bsd-card__content__infos__other">
                   <WasteDetails
@@ -214,28 +231,45 @@ function BsdCard({
                 </div>
               </div>
               <div className="bsd-card__content__cta">
-                {canPublishBsd(bsdDisplay, currentSiret) && ctaPrimaryLabel && (
+                {!isReviewsTab &&
+                  canPublishBsd(bsdDisplay, currentSiret) &&
+                  ctaPrimaryLabel && (
+                    <button
+                      data-testid={`bsd-card-btn-primary-${bsdDisplay.readableid}`}
+                      type="button"
+                      className="fr-btn fr-btn--sm"
+                      onClick={handleValidationClick}
+                    >
+                      {ctaPrimaryLabel}
+                    </button>
+                  )}
+
+                {isReviewsTab && (
                   <button
-                    data-testid="bsd-card-btn-primary"
+                    data-testid={`bsd-card-btn-review-primary-${bsdDisplay.readableid}`}
                     type="button"
                     className="fr-btn fr-btn--sm"
                     onClick={handleValidationClick}
                   >
-                    {ctaPrimaryLabel}
+                    {ctaPrimaryReviewLabel}
                   </button>
                 )}
 
                 <BsdAdditionalActionsButton
                   bsd={bsdDisplay}
                   currentSiret={currentSiret}
-                  onOverview={onOverview!}
-                  onDelete={onDelete}
-                  onDuplicate={onDuplicate}
-                  onUpdate={onUpdate!}
-                  onRevision={onRevision!}
-                  onPdf={onPdf}
-                  onBsdSuite={onBsdSuite}
-                  onAppendix1={onAppendix1}
+                  actionList={{
+                    onOverview,
+                    onDelete,
+                    onDuplicate,
+                    onUpdate,
+                    onRevision,
+                    onPdf,
+                    onAppendix1,
+                    onBsdSuite,
+                    onDeleteReview,
+                  }}
+                  hideReviewCta={isReviewsTab}
                 />
               </div>
             </div>
@@ -254,4 +288,4 @@ function BsdCard({
   );
 }
 
-export default BsdCard;
+export default React.memo(BsdCard);

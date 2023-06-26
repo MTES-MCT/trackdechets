@@ -1,7 +1,7 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
 import getWasteConnection from "../../wastes";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkIsCompanyMember } from "../../../users/permissions";
+import { Permission, checkUserPermissions } from "../../../permissions";
 
 const allWastesResolver: QueryResolvers["allWastes"] = async (
   _,
@@ -11,7 +11,12 @@ const allWastesResolver: QueryResolvers["allWastes"] = async (
   const user = checkIsAuthenticated(context);
 
   for (const siret of args.sirets) {
-    await checkIsCompanyMember({ id: user.id }, { orgId: siret });
+    await checkUserPermissions(
+      user,
+      [siret].filter(Boolean),
+      Permission.RegistryCanRead,
+      `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${siret}`
+    );
   }
 
   return getWasteConnection("ALL", args);

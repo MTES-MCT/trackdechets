@@ -56,16 +56,12 @@ export async function cachedGet<T>(
     return parser.parse(redisValue);
   }
 
-  try {
-    const dbValue = await getter(itemKey);
+  const dbValue = await getter(itemKey);
 
-    // No need to await the set, and it doesn't really matters if it fails
-    setInCache(cacheKey, parser.stringify(dbValue), options).catch(_ => null);
+  // No need to await the set, and it doesn't really matters if it fails
+  setInCache(cacheKey, parser.stringify(dbValue), options).catch(_ => null);
 
-    return dbValue;
-  } catch (err) {
-    throw err;
-  }
+  return dbValue;
 }
 
 export async function setInCache(

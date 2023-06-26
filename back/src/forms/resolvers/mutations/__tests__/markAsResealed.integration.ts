@@ -18,6 +18,7 @@ import {
 } from "../../../../generated/graphql/types";
 import { gql } from "apollo-server-core";
 import * as sirenify from "../../../sirenify";
+import { getFirstTransporterSync } from "../../../database";
 
 const sirenifyMock = jest
   .spyOn(sirenify, "sirenifyResealedFormInput")
@@ -143,8 +144,14 @@ describe("Mutation markAsResealed", () => {
 
     const resealedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
-      include: { forwardedIn: true }
+      include: {
+        forwardedIn: { include: { transporters: true } },
+        transporters: true
+      }
     });
+    const forwardedInTransporter = getFirstTransporterSync(
+      resealedForm.forwardedIn!
+    );
     expect(resealedForm.status).toEqual("RESEALED");
     expect(resealedForm.forwardedIn!.emitterCompanySiret).toEqual(
       collector.siret
@@ -152,9 +159,10 @@ describe("Mutation markAsResealed", () => {
     expect(resealedForm.forwardedIn!.recipientCompanySiret).toEqual(
       destination.siret
     );
-    expect(resealedForm.forwardedIn!.transporterCompanySiret).toEqual(
+    expect(forwardedInTransporter!.transporterCompanySiret).toEqual(
       transporter.siret
     );
+
     expect(resealedForm.forwardedIn!.readableId).toEqual(
       `${form.readableId}-suite`
     );
@@ -288,10 +296,13 @@ describe("Mutation markAsResealed", () => {
 
     const resealedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
-      include: { forwardedIn: true }
+      include: { forwardedIn: { include: { transporters: true } } }
     });
+    const forwardedInTransporter = getFirstTransporterSync(
+      resealedForm.forwardedIn!
+    );
     expect(resealedForm.status).toEqual("RESEALED");
-    expect(resealedForm.forwardedIn!.transporterCompanySiret).toEqual(
+    expect(forwardedInTransporter!.transporterCompanySiret).toEqual(
       transporter.siret
     );
   });

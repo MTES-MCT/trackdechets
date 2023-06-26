@@ -5,21 +5,23 @@ import "react-app-polyfill/stable";
 import "./setupSentry";
 
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+import { createRoot, hydrateRoot } from "react-dom/client";
 
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import * as Sentry from "@sentry/browser";
-import "remixicon/fonts/remixicon.css";
-import "@reach/tooltip/styles.css";
 import "./scss/index.scss";
+
+import { startReactDsfr } from "@codegouvfr/react-dsfr/spa";
+startReactDsfr({ defaultColorScheme: "light" });
 
 try {
   const rootElement = document.getElementById("root");
   if (rootElement && rootElement.hasChildNodes()) {
-    ReactDOM.hydrate(<App />, rootElement);
+    hydrateRoot(rootElement, <App />);
   } else {
-    ReactDOM.render(<App />, rootElement);
+    const root = createRoot(rootElement!);
+    root.render(<App />);
   }
 } catch (error) {
   Sentry.addBreadcrumb({

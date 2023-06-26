@@ -48,6 +48,7 @@ const getInitialState = (f?: Bsdasri | null) => ({
     company: getInitialCompany(),
     customInfo: "",
     recepisse: {
+      isExempted: false,
       number: "",
       department: "",
       validityLimit: startOfYear(addYears(new Date(), 1)).toISOString(),

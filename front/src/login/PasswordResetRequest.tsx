@@ -4,17 +4,10 @@ import {
   Mutation,
   MutationCreatePasswordResetRequestArgs,
 } from "generated/graphql/types";
-import Loader from "common/components/Loaders";
-import {
-  Container,
-  Row,
-  Col,
-  Title,
-  Text,
-  TextInput,
-  Button,
-  Alert,
-} from "@dataesr/react-dsfr";
+import Loader from "Apps/common/Components/Loader/Loaders";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Captcha, useCaptcha } from "common/components/captcha";
 
 import styles from "./Login.module.scss";
@@ -65,19 +58,19 @@ export default function PasswordResetRequest() {
     : error?.message;
 
   const errorAlert = error?.message ? (
-    <Row spacing="mb-2w">
-      <Alert title="Erreur" description={errorMessage} type="error" />
-    </Row>
+    <div className="fr-grid-row fr-mb-2w">
+      <Alert title="Erreur" description={errorMessage} severity="error" />
+    </div>
   ) : null;
 
   const successAlert = data ? (
-    <Row spacing="mb-2w">
+    <div className="fr-grid-row fr-mb-2w">
       <Alert
         title="Succès"
         description="Si l'adresse email existe dans notre système, vous allez recevoir un email (veuillez également vérifier dans votre dossier de courrier indésirable)."
-        type="success"
+        severity="success"
       />
-    </Row>
+    </div>
   ) : null;
 
   if (captchaLoading) {
@@ -85,45 +78,45 @@ export default function PasswordResetRequest() {
   }
   if (captchaError) {
     return (
-      <Row spacing="mb-2w">
+      <div className="fr-grid-row fr-mb-2w">
         <Alert
           title="Erreur"
           description="Une erreur est survenue, veuillez rafraîchir la page"
-          type="error"
+          severity="error"
         />
-      </Row>
+      </div>
     );
   }
 
   return (
     <div className={styles.onboardingWrapper}>
       <form onSubmit={handleSubmit}>
-        <Container
-          className={`pt-5w ${styles.centralContainerLarge}`}
-          spacing="pt-10w"
+        <div
+          className={`fr-container fr-pt-10w ${styles.centralContainerLarge}`}
         >
           {successAlert}
           {errorAlert}
 
-          <Row justifyContent="center" spacing="mb-2w">
-            <Col spacing="m-auto">
-              <Title as="h1" look="h3" spacing="mb-3w">
+          <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
+            <div className="fr-col fr-m-auto">
+              <h1 className="fr-h3 fr-mb-3w">
                 Réinitialisation de votre mot de passe
-              </Title>
-              <Text as="p">
+              </h1>
+              <p className="fr-text--md">
                 Afin de réinitialiser votre mot de passe, merci de saisir votre
                 email. Un lien vous sera transmis à cette adresse email.
-              </Text>
-              <TextInput
-                // @ts-ignore
-                name="email"
+              </p>
+              <Input
                 label="Email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
+                nativeInputProps={{
+                  name: "email",
+                  value: email,
+                  onChange: e => setEmail(e.target.value),
+                  required: true,
+                }}
               />
-            </Col>
-          </Row>
+            </div>
+          </div>
           <Captcha
             setCaptchaInput={setCaptchaInput}
             captchaImg={captchaData?.img}
@@ -131,18 +124,18 @@ export default function PasswordResetRequest() {
             captchaToken={captchaData?.token}
             refetch={refetchCaptcha}
           />
-          <Row justifyContent="right">
-            <Col className={styles.resetFlexCol}>
+          <div className="fr-grid-row fr-grid-row--right">
+            <div className={`fr-col ${styles.resetFlexCol}`}>
               <Button
                 disabled={!email || !captchaInput}
-                size="md"
+                size="medium"
                 onClick={handleSubmit}
               >
                 Réinitialiser
               </Button>
-            </Col>
-          </Row>
-        </Container>
+            </div>
+          </div>
+        </div>
       </form>
     </div>
   );

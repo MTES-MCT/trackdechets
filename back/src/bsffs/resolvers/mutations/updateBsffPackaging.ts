@@ -5,11 +5,11 @@ import {
   expandBsffPackagingFromDB
 } from "../../converter";
 import { getBsffPackagingOrNotFound } from "../../database";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { UserInputError } from "apollo-server-core";
 import { getBsffPackagingRepository } from "../../repository";
 import { checkEditionRules } from "../../edition/bsffPackagingEdition";
 import { sirenifyBsffPackagingInput } from "../../sirenify";
+import { checkCanUpdateBsffPackaging } from "../../permissions";
 
 const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
   _,
@@ -19,18 +19,7 @@ const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
   const user = checkIsAuthenticated(context);
   const existingBsffPackaging = await getBsffPackagingOrNotFound({ id });
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-
-  if (
-    !existingBsffPackaging.bsff.destinationCompanySiret ||
-    !userCompaniesSiretOrVat.includes(
-      existingBsffPackaging.bsff.destinationCompanySiret
-    )
-  ) {
-    throw new UserInputError(
-      "Seul le destinataire du BSFF peut modifier les informations d'acceptation et d'opération sur un contenant"
-    );
-  }
+  await checkCanUpdateBsffPackaging(user, existingBsffPackaging.bsff);
 
   if (input.numero === null || input.numero === "") {
     throw new UserInputError(

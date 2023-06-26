@@ -35,10 +35,15 @@ describe("{ mutation { takeOverSegment } }", () => {
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
-        transporterCompanySiret: firstTransporterCompany.siret,
         status: "SENT",
-        currentTransporterSiret: firstTransporterCompany.siret,
-        nextTransporterSiret: secondTransporterCompany.siret
+        currentTransporterOrgId: firstTransporterCompany.siret,
+        nextTransporterOrgId: secondTransporterCompany.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: firstTransporterCompany.siret,
+            number: 1
+          }
+        }
       }
     });
     // an attached readyToTakeOver segment to be taken over by the second transporter
@@ -53,7 +58,7 @@ describe("{ mutation { takeOverSegment } }", () => {
         transporterReceipt: "R2D2",
         transporterDepartment: "83",
         readyToTakeOver: true,
-        mode: "ROAD"
+        transporterTransportMode: "ROAD"
       }
     });
     const { mutate } = makeClient(secondTransporter);
@@ -68,7 +73,7 @@ describe("{ mutation { takeOverSegment } }", () => {
     );
 
     // segment take over fields are filled
-    const takenOverSegment = await prisma.transportSegment.findUniqueOrThrow({
+    const takenOverSegment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: segment.id }
     });
 
@@ -77,13 +82,13 @@ describe("{ mutation { takeOverSegment } }", () => {
     );
     expect(takenOverSegment.takenOverBy).toBe("transporter suivant");
 
-    // form next and currentTransporterSiret have been updated
+    // form next and currentTransporterOrgId have been updated
     const udpatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
-    expect(udpatedForm.currentTransporterSiret).toBe(
+    expect(udpatedForm.currentTransporterOrgId).toBe(
       secondTransporterCompany.siret
     );
-    expect(udpatedForm.nextTransporterSiret).toBe("");
+    expect(udpatedForm.nextTransporterOrgId).toBe("");
   });
 });

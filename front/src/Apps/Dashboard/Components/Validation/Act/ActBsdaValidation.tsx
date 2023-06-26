@@ -1,11 +1,23 @@
 import React from "react";
 import { SignEmission } from "dashboard/components/BSDList/BSDa/WorkflowAction/SignEmission";
-import { SignOperation } from "dashboard/components/BSDList/BSDa/WorkflowAction/SignOperation";
-import { SignTransport } from "dashboard/components/BSDList/BSDa/WorkflowAction/SignTransport";
-import { SignWork } from "dashboard/components/BSDList/BSDa/WorkflowAction/SignWork";
-import { BsdaStatus } from "generated/graphql/types";
+import SignOperation from "dashboard/components/BSDList/BSDa/WorkflowAction/SignOperation";
+import SignTransport from "dashboard/components/BSDList/BSDa/WorkflowAction/SignTransport";
+import SignWork from "dashboard/components/BSDList/BSDa/WorkflowAction/SignWork";
+import { Bsda, BsdaStatus } from "generated/graphql/types";
+import { isCollection_2710 } from "Apps/Dashboard/dashboardServices";
 
-const ActBsdaValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
+interface ActBsdaValidationProps {
+  bsd: Bsda;
+  currentSiret: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+const ActBsdaValidation = ({
+  bsd,
+  currentSiret,
+  isOpen,
+  onClose,
+}: ActBsdaValidationProps) => {
   const actionButtonAdapterProps = {
     isModalOpenFromParent: isOpen,
     onModalCloseFromParent: onClose,
@@ -13,7 +25,10 @@ const ActBsdaValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
   };
 
   const renderInitialModal = () => {
-    if (currentSiret === bsd.destination?.company?.siret) {
+    if (
+      isCollection_2710(bsd["bsdaType"]) &&
+      currentSiret === bsd.destination?.company?.siret
+    ) {
       return (
         <SignOperation
           siret={currentSiret}
@@ -113,4 +128,4 @@ const ActBsdaValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
   );
 };
 
-export default ActBsdaValidation;
+export default React.memo(ActBsdaValidation);

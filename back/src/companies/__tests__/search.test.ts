@@ -258,6 +258,7 @@ describe("searchCompanies", () => {
     expect(client.search as jest.Mock).toHaveBeenCalledTimes(1);
     expect(client.search as jest.Mock).toHaveBeenCalledWith(
       {
+        _source_excludes: "td_search_companies",
         body: {
           query: {
             bool: {
@@ -265,7 +266,6 @@ describe("searchCompanies", () => {
                 {
                   match: {
                     td_search_companies: {
-                      operator: "or",
                       query: "ACME OF TRACKDECHETS"
                     }
                   }
@@ -274,7 +274,8 @@ describe("searchCompanies", () => {
             }
           }
         },
-        index: "stocketablissement-production"
+        index: "stocketablissement-production",
+        size: 20
       },
       undefined
     );

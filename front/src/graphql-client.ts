@@ -58,7 +58,7 @@ const httpLink = createHttpLink({
   credentials: "include",
 });
 
-export default new ApolloClient({
+const apolloClient = new ApolloClient({
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
@@ -93,3 +93,5 @@ export default new ApolloClient({
   ]),
   name: "trackdechets-front",
 });
+
+export default apolloClient;

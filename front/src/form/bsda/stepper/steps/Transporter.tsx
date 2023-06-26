@@ -4,6 +4,8 @@ import { Bsda, BsdaType } from "generated/graphql/types";
 import React from "react";
 import { Transport } from "./Transport";
 import initialState from "../initial-state";
+import TransporterReceiptEditionSwitch from "form/common/components/company/TransporterReceiptEditionSwitch";
+import { onTransporterSelected } from "form/bsvhu/Transporter";
 
 export function Transporter({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Bsda>();
@@ -18,6 +20,8 @@ export function Transporter({ disabled }) {
       </div>
     );
   }
+
+  const { transporter: initialTransporter } = initialState;
 
   return (
     <>
@@ -35,31 +39,16 @@ export function Transporter({ disabled }) {
         allowForeignCompanies={true}
         isBsdaTransporter={true}
         registeredOnlyCompanies={true}
-        onCompanySelected={transporter => {
-          if (transporter.transporterReceipt) {
-            setFieldValue(
-              "transporter.recepisse.number",
-              transporter.transporterReceipt.receiptNumber
-            );
-            setFieldValue(
-              "transporter.recepisse.validityLimit",
-              transporter.transporterReceipt.validityLimit
-            );
-            setFieldValue(
-              "transporter.recepisse.department",
-              transporter.transporterReceipt.department
-            );
-          } else {
-            setFieldValue("transporter.recepisse.number", "");
-            setFieldValue(
-              "transporter.recepisse.validityLimit",
-              initialState.transporter.recepisse.validityLimit
-            );
-            setFieldValue("transporter.recepisse.department", "");
-          }
-        }}
+        onCompanySelected={onTransporterSelected(
+          initialTransporter,
+          setFieldValue
+        )}
       />
-
+      <TransporterReceiptEditionSwitch
+        transporter={values.transporter!}
+        disabled={disabled}
+        setFieldValue={setFieldValue}
+      />
       <Transport disabled={disabled} />
     </>
   );

@@ -109,7 +109,19 @@ describe("Mutation.deleteForm", () => {
       const owner = await userFactory();
       const form = await formFactory({
         ownerId: owner.id,
-        opt: { [`${role}CompanySiret`]: company.siret, status: "DRAFT" }
+        opt: {
+          status: "DRAFT",
+          ...(role === "transporter"
+            ? {
+                transporters: {
+                  create: {
+                    [`${role}CompanySiret`]: company.siret,
+                    number: 1
+                  }
+                }
+              }
+            : { [`${role}CompanySiret`]: company.siret })
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -131,9 +143,22 @@ describe("Mutation.deleteForm", () => {
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const owner = await userFactory();
+
       const form = await formFactory({
         ownerId: owner.id,
-        opt: { [`${role}CompanySiret`]: company.siret, status: "SEALED" }
+        opt: {
+          status: "SEALED",
+          ...(role === "transporter"
+            ? {
+                transporters: {
+                  create: {
+                    [`${role}CompanySiret`]: company.siret,
+                    number: 1
+                  }
+                }
+              }
+            : { [`${role}CompanySiret`]: company.siret })
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -223,5 +248,29 @@ describe("Mutation.deleteForm", () => {
       where: { id: forwardedIn!.id }
     });
     expect(updatedForwardedInForm.isDeleted).toEqual(true);
+  });
+
+  it("emitter can delete a form he is the only one to have signed", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: company.siret,
+        emittedAt: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
+      variables: { id: form.id }
+    });
+
+    expect(data.deleteForm.id).toBeTruthy();
+
+    const deletedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(deletedForm.isDeleted).toBe(true);
   });
 });

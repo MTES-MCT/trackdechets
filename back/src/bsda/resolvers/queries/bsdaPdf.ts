@@ -3,10 +3,10 @@ import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { createPDFResponse } from "../../../common/pdf";
 import { getBsdaOrNotFound } from "../../database";
-import { checkCanAccessBsdaPdf } from "../../permissions";
 import { buildPdf } from "../../pdf/generator";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { getReadonlyBsdaRepository } from "../../repository";
+import { checkCanReadPdf } from "../../permissions";
 
 export const bsdaPdfDownloadHandler: DownloadHandler<QueryBsdaPdfArgs> = {
   name: "bsdaPdf",
@@ -21,7 +21,7 @@ export default async function bsdaPdf(_, { id }: QueryBsdaPdfArgs, context) {
   const user = checkIsAuthenticated(context);
   const bsda = await getBsdaOrNotFound(id);
 
-  await checkCanAccessBsdaPdf(user, bsda);
+  await checkCanReadPdf(user, bsda);
 
   return getFileDownload({
     handler: bsdaPdfDownloadHandler.name,

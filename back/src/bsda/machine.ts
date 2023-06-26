@@ -1,7 +1,7 @@
 import { Bsda, BsdaType, BsdaStatus } from "@prisma/client";
 import { createMachine } from "xstate";
 import { BsdaSignatureType } from "../generated/graphql/types";
-import { PARTIAL_OPERATIONS } from "./validation";
+import { PARTIAL_OPERATIONS } from "./validation/constants";
 
 export enum EventType {
   ProducerSignature,
@@ -18,6 +18,9 @@ export const machine = createMachine<Record<string, never>, Event>(
   {
     id: "bsda-workflow",
     initial: BsdaStatus.INITIAL,
+    // This flag is an opt into some fixed behaviors that will be the default in v5
+    // cf. https://xstate.js.org/docs/guides/actions.html
+    predictableActionArguments: true,
     states: {
       [BsdaStatus.CANCELED]: { type: "final" },
       [BsdaStatus.INITIAL]: {

@@ -1,21 +1,14 @@
 import React, { useState, createRef, useEffect } from "react";
 import * as queryString from "query-string";
 import { useLocation, Redirect } from "react-router-dom";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { Captcha, useCaptcha } from "common/components/captcha";
 
-import {
-  Container,
-  Row,
-  Col,
-  Title,
-  Text,
-  TextInput,
-  Button,
-  Link,
-  Alert,
-} from "@dataesr/react-dsfr";
-import { Loader } from "common/components";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { PasswordInput } from "@codegouvfr/react-dsfr/blocks/PasswordInput";
+import { Loader } from "Apps/common/Components";
 
 import styles from "./Login.module.scss";
 
@@ -53,7 +46,6 @@ export default function Login() {
     document.title = `Se connecter | ${document.title}`;
   }, []);
 
-  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [captchaInput, setCaptchaInput] = useState("");
@@ -97,23 +89,23 @@ export default function Login() {
   const showCaptcha = displayCaptcha(errorCode);
 
   const alert = errorCode ? (
-    <Row spacing="mb-2w">
+    <div className="fr-grid-row fr-mb-2w">
       <Alert
         title="Erreur"
         description={getErrorMessage(errorCode)}
-        type="error"
+        severity="error"
       />
-    </Row>
+    </div>
   ) : null;
 
   const createdAlert = createdWithSuccess ? (
-    <Row spacing="mb-2w">
+    <div className="fr-grid-row fr-mb-2w">
       <Alert
         title="Votre compte est créé !"
         description="Vous pouvez maintenant vous connecter puis créer ou rejoindre un établissement."
-        type="success"
+        severity="success"
       />
-    </Row>
+    </div>
   ) : null;
 
   return (
@@ -124,45 +116,34 @@ export default function Login() {
         method="post"
         name="login"
       >
-        <Container className={styles.centralContainer} spacing="pt-10w">
+        <div className={`fr-container fr-pt-10w ${styles.centralContainer}`}>
           {createdAlert}
           {alert}
-          <Row justifyContent="center" spacing="mb-2w">
-            <Col spacing="m-auto">
-              <Title as="h1" look="h3" spacing="mb-3w">
-                Se connecter
-              </Title>
+          <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
+            <div className="fr-col fr-m-auto">
+              <h1 className="fr-h3 fr-mb-3w">Se connecter</h1>
 
-              <TextInput
-                // @ts-ignore
-                defaultValue={username}
-                name="email"
-                required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+              <Input
+                nativeInputProps={{
+                  value: email || username,
+                  name: "email",
+                  required: true,
+                  onChange: e => setEmail(e.target.value),
+                }}
                 label="Email"
               />
-              <TextInput
-                type={showPassword ? "text" : "password"}
-                // @ts-ignore
-                name="password"
-                required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
+              <PasswordInput
+                nativeInputProps={{
+                  name: "password",
+                  value: password,
+                  required: true,
+                  onChange: e => setPassword(e.target.value),
+                }}
                 label="Mot de passe"
               />
               {returnTo && (
                 <input type="hidden" name="returnTo" value={returnTo} />
               )}
-              <Button
-                tertiary
-                hasBorder={false}
-                icon={showPassword ? "ri-eye-off-line" : "ri-eye-line"}
-                iconPosition="left"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? "Masquer" : "Afficher"} le mot de passe
-              </Button>
               {!!showCaptcha && !!captchaData?.token && !!captchaData?.img && (
                 <>
                   <input
@@ -181,39 +162,39 @@ export default function Login() {
                   />
                 </>
               )}
-            </Col>
-          </Row>
-          <Row justifyContent="right">
-            <Col className={styles.resetFlexCol}>
-              <Button size="md" submit={true}>
+            </div>
+          </div>
+          <div className="fr-grid-row fr-grid-row--right">
+            <div className={`fr-col ${styles.resetFlexCol}`}>
+              <Button size="medium" nativeButtonProps={{ type: "submit" }}>
                 Se connecter
               </Button>
-            </Col>
-          </Row>
-          <Row spacing="pt-3w">
-            <Col>
-              <Text as="p">
+            </div>
+          </div>
+          <div className="fr-grid-row fr-pt-3w">
+            <div className="fr-col">
+              <p className="fr-text--md">
                 Vous n'avez pas encore de compte ?{" "}
-                <Link href={routes.signup.index} isSimple>
+                <a href={routes.signup.index} className="fr-link">
                   Inscrivez-vous
-                </Link>
-              </Text>
-              <Text as="p">
+                </a>
+              </p>
+              <p className="fr-text--md">
                 Vous n'avez pas reçu d'email d'activation suite à votre
                 inscription ?{" "}
-                <Link href={routes.resendActivationEmail} isSimple>
+                <a href={routes.resendActivationEmail} className="fr-link">
                   Renvoyer l'email d'activation
-                </Link>
-              </Text>
-              <Text as="p">
+                </a>
+              </p>
+              <p className="fr-text--md">
                 Vous avez perdu votre mot de passe ?{" "}
-                <Link href={routes.passwordResetRequest} isSimple>
+                <a href={routes.passwordResetRequest} className="fr-link">
                   Réinitialisez-le
-                </Link>
-              </Text>
-            </Col>
-          </Row>
-        </Container>
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
       </form>
     </div>
   );

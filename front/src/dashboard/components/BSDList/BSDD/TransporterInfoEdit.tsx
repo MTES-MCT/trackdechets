@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 import { Form as FormModel } from "generated/graphql/types";
 import { isBsddTransporterFieldEditable } from "generated/constants/formHelpers";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { capitalize } from "common/helper";
 import { IconPaperWrite } from "common/components/Icons";
 import TdModal from "common/components/Modal";

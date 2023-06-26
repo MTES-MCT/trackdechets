@@ -7,7 +7,7 @@ import {
   IconWarehousePackage,
   IconWaterDam,
 } from "common/components/Icons";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSDa/BSDaActions/useDownloadPdf";
 import { useDuplicate } from "dashboard/components/BSDList/BSDa/BSDaActions/useDuplicate";
 import { statusLabels, transportModeLabels } from "dashboard/constants";
@@ -15,6 +15,7 @@ import styles from "dashboard/detail/common/BSDDetailContent.module.scss";
 import {
   DateRow,
   DetailRow,
+  TransporterReceiptDetails,
   YesNoRow,
 } from "dashboard/detail/common/Components";
 import { getVerboseAcceptationStatus } from "dashboard/detail/common/utils";
@@ -160,20 +161,7 @@ const Transporter = ({ form }: { form: Bsda }) => {
       <div className={styles.detailGrid}>
         <Company label="Transporteur" company={transporter?.company} />
       </div>
-      <div className={styles.detailGrid}>
-        <DetailRow
-          value={transporter?.recepisse?.number}
-          label="Numéro de récépissé"
-        />
-        <DetailRow
-          value={transporter?.recepisse?.department}
-          label="Département"
-        />
-        <DateRow
-          value={transporter?.recepisse?.validityLimit}
-          label="Date de validité"
-        />
-      </div>
+      <TransporterReceiptDetails transporter={transporter} />
       <div className={`${styles.detailGrid} `}>
         <DateRow
           value={transporter?.transport?.takenOverAt}

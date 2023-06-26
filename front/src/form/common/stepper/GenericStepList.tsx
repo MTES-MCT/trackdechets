@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { useHistory } from "react-router-dom";
 import { Stepper, StepperItem } from "common/components";
-import { InlineError } from "common/components/Error";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import "./GenericStepList.scss";
 import { IStepContainerProps } from "./Step";
 

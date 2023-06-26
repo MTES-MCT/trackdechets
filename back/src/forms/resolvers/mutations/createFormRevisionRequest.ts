@@ -3,7 +3,8 @@ import {
   Form,
   Prisma,
   RevisionRequestStatus,
-  Status
+  Status,
+  User
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
@@ -98,9 +99,8 @@ export default async function createFormRevisionRequest(
   const existingBsdd = await getFormOrFormNotFound({ id: formId });
 
   const formRepository = getFormRepository(user);
-  const forwardedIn = await formRepository.findForwardedInById(formId);
 
-  await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd, forwardedIn);
+  await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd);
 
   const flatContent = await getFlatContent(content, existingBsdd);
 
@@ -140,6 +140,7 @@ async function getAuthoringCompany(
     ![
       bsdd.emitterCompanySiret,
       bsdd.recipientCompanySiret,
+      bsdd.ecoOrganismeSiret,
       forwardedIn?.recipientCompanySiret
     ].includes(authoringCompanySiret)
   ) {
@@ -163,11 +164,10 @@ async function getAuthoringCompany(
 }
 
 async function checkIfUserCanRequestRevisionOnBsdd(
-  user: Express.User,
-  bsdd: Form,
-  forwardedIn?: Form | null
+  user: User,
+  bsdd: Form
 ): Promise<void> {
-  await checkCanRequestRevision(user, bsdd, forwardedIn);
+  await checkCanRequestRevision(user, bsdd);
   if (bsdd.emitterIsPrivateIndividual || bsdd.emitterIsForeignShip) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau car l'émetteur est un particulier ou un navire étranger."
@@ -197,7 +197,7 @@ async function checkIfUserCanRequestRevisionOnBsdd(
   }
 
   const unsettledRevisionRequestsOnBsdd = await getFormRepository(
-    user
+    user as Express.User
   ).countRevisionRequests({
     bsddId: bsdd.id,
     status: RevisionRequestStatus.PENDING
@@ -266,8 +266,16 @@ async function getApproversSirets(
   authoringCompanySiret: string,
   user: Express.User
 ) {
-  const approvers = [
+  // do not include emitter and ecoOrg sirets if authoring company is one of them
+  const authoringCompanyIsEmitterOrEcoOrg = [
     bsdd.emitterCompanySiret,
+    bsdd.ecoOrganismeSiret
+  ].includes(authoringCompanySiret);
+
+  const approvers = [
+    ...(authoringCompanyIsEmitterOrEcoOrg
+      ? []
+      : [bsdd.emitterCompanySiret, bsdd.ecoOrganismeSiret]),
     bsdd.traderCompanySiret,
     bsdd.recipientCompanySiret
   ].filter(Boolean);
@@ -316,7 +324,7 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
     wasteDetailsPop: yup.boolean().nullable(),
     wasteDetailsPackagingInfos: yup
       .array()
-      .of(packagingInfoFn(false))
+      .of(packagingInfoFn({ isDraft: false }))
       .transform(v => (v === null ? Prisma.JsonNull : v)),
     quantityReceived: yup.number().min(0).nullable(),
     processingOperationDone: yup

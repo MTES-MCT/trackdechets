@@ -2,28 +2,27 @@ import { useMutation, gql } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import { Field, Form as FormikForm, Formik } from "formik";
 import React, { useState } from "react";
-import * as yup from "yup";
-import { boolean, date, object, string, StringSchema } from "yup";
-import { companySchema } from "common/validation/schema";
 import {
   Mutation,
   MutationPrepareSegmentArgs,
+  NextSegmentInfoInput,
   TransportMode,
 } from "generated/graphql/types";
-import { segmentFragment } from "common/fragments";
+import { segmentFragment } from "Apps/common/queries/fragments";
 import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { IconBusTransfer } from "common/components/Icons";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { WorkflowActionProps } from "../WorkflowAction";
 import TdSwitch from "common/components/Switch";
-import { GET_BSDS, GET_DETAIL_FORM } from "common/queries";
+import { GET_BSDS, GET_DETAIL_FORM } from "Apps/common/queries";
+import { FieldTransportModeSelect, RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
 import {
-  Loader,
-  FieldTransportModeSelect,
-  RedErrorMessage,
-} from "common/components";
+  onCompanySelected,
+  validationSchema,
+} from "dashboard/detail/bsdd/EditSegment";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
 
 const PREPARE_SEGMENT = gql`
@@ -38,39 +37,6 @@ const PREPARE_SEGMENT = gql`
   }
   ${segmentFragment}
 `;
-
-/**
- * TEMP Transporter schema, to be merged with "form/bsdd/utils/schema"
- * when TransportSegment supports foreign companies
- */
-export const transporterSchema = object().shape({
-  isExemptedOfReceipt: boolean().nullable(true),
-  receipt: string().when(
-    "isExemptedOfReceipt",
-    (isExemptedOfReceipt: boolean, schema: StringSchema) =>
-      isExemptedOfReceipt
-        ? schema.nullable(true)
-        : schema
-            .ensure()
-            .required(
-              "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le numéro est donc est obligatoire"
-            )
-  ),
-  department: string().when(
-    "isExemptedOfReceipt",
-    (isExemptedOfReceipt: boolean, schema: StringSchema) =>
-      isExemptedOfReceipt
-        ? schema.nullable(true)
-        : schema.required(
-            "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le département est donc est obligatoire"
-          )
-  ),
-  validityLimit: date().nullable(true),
-  numberPlate: string().nullable(true),
-  company: companySchema,
-});
-
-const validationSchema = yup.object({ transporter: transporterSchema });
 
 export function PrepareSegment({ form, siret }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -91,7 +57,7 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
     },
   });
 
-  const initialValues = {
+  const initialValues: NextSegmentInfoInput = {
     transporter: {
       company: {
         siret: "",
@@ -103,10 +69,10 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
         vatNumber: "",
       },
       isExemptedOfReceipt: false,
-      receipt: "",
-      department: "",
-      validityLimit: new Date().toISOString(),
-      numberPlate: "",
+      receipt: null,
+      department: null,
+      validityLimit: null,
+      numberPlate: null,
     },
 
     mode: "ROAD" as TransportMode,
@@ -132,7 +98,7 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
             validationSchema={validationSchema}
             onSubmit={values => {
               const { transporter, ...rst } = values;
-              const { validityLimit } = transporter;
+              const { validityLimit } = transporter!;
               // prevent empty strings to be sent for validityLimit
               prepareSegment({
                 variables: {
@@ -178,32 +144,15 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
                   />
                   <RedErrorMessage name="transporter.numberPlate" />
                 </div>
-                <h4 className="form__section-heading">Siret</h4>
+                <h4 className="form__section-heading">
+                  Siret ou numéro de TVA pour les transporteurs étrangers
+                </h4>
                 <CompanySelector
                   name="transporter.company"
-                  allowForeignCompanies={false}
+                  allowForeignCompanies={true}
                   registeredOnlyCompanies={true}
                   initialAutoSelectFirstCompany={false}
-                  onCompanySelected={transporter => {
-                    if (transporter.transporterReceipt) {
-                      setFieldValue(
-                        "transporter.receipt",
-                        transporter.transporterReceipt.receiptNumber
-                      );
-                      setFieldValue(
-                        "transporter.validityLimit",
-                        transporter.transporterReceipt.validityLimit
-                      );
-                      setFieldValue(
-                        "transporter.department",
-                        transporter.transporterReceipt.department
-                      );
-                    } else {
-                      setFieldValue("transporter.receipt", "");
-                      setFieldValue("transporter.validityLimit", null);
-                      setFieldValue("transporter.department", "");
-                    }
-                  }}
+                  onCompanySelected={onCompanySelected(setFieldValue)}
                 />
                 {!isForeignVat(values.transporter?.company?.vatNumber!!) && (
                   <>
@@ -214,7 +163,7 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
 
                     <div className="form__row">
                       <TdSwitch
-                        checked={!!values.transporter.isExemptedOfReceipt}
+                        checked={!!values.transporter?.isExemptedOfReceipt}
                         onChange={checked =>
                           setFieldValue(
                             "transporter.isExemptedOfReceipt",

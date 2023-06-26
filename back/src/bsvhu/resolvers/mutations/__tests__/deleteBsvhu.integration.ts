@@ -16,7 +16,7 @@ mutation DeleteVhu($id: ID!){
   }
 }
 `;
-describe("Mutation.deleteBsdasri", () => {
+describe("Mutation.deleteBsvhu", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { formatDate } from "common/datetime";
 import {
   Transporter,
@@ -8,8 +8,14 @@ import {
   BsdaTransporterInput,
   BsvhuTransporterInput,
   TransporterInput,
+  BsdaTransporter,
+  BsffTransporter,
+  BsdasriTransporter,
+  BsvhuTransporter,
 } from "generated/graphql/types";
-import { Alert, Row } from "@dataesr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
+import { BsffFormTransporterInput } from "form/bsff/utils/initial-state";
 
 interface UniversalRecepisse {
   /** Numéro de récépissé */
@@ -26,13 +32,43 @@ export type NotFormTransporter =
   | BsvhuTransporterInput
   | BsffTransporterInput;
 
-type UniversalTransporter = TransporterInput | NotFormTransporter;
+type UniversalTransporter =
+  | TransporterInput
+  | NotFormTransporter
+  | BsffTransporter;
 
 export default function TransporterReceipt({
   transporter,
 }: {
   transporter: UniversalTransporter;
 }) {
+  /**
+   * Universal Receipt exemption detection
+   */
+  const isExemptedOfReceipt: boolean = useMemo(() => {
+    if (!!(transporter as Transporter)?.isExemptedOfReceipt) {
+      return !!(transporter as Transporter).isExemptedOfReceipt;
+    } else if (!!(transporter as BsdaTransporter)?.recepisse?.isExempted) {
+      return !!(transporter as BsdaTransporter)?.recepisse?.isExempted;
+    } else if (!!(transporter as BsvhuTransporter)?.recepisse?.isExempted) {
+      return !!(transporter as BsvhuTransporter)?.recepisse?.isExempted;
+    } else if (!!(transporter as BsdasriTransporter)?.recepisse?.isExempted) {
+      return !!(transporter as BsdasriTransporter)?.recepisse?.isExempted;
+    } else if (
+      !!(transporter as BsffFormTransporterInput)?.isExemptedOfRecepisse
+    ) {
+      return !!(transporter as BsffFormTransporterInput).isExemptedOfRecepisse;
+    } else if (
+      !!(transporter as BsffTransporter)?.company?.orgId &&
+      (transporter as BsffTransporter)?.recepisse === null
+    ) {
+      // specific for the Bsff transporter signature dialog
+      return true;
+    } else {
+      return false;
+    }
+  }, [transporter]);
+
   const recepisse: UniversalRecepisse = {
     number:
       (transporter as Transporter).receipt ??
@@ -47,11 +83,12 @@ export default function TransporterReceipt({
       (transporter as NotFormTransporter)?.recepisse?.validityLimit ??
       "",
   };
-  return (
-    <Row spacing="mb-2w mt-2w">
+  return !isExemptedOfReceipt &&
+    !isForeignVat(transporter.company?.vatNumber!!) ? (
+    <div className="fr-grid-row fr-mb-2w fr-mt-2w">
       <Alert
         title={"Récépissé de déclaration de transport de déchets"}
-        type={recepisse.number?.length ? "info" : "error"}
+        severity={recepisse.number?.length ? "info" : "error"}
         description={
           <>
             {recepisse.number ? (
@@ -72,6 +109,8 @@ export default function TransporterReceipt({
           </>
         }
       />
-    </Row>
+    </div>
+  ) : (
+    <></>
   );
 }

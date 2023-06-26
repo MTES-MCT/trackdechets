@@ -3,7 +3,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
 
 export type UpdateManyBsffFn = (
@@ -35,7 +35,7 @@ export function buildUpdateManyBsff(deps: RepositoryFnDeps): UpdateManyBsffFn {
         }
       });
 
-      prisma.addAfterCommitCallback(() => enqueueBsdToIndex(id));
+      prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(id));
     }
 
     return batchPayload;

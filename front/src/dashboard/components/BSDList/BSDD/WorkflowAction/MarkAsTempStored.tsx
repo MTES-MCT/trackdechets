@@ -3,10 +3,11 @@ import { Query, QueryFormArgs } from "generated/graphql/types";
 import { useLazyQuery } from "@apollo/client";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton, Loader } from "common/components";
+import { ActionButton } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { IconWarehouseStorage } from "common/components/Icons";
 import ReceivedInfo from "./ReceivedInfo";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { GET_FORM } from "form/bsdd/utils/queries";
 
 export default function MarkAsTempStored({ form }: WorkflowActionProps) {
@@ -57,6 +58,8 @@ export default function MarkAsTempStored({ form }: WorkflowActionProps) {
               />
             );
           }
+
+          return <></>;
         }}
       />
     </div>

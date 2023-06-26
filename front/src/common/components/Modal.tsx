@@ -1,81 +1,136 @@
-import { DialogOverlay, DialogContent } from "@reach/dialog";
-import { IconDelete1 } from "./Icons";
-import "@reach/dialog/styles.css";
+import React from "react";
+import { Overlay, useModalOverlay, useOverlayTrigger } from "react-aria";
+import { useOverlayTriggerState, OverlayTriggerState } from "react-stately";
 import styles from "./Modal.module.scss";
-import React, { useState } from "react";
+import { IconDelete1 } from "./Icons";
 import classNames from "classnames";
 
-type TdModalProps = {
-  onClose: () => any;
+type ModalProps = {
+  state: OverlayTriggerState;
   children: React.ReactNode;
-  isOpen: boolean;
   padding?: boolean;
   ariaLabel: string;
   wide?: boolean;
+  isDismissable: boolean;
+  isKeyboardDismissDisabled: boolean;
 };
 
-export default function TdModal({
-  onClose,
-  isOpen,
-  ariaLabel,
+export function Modal({
+  state,
   children,
+  ariaLabel,
   padding = true,
   wide = false,
-}: TdModalProps) {
+  ...props
+}: ModalProps) {
+  let ref = React.useRef(null);
+  let { modalProps, underlayProps } = useModalOverlay(props, state, ref);
+
   return (
-    <DialogOverlay
-      isOpen={isOpen}
-      onDismiss={onClose}
-      className={classNames("fr-raw-link fr-raw-list", styles.tdModalOverlay)}
-    >
-      <DialogContent
-        aria-label={ariaLabel}
-        className={classNames(styles.tdModal, {
-          [styles.tdModalWide]: wide,
-          [styles.tdModalPadding]: padding,
-        })}
-      >
-        <button
-          type="button"
-          className={styles.ModalCloseButton}
-          onClick={onClose}
-          aria-label="Close"
+    <Overlay>
+      <div className={styles.tdModalOverlay} {...underlayProps}>
+        <div
+          className={classNames(styles.tdModal, {
+            [styles.tdModalWide]: wide,
+            [styles.tdModalPadding]: padding,
+          })}
+          aria-label={ariaLabel}
+          {...modalProps}
+          ref={ref}
         >
-          <IconDelete1 aria-hidden />
-        </button>
-        {children}
-      </DialogContent>
-    </DialogOverlay>
+          <button
+            type="button"
+            className={styles.ModalCloseButton}
+            onClick={state.close}
+            aria-label="Close"
+          >
+            <IconDelete1 aria-hidden />
+          </button>
+          {children}
+        </div>
+      </div>
+    </Overlay>
   );
 }
 
-type ModalTriggerProps = {
-  trigger: (open: () => void) => React.ReactNode;
-  modalContent: (close: () => void) => React.ReactNode;
+type TdModalProps = {
+  children: React.ReactNode;
+  isOpen: boolean;
+  onClose: () => void;
 };
 
-/**
- * Represents a component, usually a button used to trigger
- * a modal and its content
- */
+export default function TdModal({
+  children,
+  isOpen,
+  onClose,
+  padding,
+  wide,
+  ariaLabel,
+  ...props
+}: Pick<ModalProps, "padding" | "ariaLabel" | "wide"> & TdModalProps) {
+  let state = useOverlayTriggerState({
+    isOpen: isOpen,
+    onOpenChange: isOpen => {
+      if (!isOpen) onClose();
+    },
+    ...props,
+  });
+
+  return (
+    <>
+      {state.isOpen && (
+        <Modal
+          ariaLabel={ariaLabel}
+          wide={wide}
+          padding={padding}
+          isDismissable
+          isKeyboardDismissDisabled
+          {...props}
+          state={state}
+        >
+          {children}
+        </Modal>
+      )}
+    </>
+  );
+}
+
+type TdModalTriggerProps = {
+  trigger: (open: () => void) => React.ReactElement;
+  modalContent: (close: () => void) => React.ReactElement;
+};
+
 export function TdModalTrigger({
   trigger,
   modalContent,
-  ...modalProps
-}: Pick<TdModalProps, "padding" | "ariaLabel" | "wide"> & ModalTriggerProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  padding,
+  wide,
+  ariaLabel,
+  ...props
+}: Pick<ModalProps, "padding" | "ariaLabel" | "wide"> & TdModalTriggerProps) {
+  let state = useOverlayTriggerState(props);
+  let { triggerProps, overlayProps } = useOverlayTrigger(
+    { type: "dialog" },
+    state
+  );
 
-  const open = () => setIsOpen(true);
-  const close = () => setIsOpen(false);
   return (
-    <div>
-      {trigger(open)}
-      <TdModal {...modalProps} isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <>
-          <h2 className="td-modal-title">{modalProps.ariaLabel}</h2>
-          {modalContent(close)}
-        </>
-      </TdModal>
-    </div>
+    <>
+      {React.cloneElement(trigger(state.open), triggerProps)}
+      {state.isOpen && (
+        <Modal
+          ariaLabel={ariaLabel}
+          wide={wide}
+          padding={padding}
+          isDismissable
+          isKeyboardDismissDisabled
+          {...props}
+          state={state}
+        >
+          <h2 className="td-modal-title">{ariaLabel}</h2>
+          {React.cloneElement(modalContent(state.close), overlayProps)}
+        </Modal>
+      )}
+    </>
   );
 }

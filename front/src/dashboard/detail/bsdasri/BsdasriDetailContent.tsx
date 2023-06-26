@@ -9,7 +9,7 @@ import {
   BsdasriPackaging,
   BsdasriType,
 } from "generated/graphql/types";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDownloadPdf";
 
 import {
@@ -18,6 +18,7 @@ import {
   IconRenewableEnergyEarth,
   IconBSDasri,
   IconDuplicateFile,
+  IconPdf,
 } from "common/components/Icons";
 import { InitialDasris } from "./InitialDasris";
 import QRCodeIcon from "react-qr-code";
@@ -28,7 +29,11 @@ import {
   getVerboseWeightType,
   getVerboseAcceptationStatus,
 } from "dashboard/detail/common/utils";
-import { DateRow, DetailRow } from "dashboard/detail/common/Components";
+import {
+  DateRow,
+  DetailRow,
+  TransporterReceiptDetails,
+} from "dashboard/detail/common/Components";
 
 import classNames from "classnames";
 
@@ -137,20 +142,7 @@ const Transporter = ({ form }: { form: Bsdasri }) => {
       <div className={styles.detailGrid}>
         <Company label="Transporteur" company={transporter?.company} />
       </div>
-      <div className={styles.detailGrid}>
-        <DetailRow
-          value={transporter?.recepisse?.number}
-          label="Numéro de récépissé"
-        />
-        <DetailRow
-          value={transporter?.recepisse?.department}
-          label="Département"
-        />
-        <DateRow
-          value={transporter?.recepisse?.validityLimit}
-          label="Date de validité"
-        />
-      </div>
+      <TransporterReceiptDetails transporter={transporter} />
       <div className={styles.detailGrid}>
         <DetailRow
           value={getTransportModeLabel(transporter?.transport?.mode)}
@@ -539,11 +531,13 @@ const AssociatedTo = ({ formId, label }: { formId: string; label: string }) => {
     <DetailRow
       value={
         <span>
-          {formId} (
-          <button className="link" onClick={() => downloadPdf()}>
-            PDF
+          {formId}
+          <button className="link tw-flex" onClick={() => downloadPdf()}>
+            <IconPdf size="18px" color="blueLight" />
+            <span className={classNames(styles.downloadLink, "tw-ml-1")}>
+              Pdf
+            </span>
           </button>
-          )
         </span>
       }
       label={`${label} bordereau n°`}

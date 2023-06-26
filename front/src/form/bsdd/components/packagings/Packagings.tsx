@@ -4,6 +4,7 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { Field, FieldArray, FieldProps, useFormikContext } from "formik";
 import {
+  EmitterType,
   PackagingInfo,
   Packagings as PackagingsEnum,
 } from "generated/graphql/types";
@@ -20,7 +21,9 @@ export default function Packagings({
   id,
   ...props
 }: FieldProps<PackagingInfo[] | null> & InputHTMLAttributes<HTMLInputElement>) {
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue, values } = useFormikContext<{
+    emitter: { type: EmitterType | undefined } | undefined;
+  }>();
   const isAddButtonDisabled = useMemo(() => {
     if (value == null || value.length === 0) {
       return false;
@@ -30,6 +33,13 @@ export default function Packagings({
       [PackagingsEnum.Citerne, PackagingsEnum.Benne].includes(p.type)
     );
   }, [value]);
+
+  const packagings = Object.entries(PACKAGINGS_NAMES).filter(([key]) => {
+    return (
+      values.emitter?.type !== EmitterType.Appendix1Producer ||
+      key !== PackagingsEnum.Pipeline
+    );
+  }) as Array<[PackagingsEnum, string]>;
 
   if (!value) {
     return null;
@@ -72,29 +82,27 @@ export default function Packagings({
                               });
                             }}
                           >
-                            {(
-                              Object.entries(PACKAGINGS_NAMES) as Array<
-                                [keyof typeof PACKAGINGS_NAMES, string]
-                              >
-                            ).map(([optionValue, optionLabel]) => (
+                            {packagings.map(([optionValue, optionLabel]) => (
                               <option
                                 key={optionValue}
                                 value={optionValue}
                                 disabled={
-                                  value?.length > 1 &&
-                                  ([
-                                    PackagingsEnum.Citerne,
-                                    PackagingsEnum.Benne,
-                                  ].includes(optionValue) ||
-                                    value.some(p =>
-                                      [
-                                        PackagingsEnum.Citerne,
-                                        PackagingsEnum.Benne,
-                                        ...(optionValue !== PackagingsEnum.Autre
-                                          ? [optionValue]
-                                          : []),
-                                      ].includes(p.type)
-                                    ))
+                                  props.disabled ||
+                                  (value?.length > 1 &&
+                                    ([
+                                      PackagingsEnum.Citerne,
+                                      PackagingsEnum.Benne,
+                                    ].includes(optionValue) ||
+                                      value.some(p =>
+                                        [
+                                          PackagingsEnum.Citerne,
+                                          PackagingsEnum.Benne,
+                                          ...(optionValue !==
+                                          PackagingsEnum.Autre
+                                            ? [optionValue]
+                                            : []),
+                                        ].includes(p.type)
+                                      )))
                                 }
                               >
                                 {optionLabel}
@@ -111,34 +119,38 @@ export default function Packagings({
                               className="td-input"
                               name={`${name}.${idx}.other`}
                               placeholder="..."
+                              disabled={props.disabled}
                             />
                           </label>
                         )}
                       </div>
                       <div className="tw-w-1/3 tw-px-2">
-                        <Field
-                          label="Colis"
-                          component={NumberInput}
-                          className="td-input"
-                          name={`${name}.${idx}.quantity`}
-                          placeholder="Nombre de colis"
-                          min="1"
-                          max={
-                            [
-                              PackagingsEnum.Citerne,
-                              PackagingsEnum.Benne,
-                            ].includes(p.type)
-                              ? 2
-                              : undefined
-                          }
-                        />
+                        {p.type !== "PIPELINE" && (
+                          <Field
+                            label="Colis"
+                            disabled={props.disabled}
+                            component={NumberInput}
+                            className="td-input"
+                            name={`${name}.${idx}.quantity`}
+                            placeholder="Nombre de colis"
+                            min="1"
+                            max={
+                              [
+                                PackagingsEnum.Citerne,
+                                PackagingsEnum.Benne,
+                              ].includes(p.type)
+                                ? 2
+                                : undefined
+                            }
+                          />
+                        )}
                       </div>
                     </div>
                     <div
                       className="tw-px-2"
                       onClick={() => arrayHelpers.remove(idx)}
                     >
-                      <button type="button">
+                      <button type="button" disabled={props.disabled}>
                         <IconClose />
                       </button>
                     </div>
@@ -152,7 +164,7 @@ export default function Packagings({
             <button
               type="button"
               className="btn btn--outline-primary"
-              disabled={isAddButtonDisabled}
+              disabled={props.disabled || isAddButtonDisabled}
               onClick={() =>
                 arrayHelpers.push({
                   type: PackagingsEnum.Autre,

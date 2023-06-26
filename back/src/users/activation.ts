@@ -1,19 +1,30 @@
 import prisma from "../prisma";
 import { getUIBaseURL } from "../utils";
 
+/**
+ *
+ * Activate a recently signed-up user
+ *
+ * - User receives an emailed link upon signup
+ * - A click on the aforementionned link open a frontend confirm form pointing to this POST handler
+ * - The handler checks userActivation exists, then activates matching user and deletes hash
+ * - redirects to /login?signup=complete if successful
+ *
+ * In case of error, redirects to user activation frontend page with error code in querystring
+ */
 export const userActivationHandler = async (req, res) => {
-  const { hash } = req.query;
+  const UI_BASE_URL = getUIBaseURL();
+  const errorRedirect = `${UI_BASE_URL}/user-activation?errorCode=INVALID_OR_MISSING_HASH`;
+  const { hash } = req.body;
   if (hash == null) {
-    res.status(500).send("Hash manquant.");
-    return;
+    return res.redirect(errorRedirect);
   }
 
   const user = await prisma.userActivationHash
     .findUnique({ where: { hash } })
     .user();
   if (user == null) {
-    res.status(500).send("Hash invalide.");
-    return;
+    return res.redirect(errorRedirect);
   }
 
   await prisma.user.update({
@@ -23,6 +34,5 @@ export const userActivationHandler = async (req, res) => {
 
   await prisma.userActivationHash.delete({ where: { hash } });
 
-  const UI_BASE_URL = getUIBaseURL();
   return res.redirect(`${UI_BASE_URL}/login?signup=complete`);
 };

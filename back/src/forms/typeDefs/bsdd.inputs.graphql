@@ -575,7 +575,7 @@ input WasteDetailsInput {
   """
   code: String
 
-  "Dénomination usuelle"
+  "Dénomination usuelle. Obligatoire"
   name: String
 
   "Code ONU. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire."
@@ -630,6 +630,9 @@ input WasteDetailsInput {
 
   "Identifiant(s) du ou des terrains lorsque les terres ont été extraites d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6"
   landIdentifiers: [String!]
+
+  "Numéro d'échantillon pour les huiles noires. Ne concerne que les bordereaux parmi les codes suivants: 13 02 04*, 13 02 05*, 13 02 06*, 13 02 07*, 13 02 08*"
+  sampleNumber: String
 }
 
 """
@@ -924,5 +927,8 @@ input FormRevisionRequestTemporaryStorerInput {
 }
 
 input FormRevisionRequestWhere {
+  "Permet de filtrer sur un statut de demande de révision"
   status: RevisionRequestStatus
+  "Permet de filtrer sur un numéro de bordereau"
+  bsddId: StringFilter
 }

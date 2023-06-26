@@ -9,7 +9,7 @@ import MarkAsResealed from "./MarkAsResealed";
 import MarkAsTempStorerAccepted from "./MarkAsTempStorerAccepted";
 import SignEmissionForm from "./SignEmissionForm";
 import SignTransportForm from "./SignTransportForm";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { useRouteMatch } from "react-router-dom";
 
 import {
@@ -25,6 +25,7 @@ export interface WorkflowActionProps {
 }
 
 export function WorkflowAction(props: WorkflowActionProps) {
+  // siret prop contains either SIRET or a VAT number
   const { form, siret } = props;
   const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
 
@@ -48,7 +49,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
               form.emitter?.company?.siret,
               form.ecoOrganisme?.siret,
               form.transporter?.company?.orgId,
-            ].includes(siret) && <SignEmissionForm {...props} />}
+            ].includes(siret) &&
+              !form.emitter?.isPrivateIndividual && (
+                <SignEmissionForm {...props} />
+              )}
 
             {props.options?.canSkipEmission &&
               form.transporter?.company?.orgId === siret && (

@@ -10,7 +10,11 @@ import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 import { statusLabels } from "../../constants";
-import { DateRow, DetailRow } from "../common/Components";
+import {
+  DateRow,
+  DetailRow,
+  TransporterReceiptDetails,
+} from "../common/Components";
 
 import styles from "../common/BSDDetailContent.module.scss";
 import { getVerboseAcceptationStatus } from "../common/utils";
@@ -169,20 +173,7 @@ function Transporter({ form }: { form: Bsvhu }) {
       <div className={styles.detailGrid}>
         <Company label="Transporteur" company={transporter?.company} />
       </div>
-      <div className={styles.detailGrid}>
-        <DetailRow
-          value={transporter?.recepisse?.number}
-          label="Numéro de récépissé"
-        />
-        <DetailRow
-          value={transporter?.recepisse?.department}
-          label="Département"
-        />
-        <DateRow
-          value={transporter?.recepisse?.validityLimit}
-          label="Date de validité"
-        />
-      </div>
+      <TransporterReceiptDetails transporter={transporter} />
       <div className={styles.detailGrid}>
         <DetailRow
           value={

@@ -1,9 +1,9 @@
-import { checkIsCompanyMember } from "../../../users/permissions";
 import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { expandFormFromDb } from "../../converter";
 import { Decimal } from "decimal.js-light";
+import { checkCanList } from "../../permissions";
 
 const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
   _,
@@ -11,7 +11,8 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  await checkIsCompanyMember(user, { orgId: siret });
+
+  await checkCanList(user, siret);
 
   const queriedForms = await prisma.form.findMany({
     where: {
@@ -32,9 +33,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
       ]
     },
     include: {
-      forwardedIn: {
-        select: { quantityReceived: true }
-      },
+      forwardedIn: true,
       groupedIn: true
     }
   });

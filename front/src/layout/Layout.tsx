@@ -1,9 +1,7 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { Query } from "generated/graphql/types";
 import Header from "./Header";
-
-import SurveyBanner from "../Apps/Common/Components/SurveyBanner/SurveyBanner";
 
 import sandboxIcon from "./assets/code-sandbox.svg";
 import downtimeIcon from "./assets/code-downtime.svg";
@@ -13,8 +11,6 @@ interface AuthProps {
   isAdmin: boolean;
 }
 const { VITE_WARNING_MESSAGE, VITE_DOWNTIME_MESSAGE } = import.meta.env;
-
-const SURVEY_NAME = "TD-survey0323";
 
 const GET_WARNING_MESSAGE = gql`
   query GetWarningMessage {
@@ -29,20 +25,14 @@ export default function Layout({
   children,
   isAuthenticated,
   isAdmin,
-}: AuthProps & { children: ReactNode }) {
-  const localStorage = window.localStorage;
-  const storedItem = localStorage.getItem(SURVEY_NAME);
-  const surveyStatus: boolean = storedItem ? JSON.parse(storedItem) : true;
-
+  flags,
+}: AuthProps & {
+  children: ReactNode;
+  flags: { flagDashboardV2: boolean };
+}) {
   const { data } = useQuery<Pick<Query, "warningMessage">>(GET_WARNING_MESSAGE);
-  const [showSurveyBanner, setShowSurveyBanner] = useState(surveyStatus);
 
   const isIE11 = !!navigator.userAgent.match(/Trident.*rv:11\./);
-
-  const onCloseSurveyBanner = () => {
-    localStorage.setItem(SURVEY_NAME, JSON.stringify(false));
-    setShowSurveyBanner(false);
-  };
 
   return (
     <>
@@ -92,18 +82,6 @@ export default function Layout({
           }}
         >
           {data.warningMessage}
-        </div>
-      )}
-      {isAuthenticated && showSurveyBanner && (
-        <div>
-          <SurveyBanner
-            message="Afin de mesurer votre ressenti vis à vis de l'application Trackdéchets, nous vous invitons à répondre à ce questionnaire."
-            button={{
-              title: "Répondre au questionnaire",
-              href: "https://tally.so/r/3jeK66",
-            }}
-            onClickClose={onCloseSurveyBanner}
-          />
         </div>
       )}
       <Header isAuthenticated={isAuthenticated} isAdmin={isAdmin} />

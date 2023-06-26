@@ -5,7 +5,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { convertUrls, getCompanyActiveUsers } from "../../database";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { deleteCachedUserCompanies } from "../../../common/redis/users";
+import { deleteCachedUserRoles } from "../../../common/redis/users";
 
 const deleteCompanyResolver: MutationResolvers["deleteCompany"] = async (
   _,
@@ -32,7 +32,7 @@ const deleteCompanyResolver: MutationResolvers["deleteCompany"] = async (
   // clear cache
 
   await Promise.all(
-    associatedUsers.map(user => deleteCachedUserCompanies(user.id))
+    associatedUsers.map(user => deleteCachedUserRoles(user.id))
   );
 
   await prisma.companyAssociation.deleteMany({ where: { companyId: id } });

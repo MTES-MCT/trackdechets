@@ -1,6 +1,6 @@
 import React from "react";
+import { usePopperTooltip } from "react-popper-tooltip";
 import { IconQuestionCircle } from "common/components/Icons";
-import { Tooltip } from "@reach/tooltip";
 import style from "./Tooltip.module.scss";
 
 type Props = {
@@ -13,24 +13,32 @@ type Props = {
  */
 
 const TdTooltip = ({ msg }: Props) => {
+  const {
+    getArrowProps,
+    getTooltipProps,
+    setTooltipRef,
+    setTriggerRef,
+    visible,
+  } = usePopperTooltip({
+    offset: [0, 10],
+    placement: "top",
+  });
+
   return !!msg ? (
-    <Tooltip
-      label={msg}
-      aria-label={msg}
-      style={{
-        background: "hsla(0, 0%, 0%, 0.75)",
-        color: "white",
-        border: "none",
-        borderRadius: "3px",
-        padding: "0.5em 1em",
-        whiteSpace: "pre-wrap",
-        zIndex: 999,
-      }}
-    >
-      <button className={style.tdTooltip} type="button">
+    <>
+      <span className={style.button} role="tooltip" ref={setTriggerRef}>
         <IconQuestionCircle color="blue" size="20px" />
-      </button>
-    </Tooltip>
+      </span>
+      {visible && (
+        <div
+          ref={setTooltipRef}
+          {...getTooltipProps({ className: style.tooltip })}
+        >
+          <div {...getArrowProps({ className: style.arrow })} />
+          {msg}
+        </div>
+      )}
+    </>
   ) : null;
 };
 

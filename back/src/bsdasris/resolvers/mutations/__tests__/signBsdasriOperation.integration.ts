@@ -8,7 +8,8 @@ import {
   initialData,
   readyToTakeOverData,
   readyToReceiveData,
-  readyToProcessData
+  readyToProcessData,
+  readyToPublishData
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -29,8 +30,9 @@ describe("Mutation.signBsdasri operation", () => {
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         ...{
           destinationOperationCode: "XYZ",
           destinationOperationDate: new Date()
@@ -76,8 +78,9 @@ describe("Mutation.signBsdasri operation", () => {
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         ...readyToProcessData,
         status: BsdasriStatus.RECEIVED
       }
@@ -117,8 +120,9 @@ describe("Mutation.signBsdasri operation", () => {
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         ...readyToProcessData,
         destinationOperationCode: "D12",
         status: BsdasriStatus.RECEIVED
@@ -158,8 +162,9 @@ describe("Mutation.signBsdasri operation", () => {
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         ...processDataWithoutQuantity,
         status: BsdasriStatus.RECEIVED
       }
@@ -205,8 +210,9 @@ describe("Mutation.signBsdasri operation", () => {
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         ...readyToProcessData,
         destinationOperationCode: "D12",
         status: BsdasriStatus.RECEIVED

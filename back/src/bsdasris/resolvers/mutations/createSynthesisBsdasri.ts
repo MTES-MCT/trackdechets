@@ -5,14 +5,13 @@ import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { validateBsdasri } from "../../validation";
-import { checkIsBsdasriContributor } from "../../permissions";
 import { getEligibleDasrisForSynthesis, aggregatePackagings } from "./utils";
 import { indexBsdasri } from "../../elastic";
 import { UserInputError } from "apollo-server-express";
 import { BsdasriType } from "@prisma/client";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { getBsdasriRepository } from "../../repository";
 import sirenify from "../../sirenify";
+import { checkCanCreateSynthesis } from "../../permissions";
 
 /**
  * Bsdasri creation mutation :
@@ -28,7 +27,6 @@ const createSynthesisBsdasri = async (
   context: GraphQLContext
 ) => {
   const user = checkIsAuthenticated(context);
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   if (
     input?.emitter ||
@@ -40,14 +38,8 @@ const createSynthesisBsdasri = async (
     );
   }
 
-  if (
-    !input.transporter?.company?.siret ||
-    !userCompaniesSiretOrVat.includes(input.transporter.company.siret)
-  ) {
-    throw new UserInputError(
-      `Le siret du transporteur doit être un des vôtres`
-    );
-  }
+  await checkCanCreateSynthesis(user, input);
+
   const { synthesizing, ...rest } = input;
 
   if (!synthesizing || !synthesizing.length) {
@@ -55,23 +47,11 @@ const createSynthesisBsdasri = async (
       "Un dasri de synthèse doit comporter des bordereaux associés"
     );
   }
-  const formSirets = {
-    emitterCompanySiret: input.transporter?.company?.siret,
-    transporterCompanySiret: input.transporter?.company?.siret,
-    transporterCompanyVatNumber: input.transporter?.company?.vatNumber ?? null,
-    destinationCompanySiret: input.destination?.company?.siret ?? null
-  };
-
-  await checkIsBsdasriContributor(
-    user,
-    formSirets,
-    "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparaît pas"
-  );
 
   const dasrisToAssociate = await getEligibleDasrisForSynthesis(
     synthesizing,
     null,
-    input.transporter.company
+    input.transporter?.company
   );
 
   const aggregatedPackagings = aggregatePackagings(dasrisToAssociate);

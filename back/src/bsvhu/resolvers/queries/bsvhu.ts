@@ -3,7 +3,7 @@ import { QueryBsvhuArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
-import { checkIsBsvhuContributor } from "../../permissions";
+import { checkCanRead } from "../../permissions";
 
 export default async function bsvhu(
   _,
@@ -12,12 +12,9 @@ export default async function bsvhu(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const form = await getBsvhuOrNotFound(id);
-  await checkIsBsvhuContributor(
-    user,
-    form,
-    "Vous n'êtes pas autorisé à accéder à ce bordereau"
-  );
+  const bsvhu = await getBsvhuOrNotFound(id);
 
-  return expandVhuFormFromDb(form);
+  await checkCanRead(user, bsvhu);
+
+  return expandVhuFormFromDb(bsvhu);
 }

@@ -318,7 +318,7 @@ export function Destination({ disabled }) {
           <CompanySelector
             name="broker.company"
             onCompanySelected={broker => {
-              if (broker.brokerReceipt) {
+              if (broker?.brokerReceipt) {
                 setFieldValue(
                   "broker.recepisse.number",
                   broker.brokerReceipt.receiptNumber
@@ -346,7 +346,6 @@ export function Destination({ disabled }) {
                 type="text"
                 name="broker.recepisse.number"
                 className="td-input td-input--medium"
-                disabled={true}
               />
             </label>
 
@@ -360,7 +359,6 @@ export function Destination({ disabled }) {
                 name="broker.recepisse.department"
                 placeholder="Ex: 83"
                 className="td-input td-input--small"
-                disabled={true}
               />
             </label>
 
@@ -373,7 +371,6 @@ export function Destination({ disabled }) {
                 component={DateInput}
                 name="broker.recepisse.validityLimit"
                 className="td-input td-input--small"
-                disabled={true}
               />
             </label>
 

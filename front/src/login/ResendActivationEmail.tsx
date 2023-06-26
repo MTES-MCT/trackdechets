@@ -4,19 +4,12 @@ import {
   Mutation,
   MutationResendActivationEmailArgs,
 } from "generated/graphql/types";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { Captcha, useCaptcha } from "common/components/captcha";
 
-import {
-  Container,
-  Row,
-  Col,
-  Title,
-  Text,
-  TextInput,
-  Button,
-  Alert,
-} from "@dataesr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import styles from "./Login.module.scss";
 
 const RESEND_ACTIVATION_EMAIL = gql`
@@ -59,19 +52,19 @@ export default function ResendActivationEmail() {
   };
 
   const errorAlert = error?.message ? (
-    <Row spacing="mb-2w">
-      <Alert title="Erreur" description={error.message} type="error" />
-    </Row>
+    <div className="fr-grid-row fr-mb-2w">
+      <Alert title="Erreur" description={error.message} severity="error" />
+    </div>
   ) : null;
 
   const successAlert = data ? (
-    <Row spacing="mb-2w">
+    <div className="fr-grid-row fr-mb-2w">
       <Alert
         title="Succès"
         description="Si votre compte est effectivement en attente sur notre plateforme, un email d'activation vous a été renvoyé."
-        type="success"
+        severity="success"
       />
-    </Row>
+    </div>
   ) : null;
 
   if (captchaLoading) {
@@ -79,45 +72,43 @@ export default function ResendActivationEmail() {
   }
   if (captchaError) {
     return (
-      <Row spacing="mb-2w">
+      <div className="fr-grid-row fr-mb-2w">
         <Alert
           title="Erreur"
           description="Une erreur est survenue, veuillez rafraîchir la page"
-          type="error"
+          severity="error"
         />
-      </Row>
+      </div>
     );
   }
 
   return (
     <div className={styles.onboardingWrapper}>
       <form onSubmit={handleSubmit}>
-        <Container
-          className={`pt-5w ${styles.centralContainerLarge}`}
-          spacing="pt-10w"
+        <div
+          className={`fr-container fr-pt-10w ${styles.centralContainerLarge}`}
         >
           {successAlert}
           {errorAlert}
-          <Row justifyContent="center" spacing="mb-2w">
-            <Col spacing="m-auto">
-              <Title as="h1" look="h3" spacing="mb-3w">
-                Renvoyer l'email d'activation
-              </Title>
-              <Text as="p">
+          <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
+            <div className="fr-col fr-m-auto">
+              <h1 className="fr-h3 fr-mb-3w">Renvoyer l'email d'activation</h1>
+              <p className="fr-text--md">
                 Si vous n'avez pas reçu d'email d'activation suite à votre
                 inscription, vous pouvez en renvoyer un en renseignant votre
                 adresse email ci-dessous :
-              </Text>
-              <TextInput
-                // @ts-ignore
+              </p>
+              <Input
                 label="Email"
-                name="email"
-                required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                nativeInputProps={{
+                  name: "email",
+                  required: true,
+                  value: email,
+                  onChange: e => setEmail(e.target.value),
+                }}
               />
-            </Col>
-          </Row>
+            </div>
+          </div>
 
           <Captcha
             setCaptchaInput={setCaptchaInput}
@@ -127,18 +118,18 @@ export default function ResendActivationEmail() {
             refetch={refetchCaptcha}
           />
 
-          <Row justifyContent="right">
-            <Col className={styles.resetFlexCol}>
+          <div className="fr-grid-row fr-grid-row--right">
+            <div className={`fr-col ${styles.resetFlexCol}`}>
               <Button
                 disabled={!email || !captchaInput}
-                size="md"
+                size="medium"
                 onClick={handleSubmit}
               >
                 Renvoyer l'email
               </Button>
-            </Col>
-          </Row>
-        </Container>
+            </div>
+          </div>
+        </div>
       </form>
     </div>
   );

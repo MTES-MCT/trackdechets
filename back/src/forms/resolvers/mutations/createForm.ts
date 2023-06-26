@@ -1,4 +1,4 @@
-import { EmitterType, Prisma } from "@prisma/client";
+import { EmitterType, Prisma, TransportMode } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -10,18 +10,22 @@ import { MissingTempStorageFlag } from "../../errors";
 import {
   expandFormFromDb,
   flattenFormInput,
-  flattenTemporaryStorageDetailInput
+  flattenTemporaryStorageDetailInput,
+  flattenTransporterInput
 } from "../../converter";
-import { checkIsFormContributor } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
-import { FormCompanies } from "../../types";
-import { draftFormSchema, validateGroupement } from "../../validation";
+import {
+  draftFormSchema,
+  hasPipeline,
+  validateGroupement
+} from "../../validation";
 import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
-import { sirenifyFormInput } from "../../sirenify";
 import { validateIntermediariesInput } from "../../../common/validation";
+import { sirenifyFormInput } from "../../sirenify";
+import { checkCanCreate } from "../../permissions";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -52,56 +56,53 @@ const createFormResolver = async (
     formContent.wasteDetails.isDangerous = true;
   }
 
-  const formCompanies: FormCompanies = {
-    emitterCompanySiret: formContent.emitter?.company?.siret ?? null,
-    recipientCompanySiret: formContent.recipient?.company?.siret ?? null,
-    transporterCompanySiret: formContent.transporter?.company?.siret ?? null,
-    transporterCompanyVatNumber:
-      formContent.transporter?.company?.vatNumber ?? null,
-    traderCompanySiret: formContent.trader?.company?.siret ?? null,
-    brokerCompanySiret: formContent.broker?.company?.siret ?? null,
-    ecoOrganismeSiret: formContent.ecoOrganisme?.siret ?? null,
-    ...(temporaryStorageDetail?.destination?.company?.siret
-      ? {
-          forwardedIn: {
-            recipientCompanySiret:
-              temporaryStorageDetail.destination.company.siret,
-            transporterCompanySiret: null,
-            transporterCompanyVatNumber: null
-          }
-        }
-      : {}),
-    ...(intermediaries?.length
-      ? {
-          intermediariesVatNumbers: intermediaries
-            ?.map(intermediary => intermediary.vatNumber)
-            .filter(Boolean),
-          intermediariesSirets: intermediaries
-            ?.map(intermediary => intermediary.siret)
-            .filter(Boolean)
-        }
-      : {})
-  };
-
   // APPENDIX1_PRODUCER is the only type of forms for which you don't necessarely appear during creation.
   // The destination and transporter will be auto completed
   if (formContent?.emitter?.type !== "APPENDIX1_PRODUCER") {
-    await checkIsFormContributor(
-      user,
-      formCompanies,
-      "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
-    );
+    await checkCanCreate(user, createFormInput);
   }
 
   const form = flattenFormInput(formContent);
+  let transporter: Omit<
+    Prisma.BsddTransporterCreateWithoutFormInput,
+    "number"
+  > = flattenTransporterInput(formContent);
+  // Pipeline erases transporter EXCEPT for transporterTransportMode
+  if (hasPipeline(form as any) && transporter) {
+    transporter = {
+      transporterTransportMode: TransportMode.OTHER
+    };
+  }
 
   const readableId = getReadableId();
 
-  const cleanedForm = await draftFormSchema.validate(form);
+  const cleanedForm = await draftFormSchema.validate({
+    ...form,
+    ...transporter
+  });
+
+  // `cleanedForm` was introduced for the annexe 1 to get only the keys from
+  // the annexe 1 yup schema. The problem is that it also returns the `transporter*`
+  // fields that should not be included in the FormCreateInput.
+  if (cleanedForm) {
+    for (const key of Object.keys(cleanedForm)) {
+      if (!(key in form)) {
+        delete cleanedForm[key];
+      }
+    }
+  }
+
   const formCreateInput: Prisma.FormCreateInput = {
     ...cleanedForm,
     readableId,
-    owner: { connect: { id: user.id } }
+    owner: { connect: { id: user.id } },
+    ...(form.emitterType !== EmitterType.APPENDIX1_PRODUCER
+      ? {
+          transporters: {
+            create: { ...transporter, number: 1, readyToTakeOver: true }
+          }
+        }
+      : {})
   };
 
   if (temporaryStorageDetail) {

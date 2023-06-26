@@ -1,198 +1,272 @@
-import { Bsda, BsdaStatus, BsdaType } from "@prisma/client";
+import { Bsda, BsdaStatus, BsdaType, Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import {
   AlreadySignedError,
   InvalidSignatureError
 } from "../../../bsvhu/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkSecurityCode } from "../../../forms/permissions";
 import {
   BsdaSignatureInput,
   BsdaSignatureType,
+  MutationResolvers,
   MutationSignBsdaArgs
 } from "../../../generated/graphql/types";
 import { sendMail } from "../../../mailer/mailing";
 import { finalDestinationModified } from "../../../mailer/templates";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { GraphQLContext } from "../../../types";
-import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaHistory, getBsdaOrNotFound } from "../../database";
 import { machine } from "../../machine";
-import { getBsdaRepository } from "../../repository";
+import { BsdaRepository, getBsdaRepository } from "../../repository";
 import { runInTransaction } from "../../../common/repository/helper";
-import { validateBsda } from "../../validation";
-import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
+import { parseBsda } from "../../validation/validate";
+import { checkCanSignFor } from "../../../permissions";
+import { InvalidTransition } from "../../../forms/errors";
 
-type SignatureTypeInfos = {
-  dbDateKey: keyof Bsda;
-  dbAuthorKey: keyof Bsda;
-  getAuthorizedSiret: (form: Bsda) => string | null;
-};
-
-export default async function sign(
+const signBsda: MutationResolvers["signBsda"] = async (
   _,
   { id, input }: MutationSignBsdaArgs,
   context: GraphQLContext
-) {
+) => {
   const user = checkIsAuthenticated(context);
 
-  const signatureTypeInfos = signatureTypeMapping[input.type];
   const bsda = await getBsdaOrNotFound(id);
+
+  const authorizedOrgIds = getAuthorizedOrgIds(bsda, input.type);
 
   // To sign a form for a company, you must either:
   // - be part of that company
   // - provide the company security code
-  await checkAuthorization(
-    { currentUserId: user.id, securityCode: input.securityCode },
-    signatureTypeInfos.getAuthorizedSiret(bsda)
-  );
+  await checkCanSignFor(user, input.type, authorizedOrgIds, input.securityCode);
 
-  // Cannot re-sign a form
-  if (bsda[signatureTypeInfos.dbDateKey] != null) {
-    throw new AlreadySignedError();
-  }
-
-  checkBsdaTypeSpecificRules(bsda, input);
-  const {
-    intermediaries,
-    BsdaRevisionRequest,
-    groupedIn,
-    grouping,
-    forwardedIn,
-    forwarding,
-    ...simpleBsda
-  } = bsda;
-  // Check that all necessary fields are filled
-  await validateBsda(
-    simpleBsda as any,
-    { previousBsdas: [], intermediaries: [] },
-    {
-      skipPreviousBsdas: true,
-      emissionSignature:
-        bsda.emitterEmissionSignatureDate != null || input.type === "EMISSION",
-      workSignature:
-        bsda.workerWorkSignatureDate != null || input.type === "WORK",
-      transportSignature:
-        bsda.transporterTransportSignatureDate != null ||
-        input.type === "TRANSPORT",
-      operationSignature:
-        bsda.destinationOperationSignatureDate != null ||
-        input.type === "OPERATION"
-    }
-  );
-
-  const { value: newStatus } = machine.transition(bsda.status, {
-    type: input.type,
-    bsda: bsda
-  });
-
-  if (newStatus === bsda.status) {
-    throw new InvalidSignatureError();
-  }
-
-  const signedBsda = await runInTransaction(async transaction => {
-    const bsdaRepository = getBsdaRepository(user, transaction);
-
-    const signedBsda = await bsdaRepository.update(
-      { id },
-      {
-        [signatureTypeInfos.dbAuthorKey]: input.author,
-        [signatureTypeInfos.dbDateKey]: new Date(input.date ?? Date.now()),
-        isDraft: false,
-        status: newStatus as BsdaStatus,
-        ...(newStatus === BsdaStatus.REFUSED && { forwardingId: null })
-      }
-    );
-
-    if (newStatus === BsdaStatus.PROCESSED) {
-      const previousBsdas = await getBsdaHistory(signedBsda);
-      await bsdaRepository.updateMany(
-        {
-          id: { in: previousBsdas.map(bsff => bsff.id) }
-        },
-        {
-          status: BsdaStatus.PROCESSED
-        }
-      );
-    }
-
-    if (newStatus === BsdaStatus.REFUSED) {
-      await bsdaRepository.updateMany(
-        {
-          groupedInId: signedBsda.id
-        },
-        { groupedInId: null }
-      );
-    }
-
-    return signedBsda;
-  });
-
-  sendAlertIfFollowingBsdaChangedPlannedDestination(signedBsda);
-
-  return expandBsdaFromDb(signedBsda);
-}
-
-const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {
-  EMISSION: {
-    dbDateKey: "emitterEmissionSignatureDate",
-    dbAuthorKey: "emitterEmissionSignatureAuthor",
-    getAuthorizedSiret: form => form.emitterCompanySiret
-  },
-  WORK: {
-    dbDateKey: "workerWorkSignatureDate",
-    dbAuthorKey: "workerWorkSignatureAuthor",
-    getAuthorizedSiret: form => form.workerCompanySiret
-  },
-  OPERATION: {
-    dbDateKey: "destinationOperationSignatureDate",
-    dbAuthorKey: "destinationOperationSignatureAuthor",
-    getAuthorizedSiret: form => form.destinationCompanySiret
-  },
-  TRANSPORT: {
-    dbDateKey: "transporterTransportSignatureDate",
-    dbAuthorKey: "transporterTransportSignatureAuthor",
-    getAuthorizedSiret: form => getTransporterCompanyOrgId(form)
-  }
-};
-
-function checkAuthorization(
-  requestInfo: { currentUserId: string; securityCode?: number | null },
-  signingCompanySiret: string | null
-) {
-  if (!signingCompanySiret) {
-    throw new UserInputError(
-      "SIRET manquant pour pouvoir apposer cette signature."
-    );
-  }
-
-  // If there is a security code provided, it must be authorized
-  if (requestInfo.securityCode) {
-    return checkSecurityCode(signingCompanySiret, requestInfo.securityCode);
-  }
-
-  return checkIsCompanyMember(
-    { id: requestInfo.currentUserId },
-    { orgId: signingCompanySiret }
-  );
-}
-
-function checkBsdaTypeSpecificRules(bsda: Bsda, input: BsdaSignatureInput) {
   if (bsda.type === BsdaType.COLLECTION_2710 && input.type !== "OPERATION") {
     throw new UserInputError(
       "Ce type de bordereau ne peut être signé qu'à la réception par la déchetterie."
     );
   }
 
-  if (
-    (bsda.type === BsdaType.RESHIPMENT || bsda.type === BsdaType.GATHERING) &&
-    input.type === "WORK"
-  ) {
+  checkBsdaTypeSpecificRules(bsda, input);
+
+  // Check that all necessary fields are filled
+  await parseBsda(
+    {
+      ...bsda,
+      grouping: bsda.grouping?.map(g => g.id),
+      forwarding: bsda.forwarding?.id
+    },
+    {
+      currentSignatureType: input.type
+    }
+  );
+
+  const sign = signatures[input.type];
+  const signedBsda = await sign(user, bsda, {
+    ...input,
+    date: new Date(input.date ?? Date.now())
+  });
+
+  return expandBsdaFromDb(signedBsda);
+};
+
+export default signBsda;
+
+/**
+ * Returns the different companies allowed to perform the signature
+ * @param bsda the BSDA we wante to sign
+ * @param signatureType the type of signature (ex: EMISSION, TRANSPORT, etc)
+ * @returns a list of organisation identifiers
+ */
+export function getAuthorizedOrgIds(
+  bsda: Bsda,
+  signatureType: BsdaSignatureType
+): string[] {
+  const signatureTypeToFn: {
+    [Key in BsdaSignatureType]: (bsda: Bsda) => (string | null)[];
+  } = {
+    EMISSION: (bsda: Bsda) => [bsda.emitterCompanySiret],
+    WORK: (bsda: Bsda) => [bsda.workerCompanySiret],
+    TRANSPORT: (bsda: Bsda) => [
+      bsda.transporterCompanySiret,
+      bsda.transporterCompanyVatNumber
+    ],
+    OPERATION: (bsda: Bsda) => [bsda.destinationCompanySiret]
+  };
+
+  const getAuthorizedSiretsFn = signatureTypeToFn[signatureType];
+
+  return getAuthorizedSiretsFn(bsda).filter(Boolean);
+}
+
+// Defines different signature function based on signature type
+const signatures: Record<
+  BsdaSignatureType,
+  (user: Express.User, bsda: Bsda, input: BsdaSignatureInput) => Promise<Bsda>
+> = {
+  EMISSION: signEmission,
+  WORK: signWork,
+  TRANSPORT: signTransport,
+  OPERATION: signOperation
+};
+
+async function signEmission(
+  user: Express.User,
+  bsda: Bsda,
+  input: BsdaSignatureInput
+) {
+  if (bsda.emitterEmissionSignatureDate !== null) {
+    throw new AlreadySignedError();
+  }
+
+  const updateInput: Prisma.BsdaUpdateInput = {
+    emitterEmissionSignatureAuthor: input.author,
+    emitterEmissionSignatureDate: new Date(input.date ?? Date.now()),
+    isDraft: false,
+    status: await getNextStatus(bsda, input.type)
+  };
+
+  return updateBsda(user, bsda, updateInput);
+}
+
+async function signWork(
+  user: Express.User,
+  bsda: Bsda,
+  input: BsdaSignatureInput
+) {
+  if (bsda.workerWorkSignatureDate !== null) {
+    throw new AlreadySignedError();
+  }
+
+  if (bsda.type === BsdaType.RESHIPMENT || bsda.type === BsdaType.GATHERING) {
     throw new UserInputError(
       "Ce type de bordereau ne peut pas être signé par une entreprise de travaux."
     );
   }
+
+  const nextStatus = await getNextStatus(bsda, input.type);
+
+  const updateInput: Prisma.BsdaUpdateInput = {
+    workerWorkSignatureAuthor: input.author,
+    workerWorkSignatureDate: new Date(input.date ?? Date.now()),
+    status: nextStatus
+  };
+
+  return updateBsda(user, bsda, updateInput);
+}
+
+async function signTransport(
+  user: Express.User,
+  bsda: Bsda,
+  input: BsdaSignatureInput
+) {
+  if (bsda.transporterTransportSignatureDate !== null) {
+    throw new AlreadySignedError();
+  }
+
+  const nextStatus = await getNextStatus(bsda, input.type);
+
+  const updateInput: Prisma.BsdaUpdateInput = {
+    transporterTransportSignatureAuthor: input.author,
+    transporterTransportSignatureDate: new Date(input.date ?? Date.now()),
+    status: nextStatus
+  };
+
+  return updateBsda(user, bsda, updateInput);
+}
+
+async function signOperation(
+  user: Express.User,
+  bsda: Bsda,
+  input: BsdaSignatureInput
+) {
+  if (bsda.destinationOperationSignatureDate !== null) {
+    throw new AlreadySignedError();
+  }
+
+  const nextStatus = await getNextStatus(bsda, input.type);
+
+  const updateInput: Prisma.BsdaUpdateInput = {
+    destinationOperationSignatureAuthor: input.author,
+    destinationOperationSignatureDate: new Date(input.date ?? Date.now()),
+    status: await getNextStatus(bsda, input.type),
+    ...(nextStatus === BsdaStatus.REFUSED && { forwardingId: null })
+  };
+
+  return updateBsda(user, bsda, updateInput);
+}
+
+/**
+ * Transition a BSDA from initial state (ex: SENT) to next state (ex: RECEIVED)
+ * Allowed transitions are defined as a state machine using xstate
+ */
+export async function getNextStatus(
+  bsda: Bsda,
+  signatureType: BsdaSignatureType
+) {
+  if (bsda.isDraft) {
+    throw new InvalidTransition();
+  }
+  const currentStatus = bsda.status;
+
+  // Use state machine to calculate new status
+  const nextState = machine.transition(currentStatus, {
+    type: signatureType,
+    bsda: bsda
+  });
+
+  // This transition is not possible
+  if (!nextState.changed) {
+    throw new InvalidSignatureError();
+  }
+
+  const nextStatus = nextState.value as BsdaStatus;
+
+  return nextStatus;
+}
+
+/**
+ * Perform the signature in DB and run the
+ * post signature hook in transaction
+ */
+async function updateBsda(
+  user: Express.User,
+  bsda: Bsda,
+  updateInput: Prisma.BsdaUpdateInput
+) {
+  return runInTransaction(async transaction => {
+    const bsdaRepository = getBsdaRepository(user, transaction);
+    const signBsda = await bsdaRepository.update({ id: bsda.id }, updateInput);
+    await postSignatureHook(signBsda, bsdaRepository);
+    return signBsda;
+  });
+}
+
+/**
+ * Custom signature hook used to update dependent objects
+ * based on the new status of the signed BSDA
+ */
+async function postSignatureHook(bsda: Bsda, repository: BsdaRepository) {
+  if (bsda.status === BsdaStatus.PROCESSED) {
+    const previousBsdas = await getBsdaHistory(bsda);
+    await repository.updateMany(
+      {
+        id: { in: previousBsdas.map(bsff => bsff.id) }
+      },
+      {
+        status: BsdaStatus.PROCESSED
+      }
+    );
+  }
+
+  if (bsda.status === BsdaStatus.REFUSED) {
+    await repository.updateMany(
+      {
+        groupedInId: bsda.id
+      },
+      { groupedInId: null }
+    );
+  }
+  await sendAlertIfFollowingBsdaChangedPlannedDestination(bsda);
 }
 
 async function sendAlertIfFollowingBsdaChangedPlannedDestination(bsda: Bsda) {
@@ -238,5 +312,22 @@ async function sendAlertIfFollowingBsdaChangedPlannedDestination(bsda: Bsda) {
       });
       sendMail(mail);
     }
+  }
+}
+
+function checkBsdaTypeSpecificRules(bsda: Bsda, input: BsdaSignatureInput) {
+  if (bsda.type === BsdaType.COLLECTION_2710 && input.type !== "OPERATION") {
+    throw new UserInputError(
+      "Ce type de bordereau ne peut être signé qu'à la réception par la déchetterie."
+    );
+  }
+
+  if (
+    (bsda.type === BsdaType.RESHIPMENT || bsda.type === BsdaType.GATHERING) &&
+    input.type === "WORK"
+  ) {
+    throw new UserInputError(
+      "Ce type de bordereau ne peut pas être signé par une entreprise de travaux."
+    );
   }
 }

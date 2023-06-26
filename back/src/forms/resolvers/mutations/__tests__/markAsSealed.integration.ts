@@ -1,10 +1,8 @@
 import { CompanyType, CompanyVerificationStatus, Status } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
-  Consistence,
-  EmitterType,
   Mutation,
-  QuantityType
+  MutationMarkAsSealedArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
@@ -20,8 +18,6 @@ import makeClient from "../../../../__tests__/testClient";
 import * as mailer from "../../../../mailer/mailing";
 import { contentAwaitsGuest } from "../../../../mailer/templates";
 import { renderMail } from "../../../../mailer/templates/renderers";
-import getReadableId from "../../../readableId";
-import { UserInputError } from "apollo-server-core";
 
 jest.mock("axios", () => ({
   default: {
@@ -36,67 +32,8 @@ sendMailSpy.mockImplementation(() => Promise.resolve());
 // Mock external search services
 import * as search from "../../../../companies/sirene/searchCompany";
 import { MARK_AS_SEALED } from "./mutations";
-const searchCompanyMock = jest.spyOn(search, "default");
 
-const formdataForPrivateOrShip = {
-  brokerCompanyAddress: "",
-  brokerCompanyContact: "",
-  brokerCompanyMail: "",
-  brokerCompanyName: "",
-  brokerCompanyPhone: "",
-  brokerCompanySiret: "",
-  customId: null,
-  emitterCompanyName: "WASTE PRODUCER",
-  emitterType: "PRODUCER" as EmitterType,
-  emitterWorkSiteAddress: "",
-  emitterWorkSiteCity: "",
-  emitterWorkSiteInfos: "",
-  emitterWorkSiteName: "",
-  emitterWorkSitePostalCode: "",
-  isDeleted: false,
-  noTraceability: null,
-  processingOperationDone: null,
-  recipientCap: "I am a CAP",
-  recipientCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
-  recipientCompanyContact: "Jean Dupont",
-  recipientCompanyMail: "recipient@td.io",
-  recipientCompanyName: "WASTE COMPANY",
-  recipientCompanyPhone: "06 18 76 02 99",
-  recipientCompanySiret: siretify(1),
-  recipientProcessingOperation: "D 6",
-  sentAt: "2019-11-20T00:00:00.000Z",
-  sentBy: "signe",
-  traderCompanyAddress: "",
-  traderCompanyContact: "",
-  traderCompanyMail: "",
-  traderCompanyName: "",
-  traderCompanyPhone: "",
-  traderCompanySiret: "",
-  traderDepartment: "",
-  traderReceipt: "",
-  traderValidityLimit: null,
-  transporterCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
-  transporterCompanyMail: "transporter@td.io",
-  transporterCompanyName: "WASTE TRANSPORTER",
-  transporterCompanyPhone: "06 18 76 02 66",
-  transporterCompanyContact: "Walter Transporter",
-  transporterCompanySiret: siretify(1),
-  transporterDepartment: "86",
-  transporterIsExemptedOfReceipt: false,
-  transporterNumberPlate: "aa22",
-  transporterReceipt: "33AA",
-  wasteAcceptationStatus: null,
-  wasteDetailsCode: "05 01 04*",
-  wasteDetailsConsistence: "SOLID" as Consistence,
-  wasteDetailsIsDangerous: true,
-  wasteDetailsName: "Divers",
-  wasteDetailsOnuCode: "2003",
-  wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 2 }],
-  wasteDetailsPop: false,
-  wasteDetailsQuantity: 22,
-  wasteDetailsQuantityType: "ESTIMATED" as QuantityType,
-  wasteRefusalReason: ""
-};
+const searchCompanyMock = jest.spyOn(search, "default");
 
 describe("Mutation.markAsSealed", () => {
   const OLD_ENV = process.env;
@@ -158,7 +95,13 @@ describe("Mutation.markAsSealed", () => {
         ownerId: user.id,
         opt: {
           status: "DRAFT",
-          [`${role}CompanySiret`]: company.siret,
+          ...(role === "transporter"
+            ? {
+                transporters: {
+                  create: { transporterCompanySiret: company.siret, number: 1 }
+                }
+              }
+            : { [`${role}CompanySiret`]: company.siret }),
           ...(role !== "recipient"
             ? { recipientCompanySiret: (await destinationFactory()).siret }
             : {}),
@@ -434,7 +377,47 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(statusLogs.length).toEqual(0);
   });
+  it("the BSD can not be sealed if waste detail name is missing", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+    });
+    const recipientCompany = await destinationFactory();
+    let form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        wasteDetailsCode: "05 01 04*",
+        wasteDetailsName: "" // this field is required and will make the mutation fail
+      }
+    });
 
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    const errMessage =
+      "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.\n" +
+      "Erreur(s): L'appellation du déchet est obligatoire.";
+
+    expect(errors[0].message).toBe(errMessage);
+
+    form = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
+    expect(form.status).toEqual("DRAFT");
+
+    // no statusLog is created
+    const statusLogs = await prisma.statusLog.findMany({
+      where: { form: { id: form.id }, user: { id: user.id } }
+    });
+    expect(statusLogs.length).toEqual(0);
+  });
   it.each(["toto", "lorem ipsum", "01 02 03", "101309*"])(
     "wrong waste code (%p) must invalidate mutation",
     async wrongWasteCode => {
@@ -1057,25 +1040,17 @@ describe("Mutation.markAsSealed", () => {
   });
 
   it("should fail if bsd has a foreign ship and the wrong emitterType", async () => {
-    const recipientCompany = await destinationFactory();
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const options = {
+
+    const form = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "DRAFT" as Status,
-        emitterType: "OTHER" as EmitterType,
-        recipientCompanySiret: recipientCompany.siret,
+        status: "DRAFT",
+        recipientCompanySiret: company.siret,
+        emitterCompanySiret: null,
+        emitterType: "OTHER",
         emitterIsForeignShip: true,
-        emitterCompanyOmiNumber: "OMI1234567",
-        transporterCompanySiret: company.siret
-      }
-    };
-    const formParams = { ...formdataForPrivateOrShip, ...options.opt };
-    const form = await prisma.form.create({
-      data: {
-        readableId: getReadableId(),
-        ...formParams,
-        owner: { connect: { id: options.ownerId } }
+        emitterCompanyOmiNumber: "OMI1234567"
       }
     });
 
@@ -1097,27 +1072,17 @@ describe("Mutation.markAsSealed", () => {
   });
 
   it("should fail if bsd has a private producer and the wrong emitterType", async () => {
-    const recipientCompany = await destinationFactory();
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
-    const options = {
+    const form = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "DRAFT" as Status,
-        emitterType: "OTHER" as EmitterType,
-        recipientCompanySiret: recipientCompany.siret,
-        emitterIsPrivateIndividual: true,
-        emitterCompanyName: "MR Paul Jetta",
-        emitterCompanyAddress: "3 bd de la poubelle toxique",
-        transporterCompanySiret: company.siret
-      }
-    };
-    const formParams = { ...formdataForPrivateOrShip, ...options.opt };
-    const form = await prisma.form.create({
-      data: {
-        readableId: getReadableId(),
-        ...formParams,
-        owner: { connect: { id: options.ownerId } }
+        status: "DRAFT",
+        recipientCompanySiret: company.siret,
+        emitterCompanySiret: null,
+        emitterCompanyContact: null,
+        emitterType: "OTHER",
+        emitterIsPrivateIndividual: true
       }
     });
 
@@ -1138,32 +1103,58 @@ describe("Mutation.markAsSealed", () => {
     ]);
   });
 
-  it("should seal and automatically transition to SIGNED_BY_PRODUCER when private emitter", async () => {
+  it("should seal and automatically transition to SIGNED_BY_PRODUCER when private individual emitter", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const recipientCompany = await destinationFactory();
-    const options = {
+
+    const form = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "DRAFT" as Status,
-        emitterType: "PRODUCER" as EmitterType,
-        recipientCompanySiret: recipientCompany.siret,
+        status: "DRAFT",
+        recipientCompanySiret: company.siret,
+        emitterCompanySiret: null,
+        emitterCompanyContact: null,
+        emitterType: "PRODUCER",
         emitterIsPrivateIndividual: true,
         emitterCompanyName: "MR Paul Jetta",
-        emitterCompanyAddress: "3 bd de la poubelle toxique",
-        transporterCompanySiret: company.siret
-      }
-    };
-    const formParams = { ...formdataForPrivateOrShip, ...options.opt };
-    const form = await prisma.form.create({
-      data: {
-        readableId: getReadableId(),
-        ...formParams,
-        owner: { connect: { id: options.ownerId } }
+        emitterCompanyAddress: "3 bd de la poubelle toxique"
       }
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "markAsSealed">>(
+    await mutate<Pick<Mutation, "markAsSealed">>(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(updatedForm.status).toEqual("SIGNED_BY_PRODUCER");
+    expect(updatedForm.emittedAt).not.toBeNull();
+    expect(updatedForm.emittedBy).toEqual("Signature auto (particulier)");
+  });
+
+  it("should seal and automatically transition to SIGNED_BY_PRODUCER when foreign ship emitter", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        recipientCompanySiret: company.siret,
+        emitterCompanySiret: null,
+        emitterCompanyContact: null,
+        emitterType: "PRODUCER",
+        emitterIsForeignShip: true,
+        emitterCompanyOmiNumber: "OMI1234567",
+        emitterCompanyName: "Navire étranger",
+        emitterCompanyAddress: "Quelque part en mer"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate<Pick<Mutation, "markAsSealed">, MutationMarkAsSealedArgs>(
       MARK_AS_SEALED,
       {
         variables: {
@@ -1172,133 +1163,43 @@ describe("Mutation.markAsSealed", () => {
       }
     );
 
-    expect(data.markAsSealed.status).toBe("SIGNED_BY_PRODUCER");
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(updatedForm.status).toEqual("SIGNED_BY_PRODUCER");
+    expect(updatedForm.emittedAt).not.toBeNull();
+    expect(updatedForm.emittedBy).toEqual("Signature auto (navire étranger)");
   });
 
-  it("should throw an error if any SIRET does not exists", async () => {
-    // activate the tested feature
-    const OLD_ENV = process.env;
-    process.env.VERIFY_COMPANY = "true";
+  it("should be possible to seal a form without transporter", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
 
-    searchCompanyMock.mockRejectedValueOnce(
-      new UserInputError("Aucun établissement trouvé avec ce SIRET", {
-        invalidArgs: ["siret"]
-      })
-    );
-    const { user, company: emitterCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
-    const recipientCompany = await companyFactory({
-      companyTypes: { set: [CompanyType.COLLECTOR] }
-    });
-    const transporterCompany = await companyFactory({
-      companyTypes: { set: [CompanyType.TRANSPORTER] }
-    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
-        transporterCompanySiret: transporterCompany.siret
+        emitterCompanySiret: company.siret
       }
     });
+
+    await prisma.form.update({
+      where: { id: form.id },
+      data: { transporters: { deleteMany: {} } }
+    });
+
     const { mutate } = makeClient(user);
     const { errors } = await mutate(MARK_AS_SEALED, {
-      variables: { id: form.id }
+      variables: {
+        id: form.id
+      }
     });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: expect.stringMatching(
-          new RegExp(
-            `Établissement (${transporterCompany.siret}|${emitterCompany.siret}|${recipientCompany.siret}) introuvable, veuillez vérifier son numéro de SIRET`
-          )
-        )
-      })
-    ]);
-    process.env = OLD_ENV;
+
+    expect(errors).toBeUndefined();
+
+    const sealedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+
+    expect(sealedForm.status).toEqual("SEALED");
   });
-  it.each(["emitter", "recipient", "trader", "broker", "transporter"])(
-    "%p of the BSD cannot seal it if any of the company SIRET is closed",
-    async role => {
-      // activate the tested feature
-      const OLD_ENV = process.env;
-      process.env.VERIFY_COMPANY = "true";
-
-      const companyType = (role: string) =>
-        ({
-          emitter: CompanyType.PRODUCER,
-          recipient: CompanyType.WASTEPROCESSOR,
-          trader: CompanyType.TRADER,
-          transporter: CompanyType.TRANSPORTER
-        }[role]);
-
-      const { user, company } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: { set: [companyType(role) as CompanyType] }
-      });
-      const { siret: recipientCompanySiret } = await destinationFactory();
-
-      const form = await formFactory({
-        ownerId: user.id,
-        opt: {
-          status: "DRAFT",
-          [`${role}CompanySiret`]: company.siret,
-          ...(role !== "recipient" ? { recipientCompanySiret } : {}),
-          ...(["trader", "broker"].includes(role)
-            ? {
-                [`${role}CompanyName`]: "Trader or Broker",
-                [`${role}CompanyContact`]: "Mr Trader or Broker",
-                [`${role}CompanyMail`]: "traderbroker@trackdechets.fr",
-                [`${role}CompanyAddress`]: "Wall street",
-                [`${role}CompanyPhone`]: "00 00 00 00 00",
-                [`${role}Receipt`]: "receipt",
-                [`${role}Department`]: "07",
-                [`${role}ValidityLimit`]: new Date("2023-01-01")
-              }
-            : {})
-        }
-      });
-      searchCompanyMock.mockImplementation(siret => {
-        switch (siret) {
-          case form.transporterCompanySiret:
-          case form.emitterCompanySiret:
-          case form.brokerCompanySiret:
-          case form.traderCompanySiret:
-          case form.nextTransporterSiret:
-          case form.recipientCompanySiret: {
-            if (siret === company.siret) {
-              return Promise.resolve({
-                siret,
-                name: "Code en stock",
-                etatAdministratif: "F"
-              });
-            }
-            return Promise.resolve({
-              siret,
-              name: "Code en stock",
-              etatAdministratif: "A"
-            });
-          }
-          default: {
-            return Promise.resolve({
-              siret,
-              name: "Code en stock",
-              etatAdministratif: "A"
-            });
-          }
-        }
-      });
-
-      const { mutate } = makeClient(user);
-      const { errors } = await mutate(MARK_AS_SEALED, {
-        variables: { id: form.id }
-      });
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message: `Établissement ${company.siret} fermé, veuillez vérifier son numéro de SIRET`
-        })
-      ]);
-      process.env = OLD_ENV;
-    }
-  );
 });

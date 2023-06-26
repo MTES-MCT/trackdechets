@@ -13,18 +13,24 @@ import {
   client,
   BsdElastic,
   index,
-  PrismaBsdMap
+  groupByBsdType
 } from "../../../common/elastic";
-import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "@prisma/client";
+import { Bsdasri } from "@prisma/client";
 import prisma from "../../../prisma";
 import { expandFormFromElastic } from "../../../forms/converter";
 import { expandBsdasriFromElastic } from "../../../bsdasris/converter";
 import { expandVhuFormFromDb } from "../../../bsvhu/converter";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { expandBsdaFromElastic } from "../../../bsda/converter";
 import { expandBsffFromElastic } from "../../../bsffs/converter";
 import { bsdSearchSchema } from "../../validation";
 import { toElasticQuery } from "../../where";
+import { Permission, can, getUserRoles } from "../../../permissions";
+import { distinct } from "../../../common/arrays";
+import { RawForm } from "../../../forms/elastic";
+import { RawBsdasri } from "../../../bsdasris/elastic";
+import { RawBsvhu } from "../../../bsvhu/elastic";
+import { RawBsda } from "../../../bsda/elastic";
+import { RawBsff } from "../../../bsffs/elastic";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -41,30 +47,26 @@ export interface GetResponse<T> {
   _source: T;
 }
 
+type PrismaBsdMap = {
+  bsdds: RawForm[];
+  bsdasris: RawBsdasri[];
+  bsvhus: RawBsvhu[];
+  bsdas: RawBsda[];
+  bsffs: RawBsff[];
+};
+
 /**
  * Convert a list of BsdElastic to a mapping of prisma-like Bsds by retrieving rawBsd elastic field
  */
 async function toRawBsds(bsdsElastic: BsdElastic[]): Promise<PrismaBsdMap> {
-  const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = bsdsElastic.reduce<{
-    BSDD: Form[];
-    BSDASRI: Bsdasri[];
-    BSVHU: Bsvhu[];
-    BSDA: Bsda[];
-    BSFF: Bsff[];
-  }>(
-    (acc, bsdElastic) => ({
-      ...acc,
-      [bsdElastic.type]: [...acc[bsdElastic.type], bsdElastic?.rawBsd]
-    }),
-    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
-  );
+  const { BSDD, BSDA, BSDASRI, BSFF, BSVHU } = groupByBsdType(bsdsElastic);
 
   return {
-    bsdds: BSDD,
-    bsdasris: BSDASRI,
-    bsvhus: BSVHU,
-    bsdas: BSDA,
-    bsffs: BSFF
+    bsdds: BSDD.map(bsdElastic => bsdElastic.rawBsd as RawForm),
+    bsdasris: BSDASRI.map(bsdsElastic => bsdsElastic.rawBsd as RawBsdasri),
+    bsvhus: BSVHU.map(bsdElastic => bsdElastic.rawBsd as RawBsvhu),
+    bsdas: BSDA.map(bsdElastic => bsdElastic.rawBsd as RawBsda),
+    bsffs: BSFF.map(bsdsElastic => bsdsElastic.rawBsd as RawBsff)
   };
 }
 
@@ -118,10 +120,14 @@ async function buildQuery(
   }
 
   // Limit the scope of what the user can see to their companies
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+  const roles = await getUserRoles(user.id);
+  const orgIdsWithListPermission = Object.keys(roles).filter(orgId =>
+    can(roles[orgId], Permission.BsdCanList)
+  );
+
   query.bool.filter.push({
     terms: {
-      sirets: userCompaniesSiretOrVat
+      sirets: orgIdsWithListPermission
     }
   });
 
@@ -253,8 +259,7 @@ async function buildDasris(dasris: Bsdasri[]) {
     .map(bsd => bsd.emitterCompanySiret)
     .filter(Boolean);
 
-  // deduplicate sirets
-  const uniqueSirets = Array.from(new Set(emitterSirets));
+  const uniqueSirets = distinct(emitterSirets);
 
   // build an array of sirets allowing direct takeover
   const allows = (

@@ -3,7 +3,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { formDiff } from "../../workflow/diff";
 
@@ -22,7 +22,12 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
     const oldForm = await prisma.form.findUniqueOrThrow({
       where,
       include: {
-        forwardedIn: true
+        transporters: true, // make sure transporters field is not re-computed in `formDiff`
+        forwardedIn: {
+          include: {
+            transporters: true // make sure transporters field is not re-computed in `formDiff`
+          }
+        }
       }
     });
 
@@ -31,8 +36,8 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
       where,
       data,
       include: hasPossibleSiretChange
-        ? { ...SIRETS_BY_ROLE_INCLUDE, forwardedIn: true }
-        : { forwardedIn: true }
+        ? { ...SIRETS_BY_ROLE_INCLUDE, forwardedIn: true, transporters: true }
+        : { forwardedIn: true, transporters: true }
     });
 
     // Calculating the sirets from Prisma.FormUpdateInput and the previously existing ones is hard
@@ -84,7 +89,7 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
     }
 
     prisma.addAfterCommitCallback(() =>
-      enqueueBsdToIndex(updatedForm.readableId)
+      enqueueUpdatedBsdToIndex(updatedForm.readableId)
     );
 
     return updatedForm;
@@ -93,10 +98,8 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
 export function checkIfHasPossibleSiretChange(data: Prisma.FormUpdateInput) {
   return Boolean(
     data.recipientCompanySiret ||
-      data.transporterCompanySiret ||
-      data.transporterCompanyVatNumber ||
       data.intermediaries ||
-      data.transportSegments ||
+      data.transporters ||
       data.forwardedIn
   );
 }

@@ -6,19 +6,19 @@ import {
   useRouteMatch,
 } from "react-router-dom";
 import { IconQrCode } from "common/components/Icons";
-import routes from "common/routes";
-import { MenuLink } from "@reach/menu-button";
+import routes from "Apps/routes";
 
 export const CardRoadControlButton = ({ siret, form }) => {
   const location = useLocation();
-
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
   if (!useDisplayRoadControlButton(form)) {
     return null;
   }
   return (
     <Link
       to={{
-        pathname: generatePath(routes.dashboard.roadControl, {
+        pathname: generatePath(routes[dashboardRoutePrefix].roadControl, {
           siret,
 
           id: form.id,
@@ -41,8 +41,7 @@ export const TableRoadControlButton = ({ siret, form }) => {
   }
 
   return (
-    <MenuLink
-      as={Link}
+    <Link
       to={{
         pathname: generatePath(routes.dashboard.roadControl, {
           siret,
@@ -58,11 +57,11 @@ export const TableRoadControlButton = ({ siret, form }) => {
         <br />
         routier
       </span>
-    </MenuLink>
+    </Link>
   );
 };
 
-const useDisplayRoadControlButton = bsd => {
+export const useDisplayRoadControlButton = bsd => {
   const statusKey = {
     Form: "status",
     Bsdasri: "bsdasriStatus",
@@ -70,6 +69,11 @@ const useDisplayRoadControlButton = bsd => {
     Bsvhu: "bsvhuStatus",
     Bsda: "bsdaStatus",
   }[bsd.__typename];
-  const isCollectedTab = !!useRouteMatch(routes.dashboard.transport.collected);
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
+  const isCollectedTab = !!useRouteMatch(
+    routes[dashboardRoutePrefix].transport.collected
+  );
+
   return ["SENT", "RESENT"].includes(bsd[statusKey]) && isCollectedTab;
 };

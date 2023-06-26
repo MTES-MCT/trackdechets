@@ -70,7 +70,6 @@ describe("Managed wastes registry", () => {
       ownerId: emitter.user.id,
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         recipientCompanySiret: destination.company.siret,
         traderCompanySiret: trader.company.siret,
         brokerCompanySiret: broker.company.siret,
@@ -81,7 +80,13 @@ describe("Managed wastes registry", () => {
         sentAt: new Date("2021-04-01"),
         receivedAt: new Date("2021-04-01"),
         processedAt: new Date("2021-04-01"),
-        processingOperationDone: "R 1"
+        processingOperationDone: "R 1",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
+          }
+        }
       }
     });
     bsd2 = await bsdaFactory({
@@ -147,7 +152,7 @@ describe("Managed wastes registry", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0]).toEqual(
       expect.objectContaining({
-        message: `Vous n'êtes pas membre de l'entreprise portant le siret "${broker.company.siret}".`
+        message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${broker.company.siret}`
       })
     );
   });
@@ -255,7 +260,7 @@ describe("Managed wastes registry", () => {
     );
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Vous n'êtes pas membre de l'entreprise portant le siret "${destination.company.siret}".`
+        message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${destination.company.siret}`
       })
     ]);
   });

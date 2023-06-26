@@ -1,22 +1,26 @@
 import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
+import { string, object, date, boolean } from "yup";
 import cogoToast from "cogo-toast";
 import {
+  CompanySearchPrivate,
+  CompanySearchResult,
   Mutation,
   MutationEditSegmentArgs,
   NextSegmentInfoInput,
   TransportSegment,
 } from "generated/graphql/types";
-import { segmentFragment } from "common/fragments";
+import { segmentFragment } from "Apps/common/queries/fragments";
 import { IconPaperWrite } from "common/components/Icons";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 import TdSwitch from "common/components/Switch";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import { FieldTransportModeSelect } from "common/components";
+import { FieldTransportModeSelect, RedErrorMessage } from "common/components";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
+import { transporterCompanySchema } from "common/validation/schema";
 
 const EDIT_SEGMENT = gql`
   mutation editSegment(
@@ -35,6 +39,67 @@ type Props = {
   siret: string;
   segment: TransportSegment;
 };
+
+export const validationSchema = object().shape({
+  transporter: object().shape({
+    isExemptedOfReceipt: boolean().nullable(),
+    receipt: string().when(["isExemptedOfReceipt", "company.vatNumber"], {
+      is: (isExemptedOfReceipt: boolean, transporterCompanyVatNumber: string) =>
+        isForeignVat(transporterCompanyVatNumber) || isExemptedOfReceipt,
+      then: schema => schema.nullable(true),
+      otherwise: schema =>
+        schema
+          .ensure()
+          .required(
+            "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+          ),
+    }),
+    department: string().when(["isExemptedOfReceipt", "company.vatNumber"], {
+      is: (isExemptedOfReceipt: boolean, transporterCompanyVatNumber: string) =>
+        isForeignVat(transporterCompanyVatNumber) || isExemptedOfReceipt,
+      then: schema => schema.nullable(true),
+      otherwise: schema =>
+        schema
+          .ensure()
+          .required("Le département du transporteur est obligatoire"),
+    }),
+    validityLimit: date().nullable(true),
+    numberPlate: string().nullable(true),
+    company: transporterCompanySchema,
+  }),
+});
+
+/**
+ * Common onCompanySelected function
+ * @param setFieldValue Formik function
+ * @returns
+ */
+export const onCompanySelected =
+  setFieldValue =>
+  (transporter?: CompanySearchResult | CompanySearchPrivate) => {
+    if (transporter?.transporterReceipt) {
+      setFieldValue(
+        "transporter.receipt",
+        transporter?.transporterReceipt.receiptNumber
+      );
+      setFieldValue(
+        "transporter.validityLimit",
+        transporter?.transporterReceipt.validityLimit
+      );
+      setFieldValue(
+        "transporter.department",
+        transporter?.transporterReceipt.department
+      );
+    } else {
+      setFieldValue("transporter.receipt", null);
+      setFieldValue("transporter.validityLimit", null);
+      setFieldValue("transporter.department", null);
+    }
+    // automatically check the receipt exemption
+    if (isForeignVat(transporter?.vatNumber!)) {
+      setFieldValue("transporter.isExemptedOfReceipt", true);
+    }
+  };
 
 export default function EditSegment({ siret, segment }: Props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -71,6 +136,7 @@ export default function EditSegment({ siret, segment }: Props) {
         >
           <Formik
             initialValues={initialValues}
+            validationSchema={validationSchema}
             onSubmit={values =>
               editSegment({
                 variables: {
@@ -81,7 +147,7 @@ export default function EditSegment({ siret, segment }: Props) {
               })
             }
           >
-            {({ values, setFieldValue }) => (
+            {({ values, errors, setFieldValue }) => (
               <FormikForm>
                 <h3>Modifier un transfert multimodal</h3>
                 <div className="form__row">
@@ -98,35 +164,17 @@ export default function EditSegment({ siret, segment }: Props) {
                     id="id_numberPlate"
                     className="td-input"
                   />
+                  <RedErrorMessage name="transporter.numberPlate" />
                 </div>
                 <h4 className="form__section-heading">Transporteur</h4>
-
                 {!segment.readyToTakeOver ? (
                   <>
                     <CompanySelector
                       name="transporter.company"
                       allowForeignCompanies={true}
                       registeredOnlyCompanies={true}
-                      onCompanySelected={transporter => {
-                        if (transporter.transporterReceipt) {
-                          setFieldValue(
-                            "transporter.receipt",
-                            transporter.transporterReceipt.receiptNumber
-                          );
-                          setFieldValue(
-                            "transporter.validityLimit",
-                            transporter.transporterReceipt.validityLimit
-                          );
-                          setFieldValue(
-                            "transporter.department",
-                            transporter.transporterReceipt.department
-                          );
-                        } else {
-                          setFieldValue("transporter.receipt", "");
-                          setFieldValue("transporter.validityLimit", null);
-                          setFieldValue("transporter.department", "");
-                        }
-                      }}
+                      initialAutoSelectFirstCompany={false}
+                      onCompanySelected={onCompanySelected(setFieldValue)}
                     />
                   </>
                 ) : (
@@ -139,6 +187,7 @@ export default function EditSegment({ siret, segment }: Props) {
                           name="transporter.company.contact"
                           placeholder="NOM Prénom"
                         />
+                        <RedErrorMessage name="transporter.company.contact" />
                       </label>
 
                       <label>
@@ -148,12 +197,14 @@ export default function EditSegment({ siret, segment }: Props) {
                           name="transporter.company.phone"
                           placeholder="Numéro"
                         />
+                        <RedErrorMessage name="transporter.company.phone" />
                       </label>
 
                       <label>
                         Mail
                         <Field type="email" name="transporter.company.mail" />
                       </label>
+                      <RedErrorMessage name="transporter.company.mail" />
                     </div>
                   </>
                 )}

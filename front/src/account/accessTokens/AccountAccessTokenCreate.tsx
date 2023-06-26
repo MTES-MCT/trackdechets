@@ -6,8 +6,9 @@ import { CREATE_ACCESS_TOKEN } from "./queries";
 import {
   NotificationError,
   SimpleNotificationError,
-} from "common/components/Error";
+} from "Apps/common/Components/Error/Error";
 import { Field, Form, Formik } from "formik";
+import classNames from "classnames";
 import styles from "../fields/AccountField.module.scss";
 import TdTooltip from "common/components/Tooltip";
 import * as yup from "yup";
@@ -48,7 +49,7 @@ export default function AccountAccessTokenCreate({
       >
         <Form>
           <div className={styles.field}>
-            <label className={`text-right`}>
+            <label className={classNames("text-right", styles.tooltip)}>
               <span>Description</span>{" "}
               <TdTooltip msg="À quoi ce token va t-il servir (test, script, etc) ?" />
             </label>

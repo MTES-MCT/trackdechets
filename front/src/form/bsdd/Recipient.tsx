@@ -25,7 +25,7 @@ type IntermediariesSelect = {
   label: string;
 };
 
-export default function Recipient() {
+export default function Recipient({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Form>();
   const hasTrader = !!values.trader;
   const hasBroker = !!values.broker;
@@ -119,6 +119,12 @@ export default function Recipient() {
 
   return (
     <>
+      {disabled && (
+        <div className="notification notification--error">
+          Les champs grisés ci-dessous ont été scellés via signature et ne sont
+          plus modifiables.
+        </div>
+      )}
       {!isChapeau && (
         <div className="form__row">
           <TdSwitch
@@ -126,6 +132,7 @@ export default function Recipient() {
             onChange={handleTempStorageToggle}
             label="Le BSD va passer par une étape d'entreposage provisoire ou
           reconditionnement"
+            disabled={disabled}
           />
         </div>
       )}
@@ -160,6 +167,7 @@ export default function Recipient() {
       <CompanySelector
         name="recipient.company"
         registeredOnlyCompanies={true}
+        disabled={disabled}
       />
       <h4 className="form__section-heading">Informations complémentaires</h4>
       <div className="form__row">
@@ -167,29 +175,29 @@ export default function Recipient() {
           component={ProcessingOperation}
           name="recipient.processingOperation"
           enableReuse={isGrouping}
+          disabled={disabled}
         />
         <RedErrorMessage name="recipient.processingOperation" />
       </div>
-      {values?.emitter?.type !== "APPENDIX1" && (
-        <div className="form__row">
-          <label>
-            Numéro de CAP
-            {isDangerousWaste ? (
-              <Tooltip
-                msg={`Le champ CAP est obligatoire pour les déchets dangereux.
+      <div className="form__row">
+        <label>
+          Numéro de CAP
+          {isDangerousWaste ? (
+            <Tooltip
+              msg={`Le champ CAP est obligatoire pour les déchets dangereux.
 Il est important car il qualifie les conditions de gestion et de traitement du déchet entre le producteur et l'entreprise de destination.`}
-              />
-            ) : (
-              " (Optionnel pour les déchets non dangereux)"
-            )}
-            <Field
-              type="text"
-              name="recipient.cap"
-              className={classNames("td-input", styles.recipientCap)}
             />
-          </label>
-        </div>
-      )}
+          ) : (
+            " (Optionnel pour les déchets non dangereux)"
+          )}
+          <Field
+            type="text"
+            name="recipient.cap"
+            className={classNames("td-input", styles.recipientCap)}
+            disabled={disabled}
+          />
+        </label>
+      </div>
       <div className="form__row">
         <div className="td-input">
           <label> Ajout d'intermédiaires:</label>
@@ -209,6 +217,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
               }
             }}
             classNamePrefix="react-select"
+            isDisabled={disabled}
           />
         </div>
       </div>
@@ -218,7 +227,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           <CompanySelector
             name="trader.company"
             onCompanySelected={trader => {
-              if (trader.traderReceipt) {
+              if (trader?.traderReceipt) {
                 setFieldValue(
                   "trader.receipt",
                   trader.traderReceipt.receiptNumber
@@ -242,12 +251,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           <div className="form__row">
             <label>
               Numéro de récépissé
-              <Field
-                type="text"
-                name="trader.receipt"
-                className="td-input"
-                disabled={true}
-              />
+              <Field type="text" name="trader.receipt" className="td-input" />
             </label>
 
             <RedErrorMessage name="trader.receipt" />
@@ -260,7 +264,6 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
                 name="trader.department"
                 placeholder="Ex: 83"
                 className={classNames("td-input", styles.recipientDepartment)}
-                disabled={true}
               />
             </label>
 
@@ -276,7 +279,6 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
                   "td-input",
                   styles.recipientValidityLimit
                 )}
-                disabled={true}
               />
             </label>
 
@@ -301,7 +303,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           <CompanySelector
             name="broker.company"
             onCompanySelected={broker => {
-              if (broker.brokerReceipt) {
+              if (broker?.brokerReceipt) {
                 setFieldValue(
                   "broker.receipt",
                   broker.brokerReceipt.receiptNumber
@@ -325,12 +327,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           <div className="form__row">
             <label>
               Numéro de récépissé
-              <Field
-                type="text"
-                name="broker.receipt"
-                className="td-input"
-                disabled={true}
-              />
+              <Field type="text" name="broker.receipt" className="td-input" />
             </label>
 
             <RedErrorMessage name="broker.receipt" />
@@ -343,7 +340,6 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
                 name="broker.department"
                 placeholder="Ex: 83"
                 className={classNames("td-input", styles.recipientDepartment)}
-                disabled={true}
               />
             </label>
 
@@ -359,7 +355,6 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
                   "td-input",
                   styles.recipientValidityLimit
                 )}
-                disabled={true}
               />
             </label>
 

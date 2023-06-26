@@ -52,7 +52,8 @@ describe("Query.BsdaPdf", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Vous n'êtes pas autorisé à accéder au bordereau de ce BSDA.",
+        message:
+          "Vous n'êtes pas autorisé à accéder au récépissé PDF de ce BSDA.",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })

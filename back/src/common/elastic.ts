@@ -3,10 +3,13 @@ import path from "path";
 import { Client, RequestParams } from "@elastic/elasticsearch";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
-import prisma from "../prisma";
-import { Bsda, Bsdasri, Bsff, Bsvhu, Form, Prisma } from "@prisma/client";
 import logger from "../logging/logger";
 import { BsdType, FormCompany } from "../generated/graphql/types";
+import { RawForm } from "../forms/elastic";
+import { RawBsda } from "../bsda/elastic";
+import { RawBsdasri } from "../bsdasris/elastic";
+import { RawBsvhu } from "../bsvhu/elastic";
+import { RawBsff } from "../bsffs/elastic";
 
 export interface BsdElastic {
   type: BsdType;
@@ -94,7 +97,7 @@ export interface BsdElastic {
 
   intermediaries?: FormCompany[] | null;
 
-  rawBsd: any;
+  rawBsd: RawForm | RawBsda | RawBsdasri | RawBsvhu | RawBsff;
 }
 
 const textField = {
@@ -345,6 +348,22 @@ export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
   );
 }
 
+export async function getElasticBsdById(id) {
+  const result = await client.search({
+    index: index.alias,
+    body: {
+      query: {
+        term: {
+          readableId: {
+            value: id,
+            boost: "1.0"
+          }
+        }
+      }
+    }
+  });
+  return result;
+}
 /**
  * Bulk create/update a list of documents in Elastic Search.
  */
@@ -384,7 +403,7 @@ export function deleteBsd<T extends { id: string }>(
 /**
  * Group BsdElastic by BSD type
  */
-function groupByBsdType(
+export function groupByBsdType(
   bsdsELastic: BsdElastic[]
 ): Record<BsdType, BsdElastic[]> {
   return bsdsELastic.reduce<Record<BsdType, BsdElastic[]>>(
@@ -394,80 +413,6 @@ function groupByBsdType(
     }),
     { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
   );
-}
-
-export type PrismaBsdMap = {
-  bsdds: Form[];
-  bsdasris: Bsdasri[];
-  bsvhus: Bsvhu[];
-  bsdas: Bsda[];
-  bsffs: Bsff[];
-};
-
-type PrismaBsdsInclude = {
-  BSDD?: Prisma.FormInclude;
-  BSDASRI?: Prisma.BsdasriInclude;
-  BSDA?: Prisma.BsdaInclude;
-  BSFF?: Prisma.BsffInclude;
-};
-
-/**
- * Convert a list of BsdElastic to a mapping of prisma Bsds - Used for registry
- */
-export async function toPrismaBsds(
-  bsdsElastic: BsdElastic[],
-  include: PrismaBsdsInclude = {}
-): Promise<PrismaBsdMap> {
-  const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = groupByBsdType(bsdsElastic);
-
-  const prismaBsdsPromises: [
-    Promise<Form[]>,
-    Promise<Bsdasri[]>,
-    Promise<Bsvhu[]>,
-    Promise<Bsda[]>,
-    Promise<Bsff[]>
-  ] = [
-    prisma.form.findMany({
-      where: {
-        id: {
-          in: BSDD.map(bsdd => bsdd.id)
-        }
-      },
-      ...(include.BSDD ? { include: include.BSDD } : {})
-    }),
-    prisma.bsdasri.findMany({
-      where: { id: { in: BSDASRI.map(bsdasri => bsdasri.id) } },
-      ...(include.BSDASRI ? { include: include.BSDASRI } : {})
-    }),
-    prisma.bsvhu.findMany({
-      where: {
-        id: {
-          in: BSVHU.map(bsvhu => bsvhu.id)
-        }
-      }
-    }),
-    prisma.bsda.findMany({
-      where: {
-        id: {
-          in: BSDA.map(bsda => bsda.id)
-        }
-      },
-      ...(include.BSDA ? { include: include.BSDA } : {})
-    }),
-    prisma.bsff.findMany({
-      where: {
-        id: {
-          in: BSFF.map(bsff => bsff.id)
-        }
-      },
-      ...(include.BSFF ? { include: include.BSFF } : {})
-    })
-  ];
-
-  const [bsdds, bsdasris, bsvhus, bsdas, bsffs] = await Promise.all(
-    prismaBsdsPromises
-  );
-  return { bsdds, bsdasris, bsvhus, bsdas, bsffs };
 }
 
 // This filter is used to exlude "-" from number plates in a pre-processing step

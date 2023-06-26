@@ -4,11 +4,11 @@ import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { validateBsdasri, BsdasriValidationContext } from "../../validation";
-import { checkIsBsdasriContributor } from "../../permissions";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { BsdasriType } from "@prisma/client";
 import { getBsdasriRepository } from "../../repository";
 import sirenify from "../../sirenify";
+import { checkCanCreate } from "../../permissions";
 
 const getValidationContext = ({
   isDraft,
@@ -22,7 +22,9 @@ const getValidationContext = ({
   if (isSynthesizing) {
     return { emissionSignature: true };
   }
-  return isDraft ? { isGrouping } : { emissionSignature: true, isGrouping };
+  return isDraft
+    ? { isGrouping, isDraft: true }
+    : { emissionSignature: true, isGrouping };
 };
 
 /**
@@ -39,19 +41,7 @@ const createBsdasri = async (
   const user = checkIsAuthenticated(context);
   const { grouping, synthesizing, ...rest } = input;
 
-  const formSirets = {
-    emitterCompanySiret: input.emitter?.company?.siret ?? null,
-    destinationCompanySiret: input.destination?.company?.siret ?? null,
-    transporterCompanySiret: input.transporter?.company?.siret ?? null,
-    transporterCompanyVatNumber: input.transporter?.company?.vatNumber ?? null,
-    ecoOrganismeSiret: input.ecoOrganisme?.siret
-  };
-
-  await checkIsBsdasriContributor(
-    user,
-    formSirets,
-    "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparaît pas"
-  );
+  await checkCanCreate(user, input);
 
   const sirenifiedInput = await sirenify(rest, user);
   const flattenedInput = flattenBsdasriInput(sirenifiedInput);

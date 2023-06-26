@@ -1,6 +1,10 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { bsdasriFactory } from "../../../__tests__/factories";
 import {
+  bsdasriFactory,
+  readyToPublishData
+} from "../../../__tests__/factories";
+import {
+  companyFactory,
   siretify,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -8,7 +12,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
-
+import prisma from "../../../../prisma";
 const UPDATE_DASRI = `
 mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
   updateBsdasri(id: $id, input: $input) {
@@ -158,6 +162,7 @@ describe("Mutation.updateBsdasri", () => {
         set: ["COLLECTOR"]
       }
     });
+    const destinationCompany = await companyFactory();
     const emitterCompanySiret = siretify(1);
     const regrouped = await bsdasriFactory({
       opt: {
@@ -173,7 +178,8 @@ describe("Mutation.updateBsdasri", () => {
         status: BsdasriStatus.INITIAL,
         emitterCompanySiret: company.siret,
         type: "GROUPING",
-        grouping: { connect: [{ id: regrouped.id }] }
+        grouping: { connect: [{ id: regrouped.id }] },
+        ...readyToPublishData(destinationCompany)
       }
     });
     const toRegroup = await bsdasriFactory({
@@ -198,6 +204,15 @@ describe("Mutation.updateBsdasri", () => {
 
     expect(data.updateBsdasri.grouping!.map(bsd => bsd.id)).toEqual([
       toRegroup.id
+    ]);
+
+    const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id }
+    });
+
+    expect(updatedDasri.synthesisEmitterSirets).toEqual([]);
+    expect(updatedDasri.groupingEmitterSirets).toEqual([
+      toRegroup.emitterCompanySiret
     ]);
   });
 });

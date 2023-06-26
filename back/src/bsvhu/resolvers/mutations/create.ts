@@ -7,10 +7,10 @@ import {
 
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
-import { checkIsBsvhuContributor } from "../../permissions";
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import sirenify from "../../sirenify";
+import { checkCanCreate } from "../../permissions";
 
 type CreateBsvhu = {
   isDraft: boolean;
@@ -30,12 +30,8 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
   const user = checkIsAuthenticated(context);
 
   const sirenifiedInput = await sirenify(input, user);
+  await checkCanCreate(user, input);
   const form = flattenVhuInput(sirenifiedInput);
-  await checkIsBsvhuContributor(
-    user,
-    form,
-    "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
-  );
 
   await validateBsvhu(form, { emissionSignature: !isDraft });
   const bsvhuRepository = getBsvhuRepository(user);

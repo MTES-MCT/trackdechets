@@ -29,7 +29,7 @@ REDIS_CONF_FILE="${DD_CONF_DIR}/conf.d/redisdb.d/conf.yaml"
 
 if [[ -n "${REDIS_URL}" ]] && [[ "${CONTAINER}" == "${FIRST_NODE}" ]]; then
   REDISREGEX='^redis(s?)://([^:]*):([^@]+)@([^:]+):([^/]+)/?(.*)$'
-  if [[ $REDIS_URL =~ $POSTGREGEX ]]; then
+  if [[ $REDIS_URL =~ $REDISREGEX ]]; then
     sed -i "s/<DD_REDIS_HOST>/${BASH_REMATCH[4]}/g" "${REDIS_CONF_FILE}"
     sed -i "s/<DD_REDIS_PORT>/${BASH_REMATCH[5]}/g" "${REDIS_CONF_FILE}"
     sed -i "s/<DD_REDIS_PASSWORD>/${BASH_REMATCH[3]}/g" "${REDIS_CONF_FILE}"

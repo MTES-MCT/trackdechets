@@ -2,6 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import classnames from "classnames";
 import FocusTrap from "focus-trap-react";
 import {
+  SUPRIMER_REVISION,
+  VALIDER_TRAITEMENT,
   annexe1,
   apercu_action_label,
   completer_bsd_suite,
@@ -10,18 +12,18 @@ import {
   pdf_action_label,
   revision_action_label,
   supprimer_action_label,
-} from "../../../Common/wordings/dashboard/wordingsDashboard";
+} from "../../../common/wordings/dashboard/wordingsDashboard";
 import { BsdAdditionalActionsButtonProps } from "./bsdAdditionalActionsButtonTypes";
-import useOnClickOutsideRefTarget from "../../../../common/hooks/useOnClickOutsideRefTarget";
+import useOnClickOutsideRefTarget from "../../../common/hooks/useOnClickOutsideRefTarget";
 import {
   canReviewBsd,
   canDeleteBsd,
-  canDuplicateBsff,
   canDuplicate,
   canUpdateBsd,
   canGeneratePdf,
   hasBsdSuite,
   hasAppendix1Cta,
+  canDeleteReview,
 } from "../../dashboardServices";
 
 import "./bsdAdditionalActionsButton.scss";
@@ -29,14 +31,18 @@ import "./bsdAdditionalActionsButton.scss";
 function BsdAdditionalActionsButton({
   bsd,
   currentSiret,
-  onOverview,
-  onDuplicate,
-  onPdf,
-  onDelete,
-  onUpdate,
-  onRevision,
-  onBsdSuite,
-  onAppendix1,
+  actionList: {
+    onOverview,
+    onDuplicate,
+    onPdf,
+    onDelete,
+    onUpdate,
+    onRevision,
+    onAppendix1,
+    onBsdSuite,
+    onDeleteReview,
+  },
+  hideReviewCta,
 }: BsdAdditionalActionsButtonProps) {
   const [isOpen, setisOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLElement>(null);
@@ -46,11 +52,18 @@ function BsdAdditionalActionsButton({
 
   useEffect(() => {
     const { current } = dropdownRef;
+    const dropdownBound = current?.getBoundingClientRect();
+    const headerHeight = document.getElementById("header")?.clientHeight;
+    const windowHeight = document.getElementsByTagName("body")[0].clientHeight;
+    const scrollPosition = window.scrollY;
+
     if (
       current &&
       isOpen &&
-      window.innerHeight - current.getBoundingClientRect().bottom <
-        current.scrollHeight
+      dropdownBound &&
+      dropdownBound.height + dropdownBound.y > windowHeight &&
+      headerHeight &&
+      scrollPosition > headerHeight
     ) {
       current.style.top = `-${current.offsetHeight + 20}px`;
       current.style.transition = `none`;
@@ -71,11 +84,11 @@ function BsdAdditionalActionsButton({
   };
   const handlePdf = () => {
     closeMenu();
-    onPdf(bsd);
+    onPdf!(bsd);
   };
   const handleUpdate = () => {
     closeMenu();
-    onUpdate(bsd);
+    onUpdate!(bsd);
   };
   const handleDuplicate = () => {
     closeMenu();
@@ -83,11 +96,11 @@ function BsdAdditionalActionsButton({
   };
   const handleDelete = () => {
     closeMenu();
-    onDelete(bsd);
+    onDelete!(bsd);
   };
   const handleRevision = () => {
     closeMenu();
-    onRevision(bsd);
+    onRevision!(bsd);
   };
 
   const handleBsdSuite = () => {
@@ -97,6 +110,11 @@ function BsdAdditionalActionsButton({
   const handleAppendix1 = () => {
     closeMenu();
     onAppendix1!(bsd);
+  };
+
+  const handleReviewDelete = () => {
+    closeMenu();
+    onDeleteReview!(bsd);
   };
 
   const tabIndex = isOpen ? 0 : -1;
@@ -136,12 +154,31 @@ function BsdAdditionalActionsButton({
             <li>
               <button
                 type="button"
-                data-testid="bsd-suite-btn"
+                data-testid={
+                  !bsd?.temporaryStorageDetail
+                    ? "bsd-suite-btn"
+                    : "valider-traitement-btn"
+                }
                 className="fr-btn fr-btn--tertiary-no-outline"
                 tabIndex={tabIndex}
                 onClick={handleBsdSuite}
               >
-                {completer_bsd_suite}
+                {!bsd?.temporaryStorageDetail
+                  ? completer_bsd_suite
+                  : VALIDER_TRAITEMENT}
+              </button>
+            </li>
+          )}
+          {canDeleteReview(bsd, currentSiret) && (
+            <li>
+              <button
+                type="button"
+                data-testid="review-btn"
+                className="fr-btn fr-btn--tertiary-no-outline"
+                tabIndex={tabIndex}
+                onClick={handleReviewDelete}
+              >
+                {SUPRIMER_REVISION}
               </button>
             </li>
           )}
@@ -149,6 +186,7 @@ function BsdAdditionalActionsButton({
             <li>
               <button
                 type="button"
+                data-testid="appendix1-btn"
                 className="fr-btn fr-btn--tertiary-no-outline"
                 tabIndex={tabIndex}
                 onClick={handleAppendix1}
@@ -181,7 +219,7 @@ function BsdAdditionalActionsButton({
               </button>
             </li>
           )}
-          {(canDuplicate(bsd) || canDuplicateBsff(bsd, currentSiret)) && (
+          {canDuplicate(bsd, currentSiret) && (
             <li>
               <button
                 type="button"
@@ -207,7 +245,7 @@ function BsdAdditionalActionsButton({
               </button>
             </li>
           )}
-          {canReviewBsd(bsd, currentSiret) && (
+          {!hideReviewCta && canReviewBsd(bsd, currentSiret) && (
             <li>
               <button
                 type="button"
@@ -220,7 +258,7 @@ function BsdAdditionalActionsButton({
               </button>
             </li>
           )}
-          {canDeleteBsd(bsd, currentSiret) && (
+          {!hideReviewCta && canDeleteBsd(bsd, currentSiret) && (
             <li>
               <button
                 type="button"

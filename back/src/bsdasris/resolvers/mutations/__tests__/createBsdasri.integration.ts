@@ -4,7 +4,8 @@ import {
   userFactory,
   userWithCompanyFactory,
   companyFactory,
-  siretify
+  siretify,
+  getDestinationCompanyInfo
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -25,6 +26,7 @@ const CREATE_DASRI = gql`
     }
   }
 `;
+
 describe("Mutation.createDasri", () => {
   afterEach(async () => {
     await resetDatabase();
@@ -104,7 +106,8 @@ describe("Mutation.createDasri", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -152,7 +155,8 @@ describe("Mutation.createDasri", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -174,6 +178,7 @@ describe("Mutation.createDasri", () => {
       where: { id: data.createBsdasri.id }
     });
     expect(created.synthesisEmitterSirets).toEqual([]);
+    expect(created.groupingEmitterSirets).toEqual([]);
     // check input is sirenified
     expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
@@ -228,7 +233,8 @@ describe("Mutation.createDasri", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -278,7 +284,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -325,7 +332,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -370,7 +378,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -432,7 +441,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -499,7 +509,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -571,7 +582,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -637,7 +649,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -702,7 +715,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -767,7 +781,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -809,7 +824,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -849,7 +865,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);

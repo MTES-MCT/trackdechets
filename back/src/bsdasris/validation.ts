@@ -13,7 +13,6 @@ import {
   BsdasriPackagingType,
   BsdasriSignatureType
 } from "../generated/graphql/types";
-import { isForeignVat } from "../common/constants/companySearchHelpers";
 import {
   MISSING_COMPANY_SIRET,
   MISSING_COMPANY_SIRET_OR_VAT
@@ -26,7 +25,8 @@ import {
   vatNumberTests,
   weight,
   weightConditions,
-  WeightUnits
+  WeightUnits,
+  transporterRecepisseSchema
 } from "../common/validation";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
@@ -250,9 +250,7 @@ export const emissionSchema: FactorySchemaOf<
         "emission-quantity-type-required-if-quantity-is-provided",
         "Le type de pesée (réelle ou estimée) doit être précisé si vous renseignez un poids de déchets émis",
         function (value) {
-          return !!this.parent.emitterWasteWeightValue
-            ? ![null, undefined].includes(value)
-            : true;
+          return !!this.parent.emitterWasteWeightValue ? value != null : true;
         }
       ),
 
@@ -338,43 +336,7 @@ export const transporterSchema: FactorySchemaOf<
         `Transporteur: ${MISSING_COMPANY_PHONE}`
       ),
     transporterCompanyMail: yup.string().email().ensure(),
-    transporterRecepisseNumber: yup
-      .string()
-      .ensure()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva || !isForeignVat(tva)) {
-          return schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le numéro de récépissé est obligatoire`
-          );
-        }
-        return schema.notRequired();
-      }),
-
-    transporterRecepisseDepartment: yup
-      .string()
-      .ensure()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva || !isForeignVat(tva)) {
-          return schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le département associé au récépissé est obligatoire`
-          );
-        }
-        return schema.nullable().notRequired();
-      }),
-
-    transporterRecepisseValidityLimit: yup
-      .date()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva || !isForeignVat(tva)) {
-          return schema.requiredIf(
-            context.transportSignature || requiredForSynthesis,
-            "La date de validité du récépissé est obligatoire"
-          );
-        }
-        return schema.nullable().notRequired();
-      })
+    ...transporterRecepisseSchema(context)
   });
 };
 
@@ -457,7 +419,7 @@ export const transportSchema: FactorySchemaOf<
         "Le type de pesée (réelle ou estimée) doit être précisé si vous renseignez un poids de déchets transportés",
         function (value) {
           return !!this.parent.transporterWasteWeightValue
-            ? ![null, undefined].includes(value)
+            ? value != null
             : true;
         }
       ),
@@ -490,7 +452,7 @@ export const transportSchema: FactorySchemaOf<
     transporterTransportPlates: yup
       .array()
       .of(yup.string())
-      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté") as any
   });
 
 export const recipientSchema: FactorySchemaOf<
@@ -500,38 +462,22 @@ export const recipientSchema: FactorySchemaOf<
   yup.object().shape({
     destinationCompanyName: yup
       .string()
-      .requiredIf(
-        context.receptionSignature,
-        `Destinataire: ${MISSING_COMPANY_NAME}`
-      ),
+      .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_NAME}`),
     destinationCompanySiret: siret
       .label("Destination")
-      .requiredIf(
-        context.receptionSignature,
-        `Destinataire: ${MISSING_COMPANY_SIRET}`
-      )
+      .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`)
       .test(siretTests.isRegistered("DESTINATION")),
     destinationCompanyAddress: yup
       .string()
-
-      .requiredIf(
-        context.receptionSignature,
-        `Destinataire: ${MISSING_COMPANY_ADDRESS}`
-      ),
+      .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_ADDRESS}`),
     destinationCompanyContact: yup
       .string()
 
-      .requiredIf(
-        context.receptionSignature,
-        `Destinataire: ${MISSING_COMPANY_CONTACT}`
-      ),
+      .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_CONTACT}`),
     destinationCompanyPhone: yup
       .string()
       .ensure()
-      .requiredIf(
-        context.receptionSignature,
-        `Destinataire: ${MISSING_COMPANY_PHONE}`
-      ),
+      .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_PHONE}`),
     destinationCompanyMail: yup.string().email().ensure()
   });
 
@@ -646,6 +592,7 @@ export const operationSchema: FactorySchemaOf<
           const recipientSiret = ctx.parent.destinationCompanySiret;
 
           if (
+            value &&
             DASRI_GROUPING_OPERATIONS_CODES.includes(value) &&
             !!recipientSiret
           ) {
@@ -655,7 +602,7 @@ export const operationSchema: FactorySchemaOf<
               }
             });
 
-            return isCollector(destinationCompany);
+            return !!destinationCompany && isCollector(destinationCompany);
           }
           return true;
         }
@@ -676,6 +623,7 @@ export type BsdasriValidationContext = {
   operationSignature?: boolean;
   isGrouping?: boolean;
   isSynthesis?: boolean;
+  isDraft?: boolean;
 };
 export function validateBsdasri(
   dasri: Partial<Prisma.BsdasriCreateInput>,

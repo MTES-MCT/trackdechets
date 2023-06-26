@@ -1,5 +1,5 @@
 import { BsffResolvers } from "../../generated/graphql/types";
-import { checkCanReadBsff } from "../permissions";
+import { checkCanRead } from "../permissions";
 import { ForbiddenError } from "apollo-server-express";
 import { Bsff } from "./Bsff";
 import { getReadonlyBsffRepository } from "../repository";
@@ -13,7 +13,7 @@ export const InitialBsff: BsffResolvers = {
       where: { id }
     });
     try {
-      await checkCanReadBsff(user!, bsff!);
+      await checkCanRead(user!, bsff!);
     } catch (err) {
       throw new ForbiddenError(
         `Vous ne pouvez pas accéder au champ "emitter" du bordereau initial ${id}`

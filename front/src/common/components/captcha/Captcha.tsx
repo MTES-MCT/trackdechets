@@ -1,8 +1,9 @@
 import React, { useState, useCallback } from "react";
-import { TextInput, Button } from "@dataesr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import classNames from "classnames";
 import "./Captcha.scss";
-import { Loader } from "common/components";
+import { Loader } from "Apps/common/Components";
 
 const { VITE_API_ENDPOINT } = import.meta.env;
 
@@ -43,9 +44,9 @@ const CaptchaAudio = ({ captchaToken }) => {
   };
   return (
     <Button
-      secondary
-      size="sm"
-      icon="ri-volume-up-line"
+      priority="secondary"
+      size="small"
+      iconId="ri-volume-up-line"
       title="Écouter le code"
       onClick={onClick}
       disabled={playing}
@@ -83,24 +84,24 @@ export const Captcha = ({
         >
           <Button
             onClick={refetch}
-            secondary
+            priority="secondary"
             title="Rafraîchir l'image"
-            icon="ri-restart-line"
-            size="sm"
+            iconId="ri-restart-line"
+            size="small"
           >
             Nouvelle image
           </Button>
           <CaptchaAudio captchaToken={captchaToken} />
         </div>
       </div>
-      <TextInput
-        type={"text"}
-        // @ts-ignore
-        onChange={e => setCaptchaInput(e.target.value)}
-        required
-        name="captchaInput"
-        value={captchaInput}
+      <Input
         label="Anti-robots: recopiez le texte ci-dessus"
+        nativeInputProps={{
+          required: true,
+          name: "captchaInput",
+          value: captchaInput,
+          onChange: e => setCaptchaInput(e.target.value),
+        }}
       />
     </>
   );

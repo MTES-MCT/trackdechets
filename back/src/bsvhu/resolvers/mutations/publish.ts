@@ -4,9 +4,9 @@ import { MutationPublishBsvhuArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
-import { checkIsBsvhuContributor } from "../../permissions";
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
+import { checkCanUpdate } from "../../permissions";
 
 export default async function publish(
   _,
@@ -15,20 +15,17 @@ export default async function publish(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const prismaForm = await getBsvhuOrNotFound(id);
-  await checkIsBsvhuContributor(
-    user,
-    prismaForm,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
-  );
+  const existingBsvhu = await getBsvhuOrNotFound(id);
 
-  if (!prismaForm.isDraft) {
+  await checkCanUpdate(user, existingBsvhu);
+
+  if (!existingBsvhu.isDraft) {
     throw new ForbiddenError(
       "Impossible de publier un bordereau qui n'est pas un brouillon"
     );
   }
 
-  await validateBsvhu(prismaForm, { emissionSignature: true });
+  await validateBsvhu(existingBsvhu, { emissionSignature: true });
   const bsvhuRepository = getBsvhuRepository(user);
 
   const updatedBsvhu = await bsvhuRepository.update({ id }, { isDraft: false });

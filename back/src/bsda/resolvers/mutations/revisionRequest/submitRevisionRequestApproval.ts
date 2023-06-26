@@ -8,8 +8,8 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../../common/permissions";
 import { MutationSubmitBsdaRevisionRequestApprovalArgs } from "../../../../generated/graphql/types";
 import { GraphQLContext } from "../../../../types";
-import { getUserCompanies } from "../../../../users/database";
 import { getBsdaRepository } from "../../../repository";
+import { Permission, can, getUserRoles } from "../../../../permissions";
 
 const bsdaRevisionRequestWithApprovals =
   Prisma.validator<Prisma.BsdaRevisionRequestArgs>()({
@@ -42,49 +42,58 @@ export async function submitBsdaRevisionRequestApproval(
     );
   }
 
-  const currentApproverSiret = await getCurrentApproverSiret(
+  const currentApproverSirets = await getCurrentApproverSirets(
     user,
     revisionRequest
   );
-  const approval = revisionRequest.approvals.find(
-    approval => approval.approverSiret === currentApproverSiret
-  );
 
-  if (!approval) {
-    throw new UserInputError("Vous n'êtes pas approbateur de cette révision.");
-  }
+  for (const currentApproverSiret of currentApproverSirets) {
+    const approval = revisionRequest.approvals.find(
+      approval => approval.approverSiret === currentApproverSiret
+    );
 
-  if (isApproved) {
-    await bsdaRepository.acceptRevisionRequestApproval(approval.id, {
-      comment
-    });
-  } else {
-    await bsdaRepository.refuseRevisionRequestApproval(approval.id, {
-      comment
-    });
+    if (!approval) {
+      throw new UserInputError(
+        "Vous n'êtes pas approbateur de cette révision."
+      );
+    }
+
+    if (isApproved) {
+      await bsdaRepository.acceptRevisionRequestApproval(approval.id, {
+        comment
+      });
+    } else {
+      await bsdaRepository.refuseRevisionRequestApproval(approval.id, {
+        comment
+      });
+    }
   }
 
   return bsdaRepository.findUniqueRevisionRequest({ id });
 }
 
-async function getCurrentApproverSiret(
+async function getCurrentApproverSirets(
   user: User,
   revisionRequest: BsdaRevisionRequestWithApprovals
-) {
+): Promise<string[]> {
   const remainingApproverSirets = revisionRequest.approvals
     .filter(approval => approval.status === Status.PENDING)
     .map(approvals => approvals.approverSiret);
 
-  const userCompanies = await getUserCompanies(user.id);
-  const approvingCompaniesCandidate = userCompanies.find(
-    company => company.siret && remainingApproverSirets.includes(company.siret)
+  const roles = await getUserRoles(user.id);
+  const userOrgIds = Object.keys(roles).filter(orgId =>
+    can(roles[orgId], Permission.BsdCanRevise)
   );
 
-  if (!approvingCompaniesCandidate) {
+  const approvingCompaniesCandidates = userOrgIds.filter(orgId =>
+    remainingApproverSirets.includes(orgId)
+  );
+
+  if (!approvingCompaniesCandidates.length) {
     throw new ForbiddenError(
       "Vous n'êtes pas destinataire de cette révision, ou alors cette révision a déjà été approuvée."
     );
   }
 
-  return approvingCompaniesCandidate.siret;
+  return approvingCompaniesCandidates;
 }

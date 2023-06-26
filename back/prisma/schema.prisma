@@ -102,9 +102,12 @@ enum TransportMode {
   AIR
   RIVER
   SEA
+  OTHER
 }
 
 enum UserRole {
+  READER
+  DRIVER
   MEMBER
   ADMIN
 }
@@ -244,12 +247,13 @@ model AnonymousCompany {
 }
 
 model CompanyAssociation {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   role      UserRole
   companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
+  company   Company   @relation(fields: [companyId], references: [id])
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime? @default(now()) @db.Timestamptz(6)
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")
@@ -310,18 +314,6 @@ model Form {
   recipientCompanyContact            String?
   recipientCompanyPhone              String?
   recipientCompanyMail               String?
-  transporterCompanyName             String?
-  transporterCompanySiret            String?
-  transporterCompanyAddress          String?
-  transporterCompanyContact          String?
-  transporterCompanyPhone            String?
-  transporterCompanyMail             String?
-  transporterCompanyVatNumber        String?
-  transporterReceipt                 String?
-  transporterDepartment              String?
-  transporterValidityLimit           DateTime?               @db.Timestamptz(6)
-  transporterNumberPlate             String?
-  transporterTransportMode           TransportMode?          @default(ROAD)
   wasteDetailsCode                   String?
   wasteDetailsOnuCode                String?
   wasteDetailsPackagingInfos         Json                    @default("[]")
@@ -332,6 +324,7 @@ model Form {
   wasteDetailsParcelNumbers          Json                    @default("[]")
   wasteDetailsAnalysisReferences     String[]
   wasteDetailsLandIdentifiers        String[]
+  wasteDetailsSampleNumber           String?
   readableId                         String                  @unique
   status                             Status                  @default(DRAFT)
   emittedBy                          String?
@@ -374,7 +367,6 @@ model Form {
   processingOperationDescription     String?
   noTraceability                     Boolean?
   signedByTransporter                Boolean?
-  transporterIsExemptedOfReceipt     Boolean?
   customId                           String?
   wasteAcceptationStatus             WasteAcceptationStatus?
   wasteRefusalReason                 String?
@@ -392,19 +384,18 @@ model Form {
   emitterWorkSiteCity                String?
   emitterWorkSitePostalCode          String?
   emitterWorkSiteInfos               String?
-  transporterCustomInfo              String?
   recipientIsTempStorage             Boolean?                @default(false)
   signedAt                           DateTime?               @db.Timestamptz(6)
-  currentTransporterSiret            String?
-  nextTransporterSiret               String?
+  currentTransporterOrgId            String?
+  nextTransporterOrgId               String?
   isImportedFromPaper                Boolean                 @default(false)
   ecoOrganismeName                   String?
   ecoOrganismeSiret                  String?
   signedBy                           String?
 
-  transportSegments TransportSegment[]
-  groupedIn         FormGroupement[]   @relation("GroupedIn")
-  grouping          FormGroupement[]   @relation("Grouping")
+  transporters BsddTransporter[]
+  groupedIn    FormGroupement[]  @relation("GroupedIn")
+  grouping     FormGroupement[]  @relation("Grouping")
 
   ownerId              String
   owner                User                          @relation(fields: [ownerId], references: [id])
@@ -427,7 +418,6 @@ model Form {
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
-  @@index([transporterCompanySiret], map: "_FormTransporterCompanySiretIdx")
   @@index([traderCompanySiret], map: "_FormTraderCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
   @@index([ecoOrganismeSiret], map: "_FormEcoOrganismeSiretIdx")
@@ -436,6 +426,8 @@ model Form {
   @@index([createdAt], map: "_FormCreatedAtIdx")
   @@index([wasteDetailsCode], map: "_FormWasteDetailsCodeIdx")
   @@index([customId], map: "_FormCustomIdIdx")
+  @@index([currentTransporterOrgId], map: "_FormCurrentTransporterOrgIdIdx")
+  @@index([nextTransporterOrgId], map: "_FormNextTransporterOrgIdIdx")
 }
 
 model FormGroupement {
@@ -633,6 +625,7 @@ model StatusLog {
 
   @@index([userId], map: "_StatusLogUserIdIdx")
   @@index([formId], map: "_StatusLogFormIdIdx")
+  @@index([loggedAt], map: "_StatusLogLoggedAtIdx")
 }
 
 model TraderReceipt {
@@ -677,10 +670,11 @@ model WorkerCertification {
   Company             Company[]
 }
 
-model TransportSegment {
+model BsddTransporter {
   id                              String         @id @default(cuid())
-  segmentNumber                   Int?
+  number                          Int
   transporterCompanySiret         String?
+  transporterCompanyVatNumber     String?
   transporterCompanyName          String?
   transporterCompanyAddress       String?
   transporterCompanyContact       String?
@@ -691,18 +685,20 @@ model TransportSegment {
   transporterDepartment           String?
   transporterValidityLimit        DateTime?      @db.Timestamptz(6)
   transporterNumberPlate          String?
-  mode                            TransportMode?
+  transporterTransportMode        TransportMode?
+  transporterCustomInfo           String?
   readyToTakeOver                 Boolean?       @default(false)
-  previousTransporterCompanySiret String?
+  previousTransporterCompanyOrgId String?
   takenOverAt                     DateTime?      @db.Timestamptz(6)
   takenOverBy                     String?
   createdAt                       DateTime       @default(now()) @db.Timestamptz(6)
   updatedAt                       DateTime       @updatedAt @db.Timestamptz(6)
   formId                          String
-  form                            Form           @relation(fields: [formId], references: [id])
+  form                            Form           @relation(fields: [formId], references: [id], onDelete: Cascade)
 
-  @@index([formId], map: "_TransportSegmentFormIdIdx")
-  @@index([transporterCompanySiret], map: "_TransportSegmentTransporterCompanySiretIdx")
+  @@index([formId], map: "_BsddTransporterFormIdIdx")
+  @@index([transporterCompanySiret], map: "_BsddTransporterCompanySiretIdx")
+  @@index([transporterCompanyVatNumber], map: "_BsddTransporterCompanyVatNumberIdx")
 }
 
 model User {
@@ -850,6 +846,7 @@ model Bsvhu {
   transporterRecepisseNumber          String?
   transporterRecepisseDepartment      String?
   transporterRecepisseValidityLimit   DateTime? @db.Timestamptz(6)
+  transporterRecepisseIsExempted      Boolean?
   transporterTransportTakenOverAt     DateTime? @db.Timestamptz(6)
   transporterTransportPlates          String[]
   transporterTransportSignatureAuthor String?
@@ -960,6 +957,7 @@ model Bsdasri {
   transporterRecepisseNumber          String?
   transporterRecepisseDepartment      String?
   transporterRecepisseValidityLimit   DateTime?               @db.Timestamptz(6)
+  transporterRecepisseIsExempted      Boolean?
   transporterCustomInfo               String? // free field
   // transport
   transporterTransportMode            TransportMode?          @default(ROAD)
@@ -1015,7 +1013,10 @@ model Bsdasri {
   synthesizedInId                             String?
 
   // Denormalized fields, storing associated dasri sirets to speed up some queries
+  // Emitter sirets list in case of synthesis bsd 
   synthesisEmitterSirets String[] @default([])
+  // Emitter sirets list in case of grouping bsd 
+  groupingEmitterSirets  String[] @default([])
 
   // partial indices _BsdasriTypeIdx, _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
   // gin index see 119_dasri_denormalized_sirets.sql
@@ -1512,4 +1513,15 @@ model PdfAccessToken {
   visitedAt DateTime? @db.Timestamptz(6)
 
   @@index([token], map: "_PdfAccessTokenTokenIdx")
+}
+
+model WebhookSetting {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  endpointUri String
+  token       String
+  orgId       String   @unique
+  activated   Boolean  @default(value: false)
+
+  @@index([orgId], map: "_WebhookSettingOrgIdIdx")
 }

@@ -15,7 +15,6 @@ import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../database";
-import { checkIsCompanyMember } from "../../../users/permissions";
 import {
   countries,
   isForeignVat
@@ -23,6 +22,7 @@ import {
 import { checkVAT } from "jsvat";
 import { searchCompany } from "../../search";
 import { CompanySearchResult } from "../../types";
+import { Permission, checkUserPermissions } from "../../../permissions";
 
 const MAX_FAVORITES = 10;
 
@@ -204,40 +204,30 @@ async function getRecentNextDestinations(
 }
 
 async function getRecentTransporters(defaultWhere: Prisma.FormWhereInput) {
-  const forms = await prisma.form.findMany({
+  const transporters = await prisma.bsddTransporter.findMany({
     ...defaultArgs,
     where: {
-      // `defaultWhere` uses an `OR` already. We need a `AND` to avoid overwriting it.
-      AND: [
-        defaultWhere,
+      form: defaultWhere,
+      OR: [
         {
-          OR: [
-            {
-              NOT: [
-                { transporterCompanySiret: null },
-                { transporterCompanySiret: "" }
-              ]
-            },
-            {
-              NOT: [
-                { transporterCompanyVatNumber: null },
-                { transporterCompanyVatNumber: "" }
-              ]
-            }
+          NOT: [
+            { transporterCompanySiret: null },
+            { transporterCompanySiret: "" }
+          ]
+        },
+        {
+          NOT: [
+            { transporterCompanyVatNumber: null },
+            { transporterCompanyVatNumber: "" }
           ]
         }
       ]
-    },
-    select: {
-      transporterCompanySiret: true,
-      transporterCompanyVatNumber: true,
-      transporterReceipt: true
     }
   });
-  const transporterSirets = forms
+  const transporterSirets = transporters
     .map(f => f.transporterCompanySiret)
     .filter(Boolean);
-  const transporterVatNumbers = forms
+  const transporterVatNumbers = transporters
     .map(f => f.transporterCompanyVatNumber)
     .filter(Boolean);
 
@@ -388,7 +378,15 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ orgId: siret });
-  await checkIsCompanyMember({ id: user.id }, { orgId: company.orgId });
+
+  // retrieving company favorites is considered as a list operation on bsd beacause
+  // getRecentPartners read all bsds for a given siret
+  await checkUserPermissions(
+    user,
+    [siret].filter(Boolean),
+    Permission.BsdCanList,
+    `Vous n'êtes pas membre de l'entreprise portant le siret "${siret}".`
+  );
 
   const recentPartners = company.siret
     ? await getRecentPartners(company.siret, type)

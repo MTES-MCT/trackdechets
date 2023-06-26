@@ -28,14 +28,21 @@ describe("{ mutation { prepareSegment } }", () => {
       }
     );
 
-    const transporterSiret = company.siret;
+    const transporterOrgId = company.orgId;
     // create a form whose first transporter is another one
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
-        transporterCompanySiret: transporterSiret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterOrgId,
+            number: 1,
+            takenOverAt: new Date(),
+            takenOverBy: "John Snow"
+          }
+        },
         status: "SENT",
-        currentTransporterSiret: transporterSiret
+        currentTransporterOrgId: transporterOrgId
       }
     });
     const transporterCompanySiret = siretify(2);
@@ -43,7 +50,7 @@ describe("{ mutation { prepareSegment } }", () => {
     const { data } = await mutate<Pick<Mutation, "prepareSegment">>(
       `mutation  {
         prepareSegment(id:"${form.id}",
-         siret:"${transporterSiret}",
+        siret:"${transporterOrgId}",
          nextSegmentInfo: {
             transporter: {
               company: {
@@ -60,7 +67,7 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    const segment = await prisma.transportSegment.findUniqueOrThrow({
+    const segment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: data.prepareSegment.id }
     });
 
@@ -77,14 +84,21 @@ describe("{ mutation { prepareSegment } }", () => {
       }
     );
 
-    const transporterSiret = company.siret;
+    const transporterOrgId = company.orgId;
     // create a form whose first transporter is another one
     const form = await formFactory({
       ownerId: firstTransporter.id,
       opt: {
-        transporterCompanySiret: transporterSiret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterOrgId,
+            number: 1,
+            takenOverAt: new Date(),
+            takenOverBy: "John Snow"
+          }
+        },
         status: "SENT",
-        currentTransporterSiret: transporterSiret
+        currentTransporterOrgId: transporterOrgId
       }
     });
     const transporterCompanySiret = siretify(2);
@@ -92,24 +106,24 @@ describe("{ mutation { prepareSegment } }", () => {
     const { data } = await mutate<Pick<Mutation, "prepareSegment">>(
       `mutation  {
         prepareSegment(id:"${form.id}",
-         siret:"${transporterSiret}",
-         nextSegmentInfo: {
-            transporter: {
-              company: {
-                siret: "${transporterCompanySiret}"
-                name: "Nightwatch fight club"
-                address: "The north wall"
-                contact: "John Snow"
-              }
+        siret:"${transporterOrgId}",
+        nextSegmentInfo: {
+          transporter: {
+            company: {
+              siret: "${transporterCompanySiret}"
+              name: "Nightwatch fight club"
+              address: "The north wall"
+              contact: "John Snow"
             }
-            mode: ROAD
-          }) {
-              id
           }
+          mode: ROAD
+      }) {
+        id
+      }
       }`
     );
 
-    const segment = await prisma.transportSegment.findUniqueOrThrow({
+    const segment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: data.prepareSegment.id }
     });
 
@@ -146,14 +160,21 @@ describe("{ mutation { prepareSegment } }", () => {
       segmentPayload: { transporterCompanySiret }
     });
 
-    const transporterSiret = company.siret;
+    const transporterOrgId = company.orgId;
     // create a form whose first transporter is another one
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
-        transporterCompanySiret: transporterSiret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterOrgId,
+            takenOverAt: new Date(),
+            takenOverBy: "John Snow",
+            number: 1
+          }
+        },
         status: "SENT",
-        currentTransporterSiret: transporterSiret
+        currentTransporterOrgId: transporterOrgId
       }
     });
 
@@ -161,8 +182,8 @@ describe("{ mutation { prepareSegment } }", () => {
     const { data } = await mutate<Pick<Mutation, "prepareSegment">>(
       `mutation  {
         prepareSegment(id:"${form.id}",
-         siret:"${transporterSiret}",
-         nextSegmentInfo: {
+          siret:"${transporterOrgId}",
+          nextSegmentInfo: {
             transporter: {
               company: {
                 siret: "${company2.siret}"
@@ -189,8 +210,8 @@ describe("{ mutation { prepareSegment } }", () => {
     expect(data.prepareSegment.transporter!.company!.siret).toBe(
       company2.siret
     );
-    const segment = await prisma.transportSegment.findFirstOrThrow({
-      where: { form: { id: form.id } }
+    const segment = await prisma.bsddTransporter.findFirstOrThrow({
+      where: { form: { id: form.id }, number: 2 }
     });
 
     expect(segment.id).toBe(data.prepareSegment.id);
@@ -218,7 +239,7 @@ describe("{ mutation { prepareSegment } }", () => {
     const { data: data2 } = await mutate2<Pick<Mutation, "prepareSegment">>(
       `mutation  {
         prepareSegment(id:"${form.id}",
-         siret:"${company2.siret}",
+         siret:"${company2.orgId}",
          nextSegmentInfo: {
             transporter: {
               company: {
@@ -262,8 +283,8 @@ describe("{ mutation { prepareSegment } }", () => {
     >(
       `mutation  {
       prepareSegment(id:"${form.id}",
-       siret:"${company3.siret}",
-       nextSegmentInfo: {
+        siret:"${company3.orgId}",
+        nextSegmentInfo: {
           transporter: {
             company: {
               siret: "${transporterCompanySiret}"
@@ -307,8 +328,8 @@ describe("{ mutation { prepareSegment } }", () => {
     >(
       `mutation  {
         prepareSegment(id:"${form.id}",
-         siret:"${company3.siret}",
-         nextSegmentInfo: {
+          siret:"${company3.orgId}",
+          nextSegmentInfo: {
             transporter: {
               company: {
                 siret: "${transporterCompanySiret}"

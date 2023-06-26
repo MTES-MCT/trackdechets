@@ -21,14 +21,17 @@ import {
   CompanyInput,
 } from "generated/graphql/types";
 import graphlClient from "graphql-client";
-import { COMPANY_INFOS_REGISTRATION } from "form/common/components/company/query";
+import { COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA } from "form/common/components/company/query";
 import {
   isVat,
   isFRVat,
   isSiret,
   isForeignVat,
 } from "generated/constants/companySearchHelpers";
-import { companySchema } from "common/validation/schema";
+import {
+  companySchema,
+  transporterCompanySchema,
+} from "common/validation/schema";
 
 setLocale({
   mixed: {
@@ -37,7 +40,7 @@ setLocale({
 });
 
 // Destination should be a company registered in TD with profile COLLECTOR or WASTEPROCESSOR
-const destinationSchema = companySchema.concat(
+const companyRegistrationAndTypeSchema = companySchema.concat(
   object().shape({
     siret: string().test(
       "is-registered-test",
@@ -48,7 +51,7 @@ const destinationSchema = companySchema.concat(
       async value => {
         if (value) {
           const { data } = await graphlClient.query({
-            query: COMPANY_INFOS_REGISTRATION,
+            query: COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA,
             variables: { siret: value },
           });
           // it should be registered to TD
@@ -118,7 +121,7 @@ export const transporterSchema = object().shape({
     ),
   validityLimit: date().nullable(true),
   numberPlate: string().nullable(true),
-  company: companySchema,
+  company: transporterCompanySchema,
 });
 
 const packagingInfo: SchemaOf<Omit<PackagingInfo, "__typename">> =
@@ -227,7 +230,7 @@ export const formSchema = object().shape({
           return true;
         }
       ),
-    company: destinationSchema,
+    company: companyRegistrationAndTypeSchema,
   }),
   transporter: transporterSchema,
   trader: object()
@@ -305,7 +308,7 @@ export const formSchema = object().shape({
     .nullable()
     .shape({
       destination: object().notRequired().nullable().shape({
-        company: destinationSchema,
+        company: companyRegistrationAndTypeSchema,
       }),
     }),
   intermediaries: array().required().min(0).of(intermediariesShape),

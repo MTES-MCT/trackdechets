@@ -2,25 +2,22 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import {
   NotificationError,
   SimpleNotificationError,
-} from "common/components/Error";
+} from "Apps/common/Components/Error/Error";
 import { IconLoading, IconSearch } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { constantCase } from "constant-case";
 import { Field, useField, useFormikContext } from "formik";
 import {
-  countries as vatCountries,
   isFRVat,
   isVat,
   isForeignVat,
 } from "generated/constants/companySearchHelpers";
-import { checkVAT } from "jsvat";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { debounce } from "common/helper";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import {
   BsdasriTransporterInput,
-  BsdaTransporter,
   BsdaTransporterInput,
   BsvhuTransporterInput,
   CompanyFavorite,
@@ -33,7 +30,6 @@ import {
   QueryCompanyPrivateInfosArgs,
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs,
-  Transporter,
   TransporterInput,
 } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
@@ -52,8 +48,10 @@ const DEBOUNCE_DELAY = 500;
 
 interface CompanySelectorProps {
   name: string;
+  // Callback for the host component
+  // Called with empty parameter to un-select a company
   onCompanySelected?: (
-    company: CompanySearchResult | CompanySearchPrivate
+    company?: CompanySearchResult | CompanySearchPrivate
   ) => void;
   allowForeignCompanies?: boolean;
   registeredOnlyCompanies?: boolean;
@@ -98,24 +96,10 @@ export default function CompanySelector({
         | Maybe<BsffFormTransporterInput>;
     }>();
 
-  const isExemptedOfReceipt = useMemo(
-    () =>
-      !!(values.transporter as Transporter)?.isExemptedOfReceipt
-        ? (values.transporter as Transporter).isExemptedOfReceipt
-        : !!(values.transporter as BsdaTransporter)?.recepisse?.isExempted
-        ? (values.transporter as BsdaTransporter)?.recepisse?.isExempted
-        : // BSFF form as specific values
-        !!(values.transporter as BsffFormTransporterInput)
-            ?.isExemptedOfRecepisse
-        ? (values.transporter as BsffFormTransporterInput)
-            ?.isExemptedOfRecepisse
-        : false,
-    [values.transporter]
-  );
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
     (field.value?.country && field.value?.country !== "FR") ||
-      isForeignVat(field.value?.vatNumber!!)
+      isForeignVat(field.value?.vatNumber!)
   );
   // this 2 input ref are to cross-link the value of the input in both search input and department input
   const departmentInputRef = useRef<HTMLInputElement>(null);
@@ -128,7 +112,7 @@ export default function CompanySelector({
   ] = useState<boolean>(false);
 
   // Memoize for changes in field.value.siret and field.value.orgId
-  // To support both FormCompany and Intermediary (that don't have orgId)
+  // To support both FormCompany and Intermediary (which doesn't have orgId)
   const orgId = useMemo(
     () => field.value?.orgId ?? field.value?.siret ?? null,
     [field.value?.siret, field.value?.orgId]
@@ -174,7 +158,7 @@ export default function CompanySelector({
    * CompanyPrivateInfos pour completer les informations
    * de la Company courante enregistrée dans le BSD à son ouverture
    */
-  const { data: selectedData } = useQuery<
+  const { data: companyPrivateData } = useQuery<
     Pick<Query, "companyPrivateInfos">,
     QueryCompanyPrivateInfosArgs
   >(COMPANY_SELECTOR_PRIVATE_INFOS, {
@@ -183,13 +167,25 @@ export default function CompanySelector({
       clue: orgId!,
     },
     skip: !orgId,
-    onCompleted(data) {
-      onCompanySelected?.(data.companyPrivateInfos);
-    },
   });
 
-  function isUnknownCompanyName(company: CompanySearchResult): boolean {
-    return company.name === "---" || company.name === "";
+  /**
+   * Update the current form value when companyPrivateInfos changes
+   * Hack to fix country data when needed.
+   */
+  useEffect(() => {
+    if (
+      companyPrivateData?.companyPrivateInfos?.codePaysEtrangerEtablissement
+    ) {
+      setFieldValue(
+        `${field.name}.country`,
+        companyPrivateData.companyPrivateInfos.codePaysEtrangerEtablissement
+      );
+    }
+  }, [field.name, setFieldValue, companyPrivateData]);
+
+  function isUnknownCompanyName(companyName?: string): boolean {
+    return companyName === "---" || companyName === "";
   }
 
   /**
@@ -197,10 +193,11 @@ export default function CompanySelector({
    */
   function selectCompany(company?: CompanySearchResult) {
     if (disabled) return;
-    // empty the  selected company when null
+    // empty the fields
     if (!company) {
       setFieldValue(field.name, getInitialCompany());
       setFieldTouched(`${field.name}`, true, true);
+      onCompanySelected?.();
       return;
     }
 
@@ -212,7 +209,7 @@ export default function CompanySelector({
 
     // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
     setDisplayForeignCompanyWithUnknownInfos(
-      isForeignVat(company.vatNumber!!) && isUnknownCompanyName(company)
+      isForeignVat(company.vatNumber!!) && isUnknownCompanyName(company.name!)
     );
 
     setIsForeignCompany(isForeignVat(company.vatNumber!!));
@@ -221,22 +218,14 @@ export default function CompanySelector({
       orgId: company.orgId,
       siret: company.siret,
       vatNumber: company.vatNumber,
-      name: company.name && !isUnknownCompanyName(company) ? company.name : "",
+      name:
+        company.name && !isUnknownCompanyName(company.name) ? company.name : "",
       address: company.address ?? "",
       contact: company.contact ?? "",
       phone: company.contactPhone ?? "",
       mail: company.contactEmail ?? "",
       country: company.codePaysEtrangerEtablissement,
     };
-
-    // Automatiquement écraser le champ country
-    if (company.vatNumber) {
-      const vatCountryCode = checkVAT(company.vatNumber, vatCountries)?.country
-        ?.isoCode.short;
-      if (vatCountryCode) {
-        fields.country = vatCountryCode;
-      }
-    }
 
     Object.keys(fields).forEach(key => {
       setFieldValue(`${field.name}.${key}`, fields[key]);
@@ -335,11 +324,14 @@ export default function CompanySelector({
 
   // Disable the name field for foreign companies whose name is filled
   const disableNameField =
-    !!selectedCompanyDetails.name && !displayForeignCompanyWithUnknownInfos;
+    disabled ||
+    (!!selectedCompanyDetails.name && !displayForeignCompanyWithUnknownInfos);
 
   // Disable the address field for foreign companies whose address is filled
   const disableAddressField =
-    !!selectedCompanyDetails.address && !displayForeignCompanyWithUnknownInfos;
+    disabled ||
+    (!!selectedCompanyDetails.address &&
+      !displayForeignCompanyWithUnknownInfos);
 
   return (
     <>
@@ -490,10 +482,11 @@ export default function CompanySelector({
               address: field.value?.address,
               codePaysEtrangerEtablissement: field.value?.country,
               // complete with companyPrivateInfos data
-              ...(selectedData?.companyPrivateInfos && {
-                isRegistered: selectedData?.companyPrivateInfos.isRegistered,
+              ...(companyPrivateData?.companyPrivateInfos && {
+                isRegistered:
+                  companyPrivateData?.companyPrivateInfos.isRegistered,
                 codePaysEtrangerEtablissement:
-                  selectedData?.companyPrivateInfos
+                  companyPrivateData?.companyPrivateInfos
                     .codePaysEtrangerEtablissement,
               }),
             } as CompanySearchResult
@@ -580,13 +573,9 @@ export default function CompanySelector({
           <RedErrorMessage name={`${field.name}.mail`} />
         </div>
 
-        {values.transporter &&
-          !!orgId &&
-          !isForeignCompany &&
-          !isExemptedOfReceipt &&
-          name === "transporter.company" && (
-            <TransporterReceipt transporter={values.transporter} />
-          )}
+        {values.transporter && !!orgId && name === "transporter.company" && (
+          <TransporterReceipt transporter={values.transporter} />
+        )}
       </div>
     </>
   );
@@ -596,24 +585,10 @@ function favoriteToCompanySearchResult(
   company: CompanyFavorite
 ): CompanySearchResult {
   return {
-    orgId: company.orgId,
-    siret: company.siret,
-    vatNumber: company.vatNumber,
-    name: company.name,
-    address: company.address,
-    transporterReceipt: company.transporterReceipt,
-    traderReceipt: company.traderReceipt,
-    brokerReceipt: company.brokerReceipt,
-    vhuAgrementDemolisseur: company.vhuAgrementDemolisseur,
-    vhuAgrementBroyeur: company.vhuAgrementBroyeur,
-    workerCertification: company.workerCertification,
-    codePaysEtrangerEtablissement:
-      company.codePaysEtrangerEtablissement || "FR",
-    contact: company.contact,
+    ...(company as CompanySearchResult),
     contactPhone: company.phone,
     contactEmail: company.mail,
-    isRegistered: company.isRegistered,
-    companyTypes: [],
     etatAdministratif: "A",
+    companyTypes: [],
   };
 }

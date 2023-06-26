@@ -1,8 +1,6 @@
-import { checkCanReadBsdasri } from "../permissions";
+import { checkCanRead } from "../permissions";
 import { BsdasriType } from "@prisma/client";
-
 import { resetDatabase } from "../../../integration-tests/helper";
-import { ErrorCode } from "../../common/errors";
 import { bsdasriFactory, initialData } from "../__tests__/factories";
 import {
   userWithCompanyFactory,
@@ -22,11 +20,9 @@ describe("Dasri permission helpers", () => {
       }
     });
 
-    try {
-      await checkCanReadBsdasri(user, dasri);
-    } catch (err) {
-      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
-    }
+    await expect(checkCanRead(user, dasri)).rejects.toThrow(
+      "Vous n'êtes pas autorisé à accéder à ce bordereau"
+    );
   });
 
   it("should grant dasri reading access to user whose siret belongs to the form", async () => {
@@ -38,10 +34,11 @@ describe("Dasri permission helpers", () => {
       }
     });
 
-    const grant = await checkCanReadBsdasri(user, dasri);
+    const grant = await checkCanRead(user, dasri);
 
     expect(grant).toBe(true);
   });
+
   it("should deny synthesis dasri reading access to user whose siret is not emitter on the associated form", async () => {
     const { user } = await userWithCompanyFactory("MEMBER");
     const mainCompany = await companyFactory();
@@ -59,11 +56,10 @@ describe("Dasri permission helpers", () => {
         synthesizing: { connect: [{ id: initialBsdasri.id }] }
       }
     });
-    try {
-      await checkCanReadBsdasri(user, synthesisBsdasri);
-    } catch (err) {
-      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
-    }
+
+    await expect(checkCanRead(user, synthesisBsdasri)).rejects.toThrow(
+      "Vous n'êtes pas autorisé à accéder à ce bordereau"
+    );
   });
 
   it("should grant synthesis dasri reading access to user whose siret is emitter on the associated form", async () => {
@@ -85,7 +81,55 @@ describe("Dasri permission helpers", () => {
       }
     });
 
-    const grant = await checkCanReadBsdasri(user, synthesisBsdasri);
+    const grant = await checkCanRead(user, synthesisBsdasri);
+
+    expect(grant).toBe(true);
+  });
+
+  it("should deny grouping dasri reading access to user whose siret is not emitter on the grouped form", async () => {
+    const { user } = await userWithCompanyFactory("MEMBER");
+    const initialCompany = await companyFactory();
+    const mainCompany = await companyFactory();
+
+    const initialBsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(initialCompany)
+      }
+    });
+    const groupingBsdasri = await bsdasriFactory({
+      opt: {
+        type: BsdasriType.GROUPING,
+        ...initialData(mainCompany),
+        grouping: { connect: [{ id: initialBsdasri.id }] }
+      }
+    });
+
+    await expect(checkCanRead(user, groupingBsdasri)).rejects.toThrow(
+      "Vous n'êtes pas autorisé à accéder à ce bordereau"
+    );
+  });
+
+  it("should grant grouping dasri reading access to user whose siret is emitter on the grouped form", async () => {
+    const { user, company: initialCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const mainCompany = await companyFactory();
+
+    const initialBsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(initialCompany)
+      }
+    });
+    const groupingBsdasri = await bsdasriFactory({
+      opt: {
+        type: BsdasriType.GROUPING,
+        ...initialData(mainCompany),
+        grouping: { connect: [{ id: initialBsdasri.id }] }
+      }
+    });
+
+    const grant = await checkCanRead(user, groupingBsdasri);
 
     expect(grant).toBe(true);
   });

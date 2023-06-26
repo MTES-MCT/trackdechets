@@ -26,11 +26,13 @@ import { graphqlRegenerateSessionMiddleware } from "./common/middlewares/graphql
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
 import { rateLimiterMiddleware } from "./common/middlewares/rateLimiter";
 import { timeoutMiddleware } from "./common/middlewares/timeout";
+import { graphqlQueryMergingLimiter } from "./common/middlewares/graphqlQueryMergingLimiter";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
 import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
+import { createEventsDataLoaders } from "./activity-events/dataloader";
 import { createFormDataLoaders } from "./forms/dataloader";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
@@ -81,7 +83,8 @@ export const server = new ApolloServer({
       dataloaders: {
         ...createUserDataLoaders(),
         ...createCompanyDataLoaders(),
-        ...createFormDataLoaders()
+        ...createFormDataLoaders(),
+        ...createEventsDataLoaders()
       }
     };
   },
@@ -90,6 +93,12 @@ export const server = new ApolloServer({
     const customError = err.extensions.exception as any;
     if (customError?.name === "ValidationError") {
       return new UserInputError(customError.errors.join("\n"));
+    }
+    if (customError?.name === "ZodError") {
+      return new UserInputError(
+        customError.issues.map(issue => issue.message).join("\n"),
+        { issues: customError.issues }
+      );
     }
     if (
       err.extensions.code === ErrorCode.INTERNAL_SERVER_ERROR &&
@@ -114,7 +123,11 @@ export const server = new ApolloServer({
 
     return err;
   },
-  plugins: [graphiqlLandingPagePlugin(), ...(Sentry ? [sentryReporter] : [])]
+  plugins: [
+    graphiqlLandingPagePlugin(),
+    ...(Sentry ? [sentryReporter] : []),
+    graphqlQueryMergingLimiter()
+  ]
 });
 
 export const app = express();
@@ -295,7 +308,9 @@ app.get("/captcha", (_, res) => captchaGen(res));
 app.get("/captcha-audio/:tokenId", (req, res) => {
   captchaSound(req.params.tokenId, res);
 });
-app.get("/userActivation", userActivationHandler);
+
+app.post("/userActivation", userActivationHandler);
+
 app.get("/download", downloadRouter);
 
 app.get("/exports", (_, res) =>

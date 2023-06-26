@@ -4,13 +4,27 @@ import prisma from "../prisma";
 
 export function createFormDataLoaders() {
   return {
+    forms: new DataLoader((formIds: string[]) => getForms(formIds)),
     forwardedIns: new DataLoader((formIds: string[]) =>
       getForwardedIns(formIds)
     ),
-    formGoupements: new DataLoader((formIds: string[]) =>
-      getFormGroupements(formIds)
+    initialFormGoupements: new DataLoader((formIds: string[]) =>
+      getInitialFormGroupements(formIds)
+    ),
+    nextFormGoupements: new DataLoader((formIds: string[]) =>
+      getNextFormGroupements(formIds)
     )
   };
+}
+
+async function getForms(formIds: string[]) {
+  const forms = await prisma.form.findMany({
+    where: {
+      id: { in: formIds }
+    }
+  });
+
+  return formIds.map(formId => forms.find(form => form.id === formId));
 }
 
 async function getForwardedIns(formIds: string[]) {
@@ -28,7 +42,7 @@ async function getForwardedIns(formIds: string[]) {
   );
 }
 
-async function getFormGroupements(formIds: string[]) {
+async function getInitialFormGroupements(formIds: string[]) {
   const groupements = await prisma.formGroupement.findMany({
     where: {
       initialFormId: { in: formIds }
@@ -48,4 +62,24 @@ async function getFormGroupements(formIds: string[]) {
   }
 
   return formIds.map(formId => groupementsGroupedByInitialFormId[formId]);
+}
+
+async function getNextFormGroupements(formIds: string[]) {
+  const groupements = await prisma.formGroupement.findMany({
+    where: {
+      nextFormId: { in: formIds }
+    }
+  });
+
+  const groupementsGroupedByNextFormId: { [id: string]: FormGroupement[] } =
+    formIds.reduce((prev, cur) => {
+      prev[cur] = [];
+      return prev;
+    }, {});
+
+  for (const groupement of groupements) {
+    groupementsGroupedByNextFormId[groupement.nextFormId].push(groupement);
+  }
+
+  return formIds.map(formId => groupementsGroupedByNextFormId[formId]);
 }

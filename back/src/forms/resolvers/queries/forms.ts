@@ -5,10 +5,10 @@ import { QueryResolvers } from "../../../generated/graphql/types";
 import { Company, Status, Prisma } from "@prisma/client";
 import prisma from "../../../prisma";
 import { getUserCompanies } from "../../../users/database";
-import { checkIsCompanyMember } from "../../../users/permissions";
 import { getFormsRightFilter } from "../../database";
 import { expandFormFromDb } from "../../converter";
 import { getPrismaPaginationArgs } from "../../../common/pagination";
+import { checkCanList } from "../../permissions";
 
 const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
@@ -20,7 +20,7 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
   if (siret) {
     // a siret is specified, check user has permission on this company
     company = await getCompanyOrCompanyNotFound({ orgId: siret });
-    await checkIsCompanyMember({ id: user.id }, { orgId: siret });
+    await checkCanList(user, siret);
   } else {
     const userCompanies = await getUserCompanies(user.id);
 

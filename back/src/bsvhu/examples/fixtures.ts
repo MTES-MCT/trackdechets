@@ -42,6 +42,7 @@ function transporterCompanyInput(siret: string) {
 }
 
 const receiptInput = {
+  isExempted: false,
   number: "recepisse number",
   department: "75",
   validityLimit: "2020-06-30"

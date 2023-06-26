@@ -28,6 +28,16 @@ export async function getStreamEvents(streamId: string, lte?: Date) {
   return documents;
 }
 
+export async function getStreamsEvents(streamIds: string[]) {
+  const documents = await eventsCollection
+    .find({
+      streamId: { $in: streamIds }
+    })
+    .toArray();
+
+  return documents;
+}
+
 export async function insertStreamEvents(tdEvents: Event[]) {
   try {
     await eventsCollection.bulkWrite(

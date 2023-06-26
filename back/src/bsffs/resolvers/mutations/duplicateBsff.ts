@@ -1,11 +1,12 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandBsffFromDB } from "../../converter";
-import { checkCanWriteBsff } from "../../permissions";
+import { checkCanDuplicate } from "../../permissions";
 import { getBsffOrNotFound } from "../../database";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import { BsffStatus, Prisma } from "@prisma/client";
+import { Bsff, BsffStatus, Prisma } from "@prisma/client";
 import { getBsffRepository } from "../../repository";
+import prisma from "../../../prisma";
 
 const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
   _,
@@ -15,44 +16,67 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound({ id });
 
-  await checkCanWriteBsff(user, existingBsff);
+  await checkCanDuplicate(user, existingBsff);
+
+  const { emitter, transporter, destination } = await getBsffCompanies(
+    existingBsff
+  );
 
   const createInput: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
     isDraft: true,
     type: existingBsff.type,
     status: BsffStatus.INITIAL,
-    emitterCompanyName: existingBsff.emitterCompanyName,
-    emitterCompanySiret: existingBsff.emitterCompanySiret,
-    emitterCompanyAddress: existingBsff.emitterCompanyAddress,
-    emitterCompanyContact: existingBsff.emitterCompanyContact,
-    emitterCompanyPhone: existingBsff.emitterCompanyPhone,
-    emitterCompanyMail: existingBsff.emitterCompanyMail,
+    emitterCompanyName: emitter?.name ?? existingBsff.emitterCompanyName,
+    emitterCompanySiret: emitter?.siret ?? existingBsff.emitterCompanySiret,
+    emitterCompanyAddress:
+      emitter?.address ?? existingBsff.emitterCompanyAddress,
+    emitterCompanyContact:
+      emitter?.contact ?? existingBsff.emitterCompanyContact,
+    emitterCompanyPhone:
+      emitter?.contactPhone ?? existingBsff.emitterCompanyPhone,
+    emitterCompanyMail:
+      emitter?.contactEmail ?? existingBsff.emitterCompanyMail,
     wasteCode: existingBsff.wasteCode,
     wasteDescription: existingBsff.wasteDescription,
     wasteAdr: existingBsff.wasteAdr,
     weightValue: existingBsff.weightValue,
     weightIsEstimate: existingBsff.weightIsEstimate,
-    transporterCompanyName: existingBsff.transporterCompanyName,
+    transporterCompanyName:
+      transporter?.name ?? existingBsff.transporterCompanyName,
     transporterCompanySiret: existingBsff.transporterCompanySiret,
     transporterCompanyVatNumber: existingBsff.transporterCompanyVatNumber,
-    transporterCompanyAddress: existingBsff.transporterCompanyAddress,
-    transporterCompanyContact: existingBsff.transporterCompanyContact,
-    transporterCompanyPhone: existingBsff.transporterCompanyPhone,
-    transporterCompanyMail: existingBsff.transporterCompanyMail,
-    transporterRecepisseNumber: existingBsff.transporterRecepisseNumber,
-    transporterRecepisseDepartment: existingBsff.transporterRecepisseDepartment,
+    transporterCompanyAddress:
+      transporter?.address ?? existingBsff.transporterCompanyAddress,
+    transporterCompanyContact:
+      transporter?.contact ?? existingBsff.transporterCompanyContact,
+    transporterCompanyPhone:
+      transporter?.contactPhone ?? existingBsff.transporterCompanyPhone,
+    transporterCompanyMail:
+      transporter?.contactEmail ?? existingBsff.transporterCompanyMail,
+    transporterRecepisseNumber:
+      transporter?.transporterReceipt?.receiptNumber ??
+      existingBsff.transporterRecepisseNumber,
+    transporterRecepisseDepartment:
+      transporter?.transporterReceipt?.department ??
+      existingBsff.transporterRecepisseDepartment,
     transporterRecepisseValidityLimit:
+      transporter?.transporterReceipt?.validityLimit ??
       existingBsff.transporterRecepisseValidityLimit,
     transporterTransportMode: existingBsff.transporterTransportMode,
     transporterTransportPlates: existingBsff.transporterTransportPlates,
     destinationCap: existingBsff.destinationCap,
-    destinationCompanyName: existingBsff.destinationCompanyName,
+    destinationCompanyName:
+      destination?.name ?? existingBsff.destinationCompanyName,
     destinationCompanySiret: existingBsff.destinationCompanySiret,
-    destinationCompanyAddress: existingBsff.destinationCompanyAddress,
-    destinationCompanyContact: existingBsff.destinationCompanyContact,
-    destinationCompanyPhone: existingBsff.destinationCompanyPhone,
-    destinationCompanyMail: existingBsff.destinationCompanyMail,
+    destinationCompanyAddress:
+      destination?.address ?? existingBsff.destinationCompanyAddress,
+    destinationCompanyContact:
+      destination?.contact ?? existingBsff.destinationCompanyContact,
+    destinationCompanyPhone:
+      destination?.contactPhone ?? existingBsff.destinationCompanyPhone,
+    destinationCompanyMail:
+      destination?.contactEmail ?? existingBsff.destinationCompanyMail,
     destinationPlannedOperationCode:
       existingBsff.destinationPlannedOperationCode
   };
@@ -68,5 +92,38 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
 
   return expandBsffFromDB(duplicatedBsff);
 };
+
+async function getBsffCompanies(bsff: Bsff) {
+  const companiesOrgIds = [
+    bsff.emitterCompanySiret,
+    bsff.transporterCompanySiret,
+    bsff.transporterCompanyVatNumber,
+    bsff.destinationCompanySiret
+  ].filter(Boolean);
+
+  // Batch fetch all companies involved in the BSFF
+  const companies = await prisma.company.findMany({
+    where: { orgId: { in: companiesOrgIds } },
+    include: {
+      transporterReceipt: true
+    }
+  });
+
+  const emitter = companies.find(
+    company => company.orgId === bsff.emitterCompanySiret
+  );
+
+  const destination = companies.find(
+    company => company.orgId === bsff.destinationCompanySiret
+  );
+
+  const transporter = companies.find(
+    company =>
+      company.orgId === bsff.transporterCompanySiret ||
+      company.orgId === bsff.transporterCompanyVatNumber
+  );
+
+  return { emitter, destination, transporter };
+}
 
 export default duplicateBsff;

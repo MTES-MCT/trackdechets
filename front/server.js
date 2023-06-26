@@ -19,7 +19,11 @@ const CONNECT_SRC = [
   ...DEFAULT_SRC,
   "https://api-adresse.data.gouv.fr",
   "https://sentry.incubateur.net",
+  "https://openmaptiles.geo.data.gouv.fr",
+  "https://openmaptiles.github.io",
 ];
+
+const WORKER_SRC = ["blob:"]; // needed for MapBox
 
 app.use(
   helmet({
@@ -31,6 +35,7 @@ app.use(
       directives: {
         defaultSrc: DEFAULT_SRC,
         connectSrc: CONNECT_SRC,
+        workerSrc: WORKER_SRC,
         baseUri: "'self'",
         formAction: ["http:"], // allow external redirects for oauth workflow
         fontSrc: ["'self'", "https:", "data:"],
@@ -64,7 +69,7 @@ app.use(bodyParser.text());
 // Sentry tunnel to deal with ad blockers
 // https://docs.sentry.io/platforms/javascript/troubleshooting/#using-the-tunnel-option
 // https://github.com/getsentry/examples/blob/master/tunneling/nextjs/pages/api/tunnel.js
-app.post("/sentry", async function(req, res) {
+app.post("/sentry", async function (req, res) {
   if (!SENTRY_DSN) {
     return res.status(500).json({ status: "sentry n'est pas configuré" });
   }
@@ -87,11 +92,11 @@ app.post("/sentry", async function(req, res) {
   }
 });
 
-app.get("/*", function(req, res) {
+app.get("/*", function (req, res) {
   res.send(indexContent);
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, function() {
+app.listen(port, function () {
   console.log("Trackdechets front listening on", port);
 });

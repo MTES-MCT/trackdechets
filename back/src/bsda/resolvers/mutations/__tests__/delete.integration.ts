@@ -154,7 +154,7 @@ describe("Mutation.deleteBsda", () => {
     ]);
   });
 
-  it("should remove forwardedIn link to deleted BSDA", async () => {
+  it("should remove forwardedIn link in deleted BSDA", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const forwardedBsda = await bsdaFactory({
       opt: {
@@ -180,11 +180,12 @@ describe("Mutation.deleteBsda", () => {
 
     expect(data.deleteBsda.id).toBeTruthy();
 
-    const updatedForwarded = await prisma.bsda.findUniqueOrThrow({
-      where: { id: forwardedBsda.id },
+    const updatedForwarding = await prisma.bsda.findUniqueOrThrow({
+      where: { id: forwardingBsda.id },
       include: { forwarding: true }
     });
-    expect(updatedForwarded.forwarding).toBe(null);
+    expect(updatedForwarding.forwardingId).toBe(null);
+    expect(updatedForwarding.forwarding).toBe(null);
   });
 
   it("should allow the producer to remove a bsda signed by himself only", async () => {

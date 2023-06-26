@@ -3,7 +3,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdasriEventTypes } from "./eventTypes";
 
 export type UpdateBsdasriFn = (
@@ -21,9 +21,12 @@ export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
     const bsdasri = await prisma.bsdasri.update({
       where,
       data,
-      include: { synthesizing: !!data?.synthesizing }
+      include: {
+        synthesizing: !!data?.synthesizing,
+        grouping: !!data?.grouping
+      }
     });
-
+    // denormalize synthesis emitter sirets
     if (!!data?.synthesizing) {
       const synthesisEmitterSirets = [
         ...new Set(
@@ -37,6 +40,16 @@ export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
       });
     }
 
+    // denormalize grouping emitter sirets
+    if (!!data?.grouping) {
+      const groupingEmitterSirets = [
+        ...new Set(bsdasri.grouping.map(grouped => grouped.emitterCompanySiret))
+      ].filter(Boolean);
+      await prisma.bsdasri.update({
+        where,
+        data: { groupingEmitterSirets }
+      });
+    }
     await prisma.event.create({
       data: {
         streamId: bsdasri.id,
@@ -60,7 +73,7 @@ export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
       });
     }
 
-    prisma.addAfterCommitCallback(() => enqueueBsdToIndex(bsdasri.id));
+    prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(bsdasri.id));
 
     return bsdasri;
   };

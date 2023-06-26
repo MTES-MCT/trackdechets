@@ -3,13 +3,8 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { getBsdasriOrNotFound } from "../../database";
 import { expandBsdasriFromDB } from "../../converter";
 import { validateBsdasri } from "../../validation";
-import {
-  checkIsBsdasriContributor,
-  checkIsBsdasriPublishable,
-  checkCanEditBsdasri
-} from "../../permissions";
-
 import { getBsdasriRepository } from "../../repository";
+import { checkCanUpdate, checkIsBsdasriPublishable } from "../../permissions";
 
 const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   _,
@@ -22,14 +17,8 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
     id,
     includeAssociated: true
   });
+  await checkCanUpdate(user, bsdasri);
 
-  checkCanEditBsdasri(bsdasri);
-
-  await checkIsBsdasriContributor(
-    user,
-    bsdasri,
-    "Vous ne pouvez publier ce bordereau si vous ne figurez pas dessus"
-  );
   await checkIsBsdasriPublishable(
     bsdasri,
     grouping.map(el => el.id)

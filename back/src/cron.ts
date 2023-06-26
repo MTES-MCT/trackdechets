@@ -1,22 +1,32 @@
 import * as cron from "cron";
 import cronValidator from "cron-validate";
 import {
-  sendFirstOnboardingEmail,
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
   sendPendingMembershipRequestToAdminDetailsEmail,
+  sendPendingRevisionRequestToAdminDetailsEmail,
   sendSecondOnboardingEmail
 } from "./commands/onboarding.helpers";
 import { initSentry } from "./common/sentry";
+import { cleanUnusedAppendix1ProducerBsdds } from "./commands/appendix1.helpers";
 
 const {
   CRON_ONBOARDING_SCHEDULE,
   FIRST_ONBOARDING_TEMPLATE_ID,
   PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID,
-  PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
+  PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID,
+  VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID
 } = process.env;
 
-let jobs: cron.CronJob[] = [];
+let jobs: cron.CronJob[] = [
+  new cron.CronJob({
+    cronTime: "30 0 * * *", // Every day at 00:30
+    onTick: async () => {
+      await cleanUnusedAppendix1ProducerBsdds();
+    },
+    timeZone: "Europe/Paris"
+  })
+];
 
 if (CRON_ONBOARDING_SCHEDULE) {
   validateOnbardingCronSchedule(CRON_ONBOARDING_SCHEDULE);
@@ -24,26 +34,20 @@ if (CRON_ONBOARDING_SCHEDULE) {
   if (
     !FIRST_ONBOARDING_TEMPLATE_ID ||
     !PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID ||
-    !PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
+    !PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID ||
+    !VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID
   ) {
     throw new Error(
       `Cannot start onboarding email cron job because some email templates were not configured :
       - FIRST_ONBOARDING_TEMPLATE_ID
       - PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID
-      - PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID`
+      - PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
+      - VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID`
     );
   }
 
   jobs = [
     ...jobs,
-    // first onboarding email
-    new cron.CronJob({
-      cronTime: CRON_ONBOARDING_SCHEDULE,
-      onTick: async () => {
-        await sendFirstOnboardingEmail();
-      },
-      timeZone: "Europe/Paris"
-    }),
     // second onbarding email
     new cron.CronJob({
       cronTime: CRON_ONBOARDING_SCHEDULE,
@@ -73,6 +77,14 @@ if (CRON_ONBOARDING_SCHEDULE) {
       cronTime: CRON_ONBOARDING_SCHEDULE,
       onTick: async () => {
         await sendPendingMembershipRequestToAdminDetailsEmail();
+      },
+      timeZone: "Europe/Paris"
+    }),
+    // admins who did not answer to revision requests
+    new cron.CronJob({
+      cronTime: CRON_ONBOARDING_SCHEDULE,
+      onTick: async () => {
+        await sendPendingRevisionRequestToAdminDetailsEmail();
       },
       timeZone: "Europe/Paris"
     })

@@ -3,7 +3,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsvhuEventTypes } from "./eventTypes";
 
 export type UpdateManyBsvhuFn = (
@@ -45,7 +45,7 @@ export function buildUpdateManyBsvhus(
       data: eventsData
     });
     for (const id of ids) {
-      prisma.addAfterCommitCallback(() => enqueueBsdToIndex(id));
+      prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(id));
     }
 
     return update;

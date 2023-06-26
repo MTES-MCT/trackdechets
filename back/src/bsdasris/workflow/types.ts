@@ -1,16 +1,8 @@
 import { Prisma } from "@prisma/client";
-
-// Xstate event type
-export enum BsdasriEventType {
-  SignEmission = "SIGN_EMISSION",
-  SignEmissionWithSecretCode = "SIGN_EMISSION_WITH_SECRET_CODE",
-  SignTransport = "SIGN_TRANSPORT",
-  SignReception = "SIGN_RECEPTION",
-  SignOperation = "SIGN_OPERATION"
-}
+import { BsdasriSignatureType } from "../../generated/graphql/types";
 
 // Xstate event
 export type BsdasriEvent = {
-  type: BsdasriEventType;
+  type: BsdasriSignatureType;
   dasriUpdateInput?: Prisma.BsdasriUpdateInput;
 };

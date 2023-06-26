@@ -1,9 +1,9 @@
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
-import { Loader } from "common/components";
-import { NotificationError } from "common/components/Error";
+import { Loader } from "Apps/common/Components";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import TdModal from "common/components/Modal";
-import { statusChangeFragment } from "common/fragments";
-import { GET_BSDS } from "common/queries";
+import { statusChangeFragment } from "Apps/common/queries/fragments";
+import { GET_BSDS } from "Apps/common/queries";
 import AcceptedInfo from "dashboard/components/BSDList/BSDD/WorkflowAction/AcceptedInfo";
 import ReceivedInfo from "dashboard/components/BSDList/BSDD/WorkflowAction/ReceivedInfo";
 import { MarkSegmentAsReadyToTakeOver } from "dashboard/components/BSDList/BSDD/WorkflowAction/segments/MarkSegmentAsReadyToTakeOver";
@@ -12,6 +12,7 @@ import { TakeOverSegment } from "dashboard/components/BSDList/BSDD/WorkflowActio
 import { GET_FORM } from "form/bsdd/utils/queries";
 import {
   EmitterType,
+  Form,
   FormStatus,
   Mutation,
   MutationMarkAsAcceptedArgs,
@@ -48,8 +49,18 @@ const MARK_AS_ACCEPTED = gql`
   }
   ${statusChangeFragment}
 `;
-
-const ActBsddValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
+interface ActBsddValidationProps {
+  bsd: Form;
+  currentSiret: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+const ActBsddValidation = ({
+  bsd,
+  currentSiret,
+  isOpen,
+  onClose,
+}: ActBsddValidationProps) => {
   const [getBsdd, { error: bsddGetError, data, loading: bsddGetLoading }] =
     useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
       variables: {
@@ -305,7 +316,7 @@ const ActBsddValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             <ReceivedInfo
               form={data?.form}
               close={onClose}
-              isTempStorage={isTempStorage}
+              isTempStorage={isTempStorage as boolean}
             />
           </TdModal>
         );

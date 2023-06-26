@@ -2,6 +2,9 @@ import { FieldArray, FieldProps } from "formik";
 import React, { InputHTMLAttributes } from "react";
 import Tooltip from "common/components/Tooltip";
 import { CompanyType } from "../generated/graphql/types";
+import styles from "./CompanyType.module.scss";
+
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 
 export const COMPANY_CONSTANTS = [
   {
@@ -41,7 +44,7 @@ export const COMPANY_CONSTANTS = [
     value: CompanyType.Transporter,
     label: "Transporteur",
     helpText:
-      "Transporteur de déchets professionnel disposant d'un récépissé de déclaration -ou- personne qui transporte ses propres déchets ou qui répond à l'exemption de récépissé",
+      "Entreprises de transport routier, immatriculées au registre national, disposant d'un récépissé de déclaration de transport de déchets ou qui répond à l'exemption de récépissé",
   },
   {
     value: CompanyType.Trader,
@@ -69,45 +72,69 @@ export const COMPANY_CONSTANTS = [
   },
 ];
 
+interface CompanyTypeFieldProps {
+  handleChange(e, arrayHelpers, companyType, value): void;
+}
+
 export default function CompanyTypeField({
   field: { name, value },
   id,
   label,
+  handleChange,
+  subfields,
   ...props
-}: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement>) {
+}: FieldProps & {
+  label: string;
+  subfields?: object;
+} & InputHTMLAttributes<HTMLInputElement> &
+  CompanyTypeFieldProps) {
   return (
     <FieldArray
       name={name}
       render={arrayHelpers => (
-        <fieldset className={name + "-fieldset"}>
-          {COMPANY_CONSTANTS.map((companyType, idx) => (
-            <div key={idx}>
-              <label
-                className="tw-flex tw-items-center"
-                key={companyType.value}
-              >
-                <input
-                  type="checkbox"
-                  name={name}
-                  className="td-checkbox"
-                  value={companyType.value}
-                  checked={value.includes(companyType.value)}
-                  disabled={props.disabled}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      arrayHelpers.push(companyType.value);
-                    } else {
-                      const idx = value.indexOf(companyType.value);
-                      arrayHelpers.remove(idx);
-                    }
-                  }}
-                />
-                {companyType.label}
-                <Tooltip msg={companyType.helpText} />
-              </label>
-            </div>
-          ))}
-        </fieldset>
+        <>
+          <div className="fr-grid-row fr-mb-2w">
+            <span className="fr-text">Profil</span>
+          </div>
+          <div className="fr-container-fluid">
+            {COMPANY_CONSTANTS.map((companyType, idx) => (
+              <div key={idx}>
+                <div
+                  className="fr-grid-row fr-grid-row--gutters"
+                  key={companyType.value}
+                >
+                  <div className="fr-col-11">
+                    <Checkbox
+                      disabled={props.disabled}
+                      options={[
+                        {
+                          label: companyType.label,
+                          nativeInputProps: {
+                            name: name,
+                            defaultChecked: value.includes(companyType.value),
+                            onClick: e =>
+                              handleChange(e, arrayHelpers, companyType, value),
+                          },
+                        },
+                      ]}
+                    />
+                  </div>
+
+                  <div className="fr-col-1">
+                    <Tooltip msg={companyType.helpText} />
+                  </div>
+                </div>
+                {subfields?.[companyType.value] ? (
+                  <div className={styles.subfields}>
+                    <div className="fr-grid-row">
+                      {subfields?.[companyType.value]}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </>
       )}
     />
   );

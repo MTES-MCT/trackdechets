@@ -1,5 +1,6 @@
+import prisma from "../prisma";
 import { GraphQLContext } from "../types";
-import { NotAdmin, NotLoggedIn } from "./errors";
+import { InvaliSecurityCode, NotAdmin, NotLoggedIn } from "./errors";
 
 export function checkIsAuthenticated(context: GraphQLContext): Express.User {
   if (!context.user) {
@@ -14,4 +15,14 @@ export function checkIsAdmin(context: GraphQLContext): Express.User {
     throw new NotAdmin();
   }
   return user;
+}
+
+export async function checkSecurityCode(siret: string, securityCode: number) {
+  const exists = await prisma.company.findFirst({
+    where: { orgId: siret, securityCode }
+  });
+  if (!exists) {
+    throw new InvaliSecurityCode();
+  }
+  return true;
 }

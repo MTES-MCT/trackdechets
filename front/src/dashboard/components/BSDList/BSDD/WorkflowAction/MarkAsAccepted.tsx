@@ -7,13 +7,14 @@ import {
 } from "generated/graphql/types";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation, useLazyQuery } from "@apollo/client";
-import { statusChangeFragment } from "common/fragments";
+import { statusChangeFragment } from "Apps/common/queries/fragments";
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton, Loader } from "common/components";
+import { ActionButton } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { IconWaterDam } from "common/components/Icons";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import AcceptedInfo from "./AcceptedInfo";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS } from "Apps/common/queries";
 import { GET_FORM } from "form/bsdd/utils/queries";
 
 const MARK_AS_ACCEPTED = gql`
@@ -103,6 +104,8 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
             </div>
           );
         }
+
+        return <></>;
       }}
     />
   );

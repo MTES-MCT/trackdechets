@@ -3,7 +3,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
 
 export type CreateBsffFn = (
@@ -27,7 +27,7 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
       }
     });
 
-    prisma.addAfterCommitCallback(() => enqueueBsdToIndex(bsff.id));
+    prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsff.id));
 
     return bsff;
   };

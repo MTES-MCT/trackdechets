@@ -95,10 +95,12 @@ function getWhere(bsvhu: Bsvhu): Pick<BsdElastic, WhereKeys> {
   return where;
 }
 
+export type RawBsvhu = Bsvhu;
+
 /**
  * Convert a bsvhu from the bsvhu table to Elastic Search's BSD model.
  */
-export function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
+export function toBsdElastic(bsvhu: RawBsvhu): BsdElastic {
   const where = getWhere(bsvhu);
 
   return {

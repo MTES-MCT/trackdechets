@@ -39,6 +39,10 @@ export default function DateInput({
       onChange={(value: Date | null) => {
         setFieldValue(field.name, value ? format(value, "yyyy-MM-dd") : null);
       }}
+      onChangeRaw={e => {
+        // disable entering manual date
+        e.preventDefault();
+      }}
     />
   );
 }

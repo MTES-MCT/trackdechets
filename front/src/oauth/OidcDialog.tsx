@@ -1,9 +1,10 @@
 import React from "react";
 import { IconCheckCircle1 } from "common/components/Icons";
-import Loader from "../common/components/Loaders";
+import Loader from "../Apps/common/Components/Loader/Loaders";
 import styles from "./Dialog.module.scss";
 import { useOIDC, AuthorizePayload } from "./use-oidc";
 import * as queryString from "query-string";
+import { localAuthService } from "login/auth.service";
 
 import { useLocation } from "react-router-dom";
 export default function OidcDialog() {
@@ -34,7 +35,26 @@ export default function OidcDialog() {
         <IconCheckCircle1 size="40px" />
         <img src="/trackdechets.png" alt="trackdechets" width="100px" />
       </div>
-      <h4 className="text-center">S'identifier sur {client.name}</h4>
+      <div className="tw-flex tw-justify-between tw-mt-4">
+        <h4 className="text-center">S'identifier sur {client.name}</h4>
+        <form
+          className={styles.headerConnexion}
+          name="logout"
+          action={`${VITE_API_ENDPOINT}/logout`}
+          method="post"
+        >
+          <button
+            className={`${styles.headerConnexion} btn btn--sqr`}
+            onClick={() => {
+              localAuthService.locallySignOut();
+              document.forms["logout"].submit();
+              return false;
+            }}
+          >
+            <span>Se déconnecter</span>
+          </button>
+        </form>
+      </div>
       <div className="panel tw-mt-2">
         <p className="text-center">
           {user.name}, l'application {client.name} souhaite accéder à votre

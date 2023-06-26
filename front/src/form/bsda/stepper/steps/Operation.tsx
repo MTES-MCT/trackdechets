@@ -1,4 +1,5 @@
 import { RedErrorMessage } from "common/components";
+import { subMonths } from "date-fns";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
@@ -25,6 +26,8 @@ export default function Operation({ bsda }: Props) {
     }
   }, [values.destination?.reception?.acceptationStatus, setFieldValue]);
 
+  const TODAY = new Date();
+
   return (
     <>
       <h4 className="form__section-heading">Réception</h4>
@@ -33,6 +36,8 @@ export default function Operation({ bsda }: Props) {
           Date de réception
           <Field
             component={DateInput}
+            minDate={subMonths(TODAY, 2)}
+            maxDate={TODAY}
             name="destination.reception.date"
             className={`td-input td-input--small`}
           />

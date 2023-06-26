@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
-import { Loader } from "common/components";
-import { NotificationError } from "common/components/Error";
+import { Loader } from "Apps/common/Components";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { Query } from "generated/graphql/types";
 import React from "react";
 import AccountAuthorizedApp from "./AccountAuthorizedApp";

@@ -16,6 +16,21 @@ describe("Workflow machine", () => {
     });
     expect(nextState.value).toEqual(Status.SENT);
   });
+  test("SEALED -> SENT", () => {
+    const nextState = machine.transition(Status.SEALED, {
+      type: EventType.SignedByProducer,
+      formUpdateInput: {
+        wasteDetailsPackagingInfos: [{ type: "PIPELINE", quantity: 1 }]
+      }
+    });
+    expect(nextState.value).toEqual(Status.SENT);
+  });
+  test("SEALED -> SENT", () => {
+    const nextState = machine.transition(Status.SEALED, {
+      type: EventType.SignedByProducer
+    });
+    expect(nextState.value).toEqual(Status.SIGNED_BY_PRODUCER);
+  });
   test("SENT -> RECEIVED", () => {
     const nextState = machine.transition(Status.SENT, {
       type: EventType.MarkAsReceived

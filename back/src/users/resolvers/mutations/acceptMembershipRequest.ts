@@ -11,10 +11,11 @@ import {
   MembershipRequestAlreadyAccepted,
   MembershipRequestAlreadyRefused
 } from "../../errors";
-import { checkIsCompanyAdmin } from "../../permissions";
 import { convertUrls } from "../../../companies/database";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { membershipRequestAccepted } from "../../../mailer/templates";
+import { checkUserPermissions, Permission } from "../../../permissions";
+import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipRequest"] =
   async (_, { id, role }, context) => {
@@ -36,7 +37,12 @@ const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipReques
     }
 
     // check authenticated user is admin of the company
-    await checkIsCompanyAdmin(user, company);
+    await checkUserPermissions(
+      user,
+      company.orgId,
+      Permission.CompanyCanManageMembers,
+      NotCompanyAdminErrorMsg(company.orgId)
+    );
 
     // throw error if membership request was already accepted
     if (membershipRequest.status === "ACCEPTED") {

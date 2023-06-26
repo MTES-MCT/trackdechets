@@ -9,8 +9,6 @@ Avant de pouvoir implémenter le procotole OpenID Connect, vous aurez besoin d'u
 L'activation d'OpenID Connect sur une application doit être demandée au support.
 :::
 
-Une [application de test](https://github.com/MTES-MCT/trackdechets-openidconnect-demo) (client/RP) est disponible.
-
 Le [protocole Open ID Connect](https://openid.net/specs/openid-connect-core-1_0.html) permet à des logiciels tiers ("client") de construire un mécanisme d'authentification en considérant l'identité d'un utilisateur de Trackdéchets comme une ressource.
 
 ```
@@ -170,6 +168,3 @@ Trackdéchets implémente 3 valeurs standard et une valeur spécifique:
     - vat_number : numéro de tva si disponible, utilisé pour identifier les entreprises étrangères
     - verified: true|false, précise si l'établissement est vérifié (la vérification n'est effectuée que sur certains type d'établissements )
 
-:::tip
-Une application Openid de démonstration a été créée à l'adresse [https://openid-demo.trackdechets.beta.gouv.fr/](https://openid-demo.trackdechets.beta.gouv.fr/)
-:::

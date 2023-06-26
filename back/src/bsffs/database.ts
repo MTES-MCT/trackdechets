@@ -25,13 +25,7 @@ import {
 } from "./validation";
 import { GraphQLContext } from "../types";
 import { toBsffPackagingWithType } from "./compat";
-import {
-  checkCanWriteBsff,
-  checkCanWriteFicheIntervention,
-  isBsffContributor,
-  isBsffDetenteur
-} from "./permissions";
-import { getCachedUserSiretOrVat } from "../common/redis/users";
+import { checkCanCreate, checkCanUpdateFicheIntervention } from "./permissions";
 import {
   getBsffRepository,
   getReadonlyBsffFicheInterventionRepository,
@@ -39,6 +33,7 @@ import {
   getReadonlyBsffRepository
 } from "./repository";
 import { sirenifyBsffInput } from "./sirenify";
+import { Permission, can, getUserRoles } from "../permissions";
 
 export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
   const { findUnique } = getReadonlyBsffRepository();
@@ -107,26 +102,41 @@ export async function getFicheInterventions({
     (await findUniqueGetFicheInterventions({
       where: { id: bsff.id }
     })) ?? [];
-  const isContributor = await isBsffContributor(user, bsff);
-  const isDetenteur = await isBsffDetenteur(user, bsff);
+
+  const userRoles = await getUserRoles(user.id);
+
+  const isBsffReader = [
+    bsff.emitterCompanySiret,
+    bsff.transporterCompanySiret,
+    bsff.transporterCompanyVatNumber,
+    bsff.destinationCompanySiret
+  ].some(
+    orgId =>
+      orgId && userRoles[orgId] && can(userRoles[orgId], Permission.BsdCanRead)
+  );
+
+  const isDetenteur = bsff.detenteurCompanySirets.some(
+    siret => userRoles[siret] && can(userRoles[siret], Permission.BsdCanRead)
+  );
 
   const expandedFicheInterventions = ficheInterventions.map(
     expandFicheInterventionBsffFromDB
   );
 
-  if (isContributor) {
+  if (isBsffReader) {
     return expandedFicheInterventions;
   }
 
   if (isDetenteur) {
-    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-
     // only return detenteur's fiche d'intervention
-    return expandedFicheInterventions.filter(
-      fi =>
-        fi.detenteur?.company?.siret &&
-        userCompaniesSiretOrVat.includes(fi.detenteur.company.siret)
-    );
+    return expandedFicheInterventions.filter(fi => {
+      const detenteurCompanySiret = fi.detenteur?.company?.siret;
+      if (!detenteurCompanySiret) return false;
+      return (
+        userRoles[detenteurCompanySiret] &&
+        can(userRoles[detenteurCompanySiret], Permission.BsdCanRead)
+      );
+    });
   }
 
   throw new ForbiddenError(
@@ -137,18 +147,17 @@ export async function getFicheInterventions({
 export async function createBsff(
   user: Express.User,
   input: BsffInput,
-  additionalData: Partial<Bsff> = {}
+  { isDraft } = { isDraft: false }
 ) {
+  await checkCanCreate(user, input);
+
   const sirenifiedInput = await sirenifyBsffInput(input, user);
 
   const flatInput: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
-    isDraft: false,
-    ...flattenBsffInput(sirenifiedInput),
-    ...additionalData
+    isDraft,
+    ...flattenBsffInput(sirenifiedInput)
   };
-
-  await checkCanWriteBsff(user, flatInput);
 
   if (!input.type) {
     throw new UserInputError("Vous devez préciser le type de BSFF");
@@ -166,7 +175,7 @@ export async function createBsff(
 
   const packagingsInput = input.packagings?.map(toBsffPackagingWithType);
   for (const ficheIntervention of ficheInterventions) {
-    await checkCanWriteFicheIntervention(user, ficheIntervention);
+    await checkCanUpdateFicheIntervention(user, ficheIntervention);
   }
 
   const futureBsff = {
@@ -174,7 +183,10 @@ export async function createBsff(
     packagings: packagingsInput
   };
 
-  await validateBsff(futureBsff);
+  await validateBsff(futureBsff, {
+    isDraft,
+    transporterSignature: false
+  });
   await validateFicheInterventions(futureBsff, ficheInterventions);
   const { forwarding, grouping, repackaging } = input;
 

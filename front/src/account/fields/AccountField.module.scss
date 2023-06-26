@@ -6,6 +6,7 @@
   margin: auto;
   padding: 1em;
   justify-content: flex-start;
+  align-items: center;
   border-top: 1px solid $grey-lighter;
 
   table {
@@ -36,6 +37,12 @@
   }
 }
 
+.tooltip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .field__value {
   margin-left: 1em;
   margin-right: 1em;
@@ -60,6 +67,9 @@
   flex-shrink: 0;
   font-weight: bold;
   width: 180px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .modifier {

@@ -9,12 +9,12 @@ import {
 import { format } from "date-fns";
 import prisma from "../../../../prisma";
 import {
+  formFactory,
   siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import getReadableId from "../../../readableId";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { allowedFormats } from "../../../../common/dates";
 import {
@@ -82,6 +82,7 @@ describe("mutation / importPaperForm", () => {
         },
         wasteDetails: {
           code: "01 03 04*",
+          name: "Déchets divers",
           quantity: 1.0,
           quantityType: QuantityType.REAL,
           packagingInfos: [{ type: "BENNE" as Packagings, quantity: 1 }],
@@ -357,7 +358,7 @@ describe("mutation / importPaperForm", () => {
   describe("update an existing BSD with imported data", () => {
     afterEach(resetDatabase);
 
-    async function getBaseData() {
+    async function getBaseData(): Promise<Partial<Prisma.FormCreateInput>> {
       const { company: transporterCompany } = await userWithCompanyFactory(
         "MEMBER"
       );
@@ -382,21 +383,27 @@ describe("mutation / importPaperForm", () => {
         recipientCompanyContact: "Mr Destination",
         recipientCompanyMail: "recipient@trackdechets.fr",
         recipientCap: "it's a CAP",
-        transporterIsExemptedOfReceipt: true,
-        transporterCompanySiret: transporterCompany.siret,
-        transporterCompanyName: "Transporteur",
-        transporterCompanyAddress: "Somewhere",
-        transporterCompanyPhone: "0000000000",
-        transporterCompanyContact: "Mr Transporteur",
-        transporterCompanyMail: "trasnporteur@trackdechets.fr",
         wasteDetailsCode: "01 03 04*",
+        wasteDetailsName: "stériles acidogènes",
         wasteDetailsQuantity: 1.0,
         wasteDetailsQuantityType: QuantityType.ESTIMATED,
         wasteDetailsPackagingInfos: [{ type: "BENNE", quantity: 1 }],
         wasteDetailsConsistence: Consistence.SOLID,
         wasteDetailsPop: false,
         wasteDetailsIsDangerous: true,
-        wasteDetailsOnuCode: "ONU"
+        wasteDetailsOnuCode: "ONU",
+        transporters: {
+          create: {
+            transporterIsExemptedOfReceipt: true,
+            transporterCompanySiret: transporterCompany.siret,
+            transporterCompanyName: "Transporteur",
+            transporterCompanyAddress: "Somewhere",
+            transporterCompanyPhone: "0000000000",
+            transporterCompanyContact: "Mr Transporteur",
+            transporterCompanyMail: "trasnporteur@trackdechets.fr",
+            number: 1
+          }
+        }
       };
     }
 
@@ -424,18 +431,15 @@ describe("mutation / importPaperForm", () => {
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const formCreateInput: Prisma.FormCreateInput = {
-        ...(await getBaseData()),
-        readableId: getReadableId(),
-        owner: {
-          connect: { id: owner.id }
-        },
-        status: "SEALED",
-        recipientCompanySiret: company.siret // user is recipient
-      };
-
       // create a form with a sealed status
-      const form = await prisma.form.create({ data: formCreateInput });
+      const form = await formFactory({
+        ownerId: owner.id,
+        opt: {
+          ...(await getBaseData()),
+          status: "SEALED",
+          recipientCompanySiret: company.siret
+        }
+      });
 
       const { mutate } = makeClient(user);
 
@@ -447,6 +451,7 @@ describe("mutation / importPaperForm", () => {
           }
         }
       });
+
       const updatedForm = await prisma.form.findUniqueOrThrow({
         where: { id: form.id }
       });
@@ -491,7 +496,6 @@ describe("mutation / importPaperForm", () => {
         isImportedFromPaper: true,
         emittedAt: importedData.signingInfo.sentAt,
         emittedBy: importedData.signingInfo.sentBy,
-        signedByTransporter: true,
         sentAt: importedData.signingInfo.sentAt,
         sentBy: importedData.signingInfo.sentBy,
         takenOverAt: importedData.signingInfo.sentAt,
@@ -514,18 +518,15 @@ describe("mutation / importPaperForm", () => {
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const formCreateInput: Prisma.FormCreateInput = {
-        ...(await getBaseData()),
-        readableId: getReadableId(),
-        owner: {
-          connect: { id: owner.id }
-        },
-        status: "SEALED",
-        recipientCompanySiret: company.siret // user is recipient
-      };
-
       // create a form with a sealed status
-      const form = await prisma.form.create({ data: formCreateInput });
+      const form = await formFactory({
+        ownerId: owner.id,
+        opt: {
+          ...(await getBaseData()),
+          status: "SEALED",
+          recipientCompanySiret: company.siret
+        }
+      });
 
       const { mutate } = makeClient(user);
 
@@ -556,18 +557,15 @@ describe("mutation / importPaperForm", () => {
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const formCreateInput: Prisma.FormCreateInput = {
-        ...(await getBaseData()),
-        readableId: getReadableId(),
-        owner: {
-          connect: { id: owner.id }
-        },
-        status: "DRAFT",
-        recipientCompanySiret: company.siret // user is recipient
-      };
-
       // create a form with a sealed status
-      const form = await prisma.form.create({ data: formCreateInput });
+      const form = await formFactory({
+        ownerId: owner.id,
+        opt: {
+          ...(await getBaseData()),
+          status: "DRAFT",
+          recipientCompanySiret: company.siret
+        }
+      });
 
       const { mutate } = makeClient(user);
 
@@ -593,17 +591,13 @@ describe("mutation / importPaperForm", () => {
 
       const user = await userFactory();
 
-      const formCreateInput: Prisma.FormCreateInput = {
-        ...(await getBaseData()),
-        readableId: getReadableId(),
-        owner: {
-          connect: { id: owner.id }
-        },
-        status: "SEALED"
-      };
-
-      // create a form with a sealed status
-      const form = await prisma.form.create({ data: formCreateInput });
+      const form = await formFactory({
+        ownerId: owner.id,
+        opt: {
+          ...(await getBaseData()),
+          status: "DRAFT"
+        }
+      });
 
       const { mutate } = makeClient(user);
 
@@ -620,7 +614,7 @@ describe("mutation / importPaperForm", () => {
       );
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toEqual(
-        "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir mettre à jour ce bordereau"
+        "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir importer ce bordereau"
       );
     });
 
@@ -629,18 +623,14 @@ describe("mutation / importPaperForm", () => {
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const formCreateInput: Prisma.FormCreateInput = {
-        ...(await getBaseData()),
-        readableId: getReadableId(),
-        owner: {
-          connect: { id: owner.id }
-        },
-        status: "SEALED",
-        recipientCompanySiret: company.siret // user is recipient
-      };
-
-      // create a form with a sealed status
-      const form = await prisma.form.create({ data: formCreateInput });
+      const form = await formFactory({
+        ownerId: owner.id,
+        opt: {
+          ...(await getBaseData()),
+          status: "SEALED",
+          recipientCompanySiret: company.siret
+        }
+      });
 
       const { mutate } = makeClient(user);
 
@@ -671,18 +661,15 @@ describe("mutation / importPaperForm", () => {
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const formCreateInput: Prisma.FormCreateInput = {
-        ...(await getBaseData()),
-        readableId: getReadableId(),
-        owner: {
-          connect: { id: owner.id }
-        },
-        status: "SEALED",
-        recipientCompanySiret: company.siret // user is recipient
-      };
-
       // create a form with a sealed status
-      const form = await prisma.form.create({ data: formCreateInput });
+      const form = await formFactory({
+        ownerId: owner.id,
+        opt: {
+          ...(await getBaseData()),
+          status: "SEALED",
+          recipientCompanySiret: company.siret
+        }
+      });
 
       const { mutate } = makeClient(user);
 
@@ -714,18 +701,14 @@ describe("mutation / importPaperForm", () => {
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const formCreateInput: Prisma.FormCreateInput = {
-        ...(await getBaseData()),
-        readableId: getReadableId(),
-        owner: {
-          connect: { id: owner.id }
-        },
-        status: "SEALED",
-        recipientCompanySiret: company.siret // user is recipient
-      };
-
-      // create a form with a sealed status
-      const form = await prisma.form.create({ data: formCreateInput });
+      const form = await formFactory({
+        ownerId: owner.id,
+        opt: {
+          ...(await getBaseData()),
+          status: "SEALED",
+          recipientCompanySiret: company.siret
+        }
+      });
 
       const { mutate } = makeClient(user);
 
@@ -764,18 +747,14 @@ describe("mutation / importPaperForm", () => {
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const formCreateInput: Prisma.FormCreateInput = {
-        ...(await getBaseData()),
-        readableId: getReadableId(),
-        owner: {
-          connect: { id: owner.id }
-        },
-        status: "SEALED",
-        recipientCompanySiret: company.siret // user is recipient
-      };
-
-      // create a form with a sealed status
-      const form = await prisma.form.create({ data: formCreateInput });
+      const form = await formFactory({
+        ownerId: owner.id,
+        opt: {
+          ...(await getBaseData()),
+          status: "SEALED",
+          recipientCompanySiret: company.siret
+        }
+      });
 
       const { mutate } = makeClient(user);
 

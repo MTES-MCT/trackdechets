@@ -1,20 +1,20 @@
 import { UserInputError } from "apollo-server-express";
-import { checkIsAuthenticated } from "../../../common/permissions";
+import {
+  checkIsAuthenticated,
+  checkSecurityCode
+} from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { getFormOrFormNotFound } from "../../database";
+import {
+  getFirstTransporterSync,
+  getFormOrFormNotFound,
+  getFullForm
+} from "../../database";
 import {
   expandFormFromDb,
   flattenSignedByTransporterInput
 } from "../../converter";
-import {
-  checkCanSignedByTransporter,
-  checkSecurityCode
-} from "../../permissions";
-import {
-  beforeSignedByTransporterSchema,
-  signingInfoSchema,
-  wasteDetailsSchema
-} from "../../validation";
+import { checkCanSignedByTransporter } from "../../permissions";
+import { signingInfoSchema, validateBeforeTransport } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
@@ -28,6 +28,10 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
     const { id, signingInfo } = args;
 
     const form = await getFormOrFormNotFound({ id });
+
+    const fullForm = await getFullForm(form);
+
+    const transporter = await getFirstTransporterSync(fullForm);
 
     await checkCanSignedByTransporter(user, form);
 
@@ -64,25 +68,35 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
     };
 
     const futureForm = {
+      ...transporter,
       ...form,
       ...wasteDetails
     };
 
-    // check waste details override is valid
-    await wasteDetailsSchema.validate(futureForm);
-    await beforeSignedByTransporterSchema.validate(futureForm);
+    // check waste details override is valid and transporter info is filled
+    await validateBeforeTransport(futureForm);
 
     const formRepository = getFormRepository(user);
-    if (form.sentAt) {
+
+    const transporterUpdate: Prisma.BsddTransporterUpdateWithoutFormInput = {
+      takenOverAt: infos.sentAt, // takenOverAt is duplicated between Form and BsddTransporter
+      takenOverBy: user.name // takenOverBy is duplicated between Form and BsddTransporter
+    };
+
+    if (form.takenOverAt && fullForm.forwardedIn) {
       // BSD has already been sent, it must be a signature for frame 18
 
       // check security code is temp storer's
-      await checkSecurityCode(form.recipientCompanySiret, securityCode);
+      await checkSecurityCode(form.recipientCompanySiret!, securityCode);
 
       const { forwardedIn } =
         (await getFormRepository(user).findFullFormById(id)) ?? {};
 
       const hasWasteDetailsOverride = !!forwardedIn?.wasteDetailsQuantity;
+
+      const forwardedInTransporter = getFirstTransporterSync(
+        fullForm.forwardedIn
+      );
 
       const formUpdateInput: Prisma.FormUpdateInput = {
         ...(!hasWasteDetailsOverride && wasteDetails),
@@ -101,7 +115,15 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
             // We don't have this information so we're doing our best:
             takenOverBy: user.name,
 
-            ...(hasWasteDetailsOverride && wasteDetails)
+            ...(hasWasteDetailsOverride && wasteDetails),
+            ...(forwardedInTransporter && {
+              transporters: {
+                update: {
+                  where: { id: forwardedInTransporter.id },
+                  data: transporterUpdate
+                }
+              }
+            })
           }
         }
       };
@@ -130,12 +152,12 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       await checkSecurityCode(form.ecoOrganismeSiret, signingInfo.securityCode);
     } else {
       await checkSecurityCode(
-        form.emitterCompanySiret,
+        form.emitterCompanySiret!,
         signingInfo.securityCode
       );
     }
 
-    const formUpdateInput = {
+    const formUpdateInput: Prisma.FormUpdateInput = {
       // The following fields are deprecated but what this mutation used to fill
       // so we need to continue doing so until the mutation is completely removed
       signedByTransporter: true,
@@ -152,7 +174,15 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       takenOverBy: user.name,
 
       ...wasteDetails,
-      currentTransporterSiret: getTransporterCompanyOrgId(form)
+      currentTransporterOrgId: getTransporterCompanyOrgId(transporter),
+      ...(transporter && {
+        transporters: {
+          update: {
+            where: { id: transporter.id },
+            data: transporterUpdate
+          }
+        }
+      })
     };
 
     const sentForm = await formRepository.update(

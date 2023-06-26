@@ -61,6 +61,11 @@ const columns: Column[] = [
   { field: "status", label: "Statut du bordereau" },
   { field: "wasteDescription", label: "Dénomination usuelle" },
   { field: "wasteCode", label: "Code du déchet" },
+  {
+    field: "wasteIsDangerous",
+    label: "Déchet dangereux",
+    format: formatBoolean
+  },
   { field: "pop", label: "POP", format: formatBoolean },
   { field: "weight", label: "Quantité de déchet", format: formatNumber },
   // Origine du déchet
@@ -82,6 +87,7 @@ const columns: Column[] = [
   { field: "emitterCompanyName", label: "Expéditeur raison sociale" },
   { field: "emitterCompanySiret", label: "Expéditeur SIRET" },
   { field: "emitterCompanyAddress", label: "Expéditeur adresse" },
+  { field: "emitterPickupsiteName", label: "Nom du point de prise en charge" },
   { field: "emitterPickupsiteAddress", label: "Adresse de prise en charge" },
   { field: "emitterCompanyMail", label: "Expéditeur contact" },
   { field: "workerCompanyName", label: "Entreprise de travaux raison sociale" },

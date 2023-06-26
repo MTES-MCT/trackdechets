@@ -56,12 +56,6 @@ export class CountryNotFound extends UserInputError {
   }
 }
 
-export class InvaliSecurityCode extends ForbiddenError {
-  constructor() {
-    super("Le code de signature est invalide.");
-  }
-}
-
 export class TemporaryStorageCannotReceive extends UserInputError {
   constructor() {
     super(

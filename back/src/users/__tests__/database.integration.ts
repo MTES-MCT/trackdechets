@@ -6,11 +6,8 @@ import {
   userFactory,
   companyFactory
 } from "../../__tests__/factories";
-import {
-  associateUserToCompany,
-  createUserAccountHash,
-  getFullUser
-} from "../database";
+import { associateUserToCompany, createUserAccountHash } from "../database";
+import { getUserRoles } from "../../permissions";
 
 describe("createUserAccountHash", () => {
   afterAll(resetDatabase);
@@ -70,8 +67,8 @@ describe("associateUserToCompany", () => {
     const refreshedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
-    const fullUser = await getFullUser(refreshedUser);
-    expect(fullUser.firstAssociationDate).toBeTruthy();
-    expect(fullUser.companies).toEqual([company]);
+    const userRoles = await getUserRoles(user.id);
+    expect(userRoles).toEqual({ [company.orgId]: "MEMBER" });
+    expect(refreshedUser.firstAssociationDate).toBeTruthy();
   });
 });

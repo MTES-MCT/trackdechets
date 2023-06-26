@@ -1,0 +1,62 @@
+.dropdown-menu {
+  position: relative;
+
+  .menu-btn {
+    &__iconAlone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    &::after {
+      content: "";
+      display: block;
+      background: url("/icons/dashboard/arrow-s-line.svg");
+      width: 16px;
+      height: 16px;
+      margin-left: 5px;
+    }
+  }
+
+  .isOpen {
+    &:after {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__content {
+    position: absolute;
+    display: block;
+    background-color: #fff;
+    width: fit-content;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+
+    &__icon {
+      svg {
+        width: 28px;
+        height: 28px;
+        margin-right: 10px;
+      }
+    }
+
+    a,
+    button {
+      color: #000;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      &:hover {
+        background-color: #f1f1f1;
+      }
+    }
+
+    &__iconAlone {
+      a,
+      button {
+        flex-direction: column;
+      }
+    }
+  }
+}

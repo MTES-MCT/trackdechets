@@ -1,10 +1,13 @@
 import { indexBsdJob } from "./jobs";
+import { indexQueue } from "./producers/elastic";
 import {
-  indexQueue,
   DELETE_JOB_NAME,
-  INDEX_JOB_NAME
-} from "./producers/elastic";
+  INDEX_JOB_NAME,
+  INDEX_CREATED_JOB_NAME,
+  INDEX_UPDATED_JOB_NAME
+} from "./producers/jobNames";
 import { deleteBsdJob } from "./jobs/deleteBsd";
+
 import { indexChunkBsdJob, indexAllInBulk } from "./jobs/indexAllBsds";
 
 function startConsumers() {
@@ -16,7 +19,9 @@ function startConsumers() {
     indexChunkBsdJob
   );
   indexQueue.process("indexAllInBulk", indexAllInBulk);
-  indexQueue.process(INDEX_JOB_NAME, indexBsdJob);
+  indexQueue.process(INDEX_JOB_NAME, indexBsdJob); // todo: remove post webhook release
+  indexQueue.process(INDEX_CREATED_JOB_NAME, indexBsdJob);
+  indexQueue.process(INDEX_UPDATED_JOB_NAME, indexBsdJob);
   indexQueue.process(DELETE_JOB_NAME, deleteBsdJob);
 }
 

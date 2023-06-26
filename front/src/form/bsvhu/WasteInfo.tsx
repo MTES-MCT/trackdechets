@@ -39,7 +39,7 @@ export default function WasteInfo({ disabled }) {
             disabled={disabled}
             name="wasteCode"
             id="16 01 04*"
-            label="16 01 04* - véhicules hors d’usage non dépollué par un centre agréé"
+            label="16 01 04* - véhicules hors d’usage non dépollués par un centre agréé"
             component={RadioButton}
           />
         </fieldset>

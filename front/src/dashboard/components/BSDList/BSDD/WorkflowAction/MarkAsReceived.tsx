@@ -3,7 +3,8 @@ import { Query, QueryFormArgs } from "generated/graphql/types";
 import { useLazyQuery } from "@apollo/client";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton, Loader } from "common/components";
+import { ActionButton } from "common/components";
+import { Loader } from "Apps/common/Components";
 import { IconWaterDam } from "common/components/Icons";
 import ReceivedInfo from "./ReceivedInfo";
 import { GET_FORM } from "form/bsdd/utils/queries";
@@ -52,6 +53,8 @@ export default function MarkAsReceived({ form }: WorkflowActionProps) {
             </div>
           );
         }
+
+        return <></>;
       }}
     />
   );

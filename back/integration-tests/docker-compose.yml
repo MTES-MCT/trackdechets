@@ -40,7 +40,7 @@ services:
     build:
       context: ../
       dockerfile: Dockerfile.dev
-    command: ["npm", "run", "dev:integration"]
+    command: [ "npm", "run", "dev:integration" ]
     volumes:
       - ../src:/usr/src/app/src
     env_file:
@@ -52,9 +52,10 @@ services:
       EMAIL_BACKEND: "sendinblue"
       SIB_BASE_URL: "http://mailservice"
       MAIN_TEMPLATE_ID: "9"
-      FIRST_ONBOARDING_TEMPLATE_ID: "12"
-      PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID: "10"
-      PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "11"
+      FIRST_ONBOARDING_TEMPLATE_ID: "246"
+      PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID: "248"
+      PROFESIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "250"
+      VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID: "247"
       SENDER_EMAIL_ADDRESS: "us@td.test"
       SENDER_NAME: "Wastetracker corp."
       POST_BACKEND: console

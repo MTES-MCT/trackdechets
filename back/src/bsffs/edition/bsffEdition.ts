@@ -1,7 +1,6 @@
 import { Bsff, BsffPackaging, User, Prisma } from "@prisma/client";
 import { safeInput } from "../../common/converter";
 import { SealedFieldError } from "../../common/errors";
-import { getCachedUserSiretOrVat } from "../../common/redis/users";
 import { objectDiff } from "../../forms/workflow/diff";
 import { BsffInput, BsffSignatureType } from "../../generated/graphql/types";
 import { flattenBsffInput } from "../converter";
@@ -9,6 +8,7 @@ import {
   getReadonlyBsffPackagingRepository,
   getReadonlyBsffRepository
 } from "../repository";
+import { getUserRoles } from "../../permissions";
 
 type BsffSignatureTypeUntilReception = Extract<
   BsffSignatureType,
@@ -98,7 +98,7 @@ export async function checkEditionRules(
     return true;
   }
 
-  const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
+  const userSirets = user?.id ? Object.keys(await getUserRoles(user.id)) : [];
   const isEmitter =
     existingBsff.emitterCompanySiret &&
     userSirets.includes(existingBsff.emitterCompanySiret);

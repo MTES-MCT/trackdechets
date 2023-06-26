@@ -53,6 +53,8 @@ type IncomingWaste {
   emitterCompanySiret: String
   "L'adresse de l'établissement expéditeur des déchets"
   emitterCompanyAddress: String
+  "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
+  emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement expéditeur des déchets"
   emitterPickupsiteAddress: String
   """
@@ -185,6 +187,11 @@ type IncomingWaste {
   """
   wasteAdr: String
 
+  """
+  Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  """
+  wasteIsDangerous: Boolean
+
   "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
   "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
@@ -246,6 +253,8 @@ type OutgoingWaste {
 
   "L'adresse de l'établissement"
   emitterCompanyAddress: String
+  "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
+  emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
   "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
@@ -396,6 +405,11 @@ type OutgoingWaste {
   """
   wasteAdr: String
 
+  """
+  Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  """
+  wasteIsDangerous: Boolean
+
   "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
   "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
@@ -504,6 +518,8 @@ type TransportedWaste {
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyAddress: String
+  "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
+  emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
 
@@ -595,6 +611,11 @@ type TransportedWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+
+  """
+  Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  """
+  wasteIsDangerous: Boolean
 }
 
 type TransportedWasteEdge {
@@ -688,6 +709,8 @@ type ManagedWaste {
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyAddress: String
+  "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
+  emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
 
@@ -796,6 +819,11 @@ type ManagedWaste {
   """
   wasteAdr: String
 
+  """
+  Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  """
+  wasteIsDangerous: Boolean
+
   "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
   "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
@@ -892,6 +920,8 @@ type AllWaste {
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyAddress: String
+  "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
+  emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
   "La quantité de déchet sortant en tonne"
@@ -937,6 +967,11 @@ type AllWaste {
   transport maritime de marchandises dangereuses
   """
   wasteAdr: String
+
+  """
+  Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  """
+  wasteIsDangerous: Boolean
 
   "La raison sociale du négociant si le déchet est géré par un négociant"
   traderCompanyName: String

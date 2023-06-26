@@ -1,7 +1,7 @@
 import React from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Formik, FormikProps, Form, Field } from "formik";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { CompanyPrivate } from "generated/graphql/types";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import Tooltip from "common/components/Tooltip";
@@ -19,7 +19,7 @@ type V = {
   organisation?: string | null;
 };
 
-const UPDATE_WORKER_CERTIFICATION = gql`
+export const UPDATE_WORKER_CERTIFICATION = gql`
   mutation UpdateWorkerCertification($input: UpdateWorkerCertificationInput!) {
     updateWorkerCertification(input: $input) {
       id
@@ -61,7 +61,7 @@ export const UPDATE_COMPANY_WORKER_CERTIFICATION = gql`
   }
 `;
 
-const DELETE_WORKER_CERTIFICATION = gql`
+export const DELETE_WORKER_CERTIFICATION = gql`
   mutation DeleteWorkerCertification($input: DeleteWorkerCertificationInput!) {
     deleteWorkerCertification(input: $input) {
       id

@@ -15,12 +15,14 @@ describe("user activation", () => {
 
   it("should activate an user", async () => {
     const user = await userFactory({
-      email: "bruce.banner@trackdechets.fr",
+      email: "clark.kent@trackdechets.fr",
       isActive: false
     });
 
     const userActivationHash = await createActivationHash(user);
-    await request.get(`/userActivation?hash=${userActivationHash.hash}`);
+    await request
+      .post(`/userActivation`)
+      .send({ hash: userActivationHash.hash });
 
     const refreshedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
@@ -49,7 +51,8 @@ describe("user activation", () => {
         id: userActivationHash.id
       }
     });
-    await request.get(`/userActivation?hash=${hash}`);
+
+    await request.post(`/userActivation`).send({ hash });
 
     const refreshedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }

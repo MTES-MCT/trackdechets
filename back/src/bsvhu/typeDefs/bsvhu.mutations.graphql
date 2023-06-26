@@ -71,6 +71,7 @@ type Mutation {
       phone
     }
     recepisse {
+      isExempted
       number
       department
       validityLimit

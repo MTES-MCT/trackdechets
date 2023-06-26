@@ -1,377 +1,315 @@
-import { EmitterType, Form, Status, User } from "@prisma/client";
-import { ForbiddenError } from "apollo-server-express";
+import {
+  BsddTransporter,
+  EmitterType,
+  Form,
+  Status,
+  User
+} from "@prisma/client";
+import { ForbiddenError } from "apollo-server-core";
+import {
+  CreateFormInput,
+  ImportPaperFormInput,
+  UpdateFormInput
+} from "../generated/graphql/types";
+import {
+  Permission,
+  checkUserPermissions,
+  getUserRoles,
+  can
+} from "../permissions";
 import prisma from "../prisma";
-import { FormCompanies } from "./types";
+import {
+  getFirstTransporter,
+  getFirstTransporterSync,
+  getFullForm
+} from "./database";
+import { getReadOnlyFormRepository } from "./repository";
+import { checkSecurityCode } from "../common/permissions";
+import { FullForm } from "./types";
+import { editionRules, getUpdatedFields } from "./edition";
 
-import { getCachedUserSiretOrVat } from "../common/redis/users";
+/**
+ * Retrieves companies allowed to update, delete or duplicate an existing BSDD.
+ * In case of update, this function can be called with an `updateInput`
+ * parameter to pre-compute the form contributors after the update, hence verifying
+ * a user is not removing his own company from the BSDD
+ */
+function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
+  const updateEmitterCompanySiret = input?.emitter?.company?.siret;
+  const updateRecipientCompanySiret = input?.recipient?.company?.siret;
+  const updateTransporterCompanySiret = input?.transporter?.company?.siret;
+  const updateTransporterCompanyVatNumber =
+    input?.transporter?.company?.vatNumber;
+  const updateTraderCompanySiret = input?.trader?.company?.siret;
+  const updateBrokerCompanySiret = input?.broker?.company?.siret;
+  const updateEcoOrganismeSiret = input?.ecoOrganisme?.siret;
+  const updateFinalDestinationCompanySiret =
+    input?.temporaryStorageDetail?.destination?.company?.siret;
 
-import { getFullForm } from "./database";
-import { InvaliSecurityCode, NotFormContributor } from "./errors";
-import { getFormRepository } from "./repository";
-
-export async function formToCompanies(form: Form): Promise<FormCompanies> {
-  const fullForm = await getFullForm(form);
-  return {
-    emitterCompanySiret: fullForm.emitterCompanySiret,
-    recipientCompanySiret: fullForm.recipientCompanySiret,
-    transporterCompanySiret: fullForm.transporterCompanySiret,
-    transporterCompanyVatNumber: fullForm.transporterCompanyVatNumber,
-    traderCompanySiret: fullForm.traderCompanySiret,
-    brokerCompanySiret: fullForm.brokerCompanySiret,
-    ecoOrganismeSiret: fullForm.ecoOrganismeSiret,
-    ...(fullForm.intermediaries?.length
-      ? {
-          intermediariesVatNumbers: fullForm.intermediaries
-            .map(int => int.vatNumber)
-            .filter(Boolean),
-          intermediariesSirets: fullForm.intermediaries
-            .map(int => int.siret)
-            .filter(Boolean)
-        }
-      : {}),
-    ...(fullForm.transportSegments?.length
-      ? {
-          transportSegments: fullForm.transportSegments.map(seg => ({
-            transporterCompanySiret: seg.transporterCompanySiret
-          }))
-        }
-      : {}),
-    ...(fullForm.forwardedIn
-      ? {
-          forwardedIn: {
-            recipientCompanySiret: fullForm.forwardedIn.recipientCompanySiret,
-            transporterCompanySiret:
-              fullForm.forwardedIn.transporterCompanySiret,
-            transporterCompanyVatNumber:
-              fullForm.forwardedIn.transporterCompanyVatNumber
-          }
-        }
-      : {})
-  };
-}
-
-function isFormEmitter(userCompaniesSiretOrVat: string[], form: FormCompanies) {
-  if (!form.emitterCompanySiret) {
-    return false;
+  const transporter = getFirstTransporterSync(form);
+  let forwardedInTransporter: BsddTransporter | null = null;
+  if (form.forwardedIn) {
+    forwardedInTransporter = getFirstTransporterSync(form.forwardedIn);
   }
 
-  return userCompaniesSiretOrVat.includes(form.emitterCompanySiret);
-}
+  const emitterCompanySiret =
+    updateEmitterCompanySiret !== undefined
+      ? updateEmitterCompanySiret
+      : form.emitterCompanySiret;
 
-function isFormRecipient(
-  userCompaniesSiretOrVat: string[],
-  form: FormCompanies
-) {
-  if (!form.recipientCompanySiret) {
-    return false;
-  }
+  const recipientCompanySiret =
+    updateRecipientCompanySiret !== undefined
+      ? updateRecipientCompanySiret
+      : form.recipientCompanySiret;
 
-  return userCompaniesSiretOrVat.includes(form.recipientCompanySiret);
-}
+  const transporterCompanySiret =
+    updateTransporterCompanySiret !== undefined
+      ? updateTransporterCompanySiret
+      : transporter?.transporterCompanySiret;
 
-function isFormTransporter(
-  userCompaniesSiretOrVat: string[],
-  form: FormCompanies
-) {
-  if (!form.transporterCompanySiret && !form.transporterCompanyVatNumber) {
-    return false;
-  }
+  const transporterCompanyVatNumber =
+    updateTransporterCompanyVatNumber !== undefined
+      ? updateTransporterCompanyVatNumber
+      : transporter?.transporterCompanyVatNumber;
 
-  return (
-    (form.transporterCompanyVatNumber &&
-      userCompaniesSiretOrVat.includes(form.transporterCompanyVatNumber)) ||
-    (form.transporterCompanySiret &&
-      userCompaniesSiretOrVat.includes(form.transporterCompanySiret))
+  const traderCompanySiret =
+    updateTraderCompanySiret !== undefined
+      ? updateTraderCompanySiret
+      : form.traderCompanySiret;
+
+  const brokerCompanySiret =
+    updateBrokerCompanySiret !== undefined
+      ? updateBrokerCompanySiret
+      : form.brokerCompanySiret;
+
+  const ecoOrganismeSiret =
+    updateEcoOrganismeSiret !== undefined
+      ? updateEcoOrganismeSiret
+      : form.ecoOrganismeSiret;
+
+  const bsdSuiteOrgIds = form.forwardedIn
+    ? [
+        forwardedInTransporter?.transporterCompanySiret,
+        forwardedInTransporter?.transporterCompanyVatNumber,
+        updateFinalDestinationCompanySiret !== undefined
+          ? updateFinalDestinationCompanySiret
+          : form.forwardedIn.recipientCompanySiret
+      ]
+    : [];
+
+  const intermediariesOrgIds =
+    input?.intermediaries !== undefined
+      ? (input.intermediaries ?? []).flatMap(i => [i.siret, i.vatNumber])
+      : form.intermediaries
+      ? form.intermediaries.flatMap(i => [i.siret, i.vatNumber])
+      : [];
+
+  const multiModalTransporters = (form.transporters ?? []).map(
+    s => s.transporterCompanySiret
   );
-}
 
-function isFormTrader(userCompaniesSiretOrVat: string[], form: FormCompanies) {
-  if (!form.traderCompanySiret) {
-    return false;
-  }
-
-  return userCompaniesSiretOrVat.includes(form.traderCompanySiret);
-}
-
-function isFormBroker(userCompaniesSiretOrVat: string[], form: FormCompanies) {
-  if (!form.brokerCompanySiret) {
-    return false;
-  }
-
-  return userCompaniesSiretOrVat.includes(form.brokerCompanySiret);
-}
-
-function isFormEcoOrganisme(
-  userCompaniesSiretOrVat: string[],
-  form: FormCompanies
-) {
-  if (!form.ecoOrganismeSiret) {
-    return false;
-  }
-
-  return userCompaniesSiretOrVat.includes(form.ecoOrganismeSiret);
-}
-
-function isFormDestinationAfterTempStorage(
-  userCompaniesSiretOrVat: string[],
-  form: FormCompanies
-) {
-  if (!form.forwardedIn) {
-    return false;
-  }
-
-  return (
-    form.forwardedIn.recipientCompanySiret &&
-    userCompaniesSiretOrVat.includes(form.forwardedIn.recipientCompanySiret)
-  );
-}
-
-function isFormTransporterAfterTempStorage(
-  userCompaniesSiretOrVat: string[],
-  form: FormCompanies
-) {
-  if (!form.forwardedIn) {
-    return false;
-  }
-
-  return (
-    (form.forwardedIn.transporterCompanySiret &&
-      userCompaniesSiretOrVat.includes(
-        form.forwardedIn.transporterCompanySiret
-      )) ||
-    (form.forwardedIn.transporterCompanyVatNumber &&
-      userCompaniesSiretOrVat.includes(
-        form.forwardedIn.transporterCompanyVatNumber
-      ))
-  );
-}
-
-function isFormMultiModalTransporter(
-  userCompaniesSiretOrVat: string[],
-  form: FormCompanies
-) {
-  if (!form.transportSegments) {
-    return false;
-  }
-
-  const transportSegmentSirets = form.transportSegments.map(
-    segment => segment.transporterCompanySiret
-  );
-  return transportSegmentSirets.some(
-    s => s && userCompaniesSiretOrVat.includes(s)
-  );
-}
-
-function isFormIntermediary(userCompanies: string[], form: FormCompanies) {
-  if (
-    !form.intermediariesVatNumbers?.length &&
-    !form.intermediariesSirets?.length
-  ) {
-    return false;
-  }
-  const intermediaryCompanyIds = [
-    ...(form.intermediariesVatNumbers ? form.intermediariesVatNumbers : []),
-    ...(form.intermediariesSirets ? form.intermediariesSirets : [])
-  ];
-
-  return intermediaryCompanyIds.some(i => userCompanies.includes(i));
-}
-
-export async function isFormContributor(user: User, form: FormCompanies) {
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  // fetch both vatNumber and siret
-  const userCompanies = await getCachedUserSiretOrVat(user.id);
-  const isFormCompanyIdContributor = isFormIntermediary(userCompanies, form);
-  const isFormSiretContributor = [
-    isFormEmitter,
-    isFormRecipient,
-    isFormTrader,
-    isFormBroker,
-    isFormTransporter,
-    isFormEcoOrganisme,
-    isFormTransporterAfterTempStorage,
-    isFormDestinationAfterTempStorage,
-    isFormMultiModalTransporter
-  ].some(isFormRole => isFormRole(userCompaniesSiretOrVat, form));
-  return isFormCompanyIdContributor || isFormSiretContributor;
-}
-
-async function isFormInitialEmitter(user: Express.User, form: Form) {
-  const { findGroupedFormsById } = getFormRepository(user);
-  const appendix2Forms = await findGroupedFormsById(form.id);
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  return appendix2Forms.reduce(
-    (acc, f) => acc || isFormEmitter(userCompaniesSiretOrVat, f),
-    false
-  );
+  return [
+    emitterCompanySiret,
+    recipientCompanySiret,
+    transporterCompanySiret,
+    transporterCompanyVatNumber,
+    traderCompanySiret,
+    brokerCompanySiret,
+    ecoOrganismeSiret,
+    ...bsdSuiteOrgIds,
+    ...intermediariesOrgIds,
+    ...multiModalTransporters
+  ].filter(Boolean);
 }
 
 /**
- * Check that at least one of user's company is present somewhere in the form
- * or throw a NotFormContributor
- * */
-export async function checkIsFormContributor(
-  user: User,
-  form: FormCompanies,
-  errorMsg: string
-) {
-  const isContributor = await isFormContributor(user, form);
-
-  if (!isContributor) {
-    throw new NotFormContributor(errorMsg);
-  }
-
-  return true;
+ * Retrieves companies allowed to create a form of the given payload
+ */
+function formCreators(input: CreateFormInput): string[] {
+  return [
+    input.emitter?.company?.siret,
+    input.recipient?.company?.siret,
+    input.transporter?.company?.siret,
+    input.transporter?.company?.vatNumber,
+    input.trader?.company?.siret,
+    input.broker?.company?.siret,
+    input.ecoOrganisme?.siret,
+    input.temporaryStorageDetail?.destination?.company?.siret,
+    ...(input.intermediaries
+      ? input.intermediaries.flatMap(i => [i.siret, i.vatNumber])
+      : [])
+  ].filter(Boolean);
 }
 
-export async function checkCanRead(user: Express.User, form: Form) {
-  const formCompanies = await formToCompanies(form);
-  const isContributor = await isFormContributor(user, formCompanies);
-  if (isContributor) {
-    return true;
-  }
-  if (
-    [EmitterType.APPENDIX1, EmitterType.APPENDIX2].some(
-      type => form.emitterType === type
-    )
-  ) {
-    const isInitialEmitter = await isFormInitialEmitter(user, form);
-    if (isInitialEmitter) {
-      return true;
-    }
-  }
+/**
+ * Retrieves organisation allowed to read a BSDD
+ */
+function formReaders(form: FullForm & { grouping: Form[] }): string[] {
+  return [
+    ...formContributors(form),
+    ...(form.transporters
+      ? form.transporters.map(s => s.transporterCompanySiret)
+      : []),
+    ...(form.grouping ? form.grouping.map(f => f.emitterCompanySiret) : [])
+  ].filter(Boolean);
+}
 
-  throw new NotFormContributor(
+export function isFormReader(user: User, form: Form) {
+  return checkCanRead(user, form).catch(_ => false);
+}
+
+export async function checkCanRead(user: User, form: Form) {
+  const fullForm = await getFullForm(form);
+  const { findGroupedFormsById } = getReadOnlyFormRepository();
+  const grouping = await findGroupedFormsById(form.id);
+  const authorizedOrgIds = formReaders({ ...fullForm, grouping });
+
+  return checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanRead,
     "Vous n'êtes pas autorisé à accéder à ce bordereau"
   );
 }
 
-export async function checkCanDuplicate(user: User, form: Form) {
-  return checkIsFormContributor(
+export async function checkCanList(user: User, orgId: string) {
+  return checkUserPermissions(
     user,
-    await formToCompanies(form),
-    "Vous n'êtes pas autorisé à dupliquer ce bordereau"
+    [orgId].filter(Boolean),
+    Permission.BsdCanList,
+    `Vous n'avez pas la permission de lister les bordereaux de l'établissement ${orgId}`
   );
 }
 
-export async function checkCanUpdate(user: User, form: Form) {
-  await checkIsFormContributor(
-    user,
-    await formToCompanies(form),
-    "Vous n'êtes pas autorisé à modifier ce bordereau"
-  );
+export async function checkCanCreate(user: User, input: CreateFormInput) {
+  const authorizedOrgIds = formCreators(input);
 
-  // TODO: should we limit which field remains editable for appendix 1 ?
+  return checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanCreate,
+    "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
+  );
+}
+
+export async function checkCanUpdate(
+  user: User,
+  form: Form,
+  input: UpdateFormInput
+) {
   if (form.emitterType === EmitterType.APPENDIX1 && form.status === "SENT") {
     return true;
   }
 
-  if (form.status === "SIGNED_BY_PRODUCER") {
-    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+  const fullForm = await getFullForm(form);
 
-    if (
-      form.emittedByEcoOrganisme &&
-      form.ecoOrganismeSiret &&
-      !userCompaniesSiretOrVat.includes(form.ecoOrganismeSiret)
-    ) {
-      throw new ForbiddenError(
-        "L'éco-organisme a signé ce bordereau, il est le seul à pouvoir le mettre à jour."
-      );
-    }
+  const transporter = getFirstTransporterSync(fullForm);
 
-    if (
-      form.emitterCompanySiret &&
-      !userCompaniesSiretOrVat.includes(form.emitterCompanySiret)
-    ) {
-      throw new ForbiddenError(
-        "Le producteur a signé ce bordereau, il est le seul à pouvoir le mettre à jour."
-      );
+  let authorizedOrgIds: string[] = [];
+  let errorMsg = "Vous n'êtes pas autorisé à modifier ce bordereau";
+
+  if (
+    ["DRAFT", "SEALED"].includes(form.status) ||
+    (form.emitterType === EmitterType.APPENDIX1 && form.status === "SENT")
+  ) {
+    authorizedOrgIds = formContributors(fullForm);
+  } else if (form.status === "SIGNED_BY_PRODUCER") {
+    const updatedFields = await getUpdatedFields(form, input);
+    if (form.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+      // Le transporteur peut modifier les données de l'annexe 1 jusqu'à sa signature
+      authorizedOrgIds = [transporter?.transporterCompanySiret].filter(Boolean);
+    } else if (updatedFields.every(f => editionRules[f] === "TRANSPORT")) {
+      // Les infos de transport peuvent être modifiées par tous les acteurs
+      // du BSDD tant que le déchet n'a pas été enlevé
+      authorizedOrgIds = formContributors(fullForm);
+    } else {
+      if (form.emittedByEcoOrganisme) {
+        authorizedOrgIds = [form.ecoOrganismeSiret].filter(Boolean);
+        errorMsg =
+          "L'éco-organisme a signé ce bordereau, seules les informations de transport peuvent être mises à jour.";
+      } else {
+        authorizedOrgIds = [form.emitterCompanySiret].filter(Boolean);
+        errorMsg =
+          "Le producteur a signé ce bordereau, seules les informations de transport peuvent être mises à jour.";
+      }
     }
-  } else if (!["DRAFT", "SEALED"].includes(form.status)) {
-    throw new ForbiddenError(
-      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés"
-    );
+  } else {
+    errorMsg =
+      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés";
   }
 
-  return true;
+  await checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanUpdate,
+    errorMsg
+  );
+
+  const futureContributors = formContributors(fullForm, input);
+
+  return checkUserPermissions(
+    user,
+    futureContributors,
+    Permission.BsdCanUpdate,
+    "Vous ne pouvez pas enlever votre établissement du bordereau"
+  );
+}
+
+export async function checkCanDuplicate(user: User, form: Form) {
+  const fullForm = await getFullForm(form);
+  const authorizedOrgIds = formContributors(fullForm);
+
+  return checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanCreate,
+    "Vous n'êtes pas autorisé à dupliquer ce bordereau"
+  );
 }
 
 export async function checkCanDelete(user: User, form: Form) {
-  await checkIsFormContributor(
+  const fullForm = await getFullForm(form);
+
+  let authorizedOrgIds: string[] = [];
+  let errorMsg = "Vous n'êtes pas autorisé à supprimer ce bordereau";
+
+  if (["DRAFT", "SEALED"].includes(form.status)) {
+    authorizedOrgIds = formContributors(fullForm);
+  } else if (
+    form.status === "SIGNED_BY_PRODUCER" &&
+    form.emittedByEcoOrganisme
+  ) {
+    authorizedOrgIds = [form.ecoOrganismeSiret].filter(Boolean);
+    errorMsg =
+      "L'éco-organisme a signé ce bordereau, il est le seul à pouvoir le supprimer.";
+  } else if (
+    form.status === "SIGNED_BY_PRODUCER" &&
+    !form.emittedByEcoOrganisme
+  ) {
+    authorizedOrgIds = [form.emitterCompanySiret].filter(Boolean);
+    errorMsg =
+      "Le producteur a signé ce bordereau, il est le seul à pouvoir le supprimer.";
+  } else {
+    errorMsg =
+      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés";
+  }
+
+  return checkUserPermissions(
     user,
-    await formToCompanies(form),
-    "Vous n'êtes pas autorisé à supprimer ce bordereau"
+    authorizedOrgIds,
+    Permission.BsdCanDelete,
+    errorMsg
   );
-
-  if (form.status === "SIGNED_BY_PRODUCER") {
-    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-
-    if (
-      form.emittedByEcoOrganisme &&
-      form.ecoOrganismeSiret &&
-      !userCompaniesSiretOrVat.includes(form.ecoOrganismeSiret)
-    ) {
-      throw new ForbiddenError(
-        "L'éco-organisme a signé ce bordereau, il est le seul à pouvoir le supprimer."
-      );
-    }
-
-    if (
-      form.emitterCompanySiret &&
-      !userCompaniesSiretOrVat.includes(form.emitterCompanySiret)
-    ) {
-      throw new ForbiddenError(
-        "Le producteur a signé ce bordereau, il est le seul à pouvoir le supprimer."
-      );
-    }
-  } else if (!["DRAFT", "SEALED"].includes(form.status)) {
-    throw new ForbiddenError(
-      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
-    );
-  }
-
-  return true;
-}
-
-export async function checkCanUpdateTransporterFields(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  // check if Intermediary can update Transporter fields
-  if (!isFormTransporter(userCompaniesSiretOrVat, form)) {
-    throw new ForbiddenError("Vous n'êtes pas transporteur de ce bordereau.");
-  }
 }
 
 export async function checkCanMarkAsSealed(user: User, form: Form) {
-  return checkIsFormContributor(
+  const fullForm = await getFullForm(form);
+  const authorizedOrgIds = formContributors(fullForm);
+  return checkUserPermissions(
     user,
-    await formToCompanies(form),
+    authorizedOrgIds,
+    Permission.BsdCanDelete,
     "Vous n'êtes pas autorisé à sceller ce bordereau"
-  );
-}
-
-export async function checkCanSignFor(
-  siret: string | null,
-  user: User,
-  securityCode?: number | null
-) {
-  if (!siret) {
-    throw new ForbiddenError(
-      "Vous n'êtes pas autorisé à signer ce bordereau, aucun transporteur n'a été identifié"
-    );
-  }
-
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-
-  if (userCompaniesSiretOrVat.includes(siret)) {
-    return true;
-  }
-
-  if (securityCode) {
-    return checkSecurityCode(siret, securityCode);
-  }
-
-  throw new ForbiddenError(
-    "Vous n'êtes pas autorisé à signer ce bordereau pour cet acteur"
   );
 }
 
@@ -382,40 +320,60 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
     );
   }
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const formCompanies = await formToCompanies(form);
-  const isAuthorized = [
-    isFormTransporter,
-    isFormTransporterAfterTempStorage
-  ].some(isFormRole => isFormRole(userCompaniesSiretOrVat, formCompanies));
+  const { forwardedIn, ...fullForm } = await getFullForm(form);
+  const transporter = getFirstTransporterSync(fullForm);
+  const forwardedInTransporter = forwardedIn
+    ? getFirstTransporterSync(forwardedIn)
+    : null;
 
-  if (!isAuthorized) {
-    throw new ForbiddenError(
-      "Vous n'êtes pas autorisé à signer ce bordereau pour le transport"
-    );
-  }
-  return true;
+  const authorizedOrgIds = [
+    transporter?.transporterCompanySiret,
+    transporter?.transporterCompanyVatNumber,
+    forwardedInTransporter?.transporterCompanySiret,
+    forwardedInTransporter?.transporterCompanyVatNumber
+  ].filter(Boolean);
+
+  return checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanSignTransport,
+    "Vous n'êtes pas autorisé à signer ce bordereau pour le transport"
+  );
 }
 
-export async function checkCanMarkAsReceived(user: User, form: Form) {
-  if (EmitterType.APPENDIX1_PRODUCER === form.emitterType) {
-    throw new ForbiddenError(
-      "Un bordereau d'annexe 1 ne peut pas être marqué comme reçu. C'est la réception du bordereau de tournée qui mettra à jour le statut de ce bordereau."
-    );
+export async function checkCanSignFor(
+  siret: string,
+  user: User,
+  permission: Permission,
+  securityCode?: number | null
+) {
+  const userRoles = await getUserRoles(user.id);
+  if (userRoles[siret] && can(userRoles[siret], permission)) {
+    return true;
+  }
+  if (securityCode) {
+    return checkSecurityCode(siret, securityCode);
   }
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const formCompanies = await formToCompanies(form);
-  const isAuthorized = form.forwardedInId
-    ? isFormDestinationAfterTempStorage(userCompaniesSiretOrVat, formCompanies)
-    : isFormRecipient(userCompaniesSiretOrVat, formCompanies);
+  throw new ForbiddenError(
+    "Vous n'êtes pas autorisé à signer ce bordereau pour cet acteur"
+  );
+}
 
-  if (!isAuthorized) {
-    throw new ForbiddenError(
-      "Vous n'êtes pas autorisé à réceptionner ce bordereau"
-    );
-  }
-  return true;
+export async function checkCanUpdateTransporterFields(user: User, form: Form) {
+  const transporter = await getFirstTransporter(form);
+
+  const authorizedOrgIds = [
+    transporter?.transporterCompanySiret,
+    transporter?.transporterCompanyVatNumber
+  ].filter(Boolean);
+
+  return checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanUpdate,
+    "Vous n'êtes pas transporteur de ce bordereau."
+  );
 }
 
 export async function checkCanMarkAsAccepted(user: User, form: Form) {
@@ -424,45 +382,38 @@ export async function checkCanMarkAsAccepted(user: User, form: Form) {
       "Un bordereau d'annexe 1 ne peut pas avoir être marqué comme accepté. Il suit son bordereau de tournée."
     );
   }
+  const fullForm = await getFullForm(form);
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const formCompanies = await formToCompanies(form);
-  const isAuthorized = form.forwardedInId
-    ? isFormDestinationAfterTempStorage(userCompaniesSiretOrVat, formCompanies)
-    : isFormRecipient(userCompaniesSiretOrVat, formCompanies);
-  if (!isAuthorized) {
-    throw new ForbiddenError(
-      "Vous n'êtes pas autorisé à marquer ce bordereau comme accepté"
-    );
-  }
-  return true;
+  const recipientSiret = fullForm.forwardedIn
+    ? fullForm.forwardedIn.recipientCompanySiret
+    : form.recipientCompanySiret;
+
+  return checkUserPermissions(
+    user,
+    [recipientSiret].filter(Boolean),
+    Permission.BsdCanSignAcceptation,
+    "Vous n'êtes pas autorisé à marquer ce bordereau comme accepté"
+  );
 }
 
-export async function checkCanMarkAsProcessed(user: User, form: Form) {
+export async function checkCanMarkAsReceived(user: User, form: Form) {
   if (EmitterType.APPENDIX1_PRODUCER === form.emitterType) {
     throw new ForbiddenError(
-      "Un bordereau d'annexe 1 ne peut pas avoir être marqué comme traité. Il suit son bordereau de tournée."
+      "Un bordereau d'annexe 1 ne peut pas être marqué comme reçu. C'est la réception du bordereau de tournée qui mettra à jour le statut de ce bordereau."
     );
   }
+  const fullForm = await getFullForm(form);
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const formCompanies = await formToCompanies(form);
-  const isAuthorized = form.forwardedInId
-    ? isFormDestinationAfterTempStorage(
-        userCompaniesSiretOrVat,
-        formCompanies
-      ) ||
-      // case when the temp storer decides to do an anticipated treatment
-      (form.status === Status.TEMP_STORER_ACCEPTED &&
-        isFormRecipient(userCompaniesSiretOrVat, formCompanies))
-    : isFormRecipient(userCompaniesSiretOrVat, formCompanies);
+  const recipientSiret = fullForm.forwardedIn
+    ? fullForm.forwardedIn.recipientCompanySiret
+    : form.recipientCompanySiret;
 
-  if (!isAuthorized) {
-    throw new ForbiddenError(
-      "Vous n'êtes pas autorisé à marquer ce bordereau comme traité"
-    );
-  }
-  return true;
+  return checkUserPermissions(
+    user,
+    [recipientSiret].filter(Boolean),
+    Permission.BsdCanSignAcceptation,
+    "Vous n'êtes pas autorisé à réceptionner ce bordereau"
+  );
 }
 
 export async function checkCanMarkAsTempStored(user: User, form: Form) {
@@ -472,107 +423,92 @@ export async function checkCanMarkAsTempStored(user: User, form: Form) {
     );
   }
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const formCompanies = await formToCompanies(form);
-
-  const isAuthorized = isFormRecipient(userCompaniesSiretOrVat, formCompanies);
-  if (!isAuthorized) {
-    throw new ForbiddenError(
-      "Vous n'êtes pas autorisé à marquer ce bordereau comme entreposé provisoirement"
-    );
-  }
-  return true;
-}
-
-export async function checkCanMarkAsTempStorerAccepted(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const formCompanies = await formToCompanies(form);
-
-  const isAuthorized = isFormRecipient(userCompaniesSiretOrVat, formCompanies);
-  if (!isAuthorized) {
-    throw new ForbiddenError(
-      "Vous n'êtes pas autorisé à marquer ce bordereau comme entreposé provisoirement"
-    );
-  }
-  return true;
+  return checkUserPermissions(
+    user,
+    [form.recipientCompanySiret].filter(Boolean),
+    Permission.BsdCanSignAcceptation,
+    "Vous n'êtes pas autorisé à marquer ce bordereau comme entreposé provisoirement"
+  );
 }
 
 export async function checkCanMarkAsResealed(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const formCompanies = await formToCompanies(form);
+  return checkUserPermissions(
+    user,
+    [form.recipientCompanySiret].filter(Boolean),
+    Permission.BsdCanUpdate,
+    "Vous n'êtes pas autorisé à sceller ce bordereau après entreposage provisoire"
+  );
+}
 
-  const isAuthorized = isFormRecipient(userCompaniesSiretOrVat, formCompanies);
-  if (!isAuthorized) {
+export async function checkCanMarkAsProcessed(user: User, form: Form) {
+  if (EmitterType.APPENDIX1_PRODUCER === form.emitterType) {
     throw new ForbiddenError(
-      "Vous n'êtes pas autorisé à sceller ce bordereau après entreposage provisoire"
+      "Un bordereau d'annexe 1 ne peut pas avoir être marqué comme traité. Il suit son bordereau de tournée."
     );
   }
-  return true;
+
+  const fullForm = await getFullForm(form);
+
+  const authorizedOrgIds = fullForm.forwardedIn
+    ? [
+        fullForm.forwardedIn.recipientCompanySiret,
+        // case when the temp storer decides to do an anticipated treatment
+        ...(form.status === Status.TEMP_STORER_ACCEPTED
+          ? [form.recipientCompanySiret]
+          : [])
+      ]
+    : [form.recipientCompanySiret];
+
+  return checkUserPermissions(
+    user,
+    authorizedOrgIds.filter(Boolean),
+    Permission.BsdCanSignOperation,
+    "Vous n'êtes pas autorisé à marquer ce bordereau comme traité"
+  );
 }
 
 export async function checkCanMarkAsResent(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const formCompanies = await formToCompanies(form);
-
-  const isAuthorized = isFormRecipient(userCompaniesSiretOrVat, formCompanies);
-  if (!isAuthorized) {
-    throw new ForbiddenError(
-      "Vous n'êtes pas autorisé à marquer ce borderau comme envoyé après entreposage provisoire"
-    );
-  }
-  return true;
-}
-
-// only recipient of the form can import data from paper
-export async function checkCanImportForm(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const isAuthorized = isFormRecipient(userCompaniesSiretOrVat, form);
-  if (!isAuthorized) {
-    throw new ForbiddenError(
-      "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir mettre à jour ce bordereau"
-    );
-  }
-  return true;
-}
-
-export async function checkSecurityCode(
-  siret: string | null,
-  securityCode: number
-) {
-  if (!siret) {
-    throw new Error("Cannot check security code, siret is not set");
-  }
-  const exists = await prisma.company.findFirst({
-    where: { orgId: siret, securityCode }
-  });
-  if (!exists) {
-    throw new InvaliSecurityCode();
-  }
-  return true;
-}
-
-export async function checkCanRequestRevision(
-  user: User,
-  form: Form,
-  forwardedIn?: Form | null
-) {
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-
-  const canRequestRevision = [
-    isFormEmitter,
-    isFormRecipient,
-    isFormDestinationAfterTempStorage
-  ].some(isFormRole =>
-    isFormRole(userCompaniesSiretOrVat, { ...form, forwardedIn })
+  return checkUserPermissions(
+    user,
+    [form.recipientCompanySiret].filter(Boolean),
+    Permission.BsdCanSignEmission,
+    "Vous n'êtes pas autorisé à marquer ce borderau comme envoyé après entreposage provisoire"
   );
+}
 
-  if (!canRequestRevision) {
-    throw new NotFormContributor(
-      "Vous n'êtes pas autorisé à réviser ce bordereau"
-    );
-  }
+export async function checkCanImportForm(
+  user: User,
+  input: ImportPaperFormInput,
+  form?: Form | null
+) {
+  const authorizedOrgIds =
+    form && form.recipientCompanySiret
+      ? [form.recipientCompanySiret]
+      : [input.recipient?.company?.siret];
 
-  return true;
+  return checkUserPermissions(
+    user,
+    authorizedOrgIds.filter(Boolean),
+    Permission.BsdCanCreate,
+    "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir importer ce bordereau"
+  );
+}
+
+export async function checkCanRequestRevision(user: User, form: Form) {
+  const fullForm = await getFullForm(form);
+  const authorizedOrgIds = [
+    fullForm.emitterCompanySiret,
+    fullForm.recipientCompanySiret,
+    fullForm.ecoOrganismeSiret,
+    fullForm.forwardedIn?.recipientCompanySiret
+  ].filter(Boolean);
+
+  return checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanRevise,
+    "Vous n'êtes pas autorisé à réviser ce bordereau"
+  );
 }
 
 export async function hasSignatureAutomation({

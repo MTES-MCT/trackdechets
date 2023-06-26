@@ -7,11 +7,9 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import * as sirenify from "../../../sirenify";
-
-const sirenifyMock = jest
-  .spyOn(sirenify, "default")
-  .mockImplementation(input => Promise.resolve(input));
+import { BsdaStatus } from "@prisma/client";
+import { bsdaFactory } from "../../../__tests__/factories";
+import prisma from "../../../../prisma";
 
 const CREATE_BSDA = `
 mutation CreateBsda($input: BsdaInput!) {
@@ -42,7 +40,6 @@ mutation CreateBsda($input: BsdaInput!) {
 describe("Mutation.Bsda.create", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -95,6 +92,7 @@ describe("Mutation.Bsda.create", () => {
     );
 
     const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
       emitter: {
         isPrivateIndividual: false,
         company: {
@@ -154,8 +152,6 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.destination!.company!.siret).toBe(
       input.destination!.company!.siret
     );
-    // check input is sirenified
-    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("should allow creating a valid form with null sealNumbers field", async () => {
@@ -165,6 +161,7 @@ describe("Mutation.Bsda.create", () => {
     );
 
     const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
       emitter: {
         isPrivateIndividual: false,
         company: {
@@ -232,6 +229,7 @@ describe("Mutation.Bsda.create", () => {
     );
 
     const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
       emitter: {
         isPrivateIndividual: false,
         company: {
@@ -301,6 +299,7 @@ describe("Mutation.Bsda.create", () => {
     );
 
     const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
       emitter: {
         isPrivateIndividual: false,
         company: {
@@ -378,6 +377,7 @@ describe("Mutation.Bsda.create", () => {
     );
 
     const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
       emitter: {
         isPrivateIndividual: false,
         company: {
@@ -459,6 +459,7 @@ describe("Mutation.Bsda.create", () => {
     );
 
     const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
       emitter: {
         isPrivateIndividual: false,
         company: {
@@ -512,7 +513,7 @@ describe("Mutation.Bsda.create", () => {
       }
     });
 
-    expect(errors[0].message).toBe("Le code déchet est obligatoire");
+    expect(errors[0].message).toBe("Le code déchet est obligatoire.");
   });
 
   it("should disallow creating the bsda with type COLLECTION_2710 if destination is not set", async () => {
@@ -674,6 +675,84 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.id).toBeDefined();
   });
 
+  it("should allow creating the bsda with type COLLECTION_2710 even if transporter and worker have empty strings as siret", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: ["WASTE_CENTER"] }
+    });
+
+    const input: BsdaInput = {
+      type: "COLLECTION_2710",
+      worker: {
+        company: {
+          address: "",
+          contact: "",
+          country: "",
+          mail: "",
+          name: "",
+          omiNumber: "",
+          phone: "",
+          siret: "",
+          vatNumber: ""
+        }
+      },
+      transporter: {
+        company: {
+          address: "",
+          contact: "",
+          country: "",
+          mail: "",
+          name: "",
+          omiNumber: "",
+          phone: "",
+          siret: "",
+          vatNumber: ""
+        }
+      },
+      emitter: {
+        isPrivateIndividual: true,
+        company: {
+          name: "Jean DUPONT",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      waste: {
+        code: "06 07 01*",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: company.siret,
+          name: company.name,
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(data.createBsda.id).toBeDefined();
+  });
+
   it("should disallow creating a bsda with packaging OTHER and no description", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: { set: ["WASTE_CENTER"] }
@@ -724,7 +803,7 @@ describe("Mutation.Bsda.create", () => {
     });
 
     expect(errors[0].message).toBe(
-      "Détail du conditionnement ne peut pas être null"
+      "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
     );
   });
 
@@ -787,6 +866,7 @@ describe("Mutation.Bsda.create", () => {
     );
 
     const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
       emitter: {
         isPrivateIndividual: false,
         company: {
@@ -860,6 +940,7 @@ describe("Mutation.Bsda.create", () => {
     );
 
     const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
       emitter: {
         isPrivateIndividual: false,
         company: {
@@ -935,6 +1016,7 @@ describe("Mutation.Bsda.create", () => {
     );
 
     const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
       emitter: {
         isPrivateIndividual: false,
         company: {
@@ -1026,6 +1108,7 @@ describe("Mutation.Bsda.create", () => {
     );
 
     const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
       emitter: {
         isPrivateIndividual: false,
         company: {
@@ -1123,6 +1206,7 @@ describe("Mutation.Bsda.create", () => {
     );
 
     const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
       emitter: {
         isPrivateIndividual: false,
         company: {
@@ -1186,5 +1270,181 @@ describe("Mutation.Bsda.create", () => {
     expect(errors[0].message).toContain(
       "est pas inscrite sur Trackdéchets en tant qu'installation de traitement"
     );
+  });
+
+  it("should create a RESHIPMENT bsda and copy consistence from forwarded bsda if field is not provided", async () => {
+    const { company: emitter } = await userWithCompanyFactory("MEMBER");
+    const { company: transporter } = await userWithCompanyFactory("MEMBER");
+    const { user, company: destination } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        transporterCompanySiret: transporter.siret,
+        destinationCompanySiret: ttr.siret,
+        status: BsdaStatus.AWAITING_CHILD,
+        destinationOperationCode: "D 15",
+        wasteConsistence: "PULVERULENT"
+      }
+    });
+
+    const input: BsdaInput = {
+      type: "RESHIPMENT",
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: emitter.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: siretify(2),
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "06 07 01*",
+        adr: "ADR",
+        pop: true,
+        // consistence not provided
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: destination.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      forwarding: bsda.id
+    };
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<Pick<Mutation, "createBsda">>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toBeUndefined();
+    expect(data.createBsda.id).toBeTruthy();
+    const reshipped = await prisma.bsda.findUnique({
+      where: { id: data.createBsda.id }
+    });
+    expect(reshipped?.type).toEqual("RESHIPMENT");
+    expect(reshipped?.forwardingId).toEqual(bsda.id);
+    expect(reshipped?.wasteConsistence).toEqual("PULVERULENT"); // consistence matches forwarde bsda consistence
+  });
+
+  it("should create a RESHIPMENT bsda and use provided cosnsitence field ", async () => {
+    const { company: emitter } = await userWithCompanyFactory("MEMBER");
+    const { company: transporter } = await userWithCompanyFactory("MEMBER");
+    const { user, company: destination } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        transporterCompanySiret: transporter.siret,
+        destinationCompanySiret: ttr.siret,
+        status: BsdaStatus.AWAITING_CHILD,
+        destinationOperationCode: "D 15",
+        wasteConsistence: "SOLIDE"
+      }
+    });
+
+    const input: BsdaInput = {
+      type: "RESHIPMENT",
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: emitter.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: siretify(2),
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "06 07 01*",
+        adr: "ADR",
+        pop: true,
+        consistence: "PULVERULENT",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: destination.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      forwarding: bsda.id
+    };
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<Pick<Mutation, "createBsda">>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toBeUndefined();
+    expect(data.createBsda.id).toBeTruthy();
+    const reshipped = await prisma.bsda.findUnique({
+      where: { id: data.createBsda.id }
+    });
+    expect(reshipped?.type).toEqual("RESHIPMENT");
+    expect(reshipped?.forwardingId).toEqual(bsda.id);
+    expect(reshipped?.wasteConsistence).toEqual("PULVERULENT"); // consistence matches input
   });
 });

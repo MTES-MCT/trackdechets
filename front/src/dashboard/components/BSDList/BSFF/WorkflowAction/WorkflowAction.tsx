@@ -9,7 +9,7 @@ import { SignBsffOperationOnePackaging } from "./SignOperation";
 import { SignBsffAcceptationOnePackaging } from "./SignAcceptation";
 import { SignPackagings } from "./SignPackagings";
 import { useParams, useRouteMatch } from "react-router-dom";
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 export interface WorkflowActionProps {
   form: BsffFragment;
@@ -21,8 +21,11 @@ export function WorkflowAction(props: WorkflowActionProps) {
 
   const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
   const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
+  const isToCollectTabV2Route = !!useRouteMatch(
+    routes.dashboardv2.transport.toCollect
+  );
   const emitterSiret = form.bsffEmitter?.company?.siret;
-  const transporterSiret = form.bsffTransporter?.company?.siret;
+  const transporterSiret = form.bsffTransporter?.company?.orgId;
   const destinationSiret = form.bsffDestination?.company?.siret;
 
   if (
@@ -38,7 +41,12 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return <SignEmission bsffId={form.id} />;
 
     case BsffStatus.SignedByEmitter:
-      if (siret !== transporterSiret || !isToCollectTab) return null;
+      if (siret !== transporterSiret) {
+        if (!isToCollectTab || !isToCollectTabV2Route) {
+          return null;
+        }
+        return null;
+      }
       return <SignTransport bsffId={form.id} />;
 
     case BsffStatus.Sent:

@@ -1,42 +1,42 @@
 import React from "react";
-import { fullFormFragment } from "common/fragments";
+import { fullFormFragment } from "Apps/common/queries/fragments";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
 import * as yup from "yup";
 import {
+  EmitterType,
   Mutation,
   MutationSignTransportFormArgs,
+  MutationUpdateFormArgs,
   Query,
   QueryFormArgs,
 } from "generated/graphql/types";
-import { GET_FORM } from "form/bsdd/utils/queries";
-import { Loader, RedErrorMessage } from "common/components";
+import { GET_FORM, UPDATE_FORM } from "form/bsdd/utils/queries";
+import { RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
 import {
   InlineError,
   NotificationError,
   SimpleNotificationError,
-} from "common/components/Error";
+} from "Apps/common/Components/Error/Error";
 import { FormWasteTransportSummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormWasteTransportSummary";
 import { FormJourneySummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormJourneySummary";
-import DateInput from "form/common/components/custom-inputs/DateInput";
 import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
-const getValidationSchema = (today: Date) =>
-  yup.object({
-    takenOverAt: yup
-      .date()
-      .required("La date de prise en charge est requise")
-      .max(today, "La date de prise en charge ne peut être dans le futur"),
-    takenOverBy: yup
-      .string()
-      .ensure()
-      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-    securityCode: yup
-      .string()
-      .nullable()
-      .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
-  });
+const validationSchema = yup.object({
+  takenOverAt: yup.date().required("La date de prise en charge est requise"),
+  takenOverBy: yup
+    .string()
+    .ensure()
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+  securityCode: yup
+    .string()
+    .nullable()
+    .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
+});
 interface SignTransportFormModalProps {
   title: string;
   siret: string;
@@ -62,7 +62,7 @@ interface SignTransportFormModalProps {
   formId: string;
 }
 
-function SignTransportFormModalContent({
+export default function SignTransportFormModalContent({
   title,
   siret,
   formId,
@@ -98,6 +98,11 @@ function SignTransportFormModalContent({
     },
   });
 
+  const [updateForm, { error: updateError }] = useMutation<
+    Pick<Mutation, "updateForm">,
+    MutationUpdateFormArgs
+  >(UPDATE_FORM);
+
   if (formLoading) return <Loader />;
   if (formError) return <InlineError apolloError={formError} />;
   if (!data?.form) {
@@ -108,11 +113,9 @@ function SignTransportFormModalContent({
   const form = data?.form;
 
   const TODAY = new Date();
-  const validationSchema = getValidationSchema(TODAY);
 
   return (
     <>
-      <h2 className="td-modal-title">{title}</h2>
       <Formik
         initialValues={{
           takenOverBy: "",
@@ -120,10 +123,41 @@ function SignTransportFormModalContent({
           securityCode: "",
           transporterNumberPlate:
             form.stateSummary?.transporterNumberPlate ?? "",
+          emitter: { type: form?.emitter?.type },
+          update: {
+            quantity: form.wasteDetails?.quantity ?? 0,
+            sampleNumber: form.wasteDetails?.sampleNumber ?? "",
+            packagingInfos: form.wasteDetails?.packagingInfos ?? [],
+          },
         }}
         validationSchema={validationSchema}
         onSubmit={async values => {
           try {
+            const { update } = values;
+            if (
+              form.emitter?.type === EmitterType.Appendix1Producer &&
+              (update.quantity ||
+                update.sampleNumber ||
+                update.packagingInfos.length > 0)
+            ) {
+              await updateForm({
+                variables: {
+                  updateFormInput: {
+                    id: form.id,
+                    wasteDetails: {
+                      ...(update.quantity && { quantity: update.quantity }),
+                      ...(update.sampleNumber && {
+                        sampleNumber: update.sampleNumber,
+                      }),
+                      ...(update.packagingInfos.length > 0 && {
+                        packagingInfos: update.packagingInfos,
+                      }),
+                    },
+                  },
+                },
+              });
+            }
+
             await signTransportForm({
               variables: {
                 id: form.id,
@@ -145,7 +179,9 @@ function SignTransportFormModalContent({
           <FormikForm>
             <FormWasteTransportSummary form={form} />
             <FormJourneySummary form={form} />
-            <TransporterReceipt transporter={form.transporter!} />
+            {form.emitter?.type !== EmitterType.Appendix1Producer && (
+              <TransporterReceipt transporter={form.transporter!} />
+            )}
             <p>
               En qualité de <strong>transporteur du déchet</strong>, j'atteste
               que les informations ci-dessus sont correctes. En signant ce
@@ -153,14 +189,16 @@ function SignTransportFormModalContent({
             </p>
 
             <div className="form__row">
-              <label className="tw-font-semibold">
+              <label>
                 Date de prise en charge
                 <div className="td-date-wrapper">
                   <Field
                     name="takenOverAt"
                     component={DateInput}
-                    className="td-input"
+                    minDate={subMonths(TODAY, 2)}
                     maxDate={TODAY}
+                    required
+                    className="td-input"
                   />
                 </div>
               </label>
@@ -198,6 +236,7 @@ function SignTransportFormModalContent({
             )}
 
             {error && <NotificationError apolloError={error} />}
+            {updateError && <NotificationError apolloError={updateError} />}
 
             <div className="td-modal-actions">
               <button
@@ -221,4 +260,3 @@ function SignTransportFormModalContent({
     </>
   );
 }
-export default SignTransportFormModalContent;

@@ -1,7 +1,14 @@
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
-import { EmitterType, Form } from "generated/graphql/types";
+import {
+  CompanySearchPrivate,
+  CompanyType,
+  EmitterType,
+  Form,
+  Query,
+  QueryCompanyPrivateInfosArgs,
+} from "generated/graphql/types";
 import React, { useEffect } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WorkSite from "form/common/components/work-site/WorkSite";
@@ -9,9 +16,12 @@ import { getInitialEmitterWorkSite } from "form/bsdd/utils/initial-state";
 import "./Emitter.scss";
 import MyCompanySelector from "form/common/components/company/MyCompanySelector";
 import { emitterTypeLabels } from "dashboard/constants";
-import { isOmi } from "generated/constants/companySearchHelpers";
+import { isForeignVat, isOmi } from "generated/constants/companySearchHelpers";
 import { RedErrorMessage } from "common/components";
 import Tooltip from "common/components/Tooltip";
+import { onBsddTransporterCompanySelected } from "./utils/onBsddTransporterCompanySelected";
+import { useQuery } from "@apollo/client";
+import { COMPANY_SELECTOR_PRIVATE_INFOS } from "form/common/components/company/query";
 
 export default function Emitter({ disabled }) {
   const ctx = useFormikContext<Form>();
@@ -23,10 +33,12 @@ export default function Emitter({ disabled }) {
   const isGrouping = [EmitterType.Appendix2, EmitterType.Appendix1].some(
     type => values.emitter?.type === type
   );
+
+  const isForeignShipOrPrivateIndividual =
+    values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual;
+
   const lockEmitterProducer =
-    hasInitialGrouping ||
-    values.emitter?.isForeignShip ||
-    values.emitter?.isPrivateIndividual;
+    disabled || hasInitialGrouping || isForeignShipOrPrivateIndividual;
 
   useEffect(() => {
     if (values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual) {
@@ -57,8 +69,41 @@ export default function Emitter({ disabled }) {
     return undefined;
   }
 
+  const [orgId, setOrgId] = React.useState<string>("");
+  const updateBsddTransporterReceipt =
+    onBsddTransporterCompanySelected(setFieldValue);
+  const { loading, error, refetch } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_SELECTOR_PRIVATE_INFOS, {
+    variables: {
+      clue: orgId!,
+    },
+    skip: !orgId,
+    onCompleted: data => {
+      if (data && typeof updateBsddTransporterReceipt === "function") {
+        updateBsddTransporterReceipt(
+          data.companyPrivateInfos as CompanySearchPrivate
+        );
+      }
+    },
+  });
+
+  React.useCallback(() => {
+    if (!loading && !error && orgId) {
+      // fetch the data
+      refetch();
+    }
+  }, [refetch, error, loading, orgId]);
+
   return (
     <>
+      {disabled && (
+        <div className="notification notification--error">
+          Les champs grisés ci-dessous ont été scellés via signature et ne sont
+          plus modifiables.
+        </div>
+      )}
       <div className="form__row">
         <label htmlFor="id_customId">Autre Numéro Libre (optionnel)</label>
         <Field
@@ -67,12 +112,13 @@ export default function Emitter({ disabled }) {
           className="td-input"
           placeholder="Utilisez votre propre numéro de BSD si nécessaire."
           name="customId"
+          disabled={disabled}
         />
       </div>
 
-      <EcoOrganismes name="ecoOrganisme" />
+      <EcoOrganismes name="ecoOrganisme" disabled={disabled} />
 
-      {lockEmitterProducer && (
+      {isForeignShipOrPrivateIndividual && (
         <div className="form__row notification notification--warning">
           Lorsqu'un particulier ou un navire étranger est émetteur du déchet, le
           type d'émetteur est verrouillé à "Producteur". La signature de
@@ -281,6 +327,7 @@ export default function Emitter({ disabled }) {
       {isGrouping && (
         <div className="tw-my-6">
           <h4 className="form__section-heading">Entreprise émettrice</h4>
+
           <MyCompanySelector
             fieldName="emitter.company"
             siretEditable={!siretNonEditable}
@@ -292,7 +339,27 @@ export default function Emitter({ disabled }) {
               }
               if (values.emitter?.type === EmitterType.Appendix1) {
                 setFieldValue("transporter.company", company);
+                // refresh CompanyPrivateInfos and propagate the receipt form values
+                setOrgId(company.orgId);
               }
+            }}
+            filter={companies => {
+              if (values.emitter?.type === EmitterType.Appendix1) {
+                const authorizedTypes = [
+                  CompanyType.Collector,
+                  CompanyType.Transporter,
+                  CompanyType.Wasteprocessor,
+                  CompanyType.WasteCenter,
+                ];
+                return companies.filter(
+                  company =>
+                    !isForeignVat(company.orgId) &&
+                    company.companyTypes.some(type =>
+                      authorizedTypes.includes(type)
+                    )
+                );
+              }
+              return companies;
             }}
           />
         </div>
@@ -304,6 +371,7 @@ export default function Emitter({ disabled }) {
           <CompanySelector
             name="emitter.company"
             heading="Entreprise émettrice"
+            disabled={disabled}
           />
         )}
 
@@ -313,6 +381,7 @@ export default function Emitter({ disabled }) {
           headingTitle="Adresse chantier"
           designation="du chantier ou lieu de collecte"
           getInitialEmitterWorkSiteFn={getInitialEmitterWorkSite}
+          disabled={disabled}
         />
       )}
     </>

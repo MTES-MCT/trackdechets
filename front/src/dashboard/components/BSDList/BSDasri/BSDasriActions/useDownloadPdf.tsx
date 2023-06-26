@@ -2,7 +2,7 @@ import { gql, LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
 import { Query, QueryBsdasriPdfArgs } from "generated/graphql/types";
 
 export const BSDASRI_PDF = gql`
-  query Bsdasridf($id: ID) {
+  query Bsdasridf($id: ID!) {
     bsdasriPdf(id: $id) {
       downloadLink
       token

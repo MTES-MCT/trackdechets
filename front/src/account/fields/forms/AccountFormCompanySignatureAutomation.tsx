@@ -21,6 +21,7 @@ const ADD_SIGNATURE_DELEGATION = gql`
   mutation AddSignatureAutomation($input: SignatureAutomationInput!) {
     addSignatureAutomation(input: $input) {
       id
+      createdAt
       to {
         name
         siret
@@ -48,24 +49,24 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
       const newDelegation = newDelegationResponse.data?.addSignatureAutomation;
       if (!newDelegation) return;
 
+      const newAutomationRef = cache.writeFragment({
+        data: newDelegation,
+        fragment: gql`
+          fragment NewSignatureAutomation on SignatureAutomation {
+            id
+            to {
+              name
+              siret
+              vatNumber
+            }
+          }
+        `,
+      });
+
       cache.modify({
         id: `CompanyPrivate:${company.id}`,
         fields: {
           signatureAutomations(existingDelegationsRefs = [], { readField }) {
-            const newCommentRef = cache.writeFragment({
-              data: newDelegation,
-              fragment: gql`
-                fragment NewSignatureAutomation on SignatureAutomation {
-                  id
-                  to {
-                    name
-                    siret
-                    vatNumber
-                  }
-                }
-              `,
-            });
-
             // Quick safety check - if the new comment is already
             // present in the cache, we don't need to add it again.
             if (
@@ -76,7 +77,7 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
               return existingDelegationsRefs;
             }
 
-            return [...existingDelegationsRefs, newCommentRef];
+            return [...existingDelegationsRefs, newAutomationRef];
           },
         },
       });

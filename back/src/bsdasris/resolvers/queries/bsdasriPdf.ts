@@ -5,10 +5,10 @@ import {
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsdasriOrNotFound } from "../../database";
-import { checkCanReadBsdasri } from "../../permissions";
 import { buildPdf } from "../../pdf/generator";
 import { createPDFResponse } from "../../../common/pdf";
 import { DownloadHandler } from "../../../routers/downloadRouter";
+import { checkCanRead } from "../../permissions";
 
 export const bsdasriPdfDownloadHandler: DownloadHandler<QueryBsdasriPdfArgs> = {
   name: "bsdasriPdf",
@@ -27,7 +27,7 @@ const bsdasriPdfResolver: QueryResolvers["bsdasriPdf"] = async (
   const user = checkIsAuthenticated(context);
   const dasri = await getBsdasriOrNotFound({ id });
 
-  await checkCanReadBsdasri(user, dasri);
+  await checkCanRead(user, dasri);
 
   return getFileDownload({
     handler: bsdasriPdfDownloadHandler.name,

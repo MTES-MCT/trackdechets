@@ -5,9 +5,8 @@ import {
   BlankslateDescription,
   BlankslateImg,
   BlankslateTitle,
-  Breadcrumb,
-  BreadcrumbItem,
-} from "common/components";
+} from "Apps/common/Components";
+import { Breadcrumb, BreadcrumbItem } from "common/components";
 import { BSDList, COLUMNS } from "../../components/BSDList";
 import illustration from "./assets/blankslateToCollect.svg";
 

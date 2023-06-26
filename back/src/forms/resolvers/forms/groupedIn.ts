@@ -1,18 +1,25 @@
 import { FormResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { expandFormFromDb } from "../../converter";
 
-const groupedInResolver: FormResolvers["groupedIn"] = async form => {
-  const groupement = await prisma.formGroupement.findMany({
-    where: { initialFormId: form.id },
-    include: { nextForm: true }
-  });
+const groupedInResolver: FormResolvers["groupedIn"] = async (
+  form,
+  _,
+  { dataloaders }
+) => {
+  const groupements = await dataloaders.initialFormGoupements.load(form.id);
+  const nextFormIds = groupements.map(g => g.nextFormId);
+  const nextForms = await Promise.all(
+    nextFormIds.map(id => dataloaders.forms.load(id))
+  );
 
   return Promise.all(
-    groupement.map(async ({ nextForm, quantity }) => ({
-      form: await expandFormFromDb(nextForm),
-      quantity
-    }))
+    groupements.map(async ({ quantity, nextFormId }) => {
+      const nextForm = nextForms.find(f => f && f.id === nextFormId);
+      return {
+        form: await expandFormFromDb(nextForm!),
+        quantity
+      };
+    })
   );
 };
 

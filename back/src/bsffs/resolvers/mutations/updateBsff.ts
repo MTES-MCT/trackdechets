@@ -4,7 +4,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound, getPackagingCreateInput } from "../../database";
 import { flattenBsffInput, expandBsffFromDB } from "../../converter";
-import { checkCanWriteBsff } from "../../permissions";
+import { checkCanUpdate } from "../../permissions";
 import {
   validateBsff,
   validateFicheInterventions,
@@ -27,7 +27,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   const user = checkIsAuthenticated(context);
 
   const existingBsff = await getBsffOrNotFound({ id });
-  await checkCanWriteBsff(user, existingBsff);
+  await checkCanUpdate(user, existingBsff, input);
 
   const { findPreviousPackagings } = getBsffPackagingRepository(user);
   const { findMany: findManyFicheInterventions } =
@@ -72,8 +72,6 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       input.packagings?.map(toBsffPackagingWithType) ?? existingBsff.packagings
   };
 
-  await checkCanWriteBsff(user, futureBsff);
-
   await checkEditionRules(existingBsff, input, user);
 
   const packagingHasChanged =
@@ -82,7 +80,10 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     !!input.repackaging ||
     !!input.packagings;
 
-  await validateBsff(futureBsff);
+  await validateBsff(futureBsff, {
+    isDraft: existingBsff.isDraft,
+    transporterSignature: !!existingBsff.transporterTransportSignatureDate
+  });
 
   const existingPreviousPackagings = await findPreviousPackagings(
     existingBsff.packagings.map(p => p.id),

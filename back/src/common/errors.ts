@@ -18,7 +18,8 @@ export enum ErrorCode {
   BAD_USER_INPUT = "BAD_USER_INPUT",
   TOO_MANY_REQUESTS = "TOO_MANY_REQUESTS",
   INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",
-  EXTERNAL_SERVICE_ERROR = "EXTERNAL_SERVICE_ERROR"
+  EXTERNAL_SERVICE_ERROR = "EXTERNAL_SERVICE_ERROR",
+  GRAPHQL_MAX_OPERATIONS_ERROR = "GRAPHQL_MAX_OPERATIONS_ERROR"
 }
 
 export class TooManyRequestsError extends ApolloError {
@@ -52,11 +53,12 @@ export class MissingSirets extends UserInputError {
   }
 }
 
+export const NotCompanyAdminErrorMsg = (siret: string) =>
+  `Vous n'êtes pas administrateur de l'entreprise portant le siret "${siret}".`;
+
 export class NotCompanyAdmin extends ForbiddenError {
   constructor(siret: string) {
-    super(
-      `Vous n'êtes pas administrateur de l'entreprise portant le siret "${siret}".`
-    );
+    super(NotCompanyAdminErrorMsg(siret));
   }
 }
 
@@ -91,5 +93,11 @@ export class SealedFieldError extends ForbiddenError {
         ", "
       )}`
     );
+  }
+}
+
+export class InvaliSecurityCode extends ForbiddenError {
+  constructor() {
+    super("Le code de signature est invalide.");
   }
 }

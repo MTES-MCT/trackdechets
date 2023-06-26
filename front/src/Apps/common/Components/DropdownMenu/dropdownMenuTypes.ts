@@ -1,0 +1,15 @@
+export interface DropdownMenuProps {
+  links: {
+    title: string;
+    route: string | { pathname: string; search?: string; state?: object };
+    icon?: React.ReactNode;
+    isButton?: boolean;
+    isVisible?: boolean;
+    handleClick?: (
+      event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ) => void;
+  }[];
+  menuTitle: string;
+  isDisabled?: boolean;
+  iconAlone?: boolean;
+}

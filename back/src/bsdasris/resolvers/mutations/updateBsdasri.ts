@@ -10,13 +10,10 @@ import { ForbiddenError } from "apollo-server-express";
 
 import { GraphQLContext } from "../../../types";
 import { getBsdasriOrNotFound } from "../../database";
-import {
-  checkIsBsdasriContributor,
-  checkCanEditBsdasri
-} from "../../permissions";
 
 import updateSynthesisBsdasri from "./updateSynthesisBsdasri";
 import updateBsdasri from "./updateSimpleBsdasri";
+import { checkCanUpdate } from "../../permissions";
 
 /**
  * Bsdasri update mutation
@@ -29,36 +26,23 @@ const updateBsdasriResolver = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const {
-    grouping: dbGrouping,
-    synthesizing: dbSynthesizing,
-    ...dbBsdasri
-  } = await getBsdasriOrNotFound({
+  const existingBsdasri = await getBsdasriOrNotFound({
     id,
     includeAssociated: true
   });
 
-  const formSirets = {
-    emitterCompanySiret: dbBsdasri?.emitterCompanySiret,
-    destinationCompanySiret: dbBsdasri?.destinationCompanySiret,
-    transporterCompanySiret: dbBsdasri?.transporterCompanySiret,
-    transporterCompanyVatNumber: dbBsdasri?.transporterCompanyVatNumber,
-    ecoOrganismeSiret: dbBsdasri?.ecoOrganismeSiret
-  };
+  const {
+    grouping: dbGrouping,
+    synthesizing: dbSynthesizing,
+    ...dbBsdasri
+  } = existingBsdasri;
 
-  await checkIsBsdasriContributor(
-    user,
-    formSirets,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparaît pas"
-  );
+  await checkCanUpdate(user, existingBsdasri, input);
 
   // forbid editing on some statuses
   if (["PROCESSED", "REFUSED"].includes(dbBsdasri.status)) {
     throw new ForbiddenError("Ce bordereau n'est plus modifiable");
   }
-
-  // check this dasri is not associated to a synthesis bsdasri (grouped dasris are already PROCESSED thus no)
-  checkCanEditBsdasri(dbBsdasri);
 
   if (dbBsdasri.type === BsdasriType.SYNTHESIS) {
     return updateSynthesisBsdasri({

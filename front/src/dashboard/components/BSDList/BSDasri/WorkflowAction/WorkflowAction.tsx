@@ -3,14 +3,13 @@ import React from "react";
 import { ActionLink } from "common/components";
 import { generatePath, useLocation, useRouteMatch } from "react-router-dom";
 
-import "@reach/menu-button/styles.css";
 import {
   IconCheckCircle1,
   IconShipmentSignSmartphone,
   IconPaperWrite,
 } from "common/components/Icons";
 
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 import { Bsdasri, BsdasriStatus, BsdasriType } from "generated/graphql/types";
 
@@ -37,6 +36,13 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const location = useLocation();
   const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
   const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
+  const isToCollectTabV2Route = !!useRouteMatch(
+    routes.dashboardv2.transport.toCollect
+  );
+
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
+
   const isSynthesis = form.type === BsdasriType.Synthesis;
   const isAssociatedToSynthesis = !!form?.synthesizedIn?.id;
 
@@ -96,7 +102,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
         );
       }
 
-      if (isTransporter && isToCollectTab) {
+      if (isTransporter && (isToCollectTab || isToCollectTabV2Route)) {
         return (
           <>
             {!isSynthesis && (
@@ -105,7 +111,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
                 icon={<IconShipmentSignSmartphone size="24px" />}
                 to={{
                   pathname: generatePath(
-                    routes.dashboard.bsdasris.sign.emissionSecretCode,
+                    routes[dashboardRoutePrefix].bsdasris.sign
+                      .emissionSecretCode,
                     {
                       siret,
                       id: form.id,
@@ -159,7 +166,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case BsdasriStatus.SignedByProducer: {
-      if (!isTransporter || !isToCollectTab) {
+      if (!isTransporter) {
+        if (!isToCollectTab || !isToCollectTabV2Route) {
+          return null;
+        }
         return null;
       }
       if (!isSynthesis) {
@@ -168,7 +178,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
             icon={<IconCheckCircle1 size="24px" />}
             to={{
               pathname: generatePath(
-                routes.dashboard.bsdasris.sign.transporter,
+                routes[dashboardRoutePrefix].bsdasris.sign.transporter,
                 {
                   siret,
                   id: form.id,

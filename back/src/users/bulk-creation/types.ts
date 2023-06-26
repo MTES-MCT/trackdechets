@@ -8,9 +8,9 @@ export type RoleRow = InferType<typeof r>;
 
 // Company info from SIRENE API
 export interface CompanyInfo {
-  name: string;
-  codeNaf: string;
-  address: string;
-  latitude: number;
-  longitude: number;
+  name: string | null | undefined;
+  codeNaf: string | null | undefined;
+  address: string | null | undefined;
+  latitude: number | null | undefined;
+  longitude: number | null | undefined;
 }

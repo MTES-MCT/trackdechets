@@ -1,22 +1,30 @@
 import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
 import {
-  Company,
-  CompanyAssociation,
+  CompanyType,
   MembershipRequestStatus,
+  BsdaRevisionRequest,
+  BsdaRevisionRequestApproval,
+  BsddRevisionRequest,
+  BsddRevisionRequestApproval,
+  Company,
+  RevisionRequestApprovalStatus,
+  RevisionRequestStatus,
   User
 } from "@prisma/client";
 import * as COMPANY_CONSTANTS from "../common/constants/COMPANY_CONSTANTS";
 import {
-  onboardingFirstStep,
-  onboardingProducerSecondStep,
-  onboardingProfessionalSecondStep,
   membershipRequestDetailsEmail,
   pendingMembershipRequestDetailsEmail,
-  pendingMembershipRequestAdminDetailsEmail
+  pendingMembershipRequestAdminDetailsEmail,
+  profesionalsSecondOnboardingEmail,
+  producersSecondOnboardingEmail,
+  pendingRevisionRequestAdminDetailsEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
 import { MessageVersion } from "../mailer/types";
+import { getCompaniesAndActiveAdminsByCompanyOrgIds } from "../companies/database";
+import { formatDate } from "../common/pdf";
 
 /**
  * Compute a past date relative to baseDate
@@ -32,96 +40,133 @@ export const xDaysAgo = (baseDate: Date, daysAgo: number): Date => {
   return new Date(clonedDate.toDateString());
 };
 
-type GetRecentlyJoinedUsersParams = {
-  daysAgo: number;
-  retrieveCompanies?: boolean;
-};
-export const getRecentlyAssociatedUsers = async ({
-  daysAgo,
-  retrieveCompanies = false
-}: GetRecentlyJoinedUsersParams) => {
+/**
+ * Return recently "registered" profesionals. That means either:
+ * - Users who joined a verified pro company x days ago
+ * - Users who joined a pro company that was verified x days ago, before its verification
+ */
+export const getRecentlyRegisteredProfesionals = async (daysAgo = 2) => {
   const now = new Date();
 
-  const associatedDateGt = xDaysAgo(now, daysAgo);
-  const associatedDateLt = xDaysAgo(now, daysAgo - 1);
-  // retrieve users whose account was created xDaysAgo
-  // and associated company(ies) to tell apart producers and waste professionals according to their type
+  const dateGt = xDaysAgo(now, daysAgo);
+  const dateLt = xDaysAgo(now, daysAgo - 1);
 
-  return prisma.user.findMany({
+  // Company has been verified long ago. Fetch new associations
+  const recentlyJoiningProsAssociations =
+    await prisma.companyAssociation.findMany({
+      where: {
+        createdAt: { gte: dateGt, lt: dateLt },
+        company: {
+          companyTypes: {
+            hasSome: COMPANY_CONSTANTS.PROFESSIONALS as CompanyType[]
+          },
+          verifiedAt: { lte: dateGt }
+        }
+      },
+      include: {
+        user: { select: { id: true, name: true, email: true } }
+      }
+    });
+
+  // Company has been verified recently. Take all associations created BEFORE
+  // verification (should be creator only)
+  const recentlyVerifiedCompaniesCreatorsAssociations =
+    await prisma.companyAssociation.findMany({
+      where: {
+        createdAt: { lte: dateLt },
+        company: {
+          verifiedAt: { gte: dateGt, lt: dateLt },
+          companyTypes: {
+            hasSome: COMPANY_CONSTANTS.PROFESSIONALS as CompanyType[]
+          }
+        }
+      },
+      include: {
+        user: { select: { id: true, name: true, email: true } }
+      }
+    });
+
+  const users = [
+    ...recentlyJoiningProsAssociations.map(j => j.user),
+    ...recentlyVerifiedCompaniesCreatorsAssociations.map(p => p.user)
+  ];
+
+  const uniqueUsers = users.filter(
+    (user, index, self) => self.findIndex(v => v.id === user.id) === index
+  );
+
+  return uniqueUsers;
+};
+
+export const getRecentlyRegisteredProducers = async (daysAgo = 2) => {
+  const now = new Date();
+
+  const dateGt = xDaysAgo(now, daysAgo);
+  const dateLt = xDaysAgo(now, daysAgo - 1);
+
+  const associations = await prisma.companyAssociation.findMany({
     where: {
-      firstAssociationDate: { gt: associatedDateGt, lt: associatedDateLt },
-      isActive: true
+      createdAt: { gte: dateGt, lt: dateLt },
+      company: {
+        companyTypes: {
+          hasSome: COMPANY_CONSTANTS.NON_PROFESSIONALS as CompanyType[]
+        }
+      }
     },
-    ...(retrieveCompanies && {
-      include: { companyAssociations: { include: { company: true } } }
-    })
+    include: {
+      user: { select: { id: true, name: true, email: true } }
+    }
   });
+
+  const uniqueUsers = associations
+    .map(a => a.user)
+    .filter(
+      (user, index, self) => self.findIndex(v => v.id === user.id) === index
+    );
+
+  return uniqueUsers;
 };
 
 /**
- * Send first step onboarding email to active users who suscribed yesterday
+ * Second onboarding email. Different for profesionals & non-profesionals / producers
  */
-export const sendFirstOnboardingEmail = async (daysAgo = 1) => {
-  const recipients = await getRecentlyAssociatedUsers({ daysAgo });
-  await Promise.all(
-    recipients.map(recipient => {
-      const payload = renderMail(onboardingFirstStep, {
-        to: [{ name: recipient.name, email: recipient.email }]
-      });
-      return sendMail(payload);
-    })
-  );
-  await prisma.$disconnect();
-};
+export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
+  // Pros
+  const profesionals = await getRecentlyRegisteredProfesionals(daysAgo);
 
-type recipientType = User & {
-  companyAssociations: (CompanyAssociation & {
-    company: Company;
-  })[];
-};
+  // Send pros email (if any)
+  if (profesionals.length) {
+    const proMessageVersions: MessageVersion[] = profesionals.map(pro => ({
+      to: [{ email: pro.email, name: pro.name }]
+    }));
+    const proPayload = renderMail(profesionalsSecondOnboardingEmail, {
+      messageVersions: proMessageVersions
+    });
 
-/**
- * Which email should we send ?
- * We retrieve user company(ies), then check their type
- * If the only type is PRODUCER, we send onboardingProducerSecondStep else
- * we send onboardingProfessionalSecondStep
- * We also have to handle users who belong to several companies
- */
-export const selectSecondOnboardingEmail = (recipient: recipientType) => {
-  const companyTypes = new Set(
-    recipient.companyAssociations.flatMap(c => c.company.companyTypes)
-  );
-
-  if (
-    [...companyTypes].some(ct => COMPANY_CONSTANTS.PROFESSIONALS.includes(ct))
-  ) {
-    return onboardingProfessionalSecondStep;
+    await sendMail(proPayload);
   }
 
-  return onboardingProducerSecondStep;
-};
-
-/**
- * Send second step onboarding email to active users who suscribed 3 days ago
- * email function (and template id) depends upon user profile
- */
-
-export const sendSecondOnboardingEmail = async (daysAgo = 3) => {
-  // we explictly retrieve user companies to tell apart producers from waste
-  // professionals to selectthe right email template
-  const recipients = await getRecentlyAssociatedUsers({
-    daysAgo,
-    retrieveCompanies: true
-  });
-  await Promise.all(
-    recipients.map(recipient => {
-      const mailTemplate = selectSecondOnboardingEmail(recipient);
-      const payload = renderMail(mailTemplate, {
-        to: [{ email: recipient.email, name: recipient.name }]
-      });
-      return sendMail(payload);
-    })
+  // Producers. If already in pro list, remove (only 1 email, pro has priority)
+  const producers = await getRecentlyRegisteredProducers(daysAgo);
+  const profesionalsIds = profesionals.map(p => p.id);
+  const filteredProducers = producers.filter(
+    r => !profesionalsIds.includes(r.id)
   );
+
+  // Send producers email (if any)
+  if (filteredProducers.length) {
+    const producersMessageVersions: MessageVersion[] = filteredProducers.map(
+      producer => ({
+        to: [{ email: producer.email, name: producer.name }]
+      })
+    );
+    const producersPayload = renderMail(producersSecondOnboardingEmail, {
+      messageVersions: producersMessageVersions
+    });
+
+    await sendMail(producersPayload);
+  }
+
   await prisma.$disconnect();
 };
 
@@ -157,15 +202,17 @@ export const sendMembershipRequestDetailsEmail = async (daysAgo = 7) => {
   const recipients =
     await getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest(daysAgo);
 
-  const messageVersions: MessageVersion[] = recipients.map(recipient => ({
-    to: [{ email: recipient.email, name: recipient.name }]
-  }));
+  if (recipients.length) {
+    const messageVersions: MessageVersion[] = recipients.map(recipient => ({
+      to: [{ email: recipient.email, name: recipient.name }]
+    }));
 
-  const payload = renderMail(membershipRequestDetailsEmail, {
-    messageVersions
-  });
+    const payload = renderMail(membershipRequestDetailsEmail, {
+      messageVersions
+    });
 
-  await sendMail(payload);
+    await sendMail(payload);
+  }
 
   await prisma.$disconnect();
 };
@@ -208,15 +255,17 @@ export const sendPendingMembershipRequestDetailsEmail = async (
 ) => {
   const recipients = await getActiveUsersWithPendingMembershipRequests(daysAgo);
 
-  const messageVersions: MessageVersion[] = recipients.map(recipient => ({
-    to: [{ email: recipient.email, name: recipient.name }]
-  }));
+  if (recipients.length) {
+    const messageVersions: MessageVersion[] = recipients.map(recipient => ({
+      to: [{ email: recipient.email, name: recipient.name }]
+    }));
 
-  const payload = renderMail(pendingMembershipRequestDetailsEmail, {
-    messageVersions
-  });
+    const payload = renderMail(pendingMembershipRequestDetailsEmail, {
+      messageVersions
+    });
 
-  await sendMail(payload);
+    await sendMail(payload);
+  }
 
   await prisma.$disconnect();
 };
@@ -260,35 +309,205 @@ export const sendPendingMembershipRequestToAdminDetailsEmail = async (
     daysAgo
   );
 
-  const messageVersions: MessageVersion[] = requests.map(request => {
-    const variables = {
-      requestId: request.id,
-      email: request.user.email,
-      orgName: request.company.name,
-      orgId: request.company.orgId
-    };
+  if (requests.length) {
+    const messageVersions: MessageVersion[] = requests.map(request => {
+      const variables = {
+        requestId: request.id,
+        email: request.user.email,
+        orgName: request.company.name,
+        orgId: request.company.orgId
+      };
 
-    const template = renderMail(pendingMembershipRequestAdminDetailsEmail, {
-      variables,
-      messageVersions: []
+      const template = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+        variables,
+        messageVersions: []
+      });
+
+      return {
+        to: request.company.companyAssociations.map(companyAssociation => ({
+          email: companyAssociation.user.email,
+          name: companyAssociation.user.name
+        })),
+        ...(template.body && {
+          params: {
+            body: template.body
+          }
+        })
+      };
     });
 
+    const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+      messageVersions
+    });
+
+    await sendMail(payload);
+  }
+
+  await prisma.$disconnect();
+};
+
+export interface BsddRevisionRequestWithReadableId extends BsddRevisionRequest {
+  bsdd: { readableId: string };
+}
+
+type RequestWithApprovals =
+  | (BsddRevisionRequestWithReadableId & {
+      approvals: BsddRevisionRequestApproval[];
+    })
+  | (BsdaRevisionRequest & {
+      approvals: BsdaRevisionRequestApproval[];
+    });
+
+type RequestWithWrappedApprovals =
+  | (BsddRevisionRequestWithReadableId & {
+      approvals: (BsddRevisionRequestApproval & {
+        admins: User[];
+        company: Company;
+      })[];
+    })
+  | (BsdaRevisionRequest & {
+      approvals: (BsdaRevisionRequestApproval & {
+        admins: User[];
+        company: Company;
+      })[];
+    });
+
+/**
+ * Will add pending approval companies' admins to requests
+ */
+export const addPendingApprovalsCompanyAdmins = async (
+  requests: RequestWithApprovals[]
+): Promise<RequestWithWrappedApprovals[]> => {
+  // Extract all pending company sirets
+  const companySirets: string[] = requests
+    .map(request =>
+      request.approvals
+        .filter(
+          approval => approval.status === RevisionRequestApprovalStatus.PENDING
+        )
+        .map(approvals => approvals.approverSiret)
+    )
+    .flat();
+
+  // Find companies and their respective admins
+  const companiesAndAdminsByOrgIds =
+    await getCompaniesAndActiveAdminsByCompanyOrgIds(companySirets);
+
+  // Add admins to requests
+  return requests.map((request: RequestWithApprovals) => {
     return {
-      to: request.company.companyAssociations.map(companyAssociation => ({
-        email: companyAssociation.user.email,
-        name: companyAssociation.user.name
-      })),
-      params: {
-        body: template.body
-      }
+      ...request,
+      approvals: request.approvals
+        .filter(
+          approval => approval.status === RevisionRequestApprovalStatus.PENDING
+        )
+        .map(approval => ({
+          ...approval,
+          company: companiesAndAdminsByOrgIds[approval.approverSiret],
+          admins: companiesAndAdminsByOrgIds[approval.approverSiret].admins
+        }))
     };
   });
+};
 
-  const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
-    messageVersions
+export const getPendingBSDDRevisionRequestsWithAdmins = async (
+  daysAgo: number
+): Promise<RequestWithWrappedApprovals[]> => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  // Get all pending requests
+  const requests = await prisma.bsddRevisionRequest.findMany({
+    where: {
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
+      status: RevisionRequestStatus.PENDING
+    },
+    include: { approvals: true, bsdd: { select: { readableId: true } } }
   });
 
-  await sendMail(payload);
+  // Add admins to requests
+  return await addPendingApprovalsCompanyAdmins(requests);
+};
+
+export const getPendingBSDARevisionRequestsWithAdmins = async (
+  daysAgo: number
+): Promise<RequestWithWrappedApprovals[]> => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  // Get all pending requests
+  const requests = await prisma.bsdaRevisionRequest.findMany({
+    where: {
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
+      status: RevisionRequestStatus.PENDING
+    },
+    include: { approvals: true }
+  });
+
+  // Add admins to requests
+  return await addPendingApprovalsCompanyAdmins(requests);
+};
+
+/**
+ * Send an email to admins who didn't answer to a revision request
+ */
+export const sendPendingRevisionRequestToAdminDetailsEmail = async (
+  daysAgo = 5
+) => {
+  const pendingBsddRevisionRequest =
+    await getPendingBSDDRevisionRequestsWithAdmins(daysAgo);
+  const pendingBsdaRevisionRequest =
+    await getPendingBSDARevisionRequestsWithAdmins(daysAgo);
+
+  const requests = [
+    ...pendingBsddRevisionRequest,
+    ...pendingBsdaRevisionRequest
+  ];
+
+  if (requests.length) {
+    // Build a message template for each request, for each approval
+    const messageVersions: MessageVersion[] = requests
+      .map(request => {
+        return request.approvals.map(approval => {
+          const variables = {
+            requestCreatedAt: formatDate(request.createdAt),
+            bsdReadableId:
+              (request as BsddRevisionRequestWithReadableId).bsdd?.readableId ??
+              (request as BsdaRevisionRequest).bsdaId,
+            companyName: approval.company.name,
+            companyOrgId: approval.company.orgId
+          };
+
+          const template = renderMail(pendingRevisionRequestAdminDetailsEmail, {
+            variables,
+            messageVersions: []
+          });
+
+          return {
+            to: approval.admins.map(admin => ({
+              email: admin.email,
+              name: admin.name
+            })),
+            ...(template.body && {
+              params: {
+                body: template.body
+              }
+            })
+          };
+        });
+      })
+      .flat();
+
+    const payload = renderMail(pendingRevisionRequestAdminDetailsEmail, {
+      messageVersions
+    });
+
+    await sendMail(payload);
+  }
 
   await prisma.$disconnect();
 };

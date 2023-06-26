@@ -193,7 +193,7 @@ describe("Mutation.Bsda.createDraft", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Impossible de saisir le SIRET d'une entreprise de travaux pour ce type de bordereau"
+          "Il n'y a pas d'entreprise de travaux, impossible de saisir le SIRET ou le nom de l'entreprise de travaux."
       })
     ]);
   });

@@ -4,15 +4,16 @@ import { filter } from "graphql-anywhere";
 import AccountCompany from "./AccountCompany";
 import { useHistory } from "react-router-dom";
 import { Query } from "generated/graphql/types";
-import { Loader } from "common/components";
-import { NotificationError } from "common/components/Error";
-import routes from "common/routes";
+import { Loader } from "Apps/common/Components";
+import { NotificationError } from "Apps/common/Components/Error/Error";
+import routes from "Apps/routes";
 import { debounce } from "common/helper";
 import {
   MIN_MY_COMPANIES_SEARCH,
   MAX_MY_COMPANIES_SEARCH,
 } from "generated/constants/COMPANY_CONSTANTS";
-import { Container, Row, Col, TextInput, Button } from "@dataesr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 export const MY_COMPANIES = gql`
   query MyCompanies($first: Int, $after: ID, $search: String) {
@@ -81,33 +82,36 @@ export default function AccountCompanyList() {
   };
 
   const getPageContent = content => (
-    <Container fluid>
-      <Row spacing="mb-4w" alignItems={"bottom"}>
-        <Col n="4">
-          <TextInput
+    <div className="fr-container-fluid">
+      <div className="fr-grid-row mb-4w fr-grid-row--bottom">
+        <div className="fr-col-4">
+          <Input
             label="Filtrer mes établissements par nom, SIRET ou n° de TVA"
-            hint="Veuillez entrer au minimum 3 caractères"
-            maxLength={MAX_MY_COMPANIES_SEARCH}
-            onChange={e => {
-              setInputValue(e.target.value);
-              handleOnChangeSearch(e.target.value);
+            hintText="Veuillez entrer au minimum 3 caractères"
+            nativeInputProps={{
+              maxLength: MAX_MY_COMPANIES_SEARCH,
+              onChange: e => {
+                setInputValue(e.target.value);
+                handleOnChangeSearch(e.target.value);
+              },
+              value: inputValue,
             }}
-            value={inputValue}
-          ></TextInput>
-        </Col>
-        <Col n="4" spacing="ml-1w">
+          ></Input>
+        </div>
+        <div className="fr-col-4 fr-ml-1w">
           <Button
             onClick={handleOnResetSearch}
             disabled={displayPreloader || !searchClue.length}
+            nativeButtonProps={{ type: "button" }}
           >
             Effacer le filtre
           </Button>
-        </Col>
-      </Row>
-      <Row spacing="mb-2w">
-        <Col n="12">{content}</Col>
-      </Row>
-    </Container>
+        </div>
+      </div>
+      <div className="fr-grid-row fr-mb-2w">
+        <div className="fr-col-12">{content}</div>
+      </div>
+    </div>
   );
 
   if (error) {

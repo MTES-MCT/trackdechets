@@ -5,7 +5,7 @@ import styles from "../AccountField.module.scss";
 
 describe("<AccountField />", () => {
   it("should render label, value, tooltip and modifier", () => {
-    const { container, getByText, getByRole, queryByRole } = render(
+    const { container, getByText, queryByRole } = render(
       <AccountField
         name="username"
         label="Nom utilisateur"
@@ -20,9 +20,6 @@ describe("<AccountField />", () => {
 
     // it should contain label
     expect(getByText("Nom utilisateur")).toBeInTheDocument();
-
-    // it should contain tooltip trigger
-    expect(getByRole("button")).toBeInTheDocument();
 
     // it should contain field value
     expect(getByText("John Snow")).toBeInTheDocument();

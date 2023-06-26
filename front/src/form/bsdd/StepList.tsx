@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import {
+  Form,
   FormInput,
   Mutation,
   MutationCreateFormArgs,
@@ -12,17 +13,18 @@ import { useHistory } from "react-router-dom";
 import { getInitialState } from "./utils/initial-state";
 import { formSchema } from "./utils/schema";
 import { CREATE_FORM, GET_FORM, UPDATE_FORM } from "./utils/queries";
-import { IStepContainerProps } from "../common/stepper/Step";
-import { GET_BSDS } from "common/queries";
-import { Loader } from "common/components";
+import { GET_BSDS } from "Apps/common/queries";
+import { Loader } from "Apps/common/Components";
 import { formInputToastError } from "form/common/stepper/toaster";
+import { IStepContainerProps } from "form/common/stepper/Step";
 const GenericStepList = lazy(
   () => import("form/common/stepper/GenericStepList")
 );
 interface Props {
-  children: ReactElement<IStepContainerProps>[];
+  children: (form: Form | undefined) => ReactElement;
   formId?: string;
 }
+
 export default function StepsList(props: Props) {
   const history = useHistory();
 
@@ -85,10 +87,16 @@ export default function StepsList(props: Props) {
       .catch(err => formInputToastError(err));
   }
 
+  // As it's a render function, the steps are nested into a `<></>` block
+  // So we render then unwrap to get the steps
+  const parentOfSteps = props.children(formQuery.data?.form);
+  const steps = parentOfSteps.props
+    .children as ReactElement<IStepContainerProps>[];
+
   return (
     <>
       <GenericStepList
-        children={props.children}
+        children={steps}
         formId={props.formId}
         formQuery={formQuery}
         onSubmit={onSubmit}

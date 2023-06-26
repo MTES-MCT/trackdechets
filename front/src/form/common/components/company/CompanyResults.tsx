@@ -7,7 +7,7 @@ import {
 import styles from "./CompanyResult.module.scss";
 import { CompanySearchResult } from "../../../../generated/graphql/types";
 import { generatePath } from "react-router-dom";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import classNames from "classnames";
 
 interface CompanyResultsProps<T> {

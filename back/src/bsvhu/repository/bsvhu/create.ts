@@ -3,7 +3,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsvhuEventTypes } from "./eventTypes";
 export type CreateBsvhuFn = (
   data: Prisma.BsvhuCreateInput,
@@ -26,7 +26,7 @@ export function buildCreateBsvhu(deps: RepositoryFnDeps): CreateBsvhuFn {
       }
     });
 
-    prisma.addAfterCommitCallback(() => enqueueBsdToIndex(bsvhu.id));
+    prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsvhu.id));
 
     return bsvhu;
   };

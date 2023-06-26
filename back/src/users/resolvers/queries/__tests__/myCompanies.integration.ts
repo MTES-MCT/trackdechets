@@ -10,6 +10,7 @@ import { associateUserToCompany } from "../../../database";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { AuthType } from "../../../../auth";
+import { subDays } from "date-fns";
 
 const MY_COMPANIES = gql`
   query MyCompanies(
@@ -37,8 +38,15 @@ const MY_COMPANIES = gql`
         cursor
         node {
           id
+          siret
           givenName
           name
+          users {
+            email
+            name
+          }
+          userRole
+          userPermissions
         }
       }
     }
@@ -350,4 +358,100 @@ describe("query { myCompanies }", () => {
       company4.id
     ]);
   }, 20000);
+
+  it("should not obfuscate user name when association comes from an older accepted invitation", async () => {
+    const user = await userFactory();
+    const member = await userFactory({ createdAt: subDays(new Date(), 8) });
+    const company = await companyFactory();
+
+    await associateUserToCompany(user.id, company.orgId, "ADMIN");
+    // associations created 8 days ago - no more name obfuscation
+    await associateUserToCompany(member.id, company.orgId, "MEMBER", {
+      createdAt: subDays(new Date(), 8)
+    });
+
+    const { query } = makeClient(user);
+    const { data: page1 } = await query<Pick<Query, "myCompanies">>(
+      MY_COMPANIES
+    );
+
+    expect(page1!.myCompanies.totalCount).toEqual(1);
+
+    const userNames = page1!.myCompanies.edges[0].node.users
+      ?.filter(u => u.email !== user.email)
+      .map(u => u.name);
+    expect(userNames?.length).toBe(1);
+    expect(userNames).toStrictEqual([member.name]);
+  }, 20000);
+
+  it("should obfuscate user name when association comes from a recent automatically accepted invitation", async () => {
+    const user = await userFactory();
+    const member = await userFactory({ createdAt: subDays(new Date(), 2) });
+    const company = await companyFactory();
+
+    await associateUserToCompany(user.id, company.orgId, "ADMIN");
+    // associations created 2 days ago - name obfuscation
+    await associateUserToCompany(member.id, company.orgId, "MEMBER", {
+      createdAt: subDays(new Date(), 2)
+    });
+
+    const { query } = makeClient(user);
+    const { data: page1 } = await query<Pick<Query, "myCompanies">>(
+      MY_COMPANIES
+    );
+
+    expect(page1!.myCompanies.totalCount).toEqual(1);
+
+    const userNames = page1!.myCompanies.edges[0].node.users
+      ?.filter(u => u.email !== user.email)
+      .map(u => u.name);
+    expect(userNames?.length).toBe(1);
+    expect(userNames).toStrictEqual(["Temporairement masqué"]);
+  }, 20000);
+
+  it("should not obfuscate user name when user was created way before its association", async () => {
+    const user = await userFactory();
+    const member = await userFactory({ createdAt: subDays(new Date(), 1) });
+    const company = await companyFactory();
+
+    await associateUserToCompany(user.id, company.orgId, "ADMIN");
+    // associations created 2 days ago - no name obfuscation because user was created a while ago, it's not an automatically accepted invitation
+    await associateUserToCompany(member.id, company.orgId, "MEMBER");
+
+    const { query } = makeClient(user);
+    const { data: page1 } = await query<Pick<Query, "myCompanies">>(
+      MY_COMPANIES
+    );
+
+    expect(page1!.myCompanies.totalCount).toEqual(1);
+
+    const userNames = page1!.myCompanies.edges[0].node.users
+      ?.filter(u => u.email !== user.email)
+      .map(u => u.name);
+    expect(userNames?.length).toBe(1);
+    expect(userNames).toStrictEqual([member.name]);
+  }, 20000);
+  it("should return userRole and userPermissions", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "myCompanies">>(MY_COMPANIES);
+    expect(data.myCompanies.edges).toHaveLength(1);
+    expect(data.myCompanies.edges[0].node.siret).toEqual(company.siret);
+    expect(data.myCompanies.edges[0].node.userRole).toEqual("MEMBER");
+    expect(data.myCompanies.edges[0].node.userPermissions).toEqual([
+      "BSD_CAN_READ",
+      "BSD_CAN_LIST",
+      "COMPANY_CAN_READ",
+      "REGISTRY_CAN_READ",
+      "BSD_CAN_CREATE",
+      "BSD_CAN_UPDATE",
+      "BSD_CAN_SIGN_EMISSION",
+      "BSD_CAN_SIGN_WORK",
+      "BSD_CAN_SIGN_TRANSPORT",
+      "BSD_CAN_SIGN_ACCEPTATION",
+      "BSD_CAN_SIGN_OPERATION",
+      "BSD_CAN_DELETE",
+      "BSD_CAN_REVISE"
+    ]);
+  });
 });

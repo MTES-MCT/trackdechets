@@ -26,7 +26,7 @@ import { useHistory } from "react-router";
 import { useParams } from "react-router-dom";
 import * as yup from "yup";
 import { removeEmptyKeys } from "../../../../../common/helper";
-import { CREATE_FORM_REVISION_REQUEST } from "../query";
+import { CREATE_FORM_REVISION_REQUEST } from "Apps/common/queries/reviews/BsddReviewsQuery";
 import styles from "./BsddRequestRevision.module.scss";
 import { ReviewableField } from "./ReviewableField";
 import { BsddRequestRevisionCancelationInput } from "../BsddRequestRevisionCancelationInput";
@@ -87,7 +87,11 @@ export function BsddRequestRevision({ bsdd }: Props) {
       </h2>
 
       <Formik
-        initialValues={{ comment: "", content: initialReview }}
+        initialValues={{
+          comment: "",
+          content: initialReview,
+          emitter: { type: bsdd?.emitter?.type },
+        }}
         validationSchema={validationSchema}
         onSubmit={async ({ content, comment }) => {
           let cleanedContent;
@@ -302,7 +306,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       <CompanySelector
                         name="content.broker.company"
                         onCompanySelected={broker => {
-                          if (broker.brokerReceipt) {
+                          if (broker?.brokerReceipt) {
                             setFieldValue(
                               "content.broker.receipt",
                               broker.brokerReceipt.receiptNumber
@@ -329,7 +333,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                             type="text"
                             name="content.broker.receipt"
                             className="td-input"
-                            disabled={true}
                           />
                         </label>
 
@@ -346,7 +349,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                               "td-input",
                               styles.recipientDepartment
                             )}
-                            disabled={true}
                           />
                         </label>
 
@@ -362,7 +364,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                               "td-input",
                               styles.recipientValidityLimit
                             )}
-                            disabled={true}
                           />
                         </label>
 
@@ -387,7 +388,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       <CompanySelector
                         name="content.trader.company"
                         onCompanySelected={trader => {
-                          if (trader.traderReceipt) {
+                          if (trader?.traderReceipt) {
                             setFieldValue(
                               "content.trader.receipt",
                               trader.traderReceipt.receiptNumber
@@ -414,7 +415,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                             type="text"
                             name="content.trader.receipt"
                             className="td-input"
-                            disabled={true}
                           />
                         </label>
 
@@ -431,7 +431,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                               "td-input",
                               styles.recipientDepartment
                             )}
-                            disabled={true}
                           />
                         </label>
 
@@ -447,7 +446,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                               "td-input",
                               styles.recipientValidityLimit
                             )}
-                            disabled={true}
                           />
                         </label>
 

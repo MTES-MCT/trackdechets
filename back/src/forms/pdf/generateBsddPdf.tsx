@@ -160,8 +160,8 @@ export function getOtherPackagingLabel(packagingInfos: PackagingInfo[]) {
     otherPackagings.length === 0
       ? "à préciser"
       : otherPackagings
-          .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
-          .join(", ");
+        .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
+        .join(", ");
   return `Autre (${otherPackagingsSummary})`;
 }
 
@@ -180,6 +180,7 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
           { label: "Citerne", value: "CITERNE" },
           { label: "GRV", value: "GRV" },
           { label: "Fûts", value: "FUT" },
+          { label: "Conditionnné pour Pipeline", value: "PIPELINE" },
           { label: getOtherPackagingLabel(packagingInfos), value: "AUTRE" }
         ].map((packagingType, index) => (
           <tr key={index}>
@@ -278,7 +279,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
 
   const form: GraphQLForm = {
     ...(await expandFormFromDb(fullPrismaForm)),
-    transportSegments: fullPrismaForm.transportSegments?.map(
+    transportSegments: fullPrismaForm.transporters?.map(
       expandTransportSegmentFromDb
     ),
     grouping: await Promise.all(
@@ -343,6 +344,12 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               un bordereau de tournée dédiée{" "}
               <input
                 type="checkbox"
+                checked={form.emitter?.type === EmitterType.APPENDIX1_PRODUCER}
+                readOnly
+              />{" "}
+              un bordereau d'annexe 1{" "}
+              <input
+                type="checkbox"
                 checked={form.emitter?.type === EmitterType.APPENDIX2}
                 readOnly
               />{" "}
@@ -360,7 +367,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               {!!form.customId && <>({form.customId})</>}
               {!!groupedIn?.length && (
                 <>
-                  <strong>Annexé au bordereau n° :</strong>{" "}
+                  <strong>Annexé au bordereau {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER && "de tournée dédiée"} n° :</strong>{" "}
                   {groupedIn.map(bsd => bsd.readableId)}
                 </>
               )}
@@ -544,6 +551,12 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 </React.Fragment>
               ))}
             </p>
+            {form.wasteDetails?.sampleNumber && (
+              <p>
+                Numéro d'échantillon :<br />
+                {form.wasteDetails.sampleNumber}
+              </p>
+            )}
           </div>
 
           <div className="BoxCol">
@@ -824,7 +837,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                   packagingInfos={
                     isRepackging
                       ? form.temporaryStorageDetail?.wasteDetails
-                          ?.packagingInfos ?? []
+                        ?.packagingInfos ?? []
                       : []
                   }
                 />
@@ -996,11 +1009,14 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                     <th>Dénomination usuelle</th>
                     <th>Pesée (tonne)</th>
                     <th>Réelle / estimée</th>
-                    {form?.emitter?.type !== EmitterType.APPENDIX1_PRODUCER && (
+                    {form?.emitter?.type !== EmitterType.APPENDIX1 && (
                       <th>Fraction regroupée (tonne)</th>
                     )}
                     <th>Date de prise en charge initiale</th>
                     <th>Code postal lieu de collecte</th>
+                    {form?.emitter?.type === EmitterType.APPENDIX1 && (
+                      <th>N° d'échantillon</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -1011,28 +1027,33 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                         length: 10 - form.grouping.length
                       }).fill({ form: null, quantity: null })
                     ] as Array<InitialFormFraction>
-                  ).map(({ form, quantity }, index) => (
+                  ).map(({ form: groupedForm, quantity }, index) => (
                     <tr key={index}>
                       <td>{index + 1}</td>
-                      <td>{form?.readableId}</td>
-                      <td>{form?.wasteDetails?.code}</td>
-                      <td>{form?.wasteDetails?.name}</td>
+                      <td>{groupedForm?.readableId}</td>
+                      <td>{groupedForm?.wasteDetails?.code}</td>
+                      <td>{groupedForm?.wasteDetails?.name}</td>
                       <td>
-                        {form?.quantityReceived ?? form?.wasteDetails?.quantity}
+                        {groupedForm?.quantityReceived ??
+                          groupedForm?.wasteDetails?.quantity}
                       </td>
                       <td>
-                        {form?.quantityReceived
+                        {groupedForm?.quantityReceived
                           ? "R"
-                          : form?.wasteDetails?.quantityType?.charAt(0)}
+                          : groupedForm?.wasteDetails?.quantityType?.charAt(0)}
                       </td>
-                      {form?.emitter?.type !==
-                        EmitterType.APPENDIX1_PRODUCER && <td>{quantity}</td>}
+                      {form?.emitter?.type !== EmitterType.APPENDIX1 && (
+                        <td>{quantity}</td>
+                      )}
                       <td>
-                        {form?.emitter?.type === EmitterType.APPENDIX1_PRODUCER
-                          ? formatDate(form?.takenOverAt)
-                          : formatDate(form?.signedAt)}
+                        {form?.emitter?.type === EmitterType.APPENDIX1
+                          ? formatDate(groupedForm?.takenOverAt)
+                          : formatDate(groupedForm?.signedAt)}
                       </td>
-                      <td>{form?.emitterPostalCode}</td>
+                      <td>{groupedForm?.emitterPostalCode}</td>
+                      {form?.emitter?.type === EmitterType.APPENDIX1 && (
+                        <td>{groupedForm?.wasteDetails?.sampleNumber}</td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

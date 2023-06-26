@@ -17,6 +17,14 @@ AccountFieldCompanyTypes.fragments = {
       siret
       companyTypes
       userRole
+      workerCertification {
+        id
+        hasSubSectionFour
+        hasSubSectionThree
+        certificationNumber
+        validityLimit
+        organisation
+      }
     }
   `,
 };
@@ -47,7 +55,7 @@ export default function AccountFieldCompanyTypes({ company }: Props) {
           renderForm={toggleEdition => (
             <AccountFormCompanyTypes
               name="companyTypes"
-              id={company.id}
+              company={company}
               companyTypes={companyTypes}
               toggleEdition={toggleEdition}
             />

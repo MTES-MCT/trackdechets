@@ -1,47 +1,37 @@
-import React, { useState, createRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { Mutation, MutationSignupArgs } from "generated/graphql/types";
 import { SIGNUP } from "./mutations";
 import PasswordHelper from "common/components/PasswordHelper";
 
-import routes from "common/routes";
+import routes from "Apps/routes";
 
-import {
-  Container,
-  Row,
-  Col,
-  Title,
-  Text,
-  TextInput,
-  Button,
-  Checkbox,
-  Link,
-  Alert,
-} from "@dataesr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
+import { PasswordInput } from "@codegouvfr/react-dsfr/blocks/PasswordInput";
 import styles from "./Login.module.scss";
 
 import { SENDER_EMAIL } from "common/config";
 
 export default function Signup() {
-  const [showPassword, setShowPassword] = useState(false);
   const [submittable, setSubmittable] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [signupCompleted, setSignupCompleted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [userEmail, setUserEmail] = useState("");
+
+  const [nameValue, setNameValue] = useState("");
+  const [emailValue, setEmailValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
+  const [cguValue, setCguValue] = useState(false);
 
   const [signup] = useMutation<Pick<Mutation, "signup">, MutationSignupArgs>(
     SIGNUP
   );
 
   const history = useHistory();
-
-  const nameRef = createRef<HTMLInputElement>();
-  const emailRef = createRef<HTMLInputElement>();
-  const passwordRef = createRef<HTMLInputElement>();
-  const cguRef = createRef<HTMLInputElement>();
 
   useEffect(() => {
     document.title = `Créer un compte | ${document.title}`;
@@ -53,16 +43,15 @@ export default function Signup() {
     if (!submittable || submitting) return;
 
     const userInfos = {
-      email: emailRef.current?.value || "",
-      name: nameRef.current?.value || "",
-      password: passwordRef.current?.value || "",
+      email: emailValue || "",
+      name: nameValue || "",
+      password: passwordValue || "",
     };
 
     setSubmitting(true);
 
     signup({ variables: { userInfos } })
       .then(_ => {
-        setUserEmail(userInfos.email);
         setSignupCompleted(true);
       })
       .catch(_ => {
@@ -81,165 +70,154 @@ export default function Signup() {
     });
   };
 
-  const onChange = () => {
+  useEffect(() => {
     const formFilled =
-      !!nameRef.current?.value &&
-      !!emailRef.current?.value &&
-      !!passwordRef.current?.value &&
-      !!cguRef.current?.checked;
+      !!nameValue && !!emailValue && !!passwordValue && !!cguValue;
 
     setSubmittable(formFilled);
-  };
+  }, [nameValue, emailValue, passwordValue, cguValue]);
 
   const alert =
     errorMessage.length > 0 ? (
-      <Row spacing="mb-2w">
-        <Alert title="Erreur" description={errorMessage} type="error" />
-      </Row>
+      <div className="fr-grid-row fr-mb-2w">
+        <Alert title="Erreur" description={errorMessage} severity="error" />
+      </div>
     ) : null;
 
   const formContent = (
     <form onSubmit={handleSubmit}>
-      <Container className={styles.centralContainer} spacing="pt-10w">
-        <Row justifyContent="center" spacing="mb-2w">
-          <Col spacing="m-auto">
-            <Title as="h1" look="h3" spacing="mb-1w">
-              Créer mon compte Trackdéchets
-            </Title>
-            <Text as="p" spacing="mb-1w">
+      <div className={`fr-container fr-pt-10w ${styles.centralContainer}`}>
+        <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
+          <div className="fr-col fr-m-auto">
+            <h1 className="fr-h3 fr-mb-1w">Créer mon compte Trackdéchets</h1>
+            <p className="fr-text--md fr-mb-1w">
               Vous vous apprêtez à créer votre compte utilisateur. Cette étape
               est préalable à l'enregistrement ou au rattachement d'une
               entreprise dans Trackdéchets.
-            </Text>
+            </p>
             {alert}
-            <Text as="p" className="fr-text--bold">
-              Vos informations :
-            </Text>
-            <TextInput
-              // @ts-ignore Ref isn't part of the interface
-              ref={nameRef}
-              required
+            <p className="fr-text--bold">Vos informations :</p>
+            <Input
               label="Nom et prénom"
-              onBlur={onChange}
+              nativeInputProps={{
+                required: true,
+                onChange: e => setNameValue(e.target.value),
+              }}
             />
-            <TextInput
-              // @ts-ignore ref
-              ref={emailRef}
-              required
+            <Input
               label="Email"
-              onBlur={onChange}
+              nativeInputProps={{
+                required: true,
+                onChange: e => setEmailValue(e.target.value),
+              }}
             />
-            <TextInput
-              type={showPassword ? "text" : "password"}
-              required
+            <PasswordInput
               label="Mot de passe"
-              // @ts-ignore
-              ref={passwordRef}
-              onBlur={onChange}
-              onChange={e => setPasswordValue(e.target.value)}
+              nativeInputProps={{
+                required: true,
+                onChange: e => setPasswordValue(e.target.value),
+              }}
             />
-            <Button
-              tertiary
-              hasBorder={false}
-              icon={showPassword ? "ri-eye-off-line" : "ri-eye-line"}
-              iconPosition="left"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? "Masquer" : "Afficher"} le mot de passe
-            </Button>
 
             <PasswordHelper password={passwordValue} />
-          </Col>
-        </Row>
-        <Row spacing="mb-2w">
-          <Col className={styles.resetFlexCol}>
+          </div>
+        </div>
+        <div className="fr-grid-row fr-mb-2w">
+          <div className={`fr-col ${styles.resetFlexCol}`}>
             <Checkbox
-              // @ts-ignore no change event in interface / passes as remaining props
-              onChange={onChange}
-              label="Je certifie avoir lu les conditions générales"
-              ref={cguRef}
+              options={[
+                {
+                  label: "Je certifie avoir lu les conditions générales",
+                  nativeInputProps: {
+                    onChange: e => {
+                      setCguValue(e.currentTarget.checked);
+                    },
+                  },
+                },
+              ]}
             />
-            <Link
+            <a
               href="https://trackdechets.beta.gouv.fr/cgu"
               target="_blank"
-              isSimple
-              // @ts-ignore
               rel="noopener noreferrer"
+              className="fr-link"
             >
               Voir les conditions générales.
-            </Link>
-          </Col>
-        </Row>
-        <Row justifyContent="right">
-          <Col className={styles.resetFlexCol}>
+            </a>
+          </div>
+        </div>
+        <div className="fr-grid-row fr-grid-row--right">
+          <div className={`fr-col ${styles.resetFlexCol}`}>
             <Button
-              icon="ri-arrow-right-line"
+              iconId="ri-arrow-right-line"
               iconPosition="right"
-              size="md"
+              size="medium"
               title={submitting ? "Création en cours..." : "Créer mon compte"}
               disabled={!submittable || submitting}
               onClick={handleSubmit}
             >
               Créer mon compte
             </Button>
-          </Col>
-        </Row>
-      </Container>
+          </div>
+        </div>
+      </div>
     </form>
   );
 
   const successContent = (
-    <Container className={styles.centralContainerLarge} spacing="pt-10w">
-      <Row justifyContent="center" spacing="mb-2w">
-        <Col spacing="m-auto pr-2w">
-          <Title as="h1" look="h3" spacing="mb-1w">
-            On y est presque !
-          </Title>
-          <Text as="p" spacing="mb-1w">
+    <div className={`fr-container fr-pt-10w ${styles.centralContainerLarge}`}>
+      <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
+        <div className="fr-col fr-m-auto fr-pr-2w">
+          <h1 className="fr-h3 fr-mb-1w">On y est presque !</h1>
+          <p className="fr-text--md fr-mb-1w">
             Un email de confirmation vous a été envoyé à l'adresse{" "}
-            <strong>{userEmail}</strong> 📨
-          </Text>
-          <Text as="p">👉 Il peut mettre quelques minutes à arriver</Text>
-          <Text as="p">👉 Vérifiez vos spams ou indésirables</Text>
-          <Text as="p">👉 Ajoutez {SENDER_EMAIL} à vos contacts</Text>
-          <Text as="p">
+            <strong>{emailValue}</strong> 📨
+          </p>
+          <p className="fr-text--md">
+            👉 Il peut mettre quelques minutes à arriver
+          </p>
+          <p className="fr-text--md">👉 Vérifiez vos spams ou indésirables</p>
+          <p className="fr-text--md">
+            👉 Ajoutez {SENDER_EMAIL} à vos contacts
+          </p>
+          <p className="fr-text--md">
             👉 Si vous n'avez pas reçu l'email de confirmation au bout d'une
             heure, vous pouvez le renvoyer depuis{" "}
-            <Link href={routes.resendActivationEmail} isSimple>
+            <a href={routes.resendActivationEmail} className="fr-link">
               cette page
-            </Link>
-          </Text>
-          <Text as="p">
+            </a>
+          </p>
+          <p className="fr-text--md">
             Le message peut ne pas arriver pour les raisons suivantes :<br />-
             adresse email erronée
             <br />- antivirus ou suite logicielle de sécurité trop restrictifs
-          </Text>
-          <Text as="p">
+          </p>
+          <p className="fr-text--md">
             Pour finaliser votre inscription, cliquez sur le lien qui vous a été
             envoyé par email. Vous pourrez ensuite vous connecter à
             Trackdéchets. 🚀
-          </Text>
-          <Text as="p">
+          </p>
+          <p className="fr-text--md">
             Des questions, des interrogations ? N'hésitez pas à nous contacter
             via{" "}
-            <Link
+            <a
               href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
-              isSimple
+              className="fr-link"
             >
               la FAQ
-            </Link>
+            </a>
             .
-          </Text>
-        </Col>
-      </Row>
-      <Row justifyContent="right">
-        <Col className={styles.resetFlexCol}>
-          <Button size="md" title="Se connecter" onClick={onConnectClick}>
+          </p>
+        </div>
+      </div>
+      <div className="fr-grid-row fr-grid-row--right">
+        <div className={`fr-col ${styles.resetFlexCol}`}>
+          <Button size="medium" title="Se connecter" onClick={onConnectClick}>
             Se connecter
           </Button>
-        </Col>
-      </Row>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 
   return (

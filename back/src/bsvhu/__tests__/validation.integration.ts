@@ -60,6 +60,19 @@ describe("BSVHU validation", () => {
       });
       expect(validated).toBeDefined();
     });
+    test("when transporter is french and exemption of recepisse is true", async () => {
+      const data = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null
+      };
+      const validated = await validateBsvhu(data, {
+        transportSignature: true
+      });
+      expect(validated).toBeDefined();
+    });
   });
 
   describe("BSVHU should not be valid", () => {
@@ -266,6 +279,7 @@ describe("BSVHU validation", () => {
     test("when transporter is french but recepisse fields are missing", async () => {
       const data = {
         ...bsvhu,
+        transporterRecepisseIsExempted: false,
         transporterRecepisseDepartment: null,
         transporterRecepisseNumber: null,
         transporterRecepisseValidityLimit: null
@@ -280,7 +294,7 @@ describe("BSVHU validation", () => {
         expect(err.errors).toEqual([
           "Transporteur: le département associé au récépissé est obligatoire",
           "Transporteur: le numéro de récépissé est obligatoire",
-          "Transporteur: la date de validité de récépissé est obligatoire"
+          "Transporteur: la date limite de validité du récépissé est obligatoire"
         ]);
       }
     });

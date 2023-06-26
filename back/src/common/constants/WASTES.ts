@@ -5537,7 +5537,7 @@ const bsdaOnlyWasteCodes = [
   "16 02 12*",
   "17 06 01*",
   "17 06 05*"
-];
+] as const;
 const bsdasriOnlyWasteCodes = ["18 01 03*", "18 02 02*"];
 
 export const BSDA_WASTE_CODES = [
@@ -5560,7 +5560,7 @@ export const BSDA_WASTE_CODES = [
   "17 06 03*",
   "17 08 01*",
   "17 09 03*"
-];
+] as const;
 
 export const BSFF_WASTE_CODES = [
   ...bsffOnlyWasteCodes,
@@ -5584,7 +5584,7 @@ export const BSDD_WASTES = flatten(BSDD_WASTES_TREE);
 export const BSDD_WASTE_CODES = BSDD_WASTES.map(waste => waste.code);
 
 export const BSDA_WASTES = ALL_WASTES.filter(w =>
-  BSDA_WASTE_CODES.includes(w.code)
+  BSDA_WASTE_CODES.some(code => code === w.code)
 );
 
 export const BSFF_WASTES = ALL_WASTES.filter(w =>
@@ -5597,6 +5597,7 @@ export const BSDD_APPENDIX1_WASTE_CODES = [
     return prefixes.some(prefix => waste.code.startsWith(prefix));
   }).map(waste => waste.code),
   "15 01 10*",
+  "15 02 02*",
   "16 06 01*",
   "19 08 10*"
 ];

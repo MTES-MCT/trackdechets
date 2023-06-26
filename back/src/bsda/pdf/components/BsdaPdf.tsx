@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import {
   Document,
   formatDate,
@@ -268,7 +268,9 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
               <p>
                 <input
                   type="checkbox"
-                  checked={Boolean(bsda?.worker?.work?.hasEmitterPaperSignature)}
+                  checked={Boolean(
+                    bsda?.worker?.work?.hasEmitterPaperSignature
+                  )}
                   readOnly
                 />{" "}
                 je certifie disposer d’une version papier, signée du MOA et de

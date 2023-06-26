@@ -3,11 +3,12 @@ import { MutationUpdateBsvhuArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
-import { checkIsBsvhuContributor } from "../../permissions";
+
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import { checkEditionRules } from "../../edition";
 import sirenify from "../../sirenify";
+import { checkCanUpdate } from "../../permissions";
 
 export default async function edit(
   _,
@@ -16,29 +17,23 @@ export default async function edit(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const prismaForm = await getBsvhuOrNotFound(id);
-  await checkIsBsvhuContributor(
-    user,
-    prismaForm,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
-  );
+  const existingBsvhu = await getBsvhuOrNotFound(id);
+
+  await checkCanUpdate(user, existingBsvhu, input);
 
   const sirenifiedInput = await sirenify(input, user);
   const formUpdate = flattenVhuInput(sirenifiedInput);
 
-  const resultingForm = { ...prismaForm, ...formUpdate };
-  await checkIsBsvhuContributor(
-    user,
-    resultingForm,
-    "Vous ne pouvez pas enlever votre établissement du bordereau"
-  );
+  const resultingForm = { ...existingBsvhu, ...formUpdate };
 
-  await checkEditionRules(prismaForm, input, user);
+  await checkEditionRules(existingBsvhu, input, user);
 
   await validateBsvhu(resultingForm, {
-    emissionSignature: prismaForm.emitterEmissionSignatureAuthor != null,
-    operationSignature: prismaForm.destinationOperationSignatureAuthor != null,
-    transportSignature: prismaForm.transporterTransportSignatureAuthor != null
+    emissionSignature: existingBsvhu.emitterEmissionSignatureAuthor != null,
+    operationSignature:
+      existingBsvhu.destinationOperationSignatureAuthor != null,
+    transportSignature:
+      existingBsvhu.transporterTransportSignatureAuthor != null
   });
   const bsvhuRepository = getBsvhuRepository(user);
 

@@ -2,3 +2,4 @@ web: node ${STARTUP_FILE:-dist/src/index.js}
 clock: node dist/src/cron.js
 queue: node dist/src/queue/consumer.js
 indexqueue: node dist/src/queue/consumerIndexation.js
+webhooksqueue: node dist/src/queue/consumerWebhooks.js

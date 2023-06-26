@@ -1,11 +1,11 @@
 import { Bsdasri, User, Prisma } from "@prisma/client";
 import { safeInput } from "../common/converter";
 import { SealedFieldError } from "../common/errors";
-import { getCachedUserSiretOrVat } from "../common/redis/users";
 import { objectDiff } from "../forms/workflow/diff";
 import { BsdasriInput, BsdasriSignatureType } from "../generated/graphql/types";
 import { flattenBsdasriInput } from "./converter";
 import { getReadonlyBsdasriRepository } from "./repository";
+import { getUserRoles } from "../permissions";
 
 type EditableBsdasriFields = Required<
   Omit<
@@ -20,6 +20,7 @@ type EditableBsdasriFields = Required<
     | "groupedIn"
     | "synthesizedIn"
     | "synthesisEmitterSirets"
+    | "groupingEmitterSirets"
     | "transportSignatory"
     | "emissionSignatory"
     | "emitterEmissionSignatureDate"
@@ -70,6 +71,7 @@ export const editionRules: {
   transporterCompanyPhone: "TRANSPORT",
   transporterCompanyMail: "TRANSPORT",
   transporterCompanyVatNumber: "TRANSPORT",
+  transporterRecepisseIsExempted: "TRANSPORT",
   transporterRecepisseNumber: "TRANSPORT",
   transporterRecepisseDepartment: "TRANSPORT",
   transporterRecepisseValidityLimit: "TRANSPORT",
@@ -141,7 +143,7 @@ export async function checkEditionRules(
     return true;
   }
 
-  const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
+  const userSirets = user?.id ? Object.keys(await getUserRoles(user.id)) : [];
   const isEmitter =
     bsdasri.emitterCompanySiret &&
     userSirets.includes(bsdasri.emitterCompanySiret);

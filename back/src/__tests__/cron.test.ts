@@ -1,5 +1,9 @@
 import { validateOnbardingCronSchedule } from "../cron";
 
+jest.mock("../commands/appendix1.helpers", () => ({
+  cleanUnusedAppendix1ProducerBsdds: jest.fn(() => Promise.resolve())
+}));
+
 describe("validateOnbardingCronSchedule", () => {
   it("should throw error when invalid quartz expression", () => {
     expect(() => validateOnbardingCronSchedule("80 8 * * *")).toThrow(
