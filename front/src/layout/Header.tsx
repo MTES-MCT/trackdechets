@@ -71,8 +71,7 @@ const getMenuEntries = (
   isAuthenticated,
   isAdmin,
   currentSiret,
-  isProduction,
-  featureFlags
+  canAccessDashboardV2
 ) => {
   const common = [
     {
@@ -133,8 +132,6 @@ const getMenuEntries = (
       navlink: true,
     },
   ];
-
-  const canAccessDashboardV2 = isAdmin || featureFlags.dashboardV2;
 
   return [
     ...common,
@@ -197,10 +194,11 @@ export default withRouter(function Header({
   location,
   history,
 }: RouteComponentProps & HeaderProps) {
-  const { VITE_API_ENDPOINT, NODE_ENV } = import.meta.env;
-  const isProduction = NODE_ENV === "production";
+  const { VITE_API_ENDPOINT } = import.meta.env;
 
   const { featureFlags } = useFeatureFlags();
+
+  const canAccessDashboardV2 = isAdmin || featureFlags.dashboardV2;
 
   const [menuHidden, toggleMenu] = useState(true);
 
@@ -228,7 +226,7 @@ export default withRouter(function Header({
   });
 
   let matchDashboardV2;
-  if (!isProduction) {
+  if (canAccessDashboardV2) {
     matchDashboardV2 = matchPath(location.pathname, {
       path: routes.dashboardv2.index,
       exact: false,
@@ -241,7 +239,7 @@ export default withRouter(function Header({
   // Catching siret from url when not available from props (just after login)
   let currentSiret = matchDashboard?.params["siret"];
 
-  if (!isProduction && matchDashboardV2) {
+  if (matchDashboardV2) {
     currentSiret =
       matchDashboard?.params["siret"] || matchDashboardV2?.params["siret"];
   }
@@ -249,8 +247,7 @@ export default withRouter(function Header({
     isAuthenticated,
     isAdmin,
     currentSiret,
-    isProduction,
-    featureFlags
+    canAccessDashboardV2
   );
 
   const mobileNav = () => {

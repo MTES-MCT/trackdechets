@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useContext, useEffect } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import {
   Route,
   withRouter,
@@ -72,7 +72,10 @@ export default withRouter(function LayoutContainer({ history }) {
     : [""];
   const { updateFeatureFlags } = useFeatureFlags();
 
-  const dashboardRoutePrefixAdminCheck = isAdmin ? "dashboardv2" : "dashboard";
+  const canAccessDashboardV2 = flagDashboardV2UserId.includes(userId);
+
+  const dashboardRoutePrefixAdminCheck =
+    isAdmin || canAccessDashboardV2 ? "dashboardv2" : "dashboard";
   const dashboardRoutePrefix = !isV2Routes
     ? "dashboard"
     : dashboardRoutePrefixAdminCheck;
@@ -96,9 +99,9 @@ export default withRouter(function LayoutContainer({ history }) {
   }
   useEffect(() => {
     updateFeatureFlags({
-      dashboardV2: flagDashboardV2UserId.includes(userId),
+      dashboardV2: canAccessDashboardV2,
     });
-  }, [userId]);
+  }, [canAccessDashboardV2]);
 
   useEffect(() => {
     if (import.meta.env.VITE_SENTRY_DSN && email) {
