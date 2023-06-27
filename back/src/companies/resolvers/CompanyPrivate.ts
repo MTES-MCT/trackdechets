@@ -23,7 +23,7 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
       ];
     }
 
-    return getCompanyUsers(parent.orgId, context.dataloaders);
+    return getCompanyUsers(parent.orgId, context.dataloaders, userId);
   },
   userRole: async (parent, _, context) => {
     const userId = context.user!.id;

@@ -15,7 +15,7 @@ import {
 import { CompanyMember, UserRole } from "../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
 import { AppDataloaders } from "../types";
-import { differenceInDays, differenceInMinutes } from "date-fns";
+import { differenceInDays } from "date-fns";
 /**
  * Retrieves a company by any unique identifier or throw a CompanyNotFound error
  */
@@ -114,9 +114,10 @@ export async function isCompanyMember(user: User, company: Company) {
  */
 export async function getCompanyUsers(
   orgId: string,
-  dataloaders: AppDataloaders
+  dataloaders: AppDataloaders,
+  requestingUserid: string
 ): Promise<CompanyMember[]> {
-  const activeUsers = await getCompanyActiveUsers(orgId);
+  const activeUsers = await getCompanyActiveUsers(orgId, requestingUserid);
   const invitedUsers = await getCompanyInvitedUsers(orgId, dataloaders);
 
   return [...activeUsers, ...invitedUsers];
@@ -132,24 +133,25 @@ const OBFUSCATED_USER_NAME = "Temporairement masqué";
 const userNameDisplay = (
   association: CompanyAssociation & {
     user: User;
-  }
+  },
+  requestingUserid?: string
 ): string => {
   const today = new Date();
-  // default createdAt was added afterwards, we have a lot of null values in db, let's ignore them
-
-  if (!association.createdAt) {
+  // In the following cases, we return clear user name:
+  // - default createdAt was added afterwards, we have a lot of null values in db, let's ignore them
+  // - association was either manually accepted or initated by user themselves
+  // - user is the requesting user calling this function
+  // - requestingUserid is not provided, meaning calling function is used for non-web context (email)
+  if (
+    !association.createdAt ||
+    !association.automaticallyAccepted ||
+    association.userId === requestingUserid ||
+    !requestingUserid
+  ) {
     return association.user.name;
   }
 
-  // when an existing user is invited, user.createdAt is way older than association.createdAt
-  const wasAutomaticallyAccepted =
-    Math.abs(
-      differenceInMinutes(association.user.createdAt, association.createdAt)
-    ) < 1;
-
-  if (!wasAutomaticallyAccepted) {
-    return association.user.name;
-  }
+  // association automatically accepted, must be older than DISPLAY_USER_NAME_AFTER days
   const canDisplayUserName =
     differenceInDays(today, association.createdAt) > DISPLAY_USER_NAME_AFTER;
   if (canDisplayUserName) {
@@ -163,7 +165,8 @@ const userNameDisplay = (
  * @param siret
  */
 export async function getCompanyActiveUsers(
-  orgId: string
+  orgId: string,
+  requestingUserid?: string
 ): Promise<CompanyMember[]> {
   const associations = await prisma.company
     .findUniqueOrThrow({ where: { orgId } })
@@ -172,7 +175,7 @@ export async function getCompanyActiveUsers(
   return associations.map(a => {
     return {
       ...a.user,
-      name: userNameDisplay(a),
+      name: userNameDisplay(a, requestingUserid),
       // type casting is necessary here as long as we
       // do not expose READER and DRIVER role in the API
       role: a.role as UserRole,

@@ -152,6 +152,9 @@ describe("mutation acceptMembershipRequest", () => {
       expect(companyAssociations).toHaveLength(1);
       expect(companyAssociations[0].role).toEqual(role);
 
+      // when a new user is invited and accepts invitation, `automaticallyAccepted` is false
+      expect(companyAssociations[0].automaticallyAccepted).toEqual(false);
+
       expect(sendMailSpy).toHaveBeenCalledWith(
         renderMail(membershipRequestAccepted, {
           to: [{ email: requester.email, name: requester.name }],

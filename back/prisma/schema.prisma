@@ -247,13 +247,15 @@ model AnonymousCompany {
 }
 
 model CompanyAssociation {
-  id        String    @id @default(cuid())
-  role      UserRole
-  companyId String
-  company   Company   @relation(fields: [companyId], references: [id])
-  userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  createdAt DateTime? @default(now()) @db.Timestamptz(6)
+  id                    String    @id @default(cuid())
+  role                  UserRole
+  companyId             String
+  company               Company   @relation(fields: [companyId], references: [id])
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id])
+  createdAt             DateTime? @default(now()) @db.Timestamptz(6)
+  // Tell apart automatically accepted invitations from others
+  automaticallyAccepted Boolean   @default(false)
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")
