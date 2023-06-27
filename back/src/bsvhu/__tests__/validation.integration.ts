@@ -299,4 +299,42 @@ describe("BSVHU validation", () => {
       }
     });
   });
+
+  describe("Emitter transports own waste", () => {
+    it("allowed if exemption", async () => {
+      const data = {
+        ...bsvhu,
+        transporterCompanySiret: bsvhu.emitterCompanySiret,
+        transporterRecepisseIsExempted: true
+      };
+
+      expect.assertions(1);
+
+      const validated = await validateBsvhu(data, {
+        transportSignature: true
+      });
+
+      expect(validated).toBeDefined();
+    });
+
+    it("NOT allowed if no exemption", async () => {
+      const data = {
+        ...bsvhu,
+        transporterCompanySiret: bsvhu.emitterCompanySiret,
+        transporterRecepisseIsExempted: false
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsvhu(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          `Le transporteur saisi sur le bordereau (SIRET: ${bsvhu.emitterCompanySiret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+        ]);
+      }
+    });
+  });
 });

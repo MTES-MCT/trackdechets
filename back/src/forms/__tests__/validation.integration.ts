@@ -351,9 +351,9 @@ describe("sealedFormSchema", () => {
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
         `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets` +
-          " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
-          " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
-          " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
+        " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
+        " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
       );
     });
 
@@ -370,9 +370,9 @@ describe("sealedFormSchema", () => {
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
         `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets` +
-          " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
-          " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
-          " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
+        " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
+        " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
       );
     });
 
@@ -407,9 +407,9 @@ describe("sealedFormSchema", () => {
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
         `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est` +
-          " pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement." +
-          " Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur" +
-          " de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        " pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement." +
+        " Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur" +
+        " de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
       );
     });
 
@@ -585,56 +585,32 @@ describe("sealedFormSchema", () => {
   });
 
   describe("Emitter transports own waste", () => {
-    it("allowed if dangerous waste <= 100kg", async () => {
-      const partialForm: Partial<Form> = {
+    it("allowed if exemption", async () => {
+      const partialForm: Partial<Form & BsddTransporter> = {
         ...sealedForm,
         transporterCompanySiret: sealedForm.emitterCompanySiret,
-        wasteDetailsCode: "16 06 01*",
-        wasteDetailsQuantity: 0.1
+        transporterIsExemptedOfReceipt: true
       };
-      const isValid = sealedFormSchema.isValid(partialForm);
 
-      expect(isValid).toBeTruthy();
+      expect.assertions(1);
+
+      const isValid = await sealedFormSchema.isValid(partialForm);
+
+      expect(isValid).toBe(true);
     });
 
-    it("allowed if non-dangerous waste <= 500kg", async () => {
-      const partialForm: Partial<Form> = {
+    it("NOT allowed if no exemption", async () => {
+      const partialForm: Partial<Form & BsddTransporter> = {
         ...sealedForm,
         transporterCompanySiret: sealedForm.emitterCompanySiret,
-        wasteDetailsCode: "18 01 01",
-        wasteDetailsQuantity: 0.5
+        transporterIsExemptedOfReceipt: false
       };
-      const isValid = sealedFormSchema.isValid(partialForm);
 
-      expect(isValid).toBeTruthy();
-    });
+      expect.assertions(1);
 
-    it("not allowed if dangerous waste > 100kg", async () => {
-      const partialForm: Partial<Form> = {
-        ...sealedForm,
-        transporterCompanySiret: sealedForm.emitterCompanySiret,
-        wasteDetailsCode: "16 06 01*",
-        wasteDetailsQuantity: 0.101
-      };
-      const validateFn = () => sealedFormSchema.validate(partialForm);
+      const isValid = await sealedFormSchema.isValid(partialForm);
 
-      await expect(validateFn()).rejects.toThrow(
-        "Si vous transportez vos propres déchets, vous ne pouvez transporter que 100kg de déchets dangereux maximum."
-      );
-    });
-
-    it("not allowed if non-dangerous waste > 500kg", async () => {
-      const partialForm: Partial<Form> = {
-        ...sealedForm,
-        transporterCompanySiret: sealedForm.emitterCompanySiret,
-        wasteDetailsCode: "18 01 01",
-        wasteDetailsQuantity: 0.501
-      };
-      const validateFn = () => sealedFormSchema.validate(partialForm);
-
-      await expect(validateFn()).rejects.toThrow(
-        "Si vous transportez vos propres déchets, vous ne pouvez transporter que 500kg de déchets non dangereux maximum."
-      );
+      expect(isValid).toBe(false);
     });
   });
 });

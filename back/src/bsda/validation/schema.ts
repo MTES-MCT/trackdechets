@@ -131,9 +131,8 @@ export const rawBsdaSchema = z
       .string()
       .nullish(),
     transporterCompanyName: z.string().nullish(),
-    transporterCompanySiret: siretSchema
-      .nullish()
-      .superRefine(isRegisteredSiretRefinement("TRANSPORTER")),
+    transporterCompanySiret: siretSchema.nullish(),
+    // Further verifications done hereunder in superRefine
     transporterCompanyAddress: z.string().nullish(),
     transporterCompanyContact: z.string().nullish(),
     transporterCompanyPhone: z.string().nullish(),
@@ -194,6 +193,15 @@ export const rawBsdaSchema = z
       .nullish()
       .superRefine(intermediariesRefinement),
     intermediariesOrgIds: z.array(z.string()).optional()
+  })
+  // Additionnal checks on the transporterCompanySiret
+  .superRefine((val, ctx) => {
+    const { transporterCompanySiret, transporterRecepisseIsExempted } = val;
+
+    return isRegisteredSiretRefinement(
+      "TRANSPORTER",
+      transporterRecepisseIsExempted
+    )(transporterCompanySiret ?? "", ctx);
   })
   .superRefine((val, ctx) => {
     if (

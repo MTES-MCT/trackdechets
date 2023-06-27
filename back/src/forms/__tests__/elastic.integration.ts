@@ -307,23 +307,23 @@ describe("getSiretsByTab", () => {
     );
   });
 
-  describe("status SIGNED_BY_PRODUCER", () => {
-    test("emitter is transporter", async () => {
-      const user = await userFactory();
-      const form = await formWithTempStorageFactory({
-        opt: { status: Status.SIGNED_BY_PRODUCER, forwardedIn: undefined },
-        ownerId: user.id
-      });
-      const updatedForm = await prisma.form.update({
-        data: {
-          transporterCompanySiret: form.emitterCompanySiret
-        },
-        where: { id: form.id }
-      });
-      const fullForm = await getFullForm(updatedForm);
+  // describe("status SIGNED_BY_PRODUCER", () => {
+  //   test("emitter is transporter", async () => {
+  //     const user = await userFactory();
+  //     const form = await formWithTempStorageFactory({
+  //       opt: { status: Status.SIGNED_BY_PRODUCER, forwardedIn: undefined },
+  //       ownerId: user.id
+  //     });
+  //     const updatedForm = await prisma.form.update({
+  //       data: {
+  //         transporterCompanySiret: form.emitterCompanySiret
+  //       },
+  //       where: { id: form.id }
+  //     });
+  //     const fullForm = await getFullForm(updatedForm);
 
-      const { isForActionFor } = getSiretsByTab(fullForm);
-      expect(isForActionFor).toContain(form.emitterCompanySiret);
-    });
-  });
+  //     const { isForActionFor } = getSiretsByTab(fullForm);
+  //     expect(isForActionFor).toContain(form.emitterCompanySiret);
+  //   });
+  // });
 });

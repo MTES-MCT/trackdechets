@@ -219,7 +219,7 @@ describe("transporterSchema", () => {
   });
 
   describe("Emitter transports own waste", () => {
-    it("allowed if dangerous waste <= 100kg", async () => {
+    it("allowed if exemption", async () => {
       const emitterAndTransporter = await companyFactory({
         companyTypes: ["PRODUCER"]
       });
@@ -229,31 +229,18 @@ describe("transporterSchema", () => {
         emitterCompanySiret: emitterAndTransporter.siret,
         transporterCompanySiret: emitterAndTransporter.siret,
         wasteDetailsCode: "16 06 01*",
-        wasteDetailsQuantity: 0.1
+        wasteDetailsQuantity: 10,
+        transporterRecepisseIsExempted: true
       };
-      const isValid = transporterSchema.isValid(bsff);
 
-      expect(isValid).toBeTruthy();
+      expect.assertions(1);
+
+      const isValid = await transporterSchema.isValid(bsff);
+
+      expect(isValid).toBe(true);
     });
 
-    it("allowed if non-dangerous waste <= 500kg", async () => {
-      const emitterAndTransporter = await companyFactory({
-        companyTypes: ["PRODUCER"]
-      });
-
-      const bsff = {
-        ...transporterData,
-        emitterCompanySiret: emitterAndTransporter.siret,
-        transporterCompanySiret: emitterAndTransporter.siret,
-        wasteDetailsCode: "18 01 01",
-        wasteDetailsQuantity: 0.5
-      };
-      const isValid = transporterSchema.isValid(bsff);
-
-      expect(isValid).toBeTruthy();
-    });
-
-    it("not allowed if dangerous waste > 100kg", async () => {
+    it("NOT allowed if no exemption", async () => {
       const emitterAndTransporter = await companyFactory({
         companyTypes: ["PRODUCER"]
       });
@@ -263,32 +250,15 @@ describe("transporterSchema", () => {
         emitterCompanySiret: emitterAndTransporter.siret,
         transporterCompanySiret: emitterAndTransporter.siret,
         wasteDetailsCode: "16 06 01*",
-        wasteDetailsQuantity: 0.101
+        wasteDetailsQuantity: 10,
+        transporterRecepisseIsExempted: false
       };
-      const validateFn = () => transporterSchema.validate(bsff);
 
-      await expect(validateFn()).rejects.toThrow(
-        "Si vous transportez vos propres déchets, vous ne pouvez transporter que 100kg de déchets dangereux maximum."
-      );
-    });
+      expect.assertions(1);
 
-    it("not allowed if non-dangerous waste > 500kg", async () => {
-      const emitterAndTransporter = await companyFactory({
-        companyTypes: ["PRODUCER"]
-      });
+      const isValid = await transporterSchema.isValid(bsff);
 
-      const bsff = {
-        ...transporterData,
-        emitterCompanySiret: emitterAndTransporter.siret,
-        transporterCompanySiret: emitterAndTransporter.siret,
-        wasteDetailsCode: "18 01 01",
-        wasteDetailsQuantity: 0.501
-      };
-      const validateFn = () => transporterSchema.validate(bsff);
-
-      await expect(validateFn()).rejects.toThrow(
-        "Si vous transportez vos propres déchets, vous ne pouvez transporter que 500kg de déchets non dangereux maximum."
-      );
+      expect(isValid).toBe(false);
     });
   });
 });

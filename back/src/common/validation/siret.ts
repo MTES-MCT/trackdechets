@@ -44,7 +44,8 @@ export const foreignVatNumberSchema = vatNumberSchema.refine(value => {
 }, "Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement");
 
 export const isRegisteredSiretRefinement =
-  role => async (siret: string, ctx) => {
+  (role, transporterRecepisseIsExempted = false) =>
+  async (siret: string, ctx) => {
     if (!siret) return;
     const company = await prisma.company.findUnique({
       where: { siret }
@@ -85,6 +86,8 @@ export const isRegisteredSiretRefinement =
       }
     }
     if (role === "TRANSPORTER" && !isTransporter(company)) {
+      if (transporterRecepisseIsExempted) return true;
+
       return ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:

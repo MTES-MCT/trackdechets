@@ -21,7 +21,6 @@ import {
   isSiret,
   isVat
 } from "./constants/companySearchHelpers";
-import { isDangerous } from "./constants";
 
 // Poids maximum en tonnes tout mode de transport confondu
 const MAX_WEIGHT_TONNES = 50000;
@@ -207,47 +206,12 @@ export const siretTests: SiretTests = {
       }
       if (role === "TRANSPORTER" && !isTransporter(company)) {
         const {
-          emitterType,
-          transporterCompanySiret,
-          emitterCompanySiret,
-          wasteDetailsCode,
-          wasteCode,
-          wasteDetailsQuantity,
-          wasteValue
+          transporterIsExemptedOfReceipt,
+          transporterRecepisseIsExempted
         } = ctx.parent;
 
-        const bsdWasteCode = wasteCode ?? wasteDetailsCode;
-        const bsdWasteValue = wasteValue ?? wasteDetailsQuantity;
-
-        const isTransportingOwnWastes =
-          transporterCompanySiret &&
-          emitterCompanySiret &&
-          emitterCompanySiret === transporterCompanySiret;
-
-        const isEmitterTypeOk =
-          emitterType !== "APPENDIX1" && // Annexe 1
-          emitterType !== "APPENDIX2"; // Regroupement
-
-        // Emitter transports own waste
-        if (isTransportingOwnWastes && isEmitterTypeOk) {
-          // Dangerous waste. Up to 100kg
-          if (isDangerous(bsdWasteCode)) {
-            if (bsdWasteValue > 0.1) {
-              return ctx.createError({
-                message:
-                  "Si vous transportez vos propres déchets, vous ne pouvez transporter que 100kg de déchets dangereux maximum."
-              });
-            }
-          } else {
-            // Non-dangerous waste. 500kg max
-            if (bsdWasteValue > 0.5) {
-              return ctx.createError({
-                message:
-                  "Si vous transportez vos propres déchets, vous ne pouvez transporter que 500kg de déchets non dangereux maximum."
-              });
-            }
-          }
-        }
+        if (transporterIsExemptedOfReceipt || transporterRecepisseIsExempted)
+          return true;
 
         return ctx.createError({
           message:
