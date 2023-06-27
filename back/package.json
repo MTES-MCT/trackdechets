@@ -122,7 +122,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "soap": "^0.43.0",
-    "winston": "^3.2.1",
+    "winston": "^3.8.2",
     "winston-transport": "^4.3.0",
     "world-countries": "^4.0.0",
     "xss": "^1.0.10",
