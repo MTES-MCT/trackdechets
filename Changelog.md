@@ -18,6 +18,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Lorsqu'une révision est acceptée sur un bordereau chapeau d'annexe 1, les modifications sont répercutéres sur les annexes 1 [PR 2472](https://github.com/MTES-MCT/trackdechets/pull/2472)
 - Le mode pipeline n'est plus proposé sur les annexes 1 [PR 2472](https://github.com/MTES-MCT/trackdechets/pull/2472)
+- Correction d'un bug empêchant l'affichage des révisions BSDD lorsqu'une révision a eu lieu sur un BSDD entreposé provisoirement qui subit ensuite un traitement anticipé. [PR 2487](https://github.com/MTES-MCT/trackdechets/pull/2487)
 
 #### :boom: Breaking changes
 
@@ -31,6 +32,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Refacto transporteurs BSDD : les données du premier transporteur sont migrées dans la table `BsddTransporter` (renommage de `TransportSegment`) [PR 2418](https://github.com/MTES-MCT/trackdechets/pull/2418)
+- Amélioration du test `duplicateBsda.integration.ts` afin de vérifier la présence des champs dupliqués [PR 2453](https://github.com/MTES-MCT/trackdechets/pull/2453)
 
 # [2023.6.1] 06/06/2023
 
