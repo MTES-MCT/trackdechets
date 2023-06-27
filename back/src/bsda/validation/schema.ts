@@ -194,15 +194,6 @@ export const rawBsdaSchema = z
       .superRefine(intermediariesRefinement),
     intermediariesOrgIds: z.array(z.string()).optional()
   })
-  // Additionnal checks on the transporterCompanySiret
-  .superRefine((val, ctx) => {
-    const { transporterCompanySiret, transporterRecepisseIsExempted } = val;
-
-    return isRegisteredSiretRefinement(
-      "TRANSPORTER",
-      transporterRecepisseIsExempted
-    )(transporterCompanySiret ?? "", ctx);
-  })
   .superRefine((val, ctx) => {
     if (
       val.destinationReceptionDate &&
@@ -276,6 +267,12 @@ export const rawBsdaSchema = z
           "Les opérations d'entreposage provisoire et groupement ne sont pas compatibles entre elles"
       });
     }
+
+    // Additionnal checks on the transporterCompanySiret
+    return isRegisteredSiretRefinement(
+      "TRANSPORTER",
+      val.transporterRecepisseIsExempted
+    )(val.transporterCompanySiret ?? "", ctx);
   })
   .transform(val => {
     val.intermediariesOrgIds = val.intermediaries
