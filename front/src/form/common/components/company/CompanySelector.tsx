@@ -2,7 +2,7 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import {
   NotificationError,
   SimpleNotificationError,
-} from "common/components/Error";
+} from "Apps/common/Components/Error/Error";
 import { IconLoading, IconSearch } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { constantCase } from "constant-case";

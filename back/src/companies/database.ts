@@ -3,7 +3,7 @@
  */
 
 import prisma from "../prisma";
-import { User, Prisma, Company } from "@prisma/client";
+import { User, Prisma, Company, CompanyAssociation } from "@prisma/client";
 import {
   CompanyNotFound,
   TraderReceiptNotFound,
@@ -15,7 +15,7 @@ import {
 import { CompanyMember, UserRole } from "../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
 import { AppDataloaders } from "../types";
-
+import { differenceInDays } from "date-fns";
 /**
  * Retrieves a company by any unique identifier or throw a CompanyNotFound error
  */
@@ -93,26 +93,6 @@ export function getDeclarations(codeS3ic: string | null | undefined) {
 }
 
 /**
- * Returns the role (ADMIN or MEMBER) of a user
- * in a company.
- * Returns null if the user is not a member of the company.
- * There should be only one association between a user
- * and a company, so we return the first one
- * @param userId
- * @param orgId
- */
-export async function getUserRole(userId: string, orgId: string) {
-  const associations = await prisma.company
-    .findUniqueOrThrow({ where: { orgId } })
-    .companyAssociations({ where: { userId } });
-
-  if (associations.length > 0) {
-    return associations[0].role;
-  }
-  return null;
-}
-
-/**
  * Returns true if user belongs to company with either
  * MEMBER or ADMIN role, false otherwise
  * @param user
@@ -134,20 +114,59 @@ export async function isCompanyMember(user: User, company: Company) {
  */
 export async function getCompanyUsers(
   orgId: string,
-  dataloaders: AppDataloaders
+  dataloaders: AppDataloaders,
+  requestingUserid: string
 ): Promise<CompanyMember[]> {
-  const activeUsers = await getCompanyActiveUsers(orgId);
+  const activeUsers = await getCompanyActiveUsers(orgId, requestingUserid);
   const invitedUsers = await getCompanyInvitedUsers(orgId, dataloaders);
 
   return [...activeUsers, ...invitedUsers];
 }
+
+const DISPLAY_USER_NAME_AFTER = 7; // days
+const OBFUSCATED_USER_NAME = "Temporairement masqué";
+/**
+ * Display user name if association is older than DISPLAY_USER_NAME_AFTER days or not automatically accepted
+ * @param association
+ * @returns
+ */
+const userNameDisplay = (
+  association: CompanyAssociation & {
+    user: User;
+  },
+  requestingUserid?: string
+): string => {
+  const today = new Date();
+  // In the following cases, we return clear user name:
+  // - default createdAt was added afterwards, we have a lot of null values in db, let's ignore them
+  // - association was either manually accepted or initated by user themselves
+  // - user is the requesting user calling this function
+  // - requestingUserid is not provided, meaning calling function is used for non-web context (email)
+  if (
+    !association.createdAt ||
+    !association.automaticallyAccepted ||
+    association.userId === requestingUserid ||
+    !requestingUserid
+  ) {
+    return association.user.name;
+  }
+
+  // association automatically accepted, must be older than DISPLAY_USER_NAME_AFTER days
+  const canDisplayUserName =
+    differenceInDays(today, association.createdAt) > DISPLAY_USER_NAME_AFTER;
+  if (canDisplayUserName) {
+    return association.user.name;
+  }
+  return OBFUSCATED_USER_NAME;
+};
 
 /**
  * Returns company members that already have an account in TD
  * @param siret
  */
 export async function getCompanyActiveUsers(
-  orgId: string
+  orgId: string,
+  requestingUserid?: string
 ): Promise<CompanyMember[]> {
   const associations = await prisma.company
     .findUniqueOrThrow({ where: { orgId } })
@@ -156,6 +175,7 @@ export async function getCompanyActiveUsers(
   return associations.map(a => {
     return {
       ...a.user,
+      name: userNameDisplay(a, requestingUserid),
       // type casting is necessary here as long as we
       // do not expose READER and DRIVER role in the API
       role: a.role as UserRole,
@@ -322,12 +342,14 @@ export function convertUrls<T extends Partial<Company>>(
   ecoOrganismeAgreements: URL[];
   signatureAutomations: [];
   receivedSignatureAutomations: [];
+  userPermissions: [];
 } {
   return {
     ...company,
     ecoOrganismeAgreements:
       company.ecoOrganismeAgreements?.map(a => new URL(a)) ?? [],
     signatureAutomations: [],
-    receivedSignatureAutomations: []
+    receivedSignatureAutomations: [],
+    userPermissions: []
   };
 }

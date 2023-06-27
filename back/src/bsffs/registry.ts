@@ -64,6 +64,7 @@ function toGenericWaste(
   return {
     wasteDescription: bsff.wasteDescription,
     wasteCode: bsff.wasteCode,
+    wasteIsDangerous: true,
     pop: false,
     id: bsff.id,
     createdAt: bsff.createdAt,

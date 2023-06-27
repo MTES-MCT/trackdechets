@@ -10,7 +10,7 @@ import { buildAddress } from "../companies/sirene/utils";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 
-export type BsdaToElastic = Bsda & {
+export type RawBsda = Bsda & {
   intermediaries: IntermediaryBsdaAssociation[];
 };
 
@@ -31,7 +31,7 @@ type WhereKeys =
 // | PROCESSED          | archive         | archive         | archive     | archive         | follow          | archive      |
 // | REFUSED            | archive         | archive         | archive     | archive         | follow          | archive      |
 // | AWAITING_CHILD     | follow          | follow          | follow      | follow          | follow          | follow       |
-function getWhere(bsda: BsdaToElastic): Pick<BsdElastic, WhereKeys> {
+function getWhere(bsda: RawBsda): Pick<BsdElastic, WhereKeys> {
   const where: Record<WhereKeys, string[]> = {
     isDraftFor: [],
     isForActionFor: [],
@@ -149,7 +149,7 @@ function getWhere(bsda: BsdaToElastic): Pick<BsdElastic, WhereKeys> {
   return where;
 }
 
-export function toBsdElastic(bsda: BsdaToElastic): BsdElastic {
+export function toBsdElastic(bsda: RawBsda): BsdElastic {
   const where = getWhere(bsda);
 
   return {
@@ -238,6 +238,6 @@ export function toBsdElastic(bsda: BsdaToElastic): BsdElastic {
   };
 }
 
-export function indexBsda(bsda: BsdaToElastic, ctx?: GraphQLContext) {
+export function indexBsda(bsda: RawBsda, ctx?: GraphQLContext) {
   return indexBsd(toBsdElastic(bsda), ctx);
 }

@@ -56,6 +56,23 @@
       width: 205px;
     }
   }
+
+  &--review_accepted {
+    color: #3558a2;
+    background-color: #e6eefe;
+  }
+  &--review_pending {
+    color: #006a6f;
+    background-color: #e5fbfd;
+  }
+  &--review_refused {
+    color: #716043;
+    background-color: #feecc2;
+  }
+  &--review_cancelled {
+    color: #716043;
+    background-color: #feecc2;
+  }
   &--PROCESSED,
   &--FOLLOWED_WITH_PNTTD,
   &--NO_TRACEABILITY {

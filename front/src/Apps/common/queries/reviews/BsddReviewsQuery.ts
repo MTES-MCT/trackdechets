@@ -1,12 +1,38 @@
 import { gql } from "@apollo/client";
-import { companyFragment } from "common/fragments";
+import { companyFragment } from "Apps/common/queries/fragments";
 
 const reviewFragment = gql`
   fragment FormRevisionRequestFragment on FormRevisionRequest {
     id
     form {
       id
+      status
       readableId
+      stateSummary {
+        lastActionOn
+      }
+      transporter {
+        company {
+          name
+          siret
+          orgId
+        }
+      }
+      recipient {
+        company {
+          name
+          siret
+          orgId
+        }
+      }
+      emitter {
+        type
+        company {
+          name
+          siret
+          orgId
+        }
+      }
       wasteDetails {
         code
         name

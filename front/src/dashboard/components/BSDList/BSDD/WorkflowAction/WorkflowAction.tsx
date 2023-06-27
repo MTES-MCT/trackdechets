@@ -9,7 +9,7 @@ import MarkAsResealed from "./MarkAsResealed";
 import MarkAsTempStorerAccepted from "./MarkAsTempStorerAccepted";
 import SignEmissionForm from "./SignEmissionForm";
 import SignTransportForm from "./SignTransportForm";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { useRouteMatch } from "react-router-dom";
 
 import {

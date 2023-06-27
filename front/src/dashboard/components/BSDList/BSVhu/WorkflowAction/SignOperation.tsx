@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS } from "Apps/common/queries";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import Operation from "form/bsvhu/Operation";
 import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
@@ -15,8 +15,11 @@ import {
 import React from "react";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+import { subMonths } from "date-fns";
 
 const validationSchema = yup.object({
+  date: yup.date().required("La date est requise"),
   author: yup
     .string()
     .ensure()
@@ -46,6 +49,8 @@ export function SignOperation({
     MutationSignBsvhuArgs
   >(SIGN_BSVHU, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
+  const TODAY = new Date();
+
   return (
     <SignBsvhu
       title="Signer le traitement"
@@ -58,12 +63,13 @@ export function SignOperation({
         <Formik
           initialValues={{
             author: "",
+            date: TODAY.toISOString(),
             ...getComputedState(
               {
                 destination: {
                   type: bsvhu.destination.type,
                   reception: {
-                    date: new Date().toISOString(),
+                    date: TODAY.toISOString(),
                     acceptationStatus: null,
                     refusalReason: "",
                     quantity: null,
@@ -73,7 +79,7 @@ export function SignOperation({
                     },
                   },
                   operation: {
-                    date: new Date().toISOString(),
+                    date: TODAY.toISOString(),
                     code: "",
                     nextDestination: { company: getInitialCompany() },
                   },
@@ -84,7 +90,7 @@ export function SignOperation({
           }}
           validationSchema={validationSchema}
           onSubmit={async values => {
-            const { id, author, ...update } = values;
+            const { id, author, date, ...update } = values;
             await updateBsvhu({
               variables: {
                 id: bsvhuId,
@@ -94,7 +100,7 @@ export function SignOperation({
             await signBsvhu({
               variables: {
                 id: bsvhu.id,
-                input: { author, type: SignatureTypeInput.Operation },
+                input: { author, date, type: SignatureTypeInput.Operation },
               },
             });
             onClose();
@@ -107,8 +113,26 @@ export function SignOperation({
                 En qualité de <strong>destinataire du déchet</strong>, j'atteste
                 que les informations ci-dessus sont correctes. En signant, je
                 confirme le traitement des déchets pour la quantité indiquée
-                dans ce bordereau. La signature est horodatée.
+                dans ce bordereau.
               </p>
+
+              <div className="form__row">
+                <label>
+                  Date de signature
+                  <div className="td-date-wrapper">
+                    <Field
+                      name="date"
+                      component={DateInput}
+                      className="td-input"
+                      minDate={subMonths(TODAY, 2)}
+                      maxDate={TODAY}
+                      required
+                    />
+                  </div>
+                </label>
+                <RedErrorMessage name="date" />
+              </div>
+
               <div className="form__row">
                 <label>
                   Nom du signataire

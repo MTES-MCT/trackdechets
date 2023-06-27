@@ -5,8 +5,6 @@
 import prisma from "../prisma";
 
 import { User, UserRole, Prisma, Company } from "@prisma/client";
-
-import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
@@ -19,18 +17,6 @@ export async function getUserCompanies(userId: string): Promise<Company[]> {
     include: { company: true }
   });
   return companyAssociations.map(association => association.company);
-}
-
-/**
- * Returns a user with linked objects
- * @param user
- */
-export async function getFullUser(user: User): Promise<FullUser> {
-  const companies = await getUserCompanies(user.id);
-  return {
-    ...user,
-    companies
-  };
 }
 
 /**

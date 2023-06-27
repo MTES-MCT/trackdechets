@@ -10,7 +10,8 @@ import { MissingTempStorageFlag } from "../../errors";
 import {
   expandFormFromDb,
   flattenFormInput,
-  flattenTemporaryStorageDetailInput
+  flattenTemporaryStorageDetailInput,
+  flattenTransporterInput
 } from "../../converter";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
@@ -62,23 +63,46 @@ const createFormResolver = async (
   }
 
   const form = flattenFormInput(formContent);
+  let transporter: Omit<
+    Prisma.BsddTransporterCreateWithoutFormInput,
+    "number"
+  > = flattenTransporterInput(formContent);
   // Pipeline erases transporter EXCEPT for transporterTransportMode
-  if (hasPipeline(form as any)) {
-    Object.keys(form)
-      .filter(key => key.startsWith("transporter"))
-      .forEach(key => {
-        form[key] = null;
-      });
-    form.transporterTransportMode = TransportMode.OTHER;
+  if (hasPipeline(form as any) && transporter) {
+    transporter = {
+      transporterTransportMode: TransportMode.OTHER
+    };
   }
 
   const readableId = getReadableId();
 
-  const cleanedForm = await draftFormSchema.validate(form);
+  const cleanedForm = await draftFormSchema.validate({
+    ...form,
+    ...transporter
+  });
+
+  // `cleanedForm` was introduced for the annexe 1 to get only the keys from
+  // the annexe 1 yup schema. The problem is that it also returns the `transporter*`
+  // fields that should not be included in the FormCreateInput.
+  if (cleanedForm) {
+    for (const key of Object.keys(cleanedForm)) {
+      if (!(key in form)) {
+        delete cleanedForm[key];
+      }
+    }
+  }
+
   const formCreateInput: Prisma.FormCreateInput = {
     ...cleanedForm,
     readableId,
-    owner: { connect: { id: user.id } }
+    owner: { connect: { id: user.id } },
+    ...(form.emitterType !== EmitterType.APPENDIX1_PRODUCER
+      ? {
+          transporters: {
+            create: { ...transporter, number: 1, readyToTakeOver: true }
+          }
+        }
+      : {})
   };
 
   if (temporaryStorageDetail) {

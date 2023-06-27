@@ -25,7 +25,9 @@ export default function Layout({
   children,
   isAuthenticated,
   isAdmin,
-}: AuthProps & { children: ReactNode }) {
+}: AuthProps & {
+  children: ReactNode;
+}) {
   const { data } = useQuery<Pick<Query, "warningMessage">>(GET_WARNING_MESSAGE);
 
   const isIE11 = !!navigator.userAgent.match(/Trident.*rv:11\./);

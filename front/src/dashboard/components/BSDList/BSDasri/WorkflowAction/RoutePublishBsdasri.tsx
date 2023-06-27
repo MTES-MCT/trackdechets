@@ -6,13 +6,16 @@ import {
   QueryBsdasriArgs,
   MutationPublishBsdasriArgs,
 } from "generated/graphql/types";
-import { NotificationError, InlineError } from "common/components/Error";
+import {
+  NotificationError,
+  InlineError,
+} from "Apps/common/Components/Error/Error";
 
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation, gql } from "@apollo/client";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { useParams, useHistory, generatePath, Link } from "react-router-dom";
-import { GET_DETAIL_DASRI_WITH_METADATA, GET_BSDS } from "common/queries";
+import { GET_DETAIL_DASRI_WITH_METADATA, GET_BSDS } from "Apps/common/queries";
 
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
 import cogoToast from "cogo-toast";

@@ -1,11 +1,13 @@
 import { estypes } from "@elastic/elasticsearch";
-import { BsdElastic, client, index } from "../common/elastic";
+import { BsdElastic, client, groupByBsdType, index } from "../common/elastic";
 import {
   OrderType,
   WasteRegistryType,
   WasteRegistryWhere
 } from "../generated/graphql/types";
 import { toElasticFilter } from "./where";
+import { Bsvhu, Prisma } from "@prisma/client";
+import prisma from "../prisma";
 
 export function buildQuery(
   registryType: WasteRegistryType,
@@ -72,4 +74,107 @@ export async function searchBsds(
   });
 
   return body.hits;
+}
+
+export const RegistryFormInclude = {
+  forwarding: { include: { transporters: true } },
+  grouping: { include: { initialForm: { include: { transporters: true } } } },
+  transporters: true
+};
+
+export type RegistryForm = Prisma.FormGetPayload<{
+  include: typeof RegistryFormInclude;
+}>;
+
+const RegistryBsdaInclude = { grouping: true, forwarding: true };
+
+type RegistryBsda = Prisma.BsdaGetPayload<{
+  include: typeof RegistryBsdaInclude;
+}>;
+
+const RegistryBsdasriInclude = { grouping: true };
+
+type RegistryBsdasri = Prisma.BsdasriGetPayload<{
+  include: typeof RegistryBsdasriInclude;
+}>;
+
+const RegistryBsffInclude = {
+  packagings: {
+    include: {
+      previousPackagings: {
+        include: { bsff: true }
+      }
+    }
+  }
+};
+
+type RegistryBsff = Prisma.BsffGetPayload<{
+  include: typeof RegistryBsffInclude;
+}>;
+
+type RegistryBsvhu = Bsvhu;
+
+export type RegistryBsdMap = {
+  bsdds: RegistryForm[];
+  bsdasris: RegistryBsdasri[];
+  bsvhus: RegistryBsvhu[];
+  bsdas: RegistryBsda[];
+  bsffs: RegistryBsff[];
+};
+/**
+ * Convert a list of BsdElastic to a mapping of prisma Bsds
+ */
+export async function toPrismaBsds(
+  bsdsElastic: BsdElastic[]
+): Promise<RegistryBsdMap> {
+  const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = groupByBsdType(bsdsElastic);
+
+  const prismaBsdsPromises: [
+    Promise<RegistryForm[]>,
+    Promise<RegistryBsdasri[]>,
+    Promise<RegistryBsvhu[]>,
+    Promise<RegistryBsda[]>,
+    Promise<RegistryBsff[]>
+  ] = [
+    prisma.form.findMany({
+      where: {
+        id: {
+          in: BSDD.map(bsdd => bsdd.id)
+        }
+      },
+      include: RegistryFormInclude
+    }),
+    prisma.bsdasri.findMany({
+      where: { id: { in: BSDASRI.map(bsdasri => bsdasri.id) } },
+      include: RegistryBsdasriInclude
+    }),
+    prisma.bsvhu.findMany({
+      where: {
+        id: {
+          in: BSVHU.map(bsvhu => bsvhu.id)
+        }
+      }
+    }),
+    prisma.bsda.findMany({
+      where: {
+        id: {
+          in: BSDA.map(bsda => bsda.id)
+        }
+      },
+      include: RegistryBsdaInclude
+    }),
+    prisma.bsff.findMany({
+      where: {
+        id: {
+          in: BSFF.map(bsff => bsff.id)
+        }
+      },
+      include: RegistryBsffInclude
+    })
+  ];
+
+  const [bsdds, bsdasris, bsvhus, bsdas, bsffs] = await Promise.all(
+    prismaBsdsPromises
+  );
+  return { bsdds, bsdasris, bsvhus, bsdas, bsffs };
 }

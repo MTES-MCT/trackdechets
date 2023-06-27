@@ -5,7 +5,7 @@ import { Mutation, MutationSignupArgs } from "generated/graphql/types";
 import { SIGNUP } from "./mutations";
 import PasswordHelper from "common/components/PasswordHelper";
 
-import routes from "common/routes";
+import routes from "Apps/routes";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";

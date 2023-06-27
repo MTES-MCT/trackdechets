@@ -7,7 +7,7 @@ import {
   IconWarehousePackage,
   IconWaterDam,
 } from "common/components/Icons";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSDa/BSDaActions/useDownloadPdf";
 import { useDuplicate } from "dashboard/components/BSDList/BSDa/BSDaActions/useDuplicate";
 import { statusLabels, transportModeLabels } from "dashboard/constants";

@@ -3,7 +3,8 @@ import { Field, Form, Formik } from "formik";
 import { startOfDay } from "date-fns";
 import { parseDate } from "common/datetime";
 import * as yup from "yup";
-import { Loader, RedErrorMessage } from "common/components";
+import { RedErrorMessage } from "common/components";
+import { Loader } from "Apps/common/Components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import {
@@ -20,9 +21,9 @@ import {
   MutationMarkAsTempStoredArgs,
 } from "generated/graphql/types";
 import { gql, useMutation } from "@apollo/client";
-import { statusChangeFragment } from "common/fragments";
-import { GET_BSDS } from "common/queries";
-import { NotificationError } from "common/components/Error";
+import { statusChangeFragment } from "Apps/common/queries/fragments";
+import { GET_BSDS } from "Apps/common/queries";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 
 export const textConfig: {
   [id: string]: {
@@ -48,16 +49,16 @@ export const textConfig: {
 
 export type ReceivedInfoValues = {
   receivedBy: string;
-  receivedAt: string;
-  signedAt: string;
+  receivedAt: Date;
+  signedAt: Date;
   quantityReceived: number | null;
   wasteAcceptationStatus: WasteAcceptationStatus | null;
   wasteRefusalReason: string;
   quantityType?: QuantityType;
 };
 
-const validationSchema = (form: TdForm) =>
-  yup.object({
+const validationSchema = (form: TdForm, today: Date) => {
+  return yup.object({
     wasteAcceptationStatus: yup.string().nullable(),
     quantityReceived: yup
       .number()
@@ -67,12 +68,12 @@ const validationSchema = (form: TdForm) =>
       .date()
       .nullable()
       .required("La date de présentation est un champ requis")
-      // we only care about the day, not the exact time
-      .transform(value => startOfDay(parseDate(value)))
       .min(
-        startOfDay(parseDate(form.emittedAt!)),
-        "La date de réception du déchet ne peut pas être antérieure à sa date d'émission."
-      ),
+        startOfDay(parseDate(form.takenOverAt!)),
+        "La date de réception du déchet ne peut pas être antérieure à sa date d'enlèvement."
+      )
+      // we only care about the day, not the exact time
+      .transform(value => startOfDay(parseDate(value))),
     receivedBy: yup
       .string()
       .nullable()
@@ -80,8 +81,24 @@ const validationSchema = (form: TdForm) =>
     signedAt: yup
       .date()
       .nullable()
-      .transform(value => startOfDay(parseDate(value))),
+      .required("La date d'acceptation est un champ requis")
+      .when("receivedAt", receivedAt =>
+        receivedAt
+          ? yup
+              .date()
+              .min(
+                startOfDay(parseDate(receivedAt)),
+                "La date d'acceptation ne peut pas être antérieure à la date de réception."
+              )
+          : yup.date().required("La date d'acceptation est un champ requis")
+      )
+      .max(today, "La date d'acceptation ne peut être dans le futur")
+      // we only care about the day, not the exact time
+      .transform(value => {
+        startOfDay(value);
+      }),
   });
+};
 
 const MARK_AS_RECEIVED = gql`
   mutation MarkAsReceived($id: ID!, $receivedInfo: ReceivedFormInput!) {
@@ -142,13 +159,15 @@ export default function ReceivedInfo({
     },
   });
 
+  const TODAY = new Date();
+
   return (
     <>
       <Formik<ReceivedInfoValues>
         initialValues={{
           receivedBy: "",
-          receivedAt: new Date().toISOString(),
-          signedAt: new Date().toISOString(),
+          receivedAt: TODAY,
+          signedAt: TODAY,
           quantityReceived: null,
           wasteAcceptationStatus: null,
           wasteRefusalReason: "",
@@ -164,6 +183,8 @@ export default function ReceivedInfo({
                   id: form.id,
                   tempStoredInfos: {
                     ...values,
+                    receivedAt: parseDate(values.receivedAt).toISOString(),
+                    signedAt: parseDate(values.signedAt).toISOString(),
                     quantityType: values.quantityType ?? QuantityType.Real,
                     quantityReceived: values.quantityReceived ?? 0,
                     wasteAcceptationStatus:
@@ -175,11 +196,15 @@ export default function ReceivedInfo({
             : markAsReceived({
                 variables: {
                   id: form.id,
-                  receivedInfo: values,
+                  receivedInfo: {
+                    ...values,
+                    receivedAt: parseDate(values.receivedAt).toISOString(),
+                    signedAt: parseDate(values.signedAt).toISOString(),
+                  },
                 },
               })
         }
-        validationSchema={() => validationSchema(form)}
+        validationSchema={() => validationSchema(form, TODAY)}
       >
         {({ values, isSubmitting, handleReset, setFieldValue }) => (
           <Form>
@@ -189,6 +214,7 @@ export default function ReceivedInfo({
                 <Field
                   component={DateInput}
                   minDate={parseDate(form.takenOverAt!)}
+                  maxDate={TODAY}
                   name="receivedAt"
                   className="td-input"
                 />
@@ -304,10 +330,14 @@ export default function ReceivedInfo({
             </div>
             <div className="form__row">
               <label>
-                Date d'acceptation
+                {values.wasteAcceptationStatus ===
+                WasteAcceptationStatus.Refused
+                  ? "Date de refus"
+                  : "Date d'acceptation"}
                 <Field
                   component={DateInput}
                   minDate={parseDate(values.receivedAt)}
+                  maxDate={TODAY}
                   name="signedAt"
                   className="td-input"
                 />

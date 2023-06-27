@@ -156,8 +156,8 @@ test("should create a transport segment", async () => {
     transporterCompanySiret
   );
   //check reverse access
-  const segments = await prisma.form
+  const transporters = await prisma.form
     .findUnique({ where: { id: frm.id } })
-    .transportSegments();
-  expect(segments!.length).toEqual(1);
+    .transporters({ where: { number: { gte: 2 } } });
+  expect(transporters!.length).toEqual(1);
 });

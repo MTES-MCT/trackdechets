@@ -6,21 +6,24 @@ import {
   matchPath,
   RouteComponentProps,
   generatePath,
+  useRouteMatch,
 } from "react-router-dom";
 
 import { localAuthService } from "login/auth.service";
 import { IconProfile, IconLeftArrow, IconClose } from "common/components/Icons";
 import { AccountMenuContent } from "account/AccountMenu";
 import { useQuery, gql } from "@apollo/client";
-import Loader from "common/components/Loaders";
-import { InlineError } from "common/components/Error";
+import Loader from "Apps/common/Components/Loader/Loaders";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import { Query } from "generated/graphql/types";
 
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { DEVELOPERS_DOCUMENTATION_URL, MEDIA_QUERIES } from "common/config";
 import styles from "./Header.module.scss";
 import { useMedia } from "use-media";
 import { DashboardTabs } from "dashboard/DashboardTabs";
+import { default as DashboardTabsV2 } from "Apps/Dashboard/Components/DashboardTabs/DashboardTabs";
+import { useFeatureFlags } from "common/contexts/FeatureFlagsContext";
 
 export const GET_ME = gql`
   {
@@ -44,7 +47,7 @@ export const GET_ME = gql`
  */
 function MobileSubNav({ currentSiret }) {
   const { error, data } = useQuery<Pick<Query, "me">>(GET_ME, {});
-
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   if (error) return <InlineError apolloError={error} />;
   if (data?.me == null) return <Loader />;
 
@@ -57,8 +60,10 @@ function MobileSubNav({ currentSiret }) {
     return null;
   }
 
-  return (
+  return !isV2Routes ? (
     <DashboardTabs currentCompany={currentCompany} companies={companies} />
+  ) : (
+    <DashboardTabsV2 currentCompany={currentCompany} companies={companies} />
   );
 }
 
@@ -66,7 +71,7 @@ const getMenuEntries = (
   isAuthenticated,
   isAdmin,
   currentSiret,
-  isProduction
+  canAccessDashboardV2
 ) => {
   const common = [
     {
@@ -127,11 +132,12 @@ const getMenuEntries = (
       navlink: true,
     },
   ];
+
   return [
     ...common,
     ...(isAuthenticated ? connected : []),
     ...(isAdmin ? admin : []),
-    ...(!isProduction && isAdmin ? dashboardV2 : []),
+    ...(canAccessDashboardV2 ? dashboardV2 : []),
   ];
 };
 
@@ -188,8 +194,11 @@ export default withRouter(function Header({
   location,
   history,
 }: RouteComponentProps & HeaderProps) {
-  const { VITE_API_ENDPOINT, NODE_ENV } = import.meta.env;
-  const isProduction = NODE_ENV === "production";
+  const { VITE_API_ENDPOINT } = import.meta.env;
+
+  const { featureFlags } = useFeatureFlags();
+
+  const canAccessDashboardV2 = isAdmin || featureFlags.dashboardV2;
 
   const [menuHidden, toggleMenu] = useState(true);
 
@@ -217,7 +226,7 @@ export default withRouter(function Header({
   });
 
   let matchDashboardV2;
-  if (!isProduction) {
+  if (canAccessDashboardV2) {
     matchDashboardV2 = matchPath(location.pathname, {
       path: routes.dashboardv2.index,
       exact: false,
@@ -230,7 +239,7 @@ export default withRouter(function Header({
   // Catching siret from url when not available from props (just after login)
   let currentSiret = matchDashboard?.params["siret"];
 
-  if (!isProduction && matchDashboardV2) {
+  if (matchDashboardV2) {
     currentSiret =
       matchDashboard?.params["siret"] || matchDashboardV2?.params["siret"];
   }
@@ -238,7 +247,7 @@ export default withRouter(function Header({
     isAuthenticated,
     isAdmin,
     currentSiret,
-    isProduction
+    canAccessDashboardV2
   );
 
   const mobileNav = () => {

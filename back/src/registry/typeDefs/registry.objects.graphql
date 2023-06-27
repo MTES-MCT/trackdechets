@@ -187,6 +187,11 @@ type IncomingWaste {
   """
   wasteAdr: String
 
+  """
+  Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  """
+  wasteIsDangerous: Boolean
+
   "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
   "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
@@ -400,6 +405,11 @@ type OutgoingWaste {
   """
   wasteAdr: String
 
+  """
+  Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  """
+  wasteIsDangerous: Boolean
+
   "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
   "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
@@ -601,6 +611,11 @@ type TransportedWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+
+  """
+  Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  """
+  wasteIsDangerous: Boolean
 }
 
 type TransportedWasteEdge {
@@ -804,6 +819,11 @@ type ManagedWaste {
   """
   wasteAdr: String
 
+  """
+  Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  """
+  wasteIsDangerous: Boolean
+
   "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
   "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
@@ -947,6 +967,11 @@ type AllWaste {
   transport maritime de marchandises dangereuses
   """
   wasteAdr: String
+
+  """
+  Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  """
+  wasteIsDangerous: Boolean
 
   "La raison sociale du négociant si le déchet est géré par un négociant"
   traderCompanyName: String

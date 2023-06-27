@@ -48,7 +48,7 @@
     }
   },
   "dependencies": {
-    "@apollo/client": "^3.6.8",
+    "@apollo/client": "^3.7.16",
     "@codegouvfr/react-dsfr": "^0.51.0",
     "@sentry/browser": "^6.19.7",
     "body-parser": "^1.20.1",
@@ -76,7 +76,7 @@
     "rc-tree": "^5.7.3",
     "react": "18.2.0",
     "react-app-polyfill": "^1.0.6",
-    "react-aria": "^3.24.0",
+    "react-aria": "3.25.0",
     "react-datepicker": "^3.4.1",
     "react-dom": "18.2.0",
     "react-multi-select-component": "^4.3.4",

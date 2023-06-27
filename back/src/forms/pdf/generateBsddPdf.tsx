@@ -160,8 +160,8 @@ export function getOtherPackagingLabel(packagingInfos: PackagingInfo[]) {
     otherPackagings.length === 0
       ? "à préciser"
       : otherPackagings
-          .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
-          .join(", ");
+        .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
+        .join(", ");
   return `Autre (${otherPackagingsSummary})`;
 }
 
@@ -279,7 +279,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
 
   const form: GraphQLForm = {
     ...(await expandFormFromDb(fullPrismaForm)),
-    transportSegments: fullPrismaForm.transportSegments?.map(
+    transportSegments: fullPrismaForm.transporters?.map(
       expandTransportSegmentFromDb
     ),
     grouping: await Promise.all(
@@ -344,6 +344,12 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               un bordereau de tournée dédiée{" "}
               <input
                 type="checkbox"
+                checked={form.emitter?.type === EmitterType.APPENDIX1_PRODUCER}
+                readOnly
+              />{" "}
+              un bordereau d'annexe 1{" "}
+              <input
+                type="checkbox"
                 checked={form.emitter?.type === EmitterType.APPENDIX2}
                 readOnly
               />{" "}
@@ -361,7 +367,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               {!!form.customId && <>({form.customId})</>}
               {!!groupedIn?.length && (
                 <>
-                  <strong>Annexé au bordereau n° :</strong>{" "}
+                  <strong>Annexé au bordereau {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER && "de tournée dédiée"} n° :</strong>{" "}
                   {groupedIn.map(bsd => bsd.readableId)}
                 </>
               )}
@@ -831,7 +837,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                   packagingInfos={
                     isRepackging
                       ? form.temporaryStorageDetail?.wasteDetails
-                          ?.packagingInfos ?? []
+                        ?.packagingInfos ?? []
                       : []
                   }
                 />

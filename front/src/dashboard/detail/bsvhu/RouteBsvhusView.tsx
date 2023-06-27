@@ -3,9 +3,9 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
 import { Query, QueryBsvhuArgs } from "generated/graphql/types";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { GET_VHU_FORM } from "form/bsvhu/utils/queries";
-import { InlineError } from "common/components/Error";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
 
 import { BsvhuDetailContent } from "./BsvhuDetailContent";

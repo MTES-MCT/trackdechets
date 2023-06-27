@@ -1,11 +1,11 @@
 import React from "react";
 import BsdasriDetailContent from "./BsdasriDetailContent";
-import Loader from "common/components/Loaders";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { useQuery } from "@apollo/client";
 import { Query, QueryBsdasriArgs } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
-import { GET_DETAIL_DASRI } from "common/queries";
-import { InlineError } from "common/components/Error";
+import { GET_DETAIL_DASRI } from "Apps/common/queries";
+import { InlineError } from "Apps/common/Components/Error/Error";
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
 export function RouteBSDasrisView() {
   const { id: formId } = useParams<{ id: string }>();

@@ -16,6 +16,7 @@ import {
 import prisma from "../prisma";
 import { hashToken } from "../utils";
 import { createUser } from "../users/database";
+
 /**
  * Create a user with name and email
  * @param opt: extra parameters
@@ -208,7 +209,7 @@ export const getDestinationCompanyInfo = async () => {
   };
 };
 
-const formdata = {
+const formdata: Partial<Prisma.FormCreateInput> = {
   brokerCompanyAddress: "",
   brokerCompanyContact: "",
   brokerCompanyMail: "",
@@ -265,18 +266,23 @@ const formdata = {
   traderDepartment: "",
   traderReceipt: "",
   traderValidityLimit: null,
-  transporterCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
-  transporterCompanyContact: "transporter",
-  transporterCompanyMail: "transporter@td.io",
-  transporterCompanyName: "WASTE TRANSPORTER",
-  transporterCompanyPhone: "06 18 76 02 66",
-  transporterCompanySiret: siretify(1),
-  transporterDepartment: "86",
-  transporterIsExemptedOfReceipt: false,
-  transporterTransportMode: TransportMode.ROAD,
-  transporterNumberPlate: "aa22",
-  transporterReceipt: "33AA",
-  transporterValidityLimit: "2019-11-27T00:00:00.000Z",
+  transporters: {
+    create: {
+      number: 1,
+      transporterCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
+      transporterCompanyContact: "transporter",
+      transporterCompanyMail: "transporter@td.io",
+      transporterCompanyName: "WASTE TRANSPORTER",
+      transporterCompanyPhone: "06 18 76 02 66",
+      transporterCompanySiret: siretify(1),
+      transporterDepartment: "86",
+      transporterIsExemptedOfReceipt: false,
+      transporterTransportMode: TransportMode.ROAD,
+      transporterNumberPlate: "aa22",
+      transporterReceipt: "33AA",
+      transporterValidityLimit: "2019-11-27T00:00:00.000Z"
+    }
+  },
   wasteAcceptationStatus: null,
   wasteDetailsCode: "05 01 04*",
   wasteDetailsConsistence: "SOLID" as Consistence,
@@ -313,25 +319,39 @@ export const forwardedInData: Partial<Prisma.FormCreateInput> = {
   wasteDetailsQuantity: 1,
   wasteDetailsConsistence: "SOLID" as Consistence,
   wasteDetailsQuantityType: "ESTIMATED",
-  transporterCompanyName: "Transporteur",
-  transporterCompanySiret: siretify(4),
-  transporterCompanyAddress: "6 chemin des pneus, 07100 Bourg d'ici",
-  transporterCompanyContact: "Mathieu O'connor",
-  transporterCompanyPhone: "0700000000",
-  transporterCompanyMail: "mathieu@transporteur.org",
-  transporterIsExemptedOfReceipt: false,
-  transporterReceipt: "xxxxxx",
-  transporterDepartment: "07",
-  transporterValidityLimit: "2019-11-27T00:00:00.000Z",
-  transporterNumberPlate: "AD-007-XX",
+  transporters: {
+    create: {
+      number: 1,
+      transporterCompanyName: "Transporteur",
+      transporterCompanySiret: siretify(4),
+      transporterCompanyAddress: "6 chemin des pneus, 07100 Bourg d'ici",
+      transporterCompanyContact: "Mathieu O'connor",
+      transporterCompanyPhone: "0700000000",
+      transporterCompanyMail: "mathieu@transporteur.org",
+      transporterIsExemptedOfReceipt: false,
+      transporterReceipt: "xxxxxx",
+      transporterDepartment: "07",
+      transporterValidityLimit: "2019-11-27T00:00:00.000Z",
+      transporterNumberPlate: "AD-007-XX"
+    }
+  },
+
   signedByTransporter: true,
   signedBy: "Mathieu O'connor"
 };
 
-export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
-  return prisma.transportSegment.create({
+export const transportSegmentFactory = async ({
+  formId,
+  segmentPayload
+}: {
+  formId: string;
+  segmentPayload: Omit<Prisma.BsddTransporterCreateWithoutFormInput, "number">;
+}) => {
+  const count = await prisma.bsddTransporter.count({ where: { formId } });
+  return prisma.bsddTransporter.create({
     data: {
       form: { connect: { id: formId } },
+      number: count + 1,
       ...segmentPayload
     }
   });
@@ -372,12 +392,21 @@ export const formFactory = async ({
   opt?: Partial<Prisma.FormCreateInput>;
 }) => {
   // Those sirets are required for the form to be updatable
-  await upsertBaseSiret(formdata.transporterCompanySiret);
+  await upsertBaseSiret(
+    (formdata.transporters!.create! as any).transporterCompanySiret as any
+  );
   await upsertBaseSiret(formdata.recipientCompanySiret);
 
-  const formParams = {
+  const formParams: Omit<Prisma.FormCreateInput, "readableId" | "owner"> = {
     ...formdata,
-    ...opt
+    ...opt,
+    transporters: {
+      create: {
+        ...formdata.transporters!.create,
+        ...opt.transporters?.create,
+        number: 1
+      }
+    }
   };
   return prisma.form.create({
     data: {
@@ -398,8 +427,25 @@ export const formWithTempStorageFactory = async ({
   opt?: Partial<Prisma.FormCreateInput>;
   forwardedInOpts?: Partial<Prisma.FormCreateInput>;
 }) => {
-  await upsertBaseSiret(forwardedInData.transporterCompanySiret);
+  await upsertBaseSiret(
+    (forwardedInData.transporters?.create as any).transporterCompanySiret
+  );
   await upsertBaseSiret(forwardedInData.recipientCompanySiret);
+
+  const forwardedCreateInput: Omit<
+    Prisma.FormCreateInput,
+    "readableId" | "owner"
+  > = {
+    ...forwardedInData,
+    ...forwardedInOpts,
+    transporters: {
+      create: {
+        ...forwardedInData.transporters!.create,
+        ...forwardedInOpts?.transporters?.create,
+        number: 1
+      }
+    }
+  };
 
   return formFactory({
     ownerId,
@@ -409,8 +455,7 @@ export const formWithTempStorageFactory = async ({
         create: {
           readableId: getReadableId(),
           owner: { connect: { id: ownerId } },
-          ...forwardedInData,
-          ...forwardedInOpts
+          ...forwardedCreateInput
         }
       },
       ...opt

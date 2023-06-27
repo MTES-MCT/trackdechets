@@ -8,7 +8,7 @@ import { getBsdaRepository } from "../../repository";
 import { checkCanUpdate } from "../../permissions";
 import { parseBsda } from "../../validation/validate";
 
-export default async function create(
+export default async function publish(
   _,
   { id }: MutationPublishBsdaArgs,
   context: GraphQLContext

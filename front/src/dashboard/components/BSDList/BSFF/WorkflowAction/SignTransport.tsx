@@ -11,21 +11,21 @@ import {
   TransportMode,
 } from "generated/graphql/types";
 import { RedErrorMessage } from "common/components";
-import { NotificationError } from "common/components/Error";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS } from "Apps/common/queries";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
+import { subMonths } from "date-fns";
 
-const getValidationSchema = (today: Date) =>
-  yup.object({
-    takenOverAt: yup.date().required("La date de prise en charge est requise"),
-    signatureAuthor: yup
-      .string()
-      .ensure()
-      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-  });
+const validationSchema = yup.object({
+  takenOverAt: yup.date().required("La date de prise en charge est requise"),
+  signatureAuthor: yup
+    .string()
+    .ensure()
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+});
 
 interface SignTransportFormProps {
   bsff: Bsff;
@@ -44,7 +44,6 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
   >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   const TODAY = new Date();
-  const validationSchema = getValidationSchema(TODAY);
 
   return (
     <Formik
@@ -89,14 +88,16 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
           </p>
           <TransporterReceipt transporter={bsff.transporter!} />
           <div className="form__row">
-            <label className="tw-font-semibold">
+            <label>
               Date de prise en charge
               <div className="td-date-wrapper">
                 <Field
                   name="takenOverAt"
                   component={DateInput}
                   className="td-input"
+                  minDate={subMonths(TODAY, 2)}
                   maxDate={TODAY}
+                  required
                 />
               </div>
             </label>

@@ -38,10 +38,10 @@ import {
   chain,
   undefinedOrDefault
 } from "../common/converter";
-import { BsdElastic } from "../common/elastic";
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { RawBsdasri } from "./elastic";
 
 export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
   return {
@@ -194,17 +194,16 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
   };
 }
 
-export function expandBsdasriFromElastic(
-  bsdasri: BsdElastic["rawBsd"]
-): GqlBsdasri {
+export function expandBsdasriFromElastic(bsdasri: RawBsdasri): GqlBsdasri {
   const expanded = expandBsdasriFromDB(bsdasri);
 
+  // pass down related field to sub-resolvers
   return {
     ...expanded,
-    grouping: bsdasri.grouping,
-    synthesizing: bsdasri.synthesizing,
-    groupedIn: bsdasri.groupedIn,
-    synthesizedIn: bsdasri.synthesizedInId
+    grouping: [],
+    synthesizing: [],
+    groupedIn: undefined,
+    synthesizedIn: undefined
   };
 }
 

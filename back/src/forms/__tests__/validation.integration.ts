@@ -1,4 +1,4 @@
-import { EmitterType, Form } from "@prisma/client";
+import { BsddTransporter, EmitterType, Form } from "@prisma/client";
 import {
   draftFormSchema,
   sealedFormSchema,
@@ -15,7 +15,7 @@ import { resetDatabase } from "../../../integration-tests/helper";
 const siret1 = siretify(1);
 const siret2 = siretify(2);
 const siret3 = siretify(3);
-const formData: Partial<Form> = {
+const formData: Partial<Form & BsddTransporter> = {
   id: "cjplbvecc000d0766j32r19am",
   readableId: "BSD-20210101-AAAAAAAA",
   status: "DRAFT",
@@ -62,7 +62,7 @@ const formData: Partial<Form> = {
 };
 
 describe("sealedFormSchema", () => {
-  let sealedForm: Partial<Form>;
+  let sealedForm: Partial<Form & BsddTransporter>;
 
   afterAll(resetDatabase);
   beforeAll(async () => {
@@ -225,7 +225,7 @@ describe("sealedFormSchema", () => {
         orgId: "ESA15022510",
         vatNumber: "ESA15022510"
       });
-      const partialForm: Partial<Form> = {
+      const partialForm: Partial<Form & BsddTransporter> = {
         ...sealedForm,
         transporterCompanySiret: null,
         transporterCompanyVatNumber: transporter.vatNumber
@@ -310,7 +310,7 @@ describe("sealedFormSchema", () => {
     });
 
     it("when transporterCompanySiret is not well formatted", async () => {
-      const partialForm: Partial<Form> = {
+      const partialForm: Partial<Form & BsddTransporter> = {
         ...sealedForm,
         transporterCompanySiret: "123"
       };
@@ -321,7 +321,7 @@ describe("sealedFormSchema", () => {
     });
 
     it("when transporter is not registered in Trackdéchets", async () => {
-      const partialForm: Partial<Form> = {
+      const partialForm: Partial<Form & BsddTransporter> = {
         ...sealedForm,
         transporterCompanySiret: "85001946400021"
       };
@@ -332,7 +332,7 @@ describe("sealedFormSchema", () => {
     });
 
     it("when foreign transporter is not registered in Trackdéchets", async () => {
-      const partialForm: Partial<Form> = {
+      const partialForm: Partial<Form & BsddTransporter> = {
         ...sealedForm,
         transporterCompanyVatNumber: "IT13029381004"
       };
@@ -344,7 +344,7 @@ describe("sealedFormSchema", () => {
 
     it("when transporter is registered in Trackdéchets with wrong profile", async () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
-      const partialForm: Partial<Form> = {
+      const partialForm: Partial<Form & BsddTransporter> = {
         ...sealedForm,
         transporterCompanySiret: company.siret
       };
@@ -363,7 +363,7 @@ describe("sealedFormSchema", () => {
         orgId: "IT13029381004",
         vatNumber: "IT13029381004"
       });
-      const partialForm: Partial<Form> = {
+      const partialForm: Partial<Form & BsddTransporter> = {
         ...sealedForm,
         transporterCompanyVatNumber: company.vatNumber
       };
@@ -558,7 +558,7 @@ describe("sealedFormSchema", () => {
     });
 
     it("when the transporterCompanyVatNumber is invalid", async () => {
-      const partialForm: Partial<Form> = {
+      const partialForm: Partial<Form & BsddTransporter> = {
         ...sealedForm,
         transporterCompanySiret: null,
         transporterCompanyVatNumber: "invalid"
@@ -571,7 +571,7 @@ describe("sealedFormSchema", () => {
     });
 
     it("when the transporterCompanyVatNumber is FR", async () => {
-      const partialForm: Partial<Form> = {
+      const partialForm: Partial<Form & BsddTransporter> = {
         ...sealedForm,
         transporterCompanySiret: null,
         transporterCompanyVatNumber: "FR35552049447"
@@ -586,7 +586,7 @@ describe("sealedFormSchema", () => {
 });
 
 describe("beforeTransportSchema", () => {
-  let beforeTransportForm: Partial<Form>;
+  let beforeTransportForm: Partial<Form & BsddTransporter>;
 
   afterAll(resetDatabase);
   beforeAll(async () => {
@@ -622,7 +622,7 @@ describe("beforeTransportSchema", () => {
   });
 
   it("should not be valid when there is nor transporterCompanySiret nor transporterCompanyVatNumber", async () => {
-    const testForm: Partial<Form> = {
+    const testForm: Partial<Form & BsddTransporter> = {
       ...beforeTransportForm,
       transporterCompanySiret: null,
       transporterCompanyVatNumber: null
@@ -639,7 +639,7 @@ describe("beforeTransportSchema", () => {
       vatNumber: "BE0541696005"
     });
 
-    const testForm: Partial<Form> = {
+    const testForm: Partial<Form & BsddTransporter> = {
       ...beforeTransportForm,
       transporterCompanySiret: null,
       transporterCompanyVatNumber: transporterCompany.vatNumber
@@ -652,7 +652,7 @@ describe("beforeTransportSchema", () => {
       companyTypes: ["TRANSPORTER"]
     });
 
-    const testForm: Partial<Form> = {
+    const testForm: Partial<Form & BsddTransporter> = {
       ...beforeTransportForm,
       transporterCompanySiret: transporterCompany.siret,
       transporterCompanyVatNumber: null
@@ -661,7 +661,7 @@ describe("beforeTransportSchema", () => {
   });
 
   it("transporter SIRET is required with a french vatNumber", async () => {
-    const testForm: Partial<Form> = {
+    const testForm: Partial<Form & BsddTransporter> = {
       ...beforeTransportForm,
       transporterCompanySiret: null,
       transporterCompanyVatNumber: "FR87850019464"
@@ -674,7 +674,7 @@ describe("beforeTransportSchema", () => {
   });
 
   it("transporter vatNumber should be valid", async () => {
-    const testForm: Partial<Form> = {
+    const testForm: Partial<Form & BsddTransporter> = {
       ...beforeTransportForm,
       transporterCompanySiret: null,
       transporterCompanyVatNumber: "invalid"
@@ -688,7 +688,7 @@ describe("beforeTransportSchema", () => {
   });
 
   it("transporter SIRET or VAT number is required", async () => {
-    const testForm: Partial<Form> = {
+    const testForm: Partial<Form & BsddTransporter> = {
       ...beforeTransportForm,
       transporterCompanySiret: null,
       transporterCompanyVatNumber: null
@@ -801,7 +801,7 @@ describe("receivedInfosSchema", () => {
 });
 
 describe("draftFormSchema", () => {
-  const form: Partial<Form> = {
+  const form: Partial<Form & BsddTransporter> = {
     emitterCompanySiret: "",
     recipientCompanySiret: "",
     transporterCompanySiret: "",

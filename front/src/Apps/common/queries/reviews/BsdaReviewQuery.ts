@@ -1,12 +1,20 @@
 import { gql } from "@apollo/client";
-import { companyFragment } from "common/fragments";
+import { companyFragment } from "Apps/common/queries/fragments";
 
 const reviewFragment = gql`
   fragment BsdaRevisionRequestFragment on BsdaRevisionRequest {
     id
     bsda {
       id
+      status
+      updatedAt
+      type
       emitter {
+        company {
+          name
+          siret
+          orgId
+        }
         pickupSite {
           name
           address
@@ -20,6 +28,16 @@ const reviewFragment = gql`
         materialName
         pop
         sealNumbers
+      }
+      weight {
+        value
+      }
+      transporter {
+        company {
+          name
+          siret
+          orgId
+        }
       }
       packagings {
         other
@@ -38,6 +56,11 @@ const reviewFragment = gql`
       }
       destination {
         cap
+        company {
+          name
+          siret
+          orgId
+        }
         reception {
           weight
         }

@@ -5,7 +5,8 @@ import {
   RevisionRequestApprovalStatus,
   BsddRevisionRequestApproval,
   RevisionRequestStatus,
-  Status
+  Status,
+  EmitterType
 } from "@prisma/client";
 import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../../common/constants";
 import { removeEmpty } from "../../../common/converter";
@@ -118,7 +119,7 @@ const buildAcceptRevisionRequestApproval: (
       }
     });
 
-    // when eco organisme is present onf bsdd
+    // when eco organisme is present on bsdd
     await handleEcoOrganismeApprovals(prisma, updatedApproval);
 
     // If it was the last approval:
@@ -282,8 +283,31 @@ export async function approveAndApplyRevisionRequest(
         forwardedIn: { update: { ...forwardedInUpdate } }
       })
     },
-    select: { readableId: true }
+    select: { readableId: true, emitterType: true, grouping: true }
   });
+
+  if (updatedBsdd.emitterType === EmitterType.APPENDIX1) {
+    const { wasteDetailsCode, wasteDetailsName, wasteDetailsPop } =
+      revisionRequest;
+    const appendix1ProducerUpdate = {
+      ...(wasteDetailsCode && { wasteDetailsCode }),
+      ...(wasteDetailsName && { wasteDetailsName }),
+      ...(wasteDetailsPop && { wasteDetailsPop })
+    };
+    const appendix1ProducerIds = updatedBsdd.grouping.map(g => g.initialFormId);
+
+    if (Object.keys(appendix1ProducerUpdate).length > 0) {
+      await prisma.form.updateMany({
+        where: { id: { in: appendix1ProducerIds } },
+        data: appendix1ProducerUpdate
+      });
+      prisma.addAfterCommitCallback?.(() => {
+        for (const id in appendix1ProducerIds) {
+          enqueueUpdatedBsdToIndex(id);
+        }
+      });
+    }
+  }
 
   if (revisionRequest.isCanceled) {
     // Disconnect appendix2 forms if any

@@ -9,7 +9,7 @@ import {
   BsdasriPackaging,
   BsdasriType,
 } from "generated/graphql/types";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDownloadPdf";
 
 import {

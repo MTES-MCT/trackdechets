@@ -10,7 +10,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
-import { Status } from "@prisma/client";
+import { EmitterType, Status } from "@prisma/client";
 import {
   CANCELLABLE_BSDD_STATUSES,
   NON_CANCELLABLE_BSDD_STATUSES
@@ -340,13 +340,18 @@ describe("Mutation.createFormRevisionRequest", () => {
             recipientCompanySiret: company.siret,
             recipientCap: "",
             recipientProcessingOperation: "R 6",
-            transporterCompanyName: "Transporter",
-            transporterCompanySiret: siretify(4),
-            transporterIsExemptedOfReceipt: false,
-            transporterReceipt: "Dabcd",
-            transporterDepartment: "10",
-            transporterValidityLimit: "2054-11-20T00:00:00.000Z",
-            transporterNumberPlate: ""
+            transporters: {
+              create: {
+                transporterCompanyName: "Transporter",
+                transporterCompanySiret: siretify(4),
+                transporterIsExemptedOfReceipt: false,
+                transporterReceipt: "Dabcd",
+                transporterDepartment: "10",
+                transporterValidityLimit: "2054-11-20T00:00:00.000Z",
+                transporterNumberPlate: "",
+                number: 1
+              }
+            }
           }
         }
       }
@@ -626,4 +631,38 @@ describe("Mutation.createFormRevisionRequest", () => {
       expect(errors.length).toBeGreaterThan(0);
     }
   );
+
+  it("should fail if trying to use a forbidden waste code on EmitterType.APPENDIX1 bsdd", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterType: EmitterType.APPENDIX1,
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { wasteDetails: { code: "06 01 01*" } },
+          comment: "I want to use a forbidden waste code",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "Impossible d'utiliser ce code déchet sur un bordereau de tournée d'annexe 1."
+    );
+  });
 });

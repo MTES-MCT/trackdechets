@@ -1,5 +1,5 @@
 import SideMenu from "common/components/SideMenu";
-import routes from "common/routes";
+import routes from "Apps/routes";
 import React from "react";
 import { NavLink, Switch, Route, Redirect } from "react-router-dom";
 import { CreateAnonymousCompany } from "./anonymousCompany";
