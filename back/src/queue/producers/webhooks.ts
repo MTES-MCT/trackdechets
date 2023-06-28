@@ -48,7 +48,7 @@ export const enqueueDeletedFormWebhook = async (id: string) => {
     }
   });
   if (!fullForm) return;
-  const siretsByTab = getSiretsByTab(fullForm);
+  const siretsByTab = await getSiretsByTab(fullForm);
 
   return scheduleWebhook(
     fullForm.readableId,

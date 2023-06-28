@@ -4,6 +4,8 @@ import { FullForm } from "./types";
 
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { getFirstTransporterSync } from "./database";
+import prisma from "../prisma";
+import { isTransporter } from "../companies/validation";
 
 /**
  * Computes which SIRET or VAT number should appear on which tab in the frontend
@@ -34,7 +36,9 @@ type WhereKeys =
   | "isToCollectFor"
   | "isCollectedFor";
 
-export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
+export async function getSiretsByTab(
+  form: FullForm
+): Promise<Pick<BsdElastic, WhereKeys>> {
   // we build a mapping where each key has to be unique.
   // Same siret can be used by different actors on the same form, so we can't use them as keys.
   // Instead we rely on field names and segments ids
@@ -64,6 +68,13 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
   );
 
   const transporter = getFirstTransporterSync(form);
+
+  let transporterCompany;
+  if (transporter?.transporterCompanySiret) {
+    transporterCompany = await prisma.company.findUnique({
+      where: { siret: transporter?.transporterCompanySiret }
+    });
+  }
 
   const formSirets =
     form.emitterType === EmitterType.APPENDIX1_PRODUCER
@@ -135,18 +146,20 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
       break;
     }
     case Status.SIGNED_BY_PRODUCER: {
-      // // Emitter is also transporter (not regroupement nor annexe 1)
-      // if (
-      //   form.emitterType !== "APPENDIX1" && // Annexe 1
-      //   form.emitterType !== "APPENDIX2" && // Regroupement
-      //   form.transporterCompanySiret &&
-      //   form.emitterCompanySiret &&
-      //   form.emitterCompanySiret === form.transporterCompanySiret
-      // ) {
-      //   setFieldTab("transporterCompanySiret", "isForActionFor");
-      // } else {
-      // }
-      setFieldTab("transporterCompanySiret", "isToCollectFor");
+      // Transporter does not have the "transporter" role. Show BSD in "Pour action"
+      if (transporterCompany && !isTransporter(transporterCompany)) {
+        setFieldTab("transporterCompanySiret", "isForActionFor");
+
+        // Transporter is also emitter. Don't show BSD in "Suivi" yet
+        if (
+          form.emitterCompanySiret &&
+          form.emitterCompanySiret === transporterCompany.siret
+        ) {
+          setFieldTab("emitterCompanySiret", "isForActionFor");
+        }
+      } else {
+        setFieldTab("transporterCompanySiret", "isToCollectFor");
+      }
 
       break;
     }

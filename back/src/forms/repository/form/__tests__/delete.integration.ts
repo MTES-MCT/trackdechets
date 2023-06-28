@@ -90,8 +90,10 @@ describe("formRepository.delete", () => {
     const form = await formWithTempStorageFactory({ ownerId: user.id });
     const fullForm = await getFullForm(form);
 
-    await indexBsd(toBsdElastic(fullForm));
-    await indexBsd(toBsdElastic(await getFullForm(fullForm.forwardedIn!)));
+    await indexBsd(await toBsdElastic(fullForm));
+    await indexBsd(
+      await toBsdElastic(await getFullForm(fullForm.forwardedIn!))
+    );
 
     await refreshElasticSearch();
 

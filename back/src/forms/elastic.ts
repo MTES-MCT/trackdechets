@@ -13,8 +13,8 @@ export type RawForm = FullForm & { forwarding?: Form };
 /**
  * Convert a BSD from the forms table to Elastic Search's BSD model.
  */
-export function toBsdElastic(form: RawForm): BsdElastic {
-  const siretsByTab = getSiretsByTab(form);
+export async function toBsdElastic(form: RawForm): Promise<BsdElastic> {
+  const siretsByTab = await getSiretsByTab(form);
 
   const recipient = getRecipient(form);
 
@@ -120,7 +120,7 @@ export async function indexForm(
   if (form.forwardedIn) {
     // index next BSD asynchronously
     indexBsd(
-      toBsdElastic({
+      await toBsdElastic({
         ...form.forwardedIn,
         intermediaries: [],
         forwardedIn: null,
@@ -128,7 +128,7 @@ export async function indexForm(
       })
     );
   }
-  const bsdElastic = toBsdElastic(form);
+  const bsdElastic = await toBsdElastic(form);
   await indexBsd(bsdElastic, ctx);
   return bsdElastic;
 }
