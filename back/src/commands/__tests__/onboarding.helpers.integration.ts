@@ -31,7 +31,6 @@ import {
   Mutation,
   MutationDeleteCompanyArgs
 } from "../../generated/graphql/types";
-import { DELETE_COMPANY } from "../../companies/resolvers/mutations/__tests__/deleteCompany.integration";
 import makeClient from "../../__tests__/testClient";
 
 const TODAY = new Date();
@@ -39,6 +38,14 @@ const ONE_DAY_AGO = xDaysAgo(TODAY, 1);
 const TWO_DAYS_AGO = xDaysAgo(TODAY, 2);
 const THREE_DAYS_AGO = xDaysAgo(TODAY, 3);
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
+
+export const DELETE_COMPANY = `
+  mutation DeleteCompany($id: ID!) {
+    deleteCompany(id: $id) {
+      id
+    }
+  }
+`;
 
 describe("getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest", () => {
   afterEach(resetDatabase);
