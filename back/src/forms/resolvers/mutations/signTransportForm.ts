@@ -24,6 +24,30 @@ import { sumPackagingInfos } from "../../repository/helper";
 import { validateBeforeTransport } from "../../validation";
 import { Permission } from "../../../permissions";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
+import { recipifyFormInput } from "../../recipify";
+
+export async function getFormReceiptField(transporter) {
+  const recipifiedTransporter = await recipifyFormInput({
+    transporter: {
+      isExemptedOfReceipt: transporter?.transporterIsExemptedOfReceipt,
+      receipt: transporter?.transporterReceipt,
+      validityLimit: transporter?.transporterValidityLimit,
+      department: transporter?.transporterDepartment,
+      company: {
+        siret: transporter?.transporterCompanySiret,
+        vatNumber: transporter?.transporterCompanyVatNumber
+      }
+    }
+  });
+  const receiptFields = {
+    transporterReceipt: recipifiedTransporter.transporter?.receipt,
+    transporterDepartment: recipifiedTransporter.transporter?.department,
+    transporterValidityLimit: recipifiedTransporter.transporter?.validityLimit,
+    transporterIsExemptedOfReceipt:
+      recipifiedTransporter.transporter?.isExemptedOfReceipt
+  };
+  return receiptFields;
+}
 
 /**
  * Common function for signing
@@ -39,7 +63,7 @@ const signTransportFn = async (
     );
   }
   const transporter = await getFirstTransporter(existingForm);
-
+  const receiptFields = await getFormReceiptField(transporter);
   await checkCanSignFor(
     getTransporterCompanyOrgId(transporter)!,
     user,
@@ -54,7 +78,8 @@ const signTransportFn = async (
       ? {
           transporterNumberPlate: args.input.transporterNumberPlate
         }
-      : {})
+      : {}),
+    ...receiptFields
   });
 
   const transporterUpdate: Prisma.BsddTransporterUpdateWithoutFormInput = {
@@ -64,7 +89,8 @@ const signTransportFn = async (
       ? {
           transporterNumberPlate: args.input.transporterNumberPlate
         }
-      : {})
+      : {}),
+    ...receiptFields
   };
 
   const formUpdateInput: Prisma.FormUpdateInput = {

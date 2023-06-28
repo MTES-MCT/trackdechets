@@ -69,9 +69,6 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
         vatNumber: "",
       },
       isExemptedOfReceipt: false,
-      receipt: null,
-      department: null,
-      validityLimit: null,
       numberPlate: null,
     },
 

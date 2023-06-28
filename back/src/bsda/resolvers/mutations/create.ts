@@ -34,7 +34,6 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const user = checkIsAuthenticated(context);
 
   await checkCanCreate(user, input);
-
   const companies = await getUserCompanies(user.id);
   const destinationCompany = companies.find(
     company => company.siret === input.destination?.company?.siret
@@ -52,7 +51,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const bsda = await parseBsda(
     { ...unparsedBsda, isDraft },
     {
-      enableSirenification: true,
+      enableCompletionTransformers: true,
       enablePreviousBsdasChecks: !canBypassSirenify(user),
       currentSignatureType: !isDraft ? "EMISSION" : undefined
     }

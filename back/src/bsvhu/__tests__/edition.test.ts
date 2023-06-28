@@ -35,11 +35,10 @@ describe("edition", () => {
       omiNumber: ""
     };
 
-    const recepisse: Required<BsvhuRecepisseInput> = {
-      isExempted: true,
-      number: "",
-      department: "",
-      validityLimit: new Date()
+    const recepisse: Required<
+      Omit<BsvhuRecepisseInput, "number" | "department" | "validityLimit">
+    > = {
+      isExempted: true
     };
 
     const emitter: Required<BsvhuEmitterInput> = {

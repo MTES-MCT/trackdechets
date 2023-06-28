@@ -6,7 +6,10 @@ import {
   MutationSignBsdaArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  transporterReceiptFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../__tests__/factories";
 
@@ -377,7 +380,7 @@ describe("Mutation.Bsda.sign", () => {
   });
 
   describe("TRANSPORT", () => {
-    it("should allow transporter to sign transport", async () => {
+    it("should allow transporter to sign transport when exempted of receipt", async () => {
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
 
       const bsda = await bsdaFactory({
@@ -388,6 +391,7 @@ describe("Mutation.Bsda.sign", () => {
           workerWorkSignatureAuthor: "worker",
           workerWorkSignatureDate: new Date(),
           transporterCompanySiret: transporter.company.siret,
+          transporterRecepisseIsExempted: true,
           transporterTransportMode: "ROAD",
           transporterTransportPlates: ["AA-00-XX"]
         }
@@ -408,6 +412,44 @@ describe("Mutation.Bsda.sign", () => {
       });
 
       expect(data.signBsda.id).toBeTruthy();
+    });
+
+    it("should disallow transporter to sign transport when receipt if missing", async () => {
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_WORKER",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "worker",
+          workerWorkSignatureDate: new Date(),
+          transporterCompanySiret: transporter.company.siret,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: ["AA-00-XX"]
+        }
+      });
+
+      const { mutate } = makeClient(transporter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "TRANSPORT",
+            author: transporter.user.name
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: expect.stringContaining(
+            "Transporteur: le numéro de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+          )
+        })
+      ]);
     });
 
     it("should disallow transporter to sign transport when required data is missing", async () => {
@@ -453,7 +495,9 @@ describe("Mutation.Bsda.sign", () => {
     it("should disallow transporter to sign transport when bsda is not SIGNED_BY_WORKER", async () => {
       const emitter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
       const bsda = await bsdaFactory({
         opt: {
           emitterCompanySiret: emitter.company.siret,
@@ -462,7 +506,10 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "worker",
           workerWorkSignatureDate: new Date(),
-          transporterCompanySiret: transporter.company.siret
+          transporterCompanySiret: transporter.company.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
         }
       });
 
@@ -490,7 +537,9 @@ describe("Mutation.Bsda.sign", () => {
 
     it("should allow transporter to sign bsda signed by emitter only if worker is disabled", async () => {
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
       const bsda = await bsdaFactory({
         opt: {
           status: "SIGNED_BY_PRODUCER",
@@ -500,6 +549,9 @@ describe("Mutation.Bsda.sign", () => {
           workerCompanySiret: null,
           workerCompanyName: null,
           transporterCompanySiret: transporter.company.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           transporterTransportMode: "ROAD",
           transporterTransportPlates: ["AA-00-XX"]
         }
@@ -524,7 +576,9 @@ describe("Mutation.Bsda.sign", () => {
 
     it("should allow transporter to sign an initial bsda if the emitter is a private individual and the worker is disabled", async () => {
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
       const bsda = await bsdaFactory({
         opt: {
           status: "INITIAL",
@@ -534,6 +588,9 @@ describe("Mutation.Bsda.sign", () => {
           workerCompanySiret: null,
           workerCompanyName: null,
           transporterCompanySiret: transporter.company.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           transporterTransportMode: "ROAD",
           transporterTransportPlates: ["AA-00-XX"]
         }
@@ -560,7 +617,10 @@ describe("Mutation.Bsda.sign", () => {
   describe("OPERATION", () => {
     it("should allow destination to sign operation", async () => {
       const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
       const bsda = await bsdaFactory({
         opt: {
           status: "SENT",
@@ -568,8 +628,12 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "Worker",
           workerWorkSignatureDate: new Date(),
+          transporterCompanySiret: transporter.company.siret,
           transporterTransportSignatureAuthor: "Transporter",
           transporterTransportSignatureDate: new Date(),
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: company.siret
         }
       });
@@ -593,7 +657,10 @@ describe("Mutation.Bsda.sign", () => {
 
     it("should mark as AWAITING_CHILD if operation code implies it", async () => {
       const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
       const bsda = await bsdaFactory({
         opt: {
           status: "SENT",
@@ -601,8 +668,12 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "Worker",
           workerWorkSignatureDate: new Date(),
+          transporterCompanySiret: transporter.company.siret,
           transporterTransportSignatureAuthor: "Transporter",
           transporterTransportSignatureDate: new Date(),
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: company.siret,
           destinationOperationCode: "D 15"
         }
@@ -703,6 +774,9 @@ describe("Mutation.Bsda.sign", () => {
       const { company: transporter } = await userWithCompanyFactory(
         UserRole.ADMIN
       );
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter
+      });
       const { user, company: destination } = await userWithCompanyFactory(
         UserRole.ADMIN
       );
@@ -713,6 +787,9 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           emitterCompanySiret: emitter.siret,
           transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr1.siret,
           status: BsdaStatus.AWAITING_CHILD,
           destinationOperationCode: "D 9"
@@ -724,6 +801,9 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           emitterCompanySiret: emitter.siret,
           transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr2.siret,
           destinationOperationCode: "D 9",
           status: BsdaStatus.AWAITING_CHILD,
@@ -736,6 +816,9 @@ describe("Mutation.Bsda.sign", () => {
           status: BsdaStatus.SENT,
           emitterCompanySiret: ttr2.siret,
           transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: destination.siret,
           destinationOperationCode: "D 9",
           forwarding: { connect: { id: bsda2.id } }
@@ -843,6 +926,9 @@ describe("Mutation.Bsda.sign", () => {
       const { company: transporter } = await userWithCompanyFactory(
         UserRole.ADMIN
       );
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter
+      });
       const { user, company: destination } = await userWithCompanyFactory(
         UserRole.ADMIN
       );
@@ -852,6 +938,9 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           emitterCompanySiret: ttr1.siret,
           transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: destination.siret,
           status: BsdaStatus.SENT,
           destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
@@ -865,6 +954,9 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           emitterCompanySiret: emitter.siret,
           transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr1.siret,
           destinationOperationCode: "R 13",
           status: BsdaStatus.AWAITING_CHILD,
@@ -876,6 +968,9 @@ describe("Mutation.Bsda.sign", () => {
           status: BsdaStatus.AWAITING_CHILD,
           emitterCompanySiret: emitter.siret,
           transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr1.siret,
           destinationOperationCode: "R 13",
           groupedIn: { connect: { id: bsda.id } }
@@ -917,6 +1012,9 @@ describe("Mutation.Bsda.sign", () => {
       const { company: transporter } = await userWithCompanyFactory(
         UserRole.ADMIN
       );
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter
+      });
       const { user, company: destination } = await userWithCompanyFactory(
         UserRole.ADMIN
       );
@@ -926,6 +1024,9 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           emitterCompanySiret: emitter.siret,
           transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr1.siret,
           status: BsdaStatus.AWAITING_CHILD,
           destinationOperationCode: "R 13"
@@ -936,6 +1037,9 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           emitterCompanySiret: emitter.siret,
           transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: destination.siret,
           destinationReceptionWeight: 0,
           destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,

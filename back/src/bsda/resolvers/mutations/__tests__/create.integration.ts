@@ -4,7 +4,9 @@ import { BsdaInput, Mutation } from "../../../../generated/graphql/types";
 import {
   siretify,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  companyFactory,
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdaStatus } from "@prisma/client";
@@ -28,6 +30,11 @@ mutation CreateBsda($input: BsdaInput!) {
     transporter {
       transport {
         plates
+      }
+      recepisse {
+        number
+        department
+        validityLimit
       }
     }
     intermediaries {
@@ -365,6 +372,92 @@ describe("Mutation.Bsda.create", () => {
     });
 
     expect(data.createBsda.transporter!.transport!.plates!.length).toBe(2);
+  });
+
+  it("should create a bsda and autocomplete transporter receipt", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const transporterCompany = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({ company: transporterCompany });
+
+    const input: BsdaInput = {
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: siretify(2),
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "06 07 01*",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      transporter: {
+        company: {
+          siret: transporterCompany.siret,
+          name: "The Transporter",
+          address: "Rue du bsda",
+          contact: "Un transporter",
+          phone: "0101010101",
+          mail: "transporter@mail.com"
+        },
+        transport: { plates: ["SD-99-TY"] }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(data.createBsda.transporter!.recepisse!.number).toEqual(
+      "the number"
+    );
+    expect(data.createBsda.transporter!.recepisse!.department).toEqual("83");
+    expect(data.createBsda.transporter!.recepisse!.validityLimit).toEqual(
+      "2055-01-01T00:00:00.000Z"
+    );
   });
 
   it("should fail creating the form if more than 2 plates are submitted", async () => {

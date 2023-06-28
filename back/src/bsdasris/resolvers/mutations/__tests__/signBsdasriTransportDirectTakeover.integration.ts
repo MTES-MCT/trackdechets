@@ -2,6 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
+  transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -27,6 +28,7 @@ describe("Mutation.signBsdasri transport", () => {
 
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
+    await transporterReceiptFactory({ company: transporterCompany });
     const destinationCompany = await companyFactory();
 
     const dasri = await bsdasriFactory({
@@ -97,6 +99,7 @@ describe("Mutation.signBsdasri transport", () => {
 
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
+    await transporterReceiptFactory({ company: transporterCompany });
     const destination = await companyFactory();
 
     // missing onu code

@@ -27,6 +27,7 @@ import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
 import { sirenifyFormInput } from "../../sirenify";
+import { recipifyFormInput } from "../../recipify";
 import { validateIntermediariesInput } from "../../../common/validation";
 
 function validateArgs(args: MutationUpdateFormArgs) {
@@ -48,13 +49,15 @@ const updateFormResolver = async (
 
   const id = updateFormInput.id;
 
+  const sirenifiedFormInput = await sirenifyFormInput(updateFormInput, user);
+
   const {
     appendix2Forms,
     grouping,
     temporaryStorageDetail,
     intermediaries,
     ...formContent
-  } = await sirenifyFormInput(updateFormInput, user);
+  } = await recipifyFormInput(sirenifiedFormInput);
 
   if (appendix2Forms && grouping) {
     throw new UserInputError(

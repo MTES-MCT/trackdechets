@@ -3,7 +3,6 @@ import { RefinementCtx, z } from "zod";
 import { BsdaSignatureType } from "../../generated/graphql/types";
 import { SIGNATURES_HIERARCHY } from "./edition";
 import { getReadonlyBsdaRepository } from "../repository";
-import { sirenify } from "./sirenify";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { editionRules } from "./rules";
 import { ZodBsda, rawBsdaSchema } from "./schema";
@@ -12,13 +11,13 @@ import { runTransformers } from "./transformers";
 
 type BsdaValidationContext = {
   enablePreviousBsdasChecks?: boolean;
-  enableSirenification?: boolean;
+  enableCompletionTransformers?: boolean;
   currentSignatureType?: BsdaSignatureType;
 };
 
 export async function parseBsda(
   bsda: unknown,
-  validationContext: BsdaValidationContext = {}
+  validationContext: BsdaValidationContext
 ): Promise<ZodBsda> {
   const contextualSchema = getContextualBsdaSchema(validationContext);
 
@@ -47,11 +46,9 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
             .filter(Boolean)
         : undefined;
 
-      if (validationContext.enableSirenification) {
-        val = await sirenify(val, sealedFields);
+      if (validationContext.enableCompletionTransformers) {
+        val = await runTransformers(val, sealedFields);
       }
-
-      val = await runTransformers(val);
 
       return val;
     })
@@ -73,7 +70,7 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
             : `Le champ ${field}`;
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `${description} est obligatoire.`
+            message: `${description} est obligatoire.${rule.suffix ?? ""}`
           });
         }
       }

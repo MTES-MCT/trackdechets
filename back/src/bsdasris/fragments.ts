@@ -80,6 +80,7 @@ export const fullBsdasriFragment = gql`
         number
         department
         validityLimit
+        isExempted
       }
       transport {
         handedOverAt

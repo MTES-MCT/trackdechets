@@ -11,7 +11,7 @@ export const Metadata: BsdaMetadataResolvers = {
   errors: async (
     metadata: BsdaMetadata & { id: string; status: BsdaStatus }
   ) => {
-    const prismaForm = await getBsdaOrNotFound(metadata.id);
+    const prismaBsda = await getBsdaOrNotFound(metadata.id);
 
     const validationMatrix = [
       {
@@ -46,7 +46,9 @@ export const Metadata: BsdaMetadataResolvers = {
     );
     for (const { currentSignatureType } of filteredValidationMatrix) {
       try {
-        await parseBsda(prismaForm, { currentSignatureType });
+        await parseBsda(prismaBsda, {
+          currentSignatureType
+        });
         return [];
       } catch (errors) {
         return errors.inner?.map(e => {

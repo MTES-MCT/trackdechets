@@ -83,6 +83,7 @@ export const readyToTakeOverData = company => ({
   transporterCompanyPhone: "987654534",
   transporterCompanyContact: "Contact",
   transporterCompanyMail: "transporter@test.fr",
+  // ignored and deprecated fields
   transporterRecepisseNumber: "xyz",
   transporterRecepisseDepartment: "83",
   transporterRecepisseValidityLimit: new Date(),

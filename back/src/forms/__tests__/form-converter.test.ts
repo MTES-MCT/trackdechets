@@ -102,8 +102,11 @@ describe("flattenFormInput", () => {
         }
       },
       transporter: {
+        // ignored field
         receipt: "12379",
+        // ignored field
         department: "07",
+        // ignored field
         validityLimit: new Date("2020-06-30"),
         numberPlate: "AD-007-TS",
         company: null

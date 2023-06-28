@@ -3,6 +3,15 @@ export const MARK_AS_SEALED = `
     markAsSealed(id: $id) {
       id
       status
+      transporter {
+        company {
+          siret
+        }
+        isExemptedOfReceipt
+        receipt
+        validityLimit
+        department
+      }
     }
   }
 `;

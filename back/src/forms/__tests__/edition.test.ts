@@ -57,12 +57,11 @@ describe("edition", () => {
       isTempStorage: false
     };
 
-    const transporter: Required<TransporterInput> = {
+    const transporter: Required<
+      Omit<TransporterInput, "department" | "validityLimit" | "receipt">
+    > = {
       company,
       isExemptedOfReceipt: false,
-      receipt: "",
-      department: "",
-      validityLimit: new Date(),
       numberPlate: "",
       customInfo: "",
       mode: "ROAD"

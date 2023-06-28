@@ -11,6 +11,7 @@ import {
 import { ReceivedFormInput } from "../../generated/graphql/types";
 import { companyFactory, siretify } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
+import { REQUIRED_RECEIPT_NUMBER } from "../../common/validation";
 
 const siret1 = siretify(1);
 const siret2 = siretify(2);
@@ -646,9 +647,7 @@ describe("beforeTransportSchema", () => {
 
     const validateFn = () => beforeTransportSchema.validate(testForm);
 
-    await expect(validateFn()).rejects.toThrow(
-      "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-    );
+    await expect(validateFn()).rejects.toThrow(REQUIRED_RECEIPT_NUMBER);
   });
 
   it("should not be valid when there is nor transporterCompanySiret nor transporterCompanyVatNumber", async () => {

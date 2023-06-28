@@ -3,12 +3,15 @@ import {
   formFactory,
   userFactory,
   transportSegmentFactory,
-  siretify
+  siretify,
+  transporterReceiptFactory,
+  companyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
+import { CompanyType } from "@prisma/client";
 
 jest.mock("axios", () => ({
   default: {
@@ -132,6 +135,141 @@ describe("{ mutation { prepareSegment } }", () => {
     expect(segment.readyToTakeOver).toBe(false);
   });
 
+  it("should create a segment and autocomplete transporter receipt", async () => {
+    const { user: firstTransporter, company } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: { set: ["TRANSPORTER"] }
+      }
+    );
+
+    const transporterOrgId = company.orgId;
+    // create a form whose first transporter is another one
+    const form = await formFactory({
+      ownerId: firstTransporter.id,
+      opt: {
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterOrgId,
+            number: 1,
+            takenOverAt: new Date(),
+            takenOverBy: "John Snow"
+          }
+        },
+        status: "SENT",
+        currentTransporterOrgId: transporterOrgId
+      }
+    });
+
+    const secondTransporter = await companyFactory({
+      companyTypes: { set: [CompanyType.TRANSPORTER] }
+    });
+
+    await transporterReceiptFactory({
+      number: "multimodal receipt",
+      company: secondTransporter
+    });
+    const { mutate } = makeClient(firstTransporter);
+    const { data } = await mutate<Pick<Mutation, "prepareSegment">>(
+      `mutation  {
+        prepareSegment(id:"${form.id}",
+        siret:"${transporterOrgId}",
+        nextSegmentInfo: {
+          transporter: {
+            company: {
+              siret: "${secondTransporter.siret}"
+              name: "Nightwatch fight club"
+              address: "The north wall"
+              contact: "John Snow"
+            }
+          }
+          mode: ROAD
+      }) {
+        id
+      }
+      }`
+    );
+
+    const segment = await prisma.bsddTransporter.findUniqueOrThrow({
+      where: { id: data.prepareSegment.id }
+    });
+
+    expect(segment.transporterReceipt).toEqual("multimodal receipt");
+    expect(segment.transporterDepartment).toEqual("83");
+    expect(segment.transporterValidityLimit).toEqual(
+      new Date("2055-01-01T00:00:00.000Z")
+    );
+  });
+
+  it("should ignore transporter receipt input and return the transporters company receipt infos", async () => {
+    const { user: firstTransporter, company } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: { set: ["TRANSPORTER"] }
+      }
+    );
+
+    const transporterOrgId = company.orgId;
+    // create a form whose first transporter is another one
+    const form = await formFactory({
+      ownerId: firstTransporter.id,
+      opt: {
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterOrgId,
+            number: 1,
+            takenOverAt: new Date(),
+            takenOverBy: "John Snow"
+          }
+        },
+        status: "SENT",
+        currentTransporterOrgId: transporterOrgId
+      }
+    });
+
+    const transporter = await companyFactory({
+      companyTypes: { set: [CompanyType.TRANSPORTER] }
+    });
+
+    await transporterReceiptFactory({
+      number: "multimodal receipt",
+      company: transporter
+    });
+    const { mutate } = makeClient(firstTransporter);
+    const { data } = await mutate<Pick<Mutation, "prepareSegment">>(
+      `mutation  {
+        prepareSegment(id:"${form.id}",
+        siret:"${transporterOrgId}",
+        nextSegmentInfo: {
+          transporter: {
+            company: {
+              siret: "${transporter.siret}"
+              name: "Nightwatch fight club"
+              address: "The north wall"
+              contact: "John Snow"
+            }
+            receipt: "abcde"
+            validityLimit: "2010-01-01T00:00:00.000Z"
+            department: "13"
+          }
+          mode: ROAD
+      }) {
+        id
+      }
+      }`
+    );
+
+    const segment = await prisma.bsddTransporter.findUniqueOrThrow({
+      where: { id: data.prepareSegment.id }
+    });
+    // receipt is pulled from db, input ignored
+    expect(segment.transporterReceipt).toEqual("multimodal receipt");
+    expect(segment.transporterDepartment).toEqual("83");
+    expect(segment.transporterValidityLimit).toEqual(
+      new Date("2055-01-01T00:00:00.000Z")
+    );
+  });
+
   it("should create multiple segments and return the created segment id", async () => {
     // after a regression where the returned segment was not the created one, this test ensures the fixed code works
     const owner = await userFactory();
@@ -141,10 +279,17 @@ describe("{ mutation { prepareSegment } }", () => {
         companyTypes: { set: ["TRANSPORTER"] }
       }
     );
+
     const { user: secondTransporter, company: company2 } =
       await userWithCompanyFactory("ADMIN", {
         companyTypes: { set: ["TRANSPORTER"] }
       });
+
+    await transporterReceiptFactory({
+      number: "multimodal receipt 1",
+      company: company2
+    });
+
     const { user: thirdTransporter, company: company3 } =
       await userWithCompanyFactory("ADMIN", {
         companyTypes: { set: ["TRANSPORTER"] }
@@ -277,7 +422,7 @@ describe("{ mutation { prepareSegment } }", () => {
 
     expect(markReadyErrors2).toBeUndefined();
     const { mutate: mutate3 } = makeClient(thirdTransporter);
-    // should not allow to prepare befor takeOver segment
+    // should not allow to prepare before takeOver segment
     const { errors: errorToPrepare } = await mutate3<
       Pick<Mutation, "prepareSegment">
     >(

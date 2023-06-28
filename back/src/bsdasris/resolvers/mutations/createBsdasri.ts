@@ -8,6 +8,7 @@ import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { BsdasriType } from "@prisma/client";
 import { getBsdasriRepository } from "../../repository";
 import sirenify from "../../sirenify";
+import { recipify } from "../../recipify";
 import { checkCanCreate } from "../../permissions";
 
 const getValidationContext = ({
@@ -44,7 +45,10 @@ const createBsdasri = async (
   await checkCanCreate(user, input);
 
   const sirenifiedInput = await sirenify(rest, user);
-  const flattenedInput = flattenBsdasriInput(sirenifiedInput);
+
+  const autocompletedInput = await recipify(sirenifiedInput);
+
+  const flattenedInput = flattenBsdasriInput(autocompletedInput);
 
   const isGrouping = !!grouping && !!grouping.length;
 

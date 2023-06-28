@@ -159,6 +159,7 @@ export function flattenTransporterInput(input: {
       input.transporter,
       t => t.isExemptedOfReceipt
     ),
+    // deprecated receipt fields, ignored
     transporterReceipt: chain(input.transporter, t => t.receipt),
     transporterDepartment: chain(input.transporter, t => t.department),
     transporterValidityLimit: chain(input.transporter, t => t.validityLimit),

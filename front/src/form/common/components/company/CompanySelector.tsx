@@ -574,7 +574,7 @@ export default function CompanySelector({
         </div>
 
         {values.transporter && !!orgId && name === "transporter.company" && (
-          <TransporterReceipt transporter={values.transporter} />
+          <TransporterReceipt transporter={values.transporter!} />
         )}
       </div>
     </>

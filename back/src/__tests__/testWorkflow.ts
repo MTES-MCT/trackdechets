@@ -1,5 +1,10 @@
+import { isForeignVat } from "../common/constants/companySearchHelpers";
 import { Workflow } from "../common/workflow";
-import { userWithCompanyFactory, ecoOrganismeFactory } from "./factories";
+import {
+  userWithCompanyFactory,
+  ecoOrganismeFactory,
+  transporterReceiptFactory
+} from "./factories";
 import makeClient from "./testClient";
 
 async function testWorkflow(workflow: Workflow) {
@@ -16,7 +21,13 @@ async function testWorkflow(workflow: Workflow) {
       // create ecoOrganisme to allow its user to perform api calls
       await ecoOrganismeFactory({ siret: company.siret!, handleBsdasri: true });
     }
-
+    if (
+      workflowCompany.companyTypes.includes("TRANSPORTER") &&
+      !isForeignVat(company.vatNumber)
+    ) {
+      // create transporter receipt
+      await transporterReceiptFactory({ company });
+    }
     context = { ...context, [workflowCompany.name]: { ...company, user } };
   }
 

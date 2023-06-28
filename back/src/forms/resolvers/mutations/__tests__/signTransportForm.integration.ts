@@ -9,6 +9,7 @@ import {
   formFactory,
   formWithTempStorageFactory,
   toIntermediaryCompany,
+  transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -39,6 +40,7 @@ describe("signTransportForm", () => {
   it("should sign transport", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter.company });
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
     const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
     const form = await formFactory({
@@ -91,9 +93,66 @@ describe("signTransportForm", () => {
     );
   });
 
+  it("should sign transport with receipt exemption", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+    const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        signedByTransporter: null,
+        sentAt: null,
+        sentBy: null,
+        emittedAt: emittedAt,
+        emittedBy: emitter.user.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name,
+            transporterIsExemptedOfReceipt: true,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(transporter.user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          takenOverAt: takenOverAt.toISOString() as unknown as Date,
+          takenOverBy: transporter.user.name
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.signTransportForm).toEqual(
+      expect.objectContaining({
+        status: "SENT",
+
+        signedByTransporter: true,
+        sentAt: takenOverAt.toISOString(),
+        sentBy: emitter.user.name,
+
+        takenOverAt: takenOverAt.toISOString(),
+        takenOverBy: transporter.user.name
+      })
+    );
+  });
+
   it("should sign transport with security code", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter.company });
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
     const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
     const form = await formFactory({
@@ -461,7 +520,30 @@ describe("signTransportForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Transporteur: L'adresse de l'entreprise est obligatoire"
+        message: expect.stringContaining(
+          "Transporteur: L'adresse de l'entreprise est obligatoire"
+        )
+      })
+    ]);
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining(
+          "Transporteur: le département associé au récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+        )
+      })
+    ]);
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining(
+          "Transporteur: la date limite de validité du récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+        )
+      })
+    ]);
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining(
+          "Transporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+        )
       })
     ]);
   });
@@ -510,7 +592,7 @@ describe("signTransportForm", () => {
         "MEMBER"
       );
       const { user, company } = await userWithCompanyFactory("MEMBER");
-
+      await transporterReceiptFactory({ company });
       const appendix1Item = await formFactory({
         ownerId: user.id,
         opt: {
@@ -589,7 +671,7 @@ describe("signTransportForm", () => {
         "MEMBER"
       );
       const { user, company } = await userWithCompanyFactory("MEMBER");
-
+      await transporterReceiptFactory({ company });
       // This first item is already SENT
       const appendix1_signed = await formFactory({
         ownerId: user.id,
@@ -673,7 +755,7 @@ describe("signTransportForm", () => {
         "MEMBER"
       );
       const { user, company } = await userWithCompanyFactory("MEMBER");
-
+      await transporterReceiptFactory({ company });
       const appendix1Item = await formFactory({
         ownerId: user.id,
         opt: {
@@ -733,7 +815,7 @@ describe("signTransportForm", () => {
         "MEMBER"
       );
       const { user, company } = await userWithCompanyFactory("MEMBER");
-
+      await transporterReceiptFactory({ company });
       // Allow automatic signature
       await prisma.signatureAutomation.create({
         data: {
@@ -803,6 +885,7 @@ describe("signTransportForm", () => {
         "MEMBER"
       );
       const { user, company } = await userWithCompanyFactory("MEMBER");
+      await transporterReceiptFactory({ company });
       const ecoOrganisme = await userWithCompanyFactory("ADMIN");
 
       const appendix1Item = await formFactory({
@@ -869,7 +952,7 @@ describe("signTransportForm", () => {
         "MEMBER"
       );
       const { user, company } = await userWithCompanyFactory("MEMBER");
-
+      await transporterReceiptFactory({ company });
       const appendix1Item = await formFactory({
         ownerId: user.id,
         opt: {
