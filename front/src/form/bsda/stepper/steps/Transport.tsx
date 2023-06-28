@@ -7,9 +7,9 @@ import { subMonths } from "date-fns";
 
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
-type Props = { disabled: boolean };
+type Props = { disabled: boolean; required?: boolean };
 
-export function Transport({ disabled }: Props) {
+export function Transport({ disabled, required = false }: Props) {
   const TODAY = new Date();
 
   return (
@@ -49,7 +49,7 @@ export function Transport({ disabled }: Props) {
             disabled={disabled}
             minDate={subMonths(TODAY, 2)}
             maxDate={TODAY}
-            required
+            required={required}
           />
         </label>
       </div>
