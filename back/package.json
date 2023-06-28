@@ -99,7 +99,7 @@
     "graphql-depth-limit": "^1.1.0",
     "graphql-scalars": "^1.20.4",
     "graylog2": "^0.2.1",
-    "helmet": "^6.0.1",
+    "helmet": "^6.2.0",
     "ioredis": "^4.28.0",
     "jose": "^4.11.2",
     "jsvat": "^2.5.3",
