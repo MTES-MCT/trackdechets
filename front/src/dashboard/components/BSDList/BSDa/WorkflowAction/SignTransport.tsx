@@ -161,7 +161,7 @@ export function SignTransport({
 
                 <div className="form__row">
                   <label>
-                    Date
+                    Date de signature
                     <div className="td-date-wrapper">
                       <Field
                         name="date"

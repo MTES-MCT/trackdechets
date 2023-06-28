@@ -56,7 +56,9 @@ describe("inviteUserToCompany", () => {
       role: "MEMBER"
     });
 
-    expect(associateUserToCompanyMock).toBeCalledWith("id", siret, "MEMBER");
+    expect(associateUserToCompanyMock).toBeCalledWith("id", siret, "MEMBER", {
+      automaticallyAccepted: true
+    });
 
     expect(sendMailMock).toHaveBeenCalledWith(
       renderMail(notifyUserOfInvite, {
