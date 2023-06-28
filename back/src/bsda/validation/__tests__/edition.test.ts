@@ -42,11 +42,10 @@ describe("edition", () => {
       omiNumber: ""
     };
 
-    const recepisse: Required<BsdaRecepisseInput> = {
-      isExempted: true,
-      number: "",
-      department: "",
-      validityLimit: new Date()
+    const recepisse: Required<
+      Omit<BsdaRecepisseInput, "number" | "department" | "validityLimit">
+    > = {
+      isExempted: true
     };
 
     const pickupSite: Required<PickupSiteInput> = {

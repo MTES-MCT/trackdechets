@@ -25,7 +25,9 @@ export async function parseBsda(
   return contextualSchema.parseAsync(bsda);
 }
 
-function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
+export function getContextualBsdaSchema(
+  validationContext: BsdaValidationContext
+) {
   return rawBsdaSchema
     .transform(async val => {
       val.intermediariesOrgIds = val.intermediaries

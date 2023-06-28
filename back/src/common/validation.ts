@@ -344,6 +344,14 @@ export async function validateIntermediariesInput(
 
   return intermediaries;
 }
+
+export const REQUIRED_RECEIPT_VALIDITYLIMIT = `Transporteur: la date limite de validité du récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets`;
+export const REQUIRED_RECEIPT_NUMBER = `Transporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets`;
+export const REQUIRED_RECEIPT_DEPARTMENT = `Transporteur: le département associé au récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets`;
+
+/**
+ * Common receipt schema for BSDA, BSVHU, BSDASRI
+ */
 export const transporterRecepisseSchema = context => ({
   transporterRecepisseIsExempted: yup.boolean().nullable(),
   transporterRecepisseDepartment: yup
@@ -354,7 +362,7 @@ export const transporterRecepisseSchema = context => ({
       otherwise: schema =>
         schema.requiredIf(
           context.transportSignature,
-          `Transporteur: le département associé au récépissé est obligatoire`
+          REQUIRED_RECEIPT_VALIDITYLIMIT
         )
     }),
   transporterRecepisseNumber: yup
@@ -363,10 +371,7 @@ export const transporterRecepisseSchema = context => ({
       is: (isExempted, vat) => isExempted || isForeignVat(vat),
       then: schema => schema.nullable().notRequired(),
       otherwise: schema =>
-        schema.requiredIf(
-          context.transportSignature,
-          `Transporteur: le numéro de récépissé est obligatoire`
-        )
+        schema.requiredIf(context.transportSignature, REQUIRED_RECEIPT_NUMBER)
     }),
   transporterRecepisseValidityLimit: yup
     .date()
@@ -376,7 +381,7 @@ export const transporterRecepisseSchema = context => ({
       otherwise: schema =>
         schema.requiredIf(
           context.transportSignature,
-          `Transporteur: la date limite de validité du récépissé est obligatoire`
+          REQUIRED_RECEIPT_DEPARTMENT
         )
     })
 });
