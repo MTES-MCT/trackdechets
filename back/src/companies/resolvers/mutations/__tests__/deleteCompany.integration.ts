@@ -8,7 +8,7 @@ import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-const DELETE_COMPANY = `
+export const DELETE_COMPANY = `
   mutation DeleteCompany($id: ID!) {
     deleteCompany(id: $id) {
       id
