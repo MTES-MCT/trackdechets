@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useCallback } from "react";
 
 interface InterfaceFlags {
   dashboardV2?: boolean;
@@ -29,9 +29,12 @@ export function FeatureFlagsProvider({
   const [featureFlags, setFeatureFlags] =
     useState<InterfaceFlags>(defaultFeatureFlags);
 
-  function updateFeatureFlags(newFeatureFlags: InterfaceFlags) {
-    setFeatureFlags(newFeatureFlags);
-  }
+  const updateFeatureFlags = useCallback(
+    (newFeatureFlags: InterfaceFlags) => {
+      setFeatureFlags(newFeatureFlags);
+    },
+    [setFeatureFlags]
+  );
 
   return (
     <FeatureFlagsContext.Provider value={{ featureFlags, updateFeatureFlags }}>
