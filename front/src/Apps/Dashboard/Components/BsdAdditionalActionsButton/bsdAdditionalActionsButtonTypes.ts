@@ -13,6 +13,9 @@ export interface BsdAdditionalActionsButtonProps {
     onAppendix1?: Function;
     onBsdSuite?: Function;
     onDeleteReview?: Function;
+    onEmitterDasriSign?: Function;
   };
   hideReviewCta?: boolean;
+  isToCollectTab?: boolean;
+  isCollectedTab?: boolean;
 }

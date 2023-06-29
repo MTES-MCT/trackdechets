@@ -8,6 +8,7 @@ import { NotificationError } from "Apps/common/Components/Error/Error";
 import { capitalize } from "common/helper";
 import { IconPaperWrite } from "common/components/Icons";
 import TdModal from "common/components/Modal";
+import { useRouteMatch } from "react-router-dom";
 
 const UPDATE_PLATE = gql`
   mutation updateTransporterFields(
@@ -38,19 +39,24 @@ type Props = {
   form: FormModel;
   fieldName: string;
   verboseFieldName: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
 };
 
 export default function TransporterInfoEdit({
   form,
   fieldName,
   verboseFieldName,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
 }: Props) {
   const mutationFieldName = `transporter${capitalize(fieldName)}`;
 
   const [isOpen, setIsOpen] = useState(false);
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
 
   const [updateTransporterPlate, { error }] = useMutation(UPDATE_PLATE, {
-    onCompleted: () => setIsOpen(false),
+    onCompleted: () => handleClose(),
   });
 
   const formik = useFormik({
@@ -69,19 +75,30 @@ export default function TransporterInfoEdit({
   if (!isBsddTransporterFieldEditable(form.status)) {
     return null;
   }
+  const isOpened = isOpen || isModalOpenFromParent!;
+
+  const handleClose = () => {
+    if (isModalOpenFromParent) {
+      onModalCloseFromParent!();
+    } else {
+      setIsOpen(false);
+    }
+  };
   return (
     <>
-      <button
-        className="link__ icon__ btn--no-style"
-        onClick={() => setIsOpen(true)}
-        title={`Modifier ${verboseFieldName}`}
-      >
-        <IconPaperWrite color="blue" />
-      </button>
+      {!isV2Routes && !isModalOpenFromParent && (
+        <button
+          className="link__ icon__ btn--no-style"
+          onClick={() => setIsOpen(true)}
+          title={`Modifier ${verboseFieldName}`}
+        >
+          <IconPaperWrite color="blue" />
+        </button>
+      )}
       <TdModal
-        isOpen={isOpen}
+        isOpen={isOpened}
         ariaLabel={`Modifier ${verboseFieldName}`}
-        onClose={() => setIsOpen(false)}
+        onClose={handleClose}
       >
         <h2 className="h2 tw-mb-4">Modifier</h2>
         <form onSubmit={formik.handleSubmit}>
@@ -102,7 +119,7 @@ export default function TransporterInfoEdit({
             <button
               className="btn btn--outline-primary"
               type="button"
-              onClick={() => setIsOpen(false)}
+              onClick={handleClose}
             >
               Annuler
             </button>

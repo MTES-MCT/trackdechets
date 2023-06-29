@@ -8,6 +8,10 @@ export const getLabelValue = (code: InfoIconCode): InfoIconValue => {
       return InfoIconValue.EcoOrganism;
     case InfoIconCode.LastModificationDate:
       return InfoIconValue.LastModificationDate;
+    case InfoIconCode.CustomInfo:
+      return InfoIconValue.CustomInfo;
+    case InfoIconCode.TransporterNumberPlate:
+      return InfoIconValue.TransporterNumberPlate;
     default:
       return InfoIconValue.default;
   }

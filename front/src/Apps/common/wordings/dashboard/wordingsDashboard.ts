@@ -149,7 +149,11 @@ export const COLLECTED = "Collecté";
 export const REGISTER = "Registre";
 
 // Reviews
-
 export const APPROUVER_REFUSER_REVISION = "Approuver / Refuser";
 export const CONSULTER_REVISION = "Consulter";
 export const SUPRIMER_REVISION = "Supprimer la révision";
+
+// Transport
+export const EMPORT_DIRECT_LABEL = "Signer directement";
+export const VALIDER_SYNTHESE_LABEL = "Valider la synthèse";
+export const ROAD_CONTROL = "Contrôle routier";
