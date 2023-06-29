@@ -4,6 +4,7 @@ import { getBsffOrNotFound } from "../../database";
 import { checkCanUpdate } from "../../permissions";
 import { expandBsffFromDB } from "../../converter";
 import {
+  BsffLike,
   validateBsff,
   validateFicheInterventions,
   validatePreviousPackagings
@@ -14,6 +15,7 @@ import {
   getBsffPackagingRepository,
   getBsffRepository
 } from "../../repository";
+import { getTransporterReceipt } from "./signBsff";
 
 const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   _,
@@ -56,7 +58,15 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
     where: { bsffs: { some: { id: { in: [existingBsff.id] } } } }
   });
 
-  const fullBsff = { ...existingBsff, packagings, isDraft: false };
+  // fetch TransporterReceipt
+  const receipt = await getTransporterReceipt(existingBsff);
+  // complete Bsff
+  const fullBsff: BsffLike = {
+    ...existingBsff,
+    packagings,
+    isDraft: false,
+    ...receipt
+  };
 
   await validateBsff(fullBsff, { isDraft: false, transporterSignature: false });
   await validateFicheInterventions(fullBsff, ficheInterventions);

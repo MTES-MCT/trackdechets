@@ -9,7 +9,8 @@ import {
 } from "../../../../generated/graphql/types";
 import {
   siretify,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { fullBsff } from "../../../fragments";
@@ -111,6 +112,52 @@ describe("Mutation.createBsff", () => {
     ]);
     // check input is sirenified
     expect(sirenifyMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("should create a bsff and autocomplete recepisse", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({
+      company: transporter.company
+    });
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(emitter.user);
+    const { data } = await mutate<
+      Pick<Mutation, "createBsff">,
+      MutationCreateBsffArgs
+    >(CREATE_BSFF, {
+      variables: {
+        input: createInput(emitter, transporter, destination)
+      }
+    });
+
+    expect(data.createBsff.transporter!.recepisse!.number).toEqual(
+      "the number"
+    );
+    expect(data.createBsff.transporter!.recepisse!.department).toEqual("83");
+    expect(data.createBsff.transporter!.recepisse!.validityLimit).toEqual(
+      "2055-01-01T00:00:00.000Z"
+    );
+  });
+
+  it("should create a bsff and ignore recepisse input", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(emitter.user);
+
+    const { data } = await mutate<
+      Pick<Mutation, "createBsff">,
+      MutationCreateBsffArgs
+    >(CREATE_BSFF, {
+      variables: {
+        input: createInput(emitter, transporter, destination)
+      }
+    });
+
+    expect(data.createBsff.transporter!.recepisse).toEqual(null);
   });
 
   it("should disallow unauthenticated user from creating a bsff", async () => {

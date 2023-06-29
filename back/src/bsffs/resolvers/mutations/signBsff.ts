@@ -29,6 +29,8 @@ import {
   getBsffRepository
 } from "../../repository";
 import { checkCanSignFor } from "../../../permissions";
+import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
+import prisma from "../../../prisma";
 
 const signBsff: MutationResolvers["signBsff"] = async (
   _,
@@ -79,6 +81,24 @@ export function getAuthorizedOrgIds(
   return getAuthorizedSiretsFn(bsff).filter(Boolean);
 }
 
+export async function getTransporterReceipt(existingBsff: Bsff) {
+  // fetch TransporterReceipt
+  const orgId = getTransporterCompanyOrgId(existingBsff);
+  let transporterReceipt;
+  if (orgId) {
+    transporterReceipt = await prisma.company
+      .findUnique({
+        where: { orgId }
+      })
+      .transporterReceipt();
+  }
+  return {
+    transporterRecepisseNumber: transporterReceipt?.receiptNumber ?? null,
+    transporterRecepisseDepartment: transporterReceipt?.department ?? null,
+    transporterRecepisseValidityLimit: transporterReceipt?.validityLimit ?? null
+  };
+}
+
 // Defines different signature function based on signature type
 const signatures: Record<
   BsffSignatureType,
@@ -108,7 +128,8 @@ async function signEmission(
   bsff: Bsff & { packagings: BsffPackaging[] },
   input: BsffSignatureInput
 ) {
-  await validateBeforeEmission(bsff);
+  const transporterReceipt = await getTransporterReceipt(bsff);
+  await validateBeforeEmission({ ...bsff, ...transporterReceipt });
 
   const { update: updateBsff } = getBsffRepository(user);
 
@@ -117,7 +138,8 @@ async function signEmission(
     data: {
       status: BsffStatus.SIGNED_BY_EMITTER,
       emitterEmissionSignatureDate: input.date,
-      emitterEmissionSignatureAuthor: input.author
+      emitterEmissionSignatureAuthor: input.author,
+      ...transporterReceipt
     }
   });
 }
@@ -135,7 +157,8 @@ async function signTransport(
   bsff: Bsff & { packagings: BsffPackaging[] },
   input: BsffSignatureInput
 ) {
-  await validateBeforeTransport(bsff);
+  const transporterReceipt = await getTransporterReceipt(bsff);
+  await validateBeforeTransport({ ...bsff, ...transporterReceipt });
 
   const { update: updateBsff } = getBsffRepository(user);
 
@@ -144,7 +167,8 @@ async function signTransport(
     data: {
       status: BsffStatus.SENT,
       transporterTransportSignatureDate: input.date,
-      transporterTransportSignatureAuthor: input.author
+      transporterTransportSignatureAuthor: input.author,
+      ...transporterReceipt
     }
   });
 }

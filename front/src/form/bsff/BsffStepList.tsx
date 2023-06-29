@@ -90,7 +90,7 @@ export default function BsffStepsList(props: Props) {
       previousPackagings,
       packagings,
       type,
-      transporter: { recepisse, isExemptedOfRecepisse, ...transporter },
+      transporter: { isExemptedOfRecepisse, ...transporter },
       destination: { plannedOperationCode, ...destination },
       ...input
     } = values;
@@ -99,14 +99,10 @@ export default function BsffStepsList(props: Props) {
       type,
       ...input,
       transporter: {
-        recepisse: isExemptedOfRecepisse
-          ? null
-          : {
-              ...recepisse,
-              validityLimit:
-                recepisse.validityLimit === "" ? null : recepisse.validityLimit,
-            },
         ...transporter,
+        recepisse: {
+          isExempted: isExemptedOfRecepisse,
+        },
       },
       destination: {
         ...destination,

@@ -35,11 +35,6 @@ function transporterInput(siret: string) {
       contact: "Claire Dupuis",
       mail: "claire.dupuis@transportco.fr",
       phone: "04 00 00 00 00"
-    },
-    recepisse: {
-      number: "XXXXX",
-      department: "07",
-      validityLimit: "2023-01-01"
     }
   };
 }
