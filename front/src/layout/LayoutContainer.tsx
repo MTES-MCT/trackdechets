@@ -1,7 +1,6 @@
-import React, { lazy, Suspense, useEffect } from "react";
+import React, { lazy, Suspense } from "react";
 import {
   Route,
-  withRouter,
   Switch,
   Redirect,
   generatePath,
@@ -55,32 +54,38 @@ const GET_ME = gql`
         orgId
         siret
       }
+      featureFlags {
+        name
+        enabled
+      }
     }
   }
 `;
 
-export default withRouter(function LayoutContainer({ history }) {
-  const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME);
+export default function LayoutContainer() {
+  const { featureFlags, updateFeatureFlags } = useFeatureFlags();
+
+  const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME, {
+    onCompleted: ({ me }) => {
+      updateFeatureFlags({
+        dashboardV2:
+          Boolean(me.isAdmin) ||
+          me.featureFlags.some(
+            flag => flag.name === "DASHBOARD_V2" && flag.enabled
+          ),
+      });
+
+      if (import.meta.env.VITE_SENTRY_DSN && me.email) {
+        Sentry.setUser({ email: me.email });
+      }
+    },
+  });
   const isAuthenticated = !loading && data != null;
-  const isAdmin = (isAuthenticated && data?.me?.isAdmin) || false;
-  const email = data?.me?.email;
-  const userId = data?.me?.id;
+  const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
+
   const isV2Routes = !!useRouteMatch("/v2/dashboard/");
-  const { VITE_FLAG_DASHBOARDV2_USERID } = import.meta.env;
-  const flagDashboardV2UserId = VITE_FLAG_DASHBOARDV2_USERID
-    ? VITE_FLAG_DASHBOARDV2_USERID.split(",")
-    : [""];
-  const { updateFeatureFlags } = useFeatureFlags();
-
-  const canAccessDashboardV2 =
-    isAdmin || flagDashboardV2UserId.includes(userId);
-
-  const dashboardRoutePrefixAccessCheck = canAccessDashboardV2
-    ? "dashboardv2"
-    : "dashboard";
-  const dashboardRoutePrefix = !isV2Routes
-    ? "dashboard"
-    : dashboardRoutePrefixAccessCheck;
+  const dashboardRoutePrefix =
+    isV2Routes && featureFlags.dashboardV2 ? "dashboardv2" : "dashboard";
 
   const { DEV } = import.meta.env;
   const isDevelopment = DEV;
@@ -99,18 +104,6 @@ export default withRouter(function LayoutContainer({ history }) {
       enableAutoPageviews();
     }
   }
-
-  useEffect(() => {
-    updateFeatureFlags({
-      dashboardV2: canAccessDashboardV2,
-    });
-  }, [updateFeatureFlags, canAccessDashboardV2]);
-
-  useEffect(() => {
-    if (import.meta.env.VITE_SENTRY_DSN && email) {
-      Sentry.setUser({ email });
-    }
-  }, [email]);
 
   if (loading) {
     return <Loader />;
@@ -346,4 +339,4 @@ export default withRouter(function LayoutContainer({ history }) {
       </Switch>
     </Suspense>
   );
-});
+}
