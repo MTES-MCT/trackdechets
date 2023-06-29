@@ -85,9 +85,6 @@ type Mutation {
       takenOverAt
     }
     recepisse {
-      number
-      department
-      validityLimit
       isExempted
     }
   }

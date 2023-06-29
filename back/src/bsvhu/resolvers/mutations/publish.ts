@@ -7,6 +7,7 @@ import { getBsvhuOrNotFound } from "../../database";
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import { checkCanUpdate } from "../../permissions";
+import { getTransporterReceipt } from "../../../bsdasris/recipify";
 
 export default async function publish(
   _,
@@ -24,11 +25,20 @@ export default async function publish(
       "Impossible de publier un bordereau qui n'est pas un brouillon"
     );
   }
-
-  await validateBsvhu(existingBsvhu, { emissionSignature: true });
+  const transporterReceipt = await getTransporterReceipt(existingBsvhu);
+  await validateBsvhu(
+    {
+      ...existingBsvhu,
+      ...transporterReceipt
+    },
+    { emissionSignature: true }
+  );
   const bsvhuRepository = getBsvhuRepository(user);
 
-  const updatedBsvhu = await bsvhuRepository.update({ id }, { isDraft: false });
+  const updatedBsvhu = await bsvhuRepository.update(
+    { id },
+    { isDraft: false, ...transporterReceipt }
+  );
 
   return expandVhuFormFromDb(updatedBsvhu);
 }

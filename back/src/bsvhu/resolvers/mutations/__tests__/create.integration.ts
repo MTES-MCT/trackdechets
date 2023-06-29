@@ -5,7 +5,8 @@ import {
   companyFactory,
   siretify,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as sirenify from "../../../sirenify";
@@ -36,6 +37,11 @@ mutation CreateVhuForm($input: BsvhuInput!) {
         contact
         mail
         phone
+      }
+      recepisse {
+        number
+        department
+        validityLimit
       }
     }
     weight {
@@ -162,6 +168,146 @@ describe("Mutation.Vhu.create", () => {
     expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
+  it("should create a bsvhu and autocpmplete transporter recepisse", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTEPROCESSOR"]
+    });
+
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({
+      company: transporter
+    });
+    const input = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      transporter: { company: { siret: transporter.siret } }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(data.createBsvhu.transporter!.recepisse!.number).toEqual(
+      "the number"
+    );
+    expect(data.createBsvhu.transporter!.recepisse!.department).toEqual("83");
+    expect(data.createBsvhu.transporter!.recepisse!.validityLimit).toEqual(
+      "2055-01-01T00:00:00.000Z"
+    );
+  });
+
+  it("should create a bsvhu and ignore recepisse input", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTEPROCESSOR"]
+    });
+
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({
+      company: transporter
+    });
+    const input = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      transporter: {
+        company: { siret: transporter.siret },
+        recepisse: {
+          department: "83",
+          number: "N°99999",
+          validityLimit: "2022-06-06T22:00:00"
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(data.createBsvhu.transporter!.recepisse!.number).toEqual(
+      "the number"
+    );
+    expect(data.createBsvhu.transporter!.recepisse!.department).toEqual("83");
+    expect(data.createBsvhu.transporter!.recepisse!.validityLimit).toEqual(
+      "2055-01-01T00:00:00.000Z"
+    );
+  });
   it("should fail if a required field like the emitter agrement is missing", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({

@@ -5,6 +5,7 @@ import { expandBsdasriFromDB } from "../../converter";
 import { validateBsdasri } from "../../validation";
 import { getBsdasriRepository } from "../../repository";
 import { checkCanUpdate, checkIsBsdasriPublishable } from "../../permissions";
+import { getTransporterReceipt } from "../../recipify";
 
 const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   _,
@@ -23,15 +24,24 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
     bsdasri,
     grouping.map(el => el.id)
   );
-
-  await validateBsdasri(bsdasri as any, { emissionSignature: true });
+  const transporterReceipt = await getTransporterReceipt(bsdasri);
+  await validateBsdasri(
+    {
+      ...(bsdasri as any),
+      ...transporterReceipt
+    },
+    { emissionSignature: true }
+  );
 
   const bsdasriRepository = getBsdasriRepository(user);
 
   // publish  dasri
   const publishedBsdasri = await bsdasriRepository.update(
     { id: bsdasri.id },
-    { isDraft: false }
+    {
+      isDraft: false,
+      ...transporterReceipt
+    }
   );
 
   const expandedDasri = expandBsdasriFromDB(publishedBsdasri);

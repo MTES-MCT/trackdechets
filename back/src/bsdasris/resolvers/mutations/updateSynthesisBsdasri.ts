@@ -12,6 +12,7 @@ import {
 } from "../../repository";
 import { checkEditionRules } from "../../edition";
 import sirenify from "../../sirenify";
+import { recipify } from "../../recipify";
 
 const buildSynthesizedBsdasriArgs = async (
   dasrisToAssociate: Bsdasri[] | null | undefined,
@@ -105,7 +106,8 @@ const updateSynthesisBsdasri = async ({
     dbBsdasri.status
   );
   const sirenifiedInput = await sirenify(rest, user);
-  const flattenedInput = flattenBsdasriInput(sirenifiedInput);
+  const autocompletedInput = await recipify(sirenifiedInput);
+  const flattenedInput = flattenBsdasriInput(autocompletedInput);
 
   await checkEditionRules(dbBsdasri, input, user);
 

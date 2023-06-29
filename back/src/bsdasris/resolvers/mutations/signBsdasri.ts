@@ -31,6 +31,7 @@ import {
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { runInTransaction } from "../../../common/repository/helper";
 import { BsdasriRepository, getBsdasriRepository } from "../../repository";
+import { getTransporterReceipt } from "../../recipify";
 
 const signBsdasri: MutationResolvers["signBsdasri"] = async (
   _,
@@ -127,8 +128,14 @@ export async function signEmission(
       "Un dasri de synthèse INITIAL attend une signature transporteur, la signature producteur n'est pas acceptée."
     );
   }
-
-  await validateBsdasri(bsdasri as any, { emissionSignature: true });
+  const transporterReceipt = await getTransporterReceipt(bsdasri);
+  await validateBsdasri(
+    {
+      ...(bsdasri as any),
+      ...transporterReceipt
+    },
+    { emissionSignature: true }
+  );
 
   // 'signatureAuthor' can be used in signBsdasriEmissionWithSecretCode to
   // specify that a signature with secret code is made on behalf of the eco-organisme
@@ -158,7 +165,11 @@ export async function signEmission(
     dasriUpdateInput: updateInput as any
   });
 
-  return updateBsdasri(user, bsdasri, { ...updateInput, status });
+  return updateBsdasri(user, bsdasri, {
+    ...updateInput,
+    status,
+    ...transporterReceipt
+  });
 }
 
 /**

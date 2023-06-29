@@ -350,7 +350,7 @@ export const REQUIRED_RECEIPT_NUMBER = `Transporteur: le numéro de récépissé
 export const REQUIRED_RECEIPT_DEPARTMENT = `Transporteur: le département associé au récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets`;
 
 /**
- * Common receipt schema for BSDA, BSVHU, BSDASRI
+ * Common transporter receipt schema for BSVHU, BSDASRI
  */
 export const transporterRecepisseSchema = context => ({
   transporterRecepisseIsExempted: yup.boolean().nullable(),

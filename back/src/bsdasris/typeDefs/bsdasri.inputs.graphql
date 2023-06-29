@@ -199,11 +199,11 @@ input BsdasriRecepisseInput {
   "Exemption de récépissé"
   isExempted: Boolean
   "Numéro de récépissé"
-  number: String
+  number: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
   "Département"
-  department: String
+  department: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
   "Date limite de validité"
-  validityLimit: DateTime
+  validityLimit: DateTime @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
 }
 
 input BsdasriTransporterInput {

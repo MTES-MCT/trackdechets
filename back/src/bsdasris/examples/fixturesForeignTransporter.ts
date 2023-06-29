@@ -29,8 +29,7 @@ function transporteurCompanyInput(vatNumber: string) {
 
 function transporterInput(vatNumber: string) {
   return {
-    company: transporteurCompanyInput(vatNumber),
-    recepisse: null
+    company: transporteurCompanyInput(vatNumber)
   };
 }
 
