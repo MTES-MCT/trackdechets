@@ -1,3 +1,10 @@
+.label-icon-editable {
+  background: none;
+  border: none;
+  &:disabled {
+    color: initial;
+  }
+}
 .label-icon {
   margin: 0;
   padding: 0;
@@ -30,6 +37,26 @@
       background-image: url("/icons/dashboard/last-modification-date.svg");
       width: 15px;
       height: 15px;
+      margin-right: 5px;
+    }
+  }
+  &__CustomInfo {
+    &:before {
+      display: inline-block;
+      content: "";
+      background-image: url("/icons/dashboard/custom-info-icon.svg");
+      width: 24px;
+      height: 24px;
+      margin-right: 5px;
+    }
+  }
+  &__TransporterNumberPlate {
+    &:before {
+      display: inline-block;
+      content: "";
+      background-image: url("/icons/dashboard/transporter-number-plate-icon.svg");
+      width: 24px;
+      height: 24px;
       margin-right: 5px;
     }
   }

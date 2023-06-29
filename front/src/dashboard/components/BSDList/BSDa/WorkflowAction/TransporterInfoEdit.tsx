@@ -11,13 +11,21 @@ import {
   Mutation,
   MutationUpdateBsdaArgs,
 } from "generated/graphql/types";
+import { useRouteMatch } from "react-router-dom";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 type Props = {
   bsda: Bsda;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
 };
 
-export function TransporterInfoEdit({ bsda }: Props) {
+export function TransporterInfoEdit({
+  bsda,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   const [updateBsda, { error }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
@@ -31,19 +39,31 @@ export function TransporterInfoEdit({ bsda }: Props) {
     return null;
   }
 
+  const isOpened = isOpen || isModalOpenFromParent!;
+
+  const handleClose = () => {
+    if (isModalOpenFromParent) {
+      onModalCloseFromParent!();
+    } else {
+      setIsOpen(false);
+    }
+  };
+
   return (
     <>
-      <button
-        className="link__ icon__ btn--no-style"
-        onClick={() => setIsOpen(true)}
-        title="Modifier les informations de transport"
-      >
-        <IconPaperWrite color="blue" />
-      </button>
+      {!isV2Routes && !isModalOpenFromParent && (
+        <button
+          className="link__ icon__ btn--no-style"
+          onClick={() => setIsOpen(true)}
+          title="Modifier les informations de transport"
+        >
+          <IconPaperWrite color="blue" />
+        </button>
+      )}
       <TdModal
-        isOpen={isOpen}
+        isOpen={isOpened}
         ariaLabel="Modifier les informations de transport"
-        onClose={() => setIsOpen(false)}
+        onClose={handleClose}
       >
         <h2 className="h2 tw-mb-4">Modifier</h2>
         <Formik
@@ -62,7 +82,7 @@ export function TransporterInfoEdit({ bsda }: Props) {
                 input: values,
               },
             });
-            setIsOpen(false);
+            handleClose();
           }}
         >
           <Form>
@@ -89,7 +109,7 @@ export function TransporterInfoEdit({ bsda }: Props) {
               <button
                 className="btn btn--outline-primary"
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={handleClose}
               >
                 Annuler
               </button>

@@ -7,22 +7,44 @@ import { UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { Field, Form, Formik } from "formik";
 import { BsffFragment } from "../types";
 import { NotificationError } from "Apps/common/Components/Error/Error";
+import { useRouteMatch } from "react-router-dom";
 
-export function UpdateTransporterCustomInfo({ bsff }: { bsff: BsffFragment }) {
+export function UpdateTransporterCustomInfo({
+  bsff,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+}: {
+  bsff: BsffFragment;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+
+  const isOpened = isOpen || isModalOpenFromParent!;
+  const handleClose = () => {
+    if (isModalOpenFromParent) {
+      onModalCloseFromParent!();
+    } else {
+      setIsOpen(false);
+    }
+  };
+
   return (
     <>
-      <button
-        className="link__ icon__ btn--no-style"
-        onClick={() => setIsOpen(true)}
-        title={`Modifier le champ libre`}
-      >
-        <IconPaperWrite color="blue" />
-      </button>
+      {!isV2Routes && !isModalOpenFromParent && (
+        <button
+          className="link__ icon__ btn--no-style"
+          onClick={() => setIsOpen(true)}
+          title={`Modifier le champ libre`}
+        >
+          <IconPaperWrite color="blue" />
+        </button>
+      )}
       <UpdateTransporterCustomInfoModal
         bsff={bsff}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        isOpen={isOpened}
+        onClose={handleClose}
       />
     </>
   );
