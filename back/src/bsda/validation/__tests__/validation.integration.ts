@@ -279,7 +279,7 @@ describe("BSDA validation", () => {
         });
       } catch (error) {
         expect(error.issues[0].message).toBe(
-          "Transporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+          "Transporteur: le numéro de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
         );
       }
     });

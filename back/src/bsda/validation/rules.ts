@@ -37,6 +37,7 @@ export const editionRules: {
     isRequired: boolean | ((val: ZodBsda) => boolean); // Whether or not the field is required when sealed. The rule can depend on other fields
     superRefineWhenSealed?: (val: ZodBsda[Key], ctx: RefinementCtx) => void; // For custom rules to apply when the field is sealed
     name?: string; // A custom field name for errors
+    suffix?: string; // A custom message at the end of the error
   };
 } = {
   type: { sealedBy: "EMISSION", isRequired: true },
@@ -203,7 +204,8 @@ export const editionRules: {
       hasTransporter(bsda) &&
       !bsda.transporterRecepisseIsExempted &&
       !isForeignVat(bsda.transporterCompanyVatNumber),
-    name: "le numéro de récépissé transporteur"
+    name: "Transporteur: le numéro de récépissé",
+    suffix: " 'établissement doit renseigner son récépissé dans Trackdéchets"
   },
   transporterRecepisseDepartment: {
     sealedBy: "TRANSPORT",
@@ -211,7 +213,8 @@ export const editionRules: {
       hasTransporter(bsda) &&
       !bsda.transporterRecepisseIsExempted &&
       !isForeignVat(bsda.transporterCompanyVatNumber),
-    name: "le département de récépissé transporteur"
+    name: "Transporteur: le département de récépissé",
+    suffix: " L'établissement doit renseigner son récépissé dans Trackdéchets"
   },
   transporterRecepisseValidityLimit: {
     sealedBy: "TRANSPORT",
@@ -219,7 +222,8 @@ export const editionRules: {
       hasTransporter(bsda) &&
       !bsda.transporterRecepisseIsExempted &&
       !isForeignVat(bsda.transporterCompanyVatNumber),
-    name: "la date de validité du récépissé transporteur"
+    name: "Transporteur: la date de validité du récépissé",
+    suffix: " L'établissement doit renseigner son récépissé dans Trackdéchets"
   },
   transporterTransportMode: {
     sealedBy: "TRANSPORT",
