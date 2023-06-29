@@ -52,6 +52,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     { ...unparsedBsda, isDraft },
     {
       enableSirenification: true,
+      enableSaveTransporterReceipt: false,
       enablePreviousBsdasChecks: !canBypassSirenify(user),
       currentSignatureType: !isDraft ? "EMISSION" : undefined
     }

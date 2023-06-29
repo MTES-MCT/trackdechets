@@ -1,7 +1,7 @@
 import { CompanySearchResult } from "../../../companies/types";
 import { userWithCompanyFactory } from "../../../__tests__/factories";
 import * as search from "../../../companies/search";
-import { sirenify } from "../../validation/sirenify";
+import { sirenify } from "../sirenify";
 import { resetDatabase } from "../../../../integration-tests/helper";
 
 const searchCompanySpy = jest.spyOn(search, "searchCompany");

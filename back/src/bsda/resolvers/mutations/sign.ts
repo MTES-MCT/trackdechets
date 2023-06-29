@@ -56,6 +56,7 @@ const signBsda: MutationResolvers["signBsda"] = async (
       forwarding: bsda.forwarding?.id
     },
     {
+      enableSaveTransporterReceipt: true,
       currentSignatureType: input.type
     }
   );

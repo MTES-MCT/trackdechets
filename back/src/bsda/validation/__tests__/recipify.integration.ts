@@ -1,12 +1,9 @@
-import { recipify } from "../transformers";
+import { recipify } from "../recipify";
 import {
   companyFactory,
   transporterReceiptFactory
 } from "../../../__tests__/factories";
 import { bsdaFactory } from "../../__tests__/factories";
-import { getContextualBsdaSchema } from "../validate";
-
-const contextualSchema = getContextualBsdaSchema({});
 
 describe("Bsda Recipify Module", () => {
   it("recipify should correctly process input and return completedInput with transporter receipt", async () => {
@@ -23,9 +20,7 @@ describe("Bsda Recipify Module", () => {
       }
     });
 
-    const completedInput = await recipify(
-      await contextualSchema.parseAsync(bsda)
-    );
+    const completedInput = await recipify(bsda, false);
     expect(completedInput).toMatchObject({
       transporterRecepisseIsExempted: false,
       transporterRecepisseNumber: receipt.receiptNumber,
@@ -47,9 +42,7 @@ describe("Bsda Recipify Module", () => {
       }
     });
 
-    const completedInput = await recipify(
-      await contextualSchema.parseAsync(bsda)
-    );
+    const completedInput = await recipify(bsda, false);
     expect(completedInput).toMatchObject({
       transporterRecepisseIsExempted: true,
       transporterRecepisseNumber: null,

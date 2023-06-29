@@ -315,7 +315,6 @@ input BsdaTransporterInput {
   company: CompanyInput
   "Champ libre"
   customInfo: String
-  ""
   recepisse: BsdaRecepisseInput
   transport: BsdaTransportInput
 }

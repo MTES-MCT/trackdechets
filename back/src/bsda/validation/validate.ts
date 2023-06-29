@@ -9,25 +9,29 @@ import { editionRules } from "./rules";
 import { ZodBsda, rawBsdaSchema } from "./schema";
 import { capitalize } from "../../common/strings";
 import { runTransformers } from "./transformers";
+import { recipify } from "./recipify";
 
 type BsdaValidationContext = {
   enablePreviousBsdasChecks?: boolean;
+  enableSaveTransporterReceipt: boolean;
   enableSirenification?: boolean;
   currentSignatureType?: BsdaSignatureType;
 };
 
 export async function parseBsda(
   bsda: unknown,
-  validationContext: BsdaValidationContext = {}
+  validationContext: BsdaValidationContext
 ): Promise<ZodBsda> {
+  const completedBsda = await recipify(
+    bsda as Bsda,
+    validationContext.enableSaveTransporterReceipt
+  );
   const contextualSchema = getContextualBsdaSchema(validationContext);
 
-  return contextualSchema.parseAsync(bsda);
+  return contextualSchema.parseAsync(completedBsda);
 }
 
-export function getContextualBsdaSchema(
-  validationContext: BsdaValidationContext
-) {
+function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
   return rawBsdaSchema
     .transform(async val => {
       val.intermediariesOrgIds = val.intermediaries

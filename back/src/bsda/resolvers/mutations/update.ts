@@ -37,6 +37,7 @@ export default async function edit(
   };
   const bsda = await parseBsda(unparsedBsda, {
     enableSirenification: !canBypassSirenify(user),
+    enableSaveTransporterReceipt: false,
     enablePreviousBsdasChecks: true,
     currentSignatureType: getCurrentSignatureType(unparsedBsda)
   });

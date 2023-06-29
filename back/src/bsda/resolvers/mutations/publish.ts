@@ -33,7 +33,7 @@ export default async function publish(
       grouping: bsda.grouping?.map(g => g.id),
       forwarding: bsda.forwarding?.id
     },
-    { currentSignatureType: "EMISSION" }
+    { currentSignatureType: "EMISSION", enableSaveTransporterReceipt: true }
   );
 
   const updatedBsda = await getBsdaRepository(user).update(

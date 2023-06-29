@@ -273,7 +273,10 @@ describe("BSDA validation", () => {
       };
 
       try {
-        await parseBsda(data, { currentSignatureType: "TRANSPORT" });
+        await parseBsda(data, {
+          currentSignatureType: "TRANSPORT",
+          enableSaveTransporterReceipt: false
+        });
       } catch (error) {
         expect(error.issues[0].message).toBe(
           "Transporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
