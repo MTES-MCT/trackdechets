@@ -1,3 +1,4 @@
+import { EmitterType, Form, Status } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
@@ -13,10 +14,10 @@ import { EventType } from "../../workflow/types";
 import { sendMail } from "../../../mailer/mailing";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { contentAwaitsGuest } from "../../../mailer/templates";
-import { EmitterType, Form, Status } from "@prisma/client";
 import { FormRepository, getFormRepository } from "../../repository";
 import prisma from "../../../prisma";
 import { runInTransaction } from "../../../common/repository/helper";
+import { recipifyTransporterInDb } from "../../recipify";
 
 const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   parent,
@@ -32,14 +33,14 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   await checkCanBeSealed({ ...form, ...transporter });
 
   await validateForwardedInCompanies(form);
-  let formUpdateInput;
 
+  let specialFormUpdateInput;
   if (
     form.emitterIsForeignShip === true ||
     form.emitterIsPrivateIndividual === true
   ) {
     // pre-validate when signature by producer will be by-passed at the end of this mutation
-    formUpdateInput = {
+    specialFormUpdateInput = {
       emittedAt: new Date(),
       emittedBy: form.emitterIsPrivateIndividual
         ? "Signature auto (particulier)"
@@ -49,11 +50,11 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       emitterIsForeignShip: form.emitterIsForeignShip,
       emitterIsPrivateIndividual: form.emitterIsPrivateIndividual
     };
-    const futureForm: Form = {
+
+    await wasteDetailsSchema.validate({
       ...form,
-      ...formUpdateInput
-    };
-    await wasteDetailsSchema.validate(futureForm);
+      ...specialFormUpdateInput
+    });
   }
 
   const emitterCompanyExists = form.emitterCompanySiret
@@ -62,6 +63,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       })) > 0
     : false;
 
+  const formUpdateInput = await recipifyTransporterInDb(transporter);
   const resultingForm = await runInTransaction(async transaction => {
     const formRepository = getFormRepository(user, transaction);
     const sealedForm = await formRepository.update(
@@ -69,7 +71,9 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       {
         status: transitionForm(form, {
           type: EventType.MarkAsSealed
-        })
+        }),
+        ...(specialFormUpdateInput ? { ...specialFormUpdateInput } : {}),
+        ...formUpdateInput
       }
     );
 
@@ -87,7 +91,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
 
     // by-pass producer signature
     if (
-      formUpdateInput &&
+      specialFormUpdateInput &&
       (sealedForm.emitterIsForeignShip === true ||
         sealedForm.emitterIsPrivateIndividual === true)
     ) {
@@ -95,10 +99,8 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
         { id: sealedForm.id },
         {
           status: transitionForm(sealedForm, {
-            type: EventType.SignedByProducer,
-            formUpdateInput
-          }),
-          ...formUpdateInput
+            type: EventType.SignedByProducer
+          })
         }
       );
     }

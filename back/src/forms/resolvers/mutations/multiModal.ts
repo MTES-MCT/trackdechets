@@ -16,6 +16,10 @@ import { Prisma } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import prisma from "../../../prisma";
 import { sirenifyTransportSegmentInput } from "../../sirenify";
+import {
+  recipifyTransportSegmentInput,
+  recipifyTransporterInDb
+} from "../../recipify";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import {
   PartialTransporterCompany,
@@ -30,6 +34,8 @@ import {
   MISSING_COMPANY_SIRET_OR_VAT
 } from "../../errors";
 import {
+  REQUIRED_RECEIPT_DEPARTMENT,
+  REQUIRED_RECEIPT_NUMBER,
   foreignVatNumber,
   siret,
   siretConditions,
@@ -78,18 +84,14 @@ const segmentSchema = yup.object<any>().shape({
     .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
       is: (isExempted, vat) => isForeignVat(vat) || isExempted,
       then: schema => schema.notRequired().nullable(),
-      otherwise: schema =>
-        schema.required(
-          "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-        )
+      otherwise: schema => schema.required(REQUIRED_RECEIPT_NUMBER)
     }),
   transporterDepartment: yup
     .string()
     .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
       is: (isExempted, vat) => isForeignVat(vat) || isExempted,
       then: schema => schema.notRequired().nullable(),
-      otherwise: schema =>
-        schema.required("Le département du transporteur est obligatoire")
+      otherwise: schema => schema.required(REQUIRED_RECEIPT_DEPARTMENT)
     }),
 
   transporterValidityLimit: yup.date().nullable(),
@@ -135,7 +137,8 @@ export async function prepareSegment(
   );
 
   const sirenified = await sirenifyTransportSegmentInput(nextSegmentInfo, user);
-  const nextSegmentPayload = flattenTransportSegmentInput(sirenified);
+  const recipified = await recipifyTransportSegmentInput(sirenified);
+  const nextSegmentPayload = flattenTransportSegmentInput(recipified);
   const nextSegmentPayloadOrgId = getTransporterCompanyOrgId(
     nextSegmentPayload as PartialTransporterCompany
   );
@@ -247,6 +250,8 @@ export async function markSegmentAsReadyToTakeOver(
   if (!currentSegment) {
     throw new ForbiddenError(SEGMENT_NOT_FOUND);
   }
+
+  const formUpdateInput = await recipifyTransporterInDb(currentSegment);
   const formRepository = getFormRepository(user);
   const form = await formRepository.findUnique(
     { id: currentSegment.form.id },
@@ -285,7 +290,17 @@ export async function markSegmentAsReadyToTakeOver(
     { id: currentSegment.form.id },
     {
       transporters: {
-        update: { where: { id }, data: { readyToTakeOver: true } }
+        update: {
+          where: { id },
+          ...(formUpdateInput.transporters?.update?.data
+            ? {
+                data: {
+                  ...formUpdateInput.transporters?.update?.data,
+                  readyToTakeOver: true
+                }
+              }
+            : { data: { readyToTakeOver: true } })
+        }
       }
     }
   );
@@ -364,6 +379,7 @@ export async function takeOverSegment(
       )}`
     );
   }
+  const formUpdateInput = await recipifyTransporterInDb(currentSegment);
 
   await formRepository.update(
     { id: currentSegment.form.id },
@@ -373,7 +389,14 @@ export async function takeOverSegment(
       transporters: {
         update: {
           where: { id },
-          data: takeOverInfo
+          ...(formUpdateInput.transporters?.update?.data
+            ? {
+                data: {
+                  ...formUpdateInput.transporters?.update?.data,
+                  ...takeOverInfo
+                }
+              }
+            : { data: takeOverInfo })
         }
       }
     },
@@ -415,8 +438,9 @@ export async function editSegment(
   if (!currentSegment) {
     throw new ForbiddenError(SEGMENT_NOT_FOUND);
   }
-
-  const nextSegmentPayload = flattenTransportSegmentInput(nextSegmentInfo);
+  const sirenified = await sirenifyTransportSegmentInput(nextSegmentInfo, user);
+  const recipified = await recipifyTransportSegmentInput(sirenified);
+  const nextSegmentPayload = flattenTransportSegmentInput(recipified);
   const nextSegmentPayloadOrgId = getTransporterCompanyOrgId(
     nextSegmentPayload as PartialTransporterCompany
   );

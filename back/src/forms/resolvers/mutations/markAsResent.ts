@@ -1,6 +1,6 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getFormOrFormNotFound } from "../../database";
+import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb, flattenFormInput } from "../../converter";
 import transitionForm from "../../workflow/transitionForm";
 import { checkCanMarkAsResent } from "../../permissions";
@@ -12,6 +12,7 @@ import {
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import { EmitterType, Prisma, Status } from "@prisma/client";
+import { recipifyTransporterInDb } from "../../recipify";
 
 const markAsResentResolver: MutationResolvers["markAsResent"] = async (
   parent,
@@ -38,6 +39,9 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
   await checkCanMarkAsResent(user, form);
 
   const { destination, transporter, wasteDetails } = resentInfos;
+  const formTransporterReceiptInput = await recipifyTransporterInDb(
+    await getFirstTransporter(forwardedIn!)
+  );
 
   // copy basic info from initial BSD and overwrite it with resealedInfos
   const updateInput: Prisma.FormUpdateInput = {
@@ -54,7 +58,8 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
     wasteDetailsName: form.wasteDetailsName,
     wasteDetailsOnuCode: form.wasteDetailsOnuCode,
     wasteDetailsPop: form.wasteDetailsPop,
-    ...flattenFormInput({ transporter, wasteDetails, recipient: destination })
+    ...flattenFormInput({ transporter, wasteDetails, recipient: destination }),
+    ...formTransporterReceiptInput
   };
 
   // validate input

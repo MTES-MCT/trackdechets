@@ -8,7 +8,8 @@ import {
   formWithTempStorageFactory,
   siretify,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { CompanyType, CompanyVerificationStatus, Status } from "@prisma/client";
@@ -169,6 +170,159 @@ describe("Mutation markAsResealed", () => {
     expect(resealedForm.forwardedIn!.status).toEqual("SEALED");
   });
 
+  test("transporter receipt is pulled from db", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const destination = await destinationFactory();
+    const transporter = await companyFactory({
+      companyTypes: { set: [CompanyType.TRANSPORTER] }
+    });
+
+    await transporterReceiptFactory({
+      number: "reseal number",
+      company: transporter
+    });
+
+    const { mutate } = makeClient(user);
+
+    const form = await formFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
+      }
+    });
+
+    await mutate<Pick<Mutation, "markAsResealed">, MutationMarkAsResealedArgs>(
+      MARK_AS_RESEALED,
+      {
+        variables: {
+          id: form.id,
+          resealedInfos: {
+            destination: {
+              company: {
+                siret: destination.siret,
+                name: destination.name,
+                address: destination.address,
+                contact: "Mr Destination",
+                mail: destination.contactEmail,
+                phone: destination.contactPhone
+              },
+              cap: "CAP 2",
+              processingOperation: "R 1"
+            },
+            transporter: {
+              company: {
+                siret: transporter.siret,
+                name: transporter.name,
+                address: transporter.address,
+                contact: "Mr transporter",
+                mail: transporter.contactEmail,
+                phone: transporter.contactPhone
+              }
+            }
+          }
+        }
+      }
+    );
+
+    const resealedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: {
+        forwardedIn: {
+          include: {
+            transporters: true
+          }
+        }
+      }
+    });
+    expect(resealedForm.status).toEqual("RESEALED");
+    expect(resealedForm.forwardedIn!.emitterCompanySiret).toEqual(
+      collector.siret
+    );
+    expect(resealedForm.forwardedIn!.recipientCompanySiret).toEqual(
+      destination.siret
+    );
+    expect(resealedForm.forwardedIn!.readableId).toEqual(
+      `${form.readableId}-suite`
+    );
+    expect(resealedForm.forwardedIn!.status).toEqual("SEALED");
+    const firstTransporter = resealedForm.forwardedIn!.transporters[0];
+    expect(firstTransporter.transporterReceipt).toEqual("reseal number");
+    expect(firstTransporter.transporterDepartment).toEqual("83");
+    expect(firstTransporter.transporterValidityLimit).toEqual(
+      new Date("2055-01-01T00:00:00.000Z")
+    );
+  });
+
+  test("transporter without receipt can markAsResealed", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const destination = await destinationFactory();
+
+    // this transporter has no receipt in db
+    const transporter = await companyFactory({
+      companyTypes: { set: [CompanyType.TRANSPORTER] }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const form = await formFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsResealed">,
+      MutationMarkAsResealedArgs
+    >(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {
+          destination: {
+            company: {
+              siret: destination.siret,
+              name: destination.name,
+              address: destination.address,
+              contact: "Mr Destination",
+              mail: destination.contactEmail,
+              phone: destination.contactPhone
+            },
+            cap: "CAP 2",
+            processingOperation: "R 1"
+          },
+          transporter: {
+            company: {
+              siret: transporter.siret,
+              name: transporter.name,
+              address: transporter.address,
+              contact: "Mr transporter",
+              mail: transporter.contactEmail,
+              phone: transporter.contactPhone
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
   test("it should fail if temporary storage detail is incomplete", async () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(
@@ -267,6 +421,10 @@ describe("Mutation markAsResealed", () => {
     );
     const destination = await destinationFactory();
     const transporter = await companyFactory();
+    await transporterReceiptFactory({
+      number: "reseal number",
+      company: transporter
+    });
 
     const { mutate } = makeClient(user);
 
@@ -416,7 +574,7 @@ describe("Mutation markAsResealed", () => {
     );
     const destination = await destinationFactory();
     const transporter = await companyFactory();
-
+    await transporterReceiptFactory({ company: transporter });
     const { mutate } = makeClient(user);
 
     const form = await formWithTempStorageFactory({
@@ -429,16 +587,12 @@ describe("Mutation markAsResealed", () => {
       forwardedInOpts: { recipientCompanySiret: destination.siret }
     });
 
-    await mutate(MARK_AS_RESEALED, {
+    const { errors } = await mutate(MARK_AS_RESEALED, {
       variables: {
         id: form.id,
         resealedInfos: {
           transporter: {
             isExemptedOfReceipt: false,
-            receipt: "333",
-            department: "27",
-            numberPlate: "",
-            validityLimit: "2021-12-31",
             customInfo: "Route",
             company: {
               name: "Transporteur",
@@ -452,7 +606,7 @@ describe("Mutation markAsResealed", () => {
         }
       }
     });
-
+    console.log(errors);
     const resealedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });

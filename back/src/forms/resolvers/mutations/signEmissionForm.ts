@@ -20,6 +20,7 @@ import { wasteDetailsSchema } from "../../validation";
 import { getFormRepository } from "../../repository";
 import { prismaJsonNoNull } from "../../../common/converter";
 import { Permission } from "../../../permissions";
+import { recipifyTransporterInDb } from "../../recipify";
 
 const signatures: Partial<
   Record<
@@ -61,9 +62,10 @@ const signatures: Partial<
         args.securityCode
       );
     }
-
     const transporter = await getFirstTransporter(existingForm);
-
+    const formTransporterReceiptInput = await recipifyTransporterInDb(
+      transporter
+    );
     const formUpdateInput: Prisma.FormUpdateInput = {
       wasteDetailsPackagingInfos:
         prismaJsonNoNull(args.input.packagingInfos) ??
@@ -73,14 +75,17 @@ const signatures: Partial<
       wasteDetailsOnuCode:
         args.input.onuCode ?? existingForm.wasteDetailsOnuCode,
       transporters: {
-        updateMany: {
-          where: { number: 1 },
-          data: {
-            transporterNumberPlate:
-              args.input.transporterNumberPlate ??
-              transporter?.transporterNumberPlate
+        ...{
+          updateMany: {
+            where: { number: 1 },
+            data: {
+              transporterNumberPlate:
+                args.input.transporterNumberPlate ??
+                transporter?.transporterNumberPlate
+            }
           }
-        }
+        },
+        ...formTransporterReceiptInput.transporters
       },
       emittedAt: args.input.emittedAt,
       emittedBy: args.input.emittedBy,
@@ -119,6 +124,9 @@ const signatures: Partial<
 
     const existingFullForm = await getFullForm(existingForm);
     const transporter = getFirstTransporterSync(existingFullForm.forwardedIn!);
+    const formTransporterReceiptInput = await recipifyTransporterInDb(
+      transporter
+    );
     const formUpdateInput: Prisma.FormUpdateInput = {
       forwardedIn: {
         update: {
@@ -151,7 +159,8 @@ const signatures: Partial<
             : {}),
 
           emittedAt: args.input.emittedAt,
-          emittedBy: args.input.emittedBy
+          emittedBy: args.input.emittedBy,
+          ...formTransporterReceiptInput
         }
       }
     };

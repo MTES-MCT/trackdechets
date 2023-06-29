@@ -9,7 +9,8 @@ import {
   siretify,
   toIntermediaryCompany,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {
@@ -239,6 +240,126 @@ describe("Mutation.updateForm", () => {
       expect(sirenifyMock).toHaveBeenCalledTimes(1);
     }
   );
+
+  it("should autocomplete transporter receipt with receipt pulled from db", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const transporterCompany = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({
+      company: transporterCompany
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: company.siret,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      transporter: {
+        company: { siret: transporterCompany.siret }
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    // receipt data is pulled from db
+    expect(data.updateForm.transporter!.receipt).toEqual("the number");
+    expect(data.updateForm.transporter!.department).toEqual("83");
+    expect(data.updateForm.transporter!.validityLimit).toEqual(
+      "2055-01-01T00:00:00.000Z"
+    );
+  });
+
+  it("should void transporter receipt is they do not have receipt in db", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    // transporter has not receipt stored in db
+    const transporterCompany = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: company.siret,
+            number: 1,
+            transporterReceipt: "plop",
+            transporterDepartment: "65",
+            transporterValidityLimit: new Date()
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      transporter: {
+        company: { siret: transporterCompany.siret }
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    // receipt data is pulled from db
+    expect(data.updateForm.transporter!.receipt).toEqual(null);
+    expect(data.updateForm.transporter!.department).toEqual(null);
+    expect(data.updateForm.transporter!.validityLimit).toEqual(null);
+  });
+
+  it("should should left transporter receipt unchanged if transporter is unchanged", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const receipt = await transporterReceiptFactory({ company });
+    // form receipt is fileld
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: company.siret,
+            number: 1,
+            transporterReceipt: receipt.receiptNumber,
+            transporterDepartment: receipt.department,
+            transporterValidityLimit: receipt.validityLimit
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    // transporter is unchanged
+    const updateFormInput = {
+      id: form.id,
+      wasteDetails: {
+        code: "01 01 01"
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    // receipt data is unchanged
+    expect(data.updateForm.transporter!.receipt).toEqual(receipt.receiptNumber);
+    expect(data.updateForm.transporter!.department).toEqual(receipt.department);
+    expect(data.updateForm.transporter!.validityLimit).toEqual(
+      receipt.validityLimit
+    );
+  });
 
   it.each(["emitter", "trader", "broker", "recipient", "transporter"])(
     "should allow %p to update a sealed form",
@@ -1966,6 +2087,12 @@ describe("Mutation.updateForm", () => {
 
   it("should update denormalized fields", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporterCompany = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({ company: transporterCompany });
+
+    const intermediaryCompany = await companyFactory();
     const { mutate } = makeClient(user);
 
     const form = await formFactory({
@@ -1985,9 +2112,9 @@ describe("Mutation.updateForm", () => {
       variables: {
         updateFormInput: {
           id: form.id,
-          transporter: { company: { siret: company.siret } },
+          transporter: { company: { siret: transporterCompany.siret } },
           recipient: { company: { siret: company.siret } },
-          intermediaries: [toIntermediaryCompany(company)]
+          intermediaries: [toIntermediaryCompany(intermediaryCompany)]
         }
       }
     });
@@ -1997,8 +2124,10 @@ describe("Mutation.updateForm", () => {
     });
 
     expect(updatedForm.recipientsSirets).toContain(company.siret);
-    expect(updatedForm.transportersSirets).toContain(company.siret);
-    expect(updatedForm.intermediariesSirets).toContain(company.siret);
+    expect(updatedForm.transportersSirets).toContain(transporterCompany.siret);
+    expect(updatedForm.intermediariesSirets).toContain(
+      intermediaryCompany.siret
+    );
   });
 
   it("should not be possible to update a weight > 40 T when transport mode is ROAD", async () => {

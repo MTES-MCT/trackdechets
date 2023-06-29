@@ -11,6 +11,7 @@ import {
   formFactory,
   formWithTempStorageFactory,
   siretify,
+  transporterReceiptFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -32,6 +33,7 @@ sendMailSpy.mockImplementation(() => Promise.resolve());
 // Mock external search services
 import * as search from "../../../../companies/sirene/searchCompany";
 import { MARK_AS_SEALED } from "./mutations";
+import { getFirstTransporterSync } from "../../../database";
 
 const searchCompanyMock = jest.spyOn(search, "default");
 
@@ -91,7 +93,7 @@ describe("Mutation.markAsSealed", () => {
         companyTypes: { set: [companyType(role) as CompanyType] }
       });
 
-      let form = await formFactory({
+      const form = await formFactory({
         ownerId: user.id,
         opt: {
           status: "DRAFT",
@@ -127,12 +129,19 @@ describe("Mutation.markAsSealed", () => {
         }
       });
 
-      form = await prisma.form.findUniqueOrThrow({
+      const formDb = await prisma.form.findUniqueOrThrow({
         where: { id: form.id },
-        include: { forwardedIn: true }
+        include: { transporters: true }
       });
 
-      expect(form.status).toEqual("SEALED");
+      expect(formDb.status).toEqual("SEALED");
+      // check transporters
+      const transporter = getFirstTransporterSync(formDb);
+      // should let the transporter receipt empty
+      expect(transporter!.transporterValidityLimit).toEqual(null);
+      expect(transporter!.transporterDepartment).toEqual(null);
+      expect(transporter!.transporterReceipt).toEqual(null);
+      expect(transporter!.transporterIsExemptedOfReceipt).toEqual(false);
 
       // check relevant statusLog is created
       const statusLogs = await prisma.statusLog.findMany({
@@ -145,6 +154,53 @@ describe("Mutation.markAsSealed", () => {
       expect(statusLogs.length).toEqual(1);
     }
   );
+
+  it("should auto-complete transporter receipt", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const recipientCompany = await destinationFactory();
+    const company = await companyFactory({
+      companyTypes: CompanyType.TRANSPORTER
+    });
+    const transporterReceipt = await transporterReceiptFactory({ company });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: company.siret,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "markAsSealed">>(
+      MARK_AS_SEALED,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+
+    expect(data.markAsSealed.status).toBe("SEALED");
+    expect(data.markAsSealed.transporter?.isExemptedOfReceipt).toBe(false);
+    expect(data.markAsSealed.transporter?.receipt).toBe(
+      transporterReceipt.receiptNumber
+    );
+    expect(data.markAsSealed.transporter?.validityLimit).toBe(
+      transporterReceipt.validityLimit.toISOString()
+    );
+    expect(data.markAsSealed.transporter?.department).toBe(
+      transporterReceipt.department
+    );
+  });
 
   it("the eco-organisme of the BSD can seal it", async () => {
     const emitterCompany = await companyFactory();

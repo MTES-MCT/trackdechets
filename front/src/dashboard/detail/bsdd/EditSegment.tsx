@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
-import { string, object, date, boolean } from "yup";
+import { string, object, boolean } from "yup";
 import cogoToast from "cogo-toast";
 import {
-  CompanySearchPrivate,
-  CompanySearchResult,
   Mutation,
   MutationEditSegmentArgs,
   NextSegmentInfoInput,
@@ -43,27 +41,6 @@ type Props = {
 export const validationSchema = object().shape({
   transporter: object().shape({
     isExemptedOfReceipt: boolean().nullable(),
-    receipt: string().when(["isExemptedOfReceipt", "company.vatNumber"], {
-      is: (isExemptedOfReceipt: boolean, transporterCompanyVatNumber: string) =>
-        isForeignVat(transporterCompanyVatNumber) || isExemptedOfReceipt,
-      then: schema => schema.nullable(true),
-      otherwise: schema =>
-        schema
-          .ensure()
-          .required(
-            "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-          ),
-    }),
-    department: string().when(["isExemptedOfReceipt", "company.vatNumber"], {
-      is: (isExemptedOfReceipt: boolean, transporterCompanyVatNumber: string) =>
-        isForeignVat(transporterCompanyVatNumber) || isExemptedOfReceipt,
-      then: schema => schema.nullable(true),
-      otherwise: schema =>
-        schema
-          .ensure()
-          .required("Le département du transporteur est obligatoire"),
-    }),
-    validityLimit: date().nullable(true),
     numberPlate: string().nullable(true),
     company: transporterCompanySchema,
   }),
@@ -74,32 +51,12 @@ export const validationSchema = object().shape({
  * @param setFieldValue Formik function
  * @returns
  */
-export const onCompanySelected =
-  setFieldValue =>
-  (transporter?: CompanySearchResult | CompanySearchPrivate) => {
-    if (transporter?.transporterReceipt) {
-      setFieldValue(
-        "transporter.receipt",
-        transporter?.transporterReceipt.receiptNumber
-      );
-      setFieldValue(
-        "transporter.validityLimit",
-        transporter?.transporterReceipt.validityLimit
-      );
-      setFieldValue(
-        "transporter.department",
-        transporter?.transporterReceipt.department
-      );
-    } else {
-      setFieldValue("transporter.receipt", null);
-      setFieldValue("transporter.validityLimit", null);
-      setFieldValue("transporter.department", null);
-    }
-    // automatically check the receipt exemption
-    if (isForeignVat(transporter?.vatNumber!)) {
-      setFieldValue("transporter.isExemptedOfReceipt", true);
-    }
-  };
+export const onCompanySelected = setFieldValue => transporter => {
+  // automatically check the receipt exemption
+  if (isForeignVat(transporter?.vatNumber!)) {
+    setFieldValue("transporter.isExemptedOfReceipt", true);
+  }
+};
 
 export default function EditSegment({ siret, segment }: Props) {
   const [isOpen, setIsOpen] = useState(false);

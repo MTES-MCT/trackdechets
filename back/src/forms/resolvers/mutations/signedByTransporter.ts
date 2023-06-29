@@ -15,6 +15,7 @@ import {
 } from "../../converter";
 import { checkCanSignedByTransporter } from "../../permissions";
 import { signingInfoSchema, validateBeforeTransport } from "../../validation";
+import { recipifyFormInput } from "../../recipify";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
@@ -76,11 +77,26 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
     // check waste details override is valid and transporter info is filled
     await validateBeforeTransport(futureForm);
 
+    const recipifiedTransporter = await recipifyFormInput({
+      transporter: {
+        isExemptedOfReceipt: transporter?.transporterIsExemptedOfReceipt,
+        receipt: transporter?.transporterReceipt,
+        validityLimit: transporter?.transporterValidityLimit,
+        department: transporter?.transporterDepartment
+      }
+    });
+
     const formRepository = getFormRepository(user);
 
     const transporterUpdate: Prisma.BsddTransporterUpdateWithoutFormInput = {
       takenOverAt: infos.sentAt, // takenOverAt is duplicated between Form and BsddTransporter
-      takenOverBy: user.name // takenOverBy is duplicated between Form and BsddTransporter
+      takenOverBy: user.name, // takenOverBy is duplicated between Form and BsddTransporter
+      transporterReceipt: recipifiedTransporter.transporter?.receipt,
+      transporterDepartment: recipifiedTransporter.transporter?.department,
+      transporterValidityLimit:
+        recipifiedTransporter.transporter?.validityLimit,
+      transporterIsExemptedOfReceipt:
+        recipifiedTransporter.transporter?.isExemptedOfReceipt
     };
 
     if (form.takenOverAt && fullForm.forwardedIn) {
