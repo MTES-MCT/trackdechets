@@ -90,7 +90,7 @@ export default function Dashboard() {
         updatePermissions(currentCompany.userPermissions);
       }
     }
-  }, [data, siret]);
+  }, [updatePermissions, data, siret]);
 
   if (data?.me == null) {
     return <Loader />;

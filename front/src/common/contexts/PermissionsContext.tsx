@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useCallback } from "react";
 import { UserPermission } from "generated/graphql/types";
 
 interface InterfacePermissions {
@@ -26,9 +26,12 @@ export function PermissionsProvider({
   const [permissions, setPermissions] =
     useState<UserPermission[]>(defaultPermissions);
 
-  function updatePermissions(newPermissions: UserPermission[]) {
-    setPermissions(newPermissions);
-  }
+  const updatePermissions = useCallback(
+    (newPermissions: UserPermission[]) => {
+      setPermissions(newPermissions);
+    },
+    [setPermissions]
+  );
 
   return (
     <PermissionsContext.Provider value={{ permissions, updatePermissions }}>

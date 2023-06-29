@@ -55,7 +55,6 @@ function MobileSubNav({ currentSiret }) {
   const { updatePermissions } = usePermissions();
   const { error, data } = useQuery<Pick<Query, "me">>(GET_ME, {});
   const isV2Routes = !!useRouteMatch("/v2/dashboard/");
-  if (error) return <InlineError apolloError={error} />;
 
   useEffect(() => {
     if (data) {
@@ -67,7 +66,9 @@ function MobileSubNav({ currentSiret }) {
         updatePermissions(currentCompany.userPermissions);
       }
     }
-  }, [data, currentSiret]);
+  }, [updatePermissions, data, currentSiret]);
+
+  if (error) return <InlineError apolloError={error} />;
 
   if (data?.me == null) return <Loader />;
 
