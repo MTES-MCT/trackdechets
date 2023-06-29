@@ -15,11 +15,15 @@ const DropdownMenu = ({
 }: DropdownMenuProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { targetRef } = useOnClickOutsideRefTarget({
-    onClickOutside: () => setIsOpen(false),
+    onClickOutside: () => closeMenu(),
   });
 
-  const onClick = () => {
+  const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const closeMenu = () => {
+    setIsOpen(false);
   };
 
   return (
@@ -34,10 +38,7 @@ const DropdownMenu = ({
             "menu-btn__iconAlone": iconAlone,
           })}
           disabled={isDisabled}
-          onClick={e => {
-            setIsOpen(false);
-            onClick();
-          }}
+          onClick={toggleMenu}
         >
           {menuTitle}
         </button>
@@ -55,7 +56,7 @@ const DropdownMenu = ({
                       type="button"
                       className="fr-btn fr-btn--tertiary-no-outline"
                       onClick={e => {
-                        setIsOpen(false);
+                        closeMenu();
                         !!link.handleClick && link.handleClick(e);
                       }}
                     >
@@ -73,6 +74,7 @@ const DropdownMenu = ({
                           ? link.route
                           : { ...link.route }
                       }
+                      onClick={closeMenu}
                     >
                       {link.icon && (
                         <span className="dropdown-menu__content__icon">
