@@ -3,7 +3,10 @@ import { User } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { app } from "../../server";
 import { createAccessToken } from "../../users/database";
-import { userWithCompanyFactory } from "../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  transporterReceiptFactory
+} from "../../__tests__/factories";
 
 const request = supertest(app);
 
@@ -202,7 +205,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
     expect(exutoireSignatureResponse.body.data.signBsda.status).toBe(
       "SIGNED_BY_WORKER"
     );
-
+    // le transporteur renseigne son récépissé juste avant signature.
+    await transporterReceiptFactory({ company: transporterCompany });
     // Ensuite le transporteur édite ses données, puis signe
     const transporterBsdaQuery = `
         mutation {
@@ -390,7 +394,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
     expect(workerSignatureResponse.body.data.signBsda.status).toBe(
       "SIGNED_BY_WORKER"
     );
-
+    // le transporteur renseigne son récépissé juste avant signature.
+    await transporterReceiptFactory({ company: transporterCompany });
     // Ensuite le transporteur édite ses données, puis signe
     const transporterBsdaQuery = `
         mutation {
