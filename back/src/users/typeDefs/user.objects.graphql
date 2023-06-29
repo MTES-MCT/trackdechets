@@ -31,6 +31,8 @@ type User {
   "DEPRECATED - Liste des établissements dont l'utilisateur est membre. "
   companies: [CompanyPrivate!]!
     @deprecated(reason: "Utiliser la query avec pagination `myCompanies`")
+
+  featureFlags: [FeatureFlag!]!
 }
 
 """
@@ -57,8 +59,18 @@ type MembershipRequest {
   de rattachement a été envoyée. Si l'email associé au compte qui effectue la requête
   n'appartient pas au même domaine, les adresses emails sont partiellement masquées de la
   façon suivante j********w@trackdechets.fr.
-  Les adresses emails issues de fournisseurs de boite mail (gmail, orange, yahoo etc) 
+  Les adresses emails issues de fournisseurs de boite mail (gmail, orange, yahoo etc)
   sont toujours partiellement masquées.
   """
   sentTo: [String!]!
+}
+
+"""
+Fonctionnalité optionelle
+"""
+type FeatureFlag {
+  "Nom de la fonctionnalité"
+  name: String!
+  "Etat d'activation de la fonctionnalité"
+  enabled: Boolean!
 }
