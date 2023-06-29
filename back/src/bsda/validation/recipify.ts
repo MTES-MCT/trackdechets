@@ -6,16 +6,22 @@ export const recipify = async (bsda: Bsda, enableSaveTransporterReceipt) => {
   if (bsda.transporterRecepisseIsExempted === true) {
     return bsda;
   }
-  const transporterReceipt = await prisma.company
-    .findUnique({
-      where: {
-        orgId: getTransporterCompanyOrgId({
-          transporterCompanySiret: bsda.transporterCompanySiret ?? null,
-          transporterCompanyVatNumber: bsda.transporterCompanyVatNumber ?? null
-        })!
-      }
-    })
-    .transporterReceipt();
+  const orgId = getTransporterCompanyOrgId({
+    transporterCompanySiret: bsda.transporterCompanySiret ?? null,
+    transporterCompanyVatNumber: bsda.transporterCompanyVatNumber ?? null
+  });
+
+  let transporterReceipt;
+  if (orgId) {
+    transporterReceipt = await prisma.company
+      .findUnique({
+        where: {
+          orgId
+        }
+      })
+      .transporterReceipt();
+  }
+
   const data = {
     transporterRecepisseNumber: transporterReceipt?.receiptNumber ?? null,
     transporterRecepisseValidityLimit:
