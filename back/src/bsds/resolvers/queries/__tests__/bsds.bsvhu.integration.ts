@@ -1,4 +1,3 @@
-import { addYears } from "date-fns";
 import {
   Company,
   User,
@@ -23,7 +22,10 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { indexBsvhu } from "../../../../bsvhu/elastic";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  transporterReceiptFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 
 const GET_BSDS = `
@@ -43,7 +45,7 @@ const CREATE_DRAFT_VHU = `
 mutation CreateDraftVhu($input: BsvhuInput!) {
   createDraftBsvhu(input: $input) {
     id
-     
+
   }
 }
 `;
@@ -82,6 +84,7 @@ describe("Query.bsds.vhus base workflow", () => {
         set: ["TRANSPORTER"]
       }
     });
+    await transporterReceiptFactory({ company: transporter.company });
     destination = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["WASTEPROCESSOR"]
@@ -148,11 +151,6 @@ describe("Query.bsds.vhus base workflow", () => {
                 contact: "Un transporteur de voiture cassée",
                 phone: "0101010101",
                 mail: "transporter@mail.com"
-              },
-              recepisse: {
-                number: "122",
-                department: "83",
-                validityLimit: addYears(new Date(), 1).toISOString() as any
               }
             }
           }

@@ -17,7 +17,11 @@ import {
   QueryBsdsArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  transporterReceiptFactory
+} from "../../../../__tests__/factories";
+
 import makeClient from "../../../../__tests__/testClient";
 
 const CREATE_DRAFT_BSDA = `
@@ -82,6 +86,7 @@ describe("Query.bsds.bsda base workflow", () => {
         set: ["TRANSPORTER"]
       }
     });
+    await transporterReceiptFactory({ company: transporter.company });
     destination = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["WASTEPROCESSOR"]
@@ -132,11 +137,6 @@ describe("Query.bsds.bsda base workflow", () => {
                 contact: "contactEmail",
                 phone: "contactPhone",
                 mail: "contactEmail@mail.com"
-              },
-              recepisse: {
-                department: "83",
-                number: "1234",
-                validityLimit: new Date().toISOString() as any
               },
               transport: {
                 mode: "ROAD",
