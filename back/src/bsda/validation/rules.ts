@@ -205,7 +205,7 @@ export const editionRules: {
       !bsda.transporterRecepisseIsExempted &&
       !isForeignVat(bsda.transporterCompanyVatNumber),
     name: "Transporteur: le numéro de récépissé",
-    suffix: " 'établissement doit renseigner son récépissé dans Trackdéchets"
+    suffix: " L'établissement doit renseigner son récépissé dans Trackdéchets"
   },
   transporterRecepisseDepartment: {
     sealedBy: "TRANSPORT",

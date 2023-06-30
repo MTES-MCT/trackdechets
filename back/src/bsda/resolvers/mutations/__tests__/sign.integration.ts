@@ -451,7 +451,7 @@ describe("Mutation.Bsda.sign", () => {
               {
                 code: "custom",
                 message:
-                  "Transporteur: le numéro de récépissé est obligatoire. 'établissement doit renseigner son récépissé dans Trackdéchets",
+                  "Transporteur: le numéro de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets",
                 path: []
               }
             ])
