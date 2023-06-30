@@ -113,7 +113,7 @@ export default function DashboardTabs({
           </li>
         </ul>
 
-        {currentCompany.companyTypes.includes(CompanyType.Transporter) && (
+        {/* {currentCompany.companyTypes.includes(CompanyType.Transporter) && (
           <>
             <p className="sidebar__chapter ">Transport</p>
             <ul>
@@ -141,7 +141,7 @@ export default function DashboardTabs({
               </li>
             </ul>
           </>
-        )}
+        )} */}
 
         <ul>
           <li>

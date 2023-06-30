@@ -4,6 +4,7 @@ import { CompanyPrivate, CompanyType } from "generated/graphql/types";
 import DashboardCompanySelector from "./DashboardCompanySelector";
 import routes from "Apps/routes";
 import "./DashboardTabs.scss";
+import { useIsTransporterOnBsds } from "./transport/hooks/useIsTransporterOnBsds";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;
@@ -15,6 +16,11 @@ export function DashboardTabs({
   companies,
 }: DashboardTabsProps) {
   const history = useHistory();
+
+  const { isTransporterOnBsds } = useIsTransporterOnBsds(
+    currentCompany.companyTypes,
+    currentCompany.siret
+  );
 
   return (
     <>
@@ -98,7 +104,7 @@ export function DashboardTabs({
           </li>
         </ul>
 
-        {currentCompany.companyTypes.includes(CompanyType.Transporter) && (
+        {isTransporterOnBsds && (
           <>
             <p className="sidebar__chapter ">Transport</p>
             <ul>
