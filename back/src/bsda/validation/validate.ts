@@ -80,7 +80,7 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
             : `Le champ ${field}`;
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `${description} est obligatoire.${rule.suffix}`
+            message: `${description} est obligatoire.${rule.suffix ?? ""}`
           });
         }
       }
