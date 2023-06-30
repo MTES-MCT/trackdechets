@@ -1,4 +1,4 @@
-import { Company, User, UserRole } from "@prisma/client";
+import { Company, TransporterReceipt, User, UserRole } from "@prisma/client";
 import {
   Query,
   QueryBsdsArgs,
@@ -71,6 +71,7 @@ mutation CreateForm($createFormInput: CreateFormInput!) {
 describe("Query.bsds workflow", () => {
   let emitter: { user: User; company: Company };
   let transporter: { user: User; company: Company };
+  let transporterReceipt: TransporterReceipt;
   let recipient: { user: User; company: Company };
   let intermediary: { user: User; company: Company };
   let formId: string;
@@ -91,7 +92,7 @@ describe("Query.bsds workflow", () => {
         set: ["TRANSPORTER"]
       }
     });
-    await transporterReceiptFactory({
+    transporterReceipt = await transporterReceiptFactory({
       company: transporter.company
     });
 
@@ -374,6 +375,25 @@ describe("Query.bsds workflow", () => {
 
   describe("when the bsd is received by the recipient", () => {
     beforeAll(async () => {
+      const { id } = await formFactory({
+        ownerId: emitter.user.id,
+        opt: {
+          emitterCompanySiret: emitter.company.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.company.siret,
+              transporterDepartment: transporterReceipt.department,
+              transporterIsExemptedOfReceipt: false,
+              transporterValidityLimit: transporterReceipt.validityLimit,
+              transporterReceipt: transporterReceipt.receiptNumber,
+              number: 1
+            }
+          },
+          recipientCompanySiret: recipient.company.siret,
+          status: "SENT"
+        }
+      });
+      formId = id;
       expect(formId).toBeDefined();
       const { mutate } = makeClient(recipient.user);
       const MARK_AS_RECEIVED = `
@@ -424,6 +444,26 @@ describe("Query.bsds workflow", () => {
 
   describe("when the bsd is treated by the recipient", () => {
     beforeAll(async () => {
+      const { id } = await formFactory({
+        ownerId: emitter.user.id,
+        opt: {
+          emitterCompanySiret: emitter.company.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.company.siret,
+              transporterDepartment: transporterReceipt.department,
+              transporterIsExemptedOfReceipt: false,
+              transporterValidityLimit: transporterReceipt.validityLimit,
+              transporterReceipt: transporterReceipt.receiptNumber,
+              number: 1
+            }
+          },
+          recipientCompanySiret: recipient.company.siret,
+          status: "ACCEPTED"
+        }
+      });
+
+      formId = id;
       expect(formId).toBeDefined();
       const { mutate } = makeClient(recipient.user);
       const MARK_AS_PROCESSED = `
