@@ -2,6 +2,9 @@
   "name": "td-doc",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "^16"
+  },
   "scripts": {
     "docusaurus": "docusaurus",
     "prebuild": "yarn build-workflow-plugin && yarn docs",

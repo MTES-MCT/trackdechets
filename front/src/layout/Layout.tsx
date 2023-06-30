@@ -25,10 +25,8 @@ export default function Layout({
   children,
   isAuthenticated,
   isAdmin,
-  flags,
 }: AuthProps & {
   children: ReactNode;
-  flags: { flagDashboardV2: boolean };
 }) {
   const { data } = useQuery<Pick<Query, "warningMessage">>(GET_WARNING_MESSAGE);
 

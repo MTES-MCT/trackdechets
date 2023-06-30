@@ -399,7 +399,10 @@ export const addPendingApprovalsCompanyAdmins = async (
       ...request,
       approvals: request.approvals
         .filter(
-          approval => approval.status === RevisionRequestApprovalStatus.PENDING
+          approval =>
+            approval.status === RevisionRequestApprovalStatus.PENDING &&
+            // Make sure company exists. May have been deleted.
+            Boolean(companiesAndAdminsByOrgIds[approval.approverSiret])
         )
         .map(approval => ({
           ...approval,
@@ -471,6 +474,7 @@ export const sendPendingRevisionRequestToAdminDetailsEmail = async (
   if (requests.length) {
     // Build a message template for each request, for each approval
     const messageVersions: MessageVersion[] = requests
+      .filter(request => request.approvals.length !== 0)
       .map(request => {
         return request.approvals.map(approval => {
           const variables = {

@@ -52,9 +52,9 @@ export function buildSetAppendix1({
     // - the destination
     // - the waste infos (code & name)
     await Promise.all(
-      newAppendix1Fractions.map(({ form }) =>
+      newAppendix1Fractions.map(({ form: appendix1Form }) =>
         updateForm(
-          { id: form.id },
+          { id: appendix1Form.id },
           {
             // Most data are copied from the container form and not editable:
             // - waste infos

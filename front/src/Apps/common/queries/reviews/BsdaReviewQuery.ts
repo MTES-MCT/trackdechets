@@ -8,6 +8,7 @@ const reviewFragment = gql`
       id
       status
       updatedAt
+      type
       emitter {
         company {
           name

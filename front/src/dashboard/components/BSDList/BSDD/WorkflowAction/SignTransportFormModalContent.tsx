@@ -123,6 +123,7 @@ export default function SignTransportFormModalContent({
           securityCode: "",
           transporterNumberPlate:
             form.stateSummary?.transporterNumberPlate ?? "",
+          emitter: { type: form?.emitter?.type },
           update: {
             quantity: form.wasteDetails?.quantity ?? 0,
             sampleNumber: form.wasteDetails?.sampleNumber ?? "",

@@ -139,7 +139,7 @@ export function SignTransport({
             {({ isSubmitting, handleReset }) => (
               <Form>
                 <div className="tw-mb-6">
-                  <Transport disabled={false} />
+                  <Transport disabled={false} required={true} />
                 </div>
                 <div className="form__row">
                   <label>
@@ -161,7 +161,7 @@ export function SignTransport({
 
                 <div className="form__row">
                   <label>
-                    Date
+                    Date de signature
                     <div className="td-date-wrapper">
                       <Field
                         name="date"

@@ -361,12 +361,13 @@ describe("query { myCompanies }", () => {
 
   it("should not obfuscate user name when association comes from an older accepted invitation", async () => {
     const user = await userFactory();
-    const member = await userFactory({ createdAt: subDays(new Date(), 8) });
+    const member = await userFactory();
     const company = await companyFactory();
 
     await associateUserToCompany(user.id, company.orgId, "ADMIN");
-    // associations created 8 days ago - no more name obfuscation
+    // association created 8 days ago - no more name obfuscation
     await associateUserToCompany(member.id, company.orgId, "MEMBER", {
+      automaticallyAccepted: true,
       createdAt: subDays(new Date(), 8)
     });
 
@@ -386,15 +387,17 @@ describe("query { myCompanies }", () => {
 
   it("should obfuscate user name when association comes from a recent automatically accepted invitation", async () => {
     const user = await userFactory();
-    const member = await userFactory({ createdAt: subDays(new Date(), 2) });
+    const member = await userFactory();
     const company = await companyFactory();
 
     await associateUserToCompany(user.id, company.orgId, "ADMIN");
-    // associations created 2 days ago - name obfuscation
+    // association created 2 days ago - name obfuscation
     await associateUserToCompany(member.id, company.orgId, "MEMBER", {
+      automaticallyAccepted: true,
       createdAt: subDays(new Date(), 2)
     });
 
+    // requesting user is not the invited user, their name is obfuscated during several days
     const { query } = makeClient(user);
     const { data: page1 } = await query<Pick<Query, "myCompanies">>(
       MY_COMPANIES
@@ -409,16 +412,19 @@ describe("query { myCompanies }", () => {
     expect(userNames).toStrictEqual(["Temporairement masqué"]);
   }, 20000);
 
-  it("should not obfuscate user name when user was created way before its association", async () => {
+  it("should not obfuscate user name for themselves", async () => {
     const user = await userFactory();
-    const member = await userFactory({ createdAt: subDays(new Date(), 1) });
+    const member = await userFactory();
     const company = await companyFactory();
 
     await associateUserToCompany(user.id, company.orgId, "ADMIN");
-    // associations created 2 days ago - no name obfuscation because user was created a while ago, it's not an automatically accepted invitation
-    await associateUserToCompany(member.id, company.orgId, "MEMBER");
+    // association created 2 days ago - name obfuscation
+    await associateUserToCompany(member.id, company.orgId, "MEMBER", {
+      automaticallyAccepted: true,
+      createdAt: subDays(new Date(), 2)
+    });
 
-    const { query } = makeClient(user);
+    const { query } = makeClient(member);
     const { data: page1 } = await query<Pick<Query, "myCompanies">>(
       MY_COMPANIES
     );
@@ -431,6 +437,7 @@ describe("query { myCompanies }", () => {
     expect(userNames?.length).toBe(1);
     expect(userNames).toStrictEqual([member.name]);
   }, 20000);
+
   it("should return userRole and userPermissions", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { query } = makeClient(user);

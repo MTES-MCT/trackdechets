@@ -301,6 +301,11 @@ export async function approveAndApplyRevisionRequest(
         where: { id: { in: appendix1ProducerIds } },
         data: appendix1ProducerUpdate
       });
+      prisma.addAfterCommitCallback?.(() => {
+        for (const id in appendix1ProducerIds) {
+          enqueueUpdatedBsdToIndex(id);
+        }
+      });
     }
   }
 
