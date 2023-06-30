@@ -14,6 +14,7 @@ import {
 } from "../../__tests__/factories";
 import {
   BsddRevisionRequestWithReadableId,
+  addPendingApprovalsCompanyAdmins,
   getActiveUsersWithPendingMembershipRequests,
   getPendingBSDARevisionRequestsWithAdmins,
   getPendingBSDDRevisionRequestsWithAdmins,
@@ -26,12 +27,25 @@ import {
 import prisma from "../../prisma";
 import { bsdaFactory } from "../../bsda/__tests__/factories";
 import { associateUserToCompany } from "../../users/database";
+import {
+  Mutation,
+  MutationDeleteCompanyArgs
+} from "../../generated/graphql/types";
+import makeClient from "../../__tests__/testClient";
 
 const TODAY = new Date();
 const ONE_DAY_AGO = xDaysAgo(TODAY, 1);
 const TWO_DAYS_AGO = xDaysAgo(TODAY, 2);
 const THREE_DAYS_AGO = xDaysAgo(TODAY, 3);
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
+
+export const DELETE_COMPANY = `
+  mutation DeleteCompany($id: ID!) {
+    deleteCompany(id: $id) {
+      id
+    }
+  }
+`;
 
 describe("getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest", () => {
   afterEach(resetDatabase);
@@ -1626,5 +1640,64 @@ describe("getRecentlyRegisteredProducers", () => {
 
     // Then
     expect(profesionnals).toEqual([]);
+  });
+});
+
+describe("addPendingApprovalsCompanyAdmins", () => {
+  afterEach(resetDatabase);
+
+  it("BUG - should not crash if company has been deleted", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const user2 = await userFactory();
+    await associateUserToCompany(user2.id, company.orgId, "MEMBER");
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: companyOfSomeoneElse.siret }
+    });
+
+    const request = await prisma.bsddRevisionRequest.create({
+      data: {
+        createdAt: TWO_DAYS_AGO,
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: ""
+      }
+    });
+
+    // Then DELETE company
+    const { mutate } = makeClient(user);
+    await mutate<Pick<Mutation, "deleteCompany">, MutationDeleteCompanyArgs>(
+      DELETE_COMPANY,
+      {
+        variables: { id: company.id }
+      }
+    );
+
+    // When
+    const requestsWithApprovals = await prisma.bsddRevisionRequest.findMany({
+      where: {
+        createdAt: { gte: THREE_DAYS_AGO, lt: ONE_DAY_AGO },
+        status: "PENDING"
+      },
+      include: { approvals: true, bsdd: { select: { readableId: true } } }
+    });
+
+    const wrappedRequests = await addPendingApprovalsCompanyAdmins(
+      requestsWithApprovals
+    );
+
+    // Then
+    expect(requestsWithApprovals.length).toBe(1);
+    expect(requestsWithApprovals[0].id).toBe(request.id);
+
+    expect(wrappedRequests.length).toBe(1);
+    expect(wrappedRequests[0].id).toBe(request.id);
+    expect(wrappedRequests[0].approvals.length).toBe(0);
   });
 });

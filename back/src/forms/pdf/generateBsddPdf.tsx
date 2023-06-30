@@ -279,7 +279,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
 
   const form: GraphQLForm = {
     ...(await expandFormFromDb(fullPrismaForm)),
-    transportSegments: fullPrismaForm.transporters?.map(
+    transportSegments: fullPrismaForm.transporters?.filter(transporter => transporter.number >= 2).map(
       expandTransportSegmentFromDb
     ),
     grouping: await Promise.all(
