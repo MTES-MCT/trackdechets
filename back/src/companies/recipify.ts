@@ -1,10 +1,8 @@
-import { UserInputError } from "apollo-server-express";
 import {
   CompanyInput,
   BsdasriRecepisseInput
 } from "../generated/graphql/types";
 import prisma from "../prisma";
-import { missingCompanyError } from "../common/validation/siret";
 
 type RecipifyOutput = {
   number: string | null;
@@ -39,16 +37,12 @@ export async function findCompanyFailFast(orgId: string) {
 }
 
 function findCompany(where: { where: { orgId: string } }) {
-  try {
-    return prisma.company.findUniqueOrThrow({
-      ...where,
-      select: {
-        transporterReceiptId: true
-      }
-    });
-  } catch (e) {
-    throw new UserInputError(missingCompanyError(where.where.orgId));
-  }
+  return prisma.company.findUnique({
+    ...where,
+    select: {
+      transporterReceiptId: true
+    }
+  });
 }
 
 export function recipifyGeneric<T>(
@@ -69,6 +63,7 @@ export function recipifyGeneric<T>(
     let completedInput = { ...input };
     for (const [idx, company] of companies.entries()) {
       const { setter } = accessors[idx];
+      // if company exists, we auto-complete
       if (company) {
         let receipt: RecipifyOutput;
         if (!!company?.transporterReceiptId) {

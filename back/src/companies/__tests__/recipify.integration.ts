@@ -24,7 +24,7 @@ describe("Company Recipify Module", () => {
   });
 
   it("findCompanyFailFast should log an error message when company is not found", async () => {
-    expect(findCompanyFailFast("1234")).rejects.toThrow("No Company found");
+    expect(findCompanyFailFast("1234")).resolves.toBe(null);
   });
 
   it("recipifyGeneric should complete data as configured in the accessors", async () => {
