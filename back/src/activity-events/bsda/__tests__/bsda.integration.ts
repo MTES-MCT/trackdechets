@@ -9,7 +9,10 @@ import {
   MutationUpdateBsdaArgs
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
-import { userWithCompanyFactory } from "../../../__tests__/factories";
+import {
+  transporterReceiptFactory,
+  userWithCompanyFactory
+} from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { getStream } from "../../data";
 
@@ -55,6 +58,7 @@ describe("ActivityEvent.Bsda", () => {
         companyTypes: { set: ["WASTEPROCESSOR", "TRANSPORTER"] }
       }
     );
+    await transporterReceiptFactory({ company: destinationCompany });
     const { mutate } = makeClient(user);
 
     // Create Bsda
@@ -105,11 +109,6 @@ describe("ActivityEvent.Bsda", () => {
             }
           },
           transporter: {
-            recepisse: {
-              number: "AA84",
-              department: "82",
-              validityLimit: "2018-12-11T00:00:00.000Z" as any
-            },
             transport: {
               plates: ["12345"]
             },
@@ -283,11 +282,6 @@ describe("ActivityEvent.Bsda", () => {
             }
           },
           transporter: {
-            recepisse: {
-              number: "AA84",
-              department: "82",
-              validityLimit: "2018-12-11T00:00:00.000Z" as any
-            },
             transport: {
               plates: ["12345"]
             },
