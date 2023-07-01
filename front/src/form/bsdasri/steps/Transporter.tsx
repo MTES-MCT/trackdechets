@@ -161,28 +161,6 @@ function CurrentCompanyWidget({ disabled = false }) {
           completed?.companyInfos?.contactPhone
         );
       }
-      if (completed?.companyInfos?.transporterReceipt) {
-        setFieldValue(
-          "transporter.recepisse.number",
-          completed?.companyInfos?.transporterReceipt.receiptNumber
-        );
-        setFieldValue(
-          "transporter.recepisse.validityLimit",
-          completed?.companyInfos?.transporterReceipt.validityLimit
-        );
-        setFieldValue(
-          "transporter.recepisse.department",
-          completed?.companyInfos?.transporterReceipt.department
-        );
-      } else {
-        setFieldValue("transporter.recepisse.number", "");
-        setFieldValue(
-          "transporter.recepisse.validityLimit",
-          initialState().transporter.recepisse.validityLimit
-        );
-
-        setFieldValue("transporter.recepisse.department", "");
-      }
     },
   });
   if (loading) {
