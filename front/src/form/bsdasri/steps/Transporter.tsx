@@ -10,7 +10,6 @@ import {
   QueryCompanyInfosArgs,
 } from "generated/graphql/types";
 import React from "react";
-import initialState from "../utils/initial-state";
 import { gql, useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
@@ -21,7 +20,6 @@ import companyStyles from "form/common/components/company/CompanyResult.module.s
 import RedErrorMessage from "common/components/RedErrorMessage";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 import TransporterReceiptEditionSwitch from "form/common/components/company/TransporterReceiptEditionSwitch";
-import { onTransporterSelected } from "form/bsvhu/Transporter";
 
 /**
  *
@@ -47,7 +45,6 @@ export default function Transporter({ status, stepName }) {
   );
 
   const transportEmphasis = stepName === "transport";
-  const { transporter: initialTransporter } = initialState();
   return (
     <>
       {transportEmphasis && <FillFieldsInfo />}
@@ -67,10 +64,6 @@ export default function Transporter({ status, stepName }) {
             optionalMail={true}
             allowForeignCompanies={true}
             registeredOnlyCompanies={true}
-            onCompanySelected={onTransporterSelected(
-              initialTransporter,
-              setFieldValue
-            )}
           />
         )}
       </div>
