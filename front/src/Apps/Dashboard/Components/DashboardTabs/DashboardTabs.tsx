@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { generatePath, NavLink, useHistory } from "react-router-dom";
-import { CompanyPrivate, CompanyType } from "generated/graphql/types";
+import { CompanyPrivate } from "generated/graphql/types";
 import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
 import routes from "Apps/routes";
 import "./DashboardTabs.scss";
