@@ -37,7 +37,7 @@ export const useShowTransportTabs = (companyTypes, companySiret) => {
     notifyOnNetworkStatusChange: true,
     variables: {
       first: 1,
-      where: { isToCollectFor: [companySiret] },
+      where: { isCollectedFor: [companySiret] },
     },
   });
 
