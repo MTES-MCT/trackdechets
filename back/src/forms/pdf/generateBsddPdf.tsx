@@ -90,11 +90,13 @@ function QuantityFields({ quantity, quantityType }: QuantityFieldsProps) {
 type AcceptationFieldsProps = {
   wasteAcceptationStatus?: WasteAcceptationStatus | null;
   wasteRefusalReason?: string | null;
+  signedAt?: Date | null;
 };
 
 function AcceptationFields({
   wasteAcceptationStatus,
-  wasteRefusalReason
+  wasteRefusalReason,
+  signedAt
 }: AcceptationFieldsProps) {
   return (
     <p>
@@ -122,6 +124,9 @@ function AcceptationFields({
       <br />
       Motif de refus (même partiel) :<br />
       {wasteRefusalReason}
+      <br />
+      Date de signature : {formatDate(signedAt)}
+      <br />
     </p>
   );
 }
