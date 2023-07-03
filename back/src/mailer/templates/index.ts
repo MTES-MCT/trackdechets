@@ -53,7 +53,8 @@ export const createPasswordResetRequest: MailTemplate<{
 };
 
 export const formNotAccepted: MailTemplate<{ form: Form & BsddTransporter }> = {
-  subject: "Refus de prise en charge de votre déchet",
+  subject: ({ form }) =>
+    `Refus de prise en charge de votre déchet par l'entreprise ${form.emitterCompanyName}`,
   body: mustacheRenderer("refus-total-dechet.html"),
   templateId: templateIds.LAYOUT,
   prepareVariables: ({ form }) => {
@@ -64,9 +65,9 @@ export const formNotAccepted: MailTemplate<{ form: Form & BsddTransporter }> = {
         transporterCompanyName: cleanupSpecialChars(
           form.transporterCompanyName
         ),
-        receivedAt: form.receivedAt
-          ? toFrFormat(new Date(form.receivedAt))
-          : form.receivedAt,
+        signedAt: form.signedAt
+          ? toFrFormat(new Date(form.signedAt))
+          : form.signedAt,
         sentBy: form.sentBy ?? ""
       }
     };
@@ -76,7 +77,8 @@ export const formNotAccepted: MailTemplate<{ form: Form & BsddTransporter }> = {
 export const formPartiallyRefused: MailTemplate<{
   form: Form & BsddTransporter;
 }> = {
-  subject: "Refus partiel de prise en charge de votre déchet",
+  subject: ({ form }) =>
+    `Refus partiel de prise en charge de votre déchet par l'entreprise ${form.emitterCompanyName}`,
   body: mustacheRenderer("refus-partiel-dechet.html"),
   templateId: templateIds.LAYOUT,
   prepareVariables: ({ form }) => {
@@ -89,9 +91,9 @@ export const formPartiallyRefused: MailTemplate<{
         ),
         quantityPartiallyRefused:
           form.wasteDetailsQuantity! - form.quantityReceived!,
-        receivedAt: form.receivedAt
-          ? toFrFormat(new Date(form.receivedAt))
-          : "",
+        signedAt: form.signedAt
+          ? toFrFormat(new Date(form.signedAt))
+          : form.signedAt,
         sentBy: form.sentBy ?? ""
       }
     };
