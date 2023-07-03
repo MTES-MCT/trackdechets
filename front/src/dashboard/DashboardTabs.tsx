@@ -1,10 +1,10 @@
 import React from "react";
 import { generatePath, NavLink, useHistory } from "react-router-dom";
-import { CompanyPrivate, CompanyType } from "generated/graphql/types";
+import { CompanyPrivate } from "generated/graphql/types";
 import DashboardCompanySelector from "./DashboardCompanySelector";
 import routes from "Apps/routes";
 import "./DashboardTabs.scss";
-import { useIsTransporterOnBsds } from "./transport/hooks/useIsTransporterOnBsds";
+import { useShowTransportTabs } from "./transport/hooks/useShowTransportTabs";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;
@@ -17,7 +17,7 @@ export function DashboardTabs({
 }: DashboardTabsProps) {
   const history = useHistory();
 
-  const { isTransporterOnBsds } = useIsTransporterOnBsds(
+  const { showTransportTabs } = useShowTransportTabs(
     currentCompany.companyTypes,
     currentCompany.siret
   );
@@ -104,7 +104,7 @@ export function DashboardTabs({
           </li>
         </ul>
 
-        {isTransporterOnBsds && (
+        {showTransportTabs && (
           <>
             <p className="sidebar__chapter ">Transport</p>
             <ul>
