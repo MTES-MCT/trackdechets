@@ -37,6 +37,7 @@ const reviewFragment = gql`
         code
         name
         pop
+        quantity
         packagingInfos {
           type
           other
