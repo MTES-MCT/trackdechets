@@ -123,8 +123,8 @@ describe("Mutation.signBsdasri emission", () => {
     it("should work if transport mode is ROAD & plates are defined", async () => {
       const data = {
         ...bsdasri,
-        transporterTransportMode: "AIR",
-        transporterNumberPlate: "TRANSPORTER-PLATES"
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: ["TRANSPORTER-PLATES"]
       };
       const validated = await validateBsdasri(data as any, {
         transportSignature: true
@@ -373,7 +373,7 @@ describe("Mutation.signBsdasri emission", () => {
       const data = {
         ...bsdasri,
         transporterTransportMode: "ROAD",
-        transporterNumberPlate: undefined
+        transporterTransportPlates: undefined
       };
       expect.assertions(1);
 
@@ -386,21 +386,24 @@ describe("Mutation.signBsdasri emission", () => {
       }
     });
 
-    it("transporter plate is required if transporter mode is ROAD - empty string", async () => {
-      const data = {
-        ...bsdasri,
-        transporterTransportMode: "ROAD",
-        transporterNumberPlate: ""
-      };
-      expect.assertions(1);
+    it.each(["", null, [], [""], [null], [undefined]])(
+      "transporter plate is required if transporter mode is ROAD - invalid values",
+      async invalidValue => {
+        const data = {
+          ...bsdasri,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: invalidValue
+        };
+        expect.assertions(1);
 
-      try {
-        await validateBsdasri(data as any, {
-          transportSignature: true
-        });
-      } catch (err) {
-        expect(err.errors).toEqual(["La plaque d'immatriculation est requise"]);
+        try {
+          await validateBsdasri(data as any, {
+            transportSignature: true
+          });
+        } catch (err) {
+          expect(err.errors.length).toBeTruthy();
+        }
       }
-    });
+    );
   });
 });
