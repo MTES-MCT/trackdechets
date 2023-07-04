@@ -226,7 +226,8 @@ describe("Test Form reception", () => {
 
     expect(sendMailSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        subject: "Refus de prise en charge de votre déchet"
+        subject:
+          "Refus de prise en charge de votre déchet par l'entreprise company_1"
       })
     );
   });
@@ -324,7 +325,8 @@ describe("Test Form reception", () => {
 
     expect(sendMailSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        subject: "Refus de prise en charge de votre déchet"
+        subject:
+          "Refus partiel de prise en charge de votre déchet par l'entreprise company_1"
       })
     );
   });
