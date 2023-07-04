@@ -46,7 +46,29 @@ const signTransportFn = async (
     args.securityCode
   );
 
-  await validateBeforeTransport({ ...existingForm, ...transporter });
+  console.log(
+    JSON.stringify(
+      {
+        ...existingForm,
+        ...(args.input.transporterNumberPlate
+          ? {
+              transporterNumberPlate: args.input.transporterNumberPlate
+            }
+          : {})
+      },
+      null,
+      4
+    )
+  );
+
+  await validateBeforeTransport({
+    ...existingForm,
+    ...(args.input.transporterNumberPlate
+      ? {
+          transporterNumberPlate: args.input.transporterNumberPlate
+        }
+      : {})
+  });
 
   const transporterUpdate: Prisma.BsddTransporterUpdateWithoutFormInput = {
     takenOverAt: args.input.takenOverAt, // takenOverAt is duplicated between Form and BsddTransporter

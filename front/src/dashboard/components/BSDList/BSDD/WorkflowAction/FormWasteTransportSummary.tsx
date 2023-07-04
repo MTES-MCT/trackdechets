@@ -13,6 +13,7 @@ import {
   DataListDescription,
   DataListItem,
   DataListTerm,
+  RedErrorMessage,
 } from "common/components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { IconPaperWrite } from "common/components/Icons";
@@ -44,6 +45,7 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
         Plaque d'immatriculation{" "}
         <Field name="transporterNumberPlate" className="td-input" />
       </label>
+      <RedErrorMessage name="transporterNumberPlate" />
     </div>
   ),
   quantity: () => (
@@ -79,8 +81,9 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
 export function FormWasteTransportSummary({
   form,
 }: FormWasteTransportSummaryProps) {
-  const { values } = useFormikContext<FormValues>();
-  const [fields, setFields] = React.useState<FormKeys[]>([]);
+  const [fields, setFields] = React.useState<FormKeys[]>([
+    "transporterNumberPlate",
+  ]);
   const addField = (name: FormKeys) =>
     setFields(currentFields =>
       currentFields
@@ -193,19 +196,6 @@ export function FormWasteTransportSummary({
               </DataListDescription>
             </DataListItem>
           )}
-        <DataListItem>
-          <DataListTerm>Plaque d'immatriculation</DataListTerm>
-          <DataListDescription>
-            {values.transporterNumberPlate}
-            <button
-              type="button"
-              onClick={() => addField("transporterNumberPlate")}
-              className="tw-ml-2"
-            >
-              <IconPaperWrite color="blue" />
-            </button>
-          </DataListDescription>
-        </DataListItem>
       </DataList>
       {fields.length > 0 && (
         <div className="tw-mb-4">
