@@ -76,7 +76,8 @@ export async function signupFn({
   return {
     ...user,
     // companies are resolved through a separate resolver (User.companies)
-    companies: []
+    companies: [],
+    featureFlags: []
   };
 }
 
