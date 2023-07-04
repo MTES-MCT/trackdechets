@@ -4,4 +4,5 @@ export interface WasteDetailsProps {
   wasteType?: BsdType;
   code?: string;
   name?: string;
+  weight?: string;
 }

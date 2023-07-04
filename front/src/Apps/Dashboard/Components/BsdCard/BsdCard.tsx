@@ -12,6 +12,8 @@ import {
   getPrimaryActionsLabelFromBsdStatus,
   getPrimaryActionsReviewsLabel,
   getWorkflowLabel,
+  isBsdasri,
+  isBsff,
 } from "../../dashboardServices";
 import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditionalActionsButton";
 import Actors from "../Actors/Actors";
@@ -35,7 +37,6 @@ import {
 import { Loader } from "Apps/common/Components";
 import { BsdDisplay } from "Apps/common/types/bsdTypes";
 import DeleteModal from "../DeleteModal/DeleteModal";
-import { IconWeight } from "common/components/Icons";
 
 function BsdCard({
   bsd,
@@ -172,6 +173,9 @@ function BsdCard({
       : bsdDisplay?.transporter?.company?.name;
 
   const transporterName = transporterNameEmmiter || "Non renseigné";
+
+  const unitOfMeasure =
+    isBsdasri(bsdDisplay?.type!) || isBsff(bsdDisplay?.type!) ? "kg" : "t";
   return (
     <>
       <div className="bsd-card" tabIndex={0}>
@@ -208,19 +212,17 @@ function BsdCard({
                     bsdType={bsdDisplay.type}
                     reviewStatus={bsdDisplay?.review?.status}
                   />
-                  {!isReviewsTab &&
-                    Boolean(bsdDisplay.wasteDetails?.weight) && (
-                      <p className="bsd-card__content__infos__weight">
-                        <IconWeight />
-                        <span>{bsdDisplay.wasteDetails.weight} t</span>
-                      </p>
-                    )}
                 </div>
                 <div className="bsd-card__content__infos__other">
                   <WasteDetails
                     wasteType={bsdDisplay.type}
                     code={bsdDisplay.wasteDetails.code!}
                     name={bsdDisplay.wasteDetails.name!}
+                    weight={
+                      Boolean(bsdDisplay.wasteDetails?.weight)
+                        ? `${bsdDisplay.wasteDetails.weight} ${unitOfMeasure}`
+                        : ""
+                    }
                   />
 
                   <Actors
