@@ -791,14 +791,7 @@ export const transporterSchemaFn: FactorySchemaOf<
       .string()
       .nullable()
       .test((transporterNumberPlate, ctx) => {
-        console.log("========================================");
-        console.log("========================================");
-        console.log("========================================");
         const { transporterTransportMode } = ctx.parent;
-
-        console.log("transporterSignature", transporterSignature);
-        console.log("transporterTransportMode", transporterTransportMode);
-        console.log("transporterNumberPlate", transporterNumberPlate);
 
         if (
           transporterSignature &&

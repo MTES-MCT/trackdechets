@@ -296,6 +296,24 @@ export const transporterSchema: FactorySchemaOf<
 > = context => {
   const requiredForSynthesis = context.emissionSignature && context.isSynthesis;
   return yup.object({
+    transporterNumberPlate: yup
+      .string()
+      .nullable()
+      .test((transporterNumberPlate, ctx) => {
+        const { transporterTransportMode } = ctx.parent;
+
+        if (
+          context.transportSignature &&
+          transporterTransportMode === "ROAD" &&
+          !transporterNumberPlate
+        ) {
+          return new yup.ValidationError(
+            "La plaque d'immatriculation est requise"
+          );
+        }
+
+        return true;
+      }),
     transporterCompanyName: yup
       .string()
       .ensure()

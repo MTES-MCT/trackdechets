@@ -108,6 +108,29 @@ describe("Mutation.signBsdasri emission", () => {
       });
       expect(validated).toBeDefined();
     });
+
+    it("transporter plate is not required if transport mode is not ROAD", async () => {
+      const data = {
+        ...bsdasri,
+        transporterTransportMode: "AIR"
+      };
+      const validated = await validateBsdasri(data as any, {
+        transportSignature: true
+      });
+      expect(validated).toBeDefined();
+    });
+
+    it("should work if transport mode is ROAD & plates are defined", async () => {
+      const data = {
+        ...bsdasri,
+        transporterTransportMode: "AIR",
+        transporterNumberPlate: "TRANSPORTER-PLATES"
+      };
+      const validated = await validateBsdasri(data as any, {
+        transportSignature: true
+      });
+      expect(validated).toBeDefined();
+    });
   });
 
   describe("BSDASRI should not be valid", () => {
@@ -343,6 +366,40 @@ describe("Mutation.signBsdasri emission", () => {
             " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil" +
             " de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
         ]);
+      }
+    });
+
+    it("transporter plate is required if transporter mode is ROAD", async () => {
+      const data = {
+        ...bsdasri,
+        transporterTransportMode: "ROAD",
+        transporterNumberPlate: undefined
+      };
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data as any, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual(["La plaque d'immatriculation est requise"]);
+      }
+    });
+
+    it("transporter plate is required if transporter mode is ROAD - empty string", async () => {
+      const data = {
+        ...bsdasri,
+        transporterTransportMode: "ROAD",
+        transporterNumberPlate: ""
+      };
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data as any, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual(["La plaque d'immatriculation est requise"]);
       }
     });
   });
