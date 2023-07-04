@@ -589,6 +589,6 @@ function favoriteToCompanySearchResult(
     contactPhone: company.phone,
     contactEmail: company.mail,
     etatAdministratif: "A",
-    companyTypes: [],
+    companyTypes: company.companyTypes,
   };
 }

@@ -80,7 +80,8 @@ function companyToFavorite(
     codePaysEtrangerEtablissement: !isForeignVat(company.vatNumber)
       ? "FR"
       : checkVAT(company.vatNumber ?? "", countries)?.country?.isoCode.short,
-    transporterReceipt: company.transporterReceipt
+    transporterReceipt: company.transporterReceipt,
+    companyTypes: company.companyTypes ?? []
   };
 }
 
@@ -96,7 +97,8 @@ function companySearchResultToFavorite(
     contact: companySearchResult.contact,
     phone: companySearchResult.contactPhone ?? "",
     mail: companySearchResult.contactEmail ?? "",
-    isRegistered: companySearchResult.isRegistered
+    isRegistered: companySearchResult.isRegistered,
+    companyTypes: companySearchResult.companyTypes ?? []
   };
 }
 
@@ -417,6 +419,7 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
         company.vatNumber &&
         favorite.vatNumber === company.vatNumber)
   );
+  console.log(company, companyToFavorite(company))
   if (isMatchingType && !isAlreadyListed) {
     favorites.push(companyToFavorite(company));
   }
