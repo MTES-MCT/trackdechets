@@ -63,6 +63,7 @@ const signTransportFn = async (
 
   await validateBeforeTransport({
     ...existingForm,
+    ...transporter,
     ...(args.input.transporterNumberPlate
       ? {
           transporterNumberPlate: args.input.transporterNumberPlate
