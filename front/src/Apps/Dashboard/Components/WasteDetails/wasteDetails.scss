@@ -1,13 +1,12 @@
 .waste-details {
   display: flex;
-  align-items: center;
   box-sizing: border-box;
+  padding: 5px 0;
 
   &__infos {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    padding: 5px;
+    padding: 0 5px;
     width: 170px;
     &__code {
       margin: 0;
@@ -29,6 +28,23 @@
     }
     &__workflow {
       font-weight: 700;
+    }
+    &__weight {
+      display: flex;
+      align-items: center;
+      position: relative;
+      font-weight: 400;
+      font-size: 0.75rem; //12px
+      line-height: 20px;
+      color: #161616;
+      margin: 0 0 0 -35px;
+      span {
+        margin-left: 35px;
+      }
+      svg {
+        position: absolute;
+        left: -8px;
+      }
     }
   }
 }
