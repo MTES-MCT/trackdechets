@@ -50,7 +50,8 @@ export async function changePasswordFn(
   return {
     ...updatedUser,
     // companies are resolved through a separate resolver (User.companies)
-    companies: []
+    companies: [],
+    featureFlags: []
   };
 }
 
