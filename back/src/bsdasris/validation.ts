@@ -307,8 +307,7 @@ export const transporterSchema: FactorySchemaOf<
           context.transportSignature &&
           transporterTransportMode === "ROAD" &&
           (!transporterTransportPlates ||
-            !transporterTransportPlates.length ||
-            transporterTransportPlates?.filter(p => Boolean(p)).length === 0)
+            !transporterTransportPlates?.filter(p => Boolean(p)).length)
         ) {
           return new yup.ValidationError(
             "La plaque d'immatriculation est requise"

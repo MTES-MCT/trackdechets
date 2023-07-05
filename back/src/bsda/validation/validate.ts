@@ -58,8 +58,7 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
         if (
           transporterTransportMode === "ROAD" &&
           (!transporterTransportPlates ||
-            !transporterTransportPlates.length ||
-            transporterTransportPlates?.filter(p => Boolean(p)).length === 0)
+            !transporterTransportPlates?.filter(p => Boolean(p)).length)
         ) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
