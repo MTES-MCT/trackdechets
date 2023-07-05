@@ -54,7 +54,7 @@ export const createPasswordResetRequest: MailTemplate<{
 
 export const formNotAccepted: MailTemplate<{ form: Form & BsddTransporter }> = {
   subject: ({ form }) =>
-    `Refus de prise en charge de votre déchet par l'entreprise ${form.emitterCompanyName}`,
+    `Refus de prise en charge de votre déchet de l'entreprise ${form.emitterCompanyName}`,
   body: mustacheRenderer("refus-total-dechet.html"),
   templateId: templateIds.LAYOUT,
   prepareVariables: ({ form }) => {
@@ -78,7 +78,7 @@ export const formPartiallyRefused: MailTemplate<{
   form: Form & BsddTransporter;
 }> = {
   subject: ({ form }) =>
-    `Refus partiel de prise en charge de votre déchet par l'entreprise ${form.emitterCompanyName}`,
+    `Refus partiel de prise en charge de votre déchet de l'entreprise ${form.emitterCompanyName}`,
   body: mustacheRenderer("refus-partiel-dechet.html"),
   templateId: templateIds.LAYOUT,
   prepareVariables: ({ form }) => {

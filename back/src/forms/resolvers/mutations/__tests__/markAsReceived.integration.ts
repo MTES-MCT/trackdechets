@@ -283,7 +283,7 @@ describe("Test Form reception", () => {
     expect(sendMailSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
-          "Refus de prise en charge de votre déchet par l'entreprise company_1"
+          "Refus de prise en charge de votre déchet de l'entreprise company_1"
       })
     );
   });
@@ -601,8 +601,8 @@ describe("Test Form reception", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
       "Ce bordereau ne peut pas être marqué comme reçu car le destinataire est une installation " +
-        "d'entreposage provisoire ou de reconditionnement. Utiliser la mutation markAsTempStored " +
-        "pour marquer ce bordereau comme entreposé provisoirement"
+      "d'entreposage provisoire ou de reconditionnement. Utiliser la mutation markAsTempStored " +
+      "pour marquer ce bordereau comme entreposé provisoirement"
     );
   });
 

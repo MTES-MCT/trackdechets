@@ -282,7 +282,7 @@ describe("{ mutation { markAsTempStored } }", () => {
     expect(sendMailSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
-          "Refus de prise en charge de votre déchet par l'entreprise WASTE PRODUCER"
+          "Refus de prise en charge de votre déchet de l'entreprise WASTE PRODUCER"
       })
     );
   });
@@ -327,7 +327,7 @@ describe("{ mutation { markAsTempStored } }", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
       "Ce bordereau ne peut pas être marqué comme entreposé provisoirement car le destinataire " +
-        "n'a pas été identifié comme étant une installation d'entreposage provisoire ou de reconditionnement"
+      "n'a pas été identifié comme étant une installation d'entreposage provisoire ou de reconditionnement"
     );
     expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
