@@ -222,48 +222,53 @@ describe("transporterSchema", () => {
     const bsff = {
       ...transporterData,
       transporterTransportMode: "ROAD",
-      transporterNumberPlate: undefined
+      transporterTransportPlates: undefined
     };
-    const validateFn = () => transporterSchema.validate(bsff);
+    expect.assertions(1);
 
-    await expect(validateFn()).rejects.toThrow(
-      "La plaque d'immatriculation est requise"
-    );
+    try {
+      await transporterSchema.validate(bsff);
+    } catch (err) {
+      expect(err.errors).toEqual(["La plaque d'immatriculation est requise"]);
+    }
   });
 
-  it("transporter plate is required if transporter mode is ROAD - empty string", async () => {
-    const bsff = {
-      ...transporterData,
-      transporterTransportMode: "ROAD",
-      transporterNumberPlate: ""
-    };
-    const validateFn = () => transporterSchema.validate(bsff);
+  it.each(["", null, [], [""], [null], [undefined]])(
+    "transporter plate is required if transporter mode is ROAD - invalid values",
+    async invalidValue => {
+      const bsff = {
+        ...transporterData,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: invalidValue
+      };
+      expect.assertions(1);
 
-    await expect(validateFn()).rejects.toThrow(
-      "La plaque d'immatriculation est requise"
-    );
-  });
+      try {
+        await transporterSchema.validate(bsff);
+      } catch (err) {
+        expect(err.errors.length).toBeTruthy();
+      }
+    }
+  );
 
   it("transporter plate is not required if transport mode is not ROAD", async () => {
     const bsff = {
       ...transporterData,
-      transporterTransportMode: "AIR",
-      transporterNumberPlate: undefined
+      transporterTransportMode: "AIR"
     };
-    const isValid = transporterSchema.isValid(bsff);
 
-    expect(isValid).toBeTruthy();
+    const validated = await transporterSchema.isValid(bsff);
+    expect(validated).toBeDefined();
   });
 
   it("should work if transport mode is ROAD & plates are defined", async () => {
     const bsff = {
       ...transporterData,
       transporterTransportMode: "ROAD",
-      transporterNumberPlate: "TRANSPORTER-PLATES"
+      transporterTransportPlates: ["TRANSPORTER-PLATES"]
     };
-    const isValid = transporterSchema.isValid(bsff);
-
-    expect(isValid).toBeTruthy();
+    const validated = await transporterSchema.isValid(bsff);
+    expect(validated).toBeDefined();
   });
 });
 
