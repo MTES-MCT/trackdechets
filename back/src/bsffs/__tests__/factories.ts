@@ -178,6 +178,7 @@ export function createBsffAfterTransport(
     transporterTransportSignatureAuthor: args.transporter.user.name,
     transporterTransportSignatureDate: new Date().toISOString(),
     transporterTransportTakenOverAt: new Date().toISOString(),
+    transporterTransportPlates: ["TRANSPORER-PLATE"],
     ...initialData
   });
 }
