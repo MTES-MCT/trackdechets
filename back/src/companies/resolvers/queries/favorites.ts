@@ -419,7 +419,7 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
         company.vatNumber &&
         favorite.vatNumber === company.vatNumber)
   );
-  console.log(company, companyToFavorite(company))
+
   if (isMatchingType && !isAlreadyListed) {
     favorites.push(companyToFavorite(company));
   }

@@ -205,7 +205,9 @@ export const makeSearchCompanies =
       return results.map(company => ({
         ...company,
         orgId: company.siret!,
-        isRegistered: Boolean(existingCompaniesOrgIds[company.siret!]?.isRegistered),
+        isRegistered: Boolean(
+          existingCompaniesOrgIds[company.siret!]?.isRegistered
+        ),
         companyTypes:
           existingCompaniesOrgIds[company.siret!]?.companyTypes ?? []
       }));
