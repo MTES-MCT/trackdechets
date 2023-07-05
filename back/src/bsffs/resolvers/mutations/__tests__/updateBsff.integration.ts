@@ -142,6 +142,56 @@ describe("Mutation.updateBsff", () => {
     ]);
   });
 
+  it("should update fiche d'interventions", async () => {
+    const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur1 = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur2 = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const ficheIntervention1 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur1
+    });
+    const ficheIntervention2 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur2
+    });
+    const bsff = await createBsff(
+      { emitter: operateur },
+      {
+        type: "COLLECTE_PETITES_QUANTITES",
+        ficheInterventions: { connect: { id: ficheIntervention1.id } },
+        isDraft: true
+      }
+    );
+
+    const { mutate } = makeClient(operateur.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          ficheInterventions: [ficheIntervention2.id]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { ficheInterventions: true }
+    });
+
+    expect(updatedBsff.ficheInterventions.map(fi => fi.id)).toEqual([
+      ficheIntervention2.id
+    ]);
+    expect(updatedBsff.detenteurCompanySirets).toEqual([
+      detenteur2.company.siret
+    ]);
+  });
+
   it("should disallow unauthenticated user from updating a bsff", async () => {
     const { mutate } = makeClient();
     const { errors } = await mutate<
