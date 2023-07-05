@@ -147,6 +147,7 @@ export function createBsffBeforeTransport(
       create: createBsffPackagingBeforeTransport({}, args.previousPackagings)
     },
     transporterTransportMode: TransportMode.ROAD,
+    transporterTransportPlates: ["TRANSPORTER-PLATE"],
     transporterTransportTakenOverAt: new Date(),
     ...initialData
   });
