@@ -84,6 +84,21 @@ export default function Signup() {
       </div>
     ) : null;
 
+  const handleEmailChange = e => {
+    const { value } = e.target;
+    const mailRegex =
+      /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
+    if (value.match(mailRegex)) {
+      setEmailValue(e.target.value);
+      setErrorMessage("");
+    } else {
+      setErrorMessage("Format de l'email invalide");
+    }
+    if (!value) {
+      setErrorMessage("");
+    }
+  };
+
   const formContent = (
     <form onSubmit={handleSubmit}>
       <div className={`fr-container fr-pt-10w ${styles.centralContainer}`}>
@@ -108,7 +123,8 @@ export default function Signup() {
               label="Email"
               nativeInputProps={{
                 required: true,
-                onChange: e => setEmailValue(e.target.value),
+                type: "email",
+                onChange: handleEmailChange,
               }}
             />
             <PasswordInput
