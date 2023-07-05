@@ -6,8 +6,7 @@ import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";
 import {
   userWithCompanyFactory,
   companyAssociatedToExistingUserFactory,
-  siretify,
-  companyFactory
+  siretify
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { fullBsff } from "../../../fragments";
