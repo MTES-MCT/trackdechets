@@ -6,11 +6,16 @@ import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";
 import {
   userWithCompanyFactory,
   companyAssociatedToExistingUserFactory,
-  siretify
+  siretify,
+  companyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { fullBsff } from "../../../fragments";
-import { createBsff } from "../../../__tests__/factories";
+import {
+  createBsff,
+  createFicheIntervention
+} from "../../../__tests__/factories";
+import prisma from "../../../../prisma";
 
 const GET_BSFFS = gql`
   query GetBsffs(
@@ -50,6 +55,29 @@ describe("Query.bsffs", () => {
     );
 
     expect(data.bsffs.edges.length).toBe(1);
+  });
+
+  it("should return detenteur company's bsffs", async () => {
+    const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+    const ficheIntervention = await createFicheIntervention({
+      operateur,
+      detenteur
+    });
+    const bsff = await createBsff(
+      { emitter: operateur },
+      {
+        ficheInterventions: { connect: { id: ficheIntervention.id } },
+        detenteurCompanySirets: [detenteur.company.siret!]
+      }
+    );
+    const { query } = makeClient(detenteur.user);
+    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS
+    );
+
+    expect(data.bsffs.edges.length).toBe(1);
+    expect(data.bsffs.edges.map(edge => edge.node.id)).toEqual([bsff.id]);
   });
 
   it("should filter out bsffs where the user's company doesn't appear", async () => {
@@ -284,6 +312,122 @@ describe("Query.bsffs", () => {
         node: expect.objectContaining({ id: bsff2.id })
       })
     ]);
+  });
+
+  it("should filter on fiche d'interventions detenteur siret", async () => {
+    const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur1 = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur2 = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur3 = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const ficheIntervention1 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur1
+    });
+    const ficheIntervention2 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur2
+    });
+    const ficheIntervention3 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur3
+    });
+
+    const bsff1 = await createBsff(
+      { emitter: operateur },
+      {
+        ficheInterventions: { connect: { id: ficheIntervention1.id } }
+      }
+    );
+    await createBsff(
+      { emitter: operateur },
+      {
+        ficheInterventions: { connect: { id: ficheIntervention2.id } }
+      }
+    );
+    await createBsff(
+      { emitter: operateur },
+      {
+        ficheInterventions: { connect: { id: ficheIntervention3.id } }
+      }
+    );
+
+    const { query } = makeClient(operateur.user);
+    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS,
+      {
+        variables: {
+          where: {
+            ficheInterventions: {
+              detenteur: {
+                company: { siret: { _eq: detenteur1.company.siret } }
+              }
+            }
+          }
+        }
+      }
+    );
+    const bsffIds = data.bsffs.edges.map(({ node }) => node.id);
+    expect(bsffIds).toEqual([bsff1.id]);
+  });
+
+  it("should filter on fiche d'interventions number", async () => {
+    const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur1 = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur2 = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur3 = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const ficheIntervention1 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur1
+    });
+    await prisma.bsffFicheIntervention.update({
+      where: { id: ficheIntervention1.id },
+      data: { numero: "MON-NUMERO" }
+    });
+    const ficheIntervention2 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur2
+    });
+    const ficheIntervention3 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur3
+    });
+
+    const bsff1 = await createBsff(
+      { emitter: operateur },
+      {
+        ficheInterventions: { connect: { id: ficheIntervention1.id } }
+      }
+    );
+    await createBsff(
+      { emitter: operateur },
+      {
+        ficheInterventions: { connect: { id: ficheIntervention2.id } }
+      }
+    );
+    await createBsff(
+      { emitter: operateur },
+      {
+        ficheInterventions: { connect: { id: ficheIntervention3.id } }
+      }
+    );
+
+    const { query } = makeClient(operateur.user);
+    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS,
+      {
+        variables: {
+          where: {
+            ficheInterventions: {
+              numero: { _eq: "MON-NUMERO" }
+            }
+          }
+        }
+      }
+    );
+    const bsffIds = data.bsffs.edges.map(({ node }) => node.id);
+    expect(bsffIds).toEqual([bsff1.id]);
   });
 
   it("should work with a nested _or filter", async () => {
