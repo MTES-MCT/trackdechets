@@ -18,6 +18,7 @@ import {
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { IconPaperWrite } from "common/components/Icons";
 import Packagings from "form/bsdd/components/packagings/Packagings";
+import { useEffect } from "react";
 
 interface FormWasteTransportSummaryProps {
   form: Form;
@@ -81,15 +82,20 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
 export function FormWasteTransportSummary({
   form,
 }: FormWasteTransportSummaryProps) {
-  const [fields, setFields] = React.useState<FormKeys[]>([
-    "transporterNumberPlate",
-  ]);
+  const { values } = useFormikContext<FormValues>();
+  const [fields, setFields] = React.useState<FormKeys[]>([]);
   const addField = (name: FormKeys) =>
     setFields(currentFields =>
       currentFields
         .concat([name])
         .filter((name, index, fields) => fields.indexOf(name) === index)
     );
+
+  useEffect(() => {
+    if (form.transporter?.mode === "ROAD") {
+      addField("transporterNumberPlate");
+    }
+  }, [form]);
 
   const { temporaryStorageDetail } = form;
 
@@ -196,6 +202,19 @@ export function FormWasteTransportSummary({
               </DataListDescription>
             </DataListItem>
           )}
+        <DataListItem>
+          <DataListTerm>Plaque d'immatriculation</DataListTerm>
+          <DataListDescription>
+            {values.transporterNumberPlate}
+            <button
+              type="button"
+              onClick={() => addField("transporterNumberPlate")}
+              className="tw-ml-2"
+            >
+              <IconPaperWrite color="blue" />
+            </button>
+          </DataListDescription>
+        </DataListItem>
       </DataList>
       {fields.length > 0 && (
         <div className="tw-mb-4">

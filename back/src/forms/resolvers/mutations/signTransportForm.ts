@@ -46,21 +46,6 @@ const signTransportFn = async (
     args.securityCode
   );
 
-  console.log(
-    JSON.stringify(
-      {
-        ...existingForm,
-        ...(args.input.transporterNumberPlate
-          ? {
-              transporterNumberPlate: args.input.transporterNumberPlate
-            }
-          : {})
-      },
-      null,
-      4
-    )
-  );
-
   await validateBeforeTransport({
     ...existingForm,
     ...transporter,
