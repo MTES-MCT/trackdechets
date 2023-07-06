@@ -601,8 +601,8 @@ describe("Test Form reception", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
       "Ce bordereau ne peut pas être marqué comme reçu car le destinataire est une installation " +
-      "d'entreposage provisoire ou de reconditionnement. Utiliser la mutation markAsTempStored " +
-      "pour marquer ce bordereau comme entreposé provisoirement"
+        "d'entreposage provisoire ou de reconditionnement. Utiliser la mutation markAsTempStored " +
+        "pour marquer ce bordereau comme entreposé provisoirement"
     );
   });
 
