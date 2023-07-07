@@ -206,8 +206,8 @@ export const siretTests: SiretTests = {
       }
       if (role === "TRANSPORTER" && !isTransporter(company)) {
         const {
-          transporterIsExemptedOfReceipt,
-          transporterRecepisseIsExempted
+          transporterIsExemptedOfReceipt, // For BSDDs
+          transporterRecepisseIsExempted // For other BSDs
         } = ctx.parent;
 
         if (transporterIsExemptedOfReceipt || transporterRecepisseIsExempted)
