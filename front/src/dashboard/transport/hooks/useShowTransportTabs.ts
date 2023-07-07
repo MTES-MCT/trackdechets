@@ -3,7 +3,7 @@ import { GET_BSDS } from "Apps/common/queries";
 import { useNotifier } from "dashboard/components/BSDList/useNotifier";
 import { CompanyType, Query, QueryBsdsArgs } from "generated/graphql/types";
 
-const isTransporter = companyTypes =>
+const hasTransporterProfile = companyTypes =>
   companyTypes.includes(CompanyType.Transporter);
 
 const hasBsds = (loading, data) => {
@@ -13,12 +13,14 @@ const hasBsds = (loading, data) => {
 };
 
 export const useShowTransportTabs = (companyTypes, companySiret) => {
+  const isTransporter = hasTransporterProfile(companyTypes);
+
   const {
     loading: loadingIsToCollectForData,
     data: isToCollectForData,
     refetch: refetchIsToCollectForData,
   } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
-    skip: isTransporter(companyTypes),
+    skip: isTransporter,
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
     variables: {
@@ -32,7 +34,7 @@ export const useShowTransportTabs = (companyTypes, companySiret) => {
     data: isCollectedForData,
     refetch: refetchIsCollectedForData,
   } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
-    skip: isTransporter(companyTypes),
+    skip: isTransporter,
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
     variables: {
@@ -46,7 +48,7 @@ export const useShowTransportTabs = (companyTypes, companySiret) => {
 
   return {
     showTransportTabs:
-      isTransporter(companyTypes) ||
+      isTransporter ||
       hasBsds(loadingIsToCollectForData, isToCollectForData) ||
       hasBsds(loadingIsCollectedForData, isCollectedForData),
   };
