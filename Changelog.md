@@ -5,6 +5,22 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.7.1] 17/07/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+- La plaque d'immatriculation est désormais obligatoire à la signature du transporteur (BSDD, BSFF, BSDASRI, BSDA) [PR 2528](https://github.com/MTES-MCT/trackdechets/pull/2528)
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2023.6.2] 27/06/2023
 
 #### :rocket: Nouvelles fonctionnalités
