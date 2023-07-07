@@ -104,7 +104,7 @@ export default withRouter(function LayoutContainer({ history }) {
     updateFeatureFlags({
       dashboardV2: canAccessDashboardV2,
     });
-  }, [canAccessDashboardV2]);
+  }, [updateFeatureFlags, canAccessDashboardV2]);
 
   useEffect(() => {
     if (import.meta.env.VITE_SENTRY_DSN && email) {

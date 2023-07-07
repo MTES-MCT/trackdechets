@@ -77,24 +77,6 @@
         margin: 5px 0;
       }
 
-      &__weight {
-        position: relative;
-        margin: 10px 0 0 8px;
-        font-weight: 400;
-        font-size: 0.75rem; //12px
-        line-height: 20px;
-        color: #161616;
-        span {
-          position: absolute;
-          top: -2px;
-          padding-left: 18px;
-        }
-        svg {
-          width: 16px;
-          height: 16px;
-        }
-      }
-
       @include desktop {
         flex-direction: row;
         align-items: center;
@@ -109,6 +91,7 @@
       &__other {
         display: flex;
         flex-direction: column;
+        align-items: center;
 
         .waste-details,
         .actors {

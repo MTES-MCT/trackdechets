@@ -215,9 +215,9 @@ const isSameSiretTemporaryStorageDestination = (
 
 const isBsvhu = (type: BsdType): boolean => type === BsdType.Bsvhu;
 const isBsda = (type: BsdType): boolean => type === BsdType.Bsda;
-const isBsff = (type: BsdType): boolean => type === BsdType.Bsff;
+export const isBsff = (type: BsdType): boolean => type === BsdType.Bsff;
 const isBsdd = (type: BsdType): boolean => type === BsdType.Bsdd;
-const isBsdasri = (type: BsdType): boolean => type === BsdType.Bsdasri;
+export const isBsdasri = (type: BsdType): boolean => type === BsdType.Bsdasri;
 
 export const isBsdaSign = (bsd: BsdDisplay, currentSiret: string) => {
   if (isBsda(bsd.type)) {
