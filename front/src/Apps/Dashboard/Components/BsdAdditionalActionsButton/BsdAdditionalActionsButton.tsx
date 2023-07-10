@@ -2,6 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import classnames from "classnames";
 import FocusTrap from "focus-trap-react";
 import {
+  FAIRE_SIGNER,
+  ROAD_CONTROL,
   SUPRIMER_REVISION,
   VALIDER_TRAITEMENT,
   annexe1,
@@ -24,9 +26,14 @@ import {
   hasBsdSuite,
   hasAppendix1Cta,
   canDeleteReview,
+  hasBsdasriEmitterSign,
+  hasRoadControlButton,
 } from "../../dashboardServices";
 
 import "./bsdAdditionalActionsButton.scss";
+import { Link, generatePath, useLocation } from "react-router-dom";
+import routes from "Apps/routes";
+import { IconQrCode } from "common/components/Icons";
 
 function BsdAdditionalActionsButton({
   bsd,
@@ -41,14 +48,18 @@ function BsdAdditionalActionsButton({
     onAppendix1,
     onBsdSuite,
     onDeleteReview,
+    onEmitterDasriSign,
   },
   hideReviewCta,
+  isToCollectTab = false,
+  isCollectedTab = false,
 }: BsdAdditionalActionsButtonProps) {
   const [isOpen, setisOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLElement>(null);
   const { targetRef } = useOnClickOutsideRefTarget({
     onClickOutside: () => setisOpen(false),
   });
+  const location = useLocation();
 
   useEffect(() => {
     const { current } = dropdownRef;
@@ -70,7 +81,7 @@ function BsdAdditionalActionsButton({
     }
   }, [isOpen]);
 
-  const onClick = () => {
+  const toggleMenu = () => {
     setisOpen(!isOpen);
   };
 
@@ -117,6 +128,11 @@ function BsdAdditionalActionsButton({
     onDeleteReview!(bsd);
   };
 
+  const handleDasriEmitterSign = () => {
+    closeMenu();
+    onEmitterDasriSign!(bsd);
+  };
+
   const tabIndex = isOpen ? 0 : -1;
 
   return (
@@ -131,7 +147,7 @@ function BsdAdditionalActionsButton({
           className="fr-btn fr-btn--tertiary-no-outline bsd-actions-kebab-menu__button"
           aria-controls={`bsd-actions-dropdown_${bsd.id}`}
           aria-expanded={isOpen}
-          onClick={onClick}
+          onClick={toggleMenu}
         >
           <span className="sr-only">
             {isOpen ? "fermer menu actions" : "ouvrir menu actions"}
@@ -150,6 +166,25 @@ function BsdAdditionalActionsButton({
             "bsd-actions-kebab-menu__dropdown--active": isOpen,
           })}
         >
+          {hasRoadControlButton(bsd, isCollectedTab) && (
+            <li data-testid="road-control-btn">
+              <Link
+                to={{
+                  pathname: generatePath(routes.dashboardv2.roadControl, {
+                    siret: currentSiret,
+                    id: bsd.id,
+                  }),
+                  state: { background: location },
+                }}
+                className="fr-btn fr-btn--tertiary-no-outline"
+                onClick={closeMenu}
+              >
+                <IconQrCode />
+                &nbsp;
+                {ROAD_CONTROL}
+              </Link>
+            </li>
+          )}
           {hasBsdSuite(bsd, currentSiret) && (
             <li>
               <button
@@ -179,6 +214,19 @@ function BsdAdditionalActionsButton({
                 onClick={handleReviewDelete}
               >
                 {SUPRIMER_REVISION}
+              </button>
+            </li>
+          )}
+          {hasBsdasriEmitterSign(bsd, currentSiret, isToCollectTab) && (
+            <li>
+              <button
+                type="button"
+                data-testid="emport-direct-btn"
+                className="fr-btn fr-btn--tertiary-no-outline"
+                tabIndex={tabIndex}
+                onClick={handleDasriEmitterSign}
+              >
+                {FAIRE_SIGNER}
               </button>
             </li>
           )}

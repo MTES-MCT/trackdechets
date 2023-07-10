@@ -1,10 +1,5 @@
 import * as React from "react";
-import {
-  generatePath,
-  useParams,
-  useLocation,
-  useRouteMatch,
-} from "react-router-dom";
+import { generatePath, useParams, useLocation } from "react-router-dom";
 
 import routes from "Apps/routes";
 import {
@@ -46,14 +41,11 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
     form.bsffStatus === BsffStatus.Initial ||
     (form.bsffStatus === BsffStatus.SignedByEmitter && siret === emitterSiret);
 
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
-  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
-
   const links = [
     {
       title: "Contrôle routier",
       route: {
-        pathname: generatePath(routes[dashboardRoutePrefix].roadControl, {
+        pathname: generatePath(routes.dashboard.roadControl, {
           siret,
           id: form.id,
         }),
@@ -65,7 +57,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
     {
       title: "Aperçu",
       route: {
-        pathname: generatePath(routes[dashboardRoutePrefix].bsffs.view, {
+        pathname: generatePath(routes.dashboard.bsffs.view, {
           siret,
           id: form.id,
         }),
@@ -92,7 +84,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
     },
     {
       title: "Modifier",
-      route: generatePath(routes[dashboardRoutePrefix].bsffs.edit, {
+      route: generatePath(routes.dashboard.bsffs.edit, {
         siret,
         id: form.id,
       }),

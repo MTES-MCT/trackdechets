@@ -25,6 +25,8 @@ import React, { useEffect } from "react";
 import MarkAsProcessedModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/MarkAsProcessedModalContent";
 import SignEmissionFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignEmissionFormModalContent";
 import SignTransportFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignTransportFormModalContent";
+import { isSignTransportAndCanSkipEmission } from "Apps/Dashboard/dashboardServices";
+import { BsdDisplay } from "Apps/common/types/bsdTypes";
 
 const MARK_TEMP_STORER_ACCEPTED = gql`
   mutation MarkAsTempStorerAccepted(
@@ -135,14 +137,14 @@ const ActBsddValidation = ({
         ? `Signer en tant qu'émetteur`
         : `Faire signer l'émetteur`;
 
-      if (bsd.emitter?.type === EmitterType.Appendix1) {
-        return "Valider la réception";
-      }
-
       if (bsd.emitter?.type === EmitterType.Appendix1Producer) {
-        const canSkipEmission = Boolean(bsd.ecoOrganisme?.siret);
-
-        if (canSkipEmission) {
+        if (
+          isSignTransportAndCanSkipEmission(currentSiret, {
+            emitterType: bsd.emitter?.type,
+            transporter: bsd?.transporter,
+            ecoOrganisme: bsd?.ecoOrganisme,
+          } as BsdDisplay)
+        ) {
           return "Signature transporteur";
         } else {
           return title;
@@ -258,21 +260,17 @@ const ActBsddValidation = ({
   };
 
   const renderContentSealed = () => {
-    if (bsd.emitter?.type === EmitterType.Appendix1) {
-      return renderMarkAsReceivedModal();
+    if (
+      isSignTransportAndCanSkipEmission(currentSiret, {
+        emitterType: bsd.emitter?.type,
+        transporter: bsd?.transporter,
+        ecoOrganisme: bsd?.ecoOrganisme,
+      } as BsdDisplay)
+    ) {
+      return renderSignTransportFormModal();
+    } else {
+      return renderSignEmissionFormModal();
     }
-
-    if (bsd.emitter?.type === EmitterType.Appendix1Producer) {
-      const canSkipEmission = Boolean(bsd.ecoOrganisme?.siret);
-
-      if (!canSkipEmission) {
-        return renderSignEmissionFormModal();
-      } else {
-        return renderSignTransportFormModal();
-      }
-    }
-
-    return renderSignEmissionFormModal();
   };
 
   const renderContentResealed = () => {

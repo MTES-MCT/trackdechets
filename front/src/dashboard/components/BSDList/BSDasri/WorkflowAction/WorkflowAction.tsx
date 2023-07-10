@@ -36,12 +36,6 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const location = useLocation();
   const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
   const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
-  const isToCollectTabV2Route = !!useRouteMatch(
-    routes.dashboardv2.transport.toCollect
-  );
-
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
-  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
 
   const isSynthesis = form.type === BsdasriType.Synthesis;
   const isAssociatedToSynthesis = !!form?.synthesizedIn?.id;
@@ -102,7 +96,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
         );
       }
 
-      if (isTransporter && (isToCollectTab || isToCollectTabV2Route)) {
+      if (isTransporter && isToCollectTab) {
         return (
           <>
             {!isSynthesis && (
@@ -111,8 +105,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                 icon={<IconShipmentSignSmartphone size="24px" />}
                 to={{
                   pathname: generatePath(
-                    routes[dashboardRoutePrefix].bsdasris.sign
-                      .emissionSecretCode,
+                    routes.dashboard.bsdasris.sign.emissionSecretCode,
                     {
                       siret,
                       id: form.id,
@@ -167,7 +160,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
     }
     case BsdasriStatus.SignedByProducer: {
       if (!isTransporter) {
-        if (!isToCollectTab || !isToCollectTabV2Route) {
+        if (!isToCollectTab) {
           return null;
         }
         return null;
@@ -178,7 +171,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
             icon={<IconCheckCircle1 size="24px" />}
             to={{
               pathname: generatePath(
-                routes[dashboardRoutePrefix].bsdasris.sign.transporter,
+                routes.dashboard.bsdasris.sign.transporter,
                 {
                   siret,
                   id: form.id,

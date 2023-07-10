@@ -34,10 +34,6 @@ import {
   RouteBsvhusView,
 } from "../../dashboard/detail";
 import Exports from "../../dashboard/exports/Exports";
-import {
-  RouteTransportCollected,
-  RouteTransportToCollect,
-} from "../../dashboard/transport";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
 
 import "./dashboard.scss";
@@ -163,12 +159,6 @@ function DashboardRoutes() {
             <Route path={routes.dashboardv2.bsffs.view}>
               <RouteBsffsView />
             </Route>
-            <Route path={routes.dashboardv2.transport.toCollect}>
-              <RouteTransportToCollect />
-            </Route>
-            <Route path={routes.dashboardv2.transport.collected}>
-              <RouteTransportCollected />
-            </Route>
             <Route path={routes.dashboardv2.exports}>
               <Exports
                 companies={filter(Exports.fragments.company, companies)}
@@ -182,6 +172,8 @@ function DashboardRoutes() {
                 routes.dashboardv2.bsds.follow,
                 routes.dashboardv2.bsds.history,
                 routes.dashboardv2.bsds.reviews,
+                routes.dashboardv2.transport.toCollect,
+                routes.dashboardv2.transport.collected,
               ]}
             >
               {dashboardPageComponent}

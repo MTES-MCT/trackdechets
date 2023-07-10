@@ -24,6 +24,7 @@ import {
   isBsvhuSign,
   isEcoOrgSign,
   isEmetteurSign,
+  isSignTransportAndCanSkipEmission,
 } from "./dashboardServices";
 import {
   BsdType,
@@ -45,6 +46,7 @@ import {
   VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE,
   VALIDER_ENTREPOSAGE_PROVISOIRE,
   VALIDER_RECEPTION,
+  VALIDER_SYNTHESE_LABEL,
   VALIDER_TRAITEMENT,
   completer_bsd_suite,
 } from "Apps/common/wordings/dashboard/wordingsDashboard";
@@ -320,10 +322,11 @@ describe("dashboardServices", () => {
         transporter: {
           company: { siret: "987654321" },
         },
+        bsdWorkflowType: "SYNTHESIS",
       } as BsdDisplay;
       const result = getIsNonDraftLabel(bsd, currentSiret, bsdCurrentTab);
 
-      expect(result).toBe(SIGNER);
+      expect(result).toBe(VALIDER_SYNTHESE_LABEL);
     });
 
     it("should return the correct label for bsff", () => {
@@ -1084,6 +1087,39 @@ describe("dashboardServices", () => {
       };
 
       const result = canReviewBsdd(bsd);
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe("isSignTransportAndCanSkipEmission", () => {
+    const currentSiret = "123456789";
+    const bsd = {
+      emitterType: "APPENDIX1_PRODUCER",
+      transporter: { company: { siret: "123456789" } },
+      ecoOrganisme: { siret: "1" },
+    } as BsdDisplay;
+
+    it("returns true if can Skip Emission and is Same Siret Transporter", () => {
+      const result = isSignTransportAndCanSkipEmission(currentSiret, bsd);
+
+      expect(result).toBe(true);
+    });
+
+    it("returns false if cannot Skip Emission", () => {
+      const result = isSignTransportAndCanSkipEmission(currentSiret, {
+        ...bsd,
+        ecoOrganisme: null,
+      });
+
+      expect(result).toBe(false);
+    });
+
+    it("returns false if not is Same Siret Transporter", () => {
+      const result = isSignTransportAndCanSkipEmission(currentSiret, {
+        ...bsd,
+        transporter: { company: { siret: "2" } },
+      });
 
       expect(result).toBe(false);
     });

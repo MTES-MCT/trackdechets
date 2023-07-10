@@ -78,6 +78,8 @@ const createBsdd = (bsdd: FormWithReview): BsdDisplay => {
     temporaryStorageDetail: bsdd.temporaryStorageDetail,
     bsdWorkflowType: bsdd.emitter?.type,
     review: bsdd?.review,
+    transporterCustomInfo: bsdd.stateSummary?.transporterCustomInfo,
+    transporterNumberPlate: bsdd.stateSummary?.transporterNumberPlate,
   } as BsdDisplay;
   return bsddFormatted;
 };
@@ -105,6 +107,11 @@ const createBsda = (bsda: BsdaWithReview): BsdDisplay => {
     bsdWorkflowType: bsda.type || bsda["bsdaType"],
     grouping: bsda.grouping,
     review: bsda?.review,
+    transporterCustomInfo:
+      bsda.transporter?.customInfo || bsda["bsdaTransporter"]?.customInfo,
+    transporterNumberPlate:
+      bsda.transporter?.transport?.plates ||
+      bsda["bsdaTransporter"]?.transport?.plates,
   };
   return bsdaFormatted;
 };
@@ -129,6 +136,13 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     bsdWorkflowType: bsdasri?.type,
     grouping: bsdasri?.grouping,
     synthesizing: bsdasri?.synthesizing,
+    allowDirectTakeOver: bsdasri?.allowDirectTakeOver,
+    transporterCustomInfo:
+      bsdasri.transporter?.customInfo ||
+      bsdasri["bsdasriTransporter"]?.customInfo,
+    transporterNumberPlate:
+      bsdasri.transporter?.transport?.plates ||
+      bsdasri["bsdasriTransporter"]?.transport?.plates,
   };
   return bsdasriFormatted;
 };
@@ -172,6 +186,8 @@ const createBsff = (bsff: Bsff): BsdDisplay => {
     updatedAt: bsff["bsffUpdatedAt"],
     bsdWorkflowType: bsff.type,
     grouping: bsff.grouping,
+    transporterCustomInfo: bsff["bsffTransporter"]?.customInfo,
+    transporterNumberPlate: bsff["bsffTransporter"]?.transport?.plates,
   };
   return bsffFormatted;
 };
