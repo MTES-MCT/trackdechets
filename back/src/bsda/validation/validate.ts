@@ -233,10 +233,10 @@ async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
 /**
  * Destination is editable until TRANSPORT.
  * But afer EMISSION, if you change the destination, the current destination must become the nextDestination.
- * 
- * @param bsda 
- * @param currentSignatureType 
- * @param ctx 
+ *
+ * @param bsda
+ * @param currentSignatureType
+ * @param ctx
  */
 async function validateDestination(
   bsda: ZodBsda,
