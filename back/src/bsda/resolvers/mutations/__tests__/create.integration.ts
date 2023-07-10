@@ -675,7 +675,7 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.id).toBeDefined();
   });
 
-  it("should allow creating the bsda with type COLLECTION_2710 even if transporter and worker have empty strings as siret", async () => {
+  it("should not allow creating the bsda with type COLLECTION_2710 even if transporter and worker have empty strings as siret", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: { set: ["WASTE_CENTER"] }
     });
@@ -744,13 +744,13 @@ describe("Mutation.Bsda.create", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
       variables: {
         input
       }
     });
 
-    expect(data.createBsda.id).toBeDefined();
+    expect(errors.length).toBeGreaterThan(0);
   });
 
   it("should disallow creating a bsda with packaging OTHER and no description", async () => {
