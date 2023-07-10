@@ -100,6 +100,7 @@ export default function buildSirenify<T>(
 
 type NextCompanyInputAccessor<T> = {
   siret: string | null | undefined;
+  skip: boolean;
   setter: (
     input: T,
     data: {
@@ -110,17 +111,19 @@ type NextCompanyInputAccessor<T> = {
 };
 
 export function nextBuildSirenify<T>(
-  companyInputAccessors: (input: T) => NextCompanyInputAccessor<T>[]
-): (input: T) => Promise<T> {
-  return async input => {
-    const accessors = companyInputAccessors(input);
-
-    // retrieves the different companyInput included in the input
-    const sirets = accessors.map(({ siret }) => siret);
+  companyInputAccessors: (
+    input: T,
+    sealedFields: string[]
+  ) => NextCompanyInputAccessor<T>[]
+): (input: T, sealedFields: string[]) => Promise<T> {
+  return async (input, sealedFields) => {
+    const accessors = companyInputAccessors(input, sealedFields);
 
     // check if we found a corresponding companySearchResult based on siret
     const companySearchResults = await Promise.all(
-      sirets.map(siret => (siret ? searchCompanyFailFast(siret) : null))
+      accessors.map(({ siret, skip }) =>
+        !skip && siret ? searchCompanyFailFast(siret) : null
+      )
     );
 
     // make a copy to avoid mutating initial data

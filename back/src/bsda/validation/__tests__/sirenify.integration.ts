@@ -67,7 +67,7 @@ describe("sirenify", () => {
       ]
     };
 
-    const sirenified = await sirenify(bsdaInput);
+    const sirenified = await sirenify(bsdaInput, []);
 
     expect(sirenified.emitterCompanyName).toEqual(
       searchResults[emitter.company.siret!].name
@@ -151,7 +151,7 @@ describe("sirenify", () => {
       ]
     };
 
-    const sirenified = await sirenify(bsdaInput);
+    const sirenified = await sirenify(bsdaInput, []);
 
     expect(sirenified.emitterCompanyName).toEqual(
       searchResults[emitter.company.siret!].name

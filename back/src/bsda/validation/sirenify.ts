@@ -7,9 +7,13 @@ type SiretInfos = {
   address: string | null | undefined;
 };
 
-const accessors = (input: ReturnType<typeof flattenBsdaInput>) => [
+const accessors = (
+  input: ReturnType<typeof flattenBsdaInput>,
+  sealedFields: string[]
+) => [
   {
     siret: input?.emitterCompanySiret,
+    skip: sealedFields.includes("emitterCompanySiret"),
     setter: (input, companyInput: SiretInfos) => {
       input.emitterCompanyName = companyInput.name;
       input.emitterCompanyAddress = companyInput.address;
@@ -17,6 +21,7 @@ const accessors = (input: ReturnType<typeof flattenBsdaInput>) => [
   },
   {
     siret: input?.transporterCompanySiret,
+    skip: sealedFields.includes("transporterCompanySiret"),
     setter: (input, companyInput: CompanyInput) => {
       input.transporterCompanyName = companyInput.name;
       input.transporterCompanyAddress = companyInput.address;
@@ -24,6 +29,7 @@ const accessors = (input: ReturnType<typeof flattenBsdaInput>) => [
   },
   {
     siret: input?.destinationCompanySiret,
+    skip: sealedFields.includes("destinationCompanySiret"),
     setter: (input, companyInput: CompanyInput) => {
       input.destinationCompanyName = companyInput.name;
       input.destinationCompanyAddress = companyInput.address;
@@ -31,6 +37,7 @@ const accessors = (input: ReturnType<typeof flattenBsdaInput>) => [
   },
   {
     siret: input?.workerCompanySiret,
+    skip: sealedFields.includes("workerCompanySiret"),
     setter: (input, companyInput: CompanyInput) => {
       input.workerCompanyName = companyInput.name;
       input.workerCompanyAddress = companyInput.address;
@@ -38,6 +45,7 @@ const accessors = (input: ReturnType<typeof flattenBsdaInput>) => [
   },
   ...(input.intermediaries ?? []).map((_, idx) => ({
     siret: input.intermediaries![idx].siret,
+    skip: sealedFields.includes("intermediaries"),
     setter: (input, companyInput: CompanyInput) => {
       const intermediary = input.intermediaries[idx];
 
