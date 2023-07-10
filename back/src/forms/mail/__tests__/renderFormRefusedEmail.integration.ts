@@ -28,7 +28,7 @@ describe("renderFormRefusedEmail", () => {
         recipientCompanyName: destination.company.name,
         recipientCompanyAddress: destination.company.address,
         sentAt: new Date("2022-01-01"),
-        receivedAt: new Date("2022-01-02"),
+        signedAt: new Date("2022-01-02"),
         status: Status.REFUSED,
         wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
         wasteRefusalReason: "Parce que !!"
@@ -76,7 +76,7 @@ describe("renderFormRefusedEmail", () => {
         recipientCompanyName: destination.company.name,
         recipientCompanyAddress: destination.company.address,
         sentAt: new Date("2022-01-01"),
-        receivedAt: new Date("2022-01-02"),
+        signedAt: new Date("2022-01-02"),
         status: Status.REFUSED,
         wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
         wasteRefusalReason: "Parce que !!"
@@ -106,7 +106,7 @@ describe("renderFormRefusedEmail", () => {
         recipientCompanyName: destination.company.name,
         recipientCompanyAddress: destination.company.address,
         sentAt: new Date("2022-01-01"),
-        receivedAt: new Date("2022-01-02"),
+        signedAt: new Date("2022-01-02"),
         status: Status.ACCEPTED,
         wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
         quantityReceived: 1,
@@ -153,7 +153,7 @@ describe("renderFormRefusedEmail", () => {
         recipientCompanyName: ttr.company.name,
         recipientCompanyAddress: ttr.company.address,
         sentAt: new Date("2022-01-01"),
-        receivedAt: new Date("2022-01-02"),
+        signedAt: new Date("2022-01-02"),
         status: Status.REFUSED,
         wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
         wasteRefusalReason: "Parce que !!"
@@ -205,7 +205,7 @@ describe("renderFormRefusedEmail", () => {
         recipientCompanyName: ttr.company.name,
         recipientCompanyAddress: ttr.company.address,
         sentAt: new Date("2022-01-01"),
-        receivedAt: new Date("2022-01-02"),
+        signedAt: new Date("2022-01-02"),
         status: Status.ACCEPTED,
         wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED
       },
@@ -217,7 +217,7 @@ describe("renderFormRefusedEmail", () => {
         recipientCompanyName: destination.company.name,
         recipientCompanyAddress: destination.company.address,
         sentAt: new Date("2022-01-01"),
-        receivedAt: new Date("2022-01-02"),
+        signedAt: new Date("2022-01-02"),
         status: Status.REFUSED,
         wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
         wasteRefusalReason: "Parce que !!"
