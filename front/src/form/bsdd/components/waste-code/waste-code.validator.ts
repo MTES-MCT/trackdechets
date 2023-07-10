@@ -2,13 +2,15 @@ import { wasteCodeValidator } from "form/common/wasteCode";
 import { BSDD_WASTES } from "generated/constants";
 
 export function bsddWasteCodeValidator(wasteCode: string) {
-  const error = wasteCodeValidator(wasteCode);
+  const wasteCodeWithoutSpaces = wasteCode.replace(/\s+/g, "");
+
+  const error = wasteCodeValidator(wasteCodeWithoutSpaces);
 
   if (error) {
     return error;
   }
 
-  if (!BSDD_WASTES.find(waste => waste.code === wasteCode)) {
+  if (!BSDD_WASTES.find(waste => waste.code === wasteCodeWithoutSpaces)) {
     return (
       "Le code déchet saisi correspond à une typologie de déchets nécessitant" +
       " d'utiliser un Bordereau de suivi spécifique. Veuillez créer le bordereau" +
