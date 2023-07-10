@@ -43,8 +43,12 @@ export const useShowTransportTabs = (companyTypes, companySiret) => {
     },
   });
 
-  useNotifier(companySiret, refetchIsToCollectForData);
-  useNotifier(companySiret, refetchIsCollectedForData);
+  useNotifier(companySiret, () => {
+    if (!isTransporter) refetchIsToCollectForData();
+  });
+  useNotifier(companySiret, () => {
+    if (!isTransporter) refetchIsCollectedForData();
+  });
 
   return {
     showTransportTabs:
