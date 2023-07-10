@@ -78,7 +78,7 @@ export default function LayoutContainer() {
 
   const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   const dashboardRoutePrefix =
-    isV2Routes && (Boolean(me.isAdmin) || featureFlags.dashboardV2)
+    isV2Routes && (isAdmin || featureFlags.dashboardV2)
       ? "dashboardv2"
       : "dashboard";
 
