@@ -231,9 +231,9 @@ async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
 }
 
 /**
- * Destination is editable until TRANSPORT. But afer EMISSION:
- * - if you change the destination, the current destination must become the nextDestination
-   - if you change the nextDestination
+ * Destination is editable until TRANSPORT.
+ * But afer EMISSION, if you change the destination, the current destination must become the nextDestination.
+ * 
  * @param bsda 
  * @param currentSignatureType 
  * @param ctx 
@@ -243,7 +243,8 @@ async function validateDestination(
   currentSignatureType: BsdaSignatureType | undefined,
   ctx: RefinementCtx
 ) {
-  // If the bsda has no signature or is already transported, abort as the fields are not editable.
+  // If the bsda has no signature, fields are freeely editable.
+  // If the bsda is already transported, fields are not editable.
   if (
     currentSignatureType === undefined ||
     currentSignatureType === "OPERATION"
