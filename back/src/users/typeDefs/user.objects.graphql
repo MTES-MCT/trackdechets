@@ -32,7 +32,8 @@ type User {
   companies: [CompanyPrivate!]!
     @deprecated(reason: "Utiliser la query avec pagination `myCompanies`")
 
-  featureFlags: [FeatureFlag!]!
+  "Liste des fonctionnalités optionelles activées"
+  featureFlags: [String!]!
 }
 
 """
@@ -63,14 +64,4 @@ type MembershipRequest {
   sont toujours partiellement masquées.
   """
   sentTo: [String!]!
-}
-
-"""
-Fonctionnalité optionelle
-"""
-type FeatureFlag {
-  "Nom de la fonctionnalité"
-  name: String!
-  "Etat d'activation de la fonctionnalité"
-  enabled: Boolean!
 }

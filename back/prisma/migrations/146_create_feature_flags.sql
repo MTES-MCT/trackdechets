@@ -4,5 +4,5 @@ CREATE TABLE IF NOT EXISTS "default$default"."FeatureFlag" (
   "enabled" BOOLEAN NOT NULL DEFAULT FALSE,
   "userId" VARCHAR(30) NOT NULL,
   CONSTRAINT "FeatureFlag_name_userId_unique_together" UNIQUE ("name", "userId"),
-  FOREIGN KEY ("userId") REFERENCES "default$default"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE
+  FOREIGN KEY ("userId") REFERENCES "default$default"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );

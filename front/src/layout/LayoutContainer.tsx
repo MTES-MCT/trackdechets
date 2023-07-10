@@ -54,10 +54,7 @@ const GET_ME = gql`
         orgId
         siret
       }
-      featureFlags {
-        name
-        enabled
-      }
+      featureFlags
     }
   }
 `;
@@ -68,11 +65,7 @@ export default function LayoutContainer() {
   const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME, {
     onCompleted: ({ me }) => {
       updateFeatureFlags({
-        dashboardV2:
-          Boolean(me.isAdmin) ||
-          me.featureFlags.some(
-            flag => flag.name === "DASHBOARD_V2" && flag.enabled
-          ),
+        dashboardV2: me.featureFlags.includes("DASHBOARD_V2"),
       });
 
       if (import.meta.env.VITE_SENTRY_DSN && me.email) {
@@ -85,7 +78,9 @@ export default function LayoutContainer() {
 
   const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   const dashboardRoutePrefix =
-    isV2Routes && featureFlags.dashboardV2 ? "dashboardv2" : "dashboard";
+    isV2Routes && (Boolean(me.isAdmin) || featureFlags.dashboardV2)
+      ? "dashboardv2"
+      : "dashboard";
 
   const { DEV } = import.meta.env;
   const isDevelopment = DEV;

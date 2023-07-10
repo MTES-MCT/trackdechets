@@ -20,7 +20,11 @@ const userResolvers: UserResolvers = {
     });
   },
   featureFlags: async ({ id }) => {
-    return prisma.featureFlag.findMany({ where: { userId: id } });
+    const featureFlags = await prisma.user
+      .findUnique({ where: { id } })
+      .featureFlags({ where: { enabled: true } });
+
+    return featureFlags?.map(ff => ff.name) ?? [];
   }
 };
 
