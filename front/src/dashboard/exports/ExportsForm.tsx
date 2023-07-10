@@ -9,12 +9,13 @@ import {
   WasteRegistryType,
 } from "generated/graphql/types";
 import WasteTreeModal from "search/WasteTreeModal";
-import { wasteCodeValidator } from "form/bsdd/components/waste-code/waste-code.validator";
+
 import { ALL_WASTES, ALL_WASTES_TREE } from "generated/constants";
 import { useLazyQuery, gql } from "@apollo/client";
 import { NotificationError } from "Apps/common/Components/Error/Error";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { sortCompaniesByName } from "common/helper";
+import { wasteCodeValidator } from "form/common/wasteCode";
 
 interface IProps {
   companies: CompanyPrivate[];

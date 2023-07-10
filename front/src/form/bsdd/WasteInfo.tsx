@@ -12,7 +12,10 @@ import React, { useEffect } from "react";
 import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import Packagings from "./components/packagings/Packagings";
 import { ParcelNumbersSelector } from "./components/parcel-number/ParcelNumber";
-import { WasteCodeSelect, wasteCodeValidator } from "./components/waste-code";
+import {
+  WasteCodeSelect,
+  bsddWasteCodeValidator,
+} from "./components/waste-code";
 import "./WasteInfo.scss";
 
 type Values = {
@@ -71,7 +74,7 @@ export default connect<{ disabled }, Values>(function WasteInfo({
         <Field
           name="wasteDetails.code"
           component={WasteCodeSelect}
-          validate={wasteCodeValidator}
+          validate={bsddWasteCodeValidator}
           disabled={disabled}
         />
       </div>
