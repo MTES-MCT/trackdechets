@@ -18,6 +18,7 @@ import { GET_BSDS } from "Apps/common/queries";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 import { subMonths } from "date-fns";
+import TagsInput from "common/components/tags-input/TagsInput";
 
 const validationSchema = yup.object({
   takenOverAt: yup.date().required("La date de prise en charge est requise"),
@@ -50,6 +51,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
       initialValues={{
         signatureAuthor: "",
         takenOverAt: TODAY.toISOString(),
+        transporterTransportPlates: bsff.transporter?.transport?.plates,
       }}
       validationSchema={validationSchema}
       onSubmit={async values => {
@@ -60,6 +62,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
               transporter: {
                 transport: {
                   takenOverAt: values.takenOverAt,
+                  plates: values.transporterTransportPlates,
                   mode: bsff.transporter?.transport?.mode ?? TransportMode.Road,
                 },
               },
@@ -87,6 +90,17 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
             je déclare prendre en charge le déchet.
           </p>
           <TransporterReceipt transporter={bsff.transporter!} />
+
+          {!bsff.transporter?.transport?.mode ||
+            (bsff.transporter?.transport?.mode === TransportMode.Road && (
+              <div className="form__row">
+                <label>
+                  Immatriculations
+                  <TagsInput name="transporterTransportPlates" />
+                </label>
+              </div>
+            ))}
+
           <div className="form__row">
             <label>
               Date de prise en charge

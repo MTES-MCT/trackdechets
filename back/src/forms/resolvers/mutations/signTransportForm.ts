@@ -23,6 +23,7 @@ import { runInTransaction } from "../../../common/repository/helper";
 import { sumPackagingInfos } from "../../repository/helper";
 import { validateBeforeTransport } from "../../validation";
 import { Permission } from "../../../permissions";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 
 /**
  * Common function for signing
@@ -46,7 +47,15 @@ const signTransportFn = async (
     args.securityCode
   );
 
-  await validateBeforeTransport({ ...existingForm, ...transporter });
+  await validateBeforeTransport({
+    ...existingForm,
+    ...transporter,
+    ...(args.input.transporterNumberPlate
+      ? {
+          transporterNumberPlate: args.input.transporterNumberPlate
+        }
+      : {})
+  });
 
   const transporterUpdate: Prisma.BsddTransporterUpdateWithoutFormInput = {
     takenOverAt: args.input.takenOverAt, // takenOverAt is duplicated between Form and BsddTransporter
@@ -167,6 +176,26 @@ const signTransportFn = async (
             .reduce((sum, quantity) => sum + quantity, 0)
         }
       );
+
+      // For user convenience, we update the bsds with the
+      // immatriculation (if not filled already)
+      const ids = appendix1Forms.map(form => form.id);
+
+      // Update their plates
+      await transaction.bsddTransporter.updateMany({
+        where: {
+          formId: { in: ids },
+          OR: [{ transporterNumberPlate: null }, { transporterNumberPlate: "" }]
+        },
+        data: {
+          transporterNumberPlate: transporterUpdate.transporterNumberPlate
+        }
+      });
+
+      // Update ES
+      ids.forEach(id => {
+        enqueueUpdatedBsdToIndex(id);
+      });
     }
     return updatedForm;
   });

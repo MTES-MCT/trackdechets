@@ -863,5 +863,151 @@ describe("signTransportForm", () => {
       });
       expect(appendix1Container.status).toBe(Status.SENT);
     });
+
+    it("should update all forms with plate number", async () => {
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const appendix1Item = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SIGNED_BY_PRODUCER,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          emitterCompanyName: company.name,
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1,
+              transporterNumberPlate: ""
+            }
+          }
+        }
+      });
+
+      const appendix2Item = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SIGNED_BY_PRODUCER,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          emitterCompanyName: company.name,
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1,
+              transporterNumberPlate: ""
+            }
+          }
+        }
+      });
+
+      await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SENT,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          emitterCompanyName: company.name,
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
+          }
+        }
+      });
+
+      await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SEALED,
+          emitterType: EmitterType.APPENDIX1,
+          emitterCompanySiret: company.siret,
+          emitterCompanyName: company.name,
+          grouping: {
+            createMany: {
+              data: [
+                { initialFormId: appendix1Item.id, quantity: 10 },
+                { initialFormId: appendix2Item.id, quantity: 10 }
+              ]
+            }
+          },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data: updatedAppendix1Item } = await mutate<
+        Pick<Mutation, "signTransportForm">,
+        MutationSignTransportFormArgs
+      >(SIGN_TRANSPORT_FORM, {
+        variables: {
+          id: appendix1Item.id,
+          input: {
+            takenOverAt: new Date().toISOString() as unknown as Date,
+            takenOverBy: "Collecteur annexe 1",
+            transporterNumberPlate: "TRANSPORTER-PLATE"
+          }
+        }
+      });
+
+      expect(updatedAppendix1Item.signTransportForm.status).toBe(Status.SENT);
+
+      // Should save plate
+      const appendix1ItemTransporters = await prisma.bsddTransporter.findFirst({
+        where: { formId: appendix1Item.id }
+      });
+      expect(appendix1ItemTransporters?.transporterNumberPlate).toBe(
+        "TRANSPORTER-PLATE"
+      );
+
+      // Should copy plate to next items
+      const appendix2ItemTransporters = await prisma.bsddTransporter.findFirst({
+        where: { formId: appendix2Item.id }
+      });
+      expect(appendix2ItemTransporters?.transporterNumberPlate).toBe(
+        "TRANSPORTER-PLATE"
+      );
+
+      await mutate<
+        Pick<Mutation, "signTransportForm">,
+        MutationSignTransportFormArgs
+      >(SIGN_TRANSPORT_FORM, {
+        variables: {
+          id: appendix2Item.id,
+          input: {
+            takenOverAt: new Date().toISOString() as unknown as Date,
+            takenOverBy: "Collecteur annexe 1",
+            transporterNumberPlate: "TRANSPORTER-PLATE-2"
+          }
+        }
+      });
+
+      // Should override plate
+      const appendix2ItemTransportersBis =
+        await prisma.bsddTransporter.findFirst({
+          where: { formId: appendix2Item.id }
+        });
+      expect(appendix2ItemTransportersBis?.transporterNumberPlate).toBe(
+        "TRANSPORTER-PLATE-2"
+      );
+
+      // Should not modify already saved plate
+      const appendix1ItemTransportersBis =
+        await prisma.bsddTransporter.findFirst({
+          where: { formId: appendix1Item.id }
+        });
+      expect(appendix1ItemTransportersBis?.transporterNumberPlate).toBe(
+        "TRANSPORTER-PLATE"
+      );
+    });
   });
 });

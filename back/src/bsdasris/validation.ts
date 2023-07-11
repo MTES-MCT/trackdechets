@@ -296,6 +296,26 @@ export const transporterSchema: FactorySchemaOf<
 > = context => {
   const requiredForSynthesis = context.emissionSignature && context.isSynthesis;
   return yup.object({
+    transporterTransportPlates: yup
+      .array()
+      .of(yup.string())
+      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+      .test((transporterTransportPlates, ctx) => {
+        const { transporterTransportMode } = ctx.parent;
+
+        if (
+          context.transportSignature &&
+          transporterTransportMode === "ROAD" &&
+          (!transporterTransportPlates ||
+            !transporterTransportPlates?.filter(p => Boolean(p)).length)
+        ) {
+          return new yup.ValidationError(
+            "La plaque d'immatriculation est requise"
+          );
+        }
+
+        return true;
+      }),
     transporterCompanyName: yup
       .string()
       .ensure()
