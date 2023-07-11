@@ -196,7 +196,8 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
     expect(statusLogs.length).toEqual(1);
     expect(sendMailSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        subject: "Refus de prise en charge de votre déchet"
+        subject:
+          "Refus de prise en charge de votre déchet de l'entreprise WASTE PRODUCER"
       })
     );
   });

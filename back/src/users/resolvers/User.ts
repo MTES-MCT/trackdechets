@@ -2,6 +2,7 @@ import { convertUrls } from "../../companies/database";
 import { UserResolvers, CompanyPrivate } from "../../generated/graphql/types";
 import { getUserCompanies } from "../database";
 import { nafCodes } from "../../common/constants/NAF";
+import prisma from "../../prisma";
 
 const userResolvers: UserResolvers = {
   // Returns the list of companies a user belongs to
@@ -17,6 +18,13 @@ const userResolvers: UserResolvers = {
 
       return { ...companyPrivate, naf, libelleNaf, address };
     });
+  },
+  featureFlags: async ({ id }) => {
+    const featureFlags = await prisma.user
+      .findUnique({ where: { id } })
+      .featureFlags({ where: { enabled: true } });
+
+    return featureFlags?.map(ff => ff.name) ?? [];
   }
 };
 

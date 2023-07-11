@@ -2,7 +2,12 @@ import React from "react";
 import { RedErrorMessage, Label, FieldSwitch } from "common/components";
 import Packagings from "form/bsdasri/components/packagings/Packagings";
 import WeightWidget from "form/bsdasri/components/Weight";
-import { useParams, useHistory, generatePath } from "react-router-dom";
+import {
+  useParams,
+  useHistory,
+  generatePath,
+  useRouteMatch,
+} from "react-router-dom";
 import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
 import Loader from "Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
@@ -61,16 +66,21 @@ export function RouteBSDasrisSignEmissionSecretCode() {
     MutationSignBsdasriEmissionWithSecretCodeArgs
   >(SIGN_BSDASRI_EMISSION_WITH_SECRET_CODE);
 
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
   const toCollectDashboard = {
-    pathname: generatePath(routes.dashboard.transport.toCollect, {
+    pathname: generatePath(routes[dashboardRoutePrefix].transport.toCollect, {
       siret,
     }),
   };
   const signTransporterRedirection = {
-    pathname: generatePath(routes.dashboard.bsdasris.sign.transporter, {
-      siret,
-      id: formId,
-    }),
+    pathname: generatePath(
+      routes[dashboardRoutePrefix].bsdasris.sign.transporter,
+      {
+        siret,
+        id: formId,
+      }
+    ),
     state: { background: toCollectDashboard },
   };
 

@@ -727,12 +727,13 @@ model User {
   StatusLog             StatusLog[]
   UserActivationHash    UserActivationHash[]
   UserResetPasswordHash UserResetPasswordHash[]
+  PdfAccessToken        PdfAccessToken[]
+  featureFlags          FeatureFlag[]
 
-  bsdasriEmissionSignatures  Bsdasri[]        @relation("BsdasriEmissionSignature")
-  bsdasriTransportSignatures Bsdasri[]        @relation("BsdasriTransportSignature")
-  bsdasriReceptionSignatures Bsdasri[]        @relation("BsdasriReceptionSignature")
-  bsdasriOperationignatures  Bsdasri[]        @relation("BsdasriOperationSignature")
-  PdfAccessToken             PdfAccessToken[]
+  bsdasriEmissionSignatures  Bsdasri[] @relation("BsdasriEmissionSignature")
+  bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
+  bsdasriReceptionSignatures Bsdasri[] @relation("BsdasriReceptionSignature")
+  bsdasriOperationignatures  Bsdasri[] @relation("BsdasriOperationSignature")
 }
 
 model UserAccountHash {
@@ -769,6 +770,16 @@ model UserResetPasswordHash {
   user        User     @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "_UserResetPasswordHashIdIdx")
+}
+
+model FeatureFlag {
+  id      String  @id @default(cuid())
+  name    String
+  enabled Boolean @default(false)
+  userId  String
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([name, userId])
 }
 
 // ----------------

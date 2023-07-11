@@ -72,7 +72,7 @@ describe("templates", () => {
   test("formNotAccepted", () => {
     const form: Partial<Form & BsddTransporter> = {
       recipientCompanyName: "Recipient",
-      receivedAt: new Date("2021-01-01"),
+      signedAt: new Date("2021-01-02"),
       emitterCompanyName: "Emitter",
       emitterCompanyAddress: "1 rue du déchet",
       readableId: "BSDD-XXX",
@@ -90,7 +90,7 @@ describe("templates", () => {
       to
     });
     expect(rendered.body).toContain(form.recipientCompanyName);
-    expect(rendered.body).toContain(toFrFormat(form.receivedAt!));
+    expect(rendered.body).toContain(toFrFormat(form.signedAt!));
     expect(rendered.body).toContain(form.emitterCompanyName);
     expect(rendered.body).toContain(form.emitterCompanyAddress);
     expect(rendered.body).toContain(form.readableId);
@@ -105,7 +105,7 @@ describe("templates", () => {
   test("formNotAccepted with exemption of receipt", () => {
     const form: Partial<Form & BsddTransporter> = {
       recipientCompanyName: "Recipient",
-      receivedAt: new Date("2021-01-01"),
+      signedAt: new Date("2021-01-02"),
       emitterCompanyName: "Emitter",
       emitterCompanyAddress: "1 rue du déchet",
       readableId: "BSDD-XXX",
@@ -130,7 +130,7 @@ describe("templates", () => {
   test("formNotAccepted with wasteRefusalReason nullish", () => {
     const form: Partial<Form & BsddTransporter> = {
       recipientCompanyName: "Recipient",
-      receivedAt: new Date("2021-01-01"),
+      signedAt: new Date("2021-01-02"),
       emitterCompanyName: "Emitter",
       emitterCompanyAddress: "1 rue du déchet",
       readableId: "BSDD-XXX",
@@ -153,7 +153,7 @@ describe("templates", () => {
   test("formPartiallyRefused", () => {
     const form: Partial<Form & BsddTransporter> = {
       recipientCompanyName: "Recipient",
-      receivedAt: new Date("2021-01-01"),
+      signedAt: new Date("2021-01-02"),
       emitterCompanyName: "Emitter",
       emitterCompanyAddress: "1 rue du déchet",
       readableId: "BSDD-XXX",
@@ -172,7 +172,7 @@ describe("templates", () => {
       to
     });
     expect(rendered.body).toContain(form.recipientCompanyName);
-    expect(rendered.body).toContain(toFrFormat(form.receivedAt!));
+    expect(rendered.body).toContain(toFrFormat(form.signedAt!));
     expect(rendered.body).toContain(form.emitterCompanyName);
     expect(rendered.body).toContain(form.emitterCompanyAddress);
     expect(rendered.body).toContain(form.readableId);
@@ -187,7 +187,7 @@ describe("templates", () => {
   test("formPartiallyRefused with exemption of receipt", () => {
     const form: Partial<Form & BsddTransporter> = {
       recipientCompanyName: "Recipient",
-      receivedAt: new Date("2021-01-01"),
+      signedAt: new Date("2021-01-02"),
       emitterCompanyName: "Emitter",
       emitterCompanyAddress: "1 rue du déchet",
       readableId: "BSDD-XXX",
@@ -213,7 +213,7 @@ describe("templates", () => {
   test("formPartiallyRefused with wasteRefusalReason nullish", () => {
     const form: Partial<Form & BsddTransporter> = {
       recipientCompanyName: "Recipient",
-      receivedAt: new Date("2021-01-01"),
+      signedAt: new Date("2021-01-02"),
       emitterCompanyName: "Emitter",
       emitterCompanyAddress: "1 rue du déchet",
       readableId: "BSDD-XXX",
