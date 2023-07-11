@@ -7,7 +7,8 @@ const meResolver: QueryResolvers["me"] = async (parent, args, context) => {
   return {
     ...user,
     // companies are resolved through a separate resolver (User.companies)
-    companies: []
+    companies: [],
+    featureFlags: []
   };
 };
 
