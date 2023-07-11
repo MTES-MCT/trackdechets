@@ -194,7 +194,7 @@ export const rawBsdaSchema = z
       .superRefine(intermediariesRefinement),
     intermediariesOrgIds: z.array(z.string()).optional()
   })
-  .superRefine((val, ctx) => {
+  .superRefine(async (val, ctx) => {
     if (
       val.destinationReceptionDate &&
       val.destinationOperationDate &&
@@ -269,7 +269,7 @@ export const rawBsdaSchema = z
     }
 
     // Additionnal checks on the transporterCompanySiret
-    return isRegisteredSiretRefinement(
+    await isRegisteredSiretRefinement(
       "TRANSPORTER",
       val.transporterRecepisseIsExempted
     )(val.transporterCompanySiret ?? "", ctx);
