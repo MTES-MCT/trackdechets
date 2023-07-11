@@ -16,7 +16,7 @@ describe("Mutation.signBsdasri emission", () => {
   let foreignTransporter: Company;
 
   beforeEach(async () => {
-    const emitter = await companyFactory();
+    const emitter = await companyFactory({ companyTypes: ["PRODUCER"] });
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
     foreignTransporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -405,5 +405,46 @@ describe("Mutation.signBsdasri emission", () => {
         }
       }
     );
+  });
+
+  describe("Emitter transports own waste", () => {
+    it("allowed if exemption", async () => {
+      const data = {
+        ...bsdasri,
+        transporterCompanySiret: bsdasri.emitterCompanySiret,
+        transporterRecepisseIsExempted: true
+      };
+
+      expect.assertions(1);
+
+      const validated = await validateBsdasri(data as any, {
+        transportSignature: true
+      });
+
+      expect(validated).toBeDefined();
+    });
+
+    it("NOT allowed if no exemption", async () => {
+      const data = {
+        ...bsdasri,
+        transporterCompanySiret: bsdasri.emitterCompanySiret,
+        transporterRecepisseIsExempted: false
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data as any, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          `Le transporteur saisi sur le bordereau (SIRET: ${bsdasri.emitterCompanySiret}) n'est pas inscrit sur Trackdéchets` +
+            ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
+            ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
+            ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+        ]);
+      }
+    });
   });
 });

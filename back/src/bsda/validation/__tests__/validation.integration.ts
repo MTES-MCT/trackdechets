@@ -341,4 +341,52 @@ describe("BSDA validation", () => {
       }
     );
   });
+
+  describe("Emitter transports own waste", () => {
+    it("allowed if exemption", async () => {
+      const emitterAndTransporter = await companyFactory({
+        companyTypes: ["PRODUCER"]
+      });
+
+      const data = {
+        ...bsda,
+        emittedCompanySiret: emitterAndTransporter.siret,
+        transporterCompanySiret: emitterAndTransporter.siret,
+        transporterRecepisseIsExempted: true
+      };
+
+      expect.assertions(1);
+
+      const result = await parseBsda(data, {
+        currentSignatureType: "TRANSPORT"
+      });
+
+      expect(result).toBeTruthy();
+    });
+
+    it("NOT allowed if no exemption", async () => {
+      const emitterAndTransporter = await companyFactory({
+        companyTypes: ["PRODUCER"]
+      });
+
+      const data = {
+        ...bsda,
+        emittedCompanySiret: emitterAndTransporter.siret,
+        transporterCompanySiret: emitterAndTransporter.siret,
+        transporterRecepisseIsExempted: false
+      };
+
+      expect.assertions(1);
+
+      try {
+        await parseBsda(data);
+      } catch (error) {
+        expect(error.issues[0].message).toBe(
+          `Le transporteur saisi sur le bordereau (SIRET: ${emitterAndTransporter.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
+            " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        );
+      }
+    });
+  });
 });
