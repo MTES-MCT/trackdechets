@@ -9,7 +9,7 @@ type SiretInfos = {
 
 const accessors = (
   input: ReturnType<typeof flattenBsdaInput>,
-  sealedFields: string[]
+  sealedFields: string[] // Tranformations should not be run on sealed fields
 ) => [
   {
     siret: input?.emitterCompanySiret,
