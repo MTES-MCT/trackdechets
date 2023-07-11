@@ -16,20 +16,7 @@ describe("BSDA validation", () => {
   afterEach(resetDatabase);
 
   describe("BSDA should be valid - transitory empty strings", () => {
-    test("when type is COLLECTION_2710 and unused company fields are empty strings", async () => {
-      // on COLLECTION_2710 Bsdas worker and trasporter fields are not used
-      const { success } = await rawBsdaSchema.safeParseAsync({
-        ...bsda,
-        type: BsdaType.COLLECTION_2710,
-        transporterCompanySiret: "",
-        transporterCompanyName: "",
-        workerCompanyName: "",
-        workerCompanySiret: ""
-      });
-
-      expect(success).toEqual(true);
-    });
-    test("when type is COLLECTION_2710 and unused company fields are  empty nulls", async () => {
+    test("when type is COLLECTION_2710 and unused company fields are nulls", async () => {
       // on COLLECTION_2710 Bsdas worker and trasporter fields are not used
       const { success } = await rawBsdaSchema.safeParseAsync({
         ...bsda,
@@ -109,6 +96,21 @@ describe("BSDA validation", () => {
 
   describe("BSDA should not be valid", () => {
     afterEach(resetDatabase);
+
+    test("when type is COLLECTION_2710 and unused company fields are empty strings", async () => {
+      // on COLLECTION_2710 Bsdas worker and trasporter fields are not used
+      const { success } = await rawBsdaSchema.safeParseAsync({
+        ...bsda,
+        type: BsdaType.COLLECTION_2710,
+        transporterCompanySiret: "",
+        transporterCompanyName: "",
+        workerCompanyName: "",
+        workerCompanySiret: ""
+      });
+
+      expect(success).toEqual(false);
+    });
+
     test("when emitter siret is not valid", async () => {
       const data = {
         ...bsda,
