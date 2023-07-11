@@ -36,10 +36,10 @@ export const envVariables = z
     // Various
     REGISTRY_WHITE_LIST_IP: z.string().optional(),
     USERS_BLACKLIST: z.string().optional(),
-    MAX_REQUESTS_PER_WINDOW: z.string(),
+    MAX_REQUESTS_PER_WINDOW: z.string().optional().default("1000"),
     STARTUP_FILE: z.string(),
-    TRUST_PROXY_HOPS: z.string().refine(isNumber),
-    CRON_ONBOARDING_SCHEDULE: z.string(),
+    TRUST_PROXY_HOPS: z.string().optional().default("1").refine(isNumber),
+    CRON_ONBOARDING_SCHEDULE: z.string().optional(),
     LOG_TO_HTTP: z.string().optional().default("false").refine(isBoolean),
     FORCE_LOGGER_CONSOLE: z
       .string()
@@ -101,7 +101,6 @@ export const envVariables = z
     PROFESIONAL_SECOND_ONBOARDING_TEMPLATE_ID: z.string(),
     FIRST_ONBOARDING_TEMPLATE_ID: z.string(),
     PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID: z.string(),
-    PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID: z.string(),
     VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID: z.string(),
     // -------
     // Webhooks
@@ -127,7 +126,7 @@ export const envVariables = z
     // Datadog
     DD_ENV: z.string(),
     DD_API_KEY: z.string(),
-    DD_APP_NAME: z.string(),
+    DD_APP_NAME: z.string().optional(),
     // -------
     // S3
     S3_ENDPOINT: z.string(),
@@ -138,7 +137,7 @@ export const envVariables = z
     // -------
     // Queues
     QUEUE_MONITOR_TOKEN: z.string().optional(),
-    QUEUE_NAME_COMPANY: z.string(),
+    QUEUE_NAME_COMPANY: z.string().optional(),
     QUEUE_NAME_SENDMAIL: z.string(),
     QUEUE_MAXRATE_SENDMAIL: z.string().default("16").refine(isNumber),
     // -------
