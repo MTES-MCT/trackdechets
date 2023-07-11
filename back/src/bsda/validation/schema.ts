@@ -269,7 +269,7 @@ export const rawBsdaSchema = z
     }
 
     // Additionnal checks on the transporterCompanySiret
-    return isRegisteredSiretRefinement(
+    isRegisteredSiretRefinement(
       "TRANSPORTER",
       val.transporterRecepisseIsExempted
     )(val.transporterCompanySiret ?? "", ctx);
