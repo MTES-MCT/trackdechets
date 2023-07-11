@@ -26,6 +26,16 @@ export async function parseBsda(
 }
 
 function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
+  // Some signatures may be skipped, so always check all the hierarchy
+  const signaturesToCheck = getSignatureHierarchy(
+    validationContext.currentSignatureType
+  );
+  // We skip the rules for which the fields are not sealed yet
+  const sealedRules = Object.entries(editionRules).filter(([_, rule]) =>
+    signaturesToCheck.includes(rule.sealedBy)
+  );
+  const sealedFields = sealedRules.map(([field]) => field);
+
   return rawBsdaSchema
     .transform(async val => {
       val.intermediariesOrgIds = val.intermediaries
@@ -38,7 +48,7 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
         : undefined;
 
       if (validationContext.enableSirenification) {
-        val = await sirenify(val);
+        val = await sirenify(val, sealedFields);
       }
 
       val = await runTransformers(val);
@@ -46,16 +56,6 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
       return val;
     })
     .superRefine(async (val, ctx) => {
-      // Some signatures may be skipped, so always check all the hierarchy
-      const signaturesToCheck = getSignatureHierarchy(
-        validationContext.currentSignatureType
-      );
-
-      // We skip the rules for which the fields are not sealed yet
-      const sealedRules = Object.entries(editionRules).filter(([_, rule]) =>
-        signaturesToCheck.includes(rule.sealedBy)
-      );
-
       // Fields validation
       for (const [field, rule] of sealedRules) {
         if (rule.superRefineWhenSealed instanceof Function) {

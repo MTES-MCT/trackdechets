@@ -67,7 +67,7 @@ describe("sirenify", () => {
       ]
     };
 
-    const sirenified = await sirenify(bsdaInput);
+    const sirenified = await sirenify(bsdaInput, []);
 
     expect(sirenified.emitterCompanyName).toEqual(
       searchResults[emitter.company.siret!].name
@@ -151,7 +151,7 @@ describe("sirenify", () => {
       ]
     };
 
-    const sirenified = await sirenify(bsdaInput);
+    const sirenified = await sirenify(bsdaInput, []);
 
     expect(sirenified.emitterCompanyName).toEqual(
       searchResults[emitter.company.siret!].name
@@ -165,6 +165,106 @@ describe("sirenify", () => {
     expect(sirenified.transporterCompanyAddress).toEqual(
       searchResults[transporter.company.siret!].address
     );
+    expect(sirenified.destinationCompanyName).toEqual(
+      searchResults[destination.company.siret!].name
+    );
+    expect(sirenified.destinationCompanyAddress).toEqual(
+      searchResults[destination.company.siret!].address
+    );
+    expect(sirenified.workerCompanyName).toEqual(
+      searchResults[worker.company.siret!].name
+    );
+    expect(sirenified.workerCompanyAddress).toEqual(
+      searchResults[worker.company.siret!].address
+    );
+    expect(sirenified.intermediaries![0].name).toEqual(
+      searchResults[intermediary1.company.siret!].name
+    );
+    expect(sirenified.intermediaries![0].address).toEqual(
+      searchResults[intermediary1.company.siret!].address
+    );
+    expect(sirenified.intermediaries![1].name).toEqual(
+      searchResults[intermediary2.company.siret!].name
+    );
+    expect(sirenified.intermediaries![1].address).toEqual(
+      searchResults[intermediary2.company.siret!].address
+    );
+  });
+
+  it("should not overwrite `name` and `address` based on SIRENE data for sealed fields", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const worker = await userWithCompanyFactory("MEMBER");
+    const intermediary1 = await userWithCompanyFactory("MEMBER");
+    const intermediary2 = await userWithCompanyFactory("MEMBER");
+
+    function searchResult(companyName: string) {
+      return {
+        name: companyName,
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
+      } as CompanySearchResult;
+    }
+
+    const searchResults = {
+      [emitter.company.siret!]: searchResult("émetteur"),
+      [transporter.company.siret!]: searchResult("transporteur"),
+      [destination.company.siret!]: searchResult("destinataire"),
+      [worker.company.siret!]: searchResult("courtier"),
+      [intermediary1.company.siret!]: searchResult("intermédiaire 1"),
+      [intermediary2.company.siret!]: searchResult("intermédiaire 2")
+    };
+
+    searchCompanySpy.mockImplementation((clue: string) => {
+      return Promise.resolve(searchResults[clue]);
+    });
+
+    const bsdaInput = {
+      emitterCompanySiret: emitter.company.siret,
+      emitterCompanyName: "N'importe",
+      emitterCompanyAddress: "Nawak",
+      transporterCompanySiret: transporter.company.siret,
+      transporterCompanyName: "N'importe",
+      transporterCompanyAddress: "Nawak",
+      destinationCompanySiret: destination.company.siret,
+      destinationCompanyName: "N'importe",
+      destinationCompanyAddress: "Nawak",
+      workerCompanySiret: worker.company.siret,
+      workerCompanyName: "N'importe",
+      workerCompanyAddress: "Nawak",
+      intermediaries: [
+        {
+          siret: intermediary1.company.siret,
+          contact: "Mr intermédiaire 1",
+          name: "N'importe",
+          address: "Nawak"
+        },
+        {
+          siret: intermediary2.company.siret,
+          contact: "Mr intermédiaire 2",
+          name: "N'importe",
+          address: "Nawak"
+        }
+      ]
+    };
+
+    const sealedFields = ["emitterCompanySiret", "transporterCompanySiret"];
+    const sirenified = await sirenify(bsdaInput, sealedFields);
+
+    // Unchanged
+    expect(sirenified.emitterCompanyName).toEqual(bsdaInput.emitterCompanyName);
+    expect(sirenified.emitterCompanyAddress).toEqual(
+      bsdaInput.emitterCompanyAddress
+    );
+    expect(sirenified.transporterCompanyName).toEqual(
+      bsdaInput.transporterCompanyName
+    );
+    expect(sirenified.transporterCompanyAddress).toEqual(
+      bsdaInput.transporterCompanyAddress
+    );
+
+    // Changed
     expect(sirenified.destinationCompanyName).toEqual(
       searchResults[destination.company.siret!].name
     );
