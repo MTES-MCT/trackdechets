@@ -83,6 +83,22 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
       if (validationContext.enablePreviousBsdasChecks) {
         await validatePreviousBsdas(val, ctx);
       }
+
+      // Plates are mandatory at transporter signature's step
+      if (validationContext.currentSignatureType === "TRANSPORT") {
+        const { transporterTransportMode, transporterTransportPlates } = val;
+
+        if (
+          transporterTransportMode === "ROAD" &&
+          (!transporterTransportPlates ||
+            !transporterTransportPlates?.filter(p => Boolean(p)).length)
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "La plaque d'immatriculation est requise"
+          });
+        }
+      }
     });
 }
 
