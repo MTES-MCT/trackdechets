@@ -1,3 +1,4 @@
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { formatDate } from "common/datetime";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
@@ -113,24 +114,20 @@ export function Worker({ disabled }) {
             <div className="form__row">
               {!values?.worker?.certification?.hasSubSectionFour &&
                 !values?.worker?.certification?.hasSubSectionThree && (
-                  <p>
-                    L'entreprise que vous renseignez s'est enregistrée avec un
-                    profil d'entreprise de travaux amiante mais n'a pas complété
-                    la catégorie de travaux dans son compte établissement de
-                    Trackdéchets. Il appartient à cette entreprise de compléter
-                    ses informations.
-                  </p>
+                  <Alert
+                    title={"Récépissé de déclaration de transport de déchets"}
+                    severity="warning"
+                    description="L'entreprise que vous renseignez s'est enregistrée avec un profil d'entreprise de travaux amiante mais n'a pas complété la catégorie de travaux dans son compte établissement de Trackdéchets. Il appartient à cette entreprise de compléter ses informations."
+                  />
                 )}
             </div>
           ) : (
             <div>
-              <p>
-                L'entreprise que vous renseignez ne s'est pas enregistrée avec
-                un profil d'entreprise de travaux amiante ou n'a pas complété la
-                catégorie de travaux dans son compte établissement de
-                Trackdéchets. Il n'est pas possible de l'ajouter. Il appartient
-                à cette entreprise de compléter ses informations
-              </p>
+              <Alert
+                title={"Récépissé de déclaration de transport de déchets"}
+                severity="error"
+                description="L'entreprise que vous renseignez ne s'est pas enregistrée avec un profil d'entreprise de travaux amiante ou n'a pas complété la catégorie de travaux dans son compte établissement de Trackdéchets. Il appartient à cette entreprise de compléter ses informations"
+              />
             </div>
           )}
 
