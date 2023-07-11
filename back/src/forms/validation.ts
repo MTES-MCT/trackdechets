@@ -1449,7 +1449,7 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
   }
 }
 
-const BSDD_MAX_APPENDIX2 = parseInt(process.env.BSDD_MAX_APPENDIX2!, 10) || 250;
+const BSDD_MAX_APPENDIX2 = parseInt(process.env.BSDD_MAX_APPENDIX2, 10) || 250;
 
 /**
  * Les vérifications suivantes sont effectuées :

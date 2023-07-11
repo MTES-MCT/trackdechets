@@ -41,7 +41,7 @@ describe("Mutation.markAsSealed", () => {
   beforeEach(() => {
     jest.resetModules();
     searchCompanyMock.mockReset();
-    delete process.env.VERIFY_COMPANY;
+    process.env.VERIFY_COMPANY = "false";
   });
 
   afterEach(() => {

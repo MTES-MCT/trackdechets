@@ -38,7 +38,7 @@ describe("Mutation markAsResealed", () => {
 
   beforeEach(() => {
     jest.resetModules();
-    delete process.env.VERIFY_COMPANY;
+    process.env.VERIFY_COMPANY = "false";
   });
 
   afterEach(async () => {
