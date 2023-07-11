@@ -4,7 +4,7 @@ import { FieldSwitch, RedErrorMessage } from "common/components";
 import Packagings from "form/bsdd/components/packagings/Packagings";
 import {
   WasteCodeSelect,
-  wasteCodeValidator,
+  bsddWasteCodeValidator,
 } from "form/bsdd/components/waste-code";
 import {
   getInitialBroker,
@@ -182,7 +182,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                     <Field
                       name="content.wasteDetails.code"
                       component={WasteCodeSelect}
-                      validate={wasteCodeValidator}
+                      validate={bsddWasteCodeValidator}
                     />
                   </ReviewableField>
 

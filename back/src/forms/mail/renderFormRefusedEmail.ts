@@ -99,7 +99,7 @@ export async function renderFormRefusedEmail(
         emitterCompanyAddress: form.emitterCompanyAddress,
         ...(isFinalDestinationRefusal
           ? {
-              receivedAt: forwardedIn.receivedAt,
+              signedAt: forwardedIn.signedAt,
               recipientCompanyName: forwardedIn.recipientCompanyName,
               recipientCompanySiret: forwardedIn.recipientCompanySiret,
               wasteRefusalReason: forwardedIn.wasteRefusalReason,
@@ -115,7 +115,7 @@ export async function renderFormRefusedEmail(
               quantityReceived: forwardedIn.quantityReceived
             }
           : {
-              receivedAt: form.receivedAt,
+              signedAt: form.signedAt,
               recipientCompanyName: form.recipientCompanyName,
               recipientCompanySiret: form.recipientCompanySiret,
               wasteRefusalReason: form.wasteRefusalReason,

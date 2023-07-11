@@ -61,6 +61,9 @@ const DashboardPage = () => {
   const isToCollectTab = !!useRouteMatch(
     routes.dashboardv2.transport.toCollect
   );
+  const isCollectedTab = !!useRouteMatch(
+    routes.dashboardv2.transport.collected
+  );
   const BSD_PER_PAGE = 25;
 
   const getBsdCurrentTab = (): BsdCurrentTab => {
@@ -81,6 +84,9 @@ const DashboardPage = () => {
     }
     if (isToCollectTab) {
       return "toCollectTab";
+    }
+    if (isCollectedTab) {
+      return "collectedTab";
     }
     // default tab
     return "draftTab";
@@ -113,7 +119,25 @@ const DashboardPage = () => {
         isArchivedFor: [siret],
       };
     }
-  }, [isActTab, isDraftTab, isFollowTab, isArchivesTab, siret]);
+    if (isToCollectTab) {
+      return {
+        isToCollectFor: [siret],
+      };
+    }
+    if (isCollectedTab) {
+      return {
+        isCollectedFor: [siret],
+      };
+    }
+  }, [
+    isActTab,
+    isDraftTab,
+    isFollowTab,
+    isArchivesTab,
+    isToCollectTab,
+    isCollectedTab,
+    siret,
+  ]);
 
   const defaultWhere = useMemo(
     () => withRoutePredicate(),
@@ -343,8 +367,8 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
+    setIsFiltersOpen(false);
     if (!isReviewsTab) {
-      setIsFiltersOpen(false);
       fetchWithDefaultWhere({ where: defaultWhere });
     }
   }, [
@@ -353,6 +377,8 @@ const DashboardPage = () => {
     isFollowTab,
     isArchivesTab,
     isReviewsTab,
+    isToCollectTab,
+    isCollectedTab,
     defaultWhere,
     fetchWithDefaultWhere,
   ]);

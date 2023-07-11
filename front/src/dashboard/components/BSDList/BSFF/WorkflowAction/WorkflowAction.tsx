@@ -21,9 +21,6 @@ export function WorkflowAction(props: WorkflowActionProps) {
 
   const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
   const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
-  const isToCollectTabV2Route = !!useRouteMatch(
-    routes.dashboardv2.transport.toCollect
-  );
   const emitterSiret = form.bsffEmitter?.company?.siret;
   const transporterSiret = form.bsffTransporter?.company?.orgId;
   const destinationSiret = form.bsffDestination?.company?.siret;
@@ -42,7 +39,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
 
     case BsffStatus.SignedByEmitter:
       if (siret !== transporterSiret) {
-        if (!isToCollectTab || !isToCollectTabV2Route) {
+        if (!isToCollectTab) {
           return null;
         }
         return null;
