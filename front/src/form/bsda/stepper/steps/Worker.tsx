@@ -1,12 +1,14 @@
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { formatDate } from "common/datetime";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
-import { Bsda, BsdaType } from "generated/graphql/types";
-import React from "react";
+import { Bsda, BsdaType, CompanyType } from "generated/graphql/types";
+import React, { useState } from "react";
 import initialState from "../initial-state";
 
 export function Worker({ disabled }) {
   const { setFieldValue, values, handleChange } = useFormikContext<Bsda>();
+  const [companyTypes, setCompanyTypes] = useState<CompanyType[]>([]);
 
   const isGroupement = values?.type === BsdaType.Gathering;
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
@@ -58,6 +60,8 @@ export function Worker({ disabled }) {
             name="worker.company"
             heading="Entreprise de travaux"
             onCompanySelected={worker => {
+              setCompanyTypes(worker?.companyTypes ?? []);
+
               if (worker?.workerCertification?.hasSubSectionFour) {
                 setFieldValue(
                   "worker.certification.hasSubSectionFour",
@@ -106,16 +110,26 @@ export function Worker({ disabled }) {
             Catégorie entreprise de travaux déclarée dans le profil entreprise
           </h4>
 
-          <div className="form__row">
-            {!values?.worker?.certification?.hasSubSectionFour &&
-              !values?.worker?.certification?.hasSubSectionThree && (
-                <p>
-                  L'entreprise de travaux amiante n'a pas complété ces
-                  informations dans son profil. Nous ne pouvons pas afficher la
-                  catégorie de travaux SS3 ou SS4 de l'entreprise.
-                </p>
-              )}
-          </div>
+          {companyTypes.includes(CompanyType.Worker) ? (
+            <div className="form__row">
+              {!values?.worker?.certification?.hasSubSectionFour &&
+                !values?.worker?.certification?.hasSubSectionThree && (
+                  <Alert
+                    title={"Récépissé de déclaration de transport de déchets"}
+                    severity="warning"
+                    description="L'entreprise que vous renseignez s'est enregistrée avec un profil d'entreprise de travaux amiante mais n'a pas complété la catégorie de travaux dans son compte établissement de Trackdéchets. Il appartient à cette entreprise de compléter ses informations."
+                  />
+                )}
+            </div>
+          ) : (
+            <div>
+              <Alert
+                title={"Récépissé de déclaration de transport de déchets"}
+                severity="error"
+                description="L'entreprise que vous renseignez ne s'est pas enregistrée avec un profil d'entreprise de travaux amiante ou n'a pas complété la catégorie de travaux dans son compte établissement de Trackdéchets. Il appartient à cette entreprise de compléter ses informations"
+              />
+            </div>
+          )}
 
           <div className="form__row">
             {values?.worker?.certification?.hasSubSectionFour && (

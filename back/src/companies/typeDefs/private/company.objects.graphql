@@ -28,6 +28,9 @@ type CompanyFavorite {
   "Email de contact"
   mail: String
 
+  "Profil de l'établissement"
+  companyTypes: [CompanyType!]!
+
   "Code pays de l'établissement"
   codePaysEtrangerEtablissement: String
 

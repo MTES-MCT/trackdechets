@@ -24,3 +24,7 @@ export function isWasteVehicles(company: Company) {
 export function isTransporter(company: Company) {
   return company.companyTypes.includes(CompanyType.TRANSPORTER);
 }
+
+export function isWorker(company: Company) {
+  return company.companyTypes.includes(CompanyType.WORKER);
+}

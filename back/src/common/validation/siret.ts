@@ -9,7 +9,8 @@ import {
   isTransporter,
   isWasteCenter,
   isWasteProcessor,
-  isWasteVehicles
+  isWasteVehicles,
+  isWorker
 } from "../../companies/validation";
 import { CompanyVerificationStatus } from "@prisma/client";
 import prisma from "../../prisma";
@@ -93,6 +94,16 @@ export const isRegisteredSiretRefinement =
         message:
           `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets` +
           ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
+          ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
+          ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+      });
+    }
+    if (role === "WORKER" && !isWorker(company)) {
+      return ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          `L'entreprise de travaux saisie sur le bordereau (SIRET: ${siret}) n'est pas inscrite sur Trackdéchets` +
+          ` en tant qu'entreprise de travaux. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
           ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
           ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
       });

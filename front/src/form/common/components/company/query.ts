@@ -12,6 +12,7 @@ export const FAVORITES = gql`
       phone
       mail
       isRegistered
+      companyTypes
       codePaysEtrangerEtablissement
       transporterReceipt {
         receiptNumber
@@ -73,6 +74,7 @@ export const SEARCH_COMPANIES = gql`
       contact
       contactPhone
       contactEmail
+      companyTypes
       installation {
         codeS3ic
         urlFiche
