@@ -200,8 +200,8 @@ export default function AccountCompanyAddProducer() {
                       title="Information"
                       description={
                         <>
-                          Ce profil comprend le transport de mes déchets dans
-                          les conditions de{" "}
+                          Ce profil comprend le transport de mes déchets selon
+                          les dispositions de{" "}
                           <a
                             href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000044266537/"
                             target="_blank"
