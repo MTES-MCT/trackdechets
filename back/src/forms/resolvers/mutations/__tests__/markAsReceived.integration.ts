@@ -282,7 +282,8 @@ describe("Test Form reception", () => {
     expect(logs[0].status).toBe("REFUSED");
     expect(sendMailSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        subject: "Refus de prise en charge de votre déchet"
+        subject:
+          "Refus de prise en charge de votre déchet de l'entreprise company_1"
       })
     );
   });
