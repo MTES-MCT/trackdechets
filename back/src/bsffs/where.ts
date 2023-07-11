@@ -35,6 +35,19 @@ function toPrismaBsffSimpleWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
             some: { numero: toPrismaStringFilter(where.packagings.numero) }
           }
         }
+      : {}),
+    ...(where?.ficheInterventions &&
+    Object.keys(where?.ficheInterventions).length > 0
+      ? {
+          ficheInterventions: {
+            some: safeInput({
+              numero: toPrismaStringFilter(where.ficheInterventions.numero),
+              detenteurCompanySiret: toPrismaStringFilter(
+                where.ficheInterventions.detenteur?.company?.siret
+              )
+            })
+          }
+        }
       : {})
   });
 }

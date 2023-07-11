@@ -18,6 +18,8 @@ input BsffWhere {
   destination: BsffDestinationWhere
   "Filtre sur le conditionnement"
   packagings: BsffPackagingsWhere
+  "Filtre sur les fiches d'intervention"
+  ficheInterventions: BsffFicheInterventionWhere
   "ET logique"
   _and: [BsffWhere!]
   "OU logique"
@@ -103,6 +105,19 @@ input BsffPackagingOperationWhere {
 input BsffPackagingsWhere {
   numero: StringFilter
   bsff: BsffWhere
+}
+
+"Champs possibles pour le filtre sur le détenteur du fluide"
+input BsffDetenteurWhere {
+  company: CompanyWhere
+}
+
+"Champs possibles pour le filtre sur les fiches d'intervention"
+input BsffFicheInterventionWhere {
+  "Filtre sur le numero de fiche d'intervention"
+  numero: StringFilter
+  "Filtre sur le détenteur du fluide"
+  detenteur: BsffDetenteurWhere
 }
 
 input SignatureInput {
