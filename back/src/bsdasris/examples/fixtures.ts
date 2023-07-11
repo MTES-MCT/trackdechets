@@ -67,7 +67,7 @@ const transportInput = {
     isEstimate: false
   },
   packagings: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }],
-
+  plates: ["XX-000-XX"],
   takenOverAt: "2022-04-27"
 };
 
@@ -78,7 +78,7 @@ const synthesisTransportInput = {
     value: 1,
     isEstimate: false
   },
-
+  plates: ["XX-000-XX"],
   takenOverAt: "2022-04-27"
 };
 function destinationCompanyInput(siret: string) {

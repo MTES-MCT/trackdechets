@@ -51,6 +51,22 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
         validationContext.currentSignatureType
       );
 
+      // Plates are mandatory at transporter signature's step
+      if (validationContext.currentSignatureType === "TRANSPORT") {
+        const { transporterTransportMode, transporterTransportPlates } = val;
+
+        if (
+          transporterTransportMode === "ROAD" &&
+          (!transporterTransportPlates ||
+            !transporterTransportPlates?.filter(p => Boolean(p)).length)
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "La plaque d'immatriculation est requise"
+          });
+        }
+      }
+
       // We skip the rules for which the fields are not sealed yet
       const sealedRules = Object.entries(editionRules).filter(([_, rule]) =>
         signaturesToCheck.includes(rule.sealedBy)

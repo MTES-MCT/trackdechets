@@ -218,6 +218,59 @@ describe("transporterSchema", () => {
     );
   });
 
+  it("transporter plate is required if transporter mode is ROAD", async () => {
+    const bsff = {
+      ...transporterData,
+      transporterTransportMode: "ROAD",
+      transporterTransportPlates: undefined
+    };
+    expect.assertions(1);
+
+    try {
+      await transporterSchema.validate(bsff);
+    } catch (err) {
+      expect(err.errors).toEqual(["La plaque d'immatriculation est requise"]);
+    }
+  });
+
+  it.each(["", null, [], [""], [null], [undefined]])(
+    "transporter plate is required if transporter mode is ROAD - invalid values",
+    async invalidValue => {
+      const bsff = {
+        ...transporterData,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: invalidValue
+      };
+      expect.assertions(1);
+
+      try {
+        await transporterSchema.validate(bsff);
+      } catch (err) {
+        expect(err.errors.length).toBeTruthy();
+      }
+    }
+  );
+
+  it("transporter plate is not required if transport mode is not ROAD", async () => {
+    const bsff = {
+      ...transporterData,
+      transporterTransportMode: "AIR"
+    };
+
+    const validated = await transporterSchema.isValid(bsff);
+    expect(validated).toBeDefined();
+  });
+
+  it("should work if transport mode is ROAD & plates are defined", async () => {
+    const bsff = {
+      ...transporterData,
+      transporterTransportMode: "ROAD",
+      transporterTransportPlates: ["TRANSPORTER-PLATES"]
+    };
+    const validated = await transporterSchema.isValid(bsff);
+    expect(validated).toBeDefined();
+  });
+
   describe("Emitter transports own waste", () => {
     it("allowed if exemption", async () => {
       const emitterAndTransporter = await companyFactory({

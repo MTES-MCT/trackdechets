@@ -729,6 +729,54 @@ describe("beforeTransportSchema", () => {
       "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
     );
   });
+
+  it("transporter plate is required if transporter mode is ROAD", async () => {
+    const testForm: Partial<Form & BsddTransporter> = {
+      ...beforeTransportForm,
+      transporterTransportMode: "ROAD",
+      transporterNumberPlate: undefined
+    };
+    const validateFn = () => beforeTransportSchema.validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "La plaque d'immatriculation est requise"
+    );
+  });
+
+  it("transporter plate is required if transporter mode is ROAD - empty string", async () => {
+    const testForm: Partial<Form & BsddTransporter> = {
+      ...beforeTransportForm,
+      transporterTransportMode: "ROAD",
+      transporterNumberPlate: ""
+    };
+    const validateFn = () => beforeTransportSchema.validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "La plaque d'immatriculation est requise"
+    );
+  });
+
+  it("transporter plate is not required if transport mode is not ROAD", async () => {
+    const testForm: Partial<Form & BsddTransporter> = {
+      ...beforeTransportForm,
+      transporterTransportMode: "AIR",
+      transporterNumberPlate: undefined
+    };
+    const isValid = beforeTransportSchema.isValid(testForm);
+
+    expect(isValid).toBeTruthy();
+  });
+
+  it("should work if transport mode is ROAD & plates are defined", async () => {
+    const testForm: Partial<Form & BsddTransporter> = {
+      ...beforeTransportForm,
+      transporterTransportMode: "ROAD",
+      transporterNumberPlate: "TRANSPORTER-PLATES"
+    };
+    const isValid = beforeTransportSchema.isValid(testForm);
+
+    expect(isValid).toBeTruthy();
+  });
 });
 
 describe("receivedInfosSchema", () => {

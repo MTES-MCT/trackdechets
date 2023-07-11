@@ -187,7 +187,7 @@ const Transporter = ({ form }: { form: Bsda }) => {
           }
           label="Mode de transport"
         />
-        <DateRow
+        <DetailRow
           value={transporter?.transport?.plates?.join(", ")}
           label="Immatriculations"
         />

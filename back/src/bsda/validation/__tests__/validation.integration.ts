@@ -80,6 +80,31 @@ describe("BSDA validation", () => {
       const { success } = await rawBsdaSchema.safeParseAsync(data);
       expect(success).toBe(true);
     });
+
+    it("transporter plate is not required if transport mode is not ROAD", async () => {
+      const data = {
+        ...bsda,
+        transporterTransportMode: "AIR"
+      };
+
+      const res = await parseBsda(data, {
+        currentSignatureType: "TRANSPORT"
+      });
+      expect(res).toBeTruthy();
+    });
+
+    it("should work if transport mode is ROAD & plates are defined", async () => {
+      const data = {
+        ...bsda,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: ["TRANSPORTER-PLATES"]
+      };
+
+      const res = await parseBsda(data, {
+        currentSignatureType: "TRANSPORT"
+      });
+      expect(res).toBeTruthy();
+    });
   });
 
   describe("BSDA should not be valid", () => {
@@ -280,6 +305,41 @@ describe("BSDA validation", () => {
         );
       }
     });
+
+    it("transporter plate is required if transporter mode is ROAD", async () => {
+      const data = {
+        ...bsda,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: undefined
+      };
+      expect.assertions(1);
+
+      try {
+        await parseBsda(data, { currentSignatureType: "TRANSPORT" });
+      } catch (err) {
+        expect(err.issues[0].message).toBe(
+          "La plaque d'immatriculation est requise"
+        );
+      }
+    });
+
+    it.each(["", null, [], [""], [null], [undefined]])(
+      "transporter plate is required if transporter mode is ROAD - invalid values",
+      async invalidValue => {
+        const data = {
+          ...bsda,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: invalidValue
+        };
+        expect.assertions(1);
+
+        try {
+          await parseBsda(data, { currentSignatureType: "TRANSPORT" });
+        } catch (err) {
+          expect(err.errors.length).toBeTruthy();
+        }
+      }
+    );
   });
 
   describe("Emitter transports own waste", () => {
