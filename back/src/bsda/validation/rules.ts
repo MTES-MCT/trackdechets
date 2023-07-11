@@ -79,7 +79,7 @@ export const editionRules: {
     isRequired: bsda => !!bsda.ecoOrganismeSiret
   },
   ecoOrganismeSiret: { sealedBy: "TRANSPORT", isRequired: false },
-  destinationCompanyName: { sealedBy: "EMISSION", isRequired: true },
+  destinationCompanyName: { sealedBy: "TRANSPORT", isRequired: true },
   destinationCompanySiret: {
     sealedBy: "TRANSPORT",
     isRequired: true
@@ -90,7 +90,7 @@ export const editionRules: {
   destinationCompanyMail: { sealedBy: "TRANSPORT", isRequired: true },
   destinationCustomInfo: { sealedBy: "OPERATION", isRequired: false },
   destinationCap: {
-    sealedBy: "EMISSION",
+    sealedBy: "TRANSPORT",
     isRequired: bsda =>
       [BsdaType.COLLECTION_2710, BsdaType.GATHERING, BsdaType.RESHIPMENT].every(
         type => bsda.type !== type
@@ -100,7 +100,7 @@ export const editionRules: {
       )
   },
   destinationPlannedOperationCode: {
-    sealedBy: "EMISSION",
+    sealedBy: "TRANSPORT",
     isRequired: true
   },
   destinationReceptionDate: { sealedBy: "OPERATION", isRequired: true },
