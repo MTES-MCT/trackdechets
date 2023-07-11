@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { generatePath, NavLink, useHistory } from "react-router-dom";
-import { CompanyPrivate, CompanyType } from "generated/graphql/types";
+import { CompanyPrivate } from "generated/graphql/types";
 import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
 import routes from "Apps/routes";
 import "./DashboardTabs.scss";
@@ -14,6 +14,7 @@ import {
   REVIEWS,
   TO_COLLECT,
 } from "Apps/common/wordings/dashboard/wordingsDashboard";
+import { useShowTransportTabs } from "dashboard/transport/hooks/useShowTransportTabs";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;
@@ -35,6 +36,11 @@ export default function DashboardTabs({
       );
     },
     [history]
+  );
+
+  const { showTransportTabs } = useShowTransportTabs(
+    currentCompany.companyTypes,
+    currentCompany.siret
   );
 
   return (
@@ -113,7 +119,7 @@ export default function DashboardTabs({
           </li>
         </ul>
 
-        {currentCompany.companyTypes.includes(CompanyType.Transporter) && (
+        {showTransportTabs && (
           <>
             <p className="sidebar__chapter ">Transport</p>
             <ul>

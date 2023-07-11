@@ -9,6 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Une entreprise peut désormais transporter des déchets sans avoir le profil transporteur, à condition d'avoir l'exemption de récépissé [PR 2460](https://github.com/MTES-MCT/trackdechets/pull/2460)
+
 #### :bug: Corrections de bugs
 
 - Correction de la date de refus dans les mails de notification et PDFs [PR 2527](https://github.com/MTES-MCT/trackdechets/pull/2527)

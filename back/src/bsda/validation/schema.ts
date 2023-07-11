@@ -131,9 +131,8 @@ export const rawBsdaSchema = z
       .string()
       .nullish(),
     transporterCompanyName: z.string().nullish(),
-    transporterCompanySiret: siretSchema
-      .nullish()
-      .superRefine(isRegisteredSiretRefinement("TRANSPORTER")),
+    transporterCompanySiret: siretSchema.nullish(),
+    // Further verifications done hereunder in superRefine
     transporterCompanyAddress: z.string().nullish(),
     transporterCompanyContact: z.string().nullish(),
     transporterCompanyPhone: z.string().nullish(),
@@ -195,7 +194,7 @@ export const rawBsdaSchema = z
       .superRefine(intermediariesRefinement),
     intermediariesOrgIds: z.array(z.string()).optional()
   })
-  .superRefine((val, ctx) => {
+  .superRefine(async (val, ctx) => {
     if (
       val.destinationReceptionDate &&
       val.destinationOperationDate &&
@@ -268,6 +267,12 @@ export const rawBsdaSchema = z
           "Les opérations d'entreposage provisoire et groupement ne sont pas compatibles entre elles"
       });
     }
+
+    // Additionnal checks on the transporterCompanySiret
+    await isRegisteredSiretRefinement(
+      "TRANSPORTER",
+      val.transporterRecepisseIsExempted
+    )(val.transporterCompanySiret ?? "", ctx);
   })
   .transform(val => {
     val.intermediariesOrgIds = val.intermediaries

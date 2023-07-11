@@ -205,6 +205,14 @@ export const siretTests: SiretTests = {
         }
       }
       if (role === "TRANSPORTER" && !isTransporter(company)) {
+        const {
+          transporterIsExemptedOfReceipt, // For BSDDs
+          transporterRecepisseIsExempted // For other BSDs
+        } = ctx.parent;
+
+        if (transporterIsExemptedOfReceipt || transporterRecepisseIsExempted)
+          return true;
+
         return ctx.createError({
           message:
             `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets` +

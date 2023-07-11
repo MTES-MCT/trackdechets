@@ -270,6 +270,50 @@ describe("transporterSchema", () => {
     const validated = await transporterSchema.isValid(bsff);
     expect(validated).toBeDefined();
   });
+
+  describe("Emitter transports own waste", () => {
+    it("allowed if exemption", async () => {
+      const emitterAndTransporter = await companyFactory({
+        companyTypes: ["PRODUCER"]
+      });
+
+      const bsff = {
+        ...transporterData,
+        emitterCompanySiret: emitterAndTransporter.siret,
+        transporterCompanySiret: emitterAndTransporter.siret,
+        wasteDetailsCode: "16 06 01*",
+        wasteDetailsQuantity: 10,
+        transporterRecepisseIsExempted: true
+      };
+
+      expect.assertions(1);
+
+      const isValid = await transporterSchema.isValid(bsff);
+
+      expect(isValid).toBe(true);
+    });
+
+    it("NOT allowed if no exemption", async () => {
+      const emitterAndTransporter = await companyFactory({
+        companyTypes: ["PRODUCER"]
+      });
+
+      const bsff = {
+        ...transporterData,
+        emitterCompanySiret: emitterAndTransporter.siret,
+        transporterCompanySiret: emitterAndTransporter.siret,
+        wasteDetailsCode: "16 06 01*",
+        wasteDetailsQuantity: 10,
+        transporterRecepisseIsExempted: false
+      };
+
+      expect.assertions(1);
+
+      const isValid = await transporterSchema.isValid(bsff);
+
+      expect(isValid).toBe(false);
+    });
+  });
 });
 
 describe("destinationSchema", () => {

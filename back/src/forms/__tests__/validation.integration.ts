@@ -583,6 +583,36 @@ describe("sealedFormSchema", () => {
       );
     });
   });
+
+  describe("Emitter transports own waste", () => {
+    it("allowed if exemption", async () => {
+      const partialForm: Partial<Form & BsddTransporter> = {
+        ...sealedForm,
+        transporterCompanySiret: sealedForm.emitterCompanySiret,
+        transporterIsExemptedOfReceipt: true
+      };
+
+      expect.assertions(1);
+
+      const isValid = await sealedFormSchema.isValid(partialForm);
+
+      expect(isValid).toBe(true);
+    });
+
+    it("NOT allowed if no exemption", async () => {
+      const partialForm: Partial<Form & BsddTransporter> = {
+        ...sealedForm,
+        transporterCompanySiret: sealedForm.emitterCompanySiret,
+        transporterIsExemptedOfReceipt: false
+      };
+
+      expect.assertions(1);
+
+      const isValid = await sealedFormSchema.isValid(partialForm);
+
+      expect(isValid).toBe(false);
+    });
+  });
 });
 
 describe("beforeTransportSchema", () => {
