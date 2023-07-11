@@ -118,7 +118,7 @@ const sendInBlueBackend = {
         headers
       }
     );
-    req
+    return req
       .then(() => {
         logger.info(`Contact created on SIB: ${contact.email}`);
       })

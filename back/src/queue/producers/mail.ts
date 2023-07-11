@@ -15,9 +15,7 @@ export const mailQueue = new Queue(`${QUEUE_NAME_SENDMAIL}`, `${REDIS_URL}`, {
   // Sendinblue rate limiting docs: https://developers.sendinblue.com/docs/api-limits#general-rate-limiting
   ...(process.env.JEST_WORKER_ID === undefined && {
     limiter: {
-      max: process.env.QUEUE_MAXRATE_SENDMAIL
-        ? parseInt(process.env.QUEUE_MAXRATE_SENDMAIL, 10)
-        : 16,
+      max: parseInt(process.env.QUEUE_MAXRATE_SENDMAIL, 10) || 16,
       duration: 1000
     }
   })

@@ -108,7 +108,7 @@ export function base32Encode(n: number): string {
  */
 export const hashToken = (token: string) =>
   crypto
-    .createHmac("sha256", process.env.API_TOKEN_SECRET!)
+    .createHmac("sha256", process.env.API_TOKEN_SECRET)
     .update(token)
     .digest("hex");
 

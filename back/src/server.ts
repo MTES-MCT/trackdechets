@@ -177,7 +177,7 @@ app.use(
           "https:",
           "'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='"
         ],
-        connectSrc: [process.env.API_HOST!],
+        connectSrc: [process.env.API_HOST],
         formAction: ["self"],
         upgradeInsecureRequests: NODE_ENV === "production" ? [] : null
       }
