@@ -300,10 +300,12 @@ describe("BSDA validation", () => {
       };
 
       try {
-        await parseBsda(data, { currentSignatureType: "TRANSPORT" });
+        await parseBsda(data, {
+          currentSignatureType: "TRANSPORT"
+        });
       } catch (error) {
         expect(error.issues[0].message).toBe(
-          "Le numéro de récépissé transporteur est obligatoire."
+          "Transporteur: le numéro de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
         );
       }
     });
@@ -381,7 +383,9 @@ describe("BSDA validation", () => {
       expect.assertions(1);
 
       try {
-        await parseBsda(data);
+        await parseBsda(data, {
+          currentSignatureType: "TRANSPORT"
+        });
       } catch (error) {
         expect(error.issues[0].message).toBe(
           `Le transporteur saisi sur le bordereau (SIRET: ${emitterAndTransporter.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +

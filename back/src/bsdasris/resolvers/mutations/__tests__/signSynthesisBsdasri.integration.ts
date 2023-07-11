@@ -1,5 +1,8 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  transporterReceiptFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {
   BsdasriStatus,
@@ -75,6 +78,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
+    await transporterReceiptFactory({ company: transporterCompany });
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
@@ -147,6 +151,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
       );
       const { user: transporter, company: transporterCompany } =
         await userWithCompanyFactory("MEMBER");
+      await transporterReceiptFactory({ company: transporterCompany });
       const { company: destinationCompany } = await userWithCompanyFactory(
         "MEMBER"
       );

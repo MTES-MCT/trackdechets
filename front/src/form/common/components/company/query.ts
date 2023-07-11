@@ -194,3 +194,15 @@ export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
     }
   }
 `;
+
+export const TRANSPORTER_RECEIPT = gql`
+  query CompanyPrivateInfos($clue: String!) {
+    companyPrivateInfos(clue: $clue) {
+      transporterReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
+    }
+  }
+`;

@@ -90,23 +90,20 @@ export default function BsffStepsList(props: Props) {
       previousPackagings,
       packagings,
       type,
-      transporter: { recepisse, isExemptedOfRecepisse, ...transporter },
+      transporter: { isExemptedOfRecepisse, ...transporter },
       destination: { plannedOperationCode, ...destination },
       ...input
     } = values;
-
+    // clean the temp value because it's absent from the Input gql type
+    delete transporter.isExemptedOfRecepisse;
     saveForm({
       type,
       ...input,
       transporter: {
-        recepisse: isExemptedOfRecepisse
-          ? null
-          : {
-              ...recepisse,
-              validityLimit:
-                recepisse.validityLimit === "" ? null : recepisse.validityLimit,
-            },
         ...transporter,
+        recepisse: {
+          isExempted: isExemptedOfRecepisse,
+        },
       },
       destination: {
         ...destination,

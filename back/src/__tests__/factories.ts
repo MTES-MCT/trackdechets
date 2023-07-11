@@ -527,3 +527,29 @@ export const toIntermediaryCompany = (company: Company, contact = "toto") => ({
   address: company.address,
   contact
 });
+
+export const transporterReceiptFactory = async ({
+  number = "the number",
+  department = "83",
+  company
+}: {
+  number?: string;
+  department?: string;
+  company?: Company;
+}) => {
+  const receipt = await prisma.transporterReceipt.create({
+    data: {
+      receiptNumber: number,
+      validityLimit: "2055-01-01T00:00:00.000Z",
+      department: department
+    }
+  });
+  if (!!company) {
+    await prisma.company.update({
+      where: { id: company.id },
+      data: { transporterReceipt: { connect: { id: receipt.id } } }
+    });
+  }
+
+  return receipt;
+};

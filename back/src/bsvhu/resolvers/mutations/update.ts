@@ -8,6 +8,7 @@ import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import { checkEditionRules } from "../../edition";
 import sirenify from "../../sirenify";
+import { recipify } from "../../recipify";
 import { checkCanUpdate } from "../../permissions";
 
 export default async function edit(
@@ -22,7 +23,9 @@ export default async function edit(
   await checkCanUpdate(user, existingBsvhu, input);
 
   const sirenifiedInput = await sirenify(input, user);
-  const formUpdate = flattenVhuInput(sirenifiedInput);
+  const autocompletedInput = await recipify(sirenifiedInput);
+
+  const formUpdate = flattenVhuInput(autocompletedInput);
 
   const resultingForm = { ...existingBsvhu, ...formUpdate };
 

@@ -146,9 +146,6 @@ export function getInitialState(f?: Form | null): FormInput {
     },
     transporter: {
       isExemptedOfReceipt: f?.transporter?.isExemptedOfReceipt ?? false,
-      receipt: f?.transporter?.receipt ?? "",
-      department: f?.transporter?.department ?? "",
-      validityLimit: f?.transporter?.validityLimit ?? null,
       numberPlate: f?.transporter?.numberPlate ?? "",
       customInfo: f?.transporter?.customInfo ?? null,
       company: getInitialCompany(f?.transporter?.company),

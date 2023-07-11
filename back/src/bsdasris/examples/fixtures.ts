@@ -46,16 +46,9 @@ function transporteurCompanyInput(siret: string) {
   };
 }
 
-const recepisseInput = {
-  number: "KIH-458-87",
-  department: "07",
-  validityLimit: "2022-01-01"
-};
-
 function transporterInput(siret: string) {
   return {
-    company: transporteurCompanyInput(siret),
-    recepisse: recepisseInput
+    company: transporteurCompanyInput(siret)
   };
 }
 

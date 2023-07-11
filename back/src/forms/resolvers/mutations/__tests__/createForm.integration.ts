@@ -8,7 +8,8 @@ import {
   siretify,
   toIntermediaryCompany,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
@@ -721,9 +722,6 @@ describe("Mutation.createForm", () => {
           phone: "06"
         },
         isExemptedOfReceipt: false,
-        receipt: "8043",
-        department: "69",
-        validityLimit: "2040-01-01T00:00:00.000Z",
         numberPlate: "AX-123-69",
         customInfo: "T-456"
       }
@@ -741,6 +739,95 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual(undefined);
     expect(data.createForm.transporter).toMatchObject(
       createFormInput.transporter
+    );
+  });
+
+  it("should create autocomplete transporter recepisse", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const transporterCompany = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({
+      company: transporterCompany
+    });
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      transporter: {
+        company: {
+          siret: transporterCompany.siret,
+          name: transporterCompany.name,
+          address: transporterCompany.address,
+          contact: "Jane Doe",
+          mail: "janedoe@transporter.com",
+          phone: "06"
+        },
+        isExemptedOfReceipt: false,
+
+        numberPlate: "AX-123-69",
+        customInfo: "T-456"
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput
+      }
+    });
+
+    // receipt data is pulled from db
+    expect(data.createForm.transporter!.receipt).toEqual("the number");
+    expect(data.createForm.transporter!.department).toEqual("83");
+    expect(data.createForm.transporter!.validityLimit).toEqual(
+      "2055-01-01T00:00:00.000Z"
+    );
+  });
+
+  it("should create autocomplete transporter recepisse and ignore input", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const transporterCompany = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+
+    await transporterReceiptFactory({
+      company: transporterCompany
+    });
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      transporter: {
+        company: {
+          siret: transporterCompany.siret,
+          name: transporterCompany.name,
+          address: transporterCompany.address,
+          contact: "Jane Doe",
+          mail: "janedoe@transporter.com",
+          phone: "06"
+        },
+        isExemptedOfReceipt: false,
+        numberPlate: "AX-123-69",
+        customInfo: "T-456"
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput
+      }
+    });
+    // receipt data is pulled from db, input is ignored
+    expect(data.createForm.transporter!.receipt).toEqual("the number");
+    expect(data.createForm.transporter!.department).toEqual("83");
+    expect(data.createForm.transporter!.validityLimit).toEqual(
+      "2055-01-01T00:00:00.000Z"
     );
   });
 
@@ -769,9 +856,6 @@ describe("Mutation.createForm", () => {
             phone: "06"
           },
           isExemptedOfReceipt: false,
-          receipt: "8043",
-          department: "69",
-          validityLimit: format(validityLimit, f),
           numberPlate: "AX-123-69",
           customInfo: "T-456"
         },
@@ -800,7 +884,7 @@ describe("Mutation.createForm", () => {
         include: { transporters: true }
       });
       const transporter = getFirstTransporterSync(form);
-      expect(transporter!.transporterValidityLimit).toEqual(validityLimit);
+      expect(transporter!.transporterValidityLimit).toEqual(null);
       expect(form.traderValidityLimit).toEqual(validityLimit);
     }
   );

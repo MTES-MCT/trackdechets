@@ -4,12 +4,12 @@ import TdTooltip from "common/components/Tooltip";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Field, useField, useFormikContext } from "formik";
 import { Bsff } from "generated/graphql/types";
-import initialState from "./utils/initial-state";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Transporter({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsff>();
+  // temp field
   const [{ value: isExemptedOfRecepisse }, ,] = useField<boolean>(
     "transporter.isExemptedOfRecepisse"
   );
@@ -29,20 +29,6 @@ export default function Transporter({ disabled }) {
         heading="Entreprise de transport"
         allowForeignCompanies={true}
         registeredOnlyCompanies={true}
-        onCompanySelected={transporter => {
-          if (transporter?.transporterReceipt) {
-            setFieldValue("transporter.recepisse", {
-              number: transporter.transporterReceipt.receiptNumber,
-              validityLimit: transporter.transporterReceipt.validityLimit,
-              department: transporter.transporterReceipt.department,
-            });
-          } else {
-            setFieldValue(
-              "transporter.recepisse",
-              initialState.transporter.recepisse
-            );
-          }
-        }}
       />
 
       {!isForeignVat(values?.transporter?.company?.vatNumber!!) && (

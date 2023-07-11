@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { AuthType, TransportMode, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -7,7 +7,9 @@ import {
 import prisma from "../../../../prisma";
 import {
   siretify,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  companyFactory,
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../__tests__/factories";
@@ -27,9 +29,16 @@ const UPDATE_BSDA = `
       transporter {
         company {
           name
+          siret
         }
         recepisse {
+          isExempted
           number
+          department
+          validityLimit
+        }
+        transport {
+          mode
         }
       }
       destination {
@@ -290,8 +299,8 @@ describe("Mutation.updateBsda", () => {
 
     const input = {
       transporter: {
-        recepisse: {
-          number: "Num recepisse"
+        transport: {
+          mode: TransportMode.AIR
         }
       }
     };
@@ -305,8 +314,8 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
-    expect(data.updateBsda.transporter!.recepisse!.number).toEqual(
-      "Num recepisse"
+    expect(data.updateBsda.transporter!.transport!.mode).toEqual(
+      TransportMode.AIR
     );
   });
 
@@ -352,6 +361,95 @@ describe("Mutation.updateBsda", () => {
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : workerCompanySiret"
       })
     ]);
+  });
+
+  it("should update transporter recepisse with data pulled from db", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterCompanySiret: company.siret
+      }
+    });
+
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const receipt = await transporterReceiptFactory({
+      company: transporter
+    });
+    const { mutate } = makeClient({ ...user, auth: AuthType.BEARER }); // Force BEARER to activate transformers
+    const input = {
+      transporter: { company: { siret: transporter.siret } }
+    };
+
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(data.updateBsda.transporter!.company!.siret).toEqual(
+      transporter.siret
+    );
+    // recepisse is pulled from db
+    expect(data.updateBsda.transporter!.recepisse!.number).toEqual(
+      receipt.receiptNumber
+    );
+    expect(data.updateBsda.transporter!.recepisse!.department).toEqual("83");
+    expect(data.updateBsda.transporter!.recepisse!.validityLimit).toEqual(
+      "2055-01-01T00:00:00.000Z"
+    );
+  });
+
+  it("should void transporter recepisse if company has none", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    // bsda has an associated receipt
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterCompanySiret: company.siret
+      }
+    });
+    // transporter has no associated receipt
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const { mutate } = makeClient({ ...user, auth: AuthType.BEARER }); // Force BEARER to activate transformers
+    const input = {
+      transporter: { company: { siret: transporter.siret } }
+    };
+
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(data.updateBsda.transporter!.company!.siret).toEqual(
+      transporter.siret
+    );
+    // transporter has no receipt, then bsda recepisse is set to null
+    expect(data.updateBsda.transporter!.recepisse).toEqual({
+      department: null,
+      isExempted: false,
+      number: null,
+      validityLimit: null
+    });
   });
 
   it("should not update transporter if they signed already", async () => {

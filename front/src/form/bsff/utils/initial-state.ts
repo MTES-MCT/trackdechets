@@ -27,12 +27,8 @@ const initialState: BsffFormInput = {
     company: {
       ...getInitialCompany(),
     },
+    // TEMP FIELD for the frontend to handle this special case
     isExemptedOfRecepisse: false,
-    recepisse: {
-      number: "",
-      department: "",
-      validityLimit: "",
-    },
     transport: {
       mode: TransportMode.Road,
       plates: [],

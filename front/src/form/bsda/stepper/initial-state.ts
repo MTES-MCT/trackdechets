@@ -47,9 +47,6 @@ const initialState = {
       ...getInitialCompany(),
     },
     recepisse: {
-      number: "",
-      department: "",
-      validityLimit: null,
       isExempted: false,
     },
     transport: {

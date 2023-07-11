@@ -39,10 +39,13 @@ describe("edition", () => {
       adr: ""
     };
 
-    const recepisse: Required<BsffTransporterRecepisseInput> = {
-      number: "XXXX",
-      department: "",
-      validityLimit: new Date()
+    const recepisse: Required<
+      Omit<
+        BsffTransporterRecepisseInput,
+        "number" | "department" | "validityLimit"
+      >
+    > = {
+      isExempted: false
     };
 
     const transport: Required<BsffTransporterTransportInput> = {

@@ -78,11 +78,6 @@ describe("Mutation.createDasri", () => {
           phone: "06 18 76 02 00",
           mail: "transporteur@test.fr",
           address: "avenue de la mer"
-        },
-        recepisse: {
-          number: "abcd",
-          department: "21",
-          validityLimit: new Date().toISOString()
         }
       },
       ...(await getDestinationCompanyInfo()),

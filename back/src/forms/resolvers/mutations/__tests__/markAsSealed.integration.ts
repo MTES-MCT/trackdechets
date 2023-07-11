@@ -91,7 +91,7 @@ describe("Mutation.markAsSealed", () => {
         companyTypes: { set: [companyType(role) as CompanyType] }
       });
 
-      let form = await formFactory({
+      const form = await formFactory({
         ownerId: user.id,
         opt: {
           status: "DRAFT",
@@ -127,12 +127,12 @@ describe("Mutation.markAsSealed", () => {
         }
       });
 
-      form = await prisma.form.findUniqueOrThrow({
+      const formDb = await prisma.form.findUniqueOrThrow({
         where: { id: form.id },
-        include: { forwardedIn: true }
+        include: { transporters: true }
       });
 
-      expect(form.status).toEqual("SEALED");
+      expect(formDb.status).toEqual("SEALED");
 
       // check relevant statusLog is created
       const statusLogs = await prisma.statusLog.findMany({

@@ -10,23 +10,6 @@ export const transporterSchema = yup.object().shape({
   isExemptedOfReceipt: yup.boolean().nullable(true),
   numberPlate: yup.string().nullable(true),
   company: transporterCompanySchema,
-  recepisse: yup.object({
-    number: yup.string().nullable(true),
-    department: yup
-      .string()
-      .when("number", (number: string, schema: yup.StringSchema) =>
-        number?.length
-          ? schema.required("Le département est un champ requis")
-          : schema.nullable(true)
-      ),
-    validityLimit: yup
-      .date()
-      .when("number", (number: string, schema: yup.DateSchema) =>
-        number?.length
-          ? schema.required("La limite de validité est un champ requis")
-          : schema.nullable(true)
-      ),
-  }),
 });
 
 const destinationSchema = yup.object().shape({

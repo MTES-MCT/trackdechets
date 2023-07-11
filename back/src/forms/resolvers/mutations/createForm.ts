@@ -25,6 +25,7 @@ import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
 import { validateIntermediariesInput } from "../../../common/validation";
 import { sirenifyFormInput } from "../../sirenify";
+import { recipifyFormInput } from "../../recipify";
 import { checkCanCreate } from "../../permissions";
 
 const createFormResolver = async (
@@ -34,13 +35,15 @@ const createFormResolver = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
+  const sirenifiedFormInput = await sirenifyFormInput(createFormInput, user);
+
   const {
     appendix2Forms,
     grouping,
     temporaryStorageDetail,
     intermediaries,
     ...formContent
-  } = await sirenifyFormInput(createFormInput, user);
+  } = await recipifyFormInput(sirenifiedFormInput);
 
   if (appendix2Forms && grouping) {
     throw new UserInputError(

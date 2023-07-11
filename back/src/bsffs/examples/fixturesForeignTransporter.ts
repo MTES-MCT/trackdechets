@@ -18,8 +18,7 @@ function transporterInput(vatNumber: string) {
       contact: "Claire Dupuis",
       mail: "claire.dupuis@transportco.fr",
       phone: "04 00 00 00 00"
-    },
-    recepisse: null
+    }
   };
 }
 

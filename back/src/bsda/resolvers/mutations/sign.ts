@@ -23,6 +23,7 @@ import { runInTransaction } from "../../../common/repository/helper";
 import { parseBsda } from "../../validation/validate";
 import { checkCanSignFor } from "../../../permissions";
 import { InvalidTransition } from "../../../forms/errors";
+import { getTransporterReceipt } from "../../../bsdasris/recipify";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,
@@ -48,12 +49,18 @@ const signBsda: MutationResolvers["signBsda"] = async (
 
   checkBsdaTypeSpecificRules(bsda, input);
 
+  let transporterReceipt = {};
+  if (input.type === "TRANSPORT") {
+    transporterReceipt = await getTransporterReceipt(bsda);
+  }
+
   // Check that all necessary fields are filled
   await parseBsda(
     {
       ...bsda,
       grouping: bsda.grouping?.map(g => g.id),
-      forwarding: bsda.forwarding?.id
+      forwarding: bsda.forwarding?.id,
+      ...transporterReceipt
     },
     {
       currentSignatureType: input.type
@@ -63,6 +70,7 @@ const signBsda: MutationResolvers["signBsda"] = async (
   const sign = signatures[input.type];
   const signedBsda = await sign(user, bsda, {
     ...input,
+    ...transporterReceipt,
     date: new Date(input.date ?? Date.now())
   });
 

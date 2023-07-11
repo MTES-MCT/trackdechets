@@ -44,6 +44,9 @@ export const foreignVatNumberSchema = vatNumberSchema.refine(value => {
   return isForeignVat(value);
 }, "Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement");
 
+export const missingCompanyError = siret =>
+  `L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`;
+
 export const isRegisteredSiretRefinement =
   (role, transporterRecepisseIsExempted = false) =>
   async (siret: string, ctx) => {
@@ -55,7 +58,7 @@ export const isRegisteredSiretRefinement =
     if (company === null) {
       return ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
+        message: missingCompanyError(siret)
       });
     }
     if (role === "DESTINATION") {

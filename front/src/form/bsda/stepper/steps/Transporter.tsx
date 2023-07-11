@@ -3,9 +3,7 @@ import { useFormikContext } from "formik";
 import { Bsda, BsdaType } from "generated/graphql/types";
 import React from "react";
 import { Transport } from "./Transport";
-import initialState from "../initial-state";
 import TransporterReceiptEditionSwitch from "form/common/components/company/TransporterReceiptEditionSwitch";
-import { onTransporterSelected } from "form/bsvhu/Transporter";
 
 export function Transporter({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Bsda>();
@@ -20,8 +18,6 @@ export function Transporter({ disabled }) {
       </div>
     );
   }
-
-  const { transporter: initialTransporter } = initialState;
 
   return (
     <>
@@ -39,10 +35,6 @@ export function Transporter({ disabled }) {
         allowForeignCompanies={true}
         isBsdaTransporter={true}
         registeredOnlyCompanies={true}
-        onCompanySelected={onTransporterSelected(
-          initialTransporter,
-          setFieldValue
-        )}
       />
       <TransporterReceiptEditionSwitch
         transporter={values.transporter!}

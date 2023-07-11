@@ -75,7 +75,11 @@ export function SignTransport({
               Vous devez mettre à jour le bordereau et renseigner les champs
               obligatoires avant de le signer.
             </p>
-
+            <ul className="tw-mb-2 tw-text-red-700 tw-list-disc">
+              {bsvhu.metadata?.errors.map((error, idx) => (
+                <li key={idx}>{error.message}</li>
+              ))}
+            </ul>
             <Link
               to={generatePath(routes[dashboardRoutePrefix].bsvhus.edit, {
                 siret,

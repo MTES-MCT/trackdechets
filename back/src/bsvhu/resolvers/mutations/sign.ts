@@ -15,6 +15,10 @@ import { getBsvhuRepository } from "../../repository";
 import { checkCanSignFor } from "../../../permissions";
 import { runInTransaction } from "../../../common/repository/helper";
 import { InvalidTransition } from "../../../forms/errors";
+import {
+  BsdTransporterReceiptPart,
+  getTransporterReceipt
+} from "../../../bsdasris/recipify";
 
 export default async function sign(
   _,
@@ -31,21 +35,33 @@ export default async function sign(
   // - provide the company security code
   await checkCanSignFor(user, input.type, authorizedOrgIds, input.securityCode);
 
+  let transporterReceipt = {};
+  if (input.type === "TRANSPORT") {
+    transporterReceipt = await getTransporterReceipt(bsvhu);
+  }
+
   // Check that all necessary fields are filled
-  await validateBsvhu(bsvhu, {
-    emissionSignature:
-      bsvhu.emitterEmissionSignatureDate != null || input.type === "EMISSION",
-    transportSignature:
-      bsvhu.transporterTransportSignatureDate != null ||
-      input.type === "TRANSPORT",
-    operationSignature:
-      bsvhu.destinationOperationSignatureDate != null ||
-      input.type === "OPERATION"
-  });
+  await validateBsvhu(
+    {
+      ...bsvhu,
+      ...transporterReceipt
+    },
+    {
+      emissionSignature:
+        bsvhu.emitterEmissionSignatureDate != null || input.type === "EMISSION",
+      transportSignature:
+        bsvhu.transporterTransportSignatureDate != null ||
+        input.type === "TRANSPORT",
+      operationSignature:
+        bsvhu.destinationOperationSignatureDate != null ||
+        input.type === "OPERATION"
+    }
+  );
 
   const sign = signatures[input.type];
   const signedBsvhu = await sign(user, bsvhu, {
     ...input,
+    ...transporterReceipt,
     date: new Date(input.date ?? Date.now())
   });
 
@@ -114,7 +130,7 @@ async function signEmission(
 async function signTransport(
   user: Express.User,
   bsvhu: Bsvhu,
-  input: BsvhuSignatureInput
+  input: BsvhuSignatureInput & BsdTransporterReceiptPart
 ) {
   if (bsvhu.transporterTransportSignatureDate !== null) {
     throw new AlreadySignedError();
@@ -125,7 +141,12 @@ async function signTransport(
   const updateInput: Prisma.BsvhuUpdateInput = {
     transporterTransportSignatureAuthor: input.author,
     transporterTransportSignatureDate: new Date(input.date ?? Date.now()),
-    status: nextStatus
+    status: nextStatus,
+    transporterRecepisseNumber: input.transporterRecepisseNumber ?? null,
+    transporterRecepisseDepartment:
+      input.transporterRecepisseDepartment ?? null,
+    transporterRecepisseValidityLimit:
+      input.transporterRecepisseValidityLimit ?? null
   };
 
   return updateBsvhu(user, bsvhu, updateInput);

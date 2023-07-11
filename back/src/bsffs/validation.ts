@@ -102,7 +102,7 @@ type Operation = Pick<
 
 // Validation function can be called either on an existing Bsff
 // or on a create payload
-type BsffLike = (Bsff | Prisma.BsffCreateInput) & {
+export type BsffLike = (Bsff | Prisma.BsffCreateInput) & {
   packagings?: Pick<
     BsffPackaging,
     "type" | "name" | "other" | "numero" | "volume" | "weight"

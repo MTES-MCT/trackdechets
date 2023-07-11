@@ -118,9 +118,7 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
             updateBsvhu(id: "${id}", input: {
               transporter: {
                 recepisse: {
-                  number: "recepisse number"
-                  department: "75"
-                  validityLimit: "2020-06-30"
+                  isExempted: true
                 }
               }
             }) { id }
