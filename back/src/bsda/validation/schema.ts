@@ -163,9 +163,7 @@ export const rawBsdaSchema = z
       .nullish()
       .transform(v => Boolean(v)),
     workerCompanyName: z.string().nullish(),
-    workerCompanySiret: siretSchema
-      .nullish()
-      .superRefine(isRegisteredSiretRefinement("WORKER")),
+    workerCompanySiret: siretSchema.nullish(),
     workerCompanyAddress: z.string().nullish(),
     workerCompanyContact: z.string().nullish(),
     workerCompanyPhone: z.string().nullish(),
