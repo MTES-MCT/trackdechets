@@ -68,7 +68,10 @@ export function SignTransport({
         const TODAY = new Date();
 
         return bsvhu.metadata?.errors.some(
-          error => error.requiredFor === SignatureTypeInput.Transport
+          error =>
+            error.requiredFor === SignatureTypeInput.Transport &&
+            // Transporter Receipt will be auto-completed by the transporter
+            !error.path.startsWith("transporterRecepisse")
         ) ? (
           <>
             <p className="tw-mt-2 tw-text-red-700">

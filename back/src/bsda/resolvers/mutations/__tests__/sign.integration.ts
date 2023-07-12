@@ -18,6 +18,14 @@ mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
   signBsda(id: $id, input: $input) {
       id
       status
+      transporter {
+        recepisse {
+          number
+          department
+          validityLimit
+          isExempted
+        }
+      }
   }
 }
 `;
@@ -412,6 +420,52 @@ describe("Mutation.Bsda.sign", () => {
       });
 
       expect(data.signBsda.id).toBeTruthy();
+    });
+
+    it("should allow transporter to sign transport and auto-complete the receipt", async () => {
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const receipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_WORKER",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "worker",
+          workerWorkSignatureDate: new Date(),
+          transporterCompanySiret: transporter.company.siret,
+          transporterRecepisseIsExempted: true,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: ["AA-00-XX"]
+        }
+      });
+
+      const { mutate } = makeClient(transporter.user);
+      const { data } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "TRANSPORT",
+            author: transporter.user.name
+          }
+        }
+      });
+
+      expect(data.signBsda.id).toBeTruthy();
+      expect(data.signBsda.transporter?.recepisse?.department).toBe(
+        receipt.department
+      );
+      expect(data.signBsda.transporter?.recepisse?.number).toBe(
+        receipt.receiptNumber
+      );
+      expect(data.signBsda.transporter?.recepisse?.validityLimit).toBe(
+        receipt.validityLimit.toISOString()
+      );
     });
 
     it("should disallow transporter to sign transport when receipt if missing", async () => {

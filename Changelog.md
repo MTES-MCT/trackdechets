@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Une entreprise peut désormais transporter des déchets sans avoir le profil transporteur, à condition d'avoir l'exemption de récépissé [PR 2460](https://github.com/MTES-MCT/trackdechets/pull/2460)
+- Tous BSD : api et web, le récépissé transporteur est automatiquement rempli à l'édition depuis le profil établissement du compte Trackdéchets du transporteur. Le transporteur peut le compléter jusqu'à la signature transporteur sans que ce soit bloquant [PR 2526](https://github.com/MTES-MCT/trackdechets/pull/2526)
 
 #### :bug: Corrections de bugs
 

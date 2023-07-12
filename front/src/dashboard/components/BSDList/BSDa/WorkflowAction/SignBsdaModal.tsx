@@ -18,6 +18,7 @@ export function SignBsdaModal({ title, bsdaId, children, onClose }: Props) {
     variables: {
       id: bsdaId,
     },
+    fetchPolicy: "network-only",
   });
 
   if (data == null) {
