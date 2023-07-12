@@ -1,4 +1,9 @@
-import { BsffStatus, BsffType, UserRole } from "@prisma/client";
+import {
+  BsffStatus,
+  BsffType,
+  TransporterReceipt,
+  UserRole
+} from "@prisma/client";
 import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
@@ -8,6 +13,7 @@ import {
 import prisma from "../../../../prisma";
 import {
   UserWithCompany,
+  transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -28,6 +34,13 @@ const SIGN = gql`
   mutation Sign($id: ID!, $input: BsffSignatureInput!) {
     signBsff(id: $id, input: $input) {
       id
+      transporter {
+        recepisse {
+          number
+          department
+          validityLimit
+        }
+      }
     }
   }
 `;
@@ -38,6 +51,7 @@ describe("Mutation.signBsff", () => {
   let emitter: UserWithCompany;
   let transporter: UserWithCompany;
   let destination: UserWithCompany;
+  let receipt: TransporterReceipt;
 
   beforeEach(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -50,6 +64,7 @@ describe("Mutation.signBsff", () => {
       contactPhone: "06",
       contactEmail: "contact@gmail.com"
     });
+    receipt = await transporterReceiptFactory({ company: transporter.company });
     destination = await userWithCompanyFactory(UserRole.ADMIN, {
       address: "12 rue de la Grue, 69000 Lyon",
       contactPhone: "06",
@@ -279,6 +294,43 @@ describe("Mutation.signBsff", () => {
       ]);
     });
 
+    it("should throw an error if the transporter tries to sign without receipt nor exemption", async () => {
+      const bsff = await createBsffBeforeTransport(
+        { emitter, transporter, destination },
+        {
+          emitterEmissionSignatureDate: null,
+          emitterEmissionSignatureAuthor: null
+        }
+      );
+      // remove the receipt
+      await prisma.transporterReceipt.delete({ where: { id: receipt.id } });
+      const { mutate } = makeClient(transporter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          input: {
+            type: "TRANSPORT",
+            date: new Date().toISOString() as any,
+            author: transporter.user.name
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Transporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+        })
+      ]);
+      // restore it
+      receipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
+    });
+
     it("should be possible for the emitter to sign a BSFF where the transporter is not yet specified", async () => {
       const bsff = await createBsffBeforeEmission(
         { emitter, destination },
@@ -314,7 +366,7 @@ describe("Mutation.signBsff", () => {
   });
 
   describe("TRANSPORT", () => {
-    it("should allow transporter to sign transport", async () => {
+    it("should allow transporter to sign transport while autocompleting the transporter receipt", async () => {
       const bsff = await createBsffBeforeTransport({
         emitter,
         transporter,
@@ -338,6 +390,15 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
+      expect(data.signBsff.transporter?.recepisse?.department).toBe(
+        receipt.department
+      );
+      expect(data.signBsff.transporter?.recepisse?.validityLimit).toBe(
+        receipt.validityLimit.toISOString()
+      );
+      expect(data.signBsff.transporter?.recepisse?.number).toBe(
+        receipt.receiptNumber
+      );
     });
 
     it("should disallow transporter to sign transport when required data is missing", async () => {
