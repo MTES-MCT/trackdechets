@@ -522,5 +522,26 @@ describe("Mutation.Bsda.duplicate", () => {
     expect(duplicatedBsda.workerCertificationOrganisation).toEqual(
       "AFNOR Certification"
     );
+    // Test emptying Transporter receipt
+    await prisma.transporterReceipt.delete({
+      where: { id: transporter.company.transporterReceiptId! }
+    });
+    const { errors: err3, data: data2 } = await mutate<
+      Pick<Mutation, "duplicateBsda">
+    >(DUPLICATE_BSDA, {
+      variables: {
+        id: bsda.id
+      }
+    });
+
+    // Then
+    expect(err3).toBeUndefined();
+
+    const duplicatedBsda2 = await prisma.bsda.findUniqueOrThrow({
+      where: { id: data2.duplicateBsda.id }
+    });
+    expect(duplicatedBsda2.transporterRecepisseNumber).toBeNull();
+    expect(duplicatedBsda2.transporterRecepisseValidityLimit).toBeNull();
+    expect(duplicatedBsda2.transporterRecepisseDepartment).toBeNull();
   });
 });
