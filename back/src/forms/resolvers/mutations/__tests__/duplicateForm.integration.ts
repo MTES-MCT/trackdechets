@@ -720,7 +720,7 @@ describe("Mutation.duplicateForm", () => {
     expect(duplicatedForm.nextDestinationCompanyVatNumber).toBeNull();
   });
 
-  it("should not duplicate transporter receipt when it was emptied info", async () => {
+  it("should duplicate nulling transporter receipt when it was emptied", async () => {
     const { form, transporterReceipt, emitter } = await createForm();
     const { mutate } = makeClient(emitter.user);
     await prisma.transporterReceipt.delete({

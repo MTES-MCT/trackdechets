@@ -3,6 +3,7 @@ import { xDaysAgo } from "../../../../commands/onboarding.helpers";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   companyFactory,
+  transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -68,6 +69,60 @@ describe("mutaion.duplicateBsvhu", () => {
     );
 
     expect(data.duplicateBsvhu.status).toEqual("INITIAL");
+  });
+
+  it("should duplicate without the transporter receipt when it was emptied", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const bsvhu = await bsvhuFactory({
+      opt: { transporterCompanySiret: company.siret }
+    });
+    const { mutate } = makeClient(user);
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
+      DUPLICATE_BVHU,
+      {
+        variables: {
+          id: bsvhu.id
+        }
+      }
+    );
+    const duplicateBsvhu = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: data.duplicateBsvhu.id }
+    });
+    expect(duplicateBsvhu?.transporterRecepisseDepartment).toBeNull();
+    expect(duplicateBsvhu?.transporterRecepisseValidityLimit).toBeNull();
+    expect(duplicateBsvhu?.transporterRecepisseNumber).toBeNull();
+  });
+
+  it("should duplicate transporter receipt when it was emptied info", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const receipt = await transporterReceiptFactory({ company });
+    const bsvhu = await bsvhuFactory({
+      opt: { transporterCompanySiret: company.siret }
+    });
+    const { mutate } = makeClient(user);
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
+      DUPLICATE_BVHU,
+      {
+        variables: {
+          id: bsvhu.id
+        }
+      }
+    );
+    const duplicateBsvhu = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: data.duplicateBsvhu.id }
+    });
+    expect(duplicateBsvhu?.transporterRecepisseDepartment).toBe(
+      receipt.department
+    );
+    expect(
+      duplicateBsvhu?.transporterRecepisseValidityLimit?.toISOString()
+    ).toBe(receipt.validityLimit.toISOString());
+    expect(duplicateBsvhu?.transporterRecepisseNumber).toBe(
+      receipt.receiptNumber
+    );
   });
 
   test("duplicated BSVHU should have the updated data when company info changes", async () => {

@@ -249,5 +249,25 @@ describe("Mutation.duplicateBsff", () => {
     expect(duplicatedBsff.destinationCompanyPhone).toEqual(
       "UPDATED-DESTINATION-PHONE"
     );
+    // Test emptying Transporter receipt
+    await prisma.transporterReceipt.delete({
+      where: { id: transporter.company.transporterReceiptId! }
+    });
+    const { data: data2 } = await mutate<
+      Pick<Mutation, "duplicateBsff">,
+      MutationDuplicateBsffArgs
+    >(DUPLICATE_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+
+    const duplicatedBsff2 = await prisma.bsff.findUniqueOrThrow({
+      where: { id: data2.duplicateBsff.id }
+    });
+
+    expect(duplicatedBsff2.transporterRecepisseNumber).toBeNull();
+    expect(duplicatedBsff2.transporterRecepisseValidityLimit).toBeNull();
+    expect(duplicatedBsff2.transporterRecepisseDepartment).toBeNull();
   });
 });

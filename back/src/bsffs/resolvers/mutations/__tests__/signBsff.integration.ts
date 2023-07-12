@@ -294,7 +294,7 @@ describe("Mutation.signBsff", () => {
       ]);
     });
 
-    it("should throw an error if the transporter tries to sign without receipt nor exemption", async () => {
+    it("should throw an error if the transporter tries to sign without receipt", async () => {
       const bsff = await createBsffBeforeTransport(
         { emitter, transporter, destination },
         {
