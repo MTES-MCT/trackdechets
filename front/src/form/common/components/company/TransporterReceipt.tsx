@@ -99,7 +99,11 @@ export default function TransporterReceiptComponent({
               <p>
                 L'entreprise de transport n'a pas complété ces informations dans
                 son profil Trackdéchets. Nous ne pouvons pas les afficher. Il
-                lui appartient de les compléter.
+                lui appartient de les compléter.{" "}
+                <span className="tw-text-red-500">
+                  Dans le cas contraire, elle ne pourra pas signer la prise en
+                  charge des déchets.
+                </span>
               </p>
             )}
           </>
