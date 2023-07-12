@@ -234,7 +234,6 @@ function TransporterFormCompanyFields({
   takenOverAt,
   takenOverBy
 }: TransporterFormCompanyFieldsProps) {
-  console.log("transporter", transporter);
   return (
     <div className="Row">
       <div className="Col">
