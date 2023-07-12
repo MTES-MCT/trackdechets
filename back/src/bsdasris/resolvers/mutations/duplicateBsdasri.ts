@@ -138,14 +138,11 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
       transporter?.contact ?? bsdasri.transporterCompanyContact,
     // Transporter recepisse
     transporterRecepisseNumber:
-      transporter?.transporterReceipt?.receiptNumber ??
-      bsdasri.transporterRecepisseNumber,
+      transporter?.transporterReceipt?.receiptNumber ?? null,
     transporterRecepisseValidityLimit:
-      transporter?.transporterReceipt?.validityLimit ??
-      bsdasri.transporterRecepisseValidityLimit,
+      transporter?.transporterReceipt?.validityLimit ?? null,
     transporterRecepisseDepartment:
-      transporter?.transporterReceipt?.department ??
-      bsdasri.transporterRecepisseDepartment
+      transporter?.transporterReceipt?.department ?? null
   });
 }
 
