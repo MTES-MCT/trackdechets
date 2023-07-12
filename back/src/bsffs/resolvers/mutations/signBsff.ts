@@ -31,6 +31,7 @@ import {
 } from "../../repository";
 import { checkCanSignFor } from "../../../permissions";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
+import { REQUIRED_RECEIPT_NUMBER } from "../../../common/validation";
 
 const signBsff: MutationResolvers["signBsff"] = async (
   _,
@@ -156,6 +157,10 @@ async function signTransport(
   input: BsffSignatureInput
 ) {
   const transporterReceipt = await getTransporterReceipt(bsff);
+  // Hack to override the Bsff recepisse exemption with bsff.transporterRecepisseNumber is null
+  if (!transporterReceipt.transporterRecepisseNumber) {
+    throw new UserInputError(REQUIRED_RECEIPT_NUMBER);
+  }
   await validateBeforeTransport({ ...bsff, ...transporterReceipt });
 
   const { update: updateBsff } = getBsffRepository(user);
