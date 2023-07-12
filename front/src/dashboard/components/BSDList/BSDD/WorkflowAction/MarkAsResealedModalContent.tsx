@@ -18,6 +18,7 @@ import {
   Mutation,
   QuantityType,
   ResealedFormInput,
+  TransportMode,
 } from "generated/graphql/types";
 import React, { useState } from "react";
 
@@ -46,6 +47,7 @@ const emptyState = {
   transporter: {
     isExemptedOfReceipt: false,
     numberPlate: "",
+    mode: TransportMode.Road,
     company: {
       siret: "",
       vatNumber: "",
