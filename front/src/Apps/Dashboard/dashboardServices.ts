@@ -36,7 +36,6 @@ import {
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
   SIGNER,
-  SIGNER_ENLEVEMENT,
   SIGNER_EN_TANT_QUE_TRAVAUX,
   SIGNER_PAR_ENTREPOS_PROVISOIRE,
   SIGNER_PAR_ENTREPRISE_TRAVAUX,
@@ -701,7 +700,7 @@ export const getPrimaryActionsLabelFromBsdStatus = (
 
     case BsdStatusCode.SignedByWorker:
       if (isSameSiretTransporter(currentSiret, bsd)) {
-        return SIGNER_ENLEVEMENT;
+        return SIGNER;
       }
       break;
 
