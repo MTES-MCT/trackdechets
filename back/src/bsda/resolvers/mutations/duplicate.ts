@@ -161,14 +161,11 @@ async function duplicateBsda({
       transporter?.contact ?? bsda.transporterCompanyContact,
     // Transporter recepisse
     transporterRecepisseNumber:
-      transporter?.transporterReceipt?.receiptNumber ??
-      bsda.transporterRecepisseNumber,
+      transporter?.transporterReceipt?.receiptNumber ?? null,
     transporterRecepisseValidityLimit:
-      transporter?.transporterReceipt?.validityLimit ??
-      bsda.transporterRecepisseValidityLimit,
+      transporter?.transporterReceipt?.validityLimit ?? null,
     transporterRecepisseDepartment:
-      transporter?.transporterReceipt?.department ??
-      bsda.transporterRecepisseDepartment,
+      transporter?.transporterReceipt?.department ?? null,
     // Broker company info
     brokerCompanyAddress: broker?.address ?? bsda.brokerCompanyAddress,
     brokerCompanyMail: broker?.contactEmail ?? bsda.brokerCompanyMail,
