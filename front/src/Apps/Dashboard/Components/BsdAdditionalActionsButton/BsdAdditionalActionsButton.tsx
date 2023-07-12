@@ -28,6 +28,8 @@ import {
   hasBsdasriEmitterSign,
   isSignTransportAndCanSkipEmission,
 } from "../../dashboardServices";
+import { usePermissions } from "common/contexts/PermissionsContext";
+import { UserPermission } from "generated/graphql/types";
 
 import "./bsdAdditionalActionsButton.scss";
 import { BsdType } from "generated/graphql/types";
@@ -52,6 +54,7 @@ function BsdAdditionalActionsButton({
   isToCollectTab = false,
   hasAutomaticSignature = false,
 }: BsdAdditionalActionsButtonProps) {
+  const { permissions } = usePermissions();
   const [isOpen, setisOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLElement>(null);
   const { targetRef } = useOnClickOutsideRefTarget({
@@ -168,51 +171,54 @@ function BsdAdditionalActionsButton({
             "bsd-actions-kebab-menu__dropdown--active": isOpen,
           })}
         >
-          {hasBsdSuite(bsd, currentSiret) && (
-            <li>
-              <button
-                type="button"
-                data-testid={
-                  !bsd?.temporaryStorageDetail
-                    ? "bsd-suite-btn"
-                    : "valider-traitement-btn"
-                }
-                className="fr-btn fr-btn--tertiary-no-outline"
-                tabIndex={tabIndex}
-                onClick={handleBsdSuite}
-              >
-                {!bsd?.temporaryStorageDetail
-                  ? completer_bsd_suite
-                  : VALIDER_TRAITEMENT}
-              </button>
-            </li>
-          )}
-          {canDeleteReview(bsd, currentSiret) && (
-            <li>
-              <button
-                type="button"
-                data-testid="review-btn"
-                className="fr-btn fr-btn--tertiary-no-outline"
-                tabIndex={tabIndex}
-                onClick={handleReviewDelete}
-              >
-                {SUPRIMER_REVISION}
-              </button>
-            </li>
-          )}
-          {hasBsdasriEmitterSign(bsd, currentSiret, isToCollectTab) && (
-            <li>
-              <button
-                type="button"
-                data-testid="emport-direct-dasri-btn"
-                className="fr-btn fr-btn--tertiary-no-outline"
-                tabIndex={tabIndex}
-                onClick={handleDasriEmitterSign}
-              >
-                {FAIRE_SIGNER}
-              </button>
-            </li>
-          )}
+          {permissions.includes(UserPermission.BsdCanSignOperation) &&
+            hasBsdSuite(bsd, currentSiret) && (
+              <li>
+                <button
+                  type="button"
+                  data-testid={
+                    !bsd?.temporaryStorageDetail
+                      ? "bsd-suite-btn"
+                      : "valider-traitement-btn"
+                  }
+                  className="fr-btn fr-btn--tertiary-no-outline"
+                  tabIndex={tabIndex}
+                  onClick={handleBsdSuite}
+                >
+                  {!bsd?.temporaryStorageDetail
+                    ? completer_bsd_suite
+                    : VALIDER_TRAITEMENT}
+                </button>
+              </li>
+            )}
+          {permissions.includes(UserPermission.BsdCanRevise) &&
+            canDeleteReview(bsd, currentSiret) && (
+              <li>
+                <button
+                  type="button"
+                  data-testid="review-btn"
+                  className="fr-btn fr-btn--tertiary-no-outline"
+                  tabIndex={tabIndex}
+                  onClick={handleReviewDelete}
+                >
+                  {SUPRIMER_REVISION}
+                </button>
+              </li>
+            )}
+          {permissions.includes(UserPermission.BsdCanSignEmission) &&
+            hasBsdasriEmitterSign(bsd, currentSiret, isToCollectTab) && (
+              <li>
+                <button
+                  type="button"
+                  data-testid="emport-direct-dasri-btn"
+                  className="fr-btn fr-btn--tertiary-no-outline"
+                  tabIndex={tabIndex}
+                  onClick={handleDasriEmitterSign}
+                >
+                  {FAIRE_SIGNER}
+                </button>
+              </li>
+            )}
           {isToCollectTab &&
             bsd.type === BsdType.Bsdd &&
             (hasAutomaticSignature ||
@@ -229,19 +235,20 @@ function BsdAdditionalActionsButton({
                 </button>
               </li>
             )}
-          {hasAppendix1Cta(bsd) && (
-            <li>
-              <button
-                type="button"
-                data-testid="appendix1-btn"
-                className="fr-btn fr-btn--tertiary-no-outline"
-                tabIndex={tabIndex}
-                onClick={handleAppendix1}
-              >
-                {annexe1}
-              </button>
-            </li>
-          )}
+          {permissions.includes(UserPermission.BsdCanUpdate) &&
+            hasAppendix1Cta(bsd) && (
+              <li>
+                <button
+                  type="button"
+                  data-testid="appendix1-btn"
+                  className="fr-btn fr-btn--tertiary-no-outline"
+                  tabIndex={tabIndex}
+                  onClick={handleAppendix1}
+                >
+                  {annexe1}
+                </button>
+              </li>
+            )}
           <li>
             <button
               type="button"
@@ -253,71 +260,78 @@ function BsdAdditionalActionsButton({
               {apercu_action_label}
             </button>
           </li>
-          {canGeneratePdf(bsd) && (
-            <li>
-              <button
-                type="button"
-                data-testid="bsd-pdf-btn"
-                className="fr-btn fr-btn--tertiary-no-outline"
-                tabIndex={tabIndex}
-                onClick={handlePdf}
-              >
-                {pdf_action_label}
-              </button>
-            </li>
-          )}
-          {canDuplicate(bsd, currentSiret) && (
-            <li>
-              <button
-                type="button"
-                data-testid="bsd-duplicate-btn"
-                className="fr-btn fr-btn--tertiary-no-outline"
-                tabIndex={tabIndex}
-                onClick={handleDuplicate}
-              >
-                {dupliquer_action_label}
-              </button>
-            </li>
-          )}
-          {canUpdateBsd(bsd, currentSiret) && (
-            <li>
-              <button
-                type="button"
-                data-testid="bsd-update-btn"
-                className="fr-btn fr-btn--tertiary-no-outline"
-                tabIndex={tabIndex}
-                onClick={handleUpdate}
-              >
-                {modifier_action_label}
-              </button>
-            </li>
-          )}
-          {!hideReviewCta && canReviewBsd(bsd, currentSiret) && (
-            <li>
-              <button
-                type="button"
-                data-testid="bsd-review-btn"
-                className="fr-btn fr-btn--tertiary-no-outline"
-                tabIndex={tabIndex}
-                onClick={handleRevision}
-              >
-                {revision_action_label}
-              </button>
-            </li>
-          )}
-          {!hideReviewCta && canDeleteBsd(bsd, currentSiret) && (
-            <li>
-              <button
-                type="button"
-                data-testid="bsd-delete-btn"
-                className="fr-btn fr-btn--tertiary-no-outline"
-                tabIndex={tabIndex}
-                onClick={handleDelete}
-              >
-                {supprimer_action_label}
-              </button>
-            </li>
-          )}
+          {permissions.includes(UserPermission.BsdCanRead) &&
+            canGeneratePdf(bsd) && (
+              <li>
+                <button
+                  type="button"
+                  data-testid="bsd-pdf-btn"
+                  className="fr-btn fr-btn--tertiary-no-outline"
+                  tabIndex={tabIndex}
+                  onClick={handlePdf}
+                >
+                  {pdf_action_label}
+                </button>
+              </li>
+            )}
+          {permissions.includes(UserPermission.BsdCanCreate) &&
+            canDuplicate(bsd, currentSiret) && (
+              <li>
+                <button
+                  type="button"
+                  data-testid="bsd-duplicate-btn"
+                  className="fr-btn fr-btn--tertiary-no-outline"
+                  tabIndex={tabIndex}
+                  onClick={handleDuplicate}
+                >
+                  {dupliquer_action_label}
+                </button>
+              </li>
+            )}
+          {permissions.includes(UserPermission.BsdCanUpdate) &&
+            canUpdateBsd(bsd, currentSiret) && (
+              <li>
+                <button
+                  type="button"
+                  data-testid="bsd-update-btn"
+                  className="fr-btn fr-btn--tertiary-no-outline"
+                  tabIndex={tabIndex}
+                  onClick={handleUpdate}
+                >
+                  {modifier_action_label}
+                </button>
+              </li>
+            )}
+          {permissions.includes(UserPermission.BsdCanRevise) &&
+            !hideReviewCta &&
+            canReviewBsd(bsd, currentSiret) && (
+              <li>
+                <button
+                  type="button"
+                  data-testid="bsd-review-btn"
+                  className="fr-btn fr-btn--tertiary-no-outline"
+                  tabIndex={tabIndex}
+                  onClick={handleRevision}
+                >
+                  {revision_action_label}
+                </button>
+              </li>
+            )}
+          {permissions.includes(UserPermission.BsdCanDelete) &&
+            !hideReviewCta &&
+            canDeleteBsd(bsd, currentSiret) && (
+              <li>
+                <button
+                  type="button"
+                  data-testid="bsd-delete-btn"
+                  className="fr-btn fr-btn--tertiary-no-outline"
+                  tabIndex={tabIndex}
+                  onClick={handleDelete}
+                >
+                  {supprimer_action_label}
+                </button>
+              </li>
+            )}
         </ul>
       </div>
     </FocusTrap>

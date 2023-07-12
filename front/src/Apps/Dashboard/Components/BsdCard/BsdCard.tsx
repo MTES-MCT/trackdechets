@@ -41,6 +41,8 @@ import { BsdDisplay } from "Apps/common/types/bsdTypes";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import { useMedia } from "use-media";
 import { MEDIA_QUERIES } from "common/config";
+import { usePermissions } from "common/contexts/PermissionsContext";
+import { UserPermission } from "generated/graphql/types";
 
 function BsdCard({
   bsd,
@@ -60,6 +62,7 @@ function BsdCard({
   },
   hasAutomaticSignature,
 }: BsdCardProps) {
+  const { permissions } = usePermissions();
   const isReviewsTab = bsdCurrentTab === "reviewsTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
@@ -118,6 +121,7 @@ function BsdCard({
     ? getPrimaryActionsLabelFromBsdStatus(
         bsdDisplay,
         currentSiret,
+        permissions,
         bsdCurrentTab,
         hasAutomaticSignature
       )
@@ -307,16 +311,17 @@ function BsdCard({
                     </button>
                   )}
 
-                {isReviewsTab && (
-                  <button
-                    data-testid={`bsd-card-btn-review-primary-${bsdDisplay.readableid}`}
-                    type="button"
-                    className="fr-btn fr-btn--sm"
-                    onClick={handleValidationClick}
-                  >
-                    {ctaPrimaryReviewLabel}
-                  </button>
-                )}
+                {isReviewsTab &&
+                  permissions.includes(UserPermission.BsdCanRevise) && (
+                    <button
+                      data-testid={`bsd-card-btn-review-primary-${bsdDisplay.readableid}`}
+                      type="button"
+                      className="fr-btn fr-btn--sm"
+                      onClick={handleValidationClick}
+                    >
+                      {ctaPrimaryReviewLabel}
+                    </button>
+                  )}
 
                 <BsdAdditionalActionsButton
                   bsd={bsdDisplay}

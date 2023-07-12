@@ -7,6 +7,7 @@ import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 import { MockedProvider } from "@apollo/client/testing";
 import { BsdaWithReview, FormWithReview } from "Apps/common/types/bsdTypes";
 import { MemoryRouter } from "react-router-dom";
+import { PermissionsProvider } from "common/contexts/PermissionsContext";
 
 describe("Bsd card primary action label", () => {
   const siretEmmiter = "53230142100022";
@@ -147,19 +148,21 @@ describe("Bsd card primary action label", () => {
       const onValidate = functionMock;
 
       const { queryByTestId } = render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={bsdd}
-              onValidate={onValidate}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsdd}
+                onValidate={onValidate}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
       const primaryActionBtn = screen.getByTestId(
         `bsd-card-btn-primary-${bsdd.readableId}`
@@ -185,19 +188,23 @@ describe("Bsd card primary action label", () => {
       const onValidate = functionMock;
 
       const { queryByTestId } = render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={{ ...bsdd, emitter: { type: "APPENDIX1_PRODUCER" } } as Form}
-              onValidate={onValidate}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={
+                  { ...bsdd, emitter: { type: "APPENDIX1_PRODUCER" } } as Form
+                }
+                onValidate={onValidate}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
@@ -267,19 +274,21 @@ describe("Bsd card primary action label", () => {
       } as unknown as BsdaWithReview;
       const onValidate = functionMock;
       const { queryByTestId } = render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={bsda}
-              onValidate={onValidate}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsda}
+                onValidate={onValidate}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
       const primaryActionBtn = screen.getByTestId(
         `bsd-card-btn-primary-${bsda.id}`
@@ -411,20 +420,22 @@ describe("Bsd card primary action label", () => {
     test("Bsvhu same siret", async () => {
       const onValidate = functionMock;
       const { queryByTestId } = render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={bsvhu}
-              onValidate={onValidate}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-              bsdCurrentTab="actTab"
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsvhu}
+                onValidate={onValidate}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+                bsdCurrentTab="actTab"
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
       const primaryActionBtn = screen.getByTestId(
         `bsd-card-btn-primary-${bsvhu.id}`
@@ -446,19 +457,21 @@ describe("Bsd card primary action label", () => {
 
     test("Bsvhu same siret (status processed)", () => {
       const { queryByTestId } = render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={bsvhuProcessed}
-              onValidate={functionMock}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsvhuProcessed}
+                onValidate={functionMock}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -468,19 +481,21 @@ describe("Bsd card primary action label", () => {
 
     test("Bsvhu different siret", () => {
       const { queryByTestId } = render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretTransporter}
-              bsd={bsvhu}
-              onValidate={functionMock}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretTransporter}
+                bsd={bsvhu}
+                onValidate={functionMock}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
       expect(queryByTestId(`bsd-card-btn-primary-${bsvhu.id}`)).toBeFalsy();
 
@@ -491,20 +506,22 @@ describe("Bsd card primary action label", () => {
     test("Bsff same siret", async () => {
       const onValidate = functionMock;
       render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={bsff}
-              bsdCurrentTab="actTab"
-              onValidate={onValidate}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsff}
+                bsdCurrentTab="actTab"
+                onValidate={onValidate}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
 
       const primaryActionBtn = screen.getByTestId(
@@ -529,20 +546,22 @@ describe("Bsd card primary action label", () => {
 
     test("Bsff different siret", () => {
       const { queryByTestId } = render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={bsffDifferentSiret}
-              bsdCurrentTab={bsdCurrentTab}
-              onValidate={functionMock}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsffDifferentSiret}
+                bsdCurrentTab={bsdCurrentTab}
+                onValidate={functionMock}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
 
       expect(
@@ -613,20 +632,22 @@ describe("Bsd card primary action label", () => {
       } as unknown as Bsda;
 
       render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={bsda}
-              onValidate={functionMock}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-              bsdCurrentTab="actTab"
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsda}
+                onValidate={functionMock}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+                bsdCurrentTab="actTab"
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
       const { getByText } = within(
         screen.getByTestId(`bsd-card-btn-primary-${bsda.id}`)
@@ -721,19 +742,21 @@ describe("Bsd card primary action label", () => {
         __typename: "Form",
       } as unknown as Form;
       const { queryByTestId } = render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={bsdd}
-              onValidate={functionMock}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsdd}
+                onValidate={functionMock}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
       const { getByText } = within(
         screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
@@ -851,20 +874,22 @@ describe("Bsd card primary action label", () => {
         __typename: "Form",
       } as unknown as Form;
       render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={bsdd}
-              bsdCurrentTab="actTab"
-              onValidate={functionMock}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsdd}
+                bsdCurrentTab="actTab"
+                onValidate={functionMock}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
       const { getByText } = within(
         screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
@@ -945,20 +970,22 @@ describe("Bsd card primary action label", () => {
         __typename: "Bsdasri",
       } as unknown as Bsdasri;
       const { queryByTestId } = render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={bsdari}
-              bsdCurrentTab="actTab"
-              onValidate={functionMock}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsdari}
+                bsdCurrentTab="actTab"
+                onValidate={functionMock}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
       const { getByText } = within(
         screen.getByTestId(`bsd-card-btn-primary-${bsdari.id}`)
@@ -1057,19 +1084,21 @@ describe("Bsd card primary action label", () => {
       } as unknown as FormWithReview;
 
       render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={bsdd}
-              onValidate={functionMock}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsdd}
+                onValidate={functionMock}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
       const { getByText } = within(
         screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
@@ -1096,19 +1125,21 @@ describe("Bsd card primary action label", () => {
       } as unknown as Form;
 
       render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <MemoryRouter initialEntries={[route]}>
-            <BsdCard
-              currentSiret={siretEmmiter}
-              bsd={bsdd}
-              onValidate={functionMock}
-              secondaryActions={{
-                onUpdate: functionMock,
-                onOverview: functionMock,
-              }}
-            />
-          </MemoryRouter>
-        </MockedProvider>
+        <PermissionsProvider defaultPermissions={[]}>
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsdd}
+                onValidate={functionMock}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
       );
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
