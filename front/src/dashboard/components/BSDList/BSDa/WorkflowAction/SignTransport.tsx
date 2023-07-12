@@ -67,7 +67,10 @@ export function SignTransport({
     >
       {({ bsda, onClose }) =>
         bsda.metadata?.errors?.some(
-          error => error.requiredFor === SignatureTypeInput.Transport
+          error =>
+            error.requiredFor === SignatureTypeInput.Transport &&
+            // Transporter Receipt will be auto-completed by the transporter
+            !error.path.startsWith("transporterRecepisse")
         ) ? (
           <>
             <p className="tw-m-2 tw-text-red-700">
