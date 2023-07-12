@@ -29,6 +29,7 @@ import {
   createBsffAfterOperation,
   createBsffBeforeAcceptation
 } from "../../../__tests__/factories";
+import { REQUIRED_RECEIPT_NUMBER } from "../../../../common/validation";
 
 const SIGN = gql`
   mutation Sign($id: ID!, $input: BsffSignatureInput!) {
@@ -295,13 +296,11 @@ describe("Mutation.signBsff", () => {
     });
 
     it("should throw an error if the transporter tries to sign without receipt", async () => {
-      const bsff = await createBsffBeforeTransport(
-        { emitter, transporter, destination },
-        {
-          emitterEmissionSignatureDate: null,
-          emitterEmissionSignatureAuthor: null
-        }
-      );
+      const bsff = await createBsffBeforeTransport({
+        emitter,
+        transporter,
+        destination
+      });
       // remove the receipt
       await prisma.transporterReceipt.delete({ where: { id: receipt.id } });
       const { mutate } = makeClient(transporter.user);
@@ -321,8 +320,7 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message:
-            "Transporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+          message: expect.stringContaining(REQUIRED_RECEIPT_NUMBER)
         })
       ]);
       // restore it

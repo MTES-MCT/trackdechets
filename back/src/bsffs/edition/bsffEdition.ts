@@ -68,6 +68,7 @@ export const editionRules: {
   transporterRecepisseNumber: "TRANSPORT",
   transporterRecepisseDepartment: "TRANSPORT",
   transporterRecepisseValidityLimit: "TRANSPORT",
+  transporterRecepisseIsExempted: "TRANSPORT",
   transporterTransportMode: "TRANSPORT",
   transporterTransportPlates: "TRANSPORT",
   transporterTransportTakenOverAt: "TRANSPORT",

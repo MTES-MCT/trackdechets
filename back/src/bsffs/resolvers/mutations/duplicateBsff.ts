@@ -60,6 +60,7 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
       transporter?.transporterReceipt?.department ?? null,
     transporterRecepisseValidityLimit:
       transporter?.transporterReceipt?.validityLimit ?? null,
+    transporterRecepisseIsExempted: existingBsff.transporterRecepisseIsExempted,
     transporterTransportMode: existingBsff.transporterTransportMode,
     transporterTransportPlates: existingBsff.transporterTransportPlates,
     destinationCap: existingBsff.destinationCap,

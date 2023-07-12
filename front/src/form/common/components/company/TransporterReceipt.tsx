@@ -17,7 +17,6 @@ import {
 } from "generated/graphql/types";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
-import { BsffFormTransporterInput } from "form/bsff/utils/initial-state";
 import { TRANSPORTER_RECEIPT } from "./query";
 import { useQuery } from "@apollo/client";
 
@@ -49,13 +48,10 @@ export default function TransporterReceiptComponent({
       return !!(transporter as BsvhuTransporter)?.recepisse?.isExempted;
     } else if (!!(transporter as BsdasriTransporter)?.recepisse?.isExempted) {
       return !!(transporter as BsdasriTransporter)?.recepisse?.isExempted;
+    } else if (!!(transporter as BsffTransporterInput)?.recepisse?.isExempted) {
+      return !!(transporter as BsffTransporterInput).recepisse?.isExempted;
     } else if (
-      !!(transporter as BsffFormTransporterInput)?.isExemptedOfRecepisse
-    ) {
-      return !!(transporter as BsffFormTransporterInput).isExemptedOfRecepisse;
-    } else if (
-      !!(transporter as BsffTransporter)?.company?.orgId &&
-      (transporter as BsffTransporter)?.recepisse === null
+      (transporter as BsffTransporter)?.recepisse?.isExempted === true
     ) {
       // specific for the Bsff transporter signature dialog where recepisse === null means exempted
       return true;

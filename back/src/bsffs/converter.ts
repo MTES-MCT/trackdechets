@@ -4,8 +4,7 @@ import {
   safeInput,
   processDate,
   chain,
-  undefinedOrDefault,
-  nullIfAllNull
+  undefinedOrDefault
 } from "../common/converter";
 import * as GraphQL from "../generated/graphql/types";
 import { BsffPackaging, BsffPackagingType } from "@prisma/client";
@@ -74,6 +73,9 @@ function flattenTransporterInput(input: {
     ),
     transporterRecepisseValidityLimit: chain(input.transporter, t =>
       chain(t.recepisse, r => r.validityLimit)
+    ),
+    transporterRecepisseIsExempted: chain(input.transporter, t =>
+      chain(t.recepisse, r => r.isExempted)
     ),
     transporterTransportMode: chain(input.transporter, t =>
       chain(t.transport, tr => tr.mode)
@@ -211,10 +213,13 @@ export function expandBsffFromDB(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
         phone: prismaBsff.transporterCompanyPhone,
         mail: prismaBsff.transporterCompanyMail
       }),
-      recepisse: nullIfAllNull<GraphQL.BsffTransporterRecepisse>({
+      recepisse: nullIfNoValues<GraphQL.BsffTransporterRecepisse>({
         number: prismaBsff.transporterRecepisseNumber,
         department: prismaBsff.transporterRecepisseDepartment,
-        validityLimit: processDate(prismaBsff.transporterRecepisseValidityLimit)
+        validityLimit: processDate(
+          prismaBsff.transporterRecepisseValidityLimit
+        ),
+        isExempted: prismaBsff.transporterRecepisseIsExempted
       }),
       customInfo: prismaBsff.transporterCustomInfo,
       transport: nullIfNoValues<GraphQL.BsffTransport>({
