@@ -8,12 +8,8 @@ import {
   TransportMode,
 } from "generated/graphql/types";
 
-export interface BsffFormTransporterInput extends BsffTransporterInput {
-  isExemptedOfRecepisse: boolean;
-}
-
 export interface BsffFormInput extends BsffInput {
-  transporter: BsffFormTransporterInput;
+  transporter: BsffTransporterInput;
   previousPackagings: BsffPackagingInput[];
 }
 
@@ -27,8 +23,9 @@ const initialState: BsffFormInput = {
     company: {
       ...getInitialCompany(),
     },
-    // TEMP FIELD for the frontend to handle this special case
-    isExemptedOfRecepisse: false,
+    recepisse: {
+      isExempted: false,
+    },
     transport: {
       mode: TransportMode.Road,
       plates: [],

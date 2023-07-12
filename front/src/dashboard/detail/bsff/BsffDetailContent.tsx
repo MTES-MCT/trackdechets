@@ -320,10 +320,10 @@ function Transporter({ form }: { form: Bsff }) {
         {!isForeignVat(form?.transporter?.company?.vatNumber!!) && (
           <>
             <YesNoRow
-              value={!form?.transporter?.recepisse}
+              value={form?.transporter?.recepisse?.isExempted}
               label="Exemption de récépissé"
             />
-            {form?.transporter?.recepisse !== null && (
+            {form?.transporter?.recepisse?.isExempted !== true && (
               <>
                 <DetailRow
                   value={form.transporter?.recepisse?.number}

@@ -353,12 +353,15 @@ export async function validateIntermediariesInput(
   return intermediaries;
 }
 
+/**
+ * Common transporter receipt error message
+ */
 export const REQUIRED_RECEIPT_VALIDITYLIMIT = `Transporteur: la date limite de validité du récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets`;
 export const REQUIRED_RECEIPT_NUMBER = `Transporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets`;
 export const REQUIRED_RECEIPT_DEPARTMENT = `Transporteur: le département associé au récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets`;
 
 /**
- * Common transporter receipt schema for BSVHU, BSDASRI
+ * Common transporter receipt schema for BSVHU, BSDASRI, BSDA and BSFF
  */
 export const transporterRecepisseSchema = context => ({
   transporterRecepisseIsExempted: yup.boolean().nullable(),
@@ -370,7 +373,7 @@ export const transporterRecepisseSchema = context => ({
       otherwise: schema =>
         schema.requiredIf(
           context.transportSignature,
-          REQUIRED_RECEIPT_VALIDITYLIMIT
+          REQUIRED_RECEIPT_DEPARTMENT
         )
     }),
   transporterRecepisseNumber: yup
@@ -389,7 +392,7 @@ export const transporterRecepisseSchema = context => ({
       otherwise: schema =>
         schema.requiredIf(
           context.transportSignature,
-          REQUIRED_RECEIPT_DEPARTMENT
+          REQUIRED_RECEIPT_VALIDITYLIMIT
         )
     })
 });

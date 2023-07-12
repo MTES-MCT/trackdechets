@@ -162,12 +162,13 @@ describe("Mutation.updateBsff", () => {
     expect(data.updateBsff.transporter!.recepisse).toEqual(null);
   });
 
-  it("should empty a bsff transporter recepisse if transporter has isExempted", async () => {
+  it("should empty a bsff transporter recepisse if transporter siret has changed", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff(
       { emitter, transporter: emitter },
       { isDraft: true }
     );
+    // write a receipt to the bsff
     await prisma.bsff.update({
       where: { id: bsff.id },
       data: {
@@ -197,8 +198,53 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
-    // recepisse is pulled from db
-    expect(data.updateBsff.transporter!.recepisse).toEqual(null);
+    // recepisse is empty
+    expect(data.updateBsff.transporter!.recepisse?.isExempted).toBeUndefined();
+    expect(data.updateBsff.transporter!.recepisse?.number).toBeUndefined();
+    expect(
+      data.updateBsff.transporter!.recepisse?.validityLimit
+    ).toBeUndefined();
+    expect(data.updateBsff.transporter!.recepisse?.department).toBeUndefined();
+  });
+
+  it("should empty a bsff transporter recepisse if transporter has isExempted", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff(
+      { emitter, transporter: emitter },
+      { isDraft: true }
+    );
+    await prisma.bsff.update({
+      where: { id: bsff.id },
+      data: {
+        transporterRecepisseIsExempted: true
+      }
+    });
+
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const { mutate } = makeClient(emitter.user);
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          transporter: {
+            company: {
+              siret: transporter.siret
+            }
+          }
+        }
+      }
+    });
+
+    // recepisse is empty
+    expect(data.updateBsff.transporter!.recepisse?.isExempted).toEqual(true);
+    expect(data.updateBsff.transporter!.recepisse?.number).toBeNull();
+    expect(data.updateBsff.transporter!.recepisse?.validityLimit).toBeNull();
+    expect(data.updateBsff.transporter!.recepisse?.department).toBeNull();
   });
 
   it("should allow user to update a bsff packagings", async () => {
@@ -656,6 +702,7 @@ describe("Mutation.updateBsff", () => {
   test("after transporter signature > it should be possible to update reception fields", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    await transporterReceiptFactory({ company: transporter.company });
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsffAfterTransport({
       emitter,

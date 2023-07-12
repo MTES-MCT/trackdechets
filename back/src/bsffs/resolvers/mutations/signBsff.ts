@@ -4,7 +4,6 @@ import {
   BsffPackaging,
   WasteAcceptationStatus
 } from "@prisma/client";
-import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -30,11 +29,7 @@ import {
   getBsffRepository
 } from "../../repository";
 import { checkCanSignFor } from "../../../permissions";
-import {
-  getTransporterCompanyOrgId,
-  isForeignVat
-} from "../../../common/constants/companySearchHelpers";
-import { REQUIRED_RECEIPT_NUMBER } from "../../../common/validation";
+import { getTransporterReceipt } from "../../../bsdasris/recipify";
 
 const signBsff: MutationResolvers["signBsff"] = async (
   _,
@@ -83,24 +78,6 @@ export function getAuthorizedOrgIds(
   const getAuthorizedSiretsFn = signatureTypeToFn[signatureType];
 
   return getAuthorizedSiretsFn(bsff).filter(Boolean);
-}
-
-export async function getTransporterReceipt(existingBsff: Bsff) {
-  // fetch TransporterReceipt
-  const orgId = getTransporterCompanyOrgId(existingBsff);
-  let transporterReceipt;
-  if (orgId) {
-    transporterReceipt = await prisma.company
-      .findUnique({
-        where: { orgId }
-      })
-      .transporterReceipt();
-  }
-  return {
-    transporterRecepisseNumber: transporterReceipt?.receiptNumber ?? null,
-    transporterRecepisseDepartment: transporterReceipt?.department ?? null,
-    transporterRecepisseValidityLimit: transporterReceipt?.validityLimit ?? null
-  };
 }
 
 // Defines different signature function based on signature type
@@ -160,13 +137,6 @@ async function signTransport(
   input: BsffSignatureInput
 ) {
   const transporterReceipt = await getTransporterReceipt(bsff);
-  // Hack to override the Bsff recepisse exemption with bsff.transporterRecepisseNumber is null
-  if (
-    !transporterReceipt.transporterRecepisseNumber &&
-    !isForeignVat(bsff.transporterCompanyVatNumber)
-  ) {
-    throw new UserInputError(REQUIRED_RECEIPT_NUMBER);
-  }
   await validateBeforeTransport({ ...bsff, ...transporterReceipt });
 
   const { update: updateBsff } = getBsffRepository(user);

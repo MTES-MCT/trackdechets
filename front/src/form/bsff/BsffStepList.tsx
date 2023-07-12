@@ -52,12 +52,7 @@ export default function BsffStepsList(props: Props) {
       return {
         ...formQuery.data?.bsff,
         previousPackagings,
-        transporter: {
-          ...transporter,
-          isExemptedOfRecepisse:
-            !!bsff?.transporter?.company?.orgId &&
-            bsff?.transporter?.recepisse === null,
-        },
+        transporter,
       };
     }
     const bsff = formQuery.data?.bsff;
@@ -90,21 +85,14 @@ export default function BsffStepsList(props: Props) {
       previousPackagings,
       packagings,
       type,
-      transporter: { isExemptedOfRecepisse, ...transporter },
+      transporter,
       destination: { plannedOperationCode, ...destination },
       ...input
     } = values;
-    // clean the temp value because it's absent from the Input gql type
-    delete transporter.isExemptedOfRecepisse;
     saveForm({
       type,
       ...input,
-      transporter: {
-        ...transporter,
-        recepisse: {
-          isExempted: isExemptedOfRecepisse,
-        },
-      },
+      transporter,
       destination: {
         ...destination,
         plannedOperationCode:
