@@ -115,7 +115,7 @@ export function Worker({ disabled }) {
               {!values?.worker?.certification?.hasSubSectionFour &&
                 !values?.worker?.certification?.hasSubSectionThree && (
                   <Alert
-                    title={"Récépissé de déclaration de transport de déchets"}
+                    title={"L'entreprise n'a pas complété son profil"}
                     severity="warning"
                     description="L'entreprise que vous renseignez s'est enregistrée avec un profil d'entreprise de travaux amiante mais n'a pas complété la catégorie de travaux dans son compte établissement de Trackdéchets. Il appartient à cette entreprise de compléter ses informations."
                   />
@@ -124,7 +124,9 @@ export function Worker({ disabled }) {
           ) : (
             <div>
               <Alert
-                title={"Récépissé de déclaration de transport de déchets"}
+                title={
+                  "L'entreprise n'est pas une entreprise de travaux amiante"
+                }
                 severity="error"
                 description="L'entreprise que vous renseignez ne s'est pas enregistrée avec un profil d'entreprise de travaux amiante ou n'a pas complété la catégorie de travaux dans son compte établissement de Trackdéchets. Il appartient à cette entreprise de compléter ses informations"
               />
