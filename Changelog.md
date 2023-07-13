@@ -16,6 +16,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Correction de la date de refus dans les mails de notification et PDFs [PR 2527](https://github.com/MTES-MCT/trackdechets/pull/2527)
+- Il ne devrait pas être possible de s'inscrire avec une adresse e-mail mal formatée (caractères spéciaux) [PR 2532](https://github.com/MTES-MCT/trackdechets/pull/2532)
+- BSDA : les champs de contact du particulier ne devraient pas s'auto-remplir avec les infos de mes établissements favoris [PR 2496](https://github.com/MTES-MCT/trackdechets/pull/2496)
 
 #### :boom: Breaking changes
 
@@ -24,10 +26,15 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - BSFF - API : permettre de filtrer les BSFFs (query `bsffs`) sur le numéro SIRET du détenteur initial et sur le numéro de fiche d'intervention. [PR 2531](https://github.com/MTES-MCT/trackdechets/pull/2531)
+- BSDA - permettre de rajouter un intermédiaire d'entreposage après signature Entreprise Travaux et avant signature Transporteur [PR 2495](https://github.com/MTES-MCT/trackdechets/pull/2495)
+- ETQ émetteur d'un BSDA, je suis alerté si une entreprise de travaux n'a pas le bon profil et n'a pas complété les infos SS3 SS4 [PR 2529](https://github.com/MTES-MCT/trackdechets/pull/2529)
 
 #### :memo: Documentation
 
 #### :house: Interne
+
+- Ajout d'un parsing des variables d'environnement avec Zod [PR 2484](https://github.com/MTES-MCT/trackdechets/pull/2484)
+- Meilleure gestion des feature flags [PR 2524](https://github.com/MTES-MCT/trackdechets/pull/2524)
 
 # [2023.6.2] 27/06/2023
 
