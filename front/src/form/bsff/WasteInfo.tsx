@@ -35,12 +35,18 @@ export default function WasteInfo({ disabled }) {
     setFieldValue,
   ]);
 
+  // Compute the sum of packagings weight to prefill `weight.value`
+  const totalWeight = useMemo(
+    () =>
+      values.packagings.reduce((acc, p) => {
+        return acc + p.weight ?? 0;
+      }, 0),
+    [values.packagings]
+  );
+
   useEffect(() => {
-    const totalWeight = values.packagings.reduce((acc, p) => {
-      return acc + p.weight ?? 0;
-    }, 0);
     setFieldValue("weight.value", totalWeight);
-  }, [values.packagings, setFieldValue]);
+  }, [totalWeight, setFieldValue]);
 
   const ficheInterventionsWeight = useMemo(
     () => values.ficheInterventions?.reduce((w, FI) => w + FI.weight, 0),
