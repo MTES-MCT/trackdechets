@@ -3,7 +3,6 @@ import classnames from "classnames";
 import FocusTrap from "focus-trap-react";
 import {
   FAIRE_SIGNER,
-  ROAD_CONTROL,
   SUPRIMER_REVISION,
   VALIDER_TRAITEMENT,
   annexe1,
@@ -27,13 +26,9 @@ import {
   hasAppendix1Cta,
   canDeleteReview,
   hasBsdasriEmitterSign,
-  hasRoadControlButton,
 } from "../../dashboardServices";
 
 import "./bsdAdditionalActionsButton.scss";
-import { Link, generatePath, useLocation } from "react-router-dom";
-import routes from "Apps/routes";
-import { IconQrCode } from "common/components/Icons";
 
 function BsdAdditionalActionsButton({
   bsd,
@@ -59,7 +54,6 @@ function BsdAdditionalActionsButton({
   const { targetRef } = useOnClickOutsideRefTarget({
     onClickOutside: () => setisOpen(false),
   });
-  const location = useLocation();
 
   useEffect(() => {
     const { current } = dropdownRef;
@@ -166,25 +160,6 @@ function BsdAdditionalActionsButton({
             "bsd-actions-kebab-menu__dropdown--active": isOpen,
           })}
         >
-          {hasRoadControlButton(bsd, isCollectedTab) && (
-            <li data-testid="road-control-btn">
-              <Link
-                to={{
-                  pathname: generatePath(routes.dashboardv2.roadControl, {
-                    siret: currentSiret,
-                    id: bsd.id,
-                  }),
-                  state: { background: location },
-                }}
-                className="fr-btn fr-btn--tertiary-no-outline"
-                onClick={closeMenu}
-              >
-                <IconQrCode />
-                &nbsp;
-                {ROAD_CONTROL}
-              </Link>
-            </li>
-          )}
           {hasBsdSuite(bsd, currentSiret) && (
             <li>
               <button

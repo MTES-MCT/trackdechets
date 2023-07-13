@@ -38,6 +38,7 @@ import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 import {
   FAIRE_SIGNER,
   PUBLIER,
+  ROAD_CONTROL,
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
   SIGNER,
@@ -555,7 +556,7 @@ describe("dashboardServices", () => {
     it('should return the correct label when bsd type is "Bsdd" and siret is same as temporary storage destination', () => {
       const currentSiret = "1234567890";
 
-      const result = getResentBtnLabel(currentSiret, bsd);
+      const result = getResentBtnLabel(currentSiret, bsd, "actTab");
 
       expect(result).toEqual(VALIDER_RECEPTION);
     });
@@ -563,7 +564,7 @@ describe("dashboardServices", () => {
     it("should return an empty string when siret is not same as temporary storage destination", () => {
       const currentSiret = "1234567890";
       bsd.temporaryStorageDetail!.destination!.company!.siret = "132456378399";
-      const result = getResentBtnLabel(currentSiret, bsd);
+      const result = getResentBtnLabel(currentSiret, bsd, "actTab");
       expect(result).toEqual("");
     });
 
@@ -572,6 +573,22 @@ describe("dashboardServices", () => {
       bsd.type = BsdType.Bsda;
       const result = getResealedBtnLabel(currentSiret, bsd);
       expect(result).toEqual("");
+    });
+
+    it("should return the correct label when current tab is collectedTab and status is RESENT", () => {
+      const currentSiret = "1234567890";
+      bsd.status = BsdStatusCode.Resent;
+      const result = getResentBtnLabel(currentSiret, bsd, "collectedTab");
+
+      expect(result).toEqual(ROAD_CONTROL);
+    });
+
+    it("should return the correct label when current tab is collectedTab and status is SENT", () => {
+      const currentSiret = "1234567890";
+      bsd.status = BsdStatusCode.Sent;
+      const result = getResentBtnLabel(currentSiret, bsd, "collectedTab");
+
+      expect(result).toEqual(ROAD_CONTROL);
     });
   });
 

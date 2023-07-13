@@ -32,6 +32,7 @@ import { BsdaCancelRevision } from "dashboard/components/RevisionRequestList/bsd
 import {
   canApproveOrRefuseReview,
   hasEmportDirect,
+  hasRoadControlButton,
   isSynthesis,
 } from "Apps/Dashboard/dashboardServices";
 import { BsddApproveRevision } from "dashboard/components/RevisionRequestList/bsdd/approve";
@@ -54,6 +55,7 @@ function BsdCardList({
   const isReviewsTab = bsdCurrentTab === "reviewsTab";
   const isActTab = bsdCurrentTab === "actTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
+  const isCollectedTab = bsdCurrentTab === "collectedTab";
 
   const redirectToPath = useCallback(
     (path, id) => {
@@ -229,16 +231,28 @@ function BsdCardList({
         if (bsd.status === FormStatus.Draft || bsd["isDraft"]) {
           handleDraftValidation(bsd as Bsd);
         } else {
-          handleActValidation(bsd as Bsd);
+          if (
+            hasRoadControlButton(
+              { status: bsd.status } as BsdDisplay,
+              isCollectedTab
+            )
+          ) {
+            const path = routes.dashboardv2.roadControl;
+            redirectToPath(path, bsd.id);
+          } else {
+            handleActValidation(bsd as Bsd);
+          }
         }
       }
     },
     [
       isReviewsTab,
+      isCollectedTab,
       siret,
       handleDraftValidation,
       handleActValidation,
       handleReviewsValidation,
+      redirectToPath,
     ]
   );
 
