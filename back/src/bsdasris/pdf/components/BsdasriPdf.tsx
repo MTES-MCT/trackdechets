@@ -261,6 +261,10 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
                 : ""}
             </p>
             <p>
+              Immatriculation(s) :{" "}
+              {bsdasri?.transporter?.transport?.plates?.join(", ")}
+            </p>
+            <p>
               <strong>Date de remise à l'installation de destination :</strong>
               {formatDate(
                 bsdasri?.transporter?.transport?.handedOverAt ??
