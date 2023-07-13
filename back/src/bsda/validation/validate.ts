@@ -98,7 +98,8 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
         ) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "La plaque d'immatriculation est requise"
+            message: "La plaque d'immatriculation est requise",
+            path: ["transporterTransportPlates"]
           });
         }
       }
