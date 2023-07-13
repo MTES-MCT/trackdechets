@@ -3,7 +3,6 @@ import { render, fireEvent, waitFor } from "@testing-library/react";
 import BsdAdditionalActionsButton from "./BsdAdditionalActionsButton";
 import { BsdDisplay, BsdStatusCode } from "Apps/common/types/bsdTypes";
 import { BsdType, EmitterType } from "generated/graphql/types";
-import { MemoryRouter } from "react-router-dom";
 
 const bsd = {
   id: "1",
@@ -28,43 +27,39 @@ describe("BsdAdditionalActionsButton", () => {
 
   it("renders without crashing", () => {
     render(
-      <MemoryRouter initialEntries={[""]}>
-        <BsdAdditionalActionsButton
-          bsd={bsd}
-          currentSiret={currentSiret}
-          actionList={{
-            onOverview,
-            onDelete,
-            onDuplicate,
-            onUpdate,
-            onRevision,
-            onPdf,
-            onAppendix1,
-            onBsdSuite,
-          }}
-        />
-      </MemoryRouter>
+      <BsdAdditionalActionsButton
+        bsd={bsd}
+        currentSiret={currentSiret}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
+      />
     );
   });
 
   it("opens and closes the dropdown menu on click", async () => {
     const { getByTestId, queryByTestId } = render(
-      <MemoryRouter initialEntries={[""]}>
-        <BsdAdditionalActionsButton
-          bsd={bsd}
-          currentSiret={currentSiret}
-          actionList={{
-            onOverview,
-            onDelete,
-            onDuplicate,
-            onUpdate,
-            onRevision,
-            onPdf,
-            onAppendix1,
-            onBsdSuite,
-          }}
-        />
-      </MemoryRouter>
+      <BsdAdditionalActionsButton
+        bsd={bsd}
+        currentSiret={currentSiret}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
+      />
     );
 
     expect(queryByTestId("bsd-actions-dropdown_1")).not.toHaveClass(
@@ -90,22 +85,20 @@ describe("BsdAdditionalActionsButton", () => {
 
   it("calls the `onOverview` function when the 'Vue détaillée' button is clicked", async () => {
     const { getByTestId } = render(
-      <MemoryRouter initialEntries={[""]}>
-        <BsdAdditionalActionsButton
-          bsd={bsd}
-          currentSiret={currentSiret}
-          actionList={{
-            onOverview,
-            onDelete,
-            onDuplicate,
-            onUpdate,
-            onRevision,
-            onPdf,
-            onAppendix1,
-            onBsdSuite,
-          }}
-        />
-      </MemoryRouter>
+      <BsdAdditionalActionsButton
+        bsd={bsd}
+        currentSiret={currentSiret}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
+      />
     );
 
     fireEvent.click(getByTestId("bsd-overview-btn"));
@@ -117,22 +110,20 @@ describe("BsdAdditionalActionsButton", () => {
 
   it("calls the `onDuplicate` function when the 'Dupliquer' button is clicked", async () => {
     const { getByTestId } = render(
-      <MemoryRouter initialEntries={[""]}>
-        <BsdAdditionalActionsButton
-          bsd={bsd}
-          currentSiret={currentSiret}
-          actionList={{
-            onOverview,
-            onDelete,
-            onDuplicate,
-            onUpdate,
-            onRevision,
-            onPdf,
-            onAppendix1,
-            onBsdSuite,
-          }}
-        />
-      </MemoryRouter>
+      <BsdAdditionalActionsButton
+        bsd={bsd}
+        currentSiret={currentSiret}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
+      />
     );
 
     fireEvent.click(getByTestId("bsd-duplicate-btn"));
@@ -144,22 +135,20 @@ describe("BsdAdditionalActionsButton", () => {
 
   it("calls the `onPdf` function when the 'PDF' button is clicked", async () => {
     const { getByTestId } = render(
-      <MemoryRouter initialEntries={[""]}>
-        <BsdAdditionalActionsButton
-          bsd={bsd}
-          currentSiret={currentSiret}
-          actionList={{
-            onOverview,
-            onDelete,
-            onDuplicate,
-            onUpdate,
-            onRevision,
-            onPdf,
-            onAppendix1,
-            onBsdSuite,
-          }}
-        />
-      </MemoryRouter>
+      <BsdAdditionalActionsButton
+        bsd={bsd}
+        currentSiret={currentSiret}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
+      />
     );
 
     fireEvent.click(getByTestId("bsd-pdf-btn"));
@@ -176,22 +165,20 @@ describe("BsdAdditionalActionsButton", () => {
       type: BsdType.Bsdd,
     } as BsdDisplay;
     const { getByTestId } = render(
-      <MemoryRouter initialEntries={[""]}>
-        <BsdAdditionalActionsButton
-          bsd={bsdDelete}
-          currentSiret={currentSiret}
-          actionList={{
-            onOverview,
-            onDelete,
-            onDuplicate,
-            onUpdate,
-            onRevision,
-            onPdf,
-            onAppendix1,
-            onBsdSuite,
-          }}
-        />
-      </MemoryRouter>
+      <BsdAdditionalActionsButton
+        bsd={bsdDelete}
+        currentSiret={currentSiret}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
+      />
     );
 
     fireEvent.click(getByTestId("bsd-delete-btn"));
@@ -208,22 +195,20 @@ describe("BsdAdditionalActionsButton", () => {
       type: BsdType.Bsdd,
     } as BsdDisplay;
     const { getByTestId } = render(
-      <MemoryRouter initialEntries={[""]}>
-        <BsdAdditionalActionsButton
-          bsd={bsdUpdate}
-          currentSiret={currentSiret}
-          actionList={{
-            onOverview,
-            onDelete,
-            onDuplicate,
-            onUpdate,
-            onRevision,
-            onPdf,
-            onAppendix1,
-            onBsdSuite,
-          }}
-        />
-      </MemoryRouter>
+      <BsdAdditionalActionsButton
+        bsd={bsdUpdate}
+        currentSiret={currentSiret}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
+      />
     );
 
     fireEvent.click(getByTestId("bsd-update-btn"));
@@ -240,22 +225,20 @@ describe("BsdAdditionalActionsButton", () => {
       type: BsdType.Bsdd,
     } as BsdDisplay;
     const { getByTestId } = render(
-      <MemoryRouter initialEntries={[""]}>
-        <BsdAdditionalActionsButton
-          bsd={bsdReview}
-          currentSiret={currentSiret}
-          actionList={{
-            onOverview,
-            onDelete,
-            onDuplicate,
-            onUpdate,
-            onRevision,
-            onPdf,
-            onAppendix1,
-            onBsdSuite,
-          }}
-        />
-      </MemoryRouter>
+      <BsdAdditionalActionsButton
+        bsd={bsdReview}
+        currentSiret={currentSiret}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
+      />
     );
 
     fireEvent.click(getByTestId("bsd-review-btn"));
@@ -276,22 +259,20 @@ describe("BsdAdditionalActionsButton", () => {
     } as BsdDisplay;
 
     const { getByTestId } = render(
-      <MemoryRouter initialEntries={[""]}>
-        <BsdAdditionalActionsButton
-          bsd={bsdSuite}
-          currentSiret={currentSiret}
-          actionList={{
-            onOverview,
-            onDelete,
-            onDuplicate,
-            onUpdate,
-            onRevision,
-            onPdf,
-            onAppendix1,
-            onBsdSuite,
-          }}
-        />
-      </MemoryRouter>
+      <BsdAdditionalActionsButton
+        bsd={bsdSuite}
+        currentSiret={currentSiret}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
+      />
     );
 
     fireEvent.click(getByTestId("bsd-suite-btn"));
@@ -313,22 +294,20 @@ describe("BsdAdditionalActionsButton", () => {
     } as BsdDisplay;
 
     const { getByTestId } = render(
-      <MemoryRouter initialEntries={[""]}>
-        <BsdAdditionalActionsButton
-          bsd={bsdSuite}
-          currentSiret={currentSiret}
-          actionList={{
-            onOverview,
-            onDelete,
-            onDuplicate,
-            onUpdate,
-            onRevision,
-            onPdf,
-            onAppendix1,
-            onBsdSuite,
-          }}
-        />
-      </MemoryRouter>
+      <BsdAdditionalActionsButton
+        bsd={bsdSuite}
+        currentSiret={currentSiret}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
+      />
     );
 
     fireEvent.click(getByTestId("valider-traitement-btn"));
@@ -346,22 +325,20 @@ describe("BsdAdditionalActionsButton", () => {
       type: BsdType.Bsdd,
     } as BsdDisplay;
     const { getByTestId } = render(
-      <MemoryRouter initialEntries={[""]}>
-        <BsdAdditionalActionsButton
-          bsd={bsdAppendix1}
-          currentSiret={currentSiret}
-          actionList={{
-            onOverview,
-            onDelete,
-            onDuplicate,
-            onUpdate,
-            onRevision,
-            onPdf,
-            onAppendix1,
-            onBsdSuite,
-          }}
-        />
-      </MemoryRouter>
+      <BsdAdditionalActionsButton
+        bsd={bsdAppendix1}
+        currentSiret={currentSiret}
+        actionList={{
+          onOverview,
+          onDelete,
+          onDuplicate,
+          onUpdate,
+          onRevision,
+          onPdf,
+          onAppendix1,
+          onBsdSuite,
+        }}
+      />
     );
 
     fireEvent.click(getByTestId("appendix1-btn"));
@@ -369,31 +346,5 @@ describe("BsdAdditionalActionsButton", () => {
     await waitFor(() => {
       expect(onAppendix1).toHaveBeenCalledWith(bsdAppendix1);
     });
-  });
-  it("the `Road control` button is present", async () => {
-    const bsdAppendix1 = {
-      ...bsd,
-      status: BsdStatusCode.Sent,
-      type: BsdType.Bsdd,
-    } as BsdDisplay;
-    const { getByTestId } = render(
-      <MemoryRouter initialEntries={[""]}>
-        <BsdAdditionalActionsButton
-          bsd={bsdAppendix1}
-          currentSiret={currentSiret}
-          actionList={{
-            onOverview,
-            onDelete,
-            onDuplicate,
-            onUpdate,
-            onRevision,
-            onPdf,
-          }}
-          isCollectedTab
-        />
-      </MemoryRouter>
-    );
-
-    expect(await getByTestId("road-control-btn")).toBeInTheDocument();
   });
 });

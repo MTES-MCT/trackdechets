@@ -33,6 +33,7 @@ import {
   PUBLIER,
   RECU,
   REFUSE,
+  ROAD_CONTROL,
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
   SIGNER,
@@ -399,6 +400,11 @@ export const getSentBtnLabel = (
   bsdCurrentTab: BsdCurrentTab
 ): string => {
   const isActTab = bsdCurrentTab === "actTab";
+  const isCollectedTab = bsdCurrentTab === "collectedTab";
+
+  if (hasRoadControlButton(bsd, isCollectedTab)) {
+    return ROAD_CONTROL;
+  }
 
   if (isBsdd(bsd.type)) {
     if (isAppendix1Producer(bsd)) {
@@ -556,8 +562,14 @@ const getAcceptedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
 
 export const getResentBtnLabel = (
   currentSiret: string,
-  bsd: BsdDisplay
+  bsd: BsdDisplay,
+  bsdCurrentTab: BsdCurrentTab
 ): string => {
+  const isCollectedTab = bsdCurrentTab === "collectedTab";
+  if (hasRoadControlButton(bsd, isCollectedTab)) {
+    return ROAD_CONTROL;
+  }
+
   if (
     isBsdd(bsd.type) &&
     isSameSiretTemporaryStorageDestination(currentSiret, bsd)
@@ -671,7 +683,7 @@ export const getPrimaryActionsLabelFromBsdStatus = (
       return getSentBtnLabel(currentSiret, bsd, bsdCurrentTab!);
 
     case BsdStatusCode.Resent:
-      return getResentBtnLabel(currentSiret, bsd);
+      return getResentBtnLabel(currentSiret, bsd, bsdCurrentTab!);
 
     case BsdStatusCode.Resealed:
       return getResealedBtnLabel(currentSiret, bsd);
