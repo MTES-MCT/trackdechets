@@ -11,10 +11,11 @@ import {
   intermediarySchema
 } from "../../common/validation/intermediaries";
 import {
-  isRegisteredSiretRefinement,
   isRegisteredVatNumberRefinement,
   siretSchema,
-  foreignVatNumberSchema
+  foreignVatNumberSchema,
+  isDestinationRefinement,
+  isTransporterRefinement
 } from "../../common/validation/siret";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { OPERATIONS, WORKER_CERTIFICATION_ORGANISM } from "./constants";
@@ -91,7 +92,7 @@ export const rawBsdaSchema = z
     destinationCompanyName: z.string().nullish(),
     destinationCompanySiret: siretSchema
       .nullish()
-      .superRefine(isRegisteredSiretRefinement("DESTINATION")),
+      .superRefine(isDestinationRefinement),
     destinationCompanyAddress: z.string().nullish(),
     destinationCompanyContact: z.string().nullish(),
     destinationCompanyPhone: z.string().nullish(),
@@ -117,7 +118,7 @@ export const rawBsdaSchema = z
     destinationOperationSignatureDate: z.coerce.date().nullish(),
     destinationOperationNextDestinationCompanySiret: siretSchema
       .nullish()
-      .superRefine(isRegisteredSiretRefinement("DESTINATION")),
+      .superRefine(isDestinationRefinement),
     destinationOperationNextDestinationCompanyVatNumber:
       foreignVatNumberSchema.nullish(),
     destinationOperationNextDestinationCompanyName: z.string().nullish(),
@@ -130,8 +131,7 @@ export const rawBsdaSchema = z
       .string()
       .nullish(),
     transporterCompanyName: z.string().nullish(),
-    transporterCompanySiret: siretSchema.nullish(),
-    // Further verifications done hereunder in superRefine
+    transporterCompanySiret: siretSchema.nullish(), // Further verifications done here under in superRefine
     transporterCompanyAddress: z.string().nullish(),
     transporterCompanyContact: z.string().nullish(),
     transporterCompanyPhone: z.string().nullish(),
@@ -267,10 +267,13 @@ export const rawBsdaSchema = z
     }
 
     // Additionnal checks on the transporterCompanySiret
-    await isRegisteredSiretRefinement(
-      "TRANSPORTER",
-      val.transporterRecepisseIsExempted
-    )(val.transporterCompanySiret ?? "", ctx);
+    await isTransporterRefinement(
+      {
+        siret: val.transporterCompanySiret,
+        transporterRecepisseIsExempted: val.transporterRecepisseIsExempted
+      },
+      ctx
+    );
   })
   .transform(val => {
     val.intermediariesOrgIds = val.intermediaries
