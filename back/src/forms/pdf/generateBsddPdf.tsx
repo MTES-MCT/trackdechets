@@ -814,7 +814,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 </p>
                 <AcceptationFields
                   {...form.temporaryStorageDetail?.temporaryStorer}
-                  signedAt={form.signedAt}
+                  signedAt={fullPrismaForm.signedAt}
                 />
                 <p>
                   Nom :{" "}
