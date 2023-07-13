@@ -83,14 +83,11 @@ async function getDuplicateData(
       transporter?.contactEmail ?? bsvhu.transporterCompanyMail,
     transporterCompanyVatNumber: bsvhu.transporterCompanyVatNumber,
     transporterRecepisseNumber:
-      transporter?.transporterReceipt?.receiptNumber ??
-      bsvhu.transporterRecepisseNumber,
+      transporter?.transporterReceipt?.receiptNumber ?? null,
     transporterRecepisseDepartment:
-      transporter?.transporterReceipt?.department ??
-      bsvhu.transporterRecepisseDepartment,
+      transporter?.transporterReceipt?.department ?? null,
     transporterRecepisseValidityLimit:
-      transporter?.transporterReceipt?.validityLimit ??
-      bsvhu.transporterRecepisseValidityLimit
+      transporter?.transporterReceipt?.validityLimit ?? null
   };
 }
 

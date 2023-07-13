@@ -10,6 +10,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Une entreprise peut désormais transporter des déchets sans avoir le profil transporteur, à condition d'avoir l'exemption de récépissé [PR 2460](https://github.com/MTES-MCT/trackdechets/pull/2460)
+- Tous BSD : api et web, le récépissé transporteur est automatiquement rempli à l'édition depuis le profil établissement du compte Trackdéchets du transporteur. Le transporteur peut le compléter jusqu'à la signature transporteur sans que ce soit bloquant, mais il ne pourra plus signer l'enlèvement s'il est manquant ET que l'exemption n'est pas cochée. L'obligation ne s'applique pas aux transporteurs étranger. [PR 2526](https://github.com/MTES-MCT/trackdechets/pull/2526)
+- BSFF : harmonisation de l'interface GraphQL avec BSVHU, BSDA et BSDASRI, pour les récepissés transporteurs : `BsffTransporterRecepisse` et `BsffTransporterRecepisseInput` ont désormais un champ booléen `isExempted`. Ce booléen remplace l'implicite `bsff.transporter.recepisse === null` pour activer l'exemption [PR 2553](https://github.com/MTES-MCT/trackdechets/pull/2553)
 
 #### :bug: Corrections de bugs
 

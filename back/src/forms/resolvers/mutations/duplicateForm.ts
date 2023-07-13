@@ -173,14 +173,11 @@ async function getDuplicateFormInput(
         transporterCompanyVatNumber:
           fullForm.transporter?.transporterCompanyVatNumber,
         transporterReceipt:
-          transporter?.transporterReceipt?.receiptNumber ??
-          fullForm.transporter?.transporterReceipt,
+          transporter?.transporterReceipt?.receiptNumber ?? null,
         transporterDepartment:
-          transporter?.transporterReceipt?.department ??
-          fullForm.transporter?.transporterDepartment,
+          transporter?.transporterReceipt?.department ?? null,
         transporterValidityLimit:
-          transporter?.transporterReceipt?.validityLimit ??
-          fullForm.transporter?.transporterValidityLimit,
+          transporter?.transporterReceipt?.validityLimit ?? null,
         transporterTransportMode:
           fullForm.transporter?.transporterTransportMode,
         transporterIsExemptedOfReceipt:

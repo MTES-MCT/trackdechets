@@ -7,7 +7,7 @@ import {
   autocompletedRecepisse,
   genericGetter
 } from "../common/validation/recipify";
-import { Bsda, Bsdasri, Bsvhu } from "@prisma/client";
+import { Bsda, Bsdasri, Bsff, Bsvhu } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import prisma from "../prisma";
 
@@ -35,7 +35,7 @@ export interface BsdTransporterReceiptPart {
 }
 
 export async function getTransporterReceipt(
-  existingBsd: Bsdasri | Bsvhu | Bsda
+  existingBsd: Bsdasri | Bsvhu | Bsda | Bsff
 ): Promise<BsdTransporterReceiptPart> {
   // fetch TransporterReceipt
   const orgId = getTransporterCompanyOrgId(existingBsd);

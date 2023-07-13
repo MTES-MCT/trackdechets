@@ -4,7 +4,6 @@ import {
   BsffPackaging,
   WasteAcceptationStatus
 } from "@prisma/client";
-import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -30,7 +29,7 @@ import {
   getBsffRepository
 } from "../../repository";
 import { checkCanSignFor } from "../../../permissions";
-import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
+import { getTransporterReceipt } from "../../../bsdasris/recipify";
 
 const signBsff: MutationResolvers["signBsff"] = async (
   _,
@@ -79,24 +78,6 @@ export function getAuthorizedOrgIds(
   const getAuthorizedSiretsFn = signatureTypeToFn[signatureType];
 
   return getAuthorizedSiretsFn(bsff).filter(Boolean);
-}
-
-export async function getTransporterReceipt(existingBsff: Bsff) {
-  // fetch TransporterReceipt
-  const orgId = getTransporterCompanyOrgId(existingBsff);
-  let transporterReceipt;
-  if (orgId) {
-    transporterReceipt = await prisma.company
-      .findUnique({
-        where: { orgId }
-      })
-      .transporterReceipt();
-  }
-  return {
-    transporterRecepisseNumber: transporterReceipt?.receiptNumber ?? null,
-    transporterRecepisseDepartment: transporterReceipt?.department ?? null,
-    transporterRecepisseValidityLimit: transporterReceipt?.validityLimit ?? null
-  };
 }
 
 // Defines different signature function based on signature type

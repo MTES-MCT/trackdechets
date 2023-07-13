@@ -9,7 +9,8 @@ import {
   wasteDetailsSchemaFn,
   acceptationSchema,
   operationSchema,
-  ficheInterventionSchema
+  ficheInterventionSchema,
+  validateBsff
 } from "../validation";
 
 describe("emitterSchema", () => {
@@ -63,14 +64,16 @@ describe("transporterSchema", () => {
 
   beforeAll(async () => {
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
-
     transporterData = {
       transporterCompanyName: "Transporteur",
       transporterCompanySiret: transporter.siret,
       transporterCompanyAddress: "10 chemin fluide, 13001 Marseille",
       transporterCompanyContact: "John Clim",
       transporterCompanyPhone: "06 67 78 95 88",
-      transporterCompanyMail: "john@clim.com"
+      transporterCompanyMail: "john@clim.com",
+      transporterRecepisseNumber: "receiptNumber",
+      transporterRecepisseDepartment: "25",
+      transporterRecepisseValidityLimit: new Date()
     };
   });
 
@@ -107,6 +110,40 @@ describe("transporterSchema", () => {
     await expect(validateFn()).rejects.toThrow(
       "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
     );
+  });
+
+  test("missing Receipt", async () => {
+    expect.assertions(1);
+    try {
+      await validateBsff(
+        {
+          ...transporterData,
+          transporterRecepisseNumber: null,
+          transporterRecepisseDepartment: null,
+          transporterRecepisseValidityLimit: null
+        },
+        {
+          isDraft: false,
+          transporterSignature: true
+        }
+      );
+    } catch (err) {
+      expect(err.message).toEqual(
+        "Erreur de validation des données. Des champs sont manquants ou mal formatés : \nDestination : le nom de l'établissement est requis\nDestination : le numéro SIRET est requis\nDestination : l'adresse de l'établissement est requise\nDestination : le nom du contact est requis\nDestination : le numéro de téléphone est requis\nDestination : l'adresse email est requise\nLe code de l'opération de traitement prévu est requis\nTransporteur: le département associé au récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets\nTransporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets\nTransporteur: la date limite de validité du récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets\nLe code déchet est requis\nLa dénomination usuelle du déchet est obligatoire\nLa mention ADR est requise\nLe poids total est requis\nLe type de poids (estimé ou non) est un requis\nÉmetteur : le nom de l'établissement est requis\nÉmetteur : le n°SIRET de l'établissement est requis\nÉmetteur : l'adresse de l'établissement est requise\nÉmetteur : le nom du contact est requis\nÉmetteur : le numéro de téléphone est requis\nÉmetteur : l'adresse email est requise"
+      );
+    }
+  });
+
+  test("valid data with transporter receipt exemption", async () => {
+    expect(
+      await transporterSchema.isValid({
+        ...transporterData,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseNumber: null,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseValidityLimit: null
+      })
+    ).toEqual(true);
   });
 
   test("missing SIRET and FR VAT", async () => {

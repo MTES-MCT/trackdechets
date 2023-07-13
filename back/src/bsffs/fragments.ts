@@ -119,6 +119,7 @@ export const fullBsff = gql`
         number
         department
         validityLimit
+        isExempted
       }
       transport {
         mode

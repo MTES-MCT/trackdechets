@@ -447,6 +447,7 @@ export const dashboardFormFragment = gql`
       company {
         siret
         orgId
+        name
       }
       numberPlate
       customInfo

@@ -1,3 +1,4 @@
+import { ZodIssue } from "zod";
 import {
   BsdaMetadata,
   BsdaMetadataResolvers,
@@ -51,10 +52,10 @@ export const Metadata: BsdaMetadataResolvers = {
         });
         return [];
       } catch (errors) {
-        return errors.inner?.map(e => {
+        return errors.issues?.map((e: ZodIssue) => {
           return {
             message: e.message,
-            path: e.path,
+            path: `${e.path[0]}`, // e.path is an array, first element should be the path name
             requiredFor: currentSignatureType
           };
         });

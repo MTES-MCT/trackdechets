@@ -20,6 +20,7 @@ import {
   siret,
   siretConditions,
   siretTests,
+  transporterRecepisseSchema,
   vatNumberTests,
   weight,
   weightConditions,
@@ -61,6 +62,7 @@ type Transporter = Pick<
   | "transporterRecepisseNumber"
   | "transporterRecepisseDepartment"
   | "transporterRecepisseValidityLimit"
+  | "transporterRecepisseIsExempted"
 >;
 
 type WasteDetails = Pick<
@@ -214,9 +216,7 @@ export const transporterSchemaFn: FactorySchemaOf<
         transporterSignature,
         "Transporteur : l'adresse email est requise"
       ),
-    transporterRecepisseNumber: yup.string().nullable(),
-    transporterRecepisseDepartment: yup.string().nullable(),
-    transporterRecepisseValidityLimit: yup.date().nullable()
+    ...transporterRecepisseSchema({ transportSignature: transporterSignature })
   });
 };
 

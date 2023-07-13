@@ -1,16 +1,6 @@
 import { Prisma } from "@prisma/client";
 
 /**
- * Return null if all object values are null
- * obj otherwise
- */
-export function nullIfAllNull<T extends Record<string, unknown>>(obj: {
-  [P in keyof T]?: T[P] | null; // Allow null values on the input, even if forbidden by gql
-}): T | null {
-  return Object.values(obj).every(v => v === null) ? null : (obj as T);
-}
-
-/**
  * Return null if all object values are null or an empty string
  * obj otherwise
  */
@@ -71,7 +61,7 @@ export function removeEmpty<T extends Record<string, unknown>>(
  * Equivalent to a typescript optional chaining operator foo?.bar
  * except that :
  * - it returns "null" instead of "undefined" if "null" is encountered in the chain
- * - it returns "null" instead of an empty string
+ * - it returns "null" instead of an empty string for ouputs
  * It allows to differentiate between voluntary null update and field omission that should
  * not update any data, and treats empty string as null updates
  */
@@ -79,13 +69,15 @@ export function chain<T, K>(
   o: T,
   getter: (o: NonNullable<T>) => K
 ): K | null | undefined {
-  if (o === null || o === "") {
+  if (o === null) {
     return null;
   }
   if (o === undefined) {
     return undefined;
   }
-  return getter(o);
+
+  const value = getter(o);
+  return value === "" ? null : value;
 }
 
 /**

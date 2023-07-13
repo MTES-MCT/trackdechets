@@ -23,7 +23,10 @@ import { runInTransaction } from "../../../common/repository/helper";
 import { parseBsda } from "../../validation/validate";
 import { checkCanSignFor } from "../../../permissions";
 import { InvalidTransition } from "../../../forms/errors";
-import { getTransporterReceipt } from "../../../bsdasris/recipify";
+import {
+  BsdTransporterReceiptPart,
+  getTransporterReceipt
+} from "../../../bsdasris/recipify";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,
@@ -165,7 +168,7 @@ async function signWork(
 async function signTransport(
   user: Express.User,
   bsda: Bsda,
-  input: BsdaSignatureInput
+  input: BsdaSignatureInput & BsdTransporterReceiptPart
 ) {
   if (bsda.transporterTransportSignatureDate !== null) {
     throw new AlreadySignedError();
@@ -176,7 +179,11 @@ async function signTransport(
   const updateInput: Prisma.BsdaUpdateInput = {
     transporterTransportSignatureAuthor: input.author,
     transporterTransportSignatureDate: new Date(input.date ?? Date.now()),
-    status: nextStatus
+    status: nextStatus,
+    // auto-complete transporter receipt
+    transporterRecepisseDepartment: input.transporterRecepisseDepartment,
+    transporterRecepisseNumber: input.transporterRecepisseNumber,
+    transporterRecepisseValidityLimit: input.transporterRecepisseValidityLimit
   };
 
   return updateBsda(user, bsda, updateInput);

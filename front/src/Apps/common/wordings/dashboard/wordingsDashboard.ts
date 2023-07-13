@@ -10,7 +10,6 @@ export const FAIRE_SIGNER = "Faire signer";
 export const VALIDER_ENTREPOSAGE_PROVISOIRE =
   "Valider l'entreposage provisoire";
 export const VALIDER_RECEPTION = "Valider la réception";
-export const SIGNER_ENLEVEMENT = "Signer l'enlèvement";
 export const VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE =
   "Valider l'acceptation de l'entreposage provisoire";
 export const SIGNATURE_ACCEPTATION_CONTENANT = "Gérer les contenants";

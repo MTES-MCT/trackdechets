@@ -298,5 +298,25 @@ describe("Mutation.duplicateBsdasri", () => {
     expect(duplicatedBsdasri.destinationCompanyPhone).toEqual(
       "UPDATED-DESTINATION-PHONE"
     );
+    // Test emptying Transporter receipt
+    await prisma.transporterReceipt.delete({
+      where: { id: transporterCompany.transporterReceiptId! }
+    });
+    const { data: data2 } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
+      DUPLICATE_DASRI,
+      {
+        variables: {
+          id: bsdasri.id
+        }
+      }
+    );
+
+    const duplicatedBsdasri2 = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: data2.duplicateBsdasri.id }
+    });
+
+    expect(duplicatedBsdasri2.transporterRecepisseNumber).toBeNull();
+    expect(duplicatedBsdasri2.transporterRecepisseValidityLimit).toBeNull();
+    expect(duplicatedBsdasri2.transporterRecepisseDepartment).toBeNull();
   });
 });
