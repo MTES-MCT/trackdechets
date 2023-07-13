@@ -1,4 +1,4 @@
-import { EmitterType, Form, Prisma, Status, User } from "@prisma/client";
+import { Form, Prisma, Status, User } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
