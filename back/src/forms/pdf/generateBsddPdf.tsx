@@ -165,8 +165,8 @@ export function getOtherPackagingLabel(packagingInfos: PackagingInfo[]) {
     otherPackagings.length === 0
       ? "à préciser"
       : otherPackagings
-          .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
-          .join(", ");
+        .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
+        .join(", ");
   return `Autre (${otherPackagingsSummary})`;
 }
 
@@ -443,15 +443,20 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                       pn.prefix,
                       pn.section,
                       pn.number,
-                      pn.x,
-                      pn.y
                     ]
                       .filter(Boolean)
                       .join("/")}`
                 )
                 .join(", ")}
               <br />
-              Coordonnée(s) GPS :
+              Coordonnée(s) GPS :{" "}
+              {form.wasteDetails?.parcelNumbers
+                ?.map(
+                  pn => [`lon ${pn.x}`, `lat ${pn.y}`]
+                    .filter(Boolean)
+                    .join(" / ")
+                )
+                .join(", ")}
               <br />
               Référence(s) laboratoire(s) :{" "}
               {form.wasteDetails?.analysisReferences?.join(", ")}
@@ -848,7 +853,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                   packagingInfos={
                     isRepackging
                       ? form.temporaryStorageDetail?.wasteDetails
-                          ?.packagingInfos ?? []
+                        ?.packagingInfos ?? []
                       : []
                   }
                 />

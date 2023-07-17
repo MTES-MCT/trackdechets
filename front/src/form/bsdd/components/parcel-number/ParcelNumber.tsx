@@ -165,7 +165,7 @@ function ParcelDetails({ index, parcelNumber, arrayHelpers }) {
           checked={!showParcelNumber}
           onChange={() => handleGpsToggle(parcelNumber, index, arrayHelpers)}
           label="Le domaine n'est pas cadastré, je n'ai pas les numéros de parcelle,
-          j'indique les coordonnées GPS (au format lambert II étendu)"
+          j'indique les coordonnées GPS (au format WGS 84)"
         />
       </div>
     </>
@@ -238,7 +238,7 @@ function ParcelGps({ index }) {
     <div>
       <div className="form__row">
         <label>
-          Coordonnée X (Lambert II étendu)
+          Coordonnée X (WGS 84)
           <Field
             type="number"
             name={`wasteDetails.parcelNumbers.${index}.x`}
@@ -248,7 +248,7 @@ function ParcelGps({ index }) {
       </div>
       <div className="form__row">
         <label>
-          Coordonnée Y (Lambert II étendu)
+          Coordonnée Y (WGS 84)
           <Field
             type="number"
             name={`wasteDetails.parcelNumbers.${index}.y`}
