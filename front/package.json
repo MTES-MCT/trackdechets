@@ -66,7 +66,7 @@
     "graphql-anywhere": "^4.2.7",
     "helmet": "^6.0.1",
     "jsvat": "^2.5.3",
-    "libphonenumber-js": "^1.10.8",
+    "libphonenumber-js": "^1.10.36",
     "local-storage": "^2.0.0",
     "mapbox-gl": "^1.11.1",
     "node-fetch": "^2.6.7",
