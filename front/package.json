@@ -68,7 +68,7 @@
     "jsvat": "^2.5.3",
     "libphonenumber-js": "^1.10.8",
     "local-storage": "^2.0.0",
-    "mapbox-gl": "^1.11.1",
+    "mapbox-gl": "^1.13.3",
     "node-fetch": "^2.6.7",
     "omit-deep-lodash": "^1.1.6",
     "plausible-tracker": "^0.3.8",
