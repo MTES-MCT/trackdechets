@@ -61,7 +61,7 @@
     "decimal.js-light": "^2.5.1",
     "express": "^4.18.2",
     "focus-trap-react": "^10.1.2",
-    "formik": "2.2.5",
+    "formik": "2.4.2",
     "graphql": "^16.6.0",
     "graphql-anywhere": "^4.2.7",
     "helmet": "^6.0.1",
