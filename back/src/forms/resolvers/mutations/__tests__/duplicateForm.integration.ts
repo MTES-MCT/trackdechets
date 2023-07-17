@@ -360,8 +360,6 @@ describe("Mutation.duplicateForm", () => {
       recipientIsTempStorage,
       wasteDetailsCode,
       wasteDetailsOnuCode,
-      wasteDetailsPackagingInfos,
-      wasteDetailsQuantity,
       wasteDetailsQuantityType,
       wasteDetailsPop,
       wasteDetailsIsDangerous,
