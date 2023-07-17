@@ -64,7 +64,7 @@
     "formik": "2.2.5",
     "graphql": "^16.6.0",
     "graphql-anywhere": "^4.2.7",
-    "helmet": "^6.0.1",
+    "helmet": "^6.2.0",
     "jsvat": "^2.5.3",
     "libphonenumber-js": "^1.10.8",
     "local-storage": "^2.0.0",
