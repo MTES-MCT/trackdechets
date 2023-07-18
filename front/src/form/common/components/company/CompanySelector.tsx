@@ -41,7 +41,7 @@ import {
   COMPANY_SELECTOR_PRIVATE_INFOS,
   FAVORITES,
   SEARCH_COMPANIES,
-} from "./query";
+} from "../../../../Apps/common/queries/company/query";
 import TransporterReceipt from "./TransporterReceipt";
 
 const DEBOUNCE_DELAY = 500;

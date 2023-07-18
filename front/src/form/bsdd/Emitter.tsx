@@ -21,7 +21,7 @@ import { RedErrorMessage } from "common/components";
 import Tooltip from "common/components/Tooltip";
 import { onBsddTransporterCompanySelected } from "./utils/onBsddTransporterCompanySelected";
 import { useQuery } from "@apollo/client";
-import { COMPANY_SELECTOR_PRIVATE_INFOS } from "form/common/components/company/query";
+import { COMPANY_SELECTOR_PRIVATE_INFOS } from "Apps/common/queries/company/query";
 
 export default function Emitter({ disabled }) {
   const ctx = useFormikContext<Form>();

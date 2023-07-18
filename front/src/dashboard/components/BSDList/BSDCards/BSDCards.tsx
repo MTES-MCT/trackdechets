@@ -19,7 +19,7 @@ import styles from "./BSDCards.module.scss";
 import { BsdTypename } from "dashboard/constants";
 import { BsffFragment } from "../BSFF";
 import { CardRoadControlButton } from "../RoadControlButton";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "form/common/components/company/query";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
 import { useQuery } from "@apollo/client";
 interface BSDCardsProps {
   bsds: Bsd[];
