@@ -1,3 +1,4 @@
+import { ZodIssue } from "zod";
 import {
   BsdaMetadata,
   BsdaMetadataResolvers,
@@ -11,7 +12,7 @@ export const Metadata: BsdaMetadataResolvers = {
   errors: async (
     metadata: BsdaMetadata & { id: string; status: BsdaStatus }
   ) => {
-    const prismaForm = await getBsdaOrNotFound(metadata.id);
+    const prismaBsda = await getBsdaOrNotFound(metadata.id);
 
     const validationMatrix = [
       {
@@ -46,13 +47,15 @@ export const Metadata: BsdaMetadataResolvers = {
     );
     for (const { currentSignatureType } of filteredValidationMatrix) {
       try {
-        await parseBsda(prismaForm, { currentSignatureType });
+        await parseBsda(prismaBsda, {
+          currentSignatureType
+        });
         return [];
       } catch (errors) {
-        return errors.inner?.map(e => {
+        return errors.issues?.map((e: ZodIssue) => {
           return {
             message: e.message,
-            path: e.path,
+            path: `${e.path[0]}`, // e.path is an array, first element should be the path name
             requiredFor: currentSignatureType
           };
         });

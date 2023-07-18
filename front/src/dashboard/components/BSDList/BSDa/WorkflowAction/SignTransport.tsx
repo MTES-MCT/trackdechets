@@ -67,7 +67,11 @@ export function SignTransport({
     >
       {({ bsda, onClose }) =>
         bsda.metadata?.errors?.some(
-          error => error.requiredFor === SignatureTypeInput.Transport
+          error =>
+            error.requiredFor === SignatureTypeInput.Transport &&
+            // Transporter Receipt will be auto-completed by the transporter
+            !error.path.startsWith("transporterRecepisse") &&
+            error.path !== "transporterTransportPlates"
         ) ? (
           <>
             <p className="tw-m-2 tw-text-red-700">
@@ -100,9 +104,6 @@ export function SignTransport({
                   transporter: {
                     recepisse: {
                       isExempted: false,
-                      number: "",
-                      department: "",
-                      validityLimit: null,
                     },
                     transport: {
                       mode: TransportMode.Road,

@@ -3,6 +3,7 @@ import { Field, useFormikContext } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Bsda, BsdaType, BsdaPickupSite } from "generated/graphql/types";
 import WorkSite from "form/common/components/work-site/WorkSite";
+import { getInitialCompany } from "form/bsdd/utils/initial-state";
 
 export function Emitter({ disabled }) {
   const { values, handleChange, setFieldValue } = useFormikContext<Bsda>();
@@ -45,7 +46,7 @@ export function Emitter({ disabled }) {
               className="td-checkbox"
               onChange={e => {
                 handleChange(e);
-                setFieldValue("emitter.company.siret", null);
+                setFieldValue("emitter.company", getInitialCompany());
               }}
             />
             Le MOA ou le détenteur est un particulier

@@ -24,6 +24,7 @@ import {
   isBsvhuSign,
   isEcoOrgSign,
   isEmetteurSign,
+  isSignTransportAndCanSkipEmission,
 } from "./dashboardServices";
 import {
   BsdType,
@@ -37,6 +38,7 @@ import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 import {
   FAIRE_SIGNER,
   PUBLIER,
+  ROAD_CONTROL,
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
   SIGNER,
@@ -45,6 +47,7 @@ import {
   VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE,
   VALIDER_ENTREPOSAGE_PROVISOIRE,
   VALIDER_RECEPTION,
+  VALIDER_SYNTHESE_LABEL,
   VALIDER_TRAITEMENT,
   completer_bsd_suite,
 } from "Apps/common/wordings/dashboard/wordingsDashboard";
@@ -320,10 +323,11 @@ describe("dashboardServices", () => {
         transporter: {
           company: { siret: "987654321" },
         },
+        bsdWorkflowType: "SYNTHESIS",
       } as BsdDisplay;
       const result = getIsNonDraftLabel(bsd, currentSiret, bsdCurrentTab);
 
-      expect(result).toBe(SIGNER);
+      expect(result).toBe(VALIDER_SYNTHESE_LABEL);
     });
 
     it("should return the correct label for bsff", () => {
@@ -552,7 +556,7 @@ describe("dashboardServices", () => {
     it('should return the correct label when bsd type is "Bsdd" and siret is same as temporary storage destination', () => {
       const currentSiret = "1234567890";
 
-      const result = getResentBtnLabel(currentSiret, bsd);
+      const result = getResentBtnLabel(currentSiret, bsd, "actTab");
 
       expect(result).toEqual(VALIDER_RECEPTION);
     });
@@ -560,7 +564,7 @@ describe("dashboardServices", () => {
     it("should return an empty string when siret is not same as temporary storage destination", () => {
       const currentSiret = "1234567890";
       bsd.temporaryStorageDetail!.destination!.company!.siret = "132456378399";
-      const result = getResentBtnLabel(currentSiret, bsd);
+      const result = getResentBtnLabel(currentSiret, bsd, "actTab");
       expect(result).toEqual("");
     });
 
@@ -569,6 +573,22 @@ describe("dashboardServices", () => {
       bsd.type = BsdType.Bsda;
       const result = getResealedBtnLabel(currentSiret, bsd);
       expect(result).toEqual("");
+    });
+
+    it("should return the correct label when current tab is collectedTab and status is RESENT", () => {
+      const currentSiret = "1234567890";
+      bsd.status = BsdStatusCode.Resent;
+      const result = getResentBtnLabel(currentSiret, bsd, "collectedTab");
+
+      expect(result).toEqual(ROAD_CONTROL);
+    });
+
+    it("should return the correct label when current tab is collectedTab and status is SENT", () => {
+      const currentSiret = "1234567890";
+      bsd.status = BsdStatusCode.Sent;
+      const result = getResentBtnLabel(currentSiret, bsd, "collectedTab");
+
+      expect(result).toEqual(ROAD_CONTROL);
     });
   });
 
@@ -1084,6 +1104,39 @@ describe("dashboardServices", () => {
       };
 
       const result = canReviewBsdd(bsd);
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe("isSignTransportAndCanSkipEmission", () => {
+    const currentSiret = "123456789";
+    const bsd = {
+      emitterType: "APPENDIX1_PRODUCER",
+      transporter: { company: { siret: "123456789" } },
+      ecoOrganisme: { siret: "1" },
+    } as BsdDisplay;
+
+    it("returns true if can Skip Emission and is Same Siret Transporter", () => {
+      const result = isSignTransportAndCanSkipEmission(currentSiret, bsd);
+
+      expect(result).toBe(true);
+    });
+
+    it("returns false if cannot Skip Emission", () => {
+      const result = isSignTransportAndCanSkipEmission(currentSiret, {
+        ...bsd,
+        ecoOrganisme: null,
+      });
+
+      expect(result).toBe(false);
+    });
+
+    it("returns false if not is Same Siret Transporter", () => {
+      const result = isSignTransportAndCanSkipEmission(currentSiret, {
+        ...bsd,
+        transporter: { company: { siret: "2" } },
+      });
 
       expect(result).toBe(false);
     });

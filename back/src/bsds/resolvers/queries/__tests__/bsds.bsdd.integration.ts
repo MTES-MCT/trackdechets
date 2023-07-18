@@ -1,4 +1,3 @@
-import { addYears } from "date-fns";
 import { Company, User, UserRole } from "@prisma/client";
 import {
   Query,
@@ -19,7 +18,8 @@ import makeClient from "../../../../__tests__/testClient";
 import {
   userWithCompanyFactory,
   formFactory,
-  toIntermediaryCompany
+  toIntermediaryCompany,
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 
 import { indexForm } from "../../../../forms/elastic";
@@ -91,6 +91,10 @@ describe("Query.bsds workflow", () => {
         set: ["TRANSPORTER"]
       }
     });
+    await transporterReceiptFactory({
+      company: transporter.company
+    });
+
     recipient = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["WASTEPROCESSOR"]
@@ -131,10 +135,7 @@ describe("Query.bsds workflow", () => {
             contact: "Jean-Michel",
             mail: "jean.michel@gmaiL.com",
             phone: "06"
-          },
-          receipt: "123456789",
-          department: "69",
-          validityLimit: addYears(new Date(), 1).toISOString() as any
+          }
         },
         recipient: {
           company: {

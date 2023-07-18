@@ -3,7 +3,6 @@ import { RefinementCtx, z } from "zod";
 import { BsdaSignatureType } from "../../generated/graphql/types";
 import { SIGNATURES_HIERARCHY } from "./edition";
 import { getReadonlyBsdaRepository } from "../repository";
-import { sirenify } from "./sirenify";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { editionRules } from "./rules";
 import { ZodBsda, rawBsdaSchema } from "./schema";
@@ -12,13 +11,13 @@ import { runTransformers } from "./transformers";
 
 type BsdaValidationContext = {
   enablePreviousBsdasChecks?: boolean;
-  enableSirenification?: boolean;
+  enableCompletionTransformers?: boolean;
   currentSignatureType?: BsdaSignatureType;
 };
 
 export async function parseBsda(
   bsda: unknown,
-  validationContext: BsdaValidationContext = {}
+  validationContext: BsdaValidationContext
 ): Promise<ZodBsda> {
   const contextualSchema = getContextualBsdaSchema(validationContext);
 
@@ -47,16 +46,13 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
             .filter(Boolean)
         : undefined;
 
-      if (validationContext.enableSirenification) {
-        val = await sirenify(val, sealedFields);
+      if (validationContext.enableCompletionTransformers) {
+        val = await runTransformers(val, sealedFields);
       }
-
-      val = await runTransformers(val);
 
       return val;
     })
     .superRefine(async (val, ctx) => {
-      // Fields validation
       for (const [field, rule] of sealedRules) {
         if (rule.superRefineWhenSealed instanceof Function) {
           // @ts-expect-error TODO: superRefineWhenSealed first param is inferred as never ?
@@ -74,7 +70,8 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
             : `Le champ ${field}`;
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `${description} est obligatoire.`
+            path: [`${field}`],
+            message: `${description} est obligatoire.${rule.suffix ?? ""}`
           });
         }
       }
@@ -82,6 +79,29 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
       // Custom validation, not part of the schema because it depends on the validationContext
       if (validationContext.enablePreviousBsdasChecks) {
         await validatePreviousBsdas(val, ctx);
+      }
+
+      await validateDestination(
+        val,
+        validationContext.currentSignatureType,
+        ctx
+      );
+
+      // Plates are mandatory at transporter signature's step
+      if (validationContext.currentSignatureType === "TRANSPORT") {
+        const { transporterTransportMode, transporterTransportPlates } = val;
+
+        if (
+          transporterTransportMode === "ROAD" &&
+          (!transporterTransportPlates ||
+            !transporterTransportPlates?.filter(p => Boolean(p)).length)
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "La plaque d'immatriculation est requise",
+            path: ["transporterTransportPlates"]
+          });
+        }
       }
     });
 }
@@ -221,5 +241,44 @@ async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
         fatal: true
       });
     }
+  }
+}
+
+/**
+ * Destination is editable until TRANSPORT.
+ * But afer EMISSION, if you change the destination, the current destination must become the nextDestination.
+ *
+ * @param bsda
+ * @param currentSignatureType
+ * @param ctx
+ */
+async function validateDestination(
+  bsda: ZodBsda,
+  currentSignatureType: BsdaSignatureType | undefined,
+  ctx: RefinementCtx
+) {
+  // If the bsda has no signature, fields are freeely editable.
+  // If the bsda is already transported, fields are not editable.
+  if (
+    currentSignatureType === undefined ||
+    currentSignatureType === "OPERATION"
+  ) {
+    return;
+  }
+
+  const { findUnique } = getReadonlyBsdaRepository();
+  const currentBsda = await findUnique({ id: bsda.id });
+
+  if (
+    currentBsda &&
+    currentBsda.destinationCompanySiret !== bsda.destinationCompanySiret &&
+    bsda.destinationOperationNextDestinationCompanySiret !==
+      currentBsda.destinationCompanySiret
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comment destination finale.`,
+      fatal: true
+    });
   }
 }

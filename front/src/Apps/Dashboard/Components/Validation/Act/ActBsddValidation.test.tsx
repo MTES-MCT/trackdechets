@@ -98,7 +98,7 @@ describe("ActBsddValidation", () => {
 
     await waitFor(async () => {
       expect(
-        await screen.getByText("Valider la réception")
+        await screen.getByText("Signer en tant qu'émetteur")
       ).toBeInTheDocument();
     });
   });
@@ -127,7 +127,7 @@ describe("ActBsddValidation", () => {
     expect(screen.getByText("Signer en tant qu'émetteur")).toBeInTheDocument();
   });
 
-  it("renders with expected text when status is Sealed and user is emitter and emitter type is Appendix1Producer and there is an ecoOrganisme", () => {
+  it("renders with expected text when status is Sealed and is emitter and transporter and is Appendix1Producer and there is an ecoOrganisme", () => {
     const currentSiret = "12345678901234";
     const appendix1ProducerSealedBsdEcoOrg = {
       id: "1",
@@ -136,6 +136,9 @@ describe("ActBsddValidation", () => {
       emitter: {
         company: { siret: "12345678901234" },
         type: "APPENDIX1_PRODUCER",
+      },
+      transporter: {
+        company: { siret: "12345678901234" },
       },
     } as Form;
     render(

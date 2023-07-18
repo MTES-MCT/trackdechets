@@ -5,7 +5,8 @@ import {
   userWithCompanyFactory,
   companyFactory,
   siretify,
-  getDestinationCompanyInfo
+  getDestinationCompanyInfo,
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -198,11 +199,6 @@ describe("Mutation.createDasri", () => {
           siret: company.siret
         },
         customInfo: null,
-        recepisse: {
-          department: "26",
-          number: "N°99999",
-          validityLimit: "2022-06-06T22:00:00"
-        },
         transport: {
           acceptation: null,
           handedOverAt: null,
@@ -252,6 +248,150 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.type).toEqual("SIMPLE");
 
     expect(data.createBsdasri.emitter!.company!.siret).toEqual(company.siret);
+  });
+
+  it("should create a dasri and autocomplete transporter recepisse", async () => {
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({
+      company: transporter
+    });
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      transporter: {
+        company: {
+          address: "5, route du dasri",
+          contact: "-",
+          mail: "_@email.indisponible",
+          name: "Transporteur de dasris",
+          phone: "-",
+          siret: transporter.siret
+        },
+        customInfo: null,
+        transport: {
+          acceptation: null,
+          handedOverAt: null,
+          mode: null,
+          packagings: [],
+          plates: [],
+          takenOverAt: null,
+          weight: {}
+        }
+      },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          // email not required
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      ...(await getDestinationCompanyInfo())
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(data.createBsdasri.transporter!.recepisse!.number).toEqual(
+      "the number"
+    );
+    expect(data.createBsdasri.transporter!.recepisse!.department).toEqual("83");
+    expect(data.createBsdasri.transporter!.recepisse!.validityLimit).toEqual(
+      "2055-01-01T00:00:00.000Z"
+    );
+  });
+
+  it("create a dasri and ignore recepisse input", async () => {
+    // transporter has no recepisse
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      transporter: {
+        company: {
+          address: "5, route du dasri",
+          contact: "-",
+          mail: "_@email.indisponible",
+          name: "Transporteur de dasris",
+          phone: "-",
+          siret: transporter.siret
+        },
+        customInfo: null,
+        recepisse: {
+          department: "83",
+          number: "N°99999",
+          validityLimit: "2022-06-06T22:00:00"
+        },
+        transport: {
+          acceptation: null,
+          handedOverAt: null,
+          mode: null,
+          packagings: [],
+          plates: [],
+          takenOverAt: null,
+          weight: {}
+        }
+      },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          // email not required
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      ...(await getDestinationCompanyInfo())
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    // recepissé input was ignored
+    expect(data.createBsdasri.transporter!.recepisse).toEqual(null);
   });
 });
 

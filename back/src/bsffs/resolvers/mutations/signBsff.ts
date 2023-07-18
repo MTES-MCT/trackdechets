@@ -29,6 +29,7 @@ import {
   getBsffRepository
 } from "../../repository";
 import { checkCanSignFor } from "../../../permissions";
+import { getTransporterReceipt } from "../../../bsdasris/recipify";
 
 const signBsff: MutationResolvers["signBsff"] = async (
   _,
@@ -135,7 +136,8 @@ async function signTransport(
   bsff: Bsff & { packagings: BsffPackaging[] },
   input: BsffSignatureInput
 ) {
-  await validateBeforeTransport(bsff);
+  const transporterReceipt = await getTransporterReceipt(bsff);
+  await validateBeforeTransport({ ...bsff, ...transporterReceipt });
 
   const { update: updateBsff } = getBsffRepository(user);
 
@@ -144,7 +146,8 @@ async function signTransport(
     data: {
       status: BsffStatus.SENT,
       transporterTransportSignatureDate: input.date,
-      transporterTransportSignatureAuthor: input.author
+      transporterTransportSignatureAuthor: input.author,
+      ...transporterReceipt
     }
   });
 }

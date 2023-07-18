@@ -214,6 +214,8 @@ type BsffTransporterRecepisse {
   department: String
   "Date limite de validité du récépissé."
   validityLimit: DateTime
+  "Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement)"
+  isExempted: Boolean
 }
 type BsffTransport {
   "Date de prise en charge"

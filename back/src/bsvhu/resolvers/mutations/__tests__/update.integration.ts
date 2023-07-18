@@ -4,7 +4,8 @@ import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 import {
   companyFactory,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -42,6 +43,8 @@ mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
       }
       recepisse {
         number
+        department
+        validityLimit
       }
     }
     weight {
@@ -227,5 +230,82 @@ describe("Mutation.Vhu.update", () => {
     expect(data.updateBsvhu.transporter!.company!.vatNumber).toBe(
       foreignTransporter.vatNumber
     );
+  });
+
+  it("should update transporter recepisse with data pulled from db", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({
+      company: transporter
+    });
+    const form = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureAuthor: "The Signatory",
+        emitterEmissionSignatureDate: new Date(),
+        transporterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const input = {
+      transporter: {
+        company: { siret: transporter.siret }
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: form.id, input }
+      }
+    );
+
+    // recepisse is pulled from db
+    expect(data.updateBsvhu.transporter!.recepisse!.number).toEqual(
+      "the number"
+    );
+    expect(data.updateBsvhu.transporter!.recepisse!.department).toEqual("83");
+    expect(data.updateBsvhu.transporter!.recepisse!.validityLimit).toEqual(
+      "2055-01-01T00:00:00.000Z"
+    );
+  });
+
+  it("should empty transporter recepisse with data pulled from db", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    // no associated receipt
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const form = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureAuthor: "The Signatory",
+        emitterEmissionSignatureDate: new Date(),
+        transporterCompanySiret: company.siret,
+        transporterRecepisseNumber: "xyz",
+        transporterRecepisseDepartment: "13",
+        transporterRecepisseValidityLimit: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const input = {
+      transporter: {
+        company: { siret: transporter.siret }
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: form.id, input }
+      }
+    );
+
+    // recepisse is pulled from db
+    expect(data.updateBsvhu.transporter!.recepisse).toEqual(null);
   });
 });

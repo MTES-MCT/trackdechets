@@ -16,7 +16,7 @@ describe("Mutation.signBsdasri emission", () => {
   let foreignTransporter: Company;
 
   beforeEach(async () => {
-    const emitter = await companyFactory();
+    const emitter = await companyFactory({ companyTypes: ["PRODUCER"] });
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
     foreignTransporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -108,6 +108,29 @@ describe("Mutation.signBsdasri emission", () => {
       });
       expect(validated).toBeDefined();
     });
+
+    it("transporter plate is not required if transport mode is not ROAD", async () => {
+      const data = {
+        ...bsdasri,
+        transporterTransportMode: "AIR"
+      };
+      const validated = await validateBsdasri(data as any, {
+        transportSignature: true
+      });
+      expect(validated).toBeDefined();
+    });
+
+    it("should work if transport mode is ROAD & plates are defined", async () => {
+      const data = {
+        ...bsdasri,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: ["TRANSPORTER-PLATES"]
+      };
+      const validated = await validateBsdasri(data as any, {
+        transportSignature: true
+      });
+      expect(validated).toBeDefined();
+    });
   });
 
   describe("BSDASRI should not be valid", () => {
@@ -129,11 +152,13 @@ describe("Mutation.signBsdasri emission", () => {
           transportSignature: true
         });
       } catch (err) {
-        expect(err.errors).toEqual([
-          "Transporteur: le département associé au récépissé est obligatoire",
-          "Transporteur: le numéro de récépissé est obligatoire",
-          "Transporteur: la date limite de validité du récépissé est obligatoire"
-        ]);
+        expect(err.errors).toEqual(
+          expect.arrayContaining([
+            "Transporteur: le département associé au récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets",
+            "Transporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets",
+            "Transporteur: la date limite de validité du récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+          ])
+        );
       }
     });
 
@@ -342,6 +367,84 @@ describe("Mutation.signBsdasri emission", () => {
             " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc" +
             " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil" +
             " de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        ]);
+      }
+    });
+
+    it("transporter plate is required if transporter mode is ROAD", async () => {
+      const data = {
+        ...bsdasri,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: undefined
+      };
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data as any, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual(["La plaque d'immatriculation est requise"]);
+      }
+    });
+
+    it.each(["", null, [], [""], [null], [undefined]])(
+      "transporter plate is required if transporter mode is ROAD - invalid values",
+      async invalidValue => {
+        const data = {
+          ...bsdasri,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: invalidValue
+        };
+        expect.assertions(1);
+
+        try {
+          await validateBsdasri(data as any, {
+            transportSignature: true
+          });
+        } catch (err) {
+          expect(err.errors.length).toBeTruthy();
+        }
+      }
+    );
+  });
+
+  describe("Emitter transports own waste", () => {
+    it("allowed if exemption", async () => {
+      const data = {
+        ...bsdasri,
+        transporterCompanySiret: bsdasri.emitterCompanySiret,
+        transporterRecepisseIsExempted: true
+      };
+
+      expect.assertions(1);
+
+      const validated = await validateBsdasri(data as any, {
+        transportSignature: true
+      });
+
+      expect(validated).toBeDefined();
+    });
+
+    it("NOT allowed if no exemption", async () => {
+      const data = {
+        ...bsdasri,
+        transporterCompanySiret: bsdasri.emitterCompanySiret,
+        transporterRecepisseIsExempted: false
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data as any, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          `Le transporteur saisi sur le bordereau (SIRET: ${bsdasri.emitterCompanySiret}) n'est pas inscrit sur Trackdéchets` +
+            ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
+            ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
+            ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
         ]);
       }
     });

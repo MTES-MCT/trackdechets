@@ -7,11 +7,15 @@ import { InfoIconCode } from "../InfoWithIcon/infoWithIconTypes";
 import { BsdCardProps } from "./bsdCardTypes";
 import WasteDetails from "../WasteDetails/WasteDetails";
 import {
+  canEditCustomInfoOrTransporterNumberlate,
   canPublishBsd,
   getBsdView,
   getPrimaryActionsLabelFromBsdStatus,
   getPrimaryActionsReviewsLabel,
   getWorkflowLabel,
+  isBsdasri,
+  isBsff,
+  isBsvhu,
 } from "../../dashboardServices";
 import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditionalActionsButton";
 import Actors from "../Actors/Actors";
@@ -35,13 +39,13 @@ import {
 import { Loader } from "Apps/common/Components";
 import { BsdDisplay } from "Apps/common/types/bsdTypes";
 import DeleteModal from "../DeleteModal/DeleteModal";
-import { IconWeight } from "common/components/Icons";
 
 function BsdCard({
   bsd,
   bsdCurrentTab,
   currentSiret,
   onValidate,
+  onEditTransportInfo,
   secondaryActions: {
     onOverview,
     onUpdate,
@@ -49,9 +53,12 @@ function BsdCard({
     onBsdSuite,
     onAppendix1,
     onDeleteReview,
+    onEmitterDasriSign,
   },
 }: BsdCardProps) {
   const isReviewsTab = bsdCurrentTab === "reviewsTab";
+  const isToCollectTab = bsdCurrentTab === "toCollectTab";
+  const isCollectedTab = bsdCurrentTab === "collectedTab";
   const bsdDisplay = getBsdView(bsd);
 
   const options = {
@@ -120,6 +127,12 @@ function BsdCard({
   ) => {
     onValidate(bsd);
   };
+  const handleEditableInfoClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    infoName: string
+  ) => {
+    onEditTransportInfo!(bsd, infoName);
+  };
 
   const onPdf = (bsd: BsdDisplay) => {
     if (bsd.type === BsdType.Bsdd) {
@@ -172,6 +185,9 @@ function BsdCard({
       : bsdDisplay?.transporter?.company?.name;
 
   const transporterName = transporterNameEmmiter || "Non renseigné";
+
+  const unitOfMeasure =
+    isBsdasri(bsdDisplay?.type!) || isBsff(bsdDisplay?.type!) ? "kg" : "t";
   return (
     <>
       <div className="bsd-card" tabIndex={0}>
@@ -197,6 +213,43 @@ function BsdCard({
                 {bsdDisplay?.emittedByEcoOrganisme && (
                   <InfoWithIcon labelCode={InfoIconCode.EcoOrganism} />
                 )}
+                {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
+                  (isCollectedTab &&
+                    Boolean(bsdDisplay?.transporterCustomInfo?.length))) && (
+                  <InfoWithIcon
+                    labelCode={InfoIconCode.CustomInfo}
+                    editableInfos={{
+                      customInfo: bsdDisplay?.transporterCustomInfo,
+                    }}
+                    hasEditableInfos
+                    isDisabled={
+                      isCollectedTab ||
+                      !canEditCustomInfoOrTransporterNumberlate(bsdDisplay)
+                    }
+                    onClick={e =>
+                      handleEditableInfoClick(e, "transporterCustomInfo")
+                    }
+                  />
+                )}
+                {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
+                  (isCollectedTab &&
+                    Boolean(bsdDisplay?.transporterNumberPlate?.length))) && (
+                  <InfoWithIcon
+                    labelCode={InfoIconCode.TransporterNumberPlate}
+                    editableInfos={{
+                      transporterNumberPlate:
+                        bsdDisplay?.transporterNumberPlate,
+                    }}
+                    hasEditableInfos
+                    isDisabled={
+                      isCollectedTab ||
+                      !canEditCustomInfoOrTransporterNumberlate(bsdDisplay)
+                    }
+                    onClick={e =>
+                      handleEditableInfoClick(e, "transporterNumberPlate")
+                    }
+                  />
+                )}
               </div>
             </div>
             <div className="bsd-card__content">
@@ -208,19 +261,17 @@ function BsdCard({
                     bsdType={bsdDisplay.type}
                     reviewStatus={bsdDisplay?.review?.status}
                   />
-                  {!isReviewsTab &&
-                    Boolean(bsdDisplay.wasteDetails?.weight) && (
-                      <p className="bsd-card__content__infos__weight">
-                        <IconWeight />
-                        <span>{bsdDisplay.wasteDetails.weight} t</span>
-                      </p>
-                    )}
                 </div>
                 <div className="bsd-card__content__infos__other">
                   <WasteDetails
                     wasteType={bsdDisplay.type}
                     code={bsdDisplay.wasteDetails.code!}
                     name={bsdDisplay.wasteDetails.name!}
+                    weight={
+                      Boolean(bsdDisplay.wasteDetails?.weight)
+                        ? `${bsdDisplay.wasteDetails.weight} ${unitOfMeasure}`
+                        : ""
+                    }
                   />
 
                   <Actors
@@ -268,8 +319,11 @@ function BsdCard({
                     onAppendix1,
                     onBsdSuite,
                     onDeleteReview,
+                    onEmitterDasriSign,
                   }}
                   hideReviewCta={isReviewsTab}
+                  isToCollectTab={isToCollectTab}
+                  isCollectedTab={isCollectedTab}
                 />
               </div>
             </div>

@@ -1,10 +1,5 @@
 import * as React from "react";
-import {
-  generatePath,
-  useParams,
-  useLocation,
-  useRouteMatch,
-} from "react-router-dom";
+import { generatePath, useParams, useLocation } from "react-router-dom";
 
 import routes from "Apps/routes";
 import {
@@ -65,16 +60,15 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   const canRequestRevision =
     ![FormStatus.Draft, FormStatus.Sealed, FormStatus.Refused].includes(
       form.status
-    ) && !isAppendix1Producer;
-
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
-  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
+    ) &&
+    !isAppendix1Producer &&
+    !form.emitter?.isPrivateIndividual;
 
   const links = [
     {
       title: "Contrôle routier",
       route: {
-        pathname: generatePath(routes[dashboardRoutePrefix].roadControl, {
+        pathname: generatePath(routes.dashboard.roadControl, {
           siret,
           id: form.id,
         }),
@@ -86,7 +80,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     {
       title: "Aperçu",
       route: {
-        pathname: generatePath(routes[dashboardRoutePrefix].bsdds.view, {
+        pathname: generatePath(routes.dashboard.bsdds.view, {
           siret,
           id: form.id,
         }),
@@ -98,7 +92,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     {
       title: "Annexe 1",
       route: {
-        pathname: generatePath(routes[dashboardRoutePrefix].bsdds.view, {
+        pathname: generatePath(routes.dashboard.bsdds.view, {
           siret,
           id: form.id,
         }),
@@ -127,7 +121,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     },
     {
       title: "Modifier",
-      route: generatePath(routes[dashboardRoutePrefix].bsdds.edit, {
+      route: generatePath(routes.dashboard.bsdds.edit, {
         siret,
         id: form.id,
       }),
@@ -137,7 +131,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     {
       title: "Révision",
       route: {
-        pathname: generatePath(routes[dashboardRoutePrefix].bsdds.review, {
+        pathname: generatePath(routes.dashboard.bsdds.review, {
           siret,
           id: form.id,
         }),

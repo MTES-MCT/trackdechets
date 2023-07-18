@@ -29,11 +29,21 @@ import ActBsvhuValidation from "Apps/Dashboard/Components/Validation/Act/ActBsvh
 import { BsdDisplay, BsdWithReview } from "Apps/common/types/bsdTypes";
 import { BsddCancelRevision } from "dashboard/components/RevisionRequestList/bsdd/approve/BsddCancelRevision";
 import { BsdaCancelRevision } from "dashboard/components/RevisionRequestList/bsda/approve/BsdaCancelRevision";
-import { canApproveOrRefuseReview } from "Apps/Dashboard/dashboardServices";
+import {
+  canApproveOrRefuseReview,
+  hasEmportDirect,
+  hasRoadControlButton,
+  isSynthesis,
+} from "Apps/Dashboard/dashboardServices";
 import { BsddApproveRevision } from "dashboard/components/RevisionRequestList/bsdd/approve";
 import { BsdaApproveRevision } from "dashboard/components/RevisionRequestList/bsda/approve/BsdaApproveRevision";
 import { BsddConsultRevision } from "dashboard/components/RevisionRequestList/bsdd/approve/BsddConsultRevision";
 import { BsdaConsultRevision } from "dashboard/components/RevisionRequestList/bsda/approve/BsdaConsultRevision";
+import { default as TransporterInfoEditBsdd } from "dashboard/components/BSDList/BSDD/TransporterInfoEdit";
+import { TransporterInfoEdit as TransporterInfoEditBsda } from "dashboard/components/BSDList/BSDa/WorkflowAction/TransporterInfoEdit";
+import { UpdateTransporterCustomInfo } from "dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterCustomInfo";
+import { BsffFragment } from "dashboard/components/BSDList/BSFF";
+import { UpdateTransporterPlates } from "dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterPlates";
 
 function BsdCardList({
   siret,
@@ -43,6 +53,9 @@ function BsdCardList({
   const history = useHistory();
   const location = useLocation();
   const isReviewsTab = bsdCurrentTab === "reviewsTab";
+  const isActTab = bsdCurrentTab === "actTab";
+  const isToCollectTab = bsdCurrentTab === "toCollectTab";
+  const isCollectedTab = bsdCurrentTab === "collectedTab";
 
   const redirectToPath = useCallback(
     (path, id) => {
@@ -67,6 +80,8 @@ function BsdCardList({
 
   const onClose = () => {
     setIsModalOpen(false);
+    setBsdClicked(undefined);
+    setValidationWorkflowType("");
   };
 
   const handleDraftValidation = useCallback(
@@ -99,8 +114,34 @@ function BsdCardList({
     (bsd: Bsd) => {
       const status = bsd["bsdasriStatus"];
       if (status === BsdasriStatus.Initial) {
-        const path = routes.dashboardv2.bsdasris.sign.emission;
-        redirectToPath(path, bsd.id);
+        if (isActTab) {
+          const path = routes.dashboardv2.bsdasris.sign.emission;
+          redirectToPath(path, bsd.id);
+        }
+        if (isToCollectTab) {
+          const formattedBsdAsBsdDisplay = {
+            type: bsd.__typename?.toUpperCase(),
+            bsdWorkflowType: bsd["type"],
+            allowDirectTakeOver: bsd["allowDirectTakeOver"],
+            transporter: bsd.transporter || bsd["bsdasriTransporter"],
+          } as unknown as BsdDisplay;
+
+          if (
+            hasEmportDirect(formattedBsdAsBsdDisplay, siret, isToCollectTab)
+          ) {
+            const path = routes.dashboardv2.bsdasris.sign.directTakeover;
+            redirectToPath(path, bsd.id);
+          } else {
+            const path = routes.dashboardv2.bsdasris.sign.emissionSecretCode;
+            redirectToPath(path, bsd.id);
+          }
+          if (
+            isSynthesis(formattedBsdAsBsdDisplay.bsdWorkflowType?.toString())
+          ) {
+            const path = routes.dashboardv2.bsdasris.sign.synthesisTakeover;
+            redirectToPath(path, bsd.id);
+          }
+        }
       }
       if (status === BsdasriStatus.SignedByProducer) {
         const path = routes.dashboardv2.bsdasris.sign.transporter;
@@ -115,7 +156,7 @@ function BsdCardList({
         redirectToPath(path, bsd.id);
       }
     },
-    [redirectToPath]
+    [redirectToPath, isActTab, isToCollectTab, siret]
   );
 
   const handleActValidation = useCallback(
@@ -190,18 +231,54 @@ function BsdCardList({
         if (bsd.status === FormStatus.Draft || bsd["isDraft"]) {
           handleDraftValidation(bsd as Bsd);
         } else {
-          handleActValidation(bsd as Bsd);
+          if (
+            hasRoadControlButton(
+              { status: bsd.status } as BsdDisplay,
+              isCollectedTab
+            )
+          ) {
+            const path = routes.dashboardv2.roadControl;
+            redirectToPath(path, bsd.id);
+          } else {
+            handleActValidation(bsd as Bsd);
+          }
         }
       }
     },
     [
       isReviewsTab,
+      isCollectedTab,
       siret,
       handleDraftValidation,
       handleActValidation,
       handleReviewsValidation,
+      redirectToPath,
     ]
   );
+
+  const handleEditTransportInfo = useCallback((bsd: Bsd, infoName: string) => {
+    if (bsd.__typename === "Form") {
+      if (infoName === "transporterCustomInfo") {
+        setValidationWorkflowType("UPDATE_CUSTOM_INFO_BSDD");
+      } else if (infoName === "transporterNumberPlate") {
+        setValidationWorkflowType("UPDATE_PLATE_INFO_BSDD");
+      }
+    }
+
+    if (bsd.__typename === "Bsda") {
+      setValidationWorkflowType("UPDATE_INFO_BSDA");
+    }
+    if (bsd.__typename === "Bsff") {
+      if (infoName === "transporterCustomInfo") {
+        setValidationWorkflowType("UPDATE_CUSTOM_INFO_BSFF");
+      } else {
+        setValidationWorkflowType("UPDATE_CUSTOM_PLATE_BSFF");
+      }
+    }
+
+    setBsdClicked(bsd);
+    setIsModalOpen(true);
+  }, []);
 
   const onBsdUpdate = useCallback(
     (bsd: BsdDisplay) => {
@@ -255,6 +332,14 @@ function BsdCardList({
     setIsModalOpen(true);
   }, []);
 
+  const onEmitterDasriSign = useCallback(
+    (bsd: BsdDisplay) => {
+      const path = routes.dashboardv2.bsdasris.sign.emissionSecretCode;
+      redirectToPath(path, bsd.id);
+    },
+    [redirectToPath]
+  );
+
   return (
     <>
       <ul className="bsd-card-list">
@@ -286,6 +371,7 @@ function BsdCardList({
                 currentSiret={siret}
                 bsdCurrentTab={bsdCurrentTab}
                 onValidate={onBsdValidation}
+                onEditTransportInfo={handleEditTransportInfo}
                 secondaryActions={{
                   onUpdate: onBsdUpdate,
                   onOverview: onBsdOverview,
@@ -293,6 +379,7 @@ function BsdCardList({
                   onBsdSuite,
                   onAppendix1,
                   onDeleteReview,
+                  onEmitterDasriSign,
                 }}
               />
             </li>
@@ -392,6 +479,45 @@ function BsdCardList({
         <BsdaConsultRevision
           // @ts-ignore
           review={bsdClicked}
+          isModalOpenFromParent={isModalOpen}
+          onModalCloseFromParent={onClose}
+        />
+      )}
+      {validationWorkflowType === "UPDATE_CUSTOM_INFO_BSDD" && (
+        <TransporterInfoEditBsdd
+          fieldName="customInfo"
+          verboseFieldName="champ libre"
+          form={bsdClicked as Form}
+          isModalOpenFromParent={isModalOpen}
+          onModalCloseFromParent={onClose}
+        />
+      )}
+      {validationWorkflowType === "UPDATE_CUSTOM_INFO_BSFF" && (
+        <UpdateTransporterCustomInfo
+          bsff={bsdClicked as unknown as BsffFragment}
+          isModalOpenFromParent={isModalOpen}
+          onModalCloseFromParent={onClose}
+        />
+      )}
+      {validationWorkflowType === "UPDATE_PLATE_INFO_BSDD" && (
+        <TransporterInfoEditBsdd
+          fieldName="numberPlate"
+          verboseFieldName="plaque d'immatriculation"
+          form={bsdClicked as Form}
+          isModalOpenFromParent={isModalOpen}
+          onModalCloseFromParent={onClose}
+        />
+      )}
+      {validationWorkflowType === "UPDATE_CUSTOM_PLATE_BSFF" && (
+        <UpdateTransporterPlates
+          bsff={bsdClicked as unknown as BsffFragment}
+          isModalOpenFromParent={isModalOpen}
+          onModalCloseFromParent={onClose}
+        />
+      )}
+      {validationWorkflowType === "UPDATE_INFO_BSDA" && (
+        <TransporterInfoEditBsda
+          bsda={bsdClicked as Bsda}
           isModalOpenFromParent={isModalOpen}
           onModalCloseFromParent={onClose}
         />

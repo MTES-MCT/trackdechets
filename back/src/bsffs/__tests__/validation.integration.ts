@@ -9,7 +9,8 @@ import {
   wasteDetailsSchemaFn,
   acceptationSchema,
   operationSchema,
-  ficheInterventionSchema
+  ficheInterventionSchema,
+  validateBsff
 } from "../validation";
 
 describe("emitterSchema", () => {
@@ -63,14 +64,16 @@ describe("transporterSchema", () => {
 
   beforeAll(async () => {
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
-
     transporterData = {
       transporterCompanyName: "Transporteur",
       transporterCompanySiret: transporter.siret,
       transporterCompanyAddress: "10 chemin fluide, 13001 Marseille",
       transporterCompanyContact: "John Clim",
       transporterCompanyPhone: "06 67 78 95 88",
-      transporterCompanyMail: "john@clim.com"
+      transporterCompanyMail: "john@clim.com",
+      transporterRecepisseNumber: "receiptNumber",
+      transporterRecepisseDepartment: "25",
+      transporterRecepisseValidityLimit: new Date()
     };
   });
 
@@ -107,6 +110,40 @@ describe("transporterSchema", () => {
     await expect(validateFn()).rejects.toThrow(
       "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
     );
+  });
+
+  test("missing Receipt", async () => {
+    expect.assertions(1);
+    try {
+      await validateBsff(
+        {
+          ...transporterData,
+          transporterRecepisseNumber: null,
+          transporterRecepisseDepartment: null,
+          transporterRecepisseValidityLimit: null
+        },
+        {
+          isDraft: false,
+          transporterSignature: true
+        }
+      );
+    } catch (err) {
+      expect(err.message).toEqual(
+        "Erreur de validation des données. Des champs sont manquants ou mal formatés : \nDestination : le nom de l'établissement est requis\nDestination : le numéro SIRET est requis\nDestination : l'adresse de l'établissement est requise\nDestination : le nom du contact est requis\nDestination : le numéro de téléphone est requis\nDestination : l'adresse email est requise\nLe code de l'opération de traitement prévu est requis\nTransporteur: le département associé au récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets\nTransporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets\nTransporteur: la date limite de validité du récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets\nLe code déchet est requis\nLa dénomination usuelle du déchet est obligatoire\nLa mention ADR est requise\nLe poids total est requis\nLe type de poids (estimé ou non) est un requis\nÉmetteur : le nom de l'établissement est requis\nÉmetteur : le n°SIRET de l'établissement est requis\nÉmetteur : l'adresse de l'établissement est requise\nÉmetteur : le nom du contact est requis\nÉmetteur : le numéro de téléphone est requis\nÉmetteur : l'adresse email est requise"
+      );
+    }
+  });
+
+  test("valid data with transporter receipt exemption", async () => {
+    expect(
+      await transporterSchema.isValid({
+        ...transporterData,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseNumber: null,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseValidityLimit: null
+      })
+    ).toEqual(true);
   });
 
   test("missing SIRET and FR VAT", async () => {
@@ -216,6 +253,103 @@ describe("transporterSchema", () => {
     await expect(validateFn()).rejects.toThrow(
       "Transporteur : l'adresse email est invalide"
     );
+  });
+
+  it("transporter plate is required if transporter mode is ROAD", async () => {
+    const bsff = {
+      ...transporterData,
+      transporterTransportMode: "ROAD",
+      transporterTransportPlates: undefined
+    };
+    expect.assertions(1);
+
+    try {
+      await transporterSchema.validate(bsff);
+    } catch (err) {
+      expect(err.errors).toEqual(["La plaque d'immatriculation est requise"]);
+    }
+  });
+
+  it.each(["", null, [], [""], [null], [undefined]])(
+    "transporter plate is required if transporter mode is ROAD - invalid values",
+    async invalidValue => {
+      const bsff = {
+        ...transporterData,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: invalidValue
+      };
+      expect.assertions(1);
+
+      try {
+        await transporterSchema.validate(bsff);
+      } catch (err) {
+        expect(err.errors.length).toBeTruthy();
+      }
+    }
+  );
+
+  it("transporter plate is not required if transport mode is not ROAD", async () => {
+    const bsff = {
+      ...transporterData,
+      transporterTransportMode: "AIR"
+    };
+
+    const validated = await transporterSchema.isValid(bsff);
+    expect(validated).toBeDefined();
+  });
+
+  it("should work if transport mode is ROAD & plates are defined", async () => {
+    const bsff = {
+      ...transporterData,
+      transporterTransportMode: "ROAD",
+      transporterTransportPlates: ["TRANSPORTER-PLATES"]
+    };
+    const validated = await transporterSchema.isValid(bsff);
+    expect(validated).toBeDefined();
+  });
+
+  describe("Emitter transports own waste", () => {
+    it("allowed if exemption", async () => {
+      const emitterAndTransporter = await companyFactory({
+        companyTypes: ["PRODUCER"]
+      });
+
+      const bsff = {
+        ...transporterData,
+        emitterCompanySiret: emitterAndTransporter.siret,
+        transporterCompanySiret: emitterAndTransporter.siret,
+        wasteDetailsCode: "16 06 01*",
+        wasteDetailsQuantity: 10,
+        transporterRecepisseIsExempted: true
+      };
+
+      expect.assertions(1);
+
+      const isValid = await transporterSchema.isValid(bsff);
+
+      expect(isValid).toBe(true);
+    });
+
+    it("NOT allowed if no exemption", async () => {
+      const emitterAndTransporter = await companyFactory({
+        companyTypes: ["PRODUCER"]
+      });
+
+      const bsff = {
+        ...transporterData,
+        emitterCompanySiret: emitterAndTransporter.siret,
+        transporterCompanySiret: emitterAndTransporter.siret,
+        wasteDetailsCode: "16 06 01*",
+        wasteDetailsQuantity: 10,
+        transporterRecepisseIsExempted: false
+      };
+
+      expect.assertions(1);
+
+      const isValid = await transporterSchema.isValid(bsff);
+
+      expect(isValid).toBe(false);
+    });
   });
 });
 

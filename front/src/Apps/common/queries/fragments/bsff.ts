@@ -145,6 +145,7 @@ export const FullBsffFragment = gql`
         number
         department
         validityLimit
+        isExempted
       }
       transport {
         mode

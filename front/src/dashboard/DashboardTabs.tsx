@@ -1,9 +1,10 @@
 import React from "react";
 import { generatePath, NavLink, useHistory } from "react-router-dom";
-import { CompanyPrivate, CompanyType } from "generated/graphql/types";
+import { CompanyPrivate } from "generated/graphql/types";
 import DashboardCompanySelector from "./DashboardCompanySelector";
 import routes from "Apps/routes";
 import "./DashboardTabs.scss";
+import { useShowTransportTabs } from "./transport/hooks/useShowTransportTabs";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;
@@ -15,6 +16,11 @@ export function DashboardTabs({
   companies,
 }: DashboardTabsProps) {
   const history = useHistory();
+
+  const { showTransportTabs } = useShowTransportTabs(
+    currentCompany.companyTypes,
+    currentCompany.siret
+  );
 
   return (
     <>
@@ -98,7 +104,7 @@ export function DashboardTabs({
           </li>
         </ul>
 
-        {currentCompany.companyTypes.includes(CompanyType.Transporter) && (
+        {showTransportTabs && (
           <>
             <p className="sidebar__chapter ">Transport</p>
             <ul>

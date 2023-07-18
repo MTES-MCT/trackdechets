@@ -23,6 +23,7 @@ const consoleBackend = {
   },
   addContact: function (contact: Contact) {
     this.log(contact);
+    return Promise.resolve();
   }
 };
 

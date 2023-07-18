@@ -727,12 +727,13 @@ model User {
   StatusLog             StatusLog[]
   UserActivationHash    UserActivationHash[]
   UserResetPasswordHash UserResetPasswordHash[]
+  PdfAccessToken        PdfAccessToken[]
+  featureFlags          FeatureFlag[]
 
-  bsdasriEmissionSignatures  Bsdasri[]        @relation("BsdasriEmissionSignature")
-  bsdasriTransportSignatures Bsdasri[]        @relation("BsdasriTransportSignature")
-  bsdasriReceptionSignatures Bsdasri[]        @relation("BsdasriReceptionSignature")
-  bsdasriOperationignatures  Bsdasri[]        @relation("BsdasriOperationSignature")
-  PdfAccessToken             PdfAccessToken[]
+  bsdasriEmissionSignatures  Bsdasri[] @relation("BsdasriEmissionSignature")
+  bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
+  bsdasriReceptionSignatures Bsdasri[] @relation("BsdasriReceptionSignature")
+  bsdasriOperationignatures  Bsdasri[] @relation("BsdasriOperationSignature")
 }
 
 model UserAccountHash {
@@ -769,6 +770,16 @@ model UserResetPasswordHash {
   user        User     @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "_UserResetPasswordHashIdIdx")
+}
+
+model FeatureFlag {
+  id      String  @id @default(cuid())
+  name    String
+  enabled Boolean @default(false)
+  userId  String
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([name, userId])
 }
 
 // ----------------
@@ -1015,9 +1026,9 @@ model Bsdasri {
   synthesizedInId                             String?
 
   // Denormalized fields, storing associated dasri sirets to speed up some queries
-  // Emitter sirets list in case of synthesis bsd 
+  // Emitter sirets list in case of synthesis bsd
   synthesisEmitterSirets String[] @default([])
-  // Emitter sirets list in case of grouping bsd 
+  // Emitter sirets list in case of grouping bsd
   groupingEmitterSirets  String[] @default([])
 
   // partial indices _BsdasriTypeIdx, _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
@@ -1081,6 +1092,7 @@ model Bsff {
   transporterRecepisseNumber        String?
   transporterRecepisseDepartment    String?
   transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
+  transporterRecepisseIsExempted      Boolean?
 
   transporterTransportMode            TransportMode? @default(ROAD)
   transporterTransportPlates          String[]

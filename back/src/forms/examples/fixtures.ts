@@ -50,17 +50,9 @@ function transporter2CompanyInput(siret: string) {
   };
 }
 
-const receiptInput = {
-  receipt: "12379",
-  department: "07",
-  validityLimit: "2020-06-30T00:00:00.000",
-  numberPlate: "AD-007-TS"
-};
-
 function transporterInput(siret: string) {
   return {
-    company: transporterCompanyInput(siret),
-    ...receiptInput
+    company: transporterCompanyInput(siret)
   };
 }
 
@@ -185,8 +177,7 @@ function resealedInfosInput(siret: string) {
 function nextSegmentInfoInput(siret: string) {
   return {
     transporter: {
-      company: transporter2CompanyInput(siret),
-      ...receiptInput
+      company: transporter2CompanyInput(siret)
     },
     mode: "RAIL"
   };
@@ -209,7 +200,6 @@ export default {
   ttrInput,
   wasteDetailsInput,
   workSiteInput,
-  receiptInput,
   signEmissionFormInput,
   signTransportFormInput,
   receivedInfoInput,

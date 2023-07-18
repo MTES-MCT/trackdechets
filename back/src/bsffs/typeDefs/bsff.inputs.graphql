@@ -18,6 +18,8 @@ input BsffWhere {
   destination: BsffDestinationWhere
   "Filtre sur le conditionnement"
   packagings: BsffPackagingsWhere
+  "Filtre sur les fiches d'intervention"
+  ficheInterventions: BsffFicheInterventionWhere
   "ET logique"
   _and: [BsffWhere!]
   "OU logique"
@@ -103,6 +105,19 @@ input BsffPackagingOperationWhere {
 input BsffPackagingsWhere {
   numero: StringFilter
   bsff: BsffWhere
+}
+
+"Champs possibles pour le filtre sur le détenteur du fluide"
+input BsffDetenteurWhere {
+  company: CompanyWhere
+}
+
+"Champs possibles pour le filtre sur les fiches d'intervention"
+input BsffFicheInterventionWhere {
+  "Filtre sur le numero de fiche d'intervention"
+  numero: StringFilter
+  "Filtre sur le détenteur du fluide"
+  detenteur: BsffDetenteurWhere
 }
 
 input SignatureInput {
@@ -257,19 +272,21 @@ input BsffWeightInput {
 
 input BsffTransporterInput {
   company: CompanyInput
-  "Informations sur le récepissé transporteur."
+  "Informations sur le récepissé transporteur. Si 'null', l'exemption de récépissé est assumée (conformément aux dispositions de l'article R.541-50 du code de l'environnement)"
   recepisse: BsffTransporterRecepisseInput
   transport: BsffTransporterTransportInput
   "Champ libre"
   customInfo: String
 }
 input BsffTransporterRecepisseInput {
+  "Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement)"
+  isExempted: Boolean
   "Le cas échéant, numéro de récépissé mentionné à l'article R. 541-51 du code de l'environnement."
-  number: String
+  number: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
   "Le cas échéant, département de la déclaration mentionnée à l'article R. 541-50 du code de l'environnement."
-  department: String
+  department: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
   "Le cas échéant, limite de validité du récépissé."
-  validityLimit: DateTime
+  validityLimit: DateTime @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
 }
 input BsffTransporterTransportInput {
   "Date de prise en charge"

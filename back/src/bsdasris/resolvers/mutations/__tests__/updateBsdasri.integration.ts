@@ -7,31 +7,30 @@ import {
 import {
   userWithCompanyFactory,
   ecoOrganismeFactory,
-  companyFactory
+  companyFactory,
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 import * as sirenify from "../../../sirenify";
+import { fullGroupingBsdasriFragment } from "../../../fragments";
+import { gql } from "apollo-server-express";
 
 const sirenifyMock = jest
   .spyOn(sirenify, "default")
   .mockImplementation(input => Promise.resolve(input));
 
-const UPDATE_DASRI = `
-mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
-  updateBsdasri(id: $id, input: $input) {
-    id
-    status
-    type
-    emitter {
-       company {
-          mail
-        }
-      }
+const UPDATE_DASRI = gql`
+  ${fullGroupingBsdasriFragment}
+  mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
+    updateBsdasri(id: $id, input: $input) {
+      ...FullGroupingBsdasriFragment
+    }
   }
-}`;
+`;
+
 describe("Mutation.updateBsdasri", () => {
   afterEach(async () => {
     await resetDatabase();
@@ -204,6 +203,124 @@ describe("Mutation.updateBsdasri", () => {
       expect(sirenifyMock).toHaveBeenCalledTimes(1);
     }
   );
+
+  it("should update transporter recepisse with data pulled from db", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.INITIAL,
+        isDraft: true,
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: company.siret,
+        ...readyToPublishData(await companyFactory())
+      }
+    });
+
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({
+      company: transporter
+    });
+    const { mutate } = makeClient(user);
+    const input = {
+      transporter: { company: { siret: transporter.siret } }
+    };
+
+    const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input
+        }
+      }
+    );
+    // recepisse is pulled from db
+    expect(data.updateBsdasri.transporter!.recepisse!.number).toEqual(
+      "the number"
+    );
+    expect(data.updateBsdasri.transporter!.recepisse!.department).toEqual("83");
+    expect(data.updateBsdasri.transporter!.recepisse!.validityLimit).toEqual(
+      "2055-01-01T00:00:00.000Z"
+    );
+  });
+
+  it("should empty transporter recepisse if transporter has no receipt data", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.INITIAL,
+        isDraft: true,
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: company.siret,
+        transporterRecepisseNumber: "xyz",
+        transporterRecepisseDepartment: "13",
+        transporterRecepisseValidityLimit: new Date(),
+        ...readyToPublishData(await companyFactory())
+      }
+    });
+
+    // no associated receipt
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const { mutate } = makeClient(user);
+    const input = {
+      transporter: { company: { siret: transporter.siret } }
+    };
+
+    const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input
+        }
+      }
+    );
+    // no receipt in db, recpisse fields are emptied
+    expect(data.updateBsdasri.transporter!.recepisse).toEqual(null);
+  });
+
+  it("should store recepisse exemption", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    // no associated receipt
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.INITIAL,
+        isDraft: true,
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: transporter.siret,
+        transporterRecepisseNumber: "xyz",
+        transporterRecepisseDepartment: "13",
+        transporterRecepisseValidityLimit: new Date(),
+        ...readyToPublishData(await companyFactory())
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const input = {
+      transporter: { recepisse: { isExempted: true } }
+    };
+
+    const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input
+        }
+      }
+    );
+    // no receipt in db
+    expect(data.updateBsdasri.transporter!.recepisse?.isExempted).toEqual(true);
+  });
+
   it("should allow eco organisme fields update for INITIAL bsdasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
@@ -235,6 +352,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(updated.ecoOrganismeSiret).toEqual(ecoOrgCompany.siret);
     expect(updated.ecoOrganismeName).toEqual("eco-org");
   });
+
   it("should allow eco organisme fields nulling for INITIAL bsdasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });

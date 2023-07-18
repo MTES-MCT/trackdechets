@@ -16,20 +16,7 @@ describe("BSDA validation", () => {
   afterEach(resetDatabase);
 
   describe("BSDA should be valid - transitory empty strings", () => {
-    test("when type is COLLECTION_2710 and unused company fields are empty strings", async () => {
-      // on COLLECTION_2710 Bsdas worker and trasporter fields are not used
-      const { success } = await rawBsdaSchema.safeParseAsync({
-        ...bsda,
-        type: BsdaType.COLLECTION_2710,
-        transporterCompanySiret: "",
-        transporterCompanyName: "",
-        workerCompanyName: "",
-        workerCompanySiret: ""
-      });
-
-      expect(success).toEqual(true);
-    });
-    test("when type is COLLECTION_2710 and unused company fields are  empty nulls", async () => {
+    test("when type is COLLECTION_2710 and unused company fields are nulls", async () => {
       // on COLLECTION_2710 Bsdas worker and trasporter fields are not used
       const { success } = await rawBsdaSchema.safeParseAsync({
         ...bsda,
@@ -80,10 +67,50 @@ describe("BSDA validation", () => {
       const { success } = await rawBsdaSchema.safeParseAsync(data);
       expect(success).toBe(true);
     });
+
+    it("transporter plate is not required if transport mode is not ROAD", async () => {
+      const data = {
+        ...bsda,
+        transporterTransportMode: "AIR"
+      };
+
+      const res = await parseBsda(data, {
+        currentSignatureType: "TRANSPORT"
+      });
+      expect(res).toBeTruthy();
+    });
+
+    it("should work if transport mode is ROAD & plates are defined", async () => {
+      const data = {
+        ...bsda,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: ["TRANSPORTER-PLATES"]
+      };
+
+      const res = await parseBsda(data, {
+        currentSignatureType: "TRANSPORT"
+      });
+      expect(res).toBeTruthy();
+    });
   });
 
   describe("BSDA should not be valid", () => {
     afterEach(resetDatabase);
+
+    test("when type is COLLECTION_2710 and unused company fields are empty strings", async () => {
+      // on COLLECTION_2710 Bsdas worker and trasporter fields are not used
+      const { success } = await rawBsdaSchema.safeParseAsync({
+        ...bsda,
+        type: BsdaType.COLLECTION_2710,
+        transporterCompanySiret: "",
+        transporterCompanyName: "",
+        workerCompanyName: "",
+        workerCompanySiret: ""
+      });
+
+      expect(success).toEqual(false);
+    });
+
     test("when emitter siret is not valid", async () => {
       const data = {
         ...bsda,
@@ -273,10 +300,97 @@ describe("BSDA validation", () => {
       };
 
       try {
-        await parseBsda(data, { currentSignatureType: "TRANSPORT" });
+        await parseBsda(data, {
+          currentSignatureType: "TRANSPORT"
+        });
       } catch (error) {
         expect(error.issues[0].message).toBe(
-          "Le numéro de récépissé transporteur est obligatoire."
+          "Transporteur: le numéro de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+        );
+      }
+    });
+
+    it("transporter plate is required if transporter mode is ROAD", async () => {
+      const data = {
+        ...bsda,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: undefined
+      };
+      expect.assertions(1);
+
+      try {
+        await parseBsda(data, { currentSignatureType: "TRANSPORT" });
+      } catch (err) {
+        expect(err.issues[0].message).toBe(
+          "La plaque d'immatriculation est requise"
+        );
+      }
+    });
+
+    it.each(["", null, [], [""], [null], [undefined]])(
+      "transporter plate is required if transporter mode is ROAD - invalid values",
+      async invalidValue => {
+        const data = {
+          ...bsda,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: invalidValue
+        };
+        expect.assertions(1);
+
+        try {
+          await parseBsda(data, { currentSignatureType: "TRANSPORT" });
+        } catch (err) {
+          expect(err.errors.length).toBeTruthy();
+        }
+      }
+    );
+  });
+
+  describe("Emitter transports own waste", () => {
+    it("allowed if exemption", async () => {
+      const emitterAndTransporter = await companyFactory({
+        companyTypes: ["PRODUCER"]
+      });
+
+      const data = {
+        ...bsda,
+        emittedCompanySiret: emitterAndTransporter.siret,
+        transporterCompanySiret: emitterAndTransporter.siret,
+        transporterRecepisseIsExempted: true
+      };
+
+      expect.assertions(1);
+
+      const result = await parseBsda(data, {
+        currentSignatureType: "TRANSPORT"
+      });
+
+      expect(result).toBeTruthy();
+    });
+
+    it("NOT allowed if no exemption", async () => {
+      const emitterAndTransporter = await companyFactory({
+        companyTypes: ["PRODUCER"]
+      });
+
+      const data = {
+        ...bsda,
+        emittedCompanySiret: emitterAndTransporter.siret,
+        transporterCompanySiret: emitterAndTransporter.siret,
+        transporterRecepisseIsExempted: false
+      };
+
+      expect.assertions(1);
+
+      try {
+        await parseBsda(data, {
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (error) {
+        expect(error.issues[0].message).toBe(
+          `Le transporteur saisi sur le bordereau (SIRET: ${emitterAndTransporter.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
+            " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
         );
       }
     });

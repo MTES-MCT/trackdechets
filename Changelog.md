@@ -5,6 +5,37 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.7.1] 18/07/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Une entreprise peut désormais transporter des déchets sans avoir le profil transporteur, à condition d'avoir l'exemption de récépissé [PR 2460](https://github.com/MTES-MCT/trackdechets/pull/2460)
+- Tous BSD : api et web, le récépissé transporteur est automatiquement rempli à l'édition depuis le profil établissement du compte Trackdéchets du transporteur. Le transporteur peut le compléter jusqu'à la signature transporteur sans que ce soit bloquant, mais il ne pourra plus signer l'enlèvement s'il est manquant ET que l'exemption n'est pas cochée. L'obligation ne s'applique pas aux transporteurs étranger. [PR 2526](https://github.com/MTES-MCT/trackdechets/pull/2526)
+- BSFF : harmonisation de l'interface GraphQL avec BSVHU, BSDA et BSDASRI, pour les récepissés transporteurs : `BsffTransporterRecepisse` et `BsffTransporterRecepisseInput` ont désormais un champ booléen `isExempted`. Ce booléen remplace l'implicite `bsff.transporter.recepisse === null` pour activer l'exemption [PR 2553](https://github.com/MTES-MCT/trackdechets/pull/2553)
+
+#### :bug: Corrections de bugs
+
+- Correction de la date de refus dans les mails de notification et PDFs [PR 2527](https://github.com/MTES-MCT/trackdechets/pull/2527)
+- Il ne devrait pas être possible de s'inscrire avec une adresse e-mail mal formatée (caractères spéciaux) [PR 2532](https://github.com/MTES-MCT/trackdechets/pull/2532)
+- BSDA : les champs de contact du particulier ne devraient pas s'auto-remplir avec les infos de mes établissements favoris [PR 2496](https://github.com/MTES-MCT/trackdechets/pull/2496)
+
+#### :boom: Breaking changes
+
+- La plaque d'immatriculation est désormais obligatoire à la signature du transporteur (BSDD, BSFF, BSDASRI, BSDA) [PR 2528](https://github.com/MTES-MCT/trackdechets/pull/2528)
+
+#### :nail_care: Améliorations
+
+- BSFF - API : permettre de filtrer les BSFFs (query `bsffs`) sur le numéro SIRET du détenteur initial et sur le numéro de fiche d'intervention. [PR 2531](https://github.com/MTES-MCT/trackdechets/pull/2531)
+- BSDA - permettre de rajouter un intermédiaire d'entreposage après signature Entreprise Travaux et avant signature Transporteur [PR 2495](https://github.com/MTES-MCT/trackdechets/pull/2495)
+- ETQ émetteur d'un BSDA, je suis alerté si une entreprise de travaux n'a pas le bon profil et n'a pas complété les infos SS3 SS4 [PR 2529](https://github.com/MTES-MCT/trackdechets/pull/2529)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Ajout d'un parsing des variables d'environnement avec Zod [PR 2484](https://github.com/MTES-MCT/trackdechets/pull/2484)
+- Meilleure gestion des feature flags [PR 2524](https://github.com/MTES-MCT/trackdechets/pull/2524)
+
 # [2023.6.2] 27/06/2023
 
 #### :rocket: Nouvelles fonctionnalités

@@ -20,6 +20,7 @@ import {
   siret,
   siretConditions,
   siretTests,
+  transporterRecepisseSchema,
   vatNumberTests,
   weight,
   weightConditions,
@@ -61,6 +62,7 @@ type Transporter = Pick<
   | "transporterRecepisseNumber"
   | "transporterRecepisseDepartment"
   | "transporterRecepisseValidityLimit"
+  | "transporterRecepisseIsExempted"
 >;
 
 type WasteDetails = Pick<
@@ -102,7 +104,7 @@ type Operation = Pick<
 
 // Validation function can be called either on an existing Bsff
 // or on a create payload
-type BsffLike = (Bsff | Prisma.BsffCreateInput) & {
+export type BsffLike = (Bsff | Prisma.BsffCreateInput) & {
   packagings?: Pick<
     BsffPackaging,
     "type" | "name" | "other" | "numero" | "volume" | "weight"
@@ -152,6 +154,26 @@ export const transporterSchemaFn: FactorySchemaOf<
   Transporter
 > = ({ transporterSignature }) => {
   return yup.object({
+    transporterTransportPlates: yup
+      .array()
+      .of(yup.string())
+      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+      .test((transporterTransportPlates, ctx) => {
+        const { transporterTransportMode } = ctx.parent;
+
+        if (
+          transporterSignature &&
+          transporterTransportMode === "ROAD" &&
+          (!transporterTransportPlates ||
+            !transporterTransportPlates?.filter(p => Boolean(p)).length)
+        ) {
+          return new yup.ValidationError(
+            "La plaque d'immatriculation est requise"
+          );
+        }
+
+        return true;
+      }),
     transporterCompanyName: yup
       .string()
       .requiredIf(
@@ -194,9 +216,7 @@ export const transporterSchemaFn: FactorySchemaOf<
         transporterSignature,
         "Transporteur : l'adresse email est requise"
       ),
-    transporterRecepisseNumber: yup.string().nullable(),
-    transporterRecepisseDepartment: yup.string().nullable(),
-    transporterRecepisseValidityLimit: yup.date().nullable()
+    ...transporterRecepisseSchema({ transportSignature: transporterSignature })
   });
 };
 

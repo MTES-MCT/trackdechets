@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { formatDate } from "common/datetime";
 import {
   Transporter,
-  Scalars,
   BsffTransporterInput,
   BsdasriTransporterInput,
   BsdaTransporterInput,
@@ -12,19 +11,14 @@ import {
   BsffTransporter,
   BsdasriTransporter,
   BsvhuTransporter,
+  TransporterReceipt,
+  Query,
+  QueryCompanyPrivateInfosArgs,
 } from "generated/graphql/types";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
-import { BsffFormTransporterInput } from "form/bsff/utils/initial-state";
-
-interface UniversalRecepisse {
-  /** Numéro de récépissé */
-  number: string;
-  /** Département */
-  department: string;
-  /** Date limite de validité */
-  validityLimit?: Scalars["DateTime"];
-}
+import { TRANSPORTER_RECEIPT } from "./query";
+import { useQuery } from "@apollo/client";
 
 export type NotFormTransporter =
   | BsdaTransporterInput
@@ -37,7 +31,7 @@ type UniversalTransporter =
   | NotFormTransporter
   | BsffTransporter;
 
-export default function TransporterReceipt({
+export default function TransporterReceiptComponent({
   transporter,
 }: {
   transporter: UniversalTransporter;
@@ -54,47 +48,49 @@ export default function TransporterReceipt({
       return !!(transporter as BsvhuTransporter)?.recepisse?.isExempted;
     } else if (!!(transporter as BsdasriTransporter)?.recepisse?.isExempted) {
       return !!(transporter as BsdasriTransporter)?.recepisse?.isExempted;
+    } else if (!!(transporter as BsffTransporterInput)?.recepisse?.isExempted) {
+      return !!(transporter as BsffTransporterInput).recepisse?.isExempted;
     } else if (
-      !!(transporter as BsffFormTransporterInput)?.isExemptedOfRecepisse
+      (transporter as BsffTransporter)?.recepisse?.isExempted === true
     ) {
-      return !!(transporter as BsffFormTransporterInput).isExemptedOfRecepisse;
-    } else if (
-      !!(transporter as BsffTransporter)?.company?.orgId &&
-      (transporter as BsffTransporter)?.recepisse === null
-    ) {
-      // specific for the Bsff transporter signature dialog
+      // specific for the Bsff transporter signature dialog where recepisse === null means exempted
       return true;
     } else {
       return false;
     }
   }, [transporter]);
 
-  const recepisse: UniversalRecepisse = {
-    number:
-      (transporter as Transporter).receipt ??
-      (transporter as NotFormTransporter)?.recepisse?.number ??
-      "",
-    department:
-      (transporter as Transporter).department ??
-      (transporter as NotFormTransporter)?.recepisse?.department ??
-      "",
-    validityLimit:
-      (transporter as Transporter).validityLimit ??
-      (transporter as NotFormTransporter)?.recepisse?.validityLimit ??
-      "",
-  };
-  return !isExemptedOfReceipt &&
+  /**
+   * CompanyPrivateInfos pour completer les informations
+   */
+  const { data, loading } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(TRANSPORTER_RECEIPT, {
+    variables: {
+      // Compatibility with intermediaries that don't have orgId
+      clue: transporter.company?.siret!,
+    },
+    skip: !transporter.company?.siret,
+  });
+
+  const receipt: TransporterReceipt | null =
+    data?.companyPrivateInfos.transporterReceipt || null;
+
+  return !loading &&
+    !isExemptedOfReceipt &&
     !isForeignVat(transporter.company?.vatNumber!!) ? (
     <div className="fr-grid-row fr-mb-2w fr-mt-2w">
       <Alert
         title={"Récépissé de déclaration de transport de déchets"}
-        severity={recepisse.number?.length ? "info" : "error"}
+        severity={receipt?.receiptNumber?.length ? "info" : "error"}
         description={
           <>
-            {recepisse.number ? (
+            {receipt?.receiptNumber ? (
               <p>
-                Numéro: {recepisse.number}, département: {recepisse.department},
-                date limite de validité: {formatDate(recepisse.validityLimit!)}.
+                Numéro: {receipt?.receiptNumber}, département:{" "}
+                {receipt?.department}, date limite de validité:{" "}
+                {formatDate(receipt?.validityLimit!)}.
                 <br />
                 Informations complétées par le transporteur dans son profil
                 Trackdéchets.
@@ -103,7 +99,11 @@ export default function TransporterReceipt({
               <p>
                 L'entreprise de transport n'a pas complété ces informations dans
                 son profil Trackdéchets. Nous ne pouvons pas les afficher. Il
-                lui appartient de les compléter.
+                lui appartient de les compléter.{" "}
+                <span className="tw-text-red-500">
+                  Dans le cas contraire, elle ne pourra pas signer la prise en
+                  charge des déchets.
+                </span>
               </p>
             )}
           </>

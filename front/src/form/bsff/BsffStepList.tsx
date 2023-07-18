@@ -52,12 +52,7 @@ export default function BsffStepsList(props: Props) {
       return {
         ...formQuery.data?.bsff,
         previousPackagings,
-        transporter: {
-          ...transporter,
-          isExemptedOfRecepisse:
-            !!bsff?.transporter?.company?.orgId &&
-            bsff?.transporter?.recepisse === null,
-        },
+        transporter,
       };
     }
     const bsff = formQuery.data?.bsff;
@@ -90,24 +85,14 @@ export default function BsffStepsList(props: Props) {
       previousPackagings,
       packagings,
       type,
-      transporter: { recepisse, isExemptedOfRecepisse, ...transporter },
+      transporter,
       destination: { plannedOperationCode, ...destination },
       ...input
     } = values;
-
     saveForm({
       type,
       ...input,
-      transporter: {
-        recepisse: isExemptedOfRecepisse
-          ? null
-          : {
-              ...recepisse,
-              validityLimit:
-                recepisse.validityLimit === "" ? null : recepisse.validityLimit,
-            },
-        ...transporter,
-      },
+      transporter,
       destination: {
         ...destination,
         plannedOperationCode:

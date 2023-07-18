@@ -1,5 +1,4 @@
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import { addYears, startOfYear } from "date-fns";
 
 import {
   BsdasriWeight,
@@ -49,9 +48,6 @@ const getInitialState = (f?: Bsdasri | null) => ({
     customInfo: "",
     recepisse: {
       isExempted: false,
-      number: "",
-      department: "",
-      validityLimit: startOfYear(addYears(new Date(), 1)).toISOString(),
     },
     transport: {
       mode: "ROAD",

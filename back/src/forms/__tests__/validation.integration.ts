@@ -11,6 +11,7 @@ import {
 import { ReceivedFormInput } from "../../generated/graphql/types";
 import { companyFactory, siretify } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
+import { REQUIRED_RECEIPT_NUMBER } from "../../common/validation";
 
 const siret1 = siretify(1);
 const siret2 = siretify(2);
@@ -583,6 +584,36 @@ describe("sealedFormSchema", () => {
       );
     });
   });
+
+  describe("Emitter transports own waste", () => {
+    it("allowed if exemption", async () => {
+      const partialForm: Partial<Form & BsddTransporter> = {
+        ...sealedForm,
+        transporterCompanySiret: sealedForm.emitterCompanySiret,
+        transporterIsExemptedOfReceipt: true
+      };
+
+      expect.assertions(1);
+
+      const isValid = await sealedFormSchema.isValid(partialForm);
+
+      expect(isValid).toBe(true);
+    });
+
+    it("NOT allowed if no exemption", async () => {
+      const partialForm: Partial<Form & BsddTransporter> = {
+        ...sealedForm,
+        transporterCompanySiret: sealedForm.emitterCompanySiret,
+        transporterIsExemptedOfReceipt: false
+      };
+
+      expect.assertions(1);
+
+      const isValid = await sealedFormSchema.isValid(partialForm);
+
+      expect(isValid).toBe(false);
+    });
+  });
 });
 
 describe("beforeTransportSchema", () => {
@@ -616,9 +647,7 @@ describe("beforeTransportSchema", () => {
 
     const validateFn = () => beforeTransportSchema.validate(testForm);
 
-    await expect(validateFn()).rejects.toThrow(
-      "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-    );
+    await expect(validateFn()).rejects.toThrow(REQUIRED_RECEIPT_NUMBER);
   });
 
   it("should not be valid when there is nor transporterCompanySiret nor transporterCompanyVatNumber", async () => {
@@ -698,6 +727,54 @@ describe("beforeTransportSchema", () => {
     await expect(validateFn()).rejects.toThrow(
       "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
     );
+  });
+
+  it("transporter plate is required if transporter mode is ROAD", async () => {
+    const testForm: Partial<Form & BsddTransporter> = {
+      ...beforeTransportForm,
+      transporterTransportMode: "ROAD",
+      transporterNumberPlate: undefined
+    };
+    const validateFn = () => beforeTransportSchema.validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "La plaque d'immatriculation est requise"
+    );
+  });
+
+  it("transporter plate is required if transporter mode is ROAD - empty string", async () => {
+    const testForm: Partial<Form & BsddTransporter> = {
+      ...beforeTransportForm,
+      transporterTransportMode: "ROAD",
+      transporterNumberPlate: ""
+    };
+    const validateFn = () => beforeTransportSchema.validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "La plaque d'immatriculation est requise"
+    );
+  });
+
+  it("transporter plate is not required if transport mode is not ROAD", async () => {
+    const testForm: Partial<Form & BsddTransporter> = {
+      ...beforeTransportForm,
+      transporterTransportMode: "AIR",
+      transporterNumberPlate: undefined
+    };
+    const isValid = beforeTransportSchema.isValid(testForm);
+
+    expect(isValid).toBeTruthy();
+  });
+
+  it("should work if transport mode is ROAD & plates are defined", async () => {
+    const testForm: Partial<Form & BsddTransporter> = {
+      ...beforeTransportForm,
+      transporterTransportMode: "ROAD",
+      transporterNumberPlate: "TRANSPORTER-PLATES"
+    };
+    const isValid = beforeTransportSchema.isValid(testForm);
+
+    expect(isValid).toBeTruthy();
   });
 });
 

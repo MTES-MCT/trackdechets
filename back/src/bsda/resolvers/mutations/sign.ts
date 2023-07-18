@@ -23,6 +23,10 @@ import { runInTransaction } from "../../../common/repository/helper";
 import { parseBsda } from "../../validation/validate";
 import { checkCanSignFor } from "../../../permissions";
 import { InvalidTransition } from "../../../forms/errors";
+import {
+  BsdTransporterReceiptPart,
+  getTransporterReceipt
+} from "../../../bsdasris/recipify";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,
@@ -48,12 +52,18 @@ const signBsda: MutationResolvers["signBsda"] = async (
 
   checkBsdaTypeSpecificRules(bsda, input);
 
+  let transporterReceipt = {};
+  if (input.type === "TRANSPORT") {
+    transporterReceipt = await getTransporterReceipt(bsda);
+  }
+
   // Check that all necessary fields are filled
   await parseBsda(
     {
       ...bsda,
       grouping: bsda.grouping?.map(g => g.id),
-      forwarding: bsda.forwarding?.id
+      forwarding: bsda.forwarding?.id,
+      ...transporterReceipt
     },
     {
       currentSignatureType: input.type
@@ -63,6 +73,7 @@ const signBsda: MutationResolvers["signBsda"] = async (
   const sign = signatures[input.type];
   const signedBsda = await sign(user, bsda, {
     ...input,
+    ...transporterReceipt,
     date: new Date(input.date ?? Date.now())
   });
 
@@ -157,7 +168,7 @@ async function signWork(
 async function signTransport(
   user: Express.User,
   bsda: Bsda,
-  input: BsdaSignatureInput
+  input: BsdaSignatureInput & BsdTransporterReceiptPart
 ) {
   if (bsda.transporterTransportSignatureDate !== null) {
     throw new AlreadySignedError();
@@ -168,7 +179,11 @@ async function signTransport(
   const updateInput: Prisma.BsdaUpdateInput = {
     transporterTransportSignatureAuthor: input.author,
     transporterTransportSignatureDate: new Date(input.date ?? Date.now()),
-    status: nextStatus
+    status: nextStatus,
+    // auto-complete transporter receipt
+    transporterRecepisseDepartment: input.transporterRecepisseDepartment,
+    transporterRecepisseNumber: input.transporterRecepisseNumber,
+    transporterRecepisseValidityLimit: input.transporterRecepisseValidityLimit
   };
 
   return updateBsda(user, bsda, updateInput);

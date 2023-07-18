@@ -12,6 +12,7 @@ export const FAVORITES = gql`
       phone
       mail
       isRegistered
+      companyTypes
       codePaysEtrangerEtablissement
       transporterReceipt {
         receiptNumber
@@ -73,6 +74,7 @@ export const SEARCH_COMPANIES = gql`
       contact
       contactPhone
       contactEmail
+      companyTypes
       installation {
         codeS3ic
         urlFiche
@@ -184,6 +186,18 @@ export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
       isAnonymousCompany
       companyTypes
       codePaysEtrangerEtablissement
+      transporterReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
+    }
+  }
+`;
+
+export const TRANSPORTER_RECEIPT = gql`
+  query CompanyPrivateInfos($clue: String!) {
+    companyPrivateInfos(clue: $clue) {
       transporterReceipt {
         receiptNumber
         validityLimit

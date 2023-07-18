@@ -56,7 +56,8 @@ const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
   return {
     ...user,
     // companies are resolved through a separate resolver (User.companies)
-    companies: []
+    companies: [],
+    featureFlags: []
   };
 };
 

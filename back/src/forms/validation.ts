@@ -30,6 +30,9 @@ import {
 } from "../common/constants/companySearchHelpers";
 import {
   foreignVatNumber,
+  REQUIRED_RECEIPT_DEPARTMENT,
+  REQUIRED_RECEIPT_NUMBER,
+  REQUIRED_RECEIPT_VALIDITYLIMIT,
   siret,
   siretConditions,
   siretTests,
@@ -787,7 +790,24 @@ export const transporterSchemaFn: FactorySchemaOf<
 > = ({ transporterSignature }) =>
   yup.object({
     transporterCustomInfo: yup.string().nullable(),
-    transporterNumberPlate: yup.string().nullable(),
+    transporterNumberPlate: yup
+      .string()
+      .nullable()
+      .test((transporterNumberPlate, ctx) => {
+        const { transporterTransportMode } = ctx.parent;
+
+        if (
+          transporterSignature &&
+          transporterTransportMode === "ROAD" &&
+          !transporterNumberPlate
+        ) {
+          return new yup.ValidationError(
+            "La plaque d'immatriculation est requise"
+          );
+        }
+
+        return true;
+      }),
     transporterCompanyName: yup
       .string()
       .ensure()
@@ -846,10 +866,7 @@ export const transporterSchemaFn: FactorySchemaOf<
         is: (isExempted, vat) => isForeignVat(vat) || isExempted,
         then: schema => schema.notRequired().nullable(),
         otherwise: schema =>
-          schema.requiredIf(
-            transporterSignature,
-            "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-          )
+          schema.requiredIf(transporterSignature, REQUIRED_RECEIPT_NUMBER)
       }),
     transporterDepartment: yup
       .string()
@@ -857,12 +874,19 @@ export const transporterSchemaFn: FactorySchemaOf<
         is: (isExempted, vat) => isForeignVat(vat) || isExempted,
         then: schema => schema.notRequired().nullable(),
         otherwise: schema =>
+          schema.requiredIf(transporterSignature, REQUIRED_RECEIPT_DEPARTMENT)
+      }),
+    transporterValidityLimit: yup
+      .date()
+      .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
+        is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+        then: schema => schema.notRequired().nullable(),
+        otherwise: schema =>
           schema.requiredIf(
             transporterSignature,
-            "Le département du transporteur est obligatoire"
+            REQUIRED_RECEIPT_VALIDITYLIMIT
           )
-      }),
-    transporterValidityLimit: yup.date().nullable()
+      })
   });
 
 // 8 - Collecteur-transporteur vide dans le cas du pipeline
@@ -1449,7 +1473,7 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
   }
 }
 
-const BSDD_MAX_APPENDIX2 = parseInt(process.env.BSDD_MAX_APPENDIX2!, 10) || 250;
+const BSDD_MAX_APPENDIX2 = parseInt(process.env.BSDD_MAX_APPENDIX2, 10) || 250;
 
 /**
  * Les vérifications suivantes sont effectuées :

@@ -31,6 +31,7 @@ import {
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { runInTransaction } from "../../../common/repository/helper";
 import { BsdasriRepository, getBsdasriRepository } from "../../repository";
+import { getTransporterReceipt } from "../../recipify";
 
 const signBsdasri: MutationResolvers["signBsdasri"] = async (
   _,
@@ -206,10 +207,18 @@ async function signTransport(
     isEmissionDirectTakenOver = true;
   }
 
-  await validateBsdasri(bsdasri as any, {
-    emissionSignature: true,
-    transportSignature: true
-  });
+  const transporterReceipt = await getTransporterReceipt(bsdasri);
+
+  await validateBsdasri(
+    {
+      ...(bsdasri as any),
+      ...transporterReceipt
+    },
+    {
+      emissionSignature: true,
+      transportSignature: true
+    }
+  );
 
   const updateInput: Prisma.BsdasriUpdateInput = {
     transporterTransportSignatureAuthor: input.author,
@@ -223,7 +232,12 @@ async function signTransport(
     dasriUpdateInput: updateInput as any
   });
 
-  return updateBsdasri(user, bsdasri, { ...updateInput, status });
+  const recipifiedInput = {
+    ...updateInput,
+    ...transporterReceipt,
+    status
+  };
+  return updateBsdasri(user, bsdasri, recipifiedInput);
 }
 
 /**

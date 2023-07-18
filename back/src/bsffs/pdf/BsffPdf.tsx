@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import {
   BsffPackagingType,
   BsffType,
@@ -20,6 +20,7 @@ import {
 import { BSFF_WASTES } from "../../common/constants";
 import { extractPostalCode } from "../../utils";
 import { Decimal } from "decimal.js-light";
+import { Recepisse } from "./Recepisse";
 
 type Props = {
   bsff: Bsff & { packagings: BsffPackaging[] } & {
@@ -350,22 +351,14 @@ function BsffTransporter({ bsff }: Pick<Props, "bsff">) {
             <FormCompanyFields company={bsff.transporter?.company} />
           </div>
           <div className="Col">
-            {bsff.transporter?.company?.siret &&
-            !bsff.transporter?.recepisse ? (
+            {bsff?.transporter?.recepisse?.isExempted ? (
               <p>
-                <input type="checkbox" defaultChecked readOnly /> Je déclare
-                être exempté de récépissé au titre de l'article R.541-50 du code
-                de l'environnement
+                Le transporteur déclare être exempté de récépissé conformément
+                aux dispositions de l'article R.541-50 du code de
+                l'environnement.
               </p>
             ) : (
-              <p>
-                Récépissé n° : {bsff.transporter?.recepisse?.number}
-                <br />
-                Département : {bsff.transporter?.recepisse?.department}
-                <br />
-                Limite de validité :{" "}
-                {formatDate(bsff.transporter?.recepisse?.validityLimit)}
-              </p>
+              <Recepisse recepisse={bsff?.transporter?.recepisse} />
             )}
             <p>
               Mode de transport :{" "}

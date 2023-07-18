@@ -23,6 +23,31 @@ import { runInTransaction } from "../../../common/repository/helper";
 import { sumPackagingInfos } from "../../repository/helper";
 import { validateBeforeTransport } from "../../validation";
 import { Permission } from "../../../permissions";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
+import { recipifyFormInput } from "../../recipify";
+
+export async function getFormReceiptField(transporter) {
+  const recipifiedTransporter = await recipifyFormInput({
+    transporter: {
+      isExemptedOfReceipt: transporter?.transporterIsExemptedOfReceipt,
+      receipt: transporter?.transporterReceipt,
+      validityLimit: transporter?.transporterValidityLimit,
+      department: transporter?.transporterDepartment,
+      company: {
+        siret: transporter?.transporterCompanySiret,
+        vatNumber: transporter?.transporterCompanyVatNumber
+      }
+    }
+  });
+  const receiptFields = {
+    transporterReceipt: recipifiedTransporter.transporter?.receipt,
+    transporterDepartment: recipifiedTransporter.transporter?.department,
+    transporterValidityLimit: recipifiedTransporter.transporter?.validityLimit,
+    transporterIsExemptedOfReceipt:
+      recipifiedTransporter.transporter?.isExemptedOfReceipt
+  };
+  return receiptFields;
+}
 
 /**
  * Common function for signing
@@ -38,7 +63,7 @@ const signTransportFn = async (
     );
   }
   const transporter = await getFirstTransporter(existingForm);
-
+  const receiptFields = await getFormReceiptField(transporter);
   await checkCanSignFor(
     getTransporterCompanyOrgId(transporter)!,
     user,
@@ -46,7 +71,16 @@ const signTransportFn = async (
     args.securityCode
   );
 
-  await validateBeforeTransport({ ...existingForm, ...transporter });
+  await validateBeforeTransport({
+    ...existingForm,
+    ...transporter,
+    ...(args.input.transporterNumberPlate
+      ? {
+          transporterNumberPlate: args.input.transporterNumberPlate
+        }
+      : {}),
+    ...receiptFields
+  });
 
   const transporterUpdate: Prisma.BsddTransporterUpdateWithoutFormInput = {
     takenOverAt: args.input.takenOverAt, // takenOverAt is duplicated between Form and BsddTransporter
@@ -55,7 +89,8 @@ const signTransportFn = async (
       ? {
           transporterNumberPlate: args.input.transporterNumberPlate
         }
-      : {})
+      : {}),
+    ...receiptFields
   };
 
   const formUpdateInput: Prisma.FormUpdateInput = {
@@ -167,6 +202,26 @@ const signTransportFn = async (
             .reduce((sum, quantity) => sum + quantity, 0)
         }
       );
+
+      // For user convenience, we update the bsds with the
+      // immatriculation (if not filled already)
+      const ids = appendix1Forms.map(form => form.id);
+
+      // Update their plates
+      await transaction.bsddTransporter.updateMany({
+        where: {
+          formId: { in: ids },
+          OR: [{ transporterNumberPlate: null }, { transporterNumberPlate: "" }]
+        },
+        data: {
+          transporterNumberPlate: transporterUpdate.transporterNumberPlate
+        }
+      });
+
+      // Update ES
+      ids.forEach(id => {
+        enqueueUpdatedBsdToIndex(id);
+      });
     }
     return updatedForm;
   });

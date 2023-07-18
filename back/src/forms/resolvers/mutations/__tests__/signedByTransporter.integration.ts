@@ -7,6 +7,7 @@ import {
   formFactory,
   formWithTempStorageFactory,
   toIntermediaryCompany,
+  transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -32,6 +33,8 @@ describe("Mutation.signedByTransporter", () => {
 
   it("should mark a form as signed with deprecated packagings field", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company });
+
     const emitterCompany = await companyFactory();
     const form = await formFactory({
       ownerId: user.id,
@@ -79,6 +82,7 @@ describe("Mutation.signedByTransporter", () => {
 
   it("should mark a form as signed", async () => {
     const transporter = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter.company });
     const emitter = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: transporter.user.id,
@@ -134,10 +138,70 @@ describe("Mutation.signedByTransporter", () => {
     );
   });
 
+  it("should mark a form as signed with transporter receipt exemption", async () => {
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: transporter.user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        emitterCompanyName: emitter.company.name,
+        emitterCompanySiret: emitter.company.siret,
+        transporters: {
+          create: {
+            transporterCompanyName: transporter.company.name,
+            transporterCompanySiret: transporter.company.siret,
+            transporterIsExemptedOfReceipt: true,
+            number: 1
+          }
+        }
+      }
+    });
+    const sentAt = new Date("2018-12-11T00:00:00.000Z");
+
+    const { mutate } = makeClient(transporter.user);
+    await mutate<Pick<Mutation, "signedByTransporter">>(SIGNED_BY_TRANSPORTER, {
+      variables: {
+        id: form.id,
+        signingInfo: {
+          sentAt: sentAt.toISOString(),
+          signedByTransporter: true,
+          securityCode: emitter.company.securityCode,
+          sentBy: emitter.user.name,
+          signedByProducer: true,
+          packagingInfos: form.wasteDetailsPackagingInfos,
+          quantity: form.wasteDetailsQuantity,
+          onuCode: "Code ONU"
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+    expect(resultingForm).toEqual(
+      expect.objectContaining({
+        status: "SENT",
+        signedByTransporter: true,
+        sentAt: sentAt,
+        sentBy: emitter.user.name,
+
+        emittedAt: sentAt,
+        emittedBy: emitter.user.name,
+        emittedByEcoOrganisme: false,
+        takenOverAt: sentAt,
+        takenOverBy: transporter.user.name
+      })
+    );
+  });
+
   it("should return an error if onuCode is provided empty for a dangerous waste", async () => {
     const { user, company: transporter } = await userWithCompanyFactory(
       "ADMIN"
     );
+    await transporterReceiptFactory({ company: transporter });
+
     const emitter = await companyFactory();
     const form = await formFactory({
       ownerId: user.id,
@@ -185,10 +249,65 @@ describe("Mutation.signedByTransporter", () => {
     ]);
   });
 
+  it("should return an error if transporter receipt is missing", async () => {
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const emitter = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        wasteDetailsCode: "01 03 04*",
+        emitterCompanySiret: emitter.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.siret,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "signedByTransporter">>(
+      SIGNED_BY_TRANSPORTER,
+      {
+        variables: {
+          id: form.id,
+          signingInfo: {
+            sentAt: "2018-12-11T00:00:00.000Z",
+            signedByTransporter: true,
+            securityCode: emitter.securityCode,
+            sentBy: "Roger Lapince",
+            signedByProducer: true,
+            packagingInfos: form.wasteDetailsPackagingInfos,
+            quantity: form.wasteDetailsQuantity,
+            onuCode: ""
+          }
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining(
+          "Transporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+        ),
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
   it("should not return an error if onuCode is provided empty for a non-dangerous waste", async () => {
     const { user, company: transporter } = await userWithCompanyFactory(
       "ADMIN"
     );
+    await transporterReceiptFactory({ company: transporter });
+
     const emitter = await companyFactory();
     const form = await formFactory({
       ownerId: user.id,
@@ -232,6 +351,8 @@ describe("Mutation.signedByTransporter", () => {
 
   it("should fail if wrong security code", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company });
+
     const emitterCompany = await companyFactory();
     const form = await formFactory({
       ownerId: user.id,
@@ -435,6 +556,8 @@ describe("Mutation.signedByTransporter", () => {
     const { user, company: transporter } = await userWithCompanyFactory(
       "ADMIN"
     );
+    await transporterReceiptFactory({ company: transporter });
+
     const emitter = await companyFactory();
     const ecoOrganisme = await companyFactory({
       securityCode: 6789,
@@ -493,6 +616,7 @@ describe("Mutation.signedByTransporter", () => {
     const transporter = await userWithCompanyFactory("ADMIN");
     const temporaryStorage = await userWithCompanyFactory("ADMIN");
     const finalRecipient = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter.company });
 
     const form = await formWithTempStorageFactory({
       ownerId: transporter.user.id,
@@ -501,7 +625,13 @@ describe("Mutation.signedByTransporter", () => {
         recipientCompanyName: temporaryStorage.company.name,
         recipientCompanySiret: temporaryStorage.company.siret,
         takenOverAt: "2019-11-20T00:00:00.000Z",
-        sentAt: "2019-11-20T00:00:00.000Z"
+        sentAt: "2019-11-20T00:00:00.000Z",
+        transporters: {
+          create: {
+            transporterIsExemptedOfReceipt: true,
+            number: 1
+          }
+        }
       },
       forwardedInOpts: {
         quantityReceived: 2.4,
@@ -518,9 +648,6 @@ describe("Mutation.signedByTransporter", () => {
             transporterCompanyName: transporter.company.name,
             transporterCompanySiret: transporter.company.siret,
             transporterIsExemptedOfReceipt: false,
-            transporterReceipt: "Damned! That receipt looks good",
-            transporterDepartment: "10",
-            transporterValidityLimit: "2019-11-20T00:00:00.000Z",
             transporterNumberPlate: "",
             number: 1
           }
@@ -571,6 +698,8 @@ describe("Mutation.signedByTransporter", () => {
     "%p should be a valid format for sentAt",
     async f => {
       const { user, company } = await userWithCompanyFactory("ADMIN");
+      await transporterReceiptFactory({ company });
+
       const emitterCompany = await companyFactory();
       // convert sentAt to formatted string
       const sentAt = new Date("2018-12-11");
@@ -625,6 +754,7 @@ describe("Mutation.signedByTransporter", () => {
     const { user, company: transporter } = await userWithCompanyFactory(
       "ADMIN"
     );
+    await transporterReceiptFactory({ company: transporter });
     const emitter = await companyFactory();
     const form = await formFactory({
       ownerId: user.id,

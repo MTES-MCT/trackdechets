@@ -1,4 +1,3 @@
-import { addYears } from "date-fns";
 import {
   Company,
   User,
@@ -23,7 +22,10 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { indexBsdasri } from "../../../../bsdasris/elastic";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  transporterReceiptFactory
+} from "../../../../__tests__/factories";
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
 
 const CREATE_DRAFT_DASRI = `
@@ -82,6 +84,7 @@ describe("Query.bsds.dasris base workflow", () => {
         set: ["TRANSPORTER"]
       }
     });
+    await transporterReceiptFactory({ company: transporter.company });
     destination = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["WASTEPROCESSOR"]
@@ -138,16 +141,11 @@ describe("Query.bsds.dasris base workflow", () => {
                 mail: "jean.michel@gmaiL.com",
                 phone: "06"
               },
-              recepisse: {
-                number: "123456789",
-                department: "69",
-                validityLimit: addYears(new Date(), 1).toISOString() as any
-              },
               transport: {
                 takenOverAt: new Date().toISOString() as any,
 
                 weight: { value: 99, isEstimate: false },
-
+                plates: ["TRANSPORTER-PLATE"],
                 packagings: [{ type: "FUT", quantity: 44, volume: 123 }],
 
                 acceptation: { status: WasteAcceptationStatus.ACCEPTED }

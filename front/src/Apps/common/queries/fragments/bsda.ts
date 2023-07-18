@@ -204,6 +204,7 @@ export const FullBsdaFragment = gql`
     metadata {
       errors {
         message
+        path
         requiredFor
       }
     }

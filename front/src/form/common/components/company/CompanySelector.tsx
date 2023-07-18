@@ -31,6 +31,7 @@ import {
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs,
   TransporterInput,
+  BsffTransporterInput,
 } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -42,7 +43,6 @@ import {
   SEARCH_COMPANIES,
 } from "./query";
 import TransporterReceipt from "./TransporterReceipt";
-import { BsffFormTransporterInput } from "form/bsff/utils/initial-state";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -93,7 +93,7 @@ export default function CompanySelector({
         | Maybe<BsdaTransporterInput>
         | Maybe<BsdasriTransporterInput>
         | Maybe<BsvhuTransporterInput>
-        | Maybe<BsffFormTransporterInput>;
+        | Maybe<BsffTransporterInput>;
     }>();
 
   // determine if the current Form company is foreign
@@ -574,7 +574,7 @@ export default function CompanySelector({
         </div>
 
         {values.transporter && !!orgId && name === "transporter.company" && (
-          <TransporterReceipt transporter={values.transporter} />
+          <TransporterReceipt transporter={values.transporter!} />
         )}
       </div>
     </>
@@ -589,6 +589,6 @@ function favoriteToCompanySearchResult(
     contactPhone: company.phone,
     contactEmail: company.mail,
     etatAdministratif: "A",
-    companyTypes: [],
+    companyTypes: company.companyTypes,
   };
 }

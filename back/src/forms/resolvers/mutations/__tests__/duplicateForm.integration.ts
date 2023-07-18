@@ -131,7 +131,15 @@ async function createForm(opt: Partial<Prisma.FormCreateInput> = {}) {
     }
   });
 
-  return { form, emitter, transporter, recipient, broker, trader };
+  return {
+    form,
+    emitter,
+    transporter,
+    recipient,
+    broker,
+    trader,
+    transporterReceipt
+  };
 }
 
 const validateIntermediariesInputMock = jest.fn();
@@ -352,8 +360,6 @@ describe("Mutation.duplicateForm", () => {
       recipientIsTempStorage,
       wasteDetailsCode,
       wasteDetailsOnuCode,
-      wasteDetailsPackagingInfos,
-      wasteDetailsQuantity,
       wasteDetailsQuantityType,
       wasteDetailsPop,
       wasteDetailsIsDangerous,
@@ -710,6 +716,31 @@ describe("Mutation.duplicateForm", () => {
     expect(duplicatedForm.nextDestinationCompanyMail).toBeNull();
     expect(duplicatedForm.nextDestinationCompanyPhone).toBeNull();
     expect(duplicatedForm.nextDestinationCompanyVatNumber).toBeNull();
+  });
+
+  it("should duplicate nulling transporter receipt when it was emptied", async () => {
+    const { form, transporterReceipt, emitter } = await createForm();
+    const { mutate } = makeClient(emitter.user);
+    await prisma.transporterReceipt.delete({
+      where: { id: transporterReceipt.id }
+    });
+    const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+      DUPLICATE_FORM,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+    const duplicatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.duplicateForm.id }
+    });
+    const firstDuplicatedTransporter = await getFirstTransporter(
+      duplicatedForm
+    );
+    expect(firstDuplicatedTransporter?.transporterReceipt).toBeNull();
+    expect(firstDuplicatedTransporter?.transporterDepartment).toBeNull();
+    expect(firstDuplicatedTransporter?.transporterValidityLimit).toBeNull();
   });
 
   test("duplicated BSDD should have the updated data when company info changes", async () => {

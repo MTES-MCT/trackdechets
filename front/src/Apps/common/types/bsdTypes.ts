@@ -127,6 +127,9 @@ export interface BsdDisplay {
     status: TBsdStatusCode;
     id: string;
   };
+  allowDirectTakeOver?: Maybe<Scalars["Boolean"]>;
+  transporterCustomInfo?: string | Maybe<string[]>;
+  transporterNumberPlate?: string | Maybe<string[]>;
 }
 
 export type BsdWithReview = Bsd & {

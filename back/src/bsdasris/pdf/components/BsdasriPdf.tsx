@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import {
   Document,
   formatDate,
@@ -9,12 +9,14 @@ import {
   Bsdasri,
   InitialBsdasri,
   BsdasriSignature,
-  Maybe
+  Maybe,
+  BsdaRecepisse
 } from "../../../generated/graphql/types";
 import { TraceabilityTable } from "./TraceabilityTable";
 import { PackagingInfosTable } from "./PackagingInfosTable";
 import { FormCompanyFields } from "./FormCompanyFields";
 import { BsdasriType } from "@prisma/client";
+import { Recepisse } from "../../../bsda/pdf/components/Recepisse";
 
 /**
  *
@@ -240,23 +242,27 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
             </p>
             <FormCompanyFields company={bsdasri.transporter?.company} />
             <p>
-              <strong>Récépissé</strong> <br />
-              <span>Numéro : {bsdasri?.transporter?.recepisse?.number}</span>
-              <br />
-              <span>
-                Département: {bsdasri?.transporter?.recepisse?.department}
-              </span>
-              <span> - </span>
-              <span>
-                Validité:{" "}
-                {formatDate(bsdasri?.transporter?.recepisse?.validityLimit)}
-              </span>
+              {bsdasri?.transporter?.recepisse?.isExempted ? (
+                <p>
+                  Le transporteur déclare être exempté de récépissé conformément
+                  aux dispositions de l'article R.541-50 du code de
+                  l'environnement.
+                </p>
+              ) : (
+                <Recepisse
+                  recepisse={bsdasri?.transporter?.recepisse as BsdaRecepisse}
+                />
+              )}
             </p>
             <p>
               Mode de transport:{" "}
               {bsdasri?.transporter?.transport?.mode
                 ? TRANSPORT_MODE_LABELS[bsdasri?.transporter?.transport?.mode]
                 : ""}
+            </p>
+            <p>
+              Immatriculation(s) :{" "}
+              {bsdasri?.transporter?.transport?.plates?.join(", ")}
             </p>
             <p>
               <strong>Date de remise à l'installation de destination :</strong>

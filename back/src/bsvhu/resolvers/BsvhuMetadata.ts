@@ -1,3 +1,4 @@
+import { getTransporterReceipt } from "../../bsdasris/recipify";
 import {
   BsvhuMetadata,
   BsvhuMetadataResolvers,
@@ -10,7 +11,7 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
   errors: async (
     metadata: BsvhuMetadata & { id: string; status: BsvhuStatus }
   ) => {
-    const prismaForm = await getBsvhuOrNotFound(metadata.id);
+    const prismaBsvhu = await getBsvhuOrNotFound(metadata.id);
 
     const validationMatrix = [
       {
@@ -45,9 +46,19 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
     const filteredValidationMatrix = validationMatrix.filter(
       matrix => !matrix.skip
     );
+
+    // import transporterReceipt that will be completed after transporter signature
+    const transporterReceipt = await getTransporterReceipt(prismaBsvhu);
+
     for (const { context, requiredFor } of filteredValidationMatrix) {
       try {
-        await validateBsvhu(prismaForm, context);
+        await validateBsvhu(
+          {
+            ...prismaBsvhu,
+            ...transporterReceipt
+          },
+          context
+        );
         return [];
       } catch (errors) {
         return errors.inner?.map(e => {

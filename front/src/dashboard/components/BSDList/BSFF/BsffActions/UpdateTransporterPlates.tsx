@@ -8,23 +8,45 @@ import { UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { BsffFragment } from "../types";
 import { NotificationError } from "Apps/common/Components/Error/Error";
 import Tooltip from "common/components/Tooltip";
+import { useRouteMatch } from "react-router-dom";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
-export function UpdateTransporterPlates({ bsff }: { bsff: BsffFragment }) {
+export function UpdateTransporterPlates({
+  bsff,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+}: {
+  bsff: BsffFragment;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+
+  const isOpened = isOpen || isModalOpenFromParent!;
+  const handleClose = () => {
+    if (isModalOpenFromParent) {
+      onModalCloseFromParent!();
+    } else {
+      setIsOpen(false);
+    }
+  };
+
   return (
     <>
-      <button
-        className="link__ icon__ btn--no-style"
-        onClick={() => setIsOpen(true)}
-        title={"Modifier la ou les plaque(s) d'immatriculation"}
-      >
-        <IconPaperWrite color="blue" />
-      </button>
+      {!isV2Routes && !isModalOpenFromParent && (
+        <button
+          className="link__ icon__ btn--no-style"
+          onClick={() => setIsOpen(true)}
+          title={"Modifier la ou les plaque(s) d'immatriculation"}
+        >
+          <IconPaperWrite color="blue" />
+        </button>
+      )}
       <UpdateTransporterPlatesModal
         bsff={bsff}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        isOpen={isOpened}
+        onClose={handleClose}
       />
     </>
   );

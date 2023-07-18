@@ -490,13 +490,13 @@ input TransporterInput {
   isExemptedOfReceipt: Boolean
 
   "N° de récipissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée"
-  receipt: String
+  receipt: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
 
   "Département du récépissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée"
-  department: String
+  department: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
 
   "Limite de validité du récépissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée"
-  validityLimit: DateTime
+  validityLimit: DateTime @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
 
   "Numéro de plaque d'immatriculation"
   numberPlate: String

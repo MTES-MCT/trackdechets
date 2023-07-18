@@ -90,11 +90,13 @@ function QuantityFields({ quantity, quantityType }: QuantityFieldsProps) {
 type AcceptationFieldsProps = {
   wasteAcceptationStatus?: WasteAcceptationStatus | null;
   wasteRefusalReason?: string | null;
+  signedAt?: Date | null;
 };
 
 function AcceptationFields({
   wasteAcceptationStatus,
-  wasteRefusalReason
+  wasteRefusalReason,
+  signedAt
 }: AcceptationFieldsProps) {
   return (
     <p>
@@ -122,6 +124,9 @@ function AcceptationFields({
       <br />
       Motif de refus (même partiel) :<br />
       {wasteRefusalReason}
+      <br />
+      Date de signature : {formatDate(signedAt)}
+      <br />
     </p>
   );
 }
@@ -160,8 +165,8 @@ export function getOtherPackagingLabel(packagingInfos: PackagingInfo[]) {
     otherPackagings.length === 0
       ? "à préciser"
       : otherPackagings
-        .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
-        .join(", ");
+          .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
+          .join(", ");
   return `Autre (${otherPackagingsSummary})`;
 }
 
@@ -279,9 +284,9 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
 
   const form: GraphQLForm = {
     ...(await expandFormFromDb(fullPrismaForm)),
-    transportSegments: fullPrismaForm.transporters?.filter(transporter => transporter.number >= 2).map(
-      expandTransportSegmentFromDb
-    ),
+    transportSegments: fullPrismaForm.transporters
+      ?.filter(transporter => transporter.number >= 2)
+      .map(expandTransportSegmentFromDb),
     grouping: await Promise.all(
       grouping.map(async ({ form, quantity }) => ({
         form: await expandInitialFormFromDb(form),
@@ -367,7 +372,12 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               {!!form.customId && <>({form.customId})</>}
               {!!groupedIn?.length && (
                 <>
-                  <strong>Annexé au bordereau {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER && "de tournée dédiée"} n° :</strong>{" "}
+                  <strong>
+                    Annexé au bordereau{" "}
+                    {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER &&
+                      "de tournée dédiée"}{" "}
+                    n° :
+                  </strong>{" "}
                   {groupedIn.map(bsd => bsd.readableId)}
                 </>
               )}
@@ -804,6 +814,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 </p>
                 <AcceptationFields
                   {...form.temporaryStorageDetail?.temporaryStorer}
+                  signedAt={fullPrismaForm.signedAt}
                 />
                 <p>
                   Nom :{" "}
@@ -837,7 +848,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                   packagingInfos={
                     isRepackging
                       ? form.temporaryStorageDetail?.wasteDetails
-                        ?.packagingInfos ?? []
+                          ?.packagingInfos ?? []
                       : []
                   }
                 />

@@ -37,11 +37,10 @@ describe("edition", () => {
       vatNumber: ""
     };
 
-    const recepisse: Required<BsdasriRecepisseInput> = {
-      isExempted: false,
-      number: "",
-      department: "",
-      validityLimit: new Date("2022-01-01")
+    const recepisse: Required<
+      Omit<BsdasriRecepisseInput, "number" | "department" | "validityLimit">
+    > = {
+      isExempted: false
     };
 
     const packaging: Required<BsdasriPackagingsInput> = {

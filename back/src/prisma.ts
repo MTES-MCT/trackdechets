@@ -51,7 +51,7 @@ prisma.$on("query", e => {
 
 function getDbUrl() {
   try {
-    const dbUrl = new URL(process.env.DATABASE_URL!);
+    const dbUrl = new URL(process.env.DATABASE_URL);
     dbUrl.searchParams.set("schema", "default$default");
 
     return unescape(dbUrl.href); // unescape needed because of the `$`

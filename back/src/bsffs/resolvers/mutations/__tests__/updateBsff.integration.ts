@@ -17,7 +17,8 @@ import { associateUserToCompany } from "../../../../users/database";
 import {
   companyFactory,
   siretify,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION } from "../../../constants";
@@ -80,6 +81,172 @@ describe("Mutation.updateBsff", () => {
     expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
+  it("should update a bsff transporter recepisse with data pulled from db", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff(
+      { emitter, transporter: emitter },
+      { isDraft: true }
+    );
+
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const receipt = await transporterReceiptFactory({
+      company: transporter
+    });
+    const { mutate } = makeClient(emitter.user);
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          transporter: {
+            company: {
+              siret: transporter.siret
+            }
+          }
+        }
+      }
+    });
+
+    // recepisse is pulled from db
+    expect(data.updateBsff.transporter!.recepisse!.number).toEqual(
+      receipt.receiptNumber
+    );
+    expect(data.updateBsff.transporter!.recepisse!.department).toEqual(
+      receipt.department
+    );
+    expect(data.updateBsff.transporter!.recepisse!.validityLimit).toEqual(
+      receipt.validityLimit.toISOString()
+    );
+  });
+
+  it("should empty a bsff transporter recepisse if transporter has no receipt data", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff(
+      { emitter, transporter: emitter },
+      { isDraft: true }
+    );
+    await prisma.bsff.update({
+      where: { id: bsff.id },
+      data: {
+        transporterRecepisseNumber: "abc",
+        transporterRecepisseDepartment: "13",
+        transporterRecepisseValidityLimit: new Date()
+      }
+    });
+
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const { mutate } = makeClient(emitter.user);
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          transporter: {
+            company: {
+              siret: transporter.siret
+            }
+          }
+        }
+      }
+    });
+
+    // recepisse is pulled from db
+    expect(data.updateBsff.transporter!.recepisse).toEqual(null);
+  });
+
+  it("should empty a bsff transporter recepisse if transporter siret has changed", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff(
+      { emitter, transporter: emitter },
+      { isDraft: true }
+    );
+    // write a receipt to the bsff
+    await prisma.bsff.update({
+      where: { id: bsff.id },
+      data: {
+        transporterRecepisseNumber: "abc",
+        transporterRecepisseDepartment: "13",
+        transporterRecepisseValidityLimit: new Date()
+      }
+    });
+
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const { mutate } = makeClient(emitter.user);
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          transporter: {
+            company: {
+              siret: transporter.siret
+            }
+          }
+        }
+      }
+    });
+
+    // recepisse is empty
+    expect(data.updateBsff.transporter!.recepisse?.isExempted).toBeUndefined();
+    expect(data.updateBsff.transporter!.recepisse?.number).toBeUndefined();
+    expect(
+      data.updateBsff.transporter!.recepisse?.validityLimit
+    ).toBeUndefined();
+    expect(data.updateBsff.transporter!.recepisse?.department).toBeUndefined();
+  });
+
+  it("should empty a bsff transporter recepisse if transporter has isExempted", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff(
+      { emitter, transporter: emitter },
+      { isDraft: true }
+    );
+    await prisma.bsff.update({
+      where: { id: bsff.id },
+      data: {
+        transporterRecepisseIsExempted: true
+      }
+    });
+
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const { mutate } = makeClient(emitter.user);
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          transporter: {
+            company: {
+              siret: transporter.siret
+            }
+          }
+        }
+      }
+    });
+
+    // recepisse is empty
+    expect(data.updateBsff.transporter!.recepisse?.isExempted).toEqual(true);
+    expect(data.updateBsff.transporter!.recepisse?.number).toBeNull();
+    expect(data.updateBsff.transporter!.recepisse?.validityLimit).toBeNull();
+    expect(data.updateBsff.transporter!.recepisse?.department).toBeNull();
+  });
+
   it("should allow user to update a bsff packagings", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff(
@@ -139,6 +306,56 @@ describe("Mutation.updateBsff", () => {
     expect(data.updateBsff.packagings).toEqual([
       expect.objectContaining({ name: "BOUTEILLE", weight: 1, numero: "2" }),
       expect.objectContaining({ name: "BOUTEILLE", weight: 1, numero: "3" })
+    ]);
+  });
+
+  it("should update fiche d'interventions", async () => {
+    const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur1 = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur2 = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const ficheIntervention1 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur1
+    });
+    const ficheIntervention2 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur2
+    });
+    const bsff = await createBsff(
+      { emitter: operateur },
+      {
+        type: "COLLECTE_PETITES_QUANTITES",
+        ficheInterventions: { connect: { id: ficheIntervention1.id } },
+        isDraft: true
+      }
+    );
+
+    const { mutate } = makeClient(operateur.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          ficheInterventions: [ficheIntervention2.id]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { ficheInterventions: true }
+    });
+
+    expect(updatedBsff.ficheInterventions.map(fi => fi.id)).toEqual([
+      ficheIntervention2.id
+    ]);
+    expect(updatedBsff.detenteurCompanySirets).toEqual([
+      detenteur2.company.siret
     ]);
   });
 
@@ -485,6 +702,7 @@ describe("Mutation.updateBsff", () => {
   test("after transporter signature > it should be possible to update reception fields", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    await transporterReceiptFactory({ company: transporter.company });
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsffAfterTransport({
       emitter,

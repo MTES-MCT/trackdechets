@@ -79,16 +79,9 @@ function transporterCompanyInput(siret: string) {
   };
 }
 
-const recepisseInput = {
-  number: "12379",
-  department: "07",
-  validityLimit: "2020-06-30"
-};
-
 function transporterInput(siret: string) {
   return {
-    company: transporterCompanyInput(siret),
-    recepisse: recepisseInput
+    company: transporterCompanyInput(siret)
   };
 }
 
@@ -167,7 +160,6 @@ function destinationSignatureUpdateInput() {
 function transporterToGroupInput(siret: string) {
   return {
     company: transporterCompanyInput(siret),
-    recepisse: recepisseInput,
     transport: {
       mode: "ROAD",
       plates: ["abc21cde"],

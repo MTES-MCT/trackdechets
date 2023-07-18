@@ -247,6 +247,7 @@ describe("searchCompanies", () => {
       addressVoie: "4 BD LONGCHAMP",
       codeCommune: undefined,
       codePaysEtrangerEtablissement: undefined,
+      companyTypes: [],
       addressPostalCode: company.addressPostalCode,
       addressCity: "MARSEILLE",
       name: company.name,

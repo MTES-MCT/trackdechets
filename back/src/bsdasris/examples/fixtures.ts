@@ -46,16 +46,9 @@ function transporteurCompanyInput(siret: string) {
   };
 }
 
-const recepisseInput = {
-  number: "KIH-458-87",
-  department: "07",
-  validityLimit: "2022-01-01"
-};
-
 function transporterInput(siret: string) {
   return {
-    company: transporteurCompanyInput(siret),
-    recepisse: recepisseInput
+    company: transporteurCompanyInput(siret)
   };
 }
 
@@ -67,7 +60,7 @@ const transportInput = {
     isEstimate: false
   },
   packagings: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }],
-
+  plates: ["XX-000-XX"],
   takenOverAt: "2022-04-27"
 };
 
@@ -78,7 +71,7 @@ const synthesisTransportInput = {
     value: 1,
     isEstimate: false
   },
-
+  plates: ["XX-000-XX"],
   takenOverAt: "2022-04-27"
 };
 function destinationCompanyInput(siret: string) {

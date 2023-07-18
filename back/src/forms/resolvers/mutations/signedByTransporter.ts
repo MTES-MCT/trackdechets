@@ -20,6 +20,7 @@ import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import { Prisma } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
+import { getFormReceiptField } from "./signTransportForm";
 
 const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
   async (parent, args, context) => {
@@ -67,10 +68,12 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       wasteDetailsOnuCode: infos.onuCode ?? form.wasteDetailsOnuCode
     };
 
+    const receiptFields = await getFormReceiptField(transporter);
     const futureForm = {
       ...transporter,
       ...form,
-      ...wasteDetails
+      ...wasteDetails,
+      ...receiptFields
     };
 
     // check waste details override is valid and transporter info is filled
@@ -80,7 +83,8 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
 
     const transporterUpdate: Prisma.BsddTransporterUpdateWithoutFormInput = {
       takenOverAt: infos.sentAt, // takenOverAt is duplicated between Form and BsddTransporter
-      takenOverBy: user.name // takenOverBy is duplicated between Form and BsddTransporter
+      takenOverBy: user.name, // takenOverBy is duplicated between Form and BsddTransporter
+      ...receiptFields
     };
 
     if (form.takenOverAt && fullForm.forwardedIn) {
