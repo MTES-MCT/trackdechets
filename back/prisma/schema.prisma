@@ -223,6 +223,9 @@ model Company {
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
+  @@index([createdAt], map: "_CompanyCreatedAtIdx")
+  @@index([companyTypes], map: "_CompanyTypesIdx")
+  @@index([verificationStatus], map: "_CompanyVerificationStatusIdx")
 }
 
 // Companies with restricted diffusion of SIRENE or VAT information (police, army, etc)
@@ -260,6 +263,7 @@ model CompanyAssociation {
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")
+  @@index([role], map: "_CompanyAssociationRoleIdx")
 }
 
 model SignatureAutomation {
