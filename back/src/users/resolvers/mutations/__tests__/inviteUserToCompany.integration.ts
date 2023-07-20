@@ -62,8 +62,8 @@ describe("mutation inviteUserToCompany", () => {
         }
       })
       .company();
-    expect(userCompany.siret).toEqual(company.siret);
-    expect(userCompany.siret).toEqual(company.siret);
+    expect(userCompany?.siret).toEqual(company.siret);
+    expect(userCompany?.siret).toEqual(company.siret);
   });
 
   test("admin user can invite a new user to a company", async () => {

@@ -974,7 +974,7 @@ describe("query favorites", () => {
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: forwardedIn.recipientCompanySiret
+        siret: forwardedIn?.recipientCompanySiret
       })
     ]);
   });

@@ -603,7 +603,7 @@ describe("Mutation.updateBsda", () => {
       .findUniqueOrThrow({ where: { id: bsda.id } })
       .forwarding();
 
-    expect(actualForwarded.id).toEqual(newForwarded.id);
+    expect(actualForwarded?.id).toEqual(newForwarded.id);
   });
 
   it("should ignore grouping if the bsdas ids order has changed", async () => {
