@@ -148,11 +148,7 @@ export const envVariables = z
       .optional()
       .default("false")
       .refine(isBoolean),
-    MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER: z
-      .string()
-      .optional()
-      .default("0")
-      .refine(isNumber)
+    MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER: z.string().datetime().optional()
   })
   .superRefine((val, ctx) => {
     if (val.SENTRY_DSN && !val.SENTRY_ENVIRONMENT) {

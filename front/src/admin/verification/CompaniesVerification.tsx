@@ -27,7 +27,11 @@ export default function CompaniesVerification() {
         (acc, filter) => ({ ...acc, [filter.id]: filter.value }),
         {}
       );
-      refetch({ first: pageSize, skip: pageIndex * pageSize, where });
+      refetch({
+        first: pageSize,
+        skip: pageIndex * pageSize,
+        where: Object.keys(where).length ? where : undefined,
+      });
     },
     [refetch]
   );
