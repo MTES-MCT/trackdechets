@@ -221,10 +221,11 @@ model Company {
   givenSignatureAutomations            SignatureAutomation[]     @relation("SignatureAutomationFrom")
   receivedSignatureAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
 
+  // gin indices _CompanyTypesIdx => 148_create_company_indices.sql
+
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
   @@index([createdAt], map: "_CompanyCreatedAtIdx")
-  @@index([companyTypes], map: "_CompanyTypesIdx")
   @@index([verificationStatus], map: "_CompanyVerificationStatusIdx")
 }
 
