@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import prisma from "../prisma";
 import { ApplicationNotFound } from "./errors";
 
@@ -7,7 +6,9 @@ import { ApplicationNotFound } from "./errors";
  */
 export async function getApplicationOrApplicationNotFound({
   id
-}: Required<Prisma.ApplicationWhereUniqueInput>) {
+}: {
+  id: string;
+}) {
   const application = await prisma.application.findUnique({
     where: { id }
   });
