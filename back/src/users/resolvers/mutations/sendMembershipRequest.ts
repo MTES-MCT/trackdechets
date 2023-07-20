@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -14,6 +13,7 @@ import {
   membershipRequestConfirmation
 } from "../../../mailer/templates";
 import { getEmailDomain, canSeeEmail } from "../../utils";
+import { UserInputError } from "../../../common/errors";
 
 const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] =
   async (parent, { siret }, context) => {

@@ -1,16 +1,15 @@
-import {
-  ApolloError,
-  ApolloServer,
-  AuthenticationError,
-  ForbiddenError,
-  gql,
-  UserInputError
-} from "apollo-server-express";
+import { ApolloServer, gql } from "apollo-server-express";
 import express from "express";
 import * as Sentry from "@sentry/node";
 import supertest from "supertest";
 import * as yup from "yup";
 import sentryReporter from "../sentryReporter";
+import {
+  AuthenticationError,
+  ForbiddenError,
+  UserInputError
+} from "../../errors";
+import { GraphQLError } from "graphql";
 
 const captureExceptionSpy = jest.spyOn(Sentry, "captureException");
 const mockResolver = jest.fn();
@@ -89,7 +88,7 @@ describe("graphqlErrorHandler", () => {
 
   it("should not report generic ApolloError", async () => {
     mockResolver.mockImplementation(() => {
-      throw new ApolloError("Bam Boom");
+      throw new GraphQLError("Bam Boom");
     });
     await request.post("/graphql").send({ query: "query { bim }" });
     expect(captureExceptionSpy).not.toHaveBeenCalled();

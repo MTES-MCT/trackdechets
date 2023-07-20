@@ -5,7 +5,7 @@ import { renderMail } from "../../../mailer/templates/renderers";
 import { onSignup } from "../../../mailer/templates";
 import { object, string } from "yup";
 import { checkCaptcha } from "../../../captcha/captchaGen";
-import { UserInputError } from "apollo-server-core";
+import { UserInputError } from "../../../common/errors";
 
 const resendActivationEmail: MutationResolvers["resendActivationEmail"] =
   async (parent, { input }) => {

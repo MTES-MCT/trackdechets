@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import {
@@ -8,6 +7,7 @@ import {
   createUser
 } from "../../database";
 import { hashPassword } from "../../utils";
+import { UserInputError } from "../../../common/errors";
 
 const validationSchema = yup.object({
   name: yup.string().required("Le nom est un champ requis"),

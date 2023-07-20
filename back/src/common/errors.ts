@@ -1,9 +1,4 @@
-import {
-  ApolloError,
-  AuthenticationError,
-  UserInputError,
-  ForbiddenError
-} from "apollo-server-express";
+import { GraphQLError } from "graphql";
 
 /**
  * Apollo built-in error code
@@ -22,10 +17,44 @@ export enum ErrorCode {
   GRAPHQL_MAX_OPERATIONS_ERROR = "GRAPHQL_MAX_OPERATIONS_ERROR"
 }
 
-export class TooManyRequestsError extends ApolloError {
-  constructor(message: string, properties?: Record<string, any>) {
-    super(message, "TOO_MANY_REQUESTS", properties);
-    Object.defineProperty(this, "name", { value: "TooManyRequestsError" });
+export class ForbiddenError extends GraphQLError {
+  constructor(message: string) {
+    super(message, {
+      extensions: {
+        code: ErrorCode.FORBIDDEN
+      }
+    });
+  }
+}
+
+export class AuthenticationError extends GraphQLError {
+  constructor(message: string) {
+    super(message, {
+      extensions: {
+        code: ErrorCode.UNAUTHENTICATED
+      }
+    });
+  }
+}
+
+export class UserInputError extends GraphQLError {
+  constructor(message: string, extensions?: Record<string, any>) {
+    super(message, {
+      extensions: {
+        ...extensions,
+        code: ErrorCode.BAD_USER_INPUT
+      }
+    });
+  }
+}
+
+export class TooManyRequestsError extends GraphQLError {
+  constructor(message: string) {
+    super(message, {
+      extensions: {
+        code: ErrorCode.TOO_MANY_REQUESTS
+      }
+    });
   }
 }
 

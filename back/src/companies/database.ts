@@ -13,9 +13,9 @@ import {
   WorkerCertificationNotFound
 } from "./errors";
 import { CompanyMember, UserRole } from "../generated/graphql/types";
-import { UserInputError } from "apollo-server-express";
 import { AppDataloaders } from "../types";
 import { differenceInDays } from "date-fns";
+import { UserInputError } from "../common/errors";
 /**
  * Retrieves a company by any unique identifier or throw a CompanyNotFound error
  */

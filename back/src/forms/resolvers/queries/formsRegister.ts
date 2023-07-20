@@ -9,7 +9,7 @@ import {
 import { wastesRegistryCsvResolverFn } from "../../../registry/resolvers/queries/wastesRegistryCsv";
 import { wastesRegistryXlsResolverFn } from "../../../registry/resolvers/queries/wastesRegistryXls";
 import { can, getUserRoles, Permission } from "../../../permissions";
-import { ForbiddenError } from "apollo-server-core";
+import { ForbiddenError } from "../../../common/errors";
 
 // compatibility between register v1 and register v2
 const exportTypeToRegisterType: Record<

@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import { UserRole } from "@prisma/client";
 import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
@@ -6,6 +5,7 @@ import { convertUrls, getCompanyActiveUsers } from "../../database";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
+import { UserInputError } from "../../../common/errors";
 
 const deleteCompanyResolver: MutationResolvers["deleteCompany"] = async (
   _,

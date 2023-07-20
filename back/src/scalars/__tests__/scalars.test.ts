@@ -1,6 +1,7 @@
-import { ApolloServer, gql, UserInputError } from "apollo-server-express";
+import { ApolloServer, gql } from "apollo-server-express";
 import { format } from "date-fns";
 import scalars from "..";
+import { UserInputError } from "../../common/errors";
 
 describe("DateTime", () => {
   afterAll(() => jest.clearAllMocks());

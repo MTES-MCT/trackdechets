@@ -7,7 +7,6 @@ import {
   Status,
   WasteAcceptationStatus
 } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
 import { Decimal } from "decimal.js-light";
 import { checkVAT } from "jsvat";
 import countries from "world-countries";
@@ -67,6 +66,7 @@ import {
 } from "./errors";
 import { format, sub } from "date-fns";
 import { getFirstTransporterSync } from "./database";
+import { UserInputError } from "../common/errors";
 // set yup default error messages
 configureYup();
 

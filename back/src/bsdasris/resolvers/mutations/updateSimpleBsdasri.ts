@@ -3,12 +3,12 @@ import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
 
 import { BsdasriInput } from "../../../generated/graphql/types";
 import { validateBsdasri } from "../../validation";
-import { UserInputError } from "apollo-server-express";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { getBsdasriRepository } from "../../repository";
 import { checkEditionRules } from "../../edition";
 import sirenify from "../../sirenify";
 import { recipify } from "../../recipify";
+import { UserInputError } from "../../../common/errors";
 
 const getGroupedBsdasriArgs = (
   inputRegroupedBsdasris: string[] | null | undefined

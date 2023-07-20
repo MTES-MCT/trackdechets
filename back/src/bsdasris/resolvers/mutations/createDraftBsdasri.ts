@@ -1,9 +1,9 @@
+import { UserInputError } from "../../../common/errors";
 import {
   MutationCreateBsdasriArgs,
   ResolversParentTypes
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-import { UserInputError } from "apollo-server-express";
 import createBsdasri from "./createBsdasri";
 
 const createDraftBsdasriResolver = async (

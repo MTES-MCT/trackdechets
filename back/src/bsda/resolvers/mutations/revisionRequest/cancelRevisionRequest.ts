@@ -1,11 +1,11 @@
 import { RevisionRequestStatus } from "@prisma/client";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../../common/permissions";
 import { MutationCancelBsdaRevisionRequestArgs } from "../../../../generated/graphql/types";
 import { GraphQLContext } from "../../../../types";
 import { getBsdaRepository } from "../../../repository";
 import { Permission, can, getUserRoles } from "../../../../permissions";
 import prisma from "../../../../prisma";
+import { ForbiddenError, UserInputError } from "../../../../common/errors";
 
 export async function cancelBsdaRevisionRequest(
   _,

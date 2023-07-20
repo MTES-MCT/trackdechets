@@ -1,4 +1,3 @@
-import { ApolloError, UserInputError } from "apollo-server-express";
 import { checkVAT } from "jsvat";
 import path from "path";
 import { createClientAsync, Client, IOptions } from "soap";
@@ -8,11 +7,20 @@ import {
   isVat
 } from "../../../common/constants/companySearchHelpers";
 import logger from "../../../logging/logger";
-import { ErrorCode } from "../../../common/errors";
+import { ErrorCode, UserInputError } from "../../../common/errors";
+import { GraphQLError } from "graphql";
 
 const viesUrl = path.join(__dirname, "checkVatService.wsdl");
 
-export class ViesClientError extends ApolloError {}
+export class ViesClientError extends GraphQLError {
+  constructor(message: string) {
+    super(message, {
+      extensions: {
+        code: ErrorCode.EXTERNAL_SERVICE_ERROR
+      }
+    });
+  }
+}
 
 /**
  * Dependency injection
@@ -112,7 +120,7 @@ export const client = async (
       });
     }
     // Throws VIES Server unavailability message
-    throw new ViesClientError(faultMessage, ErrorCode.EXTERNAL_SERVICE_ERROR);
+    throw new ViesClientError(faultMessage);
   }
 };
 

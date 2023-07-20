@@ -1,4 +1,3 @@
-import { ForbiddenError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationPublishBsvhuArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
@@ -7,6 +6,7 @@ import { getBsvhuOrNotFound } from "../../database";
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import { checkCanUpdate } from "../../permissions";
+import { ForbiddenError } from "../../../common/errors";
 
 export default async function publish(
   _,

@@ -1,9 +1,9 @@
-import { ApolloError } from "apollo-server-express";
 import { ApolloServerPlugin } from "apollo-server-plugin-base";
 import { ValidationError } from "yup";
 import * as Sentry from "@sentry/node";
+import { GraphQLError } from "graphql";
 
-const knownErrors = [ApolloError, ValidationError];
+const knownErrors = [GraphQLError, ValidationError];
 
 /**
  * Apollo server plugin used to capture unhandled errors in Sentry

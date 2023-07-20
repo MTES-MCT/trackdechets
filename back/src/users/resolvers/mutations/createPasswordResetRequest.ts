@@ -8,8 +8,8 @@ import { createPasswordResetRequest } from "../../../mailer/templates";
 import { sanitizeEmail } from "../../../utils";
 import { addHours } from "date-fns";
 import { checkCaptcha } from "../../../captcha/captchaGen";
+import { UserInputError } from "../../../common/errors";
 
-import { UserInputError } from "apollo-server-core";
 const createPasswordResetRequestResolver: MutationResolvers["createPasswordResetRequest"] =
   async (parent, { input }) => {
     const { email, captcha } = input;

@@ -1,6 +1,6 @@
 import { GraphQLScalarType, Kind } from "graphql";
-import { UserInputError } from "apollo-server-express";
 import xss, { IFilterXSSOptions } from "xss";
+import { UserInputError } from "../common/errors";
 
 const xssOptions: IFilterXSSOptions = { stripIgnoreTag: true };
 

@@ -3,7 +3,6 @@ import {
   CompanyVerificationMode,
   CompanyVerificationStatus
 } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
@@ -20,7 +19,10 @@ import { isForeignVat } from "../../../common/constants/companySearchHelpers";
 import { isTransporter } from "../../validation";
 import * as COMPANY_CONSTANTS from "../../../common/constants/COMPANY_CONSTANTS";
 import { Permission, checkUserPermissions } from "../../../permissions";
-import { NotCompanyAdminErrorMsg } from "../../../common/errors";
+import {
+  NotCompanyAdminErrorMsg,
+  UserInputError
+} from "../../../common/errors";
 
 export const sendPostVerificationFirstOnboardingEmail = async (
   company: Company,

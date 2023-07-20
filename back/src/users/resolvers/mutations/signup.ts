@@ -1,5 +1,4 @@
 import { User } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import prisma from "../../../prisma";
 import * as yup from "yup";
@@ -17,6 +16,7 @@ import {
 import { hashPassword, checkPasswordCriteria } from "../../utils";
 import { onSignup } from "../../../mailer/templates";
 import { renderMail } from "../../../mailer/templates/renderers";
+import { UserInputError } from "../../../common/errors";
 
 function validateArgs(args: MutationSignupArgs) {
   const signupSchema = yup.object({

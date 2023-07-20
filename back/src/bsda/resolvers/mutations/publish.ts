@@ -1,4 +1,3 @@
-import { ForbiddenError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationPublishBsdaArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
@@ -7,6 +6,7 @@ import { getBsdaOrNotFound } from "../../database";
 import { getBsdaRepository } from "../../repository";
 import { checkCanUpdate } from "../../permissions";
 import { parseBsda } from "../../validation/validate";
+import { ForbiddenError } from "../../../common/errors";
 
 export default async function publish(
   _,

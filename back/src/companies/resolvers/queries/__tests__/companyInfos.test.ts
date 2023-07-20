@@ -1,6 +1,5 @@
-import { UserInputError } from "apollo-server-express";
 import { getCompanyInfos } from "../companyInfos";
-import { ErrorCode } from "../../../../common/errors";
+import { ErrorCode, UserInputError } from "../../../../common/errors";
 import { siretify } from "../../../../__tests__/factories";
 
 const searchCompanyMock = jest.fn();

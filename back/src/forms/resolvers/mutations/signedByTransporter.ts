@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import {
   checkIsAuthenticated,
   checkSecurityCode
@@ -21,6 +20,7 @@ import { getFormRepository } from "../../repository";
 import { Prisma } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 import { getFormReceiptField } from "./signTransportForm";
+import { UserInputError } from "../../../common/errors";
 
 const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
   async (parent, args, context) => {

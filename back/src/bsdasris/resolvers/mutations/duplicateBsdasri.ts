@@ -7,10 +7,10 @@ import {
 } from "../../../generated/graphql/types";
 import { expandBsdasriFromDB } from "../../converter";
 import { getBsdasriOrNotFound } from "../../database";
-import { ForbiddenError } from "apollo-server-express";
 import { getBsdasriRepository } from "../../repository";
 import { checkCanDuplicate } from "../../permissions";
 import prisma from "../../../prisma";
+import { ForbiddenError } from "../../../common/errors";
 
 /**
  *

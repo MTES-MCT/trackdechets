@@ -1,5 +1,5 @@
-import { ForbiddenError } from "apollo-server-core";
 import { applyAuthStrategies, AuthType } from "../../../auth";
+import { ForbiddenError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";

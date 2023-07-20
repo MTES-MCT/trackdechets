@@ -1,4 +1,4 @@
-import { ForbiddenError, UserInputError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyAdminUsers } from "../../../companies/database";
 import { QueryResolvers } from "../../../generated/graphql/types";

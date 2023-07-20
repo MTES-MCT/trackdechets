@@ -3,11 +3,11 @@ import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAdmin } from "../../../common/permissions";
 import { applyAuthStrategies, AuthType } from "../../../auth";
-import { UserInputError } from "apollo-server-core";
 import { PrismaTransaction } from "../../../common/repository/types";
 import { hashPassword } from "../../utils";
 import { clearUserSessions } from "../../clearUserSessions";
 import { getUid } from "../../../utils";
+import { UserInputError } from "../../../common/errors";
 
 export async function checkCompanyAssociations(user: User): Promise<string[]> {
   const errors: string[] = [];

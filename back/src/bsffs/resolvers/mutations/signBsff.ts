@@ -4,7 +4,6 @@ import {
   BsffPackaging,
   WasteAcceptationStatus
 } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   BsffSignatureInput,
@@ -30,6 +29,7 @@ import {
 } from "../../repository";
 import { checkCanSignFor } from "../../../permissions";
 import { getTransporterReceipt } from "../../../bsdasris/recipify";
+import { UserInputError } from "../../../common/errors";
 
 const signBsff: MutationResolvers["signBsff"] = async (
   _,

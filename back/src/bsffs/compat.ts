@@ -6,12 +6,12 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import prismaClient from "../prisma";
-import { UserInputError } from "apollo-server-core";
 import { RepositoryFnDeps } from "../common/repository/types";
 import { BsffPackagingInput } from "../generated/graphql/types";
 import { isFinalOperation } from "./constants";
 import { getReadonlyBsffPackagingRepository } from "./repository";
 import { Nullable } from "../types";
+import { UserInputError } from "../common/errors";
 
 type BsffDestination = {
   receptionWeight: number;

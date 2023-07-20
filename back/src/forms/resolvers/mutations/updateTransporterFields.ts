@@ -2,10 +2,10 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { isBsddTransporterFieldEditable } from "../../../common/constants/formHelpers";
 import { getFormOrFormNotFound } from "../../database";
-import { ForbiddenError } from "apollo-server-express";
 import { checkCanUpdateTransporterFields } from "../../permissions";
 import { expandFormFromDb } from "../../converter";
 import { getFormRepository } from "../../repository";
+import { ForbiddenError } from "../../../common/errors";
 
 const updateTransporterFieldsResolver: MutationResolvers["updateTransporterFields"] =
   async (

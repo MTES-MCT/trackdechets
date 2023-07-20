@@ -1,3 +1,4 @@
+import { UserInputError } from "../../common/errors";
 import {
   partiallyHideEmail,
   generatePassword,
@@ -7,7 +8,6 @@ import {
   minimalPasswordLength,
   checkPasswordCriteria
 } from "../utils";
-import { UserInputError } from "apollo-server-express";
 describe("partiallyHideEmail", () => {
   it("should partially hide a well formatted email address", () => {
     const hidden = partiallyHideEmail("john.snow@trackdechets.fr");

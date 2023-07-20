@@ -1,11 +1,7 @@
 import "./tracer";
 
 import { makeExecutableSchema } from "@graphql-tools/schema";
-import {
-  ApolloError,
-  ApolloServer,
-  UserInputError
-} from "apollo-server-express";
+import { ApolloServer } from "apollo-server-express";
 import redisStore from "connect-redis";
 import cors from "cors";
 import express, { json, static as serveStatic, urlencoded } from "express";
@@ -16,7 +12,7 @@ import passport from "passport";
 import path from "path";
 import { passportBearerMiddleware } from "./auth";
 import { ROAD_CONTROL_SLUG } from "./common/constants";
-import { ErrorCode } from "./common/errors";
+import { ErrorCode, UserInputError } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
 import { graphqlBodyParser } from "./common/middlewares/graphqlBodyParser";
@@ -45,6 +41,7 @@ import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
 import { captchaGen, captchaSound } from "./captcha/captchaGen";
+import { GraphQLError } from "graphql";
 
 const {
   SESSION_SECRET,
@@ -113,11 +110,15 @@ export const server = new ApolloServer({
       }
       // Do not leak error for internal server error in production
       const sentryId = (err?.originalError as any)?.sentryId;
-      return new ApolloError(
+      return new GraphQLError(
         sentryId
           ? `Erreur serveur : rapport d'erreur ${sentryId}`
           : "Erreur serveur",
-        ErrorCode.INTERNAL_SERVER_ERROR
+        {
+          extensions: {
+            code: ErrorCode.INTERNAL_SERVER_ERROR
+          }
+        }
       );
     }
 

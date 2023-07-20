@@ -1,8 +1,8 @@
 import { WebhookSettingNotFound } from "./errors";
-import { UserInputError } from "apollo-server-express";
 import { getReadonlyWebhookSettingRepository } from "./repository";
 import { WebhookSetting } from "@prisma/client";
 import prisma from "../prisma";
+import { UserInputError } from "../common/errors";
 
 /**
  * Retrieves a webhookConfig by id or throw a WebhookSettingNotFound error

@@ -10,8 +10,8 @@ import { createPDFResponse } from "../../../common/pdf";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { buildPdf } from "../../pdf/generator";
 import prisma from "../../../prisma";
-import { UserInputError } from "apollo-server-core";
 import { getReadonlyBsffPackagingRepository } from "../../repository";
+import { UserInputError } from "../../../common/errors";
 
 export const bsffPdfDownloadHandler: DownloadHandler<QueryBsffPdfArgs> = {
   name: "bsffPdf",

@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import { compare } from "bcrypt";
 import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
@@ -11,6 +10,7 @@ import { checkPasswordCriteria } from "../../utils";
 import { updateUserPassword } from "../../database";
 import { storeUserSessionsId } from "../../../common/redis/users";
 import { clearUserSessions } from "../../clearUserSessions";
+import { UserInputError } from "../../../common/errors";
 
 /**
  * Change user password

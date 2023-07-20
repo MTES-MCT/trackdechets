@@ -1,5 +1,4 @@
 import { Bsda, BsdaStatus, BsdaType, Prisma } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
 import {
   AlreadySignedError,
   InvalidSignatureError
@@ -27,6 +26,7 @@ import {
   BsdTransporterReceiptPart,
   getTransporterReceipt
 } from "../../../bsdasris/recipify";
+import { UserInputError } from "../../../common/errors";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,

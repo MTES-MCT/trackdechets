@@ -2,7 +2,7 @@ import { QueryResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
-import { UserInputError } from "apollo-server-core";
+import { UserInputError } from "../../../common/errors";
 
 const myApplications: QueryResolvers["myApplications"] = async (
   _,
