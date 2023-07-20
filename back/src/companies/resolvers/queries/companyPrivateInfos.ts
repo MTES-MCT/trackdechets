@@ -1,7 +1,6 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import {
   isSiret,
-  isVat,
   cleanClue as cleanClueFn
 } from "../../../common/constants/companySearchHelpers";
 import { checkIsAuthenticated } from "../../../common/permissions";
