@@ -34,7 +34,6 @@ export const envVariables = z
     OIDC_PRIVATE_KEY: z.string(),
     // -------
     // Various
-    REGISTRY_WHITE_LIST_IP: z.string().optional(),
     USERS_BLACKLIST: z.string().optional(),
     MAX_REQUESTS_PER_WINDOW: z.string().optional().default("1000"),
     STARTUP_FILE: z.string().optional(),
