@@ -885,6 +885,11 @@ describe("Mutation.updateBsda", () => {
       destination: {
         company: {
           siret: transporter.company.siret
+        },
+        operation: {
+          nextDestination: {
+            company: { siret: transporter.company.siret }
+          }
         }
       }
     };
