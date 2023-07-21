@@ -903,4 +903,53 @@ describe("Mutation.updateBsda", () => {
       "Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comment destination finale."
     );
   });
+
+  it("if disabling the worker, all worker data (including certification) shoud be removed", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        workerCertificationHasSubSectionFour: true,
+        workerCertificationHasSubSectionThree: true,
+        workerCertificationCertificationNumber: "CERTIFICATION-NUMBER",
+        workerCertificationValidityLimit: new Date(),
+        workerCertificationOrganisation: "AFNOR Certification"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          worker: {
+            isDisabled: true
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    expect(data.updateBsda.id).toBeTruthy();
+
+    const updatedBsda = await prisma.bsda.findUnique({
+      where: { id: data.updateBsda.id }
+    });
+
+    expect(updatedBsda?.workerCompanyName).toBeNull();
+    expect(updatedBsda?.workerCompanySiret).toBeNull();
+    expect(updatedBsda?.workerCompanyAddress).toBeNull();
+    expect(updatedBsda?.workerCompanyContact).toBeNull();
+    expect(updatedBsda?.workerCompanyPhone).toBeNull();
+    expect(updatedBsda?.workerCompanyMail).toBeNull();
+    expect(updatedBsda?.workerCertificationHasSubSectionFour).toBe(false);
+    expect(updatedBsda?.workerCertificationHasSubSectionThree).toBe(false);
+    expect(updatedBsda?.workerCertificationCertificationNumber).toBeNull();
+    expect(updatedBsda?.workerCertificationValidityLimit).toBeNull();
+    expect(updatedBsda?.workerCertificationOrganisation).toBeNull();
+  });
 });

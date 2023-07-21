@@ -13,6 +13,20 @@ import { getBsdaRepository } from "../../repository";
 import { parseBsda } from "../../validation/validate";
 import { canBypassSirenify } from "../../../companies/sirenify";
 
+const emptyWorkerData = {
+  workerCompanyName: null,
+  workerCompanySiret: null,
+  workerCompanyAddress: null,
+  workerCompanyContact: null,
+  workerCompanyPhone: null,
+  workerCompanyMail: null,
+  workerCertificationHasSubSectionFour: false,
+  workerCertificationHasSubSectionThree: false,
+  workerCertificationCertificationNumber: null,
+  workerCertificationValidityLimit: null,
+  workerCertificationOrganisation: null
+};
+
 export default async function edit(
   _,
   { id, input }: MutationUpdateBsdaArgs,
@@ -33,8 +47,10 @@ export default async function edit(
     ...flattenedInput,
     intermediaries: input.intermediaries ?? existingBsda.intermediaries,
     grouping: input.grouping || existingBsda.grouping.map(bsda => bsda.id),
-    forwarding: input.forwarding || existingBsda.forwarding?.id
+    forwarding: input.forwarding || existingBsda.forwarding?.id,
+    ...(flattenedInput.workerIsDisabled ? emptyWorkerData : {})
   };
+
   const bsda = await parseBsda(unparsedBsda, {
     enableCompletionTransformers: !canBypassSirenify(user),
     enablePreviousBsdasChecks: true,
