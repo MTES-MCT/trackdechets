@@ -904,7 +904,7 @@ describe("Mutation.updateBsda", () => {
     );
   });
 
-  it("if disabling the worker, all worker data (including certification) shoud be removed", async () => {
+  it("if disabling the worker, worker certification data shoud be removed", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
       opt: {
@@ -926,7 +926,11 @@ describe("Mutation.updateBsda", () => {
         id: bsda.id,
         input: {
           worker: {
-            isDisabled: true
+            isDisabled: true,
+            company: {
+              name: null,
+              siret: null
+            }
           }
         }
       }
@@ -942,10 +946,6 @@ describe("Mutation.updateBsda", () => {
 
     expect(updatedBsda?.workerCompanyName).toBeNull();
     expect(updatedBsda?.workerCompanySiret).toBeNull();
-    expect(updatedBsda?.workerCompanyAddress).toBeNull();
-    expect(updatedBsda?.workerCompanyContact).toBeNull();
-    expect(updatedBsda?.workerCompanyPhone).toBeNull();
-    expect(updatedBsda?.workerCompanyMail).toBeNull();
     expect(updatedBsda?.workerCertificationHasSubSectionFour).toBe(false);
     expect(updatedBsda?.workerCertificationHasSubSectionThree).toBe(false);
     expect(updatedBsda?.workerCertificationCertificationNumber).toBeNull();
