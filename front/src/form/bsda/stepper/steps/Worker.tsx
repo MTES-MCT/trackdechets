@@ -23,6 +23,20 @@ export function Worker({ disabled }) {
     );
   }
 
+  const resetWorkerData = () => {
+    setFieldValue("worker.company.name", null);
+    setFieldValue("worker.company.siret", null);
+    setFieldValue("worker.company.contact", null);
+    setFieldValue("worker.company.address", null);
+    setFieldValue("worker.company.mail", null);
+    setFieldValue("worker.company.phone", null);
+    setFieldValue("worker.certification.hasSubSectionFour", false);
+    setFieldValue("worker.certification.hasSubSectionThree", false);
+    setFieldValue("worker.certification.certificationNumber", null);
+    setFieldValue("worker.certification.validityLimit", null);
+    setFieldValue("worker.certification.organisation", null);
+  };
+
   return (
     <>
       {disabled && (
@@ -41,12 +55,7 @@ export function Worker({ disabled }) {
             className="td-checkbox"
             onChange={e => {
               handleChange(e);
-              setFieldValue("worker.company.name", null);
-              setFieldValue("worker.company.siret", null);
-              setFieldValue("worker.company.contact", null);
-              setFieldValue("worker.company.address", null);
-              setFieldValue("worker.company.mail", null);
-              setFieldValue("worker.company.phone", null);
+              resetWorkerData();
             }}
           />
           Il n'y a pas d'entreprise de travaux
