@@ -44,8 +44,12 @@ async function reshipmentBsdaTransformer(
 
 async function recipisseTransporterTransformer(
   val: ZodBsda,
-  _: string[]
+  sealedFields: string[]
 ): Promise<ZodBsda> {
+  if (sealedFields.includes("transporterCompanySiret")) {
+    return val;
+  }
+
   const orgId = getTransporterCompanyOrgId({
     transporterCompanySiret: val.transporterCompanySiret ?? null,
     transporterCompanyVatNumber: val.transporterCompanyVatNumber ?? null

@@ -900,7 +900,56 @@ describe("Mutation.updateBsda", () => {
 
     expect(errors.length).toBe(1);
     expect(errors[0].message).toBe(
-      "Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comment destination finale."
+      "Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comme destination finale."
+    );
+  });
+
+  it("should allow removing the nextDestination", async () => {
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_WORKER",
+        destinationCompanySiret: transporter.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        destinationOperationNextDestinationCompanySiret:
+          destination.company.siret,
+        emitterEmissionSignatureAuthor: "Emit",
+        workerWorkSignatureAuthor: "Work"
+      }
+    });
+
+    const { mutate } = makeClient(transporter.user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: destination.company.siret
+        },
+        operation: {
+          nextDestination: null
+        }
+      }
+    };
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    const updatedBsda = await prisma.bsda.findUnique({
+      where: { id: data.updateBsda.id }
+    });
+
+    expect(updatedBsda?.destinationCompanySiret).toBe(
+      destination.company.siret
+    );
+    expect(updatedBsda?.destinationOperationNextDestinationCompanySiret).toBe(
+      null
     );
   });
 });
