@@ -61,6 +61,8 @@ async function duplicateBsda({
   destinationOperationSignatureDate,
   destinationOperationDate,
   wasteSealNumbers,
+  packagings,
+  weightValue,
   forwardingId,
   groupedInId,
   intermediaries,
@@ -116,7 +118,6 @@ async function duplicateBsda({
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
     isDraft: true,
-    packagings: bsda.packagings ?? Prisma.JsonNull,
     ...(intermediaries && {
       intermediaries: {
         createMany: {
