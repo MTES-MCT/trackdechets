@@ -273,7 +273,7 @@ async function validateDestination(
     return;
   }
 
-  // If we add a temporary destination, the final destination must remain the same 
+  // If we add a temporary destination, the final destination must remain the same
   if (
     currentBsda.destinationCompanySiret !== bsda.destinationCompanySiret &&
     bsda.destinationOperationNextDestinationCompanySiret &&
