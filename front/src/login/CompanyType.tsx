@@ -44,7 +44,7 @@ export const COMPANY_CONSTANTS = [
     value: CompanyType.Transporter,
     label: "Transporteur",
     helpText:
-      "Entreprises de transport routier, immatriculées au registre national, disposant d'un récépissé de déclaration de transport de déchets ou qui répond à l'exemption de récépissé",
+      "Entreprises de transport routier immatriculées au registre national des transports, ou transporteurs pour compte propre; disposant d'un récépissé de déclaration en Préfecture de l'activité de transport par route de déchets",
   },
   {
     value: CompanyType.Trader,

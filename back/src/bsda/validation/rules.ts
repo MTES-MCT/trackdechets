@@ -304,7 +304,7 @@ export const editionRules: {
     isRequired: false
   },
   wasteCode: { sealedBy: "EMISSION", isRequired: true, name: "le code déchet" },
-  wasteAdr: { sealedBy: "WORK", isRequired: true },
+  wasteAdr: { sealedBy: "WORK", isRequired: false },
   wasteFamilyCode: {
     sealedBy: "WORK",
     isRequired: true,
