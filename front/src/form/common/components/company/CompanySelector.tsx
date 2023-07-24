@@ -89,17 +89,17 @@ export default function CompanySelector({
   const { setFieldError, setFieldValue, setFieldTouched, values } =
     useFormikContext<{
       transporter:
-        | Maybe<TransporterInput>
-        | Maybe<BsdaTransporterInput>
-        | Maybe<BsdasriTransporterInput>
-        | Maybe<BsvhuTransporterInput>
-        | Maybe<BsffTransporterInput>;
+      | Maybe<TransporterInput>
+      | Maybe<BsdaTransporterInput>
+      | Maybe<BsdasriTransporterInput>
+      | Maybe<BsvhuTransporterInput>
+      | Maybe<BsffTransporterInput>;
     }>();
 
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
     (field.value?.country && field.value?.country !== "FR") ||
-      isForeignVat(field.value?.vatNumber!)
+    isForeignVat(field.value?.vatNumber!)
   );
   // this 2 input ref are to cross-link the value of the input in both search input and department input
   const departmentInputRef = useRef<HTMLInputElement>(null);
@@ -146,7 +146,6 @@ export default function CompanySelector({
     SEARCH_COMPANIES,
     {
       onCompleted: data => {
-        console.log("data", JSON.stringify(data, null, 4));
         mergeResults(
           data?.searchCompanies ?? [],
           favoritesData?.favorites ?? []
