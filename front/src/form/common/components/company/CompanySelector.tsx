@@ -158,9 +158,9 @@ export default function CompanySelector({
   // Fetch company again to have exhaustive data.
   useEffect(() => {
     if (field.value?.orgId) {
-      searchCompaniesQuery({ variables: { clue: field.value.orgId } });
+      searchCompaniesQuery({ variables: { clue: field.value?.orgId } });
     }
-  }, [searchCompaniesQuery, siret, field.value]);
+  }, [searchCompaniesQuery, siret, field.value?.orgId]);
 
   /**
    * CompanyPrivateInfos pour completer les informations
