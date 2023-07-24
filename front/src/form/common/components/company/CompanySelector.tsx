@@ -146,6 +146,7 @@ export default function CompanySelector({
     SEARCH_COMPANIES,
     {
       onCompleted: data => {
+        console.log("data", JSON.stringify(data, null, 4));
         mergeResults(
           data?.searchCompanies ?? [],
           favoritesData?.favorites ?? []
@@ -153,6 +154,14 @@ export default function CompanySelector({
       },
     }
   );
+
+  // Fix a bug where data is missing from selected company.
+  // Fetch company again to have exhaustive data.
+  useEffect(() => {
+    if (field.value.orgId) {
+      searchCompaniesQuery({ variables: { clue: field.value.orgId } });
+    }
+  }, [searchCompaniesQuery, siret, field.value]);
 
   /**
    * CompanyPrivateInfos pour completer les informations
@@ -192,6 +201,8 @@ export default function CompanySelector({
    * Selection d'un établissement dans le formulaire
    */
   function selectCompany(company?: CompanySearchResult) {
+    console.log("========== SELECT COMPANY ============");
+    console.log("company", JSON.stringify(company, null, 4));
     if (disabled) return;
     // empty the fields
     if (!company) {
