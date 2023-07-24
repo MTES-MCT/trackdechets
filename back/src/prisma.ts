@@ -35,6 +35,8 @@ if (process.env.NODE_ENV === "production") {
 }
 
 function collectMetrics() {
+  if (!process.env.DD_API_KEY) return;
+
   ddMetrics.init({
     host: process.env.API_HOST,
     site: process.env.DD_SITE,
