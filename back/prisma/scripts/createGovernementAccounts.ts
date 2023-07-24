@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Create government accounts",
   "Create government accounts",
-  false
+  true
 )
 export class CreateGovernementAccounts implements Updater {
   async run() {
@@ -19,6 +19,7 @@ export class CreateGovernementAccounts implements Updater {
           data: {
             governmentAccount: {
               create: {
+                permissions: ["REGISTRY_CAN_READ_ALL"],
                 name: accountName,
                 authorizedOrgIds: ["ALL"],
                 authorizedIPs: [] // à compléter à la mano
