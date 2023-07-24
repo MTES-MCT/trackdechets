@@ -42,7 +42,7 @@ export const userFactory = async (
  * a random number will not pass the luhnCheck
  * @param index numerical index
  */
-export function siretify(index: number | undefined) {
+export function siretify(index?: number) {
   if (index && index <= 9) {
     // Compatibility with an old version of siretify using
     // a company index. This should be refactored to remove
@@ -160,7 +160,9 @@ export const destinationFactory = async (
  * Create a user and an accessToken
  * @param opt : extra parameters for user
  */
-export const userWithAccessTokenFactory = async (opt = {}) => {
+export const userWithAccessTokenFactory = async (
+  opt: Partial<Prisma.UserCreateInput> = {}
+) => {
   const user = await userFactory(opt);
 
   const accessTokenIndex = (await prisma.accessToken.count()) + 1;

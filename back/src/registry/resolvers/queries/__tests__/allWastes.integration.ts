@@ -10,7 +10,8 @@ import {
   Company,
   Status,
   User,
-  UserRole
+  UserRole,
+  GovernmentPermission
 } from "@prisma/client";
 import {
   refreshElasticSearch,
@@ -29,11 +30,14 @@ import { indexForm } from "../../../../forms/elastic";
 import { Query } from "../../../../generated/graphql/types";
 import {
   formFactory,
-  userFactory,
+  userWithAccessTokenFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { ALL_WASTES } from "./queries";
+import supertest from "supertest";
+import { app } from "../../../../server";
+import { faker } from "@faker-js/faker";
 
 describe("All wastes registry", () => {
   let emitter: { user: User; company: Company };
@@ -200,19 +204,39 @@ describe("All wastes registry", () => {
 
   it("should not allow user to request any siret if authenticated from a service account", async () => {
     // service account access is limited to incomingWastes, outgoingWastes, transportedWastes and managedWastes
-    const user = await userFactory({ isRegistreNational: true });
-    const { query } = makeClient(user);
-    const { errors } = await query<Pick<Query, "allWastes">>(ALL_WASTES, {
-      variables: {
-        sirets: [destination.company.siret],
-        first: 2
+
+    const request = supertest(app);
+
+    const allowedIP = faker.internet.ipv4();
+
+    const { accessToken } = await userWithAccessTokenFactory({
+      governmentAccount: {
+        create: {
+          name: "RDNTS",
+          permissions: [GovernmentPermission.REGISTRY_CAN_READ_ALL],
+          authorizedIPs: [allowedIP],
+          authorizedOrgIds: ["ALL"]
+        }
       }
     });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${destination.company.siret}`
+
+    const res = await request
+      .post("/")
+      .send({
+        query: `{ allWastes(sirets: ["${destination.company.siret}"]) { totalCount } }`
       })
-    ]);
+      .set("Authorization", `Bearer ${accessToken}`)
+      .set("X-Forwarded-For", allowedIP);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        errors: [
+          expect.objectContaining({
+            message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${destination.company.siret}`
+          })
+        ]
+      })
+    );
   });
 
   it("should paginate forward with first and after", async () => {
