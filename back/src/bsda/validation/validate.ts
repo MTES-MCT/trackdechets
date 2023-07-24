@@ -269,15 +269,20 @@ async function validateDestination(
   const { findUnique } = getReadonlyBsdaRepository();
   const currentBsda = await findUnique({ id: bsda.id });
 
+  if (!currentBsda) {
+    return;
+  }
+
+  // If we add a temporary destination, the final destination must remain the same
   if (
-    currentBsda &&
     currentBsda.destinationCompanySiret !== bsda.destinationCompanySiret &&
+    bsda.destinationOperationNextDestinationCompanySiret &&
     bsda.destinationOperationNextDestinationCompanySiret !==
       currentBsda.destinationCompanySiret
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comment destination finale.`,
+      message: `Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comme destination finale.`,
       fatal: true
     });
   }
