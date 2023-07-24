@@ -201,8 +201,6 @@ export default function CompanySelector({
    * Selection d'un établissement dans le formulaire
    */
   function selectCompany(company?: CompanySearchResult) {
-    console.log("========== SELECT COMPANY ============");
-    console.log("company", JSON.stringify(company, null, 4));
     if (disabled) return;
     // empty the fields
     if (!company) {
