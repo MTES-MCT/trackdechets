@@ -7,7 +7,7 @@ import { enqueueBsdToDelete } from "../../../queue/producers/elastic";
 import { bsdasriEventTypes } from "./eventTypes";
 
 export type DeleteBsdasriFn = (
-  where: Prisma.BsdaWhereUniqueInput,
+  where: Prisma.BsdasriWhereUniqueInput,
   logMetadata?: LogMetadata
 ) => Promise<Bsdasri>;
 

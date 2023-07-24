@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 export type PrismaTransaction = Omit<
   PrismaClient,
-  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use"
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
 >;
 export type RepositoryTransaction = PrismaTransaction & {
   addAfterCommitCallback: (callback: () => void | Promise<void>) => void;
