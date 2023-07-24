@@ -52,7 +52,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     { ...unparsedBsda, isDraft },
     {
       enableCompletionTransformers: true,
-      enablePreviousBsdasChecks: !canBypassSirenify(user),
+      enablePreviousBsdasChecks: true,
       currentSignatureType: !isDraft ? "EMISSION" : undefined
     }
   );
