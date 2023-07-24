@@ -35,24 +35,6 @@ export function Transporter({ disabled }) {
         allowForeignCompanies={true}
         isBsdaTransporter={true}
         registeredOnlyCompanies={true}
-        onCompanySelected={transporter => {
-          if (transporter?.transporterReceipt) {
-            setFieldValue(
-              "transporter.recepisse.number",
-              transporter.transporterReceipt.receiptNumber
-            );
-            setFieldValue(
-              "transporter.recepisse.validityLimit",
-              transporter.transporterReceipt.validityLimit
-            );
-            setFieldValue(
-              "transporter.recepisse.department",
-              transporter.transporterReceipt.department
-            );
-          } else {
-            setFieldValue("transporter.recepisse", null);
-          }
-        }}
       />
       <TransporterReceiptEditionSwitch
         transporter={values.transporter!}

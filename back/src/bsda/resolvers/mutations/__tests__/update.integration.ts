@@ -1,4 +1,4 @@
-import { AuthType, TransportMode, UserRole } from "@prisma/client";
+import { TransportMode, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -381,7 +381,7 @@ describe("Mutation.updateBsda", () => {
     const receipt = await transporterReceiptFactory({
       company: transporter
     });
-    const { mutate } = makeClient({ ...user, auth: AuthType.BEARER }); // Force BEARER to activate transformers
+    const { mutate } = makeClient(user);
     const input = {
       transporter: { company: { siret: transporter.siret } }
     };
@@ -403,9 +403,45 @@ describe("Mutation.updateBsda", () => {
     expect(data.updateBsda.transporter!.recepisse!.number).toEqual(
       receipt.receiptNumber
     );
-    expect(data.updateBsda.transporter!.recepisse!.department).toEqual("83");
+    expect(data.updateBsda.transporter!.recepisse!.department).toEqual(
+      receipt.department
+    );
     expect(data.updateBsda.transporter!.recepisse!.validityLimit).toEqual(
-      "2055-01-01T00:00:00.000Z"
+      receipt.validityLimit.toISOString()
+    );
+    const transporter2 = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const receipt2 = await transporterReceiptFactory({
+      company: transporter2,
+      number: "other",
+      department: "32"
+    });
+    const input2 = {
+      transporter: { company: { siret: transporter2.siret } }
+    };
+    const { data: data2 } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: input2
+      }
+    });
+
+    expect(data2.updateBsda.transporter!.company!.siret).toEqual(
+      transporter2.siret
+    );
+    // recepisse2 is pulled from db
+    expect(data2.updateBsda.transporter!.recepisse!.number).toEqual(
+      receipt2.receiptNumber
+    );
+    expect(data2.updateBsda.transporter!.recepisse!.department).toEqual(
+      receipt2.department
+    );
+    expect(data2.updateBsda.transporter!.recepisse!.validityLimit).toEqual(
+      receipt2.validityLimit.toISOString()
     );
   });
 
@@ -425,7 +461,7 @@ describe("Mutation.updateBsda", () => {
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"]
     });
-    const { mutate } = makeClient({ ...user, auth: AuthType.BEARER }); // Force BEARER to activate transformers
+    const { mutate } = makeClient(user);
     const input = {
       transporter: { company: { siret: transporter.siret } }
     };
