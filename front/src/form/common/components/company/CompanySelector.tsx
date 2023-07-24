@@ -157,7 +157,7 @@ export default function CompanySelector({
   // Fix a bug where data is missing from selected company.
   // Fetch company again to have exhaustive data.
   useEffect(() => {
-    if (field.value.orgId) {
+    if (field.value?.orgId) {
       searchCompaniesQuery({ variables: { clue: field.value.orgId } });
     }
   }, [searchCompaniesQuery, siret, field.value]);
