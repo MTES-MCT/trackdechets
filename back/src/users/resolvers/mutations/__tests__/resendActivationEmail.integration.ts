@@ -117,9 +117,9 @@ describe("mutation resendActivationEmail", () => {
       expect.objectContaining({
         message: "Le test anti-robots est incorrect",
 
-        extensions: {
+        extensions: expect.objectContaining({
           code: "BAD_USER_INPUT"
-        }
+        })
       })
     ]);
     // no mail sent

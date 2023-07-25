@@ -98,9 +98,9 @@ describe("Mutation.createDraftBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        extensions: {
+        extensions: expect.objectContaining({
           code: "UNAUTHENTICATED"
-        }
+        })
       })
     ]);
   });
