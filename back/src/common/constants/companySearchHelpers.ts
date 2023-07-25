@@ -139,11 +139,26 @@ export const isVat = (clue: string | null | undefined): boolean => {
 };
 
 /**
+ * Return the french VAT key for a SIREN (first 2 numbers of the VAT)
+ */
+const sirenToVatKey = (siren: string): number =>
+  (12 + 3 * (parseInt(siren, 10) % 97)) % 97;
+
+/**
  * TVA Français
  */
 export const isFRVat = (clue: string | null | undefined): boolean => {
-  if (!clue || !isVat(clue)) return false;
-  return clue.slice(0, 2).toUpperCase().startsWith("FR");
+  if (
+    !isVat(clue) ||
+    clue?.length !== 13 ||
+    !clue.slice(0, 2).toUpperCase().startsWith("FR")
+  ) {
+    return false;
+  }
+  const siren = clue.slice(4);
+  return (
+    sirenToVatKey(siren) === parseInt(clue.slice(2, 4), 10) && luhnCheck(siren)
+  );
 };
 
 /**

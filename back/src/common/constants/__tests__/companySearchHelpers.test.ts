@@ -10,6 +10,8 @@ import {
 test("isVat", () => {
   expect(isVat("FR87850019464")).toEqual(true);
   expect(isVat("BE0541696005")).toEqual(true);
+  expect(isVat("FR52000063031")).toEqual(true);
+  expect(isVat("FR 52000063031")).toEqual(false);
 });
 
 test("isFRVat", () => {
@@ -18,6 +20,7 @@ test("isFRVat", () => {
   expect(isFRVat("FR87-85-0019464")).toEqual(false);
   expect(isFRVat("FR87850019464")).toEqual(true);
   expect(isFRVat("BE0541696005")).toEqual(false);
+  expect(isFRVat("FR52000063031")).toEqual(false);
 });
 
 test("not isVat", () => {
@@ -49,12 +52,16 @@ test("isForeignVat", () => {
   expect(isForeignVat("FR87-85-0019464")).toEqual(false);
   expect(isForeignVat("FR87850019464")).toEqual(false);
   expect(isForeignVat("BE0541696005")).toEqual(true);
+  expect(isForeignVat("BE 054 1696005")).toEqual(false);
+  expect(isForeignVat("FR52000063031")).toEqual(true);
+  expect(isForeignVat("FR 52000063031")).toEqual(false);
 });
 
 test("luhnCheck", () => {
   expect(luhnCheck("4485275742308327")).toBeTruthy();
   expect(luhnCheck(6011329933655299)).toBeTruthy();
   expect(luhnCheck(123456789)).toBeFalsy();
+  expect(luhnCheck("000063031")).toBeFalsy();
 });
 
 test("isSiret", () => {
