@@ -10,7 +10,8 @@ import {
   Company,
   Status,
   User,
-  UserRole
+  UserRole,
+  GovernmentPermission
 } from "@prisma/client";
 import {
   refreshElasticSearch,
@@ -32,6 +33,7 @@ import {
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   userWithAccessTokenFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -39,7 +41,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { INCOMING_WASTES } from "./queries";
 import supertest from "supertest";
 import { app } from "../../../../server";
-import { REGISTRY_WHITE_LIST_IP } from "../../../permissions";
+import { faker } from "@faker-js/faker";
 
 describe("Incoming wastes registry", () => {
   let emitter: { user: User; company: Company };
@@ -371,11 +373,46 @@ describe("Incoming wastes registry", () => {
   it("should allow user to request any siret if authenticated from a service account", async () => {
     const request = supertest(app);
 
+    const allowedIP = faker.internet.ipv4();
+
     const { accessToken } = await userWithAccessTokenFactory({
-      isRegistreNational: true
+      governmentAccount: {
+        create: {
+          name: "RDNTS",
+          permissions: [GovernmentPermission.REGISTRY_CAN_READ_ALL],
+          authorizedOrgIds: ["ALL"],
+          authorizedIPs: [allowedIP]
+        }
+      }
     });
 
-    const allowedIP = REGISTRY_WHITE_LIST_IP[0];
+    const res = await request
+      .post("/")
+      .send({
+        query: `{ incomingWastes(sirets: ["${destination.company.siret}"]) { totalCount } }`
+      })
+      .set("Authorization", `Bearer ${accessToken}`)
+      .set("X-Forwarded-For", allowedIP);
+
+    expect(res.body).toEqual({ data: { incomingWastes: { totalCount: 5 } } });
+  });
+
+  it("should allow user to request any siret if authenticated from a service account and orgId is specified in white list", async () => {
+    const request = supertest(app);
+
+    const allowedIP = faker.internet.ipv4();
+
+    const { accessToken } = await userWithAccessTokenFactory({
+      governmentAccount: {
+        create: {
+          name: "RDNTS",
+          permissions: [GovernmentPermission.REGISTRY_CAN_READ_ALL],
+          authorizedOrgIds: [destination.company!.siret!],
+          authorizedIPs: [allowedIP]
+        }
+      }
+    });
+
     const res = await request
       .post("/")
       .send({
@@ -390,8 +427,18 @@ describe("Incoming wastes registry", () => {
   it("should not accept service account connection from IP address not in the white list", async () => {
     const request = supertest(app);
 
+    const allowedIP = faker.internet.ipv4();
+    const forbiddenIP = faker.internet.ipv4();
+
     const { accessToken } = await userWithAccessTokenFactory({
-      isRegistreNational: true
+      governmentAccount: {
+        create: {
+          name: "RDNTS",
+          permissions: [GovernmentPermission.REGISTRY_CAN_READ_ALL],
+          authorizedOrgIds: ["ALL"],
+          authorizedIPs: [allowedIP]
+        }
+      }
     });
 
     const res = await request
@@ -400,7 +447,41 @@ describe("Incoming wastes registry", () => {
         query: `{ incomingWastes(sirets: ["${destination.company.siret}"]) { totalCount } }`
       })
       .set("Authorization", `Bearer ${accessToken}`)
-      .set("X-Forwarded-For", "localhost");
+      .set("X-Forwarded-For", forbiddenIP);
+
+    expect(res.body).toEqual({
+      data: null,
+      errors: [
+        expect.objectContaining({
+          message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${destination.company.siret}`
+        })
+      ]
+    });
+  });
+
+  it("should not accept service account connection from allowed IP if the orgId does not match", async () => {
+    const request = supertest(app);
+
+    const allowedIP = faker.internet.ipv4();
+
+    const { accessToken } = await userWithAccessTokenFactory({
+      governmentAccount: {
+        create: {
+          name: "RDNTS",
+          permissions: [GovernmentPermission.REGISTRY_CAN_READ_ALL],
+          authorizedOrgIds: [siretify()], // only allowed for another orgId
+          authorizedIPs: [allowedIP]
+        }
+      }
+    });
+
+    const res = await request
+      .post("/")
+      .send({
+        query: `{ incomingWastes(sirets: ["${destination.company.siret}"]) { totalCount } }`
+      })
+      .set("Authorization", `Bearer ${accessToken}`)
+      .set("X-Forwarded-For", allowedIP);
 
     expect(res.body).toEqual({
       data: null,

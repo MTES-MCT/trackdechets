@@ -10,7 +10,8 @@ import {
   Status,
   User,
   UserRole,
-  BsdasriStatus
+  BsdasriStatus,
+  GovernmentPermission
 } from "@prisma/client";
 import {
   refreshElasticSearch,
@@ -28,14 +29,17 @@ import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { getFullForm } from "../../../../forms/database";
 import { indexForm } from "../../../../forms/elastic";
 import { Query } from "../../../../generated/graphql/types";
-import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
 import {
   formFactory,
-  userFactory,
+  siretify,
+  userWithAccessTokenFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { TRANSPORTED_WASTES } from "./queries";
+import supertest from "supertest";
+import { faker } from "@faker-js/faker";
+import { app } from "../../../../server";
 
 describe("Transported wastes registry", () => {
   let emitter: { user: User; company: Company };
@@ -313,50 +317,129 @@ describe("Transported wastes registry", () => {
   });
 
   it("should allow user to request any siret if authenticated from a service account", async () => {
-    jest.resetModules();
-    process.env = { ...OLD_ENV, REGISTRY_WHITE_LIST_IP: "127.0.0.1" };
-    const server = require("../../../../server").server;
-    await server.start();
-    const makeClientLocal: (user?: User) => {
-      query: TestQuery;
-    } = require("../../../../__tests__/testClient").default;
-    const user = await userFactory({ isRegistreNational: true });
-    const { query } = makeClientLocal(user);
-    const { data } = await query<Pick<Query, "transportedWastes">>(
-      TRANSPORTED_WASTES,
-      {
-        variables: {
-          sirets: [transporter.company.siret],
-          first: 2
+    const request = supertest(app);
+
+    const allowedIP = faker.internet.ipv4();
+
+    const { accessToken } = await userWithAccessTokenFactory({
+      governmentAccount: {
+        create: {
+          name: "RDNTS",
+          permissions: [GovernmentPermission.REGISTRY_CAN_READ_ALL],
+          authorizedOrgIds: ["ALL"],
+          authorizedIPs: [allowedIP]
         }
       }
-    );
-    expect(data.transportedWastes.edges).toHaveLength(2);
+    });
+
+    const res = await request
+      .post("/")
+      .send({
+        query: `{ transportedWastes(sirets: ["${transporter.company.siret}"]) { totalCount } }`
+      })
+      .set("Authorization", `Bearer ${accessToken}`)
+      .set("X-Forwarded-For", allowedIP);
+
+    expect(res.body).toEqual({
+      data: { transportedWastes: { totalCount: 5 } }
+    });
+  });
+
+  it("should allow user to request any siret if authenticated from a service account and orgId is in the white list", async () => {
+    const request = supertest(app);
+
+    const allowedIP = faker.internet.ipv4();
+
+    const { accessToken } = await userWithAccessTokenFactory({
+      governmentAccount: {
+        create: {
+          name: "RDNTS",
+          permissions: [GovernmentPermission.REGISTRY_CAN_READ_ALL],
+          authorizedOrgIds: [transporter.company!.siret!],
+          authorizedIPs: [allowedIP]
+        }
+      }
+    });
+
+    const res = await request
+      .post("/")
+      .send({
+        query: `{ transportedWastes(sirets: ["${transporter.company.siret}"]) { totalCount } }`
+      })
+      .set("Authorization", `Bearer ${accessToken}`)
+      .set("X-Forwarded-For", allowedIP);
+
+    expect(res.body).toEqual({
+      data: { transportedWastes: { totalCount: 5 } }
+    });
   });
 
   it("should not accept service account connection from IP address not in the white list", async () => {
-    jest.resetModules();
-    process.env = { ...OLD_ENV, REGISTRY_WHITE_LIST_IP: undefined };
-    const server = require("../../../../server").server;
-    await server.start();
-    const makeClientLocal: (user?: User) => {
-      query: TestQuery;
-    } = require("../../../../__tests__/testClient").default;
-    const user = await userFactory({ isRegistreNational: true });
-    const { query } = makeClientLocal(user);
-    const { errors } = await query<Pick<Query, "transportedWastes">>(
-      TRANSPORTED_WASTES,
-      {
-        variables: {
-          sirets: [destination.company.siret],
-          first: 2
+    const request = supertest(app);
+
+    const allowedIP = faker.internet.ipv4();
+    const forbiddenIP = faker.internet.ipv4();
+
+    const { accessToken } = await userWithAccessTokenFactory({
+      governmentAccount: {
+        create: {
+          name: "RDNTS",
+          permissions: [GovernmentPermission.REGISTRY_CAN_READ_ALL],
+          authorizedOrgIds: ["ALL"],
+          authorizedIPs: [allowedIP]
         }
       }
-    );
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${destination.company.siret}`
+    });
+
+    const res = await request
+      .post("/")
+      .send({
+        query: `{ transportedWastes(sirets: ["${transporter.company.siret}"]) { totalCount } }`
       })
-    ]);
+      .set("Authorization", `Bearer ${accessToken}`)
+      .set("X-Forwarded-For", forbiddenIP);
+
+    expect(res.body).toEqual({
+      data: null,
+      errors: [
+        expect.objectContaining({
+          message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${transporter.company.siret}`
+        })
+      ]
+    });
+  });
+
+  it("should not accept service account connection from authorized IP address if orgId does not match", async () => {
+    const request = supertest(app);
+
+    const allowedIP = faker.internet.ipv4();
+
+    const { accessToken } = await userWithAccessTokenFactory({
+      governmentAccount: {
+        create: {
+          name: "RDNTS",
+          permissions: [GovernmentPermission.REGISTRY_CAN_READ_ALL],
+          authorizedOrgIds: [siretify()],
+          authorizedIPs: [allowedIP]
+        }
+      }
+    });
+
+    const res = await request
+      .post("/")
+      .send({
+        query: `{ transportedWastes(sirets: ["${transporter.company.siret}"]) { totalCount } }`
+      })
+      .set("Authorization", `Bearer ${accessToken}`)
+      .set("X-Forwarded-For", allowedIP);
+
+    expect(res.body).toEqual({
+      data: null,
+      errors: [
+        expect.objectContaining({
+          message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${transporter.company.siret}`
+        })
+      ]
+    });
   });
 });
