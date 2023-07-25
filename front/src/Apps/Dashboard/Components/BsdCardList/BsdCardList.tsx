@@ -228,15 +228,16 @@ function BsdCardList({
       if (isReviewsTab) {
         handleReviewsValidation(bsd, siret);
       } else {
-        if (bsd.status === FormStatus.Draft || bsd["isDraft"]) {
+        const status =
+          bsd.status ||
+          bsd["bsdaStatus"] ||
+          bsd["bsffStatus"] ||
+          bsd["bsdasriStatus"] ||
+          bsd["bsvhuStatus"];
+        if (status === FormStatus.Draft || bsd["isDraft"]) {
           handleDraftValidation(bsd as Bsd);
         } else {
-          if (
-            hasRoadControlButton(
-              { status: bsd.status } as BsdDisplay,
-              isCollectedTab
-            )
-          ) {
+          if (hasRoadControlButton({ status } as BsdDisplay, isCollectedTab)) {
             const path = routes.dashboardv2.roadControl;
             redirectToPath(path, bsd.id);
           } else {
