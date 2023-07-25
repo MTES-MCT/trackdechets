@@ -37,6 +37,9 @@ if (process.env.NODE_ENV === "production") {
 function collectMetrics() {
   if (!process.env.DD_API_KEY) return;
 
+  const flushIntervalSeconds = 15;
+  const refreshRate = 1000 * flushIntervalSeconds;
+
   ddMetrics.init({
     host: process.env.API_HOST,
     site: process.env.DD_SITE,
@@ -47,8 +50,6 @@ function collectMetrics() {
       `container:${process.env.CONTAINER}`
     ]
   });
-
-  const refreshRate = 1000 * 10;
 
   let previousHistograms: Prisma.Metric<Prisma.MetricHistogram>[] | null = null;
   setInterval(async () => {
@@ -69,8 +70,9 @@ function collectMetrics() {
     for (const [histogramIndex, histogram] of diffHistograms.entries()) {
       for (const [bucketIndex, values] of histogram.value.buckets.entries()) {
         const [bucket, count] = values;
-        const [_, prev] =
-          previousHistograms[histogramIndex].value.buckets[bucketIndex];
+        const [_, prev] = previousHistograms[histogramIndex]?.value.buckets[
+          bucketIndex
+        ] ?? [bucket, 0];
         const change = count - prev;
 
         for (let sendTimes = 0; sendTimes < change; sendTimes++) {
