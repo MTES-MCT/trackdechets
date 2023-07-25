@@ -11,8 +11,6 @@
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 0;
-      height: 90px;
     }
 
     &__item {
@@ -26,6 +24,13 @@
         flex-direction: row;
         .item-to-fill {
           width: 100%;
+        }
+        .date-item {
+          display: flex;
+          justify-content: space-evenly;
+          .react-datepicker-wrapper {
+            margin: 0 2px;
+          }
         }
       }
 
@@ -52,10 +57,5 @@
         height: 40px;
       }
     }
-  }
-
-  &__primary-cta {
-    margin: 10px 0;
-    text-align: right;
   }
 }

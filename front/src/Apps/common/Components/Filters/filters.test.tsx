@@ -1,10 +1,7 @@
 import React from "react";
 import { render, fireEvent, cleanup } from "@testing-library/react";
 import Filters from "./Filters";
-import {
-  filter_type_apply_btn,
-  filter_type_select_placeholder,
-} from "Apps/common/wordings/dashboard/wordingsDashboard";
+import { filter_type_select_placeholder } from "Apps/common/wordings/dashboard/wordingsDashboard";
 import { FilterType } from "./filtersTypes";
 
 describe("Filters component", () => {
@@ -52,18 +49,5 @@ describe("Filters component", () => {
     const selectFilterOption = getByText(filters[0].label);
     fireEvent.click(selectFilterOption);
     expect(getByText(filters[0].label)).toBeTruthy();
-  });
-
-  it("disables the apply button if no filter value is entered", () => {
-    const onApplyFilters = jest.fn();
-    const { getByText } = render(
-      <Filters filters={filters} onApplyFilters={onApplyFilters} />
-    );
-    const addFilterButton = getByText("+");
-    fireEvent.click(addFilterButton);
-    const selectFilterOption = getByText(filters[0].label);
-    fireEvent.click(selectFilterOption);
-    const applyButton = getByText(filter_type_apply_btn);
-    expect(applyButton).toBeDisabled();
   });
 });
