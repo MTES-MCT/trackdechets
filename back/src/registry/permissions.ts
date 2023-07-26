@@ -1,17 +1,46 @@
-import net from "net";
+import prisma from "../prisma";
+import { GovernmentPermission } from "@prisma/client";
 
-export const REGISTRY_WHITE_LIST_IP =
-  process.env.REGISTRY_WHITE_LIST_IP?.split(",").filter(
-    ip => net.isIP(ip) > 0
-  ) ?? [];
-
-export function checkIsRegistreNational(user: Express.User) {
-  if (
-    user.isRegistreNational &&
-    user.ip &&
-    REGISTRY_WHITE_LIST_IP.includes(user.ip)
-  ) {
-    return true;
+/**
+ * Les utilisateurs liés à un compte gouvernemental
+ * (ex: GEREP, RNDTS) sont susceptibles d'avoir un accès
+ * étendu au registre
+ */
+export async function hasGovernmentRegistryPerm(
+  user: Express.User,
+  sirets: string[]
+): Promise<boolean> {
+  if (!user.governmentAccountId || !user.ip) {
+    return false;
   }
+
+  const governmentAccount = await prisma.user
+    .findUniqueOrThrow({
+      where: { id: user.id }
+    })
+    .governmentAccount();
+
+  if (!governmentAccount) {
+    return false;
+  }
+
+  const { permissions, authorizedIPs, authorizedOrgIds } = governmentAccount;
+
+  if (permissions.includes(GovernmentPermission.REGISTRY_CAN_READ_ALL)) {
+    const authorizedIP = (authorizedIPs ?? []).find(ip => ip === user.ip);
+    if (!authorizedIP) {
+      // la requête ne provient pas d'une IP autorisée
+      return false;
+    } else {
+      if (authorizedOrgIds.length === 1 && authorizedOrgIds.includes("ALL")) {
+        // Si la valeur de orgIds est ["ALL"], on considère que le compte
+        // gouvernementale a accès à l'ensemble des établissements
+        return true;
+      } else {
+        return sirets.every(siret => authorizedOrgIds.includes(siret));
+      }
+    }
+  }
+
   return false;
 }

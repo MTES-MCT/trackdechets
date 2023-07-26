@@ -1,7 +1,7 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
 import getWasteConnection from "../../wastes";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkIsRegistreNational } from "../../permissions";
+import { hasGovernmentRegistryPerm } from "../../permissions";
 import { Permission, checkUserPermissions } from "../../../permissions";
 
 const incomingWastesResolver: QueryResolvers["incomingWastes"] = async (
@@ -11,10 +11,13 @@ const incomingWastesResolver: QueryResolvers["incomingWastes"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const isRegistreNational = checkIsRegistreNational(user);
+  const hasGovernmentPermission = await hasGovernmentRegistryPerm(
+    user,
+    args.sirets
+  );
 
   // bypass authorization if the user is authenticated from a service account
-  if (!isRegistreNational) {
+  if (!hasGovernmentPermission) {
     for (const siret of args.sirets) {
       await checkUserPermissions(
         user,
