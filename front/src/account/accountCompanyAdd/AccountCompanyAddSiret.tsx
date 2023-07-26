@@ -11,7 +11,6 @@ import {
   isVat,
   isClosedCompany,
   CLOSED_COMPANY_ERROR,
-  isForeignVat,
 } from "generated/constants/companySearchHelpers";
 
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -23,6 +22,8 @@ type IProps = {
   showIndividualInfo?: Boolean;
   onlyForeignVAT?: Boolean;
   defaultQuery?: string;
+  label?: string;
+  hintText?: string;
 };
 
 const CREATE_TEST_COMPANY = gql`
@@ -140,6 +141,8 @@ export default function AccountCompanyAddSiret({
   showIndividualInfo = false,
   onlyForeignVAT = false,
   defaultQuery = "",
+  label = "SIRET",
+  hintText = "ou numéro TVA pour un transporteur de l'UE",
 }: IProps) {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -174,11 +177,11 @@ export default function AccountCompanyAddSiret({
         }
       }
     },
-    onError: (error: ApolloError) => {
-      if (error.graphQLErrors.length) {
+    onError: (err: ApolloError) => {
+      if (err.graphQLErrors) {
         if (
-          error.graphQLErrors.some(
-            error => error.message.search(CLOSED_COMPANY_ERROR) === -1
+          err.graphQLErrors.some(
+            gqlerr => gqlerr.message.search(CLOSED_COMPANY_ERROR) !== -1
           )
         ) {
           setIsClosed(true);
@@ -214,12 +217,16 @@ export default function AccountCompanyAddSiret({
               const isValidVat = isVat(values.siret);
 
               if (onlyForeignVAT) {
-                const isValidForeignVat = isForeignVat(values.siret);
-
-                if (!isValidForeignVat) {
+                if (!isValidVat) {
                   return {
                     siret:
                       "Vous devez entrer un numéro de TVA intracommunautaire valide. You must use a valid VAT number.",
+                  };
+                }
+                if (isValidVat && isFRVat(values.siret)) {
+                  return {
+                    siret:
+                      "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA",
                   };
                 }
               } else {
@@ -227,27 +234,29 @@ export default function AccountCompanyAddSiret({
                   return {
                     siret: "Vous devez entrer un SIRET composé de 14 chiffres",
                   };
-                } else if (!isValidSiret && /^[0-9]{14}/.test(values.siret)) {
+                }
+                if (!isValidSiret && /^[0-9]{14}/.test(values.siret)) {
                   return {
                     siret: "Aucun établissement trouvé avec ce SIRET",
                   };
-                } else if (
-                  !isValidSiret &&
-                  !/^[a-zA-Z]{2}/.test(values.siret)
-                ) {
+                }
+                if (!isValidSiret && !/^[a-zA-Z]{2}/.test(values.siret)) {
                   return {
                     siret: "Vous devez entrer un SIRET composé de 14 chiffres",
                   };
-                } else if (!isValidSiret && /^[0-9]{9}/.test(values.siret)) {
+                }
+                if (!isValidSiret && /^[0-9]{9}/.test(values.siret)) {
                   return {
                     siret:
                       "Vous devez entrer un SIRET composé de 14 chiffres, ne pas confondre avec le SIREN",
                   };
-                } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
+                }
+                if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
                   return {
                     siret: `Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter via la FAQ https://faq.trackdechets.fr/pour-aller-plus-loin/assistance avec un justificatif légal du pays d'origine.`,
                   };
-                } else if (isValidVat && isFRVat(values.siret)) {
+                }
+                if (isValidVat && isFRVat(values.siret)) {
                   return {
                     siret:
                       "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA",
@@ -277,8 +286,8 @@ export default function AccountCompanyAddSiret({
                   {({ field }) => {
                     return (
                       <Input
-                        label="SIRET"
-                        hintText="ou numéro TVA pour un transporteur de l'UE"
+                        label={label}
+                        hintText={hintText}
                         state={errors.siret ? "error" : "default"}
                         stateRelatedMessage={errors.siret || ""}
                         disabled={isDisabled}
