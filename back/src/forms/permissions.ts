@@ -145,6 +145,10 @@ function formCreators(input: CreateFormInput): string[] {
  * Retrieves organisation allowed to read a BSDD
  */
 function formReaders(form: FullForm & { grouping: Form[] }): string[] {
+  if (form.status === Status.DRAFT) {
+    return form.canAccessDraftSirets;
+  }
+
   return [
     ...formContributors(form),
     ...(form.transporters

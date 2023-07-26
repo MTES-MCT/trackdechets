@@ -68,7 +68,10 @@ export async function getFormOrFormNotFound({
  * @param siret the siret to filter on
  * @param roles optional [FormRole] to refine filter
  */
-export function getFormsRightFilter(siret: string, roles?: FormRole[] | null) {
+export function getFormsRightFilter(
+  siret: string,
+  roles?: FormRole[] | null
+): Prisma.FormWhereInput {
   const filtersByRole: {
     [key in FormRole]: Partial<Prisma.FormWhereInput>[];
   } = {
@@ -81,13 +84,29 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[] | null) {
     ["INTERMEDIARY"]: [{ intermediariesSirets: { has: siret } }]
   };
 
+  function getOrFilter({ defaultToActive }: { defaultToActive: boolean }) {
+    return {
+      OR: Object.keys(filtersByRole)
+        .filter((role: FormRole) =>
+          roles && roles.length > 0 ? roles.includes(role) : defaultToActive
+        )
+        .map(role => filtersByRole[role])
+        .flat()
+    };
+  }
+
   return {
-    OR: Object.keys(filtersByRole)
-      .filter((role: FormRole) =>
-        roles && roles.length > 0 ? roles.includes(role) : true
-      )
-      .map(role => filtersByRole[role])
-      .flat()
+    OR: [
+      {
+        status: { not: "DRAFT" },
+        ...getOrFilter({ defaultToActive: true })
+      },
+      {
+        status: "DRAFT",
+        canAccessDraftSirets: { has: siret },
+        ...(roles && getOrFilter({ defaultToActive: false }))
+      }
+    ]
   };
 }
 
