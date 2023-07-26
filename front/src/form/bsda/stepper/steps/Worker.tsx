@@ -14,12 +14,12 @@ export function Worker({ disabled }) {
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
   const isDechetterie = values?.type === BsdaType.Collection_2710;
 
-  const workerHasCertification =
+  const hasCertification =
     values.worker &&
     (values.worker.certification?.hasSubSectionFour ||
       values.worker.certification?.hasSubSectionFour);
   const isWorker =
-    workerHasCertification || companyTypes?.includes(CompanyType.Worker);
+    hasCertification || companyTypes?.includes(CompanyType.Worker);
 
   if (isGroupement || isEntreposageProvisoire || isDechetterie) {
     return (
@@ -129,7 +129,7 @@ export function Worker({ disabled }) {
             </div>
           )}
 
-          {isWorker && !workerHasCertification && (
+          {isWorker && !hasCertification && (
             <div className="form__row">
               {!values?.worker?.certification?.hasSubSectionFour &&
                 !values?.worker?.certification?.hasSubSectionThree && (
