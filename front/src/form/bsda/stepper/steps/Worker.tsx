@@ -14,9 +14,6 @@ export function Worker({ disabled }) {
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
   const isDechetterie = values?.type === BsdaType.Collection_2710;
 
-  console.log("values?.worker", values?.worker);
-  console.log("companyTypes", companyTypes);
-
   const workerHasCertification =
     values.worker &&
     (values.worker.certification?.hasSubSectionFour ||
