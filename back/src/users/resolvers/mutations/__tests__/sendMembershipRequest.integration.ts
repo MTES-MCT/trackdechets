@@ -77,13 +77,13 @@ describe("mutation sendMembershipRequest", () => {
     const linkedUser = await prisma.membershipRequest
       .findUniqueOrThrow({ where: { id } })
       .user();
-    expect(linkedUser.id).toEqual(requester.id);
+    expect(linkedUser?.id).toEqual(requester.id);
 
     // check relation to company was created
     const linkedCompany = await prisma.membershipRequest
       .findUniqueOrThrow({ where: { id } })
       .company();
-    expect(linkedCompany.id).toEqual(company.id);
+    expect(linkedCompany?.id).toEqual(company.id);
 
     expect(membershipRequest.sentTo).toEqual(["john.snow@trackdechets.fr"]);
     expect(membershipRequest.status).toEqual("PENDING");
@@ -148,13 +148,13 @@ describe("mutation sendMembershipRequest", () => {
     const linkedUser = await prisma.membershipRequest
       .findUniqueOrThrow({ where: { id } })
       .user();
-    expect(linkedUser.id).toEqual(requester.id);
+    expect(linkedUser?.id).toEqual(requester.id);
 
     // check relation to company was created
     const linkedCompany = await prisma.membershipRequest
       .findUniqueOrThrow({ where: { id } })
       .company();
-    expect(linkedCompany.id).toEqual(company.id);
+    expect(linkedCompany?.id).toEqual(company.id);
 
     expect(membershipRequest.sentTo).toEqual([
       `admin${userIndex}@trackdechets.fr`

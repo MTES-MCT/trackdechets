@@ -206,7 +206,8 @@ type GenericWhereInput =
   | Prisma.BsffWhereInput
   | Prisma.BsdaWhereInput
   | Prisma.BsvhuWhereInput
-  | Prisma.BsdasriWhereInput;
+  | Prisma.BsdasriWhereInput
+  | Prisma.BsffPackagingWhereInput;
 
 /**
  * This function applies a mask on a whereInput.

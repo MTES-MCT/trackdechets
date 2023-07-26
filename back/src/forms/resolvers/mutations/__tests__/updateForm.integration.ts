@@ -1087,7 +1087,7 @@ describe("Mutation.updateForm", () => {
       })
       .forwardedIn();
 
-    expect(tempStorage.readableId).toBe(`${form.readableId}-suite`);
+    expect(tempStorage?.readableId).toBe(`${form.readableId}-suite`);
   });
 
   it("should update the temporary storage", async () => {

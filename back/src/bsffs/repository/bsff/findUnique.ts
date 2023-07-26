@@ -28,7 +28,6 @@ export function buildFinduniqueBsff({
 }: ReadRepositoryFnDeps): FindUniqueBsffFn {
   return async args => {
     const bsff = await prisma.bsff.findFirst({
-      ...args,
       where: { ...args.where, isDeleted: false },
       include: {
         packagings: true,
@@ -36,6 +35,7 @@ export function buildFinduniqueBsff({
         ...(args.include ?? {})
       }
     });
+
     return bsff;
   };
 }
