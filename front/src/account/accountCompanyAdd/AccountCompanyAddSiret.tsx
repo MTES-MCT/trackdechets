@@ -292,7 +292,8 @@ export default function AccountCompanyAddSiret({
                         stateRelatedMessage={errors.siret || ""}
                         disabled={isDisabled}
                         nativeInputProps={{
-                          onChange: e => {
+                          // force remove whitespace
+                          onKeyUp: (e: React.ChangeEvent<HTMLInputElement>) => {
                             const siret = e.target.value
                               .split(" ")
                               .join("")
