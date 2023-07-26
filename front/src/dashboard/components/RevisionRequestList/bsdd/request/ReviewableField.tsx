@@ -6,7 +6,9 @@ type Props = {
   title: string;
   children: React.ReactNode;
   name: string;
+  // Value coming from revised bsd, allowing reset when component is closed
   defaultValue: any;
+  // Optional value to initialize children field value, usefule for booleans
   initialValue?: any;
   value: string | number | React.ReactNode;
 };
