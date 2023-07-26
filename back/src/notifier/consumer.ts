@@ -1,5 +1,5 @@
 import { Job } from "bull";
-import { BsdUpdateQueueItem, updatesQueue } from "../queue/producers/elastic";
+import { BsdUpdateQueueItem, updatesQueue } from "../queue/producers/bsdUpdate";
 
 import { pushSseUpdate } from "./handlers/sse";
 

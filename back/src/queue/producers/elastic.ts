@@ -2,21 +2,17 @@
 import Queue, { JobOptions } from "bull";
 import logger from "../../logging/logger";
 import { scheduleWebhook } from "./webhooks";
-const { REDIS_URL, NODE_ENV } = process.env;
 import {
   INDEX_JOB_NAME,
   INDEX_CREATED_JOB_NAME,
   INDEX_UPDATED_JOB_NAME,
   DELETE_JOB_NAME
 } from "./jobNames";
+import { updatesQueue } from "./bsdUpdate";
 
+const { REDIS_URL, NODE_ENV } = process.env;
 export const INDEX_QUEUE_NAME = `queue_index_elastic_${NODE_ENV}`;
 
-export type BsdUpdateQueueItem = {
-  sirets: string[];
-  id: string;
-  jobName?: string;
-};
 export const indexQueue = new Queue<string>(INDEX_QUEUE_NAME, REDIS_URL!, {
   defaultJobOptions: {
     attempts: 3,
@@ -25,19 +21,6 @@ export const indexQueue = new Queue<string>(INDEX_QUEUE_NAME, REDIS_URL!, {
     timeout: 10000
   }
 });
-
-const INDEX_REFRESH_INTERVAL = 1000;
-// Updates queue, used by the notifier. Items are enqueued once indexation is done
-export const updatesQueue = new Queue<BsdUpdateQueueItem>(
-  `queue_updates_elastic_${NODE_ENV}`,
-  REDIS_URL!,
-  {
-    defaultJobOptions: {
-      delay: INDEX_REFRESH_INTERVAL, // We delay processing to make sure updates have been refreshed in ES
-      removeOnComplete: 100
-    }
-  }
-);
 
 indexQueue.on("completed", job => {
   const id = job.data;
