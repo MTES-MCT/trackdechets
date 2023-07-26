@@ -14,6 +14,16 @@ export function Worker({ disabled }) {
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
   const isDechetterie = values?.type === BsdaType.Collection_2710;
 
+  console.log("values?.worker", values?.worker);
+  console.log("companyTypes", companyTypes);
+
+  const workerHasCertification =
+    values.worker &&
+    (values.worker.certification?.hasSubSectionFour ||
+      values.worker.certification?.hasSubSectionFour);
+  const isWorker =
+    workerHasCertification || companyTypes?.includes(CompanyType.Worker);
+
   if (isGroupement || isEntreposageProvisoire || isDechetterie) {
     return (
       <div className="notification">
@@ -110,7 +120,7 @@ export function Worker({ disabled }) {
             Catégorie entreprise de travaux déclarée dans le profil entreprise
           </h4>
 
-          {companyTypes && !companyTypes.includes(CompanyType.Worker) ? (
+          {!isWorker && (
             <div>
               <Alert
                 title={
@@ -120,7 +130,9 @@ export function Worker({ disabled }) {
                 description="L'entreprise que vous renseignez ne s'est pas enregistrée avec un profil d'entreprise de travaux amiante ou n'a pas complété la catégorie de travaux dans son compte établissement de Trackdéchets. Il appartient à cette entreprise de compléter ses informations"
               />
             </div>
-          ) : (
+          )}
+
+          {isWorker && !workerHasCertification && (
             <div className="form__row">
               {!values?.worker?.certification?.hasSubSectionFour &&
                 !values?.worker?.certification?.hasSubSectionThree && (
