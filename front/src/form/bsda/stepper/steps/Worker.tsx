@@ -16,7 +16,7 @@ export function Worker({ disabled }) {
 
   const hasCertification =
     values.worker &&
-    (values.worker.certification?.hasSubSectionFour ||
+    (values.worker.certification?.hasSubSectionThree ||
       values.worker.certification?.hasSubSectionFour);
   const isWorker =
     hasCertification || companyTypes?.includes(CompanyType.Worker);
