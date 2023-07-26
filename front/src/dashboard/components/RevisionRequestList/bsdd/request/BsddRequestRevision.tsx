@@ -203,6 +203,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                     value={Boolean(bsdd.wasteDetails?.pop) ? "Oui" : "Non"}
                     name="content.wasteDetails.pop"
                     defaultValue={initialReview.wasteDetails.pop}
+                    initialValue={false}
                   >
                     <Field
                       type="checkbox"
