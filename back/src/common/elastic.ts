@@ -5,12 +5,12 @@ import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import logger from "../logging/logger";
 import { BsdType, FormCompany } from "../generated/graphql/types";
-import { RawForm } from "../forms/elastic";
-import { RawBsda } from "../bsda/elastic";
-import { RawBsdasri } from "../bsdasris/elastic";
-import { RawBsvhu } from "../bsvhu/elastic";
-import { RawBsff } from "../bsffs/elastic";
 import { OperationMode } from "@prisma/client";
+import { FormForElastic } from "../forms/elastic";
+import { BsdaForElastic } from "../bsda/elastic";
+import { BsdasriForElastic } from "../bsdasris/elastic";
+import { BsvhuForElastic } from "../bsvhu/elastic";
+import { BsffForElastic } from "../bsffs/elastic";
 
 export interface BsdElastic {
   type: BsdType;
@@ -96,10 +96,19 @@ export interface BsdElastic {
   isOutgoingWasteFor: string[];
   isTransportedWasteFor: string[];
   isManagedWasteFor: string[];
+  // Liste des établissements concernés par une demande de révision en cours sur ce bordereau
+  isInRevisionFor: string[];
+  // Liste des établissements concernés par une demande de révision passée sur ce bordereau
+  isRevisedFor: string[];
 
   intermediaries?: FormCompany[] | null;
 
-  rawBsd: RawForm | RawBsda | RawBsdasri | RawBsvhu | RawBsff;
+  rawBsd:
+    | FormForElastic
+    | BsdaForElastic
+    | BsdasriForElastic
+    | BsvhuForElastic
+    | BsffForElastic;
 }
 
 const textField = {
@@ -263,6 +272,8 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   isOutgoingWasteFor: stringField,
   isTransportedWasteFor: stringField,
   isManagedWasteFor: stringField,
+  isInRevisionFor: stringField,
+  isRevisedFor: stringField,
 
   intermediaries: {
     properties: {

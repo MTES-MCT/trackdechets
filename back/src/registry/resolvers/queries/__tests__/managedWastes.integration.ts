@@ -12,10 +12,9 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../../../integration-tests/helper";
-import { indexBsda } from "../../../../bsda/elastic";
+import { getBsdaForElastic, indexBsda } from "../../../../bsda/elastic";
 import { bsdaFactory } from "../../../../bsda/__tests__/factories";
-import { getFullForm } from "../../../../forms/database";
-import { indexForm } from "../../../../forms/elastic";
+import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 import { Query } from "../../../../generated/graphql/types";
 import {
   formFactory,
@@ -113,8 +112,8 @@ describe("Managed wastes registry", () => {
     });
 
     await Promise.all([
-      indexForm(await getFullForm(bsd1)),
-      indexBsda({ ...bsd2, intermediaries: [] })
+      indexForm(await getFormForElastic(bsd1)),
+      indexBsda(await getBsdaForElastic(bsd2))
     ]);
     await refreshElasticSearch();
   });

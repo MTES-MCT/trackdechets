@@ -9,10 +9,16 @@ import {
   BsdElastic
 } from "../../common/elastic";
 import { BsdType } from "../../generated/graphql/types";
-import { toBsdElastic as bsdaToBsdElastic } from "../../bsda/elastic";
+import {
+  BsdaForElasticInclude,
+  toBsdElastic as bsdaToBsdElastic
+} from "../../bsda/elastic";
 import { toBsdElastic as bsdasriToBsdElastic } from "../../bsdasris/elastic";
 import { toBsdElastic as bsffToBsdElastic } from "../../bsffs/elastic";
-import { toBsdElastic as formToBsdElastic } from "../../forms/elastic";
+import {
+  FormForElasticInclude,
+  toBsdElastic as formToBsdElastic
+} from "../../forms/elastic";
 import { toBsdElastic as bsvhuToBsdElastic } from "../../bsvhu/elastic";
 import { indexQueue } from "../../queue/producers/elastic";
 import { IndexAllFnSignature, FindManyAndIndexBsdsFnSignature } from "./types";
@@ -51,11 +57,7 @@ const prismaFindManyOptions = {
   },
   bsvhu: {},
   bsda: {
-    include: {
-      forwardedIn: { select: { id: true } },
-      groupedIn: { select: { id: true } },
-      intermediaries: true
-    }
+    include: BsdaForElasticInclude
   },
   bsdasri: {
     include: {
@@ -64,12 +66,7 @@ const prismaFindManyOptions = {
     }
   },
   bsdd: {
-    include: {
-      forwarding: true,
-      forwardedIn: { include: { transporters: true } },
-      transporters: true,
-      intermediaries: true
-    }
+    include: FormForElasticInclude
   }
 };
 

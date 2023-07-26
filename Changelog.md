@@ -23,6 +23,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Ajout de filtres à la query bsds pour filtrer sur les bordereaux ayant une demande de révision en cours ou passée [PR 2598](Ajout de filtres à la query bsds pour filtrer sur les bordereaux ayant une demande de révision en cours ou passée)
+
 # [2023.8.3] 29/08/2023
 
 #### :rocket: Nouvelles fonctionnalités

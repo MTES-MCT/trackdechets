@@ -61,7 +61,7 @@ import {
 import prisma from "../prisma";
 import { extractPostalCode } from "../utils";
 import { getFirstTransporterSync } from "./database";
-import { RawForm } from "./elastic";
+import { FormForElastic } from "./elastic";
 import DataLoader from "dataloader";
 
 function flattenDestinationInput(input: {
@@ -814,7 +814,7 @@ export function expandFormFromDb(
 }
 
 export async function expandFormFromElastic(
-  form: RawForm,
+  form: FormForElastic,
   formLoader?: DataLoader<
     string,
     PrismaFormWithForwardedInAndTransporters | undefined,

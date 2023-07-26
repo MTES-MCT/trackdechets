@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { approveAndApplyRevisionRequest } from "./accept";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 
 export type CreateRevisionRequestFn = (
   data: Prisma.BsdaRevisionRequestCreateInput,
@@ -30,6 +31,10 @@ export function buildCreateRevisionRequest(
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+
+    prisma.addAfterCommitCallback(() =>
+      enqueueUpdatedBsdToIndex(revisionRequest.bsdaId)
+    );
 
     if (revisionRequest.approvals.length > 0) {
       return revisionRequest;
