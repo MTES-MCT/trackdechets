@@ -935,4 +935,57 @@ describe("Integration / Forms query for transporters", () => {
     expect(data.forms).toHaveLength(1);
     expect(data.forms[0].id).toEqual(form.id);
   });
+
+  it("should not return draft forms for which user is present but not the owner", async () => {
+    const { user: owner, company: ownerCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: {
+        set: ["WASTEPROCESSOR"]
+      }
+    });
+
+    // Create form associated to the EO
+    await formFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: ownerCompany.siret,
+        emitterCompanyName: ownerCompany.name,
+        recipientCompanySiret: company.name,
+        recipientCompanyName: company.siret
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "forms">>(FORMS);
+
+    const forms = data.forms.filter(
+      f => f.recipient?.company?.siret === company.siret
+    );
+    expect(forms.length).toBe(0);
+  });
+
+  it("should return draft forms for which user is the owner", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    // Create form associated to the EO
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        emitterCompanyName: company.name
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "forms">>(FORMS);
+
+    const forms = data.forms.filter(
+      f => f.emitter?.company?.siret === company.siret
+    );
+    expect(forms.length).toBe(1);
+  });
 });
