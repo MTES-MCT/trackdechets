@@ -22,7 +22,7 @@ const inspector = new Inspector({
 
 const DURATION = process.env.INSPECTOR_DURATION
   ? parseInt(process.env.INSPECTOR_DURATION, 10)
-  : 10000;
+  : 30000;
 
 export async function cpuProfiling() {
   await inspector.profiler.enable();
