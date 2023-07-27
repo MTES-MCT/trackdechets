@@ -178,7 +178,7 @@ async function checkMultiModalTransporterPermission(
 
 async function checkRandomUserPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = Status.DRAFT
+  formStatus: Status = Status.DRAFT
 ) {
   const owner = await userFactory();
   const user = await userFactory();
@@ -195,7 +195,6 @@ describe.each([
   checkCanRead,
   checkCanDuplicate,
   //checkCanUpdate,
-  checkCanDelete,
   checkCanMarkAsSealed
 ])("%p for non draft form", permission => {
   afterAll(resetDatabase);
@@ -203,7 +202,7 @@ describe.each([
   it("should deny access to random user", async () => {
     expect.assertions(1);
     try {
-      await checkRandomUserPermission(permission);
+      await checkRandomUserPermission(permission, Status.SENT);
     } catch (err) {
       expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
     }
@@ -277,44 +276,76 @@ describe.each([
     }
   });
 
-  it("should allow emitter", async () => {
-    const check = await checkEmitterPermission(permission);
-    expect(check).toEqual(false);
+  it("should deny access to emitter", async () => {
+    expect.assertions(1);
+    try {
+      await checkEmitterPermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow recipient", async () => {
-    const check = await checkRecipientPermission(permission);
-    expect(check).toEqual(false);
+  it("should deny access to recipient", async () => {
+    expect.assertions(1);
+    try {
+      await checkRecipientPermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow transporter", async () => {
-    const check = await checkTransporterPermission(permission);
-    expect(check).toEqual(false);
+  it("should deny access to transporter", async () => {
+    expect.assertions(1);
+    try {
+      await checkTransporterPermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow trader", async () => {
-    const check = await checkTraderPermission(permission);
-    expect(check).toEqual(false);
+  it("should deny access to trader", async () => {
+    expect.assertions(1);
+    try {
+      await checkTraderPermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow ecoOrganisme", async () => {
-    const check = await checkEcoOrganismePermission(permission);
-    expect(check).toEqual(false);
+  it("should deny access to ecoOrganisme", async () => {
+    expect.assertions(1);
+    try {
+      await checkEcoOrganismePermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow transporter after temp storage", async () => {
-    const check = await checkTransporterAfterTempStoragePermission(permission);
-    expect(check).toEqual(false);
+  it("should deny access to transporter after temp storage", async () => {
+    expect.assertions(1);
+    try {
+      await checkTransporterAfterTempStoragePermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow destination after temp storage", async () => {
-    const check = await checkDestinationAfterTempStoragePermission(permission);
-    expect(check).toEqual(false);
+  it("should deny access to destination after temp storage", async () => {
+    expect.assertions(1);
+    try {
+      await checkDestinationAfterTempStoragePermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow multimodal transporter", async () => {
-    const check = await checkMultiModalTransporterPermission(permission);
-    expect(check).toEqual(false);
+  it("should deny access to multimodal transporter", async () => {
+    expect.assertions(1);
+    try {
+      await checkMultiModalTransporterPermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 });
 

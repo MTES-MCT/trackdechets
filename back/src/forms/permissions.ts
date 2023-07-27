@@ -35,6 +35,10 @@ import { ForbiddenError } from "../common/errors";
  * a user is not removing his own company from the BSDD
  */
 function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
+  if (form.status === Status.DRAFT) {
+    return form.canAccessDraftSirets;
+  }
+
   const updateEmitterCompanySiret = input?.emitter?.company?.siret;
   const updateRecipientCompanySiret = input?.recipient?.company?.siret;
   const updateTransporterCompanySiret = input?.transporter?.company?.siret;
@@ -146,7 +150,7 @@ function formCreators(input: CreateFormInput): string[] {
  */
 function formReaders(form: FullForm & { grouping: Form[] }): string[] {
   if (form.status === Status.DRAFT) {
-    return form.canAccessDraftSirets;
+    return formContributors(form);
   }
 
   return [
