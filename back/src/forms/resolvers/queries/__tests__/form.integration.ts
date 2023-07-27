@@ -223,10 +223,13 @@ describe("Query.form", () => {
 
   it("should allow user to see a draft form if he is the owner", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
-    const form = await createForm({
-      status: "DRAFT",
-      emitterCompanySiret: company.siret,
-      emitterCompanyName: company.name
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        emitterCompanyName: company.name
+      }
     });
 
     const { query } = makeClient(user);

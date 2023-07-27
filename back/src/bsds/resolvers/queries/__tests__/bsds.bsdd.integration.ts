@@ -249,7 +249,7 @@ describe("Query.bsds workflow", () => {
   describe("when the bsd is sealed", () => {
     beforeAll(async () => {
       expect(formId).toBeDefined();
-      const { mutate } = makeClient(transporter.user);
+      const { mutate } = makeClient(emitter.user);
       const MARK_AS_SEALED = `
         mutation MarkAsSealed($id: ID!) {
           markAsSealed(id: $id) {

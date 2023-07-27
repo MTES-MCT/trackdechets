@@ -20,11 +20,8 @@ describe("getSiretsByTab", () => {
       opt: { status: Status.DRAFT }
     });
     const fullForm = await getFullForm(form);
-    const transporter = getFirstTransporterSync(fullForm);
     const { isDraftFor } = getSiretsByTab(fullForm);
-    expect(isDraftFor).toContain(form.emitterCompanySiret);
-    expect(isDraftFor).toContain(form.recipientCompanySiret);
-    expect(isDraftFor).toContain(transporter!.transporterCompanySiret);
+    expect(isDraftFor).toEqual([]);
   });
 
   test("status SEALED", async () => {
