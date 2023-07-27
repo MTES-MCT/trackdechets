@@ -221,8 +221,12 @@ model Company {
   givenSignatureAutomations            SignatureAutomation[]     @relation("SignatureAutomationFrom")
   receivedSignatureAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
 
+  // gin indices _CompanyTypesIdx => 149_create_company_indices.sql
+
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
+  @@index([createdAt], map: "_CompanyCreatedAtIdx")
+  @@index([verificationStatus], map: "_CompanyVerificationStatusIdx")
 }
 
 // Companies with restricted diffusion of SIRENE or VAT information (police, army, etc)
@@ -260,6 +264,7 @@ model CompanyAssociation {
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")
+  @@index([role], map: "_CompanyAssociationRoleIdx")
 }
 
 model SignatureAutomation {
