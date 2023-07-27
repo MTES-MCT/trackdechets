@@ -8,8 +8,10 @@ export async function getStream(
   streamId: string,
   { until }: { until?: Date } = {}
 ): Promise<ActivityEvent[]> {
+  const mongoEventsIds: string[] = [];
+  const events: EventCollection[] = [];
   // Events might be dispatched between Psql & Mongo so we fetch from both
-  const [mongoEvents, psqlEvents] = await Promise.all([
+  const [stream, psqlEvents] = await Promise.all([
     getStreamEvents(streamId, until),
     prisma.event.findMany({
       where: {
@@ -18,21 +20,36 @@ export async function getStream(
       }
     })
   ]);
+  return new Promise<ActivityEvent[]>((resolve, reject) => {
+    stream.on("data", (document: EventCollection) => {
+      mongoEventsIds.push(document._id);
+      events.push(document);
+    });
 
-  const mongoEventsIds = mongoEvents.map(e => e._id);
-  const events = [
-    ...mongoEvents,
-    // Some events might be already in Mongo but still in Psql (especially during tests), so we remove duplicates
-    ...psqlEvents.filter(evt => !mongoEventsIds.includes(evt.id))
-  ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    stream.on("end", () => {
+      // Stream has ended, all documents have been processed
+      const allEvents = [
+        ...events,
+        // Some events might be already in Mongo but still in Psql (especially during tests), so we remove duplicates
+        ...psqlEvents.filter(evt => !mongoEventsIds.includes(evt.id))
+      ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
-  return events?.map(event => ({
-    type: event.type,
-    actor: event.actor,
-    streamId: event.streamId,
-    data: event.data as Record<string, unknown>,
-    metadata: event.metadata as Record<string, unknown>
-  }));
+      resolve(
+        allEvents?.map(event => ({
+          type: event.type,
+          actor: event.actor,
+          streamId: event.streamId,
+          data: event.data as Record<string, unknown>,
+          metadata: event.metadata as Record<string, unknown>
+        }))
+      );
+    });
+
+    stream.on("error", error => {
+      // Handle any errors that occurred during the streaming
+      reject(error);
+    });
+  });
 }
 
 export function dbEventToActivityEvent(
