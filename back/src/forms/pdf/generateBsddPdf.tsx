@@ -165,8 +165,8 @@ export function getOtherPackagingLabel(packagingInfos: PackagingInfo[]) {
     otherPackagings.length === 0
       ? "à préciser"
       : otherPackagings
-        .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
-        .join(", ");
+          .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
+          .join(", ");
   return `Autre (${otherPackagingsSummary})`;
 }
 
@@ -442,7 +442,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                     `${pn.city} - ${pn.postalCode} - ${[
                       pn.prefix,
                       pn.section,
-                      pn.number,
+                      pn.number
                     ]
                       .filter(Boolean)
                       .join("/")}`
@@ -451,11 +451,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               <br />
               Coordonnée(s) GPS :{" "}
               {form.wasteDetails?.parcelNumbers
-                ?.map(
-                  pn => [`lon ${pn.x}`, `lat ${pn.y}`]
-                    .filter(Boolean)
-                    .join(" / ")
-                )
+                ?.filter(pn => pn.x && pn.y)
+                .map(pn => [`lon ${pn.x}`, `lat ${pn.y}`].join(" / "))
                 .join(", ")}
               <br />
               Référence(s) laboratoire(s) :{" "}
@@ -853,7 +850,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                   packagingInfos={
                     isRepackging
                       ? form.temporaryStorageDetail?.wasteDetails
-                        ?.packagingInfos ?? []
+                          ?.packagingInfos ?? []
                       : []
                   }
                 />
