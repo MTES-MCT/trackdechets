@@ -3,6 +3,7 @@ import express from "express";
 import * as Sentry from "@sentry/node";
 import supertest from "supertest";
 import * as yup from "yup";
+import { z } from "zod";
 import sentryReporter from "../sentryReporter";
 import {
   AuthenticationError,
@@ -86,7 +87,17 @@ describe("graphqlErrorHandler", () => {
     expect(captureExceptionSpy).not.toHaveBeenCalled();
   });
 
-  it("should not report generic ApolloError", async () => {
+  it("should not report zod ZodError", async () => {
+    mockResolver.mockImplementation(() => {
+      const zodSchema = z.object({ foo: z.number().min(0) });
+      // failing yup validation, foo should be positive
+      zodSchema.parse({ foo: -1 });
+    });
+    await request.post("/graphql").send({ query: "query { bim }" });
+    expect(captureExceptionSpy).not.toHaveBeenCalled();
+  });
+
+  it("should not report generic GraphQLError", async () => {
     mockResolver.mockImplementation(() => {
       throw new GraphQLError("Bam Boom");
     });

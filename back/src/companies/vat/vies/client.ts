@@ -7,12 +7,11 @@ import {
   isVat
 } from "../../../common/constants/companySearchHelpers";
 import logger from "../../../logging/logger";
-import { ErrorCode, UserInputError } from "../../../common/errors";
-import { GraphQLError } from "graphql";
+import { ErrorCode, TDGraphQLError, UserInputError } from "../../../common/errors";
 
 const viesUrl = path.join(__dirname, "checkVatService.wsdl");
 
-export class ViesClientError extends GraphQLError {
+export class ViesClientError extends TDGraphQLError {
   constructor(message: string) {
     super(message, {
       extensions: {

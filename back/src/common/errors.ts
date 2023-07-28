@@ -17,7 +17,9 @@ export enum ErrorCode {
   GRAPHQL_MAX_OPERATIONS_ERROR = "GRAPHQL_MAX_OPERATIONS_ERROR"
 }
 
-export class ForbiddenError extends GraphQLError {
+export class TDGraphQLError extends GraphQLError {}
+
+export class ForbiddenError extends TDGraphQLError {
   constructor(message: string) {
     super(message, {
       extensions: {
@@ -27,7 +29,7 @@ export class ForbiddenError extends GraphQLError {
   }
 }
 
-export class AuthenticationError extends GraphQLError {
+export class AuthenticationError extends TDGraphQLError {
   constructor(message: string) {
     super(message, {
       extensions: {
@@ -37,7 +39,7 @@ export class AuthenticationError extends GraphQLError {
   }
 }
 
-export class UserInputError extends GraphQLError {
+export class UserInputError extends TDGraphQLError {
   constructor(message: string, extensions?: Record<string, any>) {
     super(message, {
       extensions: {
@@ -48,7 +50,7 @@ export class UserInputError extends GraphQLError {
   }
 }
 
-export class TooManyRequestsError extends GraphQLError {
+export class TooManyRequestsError extends TDGraphQLError {
   constructor(message: string) {
     super(message, {
       extensions: {
