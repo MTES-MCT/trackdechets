@@ -60,7 +60,9 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   const canRequestRevision =
     ![FormStatus.Draft, FormStatus.Sealed, FormStatus.Refused].includes(
       form.status
-    ) && !isAppendix1Producer;
+    ) &&
+    !isAppendix1Producer &&
+    !form.emitter?.isPrivateIndividual;
 
   const links = [
     {

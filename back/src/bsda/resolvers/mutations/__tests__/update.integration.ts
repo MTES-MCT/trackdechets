@@ -603,7 +603,7 @@ describe("Mutation.updateBsda", () => {
       .findUniqueOrThrow({ where: { id: bsda.id } })
       .forwarding();
 
-    expect(actualForwarded.id).toEqual(newForwarded.id);
+    expect(actualForwarded?.id).toEqual(newForwarded.id);
   });
 
   it("should ignore grouping if the bsdas ids order has changed", async () => {
@@ -885,6 +885,11 @@ describe("Mutation.updateBsda", () => {
       destination: {
         company: {
           siret: transporter.company.siret
+        },
+        operation: {
+          nextDestination: {
+            company: { siret: transporter.company.siret }
+          }
         }
       }
     };
@@ -900,7 +905,105 @@ describe("Mutation.updateBsda", () => {
 
     expect(errors.length).toBe(1);
     expect(errors[0].message).toBe(
-      "Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comment destination finale."
+      "Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comme destination finale."
     );
+  });
+
+  it("should allow removing the nextDestination", async () => {
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_WORKER",
+        destinationCompanySiret: transporter.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        destinationOperationNextDestinationCompanySiret:
+          destination.company.siret,
+        emitterEmissionSignatureAuthor: "Emit",
+        workerWorkSignatureAuthor: "Work"
+      }
+    });
+
+    const { mutate } = makeClient(transporter.user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: destination.company.siret
+        },
+        operation: {
+          nextDestination: null
+        }
+      }
+    };
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    const updatedBsda = await prisma.bsda.findUnique({
+      where: { id: data.updateBsda.id }
+    });
+
+    expect(updatedBsda?.destinationCompanySiret).toBe(
+      destination.company.siret
+    );
+    expect(updatedBsda?.destinationOperationNextDestinationCompanySiret).toBe(
+      null
+    );
+  });
+
+  it("if disabling the worker, worker certification data shoud be removed", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        workerCertificationHasSubSectionFour: true,
+        workerCertificationHasSubSectionThree: true,
+        workerCertificationCertificationNumber: "CERTIFICATION-NUMBER",
+        workerCertificationValidityLimit: new Date(),
+        workerCertificationOrganisation: "AFNOR Certification"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          worker: {
+            isDisabled: true,
+            company: {
+              name: null,
+              siret: null
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    expect(data.updateBsda.id).toBeTruthy();
+
+    const updatedBsda = await prisma.bsda.findUnique({
+      where: { id: data.updateBsda.id }
+    });
+
+    expect(updatedBsda?.workerCompanyName).toBeNull();
+    expect(updatedBsda?.workerCompanySiret).toBeNull();
+    expect(updatedBsda?.workerCertificationHasSubSectionFour).toBe(false);
+    expect(updatedBsda?.workerCertificationHasSubSectionThree).toBe(false);
+    expect(updatedBsda?.workerCertificationCertificationNumber).toBeNull();
+    expect(updatedBsda?.workerCertificationValidityLimit).toBeNull();
+    expect(updatedBsda?.workerCertificationOrganisation).toBeNull();
   });
 });

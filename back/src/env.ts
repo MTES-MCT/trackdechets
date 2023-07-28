@@ -34,7 +34,6 @@ export const envVariables = z
     OIDC_PRIVATE_KEY: z.string(),
     // -------
     // Various
-    REGISTRY_WHITE_LIST_IP: z.string().optional(),
     USERS_BLACKLIST: z.string().optional(),
     MAX_REQUESTS_PER_WINDOW: z.string().optional().default("1000"),
     STARTUP_FILE: z.string().optional(),
@@ -148,11 +147,7 @@ export const envVariables = z
       .optional()
       .default("false")
       .refine(isBoolean),
-    MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER: z
-      .string()
-      .optional()
-      .default("0")
-      .refine(isNumber)
+    MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER: z.string().datetime().optional()
   })
   .superRefine((val, ctx) => {
     if (val.SENTRY_DSN && !val.SENTRY_ENVIRONMENT) {

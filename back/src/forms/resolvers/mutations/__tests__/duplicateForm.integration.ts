@@ -360,8 +360,6 @@ describe("Mutation.duplicateForm", () => {
       recipientIsTempStorage,
       wasteDetailsCode,
       wasteDetailsOnuCode,
-      wasteDetailsPackagingInfos,
-      wasteDetailsQuantity,
       wasteDetailsQuantityType,
       wasteDetailsPop,
       wasteDetailsIsDangerous,
@@ -459,7 +457,7 @@ describe("Mutation.duplicateForm", () => {
       wasteDetailsName,
       wasteDetailsConsistence,
       ...rest
-    } = forwardedIn;
+    } = forwardedIn ?? {};
 
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
@@ -476,13 +474,14 @@ describe("Mutation.duplicateForm", () => {
     const {
       transporters: duplicatedForwardedInTransporters,
       ...duplicatedForwardedIn
-    } = await prisma.form
-      .findUniqueOrThrow({
-        where: {
-          id: duplicatedForm.id
-        }
-      })
-      .forwardedIn({ include: { transporters: true } });
+    } =
+      (await prisma.form
+        .findUniqueOrThrow({
+          where: {
+            id: duplicatedForm.id
+          }
+        })
+        .forwardedIn({ include: { transporters: true } })) ?? {};
 
     expect(duplicatedForm.recipientIsTempStorage).toBe(true);
     // transporter after temp storage should not be duplicated
@@ -1002,34 +1001,34 @@ describe("Mutation.duplicateForm", () => {
         })
         .forwardedIn();
 
-      expect(duplicatedForwardedIn.emitterCompanyName).toEqual(
+      expect(duplicatedForwardedIn?.emitterCompanyName).toEqual(
         "UPDATED-TTR-NAME"
       );
-      expect(duplicatedForwardedIn.emitterCompanyAddress).toEqual(
+      expect(duplicatedForwardedIn?.emitterCompanyAddress).toEqual(
         "UPDATED-TTR-ADDRESS"
       );
-      expect(duplicatedForwardedIn.emitterCompanyContact).toEqual(
+      expect(duplicatedForwardedIn?.emitterCompanyContact).toEqual(
         "UPDATED-TTR-CONTACT"
       );
-      expect(duplicatedForwardedIn.emitterCompanyPhone).toEqual(
+      expect(duplicatedForwardedIn?.emitterCompanyPhone).toEqual(
         "UPDATED-TTR-PHONE"
       );
-      expect(duplicatedForwardedIn.emitterCompanyMail).toEqual(
+      expect(duplicatedForwardedIn?.emitterCompanyMail).toEqual(
         "UPDATED-TTR-MAIL"
       );
-      expect(duplicatedForwardedIn.recipientCompanyName).toEqual(
+      expect(duplicatedForwardedIn?.recipientCompanyName).toEqual(
         "UPDATED-DESTINATION-NAME"
       );
-      expect(duplicatedForwardedIn.recipientCompanyAddress).toEqual(
+      expect(duplicatedForwardedIn?.recipientCompanyAddress).toEqual(
         "UPDATED-DESTINATION-ADDRESS"
       );
-      expect(duplicatedForwardedIn.recipientCompanyContact).toEqual(
+      expect(duplicatedForwardedIn?.recipientCompanyContact).toEqual(
         "UPDATED-DESTINATION-CONTACT"
       );
-      expect(duplicatedForwardedIn.recipientCompanyPhone).toEqual(
+      expect(duplicatedForwardedIn?.recipientCompanyPhone).toEqual(
         "UPDATED-DESTINATION-PHONE"
       );
-      expect(duplicatedForwardedIn.recipientCompanyMail).toEqual(
+      expect(duplicatedForwardedIn?.recipientCompanyMail).toEqual(
         "UPDATED-DESTINATION-MAIL"
       );
     }

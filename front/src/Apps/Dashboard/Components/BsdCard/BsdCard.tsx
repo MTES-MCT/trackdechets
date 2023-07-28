@@ -54,7 +54,9 @@ function BsdCard({
     onAppendix1,
     onDeleteReview,
     onEmitterDasriSign,
+    onEmitterBsddSign,
   },
+  hasAutomaticSignature,
 }: BsdCardProps) {
   const isReviewsTab = bsdCurrentTab === "reviewsTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
@@ -114,7 +116,8 @@ function BsdCard({
     ? getPrimaryActionsLabelFromBsdStatus(
         bsdDisplay,
         currentSiret,
-        bsdCurrentTab
+        bsdCurrentTab,
+        hasAutomaticSignature
       )
     : "";
 
@@ -320,10 +323,11 @@ function BsdCard({
                     onBsdSuite,
                     onDeleteReview,
                     onEmitterDasriSign,
+                    onEmitterBsddSign,
                   }}
                   hideReviewCta={isReviewsTab}
                   isToCollectTab={isToCollectTab}
-                  isCollectedTab={isCollectedTab}
+                  hasAutomaticSignature={hasAutomaticSignature}
                 />
               </div>
             </div>

@@ -18,8 +18,6 @@ import ResendActivationEmail from "login/ResendActivationEmail";
 import Login from "login/Login";
 import { useFeatureFlags } from "common/contexts/FeatureFlagsContext";
 
-import Plausible from "plausible-tracker";
-
 const Admin = lazy(() => import("admin/Admin"));
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
 const DashboardV2Routes = lazy(() => import("Apps/Dashboard/DashboardRoutes"));
@@ -81,24 +79,6 @@ export default function LayoutContainer() {
     isV2Routes && (isAdmin || featureFlags.dashboardV2)
       ? "dashboardv2"
       : "dashboard";
-
-  const { DEV } = import.meta.env;
-  const isDevelopment = DEV;
-
-  if (!isDevelopment) {
-    const plausibleDomain = import.meta.env.VITE_PLAUSIBLE_DOMAIN;
-
-    if (plausibleDomain) {
-      const { enableAutoPageviews } = Plausible({
-        // Var d'ENV représentant l'identifiant de l'application sur Plausible
-        domain: plausibleDomain,
-        // URL de l'application Plausible self-hosted
-        apiHost: "https://plausible.trackdechets.beta.gouv.fr",
-      });
-
-      enableAutoPageviews();
-    }
-  }
 
   if (loading) {
     return <Loader />;

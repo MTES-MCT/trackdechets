@@ -396,12 +396,12 @@ describe("Mutation markAsResealed", () => {
         where: { id: form.id }
       })
       .forwardedIn();
-    expect(tempStorage.wasteDetailsPackagingInfos).toEqual(
+    expect(tempStorage?.wasteDetailsPackagingInfos).toEqual(
       repackaging.packagingInfos
     );
-    expect(tempStorage.wasteDetailsOnuCode).toEqual(repackaging.onuCode);
-    expect(tempStorage.wasteDetailsQuantity).toEqual(repackaging.quantity);
-    expect(tempStorage.wasteDetailsQuantityType).toEqual(
+    expect(tempStorage?.wasteDetailsOnuCode).toEqual(repackaging.onuCode);
+    expect(tempStorage?.wasteDetailsQuantity).toEqual(repackaging.quantity);
+    expect(tempStorage?.wasteDetailsQuantityType).toEqual(
       repackaging.quantityType
     );
   });

@@ -14,7 +14,7 @@ import { statusLabels } from "../../../constants";
 import TransporterInfoEdit from "./TransporterInfoEdit";
 import { WorkflowAction } from "./WorkflowAction";
 import { useQuery } from "@apollo/client";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "form/common/components/company/query";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
 
 export const COLUMNS: Record<
   string,

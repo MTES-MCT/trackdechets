@@ -8,7 +8,7 @@ import initialState from "../initial-state";
 
 export function Worker({ disabled }) {
   const { setFieldValue, values, handleChange } = useFormikContext<Bsda>();
-  const [companyTypes, setCompanyTypes] = useState<CompanyType[]>([]);
+  const [companyTypes, setCompanyTypes] = useState<CompanyType[] | undefined>();
 
   const isGroupement = values?.type === BsdaType.Gathering;
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
@@ -110,7 +110,17 @@ export function Worker({ disabled }) {
             Catégorie entreprise de travaux déclarée dans le profil entreprise
           </h4>
 
-          {companyTypes.includes(CompanyType.Worker) ? (
+          {companyTypes && !companyTypes.includes(CompanyType.Worker) ? (
+            <div>
+              <Alert
+                title={
+                  "L'entreprise n'est pas une entreprise de travaux amiante"
+                }
+                severity="error"
+                description="L'entreprise que vous renseignez ne s'est pas enregistrée avec un profil d'entreprise de travaux amiante ou n'a pas complété la catégorie de travaux dans son compte établissement de Trackdéchets. Il appartient à cette entreprise de compléter ses informations"
+              />
+            </div>
+          ) : (
             <div className="form__row">
               {!values?.worker?.certification?.hasSubSectionFour &&
                 !values?.worker?.certification?.hasSubSectionThree && (
@@ -120,16 +130,6 @@ export function Worker({ disabled }) {
                     description="L'entreprise que vous renseignez s'est enregistrée avec un profil d'entreprise de travaux amiante mais n'a pas complété la catégorie de travaux dans son compte établissement de Trackdéchets. Il appartient à cette entreprise de compléter ses informations."
                   />
                 )}
-            </div>
-          ) : (
-            <div>
-              <Alert
-                title={
-                  "L'entreprise n'est pas une entreprise de travaux amiante"
-                }
-                severity="error"
-                description="L'entreprise que vous renseignez ne s'est pas enregistrée avec un profil d'entreprise de travaux amiante ou n'a pas complété la catégorie de travaux dans son compte établissement de Trackdéchets. Il appartient à cette entreprise de compléter ses informations"
-              />
             </div>
           )}
 

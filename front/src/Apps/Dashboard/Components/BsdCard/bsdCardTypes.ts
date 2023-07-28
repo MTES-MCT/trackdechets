@@ -31,5 +31,7 @@ export interface BsdCardProps {
     onAppendix1?: Function;
     onDeleteReview?: Function;
     onEmitterDasriSign?: Function;
+    onEmitterBsddSign?: Function;
   };
+  hasAutomaticSignature?: boolean;
 }

@@ -18,7 +18,7 @@ export function buildFindUniqueBsffPackaging({
 }: ReadRepositoryFnDeps): FindUniqueBsffPackagingFn {
   return async args => {
     return prisma.bsffPackaging.findUnique({
-      ...args,
+      where: args.where,
       include: { bsff: true, ...(args.include ?? {}) }
     });
   };

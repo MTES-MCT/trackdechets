@@ -15,7 +15,8 @@ export const runTransformers = async (
   const transformers = [
     reshipmentBsdaTransformer,
     sirenify,
-    recipisseTransporterTransformer
+    recipisseTransporterTransformer,
+    workerTransformer
   ];
   for (const transformer of transformers) {
     val = await transformer(val, sealedFields);
@@ -44,8 +45,12 @@ async function reshipmentBsdaTransformer(
 
 async function recipisseTransporterTransformer(
   val: ZodBsda,
-  _: string[]
+  sealedFields: string[]
 ): Promise<ZodBsda> {
+  if (sealedFields.includes("transporterCompanySiret")) {
+    return val;
+  }
+
   const orgId = getTransporterCompanyOrgId({
     transporterCompanySiret: val.transporterCompanySiret ?? null,
     transporterCompanyVatNumber: val.transporterCompanyVatNumber ?? null
@@ -64,6 +69,18 @@ async function recipisseTransporterTransformer(
     val.transporterRecepisseValidityLimit =
       transporterReceipt?.validityLimit ?? null;
     val.transporterRecepisseDepartment = transporterReceipt?.department ?? null;
+  }
+
+  return val;
+}
+
+async function workerTransformer(val: ZodBsda, _: string[]): Promise<ZodBsda> {
+  if (val.workerIsDisabled) {
+    val.workerCertificationHasSubSectionFour = false;
+    val.workerCertificationHasSubSectionThree = false;
+    val.workerCertificationCertificationNumber = null;
+    val.workerCertificationValidityLimit = null;
+    val.workerCertificationOrganisation = null;
   }
 
   return val;

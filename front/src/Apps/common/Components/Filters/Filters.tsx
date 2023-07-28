@@ -1,11 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Filter, FiltersProps, FilterType } from "./filtersTypes";
-import { filter_type_apply_btn } from "../../wordings/dashboard/wordingsDashboard";
 import FilterLine from "./FilterLine";
 import { MAX_FILTER } from "../../../Dashboard/dashboardUtils";
 import Input from "../Input/Input";
 import { inputType } from "../../types/commonTypes";
 import Select from "../Select/Select";
+import DatePickerWrapper from "../DatePicker/DatePickerWrapper";
 
 import "./filters.scss";
 
@@ -17,7 +17,10 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
   const [hasReachMaxFilter, setHasReachMaxFilter] = useState(false);
   const [hasRemovedFilterLine, setHasRemovedFilterLine] =
     useState<boolean>(false);
-  const [selectMultipleValueArray, setSelectMultipleValueArray] = useState([]);
+  const [selectMultipleValueArray, setSelectMultipleValueArray] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [error, setError] = useState({});
 
   const newInputElementRef = useRef<HTMLInputElement>(null);
   const newSelectElementRef = useRef<HTMLSelectElement>(null);
@@ -104,10 +107,14 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
       setIsApplyDisabled(true);
     }
   };
-  const onFilterSelectMultipleValueChange = (selectList, filterName) => {
+
+  const onFilterSelectMultipleValueChange = (
+    selectList: { value: string; label: string }[],
+    filterName: string
+  ) => {
     setSelectMultipleValueArray(selectList);
     const newFilterValues = { ...filterValues };
-    newFilterValues[filterName] = selectList.map(selected => selected.value);
+    newFilterValues[filterName] = selectList.map(selected => selected.value!);
     setFilterValues(newFilterValues);
     if (selectList.length) {
       setIsApplyDisabled(false);
@@ -116,9 +123,41 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
     }
   };
 
-  const onApply = () => {
-    onApplyFilters(filterValues);
-    setIsApplyDisabled(true);
+  const onDateChange = (
+    date: string,
+    filterName: string,
+    isStartDate: boolean
+  ) => {
+    if (date) {
+      const newFilterValues = { ...filterValues };
+      if (isStartDate) {
+        newFilterValues[filterName] = {
+          ...newFilterValues[filterName],
+          startDate: date,
+        };
+      } else {
+        newFilterValues[filterName] = {
+          ...newFilterValues[filterName],
+          endDate: date,
+        };
+      }
+
+      setFilterValues(newFilterValues);
+      if (
+        newFilterValues[filterName].startDate &&
+        newFilterValues[filterName].endDate &&
+        newFilterValues[filterName].startDate <
+          newFilterValues[filterName].endDate
+      ) {
+        setIsApplyDisabled(false);
+        setError({ [filterName]: false });
+      } else {
+        setError({ ...error, [filterName]: true });
+        setIsApplyDisabled(true);
+      }
+    } else {
+      setIsApplyDisabled(true);
+    }
   };
 
   const displayFilterItem = (filter: Filter) => {
@@ -143,7 +182,10 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
           onChange={e =>
             !filter.isMultiple
               ? onFilterValueChange(e, filter.name)
-              : onFilterSelectMultipleValueChange(e, filter.name)
+              : onFilterSelectMultipleValueChange(
+                  e as unknown as { value: string; label: string }[],
+                  filter.name
+                )
           }
           defaultValue=""
           label={filter.label}
@@ -152,6 +194,23 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
           selected={selectMultipleValueArray}
           disableSearch={filter.isMultiple}
         />
+      );
+    }
+    if (filter?.type === FilterType.date) {
+      const filterName = filter.name;
+      return (
+        <div className="date-item">
+          <DatePickerWrapper
+            label="Date de début"
+            onDateChange={date => onDateChange(date, filterName, true)}
+          />
+
+          <DatePickerWrapper
+            label="Date de fin"
+            onDateChange={date => onDateChange(date, filterName, false)}
+            errorMessage={error[filterName] ? "Date de fin invalide" : ""}
+          />
+        </div>
       );
     }
   };
@@ -182,6 +241,12 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
     }
   }, [filterValues, hasRemovedFilterLine]);
 
+  useEffect(() => {
+    if (!isApplyDisabled) {
+      onApplyFilters(filterValues);
+    }
+  }, [filterValues, isApplyDisabled, onApplyFilters]);
+
   return (
     <div className="filters">
       {filterSelectedList.map((filter, i) => {
@@ -211,16 +276,6 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
           isMaxLine={hasReachMaxFilter}
           isCurrentLine
         />
-      </div>
-      <div className="filters__primary-cta">
-        <button
-          type="button"
-          className="fr-btn"
-          onClick={onApply}
-          disabled={isApplyDisabled}
-        >
-          {filter_type_apply_btn}
-        </button>
       </div>
     </div>
   );

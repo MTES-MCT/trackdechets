@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["tracing", "metrics"]
 }
 
 datasource db {
@@ -220,8 +221,12 @@ model Company {
   givenSignatureAutomations            SignatureAutomation[]     @relation("SignatureAutomationFrom")
   receivedSignatureAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
 
+  // gin indices _CompanyTypesIdx => 149_create_company_indices.sql
+
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
+  @@index([createdAt], map: "_CompanyCreatedAtIdx")
+  @@index([verificationStatus], map: "_CompanyVerificationStatusIdx")
 }
 
 // Companies with restricted diffusion of SIRENE or VAT information (police, army, etc)
@@ -259,6 +264,7 @@ model CompanyAssociation {
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")
+  @@index([role], map: "_CompanyAssociationRoleIdx")
 }
 
 model SignatureAutomation {
@@ -716,8 +722,10 @@ model User {
   firstAssociationDate  DateTime?               @db.Timestamptz(6) // when was this user first associated to any company ? - emailing purpose @db.Timestamptz(6)
   isActive              Boolean?                @default(false)
   isAdmin               Boolean?                @default(false)
-  // compte de service avec des droits étendus
+  // TODO champ à supprimer suite à la création des comptes gouvernementaux
   isRegistreNational    Boolean?                @default(false)
+  // compte gouvernemental avec des droits étendus
+  governmentAccount     GovernmentAccount?      @relation(fields: [governmentAccountId], references: [id], onDelete: SetNull)
   applications          Application[]
   companyAssociations   CompanyAssociation[]
   AccessToken           AccessToken[]
@@ -734,6 +742,30 @@ model User {
   bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
   bsdasriReceptionSignatures Bsdasri[] @relation("BsdasriReceptionSignature")
   bsdasriOperationignatures  Bsdasri[] @relation("BsdasriOperationSignature")
+  governmentAccountId        String?   @unique
+}
+
+enum GovernmentPermission {
+  // Accès en lecture au registre de tous les établissements
+  REGISTRY_CAN_READ_ALL
+}
+
+model GovernmentAccount {
+  id               String                 @id @default(cuid())
+  name             String // Exemple RNDTS, GEREP, etc
+  permissions      GovernmentPermission[]
+  // Liste blanche d'IP pour les connexions depuis ce compte de service
+  // Seules les connexions depuis ces adresses IP auront les permissions 
+  // étendues définies par le champ `permissions`. 
+  authorizedIPs    String[]
+  // Permet de restreindre les permissions étendues définies par le
+  // le champ `GovernmentAccount.permissions` à une liste d'établissements.
+  // Cela permet à des applications gouvernementales tierces d'effectuer 
+  // des tests sur des données réelles sur un nombre restreint d'entreprises.
+  // Pour que les permissions étendues s'appliquent à tous les établissements, 
+  // passer la valeur 'ALL'
+  authorizedOrgIds String[]
+  User             User[]
 }
 
 model UserAccountHash {
@@ -1092,7 +1124,7 @@ model Bsff {
   transporterRecepisseNumber        String?
   transporterRecepisseDepartment    String?
   transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
-  transporterRecepisseIsExempted      Boolean?
+  transporterRecepisseIsExempted    Boolean?
 
   transporterTransportMode            TransportMode? @default(ROAD)
   transporterTransportPlates          String[]

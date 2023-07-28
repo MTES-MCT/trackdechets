@@ -20,7 +20,7 @@ import {
   CompanyInput,
 } from "generated/graphql/types";
 import graphlClient from "graphql-client";
-import { COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA } from "form/common/components/company/query";
+import { COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA } from "Apps/common/queries/company/query";
 import {
   isVat,
   isFRVat,

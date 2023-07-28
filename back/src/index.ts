@@ -1,7 +1,7 @@
 import { app, startApolloServer } from "./server";
 import { closeQueues } from "./queue/producers";
 import { cleanGqlCaches } from "./temp-memory";
-import { heapSnapshotToS3Router } from "./logging/heapSnapshot";
+import { cpuProfiling, memorySampling } from "./logging/heapSnapshot";
 import { envVariables } from "./env";
 
 envVariables.parse(process.env);
@@ -22,7 +22,8 @@ async function start() {
   process.on("SIGTERM", shutdown);
   process.on("SIGINT", shutdown);
 
-  process.on("SIGUSR1", heapSnapshotToS3Router);
+  process.on("SIGUSR1", memorySampling);
+  process.on("SIGUSR2", cpuProfiling);
 }
 
 if (process.env.TZ !== "Europe/Paris") {
