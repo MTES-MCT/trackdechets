@@ -30,7 +30,7 @@ export function ReviewableField({
       setValue(defaultValue);
     } else {
       // When toggling visibility to on, set children value to optional initialValue (to tell apart empty strings from boolean)
-      initialValue !== undefined && setValue(initialValue);
+      if (initialValue !== undefined) setValue(initialValue);
     }
     setIsEditing(!isEditing);
   }
