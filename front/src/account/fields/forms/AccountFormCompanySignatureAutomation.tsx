@@ -1,7 +1,7 @@
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
 import { IconTrash } from "common/components/Icons";
 import { formatDate } from "common/datetime";
-import { SEARCH_COMPANIES } from "form/common/components/company/query";
+import { SEARCH_COMPANIES } from "Apps/common/queries/company/query";
 import {
   CompanyPrivate,
   Mutation,

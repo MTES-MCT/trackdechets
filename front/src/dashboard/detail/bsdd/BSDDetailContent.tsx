@@ -68,7 +68,7 @@ import {
 } from "generated/constants/companySearchHelpers";
 import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
 import { useQuery } from "@apollo/client";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "form/common/components/company/query";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
 import { formTransportIsPipeline } from "form/bsdd/utils/packagings";
 
 type CompanyProps = {

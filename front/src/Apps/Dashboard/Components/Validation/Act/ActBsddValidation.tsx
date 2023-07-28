@@ -56,12 +56,16 @@ interface ActBsddValidationProps {
   currentSiret: string;
   isOpen: boolean;
   onClose: () => void;
+  hasAutomaticSignature?: boolean;
+  hasEmitterSignSecondaryCta?: boolean;
 }
 const ActBsddValidation = ({
   bsd,
   currentSiret,
   isOpen,
   onClose,
+  hasAutomaticSignature,
+  hasEmitterSignSecondaryCta,
 }: ActBsddValidationProps) => {
   const [getBsdd, { error: bsddGetError, data, loading: bsddGetLoading }] =
     useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
@@ -136,9 +140,12 @@ const ActBsddValidation = ({
       const title = currentUserIsEmitter
         ? `Signer en tant qu'émetteur`
         : `Faire signer l'émetteur`;
-
+      if (hasEmitterSignSecondaryCta) {
+        return title;
+      }
       if (bsd.emitter?.type === EmitterType.Appendix1Producer) {
         if (
+          hasAutomaticSignature ||
           isSignTransportAndCanSkipEmission(currentSiret, {
             emitterType: bsd.emitter?.type,
             transporter: bsd?.transporter,
@@ -260,7 +267,11 @@ const ActBsddValidation = ({
   };
 
   const renderContentSealed = () => {
+    if (hasEmitterSignSecondaryCta) {
+      return renderSignEmissionFormModal();
+    }
     if (
+      hasAutomaticSignature ||
       isSignTransportAndCanSkipEmission(currentSiret, {
         emitterType: bsd.emitter?.type,
         transporter: bsd?.transporter,

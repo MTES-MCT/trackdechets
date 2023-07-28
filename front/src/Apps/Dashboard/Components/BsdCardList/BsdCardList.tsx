@@ -49,6 +49,7 @@ function BsdCardList({
   siret,
   bsds,
   bsdCurrentTab,
+  siretsWithAutomaticSignature,
 }: BsdCardListProps): JSX.Element {
   const history = useHistory();
   const location = useLocation();
@@ -78,10 +79,14 @@ function BsdCardList({
 
   const [isModalOpen, setIsModalOpen] = useState(true);
 
+  const [hasEmitterSignSecondaryCta, setHasEmitterSignSecondaryCta] =
+    useState(false);
+
   const onClose = () => {
     setIsModalOpen(false);
     setBsdClicked(undefined);
     setValidationWorkflowType("");
+    setHasEmitterSignSecondaryCta(false);
   };
 
   const handleDraftValidation = useCallback(
@@ -341,6 +346,13 @@ function BsdCardList({
     [redirectToPath]
   );
 
+  const onEmitterBsddSign = useCallback((bsd: BsdDisplay) => {
+    setValidationWorkflowType("ACT_BSDD");
+    setBsdClicked(bsd);
+    setIsModalOpen(true);
+    setHasEmitterSignSecondaryCta(true);
+  }, []);
+
   return (
     <>
       <ul className="bsd-card-list">
@@ -361,6 +373,9 @@ function BsdCardList({
             newBsddNode.review = reviewBsdd;
             bsdNode = { ...newBsddNode, ...newBsdaNode };
           }
+          const hasAutomaticSignature = siretsWithAutomaticSignature?.includes(
+            bsdNode?.emitter?.company?.siret
+          );
 
           return (
             <li
@@ -381,7 +396,9 @@ function BsdCardList({
                   onAppendix1,
                   onDeleteReview,
                   onEmitterDasriSign,
+                  onEmitterBsddSign,
                 }}
+                hasAutomaticSignature={hasAutomaticSignature}
               />
             </li>
           );
@@ -403,6 +420,10 @@ function BsdCardList({
           currentSiret={siret}
           isOpen={isModalOpen}
           onClose={onClose}
+          hasEmitterSignSecondaryCta={hasEmitterSignSecondaryCta}
+          hasAutomaticSignature={siretsWithAutomaticSignature?.includes(
+            bsdClicked?.emitter?.company?.siret
+          )}
         />
       )}
       {validationWorkflowType === "ACT_BSD_SUITE" && (

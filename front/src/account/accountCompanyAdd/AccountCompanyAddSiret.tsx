@@ -1,7 +1,7 @@
 import { ApolloError, gql, useLazyQuery, useMutation } from "@apollo/client";
 import { Field, Form, Formik, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
-import { COMPANY_ACCOUNT_ADD_PRIVATE_INFOS } from "form/common/components/company/query";
+import { COMPANY_ACCOUNT_ADD_PRIVATE_INFOS } from "Apps/common/queries/company/query";
 import AccountCompanyAddMembershipRequest from "./AccountCompanyAddMembershipRequest";
 import styles from "../AccountCompanyAdd.module.scss";
 import { Mutation, Query } from "generated/graphql/types";

@@ -12,6 +12,7 @@ import {
   Query,
   QueryBsdaRevisionRequestsArgs,
   QueryBsdsArgs,
+  QueryCompanyPrivateInfosArgs,
   QueryFormRevisionRequestsArgs,
 } from "generated/graphql/types";
 import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
@@ -51,6 +52,7 @@ import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 import "./dashboard.scss";
 import { GET_BSDA_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsdaReviewQuery";
 import { GET_FORM_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsddReviewsQuery";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
 
 const DashboardPage = () => {
   const isActTab = !!useRouteMatch(routes.dashboardv2.bsds.act);
@@ -227,6 +229,19 @@ const DashboardPage = () => {
     },
     fetchPolicy: "cache-and-network",
   });
+
+  const { data: companyData } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
+    variables: { clue: siret },
+  });
+
+  const siretsWithAutomaticSignature = companyData
+    ? companyData.companyPrivateInfos.receivedSignatureAutomations.map(
+        automation => automation.from.siret
+      )
+    : [];
 
   const handleFiltersSubmit = React.useCallback(
     filterValues => {
@@ -548,6 +563,7 @@ const DashboardPage = () => {
               siret={siret}
               bsds={bsds!}
               bsdCurrentTab={bsdCurrentTab}
+              siretsWithAutomaticSignature={siretsWithAutomaticSignature}
             />
           )}
 

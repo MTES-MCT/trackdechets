@@ -26,9 +26,11 @@ import {
   hasAppendix1Cta,
   canDeleteReview,
   hasBsdasriEmitterSign,
+  isSignTransportAndCanSkipEmission,
 } from "../../dashboardServices";
 
 import "./bsdAdditionalActionsButton.scss";
+import { BsdType } from "generated/graphql/types";
 
 function BsdAdditionalActionsButton({
   bsd,
@@ -44,10 +46,11 @@ function BsdAdditionalActionsButton({
     onBsdSuite,
     onDeleteReview,
     onEmitterDasriSign,
+    onEmitterBsddSign,
   },
   hideReviewCta,
   isToCollectTab = false,
-  isCollectedTab = false,
+  hasAutomaticSignature = false,
 }: BsdAdditionalActionsButtonProps) {
   const [isOpen, setisOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLElement>(null);
@@ -127,6 +130,11 @@ function BsdAdditionalActionsButton({
     onEmitterDasriSign!(bsd);
   };
 
+  const handleBsddEmitterSign = () => {
+    closeMenu();
+    onEmitterBsddSign!(bsd);
+  };
+
   const tabIndex = isOpen ? 0 : -1;
 
   return (
@@ -196,7 +204,7 @@ function BsdAdditionalActionsButton({
             <li>
               <button
                 type="button"
-                data-testid="emport-direct-btn"
+                data-testid="emport-direct-dasri-btn"
                 className="fr-btn fr-btn--tertiary-no-outline"
                 tabIndex={tabIndex}
                 onClick={handleDasriEmitterSign}
@@ -205,6 +213,22 @@ function BsdAdditionalActionsButton({
               </button>
             </li>
           )}
+          {isToCollectTab &&
+            bsd.type === BsdType.Bsdd &&
+            (hasAutomaticSignature ||
+              isSignTransportAndCanSkipEmission(currentSiret, bsd)) && (
+              <li>
+                <button
+                  type="button"
+                  data-testid="emport-direct-bsdd-btn"
+                  className="fr-btn fr-btn--tertiary-no-outline"
+                  tabIndex={tabIndex}
+                  onClick={handleBsddEmitterSign}
+                >
+                  {FAIRE_SIGNER}
+                </button>
+              </li>
+            )}
           {hasAppendix1Cta(bsd) && (
             <li>
               <button

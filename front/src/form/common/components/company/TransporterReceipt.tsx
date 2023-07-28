@@ -17,7 +17,7 @@ import {
 } from "generated/graphql/types";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
-import { TRANSPORTER_RECEIPT } from "./query";
+import { TRANSPORTER_RECEIPT } from "../../../../Apps/common/queries/company/query";
 import { useQuery } from "@apollo/client";
 
 export type NotFormTransporter =
