@@ -987,23 +987,7 @@ describe("signTransportForm", () => {
         }
       });
 
-      await formFactory({
-        ownerId: user.id,
-        opt: {
-          status: Status.SENT,
-          emitterType: EmitterType.APPENDIX1_PRODUCER,
-          emitterCompanySiret: producerCompany.siret,
-          emitterCompanyName: company.name,
-          transporters: {
-            create: {
-              transporterCompanySiret: company.siret,
-              number: 1
-            }
-          }
-        }
-      });
-
-      await formFactory({
+      const parent = await formFactory({
         ownerId: user.id,
         opt: {
           status: Status.SEALED,
@@ -1060,6 +1044,16 @@ describe("signTransportForm", () => {
         "TRANSPORTER-PLATE"
       );
 
+      // Parent should have its plate updated as well
+      const parentTransporters = await prisma.bsddTransporter.findFirst({
+        where: { formId: parent.id }
+      });
+      expect(parentTransporters?.transporterNumberPlate).toBe(
+        "TRANSPORTER-PLATE"
+      );
+
+      // SECOND UPDATE (on the second child bsd)
+
       await mutate<
         Pick<Mutation, "signTransportForm">,
         MutationSignTransportFormArgs
@@ -1083,13 +1077,21 @@ describe("signTransportForm", () => {
         "TRANSPORTER-PLATE-2"
       );
 
-      // Should not modify already saved plate
+      // Should override plate from child bsd 1
       const appendix1ItemTransportersBis =
         await prisma.bsddTransporter.findFirst({
           where: { formId: appendix1Item.id }
         });
       expect(appendix1ItemTransportersBis?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE"
+        "TRANSPORTER-PLATE-2"
+      );
+
+      // Parent should have its plate updated as well
+      const parentTransportersBis = await prisma.bsddTransporter.findFirst({
+        where: { formId: parent.id }
+      });
+      expect(parentTransportersBis?.transporterNumberPlate).toBe(
+        "TRANSPORTER-PLATE-2"
       );
     });
   });
