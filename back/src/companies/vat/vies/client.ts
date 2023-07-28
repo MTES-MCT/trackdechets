@@ -7,7 +7,11 @@ import {
   isVat
 } from "../../../common/constants/companySearchHelpers";
 import logger from "../../../logging/logger";
-import { ErrorCode, TDGraphQLError, UserInputError } from "../../../common/errors";
+import {
+  ErrorCode,
+  TDGraphQLError,
+  UserInputError
+} from "../../../common/errors";
 
 const viesUrl = path.join(__dirname, "checkVatService.wsdl");
 
