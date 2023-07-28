@@ -1,15 +1,7 @@
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { registerInstrumentations } from "@opentelemetry/instrumentation";
-import { Resource } from "@opentelemetry/resources";
-import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
-import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
-import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { Prisma, PrismaClient } from "@prisma/client";
-import { PrismaInstrumentation } from "@prisma/instrumentation";
 import * as ddMetrics from "datadog-metrics";
 import { unescape } from "querystring";
 import { URL } from "url";
-import { DatadogContextManager } from "./tracer";
 
 const prisma = new PrismaClient({
   datasources: {
@@ -30,7 +22,6 @@ function getDbUrl() {
 }
 
 if (process.env.NODE_ENV === "production") {
-  collectTraces();
   collectMetrics();
 }
 
@@ -82,29 +73,6 @@ function collectMetrics() {
     }
     previousHistograms = diffHistograms;
   }, refreshRate);
-}
-
-function collectTraces() {
-  // Configure the trace provider
-  const provider = new NodeTracerProvider({
-    resource: new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: "Backend Prisma",
-      [SemanticResourceAttributes.CONTAINER_ID]: process.env.CONTAINER
-    })
-  });
-  // Configure how spans are processed and exported
-  provider.addSpanProcessor(new BatchSpanProcessor(new OTLPTraceExporter()));
-
-  // Register your auto-instrumentors
-  registerInstrumentations({
-    tracerProvider: provider,
-    instrumentations: [new PrismaInstrumentation()]
-  });
-
-  // Register the provider globally
-  provider.register({
-    contextManager: new DatadogContextManager()
-  });
 }
 
 function diffMetrics(metrics: Prisma.Metric<Prisma.MetricHistogram>[]) {
