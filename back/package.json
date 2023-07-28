@@ -103,6 +103,7 @@
     "graphql-scalars": "^1.20.4",
     "graylog2": "^0.2.1",
     "helmet": "^6.2.0",
+    "inspector-api": "^1.4.7",
     "ioredis": "^4.28.0",
     "jose": "^4.11.2",
     "jsvat": "^2.5.3",
