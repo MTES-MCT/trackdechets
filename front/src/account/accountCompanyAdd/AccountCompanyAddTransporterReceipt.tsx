@@ -18,7 +18,7 @@ export default function AccountCompanyAddTransporterReceipt() {
               <>
                 Ce profil comprend les entreprises de transport routier,
                 immatriculées au registre national des transports, et les
-                établissement disposant d'une flotte en propre, disposant dans
+                établissements disposant d'une flotte en propre, disposant dans
                 les 2 cas d'un récépissé de déclaration de transport de déchets
                 ou qui répondent à l'exemption de récépissé.
               </>
