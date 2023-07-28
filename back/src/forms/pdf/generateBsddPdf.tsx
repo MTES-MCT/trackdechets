@@ -442,16 +442,18 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                     `${pn.city} - ${pn.postalCode} - ${[
                       pn.prefix,
                       pn.section,
-                      pn.number,
-                      pn.x,
-                      pn.y
+                      pn.number
                     ]
                       .filter(Boolean)
                       .join("/")}`
                 )
                 .join(", ")}
               <br />
-              Coordonnée(s) GPS :
+              Coordonnée(s) GPS :{" "}
+              {form.wasteDetails?.parcelNumbers
+                ?.filter(pn => pn.x && pn.y)
+                .map(pn => [`lon ${pn.x}`, `lat ${pn.y}`].join(" / "))
+                .join(", ")}
               <br />
               Référence(s) laboratoire(s) :{" "}
               {form.wasteDetails?.analysisReferences?.join(", ")}
