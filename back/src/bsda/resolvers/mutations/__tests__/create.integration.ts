@@ -1389,7 +1389,7 @@ describe("Mutation.Bsda.create", () => {
       emitter: {
         isPrivateIndividual: false,
         company: {
-          siret: emitter.siret,
+          siret: ttr.siret,
           name: "The crusher",
           address: "Rue de la carcasse",
           contact: "Centre amiante",
@@ -1477,7 +1477,7 @@ describe("Mutation.Bsda.create", () => {
       emitter: {
         isPrivateIndividual: false,
         company: {
-          siret: emitter.siret,
+          siret: ttr.siret,
           name: "The crusher",
           address: "Rue de la carcasse",
           contact: "Centre amiante",
