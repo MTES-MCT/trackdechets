@@ -5,7 +5,8 @@ import {
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../__tests__/factories";
 import { getFirstTransporterSync, getFullForm } from "../database";
 import { getSiretsByTab } from "../elasticHelpers";
@@ -14,14 +15,17 @@ describe("getSiretsByTab", () => {
   afterEach(resetDatabase);
 
   test("status DRAFT", async () => {
-    const user = await userFactory();
+    const { user, company } = await userWithCompanyFactory();
     const form = await formFactory({
       ownerId: user.id,
-      opt: { status: Status.DRAFT }
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: Status.DRAFT
+      }
     });
     const fullForm = await getFullForm(form);
     const { isDraftFor } = getSiretsByTab(fullForm);
-    expect(isDraftFor).toEqual([]);
+    expect(isDraftFor).toContain(form.emitterCompanySiret);
   });
 
   test("status SEALED", async () => {
