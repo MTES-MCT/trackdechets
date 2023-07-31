@@ -9,6 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Permettre aux transporteurs monégasques avec un numéro de TVA commençant aussi par 'FR' d'être reconnus comme transporteurs étrangers pouvant s'inscrire sur Trackdéchets. [PR 2591](https://github.com/MTES-MCT/trackdechets/pull/2591)
+
 #### :bug: Corrections de bugs
 - Correction d'un message d'erreur incompréhensible en l'absence des informations de contact entreprise sur le BSFF après avoir cliqué sur "Modifier" [PR 2601](https://github.com/MTES-MCT/trackdechets/pull/2601)
 - Correction de 'limpossibilité d'enlever la présence de POP sur les BSDDs via la révision [PR 2596](https://github.com/MTES-MCT/trackdechets/pull/2596)

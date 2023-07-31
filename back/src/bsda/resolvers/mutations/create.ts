@@ -13,7 +13,6 @@ import {
 import { getBsdaRepository } from "../../repository";
 import { checkCanCreate } from "../../permissions";
 import { parseBsda } from "../../validation/validate";
-import { canBypassSirenify } from "../../../companies/sirenify";
 import { UserInputError } from "../../../common/errors";
 
 type CreateBsda = {
