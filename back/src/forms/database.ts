@@ -84,12 +84,19 @@ export function getFormsRightFilter(
     ["INTERMEDIARY"]: [{ intermediariesSirets: { has: siret } }]
   };
 
-  function getOrFilter({ defaultToActive }: { defaultToActive: boolean }) {
+  function getCommonORFilter({
+    defaultToAllRoles
+  }: {
+    defaultToAllRoles: boolean;
+  }) {
     return {
       OR: Object.keys(filtersByRole)
-        .filter((role: FormRole) =>
-          roles && roles.length > 0 ? roles.includes(role) : defaultToActive
-        )
+        .filter((role: FormRole) => {
+          if (roles && roles.length > 0) {
+            return roles.includes(role);
+          }
+          return defaultToAllRoles;
+        })
         .map(role => filtersByRole[role])
         .flat()
     };
@@ -99,12 +106,12 @@ export function getFormsRightFilter(
     OR: [
       {
         status: { not: "DRAFT" },
-        ...getOrFilter({ defaultToActive: true })
+        ...getCommonORFilter({ defaultToAllRoles: true })
       },
       {
         status: "DRAFT",
         canAccessDraftSirets: { has: siret },
-        ...(roles && getOrFilter({ defaultToActive: false }))
+        ...(roles && getCommonORFilter({ defaultToAllRoles: false }))
       }
     ]
   };
