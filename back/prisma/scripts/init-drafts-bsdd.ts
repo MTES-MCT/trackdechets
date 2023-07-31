@@ -30,7 +30,9 @@ export class InitBsddCanAccessDraft implements Updater {
       for (const { ownerId } of draftOwnerIds) {
         // To speed up the migration, we assign all the owners companies to `canAccessDraftSirets`
         // We don't filter on sirets present on the form.
-        // ES will filter when reindexing so it won't be a problem in the dashboard
+        // - for the permission we intersect canAccessDraftSirets with the actual contributors
+        // - ES will filter when reindexing so it won't be a problem in the dashboard
+        // So this should not be a security issue
         const ownerCompanies = await getUserCompanies(ownerId);
         const ownerOrgIds = ownerCompanies.map(company => company.orgId);
 
