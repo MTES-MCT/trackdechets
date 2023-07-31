@@ -175,51 +175,57 @@ model Application {
 }
 
 model Company {
-  id                                   String                    @id @default(cuid())
-  orgId                                String                    @unique
-  siret                                String?                   @unique
-  vatNumber                            String?                   @unique
-  updatedAt                            DateTime                  @updatedAt @db.Timestamptz(6)
-  createdAt                            DateTime                  @default(now()) @db.Timestamptz(6)
-  securityCode                         Int
-  verificationCode                     String
-  verificationStatus                   CompanyVerificationStatus @default(TO_BE_VERIFIED)
-  verificationMode                     CompanyVerificationMode?
-  verificationComment                  String?
-  verifiedAt                           DateTime?                 @db.Timestamptz(6)
-  name                                 String
-  address                              String?
-  codeDepartement                      String?
-  longitude                            Float?
-  latitude                             Float?
-  gerepId                              String?
-  codeNaf                              String?
-  givenName                            String?
-  contact                              String?
-  contactEmail                         String?
-  contactPhone                         String?
-  website                              String?
-  ecoOrganismeAgreements               String[]
-  companyTypes                         CompanyType[]
-  traderReceiptId                      String?
-  traderReceipt                        TraderReceipt?            @relation(fields: [traderReceiptId], references: [id])
-  brokerReceiptId                      String?
-  brokerReceipt                        BrokerReceipt?            @relation(fields: [brokerReceiptId], references: [id])
-  transporterReceiptId                 String?
-  transporterReceipt                   TransporterReceipt?       @relation(fields: [transporterReceiptId], references: [id])
-  vhuAgrementDemolisseurId             String?
-  vhuAgrementDemolisseur               VhuAgrement?              @relation(name: "VhuAgrementDemolisseur_Company", fields: [vhuAgrementDemolisseurId], references: [id])
-  vhuAgrementBroyeurId                 String?
-  vhuAgrementBroyeur                   VhuAgrement?              @relation(name: "VhuAgrementBroyeur_Company", fields: [vhuAgrementBroyeurId], references: [id])
-  workerCertificationId                String?
-  workerCertification                  WorkerCertification?      @relation(fields: [workerCertificationId], references: [id])
-  companyAssociations                  CompanyAssociation[]
-  MembershipRequest                    MembershipRequest[]
-  allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
-  bsddRevisionRequests                 BsddRevisionRequest[]
-  BsdaRevisionRequest                  BsdaRevisionRequest[]
-  givenSignatureAutomations            SignatureAutomation[]     @relation("SignatureAutomationFrom")
-  receivedSignatureAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
+  orgId                                  String                    @unique
+  id                                     String                    @id @default(cuid())
+  siret                                  String?                   @unique
+  vatNumber                              String?                   @unique
+  updatedAt                              DateTime                  @updatedAt @db.Timestamptz(6)
+  createdAt                              DateTime                  @default(now()) @db.Timestamptz(6)
+  securityCode                           Int
+  verificationCode                       String
+  verificationStatus                     CompanyVerificationStatus @default(TO_BE_VERIFIED)
+  verificationMode                       CompanyVerificationMode?
+  verificationComment                    String?
+  verifiedAt                             DateTime?                 @db.Timestamptz(6)
+  name                                   String
+  address                                String?
+  codeDepartement                        String?
+  longitude                              Float?
+  latitude                               Float?
+  gerepId                                String?
+  codeNaf                                String?
+  givenName                              String?
+  contact                                String?
+  contactEmail                           String?
+  contactPhone                           String?
+  website                                String?
+  ecoOrganismeAgreements                 String[]
+  companyTypes                           CompanyType[]
+  traderReceiptNumber                    String?
+  traderReceiptValidityLimit             DateTime?  @db.Timestamptz(6)
+  traderReceiptDepartment                String?
+  brokerReceiptNumber                    String?
+  brokerReceiptValidityLimit             DateTime?  @db.Timestamptz(6)
+  brokerReceiptDepartment                String?
+  transporterReceiptNumber               String?
+  transporterReceiptValidityLimit        DateTime?  @db.Timestamptz(6)
+  transporterReceiptDepartment           String?
+  vhuAgrementDemolisseurNumber   String?
+  vhuAgrementDemolisseurDepartment       String?
+  vhuAgrementBroyeurNumber       String?
+  vhuAgrementBroyeurDepartment           String?
+  workerCertificationHasSubSectionFour   Boolean?
+  workerCertificationHasSubSectionThree  Boolean?
+  workerCertificationNumber              String?
+  workerCertificationValidityLimit       DateTime?  @db.Timestamptz(6)
+  workerCertificationOrganisation        String?
+  allowBsdasriTakeOverWithoutSignature   Boolean  @default(false)
+  companyAssociations                    CompanyAssociation[]
+  MembershipRequest                      MembershipRequest[]
+  bsddRevisionRequests                   BsddRevisionRequest[]
+  BsdaRevisionRequest                    BsdaRevisionRequest[]
+  givenSignatureAutomations              SignatureAutomation[]     @relation("SignatureAutomationFrom")
+  receivedSignatureAutomations           SignatureAutomation[]     @relation("SignatureAutomationTo")
 
   // gin indices _CompanyTypesIdx => 149_create_company_indices.sql
 
@@ -637,48 +643,6 @@ model StatusLog {
   @@index([loggedAt], map: "_StatusLogLoggedAtIdx")
 }
 
-model TraderReceipt {
-  id            String    @id @default(cuid())
-  receiptNumber String
-  validityLimit DateTime  @db.Timestamptz(6)
-  department    String
-  Company       Company[]
-}
-
-model BrokerReceipt {
-  id            String    @id @default(cuid())
-  receiptNumber String
-  validityLimit DateTime  @db.Timestamptz(6)
-  department    String
-  Company       Company[]
-}
-
-model TransporterReceipt {
-  id            String    @id @default(cuid())
-  receiptNumber String
-  validityLimit DateTime  @db.Timestamptz(6)
-  department    String
-  Company       Company[]
-}
-
-model VhuAgrement {
-  id                   String    @id @default(cuid())
-  agrementNumber       String
-  department           String
-  demolisseurCompanies Company[] @relation("VhuAgrementDemolisseur_Company")
-  broyeurCompanies     Company[] @relation("VhuAgrementBroyeur_Company")
-}
-
-model WorkerCertification {
-  id                  String    @id @default(cuid())
-  hasSubSectionFour   Boolean
-  hasSubSectionThree  Boolean
-  certificationNumber String?
-  validityLimit       DateTime? @db.Timestamptz(6)
-  organisation        String?
-  Company             Company[]
-}
-
 model BsddTransporter {
   id                              String         @id @default(cuid())
   number                          Int
@@ -756,14 +720,14 @@ model GovernmentAccount {
   name             String // Exemple RNDTS, GEREP, etc
   permissions      GovernmentPermission[]
   // Liste blanche d'IP pour les connexions depuis ce compte de service
-  // Seules les connexions depuis ces adresses IP auront les permissions 
-  // étendues définies par le champ `permissions`. 
+  // Seules les connexions depuis ces adresses IP auront les permissions
+  // étendues définies par le champ `permissions`.
   authorizedIPs    String[]
   // Permet de restreindre les permissions étendues définies par le
   // le champ `GovernmentAccount.permissions` à une liste d'établissements.
-  // Cela permet à des applications gouvernementales tierces d'effectuer 
+  // Cela permet à des applications gouvernementales tierces d'effectuer
   // des tests sur des données réelles sur un nombre restreint d'entreprises.
-  // Pour que les permissions étendues s'appliquent à tous les établissements, 
+  // Pour que les permissions étendues s'appliquent à tous les établissements,
   // passer la valeur 'ALL'
   authorizedOrgIds String[]
   User             User[]

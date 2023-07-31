@@ -27,17 +27,17 @@ type Mutation {
     "Nom d'usage de l'établissement"
     givenName: String
     "Identifiant d'un récépissé transporteur"
-    transporterReceiptId: String
+    transporterReceiptId: String @deprecated(reason: "Ignoré - utiliser mutation updateTransporterReceipt")
     "Identifiant d'un récépissé négociant"
-    traderReceiptId: String
+    traderReceiptId: String @deprecated(reason: "Ignoré - utiliser mutation updateTraderReceipt")
     "Identifiant d'un récépissé courtier"
-    brokerReceiptId: String
+    brokerReceiptId: String @deprecated(reason: "Ignoré - utiliser mutation updateBrokerReceipt")
     "Identifiant d'un agrément VHU démolisseur"
-    vhuAgrementDemolisseurId: String
+    vhuAgrementDemolisseurId: String @deprecated(reason: "Ignoré - utiliser mutation updateVhuAgrement")
     "Identifiant d'un agrément VHU broyeur"
-    vhuAgrementBroyeurId: String
+    vhuAgrementBroyeurId: String @deprecated(reason: "Ignoré - utiliser mutation updateVhuAgrement")
     "Identifiant des informations de certification de l'entreprise de travaux"
-    workerCertificationId: String
+    workerCertificationId: String @deprecated(reason: "Ignoré - utiliser mutation updateWorkerCertification")
     "Agréments de l'éco-organisme"
     ecoOrganismeAgreements: [URL!]
     "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"

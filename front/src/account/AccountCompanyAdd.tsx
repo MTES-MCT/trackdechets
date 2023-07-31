@@ -211,7 +211,6 @@ export default function AccountCompanyAdd() {
       ...companyValues
     } = values;
 
-    let transporterReceiptId: string | null = null;
     // create transporter receipt if any
     if (
       !!transporterReceiptNumber &&
@@ -221,6 +220,7 @@ export default function AccountCompanyAdd() {
     ) {
       // all fields should be set
       const input = {
+        id: companyInfos?.orgId,
         receiptNumber: transporterReceiptNumber,
         validityLimit: transporterReceiptValidity,
         department: transporterReceiptDepartment,
@@ -229,13 +229,7 @@ export default function AccountCompanyAdd() {
       const { data } = await createTransporterReceipt({
         variables: { input },
       });
-
-      if (data) {
-        transporterReceiptId = data.createTransporterReceipt.id;
-      }
     }
-
-    let traderReceiptId: string | null = null;
 
     // create trader receipt if any
     if (
@@ -246,6 +240,7 @@ export default function AccountCompanyAdd() {
     ) {
       // all fields should be set
       const input = {
+        id: companyInfos.orgId,
         receiptNumber: traderReceiptNumber,
         validityLimit: traderReceiptValidity,
         department: traderReceiptDepartment,
@@ -292,8 +287,9 @@ export default function AccountCompanyAdd() {
     if (isVhu(values.companyTypes)) {
       if (vhuAgrementDemolisseurNumber && vhuAgrementDemolisseurDepartment) {
         const input = {
-          agrementNumber: vhuAgrementDemolisseurNumber,
-          department: vhuAgrementDemolisseurDepartment,
+          id: companyInfos?.orgId,
+          vhuAgrementDemolisseurNumber,
+          vhuAgrementDemolisseurDepartment,
         };
 
         const { data } = await createVhuAgrement({
@@ -307,8 +303,9 @@ export default function AccountCompanyAdd() {
 
       if (vhuAgrementBroyeurNumber && vhuAgrementBroyeurDepartment) {
         const input = {
-          agrementNumber: vhuAgrementBroyeurNumber,
-          department: vhuAgrementBroyeurDepartment,
+          id: companyInfos?.orgId,
+          vhuAgrementBroyeurNumber,
+          vhuAgrementBroyeurDepartment,
         };
 
         const { data } = await createVhuAgrement({

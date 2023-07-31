@@ -6,13 +6,15 @@ import prisma from "../prisma";
 import { User, Prisma, Company, CompanyAssociation } from "@prisma/client";
 import {
   CompanyNotFound,
-  TraderReceiptNotFound,
   BrokerReceiptNotFound,
-  TransporterReceiptNotFound,
-  VhuAgrementNotFound,
   WorkerCertificationNotFound
 } from "./errors";
-import { CompanyMember, UserRole } from "../generated/graphql/types";
+import {
+  BrokerReceipt,
+  CompanyMember,
+  UserRole,
+  WorkerCertification
+} from "../generated/graphql/types";
 import { AppDataloaders } from "../types";
 import { differenceInDays } from "date-fns";
 import { UserInputError } from "../common/errors";
@@ -284,58 +286,53 @@ export const getCompaniesAndActiveAdminsByCompanyOrgIds = async (
   );
 };
 
-export async function getTraderReceiptOrNotFound({
-  id
-}: Prisma.TraderReceiptWhereUniqueInput) {
-  const receipt = await prisma.traderReceipt.findUnique({ where: { id } });
-  if (receipt == null) {
-    throw new TraderReceiptNotFound();
-  }
-  return receipt;
-}
-
 export async function getBrokerReceiptOrNotFound({
   id
-}: Prisma.BrokerReceiptWhereUniqueInput) {
-  const receipt = await prisma.brokerReceipt.findUnique({ where: { id } });
-  if (receipt == null) {
+}: Prisma.CompanyWhereUniqueInput): Promise<BrokerReceipt> {
+  const company = await prisma.company.findUnique({
+    where: { orgId: id },
+    select: {
+      brokerReceiptNumber: true,
+      brokerReceiptDepartment: true,
+      brokerReceiptValidityLimit: true
+    }
+  });
+  if (company == null || !company.brokerReceiptNumber) {
     throw new BrokerReceiptNotFound();
   }
-  return receipt;
-}
-
-export async function getTransporterReceiptOrNotFound({
-  id
-}: Prisma.TransporterReceiptWhereUniqueInput) {
-  const receipt = await prisma.transporterReceipt.findUnique({ where: { id } });
-  if (receipt == null) {
-    throw new TransporterReceiptNotFound();
-  }
-  return receipt;
-}
-
-export async function getVhuAgrementOrNotFound({
-  id
-}: Prisma.VhuAgrementWhereUniqueInput) {
-  const agrement = await prisma.vhuAgrement.findUnique({ where: { id } });
-  if (agrement == null) {
-    throw new VhuAgrementNotFound();
-  }
-  return agrement;
+  return {
+    id: id!,
+    receiptNumber: company.brokerReceiptNumber,
+    department: company.brokerReceiptDepartment!,
+    validityLimit: company.brokerReceiptValidityLimit!
+  };
 }
 
 export async function getWorkerCertificationOrNotFound({
   id
-}: Prisma.WorkerCertificationWhereUniqueInput) {
-  const agrement = await prisma.workerCertification.findUnique({
-    where: { id }
+}: Prisma.CompanyWhereUniqueInput): Promise<WorkerCertification> {
+  const company = await prisma.company.findUnique({
+    where: { orgId: id },
+    select: {
+      workerCertificationHasSubSectionFour: true,
+      workerCertificationHasSubSectionThree: true,
+      workerCertificationNumber: true,
+      workerCertificationValidityLimit: true,
+      workerCertificationOrganisation: true
+    }
   });
-  if (agrement == null) {
+  if (company == null || !company.workerCertificationNumber) {
     throw new WorkerCertificationNotFound();
   }
-  return agrement;
+  return {
+    id: id!,
+    hasSubSectionThree: company.workerCertificationHasSubSectionThree!,
+    hasSubSectionFour: company.workerCertificationHasSubSectionFour!,
+    certificationNumber: company.workerCertificationNumber,
+    validityLimit: company.workerCertificationValidityLimit!,
+    organisation: company.workerCertificationOrganisation!
+  };
 }
-
 export function convertUrls<T extends Partial<Company>>(
   company: T
 ): T & {

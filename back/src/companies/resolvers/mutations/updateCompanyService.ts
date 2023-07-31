@@ -15,12 +15,6 @@ export async function updateCompanyFn({
   contactPhone,
   website,
   givenName,
-  transporterReceiptId,
-  traderReceiptId,
-  brokerReceiptId,
-  vhuAgrementDemolisseurId,
-  vhuAgrementBroyeurId,
-  workerCertificationId,
   ecoOrganismeAgreements,
   allowBsdasriTakeOverWithoutSignature
 }: MutationUpdateCompanyArgs): Promise<CompanyPrivate> {
@@ -34,26 +28,6 @@ export async function updateCompanyFn({
     ...(givenName != null ? { givenName } : {}),
     ...(allowBsdasriTakeOverWithoutSignature !== null
       ? { allowBsdasriTakeOverWithoutSignature }
-      : {}),
-    ...(transporterReceiptId
-      ? { transporterReceipt: { connect: { id: transporterReceiptId } } }
-      : {}),
-    ...(traderReceiptId
-      ? { traderReceipt: { connect: { id: traderReceiptId } } }
-      : {}),
-    ...(brokerReceiptId
-      ? { brokerReceipt: { connect: { id: brokerReceiptId } } }
-      : {}),
-    ...(vhuAgrementDemolisseurId
-      ? {
-          vhuAgrementDemolisseur: { connect: { id: vhuAgrementDemolisseurId } }
-        }
-      : {}),
-    ...(vhuAgrementBroyeurId
-      ? { vhuAgrementBroyeur: { connect: { id: vhuAgrementBroyeurId } } }
-      : {}),
-    ...(workerCertificationId
-      ? { workerCertification: { connect: { id: workerCertificationId } } }
       : {}),
     ...(ecoOrganismeAgreements != null
       ? {

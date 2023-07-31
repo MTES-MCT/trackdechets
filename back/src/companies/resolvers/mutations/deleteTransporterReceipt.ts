@@ -2,8 +2,8 @@ import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getTransporterReceiptOrNotFound } from "../../database";
-import { checkCanReadUpdateDeleteTransporterReceipt } from "../../permissions";
+import { checkUserPermissions, Permission } from "../../../permissions";
+import { TransporterReceiptNotFound } from "../../errors";
 
 /**
  * Delete a transporter receipt
@@ -14,12 +14,35 @@ const deleteTransporterReceiptResolver: MutationResolvers["deleteTransporterRece
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
     const { id } = input;
-    const receipt = await getTransporterReceiptOrNotFound({ id });
-    await checkCanReadUpdateDeleteTransporterReceipt(user, receipt);
-    const transporterReceipt = await prisma.transporterReceipt.delete({
-      where: { id }
-    });
-    return transporterReceipt;
+    await checkUserPermissions(
+      user,
+      [id],
+      Permission.CompanyCanUpdate,
+      `Vous n'avez pas le droit d'éditer ou supprimer ce récépissé transporteur`
+    );
+    try {
+      const company = await prisma.company.update({
+        where: { orgId: id },
+        data: {
+          transporterReceiptNumber: null,
+          transporterReceiptDepartment: null,
+          transporterReceiptValidityLimit: null
+        },
+        select: {
+          transporterReceiptNumber: true,
+          transporterReceiptDepartment: true,
+          transporterReceiptValidityLimit: true
+        }
+      });
+      return {
+        id: id!,
+        receiptNumber: company.transporterReceiptNumber!,
+        department: company.transporterReceiptDepartment!,
+        validityLimit: company.transporterReceiptValidityLimit!
+      };
+    } catch (_) {
+      throw new TransporterReceiptNotFound();
+    }
   };
 
 export default deleteTransporterReceiptResolver;

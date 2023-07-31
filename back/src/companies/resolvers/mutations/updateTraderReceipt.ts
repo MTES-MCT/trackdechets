@@ -2,10 +2,9 @@ import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { getTraderReceiptOrNotFound } from "../../database";
-import { checkCanReadUpdateDeleteTraderReceipt } from "../../permissions";
 import { receiptSchema } from "../../validation";
-import { removeEmptyKeys } from "../../../common/converter";
+import { checkUserPermissions, Permission } from "../../../permissions";
+import { TraderReceiptNotFound } from "../../errors";
 
 /**
  * Update a trader receipt
@@ -18,14 +17,36 @@ const updateTraderReceiptResolver: MutationResolvers["updateTraderReceipt"] =
     const {
       input: { id, ...data }
     } = args;
-    const receipt = await getTraderReceiptOrNotFound({ id });
-    await receiptSchema.validate({ ...receipt, ...data });
-    await checkCanReadUpdateDeleteTraderReceipt(user, receipt);
-    const traderReceipt = await prisma.traderReceipt.update({
-      data: removeEmptyKeys(data),
-      where: { id: receipt.id }
+    await checkUserPermissions(
+      user,
+      [id],
+      Permission.CompanyCanUpdate,
+      `Vous n'avez pas le droit d'éditer ou supprimer ce récépissé négociant`
+    );
+    await receiptSchema.validate(data);
+
+    const company = await prisma.company.update({
+      where: { orgId: id },
+      data: {
+        traderReceiptDepartment: null,
+        traderReceiptValidityLimit: null,
+        traderReceiptNumber: null
+      },
+      select: {
+        traderReceiptNumber: true,
+        traderReceiptDepartment: true,
+        traderReceiptValidityLimit: true
+      }
     });
-    return traderReceipt;
+    if (company == null || !company.traderReceiptNumber) {
+      throw new TraderReceiptNotFound();
+    }
+    return {
+      id: id!,
+      receiptNumber: company.traderReceiptNumber!,
+      department: company.traderReceiptDepartment!,
+      validityLimit: company.traderReceiptValidityLimit!
+    };
   };
 
 export default updateTraderReceiptResolver;

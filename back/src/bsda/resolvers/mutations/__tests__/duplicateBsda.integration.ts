@@ -23,44 +23,25 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
   // Companies with their initial data
   const emitter = await userWithCompanyFactory();
   const transporter = await userWithCompanyFactory("ADMIN", {
-    transporterReceipt: {
-      create: {
-        receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
-        validityLimit: TODAY.toISOString() as any,
-        department: "TRANSPORTER- RECEIPT-DEPARTMENT"
-      }
-    }
+    transporterReceiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+    transporterReceiptValidityLimit: TODAY.toISOString() as any,
+    transporterReceiptDepartment: "TRANSPORTER- RECEIPT-DEPARTMENT"
   });
-  const transporterReceipt = await prisma.transporterReceipt.findUniqueOrThrow({
-    where: { id: transporter.company.transporterReceiptId! }
-  });
+
   const broker = await userWithCompanyFactory("ADMIN", {
-    brokerReceipt: {
-      create: {
-        receiptNumber: "BROKER-RECEIPT-NUMBER",
-        validityLimit: TODAY.toISOString() as any,
-        department: "BROKER-RECEIPT-DEPARTMENT"
-      }
-    }
+    brokerReceiptNumber: "BROKER-RECEIPT-NUMBER",
+    brokerReceiptValidityLimit: TODAY.toISOString() as any,
+    brokerReceiptDepartment: "BROKER-RECEIPT-DEPARTMENT"
   });
-  const brokerReceipt = await prisma.brokerReceipt.findUniqueOrThrow({
-    where: { id: broker.company.brokerReceiptId! }
-  });
+
   const worker = await userWithCompanyFactory("ADMIN", {
-    workerCertification: {
-      create: {
-        hasSubSectionFour: true,
-        hasSubSectionThree: true,
-        certificationNumber: "WORKER-CERTIFICATION-NBR",
-        validityLimit: TODAY.toISOString() as any,
-        organisation: "GLOBAL CERTIFICATION"
-      }
-    }
+    workerCertificationHasSubSectionFour: true,
+    workerCertificationHasSubSectionThree: true,
+    workerCertificationNumber: "WORKER-CERTIFICATION-NBR",
+    workerCertificationValidityLimit: TODAY.toISOString() as any,
+    workerCertificationOrganisation: "GLOBAL CERTIFICATION"
   });
-  const workerCertification =
-    await prisma.workerCertification.findUniqueOrThrow({
-      where: { id: worker.company.workerCertificationId! }
-    });
+
   const destination = await userWithCompanyFactory();
 
   const bsda = await bsdaFactory({
@@ -78,22 +59,26 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
       workerCompanyPhone: worker.company.contactPhone,
       workerCompanyMail: worker.company.contactEmail,
       workerCertificationCertificationNumber:
-        workerCertification.certificationNumber,
+        worker.company.workerCertificationNumber,
       workerCertificationHasSubSectionFour:
-        workerCertification.hasSubSectionFour,
-      workerCertificationOrganisation: workerCertification.organisation,
+        worker.company.workerCertificationHasSubSectionFour,
+      workerCertificationOrganisation:
+        worker.company.workerCertificationOrganisation,
       workerCertificationHasSubSectionThree:
-        workerCertification.hasSubSectionThree,
-      workerCertificationValidityLimit: workerCertification.validityLimit,
+        worker.company.workerCertificationHasSubSectionThree,
+      workerCertificationValidityLimit:
+        worker.company.workerCertificationValidityLimit,
       transporterCompanySiret: transporter.company.siret,
       transporterCompanyName: transporter.company.name,
       transporterCompanyAddress: transporter.company.address,
       transporterCompanyContact: transporter.company.contact,
       transporterCompanyPhone: transporter.company.contactPhone,
       transporterCompanyMail: transporter.company.contactEmail,
-      transporterRecepisseNumber: transporterReceipt.receiptNumber,
-      transporterRecepisseDepartment: transporterReceipt.department,
-      transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+      transporterRecepisseNumber: transporter.company.transporterReceiptNumber,
+      transporterRecepisseDepartment:
+        transporter.company.transporterReceiptDepartment,
+      transporterRecepisseValidityLimit:
+        transporter.company.transporterReceiptValidityLimit,
       destinationCompanySiret: destination.company.siret,
       destinationCompanyName: destination.company.name,
       destinationCompanyAddress: destination.company.address,
@@ -106,9 +91,9 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
       brokerCompanyContact: broker.company.contact,
       brokerCompanyPhone: broker.company.contactPhone,
       brokerCompanyMail: broker.company.contactEmail,
-      brokerRecepisseNumber: brokerReceipt.receiptNumber,
-      brokerRecepisseDepartment: brokerReceipt.department,
-      brokerRecepisseValidityLimit: brokerReceipt.validityLimit,
+      brokerRecepisseNumber: broker.company.brokerReceiptNumber,
+      brokerRecepisseDepartment: broker.company.brokerReceiptDepartment,
+      brokerRecepisseValidityLimit: broker.company.brokerReceiptValidityLimit,
       ...opt
     }
   });
@@ -360,13 +345,9 @@ describe("Mutation.Bsda.duplicate", () => {
         id: transporter.company.id
       },
       data: {
-        transporterReceipt: {
-          update: {
-            receiptNumber: "UPDATED-TRANSPORTER-RECEIPT-NUMBER",
-            validityLimit: FOUR_DAYS_AGO.toISOString(),
-            department: "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
-          }
-        }
+        transporterReceiptNumber: "UPDATED-TRANSPORTER-RECEIPT-NUMBER",
+        transporterReceiptValidityLimit: FOUR_DAYS_AGO.toISOString(),
+        transporterReceiptDepartment: "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
       }
     });
 
@@ -380,13 +361,9 @@ describe("Mutation.Bsda.duplicate", () => {
         contact: "UPDATED-BROKER-CONTACT",
         contactPhone: "UPDATED-BROKER-PHONE",
         contactEmail: "UPDATED-BROKER-MAIL",
-        brokerReceipt: {
-          update: {
-            receiptNumber: "UPDATED-BROKER-RECEIPT-NUMBER",
-            validityLimit: FOUR_DAYS_AGO.toISOString(),
-            department: "UPDATED-BROKER-RECEIPT-DEPARTMENT"
-          }
-        }
+        brokerReceiptNumber: "UPDATED-BROKER-RECEIPT-NUMBER",
+        brokerReceiptValidityLimit: FOUR_DAYS_AGO.toISOString(),
+        brokerReceiptDepartment: "UPDATED-BROKER-RECEIPT-DEPARTMENT"
       }
     });
 
@@ -413,15 +390,11 @@ describe("Mutation.Bsda.duplicate", () => {
         contact: "UPDATED-WORKER-CONTACT",
         contactPhone: "UPDATED-WORKER-PHONE",
         contactEmail: "UPDATED-WORKER-MAIL",
-        workerCertification: {
-          update: {
-            hasSubSectionFour: false,
-            hasSubSectionThree: false,
-            certificationNumber: "UPDATED-WORKER-CERTIFICATION-NBR",
-            validityLimit: FOUR_DAYS_AGO.toISOString() as any,
-            organisation: "AFNOR Certification"
-          }
-        }
+        workerCertificationHasSubSectionFour: false,
+        workerCertificationHasSubSectionThree: false,
+        workerCertificationNumber: "UPDATED-WORKER-CERTIFICATION-NBR",
+        workerCertificationValidityLimit: FOUR_DAYS_AGO.toISOString() as any,
+        workerCertificationOrganisation: "AFNOR Certification"
       }
     });
 
@@ -521,8 +494,13 @@ describe("Mutation.Bsda.duplicate", () => {
       "AFNOR Certification"
     );
     // Test emptying Transporter receipt
-    await prisma.transporterReceipt.delete({
-      where: { id: transporter.company.transporterReceiptId! }
+    await prisma.company.update({
+      where: { id: transporter.company.id },
+      data: {
+        transporterReceiptDepartment: null,
+        transporterReceiptNumber: null,
+        transporterReceiptValidityLimit: null
+      }
     });
     const { errors: err3, data: data2 } = await mutate<
       Pick<Mutation, "duplicateBsda">

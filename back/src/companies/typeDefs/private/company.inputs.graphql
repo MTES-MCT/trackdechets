@@ -3,6 +3,10 @@ Payload de création d'un récépissé transporteur
 """
 input CreateTransporterReceiptInput {
   """
+  ID 'orgId' de Company portant le récépissé transporter à créer
+  """
+  id: ID!
+  """
   Numéro de récépissé transporteur
   """
   receiptNumber: String!
@@ -23,7 +27,7 @@ Payload d'édition d'un récépissé transporteur
 """
 input UpdateTransporterReceiptInput {
   """
-  The id of the transporter receipt to modify
+  ID 'orgId' de Company portant le récépissé transporter à modifier
   """
   id: ID!
 
@@ -48,7 +52,7 @@ Payload de suppression d'un récépissé transporteur
 """
 input DeleteTransporterReceiptInput {
   """
-  The id of the transporter receipt to delete
+  ID 'orgId' de Company portant le récépissé transporter à supprimer
   """
   id: ID!
 }
@@ -57,6 +61,10 @@ input DeleteTransporterReceiptInput {
 Payload de création d'un récépissé négociant
 """
 input CreateTraderReceiptInput {
+  """
+  ID 'orgId' de Company portant le récépissé négociant à créer
+  """
+  id: ID!
   """
   Numéro de récépissé négociant
   """
@@ -78,7 +86,7 @@ Payload d'édition d'un récépissé négociant
 """
 input UpdateTraderReceiptInput {
   """
-  The id of the trader receipt to modify
+   ID 'orgId' de Company portant le récépissé négociant à modifier
   """
   id: ID!
 
@@ -103,7 +111,7 @@ Payload de suppression d'un récépissé négociant
 """
 input DeleteTraderReceiptInput {
   """
-  The id of the trader receipt to delete
+   ID 'orgId' de Company portant le récépissé négociant à supprimer
   """
   id: ID!
 }
@@ -112,6 +120,10 @@ input DeleteTraderReceiptInput {
 Payload de création d'un récépissé courtier
 """
 input CreateBrokerReceiptInput {
+  """
+  ID 'orgId' de Company portant le récépissé courtier à créer
+  """
+  id: ID!
   """
   Numéro de récépissé courtier
   """
@@ -129,26 +141,11 @@ input CreateBrokerReceiptInput {
 }
 
 """
-Payload de création d'un agrément VHU
-"""
-input CreateVhuAgrementInput {
-  """
-  Numéro d'agrément VHU
-  """
-  agrementNumber: String!
-
-  """
-  Département ayant enregistré la déclaration
-  """
-  department: String!
-}
-
-"""
 Payload d'édition d'un récépissé courtier
 """
 input UpdateBrokerReceiptInput {
   """
-  The id of the broker receipt to modify
+  ID 'orgId' de Company portant le récépissé courtier à modifier
   """
   id: ID!
 
@@ -169,11 +166,50 @@ input UpdateBrokerReceiptInput {
 }
 
 """
+Payload de suppression d'un récépissé courtier
+"""
+input DeleteBrokerReceiptInput {
+  """
+  ID 'orgId' de Company portant le récépissé courtier à supprimer
+  """
+  id: ID!
+}
+
+enum VhuAgrementType {
+  BROYEUR
+  DEMOLISSEUR
+}
+
+"""
+Payload de création d'un agrément VHU
+"""
+input CreateVhuAgrementInput {
+  """
+  ID 'orgId' de Company portant l'agrément VHU à créer
+  """
+  id: ID!
+  """
+  Numéro d'agrément VHU
+  """
+  agrementNumber: String!
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String!
+
+  """
+  Type démolisseur ou broyeur
+  """
+  type: VhuAgrementType!
+}
+
+"""
 Payload d'édition d'un agrément VHU
 """
 input UpdateVhuAgrementInput {
   """
-  ID de l'agrément VHU à modifier
+  ID 'orgId' de Company portant l'agrément VHU à modifier
   """
   id: ID!
 
@@ -186,19 +222,33 @@ input UpdateVhuAgrementInput {
   Département ayant enregistré la déclaration
   """
   department: String
+
+  """
+  Type démolisseur ou broyeur
+  """
+  type: VhuAgrementType!
 }
 
 """
-Payload de suppression d'un récépissé courtier
+Payload de suppression d'un agrément VHU
 """
-input DeleteBrokerReceiptInput {
+input DeleteVhuAgrementInput {
   """
-  The id of the broker receipt to delete
+  ID 'orgId' de Company portant l'agrément VHU à supprimer
   """
   id: ID!
+
+  """
+  Type démolisseur ou broyeur
+  """
+  type: VhuAgrementType!
 }
 
 input CreateWorkerCertificationInput {
+  """
+  ID 'orgId' de Company portant la certification d'entreprise de travaux à créer
+  """
+  id: ID!
   """
   Indique si l'entreprise réalise des travaux relevant de la sous-section 4
   """
@@ -228,7 +278,7 @@ input CreateWorkerCertificationInput {
 
 input UpdateWorkerCertificationInput {
   """
-  The id of the worker certification to update
+  ID 'orgId' de Company portant la certification d'entreprise de travaux à mettre à jour
   """
   id: ID!
 
@@ -261,7 +311,7 @@ input UpdateWorkerCertificationInput {
 
 input DeleteWorkerCertificationInput {
   """
-  The id of the worker certification to delete
+  ID 'orgId' de Company portant la certification d'entreprise de travaux à supprimer
   """
   id: ID!
 }
@@ -271,16 +321,6 @@ input VerifyCompanyInput {
   siret: String!
   "Le code de vérification de l'établissement envoyé par courrier"
   code: String!
-}
-
-"""
-Payload de suppression d'un agrément VHU
-"""
-input DeleteVhuAgrementInput {
-  """
-  ID de l'agrément VHU à supprimer
-  """
-  id: ID!
 }
 
 "Payload permettant le rattachement d'un établissement à un utilisateur"
@@ -310,29 +350,94 @@ input PrivateCompanyInput {
   address: String!
 
   """
-  Récipissé transporteur (le cas échéant, pour les profils transporteur)
+  Numéro de récépissé transporteur (le cas échéant, pour les profils transporteur)
   """
-  transporterReceiptId: String
+  transporterReceiptNumber: String
 
   """
-  Récipissé négociant (le cas échéant, pour les profils négociant)
+  Limite de validité du récépissé transporteur (le cas échéant, pour les profils transporteur)
   """
-  traderReceiptId: String
+  transporterReceiptValidityLimit: DateTime
 
   """
-  Récipissé courtier (le cas échéant, pour les profils courtier)
+  Département ayant enregistré la déclaration transporteur (le cas échéant, pour les profils transporteur)
   """
-  brokerReceiptId: String
+  transporterReceiptDepartment: String
+
+  """
+  Numéro de récipissé négociant (le cas échéant, pour les profils négociant)
+  """
+  traderReceiptNumber: String
+  """
+  Limite de validité du récépissé négociant (le cas échéant, pour les profils négociant)
+  """
+  traderReceiptValidityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration du récépissé négociant (le cas échéant, pour les profils négociant)
+  """
+  traderReceiptDepartment: String
+
+  """
+  Numéro de récipissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceiptNumber: String
+
+  """
+  Limite de validité du récépissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceiptValidityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration du récépissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceiptDepartment: String
 
   """
   Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
   """
-  vhuAgrementDemolisseurId: String
+  vhuAgrementDemolisseurNumber: String
+
+  """
+  Department de l'agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseurDepartment: String
 
   """
   Agrément VHU broyeur (le cas échéant, pour les profils VHU)
   """
-  vhuAgrementBroyeurId: String
+  vhuAgrementBroyeurNumber: String
+
+  """
+  Department de l'agrément VHU broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeurDepartment: String
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 4
+  """
+  workerCertificationHasSubSectionFour: Boolean
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 3
+  """
+  workerCertificationHasSubSectionThree: Boolean
+
+  """
+  Numéro de certification de l'entreprise de travaux (sous-section 3 uniquement)
+  """
+  workerCertificationCertificationNumber: String
+
+  """
+  Limite de validité de la certification de l'entreprise de travaux (sous-section 3 uniquement)
+  """
+  workerCertificationValidityLimit: DateTime
+
+  """
+  Organisation qui a décerné la certification de l'entreprise de travaux (sous-section 3 uniquement)
+  Peut prendre uniquement les valeurs suivantes: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT
+  """
+  workerCertificationOrganisation: String
 
   """
   Liste des agréments de l'éco-organisme

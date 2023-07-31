@@ -87,11 +87,6 @@ async function duplicateBsda({
       orgId: {
         in: companiesOrgIds
       }
-    },
-    include: {
-      transporterReceipt: true,
-      brokerReceipt: true,
-      workerCertification: true
     }
   });
 
@@ -161,12 +156,11 @@ async function duplicateBsda({
     transporterCompanyContact:
       transporter?.contact ?? bsda.transporterCompanyContact,
     // Transporter recepisse
-    transporterRecepisseNumber:
-      transporter?.transporterReceipt?.receiptNumber ?? null,
+    transporterRecepisseNumber: transporter?.transporterReceiptNumber ?? null,
     transporterRecepisseValidityLimit:
-      transporter?.transporterReceipt?.validityLimit ?? null,
+      transporter?.transporterReceiptValidityLimit ?? null,
     transporterRecepisseDepartment:
-      transporter?.transporterReceipt?.department ?? null,
+      transporter?.transporterReceiptDepartment ?? null,
     // Broker company info
     brokerCompanyAddress: broker?.address ?? bsda.brokerCompanyAddress,
     brokerCompanyMail: broker?.contactEmail ?? bsda.brokerCompanyMail,
@@ -175,11 +169,11 @@ async function duplicateBsda({
     brokerCompanyContact: broker?.contact ?? bsda.brokerCompanyContact,
     // Broker recepisse
     brokerRecepisseNumber:
-      broker?.brokerReceipt?.receiptNumber ?? bsda.brokerRecepisseNumber,
+      broker?.brokerReceiptNumber ?? bsda.brokerRecepisseNumber,
     brokerRecepisseValidityLimit:
-      broker?.brokerReceipt?.validityLimit ?? bsda.brokerRecepisseValidityLimit,
+      broker?.brokerReceiptValidityLimit ?? bsda.brokerRecepisseValidityLimit,
     brokerRecepisseDepartment:
-      broker?.brokerReceipt?.department ?? bsda.brokerRecepisseDepartment,
+      broker?.brokerReceiptDepartment ?? bsda.brokerRecepisseDepartment,
     // Worker company info
     workerCompanyAddress: worker?.address ?? bsda.workerCompanyAddress,
     workerCompanyMail: worker?.contactEmail ?? bsda.workerCompanyMail,
@@ -188,19 +182,19 @@ async function duplicateBsda({
     workerCompanyContact: worker?.contact ?? bsda.workerCompanyContact,
     // Worker certification
     workerCertificationHasSubSectionFour:
-      worker?.workerCertification?.hasSubSectionFour ??
+      worker?.workerCertificationHasSubSectionFour ??
       bsda.workerCertificationHasSubSectionFour,
     workerCertificationHasSubSectionThree:
-      worker?.workerCertification?.hasSubSectionThree ??
+      worker?.workerCertificationHasSubSectionThree ??
       bsda.workerCertificationHasSubSectionThree,
     workerCertificationValidityLimit:
-      worker?.workerCertification?.validityLimit ??
+      worker?.workerCertificationValidityLimit ??
       bsda.workerCertificationValidityLimit,
     workerCertificationOrganisation:
-      worker?.workerCertification?.organisation ??
+      worker?.workerCertificationOrganisation ??
       bsda.workerCertificationOrganisation,
     workerCertificationCertificationNumber:
-      worker?.workerCertification?.certificationNumber ??
+      worker?.workerCertificationNumber ??
       bsda.workerCertificationCertificationNumber
   };
 }

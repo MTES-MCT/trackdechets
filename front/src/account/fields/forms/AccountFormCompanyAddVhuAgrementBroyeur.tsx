@@ -6,21 +6,28 @@ import { NotificationError } from "Apps/common/Components/Error/Error";
 import { CompanyPrivate } from "generated/graphql/types";
 
 type Props = {
-  company: Pick<CompanyPrivate, "id" | "siret" | "vhuAgrementBroyeur">;
+  company: Pick<
+    CompanyPrivate,
+    | "id"
+    | "siret"
+    | "orgId"
+    | "vhuAgrementBroyeurNumber"
+    | "vhuAgrementBroyeurDepartment"
+  >;
   toggleEdition: () => void;
 };
 
 type V = {
-  agrementNumber: string;
-  department: string;
+  vhuAgrementBroyeurNumber: string;
+  vhuAgrementBroyeurDepartment: string;
 };
 
 const UPDATE_VHU_AGREMENT = gql`
   mutation UpdateVhuAgrement($input: UpdateVhuAgrementInput!) {
     updateVhuAgrement(input: $input) {
       id
-      agrementNumber
-      department
+      vhuAgrementBroyeurNumber
+      vhuAgrementBroyeurDepartment
     }
   }
 `;
@@ -29,21 +36,8 @@ const CREATE_VHU_AGREMENT = gql`
   mutation CreateVhuAgrement($input: CreateVhuAgrementInput!) {
     createVhuAgrement(input: $input) {
       id
-      agrementNumber
-      department
-    }
-  }
-`;
-
-const UPDATE_COMPANY_VHU_AGREMENT = gql`
-  mutation UpdateCompany($id: String!, $vhuAgrementBroyeurId: String!) {
-    updateCompany(id: $id, vhuAgrementBroyeurId: $vhuAgrementBroyeurId) {
-      id
-      vhuAgrementBroyeur {
-        id
-        agrementNumber
-        department
-      }
+      vhuAgrementBroyeurNumber
+      vhuAgrementBroyeurDepartment
     }
   }
 `;
@@ -64,19 +58,14 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
   company,
   toggleEdition,
 }: Props) {
-  const vhuAgrementBroyeur = company.vhuAgrementBroyeur;
+  const vhuAgrementBroyeurNumber = company.vhuAgrementBroyeurNumber;
 
   const [
     createOrUpdateVhuAgrement,
     { loading: updateOrCreateLoading, error: updateOrCreateError },
   ] = useMutation(
-    vhuAgrementBroyeur ? UPDATE_VHU_AGREMENT : CREATE_VHU_AGREMENT
+    vhuAgrementBroyeurNumber ? UPDATE_VHU_AGREMENT : CREATE_VHU_AGREMENT
   );
-
-  const [
-    updateCompany,
-    { loading: updateCompanyLoading, error: updateCompanyError },
-  ] = useMutation(UPDATE_COMPANY_VHU_AGREMENT);
 
   const [deleteVhuAgrement, { loading: deleteLoading, error: deleteError }] =
     useMutation(DELETE_VHU_AGREMENT, {
@@ -86,24 +75,22 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
           fragment: gql`
             fragment VhuAgrementBroyeurCompanyFragment on CompanyPrivate {
               id
-              vhuAgrementBroyeur {
-                id
-              }
+              vhuAgrementBroyeurNumber
             }
           `,
-          data: { vhuAgrementBroyeur: null },
+          data: { id: company.orgId },
         });
       },
     });
 
-  const initialValues: V = vhuAgrementBroyeur
+  const initialValues: V = vhuAgrementBroyeurNumber
     ? {
-        agrementNumber: vhuAgrementBroyeur.agrementNumber,
-        department: vhuAgrementBroyeur.department,
+        vhuAgrementBroyeurNumber,
+        vhuAgrementBroyeurDepartment,
       }
     : {
-        agrementNumber: "",
-        department: "",
+        vhuAgrementBroyeurNumber: "",
+        vhuAgrementBroyeurDepartment: "",
       };
 
   return (
@@ -112,37 +99,27 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
         <NotificationError apolloError={updateOrCreateError} />
       )}
 
-      {updateCompanyError && (
-        <NotificationError apolloError={updateCompanyError} />
-      )}
-
       {deleteError && <NotificationError apolloError={deleteError} />}
       <Formik
         initialValues={initialValues}
         onSubmit={async values => {
           const input = {
-            ...(vhuAgrementBroyeur?.id ? { id: vhuAgrementBroyeur.id } : {}),
+            ...(vhuAgrementBroyeurNumber ? { id: company.orgId } : {}),
             ...values,
           };
           const { data } = await createOrUpdateVhuAgrement({
             variables: { input },
           });
-          if (data.createVhuAgrement) {
-            await updateCompany({
-              variables: {
-                id: company.id,
-                vhuAgrementBroyeurId: data.createVhuAgrement.id,
-              },
-            });
-          }
           toggleEdition();
         }}
         validate={values => {
           return {
-            ...(!values.agrementNumber
-              ? { agrementNumber: "Champ requis" }
+            ...(!values.vhuAgrementBroyeurNumber
+              ? { vhuAgrementBroyeurNumber: "Champ requis" }
               : {}),
-            ...(!values.department ? { department: "Champ requis" } : {}),
+            ...(!values.vhuAgrementBroyeurDepartment
+              ? { vhuAgrementBroyeurDepartment: "Champ requis" }
+              : {}),
           };
         }}
       >
@@ -155,10 +132,10 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
                   <td>
                     <Field
                       type="text"
-                      name="agrementNumber"
+                      name="vhuAgrementBroyeurNumber"
                       className="td-input"
                     />
-                    <RedErrorMessage name="agrementNumber" />
+                    <RedErrorMessage name="vhuAgrementBroyeurNumber" />
                   </td>
                 </tr>
                 <tr>
@@ -166,20 +143,20 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
                   <td>
                     <Field
                       type="text"
-                      name="department"
+                      name="vhuAgrementBroyeurDepartment"
                       placeholder="75"
                       className="td-input"
                     />
-                    <RedErrorMessage name="department" />
+                    <RedErrorMessage name="vhuAgrementBroyeurDepartment" />
                   </td>
                 </tr>
               </tbody>
             </table>
-            {(updateOrCreateLoading ||
-              deleteLoading ||
-              updateCompanyLoading) && <div>Envoi en cours...</div>}
+            {(updateOrCreateLoading || deleteLoading) && (
+              <div>Envoi en cours...</div>
+            )}
             <div className="tw-mt-2">
-              {vhuAgrementBroyeur && (
+              {vhuAgrementBroyeurNumber && (
                 <button
                   className="btn btn--danger tw-mr-1"
                   type="button"
@@ -187,7 +164,7 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
                   onClick={async () => {
                     await deleteVhuAgrement({
                       variables: {
-                        input: { id: vhuAgrementBroyeur.id },
+                        input: { id: company.orgId },
                       },
                     });
                     toggleEdition();
@@ -201,7 +178,7 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
                 type="submit"
                 disabled={props.isSubmitting}
               >
-                {vhuAgrementBroyeur ? "Modifier" : "Créer"}
+                {vhuAgrementBroyeurNumber ? "Modifier" : "Créer"}
               </button>
             </div>
           </Form>

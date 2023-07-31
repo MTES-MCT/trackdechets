@@ -3,9 +3,9 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getBrokerReceiptOrNotFound } from "../../database";
-import { checkCanReadUpdateDeleteBrokerReceipt } from "../../permissions";
 import { receiptSchema } from "../../validation";
 import { removeEmptyKeys } from "../../../common/converter";
+import { checkUserPermissions, Permission } from "../../../permissions";
 
 /**
  * Update a broker receipt
@@ -19,8 +19,14 @@ const updateBrokerReceiptResolver: MutationResolvers["updateBrokerReceipt"] =
       input: { id, ...data }
     } = args;
     const receipt = await getBrokerReceiptOrNotFound({ id });
+    await checkUserPermissions(
+      user,
+      [id],
+      Permission.CompanyCanUpdate,
+      `Vous n'avez pas le droit d'éditer ou supprimer ce récépissé courtier`
+    );
+
     await receiptSchema.validate({ ...receipt, ...data });
-    await checkCanReadUpdateDeleteBrokerReceipt(user, receipt);
     return await prisma.brokerReceipt.update({
       data: removeEmptyKeys(data),
       where: { id: receipt.id }

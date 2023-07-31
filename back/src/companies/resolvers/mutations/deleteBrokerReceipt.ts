@@ -3,7 +3,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBrokerReceiptOrNotFound } from "../../database";
-import { checkCanReadUpdateDeleteBrokerReceipt } from "../../permissions";
+import { checkUserPermissions, Permission } from "../../../permissions";
 
 /**
  * Delete a broker receipt
@@ -14,8 +14,14 @@ const deleteBrokerReceiptResolver: MutationResolvers["deleteBrokerReceipt"] =
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
     const { id } = input;
-    const receipt = await getBrokerReceiptOrNotFound({ id });
-    await checkCanReadUpdateDeleteBrokerReceipt(user, receipt);
+    getBrokerReceiptOrNotFound({ id });
+    await checkUserPermissions(
+      user,
+      [id],
+      Permission.CompanyCanUpdate,
+      `Vous n'avez pas le droit d'éditer ou supprimer ce récépissé courtier`
+    );
+
     return await prisma.brokerReceipt.delete({ where: { id } });
   };
 

@@ -1,10 +1,10 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationDeleteWorkerCertificationArgs } from "../../../generated/graphql/types";
+import { checkUserPermissions, Permission } from "../../../permissions";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getWorkerCertificationOrNotFound } from "../../database";
-import { checkCanReadUpdateDeleteWorkerCertification } from "../../permissions";
 
 export async function deleteWorkerCertification(
   _,
@@ -14,7 +14,12 @@ export async function deleteWorkerCertification(
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const { id } = input;
-  const receipt = await getWorkerCertificationOrNotFound({ id });
-  await checkCanReadUpdateDeleteWorkerCertification(user, receipt);
+  await getWorkerCertificationOrNotFound({ id });
+  await checkUserPermissions(
+    user,
+    [id],
+    Permission.CompanyCanUpdate,
+    `Vous n'avez pas le droit d'éditer ou supprimer cette certification`
+  );
   return prisma.workerCertification.delete({ where: { id } });
 }
