@@ -2,9 +2,9 @@ import { ApolloServerPlugin } from "apollo-server-plugin-base";
 import { ValidationError } from "yup";
 import { ZodError } from "zod";
 import * as Sentry from "@sentry/node";
-import { TDGraphQLError } from "../errors";
+import { GraphQLError } from "graphql";
 
-const knownErrors = [TDGraphQLError, ValidationError, ZodError];
+const knownErrors = [GraphQLError, ValidationError, ZodError];
 
 /**
  * Apollo server plugin used to capture unhandled errors in Sentry
@@ -23,12 +23,9 @@ const sentryReporter: ApolloServerPlugin = {
           // don't do anything with errors we expect.
           if (
             knownErrors.some(
-              expectedError =>
-                error instanceof expectedError ||
-                error.originalError instanceof expectedError
+              expectedError => error.originalError instanceof expectedError
             )
           ) {
-            console.log("continue ?");
             continue;
           }
 

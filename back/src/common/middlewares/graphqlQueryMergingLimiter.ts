@@ -2,11 +2,11 @@ import {
   ApolloServerPlugin,
   GraphQLRequestContext
 } from "apollo-server-plugin-base";
-import { Kind, OperationDefinitionNode } from "graphql";
+import { GraphQLError, Kind, OperationDefinitionNode } from "graphql";
 import { MAX_OPERATIONS_PER_REQUEST } from "./graphqlBatchLimiter";
-import { ErrorCode, TDGraphQLError } from "../errors";
+import { ErrorCode } from "../errors";
 
-export class GraphqlQueryLimit extends TDGraphQLError {
+export class GraphqlQueryLimit extends GraphQLError {
   constructor(message: string) {
     super(message, {
       extensions: {
