@@ -7,14 +7,17 @@ if (process.env.NODE_ENV !== "test") {
     logInjection: true
   });
 
-  const provider = new TracerProvider();
-  registerInstrumentations({
-    tracerProvider: provider,
-    instrumentations: [new PrismaInstrumentation({})]
-  });
+  // If tracer is disabled, a noop proxy is loaded and the instrumentation fails
+  if (process.env.DD_TRACE_ENABLED !== "false") {
+    const provider = new TracerProvider();
+    registerInstrumentations({
+      tracerProvider: provider,
+      instrumentations: [new PrismaInstrumentation({})]
+    });
 
-  // Register the provider globally
-  provider.register();
+    // Register the provider globally
+    provider.register();
+  }
 }
 
 export { tracer };
