@@ -1,5 +1,4 @@
 import { User, UserRole } from "@prisma/client";
-import { ForbiddenError } from "apollo-server-core";
 import { cachedGet } from "./common/redis";
 import prisma from "./prisma";
 import * as thisModule from "./permissions";
@@ -11,6 +10,7 @@ import {
   UserPermission
 } from "./generated/graphql/types";
 import { checkSecurityCode } from "./common/permissions";
+import { ForbiddenError } from "./common/errors";
 
 // List of all the permissions
 export enum Permission {

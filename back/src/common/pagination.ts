@@ -1,6 +1,6 @@
-import { UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import { PageInfo } from "../generated/graphql/types";
+import { UserInputError } from "./errors";
 
 const DEFAULT_PAGINATE_BY = 50;
 const MAX_PAGINATE_BY = 500;

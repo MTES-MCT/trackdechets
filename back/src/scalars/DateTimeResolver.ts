@@ -1,6 +1,6 @@
 import { GraphQLScalarType, Kind } from "graphql";
 import { isValid, parseISO } from "date-fns";
-import { UserInputError } from "apollo-server-express";
+import { UserInputError } from "../common/errors";
 
 const INVALID_DATE_FORMAT = v =>
   `Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu ${v}.`;

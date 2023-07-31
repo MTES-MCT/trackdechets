@@ -6,7 +6,6 @@ import {
   Status,
   User
 } from "@prisma/client";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import {
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
@@ -27,6 +26,7 @@ import { getFormRepository } from "../../repository";
 import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import { packagingInfoFn } from "../../validation";
 import { isSiret } from "../../../common/constants/companySearchHelpers";
+import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDD_STATUSES: Status[] = [

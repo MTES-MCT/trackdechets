@@ -1,9 +1,10 @@
-import { ApolloError } from "apollo-server-express";
 import { ApolloServerPlugin } from "apollo-server-plugin-base";
 import { ValidationError } from "yup";
+import { ZodError } from "zod";
 import * as Sentry from "@sentry/node";
+import { GraphQLError } from "graphql";
 
-const knownErrors = [ApolloError, ValidationError];
+const knownErrors = [GraphQLError, ValidationError, ZodError];
 
 /**
  * Apollo server plugin used to capture unhandled errors in Sentry
@@ -22,9 +23,7 @@ const sentryReporter: ApolloServerPlugin = {
           // don't do anything with errors we expect.
           if (
             knownErrors.some(
-              expectedError =>
-                error instanceof expectedError ||
-                error.originalError instanceof expectedError
+              expectedError => error.originalError instanceof expectedError
             )
           ) {
             continue;
@@ -58,10 +57,6 @@ const sentryReporter: ApolloServerPlugin = {
           });
 
           const sentryId = Sentry.captureException(error, scope);
-
-          // kinda of a hack but seems to be the only way to pass
-          // info down to formatError. See also
-          // https://github.com/apollographql/apollo-server/issues/4010
           if (error.originalError) {
             (error.originalError as any).sentryId = sentryId;
           }

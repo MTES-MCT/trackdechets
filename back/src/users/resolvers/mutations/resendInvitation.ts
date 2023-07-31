@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { sendMail } from "../../../mailer/mailing";
@@ -8,7 +7,10 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { inviteUserToJoin } from "../../../mailer/templates";
 import { checkUserPermissions, Permission } from "../../../permissions";
-import { NotCompanyAdminErrorMsg } from "../../../common/errors";
+import {
+  NotCompanyAdminErrorMsg,
+  UserInputError
+} from "../../../common/errors";
 
 const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
   parent,

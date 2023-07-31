@@ -1,7 +1,7 @@
-import { UserInputError, ApolloError } from "apollo-server-express";
 import { readFileSync } from "fs";
 import { ValidationError } from "yup";
-import { ErrorCode } from "../common/errors";
+import { ErrorCode, UserInputError } from "../common/errors";
+import { GraphQLError } from "graphql";
 
 const mockFoo = jest.fn();
 const mockBar = jest.fn();
@@ -85,7 +85,7 @@ describe("Error handling", () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     mockFoo.mockImplementationOnce(() => {
-      throw new ApolloError("Bang");
+      throw new GraphQLError("Bang");
     });
     const { errors } = await server.executeOperation({ query: FOO });
     expect(errors).toHaveLength(1);
@@ -99,8 +99,8 @@ describe("Error handling", () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     mockFoo.mockImplementationOnce(() => {
-      const error = new ApolloError("Bang");
-      error.sentryId = "sentry_id";
+      const error = new GraphQLError("Bang");
+      (error as any).sentryId = "sentry_id";
       throw error;
     });
     const { errors } = await server.executeOperation({ query: FOO });

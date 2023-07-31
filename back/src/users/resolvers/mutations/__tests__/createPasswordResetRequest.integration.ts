@@ -87,9 +87,9 @@ describe("mutation createPasswordResetRequest", () => {
       expect.objectContaining({
         message: "Le test anti-robots est incorrect",
 
-        extensions: {
+        extensions: expect.objectContaining({
           code: "BAD_USER_INPUT"
-        }
+        })
       })
     ]);
 

@@ -1,6 +1,5 @@
 import { estypes } from "@elastic/elasticsearch";
 import { Prisma } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
 import { removeEmptyKeys, safeInput } from "../common/converter";
 import {
   DateFilter,
@@ -9,6 +8,7 @@ import {
   StringNullableListFilter,
   TextFilter
 } from "../generated/graphql/types";
+import { UserInputError } from "./errors";
 
 type EnumFilter<E> = {
   _in?: E[] | null;

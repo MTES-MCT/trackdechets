@@ -1,5 +1,4 @@
 import * as yup from "yup";
-import { UserInputError } from "apollo-server-express";
 import {
   Bsff,
   BsffPackaging as PrismaBsffPackaging,
@@ -26,6 +25,7 @@ import {
   weightConditions,
   WeightUnits
 } from "../common/validation";
+import { UserInputError } from "../common/errors";
 
 configureYup();
 

@@ -1,4 +1,4 @@
-import { UserInputError } from "apollo-server-core";
+import { UserInputError } from "../../common/errors";
 import { PackagingInfo } from "../../generated/graphql/types";
 
 export function sumPackagingInfos(groupOfPackagingInfos: PackagingInfo[][]) {

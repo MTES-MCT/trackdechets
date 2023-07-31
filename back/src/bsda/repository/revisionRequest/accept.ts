@@ -14,7 +14,7 @@ import {
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { PARTIAL_OPERATIONS } from "../../validation/constants";
 import { NON_CANCELLABLE_BSDA_STATUSES } from "../../resolvers/mutations/revisionRequest/createRevisionRequest";
-import { ForbiddenError } from "apollo-server-core";
+import { ForbiddenError } from "../../../common/errors";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,

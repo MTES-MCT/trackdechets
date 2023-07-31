@@ -23,12 +23,12 @@ import {
   validateGroupement
 } from "../../validation";
 import prisma from "../../../prisma";
-import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
 import { sirenifyFormInput } from "../../sirenify";
 import { recipifyFormInput } from "../../recipify";
 import { validateIntermediariesInput } from "../../../common/validation";
+import { UserInputError } from "../../../common/errors";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;

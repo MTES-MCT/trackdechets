@@ -17,7 +17,6 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsdasriOrNotFound } from "../../database";
 import { expandBsdasriFromDB } from "../../converter";
 import { checkCanEditBsdasri } from "../../permissions";
-import { UserInputError } from "apollo-server-core";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 import { FullDbBsdasri } from "../../types";
 import { validateBsdasri } from "../../validation";
@@ -32,6 +31,7 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { runInTransaction } from "../../../common/repository/helper";
 import { BsdasriRepository, getBsdasriRepository } from "../../repository";
 import { getTransporterReceipt } from "../../recipify";
+import { UserInputError } from "../../../common/errors";
 
 const signBsdasri: MutationResolvers["signBsdasri"] = async (
   _,

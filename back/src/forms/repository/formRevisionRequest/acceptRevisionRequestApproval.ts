@@ -18,9 +18,9 @@ import {
 } from "../../../common/repository/types";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { NON_CANCELLABLE_BSDD_STATUSES } from "../../resolvers/mutations/createFormRevisionRequest";
-import { ForbiddenError } from "apollo-server-core";
 import buildRemoveAppendix2 from "../form/removeAppendix2";
 import { distinct } from "../../../common/arrays";
+import { ForbiddenError } from "../../../common/errors";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,

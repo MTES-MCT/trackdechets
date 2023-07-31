@@ -1,5 +1,4 @@
 import * as yup from "yup";
-import { UserInputError } from "apollo-server-express";
 import {
   AnonymousCompanyInput,
   MutationResolvers
@@ -14,6 +13,7 @@ import {
   siret,
   siretConditions
 } from "../../../common/validation";
+import { UserInputError } from "../../../common/errors";
 
 const anonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
   yup.object({

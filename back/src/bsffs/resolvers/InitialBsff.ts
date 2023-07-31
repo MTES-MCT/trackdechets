@@ -1,8 +1,8 @@
 import { BsffResolvers } from "../../generated/graphql/types";
 import { checkCanRead } from "../permissions";
-import { ForbiddenError } from "apollo-server-express";
 import { Bsff } from "./Bsff";
 import { getReadonlyBsffRepository } from "../repository";
+import { ForbiddenError } from "../../common/errors";
 
 export const InitialBsff: BsffResolvers = {
   packagings: Bsff.packagings,

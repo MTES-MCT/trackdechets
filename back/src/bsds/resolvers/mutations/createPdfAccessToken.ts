@@ -1,7 +1,6 @@
 import prisma from "../../../prisma";
 import { addMinutes } from "date-fns";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { ForbiddenError } from "apollo-server-core";
 import { ReadableIdPrefix } from "../../../forms/readableId";
 import { getUid, getAPIBaseURL } from "../../../utils";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -24,6 +23,7 @@ import {
 import { ROAD_CONTROL_SLUG } from "../../../common/constants";
 import { checkCanRead as checkCanReadForm } from "../../../forms/permissions";
 import { checkCanRead as checkCanReadBsdasri } from "../../../bsdasris/permissions";
+import { ForbiddenError } from "../../../common/errors";
 
 const accessors = {
   [BsdType.BSDD]: id => getFormOrFormNotFound({ id }),

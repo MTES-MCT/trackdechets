@@ -61,9 +61,9 @@ describe("Mutation.deleteBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        extensions: {
+        extensions: expect.objectContaining({
           code: "UNAUTHENTICATED"
-        }
+        })
       })
     ]);
   });

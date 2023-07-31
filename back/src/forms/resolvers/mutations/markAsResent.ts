@@ -4,7 +4,6 @@ import { getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb, flattenFormInput } from "../../converter";
 import transitionForm from "../../workflow/transitionForm";
 import { checkCanMarkAsResent } from "../../permissions";
-import { UserInputError } from "apollo-server-express";
 import {
   validateForwardedInCompanies,
   sealedFormSchema
@@ -12,6 +11,7 @@ import {
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import { EmitterType, Prisma, Status } from "@prisma/client";
+import { UserInputError } from "../../../common/errors";
 
 const markAsResentResolver: MutationResolvers["markAsResent"] = async (
   parent,

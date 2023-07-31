@@ -5,11 +5,11 @@ import {
   expandBsffPackagingFromDB
 } from "../../converter";
 import { getBsffPackagingOrNotFound } from "../../database";
-import { UserInputError } from "apollo-server-core";
 import { getBsffPackagingRepository } from "../../repository";
 import { checkEditionRules } from "../../edition/bsffPackagingEdition";
 import { sirenifyBsffPackagingInput } from "../../sirenify";
 import { checkCanUpdateBsffPackaging } from "../../permissions";
+import { UserInputError } from "../../../common/errors";
 
 const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
   _,

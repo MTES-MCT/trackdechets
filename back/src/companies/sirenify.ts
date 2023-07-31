@@ -1,5 +1,5 @@
-import { UserInputError } from "apollo-server-core";
 import { AuthType } from "../auth";
+import { UserInputError } from "../common/errors";
 import { searchCompany } from "../companies/search";
 import { CompanySearchResult } from "../companies/types";
 import { CompanyInput } from "../generated/graphql/types";

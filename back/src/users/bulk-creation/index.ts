@@ -7,7 +7,6 @@ import { hashPassword, generatePassword } from "../utils";
 import { randomNumber, getUIBaseURL, sanitizeEmail } from "../../utils";
 import { groupBy } from "./utils";
 import { sendMail } from "../../mailer/mailing";
-import { UserInputError } from "apollo-server-express";
 import {
   associateUserToCompany,
   acceptNewUserCompanyInvitations,
@@ -20,6 +19,7 @@ import {
   CompanyVerificationStatus
 } from "@prisma/client";
 import { CompanyInfo, CompanyRow, RoleRow } from "./types";
+import { UserInputError } from "../../common/errors";
 
 function printHelp() {
   console.log(`

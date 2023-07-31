@@ -3,11 +3,11 @@
  */
 
 import { BsddTransporter, Form, Prisma } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
 import { FormRole } from "../generated/graphql/types";
 import { FormNotFound } from "./errors";
 import { FullForm } from "./types";
+import { UserInputError } from "../common/errors";
 
 /**
  * Returns a prisma Form with all linked objects

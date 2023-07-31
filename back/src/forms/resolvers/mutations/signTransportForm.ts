@@ -1,5 +1,4 @@
 import { EmitterType, Form, Prisma, Status } from "@prisma/client";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
   Form as GraphQLForm,
@@ -25,6 +24,7 @@ import { validateBeforeTransport } from "../../validation";
 import { Permission } from "../../../permissions";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { recipifyFormInput } from "../../recipify";
+import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 export async function getFormReceiptField(transporter) {
   const recipifiedTransporter = await recipifyFormInput({

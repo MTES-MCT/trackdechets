@@ -5,7 +5,6 @@ import {
   Status,
   User
 } from "@prisma/client";
-import { ForbiddenError } from "apollo-server-core";
 import {
   CreateFormInput,
   ImportPaperFormInput,
@@ -27,6 +26,7 @@ import { getReadOnlyFormRepository } from "./repository";
 import { checkSecurityCode } from "../common/permissions";
 import { FullForm } from "./types";
 import { editionRules, getUpdatedFields } from "./edition";
+import { ForbiddenError } from "../common/errors";
 
 /**
  * Retrieves companies allowed to update, delete or duplicate an existing BSDD.

@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-core";
 import {
   GET_BSDS_CUSTOM_INFO_MAX_LENGTH,
   GET_BSDS_PLATES_MAX_LENGTH,
@@ -14,6 +13,7 @@ import {
 import { BsdWhere } from "../generated/graphql/types";
 import { transportPlateFilter } from "../common/elastic";
 import { estypes } from "@elastic/elasticsearch";
+import { UserInputError } from "../common/errors";
 
 export function toElasticSimpleQuery(where: BsdWhere) {
   return {

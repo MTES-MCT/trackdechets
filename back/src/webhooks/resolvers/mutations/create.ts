@@ -5,12 +5,12 @@ import {
 import { GraphQLContext } from "../../../types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getWebhookSettingRepository } from "../../repository";
-import { UserInputError } from "apollo-server-express";
 import { formatWebhookSettingFromDB } from "../../converter";
 import { getUserWebhookCompanyOrgIds } from "../../database";
 import { validateWebhookCreateInput } from "../../validation";
 import { aesEncrypt } from "../../../utils";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
+import { UserInputError } from "../../../common/errors";
 
 const createWebhookSettingResolver = async (
   _: ResolversParentTypes["Mutation"],

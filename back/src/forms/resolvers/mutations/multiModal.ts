@@ -1,4 +1,3 @@
-import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -42,6 +41,7 @@ import {
   siretTests,
   vatNumberTests
 } from "../../../common/validation";
+import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =

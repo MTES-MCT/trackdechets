@@ -1,5 +1,4 @@
 import { Form, Prisma, Status } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   ImportPaperFormInput,
@@ -21,6 +20,7 @@ import {
   isDangerous,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "../../../common/constants";
+import { UserInputError } from "../../../common/errors";
 
 /**
  * Update an existing form with data imported from a paper form

@@ -3,8 +3,8 @@ import crypto from "crypto";
 import * as yup from "yup";
 import { base32Encode } from "../utils";
 import { EMAIL_PROVIDER_DOMAINS } from "../common/constants/emailProviderDomain";
-import { UserInputError } from "apollo-server-express";
 import zxcvbn from "zxcvbn";
+import { UserInputError } from "../common/errors";
 
 const saltRound = 10;
 export const minimalPasswordLength = 10; // update frontend validation if this value is edited

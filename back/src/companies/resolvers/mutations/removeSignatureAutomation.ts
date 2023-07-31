@@ -1,11 +1,13 @@
-import { UserInputError } from "apollo-server-core";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationRemoveSignatureAutomationArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkUserPermissions, Permission } from "../../../permissions";
-import { NotCompanyAdminErrorMsg } from "../../../common/errors";
+import {
+  NotCompanyAdminErrorMsg,
+  UserInputError
+} from "../../../common/errors";
 
 export async function removeSignatureAutomation(
   _,

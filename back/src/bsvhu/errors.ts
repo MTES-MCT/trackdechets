@@ -1,4 +1,4 @@
-import { ForbiddenError, UserInputError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "../common/errors";
 
 export class AlreadySignedError extends UserInputError {
   constructor() {

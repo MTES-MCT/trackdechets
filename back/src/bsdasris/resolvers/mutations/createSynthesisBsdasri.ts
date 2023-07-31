@@ -7,11 +7,11 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { validateBsdasri } from "../../validation";
 import { getEligibleDasrisForSynthesis, aggregatePackagings } from "./utils";
 import { indexBsdasri } from "../../elastic";
-import { UserInputError } from "apollo-server-express";
 import { BsdasriType } from "@prisma/client";
 import { getBsdasriRepository } from "../../repository";
 import sirenify from "../../sirenify";
 import { checkCanCreateSynthesis } from "../../permissions";
+import { UserInputError } from "../../../common/errors";
 
 /**
  * Bsdasri creation mutation :

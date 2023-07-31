@@ -4,12 +4,12 @@ import {
   RevisionRequestStatus,
   User
 } from "@prisma/client";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationSubmitFormRevisionRequestApprovalArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getFormRepository } from "../../repository";
+import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 const formRevisionRequestWithApprovals =
   Prisma.validator<Prisma.BsddRevisionRequestArgs>()({

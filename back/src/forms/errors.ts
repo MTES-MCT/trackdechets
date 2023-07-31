@@ -1,4 +1,4 @@
-import { UserInputError, ForbiddenError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "../common/errors";
 
 export class InvalidTransition extends UserInputError {
   constructor() {

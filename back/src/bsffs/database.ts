@@ -6,7 +6,6 @@ import {
   BsffType,
   Prisma
 } from "@prisma/client";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   BsffFicheIntervention,
   BsffInput,
@@ -35,6 +34,7 @@ import {
 import { sirenifyBsffInput } from "./sirenify";
 import { Permission, can, getUserRoles } from "../permissions";
 import { recipify } from "./recipify";
+import { ForbiddenError, UserInputError } from "../common/errors";
 
 export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
   const { findUnique } = getReadonlyBsffRepository();

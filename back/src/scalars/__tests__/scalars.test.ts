@@ -1,6 +1,7 @@
-import { ApolloServer, gql, UserInputError } from "apollo-server-express";
+import { ApolloServer, gql } from "apollo-server-express";
 import { format } from "date-fns";
 import scalars from "..";
+import { UserInputError } from "../../common/errors";
 
 describe("DateTime", () => {
   afterAll(() => jest.clearAllMocks());
@@ -93,7 +94,7 @@ describe("DateTime", () => {
     });
     expect(errors).toEqual([
       new UserInputError(
-        `Variable "$bar" got invalid value "2020-33-02"; Expected type "DateTime". Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 2020-33-02.`
+        `Variable "$bar" got invalid value "2020-33-02"; Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 2020-33-02.`
       )
     ]);
   });
@@ -105,7 +106,7 @@ describe("DateTime", () => {
     });
     expect(errors).toEqual([
       new UserInputError(
-        `Variable "$bar" got invalid value 1; Expected type "DateTime". Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 1.`
+        `Variable "$bar" got invalid value 1; Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 1.`
       )
     ]);
   });

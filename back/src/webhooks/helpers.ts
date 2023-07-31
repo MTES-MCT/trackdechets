@@ -1,6 +1,6 @@
-import { UserInputError } from "apollo-server-express";
 import { WebhookSetting } from "@prisma/client";
 import prisma from "../prisma";
+import { UserInputError } from "../common/errors";
 
 /**
  * Retrieve active WebhookSettings associated to and orgId

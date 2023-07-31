@@ -4,7 +4,6 @@ import {
   Prisma,
   RevisionRequestStatus
 } from "@prisma/client";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import { BSDA_WASTE_CODES } from "../../../../common/constants/WASTES";
 import { checkIsAuthenticated } from "../../../../common/permissions";
@@ -20,6 +19,7 @@ import { getBsdaOrNotFound } from "../../../database";
 import { getBsdaRepository } from "../../../repository";
 import { OPERATIONS } from "../../../validation/constants";
 import { checkCanRequestRevision } from "../../../permissions";
+import { ForbiddenError, UserInputError } from "../../../../common/errors";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [

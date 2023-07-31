@@ -3,7 +3,6 @@ import { Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
 import { BsdasriInput } from "../../../generated/graphql/types";
 
 import { validateBsdasri } from "../../validation";
-import { UserInputError } from "apollo-server-express";
 
 import { getEligibleDasrisForSynthesis, aggregatePackagings } from "./utils";
 import {
@@ -13,6 +12,7 @@ import {
 import { checkEditionRules } from "../../edition";
 import sirenify from "../../sirenify";
 import { recipify } from "../../recipify";
+import { UserInputError } from "../../../common/errors";
 
 const buildSynthesizedBsdasriArgs = async (
   dasrisToAssociate: Bsdasri[] | null | undefined,

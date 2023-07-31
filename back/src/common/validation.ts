@@ -3,7 +3,6 @@ import {
   TransportMode,
   WasteAcceptationStatus
 } from "@prisma/client";
-import { UserInputError } from "apollo-server-core";
 import * as yup from "yup";
 import { ConditionBuilder, ConditionConfig } from "yup/lib/Condition";
 import {
@@ -21,6 +20,7 @@ import {
   isSiret,
   isVat
 } from "./constants/companySearchHelpers";
+import { UserInputError } from "./errors";
 
 // Poids maximum en tonnes tout mode de transport confondu
 const MAX_WEIGHT_TONNES = 50000;
