@@ -7,9 +7,17 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2023.8.1] 08/08/2023
 
-#### :bug: Corrections de bugs
+#### :rocket: Nouvelles fonctionnalités
 
+#### :bug: Corrections de bugs
 - Correction d'un message d'erreur incompréhensible en l'absence des informations de contact entreprise sur le BSFF après avoir cliqué sur "Modifier" [PR 2601](https://github.com/MTES-MCT/trackdechets/pull/2601)
+- Correction de 'limpossibilité d'enlever la présence de POP sur les BSDDs via la révision [PR 2596](https://github.com/MTES-MCT/trackdechets/pull/2596)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :house: Interne
 
 # [2023.7.2] 25/07/2023
 
