@@ -299,6 +299,7 @@ const formdata: Partial<Prisma.FormCreateInput> = {
 };
 
 export const forwardedInData: Partial<Prisma.FormCreateInput> = {
+  status: "RESENT",
   quantityReceived: 1,
   wasteAcceptationStatus: "ACCEPTED",
   wasteRefusalReason: null,

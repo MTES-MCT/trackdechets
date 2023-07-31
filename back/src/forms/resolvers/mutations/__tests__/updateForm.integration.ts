@@ -895,7 +895,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "DRAFT",
+        status: "SENT",
         emitterCompanySiret: company.siret,
         intermediaries: {
           create: [toIntermediaryCompany(intermediary.company)]
