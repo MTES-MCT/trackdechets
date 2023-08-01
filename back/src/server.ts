@@ -249,12 +249,6 @@ app.use(authRouter);
 app.use(oauth2Router);
 app.use(oidcRouter);
 
-const USERS_BLACKLIST_ENV = process.env.USERS_BLACKLIST;
-let blacklist: string[] = [];
-if (USERS_BLACKLIST_ENV && USERS_BLACKLIST_ENV.length > 0) {
-  blacklist = USERS_BLACKLIST_ENV.split(",");
-}
-
 // The following  middlewares use email to generate rate limit redis key and therefore
 // must stay after passport initialization to ensure req.user.email is available
 
@@ -289,13 +283,6 @@ app.use(
     maxRequestsPerWindow: 10 // 10 requests each 3 minutes
   })
 );
-
-app.use(function checkBlacklist(req, res, next) {
-  if (req.user && blacklist.includes(req.user.email)) {
-    return res.send("Too Many Requests").status(429);
-  }
-  next();
-});
 
 app.get("/ping", (_, res) => res.send("Pong!"));
 
@@ -340,6 +327,18 @@ app.use(bullBoardPath, ensureLoggedInAndAdmin(), serverAdapter.getRouter());
 
 // Apply passport auth middlewares to the graphQL endpoint
 app.use(graphQLPath, passportBearerMiddleware);
+
+const USERS_BLACKLIST_ENV = process.env.USERS_BLACKLIST;
+let blacklist: string[] = [];
+if (USERS_BLACKLIST_ENV && USERS_BLACKLIST_ENV.length > 0) {
+  blacklist = USERS_BLACKLIST_ENV.split(",");
+}
+app.use(function checkBlacklist(req, res, next) {
+  if (req.user && blacklist.includes(req.user.email)) {
+    return res.send("Too Many Requests").status(429);
+  }
+  next();
+});
 
 // Returns 404 Not Found for every routes not handled by apollo
 app.use((req, res, next) => {
