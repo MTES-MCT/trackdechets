@@ -24,27 +24,30 @@ export const getEligibleDasrisForSynthesis = async (
   // wich are of SIMPLE type
   // which are not already grouped, grouping, synthesized or synthesizing
   // whose recipient in current transporter
-  const found = await bsdasriReadonlyRepository.findMany({
-    id: { in: synthesizingIds },
-    status: BsdasriStatus.SENT,
-    type: BsdasriType.SIMPLE,
-    groupedIn: null,
-    grouping: { none: {} },
-    synthesizedIn: null,
-    synthesizing: { none: {} },
-    OR: [
-      {
-        transporterCompanySiret: bsdasri
-          ? bsdasri.transporterCompanySiret
-          : company?.siret
-      },
-      {
-        transporterCompanyVatNumber: bsdasri
-          ? bsdasri.transporterCompanyVatNumber
-          : company?.vatNumber
-      }
-    ]
-  });
+  const found = await bsdasriReadonlyRepository.findMany(
+    {
+      id: { in: synthesizingIds },
+      status: BsdasriStatus.SENT,
+      type: BsdasriType.SIMPLE,
+      groupedIn: null,
+      groupingEmitterSirets: { isEmpty: true },
+      synthesizedIn: null,
+      synthesisEmitterSirets: { isEmpty: true },
+      OR: [
+        {
+          transporterCompanySiret: bsdasri
+            ? bsdasri.transporterCompanySiret
+            : company?.siret
+        },
+        {
+          transporterCompanyVatNumber: bsdasri
+            ? bsdasri.transporterCompanyVatNumber
+            : company?.vatNumber
+        }
+      ]
+    },
+    { select: { id: true }, orderBy: { id: "desc" } }
+  );
 
   const foundIds = found.map(el => el.id);
   const diff = synthesizingIds.filter(el => !foundIds.includes(el));
