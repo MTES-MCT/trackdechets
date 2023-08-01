@@ -80,9 +80,9 @@ describe("Bsdasri where conversion", () => {
 
     const prismaWhere = toPrismaWhereInput(where);
     expect(prismaWhere).toEqual({
-      grouping: { none: {} },
+      groupingEmitterSirets: { isEmpty: true },
       groupedInId: null,
-      synthesizing: { none: {} },
+      synthesisEmitterSirets: { isEmpty: true },
       synthesizedInId: null,
       type: "SIMPLE"
     });
@@ -97,9 +97,9 @@ describe("Bsdasri where conversion", () => {
 
     expect(prismaWhere).toEqual({
       OR: [
-        { grouping: { some: {} } },
+        { groupingEmitterSirets: { isEmpty: false } },
         { groupedInId: { not: null } },
-        { synthesizing: { some: {} } },
+        { synthesisEmitterSirets: { isEmpty: false } },
         { synthesizedInId: { not: null } },
         { type: { not: "SIMPLE" } }
       ]
