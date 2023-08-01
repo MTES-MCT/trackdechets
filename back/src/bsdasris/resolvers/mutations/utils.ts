@@ -9,7 +9,12 @@ export const getEligibleDasrisForSynthesis = async (
   synthesizingIds: string[],
   bsdasri: Bsdasri | null,
   company?: CompanyInput | null
-): Promise<Bsdasri[]> => {
+): Promise<
+  Pick<
+    Bsdasri,
+    "id" | "transporterWasteVolume" | "transporterWastePackagings"
+  >[]
+> => {
   if (!synthesizingIds) {
     return [];
   }
@@ -21,7 +26,7 @@ export const getEligibleDasrisForSynthesis = async (
   // retrieve dasris:
   // whose id is in synthesizingIds array
   // which are in SENT status
-  // wich are of SIMPLE type
+  // which are of SIMPLE type
   // which are not already grouped, grouping, synthesized or synthesizing
   // whose recipient in current transporter
   const found = await bsdasriReadonlyRepository.findMany(
@@ -46,7 +51,13 @@ export const getEligibleDasrisForSynthesis = async (
         }
       ]
     },
-    { select: { id: true }, orderBy: { id: "desc" } }
+    {
+      select: {
+        id: true,
+        transporterWastePackagings: true,
+        transporterWasteVolume: true
+      }
+    }
   );
 
   const foundIds = found.map(el => el.id);
@@ -97,9 +108,9 @@ export const checkDasrisAreGroupable = async (
       status: BsdasriStatus.AWAITING_GROUP,
       type: BsdasriType.SIMPLE,
       groupedIn: null,
-      grouping: { none: {} },
+      groupingEmitterSirets: { isEmpty: true },
       synthesizedIn: null,
-      synthesizing: { none: {} },
+      synthesisEmitterSirets: { isEmpty: true },
       destinationCompanySiret: emitterSiret
     },
     { select: { id: true } }
@@ -149,7 +160,12 @@ type dbPackaging = {
 /**
  * Aggregate packagings from several bsds and sum their volume an quantity by container type
  */
-export const aggregatePackagings = (dasrisToAssociate: Bsdasri[]) => {
+export const aggregatePackagings = (
+  dasrisToAssociate: Pick<
+    Bsdasri,
+    "id" | "transporterWasteVolume" | "transporterWastePackagings"
+  >[]
+) => {
   const packagingsArray = dasrisToAssociate.map(dasri =>
     Array.isArray(dasri.transporterWastePackagings)
       ? <dbPackaging[]>dasri.transporterWastePackagings
