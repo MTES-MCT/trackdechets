@@ -1,10 +1,11 @@
-import { Form, Prisma } from "@prisma/client";
+import { Form, Prisma, Status } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
+import { getUserCompanies } from "../../../users/database";
 
 export type CreateFormFn = (
   data: Prisma.FormCreateInput,
@@ -27,9 +28,31 @@ const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
     // Deducting every sirets from a Prisma.FormCreateInput object is far from trivial
     // It's safer to fill the denormalized sirets after the creation
     const denormalizedSirets = getFormSiretsByRole(form as any); // Ts doesn't infer correctly because of the boolean
+
+    // For drafts, only the owner's sirets that appear on the form have access
+    const canAccessDraftSirets: string[] = [];
+    if (form.status === Status.DRAFT) {
+      const ownerCompanies = await getUserCompanies(form.ownerId);
+      const ownerOrgIds = ownerCompanies.map(company => company.orgId);
+
+      const formOrgIds = [
+        ...denormalizedSirets.intermediariesSirets,
+        ...denormalizedSirets.recipientsSirets,
+        ...denormalizedSirets.transportersSirets,
+        form.emitterCompanySiret,
+        form.brokerCompanySiret,
+        form.traderCompanySiret,
+        form.ecoOrganismeSiret
+      ].filter(Boolean);
+      const ownerOrgIdsInForm = ownerOrgIds.filter(orgId =>
+        formOrgIds.includes(orgId)
+      );
+      canAccessDraftSirets.push(...ownerOrgIdsInForm);
+    }
+
     await prisma.form.update({
       where: { id: form.id },
-      data: denormalizedSirets
+      data: { ...denormalizedSirets, canAccessDraftSirets }
     });
 
     await prisma.statusLog.create({

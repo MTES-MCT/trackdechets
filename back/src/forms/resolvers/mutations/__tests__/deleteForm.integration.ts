@@ -106,9 +106,8 @@ describe("Mutation.deleteForm", () => {
     "should allow %p to soft delete a draft form",
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
-      const owner = await userFactory();
       const form = await formFactory({
-        ownerId: owner.id,
+        ownerId: user.id,
         opt: {
           status: "DRAFT",
           ...(role === "transporter"

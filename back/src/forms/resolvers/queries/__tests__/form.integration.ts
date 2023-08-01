@@ -220,4 +220,71 @@ describe("Query.form", () => {
 
     expect(data.form.id).toBe(form.id);
   });
+
+  it("should allow user to see a draft form if he is the owner", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        emitterCompanyName: company.name
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "form">>(GET_FORM_QUERY, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    expect(data.form.id).toBe(form.id);
+  });
+
+  it("should allow user to see a draft form if he is the owner", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        emitterCompanyName: company.name
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "form">>(GET_FORM_QUERY, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    expect(data.form.id).toBe(form.id);
+  });
+
+  it("should not allow user to see a draft form if he is not the owner", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user: owner } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        emitterCompanyName: company.name
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { errors } = await query<Pick<Query, "form">>(GET_FORM_QUERY, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "Vous n'êtes pas autorisé à accéder à ce bordereau"
+    );
+  });
 });

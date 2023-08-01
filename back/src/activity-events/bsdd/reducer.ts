@@ -19,6 +19,7 @@ export function bsddReducer(
         recipientsSirets,
         transportersSirets,
         intermediariesSirets,
+        canAccessDraftSirets,
         ...bsdd
       } = event.data.content;
       return {
@@ -66,6 +67,7 @@ export function bsddReducer(
         recipientsSirets,
         transportersSirets,
         intermediariesSirets,
+        canAccessDraftSirets,
         ...bsdd
       } = event.data.content as Prisma.FormCreateInput; // TODO Check if we can we somehow keep Prisma.FormUpdateInput
 
