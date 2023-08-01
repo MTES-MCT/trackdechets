@@ -428,7 +428,133 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
 
     expect(updatedBsdd.wasteDetailsCode).toBe("01 03 08");
   });
+  it("should set pop from true to false", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
 
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        wasteDetailsPop: true
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        wasteDetailsPop: false,
+        comment: ""
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id }
+    });
+
+    expect(updatedBsdd.wasteDetailsPop).toBe(false);
+  });
+  it("should set pop from false to true", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        wasteDetailsPop: false
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        wasteDetailsPop: true,
+        comment: ""
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id }
+    });
+
+    expect(updatedBsdd.wasteDetailsPop).toBe(true);
+  });
+
+  it.each([true, false])(
+    "should leave pop unchanged (%p)",
+    async initialPopValue => {
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: companyOfSomeoneElse.siret,
+          wasteDetailsPop: initialPopValue
+        }
+      });
+
+      const revisionRequest = await prisma.bsddRevisionRequest.create({
+        data: {
+          bsddId: bsdd.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret! } },
+          wasteDetailsCode: "01 03 08",
+          comment: ""
+        }
+      });
+
+      await mutate<
+        Pick<Mutation, "submitFormRevisionRequestApproval">,
+        MutationSubmitFormRevisionRequestApprovalArgs
+      >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+      const updatedBsdd = await prisma.form.findUniqueOrThrow({
+        where: { id: bsdd.id }
+      });
+
+      expect(updatedBsdd.wasteDetailsPop).toBe(initialPopValue);
+    }
+  );
   it("should update BSDD accordingly when there is a temporary storage", async () => {
     const { company: ttr } = await userWithCompanyFactory("ADMIN");
     const { company: exutoire } = await userWithCompanyFactory("ADMIN");

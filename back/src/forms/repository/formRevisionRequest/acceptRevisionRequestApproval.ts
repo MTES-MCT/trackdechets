@@ -165,7 +165,7 @@ async function getUpdateFromFormRevisionRequest(
     recipientCap: revisionRequest.recipientCap,
     wasteDetailsCode: revisionRequest.wasteDetailsCode,
     wasteDetailsName: revisionRequest.wasteDetailsName,
-    ...(revisionRequest.wasteDetailsPop && {
+    ...(revisionRequest.wasteDetailsPop !== null && {
       wasteDetailsPop: revisionRequest.wasteDetailsPop
     }),
     ...(revisionRequest.wasteDetailsPackagingInfos && {
