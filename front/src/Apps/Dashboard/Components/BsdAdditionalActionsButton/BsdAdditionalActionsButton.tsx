@@ -28,7 +28,6 @@ import {
   hasBsdasriEmitterSign,
   isSignTransportAndCanSkipEmission,
 } from "../../dashboardServices";
-import { usePermissions } from "common/contexts/PermissionsContext";
 import { UserPermission } from "generated/graphql/types";
 
 import "./bsdAdditionalActionsButton.scss";
@@ -36,6 +35,7 @@ import { BsdType } from "generated/graphql/types";
 
 function BsdAdditionalActionsButton({
   bsd,
+  permissions,
   currentSiret,
   actionList: {
     onOverview,
@@ -54,7 +54,6 @@ function BsdAdditionalActionsButton({
   isToCollectTab = false,
   hasAutomaticSignature = false,
 }: BsdAdditionalActionsButtonProps) {
-  const { permissions } = usePermissions();
   const [isOpen, setisOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLElement>(null);
   const { targetRef } = useOnClickOutsideRefTarget({
@@ -221,6 +220,7 @@ function BsdAdditionalActionsButton({
             )}
           {isToCollectTab &&
             bsd.type === BsdType.Bsdd &&
+            permissions.includes(UserPermission.BsdCanSignEmission) &&
             (hasAutomaticSignature ||
               isSignTransportAndCanSkipEmission(currentSiret, bsd)) && (
               <li>

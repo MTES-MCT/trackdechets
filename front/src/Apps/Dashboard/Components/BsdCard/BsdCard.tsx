@@ -325,6 +325,7 @@ function BsdCard({
 
                 <BsdAdditionalActionsButton
                   bsd={bsdDisplay}
+                  permissions={permissions}
                   currentSiret={currentSiret}
                   actionList={{
                     onOverview,

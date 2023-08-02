@@ -2,7 +2,14 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { fireEvent, waitFor, within } from "@testing-library/dom";
 import BsdCard from "./BsdCard";
-import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "generated/graphql/types";
+import {
+  Bsda,
+  Bsdasri,
+  Bsff,
+  Bsvhu,
+  Form,
+  UserPermission,
+} from "generated/graphql/types";
 import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 import { MockedProvider } from "@apollo/client/testing";
 import { BsdaWithReview, FormWithReview } from "Apps/common/types/bsdTypes";
@@ -148,7 +155,13 @@ describe("Bsd card primary action label", () => {
       const onValidate = functionMock;
 
       const { queryByTestId } = render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider
+          defaultPermissions={[
+            UserPermission.BsdCanUpdate,
+            UserPermission.BsdCanDelete,
+            UserPermission.BsdCanCreate,
+          ]}
+        >
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
@@ -188,7 +201,7 @@ describe("Bsd card primary action label", () => {
       const onValidate = functionMock;
 
       const { queryByTestId } = render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider defaultPermissions={[UserPermission.BsdCanList]}>
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
@@ -274,7 +287,14 @@ describe("Bsd card primary action label", () => {
       } as unknown as BsdaWithReview;
       const onValidate = functionMock;
       const { queryByTestId } = render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider
+          defaultPermissions={[
+            UserPermission.BsdCanSignEmission,
+            UserPermission.BsdCanDelete,
+            UserPermission.BsdCanUpdate,
+            UserPermission.BsdCanCreate,
+          ]}
+        >
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
@@ -420,7 +440,15 @@ describe("Bsd card primary action label", () => {
     test("Bsvhu same siret", async () => {
       const onValidate = functionMock;
       const { queryByTestId } = render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider
+          defaultPermissions={[
+            UserPermission.BsdCanUpdate,
+            UserPermission.BsdCanDelete,
+            UserPermission.BsdCanRead,
+            UserPermission.BsdCanSignEmission,
+            UserPermission.BsdCanCreate,
+          ]}
+        >
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
@@ -457,7 +485,9 @@ describe("Bsd card primary action label", () => {
 
     test("Bsvhu same siret (status processed)", () => {
       const { queryByTestId } = render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider
+          defaultPermissions={[UserPermission.BsdCanSignOperation]}
+        >
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
@@ -506,7 +536,15 @@ describe("Bsd card primary action label", () => {
     test("Bsff same siret", async () => {
       const onValidate = functionMock;
       render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider
+          defaultPermissions={[
+            UserPermission.BsdCanSignEmission,
+            UserPermission.BsdCanRead,
+            UserPermission.BsdCanDelete,
+            UserPermission.BsdCanCreate,
+            UserPermission.BsdCanUpdate,
+          ]}
+        >
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
@@ -546,7 +584,12 @@ describe("Bsd card primary action label", () => {
 
     test("Bsff different siret", () => {
       const { queryByTestId } = render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider
+          defaultPermissions={[
+            UserPermission.BsdCanSignEmission,
+            UserPermission.BsdCanRead,
+          ]}
+        >
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
@@ -632,7 +675,9 @@ describe("Bsd card primary action label", () => {
       } as unknown as Bsda;
 
       render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider
+          defaultPermissions={[UserPermission.BsdCanSignEmission]}
+        >
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
@@ -742,7 +787,9 @@ describe("Bsd card primary action label", () => {
         __typename: "Form",
       } as unknown as Form;
       const { queryByTestId } = render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider
+          defaultPermissions={[UserPermission.BsdCanSignEmission]}
+        >
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
@@ -874,7 +921,9 @@ describe("Bsd card primary action label", () => {
         __typename: "Form",
       } as unknown as Form;
       render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider
+          defaultPermissions={[UserPermission.BsdCanSignAcceptation]}
+        >
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
@@ -970,7 +1019,9 @@ describe("Bsd card primary action label", () => {
         __typename: "Bsdasri",
       } as unknown as Bsdasri;
       const { queryByTestId } = render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider
+          defaultPermissions={[UserPermission.BsdCanSignAcceptation]}
+        >
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
@@ -1084,7 +1135,9 @@ describe("Bsd card primary action label", () => {
       } as unknown as FormWithReview;
 
       render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider
+          defaultPermissions={[UserPermission.BsdCanSignOperation]}
+        >
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
@@ -1125,7 +1178,7 @@ describe("Bsd card primary action label", () => {
       } as unknown as Form;
 
       render(
-        <PermissionsProvider defaultPermissions={[]}>
+        <PermissionsProvider defaultPermissions={[UserPermission.BsdCanUpdate]}>
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard

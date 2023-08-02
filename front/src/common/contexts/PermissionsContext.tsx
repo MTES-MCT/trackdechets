@@ -21,7 +21,7 @@ export function usePermissions() {
 
 export function PermissionsProvider({
   children,
-  defaultPermissions,
+  defaultPermissions = [],
 }: InterfacePermissions) {
   const [permissions, setPermissions] =
     useState<UserPermission[]>(defaultPermissions);

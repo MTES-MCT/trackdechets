@@ -1,7 +1,9 @@
 import { BsdDisplay } from "Apps/common/types/bsdTypes";
+import { UserPermission } from "generated/graphql/types";
 
 export interface BsdAdditionalActionsButtonProps {
   bsd: BsdDisplay;
+  permissions: UserPermission[];
   currentSiret: string;
   actionList: {
     onOverview: Function;
