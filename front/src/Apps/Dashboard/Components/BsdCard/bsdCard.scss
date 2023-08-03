@@ -1,11 +1,21 @@
 @import "src/scss/Breakpoints.scss";
+.bsd-card-border {
+  border-bottom: 1px solid #dddddd;
+  width: 100%;
+  margin: 8px 0;
+}
 .bsd-card {
   background: #ffffff;
   border: 1px solid #dddddd;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0;
+  padding: 5px 0;
+
+  @include desktop {
+    min-height: 120px;
+    padding: 0;
+  }
 
   &__header {
     display: flex;
@@ -14,7 +24,14 @@
     padding: 2px 8px;
 
     p {
-      font-size: 0.75rem; //12px
+      font-size: 0.875rem; //14px
+    }
+
+    &__infos {
+      display: flex;
+      p {
+        padding: 0 5px;
+      }
     }
 
     @include desktop {
@@ -26,26 +43,18 @@
         border-bottom: 1px solid #dddddd;
         width: 100%;
       }
-
-      p {
-        padding: 0 4px;
+      &__infos {
+        p {
+          padding: 0 10px;
+        }
       }
     }
 
     .bsd-number {
-      margin: 2px;
-      padding: 2px;
-      font-size: 1.125rem; //18px
-      line-height: 28px;
-      color: #000091;
-      @include desktop {
-        font-size: 0.75rem; //12px
-        line-height: 20px;
-        color: #161616;
-      }
+      font-size: 0.875rem; //14px
+      color: #161616;
     }
     .workflow-type {
-      margin: 0;
       display: flex;
       align-items: center;
       &:before {
@@ -72,45 +81,25 @@
     &__infos {
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
 
       &__status {
-        margin: 5px 0;
+        width: 100%;
+
+        .fr-badge {
+          margin: 5px 0;
+          width: fit-content;
+        }
+      }
+      .waste-details,
+      .actors {
+        width: 100%;
       }
 
       @include desktop {
         flex-direction: row;
         align-items: center;
         flex: 2;
-
-        &__status {
-          margin: 0;
-          width: 285px;
-        }
-      }
-
-      &__other {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        .waste-details,
-        .actors {
-          margin: 5px 0;
-        }
-
-        @include desktop {
-          flex-direction: row;
-
-          .waste-details {
-            width: 170px;
-            margin: 0 16px;
-          }
-
-          .actors {
-            width: 230px;
-            margin: 0 50px 0 20px;
-          }
-        }
       }
     }
 
@@ -119,12 +108,12 @@
       justify-content: flex-end;
       align-items: center;
 
-      @include desktop {
-        flex: 1;
+      .fr-btn {
+        margin: 10px 2px;
       }
 
-      .fr-btn {
-        margin: 0 2px;
+      @include desktop {
+        flex: 1;
       }
     }
   }

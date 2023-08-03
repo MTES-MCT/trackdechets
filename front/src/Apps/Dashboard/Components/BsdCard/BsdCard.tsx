@@ -39,6 +39,8 @@ import {
 import { Loader } from "Apps/common/Components";
 import { BsdDisplay } from "Apps/common/types/bsdTypes";
 import DeleteModal from "../DeleteModal/DeleteModal";
+import { useMedia } from "use-media";
+import { MEDIA_QUERIES } from "common/config";
 
 function BsdCard({
   bsd,
@@ -191,6 +193,9 @@ function BsdCard({
 
   const unitOfMeasure =
     isBsdasri(bsdDisplay?.type!) || isBsff(bsdDisplay?.type!) ? "kg" : "t";
+
+  const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
+
   return (
     <>
       <div className="bsd-card" tabIndex={0}>
@@ -199,64 +204,79 @@ function BsdCard({
             <div className="bsd-card__header">
               <div>
                 <p className="bsd-number">N°: {bsdDisplay.readableid}</p>
-                {bsdDisplay?.isTempStorage && (
-                  <InfoWithIcon labelCode={InfoIconCode.TempStorage} />
-                )}
-                {getWorkflowLabel(bsdDisplay.bsdWorkflowType) && (
-                  <p className="workflow-type">
-                    {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
-                  </p>
-                )}
-                {updatedAt && (
-                  <InfoWithIcon
-                    labelCode={InfoIconCode.LastModificationDate}
-                    date={updatedAt}
-                  />
-                )}
-                {bsdDisplay?.emittedByEcoOrganisme && (
-                  <InfoWithIcon labelCode={InfoIconCode.EcoOrganism} />
-                )}
-                {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
-                  (isCollectedTab &&
-                    Boolean(bsdDisplay?.transporterCustomInfo?.length))) && (
-                  <InfoWithIcon
-                    labelCode={InfoIconCode.CustomInfo}
-                    editableInfos={{
-                      customInfo: bsdDisplay?.transporterCustomInfo,
-                    }}
-                    hasEditableInfos
-                    isDisabled={
-                      isCollectedTab ||
-                      !canEditCustomInfoOrTransporterNumberlate(bsdDisplay)
-                    }
-                    onClick={e =>
-                      handleEditableInfoClick(e, "transporterCustomInfo")
-                    }
-                  />
-                )}
-                {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
-                  (isCollectedTab &&
-                    Boolean(bsdDisplay?.transporterNumberPlate?.length))) && (
-                  <InfoWithIcon
-                    labelCode={InfoIconCode.TransporterNumberPlate}
-                    editableInfos={{
-                      transporterNumberPlate:
-                        bsdDisplay?.transporterNumberPlate,
-                    }}
-                    hasEditableInfos
-                    isDisabled={
-                      isCollectedTab ||
-                      !canEditCustomInfoOrTransporterNumberlate(bsdDisplay)
-                    }
-                    onClick={e =>
-                      handleEditableInfoClick(e, "transporterNumberPlate")
-                    }
-                  />
-                )}
+
+                {isMobile && <div className="bsd-card-border" />}
+                <div className="bsd-card__header__infos">
+                  {bsdDisplay?.isTempStorage && (
+                    <InfoWithIcon labelCode={InfoIconCode.TempStorage} />
+                  )}
+                  {getWorkflowLabel(bsdDisplay.bsdWorkflowType) && (
+                    <p className="workflow-type">
+                      {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
+                    </p>
+                  )}
+                  {updatedAt && (
+                    <InfoWithIcon
+                      labelCode={InfoIconCode.LastModificationDate}
+                      date={updatedAt}
+                    />
+                  )}
+                  {bsdDisplay?.emittedByEcoOrganisme && (
+                    <InfoWithIcon labelCode={InfoIconCode.EcoOrganism} />
+                  )}
+                  {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
+                    (isCollectedTab &&
+                      Boolean(bsdDisplay?.transporterCustomInfo?.length))) && (
+                    <InfoWithIcon
+                      labelCode={InfoIconCode.CustomInfo}
+                      editableInfos={{
+                        customInfo: bsdDisplay?.transporterCustomInfo,
+                      }}
+                      hasEditableInfos
+                      isDisabled={
+                        isCollectedTab ||
+                        !canEditCustomInfoOrTransporterNumberlate(bsdDisplay)
+                      }
+                      onClick={e =>
+                        handleEditableInfoClick(e, "transporterCustomInfo")
+                      }
+                    />
+                  )}
+                  {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
+                    (isCollectedTab &&
+                      Boolean(bsdDisplay?.transporterNumberPlate?.length))) && (
+                    <InfoWithIcon
+                      labelCode={InfoIconCode.TransporterNumberPlate}
+                      editableInfos={{
+                        transporterNumberPlate:
+                          bsdDisplay?.transporterNumberPlate,
+                      }}
+                      hasEditableInfos
+                      isDisabled={
+                        isCollectedTab ||
+                        !canEditCustomInfoOrTransporterNumberlate(bsdDisplay)
+                      }
+                      onClick={e =>
+                        handleEditableInfoClick(e, "transporterNumberPlate")
+                      }
+                    />
+                  )}
+                </div>
+                {isMobile && <div className="bsd-card-border" />}
               </div>
             </div>
             <div className="bsd-card__content">
               <div className="bsd-card__content__infos">
+                <WasteDetails
+                  wasteType={bsdDisplay.type}
+                  code={bsdDisplay.wasteDetails.code!}
+                  name={bsdDisplay.wasteDetails.name!}
+                  weight={
+                    Boolean(bsdDisplay.wasteDetails?.weight)
+                      ? `${bsdDisplay.wasteDetails.weight} ${unitOfMeasure}`
+                      : ""
+                  }
+                />
                 <div className="bsd-card__content__infos__status">
                   <Badge
                     status={bsdDisplay.status}
@@ -265,24 +285,13 @@ function BsdCard({
                     reviewStatus={bsdDisplay?.review?.status}
                   />
                 </div>
-                <div className="bsd-card__content__infos__other">
-                  <WasteDetails
-                    wasteType={bsdDisplay.type}
-                    code={bsdDisplay.wasteDetails.code!}
-                    name={bsdDisplay.wasteDetails.name!}
-                    weight={
-                      Boolean(bsdDisplay.wasteDetails?.weight)
-                        ? `${bsdDisplay.wasteDetails.weight} ${unitOfMeasure}`
-                        : ""
-                    }
-                  />
+                {isMobile && <div className="bsd-card-border" />}
 
-                  <Actors
-                    emitterName={bsdDisplay.emitter?.company?.name!}
-                    transporterName={transporterName}
-                    destinationName={bsdDisplay.destination?.company?.name!}
-                  />
-                </div>
+                <Actors
+                  emitterName={bsdDisplay.emitter?.company?.name!}
+                  transporterName={transporterName}
+                  destinationName={bsdDisplay.destination?.company?.name!}
+                />
               </div>
               <div className="bsd-card__content__cta">
                 {!isReviewsTab &&
