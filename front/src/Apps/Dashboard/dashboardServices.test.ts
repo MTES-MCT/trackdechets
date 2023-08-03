@@ -36,7 +36,6 @@ import {
 
 import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 import {
-  FAIRE_SIGNER,
   PUBLIER,
   ROAD_CONTROL,
   SIGNATURE_ACCEPTATION_CONTENANT,
@@ -415,7 +414,7 @@ describe("dashboardServices", () => {
       bsd.ecoOrganisme!.siret = "1234567890";
       const currentSiret = "1234567890";
       const result = getSealedBtnLabel(currentSiret, bsd);
-      expect(result).toEqual(FAIRE_SIGNER);
+      expect(result).toEqual(SIGNER);
     });
 
     test("returns FAIRE_SIGNER for BSDD type with valid conditions", () => {
@@ -425,7 +424,7 @@ describe("dashboardServices", () => {
       bsd.ecoOrganisme!.siret = "1234567899";
       const currentSiret = "1234567890";
       const result = getSealedBtnLabel(currentSiret, bsd);
-      expect(result).toEqual(FAIRE_SIGNER);
+      expect(result).toEqual(SIGNER);
     });
 
     test("returns SIGNER for Bsda", () => {

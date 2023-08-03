@@ -380,7 +380,7 @@ export const getSealedBtnLabel = (
       }
     }
     if (hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
-      return FAIRE_SIGNER;
+      return SIGNER;
     }
   }
   if (isBsda(bsd.type) || isBsff(bsd.type) || isBsvhu(bsd.type)) {
