@@ -500,8 +500,8 @@ describe("Mutation.createForm", () => {
       {
         city: "Paris",
         postalCode: "75001",
-        x: 12000,
-        y: 12000
+        x: 50.45612,
+        y: 168.12546
       },
       {
         city: "Paris",

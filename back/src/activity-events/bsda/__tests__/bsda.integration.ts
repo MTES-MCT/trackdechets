@@ -55,7 +55,7 @@ describe("ActivityEvent.Bsda", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER",
       {
-        companyTypes: { set: ["WASTEPROCESSOR", "TRANSPORTER"] }
+        companyTypes: { set: ["WASTEPROCESSOR", "TRANSPORTER", "WORKER"] }
       }
     );
     await transporterReceiptFactory({ company: destinationCompany });

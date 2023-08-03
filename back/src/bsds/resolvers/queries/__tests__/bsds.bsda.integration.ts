@@ -78,7 +78,7 @@ describe("Query.bsds.bsda base workflow", () => {
     });
     worker = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
-        set: ["PRODUCER"]
+        set: ["PRODUCER", "WORKER"]
       }
     });
     transporter = await userWithCompanyFactory(UserRole.ADMIN, {

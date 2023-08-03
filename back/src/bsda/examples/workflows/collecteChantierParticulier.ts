@@ -18,7 +18,7 @@ const workflow: Workflow = {
   Le BSDA est disponible sur la plateforme pour tous les acteurs.
   `,
   companies: [
-    { name: "worker", companyTypes: ["PRODUCER"] },
+    { name: "worker", companyTypes: ["PRODUCER", "WORKER"] },
     { name: "transporteur", companyTypes: ["TRANSPORTER"] },
     { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
   ],
