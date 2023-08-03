@@ -1,4 +1,4 @@
-import { Form, Prisma } from "@prisma/client";
+import { Form, Prisma, Status } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
@@ -6,6 +6,7 @@ import {
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { formDiff } from "../../workflow/diff";
+import { getUserCompanies } from "../../../users/database";
 
 export type UpdateFormFn = (
   where: Prisma.FormWhereUniqueInput,
@@ -44,7 +45,31 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
     // If a siret change might have occurred, we process it in a second update
     if (hasPossibleSiretChange) {
       const denormalizedSirets = getFormSiretsByRole(updatedForm as any); // Ts doesn't infer correctly because of the boolean
-      await prisma.form.update({ where, data: denormalizedSirets });
+
+      const canAccessDraftSirets: string[] = [];
+      if (updatedForm.status === Status.DRAFT) {
+        const ownerCompanies = await getUserCompanies(updatedForm.ownerId);
+        const ownerOrgIds = ownerCompanies.map(company => company.orgId);
+
+        const formOrgIds = [
+          ...denormalizedSirets.intermediariesSirets,
+          ...denormalizedSirets.recipientsSirets,
+          ...denormalizedSirets.transportersSirets,
+          updatedForm.emitterCompanySiret,
+          updatedForm.brokerCompanySiret,
+          updatedForm.traderCompanySiret,
+          updatedForm.ecoOrganismeSiret
+        ].filter(Boolean);
+        const ownerOrgIdsInForm = ownerOrgIds.filter(orgId =>
+          formOrgIds.includes(orgId)
+        );
+
+        canAccessDraftSirets.push(...ownerOrgIdsInForm);
+      }
+      await prisma.form.update({
+        where,
+        data: { ...denormalizedSirets, canAccessDraftSirets }
+      });
     }
 
     await prisma.event.create({

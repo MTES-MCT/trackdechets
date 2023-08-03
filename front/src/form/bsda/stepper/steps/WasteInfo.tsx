@@ -119,7 +119,8 @@ export function WasteInfoWorker({ disabled }) {
 
       <div className="form__row">
         <label>
-          Mention au titre des règlements ADR/RID/ADN/IMDG (Optionnel)
+          Mention au titre des règlements ADR/RID/ADN/IMDG - ou "non soumis" le
+          cas échéant
           <Field
             disabled={disabled}
             type="text"

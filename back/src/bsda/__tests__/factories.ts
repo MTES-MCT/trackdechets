@@ -12,6 +12,7 @@ export const bsdaFactory = async ({
 
   await upsertBaseSiret(bsdaObject.transporterCompanySiret);
   await upsertBaseSiret(bsdaObject.destinationCompanySiret);
+  await upsertBaseSiret(bsdaObject.workerCompanySiret);
 
   const formParams = { ...bsdaObject, ...opt };
   const created = await prisma.bsda.create({

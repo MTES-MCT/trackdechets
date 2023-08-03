@@ -452,7 +452,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               Coordonnée(s) GPS :{" "}
               {form.wasteDetails?.parcelNumbers
                 ?.filter(pn => pn.x && pn.y)
-                .map(pn => [`lon ${pn.x}`, `lat ${pn.y}`].join(" / "))
+                .map(pn => [`lon ${pn.x}°`, `lat ${pn.y}°`].join(" / "))
                 .join(", ")}
               <br />
               Référence(s) laboratoire(s) :{" "}

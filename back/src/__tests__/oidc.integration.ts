@@ -579,7 +579,7 @@ describe("/oidc/token - id/secret auth", () => {
         vat_number: "ES0541696002",
         name: "the company",
         given_name: "happy company",
-        types: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"],
+        types: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR", "WORKER"],
         verified: false
       }
     ]);
@@ -1075,7 +1075,7 @@ describe("/oidc/token - basic auth", () => {
         vat_number: "BE0541696002",
         name: "the company",
         given_name: "happy company",
-        types: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"],
+        types: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR", "WORKER"],
         verified: true
       }
     ]);
