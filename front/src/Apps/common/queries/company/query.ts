@@ -191,6 +191,13 @@ export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
         validityLimit
         department
       }
+      workerCertification {
+        hasSubSectionFour
+        hasSubSectionThree
+        certificationNumber
+        validityLimit
+        organisation
+      }
     }
   }
 `;
@@ -202,6 +209,20 @@ export const TRANSPORTER_RECEIPT = gql`
         receiptNumber
         validityLimit
         department
+      }
+    }
+  }
+`;
+
+export const WORKER_CERTIFICATION = gql`
+  query SearchCompanies($clue: String!) {
+    searchCompanies(clue: $clue) {
+      workerCertification {
+        hasSubSectionFour
+        hasSubSectionThree
+        certificationNumber
+        validityLimit
+        organisation
       }
     }
   }
