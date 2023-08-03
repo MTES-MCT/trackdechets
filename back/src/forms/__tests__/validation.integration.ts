@@ -583,6 +583,32 @@ describe("sealedFormSchema", () => {
         "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
       );
     });
+
+    it("when parcel number coordinate is out of range", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        wasteDetailsParcelNumbers: [
+          { city: "Paris", postalCode: "75018", x: 100, y: 0 }
+        ]
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        "Parcelle: la coordonnée X doit être inférieure ou égale à 90"
+      );
+    });
+
+    it("when parcel number coordinate has too many decimals", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        wasteDetailsParcelNumbers: [
+          { city: "Paris", postalCode: "75018", x: 5.1234567, y: 5 }
+        ]
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        "La coordonnée ne peut pas avoir plus de 6 décimales"
+      );
+    });
   });
 
   describe("Emitter transports own waste", () => {

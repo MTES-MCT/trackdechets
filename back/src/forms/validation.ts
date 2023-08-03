@@ -599,9 +599,38 @@ const parcelNumber = yup.object({
     .max(5)
     .required("Parcelle: le numéro de parcelle est obligatoire")
 });
+const patternSixDigisAfterComma = /^\d+(\.\d{0,6})?$/;
 const parcelCoordinates = yup.object({
-  x: yup.number().required("Parcelle: la coordonnée X est obligatoire"),
-  y: yup.number().required("Parcelle: la coordonnée Y est obligatoire")
+  x: yup
+    .number()
+    .test(
+      "is-decimal",
+      "La coordonnée ne peut pas avoir plus de 6 décimales",
+      (val: any) => {
+        if (val != undefined) {
+          return patternSixDigisAfterComma.test(val);
+        }
+        return true;
+      }
+    )
+    .min(-90, "Parcelle: la coordonnée X doit être supérieure ou égale à -90")
+    .max(90, "Parcelle: la coordonnée X doit être inférieure ou égale à 90")
+    .required("Parcelle: la coordonnée X est obligatoire"),
+  y: yup
+    .number()
+    .test(
+      "is-decimal",
+      "La coordonnée ne peut pas avoir plus de 6 décimales",
+      (val: any) => {
+        if (val != undefined) {
+          return patternSixDigisAfterComma.test(val);
+        }
+        return true;
+      }
+    )
+    .min(-180, "Parcelle: la coordonnée Y doit être supérieure ou égale à -180")
+    .max(180, "Parcelle: la coordonnée Y doit être inférieure ou égale à 180")
+    .required("Parcelle: la coordonnée Y est obligatoire")
 });
 const parcelInfos = yup.lazy(value => {
   if (value.prefix || value.section || value.number) {

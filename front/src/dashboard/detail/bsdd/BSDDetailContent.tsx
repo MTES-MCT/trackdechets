@@ -650,8 +650,8 @@ export default function BSDDetailContent({
                         pn.prefix,
                         pn.section,
                         pn.number,
-                        pn.x,
-                        pn.y,
+                        pn.x ? `${pn.x}°` : null,
+                        pn.y ? `${pn.y}°` : null,
                       ]
                         .filter(Boolean)
                         .join("/")}`
