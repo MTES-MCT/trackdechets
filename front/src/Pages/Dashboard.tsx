@@ -515,6 +515,9 @@ const DashboardPage = () => {
     ? loadingBsdaReviews || loadingBsddReviews
     : loading;
 
+  const sortedFilterList = filterList.sort((a, b) =>
+    a.label.localeCompare(b.label)
+  );
   return (
     <div className="dashboard-page">
       {!isReviewsTab && (
@@ -540,7 +543,10 @@ const DashboardPage = () => {
         </div>
       )}
       {isFiltersOpen && (
-        <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
+        <Filters
+          filters={sortedFilterList}
+          onApplyFilters={handleFiltersSubmit}
+        />
       )}
       {isFetchingMore && <Loader />}
       {isLoadingBsds && !isFetchingMore ? (
