@@ -72,7 +72,7 @@ export const companyFactory = async (
       orgId: opts.vatNumber ?? siret,
       siret,
       companyTypes: {
-        set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
+        set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR", "WORKER"]
       },
       name: `company_${companyIndex}`,
       contact: "Company Contact",
@@ -371,7 +371,7 @@ export const upsertBaseSiret = async siret => {
           orgId: siret,
           siret,
           companyTypes: {
-            set: ["TRANSPORTER", "WASTEPROCESSOR"]
+            set: ["TRANSPORTER", "WASTEPROCESSOR", "WORKER"]
           },
           name: `company_${siret}`,
           securityCode: 1234,
