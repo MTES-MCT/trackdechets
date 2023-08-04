@@ -36,7 +36,9 @@ import { RawBsff } from "../../../bsffs/elastic";
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
 export interface SearchResponse<T> {
   hits: {
-    total: number;
+    total: {
+      value: number;
+    };
     hits: Array<{
       _source: T;
     }>;
@@ -360,7 +362,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   return {
     edges,
     pageInfo,
-    totalCount: body.hits.total
+    totalCount: body.hits.total.value
   };
 };
 
