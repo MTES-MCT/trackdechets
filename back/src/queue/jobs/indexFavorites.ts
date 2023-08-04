@@ -15,6 +15,10 @@ import { Client } from "@elastic/elasticsearch";
 import { FavoriteType } from "../../generated/graphql/types";
 
 /**
+ * TODO add support for all BSD types
+ */
+
+/**
  * ElasticSearch Favorites index
  */
 export const indexConfig = {
@@ -182,43 +186,31 @@ async function getRecentNextDestinations(
   return favorites.filter(Boolean);
 }
 
-async function getRecentTransporters(
-  defaultWhere: Prisma.FormWhereInput
-): Promise<CompanySearchResult[]> {
-  const forms = await prisma.form.findMany({
+async function getRecentTransporters(defaultWhere: Prisma.FormWhereInput) {
+  const transporters = await prisma.bsddTransporter.findMany({
     ...defaultArgs,
     where: {
-      // `defaultWhere` uses an `OR` already. We need a `AND` to avoid overwriting it.
-      AND: [
-        defaultWhere,
+      form: defaultWhere,
+      OR: [
         {
-          OR: [
-            {
-              NOT: [
-                { transporterCompanySiret: null },
-                { transporterCompanySiret: "" }
-              ]
-            },
-            {
-              NOT: [
-                { transporterCompanyVatNumber: null },
-                { transporterCompanyVatNumber: "" }
-              ]
-            }
+          NOT: [
+            { transporterCompanySiret: null },
+            { transporterCompanySiret: "" }
+          ]
+        },
+        {
+          NOT: [
+            { transporterCompanyVatNumber: null },
+            { transporterCompanyVatNumber: "" }
           ]
         }
       ]
-    },
-    select: {
-      transporterCompanySiret: true,
-      transporterCompanyVatNumber: true,
-      transporterReceipt: true
     }
   });
-  const transporterSirets = forms
+  const transporterSirets = transporters
     .map(f => f.transporterCompanySiret)
     .filter(Boolean);
-  const transporterVatNumbers = forms
+  const transporterVatNumbers = transporters
     .map(f => f.transporterCompanyVatNumber)
     .filter(Boolean);
 
@@ -228,8 +220,7 @@ async function getRecentTransporters(
         { siret: { in: transporterSirets } },
         { vatNumber: { in: transporterVatNumbers } }
       ]
-    },
-    select: { orgId: true }
+    }
   });
   return Promise.all(companies.map(({ orgId }) => searchCompany(orgId)));
 }

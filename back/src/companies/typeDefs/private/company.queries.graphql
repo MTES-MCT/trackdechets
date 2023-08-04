@@ -7,11 +7,11 @@ type Query {
   établissements qui font souvent partis des BSD édités
   """
   favorites(
-    "siret de l'entreprise pour laquelle retourner les favoris"
-    siret: String!
+    "siret ou numéro de TVA intra-communautaire de l'entreprise pour laquelle retourner les favoris"
+    orgId: String!
     "type de favoris"
     type: FavoriteType!
-  ): [CompanyFavorite!]!
+  ): [CompanySearchResult!]!
 
   "List companies for the company verfication table of the admin panel"
   companiesForVerification(
