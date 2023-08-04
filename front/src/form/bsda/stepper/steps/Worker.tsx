@@ -54,9 +54,9 @@ export function Worker({ disabled }) {
   }, [siret, data?.searchCompanies]);
 
   const hasCertification =
-    values.worker &&
-    (values.worker.certification?.hasSubSectionThree ||
-      values.worker.certification?.hasSubSectionFour);
+    workerCertification &&
+    (workerCertification.hasSubSectionThree ||
+      workerCertification.hasSubSectionFour);
   const isWorker =
     hasCertification || companyTypes?.includes(CompanyType.Worker);
 
