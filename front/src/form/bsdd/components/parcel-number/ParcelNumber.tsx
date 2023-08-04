@@ -238,7 +238,7 @@ function ParcelGps({ index }) {
     <div>
       <div className="form__row">
         <label>
-          Coordonnée X (WGS 84) en °
+          Coordonnée latitude au format WGS 84 (entre -90° et 90°)
           <Field
             type="number"
             name={`wasteDetails.parcelNumbers.${index}.x`}
@@ -248,7 +248,7 @@ function ParcelGps({ index }) {
       </div>
       <div className="form__row">
         <label>
-          Coordonnée Y (WGS 84) en °
+          Coordonnée longitude au format WGS 84 (entre -180° et 180°)
           <Field
             type="number"
             name={`wasteDetails.parcelNumbers.${index}.y`}
