@@ -375,7 +375,7 @@ export const getSealedBtnLabel = (
         return SIGNER;
       } else {
         if (isSignEmitterPrivateIndividual(currentSiret, bsd)) {
-          return FAIRE_SIGNER;
+          return SIGNER;
         }
       }
     }
