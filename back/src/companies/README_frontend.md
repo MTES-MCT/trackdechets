@@ -1,5 +1,5 @@
 ---
-title: CompanySearch components
+title: CompanySearch Frontend components
 ---
 erDiagram
     BSD_EDITION ||--|{ COMPANY_SELECTION : contains
