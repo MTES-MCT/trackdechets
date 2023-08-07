@@ -28,15 +28,15 @@ export function Transport({ disabled, required = false }: Props) {
       </div>
 
       <div className="form__row">
-        <label>
+        <label htmlFor="transporter.transport.plates">
           Immatriculations
           <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
-          <TagsInput
-            name="transporter.transport.plates"
-            disabled={disabled}
-            limit={2}
-          />
         </label>
+        <TagsInput
+          name="transporter.transport.plates"
+          disabled={disabled}
+          limit={2}
+        />
       </div>
 
       <div className="form__row">
