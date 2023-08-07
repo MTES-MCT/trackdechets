@@ -4,6 +4,7 @@ import { formatDate } from "common/datetime";
 import { SEARCH_COMPANIES } from "Apps/common/queries/company/query";
 import {
   CompanyPrivate,
+  CompanySearchResult,
   Mutation,
   MutationAddSignatureAutomationArgs,
   MutationRemoveSignatureAutomationArgs,
@@ -41,6 +42,10 @@ const REMOVE_SIGNATURE_DELEGATION = gql`
 
 export function AccountFormCompanySignatureAutomation({ company }: Props) {
   const [clue, setClue] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+  const [companies, setCompanies] = useState<
+    CompanySearchResult[] | undefined
+  >();
   const [addSignatureAutomation, { loading: isAdding }] = useMutation<
     Pick<Mutation, "addSignatureAutomation">,
     MutationAddSignatureAutomationArgs
@@ -102,10 +107,41 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
     },
   });
 
-  const [searchCompaniesQuery, { loading: isLoadingSearch, data, error }] =
+  const [searchCompaniesQuery, { loading: isLoadingSearch, error }] =
     useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
-      SEARCH_COMPANIES
+      SEARCH_COMPANIES,
+      {
+        onCompleted: data => {
+          setCompanies(data.searchCompanies);
+        },
+      }
     );
+
+  const handleSearchValueChange = e => {
+    const { value } = e.target;
+    setClue(value);
+    setSearchValue(value);
+  };
+
+  const handleSiretAdd = result => {
+    if (!isAdding) {
+      addSignatureAutomation({
+        variables: {
+          input: {
+            from: company.id,
+            to: result.trackdechetsId!,
+          },
+        },
+      });
+      setClue("");
+    }
+    setSearchValue("");
+    setCompanies(undefined);
+  };
+
+  const handleCompanySearch = async () => {
+    await searchCompaniesQuery({ variables: { clue } });
+  };
 
   return (
     <div>
@@ -153,14 +189,13 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
           type="search"
           className="td-input"
           placeholder="SIRET"
-          onChange={e => setClue(e.target.value)}
+          value={searchValue}
+          onChange={handleSearchValueChange}
         />
         <button
           className="btn btn--primary small"
           type="submit"
-          onClick={() => {
-            searchCompaniesQuery({ variables: { clue } });
-          }}
+          onClick={handleCompanySearch}
           disabled={isLoadingSearch}
         >
           Rechercher
@@ -175,8 +210,8 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
           </span>
         )}
         {Boolean(clue) &&
-          data?.searchCompanies
-            .filter(result => Boolean(result.trackdechetsId))
+          companies
+            ?.filter(result => Boolean(result.trackdechetsId))
             .map(result => {
               return (
                 <div
@@ -188,18 +223,7 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
                   </span>
                   <button
                     className="btn btn--primary small"
-                    onClick={() => {
-                      if (isAdding) return;
-                      addSignatureAutomation({
-                        variables: {
-                          input: {
-                            from: company.id,
-                            to: result.trackdechetsId!,
-                          },
-                        },
-                      });
-                      setClue("");
-                    }}
+                    onClick={() => handleSiretAdd(result)}
                     disabled={isAdding}
                   >
                     Ajouter
