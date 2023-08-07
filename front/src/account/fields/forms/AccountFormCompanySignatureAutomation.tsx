@@ -41,6 +41,7 @@ const REMOVE_SIGNATURE_DELEGATION = gql`
 
 export function AccountFormCompanySignatureAutomation({ company }: Props) {
   const [clue, setClue] = useState("");
+  const [searchValue, setSearchValue] = useState("");
   const [addSignatureAutomation, { loading: isAdding }] = useMutation<
     Pick<Mutation, "addSignatureAutomation">,
     MutationAddSignatureAutomationArgs
@@ -107,6 +108,27 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
       SEARCH_COMPANIES
     );
 
+  const handleSearchValueChange = e => {
+    const { value } = e.target;
+    setClue(value);
+    setSearchValue(value);
+  };
+
+  const handleSiretAdd = result => {
+    if (!isAdding) {
+      addSignatureAutomation({
+        variables: {
+          input: {
+            from: company.id,
+            to: result.trackdechetsId!,
+          },
+        },
+      });
+      setClue("");
+    }
+    setSearchValue("");
+  };
+
   return (
     <div>
       <p className="tw-pb-6">
@@ -153,7 +175,8 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
           type="search"
           className="td-input"
           placeholder="SIRET"
-          onChange={e => setClue(e.target.value)}
+          value={searchValue}
+          onChange={handleSearchValueChange}
         />
         <button
           className="btn btn--primary small"
@@ -188,18 +211,7 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
                   </span>
                   <button
                     className="btn btn--primary small"
-                    onClick={() => {
-                      if (isAdding) return;
-                      addSignatureAutomation({
-                        variables: {
-                          input: {
-                            from: company.id,
-                            to: result.trackdechetsId!,
-                          },
-                        },
-                      });
-                      setClue("");
-                    }}
+                    onClick={() => handleSiretAdd(result)}
                     disabled={isAdding}
                   >
                     Ajouter
