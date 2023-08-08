@@ -213,17 +213,3 @@ export const TRANSPORTER_RECEIPT = gql`
     }
   }
 `;
-
-export const WORKER_CERTIFICATION = gql`
-  query SearchCompanies($clue: String!) {
-    searchCompanies(clue: $clue) {
-      workerCertification {
-        hasSubSectionFour
-        hasSubSectionThree
-        certificationNumber
-        validityLimit
-        organisation
-      }
-    }
-  }
-`;
