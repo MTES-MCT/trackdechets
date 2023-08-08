@@ -35,58 +35,7 @@ type WhereKeys =
   | "isCollectedFor";
 
 export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
-  // we build a mapping where each key has to be unique.
-  // Same siret can be used by different actors on the same form, so we can't use them as keys.
-  // Instead we rely on field names and segments ids
-  const multimodalTransportersBySegmentId = (form.transporters ?? [])
-    .filter(t => t.number && t.number > 1)
-    .reduce((acc, segment) => {
-      if (!!getTransporterCompanyOrgId(segment)) {
-        return {
-          ...acc,
-          [`${segment.id}`]: getTransporterCompanyOrgId(segment)
-        };
-      }
-      return acc;
-    }, {});
-
-  const intermediarySiretsReducer = form.intermediaries?.reduce(
-    (acc, intermediary) => {
-      if (!!intermediary.siret) {
-        return {
-          ...acc,
-          [`intermediarySiret${intermediary.siret}`]: intermediary.siret
-        };
-      }
-      return acc;
-    },
-    {}
-  );
-
-  const transporter = getFirstTransporterSync(form);
-
-  const formSirets =
-    form.emitterType === EmitterType.APPENDIX1_PRODUCER
-      ? {
-          // Appendix 1 only appears in the dashboard for emitters & transporters
-          emitterCompanySiret: form.emitterCompanySiret,
-          transporterCompanySiret: getTransporterCompanyOrgId(transporter)
-        }
-      : {
-          emitterCompanySiret: form.emitterCompanySiret,
-          recipientCompanySiret: form.recipientCompanySiret,
-          forwardedInDestinationCompanySiret:
-            form.forwardedIn?.recipientCompanySiret,
-          forwardedInTransporterCompanySiret: getTransporterCompanyOrgId(
-            form.forwardedIn ? getFirstTransporterSync(form.forwardedIn) : null
-          ),
-          traderCompanySiret: form.traderCompanySiret,
-          brokerCompanySiret: form.brokerCompanySiret,
-          ecoOrganismeSiret: form.ecoOrganismeSiret,
-          transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-          ...multimodalTransportersBySegmentId,
-          ...intermediarySiretsReducer
-        };
+  const formSirets = getFormSirets(form);
 
   const siretsByTab: Record<WhereKeys, string[]> = {
     isDraftFor: [],
@@ -214,4 +163,69 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
   }
 
   return siretsByTab;
+}
+
+function getFormSirets(form: FullForm) {
+  const transporter = getFirstTransporterSync(form);
+
+  // Appendix 1 only appears in the dashboard for emitters & transporters
+  if (form.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+    return {
+      emitterCompanySiret: form.emitterCompanySiret,
+      transporterCompanySiret: getTransporterCompanyOrgId(transporter)
+    };
+  }
+
+  // we build a mapping where each key has to be unique.
+  // Same siret can be used by different actors on the same form, so we can't use them as keys.
+  // Instead we rely on field names and segments ids
+  const multimodalTransportersBySegmentId = (form.transporters ?? [])
+    .filter(t => t.number && t.number > 1)
+    .reduce((acc, segment) => {
+      if (!!getTransporterCompanyOrgId(segment)) {
+        return {
+          ...acc,
+          [`${segment.id}`]: getTransporterCompanyOrgId(segment)
+        };
+      }
+      return acc;
+    }, {});
+
+  const intermediarySiretsReducer = form.intermediaries?.reduce(
+    (acc, intermediary) => {
+      if (!!intermediary.siret) {
+        return {
+          ...acc,
+          [`intermediarySiret${intermediary.siret}`]: intermediary.siret
+        };
+      }
+      return acc;
+    },
+    {}
+  );
+
+  const allFormSirets = {
+    emitterCompanySiret: form.emitterCompanySiret,
+    recipientCompanySiret: form.recipientCompanySiret,
+    forwardedInDestinationCompanySiret: form.forwardedIn?.recipientCompanySiret,
+    forwardedInTransporterCompanySiret: getTransporterCompanyOrgId(
+      form.forwardedIn ? getFirstTransporterSync(form.forwardedIn) : null
+    ),
+    traderCompanySiret: form.traderCompanySiret,
+    brokerCompanySiret: form.brokerCompanySiret,
+    ecoOrganismeSiret: form.ecoOrganismeSiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
+    ...multimodalTransportersBySegmentId,
+    ...intermediarySiretsReducer
+  };
+
+  // Drafts only appear in the dashboard for companies the form owner belongs to
+  if (form.status === Status.DRAFT) {
+    const draftFormSiretsEntries = Object.entries(allFormSirets).filter(
+      ([, siret]) => siret && form.canAccessDraftSirets.includes(siret)
+    );
+    return Object.fromEntries(draftFormSiretsEntries);
+  }
+
+  return allFormSirets;
 }

@@ -1,8 +1,8 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getApplicationOrApplicationNotFound } from "../../database";
-import { ForbiddenError } from "apollo-server-core";
 import { applyAuthStrategies, AuthType } from "../../../auth";
+import { ForbiddenError } from "../../../common/errors";
 
 const applicationResolver: QueryResolvers["application"] = async (
   _,

@@ -1,5 +1,4 @@
 import { EmitterType, Form, Prisma, Status } from "@prisma/client";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
   MutationSignEmissionFormArgs,
@@ -20,6 +19,7 @@ import { wasteDetailsSchema } from "../../validation";
 import { getFormRepository } from "../../repository";
 import { prismaJsonNoNull } from "../../../common/converter";
 import { Permission } from "../../../permissions";
+import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 const signatures: Partial<
   Record<

@@ -198,6 +198,8 @@ export default function AccountCompanyAddForeign() {
             {...{
               onCompanyInfos: companyInfos => setCompanyInfos(companyInfos),
             }}
+            label={memoizedStrings.vatNumber.label}
+            hintText=""
           />
         </div>
       </div>

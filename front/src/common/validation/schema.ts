@@ -36,11 +36,16 @@ export const companySchema = yup.object().shape({
     .nullable(),
   contact: yup
     .string()
+    .nullable()
     .required("Le contact dans l'entreprise est obligatoire"),
-  phone: yup.string().required("Le téléphone de l'entreprise est obligatoire"),
+  phone: yup
+    .string()
+    .nullable()
+    .required("Le téléphone de l'entreprise est obligatoire"),
   mail: yup
     .string()
     .email("Le format d'adresse email est incorrect")
+    .nullable()
     .required("L'email est obligatoire"),
   omiNumber: yup
     .string()

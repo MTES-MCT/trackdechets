@@ -2,7 +2,6 @@ import { checkVAT } from "jsvat";
 import prisma from "../prisma";
 import redundantCachedSearchSirene from "./sirene/searchCompany";
 import decoratedSearchCompanies from "./sirene/searchCompanies";
-import { UserInputError } from "apollo-server-express";
 import { CompanySearchResult } from "./types";
 import { searchVat } from "./vat";
 import { convertUrls } from "./database";
@@ -18,6 +17,7 @@ import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
 import { AnonymousCompanyError } from "./sirene/errors";
 import { removeEmptyKeys } from "../common/converter";
+import { UserInputError } from "../common/errors";
 
 interface SearchCompaniesDeps {
   searchCompany: (clue: string) => Promise<CompanySearchResult>;

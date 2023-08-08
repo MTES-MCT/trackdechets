@@ -10,9 +10,9 @@ import { getRegistryFileName } from "../../filename";
 import { format } from "@fast-csv/format";
 import { wasteFormatter, wastesReader } from "../../streams";
 import { searchBsds } from "../../elastic";
-import { UserInputError } from "apollo-server-express";
 import { GraphQLContext } from "../../../types";
 import { Permission, checkUserPermissions } from "../../../permissions";
+import { UserInputError } from "../../../common/errors";
 
 export const wastesRegistryCsvDownloadHandler: DownloadHandler<QueryWastesRegistryCsvArgs> =
   {

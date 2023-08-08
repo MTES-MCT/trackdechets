@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import { Prisma, BsffType } from "@prisma/client";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -19,6 +18,7 @@ import {
 import { checkEditionRules } from "../../edition/bsffEdition";
 import { sirenifyBsffInput } from "../../sirenify";
 import { recipify } from "../../recipify";
+import { UserInputError } from "../../../common/errors";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
   _,

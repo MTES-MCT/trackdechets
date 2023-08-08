@@ -97,6 +97,7 @@ describe("Mutation.Bsda.create", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const worker = await companyFactory();
 
     const input: BsdaInput = {
       type: "OTHER_COLLECTIONS",
@@ -113,7 +114,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -166,6 +167,7 @@ describe("Mutation.Bsda.create", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const worker = await companyFactory();
 
     const input: BsdaInput = {
       type: "OTHER_COLLECTIONS",
@@ -182,7 +184,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -234,6 +236,7 @@ describe("Mutation.Bsda.create", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const worker = await companyFactory();
 
     const input: BsdaInput = {
       type: "OTHER_COLLECTIONS",
@@ -250,7 +253,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -304,6 +307,7 @@ describe("Mutation.Bsda.create", () => {
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const worker = await companyFactory();
 
     const input: BsdaInput = {
       type: "OTHER_COLLECTIONS",
@@ -320,7 +324,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -385,6 +389,7 @@ describe("Mutation.Bsda.create", () => {
       companyTypes: ["TRANSPORTER"]
     });
     await transporterReceiptFactory({ company: transporterCompany });
+    const worker = await companyFactory();
 
     const input: BsdaInput = {
       emitter: {
@@ -400,7 +405,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -468,6 +473,7 @@ describe("Mutation.Bsda.create", () => {
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const worker = await companyFactory();
 
     const input: BsdaInput = {
       type: "OTHER_COLLECTIONS",
@@ -484,7 +490,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -550,6 +556,7 @@ describe("Mutation.Bsda.create", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const worker = await companyFactory();
 
     const input: BsdaInput = {
       type: "OTHER_COLLECTIONS",
@@ -566,7 +573,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -957,6 +964,7 @@ describe("Mutation.Bsda.create", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const worker = await companyFactory();
 
     const input: BsdaInput = {
       type: "OTHER_COLLECTIONS",
@@ -973,7 +981,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -1031,6 +1039,7 @@ describe("Mutation.Bsda.create", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const worker = await companyFactory();
 
     const input: BsdaInput = {
       type: "OTHER_COLLECTIONS",
@@ -1047,7 +1056,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -1107,6 +1116,7 @@ describe("Mutation.Bsda.create", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const worker = await companyFactory();
 
     const input: BsdaInput = {
       type: "OTHER_COLLECTIONS",
@@ -1123,7 +1133,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -1199,6 +1209,7 @@ describe("Mutation.Bsda.create", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const worker = await companyFactory();
 
     const input: BsdaInput = {
       type: "OTHER_COLLECTIONS",
@@ -1215,7 +1226,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -1297,6 +1308,7 @@ describe("Mutation.Bsda.create", () => {
         companyTypes: { set: ["PRODUCER"] } // NOT a destination
       }
     );
+    const worker = await companyFactory();
 
     const input: BsdaInput = {
       type: "OTHER_COLLECTIONS",
@@ -1313,7 +1325,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -1372,6 +1384,7 @@ describe("Mutation.Bsda.create", () => {
       "MEMBER"
     );
     const { company: ttr } = await userWithCompanyFactory("MEMBER");
+    const worker = await companyFactory();
 
     const bsda = await bsdaFactory({
       opt: {
@@ -1389,7 +1402,7 @@ describe("Mutation.Bsda.create", () => {
       emitter: {
         isPrivateIndividual: false,
         company: {
-          siret: emitter.siret,
+          siret: ttr.siret,
           name: "The crusher",
           address: "Rue de la carcasse",
           contact: "Centre amiante",
@@ -1399,7 +1412,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -1454,6 +1467,7 @@ describe("Mutation.Bsda.create", () => {
   });
 
   it("should create a RESHIPMENT bsda and use provided cosnsitence field ", async () => {
+    const worker = await companyFactory();
     const { company: emitter } = await userWithCompanyFactory("MEMBER");
     const { company: transporter } = await userWithCompanyFactory("MEMBER");
     const { user, company: destination } = await userWithCompanyFactory(
@@ -1477,7 +1491,7 @@ describe("Mutation.Bsda.create", () => {
       emitter: {
         isPrivateIndividual: false,
         company: {
-          siret: emitter.siret,
+          siret: ttr.siret,
           name: "The crusher",
           address: "Rue de la carcasse",
           contact: "Centre amiante",
@@ -1487,7 +1501,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: siretify(2),
+          siret: worker.siret,
           name: "worker",
           address: "address",
           contact: "contactEmail",

@@ -1,7 +1,7 @@
 import { FullDbBsdasri } from "./types";
 import { BsdasriNotFound } from "./errors";
-import { UserInputError } from "apollo-server-express";
 import { getReadonlyBsdasriRepository } from "./repository";
+import { UserInputError } from "../common/errors";
 
 /**
  * Retrieves a dasri by id or throw a BsdasriNotFound error

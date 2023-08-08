@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Create government accounts",
   "Create government accounts",
-  true
+  false
 )
 export class CreateGovernementAccounts implements Updater {
   async run() {

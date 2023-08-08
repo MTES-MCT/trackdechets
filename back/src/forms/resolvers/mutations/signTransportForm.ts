@@ -1,5 +1,4 @@
 import { EmitterType, Form, Prisma, Status } from "@prisma/client";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
   Form as GraphQLForm,
@@ -25,6 +24,7 @@ import { validateBeforeTransport } from "../../validation";
 import { Permission } from "../../../permissions";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { recipifyFormInput } from "../../recipify";
+import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 export async function getFormReceiptField(transporter) {
   const recipifiedTransporter = await recipifyFormInput({
@@ -203,15 +203,13 @@ const signTransportFn = async (
         }
       );
 
-      // For user convenience, we update the bsds with the
-      // immatriculation (if not filled already)
+      // At any given time, all bsds from an Annexe1 must have the same plates
       const ids = appendix1Forms.map(form => form.id);
 
       // Update their plates
       await transaction.bsddTransporter.updateMany({
         where: {
-          formId: { in: ids },
-          OR: [{ transporterNumberPlate: null }, { transporterNumberPlate: "" }]
+          formId: { in: ids }
         },
         data: {
           transporterNumberPlate: transporterUpdate.transporterNumberPlate

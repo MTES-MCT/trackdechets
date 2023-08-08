@@ -15,7 +15,7 @@ import {
 } from "@prisma/client";
 import prisma from "../prisma";
 import { hashToken } from "../utils";
-import { createUser } from "../users/database";
+import { createUser, getUserCompanies } from "../users/database";
 
 /**
  * Create a user with name and email
@@ -72,7 +72,7 @@ export const companyFactory = async (
       orgId: opts.vatNumber ?? siret,
       siret,
       companyTypes: {
-        set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
+        set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR", "WORKER"]
       },
       name: `company_${companyIndex}`,
       contact: "Company Contact",
@@ -299,6 +299,7 @@ const formdata: Partial<Prisma.FormCreateInput> = {
 };
 
 export const forwardedInData: Partial<Prisma.FormCreateInput> = {
+  status: "RESENT",
   quantityReceived: 1,
   wasteAcceptationStatus: "ACCEPTED",
   wasteRefusalReason: null,
@@ -370,7 +371,7 @@ export const upsertBaseSiret = async siret => {
           orgId: siret,
           siret,
           companyTypes: {
-            set: ["TRANSPORTER", "WASTEPROCESSOR"]
+            set: ["TRANSPORTER", "WASTEPROCESSOR", "WORKER"]
           },
           name: `company_${siret}`,
           securityCode: 1234,
@@ -399,8 +400,12 @@ export const formFactory = async ({
   );
   await upsertBaseSiret(formdata.recipientCompanySiret);
 
+  const ownerCompanies = await getUserCompanies(ownerId);
+  const ownerOrgIds = ownerCompanies.map(company => company.orgId);
+
   const formParams: Omit<Prisma.FormCreateInput, "readableId" | "owner"> = {
     ...formdata,
+    canAccessDraftSirets: ownerOrgIds,
     ...opt,
     transporters: {
       create: {

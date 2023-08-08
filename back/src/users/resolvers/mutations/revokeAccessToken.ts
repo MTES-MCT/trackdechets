@@ -2,7 +2,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import prisma from "../../../prisma";
-import { ForbiddenError, UserInputError } from "apollo-server-core";
+import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 const revokeAccessTokenResolver: MutationResolvers["revokeAccessToken"] =
   async (_parent, { id }, context) => {

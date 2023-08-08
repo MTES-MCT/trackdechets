@@ -98,21 +98,21 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
       )}
 
       <div className="form__row">
-        <label>
+        <label htmlFor="wasteDetails.landIdentifiers">
           Identifiant(s) du terrain lorsque les terres ont été extraites d'un
           terrain placé en secteur d'information sur les sols au titre de
           l'article L. 125-6 (optionnel)
           <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
-          <TagsInput name="wasteDetails.landIdentifiers" />
         </label>
+        <TagsInput name="wasteDetails.landIdentifiers" />
       </div>
 
       <div className="form__row">
-        <label>
+        <label htmlFor="wasteDetails.analysisReferences">
           Références d'analyses (optionnel)
           <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
-          <TagsInput name="wasteDetails.analysisReferences" />
         </label>
+        <TagsInput name="wasteDetails.analysisReferences" />
       </div>
     </div>
   );
@@ -165,7 +165,7 @@ function ParcelDetails({ index, parcelNumber, arrayHelpers }) {
           checked={!showParcelNumber}
           onChange={() => handleGpsToggle(parcelNumber, index, arrayHelpers)}
           label="Le domaine n'est pas cadastré, je n'ai pas les numéros de parcelle,
-          j'indique les coordonnées GPS (au format lambert II étendu)"
+          j'indique les coordonnées GPS (au format WGS 84)"
         />
       </div>
     </>
@@ -238,7 +238,7 @@ function ParcelGps({ index }) {
     <div>
       <div className="form__row">
         <label>
-          Coordonnée X (Lambert II étendu)
+          Coordonnée latitude au format WGS 84 (entre -90° et 90°)
           <Field
             type="number"
             name={`wasteDetails.parcelNumbers.${index}.x`}
@@ -248,7 +248,7 @@ function ParcelGps({ index }) {
       </div>
       <div className="form__row">
         <label>
-          Coordonnée Y (Lambert II étendu)
+          Coordonnée longitude au format WGS 84 (entre -180° et 180°)
           <Field
             type="number"
             name={`wasteDetails.parcelNumbers.${index}.y`}

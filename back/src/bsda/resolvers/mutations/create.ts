@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   BsdaInput,
@@ -14,7 +13,7 @@ import {
 import { getBsdaRepository } from "../../repository";
 import { checkCanCreate } from "../../permissions";
 import { parseBsda } from "../../validation/validate";
-import { canBypassSirenify } from "../../../companies/sirenify";
+import { UserInputError } from "../../../common/errors";
 
 type CreateBsda = {
   isDraft: boolean;
@@ -52,7 +51,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     { ...unparsedBsda, isDraft },
     {
       enableCompletionTransformers: true,
-      enablePreviousBsdasChecks: !canBypassSirenify(user),
+      enablePreviousBsdasChecks: true,
       currentSignatureType: !isDraft ? "EMISSION" : undefined
     }
   );

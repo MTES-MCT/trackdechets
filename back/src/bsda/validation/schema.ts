@@ -15,7 +15,8 @@ import {
   siretSchema,
   foreignVatNumberSchema,
   isDestinationRefinement,
-  isTransporterRefinement
+  isTransporterRefinement,
+  isWorkerRefinement
 } from "../../common/validation/siret";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { OPERATIONS, WORKER_CERTIFICATION_ORGANISM } from "./constants";
@@ -161,7 +162,7 @@ export const rawBsdaSchema = z
       .nullish()
       .transform(v => Boolean(v)),
     workerCompanyName: z.string().nullish(),
-    workerCompanySiret: siretSchema.nullish(),
+    workerCompanySiret: siretSchema.nullish().superRefine(isWorkerRefinement),
     workerCompanyAddress: z.string().nullish(),
     workerCompanyContact: z.string().nullish(),
     workerCompanyPhone: z.string().nullish(),

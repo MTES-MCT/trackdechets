@@ -1,4 +1,3 @@
-import { ForbiddenError } from "apollo-server-core";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationAddSignatureAutomationArgs } from "../../../generated/graphql/types";
@@ -6,7 +5,10 @@ import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getCompanyOrCompanyNotFound } from "../../database";
 import { checkUserPermissions, Permission } from "../../../permissions";
-import { NotCompanyAdminErrorMsg } from "../../../common/errors";
+import {
+  ForbiddenError,
+  NotCompanyAdminErrorMsg
+} from "../../../common/errors";
 
 export async function addSignatureAutomation(
   _,

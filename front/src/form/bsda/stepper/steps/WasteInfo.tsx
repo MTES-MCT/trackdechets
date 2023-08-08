@@ -119,7 +119,8 @@ export function WasteInfoWorker({ disabled }) {
 
       <div className="form__row">
         <label>
-          Mention au titre des règlements ADR/RID/ADN/IMDG (Optionnel)
+          Mention au titre des règlements ADR/RID/ADN/IMDG - ou "non soumis" le
+          cas échéant
           <Field
             disabled={disabled}
             type="text"
@@ -211,11 +212,11 @@ export function WasteInfoWorker({ disabled }) {
             <Tooltip msg="Ils peuvent être remplis au moment de la signature. Vous n'êtes pas obligé de les compléter à la création du bordereau." />
           </h4>
           <div className="form__row">
-            <label>
+            <label htmlFor="waste.sealNumbers">
               Numéros de scellés
               <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
-              <TagsInput name="waste.sealNumbers" disabled={disabled} />
             </label>
+            <TagsInput name="waste.sealNumbers" disabled={disabled} />
           </div>
           <p>
             Vous avez saisi {values.waste?.sealNumbers?.length ?? 0} scellé(s)

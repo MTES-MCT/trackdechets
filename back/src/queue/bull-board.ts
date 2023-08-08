@@ -5,7 +5,8 @@ import {
   geocodeCompanyQueue,
   setCompanyDepartementQueue
 } from "./producers/company";
-import { indexQueue, updatesQueue } from "./producers/elastic";
+import { indexQueue } from "./producers/elastic";
+import { updatesQueue } from "./producers/bsdUpdate";
 import { webhooksQueue } from "./producers/webhooks";
 import { syncEventsQueue } from "./producers/events";
 import { mailQueue } from "./producers/mail";

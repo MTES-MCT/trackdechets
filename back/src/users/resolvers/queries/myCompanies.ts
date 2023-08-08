@@ -7,13 +7,13 @@ import {
   CompanyPrivate,
   QueryResolvers
 } from "../../../generated/graphql/types";
-import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import { AuthType } from "../../../auth";
 import {
   MIN_MY_COMPANIES_SEARCH,
   MAX_MY_COMPANIES_SEARCH
 } from "../../../common/constants/COMPANY_CONSTANTS";
+import { UserInputError } from "../../../common/errors";
 
 const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
   _parent,

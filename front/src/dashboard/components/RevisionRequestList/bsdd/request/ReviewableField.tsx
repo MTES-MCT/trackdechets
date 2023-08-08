@@ -6,7 +6,10 @@ type Props = {
   title: string;
   children: React.ReactNode;
   name: string;
+  // Value coming from revised bsd, allowing reset when component is closed
   defaultValue: any;
+  // Optional value to initialize children field value, usefule for booleans
+  initialValue?: any;
   value: string | number | React.ReactNode;
 };
 
@@ -15,6 +18,7 @@ export function ReviewableField({
   title,
   name,
   defaultValue,
+  initialValue,
   children,
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
@@ -22,10 +26,15 @@ export function ReviewableField({
 
   function handleIsEditingChange() {
     if (isEditing) {
+      // When toggling visibility to off, set children value to pre-existing value
       setValue(defaultValue);
+    } else {
+      // When toggling visibility to on, set children value to optional initialValue (to tell apart empty strings from boolean)
+      if (initialValue !== undefined) setValue(initialValue);
     }
     setIsEditing(!isEditing);
   }
+
   return (
     <div className="tw-pb-4">
       <div className="tw-flex">

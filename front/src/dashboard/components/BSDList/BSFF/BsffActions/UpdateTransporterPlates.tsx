@@ -87,11 +87,11 @@ function UpdateTransporterPlatesModal({
         }}
       >
         <Form>
-          <label>
+          <label htmlFor="plates">
             Immatriculations
             <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
-            <TagsInput name="plates" limit={2} />
           </label>
+          <TagsInput name="plates" limit={2} />
 
           {!!error && <NotificationError apolloError={error} />}
 

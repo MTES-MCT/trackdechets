@@ -5,7 +5,6 @@ import {
   Status,
   User
 } from "@prisma/client";
-import { ForbiddenError } from "apollo-server-core";
 import {
   CreateFormInput,
   ImportPaperFormInput,
@@ -27,6 +26,7 @@ import { getReadOnlyFormRepository } from "./repository";
 import { checkSecurityCode } from "../common/permissions";
 import { FullForm } from "./types";
 import { editionRules, getUpdatedFields } from "./edition";
+import { ForbiddenError } from "../common/errors";
 
 /**
  * Retrieves companies allowed to update, delete or duplicate an existing BSDD.
@@ -108,7 +108,7 @@ function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
     s => s.transporterCompanySiret
   );
 
-  return [
+  const contributors = [
     emitterCompanySiret,
     recipientCompanySiret,
     transporterCompanySiret,
@@ -120,6 +120,16 @@ function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
     ...intermediariesOrgIds,
     ...multiModalTransporters
   ].filter(Boolean);
+
+  // For enhanced safety, we intersect canAccessDraftSirets & contributors
+  // as canAccessDraftSirets is calculated on create and the contributors might change
+  if (form.status === Status.DRAFT) {
+    return form.canAccessDraftSirets.filter(siret =>
+      contributors.includes(siret)
+    );
+  }
+
+  return contributors;
 }
 
 /**
@@ -145,6 +155,10 @@ function formCreators(input: CreateFormInput): string[] {
  * Retrieves organisation allowed to read a BSDD
  */
 function formReaders(form: FullForm & { grouping: Form[] }): string[] {
+  if (form.status === Status.DRAFT) {
+    return formContributors(form);
+  }
+
   return [
     ...formContributors(form),
     ...(form.transporters

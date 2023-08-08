@@ -1,4 +1,4 @@
-import { UserInputError } from "apollo-server-core";
+import { UserInputError } from "../common/errors";
 
 export class ApplicationNotFound extends UserInputError {
   constructor(id: string) {

@@ -6,7 +6,6 @@ import {
 } from "../../../generated/graphql/types";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { ForbiddenError } from "apollo-server-express";
 
 import { GraphQLContext } from "../../../types";
 import { getBsdasriOrNotFound } from "../../database";
@@ -14,6 +13,7 @@ import { getBsdasriOrNotFound } from "../../database";
 import updateSynthesisBsdasri from "./updateSynthesisBsdasri";
 import updateBsdasri from "./updateSimpleBsdasri";
 import { checkCanUpdate } from "../../permissions";
+import { ForbiddenError } from "../../../common/errors";
 
 /**
  * Bsdasri update mutation

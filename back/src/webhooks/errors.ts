@@ -1,4 +1,4 @@
-import { UserInputError } from "apollo-server-express";
+import { UserInputError } from "../common/errors";
 
 export class WebhookSettingNotFound extends UserInputError {
   constructor(id: string) {

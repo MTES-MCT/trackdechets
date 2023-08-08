@@ -24,7 +24,7 @@ import { checkSecurityCode } from "../../common/permissions";
 
 async function checkEmitterPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = Status.DRAFT
+  formStatus: Status = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -37,7 +37,7 @@ async function checkEmitterPermission(
 
 async function checkRecipientPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = Status.DRAFT
+  formStatus: Status = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -50,7 +50,7 @@ async function checkRecipientPermission(
 
 async function checkTransporterPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = Status.DRAFT
+  formStatus: Status = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -68,7 +68,7 @@ async function checkTransporterPermission(
 
 async function checkTraderPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = Status.DRAFT
+  formStatus: Status = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -81,7 +81,7 @@ async function checkTraderPermission(
 
 async function checkEcoOrganismePermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = Status.DRAFT
+  formStatus: Status = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -105,7 +105,7 @@ async function checkEcoOrganismePermission(
 
 async function checkTransporterAfterTempStoragePermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = Status.DRAFT
+  formStatus: Status = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -135,7 +135,7 @@ async function checkTransporterAfterTempStoragePermission(
 
 async function checkDestinationAfterTempStoragePermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = Status.DRAFT
+  formStatus: Status = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -156,7 +156,7 @@ async function checkDestinationAfterTempStoragePermission(
 
 async function checkMultiModalTransporterPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = Status.DRAFT
+  formStatus: Status = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -178,7 +178,7 @@ async function checkMultiModalTransporterPermission(
 
 async function checkRandomUserPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = Status.DRAFT
+  formStatus: Status = Status.DRAFT
 ) {
   const owner = await userFactory();
   const user = await userFactory();
@@ -195,9 +195,76 @@ describe.each([
   checkCanRead,
   checkCanDuplicate,
   //checkCanUpdate,
+  checkCanMarkAsSealed
+])("%p for non draft form", permission => {
+  afterAll(resetDatabase);
+
+  it("should deny access to random user", async () => {
+    expect.assertions(1);
+    try {
+      await checkRandomUserPermission(permission, Status.SENT);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
+  });
+
+  it("should allow emitter", async () => {
+    const check = await checkEmitterPermission(permission, Status.SENT);
+    expect(check).toEqual(true);
+  });
+
+  it("should allow recipient", async () => {
+    const check = await checkRecipientPermission(permission, Status.SENT);
+    expect(check).toEqual(true);
+  });
+
+  it("should allow transporter", async () => {
+    const check = await checkTransporterPermission(permission, Status.SENT);
+    expect(check).toEqual(true);
+  });
+
+  it("should allow trader", async () => {
+    const check = await checkTraderPermission(permission, Status.SENT);
+    expect(check).toEqual(true);
+  });
+
+  it("should allow ecoOrganisme", async () => {
+    const check = await checkEcoOrganismePermission(permission, Status.SENT);
+    expect(check).toEqual(true);
+  });
+
+  it("should allow transporter after temp storage", async () => {
+    const check = await checkTransporterAfterTempStoragePermission(
+      permission,
+      Status.SENT
+    );
+    expect(check).toEqual(true);
+  });
+
+  it("should allow destination after temp storage", async () => {
+    const check = await checkDestinationAfterTempStoragePermission(
+      permission,
+      Status.SENT
+    );
+    expect(check).toEqual(true);
+  });
+
+  it("should allow multimodal transporter", async () => {
+    const check = await checkMultiModalTransporterPermission(
+      permission,
+      Status.SENT
+    );
+    expect(check).toEqual(true);
+  });
+});
+
+describe.each([
+  checkCanRead,
+  checkCanDuplicate,
+  //checkCanUpdate,
   checkCanDelete,
   checkCanMarkAsSealed
-])("%p", permission => {
+])("%p for draft the current user didnt create", permission => {
   afterAll(resetDatabase);
 
   it("should deny access to random user", async () => {
@@ -209,44 +276,76 @@ describe.each([
     }
   });
 
-  it("should allow emitter", async () => {
-    const check = await checkEmitterPermission(permission);
-    expect(check).toEqual(true);
+  it("should deny access to emitter", async () => {
+    expect.assertions(1);
+    try {
+      await checkEmitterPermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow recipient", async () => {
-    const check = await checkRecipientPermission(permission);
-    expect(check).toEqual(true);
+  it("should deny access to recipient", async () => {
+    expect.assertions(1);
+    try {
+      await checkRecipientPermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow transporter", async () => {
-    const check = await checkTransporterPermission(permission);
-    expect(check).toEqual(true);
+  it("should deny access to transporter", async () => {
+    expect.assertions(1);
+    try {
+      await checkTransporterPermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow trader", async () => {
-    const check = await checkTraderPermission(permission);
-    expect(check).toEqual(true);
+  it("should deny access to trader", async () => {
+    expect.assertions(1);
+    try {
+      await checkTraderPermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow ecoOrganisme", async () => {
-    const check = await checkEcoOrganismePermission(permission);
-    expect(check).toEqual(true);
+  it("should deny access to ecoOrganisme", async () => {
+    expect.assertions(1);
+    try {
+      await checkEcoOrganismePermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow transporter after temp storage", async () => {
-    const check = await checkTransporterAfterTempStoragePermission(permission);
-    expect(check).toEqual(true);
+  it("should deny access to transporter after temp storage", async () => {
+    expect.assertions(1);
+    try {
+      await checkTransporterAfterTempStoragePermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow destination after temp storage", async () => {
-    const check = await checkDestinationAfterTempStoragePermission(permission);
-    expect(check).toEqual(true);
+  it("should deny access to destination after temp storage", async () => {
+    expect.assertions(1);
+    try {
+      await checkDestinationAfterTempStoragePermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
-  it("should allow multimodal transporter", async () => {
-    const check = await checkMultiModalTransporterPermission(permission);
-    expect(check).toEqual(true);
+  it("should deny access to multimodal transporter", async () => {
+    expect.assertions(1);
+    try {
+      await checkMultiModalTransporterPermission(permission);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 });
 

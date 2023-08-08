@@ -1,15 +1,20 @@
 import prisma from "../../../prisma";
-import { UserInputError } from "apollo-server-express";
 import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
 import { DASRI_GROUPING_OPERATIONS_CODES } from "../../../common/constants";
 import { getReadonlyBsdasriRepository } from "../../repository";
 import { CompanyInput } from "../../../generated/graphql/types";
+import { UserInputError } from "../../../common/errors";
 
 export const getEligibleDasrisForSynthesis = async (
   synthesizingIds: string[],
   bsdasri: Bsdasri | null,
   company?: CompanyInput | null
-): Promise<Bsdasri[]> => {
+): Promise<
+  Pick<
+    Bsdasri,
+    "id" | "transporterWasteVolume" | "transporterWastePackagings"
+  >[]
+> => {
   if (!synthesizingIds) {
     return [];
   }
@@ -21,30 +26,39 @@ export const getEligibleDasrisForSynthesis = async (
   // retrieve dasris:
   // whose id is in synthesizingIds array
   // which are in SENT status
-  // wich are of SIMPLE type
+  // which are of SIMPLE type
   // which are not already grouped, grouping, synthesized or synthesizing
   // whose recipient in current transporter
-  const found = await bsdasriReadonlyRepository.findMany({
-    id: { in: synthesizingIds },
-    status: BsdasriStatus.SENT,
-    type: BsdasriType.SIMPLE,
-    groupedIn: null,
-    grouping: { none: {} },
-    synthesizedIn: null,
-    synthesizing: { none: {} },
-    OR: [
-      {
-        transporterCompanySiret: bsdasri
-          ? bsdasri.transporterCompanySiret
-          : company?.siret
-      },
-      {
-        transporterCompanyVatNumber: bsdasri
-          ? bsdasri.transporterCompanyVatNumber
-          : company?.vatNumber
+  const found = await bsdasriReadonlyRepository.findMany(
+    {
+      id: { in: synthesizingIds },
+      status: BsdasriStatus.SENT,
+      type: BsdasriType.SIMPLE,
+      groupedIn: null,
+      groupingEmitterSirets: { isEmpty: true },
+      synthesizedIn: null,
+      synthesisEmitterSirets: { isEmpty: true },
+      OR: [
+        {
+          transporterCompanySiret: bsdasri
+            ? bsdasri.transporterCompanySiret
+            : company?.siret
+        },
+        {
+          transporterCompanyVatNumber: bsdasri
+            ? bsdasri.transporterCompanyVatNumber
+            : company?.vatNumber
+        }
+      ]
+    },
+    {
+      select: {
+        id: true,
+        transporterWastePackagings: true,
+        transporterWasteVolume: true
       }
-    ]
-  });
+    }
+  );
 
   const foundIds = found.map(el => el.id);
   const diff = synthesizingIds.filter(el => !foundIds.includes(el));
@@ -94,9 +108,9 @@ export const checkDasrisAreGroupable = async (
       status: BsdasriStatus.AWAITING_GROUP,
       type: BsdasriType.SIMPLE,
       groupedIn: null,
-      grouping: { none: {} },
+      groupingEmitterSirets: { isEmpty: true },
       synthesizedIn: null,
-      synthesizing: { none: {} },
+      synthesisEmitterSirets: { isEmpty: true },
       destinationCompanySiret: emitterSiret
     },
     { select: { id: true } }
@@ -146,7 +160,12 @@ type dbPackaging = {
 /**
  * Aggregate packagings from several bsds and sum their volume an quantity by container type
  */
-export const aggregatePackagings = (dasrisToAssociate: Bsdasri[]) => {
+export const aggregatePackagings = (
+  dasrisToAssociate: Pick<
+    Bsdasri,
+    "id" | "transporterWasteVolume" | "transporterWastePackagings"
+  >[]
+) => {
   const packagingsArray = dasrisToAssociate.map(dasri =>
     Array.isArray(dasri.transporterWastePackagings)
       ? <dbPackaging[]>dasri.transporterWastePackagings

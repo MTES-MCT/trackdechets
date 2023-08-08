@@ -94,11 +94,11 @@ export default function WasteInfo({ disabled }) {
       </div>
 
       <div className="form__row">
-        <label>
+        <label htmlFor="identification.numbers">
           Détail des identifications
           <Tooltip msg="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune" />
-          <TagsInput name="identification.numbers" disabled={disabled} />
         </label>
+        <TagsInput name="identification.numbers" disabled={disabled} />
       </div>
 
       <h4 className="form__section-heading">Quantité</h4>

@@ -1,16 +1,16 @@
-import {
-  ApolloError,
-  ApolloServer,
-  AuthenticationError,
-  ForbiddenError,
-  gql,
-  UserInputError
-} from "apollo-server-express";
+import { ApolloServer, gql } from "apollo-server-express";
 import express from "express";
 import * as Sentry from "@sentry/node";
 import supertest from "supertest";
 import * as yup from "yup";
+import { z } from "zod";
 import sentryReporter from "../sentryReporter";
+import {
+  AuthenticationError,
+  ForbiddenError,
+  UserInputError
+} from "../../errors";
+import { GraphQLError } from "graphql";
 
 const captureExceptionSpy = jest.spyOn(Sentry, "captureException");
 const mockResolver = jest.fn();
@@ -87,9 +87,19 @@ describe("graphqlErrorHandler", () => {
     expect(captureExceptionSpy).not.toHaveBeenCalled();
   });
 
-  it("should not report generic ApolloError", async () => {
+  it("should not report zod ZodError", async () => {
     mockResolver.mockImplementation(() => {
-      throw new ApolloError("Bam Boom");
+      const zodSchema = z.object({ foo: z.number().min(0) });
+      // failing yup validation, foo should be positive
+      zodSchema.parse({ foo: -1 });
+    });
+    await request.post("/graphql").send({ query: "query { bim }" });
+    expect(captureExceptionSpy).not.toHaveBeenCalled();
+  });
+
+  it("should not report generic GraphQLError", async () => {
+    mockResolver.mockImplementation(() => {
+      throw new GraphQLError("Bam Boom");
     });
     await request.post("/graphql").send({ query: "query { bim }" });
     expect(captureExceptionSpy).not.toHaveBeenCalled();

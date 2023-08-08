@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -6,7 +5,10 @@ import { getCompanyOrCompanyNotFound } from "../../database";
 import { updateCompanyFn } from "./updateCompanyService";
 import { isForeignVat } from "../../../common/constants/companySearchHelpers";
 import { checkUserPermissions, Permission } from "../../../permissions";
-import { NotCompanyAdminErrorMsg } from "../../../common/errors";
+import {
+  NotCompanyAdminErrorMsg,
+  UserInputError
+} from "../../../common/errors";
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   parent,

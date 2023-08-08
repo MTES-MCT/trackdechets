@@ -5,6 +5,23 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.8.1] 08/08/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Permettre aux transporteurs monégasques avec un numéro de TVA commençant aussi par 'FR' d'être reconnus comme transporteurs étrangers pouvant s'inscrire sur Trackdéchets. [PR 2591](https://github.com/MTES-MCT/trackdechets/pull/2591)
+- Les brouillons des BSDD ne sont plus visibles par l'ensemble des acteurs du bordereau, mais uniquement par l'entreprise à l'origine de la création du bordereau. [PR 2600](https://github.com/MTES-MCT/trackdechets/pull/2600)
+
+#### :bug: Corrections de bugs
+- Correction d'un message d'erreur incompréhensible en l'absence des informations de contact entreprise sur le BSFF après avoir cliqué sur "Modifier" [PR 2601](https://github.com/MTES-MCT/trackdechets/pull/2601)
+- Correction de 'limpossibilité d'enlever la présence de POP sur les BSDDs via la révision [PR 2596](https://github.com/MTES-MCT/trackdechets/pull/2596)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :house: Interne
+
 # [2023.7.2] 25/07/2023
 
 #### :house: Interne

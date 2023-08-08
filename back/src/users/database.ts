@@ -5,11 +5,11 @@
 import prisma from "../prisma";
 
 import { User, UserRole, Prisma, Company } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
 import { deleteCachedUserRoles } from "../common/redis/users";
 import { hashPassword, passwordVersion } from "./utils";
+import { UserInputError } from "../common/errors";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.companyAssociation.findMany({

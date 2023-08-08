@@ -55,7 +55,8 @@ describe("Test Factories", () => {
     expect([...companyAssociations[0].company.companyTypes]).toMatchObject([
       "PRODUCER",
       "TRANSPORTER",
-      "WASTEPROCESSOR"
+      "WASTEPROCESSOR",
+      "WORKER"
     ]);
     expect(companyAssociations[0].company.siret).toBe(company.siret);
   });

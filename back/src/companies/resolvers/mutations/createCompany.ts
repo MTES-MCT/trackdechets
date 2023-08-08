@@ -1,5 +1,4 @@
 import { CompanyType, Prisma } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
 import { convertUrls } from "../../database";
 import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
@@ -27,6 +26,7 @@ import {
   addToGeocodeCompanyQueue,
   addToSetCompanyDepartementQueue
 } from "../../../queue/producers/company";
+import { UserInputError } from "../../../common/errors";
 
 /**
  * Create a new company and associate it to a user

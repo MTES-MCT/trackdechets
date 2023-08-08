@@ -1,5 +1,3 @@
-import { UserInputError } from "apollo-server-express";
-
 import prisma from "../../../prisma";
 
 import {
@@ -9,6 +7,7 @@ import {
 import { checkPasswordCriteria } from "../../utils";
 import { updateUserPassword } from "../../database";
 import { clearUserSessions } from "../../clearUserSessions";
+import { UserInputError } from "../../../common/errors";
 /**
  * Update user password in a password reset workflow
  *

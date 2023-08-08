@@ -1,10 +1,10 @@
-import { ForbiddenError, UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFormsRightFilter } from "../../database";
 import { getConnection } from "../../../common/pagination";
 import { getUserRoles } from "../../../permissions";
+import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 const PAGINATE_BY = 100;
 

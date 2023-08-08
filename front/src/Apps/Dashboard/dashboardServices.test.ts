@@ -36,7 +36,6 @@ import {
 
 import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 import {
-  FAIRE_SIGNER,
   PUBLIER,
   ROAD_CONTROL,
   SIGNATURE_ACCEPTATION_CONTENANT,
@@ -215,19 +214,22 @@ describe("dashboardServices", () => {
         name: "eco org",
         siret: "123456789",
       },
-      emitterType: EmitterType.Producer,
+      emitter: {},
+      emitterType: EmitterType.Appendix1Producer,
     } as BsdDisplay;
 
-    it("should return true if isAppendix1Producer is true and bsd.ecoOrganisme.siret is set", () => {
-      bsd.emitterType = EmitterType.Appendix1Producer;
+    it("should return true if bsd.ecoOrganisme.siret is set", () => {
       const result = canSkipEmission(bsd);
       expect(result).toBe(true);
     });
 
-    it("should return false if isAppendix1Producer is false", () => {
-      bsd.emitterType = EmitterType.Producer;
-      const result = canSkipEmission(bsd);
-      expect(result).toBe(false);
+    it("should return true if isPrivateIndividual is true", () => {
+      const bsdPrivateIndividual = {
+        ...bsd,
+        emitter: { isPrivateIndividual: true },
+      };
+      const result = canSkipEmission(bsdPrivateIndividual);
+      expect(result).toBe(true);
     });
 
     it("should return false if bsd.ecoOrganisme.siret is not set", () => {
@@ -405,7 +407,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(SIGNER);
     });
 
-    test("returns SIGNER for BSDD type with valid conditions", () => {
+    test("returns FAIRE_SIGNER for BSDD type with valid conditions", () => {
       bsd.emitterType = EmitterType.Producer;
       bsd.transporter!.company!.siret = "1234567890";
       bsd.emitter!.company!.siret = "1234567890";
@@ -422,7 +424,7 @@ describe("dashboardServices", () => {
       bsd.ecoOrganisme!.siret = "1234567899";
       const currentSiret = "1234567890";
       const result = getSealedBtnLabel(currentSiret, bsd);
-      expect(result).toEqual(FAIRE_SIGNER);
+      expect(result).toEqual(SIGNER);
     });
 
     test("returns SIGNER for Bsda", () => {

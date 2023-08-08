@@ -19,7 +19,7 @@ const workflow: Workflow = {
   `,
   companies: [
     { name: "producteur", companyTypes: ["PRODUCER"] },
-    { name: "worker", companyTypes: ["PRODUCER"] },
+    { name: "worker", companyTypes: ["PRODUCER", "WORKER"] },
     {
       name: "transporteur",
       companyTypes: ["TRANSPORTER"],

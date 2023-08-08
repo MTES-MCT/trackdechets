@@ -167,12 +167,6 @@ const hasSameEmitterTransporterAndEcoOrgSiret = (
     bsd.transporter?.company?.siret,
   ].includes(siret);
 };
-const hasEmmiterAndEcoOrganismeSiret = (
-  bsd: BsdDisplay,
-  siret: string
-): boolean => {
-  return [bsd.emitter?.company?.siret, bsd.ecoOrganisme?.siret].includes(siret);
-};
 
 const isSameSiretEmmiter = (currentSiret: string, bsd: BsdDisplay): boolean =>
   currentSiret === bsd.emitter?.company?.siret;
@@ -344,7 +338,7 @@ const isAppendix1Producer = (bsd: BsdDisplay): boolean =>
   bsd.emitterType === EmitterType.Appendix1Producer;
 
 export const canSkipEmission = (bsd: BsdDisplay): boolean =>
-  isAppendix1Producer(bsd) && Boolean(bsd.ecoOrganisme?.siret);
+  Boolean(bsd.ecoOrganisme?.siret) || Boolean(bsd.emitter?.isPrivateIndividual);
 
 export const isSignTransportAndCanSkipEmission = (
   currentSiret: string,
@@ -365,27 +359,28 @@ const isSignEmitterPrivateIndividual = (
 
 export const getSealedBtnLabel = (
   currentSiret: string,
-  bsd: BsdDisplay
+  bsd: BsdDisplay,
+  hasAutomaticSignature?: boolean
 ): string => {
   if (isBsdd(bsd.type)) {
-    if (!isAppendix1(bsd)) {
-      if (isAppendix1Producer(bsd)) {
-        if (isSignTransportAndCanSkipEmission(currentSiret, bsd)) {
-          return SIGNER;
-        } else {
-          if (isSignEmitterPrivateIndividual(currentSiret, bsd)) {
-            return FAIRE_SIGNER;
-          }
-        }
+    if (isAppendix1(bsd)) {
+      return "";
+    }
+
+    if (isAppendix1Producer(bsd)) {
+      if (
+        hasAutomaticSignature ||
+        isSignTransportAndCanSkipEmission(currentSiret, bsd)
+      ) {
+        return SIGNER;
       } else {
-        if (hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
-          if (hasEmmiterAndEcoOrganismeSiret(bsd, currentSiret)) {
-            return SIGNER;
-          } else {
-            return FAIRE_SIGNER;
-          }
+        if (isSignEmitterPrivateIndividual(currentSiret, bsd)) {
+          return SIGNER;
         }
       }
+    }
+    if (hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
+      return SIGNER;
     }
   }
   if (isBsda(bsd.type) || isBsff(bsd.type) || isBsvhu(bsd.type)) {
@@ -670,14 +665,15 @@ export const canDeleteReview = (bsd: BsdDisplay, currentSiret: string) => {
 export const getPrimaryActionsLabelFromBsdStatus = (
   bsd: BsdDisplay,
   currentSiret: string,
-  bsdCurrentTab?: BsdCurrentTab
+  bsdCurrentTab?: BsdCurrentTab,
+  hasAutomaticSignature?: boolean
 ) => {
   switch (bsd.status) {
     case BsdStatusCode.Draft:
     case BsdStatusCode.Initial:
       return getDraftOrInitialBtnLabel(currentSiret, bsd, bsdCurrentTab!);
     case BsdStatusCode.Sealed:
-      return getSealedBtnLabel(currentSiret, bsd);
+      return getSealedBtnLabel(currentSiret, bsd, hasAutomaticSignature);
 
     case BsdStatusCode.Sent:
       return getSentBtnLabel(currentSiret, bsd, bsdCurrentTab!);

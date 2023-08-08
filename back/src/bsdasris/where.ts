@@ -15,9 +15,9 @@ const toPrismaGroupableFilter = (groupable?: boolean | null) => {
 
   if (!!groupable) {
     return {
-      grouping: { none: {} },
+      groupingEmitterSirets: { isEmpty: true },
       groupedInId: null,
-      synthesizing: { none: {} },
+      synthesisEmitterSirets: { isEmpty: true },
       synthesizedInId: null,
       type: BsdasriType.SIMPLE
     };
@@ -27,9 +27,9 @@ const toPrismaGroupableFilter = (groupable?: boolean | null) => {
   if (groupable === false) {
     return {
       OR: [
-        { grouping: { some: {} } },
+        { groupingEmitterSirets: { isEmpty: false } },
         { groupedInId: { not: null } },
-        { synthesizing: { some: {} } },
+        { synthesisEmitterSirets: { isEmpty: false } },
         { synthesizedInId: { not: null } },
         { type: { not: BsdasriType.SIMPLE } }
       ]

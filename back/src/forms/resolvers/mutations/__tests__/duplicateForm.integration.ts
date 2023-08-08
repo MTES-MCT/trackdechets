@@ -290,6 +290,7 @@ describe("Mutation.duplicateForm", () => {
       "recipientsSirets",
       "transportersSirets",
       "intermediariesSirets",
+      "canAccessDraftSirets",
       "forwardedIn"
     ];
 
@@ -593,6 +594,7 @@ describe("Mutation.duplicateForm", () => {
       "recipientsSirets",
       "transportersSirets",
       "intermediariesSirets",
+      "canAccessDraftSirets",
       "brokerCompanyAddress",
       "brokerCompanyContact",
       "brokerCompanyMail",

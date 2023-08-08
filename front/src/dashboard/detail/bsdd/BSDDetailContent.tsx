@@ -68,7 +68,7 @@ import {
 } from "generated/constants/companySearchHelpers";
 import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
 import { useQuery } from "@apollo/client";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "form/common/components/company/query";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
 import { formTransportIsPipeline } from "form/bsdd/utils/packagings";
 
 type CompanyProps = {
@@ -104,9 +104,39 @@ const TransportSegmentDetail = ({ segment, siret }: SegmentProps) => {
     <>
       <div className={styles.detailGrid}>
         <Company label={label} company={segment?.transporter?.company} />
+      </div>
+
+      <div className={styles.detailGrid}>
+        <YesNoRow
+          value={segment?.transporter?.isExemptedOfReceipt}
+          label="Exemption de récépissé"
+        />
+        {!segment?.transporter?.isExemptedOfReceipt && (
+          <>
+            <DetailRow
+              value={segment?.transporter?.receipt}
+              label="Numéro de récépissé"
+              showEmpty={true}
+            />
+            <DetailRow
+              value={segment?.transporter?.department}
+              label="Département"
+              showEmpty={true}
+            />
+            <DateRow
+              value={segment?.transporter?.validityLimit}
+              label="Date de validité"
+            />
+          </>
+        )}
+        <DetailRow
+          value={segment?.transporter?.numberPlate}
+          label="Immatriculation"
+        />
 
         <DateRow value={segment?.takenOverAt} label="Pris en charge le" />
         <DetailRow value={segment?.takenOverBy} label="Pris en charge par" />
+
         <DetailRow
           value={getTransportModeLabel(segment?.mode)}
           label="Mode de transport"
@@ -650,8 +680,8 @@ export default function BSDDetailContent({
                         pn.prefix,
                         pn.section,
                         pn.number,
-                        pn.x,
-                        pn.y,
+                        pn.x ? `${pn.x}°` : null,
+                        pn.y ? `${pn.y}°` : null,
                       ]
                         .filter(Boolean)
                         .join("/")}`

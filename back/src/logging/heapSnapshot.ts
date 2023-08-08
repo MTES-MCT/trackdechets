@@ -2,6 +2,45 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { createWriteStream } from "fs";
 import v8 from "v8";
+import Inspector from "inspector-api";
+
+const inspector = new Inspector({
+  storage: {
+    type: "s3",
+    bucket: process.env.S3_BUCKET,
+    dir: "inspector"
+  },
+  aws: {
+    endpoint: process.env.S3_ENDPOINT,
+    region: process.env.S3_REGION,
+    credentials: {
+      accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!
+    }
+  }
+});
+
+const DURATION = process.env.INSPECTOR_DURATION
+  ? parseInt(process.env.INSPECTOR_DURATION, 10)
+  : 30000;
+
+export async function cpuProfiling() {
+  await inspector.profiler.enable();
+  await inspector.profiler.start();
+
+  setTimeout(async () => {
+    await inspector.profiler.stop();
+  }, DURATION);
+}
+
+export async function memorySampling() {
+  await inspector.heap.enable();
+  await inspector.heap.startSampling();
+
+  setTimeout(async () => {
+    await inspector.heap.stopSampling();
+  }, DURATION);
+}
 
 export async function heapSnapshotToS3Router() {
   // It's important that the filename end with `.heapsnapshot`,

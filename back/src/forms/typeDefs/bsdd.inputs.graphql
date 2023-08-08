@@ -649,9 +649,9 @@ input ParcelNumberInput {
   section: String
   "Numéro de parcelle cadastrale"
   number: String
-  "Coordonnée X au format Lambert II, à utiliser uniquement en cas de domaine non cadastré"
+  "Coordonnée X au format WGS 84, à utiliser uniquement en cas de domaine non cadastré"
   x: Float
-  "Coordonnée Y au format Lambert II, à utiliser uniquement en cas de domaine non cadastré"
+  "Coordonnée Y au format WGS 84, à utiliser uniquement en cas de domaine non cadastré"
   y: Float
 }
 

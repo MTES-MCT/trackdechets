@@ -20,13 +20,13 @@ import {
   hasPipeline,
   validateGroupement
 } from "../../validation";
-import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
 import { validateIntermediariesInput } from "../../../common/validation";
 import { sirenifyFormInput } from "../../sirenify";
 import { recipifyFormInput } from "../../recipify";
 import { checkCanCreate } from "../../permissions";
+import { UserInputError } from "../../../common/errors";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],

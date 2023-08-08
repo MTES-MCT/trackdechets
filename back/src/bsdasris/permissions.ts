@@ -1,7 +1,7 @@
 import { Bsdasri, BsdasriStatus, User } from "@prisma/client";
 import { BsdasriInput } from "../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../permissions";
-import { ForbiddenError, UserInputError } from "apollo-server-core";
+import { ForbiddenError, UserInputError } from "../common/errors";
 
 /**
  * Retrieves organisations allowed to read a BSDASRI

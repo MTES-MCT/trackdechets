@@ -1,10 +1,10 @@
 import { RevisionRequestStatus } from "@prisma/client";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationCancelFormRevisionRequestArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getFormRepository } from "../../repository";
+import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 export default async function cancelFormRevisionRequest(
   _,

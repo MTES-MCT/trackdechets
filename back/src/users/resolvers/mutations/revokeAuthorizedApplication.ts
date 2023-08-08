@@ -3,7 +3,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import prisma from "../../../prisma";
 import { getApplicationOrApplicationNotFound } from "../../../applications/database";
-import { UserInputError } from "apollo-server-core";
+import { UserInputError } from "../../../common/errors";
 
 const revokeAuthorizedApplicationResolver: MutationResolvers["revokeAuthorizedApplication"] =
   async (_parent, { id }, context) => {

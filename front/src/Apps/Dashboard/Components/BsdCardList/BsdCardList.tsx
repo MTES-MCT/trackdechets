@@ -49,6 +49,7 @@ function BsdCardList({
   siret,
   bsds,
   bsdCurrentTab,
+  siretsWithAutomaticSignature,
 }: BsdCardListProps): JSX.Element {
   const history = useHistory();
   const location = useLocation();
@@ -78,10 +79,14 @@ function BsdCardList({
 
   const [isModalOpen, setIsModalOpen] = useState(true);
 
+  const [hasEmitterSignSecondaryCta, setHasEmitterSignSecondaryCta] =
+    useState(false);
+
   const onClose = () => {
     setIsModalOpen(false);
     setBsdClicked(undefined);
     setValidationWorkflowType("");
+    setHasEmitterSignSecondaryCta(false);
   };
 
   const handleDraftValidation = useCallback(
@@ -228,15 +233,16 @@ function BsdCardList({
       if (isReviewsTab) {
         handleReviewsValidation(bsd, siret);
       } else {
-        if (bsd.status === FormStatus.Draft || bsd["isDraft"]) {
+        const status =
+          bsd.status ||
+          bsd["bsdaStatus"] ||
+          bsd["bsffStatus"] ||
+          bsd["bsdasriStatus"] ||
+          bsd["bsvhuStatus"];
+        if (status === FormStatus.Draft || bsd["isDraft"]) {
           handleDraftValidation(bsd as Bsd);
         } else {
-          if (
-            hasRoadControlButton(
-              { status: bsd.status } as BsdDisplay,
-              isCollectedTab
-            )
-          ) {
+          if (hasRoadControlButton({ status } as BsdDisplay, isCollectedTab)) {
             const path = routes.dashboardv2.roadControl;
             redirectToPath(path, bsd.id);
           } else {
@@ -340,6 +346,13 @@ function BsdCardList({
     [redirectToPath]
   );
 
+  const onEmitterBsddSign = useCallback((bsd: BsdDisplay) => {
+    setValidationWorkflowType("ACT_BSDD");
+    setBsdClicked(bsd);
+    setIsModalOpen(true);
+    setHasEmitterSignSecondaryCta(true);
+  }, []);
+
   return (
     <>
       <ul className="bsd-card-list">
@@ -360,6 +373,9 @@ function BsdCardList({
             newBsddNode.review = reviewBsdd;
             bsdNode = { ...newBsddNode, ...newBsdaNode };
           }
+          const hasAutomaticSignature = siretsWithAutomaticSignature?.includes(
+            bsdNode?.emitter?.company?.siret
+          );
 
           return (
             <li
@@ -380,7 +396,9 @@ function BsdCardList({
                   onAppendix1,
                   onDeleteReview,
                   onEmitterDasriSign,
+                  onEmitterBsddSign,
                 }}
+                hasAutomaticSignature={hasAutomaticSignature}
               />
             </li>
           );
@@ -402,6 +420,10 @@ function BsdCardList({
           currentSiret={siret}
           isOpen={isModalOpen}
           onClose={onClose}
+          hasEmitterSignSecondaryCta={hasEmitterSignSecondaryCta}
+          hasAutomaticSignature={siretsWithAutomaticSignature?.includes(
+            bsdClicked?.emitter?.company?.siret
+          )}
         />
       )}
       {validationWorkflowType === "ACT_BSD_SUITE" && (

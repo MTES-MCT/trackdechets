@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 
 import { sendMail } from "../../../mailer/mailing";
@@ -10,6 +9,7 @@ import { convertUrls, getCompanyActiveUsers } from "../../database";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { securityCodeRenewal } from "../../../mailer/templates";
 import { isSiret, isVat } from "../../../common/constants/companySearchHelpers";
+import { UserInputError } from "../../../common/errors";
 
 /**
  * This function is used to renew the security code

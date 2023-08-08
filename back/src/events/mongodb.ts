@@ -20,23 +20,17 @@ export async function closeMongoClient() {
   return mongodbClient.close();
 }
 
-export async function getStreamEvents(streamId: string, lte?: Date) {
-  const documents = await eventsCollection
+export const getStreamEvents = (streamId: string, lte?: Date) =>
+  eventsCollection
     .find({ streamId, ...(lte && { createdAt: { $lte: lte } }) })
-    .toArray();
+    .stream();
 
-  return documents;
-}
-
-export async function getStreamsEvents(streamIds: string[]) {
-  const documents = await eventsCollection
+export const getStreamsEvents = (streamIds: string[]) =>
+  eventsCollection
     .find({
       streamId: { $in: streamIds }
     })
-    .toArray();
-
-  return documents;
-}
+    .stream();
 
 export async function insertStreamEvents(tdEvents: Event[]) {
   try {

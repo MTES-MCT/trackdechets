@@ -12,15 +12,30 @@ import {
   dropdown_create_bsdd,
   dropdown_create_bsff,
   dropdown_create_bsvhu,
+  filter_acceptation_sign_date,
+  filter_broker_siret,
   filter_bsd_number,
   filter_bsd_type,
   filter_chantier_adress,
   filter_chantier_name,
   filter_contenant_number,
+  filter_emitter_name,
+  filter_emitter_sign_date,
+  filter_fiche_intervention_numbers,
   filter_free_text,
   filter_immat_number,
+  filter_next_destination_siret,
+  filter_operation_sign_date,
+  filter_reception_sign_date,
+  filter_seal_numbers,
   filter_siret,
+  filter_siret_productor_address,
+  filter_trader_siret,
+  filter_transporter_sign_date,
+  filter_tva_intra,
   filter_waste_code,
+  filter_worker_operation_code,
+  filter_worker_sign_date,
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { BsdType, BsdWhere } from "../../generated/graphql/types";
 import { Filter, FilterType } from "../common/Components/Filters/filtersTypes";
@@ -67,6 +82,21 @@ enum FilterName {
   packagingNumbers = "packagingNumbers",
   pickupSiteName = "name",
   pickupSiteAddress = "address",
+  emitterSignDate = "emitterSignDate",
+  workerSignDate = "workerSignDate",
+  operationCode = "code",
+  transporterTransportSignDate = "takenOverAt",
+  destinationReceptionDate = "destinationReceptionDate",
+  destinationAcceptationDate = "destinationAcceptationDate",
+  destinationOperationSignDate = "destinationOperationSignDate",
+  siretProductorAddress = "siretProductorAddress",
+  tvaIntra = "vatNumber",
+  nextDestinationSiret = "nextDestinationSiret",
+  traderSiret = "traderSiret",
+  brokerSiret = "brokerSiret",
+  givenName = "givenName",
+  sealNumbers = "sealNumbers",
+  ficheInterventionNumbers = "ficheInterventionNumbers",
 }
 
 export const filterList: Filter[] = [
@@ -126,6 +156,96 @@ export const filterList: Filter[] = [
     type: FilterType.input,
     isActive: true,
   },
+  {
+    name: FilterName.operationCode,
+    label: filter_worker_operation_code,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.siretProductorAddress,
+    label: filter_siret_productor_address,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.tvaIntra,
+    label: filter_tva_intra,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.nextDestinationSiret,
+    label: filter_next_destination_siret,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.traderSiret,
+    label: filter_trader_siret,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.brokerSiret,
+    label: filter_broker_siret,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.givenName,
+    label: filter_emitter_name,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.sealNumbers,
+    label: filter_seal_numbers,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.ficheInterventionNumbers,
+    label: filter_fiche_intervention_numbers,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.emitterSignDate,
+    label: filter_emitter_sign_date,
+    type: FilterType.date,
+    isActive: true,
+  },
+  {
+    name: FilterName.workerSignDate,
+    label: filter_worker_sign_date,
+    type: FilterType.date,
+    isActive: true,
+  },
+  {
+    name: FilterName.transporterTransportSignDate,
+    label: filter_transporter_sign_date,
+    type: FilterType.date,
+    isActive: true,
+  },
+  {
+    name: FilterName.destinationReceptionDate,
+    label: filter_reception_sign_date,
+    type: FilterType.date,
+    isActive: true,
+  },
+  {
+    name: FilterName.destinationAcceptationDate,
+    label: filter_acceptation_sign_date,
+    type: FilterType.date,
+    isActive: true,
+  },
+  {
+    name: FilterName.destinationOperationSignDate,
+    label: filter_operation_sign_date,
+    type: FilterType.date,
+    isActive: true,
+  },
 ];
 
 export const filterPredicates: {
@@ -162,7 +282,7 @@ export const filterPredicates: {
   },
   {
     filterName: FilterName.sirets,
-    where: value => ({ sirets: { _has: value } }),
+    where: value => ({ sirets: { _itemContains: value } }),
     order: "sirets",
   },
   {
@@ -179,6 +299,151 @@ export const filterPredicates: {
     filterName: FilterName.pickupSiteAddress,
     where: value => ({
       emitter: { pickupSite: { address: { _match: value } } },
+    }),
+    order: "address",
+  },
+  {
+    filterName: FilterName.tvaIntra,
+    where: value => ({
+      destination: {
+        operation: {
+          nextDestination: { company: { vatNumber: { _contains: value } } },
+        },
+      },
+    }),
+    order: "vatNumber",
+  },
+  {
+    filterName: FilterName.traderSiret,
+    where: value => ({
+      trader: {
+        company: {
+          siret: { _contains: value },
+        },
+      },
+    }),
+    order: "siret",
+  },
+  {
+    filterName: FilterName.brokerSiret,
+    where: value => ({
+      broker: {
+        company: {
+          siret: { _contains: value },
+        },
+      },
+    }),
+    order: "siret",
+  },
+  {
+    filterName: FilterName.givenName,
+    where: value => ({
+      emitter: {
+        company: {
+          name: { _match: value },
+        },
+      },
+    }),
+    order: "name",
+  },
+  {
+    filterName: FilterName.sealNumbers,
+    where: value => ({
+      sealNumbers: {
+        _itemContains: value,
+      },
+    }),
+    order: "sealNumbers",
+  },
+  {
+    filterName: FilterName.ficheInterventionNumbers,
+    where: value => ({
+      ficheInterventionNumbers: {
+        _itemContains: value,
+      },
+    }),
+    order: "sealNumbers",
+  },
+  {
+    filterName: FilterName.nextDestinationSiret,
+    where: value => ({
+      destination: {
+        operation: {
+          nextDestination: { company: { siret: { _contains: value } } },
+        },
+      },
+    }),
+    order: "siret",
+  },
+  {
+    filterName: FilterName.operationCode,
+    where: value => ({
+      destination: { operation: { code: { _contains: value } } },
+    }),
+    order: "code",
+  },
+  {
+    filterName: FilterName.emitterSignDate,
+    where: value => ({
+      emitter: {
+        emission: { date: { _lte: value.startDate, _gte: value.endDate } },
+      },
+    }),
+    order: "date",
+  },
+  {
+    filterName: FilterName.workerSignDate,
+    where: value => ({
+      worker: {
+        work: { date: { _lte: value.startDate, _gte: value.endDate } },
+      },
+    }),
+    order: "date",
+  },
+  {
+    filterName: FilterName.transporterTransportSignDate,
+    where: value => ({
+      transporter: {
+        transport: {
+          takenOverAt: { _lte: value.startDate, _gte: value.endDate },
+        },
+      },
+    }),
+    order: "takenOverAt",
+  },
+  {
+    filterName: FilterName.destinationReceptionDate,
+    where: value => ({
+      destination: {
+        reception: { date: { _lte: value.startDate, _gte: value.endDate } },
+      },
+    }),
+    order: "date",
+  },
+  {
+    filterName: FilterName.destinationAcceptationDate,
+    where: value => ({
+      destination: {
+        acceptation: { date: { _lte: value.startDate, _gte: value.endDate } },
+      },
+    }),
+    order: "date",
+  },
+  {
+    filterName: FilterName.destinationOperationSignDate,
+    where: value => ({
+      destination: {
+        operation: { date: { _lte: value.startDate, _gte: value.endDate } },
+      },
+    }),
+    order: "date",
+  },
+  {
+    filterName: FilterName.siretProductorAddress,
+    where: value => ({
+      emitter: {
+        company: { address: { _match: value } },
+      },
     }),
     order: "address",
   },

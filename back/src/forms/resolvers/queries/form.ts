@@ -3,11 +3,11 @@ import {
   QueryFormArgs
 } from "../../../generated/graphql/types";
 import { expandFormFromDb } from "../../converter";
-import { UserInputError } from "apollo-server-express";
 import { MissingIdOrReadableId } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanRead } from "../../permissions";
 import { getFormOrFormNotFound } from "../../database";
+import { UserInputError } from "../../../common/errors";
 
 function validateArgs(args: QueryFormArgs) {
   if (args.id == null && args.readableId == null) {
