@@ -5,7 +5,7 @@ import { getUserCompanies } from "../../src/users/database";
 @registerUpdater(
   "Init BSDD draft canAccessDraft field",
   "Drafts are now only visible to their creators companies.",
-  true
+  false
 )
 export class InitBsddCanAccessDraft implements Updater {
   async run() {
