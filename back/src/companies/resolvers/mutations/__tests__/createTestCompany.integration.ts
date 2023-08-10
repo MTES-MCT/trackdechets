@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express";
+import gql from 'graphql-tag';
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Mutation } from "../../../../generated/graphql/types";
 import { userFactory } from "../../../../__tests__/factories";

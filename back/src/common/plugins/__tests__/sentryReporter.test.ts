@@ -1,4 +1,5 @@
-import { ApolloServer, gql } from "apollo-server-express";
+import { ApolloServer } from "apollo-server-express";
+import gql from "graphql-tag";
 import express from "express";
 import * as Sentry from "@sentry/node";
 import supertest from "supertest";

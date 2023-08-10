@@ -1,6 +1,7 @@
 import express from "express";
 import supertest from "supertest";
-import { ApolloServer, gql } from "apollo-server-express";
+import { ApolloServer } from "apollo-server-express";
+import gql from "graphql-tag";
 import { graphqlQueryMergingLimiter } from "../graphqlQueryMergingLimiter";
 import { ErrorCode } from "../../errors";
 import { MAX_OPERATIONS_PER_REQUEST } from "../graphqlBatchLimiter";

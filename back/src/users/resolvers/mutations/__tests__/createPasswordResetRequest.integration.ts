@@ -8,7 +8,7 @@ import { createPasswordResetRequest } from "../../../../mailer/templates";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { addMinutes } from "date-fns";
 import { setCaptchaToken } from "../../../../common/redis/captcha";
-import { gql } from "apollo-server-express";
+import gql from 'graphql-tag';
 
 // Mails spy
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");

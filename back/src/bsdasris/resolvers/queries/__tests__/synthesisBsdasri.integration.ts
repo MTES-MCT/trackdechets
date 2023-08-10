@@ -12,7 +12,7 @@ import {
 } from "../../../__tests__/factories";
 import { Query } from "../../../../generated/graphql/types";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
-import { gql } from "apollo-server-express";
+import gql from 'graphql-tag';
 import { BsdasriType } from "@prisma/client";
 
 const GET_BSDASRIS = gql`

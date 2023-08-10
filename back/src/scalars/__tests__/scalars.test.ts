@@ -1,4 +1,5 @@
-import { ApolloServer, gql } from "apollo-server-express";
+import { ApolloServer } from "apollo-server-express";
+import gql from "graphql-tag";
 import { format } from "date-fns";
 import scalars from "..";
 import { UserInputError } from "../../common/errors";

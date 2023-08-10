@@ -11,7 +11,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
-import { gql } from "apollo-server-express";
+import gql from 'graphql-tag';
 import prisma from "../../../../prisma";
 import * as sirenify from "../../../sirenify";
 

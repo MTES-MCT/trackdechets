@@ -1,5 +1,5 @@
 import { UserRole } from "@prisma/client";
-import { gql } from "apollo-server-core";
+import gql from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Query,

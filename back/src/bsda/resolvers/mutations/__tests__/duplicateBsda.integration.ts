@@ -2,7 +2,7 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
-import { gql } from "apollo-server-core";
+import gql from "graphql-tag";
 import { Prisma } from "@prisma/client";
 import prisma from "../../../../prisma";
 import { xDaysAgo } from "../../../../commands/onboarding.helpers";

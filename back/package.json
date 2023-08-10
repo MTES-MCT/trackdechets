@@ -101,6 +101,7 @@
     "graphql": "^16.6.0",
     "graphql-depth-limit": "^1.1.0",
     "graphql-scalars": "^1.20.4",
+    "graphql-tag": "^2.12.6",
     "graylog2": "^0.2.1",
     "helmet": "^6.2.0",
     "inspector-api": "^1.4.7",

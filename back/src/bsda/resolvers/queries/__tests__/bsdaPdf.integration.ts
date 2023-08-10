@@ -8,7 +8,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { bsdaFactory } from "../../../__tests__/factories";
 import { Query } from "../../../../generated/graphql/types";
 
-import { gql } from "apollo-server-express";
+import gql from 'graphql-tag';
 
 const BSDA_PDF = gql`
   query BsdaPdf($id: ID!) {

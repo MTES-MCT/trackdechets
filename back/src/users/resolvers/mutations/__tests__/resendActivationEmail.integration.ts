@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express";
+import gql from 'graphql-tag';
 import prisma from "../../../../prisma";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
