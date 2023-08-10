@@ -301,7 +301,7 @@ describe("Mutation.createCompany", () => {
     });
 
     expect(data).toBeNull();
-    expect(errors[0].extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toBe(ErrorCode.BAD_USER_INPUT);
   });
 
   it("should return an error when creating an unknown eco-organisme", async () => {

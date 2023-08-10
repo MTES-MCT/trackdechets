@@ -96,7 +96,7 @@ describe("query { formsRegister }", () => {
       }
     `);
     expect(errors).toHaveLength(1);
-    expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.FORBIDDEN);
   });
 
   // Test CSV export for different exportType

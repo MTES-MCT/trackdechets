@@ -1,10 +1,12 @@
-import express from "express";
+import express, { json } from "express";
 import supertest from "supertest";
-import { ApolloServer } from "apollo-server-express";
+import { ApolloServer } from "@apollo/server";
 import gql from "graphql-tag";
 import { graphqlQueryMergingLimiter } from "../graphqlQueryMergingLimiter";
 import { ErrorCode } from "../../errors";
 import { MAX_OPERATIONS_PER_REQUEST } from "../graphqlBatchLimiter";
+import cors from "cors";
+import { expressMiddleware } from "@apollo/server/express4";
 
 const graphQLPath = "/gql";
 
@@ -69,16 +71,17 @@ describe("graphqlQueryMergingLimiter Apollo Plugin", () => {
 
     await server.start();
 
-    server.applyMiddleware({
-      app,
-      cors: {
+    app.use(
+      graphQLPath,
+      cors({
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         preflightContinue: false,
         optionsSuccessStatus: 204,
         credentials: true
-      },
-      path: graphQLPath
-    });
+      }),
+      json(),
+      expressMiddleware(server)
+    );
 
     request = supertest(app);
   });

@@ -1,6 +1,7 @@
-import { ApolloServer } from "apollo-server-express";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
 import gql from "graphql-tag";
-import express from "express";
+import express, { json } from "express";
 import * as Sentry from "@sentry/node";
 import supertest from "supertest";
 import * as yup from "yup";
@@ -12,6 +13,7 @@ import {
   UserInputError
 } from "../../errors";
 import { GraphQLError } from "graphql";
+import cors from "cors";
 
 const captureExceptionSpy = jest.spyOn(Sentry, "captureException");
 const mockResolver = jest.fn();
@@ -47,16 +49,17 @@ describe("graphqlErrorHandler", () => {
 
     await server.start();
 
-    server.applyMiddleware({
-      app,
-      cors: {
+    app.use(
+      "/graphql",
+      cors({
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         preflightContinue: false,
         optionsSuccessStatus: 204,
         credentials: true
-      },
-      path: "/graphql"
-    });
+      }),
+      json(),
+      expressMiddleware(server)
+    );
 
     request = supertest(app);
   });

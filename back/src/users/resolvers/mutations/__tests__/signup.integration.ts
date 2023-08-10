@@ -1,16 +1,12 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  createTestClient,
-  TestQuery
-} from "../../../../__tests__/apollo-integration-testing";
 import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
 import * as mailsHelper from "../../../../mailer/mailing";
-import { server } from "../../../../server";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { onSignup } from "../../../../mailer/templates";
 import { Mutation } from "../../../../generated/graphql/types";
+import makeClient from "../../../../__tests__/testClient";
 
 const viablePassword = "trackdechets#";
 
@@ -29,11 +25,9 @@ const SIGNUP = `
 `;
 
 describe("Mutation.signup", () => {
-  let mutate: TestQuery;
+  let mutate: ReturnType<typeof makeClient>["mutate"];
   beforeAll(() => {
-    const testClient = createTestClient({
-      apolloServer: server
-    });
+    const testClient = makeClient();
     mutate = testClient.mutate;
   });
 
@@ -93,7 +87,7 @@ describe("Mutation.signup", () => {
         }
       }
     });
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
   it("should throw BAD_USER_INPUT if email already exist regarldess of the email casing", async () => {
@@ -109,7 +103,7 @@ describe("Mutation.signup", () => {
         }
       }
     });
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
   it("should throw BAD_USER_INPUT if email is not valid", async () => {
@@ -130,7 +124,7 @@ describe("Mutation.signup", () => {
         }
       }
     });
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
   it("should throw BAD_USER_INPUT if password is less than 10 characters long", async () => {
@@ -150,7 +144,7 @@ describe("Mutation.signup", () => {
         }
       }
     });
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
   it("should throw BAD_USER_INPUT if password is not complex enough", async () => {
@@ -170,7 +164,7 @@ describe("Mutation.signup", () => {
         }
       }
     });
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
   it("should throw BAD_USER_INPUT if password is to long", async () => {
@@ -191,7 +185,7 @@ describe("Mutation.signup", () => {
         }
       }
     });
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
   it("should throw BAD_USER_INPUT if name contains unsafe SSTI chars", async () => {

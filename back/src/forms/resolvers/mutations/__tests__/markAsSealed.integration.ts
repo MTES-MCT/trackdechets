@@ -328,7 +328,7 @@ describe("Mutation.markAsSealed", () => {
         id: form.id
       }
     });
-    expect(errors[0].extensions.code).toBe("FORBIDDEN");
+    expect(errors[0].extensions?.code).toBe("FORBIDDEN");
 
     const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }

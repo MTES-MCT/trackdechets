@@ -1,6 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
-import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
 import { companyFactory, siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as sirene from "../../../search";
@@ -8,7 +7,7 @@ import * as sirene from "../../../search";
 const searchCompanySpy = jest.spyOn(sirene, "searchCompanies");
 
 describe("query { searchCompanies(clue, department) }", () => {
-  let query: TestQuery;
+  let query: ReturnType<typeof makeClient>["query"];
   beforeAll(() => {
     const client = makeClient(null);
     query = client.query;

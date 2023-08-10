@@ -42,7 +42,7 @@ describe("mutation resetPassword", () => {
         variables: { hash: "abcdef", newPassword: newPassword }
       }
     );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
   it("should deny weak short password", async () => {
@@ -65,7 +65,7 @@ describe("mutation resetPassword", () => {
         variables: { hash: "abcdef", newPassword }
       }
     );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
   it("should deny long short password", async () => {
@@ -89,7 +89,7 @@ describe("mutation resetPassword", () => {
         variables: { hash: "abcdef", newPassword }
       }
     );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
   it("should reset user password", async () => {

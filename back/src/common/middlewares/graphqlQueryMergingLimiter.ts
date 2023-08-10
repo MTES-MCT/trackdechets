@@ -1,7 +1,4 @@
-import {
-  ApolloServerPlugin,
-  GraphQLRequestContext
-} from "apollo-server-plugin-base";
+import { ApolloServerPlugin, GraphQLRequestContext } from "@apollo/server";
 import { GraphQLError, Kind, OperationDefinitionNode } from "graphql";
 import { MAX_OPERATIONS_PER_REQUEST } from "./graphqlBatchLimiter";
 import { ErrorCode } from "../errors";
@@ -18,9 +15,9 @@ export class GraphqlQueryLimit extends GraphQLError {
 
 export function graphqlQueryMergingLimiter(): ApolloServerPlugin {
   return {
-    async requestDidStart(_: GraphQLRequestContext) {
+    async requestDidStart(_: GraphQLRequestContext<any>) {
       return {
-        async didResolveOperation(requestContext: GraphQLRequestContext) {
+        async didResolveOperation(requestContext: GraphQLRequestContext<any>) {
           const operationsDefinitions =
             requestContext?.document?.definitions.filter(
               definition => definition.kind === Kind.OPERATION_DEFINITION

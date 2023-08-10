@@ -137,7 +137,7 @@ describe("Mutation markAsResent", () => {
     expect(errors[0].message).toEqual(
       "Destinataire: Le siret de l'entreprise est obligatoire"
     );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
     const resealedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
