@@ -1,6 +1,6 @@
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 import express, { json } from "express";
 import * as Sentry from "@sentry/node";
 import supertest from "supertest";

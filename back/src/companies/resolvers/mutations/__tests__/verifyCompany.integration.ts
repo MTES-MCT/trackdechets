@@ -3,7 +3,7 @@ import {
   CompanyVerificationStatus,
   UserRole
 } from "@prisma/client";
-import gql from 'graphql-tag';
+import { gql } from "graphql-tag";
 import { AuthType } from "../../../../auth";
 import prisma from "../../../../prisma";
 import {

@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 import { xDaysAgo } from "../../../../commands/onboarding.helpers";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {

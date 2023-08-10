@@ -10,7 +10,7 @@ import { bsdasriFactory } from "../../../__tests__/factories";
 import { BsdasriStatus } from "@prisma/client";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
-import gql from 'graphql-tag';
+import { gql } from "graphql-tag";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 
 const CREATE_DASRI = gql`

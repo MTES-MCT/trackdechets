@@ -1,5 +1,5 @@
 import { WasteAcceptationStatus } from "@prisma/client";
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 import {
   Mutation,
   MutationUpdateBsffPackagingArgs

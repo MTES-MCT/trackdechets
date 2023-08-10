@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 import { Request, Response, NextFunction } from "express";
 import { DefinitionNode, FieldNode, OperationTypeNode } from "graphql";
 

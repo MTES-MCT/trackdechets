@@ -1,5 +1,5 @@
 import { BsffPackagingType, BsffType, UserRole } from "@prisma/client";
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "../../../../common/constants";
 import {

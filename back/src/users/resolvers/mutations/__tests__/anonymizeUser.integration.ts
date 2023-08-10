@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from "graphql-tag";
 import supertest from "supertest";
 import * as utils from "../../../../utils";
 import { resetDatabase } from "../../../../../integration-tests/helper";

@@ -16,7 +16,7 @@ import {
   Mutation,
   MutationMarkAsResealedArgs
 } from "../../../../generated/graphql/types";
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 import * as sirenify from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
 

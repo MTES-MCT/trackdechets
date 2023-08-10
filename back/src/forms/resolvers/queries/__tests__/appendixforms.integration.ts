@@ -7,7 +7,7 @@ import {
 } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 import prisma from "../../../../prisma";
 
 const APPENDIX_FORMS = gql`

@@ -1,7 +1,7 @@
 import express, { json } from "express";
 import supertest from "supertest";
 import { ApolloServer } from "@apollo/server";
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 import { graphqlQueryMergingLimiter } from "../graphqlQueryMergingLimiter";
 import { ErrorCode } from "../../errors";
 import { MAX_OPERATIONS_PER_REQUEST } from "../graphqlBatchLimiter";

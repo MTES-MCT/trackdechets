@@ -10,7 +10,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
-import gql from 'graphql-tag';
+import { gql } from "graphql-tag";
 const CREATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
   mutation DasriCreate($input: BsdasriInput!) {

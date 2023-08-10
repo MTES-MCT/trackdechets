@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import prisma from "../../../../prisma";

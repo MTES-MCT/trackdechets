@@ -8,7 +8,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
 import { Query } from "../../../../generated/graphql/types";
 import { fullBsdasriFragment } from "../../../fragments";
-import gql from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const GET_BSDASRIS = gql`
   ${fullBsdasriFragment}

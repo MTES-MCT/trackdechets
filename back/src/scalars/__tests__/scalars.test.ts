@@ -1,5 +1,5 @@
 import { ApolloServer } from "@apollo/server";
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 import { format } from "date-fns";
 import scalars from "..";
 import { UserInputError } from "../../common/errors";

@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 // Fragments used for documentation and for tests
 

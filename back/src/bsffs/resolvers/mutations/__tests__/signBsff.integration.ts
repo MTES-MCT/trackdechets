@@ -4,7 +4,7 @@ import {
   TransporterReceipt,
   UserRole
 } from "@prisma/client";
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
