@@ -2,7 +2,7 @@ import "./tracer";
 
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { ApolloServer } from "@apollo/server";
-import { unwrapResolverError } from '@apollo/server/errors';
+import { unwrapResolverError } from "@apollo/server/errors";
 import { expressMiddleware } from "@apollo/server/express4";
 import redisStore from "connect-redis";
 import cors from "cors";
@@ -77,7 +77,7 @@ export const server = new ApolloServer<GraphQLContext>({
   validationRules: [depthLimit(10)],
   formatError: (formattedError, error) => {
     // Catch Yup `ValidationError` and throw a `UserInputError` instead of an `InternalServerError`
-    const customError = unwrapResolverError(error)
+    const customError = unwrapResolverError(error);
     if (customError instanceof ValidationError) {
       return new UserInputError(customError.errors.join("\n"));
     }
@@ -94,7 +94,10 @@ export const server = new ApolloServer<GraphQLContext>({
       // Workaround for graphQL validation error displayed as internal server error
       // when graphQL variables are of of invalid type
       // See: https://github.com/apollographql/apollo-server/issues/3498
-      if (formattedError.message && formattedError.message.startsWith(`Variable "`)) {
+      if (
+        formattedError.message &&
+        formattedError.message.startsWith(`Variable "`)
+      ) {
         formattedError.extensions.code = "GRAPHQL_VALIDATION_FAILED";
         return formattedError;
       }
@@ -346,6 +349,13 @@ if (Sentry) {
 
 app.use(errorHandler);
 
+export const serverDataloaders = {
+  ...createUserDataLoaders(),
+  ...createCompanyDataLoaders(),
+  ...createFormDataLoaders(),
+  ...createEventsDataLoaders()
+};
+
 export async function startApolloServer() {
   await server.start();
 
@@ -365,12 +375,7 @@ export async function startApolloServer() {
           ...ctx,
           // req.user is made available by passport
           user: ctx.req?.user ? { ...ctx.req?.user, ip: ctx.req?.ip } : null,
-          dataloaders: {
-            ...createUserDataLoaders(),
-            ...createCompanyDataLoaders(),
-            ...createFormDataLoaders(),
-            ...createEventsDataLoaders()
-          }
+          dataloaders: serverDataloaders
         };
       }
     })
