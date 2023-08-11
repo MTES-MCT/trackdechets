@@ -99,11 +99,11 @@ describe("DateTime", () => {
     });
 
     assert(body.kind === "single");
-    expect(body.singleResult.errors).toEqual([
-      new UserInputError(
-        `Variable "$bar" got invalid value "2020-33-02"; Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 2020-33-02.`
-      )
-    ]);
+    const error = body.singleResult.errors![0];
+    expect(error.extensions!.code).toBe("BAD_USER_INPUT");
+    expect(error.message).toBe(
+      `Variable "$bar" got invalid value "2020-33-02"; Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 2020-33-02.`
+    );
   });
 
   it("should fail validation when invalid type", async () => {
@@ -113,11 +113,11 @@ describe("DateTime", () => {
     });
 
     assert(body.kind === "single");
-    expect(body.singleResult.errors).toEqual([
-      new UserInputError(
-        `Variable "$bar" got invalid value 1; Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 1.`
-      )
-    ]);
+    const error = body.singleResult.errors![0];
+    expect(error.extensions!.code).toBe("BAD_USER_INPUT");
+    expect(error.message).toBe(
+      `Variable "$bar" got invalid value 1; Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 1.`
+    );
   });
 });
 

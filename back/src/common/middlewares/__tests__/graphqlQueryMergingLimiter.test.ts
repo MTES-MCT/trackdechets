@@ -66,6 +66,7 @@ describe("graphqlQueryMergingLimiter Apollo Plugin", () => {
     const server = new ApolloServer({
       typeDefs,
       resolvers,
+      allowBatchedHttpRequests: true,
       plugins: [graphqlQueryMergingLimiter()]
     });
 

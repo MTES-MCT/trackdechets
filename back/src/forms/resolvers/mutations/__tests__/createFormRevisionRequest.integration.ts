@@ -416,25 +416,24 @@ describe("Mutation.createFormRevisionRequest", () => {
     const { user } = await userWithCompanyFactory("ADMIN");
 
     const { mutate } = makeClient(user);
-    expect.assertions(2);
-    try {
-      await mutate(CREATE_FORM_REVISION_REQUEST, {
-        variables: {
-          input: {
-            bsddId: "",
-            content: {
-              wasteDetails: { onuCode: "I cannot change the onuCode" }
-            },
-            comment: "A comment"
-          }
+    const { errors } = await mutate(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: "",
+          content: {
+            wasteDetails: { onuCode: "I cannot change the onuCode" }
+          },
+          comment: "A comment",
+          authoringCompanySiret: "a siret"
         }
-      });
-    } catch (err) {
-      expect(err.message).toContain('{"code":"BAD_USER_INPUT"}');
-      expect(err.message).toContain(
-        'Field \\"onuCode\\" is not defined by type \\"FormRevisionRequestWasteDetailsInput\\".'
-      );
-    }
+      }
+    });
+
+    const error = errors[0];
+    expect(error.extensions!.code).toContain("BAD_USER_INPUT");
+    expect(error.message).toContain(
+      'Field "onuCode" is not defined by type "FormRevisionRequestWasteDetailsInput".'
+    );
   });
 
   it("should fail if fields validation fails", async () => {

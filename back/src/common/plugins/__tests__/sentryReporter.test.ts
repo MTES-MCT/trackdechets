@@ -78,7 +78,7 @@ describe("graphqlErrorHandler", () => {
     expect(captureExceptionSpy.mock.calls[0][0]).toEqual(error);
     // check sentryId has been set
     const finalError = mockFormatError.mock.calls[0][0];
-    expect(finalError.originalError.sentryId).toEqual(sentryId);
+    expect(finalError.extensions.sentryId).toEqual(sentryId);
   });
 
   it("should not report yup ValidationError", async () => {

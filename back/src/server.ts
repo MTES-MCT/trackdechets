@@ -75,16 +75,18 @@ export const server = new ApolloServer<GraphQLContext>({
   schema,
   introspection: true, // used to enable the playground in production
   validationRules: [depthLimit(10)],
+  allowBatchedHttpRequests: true,
   formatError: (formattedError, error) => {
     // Catch Yup `ValidationError` and throw a `UserInputError` instead of an `InternalServerError`
-    const customError = unwrapResolverError(error);
-    if (customError instanceof ValidationError) {
-      return new UserInputError(customError.errors.join("\n"));
+    const originalError = unwrapResolverError(error);
+
+    if (originalError instanceof ValidationError) {
+      return new UserInputError(originalError.errors.join("\n"));
     }
-    if (customError instanceof ZodError) {
+    if (originalError instanceof ZodError) {
       return new UserInputError(
-        customError.issues.map(issue => issue.message).join("\n"),
-        { issues: customError.issues }
+        originalError.issues.map(issue => issue.message).join("\n"),
+        { issues: originalError.issues }
       );
     }
     if (
@@ -102,7 +104,7 @@ export const server = new ApolloServer<GraphQLContext>({
         return formattedError;
       }
       // Do not leak error for internal server error in production
-      const sentryId = (formattedError as any).sentryId;
+      const sentryId = (originalError as any).sentryId;
       return new GraphQLError(
         sentryId
           ? `Erreur serveur : rapport d'erreur ${sentryId}`

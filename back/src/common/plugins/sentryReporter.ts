@@ -58,9 +58,7 @@ const sentryReporter: ApolloServerPlugin = {
           });
 
           const sentryId = Sentry.captureException(error, scope);
-          if (error.originalError) {
-            (error.originalError as any).sentryId = sentryId;
-          }
+          error.extensions.sentryId = sentryId;
         }
       }
     };

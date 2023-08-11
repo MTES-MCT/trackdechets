@@ -24,6 +24,8 @@ function makeClient(user?: (User & { auth?: AuthType }) | null) {
       },
       {
         contextValue: {
+          req: {},
+          res: {},
           dataloaders: serverDataloaders,
           ...(user && { user: { auth: AuthType.Session, ...user } })
         } as any
@@ -35,7 +37,11 @@ function makeClient(user?: (User & { auth?: AuthType }) | null) {
     // For retro compatibility with our previous setup, remove null and undefined from data
     // TODO: Remove this "hack" and edit all our tests to account for possible nulls
     type ReturnType = typeof body.singleResult;
-    return body.singleResult as RequiredAndNotNull<ReturnType>;
+
+    // Parse(Stringify()) is to avoid the [Object: null prototype] problem
+    return JSON.parse(
+      JSON.stringify(body.singleResult)
+    ) as RequiredAndNotNull<ReturnType>;
   }
 
   return { mutate: query, query };

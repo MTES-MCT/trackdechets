@@ -15,10 +15,4 @@ describe("Express server", () => {
     expect(response.status).toEqual(404);
     expect(response.text).toEqual("Not found");
   });
-
-  it("should return apollo health check", async () => {
-    const response = await request.get("/.well-known/apollo/server-health");
-    expect(response.status).toEqual(200);
-    expect(response.body).toEqual({ status: "pass" });
-  });
 });

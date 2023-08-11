@@ -7,6 +7,9 @@ export class GraphqlQueryLimit extends GraphQLError {
   constructor(message: string) {
     super(message, {
       extensions: {
+        http: {
+          status: 400
+        },
         code: ErrorCode.GRAPHQL_MAX_OPERATIONS_ERROR
       }
     });
