@@ -1,16 +1,15 @@
 import { RedErrorMessage } from "common/components";
 
-import { Field } from "formik";
+import { Field, useFormikContext } from "formik";
 import React from "react";
-import { BsdasriStatus } from "generated/graphql/types";
-
+import { BsdasriStatus, Bsdasri, BsdasriType } from "generated/graphql/types";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import classNames from "classnames";
 
 export default function Operation({ status, disabled = false }) {
   const operationEmphasis = false;
-
+  const { values } = useFormikContext<Bsdasri>();
   const showOperationFields = status === BsdasriStatus.Received;
   return (
     <>
@@ -37,14 +36,19 @@ export default function Operation({ status, disabled = false }) {
               <option value="R1">
                 R1 - Incinération + valorisation énergétique
               </option>
-              <option value="D12">
-                D12 - Groupement avant désinfection en D9 ou incinération en D10
-                sur un site relevant de la rubrique 2718
-              </option>
-              <option value="R12">
-                R12 - Groupement avant incinération en R1, sur un site relevant
-                de la rubrique 2718
-              </option>
+
+              {values.type !== BsdasriType.Synthesis ? (
+                <>
+                  <option value="D12">
+                    D12 - Groupement avant désinfection en D9 ou incinération en
+                    D10 sur un site relevant de la rubrique 2718
+                  </option>
+                  <option value="R12">
+                    R12 - Groupement avant incinération en R1, sur un site
+                    relevant de la rubrique 2718
+                  </option>
+                </>
+              ) : null}
             </Field>
           </div>
           <div

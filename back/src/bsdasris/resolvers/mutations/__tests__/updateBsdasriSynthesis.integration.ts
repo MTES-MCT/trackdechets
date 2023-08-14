@@ -5,7 +5,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { BsdasriStatus, BsdasriType } from "@prisma/client";
+import { BsdasriStatus, BsdasriType, CompanyType } from "@prisma/client";
 import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
 import {
@@ -369,6 +369,132 @@ describe("Mutation.updateBsdasri", () => {
       expect(updatedDasri.transporterWasteVolume).toEqual(1234);
       expect(updatedDasri.synthesizing).toEqual([{ id: associated.id }]);
       expect(updatedDasri.destinationOperationCode).toEqual("D10");
+    }
+  );
+
+  it.each(["R12", "D12"])(
+    "should forbid %p operation code on synthesis dasri",
+    async operationCode => {
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+
+      const { user: transporter, company: transporterCompany } =
+        await userWithCompanyFactory("MEMBER");
+      const destinationCompany = await companyFactory({
+        companyTypes: {
+          set: [CompanyType.COLLECTOR]
+        }
+      });
+      const associated = await bsdasriFactory({
+        opt: {
+          ...initialData(emitterCompany),
+          ...readyToTakeOverData(transporterCompany),
+          status: BsdasriStatus.INITIAL
+        }
+      });
+
+      const initialPackagings = [
+        { type: "BOITE_CARTON", volume: 10, quantity: 9 },
+        { type: "FUT", volume: 100, quantity: 3 }
+      ];
+
+      const dasri = await bsdasriFactory({
+        opt: {
+          ...initialData(emitterCompany),
+          ...readyToPublishData(destinationCompany),
+          ...readyToTakeOverData(transporterCompany),
+
+          status: BsdasriStatus.RECEIVED,
+          type: BsdasriType.SYNTHESIS,
+          synthesizing: { connect: [{ id: associated.id }] },
+          emitterWastePackagings: initialPackagings,
+          emitterWasteVolume: 1234,
+          transporterWastePackagings: initialPackagings,
+          transporterWasteVolume: 1234
+        }
+      });
+
+      const { mutate } = makeClient(transporter);
+
+      const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+        UPDATE_DASRI,
+        {
+          variables: {
+            id: dasri.id,
+            input: { destination: { operation: { code: operationCode } } }
+          }
+        }
+      );
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Les codes R12 et D12 sont interdits sur un bordereau de synthèse",
+          extensions: expect.objectContaining({
+            code: ErrorCode.BAD_USER_INPUT
+          })
+        })
+      ]);
+    }
+  );
+
+  it.each(["D9", "D10", "R1"])(
+    "should allow %p operation code on synthesis dasri",
+    async operationCode => {
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+
+      const { user: transporter, company: transporterCompany } =
+        await userWithCompanyFactory("MEMBER");
+      const destinationCompany = await companyFactory({
+        companyTypes: {
+          set: [CompanyType.COLLECTOR]
+        }
+      });
+      const associated = await bsdasriFactory({
+        opt: {
+          ...initialData(emitterCompany),
+          ...readyToTakeOverData(transporterCompany),
+          status: BsdasriStatus.INITIAL
+        }
+      });
+
+      const initialPackagings = [
+        { type: "BOITE_CARTON", volume: 10, quantity: 9 },
+        { type: "FUT", volume: 100, quantity: 3 }
+      ];
+
+      const dasri = await bsdasriFactory({
+        opt: {
+          ...initialData(emitterCompany),
+          ...readyToPublishData(destinationCompany),
+          ...readyToTakeOverData(transporterCompany),
+
+          status: BsdasriStatus.RECEIVED,
+          type: BsdasriType.SYNTHESIS,
+          synthesizing: { connect: [{ id: associated.id }] },
+          emitterWastePackagings: initialPackagings,
+          emitterWasteVolume: 1234,
+          transporterWastePackagings: initialPackagings,
+          transporterWasteVolume: 1234
+        }
+      });
+
+      const { mutate } = makeClient(transporter);
+
+      await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
+        variables: {
+          id: dasri.id,
+          input: { destination: { operation: { code: operationCode } } }
+        }
+      });
+
+      const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
+        where: { id: dasri.id }
+      });
+      expect(updatedDasri.destinationOperationCode).toEqual(operationCode);
     }
   );
 });

@@ -6,7 +6,6 @@ import WeightWidget from "form/bsdasri/components/Weight";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-
 import {
   ExtraSignatureType,
   SignatureType,
@@ -218,7 +217,7 @@ export function ReceptionSignatureForm() {
 }
 export function OperationSignatureForm() {
   const TODAY = new Date();
-
+  const { values } = useFormikContext<Bsdasri>();
   return (
     <>
       <div className="form__row">
@@ -237,14 +236,18 @@ export function OperationSignatureForm() {
           <option value="R1">
             R1 - Incinération + valorisation énergétique
           </option>
-          <option value="D12">
-            D12 - Groupement avant désinfection en D9 ou incinération en D10 sur
-            un site relevant de la rubrique 2718
-          </option>
-          <option value="R12">
-            R12 - Groupement avant incinération en R1, sur un site relevant de
-            la rubrique 2718
-          </option>
+          {values.type !== BsdasriType.Synthesis ? (
+            <>
+              <option value="D12">
+                D12 - Groupement avant désinfection en D9 ou incinération en D10
+                sur un site relevant de la rubrique 2718
+              </option>
+              <option value="R12">
+                R12 - Groupement avant incinération en R1, sur un site relevant
+                de la rubrique 2718
+              </option>
+            </>
+          ) : null}
         </Field>
       </div>
       <div className="form__row">

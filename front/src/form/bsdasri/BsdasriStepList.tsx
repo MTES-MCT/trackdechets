@@ -106,6 +106,7 @@ const removeSections = (
       ...commonKeys,
     ],
   };
+
   return omitDeep(input, mapping[status]);
 };
 export default function BsdasriStepsList(props: Props) {
@@ -164,6 +165,8 @@ export default function BsdasriStepsList(props: Props) {
       if (type === BsdasriType.Synthesis) {
         // synthesis bsdasri are  never created in draft state
         const { grouping, emitter, ecoOrganisme, ...cleanedInput } = input;
+
+        console.log(input);
         return updateBsdasri({
           variables: {
             id: formState.id,
