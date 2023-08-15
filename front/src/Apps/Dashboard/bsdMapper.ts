@@ -115,6 +115,8 @@ const createBsda = (bsda: BsdaWithReview): BsdDisplay => {
   };
   return bsdaFormatted;
 };
+const truncateTransporterInfo = (text?: string) =>
+  !!text ? text.slice(0, 15) : text;
 
 const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
   const statusCode = bsdasri?.status || bsdasri["bsdasriStatus"];
@@ -137,9 +139,10 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     grouping: bsdasri?.grouping,
     synthesizing: bsdasri?.synthesizing,
     allowDirectTakeOver: bsdasri?.allowDirectTakeOver,
-    transporterCustomInfo:
+    transporterCustomInfo: truncateTransporterInfo(
       bsdasri.transporter?.customInfo ||
-      bsdasri["bsdasriTransporter"]?.customInfo,
+        bsdasri["bsdasriTransporter"]?.customInfo
+    ),
     transporterNumberPlate:
       bsdasri.transporter?.transport?.plates ||
       bsdasri["bsdasriTransporter"]?.transport?.plates,

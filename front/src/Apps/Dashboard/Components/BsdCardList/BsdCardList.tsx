@@ -11,6 +11,7 @@ import {
   Bsvhu,
   Form,
   FormStatus,
+  Bsdasri,
 } from "../../../../generated/graphql/types";
 
 import "./bsdCardList.scss";
@@ -44,6 +45,8 @@ import { TransporterInfoEdit as TransporterInfoEditBsda } from "dashboard/compon
 import { UpdateTransporterCustomInfo } from "dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterCustomInfo";
 import { BsffFragment } from "dashboard/components/BSDList/BSFF";
 import { UpdateTransporterPlates } from "dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterPlates";
+import { UpdateBsdasriTransporterPlates } from "dashboard/components/BSDList/BSDasri/BSDasriActions/UpdateBsdasriTransporterPlates";
+import { UpdateBsdasriTransporterInfo } from "dashboard/components/BSDList/BSDasri/BSDasriActions/UpdateBsdasriTransporterInfo";
 
 function BsdCardList({
   siret,
@@ -274,11 +277,20 @@ function BsdCardList({
     if (bsd.__typename === "Bsda") {
       setValidationWorkflowType("UPDATE_INFO_BSDA");
     }
+
     if (bsd.__typename === "Bsff") {
       if (infoName === "transporterCustomInfo") {
         setValidationWorkflowType("UPDATE_CUSTOM_INFO_BSFF");
       } else {
         setValidationWorkflowType("UPDATE_CUSTOM_PLATE_BSFF");
+      }
+    }
+
+    if (bsd.__typename === "Bsdasri") {
+      if (infoName === "transporterCustomInfo") {
+        setValidationWorkflowType("UPDATE_CUSTOM_INFO_BSDASRI");
+      } else {
+        setValidationWorkflowType("UPDATE_PLATE_BSDASRI");
       }
     }
 
@@ -540,6 +552,20 @@ function BsdCardList({
       {validationWorkflowType === "UPDATE_INFO_BSDA" && (
         <TransporterInfoEditBsda
           bsda={bsdClicked as Bsda}
+          isModalOpenFromParent={isModalOpen}
+          onModalCloseFromParent={onClose}
+        />
+      )}
+      {validationWorkflowType === "UPDATE_PLATE_BSDASRI" && (
+        <UpdateBsdasriTransporterPlates
+          bsdasri={bsdClicked as Bsdasri}
+          isModalOpenFromParent={isModalOpen}
+          onModalCloseFromParent={onClose}
+        />
+      )}
+      {validationWorkflowType === "UPDATE_CUSTOM_INFO_BSDASRI" && (
+        <UpdateBsdasriTransporterInfo
+          bsdasri={bsdClicked as Bsdasri}
           isModalOpenFromParent={isModalOpen}
           onModalCloseFromParent={onClose}
         />

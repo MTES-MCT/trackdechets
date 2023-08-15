@@ -3,6 +3,14 @@ import { InfoIconCode, InfoWithIconProps } from "./infoWithIconTypes";
 import { getLabelValue } from "./infoWithIconUtils";
 import "./infoWithIcon.scss";
 
+const formatTranporterPlates = (plates?: string | string[] | null): string => {
+  if (Array.isArray(plates)) {
+    return plates.join(", ");
+  }
+
+  return !!plates ? plates : "";
+};
+
 function InfoWithIcon({
   labelCode,
   date,
@@ -29,7 +37,7 @@ function InfoWithIcon({
       <p className={`label-icon label-icon__${labelCode}`}>
         {labelCode === InfoIconCode.CustomInfo
           ? editableInfos?.customInfo
-          : editableInfos?.transporterNumberPlate}
+          : formatTranporterPlates(editableInfos?.transporterNumberPlate)}
       </p>
     </button>
   );
