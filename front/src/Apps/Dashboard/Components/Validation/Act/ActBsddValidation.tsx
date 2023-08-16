@@ -313,9 +313,6 @@ const ActBsddValidation = ({
   };
 
   const renderContentSent = () => {
-    if (isAppendix1({ emitterType: bsd.emitter?.type } as BsdDisplay)) {
-      return renderAddAppendix1Modal();
-    }
     const isTempStorage = bsd.recipient?.isTempStorage;
     if (currentSiret === bsd.recipient?.company?.siret) {
       if (!!bsddGetLoading) {
@@ -340,6 +337,10 @@ const ActBsddValidation = ({
             />
           </TdModal>
         );
+      } else {
+        if (isAppendix1({ emitterType: bsd.emitter?.type } as BsdDisplay)) {
+          return renderAddAppendix1Modal();
+        }
       }
     }
 
