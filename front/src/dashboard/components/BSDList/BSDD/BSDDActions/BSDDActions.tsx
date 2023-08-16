@@ -10,7 +10,7 @@ import {
   IconQrCode,
   IconTrash,
   IconView,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import { EmitterType, Form, FormStatus } from "generated/graphql/types";
 import { DeleteModal } from "./DeleteModal";
 import { useDuplicate } from "./useDuplicate";

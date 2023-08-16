@@ -2,9 +2,9 @@ import React from "react";
 import { FormStatus, Query, QueryFormArgs } from "generated/graphql/types";
 import { useLazyQuery } from "@apollo/client";
 import { WorkflowActionProps } from "./WorkflowAction";
-import { TdModalTrigger } from "common/components/Modal";
+import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
 import { ActionButton } from "common/components";
-import { IconCogApproved } from "common/components/Icons";
+import { IconCogApproved } from "Apps/common/Components/Icons/Icons";
 import { GET_FORM } from "form/bsdd/utils/queries";
 import MarkAsProcessedModalContent from "dashboard/components/BSDList/BSDD/WorkflowAction/MarkAsProcessedModalContent";
 

@@ -5,7 +5,7 @@ import {
   IconDestination,
   IconEmitter,
   IconTransporter,
-} from "../../../../common/components/Icons";
+} from "../../../common/Components/Icons/Icons";
 import { MEDIA_QUERIES } from "../../../../common/config";
 
 import "./actors.scss";

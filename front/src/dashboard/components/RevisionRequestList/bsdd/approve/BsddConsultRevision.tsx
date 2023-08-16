@@ -1,7 +1,7 @@
 import React from "react";
 import { ActionButton, Modal } from "common/components";
-import { IconView } from "common/components/Icons";
-import { TdModalTrigger } from "common/components/Modal";
+import { IconView } from "Apps/common/Components/Icons/Icons";
+import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
 import { FormRevisionRequest } from "generated/graphql/types";
 import { DisplayRevision } from "./BsddApproveRevision";
 import { useRouteMatch } from "react-router-dom";

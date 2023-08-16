@@ -1,8 +1,8 @@
 import React from "react";
 import { useMutation } from "@apollo/client";
 import { ActionButton, Modal } from "common/components";
-import { IconTrash } from "common/components/Icons";
-import { TdModalTrigger } from "common/components/Modal";
+import { IconTrash } from "Apps/common/Components/Icons/Icons";
+import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
 import {
   FormRevisionRequest,
   Mutation,

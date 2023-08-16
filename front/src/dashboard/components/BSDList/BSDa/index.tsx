@@ -2,7 +2,7 @@ import * as React from "react";
 import { CellProps, CellValue } from "react-table";
 
 import { Bsda, BsdaStatus, BsdaType } from "generated/graphql/types";
-import { IconBSDa } from "common/components/Icons";
+import { IconBSDa } from "Apps/common/Components/Icons/Icons";
 import { BSDaActions } from "./BSDaActions/BSDaActions";
 import { useParams } from "react-router-dom";
 import { ActionButtonContext } from "common/components/ActionButton";

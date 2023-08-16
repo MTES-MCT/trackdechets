@@ -1,4 +1,4 @@
-import { IconClose } from "common/components/Icons";
+import { IconClose } from "Apps/common/Components/Icons/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { Field, FieldArray, FieldProps, useFormikContext } from "formik";

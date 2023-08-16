@@ -7,7 +7,7 @@ import {
   IconCheckCircle1,
   IconShipmentSignSmartphone,
   IconPaperWrite,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 
 import routes from "Apps/routes";
 

@@ -9,10 +9,10 @@ import {
   TransportMode,
 } from "generated/graphql/types";
 import { segmentFragment } from "Apps/common/queries/fragments";
-import TdModal from "common/components/Modal";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import ActionButton from "common/components/ActionButton";
 import { NotificationError } from "Apps/common/Components/Error/Error";
-import { IconBusTransfer } from "common/components/Icons";
+import { IconBusTransfer } from "Apps/common/Components/Icons/Icons";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { WorkflowActionProps } from "../WorkflowAction";
 import TdSwitch from "common/components/Switch";

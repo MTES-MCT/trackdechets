@@ -4,7 +4,7 @@ import {
   IconLayout2,
   IconLayoutModule1,
   IconRefresh,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import Loader from "Apps/common/Components/Loader/Loaders";
 import { MEDIA_QUERIES } from "common/config";
 import { usePersistedState } from "Apps/common/hooks/usePersistedState";

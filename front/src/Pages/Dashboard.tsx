@@ -39,7 +39,7 @@ import {
   filter_show_btn,
   load_more_bsds,
 } from "Apps/common/wordings/dashboard/wordingsDashboard";
-import { IconDuplicateFile } from "common/components/Icons";
+import { IconDuplicateFile } from "Apps/common/Components/Icons/Icons";
 import Filters from "Apps/common/Components/Filters/Filters";
 import {
   filterList,

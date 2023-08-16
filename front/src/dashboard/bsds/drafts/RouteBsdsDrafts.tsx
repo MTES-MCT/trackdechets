@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { IconDuplicateFile } from "common/components/Icons";
+import { IconDuplicateFile } from "Apps/common/Components/Icons/Icons";
 import { useParams } from "react-router-dom";
 import { Breadcrumb, BreadcrumbItem } from "common/components";
 import {

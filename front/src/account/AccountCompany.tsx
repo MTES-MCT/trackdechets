@@ -1,7 +1,7 @@
 import React, { useState, ReactNode } from "react";
 import { gql } from "@apollo/client";
 import { filter } from "graphql-anywhere";
-import { IconPasswordKey } from "common/components/Icons";
+import { IconPasswordKey } from "Apps/common/Components/Icons/Icons";
 import AccountCompanyMenu from "./AccountCompanyMenu";
 import AccountCompanyInfo from "./AccountCompanyInfo";
 import AccountCompanySecurity from "./AccountCompanySecurity";

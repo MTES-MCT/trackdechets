@@ -1,7 +1,8 @@
+import React, { useEffect } from "react";
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
 import { Loader } from "Apps/common/Components";
 import { NotificationError } from "Apps/common/Components/Error/Error";
-import TdModal from "common/components/Modal";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import { statusChangeFragment } from "Apps/common/queries/fragments";
 import { GET_BSDS } from "Apps/common/queries";
 import AcceptedInfo from "dashboard/components/BSDList/BSDD/WorkflowAction/AcceptedInfo";
@@ -21,12 +22,15 @@ import {
   Query,
   QueryFormArgs,
 } from "generated/graphql/types";
-import React, { useEffect } from "react";
+import { BsdDisplay } from "Apps/common/types/bsdTypes";
+import {
+  isAppendix1,
+  isSignTransportAndCanSkipEmission,
+} from "Apps/Dashboard/dashboardServices";
+import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
 import MarkAsProcessedModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/MarkAsProcessedModalContent";
 import SignEmissionFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignEmissionFormModalContent";
 import SignTransportFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignTransportFormModalContent";
-import { isSignTransportAndCanSkipEmission } from "Apps/Dashboard/dashboardServices";
-import { BsdDisplay } from "Apps/common/types/bsdTypes";
 
 const MARK_TEMP_STORER_ACCEPTED = gql`
   mutation MarkAsTempStorerAccepted(
@@ -267,6 +271,10 @@ const ActBsddValidation = ({
   };
 
   const renderContentSealed = () => {
+    if (isAppendix1({ emitterType: bsd.emitter?.type } as BsdDisplay)) {
+      return renderAddAppendix1Modal();
+    }
+
     if (hasEmitterSignSecondaryCta) {
       return renderSignEmissionFormModal();
     }
@@ -305,6 +313,9 @@ const ActBsddValidation = ({
   };
 
   const renderContentSent = () => {
+    if (isAppendix1({ emitterType: bsd.emitter?.type } as BsdDisplay)) {
+      return renderAddAppendix1Modal();
+    }
     const isTempStorage = bsd.recipient?.isTempStorage;
     if (currentSiret === bsd.recipient?.company?.siret) {
       if (!!bsddGetLoading) {
@@ -440,6 +451,19 @@ const ActBsddValidation = ({
         loadingAccepted
       );
     }
+  };
+
+  const renderAddAppendix1Modal = () => {
+    return (
+      <TdModal
+        isOpen={isOpen}
+        onClose={onClose}
+        ariaLabel="Ajout d'une annexe 1 au chapeau"
+        wide
+      >
+        <Appendix1ProducerForm container={bsd} close={onClose} />
+      </TdModal>
+    );
   };
 
   return (

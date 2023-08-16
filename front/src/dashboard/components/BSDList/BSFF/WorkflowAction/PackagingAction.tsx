@@ -1,5 +1,5 @@
 import { ActionButton, Modal } from "common/components";
-import { IconCheckCircle1 } from "common/components/Icons";
+import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
 import {
   Bsff,
   BsffPackaging,
