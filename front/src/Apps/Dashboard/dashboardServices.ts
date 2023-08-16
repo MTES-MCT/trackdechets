@@ -407,15 +407,18 @@ export const getSentBtnLabel = (
       return "";
     }
 
-    if (isAppendix1(bsd)) {
-      return AJOUTER_ANNEXE_1;
-    }
+    if (isActTab) {
+      if (isSameSiretDestination(currentSiret, bsd)) {
+        if (bsd.isTempStorage) {
+          return VALIDER_ENTREPOSAGE_PROVISOIRE;
+        }
 
-    if (isActTab && isSameSiretDestination(currentSiret, bsd)) {
-      if (bsd.isTempStorage) {
-        return VALIDER_ENTREPOSAGE_PROVISOIRE;
+        return VALIDER_RECEPTION;
       }
-      return VALIDER_RECEPTION;
+
+      if (isAppendix1(bsd)) {
+        return AJOUTER_ANNEXE_1;
+      }
     }
 
     return "";
