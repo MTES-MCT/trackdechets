@@ -8,9 +8,9 @@ import {
   QueryFormArgs,
   Query,
 } from "generated/graphql/types";
-import { IconBusTransfer } from "common/components/Icons";
+import { IconBusTransfer } from "Apps/common/Components/Icons/Icons";
 import ActionButton from "common/components/ActionButton";
-import TdModal from "common/components/Modal";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import {
   NotificationError,
   SimpleNotificationError,

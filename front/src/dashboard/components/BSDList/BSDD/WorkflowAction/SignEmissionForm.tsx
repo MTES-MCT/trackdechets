@@ -1,7 +1,7 @@
 import * as React from "react";
 import { FormStatus } from "generated/graphql/types";
 import { ActionButton, Modal } from "common/components";
-import { IconShipmentSignSmartphone } from "common/components/Icons";
+import { IconShipmentSignSmartphone } from "Apps/common/Components/Icons/Icons";
 import { WorkflowActionProps } from "./WorkflowAction";
 import SignEmissionFormModalContent from "dashboard/components/BSDList/BSDD/WorkflowAction/SignEmissionFormModalContent";
 

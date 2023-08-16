@@ -10,10 +10,10 @@ import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation, useLazyQuery } from "@apollo/client";
 
 import { statusChangeFragment } from "Apps/common/queries/fragments";
-import { TdModalTrigger } from "common/components/Modal";
+import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
 import { ActionButton } from "common/components";
 import { Loader } from "Apps/common/Components";
-import { IconWarehouseStorage } from "common/components/Icons";
+import { IconWarehouseStorage } from "Apps/common/Components/Icons/Icons";
 import { NotificationError } from "Apps/common/Components/Error/Error";
 import AcceptedInfo from "./AcceptedInfo";
 import { GET_BSDS } from "Apps/common/queries";

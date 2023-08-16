@@ -3,7 +3,7 @@ import {
   IconRenewableEnergyEarth,
   IconWarehouseDelivery,
   IconWaterDam,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import { Bsvhu, FormCompany } from "generated/graphql/types";
 import React from "react";
 import QRCodeIcon from "react-qr-code";

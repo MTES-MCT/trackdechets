@@ -1,5 +1,5 @@
 import ActionButton, { ActionLink } from "./ActionButton";
-import Modal from "./Modal";
+import Modal from "../../Apps/common/Components/Modal/Modal";
 import RedErrorMessage from "./RedErrorMessage";
 import DownloadFileLink from "./DownloadFileLink";
 import Switch, { FieldSwitch } from "./Switch";

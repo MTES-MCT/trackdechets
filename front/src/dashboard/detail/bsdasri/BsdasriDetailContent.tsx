@@ -19,7 +19,7 @@ import {
   IconBSDasri,
   IconDuplicateFile,
   IconPdf,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import { InitialDasris } from "./InitialDasris";
 import QRCodeIcon from "react-qr-code";
 

@@ -30,7 +30,7 @@ import {
 import { GET_BSDS } from "Apps/common/queries";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { BSFF_WASTES } from "generated/constants";
-import { IconCheckCircle1 } from "common/components/Icons";
+import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
 import { BsffSummary } from "./BsffSummary";
 import TdTooltip from "common/components/Tooltip";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";

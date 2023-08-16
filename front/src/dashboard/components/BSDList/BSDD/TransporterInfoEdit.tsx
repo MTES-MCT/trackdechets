@@ -6,8 +6,8 @@ import { Form as FormModel } from "generated/graphql/types";
 import { isBsddTransporterFieldEditable } from "generated/constants/formHelpers";
 import { NotificationError } from "Apps/common/Components/Error/Error";
 import { capitalize } from "common/helper";
-import { IconPaperWrite } from "common/components/Icons";
-import TdModal from "common/components/Modal";
+import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import { useRouteMatch } from "react-router-dom";
 
 const UPDATE_PLATE = gql`

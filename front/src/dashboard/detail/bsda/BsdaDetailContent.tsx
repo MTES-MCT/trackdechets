@@ -6,7 +6,7 @@ import {
   IconWarehouseDelivery,
   IconWarehousePackage,
   IconWaterDam,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import routes from "Apps/routes";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSDa/BSDaActions/useDownloadPdf";
 import { useDuplicate } from "dashboard/components/BSDList/BSDa/BSDaActions/useDuplicate";

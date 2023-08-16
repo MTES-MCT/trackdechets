@@ -5,7 +5,7 @@ import {
   useLocation,
   useRouteMatch,
 } from "react-router-dom";
-import { IconQrCode } from "common/components/Icons";
+import { IconQrCode } from "Apps/common/Components/Icons/Icons";
 import routes from "Apps/routes";
 
 export const CardRoadControlButton = ({ siret, form }) => {

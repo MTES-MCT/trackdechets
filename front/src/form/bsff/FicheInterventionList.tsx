@@ -1,7 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import { Modal, RedErrorMessage } from "common/components";
 import { NotificationError } from "Apps/common/Components/Error/Error";
-import { IconClose } from "common/components/Icons";
+import { IconClose } from "Apps/common/Components/Icons/Icons";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";

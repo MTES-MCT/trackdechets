@@ -1,5 +1,5 @@
 import cogoToast from "cogo-toast";
-import TdModal from "common/components/Modal";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import { Formik, Form, Field } from "formik";
 import { gql, useMutation } from "@apollo/client";
 import React from "react";

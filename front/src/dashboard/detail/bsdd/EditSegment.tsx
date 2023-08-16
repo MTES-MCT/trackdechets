@@ -10,9 +10,9 @@ import {
   TransportSegment,
 } from "generated/graphql/types";
 import { segmentFragment } from "Apps/common/queries/fragments";
-import { IconPaperWrite } from "common/components/Icons";
+import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
 import { NotificationError } from "Apps/common/Components/Error/Error";
-import TdModal from "common/components/Modal";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import ActionButton from "common/components/ActionButton";
 import TdSwitch from "common/components/Switch";
 import CompanySelector from "form/common/components/company/CompanySelector";

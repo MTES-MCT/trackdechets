@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { IconPaperWrite } from "common/components/Icons";
+import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
 import { useMutation } from "@apollo/client";
 import { Mutation, MutationUpdateBsffArgs } from "generated/graphql/types";
-import TdModal from "common/components/Modal";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import { UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { Field, Form, Formik } from "formik";
 import { BsffFragment } from "../types";

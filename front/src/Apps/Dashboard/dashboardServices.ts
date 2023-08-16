@@ -17,6 +17,7 @@ import {
 } from "../../generated/graphql/types";
 import {
   ACCEPTE,
+  AJOUTER_ANNEXE_1,
   ANNEXE_BORDEREAU_SUITE,
   ANNULE,
   APPROUVER_REFUSER_REVISION,
@@ -331,7 +332,7 @@ export const getDraftOrInitialBtnLabel = (
   }
 };
 
-const isAppendix1 = (bsd: BsdDisplay): boolean =>
+export const isAppendix1 = (bsd: BsdDisplay): boolean =>
   bsd.emitterType === EmitterType.Appendix1;
 
 const isAppendix1Producer = (bsd: BsdDisplay): boolean =>
@@ -364,7 +365,7 @@ export const getSealedBtnLabel = (
 ): string => {
   if (isBsdd(bsd.type)) {
     if (isAppendix1(bsd)) {
-      return "";
+      return AJOUTER_ANNEXE_1;
     }
 
     if (isAppendix1Producer(bsd)) {
@@ -404,6 +405,10 @@ export const getSentBtnLabel = (
   if (isBsdd(bsd.type)) {
     if (isAppendix1Producer(bsd)) {
       return "";
+    }
+
+    if (isAppendix1(bsd)) {
+      return AJOUTER_ANNEXE_1;
     }
 
     if (isActTab && isSameSiretDestination(currentSiret, bsd)) {

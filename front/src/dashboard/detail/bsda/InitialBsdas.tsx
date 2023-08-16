@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "common/components/Table";
 import { InitialBsda } from "generated/graphql/types";
-import { IconPdf } from "common/components/Icons";
+import { IconPdf } from "Apps/common/Components/Icons/Icons";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSDa/BSDaActions/useDownloadPdf";
 
 export function InitialBsdas({ bsdas }: { bsdas: InitialBsda[] }) {

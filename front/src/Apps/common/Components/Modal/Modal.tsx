@@ -2,7 +2,7 @@ import React from "react";
 import { Overlay, useModalOverlay, useOverlayTrigger } from "react-aria";
 import { useOverlayTriggerState, OverlayTriggerState } from "react-stately";
 import styles from "./Modal.module.scss";
-import { IconDelete1 } from "./Icons";
+import { IconDelete1 } from "../Icons/Icons";
 import classNames from "classnames";
 
 type ModalProps = {
