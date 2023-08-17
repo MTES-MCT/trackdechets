@@ -5,11 +5,10 @@ import { Field, useFormikContext } from "formik";
 import {
   Bsda,
   BsdaType,
+  CompanySearchPrivate,
   CompanyType,
-  Maybe,
-  WorkerCertification,
 } from "generated/graphql/types";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import initialState from "../initial-state";
 
 export function Worker({ disabled }) {
@@ -18,16 +17,49 @@ export function Worker({ disabled }) {
   const isGroupement = values?.type === BsdaType.Gathering;
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
   const isDechetterie = values?.type === BsdaType.Collection_2710;
-  const [workerCertification, setWorkerCertification] =
-    useState<Maybe<WorkerCertification>>();
-
-  const [isWorker, setIsWorker] = useState<boolean>(false);
-  const showWorkerCertification = !!workerCertification || !isWorker;
+  const [worker, setWorker] = useState<CompanySearchPrivate>();
+  const isWorker = () =>
+    worker?.companyTypes?.includes(CompanyType.Worker) ?? false;
 
   const hasCertification =
-    workerCertification &&
-    (workerCertification.hasSubSectionThree ||
-      workerCertification.hasSubSectionFour);
+    worker?.workerCertification &&
+    (worker?.workerCertification.hasSubSectionThree ||
+      worker?.workerCertification.hasSubSectionFour);
+
+  const updateWorkerState = useCallback(
+    workerSelected => {
+      if (workerSelected) {
+        setWorker(workerSelected);
+        setFieldValue(
+          "worker.certification.hasSubSectionFour",
+          workerSelected?.workerCertification?.hasSubSectionFour
+        );
+        setFieldValue(
+          "worker.certification.hasSubSectionThree",
+          workerSelected?.workerCertification?.hasSubSectionThree
+        );
+        setFieldValue(
+          "worker.certification.certificationNumber",
+          workerSelected?.workerCertification?.certificationNumber
+        );
+        setFieldValue(
+          "worker.certification.validityLimit",
+          workerSelected?.workerCertification?.validityLimit
+        );
+        setFieldValue(
+          "worker.certification.organisation",
+          workerSelected?.workerCertification?.organisation
+        );
+      } else {
+        setWorker(undefined);
+        setFieldValue(
+          "worker.certification",
+          initialState.worker.certification
+        );
+      }
+    },
+    [setFieldValue, setWorker]
+  );
 
   if (isGroupement || isEntreposageProvisoire || isDechetterie) {
     return (
@@ -69,50 +101,17 @@ export function Worker({ disabled }) {
             disabled={disabled}
             name="worker.company"
             heading="Entreprise de travaux"
-            onCompanyPrivateInfos={worker => {
-              if (worker) {
-                setIsWorker(
-                  worker.companyTypes?.includes(CompanyType.Worker) ?? false
-                );
-                setWorkerCertification(worker?.workerCertification);
-                setFieldValue(
-                  "worker.certification.hasSubSectionFour",
-                  worker?.workerCertification?.hasSubSectionFour
-                );
-                setFieldValue(
-                  "worker.certification.hasSubSectionThree",
-                  worker?.workerCertification?.hasSubSectionThree
-                );
-                setFieldValue(
-                  "worker.certification.certificationNumber",
-                  worker?.workerCertification?.certificationNumber
-                );
-                setFieldValue(
-                  "worker.certification.validityLimit",
-                  worker?.workerCertification?.validityLimit
-                );
-                setFieldValue(
-                  "worker.certification.organisation",
-                  worker?.workerCertification?.organisation
-                );
-              } else {
-                setIsWorker(false);
-                setWorkerCertification(null);
-                setFieldValue(
-                  "worker.certification",
-                  initialState.worker.certification
-                );
-              }
-            }}
+            onCompanyPrivateInfos={updateWorkerState}
+            onCompanySelected={updateWorkerState}
           />
-          {showWorkerCertification && (
+          {(!!worker?.workerCertification || !isWorker()) && (
             <>
               <h4 className="form__section-heading">
                 Catégorie entreprise de travaux déclarée dans le profil
                 entreprise
               </h4>
 
-              {!isWorker && (
+              {!isWorker() && (
                 <div>
                   <Alert
                     title={
@@ -124,10 +123,10 @@ export function Worker({ disabled }) {
                 </div>
               )}
 
-              {isWorker && !hasCertification && (
+              {isWorker() && !hasCertification && (
                 <div className="form__row">
-                  {!workerCertification?.hasSubSectionFour &&
-                    !workerCertification?.hasSubSectionThree && (
+                  {!worker?.workerCertification?.hasSubSectionFour &&
+                    !worker?.workerCertification?.hasSubSectionThree && (
                       <Alert
                         title={"L'entreprise n'a pas complété son profil"}
                         severity="warning"
@@ -138,7 +137,7 @@ export function Worker({ disabled }) {
               )}
 
               <div className="form__row">
-                {workerCertification?.hasSubSectionFour && (
+                {worker?.workerCertification?.hasSubSectionFour && (
                   <>
                     <p>
                       SS4 <span aria-hidden> ✅</span>
@@ -148,15 +147,15 @@ export function Worker({ disabled }) {
               </div>
 
               <div className="form__row">
-                {workerCertification?.hasSubSectionThree && (
+                {worker?.workerCertification?.hasSubSectionThree && (
                   <>
                     <p>
                       SS3 <span aria-hidden> ✅</span> numéro:{" "}
-                      {workerCertification?.certificationNumber} date de
+                      {worker?.workerCertification?.certificationNumber} date de
                       validité:{" "}
-                      {formatDate(workerCertification?.validityLimit!)}
+                      {formatDate(worker?.workerCertification?.validityLimit!)}
                       {" - "}
-                      organisme: {workerCertification?.organisation}
+                      organisme: {worker?.workerCertification?.organisation}
                     </p>
                   </>
                 )}

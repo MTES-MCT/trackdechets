@@ -12,13 +12,7 @@ import {
   isVat,
   isForeignVat,
 } from "generated/constants/companySearchHelpers";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import { debounce } from "common/helper";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
@@ -179,28 +173,22 @@ export default function CompanySelector({
     );
 
   /**
-   * Hack pour écraser "country" dans le formulaire
-   */
-  useEffect(() => {
-    if (
-      companyPrivateData?.companyPrivateInfos?.codePaysEtrangerEtablissement
-    ) {
-      setFieldValue(
-        `${field.name}.country`,
-        companyPrivateData.companyPrivateInfos.codePaysEtrangerEtablissement
-      );
-    }
-  }, [field.name, setFieldValue, companyPrivateData]);
-
-  /**
    * Appel onCompanyPrivateInfos quand companyPrivateInfos répond
    * Hack pour écraser "country" dans le formulaire
    */
   useMemo(() => {
     if (companyPrivateData?.companyPrivateInfos) {
       onCompanyPrivateInfos?.(companyPrivateData.companyPrivateInfos);
+      if (
+        companyPrivateData?.companyPrivateInfos?.codePaysEtrangerEtablissement
+      ) {
+        setFieldValue(
+          `${field.name}.country`,
+          companyPrivateData.companyPrivateInfos.codePaysEtrangerEtablissement
+        );
+      }
     }
-  }, [onCompanyPrivateInfos, companyPrivateData]);
+  }, [field.name, setFieldValue, onCompanyPrivateInfos, companyPrivateData]);
 
   /**
    * Selection d'un établissement dans le formulaire
