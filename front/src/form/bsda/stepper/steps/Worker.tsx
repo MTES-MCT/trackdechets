@@ -30,32 +30,33 @@ export function Worker({ disabled }) {
     workerSelected => {
       if (workerSelected) {
         setWorker(workerSelected);
-        setFieldValue(
-          "worker.certification.hasSubSectionFour",
-          workerSelected?.workerCertification?.hasSubSectionFour
-        );
-        setFieldValue(
-          "worker.certification.hasSubSectionThree",
-          workerSelected?.workerCertification?.hasSubSectionThree
-        );
-        setFieldValue(
-          "worker.certification.certificationNumber",
-          workerSelected?.workerCertification?.certificationNumber
-        );
-        setFieldValue(
-          "worker.certification.validityLimit",
-          workerSelected?.workerCertification?.validityLimit
-        );
-        setFieldValue(
-          "worker.certification.organisation",
-          workerSelected?.workerCertification?.organisation
-        );
+        if (workerSelected?.workerCertification) {
+          setFieldValue(
+            "worker.certification.hasSubSectionFour",
+            workerSelected?.workerCertification?.hasSubSectionFour
+          );
+          setFieldValue(
+            "worker.certification.hasSubSectionThree",
+            workerSelected?.workerCertification?.hasSubSectionThree
+          );
+          setFieldValue(
+            "worker.certification.certificationNumber",
+            workerSelected?.workerCertification?.certificationNumber
+          );
+          setFieldValue(
+            "worker.certification.validityLimit",
+            workerSelected?.workerCertification?.validityLimit
+          );
+          setFieldValue(
+            "worker.certification.organisation",
+            workerSelected?.workerCertification?.organisation
+          );
+        } else {
+          setFieldValue("worker.certification", null);
+        }
       } else {
         setWorker(undefined);
-        setFieldValue(
-          "worker.certification",
-          initialState.worker.certification
-        );
+        setFieldValue("worker.certification", null);
       }
     },
     [setFieldValue, setWorker]
@@ -104,7 +105,7 @@ export function Worker({ disabled }) {
             onCompanyPrivateInfos={updateWorkerState}
             onCompanySelected={updateWorkerState}
           />
-          {(!!worker?.workerCertification || !isWorker()) && (
+          {worker && (
             <>
               <h4 className="form__section-heading">
                 Catégorie entreprise de travaux déclarée dans le profil
