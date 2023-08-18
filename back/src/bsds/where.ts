@@ -187,9 +187,7 @@ export function toElasticSimpleQuery(where: BsdWhere) {
   };
 }
 
-export function toElasticQuery(
-  where: BsdWhere
-): estypes.QueryDslQueryContainer {
+export function toElasticQuery(where: BsdWhere): estypes.QueryContainer {
   function inner(where: BsdWhere, depth = 0) {
     if (depth > 2) {
       throw new NestingWhereError(2);

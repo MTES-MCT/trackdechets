@@ -1,3 +1,4 @@
+import { TotalHits } from "@elastic/elasticsearch/api/types";
 import { tov1ReadableId } from "../forms/compat";
 import { WasteRegistryType } from "../generated/graphql/types";
 import { toWastes } from "./converters";
@@ -97,7 +98,7 @@ async function getWasteConnection<WasteType extends GenericWaste>(
   return {
     edges,
     pageInfo,
-    totalCount: searchHits.total as number
+    totalCount: (searchHits.total as TotalHits).value
   };
 }
 

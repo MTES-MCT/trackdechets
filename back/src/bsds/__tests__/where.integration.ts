@@ -29,7 +29,7 @@ describe("StringFilter to elastic query", () => {
       }
     ];
 
-    await indexBsds(index.alias, bsds as any);
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
     await refreshElasticSearch();
   });
 
@@ -177,7 +177,7 @@ describe("TextFilter to elastic query", () => {
       }
     ];
 
-    await indexBsds(index.alias, bsds as any);
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
     await refreshElasticSearch();
   });
 
@@ -307,7 +307,7 @@ describe("StringNullableFilter to elastic query", () => {
       }
     ];
 
-    await indexBsds(index.alias, bsds as any);
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
     await refreshElasticSearch();
   });
 
@@ -482,7 +482,7 @@ describe("DateFilter to elastic query", () => {
       }
     ];
 
-    await indexBsds(index.alias, bsds as any);
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
     await refreshElasticSearch();
   });
 
@@ -573,7 +573,7 @@ describe("Compound filter to elastic query", () => {
       }
     ];
 
-    await indexBsds(index.alias, bsds as any);
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
     await refreshElasticSearch();
   });
 
@@ -749,7 +749,7 @@ describe("search on readableId", () => {
       }
     ];
 
-    await indexBsds(index.alias, bsds as any);
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
     await refreshElasticSearch();
   });
 
@@ -786,7 +786,7 @@ describe("search on wasteCode", () => {
       }
     ];
 
-    await indexBsds(index.alias, bsds as any);
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
     await refreshElasticSearch();
   });
 
