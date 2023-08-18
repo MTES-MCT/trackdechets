@@ -1,13 +1,13 @@
 import { Form, Formik } from "formik";
 import React, { useState, lazy } from "react";
-import { IconPaperWrite } from "common/components/Icons";
+import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
 import { useMutation } from "@apollo/client";
 import {
   Mutation,
   MutationUpdateBsdasriArgs,
   Bsdasri,
 } from "generated/graphql/types";
-import TdModal from "common/components/Modal";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import { UPDATE_BSDASRI } from "form/bsdasri/utils/queries";
 
 import { NotificationError } from "Apps/common/Components/Error/Error";
