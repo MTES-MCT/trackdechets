@@ -12,7 +12,13 @@ import {
   isVat,
   isForeignVat,
 } from "generated/constants/companySearchHelpers";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { debounce } from "common/helper";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
@@ -173,22 +179,28 @@ export default function CompanySelector({
     );
 
   /**
-   * Appel onCompanyPrivateInfos quand companyPrivateInfos répond
-   * Hack pour écraser "country" dans le formulaire
+   * Memoize companyPrivateData to avoid too many effects and renders
    */
-  useMemo(() => {
-    if (companyPrivateData?.companyPrivateInfos) {
-      onCompanyPrivateInfos?.(companyPrivateData.companyPrivateInfos);
-      if (
-        companyPrivateData?.companyPrivateInfos?.codePaysEtrangerEtablissement
-      ) {
+  const savedCompanyInfos = useMemo(
+    () => companyPrivateData?.companyPrivateInfos,
+    [companyPrivateData]
+  );
+  /**
+   * Fonctions du changement de companyPrivateData
+   */
+  useEffect(() => {
+    if (savedCompanyInfos) {
+      // propagate to parent components
+      onCompanyPrivateInfos?.(savedCompanyInfos);
+      // hack to auto-complete the country
+      if (savedCompanyInfos?.codePaysEtrangerEtablissement) {
         setFieldValue(
           `${field.name}.country`,
-          companyPrivateData.companyPrivateInfos.codePaysEtrangerEtablissement
+          savedCompanyInfos.codePaysEtrangerEtablissement
         );
       }
     }
-  }, [field.name, setFieldValue, onCompanyPrivateInfos, companyPrivateData]);
+  }, [savedCompanyInfos, field.name, onCompanyPrivateInfos, setFieldValue]);
 
   /**
    * Selection d'un établissement dans le formulaire
@@ -506,8 +518,8 @@ export default function CompanySelector({
                 address: field.value?.address,
                 codePaysEtrangerEtablissement: field.value?.country,
                 // complete with companyPrivateInfos data
-                ...(companyPrivateData?.companyPrivateInfos && {
-                  ...companyPrivateData.companyPrivateInfos,
+                ...(savedCompanyInfos && {
+                  ...savedCompanyInfos,
                 }),
               } as CompanySearchResult
             }
