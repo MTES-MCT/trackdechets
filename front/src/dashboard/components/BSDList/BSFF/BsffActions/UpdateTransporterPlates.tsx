@@ -1,9 +1,9 @@
 import { Form, Formik } from "formik";
 import React, { useState, lazy } from "react";
-import { IconPaperWrite } from "common/components/Icons";
+import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
 import { useMutation } from "@apollo/client";
 import { Mutation, MutationUpdateBsffArgs } from "generated/graphql/types";
-import TdModal from "common/components/Modal";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import { UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { BsffFragment } from "../types";
 import { NotificationError } from "Apps/common/Components/Error/Error";
@@ -87,11 +87,11 @@ function UpdateTransporterPlatesModal({
         }}
       >
         <Form>
-          <label>
+          <label htmlFor="plates">
             Immatriculations
             <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
-            <TagsInput name="plates" limit={2} />
           </label>
+          <TagsInput name="plates" limit={2} />
 
           {!!error && <NotificationError apolloError={error} />}
 

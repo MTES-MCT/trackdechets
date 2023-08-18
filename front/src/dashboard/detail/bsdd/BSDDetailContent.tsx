@@ -38,7 +38,7 @@ import {
   IconDuplicateFile,
   IconTrash,
   IconBSDD,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import routes from "Apps/routes";
 
 import {
@@ -104,9 +104,39 @@ const TransportSegmentDetail = ({ segment, siret }: SegmentProps) => {
     <>
       <div className={styles.detailGrid}>
         <Company label={label} company={segment?.transporter?.company} />
+      </div>
+
+      <div className={styles.detailGrid}>
+        <YesNoRow
+          value={segment?.transporter?.isExemptedOfReceipt}
+          label="Exemption de récépissé"
+        />
+        {!segment?.transporter?.isExemptedOfReceipt && (
+          <>
+            <DetailRow
+              value={segment?.transporter?.receipt}
+              label="Numéro de récépissé"
+              showEmpty={true}
+            />
+            <DetailRow
+              value={segment?.transporter?.department}
+              label="Département"
+              showEmpty={true}
+            />
+            <DateRow
+              value={segment?.transporter?.validityLimit}
+              label="Date de validité"
+            />
+          </>
+        )}
+        <DetailRow
+          value={segment?.transporter?.numberPlate}
+          label="Immatriculation"
+        />
 
         <DateRow value={segment?.takenOverAt} label="Pris en charge le" />
         <DetailRow value={segment?.takenOverBy} label="Pris en charge par" />
+
         <DetailRow
           value={getTransportModeLabel(segment?.mode)}
           label="Mode de transport"

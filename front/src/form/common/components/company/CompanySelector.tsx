@@ -3,7 +3,7 @@ import {
   NotificationError,
   SimpleNotificationError,
 } from "Apps/common/Components/Error/Error";
-import { IconLoading, IconSearch } from "common/components/Icons";
+import { IconLoading, IconSearch } from "Apps/common/Components/Icons/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { constantCase } from "constant-case";
 import { Field, useField, useFormikContext } from "formik";

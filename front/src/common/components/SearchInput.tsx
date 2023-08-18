@@ -1,5 +1,5 @@
 import React from "react";
-import { IconSearch } from "./Icons";
+import { IconSearch } from "../../Apps/common/Components/Icons/Icons";
 import styles from "./SearchInput.module.scss";
 
 export default function SearchInput({

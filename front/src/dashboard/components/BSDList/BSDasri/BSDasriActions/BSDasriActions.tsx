@@ -11,7 +11,7 @@ import {
   IconDuplicateFile,
   IconPdf,
   IconQrCode,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import { Bsdasri, BsdasriStatus, BsdasriType } from "generated/graphql/types";
 import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";

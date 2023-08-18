@@ -10,7 +10,11 @@ import {
 } from "react-router-dom";
 
 import { localAuthService } from "login/auth.service";
-import { IconProfile, IconLeftArrow, IconClose } from "common/components/Icons";
+import {
+  IconProfile,
+  IconLeftArrow,
+  IconClose,
+} from "Apps/common/Components/Icons/Icons";
 import { AccountMenuContent } from "account/AccountMenu";
 import { useQuery, gql } from "@apollo/client";
 import Loader from "Apps/common/Components/Loader/Loaders";

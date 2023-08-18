@@ -94,10 +94,10 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
           {!bsff.transporter?.transport?.mode ||
             (bsff.transporter?.transport?.mode === TransportMode.Road && (
               <div className="form__row">
-                <label>
+                <label htmlFor="transporterTransportPlates">
                   Immatriculations
-                  <TagsInput name="transporterTransportPlates" />
                 </label>
+                <TagsInput name="transporterTransportPlates" />
               </div>
             ))}
 

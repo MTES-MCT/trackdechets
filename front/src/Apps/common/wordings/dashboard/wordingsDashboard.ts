@@ -13,6 +13,7 @@ export const VALIDER_RECEPTION = "Valider la réception";
 export const VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE =
   "Valider l'acceptation de l'entreposage provisoire";
 export const SIGNATURE_ACCEPTATION_CONTENANT = "Gérer les contenants";
+export const AJOUTER_ANNEXE_1 = "Ajouter une annexe 1";
 
 // status badge
 export const BROUILLON = "Brouillon";

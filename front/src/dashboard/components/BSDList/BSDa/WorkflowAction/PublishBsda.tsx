@@ -3,10 +3,10 @@ import { Mutation, MutationPublishBsdaArgs } from "generated/graphql/types";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation } from "@apollo/client";
 
-import { TdModalTrigger } from "common/components/Modal";
+import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
 import { ActionButton } from "common/components";
 import { Loader } from "Apps/common/Components";
-import { IconPaperWrite } from "common/components/Icons";
+import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
 import { NotificationError } from "Apps/common/Components/Error/Error";
 
 import cogoToast from "cogo-toast";

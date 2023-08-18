@@ -738,7 +738,7 @@ describe("Bsd card primary action label", () => {
       const { getByText } = within(
         screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
       );
-      expect(getByText("Faire signer")).toBeInTheDocument();
+      expect(getByText("Signer")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();

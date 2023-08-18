@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ActionButton, Modal } from "common/components";
-import { IconShipmentSignSmartphone } from "common/components/Icons";
+import { IconShipmentSignSmartphone } from "Apps/common/Components/Icons/Icons";
 import { WorkflowActionProps } from "./WorkflowAction";
 import SignTransportFormModalContent from "dashboard/components/BSDList/BSDD/WorkflowAction/SignTransportFormModalContent";
 

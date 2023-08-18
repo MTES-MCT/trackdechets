@@ -4,7 +4,7 @@ import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { useParams } from "react-router";
 
-import { IconBSDasri } from "common/components/Icons";
+import { IconBSDasri } from "Apps/common/Components/Icons/Icons";
 import { CellProps, CellValue } from "react-table";
 import { BSDAsriActions } from "dashboard/components/BSDList/BSDasri/BSDasriActions/BSDasriActions";
 import { WorkflowAction } from "./WorkflowAction";

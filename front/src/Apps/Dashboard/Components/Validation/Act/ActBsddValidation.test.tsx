@@ -86,19 +86,22 @@ describe("ActBsddValidation", () => {
     ];
     render(
       <MockedProvider mocks={mocksSealed} addTypename={false}>
-        <ActBsddValidation
-          bsd={sealedBsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={["/dashboard/12345678901234"]}>
+          <ActBsddValidation
+            bsd={sealedBsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
-    expect(await screen.getByTestId("loader")).toBeInTheDocument();
 
     await waitFor(async () => {
       expect(
-        await screen.getByText("Signer en tant qu'émetteur")
+        await screen.getByText(
+          "Création d'un bordereau d'annexe 1 pour le bordereau de tournée"
+        )
       ).toBeInTheDocument();
     });
   });

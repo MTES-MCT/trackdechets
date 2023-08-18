@@ -1,9 +1,9 @@
 import React from "react";
-import { IconTrash } from "common/components/Icons";
+import { IconTrash } from "Apps/common/Components/Icons/Icons";
 import { gql, useMutation } from "@apollo/client";
 import { Mutation, MutationDeleteBsdasriArgs } from "generated/graphql/types";
 import cogoToast from "cogo-toast";
-import TdModal from "common/components/Modal";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import { GET_BSDS } from "Apps/common/queries";
 import { Loader } from "Apps/common/Components";
 

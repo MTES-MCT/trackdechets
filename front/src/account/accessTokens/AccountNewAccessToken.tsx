@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import copyTextToClipboard from "copy-text-to-clipboard";
-import { IconCheckCircle1, IconCopyPaste } from "common/components/Icons";
+import {
+  IconCheckCircle1,
+  IconCopyPaste,
+} from "Apps/common/Components/Icons/Icons";
 import { NewAccessToken } from "generated/graphql/types";
 import AccountAccessTokenRevoke from "./AccountAccessTokenRevoke";
 import styles from "./AccountAccessToken.module.scss";

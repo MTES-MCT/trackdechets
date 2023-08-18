@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import prisma from "../../src/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 import { getUserCompanies } from "../../src/users/database";
@@ -6,7 +5,7 @@ import { getUserCompanies } from "../../src/users/database";
 @registerUpdater(
   "Init BSDD draft canAccessDraft field",
   "Drafts are now only visible to their creators companies.",
-  true
+  false
 )
 export class InitBsddCanAccessDraft implements Updater {
   async run() {
@@ -22,12 +21,14 @@ export class InitBsddCanAccessDraft implements Updater {
         distinct: ["ownerId"],
         select: { ownerId: true }
       });
-
+      const draftOwnerCount = draftOwnerIds.length;
       console.info(
-        `🔢 There are ${draftOwnerIds.length} DRAFT BSDD owners to process.`
+        `🔢 There are ${draftOwnerCount} DRAFT BSDD owners to process.`
       );
-
+      let count = 0;
       for (const { ownerId } of draftOwnerIds) {
+        count += 1;
+        console.info(`Owner ${count} of ${draftOwnerCount}`);
         // To speed up the migration, we assign all the owners companies to `canAccessDraftSirets`
         // We don't filter on sirets present on the form.
         // - for the permission we intersect canAccessDraftSirets with the actual contributors
@@ -39,7 +40,8 @@ export class InitBsddCanAccessDraft implements Updater {
         await prisma.form.updateMany({
           where: {
             ownerId,
-            status: "DRAFT"
+            status: "DRAFT",
+            isDeleted: false
           },
           data: {
             canAccessDraftSirets: ownerOrgIds

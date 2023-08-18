@@ -66,14 +66,11 @@ export default function Transport({ status, editionDisabled = false }) {
       </div>{" "}
       {showTransportePlates && (
         <div className="form__row">
-          <label>
+          <label htmlFor="transporter.transport.plates">
             Immatriculations
             <Tooltip msg={customInfoToolTip} />
-            <TagsInput
-              name="transporter.transport.plates"
-              disabled={disabled}
-            />
           </label>
+          <TagsInput name="transporter.transport.plates" disabled={disabled} />
         </div>
       )}
       {showTransportFields && (
@@ -133,11 +130,11 @@ export default function Transport({ status, editionDisabled = false }) {
         </>
       )}
       <div className="form__row">
-        <label>
+        <label htmlFor="identification.numbers">
           Numéros de containers
           <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
-          <TagsInput name="identification.numbers" disabled={disabled} />
         </label>
+        <TagsInput name="identification.numbers" disabled={disabled} />
       </div>
     </>
   );

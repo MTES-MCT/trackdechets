@@ -8,9 +8,9 @@ import {
   PackagingInfo,
   Trader,
 } from "generated/graphql/types";
-import { TdModalTrigger } from "common/components/Modal";
+import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
 import { ActionButton, Modal, RedErrorMessage } from "common/components";
-import { IconCogApproved } from "common/components/Icons";
+import { IconCogApproved } from "Apps/common/Components/Icons/Icons";
 import { RevisionField } from "./RevisionField";
 import { useMutation } from "@apollo/client";
 import { SUBMIT_FORM_REVISION_REQUEST_APPROVAL } from "Apps/common/queries/reviews/BsddReviewsQuery";

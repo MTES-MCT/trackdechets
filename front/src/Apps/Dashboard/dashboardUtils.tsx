@@ -45,7 +45,7 @@ import {
   IconBSVhuThin as IconBSVhu,
   IconBSDDThin as IconBSDD,
   IconBSDasriThin as IconBSDasri,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 
 export const MAX_FILTER = 5;
 

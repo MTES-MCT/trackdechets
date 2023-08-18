@@ -56,13 +56,16 @@ export default function TagsInput(props) {
                 {tag}
                 <button
                   type="button"
-                  onClick={() => !props.disabled && arrayHelpers.remove(index)}
+                  onClick={e => {
+                    e.preventDefault();
+                    !props.disabled && arrayHelpers.remove(index);
+                  }}
                 >
                   +
                 </button>
               </li>
             ))}
-            <li className="input-tag__tags__input">
+            <li className="input-tag__tags__input" id={field.name}>
               <input
                 type="text"
                 onKeyDown={e => onInputKeyDown(e, arrayHelpers)}

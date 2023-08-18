@@ -3,8 +3,8 @@ import { gql, useMutation } from "@apollo/client";
 import { Mutation, MutationPublishBsffArgs } from "generated/graphql/types";
 import { ActionButton } from "common/components";
 import { Loader } from "Apps/common/Components";
-import { TdModalTrigger } from "common/components/Modal";
-import { IconPaperWrite } from "common/components/Icons";
+import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
+import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
 import { GET_BSDS } from "Apps/common/queries";
 import { NotificationError } from "Apps/common/Components/Error/Error";
 

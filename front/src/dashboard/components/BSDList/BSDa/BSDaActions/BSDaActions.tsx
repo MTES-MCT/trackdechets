@@ -8,7 +8,7 @@ import {
   IconDuplicateFile,
   IconTrash,
   IconQrCode,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import { Bsda, BsdaStatus } from "generated/graphql/types";
 import { DeleteBsdaModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";

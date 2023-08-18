@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import WasteTree from "./WasteTree";
 import styles from "./WasteTreeModal.module.scss";
-import TdModal from "common/components/Modal";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import { BSDD_WASTES_TREE, WasteNode } from "generated/constants";
 type Props = {
   wasteTree?: WasteNode[];

@@ -26,7 +26,7 @@ import {
   UPDATE_BSFF_PACKAGING,
 } from "form/bsff/utils/queries";
 import { GET_BSDS } from "Apps/common/queries";
-import { IconCheckCircle1 } from "common/components/Icons";
+import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
 import { BsffSummary } from "./BsffSummary";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";
 import { OPERATION } from "form/bsff/utils/constants";

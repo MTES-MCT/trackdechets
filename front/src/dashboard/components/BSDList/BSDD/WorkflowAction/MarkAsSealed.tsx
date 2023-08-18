@@ -3,7 +3,7 @@ import React from "react";
 import { statusChangeFragment } from "Apps/common/queries/fragments";
 import { ActionButton } from "common/components";
 import { Loader } from "Apps/common/Components";
-import { IconPaperWrite } from "common/components/Icons";
+import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
 import {
   FormStatus,
   Mutation,
@@ -11,7 +11,7 @@ import {
 } from "generated/graphql/types";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { NotificationError } from "Apps/common/Components/Error/Error";
-import { TdModalTrigger } from "common/components/Modal";
+import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
 import cogoToast from "cogo-toast";
 import { GET_BSDS } from "Apps/common/queries";
 

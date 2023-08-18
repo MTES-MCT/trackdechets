@@ -2,8 +2,8 @@ import { useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
 import React, { useState, lazy } from "react";
 import { NotificationError } from "Apps/common/Components/Error/Error";
-import { IconPaperWrite } from "common/components/Icons";
-import TdModal from "common/components/Modal";
+import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import Tooltip from "common/components/Tooltip";
 import { UPDATE_BSDA } from "form/bsda/stepper/queries";
 import {
@@ -98,11 +98,11 @@ export function TransporterInfoEdit({
             </div>
 
             <div className="form__row">
-              <label>
+              <label htmlFor="transporter.transport.plates">
                 Immatriculations
                 <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
-                <TagsInput name="transporter.transport.plates" limit={2} />
               </label>
+              <TagsInput name="transporter.transport.plates" limit={2} />
             </div>
 
             <div className="form__actions">

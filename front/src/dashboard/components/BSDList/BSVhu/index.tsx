@@ -1,6 +1,6 @@
 import * as React from "react";
 import { CellProps, CellValue } from "react-table";
-import { IconBSVhu } from "common/components/Icons";
+import { IconBSVhu } from "Apps/common/Components/Icons/Icons";
 import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
 import { BSVhuActions } from "./BSVhuActions/BSVhuActions";
 import { useParams } from "react-router-dom";

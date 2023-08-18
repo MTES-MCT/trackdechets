@@ -4,7 +4,7 @@ import { Formik, Form, Field, FieldArray } from "formik";
 import * as yup from "yup";
 import { Label, RedErrorMessage } from "common/components";
 import { Loader } from "Apps/common/Components";
-import { IconTrash } from "common/components/Icons";
+import { IconTrash } from "Apps/common/Components/Icons/Icons";
 import {
   ApplicationGoal,
   CreateApplicationInput,

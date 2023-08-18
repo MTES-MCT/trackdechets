@@ -9,7 +9,7 @@ import {
   IconTrash,
   IconDuplicateFile,
   IconQrCode,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import { BsffStatus } from "generated/graphql/types";
 import { BsffFragment } from "../types";
 import { DeleteBsffModal } from "./DeleteModal";
