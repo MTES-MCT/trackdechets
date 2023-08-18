@@ -5,6 +5,20 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.8.2] 21/08/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :house: Interne
+
+- Mise à jour ElasticSearch vers 7.10 [PR 2423](https://github.com/MTES-MCT/trackdechets/pull/2423)
+
 # [2023.8.1] 08/08/2023
 
 #### :rocket: Nouvelles fonctionnalités
