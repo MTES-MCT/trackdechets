@@ -38,8 +38,7 @@ async function buildSearchAfter(
     body: { _source: bsd }
   }: ApiResponse<estypes.GetResponse<BsdElastic>> = await client.get({
     id: cursor,
-    index: index.alias,
-    type: index.type
+    index: index.alias
   });
 
   if (!bsd) {

@@ -11,7 +11,7 @@ import {
 } from "../generated/graphql/types";
 import { UserInputError } from "../common/errors";
 
-type QueryDslQueryContainer = estypes.QueryDslQueryContainer;
+type QueryDslQueryContainer = estypes.QueryContainer;
 
 /**
  * Convert WasteRegistryFilter into elastic query filter

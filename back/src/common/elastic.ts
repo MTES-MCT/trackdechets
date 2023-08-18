@@ -280,22 +280,19 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   rawBsd: rawField
 };
 
-export type BsdIndex = {
+export type BsdIndexationConfig = {
   alias: string;
-  type: string;
   mappings_version: string;
   settings: any;
   mappings: {
     properties: typeof properties;
   };
+  elasticSearchUrl: string;
 };
 
-export const index: BsdIndex = {
+export const index: BsdIndexationConfig = {
   // Do not change this alias name unless you know you will break the production when releasing the next version
   alias: process.env.ELASTICSEARCH_BSDS_ALIAS_NAME || "bsds",
-  // The next major version of Elastic Search doesn't use "type" anymore
-  // so while it's required for the current version, we are not using it too much
-  type: "_doc",
   settings,
 
   // increment when mapping has changed to trigger re-indexation on release
@@ -304,7 +301,8 @@ export const index: BsdIndex = {
   mappings_version: "v1.0.0",
   mappings: {
     properties
-  }
+  },
+  elasticSearchUrl: process.env.ELASTIC_SEARCH_URL || "http://localhost:9200"
 };
 
 const certPath = path.join(__dirname, "es.cert");
@@ -327,14 +325,13 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
 }
 
 /**
- * Create/update a document in Elastic Search.
+ * Create/update one document in Elastic Search.
  */
 export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
   logger.info(`Indexing BSD ${bsd.id}`);
   return client.index(
     {
       index: index.alias,
-      type: index.type,
       id: bsd.id,
       body: bsd,
       version_type: "external_gte",
@@ -367,18 +364,30 @@ export async function getElasticBsdById(id) {
 /**
  * Bulk create/update a list of documents in Elastic Search.
  */
-export function indexBsds(indexName: string, bsds: BsdElastic[]) {
-  return client.bulk({
+export function indexBsds(
+  indexName: string,
+  bsds: BsdElastic[],
+  elasticSearchUrl: string
+) {
+  // To allow passing a different `elasticSearchUrl` from the environment of the job queue consumers
+  const es = new Client({
+    node: elasticSearchUrl,
+    ssl: fs.existsSync(certPath)
+      ? { ca: fs.readFileSync(certPath, "utf-8") }
+      : undefined
+  });
+  return es.bulk({
     body: bsds.flatMap(bsd => [
       {
         index: {
           _index: indexName,
-          _type: index.type,
           _id: bsd.id
         }
       },
       bsd
-    ])
+    ]),
+    // lighten the response
+    _source_excludes: ["items.index._*", "took"]
   });
 }
 
@@ -392,7 +401,6 @@ export function deleteBsd<T extends { id: string }>(
   return client.delete(
     {
       index: index.alias,
-      type: index.type,
       id,
       ...refresh(ctx)
     },

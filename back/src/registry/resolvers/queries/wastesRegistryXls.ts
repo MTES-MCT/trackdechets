@@ -14,6 +14,7 @@ import { searchBsds } from "../../elastic";
 import { GraphQLContext } from "../../../types";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { UserInputError } from "../../../common/errors";
+import { TotalHits } from "@elastic/elasticsearch/api/types";
 
 export const wastesRegistryXlsDownloadHandler: DownloadHandler<QueryWastesRegistryXlsArgs> =
   {
@@ -72,7 +73,7 @@ export async function wastesRegistryXlsResolverFn(
     sort: [{ id: "ASC" }]
   });
 
-  if (hits.total === 0) {
+  if ((hits.total as TotalHits).value === 0) {
     throw new UserInputError(
       "Aucune donnée à exporter sur la période sélectionnée"
     );

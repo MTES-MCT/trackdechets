@@ -1,11 +1,9 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { formFactory, userFactory } from "../../../__tests__/factories";
+import { INDEX_ALIAS_NAME_SEPARATOR } from "../../../bsds/indexation/bulkIndexBsds";
+import { reindexAllBsdsInBulk } from "../../../bsds/indexation";
 import {
-  reindexAllBsdsInBulk,
-  INDEX_ALIAS_NAME_SEPARATOR
-} from "../../../bsds/indexation/bulkIndexBsds";
-import {
-  BsdIndex,
+  BsdIndexationConfig,
   client,
   index as globalIndex
 } from "../../../common/elastic";
@@ -14,12 +12,12 @@ describe("reindexAllBsdsInBulk script", () => {
   // do not use INDEX_ALIAS_NAME_SEPARATOR
   const testAlias = "testbsds";
 
-  const testIndex: BsdIndex = {
+  const testIndex: BsdIndexationConfig = {
     ...globalIndex,
     alias: testAlias
   };
 
-  const testIndexV0: BsdIndex = {
+  const testIndexV0: BsdIndexationConfig = {
     ...globalIndex,
     mappings_version: "v0",
     alias: testAlias

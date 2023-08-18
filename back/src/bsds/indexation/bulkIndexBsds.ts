@@ -4,9 +4,8 @@ import logger from "../../logging/logger";
 import prisma from "../../prisma";
 import {
   client,
-  BsdIndex,
+  BsdIndexationConfig,
   indexBsds,
-  index as defaultIndexConfig,
   BsdElastic
 } from "../../common/elastic";
 import { BsdType } from "../../generated/graphql/types";
@@ -16,11 +15,7 @@ import { toBsdElastic as bsffToBsdElastic } from "../../bsffs/elastic";
 import { toBsdElastic as formToBsdElastic } from "../../forms/elastic";
 import { toBsdElastic as bsvhuToBsdElastic } from "../../bsvhu/elastic";
 import { indexQueue } from "../../queue/producers/elastic";
-type IndexElasticSearchOpts = {
-  index?: BsdIndex;
-  force?: boolean;
-  useQueue?: boolean;
-};
+import { IndexAllFnSignature, FindManyAndIndexBsdsFnSignature } from "./types";
 
 /**
  * Separators constants
@@ -29,18 +24,6 @@ type IndexElasticSearchOpts = {
  */
 export const INDEX_ALIAS_NAME_SEPARATOR = "_";
 export const INDEX_DATETIME_SEPARATOR = "===";
-
-type IndexAllFnSignature = {
-  bsdName: string;
-  index: string;
-  since?: Date;
-};
-
-export type FindManyAndIndexBsdsFnSignature = {
-  bsdName: string;
-  index: string;
-  ids: string[];
-};
 
 type ToBsdElasticFunction = (bsd: any) => BsdElastic;
 
@@ -134,7 +117,7 @@ const getIndexMappingsVersionFromName = (indexName: string): string =>
 /**
  * Build a codified index name
  */
-const getIndexName = (index: BsdIndex, dateStr?: string): string =>
+const getIndexName = (index: BsdIndexationConfig, dateStr?: string): string =>
   [
     index.alias,
     index.mappings_version,
@@ -145,12 +128,12 @@ const getIndexName = (index: BsdIndex, dateStr?: string): string =>
 /**
  * Create index on ES optimized for bulk indexing
  */
-async function declareNewIndex(index: BsdIndex) {
+export async function declareNewIndex(index: BsdIndexationConfig) {
   const newIndex = getIndexName(index);
   await client.indices.create({
     index: newIndex,
     body: {
-      mappings: { [index.type]: index.mappings },
+      mappings: index.mappings,
       settings: {
         ...index.settings,
         index: {
@@ -160,8 +143,7 @@ async function declareNewIndex(index: BsdIndex) {
           number_of_replicas: 0
         }
       }
-    },
-    include_type_name: true // compatibility with ES 7+
+    }
   });
   return newIndex;
 }
@@ -169,8 +151,8 @@ async function declareNewIndex(index: BsdIndex) {
 /**
  * Clean older indexes and attach the newest one to the alias
  */
-const attachNewIndexAndcleanOldIndexes = async (
-  index: BsdIndex,
+export const attachNewIndexAndcleanOldIndexes = async (
+  index: BsdIndexationConfig,
   newIndex: string
 ) => {
   const aliases = await client.cat.aliases({
@@ -249,8 +231,8 @@ const attachNewIndexAndcleanOldIndexes = async (
 /**
  * Detect mappings changes the declared version
  */
-async function isIndexMappingsVersionChanged(
-  index: BsdIndex
+export async function isIndexMappingsVersionChanged(
+  index: BsdIndexationConfig
 ): Promise<boolean> {
   const aliases: ApiResponse<Array<{ index: string }>> =
     await client.cat.aliases({
@@ -281,182 +263,6 @@ async function isIndexMappingsVersionChanged(
     );
     return true;
   }
-}
-
-/**
- * Reindex all or given bsd type documents "in place" in the current index. Useful when
- * you want to force a reindex without bumping index version.
- * WARNING : it will cause a read downtime during the time of the reindex.
- */
-export async function reindexPartialInPlace(
-  index: BsdIndex,
-  bsdType: BsdType,
-  force = false,
-  useQueue = false,
-  since?: Date
-) {
-  // avoid unwanted deletion
-  if (bsdType && force && !since) {
-    logger.info(`Deleting ${bsdType} entries`);
-    await client.deleteByQuery(
-      {
-        index: index.alias,
-        body: {
-          query: {
-            match: {
-              type: bsdType
-            }
-          }
-        },
-        refresh: true
-      },
-      {
-        // do not throw an error if a document has been updated during delete operation
-        ignore: [409]
-      }
-    );
-  }
-  logger.info(
-    `Reindex in place ${bsdType ? bsdType + " " : " "}${
-      since ? "since" : ""
-    } ${since}`
-  );
-  await indexAllBsds(index.alias, useQueue, bsdType, since);
-}
-
-/**
- * Bump a new index. During indexation, the alias still points to the old index
- * to avoid read downtimes. At the end of the indexation, the alias is reconfigured to
- * point to the new index.
- */
-async function reindexAllBsdsNoDowntime(
-  index: BsdIndex,
-  force: boolean,
-  useQueue = false
-): Promise<string> {
-  const mappingChanged = await isIndexMappingsVersionChanged(index);
-  if (mappingChanged || force) {
-    // index a new version and roll-over on the same alias without downtime
-    const newIndex = await declareNewIndex(index);
-    logger.info(
-      `BSD are being indexed in the new index "${newIndex}" while the alias "${index.alias}" still points to the current index.`
-    );
-
-    await indexAllBsds(newIndex, useQueue);
-    await attachNewIndexAndcleanOldIndexes(index, newIndex);
-    // restore index settings to defaults
-    await client.indices.putSettings({
-      index: newIndex,
-      body: {
-        settings: {
-          index: {
-            refresh_interval: "1s",
-            number_of_replicas: 1
-          }
-        }
-      }
-    });
-    return newIndex;
-  } else {
-    logger.info(
-      `reindexAll script has nothing to do, no mappings changes detected nor --force argument passed`
-    );
-    return index.alias;
-  }
-}
-
-/**
- * Creates a brand new index and alias from scratch
- */
-async function initializeIndex(
-  index: BsdIndex,
-  useQueue = false
-): Promise<string> {
-  const newIndex = await declareNewIndex(index);
-  await client.indices.putAlias({
-    name: index.alias,
-    index: newIndex
-  });
-  logger.info(
-    `All BSDs are being indexed in the new index "${newIndex}" with alias "${index.alias}".`
-  );
-  await indexAllBsds(newIndex, useQueue);
-  // restore index settings to defaults
-  await client.indices.putSettings({
-    index: newIndex,
-    body: {
-      settings: {
-        index: {
-          refresh_interval: "1s",
-          number_of_replicas: 1
-        }
-      }
-    }
-  });
-  logger.info(
-    `Created the alias "${index.alias}" pointing to the new index "${newIndex}"`
-  );
-  return newIndex;
-}
-
-/**
- * Main function
- * Initialize the first index or re-index without downtime if mapping changed
- * Re-index in place (deleting & indexing again) for a single type of BSds
- */
-export async function reindexAllBsdsInBulk({
-  index = defaultIndexConfig,
-  useQueue = false,
-  force = false
-}: IndexElasticSearchOpts): Promise<string> {
-  const catAliasesResponse = await client.cat.aliases({
-    name: index.alias,
-    format: "json"
-  });
-
-  const aliasExists = catAliasesResponse.body.length > 0;
-  if (!aliasExists) {
-    // first time indexation for a new alias name
-    const newIndex = await initializeIndex(index, useQueue);
-    logger.info(`reindexAllBsdsInBulk done initializing a new index, exiting.`);
-    return newIndex;
-  } else {
-    const newIndex = await reindexAllBsdsNoDowntime(index, force, useQueue);
-    logger.info(
-      `reindexAllBsdsInBulk done rolling out a new index without downtime, exiting.`
-    );
-    return newIndex;
-  }
-}
-
-/**
- * Main queuing function
- */
-export async function addReindexAllInBulkJob(
-  force: boolean
-): Promise<Job<string>> {
-  logger.info(
-    `Enqueuing job indexAllInBulk for the indexation of all bsds in bulk without downtime`
-  );
-  // default options can be overwritten by the calling function
-  const jobOptions: JobOptions = {
-    lifo: true,
-    attempts: 1,
-    timeout: 36_000_000 // 10h
-  };
-  const job = await indexQueue.add(
-    "indexAllInBulk",
-    JSON.stringify({
-      index: defaultIndexConfig,
-      force
-    }),
-    jobOptions
-  );
-  const isActive = await job.isActive();
-  logger.info(
-    `Done enqueuing job indexAllInBulk: Job ${job.id}, is currently active ? ${isActive}`
-  );
-  return job;
 }
 
 /**
@@ -496,7 +302,8 @@ export async function processBsdIdentifiersByChunk(
 export async function indexAllBsdTypeSync({
   bsdName,
   index,
-  since
+  since,
+  indexConfig
 }: IndexAllFnSignature): Promise<void> {
   const ids = await getBsdIdentifiers(bsdName, since);
 
@@ -506,7 +313,8 @@ export async function indexAllBsdTypeSync({
     findManyAndIndexBsds({
       bsdName,
       index,
-      ids: chunk
+      ids: chunk,
+      elasticSearchUrl: indexConfig.elasticSearchUrl
     })
   );
 }
@@ -515,25 +323,26 @@ export async function indexAllBsdTypeSync({
  * Index in chunks all BSDs of a given type by adding jobs
  * to the job queue
  */
-export async function indexAllBsdTypeConcurrently({
+export async function indexAllBsdTypeConcurrentJobs({
   bsdName,
   index,
-  since
+  since,
+  indexConfig
 }: IndexAllFnSignature) {
   const jobs: Job<string>[] = [];
-
   const data: { name: string; data: string; opts?: JobOptions }[] = [];
-
   const ids = await getBsdIdentifiers(bsdName, since);
   logger.info(`Starting indexation of ${ids.length} ${bsdName}`);
 
+  // Prepare Job data payload to call indexQueue.addBulk
   await processBsdIdentifiersByChunk(ids, async chunk => {
     data.push({
       name: "indexChunk",
       data: JSON.stringify({
         bsdName,
         index,
-        ids: chunk
+        ids: chunk,
+        elasticSearchUrl: indexConfig.elasticSearchUrl
       }),
       opts: {
         lifo: true,
@@ -574,6 +383,7 @@ export async function indexAllBsdTypeConcurrently({
  */
 export async function indexAllBsds(
   index: string,
+  indexConfig: BsdIndexationConfig,
   useQueue = false,
   bsdType?: BsdType,
   updatedSince?: Date
@@ -590,13 +400,15 @@ export async function indexAllBsds(
         await indexAllBsdTypeSync({
           bsdName,
           index,
-          since: updatedSince
+          since: updatedSince,
+          indexConfig
         });
       } else {
-        await indexAllBsdTypeConcurrently({
+        await indexAllBsdTypeConcurrentJobs({
           bsdName,
           index,
-          since: updatedSince
+          since: updatedSince,
+          indexConfig
         });
       }
     }
@@ -611,7 +423,8 @@ export async function indexAllBsds(
       await indexAllBsdTypeSync({
         bsdName,
         index,
-        since: startDate
+        since: startDate,
+        indexConfig
       });
     }
   }
@@ -625,7 +438,8 @@ export async function indexAllBsds(
 export async function findManyAndIndexBsds({
   bsdName,
   index,
-  ids
+  ids,
+  elasticSearchUrl
 }: FindManyAndIndexBsdsFnSignature): Promise<void> {
   const prismaModelDelegate = prismaModels[bsdName];
   const toBsdElasticFn = bsdNameToBsdElasticFns[bsdName];
@@ -641,8 +455,11 @@ export async function findManyAndIndexBsds({
 
   await indexBsds(
     index,
-    bsds.map(bsd => toBsdElasticFn(bsd))
+    bsds.map(bsd => toBsdElasticFn(bsd)),
+    elasticSearchUrl
   );
 
-  logger.info(`Indexed ${bsdName} batch of ${bsds.length}`);
+  logger.info(
+    `Indexed ${bsdName} batch of ${bsds.length} to ${elasticSearchUrl}`
+  );
 }
