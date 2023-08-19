@@ -12,18 +12,7 @@ const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
   if (isForeignVat(clue) && !!allowForeignCompanies && !allowForeignCompanies) {
     return [];
   }
-  return searchCompanies(clue, department).then(async results =>
-    results.map(async company => ({
-      ...company,
-      ...(company.siret
-        ? {
-            installation: await context.dataloaders.installations.load(
-              company.siret!
-            )
-          }
-        : {})
-    }))
-  );
+  return searchCompanies(clue, department);
 };
 
 export default searchCompaniesResolver;

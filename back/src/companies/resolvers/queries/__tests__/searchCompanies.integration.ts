@@ -3,6 +3,8 @@ import prisma from "../../../../prisma";
 import { companyFactory, siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as sirene from "../../../search";
+import { ErrorCode } from "../../../../common/errors";
+import { Query } from "../../../../generated/graphql/types";
 
 const searchCompanySpy = jest.spyOn(sirene, "searchCompanies");
 
@@ -16,6 +18,34 @@ describe("query { searchCompanies(clue, department) }", () => {
   afterEach(async () => {
     await resetDatabase();
     searchCompanySpy.mockReset();
+  });
+
+  it("should disallow unauthenticated user", async () => {
+    const { mutate } = makeClient();
+    const gqlQuery = `
+    query {
+      searchCompanies(clue: "Code en Stock"){
+        siret
+        address
+        name
+        naf
+        libelleNaf
+        installation {
+          codeS3ic
+        }
+      }
+    }
+  `;
+    const { errors } = await mutate<Pick<Query, "searchCompanies">>(gqlQuery);
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous n'êtes pas connecté.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.UNAUTHENTICATED
+        })
+      })
+    ]);
   });
 
   it("should return list of companies based on clue", async () => {

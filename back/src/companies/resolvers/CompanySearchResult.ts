@@ -59,6 +59,11 @@ const companySearchResultResolvers: CompanySearchResultResolvers = {
         where: whereSiretOrVatNumber(parent as CompanyBaseIdentifiers)
       })
       .workerCertification();
+  },
+  installation: (parent, _, context) => {
+    return !!parent.siret
+      ? context.dataloaders.installations.load(parent.siret!)
+      : null;
   }
 };
 
