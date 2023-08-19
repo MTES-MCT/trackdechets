@@ -13,7 +13,7 @@ export function buildQuery(
   registryType: WasteRegistryType,
   sirets: string[],
   where: WasteRegistryWhere | undefined | null
-): estypes.QueryDslQueryContainer {
+): estypes.QueryContainer {
   const elasticKey: { [key in WasteRegistryType]: keyof BsdElastic } = {
     OUTGOING: "isOutgoingWasteFor",
     INCOMING: "isIncomingWasteFor",
@@ -47,7 +47,7 @@ export async function searchBsds(
   sirets: string[],
   where: WasteRegistryWhere | undefined | null,
   { size, sort, search_after }: ElasticPaginationArgs
-): Promise<estypes.SearchHitsMetadata<BsdElastic>> {
+): Promise<estypes.HitsMetadata<BsdElastic>> {
   const sortKey = Object.keys(sort[0])[0];
   const query = buildQuery(registryType, sirets, where);
 

@@ -31,10 +31,14 @@ export class ReindexTransporterInfo implements Updater {
       include: { packagings: true, ficheInterventions: true }
     });
 
-    await indexBsds(index.alias, [
-      ...bsdas.map(bsda => bsdaToBsdElastic(bsda)),
-      ...bsdasris.map(bsdasri => bsdasriToBsdElastic(bsdasri)),
-      ...bsffs.map(bsff => bsffToBsdElastic(bsff))
-    ]);
+    await indexBsds(
+      index.alias,
+      [
+        ...bsdas.map(bsda => bsdaToBsdElastic(bsda)),
+        ...bsdasris.map(bsdasri => bsdasriToBsdElastic(bsdasri)),
+        ...bsffs.map(bsff => bsffToBsdElastic(bsff))
+      ],
+      index.elasticSearchUrl
+    );
   }
 }
