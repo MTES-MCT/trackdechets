@@ -15,6 +15,8 @@ jobs:
         options: -e="discovery.type=single-node" --health-cmd="curl http://localhost:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=10
       mongo:
         image: mongo:6
+        ports:
+        - 27017/tcp
         env:
           MONGO_INITDB_ROOT_USERNAME: test
           MONGO_INITDB_ROOT_PASSWORD: no_pass
@@ -29,6 +31,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+        - 5432/tcp
       redis:
         image: redis:5.0-alpine
         options: >-
@@ -36,6 +40,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+        - 6379/tcp
     strategy:
       fail-fast: false
       matrix:
@@ -58,7 +64,6 @@ jobs:
           ELASTIC_SEARCH_URL: http://localhost:${{ job.services.elasticsearch.ports[9200] }}
         run: |
           echo $ELASTIC_SEARCH_URL
-          ss -plantu
           curl -vvv "$ELASTIC_SEARCH_URL/_cat/health?h=status"
       - name: Run integration tests
         env:
