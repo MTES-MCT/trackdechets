@@ -43,10 +43,16 @@ export async function truncateDatabase() {
   await Promise.race(
     tables.map(({ tablename }) => {
       prisma.$executeRawUnsafe(
-        `TRUNCATE TABLE \"${dbSchemaName}\".\"${tablename}\" CASCADE RESTART IDENTITY;`
+        `TRUNCATE TABLE \"${dbSchemaName}\".\"${tablename}\" CASCADE;`
       );
     })
   );
+  const sequences: Array<{ relname: string }> =
+    await prisma.$queryRaw`SELECT c.relname FROM pg_class AS c JOIN pg_namespace AS n ON c.relnamespace = n.oid WHERE c.relkind='S' AND n.nspname=${dbSchemaName};`;
+
+  for (const { relname } of sequences) {
+    await prisma.$queryRaw`ALTER SEQUENCE \"${dbSchemaName}\".\"${relname}\" RESTART WITH 1;`;
+  }
 }
 
 export async function resetDatabase() {
