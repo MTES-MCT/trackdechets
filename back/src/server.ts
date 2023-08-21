@@ -77,16 +77,18 @@ export const server = new ApolloServer<GraphQLContext>({
   validationRules: [depthLimit(10)],
   allowBatchedHttpRequests: true,
   formatError: (formattedError, error) => {
-    // Catch Yup `ValidationError` and throw a `UserInputError` instead of an `InternalServerError`
     const originalError = unwrapResolverError(error);
+    const errorInstanceName = (originalError as any).constructor?.name;
 
-    if (originalError instanceof ValidationError) {
-      return new UserInputError(originalError.errors.join("\n"));
+    if (errorInstanceName === "ValidationError") {
+      const typedError = originalError as ValidationError;
+      return new UserInputError(typedError.errors.join("\n"));
     }
-    if (originalError instanceof ZodError) {
+    if (errorInstanceName === "ZodError") {
+      const typedError = originalError as ZodError;
       return new UserInputError(
-        originalError.issues.map(issue => issue.message).join("\n"),
-        { issues: originalError.issues }
+        typedError.issues.map(issue => issue.message).join("\n"),
+        { issues: typedError.issues }
       );
     }
     if (
