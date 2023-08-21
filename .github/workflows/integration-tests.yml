@@ -6,6 +6,34 @@ jobs:
   back:
     runs-on: ubuntu-latest
     name: Integration tests (chunk ${{ matrix.shard }}/${{ strategy.job-total }})
+    services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+        ports:
+        - 9200/tcp
+        options: -e="discovery.type=single-node" -e="xpack.security.enabled=false" --health-cmd="curl http://localhost:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=10
+      mongo:
+        image: mongo:6
+        env:
+          MONGO_INITDB_ROOT_USERNAME: test
+          MONGO_INITDB_ROOT_PASSWORD: no_pass
+      postgres:
+        image: postgres:13.3-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: no_pass
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:5.0-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     strategy:
       fail-fast: false
       matrix:
