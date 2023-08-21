@@ -32,6 +32,7 @@ const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (
     prisma.company.findUnique({
       where,
       select: {
+        id: true,
         orgId: true,
         gerepId: true,
         securityCode: true,
@@ -43,7 +44,14 @@ const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (
   const companyInfosConvert: any = companyInfos;
   return {
     ...companyInfosConvert,
-    ...company,
+    ...{
+      trackdechetsId: company?.id,
+      orgId: company?.orgId,
+      gerepId: company?.gerepId,
+      securityCode: company?.securityCode,
+      verificationCode: company?.verificationCode,
+      givenName: company?.givenName
+    },
     // We don't need this infos in this query
     isAnonymousCompany: isAnonymousCompany > 0
   } as CompanySearchPrivate;

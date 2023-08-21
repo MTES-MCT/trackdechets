@@ -12,7 +12,13 @@ import {
   isVat,
   isForeignVat,
 } from "generated/constants/companySearchHelpers";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { debounce } from "common/helper";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
@@ -53,6 +59,7 @@ interface CompanySelectorProps {
   onCompanySelected?: (
     company?: CompanySearchResult | CompanySearchPrivate
   ) => void;
+  onCompanyPrivateInfos?: (company?: CompanySearchPrivate) => void;
   allowForeignCompanies?: boolean;
   registeredOnlyCompanies?: boolean;
   heading?: string;
@@ -77,6 +84,7 @@ export default function CompanySelector({
   isBsdaTransporter = false,
   optional = false,
   initialAutoSelectFirstCompany = true,
+  onCompanyPrivateInfos = undefined,
 }: CompanySelectorProps) {
   // siret is the current active company
   const { siret } = useParams<{ siret: string }>();
@@ -158,86 +166,113 @@ export default function CompanySelector({
    * CompanyPrivateInfos pour completer les informations
    * de la Company courante enregistrée dans le BSD à son ouverture
    */
-  const { data: companyPrivateData } = useQuery<
-    Pick<Query, "companyPrivateInfos">,
-    QueryCompanyPrivateInfosArgs
-  >(COMPANY_SELECTOR_PRIVATE_INFOS, {
-    variables: {
-      // Compatibility with intermediaries that don't have orgId
-      clue: orgId!,
-    },
-    skip: !orgId,
-  });
+  const { data: companyPrivateData, loading: isLoadingCompanyPrivateData } =
+    useQuery<Pick<Query, "companyPrivateInfos">, QueryCompanyPrivateInfosArgs>(
+      COMPANY_SELECTOR_PRIVATE_INFOS,
+      {
+        variables: {
+          // Compatibility with intermediaries that don't have orgId
+          clue: orgId!,
+        },
+        skip: !orgId,
+      }
+    );
 
   /**
-   * Update the current form value when companyPrivateInfos changes
-   * Hack to fix country data when needed.
+   * Memoize companyPrivateData to avoid too many effects and renders
+   */
+  const savedCompanyInfos = useMemo(
+    () => companyPrivateData?.companyPrivateInfos,
+    [companyPrivateData]
+  );
+  /**
+   * Fonctions du changement de companyPrivateData
    */
   useEffect(() => {
-    if (
-      companyPrivateData?.companyPrivateInfos?.codePaysEtrangerEtablissement
-    ) {
-      setFieldValue(
-        `${field.name}.country`,
-        companyPrivateData.companyPrivateInfos.codePaysEtrangerEtablissement
-      );
+    if (savedCompanyInfos) {
+      // propagate to parent components
+      onCompanyPrivateInfos?.(savedCompanyInfos);
+      // hack to auto-complete the country
+      if (savedCompanyInfos?.codePaysEtrangerEtablissement) {
+        setFieldValue(
+          `${field.name}.country`,
+          savedCompanyInfos.codePaysEtrangerEtablissement
+        );
+      }
     }
-  }, [field.name, setFieldValue, companyPrivateData]);
-
-  function isUnknownCompanyName(companyName?: string): boolean {
-    return companyName === "---" || companyName === "";
-  }
+  }, [savedCompanyInfos, field.name, onCompanyPrivateInfos, setFieldValue]);
 
   /**
    * Selection d'un établissement dans le formulaire
    */
-  function selectCompany(company?: CompanySearchResult) {
-    if (disabled) return;
-    // empty the fields
-    if (!company) {
-      setFieldValue(field.name, getInitialCompany());
+
+  const selectCompany = useCallback(
+    (company?: CompanySearchResult) => {
+      function isUnknownCompanyName(companyName?: string): boolean {
+        return companyName === "---" || companyName === "";
+      }
+
+      if (disabled) return;
+      // empty the fields
+      if (!company) {
+        setFieldValue(field.name, getInitialCompany());
+        setFieldTouched(`${field.name}`, true, true);
+        onCompanySelected?.();
+        return;
+      }
+
+      // Side effects
+      const notVoidCompany = Object.keys(company).length !== 0; // unselect returns emtpy object {}
+      setMustBeRegistered(
+        notVoidCompany && !company.isRegistered && registeredOnlyCompanies
+      );
+
+      // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
+      setDisplayForeignCompanyWithUnknownInfos(
+        isForeignVat(company.vatNumber!!) && isUnknownCompanyName(company.name!)
+      );
+
+      setIsForeignCompany(isForeignVat(company.vatNumber!!));
+      // Prépare la mise à jour du Form
+      const fields: FormCompany = {
+        orgId: company.orgId,
+        siret: company.siret,
+        vatNumber: company.vatNumber,
+        name:
+          company.name && !isUnknownCompanyName(company.name)
+            ? company.name
+            : "",
+        address: company.address ?? "",
+        contact: company.contact ?? "",
+        phone: company.contactPhone ?? "",
+        mail: company.contactEmail ?? "",
+        country: company.codePaysEtrangerEtablissement,
+      };
+
+      Object.keys(fields).forEach(key => {
+        setFieldValue(`${field.name}.${key}`, fields[key]);
+      });
       setFieldTouched(`${field.name}`, true, true);
-      onCompanySelected?.();
-      return;
-    }
+      onCompanySelected?.(company);
 
-    // Side effects
-    const notVoidCompany = Object.keys(company).length !== 0; // unselect returns emtpy object {}
-    setMustBeRegistered(
-      notVoidCompany && !company.isRegistered && registeredOnlyCompanies
-    );
-
-    // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
-    setDisplayForeignCompanyWithUnknownInfos(
-      isForeignVat(company.vatNumber!!) && isUnknownCompanyName(company.name!)
-    );
-
-    setIsForeignCompany(isForeignVat(company.vatNumber!!));
-    // Prépare la mise à jour du Form
-    const fields: FormCompany = {
-      orgId: company.orgId,
-      siret: company.siret,
-      vatNumber: company.vatNumber,
-      name:
-        company.name && !isUnknownCompanyName(company.name) ? company.name : "",
-      address: company.address ?? "",
-      contact: company.contact ?? "",
-      phone: company.contactPhone ?? "",
-      mail: company.contactEmail ?? "",
-      country: company.codePaysEtrangerEtablissement,
-    };
-
-    Object.keys(fields).forEach(key => {
-      setFieldValue(`${field.name}.${key}`, fields[key]);
-    });
-    setFieldTouched(`${field.name}`, true, true);
-    onCompanySelected?.(company);
-
-    setSelectedCompanyDetails({
-      name: company.name,
-      address: company.address,
-    });
-  }
+      setSelectedCompanyDetails({
+        name: company.name,
+        address: company.address,
+      });
+    },
+    [
+      setSelectedCompanyDetails,
+      onCompanySelected,
+      setFieldTouched,
+      setFieldValue,
+      setIsForeignCompany,
+      setDisplayForeignCompanyWithUnknownInfos,
+      setMustBeRegistered,
+      disabled,
+      field.name,
+      registeredOnlyCompanies,
+    ]
+  );
 
   /**
    * Merge searchCompanies et favoritesData
@@ -469,29 +504,27 @@ export default function CompanySelector({
           <span>Aucun établissement ne correspond à cette recherche...</span>
         )}
         <RedErrorMessage name={`${field.name}.siret`} />
-        <CompanyResults<CompanySearchResult>
-          onSelect={company => selectCompany(company)}
-          onUnselect={() => selectCompany()}
-          results={searchResults}
-          selectedItem={
-            {
-              orgId,
-              siret: field.value?.siret,
-              vatNumber: field.value?.vatNumber,
-              name: field.value?.name,
-              address: field.value?.address,
-              codePaysEtrangerEtablissement: field.value?.country,
-              // complete with companyPrivateInfos data
-              ...(companyPrivateData?.companyPrivateInfos && {
-                isRegistered:
-                  companyPrivateData?.companyPrivateInfos.isRegistered,
-                codePaysEtrangerEtablissement:
-                  companyPrivateData?.companyPrivateInfos
-                    .codePaysEtrangerEtablissement,
-              }),
-            } as CompanySearchResult
-          }
-        />
+        {!isLoadingCompanyPrivateData && (
+          <CompanyResults<CompanySearchResult>
+            onSelect={company => selectCompany(company)}
+            onUnselect={() => selectCompany()}
+            results={searchResults}
+            selectedItem={
+              {
+                orgId,
+                siret: field.value?.siret,
+                vatNumber: field.value?.vatNumber,
+                name: field.value?.name,
+                address: field.value?.address,
+                codePaysEtrangerEtablissement: field.value?.country,
+                // complete with companyPrivateInfos data
+                ...(savedCompanyInfos && {
+                  ...savedCompanyInfos,
+                }),
+              } as CompanySearchResult
+            }
+          />
+        )}
         <div className="form__row">
           {allowForeignCompanies && isForeignCompany && (
             <>
