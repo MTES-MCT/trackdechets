@@ -15,16 +15,16 @@ import getReadableId from "../../../../forms/readableId";
 import * as search from "../../../search";
 import { CompanySearchResult } from "../../../types";
 
-const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
-  favorites(siret: $siret, type: $type) {
+const FAVORITES = `query Favorites($orgId: String!, $type: FavoriteType!) {
+  favorites(orgId: $orgId, type: $type) {
     name
     orgId
     siret
     vatNumber
     address
     contact
-    phone
-    mail
+    contactPhone
+    contactMail
     codePaysEtrangerEtablissement
     transporterReceipt {
       receiptNumber
@@ -50,18 +50,18 @@ describe("query favorites", () => {
     );
     await formFactory({
       ownerId: user2.id,
-      opt: { recipientCompanySiret: company2.siret }
+      opt: { recipientCompanySiret: company2.orgId }
     });
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { errors } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company2.siret,
+        orgId: company2.orgId,
         type: "RECIPIENT"
       }
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Vous n'êtes pas membre de l'entreprise portant le siret "${company2.siret}".`
+        message: `Vous n'êtes pas membre de l'entreprise portant le orgId "${company2.orgId}".`
       })
     ]);
   });
@@ -73,18 +73,18 @@ describe("query favorites", () => {
     );
     await formFactory({
       ownerId: user2.id,
-      opt: { recipientCompanySiret: company2.siret }
+      opt: { recipientCompanySiret: company2.orgId }
     });
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "RECIPIENT"
       }
     });
 
     expect(data.favorites).toEqual([
-      expect.objectContaining({ siret: company.siret })
+      expect.objectContaining({ orgId: company.orgId })
     ]);
   });
 
@@ -104,7 +104,7 @@ describe("query favorites", () => {
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "EMITTER"
       }
     });
@@ -128,7 +128,7 @@ describe("query favorites", () => {
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "EMITTER"
       }
     });
@@ -146,23 +146,23 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: emitter.siret,
-        recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret!]
+        emitterCompanySiret: emitter.orgId,
+        recipientCompanySiret: company.orgId,
+        recipientsSirets: [company.orgId!]
       }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "EMITTER"
       }
     });
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: emitter.siret,
+        orgId: emitter.orgId,
         name: emitter.name,
         address: emitter.address,
         vatNumber: null,
@@ -184,13 +184,13 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: siretify(1),
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.orgId
       }
     });
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "EMITTER"
       }
     });
@@ -208,22 +208,22 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
-        recipientCompanySiret: recipient.siret
+        emitterCompanySiret: company.orgId,
+        recipientCompanySiret: recipient.orgId
       }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "RECIPIENT"
       }
     });
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: recipient.siret,
+        orgId: recipient.orgId,
         name: recipient.name,
         address: recipient.address,
         vatNumber: null,
@@ -244,14 +244,14 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
+        emitterCompanySiret: company.orgId,
         recipientCompanySiret: siretify(1)
       }
     });
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "RECIPIENT"
       }
     });
@@ -277,25 +277,25 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
+        emitterCompanySiret: company.orgId,
         transporters: {
-          create: { transporterCompanySiret: transporter.siret, number: 1 }
+          create: { transporterCompanySiret: transporter.orgId, number: 1 }
         },
-        transportersSirets: [transporter.siret!]
+        transportersSirets: [transporter.orgId!]
       }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "TRANSPORTER"
       }
     });
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: transporter.siret,
+        orgId: transporter.orgId,
         name: transporter.name,
         address: transporter.address,
         vatNumber: null,
@@ -318,12 +318,12 @@ describe("query favorites", () => {
     });
     const transporter = await companyFactory({
       vatNumber: "IT09301420155",
-      siret: "IT09301420155"
+      orgId: "IT09301420155"
     });
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
+        emitterCompanySiret: company.orgId,
         transporters: {
           create: {
             transporterCompanyVatNumber: transporter.vatNumber,
@@ -336,7 +336,7 @@ describe("query favorites", () => {
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "TRANSPORTER"
       }
     });
@@ -344,7 +344,7 @@ describe("query favorites", () => {
     expect(data.favorites).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          siret: transporter.siret,
+          orgId: transporter.orgId,
           name: transporter.name,
           address: transporter.address,
           vatNumber: transporter.vatNumber,
@@ -366,7 +366,7 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
+        emitterCompanySiret: company.orgId,
         transporters: {
           create: {
             transporterCompanySiret: siretify(1),
@@ -378,7 +378,7 @@ describe("query favorites", () => {
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "TRANSPORTER"
       }
     });
@@ -396,8 +396,8 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
-        recipientCompanySiret: tempStorer.siret,
+        emitterCompanySiret: company.orgId,
+        recipientCompanySiret: tempStorer.orgId,
         recipientIsTempStorage: true
       }
     });
@@ -405,14 +405,14 @@ describe("query favorites", () => {
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "TEMPORARY_STORAGE_DETAIL"
       }
     });
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: tempStorer.siret,
+        orgId: tempStorer.orgId,
         name: tempStorer.name,
         address: tempStorer.address,
         vatNumber: null,
@@ -433,7 +433,7 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
+        emitterCompanySiret: company.orgId,
         recipientCompanySiret: siretify(1),
         recipientIsTempStorage: true
       }
@@ -441,7 +441,7 @@ describe("query favorites", () => {
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "TEMPORARY_STORAGE_DETAIL"
       }
     });
@@ -460,23 +460,23 @@ describe("query favorites", () => {
     await formWithTempStorageFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
-        recipientsSirets: [destination.siret!]
+        emitterCompanySiret: company.orgId,
+        recipientsSirets: [destination.orgId!]
       },
-      forwardedInOpts: { recipientCompanySiret: destination.siret }
+      forwardedInOpts: { recipientCompanySiret: destination.orgId }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "DESTINATION"
       }
     });
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: destination.siret,
+        orgId: destination.orgId,
         name: destination.name,
         address: destination.address,
         vatNumber: null,
@@ -497,14 +497,14 @@ describe("query favorites", () => {
 
     await formWithTempStorageFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: company.siret },
+      opt: { emitterCompanySiret: company.orgId },
       forwardedInOpts: { recipientCompanySiret: siretify(1) }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "DESTINATION"
       }
     });
@@ -513,10 +513,10 @@ describe("query favorites", () => {
   });
 
   it("should return recent next destinations", async () => {
-    const siret = siretify(1);
+    const orgId = siretify(1);
     const destination: CompanySearchResult = {
-      siret,
-      orgId: siret,
+      orgId,
+      siret: orgId,
       address: "rue des 4 chemins",
       name: "Destination ultérieure",
       isRegistered: true,
@@ -537,22 +537,22 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
-        nextDestinationCompanySiret: destination.siret
+        emitterCompanySiret: company.orgId,
+        nextDestinationCompanySiret: destination.orgId
       }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "NEXT_DESTINATION"
       }
     });
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: destination.siret,
+        orgId: destination.orgId,
         name: destination.name,
         address: destination.address,
         vatNumber: null,
@@ -575,7 +575,7 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
+        emitterCompanySiret: company.orgId,
         nextDestinationCompanySiret: siretify(1)
       }
     });
@@ -583,7 +583,7 @@ describe("query favorites", () => {
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "NEXT_DESTINATION"
       }
     });
@@ -604,8 +604,8 @@ describe("query favorites", () => {
     });
 
     const traderSirene: CompanySearchResult = {
-      orgId: trader.siret!,
-      siret: trader.siret,
+      orgId: trader.orgId!,
+      siret: trader.orgId,
       address: "rue des 4 chemins",
       name: "Négociant",
       isRegistered: true,
@@ -626,22 +626,22 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
-        traderCompanySiret: trader.siret
+        emitterCompanySiret: company.orgId,
+        traderCompanySiret: trader.orgId
       }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "TRADER"
       }
     });
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: traderSirene.siret,
+        orgId: traderSirene.orgId,
         name: traderSirene.name,
         address: traderSirene.address,
         vatNumber: null,
@@ -669,8 +669,8 @@ describe("query favorites", () => {
     });
 
     const brokerSirene: CompanySearchResult = {
-      siret: broker.siret,
-      orgId: broker.siret!,
+      orgId: broker.orgId,
+      siret: broker.orgId!,
       address: "rue des 4 chemins",
       name: "Courtier",
       isRegistered: true,
@@ -691,22 +691,22 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
-        brokerCompanySiret: broker.siret
+        emitterCompanySiret: company.orgId,
+        brokerCompanySiret: broker.orgId
       }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "BROKER"
       }
     });
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: brokerSirene.siret,
+        orgId: brokerSirene.orgId,
         name: brokerSirene.name,
         address: brokerSirene.address,
         vatNumber: null,
@@ -731,7 +731,7 @@ describe("query favorites", () => {
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data, errors } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "EMITTER"
       }
     });
@@ -739,7 +739,7 @@ describe("query favorites", () => {
     expect(errors).toBeUndefined();
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: company.siret,
+        orgId: company.orgId,
         codePaysEtrangerEtablissement: "FR"
       })
     ]);
@@ -757,37 +757,37 @@ describe("query favorites", () => {
     const firstForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: emitter1.siret,
-        recipientsSirets: [company.siret!]
+        emitterCompanySiret: emitter1.orgId,
+        recipientsSirets: [company.orgId!]
       }
     });
     const secondForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: emitter2.siret,
-        recipientsSirets: [company.siret!]
+        emitterCompanySiret: emitter2.orgId,
+        recipientsSirets: [company.orgId!]
       }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "EMITTER"
       }
     });
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: firstForm.emitterCompanySiret,
+        orgId: firstForm.emitterCompanySiret,
         codePaysEtrangerEtablissement: "FR"
       }),
       expect.objectContaining({
-        siret: secondForm.emitterCompanySiret,
+        orgId: secondForm.emitterCompanySiret,
         codePaysEtrangerEtablissement: "FR"
       }),
       expect.objectContaining({
-        siret: company.siret,
+        orgId: company.orgId,
         codePaysEtrangerEtablissement: "FR"
       })
     ]);
@@ -805,43 +805,43 @@ describe("query favorites", () => {
     const firstForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: emitter1.siret,
-        recipientsSirets: [company.siret!]
+        emitterCompanySiret: emitter1.orgId,
+        recipientsSirets: [company.orgId!]
       }
     });
     const secondForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: emitter2.siret,
-        recipientsSirets: [company.siret!]
+        emitterCompanySiret: emitter2.orgId,
+        recipientsSirets: [company.orgId!]
       }
     });
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.orgId
       }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "EMITTER"
       }
     });
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: company.siret,
+        orgId: company.orgId,
         codePaysEtrangerEtablissement: "FR"
       }),
       expect.objectContaining({
-        siret: firstForm.emitterCompanySiret,
+        orgId: firstForm.emitterCompanySiret,
         codePaysEtrangerEtablissement: "FR"
       }),
       expect.objectContaining({
-        siret: secondForm.emitterCompanySiret,
+        orgId: secondForm.emitterCompanySiret,
         codePaysEtrangerEtablissement: "FR"
       })
     ]);
@@ -858,8 +858,8 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanyName: "A Name",
-        emitterCompanySiret: emitter.siret,
-        recipientsSirets: [company.siret!]
+        emitterCompanySiret: emitter.orgId,
+        recipientsSirets: [company.orgId!]
       }
     });
     await formFactory({
@@ -867,21 +867,21 @@ describe("query favorites", () => {
       opt: {
         emitterCompanyName: "Another Name",
         emitterCompanySiret: firstForm.emitterCompanySiret,
-        recipientsSirets: [company.siret!]
+        recipientsSirets: [company.orgId!]
       }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "EMITTER"
       }
     });
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: firstForm.emitterCompanySiret,
+        orgId: firstForm.emitterCompanySiret,
         codePaysEtrangerEtablissement: "FR"
       })
     ]);
@@ -902,7 +902,7 @@ describe("query favorites", () => {
             number: 1
           }
         },
-        recipientsSirets: [company.siret!]
+        recipientsSirets: [company.orgId!]
       }
     });
     await formFactory({
@@ -915,13 +915,13 @@ describe("query favorites", () => {
             number: 1
           }
         },
-        recipientsSirets: [company.siret!]
+        recipientsSirets: [company.orgId!]
       }
     });
 
     const { data: data2 } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "TRANSPORTER"
       }
     });
@@ -947,17 +947,17 @@ describe("query favorites", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret,
+        emitterCompanySiret: company.orgId,
         recipientCompanySiret,
         recipientIsTempStorage: true,
         forwardedIn: {
           create: {
             readableId: getReadableId(),
             ownerId: user.id,
-            recipientCompanySiret: destination.siret
+            recipientCompanySiret: destination.orgId
           }
         },
-        recipientsSirets: [recipientCompanySiret, destination.siret!]
+        recipientsSirets: [recipientCompanySiret, destination.orgId!]
       }
     });
     const forwardedIn = await prisma.form
@@ -967,14 +967,14 @@ describe("query favorites", () => {
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
+        orgId: company.orgId,
         type: "DESTINATION"
       }
     });
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: forwardedIn?.recipientCompanySiret
+        orgId: forwardedIn?.recipientCompanySiret
       })
     ]);
   });
