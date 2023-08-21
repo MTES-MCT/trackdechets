@@ -7,6 +7,7 @@ import setYupLocale from "./common/setYupLocale";
 import BrowserDetect from "./BrowserDetect";
 import ErrorBoundary from "./ErrorBoundary";
 import { FeatureFlagsProvider } from "common/contexts/FeatureFlagsContext";
+import { PermissionsProvider } from "common/contexts/PermissionsContext";
 
 // Defines app-wide french error messages for yup
 // See https://github.com/jquense/yup#using-a-custom-locale-dictionary
@@ -18,11 +19,13 @@ export default function App() {
       <ErrorBoundary>
         <ApolloProvider client={client}>
           <Router>
-            <FeatureFlagsProvider defaultFeatureFlags={{}}>
-              <div className="App">
-                <LayoutContainer />
-              </div>
-            </FeatureFlagsProvider>
+            <PermissionsProvider defaultPermissions={[]}>
+              <FeatureFlagsProvider defaultFeatureFlags={{}}>
+                <div className="App">
+                  <LayoutContainer />
+                </div>
+              </FeatureFlagsProvider>
+            </PermissionsProvider>
           </Router>
         </ApolloProvider>
       </ErrorBoundary>

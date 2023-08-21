@@ -32,6 +32,7 @@ import {
   EmitterType,
   BsdasriType,
   BsdaType,
+  UserPermission,
 } from "generated/graphql/types";
 
 import { BsdCurrentTab } from "Apps/common/types/commonTypes";
@@ -244,7 +245,7 @@ describe("dashboardServices", () => {
 
     it("should return the correct label for Bsda with same transporter siret and private individual and worker disabled", () => {
       const currentSiret = "987654321";
-
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       const bsd: BsdDisplay = {
         type: BsdType.Bsda,
         worker: { isDisabled: true },
@@ -253,13 +254,19 @@ describe("dashboardServices", () => {
           company: { siret: "987654321" },
         },
       } as BsdDisplay;
-      const result = getIsNonDraftLabel(bsd, currentSiret, bsdCurrentTab);
+      const result = getIsNonDraftLabel(
+        bsd,
+        currentSiret,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toBe(SIGNER);
     });
 
     it("should return the correct label for Bsda Collection_2710 and same siret destination", () => {
       const currentSiret = "987654321";
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       const bsd: BsdDisplay = {
         type: BsdType.Bsda,
         bsdWorkflowType: BsdaType.Collection_2710,
@@ -267,13 +274,19 @@ describe("dashboardServices", () => {
           company: { siret: "987654321" },
         },
       } as BsdDisplay;
-      const result = getIsNonDraftLabel(bsd, currentSiret, bsdCurrentTab);
+      const result = getIsNonDraftLabel(
+        bsd,
+        currentSiret,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toBe(SIGNER);
     });
 
     it("should return the correct label for bsdasri eco organism", () => {
       const currentSiret = "987654321";
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       const bsd: BsdDisplay = {
         type: BsdType.Bsdasri,
         ecoOrganisme: {
@@ -290,13 +303,19 @@ describe("dashboardServices", () => {
           company: { siret: "987654321" },
         },
       } as BsdDisplay;
-      const result = getIsNonDraftLabel(bsd, currentSiret, bsdCurrentTab);
+      const result = getIsNonDraftLabel(
+        bsd,
+        currentSiret,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toBe(SIGNATURE_ECO_ORG);
     });
 
     it("should return the correct label for bsdasri", () => {
       const currentSiret = "987654321";
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       const bsd: BsdDisplay = {
         type: BsdType.Bsdasri,
         emitter: {
@@ -309,7 +328,12 @@ describe("dashboardServices", () => {
           company: { siret: "987654321" },
         },
       } as BsdDisplay;
-      const result = getIsNonDraftLabel(bsd, currentSiret, bsdCurrentTab);
+      const result = getIsNonDraftLabel(
+        bsd,
+        currentSiret,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toBe(SIGNER);
     });
@@ -317,6 +341,9 @@ describe("dashboardServices", () => {
     it("should return the correct label for bsdasri in collect tab and same emitter siret and is transporter", () => {
       bsdCurrentTab = "toCollectTab";
       const currentSiret = "987654321";
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignTransport,
+      ];
       const bsd: BsdDisplay = {
         type: BsdType.Bsdasri,
         emitter: {
@@ -327,7 +354,12 @@ describe("dashboardServices", () => {
         },
         bsdWorkflowType: "SYNTHESIS",
       } as BsdDisplay;
-      const result = getIsNonDraftLabel(bsd, currentSiret, bsdCurrentTab);
+      const result = getIsNonDraftLabel(
+        bsd,
+        currentSiret,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toBe(VALIDER_SYNTHESE_LABEL);
     });
@@ -335,26 +367,38 @@ describe("dashboardServices", () => {
     it("should return the correct label for bsff", () => {
       bsdCurrentTab = "toCollectTab";
       const currentSiret = "987654321";
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       const bsd: BsdDisplay = {
         type: BsdType.Bsff,
         emitter: {
           company: { siret: "987654321" },
         },
       } as BsdDisplay;
-      const result = getIsNonDraftLabel(bsd, currentSiret, bsdCurrentTab);
+      const result = getIsNonDraftLabel(
+        bsd,
+        currentSiret,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toBe(SIGNER);
     });
 
     it("should return the correct label for bsdd", () => {
       const currentSiret = "987654321";
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       const bsd: BsdDisplay = {
         type: BsdType.Bsdd,
         emitter: {
           company: { siret: "987654321" },
         },
       } as BsdDisplay;
-      const result = getIsNonDraftLabel(bsd, currentSiret, bsdCurrentTab);
+      const result = getIsNonDraftLabel(
+        bsd,
+        currentSiret,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toBe(SIGNER);
     });
@@ -368,10 +412,11 @@ describe("dashboardServices", () => {
 
     it("should return the correct label when isDraft is true", () => {
       const bsdCurrentTab: BsdCurrentTab = "draftTab";
-
+      const permissions: UserPermission[] = [UserPermission.BsdCanUpdate];
       const result = getDraftOrInitialBtnLabel(
         currentSiret,
         bsd,
+        permissions,
         bsdCurrentTab
       );
       expect(result).toBe(PUBLIER);
@@ -379,13 +424,17 @@ describe("dashboardServices", () => {
 
     it("should return the correct label when isDraft is false", () => {
       const bsdCurrentTab: BsdCurrentTab = "actTab";
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       bsd.isDraft = false;
       const result = getDraftOrInitialBtnLabel(
         currentSiret,
         bsd,
+        permissions,
         bsdCurrentTab
       );
-      expect(result).toBe(getIsNonDraftLabel(bsd, currentSiret, bsdCurrentTab));
+      expect(result).toBe(
+        getIsNonDraftLabel(bsd, currentSiret, permissions, bsdCurrentTab)
+      );
     });
   });
 
@@ -401,50 +450,56 @@ describe("dashboardServices", () => {
 
     test("returns SIGNER for BSDD type with valid conditions", () => {
       const currentSiret = "1234567890";
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       bsd.emitterType = EmitterType.Appendix1Producer;
       bsd.transporter!.company!.siret = "1234567890";
-      const result = getSealedBtnLabel(currentSiret, bsd);
+      const result = getSealedBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual(SIGNER);
     });
 
     test("returns FAIRE_SIGNER for BSDD type with valid conditions", () => {
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       bsd.emitterType = EmitterType.Producer;
       bsd.transporter!.company!.siret = "1234567890";
       bsd.emitter!.company!.siret = "1234567890";
       bsd.ecoOrganisme!.siret = "1234567890";
       const currentSiret = "1234567890";
-      const result = getSealedBtnLabel(currentSiret, bsd);
+      const result = getSealedBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual(SIGNER);
     });
 
     test("returns FAIRE_SIGNER for BSDD type with valid conditions", () => {
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       bsd.emitterType = EmitterType.Producer;
       bsd.transporter!.company!.siret = "1234567890";
       bsd.emitter!.company!.siret = "1234567898";
       bsd.ecoOrganisme!.siret = "1234567899";
       const currentSiret = "1234567890";
-      const result = getSealedBtnLabel(currentSiret, bsd);
+      const result = getSealedBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual(SIGNER);
     });
 
     test("returns SIGNER for Bsda", () => {
       const currentSiret = "1234567890";
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       bsd.type = BsdType.Bsda;
-      const result = getSealedBtnLabel(currentSiret, bsd);
+      const result = getSealedBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual(SIGNER);
     });
 
     test("returns SIGNER for Bsvhu", () => {
       const currentSiret = "1234567890";
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       bsd.type = BsdType.Bsvhu;
-      const result = getSealedBtnLabel(currentSiret, bsd);
+      const result = getSealedBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual(SIGNER);
     });
 
     test("returns SIGNER for Bsff", () => {
       const currentSiret = "1234567890";
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       bsd.type = BsdType.Bsff;
-      const result = getSealedBtnLabel(currentSiret, bsd);
+      const result = getSealedBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual(SIGNER);
     });
   });
@@ -452,19 +507,28 @@ describe("dashboardServices", () => {
   describe("getSentBtnLabel", () => {
     it("should return an empty string for BSDD with appendix1 producer", () => {
       const currentSiret = "123456789";
+      const permissions: UserPermission[] = [];
       const bsd = {
         type: BsdType.Bsdd,
         emitterType: EmitterType.Appendix1Producer,
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
-      const result = getSentBtnLabel(currentSiret, bsd, bsdCurrentTab);
+      const result = getSentBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toEqual("");
     });
 
     it("should return VALIDER_ENTREPOSAGE_PROVISOIRE for BSDD with temp storage in actTab and same destination siret", () => {
       const currentSiret = "123456789";
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignAcceptation,
+      ];
       const bsd = {
         type: BsdType.Bsdd,
         destination: { company: { siret: "123456789" } },
@@ -472,13 +536,21 @@ describe("dashboardServices", () => {
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
-      const result = getSentBtnLabel(currentSiret, bsd, bsdCurrentTab);
+      const result = getSentBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toEqual(VALIDER_ENTREPOSAGE_PROVISOIRE);
     });
 
     it("should return VALIDER_RECEPTION for BSDD in actTab and same destination siret", () => {
       const currentSiret = "123456789";
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignAcceptation,
+      ];
       const bsd = {
         type: BsdType.Bsdd,
         isTempStorage: false,
@@ -486,13 +558,21 @@ describe("dashboardServices", () => {
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
-      const result = getSentBtnLabel(currentSiret, bsd, bsdCurrentTab);
+      const result = getSentBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toEqual(VALIDER_RECEPTION);
     });
 
     it("should return VALIDER_RECEPTION for BSDASRI in actTab and same destination siret", () => {
       const currentSiret = "123456789";
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignAcceptation,
+      ];
       const bsd = {
         type: BsdType.Bsdasri,
         isTempStorage: false,
@@ -500,13 +580,21 @@ describe("dashboardServices", () => {
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
-      const result = getSentBtnLabel(currentSiret, bsd, bsdCurrentTab);
+      const result = getSentBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toEqual(VALIDER_RECEPTION);
     });
 
     it("should return VALIDER_RECEPTION for BSFF in actTab and same destination siret", () => {
       const currentSiret = "123456789";
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignAcceptation,
+      ];
       const bsd = {
         type: BsdType.Bsff,
         isTempStorage: false,
@@ -514,13 +602,21 @@ describe("dashboardServices", () => {
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
-      const result = getSentBtnLabel(currentSiret, bsd, bsdCurrentTab);
+      const result = getSentBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toEqual(VALIDER_RECEPTION);
     });
 
     it("should return VALIDER_TRAITEMENT for BSDA in actTab and same destination siret", () => {
       const currentSiret = "123456789";
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignOperation,
+      ];
       const bsd = {
         type: BsdType.Bsda,
         isTempStorage: false,
@@ -528,13 +624,21 @@ describe("dashboardServices", () => {
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
-      const result = getSentBtnLabel(currentSiret, bsd, bsdCurrentTab);
+      const result = getSentBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toEqual(VALIDER_TRAITEMENT);
     });
 
     it("should return VALIDER_TRAITEMENT for BSVHU in actTab and same destination siret", () => {
       const currentSiret = "123456789";
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignOperation,
+      ];
       const bsd = {
         type: BsdType.Bsvhu,
         isTempStorage: false,
@@ -542,7 +646,12 @@ describe("dashboardServices", () => {
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
-      const result = getSentBtnLabel(currentSiret, bsd, bsdCurrentTab);
+      const result = getSentBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        bsdCurrentTab
+      );
 
       expect(result).toEqual(VALIDER_TRAITEMENT);
     });
@@ -555,10 +664,18 @@ describe("dashboardServices", () => {
         destination: { company: { siret: "1234567890" } },
       },
     } as BsdDisplay;
+    const permissions: UserPermission[] = [
+      UserPermission.BsdCanSignAcceptation,
+    ];
     it('should return the correct label when bsd type is "Bsdd" and siret is same as temporary storage destination', () => {
       const currentSiret = "1234567890";
 
-      const result = getResentBtnLabel(currentSiret, bsd, "actTab");
+      const result = getResentBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        "actTab"
+      );
 
       expect(result).toEqual(VALIDER_RECEPTION);
     });
@@ -566,21 +683,31 @@ describe("dashboardServices", () => {
     it("should return an empty string when siret is not same as temporary storage destination", () => {
       const currentSiret = "1234567890";
       bsd.temporaryStorageDetail!.destination!.company!.siret = "132456378399";
-      const result = getResentBtnLabel(currentSiret, bsd, "actTab");
+      const result = getResentBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        "actTab"
+      );
       expect(result).toEqual("");
     });
 
     it("should return an empty string when type is not bsdd", () => {
       const currentSiret = "1234567890";
       bsd.type = BsdType.Bsda;
-      const result = getResealedBtnLabel(currentSiret, bsd);
+      const result = getResealedBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual("");
     });
 
     it("should return the correct label when current tab is collectedTab and status is RESENT", () => {
       const currentSiret = "1234567890";
       bsd.status = BsdStatusCode.Resent;
-      const result = getResentBtnLabel(currentSiret, bsd, "collectedTab");
+      const result = getResentBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        "collectedTab"
+      );
 
       expect(result).toEqual(ROAD_CONTROL);
     });
@@ -588,7 +715,12 @@ describe("dashboardServices", () => {
     it("should return the correct label when current tab is collectedTab and status is SENT", () => {
       const currentSiret = "1234567890";
       bsd.status = BsdStatusCode.Sent;
-      const result = getResentBtnLabel(currentSiret, bsd, "collectedTab");
+      const result = getResentBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        "collectedTab"
+      );
 
       expect(result).toEqual(ROAD_CONTROL);
     });
@@ -602,10 +734,11 @@ describe("dashboardServices", () => {
         transporter: { company: { siret: "1234567890" } },
       },
     } as BsdDisplay;
+    const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
     it('should return the correct label when bsd type is "Bsdd" and siret is same as temporary storage transporter', () => {
       const currentSiret = "1234567890";
 
-      const result = getResealedBtnLabel(currentSiret, bsd);
+      const result = getResealedBtnLabel(currentSiret, bsd, permissions);
 
       expect(result).toEqual(SIGNER);
     });
@@ -614,14 +747,14 @@ describe("dashboardServices", () => {
       const currentSiret = "1234567890";
       bsd.temporaryStorageDetail!.transporter!.company!.siret = "132456378399";
       bsd.destination!.company!.siret = "132456378399";
-      const result = getResealedBtnLabel(currentSiret, bsd);
+      const result = getResealedBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual("");
     });
 
     it("should return an empty string when type is not bsdd", () => {
       const currentSiret = "1234567890";
       bsd.type = BsdType.Bsda;
-      const result = getResealedBtnLabel(currentSiret, bsd);
+      const result = getResealedBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual("");
     });
   });
@@ -631,10 +764,13 @@ describe("dashboardServices", () => {
       type: BsdType.Bsdd,
       destination: { company: { siret: "1234567890" } },
     } as BsdDisplay;
+    const permissions: UserPermission[] = [
+      UserPermission.BsdCanSignAcceptation,
+    ];
     it('should return the correct label when bsd type is "Bsdd" and siret is same as destination', () => {
       const currentSiret = "1234567890";
 
-      const result = getTempStoredBtnLabel(currentSiret, bsd);
+      const result = getTempStoredBtnLabel(currentSiret, bsd, permissions);
 
       expect(result).toEqual(VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE);
     });
@@ -642,14 +778,14 @@ describe("dashboardServices", () => {
     it("should return an empty string when siret is not same as destination", () => {
       const currentSiret = "1234567890";
       bsd.destination!.company!.siret = "132456378399";
-      const result = getTempStoredBtnLabel(currentSiret, bsd);
+      const result = getTempStoredBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual("");
     });
 
     it("should return an empty string when type is not bsdd", () => {
       const currentSiret = "1234567890";
       bsd.type = BsdType.Bsda;
-      const result = getTempStoredBtnLabel(currentSiret, bsd);
+      const result = getTempStoredBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual("");
     });
   });
@@ -666,18 +802,28 @@ describe("dashboardServices", () => {
         transporter: { company: { siret: "1234567890" } },
       },
     } as BsdDisplay;
+    const permissions: UserPermission[] = [
+      UserPermission.BsdCanSignOperation,
+      UserPermission.BsdCanUpdate,
+    ];
     it('should return the correct label when bsd type is "Bsdd" and siret is same as destination', () => {
       const currentSiret = "1234567890";
-
-      const result = getTempStorerAcceptedBtnLabel(currentSiret, bsd);
+      const result = getTempStorerAcceptedBtnLabel(
+        currentSiret,
+        bsd,
+        permissions
+      );
 
       expect(result).toEqual(VALIDER_TRAITEMENT);
     });
 
     it("should return the correct label when bsd suite", () => {
       const currentSiret = "1234567890";
-
-      const result = getTempStorerAcceptedBtnLabel(currentSiret, withBsdSuite);
+      const result = getTempStorerAcceptedBtnLabel(
+        currentSiret,
+        withBsdSuite,
+        permissions
+      );
 
       expect(result).toEqual(completer_bsd_suite);
     });
@@ -685,14 +831,22 @@ describe("dashboardServices", () => {
     it("should return an empty string when siret is not same as destination", () => {
       const currentSiret = "1234567890";
       bsd.destination!.company!.siret = "132456378399";
-      const result = getTempStorerAcceptedBtnLabel(currentSiret, bsd);
+      const result = getTempStorerAcceptedBtnLabel(
+        currentSiret,
+        bsd,
+        permissions
+      );
       expect(result).toEqual("");
     });
 
     it("should return an empty string when type is not bsdd", () => {
       const currentSiret = "1234567890";
       bsd.type = BsdType.Bsda;
-      const result = getTempStorerAcceptedBtnLabel(currentSiret, bsd);
+      const result = getTempStorerAcceptedBtnLabel(
+        currentSiret,
+        bsd,
+        permissions
+      );
       expect(result).toEqual("");
     });
   });
@@ -704,10 +858,11 @@ describe("dashboardServices", () => {
         transporter: { company: { siret: "1234567890" } },
       },
     } as BsdDisplay;
+    const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
     it('should return the correct label when bsd type is "Bsdd" and siret is same as transporter', () => {
       const currentSiret = "1234567890";
 
-      const result = getSignTempStorerBtnLabel(currentSiret, bsd);
+      const result = getSignTempStorerBtnLabel(currentSiret, bsd, permissions);
 
       expect(result).toEqual(SIGNER);
     });
@@ -715,14 +870,14 @@ describe("dashboardServices", () => {
     it("should return an empty string when siret is not same as temporary transporter", () => {
       const currentSiret = "1234567890";
       bsd.temporaryStorageDetail!.transporter!.company!.siret = "132456378399";
-      const result = getSignTempStorerBtnLabel(currentSiret, bsd);
+      const result = getSignTempStorerBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual("");
     });
 
     it("should return an empty string when type is not bsdd", () => {
       const currentSiret = "1234567890";
       bsd.type = BsdType.Bsda;
-      const result = getSignTempStorerBtnLabel(currentSiret, bsd);
+      const result = getSignTempStorerBtnLabel(currentSiret, bsd, permissions);
       expect(result).toEqual("");
     });
   });
@@ -736,11 +891,22 @@ describe("dashboardServices", () => {
     const bsdCurrentTab = "actTab";
 
     it("should return an empty string for bsdd type with appendix1Producer", () => {
-      const result = getReceivedBtnLabel(currentSiret, bsd, bsdCurrentTab);
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignAcceptation,
+      ];
+      const result = getReceivedBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        bsdCurrentTab
+      );
       expect(result).toEqual("");
     });
 
     it("should return VALIDER_ACCEPTATION for bsdd type with same siret temporary storage destination", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignAcceptation,
+      ];
       const result = getReceivedBtnLabel(
         currentSiret,
         {
@@ -750,42 +916,58 @@ describe("dashboardServices", () => {
             destination: { company: { siret: "123456789" } },
           },
         },
+        permissions,
         bsdCurrentTab
       );
       expect(result).toEqual(VALIDER_ACCEPTATION);
     });
 
     it("should return VALIDER_ACCEPTATION for bsdd type with same siret destination", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignAcceptation,
+      ];
       const result = getReceivedBtnLabel(
         currentSiret,
         {
           ...bsd,
           destination: { company: { siret: "123456789" } },
         },
+        permissions,
         bsdCurrentTab
       );
       expect(result).toEqual(VALIDER_ACCEPTATION);
     });
 
     it("should return VALIDER_TRAITEMENT for bsda type", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignOperation,
+      ];
       const result = getReceivedBtnLabel(
         currentSiret,
         { ...bsd, type: BsdType.Bsda },
+        permissions,
         bsdCurrentTab
       );
       expect(result).toEqual(VALIDER_TRAITEMENT);
     });
 
     it("should return VALIDER_TRAITEMENT for bsvhu type", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignOperation,
+      ];
       const result = getReceivedBtnLabel(
         currentSiret,
         { ...bsd, type: BsdType.Bsvhu },
+        permissions,
         bsdCurrentTab
       );
       expect(result).toEqual(VALIDER_TRAITEMENT);
     });
 
     it("should return SIGNATURE_ACCEPTATION_CONTENANT for bsff type with actTab and same siret destination", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignOperation,
+      ];
       const result = getReceivedBtnLabel(
         currentSiret,
         {
@@ -793,12 +975,16 @@ describe("dashboardServices", () => {
           type: BsdType.Bsff,
           destination: { company: { siret: "123456789" } },
         },
+        permissions,
         bsdCurrentTab
       );
       expect(result).toEqual(SIGNATURE_ACCEPTATION_CONTENANT);
     });
 
     it("should return VALIDER_TRAITEMENT for bsdasri type with actTab and same siret destination", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignOperation,
+      ];
       const result = getReceivedBtnLabel(
         currentSiret,
         {
@@ -806,6 +992,7 @@ describe("dashboardServices", () => {
           type: BsdType.Bsdasri,
           destination: { company: { siret: "123456789" } },
         },
+        permissions,
         bsdCurrentTab
       );
       expect(result).toEqual(VALIDER_TRAITEMENT);
@@ -829,6 +1016,9 @@ describe("dashboardServices", () => {
     } as BsdDisplay;
 
     it("should return SIGNER when currentSiret is same as transporter and bsd type is bsdd", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignTransport,
+      ];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
         {
@@ -838,12 +1028,16 @@ describe("dashboardServices", () => {
             company: { siret: "currentSiret" },
           },
         },
+        permissions,
         "actTab"
       );
       expect(result).toEqual(SIGNER);
     });
 
     it("should return SIGNER when currentSiret is same as transporter and bsd type is bsdasri but not synthesis workflow type", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignTransport,
+      ];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
         {
@@ -852,12 +1046,16 @@ describe("dashboardServices", () => {
           bsdWorkflowType: BsdasriType.Simple,
           transporter: { company: { siret: "currentSiret" } },
         },
+        permissions,
         "actTab"
       );
       expect(result).toEqual(SIGNER);
     });
 
     it("should return SIGNER when currentSiret is same as transporter, bsd type is bsda, and bsd workflow type is gathering", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignTransport,
+      ];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
         {
@@ -876,12 +1074,16 @@ describe("dashboardServices", () => {
             },
           },
         },
+        permissions,
         "actTab"
       );
       expect(result).toEqual(SIGNER);
     });
 
     it("should return SIGNER when bsd type is bsvhu", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignTransport,
+      ];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
         {
@@ -889,36 +1091,45 @@ describe("dashboardServices", () => {
           type: BsdType.Bsvhu,
           transporter: { company: { siret: "currentSiret" } },
         },
+        permissions,
         "actTab"
       );
       expect(result).toEqual(SIGNER);
     });
 
     it("should return an empty string when currentSiret is not same as transporter and bsd type is bsdasri and current tab is not toCollectTab", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignTransport,
+      ];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
         {
           ...bsd,
           type: BsdType.Bsdasri,
         },
+        permissions,
         "actTab"
       );
       expect(result).toEqual("");
     });
 
     it("should return SIGNER_EN_TANT_QUE_TRAVAUX when currentSiret is same as worker company siret", () => {
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignWork];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
         bsd,
+        permissions,
         "toCollectTab"
       );
       expect(result).toEqual(SIGNER_EN_TANT_QUE_TRAVAUX);
     });
 
     it("should return an empty string when none of the conditions are met", () => {
+      const permissions: UserPermission[] = [];
       const result = getSignByProducerBtnLabel(
         "someOtherSiret",
         bsd,
+        permissions,
         "draftTab"
       );
       expect(result).toEqual("");

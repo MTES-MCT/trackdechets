@@ -49,6 +49,7 @@ export const GET_ME = gql`
         siret
         orgId
         companyTypes
+        userPermissions
       }
     }
   }

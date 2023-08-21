@@ -2,7 +2,7 @@ import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import BsdAdditionalActionsButton from "./BsdAdditionalActionsButton";
 import { BsdDisplay, BsdStatusCode } from "Apps/common/types/bsdTypes";
-import { BsdType, EmitterType } from "generated/graphql/types";
+import { BsdType, EmitterType, UserPermission } from "generated/graphql/types";
 
 const bsd = {
   id: "1",
@@ -26,9 +26,12 @@ describe("BsdAdditionalActionsButton", () => {
   });
 
   it("renders without crashing", () => {
+    const permissions = [];
+
     render(
       <BsdAdditionalActionsButton
         bsd={bsd}
+        permissions={permissions}
         currentSiret={currentSiret}
         actionList={{
           onOverview,
@@ -45,9 +48,12 @@ describe("BsdAdditionalActionsButton", () => {
   });
 
   it("opens and closes the dropdown menu on click", async () => {
+    const permissions = [];
+
     const { getByTestId, queryByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsd}
+        permissions={permissions}
         currentSiret={currentSiret}
         actionList={{
           onOverview,
@@ -84,9 +90,12 @@ describe("BsdAdditionalActionsButton", () => {
   });
 
   it("calls the `onOverview` function when the 'Vue détaillée' button is clicked", async () => {
+    const permissions = [];
+
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsd}
+        permissions={permissions}
         currentSiret={currentSiret}
         actionList={{
           onOverview,
@@ -109,9 +118,12 @@ describe("BsdAdditionalActionsButton", () => {
   });
 
   it("calls the `onDuplicate` function when the 'Dupliquer' button is clicked", async () => {
+    const permissions = [UserPermission.BsdCanCreate];
+
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsd}
+        permissions={permissions}
         currentSiret={currentSiret}
         actionList={{
           onOverview,
@@ -134,9 +146,12 @@ describe("BsdAdditionalActionsButton", () => {
   });
 
   it("calls the `onPdf` function when the 'PDF' button is clicked", async () => {
+    const permissions = [UserPermission.BsdCanRead];
+
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsd}
+        permissions={permissions}
         currentSiret={currentSiret}
         actionList={{
           onOverview,
@@ -159,14 +174,17 @@ describe("BsdAdditionalActionsButton", () => {
   });
 
   it("calls the `onDelete` function when the 'Supprimer' button is clicked", async () => {
+    const permissions = [UserPermission.BsdCanDelete];
     const bsdDelete = {
       ...bsd,
       status: BsdStatusCode.Draft,
       type: BsdType.Bsdd,
     } as BsdDisplay;
+
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsdDelete}
+        permissions={permissions}
         currentSiret={currentSiret}
         actionList={{
           onOverview,
@@ -189,14 +207,17 @@ describe("BsdAdditionalActionsButton", () => {
   });
 
   it("calls the `onUpdate` function when the 'Modifier' button is clicked", async () => {
+    const permissions = [UserPermission.BsdCanUpdate];
     const bsdUpdate = {
       ...bsd,
       status: BsdStatusCode.Draft,
       type: BsdType.Bsdd,
     } as BsdDisplay;
+
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsdUpdate}
+        permissions={permissions}
         currentSiret={currentSiret}
         actionList={{
           onOverview,
@@ -219,14 +240,17 @@ describe("BsdAdditionalActionsButton", () => {
   });
 
   it("calls the `onRevision` function when the 'Réviser' button is clicked", async () => {
+    const permissions = [UserPermission.BsdCanRevise];
     const bsdReview = {
       ...bsd,
       status: BsdStatusCode.Processed,
       type: BsdType.Bsdd,
     } as BsdDisplay;
+
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsdReview}
+        permissions={permissions}
         currentSiret={currentSiret}
         actionList={{
           onOverview,
@@ -249,6 +273,7 @@ describe("BsdAdditionalActionsButton", () => {
   });
 
   it("calls the `onBsdSuite` function when the 'Compléter le bsd suite' button is clicked", async () => {
+    const permissions = [UserPermission.BsdCanSignOperation];
     const bsdSuite = {
       ...bsd,
       emitterType: EmitterType.Producer,
@@ -261,6 +286,7 @@ describe("BsdAdditionalActionsButton", () => {
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsdSuite}
+        permissions={permissions}
         currentSiret={currentSiret}
         actionList={{
           onOverview,
@@ -282,6 +308,7 @@ describe("BsdAdditionalActionsButton", () => {
     });
   });
   it("calls the `onBsdSuite` function when the 'Valider le traitement' button is clicked", async () => {
+    const permissions = [UserPermission.BsdCanSignOperation];
     const bsdSuite = {
       ...bsd,
       emitterType: EmitterType.Producer,
@@ -296,6 +323,7 @@ describe("BsdAdditionalActionsButton", () => {
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsdSuite}
+        permissions={permissions}
         currentSiret={currentSiret}
         actionList={{
           onOverview,
@@ -318,6 +346,7 @@ describe("BsdAdditionalActionsButton", () => {
   });
 
   it("calls the `onAppendix1` function when the 'Annexe 1' button is clicked", async () => {
+    const permissions = [UserPermission.BsdCanUpdate];
     const bsdAppendix1 = {
       ...bsd,
       emitterType: EmitterType.Appendix1,
@@ -327,6 +356,7 @@ describe("BsdAdditionalActionsButton", () => {
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsdAppendix1}
+        permissions={permissions}
         currentSiret={currentSiret}
         actionList={{
           onOverview,

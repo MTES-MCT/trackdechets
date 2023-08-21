@@ -15,6 +15,8 @@ import {
   TO_COLLECT,
 } from "Apps/common/wordings/dashboard/wordingsDashboard";
 import { useShowTransportTabs } from "dashboard/transport/hooks/useShowTransportTabs";
+import { usePermissions } from "common/contexts/PermissionsContext";
+import { UserPermission } from "generated/graphql/types";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;
@@ -25,6 +27,7 @@ export default function DashboardTabs({
   currentCompany,
   companies,
 }: DashboardTabsProps) {
+  const { permissions } = usePermissions();
   const history = useHistory();
 
   const handleCompanyChange = useCallback(
@@ -58,66 +61,70 @@ export default function DashboardTabs({
       )}
 
       <>
-        <p className="sidebar__chapter">Mes bordereaux</p>
-        <ul>
-          <li>
-            <NavLink
-              to={generatePath(routes.dashboardv2.bsds.drafts, {
-                siret: currentCompany.orgId,
-              })}
-              className="sidebar__link sidebar__link--indented"
-              activeClassName="sidebar__link--active"
-            >
-              {DRAFTS}
-            </NavLink>
-          </li>
+        {permissions.includes(UserPermission.BsdCanList) && (
+          <>
+            <p className="sidebar__chapter">Mes bordereaux</p>
+            <ul>
+              <li>
+                <NavLink
+                  to={generatePath(routes.dashboardv2.bsds.drafts, {
+                    siret: currentCompany.orgId,
+                  })}
+                  className="sidebar__link sidebar__link--indented"
+                  activeClassName="sidebar__link--active"
+                >
+                  {DRAFTS}
+                </NavLink>
+              </li>
 
-          <li>
-            <NavLink
-              to={generatePath(routes.dashboardv2.bsds.act, {
-                siret: currentCompany.orgId,
-              })}
-              className="sidebar__link sidebar__link--indented"
-              activeClassName="sidebar__link--active"
-            >
-              {ACTS}
-            </NavLink>
-          </li>
+              <li>
+                <NavLink
+                  to={generatePath(routes.dashboardv2.bsds.act, {
+                    siret: currentCompany.orgId,
+                  })}
+                  className="sidebar__link sidebar__link--indented"
+                  activeClassName="sidebar__link--active"
+                >
+                  {ACTS}
+                </NavLink>
+              </li>
 
-          <li>
-            <NavLink
-              to={generatePath(routes.dashboardv2.bsds.follow, {
-                siret: currentCompany.orgId,
-              })}
-              className="sidebar__link sidebar__link--indented"
-              activeClassName="sidebar__link--active"
-            >
-              {FOLLOWS}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to={generatePath(routes.dashboardv2.bsds.history, {
-                siret: currentCompany.orgId,
-              })}
-              className="sidebar__link sidebar__link--indented"
-              activeClassName="sidebar__link--active"
-            >
-              {ARCHIVES}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to={generatePath(routes.dashboardv2.bsds.reviews, {
-                siret: currentCompany.orgId,
-              })}
-              className="sidebar__link sidebar__link--indented"
-              activeClassName="sidebar__link--active"
-            >
-              {REVIEWS}
-            </NavLink>
-          </li>
-        </ul>
+              <li>
+                <NavLink
+                  to={generatePath(routes.dashboardv2.bsds.follow, {
+                    siret: currentCompany.orgId,
+                  })}
+                  className="sidebar__link sidebar__link--indented"
+                  activeClassName="sidebar__link--active"
+                >
+                  {FOLLOWS}
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to={generatePath(routes.dashboardv2.bsds.history, {
+                    siret: currentCompany.orgId,
+                  })}
+                  className="sidebar__link sidebar__link--indented"
+                  activeClassName="sidebar__link--active"
+                >
+                  {ARCHIVES}
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to={generatePath(routes.dashboardv2.bsds.reviews, {
+                    siret: currentCompany.orgId,
+                  })}
+                  className="sidebar__link sidebar__link--indented"
+                  activeClassName="sidebar__link--active"
+                >
+                  {REVIEWS}
+                </NavLink>
+              </li>
+            </ul>
+          </>
+        )}
 
         {showTransportTabs && (
           <>
@@ -148,20 +155,21 @@ export default function DashboardTabs({
             </ul>
           </>
         )}
-
-        <ul>
-          <li>
-            <NavLink
-              to={generatePath(routes.dashboardv2.exports, {
-                siret: currentCompany.orgId,
-              })}
-              className="sidebar__link sidebar__link--chapter"
-              activeClassName="sidebar__link--active"
-            >
-              {REGISTER}
-            </NavLink>
-          </li>
-        </ul>
+        {permissions.includes(UserPermission.RegistryCanRead) && (
+          <ul>
+            <li>
+              <NavLink
+                to={generatePath(routes.dashboardv2.exports, {
+                  siret: currentCompany.orgId,
+                })}
+                className="sidebar__link sidebar__link--chapter"
+                activeClassName="sidebar__link--active"
+              >
+                {REGISTER}
+              </NavLink>
+            </li>
+          </ul>
+        )}
       </>
     </>
   );

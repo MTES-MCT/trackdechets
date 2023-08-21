@@ -14,6 +14,7 @@ import {
   EmitterType,
   Form,
   Maybe,
+  UserPermission,
 } from "../../generated/graphql/types";
 import {
   ACCEPTE,
@@ -55,6 +56,7 @@ import {
   completer_bsd_suite,
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { BsdCurrentTab } from "Apps/common/types/commonTypes";
+import { User } from "@sentry/browser";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
@@ -266,6 +268,7 @@ export const isEcoOrgSign = (bsd: BsdDisplay, isHolder: boolean) =>
 export const getIsNonDraftLabel = (
   bsd: BsdDisplay,
   currentSiret: string,
+  permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
   const isActTab = bsdCurrentTab === "actTab";
@@ -276,11 +279,16 @@ export const getIsNonDraftLabel = (
     !isFollowTab &&
     (isBsvhuSign(bsd, currentSiret) ||
       isBsffSign(bsd, currentSiret, bsdCurrentTab) ||
-      isBsdaSign(bsd, currentSiret))
+      isBsdaSign(bsd, currentSiret)) &&
+    permissions.includes(UserPermission.BsdCanSignEmission)
   ) {
     return SIGNER;
   }
-  if (isActTab && isBsdaSignWorker(bsd, currentSiret)) {
+  if (
+    isActTab &&
+    isBsdaSignWorker(bsd, currentSiret) &&
+    permissions.includes(UserPermission.BsdCanSignWork)
+  ) {
     return SIGNER_EN_TANT_QUE_TRAVAUX;
   }
 
@@ -289,17 +297,28 @@ export const getIsNonDraftLabel = (
     const isHolder = isSameSiretEmmiter(currentSiret, bsd) || isEcoOrganisme;
     const isTransporter = isSameSiretTransporter(currentSiret, bsd);
 
-    if (isActTab && isEcoOrgSign(bsd, isHolder)) {
+    if (
+      isActTab &&
+      isEcoOrgSign(bsd, isHolder) &&
+      permissions.includes(UserPermission.BsdCanSignEmission)
+    ) {
       if (isEcoOrganisme) {
         return SIGNATURE_ECO_ORG;
       }
       return SIGNER;
     }
 
-    if (hasEmportDirect(bsd, currentSiret, isToCollectTab)) {
+    if (
+      hasEmportDirect(bsd, currentSiret, isToCollectTab) &&
+      permissions.includes(UserPermission.BsdCanSignTransport)
+    ) {
       return EMPORT_DIRECT_LABEL;
     } else {
-      if (isToCollectTab && !isSynthesis(bsd.bsdWorkflowType?.toString())) {
+      if (
+        isToCollectTab &&
+        !isSynthesis(bsd.bsdWorkflowType?.toString()) &&
+        permissions.includes(UserPermission.BsdCanSignTransport)
+      ) {
         return FAIRE_SIGNER;
       }
     }
@@ -307,14 +326,19 @@ export const getIsNonDraftLabel = (
     if (
       isToCollectTab &&
       isTransporter &&
-      isSynthesis(bsd.bsdWorkflowType?.toString())
+      isSynthesis(bsd.bsdWorkflowType?.toString()) &&
+      permissions.includes(UserPermission.BsdCanSignTransport)
     ) {
       return VALIDER_SYNTHESE_LABEL;
     }
     return "";
   }
 
-  if (!isFollowTab && isSameSiretEmmiter(currentSiret, bsd)) {
+  if (
+    !isFollowTab &&
+    isSameSiretEmmiter(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignEmission)
+  ) {
     return SIGNER;
   }
   return "";
@@ -323,12 +347,13 @@ export const getIsNonDraftLabel = (
 export const getDraftOrInitialBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
+  permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
   if (!bsd.isDraft) {
-    return getIsNonDraftLabel(bsd, currentSiret, bsdCurrentTab);
+    return getIsNonDraftLabel(bsd, currentSiret, permissions, bsdCurrentTab);
   } else {
-    return PUBLIER;
+    return permissions.includes(UserPermission.BsdCanUpdate) ? PUBLIER : "";
   }
 };
 
@@ -361,9 +386,13 @@ const isSignEmitterPrivateIndividual = (
 export const getSealedBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
+  permissions: UserPermission[],
   hasAutomaticSignature?: boolean
 ): string => {
-  if (isBsdd(bsd.type)) {
+  if (
+    isBsdd(bsd.type) &&
+    permissions.includes(UserPermission.BsdCanSignEmission)
+  ) {
     if (isAppendix1(bsd)) {
       return AJOUTER_ANNEXE_1;
     }
@@ -384,7 +413,10 @@ export const getSealedBtnLabel = (
       return SIGNER;
     }
   }
-  if (isBsda(bsd.type) || isBsff(bsd.type) || isBsvhu(bsd.type)) {
+  if (
+    (isBsda(bsd.type) || isBsff(bsd.type) || isBsvhu(bsd.type)) &&
+    permissions.includes(UserPermission.BsdCanSignEmission)
+  ) {
     return SIGNER;
   }
   return "";
@@ -393,6 +425,7 @@ export const getSealedBtnLabel = (
 export const getSentBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
+  permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
   const isActTab = bsdCurrentTab === "actTab";
@@ -408,7 +441,10 @@ export const getSentBtnLabel = (
     }
 
     if (isActTab) {
-      if (isSameSiretDestination(currentSiret, bsd)) {
+      if (
+        isSameSiretDestination(currentSiret, bsd) &&
+        permissions.includes(UserPermission.BsdCanSignAcceptation)
+      ) {
         if (bsd.isTempStorage) {
           return VALIDER_ENTREPOSAGE_PROVISOIRE;
         }
@@ -424,17 +460,21 @@ export const getSentBtnLabel = (
     return "";
   }
   if (
-    (isBsdasri(bsd.type) &&
+    ((isBsdasri(bsd.type) &&
       isActTab &&
       currentSiret === bsd.destination?.company?.siret) ||
-    (isBsff(bsd.type) && isActTab && isSameSiretDestination(currentSiret, bsd))
+      (isBsff(bsd.type) &&
+        isActTab &&
+        isSameSiretDestination(currentSiret, bsd))) &&
+    permissions.includes(UserPermission.BsdCanSignAcceptation)
   ) {
     return VALIDER_RECEPTION;
   }
 
   if (
     isSameSiretDestination(currentSiret, bsd) &&
-    (isBsvhu(bsd.type) || isBsda(bsd.type))
+    (isBsvhu(bsd.type) || isBsda(bsd.type)) &&
+    permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
     return VALIDER_TRAITEMENT;
   }
@@ -444,6 +484,7 @@ export const getSentBtnLabel = (
 export const getReceivedBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
+  permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
   const isActTab = bsdCurrentTab === "actTab";
@@ -451,7 +492,8 @@ export const getReceivedBtnLabel = (
   if (
     isBsdasri(bsd.type) &&
     isActTab &&
-    isSameSiretDestination(currentSiret, bsd)
+    isSameSiretDestination(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
     return VALIDER_TRAITEMENT;
   }
@@ -462,23 +504,32 @@ export const getReceivedBtnLabel = (
     }
     if (
       bsd.isTempStorage &&
-      isSameSiretTemporaryStorageDestination(currentSiret, bsd)
+      isSameSiretTemporaryStorageDestination(currentSiret, bsd) &&
+      permissions.includes(UserPermission.BsdCanSignAcceptation)
     ) {
       return VALIDER_ACCEPTATION;
     }
 
-    if (!bsd.isTempStorage && isSameSiretDestination(currentSiret, bsd)) {
+    if (
+      !bsd.isTempStorage &&
+      isSameSiretDestination(currentSiret, bsd) &&
+      permissions.includes(UserPermission.BsdCanSignAcceptation)
+    ) {
       return VALIDER_ACCEPTATION;
     }
   }
 
-  if (isBsda(bsd.type) || isBsvhu(bsd.type)) {
+  if (
+    (isBsda(bsd.type) || isBsvhu(bsd.type)) &&
+    permissions.includes(UserPermission.BsdCanSignOperation)
+  ) {
     return VALIDER_TRAITEMENT;
   }
   if (
     isBsff(bsd.type) &&
     isActTab &&
-    isSameSiretDestination(currentSiret, bsd)
+    isSameSiretDestination(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
     // ajouter bsff status received with packagings see dashboard/components/BSDList/BSFF/WorkflowAction/WorkflowAction.tsx
     return SIGNATURE_ACCEPTATION_CONTENANT;
@@ -490,11 +541,15 @@ export const getReceivedBtnLabel = (
 export const getSignByProducerBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
+  permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
 
-  if (isSameSiretTransporter(currentSiret, bsd)) {
+  if (
+    isSameSiretTransporter(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignTransport)
+  ) {
     if (isBsdd(bsd.type)) {
       return SIGNER;
     }
@@ -529,6 +584,7 @@ export const getSignByProducerBtnLabel = (
 const getSignedByEmitterLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
+  permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
@@ -536,18 +592,30 @@ const getSignedByEmitterLabel = (
   if (
     isBsff(bsd.type) &&
     isToCollectTab &&
-    isSameSiretTransporter(currentSiret, bsd)
+    isSameSiretTransporter(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignTransport)
   ) {
     return SIGNER;
   }
-  if (isSameSiretTransporter(currentSiret, bsd)) {
+  if (
+    isSameSiretTransporter(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignTransport)
+  ) {
     return SIGNER;
   }
   return "";
 };
 
-const getAcceptedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
-  if (isBsff(bsd.type) && isSameSiretDestination(currentSiret, bsd)) {
+const getAcceptedBtnLabel = (
+  currentSiret: string,
+  bsd: BsdDisplay,
+  permissions: UserPermission[]
+): string => {
+  if (
+    isBsff(bsd.type) &&
+    isSameSiretDestination(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignOperation)
+  ) {
     // ajouter bsff status accepted with packagings see dashboard/components/BSDList/BSFF/WorkflowAction/WorkflowAction.tsx
     return SIGNATURE_ACCEPTATION_CONTENANT;
   }
@@ -555,8 +623,9 @@ const getAcceptedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
     return "";
   }
   if (
-    isSameSiretDestination(currentSiret, bsd) ||
-    isSameSiretTemporaryStorageDestination(currentSiret, bsd)
+    (isSameSiretDestination(currentSiret, bsd) ||
+      isSameSiretTemporaryStorageDestination(currentSiret, bsd)) &&
+    permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
     return VALIDER_TRAITEMENT;
   }
@@ -566,6 +635,7 @@ const getAcceptedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
 export const getResentBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
+  permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
   const isCollectedTab = bsdCurrentTab === "collectedTab";
@@ -575,7 +645,8 @@ export const getResentBtnLabel = (
 
   if (
     isBsdd(bsd.type) &&
-    isSameSiretTemporaryStorageDestination(currentSiret, bsd)
+    isSameSiretTemporaryStorageDestination(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignAcceptation)
   ) {
     return VALIDER_RECEPTION;
   }
@@ -584,9 +655,14 @@ export const getResentBtnLabel = (
 
 export const getResealedBtnLabel = (
   currentSiret: string,
-  bsd: BsdDisplay
+  bsd: BsdDisplay,
+  permissions: UserPermission[]
 ): string => {
-  if (isBsdd(bsd.type) && hasTemporaryStorage(currentSiret, bsd)) {
+  if (
+    isBsdd(bsd.type) &&
+    hasTemporaryStorage(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignEmission)
+  ) {
     return SIGNER;
   }
   return "";
@@ -594,9 +670,14 @@ export const getResealedBtnLabel = (
 
 export const getTempStoredBtnLabel = (
   currentSiret: string,
-  bsd: BsdDisplay
+  bsd: BsdDisplay,
+  permissions: UserPermission[]
 ): string => {
-  if (isBsdd(bsd.type) && isSameSiretDestination(currentSiret, bsd)) {
+  if (
+    isBsdd(bsd.type) &&
+    isSameSiretDestination(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignAcceptation)
+  ) {
     return VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE;
   }
   return "";
@@ -604,12 +685,16 @@ export const getTempStoredBtnLabel = (
 
 export const getTempStorerAcceptedBtnLabel = (
   currentSiret: string,
-  bsd: BsdDisplay
+  bsd: BsdDisplay,
+  permissions: UserPermission[]
 ): string => {
   if (isBsdd(bsd.type) && isSameSiretDestination(currentSiret, bsd)) {
-    if (bsd?.temporaryStorageDetail) {
+    if (
+      bsd?.temporaryStorageDetail &&
+      permissions.includes(UserPermission.BsdCanUpdate)
+    ) {
       return completer_bsd_suite;
-    } else {
+    } else if (permissions.includes(UserPermission.BsdCanSignOperation)) {
       return VALIDER_TRAITEMENT;
     }
   }
@@ -618,11 +703,13 @@ export const getTempStorerAcceptedBtnLabel = (
 
 export const getSignTempStorerBtnLabel = (
   currentSiret: string,
-  bsd: BsdDisplay
+  bsd: BsdDisplay,
+  permissions: UserPermission[]
 ): string => {
   if (
     isBsdd(bsd.type) &&
-    isSameSiretTemporaryStorageTransporter(currentSiret, bsd)
+    isSameSiretTemporaryStorageTransporter(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignEmission)
   ) {
     return SIGNER;
   }
@@ -673,55 +760,84 @@ export const canDeleteReview = (bsd: BsdDisplay, currentSiret: string) => {
 export const getPrimaryActionsLabelFromBsdStatus = (
   bsd: BsdDisplay,
   currentSiret: string,
+  permissions: UserPermission[],
   bsdCurrentTab?: BsdCurrentTab,
   hasAutomaticSignature?: boolean
 ) => {
   switch (bsd.status) {
     case BsdStatusCode.Draft:
     case BsdStatusCode.Initial:
-      return getDraftOrInitialBtnLabel(currentSiret, bsd, bsdCurrentTab!);
+      return getDraftOrInitialBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        bsdCurrentTab!
+      );
     case BsdStatusCode.Sealed:
-      return getSealedBtnLabel(currentSiret, bsd, hasAutomaticSignature);
+      return getSealedBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        hasAutomaticSignature
+      );
 
     case BsdStatusCode.Sent:
-      return getSentBtnLabel(currentSiret, bsd, bsdCurrentTab!);
+      return getSentBtnLabel(currentSiret, bsd, permissions, bsdCurrentTab!);
 
     case BsdStatusCode.Resent:
-      return getResentBtnLabel(currentSiret, bsd, bsdCurrentTab!);
+      return getResentBtnLabel(currentSiret, bsd, permissions, bsdCurrentTab!);
 
     case BsdStatusCode.Resealed:
-      return getResealedBtnLabel(currentSiret, bsd);
+      return getResealedBtnLabel(currentSiret, bsd, permissions);
 
     case BsdStatusCode.TempStored:
-      return getTempStoredBtnLabel(currentSiret, bsd);
+      return getTempStoredBtnLabel(currentSiret, bsd, permissions);
 
     case BsdStatusCode.TempStorerAccepted:
-      return getTempStorerAcceptedBtnLabel(currentSiret, bsd);
+      return getTempStorerAcceptedBtnLabel(currentSiret, bsd, permissions);
 
     case BsdStatusCode.SignedByTempStorer:
-      return getSignTempStorerBtnLabel(currentSiret, bsd);
+      return getSignTempStorerBtnLabel(currentSiret, bsd, permissions);
 
     case BsdStatusCode.Received:
     case BsdStatusCode.PartiallyRefused:
-      return getReceivedBtnLabel(currentSiret, bsd, bsdCurrentTab!);
+      return getReceivedBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        bsdCurrentTab!
+      );
 
     case BsdStatusCode.AwaitingChild:
       return "";
 
     case BsdStatusCode.SignedByProducer:
-      return getSignByProducerBtnLabel(currentSiret, bsd, bsdCurrentTab!);
+      return getSignByProducerBtnLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        bsdCurrentTab!
+      );
 
     case BsdStatusCode.SignedByEmitter:
-      return getSignedByEmitterLabel(currentSiret, bsd, bsdCurrentTab!);
+      return getSignedByEmitterLabel(
+        currentSiret,
+        bsd,
+        permissions,
+        bsdCurrentTab!
+      );
 
     case BsdStatusCode.SignedByWorker:
-      if (isSameSiretTransporter(currentSiret, bsd)) {
+      if (
+        isSameSiretTransporter(currentSiret, bsd) &&
+        permissions.includes(UserPermission.BsdCanSignTransport)
+      ) {
         return SIGNER;
       }
       break;
 
     case BsdStatusCode.Accepted:
-      return getAcceptedBtnLabel(currentSiret, bsd);
+      return getAcceptedBtnLabel(currentSiret, bsd, permissions);
     default:
       return "";
   }
