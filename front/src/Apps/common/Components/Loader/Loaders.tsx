@@ -3,7 +3,16 @@ import { NetworkStatus } from "@apollo/client";
 import styles from "./Loader.module.scss";
 
 export default function Loader() {
-  return <div data-testid="loader" className={styles.loader}></div>;
+  return (
+    <div
+      data-testid="loader"
+      className={`${styles.loader} ${styles.loaderAbsolute}`}
+    ></div>
+  );
+}
+
+export function InlineLoader() {
+  return <div className={styles.loader}></div>;
 }
 
 export const ModalLoader = () => (
