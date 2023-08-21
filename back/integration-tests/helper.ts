@@ -40,17 +40,13 @@ export async function truncateDatabase() {
   const tables: Array<{ tablename: string }> =
     await prisma.$queryRaw`SELECT tablename FROM pg_tables WHERE schemaname=${dbSchemaName};`;
 
-  for (const { tablename } of tables) {
-    await prisma.$executeRawUnsafe(
-      `TRUNCATE TABLE \"${dbSchemaName}\".\"${tablename}\" CASCADE;`
-    );
-  }
-  const sequences: Array<{ relname: string }> =
-    await prisma.$queryRaw`SELECT c.relname FROM pg_class AS c JOIN pg_namespace AS n ON c.relnamespace = n.oid WHERE c.relkind='S' AND n.nspname=${dbSchemaName};`;
-
-  for (const { relname } of sequences) {
-    await prisma.$queryRaw`ALTER SEQUENCE \"${dbSchemaName}\".\"${relname}\" RESTART WITH 1;`;
-  }
+  await Promise.race(
+    tables.map(({ tablename }) => {
+      prisma.$executeRawUnsafe(
+        `TRUNCATE TABLE \"${dbSchemaName}\".\"${tablename}\" CASCADE RESTART IDENTITY;`
+      );
+    })
+  );
 }
 
 export async function resetDatabase() {
@@ -58,24 +54,30 @@ export async function resetDatabase() {
   jest.setTimeout(10000);
 
   await refreshElasticSearch();
-  await elasticSearch.deleteByQuery(
-    {
-      index: index.alias,
-      body: {
-        query: {
-          match_all: {}
-        }
+  await Promise.all([
+    elasticSearch.deleteByQuery(
+      {
+        index: index.alias,
+        body: {
+          query: {
+            match_all: {}
+          }
+        },
+        refresh: true
       },
-      refresh: true
-    },
-    {
-      // do not throw an error if a document has been updated during delete operation
-      ignore: [409]
-    }
-  );
-  await truncateDatabase();
+      {
+        // do not throw an error if a document has been updated during delete operation
+        ignore: [409]
+      }
+    ),
+    truncateDatabase()
+  ]);
 }
 
+/**
+ * Wait for the indexation queue to be drained
+ * And force refresh the index alias for 'bsdd'
+ */
 export async function refreshElasticSearch() {
   const drainedPromise = new Promise<void>(resolve =>
     indexQueue.once("global:drained", resolve)
