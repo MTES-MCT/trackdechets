@@ -1070,7 +1070,7 @@ export const hasRoadControlButton = (
   return ["SENT", "RESENT"].includes(bsd.status) && isCollectedTab;
 };
 
-export const canEditCustomInfoOrTransporterNumberlate = (
+export const canEditCustomInfoOrTransporterNumberPlate = (
   bsd: BsdDisplay
 ): boolean => {
   if (isBsdd(bsd.type)) {
@@ -1084,6 +1084,9 @@ export const canEditCustomInfoOrTransporterNumberlate = (
   }
   if (isBsff(bsd.type)) {
     return ["INITIAL", "SIGNED_BY_EMITTER"].includes(bsd.status);
+  }
+  if (isBsdasri(bsd.type)) {
+    return ["SIGNED_BY_PRODUCER", "INITIAL"].includes(bsd.status);
   }
 
   return false;

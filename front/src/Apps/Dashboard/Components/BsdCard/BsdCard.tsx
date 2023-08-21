@@ -7,7 +7,7 @@ import { InfoIconCode } from "../InfoWithIcon/infoWithIconTypes";
 import { BsdCardProps } from "./bsdCardTypes";
 import WasteDetails from "../WasteDetails/WasteDetails";
 import {
-  canEditCustomInfoOrTransporterNumberlate,
+  canEditCustomInfoOrTransporterNumberPlate,
   canPublishBsd,
   getBsdView,
   getPrimaryActionsLabelFromBsdStatus,
@@ -239,7 +239,7 @@ function BsdCard({
                       hasEditableInfos
                       isDisabled={
                         isCollectedTab ||
-                        !canEditCustomInfoOrTransporterNumberlate(bsdDisplay)
+                        !canEditCustomInfoOrTransporterNumberPlate(bsdDisplay)
                       }
                       onClick={e =>
                         handleEditableInfoClick(e, "transporterCustomInfo")
@@ -258,7 +258,7 @@ function BsdCard({
                       hasEditableInfos
                       isDisabled={
                         isCollectedTab ||
-                        !canEditCustomInfoOrTransporterNumberlate(bsdDisplay)
+                        !canEditCustomInfoOrTransporterNumberPlate(bsdDisplay)
                       }
                       onClick={e =>
                         handleEditableInfoClick(e, "transporterNumberPlate")
