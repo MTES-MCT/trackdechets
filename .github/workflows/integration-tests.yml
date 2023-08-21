@@ -5,6 +5,7 @@ on: pull_request
 jobs:
   back:
     runs-on: ubuntu-latest
+    container: node:18
     name: Integration tests (chunk ${{ matrix.shard }}/${{ strategy.job-total }})
     services:
       elasticsearch:
@@ -22,6 +23,7 @@ jobs:
         env:
           POSTGRES_USER: test
           POSTGRES_PASSWORD: no_pass
+          POSTGRES_DB: prisma
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -43,11 +45,25 @@ jobs:
         working-directory: back/integration-tests
     steps:
       - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+      - name: Check Elasticsearch connection status
+        env:
+          ELASTICSEARCH_URL: http://localhost:${{ job.services.elasticsearch.ports[9200] }}
+        run: |
+          echo $ELASTICSEARCH_URL
+          curl -fsSL "$ELASTICSEARCH_URL/_cat/health?h=status"
       - name: Run integration tests
         env:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
-
-        run: |
-          chmod +x ./run.sh
-          ./run.sh -c ${{ matrix.shard }}/${{ strategy.job-total }}
+          DATABASE_URL: postgresql://test:no_pass@localhost:${{ job.services.postgres.ports[9200] }}
+          REDIS_URL: redis://localhost:${{ job.services.redis.ports[6379] }}
+          MONGO_URL: mongodb://test:no_pass@localhost:${{ job.services.mongo.ports[27017] }}
+        run: npm run integration-tests -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
