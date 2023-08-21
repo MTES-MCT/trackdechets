@@ -22,6 +22,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Montée de version vers Apollo 4 [PR 2636](https://github.com/MTES-MCT/trackdechets/pull/2636)
+
 # [2023.7.2] 25/07/2023
 
 #### :house: Interne
