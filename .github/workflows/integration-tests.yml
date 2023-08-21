@@ -55,15 +55,16 @@ jobs:
         run: npm ci
       - name: Check Elasticsearch connection status
         env:
-          ELASTICSEARCH_URL: http://localhost:${{ job.services.elasticsearch.ports[9200] }}
+          ELASTIC_SEARCH_URL: http://localhost:${{ job.services.elasticsearch.ports[9200] }}
         run: |
-          echo $ELASTICSEARCH_URL
-          curl -fsSL "$ELASTICSEARCH_URL/_cat/health?h=status"
+          echo $ELASTIC_SEARCH_URL
+          curl -fsSL "$ELASTIC_SEARCH_URL/_cat/health?h=status"
       - name: Run integration tests
         env:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
-          DATABASE_URL: postgresql://test:no_pass@localhost:${{ job.services.postgres.ports[9200] }}
+          DATABASE_URL: postgresql://test:no_pass@localhost:${{ job.services.postgres.ports[5432] }}
+          ELASTIC_SEARCH_URL: http://localhost:${{ job.services.elasticsearch.ports[9200] }}
           REDIS_URL: redis://localhost:${{ job.services.redis.ports[6379] }}
           MONGO_URL: mongodb://test:no_pass@localhost:${{ job.services.mongo.ports[27017] }}
         run: npm run integration-tests -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
