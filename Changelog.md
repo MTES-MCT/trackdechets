@@ -18,6 +18,21 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+# [2023.8.2] 29/08/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Interdiction des codes de groupement sur les dasris de synthèse[PR 2639](https://github.com/MTES-MCT/trackdechets/pull/2639)
+
+#### :house: Interne
+
+
 # [2023.8.1] 08/08/2023
 
 #### :rocket: Nouvelles fonctionnalités

@@ -626,6 +626,22 @@ export const operationSchema: FactorySchemaOf<
           }
           return true;
         }
+      )
+      .test(
+        "groupingCodesFordbiddenForSynthesis",
+        "Les codes R12 et D12 sont interdits sur un bordereau de synthèse",
+        async (value, ctx) => {
+          const type = ctx.parent.type;
+
+          if (
+            value &&
+            DASRI_GROUPING_OPERATIONS_CODES.includes(value) &&
+            type === BsdasriType.SYNTHESIS
+          ) {
+            return false;
+          }
+          return true;
+        }
       ),
 
     destinationOperationDate: yup
