@@ -58,7 +58,7 @@ jobs:
           ELASTIC_SEARCH_URL: http://localhost:${{ job.services.elasticsearch.ports[9200] }}
         run: |
           echo $ELASTIC_SEARCH_URL
-          netstat -plantu
+          ss -plantu
           curl -vvv "$ELASTIC_SEARCH_URL/_cat/health?h=status"
       - name: Run integration tests
         env:
