@@ -41,18 +41,16 @@ const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (
       }
     })
   ]);
-  const companyInfosConvert: any = companyInfos;
   return {
-    ...companyInfosConvert,
+    ...(companyInfos as CompanySearchPrivate),
     ...{
       trackdechetsId: company?.id,
-      orgId: company?.orgId,
+      orgId: company?.orgId ?? companyInfos.orgId,
       gerepId: company?.gerepId,
       securityCode: company?.securityCode,
       verificationCode: company?.verificationCode,
       givenName: company?.givenName
     },
-    // We don't need this infos in this query
     isAnonymousCompany: isAnonymousCompany > 0
   } as CompanySearchPrivate;
 };

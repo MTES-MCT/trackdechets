@@ -494,6 +494,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     const gqlquery = `
       query {
         companyPrivateInfos(clue: "${siret}") {
+          orgId
           siret
           etatAdministratif
           name
@@ -510,6 +511,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       }`;
     const { data } = await query<any>(gqlquery);
     expect(data.companyPrivateInfos).toMatchObject({
+      orgId: anoCompany.orgId,
       siret: anoCompany.siret,
       name: anoCompany.name,
       address: anoCompany.address,
@@ -604,6 +606,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     const gqlquery = `
       query {
         companyPrivateInfos(clue: "${siret}") {
+          orgId
           siret
           vatNumber
           etatAdministratif
@@ -624,6 +627,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       }`;
     const { data } = await query<any>(gqlquery);
     expect(data.companyPrivateInfos).toMatchObject({
+      orgId: company.orgId,
       address: company.address,
       name: company.name,
       siret: company.siret,
