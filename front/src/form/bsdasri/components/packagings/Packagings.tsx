@@ -18,9 +18,11 @@ export default function DasriPackagings({
   form,
   id,
   disabled,
+  summaryHint,
   ...props
-}: FieldProps<BsdasriPackaging[] | null> &
-  InputHTMLAttributes<HTMLInputElement>) {
+}: FieldProps<BsdasriPackaging[] | null> & {
+  summaryHint?: string;
+} & InputHTMLAttributes<HTMLInputElement>) {
   const { setFieldValue } = useFormikContext();
 
   if (!value) {
@@ -172,7 +174,12 @@ export default function DasriPackagings({
         )}
       />
       {value?.length > 0 && (
-        <div className="tw-mt-4">{getDasriPackagingInfosSummary(value)}</div>
+        <div className="tw-mt-4">
+          <>
+            {getDasriPackagingInfosSummary(value)}{" "}
+            {!!summaryHint && <span>{summaryHint}</span>}
+          </>
+        </div>
       )}
     </div>
   );
