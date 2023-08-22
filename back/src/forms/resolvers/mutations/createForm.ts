@@ -16,6 +16,7 @@ import {
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import {
+  Transporter,
   draftFormSchema,
   hasPipeline,
   validateGroupement
@@ -27,6 +28,7 @@ import { sirenifyFormInput } from "../../sirenify";
 import { recipifyFormInput } from "../../recipify";
 import { checkCanCreate } from "../../permissions";
 import { UserInputError } from "../../../common/errors";
+import prisma from "../../../prisma";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -66,26 +68,86 @@ const createFormResolver = async (
   }
 
   const form = flattenFormInput(formContent);
-  let transporter: Omit<
-    Prisma.BsddTransporterCreateWithoutFormInput,
-    "number"
-  > = flattenTransporterInput(formContent);
-  // Pipeline erases transporter EXCEPT for transporterTransportMode
-  if (hasPipeline(form as any) && transporter) {
-    transporter = {
-      transporterTransportMode: TransportMode.OTHER
+
+  if (formContent.transporter && formContent.transporters) {
+    throw new UserInputError(
+      "Vous ne pouvez pas utiliser les champs `transporter` et `transporters` en même temps"
+    );
+  }
+
+  let transporters: Prisma.BsddTransporterCreateNestedManyWithoutFormInput = {}; // payload de nested write Prisma
+  let transportersForValidation: Transporter[] = []; // payload de validation
+
+  if (formContent.transporter) {
+    // Lorsque l'ancien champ `transporter` est spécifié, on crée
+    // un nouveau enregistrement dans la table BsddTransporter et on
+    // l'associe au bordereau
+    transporters.create = {
+      ...flattenTransporterInput(formContent),
+      number: 1,
+      readyToTakeOver: true
     };
+    transportersForValidation.push(transporters.create);
+  } else if (formContent.transporters) {
+    const dbTransporters = await prisma.bsddTransporter.findMany({
+      where: { id: { in: formContent.transporters } }
+    });
+    // check all identifiers has a matching record in DB
+    const unknowTransporters = formContent.transporters.filter(
+      id => !dbTransporters.map(t => t.id).includes(id)
+    );
+    if (unknowTransporters.length > 0) {
+      throw new UserInputError(
+        `Aucun transporteur ne possède le ou les identifiants suivants : ${unknowTransporters.join(
+          ", "
+        )}`
+      );
+    }
+    transportersForValidation = [
+      ...transportersForValidation,
+      ...dbTransporters
+    ];
+    // Lorsque le champs `transporters` est passé, on connecte les enregistrements
+    // de la table `BsddTransporter` avec ce bordereau. La fonction `create`
+    // du repository s'assure que la numérotation des transporteurs correspondent à
+    // l'ordre du tableau d'identifiants.
+    transporters = {
+      connect: formContent.transporters.map(id => ({
+        id
+      }))
+    };
+  }
+
+  // Pipeline erases transporter EXCEPT for transporterTransportMode
+  // FIXME here we have a silent side effect. It would be be better to throw an
+  // exception is the transporter data sent by the user does not comply
+  if (hasPipeline(form as any)) {
+    transporters = {
+      create: {
+        number: 1,
+        transporterTransportMode: TransportMode.OTHER
+      }
+    };
+    transportersForValidation = [];
+  }
+
+  // Do not take into account user sent transporter data in case of APPENDIX1_PRODUCER
+  // Transporter data will be copied from the bordereau chapeau
+  if (form.emitterType === "APPENDIX1_PRODUCER") {
+    delete transporters.create;
+    delete transporters.connect;
+    transportersForValidation = [];
   }
 
   const readableId = getReadableId();
 
   const cleanedForm = await draftFormSchema.validate({
     ...form,
-    ...transporter
+    transporters: transportersForValidation
   });
 
   // `cleanedForm` was introduced for the annexe 1 to get only the keys from
-  // the annexe 1 yup schema. The problem is that it also returns the `transporter*`
+  // the annexe 1 yup schema. The problem is that it also returns
   // fields that should not be included in the FormCreateInput.
   if (cleanedForm) {
     for (const key of Object.keys(cleanedForm)) {
@@ -99,13 +161,7 @@ const createFormResolver = async (
     ...cleanedForm,
     readableId,
     owner: { connect: { id: user.id } },
-    ...(form.emitterType !== EmitterType.APPENDIX1_PRODUCER
-      ? {
-          transporters: {
-            create: { ...transporter, number: 1, readyToTakeOver: true }
-          }
-        }
-      : {})
+    transporters
   };
 
   if (temporaryStorageDetail) {

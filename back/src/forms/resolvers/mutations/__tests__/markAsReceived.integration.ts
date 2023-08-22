@@ -8,7 +8,7 @@ import {
   formFactory,
   formWithTempStorageFactory,
   siretify,
-  transportSegmentFactory,
+  bsddTransporterFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -464,9 +464,9 @@ describe("Test Form reception", () => {
     });
 
     // a taken over segment
-    await transportSegmentFactory({
+    await bsddTransporterFactory({
       formId: form.id,
-      segmentPayload: {
+      opts: {
         transporterCompanySiret: siretify(2),
         readyToTakeOver: true,
         takenOverAt: new Date("2020-01-01"),
@@ -524,9 +524,9 @@ describe("Test Form reception", () => {
     });
 
     // a taken over segment
-    await transportSegmentFactory({
+    await bsddTransporterFactory({
       formId: form.id,
-      segmentPayload: {
+      opts: {
         transporterCompanySiret: siretify(3),
         readyToTakeOver: true,
         takenOverAt: new Date("2020-01-01"),
@@ -535,9 +535,9 @@ describe("Test Form reception", () => {
     });
 
     // this segment has not been taken over yet
-    const staleSegment = await transportSegmentFactory({
+    const staleSegment = await bsddTransporterFactory({
       formId: form.id,
-      segmentPayload: {
+      opts: {
         transporterCompanySiret: siretify(4),
         readyToTakeOver: true
       }

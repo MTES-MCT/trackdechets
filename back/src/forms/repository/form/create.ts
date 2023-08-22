@@ -55,6 +55,23 @@ const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
       data: { ...denormalizedSirets, canAccessDraftSirets }
     });
 
+    // update transporters ordering when connecting transporters records
+    if (
+      data.transporters?.connect &&
+      Array.isArray(data.transporters.connect)
+    ) {
+      await Promise.all(
+        data.transporters.connect.map(({ id: transporterId }, idx) =>
+          prisma.bsddTransporter.update({
+            where: { id: transporterId },
+            data: {
+              number: idx + 1
+            }
+          })
+        )
+      );
+    }
+
     await prisma.statusLog.create({
       data: {
         form: { connect: { id: form.id } },

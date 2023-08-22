@@ -5,13 +5,13 @@
 import { BsddTransporter, Form, Prisma } from "@prisma/client";
 import prisma from "../prisma";
 import { FormRole } from "../generated/graphql/types";
-import { FormNotFound } from "./errors";
+import { FormNotFound, FormTransporterNotFound } from "./errors";
 import { FullForm } from "./types";
 import { UserInputError } from "../common/errors";
 
 /**
  * Returns a prisma Form with all linked objects
- * (owner, ecoOrganisme, temporaryStorage, transportSegments, intermediaries)
+ * (owner, ecoOrganisme, temporaryStorage, transporters, intermediaries)
  * @param form
  */
 export async function getFullForm(form: Form): Promise<FullForm> {
@@ -29,10 +29,16 @@ export async function getFullForm(form: Form): Promise<FullForm> {
     })
     .intermediaries();
 
+  if (forwardedIn) {
+    forwardedIn.transporters = getTransportersSync({
+      transporters: forwardedIn.transporters
+    }); // make sure transporters are sorted
+  }
+
   return {
     ...form,
     forwardedIn,
-    transporters,
+    transporters: getTransportersSync({ transporters }), // make sure transporters are sorted
     intermediaries
   };
 }
@@ -58,6 +64,24 @@ export async function getFormOrFormNotFound({
     throw new FormNotFound(id ? id.toString() : readableId!);
   }
   return form;
+}
+
+export async function getFormTransporterOrNotFound({ id }: { id: string }) {
+  if (!id) {
+    throw new UserInputError(
+      "Vous devez préciser un identifiant de transporteur"
+    );
+  }
+
+  const transporter = await prisma.bsddTransporter.findUnique({
+    where: { id }
+  });
+
+  if (transporter === null) {
+    throw new FormTransporterNotFound(id);
+  }
+
+  return transporter;
 }
 
 /**
@@ -172,7 +196,7 @@ export async function getTransporters(
 export function getTransportersSync(form: {
   transporters: BsddTransporter[] | null;
 }): BsddTransporter[] {
-  return form.transporters ?? [];
+  return (form.transporters ?? []).sort((t1, t2) => t1.number - t2.number);
 }
 
 export async function getFirstTransporter(

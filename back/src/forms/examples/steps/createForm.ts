@@ -45,6 +45,25 @@ export function createFormMultiModal(
   };
 }
 
+export function createFormWithTransporters(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
+  return {
+    ...createForm(company),
+    description:
+      "Crée un bordereau en associant une liste de transporteurs dans un ordre donné",
+    variables: ({ producteur, traiteur, formTransporters }) => ({
+      createFormInput: {
+        emitter: fixtures.emitterInput(producteur.siret),
+        recipient: fixtures.recipientInput(traiteur.siret),
+        wasteDetails: fixtures.wasteDetailsInput,
+        transporters: formTransporters
+      }
+    })
+  };
+}
+
 /** Creates a form that will be grouped */
 export function createInitialForm(
   company: string,

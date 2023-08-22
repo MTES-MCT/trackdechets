@@ -8,7 +8,11 @@ import {
 import { InvalidWasteCode, MissingTempStorageFlag } from "../../errors";
 import { checkCanUpdate } from "../../permissions";
 import { GraphQLContext } from "../../../types";
-import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
+import {
+  getFirstTransporterSync,
+  getFormOrFormNotFound,
+  getFullForm
+} from "../../database";
 import {
   expandFormFromDb,
   flattenFormInput,
@@ -17,6 +21,7 @@ import {
 } from "../../converter";
 import { getFormRepository } from "../../repository";
 import {
+  Transporter,
   draftFormSchema,
   hasPipeline,
   sealedFormSchema,
@@ -29,6 +34,7 @@ import { sirenifyFormInput } from "../../sirenify";
 import { recipifyFormInput } from "../../recipify";
 import { validateIntermediariesInput } from "../../../common/validation";
 import { UserInputError } from "../../../common/errors";
+import { checkEditionRules } from "../../edition";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -74,30 +80,103 @@ const updateFormResolver = async (
   }
 
   const existingForm = await getFormOrFormNotFound({ id });
-  const existingTransporter = await getFirstTransporter(existingForm);
+  const existingFullForm = await getFullForm(existingForm);
 
+  const existingTransporters = existingFullForm.transporters;
+
+  const existingFirstTransporter = getFirstTransporterSync({
+    transporters: existingTransporters
+  });
+
+  // Vérifie que l'utilisateur fait bien partie d'un établissement
+  // qui apparait sur le bordereau et qu'il n'essaye pas d'enlever son
+  // établissement du bordereau
   await checkCanUpdate(user, existingForm, updateFormInput);
 
+  /// Vérifie en plus que les champs qui sont modifiés n'ont pas été
+  // verrouillés par une signature
+  await checkEditionRules(existingFullForm, updateFormInput, user);
+
   const form = flattenFormInput(formContent);
-  let transporter: Omit<
-    Prisma.BsddTransporterCreateWithoutFormInput,
-    "number"
-  > = flattenTransporterInput(formContent);
+
+  let transporters: Prisma.BsddTransporterUpdateManyWithoutFormNestedInput = {}; // payload de nested write Prisma
+
+  let transportersForValidation: Transporter[] = existingTransporters; // payload de validation
+
+  if (formContent.transporter === null && existingFirstTransporter) {
+    // On supprime le premier transporteur en gardant les suivants (s'ils existent)
+    // L'ordre des transporteurs se décale.
+    transporters = { delete: { id: existingFirstTransporter.id } };
+  } else if (formContent.transporter) {
+    const transporterData = flattenTransporterInput(formContent);
+    if (existingFirstTransporter) {
+      // On modifie les données du 1er transporteur
+      // Les transporteurs suivants (s'ils existent) ne sont pas modifiés
+      transporters = {
+        update: {
+          where: { id: existingFirstTransporter.id },
+          data: transporterData
+        }
+      };
+      transportersForValidation.push({
+        ...existingFirstTransporter,
+        ...transporterData
+      });
+    } else {
+      // Aucun transporteur n'a encore été associé, let's create one
+      transporters.create = {
+        ...transporterData,
+        number: 1,
+        readyToTakeOver: true
+      };
+      transportersForValidation.push(transporterData);
+    }
+  } else if (formContent.transporters) {
+    const dbTransporters = await prisma.bsddTransporter.findMany({
+      where: { id: { in: formContent.transporters } }
+    });
+    // check all identifiers has a matching record in DB
+    const unknowTransporters = formContent.transporters.filter(
+      id => !dbTransporters.map(t => t.id).includes(id)
+    );
+    if (unknowTransporters.length > 0) {
+      throw new UserInputError(
+        `Aucun transporteur ne possède le ou les identifiants suivants : ${unknowTransporters.join(
+          ", "
+        )}`
+      );
+    }
+    transportersForValidation = dbTransporters;
+    // Lorsque le champs `transporters` est passé, on déconnecte tous les transporteurs qui étaient
+    // précédement associés et on connecte les nouveaux transporteurs de la table `BsddTransporter`
+    // avec ce bordereau. La fonction `update` du repository s'assure que la numérotation des
+    // transporteurs correspond à l'ordre du tableau d'identifiants.
+    transporters = {
+      set: [],
+      connect: formContent.transporters.map(id => ({
+        id
+      }))
+    };
+  }
 
   // Pipeline erases transporter EXCEPT for transporterTransportMode
+  // FIXME here we have a silent side effect. It would be be better to throw an
+  // exception is the transporter data sent by the user does not comply
   if (hasPipeline(form as any)) {
-    if (existingTransporter || Object.keys(transporter).length > 0)
-      transporter = {
-        ...flattenTransporterInput({ transporter: null }),
+    transporters = {
+      deleteMany: {},
+      create: {
+        number: 1,
         transporterTransportMode: TransportMode.OTHER
-      };
+      }
+    };
+    transportersForValidation = [];
   }
 
   const futureForm = {
-    ...existingTransporter, // make sure not to move this after `existingForm` to prevent overwriting `id` and `createdAt`
-    ...transporter,
     ...existingForm,
-    ...form
+    ...form,
+    transporters: transportersForValidation
   };
   // Construct form update payload
   // This bit is a bit confusing. We are NOT in strict mode, so Yup doesnt complain if we pass unknown values.
@@ -115,25 +194,7 @@ const updateFormResolver = async (
     }
   }
 
-  if (Object.keys(transporter).length > 0) {
-    if (existingTransporter) {
-      if (formContent.transporter === null) {
-        formUpdateInput.transporters = {
-          delete: { id: existingTransporter.id }
-        };
-      } else {
-        formUpdateInput.transporters = {
-          update: { data: transporter, where: { id: existingTransporter.id } }
-        };
-      }
-    } else {
-      if (formContent.transporter !== null) {
-        formUpdateInput.transporters = {
-          create: { ...transporter, number: 1, readyToTakeOver: true }
-        };
-      }
-    }
-  }
+  formUpdateInput.transporters = transporters;
 
   // Validate form input
   if (existingForm.status === "DRAFT") {

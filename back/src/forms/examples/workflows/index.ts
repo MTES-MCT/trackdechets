@@ -4,6 +4,7 @@ import entreposageProvisoire from "./entreposageProvisoire";
 import entreposageProvisoireTransporteurEtranger from "./entreposageProvisoireTransporteurEtranger";
 import importBsdPapier from "./importBsdPapier";
 import multiModal from "./multiModal";
+import multiModalv2 from "./multiModalv2";
 import multiModalTransporteurEtranger from "./multiModalTransporteurEtranger";
 import regroupement from "./regroupement";
 import regroupementTransporteurEtranger from "./regroupementTransporteurEtranger";
@@ -16,6 +17,7 @@ export default {
   entreposageProvisoireTransporteurEtranger,
   importBsdPapier,
   multiModal,
+  multiModalv2,
   multiModalTransporteurEtranger,
   regroupement,
   regroupementTransporteurEtranger,

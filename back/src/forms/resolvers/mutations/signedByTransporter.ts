@@ -32,7 +32,9 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
 
     const fullForm = await getFullForm(form);
 
-    const transporter = await getFirstTransporterSync(fullForm);
+    // La mutation `signedByTransporter` ne peut être appelée que par
+    // le premier transporteur contrairement à `signTransportForm`
+    const transporter = getFirstTransporterSync(fullForm);
 
     await checkCanSignedByTransporter(user, form);
 
@@ -73,11 +75,14 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       ...transporter,
       ...form,
       ...wasteDetails,
-      ...receiptFields
+      transporters: [{ ...transporter, ...receiptFields }]
     };
 
     // check waste details override is valid and transporter info is filled
-    await validateBeforeTransport(futureForm);
+    await validateBeforeTransport(
+      futureForm,
+      getTransporterCompanyOrgId(transporter)!
+    );
 
     const formRepository = getFormRepository(user);
 

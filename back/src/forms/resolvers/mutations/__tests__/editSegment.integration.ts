@@ -3,17 +3,34 @@ import prisma from "../../../../prisma";
 import {
   formFactory,
   siretify,
-  transportSegmentFactory,
+  bsddTransporterFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { gql } from "graphql-tag";
+import {
+  Mutation,
+  MutationEditSegmentArgs
+} from "../../../../generated/graphql/types";
 
 jest.mock("axios", () => ({
   default: {
     get: jest.fn(() => Promise.resolve({ data: {} }))
   }
 }));
+
+const EDIT_SEGMENT = gql`
+  mutation EditSegment(
+    $id: ID!
+    $siret: String!
+    $nextSegmentInfo: NextSegmentInfoInput!
+  ) {
+    editSegment(id: $id, siret: $siret, nextSegmentInfo: $nextSegmentInfo) {
+      id
+    }
+  }
+`;
 
 describe("{ mutation { editSegment } }", () => {
   afterAll(() => resetDatabase());
@@ -43,30 +60,35 @@ describe("{ mutation { editSegment } }", () => {
       }
     });
     // there is already one segment
-    const segment = await transportSegmentFactory({
+    const segment = await bsddTransporterFactory({
       formId: form.id,
-      segmentPayload: { transporterCompanySiret: "98765" }
+      opts: { transporterCompanySiret: "98765", readyToTakeOver: false }
     });
 
     const { mutate } = makeClient(firstTransporter);
     const editSegmentSiret = siretify(2);
-    await mutate(
-      `mutation  {
-            editSegment(id:"${segment.id}", siret:"${transporterOrgId}", nextSegmentInfo: {
-                transporter: {
-                  company: {
-                    siret: "${editSegmentSiret}"
-                    name: "White walkers social club"
-                    address: "King's landing"
-                    contact: "The king of the night"
-                  }
-                }
-                mode: ROAD
-              }) {
-                id
-              }
-          }`
-    );
+    const { errors } = await mutate<
+      Pick<Mutation, "editSegment">,
+      MutationEditSegmentArgs
+    >(EDIT_SEGMENT, {
+      variables: {
+        id: segment.id,
+        siret: transporterOrgId,
+        nextSegmentInfo: {
+          mode: "ROAD",
+          transporter: {
+            company: {
+              siret: editSegmentSiret,
+              name: "White walkers social club",
+              address: "King's landing",
+              contact: "The king of the night"
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
 
     const editedSegment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: segment.id }
@@ -98,30 +120,36 @@ describe("{ mutation { editSegment } }", () => {
       }
     });
     // there is already one segment
-    const segment = await transportSegmentFactory({
+    const segment = await bsddTransporterFactory({
       formId: form.id,
-      segmentPayload: { transporterCompanySiret: "98765" }
+      opts: { transporterCompanySiret: "98765", readyToTakeOver: false }
     });
 
     const { mutate } = makeClient(firstTransporter);
     const editSegmentSiret = siretify(3);
-    await mutate(
-      `mutation  {
-            editSegment(id:"${segment.id}", siret:"${transporterOrgId}",   nextSegmentInfo: {
-                transporter: {
-                  company: {
-                    siret: "${editSegmentSiret}"
-                    name: "White walkers social club"
-                    address: "King's landing"
-                    contact: "The king of the night"
-                  }
-                }
-                mode: ROAD
-              }) {
-                id
-              }
-          }`
-    );
+
+    const { errors } = await mutate<
+      Pick<Mutation, "editSegment">,
+      MutationEditSegmentArgs
+    >(EDIT_SEGMENT, {
+      variables: {
+        id: segment.id,
+        siret: transporterOrgId,
+        nextSegmentInfo: {
+          mode: "ROAD",
+          transporter: {
+            company: {
+              siret: editSegmentSiret,
+              name: "White walkers social club",
+              address: "King's landing",
+              contact: "The king of the night"
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
 
     const editedSegment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: segment.id }
@@ -155,29 +183,35 @@ describe("{ mutation { editSegment } }", () => {
       }
     });
     // there is already one readyToTakeOver segment
-    const segment = await transportSegmentFactory({
+    const segment = await bsddTransporterFactory({
       formId: form.id,
-      segmentPayload: {
+      opts: {
         transporterCompanySiret: siretify(4),
         readyToTakeOver: true
       }
     });
 
     const { mutate } = makeClient(secondTransporter);
-    await mutate(
-      `mutation  {
-            editSegment(id:"${segment.id}", siret:"${secondTransporterCompany.orgId}", nextSegmentInfo: {
-                transporter: {
-                  company: {
-                    contact: "José Lannister"
-                  }
-                }
-                mode: RAIL
-              }) {
-                id
-              }
-          }`
-    );
+
+    const { errors } = await mutate<
+      Pick<Mutation, "editSegment">,
+      MutationEditSegmentArgs
+    >(EDIT_SEGMENT, {
+      variables: {
+        id: segment.id,
+        siret: secondTransporterCompany.orgId,
+        nextSegmentInfo: {
+          mode: "RAIL",
+          transporter: {
+            company: {
+              contact: "José Lannister"
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
 
     const editedSegment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: segment.id }

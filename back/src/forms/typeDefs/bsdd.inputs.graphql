@@ -191,8 +191,16 @@ input CreateFormInput {
   """
   recipient: RecipientInput
 
-  "Transporteur du déchet (case 8)"
+  "Premier transporteur du déchet (case 8)"
   transporter: TransporterInput
+
+  """
+  Liste des différents transporteurs, dans l'ordre de prise en charge du déchet.
+  Contient un seul identifiant en cas d'acheminement direct. Peut contenir au maximum
+  5 identifiants en cas de transport multi-modal. Les transporteurs peuvent être crées, modifiés,
+  supprimés à l'aide des mutations createFormTransporter, updateFormTransporter, deleteFormTransporter.
+  """
+  transporters: [ID!]
 
   "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
@@ -252,8 +260,16 @@ input UpdateFormInput {
   """
   recipient: RecipientInput
 
-  "Transporteur du déchet (case 8)"
+  "Premier transporteur du déchet (case 8)"
   transporter: TransporterInput
+
+  """
+  Liste des différents transporteurs, dans l'ordre de prise en charge du déchet.
+  Contient un seul identifiant en cas d'acheminement direct. Peut contenir au maximum
+  5 identifiants en cas de transport multi-modal. Les transporteurs peuvent être crées, modifiés,
+  supprimés à l'aide des mutations createFormTransporter, updateFormTransporter, deleteFormTransporter.
+  """
+  transporters: [ID!]
 
   "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
@@ -306,8 +322,16 @@ input FormInput {
   """
   recipient: RecipientInput
 
-  "Transporteur du déchet (case 8)"
+  "Premier transporteur du déchet (case 8)"
   transporter: TransporterInput
+
+  """
+  Liste des différents transporteurs, dans l'ordre de prise en charge du déchet.
+  Contient un seul identifiant en cas d'achemninement direct. Peut contenir au maximum
+  5 identifiants en cas de transport multi-modal. Les transporteurs peuvent être crées, modifiés,
+  supprimés à l'aide des mutations createFormTransporter, updateFormTransporter, deleteFormTransporter.
+  """
+  transporters: [ID!]
 
   "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
@@ -481,7 +505,7 @@ input RecipientInput {
   isTempStorage: Boolean
 }
 
-"Collecteur - transporteur (case 8)"
+"Collecteur - transporteur"
 input TransporterInput {
   "Établissement collecteur - transporteur"
   company: CompanyInput
@@ -490,13 +514,22 @@ input TransporterInput {
   isExemptedOfReceipt: Boolean
 
   "N° de récipissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée"
-  receipt: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
+  receipt: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport "
+    )
 
   "Département du récépissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée"
-  department: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
+  department: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport "
+    )
 
   "Limite de validité du récépissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée"
-  validityLimit: DateTime @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
+  validityLimit: DateTime
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport "
+    )
 
   "Numéro de plaque d'immatriculation"
   numberPlate: String
@@ -820,7 +853,7 @@ input ImportPaperFormInput {
   """
   recipient: RecipientInput
 
-  "Transporteur du déchet (case 8)"
+  "Premier transporteur du déchet (case 8)"
   transporter: TransporterInput
 
   "Détails du déchet (case 3 à 6)"

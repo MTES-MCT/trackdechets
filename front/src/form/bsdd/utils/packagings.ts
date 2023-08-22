@@ -39,7 +39,9 @@ export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
     : `${total} colis : ${packages}`;
 }
 
-export const formTransportIsPipeline = (form: FormInput): boolean =>
+export const formTransportIsPipeline = (
+  form: Pick<FormInput, "wasteDetails">
+): boolean =>
   form.wasteDetails?.packagingInfos?.some(
     pkg => pkg.type === Packagings.Pipeline
   )!;

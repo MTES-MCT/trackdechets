@@ -194,12 +194,21 @@ type Mutation {
     siret: String!
     nextSegmentInfo: NextSegmentInfoInput!
   ): TransportSegment!
+    @deprecated(
+      reason: "Utiliser le champ `Form.transporters` pour ajouter un transporteur et `signTransportForm` pour signer"
+    )
 
   "Marque un segment de transport comme prêt à être emporté"
   markSegmentAsReadyToTakeOver(id: ID!): TransportSegment!
+    @deprecated(
+      reason: "Utiliser le champ `Form.transporters` pour ajouter un transporteur et `signTransportForm` pour signer"
+    )
 
   "Marque un segment comme pris en charge par le nouveau transporteur"
   takeOverSegment(id: ID!, takeOverInfo: TakeOverInput!): TransportSegment!
+    @deprecated(
+      reason: "Utiliser le champ `Form.transporters` pour ajouter un transporteur et `signTransportForm` pour signer"
+    )
 
   "Édite un segment existant"
   editSegment(
@@ -207,6 +216,9 @@ type Mutation {
     siret: String!
     nextSegmentInfo: NextSegmentInfoInput!
   ): TransportSegment!
+    @deprecated(
+      reason: "Utiliser le champ `Form.transporters` pour ajouter un transporteur, `updateFormTransporter` pour le modifier et `signTransportForm` pour signer"
+    )
 
   """
   Crée une demande de révision sur un BSDD existant
@@ -237,4 +249,19 @@ type Mutation {
     "Commentaire facultatif"
     comment: String
   ): FormRevisionRequest!
+
+  """
+  Crée un transporteur BSDD
+  """
+  createFormTransporter(input: TransporterInput!): Transporter
+
+  """
+  Modifie un transporteur BSDD
+  """
+  updateFormTransporter(id: ID!, input: TransporterInput!): Transporter
+
+  """
+  Supprime un transporteur BSDD
+  """
+  deleteFormTransporter("Identifiant du transporteur" id: ID!): ID!
 }

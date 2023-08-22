@@ -9,7 +9,8 @@ import {
 import { checkCanMarkAsResealed } from "../../permissions";
 import {
   validateForwardedInCompanies,
-  sealedFormSchema
+  sealedFormSchema,
+  Transporter
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
@@ -40,14 +41,18 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
   const { forwardedIn } =
     (await formRepository.findFullFormById(form.id)) ?? {};
 
-  const forwardedInTransporter = forwardedIn
+  // markAsResealed can be called several times to update BSD suite data
+  const existingForwardedInTransporter = forwardedIn
     ? getFirstTransporterSync(forwardedIn)
     : null;
 
   await checkCanMarkAsResealed(user, form);
 
-  const { destination, transporter, wasteDetails } =
-    await sirenifyResealedFormInput(resealedInfos, user);
+  const {
+    destination,
+    transporter: transporterInput,
+    wasteDetails
+  } = await sirenifyResealedFormInput(resealedInfos, user);
 
   // copy basic info from initial BSD and overwrite it with resealedInfos
   const updateInput = {
@@ -75,16 +80,44 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     ...flattenFormInput({ wasteDetails, recipient: destination })
   };
 
-  const forwardedInTransporterUpdateInput = flattenTransporterInput({
-    transporter
-  });
+  let transporters: Prisma.BsddTransporterUpdateManyWithoutFormNestedInput = {}; // payload de nested write Prisma
+  const transportersForValidation: Transporter[] = []; // payload de validation
+
+  if (transporterInput === null && existingForwardedInTransporter) {
+    // there should be only one transporter allowed on the BSD suite
+    transporters = { deleteMany: {} };
+  } else if (transporterInput) {
+    const transporterData = flattenTransporterInput({
+      transporter: transporterInput
+    });
+    if (existingForwardedInTransporter) {
+      // On modifie les données du transporteur
+      transporters = {
+        update: {
+          where: { id: existingForwardedInTransporter.id },
+          data: transporterData
+        }
+      };
+      transportersForValidation.push({
+        ...existingForwardedInTransporter,
+        ...transporterData
+      });
+    } else {
+      // Aucun transporteur n'a encore été associé, let's create one
+      transporters.create = {
+        ...transporterData,
+        number: 1,
+        readyToTakeOver: true
+      };
+    }
+    transportersForValidation.push(transporterData);
+  }
 
   // validate input
   await sealedFormSchema.validate({
-    ...forwardedInTransporter,
-    ...forwardedInTransporterUpdateInput,
     ...forwardedIn,
-    ...updateInput
+    ...updateInput,
+    transporters: transportersForValidation
   });
 
   await validateForwardedInCompanies(form);
@@ -99,13 +132,7 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
       readableId: `${form.readableId}-suite`,
       ...updateInput,
       status: Status.SEALED,
-      ...(transporter
-        ? {
-            transporters: {
-              create: { ...forwardedInTransporterUpdateInput, number: 1 }
-            }
-          }
-        : {})
+      transporters
     };
 
     formUpdateInput = {
@@ -115,22 +142,9 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
   } else {
     const forwardedInUpdateInput: Prisma.FormUpdateWithoutForwardingInput = {
       ...updateInput,
-      status: Status.SEALED
+      status: Status.SEALED,
+      transporters
     };
-    if (transporter) {
-      if (forwardedInTransporter) {
-        forwardedInUpdateInput.transporters = {
-          update: {
-            where: { id: forwardedInTransporter.id },
-            data: forwardedInTransporterUpdateInput
-          }
-        };
-      } else {
-        forwardedInUpdateInput.transporters = {
-          create: { ...forwardedInTransporterUpdateInput, number: 1 }
-        };
-      }
-    }
     formUpdateInput = {
       forwardedIn: { update: forwardedInUpdateInput }
     };

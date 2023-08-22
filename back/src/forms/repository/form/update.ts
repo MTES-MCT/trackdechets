@@ -41,6 +41,52 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
         : { forwardedIn: true, transporters: true }
     });
 
+    // update transporters ordering when connecting transporters records
+    if (
+      data.transporters?.connect &&
+      Array.isArray(data.transporters.connect)
+    ) {
+      await Promise.all(
+        data.transporters?.connect.map(({ id: transporterId }, idx) =>
+          prisma.bsddTransporter.update({
+            where: { id: transporterId },
+            data: {
+              number: idx + 1
+            }
+          })
+        )
+      );
+    }
+
+    // If a transporter is deleted, make sure to decrement the number of transporters after him.
+    // This code should normally only be called from the `updateForm` mutation when { transporter: null }
+    // is passed in the UpdateFrom input.
+    if (data.transporters?.delete && updatedForm.transporters?.length) {
+      if (Array.isArray(data.transporters.delete)) {
+        // this case should never happen, throw a custom error to debug in Sentry if it ever does
+        throw new Error(
+          "Impossible de supprimer plusieurs transporteurs à la fois sur un bordereau"
+        );
+      } else {
+        const deletedTransporterId = data.transporters.delete.id;
+        if (deletedTransporterId) {
+          const deletedTransporter = oldForm.transporters.find(
+            t => t.id === deletedTransporterId
+          )!;
+          await Promise.all(
+            updatedForm.transporters
+              .filter(t => t.number > deletedTransporter.number)
+              .map(t =>
+                prisma.bsddTransporter.update({
+                  where: { id: t.id },
+                  data: { number: t.number - 1 }
+                })
+              )
+          );
+        }
+      }
+    }
+
     // Calculating the sirets from Prisma.FormUpdateInput and the previously existing ones is hard
     // If a siret change might have occurred, we process it in a second update
     if (hasPossibleSiretChange) {

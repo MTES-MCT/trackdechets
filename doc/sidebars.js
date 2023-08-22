@@ -58,6 +58,7 @@ module.exports = {
               BSDD: [
                 "tutoriels/examples/bsdd/acheminement-direct",
                 "tutoriels/examples/bsdd/multi-modal",
+                "tutoriels/examples/bsdd/multi-modal-v2",
                 "tutoriels/examples/bsdd/entreposage-provisoire",
                 "tutoriels/examples/bsdd/regroupement",
                 "tutoriels/examples/bsdd/import-bsd-papier",
