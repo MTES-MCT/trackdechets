@@ -66,6 +66,8 @@ jobs:
       #   run: |
       #     echo $ELASTIC_SEARCH_URL
       #     curl -vvv "$ELASTIC_SEARCH_URL/_cat/health?h=status"
+      - name: run ss
+        run: ss
       - name: Run integration tests
         working-directory: back
         env:
