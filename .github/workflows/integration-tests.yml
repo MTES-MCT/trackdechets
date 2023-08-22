@@ -5,43 +5,7 @@ on: pull_request
 jobs:
   back:
     runs-on: ubuntu-latest
-    container: node:18
     name: Integration tests (chunk ${{ matrix.shard }}/${{ strategy.job-total }})
-    services:
-      elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
-        ports:
-        - 9200:9200
-        options: -e="discovery.type=single-node" --health-cmd="curl http://127.0.0.1:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=10
-      mongo:
-        image: mongo:6
-        ports:
-        - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: test
-          MONGO_INITDB_ROOT_PASSWORD: no_pass
-      postgres:
-        image: postgres:13.3-alpine
-        env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: no_pass
-          POSTGRES_DB: prisma
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-        - 5432:5432
-      redis:
-        image: redis:5.0-alpine
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-        - 6379:6379
     strategy:
       fail-fast: false
       matrix:
@@ -51,26 +15,11 @@ jobs:
         working-directory: back/integration-tests
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-      - name: Check Elasticsearch connection status
-        env:
-          ELASTIC_SEARCH_URL: http://127.0.0.1:9200
-        run: |
-          echo $ELASTIC_SEARCH_URL
-          curl -vvv "$ELASTIC_SEARCH_URL/_cat/health?h=status"
       - name: Run integration tests
         env:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
-          DATABASE_URL: postgresql://test:no_pass@127.0.0.1:5432
-          ELASTIC_SEARCH_URL: http://127.0.0.1:9200
-          REDIS_URL: redis://127.0.0.1:6379
-          MONGO_URL: mongodb://test:no_pass@127.0.0.1:27017
-        run: npm run integration-tests -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+
+        run: |
+          chmod +x ./run.sh
+          ./run.sh -c ${{ matrix.shard }}/${{ strategy.job-total }}
