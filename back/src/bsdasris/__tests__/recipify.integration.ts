@@ -22,9 +22,9 @@ describe("Bsdasri Recipify Module", () => {
         company: mockInput.transporter.company,
         recepisse: {
           isExempted: false,
-          department: receipt.department,
-          number: receipt.receiptNumber,
-          validityLimit: receipt.validityLimit
+          department: receipt.transporterReceiptDepartment,
+          number: receipt.transporterReceiptNumber,
+          validityLimit: receipt.transporterReceiptValidityLimit
         }
       }
     });

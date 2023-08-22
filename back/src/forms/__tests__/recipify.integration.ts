@@ -28,9 +28,9 @@ describe("Test Bsdd Transporter Recipify Module for FormInput", () => {
       transporter: {
         company: company,
         isExemptedOfReceipt: false,
-        receipt: receipt.receiptNumber,
-        department: receipt.department,
-        validityLimit: receipt.validityLimit
+        receipt: receipt.transporterReceiptNumber,
+        department: receipt.transporterReceiptNumber,
+        validityLimit: receipt.transporterReceiptValidityLimit
       }
     });
   });
@@ -64,9 +64,9 @@ describe("Bsdd Resealed Recipify Module", () => {
       transporter: {
         company: mockInput.transporter.company,
         isExemptedOfReceipt: false,
-        receipt: receipt.receiptNumber,
-        department: receipt.department,
-        validityLimit: receipt.validityLimit
+        receipt: receipt.transporterReceiptNumber,
+        department: receipt.transporterReceiptNumber,
+        validityLimit: receipt.transporterReceiptValidityLimit
       }
     });
   });
@@ -101,9 +101,9 @@ describe("Bsdd Transporter segment Recipify Module", () => {
       transporter: {
         company: mockInput.transporter.company,
         isExemptedOfReceipt: false,
-        receipt: receipt.receiptNumber,
-        department: receipt.department,
-        validityLimit: receipt.validityLimit
+        receipt: receipt.transporterReceiptNumber,
+        department: receipt.transporterReceiptNumber,
+        validityLimit: receipt.transporterReceiptValidityLimit
       },
       mode: "ROAD" as TransportMode
     });
@@ -157,9 +157,9 @@ describe("Test Bsdd Transporter recipify module for db update, recipifyTransport
       transporters: {
         update: {
           data: {
-            transporterReceipt: receipt.receiptNumber,
-            transporterDepartment: receipt.department,
-            transporterValidityLimit: receipt.validityLimit,
+            transporterReceipt: receipt.transporterReceiptNumber,
+            transporterDepartment: receipt.transporterReceiptNumber,
+            transporterValidityLimit: receipt.transporterReceiptValidityLimit,
             transporterIsExemptedOfReceipt: false
           },
           where: { id: transporter?.id }

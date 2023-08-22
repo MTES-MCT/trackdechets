@@ -57,18 +57,23 @@ async function recipisseTransporterTransformer(
   });
 
   if (!val.transporterRecepisseIsExempted && orgId) {
-    const transporterReceipt = await prisma.company
-      .findUnique({
-        where: {
-          orgId
-        }
-      })
-      .transporterReceipt();
+    const transporterReceipt = await prisma.company.findUnique({
+      where: {
+        orgId
+      },
+      select: {
+        transporterReceiptDepartment: true,
+        transporterReceiptNumber: true,
+        transporterReceiptValidityLimit: true
+      }
+    });
 
-    val.transporterRecepisseNumber = transporterReceipt?.receiptNumber ?? null;
+    val.transporterRecepisseNumber =
+      transporterReceipt?.transporterReceiptNumber ?? null;
     val.transporterRecepisseValidityLimit =
-      transporterReceipt?.validityLimit ?? null;
-    val.transporterRecepisseDepartment = transporterReceipt?.department ?? null;
+      transporterReceipt?.transporterReceiptValidityLimit ?? null;
+    val.transporterRecepisseDepartment =
+      transporterReceipt?.transporterReceiptDepartment ?? null;
   }
 
   return val;

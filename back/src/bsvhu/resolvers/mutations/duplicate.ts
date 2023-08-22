@@ -82,12 +82,11 @@ async function getDuplicateData(
     transporterCompanyMail:
       transporter?.contactEmail ?? bsvhu.transporterCompanyMail,
     transporterCompanyVatNumber: bsvhu.transporterCompanyVatNumber,
-    transporterRecepisseNumber:
-      transporter?.transporterReceipt?.receiptNumber ?? null,
+    transporterRecepisseNumber: transporter?.transporterReceiptNumber ?? null,
     transporterRecepisseDepartment:
-      transporter?.transporterReceipt?.department ?? null,
+      transporter?.transporterReceiptDepartment ?? null,
     transporterRecepisseValidityLimit:
-      transporter?.transporterReceipt?.validityLimit ?? null
+      transporter?.transporterReceiptValidityLimit ?? null
   };
 }
 
@@ -101,10 +100,7 @@ async function getBsvhuCompanies(bsvhu: Bsvhu) {
 
   // Batch fetch all companies involved in the BSVHU
   const companies = await prisma.company.findMany({
-    where: { orgId: { in: companiesOrgIds } },
-    include: {
-      transporterReceipt: true
-    }
+    where: { orgId: { in: companiesOrgIds } }
   });
 
   const emitter = companies.find(

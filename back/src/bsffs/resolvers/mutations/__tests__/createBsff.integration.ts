@@ -154,7 +154,7 @@ describe("Mutation.createBsff", () => {
     const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: ["TRANSPORTER"]
     });
-    const receipt = await transporterReceiptFactory({
+    const companyWithReceipt = await transporterReceiptFactory({
       company: transporter.company
     });
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
@@ -169,13 +169,13 @@ describe("Mutation.createBsff", () => {
     });
 
     expect(data.createBsff.transporter!.recepisse!.number).toEqual(
-      receipt.receiptNumber
+      companyWithReceipt.transporterReceiptNumber
     );
     expect(data.createBsff.transporter!.recepisse!.department).toEqual(
-      receipt.department
+      companyWithReceipt.transporterReceiptDepartment
     );
     expect(data.createBsff.transporter!.recepisse!.validityLimit).toEqual(
-      receipt.validityLimit.toISOString()
+      companyWithReceipt.transporterReceiptValidityLimit?.toISOString()
     );
   });
 

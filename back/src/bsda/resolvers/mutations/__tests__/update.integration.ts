@@ -401,13 +401,13 @@ describe("Mutation.updateBsda", () => {
     );
     // recepisse is pulled from db
     expect(data.updateBsda.transporter!.recepisse!.number).toEqual(
-      receipt.receiptNumber
+      receipt.transporterReceiptNumber
     );
     expect(data.updateBsda.transporter!.recepisse!.department).toEqual(
-      receipt.department
+      receipt.transporterReceiptDepartment
     );
     expect(data.updateBsda.transporter!.recepisse!.validityLimit).toEqual(
-      receipt.validityLimit.toISOString()
+      receipt.transporterReceiptValidityLimit?.toISOString()
     );
     const transporter2 = await companyFactory({
       companyTypes: ["TRANSPORTER"]
@@ -435,13 +435,13 @@ describe("Mutation.updateBsda", () => {
     );
     // recepisse2 is pulled from db
     expect(data2.updateBsda.transporter!.recepisse!.number).toEqual(
-      receipt2.receiptNumber
+      receipt2.transporterReceiptNumber
     );
     expect(data2.updateBsda.transporter!.recepisse!.department).toEqual(
-      receipt2.department
+      receipt2.transporterReceiptDepartment
     );
     expect(data2.updateBsda.transporter!.recepisse!.validityLimit).toEqual(
-      receipt2.validityLimit.toISOString()
+      receipt2.transporterReceiptValidityLimit?.toISOString()
     );
   });
 

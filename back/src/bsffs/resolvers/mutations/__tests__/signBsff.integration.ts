@@ -1,9 +1,4 @@
-import {
-  BsffStatus,
-  BsffType,
-  TransporterReceipt,
-  UserRole
-} from "@prisma/client";
+import { BsffStatus, BsffType, Company, UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
@@ -52,7 +47,7 @@ describe("Mutation.signBsff", () => {
   let emitter: UserWithCompany;
   let transporter: UserWithCompany;
   let destination: UserWithCompany;
-  let receipt: TransporterReceipt;
+  let receipt: Company;
 
   beforeEach(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -302,7 +297,14 @@ describe("Mutation.signBsff", () => {
         destination
       });
       // remove the receipt
-      await prisma.transporterReceipt.delete({ where: { id: receipt.id } });
+      await prisma.company.update({
+        where: { id: receipt.id },
+        data: {
+          transporterReceiptNumber: null,
+          transporterReceiptValidityLimit: null,
+          transporterReceiptDepartment: null
+        }
+      });
       const { mutate } = makeClient(transporter.user);
       const { errors } = await mutate<
         Pick<Mutation, "signBsff">,
@@ -389,13 +391,13 @@ describe("Mutation.signBsff", () => {
       expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
       expect(data.signBsff.transporter?.recepisse?.department).toBe(
-        receipt.department
+        receipt.transporterReceiptDepartment
       );
       expect(data.signBsff.transporter?.recepisse?.validityLimit).toBe(
-        receipt.validityLimit.toISOString()
+        receipt.transporterReceiptValidityLimit?.toISOString()
       );
       expect(data.signBsff.transporter?.recepisse?.number).toBe(
-        receipt.receiptNumber
+        receipt.transporterReceiptNumber
       );
     });
 

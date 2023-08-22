@@ -165,13 +165,21 @@ test("should create a transport segment", async () => {
 });
 
 test("should create a transporter receipt and associate it to a company", async () => {
-  const company = await companyFactory();
+  let company = await companyFactory();
 
-  const receipt = await transporterReceiptFactory({ company });
+  company = await transporterReceiptFactory({ company });
 
   const retrievedCompany = await prisma.company.findUnique({
     where: { id: company.id }
   });
 
-  expect(retrievedCompany?.transporterReceiptId).toEqual(receipt.id);
+  expect(retrievedCompany?.transporterReceiptNumber).toEqual(
+    company.transporterReceiptNumber
+  );
+  expect(retrievedCompany?.transporterReceiptDepartment).toEqual(
+    company.transporterReceiptDepartment
+  );
+  expect(retrievedCompany?.transporterReceiptValidityLimit).toEqual(
+    company.transporterReceiptValidityLimit
+  );
 });

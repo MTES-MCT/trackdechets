@@ -54,13 +54,9 @@ export default async () => {
               companyTypes: {
                 set: ["TRANSPORTER"]
               },
-              transporterReceipt: {
-                create: {
-                  department: "07",
-                  receiptNumber: "0101010101",
-                  validityLimit: new Date("2024-01-01 00:00:00")
-                }
-              }
+              transporterReceiptNumber: "0101010101",
+              transporterReceiptValidityLimit: new Date("2024-01-01 00:00:00"),
+              transporterReceiptDepartment: "07"
             }
           }
         }

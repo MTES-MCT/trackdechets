@@ -115,39 +115,29 @@ describe("mutaion.duplicateBsvhu", () => {
       where: { id: data.duplicateBsvhu.id }
     });
     expect(duplicateBsvhu?.transporterRecepisseDepartment).toBe(
-      receipt.department
+      receipt.transporterReceiptNumber
     );
     expect(
       duplicateBsvhu?.transporterRecepisseValidityLimit?.toISOString()
-    ).toBe(receipt.validityLimit.toISOString());
+    ).toBe(receipt.transporterReceiptValidityLimit?.toISOString());
     expect(duplicateBsvhu?.transporterRecepisseNumber).toBe(
-      receipt.receiptNumber
+      receipt.transporterReceiptNumber
     );
   });
 
   test("duplicated BSVHU should have the updated data when company info changes", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporterCompany = await companyFactory({
-      transporterReceipt: {
-        create: {
-          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
-          validityLimit: TODAY.toISOString(),
-          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
-        }
-      }
+      transporterReceiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+      transporterReceiptValidityLimit: TODAY.toISOString() as any,
+      transporterReceiptDepartment: "TRANSPORTER- RECEIPT-DEPARTMENT"
     });
-    const transporterReceipt =
-      await prisma.transporterReceipt.findUniqueOrThrow({
-        where: { id: transporterCompany.transporterReceiptId! }
-      });
+
     const destinationCompany = await companyFactory({
-      vhuAgrementDemolisseur: {
-        create: {
-          agrementNumber: "UPDATED-AGREEMENT-NUMBER",
-          department: "UPDATED-DEPARTMENT"
-        }
-      }
+      vhuAgrementDemolisseurDepartment: "UPDATED-DEPARTMENT",
+      vhuAgrementDemolisseurNumber: "UPDATED-AGREEMENT-NUMBER"
     });
+
     const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
@@ -162,9 +152,11 @@ describe("mutaion.duplicateBsvhu", () => {
         transporterCompanyContact: transporterCompany.contact,
         transporterCompanyMail: transporterCompany.contactEmail,
         transporterCompanyPhone: transporterCompany.contactPhone,
-        transporterRecepisseNumber: transporterReceipt.receiptNumber,
-        transporterRecepisseDepartment: transporterReceipt.department,
-        transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+        transporterRecepisseNumber: transporterCompany.transporterReceiptNumber,
+        transporterRecepisseDepartment:
+          transporterCompany.transporterReceiptDepartment,
+        transporterRecepisseValidityLimit:
+          transporterCompany.transporterReceiptValidityLimit,
         destinationCompanySiret: destinationCompany.siret,
         destinationCompanyName: destinationCompany.name,
         destinationCompanyAddress: destinationCompany.address,
@@ -194,16 +186,10 @@ describe("mutaion.duplicateBsvhu", () => {
         address: "UPDATED-TRANSPORTER-ADDRESS",
         contact: "UPDATED-TRANSPORTER-CONTACT",
         contactPhone: "UPDATED-TRANSPORTER-PHONE",
-        contactEmail: "UPDATED-TRANSPORTER-MAIL"
-      }
-    });
-
-    await prisma.transporterReceipt.update({
-      where: { id: transporterCompany.transporterReceiptId! },
-      data: {
-        receiptNumber: "UPDATED-TRANSPORTER-RECEIPT-NUMBER",
-        validityLimit: FOUR_DAYS_AGO.toISOString(),
-        department: "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
+        contactEmail: "UPDATED-TRANSPORTER-MAIL",
+        transporterReceiptNumber: "UPDATED-TRANSPORTER-RECEIPT-NUMBER",
+        transporterReceiptValidityLimit: FOUR_DAYS_AGO.toISOString(),
+        transporterReceiptDepartment: "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
       }
     });
 

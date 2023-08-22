@@ -41,15 +41,21 @@ export async function getTransporterReceipt(
   const orgId = getTransporterCompanyOrgId(existingBsd);
   let transporterReceipt;
   if (orgId) {
-    transporterReceipt = await prisma.company
-      .findUnique({
-        where: { orgId }
-      })
-      .transporterReceipt();
+    transporterReceipt = await prisma.company.findUnique({
+      where: { orgId },
+      select: {
+        transporterReceiptDepartment: true,
+        transporterReceiptNumber: true,
+        transporterReceiptValidityLimit: true
+      }
+    });
   }
   return {
-    transporterRecepisseNumber: transporterReceipt?.receiptNumber ?? null,
-    transporterRecepisseDepartment: transporterReceipt?.department ?? null,
-    transporterRecepisseValidityLimit: transporterReceipt?.validityLimit ?? null
+    transporterRecepisseNumber:
+      transporterReceipt?.transporterReceiptNumber ?? null,
+    transporterRecepisseDepartment:
+      transporterReceipt?.transporterReceiptDepartment ?? null,
+    transporterRecepisseValidityLimit:
+      transporterReceipt?.transporterReceiptValidityLimit ?? null
   };
 }

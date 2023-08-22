@@ -3,7 +3,6 @@ import {
   CompanyPublic,
   QueryResolvers
 } from "../../../generated/graphql/types";
-import { getInstallation } from "../../database";
 import { searchCompany } from "../../search";
 
 /**
@@ -38,7 +37,6 @@ export async function getCompanyInfos(
     name: searchResult.name,
     naf: searchResult.naf,
     libelleNaf: searchResult.libelleNaf,
-    installation: await getInstallation(siretOrVat),
     contact: searchResult.contact,
     contactEmail: searchResult.contactEmail,
     contactPhone: searchResult.contactPhone,
@@ -47,12 +45,7 @@ export async function getCompanyInfos(
     companyTypes: searchResult.companyTypes ?? [],
     ecoOrganismeAgreements: searchResult.ecoOrganismeAgreements ?? [],
     allowBsdasriTakeOverWithoutSignature:
-      searchResult.allowBsdasriTakeOverWithoutSignature,
-    transporterReceipt: searchResult.transporterReceipt,
-    traderReceipt: searchResult.traderReceipt,
-    brokerReceipt: searchResult.brokerReceipt,
-    vhuAgrementDemolisseur: searchResult.vhuAgrementDemolisseur,
-    vhuAgrementBroyeur: searchResult.vhuAgrementBroyeur
+      searchResult.allowBsdasriTakeOverWithoutSignature
   };
 }
 

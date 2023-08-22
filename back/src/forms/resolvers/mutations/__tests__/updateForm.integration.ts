@@ -334,9 +334,9 @@ describe("Mutation.updateForm", () => {
           create: {
             transporterCompanySiret: company.siret,
             number: 1,
-            transporterReceipt: receipt.receiptNumber,
-            transporterDepartment: receipt.department,
-            transporterValidityLimit: receipt.validityLimit
+            transporterReceipt: receipt.transporterReceiptNumber,
+            transporterDepartment: receipt.transporterReceiptNumber,
+            transporterValidityLimit: receipt.transporterReceiptValidityLimit
           }
         }
       }
@@ -354,10 +354,14 @@ describe("Mutation.updateForm", () => {
       variables: { updateFormInput }
     });
     // receipt data is unchanged
-    expect(data.updateForm.transporter!.receipt).toEqual(receipt.receiptNumber);
-    expect(data.updateForm.transporter!.department).toEqual(receipt.department);
+    expect(data.updateForm.transporter!.receipt).toEqual(
+      receipt.transporterReceiptNumber
+    );
+    expect(data.updateForm.transporter!.department).toEqual(
+      receipt.transporterReceiptNumber
+    );
     expect(data.updateForm.transporter!.validityLimit).toEqual(
-      receipt.validityLimit.toISOString()
+      receipt.transporterReceiptValidityLimit?.toISOString()
     );
   });
 
@@ -2387,18 +2391,10 @@ describe("Mutation.updateForm", () => {
     const TODAY = new Date();
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("MEMBER", {
-      transporterReceipt: {
-        create: {
-          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
-          validityLimit: TODAY.toISOString() as any,
-          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
-        }
-      }
+      transporterReceiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+      transporterReceiptValidityLimit: TODAY.toISOString() as any,
+      transporterReceiptDepartment: "TRANSPORTER- RECEIPT-DEPARTMENT"
     });
-    const transporterReceipt =
-      await prisma.transporterReceipt.findUniqueOrThrow({
-        where: { id: transporter.company.transporterReceiptId! }
-      });
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
@@ -2417,9 +2413,11 @@ describe("Mutation.updateForm", () => {
             transporterCompanyContact: transporter.company.contact,
             transporterCompanyPhone: transporter.company.contactPhone,
             transporterCompanyMail: transporter.company.contactEmail,
-            transporterReceipt: transporterReceipt.receiptNumber,
-            transporterDepartment: transporterReceipt.department,
-            transporterValidityLimit: transporterReceipt.validityLimit,
+            transporterReceipt: transporter.company.transporterReceiptNumber,
+            transporterDepartment:
+              transporter.company.transporterReceiptDepartment,
+            transporterValidityLimit:
+              transporter.company.transporterReceiptValidityLimit,
             number: 1
           }
         }

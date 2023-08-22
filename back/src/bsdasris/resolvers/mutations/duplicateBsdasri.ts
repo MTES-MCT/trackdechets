@@ -137,12 +137,11 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     transporterCompanyContact:
       transporter?.contact ?? bsdasri.transporterCompanyContact,
     // Transporter recepisse
-    transporterRecepisseNumber:
-      transporter?.transporterReceipt?.receiptNumber ?? null,
+    transporterRecepisseNumber: transporter?.transporterReceiptNumber ?? null,
     transporterRecepisseValidityLimit:
-      transporter?.transporterReceipt?.validityLimit ?? null,
+      transporter?.transporterReceiptValidityLimit ?? null,
     transporterRecepisseDepartment:
-      transporter?.transporterReceipt?.department ?? null
+      transporter?.transporterReceiptDepartment ?? null
   });
 }
 
@@ -160,9 +159,6 @@ async function getBsdasriCompanies(bsdasri: Bsdasri) {
       siret: {
         in: companiesOrgIds
       }
-    },
-    include: {
-      transporterReceipt: true
     }
   });
 

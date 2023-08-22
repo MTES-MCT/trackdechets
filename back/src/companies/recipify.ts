@@ -40,7 +40,9 @@ function findCompany(where: { where: { orgId: string } }) {
   return prisma.company.findUnique({
     ...where,
     select: {
-      transporterReceiptId: true
+      transporterReceiptDepartment: true,
+      transporterReceiptValidityLimit: true,
+      transporterReceiptNumber: true
     }
   });
 }
@@ -66,19 +68,11 @@ export function recipifyGeneric<T>(
       // if company exists, we auto-complete
       if (company) {
         let receipt: RecipifyOutput;
-        if (!!company?.transporterReceiptId) {
-          const dbReceipt = await prisma.transporterReceipt.findFirst({
-            where: { id: company.transporterReceiptId },
-            select: {
-              receiptNumber: true,
-              validityLimit: true,
-              department: true
-            }
-          });
+        if (!!company?.transporterReceiptNumber) {
           receipt = {
-            number: dbReceipt?.receiptNumber ?? null,
-            validityLimit: dbReceipt?.validityLimit ?? null,
-            department: dbReceipt?.department ?? null
+            number: company.transporterReceiptNumber,
+            validityLimit: company.transporterReceiptValidityLimit ?? null,
+            department: company.transporterReceiptDepartment ?? null
           };
         } else {
           receipt = {

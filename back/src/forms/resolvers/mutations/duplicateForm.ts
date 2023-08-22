@@ -27,12 +27,7 @@ async function getFormCompanies(form: Form) {
 
   // Batch fetch all companies involved in the form
   const companies = await prisma.company.findMany({
-    where: { orgId: { in: companiesOrgIds } },
-    include: {
-      transporterReceipt: true,
-      traderReceipt: true,
-      brokerReceipt: true
-    }
+    where: { orgId: { in: companiesOrgIds } }
   });
 
   const emitter = companies.find(
@@ -133,22 +128,20 @@ async function getDuplicateFormInput(
     traderCompanyContact: trader?.contact ?? form.traderCompanyContact,
     traderCompanyPhone: trader?.contactPhone ?? form.traderCompanyPhone,
     traderCompanyMail: trader?.contactEmail ?? form.traderCompanyMail,
-    traderReceipt: trader?.traderReceipt?.receiptNumber ?? form.traderReceipt,
-    traderDepartment:
-      trader?.traderReceipt?.department ?? form.traderDepartment,
+    traderReceipt: trader?.traderReceiptNumber ?? form.traderReceipt,
+    traderDepartment: trader?.traderReceiptDepartment ?? form.traderDepartment,
     traderValidityLimit:
-      trader?.traderReceipt?.validityLimit ?? form.traderValidityLimit,
+      trader?.traderReceiptValidityLimit ?? form.traderValidityLimit,
     brokerCompanyName: broker?.name ?? form.brokerCompanyName,
     brokerCompanySiret: form.brokerCompanySiret,
     brokerCompanyAddress: broker?.address ?? form.brokerCompanyAddress,
     brokerCompanyContact: broker?.contact ?? form.brokerCompanyContact,
     brokerCompanyPhone: broker?.contactPhone ?? form.brokerCompanyPhone,
     brokerCompanyMail: broker?.contactEmail ?? form.brokerCompanyMail,
-    brokerReceipt: broker?.brokerReceipt?.receiptNumber ?? form.brokerReceipt,
-    brokerDepartment:
-      broker?.brokerReceipt?.department ?? form.brokerDepartment,
+    brokerReceipt: broker?.brokerReceiptNumber ?? form.brokerReceipt,
+    brokerDepartment: broker?.brokerReceiptDepartment ?? form.brokerDepartment,
     brokerValidityLimit:
-      broker?.brokerReceipt?.validityLimit ?? form.brokerValidityLimit,
+      broker?.brokerReceiptValidityLimit ?? form.brokerValidityLimit,
     ecoOrganismeName: form.ecoOrganismeName,
     ecoOrganismeSiret: form.ecoOrganismeSiret,
     transporters: {
@@ -170,12 +163,11 @@ async function getDuplicateFormInput(
           fullForm.transporter?.transporterCompanyMail,
         transporterCompanyVatNumber:
           fullForm.transporter?.transporterCompanyVatNumber,
-        transporterReceipt:
-          transporter?.transporterReceipt?.receiptNumber ?? null,
+        transporterReceipt: transporter?.transporterReceiptNumber ?? null,
         transporterDepartment:
-          transporter?.transporterReceipt?.department ?? null,
+          transporter?.transporterReceiptDepartment ?? null,
         transporterValidityLimit:
-          transporter?.transporterReceipt?.validityLimit ?? null,
+          transporter?.transporterReceiptValidityLimit ?? null,
         transporterTransportMode:
           fullForm.transporter?.transporterTransportMode,
         transporterIsExemptedOfReceipt:

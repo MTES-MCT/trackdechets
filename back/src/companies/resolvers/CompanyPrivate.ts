@@ -52,7 +52,10 @@ export const genericCompanyReceiptResolvers = {
       hasSubSectionThree: parent.workerCertificationHasSubSectionThree,
       validityLimit: parent.workerCertificationValidityLimit,
       id: parent.orgId
-    })
+    }),
+  installation: (parent, _, context) => {
+    return context.dataloaders.installations.load(parent.orgId);
+  }
 };
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
@@ -85,9 +88,6 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     const userId = context.user!.id;
     const role = await getUserRole(userId, parent.orgId);
     return role ? grants[role].map(toGraphQLPermission) : [];
-  },
-  installation: (parent, _, context) => {
-    return context.dataloaders.installations.load(parent.orgId);
   },
   signatureAutomations: parent => {
     return prisma.company

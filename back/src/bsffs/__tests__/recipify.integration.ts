@@ -15,16 +15,16 @@ describe("Bsff Recipify Module", () => {
         }
       }
     };
-    const receipt = await transporterReceiptFactory({ company });
+    const companyWithReceipt = await transporterReceiptFactory({ company });
     const completedInput = await recipifyFn(mockInput);
     expect(completedInput).toEqual({
       transporter: {
         company: mockInput.transporter.company,
         recepisse: {
           isExempted: false,
-          department: receipt.department,
-          number: receipt.receiptNumber,
-          validityLimit: receipt.validityLimit
+          department: companyWithReceipt.transporterReceiptDepartment,
+          number: companyWithReceipt.transporterReceiptNumber,
+          validityLimit: companyWithReceipt.transporterReceiptValidityLimit
         }
       }
     });

@@ -24,9 +24,10 @@ describe("BSDA Zod transformers", () => {
       const completedInput = await runTransformers(bsda as any, []);
       expect(completedInput).toMatchObject({
         transporterRecepisseIsExempted: false,
-        transporterRecepisseNumber: receipt.receiptNumber,
-        transporterRecepisseDepartment: receipt.department,
-        transporterRecepisseValidityLimit: receipt.validityLimit
+        transporterRecepisseNumber: receipt.transporterReceiptNumber,
+        transporterRecepisseDepartment: receipt.transporterReceiptDepartment,
+        transporterRecepisseValidityLimit:
+          receipt.transporterReceiptValidityLimit
       });
     });
 

@@ -51,9 +51,9 @@ describe("Company Recipify Module", () => {
     expect(completedInput).toEqual({
       ...mockInput,
       anyReceiptFormat: {
-        number: receipt.receiptNumber,
-        validityLimit: receipt.validityLimit,
-        department: receipt.department
+        number: receipt.transporterReceiptNumber,
+        validityLimit: receipt.transporterReceiptValidityLimit,
+        department: receipt.transporterReceiptNumber
       }
     });
   });

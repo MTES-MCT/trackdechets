@@ -21,6 +21,7 @@ describe("{ mutation { createTraderReceipt } }", () => {
       mutation {
         createTraderReceipt(
           input: {
+            id: 
             receiptNumber: "${receipt.receiptNumber}",
             validityLimit: "${receipt.validityLimit}",
             department: "${receipt.department}"
@@ -33,7 +34,9 @@ describe("{ mutation { createTraderReceipt } }", () => {
       mutation
     );
 
-    expect(await prisma.traderReceipt.count()).toEqual(1);
+    expect(await prisma.company.count({
+      where: { }
+    })).toEqual(1);
 
     expect(data.createTraderReceipt).toEqual(receipt);
   });

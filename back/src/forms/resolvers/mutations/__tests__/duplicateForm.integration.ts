@@ -39,17 +39,11 @@ function sortFn(a: string, b: string) {
 async function createForm(opt: Partial<Prisma.FormCreateInput> = {}) {
   const emitter = await userWithCompanyFactory("MEMBER");
   const transporter = await userWithCompanyFactory("MEMBER", {
-    transporterReceipt: {
-      create: {
-        receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
-        validityLimit: TODAY.toISOString() as any,
-        department: "TRANSPORTER- RECEIPT-DEPARTMENT"
-      }
-    }
+    transporterReceiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+    transporterReceiptValidityLimit: TODAY.toISOString() as any,
+    transporterReceiptDepartment: "TRANSPORTER- RECEIPT-DEPARTMENT"
   });
-  const transporterReceipt = await prisma.transporterReceipt.findUniqueOrThrow({
-    where: { id: transporter.company.transporterReceiptId! }
-  });
+
   const recipient = await userWithCompanyFactory("MEMBER");
   const broker = await userWithCompanyFactory("ADMIN", {
     brokerReceipt: {

@@ -5,7 +5,10 @@ import {
   Mutation,
   MutationDuplicateBsffArgs
 } from "../../../../generated/graphql/types";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  transporterReceiptFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { createBsff } from "../../../__tests__/factories";
 import { xDaysAgo } from "../../../../commands/onboarding.helpers";
@@ -129,18 +132,18 @@ describe("Mutation.duplicateBsff", () => {
   test("duplicated BSFF should have the updated data when company info changes", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
 
-    const transporter = await userWithCompanyFactory("MEMBER", {
-      transporterReceipt: {
-        create: {
-          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
-          validityLimit: TODAY.toISOString(),
-          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
-        }
-      }
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await transporterReceiptFactory({
+      company,
+      number: "TRANSPORTER-RECEIPT-NUMBER",
+      department: "TRANSPORTER- RECEIPT-DEPARTMENT"
     });
-
     const destination = await userWithCompanyFactory("MEMBER");
-    const bsff = await createBsff({ emitter, transporter, destination });
+    const bsff = await createBsff({
+      emitter,
+      transporter: { user, company: transporter },
+      destination
+    });
     const { mutate } = makeClient(emitter.user);
 
     await prisma.company.update({
@@ -155,7 +158,7 @@ describe("Mutation.duplicateBsff", () => {
     });
 
     await prisma.company.update({
-      where: { id: transporter.company.id },
+      where: { id: transporter.id },
       data: {
         name: "UPDATED-TRANSPORTER-NAME",
         address: "UPDATED-TRANSPORTER-ADDRESS",
@@ -165,12 +168,12 @@ describe("Mutation.duplicateBsff", () => {
       }
     });
 
-    await prisma.transporterReceipt.update({
-      where: { id: transporter.company.transporterReceiptId! },
+    await prisma.company.update({
+      where: { id: transporter.id },
       data: {
-        receiptNumber: "UPDATED-TRANSPORTER-RECEIPT-NUMBER",
-        validityLimit: FOUR_DAYS_AGO.toISOString(),
-        department: "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
+        transporterReceiptNumber: "UPDATED-TRANSPORTER-RECEIPT-NUMBER",
+        transporterReceiptValidityLimit: FOUR_DAYS_AGO.toISOString(),
+        transporterReceiptDepartment: "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
       }
     });
 
@@ -250,8 +253,13 @@ describe("Mutation.duplicateBsff", () => {
       "UPDATED-DESTINATION-PHONE"
     );
     // Test emptying Transporter receipt
-    await prisma.transporterReceipt.delete({
-      where: { id: transporter.company.transporterReceiptId! }
+    await prisma.company.update({
+      where: { id: transporter.id },
+      data: {
+        transporterReceiptNumber: null,
+        transporterReceiptValidityLimit: null,
+        transporterReceiptDepartment: null
+      }
     });
     const { data: data2 } = await mutate<
       Pick<Mutation, "duplicateBsff">,

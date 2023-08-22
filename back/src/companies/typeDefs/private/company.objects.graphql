@@ -39,35 +39,125 @@ type CompanyFavorite {
   """
   isRegistered: Boolean
 
-  """
+ """
   Récépissé transporteur associé à cet établissement (le cas échéant)
   """
-  transporterReceipt: TransporterReceipt
+  transporterReceipt: TransporterReceipt @deprecated(reason: "Utiliser `transporterReceipt***`")
 
   """
   Récépissé négociant associé à cet établissement (le cas échant)
   """
-  traderReceipt: TraderReceipt
+  traderReceipt: TraderReceipt @deprecated(reason: "Utiliser `brtraderReceiptokerReceipt***`")
 
   """
   Récépissé courtier associé à cet établissement (le cas échant)
   """
-  brokerReceipt: BrokerReceipt
+  brokerReceipt: BrokerReceipt @deprecated(reason: "Utiliser `brokerReceipt***`")
 
   """
   Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
   """
-  vhuAgrementDemolisseur: VhuAgrement
+  vhuAgrementDemolisseur: VhuAgrement @deprecated(reason: "Utiliser `vhuAgrementDemolisseur***`")
 
   """
   Agrément VHU broyeur (le cas échéant, pour les profils VHU)
   """
-  vhuAgrementBroyeur: VhuAgrement
+  vhuAgrementBroyeur: VhuAgrement @deprecated(reason: "Utiliser `vhuAgrementBroyeur***`")
+
+  """
+  Agrément VHU broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeurNumber: String
+
+  """
+  Department de l'agrément VHU broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeurDepartment: String
 
   """
   Certification entreprise de travaux
   """
-  workerCertification: WorkerCertification
+  workerCertification: WorkerCertification  @deprecated(reason: "Utiliser `workerCertification***`")
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 4
+  """
+  workerCertificationHasSubSectionFour: Boolean
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 3
+  """
+  workerCertificationHasSubSectionThree: Boolean
+
+  """
+  Numéro de certification de l'entreprise de travaux (sous-section 3 uniquement)
+  """
+  workerCertificationCertificationNumber: String
+
+  """
+  Limite de validité de la certification de l'entreprise de travaux (sous-section 3 uniquement)
+  """
+  workerCertificationValidityLimit: DateTime
+
+  """
+  Organisation qui a décerné la certification de l'entreprise de travaux (sous-section 3 uniquement)
+  Peut prendre uniquement les valeurs suivantes: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT
+  """
+  workerCertificationOrganisation: String
+
+"""
+  Numéro de récépissé transporteur (le cas échéant, pour les profils transporteur)
+  """
+  transporterReceiptNumber: String
+
+  """
+  Limite de validité du récépissé transporteur (le cas échéant, pour les profils transporteur)
+  """
+  transporterReceiptValidityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration transporteur (le cas échéant, pour les profils transporteur)
+  """
+  transporterReceiptDepartment: String
+
+  """
+  Numéro de récipissé négociant (le cas échéant, pour les profils négociant)
+  """
+  traderReceiptNumber: String
+  """
+  Limite de validité du récépissé négociant (le cas échéant, pour les profils négociant)
+  """
+  traderReceiptValidityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration du récépissé négociant (le cas échéant, pour les profils négociant)
+  """
+  traderReceiptDepartment: String
+
+  """
+  Numéro de récipissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceiptNumber: String
+
+  """
+  Limite de validité du récépissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceiptValidityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration du récépissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceiptDepartment: String
+
+  """
+  Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseurNumber: String
+
+  """
+  Department de l'agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseurDepartment: String
 }
 
 type CompanyForVerification {
@@ -176,30 +266,125 @@ type CompanySearchPrivate implements CompanySearchPrivateCommon {
   """
   installation: Installation
 
+   """
+  Récépissé transporteur associé à cet établissement (le cas échéant)
   """
-  Récépissé transporteur (le cas échéant, pour les profils transporteur)
-  """
-  transporterReceipt: TransporterReceipt
+  transporterReceipt: TransporterReceipt @deprecated(reason: "Utiliser `transporterReceipt***`")
 
   """
-  Récépissé négociant (le cas échéant, pour les profils négociant)
+  Récépissé négociant associé à cet établissement (le cas échant)
   """
-  traderReceipt: TraderReceipt
+  traderReceipt: TraderReceipt @deprecated(reason: "Utiliser `brtraderReceiptokerReceipt***`")
 
   """
-  Récépissé courtier (le cas échéant, pour les profils courtier)
+  Récépissé courtier associé à cet établissement (le cas échant)
   """
-  brokerReceipt: BrokerReceipt
+  brokerReceipt: BrokerReceipt @deprecated(reason: "Utiliser `brokerReceipt***`")
 
   """
-  Agrément démolisseur (le cas échéant, pour les profils VHU)
+  Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
   """
-  vhuAgrementDemolisseur: VhuAgrement
+  vhuAgrementDemolisseur: VhuAgrement @deprecated(reason: "Utiliser `vhuAgrementDemolisseur***`")
 
   """
-  Agrément broyeur (le cas échéant, pour les profils VHU)
+  Agrément VHU broyeur (le cas échéant, pour les profils VHU)
   """
-  vhuAgrementBroyeur: VhuAgrement
+  vhuAgrementBroyeur: VhuAgrement @deprecated(reason: "Utiliser `vhuAgrementBroyeur***`")
+
+  """
+  Agrément VHU broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeurNumber: String
+
+  """
+  Department de l'agrément VHU broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeurDepartment: String
+
+  """
+  Certification entreprise de travaux
+  """
+  workerCertification: WorkerCertification @deprecated(reason: "Utiliser `workerCertification***`")
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 4
+  """
+  workerCertificationHasSubSectionFour: Boolean
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 3
+  """
+  workerCertificationHasSubSectionThree: Boolean
+
+  """
+  Numéro de certification de l'entreprise de travaux (sous-section 3 uniquement)
+  """
+  workerCertificationCertificationNumber: String
+
+  """
+  Limite de validité de la certification de l'entreprise de travaux (sous-section 3 uniquement)
+  """
+  workerCertificationValidityLimit: DateTime
+
+  """
+  Organisation qui a décerné la certification de l'entreprise de travaux (sous-section 3 uniquement)
+  Peut prendre uniquement les valeurs suivantes: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT
+  """
+  workerCertificationOrganisation: String
+
+"""
+  Numéro de récépissé transporteur (le cas échéant, pour les profils transporteur)
+  """
+  transporterReceiptNumber: String
+
+  """
+  Limite de validité du récépissé transporteur (le cas échéant, pour les profils transporteur)
+  """
+  transporterReceiptValidityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration transporteur (le cas échéant, pour les profils transporteur)
+  """
+  transporterReceiptDepartment: String
+
+  """
+  Numéro de récipissé négociant (le cas échéant, pour les profils négociant)
+  """
+  traderReceiptNumber: String
+  """
+  Limite de validité du récépissé négociant (le cas échéant, pour les profils négociant)
+  """
+  traderReceiptValidityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration du récépissé négociant (le cas échéant, pour les profils négociant)
+  """
+  traderReceiptDepartment: String
+
+  """
+  Numéro de récipissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceiptNumber: String
+
+  """
+  Limite de validité du récépissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceiptValidityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration du récépissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceiptDepartment: String
+
+  """
+  Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseurNumber: String
+
+  """
+  Department de l'agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseurDepartment: String
 
   """
   Liste des agréments de l'éco-organisme
@@ -235,8 +420,4 @@ type CompanySearchPrivate implements CompanySearchPrivateCommon {
   Liste des automatisations de signature reçues par l'entreprise
   """
   receivedSignatureAutomations: [SignatureAutomation!]!
-  """
-  Certification entreprise de travaux
-  """
-  workerCertification: WorkerCertification
 }

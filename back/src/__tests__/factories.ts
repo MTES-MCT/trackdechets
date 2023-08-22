@@ -536,27 +536,20 @@ export const toIntermediaryCompany = (company: Company, contact = "toto") => ({
 });
 
 export const transporterReceiptFactory = async ({
+  company,
   number = "the number",
-  department = "83",
-  company
+  department = "83"
 }: {
+  company: Company;
   number?: string;
   department?: string;
-  company?: Company;
-}) => {
-  const receipt = await prisma.transporterReceipt.create({
+}): Promise<Company> => {
+  return prisma.company.update({
+    where: { id: company.id },
     data: {
-      receiptNumber: number,
-      validityLimit: "2055-01-01T00:00:00.000Z",
-      department: department
+      transporterReceiptDepartment: department,
+      transporterReceiptNumber: number,
+      transporterReceiptValidityLimit: "2055-01-01T00:00:00.000Z"
     }
   });
-  if (!!company) {
-    await prisma.company.update({
-      where: { id: company.id },
-      data: { transporterReceipt: { connect: { id: receipt.id } } }
-    });
-  }
-
-  return receipt;
 };

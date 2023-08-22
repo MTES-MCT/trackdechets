@@ -21,9 +21,9 @@ describe("{ mutation { createTransporterReceipt } }", () => {
       mutation {
         createTransporterReceipt(
           input: {
-            receiptNumber: "${receipt.receiptNumber}"
-            validityLimit: "${receipt.validityLimit}"
-            department: "${receipt.department}"
+            receiptNumber: "${receipt.transporterReceiptNumber}"
+            validityLimit: "${receipt.transporterReceiptValidityLimit}"
+            department: "${receipt.transporterReceiptNumber}"
           }
           ) { receiptNumber, validityLimit, department }
         }`;

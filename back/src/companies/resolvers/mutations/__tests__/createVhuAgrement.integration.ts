@@ -21,7 +21,7 @@ describe("{ mutation { createVhuAgrement } }", () => {
         createVhuAgrement(
           input: {
             agrementNumber: "${receipt.agrementNumber}"
-            department: "${receipt.department}"
+            department: "${receipt.transporterReceiptNumber}"
           }
           ) { agrementNumber, department }
         }`;

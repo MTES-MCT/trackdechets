@@ -113,13 +113,13 @@ describe("Mutation.updateBsff", () => {
 
     // recepisse is pulled from db
     expect(data.updateBsff.transporter!.recepisse!.number).toEqual(
-      receipt.receiptNumber
+      receipt.transporterReceiptNumber
     );
     expect(data.updateBsff.transporter!.recepisse!.department).toEqual(
-      receipt.department
+      receipt.transporterReceiptDepartment
     );
     expect(data.updateBsff.transporter!.recepisse!.validityLimit).toEqual(
-      receipt.validityLimit.toISOString()
+      receipt.transporterReceiptValidityLimit?.toISOString()
     );
   });
 

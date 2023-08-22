@@ -266,14 +266,11 @@ describe("query favorites", () => {
       }
     });
     const transporter = await companyFactory({
-      transporterReceipt: {
-        create: {
-          receiptNumber: "receipt",
-          validityLimit: new Date(),
-          department: "07"
-        }
-      }
+      transporterReceiptNumber: "receipt",
+      transporterReceiptValidityLimit: new Date(),
+      transporterReceiptDepartment: "07"
     });
+
     await formFactory({
       ownerId: user.id,
       opt: {
@@ -594,13 +591,9 @@ describe("query favorites", () => {
   it("should return recent traders", async () => {
     const trader = await companyFactory({
       companyTypes: ["TRADER"],
-      traderReceipt: {
-        create: {
-          receiptNumber: "receipt",
-          department: "07",
-          validityLimit: new Date()
-        }
-      }
+      traderReceiptNumber: "receipt",
+      traderReceiptDepartment: "07",
+      traderReceiptValidityLimit: new Date()
     });
 
     const traderSirene: CompanySearchResult = {
@@ -659,13 +652,9 @@ describe("query favorites", () => {
   it("should return recent brokers", async () => {
     const broker = await companyFactory({
       companyTypes: ["BROKER"],
-      brokerReceipt: {
-        create: {
-          receiptNumber: "receipt",
-          department: "07",
-          validityLimit: new Date()
-        }
-      }
+      brokerReceiptNumber: "receipt",
+      brokerReceiptDepartment: "07",
+      brokerReceiptValidityLimit: new Date()
     });
 
     const brokerSirene: CompanySearchResult = {

@@ -61,16 +61,16 @@ export async function createBsff(
       transporterCompanyPhone: transporter.company.contactPhone,
       transporterCompanyMail: transporter.company.contactEmail
     });
-    const transporterReceipt = await prisma.company
-      .findUnique({
-        where: { id: transporter.company.id }
-      })
-      .transporterReceipt();
-    if (transporterReceipt) {
+    const company = await prisma.company.findUnique({
+      where: { id: transporter.company.id }
+    });
+
+    if (company) {
       Object.assign(data, {
-        transporterRecepisseNumber: transporterReceipt.receiptNumber,
-        transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
-        transporterRecepisseDepartment: transporterReceipt.department
+        transporterRecepisseNumber: company.transporterReceiptNumber,
+        transporterRecepisseValidityLimit:
+          company.transporterReceiptValidityLimit,
+        transporterRecepisseDepartment: company.transporterReceiptDepartment
       });
     }
   }

@@ -2,6 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
+  transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -145,19 +146,13 @@ describe("Mutation.duplicateBsdasri", () => {
 
   test("duplicated BSDASRI should have the updated data when company info changes", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
-    const transporterCompany = await companyFactory({
-      transporterReceipt: {
-        create: {
-          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
-          validityLimit: TODAY.toISOString(),
-          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
-        }
-      }
+    const company = await companyFactory();
+    const transporterCompany = await transporterReceiptFactory({
+      company,
+      number: "TRANSPORTER-RECEIPT-NUMBER",
+      department: "TRANSPORTER- RECEIPT-DEPARTMENT"
     });
-    const transporterReceipt =
-      await prisma.transporterReceipt.findUniqueOrThrow({
-        where: { id: transporterCompany.transporterReceiptId! }
-      });
+
     const destinationCompany = await companyFactory();
     const bsdasri = await bsdasriFactory({
       opt: {
@@ -173,9 +168,11 @@ describe("Mutation.duplicateBsdasri", () => {
         transporterCompanyContact: transporterCompany.contact,
         transporterCompanyMail: transporterCompany.contactEmail,
         transporterCompanyPhone: transporterCompany.contactPhone,
-        transporterRecepisseNumber: transporterReceipt.receiptNumber,
-        transporterRecepisseDepartment: transporterReceipt.department,
-        transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+        transporterRecepisseNumber: transporterCompany.transporterReceiptNumber,
+        transporterRecepisseDepartment:
+          transporterCompany.transporterReceiptDepartment,
+        transporterRecepisseValidityLimit:
+          transporterCompany.transporterReceiptValidityLimit,
         destinationCompanySiret: destinationCompany.siret,
         destinationCompanyName: destinationCompany.name,
         destinationCompanyAddress: destinationCompany.address,
@@ -208,12 +205,12 @@ describe("Mutation.duplicateBsdasri", () => {
       }
     });
 
-    await prisma.transporterReceipt.update({
-      where: { id: transporterCompany.transporterReceiptId! },
+    await prisma.company.update({
+      where: { id: transporterCompany.id },
       data: {
-        receiptNumber: "UPDATED-TRANSPORTER-RECEIPT-NUMBER",
-        validityLimit: FOUR_DAYS_AGO.toISOString(),
-        department: "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
+        transporterReceiptNumber: "UPDATED-TRANSPORTER-RECEIPT-NUMBER",
+        transporterReceiptValidityLimit: FOUR_DAYS_AGO.toISOString(),
+        transporterReceiptDepartment: "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
       }
     });
 
@@ -299,8 +296,13 @@ describe("Mutation.duplicateBsdasri", () => {
       "UPDATED-DESTINATION-PHONE"
     );
     // Test emptying Transporter receipt
-    await prisma.transporterReceipt.delete({
-      where: { id: transporterCompany.transporterReceiptId! }
+    await prisma.company.update({
+      where: { id: transporterCompany.id },
+      data: {
+        transporterReceiptDepartment: null,
+        transporterReceiptNumber: null,
+        transporterReceiptValidityLimit: null
+      }
     });
     const { data: data2 } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
       DUPLICATE_DASRI,
