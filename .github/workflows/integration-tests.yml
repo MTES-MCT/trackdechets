@@ -48,7 +48,7 @@ jobs:
         shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     defaults:
       run:
-        working-directory: back/integration-tests
+        working-directory: back
     steps:
       - uses: actions/checkout@v3
       - name: Setup Node
@@ -59,13 +59,15 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-      - name: Check Elasticsearch connection status
-        env:
-          ELASTIC_SEARCH_URL: http://127.0.0.1:9200
-        run: |
-          echo $ELASTIC_SEARCH_URL
-          curl -vvv "$ELASTIC_SEARCH_URL/_cat/health?h=status"
+        working-directory: back
+      # - name: Check Elasticsearch connection status
+      #   env:
+      #     ELASTIC_SEARCH_URL: http://127.0.0.1:9200
+      #   run: |
+      #     echo $ELASTIC_SEARCH_URL
+      #     curl -vvv "$ELASTIC_SEARCH_URL/_cat/health?h=status"
       - name: Run integration tests
+        working-directory: back
         env:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
@@ -73,4 +75,4 @@ jobs:
           ELASTIC_SEARCH_URL: http://127.0.0.1:9200
           REDIS_URL: redis://127.0.0.1:6379
           MONGO_URL: mongodb://test:no_pass@127.0.0.1:27017
-        run: npm run integration-tests -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        run: npm run integration-tests -- --config ./integration-tests/jest.config.js --shard=${{ matrix.shard }}/${{ strategy.job-total }}
