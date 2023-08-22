@@ -1,7 +1,8 @@
-import { ApolloServer, gql } from "apollo-server-express";
+import { ApolloServer } from "@apollo/server";
+import { gql } from "graphql-tag";
 import { format } from "date-fns";
 import scalars from "..";
-import { UserInputError } from "../../common/errors";
+import assert from "node:assert";
 
 describe("DateTime", () => {
   afterAll(() => jest.clearAllMocks());
@@ -63,8 +64,11 @@ describe("DateTime", () => {
   `;
 
   it("should format date to ISO string", async () => {
-    const { data } = await server.executeOperation({ query: FOO_QUERY });
-    expect(data!.foo.bar).toEqual(bar.toISOString());
+    const { body } = await server.executeOperation<any>({ query: FOO_QUERY });
+
+    assert(body.kind === "single");
+    expect(body.singleResult.errors).toBeUndefined();
+    expect(body.singleResult.data!.foo.bar).toEqual(bar.toISOString());
   });
 
   it.each(
@@ -88,27 +92,31 @@ describe("DateTime", () => {
   });
 
   it("should fail validation when invalid date format", async () => {
-    const { errors } = await server.executeOperation({
+    const { body } = await server.executeOperation({
       query: CREATE_FOO,
       variables: { bar: "2020-33-02" }
     });
-    expect(errors).toEqual([
-      new UserInputError(
-        `Variable "$bar" got invalid value "2020-33-02"; Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 2020-33-02.`
-      )
-    ]);
+
+    assert(body.kind === "single");
+    const error = body.singleResult.errors![0];
+    expect(error.extensions!.code).toBe("BAD_USER_INPUT");
+    expect(error.message).toBe(
+      `Variable "$bar" got invalid value "2020-33-02"; Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 2020-33-02.`
+    );
   });
 
   it("should fail validation when invalid type", async () => {
-    const { errors } = await server.executeOperation({
+    const { body } = await server.executeOperation({
       query: CREATE_FOO,
       variables: { bar: 1 }
     });
-    expect(errors).toEqual([
-      new UserInputError(
-        `Variable "$bar" got invalid value 1; Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 1.`
-      )
-    ]);
+
+    assert(body.kind === "single");
+    const error = body.singleResult.errors![0];
+    expect(error.extensions!.code).toBe("BAD_USER_INPUT");
+    expect(error.message).toBe(
+      `Variable "$bar" got invalid value 1; Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 1.`
+    );
   });
 });
 
@@ -169,38 +177,50 @@ describe("String", () => {
 
   it("should not modify valid string", async () => {
     resolveFooMock.mockReturnValue({ bar: "bar" });
-    const { data } = await server.executeOperation({ query: FOO_QUERY });
-    expect(data!.foo.bar).toEqual("bar");
+    const { body } = await server.executeOperation<any>({ query: FOO_QUERY });
+    assert(body.kind === "single");
+    expect(body.singleResult.errors).toBeUndefined();
+    expect(body.singleResult.data!.foo.bar).toEqual("bar");
   });
 
   it("should not modify a null value", async () => {
     resolveFooMock.mockReturnValue({ bar: null });
-    const { data } = await server.executeOperation({ query: FOO_QUERY });
-    expect(data!.foo.bar).toEqual(null);
+    const { body } = await server.executeOperation<any>({ query: FOO_QUERY });
+    assert(body.kind === "single");
+    expect(body.singleResult.errors).toBeUndefined();
+    expect(body.singleResult.data!.foo.bar).toEqual(null);
   });
 
   it("should not modify an empty string", async () => {
     resolveFooMock.mockReturnValue({ bar: "" });
-    const { data } = await server.executeOperation({ query: FOO_QUERY });
-    expect(data!.foo.bar).toEqual("");
+    const { body } = await server.executeOperation<any>({ query: FOO_QUERY });
+    assert(body.kind === "single");
+    expect(body.singleResult.errors).toBeUndefined();
+    expect(body.singleResult.data!.foo.bar).toEqual("");
   });
 
   it("should remove <script> tag", async () => {
     resolveFooMock.mockReturnValue({ bar: "<script>oué</script>" });
-    const { data } = await server.executeOperation({ query: FOO_QUERY });
-    expect(data!.foo.bar).toEqual("oué");
+    const { body } = await server.executeOperation<any>({ query: FOO_QUERY });
+    assert(body.kind === "single");
+    expect(body.singleResult.errors).toBeUndefined();
+    expect(body.singleResult.data!.foo.bar).toEqual("oué");
   });
 
   it("should remove forbidden opening tag only", async () => {
     resolveFooMock.mockReturnValue({ bar: "<script>yes" });
-    const { data } = await server.executeOperation({ query: FOO_QUERY });
-    expect(data!.foo.bar).toEqual("yes");
+    const { body } = await server.executeOperation<any>({ query: FOO_QUERY });
+    assert(body.kind === "single");
+    expect(body.singleResult.errors).toBeUndefined();
+    expect(body.singleResult.data!.foo.bar).toEqual("yes");
   });
 
   it("should escape < and >", async () => {
     resolveFooMock.mockReturnValue({ bar: "> <" });
-    const { data } = await server.executeOperation({ query: FOO_QUERY });
-    expect(data!.foo.bar).toEqual("&gt; &lt;");
+    const { body } = await server.executeOperation<any>({ query: FOO_QUERY });
+    assert(body.kind === "single");
+    expect(body.singleResult.errors).toBeUndefined();
+    expect(body.singleResult.data!.foo.bar).toEqual("&gt; &lt;");
   });
 
   it("should leave incoming data untouched", async () => {

@@ -7,7 +7,7 @@ import {
 } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import { gql } from "apollo-server-core";
+import { gql } from "graphql-tag";
 import prisma from "../../../../prisma";
 
 const APPENDIX_FORMS = gql`
@@ -168,7 +168,7 @@ describe("Test appendixForms", () => {
       }
     );
     expect(errors).toHaveLength(1);
-    expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.FORBIDDEN);
     expect(data).toBe(null);
   });
 

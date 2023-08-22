@@ -60,7 +60,7 @@ describe("mutation deleteInvitation", () => {
       `;
     const { errors } = await mutate(mutation);
     expect(errors).toHaveLength(1);
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
     expect(errors[0].message).toEqual("Cette invitation n'existe pas");
   });
 });

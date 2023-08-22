@@ -16,7 +16,7 @@ import {
   Mutation,
   MutationMarkAsResealedArgs
 } from "../../../../generated/graphql/types";
-import { gql } from "apollo-server-core";
+import { gql } from "graphql-tag";
 import * as sirenify from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
 
@@ -206,7 +206,7 @@ describe("Mutation markAsResealed", () => {
     expect(errors[0].message).toEqual(
       "Destinataire: Le siret de l'entreprise est obligatoire"
     );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
     const resealedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });

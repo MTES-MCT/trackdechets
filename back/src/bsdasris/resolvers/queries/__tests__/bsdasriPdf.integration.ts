@@ -9,7 +9,7 @@ import { bsdasriFactory, initialData } from "../../../__tests__/factories";
 import { Query } from "../../../../generated/graphql/types";
 import { BsdasriType } from "@prisma/client";
 
-import { gql } from "apollo-server-express";
+import { gql } from "graphql-tag";
 
 const BSDASRI_PDF = gql`
   query BsdasriPdf($id: ID!) {

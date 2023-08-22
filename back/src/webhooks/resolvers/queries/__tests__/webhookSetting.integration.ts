@@ -8,7 +8,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { Query } from "../../../../generated/graphql/types";
 import { ErrorCode } from "../../../../common/errors";
 
-import { gql } from "apollo-server-express";
+import { gql } from "graphql-tag";
 
 const GET_WEBHOOK_SETTING = gql`
   query Webhooksetting($id: ID!) {

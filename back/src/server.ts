@@ -1,7 +1,9 @@
 import "./tracer";
 
 import { makeExecutableSchema } from "@graphql-tools/schema";
-import { ApolloServer } from "apollo-server-express";
+import { ApolloServer } from "@apollo/server";
+import { unwrapResolverError } from "@apollo/server/errors";
+import { expressMiddleware } from "@apollo/server/express4";
 import redisStore from "connect-redis";
 import cors from "cors";
 import express, { json, static as serveStatic, urlencoded } from "express";
@@ -42,6 +44,9 @@ import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
 import { captchaGen, captchaSound } from "./captcha/captchaGen";
 import { GraphQLError } from "graphql";
+import { GraphQLContext } from "./types";
+import { ValidationError } from "yup";
+import { ZodError } from "zod";
 
 const {
   SESSION_SECRET,
@@ -66,50 +71,42 @@ const schema = makeExecutableSchema({
 // GraphQL endpoint
 const graphQLPath = "/";
 
-export const server = new ApolloServer({
+export const server = new ApolloServer<GraphQLContext>({
   schema,
   introspection: true, // used to enable the playground in production
   validationRules: [depthLimit(10)],
-  csrfPrevention: true, // To prevent "simple requests". See https://www.apollographql.com/docs/apollo-server/security/cors/#preventing-cross-site-request-forgery-csrf
-  cache: "bounded", // Apollo Server's default caching features use an unbounded cache, which is not safe for production use
-  context: async ctx => {
-    return {
-      ...ctx,
-      // req.user is made available by passport
-      user: ctx.req?.user ? { ...ctx.req?.user, ip: ctx.req?.ip } : null,
-      dataloaders: {
-        ...createUserDataLoaders(),
-        ...createCompanyDataLoaders(),
-        ...createFormDataLoaders(),
-        ...createEventsDataLoaders()
-      }
-    };
-  },
-  formatError: err => {
-    // Catch Yup `ValidationError` and throw a `UserInputError` instead of an `InternalServerError`
-    const customError = err.extensions.exception as any;
-    if (customError?.name === "ValidationError") {
-      return new UserInputError(customError.errors.join("\n"));
+  allowBatchedHttpRequests: true,
+  formatError: (formattedError, error) => {
+    const originalError = unwrapResolverError(error);
+    const errorInstanceName = (originalError as any).constructor?.name;
+
+    if (errorInstanceName === "ValidationError") {
+      const typedError = originalError as ValidationError;
+      return new UserInputError(typedError.errors.join("\n"));
     }
-    if (customError?.name === "ZodError") {
+    if (errorInstanceName === "ZodError") {
+      const typedError = originalError as ZodError;
       return new UserInputError(
-        customError.issues.map(issue => issue.message).join("\n"),
-        { issues: customError.issues }
+        typedError.issues.map(issue => issue.message).join("\n"),
+        { issues: typedError.issues }
       );
     }
     if (
-      err.extensions.code === ErrorCode.INTERNAL_SERVER_ERROR &&
+      formattedError.extensions?.code === ErrorCode.INTERNAL_SERVER_ERROR &&
       NODE_ENV === "production"
     ) {
       // Workaround for graphQL validation error displayed as internal server error
       // when graphQL variables are of of invalid type
       // See: https://github.com/apollographql/apollo-server/issues/3498
-      if (err.message && err.message.startsWith(`Variable "`)) {
-        err.extensions.code = "GRAPHQL_VALIDATION_FAILED";
-        return err;
+      if (
+        formattedError.message &&
+        formattedError.message.startsWith(`Variable "`)
+      ) {
+        formattedError.extensions.code = "GRAPHQL_VALIDATION_FAILED";
+        return formattedError;
       }
       // Do not leak error for internal server error in production
-      const sentryId = (err?.originalError as any)?.sentryId;
+      const sentryId = (originalError as any).sentryId;
       return new GraphQLError(
         sentryId
           ? `Erreur serveur : rapport d'erreur ${sentryId}`
@@ -122,7 +119,7 @@ export const server = new ApolloServer({
       );
     }
 
-    return err;
+    return formattedError;
   },
   plugins: [
     graphiqlLandingPagePlugin(),
@@ -343,8 +340,7 @@ app.use(function checkBlacklist(req, res, next) {
 
 // Returns 404 Not Found for every routes not handled by apollo
 app.use((req, res, next) => {
-  const healthCheckPath = "/.well-known/apollo/server-health";
-  if (![graphQLPath, healthCheckPath].includes(req.path)) {
+  if (req.path !== graphQLPath) {
     return res.status(404).send("Not found");
   }
   next();
@@ -357,21 +353,35 @@ if (Sentry) {
 
 app.use(errorHandler);
 
+export const serverDataloaders = {
+  ...createUserDataLoaders(),
+  ...createCompanyDataLoaders(),
+  ...createFormDataLoaders(),
+  ...createEventsDataLoaders()
+};
+
 export async function startApolloServer() {
   await server.start();
 
-  /**
-   * Wire up ApolloServer to /
-   */
-  server.applyMiddleware({
-    app,
-    cors: {
+  app.use(
+    graphQLPath,
+    cors({
       origin: [UI_BASE_URL],
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
       preflightContinue: false,
       optionsSuccessStatus: 204,
       credentials: true
-    },
-    path: graphQLPath
-  });
+    }),
+    json(),
+    expressMiddleware(server, {
+      context: async ctx => {
+        return {
+          ...ctx,
+          // req.user is made available by passport
+          user: ctx.req?.user ? { ...ctx.req?.user, ip: ctx.req?.ip } : null,
+          dataloaders: serverDataloaders
+        };
+      }
+    })
+  );
 }

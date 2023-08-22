@@ -1,9 +1,4 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  createTestClient,
-  TestQuery
-} from "../../../../__tests__/apollo-integration-testing";
-import { server } from "../../../../server";
 import prisma from "../../../../prisma";
 import { companyFactory } from "../../../../__tests__/factories";
 import { getUserCompanies } from "../../../database";
@@ -19,7 +14,7 @@ const JOIN_WITH_INVITE = `
 `;
 
 describe("joinWithInvite mutation", () => {
-  let mutate: TestQuery;
+  let mutate: ReturnType<typeof makeClient>["mutate"];
   beforeAll(() => {
     const testClient = makeClient();
     mutate = testClient.mutate;
@@ -39,8 +34,6 @@ describe("joinWithInvite mutation", () => {
   });
 
   it("should raise exception if invitation was already accepted", async () => {
-    const { mutate } = createTestClient({ apolloServer: server });
-
     const company = await companyFactory();
     const invitee = "john.snow@trackdechets.fr";
 
@@ -165,8 +158,6 @@ describe("joinWithInvite mutation", () => {
   });
 
   it("should return an error if name is empty or password less than 8 characters", async () => {
-    const { mutate } = createTestClient({ apolloServer: server });
-
     const company = await companyFactory();
     const invitee = "john.snow@trackdechets.fr";
 

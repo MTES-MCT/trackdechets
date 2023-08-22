@@ -1,5 +1,5 @@
 import { BsffPackagingType, UserRole } from "@prisma/client";
-import { gql } from "apollo-server-express";
+import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";

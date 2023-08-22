@@ -3,7 +3,6 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { AuthType } from "../../../../auth";
 import { TEST_COMPANY_PREFIX } from "../../../../common/constants/companySearchHelpers";
 import prisma from "../../../../prisma";
-import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
 import {
   companyFactory,
   siretify,
@@ -16,7 +15,7 @@ import * as searchCompany from "../../../sirene/searchCompany";
 const searchSirene = jest.spyOn(searchCompany, "default");
 
 describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
-  let query: TestQuery;
+  let query: ReturnType<typeof makeClient>["query"];
   beforeAll(async () => {
     const user = await userFactory();
     const testClient = makeClient({

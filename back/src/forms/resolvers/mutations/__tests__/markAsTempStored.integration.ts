@@ -329,7 +329,7 @@ describe("{ mutation { markAsTempStored } }", () => {
       "Ce bordereau ne peut pas être marqué comme entreposé provisoirement car le destinataire " +
         "n'a pas été identifié comme étant une installation d'entreposage provisoire ou de reconditionnement"
     );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
   test.each(allowedFormats)(

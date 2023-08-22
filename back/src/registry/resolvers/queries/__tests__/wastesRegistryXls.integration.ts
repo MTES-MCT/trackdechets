@@ -106,7 +106,7 @@ describe("query { wastesRegistryXls }", () => {
       }
     );
     expect(errors).toHaveLength(1);
-    expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.FORBIDDEN);
   });
 
   // Test XLXS export for different registry types

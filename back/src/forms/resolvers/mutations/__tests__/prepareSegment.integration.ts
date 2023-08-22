@@ -453,7 +453,7 @@ describe("{ mutation { prepareSegment } }", () => {
     }`
     );
     expect(errorToPrepare.length).toBe(1);
-    expect(errorToPrepare[0].extensions.code).toBe("FORBIDDEN");
+    expect(errorToPrepare[0].extensions?.code).toBe("FORBIDDEN");
     expect(errorToPrepare[0].message).toBe(
       "Vous ne disposez pas des permissions nécessaires"
     );

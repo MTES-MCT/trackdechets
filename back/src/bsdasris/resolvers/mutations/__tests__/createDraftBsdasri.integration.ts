@@ -10,7 +10,7 @@ import { CompanyType } from "@prisma/client";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { fullBsdasriFragment } from "../../../fragments";
-import { gql } from "apollo-server-express";
+import { gql } from "graphql-tag";
 
 const CREATE_DRAFT_DASRI = gql`
   ${fullBsdasriFragment}
