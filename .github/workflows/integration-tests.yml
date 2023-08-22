@@ -66,15 +66,13 @@ jobs:
       #   run: |
       #     echo $ELASTIC_SEARCH_URL
       #     curl -vvv "$ELASTIC_SEARCH_URL/_cat/health?h=status"
-      - name: run ss
-        run: ss
       - name: Run integration tests
         working-directory: back
         env:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
-          DATABASE_URL: postgresql://test:no_pass@localhost:5432/prisma?schema=default$default
-          ELASTIC_SEARCH_URL: http://localhost:9200
-          REDIS_URL: redis:/localhost:6379
-          MONGO_URL: mongodb://test:no_pass@localhost:27017
+          DATABASE_URL: postgresql://test:no_pass@localhost:${{ job.services.postgres.ports['5432'] }}/prisma?schema=default$default
+          ELASTIC_SEARCH_URL: http://localhost:${{ job.services.elasticsearch.ports['9200'] }}
+          REDIS_URL: redis:/localhost:${{ job.services.redis.ports['6379'] }}
+          MONGO_URL: mongodb://test:no_pass@localhost:${{ job.services.mongo.ports['27017'] }}
         run: npm run integration-tests -- --config ./integration-tests/jest.config.js --shard=${{ matrix.shard }}/${{ strategy.job-total }}
