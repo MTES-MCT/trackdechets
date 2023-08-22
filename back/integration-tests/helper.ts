@@ -40,13 +40,11 @@ export async function truncateDatabase() {
   const tables: Array<{ tablename: string }> =
     await prisma.$queryRaw`SELECT tablename FROM pg_tables WHERE schemaname=${dbSchemaName};`;
 
-  await Promise.race(
-    tables.map(({ tablename }) => {
-      prisma.$executeRawUnsafe(
-        `TRUNCATE TABLE \"${dbSchemaName}\".\"${tablename}\" CASCADE;`
-      );
-    })
-  );
+  for (const { tablename } of tables) {
+    await prisma.$executeRawUnsafe(
+      `TRUNCATE TABLE \"${dbSchemaName}\".\"${tablename}\" CASCADE;`
+    );
+  }
   const sequences: Array<{ relname: string }> =
     await prisma.$queryRaw`SELECT c.relname FROM pg_class AS c JOIN pg_namespace AS n ON c.relnamespace = n.oid WHERE c.relkind='S' AND n.nspname=${dbSchemaName};`;
 
@@ -60,30 +58,24 @@ export async function resetDatabase() {
   jest.setTimeout(10000);
 
   await refreshElasticSearch();
-  await Promise.all([
-    elasticSearch.deleteByQuery(
-      {
-        index: index.alias,
-        body: {
-          query: {
-            match_all: {}
-          }
-        },
-        refresh: true
+  await elasticSearch.deleteByQuery(
+    {
+      index: index.alias,
+      body: {
+        query: {
+          match_all: {}
+        }
       },
-      {
-        // do not throw an error if a document has been updated during delete operation
-        ignore: [409]
-      }
-    ),
-    truncateDatabase()
-  ]);
+      refresh: true
+    },
+    {
+      // do not throw an error if a document has been updated during delete operation
+      ignore: [409]
+    }
+  );
+  await truncateDatabase();
 }
 
-/**
- * Wait for the indexation queue to be drained
- * And force refresh the index alias for 'bsdd'
- */
 export async function refreshElasticSearch() {
   const drainedPromise = new Promise<void>(resolve =>
     indexQueue.once("global:drained", resolve)
