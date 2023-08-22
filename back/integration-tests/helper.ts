@@ -40,7 +40,7 @@ export async function truncateDatabase() {
   const tables: Array<{ tablename: string }> =
     await prisma.$queryRaw`SELECT tablename FROM pg_tables WHERE schemaname=${dbSchemaName};`;
 
-  await Promise.race(
+  await Promise.all(
     tables.map(({ tablename }) => {
       prisma.$executeRawUnsafe(
         `TRUNCATE TABLE \"${dbSchemaName}\".\"${tablename}\" CASCADE;`
