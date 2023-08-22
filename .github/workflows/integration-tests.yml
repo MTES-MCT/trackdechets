@@ -71,8 +71,8 @@ jobs:
         env:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
-          DATABASE_URL: postgresql://test:no_pass@postgresl:5432
-          ELASTIC_SEARCH_URL: http://elasticsearch:9200
-          REDIS_URL: redis:/redis:6379
-          MONGO_URL: mongodb://test:no_pass@mongo:27017
+          DATABASE_URL: postgresql://test:no_pass@localhost:5432/prisma?schema=default$default
+          ELASTIC_SEARCH_URL: http://localhost:9200
+          REDIS_URL: redis:/localhost:6379
+          MONGO_URL: mongodb://test:no_pass@localhost:27017
         run: npm run integration-tests -- --config ./integration-tests/jest.config.js --shard=${{ matrix.shard }}/${{ strategy.job-total }}
