@@ -5,7 +5,7 @@ import {
 } from "../../../../../integration-tests/helper";
 import supertest from "supertest";
 import { ErrorCode } from "../../../../common/errors";
-import { app } from "../../../../server";
+import { app } from "../../../../download";
 import {
   companyFactory,
   formFactory,
