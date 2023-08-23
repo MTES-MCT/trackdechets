@@ -3,15 +3,20 @@ import {
   formWithTempStorageFactory,
   userFactory
 } from "../../__tests__/factories";
-import { expandFormFromDb } from "../converter";
+import prisma from "../../prisma";
+import { expandFormFromDb, expandableFormIncludes } from "../converter";
 import { getFirstTransporter } from "../database";
 
 describe("expandFormFromDb", () => {
   it("should expand normal form from db", async () => {
     const user = await userFactory();
     const form = await formFactory({ ownerId: user.id });
+    const fullForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: expandableFormIncludes
+    });
     const transporter = await getFirstTransporter(form);
-    const expanded = await expandFormFromDb(form as any);
+    const expanded = await expandFormFromDb(fullForm);
     expect(expanded).toEqual({
       id: form.id,
       readableId: form.readableId,
@@ -145,7 +150,11 @@ describe("expandFormFromDb", () => {
     const { forwardedIn, ...form } = await formWithTempStorageFactory({
       ownerId: user.id
     });
-    const expanded = await expandFormFromDb(form as any);
+    const fullForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: expandableFormIncludes
+    });
+    const expanded = await expandFormFromDb(fullForm);
     const transporter = await getFirstTransporter(forwardedIn!);
     expect(expanded.temporaryStorageDetail).toEqual({
       temporaryStorer: {
@@ -226,8 +235,12 @@ describe("expandFormFromDb", () => {
         }
       }
     });
+    const fullForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: expandableFormIncludes
+    });
     const transporter = await getFirstTransporter(form);
-    const expanded = await expandFormFromDb(form as any);
+    const expanded = await expandFormFromDb(fullForm);
     expect(expanded.transporter).toEqual({
       id: transporter!.id,
       mode: null,
@@ -263,8 +276,12 @@ describe("expandFormFromDb", () => {
         }
       }
     });
+    const fullForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: expandableFormIncludes
+    });
     const transporter = await getFirstTransporter(form);
-    const expanded = await expandFormFromDb(form as any);
+    const expanded = await expandFormFromDb(fullForm);
     expect(expanded.transporter).toEqual({
       id: transporter!.id,
       mode: "OTHER",

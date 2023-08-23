@@ -1,6 +1,8 @@
 import { isDate, isEqual } from "date-fns";
-import { Form } from "@prisma/client";
-import { PrismaFormWithForwardedInAndTransporters,expandFormFromDb } from "../converter";
+import {
+  PrismaFormWithForwardedInAndTransporters,
+  expandFormFromDb
+} from "../converter";
 
 export function isArray(obj) {
   return {}.toString.apply(obj) === "[object Array]";

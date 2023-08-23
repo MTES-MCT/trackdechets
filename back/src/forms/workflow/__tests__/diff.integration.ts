@@ -22,7 +22,7 @@ describe("formDiff", () => {
       where: { id: form.id },
       include: expandableFormIncludes
     });
-    const diff = formDiff(fullForm, form as any);
+    const diff = formDiff(fullForm, fullForm);
     expect(diff).toEqual({});
   });
 
@@ -41,7 +41,11 @@ describe("formDiff", () => {
       where: { id: form.id },
       data: formUpdateInput
     });
-    const diff = formDiff(fullForm, updatedForm as any);
+    const fullUpdatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: updatedForm.id },
+      include: expandableFormIncludes
+    });
+    const diff = formDiff(fullForm, fullUpdatedForm);
     expect(diff).toEqual({
       emitter: { company: { name: formUpdateInput.emitterCompanyName } },
       sentBy: formUpdateInput.sentBy
@@ -51,7 +55,7 @@ describe("formDiff", () => {
   it("should calculate diff on temporary storage detail", async () => {
     const user = await userFactory();
     const form = await formWithTempStorageFactory({ ownerId: user.id });
-    const { forwardedIn, ...fullForm } = await prisma.form.findUniqueOrThrow({
+    const fullForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: {
         transporters: true,
@@ -59,7 +63,9 @@ describe("formDiff", () => {
       }
     });
 
-    const forwardedInTransporter = getFirstTransporterSync(forwardedIn!);
+    const forwardedInTransporter = getFirstTransporterSync(
+      fullForm.forwardedIn!
+    );
 
     const formUpdateInput: Prisma.FormUpdateInput = {
       forwardedIn: {
@@ -79,14 +85,12 @@ describe("formDiff", () => {
       where: { id: form.id },
       data: formUpdateInput
     });
-    const updatedForwardedIn = await prisma.form
-      .findUnique({ where: { id: form.id } })
-      .forwardedIn();
+    const fullUpdatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: updatedForm.id },
+      include: expandableFormIncludes
+    });
 
-    const diff = formDiff({ ...fullForm, forwardedIn }, {
-      ...updatedForm,
-      forwardedIn: updatedForwardedIn
-    } as any);
+    const diff = formDiff(fullForm, fullUpdatedForm);
     expect(diff).toEqual({
       temporaryStorageDetail: {
         transporter: {
@@ -116,14 +120,17 @@ describe("formDiff", () => {
     };
     const updatedForm = await prisma.form.update({
       where: { id: form.id },
-      data: formUpdateInput,
-      include: { forwardedIn: true }
+      data: formUpdateInput
     });
-    const diff = formDiff(fullForm, updatedForm as any);
+    const fullUpdatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: updatedForm.id },
+      include: expandableFormIncludes
+    });
+    const diff = formDiff(fullForm, fullUpdatedForm);
 
     const expected = {
-      temporaryStorageDetail: await expandFormFromDb(
-        updatedForm.forwardedIn! as any
+      temporaryStorageDetail: expandFormFromDb(
+        fullUpdatedForm.forwardedIn! as any
       )
     };
     expect(diff).toEqual(expected);
