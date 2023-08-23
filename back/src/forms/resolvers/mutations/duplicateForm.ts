@@ -180,7 +180,8 @@ async function getDuplicateFormInput(
           fullForm.transporter?.transporterTransportMode,
         transporterIsExemptedOfReceipt:
           fullForm.transporter?.transporterIsExemptedOfReceipt,
-        number: 1
+        number: 1,
+        readyToTakeOver: true
       }
     }
   };
