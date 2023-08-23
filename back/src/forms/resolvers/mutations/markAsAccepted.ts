@@ -2,7 +2,7 @@ import { EmitterType, Status, WasteAcceptationStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb } from "../../converter";
+import { getAndExpandFormFromDb } from "../../converter";
 import { checkCanMarkAsAccepted } from "../../permissions";
 import { getFormRepository } from "../../repository";
 import { acceptedInfoSchema } from "../../validation";
@@ -91,7 +91,7 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
     }
   }
 
-  return expandFormFromDb(acceptedForm);
+  return getAndExpandFormFromDb(acceptedForm.id);
 };
 
 export default markAsAcceptedResolver;

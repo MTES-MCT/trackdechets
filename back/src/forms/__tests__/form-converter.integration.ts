@@ -11,7 +11,7 @@ describe("expandFormFromDb", () => {
     const user = await userFactory();
     const form = await formFactory({ ownerId: user.id });
     const transporter = await getFirstTransporter(form);
-    const expanded = await expandFormFromDb(form);
+    const expanded = await expandFormFromDb(form as any);
     expect(expanded).toEqual({
       id: form.id,
       readableId: form.readableId,
@@ -145,7 +145,7 @@ describe("expandFormFromDb", () => {
     const { forwardedIn, ...form } = await formWithTempStorageFactory({
       ownerId: user.id
     });
-    const expanded = await expandFormFromDb(form);
+    const expanded = await expandFormFromDb(form as any);
     const transporter = await getFirstTransporter(forwardedIn!);
     expect(expanded.temporaryStorageDetail).toEqual({
       temporaryStorer: {
@@ -227,7 +227,7 @@ describe("expandFormFromDb", () => {
       }
     });
     const transporter = await getFirstTransporter(form);
-    const expanded = await expandFormFromDb(form);
+    const expanded = await expandFormFromDb(form as any);
     expect(expanded.transporter).toEqual({
       id: transporter!.id,
       mode: null,
@@ -264,7 +264,7 @@ describe("expandFormFromDb", () => {
       }
     });
     const transporter = await getFirstTransporter(form);
-    const expanded = await expandFormFromDb(form);
+    const expanded = await expandFormFromDb(form as any);
     expect(expanded.transporter).toEqual({
       id: transporter!.id,
       mode: "OTHER",
