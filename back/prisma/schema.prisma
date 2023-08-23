@@ -756,14 +756,14 @@ model GovernmentAccount {
   name             String // Exemple RNDTS, GEREP, etc
   permissions      GovernmentPermission[]
   // Liste blanche d'IP pour les connexions depuis ce compte de service
-  // Seules les connexions depuis ces adresses IP auront les permissions 
-  // étendues définies par le champ `permissions`. 
+  // Seules les connexions depuis ces adresses IP auront les permissions
+  // étendues définies par le champ `permissions`.
   authorizedIPs    String[]
   // Permet de restreindre les permissions étendues définies par le
   // le champ `GovernmentAccount.permissions` à une liste d'établissements.
-  // Cela permet à des applications gouvernementales tierces d'effectuer 
+  // Cela permet à des applications gouvernementales tierces d'effectuer
   // des tests sur des données réelles sur un nombre restreint d'entreprises.
-  // Pour que les permissions étendues s'appliquent à tous les établissements, 
+  // Pour que les permissions étendues s'appliquent à tous les établissements,
   // passer la valeur 'ALL'
   authorizedOrgIds String[]
   User             User[]
@@ -1497,6 +1497,7 @@ model BsdaRevisionRequest {
   isCanceled Boolean @default(false)
 
   @@index([authoringCompanyId], map: "_BsdaRevisionRequestAuthoringCompanyIdIdx")
+  @@index([status], map: "_BsdaRevisionRequestStatusIdx")
   @@index([bsdaId], map: "_BsdaRevisionRequestBsdaIdIdx")
 }
 
