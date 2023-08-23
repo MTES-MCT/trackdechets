@@ -34,7 +34,6 @@ import { createEventsDataLoaders } from "./activity-events/dataloader";
 import { createFormDataLoaders } from "./forms/dataloader";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
-import { downloadRouter } from "./routers/downloadRouter";
 import { oauth2Router } from "./routers/oauth2-router";
 import { oidcRouter } from "./routers/oidc-router";
 import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
@@ -147,7 +146,7 @@ app.use(
   })
 );
 
-const RATE_LIMIT_WINDOW_SECONDS = 60;
+export const RATE_LIMIT_WINDOW_SECONDS = 60;
 
 app.use(
   rateLimiterMiddleware({
@@ -295,8 +294,6 @@ app.get("/captcha-audio/:tokenId", (req, res) => {
 });
 
 app.post("/userActivation", userActivationHandler);
-
-app.get("/download", downloadRouter);
 
 app.get("/exports", (_, res) =>
   res
