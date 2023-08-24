@@ -51,6 +51,8 @@ describe("expandFormFromDb", () => {
         },
         isTempStorage: false
       },
+      grouping: null,
+      transportSegments: [],
       transporter: {
         id: transporter!.id,
         company: {
@@ -113,7 +115,7 @@ describe("expandFormFromDb", () => {
       },
       trader: null,
       broker: null,
-      intermediaries: [],
+      intermediaries: undefined,
       ecoOrganisme: null,
       createdAt: form.createdAt,
       updatedAt: form.updatedAt,

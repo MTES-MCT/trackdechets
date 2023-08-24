@@ -748,7 +748,9 @@ export function expandFormFromDb(
         }),
     currentTransporterSiret: form.currentTransporterOrgId,
     nextTransporterSiret: form.nextTransporterOrgId,
-    intermediaries: form.intermediaries ?? [],
+    // Intermediaries cannot be null in the gql model.
+    // But for the `intermediaries` subresolver to know if the value was precalculated or not in here, we cannot return an empty array
+    intermediaries: form.intermediaries ?? (undefined as any),
     grouping: form.grouping
       ? form.grouping.map(({ quantity, initialForm }) => ({
           form: expandInitialFormFromDb(initialForm),

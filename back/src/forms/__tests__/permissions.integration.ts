@@ -63,7 +63,11 @@ async function checkTransporterPermission(
       }
     }
   });
-  return permission(user, form);
+  const formWithTransporters = await prisma.form.findUniqueOrThrow({
+    where: { id: form.id },
+    include: { transporters: true }
+  });
+  return permission(user, formWithTransporters);
 }
 
 async function checkTraderPermission(
@@ -130,7 +134,11 @@ async function checkTransporterAfterTempStoragePermission(
       }
     }
   });
-  return permission(user, form);
+  const formWithTransporters = await prisma.form.findUniqueOrThrow({
+    where: { id: form.id },
+    include: { forwardedIn: { include: { transporters: true } } }
+  });
+  return permission(user, formWithTransporters);
 }
 
 async function checkDestinationAfterTempStoragePermission(
@@ -151,7 +159,11 @@ async function checkDestinationAfterTempStoragePermission(
       forwardedIn: { update: { recipientCompanySiret: company.siret } }
     }
   });
-  return permission(user, form);
+  const formWithForwardedIn = await prisma.form.findUniqueOrThrow({
+    where: { id: form.id },
+    include: { forwardedIn: true }
+  });
+  return permission(user, formWithForwardedIn);
 }
 
 async function checkMultiModalTransporterPermission(
@@ -173,7 +185,11 @@ async function checkMultiModalTransporterPermission(
       number: 2
     }
   });
-  return permission(user, form);
+  const formWithTransporters = await prisma.form.findUniqueOrThrow({
+    where: { id: form.id },
+    include: { transporters: true }
+  });
+  return permission(user, formWithTransporters);
 }
 
 async function checkRandomUserPermission(
