@@ -283,7 +283,13 @@ export async function approveAndApplyRevisionRequest(
         forwardedIn: { update: { ...forwardedInUpdate } }
       })
     },
-    select: { readableId: true, emitterType: true, grouping: true }
+    select: {
+      readableId: true,
+      emitterType: true,
+      grouping: {
+        select: { initialForm: { select: { readableId: true } } }
+      }
+    }
   });
 
   if (updatedBsdd.emitterType === EmitterType.APPENDIX1) {
@@ -294,16 +300,18 @@ export async function approveAndApplyRevisionRequest(
       ...(wasteDetailsName && { wasteDetailsName }),
       ...(wasteDetailsPop && { wasteDetailsPop })
     };
-    const appendix1ProducerIds = updatedBsdd.grouping.map(g => g.initialFormId);
+    const appendix1ProducerIds = updatedBsdd.grouping.map(
+      g => g.initialForm.readableId
+    );
 
     if (Object.keys(appendix1ProducerUpdate).length > 0) {
       await prisma.form.updateMany({
-        where: { id: { in: appendix1ProducerIds } },
+        where: { readableId: { in: appendix1ProducerIds } },
         data: appendix1ProducerUpdate
       });
       prisma.addAfterCommitCallback?.(() => {
-        for (const id in appendix1ProducerIds) {
-          enqueueUpdatedBsdToIndex(id);
+        for (const readableId in appendix1ProducerIds) {
+          enqueueUpdatedBsdToIndex(readableId);
         }
       });
     }
