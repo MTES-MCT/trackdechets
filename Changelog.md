@@ -13,6 +13,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- ETQ utilisateur je peux charger plus de 50 contenants à regrouper lors de la création d'un BSFF de regroupement [PR 2654](https://github.com/MTES-MCT/trackdechets/pull/2654)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
