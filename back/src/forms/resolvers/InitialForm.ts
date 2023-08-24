@@ -5,7 +5,15 @@ import quantityGrouped from "./forms/quantityGrouped";
 
 const initialFormResolvers: InitialFormResolvers = {
   emitter: async (parent, _, { user }) => {
-    const form = await prisma.form.findUnique({ where: { id: parent.id } });
+    const form = await prisma.form.findUnique({
+      where: { id: parent.id },
+      include: {
+        forwardedIn: { include: { transporters: true } },
+        transporters: true,
+        grouping: { include: { initialForm: true } },
+        intermediaries: true
+      }
+    });
     if (!form || !(await isFormReader(user!, form))) {
       return null;
     }

@@ -2,7 +2,9 @@ import {
   BsddRevisionRequest,
   Prisma,
   BsddTransporter,
-  TransportMode
+  TransportMode,
+  Form,
+  IntermediaryFormAssociation
 } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import {
@@ -546,6 +548,12 @@ export type PrismaFormWithForwardedInAndTransporters = Prisma.FormGetPayload<{
   include: typeof expandableFormIncludes;
 }>;
 
+type FormGroupingItem = Prisma.FormGroupementGetPayload<{
+  include: {
+    initialForm: true;
+  };
+}>;
+
 export async function getAndExpandFormFromDb(id: string) {
   const form = await prisma.form.findUniqueOrThrow({
     where: { id },
@@ -560,9 +568,12 @@ export async function getAndExpandFormFromDb(id: string) {
  * An optional data loader for `forwardedIn` may also be passed
  */
 export function expandFormFromDb(
-  form: PrismaFormWithForwardedInAndTransporters
+  form: PrismaFormWithForwardedInAndTransporters & {
+    intermediaries?: IntermediaryFormAssociation[];
+    grouping?: FormGroupingItem[];
+  }
 ): GraphQLForm {
-  const transporters = form.transporters;
+  const transporters = form.transporters ?? []; // Theoretically transporters should never be null. But for eg form.grouping.initialForm.forwardedIn it might happen
   const transporter = getFirstTransporterSync({ transporters }); // avoid retrieving transporters twice if it is already passed
 
   const forwardedIn = form.forwardedIn;
@@ -599,6 +610,10 @@ export function expandFormFromDb(
         omiNumber: form.emitterCompanyOmiNumber
       })
     }),
+    transportSegments: transporters
+      .filter(t => t.number && t.number >= 2)
+      .sort((s1, s2) => s1.number - s2.number)
+      .map(segment => expandTransportSegmentFromDb(segment)),
     transporter: transporter ? expandTransporterFromDb(transporter) : null,
     transporters: transporters.map(t => expandTransporterFromDb(t)!),
     recipient: nullIfNoValues<Recipient>({
@@ -614,7 +629,6 @@ export function expandFormFromDb(
       }),
       isTempStorage: form.recipientIsTempStorage
     }),
-
     wasteDetails: nullIfNoValues<WasteDetails>({
       code: form.wasteDetailsCode,
       name: form.wasteDetailsName,
@@ -734,7 +748,13 @@ export function expandFormFromDb(
         }),
     currentTransporterSiret: form.currentTransporterOrgId,
     nextTransporterSiret: form.nextTransporterOrgId,
-    intermediaries: [],
+    intermediaries: form.intermediaries ?? [],
+    grouping: form.grouping
+      ? form.grouping.map(({ quantity, initialForm }) => ({
+          form: expandInitialFormFromDb(initialForm),
+          quantity
+        }))
+      : null,
     temporaryStorageDetail: forwardedIn
       ? {
           temporaryStorer: {
@@ -818,9 +838,7 @@ export async function expandFormFromElastic(
   };
 }
 
-export function expandInitialFormFromDb(
-  prismaForm: PrismaFormWithForwardedInAndTransporters
-): InitialForm {
+export function expandInitialFormFromDb(prismaForm: Form): InitialForm {
   const {
     id,
     readableId,
@@ -834,7 +852,7 @@ export function expandInitialFormFromDb(
     quantityReceived,
     processingOperationDone,
     quantityGrouped
-  } = expandFormFromDb(prismaForm);
+  } = expandFormFromDb({ ...prismaForm, transporters: [], forwardedIn: null });
 
   const hasPickupSite =
     emitter?.workSite?.postalCode && emitter.workSite.postalCode.length > 0;

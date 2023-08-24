@@ -6,6 +6,10 @@ const groupingResolver: FormResolvers["grouping"] = async (
   _,
   { dataloaders }
 ) => {
+  if (form.grouping) {
+    return form.grouping;
+  }
+
   const groupements = await dataloaders.nextFormGoupements.load(form.id);
   const initialFormIds = groupements.map(g => g.initialFormId);
   const initialForms = await Promise.all(

@@ -520,8 +520,17 @@ describe("checkCanRed", () => {
         }
       }
     });
+    const fullGroupementForm = await prisma.form.findUniqueOrThrow({
+      where: { id: groupementForm.id },
+      include: {
+        forwardedIn: { include: { transporters: true } },
+        transporters: true,
+        intermediaries: true,
+        grouping: { include: { initialForm: true } }
+      }
+    });
 
-    const check = await checkCanRead(initialEmitter, groupementForm);
+    const check = await checkCanRead(initialEmitter, fullGroupementForm);
     expect(check).toBe(true);
   });
 });
