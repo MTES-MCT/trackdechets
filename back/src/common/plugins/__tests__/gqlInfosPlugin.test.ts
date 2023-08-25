@@ -37,6 +37,7 @@ describe("gqlInfosPlugin", () => {
     const server = new ApolloServer<GraphQLContext>({
       typeDefs,
       resolvers,
+      allowBatchedHttpRequests: true,
       plugins: [gqlInfosPlugin()]
     });
 
@@ -92,7 +93,7 @@ describe("gqlInfosPlugin", () => {
   it("should return several operations info", async () => {
     await request
       .post("/graphql")
-      .send({ query: "query { foo { bar } } mutation { createFoo { bar } }" });
+      .send({ query: "query Q { foo { bar } } mutation M { createFoo { bar } }" });
 
     expect(req.gqlInfos!.length).toBe(2);
     expect(req.gqlInfos![0].operation).toBe("query");
