@@ -1,6 +1,5 @@
 import { app, startApolloServer } from "./server";
 import { closeQueues } from "./queue/producers";
-import { cleanGqlCaches } from "./temp-memory";
 import { cpuProfiling, memorySampling } from "./logging/heapSnapshot";
 import { envVariables } from "./env";
 

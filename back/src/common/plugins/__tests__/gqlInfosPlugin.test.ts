@@ -91,9 +91,9 @@ describe("gqlInfosPlugin", () => {
   });
 
   it("should return several operations info", async () => {
-    await request
-      .post("/graphql")
-      .send({ query: "query Q { foo { bar } } mutation M { createFoo { bar } }" });
+    await request.post("/graphql").send({
+      query: "query Q { foo { bar } } mutation M { createFoo { bar } }"
+    });
 
     expect(req.gqlInfos!.length).toBe(2);
     expect(req.gqlInfos![0].operation).toBe("query");

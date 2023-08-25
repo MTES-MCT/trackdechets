@@ -24,7 +24,16 @@ function makeClient(user?: (User & { auth?: AuthType }) | null) {
       },
       {
         contextValue: {
-          req: {},
+          req: {
+            session: {
+              regenerate: cb => {
+                cb();
+              },
+              save: cb => {
+                cb();
+              }
+            }
+          },
           res: {},
           dataloaders: serverDataloaders,
           ...(user && { user: { auth: AuthType.Session, ...user } })
