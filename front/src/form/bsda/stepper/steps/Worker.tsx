@@ -89,7 +89,11 @@ export function Worker({ disabled }) {
             className="td-checkbox"
             onChange={e => {
               handleChange(e);
-              setFieldValue("worker", initialState.worker);
+              setFieldValue("worker.company", initialState.worker.company);
+              setFieldValue(
+                "worker.certification",
+                initialState.worker.certification
+              );
             }}
           />
           Il n'y a pas d'entreprise de travaux
