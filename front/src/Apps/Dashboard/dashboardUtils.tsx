@@ -46,6 +46,7 @@ import {
   IconBSDDThin as IconBSDD,
   IconBSDasriThin as IconBSDasri,
 } from "Apps/common/Components/Icons/Icons";
+import { getOperationCodesFromSearchString } from "./dashboardServices";
 
 export const MAX_FILTER = 5;
 
@@ -377,9 +378,25 @@ export const filterPredicates: {
   },
   {
     filterName: FilterName.operationCode,
-    where: value => ({
-      destination: { operation: { code: { _contains: value } } },
-    }),
+    where: value => {
+      const operationCodes = getOperationCodesFromSearchString(value);
+
+      if (operationCodes.length > 1) {
+        return {
+          destination: {
+            operation: {
+              code: {
+                _in: operationCodes,
+              },
+            },
+          },
+        };
+      }
+
+      return {
+        destination: { operation: { code: { _contains: value } } },
+      };
+    },
     order: "code",
   },
   {
