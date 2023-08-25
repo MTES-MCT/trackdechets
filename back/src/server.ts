@@ -353,12 +353,14 @@ if (Sentry) {
 
 app.use(errorHandler);
 
-export const serverDataloaders = {
+// This must be a getter and not an object, as the dataloaders must be instanciated per request
+// Otherwise the caching mechanism isn't valid and you get outdated data
+export const getServerDataloaders = () => ({
   ...createUserDataLoaders(),
   ...createCompanyDataLoaders(),
   ...createFormDataLoaders(),
   ...createEventsDataLoaders()
-};
+});
 
 export async function startApolloServer() {
   await server.start();
@@ -379,7 +381,7 @@ export async function startApolloServer() {
           ...ctx,
           // req.user is made available by passport
           user: ctx.req?.user ? { ...ctx.req?.user, ip: ctx.req?.ip } : null,
-          dataloaders: serverDataloaders
+          dataloaders: getServerDataloaders()
         };
       }
     })

@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { server, serverDataloaders } from "../server";
+import { server, getServerDataloaders } from "../server";
 import { DocumentNode, print } from "graphql";
 import { AuthType } from "../auth";
 import assert from "node:assert";
@@ -26,7 +26,7 @@ function makeClient(user?: (User & { auth?: AuthType }) | null) {
         contextValue: {
           req: {},
           res: {},
-          dataloaders: serverDataloaders,
+          dataloaders: getServerDataloaders(),
           ...(user && { user: { auth: AuthType.Session, ...user } })
         } as any
       }

@@ -2401,6 +2401,77 @@ describe("Mutation.updateForm", () => {
     expect(updatedAppendix1_1.groupedIn).toEqual([]);
   });
 
+  it("should append appendix1 item on update", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const appendix1_1 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.DRAFT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        emitterCompanyName: "ProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        wasteDetailsCode: "16 06 01*",
+        owner: { connect: { id: user.id } }
+      }
+    });
+    const appendix1_2 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.DRAFT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        emitterCompanyName: "ProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        wasteDetailsCode: "16 06 01*",
+        owner: { connect: { id: user.id } }
+      }
+    });
+
+    // Group with appendix1_1
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        wasteDetailsCode: "16 06 01*",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX1,
+        grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }
+      }
+    });
+
+    // Update and group with appendix1_2
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          grouping: [
+            { form: { id: appendix1_1.id } },
+            { form: { id: appendix1_2.id } }
+          ]
+        }
+      }
+    });
+
+    expect(data.updateForm.grouping!.length).toBe(2);
+    expect(data.updateForm.grouping!.map(g => g.form.id)).toEqual([
+      appendix1_1.id,
+      appendix1_2.id
+    ]);
+  });
+
   it(
     "should be possible to update a form where transport is ROAD and wasteDetailsQuantity is > 40T " +
       "if it was created before (<=) process.env.MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER",
