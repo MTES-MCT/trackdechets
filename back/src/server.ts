@@ -18,13 +18,10 @@ import { ErrorCode, UserInputError } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
 import { graphqlBodyParser } from "./common/middlewares/graphqlBodyParser";
-import { graphqlQueryParserMiddleware } from "./common/middlewares/graphqlQueryParser";
-import { graphqlRateLimiterMiddleware } from "./common/middlewares/graphqlRatelimiter";
-import { graphqlRegenerateSessionMiddleware } from "./common/middlewares/graphqlRegenerateSession";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
 import { rateLimiterMiddleware } from "./common/middlewares/rateLimiter";
 import { timeoutMiddleware } from "./common/middlewares/timeout";
-import { graphqlQueryMergingLimiter } from "./common/middlewares/graphqlQueryMergingLimiter";
+import { graphqlQueryMergingLimiter } from "./common/plugins/graphqlQueryMergingLimiter";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
 import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
@@ -47,6 +44,9 @@ import { GraphQLError } from "graphql";
 import { GraphQLContext } from "./types";
 import { ValidationError } from "yup";
 import { ZodError } from "zod";
+import { gqlInfosPlugin } from "./common/plugins/gqlInfosPlugin";
+import { gqlRateLimitPlugin } from "./common/plugins/gqlRateLimitPlugin";
+import { gqlRegenerateSessionPlugin } from "./common/plugins/gqlRegenerateSessionPlugin";
 
 const {
   SESSION_SECRET,
@@ -62,6 +62,7 @@ const {
 const Sentry = initSentry();
 
 const UI_BASE_URL = getUIBaseURL();
+const RATE_LIMIT_WINDOW_SECONDS = 60;
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -122,6 +123,32 @@ export const server = new ApolloServer<GraphQLContext>({
     return formattedError;
   },
   plugins: [
+    gqlInfosPlugin(),
+    gqlRateLimitPlugin({
+      createPasswordResetRequest: {
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
+        maxRequestsPerWindow: 3 // 3 requests each minute (captcha)
+      },
+      createApplication: {
+        // Hacker might massively create apps or tokens to annoy us or exhaust our db
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+        maxRequestsPerWindow: 3 // 3 requests each 3 minutes
+      },
+      createAccessToken: {
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+        maxRequestsPerWindow: 3 // 3 requests each 3 minutes
+      },
+      inviteUserToCompany: {
+        // Hacker might massively invite or reinvite users to spam them
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+        maxRequestsPerWindow: 10 // 10 requests each 3 minutes
+      },
+      resendInvitation: {
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+        maxRequestsPerWindow: 10 // 10 requests each 3 minutes
+      }
+    }),
+    gqlRegenerateSessionPlugin(["changePassword"]),
     graphiqlLandingPagePlugin(),
     ...(Sentry ? [sentryReporter] : []),
     graphqlQueryMergingLimiter()
@@ -146,8 +173,6 @@ app.use(
     credentials: true
   })
 );
-
-const RATE_LIMIT_WINDOW_SECONDS = 60;
 
 app.use(
   rateLimiterMiddleware({
@@ -193,16 +218,7 @@ app.use(json());
 
 // allow application/graphql header
 app.use(graphQLPath, graphqlBodyParser);
-app.use(graphQLPath, graphqlQueryParserMiddleware());
 app.use(graphQLPath, graphqlBatchLimiterMiddleware());
-
-app.use(
-  graphQLPath,
-  graphqlRateLimiterMiddleware("createPasswordResetRequest", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
-    maxRequestsPerWindow: 3 // 3 requests each minute (captcha)
-  })
-);
 
 // logging middleware
 app.use(loggingMiddleware(graphQLPath));
@@ -240,47 +256,11 @@ app.use(session(sess));
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(graphQLPath, graphqlRegenerateSessionMiddleware("changePassword"));
 
 // authentification routes used by td-ui (/login /logout, /isAuthenticated)
 app.use(authRouter);
 app.use(oauth2Router);
 app.use(oidcRouter);
-
-// The following  middlewares use email to generate rate limit redis key and therefore
-// must stay after passport initialization to ensure req.user.email is available
-
-// Hacker might massively create apps or tokens to annoy us or exhaust our db
-app.use(
-  graphQLPath,
-  graphqlRateLimiterMiddleware("createApplication", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
-    maxRequestsPerWindow: 3 // 3 requests each 3 minutes
-  })
-);
-app.use(
-  graphQLPath,
-  graphqlRateLimiterMiddleware("createAccessToken", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
-    maxRequestsPerWindow: 3 // 3 requests each 3 minutes
-  })
-);
-// Hacker might massively invite or reinvite users to spam them
-app.use(
-  graphQLPath,
-  graphqlRateLimiterMiddleware("inviteUserToCompany", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
-    maxRequestsPerWindow: 10 // 10 requests each 3 minutes
-  })
-);
-
-app.use(
-  graphQLPath,
-  graphqlRateLimiterMiddleware("resendInvitation", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
-    maxRequestsPerWindow: 10 // 10 requests each 3 minutes
-  })
-);
 
 app.get("/ping", (_, res) => res.send("Pong!"));
 
