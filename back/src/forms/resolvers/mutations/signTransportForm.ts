@@ -262,9 +262,11 @@ const signTransportFn = async (
         });
 
         // Update ES
-        ids.forEach(id => {
-          enqueueUpdatedBsdToIndex(id);
-        });
+        appendix1Forms
+          .map(f => f.readableId)
+          .forEach(readableId => {
+            enqueueUpdatedBsdToIndex(readableId);
+          });
       }
     }
 
