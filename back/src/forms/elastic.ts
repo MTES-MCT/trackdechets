@@ -69,9 +69,9 @@ export function toBsdElastic(form: RawForm): BsdElastic {
     brokerCompanySiret: form.brokerCompanySiret ?? "",
     brokerCompanyAddress: form.brokerCompanyAddress ?? "",
 
-    traderCompanyName: "",
-    traderCompanySiret: "",
-    traderCompanyAddress: "",
+    traderCompanyName: form.traderCompanyName ?? "",
+    traderCompanySiret: form.traderCompanySiret ?? "",
+    traderCompanyAddress: form.traderCompanyAddress ?? "",
 
     ecoOrganismeName: form.ecoOrganismeName ?? "",
     ecoOrganismeSiret: form.ecoOrganismeSiret ?? "",

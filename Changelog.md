@@ -23,6 +23,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Ajout des infos négociant à l'indexation BSDD [PR 2657](https://github.com/MTES-MCT/trackdechets/pull/2657)
+
 # [2023.8.2] 29/08/2023
 
 #### :rocket: Nouvelles fonctionnalités
