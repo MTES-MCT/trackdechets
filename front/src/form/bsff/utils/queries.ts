@@ -14,8 +14,8 @@ export const GET_BSFF_FORM = gql`
 `;
 
 export const GET_PREVIOUS_PACKAGINGS = gql`
-  query BsffPackagings($where: BsffPackagingWhere) {
-    bsffPackagings(where: $where) {
+  query BsffPackagings($where: BsffPackagingWhere, $first: Int) {
+    bsffPackagings(where: $where, first: $first) {
       totalCount
       pageInfo {
         hasNextPage

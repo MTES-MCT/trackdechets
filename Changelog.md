@@ -9,9 +9,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- ETQ utilisateur je peux faire du multi-modal (v2) sur le BSDD par API [PR 2474](https://github.com/MTES-MCT/trackdechets/pull/2474)
+
 #### :bug: Corrections de bugs
 
+
 - Une validation trop restrictive des emails à l'inscription empêchaient certains utilisateurs de s'inscrire. Il est désormais possible de s'inscrire avec toute adresse email valide. [PR 2650](https://github.com/MTES-MCT/trackdechets/pull/2650)
+- ETQ utilisateur je peux charger plus de 50 contenants à regrouper lors de la création d'un BSFF de regroupement [PR 2654](https://github.com/MTES-MCT/trackdechets/pull/2654)
+
 
 #### :boom: Breaking changes
 
