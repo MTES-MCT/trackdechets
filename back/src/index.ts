@@ -12,9 +12,6 @@ async function start() {
     console.info(`Server is running on port ${process.env.API_PORT}`)
   );
 
-  // TODO - To remove. Either completely if it doesnt work or with a better fix if it does
-  cleanGqlCaches();
-
   function shutdown() {
     return closeQueues().finally(process.exit());
   }
