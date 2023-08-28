@@ -19,11 +19,13 @@ describe("StringFilter to elastic query", () => {
     const bsds: Partial<BsdElastic>[] = [
       {
         id: "1",
+        updatedAt: new Date().getTime(),
         readableId: "BSD-20230209-N84SXPCYV",
         emitterCompanySiret: "85001946400021"
       },
       {
         id: "2",
+        updatedAt: new Date().getTime(),
         readableId: "BSD-20230209-3Q6T7SPC7",
         emitterCompanySiret: "79824982700014"
       }
@@ -169,10 +171,12 @@ describe("TextFilter to elastic query", () => {
     const bsds: Partial<BsdElastic>[] = [
       {
         id: "1",
+        updatedAt: new Date().getTime(),
         emitterCompanyName: "CODE EN STOCK"
       },
       {
         id: "2",
+        updatedAt: new Date().getTime(),
         emitterCompanyName: "DÉCHETS & CO"
       }
     ];
@@ -297,12 +301,14 @@ describe("StringNullableFilter to elastic query", () => {
     const bsds: Partial<BsdElastic>[] = [
       {
         id: "1",
+        updatedAt: new Date().getTime(),
         transporterTransportPlates: ["AD-008-TS", "HY-987-DE", "JG-987-AQ"].map(
           transportPlateFilter
         )
       },
       {
         id: "2",
+        updatedAt: new Date().getTime(),
         transporterTransportPlates: ["JU-874-KL"].map(transportPlateFilter)
       }
     ];
@@ -466,19 +472,23 @@ describe("DateFilter to elastic query", () => {
     const bsds: Partial<BsdElastic>[] = [
       {
         id: "1",
-        createdAt: new Date("2023-01-01").getTime()
+        createdAt: new Date("2023-01-01").getTime(),
+        updatedAt: new Date().getTime()
       },
       {
         id: "2",
-        createdAt: new Date("2023-01-02").getTime()
+        createdAt: new Date("2023-01-02").getTime(),
+        updatedAt: new Date().getTime()
       },
       {
         id: "3",
-        createdAt: new Date("2023-01-03").getTime()
+        createdAt: new Date("2023-01-03").getTime(),
+        updatedAt: new Date().getTime()
       },
       {
         id: "4",
-        createdAt: new Date("2023-01-04").getTime()
+        createdAt: new Date("2023-01-04").getTime(),
+        updatedAt: new Date().getTime()
       }
     ];
 
@@ -548,26 +558,31 @@ describe("Compound filter to elastic query", () => {
     const bsds: Partial<BsdElastic>[] = [
       {
         id: "1",
+        updatedAt: new Date().getTime(),
         status: "SENT",
         wasteCode: "01 01 01"
       },
       {
         id: "2",
+        updatedAt: new Date().getTime(),
         status: "ACCEPTED",
         wasteCode: "01 01 01"
       },
       {
         id: "3",
+        updatedAt: new Date().getTime(),
         status: "SENT",
         wasteCode: "02 02 02"
       },
       {
         id: "4",
+        updatedAt: new Date().getTime(),
         status: "PROCESSED",
         wasteCode: "03 03 03"
       },
       {
         id: "5",
+        updatedAt: new Date().getTime(),
         status: "SENT",
         wasteCode: "04 04 04"
       }
@@ -741,10 +756,12 @@ describe("search on readableId", () => {
     const bsds: Partial<BsdElastic>[] = [
       {
         id: "1",
+        updatedAt: new Date().getTime(),
         readableId: "BSD-20230209-N84SXPCYV"
       },
       {
         id: "2",
+        updatedAt: new Date().getTime(),
         readableId: "BSD-20230209-3Q6T7SHE7"
       }
     ];
@@ -778,10 +795,12 @@ describe("search on wasteCode", () => {
     const bsds: Partial<BsdElastic>[] = [
       {
         id: "1",
+        updatedAt: new Date().getTime(),
         wasteCode: "01 01 01*"
       },
       {
         id: "2",
+        updatedAt: new Date().getTime(),
         readableId: "01 01 02"
       }
     ];
