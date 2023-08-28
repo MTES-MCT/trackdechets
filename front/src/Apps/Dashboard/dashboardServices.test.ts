@@ -25,6 +25,7 @@ import {
   isEcoOrgSign,
   isEmetteurSign,
   isSignTransportAndCanSkipEmission,
+  getOperationCodesFromSearchString,
 } from "./dashboardServices";
 import {
   BsdType,
@@ -1352,6 +1353,33 @@ describe("dashboardServices", () => {
       });
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe("getOperationCodesFromSearchString", () => {
+    it("returns operation codes from search string", () => {
+      const searchString = "r15 R 13 d13 d 15 peoropzier 23326783 d23 D 15";
+      const operationCodes = getOperationCodesFromSearchString(searchString);
+
+      expect(operationCodes).toStrictEqual([
+        "R 13",
+        "R13",
+        "D 15",
+        "D15",
+        "D 15",
+        "D15",
+        "R15",
+        "R 15",
+        "D13",
+        "D 13",
+      ]);
+    });
+
+    it("returns empty array on bad formatted string", () => {
+      const searchString = "peoropzier 23326783";
+      const operationCodes = getOperationCodesFromSearchString(searchString);
+
+      expect(operationCodes).toStrictEqual([]);
     });
   });
 });

@@ -56,7 +56,6 @@ import {
   completer_bsd_suite,
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { BsdCurrentTab } from "Apps/common/types/commonTypes";
-import { User } from "@sentry/browser";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
@@ -1090,4 +1089,19 @@ export const canEditCustomInfoOrTransporterNumberPlate = (
   }
 
   return false;
+};
+
+export const getOperationCodesFromSearchString = (value: any): string[] => {
+  let searchCodes: string[] = [];
+
+  value.match(/[rRdD]{1}( )(12|13|14|15)/g)?.forEach(code => {
+    searchCodes.push(code.toUpperCase());
+    searchCodes.push(code.replace(" ", "").toUpperCase());
+  });
+
+  value.match(/[rRdD]{1}(12|13|14|15)/g)?.forEach(code => {
+    searchCodes.push(code.toUpperCase());
+    searchCodes.push(code.replace("1", " 1").toUpperCase());
+  });
+  return searchCodes;
 };

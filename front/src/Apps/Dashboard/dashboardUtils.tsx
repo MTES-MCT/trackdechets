@@ -46,6 +46,7 @@ import {
   IconBSDDThin as IconBSDD,
   IconBSDasriThin as IconBSDasri,
 } from "Apps/common/Components/Icons/Icons";
+import { getOperationCodesFromSearchString } from "./dashboardServices";
 
 export const MAX_FILTER = 5;
 
@@ -377,16 +378,32 @@ export const filterPredicates: {
   },
   {
     filterName: FilterName.operationCode,
-    where: value => ({
-      destination: { operation: { code: { _contains: value } } },
-    }),
+    where: value => {
+      const operationCodes = getOperationCodesFromSearchString(value);
+
+      if (operationCodes.length > 1) {
+        return {
+          destination: {
+            operation: {
+              code: {
+                _in: operationCodes,
+              },
+            },
+          },
+        };
+      }
+
+      return {
+        destination: { operation: { code: { _contains: value } } },
+      };
+    },
     order: "code",
   },
   {
     filterName: FilterName.emitterSignDate,
     where: value => ({
       emitter: {
-        emission: { date: { _lte: value.startDate, _gte: value.endDate } },
+        emission: { date: { _lte: value.endDate, _gte: value.startDate } },
       },
     }),
     order: "date",
@@ -395,7 +412,7 @@ export const filterPredicates: {
     filterName: FilterName.workerSignDate,
     where: value => ({
       worker: {
-        work: { date: { _lte: value.startDate, _gte: value.endDate } },
+        work: { date: { _lte: value.endDate, _gte: value.startDate } },
       },
     }),
     order: "date",
@@ -405,7 +422,7 @@ export const filterPredicates: {
     where: value => ({
       transporter: {
         transport: {
-          takenOverAt: { _lte: value.startDate, _gte: value.endDate },
+          takenOverAt: { _lte: value.endDate, _gte: value.startDate },
         },
       },
     }),
@@ -415,7 +432,7 @@ export const filterPredicates: {
     filterName: FilterName.destinationReceptionDate,
     where: value => ({
       destination: {
-        reception: { date: { _lte: value.startDate, _gte: value.endDate } },
+        reception: { date: { _lte: value.endDate, _gte: value.startDate } },
       },
     }),
     order: "date",
@@ -424,7 +441,7 @@ export const filterPredicates: {
     filterName: FilterName.destinationAcceptationDate,
     where: value => ({
       destination: {
-        acceptation: { date: { _lte: value.startDate, _gte: value.endDate } },
+        acceptation: { date: { _lte: value.endDate, _gte: value.startDate } },
       },
     }),
     order: "date",
@@ -433,7 +450,7 @@ export const filterPredicates: {
     filterName: FilterName.destinationOperationSignDate,
     where: value => ({
       destination: {
-        operation: { date: { _lte: value.startDate, _gte: value.endDate } },
+        operation: { date: { _lte: value.endDate, _gte: value.startDate } },
       },
     }),
     order: "date",
