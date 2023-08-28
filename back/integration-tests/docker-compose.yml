@@ -6,6 +6,8 @@ services:
     environment:
       POSTGRES_USER: test
       POSTGRES_PASSWORD: no_pass
+      POSTGRES_DB: prisma
+      POSTGRES_INITDB_ARGS: --nosync
 
   redis:
     image: redis:5.0-alpine
@@ -38,13 +40,11 @@ services:
     image: td-api
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     build:
-      context: ../
+      context: "${DOCKER_COMPOSE_TD_API_BUILD_PATH:-..}"
       dockerfile: Dockerfile.dev
     command: [ "npm", "run", "dev:integration" ]
     volumes:
       - ../src:/usr/src/app/src
-    env_file:
-      - .integration-tests-env
     environment:
       NODE_ENV: test
       VIRTUAL_HOST: $API_HOST
@@ -59,6 +59,16 @@ services:
       SENDER_EMAIL_ADDRESS: "us@td.test"
       SENDER_NAME: "Wastetracker corp."
       POST_BACKEND: console
-      ELASTIC_SEARCH_URL: $ELASTIC_SEARCH_URL
       QUEUE_NAME_SENDMAIL: td-integration-tests-queue
       REGISTRY_WHITE_LIST_IP: "11.11.11.11"
+      DATABASE_URL: '"postgresql://test:no_pass@postgres:5432/prisma?schema=default$default"'
+      REDIS_URL: redis://redis:6379
+      MONGO_URL: mongodb://test:no_pass@mongodb:27017
+      SESSION_SECRET: any_secret
+      API_TOKEN_SECRET: any_secret
+      API_HOST: api.trackdechets.local
+      UI_HOST: trackdechets.local
+      ELASTIC_SEARCH_URL: http://elasticsearch:9200
+      DD_TRACE_ENABLED: "false"
+      TD_COMPANY_ELASTICSEARCH_INDEX: stocketablissement-production
+      ALLOW_TEST_COMPANY: "true"

@@ -13,13 +13,96 @@ jobs:
     defaults:
       run:
         working-directory: back/integration-tests
+    env:
+      NODE_ENV: 'test'
+      # API domain configuration
+      API_HOST: api.trackdechets.local
+      API_URL_SCHEME: http
+      VIRTUAL_HOST: $API_HOST
+      LETSENCRYPT_HOST: $API_HOST
+      # Port on which the API is served
+      # Should be set to 4000 when running the API on the host with nginx container in development
+      API_PORT: 4000
+      # Notifier domain configuration
+      NOTIFIER_HOST: notifier.trackdechets.local
+      NOTIFIER_PORT: 4001
+      # Events domain configuration
+      EVENTS_HOST: events.trackdechets.local
+      EVENTS_PORT: 4002
+      # Host for Elastic Search when running in Docker
+      ELASTIC_SEARCH_HOST: elasticsearch
+      UI_HOST: trackdechets.local
+      STORYBOOK_HOST: storybook.trackdechets.local
+      # Dockerized nginx setting for a linux docker host
+      NGINX_PROXY_HOST: host.docker.internal
+      NGINX_NETWORK_MODE: bridge
+      DATABASE_URL: '"postgresql://test:no_pass@postgres:5432/prisma?schema=default$default"'
+      REDIS_URL: 'redis://redis:6379'
+      MONGO_URL: 'mongodb://test:no_pass@mongodb:27017'
+      SESSION_SECRET: any_secret
+      API_TOKEN_SECRET: any_secret
+      ELASTIC_SEARCH_URL: http://elasticsearch:9200
+      QUEUE_NAME_SENDMAIL: td-integration-tests-queue
+      TD_COMPANY_ELASTICSEARCH_INDEX: stocketablissement-production
+      ALLOW_TEST_COMPANY: true
+      # Emailing
+      EMAIL_BACKEND: sendinblue
+      SIB_BASE_URL: http://mailservice
+      MAIN_TEMPLATE_ID: 9
+      FIRST_ONBOARDING_TEMPLATE_ID: 246
+      PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID: 248
+      PROFESIONAL_SECOND_ONBOARDING_TEMPLATE_ID: 250
+      VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID: 247
+      SENDER_EMAIL_ADDRESS: us@td.test
+      SENDER_NAME: Wastetracker corp.
+      # Datadog
+      DD_TRACE_ENABLED: false
+      # Logger to stdout
+      FORCE_LOGGER_CONSOLE: true
+      POST_BACKEND: console
+      REGISTRY_WHITE_LIST_IP: 11.11.11.11
+      # Developers domain configuration
+      DEVELOPERS_HOST: developers.trackdechets.local
+      DEVELOPERS_URL_SCHEME: http
+      DOCKER_COMPOSE_TD_API_BUILD_PATH: './back'
+
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build Docker images
+        uses: docker/bake-action@v3
+        with:
+          load: true
+          files: |
+            ./back/integration-tests/docker-compose.yml
+          set: |
+            *.cache-from=type=gha,scope=${{github.ref}}
+            *.cache-from=type=gha,scope=refs/heads/main
+            *.cache-to=type=gha,scope=${{github.ref}},mode=max
+          push: true
+      - name: Start services
+        run: docker compose up --wait --no-build
+      - name: Wait for PostgreSQL to become available
+        run: |
+          export CONTAINER_ID=$(docker ps | grep "postgres" | awk '{print $1}')
+          echo "Wait for PostgreSQL";
+          until PGPASSWORD=no_pass docker exec -t $CONTAINER_ID bash -c "psql -U \"test\" prisma -c '\q' 2>/dev/null"; do
+            echo "Postgres is unavailable - waiting"
+            sleep 1
+          done
+      - name: Check Elasticsearch connection status
+        run: |
+          export CONTAINER_ID=$(docker ps | grep "elasticsearch" | awk '{print $1}')
+          echo "Wait for ElasticSearch";
+          until docker exec -t $CONTAINER_ID bash -c "curl -XGET http://elasticsearch:9200 2> /dev/null"; do
+            >&2 echo "⏳ ElasticSearch is unavailable - sleeping"
+            sleep 1
+          done
       - name: Run integration tests
         env:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
-
         run: |
-          chmod +x ./run.sh
-          ./run.sh -c ${{ matrix.shard }}/${{ strategy.job-total }}
+          export CONTAINER_ID=$(docker ps | grep "td-api" | awk '{print $1}')
+          docker exec -e NODE_OPTIONS=--max_old_space_size=4096 -t $CONTAINER_ID npm run integration-tests -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
