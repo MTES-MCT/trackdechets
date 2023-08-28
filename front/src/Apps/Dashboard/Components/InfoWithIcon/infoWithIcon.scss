@@ -1,6 +1,7 @@
 .label-icon-editable {
   background: none;
   border: none;
+  text-align: left;
   &:disabled {
     color: initial;
   }
@@ -18,6 +19,7 @@
       background-image: url("/icons/dashboard/temp-storage.svg");
       width: 24px;
       height: 24px;
+      flex-shrink: 0;
     }
   }
   &__EcoOrganism {
@@ -28,6 +30,7 @@
       width: 16px;
       height: 16px;
       margin-right: 5px;
+      flex-shrink: 0;
     }
   }
   &__LastModificationDate {
@@ -38,6 +41,7 @@
       width: 15px;
       height: 15px;
       margin-right: 5px;
+      flex-shrink: 0;
     }
   }
   &__CustomInfo {
@@ -48,6 +52,7 @@
       width: 24px;
       height: 24px;
       margin-right: 5px;
+      flex-shrink: 0;
     }
   }
   &__TransporterNumberPlate {
@@ -58,6 +63,7 @@
       width: 24px;
       height: 24px;
       margin-right: 5px;
+      flex-shrink: 0;
     }
   }
 }
