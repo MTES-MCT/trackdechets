@@ -827,6 +827,8 @@ input NextSegmentInfoInput {
 input TakeOverInput {
   takenOverAt: DateTime!
   takenOverBy: String!
+  # Permet de mettre à jour la plaque d'immatriculation au moment de la signature u transporter N
+  numberPlate: String
 }
 
 "Payload d'import d'un BSD papier"

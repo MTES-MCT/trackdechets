@@ -514,6 +514,7 @@ export const dashboardFormFragment = gql`
       readyToTakeOver
       previousTransporterCompanySiret
       takenOverAt
+      segmentNumber
     }
     currentTransporterSiret
     nextTransporterSiret
