@@ -1,5 +1,4 @@
-web: node ${STARTUP_FILE:-dist/src/index.js}
-download: node ${STARTUP_FILE:-dist/src/download.js}
+web: pm2-runtime start ecosystem.config.js --env production
 clock: node dist/src/cron.js
 queue: node dist/src/queue/consumer.js
 indexqueue: node dist/src/queue/consumerIndexation.js

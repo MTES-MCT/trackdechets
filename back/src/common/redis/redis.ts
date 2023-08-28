@@ -24,7 +24,7 @@ export function generateKey(
 ) {
   return [objectType, id.toString(), field]
     .filter(Boolean)
-    .map(v => v.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase()) // CamelCase to kebab-case
+    .map(v => v?.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase()) // CamelCase to kebab-case
     .join(":");
 }
 
