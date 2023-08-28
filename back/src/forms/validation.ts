@@ -307,6 +307,19 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
       .label("Émetteur")
       .when("emitterIsForeignShip", siretConditions.isForeignShip)
       .when("emitterIsPrivateIndividual", siretConditions.isPrivateIndividual)
+      .test(
+        "is-not-eco-organisme",
+        "Cet établissement ne peut pas être visé comme émetteur. Merci de renseigner le réel émetteur de ce déchet (ex: déchetterie, producteur, TTR...). Un autre champ dédié existe et doit être utilisé pour viser l'éco-organisme concerné : https://faq.trackdechets.fr/dechets-dangereux-classiques/les-eco-organismes-sur-trackdechets#ou-etre-vise-en-tant-queco-organisme",
+        async value => {
+          if (!value) return true;
+
+          const ecoOrganisme = await prisma.ecoOrganisme.findFirst({
+            where: { siret: value }
+          });
+
+          return !ecoOrganisme;
+        }
+      )
       .when(["emitterIsForeignShip", "emitterIsPrivateIndividual"], {
         is: (isForeignShip: boolean, isPrivateIndividual: boolean) =>
           !isForeignShip && !isPrivateIndividual,
@@ -452,10 +465,10 @@ export const ecoOrganismeSchema = yup.object().shape({
       ecoOrganismeSiret =>
         ecoOrganismeSiret
           ? prisma.ecoOrganisme
-              .findFirst({
-                where: { siret: ecoOrganismeSiret }
-              })
-              .then(el => el != null)
+            .findFirst({
+              where: { siret: ecoOrganismeSiret }
+            })
+            .then(el => el != null)
           : true
     ),
   ecoOrganismeName: yup.string().notRequired().nullable()
@@ -495,15 +508,15 @@ const recipientSchemaFn: FactorySchemaOf<FormValidationContext, Recipient> = ({
         const oneOf =
           value === EmitterType.APPENDIX2
             ? [
-                ...PROCESSING_AND_REUSE_OPERATIONS_CODES,
-                ...PROCESSING_AND_REUSE_OPERATIONS_CODES.map(c =>
-                  c.replace(" ", "")
-                )
-              ]
+              ...PROCESSING_AND_REUSE_OPERATIONS_CODES,
+              ...PROCESSING_AND_REUSE_OPERATIONS_CODES.map(c =>
+                c.replace(" ", "")
+              )
+            ]
             : [
-                ...PROCESSING_OPERATIONS_CODES,
-                ...PROCESSING_OPERATIONS_CODES.map(c => c.replace(" ", ""))
-              ];
+              ...PROCESSING_OPERATIONS_CODES,
+              ...PROCESSING_OPERATIONS_CODES.map(c => c.replace(" ", ""))
+            ];
 
         return schema.oneOf(
           ["", ...oneOf],
@@ -549,15 +562,15 @@ export const packagingInfoFn = ({
       .when("type", (type, schema) =>
         type === "AUTRE"
           ? schema.requiredIf(
-              !isDraft,
-              "La description doit être précisée pour le conditionnement 'AUTRE'."
-            )
+            !isDraft,
+            "La description doit être précisée pour le conditionnement 'AUTRE'."
+          )
           : schema
-              .nullable()
-              .max(
-                0,
-                "${path} ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'."
-              )
+            .nullable()
+            .max(
+              0,
+              "${path} ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'."
+            )
       ),
     quantity: yup
       .number()
@@ -570,9 +583,9 @@ export const packagingInfoFn = ({
       .when("type", (type, schema) =>
         ["CITERNE", "BENNE"].includes(type)
           ? schema.max(
-              2,
-              "Le nombre de benne ou de citerne ne peut être supérieur à 2."
-            )
+            2,
+            "Le nombre de benne ou de citerne ne peut être supérieur à 2."
+          )
           : schema
       )
   });
@@ -686,70 +699,70 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
   Pick<FormValidationContext, "isDraft">,
   WasteDetailsCommon
 > = ({ isDraft }) =>
-  yup.object({
-    wasteDetailsCode: yup
-      .string()
-      .requiredIf(!isDraft, "Le code déchet est obligatoire")
-      .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
-    wasteDetailsName: yup
-      .string()
-      .requiredIf(!isDraft, "L'appellation du déchet est obligatoire."),
-    wasteDetailsIsDangerous: yup.boolean().when("wasteDetailsCode", {
-      is: (wasteCode: string) => isDangerous(wasteCode || ""),
-      then: () =>
-        yup
-          .boolean()
-          .isTrue(
-            `Un déchet avec un code comportant un astérisque est forcément dangereux`
-          ),
-      otherwise: () => yup.boolean()
-    }),
-    wasteDetailsOnuCode: yup.string().when("wasteDetailsIsDangerous", {
-      is: (wasteDetailsIsDangerous: boolean) =>
-        wasteDetailsIsDangerous === true,
-      then: () =>
-        yup
-          .string()
-          .ensure()
-          .requiredIf(
-            !isDraft,
-            `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
-          ),
-      otherwise: () => yup.string().nullable()
-    }),
-    wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
-    wasteDetailsAnalysisReferences: yup.array().of(yup.string()) as any,
-    wasteDetailsLandIdentifiers: yup.array().of(yup.string()) as any,
-    wasteDetailsConsistence: yup
-      .mixed<Consistence>()
-      .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
-    wasteDetailsPackagingInfos: yup
-      .array()
-      .of(packagingInfoFn({ isDraft }) as any)
-      .test(
-        "is-valid-packaging-infos",
-        "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
-        isValidPackagingInfos
-      )
-  });
+    yup.object({
+      wasteDetailsCode: yup
+        .string()
+        .requiredIf(!isDraft, "Le code déchet est obligatoire")
+        .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
+      wasteDetailsName: yup
+        .string()
+        .requiredIf(!isDraft, "L'appellation du déchet est obligatoire."),
+      wasteDetailsIsDangerous: yup.boolean().when("wasteDetailsCode", {
+        is: (wasteCode: string) => isDangerous(wasteCode || ""),
+        then: () =>
+          yup
+            .boolean()
+            .isTrue(
+              `Un déchet avec un code comportant un astérisque est forcément dangereux`
+            ),
+        otherwise: () => yup.boolean()
+      }),
+      wasteDetailsOnuCode: yup.string().when("wasteDetailsIsDangerous", {
+        is: (wasteDetailsIsDangerous: boolean) =>
+          wasteDetailsIsDangerous === true,
+        then: () =>
+          yup
+            .string()
+            .ensure()
+            .requiredIf(
+              !isDraft,
+              `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
+            ),
+        otherwise: () => yup.string().nullable()
+      }),
+      wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
+      wasteDetailsAnalysisReferences: yup.array().of(yup.string()) as any,
+      wasteDetailsLandIdentifiers: yup.array().of(yup.string()) as any,
+      wasteDetailsConsistence: yup
+        .mixed<Consistence>()
+        .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
+      wasteDetailsPackagingInfos: yup
+        .array()
+        .of(packagingInfoFn({ isDraft }) as any)
+        .test(
+          "is-valid-packaging-infos",
+          "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
+          isValidPackagingInfos
+        )
+    });
 
 // Schéma lorsque emitterType = APPENDIX1
 const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
   Pick<FormValidationContext, "isDraft">,
   WasteDetailsAppendix1
 > = ({ isDraft }) =>
-  baseWasteDetailsSchemaFn({ isDraft }).concat(
-    yup.object({
-      wasteDetailsName: yup.string().nullable(),
-      wasteDetailsCode: yup
-        .string()
-        .requiredIf(!isDraft, "Le code déchet est obligatoire")
-        .oneOf(
-          [...BSDD_APPENDIX1_WASTE_CODES, "", null],
-          "Le code déchet n'est pas utilisable sur une annexe 1."
-        )
-    })
-  );
+    baseWasteDetailsSchemaFn({ isDraft }).concat(
+      yup.object({
+        wasteDetailsName: yup.string().nullable(),
+        wasteDetailsCode: yup
+          .string()
+          .requiredIf(!isDraft, "Le code déchet est obligatoire")
+          .oneOf(
+            [...BSDD_APPENDIX1_WASTE_CODES, "", null],
+            "Le code déchet n'est pas utilisable sur une annexe 1."
+          )
+      })
+    );
 
 // Schéma lorsque emitterType = APPENDIX1_PRODUCER
 // TODO: Typing as any because in schemaOf<> Yup always wraps arrays as Maybe<>.
@@ -757,61 +770,61 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
 const wasteDetailsAppendix1ProducerSchemaFn: (
   context: Pick<FormValidationContext, "isDraft">
 ) => any = ({ isDraft }) =>
-  yup.object({
-    wasteDetailsQuantity: weight(WeightUnits.Tonne)
-      .label("Déchet")
-      .when(
-        ["transporters", "createdAt"],
-        weightConditions.transporters(WeightUnits.Tonne)
-      ),
-    wasteDetailsPackagingInfos: yup
-      .array()
-      .of(packagingInfoFn({ isDraft }) as any)
-      .transform(value => (!value ? [] : value))
-      .test(
-        "is-valid-packaging-infos",
-        "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
-        isValidPackagingInfos
-      ) as any
-  });
+    yup.object({
+      wasteDetailsQuantity: weight(WeightUnits.Tonne)
+        .label("Déchet")
+        .when(
+          ["transporters", "createdAt"],
+          weightConditions.transporters(WeightUnits.Tonne)
+        ),
+      wasteDetailsPackagingInfos: yup
+        .array()
+        .of(packagingInfoFn({ isDraft }) as any)
+        .transform(value => (!value ? [] : value))
+        .test(
+          "is-valid-packaging-infos",
+          "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
+          isValidPackagingInfos
+        ) as any
+    });
 
 // Schéma lorsque emitterType n'est pas APPENDIX1
 const wasteDetailsNormalSchemaFn: FactorySchemaOf<
   Pick<FormValidationContext, "isDraft">,
   WasteDetails
 > = ({ isDraft }) =>
-  baseWasteDetailsSchemaFn({ isDraft }).concat(
-    yup.object({
-      wasteDetailsPackagingInfos: yup
-        .array()
-        .requiredIf(!isDraft, "Le détail du conditionnement est obligatoire")
-        .of(packagingInfoFn({ isDraft }) as any)
-        .test(
-          "is-valid-packaging-infos",
-          "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
-          isValidPackagingInfos
-        ),
-      wasteDetailsQuantity: weight(WeightUnits.Tonne)
-        .label("Déchet")
-        .when(
-          ["transporters", "createdAt"],
-          weightConditions.transporters(WeightUnits.Tonne)
-        )
-        .requiredIf(
-          !isDraft,
-          "La quantité du déchet en tonnes est obligatoire"
-        ),
-      wasteDetailsQuantityType: yup
-        .mixed<QuantityType>()
-        .requiredIf(
-          !isDraft,
-          "Le type de quantité (réelle ou estimée) doit être précisé"
-        ),
-      wasteDetailsPop: yup
-        .boolean()
-        .requiredIf(!isDraft, "La présence (ou non) de POP doit être précisée")
-    })
-  );
+    baseWasteDetailsSchemaFn({ isDraft }).concat(
+      yup.object({
+        wasteDetailsPackagingInfos: yup
+          .array()
+          .requiredIf(!isDraft, "Le détail du conditionnement est obligatoire")
+          .of(packagingInfoFn({ isDraft }) as any)
+          .test(
+            "is-valid-packaging-infos",
+            "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
+            isValidPackagingInfos
+          ),
+        wasteDetailsQuantity: weight(WeightUnits.Tonne)
+          .label("Déchet")
+          .when(
+            ["transporters", "createdAt"],
+            weightConditions.transporters(WeightUnits.Tonne)
+          )
+          .requiredIf(
+            !isDraft,
+            "La quantité du déchet en tonnes est obligatoire"
+          ),
+        wasteDetailsQuantityType: yup
+          .mixed<QuantityType>()
+          .requiredIf(
+            !isDraft,
+            "Le type de quantité (réelle ou estimée) doit être précisé"
+          ),
+        wasteDetailsPop: yup
+          .boolean()
+          .requiredIf(!isDraft, "La présence (ou non) de POP doit être précisée")
+      })
+    );
 
 const wasteDetailsSchemaFn = (
   context: Pick<FormValidationContext, "isDraft">
@@ -860,130 +873,130 @@ export const transporterSchemaFn: FactorySchemaOf<
   Pick<FormValidationContext, "signingTransporterOrgId">,
   Transporter
 > = context =>
-  yup.object({
-    transporterCustomInfo: yup.string().nullable(),
-    transporterNumberPlate: yup
-      .string()
-      .nullable()
-      .test((transporterNumberPlate, ctx) => {
-        const {
-          transporterTransportMode,
-          transporterCompanySiret,
-          transporterCompanyVatNumber
-        } = ctx.parent;
+    yup.object({
+      transporterCustomInfo: yup.string().nullable(),
+      transporterNumberPlate: yup
+        .string()
+        .nullable()
+        .test((transporterNumberPlate, ctx) => {
+          const {
+            transporterTransportMode,
+            transporterCompanySiret,
+            transporterCompanyVatNumber
+          } = ctx.parent;
 
-        if (
-          context.signingTransporterOrgId &&
-          [transporterCompanySiret, transporterCompanyVatNumber].includes(
-            context.signingTransporterOrgId
-          ) &&
-          transporterTransportMode === "ROAD" &&
-          !transporterNumberPlate
-        ) {
-          return new yup.ValidationError(
-            "La plaque d'immatriculation est requise"
-          );
-        }
+          if (
+            context.signingTransporterOrgId &&
+            [transporterCompanySiret, transporterCompanyVatNumber].includes(
+              context.signingTransporterOrgId
+            ) &&
+            transporterTransportMode === "ROAD" &&
+            !transporterNumberPlate
+          ) {
+            return new yup.ValidationError(
+              "La plaque d'immatriculation est requise"
+            );
+          }
 
-        return true;
-      }),
-    transporterCompanyName: yup
-      .string()
-      .ensure()
-      .when(
-        ["transporterCompanySiret", "transporterCompanyVatNumber"],
-        requiredWhenTransporterSign(
-          context,
-          `Transporteur: ${MISSING_COMPANY_NAME}`
-        )
-      ),
-    // We do not need to check for the presence of either a n°SIRET or VAT number
-    // because bsdd transporter data is only validated before a specific transporter sign.
-    // It guarantees that the BSDD transporter data has matched against either the n°SIRET
-    // or VAT number.
-    transporterCompanySiret: siret
-      .label("Transporteur")
-      .test(siretTests.isRegistered("TRANSPORTER")),
-    transporterCompanyVatNumber: foreignVatNumber
-      .label("Transporteur")
-      .test(vatNumberTests.isRegisteredTransporter),
-    transporterCompanyAddress: yup
-      .string()
-      .ensure()
-      .when(
-        ["transporterCompanySiret", "transporterCompanyVatNumber"],
-        requiredWhenTransporterSign(
-          context,
-          `Transporteur: ${MISSING_COMPANY_ADDRESS}`
-        )
-      ),
-    transporterCompanyContact: yup
-      .string()
-      .ensure()
-      .when(
-        ["transporterCompanySiret", "transporterCompanyVatNumber"],
-        requiredWhenTransporterSign(
-          context,
-          `Transporteur: ${MISSING_COMPANY_CONTACT}`
-        )
-      ),
-    transporterCompanyPhone: yup
-      .string()
-      .ensure()
-      .when(
-        ["transporterCompanySiret", "transporterCompanyVatNumber"],
-        requiredWhenTransporterSign(
-          context,
-          `Transporteur: ${MISSING_COMPANY_PHONE}`
-        )
-      ),
-    transporterCompanyMail: yup
-      .string()
-      .email()
-      .ensure()
-      .when(
-        ["transporterCompanySiret", "transporterCompanyVatNumber"],
-        requiredWhenTransporterSign(
-          context,
-          `Transporteur: ${MISSING_COMPANY_EMAIL}`
-        )
-      ),
-    transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
-    transporterReceipt: yup
-      .string()
-      .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
-        is: (isExempted, vat) => isForeignVat(vat) || isExempted,
-        then: schema => schema.notRequired().nullable(),
-        otherwise: schema =>
-          schema.when(
-            ["transporterCompanySiret", "transporterCompanyVatNumber"],
-            requiredWhenTransporterSign(context, REQUIRED_RECEIPT_NUMBER)
+          return true;
+        }),
+      transporterCompanyName: yup
+        .string()
+        .ensure()
+        .when(
+          ["transporterCompanySiret", "transporterCompanyVatNumber"],
+          requiredWhenTransporterSign(
+            context,
+            `Transporteur: ${MISSING_COMPANY_NAME}`
           )
-      }),
-    transporterDepartment: yup
-      .string()
-      .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
-        is: (isExempted, vat) => isForeignVat(vat) || isExempted,
-        then: schema => schema.notRequired().nullable(),
-        otherwise: schema =>
-          schema.when(
-            ["transporterCompanySiret", "transporterCompanyVatNumber"],
-            requiredWhenTransporterSign(context, REQUIRED_RECEIPT_DEPARTMENT)
+        ),
+      // We do not need to check for the presence of either a n°SIRET or VAT number
+      // because bsdd transporter data is only validated before a specific transporter sign.
+      // It guarantees that the BSDD transporter data has matched against either the n°SIRET
+      // or VAT number.
+      transporterCompanySiret: siret
+        .label("Transporteur")
+        .test(siretTests.isRegistered("TRANSPORTER")),
+      transporterCompanyVatNumber: foreignVatNumber
+        .label("Transporteur")
+        .test(vatNumberTests.isRegisteredTransporter),
+      transporterCompanyAddress: yup
+        .string()
+        .ensure()
+        .when(
+          ["transporterCompanySiret", "transporterCompanyVatNumber"],
+          requiredWhenTransporterSign(
+            context,
+            `Transporteur: ${MISSING_COMPANY_ADDRESS}`
           )
-      }),
-    transporterValidityLimit: yup
-      .string()
-      .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
-        is: (isExempted, vat) => isForeignVat(vat) || isExempted,
-        then: schema => schema.notRequired().nullable(),
-        otherwise: schema =>
-          schema.when(
-            ["transporterCompanySiret", "transporterCompanyVatNumber"],
-            requiredWhenTransporterSign(context, REQUIRED_RECEIPT_VALIDITYLIMIT)
+        ),
+      transporterCompanyContact: yup
+        .string()
+        .ensure()
+        .when(
+          ["transporterCompanySiret", "transporterCompanyVatNumber"],
+          requiredWhenTransporterSign(
+            context,
+            `Transporteur: ${MISSING_COMPANY_CONTACT}`
           )
-      }),
-    transporterTransportMode: yup.mixed<TransportMode>()
-  });
+        ),
+      transporterCompanyPhone: yup
+        .string()
+        .ensure()
+        .when(
+          ["transporterCompanySiret", "transporterCompanyVatNumber"],
+          requiredWhenTransporterSign(
+            context,
+            `Transporteur: ${MISSING_COMPANY_PHONE}`
+          )
+        ),
+      transporterCompanyMail: yup
+        .string()
+        .email()
+        .ensure()
+        .when(
+          ["transporterCompanySiret", "transporterCompanyVatNumber"],
+          requiredWhenTransporterSign(
+            context,
+            `Transporteur: ${MISSING_COMPANY_EMAIL}`
+          )
+        ),
+      transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
+      transporterReceipt: yup
+        .string()
+        .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
+          is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+          then: schema => schema.notRequired().nullable(),
+          otherwise: schema =>
+            schema.when(
+              ["transporterCompanySiret", "transporterCompanyVatNumber"],
+              requiredWhenTransporterSign(context, REQUIRED_RECEIPT_NUMBER)
+            )
+        }),
+      transporterDepartment: yup
+        .string()
+        .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
+          is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+          then: schema => schema.notRequired().nullable(),
+          otherwise: schema =>
+            schema.when(
+              ["transporterCompanySiret", "transporterCompanyVatNumber"],
+              requiredWhenTransporterSign(context, REQUIRED_RECEIPT_DEPARTMENT)
+            )
+        }),
+      transporterValidityLimit: yup
+        .string()
+        .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
+          is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+          then: schema => schema.notRequired().nullable(),
+          otherwise: schema =>
+            schema.when(
+              ["transporterCompanySiret", "transporterCompanyVatNumber"],
+              requiredWhenTransporterSign(context, REQUIRED_RECEIPT_VALIDITYLIMIT)
+            )
+        }),
+      transporterTransportMode: yup.mixed<TransportMode>()
+    });
 
 export const traderSchemaFn: FactorySchemaOf<FormValidationContext, Trader> = ({
   isDraft
@@ -1169,13 +1182,13 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
       ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
         ? schema.ensure().required("Vous devez saisir un motif de refus")
         : schema
-            .notRequired()
-            .nullable()
-            .test(
-              "is-empty",
-              "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-              v => !v
-            )
+          .notRequired()
+          .nullable()
+          .test(
+            "is-empty",
+            "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+            v => !v
+          )
     )
 });
 
@@ -1201,13 +1214,13 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
       ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
         ? schema.ensure().required("Vous devez saisir un motif de refus")
         : schema
-            .notRequired()
-            .nullable()
-            .test(
-              "is-empty",
-              "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-              v => !v
-            )
+          .notRequired()
+          .nullable()
+          .test(
+            "is-empty",
+            "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+            v => !v
+          )
     )
 });
 
@@ -1229,8 +1242,8 @@ const withNextDestination = (required: boolean) =>
       .when("nextDestinationCompanyVatNumber", (vat, schema) => {
         return !isVat(vat) && required
           ? schema.required(
-              `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
-            )
+            `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
+          )
           : schema.notRequired().nullable();
       }),
     nextDestinationCompanyVatNumber: vatNumber.label(
@@ -1253,23 +1266,23 @@ const withNextDestination = (required: boolean) =>
       .when("nextDestinationCompanyVatNumber", (vat, schema) => {
         return isVat(vat) && required
           ? schema.test(
-              "is-country-valid",
-              "Destination ultérieure : le code du pays de l'entreprise ne correspond pas au numéro de TVA entré",
-              value =>
-                !value ||
-                checkVAT(vat.replace(BAD_CHARACTERS_REGEXP, ""), vatCountries)
-                  ?.country?.isoCode.short ===
-                  value.replace(BAD_CHARACTERS_REGEXP, "")
-            )
+            "is-country-valid",
+            "Destination ultérieure : le code du pays de l'entreprise ne correspond pas au numéro de TVA entré",
+            value =>
+              !value ||
+              checkVAT(vat.replace(BAD_CHARACTERS_REGEXP, ""), vatCountries)
+                ?.country?.isoCode.short ===
+              value.replace(BAD_CHARACTERS_REGEXP, "")
+          )
           : schema;
       })
       .when("nextDestinationCompanySiret", (siret, schema) => {
         return isSiret(siret) && required
           ? schema.test(
-              "is-fr-country-valid",
-              "Destination ultérieure : le code du pays de l'entreprise ne peut pas être différent de FR",
-              value => !value || value === "FR"
-            )
+            "is-fr-country-valid",
+            "Destination ultérieure : le code du pays de l'entreprise ne peut pas être différent de FR",
+            value => !value || value === "FR"
+          )
           : schema;
       }),
     nextDestinationCompanyContact: yup
@@ -1441,9 +1454,9 @@ const baseFormSchemaFn = (context: FormValidationContext) =>
               (wasteDetailsPackagingInfos, schema) =>
                 hasPipeline({ wasteDetailsPackagingInfos })
                   ? schema.length(
-                      0,
-                      "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
-                    )
+                    0,
+                    "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
+                  )
                   : schema
             )
             .max(5, "Vous ne pouvez pas ajouter plus de ${max} transporteurs")
@@ -1634,9 +1647,9 @@ export async function validateAppendix2Groupement(
   if (duplicates.length > 0) {
     throw new UserInputError(
       `Impossible d'associer plusieurs fractions du même bordereau initial sur un même bordereau` +
-        ` de regroupement. Identifiant du ou des bordereaux initiaux concernés : ${duplicates.join(
-          ", "
-        )}`
+      ` de regroupement. Identifiant du ou des bordereaux initiaux concernés : ${duplicates.join(
+        ", "
+      )}`
     );
   }
 
@@ -1734,8 +1747,7 @@ export async function validateAppendix2Groupement(
       if (new Decimal(quantity).greaterThan(quantityLeftToGroup)) {
         return [
           ...acc,
-          `La quantité restante à regrouper sur le BSDD ${
-            initialForm.readableId
+          `La quantité restante à regrouper sur le BSDD ${initialForm.readableId
           } est de ${Number.parseFloat(
             quantityLeftToGroup.toFixed(4)
           )} T. Vous tentez de regrouper ${quantity} T.`

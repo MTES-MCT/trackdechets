@@ -9,7 +9,8 @@ import {
   toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory,
-  transporterReceiptFactory
+  transporterReceiptFactory,
+  ecoOrganismeFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
@@ -195,6 +196,66 @@ describe("Mutation.createForm", () => {
       expect(sirenifyMock).toHaveBeenCalledTimes(1);
     }
   );
+
+  it("should allow to create a form with a regular company as emitter", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: company2 } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: {
+              siret: company2.siret
+            }
+          },
+          transporter: {
+            company: {
+              siret: company.siret
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data).not.toBeUndefined();
+  });
+
+  it("should not allow to create a form with an eco-organisme as emitter", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const ecoOrganisme = await ecoOrganismeFactory({ siret: siretify() });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: {
+              siret: ecoOrganisme.siret
+            }
+          },
+          transporter: {
+            company: {
+              siret: company.siret
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toContain(
+      "Cet établissement ne peut pas être visé comme émetteur."
+    );
+  });
 
   it("should be possible to create a form and connect existing bsddTransporters", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
