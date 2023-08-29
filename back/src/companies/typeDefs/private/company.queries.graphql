@@ -11,6 +11,12 @@ type Query {
     orgId: String!
     "type de favoris"
     type: FavoriteType!
+    """
+    (Optionnel) Filtre les résultats étrangers uniquement,
+    si 'orgId' est un numéro de TVA intra-communautaire non-français et allowForeignCompanies,
+    alors aucun résultat ne sera retourné
+    """
+    allowForeignCompanies: Boolean
   ): [CompanySearchResult!]!
 
   "List companies for the company verfication table of the admin panel"

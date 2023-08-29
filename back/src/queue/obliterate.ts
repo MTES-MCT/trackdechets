@@ -2,6 +2,7 @@
 import { mailQueue } from "./producers/mail";
 import { indexQueue } from "./producers/elastic";
 import {
+  favoritesCompanyQueue,
   geocodeCompanyQueue,
   setCompanyDepartementQueue
 } from "./producers/company";
@@ -14,7 +15,9 @@ const QUEUES = {
   // eslint-disable-next-line prettier/prettier
   "geocodeCompanyQueue": geocodeCompanyQueue,
   // eslint-disable-next-line prettier/prettier
-  "setCompanyDepartementQueue": setCompanyDepartementQueue
+  "setCompanyDepartementQueue": setCompanyDepartementQueue,
+  // eslint-disable-next-line prettier/prettier
+  "favoritesCompanyQueue": favoritesCompanyQueue
 };
 
 (async () => {

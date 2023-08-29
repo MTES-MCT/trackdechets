@@ -9,10 +9,10 @@ const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
   context
 ) => {
   checkIsAuthenticated(context);
-  if (isForeignVat(clue) && !!allowForeignCompanies && !allowForeignCompanies) {
+  if (isForeignVat(clue) && allowForeignCompanies === false) {
     return [];
   }
-  return searchCompanies(clue, department);
+  return searchCompanies(clue, department, allowForeignCompanies!);
 };
 
 export default searchCompaniesResolver;

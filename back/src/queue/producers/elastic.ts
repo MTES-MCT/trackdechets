@@ -9,6 +9,8 @@ import {
   DELETE_JOB_NAME
 } from "./jobNames";
 import { updatesQueue } from "./bsdUpdate";
+import { favoritesCompanyQueue } from "./company";
+import { allFavoriteTypes } from "../jobs/indexFavorites";
 
 const { REDIS_URL, NODE_ENV } = process.env;
 export const INDEX_QUEUE_NAME = `queue_index_elastic_${NODE_ENV}`;
@@ -42,6 +44,18 @@ indexQueue.on("completed", job => {
 
     updatesQueue.add({ sirets: siretsToNotify, id, jobName: job.name });
     scheduleWebhook(id, siretsToNotify, job.name);
+    const uniqueOrgIds = Array.from(new Set(siretsToNotify));
+
+    for (const favoriteType of allFavoriteTypes) {
+      favoritesCompanyQueue.addBulk(
+        uniqueOrgIds.map(orgId => ({
+          data: {
+            orgId,
+            type: favoriteType
+          }
+        }))
+      );
+    }
   }
 });
 

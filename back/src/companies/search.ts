@@ -11,7 +11,8 @@ import {
   isFRVat,
   TEST_COMPANY_PREFIX,
   countries,
-  cleanClue
+  cleanClue,
+  isForeignVat
 } from "../common/constants/companySearchHelpers";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
@@ -20,7 +21,10 @@ import { removeEmptyKeys } from "../common/converter";
 import { UserInputError } from "../common/errors";
 
 interface SearchCompaniesDeps {
-  searchCompany: (clue: string) => Promise<CompanySearchResult>;
+  searchCompany: (
+    clue: string,
+    allowForeignCompanies?: boolean
+  ) => Promise<CompanySearchResult>;
 }
 
 const SIRET_OR_VAT_ERROR =
@@ -75,7 +79,8 @@ async function findCompanyAndMergeInfos(
  * Supports Test SIRET and AnonymousCompany
  */
 export async function searchCompany(
-  clue: string
+  clue: string,
+  allowForeignCompanies?: boolean
 ): Promise<CompanySearchResult> {
   // remove non alphanumeric
   const cleanedClue = cleanClue(clue);
@@ -126,9 +131,17 @@ export async function searchCompany(
 
   // Search by VAT number first in our db, inder to to optimize response times
   if (isVat(cleanedClue)) {
+    if (isForeignVat(cleanedClue) && allowForeignCompanies === false) {
+      throw new UserInputError(
+        "La recherche d'établissements étrangers est désactivée",
+        {
+          invalidArgs: ["siret", "clue"]
+        }
+      );
+    }
     const company = await findCompanyAndMergeInfos(cleanedClue, {});
     if (company.isRegistered === true) {
-      // shorcut to return the result directly from database
+      // shorcut to return the result directly from database without hitting VIES
       const { country } = checkVAT(cleanedClue, countries);
       if (country) {
         return {
@@ -147,7 +160,9 @@ export async function searchCompany(
     };
   }
 
-  throw new Error(`Unhandled search company case for clue ${clue}`);
+  throw new UserInputError("Aucun établissement trouvé", {
+    invalidArgs: ["siret", "clue"]
+  });
 }
 
 // used for dependency injection in tests to easily mock `searchCompany`
@@ -155,12 +170,13 @@ export const makeSearchCompanies =
   ({ searchCompany }: SearchCompaniesDeps) =>
   (
     clue: string,
-    department?: string | null
+    department?: string | null,
+    allowForeignCompanies?: boolean
   ): Promise<CompanySearchResult[]> => {
     const cleanedClue = cleanClue(clue);
     // clue can be formatted like a SIRET or a VAT number
     if (isSiret(cleanedClue) || isVat(cleanedClue)) {
-      return searchCompany(cleanedClue)
+      return searchCompany(cleanedClue, allowForeignCompanies)
         .then(c => {
           return (
             [c]
