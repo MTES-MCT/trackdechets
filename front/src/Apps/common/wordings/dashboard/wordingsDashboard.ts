@@ -3,8 +3,6 @@ export const VALIDER_TRAITEMENT = "Valider le traitement";
 export const VALIDER_ACCEPTATION = "Valider l'acceptation";
 export const PUBLIER = "Publier";
 export const SIGNER = "Signer";
-export const SIGNER_EN_TANT_QUE_TRAVAUX =
-  "Signer en tant qu'entreprise de travaux";
 export const SIGNATURE_ECO_ORG = "Signature Éco-organisme";
 export const FAIRE_SIGNER = "Faire signer";
 export const VALIDER_ENTREPOSAGE_PROVISOIRE =
