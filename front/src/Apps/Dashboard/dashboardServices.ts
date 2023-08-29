@@ -1094,14 +1094,16 @@ export const canEditCustomInfoOrTransporterNumberPlate = (
 export const getOperationCodesFromSearchString = (value: any): string[] => {
   let searchCodes: string[] = [];
 
-  value.match(/[rRdD]{1}( )(12|13|14|15)/g)?.forEach(code => {
-    searchCodes.push(code.toUpperCase());
-    searchCodes.push(code.replace(" ", "").toUpperCase());
+  value.match(/[rRdD]{1}( )\d{1,2}/g)?.forEach(code => {
+    const cleanCode = code.toUpperCase();
+    searchCodes.push(cleanCode);
+    searchCodes.push(cleanCode.replace(" ", "").toUpperCase());
   });
 
-  value.match(/[rRdD]{1}(12|13|14|15)/g)?.forEach(code => {
-    searchCodes.push(code.toUpperCase());
-    searchCodes.push(code.replace("1", " 1").toUpperCase());
+  value.match(/[rRdD]{1}\d{1,2}/g)?.forEach(code => {
+    const cleanCode = code.toUpperCase();
+    searchCodes.push(cleanCode);
+    searchCodes.push(cleanCode.replace(/([rRdD]{1})/, "$& "));
   });
   return searchCodes;
 };
