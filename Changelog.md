@@ -5,7 +5,7 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2023.8.2] 29/08/2023
+# [2023.8.3] 29/08/2023
 
 #### :rocket: Nouvelles fonctionnalités
 
@@ -22,6 +22,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Amélioration de l'interface de groupement des dasris [PR 2638](https://github.com/MTES-MCT/trackdechets/pull/2638)
+- Interdiction des codes de groupement sur les dasris de synthèse[PR 2639](https://github.com/MTES-MCT/trackdechets/pull/2639)
 
 #### :house: Interne
 
@@ -37,9 +38,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
-- Interdiction des codes de groupement sur les dasris de synthèse[PR 2639](https://github.com/MTES-MCT/trackdechets/pull/2639)
-
 #### :house: Interne
+
+- Mise à jour ElasticSearch vers 7.10 [PR 2423](https://github.com/MTES-MCT/trackdechets/pull/2423)
 
 # [2023.8.1] 08/08/2023
 
