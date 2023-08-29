@@ -1358,7 +1358,7 @@ describe("dashboardServices", () => {
 
   describe("getOperationCodesFromSearchString", () => {
     it("returns operation codes from search string", () => {
-      const searchString = "r15 R 13 d13 d 15 peoropzier 23326783 d23 D 15";
+      const searchString = "r15 R 13 d13 d 15 peoropzie 23326783 D 15";
       const operationCodes = getOperationCodesFromSearchString(searchString);
 
       expect(operationCodes).toStrictEqual([
@@ -1376,7 +1376,7 @@ describe("dashboardServices", () => {
     });
 
     it("returns empty array on bad formatted string", () => {
-      const searchString = "peoropzier 23326783";
+      const searchString = "peoropzie 23326783";
       const operationCodes = getOperationCodesFromSearchString(searchString);
 
       expect(operationCodes).toStrictEqual([]);
