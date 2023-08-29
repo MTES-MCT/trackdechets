@@ -253,7 +253,7 @@ describe("Mutation.createForm", () => {
 
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toContain(
-      "Cet établissement ne peut pas être visé comme émetteur."
+      "L'émetteur ne peut pas être un éco-organisme."
     );
   });
 
