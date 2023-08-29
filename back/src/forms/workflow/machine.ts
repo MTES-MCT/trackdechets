@@ -85,7 +85,9 @@ const machine = Machine<any, Event>(
             {
               target: Status.RECEIVED
             }
-          ]
+          ],
+          // When a transporter N > 1 signs, the BSDD stays in the same status
+          [EventType.SignedByTransporter]: [{ target: Status.SENT }]
         }
       },
       [Status.REFUSED]: { type: "final" },

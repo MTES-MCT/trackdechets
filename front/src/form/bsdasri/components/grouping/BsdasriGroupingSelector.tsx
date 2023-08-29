@@ -17,6 +17,7 @@ function reducer(state: State, action: Action) {
       const sp = action.payload;
       return {
         selected: [sp.id, ...state.selected],
+        weights: [],
       };
     case "unselect":
       const usp = action.payload;
@@ -44,10 +45,7 @@ export default function BsdasriGroupingSelector({ name }) {
   const regroupedInDB = getIn(values, name) || [];
 
   useEffect(() => {
-    setFieldValue(
-      name,
-      state.selected.map(s => s)
-    );
+    setFieldValue(name, state.selected);
   }, [state, name, setFieldValue]);
 
   function onToggle(payload: Bsdasri | Bsdasri[]) {

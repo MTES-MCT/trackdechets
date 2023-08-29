@@ -6,7 +6,7 @@ import {
   IconTrash,
   IconWarehouseDelivery,
   IconWaterDam,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import {
   Bsff,
   BsffPackagingType,

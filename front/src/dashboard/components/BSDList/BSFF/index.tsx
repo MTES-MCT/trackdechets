@@ -1,6 +1,6 @@
 import * as React from "react";
 import { CellProps, CellValue } from "react-table";
-import { IconBSFF } from "common/components/Icons";
+import { IconBSFF } from "Apps/common/Components/Icons/Icons";
 import { BsffActions } from "./BsffActions/BsffActions";
 import { BsffFragment } from "./types";
 import { ActionButtonContext } from "common/components/ActionButton";

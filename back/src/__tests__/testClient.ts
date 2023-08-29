@@ -1,24 +1,50 @@
-import { AuthType, User } from "@prisma/client";
-import { createTestClient } from "./apollo-integration-testing";
-import { server } from "../server";
+import { User } from "@prisma/client";
+import { server, getServerDataloaders } from "../server";
+import { DocumentNode, print } from "graphql";
+import { AuthType } from "../auth";
+import assert from "node:assert";
+
+type StringOrAst = string | DocumentNode;
+type Options<T extends object> = { variables?: T };
+
+type RequiredAndNotNull<T> = { [P in keyof T]-?: Exclude<T[P], null> };
 
 /**
  * Instantiate test client
  */
 function makeClient(user?: (User & { auth?: AuthType }) | null) {
-  const { mutate, query, setOptions } = createTestClient({
-    apolloServer: server
-  });
-
-  if (user) {
-    setOptions({
-      request: {
-        user: { auth: AuthType.SESSION, ...user }
+  async function query<
+    T extends object = Record<string, unknown>,
+    V extends object = Record<string, unknown>
+  >(operation: StringOrAst, { variables }: Options<V> = {}) {
+    const { body } = await server.executeOperation<T, V>(
+      {
+        query: typeof operation === "string" ? operation : print(operation),
+        variables
+      },
+      {
+        contextValue: {
+          req: {},
+          res: {},
+          dataloaders: getServerDataloaders(),
+          ...(user && { user: { auth: AuthType.Session, ...user } })
+        } as any
       }
-    });
+    );
+
+    assert(body.kind === "single");
+
+    // For retro compatibility with our previous setup, remove null and undefined from data
+    // TODO: Remove this "hack" and edit all our tests to account for possible nulls
+    type ReturnType = typeof body.singleResult;
+
+    // Parse(Stringify()) is to avoid the [Object: null prototype] problem
+    return JSON.parse(
+      JSON.stringify(body.singleResult)
+    ) as RequiredAndNotNull<ReturnType>;
   }
 
-  return { mutate, query };
+  return { mutate: query, query };
 }
 
 export default makeClient;

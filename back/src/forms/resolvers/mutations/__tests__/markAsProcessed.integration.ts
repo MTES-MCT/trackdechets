@@ -65,7 +65,7 @@ describe("mutation.markAsProcessed", () => {
         }
       }
     });
-    expect(errors[0].extensions.code).toBe("FORBIDDEN");
+    expect(errors[0].extensions?.code).toBe("FORBIDDEN");
   });
 
   it("should mark a form as processed", async () => {

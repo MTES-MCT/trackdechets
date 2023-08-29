@@ -1,5 +1,5 @@
 import cogoToast from "cogo-toast";
-import { IconClose } from "common/components/Icons";
+import { IconClose } from "Apps/common/Components/Icons/Icons";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { FieldArray, FieldProps } from "formik";
 import {

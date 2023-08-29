@@ -8,9 +8,9 @@ import {
   MutationSubmitBsdaRevisionRequestApprovalArgs,
   PickupSite,
 } from "generated/graphql/types";
-import { TdModalTrigger } from "common/components/Modal";
+import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
 import { ActionButton, Modal, RedErrorMessage } from "common/components";
-import { IconCogApproved } from "common/components/Icons";
+import { IconCogApproved } from "Apps/common/Components/Icons/Icons";
 import { useMutation } from "@apollo/client";
 import {
   GET_BSDA_REVISION_REQUESTS,

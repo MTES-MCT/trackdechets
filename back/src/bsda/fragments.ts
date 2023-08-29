@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express";
+import { gql } from "graphql-tag";
 
 export const fullBsda = gql`
   fragment FullBsda on Bsda {

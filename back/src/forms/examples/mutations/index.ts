@@ -6,6 +6,8 @@ function loadMutation(name: string) {
 }
 
 export default {
+  createFormTransporter: loadMutation("createFormTransporter"),
+  updateFormTransporter: loadMutation("updateFormTransporter"),
   createForm: loadMutation("createForm"),
   updateForm: loadMutation("updateForm"),
   markAsSealed: loadMutation("markAsSealed"),

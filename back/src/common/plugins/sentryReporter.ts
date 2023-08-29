@@ -1,8 +1,9 @@
-import { ApolloServerPlugin } from "apollo-server-plugin-base";
+import { ApolloServerPlugin, GraphQLRequestContext } from "@apollo/server";
 import { ValidationError } from "yup";
 import { ZodError } from "zod";
 import * as Sentry from "@sentry/node";
 import { GraphQLError } from "graphql";
+import { GraphQLContext } from "../../types";
 
 const knownErrors = [GraphQLError, ValidationError, ZodError];
 
@@ -11,7 +12,7 @@ const knownErrors = [GraphQLError, ValidationError, ZodError];
  * https://www.apollographql.com/docs/apollo-server/integrations/plugins/
  */
 const sentryReporter: ApolloServerPlugin = {
-  async requestDidStart(requestContext) {
+  async requestDidStart(requestContext: GraphQLRequestContext<GraphQLContext>) {
     return {
       async didEncounterErrors(errorContext) {
         if (!errorContext.operation) {
@@ -44,9 +45,9 @@ const sentryReporter: ApolloServerPlugin = {
             });
           }
 
-          if (requestContext.context.user?.email) {
+          if (requestContext.contextValue.user?.email) {
             scope.setUser({
-              email: requestContext.context.user.email
+              email: requestContext.contextValue.user.email
             });
           }
 
@@ -57,9 +58,7 @@ const sentryReporter: ApolloServerPlugin = {
           });
 
           const sentryId = Sentry.captureException(error, scope);
-          if (error.originalError) {
-            (error.originalError as any).sentryId = sentryId;
-          }
+          error.extensions.sentryId = sentryId;
         }
       }
     };

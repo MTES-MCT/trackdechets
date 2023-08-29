@@ -2,7 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import {
   formFactory,
-  transportSegmentFactory,
+  bsddTransporterFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -47,9 +47,9 @@ describe("{ mutation { takeOverSegment } }", () => {
       }
     });
     // an attached readyToTakeOver segment to be taken over by the second transporter
-    const segment = await transportSegmentFactory({
+    const segment = await bsddTransporterFactory({
       formId: form.id,
-      segmentPayload: {
+      opts: {
         transporterCompanySiret: secondTransporterCompany.siret,
         transporterCompanyAddress: "tatooïne",
         transporterCompanyContact: "Obi wan kenobi",

@@ -11,7 +11,7 @@ import {
   createBsffAfterOperation
 } from "../../../__tests__/factories";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
-import { gql } from "apollo-server-express";
+import { gql } from "graphql-tag";
 import { fullBsff } from "../../../fragments";
 
 const GET_BSFF = gql`

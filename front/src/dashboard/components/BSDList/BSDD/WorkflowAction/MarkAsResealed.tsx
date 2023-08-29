@@ -1,9 +1,9 @@
 import React from "react";
 import { FormStatus } from "generated/graphql/types";
 import { WorkflowActionProps } from "./WorkflowAction";
-import { TdModalTrigger } from "common/components/Modal";
+import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
 import { ActionButton } from "common/components";
-import { IconPaperWrite } from "common/components/Icons";
+import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
 import MarkAsResealedModalContent from "dashboard/components/BSDList/BSDD/WorkflowAction/MarkAsResealedModalContent";
 
 export default function MarkAsResealed({ form }: WorkflowActionProps) {

@@ -136,7 +136,7 @@ export function PreviousPackagingsPicker({
   >(GET_PREVIOUS_PACKAGINGS, {
     variables: {
       // pagination does not play well with bsff picking
-      first: 5000,
+      first: 500,
       where,
     },
     // make sure we have fresh data here

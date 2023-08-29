@@ -1,7 +1,6 @@
 import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
-import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
 import { companyFactory, siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { AnonymousCompanyError } from "../../../sirene/errors";
@@ -10,7 +9,7 @@ import * as searchCompany from "../../../sirene/searchCompany";
 const searchSirene = jest.spyOn(searchCompany, "default");
 
 describe("query { companyInfos(siret: <SIRET>) }", () => {
-  let query: TestQuery;
+  let query: ReturnType<typeof makeClient>["query"];
   beforeAll(() => {
     const testClient = makeClient();
     query = testClient.query;

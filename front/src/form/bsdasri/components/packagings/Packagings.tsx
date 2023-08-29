@@ -1,4 +1,4 @@
-import { IconClose } from "common/components/Icons";
+import { IconClose } from "Apps/common/Components/Icons/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { Field, FieldArray, FieldProps, useFormikContext } from "formik";
@@ -18,9 +18,11 @@ export default function DasriPackagings({
   form,
   id,
   disabled,
+  summaryHint,
   ...props
-}: FieldProps<BsdasriPackaging[] | null> &
-  InputHTMLAttributes<HTMLInputElement>) {
+}: FieldProps<BsdasriPackaging[] | null> & {
+  summaryHint?: string;
+} & InputHTMLAttributes<HTMLInputElement>) {
   const { setFieldValue } = useFormikContext();
 
   if (!value) {
@@ -172,7 +174,12 @@ export default function DasriPackagings({
         )}
       />
       {value?.length > 0 && (
-        <div className="tw-mt-4">{getDasriPackagingInfosSummary(value)}</div>
+        <div className="tw-mt-4">
+          <>
+            {getDasriPackagingInfosSummary(value)}{" "}
+            {!!summaryHint && <span>{summaryHint}</span>}
+          </>
+        </div>
       )}
     </div>
   );

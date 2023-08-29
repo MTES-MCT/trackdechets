@@ -1,5 +1,5 @@
 import { isDate, isEqual } from "date-fns";
-import { BsddTransporter, Form } from "@prisma/client";
+import { Form } from "@prisma/client";
 import { expandFormFromDb } from "../converter";
 
 export function isArray(obj) {
@@ -108,11 +108,16 @@ export async function tempStorageDiff(
   const {
     updatedAt: _u1,
     status: _s1,
+    // there is only one transporter on forwardedIn form so we
+    // can exclude the list of transporters and compute the diff on
+    // the first transporter only (field `transporter`).
+    transporters: _ts1,
     ...expandedt1
   } = await expandFormFromDb(t1!);
   const {
     updatedAt: _u2,
     status: _s2,
+    transporters: _ts2,
     ...expandedt2
   } = await expandFormFromDb(t2!);
 
@@ -121,25 +126,29 @@ export async function tempStorageDiff(
   return isEmpty(diff) ? {} : { temporaryStorageDetail: diff };
 }
 
-type FormWithTransporters = Form & { transporters: BsddTransporter[] | null };
-
 /**
  * Calculates expanded diff between two forms
+ *
+ * FIXME - Diff on array of transporters does not work well for time being so we
+ * exclude this field from the diff comparison. The diff will only be computed
+ * on the first transporter
  */
 export async function formDiff(
-  f1: FormWithTransporters & {
-    forwardedIn?: FormWithTransporters | null;
+  f1: Form & {
+    forwardedIn?: Form | null;
   },
   f2: Form & { forwardedIn?: Form | null }
 ) {
   const {
     updatedAt: _u1,
     status: _s1,
+    transporters: _ts1,
     ...expandedf1
   } = await expandFormFromDb(f1);
   const {
     updatedAt: _u2,
     status: _s2,
+    transporters: _ts2,
     ...expandedf2
   } = await expandFormFromDb(f2);
 

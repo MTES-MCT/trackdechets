@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client";
 import { Bsff, Query, QueryBsffArgs } from "generated/graphql/types";
 import { ActionButton, Modal } from "common/components";
 import { Loader } from "Apps/common/Components";
-import { IconCheckCircle1 } from "common/components/Icons";
+import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
 import { GET_BSFF_FORM } from "form/bsff/utils/queries";
 import { BsffSummary } from "./BsffSummary";
 

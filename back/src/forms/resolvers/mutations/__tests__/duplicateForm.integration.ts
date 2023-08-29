@@ -405,7 +405,8 @@ describe("Mutation.duplicateForm", () => {
       transporterDepartment,
       transporterValidityLimit,
       transporterTransportMode,
-      transporterIsExemptedOfReceipt
+      transporterIsExemptedOfReceipt,
+      readyToTakeOver: true
     });
   });
 

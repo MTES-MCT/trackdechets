@@ -47,6 +47,7 @@ describe("expandFormFromDb", () => {
         isTempStorage: false
       },
       transporter: {
+        id: transporter!.id,
         company: {
           name: transporter!.transporterCompanyName,
           orgId: transporter!.transporterCompanySiret,
@@ -65,6 +66,28 @@ describe("expandFormFromDb", () => {
         customInfo: transporter!.transporterCustomInfo,
         mode: transporter!.transporterTransportMode
       },
+      transporters: [
+        {
+          id: transporter!.id,
+          company: {
+            name: transporter!.transporterCompanyName,
+            orgId: transporter!.transporterCompanySiret,
+            siret: transporter!.transporterCompanySiret,
+            vatNumber: transporter!.transporterCompanyVatNumber,
+            address: transporter!.transporterCompanyAddress,
+            contact: transporter!.transporterCompanyContact,
+            phone: transporter!.transporterCompanyPhone,
+            mail: transporter!.transporterCompanyMail
+          },
+          isExemptedOfReceipt: transporter!.transporterIsExemptedOfReceipt,
+          receipt: transporter!.transporterReceipt,
+          department: transporter!.transporterDepartment,
+          validityLimit: transporter!.transporterValidityLimit,
+          numberPlate: transporter!.transporterNumberPlate,
+          customInfo: transporter!.transporterCustomInfo,
+          mode: transporter!.transporterTransportMode
+        }
+      ],
       wasteDetails: {
         code: form.wasteDetailsCode,
         name: form.wasteDetailsName,
@@ -161,6 +184,7 @@ describe("expandFormFromDb", () => {
         isDangerous: forwardedIn!.wasteDetailsIsDangerous
       },
       transporter: {
+        id: transporter!.id,
         company: {
           name: transporter!.transporterCompanyName,
           orgId: transporter!.transporterCompanySiret,
@@ -205,6 +229,7 @@ describe("expandFormFromDb", () => {
     const transporter = await getFirstTransporter(form);
     const expanded = await expandFormFromDb(form);
     expect(expanded.transporter).toEqual({
+      id: transporter!.id,
       mode: null,
       company: {
         name: transporter!.transporterCompanyName,
@@ -241,6 +266,7 @@ describe("expandFormFromDb", () => {
     const transporter = await getFirstTransporter(form);
     const expanded = await expandFormFromDb(form);
     expect(expanded.transporter).toEqual({
+      id: transporter!.id,
       mode: "OTHER",
       company: {
         name: transporter!.transporterCompanyName,

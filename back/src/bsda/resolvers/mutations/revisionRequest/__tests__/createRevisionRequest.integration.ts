@@ -194,26 +194,23 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     const { user } = await userWithCompanyFactory("ADMIN");
 
     const { mutate } = makeClient(user);
-    expect.assertions(2);
-    try {
-      await mutate<Pick<Mutation, "createBsdaRevisionRequest">>(
-        CREATE_BSDA_REVISION_REQUEST,
-        {
-          variables: {
-            input: {
-              bsdaId: "",
-              content: { waste: { name: "I cannot change the name" } },
-              comment: "A comment"
-            }
-          }
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: "",
+          content: { waste: { name: "I cannot change the name" } },
+          comment: "A comment",
+          authoringCompanySiret: "a siret"
         }
-      );
-    } catch (err) {
-      expect(err.message).toContain('{"code":"BAD_USER_INPUT"}');
-      expect(err.message).toContain(
-        'Field \\"name\\" is not defined by type \\"BsdaRevisionRequestWasteInput\\".'
-      );
-    }
+      }
+    });
+    const error = errors[0];
+    expect(error.extensions!.code).toContain("BAD_USER_INPUT");
+    expect(error.message).toContain(
+      'Field "name" is not defined by type "BsdaRevisionRequestWasteInput".'
+    );
   });
 
   it("should fail if fields validation fails", async () => {

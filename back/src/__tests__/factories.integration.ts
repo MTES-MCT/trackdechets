@@ -5,8 +5,8 @@ import {
   formFactory,
   siretify,
   statusLogFactory,
-  transportSegmentFactory,
   transporterReceiptFactory,
+  bsddTransporterFactory,
   userFactory,
   userWithCompanyFactory
 } from "./factories";
@@ -148,9 +148,9 @@ test("should create a transport segment", async () => {
     ownerId: usr.id
   });
   const transporterCompanySiret = siretify(4);
-  const newTransportSegment = await transportSegmentFactory({
+  const newTransportSegment = await bsddTransporterFactory({
     formId: frm.id,
-    segmentPayload: { transporterCompanySiret }
+    opts: { transporterCompanySiret }
   });
 
   expect(newTransportSegment.id).toBeTruthy();

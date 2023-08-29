@@ -68,7 +68,7 @@ describe("mutation changePassword", () => {
         variables: { oldPassword: "pass", newPassword }
       }
     );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
   it("should deny weak password", async () => {
@@ -81,7 +81,7 @@ describe("mutation changePassword", () => {
         variables: { oldPassword: "pass", newPassword }
       }
     );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
   it("should deny long password", async () => {
     const user = await userFactory();
@@ -94,6 +94,6 @@ describe("mutation changePassword", () => {
         variables: { oldPassword: "pass", newPassword }
       }
     );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 });

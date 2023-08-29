@@ -102,7 +102,11 @@ export function Emitter({ status, stepName, disabled = false }) {
   const isRegrouping = values.type === BsdasriType.Grouping;
 
   const emissionEmphasis = stepName === "emission";
-
+  const weightLabel = `Je souhaite préciser le poids ${
+    isRegrouping
+      ? "- report des poids des bsds sélectionnés, le cas échéant"
+      : ""
+  }`;
   const { siret } = useParams<{ siret: string }>();
   const isUserCurrentEmitter = values?.emitter?.company?.siret === siret;
 
@@ -196,9 +200,15 @@ export function Emitter({ status, stepName, disabled = false }) {
           "field-emphasis": emissionEmphasis,
         })}
       >
+        {isRegrouping && (
+          <p className="tw-text-center tw-mb-2">
+            Report des conditionnements sélectionnés / peut être modifié
+          </p>
+        )}
         <Field
           name="emitter.emission.packagings"
           component={Packagings}
+          summaryHint="- Report des volumes sélectionnés"
           disabled={editionDisabled}
         />
       </div>
@@ -210,7 +220,7 @@ export function Emitter({ status, stepName, disabled = false }) {
       >
         <WeightWidget
           disabled={editionDisabled}
-          switchLabel="Je souhaite préciser le poids"
+          switchLabel={weightLabel}
           dasriPath="emitter.emission"
           getInitialWeightFn={getInitialWeightFn}
         />

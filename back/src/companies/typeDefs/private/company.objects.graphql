@@ -110,12 +110,17 @@ type AnonymousCompany {
 }
 
 "Information sur un établissement recherché par le frontend"
-type CompanySearchPrivate {
+type CompanySearchPrivate implements CompanySearchPrivateCommon {
   "Profil de l'établissement"
   companyTypes: [CompanyType!]!
 
   "SIRET ou TVA de l'établissement"
   orgId: String!
+
+  """
+  Identifiant de l'entreprise sur la plateforme Trackdéchets. N'a une valeur que si l'entreprise est inscrite sur Trackdéchets (`isRegistered=true`)
+  """
+  trackdechetsId: ID
 
   "Identifiant GEREP"
   gerepId: String
@@ -209,8 +214,9 @@ type CompanySearchPrivate {
 
   "État administratif de l'établissement. A = Actif, F = Fermé"
   etatAdministratif: String
+
   "Statut de diffusion de l'établissement selon l'INSEE. O = Oui, N = Non"
-  statutDiffusionEtablissement: String
+  statutDiffusionEtablissement: StatutDiffusionEtablissement
 
   """
   Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets

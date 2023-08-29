@@ -9,7 +9,7 @@ import {
   IconDuplicateFile,
   IconTrash,
   IconQrCode,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
 import { DeleteBsvhuModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";

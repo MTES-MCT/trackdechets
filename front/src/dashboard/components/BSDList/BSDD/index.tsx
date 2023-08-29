@@ -9,7 +9,7 @@ import {
 import { CellProps, CellValue } from "react-table";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { BSDDActions } from "dashboard/components/BSDList/BSDD/BSDDActions/BSDDActions";
-import { IconBSDD } from "common/components/Icons";
+import { IconBSDD } from "Apps/common/Components/Icons/Icons";
 import { statusLabels } from "../../../constants";
 import TransporterInfoEdit from "./TransporterInfoEdit";
 import { WorkflowAction } from "./WorkflowAction";

@@ -12,8 +12,8 @@ import { FormStatus } from "../generated/graphql/types";
  * A Prisma Form with linked objects
  */
 export interface FullForm extends Form {
-  forwardedIn: (Form & { transporters: BsddTransporter[] | null }) | null;
-  transporters: BsddTransporter[] | null;
+  forwardedIn: (Form & { transporters: BsddTransporter[] }) | null;
+  transporters: BsddTransporter[];
   intermediaries: IntermediaryFormAssociation[] | null;
 }
 

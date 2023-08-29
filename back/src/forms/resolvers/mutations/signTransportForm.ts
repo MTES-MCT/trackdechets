@@ -10,7 +10,8 @@ import {
   getFirstTransporter,
   getFirstTransporterSync,
   getFormOrFormNotFound,
-  getFullForm
+  getFullForm,
+  getTransporters
 } from "../../database";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
@@ -29,13 +30,13 @@ import { ForbiddenError, UserInputError } from "../../../common/errors";
 export async function getFormReceiptField(transporter) {
   const recipifiedTransporter = await recipifyFormInput({
     transporter: {
-      isExemptedOfReceipt: transporter?.transporterIsExemptedOfReceipt,
-      receipt: transporter?.transporterReceipt,
-      validityLimit: transporter?.transporterValidityLimit,
-      department: transporter?.transporterDepartment,
+      isExemptedOfReceipt: transporter.transporterIsExemptedOfReceipt,
+      receipt: transporter.transporterReceipt,
+      validityLimit: transporter.transporterValidityLimit,
+      department: transporter.transporterDepartment,
       company: {
-        siret: transporter?.transporterCompanySiret,
-        vatNumber: transporter?.transporterCompanyVatNumber
+        siret: transporter.transporterCompanySiret,
+        vatNumber: transporter.transporterCompanyVatNumber
       }
     }
   });
@@ -62,64 +63,107 @@ const signTransportFn = async (
       "Impossible de signer le transport d'un bordereau chapeau. C'est en signant les bordereaux d'annexe 1 que le statut de ce bordereau évoluera."
     );
   }
-  const transporter = await getFirstTransporter(existingForm);
-  const receiptFields = await getFormReceiptField(transporter);
+
+  const transporters = await getTransporters(existingForm);
+
+  if (transporters.length === 0) {
+    throw new UserInputError(
+      "Aucun transporteur n'a été renseigné sur le bordereau"
+    );
+  }
+
+  // Retourne le premier transporteur (dans l'ordre de la numérotation) qui n'a
+  // pas encore signé le bordereau. Pour être compatible avec le workflow multi-modal
+  // v1 (un transporteur ne peut pas signer un bordereau tant que `readyToTakeOver=false`)
+  // on vérifie que `readyToTakeOver=true`
+  const signingTransporterIdx = transporters.findIndex(
+    t => t.readyToTakeOver && !t.takenOverAt
+  );
+  if (signingTransporterIdx === -1) {
+    throw new UserInputError(
+      "Tous les transporteurs présents sur le bordereau ont déjà signé. " +
+        "Le bordereau est désormais en attente de réception"
+    );
+  }
+
+  const signingTransporter = transporters[signingTransporterIdx];
+
+  const signingTransporterOrgId =
+    getTransporterCompanyOrgId(signingTransporter)!;
+
   await checkCanSignFor(
-    getTransporterCompanyOrgId(transporter)!,
+    signingTransporterOrgId,
     user,
     Permission.BsdCanSignTransport,
     args.securityCode
   );
 
-  await validateBeforeTransport({
-    ...existingForm,
-    ...transporter,
-    ...(args.input.transporterNumberPlate
-      ? {
-          transporterNumberPlate: args.input.transporterNumberPlate
-        }
-      : {}),
-    ...receiptFields
-  });
+  const receiptFields = await getFormReceiptField(signingTransporter!);
 
-  const transporterUpdate: Prisma.BsddTransporterUpdateWithoutFormInput = {
-    takenOverAt: args.input.takenOverAt, // takenOverAt is duplicated between Form and BsddTransporter
-    takenOverBy: args.input.takenOverBy, // takenOverBy is duplicated between Form and BsddTransporter
-    ...(args.input.transporterNumberPlate
-      ? {
-          transporterNumberPlate: args.input.transporterNumberPlate
-        }
-      : {}),
-    ...receiptFields
+  const transportersForValidation = [...transporters];
+  // Prend en compte la plaque d'immatriculation envoyée dans l'input de signature
+  // pour la validation des données
+  transportersForValidation[signingTransporterIdx] = {
+    ...transportersForValidation[signingTransporterIdx],
+    ...(receiptFields as any) // FIXME fix typing of getFormReceiptField
   };
+  if (args.input?.transporterNumberPlate) {
+    transportersForValidation[signingTransporterIdx].transporterNumberPlate =
+      args.input?.transporterNumberPlate;
+  }
 
-  const formUpdateInput: Prisma.FormUpdateInput = {
-    takenOverAt: args.input.takenOverAt,
-    takenOverBy: args.input.takenOverBy,
-    ...(transporter
-      ? {
-          transporters: {
-            update: {
-              where: { id: transporter.id },
-              data: transporterUpdate
-            }
-          }
-        }
-      : {}),
-    currentTransporterOrgId: getTransporterCompanyOrgId(transporter),
+  await validateBeforeTransport(
+    {
+      ...existingForm,
+      transporters: transportersForValidation
+    },
+    signingTransporterOrgId
+  );
+
+  const formUpdateInput: Prisma.FormUpdateInput = {};
+
+  if (signingTransporter.number === 1) {
+    // fill takenOverAt and takenOverBy at the Form level for retro-compatibility
+    formUpdateInput.takenOverAt = args.input.takenOverAt;
+    formUpdateInput.takenOverBy = args.input.takenOverBy;
     // The following fields are deprecated
     // but we need to fill them until we remove them completely
-    signedByTransporter: true,
-    sentAt: args.input.takenOverAt,
-    sentBy: existingForm.emittedBy,
+    formUpdateInput.signedByTransporter = true;
+    formUpdateInput.sentAt = args.input.takenOverAt;
+    formUpdateInput.sentBy = existingForm.emittedBy;
+  }
 
-    // If it's an appendix1 and the emitter hasn't signed, TD automatically "signs" for him
-    ...(!existingForm.emittedAt &&
-      existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER && {
-        emittedAt: args.input.takenOverAt,
-        emittedBy: "Signature automatique Trackdéchets"
-      })
+  const transporterData: Prisma.BsddTransporterUpdateWithoutFormInput = {
+    takenOverAt: args.input.takenOverAt,
+    takenOverBy: args.input.takenOverBy,
+    ...(args.input.transporterNumberPlate
+      ? {
+          transporterNumberPlate: args.input.transporterNumberPlate
+        }
+      : {}),
+    ...receiptFields
   };
+
+  // Update signing transporter
+  const transportersUpdateInput: Prisma.BsddTransporterUpdateManyWithoutFormNestedInput =
+    {
+      update: {
+        where: { id: signingTransporter.id },
+        data: transporterData
+      }
+    };
+
+  formUpdateInput.transporters = transportersUpdateInput;
+  formUpdateInput.currentTransporterOrgId = signingTransporterOrgId;
+
+  if (
+    !existingForm.emittedAt &&
+    existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER
+  ) {
+    // If it's an appendix1 and the emitter hasn't signed, TD automatically "signs" for him
+    formUpdateInput.emittedAt = args.input.takenOverAt;
+    formUpdateInput.emittedBy = "Signature automatique Trackdéchets";
+  }
 
   const updatedForm = await runInTransaction(async transaction => {
     const { update, updateAppendix2Forms, findGroupedFormsById, findUnique } =
@@ -189,7 +233,7 @@ const signTransportFn = async (
                 transporters: {
                   update: {
                     where: { id: appendix1ContainerTransporter.id },
-                    data: transporterUpdate
+                    data: transporterData
                   }
                 }
               }
@@ -203,24 +247,29 @@ const signTransportFn = async (
         }
       );
 
-      // At any given time, all bsds from an Annexe1 must have the same plates
-      const ids = appendix1Forms.map(form => form.id);
+      if (args.input?.transporterNumberPlate && appendix1Forms?.length > 0) {
+        // At any given time, all bsds from an Annexe1 must have the same plates
+        const ids = appendix1Forms.map(form => form.id);
 
-      // Update their plates
-      await transaction.bsddTransporter.updateMany({
-        where: {
-          formId: { in: ids }
-        },
-        data: {
-          transporterNumberPlate: transporterUpdate.transporterNumberPlate
-        }
-      });
+        // Update their plates
+        await transaction.bsddTransporter.updateMany({
+          where: {
+            formId: { in: ids }
+          },
+          data: {
+            transporterNumberPlate: args.input.transporterNumberPlate
+          }
+        });
 
-      // Update ES
-      ids.forEach(id => {
-        enqueueUpdatedBsdToIndex(id);
-      });
+        // Update ES
+        appendix1Forms
+          .map(f => f.readableId)
+          .forEach(readableId => {
+            enqueueUpdatedBsdToIndex(readableId);
+          });
+      }
     }
+
     return updatedForm;
   });
 
@@ -276,6 +325,9 @@ const signatures: Partial<
     }
   },
   [Status.SIGNED_BY_PRODUCER]: async (user, args, existingForm) =>
+    signTransportFn(user, args, existingForm),
+  // Signature of transporter N > 1
+  [Status.SENT]: async (user, args, existingForm) =>
     signTransportFn(user, args, existingForm),
   [Status.SIGNED_BY_TEMP_STORER]: async (user, args, existingForm) => {
     const existingFullForm = await getFullForm(existingForm);

@@ -31,6 +31,12 @@ describe("Workflow machine", () => {
     });
     expect(nextState.value).toEqual(Status.SIGNED_BY_PRODUCER);
   });
+  test("SENT -> SENT", () => {
+    const nextState = machine.transition(Status.SENT, {
+      type: EventType.SignedByTransporter
+    });
+    expect(nextState.value).toEqual(Status.SENT);
+  });
   test("SENT -> RECEIVED", () => {
     const nextState = machine.transition(Status.SENT, {
       type: EventType.MarkAsReceived

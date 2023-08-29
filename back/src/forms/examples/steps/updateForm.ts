@@ -36,3 +36,18 @@ export function groupAppendix1Producer(company: string): WorkflowStep {
     company
   };
 }
+
+export function updateFormTransporters(company: string): WorkflowStep {
+  return {
+    description: "Un transporteur est ajouté",
+    mutation: mutations.updateForm,
+    variables: ({ bsd, updatedFormTransporters }) => ({
+      updateFormInput: {
+        id: bsd.id,
+        transporters: updatedFormTransporters
+      }
+    }),
+    data: response => response.updateForm,
+    company
+  };
+}

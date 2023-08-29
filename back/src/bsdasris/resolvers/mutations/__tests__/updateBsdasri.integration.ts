@@ -16,7 +16,7 @@ import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 import * as sirenify from "../../../sirenify";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
-import { gql } from "apollo-server-express";
+import { gql } from "graphql-tag";
 
 const sirenifyMock = jest
   .spyOn(sirenify, "default")

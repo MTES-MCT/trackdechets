@@ -8,7 +8,7 @@ import {
   IconBSVhu,
   IconBSDD,
   IconBSDasri,
-} from "../../../common/components/Icons";
+} from "../../../Apps/common/Components/Icons/Icons";
 import BsdCreateDropdown from "Apps/common/Components/DropdownMenu/DropdownMenu";
 
 type Props = { siret: string };

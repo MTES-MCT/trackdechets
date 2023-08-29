@@ -126,7 +126,8 @@ describe("edition", () => {
       grouping: [],
       ecoOrganisme,
       temporaryStorageDetail,
-      intermediaries: []
+      intermediaries: [],
+      transporters: []
     };
     const flatInput = flattenFormInput(input);
     for (const key of Object.keys(flatInput)) {

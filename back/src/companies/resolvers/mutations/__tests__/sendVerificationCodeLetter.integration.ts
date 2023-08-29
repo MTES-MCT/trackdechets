@@ -1,5 +1,5 @@
 import { CompanyVerificationStatus, UserRole } from "@prisma/client";
-import { gql } from "apollo-server-express";
+import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import * as post from "../../../../common/post";
 import prisma from "../../../../prisma";

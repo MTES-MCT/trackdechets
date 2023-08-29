@@ -39,7 +39,7 @@ import {
   filter_show_btn,
   load_more_bsds,
 } from "Apps/common/wordings/dashboard/wordingsDashboard";
-import { IconDuplicateFile } from "common/components/Icons";
+import { IconDuplicateFile } from "Apps/common/Components/Icons/Icons";
 import Filters from "Apps/common/Components/Filters/Filters";
 import {
   filterList,
@@ -48,6 +48,8 @@ import {
 } from "../Apps/Dashboard/dashboardUtils";
 import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
 import { BsdCurrentTab } from "Apps/common/types/commonTypes";
+import { usePermissions } from "common/contexts/PermissionsContext";
+import { UserPermission } from "generated/graphql/types";
 
 import "./dashboard.scss";
 import { GET_BSDA_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsdaReviewQuery";
@@ -55,6 +57,7 @@ import { GET_FORM_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsddRevi
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
 
 const DashboardPage = () => {
+  const { permissions } = usePermissions();
   const isActTab = !!useRouteMatch(routes.dashboardv2.bsds.act);
   const isDraftTab = !!useRouteMatch(routes.dashboardv2.bsds.drafts);
   const isFollowTab = !!useRouteMatch(routes.dashboardv2.bsds.follow);
@@ -522,13 +525,15 @@ const DashboardPage = () => {
     <div className="dashboard-page">
       {!isReviewsTab && (
         <div className="dashboard-page__actions">
-          <div className="create-btn">
-            <BsdCreateDropdown
-              links={dropdownCreateLinks(siret)}
-              isDisabled={loading}
-              menuTitle={dropdown_create_btn}
-            />
-          </div>
+          {permissions.includes(UserPermission.BsdCanCreate) && (
+            <div className="create-btn">
+              <BsdCreateDropdown
+                links={dropdownCreateLinks(siret)}
+                isDisabled={loading}
+                menuTitle={dropdown_create_btn}
+              />
+            </div>
+          )}
           <div className="filter-btn">
             <button
               type="button"

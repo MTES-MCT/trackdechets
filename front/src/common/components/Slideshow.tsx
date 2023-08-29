@@ -1,6 +1,9 @@
 import * as React from "react";
 import classNames from "classnames";
-import { IconArrowLeft1, IconArrowRight1 } from "common/components/Icons";
+import {
+  IconArrowLeft1,
+  IconArrowRight1,
+} from "Apps/common/Components/Icons/Icons";
 import { List, ListItem } from "./List";
 import styles from "./Slideshow.module.scss";
 

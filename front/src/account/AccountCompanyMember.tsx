@@ -1,6 +1,9 @@
 import React from "react";
 import { gql, useMutation } from "@apollo/client";
-import { IconTrash, IconEmailActionUnread } from "common/components/Icons";
+import {
+  IconTrash,
+  IconEmailActionUnread,
+} from "Apps/common/Components/Icons/Icons";
 import styles from "./AccountCompanyMember.module.scss";
 import cogoToast from "cogo-toast";
 import {

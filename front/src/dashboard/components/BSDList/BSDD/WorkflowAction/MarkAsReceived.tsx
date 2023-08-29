@@ -2,10 +2,10 @@ import React from "react";
 import { Query, QueryFormArgs } from "generated/graphql/types";
 import { useLazyQuery } from "@apollo/client";
 import { WorkflowActionProps } from "./WorkflowAction";
-import { TdModalTrigger } from "common/components/Modal";
+import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
 import { ActionButton } from "common/components";
 import { Loader } from "Apps/common/Components";
-import { IconWaterDam } from "common/components/Icons";
+import { IconWaterDam } from "Apps/common/Components/Icons/Icons";
 import ReceivedInfo from "./ReceivedInfo";
 import { GET_FORM } from "form/bsdd/utils/queries";
 

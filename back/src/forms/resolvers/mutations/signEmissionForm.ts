@@ -6,16 +6,16 @@ import {
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
-  getFirstTransporter,
   getFirstTransporterSync,
   getFormOrFormNotFound,
-  getFullForm
+  getFullForm,
+  getTransporters
 } from "../../database";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { checkCanSignFor } from "../../permissions";
 import { expandFormFromDb } from "../../converter";
-import { wasteDetailsSchema } from "../../validation";
+import { Transporter, wasteDetailsSchema } from "../../validation";
 import { getFormRepository } from "../../repository";
 import { prismaJsonNoNull } from "../../../common/converter";
 import { Permission } from "../../../permissions";
@@ -62,7 +62,10 @@ const signatures: Partial<
       );
     }
 
-    const transporter = await getFirstTransporter(existingForm);
+    const transporters = await getTransporters(existingForm);
+    const transportersForValidation: Transporter[] = transporters; // payload de validation
+
+    const transporter = getFirstTransporterSync({ transporters });
 
     const formUpdateInput: Prisma.FormUpdateInput = {
       wasteDetailsPackagingInfos:
@@ -72,16 +75,6 @@ const signatures: Partial<
         args.input.quantity ?? existingForm.wasteDetailsQuantity,
       wasteDetailsOnuCode:
         args.input.onuCode ?? existingForm.wasteDetailsOnuCode,
-      transporters: {
-        updateMany: {
-          where: { number: 1 },
-          data: {
-            transporterNumberPlate:
-              args.input.transporterNumberPlate ??
-              transporter?.transporterNumberPlate
-          }
-        }
-      },
       emittedAt: args.input.emittedAt,
       emittedBy: args.input.emittedBy,
       emittedByEcoOrganisme: args.input.emittedByEcoOrganisme ?? false,
@@ -89,9 +82,22 @@ const signatures: Partial<
       emitterIsForeignShip: existingForm.emitterIsForeignShip,
       emitterIsPrivateIndividual: existingForm.emitterIsPrivateIndividual
     };
+
+    if (args.input.transporterNumberPlate && transporter) {
+      formUpdateInput.transporters = {
+        update: {
+          where: { id: transporter.id },
+          data: { transporterNumberPlate: args.input.transporterNumberPlate }
+        }
+      };
+      transportersForValidation[0].transporterNumberPlate =
+        args.input.transporterNumberPlate;
+    }
+
     const futureForm = {
       ...existingForm,
-      ...formUpdateInput
+      ...formUpdateInput,
+      transporters: transportersForValidation
     };
 
     await wasteDetailsSchema.validate(futureForm);
@@ -118,55 +124,59 @@ const signatures: Partial<
     );
 
     const existingFullForm = await getFullForm(existingForm);
-    const transporter = getFirstTransporterSync(existingFullForm.forwardedIn!);
+
+    const transporters = await getTransporters(existingFullForm.forwardedIn!);
+    const transportersForValidation: Transporter[] = transporters; // payload de validation
+
+    const transporter = getFirstTransporterSync({ transporters });
+
+    const forwardedInUpdateInput: Prisma.FormUpdateWithoutForwardingInput = {
+      status: Status.SIGNED_BY_PRODUCER,
+      wasteDetailsPackagingInfos:
+        prismaJsonNoNull(args.input.packagingInfos) ??
+        prismaJsonNoNull(
+          existingFullForm.forwardedIn?.wasteDetailsPackagingInfos
+        ) ??
+        prismaJsonNoNull(existingFullForm.wasteDetailsPackagingInfos),
+      wasteDetailsQuantity:
+        args.input.quantity ??
+        existingFullForm.forwardedIn?.wasteDetailsQuantity ??
+        existingFullForm.wasteDetailsQuantity,
+      wasteDetailsOnuCode:
+        args.input.onuCode ??
+        existingFullForm.forwardedIn?.wasteDetailsOnuCode ??
+        existingFullForm.wasteDetailsOnuCode,
+      emittedAt: args.input.emittedAt,
+      emittedBy: args.input.emittedBy
+    };
+
+    if (args.input.transporterNumberPlate && transporter) {
+      forwardedInUpdateInput.transporters = {
+        update: {
+          where: { id: transporter.id },
+          data: { transporterNumberPlate: args.input.transporterNumberPlate }
+        }
+      };
+      transportersForValidation[0].transporterNumberPlate =
+        args.input.transporterNumberPlate;
+    }
+
     const formUpdateInput: Prisma.FormUpdateInput = {
       forwardedIn: {
-        update: {
-          status: Status.SIGNED_BY_PRODUCER,
-          wasteDetailsPackagingInfos:
-            prismaJsonNoNull(args.input.packagingInfos) ??
-            prismaJsonNoNull(
-              existingFullForm.forwardedIn?.wasteDetailsPackagingInfos
-            ) ??
-            prismaJsonNoNull(existingFullForm.wasteDetailsPackagingInfos),
-          wasteDetailsQuantity:
-            args.input.quantity ??
-            existingFullForm.forwardedIn?.wasteDetailsQuantity ??
-            existingFullForm.wasteDetailsQuantity,
-          wasteDetailsOnuCode:
-            args.input.onuCode ??
-            existingFullForm.forwardedIn?.wasteDetailsOnuCode ??
-            existingFullForm.wasteDetailsOnuCode,
-          ...(transporter && args.input.transporterNumberPlate
-            ? {
-                transporters: {
-                  update: {
-                    where: { id: transporter.id },
-                    data: {
-                      transporterNumberPlate: args.input.transporterNumberPlate
-                    }
-                  }
-                }
-              }
-            : {}),
-
-          emittedAt: args.input.emittedAt,
-          emittedBy: args.input.emittedBy
-        }
+        update: forwardedInUpdateInput
       }
     };
+
     const futureFullForm = {
       ...existingFullForm,
       forwardedIn: {
         ...existingFullForm.forwardedIn,
-        ...(formUpdateInput.forwardedIn?.update ?? {})
+        ...forwardedInUpdateInput,
+        transporters: transportersForValidation
       }
     };
 
-    await wasteDetailsSchema.validate({
-      ...futureFullForm.forwardedIn,
-      ...transporter
-    });
+    await wasteDetailsSchema.validate(futureFullForm.forwardedIn);
 
     const updatedForm = await getFormRepository(user).update(
       { id: existingForm.id },

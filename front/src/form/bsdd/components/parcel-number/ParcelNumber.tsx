@@ -9,7 +9,7 @@ import React, { useMemo, lazy } from "react";
 import TdSwitch from "common/components/Switch";
 import { Form, ParcelNumber } from "generated/graphql/types";
 import Tooltip from "common/components/Tooltip";
-import { IconDelete1 } from "common/components/Icons";
+import { IconDelete1 } from "Apps/common/Components/Icons/Icons";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 const newParcelNumber = {

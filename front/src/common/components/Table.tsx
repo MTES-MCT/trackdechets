@@ -1,6 +1,9 @@
 import * as React from "react";
 import classNames from "classnames";
-import { IconTriangleDown, IconTriangleUp } from "./Icons";
+import {
+  IconTriangleDown,
+  IconTriangleUp,
+} from "../../Apps/common/Components/Icons/Icons";
 import styles from "./Table.module.scss";
 
 interface TableProps extends React.HTMLAttributes<HTMLTableElement> {

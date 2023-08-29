@@ -9,11 +9,8 @@ import { searchCompany } from "../../search";
 /**
  * Recherche et renvoie les données diffusables
  * sur une entreprise pour un numéro de SIRET ou de TVA
- * Fusionnant les infos des bases Tracdéchets et S3IC
+ * Fusionnant les infos des bases Trackdéchets et S3IC
  * si elles existent
- * Renvoie le type CompanyPublic pour la query companyInfos
- * et le type CompanySearchPrivate pour la query companyPrivateInfos
- *
  * @param siretOrVat
  */
 export async function getCompanyInfos(

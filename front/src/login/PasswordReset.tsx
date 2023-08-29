@@ -14,7 +14,7 @@ import { NotificationError } from "Apps/common/Components/Error/Error";
 import { Formik, Form, Field } from "formik";
 import PasswordHelper from "common/components/PasswordHelper";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import { IconLock1, IconView } from "common/components/Icons";
+import { IconLock1, IconView } from "Apps/common/Components/Icons/Icons";
 import routes from "Apps/routes";
 
 const PASSWORD_RESET_REQUEST = gql`

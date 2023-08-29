@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Modal, Slideshow, List, ListItem } from "common/components";
-import { IconCheckCircle1 } from "common/components/Icons";
+import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
 
 import styles from "./OnboardingSlideshow.module.scss";
 import slide1Image from "./assets/slide1.gif";

@@ -3,7 +3,7 @@ import {
   IconCheckCircle1,
   IconTrackDechetsCheck,
   IconSignBadgeCircle,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import styles from "./CompanyResult.module.scss";
 import { CompanySearchResult } from "../../../../generated/graphql/types";
 import { generatePath } from "react-router-dom";

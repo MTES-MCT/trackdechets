@@ -38,7 +38,7 @@ import {
   IconDuplicateFile,
   IconTrash,
   IconBSDD,
-} from "common/components/Icons";
+} from "Apps/common/Components/Icons/Icons";
 import routes from "Apps/routes";
 
 import {

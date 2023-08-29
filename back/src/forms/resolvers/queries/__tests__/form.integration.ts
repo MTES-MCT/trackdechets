@@ -4,7 +4,7 @@ import { Query } from "../../../../generated/graphql/types";
 import {
   formFactory,
   toIntermediaryCompany,
-  transportSegmentFactory,
+  bsddTransporterFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -78,9 +78,9 @@ describe("Query.form", () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await createForm({});
 
-    await transportSegmentFactory({
+    await bsddTransporterFactory({
       formId: form.id,
-      segmentPayload: { transporterCompanySiret: company.siret }
+      opts: { transporterCompanySiret: company.siret }
     });
 
     const { query } = makeClient(user);

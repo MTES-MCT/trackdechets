@@ -1,3 +1,5 @@
+@import "src/scss/Breakpoints.scss";
+
 .waste-details {
   display: flex;
   box-sizing: border-box;
@@ -7,7 +9,11 @@
     display: flex;
     flex-direction: column;
     padding: 0 5px;
-    width: 170px;
+
+    @include desktop {
+      width: 170px;
+    }
+
     &__code {
       margin: 0;
       padding: 0;

@@ -13,7 +13,7 @@ import {
   DataListTerm,
 } from "common/components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { IconPaperWrite } from "common/components/Icons";
+import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
 import Packagings from "form/bsdd/components/packagings/Packagings";
 
 interface FormWasteEmissionSummaryProps {

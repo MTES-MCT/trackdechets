@@ -1,6 +1,6 @@
 import React from "react";
 import { usePopperTooltip } from "react-popper-tooltip";
-import { IconQuestionCircle } from "common/components/Icons";
+import { IconQuestionCircle } from "Apps/common/Components/Icons/Icons";
 import style from "./Tooltip.module.scss";
 
 type Props = {

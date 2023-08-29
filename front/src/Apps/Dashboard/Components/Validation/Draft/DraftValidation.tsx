@@ -13,7 +13,7 @@ import { GET_BSDS } from "Apps/common/queries";
 import cogoToast from "cogo-toast";
 import { NotificationError } from "Apps/common/Components/Error/Error";
 import { Loader } from "Apps/common/Components";
-import TdModal from "common/components/Modal";
+import TdModal from "Apps/common/Components/Modal/Modal";
 import {
   bsdaPublishDraft,
   bsddValidationDraftText,

@@ -6,6 +6,7 @@ import {
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
+  bsddTransporterFactory,
   formFactory,
   formWithTempStorageFactory,
   toIntermediaryCompany,
@@ -13,6 +14,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { getTransportersSync } from "../../../database";
 
 const SIGN_TRANSPORT_FORM = `
   mutation SignTransportForm($id: ID!, $input: SignTransportFormInput!, $securityCode: Int) {
@@ -37,7 +39,7 @@ const SIGN_TRANSPORT_FORM = `
 describe("signTransportForm", () => {
   afterEach(resetDatabase);
 
-  it("should sign transport", async () => {
+  it("should sign transport for first transporter", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");
     await transporterReceiptFactory({ company: transporter.company });
@@ -91,6 +93,140 @@ describe("signTransportForm", () => {
         takenOverBy: transporter.user.name
       })
     );
+  });
+
+  it("should sign transport for transporter N", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("ADMIN");
+    const transporter2 = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter1.company });
+    await transporterReceiptFactory({ company: transporter2.company });
+
+    const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+    const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SENT",
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        signedByTransporter: null,
+        sentAt: emittedAt,
+        sentBy: emitter.user.name,
+        takenOverAt,
+        takenOverBy: transporter1.user.name,
+        emittedAt: emittedAt,
+        emittedBy: emitter.user.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter1.company.siret,
+            takenOverAt: new Date("2018-12-12T00:00:00.000Z"),
+            takenOverBy: transporter1.user.name,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const bsddTransporter2 = await bsddTransporterFactory({
+      formId: form.id,
+      opts: {
+        transporterCompanySiret: transporter2.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(transporter2.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          takenOverAt: takenOverAt.toISOString() as any,
+          takenOverBy: transporter2.user.name
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedForm = await prisma.form.findFirstOrThrow({
+      where: { id: form.id },
+      include: { transporters: true }
+    });
+
+    const transporters = getTransportersSync(updatedForm);
+
+    expect(transporters[1].id).toEqual(bsddTransporter2.id);
+    expect(transporters[1].takenOverAt).toEqual(takenOverAt);
+    expect(transporters[1].takenOverBy).toEqual(transporter2.user.name);
+
+    expect(updatedForm.currentTransporterOrgId).toEqual(
+      transporter2.company.siret
+    );
+  });
+
+  it("should not be possible for transporter N+1 to sign if transporter N has not signed", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("ADMIN");
+    const transporter2 = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter1.company });
+    await transporterReceiptFactory({ company: transporter2.company });
+
+    const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+    const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SENT",
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        signedByTransporter: null,
+        sentAt: emittedAt,
+        sentBy: emitter.user.name,
+        takenOverAt,
+        takenOverBy: transporter1.user.name,
+        emittedAt: emittedAt,
+        emittedBy: emitter.user.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter1.company.siret,
+            takenOverAt: null, // transporter n°1 has not signed yet
+            takenOverBy: null,
+            number: 1
+          }
+        }
+      }
+    });
+
+    await bsddTransporterFactory({
+      formId: form.id,
+      opts: {
+        transporterCompanySiret: transporter2.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(transporter2.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          takenOverAt: takenOverAt.toISOString() as any,
+          takenOverBy: transporter2.user.name
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous n'êtes pas autorisé à signer ce bordereau pour cet acteur"
+      })
+    ]);
   });
 
   it("should sign transport with receipt exemption", async () => {

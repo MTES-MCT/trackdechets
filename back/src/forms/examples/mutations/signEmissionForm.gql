@@ -1,9 +1,5 @@
-mutation SignEmissionForm(
-  $id: ID!
-  $input: SignEmissionFormInput!
-  $securityCode: Int
-) {
-  signEmissionForm(id: $id, input: $input, securityCode: $securityCode) {
+mutation SignEmissionForm($id: ID!, $input: SignEmissionFormInput!) {
+  signEmissionForm(id: $id, input: $input) {
     id
     status
   }

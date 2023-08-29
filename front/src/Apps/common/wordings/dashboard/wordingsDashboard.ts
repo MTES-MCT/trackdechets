@@ -3,8 +3,6 @@ export const VALIDER_TRAITEMENT = "Valider le traitement";
 export const VALIDER_ACCEPTATION = "Valider l'acceptation";
 export const PUBLIER = "Publier";
 export const SIGNER = "Signer";
-export const SIGNER_EN_TANT_QUE_TRAVAUX =
-  "Signer en tant qu'entreprise de travaux";
 export const SIGNATURE_ECO_ORG = "Signature Éco-organisme";
 export const FAIRE_SIGNER = "Faire signer";
 export const VALIDER_ENTREPOSAGE_PROVISOIRE =
@@ -13,6 +11,7 @@ export const VALIDER_RECEPTION = "Valider la réception";
 export const VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE =
   "Valider l'acceptation de l'entreposage provisoire";
 export const SIGNATURE_ACCEPTATION_CONTENANT = "Gérer les contenants";
+export const AJOUTER_ANNEXE_1 = "Ajouter une annexe 1";
 
 // status badge
 export const BROUILLON = "Brouillon";

@@ -59,58 +59,74 @@ export const COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA = gql`
   }
 `;
 
+const commonCompanySearchString = `
+orgId
+siret
+vatNumber
+name
+address
+etatAdministratif
+codePaysEtrangerEtablissement
+isRegistered
+trackdechetsId
+contact
+contactPhone
+contactEmail
+companyTypes
+installation {
+  codeS3ic
+  urlFiche
+}
+transporterReceipt {
+  receiptNumber
+  validityLimit
+  department
+}
+traderReceipt {
+  receiptNumber
+  validityLimit
+  department
+}
+brokerReceipt {
+  receiptNumber
+  validityLimit
+  department
+}
+vhuAgrementDemolisseur {
+  agrementNumber
+  department
+}
+vhuAgrementBroyeur {
+  agrementNumber
+  department
+}
+workerCertification {
+  hasSubSectionFour
+  hasSubSectionThree
+  certificationNumber
+  validityLimit
+  organisation
+}`;
+
+const companySearchResultFragment = gql`
+  fragment CompanySearchResultFragment on CompanySearchResult {
+    ${commonCompanySearchString}
+  }
+`;
+
+const companySearchPrivateFragment = gql`
+  fragment CompanySearchPrivateFragment on CompanySearchPrivate {
+    ${commonCompanySearchString}
+  }
+`;
+
 export const SEARCH_COMPANIES = gql`
   query SearchCompanies($clue: String!, $department: String) {
     searchCompanies(clue: $clue, department: $department) {
-      orgId
-      siret
-      vatNumber
-      name
-      address
-      etatAdministratif
-      codePaysEtrangerEtablissement
-      isRegistered
-      trackdechetsId
-      contact
-      contactPhone
-      contactEmail
-      companyTypes
-      installation {
-        codeS3ic
-        urlFiche
-      }
-      transporterReceipt {
-        receiptNumber
-        validityLimit
-        department
-      }
-      traderReceipt {
-        receiptNumber
-        validityLimit
-        department
-      }
-      brokerReceipt {
-        receiptNumber
-        validityLimit
-        department
-      }
-      vhuAgrementDemolisseur {
-        agrementNumber
-        department
-      }
-      vhuAgrementBroyeur {
-        agrementNumber
-        department
-      }
-      workerCertification {
-        hasSubSectionFour
-        hasSubSectionThree
-        certificationNumber
-        validityLimit
-        organisation
-      }
+      ...CompanySearchResultFragment
     }
   }
+  ${companySearchResultFragment}
 `;
 
 /**
@@ -175,31 +191,10 @@ export const COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS = gql`
 export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
   query CompanyPrivateInfos($clue: String!) {
     companyPrivateInfos(clue: $clue) {
-      orgId
-      siret
-      name
-      address
-      vatNumber
-      etatAdministratif
-      statutDiffusionEtablissement
-      isRegistered
-      isAnonymousCompany
-      companyTypes
-      codePaysEtrangerEtablissement
-      transporterReceipt {
-        receiptNumber
-        validityLimit
-        department
-      }
-      workerCertification {
-        hasSubSectionFour
-        hasSubSectionThree
-        certificationNumber
-        validityLimit
-        organisation
-      }
+      ...CompanySearchPrivateFragment
     }
   }
+  ${companySearchPrivateFragment}
 `;
 
 export const TRANSPORTER_RECEIPT = gql`
@@ -209,20 +204,6 @@ export const TRANSPORTER_RECEIPT = gql`
         receiptNumber
         validityLimit
         department
-      }
-    }
-  }
-`;
-
-export const WORKER_CERTIFICATION = gql`
-  query SearchCompanies($clue: String!) {
-    searchCompanies(clue: $clue) {
-      workerCertification {
-        hasSubSectionFour
-        hasSubSectionThree
-        certificationNumber
-        validityLimit
-        organisation
       }
     }
   }

@@ -43,16 +43,19 @@ const companySearchPrivateResolvers: CompanySearchPrivateResolvers = {
   },
   receivedSignatureAutomations: parent => {
     return prisma.company
-      .findUnique({ where: { orgId: parent.orgId } })
+      .findUnique({
+        where: whereSiretOrVatNumber(parent as CompanyBaseIdentifiers)
+      })
       .receivedSignatureAutomations({
         include: { from: true, to: true }
       }) as any;
   },
-  workerCertification: parent => {
-    return prisma.company
-      .findUnique({ where: { id: parent.orgId } })
-      .workerCertification();
-  }
+  workerCertification: parent =>
+    prisma.company
+      .findUnique({
+        where: whereSiretOrVatNumber(parent as CompanyBaseIdentifiers)
+      })
+      .workerCertification()
 };
 
 export default companySearchPrivateResolvers;

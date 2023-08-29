@@ -2,10 +2,10 @@ import {
   userWithCompanyFactory,
   formFactory,
   userFactory,
-  transportSegmentFactory,
   siretify,
   transporterReceiptFactory,
-  companyFactory
+  companyFactory,
+  bsddTransporterFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
@@ -300,9 +300,9 @@ describe("{ mutation { prepareSegment } }", () => {
       ownerId: owner.id
     });
     const transporterCompanySiret = siretify(3);
-    await transportSegmentFactory({
+    await bsddTransporterFactory({
       formId: otherForm.id,
-      segmentPayload: { transporterCompanySiret }
+      opts: { transporterCompanySiret }
     });
 
     const transporterOrgId = company.orgId;
@@ -453,7 +453,7 @@ describe("{ mutation { prepareSegment } }", () => {
     }`
     );
     expect(errorToPrepare.length).toBe(1);
-    expect(errorToPrepare[0].extensions.code).toBe("FORBIDDEN");
+    expect(errorToPrepare[0].extensions?.code).toBe("FORBIDDEN");
     expect(errorToPrepare[0].message).toBe(
       "Vous ne disposez pas des permissions nécessaires"
     );
