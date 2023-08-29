@@ -39,7 +39,6 @@ import {
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
   SIGNER,
-  SIGNER_EN_TANT_QUE_TRAVAUX,
   SIGNER_PAR_ENTREPOS_PROVISOIRE,
   SIGNER_PAR_ENTREPRISE_TRAVAUX,
   SIGNE_PAR_EMETTEUR,
@@ -288,7 +287,7 @@ export const getIsNonDraftLabel = (
     isBsdaSignWorker(bsd, currentSiret) &&
     permissions.includes(UserPermission.BsdCanSignWork)
   ) {
-    return SIGNER_EN_TANT_QUE_TRAVAUX;
+    return SIGNER;
   }
 
   if (isBsdasri(bsd.type)) {
@@ -575,7 +574,7 @@ export const getSignByProducerBtnLabel = (
   }
 
   if (currentSiret === bsd.worker?.company?.siret) {
-    return SIGNER_EN_TANT_QUE_TRAVAUX;
+    return SIGNER;
   }
   return "";
 };

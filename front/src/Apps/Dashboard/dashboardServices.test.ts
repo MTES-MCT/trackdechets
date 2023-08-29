@@ -43,7 +43,6 @@ import {
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
   SIGNER,
-  SIGNER_EN_TANT_QUE_TRAVAUX,
   VALIDER_ACCEPTATION,
   VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE,
   VALIDER_ENTREPOSAGE_PROVISOIRE,
@@ -1114,7 +1113,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual("");
     });
 
-    it("should return SIGNER_EN_TANT_QUE_TRAVAUX when currentSiret is same as worker company siret", () => {
+    it("should return SIGNER when currentSiret is same as worker company siret", () => {
       const permissions: UserPermission[] = [UserPermission.BsdCanSignWork];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
@@ -1122,7 +1121,7 @@ describe("dashboardServices", () => {
         permissions,
         "toCollectTab"
       );
-      expect(result).toEqual(SIGNER_EN_TANT_QUE_TRAVAUX);
+      expect(result).toEqual(SIGNER);
     });
 
     it("should return an empty string when none of the conditions are met", () => {
