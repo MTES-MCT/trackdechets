@@ -25,8 +25,10 @@ export default function Layout({
   children,
   isAuthenticated,
   isAdmin,
+  v2banner,
 }: AuthProps & {
   children: ReactNode;
+  v2banner?: JSX.Element;
 }) {
   const { data } = useQuery<Pick<Query, "warningMessage">>(GET_WARNING_MESSAGE);
 
@@ -67,6 +69,7 @@ export default function Layout({
           ></div>
         </div>
       )}
+      {v2banner}
       {data?.warningMessage && (
         <div
           className="notification notification--error tw-text-center"
