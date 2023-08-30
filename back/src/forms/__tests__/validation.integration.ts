@@ -1,4 +1,9 @@
-import { BsddTransporter, EmitterType, Form } from "@prisma/client";
+import {
+  BsddTransporter,
+  EmitterType,
+  Form,
+  ProcessingMode
+} from "@prisma/client";
 import {
   draftFormSchema,
   sealedFormSchema,
@@ -1355,6 +1360,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       noTraceability: true,
       nextDestinationProcessingOperation: "D 8",
@@ -1374,6 +1380,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       noTraceability: false,
       nextDestinationProcessingOperation: "D 8",
@@ -1393,6 +1400,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
@@ -1411,6 +1419,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       noTraceability: false,
       nextDestinationProcessingOperation: "D 8",
@@ -1430,6 +1439,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
@@ -1451,6 +1461,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
@@ -1473,6 +1484,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
@@ -1495,6 +1507,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Traitement biologique",
       noTraceability: true
     };
@@ -1510,6 +1523,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Traitement biologique",
       noTraceability: false
     };
@@ -1521,6 +1535,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Traitement biologique"
     };
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
@@ -1531,6 +1546,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Traitement biologique",
       noTraceability: null
     };
@@ -1602,6 +1618,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       noTraceability: false
     };
@@ -1628,6 +1645,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "R 12",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       nextDestinationProcessingOperation: "R 1",
       noTraceability: true
@@ -1640,6 +1658,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "R 12",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       noTraceability: true,
       nextDestinationProcessingOperation: "R 1",
@@ -1658,6 +1677,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "R 12",
+      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       noTraceability: true
     };
@@ -1667,4 +1687,56 @@ describe("processedInfoSchema", () => {
       "Destination ultérieure : L'opération de traitement est obligatoire"
     );
   });
+
+  it.each(["", null, undefined, "INVALID_VALUE"])(
+    "processingModeDone must be defined and must be a ProcessingMode",
+    async processingModeDone => {
+      const processedInfo = {
+        processedBy: "John Snow",
+        processedAt: new Date(),
+        processingOperationDone: "R 12",
+        processingModeDone,
+        processingOperationDescription: "Regroupement",
+        noTraceability: true,
+        nextDestinationProcessingOperation: "R 1",
+        nextDestinationCompanyName: "",
+        nextDestinationCompanySiret: "",
+        nextDestinationCompanyAddress: "",
+        nextDestinationCompanyContact: "",
+        nextDestinationCompanyPhone: "",
+        nextDestinationCompanyMail: ""
+      };
+
+      const isValid = await processedInfoSchema.isValid(processedInfo);
+
+      expect(isValid).toBeFalsy();
+    }
+  );
+
+  it.each(Object.values(ProcessingMode))(
+    "should be valid if processingMode is valid",
+    async processingModeDone => {
+      console.log("processingModeDone", processingModeDone);
+
+      const processedInfo = {
+        processedBy: "John Snow",
+        processedAt: new Date(),
+        processingOperationDone: "R 12",
+        processingModeDone,
+        processingOperationDescription: "Regroupement",
+        noTraceability: true,
+        nextDestinationProcessingOperation: "R 1",
+        nextDestinationCompanyName: "",
+        nextDestinationCompanySiret: "",
+        nextDestinationCompanyAddress: "",
+        nextDestinationCompanyContact: "",
+        nextDestinationCompanyPhone: "",
+        nextDestinationCompanyMail: ""
+      };
+
+      const isValid = await processedInfoSchema.isValid(processedInfo);
+
+      expect(isValid).toBeTruthy();
+    }
+  );
 });

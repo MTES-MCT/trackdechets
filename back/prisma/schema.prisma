@@ -144,6 +144,18 @@ enum BsdType {
   BSVHU
 }
 
+// Mode de traitement. Directement dépendant de l'opération de traitement
+enum ProcessingMode {
+  // Réutilisation
+  REUSE
+  // Recyclage et les autres formes de valorisation de la matière
+  RECYCLING
+  // Valorisation énergétique
+  ENERGY_RECOVERY
+  // Elimination (incinération sans valorisation énergétique et stockage en décharge)
+  ELIMINATION
+}
+
 model AccessToken {
   id            String       @id @default(cuid())
   createdAt     DateTime     @default(now()) @db.Timestamptz(6)
@@ -347,6 +359,7 @@ model Form {
   quantityReceived                   Float?
   quantityReceivedType               QuantityType?
   processingOperationDone            String?
+  processingModeDone                 ProcessingMode?
   wasteDetailsName                   String?
   isDeleted                          Boolean?                @default(false)
   receivedBy                         String?

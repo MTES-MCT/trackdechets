@@ -11,7 +11,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
-import { Status } from "@prisma/client";
+import { ProcessingMode, Status } from "@prisma/client";
 import {
   Mutation,
   MutationMarkAsProcessedArgs
@@ -60,6 +60,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -86,6 +87,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -127,6 +129,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -161,6 +164,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -206,6 +210,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -261,6 +266,7 @@ describe("mutation.markAsProcessed", () => {
         id: form.id,
         processedInfo: {
           processingOperationDone: processingOperation!.code,
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -289,6 +295,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 18",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -331,6 +338,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -372,6 +380,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "R 1",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -421,6 +430,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 13",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           noTraceability: true,
@@ -463,6 +473,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 13",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           noTraceability: true,
@@ -507,6 +518,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 13",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           noTraceability: true,
@@ -542,6 +554,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -586,6 +599,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -632,6 +646,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -676,6 +691,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -725,6 +741,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -783,6 +800,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -828,6 +846,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -860,6 +879,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: format(processedAt, f)
         }
@@ -894,6 +914,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z" as any,
           noTraceability: true,
@@ -928,6 +949,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z" as any,
           nextDestination: {
@@ -973,6 +995,7 @@ describe("mutation.markAsProcessed", () => {
           processedAt: new Date("2022-01-01").toISOString() as any,
           processedBy: "John Snow",
           processingOperationDone: "R 1",
+          processingModeDone: ProcessingMode.ELIMINATION,
           processingOperationDescription: "Incinération"
         }
       }
@@ -1006,6 +1029,7 @@ describe("mutation.markAsProcessed", () => {
         id: form.id,
         processedInfo: {
           processingOperationDone: processingOperation!.code,
+          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }

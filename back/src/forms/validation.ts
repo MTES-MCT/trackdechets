@@ -6,7 +6,8 @@ import {
   QuantityType,
   Status,
   TransportMode,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  ProcessingMode
 } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
 import { checkVAT } from "jsvat";
@@ -1377,6 +1378,10 @@ const processedInfoSchemaFn: (
         PROCESSING_AND_REUSE_OPERATIONS_CODES,
         INVALID_PROCESSING_OPERATION
       ),
+    processingModeDone: yup
+      .string()
+      .required()
+      .oneOf(Object.values(ProcessingMode)),
     processingOperationDescription: yup.string().nullable()
   });
 
