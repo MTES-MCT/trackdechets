@@ -1,8 +1,5 @@
 import express, { json } from "express";
 import supertest from "supertest";
-import logger from "../../../logging/logger";
-import { graphqlQueryParserMiddleware } from "../graphqlQueryParser";
-import loggingMiddleware from "../loggingMiddleware";
 import { graphqlBodyParser } from "../graphqlBodyParser";
 
 describe("graphqlBodyParser", () => {
