@@ -56,6 +56,24 @@ export async function cachedGet<T>(
     return parser.parse(redisValue);
   }
 
+  // Distributed cache
+  // If cachedGet is called by a resolver N times simultaneously,
+  // we only want the getter to be called once.
+  // The call returns null if the NX condition is not met,
+  // meaning the lock is already acquired.
+  // And it just has to retry => return by calling the function from the start.
+  const acquireLock = await setInCache(
+    `${cacheKey}:lock`,
+    new Date().getTime(),
+    {
+      NX: true, // Only set the key if it does not already exist
+      EX: options.EX // Same TTL as the cached value
+    }
+  );
+  if (acquireLock === null) {
+    return cachedGet(getter, objectType, itemKey, settings);
+  }
+
   const dbValue = await getter(itemKey);
 
   // No need to await the set, and it doesn't really matters if it fails
@@ -73,7 +91,7 @@ export async function setInCache(
     .map(optionKey => {
       const val = options[optionKey];
       // Some options don't have an associated value
-      if (isNaN(val)) {
+      if (isNaN(val) || (val && ["NX", "XX"].includes(optionKey))) {
         return [optionKey];
       }
       return [optionKey, val];
