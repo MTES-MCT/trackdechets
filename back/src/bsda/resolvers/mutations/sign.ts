@@ -1,4 +1,10 @@
-import { Bsda, BsdaStatus, BsdaType, Prisma } from "@prisma/client";
+import {
+  Bsda,
+  BsdaStatus,
+  BsdaType,
+  Prisma,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import {
   AlreadySignedError,
   InvalidSignatureError
@@ -206,6 +212,19 @@ async function signOperation(
     status: await getNextStatus(bsda, input.type),
     ...(nextStatus === BsdaStatus.REFUSED && { forwardingId: null })
   };
+
+  if (
+    bsda.destinationReceptionAcceptationStatus &&
+    [
+      WasteAcceptationStatus.REFUSED,
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+    ].includes(bsda.destinationReceptionAcceptationStatus)
+  ) {
+    const refusedEmail = await renderBsdaRefusedEmail(bsda);
+    if (refusedEmail) {
+      sendMail(refusedEmail);
+    }
+  }
 
   return updateBsda(user, bsda, updateInput);
 }
