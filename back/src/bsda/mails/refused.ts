@@ -4,6 +4,8 @@ import { getCompanyAdminUsers } from "../../companies/database";
 import prisma from "../../prisma";
 import { buildPdfAsBase64 } from "../pdf/generator";
 import DREALS from "../../common/constants/DREALS";
+import { formNotAccepted, formPartiallyRefused } from "../../mailer/templates";
+import { renderMail } from "../../mailer/templates/renderers";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
@@ -51,10 +53,34 @@ export async function renderBsdaRefusedEmail(
   ].map(admin => ({ email: admin.email, name: admin.name ?? "" }));
 
   // Get formNotAccepted or formPartiallyRefused mail function according to wasteAcceptationStatus value
-  // const mailTemplate = {
-  //   REFUSED: formNotAccepted,
-  //   PARTIALLY_REFUSED: formPartiallyRefused
-  // }[bsda.destinationReceptionAcceptationStatus!];
+  const mailTemplate = {
+    REFUSED: formNotAccepted,
+    PARTIALLY_REFUSED: formPartiallyRefused
+  }[bsda.destinationReceptionAcceptationStatus!];
 
-  return;
+  return renderMail(mailTemplate, {
+    to,
+    cc,
+    variables: {
+      form: {
+        readableId: bsda.id,
+        wasteDetailsName: bsda.wasteMaterialName,
+        wasteDetailsCode: bsda.wasteCode,
+        emitterCompanyName: bsda.emitterCompanyName,
+        emitterCompanySiret: bsda.emitterCompanySiret,
+        emitterCompanyAddress: bsda.emitterCompanyAddress,
+        signedAt: bsda.destinationReceptionDate,
+        recipientCompanyName: bsda.destinationCompanyName,
+        recipientCompanySiret: bsda.destinationCompanySiret,
+        wasteRefusalReason: bsda.destinationReceptionRefusalReason,
+        transporterIsExemptedOfReceipt: bsda.transporterRecepisseIsExempted,
+        transporterCompanyName: bsda.transporterCompanyName,
+        transporterCompanySiret: bsda.transporterCompanySiret,
+        transporterReceipt: bsda.transporterRecepisseNumber,
+        sentBy: bsda.emitterEmissionSignatureAuthor,
+        quantityReceived: bsda.destinationReceptionWeight
+      }
+    },
+    attachment: attachmentData
+  });
 }

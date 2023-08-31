@@ -6,10 +6,17 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import {
+  BsdTransporterReceiptPart,
+  getTransporterReceipt
+} from "../../../bsdasris/recipify";
+import {
   AlreadySignedError,
   InvalidSignatureError
 } from "../../../bsvhu/errors";
+import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { runInTransaction } from "../../../common/repository/helper";
+import { InvalidTransition } from "../../../forms/errors";
 import {
   BsdaSignatureInput,
   BsdaSignatureType,
@@ -19,20 +26,14 @@ import {
 import { sendMail } from "../../../mailer/mailing";
 import { finalDestinationModified } from "../../../mailer/templates";
 import { renderMail } from "../../../mailer/templates/renderers";
+import { checkCanSignFor } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaHistory, getBsdaOrNotFound } from "../../database";
 import { machine } from "../../machine";
+import { renderBsdaRefusedEmail } from "../../mails/refused";
 import { BsdaRepository, getBsdaRepository } from "../../repository";
-import { runInTransaction } from "../../../common/repository/helper";
 import { parseBsda } from "../../validation/validate";
-import { checkCanSignFor } from "../../../permissions";
-import { InvalidTransition } from "../../../forms/errors";
-import {
-  BsdTransporterReceiptPart,
-  getTransporterReceipt
-} from "../../../bsdasris/recipify";
-import { UserInputError } from "../../../common/errors";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,
