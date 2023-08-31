@@ -291,6 +291,53 @@ describe("sirenifyFormInput", () => {
       searchResults[intermediary2.company.siret!].address
     );
   });
+
+  it("should overwrite `name` and `address` if company is not diffusible but registered in Trackdéchets", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER", {
+      siret: "90398556200011",
+      orgId: "90398556200011"
+    });
+
+    function searchResult(companyName: string) {
+      return {
+        name: companyName,
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "N",
+        isRegistered: true
+      } as CompanySearchResult;
+    }
+
+    const searchResults = {
+      [emitter.company.siret!]: searchResult("émetteur")
+    };
+
+    searchCompanySpy.mockImplementation((clue: string) => {
+      return Promise.resolve(searchResults[clue]);
+    });
+
+    const formInput: CreateFormInput = {
+      emitter: {
+        company: {
+          siret: "90398556200011"
+        }
+      }
+    };
+
+    const sirenified = await sirenifyFormInput(formInput, {
+      email: "john.snow@trackdechets.fr",
+      auth: AuthType.Bearer
+    } as Express.User);
+
+    expect(sirenified).toMatchObject({
+      emitter: {
+        company: {
+          name: "émetteur",
+          address: "Adresse émetteur",
+          siret: "90398556200011"
+        }
+      }
+    });
+  });
 });
 
 describe("sirenifyResealedFormInput", () => {
