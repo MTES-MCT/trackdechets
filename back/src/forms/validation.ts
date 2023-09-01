@@ -69,6 +69,7 @@ import { format, sub } from "date-fns";
 import { getFirstTransporterSync } from "./database";
 import { UserInputError } from "../common/errors";
 import { ConditionConfig } from "yup/lib/Condition";
+import { getProcessingModesFromProcessingOperation } from "../common/processingModes";
 // set yup default error messages
 configureYup();
 
@@ -1380,8 +1381,18 @@ const processedInfoSchemaFn: (
       ),
     processingModeDone: yup
       .string()
-      .required()
-      .oneOf(Object.values(ProcessingMode)),
+      .oneOf(Object.values(ProcessingMode))
+      .test(
+        "processing-mode-matches-processing-operation",
+        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
+        function (item) {
+          const modes = getProcessingModesFromProcessingOperation(
+            this.parent.processingOperationDone
+          );
+
+          return (!item && !modes.length) || modes.includes(item ?? "");
+        }
+      ),
     processingOperationDescription: yup.string().nullable()
   });
 

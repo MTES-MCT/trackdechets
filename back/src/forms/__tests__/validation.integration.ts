@@ -1360,7 +1360,6 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
-      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       noTraceability: true,
       nextDestinationProcessingOperation: "D 8",
@@ -1380,7 +1379,6 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
-      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       noTraceability: false,
       nextDestinationProcessingOperation: "D 8",
@@ -1400,7 +1398,6 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
-      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
@@ -1419,7 +1416,6 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
-      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       noTraceability: false,
       nextDestinationProcessingOperation: "D 8",
@@ -1439,7 +1435,6 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
-      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
@@ -1461,7 +1456,6 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
-      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
@@ -1484,7 +1478,6 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
-      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
@@ -1618,7 +1611,6 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 13",
-      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       noTraceability: false
     };
@@ -1645,7 +1637,6 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "R 12",
-      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       nextDestinationProcessingOperation: "R 1",
       noTraceability: true
@@ -1658,7 +1649,6 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "R 12",
-      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       noTraceability: true,
       nextDestinationProcessingOperation: "R 1",
@@ -1677,7 +1667,6 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "R 12",
-      processingModeDone: ProcessingMode.ELIMINATION,
       processingOperationDescription: "Regroupement",
       noTraceability: true
     };
@@ -1688,55 +1677,35 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  it.each(["", null, undefined, "INVALID_VALUE"])(
-    "processingModeDone must be defined and must be a ProcessingMode",
-    async processingModeDone => {
-      const processedInfo = {
-        processedBy: "John Snow",
-        processedAt: new Date(),
-        processingOperationDone: "R 12",
-        processingModeDone,
-        processingOperationDescription: "Regroupement",
-        noTraceability: true,
-        nextDestinationProcessingOperation: "R 1",
-        nextDestinationCompanyName: "",
-        nextDestinationCompanySiret: "",
-        nextDestinationCompanyAddress: "",
-        nextDestinationCompanyContact: "",
-        nextDestinationCompanyPhone: "",
-        nextDestinationCompanyMail: ""
-      };
+  it("should be valid if processingMode is compatible", async () => {
+    const processedInfo = {
+      nextDestination: null,
+      noTraceability: null,
+      processedAt: new Date(),
+      processedBy: "Test",
+      processingOperationDescription: "test",
+      processingOperationDone: "R 2",
+      processingModeDone: ProcessingMode.REUSE
+    };
 
-      const isValid = await processedInfoSchema.isValid(processedInfo);
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
+  });
 
-      expect(isValid).toBeFalsy();
-    }
-  );
+  it("should not be valid if processingMode is not compatible", async () => {
+    const processedInfo = {
+      nextDestination: null,
+      noTraceability: null,
+      processedAt: new Date(),
+      processedBy: "Test",
+      processingOperationDescription: "test",
+      processingOperationDone: "R 2",
+      processingModeDone: ProcessingMode.ENERGY_RECOVERY
+    };
 
-  it.each(Object.values(ProcessingMode))(
-    "should be valid if processingMode is valid",
-    async processingModeDone => {
-      console.log("processingModeDone", processingModeDone);
+    const validateFn = () => processedInfoSchema.validate(processedInfo);
 
-      const processedInfo = {
-        processedBy: "John Snow",
-        processedAt: new Date(),
-        processingOperationDone: "R 12",
-        processingModeDone,
-        processingOperationDescription: "Regroupement",
-        noTraceability: true,
-        nextDestinationProcessingOperation: "R 1",
-        nextDestinationCompanyName: "",
-        nextDestinationCompanySiret: "",
-        nextDestinationCompanyAddress: "",
-        nextDestinationCompanyContact: "",
-        nextDestinationCompanyPhone: "",
-        nextDestinationCompanyMail: ""
-      };
-
-      const isValid = await processedInfoSchema.isValid(processedInfo);
-
-      expect(isValid).toBeTruthy();
-    }
-  );
+    await expect(validateFn()).rejects.toThrow(
+      "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+    );
+  });
 });

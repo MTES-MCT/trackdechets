@@ -164,7 +164,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -210,7 +209,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -295,7 +293,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 18",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -338,7 +335,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -380,7 +376,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "R 1",
-          processingModeDone: ProcessingMode.ELIMINATION,
+          processingModeDone: ProcessingMode.ENERGY_RECOVERY,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -430,7 +426,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 13",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           noTraceability: true,
@@ -473,7 +468,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 13",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           noTraceability: true,
@@ -518,7 +512,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 13",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           noTraceability: true,
@@ -554,7 +547,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -599,7 +591,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -646,7 +637,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -691,7 +681,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -741,7 +730,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -914,7 +902,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z" as any,
           noTraceability: true,
@@ -949,7 +936,6 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
-          processingModeDone: ProcessingMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z" as any,
           nextDestination: {
@@ -995,7 +981,7 @@ describe("mutation.markAsProcessed", () => {
           processedAt: new Date("2022-01-01").toISOString() as any,
           processedBy: "John Snow",
           processingOperationDone: "R 1",
-          processingModeDone: ProcessingMode.ELIMINATION,
+          processingModeDone: ProcessingMode.ENERGY_RECOVERY,
           processingOperationDescription: "Incinération"
         }
       }

@@ -139,7 +139,7 @@ input ProcessedFormInput {
   processingOperationDone: String!
 
   "Mode de traitement"
-  processingModeDone: ProcessingMode!
+  processingModeDone: ProcessingMode
 
   """
   Description de l'opération d’élimination / valorisation (case 11)
