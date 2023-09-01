@@ -75,11 +75,9 @@ export async function cachedGet<T>(
     return cachedGet(getter, objectType, itemKey, settings);
   }
 
-  const dbValue = await getter(itemKey).catch(_ => {
+  const dbValue = await getter(itemKey).catch(err => {
     redisClient.unlink(lockKey);
-    throw new Error(
-      `cachedGet getter failed. Unable to cache data for ${cacheKey}.`
-    );
+    throw err;
   });
 
   // No need to await the set, and it doesn't really matters if it fails
