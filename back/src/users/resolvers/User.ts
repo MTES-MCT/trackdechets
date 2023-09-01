@@ -9,7 +9,15 @@ const userResolvers: UserResolvers = {
   // Information from TD and s3ic are merged in a separate resolver (CompanyPrivate.installation)
   // to make up an instance of CompanyPrivate
   companies: async parent => {
-    const companies = await getUserCompanies(parent.id);
+    const companyAssociations = await prisma.companyAssociation.findMany({
+      where: { userId: parent.id },
+      include: { company: true }
+    });
+    const companies = companyAssociations.map(association => ({
+      ...association.company,
+      userRole: association.role
+    }));
+
     return companies.map(async company => {
       const companyPrivate: CompanyPrivate = convertUrls(company);
 

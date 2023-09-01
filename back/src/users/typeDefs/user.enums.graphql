@@ -23,6 +23,8 @@ Le rôle `ADMIN` a les mêmes permissions que le rôle `MEMBER` avec en plus :
 enum UserRole {
   MEMBER
   ADMIN
+  READER
+  DRIVER
 }
 
 enum UserPermission {
