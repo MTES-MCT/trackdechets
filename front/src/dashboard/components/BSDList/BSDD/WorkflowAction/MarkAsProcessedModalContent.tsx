@@ -55,6 +55,7 @@ function MarkAsProcessedModalContent({ data, onClose }) {
           <Formik<ProcessedFormInput>
             initialValues={{
               processingOperationDone: "",
+              processingModeDone: undefined,
               processingOperationDescription: "",
               processedBy: "",
               processedAt: new Date().toISOString(),
