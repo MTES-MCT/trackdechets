@@ -19,7 +19,9 @@ jest.mock("ioredis", () =>
       return Promise.resolve(redisCache[key]).catch(() => null);
     },
     set: (...args) => mockRedisSet(...args),
-    unlink: () => {}
+    unlink: () => {
+      return Promise.resolve();
+    }
   }))
 );
 
