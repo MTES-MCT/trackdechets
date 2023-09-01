@@ -1,6 +1,5 @@
 import { convertUrls } from "../../companies/database";
 import { UserResolvers, CompanyPrivate } from "../../generated/graphql/types";
-import { getUserCompanies } from "../database";
 import { nafCodes } from "../../common/constants/NAF";
 import prisma from "../../prisma";
 
