@@ -1,5 +1,9 @@
 import { convertUrls } from "../../companies/database";
-import { UserResolvers, CompanyPrivate } from "../../generated/graphql/types";
+import {
+  UserResolvers,
+  CompanyPrivate,
+  UserRole
+} from "../../generated/graphql/types";
 import { nafCodes } from "../../common/constants/NAF";
 import prisma from "../../prisma";
 
@@ -14,7 +18,7 @@ const userResolvers: UserResolvers = {
     });
     const companies = companyAssociations.map(association => ({
       ...association.company,
-      userRole: association.role
+      userRole: association.role as UserRole
     }));
 
     return companies.map(async company => {
