@@ -1,4 +1,5 @@
 import IORedis from "ioredis";
+import { setTimeout } from "timers/promises";
 
 const { REDIS_URL } = process.env;
 
@@ -62,19 +63,24 @@ export async function cachedGet<T>(
   // The call returns null if the NX condition is not met,
   // meaning the lock is already acquired.
   // And it just has to retry => return by calling the function from the start.
-  const acquireLock = await setInCache(
-    `${cacheKey}:lock`,
-    new Date().getTime(),
-    {
-      NX: true, // Only set the key if it does not already exist
-      EX: options.EX // Same TTL as the cached value
-    }
-  );
+  const lockKey = `${cacheKey}:lock`;
+  const acquireLock = await setInCache(lockKey, new Date().getTime(), {
+    NX: true, // Only set the key if it does not already exist
+    EX: options.EX // Same TTL as the cached value
+  });
   if (acquireLock === null) {
+    // Wait for 5ms for the getter to cache the value.
+    // To avoid spamming redis with get(cacheKey) requests
+    await setTimeout(5);
     return cachedGet(getter, objectType, itemKey, settings);
   }
 
-  const dbValue = await getter(itemKey);
+  const dbValue = await getter(itemKey).catch(_ => {
+    redisClient.unlink(lockKey);
+    throw new Error(
+      `cachedGet getter failed. Unable to cache data for ${cacheKey}.`
+    );
+  });
 
   // No need to await the set, and it doesn't really matters if it fails
   setInCache(cacheKey, parser.stringify(dbValue), options).catch(_ => null);
