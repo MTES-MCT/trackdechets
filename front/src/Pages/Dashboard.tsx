@@ -257,9 +257,9 @@ const DashboardPage = () => {
         variables.where = routePredicate;
       }
       const filterKeys = Object.keys(filterValues);
-      const filters = filterList.filter(filter =>
-        filterKeys.includes(filter.name)
-      );
+      const filters = filterList
+        .flat()
+        .filter(filter => filterKeys.includes(filter.name));
       filters.forEach(f => {
         const predicate = filterPredicates.find(
           filterPredicate => filterPredicate.filterName === f.name
@@ -518,9 +518,6 @@ const DashboardPage = () => {
     ? loadingBsdaReviews || loadingBsddReviews
     : loading;
 
-  const sortedFilterList = filterList.sort((a, b) =>
-    a.label.localeCompare(b.label)
-  );
   return (
     <div className="dashboard-page">
       {!isReviewsTab && (
@@ -548,10 +545,7 @@ const DashboardPage = () => {
         </div>
       )}
       {isFiltersOpen && (
-        <Filters
-          filters={sortedFilterList}
-          onApplyFilters={handleFiltersSubmit}
-        />
+        <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
       )}
       {isFetchingMore && <Loader />}
       {isLoadingBsds && !isFetchingMore ? (
