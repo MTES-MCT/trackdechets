@@ -22,8 +22,8 @@ import { UserInputError } from "../common/errors";
 import { SearchOptions } from "./sirene/trackdechets/types";
 
 interface SearchCompaniesDeps {
-  searchCompany: (clue: string) => Promise<CompanySearchResult>;
-  searchCompanies: (
+  injectedSearchCompany: (clue: string) => Promise<CompanySearchResult>;
+  injectedSearchCompanies: (
     clue: string,
     department?: string | null,
     options?: Partial<SearchOptions>,
@@ -162,7 +162,7 @@ export async function searchCompany(
 
 // used for dependency injection in tests to easily mock `searchCompany`
 export const makeSearchCompanies =
-  ({ searchCompany, searchCompanies }: SearchCompaniesDeps) =>
+  ({ injectedSearchCompany, injectedSearchCompanies }: SearchCompaniesDeps) =>
   (
     clue: string,
     department?: string | null,
@@ -174,7 +174,7 @@ export const makeSearchCompanies =
       if (isForeignVat(cleanedClue) && allowForeignCompanies === false) {
         return Promise.resolve([]);
       }
-      return searchCompany(cleanedClue)
+      return injectedSearchCompany(cleanedClue)
         .then(c => {
           return (
             [c]
@@ -189,7 +189,7 @@ export const makeSearchCompanies =
         .catch(_ => []);
     }
     // fuzzy searching only for French companies
-    return searchCompanies(clue, department).then(async results => {
+    return injectedSearchCompanies(clue, department).then(async results => {
       if (!results) {
         return [];
       }
@@ -302,6 +302,6 @@ async function searchVatFrOnlyOrNotFound(
 }
 
 export const searchCompanies = makeSearchCompanies({
-  searchCompany,
-  searchCompanies: decoratedSearchCompanies
+  injectedSearchCompany: searchCompany,
+  injectedSearchCompanies: decoratedSearchCompanies
 });

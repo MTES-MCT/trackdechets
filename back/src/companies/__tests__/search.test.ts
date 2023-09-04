@@ -104,8 +104,8 @@ describe("searchCompanies", () => {
   const searchCompaniesMockFn = jest.fn();
   const searchCompanyMock = jest.fn();
   const searchCompanies = makeSearchCompanies({
-    searchCompany: searchCompanyMock,
-    searchCompanies: searchCompaniesMockFn
+    injectedSearchCompany: searchCompanyMock,
+    injectedSearchCompanies: searchCompaniesMockFn
   });
 
   beforeEach(() => {
