@@ -392,9 +392,9 @@ describe("sealedFormSchema", () => {
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
         `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets` +
-        " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
-        " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
-        " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+          " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
+          " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
+          " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
       );
     });
 
@@ -418,9 +418,9 @@ describe("sealedFormSchema", () => {
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
         `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets` +
-        " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
-        " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
-        " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+          " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
+          " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
+          " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
       );
     });
 
@@ -455,9 +455,9 @@ describe("sealedFormSchema", () => {
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
         `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est` +
-        " pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement." +
-        " Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur" +
-        " de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+          " pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement." +
+          " Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur" +
+          " de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
       );
     });
 
@@ -1677,7 +1677,7 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  it("should be valid if processingMode is compatible", async () => {
+  it("should be valid if operationMode is compatible", async () => {
     const processedInfo = {
       nextDestination: null,
       noTraceability: null,
@@ -1691,7 +1691,7 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  it("should not be valid if processingMode is not compatible", async () => {
+  it("should not be valid if operationMode is not compatible", async () => {
     const processedInfo = {
       nextDestination: null,
       noTraceability: null,

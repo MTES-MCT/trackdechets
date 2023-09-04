@@ -29,8 +29,8 @@ export const getOperationModesFromOperationCode = (
   return [];
 };
 
-export const getOperationModeLabel = (processingMode: OperationMode) => {
-  switch (processingMode) {
+export const getOperationModeLabel = (operationMode: OperationMode) => {
+  switch (operationMode) {
     case OperationMode.Elimination:
       return "Elimination (incinération sans valorisation énergétique et stockage en décharge)";
     case OperationMode.Recyclage:
