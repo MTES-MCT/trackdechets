@@ -1,6 +1,8 @@
 import { isDate, isEqual } from "date-fns";
-import { Form } from "@prisma/client";
-import { expandFormFromDb } from "../converter";
+import {
+  PrismaFormWithForwardedInAndTransporters,
+  expandFormFromDb
+} from "../converter";
 
 export function isArray(obj) {
   return {}.toString.apply(obj) === "[object Array]";
@@ -90,16 +92,16 @@ export function objectDiff(o1, o2) {
   }, {});
 }
 
-export async function tempStorageDiff(
-  t1: Form | null | undefined,
-  t2: Form | null | undefined
+function tempStorageDiff(
+  t1: PrismaFormWithForwardedInAndTransporters,
+  t2: PrismaFormWithForwardedInAndTransporters
 ) {
   if (!t1 && !t2) {
     return {};
   }
 
   if (!t1 && t2) {
-    return { temporaryStorageDetail: await expandFormFromDb(t2) };
+    return { temporaryStorageDetail: expandFormFromDb(t2) };
   }
 
   if (t1 && !t2) {
@@ -113,13 +115,13 @@ export async function tempStorageDiff(
     // the first transporter only (field `transporter`).
     transporters: _ts1,
     ...expandedt1
-  } = await expandFormFromDb(t1!);
+  } = expandFormFromDb(t1!);
   const {
     updatedAt: _u2,
     status: _s2,
     transporters: _ts2,
     ...expandedt2
-  } = await expandFormFromDb(t2!);
+  } = expandFormFromDb(t2!);
 
   const diff = objectDiff(expandedt1, expandedt2);
 
@@ -133,27 +135,28 @@ export async function tempStorageDiff(
  * exclude this field from the diff comparison. The diff will only be computed
  * on the first transporter
  */
-export async function formDiff(
-  f1: Form & {
-    forwardedIn?: Form | null;
-  },
-  f2: Form & { forwardedIn?: Form | null }
+export function formDiff(
+  f1: PrismaFormWithForwardedInAndTransporters,
+  f2: PrismaFormWithForwardedInAndTransporters
 ) {
   const {
     updatedAt: _u1,
     status: _s1,
     transporters: _ts1,
     ...expandedf1
-  } = await expandFormFromDb(f1);
+  } = expandFormFromDb(f1);
   const {
     updatedAt: _u2,
     status: _s2,
     transporters: _ts2,
     ...expandedf2
-  } = await expandFormFromDb(f2);
+  } = expandFormFromDb(f2);
 
   return {
     ...objectDiff(expandedf1, expandedf2),
-    ...(await tempStorageDiff(f1.forwardedIn, f2.forwardedIn))
+    ...tempStorageDiff(
+      f1.forwardedIn as PrismaFormWithForwardedInAndTransporters,
+      f2.forwardedIn as PrismaFormWithForwardedInAndTransporters
+    )
   };
 }

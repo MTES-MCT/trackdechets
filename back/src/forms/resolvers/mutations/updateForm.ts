@@ -14,7 +14,7 @@ import {
   getFullForm
 } from "../../database";
 import {
-  expandFormFromDb,
+  getAndExpandFormFromDb,
   flattenFormInput,
   flattenTemporaryStorageDetailInput,
   flattenTransporterInput
@@ -366,7 +366,7 @@ const updateFormResolver = async (
     return updatedForm;
   });
 
-  return expandFormFromDb(updatedForm);
+  return getAndExpandFormFromDb(updatedForm.id);
 };
 
 export default updateFormResolver;
