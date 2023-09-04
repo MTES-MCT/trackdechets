@@ -381,7 +381,6 @@ export const favoritesConstrutor = async ({
   type
 }: FavoritesInput): Promise<CompanySearchResult[]> => {
   const company = await getCompanyOrCompanyNotFound({ orgId });
-  const companySearch = await searchCompany(company.orgId);
   const favorites = company.orgId
     ? await getRecentPartners(company.orgId, type)
     : [];
@@ -396,9 +395,10 @@ export const favoritesConstrutor = async ({
   const isMatchingType = matchesFavoriteType(company.companyTypes, type);
   // their company is not included in the results yet
   const isAlreadyListed = favorites.find(
-    favorite => favorite.orgId === companySearch.orgId
+    favorite => favorite.orgId === company.orgId
   );
   if (isMatchingType && !isAlreadyListed) {
+    const companySearch = await searchCompany(company.orgId);
     favorites.push(companySearch);
   }
 
