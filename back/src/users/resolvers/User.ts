@@ -1,6 +1,9 @@
 import { convertUrls } from "../../companies/database";
-import { UserResolvers, CompanyPrivate } from "../../generated/graphql/types";
-import { getUserCompanies } from "../database";
+import {
+  UserResolvers,
+  CompanyPrivate,
+  UserRole
+} from "../../generated/graphql/types";
 import { nafCodes } from "../../common/constants/NAF";
 import prisma from "../../prisma";
 
@@ -9,7 +12,15 @@ const userResolvers: UserResolvers = {
   // Information from TD and s3ic are merged in a separate resolver (CompanyPrivate.installation)
   // to make up an instance of CompanyPrivate
   companies: async parent => {
-    const companies = await getUserCompanies(parent.id);
+    const companyAssociations = await prisma.companyAssociation.findMany({
+      where: { userId: parent.id },
+      include: { company: true }
+    });
+    const companies = companyAssociations.map(association => ({
+      ...association.company,
+      userRole: association.role as UserRole
+    }));
+
     return companies.map(async company => {
       const companyPrivate: CompanyPrivate = convertUrls(company);
 
