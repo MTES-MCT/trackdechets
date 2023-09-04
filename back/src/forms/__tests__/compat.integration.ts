@@ -149,6 +149,7 @@ describe("simpleFormToBsdd", () => {
       destinationReceptionSignatureDate: null,
       destinationPlannedOperationCode: form.recipientProcessingOperation,
       destinationOperationCode: null,
+      destinationOperationMode: null,
       destinationOperationSignatureAuthor: null,
       destinationOperationDate: null,
       destinationOperationSignatureDate: null,
@@ -396,6 +397,7 @@ describe("simpleFormToBsdd", () => {
       destinationPlannedOperationCode:
         fullForwardedInForm.recipientProcessingOperation,
       destinationOperationCode: null,
+      destinationOperationMode: null,
       destinationOperationSignatureAuthor: null,
       destinationOperationDate: null,
       destinationOperationSignatureDate: null,
@@ -536,6 +538,7 @@ describe("simpleFormToBsdd", () => {
         destinationReceptionSignatureDate: form.receivedAt,
         destinationPlannedOperationCode: form.recipientProcessingOperation,
         destinationOperationCode: null,
+        destinationOperationMode: null,
         destinationOperationSignatureAuthor: null,
         destinationOperationDate: null,
         destinationOperationSignatureDate: null,
