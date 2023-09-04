@@ -300,6 +300,26 @@ describe("BSVHU validation", () => {
         );
       }
     });
+
+    test("when destination agrement number is missing", async () => {
+      const data = {
+        ...bsvhu,
+        destinationAgrementNumber: null
+      };
+      expect.assertions(1);
+
+      try {
+        await validateBsvhu(data, {
+          emissionSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual(
+          expect.arrayContaining([
+            "Destinataire: le numéro d'agrément est obligatoire"
+          ])
+        );
+      }
+    });
   });
 
   describe("Emitter transports own waste", () => {
