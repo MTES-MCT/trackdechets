@@ -13,7 +13,7 @@ import {
 } from "generated/graphql/types";
 import Tooltip from "common/components/Tooltip";
 import { subMonths } from "date-fns";
-import ProcessingModeSelect from "common/components/ProcessingModeSelect";
+import OperationModeSelect from "common/components/OperationModeSelect";
 
 function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   const {
@@ -30,7 +30,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
       if (nextDestination == null) {
         setFieldValue("nextDestination", {
           processingOperation: "",
-          processingModeDone: undefined,
+          destinationOperationMode: undefined,
           notificationNumber: "",
           company: {
             siret: "",
@@ -108,7 +108,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
             form.recipient?.processingOperation}
         </div>
       </div>
-      <ProcessingModeSelect processingOperation={processingOperationDone} />
+      <OperationModeSelect processingOperation={processingOperationDone} />
       <div className="form__row">
         <label>
           Description de l'Opération

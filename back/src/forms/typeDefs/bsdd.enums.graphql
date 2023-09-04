@@ -192,23 +192,16 @@ enum FormsRegisterExportFormat {
 }
 
 """
-Mode de traitement. Directement dépendant de l'opération de traitement
+Qualification du traitement final vis-à-vis de la hiérarchie des modes
+de traitement définie à l'article L. 541-1 du code de l'environnement
 """
-enum ProcessingMode {
-  """
-  Réutilisation
-  """
-  REUSE
-  """
-  Recyclage et les autres formes de valorisation de la matière
-  """
-  RECYCLING
-  """
-  Valorisation énergétique
-  """
-  ENERGY_RECOVERY
-  """
-  Elimination (incinération sans valorisation énergétique et stockage en décharge)
-  """
+enum OperationMode {
+  "Réutilisation"
+  REUTILISATION
+  "Recyclage et autres formes de valorisation de la matière"
+  RECYCLAGE
+  "Valorisation énergétique"
+  VALORISATION_ENERGETIQUE
+  "Incinération sans valorisation énergétique ou stockage en décharge"
   ELIMINATION
 }

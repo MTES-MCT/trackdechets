@@ -33,7 +33,7 @@ type EditableBsddFields = Required<
     | "quantityReceived"
     | "quantityReceivedType"
     | "processingOperationDone"
-    | "processingModeDone"
+    | "destinationOperationMode"
     | "isDeleted"
     | "receivedBy"
     | "processedBy"
@@ -379,8 +379,8 @@ function forwardedInDiff(
     );
     const compareForwardedInTo = form.forwardedIn
       ? Object.keys(flatForwardedInInput).reduce((acc, field) => {
-          return { ...acc, [field]: form.forwardedIn![field] };
-        }, {})
+        return { ...acc, [field]: form.forwardedIn![field] };
+      }, {})
       : {};
 
     const forwardedInDiff = objectDiff(

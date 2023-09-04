@@ -7,7 +7,7 @@ import {
   Status,
   TransportMode,
   WasteAcceptationStatus,
-  ProcessingMode
+  OperationMode
 } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
 import { checkVAT } from "jsvat";
@@ -69,7 +69,7 @@ import { format, sub } from "date-fns";
 import { getFirstTransporterSync } from "./database";
 import { UserInputError } from "../common/errors";
 import { ConditionConfig } from "yup/lib/Condition";
-import { getProcessingModesFromProcessingOperation } from "../common/processingModes";
+import { getOperationModesFromOperationCode } from "../common/operationModes";
 // set yup default error messages
 configureYup();
 
@@ -1302,7 +1302,7 @@ const withNextDestination = (required: boolean) =>
       .nullable()
       .matches(
         /^[a-zA-Z]{2}[0-9]{4}$|^$/,
-        "Destination ultérieure : Le numéro d'identication ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
+        "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
       )
   });
 
@@ -1379,14 +1379,14 @@ const processedInfoSchemaFn: (
         PROCESSING_AND_REUSE_OPERATIONS_CODES,
         INVALID_PROCESSING_OPERATION
       ),
-    processingModeDone: yup
+    destinationOperationMode: yup
       .string()
-      .oneOf(Object.values(ProcessingMode))
+      .oneOf(Object.values(OperationMode))
       .test(
         "processing-mode-matches-processing-operation",
         "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
         function (item) {
-          const modes = getProcessingModesFromProcessingOperation(
+          const modes = getOperationModesFromOperationCode(
             this.parent.processingOperationDone
           );
 

@@ -144,15 +144,16 @@ enum BsdType {
   BSVHU
 }
 
-// Mode de traitement. Directement dépendant de l'opération de traitement
-enum ProcessingMode {
+// Qualification du traitement final vis-à-vis de la hiérarchie des modes
+// de traitement définie à l'article L. 541-1 du code de l'environnement
+enum OperationMode {
   // Réutilisation
-  REUSE
-  // Recyclage et les autres formes de valorisation de la matière
-  RECYCLING
+  REUTILISATION
+  // Recyclage et autres formes de valorisation de la matière
+  RECYCLAGE
   // Valorisation énergétique
-  ENERGY_RECOVERY
-  // Elimination (incinération sans valorisation énergétique et stockage en décharge)
+  VALORISATION_ENERGETIQUE
+  // Incinération sans valorisation énergétique ou stockage en décharge
   ELIMINATION
 }
 
@@ -359,7 +360,7 @@ model Form {
   quantityReceived                   Float?
   quantityReceivedType               QuantityType?
   processingOperationDone            String?
-  processingModeDone                 ProcessingMode?
+  destinationOperationMode           OperationMode?
   wasteDetailsName                   String?
   isDeleted                          Boolean?                @default(false)
   receivedBy                         String?

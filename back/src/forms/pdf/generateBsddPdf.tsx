@@ -6,7 +6,8 @@ import {
   QuantityType,
   WasteAcceptationStatus,
   EmitterType,
-  Status
+  Status,
+  OperationMode
 } from "@prisma/client";
 import * as QRCode from "qrcode";
 import concatStream from "concat-stream";
@@ -36,6 +37,7 @@ import prisma from "../../prisma";
 import { buildAddress } from "../../companies/sirene/utils";
 import { packagingsEqual } from "../../common/constants/formHelpers";
 import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
+import { getOperationModeLabel } from "../../common/operationModes";
 
 type ReceiptFieldsProps = Partial<
   Pick<
@@ -728,6 +730,11 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </p>
             <p>
               Code D/R de l’opération : {form.processingOperationDone}
+              <br />
+              Mode de traitement :{" "}
+              {getOperationModeLabel(
+                form?.destinationOperationMode as OperationMode
+              )}
               <br />
               Description : {form.processingOperationDescription}
               <br />
