@@ -136,7 +136,8 @@ describe("expandFormFromDb", () => {
       nextDestination: null,
       currentTransporterSiret: null,
       nextTransporterSiret: null,
-      temporaryStorageDetail: null
+      temporaryStorageDetail: null,
+      destinationOperationMode: null
     });
   });
 
