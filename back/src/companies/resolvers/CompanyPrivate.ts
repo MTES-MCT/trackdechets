@@ -26,6 +26,10 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     return getCompanyUsers(parent.orgId, context.dataloaders, userId);
   },
   userRole: async (parent, _, context) => {
+    if (parent.userRole) {
+      return parent.userRole;
+    }
+
     const userId = context.user!.id;
     const role = await getUserRole(userId, parent.orgId);
     // type casting is necessary here as long as we
@@ -33,8 +37,8 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     return role as UserRole;
   },
   userPermissions: async (parent, _, context) => {
-    const userId = context.user!.id;
-    const role = await getUserRole(userId, parent.orgId);
+    const role =
+      parent.userRole ?? (await getUserRole(context.user!.id, parent.orgId));
     return role ? grants[role].map(toGraphQLPermission) : [];
   },
   transporterReceipt: parent => {
