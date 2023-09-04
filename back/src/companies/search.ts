@@ -19,19 +19,23 @@ import { CompanyVatSearchResult } from "./vat/vies/types";
 import { AnonymousCompanyError } from "./sirene/errors";
 import { removeEmptyKeys } from "../common/converter";
 import { UserInputError } from "../common/errors";
+import { SearchOptions } from "./sirene/trackdechets/types";
 
 interface SearchCompaniesDeps {
-  searchCompany: (
+  searchCompany: (clue: string) => Promise<CompanySearchResult>;
+  searchCompanies: (
     clue: string,
-    allowForeignCompanies?: boolean
-  ) => Promise<CompanySearchResult>;
+    department?: string | null,
+    options?: Partial<SearchOptions>,
+    requestOptions?
+  ) => Promise<SireneSearchResult[] | null>;
 }
 
 const SIRET_OR_VAT_ERROR =
   "Il est obligatoire de rechercher soit avec un SIRET de 14 caractères soit avec un numéro de TVA intracommunautaire valide";
 
 /**
- * Search TD db and merge company info from search engines
+ * Search database and merge with company info from search engines
  */
 async function findCompanyAndMergeInfos(
   cleanClue: string,
@@ -79,8 +83,7 @@ async function findCompanyAndMergeInfos(
  * Supports Test SIRET and AnonymousCompany
  */
 export async function searchCompany(
-  clue: string,
-  allowForeignCompanies?: boolean
+  clue: string
 ): Promise<CompanySearchResult> {
   // remove non alphanumeric
   const cleanedClue = cleanClue(clue);
@@ -105,7 +108,7 @@ export async function searchCompany(
       orgId: cleanedClue
     }
   });
-  // Anonymous Company search
+  // Anonymous Company search by-pass SIRENE or VAT search
   if (anonymousCompany) {
     const companyInfo: SireneSearchResult = {
       ...removeEmptyKeys(anonymousCompany),
@@ -131,14 +134,6 @@ export async function searchCompany(
 
   // Search by VAT number first in our db, inder to to optimize response times
   if (isVat(cleanedClue)) {
-    if (isForeignVat(cleanedClue) && allowForeignCompanies === false) {
-      throw new UserInputError(
-        "La recherche d'établissements étrangers est désactivée",
-        {
-          invalidArgs: ["siret", "clue"]
-        }
-      );
-    }
     const company = await findCompanyAndMergeInfos(cleanedClue, {});
     if (company.isRegistered === true) {
       // shorcut to return the result directly from database without hitting VIES
@@ -167,7 +162,7 @@ export async function searchCompany(
 
 // used for dependency injection in tests to easily mock `searchCompany`
 export const makeSearchCompanies =
-  ({ searchCompany }: SearchCompaniesDeps) =>
+  ({ searchCompany, searchCompanies }: SearchCompaniesDeps) =>
   (
     clue: string,
     department?: string | null,
@@ -176,7 +171,10 @@ export const makeSearchCompanies =
     const cleanedClue = cleanClue(clue);
     // clue can be formatted like a SIRET or a VAT number
     if (isSiret(cleanedClue) || isVat(cleanedClue)) {
-      return searchCompany(cleanedClue, allowForeignCompanies)
+      if (isForeignVat(cleanedClue) && allowForeignCompanies === false) {
+        return Promise.resolve([]);
+      }
+      return searchCompany(cleanedClue)
         .then(c => {
           return (
             [c]
@@ -191,7 +189,7 @@ export const makeSearchCompanies =
         .catch(_ => []);
     }
     // fuzzy searching only for French companies
-    return decoratedSearchCompanies(clue, department).then(async results => {
+    return searchCompanies(clue, department).then(async results => {
       if (!results) {
         return [];
       }
@@ -303,4 +301,7 @@ async function searchVatFrOnlyOrNotFound(
   return viesResult;
 }
 
-export const searchCompanies = makeSearchCompanies({ searchCompany });
+export const searchCompanies = makeSearchCompanies({
+  searchCompany,
+  searchCompanies: decoratedSearchCompanies
+});

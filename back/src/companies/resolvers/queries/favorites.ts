@@ -46,6 +46,7 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
     })
   });
   const { favorites } = body._source!;
+  // allowForeignCompanies is optionnal and true by default
   return favorites
     ? favorites.filter(
         fav =>

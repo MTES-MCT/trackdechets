@@ -232,7 +232,7 @@ export const searchCompanies = (
       return fullTextSearchResponseToCompanies(r.body.hits.hits);
     })
     .catch(error => {
-      logger.error(`Erreur inconnue\n`, error);
+      logger.error(`Erreur de requete à ElasticSearch SIRENE\n`, error);
       throw error;
     });
 };

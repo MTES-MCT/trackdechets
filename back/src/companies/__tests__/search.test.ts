@@ -1,12 +1,12 @@
 import { makeSearchCompanies, searchCompany } from "../search";
 import { ErrorCode } from "../../common/errors";
 import prisma from "../../prisma";
-import client from "../sirene/trackdechets/esClient";
 import { siretify } from "../../__tests__/factories";
-import { SearchHit } from "../sirene/trackdechets/types";
 
+const testSiret = siretify(3);
 const createInput = {
-  siret: siretify(3),
+  siret: testSiret,
+  orgId: testSiret,
   name: "Établissement de test",
   address: "Adresse test",
   codeNaf: "XXXXX",
@@ -25,9 +25,7 @@ jest.mock("../../prisma", () => ({
   }
 }));
 
-jest.mock("../sirene/trackdechets/esClient");
-
-describe("searchCompany", () => {
+describe("searchCompany by org identifier", () => {
   it(`should throw BAD_USER_INPUT error if
     the clue is not a valid VAT number`, async () => {
     expect.assertions(1);
@@ -58,7 +56,7 @@ describe("searchCompany", () => {
     }
   });
 
-  it(`should not allow test company when env var ALLOW_TEST_COMPANY is not true`, async () => {
+  it(`should not allow test company when env var ALLOW_TEST_COMPANY is false`, async () => {
     const OLD_ENV = process.env;
     process.env.ALLOW_TEST_COMPANY = "false";
     // re-load variables with custom env
@@ -72,7 +70,7 @@ describe("searchCompany", () => {
     process.env = OLD_ENV;
   });
 
-  it(`should allow searching test company when env var ALLOW_TEST_COMPANY is setup`, async () => {
+  it(`should allow searching test company when env var ALLOW_TEST_COMPANY is true`, async () => {
     const OLD_ENV = process.env;
     process.env.ALLOW_TEST_COMPANY = "true";
     // re-load variables with custom env
@@ -80,7 +78,6 @@ describe("searchCompany", () => {
 
     const { siret } = await prisma.anonymousCompany.create({
       data: {
-        orgId: createInput.siret,
         ...createInput
       }
     });
@@ -94,7 +91,6 @@ describe("searchCompany", () => {
     createInput.siret = "11111111192062";
     const { siret } = await prisma.anonymousCompany.create({
       data: {
-        orgId: createInput.siret,
         ...createInput
       }
     });
@@ -105,14 +101,16 @@ describe("searchCompany", () => {
 });
 
 describe("searchCompanies", () => {
+  const searchCompaniesMockFn = jest.fn();
   const searchCompanyMock = jest.fn();
   const searchCompanies = makeSearchCompanies({
-    searchCompany: searchCompanyMock
+    searchCompany: searchCompanyMock,
+    searchCompanies: searchCompaniesMockFn
   });
 
   beforeEach(() => {
     searchCompanyMock.mockReset();
-    (client.search as jest.Mock).mockReset();
+    searchCompaniesMockFn.mockReset();
   });
 
   it("should call searchCompany when the clue is formatted like a SIRET", async () => {
@@ -136,7 +134,7 @@ describe("searchCompanies", () => {
     expect(companies[0]).toStrictEqual(company);
   });
 
-  it("should call searchCompany when the clue is formatted like a SIRET but without bad characters", async () => {
+  it("should call searchCompany when the clue is formatted like a SIRET but with spaces", async () => {
     const siret = siretify(1);
     const company = {
       siret,
@@ -153,6 +151,27 @@ describe("searchCompanies", () => {
     };
     searchCompanyMock.mockResolvedValue(company);
     const companies = await searchCompanies(siret.split("").join(" "));
+    expect(searchCompanyMock).toHaveBeenCalledWith(siret);
+    expect(companies[0]).toStrictEqual(company);
+  });
+
+  it("should call searchCompany when the clue is formatted like a SIRET but with commas", async () => {
+    const siret = siretify(1);
+    const company = {
+      siret,
+      name: "ACME",
+      naf: "NAF",
+      libelleNaf: "Autres activités",
+      codeCommune: "13001",
+      address: "40 boulevard Voltaire 13001 Marseille",
+      addressVoie: "40 boulevard",
+      addressCity: "Marseille",
+      addressPostalCode: "13001",
+      etatAdministratif: "A",
+      codePaysEtrangerEtablissement: "FR"
+    };
+    searchCompanyMock.mockResolvedValue(company);
+    const companies = await searchCompanies(siret.split("").join(","));
     expect(searchCompanyMock).toHaveBeenCalledWith(siret);
     expect(companies[0]).toStrictEqual(company);
   });
@@ -214,27 +233,19 @@ describe("searchCompanies", () => {
     (prisma.company.findMany as jest.Mock).mockResolvedValue(companies);
 
     // SIRENE return a different information
-    (client.search as jest.Mock).mockResolvedValueOnce({
-      body: {
-        hits: {
-          hits: [
-            {
-              _source: {
-                siret: company.siret,
-                denominationUniteLegale: company.name,
-                numeroVoieEtablissement: "4",
-                typeVoieEtablissement: "BD",
-                libelleVoieEtablissement: "LONGCHAMP",
-                codePostalEtablissement: "13001",
-                libelleCommuneEtablissement: "MARSEILLE",
-                activitePrincipaleEtablissement: "6201Z",
-                etatAdministratifEtablissement: company.etatAdministratif
-              }
-            }
-          ] as SearchHit[]
-        }
+    searchCompaniesMockFn.mockResolvedValueOnce([
+      {
+        siret: company.siret,
+        denominationUniteLegale: company.name,
+        numeroVoieEtablissement: "4",
+        typeVoieEtablissement: "BD",
+        libelleVoieEtablissement: "LONGCHAMP",
+        codePostalEtablissement: "13001",
+        libelleCommuneEtablissement: "MARSEILLE",
+        activitePrincipaleEtablissement: "6201Z",
+        etatAdministratifEtablissement: company.etatAdministratif
       }
-    });
+    ]);
     // check that searchCompanies return Sirene data instead of prisma.company data
     const companiesSearched = await searchCompanies("ACME OF TRACKDECHETS");
     expect(companiesSearched).toHaveLength(1);
@@ -253,33 +264,19 @@ describe("searchCompanies", () => {
       name: company.name,
       etatAdministratif: company.etatAdministratif,
       libelleNaf: "Programmation informatique",
-      naf: "6201Z"
+      naf: "6201Z",
+      activitePrincipaleEtablissement: "6201Z",
+      codePostalEtablissement: "13001",
+      denominationUniteLegale: company.name,
+      etatAdministratifEtablissement: company.etatAdministratif,
+      libelleCommuneEtablissement: "MARSEILLE",
+      libelleVoieEtablissement: "LONGCHAMP",
+      numeroVoieEtablissement: "4",
+      typeVoieEtablissement: "BD"
     };
     expect(companiesSearched[0]).toEqual(expected);
-    expect(client.search as jest.Mock).toHaveBeenCalledTimes(1);
-    expect(client.search as jest.Mock).toHaveBeenCalledWith(
-      {
-        _source_excludes: "td_search_companies",
-        body: {
-          query: {
-            bool: {
-              must: [
-                {
-                  match: {
-                    td_search_companies: {
-                      query: "ACME OF TRACKDECHETS"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        },
-        index: "stocketablissement-production",
-        size: 20
-      },
-      undefined
-    );
+    expect(searchCompaniesMockFn).toHaveBeenCalledTimes(1);
+    expect(searchCompaniesMockFn).toHaveBeenCalledWith("ACME OF TRACKDECHETS");
     expect(searchCompanyMock).toHaveBeenCalledTimes(0);
   });
 
@@ -308,5 +305,47 @@ describe("searchCompanies", () => {
     const companies = await searchCompanies(siret);
     expect(searchCompanyMock).toHaveBeenCalledWith(siret);
     expect(companies).toStrictEqual([]);
+  });
+
+  it(`should return [] if VAT number is passed without allowForeignCompanies`, async () => {
+    const vatNumber = "ESB50629187";
+    const expected = {
+      orgId: vatNumber,
+      vatNumber,
+      name: "ACME",
+      naf: "NAF",
+      libelleNaf: "Autres activités",
+      codeCommune: "13001",
+      address: "40 boulevard Voltaire 13001 Marseille",
+      addressVoie: "40 boulevard",
+      addressCity: "Marseille",
+      addressPostalCode: "13001",
+      etatAdministratif: "A"
+    };
+    searchCompanyMock.mockResolvedValueOnce(expected);
+    const companies = await searchCompanies(vatNumber, null, false);
+    expect(searchCompanyMock).toHaveBeenCalledTimes(0);
+    expect(companies).toStrictEqual([]);
+  });
+
+  it(`should return a foreign company if VAT number is passed with allowForeignCompanies`, async () => {
+    const vatNumber = "ESB50629187";
+    const expected = {
+      orgId: vatNumber,
+      vatNumber,
+      name: "ACME",
+      naf: "NAF",
+      libelleNaf: "Autres activités",
+      codeCommune: "13001",
+      address: "40 boulevard Voltaire 13001 Marseille",
+      addressVoie: "40 boulevard",
+      addressCity: "Marseille",
+      addressPostalCode: "13001",
+      etatAdministratif: "A"
+    };
+    searchCompanyMock.mockResolvedValueOnce(expected);
+    const companies = await searchCompanies(vatNumber, null, true);
+    expect(searchCompanyMock).toHaveBeenCalledWith(vatNumber);
+    expect(companies).toStrictEqual([expected]);
   });
 });
