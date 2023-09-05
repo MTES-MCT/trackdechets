@@ -309,6 +309,147 @@ describe("Mutation.updateBsff", () => {
     ]);
   });
 
+  it("should allow emitter to update packagings after his own signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsff = await createBsff(
+      { emitter, destination },
+      {
+        packagings: {
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            weight: 1,
+            numero: "1",
+            emissionNumero: "1"
+          }
+        },
+        isDraft: false,
+        status: "SIGNED_BY_EMITTER",
+        emitterEmissionSignatureDate: new Date(),
+        destinationPlannedOperationCode: "R1",
+        wasteCode: "14 06 01*",
+        wasteDescription: "HFC",
+        wasteAdr: "ADR",
+        weightValue: 1,
+        weightIsEstimate: false
+      }
+    );
+
+    let packagings = await prisma.bsff
+      .findUniqueOrThrow({ where: { id: bsff.id } })
+      .packagings();
+
+    expect(packagings.length).toEqual(1);
+
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          packagings: [
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              numero: "2",
+              volume: 1
+            },
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              numero: "3",
+              volume: 1
+            }
+          ]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    packagings = await prisma.bsff
+      .findUniqueOrThrow({ where: { id: bsff.id } })
+      .packagings();
+
+    expect(packagings.length).toEqual(2); // previous packagings should be deleted
+    expect(packagings[0].numero).toEqual("2");
+    expect(packagings[1].numero).toEqual("3");
+    expect(data.updateBsff.packagings).toEqual([
+      expect.objectContaining({ name: "BOUTEILLE", weight: 1, numero: "2" }),
+      expect.objectContaining({ name: "BOUTEILLE", weight: 1, numero: "3" })
+    ]);
+  });
+
+  it.only("should not allow destination tu update packagings after emission signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsff = await createBsff(
+      { emitter, destination },
+      {
+        packagings: {
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            weight: 1,
+            numero: "1",
+            emissionNumero: "1"
+          }
+        },
+        isDraft: false,
+        status: "SIGNED_BY_EMITTER",
+        emitterEmissionSignatureDate: new Date(),
+        destinationPlannedOperationCode: "R1",
+        wasteCode: "14 06 01*",
+        wasteDescription: "HFC",
+        wasteAdr: "ADR",
+        weightValue: 1,
+        weightIsEstimate: false
+      }
+    );
+
+    const packagings = await prisma.bsff
+      .findUniqueOrThrow({ where: { id: bsff.id } })
+      .packagings();
+
+    expect(packagings.length).toEqual(1);
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          packagings: [
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              numero: "2",
+              volume: 1
+            },
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              numero: "3",
+              volume: 1
+            }
+          ]
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : packagings"
+      })
+    ]);
+  });
+
   it("should update fiche d'interventions", async () => {
     const operateur = await userWithCompanyFactory(UserRole.ADMIN);
     const detenteur1 = await userWithCompanyFactory(UserRole.ADMIN);

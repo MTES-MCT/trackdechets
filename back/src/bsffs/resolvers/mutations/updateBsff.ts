@@ -57,7 +57,6 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   if (existingBsff.emitterEmissionSignatureDate) {
     // discard related objects updates after emission signatures
-    delete input.packagings;
     delete input.grouping;
     delete input.forwarding;
     delete input.repackaging;
