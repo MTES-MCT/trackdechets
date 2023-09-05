@@ -15,7 +15,9 @@ const searchCompanySpy = jest.spyOn(search, "searchCompany");
 
 describe("Index favorites job", () => {
   afterEach(resetDatabase);
-
+  beforeEach(() => {
+    searchCompanySpy.mockReset();
+  });
   it("should ignore drafts", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
@@ -64,6 +66,21 @@ describe("Index favorites job", () => {
       }
     });
     const emitter = await companyFactory();
+    searchCompanySpy.mockResolvedValueOnce({
+      name: emitter.name,
+      siret: emitter.siret,
+      orgId: emitter.orgId,
+      vatNumber: null,
+      contact: emitter.contact,
+      contactEmail: emitter.contactEmail,
+      contactPhone: emitter.contactPhone,
+      codePaysEtrangerEtablissement: "FR",
+      address: emitter.address,
+      companyTypes: emitter.companyTypes,
+      isRegistered: true,
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O"
+    });
     await formFactory({
       ownerId: user.id,
       opt: {
@@ -79,14 +96,19 @@ describe("Index favorites job", () => {
 
     expect(favorites).toEqual([
       expect.objectContaining({
-        orgId: emitter.orgId,
         name: emitter.name,
-        address: emitter.address,
+        siret: emitter.siret,
+        orgId: emitter.orgId,
         vatNumber: null,
-        mail: emitter.contactEmail,
-        phone: emitter.contactPhone,
         contact: emitter.contact,
-        codePaysEtrangerEtablissement: "FR"
+        contactEmail: emitter.contactEmail,
+        contactPhone: emitter.contactPhone,
+        codePaysEtrangerEtablissement: "FR",
+        address: emitter.address,
+        companyTypes: emitter.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O"
       })
     ]);
   });
@@ -549,6 +571,7 @@ describe("Index favorites job", () => {
       contactPhone: "00 00 00 00 00",
       contact: "John Snow"
     };
+    // TODO should mock company after brokerSirene
     searchCompanySpy.mockResolvedValueOnce(brokerSirene);
 
     const { user, company } = await userWithCompanyFactory("MEMBER", {
