@@ -531,6 +531,7 @@ const DashboardPage = () => {
                 links={dropdownCreateLinks(siret)}
                 isDisabled={loading}
                 menuTitle={dropdown_create_btn}
+                primary
               />
             </div>
           )}
