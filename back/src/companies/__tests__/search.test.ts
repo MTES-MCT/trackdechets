@@ -243,7 +243,16 @@ describe("searchCompanies", () => {
         codePostalEtablissement: "13001",
         libelleCommuneEtablissement: "MARSEILLE",
         activitePrincipaleEtablissement: "6201Z",
-        etatAdministratifEtablissement: company.etatAdministratif
+        address: "4 BD LONGCHAMP 13001 MARSEILLE",
+        addressCity: "MARSEILLE",
+        addressPostalCode: company.addressPostalCode,
+        addressVoie: "4 BD LONGCHAMP",
+        codeCommune: undefined,
+        name: company.name,
+        libelleNaf: "Programmation informatique",
+        naf: "6201Z",
+        etatAdministratifEtablissement: company.etatAdministratif,
+        statutDiffusionEtablissement: "O"
       }
     ]);
     // check that searchCompanies return Sirene data instead of prisma.company data
@@ -253,16 +262,15 @@ describe("searchCompanies", () => {
       siret: company.siret,
       orgId: company.siret,
       isRegistered: true,
-      statutDiffusionEtablissement: undefined,
+      statutDiffusionEtablissement: "O",
       address: "4 BD LONGCHAMP 13001 MARSEILLE",
+      addressCity: "MARSEILLE",
+      addressPostalCode: company.addressPostalCode,
       addressVoie: "4 BD LONGCHAMP",
       codeCommune: undefined,
       codePaysEtrangerEtablissement: undefined,
       companyTypes: [],
-      addressPostalCode: company.addressPostalCode,
-      addressCity: "MARSEILLE",
       name: company.name,
-      etatAdministratif: company.etatAdministratif,
       libelleNaf: "Programmation informatique",
       naf: "6201Z",
       activitePrincipaleEtablissement: "6201Z",
@@ -276,7 +284,10 @@ describe("searchCompanies", () => {
     };
     expect(companiesSearched[0]).toEqual(expected);
     expect(searchCompaniesMockFn).toHaveBeenCalledTimes(1);
-    expect(searchCompaniesMockFn).toHaveBeenCalledWith("ACME OF TRACKDECHETS");
+    expect(searchCompaniesMockFn).toHaveBeenCalledWith(
+      "ACME OF TRACKDECHETS",
+      undefined
+    );
     expect(searchCompanyMock).toHaveBeenCalledTimes(0);
   });
 
