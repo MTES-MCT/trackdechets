@@ -25,12 +25,13 @@ export async function buildPdf(bsda: Bsda) {
   return generatePdf(html);
 }
 
-export function buildPdfAsBase64(bsda: Bsda): Promise<string> {
-  return new Promise(async (resolve, reject) => {
+export async function buildPdfAsBase64(bsda: Bsda): Promise<string> {
+  const readableStream = await buildPdf(bsda);
+
+  return new Promise((resolve, reject) => {
     const convertToBase64 = concatStream(buffer =>
       resolve(buffer.toString("base64"))
     );
-    const readableStream = await buildPdf(bsda);
 
     readableStream.on("error", reject);
     readableStream.pipe(convertToBase64);

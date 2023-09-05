@@ -1,9 +1,5 @@
 import { Status, UserRole, WasteAcceptationStatus } from "@prisma/client";
-import {
-  formFactory,
-  formWithTempStorageFactory,
-  userWithCompanyFactory
-} from "../../../__tests__/factories";
+import { userWithCompanyFactory } from "../../../__tests__/factories";
 import { renderBsdaRefusedEmail } from "../refused";
 import * as generatePdf from "../../pdf/generator";
 import { resetDatabase } from "../../../../integration-tests/helper";
