@@ -118,6 +118,10 @@ export const editionRules: {
     sealedBy: "OPERATION",
     isRequired: isNotRefused
   },
+  destinationOperationMode: {
+    sealedBy: "OPERATION",
+    isRequired: false
+  },
   destinationOperationDescription: {
     sealedBy: "OPERATION",
     isRequired: false

@@ -78,6 +78,7 @@ export function toBsdElastic(bsff: RawBsff): BsdElastic {
     nextDestinationCompanyAddress: "",
 
     destinationOperationCode: "",
+    destinationOperationMode: undefined,
 
     emitterEmissionDate: bsff.emitterEmissionSignatureDate?.getTime(),
     workerWorkDate: undefined,

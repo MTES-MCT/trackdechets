@@ -1380,7 +1380,7 @@ const processedInfoSchemaFn: (
         INVALID_PROCESSING_OPERATION
       ),
     destinationOperationMode: yup
-      .string()
+      .mixed<OperationMode>()
       .oneOf(Object.values(OperationMode))
       .test(
         "processing-mode-matches-processing-operation",

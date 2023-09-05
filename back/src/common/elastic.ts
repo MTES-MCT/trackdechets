@@ -10,6 +10,7 @@ import { RawBsda } from "../bsda/elastic";
 import { RawBsdasri } from "../bsdasris/elastic";
 import { RawBsvhu } from "../bsvhu/elastic";
 import { RawBsff } from "../bsffs/elastic";
+import { OperationMode } from "@prisma/client";
 
 export interface BsdElastic {
   type: BsdType;
@@ -73,6 +74,7 @@ export interface BsdElastic {
   nextDestinationCompanyAddress: string;
 
   destinationOperationCode: string;
+  destinationOperationMode: OperationMode | undefined;
 
   emitterEmissionDate: number | undefined;
   workerWorkDate: number | undefined;
@@ -239,6 +241,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   nextDestinationCompanyAddress: textField,
 
   destinationOperationCode: stringField,
+  destinationOperationMode: stringField,
   emitterEmissionDate: dateField,
 
   workerWorkDate: dateField,

@@ -219,7 +219,7 @@ export function toBsdElastic(bsda: RawBsda): BsdElastic {
       bsda.destinationOperationNextDestinationCompanyAddress ?? "",
 
     destinationOperationCode: bsda.destinationOperationCode ?? "",
-
+    destinationOperationMode: bsda?.destinationOperationMode ?? undefined,
     emitterEmissionDate: bsda.emitterEmissionSignatureDate?.getTime(),
     workerWorkDate: bsda.workerWorkSignatureDate?.getTime(),
     transporterTransportTakenOverAt:

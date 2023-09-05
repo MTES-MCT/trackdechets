@@ -1,4 +1,4 @@
-import { Form } from "@prisma/client";
+import { Form, OperationMode } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { FullForm } from "./types";
 import { GraphQLContext } from "../types";
@@ -82,6 +82,8 @@ export function toBsdElastic(form: RawForm): BsdElastic {
     nextDestinationCompanyAddress: form.nextDestinationCompanyAddress ?? "",
 
     destinationOperationCode: form.processingOperationDone ?? "",
+    destinationOperationMode:
+      (form.processingOperationDone as OperationMode) ?? undefined,
 
     emitterEmissionDate: form.emittedAt?.getTime(),
     workerWorkDate: undefined,

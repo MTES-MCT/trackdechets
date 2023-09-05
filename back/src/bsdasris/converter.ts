@@ -176,6 +176,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
           value: bsdasri.destinationReceptionWasteWeightValue
         }),
         code: bsdasri.destinationOperationCode,
+        mode: bsdasri.destinationOperationMode,
         date: processDate(bsdasri.destinationOperationDate),
         signature: nullIfNoValues<BsdasriSignature>({
           author: bsdasri.destinationOperationSignatureAuthor,
@@ -516,6 +517,7 @@ function flattenOperationInput(
   }
   return {
     destinationOperationCode: chain(input.operation, o => o.code),
+    destinationOperationMode: chain(input.operation, o => o.mode),
     destinationReceptionWasteWeightValue: chain(input.operation, o =>
       chain(o.weight, q => q.value)
     ),

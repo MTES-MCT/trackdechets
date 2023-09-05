@@ -179,6 +179,7 @@ export function toBsdElastic(bsdasri: RawBsdasri): BsdElastic {
     nextDestinationCompanyAddress: "",
 
     destinationOperationCode: bsdasri.destinationOperationCode ?? "",
+    destinationOperationMode: bsdasri?.destinationOperationMode ?? undefined,
 
     emitterEmissionDate: bsdasri.emitterEmissionSignatureDate?.getTime(),
     workerWorkDate: undefined,

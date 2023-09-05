@@ -134,6 +134,7 @@ export function toIncomingWaste(
     transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
     transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
     destinationOperationCode: bsdasri.destinationOperationCode,
+    destinationOperationMode: bsdasri.destinationOperationMode,
     destinationCustomInfo: bsdasri.destinationCustomInfo,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
     transporterCompanyMail: bsdasri.transporterCompanyMail

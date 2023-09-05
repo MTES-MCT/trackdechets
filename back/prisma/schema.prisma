@@ -922,6 +922,7 @@ model Bsvhu {
 
   destinationOperationDate                            DateTime? @db.Timestamptz(6)
   destinationOperationCode                            String?
+  destinationOperationMode                            OperationMode?
   destinationOperationNextDestinationCompanyName      String?
   destinationOperationNextDestinationCompanySiret     String?
   destinationOperationNextDestinationCompanyAddress   String?
@@ -1054,6 +1055,7 @@ model Bsdasri {
   destinationReceptionDate                    DateTime? // accepted or refused date @db.Timestamptz(6)
   // processing
   destinationOperationCode                    String?
+  destinationOperationMode                    OperationMode?
   destinationOperationDate                    DateTime?               @db.Timestamptz(6)
   receptionSignatory                          User?                   @relation("BsdasriReceptionSignature", fields: [receptionSignatoryId], references: [id])
   receptionSignatoryId                        String?
@@ -1384,6 +1386,7 @@ model Bsda {
   destinationReceptionRefusalReason     String?
 
   destinationOperationCode            String?
+  destinationOperationMode            OperationMode?
   destinationOperationDescription     String?
   destinationOperationDate            DateTime? @db.Timestamptz(6)
   destinationOperationSignatureAuthor String?
