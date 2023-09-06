@@ -12,8 +12,9 @@ import { Signature } from "./Signature";
 import { TraceabilityTable } from "./TraceabilityTable";
 import { WasteDescription } from "./WasteDescription";
 import { WasteDetails } from "./WasteDetails";
-import { BsdaStatus } from "@prisma/client";
+import { BsdaStatus, OperationMode } from "@prisma/client";
 import { CancelationStamp } from "../../../common/pdf/components/CancelationStamp";
+import { getOperationModeLabel } from "../../../common/operationModes";
 
 const PACKAGINGS_NAMES = {
   BIG_BAG: "Big-bag / GRV",
@@ -367,6 +368,11 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
               <strong>8. Réalisation de l'opération</strong>
               <p>
                 Code de traitement : {bsda?.destination?.operation?.code}
+                <br />
+                Mode de traitement :{" "}
+                {getOperationModeLabel(
+                  bsda?.destination?.operation?.mode as OperationMode
+                )}
                 <br />
                 Date de réalisation :{" "}
                 {formatDate(bsda?.destination?.operation?.date)}

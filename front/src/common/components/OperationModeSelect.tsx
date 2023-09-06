@@ -8,10 +8,10 @@ import {
   getOperationModesFromOperationCode,
 } from "common/operationModes";
 
-const OperationModeSelect = ({ processingOperation }) => {
-  if (!processingOperation) return null;
+const OperationModeSelect = ({ operationCode, name }) => {
+  if (!operationCode) return null;
 
-  const modes = getOperationModesFromOperationCode(processingOperation);
+  const modes = getOperationModesFromOperationCode(operationCode);
 
   if (!modes.length) return null;
 
@@ -23,7 +23,7 @@ const OperationModeSelect = ({ processingOperation }) => {
           <div className="tw-flex">
             {modes.includes(OperationMode.Elimination) && (
               <Field
-                name="destinationOperationMode"
+                name={name}
                 id={OperationMode.Elimination}
                 label={getOperationModeLabel(OperationMode.Elimination)}
                 component={RadioButton}
@@ -31,7 +31,7 @@ const OperationModeSelect = ({ processingOperation }) => {
             )}
             {modes.includes(OperationMode.Recyclage) && (
               <Field
-                name="destinationOperationMode"
+                name={name}
                 id={OperationMode.Recyclage}
                 label={getOperationModeLabel(OperationMode.Recyclage)}
                 component={RadioButton}
@@ -39,7 +39,7 @@ const OperationModeSelect = ({ processingOperation }) => {
             )}
             {modes.includes(OperationMode.ValorisationEnergetique) && (
               <Field
-                name="destinationOperationMode"
+                name={name}
                 id={OperationMode.ValorisationEnergetique}
                 label={getOperationModeLabel(
                   OperationMode.ValorisationEnergetique
@@ -49,7 +49,7 @@ const OperationModeSelect = ({ processingOperation }) => {
             )}
             {modes.includes(OperationMode.Reutilisation) && (
               <Field
-                name="destinationOperationMode"
+                name={name}
                 id={OperationMode.Reutilisation}
                 label={getOperationModeLabel(OperationMode.Reutilisation)}
                 component={RadioButton}
@@ -58,7 +58,7 @@ const OperationModeSelect = ({ processingOperation }) => {
           </div>
         </fieldset>
 
-        <RedErrorMessage name="destinationOperationMode" />
+        <RedErrorMessage name={name} />
       </div>
     </Form>
   );

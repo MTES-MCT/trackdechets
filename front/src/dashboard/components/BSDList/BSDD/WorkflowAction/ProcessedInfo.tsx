@@ -108,7 +108,10 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
             form.recipient?.processingOperation}
         </div>
       </div>
-      <OperationModeSelect processingOperation={processingOperationDone} />
+      <OperationModeSelect
+        operationCode={processingOperationDone}
+        name="destinationOperationMode"
+      />
       <div className="form__row">
         <label>
           Description de l'Opération

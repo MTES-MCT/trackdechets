@@ -118,6 +118,7 @@ export const FullBsdaFragment = gql`
       }
       operation {
         code
+        mode
         description
         date
         signature {

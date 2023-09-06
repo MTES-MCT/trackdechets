@@ -25,12 +25,14 @@ import {
   BsdaNextDestination,
   BsdaType,
   FormCompany,
+  OperationMode,
 } from "generated/graphql/types";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
 import { generatePath, useHistory, useParams } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { InitialBsdas } from "./InitialBsdas";
+import { getOperationModeLabel } from "common/operationModes";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -246,6 +248,12 @@ const Recipient = ({ form }: { form: Bsda }) => {
         <DetailRow
           value={destination?.operation?.code}
           label="Opération de traitement réalisée"
+        />
+        <DetailRow
+          value={getOperationModeLabel(
+            destination?.operation?.mode as OperationMode
+          )}
+          label={"Mode de traitement"}
         />
         <DateRow
           value={destination?.operation?.date}
