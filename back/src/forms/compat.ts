@@ -137,6 +137,7 @@ export function simpleFormToBsdd(
     destinationCompanyMail: form.recipientCompanyMail,
     destinationCustomInfo: null,
     destinationReceptionDate: form.receivedAt,
+    // NOTE : quantityReceived DB to generic object translation
     destinationReceptionWeight: form.quantityReceived,
     destinationReceptionAcceptationStatus: form.wasteAcceptationStatus,
     destinationReceptionRefusalReason: form.wasteRefusalReason,

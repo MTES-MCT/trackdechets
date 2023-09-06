@@ -11,7 +11,8 @@ import {
   Status,
   User,
   UserRole,
-  GovernmentPermission
+  GovernmentPermission,
+  CompanyType
 } from "@prisma/client";
 import {
   refreshElasticSearch,
@@ -364,10 +365,13 @@ describe("Incoming wastes registry", () => {
     );
     expect(data.incomingWastes.edges).toHaveLength(1);
     const incomingWaste = data.incomingWastes.edges.map(e => e.node)[0];
-    expect(incomingWaste.emitterCompanySiret).toEqual(ttr.siret);
-    expect(incomingWaste.initialEmitterCompanySiret).toBeNull();
-    expect(incomingWaste.initialEmitterCompanyName).toBeNull();
-    expect(incomingWaste.initialEmitterPostalCodes).toEqual(["07100"]);
+    expect(incomingWaste.temporaryStorageDetailCompanyName).toEqual(ttr.siret);
+    expect(incomingWaste.temporaryStorageDetailCompanySiret).toBeNull();
+    expect(incomingWaste.temporaryStorageDetailQuantityReceived).toBeNull();
+    expect(incomingWaste.temporaryStorageDetailPlannedOperationCode).toEqual(
+      "07100"
+    );
+    expect(incomingWaste.temporaryStorageDetailOperationCode).toEqual("07100");
   });
 
   it("should allow user to request any siret if authenticated from a service account", async () => {
@@ -491,5 +495,84 @@ describe("Incoming wastes registry", () => {
         })
       ]
     });
+  });
+  it("should export appendix 2", async () => {
+    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
+      UserRole.MEMBER,
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const { user: destinationUser, company: destination } =
+      await userWithCompanyFactory(UserRole.MEMBER, {
+        companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+      });
+
+    const form1 = await formFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        status: "GROUPED",
+        processingOperationDone: "R 13",
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const form2 = await formFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        status: "GROUPED",
+        processingOperationDone: "R 13",
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const groupementForm = await formWithTempStorageFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        emitterType: "APPENDIX2",
+        emitterCompanySiret: ttr.siret,
+        status: Status.SENT,
+        receivedBy: "Bill",
+        recipientCompanySiret: destination.siret,
+        receivedAt: new Date("2019-01-17"),
+        grouping: {
+          createMany: {
+            data: [
+              {
+                initialFormId: form1.id,
+                quantity: form1.quantityReceived!
+              },
+              {
+                initialFormId: form2.id,
+                quantity: form2.quantityReceived!
+              }
+            ]
+          }
+        }
+      }
+    });
+    await Promise.all([
+      indexForm(await getFullForm(form1)),
+      indexForm(await getFullForm(form2)),
+      indexForm(await getFullForm(groupementForm))
+    ]);
+    await refreshElasticSearch();
+    const { query } = makeClient(destinationUser);
+    const { data } = await query<Pick<Query, "incomingWastes">>(
+      INCOMING_WASTES,
+      {
+        variables: {
+          sirets: [destination.siret]
+        }
+      }
+    );
+    expect(data.incomingWastes.edges).toHaveLength(1);
+    const incomingWaste = data.incomingWastes.edges.map(e => e.node)[0];
+    expect(incomingWaste.emitterCompanySiret).toEqual(ttr.siret);
+    expect(incomingWaste.initialEmitterCompanySiret).toBeNull();
+    expect(incomingWaste.initialEmitterCompanyName).toBeNull();
+    expect(incomingWaste.initialEmitterPostalCodes).toEqual(["07100"]);
   });
 });

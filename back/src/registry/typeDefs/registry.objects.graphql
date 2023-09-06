@@ -198,6 +198,18 @@ type IncomingWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+
+  "Extra - Numéro de SIRET de l'établissement d'entreposage provisoire"
+  temporaryStorageDetailCompanySiret: String
+  "Extra - Raison sociale de l'établissement d'entreposage provisoire"
+  temporaryStorageDetailCompanyName: String
+  "Extra - Quantité reçue en tonnes de l'entreposage provisoire"
+  temporaryStorageDetailQuantityReceived: Float
+  "Extra - Le code du traitement prévu dans l'entreposage provisoire"
+  temporaryStorageDetailPlannedOperationCode: String
+  "Extra - Le code du traitement réalisé dans l'entreposage provisoire"
+  temporaryStorageDetailOperationCode: String
+
 }
 
 type IncomingWasteEdge {

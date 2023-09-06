@@ -12,7 +12,7 @@ const appendix2FormsResolver: FormResolvers["appendix2Forms"] = async (
   if (form.emitter?.type !== "APPENDIX2") {
     return null;
   }
-
+  // TODO pick this method to complete the registry
   const grouping = await prisma.form
     .findUnique({ where: { id: form.id } })
     .grouping({
