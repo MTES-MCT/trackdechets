@@ -204,7 +204,7 @@ async function getRecentNextDestinations(
   const favorites = await Promise.all(
     nextDestinationSirets.map(async siret => {
       try {
-        return searchCompany(siret);
+        return await searchCompany(siret);
       } catch (_) {
         return null;
       }
