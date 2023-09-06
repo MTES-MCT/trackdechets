@@ -20,6 +20,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Suppression du script `npm run queue:obliterate` [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
+
 # [2023.8.3] 29/08/2023
 
 #### :rocket: Nouvelles fonctionnalités
