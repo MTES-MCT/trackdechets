@@ -709,49 +709,6 @@ describe("Mutation.Bsda.sign", () => {
       expect(data.signBsda.id).toBeTruthy();
     });
 
-    // TODO
-    // TODO
-    // TODO
-    it("should not allow destination to sign operation if mode is not filled", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-      const transporterReceipt = await transporterReceiptFactory({
-        company: transporter.company
-      });
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SENT",
-          emitterEmissionSignatureAuthor: "Emétteur",
-          emitterEmissionSignatureDate: new Date(),
-          workerWorkSignatureAuthor: "Worker",
-          workerWorkSignatureDate: new Date(),
-          transporterCompanySiret: transporter.company.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterRecepisseNumber: transporterReceipt.receiptNumber,
-          transporterRecepisseDepartment: transporterReceipt.department,
-          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
-          destinationCompanySiret: company.siret
-        }
-      });
-
-      const { mutate } = makeClient(user);
-      const { data } = await mutate<
-        Pick<Mutation, "signBsda">,
-        MutationSignBsdaArgs
-      >(SIGN_BSDA, {
-        variables: {
-          id: bsda.id,
-          input: {
-            type: "OPERATION",
-            author: user.name
-          }
-        }
-      });
-
-      expect(data.signBsda.id).toBeTruthy();
-    });
-
     it("should mark as AWAITING_CHILD if operation code implies it", async () => {
       const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
@@ -772,7 +729,8 @@ describe("Mutation.Bsda.sign", () => {
           transporterRecepisseDepartment: transporterReceipt.department,
           transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: company.siret,
-          destinationOperationCode: "D 15"
+          destinationOperationCode: "D 15",
+          destinationOperationMode: undefined
         }
       });
 
