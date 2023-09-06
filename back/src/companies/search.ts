@@ -78,8 +78,8 @@ async function findCompanyAndMergeInfos(
 }
 
 /**
- * Common entry-point for all Company search
- * Search one company by SIRET or VAT number
+ * Common Company search unique by orgId
+ * Search by SIRET or VAT number
  * Supports Test SIRET and AnonymousCompany
  */
 export async function searchCompany(

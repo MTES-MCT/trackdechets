@@ -7,6 +7,7 @@ import { searchCompany } from "../../companies/search";
 import { CompanySearchResult } from "../../companies/types";
 import { Client } from "@elastic/elasticsearch";
 import { FavoriteType } from "../../generated/graphql/types";
+import { getTransporterCompanyOrgId } from "../../common/constants/companySearchHelpers";
 import { getCompanyOrCompanyNotFound } from "../../companies/database";
 
 /**
@@ -234,20 +235,12 @@ async function getRecentTransporters(defaultWhere: Prisma.FormWhereInput) {
       ]
     }
   });
-  const transporterSirets = transporters
-    .map(f => f.transporterCompanySiret)
-    .filter(Boolean);
-  const transporterVatNumbers = transporters
-    .map(f => f.transporterCompanyVatNumber)
+  const transporterOrgIds = transporters
+    .map(f => getTransporterCompanyOrgId(f))
     .filter(Boolean);
 
   const companies = await prisma.company.findMany({
-    where: {
-      OR: [
-        { siret: { in: transporterSirets } },
-        { vatNumber: { in: transporterVatNumbers } }
-      ]
-    }
+    where: { orgId: { in: transporterOrgIds } }
   });
   return Promise.all(companies.map(({ orgId }) => searchCompany(orgId)));
 }
