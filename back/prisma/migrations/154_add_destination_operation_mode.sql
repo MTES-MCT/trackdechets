@@ -11,3 +11,6 @@ ALTER TABLE "default$default"."Bsda" ADD COLUMN IF NOT EXISTS "destinationOperat
 
 -- Add column 'destinationOperationMode' to BSDASRIs
 ALTER TABLE "default$default"."Bsdasri" ADD COLUMN IF NOT EXISTS "destinationOperationMode" "default$default"."OperationMode";
+
+-- Add column 'destinationOperationMode' to BSVHUs
+ALTER TABLE "default$default"."Bsvhu" ADD COLUMN IF NOT EXISTS "destinationOperationMode" "default$default"."OperationMode";

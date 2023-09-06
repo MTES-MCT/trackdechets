@@ -359,6 +359,7 @@ export function toAllWaste(
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationOperationCode: bsdasri.destinationOperationCode,
+    destinationOperationMode: bsdasri.destinationOperationMode,
     destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,

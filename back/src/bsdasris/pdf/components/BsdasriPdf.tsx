@@ -15,8 +15,9 @@ import {
 import { TraceabilityTable } from "./TraceabilityTable";
 import { PackagingInfosTable } from "./PackagingInfosTable";
 import { FormCompanyFields } from "./FormCompanyFields";
-import { BsdasriType } from "@prisma/client";
+import { BsdasriType, OperationMode } from "@prisma/client";
 import { Recepisse } from "../../../bsda/pdf/components/Recepisse";
+import { getOperationModeLabel } from "../../../common/operationModes";
 
 /**
  *
@@ -500,7 +501,12 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               />{" "}
               Incinération (D10)
             </p>
-
+            <p>
+              Mode de traitement :{" "}
+              {getOperationModeLabel(
+                bsdasri?.destination?.operation?.mode as OperationMode
+              )}
+            </p>
             <p>
               <strong>Quantité traitée </strong> :{" "}
               {bsdasri?.destination?.operation?.weight?.value} Kg

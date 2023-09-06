@@ -231,6 +231,7 @@ export const fullDasriFragment = gql`
           value
         }
         code
+        mode
         date
         signature {
           ...SignatureFragment

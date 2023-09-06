@@ -17,6 +17,7 @@ import { Bsdasri, BsdasriType } from "generated/graphql/types";
 import Transport from "form/bsdasri/steps/Transport";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 import { subMonths } from "date-fns";
+import OperationModeSelect from "common/components/OperationModeSelect";
 
 export function EmitterSignatureForm() {
   return (
@@ -250,6 +251,10 @@ export function OperationSignatureForm() {
           ) : null}
         </Field>
       </div>
+      <OperationModeSelect
+        operationCode={values?.destination?.operation?.code}
+        name="destination.operation.mode"
+      />
       <div className="form__row">
         <label>
           Date de traitement :
@@ -264,9 +269,7 @@ export function OperationSignatureForm() {
           </div>
         </label>
       </div>
-
       <h4 className="form__section-heading">Quantité traitée</h4>
-
       <div className="form__row">
         <label>
           Quantité en kg :

@@ -8,6 +8,7 @@ import {
   FormCompany,
   BsdasriPackaging,
   BsdasriType,
+  OperationMode,
 } from "generated/graphql/types";
 import routes from "Apps/routes";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDownloadPdf";
@@ -36,6 +37,7 @@ import {
 } from "dashboard/detail/common/Components";
 
 import classNames from "classnames";
+import { getOperationModeLabel } from "common/operationModes";
 
 const getVerboseWasteName = (code: string): string => {
   const desc = {
@@ -266,6 +268,12 @@ const Recipient = ({ form }: { form: Bsdasri }) => {
           value={destination?.operation?.code}
           label="Opération de traitement"
         />
+        <DetailRow
+          value={getOperationModeLabel(
+            destination?.operation?.mode as OperationMode
+          )}
+          label={"Mode de traitement"}
+        />
         <DateRow
           value={destination?.operation?.date}
           label="Traitement effectué le"
@@ -388,15 +396,15 @@ export default function BsdasriDetailContent({
           {[BsdasriType.Synthesis, BsdasriType.Grouping].includes(
             form?.type
           ) && (
-            <Tab className={styles.detailTab}>
-              <IconBSDasri style={{ fontSize: "24px" }} />
-              <span className={styles.detailTabCaption}>
-                {form?.type === BsdasriType.Grouping
-                  ? "Bsd groupés"
-                  : "Bsds associés"}
-              </span>
-            </Tab>
-          )}
+              <Tab className={styles.detailTab}>
+                <IconBSDasri style={{ fontSize: "24px" }} />
+                <span className={styles.detailTabCaption}>
+                  {form?.type === BsdasriType.Grouping
+                    ? "Bsd groupés"
+                    : "Bsds associés"}
+                </span>
+              </Tab>
+            )}
         </TabList>
         {/* Tabs content */}
         <div className={styles.detailTabPanels}>
