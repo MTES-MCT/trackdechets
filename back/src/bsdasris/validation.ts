@@ -651,17 +651,25 @@ export const operationSchema: FactorySchemaOf<
         }
       ),
     destinationOperationMode: yup
-      .mixed<OperationMode>()
-      .oneOf(Object.values(OperationMode))
+      .mixed<OperationMode | null | undefined>()
+      .oneOf([...Object.values(OperationMode), null, undefined])
+      .nullable()
       .test(
         "processing-mode-matches-processing-operation",
         "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
         function (item) {
-          const modes = getOperationModesFromOperationCode(
-            this.parent.processingOperationDone
-          );
+          const { destinationOperationCode } = this.parent;
+          const destinationOperationMode = item;
 
-          return (!item && !modes.length) || modes.includes(item ?? "");
+          if (destinationOperationCode && destinationOperationMode) {
+            const modes = getOperationModesFromOperationCode(
+              destinationOperationCode
+            );
+
+            return modes.includes(destinationOperationMode ?? "");
+          }
+
+          return true;
         }
       ),
     destinationOperationDate: yup

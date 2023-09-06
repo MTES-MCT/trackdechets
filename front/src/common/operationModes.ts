@@ -3,25 +3,41 @@ import { OperationMode } from "generated/graphql/types";
 export const getOperationModesFromOperationCode = (
   operationCode: string
 ): OperationMode[] => {
-  const splitted = operationCode.split(" ");
-  const letter = splitted[0];
-  const number = parseInt(splitted[1]);
+  if (!operationCode || !operationCode.length) return [];
 
-  if (letter === "D" && number <= 12) {
+  // Remove all spaces in the operation code
+  // In some places we use "X 0", in some other "X0"
+  const trimmed = operationCode.replace(/ /g, "").toString();
+
+  if (
+    [
+      "D1",
+      "D2",
+      "D3",
+      "D4",
+      "D5",
+      "D6",
+      "D7",
+      "D8",
+      "D9",
+      "D9F",
+      "D10",
+      "D11",
+      "D12",
+    ].includes(trimmed)
+  ) {
     return [OperationMode.Elimination];
   }
 
-  if (operationCode === "R 1") {
+  if (trimmed === "R1") {
     return [OperationMode.ValorisationEnergetique];
   }
 
-  if (
-    ["R 2", "R 3", "R 4", "R 5", "R 7", "R 9", "R 11"].includes(operationCode)
-  ) {
+  if (["R2", "R3", "R4", "R5", "R7", "R9", "R11"].includes(trimmed)) {
     return [OperationMode.Reutilisation, OperationMode.Recyclage];
   }
 
-  if (["R 6", "R 8", "R 10"].includes(operationCode)) {
+  if (["R6", "R8", "R10"].includes(trimmed)) {
     return [OperationMode.Recyclage];
   }
 

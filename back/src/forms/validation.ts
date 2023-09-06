@@ -1380,8 +1380,9 @@ const processedInfoSchemaFn: (
         INVALID_PROCESSING_OPERATION
       ),
     destinationOperationMode: yup
-      .mixed<OperationMode>()
-      .oneOf(Object.values(OperationMode))
+      .mixed<OperationMode | null | undefined>()
+      .oneOf([...Object.values(OperationMode), null, undefined])
+      .nullable()
       .test(
         "processing-mode-matches-processing-operation",
         "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
