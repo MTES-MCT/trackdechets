@@ -16,6 +16,7 @@ import {
 } from "../../../../queue/jobs/indexFavorites";
 import { convertUrls } from "../../../database";
 import * as search from "../../../search";
+import { nullIfNoValues } from "../../../../common/converter";
 
 const request = supertest(app);
 
@@ -137,7 +138,8 @@ describe("query favorites", () => {
       {
         vatNumber: "IE6409733C",
         orgId: "IE6409733C",
-        siret: undefined
+        siret: null,
+        companyTypes: ["TRANSPORTER"]
       }
     );
     await formFactory({
@@ -190,8 +192,20 @@ describe("query favorites", () => {
 
     expect(data2.favorites).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ orgId: company2.orgId }),
-        expect.objectContaining({ orgId: company.orgId })
+        {
+          address: company2.address,
+          brokerReceipt: null,
+          codePaysEtrangerEtablissement: null,
+          contact: company2.contact,
+          contactEmail: company2.contactEmail,
+          contactPhone: company2.contactPhone,
+          name: company2.name,
+          orgId: company2.orgId,
+          siret: company2.siret,
+          traderReceipt: null,
+          transporterReceipt: null,
+          vatNumber: company2.vatNumber
+        }
       ])
     );
   });

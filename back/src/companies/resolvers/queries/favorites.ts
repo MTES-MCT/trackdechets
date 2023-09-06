@@ -50,10 +50,9 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
   return favorites
     ? favorites.filter(
         fav =>
-          allowForeignCompanies === undefined ||
           (allowForeignCompanies === true && isForeignVat(fav.orgId)) ||
-          (allowForeignCompanies === false &&
-            (isSiret(orgId) || isFRVat(orgId)))
+          isSiret(orgId) ||
+          isFRVat(orgId)
       )
     : [];
 };
