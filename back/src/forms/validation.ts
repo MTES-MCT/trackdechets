@@ -1387,11 +1387,18 @@ const processedInfoSchemaFn: (
         "processing-mode-matches-processing-operation",
         "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
         function (item) {
-          const modes = getOperationModesFromOperationCode(
-            this.parent.processingOperationDone
-          );
+          const { processingOperationDone } = this.parent;
+          const destinationOperationMode = item;
 
-          return (!item && !modes.length) || modes.includes(item ?? "");
+          if (processingOperationDone && destinationOperationMode) {
+            const modes = getOperationModesFromOperationCode(
+              processingOperationDone
+            );
+
+            return modes.includes(destinationOperationMode ?? "");
+          }
+
+          return true;
         }
       ),
     processingOperationDescription: yup.string().nullable()

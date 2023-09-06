@@ -2,7 +2,8 @@ import {
   Prisma,
   BsvhuIdentificationType,
   BsvhuPackaging,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  OperationMode
 } from "@prisma/client";
 import { PROCESSING_OPERATIONS_CODES } from "../common/constants";
 import {
@@ -27,6 +28,7 @@ import {
   WeightUnits,
   transporterRecepisseSchema
 } from "../common/validation";
+import { getOperationModesFromOperationCode } from "../common/operationModes";
 
 type Emitter = Pick<
   Prisma.BsvhuCreateInput,
@@ -187,6 +189,28 @@ const destinationSchema: FactorySchemaOf<
       .requiredIf(
         context.operationSignature,
         `Destinataire: l'opération réalisée est obligatoire`
+      ),
+    destinationOperationMode: yup
+      .mixed<OperationMode | null | undefined>()
+      .oneOf([...Object.values(OperationMode), null, undefined])
+      .nullable()
+      .test(
+        "processing-mode-matches-processing-operation",
+        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
+        function (item) {
+          const { destinationOperationCode } = this.parent;
+          const destinationOperationMode = item;
+
+          if (destinationOperationCode && destinationOperationMode) {
+            const modes = getOperationModesFromOperationCode(
+              destinationOperationCode
+            );
+
+            return modes.includes(destinationOperationMode ?? "");
+          }
+
+          return true;
+        }
       ),
     destinationPlannedOperationCode: yup
       .string()

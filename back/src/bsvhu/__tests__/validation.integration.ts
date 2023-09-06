@@ -1,4 +1,4 @@
-import { Bsvhu, Company } from "@prisma/client";
+import { Bsvhu, Company, OperationMode } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { validateBsvhu } from "../validation";
@@ -298,6 +298,23 @@ describe("BSVHU validation", () => {
             "Transporteur: la date limite de validité du récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
           ])
         );
+      }
+    });
+
+    test("when operation mode is not compatible with operation code", async () => {
+      const data = {
+        ...bsvhu,
+        destinationOperationCode: "R 1",
+        destinationOperationMode: OperationMode.RECYCLAGE
+      };
+      expect.assertions(1);
+
+      try {
+        await validateBsvhu(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors.length).toBeTruthy();
       }
     });
   });
