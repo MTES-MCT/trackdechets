@@ -391,6 +391,21 @@ describe("Index favorites job", () => {
       }
     });
     const tempStorer = await companyFactory();
+    searchCompanySpy.mockResolvedValueOnce({
+      name: tempStorer.name,
+      siret: tempStorer.siret,
+      vatNumber: tempStorer.vatNumber,
+      orgId: tempStorer.orgId,
+      contact: tempStorer.contact,
+      contactEmail: tempStorer.contactEmail,
+      contactPhone: tempStorer.contactPhone,
+      codePaysEtrangerEtablissement: "FR",
+      address: tempStorer.address,
+      companyTypes: tempStorer.companyTypes,
+      isRegistered: true,
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O"
+    });
     await formFactory({
       ownerId: user.id,
       opt: {
@@ -406,14 +421,19 @@ describe("Index favorites job", () => {
 
     expect(favorites).toEqual([
       expect.objectContaining({
-        orgId: tempStorer.orgId,
         name: tempStorer.name,
-        address: tempStorer.address,
+        siret: tempStorer.siret,
+        orgId: tempStorer.orgId,
         vatNumber: null,
-        mail: tempStorer.contactEmail,
-        phone: tempStorer.contactPhone,
         contact: tempStorer.contact,
-        codePaysEtrangerEtablissement: "FR"
+        contactEmail: tempStorer.contactEmail,
+        contactPhone: tempStorer.contactPhone,
+        codePaysEtrangerEtablissement: "FR",
+        address: tempStorer.address,
+        companyTypes: tempStorer.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O"
       })
     ]);
   });
@@ -424,13 +444,28 @@ describe("Index favorites job", () => {
         set: ["PRODUCER"]
       }
     });
+    const unknownSiret = siretify(1);
     await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.orgId,
-        recipientCompanySiret: siretify(1),
+        recipientCompanySiret: unknownSiret,
         recipientIsTempStorage: true
       }
+    });
+    searchCompanySpy.mockResolvedValueOnce({
+      name: "tempStorer.name",
+      siret: unknownSiret,
+      vatNumber: null,
+      orgId: "tempStorer.orgId",
+      contact: "tempStorer.contact",
+      contactEmail: "tempStorer.contactEmail",
+      contactPhone: "tempStorer.contactPhone",
+      codePaysEtrangerEtablissement: "FR",
+      address: "tempStorer.address",
+      isRegistered: false,
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O"
     });
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
@@ -456,6 +491,23 @@ describe("Index favorites job", () => {
       },
       forwardedInOpts: { recipientCompanySiret: destination.orgId }
     });
+
+    searchCompanySpy.mockResolvedValueOnce({
+      name: destination.name,
+      siret: destination.siret,
+      vatNumber: destination.vatNumber,
+      orgId: destination.orgId,
+      contact: destination.contact,
+      contactEmail: destination.contactEmail,
+      contactPhone: destination.contactPhone,
+      codePaysEtrangerEtablissement: "FR",
+      address: destination.address,
+      companyTypes: destination.companyTypes,
+      isRegistered: true,
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O"
+    });
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "DESTINATION"
@@ -464,13 +516,18 @@ describe("Index favorites job", () => {
     expect(favorites).toEqual([
       expect.objectContaining({
         orgId: destination.orgId,
+        siret: destination.siret,
         name: destination.name,
         address: destination.address,
         vatNumber: null,
-        mail: destination.contactEmail,
-        phone: destination.contactPhone,
         contact: destination.contact,
-        codePaysEtrangerEtablissement: "FR"
+        contactEmail: destination.contactEmail,
+        contactPhone: destination.contactPhone,
+        codePaysEtrangerEtablissement: "FR",
+        companyTypes: destination.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O"
       })
     ]);
   });
@@ -481,11 +538,25 @@ describe("Index favorites job", () => {
         set: ["PRODUCER"]
       }
     });
-
+    const recipientCompanySiret = siretify(1);
     await formWithTempStorageFactory({
       ownerId: user.id,
       opt: { emitterCompanySiret: company.orgId },
-      forwardedInOpts: { recipientCompanySiret: siretify(1) }
+      forwardedInOpts: { recipientCompanySiret }
+    });
+    searchCompanySpy.mockResolvedValueOnce({
+      name: "destination.name",
+      siret: recipientCompanySiret,
+      vatNumber: null,
+      orgId: recipientCompanySiret,
+      contact: "destination.contact",
+      contactEmail: "destination.contactEmail",
+      contactPhone: "destination.contactPhone",
+      codePaysEtrangerEtablissement: "FR",
+      address: "destination.address",
+      isRegistered: false,
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O"
     });
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
@@ -500,6 +571,7 @@ describe("Index favorites job", () => {
     const destination: CompanySearchResult = {
       orgId,
       siret: orgId,
+      vatNumber: null,
       address: "rue des 4 chemins",
       name: "Destination ultérieure",
       isRegistered: true,
@@ -507,7 +579,9 @@ describe("Index favorites job", () => {
       statutDiffusionEtablissement: "O",
       contactEmail: "contact@traiteur.co",
       contactPhone: "00 00 00 00 00",
-      contact: "John Snow"
+      contact: "John Snow",
+      codePaysEtrangerEtablissement: "FR",
+      etatAdministratif: "A"
     };
     searchCompanySpy.mockResolvedValueOnce(destination);
 
@@ -532,13 +606,18 @@ describe("Index favorites job", () => {
     expect(favorites).toEqual([
       expect.objectContaining({
         orgId: destination.orgId,
+        siret: destination.siret,
+        vatNumber: null,
         name: destination.name,
         address: destination.address,
-        vatNumber: null,
-        mail: destination.contactEmail,
-        phone: destination.contactPhone,
+        contactEmail: destination.contactEmail,
+        contactPhone: destination.contactPhone,
         contact: destination.contact,
-        codePaysEtrangerEtablissement: "FR"
+        codePaysEtrangerEtablissement: "FR",
+        companyTypes: destination.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O"
       })
     ]);
   });
@@ -567,20 +646,22 @@ describe("Index favorites job", () => {
   });
 
   it("should return recent traders", async () => {
+    const validityLimit = new Date();
     const trader = await companyFactory({
       companyTypes: ["TRADER"],
       traderReceipt: {
         create: {
           receiptNumber: "receipt",
           department: "07",
-          validityLimit: new Date()
+          validityLimit
         }
       }
     });
 
     const traderSirene: CompanySearchResult = {
       orgId: trader.orgId!,
-      siret: trader.orgId,
+      siret: trader.siret,
+      vatNumber: null,
       address: "rue des 4 chemins",
       name: "Négociant",
       isRegistered: true,
@@ -588,7 +669,9 @@ describe("Index favorites job", () => {
       statutDiffusionEtablissement: "O",
       contactEmail: "contact@trader.co",
       contactPhone: "00 00 00 00 00",
-      contact: "John Snow"
+      contact: "John Snow",
+      etatAdministratif: "A",
+      codePaysEtrangerEtablissement: "FR"
     };
     searchCompanySpy.mockResolvedValueOnce(traderSirene);
 
@@ -614,34 +697,44 @@ describe("Index favorites job", () => {
       expect.objectContaining({
         orgId: traderSirene.orgId,
         name: traderSirene.name,
+        siret: trader.siret,
         address: traderSirene.address,
         vatNumber: null,
-        mail: traderSirene.contactEmail,
-        phone: traderSirene.contactPhone,
+        contactEmail: traderSirene.contactEmail,
+        contactPhone: traderSirene.contactPhone,
         contact: traderSirene.contact,
         codePaysEtrangerEtablissement: "FR",
+        companyTypes: traderSirene.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O",
         traderReceipt: {
-          receiptNumber: "receipt"
+          receiptNumber: "receipt",
+          department: "07",
+          validityLimit,
+          id: trader.traderReceiptId
         }
       })
     ]);
   });
 
   it("should return recent brokers", async () => {
+    const validityLimit = new Date();
     const broker = await companyFactory({
       companyTypes: ["BROKER"],
       brokerReceipt: {
         create: {
           receiptNumber: "receipt",
           department: "07",
-          validityLimit: new Date()
+          validityLimit
         }
       }
     });
 
     const brokerSirene: CompanySearchResult = {
       orgId: broker.orgId,
-      siret: broker.orgId!,
+      siret: broker.siret,
+      vatNumber: null,
       address: "rue des 4 chemins",
       name: "Courtier",
       isRegistered: true,
@@ -649,9 +742,11 @@ describe("Index favorites job", () => {
       statutDiffusionEtablissement: "O",
       contactEmail: "contact@broker.co",
       contactPhone: "00 00 00 00 00",
-      contact: "John Snow"
+      contact: "John Snow",
+      etatAdministratif: "A",
+      codePaysEtrangerEtablissement: "FR"
     };
-    // TODO should mock company after brokerSirene
+
     searchCompanySpy.mockResolvedValueOnce(brokerSirene);
 
     const { user, company } = await userWithCompanyFactory("MEMBER", {
@@ -675,15 +770,23 @@ describe("Index favorites job", () => {
     expect(favorites).toEqual([
       expect.objectContaining({
         orgId: brokerSirene.orgId,
+        siret: broker.siret,
         name: brokerSirene.name,
         address: brokerSirene.address,
         vatNumber: null,
-        mail: brokerSirene.contactEmail,
-        phone: brokerSirene.contactPhone,
+        contactEmail: brokerSirene.contactEmail,
+        contactPhone: brokerSirene.contactPhone,
         contact: brokerSirene.contact,
         codePaysEtrangerEtablissement: "FR",
+        companyTypes: brokerSirene.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O",
         brokerReceipt: {
-          receiptNumber: "receipt"
+          receiptNumber: "receipt",
+          department: "07",
+          validityLimit,
+          id: broker.brokerReceiptId
         }
       })
     ]);
@@ -695,6 +798,22 @@ describe("Index favorites job", () => {
         set: ["PRODUCER"]
       }
     });
+
+    searchCompanySpy.mockResolvedValueOnce({
+      orgId: company.orgId,
+      siret: company.orgId!,
+      vatNumber: null,
+      address: "rue des 4 chemins",
+      name: company.name,
+      isRegistered: true,
+      companyTypes: company.companyTypes,
+      statutDiffusionEtablissement: "O",
+      codePaysEtrangerEtablissement: "FR",
+      contactEmail: company.contactEmail,
+      contactPhone: company.contactPhone,
+      contact: company.contact,
+      etatAdministratif: "A"
+    });
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "EMITTER"
@@ -702,7 +821,18 @@ describe("Index favorites job", () => {
     expect(favorites).toEqual([
       expect.objectContaining({
         orgId: company.orgId,
-        codePaysEtrangerEtablissement: "FR"
+        siret: company.siret,
+        name: company.name,
+        address: "rue des 4 chemins",
+        vatNumber: null,
+        contactEmail: company.contactEmail,
+        contactPhone: company.contactPhone,
+        contact: company.contact,
+        codePaysEtrangerEtablissement: "FR",
+        companyTypes: company.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O"
       })
     ]);
   });
@@ -730,24 +860,88 @@ describe("Index favorites job", () => {
         recipientsSirets: [company.orgId!]
       }
     });
+    searchCompanySpy
+      .mockResolvedValueOnce({
+        orgId: emitter1.orgId,
+        siret: emitter1.siret,
+        address: "rue des 4 chemins",
+        name: emitter1.name,
+        isRegistered: true,
+        companyTypes: emitter1.companyTypes,
+        statutDiffusionEtablissement: "O",
+        contactEmail: emitter1.contactEmail,
+        contactPhone: emitter1.contactPhone,
+        contact: emitter1.contact
+      })
+      .mockResolvedValueOnce({
+        orgId: emitter2.orgId,
+        siret: emitter2.siret,
+        address: "rue des 4 chemins",
+        name: emitter2.name,
+        isRegistered: true,
+        companyTypes: emitter2.companyTypes,
+        statutDiffusionEtablissement: "O",
+        contactEmail: emitter2.contactEmail,
+        contactPhone: emitter2.contactPhone,
+        contact: emitter2.contact
+      })
+      .mockResolvedValueOnce({
+        orgId: company.orgId,
+        siret: company.siret,
+        address: "rue des 4 chemins",
+        name: company.name,
+        isRegistered: true,
+        companyTypes: company.companyTypes,
+        statutDiffusionEtablissement: "O",
+        contactEmail: company.contactEmail,
+        contactPhone: company.contactPhone,
+        contact: company.contact
+      });
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "EMITTER"
     });
-    expect(favorites).toEqual([
-      expect.objectContaining({
-        orgId: firstForm.emitterCompanySiret,
-        codePaysEtrangerEtablissement: "FR"
-      }),
-      expect.objectContaining({
-        orgId: secondForm.emitterCompanySiret,
-        codePaysEtrangerEtablissement: "FR"
-      }),
-      expect.objectContaining({
-        orgId: company.orgId,
-        codePaysEtrangerEtablissement: "FR"
-      })
-    ]);
+
+    expect(favorites).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          orgId: firstForm.emitterCompanySiret,
+          siret: firstForm.emitterCompanySiret,
+          address: "rue des 4 chemins",
+          name: emitter1.name,
+          isRegistered: true,
+          companyTypes: emitter1.companyTypes,
+          statutDiffusionEtablissement: "O",
+          contactEmail: emitter1.contactEmail,
+          contactPhone: emitter1.contactPhone,
+          contact: emitter1.contact
+        }),
+        expect.objectContaining({
+          orgId: secondForm.emitterCompanySiret,
+          siret: secondForm.emitterCompanySiret,
+          address: "rue des 4 chemins",
+          name: emitter2.name,
+          isRegistered: true,
+          companyTypes: emitter2.companyTypes,
+          statutDiffusionEtablissement: "O",
+          contactEmail: emitter2.contactEmail,
+          contactPhone: emitter2.contactPhone,
+          contact: emitter2.contact
+        }),
+        expect.objectContaining({
+          orgId: company.orgId,
+          siret: company.siret,
+          address: "rue des 4 chemins",
+          name: company.name,
+          isRegistered: true,
+          companyTypes: company.companyTypes,
+          statutDiffusionEtablissement: "O",
+          contactEmail: company.contactEmail,
+          contactPhone: company.contactPhone,
+          contact: company.contact
+        })
+      ])
+    );
   });
 
   it("should return the user's company based on an existing BSD", async () => {
@@ -779,24 +973,87 @@ describe("Index favorites job", () => {
         emitterCompanySiret: company.orgId
       }
     });
+    searchCompanySpy
+      .mockResolvedValueOnce({
+        orgId: emitter1.orgId,
+        siret: emitter1.siret,
+        address: "rue des 4 chemins",
+        name: emitter1.name,
+        isRegistered: true,
+        companyTypes: emitter1.companyTypes,
+        statutDiffusionEtablissement: "O",
+        contactEmail: emitter1.contactEmail,
+        contactPhone: emitter1.contactPhone,
+        contact: emitter1.contact
+      })
+      .mockResolvedValueOnce({
+        orgId: emitter2.orgId,
+        siret: emitter2.siret,
+        address: "rue des 4 chemins",
+        name: emitter2.name,
+        isRegistered: true,
+        companyTypes: emitter2.companyTypes,
+        statutDiffusionEtablissement: "O",
+        contactEmail: emitter2.contactEmail,
+        contactPhone: emitter2.contactPhone,
+        contact: emitter2.contact
+      })
+      .mockResolvedValueOnce({
+        orgId: company.orgId,
+        siret: company.siret,
+        address: "rue des 4 chemins",
+        name: company.name,
+        isRegistered: true,
+        companyTypes: company.companyTypes,
+        statutDiffusionEtablissement: "O",
+        contactEmail: company.contactEmail,
+        contactPhone: company.contactPhone,
+        contact: company.contact
+      });
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "EMITTER"
     });
-    expect(favorites).toEqual([
-      expect.objectContaining({
-        orgId: company.orgId,
-        codePaysEtrangerEtablissement: "FR"
-      }),
-      expect.objectContaining({
-        orgId: firstForm.emitterCompanySiret,
-        codePaysEtrangerEtablissement: "FR"
-      }),
-      expect.objectContaining({
-        orgId: secondForm.emitterCompanySiret,
-        codePaysEtrangerEtablissement: "FR"
-      })
-    ]);
+    expect(favorites).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          orgId: firstForm.emitterCompanySiret,
+          siret: firstForm.emitterCompanySiret,
+          address: "rue des 4 chemins",
+          name: emitter1.name,
+          isRegistered: true,
+          companyTypes: emitter1.companyTypes,
+          statutDiffusionEtablissement: "O",
+          contactEmail: emitter1.contactEmail,
+          contactPhone: emitter1.contactPhone,
+          contact: emitter1.contact
+        }),
+        expect.objectContaining({
+          orgId: secondForm.emitterCompanySiret,
+          siret: secondForm.emitterCompanySiret,
+          address: "rue des 4 chemins",
+          name: emitter2.name,
+          isRegistered: true,
+          companyTypes: emitter2.companyTypes,
+          statutDiffusionEtablissement: "O",
+          contactEmail: emitter2.contactEmail,
+          contactPhone: emitter2.contactPhone,
+          contact: emitter2.contact
+        }),
+        expect.objectContaining({
+          orgId: company.orgId,
+          siret: company.siret,
+          address: "rue des 4 chemins",
+          name: company.name,
+          isRegistered: true,
+          companyTypes: company.companyTypes,
+          statutDiffusionEtablissement: "O",
+          contactEmail: company.contactEmail,
+          contactPhone: company.contactPhone,
+          contact: company.contact
+        })
+      ])
+    );
   });
 
   it("should not return the same company twice", async () => {
@@ -822,22 +1079,64 @@ describe("Index favorites job", () => {
         recipientsSirets: [company.orgId!]
       }
     });
+    searchCompanySpy.mockResolvedValueOnce({
+      name: emitter.name,
+      siret: emitter.siret,
+      vatNumber: emitter.vatNumber,
+      orgId: emitter.orgId,
+      contact: emitter.contact,
+      contactEmail: emitter.contactEmail,
+      contactPhone: emitter.contactPhone,
+      codePaysEtrangerEtablissement: "FR",
+      address: emitter.address,
+      companyTypes: emitter.companyTypes,
+      isRegistered: true,
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O"
+    });
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "EMITTER"
     });
     expect(favorites).toEqual([
       expect.objectContaining({
+        name: emitter.name,
+        siret: firstForm.emitterCompanySiret,
+        vatNumber: null,
         orgId: firstForm.emitterCompanySiret,
+        contact: emitter.contact,
+        contactEmail: emitter.contactEmail,
+        contactPhone: emitter.contactPhone,
+        address: emitter.address,
+        companyTypes: emitter.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O",
         codePaysEtrangerEtablissement: "FR"
       })
     ]);
 
     // Test with VAT numbers
     const transporter = await companyFactory({
-      vatNumber: "IT09301420155"
+      siret: null,
+      vatNumber: "IT09301420155",
+      orgId: "IT09301420155"
     });
-
+    searchCompanySpy.mockResolvedValueOnce({
+      name: transporter.name,
+      siret: null,
+      vatNumber: transporter.vatNumber,
+      orgId: transporter.orgId,
+      contact: transporter.contact,
+      contactEmail: transporter.contactEmail,
+      contactPhone: transporter.contactPhone,
+      codePaysEtrangerEtablissement: "IT",
+      address: transporter.address,
+      companyTypes: transporter.companyTypes,
+      isRegistered: true,
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O"
+    });
     await formFactory({
       ownerId: user.id,
       opt: {
@@ -868,14 +1167,23 @@ describe("Index favorites job", () => {
       orgId: company.orgId,
       type: "TRANSPORTER"
     });
-    expect(favorites2).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          vatNumber: "IT09301420155",
-          codePaysEtrangerEtablissement: "IT"
-        })
-      ])
-    );
+    expect(favorites2).toEqual([
+      expect.objectContaining({
+        name: transporter.name,
+        siret: null,
+        vatNumber: transporter.vatNumber,
+        orgId: transporter.orgId,
+        contact: transporter.contact,
+        contactEmail: transporter.contactEmail,
+        contactPhone: transporter.contactPhone,
+        codePaysEtrangerEtablissement: "IT",
+        address: transporter.address,
+        companyTypes: transporter.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O"
+      })
+    ]);
   });
 
   it("should suggest a temporary storage detail destination", async () => {
@@ -885,6 +1193,21 @@ describe("Index favorites job", () => {
       }
     });
     const destination = await companyFactory();
+    searchCompanySpy.mockResolvedValueOnce({
+      name: destination.name,
+      siret: null,
+      vatNumber: destination.vatNumber,
+      orgId: destination.orgId,
+      contact: destination.contact,
+      contactEmail: destination.contactEmail,
+      contactPhone: destination.contactPhone,
+      codePaysEtrangerEtablissement: "FR",
+      address: destination.address,
+      companyTypes: destination.companyTypes,
+      isRegistered: true,
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O"
+    });
     const recipientCompanySiret = siretify(1);
     await formFactory({
       ownerId: user.id,
@@ -909,7 +1232,19 @@ describe("Index favorites job", () => {
     });
     expect(favorites).toEqual([
       expect.objectContaining({
-        orgId: destination.orgId
+        name: destination.name,
+        siret: null,
+        vatNumber: destination.vatNumber,
+        orgId: destination.orgId,
+        contact: destination.contact,
+        contactEmail: destination.contactEmail,
+        contactPhone: destination.contactPhone,
+        codePaysEtrangerEtablissement: "FR",
+        address: destination.address,
+        companyTypes: destination.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O"
       })
     ]);
   });
