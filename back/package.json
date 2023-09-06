@@ -41,7 +41,6 @@
     "watch:queue": "concurrently -k -p \"[{name}]\" -n \"Api Queue,Indexation Queue,Webhooks Queue\" -c \"yellow.bold,cyan.bold,magenta.bold\" \"npm run watch:apiqueue\" \"npm run watch:indexationqueue\" \"npm run watch:webhooksqueue\"",
     "watch:notifier": "tsx watch -r dotenv/config src/notifier/index.ts -e ts",
     "queue": "node dist/src/queue/consumer.js",
-    "queue:obliterate": "node dist/src/queue/obliterate.js",
     "purge-pdf-token": "node dist/src/scripts/bin/purgePdfAccessToken.js",
     "purge-pdf-token:dev": "tsx -r dotenv/config ./src/scripts/bin/purgePdfAccessToken.ts",
     "storeAllWebhookSettings.ts": "node dist/src/webhooks/commands/storeAllWebhookSettings.js",
