@@ -396,15 +396,15 @@ export default function BsdasriDetailContent({
           {[BsdasriType.Synthesis, BsdasriType.Grouping].includes(
             form?.type
           ) && (
-              <Tab className={styles.detailTab}>
-                <IconBSDasri style={{ fontSize: "24px" }} />
-                <span className={styles.detailTabCaption}>
-                  {form?.type === BsdasriType.Grouping
-                    ? "Bsd groupés"
-                    : "Bsds associés"}
-                </span>
-              </Tab>
-            )}
+            <Tab className={styles.detailTab}>
+              <IconBSDasri style={{ fontSize: "24px" }} />
+              <span className={styles.detailTabCaption}>
+                {form?.type === BsdasriType.Grouping
+                  ? "Bsd groupés"
+                  : "Bsds associés"}
+              </span>
+            </Tab>
+          )}
         </TabList>
         {/* Tabs content */}
         <div className={styles.detailTabPanels}>
