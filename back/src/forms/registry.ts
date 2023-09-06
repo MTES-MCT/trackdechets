@@ -153,7 +153,15 @@ export function toIncomingWaste(
     transporter3CompanyName: bsdd.transporter3CompanyName,
     transporter3CompanySiret: bsdd.transporter3CompanySiret,
     transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
-    transporter3CompanyMail: bsdd.transporter3CompanyMail
+    transporter3CompanyMail: bsdd.transporter3CompanyMail,
+    temporaryStorageDetailCompanySiret: bsdd.forwarding.emitterCompanySiret,
+    temporaryStorageDetailCompanyName: bsdd.forwarding.emitterCompanyName,
+    temporaryStorageDetailQuantityReceived:
+      bsdd.forwarding.destinationReceptionWeight,
+    temporaryStorageDetailPlannedOperationCode:
+      bsdd.forwarding.destinationPlannedOperationCode,
+    temporaryStorageDetailOperationCode:
+      bsdd.forwarding.destinationOperationCode
   };
 }
 

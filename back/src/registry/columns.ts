@@ -201,7 +201,27 @@ const columns: Column[] = [
     label: "Transporteur n°3 immatriculation",
     format: formatArray
   },
-  { field: "transporter3CompanyMail", label: "Transporteur n°3 contact" }
+  { field: "transporter3CompanyMail", label: "Transporteur n°3 contact" },
+  {
+    field: "temporaryStorageDetailCompanySiret",
+    label: "Extra - Numéro de SIRET de l'établissement d'entreposage provisoire"
+  },
+  {
+    field: "temporaryStorageDetailCompanyName",
+    label: "Extra - Raison sociale de l'établissement d'entreposage provisoire"
+  },
+  {
+    field: "temporaryStorageDetailQuantityReceived",
+    label: "Extra - Quantité reçue en tonnes de l'entreposage provisoire"
+  },
+  {
+    field: "temporaryStorageDetailPlannedOperationCode",
+    label: "Extra - Le code du traitement prévu dans l'entreposage provisoire"
+  },
+  {
+    field: "temporaryStorageDetailOperationCode",
+    label: "Extra - Le code du traitement réalisé dans l'entreposage provisoire"
+  }
 ];
 
 export function formatRow(waste: GenericWaste, useLabelAsKey = false) {
