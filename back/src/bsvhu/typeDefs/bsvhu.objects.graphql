@@ -125,6 +125,8 @@ type BsvhuOperation {
   date: DateTime
   "Opération de traitement réalisée (R4 ou R12)"
   code: String
+  "Qualification du traitement final"
+  mode: OperationMode
   "Broyeur de destination, à remplir uniquement lorsque la destination est lui même un centre VHU"
   nextDestination: BsvhuNextDestination
   signature: Signature

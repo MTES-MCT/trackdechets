@@ -7,6 +7,7 @@ import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Bsvhu, BsvhuDestinationType } from "generated/graphql/types";
 import { subMonths } from "date-fns";
+import OperationModeSelect from "common/components/OperationModeSelect";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Operation() {
@@ -139,6 +140,13 @@ export default function Operation() {
           </option>
         </Field>
       </div>
+
+      <OperationModeSelect
+        operationCode={values?.destination?.operation?.code}
+        name="destination.operation.mode"
+      />
+
+      <br />
     </>
   );
 }

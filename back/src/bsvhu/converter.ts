@@ -91,6 +91,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
       }),
       operation: nullIfNoValues<BsvhuOperation>({
         code: form.destinationOperationCode,
+        mode: form.destinationOperationMode,
         date: processDate(form.destinationOperationDate),
         nextDestination: nullIfNoValues<BsvhuNextDestination>({
           company: nullIfNoValues<FormCompany>({
@@ -223,6 +224,9 @@ function flattenVhuDestinationInput({
     ),
     destinationOperationCode: chain(destination, r =>
       chain(r.operation, o => o.code)
+    ),
+    destinationOperationMode: chain(destination, r =>
+      chain(r.operation, o => o.mode)
     ),
     destinationOperationNextDestinationCompanyName: chain(destination, d =>
       chain(d.operation, o =>
