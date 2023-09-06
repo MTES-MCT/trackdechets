@@ -6,7 +6,7 @@ import { Company, Status, Prisma } from "@prisma/client";
 import prisma from "../../../prisma";
 import { getUserCompanies } from "../../../users/database";
 import { getFormsRightFilter } from "../../database";
-import { expandFormFromDb } from "../../converter";
+import { expandFormFromDb, expandableFormIncludes } from "../../converter";
 import { getPrismaPaginationArgs } from "../../../common/pagination";
 import { checkCanList } from "../../permissions";
 
@@ -68,10 +68,11 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
       ],
       isDeleted: false,
       forwarding: null
-    }
+    },
+    include: expandableFormIncludes
   });
 
-  return Promise.all(queriedForms.map(f => expandFormFromDb(f)));
+  return queriedForms.map(f => expandFormFromDb(f));
 };
 
 function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {

@@ -2,7 +2,7 @@ import { Form, Prisma, Status, User } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb } from "../../converter";
+import { getAndExpandFormFromDb } from "../../converter";
 import { checkCanDuplicate } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
@@ -180,7 +180,8 @@ async function getDuplicateFormInput(
           fullForm.transporter?.transporterTransportMode,
         transporterIsExemptedOfReceipt:
           fullForm.transporter?.transporterIsExemptedOfReceipt,
-        number: 1
+        number: 1,
+        readyToTakeOver: true
       }
     }
   };
@@ -295,7 +296,7 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
     duplicate: { id: existingForm.id }
   });
 
-  return expandFormFromDb(newForm);
+  return getAndExpandFormFromDb(newForm.id);
 };
 
 export default duplicateFormResolver;

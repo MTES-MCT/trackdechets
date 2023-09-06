@@ -4,19 +4,29 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
-# [2023.8.2] 29/08/2023
+
+# [2023.8.3] 29/08/2023
 
 #### :rocket: Nouvelles fonctionnalités
 
+- ETQ utilisateur je peux faire du multi-modal (v2) sur le BSDD par API [PR 2474](https://github.com/MTES-MCT/trackdechets/pull/2474)
+
 #### :bug: Corrections de bugs
- 
+
+- Une validation trop restrictive des emails à l'inscription empêchaient certains utilisateurs de s'inscrire. Il est désormais possible de s'inscrire avec toute adresse email valide. [PR 2650](https://github.com/MTES-MCT/trackdechets/pull/2650)
+- ETQ utilisateur je peux charger plus de 50 contenants à regrouper lors de la création d'un BSFF de regroupement [PR 2654](https://github.com/MTES-MCT/trackdechets/pull/2654)
+- Le transporteur après entreposage provisoire ne voit pas le bordereau dans l'onglet "À collecter". [PR 2661](https://github.com/MTES-MCT/trackdechets/pull/2661)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
 
 - Amélioration de l'interface de groupement des dasris [PR 2638](https://github.com/MTES-MCT/trackdechets/pull/2638)
+- Interdiction des codes de groupement sur les dasris de synthèse[PR 2639](https://github.com/MTES-MCT/trackdechets/pull/2639)
 
 #### :house: Interne
+
+- Ajout des infos négociant à l'indexation BSDD [PR 2657](https://github.com/MTES-MCT/trackdechets/pull/2657)
 
 # [2023.8.2] 29/08/2023
 
@@ -28,10 +38,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
-- Interdiction des codes de groupement sur les dasris de synthèse[PR 2639](https://github.com/MTES-MCT/trackdechets/pull/2639)
-
 #### :house: Interne
 
+- Mise à jour ElasticSearch vers 7.10 [PR 2423](https://github.com/MTES-MCT/trackdechets/pull/2423)
 
 # [2023.8.1] 08/08/2023
 
@@ -41,6 +50,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Les brouillons des BSDD ne sont plus visibles par l'ensemble des acteurs du bordereau, mais uniquement par l'entreprise à l'origine de la création du bordereau. [PR 2600](https://github.com/MTES-MCT/trackdechets/pull/2600)
 
 #### :bug: Corrections de bugs
+
 - Correction d'un message d'erreur incompréhensible en l'absence des informations de contact entreprise sur le BSFF après avoir cliqué sur "Modifier" [PR 2601](https://github.com/MTES-MCT/trackdechets/pull/2601)
 - Correction de 'limpossibilité d'enlever la présence de POP sur les BSDDs via la révision [PR 2596](https://github.com/MTES-MCT/trackdechets/pull/2596)
 

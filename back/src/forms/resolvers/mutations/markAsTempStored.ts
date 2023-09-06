@@ -5,7 +5,7 @@ import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import { checkCanMarkAsTempStored } from "../../permissions";
 import { receivedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
-import { expandFormFromDb } from "../../converter";
+import { getAndExpandFormFromDb } from "../../converter";
 import { DestinationCannotTempStore } from "../../errors";
 import { Prisma, WasteAcceptationStatus } from "@prisma/client";
 import { getFormRepository } from "../../repository";
@@ -100,7 +100,7 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
     }
   }
 
-  return expandFormFromDb(tempStoredForm);
+  return getAndExpandFormFromDb(tempStoredForm.id);
 };
 
 export default markAsTempStoredResolver;

@@ -16,7 +16,7 @@ import {
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { checkCanSignFor, hasSignatureAutomation } from "../../permissions";
-import { expandFormFromDb } from "../../converter";
+import { getAndExpandFormFromDb } from "../../converter";
 import { getFormRepository } from "../../repository";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 import { runInTransaction } from "../../../common/repository/helper";
@@ -262,16 +262,18 @@ const signTransportFn = async (
         });
 
         // Update ES
-        ids.forEach(id => {
-          enqueueUpdatedBsdToIndex(id);
-        });
+        appendix1Forms
+          .map(f => f.readableId)
+          .forEach(readableId => {
+            enqueueUpdatedBsdToIndex(readableId);
+          });
       }
     }
 
     return updatedForm;
   });
 
-  return expandFormFromDb(updatedForm);
+  return getAndExpandFormFromDb(updatedForm.id);
 };
 
 const signatures: Partial<
@@ -374,7 +376,7 @@ const signatures: Partial<
       }
     );
 
-    return expandFormFromDb(updatedForm);
+    return getAndExpandFormFromDb(updatedForm.id);
   }
 };
 

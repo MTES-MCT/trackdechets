@@ -39,7 +39,6 @@ import {
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
   SIGNER,
-  SIGNER_EN_TANT_QUE_TRAVAUX,
   SIGNER_PAR_ENTREPOS_PROVISOIRE,
   SIGNER_PAR_ENTREPRISE_TRAVAUX,
   SIGNE_PAR_EMETTEUR,
@@ -56,7 +55,6 @@ import {
   completer_bsd_suite,
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { BsdCurrentTab } from "Apps/common/types/commonTypes";
-import { User } from "@sentry/browser";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
@@ -289,7 +287,7 @@ export const getIsNonDraftLabel = (
     isBsdaSignWorker(bsd, currentSiret) &&
     permissions.includes(UserPermission.BsdCanSignWork)
   ) {
-    return SIGNER_EN_TANT_QUE_TRAVAUX;
+    return SIGNER;
   }
 
   if (isBsdasri(bsd.type)) {
@@ -576,7 +574,7 @@ export const getSignByProducerBtnLabel = (
   }
 
   if (currentSiret === bsd.worker?.company?.siret) {
-    return SIGNER_EN_TANT_QUE_TRAVAUX;
+    return SIGNER;
   }
   return "";
 };
@@ -1090,4 +1088,21 @@ export const canEditCustomInfoOrTransporterNumberPlate = (
   }
 
   return false;
+};
+
+export const getOperationCodesFromSearchString = (value: any): string[] => {
+  let searchCodes: string[] = [];
+
+  value.match(/[rRdD]{1}( )\d{1,2}/g)?.forEach(code => {
+    const cleanCode = code.toUpperCase();
+    searchCodes.push(cleanCode);
+    searchCodes.push(cleanCode.replace(" ", "").toUpperCase());
+  });
+
+  value.match(/[rRdD]{1}\d{1,2}/g)?.forEach(code => {
+    const cleanCode = code.toUpperCase();
+    searchCodes.push(cleanCode);
+    searchCodes.push(cleanCode.replace(/([rRdD]{1})/, "$& "));
+  });
+  return searchCodes;
 };

@@ -25,6 +25,7 @@ import {
   isEcoOrgSign,
   isEmetteurSign,
   isSignTransportAndCanSkipEmission,
+  getOperationCodesFromSearchString,
 } from "./dashboardServices";
 import {
   BsdType,
@@ -42,7 +43,6 @@ import {
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
   SIGNER,
-  SIGNER_EN_TANT_QUE_TRAVAUX,
   VALIDER_ACCEPTATION,
   VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE,
   VALIDER_ENTREPOSAGE_PROVISOIRE,
@@ -1113,7 +1113,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual("");
     });
 
-    it("should return SIGNER_EN_TANT_QUE_TRAVAUX when currentSiret is same as worker company siret", () => {
+    it("should return SIGNER when currentSiret is same as worker company siret", () => {
       const permissions: UserPermission[] = [UserPermission.BsdCanSignWork];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
@@ -1121,7 +1121,7 @@ describe("dashboardServices", () => {
         permissions,
         "toCollectTab"
       );
-      expect(result).toEqual(SIGNER_EN_TANT_QUE_TRAVAUX);
+      expect(result).toEqual(SIGNER);
     });
 
     it("should return an empty string when none of the conditions are met", () => {
@@ -1352,6 +1352,33 @@ describe("dashboardServices", () => {
       });
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe("getOperationCodesFromSearchString", () => {
+    it("returns operation codes from search string", () => {
+      const searchString = "r15 R 13 d13 d 15 peoropzie 23326783 D 15";
+      const operationCodes = getOperationCodesFromSearchString(searchString);
+
+      expect(operationCodes).toStrictEqual([
+        "R 13",
+        "R13",
+        "D 15",
+        "D15",
+        "D 15",
+        "D15",
+        "R15",
+        "R 15",
+        "D13",
+        "D 13",
+      ]);
+    });
+
+    it("returns empty array on bad formatted string", () => {
+      const searchString = "peoropzie 23326783";
+      const operationCodes = getOperationCodesFromSearchString(searchString);
+
+      expect(operationCodes).toStrictEqual([]);
     });
   });
 });

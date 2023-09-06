@@ -86,8 +86,9 @@ export default function Signup() {
 
   const handleEmailChange = e => {
     const { value } = e.target;
+    // Taken from HTML spec: https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
     const mailRegex =
-      /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (value.match(mailRegex)) {
       setEmailValue(e.target.value);
       setErrorMessage("");
@@ -124,7 +125,7 @@ export default function Signup() {
               nativeInputProps={{
                 required: true,
                 type: "email",
-                onChange: handleEmailChange,
+                onBlur: handleEmailChange,
               }}
             />
             <PasswordInput

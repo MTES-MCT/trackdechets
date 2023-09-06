@@ -6,6 +6,7 @@ import {
 import prisma from "../../prisma";
 import {
   expandBsddRevisionRequestContent,
+  expandableFormIncludes,
   expandFormFromDb
 } from "../converter";
 
@@ -39,7 +40,7 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
   ) => {
     const fullBsdd = await prisma.bsddRevisionRequest
       .findUnique({ where: { id: parent.id } })
-      .bsdd({ include: { forwardedIn: true, transporters: true } });
+      .bsdd({ include: expandableFormIncludes });
 
     if (!fullBsdd) {
       throw new Error(`FormRevisionRequest ${parent.id} has no form.`);
