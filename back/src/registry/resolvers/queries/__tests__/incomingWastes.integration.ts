@@ -43,6 +43,7 @@ import { INCOMING_WASTES } from "./queries";
 import supertest from "supertest";
 import { app } from "../../../../server";
 import { faker } from "@faker-js/faker";
+import { extractPostalCode } from "../../../../utils";
 
 describe("Incoming wastes registry", () => {
   let emitter: { user: User; company: Company };
@@ -365,13 +366,10 @@ describe("Incoming wastes registry", () => {
     );
     expect(data.incomingWastes.edges).toHaveLength(1);
     const incomingWaste = data.incomingWastes.edges.map(e => e.node)[0];
-    expect(incomingWaste.temporaryStorageDetailCompanyName).toEqual(ttr.siret);
-    expect(incomingWaste.temporaryStorageDetailCompanySiret).toBeNull();
-    expect(incomingWaste.temporaryStorageDetailQuantityReceived).toBeNull();
-    expect(incomingWaste.temporaryStorageDetailPlannedOperationCode).toEqual(
-      "07100"
-    );
-    expect(incomingWaste.temporaryStorageDetailOperationCode).toEqual("07100");
+    expect(incomingWaste.emitterCompanySiret).toEqual(ttr.siret);
+    expect(incomingWaste.initialEmitterCompanySiret).toBeNull();
+    expect(incomingWaste.initialEmitterCompanyName).toBeNull();
+    expect(incomingWaste.initialEmitterPostalCodes).toEqual(["07100"]);
   });
 
   it("should allow user to request any siret if authenticated from a service account", async () => {
@@ -573,6 +571,24 @@ describe("Incoming wastes registry", () => {
     expect(incomingWaste.emitterCompanySiret).toEqual(ttr.siret);
     expect(incomingWaste.initialEmitterCompanySiret).toBeNull();
     expect(incomingWaste.initialEmitterCompanyName).toBeNull();
-    expect(incomingWaste.initialEmitterPostalCodes).toEqual(["07100"]);
+    expect(incomingWaste.initialEmitterPostalCodes).toEqual([
+      extractPostalCode(ttr.address)
+    ]);
+    // groupementForm.forwarded is undefined in getWasteConnection (wastes.ts)
+    expect(incomingWaste.temporaryStorageDetailCompanySiret).toBe(
+      groupementForm.forwardedIn?.emitterCompanySiret
+    );
+    expect(incomingWaste.temporaryStorageDetailCompanyName).toBe(
+      groupementForm.forwardedIn?.emitterCompanyName
+    );
+    expect(incomingWaste.temporaryStorageDetailQuantityReceived).toBe(
+      groupementForm.forwardedIn?.quantityReceived
+    );
+    expect(incomingWaste.temporaryStorageDetailPlannedOperationCode).toBe(
+      groupementForm.forwardedIn?.recipientProcessingOperation
+    );
+    expect(incomingWaste.temporaryStorageDetailOperationCode).toBe(
+      groupementForm.forwardedIn?.processingOperationDone
+    );
   });
 });
