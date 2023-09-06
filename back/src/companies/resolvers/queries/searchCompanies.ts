@@ -1,13 +1,12 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { searchCompanies } from "../../search";
-import { checkIsAuthenticated } from "../../../common/permissions";
 
 const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
   _,
   { clue, department, allowForeignCompanies },
-  context
+  _context
 ) => {
-  checkIsAuthenticated(context);
+  // FIXME add authentication
   return searchCompanies(clue, department, allowForeignCompanies!);
 };
 

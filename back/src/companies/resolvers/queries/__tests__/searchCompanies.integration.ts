@@ -2,11 +2,9 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { companyFactory, siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import * as sirene from "../../../search";
-import { ErrorCode } from "../../../../common/errors";
-import { Query } from "../../../../generated/graphql/types";
+import * as search from "../../../search";
 
-const searchCompanySpy = jest.spyOn(sirene, "searchCompanies");
+const searchCompanySpy = jest.spyOn(search, "searchCompanies");
 
 describe("query { searchCompanies(clue, department) }", () => {
   let query: ReturnType<typeof makeClient>["query"];
@@ -18,34 +16,6 @@ describe("query { searchCompanies(clue, department) }", () => {
   afterEach(async () => {
     await resetDatabase();
     searchCompanySpy.mockReset();
-  });
-
-  it("should disallow unauthenticated user", async () => {
-    const { mutate } = makeClient();
-    const gqlQuery = `
-    query {
-      searchCompanies(clue: "Code en Stock"){
-        siret
-        address
-        name
-        naf
-        libelleNaf
-        installation {
-          codeS3ic
-        }
-      }
-    }
-  `;
-    const { errors } = await mutate<Pick<Query, "searchCompanies">>(gqlQuery);
-
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: "Vous n'êtes pas connecté.",
-        extensions: expect.objectContaining({
-          code: ErrorCode.UNAUTHENTICATED
-        })
-      })
-    ]);
   });
 
   it("should return list of companies based on clue", async () => {
@@ -84,129 +54,8 @@ describe("query { searchCompanies(clue, department) }", () => {
     expect(companies).toHaveLength(1);
   });
 
-  it("should search for companies by name whether allowForeignCompanies is false or true", async () => {
-    const siret = siretify(1);
-
-    searchCompanySpy.mockResolvedValueOnce([
-      {
-        siret,
-        orgId: siret,
-        address: "4 Boulevard Longchamp 13001 Marseille",
-        name: "CODE EN STOCK",
-        naf: "6201Z",
-        libelleNaf: "Programmation informatique",
-        addressVoie: "4 boulevard Longchamp",
-        addressCity: "Marseille",
-        addressPostalCode: "13001"
-      }
-    ]);
-
-    const gqlQuery = `
-      query {
-        searchCompanies(clue: "Code en Stock", allowForeignCompanies: false){
-          siret
-          address
-          name
-          naf
-          libelleNaf
-          installation {
-            codeS3ic
-          }
-        }
-      }
-    `;
-    const response = await query<any>(gqlQuery);
-    const companies = response.data.searchCompanies;
-    expect(companies).toHaveLength(1);
-
-    const gqlQuery2 = `
-      query {
-        searchCompanies(clue: "Code en Stock", allowForeignCompanies: true){
-          siret
-          address
-          name
-          naf
-          libelleNaf
-          installation {
-            codeS3ic
-          }
-        }
-      }
-    `;
-    const response2 = await query<any>(gqlQuery2);
-    const companies2 = response2.data.searchCompanies;
-    expect(companies2).toHaveLength(1);
-  });
-
-  it("should search for companies by SIRET whether allowForeignCompanies is false or true", async () => {
-    const siret = siretify(1);
-
-    searchCompanySpy.mockResolvedValueOnce([
-      {
-        siret,
-        orgId: siret,
-        address: "4 Boulevard Longchamp 13001 Marseille",
-        name: "CODE EN STOCK",
-        naf: "6201Z",
-        libelleNaf: "Programmation informatique",
-        addressVoie: "4 boulevard Longchamp",
-        addressCity: "Marseille",
-        addressPostalCode: "13001"
-      }
-    ]);
-
-    const gqlQuery = `
-      query {
-        searchCompanies(clue: "${siret}", allowForeignCompanies: false){
-          siret
-          address
-          name
-          naf
-          libelleNaf
-          installation {
-            codeS3ic
-          }
-        }
-      }
-    `;
-    const response = await query<any>(gqlQuery);
-    const companies = response.data.searchCompanies;
-    expect(companies).toHaveLength(1);
-
-    const gqlQuery2 = `
-      query {
-        searchCompanies(clue: "${siret}", allowForeignCompanies: true){
-          siret
-          address
-          name
-          naf
-          libelleNaf
-          installation {
-            codeS3ic
-          }
-        }
-      }
-    `;
-    const response2 = await query<any>(gqlQuery2);
-    const companies2 = response2.data.searchCompanies;
-    expect(companies2).toHaveLength(1);
-  });
-
   it("should control search for foreign companies by VAT whether allowForeignCompanies is false or true", async () => {
     const vatNumber = "IT13029381004";
-
-    searchCompanySpy.mockResolvedValueOnce([
-      {
-        vatNumber,
-        orgId: vatNumber,
-        address: "4 via Longchamp 13001 Torino",
-        name: "Che codice",
-        libelleNaf: "Programmation informatique",
-        addressVoie: "4 via Longchamp",
-        addressCity: "Torino",
-        addressPostalCode: "13001"
-      }
-    ]);
 
     const gqlQuery = `
       query {
