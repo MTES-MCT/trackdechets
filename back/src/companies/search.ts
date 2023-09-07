@@ -166,7 +166,7 @@ export const makeSearchCompanies =
   (
     clue: string,
     department?: string | null,
-    allowForeignCompanies?: boolean
+    allowForeignCompanies?: boolean | null
   ): Promise<CompanySearchResult[]> => {
     const cleanedClue = cleanClue(clue);
     // clue can be formatted like a SIRET or a VAT number

@@ -5,9 +5,6 @@ const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
   _,
   { clue, department, allowForeignCompanies },
   _context
-) => {
-  // FIXME add authentication
-  return searchCompanies(clue, department, allowForeignCompanies!);
-};
+) => searchCompanies(clue, department, allowForeignCompanies);
 
 export default searchCompaniesResolver;
