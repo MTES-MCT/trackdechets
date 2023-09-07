@@ -53,6 +53,34 @@ describe("Error handling", () => {
     expect(body.singleResult.data).toEqual({ foo: "bar" });
   });
 
+  test("GRAPHQL_VALIDATION_ERROR should resolves correctly", async () => {
+    process.env.NODE_ENV = "production";
+    const server = require("../server").server;
+    const { body } = await server.executeOperation({
+      query: "query { foobar }" // query inconnue
+    });
+    const errors = body.singleResult.errors;
+    expect(errors).toHaveLength(1);
+    const error = errors[0];
+    expect(error.message).toEqual(
+      'Cannot query field "foobar" on type "Query". Did you mean "foo"?'
+    );
+    expect(error.extensions.code).toEqual("GRAPHQL_VALIDATION_FAILED");
+  });
+
+  test("GRAPHQL_PARSE_FAILED error should resolves correctly", async () => {
+    process.env.NODE_ENV = "production";
+    const server = require("../server").server;
+    const { body } = await server.executeOperation({
+      query: "query { foo" // missing bracket
+    });
+    const errors = body.singleResult.errors;
+    expect(errors).toHaveLength(1);
+    const error = errors[0];
+    expect(error.message).toEqual("Syntax Error: Expected Name, found <EOF>.");
+    expect(error.extensions.code).toEqual("GRAPHQL_PARSE_FAILED");
+  });
+
   test("subclasses of Apollo errors should be formatted correctly when thrown", async () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
@@ -161,15 +189,28 @@ describe("Error handling", () => {
 
   test("Yup validation errors should be displayed as an input error", async () => {
     const server = require("../server").server;
-    const { ValidationError } = require("yup");
+    const yup = require("yup");
     mockFoo.mockImplementationOnce(() => {
-      throw new ValidationError("Bang", "Wrong value", "path");
+      yup.string().required().validateSync(null);
     });
     const { body } = await server.executeOperation({ query: FOO });
     const errors = body.singleResult.errors;
     const error = errors[0];
     expect(error.extensions.code).toEqual("BAD_USER_INPUT");
-    expect(error.message).toContain("Bang");
+    expect(error.message).toEqual("this ne peut pas être null");
+  });
+
+  test("Zod validation errors should be displayed as an input error", async () => {
+    const server = require("../server").server;
+    const { z } = require("zod");
+    mockFoo.mockImplementationOnce(() => {
+      z.string().parse(1);
+    });
+    const { body } = await server.executeOperation({ query: FOO });
+    const errors = body.singleResult.errors;
+    const error = errors[0];
+    expect(error.extensions.code).toEqual("BAD_USER_INPUT");
+    expect(error.message).toEqual("Expected string, received number");
   });
 
   test("BAD_USER_INPUT should be returned when mutations variables are invalid", async () => {
