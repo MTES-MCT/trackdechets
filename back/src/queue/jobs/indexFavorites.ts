@@ -10,10 +10,6 @@ import { FavoriteType } from "../../generated/graphql/types";
 import { getTransporterCompanyOrgId } from "../../common/constants/companySearchHelpers";
 import { getCompanyOrCompanyNotFound } from "../../companies/database";
 
-/**
- * TODO add support for all BSD types
- */
-
 export interface FavoriteIndexBody {
   favorites: CompanySearchResult[];
   orgId: string;

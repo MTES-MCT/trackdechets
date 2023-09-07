@@ -82,11 +82,6 @@ export const favoritesCompanyQueue = new Queue(
   `${REDIS_URL}`,
 
   {
-    // low priority job
-    limiter: {
-      max: 15,
-      duration: 1000 // ms
-    },
     defaultJobOptions: {
       removeOnComplete: 10_000
     }
@@ -97,7 +92,7 @@ export async function addToFavoritesCompanyQueue(
   data: FavoritesInput,
   options?: JobOptions
 ) {
-  await setCompanyDepartementQueue.add(data, {
+  await favoritesCompanyQueue.add(data, {
     ...defaultJobOptions,
     ...options
   });
