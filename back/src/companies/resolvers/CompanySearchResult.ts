@@ -7,7 +7,7 @@ import { CompanyBaseIdentifiers } from "../types";
  * in order to find the parent Company
  */
 export const whereSiretOrVatNumber = (parent: CompanyBaseIdentifiers) => {
-  if (!!parent.siret) {
+  if (parent.siret) {
     return { siret: parent.siret };
   } else if (!!parent.vatNumber) {
     return { vatNumber: parent.vatNumber };
@@ -61,7 +61,7 @@ const companySearchResultResolvers: CompanySearchResultResolvers = {
       .workerCertification();
   },
   installation: (parent, _, context) => {
-    return !!parent.siret
+    return parent.siret
       ? context.dataloaders.installations.load(parent.siret!)
       : null;
   }
