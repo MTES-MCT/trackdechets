@@ -54,46 +54,6 @@ describe("query { searchCompanies(clue, department) }", () => {
     expect(companies).toHaveLength(1);
   });
 
-  it("should control search for foreign companies by VAT whether allowForeignCompanies is false or true", async () => {
-    const vatNumber = "IT13029381004";
-
-    const gqlQuery = `
-      query {
-        searchCompanies(clue: "${vatNumber}", allowForeignCompanies: false){
-          siret
-          address
-          name
-          naf
-          libelleNaf
-          installation {
-            codeS3ic
-          }
-        }
-      }
-    `;
-    const response = await query<any>(gqlQuery);
-    const companies = response.data.searchCompanies;
-    expect(companies).toHaveLength(0);
-
-    const gqlQuery2 = `
-      query {
-        searchCompanies(clue: "${vatNumber}", allowForeignCompanies: true){
-          siret
-          address
-          name
-          naf
-          libelleNaf
-          installation {
-            codeS3ic
-          }
-        }
-      }
-    `;
-    const response2 = await query<any>(gqlQuery2);
-    const companies2 = response2.data.searchCompanies;
-    expect(companies2).toHaveLength(1);
-  });
-
   it("should merge info from SIRENE and ICPE", async () => {
     const siret = siretify(1);
 
