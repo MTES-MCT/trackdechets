@@ -146,4 +146,5 @@ export type Bsdd = {
   destinationOperationDate: Date | null;
   destinationOperationSignatureDate: Date | null;
   destinationCap: string | null;
+  destinationIsTempStorage: boolean | null;
 };

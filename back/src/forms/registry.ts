@@ -90,7 +90,9 @@ function toGenericWaste(bsdd: Bsdd): GenericWaste {
 }
 
 export function toIncomingWaste(
-  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
+  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] } & {
+    forwardedIn: Bsdd;
+  }
 ): IncomingWaste {
   const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
@@ -154,14 +156,15 @@ export function toIncomingWaste(
     transporter3CompanySiret: bsdd.transporter3CompanySiret,
     transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
     transporter3CompanyMail: bsdd.transporter3CompanyMail,
-    temporaryStorageDetailCompanySiret: bsdd.forwarding?.emitterCompanySiret,
-    temporaryStorageDetailCompanyName: bsdd.forwarding?.emitterCompanyName,
-    temporaryStorageDetailQuantityReceived:
-      bsdd.forwarding?.destinationReceptionWeight,
-    temporaryStorageDetailPlannedOperationCode:
-      bsdd.forwarding?.destinationPlannedOperationCode,
-    temporaryStorageDetailOperationCode:
-      bsdd.forwarding?.destinationOperationCode
+    ...(bsdd.destinationIsTempStorage === true && {
+      temporaryStorageDetailCompanySiret: bsdd.destinationCompanySiret,
+      temporaryStorageDetailCompanyName: bsdd.destinationCompanyName,
+      temporaryStorageDetailQuantityReceived:
+        bsdd.forwardedIn?.destinationReceptionWeight,
+      temporaryStorageDetailPlannedOperationCode:
+        bsdd.forwardedIn?.destinationPlannedOperationCode,
+      temporaryStorageDetailOperationdCode: bsdd.destinationOperationCode
+    })
   };
 }
 

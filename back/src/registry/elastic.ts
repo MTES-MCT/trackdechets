@@ -8,6 +8,7 @@ import {
 import { toElasticFilter } from "./where";
 import { Bsvhu, Prisma } from "@prisma/client";
 import prisma from "../prisma";
+import { getFullForm } from "../forms/database";
 
 export function buildQuery(
   registryType: WasteRegistryType,
@@ -78,6 +79,7 @@ export async function searchBsds(
 
 export const RegistryFormInclude = {
   forwarding: { include: { transporters: true } },
+  forwardedIn: { include: { transporters: true } },
   grouping: { include: { initialForm: { include: { transporters: true } } } },
   transporters: true
 };
