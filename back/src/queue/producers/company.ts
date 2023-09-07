@@ -88,16 +88,6 @@ export const favoritesCompanyQueue = new Queue(
   }
 );
 
-export async function addToFavoritesCompanyQueue(
-  data: FavoritesInput,
-  options?: JobOptions
-) {
-  await favoritesCompanyQueue.add(data, {
-    ...defaultJobOptions,
-    ...options
-  });
-}
-
 /**
  * Close gracefully the queues
  */
