@@ -1,6 +1,5 @@
 // eslint-disable-next-line import/no-named-as-default
 import Queue, { JobOptions } from "bull";
-import { FavoritesInput } from "../jobs/indexFavorites";
 
 const { REDIS_URL, QUEUE_NAME_COMPANY } = process.env;
 

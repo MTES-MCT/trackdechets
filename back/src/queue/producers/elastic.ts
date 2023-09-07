@@ -38,13 +38,17 @@ indexQueue.on("completed", job => {
     ].includes(job.name)
   ) {
     // aggregate and deduplicate sirets to notify relevant recipients
-    const siretsToNotify = Array.from(
+    const orgIdsToNotify = Array.from(
       new Set([...sirets, ...(siretsBeforeUpdate ?? [])])
     );
 
-    updatesQueue.add({ sirets: siretsToNotify, id, jobName: job.name });
-    scheduleWebhook(id, siretsToNotify, job.name);
-    const uniqueOrgIds = Array.from(new Set(siretsToNotify));
+    updatesQueue.add({ sirets: orgIdsToNotify, id, jobName: job.name });
+    scheduleWebhook(id, orgIdsToNotify, job.name);
+    // après qu'un BSD soit mis à jour et indexé dans l'index `bsds`
+    // on doit mettre à jour le cache des `favorites` pour chaque orgId
+    // présent dansd ce BSD afin qu'en tant qu'éditeur dans le futur on lui
+    // propose les favoris pré-calculés.
+    const uniqueOrgIds = Array.from(new Set(orgIdsToNotify));
 
     for (const favoriteType of allFavoriteTypes) {
       favoritesCompanyQueue.addBulk(
