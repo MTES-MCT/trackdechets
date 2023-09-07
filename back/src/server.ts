@@ -79,6 +79,9 @@ export const server = new ApolloServer<GraphQLContext>({
   formatError: (formattedError, error) => {
     const originalError = unwrapResolverError(error);
 
+    // Les erreurs Yup et Zod sont vues ici comme des erreurs non gérées
+    // (INTERNAL_SERVER_ERROR). On souhaite à la place renvoyer une erreur
+    // `UserInputError` avec un code BAD_USER_INPUT
     if (originalError instanceof ValidationError) {
       return new UserInputError(originalError.errors.join("\n"));
     }
