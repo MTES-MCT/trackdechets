@@ -1,5 +1,4 @@
 import { readFileSync } from "fs";
-import { ValidationError } from "yup";
 import { ErrorCode, UserInputError } from "../common/errors";
 import { GraphQLError } from "graphql";
 
@@ -162,6 +161,7 @@ describe("Error handling", () => {
 
   test("Yup validation errors should be displayed as an input error", async () => {
     const server = require("../server").server;
+    const { ValidationError } = require("yup");
     mockFoo.mockImplementationOnce(() => {
       throw new ValidationError("Bang", "Wrong value", "path");
     });
