@@ -78,17 +78,14 @@ export const server = new ApolloServer<GraphQLContext>({
   allowBatchedHttpRequests: true,
   formatError: (formattedError, error) => {
     const originalError = unwrapResolverError(error);
-    const errorInstanceName = (originalError as any).constructor?.name;
 
-    if (errorInstanceName === "ValidationError") {
-      const typedError = originalError as ValidationError;
-      return new UserInputError(typedError.errors.join("\n"));
+    if (originalError instanceof ValidationError) {
+      return new UserInputError(originalError.errors.join("\n"));
     }
-    if (errorInstanceName === "ZodError") {
-      const typedError = originalError as ZodError;
+    if (originalError instanceof ZodError) {
       return new UserInputError(
-        typedError.issues.map(issue => issue.message).join("\n"),
-        { issues: typedError.issues }
+        originalError.issues.map(issue => issue.message).join("\n"),
+        { issues: originalError.issues }
       );
     }
     if (
