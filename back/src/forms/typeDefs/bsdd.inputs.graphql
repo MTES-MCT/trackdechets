@@ -827,7 +827,7 @@ input NextSegmentInfoInput {
 input TakeOverInput {
   takenOverAt: DateTime!
   takenOverBy: String!
-  # Permet de mettre à jour la plaque d'immatriculation au moment de la signature u transporter N
+  # Permet de mettre à jour la plaque d'immatriculation au moment de la signature du transporter N
   numberPlate: String
 }
 
