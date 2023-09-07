@@ -16,7 +16,6 @@ import {
 } from "../../../../queue/jobs/indexFavorites";
 import { convertUrls } from "../../../database";
 import * as search from "../../../search";
-import { nullIfNoValues } from "../../../../common/converter";
 
 const request = supertest(app);
 
