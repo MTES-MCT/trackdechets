@@ -38,8 +38,8 @@ export const allFavoriteTypes: FavoriteType[] = [
  */
 export const indexConfig = {
   // Do not change this alias name unless you know what you do
-  alias: process.env.ELASTICSEARCH_FAVORITES_ENDPOINT || "favorites",
-  url: process.env.ELASTICSEARCH_FAVORITES_ENDPOINT || "http://localhost:9200/"
+  alias: process.env.ELASTIC_SEARCH_FAVORITES_ALIAS || "favorites",
+  url: process.env.ELASTIC_SEARCH_URL || "http://elasticsearch:9200/"
 };
 
 /**
