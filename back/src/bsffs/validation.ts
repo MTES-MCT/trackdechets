@@ -563,6 +563,9 @@ const operationSchemaFn: (value: any) => yup.SchemaOf<Operation> = value => {
           const { operationCode } = this.parent;
           const operationMode = item;
 
+          console.log("operationCode", operationCode);
+          console.log("operationMode", operationMode);
+
           if (operationCode && operationMode) {
             const modes = getOperationModesFromOperationCode(operationCode);
             console.log("modes", modes);
