@@ -1,6 +1,5 @@
 import { app, startApolloServer } from "./server";
 import { closeQueues } from "./queue/producers";
-import { cleanGqlCaches } from "./temp-memory";
 import { cpuProfiling, memorySampling } from "./logging/heapSnapshot";
 import { envVariables } from "./env";
 
@@ -11,9 +10,6 @@ async function start() {
   app.listen(process.env.API_PORT, () =>
     console.info(`Server is running on port ${process.env.API_PORT}`)
   );
-
-  // TODO - To remove. Either completely if it doesnt work or with a better fix if it does
-  cleanGqlCaches();
 
   function shutdown() {
     return closeQueues().finally(process.exit());
