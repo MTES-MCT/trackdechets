@@ -44,6 +44,7 @@ export const editionRules: {
   acceptationWasteDescription: "ACCEPTATION",
   operationDate: "OPERATION",
   operationCode: "OPERATION",
+  operationMode: "OPERATION",
   operationDescription: "OPERATION",
   operationNoTraceability: "OPERATION",
   operationNextDestinationPlannedOperationCode: "OPERATION",

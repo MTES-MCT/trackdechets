@@ -12,6 +12,7 @@ import { isFinalOperation } from "./constants";
 import { getReadonlyBsffPackagingRepository } from "./repository";
 import { Nullable } from "../types";
 import { UserInputError } from "../common/errors";
+import { getOperationModeLabel } from "../common/operationModes";
 
 type BsffDestination = {
   receptionWeight: number;
@@ -90,7 +91,12 @@ export function toBsffDestination(
   const operationCodes = hasAnyOperation
     ? packagings
         .filter(p => !!p.operationSignatureDate && !!p.operationCode)
-        .map(p => p.operationCode)
+        .map(p => {
+          let res = p.operationCode;
+          if (p.operationMode)
+            res += " (" + getOperationModeLabel(p.operationMode) + ")";
+          return res;
+        })
     : [];
 
   const operationCode = hasAnyOperation

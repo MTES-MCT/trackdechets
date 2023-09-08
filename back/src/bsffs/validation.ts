@@ -7,7 +7,8 @@ import {
   BsffType,
   Prisma,
   WasteAcceptationStatus,
-  BsffPackagingType
+  BsffPackagingType,
+  OperationMode
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { isFinalOperation, OPERATION } from "./constants";
@@ -26,6 +27,7 @@ import {
   WeightUnits
 } from "../common/validation";
 import { UserInputError } from "../common/errors";
+import { getOperationModesFromOperationCode } from "../common/operationModes";
 
 configureYup();
 
@@ -90,6 +92,7 @@ type Operation = Pick<
   Prisma.BsffPackagingCreateInput,
   | "operationDate"
   | "operationCode"
+  | "operationMode"
   | "operationNoTraceability"
   | "operationNextDestinationPlannedOperationCode"
   | "operationNextDestinationCap"
@@ -548,6 +551,26 @@ const operationSchemaFn: (value: any) => yup.SchemaOf<Operation> = value => {
       .oneOf(
         Object.keys(OPERATION),
         "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
+      ),
+    operationMode: yup
+      .mixed<OperationMode | null | undefined>()
+      .oneOf([...Object.values(OperationMode), null, undefined])
+      .nullable()
+      .test(
+        "processing-mode-matches-processing-operation",
+        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
+        function (item) {
+          const { operationCode } = this.parent;
+          const operationMode = item;
+
+          if (operationCode && operationMode) {
+            const modes = getOperationModesFromOperationCode(operationCode);
+            console.log("modes", modes);
+            return modes.includes(operationMode ?? "");
+          }
+
+          return true;
+        }
       )
   });
 

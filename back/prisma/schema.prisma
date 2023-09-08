@@ -1253,6 +1253,7 @@ model BsffPackaging {
   operationDate            DateTime? @db.Timestamptz(6)
   operationNoTraceability  Boolean   @default(false)
   operationCode            String?
+  operationMode            OperationMode?
   operationDescription     String?
   operationSignatureAuthor String?
   operationSignatureDate   DateTime? @db.Timestamptz(6)

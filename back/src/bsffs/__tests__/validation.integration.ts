@@ -811,6 +811,24 @@ describe("operationSchema", () => {
       "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : R1, R2, R3, R5, R12, R13, D10, D13, D14, D15"
     );
   });
+
+  it("should fail if operation code and operation mode are incompatible", () => {
+    const data = {
+      ...operation,
+      operationCode: "R1",
+      operationMode: "RECYCLAGE"
+    };
+    expect(operationSchema.isValidSync(data)).toEqual(false);
+  });
+
+  it("should succeed if operation code and operation mode are compatible", async () => {
+    const data = {
+      ...operation,
+      operationCode: "R1",
+      operationMode: "VALORISATION_ENERGETIQUE"
+    };
+    expect(operationSchema.isValidSync(data)).toEqual(true);
+  });
 });
 
 describe("ficheInterventionSchema", () => {
