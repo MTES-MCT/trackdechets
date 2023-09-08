@@ -1,7 +1,6 @@
 import {
   BsffStatus,
   BsffType,
-  OperationMode,
   TransporterReceipt,
   UserRole
 } from "@prisma/client";
