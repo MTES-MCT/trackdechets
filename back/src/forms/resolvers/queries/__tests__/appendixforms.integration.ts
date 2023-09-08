@@ -9,6 +9,11 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { gql } from "graphql-tag";
 import prisma from "../../../../prisma";
+import {
+  getFormRepository,
+  getReadOnlyFormRepository
+} from "../../../repository";
+import { AuthType } from "../../../../auth";
 
 const APPENDIX_FORMS = gql`
   query AppendixForm($siret: String!) {
@@ -35,6 +40,11 @@ describe("Test appendixForms", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "ADMIN"
     );
+
+    const { updateAppendix2Forms } = getFormRepository({
+      ...ttr,
+      auth: AuthType.Session
+    });
 
     // This form is in AWAITING_GROUP and should be returned
     const awaitingGroupForm = await formFactory({
@@ -129,6 +139,8 @@ describe("Test appendixForms", () => {
         quantity: 0.5 // partially grouped,
       }
     });
+
+    await updateAppendix2Forms([initialForm1, initialForm2]);
 
     const { query } = makeClient(ttr);
     const {

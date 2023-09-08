@@ -27,6 +27,10 @@ const buildUpdateAppendix2Forms: (
   });
 
   const formUpdatesByStatus = new Map<Status, string[]>();
+
+  // Quantité regroupée par
+  const quantitGroupedByFormId: { [key: string]: number } = {};
+
   for (const form of forms) {
     if (![Status.AWAITING_GROUP, Status.GROUPED].includes(form.status as any)) {
       continue;
@@ -42,6 +46,8 @@ const buildUpdateAppendix2Forms: (
         .map(grp => grp.quantity)
         .reduce((prev, cur) => prev + cur, 0) ?? 0
     ).toDecimalPlaces(6); // set precision to gramme
+
+    quantitGroupedByFormId[form.id] = quantityGrouped.toNumber();
 
     const groupementForms = formGroupements
       .filter(grp => grp.initialFormId === form.id)
@@ -113,6 +119,16 @@ const buildUpdateAppendix2Forms: (
   }
 
   await Promise.all(promises);
+
+  // met à jour la quantité regroupée sur chaque bordereau
+  await Promise.all(
+    Object.keys(quantitGroupedByFormId).map(formId => {
+      return prisma.form.update({
+        where: { id: formId },
+        data: { quantityGrouped: quantitGroupedByFormId[formId] }
+      });
+    })
+  );
 };
 
 export default buildUpdateAppendix2Forms;

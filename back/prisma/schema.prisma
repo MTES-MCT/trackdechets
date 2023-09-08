@@ -442,6 +442,10 @@ model Form {
   intermediariesSirets String[] @default([])
   canAccessDraftSirets String[] @default([])
 
+  // Fraction du bordereau regroupé dans des bordereaux de regroupement
+  // La quantité restante à regrouper s'obtient en faisant quantityReceived - quantityGrouped 
+  quantityGrouped Float @default(0)
+
   // partial index _FormIsDeletedIdx see migration82_missing_indices.sql
   // partial index _FormRecipientIsTempStorageIdx see 99_add_form_indices.sql
   // gin indices see 104_denormalize_indexes.sql & 149_add_draft_access_form.sql
