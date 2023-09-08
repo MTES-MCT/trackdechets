@@ -67,7 +67,7 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
           : [])
       ],
       isDeleted: false,
-      forwarding: null
+      readableId: { not: { endsWith: "-suite" } }
     }
   });
 
