@@ -39,6 +39,10 @@ describe("getOperationModesFromOperationCode", () => {
     }
   );
 
+  it.each(["R 0"])("Code %p > [REUTILISATION]", code => {
+    test(code, [OperationMode.Reutilisation]);
+  });
+
   it.each(["R 1"])("Code %p > [ENERGY_RECOVERY]", code => {
     test(code, [OperationMode.ValorisationEnergetique]);
   });

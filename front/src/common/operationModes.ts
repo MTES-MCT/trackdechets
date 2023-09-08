@@ -29,6 +29,10 @@ export const getOperationModesFromOperationCode = (
     return [OperationMode.Elimination];
   }
 
+  if (trimmed === "R0") {
+    return [OperationMode.Reutilisation];
+  }
+
   if (trimmed === "R1") {
     return [OperationMode.ValorisationEnergetique];
   }
