@@ -1308,133 +1308,133 @@ export function IconBSDDThin(props: React.SVGProps<SVGSVGElement>) {
     >
       <path
         d="M4.61292 36.008V3.83063"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M28.9447 3.83063V36.008"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M1.57141 3.83063H31.9862"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M1.57141 36.008H31.9862"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M25.1428 25.2822H31.9861"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M1.57141 25.2822H9.1751"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M25.9032 14.5564H31.9861"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M1.57141 14.5564H7.65436"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M27.424 3.83063V1.53224C27.424 1.10912 27.0835 0.766113 26.6636 0.766113H22.1014C21.6814 0.766113 21.341 1.10912 21.341 1.53224V3.83063"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M16.7788 24.5161V26.8145"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M13.7373 26.8145V23.94C11.865 23.1004 10.6689 21.2179 10.6958 19.1532C10.6958 15.7682 13.4192 13.0242 16.7788 13.0242C20.1383 13.0242 22.8617 15.7682 22.8617 19.1532C22.8888 21.2176 21.6926 23.0997 19.8202 23.9385V26.8145"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M18.6797 18.3871C18.8897 18.3871 19.0599 18.5586 19.0599 18.7701"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M18.2995 18.7701C18.2995 18.5586 18.4697 18.3871 18.6797 18.3871"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M18.6797 19.1532C18.4697 19.1532 18.2995 18.9817 18.2995 18.7701"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M19.0599 18.7701C19.0599 18.9817 18.8897 19.1532 18.6797 19.1532"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M14.8779 18.3871C15.0878 18.3871 15.2581 18.5586 15.2581 18.7701"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M14.4977 18.7701C14.4977 18.5586 14.6679 18.3871 14.8779 18.3871"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M14.8779 19.1532C14.6679 19.1532 14.4977 18.9817 14.4977 18.7701"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M15.2581 18.7701C15.2581 18.9817 15.0878 19.1532 14.8779 19.1532"
-        stroke="#000091"
+        stroke="black"
         strokeWidth="0.967742"
         strokeLinecap="round"
         strokeLinejoin="round"

@@ -40,11 +40,11 @@ import {
 import { BsdType, BsdWhere } from "../../generated/graphql/types";
 import { Filter, FilterType } from "../common/Components/Filters/filtersTypes";
 import {
-  IconBSFFMedium as IconBSFF,
-  IconBSDaThin as IconBSDa,
-  IconBSVhuThin as IconBSVhu,
-  IconBSDDThin as IconBSDD,
-  IconBSDasriThin as IconBSDasri,
+  IconBSFF,
+  IconBSDa,
+  IconBSVhu,
+  IconBSDD,
+  IconBSDasri,
 } from "Apps/common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
 
