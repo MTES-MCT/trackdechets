@@ -32,6 +32,12 @@
       color: #3a3a3a;
       width: fit-content;
     }
+    &__name {
+      width: 130px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
     &__workflow {
       font-weight: 700;
     }
