@@ -143,6 +143,7 @@ export function toIncomingWaste(
     transporterCompanySiret: getTransporterCompanyOrgId(bsda),
     transporterRecepisseNumber: bsda.transporterRecepisseNumber,
     destinationOperationCode: bsda.destinationOperationCode,
+    destinationOperationMode: bsda.destinationOperationMode,
     destinationCustomInfo: bsda.destinationCustomInfo,
     emitterCompanyMail: bsda.emitterCompanyMail,
     transporterCompanyMail: bsda.transporterCompanyMail
@@ -407,6 +408,7 @@ export function toAllWaste(
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
     destinationOperationCode: bsda.destinationOperationCode,
+    destinationOperationMode: bsda.destinationOperationMode,
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsda.emitterCompanyAddress,

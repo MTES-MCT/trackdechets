@@ -4,7 +4,8 @@ import {
   Prisma,
   TransportMode,
   WasteAcceptationStatus,
-  IntermediaryFormAssociation
+  IntermediaryFormAssociation,
+  OperationMode
 } from "@prisma/client";
 import { FormStatus } from "../generated/graphql/types";
 
@@ -134,6 +135,7 @@ export type Bsdd = {
   destinationReceptionSignatureDate: Date | null;
   destinationPlannedOperationCode: string | null;
   destinationOperationCode: string | null;
+  destinationOperationMode: OperationMode | null;
   destinationOperationNoTraceability: boolean | null;
   destinationOperationNextDestinationCompanyName: string | null;
   destinationOperationNextDestinationCompanySiret: string | null;

@@ -1,7 +1,9 @@
 import * as React from "react";
 import { Document, formatDate, SignatureStamp } from "../../../common/pdf";
-import { Bsvhu } from "../../../generated/graphql/types";
+import { Bsvhu, OperationMode } from "../../../generated/graphql/types";
 import { Recepisse } from "./Recepisse";
+import bsdasri from "../../../bsdasris/resolvers/queries/bsdasri";
+import { getOperationModeLabel } from "../../../common/operationModes";
 
 const IDENTIFICATION_TYPES_LABELS = {
   NUMERO_ORDRE_REGISTRE_POLICE:
@@ -463,6 +465,13 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
                 </span>
               </label>
             </div>
+            <br />
+            <p>
+              Mode de traitement :{" "}
+              {getOperationModeLabel(
+                bsvhu?.destination?.operation?.mode as OperationMode
+              )}
+            </p>
             <p>
               Date de réalisation:{" "}
               {formatDate(bsvhu?.destination?.operation?.date)}

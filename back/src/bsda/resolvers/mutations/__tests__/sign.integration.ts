@@ -733,7 +733,8 @@ describe("Mutation.Bsda.sign", () => {
           transporterRecepisseDepartment: transporterReceipt.department,
           transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: company.siret,
-          destinationOperationCode: "D 15"
+          destinationOperationCode: "D 15",
+          destinationOperationMode: undefined
         }
       });
 
@@ -850,7 +851,8 @@ describe("Mutation.Bsda.sign", () => {
           transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr1.siret,
           status: BsdaStatus.AWAITING_CHILD,
-          destinationOperationCode: "D 9"
+          destinationOperationCode: "D 9",
+          destinationOperationMode: "ELIMINATION"
         }
       });
 
@@ -864,6 +866,7 @@ describe("Mutation.Bsda.sign", () => {
           transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr2.siret,
           destinationOperationCode: "D 9",
+          destinationOperationMode: "ELIMINATION",
           status: BsdaStatus.AWAITING_CHILD,
           forwarding: { connect: { id: bsda1.id } }
         }
@@ -879,6 +882,7 @@ describe("Mutation.Bsda.sign", () => {
           transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: destination.siret,
           destinationOperationCode: "D 9",
+          destinationOperationMode: "ELIMINATION",
           forwarding: { connect: { id: bsda2.id } }
         }
       });

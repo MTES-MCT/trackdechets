@@ -2,6 +2,7 @@ import * as React from "react";
 import {
   BsffPackagingType,
   BsffType,
+  OperationMode,
   WasteAcceptationStatus
 } from "@prisma/client";
 import {
@@ -21,6 +22,7 @@ import { BSFF_WASTES } from "../../common/constants";
 import { extractPostalCode } from "../../utils";
 import { Decimal } from "decimal.js-light";
 import { Recepisse } from "./Recepisse";
+import { getOperationModeLabel } from "../../common/operationModes";
 
 type Props = {
   bsff: Bsff & { packagings: BsffPackaging[] } & {
@@ -600,6 +602,10 @@ function BsffPackagingOperation({ packaging }: { packaging: BsffPackaging }) {
         <div>Rupture de traçabilité autorisée par arrêté préfectoral</div>
       )}
       <div>Date de réalisation : {formatDate(packaging?.operation?.date)}</div>
+      <div>
+        Mode de traitement :{" "}
+        {getOperationModeLabel(packaging?.operation?.mode as OperationMode)}
+      </div>
       {packaging?.operation?.nextDestination?.company?.siret && (
         <>
           <div>

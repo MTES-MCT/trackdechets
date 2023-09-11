@@ -91,6 +91,7 @@ describe("edition", () => {
         value: 1
       },
       code: "D10",
+      mode: "ELIMINATION",
       date: new Date("2020-04-28")
     };
 

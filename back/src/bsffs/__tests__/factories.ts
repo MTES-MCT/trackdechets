@@ -6,7 +6,8 @@ import {
   BsffType,
   BsffPackaging,
   WasteAcceptationStatus,
-  BsffPackagingType
+  BsffPackagingType,
+  OperationMode
 } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
@@ -300,6 +301,7 @@ export function createBsffPackagingBeforeOperation(
   return createBsffPackagingAfterAcceptation(
     {
       operationCode: OPERATION.R2.code,
+      operationMode: OperationMode.REUTILISATION,
       operationDate: new Date(),
       ...args
     },

@@ -33,6 +33,7 @@ type EditableBsddFields = Required<
     | "quantityReceived"
     | "quantityReceivedType"
     | "processingOperationDone"
+    | "destinationOperationMode"
     | "isDeleted"
     | "receivedBy"
     | "processedBy"

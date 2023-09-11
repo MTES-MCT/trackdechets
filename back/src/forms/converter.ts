@@ -707,6 +707,7 @@ export function expandFormFromDb(
     processingOperationDone: forwardedIn
       ? forwardedIn.processingOperationDone
       : form.processingOperationDone,
+    destinationOperationMode: form.destinationOperationMode,
     processingOperationDescription: forwardedIn
       ? forwardedIn.processingOperationDescription
       : form.processingOperationDescription,

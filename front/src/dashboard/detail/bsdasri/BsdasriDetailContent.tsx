@@ -8,6 +8,7 @@ import {
   FormCompany,
   BsdasriPackaging,
   BsdasriType,
+  OperationMode,
 } from "generated/graphql/types";
 import routes from "Apps/routes";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDownloadPdf";
@@ -36,6 +37,7 @@ import {
 } from "dashboard/detail/common/Components";
 
 import classNames from "classnames";
+import { getOperationModeLabel } from "common/operationModes";
 
 const getVerboseWasteName = (code: string): string => {
   const desc = {
@@ -265,6 +267,12 @@ const Recipient = ({ form }: { form: Bsdasri }) => {
         <DetailRow
           value={destination?.operation?.code}
           label="Opération de traitement"
+        />
+        <DetailRow
+          value={getOperationModeLabel(
+            destination?.operation?.mode as OperationMode
+          )}
+          label={"Mode de traitement"}
         />
         <DateRow
           value={destination?.operation?.date}

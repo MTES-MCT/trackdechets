@@ -442,7 +442,8 @@ describe("Query.bsds workflow", () => {
           processedInfo: {
             processedAt: new Date().toISOString() as any,
             processedBy: recipient.user.name,
-            processingOperationDone: "R 1"
+            processingOperationDone: "R 1",
+            destinationOperationMode: "VALORISATION_ENERGETIQUE"
           }
         }
       });

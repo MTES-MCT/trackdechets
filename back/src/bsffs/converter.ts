@@ -281,6 +281,7 @@ export function flattenBsffPackagingInput(
       false
     ),
     operationCode: chain(input.operation, o => o.code),
+    operationMode: chain(input.operation, o => o.mode),
     operationDescription: chain(input.operation, o => o.description),
     operationNextDestinationPlannedOperationCode: chain(input.operation, o =>
       chain(o.nextDestination, nd => nd.plannedOperationCode)
@@ -341,6 +342,7 @@ export function expandBsffPackagingFromDB(
     }),
     operation: nullIfNoValues<GraphQL.BsffPackagingOperation>({
       code: prismaBsffPackaging.operationCode as GraphQL.BsffOperationCode,
+      mode: prismaBsffPackaging.operationMode as GraphQL.OperationMode,
       date: prismaBsffPackaging.operationDate,
       description: prismaBsffPackaging.operationDescription,
       noTraceability: prismaBsffPackaging.operationNoTraceability,

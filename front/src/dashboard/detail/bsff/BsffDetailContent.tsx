@@ -13,6 +13,7 @@ import {
   BsffStatus,
   BsffType,
   FormCompany,
+  OperationMode,
   WasteAcceptationStatus,
 } from "generated/graphql/types";
 import React, { useState } from "react";
@@ -40,6 +41,7 @@ import {
 import { formatDate } from "common/datetime";
 import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
+import { getOperationModeLabel } from "common/operationModes";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -572,6 +574,8 @@ function Packagings({ form }: { form: Bsff }) {
                   </div>
                   <div>
                     {p.operation?.code} ({p?.operation?.description})
+                    <br />
+                    {getOperationModeLabel(p?.operation?.mode as OperationMode)}
                   </div>
                   {p.operation?.noTraceability && (
                     <div>Rupture de traçabilité</div>

@@ -353,6 +353,7 @@ export const detailFormFragment = gql`
     processedAt
     processingOperationDescription
     processingOperationDone
+    destinationOperationMode
     ecoOrganisme {
       siret
       name

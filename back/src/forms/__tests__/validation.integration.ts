@@ -1,4 +1,9 @@
-import { BsddTransporter, EmitterType, Form } from "@prisma/client";
+import {
+  BsddTransporter,
+  EmitterType,
+  Form,
+  OperationMode
+} from "@prisma/client";
 import {
   draftFormSchema,
   sealedFormSchema,
@@ -1524,6 +1529,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
+      destinationOperationMode: OperationMode.ELIMINATION,
       processingOperationDescription: "Traitement biologique",
       noTraceability: true
     };
@@ -1539,6 +1545,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
+      destinationOperationMode: OperationMode.ELIMINATION,
       processingOperationDescription: "Traitement biologique",
       noTraceability: false
     };
@@ -1550,6 +1557,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
+      destinationOperationMode: OperationMode.ELIMINATION,
       processingOperationDescription: "Traitement biologique"
     };
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
@@ -1560,6 +1568,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
+      destinationOperationMode: OperationMode.ELIMINATION,
       processingOperationDescription: "Traitement biologique",
       noTraceability: null
     };
@@ -1694,6 +1703,38 @@ describe("processedInfoSchema", () => {
 
     await expect(validateFn()).rejects.toThrow(
       "Destination ultérieure : L'opération de traitement est obligatoire"
+    );
+  });
+
+  it("should be valid if operationMode is compatible", async () => {
+    const processedInfo = {
+      nextDestination: null,
+      noTraceability: null,
+      processedAt: new Date(),
+      processedBy: "Test",
+      processingOperationDescription: "test",
+      processingOperationDone: "R 2",
+      destinationOperationMode: OperationMode.REUTILISATION
+    };
+
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
+  });
+
+  it("should not be valid if operationMode is not compatible", async () => {
+    const processedInfo = {
+      nextDestination: null,
+      noTraceability: null,
+      processedAt: new Date(),
+      processedBy: "Test",
+      processingOperationDescription: "test",
+      processingOperationDone: "R 2",
+      destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE
+    };
+
+    const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
     );
   });
 });

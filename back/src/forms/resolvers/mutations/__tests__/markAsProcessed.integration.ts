@@ -11,7 +11,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
-import { Status } from "@prisma/client";
+import { OperationMode, Status } from "@prisma/client";
 import {
   Mutation,
   MutationMarkAsProcessedArgs
@@ -60,6 +60,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -86,6 +87,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -96,6 +98,7 @@ describe("mutation.markAsProcessed", () => {
       where: { id: form.id }
     });
     expect(resultingForm.status).toBe("PROCESSED");
+    expect(resultingForm.destinationOperationMode).toBe("ELIMINATION");
 
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLog.findMany({
@@ -127,6 +130,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -261,6 +265,7 @@ describe("mutation.markAsProcessed", () => {
         id: form.id,
         processedInfo: {
           processingOperationDone: processingOperation!.code,
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -372,6 +377,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "R 1",
+          destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -783,6 +789,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -828,6 +835,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -860,6 +868,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: format(processedAt, f)
         }
@@ -973,6 +982,7 @@ describe("mutation.markAsProcessed", () => {
           processedAt: new Date("2022-01-01").toISOString() as any,
           processedBy: "John Snow",
           processingOperationDone: "R 1",
+          destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE,
           processingOperationDescription: "Incinération"
         }
       }
@@ -1006,6 +1016,7 @@ describe("mutation.markAsProcessed", () => {
         id: form.id,
         processedInfo: {
           processingOperationDone: processingOperation!.code,
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }

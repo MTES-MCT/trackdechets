@@ -33,6 +33,7 @@ import { OPERATION } from "form/bsff/utils/constants";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { companySchema } from "common/validation/schema";
 import { subMonths } from "date-fns";
+import OperationModeSelect from "common/components/OperationModeSelect";
 
 const operationCode = yup
   .string()
@@ -275,6 +276,7 @@ export function SignBsffOperationOnePackagingModalContent({
               input: {
                 operation: {
                   code: values.code,
+                  mode: values.mode,
                   description: values.description,
                   date: values.date,
                   noTraceability: values.noTraceability,
@@ -330,6 +332,7 @@ export function SignBsffOperationOnePackagingModalContent({
               </label>
               <RedErrorMessage name="code" />
             </div>
+            <OperationModeSelect operationCode={values?.code} name="mode" />
             <div className="form__row">
               <label>
                 Description de l'opération réalisée

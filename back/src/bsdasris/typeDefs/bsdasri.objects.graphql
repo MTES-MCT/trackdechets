@@ -157,6 +157,8 @@ type BsdasriOperation {
   weight: BsdasriOperationWeight
   "Code de l'opération de traitement - Les codes R12 et D12 sont interdits pour les bsds de synthèse."
   code: String
+  "Qualification du traitement final"
+  mode: OperationMode
   "Date de l'opération de traitement"
   date: DateTime
   signature: BsdasriSignature

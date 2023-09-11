@@ -239,6 +239,7 @@ describe("Mutation.Bsda.duplicate", () => {
       "destinationReceptionAcceptationStatus",
       "destinationReceptionRefusalReason",
       "destinationOperationCode",
+      "destinationOperationMode",
       "destinationOperationDescription",
       "destinationOperationDate",
       "destinationOperationSignatureAuthor",

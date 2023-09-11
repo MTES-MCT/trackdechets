@@ -59,6 +59,7 @@ export const editionRules: {
   destinationReceptionRefusalReason: "OPERATION",
   destinationReceptionDate: "OPERATION",
   destinationOperationCode: "OPERATION",
+  destinationOperationMode: "OPERATION",
   destinationOperationNextDestinationCompanyName: "OPERATION",
   destinationOperationDate: "OPERATION",
   destinationOperationNextDestinationCompanySiret: "OPERATION",

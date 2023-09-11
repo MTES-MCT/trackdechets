@@ -114,6 +114,7 @@ export function toIncomingWaste(bsvhu: Bsvhu): IncomingWaste {
     transporterCompanySiret: bsvhu.transporterCompanySiret,
     transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
     destinationOperationCode: bsvhu.destinationOperationCode,
+    destinationOperationMode: bsvhu.destinationOperationMode,
     destinationCustomInfo: bsvhu.destinationCustomInfo,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     transporterCompanyMail: bsvhu.transporterCompanyMail
@@ -286,6 +287,7 @@ export function toAllWaste(bsvhu: Bsvhu): AllWaste {
     destinationCompanyName: bsvhu.destinationCompanyName,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
     destinationOperationCode: bsvhu.destinationOperationCode,
+    destinationOperationMode: bsvhu.destinationOperationMode,
     destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,

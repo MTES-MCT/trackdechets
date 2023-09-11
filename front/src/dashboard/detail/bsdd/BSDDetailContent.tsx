@@ -21,6 +21,7 @@ import {
   InitialFormFraction,
   Query,
   QueryCompanyPrivateInfosArgs,
+  OperationMode,
 } from "generated/graphql/types";
 import {
   emitterTypeLabels,
@@ -70,6 +71,7 @@ import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
 import { useQuery } from "@apollo/client";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
 import { formTransportIsPipeline } from "form/bsdd/utils/packagings";
+import { getOperationModeLabel } from "common/operationModes";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -428,6 +430,12 @@ const Recipient = ({
         <DetailRow
           value={form.processingOperationDone}
           label="Traitement réalisé (code D/R)"
+        />
+        <DetailRow
+          value={getOperationModeLabel(
+            form?.destinationOperationMode as OperationMode
+          )}
+          label={"Mode de traitement"}
         />
         <DetailRow
           value={form.processingOperationDescription}

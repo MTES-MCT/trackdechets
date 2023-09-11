@@ -163,6 +163,7 @@ export function toBsdElastic(bsvhu: RawBsvhu): BsdElastic {
       bsvhu.destinationOperationNextDestinationCompanyAddress ?? "",
 
     destinationOperationCode: bsvhu.destinationOperationCode ?? "",
+    destinationOperationMode: bsvhu.destinationOperationMode ?? undefined,
 
     emitterEmissionDate: bsvhu.emitterEmissionSignatureDate?.getTime(),
     workerWorkDate: undefined,
