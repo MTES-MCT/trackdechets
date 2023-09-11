@@ -64,6 +64,22 @@ const companySearchResultResolvers: CompanySearchResultResolvers = {
     return parent.siret
       ? context.dataloaders.installations.load(parent.siret!)
       : null;
+  },
+  isRegistered: async parent => {
+    return (
+      (await prisma.company.count({
+        where: whereSiretOrVatNumber(parent as CompanyBaseIdentifiers)
+      })) > 0
+    );
+  },
+  companyTypes: async parent => {
+    const company = await prisma.company.findUnique({
+      where: whereSiretOrVatNumber(parent as CompanyBaseIdentifiers),
+      select: {
+        companyTypes: true
+      }
+    });
+    return company ? company.companyTypes : null;
   }
 };
 

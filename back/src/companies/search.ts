@@ -193,37 +193,10 @@ export const makeSearchCompanies =
       if (!results) {
         return [];
       }
-      const existingCompanies = results.length
-        ? await prisma.company.findMany({
-            where: {
-              orgId: { in: results.map(r => r.siret!) }
-            },
-            select: {
-              orgId: true,
-              companyTypes: true
-            }
-          })
-        : [];
-
-      const existingCompaniesOrgIds = existingCompanies.reduce(
-        (dic, company) => {
-          dic[company.orgId] = {
-            isRegistered: true,
-            companyTypes: company.companyTypes
-          };
-          return dic;
-        },
-        {}
-      );
 
       return results.map(company => ({
         ...company,
-        orgId: company.siret!,
-        isRegistered: Boolean(
-          existingCompaniesOrgIds[company.siret!]?.isRegistered
-        ),
-        companyTypes:
-          existingCompaniesOrgIds[company.siret!]?.companyTypes ?? []
+        orgId: company.siret!
       }));
     });
   };
