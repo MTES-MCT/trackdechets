@@ -1,6 +1,5 @@
-import React from "react";
-import { Field, Form } from "formik";
-import { OperationMode } from "generated/graphql/types";
+import React, { useEffect, useMemo } from "react";
+import { Field, Form, useFormikContext } from "formik";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import RedErrorMessage from "./RedErrorMessage";
 import {
@@ -9,9 +8,18 @@ import {
 } from "common/operationModes";
 
 const OperationModeSelect = ({ operationCode, name }) => {
-  if (!operationCode) return null;
+  const { setFieldValue, values } = useFormikContext();
+  const modes = useMemo(
+    () => getOperationModesFromOperationCode(operationCode),
+    [operationCode]
+  );
 
-  const modes = getOperationModesFromOperationCode(operationCode);
+  useEffect(() => {
+    // @ts-ignore
+    if (!values[name] || !modes.includes(values[name])) {
+      setFieldValue(name, modes[0]);
+    }
+  }, [modes, name, setFieldValue, values]);
 
   if (!modes.length) return null;
 
@@ -21,40 +29,15 @@ const OperationModeSelect = ({ operationCode, name }) => {
         <fieldset>
           <legend>Mode de traitement</legend>
           <div className="tw-flex">
-            {modes.includes(OperationMode.Elimination) && (
+            {modes.map(mode => (
               <Field
+                key={mode}
                 name={name}
-                id={OperationMode.Elimination}
-                label={getOperationModeLabel(OperationMode.Elimination)}
+                id={mode}
+                label={getOperationModeLabel(mode)}
                 component={RadioButton}
               />
-            )}
-            {modes.includes(OperationMode.Recyclage) && (
-              <Field
-                name={name}
-                id={OperationMode.Recyclage}
-                label={getOperationModeLabel(OperationMode.Recyclage)}
-                component={RadioButton}
-              />
-            )}
-            {modes.includes(OperationMode.ValorisationEnergetique) && (
-              <Field
-                name={name}
-                id={OperationMode.ValorisationEnergetique}
-                label={getOperationModeLabel(
-                  OperationMode.ValorisationEnergetique
-                )}
-                component={RadioButton}
-              />
-            )}
-            {modes.includes(OperationMode.Reutilisation) && (
-              <Field
-                name={name}
-                id={OperationMode.Reutilisation}
-                label={getOperationModeLabel(OperationMode.Reutilisation)}
-                component={RadioButton}
-              />
-            )}
+            ))}
           </div>
         </fieldset>
 
