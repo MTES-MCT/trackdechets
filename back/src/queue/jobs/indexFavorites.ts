@@ -1,14 +1,16 @@
 import fs from "fs";
 import path from "path";
 import { Job } from "bull";
-import { CompanyType, Prisma } from "@prisma/client";
+import { CompanyType } from "@prisma/client";
 import prisma from "../../prisma";
 import { searchCompany } from "../../companies/search";
 import { CompanySearchResult } from "../../companies/types";
-import { Client } from "@elastic/elasticsearch";
+import { ApiResponse, Client, estypes } from "@elastic/elasticsearch";
 import { FavoriteType } from "../../generated/graphql/types";
 import { getTransporterCompanyOrgId } from "../../common/constants/companySearchHelpers";
 import { getCompanyOrCompanyNotFound } from "../../companies/database";
+import { SearchResponse } from "@elastic/elasticsearch/api/types";
+import { BsdElastic, index } from "../../common/elastic";
 
 export interface FavoriteIndexBody {
   favorites: CompanySearchResult[];
@@ -105,98 +107,109 @@ function matchesFavoriteType(
   );
 }
 
-const defaultArgs = {
-  orderBy: { updatedAt: "desc" as Prisma.SortOrder },
-  take: MAX_FAVORITES
-};
-
 async function getRecentEmitters(
-  defaultWhere: Prisma.FormWhereInput
+  orgId: string,
+  defaultWhere: estypes.QueryContainer
 ): Promise<CompanySearchResult[]> {
-  const forms = await prisma.form.findMany({
-    ...defaultArgs,
-    where: {
-      ...defaultWhere,
-      NOT: [{ emitterCompanySiret: null }, { emitterCompanySiret: "" }]
-    },
-    select: { emitterCompanySiret: true }
-  });
-  const emitterSirets = forms.map(f => f.emitterCompanySiret).filter(Boolean);
-  const companies = await prisma.company.findMany({
-    where: { siret: { in: emitterSirets } },
-    select: { orgId: true }
-  });
-  return Promise.all(companies.map(({ orgId }) => searchCompany(orgId)));
+  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
+    {
+      index: index.alias,
+      body: {
+        size: MAX_FAVORITES,
+        ...{
+          ...defaultWhere,
+          ...{
+            must: {
+              emitterCompanySiret: orgId
+            }
+          }
+        }
+      }
+    }
+  );
+  const hits = body.hits.hits.slice(0, MAX_FAVORITES);
+  const emitterSirets = [
+    ...new Set(hits.map(f => f._source?.emitterCompanySiret).filter(Boolean))
+  ];
+  const favorites = await Promise.all(
+    emitterSirets.map(async siret => {
+      try {
+        return await searchCompany(siret);
+      } catch (_) {
+        return null;
+      }
+    })
+  );
+
+  return favorites.filter(Boolean);
 }
 
 async function getRecentRecipients(
-  defaultWhere: Prisma.FormWhereInput
+  orgId: string,
+  defaultWhere: estypes.QueryContainer
 ): Promise<CompanySearchResult[]> {
-  const forms = await prisma.form.findMany({
-    ...defaultArgs,
-    where: {
-      ...defaultWhere,
-      NOT: [{ recipientCompanySiret: null }, { recipientCompanySiret: "" }]
-    },
-    select: { recipientCompanySiret: true }
-  });
-
-  const recipientSirets = forms
-    .map(f => f.recipientCompanySiret)
-    .filter(Boolean);
-  const companies = await prisma.company.findMany({
-    where: { siret: { in: recipientSirets } },
-    select: { orgId: true }
-  });
-  return Promise.all(companies.map(({ orgId }) => searchCompany(orgId)));
-}
-
-async function getRecentDestinationAfterTempStorage(
-  defaultWhere: Prisma.FormWhereInput
-): Promise<CompanySearchResult[]> {
-  const forms = await prisma.form.findMany({
-    ...defaultArgs,
-    where: {
-      ...defaultWhere,
-      // We over fetch to avoid a join - Only check if we have recipientsSirets.
-      // In JS we will remove empty sirets and sirets which are equal to recipientCompanySiret
-      recipientsSirets: {
-        isEmpty: false
+  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
+    {
+      index: index.alias,
+      body: {
+        size: MAX_FAVORITES,
+        ...{
+          ...defaultWhere,
+          ...{
+            must: {
+              destinationCompanySiret: orgId
+            }
+          }
+        }
       }
-    },
-    select: { recipientsSirets: true, recipientCompanySiret: true }
-  });
-
-  const destinationSirets = forms
-    .flatMap(f =>
-      f.recipientsSirets.filter(siret => siret !== f.recipientCompanySiret)
+    }
+  );
+  const hits = body.hits.hits.slice(0, MAX_FAVORITES);
+  const destinationSirets = [
+    ...new Set(
+      hits.map(f => f._source?.destinationCompanySiret).filter(Boolean)
     )
-    .filter(Boolean);
-  const companies = await prisma.company.findMany({
-    where: { siret: { in: destinationSirets } },
-    select: { orgId: true }
-  });
-  return Promise.all(companies.map(({ orgId }) => searchCompany(orgId)));
+  ];
+  const favorites = await Promise.all(
+    destinationSirets.map(async siret => {
+      try {
+        return await searchCompany(siret);
+      } catch (_) {
+        return null;
+      }
+    })
+  );
+
+  return favorites.filter(Boolean);
 }
 
 async function getRecentNextDestinations(
-  defaultWhere: Prisma.FormWhereInput
-): Promise<CompanySearchResult[]> {
-  const forms = await prisma.form.findMany({
-    ...defaultArgs,
-    where: {
-      ...defaultWhere,
-      NOT: [
-        { nextDestinationCompanySiret: null },
-        { nextDestinationCompanySiret: "" }
-      ]
-    },
-    select: { nextDestinationCompanySiret: true }
-  });
-
+  orgId: string,
+  defaultWhere: estypes.QueryContainer
+) {
+  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
+    {
+      index: index.alias,
+      body: {
+        size: MAX_FAVORITES,
+        ...{
+          ...defaultWhere,
+          ...{
+            must: {
+              nextDestinationCompanySiret: orgId
+            }
+          }
+        }
+      }
+    }
+  );
+  const hits = body.hits.hits.slice(0, MAX_FAVORITES);
   const nextDestinationSirets = [
-    ...new Set(forms.map(f => f.nextDestinationCompanySiret).filter(Boolean))
+    ...new Set(
+      hits.map(f => f._source?.nextDestinationCompanySiret).filter(Boolean)
+    )
   ];
+
   const favorites = await Promise.all(
     nextDestinationSirets.map(async siret => {
       try {
@@ -210,51 +223,75 @@ async function getRecentNextDestinations(
   return favorites.filter(Boolean);
 }
 
-async function getRecentTransporters(defaultWhere: Prisma.FormWhereInput) {
-  const transporters = await prisma.bsddTransporter.findMany({
-    ...defaultArgs,
-    where: {
-      form: defaultWhere,
-      OR: [
-        {
-          NOT: [
-            { transporterCompanySiret: null },
-            { transporterCompanySiret: "" }
-          ]
-        },
-        {
-          NOT: [
-            { transporterCompanyVatNumber: null },
-            { transporterCompanyVatNumber: "" }
-          ]
+/**
+ * Only retrieve the first Transporter if many exists
+ */
+async function getRecentTransporters(
+  orgId: string,
+  defaultWhere: estypes.QueryContainer
+) {
+  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
+    {
+      index: index.alias,
+      body: {
+        size: MAX_FAVORITES,
+        ...{
+          ...defaultWhere,
+          ...{
+            should: {
+              transporterCompanySiret: orgId,
+              transporterCompanyVatNumber: orgId
+            }
+          }
         }
-      ]
+      }
     }
-  });
-  const transporterOrgIds = transporters
-    .map(f => getTransporterCompanyOrgId(f))
-    .filter(Boolean);
+  );
+  const hits = body.hits.hits.slice(0, MAX_FAVORITES);
+  const transporterOrgIds = [
+    ...new Set(
+      hits
+        .map(f => (f._source ? getTransporterCompanyOrgId(f._source) : null))
+        .filter(Boolean)
+    )
+  ];
 
-  const companies = await prisma.company.findMany({
-    where: { orgId: { in: transporterOrgIds } }
-  });
-  return Promise.all(companies.map(({ orgId }) => searchCompany(orgId)));
+  const favorites = await Promise.all(
+    transporterOrgIds.map(async orgId => {
+      try {
+        return await searchCompany(orgId);
+      } catch (_) {
+        return null;
+      }
+    })
+  );
+
+  return favorites.filter(Boolean);
 }
 
 async function getRecentTraders(
-  defaultWhere: Prisma.FormWhereInput
+  orgId: string,
+  defaultWhere: estypes.QueryContainer
 ): Promise<CompanySearchResult[]> {
-  const forms = await prisma.form.findMany({
-    ...defaultArgs,
-    where: {
-      ...defaultWhere,
-      NOT: [{ traderCompanySiret: null }, { traderCompanySiret: "" }]
-    },
-    select: { traderCompanySiret: true }
-  });
-
+  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
+    {
+      index: index.alias,
+      body: {
+        size: MAX_FAVORITES,
+        ...{
+          ...defaultWhere,
+          ...{
+            must: {
+              traderCompanySiret: orgId
+            }
+          }
+        }
+      }
+    }
+  );
+  const hits = body.hits.hits.slice(0, MAX_FAVORITES);
   const traderSirets = [
-    ...new Set(forms.map(f => f.traderCompanySiret).filter(Boolean))
+    ...new Set(hits.map(f => f._source?.traderCompanySiret).filter(Boolean))
   ];
   const favorites = await Promise.all(
     traderSirets.map(async siret => {
@@ -276,20 +313,31 @@ async function getRecentTraders(
 }
 
 async function getRecentBrokers(
-  defaultWhere: Prisma.FormWhereInput
+  orgId: string,
+  defaultWhere: estypes.QueryContainer
 ): Promise<CompanySearchResult[]> {
-  const forms = await prisma.form.findMany({
-    ...defaultArgs,
-    where: {
-      ...defaultWhere,
-      NOT: [{ brokerCompanySiret: null }, { brokerCompanySiret: "" }]
-    },
-    select: { brokerCompanySiret: true }
-  });
+  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
+    {
+      index: index.alias,
+      body: {
+        size: MAX_FAVORITES,
+        ...{
+          ...defaultWhere,
+          ...{
+            must: {
+              brokerCompanySiret: orgId
+            }
+          }
+        }
+      }
+    }
+  );
 
+  const hits = body.hits.hits.slice(0, MAX_FAVORITES);
   const brokerSirets = [
-    ...new Set(forms.map(f => f.brokerCompanySiret).filter(Boolean))
+    ...new Set(hits.map(f => f._source?.brokerCompanySiret).filter(Boolean))
   ];
+
   const favorites = await Promise.all(
     brokerSirets.map(async siret => {
       try {
@@ -325,41 +373,26 @@ async function getRecentPartners(
   orgId: string,
   type: FavoriteType
 ): Promise<CompanySearchResult[]> {
-  const defaultWhere: Prisma.FormWhereInput = {
-    OR: [
-      { emitterCompanySiret: orgId },
-      { ecoOrganismeSiret: orgId },
-      { recipientsSirets: { has: orgId } },
-      { traderCompanySiret: orgId },
-      { brokerCompanySiret: orgId },
-      { transportersSirets: { has: orgId } }
-    ],
-
-    // ignore drafts as they are likely to be incomplete
-    status: { not: "DRAFT" },
-
-    isDeleted: false
+  const defaultFilter: estypes.QueryContainer = {
+    bool: {
+      must_not: [{ term: { status: "DRAFT" } }]
+    }
   };
-
   switch (type) {
     case "EMITTER":
-      return getRecentEmitters(defaultWhere);
-    case "RECIPIENT":
-      return getRecentRecipients(defaultWhere);
-    case "TEMPORARY_STORAGE_DETAIL":
-      // do not differenciate between recipient and temp storage
-      // because the front never set type = TEMPORARY_STORAGE_DETAIL
-      return getRecentRecipients(defaultWhere);
+      return getRecentEmitters(orgId, defaultFilter);
     case "TRANSPORTER":
-      return getRecentTransporters(defaultWhere);
+      return getRecentTransporters(orgId, defaultFilter);
+    case "TEMPORARY_STORAGE_DETAIL":
+    case "RECIPIENT":
     case "DESTINATION":
-      return getRecentDestinationAfterTempStorage(defaultWhere);
+      return getRecentRecipients(orgId, defaultFilter);
     case "NEXT_DESTINATION":
-      return getRecentNextDestinations(defaultWhere);
+      return getRecentNextDestinations(orgId, defaultFilter);
     case "BROKER":
-      return getRecentBrokers(defaultWhere);
+      return getRecentBrokers(orgId, defaultFilter);
     case "TRADER":
-      return getRecentTraders(defaultWhere);
+      return getRecentTraders(orgId, defaultFilter);
     default:
       return [];
   }
