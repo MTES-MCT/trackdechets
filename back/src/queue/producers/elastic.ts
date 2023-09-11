@@ -10,7 +10,7 @@ import {
 } from "./jobNames";
 import { updatesQueue } from "./bsdUpdate";
 import { favoritesCompanyQueue } from "./company";
-import { allFavoriteTypes } from "../jobs/indexFavorites";
+import { allFavoriteTypes } from "../../companies/types";
 
 const { REDIS_URL, NODE_ENV } = process.env;
 export const INDEX_QUEUE_NAME = `queue_index_elastic_${NODE_ENV}`;

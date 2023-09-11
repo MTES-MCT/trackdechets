@@ -252,7 +252,8 @@ describe("searchCompanies", () => {
         libelleNaf: "Programmation informatique",
         naf: "6201Z",
         etatAdministratifEtablissement: company.etatAdministratif,
-        statutDiffusionEtablissement: "O"
+        statutDiffusionEtablissement: "O",
+        codePaysEtrangerEtablissement: undefined
       }
     ]);
     // check that searchCompanies return Sirene data instead of prisma.company data
@@ -261,7 +262,6 @@ describe("searchCompanies", () => {
     const expected = {
       siret: company.siret,
       orgId: company.siret,
-      isRegistered: true,
       statutDiffusionEtablissement: "O",
       address: "4 BD LONGCHAMP 13001 MARSEILLE",
       addressCity: "MARSEILLE",
@@ -269,7 +269,6 @@ describe("searchCompanies", () => {
       addressVoie: "4 BD LONGCHAMP",
       codeCommune: undefined,
       codePaysEtrangerEtablissement: undefined,
-      companyTypes: [],
       name: company.name,
       libelleNaf: "Programmation informatique",
       naf: "6201Z",
