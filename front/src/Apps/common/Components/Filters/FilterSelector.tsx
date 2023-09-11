@@ -6,7 +6,7 @@ import {
 import { Filter } from "./filtersTypes";
 
 interface FilterSelectorProps {
-  filters: Filter[];
+  filters: Filter[][];
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   disabled?: boolean;
   value?: string;
@@ -18,6 +18,20 @@ const FilterSelector = ({
   disabled = false,
   value = "",
 }: FilterSelectorProps) => {
+  const filtersList = filters.map((filtersGroup, index) => {
+    let filtersElement = filtersGroup.map(filter => (
+      <option key={filter.name} value={filter.name} disabled={!filter.isActive}>
+        {filter.label}
+      </option>
+    ));
+
+    if (index !== filters.length - 1) {
+      filtersElement.push(<option disabled>──────────</option>);
+    }
+
+    return filtersElement;
+  });
+
   return (
     <div className="fr-select-group">
       <label className="fr-label" htmlFor={`${value}_select`}>
@@ -33,15 +47,8 @@ const FilterSelector = ({
         <option value="" disabled>
           {filter_type_select_placeholder}
         </option>
-        {filters.map(filter => (
-          <option
-            key={filter.name}
-            value={filter.name}
-            disabled={!filter.isActive}
-          >
-            {filter.label}
-          </option>
-        ))}
+
+        {filtersList}
       </select>
     </div>
   );

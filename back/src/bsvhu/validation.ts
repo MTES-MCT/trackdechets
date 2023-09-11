@@ -172,7 +172,7 @@ const destinationSchema: FactorySchemaOf<
     destinationAgrementNumber: yup
       .string()
       .requiredIf(
-        context.operationSignature,
+        context.emissionSignature,
         `Destinataire: le numéro d'agrément est obligatoire`
       ),
     destinationReceptionAcceptationStatus: yup

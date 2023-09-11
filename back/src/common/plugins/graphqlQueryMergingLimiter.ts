@@ -1,7 +1,7 @@
 import { ApolloServerPlugin, GraphQLRequestContext } from "@apollo/server";
 import { GraphQLError, Kind, OperationDefinitionNode } from "graphql";
-import { MAX_OPERATIONS_PER_REQUEST } from "./graphqlBatchLimiter";
 import { ErrorCode } from "../errors";
+import { MAX_OPERATIONS_PER_REQUEST } from "../middlewares/graphqlBatchLimiter";
 
 export class GraphqlQueryLimit extends GraphQLError {
   constructor(message: string) {

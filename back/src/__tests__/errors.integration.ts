@@ -49,7 +49,10 @@ describe("Error handling", () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     mockFoo.mockResolvedValueOnce("bar");
-    const { body } = await server.executeOperation({ query: FOO });
+    const { body } = await server.executeOperation(
+      { query: FOO },
+      { contextValue: { req: {} } }
+    );
     expect(body.singleResult.errors).toBeUndefined();
     expect(body.singleResult.data).toEqual({ foo: "bar" });
   });
@@ -60,7 +63,10 @@ describe("Error handling", () => {
     mockFoo.mockImplementationOnce(() => {
       throw new UserInputError("Oups");
     });
-    const { body } = await server.executeOperation({ query: FOO });
+    const { body } = await server.executeOperation(
+      { query: FOO },
+      { contextValue: { req: {} } }
+    );
     const errors = body.singleResult.errors;
     expect(errors).toHaveLength(1);
     const error = errors[0];
@@ -74,7 +80,10 @@ describe("Error handling", () => {
     mockFoo.mockImplementationOnce(() => {
       return new UserInputError("Oups");
     });
-    const { body } = await server.executeOperation({ query: FOO });
+    const { body } = await server.executeOperation(
+      { query: FOO },
+      { contextValue: { req: {} } }
+    );
     const errors = body.singleResult.errors;
     expect(errors).toHaveLength(1);
     const error = errors[0];
@@ -88,7 +97,10 @@ describe("Error handling", () => {
     mockFoo.mockImplementationOnce(() => {
       throw new GraphQLError("Bang");
     });
-    const { body } = await server.executeOperation({ query: FOO });
+    const { body } = await server.executeOperation(
+      { query: FOO },
+      { contextValue: { req: {} } }
+    );
     const errors = body.singleResult.errors;
     expect(errors).toHaveLength(1);
 
@@ -105,7 +117,10 @@ describe("Error handling", () => {
       (error as any).sentryId = "sentry_id";
       throw error;
     });
-    const { body } = await server.executeOperation({ query: FOO });
+    const { body } = await server.executeOperation(
+      { query: FOO },
+      { contextValue: { req: {} } }
+    );
     const errors = body.singleResult.errors;
     expect(errors).toHaveLength(1);
 
@@ -122,7 +137,10 @@ describe("Error handling", () => {
     mockFoo.mockImplementationOnce(() => {
       readFileSync("path/does/not/exist");
     });
-    const { body } = await server.executeOperation({ query: FOO });
+    const { body } = await server.executeOperation(
+      { query: FOO },
+      { contextValue: { req: {} } }
+    );
     const errors = body.singleResult.errors;
     expect(errors).toHaveLength(1);
 
@@ -137,7 +155,10 @@ describe("Error handling", () => {
     mockFoo.mockImplementationOnce(() => {
       return readFileSync("path/does/not/exist");
     });
-    const { body } = await server.executeOperation({ query: FOO });
+    const { body } = await server.executeOperation(
+      { query: FOO },
+      { contextValue: { req: {} } }
+    );
     const errors = body.singleResult.errors;
     expect(errors).toHaveLength(1);
 
@@ -152,7 +173,10 @@ describe("Error handling", () => {
     mockFoo.mockImplementationOnce(() => {
       throw new Error("Bang");
     });
-    const { body } = await server.executeOperation({ query: FOO });
+    const { body } = await server.executeOperation(
+      { query: FOO },
+      { contextValue: { req: {} } }
+    );
     const errors = body.singleResult.errors;
     const error = errors[0];
     expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
@@ -165,7 +189,10 @@ describe("Error handling", () => {
     mockFoo.mockImplementationOnce(() => {
       throw new ValidationError("Bang", "Wrong value", "path");
     });
-    const { body } = await server.executeOperation({ query: FOO });
+    const { body } = await server.executeOperation(
+      { query: FOO },
+      { contextValue: { req: {} } }
+    );
     const errors = body.singleResult.errors;
     const error = errors[0];
     expect(error.extensions.code).toEqual("BAD_USER_INPUT");
@@ -177,10 +204,13 @@ describe("Error handling", () => {
     const server = require("../server").server;
     // invalid variable `toto` instead of `input`
     const variables = { toto: "toto" };
-    const { body } = await server.executeOperation({
-      query: BAR,
-      variables
-    });
+    const { body } = await server.executeOperation(
+      {
+        query: BAR,
+        variables
+      },
+      { contextValue: { req: {} } }
+    );
     const errors = body.singleResult.errors;
     const error = errors[0];
     expect(error.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);

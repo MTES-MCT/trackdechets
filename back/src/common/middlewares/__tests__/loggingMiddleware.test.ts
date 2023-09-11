@@ -2,8 +2,13 @@ import express, { json } from "express";
 import supertest from "supertest";
 import Transport from "winston-transport";
 import logger from "../../../logging/logger";
-import { graphqlQueryParserMiddleware } from "../graphqlQueryParser";
 import loggingMiddleware from "../loggingMiddleware";
+import { gql } from "graphql-tag";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import { GraphQLContext } from "../../../types";
+import { gqlInfosPlugin } from "../../plugins/gqlInfosPlugin";
+import cors from "cors";
 
 const logMock = jest.fn();
 
@@ -27,19 +32,54 @@ describe("loggingMiddleware", () => {
     logger.remove(transport);
   });
 
-  const app = express();
-  const graphQLPath = "/";
-  app.use(json());
-  app.use(graphQLPath, graphqlQueryParserMiddleware()); // We rely on `graphqlQueryParserMiddleware`
-  app.use(loggingMiddleware("/"));
-  app.get("/hello", (req, res) => {
-    res.status(200).send("world");
-  });
-  app.post(graphQLPath, (_req, res) => {
-    res.status(200).send({ data: { me: { name: "John Snow" } } });
-  });
+  let request;
+  beforeAll(async () => {
+    const app = express();
+    app.use(json());
+    app.use(loggingMiddleware("/graphql"));
 
-  const request = supertest(app);
+    // Include Apollo as it enrich the request with gqlInfos, used for logging
+    const typeDefs = gql`
+      type Foo {
+        bar: String
+      }
+      type Query {
+        foo: Foo
+      }
+    `;
+    const resolvers = {
+      Query: {
+        foo: () => ({ bar: "bar" })
+      }
+    };
+    const server = new ApolloServer<GraphQLContext>({
+      typeDefs,
+      resolvers,
+      plugins: [gqlInfosPlugin()]
+    });
+    await server.start();
+    app.use(
+      "/graphql",
+      cors({
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
+        credentials: true
+      }),
+      json(),
+      expressMiddleware(server, {
+        context: ctx => {
+          return ctx as any;
+        }
+      })
+    );
+
+    app.get("/hello", (_, res) => {
+      res.status(200).send("world");
+    });
+
+    request = supertest(app);
+  });
 
   it("should log requests to standard express endpoint", async () => {
     await request.get("/hello");
@@ -61,31 +101,25 @@ describe("loggingMiddleware", () => {
   });
 
   it("should log requests to GraphQL endpoint", async () => {
-    await request.post(graphQLPath).send({ query: "{ me { name } }" });
+    await request.post("/graphql").send({ query: "{ foo { bar } }" });
     expect(logMock.mock.calls).toHaveLength(2);
 
     for (const logCall of logMock.mock.calls) {
-      const {
-        message,
-        level,
-        graphql_query,
-        graphql_selection_name,
-        graphql_operation
-      } = logCall[0];
-      expect(message).toEqual("POST /");
+      const { message, level, graphql_query } = logCall[0];
+      expect(message).toEqual("POST /graphql");
       expect(level).toEqual("info");
-      expect(graphql_query).toEqual("{ me { name } }");
-      expect(graphql_selection_name).toEqual("me");
-      expect(graphql_operation).toEqual("query");
+      expect(graphql_query).toEqual("{ foo { bar } }");
     }
 
     const startLog = logMock.mock.calls[0][0];
     expect(startLog.request_timing).toEqual("start");
 
     const responseLog = logMock.mock.calls[1][0];
+    expect(responseLog.graphql_selection_name).toEqual("foo");
+    expect(responseLog.graphql_operation).toEqual("query");
     expect(responseLog.user).toEqual("anonyme");
-    expect(responseLog.response_body).toEqual(
-      '{"data":{"me":{"name":"John Snow"}}}'
+    expect(responseLog.response_body.trim()).toEqual(
+      '{"data":{"foo":{"bar":"bar"}}}'
     );
     expect(responseLog.execution_time_num).toBeGreaterThanOrEqual(0);
     expect(responseLog.http_status).toEqual(200);

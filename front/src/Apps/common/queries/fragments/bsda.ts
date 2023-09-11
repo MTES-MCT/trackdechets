@@ -24,6 +24,9 @@ export const bsdaFragment = gql`
         siret
         orgId
       }
+      reception {
+        weight
+      }
     }
     worker {
       isDisabled
