@@ -1,15 +1,16 @@
 import fs from "fs";
 import path from "path";
 import { Job } from "bull";
+import { SearchResponse } from "@elastic/elasticsearch/api/types";
+import { Search } from "@elastic/elasticsearch/api/requestParams";
+import { ApiResponse, Client } from "@elastic/elasticsearch";
 import { CompanyType } from "@prisma/client";
 import prisma from "../../prisma";
 import { searchCompany } from "../../companies/search";
 import { CompanySearchResult } from "../../companies/types";
-import { ApiResponse, Client, estypes } from "@elastic/elasticsearch";
 import { FavoriteType } from "../../generated/graphql/types";
 import { getTransporterCompanyOrgId } from "../../common/constants/companySearchHelpers";
 import { getCompanyOrCompanyNotFound } from "../../companies/database";
-import { SearchResponse } from "@elastic/elasticsearch/api/types";
 import { BsdElastic, index } from "../../common/elastic";
 
 export interface FavoriteIndexBody {
@@ -59,6 +60,9 @@ if (!!ssl && process.env.ELASTICSEARCH_FAVORITES_IGNORE_SSL === "true") {
   ssl.rejectUnauthorized = false;
 }
 
+/**
+ * ElasticSearch `favorites` index client
+ */
 export const client = new Client({
   node: indexConfig.url,
   ssl
@@ -107,62 +111,76 @@ function matchesFavoriteType(
   );
 }
 
-async function getRecentEmitters(
-  orgId: string,
-  defaultWhere: estypes.QueryContainer
-): Promise<CompanySearchResult[]> {
-  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
-    {
-      index: index.alias,
-      body: {
-        size: MAX_FAVORITES,
+/**
+ * ElasticSearch `bsds` query builder
+ */
+const buildBsdsQueryBody = (orgId: string, field: string): Search => ({
+  index: index.alias,
+  body: {
+    size: MAX_FAVORITES,
+    query: {
+      bool: {
         ...{
-          ...defaultWhere,
-          ...{
-            must: {
-              emitterCompanySiret: orgId
+          must: [
+            {
+              term: { sirets: orgId }
+            },
+            {
+              exists: {
+                field: "emitterCompanySiret"
+              }
             }
-          }
+          ]
+        },
+        ...{
+          must_not: [
+            { term: { status: "DRAFT" } },
+            {
+              term: {
+                [field]: ""
+              }
+            }
+          ]
         }
       }
     }
+  }
+});
+
+async function getRecentEmitters(
+  orgId: string
+): Promise<CompanySearchResult[]> {
+  const queryBody = buildBsdsQueryBody(orgId, "emitterCompanySiret");
+  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
+    queryBody
   );
   const hits = body.hits.hits.slice(0, MAX_FAVORITES);
   const emitterSirets = [
     ...new Set(hits.map(f => f._source?.emitterCompanySiret).filter(Boolean))
   ];
   const favorites = await Promise.all(
-    emitterSirets.map(async siret => {
-      try {
-        return await searchCompany(siret);
-      } catch (_) {
-        return null;
-      }
-    })
+    emitterSirets.map(searchRegisteredCompany)
   );
 
   return favorites.filter(Boolean);
 }
 
+const searchRegisteredCompany = async siret => {
+  try {
+    const company = await searchCompany(siret);
+    if (company.isRegistered) return company;
+    else return null;
+  } catch (_) {
+    return null;
+  }
+};
+
 async function getRecentRecipients(
-  orgId: string,
-  defaultWhere: estypes.QueryContainer
+  orgId: string
 ): Promise<CompanySearchResult[]> {
+  const queryBody = buildBsdsQueryBody(orgId, "destinationCompanySiret");
   const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
-    {
-      index: index.alias,
-      body: {
-        size: MAX_FAVORITES,
-        ...{
-          ...defaultWhere,
-          ...{
-            must: {
-              destinationCompanySiret: orgId
-            }
-          }
-        }
-      }
-    }
+    queryBody
   );
   const hits = body.hits.hits.slice(0, MAX_FAVORITES);
   const destinationSirets = [
@@ -171,37 +189,16 @@ async function getRecentRecipients(
     )
   ];
   const favorites = await Promise.all(
-    destinationSirets.map(async siret => {
-      try {
-        return await searchCompany(siret);
-      } catch (_) {
-        return null;
-      }
-    })
+    destinationSirets.map(searchRegisteredCompany)
   );
 
   return favorites.filter(Boolean);
 }
 
-async function getRecentNextDestinations(
-  orgId: string,
-  defaultWhere: estypes.QueryContainer
-) {
+async function getRecentNextDestinations(orgId: string) {
+  const queryBody = buildBsdsQueryBody(orgId, "nextDestinationCompanySiret");
   const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
-    {
-      index: index.alias,
-      body: {
-        size: MAX_FAVORITES,
-        ...{
-          ...defaultWhere,
-          ...{
-            must: {
-              nextDestinationCompanySiret: orgId
-            }
-          }
-        }
-      }
-    }
+    queryBody
   );
   const hits = body.hits.hits.slice(0, MAX_FAVORITES);
   const nextDestinationSirets = [
@@ -211,13 +208,7 @@ async function getRecentNextDestinations(
   ];
 
   const favorites = await Promise.all(
-    nextDestinationSirets.map(async siret => {
-      try {
-        return await searchCompany(siret);
-      } catch (_) {
-        return null;
-      }
-    })
+    nextDestinationSirets.map(searchRegisteredCompany)
   );
 
   return favorites.filter(Boolean);
@@ -226,68 +217,40 @@ async function getRecentNextDestinations(
 /**
  * Only retrieve the first Transporter if many exists
  */
-async function getRecentTransporters(
-  orgId: string,
-  defaultWhere: estypes.QueryContainer
-) {
-  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
-    {
-      index: index.alias,
-      body: {
-        size: MAX_FAVORITES,
-        ...{
-          ...defaultWhere,
-          ...{
-            should: {
-              transporterCompanySiret: orgId,
-              transporterCompanyVatNumber: orgId
-            }
-          }
-        }
-      }
-    }
-  );
+async function getRecentTransporters(orgId: string) {
+  const queryBody = buildBsdsQueryBody(orgId, "transporterCompanySiret");
+  const vatQueryBody = buildBsdsQueryBody(orgId, "transporterCompanyVatNumber");
+
+  const [{ body }, { body: vatBody }] = await Promise.all([
+    client.search(queryBody),
+    client.search(vatQueryBody)
+  ]);
   const hits = body.hits.hits.slice(0, MAX_FAVORITES);
+  const vatHits = vatBody.hits.hits.slice(0, MAX_FAVORITES);
   const transporterOrgIds = [
     ...new Set(
       hits
+        .map(f => (f._source ? getTransporterCompanyOrgId(f._source) : null))
+        .filter(Boolean)
+    ),
+    ...new Set(
+      vatHits
         .map(f => (f._source ? getTransporterCompanyOrgId(f._source) : null))
         .filter(Boolean)
     )
   ];
 
   const favorites = await Promise.all(
-    transporterOrgIds.map(async orgId => {
-      try {
-        return await searchCompany(orgId);
-      } catch (_) {
-        return null;
-      }
-    })
+    transporterOrgIds.map(searchRegisteredCompany)
   );
 
   return favorites.filter(Boolean);
 }
 
-async function getRecentTraders(
-  orgId: string,
-  defaultWhere: estypes.QueryContainer
-): Promise<CompanySearchResult[]> {
+async function getRecentTraders(orgId: string): Promise<CompanySearchResult[]> {
+  const queryBody = buildBsdsQueryBody(orgId, "traderCompanySiret");
   const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
-    {
-      index: index.alias,
-      body: {
-        size: MAX_FAVORITES,
-        ...{
-          ...defaultWhere,
-          ...{
-            must: {
-              traderCompanySiret: orgId
-            }
-          }
-        }
-      }
-    }
+    queryBody
   );
   const hits = body.hits.hits.slice(0, MAX_FAVORITES);
   const traderSirets = [
@@ -297,12 +260,13 @@ async function getRecentTraders(
     traderSirets.map(async siret => {
       try {
         const favorite = await searchCompany(siret);
-        const traderReceipt = await prisma.company
-          .findUnique({
-            where: { orgId: favorite.orgId }
-          })
-          .traderReceipt();
-        return { ...favorite, traderReceipt };
+        const company = await prisma.company.findUnique({
+          where: { orgId: favorite.orgId },
+          include: { traderReceipt: true }
+        });
+
+        if (!company) return null;
+        return { ...favorite, traderReceipt: company.traderReceipt };
       } catch (_) {
         return null;
       }
@@ -312,27 +276,11 @@ async function getRecentTraders(
   return favorites.filter(Boolean);
 }
 
-async function getRecentBrokers(
-  orgId: string,
-  defaultWhere: estypes.QueryContainer
-): Promise<CompanySearchResult[]> {
+async function getRecentBrokers(orgId: string): Promise<CompanySearchResult[]> {
+  const queryBody = buildBsdsQueryBody(orgId, "brokerCompanySiret");
   const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
-    {
-      index: index.alias,
-      body: {
-        size: MAX_FAVORITES,
-        ...{
-          ...defaultWhere,
-          ...{
-            must: {
-              brokerCompanySiret: orgId
-            }
-          }
-        }
-      }
-    }
+    queryBody
   );
-
   const hits = body.hits.hits.slice(0, MAX_FAVORITES);
   const brokerSirets = [
     ...new Set(hits.map(f => f._source?.brokerCompanySiret).filter(Boolean))
@@ -342,12 +290,12 @@ async function getRecentBrokers(
     brokerSirets.map(async siret => {
       try {
         const favorite = await searchCompany(siret);
-        const brokerReceipt = await prisma.company
-          .findUnique({
-            where: { orgId: favorite.orgId }
-          })
-          .brokerReceipt();
-        return { ...favorite, brokerReceipt };
+        const company = await prisma.company.findUnique({
+          where: { orgId: favorite.orgId },
+          include: { brokerReceipt: true }
+        });
+        if (!company) return null;
+        return { ...favorite, brokerReceipt: company.brokerReceipt };
       } catch (_) {
         return null;
       }
@@ -373,26 +321,21 @@ async function getRecentPartners(
   orgId: string,
   type: FavoriteType
 ): Promise<CompanySearchResult[]> {
-  const defaultFilter: estypes.QueryContainer = {
-    bool: {
-      must_not: [{ term: { status: "DRAFT" } }]
-    }
-  };
   switch (type) {
     case "EMITTER":
-      return getRecentEmitters(orgId, defaultFilter);
+      return getRecentEmitters(orgId);
     case "TRANSPORTER":
-      return getRecentTransporters(orgId, defaultFilter);
+      return getRecentTransporters(orgId);
     case "TEMPORARY_STORAGE_DETAIL":
     case "RECIPIENT":
     case "DESTINATION":
-      return getRecentRecipients(orgId, defaultFilter);
+      return getRecentRecipients(orgId);
     case "NEXT_DESTINATION":
-      return getRecentNextDestinations(orgId, defaultFilter);
+      return getRecentNextDestinations(orgId);
     case "BROKER":
-      return getRecentBrokers(orgId, defaultFilter);
+      return getRecentBrokers(orgId);
     case "TRADER":
-      return getRecentTraders(orgId, defaultFilter);
+      return getRecentTraders(orgId);
     default:
       return [];
   }

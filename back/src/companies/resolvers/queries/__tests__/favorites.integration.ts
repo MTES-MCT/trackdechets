@@ -16,6 +16,9 @@ import {
 } from "../../../../queue/jobs/indexFavorites";
 import { convertUrls } from "../../../database";
 import * as search from "../../../search";
+import { index, client as elasticSearch } from "../../../../common/elastic";
+import { getFullForm } from "../../../../forms/database";
+import { indexForm } from "../../../../forms/elastic";
 
 const request = supertest(app);
 
@@ -44,6 +47,17 @@ const FAVORITES = `query Favorites($orgId: String!, $type: FavoriteType!, $allow
 
 const searchCompanySpy = jest.spyOn(search, "searchCompany");
 
+async function refreshIndices() {
+  await elasticSearch.indices.refresh(
+    {
+      index: index.alias
+    },
+    {
+      // do not throw an error on version conflicts
+      ignore: [409]
+    }
+  );
+}
 describe("query favorites", () => {
   afterEach(resetDatabase);
 
@@ -59,10 +73,16 @@ describe("query favorites", () => {
     const { user: user2, company: company2 } = await userWithCompanyFactory(
       "MEMBER"
     );
-    await formFactory({
-      ownerId: user2.id,
-      opt: { recipientCompanySiret: company2.orgId }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user2.id,
+          opt: { recipientCompanySiret: company2.orgId }
+        })
+      )
+    );
+    await refreshIndices();
+
     searchCompanySpy.mockResolvedValueOnce({
       ...convertUrls(company)
     });
@@ -88,6 +108,8 @@ describe("query favorites", () => {
   it("should not be possible to access favorites of unknown companies", async () => {
     const user = await userFactory();
     const { query } = makeClient({ ...user, auth: AuthType.Session });
+    await refreshIndices();
+
     const { errors } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
         orgId: "orgId",
@@ -106,10 +128,16 @@ describe("query favorites", () => {
     const { user: user2, company: company2 } = await userWithCompanyFactory(
       "MEMBER"
     );
-    await formFactory({
-      ownerId: user2.id,
-      opt: { recipientCompanySiret: company2.orgId }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user2.id,
+          opt: { recipientCompanySiret: company2.orgId }
+        })
+      )
+    );
+    await refreshIndices();
+
     searchCompanySpy.mockResolvedValueOnce({
       ...convertUrls(company)
     });
@@ -141,19 +169,28 @@ describe("query favorites", () => {
         companyTypes: ["TRANSPORTER"]
       }
     );
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        transporters: {
-          create: { transporterCompanyVatNumber: company2.vatNumber, number: 1 }
-        },
-        emitterCompanySiret: company.orgId,
-        status: Status.SENT
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            transporters: {
+              create: {
+                transporterCompanyVatNumber: company2.vatNumber,
+                number: 1
+              }
+            },
+            emitterCompanySiret: company.orgId,
+            status: Status.SENT
+          }
+        })
+      )
+    );
     searchCompanySpy.mockResolvedValueOnce({
       ...convertUrls(company)
     });
+    await refreshIndices();
+
     await indexFavorites(
       await favoritesConstrutor({ orgId: company.orgId, type: "TRANSPORTER" }),
       { orgId: company.orgId, type: "TRANSPORTER" }
@@ -215,10 +252,16 @@ describe("query favorites", () => {
       orgId: "ESB50629187",
       siret: undefined
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: { recipientCompanySiret: company.orgId }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: { recipientCompanySiret: company.orgId }
+        })
+      )
+    );
+    await refreshIndices();
+
     searchCompanySpy.mockResolvedValueOnce({
       ...convertUrls(company)
     });

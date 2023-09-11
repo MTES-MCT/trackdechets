@@ -10,8 +10,23 @@ import { CompanySearchResult } from "../../../companies/types";
 import getReadableId from "../../../forms/readableId";
 import * as search from "../../../companies/search";
 import { favoritesConstrutor } from "../indexFavorites";
+import { indexForm } from "../../../forms/elastic";
+import { getFullForm } from "../../../forms/database";
+import { index, client as elasticSearch } from "../../../common/elastic";
 
 const searchCompanySpy = jest.spyOn(search, "searchCompany");
+
+async function refreshIndices() {
+  await elasticSearch.indices.refresh(
+    {
+      index: index.alias
+    },
+    {
+      // do not throw an error on version conflicts
+      ignore: [409]
+    }
+  );
+}
 
 describe("Index favorites job", () => {
   afterEach(resetDatabase);
@@ -24,18 +39,71 @@ describe("Index favorites job", () => {
         set: ["COLLECTOR"]
       }
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "DRAFT"
-      }
+    const emitter = await companyFactory();
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            status: "DRAFT",
+            emitterCompanySiret: emitter.orgId,
+            recipientCompanySiret: company.orgId,
+            recipientsSirets: [company.orgId!]
+          }
+        })
+      )
+    );
+    searchCompanySpy.mockResolvedValueOnce({
+      name: emitter.name,
+      siret: emitter.siret,
+      orgId: emitter.orgId,
+      vatNumber: null,
+      contact: emitter.contact,
+      contactEmail: emitter.contactEmail,
+      contactPhone: emitter.contactPhone,
+      codePaysEtrangerEtablissement: "FR",
+      address: emitter.address,
+      companyTypes: emitter.companyTypes,
+      isRegistered: true,
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O"
     });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: emitter.orgId,
+            recipientCompanySiret: company.orgId,
+            recipientsSirets: [company.orgId!]
+          }
+        })
+      )
+    );
+
+    await refreshIndices();
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "EMITTER"
     });
 
-    expect(favorites).toEqual([]);
+    expect(favorites).toEqual([
+      expect.objectContaining({
+        name: emitter.name,
+        siret: emitter.siret,
+        orgId: emitter.orgId,
+        vatNumber: null,
+        contact: emitter.contact,
+        contactEmail: emitter.contactEmail,
+        contactPhone: emitter.contactPhone,
+        codePaysEtrangerEtablissement: "FR",
+        address: emitter.address,
+        companyTypes: emitter.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O"
+      })
+    ]);
   });
 
   it("should ignore deleted forms", async () => {
@@ -44,19 +112,70 @@ describe("Index favorites job", () => {
         set: ["COLLECTOR"]
       }
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        isDeleted: true
-      }
+    const emitter = await companyFactory();
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            isDeleted: true,
+            emitterCompanySiret: emitter.orgId,
+            recipientCompanySiret: company.orgId,
+            recipientsSirets: [company.orgId!]
+          }
+        })
+      )
+    );
+    searchCompanySpy.mockResolvedValueOnce({
+      name: emitter.name,
+      siret: emitter.siret,
+      orgId: emitter.orgId,
+      vatNumber: null,
+      contact: emitter.contact,
+      contactEmail: emitter.contactEmail,
+      contactPhone: emitter.contactPhone,
+      codePaysEtrangerEtablissement: "FR",
+      address: emitter.address,
+      companyTypes: emitter.companyTypes,
+      isRegistered: true,
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O"
     });
-
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: emitter.orgId,
+            recipientCompanySiret: company.orgId,
+            recipientsSirets: [company.orgId!]
+          }
+        })
+      )
+    );
+    await refreshIndices();
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "EMITTER"
     });
 
-    expect(favorites).toEqual([]);
+    expect(favorites).toEqual([
+      expect.objectContaining({
+        name: emitter.name,
+        siret: emitter.siret,
+        orgId: emitter.orgId,
+        vatNumber: null,
+        contact: emitter.contact,
+        contactEmail: emitter.contactEmail,
+        contactPhone: emitter.contactPhone,
+        codePaysEtrangerEtablissement: "FR",
+        address: emitter.address,
+        companyTypes: emitter.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O"
+      })
+    ]);
   });
 
   it("should return recent emitters", async () => {
@@ -81,14 +200,20 @@ describe("Index favorites job", () => {
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O"
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: emitter.orgId,
-        recipientCompanySiret: company.orgId,
-        recipientsSirets: [company.orgId!]
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: emitter.orgId,
+            recipientCompanySiret: company.orgId,
+            recipientsSirets: [company.orgId!]
+          }
+        })
+      )
+    );
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "EMITTER"
@@ -119,13 +244,19 @@ describe("Index favorites job", () => {
         set: ["COLLECTOR"]
       }
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: siretify(1),
-        recipientCompanySiret: company.orgId
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: siretify(1),
+            recipientCompanySiret: company.orgId
+          }
+        })
+      )
+    );
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "EMITTER"
@@ -141,13 +272,18 @@ describe("Index favorites job", () => {
       }
     });
     const recipient = await companyFactory();
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        recipientCompanySiret: recipient.orgId
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            recipientCompanySiret: recipient.orgId
+          }
+        })
+      )
+    );
+
     searchCompanySpy.mockResolvedValueOnce({
       name: recipient.name,
       siret: recipient.siret,
@@ -163,6 +299,8 @@ describe("Index favorites job", () => {
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O"
     });
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "RECIPIENT"
@@ -193,13 +331,19 @@ describe("Index favorites job", () => {
         set: ["PRODUCER"]
       }
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        recipientCompanySiret: siretify(1)
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            recipientCompanySiret: siretify(1)
+          }
+        })
+      )
+    );
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "RECIPIENT"
@@ -241,16 +385,21 @@ describe("Index favorites job", () => {
         receiptNumber: "receipt"
       })
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        transporters: {
-          create: { transporterCompanySiret: transporter.orgId, number: 1 }
-        },
-        transportersSirets: [transporter.orgId!]
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            transporters: {
+              create: { transporterCompanySiret: transporter.orgId, number: 1 }
+            },
+            transportersSirets: [transporter.orgId!]
+          }
+        })
+      )
+    );
+    await refreshIndices();
 
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
@@ -305,18 +454,24 @@ describe("Index favorites job", () => {
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O"
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        transporters: {
-          create: {
-            transporterCompanyVatNumber: transporter.vatNumber,
-            number: 1
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            transporters: {
+              create: {
+                transporterCompanyVatNumber: transporter.vatNumber,
+                number: 1
+              }
+            }
           }
-        }
-      }
-    });
+        })
+      )
+    );
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "TRANSPORTER"
@@ -364,18 +519,24 @@ describe("Index favorites job", () => {
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O"
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        transporters: {
-          create: {
-            transporterCompanySiret: siretify(1),
-            number: 1
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            transporters: {
+              create: {
+                transporterCompanySiret: siretify(1),
+                number: 1
+              }
+            }
           }
-        }
-      }
-    });
+        })
+      )
+    );
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "TRANSPORTER"
@@ -406,14 +567,20 @@ describe("Index favorites job", () => {
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O"
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        recipientCompanySiret: tempStorer.orgId,
-        recipientIsTempStorage: true
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            recipientCompanySiret: tempStorer.orgId,
+            recipientIsTempStorage: true
+          }
+        })
+      )
+    );
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "TEMPORARY_STORAGE_DETAIL"
@@ -445,14 +612,19 @@ describe("Index favorites job", () => {
       }
     });
     const unknownSiret = siretify(1);
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        recipientCompanySiret: unknownSiret,
-        recipientIsTempStorage: true
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            recipientCompanySiret: unknownSiret,
+            recipientIsTempStorage: true
+          }
+        })
+      )
+    );
+
     searchCompanySpy.mockResolvedValueOnce({
       name: "tempStorer.name",
       siret: unknownSiret,
@@ -467,6 +639,8 @@ describe("Index favorites job", () => {
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O"
     });
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "TEMPORARY_STORAGE_DETAIL"
@@ -483,14 +657,18 @@ describe("Index favorites job", () => {
     });
     const destination = await companyFactory();
 
-    await formWithTempStorageFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        recipientsSirets: [destination.orgId!]
-      },
-      forwardedInOpts: { recipientCompanySiret: destination.orgId }
-    });
+    await indexForm(
+      await getFullForm(
+        await formWithTempStorageFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            recipientsSirets: [destination.orgId!]
+          },
+          forwardedInOpts: { recipientCompanySiret: destination.orgId }
+        })
+      )
+    );
 
     searchCompanySpy.mockResolvedValueOnce({
       name: destination.name,
@@ -507,6 +685,7 @@ describe("Index favorites job", () => {
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O"
     });
+    await refreshIndices();
 
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
@@ -539,11 +718,17 @@ describe("Index favorites job", () => {
       }
     });
     const recipientCompanySiret = siretify(1);
-    await formWithTempStorageFactory({
-      ownerId: user.id,
-      opt: { emitterCompanySiret: company.orgId },
-      forwardedInOpts: { recipientCompanySiret }
-    });
+
+    await indexForm(
+      await getFullForm(
+        await formWithTempStorageFactory({
+          ownerId: user.id,
+          opt: { emitterCompanySiret: company.orgId },
+          forwardedInOpts: { recipientCompanySiret }
+        })
+      )
+    );
+
     searchCompanySpy.mockResolvedValueOnce({
       name: "destination.name",
       siret: recipientCompanySiret,
@@ -558,6 +743,8 @@ describe("Index favorites job", () => {
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O"
     });
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "DESTINATION"
@@ -591,13 +778,19 @@ describe("Index favorites job", () => {
       }
     });
 
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        nextDestinationCompanySiret: destination.orgId
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            nextDestinationCompanySiret: destination.orgId
+          }
+        })
+      )
+    );
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "NEXT_DESTINATION"
@@ -630,13 +823,19 @@ describe("Index favorites job", () => {
       }
     });
 
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        nextDestinationCompanySiret: siretify(1)
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            nextDestinationCompanySiret: siretify(1)
+          }
+        })
+      )
+    );
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "NEXT_DESTINATION"
@@ -681,13 +880,19 @@ describe("Index favorites job", () => {
       }
     });
 
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        traderCompanySiret: trader.orgId
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            traderCompanySiret: trader.orgId
+          }
+        })
+      )
+    );
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "TRADER"
@@ -755,13 +960,19 @@ describe("Index favorites job", () => {
       }
     });
 
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        brokerCompanySiret: broker.orgId
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            brokerCompanySiret: broker.orgId
+          }
+        })
+      )
+    );
+    await refreshIndices();
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "BROKER"
@@ -814,6 +1025,7 @@ describe("Index favorites job", () => {
       contact: company.contact,
       etatAdministratif: "A"
     });
+    await refreshIndices();
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "EMITTER"
@@ -860,6 +1072,10 @@ describe("Index favorites job", () => {
         recipientsSirets: [company.orgId!]
       }
     });
+    await indexForm(await getFullForm(firstForm));
+    await indexForm(await getFullForm(secondForm));
+    await refreshIndices();
+
     searchCompanySpy
       .mockResolvedValueOnce({
         orgId: emitter1.orgId,
@@ -897,6 +1113,7 @@ describe("Index favorites job", () => {
         contactPhone: company.contactPhone,
         contact: company.contact
       });
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "EMITTER"
@@ -967,12 +1184,20 @@ describe("Index favorites job", () => {
         recipientsSirets: [company.orgId!]
       }
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId
-      }
-    });
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId
+          }
+        })
+      )
+    );
+    await indexForm(await getFullForm(firstForm));
+    await indexForm(await getFullForm(secondForm));
+    await refreshIndices();
+
     searchCompanySpy
       .mockResolvedValueOnce({
         orgId: emitter1.orgId,
@@ -1010,6 +1235,7 @@ describe("Index favorites job", () => {
         contactPhone: company.contactPhone,
         contact: company.contact
       });
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "EMITTER"
@@ -1071,14 +1297,21 @@ describe("Index favorites job", () => {
         recipientsSirets: [company.orgId!]
       }
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanyName: "Another Name",
-        emitterCompanySiret: firstForm.emitterCompanySiret,
-        recipientsSirets: [company.orgId!]
-      }
-    });
+    await indexForm(await getFullForm(firstForm));
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanyName: "Another Name",
+            emitterCompanySiret: firstForm.emitterCompanySiret,
+            recipientsSirets: [company.orgId!]
+          }
+        })
+      )
+    );
+    await refreshIndices();
+
     searchCompanySpy.mockResolvedValueOnce({
       name: emitter.name,
       siret: emitter.siret,
@@ -1137,32 +1370,42 @@ describe("Index favorites job", () => {
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O"
     });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        transporters: {
-          create: {
-            transporterCompanyName: "A Name",
-            transporterCompanyVatNumber: transporter.vatNumber,
-            number: 1
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            transporters: {
+              create: {
+                transporterCompanyName: "A Name",
+                transporterCompanyVatNumber: transporter.vatNumber,
+                number: 1
+              }
+            },
+            recipientsSirets: [company.orgId!]
           }
-        },
-        recipientsSirets: [company.orgId!]
-      }
-    });
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        transporters: {
-          create: {
-            transporterCompanyName: "Another Name",
-            transporterCompanyVatNumber: transporter.vatNumber,
-            number: 1
+        })
+      )
+    );
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            transporters: {
+              create: {
+                transporterCompanyName: "Another Name",
+                transporterCompanyVatNumber: transporter.vatNumber,
+                number: 1
+              }
+            },
+            recipientsSirets: [company.orgId!]
           }
-        },
-        recipientsSirets: [company.orgId!]
-      }
-    });
+        })
+      )
+    );
+    await refreshIndices();
+
     const favorites2 = await favoritesConstrutor({
       orgId: company.orgId,
       type: "TRANSPORTER"
@@ -1209,22 +1452,28 @@ describe("Index favorites job", () => {
       statutDiffusionEtablissement: "O"
     });
     const recipientCompanySiret = siretify(1);
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.orgId,
-        recipientCompanySiret,
-        recipientIsTempStorage: true,
-        forwardedIn: {
-          create: {
-            readableId: getReadableId(),
-            ownerId: user.id,
-            recipientCompanySiret: destination.orgId
+
+    await indexForm(
+      await getFullForm(
+        await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: company.orgId,
+            recipientCompanySiret,
+            recipientIsTempStorage: true,
+            forwardedIn: {
+              create: {
+                readableId: getReadableId(),
+                ownerId: user.id,
+                recipientCompanySiret: destination.orgId
+              }
+            },
+            recipientsSirets: [recipientCompanySiret, destination.orgId!]
           }
-        },
-        recipientsSirets: [recipientCompanySiret, destination.orgId!]
-      }
-    });
+        })
+      )
+    );
+    await refreshIndices();
 
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
