@@ -451,6 +451,7 @@ model Form {
   @@index([customId], map: "_FormCustomIdIdx")
   @@index([currentTransporterOrgId], map: "_FormCurrentTransporterOrgIdIdx")
   @@index([nextTransporterOrgId], map: "_FormNextTransporterOrgIdIdx")
+  @@index([nextDestinationCompanySiret], map: "_FormNextDestinationCompanySiretIdx")
 }
 
 model FormGroupement {
@@ -1464,7 +1465,9 @@ model Bsda {
   @@index([brokerCompanySiret], map: "_BsdaBrokerCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdaDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdaTransporterCompanySiretIdx")
+  @@index([transporterCompanyVatNumber], map: "_BsdaTransporterCompanyVatNumberIdx")
   @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
+  @@index([destinationOperationNextDestinationCompanySiret], map: "_BsdaDestinationOperationNextDestinationCompanySiretIdx")
   @@index([status], map: "_BsdaStatusIdx")
   @@index([groupedInId], map: "_BsdaGroupedInIdIdx")
   @@index([updatedAt], map: "_BsdaUpdatedAtIdx")
