@@ -6,19 +6,21 @@ import { FilterType } from "./filtersTypes";
 
 describe("Filters component", () => {
   const filters = [
-    {
-      name: "filter1",
-      label: "Filter 1",
-      type: FilterType.input,
-      isActive: true,
-    },
-    {
-      name: "filter2",
-      label: "Filter 2",
-      type: FilterType.select,
-      options: [{ value: "option1", label: "option 1" }],
-      isActive: true,
-    },
+    [
+      {
+        name: "filter1",
+        label: "Filter 1",
+        type: FilterType.input,
+        isActive: true,
+      },
+      {
+        name: "filter2",
+        label: "Filter 2",
+        type: FilterType.select,
+        options: [{ value: "option1", label: "option 1" }],
+        isActive: true,
+      },
+    ],
   ];
 
   afterEach(cleanup);
@@ -46,8 +48,8 @@ describe("Filters component", () => {
     );
     const addFilterButton = getByText("+");
     fireEvent.click(addFilterButton);
-    const selectFilterOption = getByText(filters[0].label);
+    const selectFilterOption = getByText(filters.flat()[0].label);
     fireEvent.click(selectFilterOption);
-    expect(getByText(filters[0].label)).toBeTruthy();
+    expect(getByText(filters.flat()[0].label)).toBeTruthy();
   });
 });

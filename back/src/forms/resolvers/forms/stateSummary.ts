@@ -47,7 +47,7 @@ function getLastActionOn(
   }
 }
 
-export async function getStateSummary(form: Form) {
+export function getStateSummary(form: Form) {
   const { temporaryStorageDetail } = form;
 
   // This boolean is true when a form with temporary

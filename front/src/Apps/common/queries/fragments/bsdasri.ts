@@ -125,6 +125,11 @@ export const dashboardDasriFragment = gql`
       company {
         ...DashboardCompanyFragment
       }
+      operation {
+        weight {
+          value
+        }
+      }
     }
     grouping {
       id

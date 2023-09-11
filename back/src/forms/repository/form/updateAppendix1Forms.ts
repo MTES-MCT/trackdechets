@@ -108,9 +108,15 @@ export function buildUpdateAppendix1Forms(
     const updateManyForms = buildUpdateManyForms({ prisma, user });
     const promises: Promise<Prisma.BatchPayload | Form>[] = [];
 
-    // Status updates
+    // Status updates, plus push back infos onto the appendix 1 for the PDF
     for (const [status, ids] of formUpdatesByStatus.entries()) {
-      promises.push(updateManyForms(ids, { status }));
+      promises.push(
+        updateManyForms(ids, {
+          status,
+          receivedAt: container.receivedAt,
+          receivedBy: container.receivedBy
+        })
+      );
     }
 
     // Unlink & deletions

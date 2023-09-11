@@ -384,7 +384,9 @@ export function indexBsds(
       {
         index: {
           _index: indexName,
-          _id: bsd.id
+          _id: bsd.id,
+          version_type: "external_gte",
+          version: bsd.updatedAt
         }
       },
       bsd

@@ -17,6 +17,7 @@ import { Query } from "../generated/graphql/types";
 import ResendActivationEmail from "login/ResendActivationEmail";
 import Login from "login/Login";
 import { useFeatureFlags } from "common/contexts/FeatureFlagsContext";
+import SurveyBanner from "Apps/common/Components/SurveyBanner/SurveyBanner";
 
 const Admin = lazy(() => import("admin/Admin"));
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
@@ -59,6 +60,7 @@ const GET_ME = gql`
 
 export default function LayoutContainer() {
   const { featureFlags, updateFeatureFlags } = useFeatureFlags();
+  const { VITE_SENTRY_ENVIRONMENT } = import.meta.env;
 
   const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME, {
     onCompleted: ({ me }) => {
@@ -76,13 +78,26 @@ export default function LayoutContainer() {
 
   const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   const dashboardRoutePrefix =
-    isV2Routes && (isAdmin || featureFlags.dashboardV2)
+    isV2Routes &&
+    (isAdmin ||
+      VITE_SENTRY_ENVIRONMENT === "sandbox" ||
+      featureFlags.dashboardV2)
       ? "dashboardv2"
       : "dashboard";
 
   if (loading) {
     return <Loader />;
   }
+
+  const v2banner = isV2Routes ? (
+    <SurveyBanner
+      message="« Mes bordereaux » vous permet de découvrir le nouveau tableau de bord. Découvrez-le et partagez-nous vos suggestions."
+      button={{
+        title: "Partagez vos suggestions",
+        href: "https://tally.so/r/nG9QB2",
+      }}
+    ></SurveyBanner>
+  ) : undefined;
 
   return (
     <Suspense fallback={<Loader />}>
@@ -102,7 +117,11 @@ export default function LayoutContainer() {
           <OidcDialog />
         </PrivateRoute>
         <Route>
-          <Layout isAuthenticated={isAuthenticated} isAdmin={isAdmin}>
+          <Layout
+            isAuthenticated={isAuthenticated}
+            isAdmin={isAdmin}
+            v2banner={v2banner}
+          >
             <Switch>
               <PrivateRoute
                 path={routes.admin.index}

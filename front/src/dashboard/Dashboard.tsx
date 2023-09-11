@@ -1,6 +1,6 @@
 import { useQuery, gql } from "@apollo/client";
 import { filter } from "graphql-anywhere";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   generatePath,
   Redirect,
@@ -44,7 +44,6 @@ import { RouteBsddRequestRevision } from "./components/RevisionRequestList/bsdd/
 import { DashboardTabs } from "./DashboardTabs";
 import SideMenu from "common/components/SideMenu";
 import { RouteBsdaRequestRevision } from "./components/RevisionRequestList/bsda/request";
-import { usePermissions } from "common/contexts/PermissionsContext";
 
 export const GET_ME = gql`
   {
@@ -64,7 +63,6 @@ export const GET_ME = gql`
 `;
 
 export default function Dashboard() {
-  const { updatePermissions } = usePermissions();
   const { siret } = useParams<{ siret: string }>();
   const { data } = useQuery<Pick<Query, "me">>(GET_ME);
 
@@ -81,16 +79,6 @@ export default function Dashboard() {
       siret,
     }),
   };
-
-  useEffect(() => {
-    if (data) {
-      const companies = data.me.companies;
-      const currentCompany = companies.find(company => company.orgId === siret);
-      if (currentCompany) {
-        updatePermissions(currentCompany.userPermissions);
-      }
-    }
-  }, [updatePermissions, data, siret]);
 
   if (data?.me == null) {
     return <Loader />;

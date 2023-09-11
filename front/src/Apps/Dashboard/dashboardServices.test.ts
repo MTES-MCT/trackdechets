@@ -24,7 +24,7 @@ import {
   isBsvhuSign,
   isEcoOrgSign,
   isEmetteurSign,
-  isSignTransportAndCanSkipEmission,
+  isSignTransportCanSkipEmission,
   getOperationCodesFromSearchString,
 } from "./dashboardServices";
 import {
@@ -43,7 +43,6 @@ import {
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
   SIGNER,
-  SIGNER_EN_TANT_QUE_TRAVAUX,
   VALIDER_ACCEPTATION,
   VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE,
   VALIDER_ENTREPOSAGE_PROVISOIRE,
@@ -221,7 +220,7 @@ describe("dashboardServices", () => {
     } as BsdDisplay;
 
     it("should return true if bsd.ecoOrganisme.siret is set", () => {
-      const result = canSkipEmission(bsd);
+      const result = canSkipEmission(bsd, true);
       expect(result).toBe(true);
     });
 
@@ -230,14 +229,8 @@ describe("dashboardServices", () => {
         ...bsd,
         emitter: { isPrivateIndividual: true },
       };
-      const result = canSkipEmission(bsdPrivateIndividual);
+      const result = canSkipEmission(bsdPrivateIndividual, false);
       expect(result).toBe(true);
-    });
-
-    it("should return false if bsd.ecoOrganisme.siret is not set", () => {
-      bsd.ecoOrganisme = undefined;
-      const result = canSkipEmission(bsd);
-      expect(result).toBe(false);
     });
   });
 
@@ -1114,7 +1107,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual("");
     });
 
-    it("should return SIGNER_EN_TANT_QUE_TRAVAUX when currentSiret is same as worker company siret", () => {
+    it("should return SIGNER when currentSiret is same as worker company siret", () => {
       const permissions: UserPermission[] = [UserPermission.BsdCanSignWork];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
@@ -1122,7 +1115,7 @@ describe("dashboardServices", () => {
         permissions,
         "toCollectTab"
       );
-      expect(result).toEqual(SIGNER_EN_TANT_QUE_TRAVAUX);
+      expect(result).toEqual(SIGNER);
     });
 
     it("should return an empty string when none of the conditions are met", () => {
@@ -1323,34 +1316,44 @@ describe("dashboardServices", () => {
     });
   });
 
-  describe("isSignTransportAndCanSkipEmission", () => {
+  describe("isSignTransportCanSkipEmission", () => {
     const currentSiret = "123456789";
     const bsd = {
       emitterType: "APPENDIX1_PRODUCER",
+      emitter: { isPrivateIndividual: false },
       transporter: { company: { siret: "123456789" } },
       ecoOrganisme: { siret: "1" },
     } as BsdDisplay;
 
     it("returns true if can Skip Emission and is Same Siret Transporter", () => {
-      const result = isSignTransportAndCanSkipEmission(currentSiret, bsd);
+      const result = isSignTransportCanSkipEmission(currentSiret, bsd, true);
 
       expect(result).toBe(true);
     });
 
     it("returns false if cannot Skip Emission", () => {
-      const result = isSignTransportAndCanSkipEmission(currentSiret, {
-        ...bsd,
-        ecoOrganisme: null,
-      });
+      const result = isSignTransportCanSkipEmission(
+        currentSiret,
+        {
+          ...bsd,
+          ecoOrganisme: null,
+          emitter: { isPrivateIndividual: false },
+        },
+        false
+      );
 
       expect(result).toBe(false);
     });
 
     it("returns false if not is Same Siret Transporter", () => {
-      const result = isSignTransportAndCanSkipEmission(currentSiret, {
-        ...bsd,
-        transporter: { company: { siret: "2" } },
-      });
+      const result = isSignTransportCanSkipEmission(
+        currentSiret,
+        {
+          ...bsd,
+          transporter: { company: { siret: "2" } },
+        },
+        false
+      );
 
       expect(result).toBe(false);
     });
@@ -1358,7 +1361,7 @@ describe("dashboardServices", () => {
 
   describe("getOperationCodesFromSearchString", () => {
     it("returns operation codes from search string", () => {
-      const searchString = "r15 R 13 d13 d 15 peoropzier 23326783 d23 D 15";
+      const searchString = "r15 R 13 d13 d 15 peoropzie 23326783 D 15";
       const operationCodes = getOperationCodesFromSearchString(searchString);
 
       expect(operationCodes).toStrictEqual([
@@ -1376,7 +1379,7 @@ describe("dashboardServices", () => {
     });
 
     it("returns empty array on bad formatted string", () => {
-      const searchString = "peoropzier 23326783";
+      const searchString = "peoropzie 23326783";
       const operationCodes = getOperationCodesFromSearchString(searchString);
 
       expect(operationCodes).toStrictEqual([]);

@@ -47,6 +47,7 @@ import { BsffFragment } from "dashboard/components/BSDList/BSFF";
 import { UpdateTransporterPlates } from "dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterPlates";
 import { UpdateBsdasriTransporterPlates } from "dashboard/components/BSDList/BSDasri/BSDasriActions/UpdateBsdasriTransporterPlates";
 import { UpdateBsdasriTransporterInfo } from "dashboard/components/BSDList/BSDasri/BSDasriActions/UpdateBsdasriTransporterInfo";
+import { mapBsdasri } from "Apps/Dashboard/bsdMapper";
 
 function BsdCardList({
   siret,
@@ -127,13 +128,7 @@ function BsdCardList({
           redirectToPath(path, bsd.id);
         }
         if (isToCollectTab) {
-          const formattedBsdAsBsdDisplay = {
-            type: bsd.__typename?.toUpperCase(),
-            bsdWorkflowType: bsd["type"],
-            allowDirectTakeOver: bsd["allowDirectTakeOver"],
-            transporter: bsd.transporter || bsd["bsdasriTransporter"],
-          } as unknown as BsdDisplay;
-
+          const formattedBsdAsBsdDisplay = mapBsdasri(bsd as Bsdasri);
           if (
             hasEmportDirect(formattedBsdAsBsdDisplay, siret, isToCollectTab)
           ) {

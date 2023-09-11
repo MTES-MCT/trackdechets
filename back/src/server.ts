@@ -1,36 +1,40 @@
 import "./tracer";
 
-import { makeExecutableSchema } from "@graphql-tools/schema";
 import { ApolloServer } from "@apollo/server";
 import { unwrapResolverError } from "@apollo/server/errors";
 import { expressMiddleware } from "@apollo/server/express4";
+import { makeExecutableSchema } from "@graphql-tools/schema";
 import redisStore from "connect-redis";
 import cors from "cors";
 import express, { json, static as serveStatic, urlencoded } from "express";
 import session from "express-session";
+import { GraphQLError } from "graphql";
 import depthLimit from "graphql-depth-limit";
 import helmet from "helmet";
 import passport from "passport";
 import path from "path";
+import { ValidationError } from "yup";
+import { ZodError } from "zod";
+import { createEventsDataLoaders } from "./activity-events/dataloader";
 import { passportBearerMiddleware } from "./auth";
+import { captchaGen, captchaSound } from "./captcha/captchaGen";
 import { ROAD_CONTROL_SLUG } from "./common/constants";
 import { ErrorCode, UserInputError } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
 import { graphqlBodyParser } from "./common/middlewares/graphqlBodyParser";
-import { graphqlQueryParserMiddleware } from "./common/middlewares/graphqlQueryParser";
-import { graphqlRateLimiterMiddleware } from "./common/middlewares/graphqlRatelimiter";
-import { graphqlRegenerateSessionMiddleware } from "./common/middlewares/graphqlRegenerateSession";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
 import { rateLimiterMiddleware } from "./common/middlewares/rateLimiter";
 import { timeoutMiddleware } from "./common/middlewares/timeout";
-import { graphqlQueryMergingLimiter } from "./common/middlewares/graphqlQueryMergingLimiter";
+import { gqlInfosPlugin } from "./common/plugins/gqlInfosPlugin";
+import { gqlRateLimitPlugin } from "./common/plugins/gqlRateLimitPlugin";
+import { gqlRegenerateSessionPlugin } from "./common/plugins/gqlRegenerateSessionPlugin";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
+import { graphqlQueryMergingLimiter } from "./common/plugins/graphqlQueryMergingLimiter";
 import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
-import { createEventsDataLoaders } from "./activity-events/dataloader";
 import { createFormDataLoaders } from "./forms/dataloader";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
@@ -39,14 +43,10 @@ import { oauth2Router } from "./routers/oauth2-router";
 import { oidcRouter } from "./routers/oidc-router";
 import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { resolvers, typeDefs } from "./schema";
+import { GraphQLContext } from "./types";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
-import { captchaGen, captchaSound } from "./captcha/captchaGen";
-import { GraphQLError } from "graphql";
-import { GraphQLContext } from "./types";
-import { ValidationError } from "yup";
-import { ZodError } from "zod";
 
 const {
   SESSION_SECRET,
@@ -62,6 +62,7 @@ const {
 const Sentry = initSentry();
 
 const UI_BASE_URL = getUIBaseURL();
+const RATE_LIMIT_WINDOW_SECONDS = 60;
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -78,33 +79,23 @@ export const server = new ApolloServer<GraphQLContext>({
   allowBatchedHttpRequests: true,
   formatError: (formattedError, error) => {
     const originalError = unwrapResolverError(error);
-    const errorInstanceName = (originalError as any).constructor?.name;
 
-    if (errorInstanceName === "ValidationError") {
-      const typedError = originalError as ValidationError;
-      return new UserInputError(typedError.errors.join("\n"));
+    // Les erreurs Yup et Zod sont vues ici comme des erreurs non gérées
+    // (INTERNAL_SERVER_ERROR). On souhaite à la place renvoyer une erreur
+    // `UserInputError` avec un code BAD_USER_INPUT
+    if (originalError instanceof ValidationError) {
+      return new UserInputError(originalError.errors.join("\n"));
     }
-    if (errorInstanceName === "ZodError") {
-      const typedError = originalError as ZodError;
+    if (originalError instanceof ZodError) {
       return new UserInputError(
-        typedError.issues.map(issue => issue.message).join("\n"),
-        { issues: typedError.issues }
+        originalError.issues.map(issue => issue.message).join("\n"),
+        { issues: originalError.issues }
       );
     }
     if (
       formattedError.extensions?.code === ErrorCode.INTERNAL_SERVER_ERROR &&
       NODE_ENV === "production"
     ) {
-      // Workaround for graphQL validation error displayed as internal server error
-      // when graphQL variables are of of invalid type
-      // See: https://github.com/apollographql/apollo-server/issues/3498
-      if (
-        formattedError.message &&
-        formattedError.message.startsWith(`Variable "`)
-      ) {
-        formattedError.extensions.code = "GRAPHQL_VALIDATION_FAILED";
-        return formattedError;
-      }
       // Do not leak error for internal server error in production
       const sentryId = (originalError as any).sentryId;
       return new GraphQLError(
@@ -122,6 +113,32 @@ export const server = new ApolloServer<GraphQLContext>({
     return formattedError;
   },
   plugins: [
+    gqlInfosPlugin(),
+    gqlRateLimitPlugin({
+      createPasswordResetRequest: {
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
+        maxRequestsPerWindow: 3 // 3 requests each minute (captcha)
+      },
+      createApplication: {
+        // Hacker might massively create apps or tokens to annoy us or exhaust our db
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+        maxRequestsPerWindow: 3 // 3 requests each 3 minutes
+      },
+      createAccessToken: {
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+        maxRequestsPerWindow: 3 // 3 requests each 3 minutes
+      },
+      inviteUserToCompany: {
+        // Hacker might massively invite or reinvite users to spam them
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+        maxRequestsPerWindow: 10 // 10 requests each 3 minutes
+      },
+      resendInvitation: {
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+        maxRequestsPerWindow: 10 // 10 requests each 3 minutes
+      }
+    }),
+    gqlRegenerateSessionPlugin(["changePassword"]),
     graphiqlLandingPagePlugin(),
     ...(Sentry ? [sentryReporter] : []),
     graphqlQueryMergingLimiter()
@@ -146,8 +163,6 @@ app.use(
     credentials: true
   })
 );
-
-const RATE_LIMIT_WINDOW_SECONDS = 60;
 
 app.use(
   rateLimiterMiddleware({
@@ -193,16 +208,7 @@ app.use(json());
 
 // allow application/graphql header
 app.use(graphQLPath, graphqlBodyParser);
-app.use(graphQLPath, graphqlQueryParserMiddleware());
 app.use(graphQLPath, graphqlBatchLimiterMiddleware());
-
-app.use(
-  graphQLPath,
-  graphqlRateLimiterMiddleware("createPasswordResetRequest", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
-    maxRequestsPerWindow: 3 // 3 requests each minute (captcha)
-  })
-);
 
 // logging middleware
 app.use(loggingMiddleware(graphQLPath));
@@ -240,47 +246,11 @@ app.use(session(sess));
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(graphQLPath, graphqlRegenerateSessionMiddleware("changePassword"));
 
 // authentification routes used by td-ui (/login /logout, /isAuthenticated)
 app.use(authRouter);
 app.use(oauth2Router);
 app.use(oidcRouter);
-
-// The following  middlewares use email to generate rate limit redis key and therefore
-// must stay after passport initialization to ensure req.user.email is available
-
-// Hacker might massively create apps or tokens to annoy us or exhaust our db
-app.use(
-  graphQLPath,
-  graphqlRateLimiterMiddleware("createApplication", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
-    maxRequestsPerWindow: 3 // 3 requests each 3 minutes
-  })
-);
-app.use(
-  graphQLPath,
-  graphqlRateLimiterMiddleware("createAccessToken", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
-    maxRequestsPerWindow: 3 // 3 requests each 3 minutes
-  })
-);
-// Hacker might massively invite or reinvite users to spam them
-app.use(
-  graphQLPath,
-  graphqlRateLimiterMiddleware("inviteUserToCompany", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
-    maxRequestsPerWindow: 10 // 10 requests each 3 minutes
-  })
-);
-
-app.use(
-  graphQLPath,
-  graphqlRateLimiterMiddleware("resendInvitation", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
-    maxRequestsPerWindow: 10 // 10 requests each 3 minutes
-  })
-);
 
 app.get("/ping", (_, res) => res.send("Pong!"));
 

@@ -12,4 +12,5 @@ export interface DropdownMenuProps {
   menuTitle: string;
   isDisabled?: boolean;
   iconAlone?: boolean;
+  primary?: boolean;
 }

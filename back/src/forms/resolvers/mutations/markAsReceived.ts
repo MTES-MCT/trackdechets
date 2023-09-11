@@ -5,7 +5,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { checkCanMarkAsReceived } from "../../permissions";
 import { Transporter, receivedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
-import { expandFormFromDb } from "../../converter";
+import { getAndExpandFormFromDb } from "../../converter";
 import { TemporaryStorageCannotReceive } from "../../errors";
 
 import { getFormRepository } from "../../repository";
@@ -131,7 +131,7 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     }
   }
 
-  return expandFormFromDb(receivedForm);
+  return getAndExpandFormFromDb(receivedForm.id);
 };
 
 export default markAsReceivedResolver;

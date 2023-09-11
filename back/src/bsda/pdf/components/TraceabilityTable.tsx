@@ -20,7 +20,7 @@ export function TraceabilityTable({ previousBsdas }: Props) {
       </thead>
       <tbody>
         {previousBsdas.map(bsda => (
-          <tr>
+          <tr key={bsda.id}>
             <td>{bsda?.id}</td>
             <td>{bsda?.type === "OTHER_COLLECTIONS" ? 1 : 2}</td>
             <td>{bsda?.waste?.code}</td>

@@ -2,7 +2,7 @@ import {
   QueryResolvers,
   QueryFormArgs
 } from "../../../generated/graphql/types";
-import { expandFormFromDb } from "../../converter";
+import { expandableFormIncludes, expandFormFromDb } from "../../converter";
 import { MissingIdOrReadableId } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanRead } from "../../permissions";
@@ -27,7 +27,11 @@ const formResolver: QueryResolvers["form"] = async (_, args, context) => {
 
   const validArgs = validateArgs(args);
 
-  const form = await getFormOrFormNotFound(validArgs);
+  const form = await getFormOrFormNotFound(validArgs, {
+    ...expandableFormIncludes,
+    intermediaries: true,
+    grouping: { include: { initialForm: true } }
+  });
 
   await checkCanRead(user, form);
 

@@ -29,7 +29,15 @@ const formPdfResolver: QueryResolvers["formPdf"] = async (
   // check query level permission
   const user = checkIsAuthenticated(context);
 
-  const form = await getFormOrFormNotFound({ id });
+  const form = await getFormOrFormNotFound(
+    { id },
+    {
+      forwardedIn: { include: { transporters: true } },
+      transporters: true,
+      intermediaries: true,
+      grouping: { include: { initialForm: true } }
+    }
+  );
 
   await checkCanRead(user, form);
 

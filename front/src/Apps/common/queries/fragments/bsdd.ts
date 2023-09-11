@@ -412,6 +412,7 @@ export const dashboardFormFragment = gql`
     emittedByEcoOrganisme
     takenOverAt
     status
+    quantityReceived
     wasteDetails {
       code
       name

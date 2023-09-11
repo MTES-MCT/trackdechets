@@ -2,7 +2,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFirstTransporterSync, getFormOrFormNotFound } from "../../database";
 import {
-  expandFormFromDb,
+  getAndExpandFormFromDb,
   flattenFormInput,
   flattenTransporterInput
 } from "../../converter";
@@ -168,7 +168,7 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     );
   }
 
-  return expandFormFromDb(resealedForm);
+  return getAndExpandFormFromDb(resealedForm.id);
 };
 
 export default markAsResealed;

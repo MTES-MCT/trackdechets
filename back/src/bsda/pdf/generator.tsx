@@ -6,6 +6,7 @@ import { generatePdf } from "../../common/pdf";
 import { expandBsdaFromDb } from "../converter";
 import { getBsdaHistory } from "../database";
 import { BsdaPdf } from "./components/BsdaPdf";
+import concatStream from "concat-stream";
 
 export async function buildPdf(bsda: Bsda) {
   const qrCode = await QRCode.toString(bsda.id, { type: "svg" });
@@ -22,4 +23,17 @@ export async function buildPdf(bsda: Bsda) {
     />
   );
   return generatePdf(html);
+}
+
+export async function buildPdfAsBase64(bsda: Bsda): Promise<string> {
+  const readableStream = await buildPdf(bsda);
+
+  return new Promise((resolve, reject) => {
+    const convertToBase64 = concatStream(buffer =>
+      resolve(buffer.toString("base64"))
+    );
+
+    readableStream.on("error", reject);
+    readableStream.pipe(convertToBase64);
+  });
 }

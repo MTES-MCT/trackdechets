@@ -39,7 +39,6 @@ import {
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
   SIGNER,
-  SIGNER_EN_TANT_QUE_TRAVAUX,
   SIGNER_PAR_ENTREPOS_PROVISOIRE,
   SIGNER_PAR_ENTREPRISE_TRAVAUX,
   SIGNE_PAR_EMETTEUR,
@@ -288,7 +287,7 @@ export const getIsNonDraftLabel = (
     isBsdaSignWorker(bsd, currentSiret) &&
     permissions.includes(UserPermission.BsdCanSignWork)
   ) {
-    return SIGNER_EN_TANT_QUE_TRAVAUX;
+    return SIGNER;
   }
 
   if (isBsdasri(bsd.type)) {
@@ -362,23 +361,36 @@ export const isAppendix1 = (bsd: BsdDisplay): boolean =>
 const isAppendix1Producer = (bsd: BsdDisplay): boolean =>
   bsd.emitterType === EmitterType.Appendix1Producer;
 
-export const canSkipEmission = (bsd: BsdDisplay): boolean =>
-  Boolean(bsd.ecoOrganisme?.siret) || Boolean(bsd.emitter?.isPrivateIndividual);
+export const canSkipEmission = (
+  bsd: BsdDisplay,
+  hasAutomaticSignature: boolean | undefined
+): boolean =>
+  (Boolean(bsd.ecoOrganisme?.siret) ||
+    hasAutomaticSignature ||
+    Boolean(bsd.emitter?.isPrivateIndividual)) &&
+  isAppendix1Producer(bsd);
 
-export const isSignTransportAndCanSkipEmission = (
+export const isSignTransportCanSkipEmission = (
   currentSiret: string,
-  bsd: BsdDisplay
-) => {
-  return canSkipEmission(bsd) && isSameSiretTransporter(currentSiret, bsd);
-};
-
-const isSignEmitterPrivateIndividual = (
-  currentSiret: string,
-  bsd: BsdDisplay
+  bsd: BsdDisplay,
+  hasAutomaticSignature: boolean | undefined
 ) => {
   return (
-    hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret) &&
-    !bsd?.emitter?.isPrivateIndividual
+    canSkipEmission(bsd, hasAutomaticSignature) &&
+    isSameSiretTransporter(currentSiret, bsd)
+  );
+};
+
+export const isSignEmission = (
+  currentSiret: string,
+  bsd: BsdDisplay,
+  hasAutomaticSignature: boolean | undefined
+) => {
+  return (
+    isAppendix1Producer(bsd) &&
+    (hasAutomaticSignature ||
+      (hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret) &&
+        !bsd.emitter?.isPrivateIndividual))
   );
 };
 
@@ -396,17 +408,21 @@ export const getSealedBtnLabel = (
       return AJOUTER_ANNEXE_1;
     }
 
-    if (isAppendix1Producer(bsd)) {
-      if (
-        hasAutomaticSignature ||
-        isSignTransportAndCanSkipEmission(currentSiret, bsd)
-      ) {
+    if (
+      isSignTransportCanSkipEmission(currentSiret, bsd, hasAutomaticSignature)
+    ) {
+      return SIGNER;
+    }
+    if (isSignEmission(currentSiret, bsd, hasAutomaticSignature)) {
+      const emitterSirets = [
+        bsd.emitter?.company?.siret,
+        bsd.ecoOrganisme?.siret,
+      ];
+      const currentUserIsEmitter = emitterSirets.includes(currentSiret);
+      if (currentUserIsEmitter) {
         return SIGNER;
-      } else {
-        if (isSignEmitterPrivateIndividual(currentSiret, bsd)) {
-          return SIGNER;
-        }
       }
+      return FAIRE_SIGNER;
     }
     if (hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
       return SIGNER;
@@ -574,8 +590,11 @@ export const getSignByProducerBtnLabel = (
     }
   }
 
-  if (currentSiret === bsd.worker?.company?.siret) {
-    return SIGNER_EN_TANT_QUE_TRAVAUX;
+  if (
+    currentSiret === bsd.worker?.company?.siret ||
+    currentSiret === bsd.transporter?.company?.orgId
+  ) {
+    return SIGNER;
   }
   return "";
 };
@@ -1094,14 +1113,16 @@ export const canEditCustomInfoOrTransporterNumberPlate = (
 export const getOperationCodesFromSearchString = (value: any): string[] => {
   let searchCodes: string[] = [];
 
-  value.match(/[rRdD]{1}( )(12|13|14|15)/g)?.forEach(code => {
-    searchCodes.push(code.toUpperCase());
-    searchCodes.push(code.replace(" ", "").toUpperCase());
+  value.match(/[rRdD]{1}( )\d{1,2}/g)?.forEach(code => {
+    const cleanCode = code.toUpperCase();
+    searchCodes.push(cleanCode);
+    searchCodes.push(cleanCode.replace(" ", "").toUpperCase());
   });
 
-  value.match(/[rRdD]{1}(12|13|14|15)/g)?.forEach(code => {
-    searchCodes.push(code.toUpperCase());
-    searchCodes.push(code.replace("1", " 1").toUpperCase());
+  value.match(/[rRdD]{1}\d{1,2}/g)?.forEach(code => {
+    const cleanCode = code.toUpperCase();
+    searchCodes.push(cleanCode);
+    searchCodes.push(cleanCode.replace(/([rRdD]{1})/, "$& "));
   });
   return searchCodes;
 };

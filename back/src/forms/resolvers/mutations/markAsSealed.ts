@@ -1,7 +1,7 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb } from "../../converter";
+import { getAndExpandFormFromDb } from "../../converter";
 import { checkCanMarkAsSealed } from "../../permissions";
 import {
   checkCanBeSealed,
@@ -106,7 +106,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     return sealedForm;
   });
 
-  return expandFormFromDb(resultingForm);
+  return getAndExpandFormFromDb(resultingForm.id);
 };
 
 async function mailToNonExistentEmitter(

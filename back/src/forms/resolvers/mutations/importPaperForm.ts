@@ -6,7 +6,7 @@ import {
 } from "../../../generated/graphql/types";
 import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import {
-  expandFormFromDb,
+  getAndExpandFormFromDb,
   flattenImportPaperFormInput,
   flattenTransporterInput
 } from "../../converter";
@@ -201,7 +201,7 @@ const importPaperFormResolver: MutationResolvers["importPaperForm"] = async (
 
   const form = await createOrUpdateForm(id, formInput, user);
 
-  return expandFormFromDb(form);
+  return getAndExpandFormFromDb(form.id);
 };
 
 export default importPaperFormResolver;

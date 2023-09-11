@@ -9,7 +9,7 @@ import {
   getFullForm
 } from "../../database";
 import {
-  expandFormFromDb,
+  getAndExpandFormFromDb,
   flattenSignedByTransporterInput
 } from "../../converter";
 import { checkCanSignedByTransporter } from "../../permissions";
@@ -148,7 +148,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
         }
       );
 
-      return expandFormFromDb(resentForm);
+      return getAndExpandFormFromDb(resentForm.id);
     }
 
     // check security code is producer's or eco-organisme's (if there's one)
@@ -205,7 +205,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       }
     );
 
-    return expandFormFromDb(sentForm);
+    return getAndExpandFormFromDb(sentForm.id);
   };
 
 export default signedByTransporterResolver;
