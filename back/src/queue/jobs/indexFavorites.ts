@@ -120,28 +120,24 @@ const buildBsdsQueryBody = (orgId: string, field: string): Search => ({
     size: MAX_FAVORITES,
     query: {
       bool: {
-        ...{
-          must: [
-            {
-              term: { sirets: orgId }
-            },
-            {
-              exists: {
-                field: "emitterCompanySiret"
-              }
+        must: [
+          {
+            term: { sirets: orgId }
+          },
+          {
+            exists: {
+              field
             }
-          ]
-        },
-        ...{
-          must_not: [
-            { term: { status: "DRAFT" } },
-            {
-              term: {
-                [field]: ""
-              }
+          }
+        ],
+        must_not: [
+          { term: { status: "DRAFT" } },
+          {
+            term: {
+              [field]: ""
             }
-          ]
-        }
+          }
+        ]
       }
     }
   }
@@ -218,23 +214,61 @@ async function getRecentNextDestinations(orgId: string) {
  * Only retrieve the first Transporter if many exists
  */
 async function getRecentTransporters(orgId: string) {
-  const queryBody = buildBsdsQueryBody(orgId, "transporterCompanySiret");
-  const vatQueryBody = buildBsdsQueryBody(orgId, "transporterCompanyVatNumber");
-
-  const [{ body }, { body: vatBody }] = await Promise.all([
-    client.search(queryBody),
-    client.search(vatQueryBody)
-  ]);
+  const queryBody = {
+    index: index.alias,
+    body: {
+      size: MAX_FAVORITES,
+      query: {
+        bool: {
+          must: [
+            {
+              term: { sirets: orgId }
+            },
+            {
+              bool: {
+                should: [
+                  {
+                    exists: {
+                      field: "transporterCompanySiret"
+                    }
+                  },
+                  {
+                    exists: {
+                      field: "transporterCompanyVatNumber"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          must_not: [
+            { term: { status: "DRAFT" } },
+            {
+              bool: {
+                should: [
+                  {
+                    term: {
+                      transporterCompanySiret: ""
+                    }
+                  },
+                  {
+                    term: {
+                      transporterCompanyVatNumber: ""
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  };
+  const { body } = await client.search(queryBody);
   const hits = body.hits.hits.slice(0, MAX_FAVORITES);
-  const vatHits = vatBody.hits.hits.slice(0, MAX_FAVORITES);
   const transporterOrgIds = [
     ...new Set(
       hits
-        .map(f => (f._source ? getTransporterCompanyOrgId(f._source) : null))
-        .filter(Boolean)
-    ),
-    ...new Set(
-      vatHits
         .map(f => (f._source ? getTransporterCompanyOrgId(f._source) : null))
         .filter(Boolean)
     )
