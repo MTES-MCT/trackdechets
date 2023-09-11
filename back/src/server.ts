@@ -79,33 +79,23 @@ export const server = new ApolloServer<GraphQLContext>({
   allowBatchedHttpRequests: true,
   formatError: (formattedError, error) => {
     const originalError = unwrapResolverError(error);
-    const errorInstanceName = (originalError as any).constructor?.name;
 
-    if (errorInstanceName === "ValidationError") {
-      const typedError = originalError as ValidationError;
-      return new UserInputError(typedError.errors.join("\n"));
+    // Les erreurs Yup et Zod sont vues ici comme des erreurs non gérées
+    // (INTERNAL_SERVER_ERROR). On souhaite à la place renvoyer une erreur
+    // `UserInputError` avec un code BAD_USER_INPUT
+    if (originalError instanceof ValidationError) {
+      return new UserInputError(originalError.errors.join("\n"));
     }
-    if (errorInstanceName === "ZodError") {
-      const typedError = originalError as ZodError;
+    if (originalError instanceof ZodError) {
       return new UserInputError(
-        typedError.issues.map(issue => issue.message).join("\n"),
-        { issues: typedError.issues }
+        originalError.issues.map(issue => issue.message).join("\n"),
+        { issues: originalError.issues }
       );
     }
     if (
       formattedError.extensions?.code === ErrorCode.INTERNAL_SERVER_ERROR &&
       NODE_ENV === "production"
     ) {
-      // Workaround for graphQL validation error displayed as internal server error
-      // when graphQL variables are of of invalid type
-      // See: https://github.com/apollographql/apollo-server/issues/3498
-      if (
-        formattedError.message &&
-        formattedError.message.startsWith(`Variable "`)
-      ) {
-        formattedError.extensions.code = "GRAPHQL_VALIDATION_FAILED";
-        return formattedError;
-      }
       // Do not leak error for internal server error in production
       const sentryId = (originalError as any).sentryId;
       return new GraphQLError(
