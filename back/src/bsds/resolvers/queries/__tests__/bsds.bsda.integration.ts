@@ -21,8 +21,11 @@ import {
   userWithCompanyFactory,
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
-
+import * as generatePdf from "../../../../bsda/pdf/generator";
 import makeClient from "../../../../__tests__/testClient";
+
+const buildPdfAsBase64Spy = jest.spyOn(generatePdf, "buildPdfAsBase64");
+buildPdfAsBase64Spy.mockResolvedValue("");
 
 const CREATE_DRAFT_BSDA = `
 mutation CreateDraftBsda($input: BsdaInput!) {
