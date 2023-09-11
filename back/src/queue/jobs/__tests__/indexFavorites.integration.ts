@@ -1285,7 +1285,7 @@ describe("Index favorites job", () => {
   it("should not return the same company twice", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
-        set: ["COLLECTOR"]
+        set: ["PRODUCER"]
       }
     });
     const emitter = await companyFactory();

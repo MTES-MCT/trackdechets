@@ -384,8 +384,12 @@ export const favoritesConstrutor = async ({
     favorite => favorite.orgId === company.orgId
   );
   if (isMatchingType && !isAlreadyListed) {
-    const companySearch = await searchCompany(company.orgId);
-    favorites.push(companySearch);
+    try {
+      const companySearch = await searchCompany(company.orgId);
+      favorites.push(companySearch);
+    } catch {
+      log.error("error during searchCompany() in indexFavorites");
+    }
   }
 
   // Return up to MAX_FAVORITES results
