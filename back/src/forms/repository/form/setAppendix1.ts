@@ -64,6 +64,7 @@ export function buildSetAppendix1({
             wasteDetailsCode: form.wasteDetailsCode,
             wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
             wasteDetailsName: form.wasteDetailsName,
+            wasteDetailsQuantityType: "ESTIMATED",
 
             recipientCompanySiret: form.recipientCompanySiret,
             recipientCompanyName: form.recipientCompanyName,
