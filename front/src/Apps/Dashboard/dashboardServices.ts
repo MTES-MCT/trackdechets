@@ -573,7 +573,10 @@ export const getSignByProducerBtnLabel = (
     }
   }
 
-  if (currentSiret === bsd.worker?.company?.siret) {
+  if (
+    currentSiret === bsd.worker?.company?.siret ||
+    currentSiret === bsd.transporter?.company?.orgId
+  ) {
     return SIGNER;
   }
   return "";
