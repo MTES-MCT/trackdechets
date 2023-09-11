@@ -14,6 +14,6 @@ export type Filter = {
 };
 
 export interface FiltersProps {
-  filters: Filter[];
+  filters: Filter[][];
   onApplyFilters: (values: { [key: string]: string }) => void;
 }

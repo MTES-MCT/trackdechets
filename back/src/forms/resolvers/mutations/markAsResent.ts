@@ -1,7 +1,7 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb, flattenFormInput } from "../../converter";
+import { getAndExpandFormFromDb, flattenFormInput } from "../../converter";
 import transitionForm from "../../workflow/transitionForm";
 import { checkCanMarkAsResent } from "../../permissions";
 import {
@@ -81,7 +81,7 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
       ...formUpdateInput
     }
   );
-  return expandFormFromDb(resentForm);
+  return getAndExpandFormFromDb(resentForm.id);
 };
 
 export default markAsResentResolver;

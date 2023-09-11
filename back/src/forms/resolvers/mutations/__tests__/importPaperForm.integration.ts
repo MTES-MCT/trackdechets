@@ -496,6 +496,7 @@ describe("mutation / importPaperForm", () => {
         isImportedFromPaper: true,
         emittedAt: importedData.signingInfo.sentAt,
         emittedBy: importedData.signingInfo.sentBy,
+        intermediaries: [],
         sentAt: importedData.signingInfo.sentAt,
         sentBy: importedData.signingInfo.sentBy,
         takenOverAt: importedData.signingInfo.sentAt,

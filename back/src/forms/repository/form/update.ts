@@ -131,9 +131,11 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
     if (oldForm.status !== updatedForm.status) {
       const newStatus = updatedForm.status;
       // calculates diff between initial form and updated form
-      const updatedFields = await formDiff(oldForm, {
+      const updatedFields = formDiff(oldForm, {
         ...updatedForm,
         forwardedIn: updatedForm.forwardedIn
+          ? { ...updatedForm.forwardedIn, transporters: [] }
+          : null
       });
 
       // log status change

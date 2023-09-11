@@ -66,7 +66,7 @@ const prismaFindManyOptions = {
   bsdd: {
     include: {
       forwarding: true,
-      forwardedIn: true,
+      forwardedIn: { include: { transporters: true } },
       transporters: true,
       intermediaries: true
     }

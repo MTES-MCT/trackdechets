@@ -11,7 +11,7 @@ import { BsdasriSignatureType, Query } from "generated/graphql/types";
 import { filter } from "graphql-anywhere";
 import { Location } from "history";
 import DashboardPage from "Pages/Dashboard";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   generatePath,
   Redirect,
@@ -35,6 +35,7 @@ import {
 } from "../../dashboard/detail";
 import Exports from "../../dashboard/exports/Exports";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
+import { usePermissions } from "common/contexts/PermissionsContext";
 
 import "./dashboard.scss";
 
@@ -58,6 +59,7 @@ export const GET_ME = gql`
 function DashboardRoutes() {
   const { siret } = useParams<{ siret: string }>();
   const { data } = useQuery<Pick<Query, "me">>(GET_ME);
+  const { updatePermissions } = usePermissions();
 
   const history = useHistory();
 
@@ -83,6 +85,16 @@ function DashboardRoutes() {
       }),
     });
   }, [history, siret]);
+
+  useEffect(() => {
+    if (data) {
+      const companies = data.me.companies;
+      const currentCompany = companies.find(company => company.orgId === siret);
+      if (currentCompany) {
+        updatePermissions(currentCompany.userPermissions);
+      }
+    }
+  }, [updatePermissions, data, siret]);
 
   if (data?.me == null) {
     return <Loader />;

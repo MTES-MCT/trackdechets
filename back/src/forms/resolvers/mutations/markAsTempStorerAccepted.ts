@@ -4,7 +4,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { getFormOrFormNotFound } from "../../database";
 import { checkCanMarkAsTempStored } from "../../permissions";
 import { EventType } from "../../workflow/types";
-import { expandFormFromDb } from "../../converter";
+import { getAndExpandFormFromDb } from "../../converter";
 import { Prisma, WasteAcceptationStatus } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import { acceptedInfoSchema } from "../../validation";
@@ -76,7 +76,7 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
       }
     }
 
-    return expandFormFromDb(tempStoredForm);
+    return getAndExpandFormFromDb(tempStoredForm.id);
   };
 
 export default markAsTempStorerAcceptedResolver;

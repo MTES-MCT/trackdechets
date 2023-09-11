@@ -20,29 +20,31 @@ const onApplyFilters = values => {};
 
 Primary.args = {
   filters: [
-    {
-      name: "types",
-      label: "type de bordereau",
-      type: FilterType.select,
-      isActive: true,
-      isMultiple: true,
-      options: [
-        {
-          value: "bsdd",
-          label: "Déchets Dangereux",
-        },
-        {
-          value: "bsdasri",
-          label: "Déchets d'Activités de Soins à Risque Infectieux",
-        },
-      ],
-    },
-    {
-      name: "waste",
-      label: "Code déchet",
-      type: FilterType.input,
-      isActive: true,
-    },
+    [
+      {
+        name: "types",
+        label: "type de bordereau",
+        type: FilterType.select,
+        isActive: true,
+        isMultiple: true,
+        options: [
+          {
+            value: "bsdd",
+            label: "Déchets Dangereux",
+          },
+          {
+            value: "bsdasri",
+            label: "Déchets d'Activités de Soins à Risque Infectieux",
+          },
+        ],
+      },
+      {
+        name: "waste",
+        label: "Code déchet",
+        type: FilterType.input,
+        isActive: true,
+      },
+    ],
   ],
   onApplyFilters: () => onApplyFilters(values),
 };

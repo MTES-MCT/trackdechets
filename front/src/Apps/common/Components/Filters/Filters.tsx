@@ -31,18 +31,22 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
   });
   const derivedFilters =
     filterSelectedIds.length > 0
-      ? filters.map(filter => {
-          if (filterSelectedIds.includes(filter.name)) {
-            return { ...filter, isActive: false };
-          }
-          return filter;
-        })
+      ? filters.map(filtersGroup =>
+          filtersGroup.map(filter => {
+            if (filterSelectedIds.includes(filter.name)) {
+              return { ...filter, isActive: false };
+            }
+            return filter;
+          })
+        )
       : filters;
 
   const onSelectFilterType = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
       const { value } = event.target;
-      const filter = derivedFilters.find(filter => filter.name === value);
+      const filter = derivedFilters
+        .flat()
+        .find(filter => filter.name === value);
 
       if (filter) {
         setFilterSelectedList(filterList => [...filterList, filter]);

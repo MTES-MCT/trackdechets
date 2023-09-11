@@ -1,7 +1,7 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb } from "../../converter";
+import { getAndExpandFormFromDb } from "../../converter";
 import { checkCanDelete } from "../../permissions";
 import { getFormRepository } from "../../repository";
 
@@ -20,7 +20,7 @@ const deleteFormResolver: MutationResolvers["deleteForm"] = async (
 
   const deletedForm = await formRepository.delete({ id });
 
-  return expandFormFromDb(deletedForm);
+  return getAndExpandFormFromDb(deletedForm.id);
 };
 
 export default deleteFormResolver;

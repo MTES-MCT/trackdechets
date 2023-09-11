@@ -26,7 +26,16 @@ import { checkCanRead as checkCanReadBsdasri } from "../../../bsdasris/permissio
 import { ForbiddenError } from "../../../common/errors";
 
 const accessors = {
-  [BsdType.BSDD]: id => getFormOrFormNotFound({ id }),
+  [BsdType.BSDD]: id =>
+    getFormOrFormNotFound(
+      { id },
+      {
+        forwardedIn: { include: { transporters: true } },
+        transporters: true,
+        grouping: { include: { initialForm: true } },
+        intermediaries: true
+      }
+    ),
   [BsdType.BSDA]: id => getBsdaOrNotFound(id),
   [BsdType.BSDASRI]: id => getBsdasriOrNotFound({ id }),
   [BsdType.BSFF]: id => getBsffOrNotFound({ id }),

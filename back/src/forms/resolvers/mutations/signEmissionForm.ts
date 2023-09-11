@@ -14,7 +14,7 @@ import {
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { checkCanSignFor } from "../../permissions";
-import { expandFormFromDb } from "../../converter";
+import { getAndExpandFormFromDb } from "../../converter";
 import { Transporter, wasteDetailsSchema } from "../../validation";
 import { getFormRepository } from "../../repository";
 import { prismaJsonNoNull } from "../../../common/converter";
@@ -113,7 +113,7 @@ const signatures: Partial<
       }
     );
 
-    return expandFormFromDb(updatedForm);
+    return getAndExpandFormFromDb(updatedForm.id);
   },
   [Status.RESEALED]: async (user, args, existingForm) => {
     await checkCanSignFor(
@@ -189,7 +189,7 @@ const signatures: Partial<
       }
     );
 
-    return expandFormFromDb(updatedForm);
+    return getAndExpandFormFromDb(updatedForm.id);
   }
 };
 

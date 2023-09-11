@@ -39,22 +39,22 @@ const mapBsdTypeNameToBsdType = (
 export const formatBsd = (bsd: BsdWithReview): BsdDisplay | null => {
   switch (bsd.__typename) {
     case BsdTypename.Bsdd:
-      return createBsdd(bsd);
+      return mapBsdd(bsd);
     case BsdTypename.Bsda:
-      return createBsda(bsd);
+      return mapBsda(bsd);
     case BsdTypename.Bsdasri:
-      return createBsdasri(bsd);
+      return mapBsdasri(bsd);
     case BsdTypename.Bsvhu:
-      return createBsvhu(bsd);
+      return mapBsvhu(bsd);
     case BsdTypename.Bsff:
-      return createBsff(bsd);
+      return mapBsff(bsd);
 
     default:
       return null;
   }
 };
 
-const createBsdd = (bsdd: FormWithReview): BsdDisplay => {
+export const mapBsdd = (bsdd: FormWithReview): BsdDisplay => {
   const bsddFormatted: BsdDisplay = {
     id: bsdd.id,
     readableid: bsdd.readableId,
@@ -65,7 +65,7 @@ const createBsdd = (bsdd: FormWithReview): BsdDisplay => {
     wasteDetails: {
       code: bsdd.wasteDetails?.code,
       name: bsdd.wasteDetails?.name,
-      weight: bsdd.wasteDetails?.quantity,
+      weight: bsdd.quantityReceived || bsdd.wasteDetails?.quantity,
     },
     isTempStorage: bsdd.recipient?.isTempStorage,
     emitter: bsdd.emitter,
@@ -84,7 +84,7 @@ const createBsdd = (bsdd: FormWithReview): BsdDisplay => {
   return bsddFormatted;
 };
 
-const createBsda = (bsda: BsdaWithReview): BsdDisplay => {
+const mapBsda = (bsda: BsdaWithReview): BsdDisplay => {
   const statusCode = bsda?.status || bsda["bsdaStatus"];
   const bsdaFormatted: BsdDisplay = {
     id: bsda.id,
@@ -95,7 +95,7 @@ const createBsda = (bsda: BsdaWithReview): BsdDisplay => {
     wasteDetails: {
       code: bsda.waste?.code || bsda.waste?.["bsdaCode"],
       name: bsda.waste?.materialName,
-      weight: bsda?.weight?.value,
+      weight: bsda?.destination?.reception?.weight || bsda?.weight?.value,
     },
     emitter: bsda.emitter || bsda["bsdaEmitter"],
     destination: bsda.destination || bsda["bsdaDestination"],
@@ -118,7 +118,7 @@ const createBsda = (bsda: BsdaWithReview): BsdDisplay => {
 const truncateTransporterInfo = (text?: string) =>
   !!text ? text.slice(0, 15) : text;
 
-const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
+export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
   const statusCode = bsdasri?.status || bsdasri["bsdasriStatus"];
   const bsdasriFormatted: BsdDisplay = {
     id: bsdasri.id,
@@ -128,6 +128,7 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
       code: bsdasri.waste?.code || bsdasri["bsdasriWaste"]?.code,
+      weight: bsdasri.destination?.operation?.weight?.value,
     },
     emitter: bsdasri.emitter || bsdasri["bsdasriEmitter"],
     destination: bsdasri.destination || bsdasri["bsdasriDestination"],
@@ -150,7 +151,7 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
   return bsdasriFormatted;
 };
 
-const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
+const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
   const statusCode = bsvhu?.status || bsvhu["bsvhuStatus"];
   const bsvhuFormatted: BsdDisplay = {
     id: bsvhu.id,
@@ -160,7 +161,7 @@ const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
       code: bsvhu?.wasteCode,
-      weight: bsvhu?.weight?.value,
+      weight: bsvhu?.destination?.reception?.weight || bsvhu?.weight?.value,
     },
     emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
     destination: bsvhu.destination || bsvhu["bsvhuDestination"],
@@ -170,7 +171,7 @@ const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
   return bsvhuFormatted;
 };
 
-const createBsff = (bsff: Bsff): BsdDisplay => {
+const mapBsff = (bsff: Bsff): BsdDisplay => {
   const statusCode = bsff?.status || bsff["bsffStatus"];
   const bsffFormatted: BsdDisplay = {
     id: bsff.id,
@@ -181,7 +182,7 @@ const createBsff = (bsff: Bsff): BsdDisplay => {
     wasteDetails: {
       code: bsff.waste?.code,
       name: bsff.waste?.description,
-      weight: bsff?.weight?.value || bsff["bsffWeight"]?.value,
+      weight: bsff["bsffWeight"]?.value,
     },
     emitter: bsff.emitter || bsff["bsffEmitter"],
     destination: bsff.destination || bsff["bsffDestination"],

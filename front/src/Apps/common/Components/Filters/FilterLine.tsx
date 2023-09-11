@@ -8,7 +8,7 @@ import FilterSelector from "./FilterSelector";
 import { Filter } from "./filtersTypes";
 
 interface FilterLineProps {
-  filters: Filter[];
+  filters: Filter[][];
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   onAddFilterType: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>

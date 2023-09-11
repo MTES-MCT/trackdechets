@@ -29,9 +29,9 @@ import {
 import {
   expandInitialFormFromDb,
   expandFormFromDb,
-  expandTransportSegmentFromDb
+  expandTransportSegmentFromDb,
+  expandableFormIncludes
 } from "../converter";
-import { getFullForm } from "../database";
 import prisma from "../../prisma";
 import { buildAddress } from "../../companies/sirene/utils";
 import { packagingsEqual } from "../../common/constants/formHelpers";
@@ -266,12 +266,15 @@ function TransporterFormCompanyFields({
 }
 
 export async function generateBsddPdf(prismaForm: PrismaForm) {
-  const fullPrismaForm = await getFullForm(prismaForm);
+  const fullPrismaForm = await prisma.form.findUniqueOrThrow({
+    where: { id: prismaForm.id },
+    include: { ...expandableFormIncludes, intermediaries: true }
+  });
 
   const grouping = (
     await prisma.formGroupement.findMany({
       where: { nextFormId: fullPrismaForm.id },
-      include: { initialForm: true }
+      include: { initialForm: { include: expandableFormIncludes } }
     })
   ).map(g => ({ form: g.initialForm, quantity: g.quantity }));
 
