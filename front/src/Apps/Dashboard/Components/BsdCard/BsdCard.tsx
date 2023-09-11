@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import { formatDate } from "../../../../common/datetime";
 import Badge from "../Badge/Badge";
@@ -117,15 +117,24 @@ function BsdCard({
     ? formatDate(bsdDisplay.updatedAt)
     : "";
 
-  const ctaPrimaryLabel = bsdDisplay?.type
-    ? getPrimaryActionsLabelFromBsdStatus(
-        bsdDisplay,
+  const actionsLabel = useMemo(
+    () =>
+      getPrimaryActionsLabelFromBsdStatus(
+        bsdDisplay!,
         currentSiret,
         permissions,
         bsdCurrentTab,
         hasAutomaticSignature
-      )
-    : "";
+      ),
+    [
+      bsdCurrentTab,
+      bsdDisplay,
+      currentSiret,
+      hasAutomaticSignature,
+      permissions,
+    ]
+  );
+  const ctaPrimaryLabel = bsdDisplay?.type ? actionsLabel : "";
 
   const ctaPrimaryReviewLabel = bsdDisplay?.type
     ? getPrimaryActionsReviewsLabel(bsdDisplay, currentSiret)
@@ -143,41 +152,59 @@ function BsdCard({
     onEditTransportInfo!(bsd, infoName);
   };
 
-  const onPdf = (bsd: BsdDisplay) => {
-    if (bsd.type === BsdType.Bsdd) {
-      downloadBsddPdf();
-    }
-    if (bsd.type === BsdType.Bsda) {
-      downloadBsdaPdf();
-    }
-    if (bsd.type === BsdType.Bsdasri) {
-      downloadBsdasriPdf();
-    }
-    if (bsd.type === BsdType.Bsff) {
-      downloadBsffPdf();
-    }
-    if (bsd.type === BsdType.Bsvhu) {
-      downloadBsvhuPdf();
-    }
-  };
+  const onPdf = useCallback(
+    (bsd: BsdDisplay) => {
+      if (bsd.type === BsdType.Bsdd) {
+        downloadBsddPdf();
+      }
+      if (bsd.type === BsdType.Bsda) {
+        downloadBsdaPdf();
+      }
+      if (bsd.type === BsdType.Bsdasri) {
+        downloadBsdasriPdf();
+      }
+      if (bsd.type === BsdType.Bsff) {
+        downloadBsffPdf();
+      }
+      if (bsd.type === BsdType.Bsvhu) {
+        downloadBsvhuPdf();
+      }
+    },
+    [
+      downloadBsdaPdf,
+      downloadBsdasriPdf,
+      downloadBsddPdf,
+      downloadBsffPdf,
+      downloadBsvhuPdf,
+    ]
+  );
 
-  const onDuplicate = (bsd: BsdDisplay) => {
-    if (bsd.type === BsdType.Bsdd) {
-      duplicateBsdd();
-    }
-    if (bsd.type === BsdType.Bsda) {
-      duplicateBsda();
-    }
-    if (bsd.type === BsdType.Bsdasri) {
-      duplicateBsdasri();
-    }
-    if (bsd.type === BsdType.Bsff) {
-      duplicateBsff();
-    }
-    if (bsd.type === BsdType.Bsvhu) {
-      duplicateBsvhu();
-    }
-  };
+  const onDuplicate = useCallback(
+    (bsd: BsdDisplay) => {
+      if (bsd.type === BsdType.Bsdd) {
+        duplicateBsdd();
+      }
+      if (bsd.type === BsdType.Bsda) {
+        duplicateBsda();
+      }
+      if (bsd.type === BsdType.Bsdasri) {
+        duplicateBsdasri();
+      }
+      if (bsd.type === BsdType.Bsff) {
+        duplicateBsff();
+      }
+      if (bsd.type === BsdType.Bsvhu) {
+        duplicateBsvhu();
+      }
+    },
+    [
+      duplicateBsda,
+      duplicateBsdasri,
+      duplicateBsdd,
+      duplicateBsff,
+      duplicateBsvhu,
+    ]
+  );
 
   const onCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
