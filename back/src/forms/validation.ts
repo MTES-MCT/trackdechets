@@ -314,7 +314,8 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
           if (!value) return true;
 
           const ecoOrganisme = await prisma.ecoOrganisme.findFirst({
-            where: { siret: value }
+            where: { siret: value },
+            select: { id: true }
           });
 
           return !ecoOrganisme;
