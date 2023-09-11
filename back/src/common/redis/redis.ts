@@ -1,4 +1,5 @@
 import IORedis from "ioredis";
+import { setTimeout } from "timers/promises";
 
 const { REDIS_URL } = process.env;
 
@@ -56,12 +57,38 @@ export async function cachedGet<T>(
     return parser.parse(redisValue);
   }
 
-  const dbValue = await getter(itemKey);
+  // Distributed cache
+  // If cachedGet is called by a resolver N times simultaneously,
+  // we only want the getter to be called once.
+  // The call returns null if the NX condition is not met,
+  // meaning the lock is already acquired.
+  // And it just has to retry => return by calling the function from the start.
+  const lockKey = `${cacheKey}:lock`;
+  const acquireLock = await setInCache(lockKey, new Date().getTime(), {
+    NX: true, // Only set the key if it does not already exist
+    EX: options.EX // Same TTL as the cached value
+  });
+  if (acquireLock === null) {
+    // Wait for 5ms for the getter to cache the value.
+    // To avoid spamming redis with get(cacheKey) requests
+    await setTimeout(5);
+    return cachedGet(getter, objectType, itemKey, settings);
+  }
 
-  // No need to await the set, and it doesn't really matters if it fails
-  setInCache(cacheKey, parser.stringify(dbValue), options).catch(_ => null);
+  try {
+    const dbValue = await getter(itemKey);
 
-  return dbValue;
+    // No need to await the set, and it doesn't really matters if it fails
+    setInCache(cacheKey, parser.stringify(dbValue), options).catch(_ => null);
+
+    return dbValue;
+  } catch (err) {
+    throw err;
+  } finally {
+    // In case of a failure (getter or setInCache) we must release the lock.
+    // When it succeeds, it's not mandatory but safer.
+    redisClient.unlink(lockKey);
+  }
 }
 
 export async function setInCache(
@@ -73,7 +100,7 @@ export async function setInCache(
     .map(optionKey => {
       const val = options[optionKey];
       // Some options don't have an associated value
-      if (isNaN(val)) {
+      if (isNaN(val) || (val && ["NX", "XX"].includes(optionKey))) {
         return [optionKey];
       }
       return [optionKey, val];
