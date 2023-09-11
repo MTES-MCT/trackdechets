@@ -65,7 +65,7 @@ const createBsdd = (bsdd: FormWithReview): BsdDisplay => {
     wasteDetails: {
       code: bsdd.wasteDetails?.code,
       name: bsdd.wasteDetails?.name,
-      weight: bsdd.wasteDetails?.quantity,
+      weight: bsdd.quantityReceived || bsdd.wasteDetails?.quantity,
     },
     isTempStorage: bsdd.recipient?.isTempStorage,
     emitter: bsdd.emitter,
@@ -95,7 +95,7 @@ const createBsda = (bsda: BsdaWithReview): BsdDisplay => {
     wasteDetails: {
       code: bsda.waste?.code || bsda.waste?.["bsdaCode"],
       name: bsda.waste?.materialName,
-      weight: bsda?.weight?.value,
+      weight: bsda?.destination?.reception?.weight || bsda?.weight?.value,
     },
     emitter: bsda.emitter || bsda["bsdaEmitter"],
     destination: bsda.destination || bsda["bsdaDestination"],
@@ -128,6 +128,7 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
       code: bsdasri.waste?.code || bsdasri["bsdasriWaste"]?.code,
+      weight: bsdasri.destination?.operation?.weight?.value,
     },
     emitter: bsdasri.emitter || bsdasri["bsdasriEmitter"],
     destination: bsdasri.destination || bsdasri["bsdasriDestination"],
@@ -160,7 +161,7 @@ const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
       code: bsvhu?.wasteCode,
-      weight: bsvhu?.weight?.value,
+      weight: bsvhu?.destination?.reception?.weight || bsvhu?.weight?.value,
     },
     emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
     destination: bsvhu.destination || bsvhu["bsvhuDestination"],
@@ -181,7 +182,7 @@ const createBsff = (bsff: Bsff): BsdDisplay => {
     wasteDetails: {
       code: bsff.waste?.code,
       name: bsff.waste?.description,
-      weight: bsff?.weight?.value || bsff["bsffWeight"]?.value,
+      weight: bsff["bsffWeight"]?.value,
     },
     emitter: bsff.emitter || bsff["bsffEmitter"],
     destination: bsff.destination || bsff["bsffDestination"],
