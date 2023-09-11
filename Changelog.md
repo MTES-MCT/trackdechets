@@ -9,10 +9,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Tous BSDs: l'exutoire peut désormais renseigner le mode de traitement. :warning: **Attention:** ce champ devra bientôt obligatoirement être renseigné à l'étape de traitement [PR 2673](https://github.com/MTES-MCT/trackdechets/pull/2673)
+
 #### :bug: Corrections de bugs
 
 #### :boom: Breaking changes
+
 - BSVHU: le numéro d'agrément du destinataire est obligatoire à la publication [PR 2683](https://github.com/MTES-MCT/trackdechets/pull/2683)
+
 #### :nail_care: Améliorations
 
 #### :house: Interne
