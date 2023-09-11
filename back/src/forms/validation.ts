@@ -307,6 +307,20 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
       .label("Émetteur")
       .when("emitterIsForeignShip", siretConditions.isForeignShip)
       .when("emitterIsPrivateIndividual", siretConditions.isPrivateIndividual)
+      .test(
+        "is-not-eco-organisme",
+        "L'émetteur ne peut pas être un éco-organisme. Merci de bien vouloir renseigner l'émetteur effectif de ce déchet (ex: déchetterie, producteur, TTR...). Un autre champ dédié existe et doit être utilisé pour viser l'éco-organisme concerné : https://faq.trackdechets.fr/dechets-dangereux-classiques/les-eco-organismes-sur-trackdechets#ou-etre-vise-en-tant-queco-organisme",
+        async value => {
+          if (!value) return true;
+
+          const ecoOrganisme = await prisma.ecoOrganisme.findFirst({
+            where: { siret: value },
+            select: { id: true }
+          });
+
+          return !ecoOrganisme;
+        }
+      )
       .when(["emitterIsForeignShip", "emitterIsPrivateIndividual"], {
         is: (isForeignShip: boolean, isPrivateIndividual: boolean) =>
           !isForeignShip && !isPrivateIndividual,

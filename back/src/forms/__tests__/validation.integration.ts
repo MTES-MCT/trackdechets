@@ -9,7 +9,12 @@ import {
   beforeTransportSchemaFn
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
-import { companyFactory, siretify } from "../../__tests__/factories";
+import {
+  companyFactory,
+  ecoOrganismeFactory,
+  siretify,
+  userWithCompanyFactory
+} from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { REQUIRED_RECEIPT_NUMBER } from "../../common/validation";
 
@@ -1346,6 +1351,30 @@ describe("draftFormSchema", () => {
     await expect(validateFn()).rejects.toThrow(
       "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
     );
+  });
+
+  it("should not be valid when passing eco-organisme as emitter", async () => {
+    const ecoOrganisme = await ecoOrganismeFactory({ siret: siretify() });
+
+    const partialForm: Partial<Form> = {
+      emitterCompanySiret: ecoOrganisme.siret
+    };
+    const validateFn = () => draftFormSchema.validate(partialForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "L'émetteur ne peut pas être un éco-organisme."
+    );
+  });
+
+  it("should be valid when passing non eco-organisme as emitter", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+
+    const partialForm: Partial<Form> = {
+      emitterCompanySiret: company.siret
+    };
+    const isValid = await draftFormSchema.isValid(partialForm);
+
+    expect(isValid).toEqual(true);
   });
 });
 
