@@ -82,7 +82,7 @@ export const filter_reset_btn = "Annuler les filtres";
 export const filter_type_select_placeholder = "Sélectionner un type de filtre";
 export const filter_type_select_label = "Type de filtre";
 export const filter_bsd_type = "Type de bordereau";
-export const filter_siret = "Siret";
+export const filter_siret = "SIRET";
 export const filter_waste_code = "Code déchet";
 export const filter_bsd_number = "Numéro du bordereau";
 export const filter_contenant_number = "Numéro de contenant (BSFF)";
@@ -91,22 +91,24 @@ export const filter_chantier_name = "Nom du chantier";
 export const filter_chantier_adress = "Adresse du chantier";
 export const filter_free_text = "Champs libres";
 export const filter_worker_operation_code = "Code d'opération";
-export const filter_siret_productor_address = "Adresse du SIRET producteur";
+export const filter_siret_productor_address = "Adresse du producteur";
 export const filter_transporter_sign_date = "Date d'enlèvement";
 export const filter_reception_sign_date = "Date de réception";
 export const filter_acceptation_sign_date = "Date d'acceptation";
-export const filter_operation_sign_date = "Date de traitement/d'opération";
-export const filter_tva_intra = "Numéro de TVA intracom";
-export const filter_next_destination_siret = "SIRET du destinataire ultérieure";
-export const filter_trader_siret = "SIRET Négociant";
-export const filter_broker_siret = "SIRET Courtier";
+export const filter_operation_sign_date = "Date de traitement / d'opération";
+export const filter_tva_intra = "Numéro de TVA intracommunautaire";
+export const filter_next_destination_siret = "SIRET du destinataire ultérieur";
+export const filter_trader_siret = "SIRET du négociant";
+export const filter_broker_siret = "SIRET du courtier";
 export const filter_emitter_name = "Raison sociale";
-export const filter_seal_numbers = "Nº de Scellés (BSDA)";
-export const filter_fiche_intervention_numbers = "Fiche d'intervention (BSFF)";
+export const filter_seal_numbers = "Numéro du scellé (BSDA)";
+export const filter_fiche_intervention_numbers =
+  "Numéro de fiche d'intervention (BSFF)";
 export const filter_worker_sign_date =
-  "Date de signature par l'entreprise de travaux (BSDA only)";
+  "Date de signature par l'entreprise de travaux (BSDA)";
 export const filter_emitter_sign_date =
-  "Date de signature par le producteur/émetteur/opérateur";
+  "Date de signature par le producteur / émetteur / opérateur";
+
 export const bsd_type_option_bsdd = "Déchets Dangereux";
 export const bsd_type_option_bsvhu = "Véhicules Hors d'Usage";
 export const bsd_type_option_bsff = "Déchets de Fluides Frigorigènes";
