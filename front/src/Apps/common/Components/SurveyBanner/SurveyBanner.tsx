@@ -158,18 +158,20 @@ const SurveyBanner = ({ message, button, onClickClose }: SurveyBannerProps) => {
             </Button>
           </div>
         </div>
-        <div className="survey-banner__group">
-          <div className="survey-banner__close">
-            <Button
-              priority="tertiary"
-              iconId={"ri-close-line"}
-              iconPosition="right"
-              onClick={onClickClose}
-            >
-              Fermer
-            </Button>
+        {onClickClose && (
+          <div className="survey-banner__group">
+            <div className="survey-banner__close">
+              <Button
+                priority="tertiary"
+                iconId={"ri-close-line"}
+                iconPosition="right"
+                onClick={onClickClose}
+              >
+                Fermer
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
