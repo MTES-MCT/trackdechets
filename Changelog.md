@@ -11,8 +11,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- BSDD: un éco-organisme ne peut plus être sélectionné en tant qu'émetteur des déchets [PR 2665](https://github.com/MTES-MCT/trackdechets/pull/2665)
+
 #### :boom: Breaking changes
+
 - BSVHU: le numéro d'agrément du destinataire est obligatoire à la publication [PR 2683](https://github.com/MTES-MCT/trackdechets/pull/2683)
+
 #### :nail_care: Améliorations
 
 #### :house: Interne
