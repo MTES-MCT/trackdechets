@@ -233,7 +233,10 @@ describe("Error handling", () => {
     mockFoo.mockImplementationOnce(() => {
       z.string().parse(1);
     });
-    const { body } = await server.executeOperation({ query: FOO });
+    const { body } = await server.executeOperation(
+      { query: FOO },
+      { contextValue: { req: {} } }
+    );
     const errors = body.singleResult.errors;
     const error = errors[0];
     expect(error.extensions.code).toEqual("BAD_USER_INPUT");
