@@ -526,6 +526,7 @@ model BsddRevisionRequest {
 
   @@index([authoringCompanyId], map: "_BsddRevisionRequestAuthoringCompanyIdIdx")
   @@index([bsddId], map: "_BsddRevisionRequestBsddIdIdx")
+  @@index([status], map: "_BsddRevisionRequestStatusIdx")
 }
 
 enum RevisionRequestApprovalStatus {
