@@ -2,6 +2,9 @@
   background: none;
   border: none;
   text-align: left;
+  display: flex;
+  align-items: center;
+  vertical-align: middle;
   &:disabled {
     color: initial;
   }
@@ -44,26 +47,33 @@
       flex-shrink: 0;
     }
   }
-  &__CustomInfo {
+  &__CustomInfo,
+  &__TransporterNumberPlate {
     &:before {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       content: "";
-      background-image: url("/icons/dashboard/custom-info-icon.svg");
       width: 24px;
       height: 24px;
       margin-right: 5px;
       flex-shrink: 0;
+      vertical-align: middle;
+    }
+    display: inline-block;
+    max-width: 150px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  &__CustomInfo {
+    &:before {
+      background-image: url("/icons/dashboard/custom-info-icon.svg");
     }
   }
   &__TransporterNumberPlate {
     &:before {
-      display: inline-block;
-      content: "";
       background-image: url("/icons/dashboard/transporter-number-plate-icon.svg");
-      width: 24px;
-      height: 24px;
-      margin-right: 5px;
-      flex-shrink: 0;
     }
   }
 }

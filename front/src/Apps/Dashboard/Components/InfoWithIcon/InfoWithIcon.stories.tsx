@@ -19,6 +19,8 @@ const Template: ComponentStory<typeof InfoWithIcon> = args => (
 export const EntreposageProvisoire = Template.bind({});
 export const DateDeDerniereModification = Template.bind({});
 export const EcoOrganisme = Template.bind({});
+export const CustomInfo = Template.bind({});
+export const TransporterNumberPlate = Template.bind({});
 
 EntreposageProvisoire.args = {
   labelCode: InfoIconCode.TempStorage,
@@ -29,4 +31,10 @@ DateDeDerniereModification.args = {
 };
 EcoOrganisme.args = {
   labelCode: InfoIconCode.EcoOrganism,
+};
+CustomInfo.args = {
+  labelCode: InfoIconCode.CustomInfo,
+};
+TransporterNumberPlate.args = {
+  labelCode: InfoIconCode.TransporterNumberPlate,
 };
