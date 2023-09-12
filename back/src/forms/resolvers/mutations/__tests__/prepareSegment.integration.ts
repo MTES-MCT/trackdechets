@@ -338,6 +338,7 @@ describe("{ mutation { prepareSegment } }", () => {
                 phone: "0475848484"
                 mail: "toto@mail.com"
               }
+              numberPlate: "AD-007-UV"
               isExemptedOfReceipt: true
             }
             mode: ROAD
@@ -395,6 +396,7 @@ describe("{ mutation { prepareSegment } }", () => {
                 phone: "0475848484"
                 mail: "toto@mail.com"
               }
+              numberPlate: "AD-007-UV"
               isExemptedOfReceipt: true
             }
             mode: ROAD
@@ -439,6 +441,7 @@ describe("{ mutation { prepareSegment } }", () => {
               phone: "0475848484"
               mail: "toto@mail.com"
             }
+            numberPlate: "AD-007-UV"
             isExemptedOfReceipt: true
           }
           mode: ROAD
@@ -484,6 +487,7 @@ describe("{ mutation { prepareSegment } }", () => {
                 phone: "0475848484"
                 mail: "toto@mail.com"
               }
+              numberPlate: "AD-007-UV"
               isExemptedOfReceipt: true
             }
             mode: ROAD

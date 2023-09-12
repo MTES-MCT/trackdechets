@@ -17,7 +17,7 @@ jest.mock("axios", () => ({
 describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
   afterAll(() => resetDatabase());
 
-  it("", async () => {
+  it("should mark segment as ready to take over", async () => {
     const owner = await userFactory();
     const { user: firstTransporter, company } = await userWithCompanyFactory(
       "ADMIN",

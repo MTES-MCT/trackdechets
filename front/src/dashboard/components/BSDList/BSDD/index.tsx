@@ -102,7 +102,18 @@ export const COLUMNS: Record<
     ),
   },
   status: {
-    accessor: form => statusLabels[form.status],
+    accessor: form => {
+      // Cas spécial pour le transport multi-modal
+      if (form.transportSegments && form.transportSegments.length > 0) {
+        const nextTransporter = form.transportSegments.find(
+          t => t.readyToTakeOver && !t.takenOverAt
+        );
+        if (nextTransporter) {
+          return `En attente de signature par le transporteur n° ${nextTransporter.segmentNumber!}`;
+        }
+      }
+      return statusLabels[form.status];
+    },
   },
   workflow: {
     accessor: () => null,

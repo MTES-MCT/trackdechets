@@ -47,10 +47,7 @@ function TakeOverSegmentModal({ formId, onClose }: TakeOverSegmentModalProps) {
     },
     fetchPolicy: "no-cache",
   });
-  const initialValues = {
-    takenOverBy: "",
-    takenOverAt: new Date().toISOString(),
-  };
+
   const [takeOverSegment, { loading, error }] = useMutation<
     Pick<Mutation, "takeOverSegment">,
     MutationTakeOverSegmentArgs
@@ -76,6 +73,13 @@ function TakeOverSegmentModal({ formId, onClose }: TakeOverSegmentModalProps) {
   }
   const transportSegments = data.form.transportSegments!;
   const segment = transportSegments[transportSegments.length - 1];
+
+  const initialValues = {
+    takenOverBy: "",
+    takenOverAt: new Date().toISOString(),
+    numberPlate: segment.transporter?.numberPlate ?? "",
+  };
+
   return (
     <TdModal isOpen onClose={() => onClose} ariaLabel="Prendre en charge">
       <h2 className="td-modal-title">Prendre en charge le déchet</h2>
@@ -109,6 +113,17 @@ function TakeOverSegmentModal({ formId, onClose }: TakeOverSegmentModalProps) {
                 <Field
                   component={DateInput}
                   name="takenOverAt"
+                  className="td-input"
+                />
+              </label>
+            </div>
+            <div className="form__row">
+              <label>
+                Plaque d'immatriculation
+                <Field
+                  type="text"
+                  name="numberPlate"
+                  placeholder="XX-XXX-XX"
                   className="td-input"
                 />
               </label>
