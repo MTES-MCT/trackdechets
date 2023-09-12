@@ -1,19 +1,57 @@
 import { Form, OperationMode } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
-import { FullForm } from "./types";
+import {
+  FormWithForwardedIn,
+  FormWithForwardedInInclude,
+  FormWithIntermediaries,
+  FormWithIntermediariesInclude,
+  FormWithRevisionRequests,
+  FormWithTransporters,
+  FormWithTransportersInclude,
+  FormWithRevisionRequestsInclude,
+  FormWithForwarding,
+  FormWithForwardingInclude
+} from "./types";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
-import { getSiretsByTab, getRecipient } from "./elasticHelpers";
+import {
+  getSiretsByTab,
+  getRecipient,
+  getFormRevisionOrgIds
+} from "./elasticHelpers";
 
 import { buildAddress } from "../companies/sirene/utils";
 import { getFirstTransporterSync } from "./database";
+import prisma from "../prisma";
 
-export type RawForm = FullForm & { forwarding?: Form };
+export type FormForElastic = Form &
+  FormWithTransporters &
+  FormWithForwardedIn &
+  FormWithIntermediaries &
+  FormWithForwarding &
+  FormWithRevisionRequests;
+
+export const FormForElasticInclude = {
+  ...FormWithForwardedInInclude,
+  ...FormWithForwardingInclude,
+  ...FormWithTransportersInclude,
+  ...FormWithIntermediariesInclude,
+  ...FormWithRevisionRequestsInclude
+};
+
+export async function getFormForElastic(
+  form: Pick<Form, "readableId">
+): Promise<FormForElastic> {
+  return prisma.form.findUniqueOrThrow({
+    where: { readableId: form.readableId },
+    include: FormForElasticInclude
+  });
+}
 
 /**
  * Convert a BSD from the forms table to Elastic Search's BSD model.
  */
-export function toBsdElastic(form: RawForm): BsdElastic {
+export function toBsdElastic(form: FormForElastic): BsdElastic {
   const siretsByTab = getSiretsByTab(form);
 
   const recipient = getRecipient(form);
@@ -101,9 +139,11 @@ export function toBsdElastic(form: RawForm): BsdElastic {
           isFollowFor: [],
           isArchivedFor: [],
           isToCollectFor: [],
-          isCollectedFor: []
+          isCollectedFor: [],
+          isInRevisionFor: []
         }
       : siretsByTab),
+    ...getFormRevisionOrgIds(form),
     sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form),
     intermediaries: form.intermediaries,
@@ -112,7 +152,7 @@ export function toBsdElastic(form: RawForm): BsdElastic {
 }
 
 export async function indexForm(
-  form: FullForm,
+  form: FormForElastic,
   ctx?: GraphQLContext
 ): Promise<BsdElastic> {
   // prevent unwanted cascaded reindexation
@@ -126,7 +166,8 @@ export async function indexForm(
         ...form.forwardedIn,
         intermediaries: [],
         forwardedIn: null,
-        forwarding: form
+        forwarding: form,
+        bsddRevisionRequests: []
       })
     );
   }

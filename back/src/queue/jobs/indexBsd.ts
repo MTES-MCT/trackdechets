@@ -1,10 +1,13 @@
 import { Job } from "bull";
-import { toBsdElastic as toBsdaElastic } from "../../bsda/elastic";
+import {
+  getBsdaForElastic,
+  toBsdElastic as toBsdaElastic
+} from "../../bsda/elastic";
 import { toBsdElastic as toBsdasriElastic } from "../../bsdasris/elastic";
 import { toBsdElastic as toBsvhuElastic } from "../../bsvhu/elastic";
 import { toBsdElastic as toBsffElastic } from "../../bsffs/elastic";
 import { BsdElastic, indexBsd, getElasticBsdById } from "../../common/elastic";
-import { indexForm } from "../../forms/elastic";
+import { getFormForElastic, indexForm } from "../../forms/elastic";
 import prisma from "../../prisma";
 
 export async function indexBsdJob(
@@ -19,15 +22,7 @@ export async function indexBsdJob(
   const siretsBeforeUpdate =
     indexed?.body?.hits?.hits?.[0]?._source?.sirets || [];
   if (bsdId.startsWith("BSDA-")) {
-    const bsda = await prisma.bsda.findUniqueOrThrow({
-      where: { id: bsdId },
-      include: {
-        // required for dashboard queries
-        forwardedIn: { select: { id: true } },
-        groupedIn: { select: { id: true } },
-        intermediaries: true
-      }
-    });
+    const bsda = await getBsdaForElastic({ id: bsdId });
 
     const elasticBsda = toBsdaElastic(bsda);
     await indexBsd(elasticBsda);
@@ -35,16 +30,8 @@ export async function indexBsdJob(
     return { ...elasticBsda, siretsBeforeUpdate };
   }
   if (bsdId.startsWith("BSD-") || bsdId.startsWith("TD-")) {
-    const fullForm = await prisma.form.findUniqueOrThrow({
-      where: { readableId: bsdId },
-      include: {
-        forwardedIn: { include: { transporters: true } },
-        transporters: true,
-        intermediaries: true
-      }
-    });
-    const elasticBsdd = await indexForm(fullForm);
-
+    const rawForm = await getFormForElastic({ readableId: bsdId });
+    const elasticBsdd = await indexForm(rawForm);
     return { ...elasticBsdd, siretsBeforeUpdate };
   }
 

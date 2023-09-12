@@ -3,16 +3,18 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../../../integration-tests/helper";
-import { indexBsda } from "../../../../bsda/elastic";
+import { getBsdaForElastic, indexBsda } from "../../../../bsda/elastic";
 import { bsdaFactory } from "../../../../bsda/__tests__/factories";
 import { ErrorCode } from "../../../../common/errors";
 import {
   Mutation,
+  MutationCreateBsdaRevisionRequestArgs,
   MutationCreateDraftBsdaArgs,
   MutationDeleteBsdaArgs,
   MutationDuplicateBsdaArgs,
   MutationPublishBsdaArgs,
   MutationSignBsdaArgs,
+  MutationSubmitBsdaRevisionRequestApprovalArgs,
   Query,
   QueryBsdsArgs
 } from "../../../../generated/graphql/types";
@@ -23,6 +25,7 @@ import {
 } from "../../../../__tests__/factories";
 import * as generatePdf from "../../../../bsda/pdf/generator";
 import makeClient from "../../../../__tests__/testClient";
+import { gql } from "graphql-tag";
 
 const buildPdfAsBase64Spy = jest.spyOn(generatePdf, "buildPdfAsBase64");
 buildPdfAsBase64Spy.mockResolvedValue("");
@@ -72,6 +75,7 @@ describe("Query.bsds.bsda base workflow", () => {
   let transporter: { user: User; company: Company };
   let destination: { user: User; company: Company };
   let bsdaId: string;
+  let revisionRequestId: string;
 
   beforeAll(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -726,6 +730,195 @@ describe("Query.bsds.bsda base workflow", () => {
     });
   });
 
+  describe("when the BSDA is under revision", () => {
+    beforeAll(async () => {
+      expect(bsdaId).toBeDefined();
+      const { mutate } = makeClient(destination.user);
+      const CREATE_BSDA_REVISION_REQUEST = gql`
+        mutation CreateBsdaRevisionRequest(
+          $input: CreateBsdaRevisionRequestInput!
+        ) {
+          createBsdaRevisionRequest(input: $input) {
+            id
+          }
+        }
+      `;
+
+      const { errors, data } = await mutate<
+        Pick<Mutation, "createBsdaRevisionRequest">,
+        MutationCreateBsdaRevisionRequestArgs
+      >(CREATE_BSDA_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdaId,
+            authoringCompanySiret: destination.company.siret!,
+            comment: "oups",
+            content: { waste: { code: "06 07 01*" } }
+          }
+        }
+      });
+      expect(errors).toBeUndefined();
+      revisionRequestId = data.createBsdaRevisionRequest.id;
+      await refreshElasticSearch();
+    });
+
+    it("should list bsd in emitter `isIsRevisionFor` bsdas", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isInRevisionFor: [emitter.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("should list bsd in worker `isIsRevisionFor` bsdas", async () => {
+      const { query } = makeClient(worker.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isInRevisionFor: [worker.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("should list bsd in destination `isIsRevisionFor` bsdas", async () => {
+      const { query } = makeClient(destination.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isInRevisionFor: [destination.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+  });
+
+  describe("when the BSDA revision has been accepted", () => {
+    beforeAll(async () => {
+      expect(bsdaId).toBeDefined();
+      const SUBMIT_BSDA_REVISION_REQUEST_APPROVAL = gql`
+        mutation SubmitBsdaRevisionRequestApproval(
+          $id: ID!
+          $isApproved: Boolean!
+          $comment: String
+        ) {
+          submitBsdaRevisionRequestApproval(
+            id: $id
+            isApproved: $isApproved
+            comment: $comment
+          ) {
+            id
+          }
+        }
+      `;
+      const { mutate: mutateByEmitter } = makeClient(emitter.user);
+
+      const { errors: emitterErrors } = await mutateByEmitter<
+        Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+        MutationSubmitBsdaRevisionRequestApprovalArgs
+      >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequestId,
+          isApproved: true
+        }
+      });
+      expect(emitterErrors).toBeUndefined();
+
+      const { mutate: mutateByWorker } = makeClient(worker.user);
+
+      const { errors: workerErrors } = await mutateByWorker<
+        Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+        MutationSubmitBsdaRevisionRequestApprovalArgs
+      >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequestId,
+          isApproved: true
+        }
+      });
+      expect(workerErrors).toBeUndefined();
+
+      await refreshElasticSearch();
+    });
+
+    it("should list bsd in emitter `isRevisedFor` bsdas", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isRevisedFor: [emitter.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("should list bsd in worker `isRevisedFor` bsdas", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isRevisedFor: [emitter.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("should list bsd in destination `isRevisedFor` bsdas", async () => {
+      const { query } = makeClient(destination.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isRevisedFor: [destination.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+  });
+
   describe("when the bsda operation is signed by the destination (AWAITING_CHILD)", () => {
     beforeAll(async () => {
       const { mutate } = makeClient(destination.user);
@@ -946,7 +1139,9 @@ describe("Query.bsds.bsdas mutations", () => {
       }
     });
 
-    await indexBsda({ ...bsda, intermediaries: [] });
+    const bsdaElastic = await getBsdaForElastic(bsda);
+
+    await indexBsda(bsdaElastic);
     await refreshElasticSearch();
 
     const { query } = makeClient(emitter.user);
@@ -995,7 +1190,8 @@ describe("Query.bsds.bsdas mutations", () => {
         emitterCompanySiret: emitter.company.siret
       }
     });
-    await indexBsda({ ...bsda, intermediaries: [] });
+    const elasticBsda = await getBsdaForElastic(bsda);
+    await indexBsda(elasticBsda);
 
     // duplicate bsda
     const { mutate } = makeClient(emitter.user);
