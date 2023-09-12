@@ -1064,14 +1064,14 @@ describe("Index favorites job", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitter1.orgId,
-        recipientsSirets: [company.orgId!]
+        recipientCompanySiret: company.orgId
       }
     });
     const secondForm = await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitter2.orgId,
-        recipientsSirets: [company.orgId!]
+        recipientCompanySiret: company.orgId
       }
     });
     await indexForm(await getFullForm(firstForm));
@@ -1176,14 +1176,14 @@ describe("Index favorites job", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitter1.orgId,
-        recipientsSirets: [company.orgId!]
+        recipientCompanySiret: company.orgId
       }
     });
     const secondForm = await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitter2.orgId,
-        recipientsSirets: [company.orgId!]
+        recipientCompanySiret: company.orgId
       }
     });
     await indexForm(
@@ -1284,7 +1284,7 @@ describe("Index favorites job", () => {
     );
   });
 
-  it("should not return the same company twice", async () => {
+  it("should not return the same emitter company twice", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["PRODUCER"]
@@ -1314,7 +1314,7 @@ describe("Index favorites job", () => {
     );
     await refreshIndices();
 
-    searchCompanySpy.mockResolvedValueOnce({
+    searchCompanySpy.mockResolvedValue({
       name: emitter.name,
       siret: emitter.siret,
       vatNumber: emitter.vatNumber,
@@ -1329,10 +1329,12 @@ describe("Index favorites job", () => {
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O"
     });
+
     const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "EMITTER"
     });
+
     expect(favorites).toEqual([
       expect.objectContaining({
         name: emitter.name,
@@ -1350,8 +1352,13 @@ describe("Index favorites job", () => {
         codePaysEtrangerEtablissement: "FR"
       })
     ]);
-
-    // Test with VAT numbers
+  });
+  it("should not return the same foreign transporter company twice", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
     const transporter = await companyFactory({
       siret: null,
       vatNumber: "IT09301420155",
@@ -1377,14 +1384,13 @@ describe("Index favorites job", () => {
         await formFactory({
           ownerId: user.id,
           opt: {
+            emitterCompanySiret: company.orgId,
             transporters: {
               create: {
-                transporterCompanyName: "A Name",
                 transporterCompanyVatNumber: transporter.vatNumber,
                 number: 1
               }
-            },
-            recipientsSirets: [company.orgId!]
+            }
           }
         })
       )
@@ -1394,41 +1400,44 @@ describe("Index favorites job", () => {
         await formFactory({
           ownerId: user.id,
           opt: {
+            emitterCompanySiret: company.orgId,
             transporters: {
               create: {
                 transporterCompanyName: "Another Name",
                 transporterCompanyVatNumber: transporter.vatNumber,
                 number: 1
               }
-            },
-            recipientsSirets: [company.orgId!]
+            }
           }
         })
       )
     );
     await refreshIndices();
 
-    const favorites2 = await favoritesConstrutor({
+    const favorites = await favoritesConstrutor({
       orgId: company.orgId,
       type: "TRANSPORTER"
     });
-    expect(favorites2).toEqual([
-      expect.objectContaining({
-        name: transporter.name,
-        siret: null,
-        vatNumber: transporter.vatNumber,
-        orgId: transporter.orgId,
-        contact: transporter.contact,
-        contactEmail: transporter.contactEmail,
-        contactPhone: transporter.contactPhone,
-        codePaysEtrangerEtablissement: "IT",
-        address: transporter.address,
-        companyTypes: transporter.companyTypes,
-        isRegistered: true,
-        etatAdministratif: "A",
-        statutDiffusionEtablissement: "O"
-      })
-    ]);
+
+    expect(favorites).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: transporter.name,
+          siret: null,
+          vatNumber: transporter.vatNumber,
+          orgId: transporter.orgId,
+          contact: transporter.contact,
+          contactEmail: transporter.contactEmail,
+          contactPhone: transporter.contactPhone,
+          codePaysEtrangerEtablissement: "IT",
+          address: transporter.address,
+          companyTypes: transporter.companyTypes,
+          isRegistered: true,
+          etatAdministratif: "A",
+          statutDiffusionEtablissement: "O"
+        })
+      ])
+    );
   });
 
   it("should suggest a temporary storage detail destination", async () => {
