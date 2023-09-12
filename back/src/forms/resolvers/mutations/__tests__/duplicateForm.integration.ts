@@ -601,7 +601,7 @@ describe("Mutation.duplicateForm", () => {
       "ecoOrganismeSiret",
       "transporters",
       "destinationOperationMode",
-      "groupedIn"
+      "quantityGrouped"
     ];
 
     // make sure this test breaks when a new field is added to the Form model
