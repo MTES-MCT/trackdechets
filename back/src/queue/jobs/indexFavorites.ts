@@ -202,60 +202,71 @@ async function getRecentNextDestinations(orgId: string) {
  */
 async function getRecentTransporters(orgId: string) {
   const queryBody = {
-    index: index.alias,
-    body: {
-      size: MAX_FAVORITES,
-      query: {
-        bool: {
-          must: [
-            {
-              term: { sirets: orgId }
-            },
-            {
-              bool: {
-                should: [
-                  {
-                    exists: {
-                      field: "transporterCompanySiret"
-                    }
-                  },
-                  {
-                    exists: {
-                      field: "transporterCompanyVatNumber"
-                    }
-                  }
-                ]
-              }
+    query: {
+      bool: {
+        must: [
+          {
+            term: { sirets: orgId }
+          },
+          {
+            exists: {
+              field: "transporterCompanySiret"
             }
-          ],
-          must_not: [
-            { term: { status: "DRAFT" } },
-            {
-              bool: {
-                should: [
-                  {
-                    term: {
-                      transporterCompanySiret: ""
-                    }
-                  },
-                  {
-                    term: {
-                      transporterCompanyVatNumber: ""
-                    }
-                  }
-                ]
-              }
+          }
+        ],
+        must_not: [
+          { term: { status: "DRAFT" } },
+          {
+            term: {
+              transporterCompanySiret: ""
             }
-          ]
-        }
+          }
+        ]
       }
     }
   };
-  const { body } = await client.search(queryBody);
-  const hits = body.hits.hits.slice(0, MAX_FAVORITES);
+  const queryVatBody = {
+    query: {
+      bool: {
+        must: [
+          {
+            term: { sirets: orgId }
+          },
+          {
+            exists: {
+              field: "transporterCompanyVatNumber"
+            }
+          }
+        ],
+        must_not: [
+          { term: { status: "DRAFT" } },
+          {
+            term: {
+              transporterCompanyVatNumber: ""
+            }
+          }
+        ]
+      }
+    }
+  };
+  const { body } = await client.msearch({
+    body: [
+      { index: index.alias },
+      queryBody,
+      { index: index.alias },
+      queryVatBody
+    ]
+  });
+  const hits = body.responses[0].hits.hits.slice(0, MAX_FAVORITES);
+  const vatHits = body.responses[1].hits.hits.slice(0, MAX_FAVORITES);
   const transporterOrgIds = [
     ...new Set(
       hits
+        .map(f => (f._source ? getTransporterCompanyOrgId(f._source) : null))
+        .filter(Boolean)
+    ),
+    ...new Set(
+      vatHits
         .map(f => (f._source ? getTransporterCompanyOrgId(f._source) : null))
         .filter(Boolean)
     )

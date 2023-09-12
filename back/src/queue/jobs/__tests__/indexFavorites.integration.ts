@@ -359,6 +359,9 @@ describe("Index favorites job", () => {
       }
     });
     const transporter = await companyFactory({
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      },
       transporterReceipt: {
         create: {
           receiptNumber: "receipt",
@@ -393,8 +396,7 @@ describe("Index favorites job", () => {
             emitterCompanySiret: company.orgId,
             transporters: {
               create: { transporterCompanySiret: transporter.orgId, number: 1 }
-            },
-            transportersSirets: [transporter.orgId!]
+            }
           }
         })
       )
