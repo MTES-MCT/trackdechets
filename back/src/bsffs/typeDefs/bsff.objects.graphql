@@ -261,6 +261,8 @@ type BsffPackagingAcceptation {
 type BsffPackagingOperation {
   "Code de l'opération de traitement."
   code: BsffOperationCode
+  "Qualification du traitement final"
+  mode: OperationMode
   "Description de l'opération réalisée"
   description: String
   "Date de l'opération"

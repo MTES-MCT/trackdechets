@@ -101,6 +101,7 @@ export const editionRules: {
   destinationReceptionWasteRefusalReason: "RECEPTION",
   destinationWastePackagings: "RECEPTION",
   destinationOperationCode: "OPERATION",
+  destinationOperationMode: "OPERATION",
   destinationReceptionWasteWeightValue: "OPERATION",
   destinationOperationDate: "OPERATION",
   identificationNumbers: "RECEPTION",

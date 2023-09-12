@@ -4,7 +4,7 @@ import {
   IconWarehouseDelivery,
   IconWaterDam,
 } from "Apps/common/Components/Icons/Icons";
-import { Bsvhu, FormCompany } from "generated/graphql/types";
+import { Bsvhu, FormCompany, OperationMode } from "generated/graphql/types";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -18,6 +18,7 @@ import {
 
 import styles from "../common/BSDDetailContent.module.scss";
 import { getVerboseAcceptationStatus } from "../common/utils";
+import { getOperationModeLabel } from "common/operationModes";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -277,6 +278,12 @@ function Destination({ form }: { form: Bsvhu }) {
         <DetailRow
           value={destination?.operation?.code}
           label="Opération de traitement"
+        />
+        <DetailRow
+          value={getOperationModeLabel(
+            destination?.operation?.mode as OperationMode
+          )}
+          label={"Mode de traitement"}
         />
         <DateRow
           value={destination?.operation?.date}

@@ -46,7 +46,7 @@ import {
 } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { Decimal } from "decimal.js-light";
-import { RawBsda } from "./elastic";
+import { BsdaForElastic } from "./elastic";
 
 export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
   return {
@@ -126,6 +126,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       }),
       operation: nullIfNoValues<BsdaOperation>({
         code: form.destinationOperationCode,
+        mode: form.destinationOperationMode,
         description: form.destinationOperationDescription,
         date: form.destinationOperationDate,
         signature: nullIfNoValues<Signature>({
@@ -220,7 +221,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
   };
 }
 export function expandBsdaFromElastic(
-  bsda: RawBsda
+  bsda: BsdaForElastic
 ): GraphqlBsda & { groupedIn?: string; forwardedIn?: string } {
   const expanded = expandBsdaFromDb(bsda);
 
@@ -338,6 +339,9 @@ function flattenBsdaDestinationInput({
     ),
     destinationOperationCode: chain(destination, d =>
       chain(d.operation, o => o.code)
+    ),
+    destinationOperationMode: chain(destination, d =>
+      chain(d.operation, o => o.mode)
     ),
     destinationOperationDescription: chain(destination, d =>
       chain(d.operation, o => o.description)

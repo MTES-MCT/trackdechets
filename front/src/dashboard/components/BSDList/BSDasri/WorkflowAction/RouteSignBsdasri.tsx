@@ -214,9 +214,7 @@ export function RouteSignBsdasri({
               <div className="notification success">
                 {config.validationText}
               </div>
-
               <UpdateForm signatureType={UIsignatureType} />
-
               <div className="form__row">
                 <label>
                   Date
@@ -233,7 +231,6 @@ export function RouteSignBsdasri({
                 </label>
                 <RedErrorMessage name="signature.date" />
               </div>
-
               <div className="form__row">
                 <label>
                   Nom du signataire
@@ -246,7 +243,6 @@ export function RouteSignBsdasri({
                 </label>
                 <RedErrorMessage name="signature.author" />
               </div>
-
               <div className="form__actions">
                 <button
                   type="button"

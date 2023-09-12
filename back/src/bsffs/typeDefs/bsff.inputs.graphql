@@ -243,6 +243,8 @@ input BsffPackagingOperationInput {
   date: DateTime!
   "Code de l'opération de traitement."
   code: BsffOperationCode!
+  "Qualification du traitement final"
+  mode: OperationMode
   "Description de l'opération réaliséee"
   description: String!
   "Rupture de traçabilité autorisée par arrêté préfectoral"

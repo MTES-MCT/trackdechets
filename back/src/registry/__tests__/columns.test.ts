@@ -8,6 +8,7 @@ describe("formatRow", () => {
       brokerCompanySiret: "broker_siret",
       brokerRecepisseNumber: "broker_recepisse",
       destinationOperationCode: "R10",
+      destinationOperationMode: "RECYCLAGE",
       destinationReceptionDate: new Date("2021-01-01"),
       destinationReceptionWeight: 1.2,
       ecoOrganismeName: null,
@@ -60,6 +61,7 @@ describe("formatRow", () => {
       transporterCompanySiret: "transporter siret",
       transporterRecepisseNumber: "transporter recepisse",
       destinationOperationCode: "R10",
+      destinationOperationMode: "RECYCLAGE",
       destinationReceptionDate: "2021-01-01",
       destinationReceptionWeight: 1.2
     });
@@ -89,7 +91,8 @@ describe("formatRow", () => {
       "Transporteur raison sociale": "transporter name",
       "Transporteur SIRET ou numéro de TVA le cas échéant": "transporter siret",
       "Transporteur récépissé": "transporter recepisse",
-      "Code de traitement réalisée": "R10",
+      "Code opération réalisée": "R10",
+      "Mode de traitement réalisé": "RECYCLAGE",
       "Date de réception": "2021-01-01",
       "Quantité de déchet entrant (t)": 1.2
     });

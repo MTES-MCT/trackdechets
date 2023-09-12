@@ -41,7 +41,7 @@ import {
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
-import { RawBsdasri } from "./elastic";
+import { BsdasriForElastic } from "./elastic";
 
 export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
   return {
@@ -176,6 +176,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
           value: bsdasri.destinationReceptionWasteWeightValue
         }),
         code: bsdasri.destinationOperationCode,
+        mode: bsdasri.destinationOperationMode,
         date: processDate(bsdasri.destinationOperationDate),
         signature: nullIfNoValues<BsdasriSignature>({
           author: bsdasri.destinationOperationSignatureAuthor,
@@ -194,7 +195,9 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
   };
 }
 
-export function expandBsdasriFromElastic(bsdasri: RawBsdasri): GqlBsdasri {
+export function expandBsdasriFromElastic(
+  bsdasri: BsdasriForElastic
+): GqlBsdasri {
   const expanded = expandBsdasriFromDB(bsdasri);
 
   // pass down related field to sub-resolvers
@@ -516,6 +519,7 @@ function flattenOperationInput(
   }
   return {
     destinationOperationCode: chain(input.operation, o => o.code),
+    destinationOperationMode: chain(input.operation, o => o.mode),
     destinationReceptionWasteWeightValue: chain(input.operation, o =>
       chain(o.weight, q => q.value)
     ),

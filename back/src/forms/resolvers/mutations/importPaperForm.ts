@@ -57,7 +57,11 @@ async function updateForm(
     ...flattenedFormInput,
     ...existingTransporter,
     ...flattenedTransporter,
-    isAccepted: flattenedFormInput.wasteAcceptationStatus === "ACCEPTED"
+    isAccepted: flattenedFormInput.wasteAcceptationStatus === "ACCEPTED",
+    destinationOperationMode:
+      flattenedFormInput?.destinationOperationMode ??
+      form?.destinationOperationMode ??
+      undefined
   };
 
   await processedFormSchema.validate(validationData, { abortEarly: false });

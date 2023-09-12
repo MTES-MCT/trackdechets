@@ -249,6 +249,8 @@ input BsdasriOperationInput {
   Les codes R12 et D12 ne sont autorisé que si le destinataire est une installation TTR (tri transit regroupement).
   """
   code: String
+  "Qualification du traitement final"
+  mode: OperationMode
   date: DateTime
 }
 

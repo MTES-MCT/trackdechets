@@ -353,6 +353,7 @@ export const detailFormFragment = gql`
     processedAt
     processingOperationDescription
     processingOperationDone
+    destinationOperationMode
     ecoOrganisme {
       siret
       name
@@ -515,6 +516,7 @@ export const dashboardFormFragment = gql`
       readyToTakeOver
       previousTransporterCompanySiret
       takenOverAt
+      segmentNumber
     }
     currentTransporterSiret
     nextTransporterSiret

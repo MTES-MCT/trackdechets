@@ -752,6 +752,7 @@ describe("Mutation.signBsff", () => {
         {},
         {
           operationCode: OPERATION.R13.code,
+          operationMode: null,
           operationNextDestinationCompanyName: "ACME INC",
           operationNextDestinationPlannedOperationCode: "R2",
           operationNextDestinationCap: "cap",

@@ -130,9 +130,7 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
                     name="mode"
                     component={FieldTransportModeSelect}
                   ></Field>
-                  <label htmlFor="id_numberPlate">
-                    Immatriculation (optionnel)
-                  </label>
+                  <label htmlFor="id_numberPlate">Immatriculation</label>
                   <Field
                     type="text"
                     name="transporter.numberPlate"

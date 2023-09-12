@@ -130,6 +130,7 @@ export const FullBsvhuFragment = gql`
       }
       operation {
         code
+        mode
         date
         signature {
           author

@@ -1,5 +1,8 @@
 import { Job } from "bull";
-import { toBsdElastic as toBsdaElastic } from "../../bsda/elastic";
+import {
+  BsdaForElasticInclude,
+  toBsdElastic as toBsdaElastic
+} from "../../bsda/elastic";
 import { toBsdElastic as toBsdasriElastic } from "../../bsdasris/elastic";
 import { toBsdElastic as toBsvhuElastic } from "../../bsvhu/elastic";
 import { toBsdElastic as toBsffElastic } from "../../bsffs/elastic";
@@ -15,7 +18,7 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
   if (bsdId.startsWith("BSDA-")) {
     const bsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsdId },
-      include: { intermediaries: true }
+      include: BsdaForElasticInclude
     });
 
     return toBsdaElastic(bsda);

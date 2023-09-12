@@ -1,4 +1,9 @@
-import { BsddTransporter, EmitterType, Form } from "@prisma/client";
+import {
+  BsddTransporter,
+  EmitterType,
+  Form,
+  OperationMode
+} from "@prisma/client";
 import {
   draftFormSchema,
   sealedFormSchema,
@@ -9,7 +14,12 @@ import {
   beforeTransportSchemaFn
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
-import { companyFactory, siretify } from "../../__tests__/factories";
+import {
+  companyFactory,
+  ecoOrganismeFactory,
+  siretify,
+  userWithCompanyFactory
+} from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { REQUIRED_RECEIPT_NUMBER } from "../../common/validation";
 
@@ -1347,6 +1357,30 @@ describe("draftFormSchema", () => {
       "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
     );
   });
+
+  it("should not be valid when passing eco-organisme as emitter", async () => {
+    const ecoOrganisme = await ecoOrganismeFactory({ siret: siretify() });
+
+    const partialForm: Partial<Form> = {
+      emitterCompanySiret: ecoOrganisme.siret
+    };
+    const validateFn = () => draftFormSchema.validate(partialForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "L'émetteur ne peut pas être un éco-organisme."
+    );
+  });
+
+  it("should be valid when passing non eco-organisme as emitter", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+
+    const partialForm: Partial<Form> = {
+      emitterCompanySiret: company.siret
+    };
+    const isValid = await draftFormSchema.isValid(partialForm);
+
+    expect(isValid).toEqual(true);
+  });
 });
 
 describe("processedInfoSchema", () => {
@@ -1495,6 +1529,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
+      destinationOperationMode: OperationMode.ELIMINATION,
       processingOperationDescription: "Traitement biologique",
       noTraceability: true
     };
@@ -1510,6 +1545,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
+      destinationOperationMode: OperationMode.ELIMINATION,
       processingOperationDescription: "Traitement biologique",
       noTraceability: false
     };
@@ -1521,6 +1557,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
+      destinationOperationMode: OperationMode.ELIMINATION,
       processingOperationDescription: "Traitement biologique"
     };
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
@@ -1531,6 +1568,7 @@ describe("processedInfoSchema", () => {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
+      destinationOperationMode: OperationMode.ELIMINATION,
       processingOperationDescription: "Traitement biologique",
       noTraceability: null
     };
@@ -1665,6 +1703,38 @@ describe("processedInfoSchema", () => {
 
     await expect(validateFn()).rejects.toThrow(
       "Destination ultérieure : L'opération de traitement est obligatoire"
+    );
+  });
+
+  it("should be valid if operationMode is compatible", async () => {
+    const processedInfo = {
+      nextDestination: null,
+      noTraceability: null,
+      processedAt: new Date(),
+      processedBy: "Test",
+      processingOperationDescription: "test",
+      processingOperationDone: "R 2",
+      destinationOperationMode: OperationMode.REUTILISATION
+    };
+
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
+  });
+
+  it("should not be valid if operationMode is not compatible", async () => {
+    const processedInfo = {
+      nextDestination: null,
+      noTraceability: null,
+      processedAt: new Date(),
+      processedBy: "Test",
+      processingOperationDescription: "test",
+      processingOperationDone: "R 2",
+      destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE
+    };
+
+    const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
     );
   });
 });

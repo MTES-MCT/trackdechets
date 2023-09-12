@@ -4,12 +4,118 @@ import {
   Prisma,
   TransportMode,
   WasteAcceptationStatus,
-  IntermediaryFormAssociation
+  IntermediaryFormAssociation,
+  OperationMode
 } from "@prisma/client";
 import { FormStatus } from "../generated/graphql/types";
 
+export const FormWithTransportersInclude =
+  Prisma.validator<Prisma.FormInclude>()({
+    transporters: true
+  });
+
+export type FormWithTransporters = Prisma.FormGetPayload<{
+  include: typeof FormWithTransportersInclude;
+}>;
+
+export const FormWithForwardedInInclude =
+  Prisma.validator<Prisma.FormInclude>()({
+    forwardedIn: { include: FormWithTransportersInclude }
+  });
+
+export type FormWithForwardedIn = Prisma.FormGetPayload<{
+  include: typeof FormWithForwardedInInclude;
+}>;
+
+export const FormWithIntermediariesInclude =
+  Prisma.validator<Prisma.FormInclude>()({
+    intermediaries: true
+  });
+
+export type FormWithIntermediaries = Prisma.FormGetPayload<{
+  include: typeof FormWithIntermediariesInclude;
+}>;
+
+export const FormWithForwardingInclude = Prisma.validator<Prisma.FormInclude>()(
+  {
+    forwarding: true
+  }
+);
+
+export type FormWithForwarding = Prisma.FormGetPayload<{
+  include: typeof FormWithForwardingInclude;
+}>;
+
+export const BsddRevisionRequestWithAuthoringCompanyInclude =
+  Prisma.validator<Prisma.BsddRevisionRequestInclude>()({
+    authoringCompany: { select: { orgId: true } }
+  });
+
+export type BsddRevisionRequestWithAuthoringCompany =
+  Prisma.BsddRevisionRequestGetPayload<{
+    include: typeof BsddRevisionRequestWithAuthoringCompanyInclude;
+  }>;
+
+export const BsddRevisionRequestWithApprovalsInclude =
+  Prisma.validator<Prisma.BsddRevisionRequestInclude>()({
+    approvals: { select: { approverSiret: true } }
+  });
+
+export type BsddRevisionRequestWithApprovals =
+  Prisma.BsddRevisionRequestGetPayload<{
+    include: typeof BsddRevisionRequestWithApprovalsInclude;
+  }>;
+
+export const FormWithRevisionRequestsInclude =
+  Prisma.validator<Prisma.FormInclude>()({
+    bsddRevisionRequests: {
+      include: {
+        ...BsddRevisionRequestWithAuthoringCompanyInclude,
+        ...BsddRevisionRequestWithApprovalsInclude
+      }
+    }
+  });
+
+export type FormWithRevisionRequests = Prisma.FormGetPayload<{
+  include: typeof FormWithRevisionRequestsInclude;
+}>;
+
 /**
  * A Prisma Form with linked objects
+ * ***********************************
+ *
+ * NE PLUS UTILISER SI POSSIBLE
+ *
+ * Nouvelles conventions :
+ *
+ * Pour chaque fonction, on définit la forme attendue de l'objet Form
+ * par un type spécifique que l'on définit juste au dessus de la fonction
+ * à partir des petites "briques" définies au dessus et que l'on
+ * nomme FormFor[NomDeLaFonction] ou autre chose du genre.
+ * Dans le contexte appelant, on crée un include prisma en composant
+ * les includes définit au dessus/
+ *
+ * Exemple :
+ *
+ * type FormForFoo = FormWithTransporters & FormWithIntermediaries
+ *
+ * function getFormForFoo(form: Form): Promise<FormForFoo> {
+ *  return prisma.form.findUniqueOrThrow({
+ *    where: {id: form.id },
+ *    include: { ...FormWithTransportersInclude, ...FormWithIntermediariesInclude }
+ *  })
+ * }
+ *
+ * function foo(form: FormForFoo){
+ *  /// function definition
+ *  return form
+ * }
+ *
+ * // Dans le contexte appelant
+ *
+ * const form = await getFormForFoo()
+ *
+ * foo(form)
  */
 export interface FullForm extends Form {
   forwardedIn: (Form & { transporters: BsddTransporter[] }) | null;
@@ -134,6 +240,7 @@ export type Bsdd = {
   destinationReceptionSignatureDate: Date | null;
   destinationPlannedOperationCode: string | null;
   destinationOperationCode: string | null;
+  destinationOperationMode: OperationMode | null;
   destinationOperationNoTraceability: boolean | null;
   destinationOperationNextDestinationCompanyName: string | null;
   destinationOperationNextDestinationCompanySiret: string | null;

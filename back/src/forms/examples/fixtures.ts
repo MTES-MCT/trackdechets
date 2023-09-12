@@ -142,6 +142,7 @@ const receivedInfoInput = {
 const processedInfoInput = {
   processingOperationDone: "D 10",
   processingOperationDescription: "Incinération",
+  destinationOperationMode: "ELIMINATION",
   processedBy: "Alfred Dujardin",
   processedAt: "2020-04-15T10:22:00"
 };

@@ -945,7 +945,11 @@ export const hasBsdSuite = (bsd: BsdDisplay, currentSiret): boolean => {
 const canUpdateOrDeleteBsdd = bsd =>
   bsd.type === BsdType.Bsdd &&
   bsd.emitterType !== EmitterType.Appendix1Producer &&
-  [BsdStatusCode.Draft, BsdStatusCode.Sealed].includes(bsd.status);
+  [
+    BsdStatusCode.Draft,
+    BsdStatusCode.Sealed,
+    BsdStatusCode.SignedByProducer,
+  ].includes(bsd.status);
 
 const canDeleteBsda = (bsd, siret) =>
   bsd.type === BsdType.Bsda &&

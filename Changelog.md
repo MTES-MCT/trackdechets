@@ -9,10 +9,20 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Tous BSDs: l'exutoire peut désormais renseigner le mode de traitement. :warning: **Attention:** ce champ devra bientôt obligatoirement être renseigné à l'étape de traitement [PR 2673](https://github.com/MTES-MCT/trackdechets/pull/2673)
+- ETQ transporteur, je veux pouvoir ajouter / modifier des récépissés transporteur par API [PR 2688](https://github.com/MTES-MCT/trackdechets/pull/2688)
+
 #### :bug: Corrections de bugs
 
+- BSDD: un éco-organisme ne peut plus être sélectionné en tant qu'émetteur des déchets [PR 2665](https://github.com/MTES-MCT/trackdechets/pull/2665)
+- BSFF : ETQ émetteur je veux modifier mon BSD après l'avoir signé mais les modifications de contenant ne sont pas prises en compte [PR 2686](https://github.com/MTES-MCT/trackdechets/pull/2686)
+
 #### :boom: Breaking changes
+
 - BSVHU: le numéro d'agrément du destinataire est obligatoire à la publication [PR 2683](https://github.com/MTES-MCT/trackdechets/pull/2683)
+- La plaque d'immatriculation est désormais obligatoire à la signature d'un transporteur multi-modal. Un champ `numberPlate` a été ajouté sur l'input `TakeOverInput` afin de pouvoir renseigner la valeur jusqu'au dernier moment [PR 2688](https://github.com/MTES-MCT/trackdechets/pull/2688).
+-
+
 #### :nail_care: Améliorations
 
 - Réécriture de la requête `favorites` qui renvoie désormais le type `CompanySearchResult[]` (suppression du type interne `CompanyFavorite`) et améliorations de `searchCompanies`. Ajout d'un paramètre optionnel `allowForeignCompanies` pour filtrer les entreprises étrangères des requêtes. [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
@@ -21,6 +31,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Suppression du script `npm run queue:obliterate` [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
+- Ajout de filtres à la query bsds pour filtrer sur les bordereaux ayant une demande de révision en cours ou passée [PR 2598](Ajout de filtres à la query bsds pour filtrer sur les bordereaux ayant une demande de révision en cours ou passée)
 
 # [2023.8.3] 29/08/2023
 

@@ -3,7 +3,8 @@ import {
   BsdasriStatus,
   WasteAcceptationStatus,
   Prisma,
-  BsdasriType
+  BsdasriType,
+  OperationMode
 } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { distinct } from "../../common/arrays";
@@ -109,6 +110,7 @@ export const readyToReceiveData = () => ({
 
 export const readyToProcessData = {
   destinationOperationCode: "D10",
+  destinationOperationMode: OperationMode.ELIMINATION,
   destinationReceptionWasteWeightValue: 70,
   destinationOperationDate: new Date()
 };

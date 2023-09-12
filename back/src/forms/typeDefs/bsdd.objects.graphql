@@ -106,6 +106,9 @@ type Form {
   "Traitement réalisé (code D/R)"
   processingOperationDone: String
 
+  "Mode de traitement"
+  destinationOperationMode: OperationMode
+
   "Description de l'opération d’élimination / valorisation (case 11)"
   processingOperationDescription: String
 

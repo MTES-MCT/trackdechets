@@ -138,6 +138,9 @@ input ProcessedFormInput {
   "Traitement réalisé (code D/R)"
   processingOperationDone: String!
 
+  "Mode de traitement"
+  destinationOperationMode: OperationMode
+
   """
   Description de l'opération d’élimination / valorisation (case 11)
   Elle se complète automatiquement lorsque non fournie
@@ -827,6 +830,8 @@ input NextSegmentInfoInput {
 input TakeOverInput {
   takenOverAt: DateTime!
   takenOverBy: String!
+  # Permet de mettre à jour la plaque d'immatriculation au moment de la signature du transporter N
+  numberPlate: String
 }
 
 "Payload d'import d'un BSD papier"
