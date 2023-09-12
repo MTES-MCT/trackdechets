@@ -11,7 +11,8 @@ import {
   Status,
   User,
   UserRole,
-  GovernmentPermission
+  GovernmentPermission,
+  CompanyType
 } from "@prisma/client";
 import {
   refreshElasticSearch,
@@ -491,5 +492,58 @@ describe("Incoming wastes registry", () => {
         })
       ]
     });
+  });
+
+  it("should export the quantity received of the final destination in case of transit", async () => {
+    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
+      UserRole.MEMBER,
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const { user: destinationUser, company: destination } =
+      await userWithCompanyFactory(UserRole.MEMBER, {
+        companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+      });
+
+    const formWithTempStorage = await formWithTempStorageFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        emitterCompanySiret: ttr.siret,
+        emitterCompanyAddress: ttr.address,
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1000,
+        status: Status.PROCESSED,
+        receivedAt: new Date(),
+        processedAt: new Date()
+      },
+      forwardedInOpts: {
+        emitterCompanySiret: ttr.siret,
+        emitterCompanyName: ttr.name,
+        recipientCompanySiret: destination.siret,
+        quantityReceived: 100,
+        receivedAt: new Date()
+      }
+    });
+    const formWithTempStorageFullForm = await getFullForm(formWithTempStorage);
+    await indexForm(formWithTempStorageFullForm);
+
+    await refreshElasticSearch();
+    const { query } = makeClient(destinationUser);
+    const { data } = await query<Pick<Query, "incomingWastes">>(
+      INCOMING_WASTES,
+      {
+        variables: {
+          sirets: [destination.siret]
+        }
+      }
+    );
+    expect(data.incomingWastes.edges).toHaveLength(1);
+    const incomingWaste = data.incomingWastes.edges.map(e => e.node)[0];
+    expect(incomingWaste.emitterCompanySiret).toEqual(ttr.siret);
+    // destinationReceptionWeight doit être celui de la destination finale et no pas de l'installation de transit
+    expect(incomingWaste.destinationReceptionWeight).toBe(
+      formWithTempStorageFullForm.quantityReceived
+    );
   });
 });

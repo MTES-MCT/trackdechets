@@ -33,6 +33,7 @@ export const INCOMING_WASTES = gql`
           initialEmitterCompanyAddress
           initialEmitterPostalCodes
           emitterCompanySiret
+          destinationReceptionWeight
         }
       }
     }
