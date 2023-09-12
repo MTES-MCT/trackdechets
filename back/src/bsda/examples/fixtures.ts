@@ -151,6 +151,7 @@ function destinationSignatureUpdateInput() {
       },
       operation: {
         code: "D 5",
+        mode: "ELIMINATION",
         date: new Date().toISOString() as any
       }
     }
