@@ -113,8 +113,16 @@ export function buildUpdateAppendix1Forms(
       promises.push(
         updateManyForms(ids, {
           status,
+          wasteAcceptationStatus: container.wasteAcceptationStatus,
           receivedAt: container.receivedAt,
-          receivedBy: container.receivedBy
+          receivedBy: container.receivedBy,
+          signedAt: container.signedAt,
+          processingOperationDone: container.processingOperationDone,
+          processingOperationDescription:
+            container.processingOperationDescription,
+          destinationOperationMode: container.destinationOperationMode,
+          processedAt: container.processedAt,
+          processedBy: container.processedBy
         })
       );
     }
