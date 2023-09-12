@@ -10,8 +10,7 @@ import { CompanySearchResult } from "../../../companies/types";
 import getReadableId from "../../../forms/readableId";
 import * as search from "../../../companies/search";
 import { favoritesConstrutor } from "../indexFavorites";
-import { indexForm } from "../../../forms/elastic";
-import { getFullForm } from "../../../forms/database";
+import { getFormForElastic, indexForm } from "../../../forms/elastic";
 import { index, client as elasticSearch } from "../../../common/elastic";
 
 const searchCompanySpy = jest.spyOn(search, "searchCompany");
@@ -41,7 +40,7 @@ describe("Index favorites job", () => {
     });
     const emitter = await companyFactory();
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -69,7 +68,7 @@ describe("Index favorites job", () => {
       statutDiffusionEtablissement: "O"
     });
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -114,7 +113,7 @@ describe("Index favorites job", () => {
     });
     const emitter = await companyFactory();
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -142,7 +141,7 @@ describe("Index favorites job", () => {
       statutDiffusionEtablissement: "O"
     });
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -201,7 +200,7 @@ describe("Index favorites job", () => {
       statutDiffusionEtablissement: "O"
     });
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -245,7 +244,7 @@ describe("Index favorites job", () => {
       }
     });
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -273,7 +272,7 @@ describe("Index favorites job", () => {
     });
     const recipient = await companyFactory();
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -332,7 +331,7 @@ describe("Index favorites job", () => {
       }
     });
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -389,7 +388,7 @@ describe("Index favorites job", () => {
       })
     });
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -457,7 +456,7 @@ describe("Index favorites job", () => {
       statutDiffusionEtablissement: "O"
     });
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -522,7 +521,7 @@ describe("Index favorites job", () => {
       statutDiffusionEtablissement: "O"
     });
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -570,7 +569,7 @@ describe("Index favorites job", () => {
       statutDiffusionEtablissement: "O"
     });
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -615,7 +614,7 @@ describe("Index favorites job", () => {
     });
     const unknownSiret = siretify(1);
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -660,7 +659,7 @@ describe("Index favorites job", () => {
     const destination = await companyFactory();
 
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formWithTempStorageFactory({
           ownerId: user.id,
           opt: {
@@ -722,7 +721,7 @@ describe("Index favorites job", () => {
     const recipientCompanySiret = siretify(1);
 
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formWithTempStorageFactory({
           ownerId: user.id,
           opt: { emitterCompanySiret: company.orgId },
@@ -781,7 +780,7 @@ describe("Index favorites job", () => {
     });
 
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -826,7 +825,7 @@ describe("Index favorites job", () => {
     });
 
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -883,7 +882,7 @@ describe("Index favorites job", () => {
     });
 
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -963,7 +962,7 @@ describe("Index favorites job", () => {
     });
 
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -1074,8 +1073,8 @@ describe("Index favorites job", () => {
         recipientCompanySiret: company.orgId
       }
     });
-    await indexForm(await getFullForm(firstForm));
-    await indexForm(await getFullForm(secondForm));
+    await indexForm(await getFormForElastic(firstForm));
+    await indexForm(await getFormForElastic(secondForm));
     await refreshIndices();
 
     searchCompanySpy
@@ -1187,7 +1186,7 @@ describe("Index favorites job", () => {
       }
     });
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -1196,8 +1195,8 @@ describe("Index favorites job", () => {
         })
       )
     );
-    await indexForm(await getFullForm(firstForm));
-    await indexForm(await getFullForm(secondForm));
+    await indexForm(await getFormForElastic(firstForm));
+    await indexForm(await getFormForElastic(secondForm));
     await refreshIndices();
 
     searchCompanySpy
@@ -1299,9 +1298,9 @@ describe("Index favorites job", () => {
         recipientsSirets: [company.orgId!]
       }
     });
-    await indexForm(await getFullForm(firstForm));
+    await indexForm(await getFormForElastic(firstForm));
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -1380,7 +1379,7 @@ describe("Index favorites job", () => {
       statutDiffusionEtablissement: "O"
     });
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -1396,7 +1395,7 @@ describe("Index favorites job", () => {
       )
     );
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -1465,7 +1464,7 @@ describe("Index favorites job", () => {
     const recipientCompanySiret = siretify(1);
 
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {

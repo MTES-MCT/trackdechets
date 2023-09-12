@@ -17,8 +17,7 @@ import {
 import { convertUrls } from "../../../database";
 import * as search from "../../../search";
 import { index, client as elasticSearch } from "../../../../common/elastic";
-import { getFullForm } from "../../../../forms/database";
-import { indexForm } from "../../../../forms/elastic";
+import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 
 const request = supertest(app);
 
@@ -74,7 +73,7 @@ describe("query favorites", () => {
       "MEMBER"
     );
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user2.id,
           opt: { recipientCompanySiret: company2.orgId }
@@ -129,7 +128,7 @@ describe("query favorites", () => {
       "MEMBER"
     );
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user2.id,
           opt: { recipientCompanySiret: company2.orgId }
@@ -170,7 +169,7 @@ describe("query favorites", () => {
       }
     );
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: {
@@ -253,7 +252,7 @@ describe("query favorites", () => {
       siret: undefined
     });
     await indexForm(
-      await getFullForm(
+      await getFormForElastic(
         await formFactory({
           ownerId: user.id,
           opt: { recipientCompanySiret: company.orgId }
