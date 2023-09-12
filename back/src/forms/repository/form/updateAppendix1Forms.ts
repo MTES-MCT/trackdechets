@@ -116,7 +116,12 @@ export function buildUpdateAppendix1Forms(
           wasteAcceptationStatus: container.wasteAcceptationStatus,
           receivedAt: container.receivedAt,
           receivedBy: container.receivedBy,
-          signedAt: container.signedAt
+          signedAt: container.signedAt,
+          processingOperationDone: container.processingOperationDone,
+          processingOperationDescription: container.processingOperationDescription,
+          destinationOperationMode: container.destinationOperationMode,
+          processedAt: container.processedAt,
+          processedBy: container.processedBy
         })
       );
     }
