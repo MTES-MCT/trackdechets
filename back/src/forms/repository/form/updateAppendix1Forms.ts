@@ -113,8 +113,10 @@ export function buildUpdateAppendix1Forms(
       promises.push(
         updateManyForms(ids, {
           status,
+          wasteAcceptationStatus: container.wasteAcceptationStatus,
           receivedAt: container.receivedAt,
-          receivedBy: container.receivedBy
+          receivedBy: container.receivedBy,
+          signedAt: container.signedAt
         })
       );
     }
