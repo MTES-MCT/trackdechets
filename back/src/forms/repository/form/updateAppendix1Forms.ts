@@ -118,7 +118,8 @@ export function buildUpdateAppendix1Forms(
           receivedBy: container.receivedBy,
           signedAt: container.signedAt,
           processingOperationDone: container.processingOperationDone,
-          processingOperationDescription: container.processingOperationDescription,
+          processingOperationDescription:
+            container.processingOperationDescription,
           destinationOperationMode: container.destinationOperationMode,
           processedAt: container.processedAt,
           processedBy: container.processedBy
