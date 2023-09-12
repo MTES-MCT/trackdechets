@@ -7,66 +7,11 @@ type Mutation {
 
   """
   USAGE INTERNE
-  Édite les informations d'un établissement
-  """
-  updateCompany(
-    "ID de l'établissement"
-    id: String!
-    "Identifiant GEREP"
-    gerepId: String
-    "Prénom et nom du contact dans l'entreprise"
-    contact: String
-    "Email de contact"
-    contactEmail: String
-    "Numéro de téléphone de contact"
-    contactPhone: String
-    "Site web"
-    website: String
-    "Profil de l'établissement"
-    companyTypes: [CompanyType!]
-    "Nom d'usage de l'établissement"
-    givenName: String
-    "Identifiant d'un récépissé transporteur"
-    transporterReceiptId: String
-    "Identifiant d'un récépissé négociant"
-    traderReceiptId: String
-    "Identifiant d'un récépissé courtier"
-    brokerReceiptId: String
-    "Identifiant d'un agrément VHU démolisseur"
-    vhuAgrementDemolisseurId: String
-    "Identifiant d'un agrément VHU broyeur"
-    vhuAgrementBroyeurId: String
-    "Identifiant des informations de certification de l'entreprise de travaux"
-    workerCertificationId: String
-    "Agréments de l'éco-organisme"
-    ecoOrganismeAgreements: [URL!]
-    "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
-    allowBsdasriTakeOverWithoutSignature: Boolean
-  ): CompanyPrivate!
-
-  """
-  USAGE INTERNE
   Permet de vérifier un établissement à partir du code de vérification
   envoyé par courrier à l'adresse de l'établissement renseigné au
   registre du commerce et des sociétés
   """
   verifyCompany(input: VerifyCompanyInput!): CompanyPrivate!
-
-  """
-  USAGE INTERNE
-  Crée un récépissé transporteur
-  """
-  createTransporterReceipt(
-    input: CreateTransporterReceiptInput!
-  ): TransporterReceipt!
-
-  """
-  USAGE INTERNE
-  Édite les informations d'un récépissé transporteur
-  """
-  updateTransporterReceipt(
-    input: UpdateTransporterReceiptInput!
-  ): TransporterReceipt!
 
   """
   USAGE INTERNE
