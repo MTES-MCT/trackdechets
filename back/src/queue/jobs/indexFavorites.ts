@@ -387,9 +387,7 @@ export const favoritesConstrutor = async ({
     try {
       const companySearch = await searchCompany(company.orgId);
       favorites.push(companySearch);
-    } catch {
-      log.error("error during searchCompany() in indexFavorites");
-    }
+    } catch {}
   }
 
   // Return up to MAX_FAVORITES results
