@@ -9,10 +9,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { gql } from "graphql-tag";
 import prisma from "../../../../prisma";
-import {
-  getFormRepository,
-  getReadOnlyFormRepository
-} from "../../../repository";
+import { getFormRepository } from "../../../repository";
 import { AuthType } from "../../../../auth";
 
 const APPENDIX_FORMS = gql`
