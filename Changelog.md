@@ -14,6 +14,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - BSDD: un éco-organisme ne peut plus être sélectionné en tant qu'émetteur des déchets [PR 2665](https://github.com/MTES-MCT/trackdechets/pull/2665)
+- BSFF : ETQ émetteur je veux modifier mon BSD après l'avoir signé mais les modifications de contenant ne sont pas prises en compte [PR 2686](https://github.com/MTES-MCT/trackdechets/pull/2686)
 
 #### :boom: Breaking changes
 
