@@ -29,7 +29,7 @@ const buildUpdateAppendix2Forms: (
 
   const formUpdatesByStatus = new Map<Status, string[]>();
 
-  // Quantité regroupée par
+  // Quantité regroupée par identifiant de bordereau
   const quantitGroupedByFormId: { [key: string]: number } = {};
 
   for (const form of forms) {
