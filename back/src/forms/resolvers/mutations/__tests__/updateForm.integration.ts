@@ -1466,7 +1466,8 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: "GROUPED",
         recipientCompanySiret: ttr.siret,
-        quantityReceived: 1
+        quantityReceived: 1,
+        quantityGrouped: 1
       }
     });
     const toBeAppendixForm = await formFactory({
@@ -1474,7 +1475,8 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: "AWAITING_GROUP",
         recipientCompanySiret: ttr.siret,
-        quantityReceived: 1
+        quantityReceived: 1,
+        quantityGrouped: 0
       }
     });
 
@@ -1509,12 +1511,16 @@ describe("Mutation.updateForm", () => {
       where: { id: appendixForm.id }
     });
     expect(oldAppendix2Form.status).toBe("AWAITING_GROUP");
+    expect(oldAppendix2Form.quantityGrouped).toEqual(0);
 
     // New appendix form is now GROUPED
     const newAppendix2Form = await prisma.form.findUniqueOrThrow({
       where: { id: toBeAppendixForm.id }
     });
     expect(newAppendix2Form.status).toBe("GROUPED");
+    expect(newAppendix2Form.quantityGrouped).toEqual(
+      newAppendix2Form.quantityReceived
+    );
   });
 
   it("should be possible to update data on a form containing appendix 2", async () => {
@@ -1968,7 +1974,8 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: "AWAITING_GROUP",
         recipientCompanySiret: ttr.siret,
-        quantityReceived: 1
+        quantityReceived: 1,
+        quantityGrouped: 1
       }
     });
 
@@ -2009,6 +2016,12 @@ describe("Mutation.updateForm", () => {
     });
 
     expect(data2.updateForm.appendix2Forms).toHaveLength(1);
+
+    const updatedAppendixForm = await prisma.form.findUniqueOrThrow({
+      where: { id: appendixForm.id }
+    });
+
+    expect(updatedAppendixForm.quantityGrouped).toEqual(1);
   });
 
   it("should be possible to re-associate same appendix2 (using UpdateFormInput.grouping)", async () => {
@@ -2096,6 +2109,11 @@ describe("Mutation.updateForm", () => {
       }
     });
     expect(data3.updateForm.grouping).toHaveLength(1);
+
+    const updatedAppendixForm = await prisma.form.findFirstOrThrow({
+      where: { id: appendixForm.id }
+    });
+    expect(updatedAppendixForm.quantityGrouped).toEqual(1);
   }, 30000);
 
   it("should default to quantity left when no quantity is specified in grouping", async () => {
