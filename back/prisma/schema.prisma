@@ -442,7 +442,7 @@ model Form {
   intermediariesSirets String[] @default([])
   canAccessDraftSirets String[] @default([])
 
-  // Fraction du bordereau regroupé dans des bordereaux de regroupement
+  // Fraction du bordereau regroupée dans des bordereaux de regroupement
   // La quantité restante à regrouper s'obtient en faisant quantityReceived - quantityGrouped 
   quantityGrouped Float @default(0)
 

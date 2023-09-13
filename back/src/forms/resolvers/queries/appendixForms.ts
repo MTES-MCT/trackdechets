@@ -26,7 +26,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
         }
       ],
       isDeleted: false,
-      readableId: { not: { endsWith: "-suite" } } // TODO check if we can remove completly this condition
+      readableId: { not: { endsWith: "-suite" } }
     },
     include: expandableFormIncludes
   });
