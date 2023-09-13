@@ -932,4 +932,86 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     });
     expect(updatedAppendix1.wasteDetailsCode).toBe(newWasteCode);
   });
+
+  it("if the waste code changes from dangerous to non-dangerous, wasteDetailsIsDangerous should be updated", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        wasteDetailsCode: "19 08 10*", // dangerous
+        wasteDetailsIsDangerous: true
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        wasteDetailsCode: "19 08 09", // non-dangerous
+        comment: ""
+      }
+    });
+
+    const { data } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
+
+    const updatedBsdd = await prisma.form.findFirst({ where: { id: bsdd.id } });
+    expect(updatedBsdd?.wasteDetailsIsDangerous).toBeFalsy();
+  });
+
+  it("if the waste code changes from non-dangerous to dangerous, wasteDetailsIsDangerous should be updated", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        wasteDetailsCode: "19 08 09", // non-dangerous
+        wasteDetailsIsDangerous: false
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        wasteDetailsCode: "19 08 10*", // dangerous
+        comment: ""
+      }
+    });
+
+    const { data } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
+
+    const updatedBsdd = await prisma.form.findFirst({ where: { id: bsdd.id } });
+    expect(updatedBsdd?.wasteDetailsIsDangerous).toBeTruthy();
+  });
 });
