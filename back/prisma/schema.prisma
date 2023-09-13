@@ -319,6 +319,19 @@ model EcoOrganisme {
   handleBsdasri Boolean @default(false)
 }
 
+// Modèle qui peut être partagé entre tous les
+// bordereaux
+model FinalOperation {
+  id                      String  @id @default(cuid())
+  finalFormReadableId     String
+  operationCode           String
+  quantity                Float
+  destinationCompanySiret String
+  destinationCompanyName  String
+  Form                    Form?   @relation(fields: [formId], references: [id])
+  formId                  String?
+}
+
 model Form {
   id                                 String                  @id @default(cuid())
   createdAt                          DateTime                @default(now()) @db.Timestamptz(6)
@@ -441,6 +454,8 @@ model Form {
   transportersSirets   String[] @default([])
   intermediariesSirets String[] @default([])
   canAccessDraftSirets String[] @default([])
+
+  finalOperations FinalOperation[]
 
   // partial index _FormIsDeletedIdx see migration82_missing_indices.sql
   // partial index _FormRecipientIsTempStorageIdx see 99_add_form_indices.sql
@@ -929,7 +944,7 @@ model Bsvhu {
   destinationReceptionIdentificationType    BsvhuIdentificationType?
   destinationReceptionDate                  DateTime?                @db.Timestamptz(6)
 
-  destinationOperationDate                            DateTime? @db.Timestamptz(6)
+  destinationOperationDate                            DateTime?      @db.Timestamptz(6)
   destinationOperationCode                            String?
   destinationOperationMode                            OperationMode?
   destinationOperationNextDestinationCompanyName      String?
@@ -940,7 +955,7 @@ model Bsvhu {
   destinationOperationNextDestinationCompanyMail      String?
   destinationOperationNextDestinationCompanyVatNumber String?
   destinationOperationSignatureAuthor                 String?
-  destinationOperationSignatureDate                   DateTime? @db.Timestamptz(6)
+  destinationOperationSignatureDate                   DateTime?      @db.Timestamptz(6)
 
   // partial indices _BsvhuIsDeletedIdx,_BsvhuIsDraftIdx  see migration82_missing_indices.sql
 
@@ -1259,13 +1274,13 @@ model BsffPackaging {
   acceptationSignatureAuthor String?
   acceptationSignatureDate   DateTime? @db.Timestamptz(6)
 
-  operationDate            DateTime? @db.Timestamptz(6)
-  operationNoTraceability  Boolean   @default(false)
+  operationDate            DateTime?      @db.Timestamptz(6)
+  operationNoTraceability  Boolean        @default(false)
   operationCode            String?
   operationMode            OperationMode?
   operationDescription     String?
   operationSignatureAuthor String?
-  operationSignatureDate   DateTime? @db.Timestamptz(6)
+  operationSignatureDate   DateTime?      @db.Timestamptz(6)
 
   operationNextDestinationPlannedOperationCode String?
   operationNextDestinationCap                  String?
@@ -1398,9 +1413,9 @@ model Bsda {
   destinationOperationCode            String?
   destinationOperationMode            OperationMode?
   destinationOperationDescription     String?
-  destinationOperationDate            DateTime? @db.Timestamptz(6)
+  destinationOperationDate            DateTime?      @db.Timestamptz(6)
   destinationOperationSignatureAuthor String?
-  destinationOperationSignatureDate   DateTime? @db.Timestamptz(6)
+  destinationOperationSignatureDate   DateTime?      @db.Timestamptz(6)
 
   destinationOperationNextDestinationCompanySiret         String?
   destinationOperationNextDestinationCompanyVatNumber     String?
