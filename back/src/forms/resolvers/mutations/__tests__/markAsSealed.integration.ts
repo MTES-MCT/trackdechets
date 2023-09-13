@@ -84,7 +84,8 @@ describe("Mutation.markAsSealed", () => {
           emitter: CompanyType.PRODUCER,
           recipient: CompanyType.WASTEPROCESSOR,
           trader: CompanyType.TRADER,
-          transporter: CompanyType.TRANSPORTER
+          transporter: CompanyType.TRANSPORTER,
+          broker: CompanyType.BROKER
         }[role]);
 
       const { user, company } = await userWithCompanyFactory("MEMBER", {
