@@ -121,16 +121,6 @@ const buildUpdateAppendix2Forms: (
 
   await Promise.all(promises);
 
-  // met à jour la quantité regroupée sur chaque bordereau
-  await Promise.all(
-    Object.keys(quantitGroupedByFormId).map(formId => {
-      return prisma.form.update({
-        where: { id: formId },
-        data: { quantityGrouped: quantitGroupedByFormId[formId] }
-      });
-    })
-  );
-
   // Ici on peut avoir 250 bordereaux à mettre à jour dans le pire des cas
   // On batche donc les updates par 50 pour éviter un bottleneck
   await processBsdIdentifiersByChunk(
