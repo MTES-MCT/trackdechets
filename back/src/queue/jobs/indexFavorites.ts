@@ -453,3 +453,81 @@ export const indexFavoritesJob = async (job: Job<FavoritesInput>) => {
     );
   }
 };
+
+export interface FavoritesInputBenoit {
+  bsdId: string;
+}
+
+export const indexFavoritesJobBenoit = async (
+  job: Job<FavoritesInputBenoit>
+) => {
+  const { bsdId } = job.data;
+
+  if (bsdId.startsWith("BSD" || bsdId.startsWith("TD"))) {
+    // Il s'agit d'une BSDD
+
+    const form = await prisma.form.findUniqueOrThrow({
+      where: { readableId: bsdId },
+      include: { transporters: true, forwardedIn: true }
+    });
+
+    if (!["SENT", "RESENT"].includes(form.status)) {
+      // À DISCUTER, on met à jour les favoris uniquement lorsque
+      // le bordereau est pris en charge par le transporteur
+      return;
+    }
+
+    const emitter = form.emitterCompanySiret;
+    const transporters = form.transporters
+      ?.map(t => getTransporterCompanyOrgId(t))
+      .filter(Boolean);
+    const destination = form.recipientIsTempStorage
+      ? form.forwardedIn?.recipientCompanySiret
+      : form.recipientCompanySiret;
+    const tempStorage = form.recipientIsTempStorage
+      ? form.recipientCompanySiret
+      : null;
+    const nextDestination = form.nextDestinationCompanySiret;
+    const broker = form.brokerCompanySiret;
+    const trader = form.traderCompanySiret;
+
+    const orgIds = [
+      emitter,
+      ...transporters,
+      destination,
+      tempStorage,
+      nextDestination,
+      broker,
+      trader
+    ].filter(Boolean);
+
+    const orgIdByFavoriteType: Record<FavoriteType, string | null | undefined> =
+      {
+        EMITTER: emitter,
+        DESTINATION: destination,
+        TEMPORARY_STORAGE_DETAIL: tempStorage,
+        NEXT_DESTINATION: nextDestination,
+        TRADER: trader,
+        BROKER: broker,
+        WORKER: null,
+        // je ne suis pas sur de comprendre la différence entre RECIPIENT et DESTINATION / TEMPORARY_STORAGE_DETAIL
+        RECIPIENT: destination,
+        TRANSPORTER: transporters[0] // il faudrait pouvoir gérer tous les transporteurs
+      };
+
+    // On itère sur tous les types de favoris
+    for (const favoriteType of Object.keys(orgIdByFavoriteType)) {
+      // Si un orgId est présent pour ce type de favoris
+      if (orgIdByFavoriteType[favoriteType]) {
+        const orgId = orgIdByFavoriteType[favoriteType];
+        // ON ajoute cet orgId à la liste des favoris de ce type des autres orgId
+        for (const otherOrgId of orgIds.filter(id => id !== orgId)) {
+          const ES = {}; // dummy ES
+          const currentFavorites = ES[`${otherOrgId}-${favoriteType}`]; // TODO récupères les favoris depuis ES
+          const newFavorites = [...new Set([...currentFavorites, orgId])]; // s'assure que les orgId sont uniques
+          ES[`${otherOrgId}-${favoriteType}`] = newFavorites; // TODO sauvegarde dans ES
+        }
+      }
+    }
+  }
+};
