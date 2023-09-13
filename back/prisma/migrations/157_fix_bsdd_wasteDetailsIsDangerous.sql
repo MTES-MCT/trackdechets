@@ -1,0 +1,2 @@
+-- Because of bug TRA-11112, there could be a desync between the waste code and the waste isDangerous
+update "default$default"."Form" set "wasteDetailsIsDangerous" = true where "wasteDetailsIsDangerous" is false and "wasteDetailsCode" like '%*';
