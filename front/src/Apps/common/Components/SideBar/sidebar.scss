@@ -1,0 +1,47 @@
+@import "src/scss/Constants.scss";
+@import "src/scss/Breakpoints.scss";
+
+.sidebarv2 {
+  width: 250px;
+  max-height: 700px;
+  padding: 0 8px;
+  margin-top: 20px;
+  border-right: solid 1px $grey-light;
+
+  &__item {
+    display: block;
+    height: 30px;
+    line-height: 30px;
+    border-left: 3px solid transparent;
+    padding-left: 1rem;
+    &--indented {
+      padding-left: 1.2rem;
+    }
+    &--chapter {
+      margin-top: 0.8rem;
+      font-weight: bold;
+    }
+    &:hover {
+      border-color: $blue-dark;
+    }
+  }
+
+  &__item--active {
+    font-weight: bold;
+    border-color: $blue-dark;
+  }
+  li {
+    list-style: none;
+    a {
+      text-decoration: none;
+      color: $black;
+    }
+  }
+
+  .fr-accordion {
+    &__btn {
+      color: $black;
+      font-weight: bold;
+    }
+  }
+}

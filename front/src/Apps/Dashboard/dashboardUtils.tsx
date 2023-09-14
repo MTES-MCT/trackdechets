@@ -47,6 +47,7 @@ import {
   IconBSDasri,
 } from "Apps/common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
+import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 
 export const MAX_FILTER = 5;
 
@@ -545,4 +546,46 @@ export const getRevisionPath = bsd => {
     default:
       break;
   }
+};
+
+export const getBsdCurrentTab = ({
+  isDraftTab,
+  isActTab,
+  isFollowTab,
+  isArchivesTab,
+  isReviewsTab,
+  isToCollectTab,
+  isCollectedTab,
+  // isReviewedTab,
+  // isToReviewedTab,
+}): BsdCurrentTab => {
+  if (isDraftTab) {
+    return "draftTab";
+  }
+  if (isActTab) {
+    return "actTab";
+  }
+  if (isFollowTab) {
+    return "followTab";
+  }
+  if (isArchivesTab) {
+    return "archivesTab";
+  }
+  if (isReviewsTab) {
+    return "reviewsTab";
+  }
+  // if (isReviewedTab) {
+  //   return "reviewedTab";
+  // }
+  // if (isToReviewedTab) {
+  //   return "toReviewedTab";
+  // }
+  if (isToCollectTab) {
+    return "toCollectTab";
+  }
+  if (isCollectedTab) {
+    return "collectedTab";
+  }
+  // default tab
+  return "allBsdsTab";
 };
