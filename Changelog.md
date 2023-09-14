@@ -16,6 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - BSDD: un éco-organisme ne peut plus être sélectionné en tant qu'émetteur des déchets [PR 2665](https://github.com/MTES-MCT/trackdechets/pull/2665)
 - BSFF : ETQ émetteur je veux modifier mon BSD après l'avoir signé mais les modifications de contenant ne sont pas prises en compte [PR 2686](https://github.com/MTES-MCT/trackdechets/pull/2686)
+- Les BSDD regroupés devraient basculer dans l'onglet Archives et avoir le statut "Traité" lorsque le BSDD suite à été traité [PR 2712](https://github.com/MTES-MCT/trackdechets/pull/2712)
 
 #### :boom: Breaking changes
 
