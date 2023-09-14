@@ -2,7 +2,7 @@ import { Form, OperationMode } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import {
   FormWithForwardedIn,
-  FormWithForwardedInInclude,
+  FormWithForwardedInWithTransportersInclude,
   FormWithIntermediaries,
   FormWithIntermediariesInclude,
   FormWithRevisionRequests,
@@ -10,7 +10,8 @@ import {
   FormWithTransportersInclude,
   FormWithRevisionRequestsInclude,
   FormWithForwarding,
-  FormWithForwardingInclude
+  FormWithForwardingInclude,
+  FormWithForwardedInWithTransporters
 } from "./types";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
@@ -26,13 +27,13 @@ import prisma from "../prisma";
 
 export type FormForElastic = Form &
   FormWithTransporters &
-  FormWithForwardedIn &
+  FormWithForwardedInWithTransporters &
   FormWithIntermediaries &
   FormWithForwarding &
   FormWithRevisionRequests;
 
 export const FormForElasticInclude = {
-  ...FormWithForwardedInInclude,
+  ...FormWithForwardedInWithTransportersInclude,
   ...FormWithForwardingInclude,
   ...FormWithTransportersInclude,
   ...FormWithIntermediariesInclude,
