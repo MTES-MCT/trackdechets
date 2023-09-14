@@ -65,7 +65,10 @@ export const mapBsdd = (bsdd: FormWithReview): BsdDisplay => {
     wasteDetails: {
       code: bsdd.wasteDetails?.code,
       name: bsdd.wasteDetails?.name,
-      weight: bsdd.quantityReceived || bsdd.wasteDetails?.quantity,
+      weight:
+        bsdd.quantityReceived ||
+        bsdd.temporaryStorageDetail?.wasteDetails?.quantity ||
+        bsdd.wasteDetails?.quantity,
     },
     isTempStorage: bsdd.recipient?.isTempStorage,
     emitter: bsdd.emitter,
