@@ -66,6 +66,7 @@ export const mapBsdd = (bsdd: FormWithReview): BsdDisplay => {
       code: bsdd.wasteDetails?.code,
       name: bsdd.wasteDetails?.name,
       weight:
+        bsdd.review?.["content"]?.quantityReceived ||
         bsdd.quantityReceived ||
         bsdd.temporaryStorageDetail?.wasteDetails?.quantity ||
         bsdd.wasteDetails?.quantity,
@@ -98,7 +99,10 @@ const mapBsda = (bsda: BsdaWithReview): BsdDisplay => {
     wasteDetails: {
       code: bsda.waste?.code || bsda.waste?.["bsdaCode"],
       name: bsda.waste?.materialName,
-      weight: bsda?.destination?.reception?.weight || bsda?.weight?.value,
+      weight:
+        bsda.review?.["content"]?.destination?.reception?.weight ||
+        bsda?.destination?.reception?.weight ||
+        bsda?.weight?.value,
     },
     emitter: bsda.emitter || bsda["bsdaEmitter"],
     destination: bsda.destination || bsda["bsdaDestination"],
