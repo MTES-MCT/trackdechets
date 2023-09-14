@@ -312,7 +312,7 @@ export const index: BsdIndexationConfig = {
   // increment when mapping has changed to trigger re-indexation on release
   // only use vX.Y.Z that matches regexp "v\d\.\d\.\d"
   // no special characters that are not supported by ES index names (like ":")
-  mappings_version: "v1.0.0",
+  mappings_version: "v1.1.0",
   mappings: {
     properties
   },
