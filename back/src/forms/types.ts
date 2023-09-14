@@ -20,11 +20,20 @@ export type FormWithTransporters = Prisma.FormGetPayload<{
 
 export const FormWithForwardedInInclude =
   Prisma.validator<Prisma.FormInclude>()({
-    forwardedIn: { include: FormWithTransportersInclude }
+    forwardedIn: true
   });
 
 export type FormWithForwardedIn = Prisma.FormGetPayload<{
   include: typeof FormWithForwardedInInclude;
+}>;
+
+export const FormWithForwardedInWithTransportersInclude =
+  Prisma.validator<Prisma.FormInclude>()({
+    forwardedIn: { include: { transporters: true } }
+  });
+
+export type FormWithForwardedInWithTransporters = Prisma.FormGetPayload<{
+  include: typeof FormWithForwardedInWithTransportersInclude;
 }>;
 
 export const FormWithIntermediariesInclude =
