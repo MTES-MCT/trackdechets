@@ -24,6 +24,7 @@ import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "Apps/common/queries/fragments";
 import { GET_BSDS } from "Apps/common/queries";
 import { NotificationError } from "Apps/common/Components/Error/Error";
+import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
 
 export const textConfig: {
   [id: string]: {
@@ -294,7 +295,11 @@ export default function ReceivedInfo({
                   <Field
                     name="quantityType"
                     id="ESTIMATED"
-                    label="Estimée"
+                    label={
+                      <>
+                        Estimée <EstimatedQuantityTooltip />
+                      </>
+                    }
                     component={RadioButton}
                   />
                 </fieldset>
