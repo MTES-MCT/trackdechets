@@ -771,7 +771,7 @@ describe("Mutation.createFormRevisionRequest", () => {
     );
   });
 
-  it("should work if quantityReceived < 40 tons and transportMode = ROAD", async () => {
+  it("should work if quantityReceived <= 40 tons and transportMode = ROAD", async () => {
     const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
