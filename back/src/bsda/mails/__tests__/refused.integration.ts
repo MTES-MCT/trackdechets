@@ -110,19 +110,25 @@ describe("renderBsdaRefusedEmail", () => {
       { email: destination.user.email, name: destination.user.name }
     ]);
     expect(email!.body).toContain(`<p>
-  Nous vous informons que la société ${bsda.destinationCompanyName} (${bsda.destinationCompanySiret}) a refusé
+  Nous vous informons que la société ${bsda.destinationCompanyName} (${
+      bsda.destinationCompanySiret
+    }) a refusé
   partiellement le 2 janvier 2022, le
   déchet de la société suivante :
 </p>
 <br />
 <ul>
-  <li>${bsda.emitterCompanyName} (${bsda.emitterCompanySiret}) - ${bsda.emitterCompanyAddress}</li>
+  <li>${bsda.emitterCompanyName} (${bsda.emitterCompanySiret}) - ${
+      bsda.emitterCompanyAddress
+    }</li>
   <li>Informations relatives aux déchets refusés :</li>
   <ul>
     <li>Numéro du BSD : ${bsda.id}</li>
     <li>Appellation du déchet : ${bsda.wasteMaterialName}</li>
     <li>Code déchet : ${bsda.wasteCode}</li>
-    <li>Quantité acceptée: ${bsda.destinationReceptionWeight} tonnes</li>
+    <li>Quantité acceptée: ${
+      bsda.destinationReceptionWeight! / 1000
+    } tonnes</li>
     <li>Motif de refus :
       <span>${bsda.destinationReceptionRefusalReason}</span>`);
   });
