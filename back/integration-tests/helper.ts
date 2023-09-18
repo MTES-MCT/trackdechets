@@ -37,20 +37,24 @@ export async function closeServer() {
  **/
 export async function truncateDatabase() {
   const dbSchemaName = "default$default";
-  const tables: Array<{ tablename: string }> =
+  const tablenames: Array<{ tablename: string }> =
     await prisma.$queryRaw`SELECT tablename FROM pg_tables WHERE schemaname=${dbSchemaName};`;
 
-  for (const { tablename } of tables) {
-    await prisma.$executeRawUnsafe(
-      `TRUNCATE TABLE \"${dbSchemaName}\".\"${tablename}\" CASCADE;`
-    );
-  }
-  const sequences: Array<{ relname: string }> =
-    await prisma.$queryRaw`SELECT c.relname FROM pg_class AS c JOIN pg_namespace AS n ON c.relnamespace = n.oid WHERE c.relkind='S' AND n.nspname=${dbSchemaName};`;
+  const tables = tablenames
+    .map(({ tablename }) => `"${dbSchemaName}"."${tablename}"`)
+    .join(", ");
 
-  for (const { relname } of sequences) {
-    await prisma.$queryRaw`ALTER SEQUENCE \"${dbSchemaName}\".\"${relname}\" RESTART WITH 1;`;
-  }
+  return Promise.all([
+    // Reset data
+    prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tables} CASCADE;`),
+    // Reset sequences
+    prisma.$executeRawUnsafe(`
+      SELECT SETVAL(c.oid, 1)
+      from pg_class c JOIN pg_namespace n 
+      on n.oid = c.relnamespace 
+      where c.relkind = 'S' and n.nspname = '${dbSchemaName}';
+    `)
+  ]);
 }
 
 export async function resetDatabase() {
