@@ -172,6 +172,7 @@ export function getOtherPackagingLabel(packagingInfos: PackagingInfo[]) {
   return `Autre (${otherPackagingsSummary})`;
 }
 
+const colisPackagings = ["GRV", "FUT", "AUTRE"];
 function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
   return (
     <table>
@@ -185,12 +186,19 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
         {[
           { label: "Benne", value: "BENNE" },
           { label: "Citerne", value: "CITERNE" },
+          { label: "Conditionnné pour Pipeline", value: "PIPELINE" },
           { label: "GRV", value: "GRV" },
           { label: "Fûts", value: "FUT" },
-          { label: "Conditionnné pour Pipeline", value: "PIPELINE" },
           { label: getOtherPackagingLabel(packagingInfos), value: "AUTRE" }
         ].map((packagingType, index) => (
-          <tr key={index}>
+          <tr
+            key={index}
+            style={
+              packagingType.value === "PIPELINE"
+                ? { borderBottom: "2px solid black" }
+                : {}
+            }
+          >
             <td>
               {packagingInfos.reduce(
                 (total, packaging) =>
@@ -203,14 +211,22 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
                 null}
             </td>
 
-            <td>{packagingType.label}</td>
+            <td>
+              {colisPackagings.includes(packagingType.value) ? (
+                packagingType.label
+              ) : (
+                <b>{packagingType.label}</b>
+              )}
+            </td>
           </tr>
         ))}
         <tr>
           <td>
             <strong>
               {packagingInfos.reduce((total, packaging) => {
-                return total + (packaging.quantity ?? 0);
+                return colisPackagings.includes(packaging.type)
+                  ? total + (packaging.quantity ?? 0)
+                  : total;
               }, 0) ||
                 // leave the box empty if it's 0
                 null}
