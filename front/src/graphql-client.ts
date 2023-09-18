@@ -6,7 +6,7 @@ import {
 } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { relayStylePagination } from "@apollo/client/utilities";
-import omitDeep from "omit-deep-lodash";
+import { retirerOrgId } from "common/helper";
 
 /**
  * Automatically erase `__typename` from variables
@@ -32,9 +32,7 @@ const cleanTypeNameLink = new ApolloLink((operation, forward) => {
  */
 const cleanOrgIdLink = new ApolloLink((operation, forward) => {
   if (operation.variables) {
-    for (const key in Object.keys(operation.variables)) {
-      operation.variables[key] = omitDeep(operation.variables[key], "orgId");
-    }
+    operation.variables = retirerOrgId(operation.variables);
   }
   return forward(operation);
 });
