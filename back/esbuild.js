@@ -4,7 +4,7 @@ const copyfiles = require("copyfiles");
 
 const config = {
   esbuild: {
-    tsconfig: "tsconfig.integration.json"
+    tsconfig: "tsconfig.json"
   },
   postbuild: async () => {
     console.info("Copying static files...");
@@ -14,7 +14,6 @@ const config = {
           "src/**/*.{graphql,pdf,png,ttf,html,css,svg,wsdl,mp3}",
           "src/**/assets/*.js",
           "prisma/**/*.{prisma,sql}",
-          "integration-tests/**/*.js",
           "dist" // Out dir
         ],
         {},

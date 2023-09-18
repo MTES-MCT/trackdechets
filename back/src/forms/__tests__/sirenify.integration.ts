@@ -1,6 +1,6 @@
 import { CompanySearchResult } from "../../companies/types";
 import { userWithCompanyFactory } from "../../__tests__/factories";
-import * as search from "../../companies/search";
+import { searchCompany } from "../../companies/search";
 import {
   CreateFormInput,
   ResealedFormInput
@@ -9,7 +9,7 @@ import { sirenifyFormInput, sirenifyResealedFormInput } from "../sirenify";
 import { AuthType } from "../../auth";
 import { resetDatabase } from "../../../integration-tests/helper";
 
-const searchCompanySpy = jest.spyOn(search, "searchCompany");
+jest.mock("../../companies/search");
 
 describe("sirenifyFormInput", () => {
   afterEach(resetDatabase);
@@ -43,7 +43,7 @@ describe("sirenifyFormInput", () => {
       [intermediary2.company.siret!]: searchResult("intermédiaire 2")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 
@@ -189,7 +189,7 @@ describe("sirenifyFormInput", () => {
       [intermediary2.company.siret!]: searchResult("intermédiaire 2")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 
@@ -311,7 +311,7 @@ describe("sirenifyFormInput", () => {
       [emitter.company.siret!]: searchResult("émetteur")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 
@@ -360,7 +360,7 @@ describe("sirenifyResealedFormInput", () => {
       [destination.company.siret!]: searchResult("destination")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 
@@ -417,7 +417,7 @@ describe("sirenifyResealedFormInput", () => {
       [destination.company.siret!]: searchResult("destination")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 

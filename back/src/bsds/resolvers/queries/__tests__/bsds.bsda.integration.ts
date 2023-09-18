@@ -23,12 +23,12 @@ import {
   userWithCompanyFactory,
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
-import * as generatePdf from "../../../../bsda/pdf/generator";
+import { buildPdfAsBase64 } from "../../../../bsda/pdf/generator";
 import makeClient from "../../../../__tests__/testClient";
 import { gql } from "graphql-tag";
 
-const buildPdfAsBase64Spy = jest.spyOn(generatePdf, "buildPdfAsBase64");
-buildPdfAsBase64Spy.mockResolvedValue("");
+jest.mock("../../../../bsda/pdf/generator");
+(buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
 
 const CREATE_DRAFT_BSDA = `
 mutation CreateDraftBsda($input: BsdaInput!) {

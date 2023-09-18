@@ -20,18 +20,15 @@ import {
   MutationMarkAsTempStorerAcceptedArgs
 } from "../../../../generated/graphql/types";
 import getReadableId from "../../../readableId";
-import * as mailsHelper from "../../../../mailer/mailing";
-import * as generateBsddPdf from "../../../pdf/generateBsddPdf";
+import { sendMail } from "../../../../mailer/mailing";
+import { generateBsddPdfToBase64 } from "../../../pdf/generateBsddPdf";
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
-const generateBsddPdfToBase64Spy = jest.spyOn(
-  generateBsddPdf,
-  "generateBsddPdfToBase64"
-);
-generateBsddPdfToBase64Spy.mockResolvedValue("");
+jest.mock("../../../pdf/generateBsddPdf");
+(generateBsddPdfToBase64 as jest.Mock).mockResolvedValue("");
 
 const MARK_AS_TEMP_STORER_ACCEPTED = `
     mutation MarkAsTempStorerAccepted($id: ID!, $tempStorerAcceptedInfo: TempStorerAcceptedFormInput!){
@@ -194,7 +191,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
       }
     });
     expect(statusLogs.length).toEqual(1);
-    expect(sendMailSpy).toHaveBeenCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
           "Refus de prise en charge de votre déchet de l'entreprise WASTE PRODUCER"

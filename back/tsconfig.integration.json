@@ -1,5 +1,0 @@
-{
-  "extends": "./tsconfig",
-  "include": ["src/**/*", "prisma/**/*", "integration-tests/**/*"]
-}
-  
