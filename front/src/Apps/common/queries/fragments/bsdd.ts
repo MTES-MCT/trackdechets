@@ -488,6 +488,9 @@ export const dashboardFormFragment = gql`
         }
         cap
         processingOperation
+        wasteDetails {
+          quantity
+        }
       }
       transporter {
         company {
