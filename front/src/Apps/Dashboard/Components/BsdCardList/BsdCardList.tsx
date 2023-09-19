@@ -165,10 +165,13 @@ function BsdCardList({
   const handleActValidation = useCallback(
     (bsd: Bsd) => {
       if (bsd.__typename === "Form") {
-        if (!bsd?.temporaryStorageDetail) {
-          setValidationWorkflowType("ACT_BSDD");
-        } else {
+        if (
+          bsd?.temporaryStorageDetail &&
+          bsd?.status === FormStatus.TempStorerAccepted
+        ) {
           setValidationWorkflowType("ACT_BSD_SUITE");
+        } else {
+          setValidationWorkflowType("ACT_BSDD");
         }
         setBsdClicked(bsd);
         setIsModalOpen(true);
