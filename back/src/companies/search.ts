@@ -42,10 +42,19 @@ export const mergeCompanyToCompanySearchResult = (
 ): CompanySearchResult => ({
   orgId,
   // ensure compatibility with CompanyPublic
+  siret: trackdechetsCompanyInfo?.siret,
+  name: trackdechetsCompanyInfo?.name,
+  address: trackdechetsCompanyInfo?.address,
+  vatNumber: trackdechetsCompanyInfo?.vatNumber,
+  companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
+  contact: trackdechetsCompanyInfo?.contact,
+  contactEmail: trackdechetsCompanyInfo?.contactEmail,
+  contactPhone: trackdechetsCompanyInfo?.contactPhone,
+  allowBsdasriTakeOverWithoutSignature:
+    trackdechetsCompanyInfo?.allowBsdasriTakeOverWithoutSignature,
   ecoOrganismeAgreements: [],
   isRegistered: trackdechetsCompanyInfo != null,
   trackdechetsId: trackdechetsCompanyInfo?.id,
-  companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
   ...(trackdechetsCompanyInfo != null && {
     ...convertUrls(trackdechetsCompanyInfo)
   }),
