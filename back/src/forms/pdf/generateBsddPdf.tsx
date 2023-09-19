@@ -6,7 +6,8 @@ import {
   QuantityType,
   WasteAcceptationStatus,
   EmitterType,
-  Status
+  Status,
+  OperationMode
 } from "@prisma/client";
 import * as QRCode from "qrcode";
 import concatStream from "concat-stream";
@@ -29,13 +30,14 @@ import {
 import {
   expandInitialFormFromDb,
   expandFormFromDb,
-  expandTransportSegmentFromDb
+  expandTransportSegmentFromDb,
+  expandableFormIncludes
 } from "../converter";
-import { getFullForm } from "../database";
 import prisma from "../../prisma";
 import { buildAddress } from "../../companies/sirene/utils";
 import { packagingsEqual } from "../../common/constants/formHelpers";
 import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
+import { getOperationModeLabel } from "../../common/operationModes";
 
 type ReceiptFieldsProps = Partial<
   Pick<
@@ -266,12 +268,15 @@ function TransporterFormCompanyFields({
 }
 
 export async function generateBsddPdf(prismaForm: PrismaForm) {
-  const fullPrismaForm = await getFullForm(prismaForm);
+  const fullPrismaForm = await prisma.form.findUniqueOrThrow({
+    where: { id: prismaForm.id },
+    include: { ...expandableFormIncludes, intermediaries: true }
+  });
 
   const grouping = (
     await prisma.formGroupement.findMany({
       where: { nextFormId: fullPrismaForm.id },
-      include: { initialForm: true }
+      include: { initialForm: { include: expandableFormIncludes } }
     })
   ).map(g => ({ form: g.initialForm, quantity: g.quantity }));
 
@@ -728,6 +733,11 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </p>
             <p>
               Code D/R de l’opération : {form.processingOperationDone}
+              <br />
+              Mode de traitement :{" "}
+              {getOperationModeLabel(
+                form?.destinationOperationMode as OperationMode
+              )}
               <br />
               Description : {form.processingOperationDescription}
               <br />

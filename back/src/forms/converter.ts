@@ -1,12 +1,11 @@
 import {
   BsddRevisionRequest,
-  Form,
-  Form as PrismaForm,
   Prisma,
   BsddTransporter,
-  TransportMode
+  TransportMode,
+  Form,
+  IntermediaryFormAssociation
 } from "@prisma/client";
-import DataLoader from "dataloader";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import {
   chain,
@@ -61,8 +60,9 @@ import {
 } from "../generated/graphql/types";
 import prisma from "../prisma";
 import { extractPostalCode } from "../utils";
-import { getFirstTransporterSync, getTransporters } from "./database";
-import { RawForm } from "./elastic";
+import { getFirstTransporterSync } from "./database";
+import { FormForElastic } from "./elastic";
+import DataLoader from "dataloader";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput | null;
@@ -540,53 +540,44 @@ export function expandTransporterFromDb(
 /**
  * Prisma form with optional computed fields
  */
-type PrismaFormLike = Form & { forwardedIn?: PrismaFormLike | null } & {
-  transporters?: BsddTransporter[] | null;
-};
+export const expandableFormIncludes = Prisma.validator<Prisma.FormInclude>()({
+  forwardedIn: { include: { transporters: true } },
+  transporters: true
+});
+export type PrismaFormWithForwardedInAndTransporters = Prisma.FormGetPayload<{
+  include: typeof expandableFormIncludes;
+}>;
 
+type FormGroupingItem = Prisma.FormGroupementGetPayload<{
+  include: {
+    initialForm: true;
+  };
+}>;
+
+export async function getAndExpandFormFromDb(id: string) {
+  const form = await prisma.form.findUniqueOrThrow({
+    where: { id },
+    include: expandableFormIncludes
+  });
+  return expandFormFromDb(form);
+}
 /**
  * Expand form data from db. Depending on the calling context,
  * certain related fields may be already computed or not. For example when
  * this function is called on a RawForm stored in Elasticsearch.
  * An optional data loader for `forwardedIn` may also be passed
  */
-export async function expandFormFromDb(
-  form: PrismaFormLike,
-  forwardedInLoader?: DataLoader<string, Form | null, string>
-): Promise<GraphQLForm> {
-  let forwardedIn: PrismaFormLike | null;
-  // if form is rawBsd, forwardedIn is already computed
-  if (form.forwardedIn) {
-    forwardedIn = form.forwardedIn;
-  } else if (forwardedInLoader) {
-    // id form is Form, get forwardedIn from db
-    forwardedIn = await forwardedInLoader.load(form.id);
-  } else {
-    forwardedIn = await prisma.form
-      .findUnique({ where: { id: form.id } })
-      .forwardedIn({ include: { transporters: true } });
+export function expandFormFromDb(
+  form: PrismaFormWithForwardedInAndTransporters & {
+    intermediaries?: IntermediaryFormAssociation[];
+    grouping?: FormGroupingItem[];
   }
-
-  let transporters: BsddTransporter[];
-
-  if (form.transporters) {
-    // avoid retrieving transporters twice if it is already passed
-    transporters = form.transporters;
-  } else {
-    transporters = await getTransporters(form);
-  }
-
+): GraphQLForm {
+  const transporters = form.transporters ?? []; // Theoretically transporters should never be null. But for eg form.grouping.initialForm.forwardedIn it might happen
   const transporter = getFirstTransporterSync({ transporters }); // avoid retrieving transporters twice if it is already passed
 
-  let forwardedInTransporters: BsddTransporter[] = [];
-
-  if (forwardedIn) {
-    if (forwardedIn.transporters) {
-      forwardedInTransporters = forwardedIn.transporters;
-    } else {
-      forwardedInTransporters = await getTransporters(forwardedIn);
-    }
-  }
+  const forwardedIn = form.forwardedIn;
+  const forwardedInTransporters = forwardedIn?.transporters ?? [];
 
   const forwardedInTransporter = getFirstTransporterSync({
     transporters: forwardedInTransporters
@@ -619,6 +610,10 @@ export async function expandFormFromDb(
         omiNumber: form.emitterCompanyOmiNumber
       })
     }),
+    transportSegments: transporters
+      .filter(t => t.number && t.number >= 2)
+      .sort((s1, s2) => s1.number - s2.number)
+      .map(segment => expandTransportSegmentFromDb(segment)),
     transporter: transporter ? expandTransporterFromDb(transporter) : null,
     transporters: transporters.map(t => expandTransporterFromDb(t)!),
     recipient: nullIfNoValues<Recipient>({
@@ -634,7 +629,6 @@ export async function expandFormFromDb(
       }),
       isTempStorage: form.recipientIsTempStorage
     }),
-
     wasteDetails: nullIfNoValues<WasteDetails>({
       code: form.wasteDetailsCode,
       name: form.wasteDetailsName,
@@ -713,6 +707,7 @@ export async function expandFormFromDb(
     processingOperationDone: forwardedIn
       ? forwardedIn.processingOperationDone
       : form.processingOperationDone,
+    destinationOperationMode: form.destinationOperationMode,
     processingOperationDescription: forwardedIn
       ? forwardedIn.processingOperationDescription
       : form.processingOperationDescription,
@@ -754,7 +749,15 @@ export async function expandFormFromDb(
         }),
     currentTransporterSiret: form.currentTransporterOrgId,
     nextTransporterSiret: form.nextTransporterOrgId,
-    intermediaries: [],
+    // Intermediaries cannot be null in the gql model.
+    // But for the `intermediaries` subresolver to know if the value was precalculated or not in here, we cannot return an empty array
+    intermediaries: form.intermediaries ?? (undefined as any),
+    grouping: form.grouping
+      ? form.grouping.map(({ quantity, initialForm }) => ({
+          form: expandInitialFormFromDb(initialForm),
+          quantity
+        }))
+      : null,
     temporaryStorageDetail: forwardedIn
       ? {
           temporaryStorer: {
@@ -811,25 +814,35 @@ export async function expandFormFromDb(
 }
 
 export async function expandFormFromElastic(
-  form: RawForm
+  form: FormForElastic,
+  formLoader?: DataLoader<
+    string,
+    PrismaFormWithForwardedInAndTransporters | undefined,
+    string
+  >
 ): Promise<GraphQLForm | null> {
-  const expanded = await expandFormFromDb(form);
+  const formWithInclude = await (formLoader
+    ? formLoader.load(form.id)
+    : prisma.form.findUniqueOrThrow({
+        where: { id: form.id },
+        include: expandableFormIncludes
+      }));
 
-  if (!expanded) {
+  if (!formWithInclude) {
     return null;
   }
+
+  const expanded = expandFormFromDb(formWithInclude);
   return {
     ...expanded,
-    transportSegments: (form.transporters ?? []).filter(
-      t => t.number && t.number >= 2
-    )
+    transportSegments: (form.transporters ?? [])
+      .filter(t => t.number && t.number >= 2)
+      .sort((s1, s2) => s1.number - s2.number)
+      .map(segment => expandTransportSegmentFromDb(segment))
   };
 }
 
-export async function expandInitialFormFromDb(
-  prismaForm: PrismaForm,
-  dataloader?: DataLoader<string, Form | null, string>
-): Promise<InitialForm> {
+export function expandInitialFormFromDb(prismaForm: Form): InitialForm {
   const {
     id,
     readableId,
@@ -843,7 +856,7 @@ export async function expandInitialFormFromDb(
     quantityReceived,
     processingOperationDone,
     quantityGrouped
-  } = await expandFormFromDb(prismaForm, dataloader);
+  } = expandFormFromDb({ ...prismaForm, transporters: [], forwardedIn: null });
 
   const hasPickupSite =
     emitter?.workSite?.postalCode && emitter.workSite.postalCode.length > 0;

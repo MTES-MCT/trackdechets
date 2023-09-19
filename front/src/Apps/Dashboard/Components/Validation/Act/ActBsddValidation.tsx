@@ -22,15 +22,15 @@ import {
   Query,
   QueryFormArgs,
 } from "generated/graphql/types";
-import { BsdDisplay } from "Apps/common/types/bsdTypes";
 import {
   isAppendix1,
-  isSignTransportAndCanSkipEmission,
+  isSignTransportCanSkipEmission,
 } from "Apps/Dashboard/dashboardServices";
 import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
 import MarkAsProcessedModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/MarkAsProcessedModalContent";
 import SignEmissionFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignEmissionFormModalContent";
 import SignTransportFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignTransportFormModalContent";
+import { mapBsdd } from "Apps/Dashboard/bsdMapper";
 
 const MARK_TEMP_STORER_ACCEPTED = gql`
   mutation MarkAsTempStorerAccepted(
@@ -136,30 +136,30 @@ const ActBsddValidation = ({
     }
 
     if (bsd.status === FormStatus.Sealed) {
+      const bsdDisplay = mapBsdd(bsd);
       const emitterSirets = [
         bsd.emitter?.company?.siret,
         bsd.ecoOrganisme?.siret,
       ];
       const currentUserIsEmitter = emitterSirets.includes(currentSiret);
       const title = currentUserIsEmitter
-        ? `Signer en tant qu'émetteur`
-        : `Faire signer l'émetteur`;
+        ? "Signer en tant qu'émetteur"
+        : "Faire signer l'émetteur";
       if (hasEmitterSignSecondaryCta) {
-        return title;
+        return "Faire signer l'émetteur";
+      }
+
+      if (
+        isSignTransportCanSkipEmission(
+          currentSiret,
+          bsdDisplay,
+          hasAutomaticSignature
+        )
+      ) {
+        return "Signature transporteur";
       }
       if (bsd.emitter?.type === EmitterType.Appendix1Producer) {
-        if (
-          hasAutomaticSignature ||
-          isSignTransportAndCanSkipEmission(currentSiret, {
-            emitterType: bsd.emitter?.type,
-            transporter: bsd?.transporter,
-            ecoOrganisme: bsd?.ecoOrganisme,
-          } as BsdDisplay)
-        ) {
-          return "Signature transporteur";
-        } else {
-          return title;
-        }
+        return title;
       }
 
       return title;
@@ -271,7 +271,8 @@ const ActBsddValidation = ({
   };
 
   const renderContentSealed = () => {
-    if (isAppendix1({ emitterType: bsd.emitter?.type } as BsdDisplay)) {
+    const bsdDisplay = mapBsdd(bsd);
+    if (isAppendix1(bsdDisplay)) {
       return renderAddAppendix1Modal();
     }
 
@@ -279,12 +280,11 @@ const ActBsddValidation = ({
       return renderSignEmissionFormModal();
     }
     if (
-      hasAutomaticSignature ||
-      isSignTransportAndCanSkipEmission(currentSiret, {
-        emitterType: bsd.emitter?.type,
-        transporter: bsd?.transporter,
-        ecoOrganisme: bsd?.ecoOrganisme,
-      } as BsdDisplay)
+      isSignTransportCanSkipEmission(
+        currentSiret,
+        bsdDisplay,
+        hasAutomaticSignature
+      )
     ) {
       return renderSignTransportFormModal();
     } else {
@@ -338,7 +338,8 @@ const ActBsddValidation = ({
           </TdModal>
         );
       } else {
-        if (isAppendix1({ emitterType: bsd.emitter?.type } as BsdDisplay)) {
+        const bsdDisplay = mapBsdd(bsd);
+        if (isAppendix1(bsdDisplay)) {
           return renderAddAppendix1Modal();
         }
       }

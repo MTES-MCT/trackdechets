@@ -45,6 +45,7 @@ describe("edition", () => {
     const operation: Required<BsffPackagingOperationInput> = {
       date: new Date(),
       code: "D13",
+      mode: null,
       description: "",
       nextDestination,
       noTraceability: false

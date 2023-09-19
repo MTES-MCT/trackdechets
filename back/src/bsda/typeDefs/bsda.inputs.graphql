@@ -246,6 +246,8 @@ input BsdaReceptionInput {
 input BsdaOperationInput {
   "Code D/R"
   code: String
+  "Qualification du traitement final"
+  mode: OperationMode
   "Description de l'opération"
   description: String
   "Date de réalisation de l'opération"

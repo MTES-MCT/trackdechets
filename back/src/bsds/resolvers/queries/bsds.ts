@@ -26,11 +26,12 @@ import { bsdSearchSchema } from "../../validation";
 import { toElasticQuery } from "../../where";
 import { Permission, can, getUserRoles } from "../../../permissions";
 import { distinct } from "../../../common/arrays";
-import { RawForm } from "../../../forms/elastic";
-import { RawBsdasri } from "../../../bsdasris/elastic";
-import { RawBsvhu } from "../../../bsvhu/elastic";
-import { RawBsda } from "../../../bsda/elastic";
-import { RawBsff } from "../../../bsffs/elastic";
+import { FormForElastic } from "../../../forms/elastic";
+import { BsdasriForElastic } from "../../../bsdasris/elastic";
+import { BsvhuForElastic } from "../../../bsvhu/elastic";
+import { BsdaForElastic } from "../../../bsda/elastic";
+import { BsffForElastic } from "../../../bsffs/elastic";
+import { QueryContainer } from "@elastic/elasticsearch/api/types";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -50,11 +51,11 @@ export interface GetResponse<T> {
 }
 
 type PrismaBsdMap = {
-  bsdds: RawForm[];
-  bsdasris: RawBsdasri[];
-  bsvhus: RawBsvhu[];
-  bsdas: RawBsda[];
-  bsffs: RawBsff[];
+  bsdds: FormForElastic[];
+  bsdasris: BsdasriForElastic[];
+  bsvhus: BsvhuForElastic[];
+  bsdas: BsdaForElastic[];
+  bsffs: BsffForElastic[];
 };
 
 /**
@@ -64,11 +65,13 @@ async function toRawBsds(bsdsElastic: BsdElastic[]): Promise<PrismaBsdMap> {
   const { BSDD, BSDA, BSDASRI, BSFF, BSVHU } = groupByBsdType(bsdsElastic);
 
   return {
-    bsdds: BSDD.map(bsdElastic => bsdElastic.rawBsd as RawForm),
-    bsdasris: BSDASRI.map(bsdsElastic => bsdsElastic.rawBsd as RawBsdasri),
-    bsvhus: BSVHU.map(bsdElastic => bsdElastic.rawBsd as RawBsvhu),
-    bsdas: BSDA.map(bsdElastic => bsdElastic.rawBsd as RawBsda),
-    bsffs: BSFF.map(bsdsElastic => bsdsElastic.rawBsd as RawBsff)
+    bsdds: BSDD.map(bsdElastic => bsdElastic.rawBsd as FormForElastic),
+    bsdasris: BSDASRI.map(
+      bsdsElastic => bsdsElastic.rawBsd as BsdasriForElastic
+    ),
+    bsvhus: BSVHU.map(bsdElastic => bsdElastic.rawBsd as BsvhuForElastic),
+    bsdas: BSDA.map(bsdElastic => bsdElastic.rawBsd as BsdaForElastic),
+    bsffs: BSFF.map(bsdsElastic => bsdsElastic.rawBsd as BsffForElastic)
   };
 }
 
@@ -87,24 +90,45 @@ async function buildQuery(
     }
   };
 
+  const tabsQuery: Array<QueryContainer> = [];
+
   Object.entries({
     isDraftFor: where?.isDraftFor,
     isForActionFor: where?.isForActionFor,
     isFollowFor: where?.isFollowFor,
     isArchivedFor: where?.isArchivedFor,
     isToCollectFor: where?.isToCollectFor,
-    isCollectedFor: where?.isCollectedFor
+    isCollectedFor: where?.isCollectedFor,
+    isInRevisionFor: where?.isInRevisionFor,
+    isRevisedFor: where?.isRevisedFor
   })
     .filter(([_, value]) => value != null)
     .forEach(([key, value]) => {
       if (Array.isArray(query.bool.filter)) {
-        query.bool.filter.push({
+        tabsQuery.push({
           terms: {
             [key]: value!
           }
         });
       }
     });
+
+  // Permet de filtrer sur un ensemble de catégories en même temps
+  // pour l'affichage des catégories parentes dans la v2 du dashboard
+  // On veut par exemple pouvoir afficher une catégorie "Transport" qui
+  // regroupe les bordereaux "En attente de collecte" et les bordereaux
+  // "Collecté".
+
+  // query { bsds(
+  //  where: {
+  //    isToCollectFor: [<SIRET>],
+  //    isCollectedFor: [<SIRET>]}
+  // )
+  // { id } }
+
+  if (tabsQuery.length > 0) {
+    query.bool.filter.push({ bool: { should: tabsQuery } });
+  }
 
   if (clue) {
     (query.bool.must as estypes.QueryContainer[]).push({
@@ -322,9 +346,13 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   } = await toRawBsds(hits.map(hit => hit._source));
 
   const bsds: Record<BsdType, Bsd[]> = {
-    BSDD: (await Promise.all(concreteBsdds.map(expandFormFromElastic))).filter(
-      Boolean
-    ),
+    BSDD: (
+      await Promise.all(
+        concreteBsdds.map(bsdd =>
+          expandFormFromElastic(bsdd, context.dataloaders.forms)
+        )
+      )
+    ).filter(Boolean),
     BSDASRI: await buildDasris(concreteBsdasris),
     BSVHU: concreteBsvhus.map(expandVhuFormFromDb),
     BSDA: concreteBsdas.map(expandBsdaFromElastic),

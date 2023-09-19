@@ -78,6 +78,7 @@ describe("edition", () => {
 
     const operation: Required<BsdaOperationInput> = {
       code: "",
+      mode: null,
       description: "",
       date: new Date(),
       nextDestination

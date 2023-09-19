@@ -180,7 +180,9 @@ const isSameSiretDestination = (
 export const isSameSiretTransporter = (
   currentSiret: string,
   bsd: BsdDisplay | Form
-): boolean => currentSiret === bsd.transporter?.company?.siret;
+): boolean =>
+  currentSiret === bsd.transporter?.company?.siret ||
+  currentSiret === bsd.transporter?.company?.orgId;
 
 export const isSynthesis = (bsdWorkflowType: string | undefined): boolean =>
   bsdWorkflowType === BsdasriType.Synthesis;
@@ -361,23 +363,36 @@ export const isAppendix1 = (bsd: BsdDisplay): boolean =>
 const isAppendix1Producer = (bsd: BsdDisplay): boolean =>
   bsd.emitterType === EmitterType.Appendix1Producer;
 
-export const canSkipEmission = (bsd: BsdDisplay): boolean =>
-  Boolean(bsd.ecoOrganisme?.siret) || Boolean(bsd.emitter?.isPrivateIndividual);
+export const canSkipEmission = (
+  bsd: BsdDisplay,
+  hasAutomaticSignature: boolean | undefined
+): boolean =>
+  (Boolean(bsd.ecoOrganisme?.siret) ||
+    hasAutomaticSignature ||
+    Boolean(bsd.emitter?.isPrivateIndividual)) &&
+  isAppendix1Producer(bsd);
 
-export const isSignTransportAndCanSkipEmission = (
+export const isSignTransportCanSkipEmission = (
   currentSiret: string,
-  bsd: BsdDisplay
-) => {
-  return canSkipEmission(bsd) && isSameSiretTransporter(currentSiret, bsd);
-};
-
-const isSignEmitterPrivateIndividual = (
-  currentSiret: string,
-  bsd: BsdDisplay
+  bsd: BsdDisplay,
+  hasAutomaticSignature: boolean | undefined
 ) => {
   return (
-    hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret) &&
-    !bsd?.emitter?.isPrivateIndividual
+    canSkipEmission(bsd, hasAutomaticSignature) &&
+    isSameSiretTransporter(currentSiret, bsd)
+  );
+};
+
+export const isSignEmission = (
+  currentSiret: string,
+  bsd: BsdDisplay,
+  hasAutomaticSignature: boolean | undefined
+) => {
+  return (
+    isAppendix1Producer(bsd) &&
+    (hasAutomaticSignature ||
+      (hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret) &&
+        !bsd.emitter?.isPrivateIndividual))
   );
 };
 
@@ -395,17 +410,21 @@ export const getSealedBtnLabel = (
       return AJOUTER_ANNEXE_1;
     }
 
-    if (isAppendix1Producer(bsd)) {
-      if (
-        hasAutomaticSignature ||
-        isSignTransportAndCanSkipEmission(currentSiret, bsd)
-      ) {
+    if (
+      isSignTransportCanSkipEmission(currentSiret, bsd, hasAutomaticSignature)
+    ) {
+      return SIGNER;
+    }
+    if (isSignEmission(currentSiret, bsd, hasAutomaticSignature)) {
+      const emitterSirets = [
+        bsd.emitter?.company?.siret,
+        bsd.ecoOrganisme?.siret,
+      ];
+      const currentUserIsEmitter = emitterSirets.includes(currentSiret);
+      if (currentUserIsEmitter) {
         return SIGNER;
-      } else {
-        if (isSignEmitterPrivateIndividual(currentSiret, bsd)) {
-          return SIGNER;
-        }
       }
+      return FAIRE_SIGNER;
     }
     if (hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
       return SIGNER;
@@ -573,7 +592,10 @@ export const getSignByProducerBtnLabel = (
     }
   }
 
-  if (currentSiret === bsd.worker?.company?.siret) {
+  if (
+    currentSiret === bsd.worker?.company?.siret ||
+    currentSiret === bsd.transporter?.company?.orgId
+  ) {
     return SIGNER;
   }
   return "";
@@ -925,7 +947,11 @@ export const hasBsdSuite = (bsd: BsdDisplay, currentSiret): boolean => {
 const canUpdateOrDeleteBsdd = bsd =>
   bsd.type === BsdType.Bsdd &&
   bsd.emitterType !== EmitterType.Appendix1Producer &&
-  [BsdStatusCode.Draft, BsdStatusCode.Sealed].includes(bsd.status);
+  [
+    BsdStatusCode.Draft,
+    BsdStatusCode.Sealed,
+    BsdStatusCode.SignedByProducer,
+  ].includes(bsd.status);
 
 const canDeleteBsda = (bsd, siret) =>
   bsd.type === BsdType.Bsda &&

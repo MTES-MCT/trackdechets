@@ -407,6 +407,23 @@ describe("Mutation.signBsdasri emission", () => {
         }
       }
     );
+
+    test("when operation mode is not compatible with operation code", async () => {
+      const data = {
+        ...bsdasri,
+        destinationOperationCode: "R1",
+        destinationOperationMode: "RECYCLAGE"
+      };
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data as any, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors.length).toBeTruthy();
+      }
+    });
   });
 
   describe("Emitter transports own waste", () => {

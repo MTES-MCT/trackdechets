@@ -12,6 +12,7 @@ const DropdownMenu = ({
   links,
   isDisabled,
   iconAlone,
+  primary,
 }: DropdownMenuProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { targetRef } = useOnClickOutsideRefTarget({
@@ -30,13 +31,18 @@ const DropdownMenu = ({
     <FocusTrap active={isOpen}>
       <div
         ref={targetRef as React.RefObject<HTMLDivElement>}
-        className="dropdown-menu"
+        className={classNames("dropdown-menu", {
+          "dropdown-menu--primary": primary,
+        })}
       >
         <button
-          className={classNames("menu-btn fr-btn fr-btn--secondary", {
-            isOpen: isOpen,
-            "menu-btn__iconAlone": iconAlone,
-          })}
+          className={classNames(
+            `menu-btn fr-btn fr-btn--${primary ? "primary" : "secondary"}`,
+            {
+              isOpen: isOpen,
+              "menu-btn__iconAlone": iconAlone,
+            }
+          )}
           disabled={isDisabled}
           onClick={toggleMenu}
         >

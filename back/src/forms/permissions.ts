@@ -2,6 +2,7 @@ import {
   BsddTransporter,
   EmitterType,
   Form,
+  Prisma,
   Status,
   User
 } from "@prisma/client";
@@ -22,7 +23,6 @@ import {
   getFirstTransporterSync,
   getFullForm
 } from "./database";
-import { getReadOnlyFormRepository } from "./repository";
 import { checkSecurityCode } from "../common/permissions";
 import { FullForm } from "./types";
 import { ForbiddenError } from "../common/errors";
@@ -153,7 +153,7 @@ function formCreators(input: CreateFormInput): string[] {
 /**
  * Retrieves organisation allowed to read a BSDD
  */
-function formReaders(form: FullForm & { grouping: Form[] }): string[] {
+function formReaders(form: FormForReadCheck): string[] {
   if (form.status === Status.DRAFT) {
     return formContributors(form);
   }
@@ -163,19 +163,27 @@ function formReaders(form: FullForm & { grouping: Form[] }): string[] {
     ...(form.transporters
       ? form.transporters.map(s => s.transporterCompanySiret)
       : []),
-    ...(form.grouping ? form.grouping.map(f => f.emitterCompanySiret) : [])
+    ...(form.grouping
+      ? form.grouping.map(f => f.initialForm.emitterCompanySiret)
+      : [])
   ].filter(Boolean);
 }
 
-export function isFormReader(user: User, form: Form) {
+type FormForReadCheck = Prisma.FormGetPayload<{
+  include: {
+    forwardedIn: { include: { transporters: true } };
+    transporters: true;
+    grouping: { include: { initialForm: true } };
+    intermediaries: true;
+  };
+}>;
+
+export function isFormReader(user: User, form: FormForReadCheck) {
   return checkCanRead(user, form).catch(_ => false);
 }
 
-export async function checkCanRead(user: User, form: Form) {
-  const fullForm = await getFullForm(form);
-  const { findGroupedFormsById } = getReadOnlyFormRepository();
-  const grouping = await findGroupedFormsById(form.id);
-  const authorizedOrgIds = formReaders({ ...fullForm, grouping });
+export async function checkCanRead(user: User, form: FormForReadCheck) {
+  const authorizedOrgIds = formReaders(form);
 
   return checkUserPermissions(
     user,

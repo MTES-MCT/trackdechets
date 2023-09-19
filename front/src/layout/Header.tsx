@@ -125,7 +125,7 @@ const getMenuEntries = (
   ];
   const dashboardV2 = [
     {
-      caption: "Dashboard v2",
+      caption: "Mes bordereaux 🆕",
       href: currentSiret
         ? generatePath(routes.dashboardv2.index, {
             siret: currentSiret,
@@ -216,11 +216,14 @@ export default withRouter(function Header({
   location,
   history,
 }: RouteComponentProps & HeaderProps) {
-  const { VITE_API_ENDPOINT } = import.meta.env;
+  const { VITE_API_ENDPOINT, VITE_SENTRY_ENVIRONMENT } = import.meta.env;
 
   const { featureFlags } = useFeatureFlags();
 
-  const canAccessDashboardV2 = isAdmin || featureFlags.dashboardV2;
+  const canAccessDashboardV2 =
+    isAdmin ||
+    VITE_SENTRY_ENVIRONMENT === "sandbox" ||
+    featureFlags.dashboardV2;
 
   const [menuHidden, toggleMenu] = useState(true);
 

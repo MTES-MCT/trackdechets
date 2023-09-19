@@ -141,7 +141,7 @@ export type BsdWithReview = Bsd & {
   };
 };
 export type FormWithReview = Form & {
-  review: {
+  review?: {
     approvals: FormRevisionRequestApproval[] & BsdaRevisionRequestApproval[];
     authoringCompany: FormCompany;
     status: TBsdStatusCode;

@@ -24,9 +24,6 @@ export default function (graphQLPath: string) {
       requestMetadata.graphql_operation_name = req.body?.operationName;
       requestMetadata.graphql_variables = req.body?.variables;
       requestMetadata.graphql_query = req.body?.query;
-
-      requestMetadata.graphql_operation = req.gqlInfos?.[0]?.operation;
-      requestMetadata.graphql_selection_name = req.gqlInfos?.[0]?.name;
     }
 
     logger.info(message, requestMetadata);
@@ -41,7 +38,7 @@ export default function (graphQLPath: string) {
 
     const start = new Date();
 
-    res.on("finish", () => {
+    const onFinish = () => {
       const end = new Date();
 
       const metadataWithReponse = {
@@ -51,11 +48,15 @@ export default function (graphQLPath: string) {
         http_status: res.statusCode,
         request_timing: "end",
         execution_time_num: end.getTime() - start.getTime(), // in millis
-        response_body: Buffer.isBuffer(responseBody) ? null : responseBody
+        response_body: Buffer.isBuffer(responseBody) ? null : responseBody,
+        graphql_operation: req.gqlInfos?.[0]?.operation,
+        graphql_selection_name: req.gqlInfos?.[0]?.name
       };
 
       logger.info(message, metadataWithReponse);
-    });
+      res.removeListener("finish", onFinish);
+    };
+    res.on("finish", onFinish);
 
     next();
   };

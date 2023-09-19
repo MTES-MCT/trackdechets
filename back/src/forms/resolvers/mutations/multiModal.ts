@@ -22,27 +22,12 @@ import {
 import { checkUserPermissions, Permission } from "../../../permissions";
 import {
   PartialTransporterCompany,
-  getTransporterCompanyOrgId,
-  isForeignVat
+  getTransporterCompanyOrgId
 } from "../../../common/constants/companySearchHelpers";
-import {
-  MISSING_COMPANY_ADDRESS,
-  MISSING_COMPANY_CONTACT,
-  MISSING_COMPANY_EMAIL,
-  MISSING_COMPANY_PHONE,
-  MISSING_COMPANY_SIRET_OR_VAT
-} from "../../errors";
-import {
-  REQUIRED_RECEIPT_DEPARTMENT,
-  REQUIRED_RECEIPT_NUMBER,
-  foreignVatNumber,
-  siret,
-  siretConditions,
-  siretTests,
-  vatNumberTests
-} from "../../../common/validation";
+import { MISSING_COMPANY_SIRET_OR_VAT } from "../../errors";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getTransporters } from "../../database";
+import { transporterSchemaFn } from "../../validation";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
@@ -52,52 +37,6 @@ const FORM_MUST_BE_DRAFT = "Le bordereau doit être en brouillon";
 const SEGMENT_ALREADY_SEALED = "Ce segment de transport est déjà scellé";
 const SEGMENTS_ALREADY_PREPARED =
   "Il y a d'autres segments après le vôtre, vous ne pouvez pas ajouter de segment";
-
-const segmentSchema = yup.object<any>().shape({
-  transporterTransportMode: yup.string().label("Mode de transport").required(),
-  transporterCompanySiret: siret
-    .label("Transporteur")
-    .test(siretTests.isRegistered("TRANSPORTER"))
-    .when(
-      "transporterCompanyVatNumber",
-      // set siret not required when vatNumber is defined and valid
-      siretConditions.companyVatNumber
-    ),
-  transporterCompanyVatNumber: foreignVatNumber
-    .label("Transporteur")
-    .test(vatNumberTests.isRegisteredTransporter),
-  transporterCompanyAddress: yup
-    .string()
-    .required(`Transporteur: ${MISSING_COMPANY_ADDRESS}`),
-  transporterCompanyContact: yup
-    .string()
-    .required(`Transporteur: ${MISSING_COMPANY_CONTACT}`),
-  transporterCompanyPhone: yup
-    .string()
-    .required(`Transporteur: ${MISSING_COMPANY_PHONE}`),
-  transporterCompanyMail: yup
-    .string()
-    .email("Le format d'adresse email est incorrect")
-    .required(`Transporteur: ${MISSING_COMPANY_EMAIL}`),
-  transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
-  transporterReceipt: yup
-    .string()
-    .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
-      is: (isExempted, vat) => isForeignVat(vat) || isExempted,
-      then: schema => schema.notRequired().nullable(),
-      otherwise: schema => schema.required(REQUIRED_RECEIPT_NUMBER)
-    }),
-  transporterDepartment: yup
-    .string()
-    .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
-      is: (isExempted, vat) => isForeignVat(vat) || isExempted,
-      then: schema => schema.notRequired().nullable(),
-      otherwise: schema => schema.required(REQUIRED_RECEIPT_DEPARTMENT)
-    }),
-
-  transporterValidityLimit: yup.date().nullable(),
-  transporterNumberPlate: yup.string().nullable(true)
-});
 
 const takeOverInfoSchema = yup.object<any>().shape({
   takenOverAt: yup.date().required(),
@@ -231,27 +170,20 @@ export async function markSegmentAsReadyToTakeOver(
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
-  const currentSegment = await prisma.bsddTransporter.findUnique({
+  const nextTransporter = await prisma.bsddTransporter.findUnique({
     where: { id },
     include: {
-      form: {
-        select: {
-          id: true
-        }
-      }
+      form: true
     }
   });
 
-  if (!currentSegment) {
+  if (!nextTransporter) {
     throw new ForbiddenError(SEGMENT_NOT_FOUND);
   }
+  const form = nextTransporter.form!;
 
-  const formUpdateInput = await recipifyTransporterInDb(currentSegment);
+  const formUpdateInput = await recipifyTransporterInDb(nextTransporter);
   const formRepository = getFormRepository(user);
-  const form = await formRepository.findUnique(
-    { id: currentSegment.form?.id },
-    formWithOwnerIdAndTransportSegments
-  );
 
   if (form.status !== "SENT") {
     throw new ForbiddenError(FORM_MUST_BE_SENT);
@@ -265,24 +197,26 @@ export async function markSegmentAsReadyToTakeOver(
     FORM_NOT_FOUND_OR_NOT_ALLOWED
   );
 
-  if (currentSegment.readyToTakeOver) {
+  if (nextTransporter.readyToTakeOver) {
     throw new ForbiddenError(SEGMENT_ALREADY_SEALED);
   }
 
-  const segmentErrors: string[] = await segmentSchema
-    .validate(currentSegment, { abortEarly: false })
-    .catch(err => err.errors);
+  const transporterSchema = transporterSchemaFn({
+    signingTransporterOrgId: null
+  });
 
-  if (!!segmentErrors.length) {
+  try {
+    await transporterSchema.validate(nextTransporter, { abortEarly: false });
+  } catch (err) {
     throw new UserInputError(
-      `Erreur, impossible de finaliser la préparation du transfert multi-modal car des champs sont manquants ou mal renseignés. \nErreur(s): ${segmentErrors.join(
+      `Erreur, impossible de finaliser la préparation du transfert multi-modal car des champs sont manquants ou mal renseignés. \nErreur(s): ${err.errors.join(
         "\n"
       )}`
     );
   }
 
   await formRepository.update(
-    { id: currentSegment.form?.id },
+    { id: nextTransporter.form?.id },
     {
       transporters: {
         update: {
@@ -301,7 +235,7 @@ export async function markSegmentAsReadyToTakeOver(
   );
 
   return expandTransportSegmentFromDb({
-    ...currentSegment,
+    ...nextTransporter,
     readyToTakeOver: true
   });
 }
@@ -325,26 +259,18 @@ export async function takeOverSegment(
     );
   }
 
-  const currentSegment = await prisma.bsddTransporter.findUnique({
+  const signingTransporter = await prisma.bsddTransporter.findUnique({
     where: { id },
     include: {
-      form: {
-        select: {
-          id: true
-        }
-      }
+      form: { include: { transporters: true } }
     }
   });
 
-  if (!currentSegment) {
+  if (!signingTransporter) {
     throw new ForbiddenError(SEGMENT_NOT_FOUND);
   }
+  const form = signingTransporter.form!;
 
-  const formRepository = getFormRepository(user);
-  const form = await formRepository.findUnique(
-    { id: currentSegment.form?.id },
-    formWithOwnerIdAndTransportSegments
-  );
   if (form.status !== "SENT") {
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
@@ -353,7 +279,10 @@ export async function takeOverSegment(
   const nexTransporterIsFilled = !!form.nextTransporterOrgId;
 
   const authorizedOrgIds = nexTransporterIsFilled
-    ? [form.nextTransporterOrgId, getTransporterCompanyOrgId(currentSegment)]
+    ? [
+        form.nextTransporterOrgId,
+        getTransporterCompanyOrgId(signingTransporter)
+      ]
     : [];
 
   await checkUserPermissions(
@@ -363,23 +292,39 @@ export async function takeOverSegment(
     FORM_NOT_FOUND_OR_NOT_ALLOWED
   );
 
-  const segmentErrors: string[] = await segmentSchema
-    .validate(currentSegment, { abortEarly: false })
-    .catch(err => err.errors);
+  const signingTransporterOrgId =
+    getTransporterCompanyOrgId(signingTransporter)!;
 
-  if (!!segmentErrors.length) {
+  // Prend en compte la plaque d'immatriculation envoyée dans l'input de signature
+  // pour la validation des données
+  const transportersForValidation = { ...signingTransporter };
+  if (takeOverInfo.numberPlate !== undefined) {
+    transportersForValidation.transporterNumberPlate = takeOverInfo.numberPlate;
+  }
+
+  const transporterSchema = transporterSchemaFn({
+    signingTransporterOrgId
+  });
+
+  try {
+    await transporterSchema.validate(transportersForValidation, {
+      abortEarly: false
+    });
+  } catch (err) {
     throw new UserInputError(
-      `Erreur, impossible de prendre en charge le bordereau car ces champs ne sont pas renseignés, veuillez editer le segment pour le prendre en charge.\nErreur(s): ${segmentErrors.join(
+      `Erreur, impossible de prendre en charge le bordereau car ces champs ne sont pas renseignés, veuillez editer le segment pour le prendre en charge.\nErreur(s): ${err.errors.join(
         "\n"
       )}`
     );
   }
-  const formUpdateInput = await recipifyTransporterInDb(currentSegment);
 
+  const formUpdateInput = await recipifyTransporterInDb(signingTransporter);
+
+  const formRepository = getFormRepository(user);
   await formRepository.update(
-    { id: currentSegment.form?.id },
+    { id: signingTransporter.form?.id },
     {
-      currentTransporterOrgId: getTransporterCompanyOrgId(currentSegment),
+      currentTransporterOrgId: getTransporterCompanyOrgId(signingTransporter),
       nextTransporterOrgId: "",
       transporters: {
         update: {
@@ -388,7 +333,11 @@ export async function takeOverSegment(
             ? {
                 data: {
                   ...formUpdateInput.transporters?.update?.data,
-                  ...takeOverInfo
+                  takenOverAt: takeOverInfo.takenOverAt,
+                  takenOverBy: takeOverInfo.takenOverBy,
+                  ...(takeOverInfo.numberPlate !== undefined
+                    ? { transporterNumberPlate: takeOverInfo.numberPlate }
+                    : {})
                 }
               }
             : { data: takeOverInfo })
@@ -398,7 +347,10 @@ export async function takeOverSegment(
     { takeOverSegment: true }
   );
 
-  return expandTransportSegmentFromDb({ ...currentSegment, ...takeOverInfo });
+  return expandTransportSegmentFromDb({
+    ...signingTransporter,
+    ...takeOverInfo
+  });
 }
 
 /**

@@ -1,7 +1,7 @@
 import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
-import { expandFormFromDb } from "../../converter";
+import { expandableFormIncludes, expandFormFromDb } from "../../converter";
 import { Decimal } from "decimal.js-light";
 import { checkCanList } from "../../permissions";
 
@@ -16,48 +16,42 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
 
   const queriedForms = await prisma.form.findMany({
     where: {
-      AND: [
-        ...(wasteCode ? [{ wasteDetailsCode: wasteCode }] : []),
-        { status: "AWAITING_GROUP" },
+      ...(wasteCode && { wasteDetailsCode: wasteCode }),
+      status: "AWAITING_GROUP",
+      OR: [
+        { recipientCompanySiret: siret, forwardedIn: null },
         {
-          OR: [
-            { recipientCompanySiret: siret, forwardedIn: null },
-            {
-              recipientIsTempStorage: true,
-              forwardedIn: { recipientCompanySiret: siret }
-            }
-          ]
-        },
-        { isDeleted: false },
-        { forwarding: null }
-      ]
+          recipientIsTempStorage: true,
+          forwardedIn: { recipientCompanySiret: siret }
+        }
+      ],
+      isDeleted: false,
+      readableId: { not: { endsWith: "-suite" } }
     },
     include: {
-      forwardedIn: true,
+      ...expandableFormIncludes,
       groupedIn: true
     }
   });
 
-  return Promise.all(
-    queriedForms
-      .filter(f => {
-        const quantityGrouped = f.groupedIn.reduce(
-          (sum, grp) => sum.add(grp.quantity),
-          new Decimal(0)
-        );
+  return queriedForms
+    .filter(f => {
+      const quantityGrouped = f.groupedIn.reduce(
+        (sum, grp) => sum.add(grp.quantity),
+        new Decimal(0)
+      );
 
-        const quantityReceived = f.forwardedIn
-          ? f.forwardedIn.quantityReceived
-          : f.quantityReceived;
+      const quantityReceived = f.forwardedIn
+        ? f.forwardedIn.quantityReceived
+        : f.quantityReceived;
 
-        return (
-          quantityReceived &&
-          quantityReceived > 0 &&
-          new Decimal(quantityReceived).greaterThan(quantityGrouped)
-        );
-      })
-      .map(f => expandFormFromDb(f))
-  );
+      return (
+        quantityReceived &&
+        quantityReceived > 0 &&
+        new Decimal(quantityReceived).greaterThan(quantityGrouped)
+      );
+    })
+    .map(f => expandFormFromDb(f));
 };
 
 export default appendixFormsResolver;

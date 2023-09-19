@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { isBsddTransporterFieldEditable } from "../../../common/constants/formHelpers";
 import { getFormOrFormNotFound } from "../../database";
 import { checkCanUpdateTransporterFields } from "../../permissions";
-import { expandFormFromDb } from "../../converter";
+import { getAndExpandFormFromDb } from "../../converter";
 import { getFormRepository } from "../../repository";
 import { ForbiddenError } from "../../../common/errors";
 
@@ -37,7 +37,7 @@ const updateTransporterFieldsResolver: MutationResolvers["updateTransporterField
       }
     );
 
-    return expandFormFromDb(updatedForm);
+    return getAndExpandFormFromDb(updatedForm.id);
   };
 
 export default updateTransporterFieldsResolver;

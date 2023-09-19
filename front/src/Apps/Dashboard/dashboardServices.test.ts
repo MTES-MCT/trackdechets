@@ -24,7 +24,7 @@ import {
   isBsvhuSign,
   isEcoOrgSign,
   isEmetteurSign,
-  isSignTransportAndCanSkipEmission,
+  isSignTransportCanSkipEmission,
   getOperationCodesFromSearchString,
 } from "./dashboardServices";
 import {
@@ -220,7 +220,7 @@ describe("dashboardServices", () => {
     } as BsdDisplay;
 
     it("should return true if bsd.ecoOrganisme.siret is set", () => {
-      const result = canSkipEmission(bsd);
+      const result = canSkipEmission(bsd, true);
       expect(result).toBe(true);
     });
 
@@ -229,14 +229,8 @@ describe("dashboardServices", () => {
         ...bsd,
         emitter: { isPrivateIndividual: true },
       };
-      const result = canSkipEmission(bsdPrivateIndividual);
+      const result = canSkipEmission(bsdPrivateIndividual, false);
       expect(result).toBe(true);
-    });
-
-    it("should return false if bsd.ecoOrganisme.siret is not set", () => {
-      bsd.ecoOrganisme = undefined;
-      const result = canSkipEmission(bsd);
-      expect(result).toBe(false);
     });
   });
 
@@ -1102,7 +1096,7 @@ describe("dashboardServices", () => {
         UserPermission.BsdCanSignTransport,
       ];
       const result = getSignByProducerBtnLabel(
-        "currentSiret",
+        "currentSirett",
         {
           ...bsd,
           type: BsdType.Bsdasri,
@@ -1322,34 +1316,44 @@ describe("dashboardServices", () => {
     });
   });
 
-  describe("isSignTransportAndCanSkipEmission", () => {
+  describe("isSignTransportCanSkipEmission", () => {
     const currentSiret = "123456789";
     const bsd = {
       emitterType: "APPENDIX1_PRODUCER",
+      emitter: { isPrivateIndividual: false },
       transporter: { company: { siret: "123456789" } },
       ecoOrganisme: { siret: "1" },
     } as BsdDisplay;
 
     it("returns true if can Skip Emission and is Same Siret Transporter", () => {
-      const result = isSignTransportAndCanSkipEmission(currentSiret, bsd);
+      const result = isSignTransportCanSkipEmission(currentSiret, bsd, true);
 
       expect(result).toBe(true);
     });
 
     it("returns false if cannot Skip Emission", () => {
-      const result = isSignTransportAndCanSkipEmission(currentSiret, {
-        ...bsd,
-        ecoOrganisme: null,
-      });
+      const result = isSignTransportCanSkipEmission(
+        currentSiret,
+        {
+          ...bsd,
+          ecoOrganisme: null,
+          emitter: { isPrivateIndividual: false },
+        },
+        false
+      );
 
       expect(result).toBe(false);
     });
 
     it("returns false if not is Same Siret Transporter", () => {
-      const result = isSignTransportAndCanSkipEmission(currentSiret, {
-        ...bsd,
-        transporter: { company: { siret: "2" } },
-      });
+      const result = isSignTransportCanSkipEmission(
+        currentSiret,
+        {
+          ...bsd,
+          transporter: { company: { siret: "2" } },
+        },
+        false
+      );
 
       expect(result).toBe(false);
     });

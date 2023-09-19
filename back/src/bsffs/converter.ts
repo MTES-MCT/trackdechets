@@ -9,7 +9,7 @@ import {
 import * as GraphQL from "../generated/graphql/types";
 import { BsffPackaging, BsffPackagingType } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
-import { RawBsff } from "./elastic";
+import { BsffForElastic } from "./elastic";
 
 function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter | null }) {
   return {
@@ -281,6 +281,7 @@ export function flattenBsffPackagingInput(
       false
     ),
     operationCode: chain(input.operation, o => o.code),
+    operationMode: chain(input.operation, o => o.mode),
     operationDescription: chain(input.operation, o => o.description),
     operationNextDestinationPlannedOperationCode: chain(input.operation, o =>
       chain(o.nextDestination, nd => nd.plannedOperationCode)
@@ -341,6 +342,7 @@ export function expandBsffPackagingFromDB(
     }),
     operation: nullIfNoValues<GraphQL.BsffPackagingOperation>({
       code: prismaBsffPackaging.operationCode as GraphQL.BsffOperationCode,
+      mode: prismaBsffPackaging.operationMode as GraphQL.OperationMode,
       date: prismaBsffPackaging.operationDate,
       description: prismaBsffPackaging.operationDescription,
       noTraceability: prismaBsffPackaging.operationNoTraceability,
@@ -371,7 +373,7 @@ export function expandBsffPackagingFromDB(
   };
 }
 
-export function expandBsffFromElastic(bsff: RawBsff): GraphQL.Bsff {
+export function expandBsffFromElastic(bsff: BsffForElastic): GraphQL.Bsff {
   const expanded = expandBsffFromDB(bsff);
 
   // pass down related field to sub-resolvers

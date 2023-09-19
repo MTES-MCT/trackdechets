@@ -8,7 +8,7 @@ import {
 import { GraphQLContext } from "../../../types";
 import { MissingTempStorageFlag } from "../../errors";
 import {
-  expandFormFromDb,
+  getAndExpandFormFromDb,
   flattenFormInput,
   flattenTemporaryStorageDetailInput,
   flattenTransporterInput
@@ -243,7 +243,7 @@ const createFormResolver = async (
     return newForm;
   });
 
-  return expandFormFromDb(newForm);
+  return getAndExpandFormFromDb(newForm.id);
 };
 
 export default createFormResolver;

@@ -10,6 +10,10 @@ const transportSegmentResolver: FormResolvers["transportSegments"] = async (
   _,
   ctx
 ) => {
+  if (form.transportSegments) {
+    return form.transportSegments;
+  }
+
   let segments: BsddTransporter[] = [];
 
   // use ES indexed field when requested from dashboard

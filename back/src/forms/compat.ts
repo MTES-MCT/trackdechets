@@ -144,6 +144,7 @@ export function simpleFormToBsdd(
     destinationReceptionSignatureDate: form.receivedAt,
     destinationPlannedOperationCode: form.recipientProcessingOperation,
     destinationOperationCode: form.processingOperationDone,
+    destinationOperationMode: form.destinationOperationMode,
     destinationOperationSignatureAuthor: form.processedBy,
     destinationOperationDate: form.processedAt,
     destinationOperationSignatureDate: form.processedAt,

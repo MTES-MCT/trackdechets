@@ -6,7 +6,7 @@ import {
 } from "../../../generated/graphql/types";
 import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import {
-  expandFormFromDb,
+  getAndExpandFormFromDb,
   flattenImportPaperFormInput,
   flattenTransporterInput
 } from "../../converter";
@@ -57,7 +57,11 @@ async function updateForm(
     ...flattenedFormInput,
     ...existingTransporter,
     ...flattenedTransporter,
-    isAccepted: flattenedFormInput.wasteAcceptationStatus === "ACCEPTED"
+    isAccepted: flattenedFormInput.wasteAcceptationStatus === "ACCEPTED",
+    destinationOperationMode:
+      flattenedFormInput?.destinationOperationMode ??
+      form?.destinationOperationMode ??
+      undefined
   };
 
   await processedFormSchema.validate(validationData, { abortEarly: false });
@@ -197,7 +201,7 @@ const importPaperFormResolver: MutationResolvers["importPaperForm"] = async (
 
   const form = await createOrUpdateForm(id, formInput, user);
 
-  return expandFormFromDb(form);
+  return getAndExpandFormFromDb(form.id);
 };
 
 export default importPaperFormResolver;

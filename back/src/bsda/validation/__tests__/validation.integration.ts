@@ -344,6 +344,18 @@ describe("BSDA validation", () => {
         }
       }
     );
+
+    test("when operation mode is not compatible with operation code", async () => {
+      const data = {
+        ...bsda,
+        destinationOperationCode: "R 1",
+        destinationOperationMode: "RECYCLAGE"
+      };
+
+      const { success } = await rawBsdaSchema.safeParseAsync(data);
+
+      expect(success).toBe(false);
+    });
   });
 
   describe("Emitter transports own waste", () => {

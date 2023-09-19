@@ -6,7 +6,8 @@ import {
   QuantityType,
   Status,
   TransportMode,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  OperationMode
 } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
 import { checkVAT } from "jsvat";
@@ -68,6 +69,7 @@ import { format, sub } from "date-fns";
 import { getFirstTransporterSync } from "./database";
 import { UserInputError } from "../common/errors";
 import { ConditionConfig } from "yup/lib/Condition";
+import { getOperationModesFromOperationCode } from "../common/operationModes";
 // set yup default error messages
 configureYup();
 
@@ -307,6 +309,20 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
       .label("Émetteur")
       .when("emitterIsForeignShip", siretConditions.isForeignShip)
       .when("emitterIsPrivateIndividual", siretConditions.isPrivateIndividual)
+      .test(
+        "is-not-eco-organisme",
+        "L'émetteur ne peut pas être un éco-organisme. Merci de bien vouloir renseigner l'émetteur effectif de ce déchet (ex: déchetterie, producteur, TTR...). Un autre champ dédié existe et doit être utilisé pour viser l'éco-organisme concerné : https://faq.trackdechets.fr/dechets-dangereux-classiques/les-eco-organismes-sur-trackdechets#ou-etre-vise-en-tant-queco-organisme",
+        async value => {
+          if (!value) return true;
+
+          const ecoOrganisme = await prisma.ecoOrganisme.findFirst({
+            where: { siret: value },
+            select: { id: true }
+          });
+
+          return !ecoOrganisme;
+        }
+      )
       .when(["emitterIsForeignShip", "emitterIsPrivateIndividual"], {
         is: (isForeignShip: boolean, isPrivateIndividual: boolean) =>
           !isForeignShip && !isPrivateIndividual,
@@ -1300,7 +1316,7 @@ const withNextDestination = (required: boolean) =>
       .nullable()
       .matches(
         /^[a-zA-Z]{2}[0-9]{4}$|^$/,
-        "Destination ultérieure : Le numéro d'identication ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
+        "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
       )
   });
 
@@ -1376,6 +1392,28 @@ const processedInfoSchemaFn: (
       .oneOf(
         PROCESSING_AND_REUSE_OPERATIONS_CODES,
         INVALID_PROCESSING_OPERATION
+      ),
+    destinationOperationMode: yup
+      .mixed<OperationMode | null | undefined>()
+      .oneOf([...Object.values(OperationMode), null, undefined])
+      .nullable()
+      .test(
+        "processing-mode-matches-processing-operation",
+        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
+        function (item) {
+          const { processingOperationDone } = this.parent;
+          const destinationOperationMode = item;
+
+          if (processingOperationDone && destinationOperationMode) {
+            const modes = getOperationModesFromOperationCode(
+              processingOperationDone
+            );
+
+            return modes.includes(destinationOperationMode ?? "");
+          }
+
+          return true;
+        }
       ),
     processingOperationDescription: yup.string().nullable()
   });

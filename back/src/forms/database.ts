@@ -46,15 +46,15 @@ export async function getFullForm(form: Form): Promise<FullForm> {
 /**
  * Retrieves a form by id or readableId or throw a FormNotFound error
  */
-export async function getFormOrFormNotFound({
-  id,
-  readableId
-}: Prisma.FormWhereUniqueInput) {
+export async function getFormOrFormNotFound<
+  T extends Prisma.FormInclude | undefined
+>({ id, readableId }: Prisma.FormWhereUniqueInput, include?: T) {
   if (!id && !readableId) {
     throw new UserInputError("You should specify an id or a readableId");
   }
   const form = await prisma.form.findUnique({
-    where: id ? { id } : { readableId }
+    where: id ? { id } : { readableId },
+    include
   });
   if (
     form == null ||
@@ -63,7 +63,9 @@ export async function getFormOrFormNotFound({
   ) {
     throw new FormNotFound(id ? id.toString() : readableId!);
   }
-  return form;
+  return form as Prisma.FormGetPayload<{
+    include: T;
+  }>;
 }
 
 export async function getFormTransporterOrNotFound({ id }: { id: string }) {

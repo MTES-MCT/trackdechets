@@ -29,6 +29,8 @@
 
     &__infos {
       display: flex;
+      flex-wrap: wrap;
+
       p {
         padding: 0 5px;
       }

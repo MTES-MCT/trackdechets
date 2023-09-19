@@ -1,18 +1,43 @@
-import {
-  Bsda,
-  BsdaStatus,
-  BsdType,
-  IntermediaryBsdaAssociation
-} from "@prisma/client";
+import { Bsda, BsdaStatus, BsdType } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import {
+  BsdaWithForwardedIn,
+  BsdaWithForwardedInInclude,
+  BsdaWithGroupedIn,
+  BsdaWithGroupedInInclude,
+  BsdaWithIntermediaries,
+  BsdaWithIntermediariesInclude,
+  BsdaWithRevisionRequests,
+  BsdaWithRevisionRequestsInclude
+} from "./types";
+import prisma from "../prisma";
+import { getRevisionOrgIds } from "../common/elasticHelpers";
 
-export type RawBsda = Bsda & {
-  intermediaries: IntermediaryBsdaAssociation[];
+export type BsdaForElastic = Bsda &
+  BsdaWithIntermediaries &
+  BsdaWithForwardedIn &
+  BsdaWithGroupedIn &
+  BsdaWithRevisionRequests;
+
+export const BsdaForElasticInclude = {
+  ...BsdaWithIntermediariesInclude,
+  ...BsdaWithForwardedInInclude,
+  ...BsdaWithGroupedInInclude,
+  ...BsdaWithRevisionRequestsInclude
 };
+
+export async function getBsdaForElastic(
+  bsda: Pick<Bsda, "id">
+): Promise<BsdaForElastic> {
+  return prisma.bsda.findUniqueOrThrow({
+    where: { id: bsda.id },
+    include: BsdaForElasticInclude
+  });
+}
 
 type WhereKeys =
   | "isDraftFor"
@@ -31,7 +56,7 @@ type WhereKeys =
 // | PROCESSED          | archive         | archive         | archive     | archive         | follow          | archive      |
 // | REFUSED            | archive         | archive         | archive     | archive         | follow          | archive      |
 // | AWAITING_CHILD     | follow          | follow          | follow      | follow          | follow          | follow       |
-function getWhere(bsda: RawBsda): Pick<BsdElastic, WhereKeys> {
+function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
   const where: Record<WhereKeys, string[]> = {
     isDraftFor: [],
     isForActionFor: [],
@@ -149,7 +174,7 @@ function getWhere(bsda: RawBsda): Pick<BsdElastic, WhereKeys> {
   return where;
 }
 
-export function toBsdElastic(bsda: RawBsda): BsdElastic {
+export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
   const where = getWhere(bsda);
 
   return {
@@ -219,7 +244,7 @@ export function toBsdElastic(bsda: RawBsda): BsdElastic {
       bsda.destinationOperationNextDestinationCompanyAddress ?? "",
 
     destinationOperationCode: bsda.destinationOperationCode ?? "",
-
+    destinationOperationMode: bsda?.destinationOperationMode ?? undefined,
     emitterEmissionDate: bsda.emitterEmissionSignatureDate?.getTime(),
     workerWorkDate: bsda.workerWorkSignatureDate?.getTime(),
     transporterTransportTakenOverAt:
@@ -229,8 +254,8 @@ export function toBsdElastic(bsda: RawBsda): BsdElastic {
     destinationAcceptationDate: bsda.destinationReceptionDate?.getTime(),
     destinationAcceptationWeight: bsda.destinationReceptionWeight,
     destinationOperationDate: bsda.destinationOperationDate?.getTime(),
-
     ...where,
+    ...getBsdaRevisionOrgIds(bsda),
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda),
     intermediaries: bsda.intermediaries,
@@ -238,6 +263,16 @@ export function toBsdElastic(bsda: RawBsda): BsdElastic {
   };
 }
 
-export function indexBsda(bsda: RawBsda, ctx?: GraphQLContext) {
+export function indexBsda(bsda: BsdaForElastic, ctx?: GraphQLContext) {
   return indexBsd(toBsdElastic(bsda), ctx);
+}
+
+/**
+ * Pour un BSDD donné, retourne l'ensemble des identifiants d'établissements
+ * pour lesquels il y a une demande de révision en cours ou passée.
+ */
+export function getBsdaRevisionOrgIds(
+  bsda: BsdaForElastic
+): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
+  return getRevisionOrgIds(bsda.BsdaRevisionRequest);
 }

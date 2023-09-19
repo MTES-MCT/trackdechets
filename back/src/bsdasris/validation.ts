@@ -1,4 +1,9 @@
-import { WasteAcceptationStatus, Prisma, BsdasriType } from "@prisma/client";
+import {
+  WasteAcceptationStatus,
+  Prisma,
+  BsdasriType,
+  OperationMode
+} from "@prisma/client";
 import { isCollector } from "../companies/validation";
 import * as yup from "yup";
 import {
@@ -28,6 +33,7 @@ import {
   WeightUnits,
   transporterRecepisseSchema
 } from "../common/validation";
+import { getOperationModesFromOperationCode } from "../common/operationModes";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 
@@ -113,6 +119,7 @@ type Reception = Pick<
 type Operation = Pick<
   Prisma.BsdasriCreateInput,
   | "destinationOperationCode"
+  | "destinationOperationMode"
   | "destinationOperationDate"
   | "destinationReceptionWasteWeightValue"
 >;
@@ -643,7 +650,28 @@ export const operationSchema: FactorySchemaOf<
           return true;
         }
       ),
+    destinationOperationMode: yup
+      .mixed<OperationMode | null | undefined>()
+      .oneOf([...Object.values(OperationMode), null, undefined])
+      .nullable()
+      .test(
+        "processing-mode-matches-processing-operation",
+        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
+        function (item) {
+          const { destinationOperationCode } = this.parent;
+          const destinationOperationMode = item;
 
+          if (destinationOperationCode && destinationOperationMode) {
+            const modes = getOperationModesFromOperationCode(
+              destinationOperationCode
+            );
+
+            return modes.includes(destinationOperationMode ?? "");
+          }
+
+          return true;
+        }
+      ),
     destinationOperationDate: yup
       .date()
       .label("Date de traitement")

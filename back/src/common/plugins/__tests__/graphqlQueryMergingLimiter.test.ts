@@ -4,7 +4,7 @@ import { ApolloServer } from "@apollo/server";
 import { gql } from "graphql-tag";
 import { graphqlQueryMergingLimiter } from "../graphqlQueryMergingLimiter";
 import { ErrorCode } from "../../errors";
-import { MAX_OPERATIONS_PER_REQUEST } from "../graphqlBatchLimiter";
+import { MAX_OPERATIONS_PER_REQUEST } from "../../middlewares/graphqlBatchLimiter";
 import cors from "cors";
 import { expressMiddleware } from "@apollo/server/express4";
 

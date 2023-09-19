@@ -1,6 +1,7 @@
 import {
   BsdaConsistence,
   BsdaType,
+  OperationMode,
   TransportMode,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -20,6 +21,7 @@ import {
 } from "../../common/validation/siret";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { OPERATIONS, WORKER_CERTIFICATION_ORGANISM } from "./constants";
+import { getOperationModesFromOperationCode } from "../../common/operationModes";
 
 const bsdaPackagingSchema = z
   .object({
@@ -108,6 +110,7 @@ export const rawBsdaSchema = z
       .nullish(),
     destinationReceptionRefusalReason: z.string().nullish(),
     destinationOperationCode: z.enum(OPERATIONS).nullish(),
+    destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
     destinationOperationDescription: z.string().nullish(),
     destinationOperationDate: z.coerce
       .date()
@@ -204,6 +207,21 @@ export const rawBsdaSchema = z
         code: z.ZodIssueCode.custom,
         message: `La date d'opération doit être postérieure à la date de réception`
       });
+    }
+
+    const { destinationOperationCode, destinationOperationMode } = val;
+    if (destinationOperationCode && destinationOperationMode) {
+      const modes = getOperationModesFromOperationCode(
+        destinationOperationCode ?? ""
+      );
+
+      if (!modes.includes(destinationOperationMode)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+        });
+      }
     }
 
     if (val.emitterIsPrivateIndividual && val.emitterCompanySiret) {

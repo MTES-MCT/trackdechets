@@ -26,7 +26,8 @@ import {
   hasAppendix1Cta,
   canDeleteReview,
   hasBsdasriEmitterSign,
-  isSignTransportAndCanSkipEmission,
+  isSignTransportCanSkipEmission,
+  isSignEmission,
 } from "../../dashboardServices";
 import { UserPermission } from "generated/graphql/types";
 
@@ -221,8 +222,12 @@ function BsdAdditionalActionsButton({
           {isToCollectTab &&
             bsd.type === BsdType.Bsdd &&
             permissions.includes(UserPermission.BsdCanSignEmission) &&
-            (hasAutomaticSignature ||
-              isSignTransportAndCanSkipEmission(currentSiret, bsd)) && (
+            isSignEmission(currentSiret, bsd, hasAutomaticSignature) &&
+            isSignTransportCanSkipEmission(
+              currentSiret,
+              bsd,
+              hasAutomaticSignature
+            ) && (
               <li>
                 <button
                   type="button"
@@ -338,4 +343,4 @@ function BsdAdditionalActionsButton({
   );
 }
 
-export default BsdAdditionalActionsButton;
+export default React.memo(BsdAdditionalActionsButton);

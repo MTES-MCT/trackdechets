@@ -11,7 +11,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
-import { Status } from "@prisma/client";
+import { OperationMode, Status } from "@prisma/client";
 import {
   Mutation,
   MutationMarkAsProcessedArgs
@@ -60,6 +60,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -86,6 +87,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -96,6 +98,7 @@ describe("mutation.markAsProcessed", () => {
       where: { id: form.id }
     });
     expect(resultingForm.status).toBe("PROCESSED");
+    expect(resultingForm.destinationOperationMode).toBe("ELIMINATION");
 
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLog.findMany({
@@ -127,6 +130,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -261,6 +265,7 @@ describe("mutation.markAsProcessed", () => {
         id: form.id,
         processedInfo: {
           processingOperationDone: processingOperation!.code,
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -372,6 +377,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "R 1",
+          destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
@@ -752,13 +758,24 @@ describe("mutation.markAsProcessed", () => {
   it("should mark appendix2 forms as processed", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
-    const appendix2 = await formFactory({
+    const groupedForm1 = await formFactory({
       ownerId: user.id,
       opt: {
         status: "GROUPED",
         quantityReceived: 1
       }
     });
+
+    // it should also work for BSD with temporary storage
+    const groupedForm2 = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        quantityReceived: 0.02
+      },
+      forwardedInOpts: { quantityReceived: 0.007 }
+    });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -767,10 +784,16 @@ describe("mutation.markAsProcessed", () => {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
         grouping: {
-          create: {
-            initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived!
-          }
+          create: [
+            {
+              initialFormId: groupedForm1.id,
+              quantity: groupedForm1.quantityReceived!
+            },
+            {
+              initialFormId: groupedForm2.id,
+              quantity: groupedForm2.forwardedIn!.quantityReceived!
+            }
+          ]
         }
       }
     });
@@ -783,16 +806,22 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
       }
     });
 
-    const appendix2grouped = await prisma.form.findUniqueOrThrow({
-      where: { id: appendix2.id }
+    const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm1.id }
     });
-    expect(appendix2grouped.status).toEqual("PROCESSED");
+    expect(updatedGroupedForm1.status).toEqual("PROCESSED");
+
+    const updatedGroupedForm2 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm2.id }
+    });
+    expect(updatedGroupedForm2.status).toEqual("PROCESSED");
   });
 
   it("should not mark appendix2 forms as processed if they are partially grouped", async () => {
@@ -828,6 +857,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
@@ -860,6 +890,7 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: format(processedAt, f)
         }
@@ -973,6 +1004,7 @@ describe("mutation.markAsProcessed", () => {
           processedAt: new Date("2022-01-01").toISOString() as any,
           processedBy: "John Snow",
           processingOperationDone: "R 1",
+          destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE,
           processingOperationDescription: "Incinération"
         }
       }
@@ -1006,6 +1038,7 @@ describe("mutation.markAsProcessed", () => {
         id: form.id,
         processedInfo: {
           processingOperationDone: processingOperation!.code,
+          destinationOperationMode: OperationMode.ELIMINATION,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }

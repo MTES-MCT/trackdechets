@@ -1,4 +1,5 @@
 import { RedErrorMessage } from "common/components";
+import OperationModeSelect from "common/components/OperationModeSelect";
 import { subMonths } from "date-fns";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
@@ -148,6 +149,11 @@ export default function Operation({ bsda }: Props) {
             </Field>
             <p>Opération prévue: {values.destination?.plannedOperationCode}</p>
           </div>
+
+          <OperationModeSelect
+            operationCode={values.destination?.operation?.code}
+            name="destination.operation.mode"
+          />
 
           <div className="form__row">
             <label>

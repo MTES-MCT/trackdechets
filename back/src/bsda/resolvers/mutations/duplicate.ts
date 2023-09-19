@@ -57,6 +57,7 @@ async function duplicateBsda({
   destinationReceptionAcceptationStatus,
   destinationReceptionRefusalReason,
   destinationOperationCode,
+  destinationOperationMode,
   destinationOperationSignatureAuthor,
   destinationOperationSignatureDate,
   destinationOperationDate,

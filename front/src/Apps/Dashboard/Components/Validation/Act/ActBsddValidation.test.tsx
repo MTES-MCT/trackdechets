@@ -106,7 +106,7 @@ describe("ActBsddValidation", () => {
     });
   });
 
-  it("renders with expected text when status is Sealed and user is emitter and emitter type is Appendix1Producer and there is no ecoOrganisme", () => {
+  it("renders with expected text when status is Sealed when current user is emitter", () => {
     const currentSiret = "12345678901234";
     const appendix1ProducerSealedBsd = {
       id: "1",
@@ -128,6 +128,30 @@ describe("ActBsddValidation", () => {
     );
 
     expect(screen.getByText("Signer en tant qu'émetteur")).toBeInTheDocument();
+  });
+
+  it("renders with expected text when status is Sealed when current user is not emitter", () => {
+    const currentSiret = "12345678901235";
+    const appendix1ProducerSealedBsd = {
+      id: "1",
+      status: "SEALED",
+      emitter: {
+        company: { siret: "12345678901234" },
+        type: "APPENDIX1_PRODUCER",
+      },
+    } as Form;
+    render(
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <ActBsddValidation
+          bsd={appendix1ProducerSealedBsd}
+          currentSiret={currentSiret}
+          isOpen
+          onClose={onClose}
+        />
+      </MockedProvider>
+    );
+
+    expect(screen.getByText("Faire signer l'émetteur")).toBeInTheDocument();
   });
 
   it("renders with expected text when status is Sealed and is emitter and transporter and is Appendix1Producer and there is an ecoOrganisme", () => {

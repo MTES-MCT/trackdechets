@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { createEventsDataLoaders } from "./activity-events/dataloader";
-import { GqlInfo } from "./common/middlewares/graphqlQueryParser";
+import { GqlInfo } from "./common/plugins/gqlInfosPlugin";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { createFormDataLoaders } from "./forms/dataloader";
 import { createUserDataLoaders } from "./users/dataloaders";

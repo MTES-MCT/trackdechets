@@ -80,6 +80,7 @@ describe("edition", () => {
 
     const operation: Required<BsvhuOperationInput> = {
       code: "",
+      mode: null,
       date: new Date(),
       nextDestination
     };

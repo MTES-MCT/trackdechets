@@ -12,13 +12,13 @@ import { toBsffDestination } from "./compat";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { getReadonlyBsffRepository } from "./repository";
 
-export type RawBsff = Bsff & {
+export type BsffForElastic = Bsff & {
   packagings: BsffPackaging[];
 } & {
   ficheInterventions: BsffFicheIntervention[];
 };
 
-export function toBsdElastic(bsff: RawBsff): BsdElastic {
+export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
   const bsffDestination = toBsffDestination(bsff.packagings);
 
   const bsd = {
@@ -78,6 +78,7 @@ export function toBsdElastic(bsff: RawBsff): BsdElastic {
     nextDestinationCompanyAddress: "",
 
     destinationOperationCode: "",
+    destinationOperationMode: undefined,
 
     emitterEmissionDate: bsff.emitterEmissionSignatureDate?.getTime(),
     workerWorkDate: undefined,
@@ -94,6 +95,8 @@ export function toBsdElastic(bsff: RawBsff): BsdElastic {
     isArchivedFor: [] as string[],
     isToCollectFor: [] as string[],
     isCollectedFor: [] as string[],
+    isInRevisionFor: [] as string[],
+    isRevisedFor: [] as string[],
     sirets: [
       bsff.emitterCompanySiret,
       bsff.transporterCompanySiret,

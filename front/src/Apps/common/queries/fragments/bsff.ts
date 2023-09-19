@@ -103,6 +103,7 @@ export const FullBsffFragment = gql`
       }
       operation {
         code
+        mode
         description
         noTraceability
         date

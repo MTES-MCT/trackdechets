@@ -8,7 +8,9 @@ import {
   MutationSignedByTransporterArgs,
   MutationMarkAsReceivedArgs,
   MutationMarkAsProcessedArgs,
-  CreateFormInput
+  CreateFormInput,
+  MutationCreateFormRevisionRequestArgs,
+  MutationSubmitFormRevisionRequestApprovalArgs
 } from "../../../../generated/graphql/types";
 import {
   resetDatabase,
@@ -22,8 +24,8 @@ import {
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 
-import { indexForm } from "../../../../forms/elastic";
-import { getFullForm } from "../../../../forms/database";
+import { getFormForElastic, indexForm } from "../../../../forms/elastic";
+import { gql } from "graphql-tag";
 
 const searchCompanyMock = jest.spyOn(
   require("../../../../companies/search"),
@@ -74,6 +76,7 @@ describe("Query.bsds workflow", () => {
   let recipient: { user: User; company: Company };
   let intermediary: { user: User; company: Company };
   let formId: string;
+  let revisionRequestId: string;
 
   beforeAll(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -442,7 +445,8 @@ describe("Query.bsds workflow", () => {
           processedInfo: {
             processedAt: new Date().toISOString() as any,
             processedBy: recipient.user.name,
-            processingOperationDone: "R 1"
+            processingOperationDone: "R 1",
+            destinationOperationMode: "VALORISATION_ENERGETIQUE"
           }
         }
       });
@@ -505,6 +509,237 @@ describe("Query.bsds workflow", () => {
       ]);
     });
   });
+
+  describe("when the bsd is under revision", () => {
+    beforeAll(async () => {
+      expect(formId).toBeDefined();
+      const { mutate } = makeClient(recipient.user);
+      const CREATE_FORM_REVISION_REQUEST = gql`
+        mutation CreateFormRevisionRequest(
+          $input: CreateFormRevisionRequestInput!
+        ) {
+          createFormRevisionRequest(input: $input) {
+            id
+          }
+        }
+      `;
+
+      const { errors, data } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: formId,
+            authoringCompanySiret: recipient.company.siret!,
+            comment: "oups",
+            content: { wasteDetails: { code: "04 01 03*" } }
+          }
+        }
+      });
+      expect(errors).toBeUndefined();
+      revisionRequestId = data.createFormRevisionRequest.id;
+      await refreshElasticSearch();
+    });
+
+    it("should list bsd in destination `isIsRevisionFor` forms", async () => {
+      const { query } = makeClient(recipient.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isInRevisionFor: [recipient.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: formId } })
+      ]);
+    });
+
+    it("should list bsd in emitter `isIsRevisionFor` forms", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isInRevisionFor: [emitter.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: formId } })
+      ]);
+    });
+
+    it(
+      "should list bsds in emitter's top category `Révisions` made up" +
+        " of `isInRevisionFor` and `isRevisedFor`",
+      async () => {
+        const { query } = makeClient(emitter.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isInRevisionFor: [emitter.company.siret!],
+                isRevisedFor: [emitter.company.siret!]
+              }
+            }
+          }
+        );
+
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: formId } })
+        ]);
+      }
+    );
+
+    it(
+      "should list bsds in destination's top category `Révisions` made up" +
+        " of `isInRevisionFor` and `isRevisedFor`",
+      async () => {
+        const { query } = makeClient(recipient.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isInRevisionFor: [recipient.company.siret!],
+                isRevisedFor: [recipient.company.siret!]
+              }
+            }
+          }
+        );
+
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: formId } })
+        ]);
+      }
+    );
+  });
+
+  describe("when the bsd revision has been accepted", () => {
+    beforeAll(async () => {
+      expect(formId).toBeDefined();
+      const { mutate } = makeClient(emitter.user);
+      const SUBMIT_FORM_REVISION_REQUEST_APPROVAL = gql`
+        mutation SubmitFormRevisionRequestApproval(
+          $id: ID!
+          $isApproved: Boolean!
+          $comment: String
+        ) {
+          submitFormRevisionRequestApproval(
+            id: $id
+            isApproved: $isApproved
+            comment: $comment
+          ) {
+            id
+          }
+        }
+      `;
+
+      const { errors } = await mutate<
+        Pick<Mutation, "submitFormRevisionRequestApproval">,
+        MutationSubmitFormRevisionRequestApprovalArgs
+      >(SUBMIT_FORM_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequestId,
+          isApproved: true
+        }
+      });
+      expect(errors).toBeUndefined();
+      await refreshElasticSearch();
+    });
+
+    it("should list bsd in destination `isRevisedFor` forms", async () => {
+      const { query } = makeClient(recipient.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isRevisedFor: [recipient.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: formId } })
+      ]);
+    });
+
+    it("should list bsd in emitter `isRevisedFor` forms", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isRevisedFor: [emitter.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: formId } })
+      ]);
+    });
+  });
+
+  it(
+    "should list bsds in emitter's top category `Révisions` made up" +
+      " of `isInRevisionFor` and `isRevisedFor`",
+    async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isInRevisionFor: [emitter.company.siret!],
+              isRevisedFor: [emitter.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: formId } })
+      ]);
+    }
+  );
+
+  it(
+    "should list bsds in destination's top category `Révisions` made up" +
+      " of `isInRevisionFor` and `isRevisedFor`",
+    async () => {
+      const { query } = makeClient(recipient.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isInRevisionFor: [recipient.company.siret!],
+              isRevisedFor: [recipient.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: formId } })
+      ]);
+    }
+  );
 });
 
 describe("Query.bsds edge cases", () => {
@@ -543,9 +778,9 @@ describe("Query.bsds edge cases", () => {
       }
     });
 
-    const fullForm = await getFullForm(form);
+    const rawForm = await getFormForElastic(form);
 
-    await indexForm(fullForm);
+    await indexForm(rawForm);
     await refreshElasticSearch();
 
     const { query: transporterQuery } = makeClient(
@@ -580,5 +815,38 @@ describe("Query.bsds edge cases", () => {
     expect(res.data.bsds.edges).toEqual([
       expect.objectContaining({ node: { id: form.id } })
     ]);
+  });
+
+  it("should not return other user's bsds when no filter is passed", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    const anotherEmitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "PROCESSED",
+        emitterCompanySiret: anotherEmitter.company.siret
+      }
+    });
+
+    const formForElastic = await getFormForElastic(form);
+
+    await indexForm(formForElastic);
+    await refreshElasticSearch();
+
+    const { query } = makeClient(emitter.user);
+
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS);
+
+    expect(data.bsds.edges).toHaveLength(0);
   });
 });

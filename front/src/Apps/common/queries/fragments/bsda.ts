@@ -24,6 +24,9 @@ export const bsdaFragment = gql`
         siret
         orgId
       }
+      reception {
+        weight
+      }
     }
     worker {
       isDisabled
@@ -118,6 +121,7 @@ export const FullBsdaFragment = gql`
       }
       operation {
         code
+        mode
         description
         date
         signature {

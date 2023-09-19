@@ -16,6 +16,7 @@ export const getUserLoginFailedKey = (email: string): string =>
 export async function deleteCachedUserRoles(userId: string): Promise<void> {
   const cacheKey = genUserRolesCacheKey(userId); // non-existent keys are ignored
   await redisClient.unlink(cacheKey);
+  await redisClient.unlink(`${cacheKey}:lock`);
 }
 
 /**

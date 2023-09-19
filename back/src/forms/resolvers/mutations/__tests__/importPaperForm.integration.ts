@@ -1,6 +1,7 @@
 import {
   Consistence,
   EmitterType,
+  OperationMode,
   Prisma,
   QuantityType,
   Status,
@@ -104,6 +105,7 @@ describe("mutation / importPaperForm", () => {
           processedAt: "2019-12-22T00:00:00.000Z" as any,
           processedBy: "Mr Recipient",
           processingOperationDone: "R 1",
+          destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE,
           processingOperationDescription: "Traitement final"
         },
         ecoOrganisme: null
@@ -299,6 +301,7 @@ describe("mutation / importPaperForm", () => {
       const input = await getImportPaperFormInput();
       input.recipient!.company!.siret = company.siret;
       input.processedInfo.processingOperationDone = "D 13";
+      input.processedInfo.destinationOperationMode = undefined;
       input.processedInfo.nextDestination = {
         company: {
           siret: siretify(1),
@@ -331,6 +334,7 @@ describe("mutation / importPaperForm", () => {
       input.recipient!.company!.siret = company.siret;
       input.processedInfo.noTraceability = true;
       input.processedInfo.processingOperationDone = "R 13";
+      input.processedInfo.destinationOperationMode = undefined;
       input.processedInfo.nextDestination = {
         company: {
           siret: siretify(1),
@@ -422,6 +426,7 @@ describe("mutation / importPaperForm", () => {
         processedAt: "2019-12-22T00:00:00.000Z" as any,
         processedBy: "Mr Recipient",
         processingOperationDone: "R 1",
+        destinationOperationMode: "VALORISATION_ENERGETIQUE",
         processingOperationDescription: "Traitement final"
       }
     };
@@ -496,6 +501,7 @@ describe("mutation / importPaperForm", () => {
         isImportedFromPaper: true,
         emittedAt: importedData.signingInfo.sentAt,
         emittedBy: importedData.signingInfo.sentBy,
+        intermediaries: [],
         sentAt: importedData.signingInfo.sentAt,
         sentBy: importedData.signingInfo.sentBy,
         takenOverAt: importedData.signingInfo.sentAt,
@@ -509,7 +515,8 @@ describe("mutation / importPaperForm", () => {
         processingOperationDescription:
           importedData.processedInfo.processingOperationDescription,
         processedBy: importedData.processedInfo.processedBy,
-        processedAt: importedData.processedInfo.processedAt
+        processedAt: importedData.processedInfo.processedAt,
+        destinationOperationMode: "VALORISATION_ENERGETIQUE"
       });
     });
 
@@ -714,6 +721,7 @@ describe("mutation / importPaperForm", () => {
 
       const data = { ...importedData };
       data.processedInfo.processingOperationDone = "D 13";
+      data.processedInfo.destinationOperationMode = undefined;
       data.processedInfo.nextDestination = {
         company: {
           siret: siretify(1),

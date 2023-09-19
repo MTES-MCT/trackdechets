@@ -12,6 +12,10 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../__tests__/factories";
+import * as generatePdf from "../../../pdf/generator";
+
+const buildPdfAsBase64Spy = jest.spyOn(generatePdf, "buildPdfAsBase64");
+buildPdfAsBase64Spy.mockResolvedValue("");
 
 const SIGN_BSDA = `
 mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
@@ -729,7 +733,8 @@ describe("Mutation.Bsda.sign", () => {
           transporterRecepisseDepartment: transporterReceipt.department,
           transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: company.siret,
-          destinationOperationCode: "D 15"
+          destinationOperationCode: "D 15",
+          destinationOperationMode: undefined
         }
       });
 
@@ -846,7 +851,8 @@ describe("Mutation.Bsda.sign", () => {
           transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr1.siret,
           status: BsdaStatus.AWAITING_CHILD,
-          destinationOperationCode: "D 9"
+          destinationOperationCode: "D 9",
+          destinationOperationMode: "ELIMINATION"
         }
       });
 
@@ -860,6 +866,7 @@ describe("Mutation.Bsda.sign", () => {
           transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr2.siret,
           destinationOperationCode: "D 9",
+          destinationOperationMode: "ELIMINATION",
           status: BsdaStatus.AWAITING_CHILD,
           forwarding: { connect: { id: bsda1.id } }
         }
@@ -875,6 +882,7 @@ describe("Mutation.Bsda.sign", () => {
           transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: destination.siret,
           destinationOperationCode: "D 9",
+          destinationOperationMode: "ELIMINATION",
           forwarding: { connect: { id: bsda2.id } }
         }
       });

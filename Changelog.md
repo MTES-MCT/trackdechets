@@ -5,6 +5,31 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.9.1] 19/09/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Tous BSDs: l'exutoire peut désormais renseigner le mode de traitement. :warning: **Attention:** ce champ devra bientôt obligatoirement être renseigné à l'étape de traitement [PR 2673](https://github.com/MTES-MCT/trackdechets/pull/2673)
+- ETQ transporteur, je veux pouvoir ajouter / modifier des récépissés transporteur par API [PR 2688](https://github.com/MTES-MCT/trackdechets/pull/2688)
+
+#### :bug: Corrections de bugs
+
+- BSDD: un éco-organisme ne peut plus être sélectionné en tant qu'émetteur des déchets [PR 2665](https://github.com/MTES-MCT/trackdechets/pull/2665)
+- BSFF : ETQ émetteur je veux modifier mon BSD après l'avoir signé mais les modifications de contenant ne sont pas prises en compte [PR 2686](https://github.com/MTES-MCT/trackdechets/pull/2686)
+- Les BSDD regroupés devraient basculer dans l'onglet Archives et avoir le statut "Traité" lorsque le BSDD suite à été traité [PR 2712](https://github.com/MTES-MCT/trackdechets/pull/2712)
+
+#### :boom: Breaking changes
+
+- BSVHU: le numéro d'agrément du destinataire est obligatoire à la publication [PR 2683](https://github.com/MTES-MCT/trackdechets/pull/2683)
+- La plaque d'immatriculation est désormais obligatoire à la signature d'un transporteur multi-modal. Un champ `numberPlate` a été ajouté sur l'input `TakeOverInput` afin de pouvoir renseigner la valeur jusqu'au dernier moment [PR 2688](https://github.com/MTES-MCT/trackdechets/pull/2688).
+-
+
+#### :nail_care: Améliorations
+
+#### :house: Interne
+
+- Ajout de filtres à la query bsds pour filtrer sur les bordereaux ayant une demande de révision en cours ou passée [PR 2598](Ajout de filtres à la query bsds pour filtrer sur les bordereaux ayant une demande de révision en cours ou passée)
+
 # [2023.8.3] 29/08/2023
 
 #### :rocket: Nouvelles fonctionnalités

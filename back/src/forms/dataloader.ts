@@ -1,6 +1,7 @@
 import { FormGroupement } from "@prisma/client";
 import DataLoader from "dataloader";
 import prisma from "../prisma";
+import { expandableFormIncludes } from "./converter";
 
 export function createFormDataLoaders() {
   return {
@@ -21,7 +22,8 @@ async function getForms(formIds: string[]) {
   const forms = await prisma.form.findMany({
     where: {
       id: { in: formIds }
-    }
+    },
+    include: expandableFormIncludes
   });
 
   return formIds.map(formId => forms.find(form => form.id === formId));

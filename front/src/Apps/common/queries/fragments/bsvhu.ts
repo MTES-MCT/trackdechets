@@ -78,6 +78,9 @@ export const dashboardVhuFragment = gql`
       company {
         ...DashboardCompanyFragment
       }
+      reception {
+        weight
+      }
     }
     wasteCode
     weight {
@@ -127,6 +130,7 @@ export const FullBsvhuFragment = gql`
       }
       operation {
         code
+        mode
         date
         signature {
           author
