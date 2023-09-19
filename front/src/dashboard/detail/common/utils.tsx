@@ -56,3 +56,15 @@ export const getVerboseWeightType = (
 
   return "";
 };
+
+/**
+ * Enables to read the deep value of an object, passing the path as a string.
+ * For instance, deepValue(obj, "foo.bar.baz") to access obj.foo.bar.baz.
+ */
+export const deepValue = (obj, path) => {
+  // eslint-disable-next-line @typescript-eslint/no-redeclare
+  for (var i = 0, path = path.split("."), len = path.length; i < len; i++) {
+    obj = obj[path[i]];
+  }
+  return obj;
+};

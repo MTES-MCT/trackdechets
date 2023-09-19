@@ -19,6 +19,7 @@ import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { formatDate } from "common/datetime";
 import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
 import { useRouteMatch } from "react-router-dom";
+import { getOperationModeLabel } from "common/operationModes";
 
 type Props = {
   review: FormRevisionRequest;
@@ -251,7 +252,14 @@ export function DisplayRevision({ review }: Props) {
       <RevisionField
         label="Opération réalisée"
         bsddValue={review.form.processingOperationDone}
-        reviewValue={review.content.processingOperationDone}
+        reviewValue={
+          review.content.processingOperationDone +
+          (review.content.destinationOperationMode
+            ? ` (${getOperationModeLabel(
+                review.content.destinationOperationMode ?? ""
+              )})`
+            : "")
+        }
       />
 
       <RevisionField
