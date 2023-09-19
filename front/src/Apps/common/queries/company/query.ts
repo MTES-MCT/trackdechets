@@ -1,58 +1,5 @@
 import { gql } from "@apollo/client";
-
-export const FAVORITES = gql`
-  query Favorites(
-    $orgId: String!
-    $type: FavoriteType!
-    $allowForeignCompanies: Boolean
-  ) {
-    favorites(
-      orgId: $orgId
-      type: $type
-      allowForeignCompanies: $allowForeignCompanies
-    ) {
-      orgId
-      siret
-      vatNumber
-      name
-      address
-      contact
-      contactPhone
-      contactEmail
-      isRegistered
-      companyTypes
-      codePaysEtrangerEtablissement
-      transporterReceipt {
-        receiptNumber
-        validityLimit
-        department
-      }
-      traderReceipt {
-        receiptNumber
-        validityLimit
-        department
-      }
-      brokerReceipt {
-        receiptNumber
-        validityLimit
-        department
-      }
-      vhuAgrementDemolisseur {
-        agrementNumber
-      }
-      vhuAgrementBroyeur {
-        agrementNumber
-      }
-      workerCertification {
-        hasSubSectionFour
-        hasSubSectionThree
-        certificationNumber
-        validityLimit
-        organisation
-      }
-    }
-  }
-`;
+import { FavoriteType } from "generated/graphql/types";
 
 export const COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA = gql`
   query CompanyInfos($siret: String!) {
@@ -80,34 +27,42 @@ trackdechetsId
 contact
 contactPhone
 contactEmail
-companyTypes
-installation {
-  codeS3ic
-  urlFiche
-}
+companyTypes`;
+
+const transporterReceiptCompanySearchString = `
 transporterReceipt {
   receiptNumber
   validityLimit
   department
-}
+}`;
+
+const traderReceiptCompanySearchString = `
 traderReceipt {
   receiptNumber
   validityLimit
   department
-}
+}`;
+
+const brokerReceiptCompanySearchString = `
 brokerReceipt {
   receiptNumber
   validityLimit
   department
-}
+}`;
+
+const vhuAgrementDemolisseurCompanySearchString = `
 vhuAgrementDemolisseur {
   agrementNumber
   department
-}
+}`;
+
+const vhuAgrementBroyeurCompanySearchString = `
 vhuAgrementBroyeur {
   agrementNumber
   department
-}
+}`;
+
+const workerCertificationCompanySearchString = `
 workerCertification {
   hasSubSectionFour
   hasSubSectionThree
@@ -119,12 +74,23 @@ workerCertification {
 const companySearchResultFragment = gql`
   fragment CompanySearchResultFragment on CompanySearchResult {
     ${commonCompanySearchString}
+    ${transporterReceiptCompanySearchString}
+    ${traderReceiptCompanySearchString}
+    ${brokerReceiptCompanySearchString}
+    ${vhuAgrementDemolisseurCompanySearchString}
+    ${vhuAgrementBroyeurCompanySearchString}
+    ${workerCertificationCompanySearchString}
   }
 `;
-
 const companySearchPrivateFragment = gql`
   fragment CompanySearchPrivateFragment on CompanySearchPrivate {
     ${commonCompanySearchString}
+    ${transporterReceiptCompanySearchString}
+    ${traderReceiptCompanySearchString}
+    ${brokerReceiptCompanySearchString}
+    ${vhuAgrementDemolisseurCompanySearchString}
+    ${vhuAgrementBroyeurCompanySearchString}
+    ${workerCertificationCompanySearchString}
   }
 `;
 
@@ -136,6 +102,65 @@ export const SEARCH_COMPANIES = gql`
   }
   ${companySearchResultFragment}
 `;
+
+/**
+ * Only query the necessary parts
+ */
+export const FAVORITES = (favType: FavoriteType) => {
+  let favFragmentString = commonCompanySearchString;
+  switch (favType) {
+    case FavoriteType.Broker:
+      favFragmentString = favFragmentString.concat(
+        brokerReceiptCompanySearchString
+      );
+      break;
+    case FavoriteType.Worker:
+      favFragmentString = favFragmentString.concat(
+        workerCertificationCompanySearchString
+      );
+      break;
+    case FavoriteType.Trader:
+      favFragmentString = favFragmentString.concat(
+        traderReceiptCompanySearchString
+      );
+      break;
+    case FavoriteType.Destination:
+    case FavoriteType.Recipient:
+    case FavoriteType.NextDestination:
+    case FavoriteType.TemporaryStorageDetail:
+      favFragmentString = favFragmentString.concat(
+        vhuAgrementDemolisseurCompanySearchString,
+        vhuAgrementBroyeurCompanySearchString
+      );
+      break;
+    case FavoriteType.Transporter:
+      favFragmentString = favFragmentString.concat(
+        transporterReceiptCompanySearchString
+      );
+      break;
+  }
+  const favoritesFragment = gql`
+    fragment FavoritesFragment on CompanySearchResult {
+      ${favFragmentString}
+    }
+  `;
+  return gql`
+    query Favorites(
+      $orgId: String!
+      $type: FavoriteType!
+      $allowForeignCompanies: Boolean
+    ) {
+      favorites(
+        orgId: $orgId
+        type: $type
+        allowForeignCompanies: $allowForeignCompanies
+      ) {
+        ...FavoritesFragment
+      }
+    }
+    ${favoritesFragment}
+  `;
+};
 
 /**
  * Used for Account company validation

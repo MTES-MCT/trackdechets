@@ -130,19 +130,22 @@ export default function CompanySelector({
     loading: isLoadingFavorites,
     data: favoritesData,
     error: favoritesError,
-  } = useQuery<Pick<Query, "favorites">, QueryFavoritesArgs>(FAVORITES, {
-    variables: {
-      orgId: siret,
-      type: Object.values(FavoriteType).includes(favoriteType)
-        ? favoriteType
-        : FavoriteType.Emitter,
-      allowForeignCompanies,
-    },
-    skip: skipFavorite || !siret,
-    onCompleted: data => {
-      mergeResults([], data?.favorites ?? []);
-    },
-  });
+  } = useQuery<Pick<Query, "favorites">, QueryFavoritesArgs>(
+    FAVORITES(favoriteType),
+    {
+      variables: {
+        orgId: siret,
+        type: Object.values(FavoriteType).includes(favoriteType)
+          ? favoriteType
+          : FavoriteType.Emitter,
+        allowForeignCompanies,
+      },
+      skip: skipFavorite || !siret,
+      onCompleted: data => {
+        mergeResults([], data?.favorites ?? []);
+      },
+    }
+  );
 
   /**
    * SearchCompanies can search by name, vat or siret.
