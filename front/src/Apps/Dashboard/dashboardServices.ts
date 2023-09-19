@@ -180,7 +180,9 @@ const isSameSiretDestination = (
 export const isSameSiretTransporter = (
   currentSiret: string,
   bsd: BsdDisplay | Form
-): boolean => currentSiret === bsd.transporter?.company?.siret;
+): boolean =>
+  currentSiret === bsd.transporter?.company?.siret ||
+  currentSiret === bsd.transporter?.company?.orgId;
 
 export const isSynthesis = (bsdWorkflowType: string | undefined): boolean =>
   bsdWorkflowType === BsdasriType.Synthesis;
