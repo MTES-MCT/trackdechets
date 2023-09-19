@@ -1495,6 +1495,7 @@ model BsdaRevisionRequest {
   destinationCap                  String?
   destinationReceptionWeight      Float?
   destinationOperationCode        String?
+  destinationOperationMode        OperationMode?
   destinationOperationDescription String?
 
   brokerCompanyName            String?
