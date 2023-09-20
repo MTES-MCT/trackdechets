@@ -3,6 +3,7 @@ import "./tracer";
 import { ApolloServer } from "@apollo/server";
 import { unwrapResolverError } from "@apollo/server/errors";
 import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import redisStore from "connect-redis";
 import cors from "cors";
@@ -11,6 +12,7 @@ import session from "express-session";
 import { GraphQLError } from "graphql";
 import depthLimit from "graphql-depth-limit";
 import helmet from "helmet";
+import http from "http";
 import passport from "passport";
 import path from "path";
 import { ValidationError } from "yup";
@@ -72,6 +74,9 @@ const schema = makeExecutableSchema({
 // GraphQL endpoint
 const graphQLPath = "/";
 
+export const app = express();
+export const httpServer = http.createServer(app);
+
 export const server = new ApolloServer<GraphQLContext>({
   schema,
   introspection: true, // used to enable the playground in production
@@ -92,6 +97,7 @@ export const server = new ApolloServer<GraphQLContext>({
         { issues: originalError.issues }
       );
     }
+
     if (
       formattedError.extensions?.code === ErrorCode.INTERNAL_SERVER_ERROR &&
       NODE_ENV === "production"
@@ -141,11 +147,10 @@ export const server = new ApolloServer<GraphQLContext>({
     gqlRegenerateSessionPlugin(["changePassword"]),
     graphiqlLandingPagePlugin(),
     ...(Sentry ? [sentryReporter] : []),
-    graphqlQueryMergingLimiter()
+    graphqlQueryMergingLimiter(),
+    ApolloServerPluginDrainHttpServer({ httpServer })
   ]
 });
-
-export const app = express();
 
 if (Sentry) {
   // The request handler must be the first middleware on the app

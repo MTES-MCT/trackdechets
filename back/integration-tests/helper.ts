@@ -1,32 +1,25 @@
-import { Server as HttpServer } from "http";
-import { Server as HttpsServer } from "https";
 import { redisClient } from "../src/common/redis";
 import prisma from "../src/prisma";
-import { app } from "../src/server";
 import { client as elasticSearch, index } from "../src/common/elastic";
 import { indexQueue } from "../src/queue/producers/elastic";
+import { closeMongoClient } from "../src/events/mongodb";
+import { closeQueues } from "../src/queue/producers";
+import { server, startApolloServer } from "../src/server";
 
-let httpServerInstance: HttpServer | HttpsServer | null = null;
+beforeAll(async () => {
+  await startApolloServer();
+});
 
-export function startServer() {
-  if (!httpServerInstance) {
-    httpServerInstance = app.listen(process.env.BACK_PORT);
-  }
-  return httpServerInstance;
-}
-
-export async function closeServer() {
-  return new Promise<void>(resolve => {
-    if (!httpServerInstance) {
-      return resolve();
-    }
-
-    httpServerInstance.close(() => {
-      httpServerInstance = null;
-      resolve();
-    });
-  });
-}
+afterAll(async () => {
+  await Promise.all([
+    closeMongoClient(),
+    closeQueues(),
+    elasticSearch.close(),
+    redisClient.disconnect(),
+    prisma.$disconnect(),
+    server.stop()
+  ])
+});
 
 /**
  * Special fast path to drop data from a postgres database.
