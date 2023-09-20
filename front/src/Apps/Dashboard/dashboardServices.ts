@@ -944,7 +944,7 @@ export const hasBsdSuite = (bsd: BsdDisplay, currentSiret): boolean => {
   );
 };
 
-const canUpdateOrDeleteBsdd = bsd =>
+const canUpdateBsdd = bsd =>
   bsd.type === BsdType.Bsdd &&
   bsd.emitterType !== EmitterType.Appendix1Producer &&
   [
@@ -952,6 +952,11 @@ const canUpdateOrDeleteBsdd = bsd =>
     BsdStatusCode.Sealed,
     BsdStatusCode.SignedByProducer,
   ].includes(bsd.status);
+
+const canDeleteBsdd = bsd =>
+  bsd.type === BsdType.Bsdd &&
+  bsd.emitterType !== EmitterType.Appendix1Producer &&
+  [BsdStatusCode.Draft, BsdStatusCode.Sealed].includes(bsd.status);
 
 const canDeleteBsda = (bsd, siret) =>
   bsd.type === BsdType.Bsda &&
@@ -999,7 +1004,7 @@ const canDeleteBsff = (bsd, siret) =>
   canDuplicateBsff(bsd, siret);
 
 export const canDeleteBsd = (bsd, siret) =>
-  canUpdateOrDeleteBsdd(bsd) ||
+  canDeleteBsdd(bsd) ||
   canDeleteBsda(bsd, siret) ||
   canDeleteBsdasri(bsd) ||
   canDeleteBsff(bsd, siret) ||
@@ -1040,7 +1045,7 @@ const canUpdateBsvhu = bsd =>
   ![BsdStatusCode.Processed, BsdStatusCode.Refused].includes(bsd.status);
 
 export const canUpdateBsd = (bsd, siret) =>
-  canUpdateOrDeleteBsdd(bsd) ||
+  canUpdateBsdd(bsd) ||
   canUpdateBsda(bsd) ||
   canUpdateBsdasri(bsd) ||
   canUpdateBsff(bsd, siret) ||
