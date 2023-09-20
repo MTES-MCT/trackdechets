@@ -80,18 +80,18 @@ export const editionRules: {
     isRequired: bsda => !!bsda.ecoOrganismeSiret
   },
   ecoOrganismeSiret: { sealedBy: "TRANSPORT", isRequired: false },
-  destinationCompanyName: { sealedBy: "TRANSPORT", isRequired: true },
+  destinationCompanyName: { sealedBy: "EMISSION", isRequired: true },
   destinationCompanySiret: {
-    sealedBy: "TRANSPORT",
+    sealedBy: "EMISSION",
     isRequired: true
   },
-  destinationCompanyAddress: { sealedBy: "TRANSPORT", isRequired: true },
-  destinationCompanyContact: { sealedBy: "TRANSPORT", isRequired: true },
-  destinationCompanyPhone: { sealedBy: "TRANSPORT", isRequired: true },
-  destinationCompanyMail: { sealedBy: "TRANSPORT", isRequired: true },
+  destinationCompanyAddress: { sealedBy: "EMISSION", isRequired: true },
+  destinationCompanyContact: { sealedBy: "EMISSION", isRequired: true },
+  destinationCompanyPhone: { sealedBy: "EMISSION", isRequired: true },
+  destinationCompanyMail: { sealedBy: "EMISSION", isRequired: true },
   destinationCustomInfo: { sealedBy: "OPERATION", isRequired: false },
   destinationCap: {
-    sealedBy: "TRANSPORT",
+    sealedBy: "EMISSION",
     isRequired: bsda =>
       [BsdaType.COLLECTION_2710, BsdaType.GATHERING, BsdaType.RESHIPMENT].every(
         type => bsda.type !== type
@@ -101,7 +101,7 @@ export const editionRules: {
       )
   },
   destinationPlannedOperationCode: {
-    sealedBy: "TRANSPORT",
+    sealedBy: "EMISSION",
     isRequired: true
   },
   destinationReceptionDate: { sealedBy: "OPERATION", isRequired: true },
