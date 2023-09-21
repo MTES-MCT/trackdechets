@@ -378,7 +378,7 @@ export async function getElasticBsdById(id) {
 /**
  * Bulk create/update a list of documents in Elastic Search.
  */
-export function indexBsds(
+export async function indexBsds(
   indexName: string,
   bsds: BsdElastic[],
   elasticSearchUrl: string
@@ -390,7 +390,7 @@ export function indexBsds(
       ? { ca: fs.readFileSync(certPath, "utf-8") }
       : undefined
   });
-  return es.bulk({
+  const res = await es.bulk({
     body: bsds.flatMap(bsd => [
       {
         index: {
@@ -405,6 +405,8 @@ export function indexBsds(
     // lighten the response
     _source_excludes: ["items.index._*", "took"]
   });
+  await es.close();
+  return res;
 }
 
 /**
