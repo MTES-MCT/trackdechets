@@ -2,7 +2,7 @@ import { hash } from "bcrypt";
 import crypto from "crypto";
 import * as yup from "yup";
 import { base32Encode } from "../utils";
-import { EMAIL_PROVIDER_DOMAINS } from "../common/constants/emailProviderDomain";
+import { EMAIL_PROVIDER_DOMAINS } from "shared/constants";
 import zxcvbn from "zxcvbn";
 import { UserInputError } from "../common/errors";
 

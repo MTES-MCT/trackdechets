@@ -13,7 +13,7 @@ import {
   countries,
   cleanClue,
   isForeignVat
-} from "../common/constants/companySearchHelpers";
+} from "shared/constants";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
 import { AnonymousCompanyError } from "./sirene/errors";

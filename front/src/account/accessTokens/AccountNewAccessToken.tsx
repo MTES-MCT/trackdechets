@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import copyTextToClipboard from "copy-text-to-clipboard";
 import {
   IconCheckCircle1,
-  IconCopyPaste,
-} from "Apps/common/Components/Icons/Icons";
-import { NewAccessToken } from "generated/graphql/types";
+  IconCopyPaste
+} from "../../Apps/common/Components/Icons/Icons";
+import { NewAccessToken } from "codegen-ui";
 import AccountAccessTokenRevoke from "./AccountAccessTokenRevoke";
 import styles from "./AccountAccessToken.module.scss";
-import { DEVELOPERS_DOCUMENTATION_URL } from "common/config";
+import { DEVELOPERS_DOCUMENTATION_URL } from "../../common/config";
 
 type AccountNewAccessTokenProps = {
   accessToken: NewAccessToken;
@@ -16,7 +16,7 @@ type AccountNewAccessTokenProps = {
 
 export default function AccountNewAccessToken({
   accessToken,
-  onDelete,
+  onDelete
 }: AccountNewAccessTokenProps) {
   const [isRevoking, setIsRevoking] = useState(false);
 
@@ -28,7 +28,10 @@ export default function AccountNewAccessToken({
           Vous ne serez plus en mesure de le consulter ultérieurement.
         </p>
         <strong>
-          🚨 Ce jeton est confidentiel, ne le diffusez pas, et consultez nos{" "}
+          <span role="img" aria-label="emoji light">
+            🚨
+          </span>{" "}
+          Ce jeton est confidentiel, ne le diffusez pas, et consultez nos{" "}
           <a
             href={`${DEVELOPERS_DOCUMENTATION_URL}/tutoriels/quickstart/access-token`}
             target="_blank"

@@ -1,16 +1,16 @@
 import { gql, useQuery } from "@apollo/client";
-import { InlineError } from "Apps/common/Components/Error/Error";
-import { BsdaPicker } from "form/bsda/components/bsdaPicker/BsdaPicker";
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import { InlineError } from "../../../../Apps/common/Components/Error/Error";
+import { BsdaPicker } from "../../components/bsdaPicker/BsdaPicker";
+import { getInitialCompany } from "../../../bsdd/utils/initial-state";
+import { RadioButton } from "../../../common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
 import {
   Bsda,
   BsdaType,
   CompanyType,
   Query,
-  QueryCompanyInfosArgs,
-} from "generated/graphql/types";
+  QueryCompanyInfosArgs
+} from "codegen-ui";
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
@@ -30,23 +30,23 @@ const COMPANY_INFOS = gql`
 const COMMON_OPTIONS = [
   {
     title: "la collecte d'amiante sur un chantier",
-    value: BsdaType.OtherCollections,
+    value: BsdaType.OtherCollections
   },
   {
     title:
       "le groupement de déchets entreposés sur un site relevant de la rubrique 2718 (ou 2710-1)",
-    value: BsdaType.Gathering,
+    value: BsdaType.Gathering
   },
   {
     title: "la réexpédition après entreposage provisoire",
-    value: BsdaType.Reshipment,
-  },
+    value: BsdaType.Reshipment
+  }
 ];
 const DECHETTERIE_OPTIONS = [
   {
     title: "la collecte en déchèterie relevant de la rubrique 2710-1",
-    value: BsdaType.Collection_2710,
-  },
+    value: BsdaType.Collection_2710
+  }
 ];
 
 export function Type({ disabled }: Props) {
@@ -60,7 +60,7 @@ export function Type({ disabled }: Props) {
     QueryCompanyInfosArgs
   >(COMPANY_INFOS, {
     variables: { siret },
-    fetchPolicy: "no-cache",
+    fetchPolicy: "no-cache"
   });
 
   useEffect(() => {

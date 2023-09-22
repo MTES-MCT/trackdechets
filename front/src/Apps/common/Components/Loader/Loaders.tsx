@@ -17,7 +17,7 @@ export const ModalLoader = () => (
  * networkStatus comes from useQuery hook and tells apart first load, refetch and fetchmore events
  */
 export const RefreshLoader = ({
-  networkStatus,
+  networkStatus
 }: {
   networkStatus: NetworkStatus;
 }) =>

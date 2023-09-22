@@ -1,25 +1,25 @@
 import { useMutation } from "@apollo/client";
-import cogoToast from "cogo-toast";
-import CompanySelector from "form/common/components/company/CompanySelector";
+import toast from "react-hot-toast";
+import CompanySelector from "../../common/components/company/CompanySelector";
 import { Field, Form, Formik } from "formik";
 import {
   EmitterType,
   Form as Bsdd,
   Mutation,
   MutationCreateFormArgs,
-  MutationUpdateFormArgs,
-} from "generated/graphql/types";
+  MutationUpdateFormArgs
+} from "codegen-ui";
 import React from "react";
 import {
   getInitialCompany,
-  getInitialEmitterWorkSite,
+  getInitialEmitterWorkSite
 } from "../utils/initial-state";
 import { CREATE_FORM, UPDATE_FORM } from "../utils/queries";
-import WorkSite from "form/common/components/work-site/WorkSite";
+import WorkSite from "../../common/components/work-site/WorkSite";
 
 export function Appendix1ProducerForm({
   container,
-  close,
+  close
 }: {
   container: Bsdd;
   close: () => void;
@@ -36,7 +36,7 @@ export function Appendix1ProducerForm({
 
   const currentGrouping =
     container.grouping?.map(g => ({
-      form: { id: g.form.id },
+      form: { id: g.form.id }
     })) ?? [];
 
   return (
@@ -50,13 +50,13 @@ export function Appendix1ProducerForm({
           emitter: {
             type: EmitterType.Appendix1Producer,
             isPrivateIndividual: false,
-            company: getInitialCompany(),
-          },
+            company: getInitialCompany()
+          }
         }}
         onSubmit={async (values, { setSubmitting }) => {
           try {
             const { data } = await createForm({
-              variables: { createFormInput: values },
+              variables: { createFormInput: values }
             });
             if (!data?.createForm) {
               throw new Error("Erreur lors de la création");
@@ -68,14 +68,14 @@ export function Appendix1ProducerForm({
                   id: container.id,
                   grouping: [
                     ...currentGrouping,
-                    { form: { id: data.createForm?.id } },
-                  ],
-                },
-              },
+                    { form: { id: data.createForm?.id } }
+                  ]
+                }
+              }
             });
             close();
           } catch (err: any) {
-            cogoToast.error(err.message, { hideAfter: 10 });
+            toast.error(err.message, { duration: 10 });
             setSubmitting(false);
           }
         }}

@@ -8,8 +8,8 @@ export default {
   component: InfoWithIcon,
   design: {
     type: "figma",
-    url: "https://www.figma.com/file/tyefue5qFChEpujrFU1Jiz/Librairie-TD-dashboard?node-id=1%3A2431&t=0tYb1cF2o4m4Id2g-4",
-  },
+    url: "https://www.figma.com/file/tyefue5qFChEpujrFU1Jiz/Librairie-TD-dashboard?node-id=1%3A2431&t=0tYb1cF2o4m4Id2g-4"
+  }
 } as ComponentMeta<typeof InfoWithIcon>;
 
 const Template: ComponentStory<typeof InfoWithIcon> = args => (
@@ -23,18 +23,18 @@ export const CustomInfo = Template.bind({});
 export const TransporterNumberPlate = Template.bind({});
 
 EntreposageProvisoire.args = {
-  labelCode: InfoIconCode.TempStorage,
+  labelCode: InfoIconCode.TempStorage
 };
 DateDeDerniereModification.args = {
   labelCode: InfoIconCode.LastModificationDate,
-  info: "21/12/2022",
+  info: "21/12/2022"
 };
 EcoOrganisme.args = {
-  labelCode: InfoIconCode.EcoOrganism,
+  labelCode: InfoIconCode.EcoOrganism
 };
 CustomInfo.args = {
-  labelCode: InfoIconCode.CustomInfo,
+  labelCode: InfoIconCode.CustomInfo
 };
 TransporterNumberPlate.args = {
-  labelCode: InfoIconCode.TransporterNumberPlate,
+  labelCode: InfoIconCode.TransporterNumberPlate
 };

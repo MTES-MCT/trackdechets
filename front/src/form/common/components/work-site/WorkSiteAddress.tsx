@@ -1,8 +1,8 @@
 import React, { useEffect, useReducer, useState } from "react";
 import * as Sentry from "@sentry/browser";
-import TdSwitch from "common/components/Switch";
+import TdSwitch from "../../../../common/components/Switch";
 
-import SearchInput from "common/components/SearchInput";
+import SearchInput from "../../../../common/components/SearchInput";
 import styles from "./WorkSiteAddress.module.scss";
 
 function init({ address, city, postalCode }) {
@@ -13,7 +13,7 @@ function init({ address, city, postalCode }) {
     searchResults: [],
     address,
     postalCode,
-    city,
+    city
   };
 }
 
@@ -26,13 +26,13 @@ function reducer(state, action) {
     case "set_fields":
       return {
         ...state,
-        ...action.payload,
+        ...action.payload
       };
     case "select_address":
       return {
         ...state,
         selectedAdress: action.payload,
-        searchInput: action.payload,
+        searchInput: action.payload
       };
   }
 }
@@ -43,7 +43,7 @@ export default function WorkSiteAddress({
   postalCode,
   onAddressSelection,
   designation,
-  disabled = false,
+  disabled = false
 }) {
   const [state, dispatch] = useReducer(
     reducer,
@@ -76,7 +76,7 @@ export default function WorkSiteAddress({
     onAddressSelection(feature.properties);
     dispatch({
       type: "select_address",
-      payload: feature.properties.label,
+      payload: feature.properties.label
     });
   }
   function setManualAddress(payload) {
@@ -84,14 +84,14 @@ export default function WorkSiteAddress({
 
     dispatch({
       type: "set_fields",
-      payload: { city, address, postalCode },
+      payload: { city, address, postalCode }
     });
 
     // beware postCode/postalCode & name/address (former fields returned by address api)
     onAddressSelection({
       city: city,
       name: address,
-      postcode: postalCode,
+      postcode: postalCode
     });
   }
 
@@ -133,7 +133,7 @@ export default function WorkSiteAddress({
                 setManualAddress({
                   city: state.city,
                   postalCode: state.postalCode,
-                  address: e.target.value,
+                  address: e.target.value
                 })
               }
             />
@@ -149,7 +149,7 @@ export default function WorkSiteAddress({
                 setManualAddress({
                   address: state.address,
                   postalCode: state.postalCode,
-                  city: e.target.value,
+                  city: e.target.value
                 })
               }
             />
@@ -165,7 +165,7 @@ export default function WorkSiteAddress({
                 setManualAddress({
                   address: state.address,
                   city: state.city,
-                  postalCode: e.target.value,
+                  postalCode: e.target.value
                 })
               }
             />

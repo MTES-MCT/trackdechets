@@ -1,14 +1,14 @@
 import { gql, useQuery } from "@apollo/client";
-import { InlineError } from "Apps/common/Components/Error/Error";
-import { formatDate } from "common/datetime";
+import { InlineError } from "../../../../Apps/common/Components/Error/Error";
+import { formatDate } from "../../../../common/datetime";
 import { FieldArray, useFormikContext } from "formik";
 import {
   Form,
   InitialFormFraction,
   Query,
   QueryAppendixFormsArgs,
-  Packagings,
-} from "generated/graphql/types";
+  Packagings
+} from "codegen-ui";
 import React, { useEffect, useMemo, useState } from "react";
 import { Decimal } from "decimal.js-light";
 
@@ -51,10 +51,10 @@ export default function Appendix2MultiSelect() {
     QueryAppendixFormsArgs
   >(APPENDIX2_FORMS, {
     variables: {
-      siret: values.emitter?.company?.siret ?? "",
+      siret: values.emitter?.company?.siret ?? ""
     },
     skip: !values.emitter?.company?.siret,
-    fetchPolicy: "network-only",
+    fetchPolicy: "network-only"
   });
 
   const [quantitesToGroup, setQuantitiesToGroup] = useState({});
@@ -75,14 +75,12 @@ export default function Appendix2MultiSelect() {
     return [
       ...initialValue.map(({ form, quantity }) => ({
         form,
-        quantity: new Decimal(quantity),
+        quantity: new Decimal(quantity)
       })),
       ...appendix2Forms.map(f => ({
         form: f,
-        quantity: new Decimal(f.quantityReceived!!).minus(
-          f.quantityGrouped ?? 0
-        ),
-      })),
+        quantity: new Decimal(f.quantityReceived!).minus(f.quantityGrouped ?? 0)
+      }))
     ].filter(({ form }) => {
       return wasteCodeFilter?.length
         ? form.wasteDetails?.code?.includes(wasteCodeFilter)
@@ -127,20 +125,20 @@ export default function Appendix2MultiSelect() {
               if (!acc2[packagingInfo.type]) {
                 return {
                   ...acc2,
-                  [packagingInfo.type]: packagingInfo.quantity,
+                  [packagingInfo.type]: packagingInfo.quantity
                 };
               }
               return {
                 ...acc2,
                 [packagingInfo.type]: [
                   Packagings.Benne,
-                  Packagings.Citerne,
+                  Packagings.Citerne
                 ].includes(packagingInfo.type)
                   ? Math.min(
                       packagingInfo.quantity + acc2[packagingInfo.type],
                       2
                     )
-                  : packagingInfo.quantity + acc2[packagingInfo.type],
+                  : packagingInfo.quantity + acc2[packagingInfo.type]
               };
             },
             acc1
@@ -149,7 +147,7 @@ export default function Appendix2MultiSelect() {
         return Object.keys(quantityByType).map(type => ({
           type,
           other: "",
-          quantity: quantityByType[type],
+          quantity: quantityByType[type]
         }));
       })();
 
@@ -166,7 +164,7 @@ export default function Appendix2MultiSelect() {
         "grouping",
         appendix2Candidates.map(candidate => ({
           form: candidate.form,
-          quantity: candidate.quantity.toNumber(),
+          quantity: candidate.quantity.toNumber()
         }))
       );
     }
@@ -223,7 +221,7 @@ export default function Appendix2MultiSelect() {
                   ({ form, quantity: defaultQuantity }, index) => {
                     const quantitySet = quantitesToGroup[form.id];
                     let quantityLeft = new Decimal(
-                      form.quantityReceived!!
+                      form.quantityReceived!
                     ).minus(form.quantityGrouped ?? 0);
 
                     if (values.id) {
@@ -248,7 +246,7 @@ export default function Appendix2MultiSelect() {
                                   quantity:
                                     quantitySet !== undefined
                                       ? quantitySet
-                                      : defaultQuantity.toNumber(),
+                                      : defaultQuantity.toNumber()
                                 });
                               } else {
                                 const idx = appendix2Selected
@@ -287,7 +285,7 @@ export default function Appendix2MultiSelect() {
                                 form,
                                 quantity: e.target.value
                                   ? parseFloat(e.target.value)
-                                  : 0,
+                                  : 0
                               });
                               setHasChanged(true);
                             }}

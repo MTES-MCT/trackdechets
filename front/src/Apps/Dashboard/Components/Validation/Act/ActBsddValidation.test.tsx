@@ -3,10 +3,10 @@ import { MockedProvider } from "@apollo/client/testing";
 
 import { render, screen, waitFor } from "@testing-library/react";
 import ActBsddValidation from "./ActBsddValidation";
-import { GET_FORM } from "form/bsdd/utils/queries";
+import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import ActBsdSuiteValidation from "./ActBsdSuiteValidation";
 import { MemoryRouter } from "react-router-dom";
-import { Form } from "generated/graphql/types";
+import { Form } from "codegen-ui";
 
 describe("ActBsddValidation", () => {
   const onClose = jest.fn();
@@ -14,18 +14,18 @@ describe("ActBsddValidation", () => {
     {
       request: {
         query: GET_FORM,
-        variables: { id: "1", readableId: null },
+        variables: { id: "1", readableId: null }
       },
       result: {
         data: {
           form: {
             readableId: "FORM-1",
             wasteDetails: { code: "01 01 01*" },
-            recipient: { company: { siret: "111111111" } },
-          },
-        },
-      },
-    },
+            recipient: { company: { siret: "111111111" } }
+          }
+        }
+      }
+    }
   ];
 
   it("renders with expected text when status is Resealed and user is emitter", () => {
@@ -33,7 +33,7 @@ describe("ActBsddValidation", () => {
     const resealedBsd = {
       id: "1",
       status: "RESEALED",
-      recipient: { company: { siret: "12345678901235" } },
+      recipient: { company: { siret: "12345678901235" } }
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -56,14 +56,14 @@ describe("ActBsddValidation", () => {
     const sealedBsd = {
       id: "1",
       status: "SEALED",
-      emitter: { company: { siret: "12345678901234" }, type: "APPENDIX1" },
+      emitter: { company: { siret: "12345678901234" }, type: "APPENDIX1" }
     } as Form;
 
     const mocksSealed = [
       {
         request: {
           query: GET_FORM,
-          variables: { id: "1", readableId: null },
+          variables: { id: "1", readableId: null }
         },
         result: {
           data: {
@@ -73,16 +73,16 @@ describe("ActBsddValidation", () => {
               wasteDetails: { code: "01 01 01*" },
               emitter: {
                 company: { siret: "12345678901234" },
-                type: "APPENDIX1",
+                type: "APPENDIX1"
               },
 
               recipient: {
-                company: { siret: "111111111" },
-              },
-            },
-          },
-        },
-      },
+                company: { siret: "111111111" }
+              }
+            }
+          }
+        }
+      }
     ];
     render(
       <MockedProvider mocks={mocksSealed} addTypename={false}>
@@ -113,8 +113,8 @@ describe("ActBsddValidation", () => {
       status: "SEALED",
       emitter: {
         company: { siret: "12345678901234" },
-        type: "APPENDIX1_PRODUCER",
-      },
+        type: "APPENDIX1_PRODUCER"
+      }
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -137,8 +137,8 @@ describe("ActBsddValidation", () => {
       status: "SEALED",
       emitter: {
         company: { siret: "12345678901234" },
-        type: "APPENDIX1_PRODUCER",
-      },
+        type: "APPENDIX1_PRODUCER"
+      }
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -162,11 +162,11 @@ describe("ActBsddValidation", () => {
       ecoOrganisme: { siret: "12345678901234" },
       emitter: {
         company: { siret: "12345678901234" },
-        type: "APPENDIX1_PRODUCER",
+        type: "APPENDIX1_PRODUCER"
       },
       transporter: {
-        company: { siret: "12345678901234" },
-      },
+        company: { siret: "12345678901234" }
+      }
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -186,14 +186,14 @@ describe("ActBsddValidation", () => {
     const currentSiret = "12345678901234";
     const resentBsd = {
       id: "1",
-      status: "RESENT",
+      status: "RESENT"
     } as Form;
 
     const mocksResent = [
       {
         request: {
           query: GET_FORM,
-          variables: { id: "1", readableId: null },
+          variables: { id: "1", readableId: null }
         },
         result: {
           data: {
@@ -203,13 +203,13 @@ describe("ActBsddValidation", () => {
               wasteDetails: { code: "01 01 01*" },
               recipient: {
                 company: { siret: "111111111" },
-                isTempStrorage: true,
+                isTempStrorage: true
               },
-              quantityType: "REAL",
-            },
-          },
-        },
-      },
+              quantityType: "REAL"
+            }
+          }
+        }
+      }
     ];
     render(
       <MockedProvider mocks={mocksResent} addTypename={false}>
@@ -234,7 +234,7 @@ describe("ActBsddValidation", () => {
     const signedByProducerBsd = {
       id: "1",
       status: "SIGNED_BY_PRODUCER",
-      transporter: { company: { orgId: "12345678901234" } },
+      transporter: { company: { orgId: "12345678901234" } }
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -259,7 +259,7 @@ describe("ActBsddValidation", () => {
     const currentSiret = "12345678901234";
     const tempStoredBsd = {
       id: "1",
-      status: "TEMP_STORED",
+      status: "TEMP_STORED"
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -287,7 +287,7 @@ describe("ActBsddValidation", () => {
     const sentBsd = {
       id: "1",
       status: "SENT",
-      recipient: { company: { siret: "12345678901234" } },
+      recipient: { company: { siret: "12345678901234" } }
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -313,7 +313,7 @@ describe("ActBsddValidation", () => {
     const sentBsdTempStorage = {
       id: "1",
       status: "SENT",
-      recipient: { company: { siret: "12345678901234" }, isTempStorage: true },
+      recipient: { company: { siret: "12345678901234" }, isTempStorage: true }
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -346,9 +346,9 @@ describe("ActBsddValidation", () => {
           readyToTakeOver: false,
           previousTransporterCompanySiret: "12345678901234",
           takenOverAt: null,
-          __typename: "TransportSegment",
-        },
-      ],
+          __typename: "TransportSegment"
+        }
+      ]
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -379,9 +379,9 @@ describe("ActBsddValidation", () => {
           id: "ckyef9g3a2924349syhsqc1wa",
           previousTransporterCompanySiret: "12345678901234",
           takenOverAt: "2023-03-17",
-          __typename: "TransportSegment",
-        },
-      ],
+          __typename: "TransportSegment"
+        }
+      ]
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -416,9 +416,9 @@ describe("ActBsddValidation", () => {
           previousTransporterCompanySiret: "12345678901234",
           takenOverAt: null,
           readyToTakeOver: true,
-          __typename: "TransportSegment",
-        },
-      ],
+          __typename: "TransportSegment"
+        }
+      ]
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -443,7 +443,7 @@ describe("ActBsddValidation", () => {
     const tempStorerAcceptedBsd = {
       id: "1",
       status: "TEMP_STORER_ACCEPTED",
-      recipient: { company: { siret: "12345678901235" } },
+      recipient: { company: { siret: "12345678901235" } }
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -464,7 +464,7 @@ describe("ActBsddValidation", () => {
     const signedByTempStorerBsd = {
       id: "1",
       status: "SIGNED_BY_TEMP_STORER",
-      recipient: { company: { siret: "12345678901235" } },
+      recipient: { company: { siret: "12345678901235" } }
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -485,7 +485,7 @@ describe("ActBsddValidation", () => {
 
     const receivedBsd = {
       id: "1",
-      status: "RECEIVED",
+      status: "RECEIVED"
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -509,7 +509,7 @@ describe("ActBsddValidation", () => {
     const currentSiret = "12345678901234";
     const acceptedBsd = {
       id: "1",
-      status: "ACCEPTED",
+      status: "ACCEPTED"
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -529,7 +529,7 @@ describe("ActBsddValidation", () => {
     const tempStorerAcceptedBsd = {
       id: "1",
       status: "TEMP_STORER_ACCEPTED",
-      destination: { company: { siret: "12345678901235" } },
+      destination: { company: { siret: "12345678901235" } }
     };
     const route = "/dashboard/12345678901235";
 

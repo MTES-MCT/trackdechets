@@ -1,16 +1,16 @@
 import * as React from "react";
-import { Modal, RedErrorMessage } from "common/components";
-import { NewAccessToken } from "generated/graphql/types";
+import { Modal, RedErrorMessage } from "../../common/components";
+import { NewAccessToken } from "codegen-ui";
 import { useMutation } from "@apollo/client";
 import { CREATE_ACCESS_TOKEN } from "./queries";
 import {
   NotificationError,
-  SimpleNotificationError,
-} from "Apps/common/Components/Error/Error";
+  SimpleNotificationError
+} from "../../Apps/common/Components/Error/Error";
 import { Field, Form, Formik } from "formik";
 import classNames from "classnames";
 import styles from "../fields/AccountField.module.scss";
-import TdTooltip from "common/components/Tooltip";
+import TdTooltip from "../../common/components/Tooltip";
 import * as yup from "yup";
 
 type AccountAccessTokenCreateProps = {
@@ -18,14 +18,14 @@ type AccountAccessTokenCreateProps = {
 };
 
 export default function AccountAccessTokenCreate({
-  onClose,
+  onClose
 }: AccountAccessTokenCreateProps) {
   const [createAccessToken, { loading, error }] = useMutation(
     CREATE_ACCESS_TOKEN,
     {
       onCompleted: data => {
         onClose(data.createAccessToken);
-      },
+      }
     }
   );
 

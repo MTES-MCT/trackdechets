@@ -5,7 +5,7 @@ import "./badge.scss";
 import { BsdStatusCode } from "../../../common/types/bsdTypes";
 import {
   getBsdStatusLabel,
-  getRevisionStatusLabel,
+  getRevisionStatusLabel
 } from "../../dashboardServices";
 
 function Badge({
@@ -13,7 +13,7 @@ function Badge({
   isDraft,
   bsdType,
   reviewStatus,
-  operationCode,
+  operationCode
 }: BadgeProps): JSX.Element {
   return (
     <>
@@ -26,7 +26,7 @@ function Badge({
           "fr-badge--error":
             status === BsdStatusCode.Refused ||
             status === BsdStatusCode.Canceled,
-          "fr-badge--canceled": status === BsdStatusCode.Canceled,
+          "fr-badge--canceled": status === BsdStatusCode.Canceled
         })}
       >
         {getBsdStatusLabel(status, isDraft, bsdType, operationCode)}
@@ -43,7 +43,7 @@ function Badge({
               "fr-badge--review_refused":
                 reviewStatus === BsdStatusCode.Refused,
               "fr-badge--review_cancelled":
-                reviewStatus === BsdStatusCode.Canceled,
+                reviewStatus === BsdStatusCode.Canceled
             })}
           >
             {getRevisionStatusLabel(reviewStatus as string)}

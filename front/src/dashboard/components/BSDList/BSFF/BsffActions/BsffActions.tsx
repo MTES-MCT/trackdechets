@@ -1,16 +1,16 @@
 import * as React from "react";
 import { generatePath, useParams, useLocation } from "react-router-dom";
 
-import routes from "Apps/routes";
+import routes from "../../../../../Apps/routes";
 import {
   IconView,
   IconPaperWrite,
   IconPdf,
   IconTrash,
   IconDuplicateFile,
-  IconQrCode,
-} from "Apps/common/Components/Icons/Icons";
-import { BsffStatus } from "generated/graphql/types";
+  IconQrCode
+} from "../../../../../Apps/common/Components/Icons/Icons";
+import { BsffStatus } from "codegen-ui";
 import { BsffFragment } from "../types";
 import { DeleteBsffModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
@@ -18,8 +18,8 @@ import { useDisplayRoadControlButton } from "../../RoadControlButton";
 import { useDuplicate } from "./useDuplicate";
 
 import styles from "../../BSDActions.module.scss";
-import { Loader } from "Apps/common/Components";
-import DropdownMenu from "Apps/common/Components/DropdownMenu/DropdownMenu";
+import { Loader } from "../../../../../Apps/common/Components";
+import DropdownMenu from "../../../../../Apps/common/Components/DropdownMenu/DropdownMenu";
 
 interface BsffActionsProps {
   form: BsffFragment;
@@ -30,7 +30,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
   const location = useLocation();
 
   const [duplicateBsff, { loading: isDuplicating }] = useDuplicate({
-    variables: { id: form.id },
+    variables: { id: form.id }
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
@@ -47,24 +47,24 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
       route: {
         pathname: generatePath(routes.dashboard.roadControl, {
           siret,
-          id: form.id,
+          id: form.id
         }),
-        state: { background: location },
+        state: { background: location }
       },
       icon: <IconQrCode color="blueLight" size="24px" />,
-      isVisible: useDisplayRoadControlButton(form),
+      isVisible: useDisplayRoadControlButton(form)
     },
     {
       title: "Aperçu",
       route: {
         pathname: generatePath(routes.dashboard.bsffs.view, {
           siret,
-          id: form.id,
+          id: form.id
         }),
-        state: { background: location },
+        state: { background: location }
       },
       icon: <IconView color="blueLight" size="24px" />,
-      isVisible: true,
+      isVisible: true
     },
     {
       title: "Pdf",
@@ -72,7 +72,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
       icon: <IconPdf size="24px" color="blueLight" />,
       isVisible: !form.isDraft,
       isButton: true,
-      handleClick: () => downloadPdf(),
+      handleClick: () => downloadPdf()
     },
     {
       title: "Dupliquer",
@@ -80,18 +80,18 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
       icon: <IconDuplicateFile size="24px" color="blueLight" />,
       isVisible: true,
       isButton: true,
-      handleClick: () => duplicateBsff(),
+      handleClick: () => duplicateBsff()
     },
     {
       title: "Modifier",
       route: generatePath(routes.dashboard.bsffs.edit, {
         siret,
-        id: form.id,
+        id: form.id
       }),
       icon: <IconPaperWrite size="24px" color="blueLight" />,
       isVisible: [BsffStatus.Initial, BsffStatus.SignedByEmitter].includes(
         form.bsffStatus
-      ),
+      )
     },
     {
       title: "Supprimer",
@@ -99,8 +99,8 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
       icon: <IconTrash color="blueLight" size="24px" />,
       isVisible: canDelete,
       isButton: true,
-      handleClick: () => setIsDeleting(true),
-    },
+      handleClick: () => setIsDeleting(true)
+    }
   ];
   return (
     <>

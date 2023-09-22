@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 import AccountFormAgreements from "./forms/AccountFormAgreements";
-import { CompanyPrivate, UserRole } from "../../generated/graphql/types";
+import { CompanyPrivate, UserRole } from "codegen-ui";
 import styles from "./AccountField.module.scss";
 
 interface Props {
@@ -17,7 +17,7 @@ AccountFieldCompanyAgreements.fragments = {
       userRole
       ecoOrganismeAgreements
     }
-  `,
+  `
 };
 
 export default function AccountFieldCompanyAgreements({ company }: Props) {
@@ -35,29 +35,25 @@ export default function AccountFieldCompanyAgreements({ company }: Props) {
       </ul>
     ) : null;
 
-  return (
-    <>
-      {company.userRole === UserRole.Admin ? (
-        <AccountField
+  return company.userRole === UserRole.Admin ? (
+    <AccountField
+      name={fieldName}
+      label={fieldLabel}
+      value={agreements}
+      renderForm={toggleEdition => (
+        <AccountFormAgreements
           name={fieldName}
-          label={fieldLabel}
-          value={agreements}
-          renderForm={toggleEdition => (
-            <AccountFormAgreements
-              name={fieldName}
-              ecoOrganismeAgreements={company.ecoOrganismeAgreements}
-              id={company.id}
-              toggleEdition={toggleEdition}
-            />
-          )}
-        />
-      ) : (
-        <AccountFieldNotEditable
-          name={fieldName}
-          label={fieldLabel}
-          value={agreements}
+          ecoOrganismeAgreements={company.ecoOrganismeAgreements}
+          id={company.id}
+          toggleEdition={toggleEdition}
         />
       )}
-    </>
+    />
+  ) : (
+    <AccountFieldNotEditable
+      name={fieldName}
+      label={fieldLabel}
+      value={agreements}
+    />
   );
 }

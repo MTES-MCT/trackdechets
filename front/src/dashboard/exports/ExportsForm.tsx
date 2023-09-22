@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Formik, Form, Field } from "formik";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import DateInput from "../../form/common/components/custom-inputs/DateInput";
 import styles from "./ExportsForms.module.scss";
 import {
   CompanyPrivate,
   CompanyType,
   Query,
-  WasteRegistryType,
-} from "generated/graphql/types";
-import WasteTreeModal from "search/WasteTreeModal";
+  WasteRegistryType
+} from "codegen-ui";
+import WasteTreeModal from "../../search/WasteTreeModal";
 
-import { ALL_WASTES, ALL_WASTES_TREE } from "generated/constants";
+import { ALL_WASTES, ALL_WASTES_TREE } from "shared/constants";
 import { useLazyQuery, gql } from "@apollo/client";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import { sortCompaniesByName } from "common/helper";
-import { wasteCodeValidator } from "form/common/wasteCode";
+import { NotificationError } from "../../Apps/common/Components/Error/Error";
+import RedErrorMessage from "../../common/components/RedErrorMessage";
+import { sortCompaniesByName } from "../../common/helper";
+import { wasteCodeValidator } from "../../form/common/wasteCode";
 
 interface IProps {
   companies: CompanyPrivate[];
@@ -38,7 +38,7 @@ ExportsForm.fragments = {
       givenName
       companyTypes
     }
-  `,
+  `
 };
 
 export const WASTES_REGISTRY_CSV = gql`
@@ -95,7 +95,7 @@ function getPossibleExportTypes(companies: CompanyPrivate[]) {
         CompanyType.WasteVehicles,
         CompanyType.WasteCenter,
         CompanyType.Collector,
-        CompanyType.Worker,
+        CompanyType.Worker
       ].includes(t)
     ).length > 0
   ) {
@@ -107,7 +107,7 @@ function getPossibleExportTypes(companies: CompanyPrivate[]) {
       [
         CompanyType.Wasteprocessor,
         CompanyType.WasteVehicles,
-        CompanyType.Collector,
+        CompanyType.Collector
       ].includes(t)
     ).length > 0
   ) {
@@ -143,21 +143,21 @@ export default function ExportsForm({ companies }: IProps) {
     endDate: now.toISOString(),
     companies,
     wasteCode: "",
-    exportFormat: "CSV",
+    exportFormat: "CSV"
   };
 
   const [
     wastesRegistryCsv,
-    { data: wastesCsvData, error: wastesCsvError, loading: wastesCsvLoading },
+    { data: wastesCsvData, error: wastesCsvError, loading: wastesCsvLoading }
   ] = useLazyQuery<Pick<Query, "wastesRegistryCsv">>(WASTES_REGISTRY_CSV, {
-    fetchPolicy: "network-only",
+    fetchPolicy: "network-only"
   });
 
   const [
     wastesRegistryXls,
-    { data: wastesXlsData, error: wastesXlsError, loading: wastesXlsLoading },
+    { data: wastesXlsData, error: wastesXlsError, loading: wastesXlsLoading }
   ] = useLazyQuery<Pick<Query, "wastesRegistryXls">>(WASTES_REGISTRY_XLS, {
-    fetchPolicy: "network-only",
+    fetchPolicy: "network-only"
   });
 
   // Formik onSubmit callback
@@ -168,7 +168,7 @@ export default function ExportsForm({ companies }: IProps) {
       startDate,
       endDate,
       wasteCode,
-      exportFormat,
+      exportFormat
     } = values;
 
     const downloadFile =
@@ -185,9 +185,9 @@ export default function ExportsForm({ companies }: IProps) {
         registryType: exportType,
         where: {
           ...dateFilter,
-          ...(wasteCode ? { wasteCode: { _eq: wasteCode } } : {}),
-        },
-      },
+          ...(wasteCode ? { wasteCode: { _eq: wasteCode } } : {})
+        }
+      }
     });
   };
 
@@ -201,7 +201,7 @@ export default function ExportsForm({ companies }: IProps) {
     }
     if (values.startDate > values.endDate) {
       return {
-        endDate: "La date de fin doit être supérieure à la date de début",
+        endDate: "La date de fin doit être supérieure à la date de début"
       };
     }
   };

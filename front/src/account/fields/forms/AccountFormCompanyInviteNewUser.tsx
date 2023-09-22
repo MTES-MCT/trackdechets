@@ -1,6 +1,6 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
-import RedErrorMessage from "common/components/RedErrorMessage";
+import RedErrorMessage from "../../../common/components/RedErrorMessage";
 import styles from "./AccountCompanyInviteNewUser.module.scss";
 import { useMutation, gql } from "@apollo/client";
 import AccountCompanyMember from "../../AccountCompanyMember";
@@ -9,10 +9,10 @@ import {
   CompanyPrivate,
   UserRole,
   Mutation,
-  MutationInviteUserToCompanyArgs,
-} from "generated/graphql/types";
-import cogoToast from "cogo-toast";
-import TdTooltip from "common/components/Tooltip";
+  MutationInviteUserToCompanyArgs
+} from "codegen-ui";
+import toast from "react-hot-toast";
+import TdTooltip from "../../../common/components/Tooltip";
 
 type Props = {
   company: CompanyPrivate;
@@ -24,7 +24,7 @@ AccountFormCompanyInviteNewUser.fragments = {
       id
       orgId
     }
-  `,
+  `
 };
 
 const INVITE_USER_TO_COMPANY = gql`
@@ -44,7 +44,7 @@ const INVITE_USER_TO_COMPANY = gql`
 `;
 
 const yupSchema = object().shape({
-  email: string().email(),
+  email: string().email()
 });
 
 const roleTooltip =
@@ -61,16 +61,16 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
     MutationInviteUserToCompanyArgs
   >(INVITE_USER_TO_COMPANY, {
     onCompleted: () => {
-      cogoToast.success("Invitation envoyée", { hideAfter: 5 });
+      toast.success("Invitation envoyée", { duration: 5 });
     },
     onError: () => {
-      cogoToast.error(
+      toast.error(
         "L'invitation n'a pas pu être envoyée. Veuillez réessayer dans quelques minutes.",
         {
-          hideAfter: 5,
+          duration: 5
         }
       );
-    },
+    }
   });
 
   return (
@@ -84,7 +84,7 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
       }}
       onSubmit={(values, { setSubmitting, setFieldError, resetForm }) => {
         inviteUserToCompany({
-          variables: values,
+          variables: values
         })
           .then(() => {
             setSubmitting(false);

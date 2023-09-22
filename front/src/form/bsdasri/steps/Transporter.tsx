@@ -1,5 +1,5 @@
-import CompanySelector from "form/common/components/company/CompanySelector";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import CompanySelector from "../../common/components/company/CompanySelector";
+import DateInput from "../../common/components/custom-inputs/DateInput";
 import { Field, useFormikContext } from "formik";
 
 import {
@@ -7,19 +7,19 @@ import {
   Bsdasri,
   BsdasriType,
   Query,
-  QueryCompanyInfosArgs,
-} from "generated/graphql/types";
+  QueryCompanyInfosArgs
+} from "codegen-ui";
 import React from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
 import classNames from "classnames";
 import Transport from "./Transport";
-import { Loader } from "Apps/common/Components";
-import companyStyles from "form/common/components/company/CompanyResult.module.scss";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import TransporterReceipt from "form/common/components/company/TransporterReceipt";
-import TransporterReceiptEditionSwitch from "form/common/components/company/TransporterReceiptEditionSwitch";
+import { Loader } from "../../../Apps/common/Components";
+import companyStyles from "../../common/components/company/CompanyResult.module.scss";
+import RedErrorMessage from "../../../common/components/RedErrorMessage";
+import TransporterReceipt from "../../common/components/company/TransporterReceipt";
+import TransporterReceiptEditionSwitch from "../../common/components/company/TransporterReceiptEditionSwitch";
 
 /**
  *
@@ -37,7 +37,7 @@ export default function Transporter({ status, stepName }) {
   // handedOverAt is editable even after dasri reception
   const showHandedOverAtField = [
     BsdasriStatus.Sent,
-    BsdasriStatus.Received,
+    BsdasriStatus.Received
   ].includes(status);
 
   const disabled = [BsdasriStatus.Sent, BsdasriStatus.Received].includes(
@@ -51,7 +51,7 @@ export default function Transporter({ status, stepName }) {
       {disabled && <DisabledFieldsInfo />}
       <div
         className={classNames("form__row", {
-          "field-emphasis": transportEmphasis,
+          "field-emphasis": transportEmphasis
         })}
       >
         {isSynthesizing ? (
@@ -75,7 +75,7 @@ export default function Transporter({ status, stepName }) {
       {showHandedOverAtField ? (
         <div
           className={classNames("form__row", {
-            "field-emphasis": transportEmphasis,
+            "field-emphasis": transportEmphasis
           })}
         >
           <h4 className="form__section-heading">
@@ -154,7 +154,7 @@ function CurrentCompanyWidget({ disabled = false }) {
           completed?.companyInfos?.contactPhone
         );
       }
-    },
+    }
   });
   if (loading) {
     return <Loader />;

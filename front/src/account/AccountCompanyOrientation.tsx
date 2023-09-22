@@ -1,6 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
-import routes from "Apps/routes";
+import routes from "../Apps/routes";
 
 import { CallOut } from "@codegouvfr/react-dsfr/CallOut";
 
@@ -20,9 +20,9 @@ export default function AccountCompanyOrientation() {
               iconPosition: "right",
               onClick: () => {
                 history.push({
-                  pathname: routes.account.companies.create.simple,
+                  pathname: routes.account.companies.create.simple
                 });
-              },
+              }
             }}
           >
             Vous produisez des déchets dangereux dans le cadre de votre activité
@@ -65,9 +65,9 @@ export default function AccountCompanyOrientation() {
               iconPosition: "right",
               onClick: () => {
                 history.push({
-                  pathname: routes.account.companies.create.pro,
+                  pathname: routes.account.companies.create.pro
                 });
-              },
+              }
             }}
           >
             Votre entreprise gère une grande quantité de déchets. Vous souhaitez
@@ -88,9 +88,9 @@ export default function AccountCompanyOrientation() {
               iconPosition: "right",
               onClick: () => {
                 history.push({
-                  pathname: routes.account.companies.create.foreign,
+                  pathname: routes.account.companies.create.foreign
                 });
-              },
+              }
             }}
           >
             Votre entreprise n'est pas immatriculée en France, mais vous

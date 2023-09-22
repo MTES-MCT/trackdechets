@@ -1,5 +1,5 @@
-import cogoToast from "cogo-toast";
-import TdModal from "Apps/common/Components/Modal/Modal";
+import toast from "react-hot-toast";
+import TdModal from "../../../Apps/common/Components/Modal/Modal";
 import { Formik, Form, Field } from "formik";
 import { gql, useMutation } from "@apollo/client";
 import React from "react";
@@ -7,9 +7,9 @@ import styles from "./CompanyVerifyModal.module.scss";
 import {
   CompanyForVerification,
   Mutation,
-  MutationVerifyCompanyByAdminArgs,
-} from "generated/graphql/types";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+  MutationVerifyCompanyByAdminArgs
+} from "codegen-ui";
+import { NotificationError } from "../../../Apps/common/Components/Error/Error";
 
 type VerifyModalProps = {
   isOpen: boolean;
@@ -35,21 +35,21 @@ const VERIFY_COMPANY_BY_ADMIN = gql`
 export default function CompanyVerifyModal({
   isOpen,
   onClose,
-  company,
+  company
 }: VerifyModalProps) {
   const [verifyCompanyByAdmin, { error, loading }] = useMutation<
     Pick<Mutation, "verifyCompanyByAdmin">,
     MutationVerifyCompanyByAdminArgs
   >(VERIFY_COMPANY_BY_ADMIN, {
     onCompleted: () => {
-      cogoToast.success("Verification envoyée", { hideAfter: 5 });
+      toast.success("Verification envoyée", { duration: 5 });
       return onClose();
     },
     onError: () => {
-      cogoToast.error("La vérification n'a pas pu être envoyée", {
-        hideAfter: 5,
+      toast.error("La vérification n'a pas pu être envoyée", {
+        duration: 5
       });
-    },
+    }
   });
 
   function onSubmit(values: Values) {
@@ -57,9 +57,9 @@ export default function CompanyVerifyModal({
       variables: {
         input: {
           siret: company.orgId!,
-          verificationComment: values.verificationComment,
-        },
-      },
+          verificationComment: values.verificationComment
+        }
+      }
     });
   }
 

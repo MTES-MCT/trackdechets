@@ -284,11 +284,20 @@ input BsffTransporterRecepisseInput {
   "Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement)"
   isExempted: Boolean
   "Le cas échéant, numéro de récépissé mentionné à l'article R. 541-51 du code de l'environnement."
-  number: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
+  number: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport "
+    )
   "Le cas échéant, département de la déclaration mentionnée à l'article R. 541-50 du code de l'environnement."
-  department: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
+  department: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport "
+    )
   "Le cas échéant, limite de validité du récépissé."
-  validityLimit: DateTime @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
+  validityLimit: DateTime
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport "
+    )
 }
 input BsffTransporterTransportInput {
   "Date de prise en charge"

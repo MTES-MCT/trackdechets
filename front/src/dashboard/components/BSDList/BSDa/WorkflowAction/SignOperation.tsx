@@ -1,32 +1,32 @@
 import { useMutation } from "@apollo/client";
-import { RedErrorMessage } from "common/components";
-import { GET_BSDS } from "Apps/common/queries";
-import routes from "Apps/routes";
+import { RedErrorMessage } from "../../../../../common/components";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import routes from "../../../../../Apps/routes";
 import { format, subMonths } from "date-fns";
-import { UPDATE_BSDA } from "form/bsda/stepper/queries";
-import Operation from "form/bsda/stepper/steps/Operation";
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import { getComputedState } from "form/common/getComputedState";
+import { UPDATE_BSDA } from "../../../../../form/bsda/stepper/queries";
+import Operation from "../../../../../form/bsda/stepper/steps/Operation";
+import { getInitialCompany } from "../../../../../form/bsdd/utils/initial-state";
+import { getComputedState } from "../../../../../form/common/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
   BsdaSignatureType,
   Mutation,
   MutationSignBsdaArgs,
   MutationUpdateBsdaArgs,
-  SignatureTypeInput,
-} from "generated/graphql/types";
+  SignatureTypeInput
+} from "codegen-ui";
 import React from "react";
 import { generatePath, Link, useRouteMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsda, SIGN_BSDA } from "./SignBsda";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 
 const validationSchema = yup.object({
   date: yup.date().required("La date est requise"),
   author: yup
     .string()
     .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis")
 });
 
 type Props = {
@@ -41,7 +41,7 @@ export function SignOperation({
   bsdaId,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton,
+  displayActionButton
 }: Props) {
   const [updateBsda, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsda">,
@@ -52,7 +52,7 @@ export function SignOperation({
     MutationSignBsdaArgs
   >(SIGN_BSDA, {
     refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
+    awaitRefetchQueries: true
   });
 
   const TODAY = new Date();
@@ -80,7 +80,7 @@ export function SignOperation({
             <Link
               to={generatePath(routes[dashboardRoutePrefix].bsdas.edit, {
                 siret,
-                id: bsda.id,
+                id: bsda.id
               })}
               className="btn btn--primary"
             >
@@ -100,17 +100,17 @@ export function SignOperation({
                       date: format(new Date(), "yyyy-MM-dd"),
                       acceptationStatus: "ACCEPTED",
                       refusalReason: "",
-                      weight: null,
+                      weight: null
                     },
                     operation: {
                       date: format(new Date(), "yyyy-MM-dd"),
                       code: "",
-                      nextDestination: { company: getInitialCompany() },
-                    },
-                  },
+                      nextDestination: { company: getInitialCompany() }
+                    }
+                  }
                 },
                 bsda
-              ),
+              )
             }}
             validationSchema={validationSchema}
             onSubmit={async values => {
@@ -118,8 +118,8 @@ export function SignOperation({
               await updateBsda({
                 variables: {
                   id: bsda.id,
-                  input: update,
-                },
+                  input: update
+                }
               });
               await signBsda({
                 variables: {
@@ -127,14 +127,14 @@ export function SignOperation({
                   input: {
                     date,
                     author,
-                    type: BsdaSignatureType.Operation,
-                  },
-                },
+                    type: BsdaSignatureType.Operation
+                  }
+                }
               });
               onClose();
             }}
           >
-            {({ isSubmitting, handleReset, values }) => (
+            {({ isSubmitting, handleReset }) => (
               <Form>
                 <div className="tw-mb-6">
                   <Operation bsda={bsda} />

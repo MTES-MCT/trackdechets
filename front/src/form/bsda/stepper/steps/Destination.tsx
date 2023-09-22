@@ -1,12 +1,12 @@
 import React from "react";
 import { Field, useFormikContext } from "formik";
-import CompanySelector from "form/common/components/company/CompanySelector";
-import { Bsda, BsdaType } from "generated/graphql/types";
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import CompanySelector from "../../../common/components/company/CompanySelector";
+import { Bsda, BsdaType } from "codegen-ui";
+import { getInitialCompany } from "../../../bsdd/utils/initial-state";
+import RedErrorMessage from "../../../../common/components/RedErrorMessage";
+import DateInput from "../../../common/components/custom-inputs/DateInput";
 import Select from "react-select";
-import { IntermediariesSelector } from "form/bsda/components/intermediaries/IntermediariesSelector";
+import { IntermediariesSelector } from "../../components/intermediaries/IntermediariesSelector";
 
 export function Destination({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Bsda>();
@@ -27,8 +27,8 @@ export function Destination({ disabled }) {
           recepisse: {
             number: "",
             department: "",
-            validityLimit: null,
-          },
+            validityLimit: null
+          }
         },
         false
       );
@@ -48,8 +48,8 @@ export function Destination({ disabled }) {
           mail: "",
           phone: "",
           vatNumber: "",
-          country: "",
-        },
+          country: ""
+        }
       ])
     );
   }
@@ -70,8 +70,8 @@ export function Destination({ disabled }) {
           plannedOperationCode,
           operation: {
             ...values.destination?.operation,
-            nextDestination: null,
-          },
+            nextDestination: null
+          }
         },
         false
       );
@@ -88,9 +88,9 @@ export function Destination({ disabled }) {
             nextDestination: {
               company,
               cap,
-              plannedOperationCode,
-            },
-          },
+              plannedOperationCode
+            }
+          }
         },
         false
       );
@@ -291,14 +291,14 @@ export function Destination({ disabled }) {
                 ? [
                     {
                       value: "BROKER",
-                      label: "Je suis passé par un courtier",
-                    },
+                      label: "Je suis passé par un courtier"
+                    }
                   ]
                 : []),
               {
                 value: "INTERMEDIARY",
-                label: "Ajouter un autre type d'intermédiaire",
-              },
+                label: "Ajouter un autre type d'intermédiaire"
+              }
             ]}
             onChange={option => {
               switch ((option as { value: string })?.value) {

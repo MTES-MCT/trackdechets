@@ -1,8 +1,8 @@
-import { IconClose } from "Apps/common/Components/Icons/Icons";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { IconClose } from "../../../../Apps/common/Components/Icons/Icons";
+import RedErrorMessage from "../../../../common/components/RedErrorMessage";
+import NumberInput from "../../../common/components/custom-inputs/NumberInput";
 import { Field, FieldArray, FieldProps, useFormikContext } from "formik";
-import { BsdaPackaging, BsdaPackagingType } from "generated/graphql/types";
+import { BsdaPackaging, BsdaPackagingType } from "codegen-ui";
 import React, { InputHTMLAttributes } from "react";
 import "./Packagings.scss";
 
@@ -12,12 +12,12 @@ export const PACKAGINGS_NAMES = {
   [BsdaPackagingType.PaletteFilme]: "Palette filmée",
   [BsdaPackagingType.SacRenforce]: "Sac renforcé",
   [BsdaPackagingType.ConteneurBag]: "Conteneur-bag",
-  [BsdaPackagingType.Other]: "Autre(s)",
+  [BsdaPackagingType.Other]: "Autre(s)"
 };
 
 export default function Packagings({
   field: { name, value },
-  disabled,
+  disabled
 }: FieldProps<BsdaPackaging[] | null> & InputHTMLAttributes<HTMLInputElement>) {
   const { setFieldValue } = useFormikContext();
 
@@ -59,7 +59,7 @@ export default function Packagings({
                                   event.target.value === BsdaPackagingType.Other
                                     ? p.other
                                     : "",
-                                quantity: p.quantity,
+                                quantity: p.quantity
                               });
                             }}
                           >
@@ -133,7 +133,7 @@ export default function Packagings({
                 arrayHelpers.push({
                   type: BsdaPackagingType.Other,
                   other: "",
-                  quantity: 1,
+                  quantity: 1
                 })
               }
             >

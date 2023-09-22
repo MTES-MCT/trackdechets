@@ -7,7 +7,7 @@ export const envVariables = z
       required_error:
         "Please explicitly set the `TZ` env variable to `Europe/Paris`."
     }),
-    NODE_ENV: z.enum(["test", "production", "dev"]),
+    NODE_ENV: z.enum(["test", "production", "dev", "development"]),
     // -------
     // Dbs
     REDIS_URL: z.string(),

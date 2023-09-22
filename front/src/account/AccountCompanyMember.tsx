@@ -2,18 +2,18 @@ import React from "react";
 import { gql, useMutation } from "@apollo/client";
 import {
   IconTrash,
-  IconEmailActionUnread,
-} from "Apps/common/Components/Icons/Icons";
+  IconEmailActionUnread
+} from "../Apps/common/Components/Icons/Icons";
 import styles from "./AccountCompanyMember.module.scss";
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
 import {
   CompanyPrivate,
   CompanyMember,
   UserRole,
   Mutation,
   MutationRemoveUserFromCompanyArgs,
-  MutationDeleteInvitationArgs,
-} from "generated/graphql/types";
+  MutationDeleteInvitationArgs
+} from "codegen-ui";
 
 type Props = {
   company: CompanyPrivate;
@@ -38,7 +38,7 @@ AccountCompanyMember.fragments = {
       isActive
       isPendingInvitation
     }
-  `,
+  `
 };
 
 const REMOVE_USER_FROM_COMPANY = gql`
@@ -81,96 +81,94 @@ export default function AccountCompanyMember({ company, user }: Props) {
     MutationDeleteInvitationArgs
   >(DELETE_INVITATION, {
     onCompleted: () => {
-      cogoToast.success("Invitation supprimée", { hideAfter: 5 });
+      toast.success("Invitation supprimée", { duration: 5 });
     },
     onError: () => {
-      cogoToast.error("L'invitation n'a pas pu être supprimée", {
-        hideAfter: 5,
+      toast.error("L'invitation n'a pas pu être supprimée", {
+        duration: 5
       });
-    },
+    }
   });
   const [resendInvitation, { loading: resendLoading }] = useMutation(
     RESEND_INVITATION,
     {
       onCompleted: () => {
-        cogoToast.success("Invitation renvoyée", { hideAfter: 5 });
+        toast.success("Invitation renvoyée", { duration: 5 });
       },
       onError: () => {
-        cogoToast.error(
+        toast.error(
           "L'invitation n'a pas pu être renvoyée. Veuillez réessayer dans quelques minutes.",
           {
-            hideAfter: 5,
+            duration: 5
           }
         );
-      },
+      }
     }
   );
   return (
-    <>
-      <tr key={user.id}>
-        <td>
-          {user.name} {user.isMe && <span>(vous)</span>}
+    <tr key={user.id}>
+      <td>
+        {user.name} {user.isMe && <span>(vous)</span>}
+      </td>
+      <td>{user.email}</td>
+      <td>
+        {user.role === UserRole.Admin ? "Administrateur" : "Collaborateur"}
+      </td>
+      <td>
+        {user.isPendingInvitation
+          ? "Invitation en attente"
+          : user.isActive
+          ? "Utilisateur actif"
+          : "Email non confirmé"}
+      </td>
+      {!user.isMe && !user.isPendingInvitation && (
+        <td className={styles["right-column"]}>
+          <button
+            className="btn btn--primary"
+            onClick={() => {
+              removeUserFromCompany({
+                variables: { siret: company.orgId!, userId: user.id }
+              });
+            }}
+          >
+            <IconTrash /> Retirer les droits
+          </button>
         </td>
-        <td>{user.email}</td>
-        <td>
-          {user.role === UserRole.Admin ? "Administrateur" : "Collaborateur"}
-        </td>
-        <td>
-          {user.isPendingInvitation
-            ? "Invitation en attente"
-            : user.isActive
-            ? "Utilisateur actif"
-            : "Email non confirmé"}
-        </td>
-        {!user.isMe && !user.isPendingInvitation && (
+      )}
+      {user.isPendingInvitation && (
+        <>
           <td className={styles["right-column"]}>
             <button
               className="btn btn--primary"
+              disabled={deleteLoading}
               onClick={() => {
-                removeUserFromCompany({
-                  variables: { siret: company.orgId!, userId: user.id },
+                deleteInvitation({
+                  variables: { email: user.email, siret: company.orgId! }
                 });
               }}
             >
-              <IconTrash /> Retirer les droits
+              <IconTrash />{" "}
+              {deleteLoading
+                ? "Suppression en cours"
+                : "Supprimer l'invitation"}
             </button>
           </td>
-        )}
-        {user.isPendingInvitation && (
-          <>
-            <td className={styles["right-column"]}>
-              <button
-                className="btn btn--primary"
-                disabled={deleteLoading}
-                onClick={() => {
-                  deleteInvitation({
-                    variables: { email: user.email, siret: company.orgId! },
-                  });
-                }}
-              >
-                <IconTrash />{" "}
-                {deleteLoading
-                  ? "Suppression en cours"
-                  : "Supprimer l'invitation"}
-              </button>
-            </td>
-            <td className={styles["right-column"]}>
-              <button
-                className="btn btn--primary"
-                disabled={resendLoading}
-                onClick={() => {
-                  resendInvitation({
-                    variables: { email: user.email, siret: company.orgId },
-                  });
-                }}
-              >
-                <IconEmailActionUnread />{" "}
-                {resendLoading ? "Envoi en cours" : "Renvoyer l'invitation"}
-              </button>
-            </td>
-          </>
-        )}
-      </tr>
-    </>
+          <td className={styles["right-column"]}>
+            <button
+              className="btn btn--primary"
+              disabled={resendLoading}
+              onClick={() => {
+                resendInvitation({
+                  variables: { email: user.email, siret: company.orgId }
+                });
+              }}
+            >
+              <IconEmailActionUnread />{" "}
+              {resendLoading ? "Envoi en cours" : "Renvoyer l'invitation"}
+            </button>
+          </td>
+        </>
+      )}
+    </tr>
   );
 }

@@ -1,12 +1,12 @@
 import React from "react";
 import BsdaDetailContent from "./BsdaDetailContent";
-import Loader from "Apps/common/Components/Loader/Loaders";
+import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { useQuery } from "@apollo/client";
-import { Query, QueryBsdaArgs } from "generated/graphql/types";
+import { Query, QueryBsdaArgs } from "codegen-ui";
 import { useParams } from "react-router-dom";
-import { InlineError } from "Apps/common/Components/Error/Error";
-import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
-import { GET_BSDA } from "form/bsda/stepper/queries";
+import { InlineError } from "../../../Apps/common/Components/Error/Error";
+import EmptyDetail from "../common/EmptyDetailView";
+import { GET_BSDA } from "../../../form/bsda/stepper/queries";
 
 export function RouteBSDasView() {
   const { id: formId } = useParams<{ id: string }>();
@@ -14,10 +14,10 @@ export function RouteBSDasView() {
     GET_BSDA,
     {
       variables: {
-        id: formId,
+        id: formId
       },
       skip: !formId,
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     }
   );
 

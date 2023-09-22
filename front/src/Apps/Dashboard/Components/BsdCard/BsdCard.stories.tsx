@@ -1,17 +1,17 @@
 import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-import { Bsdasri } from "generated/graphql/types";
+import { Bsdasri } from "codegen-ui";
 
 import BsdCard from "./BsdCard";
-import { BsdCurrentTab } from "Apps/common/types/commonTypes";
+import { BsdCurrentTab } from "../../../common/types/commonTypes";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCard",
   component: BsdCard,
   design: {
     type: "figma",
-    url: "https://www.figma.com/file/tyefue5qFChEpujrFU1Jiz/Librairie-TD-dashboard?node-id=1%3A2420&t=0tYb1cF2o4m4Id2g-4",
-  },
+    url: "https://www.figma.com/file/tyefue5qFChEpujrFU1Jiz/Librairie-TD-dashboard?node-id=1%3A2420&t=0tYb1cF2o4m4Id2g-4"
+  }
 } as ComponentMeta<typeof BsdCard>;
 
 const Template: ComponentStory<typeof BsdCard> = args => <BsdCard {...args} />;
@@ -30,7 +30,7 @@ BsdCardExample.args = {
     isDraft: false,
     bsdasriWaste: {
       code: "18 01 03*",
-      __typename: "BsdasriWaste",
+      __typename: "BsdasriWaste"
     },
     emitter: {
       company: {
@@ -39,19 +39,19 @@ BsdCardExample.args = {
         siret: "81232991000010",
         vatNumber: null,
         omiNumber: null,
-        __typename: "FormCompany",
+        __typename: "FormCompany"
       },
       emission: {
         isTakenOverWithoutEmitterSignature: false,
         isTakenOverWithSecretCode: false,
-        __typename: "BsdasriEmission",
+        __typename: "BsdasriEmission"
       },
-      __typename: "BsdasriEmitter",
+      __typename: "BsdasriEmitter"
     },
     ecoOrganisme: {
       siret: "79250555400032",
       emittedByEcoOrganisme: true,
-      __typename: "BsdasriEcoOrganisme",
+      __typename: "BsdasriEcoOrganisme"
     },
     transporter: {
       company: {
@@ -60,14 +60,14 @@ BsdCardExample.args = {
         siret: "13001045700013",
         vatNumber: null,
         omiNumber: null,
-        __typename: "FormCompany",
+        __typename: "FormCompany"
       },
       customInfo: "houlalalal",
       transport: {
         plates: ["obligé"],
-        __typename: "BsdasriTransport",
+        __typename: "BsdasriTransport"
       },
-      __typename: "BsdasriTransporter",
+      __typename: "BsdasriTransporter"
     },
     destination: {
       company: {
@@ -76,9 +76,9 @@ BsdCardExample.args = {
         siret: "53230142100022",
         vatNumber: null,
         omiNumber: null,
-        __typename: "FormCompany",
+        __typename: "FormCompany"
       },
-      __typename: "BsdasriDestination",
+      __typename: "BsdasriDestination"
     },
     grouping: [],
     synthesizing: [],
@@ -87,11 +87,11 @@ BsdCardExample.args = {
     allowDirectTakeOver: false,
     synthesizedIn: {
       id: "DASRI-20220603-V61NMBREF",
-      __typename: "Bsdasri",
+      __typename: "Bsdasri"
     },
-    __typename: "Bsdasri",
+    __typename: "Bsdasri"
   } as unknown as Bsdasri,
   currentSiret,
   onValidate,
-  bsdCurrentTab,
+  bsdCurrentTab
 };

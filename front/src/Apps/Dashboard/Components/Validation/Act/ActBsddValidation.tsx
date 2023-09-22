@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
-import { Loader } from "Apps/common/Components";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import TdModal from "Apps/common/Components/Modal/Modal";
-import { statusChangeFragment } from "Apps/common/queries/fragments";
-import { GET_BSDS } from "Apps/common/queries";
-import AcceptedInfo from "dashboard/components/BSDList/BSDD/WorkflowAction/AcceptedInfo";
-import ReceivedInfo from "dashboard/components/BSDList/BSDD/WorkflowAction/ReceivedInfo";
-import { MarkSegmentAsReadyToTakeOver } from "dashboard/components/BSDList/BSDD/WorkflowAction/segments/MarkSegmentAsReadyToTakeOver";
-import { PrepareSegment } from "dashboard/components/BSDList/BSDD/WorkflowAction/segments/PrepareSegment";
-import { TakeOverSegment } from "dashboard/components/BSDList/BSDD/WorkflowAction/segments/TakeOverSegment";
-import { GET_FORM } from "form/bsdd/utils/queries";
+import { Loader } from "../../../../common/Components";
+import { NotificationError } from "../../../../common/Components/Error/Error";
+import TdModal from "../../../../common/Components/Modal/Modal";
+import { statusChangeFragment } from "../../../../common/queries/fragments";
+import { GET_BSDS } from "../../../../common/queries";
+import AcceptedInfo from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/AcceptedInfo";
+import ReceivedInfo from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/ReceivedInfo";
+import { MarkSegmentAsReadyToTakeOver } from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/segments/MarkSegmentAsReadyToTakeOver";
+import { PrepareSegment } from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/segments/PrepareSegment";
+import { TakeOverSegment } from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/segments/TakeOverSegment";
+import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import {
   EmitterType,
   Form,
@@ -20,17 +20,17 @@ import {
   MutationMarkAsTempStorerAcceptedArgs,
   QuantityType,
   Query,
-  QueryFormArgs,
-} from "generated/graphql/types";
+  QueryFormArgs
+} from "codegen-ui";
 import {
   isAppendix1,
-  isSignTransportCanSkipEmission,
-} from "Apps/Dashboard/dashboardServices";
-import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
+  isSignTransportCanSkipEmission
+} from "../../../dashboardServices";
+import { Appendix1ProducerForm } from "../../../../../form/bsdd/appendix1Producer/form";
 import MarkAsProcessedModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/MarkAsProcessedModalContent";
 import SignEmissionFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignEmissionFormModalContent";
 import SignTransportFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignTransportFormModalContent";
-import { mapBsdd } from "Apps/Dashboard/bsdMapper";
+import { mapBsdd } from "../../../bsdMapper";
 
 const MARK_TEMP_STORER_ACCEPTED = gql`
   mutation MarkAsTempStorerAccepted(
@@ -69,20 +69,20 @@ const ActBsddValidation = ({
   isOpen,
   onClose,
   hasAutomaticSignature,
-  hasEmitterSignSecondaryCta,
+  hasEmitterSignSecondaryCta
 }: ActBsddValidationProps) => {
   const [getBsdd, { error: bsddGetError, data, loading: bsddGetLoading }] =
     useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
       variables: {
         id: bsd.id,
-        readableId: null,
+        readableId: null
       },
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     });
 
   const [
     markAsTempStorerAccepted,
-    { loading: loadingTempStorer, error: errorTempStorer },
+    { loading: loadingTempStorer, error: errorTempStorer }
   ] = useMutation<
     Pick<Mutation, "markAsTempStorerAccepted">,
     MutationMarkAsTempStorerAcceptedArgs
@@ -91,7 +91,7 @@ const ActBsddValidation = ({
     awaitRefetchQueries: true,
     onError: () => {
       // The error is handled in the UI
-    },
+    }
   });
   const [markAsAccepted, { loading: loadingAccepted, error: errorAccepted }] =
     useMutation<Pick<Mutation, "markAsAccepted">, MutationMarkAsAcceptedArgs>(
@@ -101,7 +101,7 @@ const ActBsddValidation = ({
         awaitRefetchQueries: true,
         onError: () => {
           // The error is handled in the UI
-        },
+        }
       }
     );
 
@@ -139,7 +139,7 @@ const ActBsddValidation = ({
       const bsdDisplay = mapBsdd(bsd);
       const emitterSirets = [
         bsd.emitter?.company?.siret,
-        bsd.ecoOrganisme?.siret,
+        bsd.ecoOrganisme?.siret
       ];
       const currentUserIsEmitter = emitterSirets.includes(currentSiret);
       const title = currentUserIsEmitter
@@ -401,9 +401,9 @@ const ActBsddValidation = ({
             tempStorerAcceptedInfo: {
               ...values,
               quantityReceived: values.quantityReceived ?? 0,
-              quantityType: values.quantityType ?? QuantityType.Real,
-            },
-          },
+              quantityType: values.quantityType ?? QuantityType.Real
+            }
+          }
         });
       return renderMarkAsProcessedOrAcceptedModal(
         onSubmit,
@@ -448,9 +448,9 @@ const ActBsddValidation = ({
             id: bsd.id,
             acceptedInfo: {
               ...values,
-              quantityReceived: values.quantityReceived ?? 0,
-            },
-          },
+              quantityReceived: values.quantityReceived ?? 0
+            }
+          }
         });
       return renderMarkAsProcessedOrAcceptedModal(
         onSubmit,

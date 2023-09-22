@@ -1,11 +1,11 @@
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import NumberInput from "../../../common/components/custom-inputs/NumberInput";
 import { Field, FieldProps, useFormikContext } from "formik";
-import { BsdasriWasteAcceptation, Bsdasri } from "generated/graphql/types";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import { BsdasriWasteAcceptation, Bsdasri } from "codegen-ui";
+import { RadioButton } from "../../../common/components/custom-inputs/RadioButton";
 import React, { InputHTMLAttributes } from "react";
-import { Label, RedErrorMessage } from "common/components";
-import TdSwitch from "common/components/Switch";
-import { getNestedNode } from "common/helper";
+import { Label, RedErrorMessage } from "../../../../common/components";
+import TdSwitch from "../../../../common/components/Switch";
+import { getNestedNode } from "../../../../common/helper";
 
 export function AcceptOnlyField({ field: { name } }) {
   const { values, setFieldValue } = useFormikContext<Bsdasri>();

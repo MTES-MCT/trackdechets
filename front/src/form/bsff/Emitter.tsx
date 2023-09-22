@@ -5,11 +5,11 @@ import {
   BsffFicheIntervention,
   BsffPackagingInput,
   BsffType,
-  CompanyInput,
-} from "generated/graphql/types";
-import CompanySelector from "form/common/components/company/CompanySelector";
+  CompanyInput
+} from "codegen-ui";
+import CompanySelector from "../common/components/company/CompanySelector";
 import { FicheInterventionList } from "./FicheInterventionList";
-import MyCompanySelector from "form/common/components/company/MyCompanySelector";
+import MyCompanySelector from "../common/components/company/MyCompanySelector";
 
 export default function Emitter({ disabled }) {
   const [{ value: id }] = useField<CompanyInput>("id");

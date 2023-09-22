@@ -3,8 +3,8 @@ import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import { object, string } from "yup";
-import { User, MutationEditProfileArgs } from "generated/graphql/types";
-import { validatePhoneNumber } from "common/helper";
+import { User, MutationEditProfileArgs } from "codegen-ui";
+import { validatePhoneNumber } from "../../common/helper";
 
 type Me = Pick<User, "phone">;
 
@@ -18,7 +18,7 @@ AccountFieldPhone.fragments = {
       id
       phone
     }
-  `,
+  `
 };
 
 const UPDATE_PHONE = gql`
@@ -38,7 +38,7 @@ const yupSchema = object().shape({
       "is-valid-phone",
       "Merci de renseigner un numéro de téléphone valide",
       value => !value || validatePhoneNumber(value)
-    ),
+    )
 });
 
 export default function AccountFieldPhone({ me }: Props) {

@@ -9,8 +9,8 @@ const buildUpdateQueryFn = (name: string) => {
       [name]: {
         ...prev[name],
         ...fetchMoreResult[name],
-        edges: prev[name].edges.concat(fetchMoreResult[name].edges),
-      },
+        edges: prev[name].edges.concat(fetchMoreResult[name].edges)
+      }
     };
   };
   return updateQueryFn;

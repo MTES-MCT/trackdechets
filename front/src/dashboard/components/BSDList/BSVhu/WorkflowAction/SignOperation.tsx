@@ -1,21 +1,21 @@
 import { useMutation } from "@apollo/client";
-import { RedErrorMessage } from "common/components";
-import { GET_BSDS } from "Apps/common/queries";
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import Operation from "form/bsvhu/Operation";
-import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
-import { getComputedState } from "form/common/getComputedState";
+import { RedErrorMessage } from "../../../../../common/components";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import { getInitialCompany } from "../../../../../form/bsdd/utils/initial-state";
+import Operation from "../../../../../form/bsvhu/Operation";
+import { UPDATE_VHU_FORM } from "../../../../../form/bsvhu/utils/queries";
+import { getComputedState } from "../../../../../form/common/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
   Mutation,
   MutationSignBsvhuArgs,
   MutationUpdateBsvhuArgs,
-  SignatureTypeInput,
-} from "generated/graphql/types";
+  SignatureTypeInput
+} from "codegen-ui";
 import React from "react";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 
 const validationSchema = yup.object({
@@ -23,7 +23,7 @@ const validationSchema = yup.object({
   author: yup
     .string()
     .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis")
 });
 
 type Props = {
@@ -34,11 +34,10 @@ type Props = {
   displayActionButton?: boolean;
 };
 export function SignOperation({
-  siret,
   bsvhuId,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton,
+  displayActionButton
 }: Props) {
   const [updateBsvhu, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsvhu">,
@@ -75,18 +74,18 @@ export function SignOperation({
                     quantity: null,
                     weight: null,
                     identification: {
-                      numbers: [],
-                    },
+                      numbers: []
+                    }
                   },
                   operation: {
                     date: TODAY.toISOString(),
                     code: "",
-                    nextDestination: { company: getInitialCompany() },
-                  },
-                },
+                    nextDestination: { company: getInitialCompany() }
+                  }
+                }
               },
               bsvhu
-            ),
+            )
           }}
           validationSchema={validationSchema}
           onSubmit={async values => {
@@ -94,14 +93,14 @@ export function SignOperation({
             await updateBsvhu({
               variables: {
                 id: bsvhuId,
-                input: update,
-              },
+                input: update
+              }
             });
             await signBsvhu({
               variables: {
                 id: bsvhu.id,
-                input: { author, date, type: SignatureTypeInput.Operation },
-              },
+                input: { author, date, type: SignatureTypeInput.Operation }
+              }
             });
             onClose();
           }}

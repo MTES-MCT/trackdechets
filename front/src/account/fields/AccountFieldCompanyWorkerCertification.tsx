@@ -1,10 +1,10 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
-import { CompanyPrivate, UserRole } from "generated/graphql/types";
+import { CompanyPrivate, UserRole } from "codegen-ui";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 import AccountFormCompanyAddWorkerCertification from "./forms/AccountFormCompanyWorkerCertification";
-import { formatDate } from "common/datetime";
+import { formatDate } from "../../common/datetime";
 
 type Props = {
   company: Pick<
@@ -28,11 +28,11 @@ AccountFieldCompanyWorkerCertification.fragments = {
         organisation
       }
     }
-  `,
+  `
 };
 
 export default function AccountFieldCompanyWorkerCertification({
-  company,
+  company
 }: Props) {
   const workerCertification = company.workerCertification ? (
     <table>
@@ -69,27 +69,23 @@ export default function AccountFieldCompanyWorkerCertification({
     "Non renseignée"
   );
 
-  return (
-    <>
-      {company.userRole === UserRole.Admin ? (
-        <AccountField
-          name="workerCertification"
-          label="Catégorie entreprise de travaux amiante"
-          value={workerCertification}
-          renderForm={toggleEdition => (
-            <AccountFormCompanyAddWorkerCertification
-              company={company}
-              toggleEdition={toggleEdition}
-            />
-          )}
-        />
-      ) : (
-        <AccountFieldNotEditable
-          name="workerCertification"
-          label="Catégorie entreprise de travaux amiante"
-          value={workerCertification}
+  return company.userRole === UserRole.Admin ? (
+    <AccountField
+      name="workerCertification"
+      label="Catégorie entreprise de travaux amiante"
+      value={workerCertification}
+      renderForm={toggleEdition => (
+        <AccountFormCompanyAddWorkerCertification
+          company={company}
+          toggleEdition={toggleEdition}
         />
       )}
-    </>
+    />
+  ) : (
+    <AccountFieldNotEditable
+      name="workerCertification"
+      label="Catégorie entreprise de travaux amiante"
+      value={workerCertification}
+    />
   );
 }

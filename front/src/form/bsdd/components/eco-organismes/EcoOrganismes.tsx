@@ -3,10 +3,10 @@ import { useField, useFormikContext } from "formik";
 import React, { useState } from "react";
 import CompanyResults from "../../../common/components/company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
-import SearchInput from "common/components/SearchInput";
-import { Query, EcoOrganisme, Form } from "../../../../generated/graphql/types";
-import TdSwitch from "common/components/Switch";
-import { getInitialEcoOrganisme } from "form/bsdd/utils/initial-state";
+import SearchInput from "../../../../common/components/SearchInput";
+import { Query, EcoOrganisme, Form } from "codegen-ui";
+import TdSwitch from "../../../../common/components/Switch";
+import { getInitialEcoOrganisme } from "../../utils/initial-state";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -81,7 +81,7 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
                   onSelect={eo =>
                     setFieldValue(field.name, {
                       name: eo.name,
-                      siret: eo.siret,
+                      siret: eo.siret
                     })
                   }
                   results={data.ecoOrganismes
@@ -90,13 +90,13 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
                     )
                     .map(eo => ({
                       ...eo,
-                      orgId: eo.siret,
+                      orgId: eo.siret
                     }))}
                   selectedItem={
                     data.ecoOrganismes
                       .map(eo => ({
                         ...eo,
-                        orgId: eo.siret,
+                        orgId: eo.siret
                       }))
                       .find(eo => eo.siret === field.value?.siret) || null
                   }

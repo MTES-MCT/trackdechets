@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Formik, Form, FormikHelpers } from "formik";
-import { Stepper, StepperItem } from "common/components";
-import { NextButton, PreviousButton } from "common/components/Buttons";
+import { Stepper, StepperItem } from "../common/components";
+import { NextButton, PreviousButton } from "../common/components/Buttons";
 
 type Props = { initialValues: Object; children: any[]; onSubmit: Function };
 type State = { page: number; values: Object };
@@ -14,19 +14,19 @@ export class Wizard extends React.Component<Props, State> {
     super(props);
     this.state = {
       page: 0,
-      values: props.initialValues,
+      values: props.initialValues
     };
   }
 
   next = (values: Object) =>
     this.setState(state => ({
       page: Math.min(state.page + 1, this.props.children.length - 1),
-      values,
+      values
     }));
 
   previous = () =>
     this.setState(state => ({
-      page: Math.max(state.page - 1, 0),
+      page: Math.max(state.page - 1, 0)
     }));
 
   validate = (values: Object) => {

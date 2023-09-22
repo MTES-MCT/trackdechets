@@ -1,5 +1,5 @@
-import { formatDate } from "common/datetime";
-import { AuthorizedApplication } from "generated/graphql/types";
+import { formatDate } from "../../common/datetime";
+import { AuthorizedApplication } from "codegen-ui";
 import React, { useState } from "react";
 import styles from "./AccountAuthorizedApp.module.scss";
 import AccountAuthorizedAppRevoke from "./AccountAuthorizedAppRevoke";
@@ -9,7 +9,7 @@ type AccountAuthorizedApplicationProps = {
 };
 
 export default function AccountAuthorizedApp({
-  authorizedApplication,
+  authorizedApplication
 }: AccountAuthorizedApplicationProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 

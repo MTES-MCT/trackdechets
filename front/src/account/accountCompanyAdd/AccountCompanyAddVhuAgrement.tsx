@@ -1,6 +1,6 @@
 import React from "react";
 import { Field } from "formik";
-import RedErrorMessage from "common/components/RedErrorMessage";
+import RedErrorMessage from "../../common/components/RedErrorMessage";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
 /**
@@ -27,7 +27,7 @@ export default function AccountCompanyAddVhuAgrement() {
                     name: field.name,
                     checked: field.value,
                     onChange: field.onChange,
-                    onBlur: field.onBlur,
+                    onBlur: field.onBlur
                   }}
                 ></Input>
               );
@@ -46,7 +46,7 @@ export default function AccountCompanyAddVhuAgrement() {
                     name: field.name,
                     checked: field.value,
                     onChange: field.onChange,
-                    onBlur: field.onBlur,
+                    onBlur: field.onBlur
                   }}
                 ></Input>
               );
@@ -71,7 +71,7 @@ export default function AccountCompanyAddVhuAgrement() {
                     name: field.name,
                     checked: field.value,
                     onChange: field.onChange,
-                    onBlur: field.onBlur,
+                    onBlur: field.onBlur
                   }}
                 ></Input>
               );
@@ -90,7 +90,7 @@ export default function AccountCompanyAddVhuAgrement() {
                     name: field.name,
                     checked: field.value,
                     onChange: field.onChange,
-                    onBlur: field.onBlur,
+                    onBlur: field.onBlur
                   }}
                 ></Input>
               );

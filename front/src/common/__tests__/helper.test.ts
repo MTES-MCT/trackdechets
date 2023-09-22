@@ -9,10 +9,10 @@ describe("removeOrgId", () => {
         address: "123 rue ABC",
         subCompany: {
           orgId: 456,
-          contact: "contact@example.com",
-        },
+          contact: "contact@example.com"
+        }
       },
-      orgId: 789,
+      orgId: 789
     };
 
     const expected = {
@@ -20,10 +20,10 @@ describe("removeOrgId", () => {
       company: {
         address: "123 rue ABC",
         subCompany: {
-          contact: "contact@example.com",
-        },
+          contact: "contact@example.com"
+        }
       },
-      orgId: 789,
+      orgId: 789
     };
 
     expect(removeOrgId(input)).toEqual(expected);
@@ -32,12 +32,12 @@ describe("removeOrgId", () => {
   it("should not remove orgId keys outside of company objects", () => {
     const input = {
       name: "Organisation1",
-      orgId: 789,
+      orgId: 789
     };
 
     const expected = {
       name: "Organisation1",
-      orgId: 789,
+      orgId: 789
     };
 
     expect(removeOrgId(input)).toEqual(expected);
@@ -47,13 +47,13 @@ describe("removeOrgId", () => {
 describe("mergeDefaults", () => {
   it("should keep the defaults", () => {
     expect(mergeDefaults({ foo: "" }, {})).toEqual({
-      foo: "",
+      foo: ""
     });
   });
 
   it("should favor the provided options", () => {
     expect(mergeDefaults({ foo: "" }, { foo: "FOO" })).toEqual({
-      foo: "FOO",
+      foo: "FOO"
     });
   });
 
@@ -62,15 +62,15 @@ describe("mergeDefaults", () => {
     mergeDefaults(defaults, { foo: "FOO" });
 
     expect(defaults).toEqual({
-      foo: "",
+      foo: ""
     });
   });
 
   it("should keep the nested defaults", () => {
     expect(mergeDefaults({ foo: { bar: "" } }, {})).toEqual({
       foo: {
-        bar: "",
-      },
+        bar: ""
+      }
     });
   });
 
@@ -79,8 +79,8 @@ describe("mergeDefaults", () => {
       mergeDefaults({ foo: { bar: "" } }, { foo: { bar: "BAR" } })
     ).toEqual({
       foo: {
-        bar: "BAR",
-      },
+        bar: "BAR"
+      }
     });
   });
 
@@ -90,22 +90,22 @@ describe("mergeDefaults", () => {
 
     expect(defaults).toEqual({
       foo: {
-        bar: "",
-      },
+        bar: ""
+      }
     });
   });
 
   it("should not extend the defaults", () => {
     expect(mergeDefaults({ foo: "" }, { bar: "" })).toEqual({
-      foo: "",
+      foo: ""
     });
   });
 
   it("should not extend the nested defaults", () => {
     expect(mergeDefaults({ foo: { bar: "" } }, { foo: { baz: "" } })).toEqual({
       foo: {
-        bar: "",
-      },
+        bar: ""
+      }
     });
   });
 });

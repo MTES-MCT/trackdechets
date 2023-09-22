@@ -2,11 +2,11 @@ import {
   InMemoryCache,
   ApolloClient,
   ApolloLink,
-  createHttpLink,
+  createHttpLink
 } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { relayStylePagination } from "@apollo/client/utilities";
-import { removeOrgId } from "common/helper";
+import { removeOrgId } from "./common/helper";
 
 /**
  * Automatically erase `__typename` from variables
@@ -40,9 +40,9 @@ const cleanOrgIdLink = new ApolloLink((operation, forward) => {
 /**
  * Handles any GraphQL errors or network error that occurred
  */
-const errorLink = onError(({ response, graphQLErrors, networkError }) => {
+const errorLink = onError(({ response, graphQLErrors }) => {
   if (graphQLErrors) {
-    for (let err of graphQLErrors) {
+    for (const err of graphQLErrors) {
       if (err.extensions?.code === "UNAUTHENTICATED") {
         // when AuthenticationError thrown
         // modify the response context to ignore the error
@@ -55,7 +55,7 @@ const errorLink = onError(({ response, graphQLErrors, networkError }) => {
 
 const httpLink = createHttpLink({
   uri: import.meta.env.VITE_API_ENDPOINT as string,
-  credentials: "include",
+  credentials: "include"
 });
 
 const apolloClient = new ApolloClient({
@@ -64,34 +64,34 @@ const apolloClient = new ApolloClient({
       Query: {
         fields: {
           // https://www.apollographql.com/docs/react/pagination/cursor-based/#relay-style-cursor-pagination
-          myCompanies: relayStylePagination(),
-        },
+          myCompanies: relayStylePagination()
+        }
       },
       Form: {
         fields: {
           transporter: {
-            merge: true,
+            merge: true
           },
           stateSummary: {
-            merge: true,
+            merge: true
           },
           wasteDetails: {
-            merge: true,
-          },
-        },
+            merge: true
+          }
+        }
       },
       CompanyMember: {
-        keyFields: ["id", "role"],
-      },
-    },
+        keyFields: ["id", "role"]
+      }
+    }
   }),
   link: ApolloLink.from([
     errorLink,
     cleanOrgIdLink,
     cleanTypeNameLink,
-    httpLink,
+    httpLink
   ]),
-  name: "trackdechets-front",
+  name: "trackdechets-front"
 });
 
 export default apolloClient;

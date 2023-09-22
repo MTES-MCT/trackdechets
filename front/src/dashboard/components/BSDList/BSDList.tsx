@@ -3,15 +3,15 @@ import classNames from "classnames";
 import {
   IconLayout2,
   IconLayoutModule1,
-  IconRefresh,
-} from "Apps/common/Components/Icons/Icons";
-import Loader from "Apps/common/Components/Loader/Loaders";
-import { MEDIA_QUERIES } from "common/config";
-import { usePersistedState } from "Apps/common/hooks/usePersistedState";
-import { GET_BSDS } from "Apps/common/queries";
-import { BsdWhere, Query, QueryBsdsArgs } from "generated/graphql/types";
+  IconRefresh
+} from "../../../Apps/common/Components/Icons/Icons";
+import Loader from "../../../Apps/common/Components/Loader/Loaders";
+import { MEDIA_QUERIES } from "../../../common/config";
+import { usePersistedState } from "../../../Apps/common/hooks/usePersistedState";
+import { GET_BSDS } from "../../../Apps/common/queries";
+import { BsdWhere, Query, QueryBsdsArgs } from "codegen-ui";
 import * as React from "react";
-import { useMedia } from "use-media";
+import { useMedia } from "../../../common/use-media";
 import { BSDCards } from "./BSDCards";
 import styles from "./BSDList.module.scss";
 import { BSDTable } from "./BSDTable";
@@ -25,7 +25,7 @@ const DEFAULT_COLUMNS = [
   COLUMNS.emitter,
   COLUMNS.recipient,
   COLUMNS.waste,
-  COLUMNS.status,
+  COLUMNS.status
 ];
 
 const LAYOUT_LOCAL_STORAGE_KEY = "td-display-type";
@@ -39,7 +39,7 @@ const LAYOUTS = [
       </>
     ),
     type: "table" as const,
-    Component: BSDTable,
+    Component: BSDTable
   },
   {
     label: (
@@ -49,8 +49,8 @@ const LAYOUTS = [
       </>
     ),
     type: "cards" as const,
-    Component: BSDCards,
-  },
+    Component: BSDCards
+  }
 ];
 
 type LayoutType = "table" | "cards";
@@ -69,13 +69,13 @@ export function BSDList({
   siret,
   columns = DEFAULT_COLUMNS,
   blankslate,
-  defaultWhere,
+  defaultWhere
 }: BSDListProps) {
   // As variables are modified by the UI filters,
   // we need to persist them so that subsequent call use the same variables
   const [bsdsVariables, setBsdsVariables] = React.useState<QueryBsdsArgs>({
     first: FIRST,
-    where: defaultWhere,
+    where: defaultWhere
   });
 
   const [lazyFetchBsds, { data, loading, fetchMore }] = useLazyQuery<
@@ -83,12 +83,12 @@ export function BSDList({
     QueryBsdsArgs
   >(GET_BSDS, {
     fetchPolicy: "cache-and-network",
-    notifyOnNetworkStatusChange: true,
+    notifyOnNetworkStatusChange: true
   });
 
   const refetchBsds = React.useCallback(() => {
     lazyFetchBsds({
-      variables: bsdsVariables,
+      variables: bsdsVariables
     });
   }, [lazyFetchBsds, bsdsVariables]);
 
@@ -102,10 +102,10 @@ export function BSDList({
     {
       variables: {
         first: FIRST,
-        where: defaultWhere,
+        where: defaultWhere
       },
       // read from the cache only to avoid duplicate requests
-      fetchPolicy: "cache-only",
+      fetchPolicy: "cache-only"
     }
   );
   const showBlankslate = cachedData?.bsds.totalCount === 0;
@@ -115,11 +115,11 @@ export function BSDList({
       const newVariables = {
         ...args,
         where: { ...where, ...defaultWhere },
-        first: FIRST,
+        first: FIRST
       };
       setBsdsVariables(newVariables);
       lazyFetchBsds({
-        variables: newVariables,
+        variables: newVariables
       });
     },
     [lazyFetchBsds, defaultWhere]
@@ -129,7 +129,7 @@ export function BSDList({
     LAYOUT_LOCAL_STORAGE_KEY,
     value => LAYOUTS.find(layout => layout.type === value)?.type ?? "table"
   );
-  const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
   const currentLayout = LAYOUTS.find(layout => layout.type === layoutType)!;
 
   React.useEffect(() => {
@@ -184,7 +184,7 @@ export function BSDList({
                 onClick={() =>
                   fetchMore({
                     variables: {
-                      after: data?.bsds.pageInfo.endCursor,
+                      after: data?.bsds.pageInfo.endCursor
                     },
                     updateQuery: (prev, { fetchMoreResult }) => {
                       if (fetchMoreResult == null) {
@@ -198,10 +198,10 @@ export function BSDList({
                           ...fetchMoreResult.bsds,
                           edges: prev.bsds.edges.concat(
                             fetchMoreResult.bsds.edges
-                          ),
-                        },
+                          )
+                        }
                       };
-                    },
+                    }
                   })
                 }
               >

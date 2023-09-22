@@ -1,18 +1,18 @@
 import React from "react";
-import { Mutation, MutationPublishBsdaArgs } from "generated/graphql/types";
+import { Mutation, MutationPublishBsdaArgs } from "codegen-ui";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation } from "@apollo/client";
 
-import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
-import { ActionButton } from "common/components";
-import { Loader } from "Apps/common/Components";
-import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
+import { ActionButton } from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
+import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
 import { generatePath, Link } from "react-router-dom";
-import routes from "Apps/routes";
-import { GET_BSDS } from "Apps/common/queries";
+import routes from "../../../../../Apps/routes";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
 
 const PUBLISH_BSDA = gql`
   mutation PublishBsda($id: ID!) {
@@ -32,12 +32,12 @@ export default function PublishBsda({ form, siret }: WorkflowActionProps) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      cogoToast.success(`Bordereau ${form.id} publié`, { hideAfter: 5 });
+      toast.success(`Bordereau ${form.id} publié`, { duration: 5 });
     },
     onError: () =>
-      cogoToast.error(`Le bordereau ${form.id} n'a pas pu être publié`, {
-        hideAfter: 5,
-      }),
+      toast.error(`Le bordereau ${form.id} n'a pas pu être publié`, {
+        duration: 5
+      })
   });
 
   const actionLabel = "Publier le bordereau";
@@ -68,8 +68,8 @@ export default function PublishBsda({ form, siret }: WorkflowActionProps) {
               onClick={() =>
                 publishBsda({
                   variables: {
-                    id: form.id,
-                  },
+                    id: form.id
+                  }
                 })
               }
             >
@@ -83,7 +83,7 @@ export default function PublishBsda({ form, siret }: WorkflowActionProps) {
               <Link
                 to={generatePath(routes.dashboard.bsdas.edit, {
                   siret,
-                  id: form.id,
+                  id: form.id
                 })}
                 className="btn btn--primary"
               >

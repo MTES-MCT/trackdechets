@@ -6,22 +6,22 @@ import {
   MutationMarkAsSealedArgs,
   MutationPublishBsdaArgs,
   MutationPublishBsffArgs,
-  MutationPublishBsvhuArgs,
-} from "generated/graphql/types";
-import { statusChangeFragment } from "Apps/common/queries/fragments";
-import { GET_BSDS } from "Apps/common/queries";
-import cogoToast from "cogo-toast";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { Loader } from "Apps/common/Components";
-import TdModal from "Apps/common/Components/Modal/Modal";
+  MutationPublishBsvhuArgs
+} from "codegen-ui";
+import { statusChangeFragment } from "../../../../common/queries/fragments";
+import { GET_BSDS } from "../../../../common/queries";
+import toast from "react-hot-toast";
+import { NotificationError } from "../../../../common/Components/Error/Error";
+import { Loader } from "../../../../common/Components";
+import TdModal from "../../../../common/Components/Modal/Modal";
 import {
   bsdaPublishDraft,
   bsddValidationDraftText,
   bsffPublishDraft,
-  bsvhuPublishDraft,
-} from "Apps/common/wordings/dashboard/wordingsDashboard";
+  bsvhuPublishDraft
+} from "../../../../common/wordings/dashboard/wordingsDashboard";
 import { generatePath, Link } from "react-router-dom";
-import routes from "Apps/routes";
+import routes from "../../../../routes";
 
 const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
   const MARK_AS_SEALED = gql`
@@ -60,7 +60,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
 
   const [
     markAsSealed,
-    { loading: loadingValidateBsdd, error: errorValidateBsdd },
+    { loading: loadingValidateBsdd, error: errorValidateBsdd }
   ] = useMutation<Pick<Mutation, "markAsSealed">, MutationMarkAsSealedArgs>(
     MARK_AS_SEALED,
     {
@@ -71,20 +71,20 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
         if (data.markAsSealed) {
           const sealedForm = data.markAsSealed;
           if (sealedForm.status === FormStatus.Sealed)
-            cogoToast.success(
+            toast.success(
               `Le numéro #${sealedForm.readableId} a été affecté au bordereau. Vous pouvez le retrouver dans l'onglet "Pour action".`
             );
         }
       },
       onError: () => {
         // The error is handled in the UI
-      },
+      }
     }
   );
 
   const [
     publishBsda,
-    { error: errorPublishBsda, loading: loadingPublishBsda },
+    { error: errorPublishBsda, loading: loadingPublishBsda }
   ] = useMutation<Pick<Mutation, "publishBsda">, MutationPublishBsdaArgs>(
     PUBLISH_BSDA,
     {
@@ -92,14 +92,14 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
       refetchQueries: [GET_BSDS],
       awaitRefetchQueries: true,
       onCompleted: () => {
-        cogoToast.success(`Bordereau ${bsd.id} publié`, {
-          hideAfter: 5,
+        toast.success(`Bordereau ${bsd.id} publié`, {
+          duration: 5
         });
       },
       onError: () =>
-        cogoToast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
-          hideAfter: 5,
-        }),
+        toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
+          duration: 5
+        })
     }
   );
 
@@ -109,7 +109,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
   >(PUBLISH_BSFF, {
     variables: { id: bsd.id },
     refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
+    awaitRefetchQueries: true
   });
 
   const [publishBsvhu, { loading: loadingBsvhu, error: errorBsvhu }] =
@@ -120,12 +120,12 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
         refetchQueries: [GET_BSDS],
         awaitRefetchQueries: true,
         onCompleted: () => {
-          cogoToast.success(`Bordereau ${bsd.id} publié`, { hideAfter: 5 });
+          toast.success(`Bordereau ${bsd.id} publié`, { duration: 5 });
         },
         onError: () =>
-          cogoToast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
-            hideAfter: 5,
-          }),
+          toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
+            duration: 5
+          })
       }
     );
 
@@ -196,8 +196,8 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
               onClick={async () => {
                 const res = await publishBsda({
                   variables: {
-                    id: bsd.id,
-                  },
+                    id: bsd.id
+                  }
                 });
                 if (!res.errors) {
                   onClose();
@@ -217,7 +217,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
               <Link
                 to={generatePath(routes.dashboardv2.bsdas.edit, {
                   siret: currentSiret,
-                  id: bsd.id,
+                  id: bsd.id
                 })}
                 className="btn btn--primary"
               >
@@ -270,8 +270,8 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
               onClick={async () => {
                 const res = await publishBsvhu({
                   variables: {
-                    id: bsd.id,
-                  },
+                    id: bsd.id
+                  }
                 });
                 if (!res.errors) {
                   onClose();
@@ -291,7 +291,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
               <Link
                 to={generatePath(routes.dashboardv2.bsvhus.edit, {
                   siret: currentSiret,
-                  id: bsd.id,
+                  id: bsd.id
                 })}
                 className="btn btn--primary"
               >

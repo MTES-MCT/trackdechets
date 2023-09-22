@@ -11,7 +11,7 @@ export {
   RedErrorMessage,
   DownloadFileLink,
   Switch,
-  FieldSwitch,
+  FieldSwitch
 };
 export * from "./Breadcrumb";
 export * from "./Stepper";

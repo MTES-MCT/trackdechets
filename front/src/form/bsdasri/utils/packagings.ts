@@ -1,7 +1,4 @@
-import {
-  BsdasriPackaging,
-  BsdasriPackagingType,
-} from "generated/graphql/types";
+import { BsdasriPackaging, BsdasriPackagingType } from "codegen-ui";
 import { Decimal } from "decimal.js-light";
 
 export const PACKAGINGS_NAMES = {
@@ -13,7 +10,7 @@ export const PACKAGINGS_NAMES = {
 
   [BsdasriPackagingType.GrandEmballage]: "Grand(s) emballage(s)",
   [BsdasriPackagingType.Grv]: "Grand(s) récipient(s) pour vrac",
-  [BsdasriPackagingType.Autre]: "Autre(s)",
+  [BsdasriPackagingType.Autre]: "Autre(s)"
 };
 
 export function getDasriPackagingInfosSummary(packagings: BsdasriPackaging[]) {
@@ -32,12 +29,12 @@ export function getDasriPackagingInfosSummary(packagings: BsdasriPackaging[]) {
     if (acc[packaging.type] > 0) {
       return {
         ...acc,
-        [packaging.type]: packaging.quantity + acc[packaging.type],
+        [packaging.type]: packaging.quantity + acc[packaging.type]
       };
     }
     return {
       ...acc,
-      [packaging.type]: packaging.quantity,
+      [packaging.type]: packaging.quantity
     };
   }, {});
 

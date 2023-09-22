@@ -1,7 +1,7 @@
 import React, { createRef, useEffect } from "react";
 import * as queryString from "query-string";
 import { useLocation, Redirect } from "react-router-dom";
-import routes from "Apps/routes";
+import routes from "../Apps/routes";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -32,7 +32,7 @@ export default function UserActivation() {
   if (queries.errorCode) {
     const { errorCode } = queries;
     const state = {
-      ...(queries.errorCode ? { errorCode } : {}),
+      ...(queries.errorCode ? { errorCode } : {})
     };
 
     return <Redirect to={{ pathname: routes.userActivation, state }} />;

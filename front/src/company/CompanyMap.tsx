@@ -30,9 +30,9 @@ export default class CompanyMap extends React.Component<Props> {
           container: "map",
           style,
           center: this.getLngLat(),
-          zoom: 13,
+          zoom: 13
         };
-        let map = new mapboxgl.Map(mapOptions);
+        const map = new mapboxgl.Map(mapOptions);
         this.addEtablissementMarker(map);
       });
   }

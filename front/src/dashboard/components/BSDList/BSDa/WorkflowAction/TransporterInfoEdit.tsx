@@ -1,18 +1,16 @@
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
 import React, { useState, lazy } from "react";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
-import TdModal from "Apps/common/Components/Modal/Modal";
-import Tooltip from "common/components/Tooltip";
-import { UPDATE_BSDA } from "form/bsda/stepper/queries";
-import {
-  Bsda,
-  Mutation,
-  MutationUpdateBsdaArgs,
-} from "generated/graphql/types";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
+import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
+import Tooltip from "../../../../../common/components/Tooltip";
+import { UPDATE_BSDA } from "../../../../../form/bsda/stepper/queries";
+import { Bsda, Mutation, MutationUpdateBsdaArgs } from "codegen-ui";
 import { useRouteMatch } from "react-router-dom";
-const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
+const TagsInput = lazy(
+  () => import("../../../../../common/components/tags-input/TagsInput")
+);
 type Props = {
   bsda: Bsda;
   isModalOpenFromParent?: boolean;
@@ -22,7 +20,7 @@ type Props = {
 export function TransporterInfoEdit({
   bsda,
   isModalOpenFromParent,
-  onModalCloseFromParent,
+  onModalCloseFromParent
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const isV2Routes = !!useRouteMatch("/v2/dashboard/");
@@ -71,16 +69,16 @@ export function TransporterInfoEdit({
             transporter: {
               customInfo: bsda.transporter?.customInfo ?? "",
               transport: {
-                plates: bsda?.transporter?.transport?.plates ?? [],
-              },
-            },
+                plates: bsda?.transporter?.transport?.plates ?? []
+              }
+            }
           }}
           onSubmit={async values => {
             await updateBsda({
               variables: {
                 id: bsda.id,
-                input: values,
-              },
+                input: values
+              }
             });
             handleClose();
           }}

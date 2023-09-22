@@ -1,5 +1,5 @@
-import { TBsdStatusCode } from "Apps/common/types/bsdTypes";
-import { BsdType } from "generated/graphql/types";
+import { TBsdStatusCode } from "../../../common/types/bsdTypes";
+import { BsdType } from "codegen-ui";
 
 export interface BadgeProps {
   status: TBsdStatusCode;

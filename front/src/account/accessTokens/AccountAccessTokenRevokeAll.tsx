@@ -1,8 +1,8 @@
 import * as React from "react";
-import { Modal } from "common/components";
+import { Modal } from "../../common/components";
 import { useMutation } from "@apollo/client";
 import { ACCESS_TOKENS, REVOKE_ALL_ACCESS_TOKENS } from "./queries";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+import { NotificationError } from "../../Apps/common/Components/Error/Error";
 
 type AccountAccessTokenRevokeAllProps = {
   onClose: () => void;
@@ -11,7 +11,7 @@ type AccountAccessTokenRevokeAllProps = {
 
 export default function AccountAccessTokenRevokeAll({
   onClose,
-  onRevokeAll,
+  onRevokeAll
 }: AccountAccessTokenRevokeAllProps) {
   const [revokeAllAccessTokens, { loading, error }] = useMutation(
     REVOKE_ALL_ACCESS_TOKENS,
@@ -20,7 +20,7 @@ export default function AccountAccessTokenRevokeAll({
       onCompleted: () => {
         onRevokeAll();
         onClose();
-      },
+      }
     }
   );
 

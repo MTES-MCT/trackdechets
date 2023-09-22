@@ -27,8 +27,7 @@ export function Blankslate({ children }: BlankslateProps) {
   return <div className={styles.Blankslate}>{children}</div>;
 }
 
-interface BlankslateImgProps
-  extends React.ImgHTMLAttributes<HTMLImageElement> {}
+type BlankslateImgProps = React.ImgHTMLAttributes<HTMLImageElement>;
 
 export function BlankslateImg(props: BlankslateImgProps) {
   return <img alt="" {...props} className={styles.BlankslateImg} />;
@@ -47,7 +46,7 @@ interface BlankslateDescriptionProps {
 }
 
 export function BlankslateDescription({
-  children,
+  children
 }: BlankslateDescriptionProps) {
   return <div className={styles.BlankslateDescription}>{children}</div>;
 }

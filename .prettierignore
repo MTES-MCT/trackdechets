@@ -1,0 +1,10 @@
+# Add files here to ignore them from prettier formatting
+/dist
+/coverage
+generated/
+doc/
+.github/
+front/public/dsfr/
+generated/
+.terraform/
+/.nx/cache

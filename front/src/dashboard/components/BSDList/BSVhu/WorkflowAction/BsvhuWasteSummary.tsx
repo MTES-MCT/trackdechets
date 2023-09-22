@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Bsvhu } from "generated/graphql/types";
+import { Bsvhu } from "codegen-ui";
 import {
   DataList,
   DataListItem,
   DataListTerm,
-  DataListDescription,
-} from "common/components";
+  DataListDescription
+} from "../../../../../common/components";
 
 interface Props {
   bsvhu: Bsvhu;

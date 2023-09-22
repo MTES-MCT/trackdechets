@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
 import { useHistory } from "react-router-dom";
-import routes from "Apps/routes";
+import routes from "../Apps/routes";
 import { GET_ME } from "../dashboard/Dashboard";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 import RedErrorMessage from "../common/components/RedErrorMessage";
@@ -21,19 +21,14 @@ import {
   Mutation,
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
-  CompanySearchResult,
-} from "generated/graphql/types";
+  CompanySearchResult
+} from "codegen-ui";
 import classNames from "classnames";
 import { MY_COMPANIES } from "./AccountCompanyList";
-import {
-  isFRVat,
-  isSiret,
-  isVat,
-  isForeignVat,
-} from "generated/constants/companySearchHelpers";
+import { isFRVat, isSiret, isVat, isForeignVat } from "shared/constants";
 import {
   CREATE_WORKER_CERTIFICATION,
-  UPDATE_COMPANY_WORKER_CERTIFICATION,
+  UPDATE_COMPANY_WORKER_CERTIFICATION
 } from "./fields/forms/AccountFormCompanyWorkerCertification";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
@@ -57,12 +52,12 @@ export const CREATE_COMPANY = gql`
 export const CREATE_COMPANY_HOOK_OPTIONS = history => ({
   refetchQueries: [
     { query: GET_ME },
-    { query: MY_COMPANIES, variables: { first: 10 } },
+    { query: MY_COMPANIES, variables: { first: 10 } }
   ],
   awaitRefetchQueries: true,
   onCompleted: () => {
     history.push(routes.account.companies.list);
-  },
+  }
 });
 
 const CREATE_TRANSPORTER_RECEIPT = gql`
@@ -154,7 +149,7 @@ export default function AccountCompanyAdd() {
 
   const [
     updateCompanyWorkerCertification,
-    { error: updateCompanyWorkerCertificationError },
+    { error: updateCompanyWorkerCertificationError }
   ] = useMutation(UPDATE_COMPANY_WORKER_CERTIFICATION);
 
   function isTransporter(companyTypes: _CompanyType[]) {
@@ -223,11 +218,11 @@ export default function AccountCompanyAdd() {
       const input = {
         receiptNumber: transporterReceiptNumber,
         validityLimit: transporterReceiptValidity,
-        department: transporterReceiptDepartment,
+        department: transporterReceiptDepartment
       };
 
       const { data } = await createTransporterReceipt({
-        variables: { input },
+        variables: { input }
       });
 
       if (data) {
@@ -248,11 +243,11 @@ export default function AccountCompanyAdd() {
       const input = {
         receiptNumber: traderReceiptNumber,
         validityLimit: traderReceiptValidity,
-        department: traderReceiptDepartment,
+        department: traderReceiptDepartment
       };
 
       const { data } = await createTraderReceipt({
-        variables: { input },
+        variables: { input }
       });
 
       if (data) {
@@ -273,11 +268,11 @@ export default function AccountCompanyAdd() {
       const input = {
         receiptNumber: brokerReceiptNumber,
         validityLimit: brokerReceiptValidity,
-        department: brokerReceiptDepartment,
+        department: brokerReceiptDepartment
       };
 
       const { data } = await createBrokerReceipt({
-        variables: { input },
+        variables: { input }
       });
 
       if (data) {
@@ -293,11 +288,11 @@ export default function AccountCompanyAdd() {
       if (vhuAgrementDemolisseurNumber && vhuAgrementDemolisseurDepartment) {
         const input = {
           agrementNumber: vhuAgrementDemolisseurNumber,
-          department: vhuAgrementDemolisseurDepartment,
+          department: vhuAgrementDemolisseurDepartment
         };
 
         const { data } = await createVhuAgrement({
-          variables: { input },
+          variables: { input }
         });
 
         if (data) {
@@ -308,11 +303,11 @@ export default function AccountCompanyAdd() {
       if (vhuAgrementBroyeurNumber && vhuAgrementBroyeurDepartment) {
         const input = {
           agrementNumber: vhuAgrementBroyeurNumber,
-          department: vhuAgrementBroyeurDepartment,
+          department: vhuAgrementBroyeurDepartment
         };
 
         const { data } = await createVhuAgrement({
-          variables: { input },
+          variables: { input }
         });
 
         if (data) {
@@ -329,10 +324,10 @@ export default function AccountCompanyAdd() {
         hasSubSectionThree: values.hasSubSectionThree,
         certificationNumber: values.certificationNumber,
         validityLimit: values.validityLimit,
-        organisation: values.organisation,
+        organisation: values.organisation
       };
       const { data } = await createWorkerCertification({
-        variables: { input },
+        variables: { input }
       });
 
       if (data) {
@@ -360,16 +355,16 @@ export default function AccountCompanyAdd() {
           ecoOrganismeAgreements: ecoOrganismeAgreements.filter(Boolean),
           ...(allowBsdasriTakeOverWithoutSignature !== null
             ? { allowBsdasriTakeOverWithoutSignature }
-            : {}),
-        },
-      },
+            : {})
+        }
+      }
     }).then(res => {
       if (workerCertificationId) {
         updateCompanyWorkerCertification({
           variables: {
             id: res.data?.createCompany.id,
-            workerCertificationId,
-          },
+            workerCertificationId
+          }
         });
       }
     });
@@ -409,7 +404,7 @@ export default function AccountCompanyAdd() {
           <h5 className={styles.subtitle}>Identification</h5>
           <AccountCompanyAddSiret
             {...{
-              onCompanyInfos: companyInfos => setCompanyInfos(companyInfos),
+              onCompanyInfos: companyInfos => setCompanyInfos(companyInfos)
             }}
           />
           {companyInfos && !companyInfos.isRegistered && isForeignCompany && (
@@ -437,7 +432,7 @@ export default function AccountCompanyAdd() {
                 onClick={() => {
                   history.push({
                     pathname: routes.account.companies.create.foreign,
-                    state: { vatNumber: companyInfos.vatNumber },
+                    state: { vatNumber: companyInfos.vatNumber }
                   });
                 }}
               >
@@ -477,7 +472,7 @@ export default function AccountCompanyAdd() {
                 hasSubSectionThree: false,
                 certificationNumber: "",
                 validityLimit: null,
-                organisation: "",
+                organisation: ""
               }}
               validate={values => {
                 // whether or not one of the transporter receipt field is set
@@ -506,22 +501,22 @@ export default function AccountCompanyAdd() {
 
                 return {
                   ...(!values.companyName && {
-                    companyName: "Champ obligatoire",
+                    companyName: "Champ obligatoire"
                   }),
                   ...(!values.address && {
-                    address: "Champ obligatoire",
+                    address: "Champ obligatoire"
                   }),
                   ...(values.willManageDasris &&
                     values.allowBsdasriTakeOverWithoutSignature === null && {
                       allowBsdasriTakeOverWithoutSignature:
-                        "Si l'établissement est susceptible de produire des DASRI, ce choix est obligatoire",
+                        "Si l'établissement est susceptible de produire des DASRI, ce choix est obligatoire"
                     }),
                   ...(values.companyTypes.length === 0 && {
-                    companyTypes: "Vous devez préciser le type d'établissement",
+                    companyTypes: "Vous devez préciser le type d'établissement"
                   }),
                   ...(!values.isAllowed && {
                     isAllowed:
-                      "Vous devez certifier être autorisé à créer ce compte pour votre entreprise",
+                      "Vous devez certifier être autorisé à créer ce compte pour votre entreprise"
                   }),
                   ...((isFRVat(values.vatNumber) ||
                     (!isSiret(
@@ -530,74 +525,74 @@ export default function AccountCompanyAdd() {
                     ) &&
                       !isVat(values.vatNumber))) && {
                     siret:
-                      "Le SIRET ou le numéro de TVA intracommunautaire doit être valides. (seuls les caractères alphanumériques sont acceptés, pas d'espaces ni de signes de ponctuation)",
+                      "Le SIRET ou le numéro de TVA intracommunautaire doit être valides. (seuls les caractères alphanumériques sont acceptés, pas d'espaces ni de signes de ponctuation)"
                   }),
                   ...(anyTransporterReceipField &&
                     isTransporter_ &&
                     !values.transporterReceiptNumber && {
-                      transporterReceiptNumber: "Champ obligatoire",
+                      transporterReceiptNumber: "Champ obligatoire"
                     }),
                   ...(anyTransporterReceipField &&
                     isTransporter_ &&
                     !values.transporterReceiptValidity && {
-                      transporterReceiptValidity: "Champ obligatoire",
+                      transporterReceiptValidity: "Champ obligatoire"
                     }),
                   ...(anyTraderReceipField &&
                     isTrader_ &&
                     !values.traderReceiptDepartment && {
-                      traderReceiptDepartment: "Champ obligatoire",
+                      traderReceiptDepartment: "Champ obligatoire"
                     }),
                   ...(anyTraderReceipField &&
                     isTrader_ &&
                     !values.traderReceiptNumber && {
-                      traderReceiptNumber: "Champ obligatoire",
+                      traderReceiptNumber: "Champ obligatoire"
                     }),
                   ...(anyTraderReceipField &&
                     isTrader_ &&
                     !values.traderReceiptValidity && {
-                      traderReceiptValidity: "Champ obligatoire",
+                      traderReceiptValidity: "Champ obligatoire"
                     }),
                   ...(anyTraderReceipField &&
                     isTrader_ &&
                     !values.traderReceiptDepartment && {
-                      traderReceiptDepartment: "Champ obligatoire",
+                      traderReceiptDepartment: "Champ obligatoire"
                     }),
                   ...(anyBrokerReceipField &&
                     isBroker_ &&
                     !values.brokerReceiptDepartment && {
-                      brokerReceiptDepartment: "Champ obligatoire",
+                      brokerReceiptDepartment: "Champ obligatoire"
                     }),
                   ...(anyBrokerReceipField &&
                     isBroker_ &&
                     !values.brokerReceiptNumber && {
-                      brokerReceiptNumber: "Champ obligatoire",
+                      brokerReceiptNumber: "Champ obligatoire"
                     }),
                   ...(anyBrokerReceipField &&
                     isBroker_ &&
                     !values.brokerReceiptValidity && {
-                      brokerReceiptValidity: "Champ obligatoire",
+                      brokerReceiptValidity: "Champ obligatoire"
                     }),
                   ...(anyBrokerReceipField &&
                     isBroker_ &&
                     !values.brokerReceiptDepartment && {
-                      brokerReceiptDepartment: "Champ obligatoire",
+                      brokerReceiptDepartment: "Champ obligatoire"
                     }),
                   ...(isEcoOrganisme(values.companyTypes) &&
                     values.ecoOrganismeAgreements.length < 1 && {
-                      ecoOrganismeAgreements: "Champ obligatoire",
+                      ecoOrganismeAgreements: "Champ obligatoire"
                     }),
                   ...(values.hasSubSectionThree &&
                     !values.certificationNumber && {
-                      certificationNumber: "Champ obligatoire",
+                      certificationNumber: "Champ obligatoire"
                     }),
                   ...(values.hasSubSectionThree &&
                     !values.validityLimit && {
-                      validityLimit: "Champ obligatoire",
+                      validityLimit: "Champ obligatoire"
                     }),
                   ...(values.hasSubSectionThree &&
                     !values.organisation && {
-                      organisation: "Champ obligatoire",
-                    }),
+                      organisation: "Champ obligatoire"
+                    })
                 };
               }}
               onSubmit={onSubmit}
@@ -608,7 +603,7 @@ export default function AccountCompanyAdd() {
                 isSubmitting,
                 errors,
                 touched,
-                handleSubmit,
+                handleSubmit
               }) => (
                 <Form className={styles.companyAddForm} onSubmit={handleSubmit}>
                   <Field name="givenName">
@@ -676,29 +671,27 @@ export default function AccountCompanyAdd() {
                       </div>
                     </div>
                   ) : (
-                    <>
-                      <Field name="address">
-                        {({ field }) => {
-                          return (
-                            <Input
-                              label="Adresse"
-                              disabled={!!companyInfos?.address}
-                              state={
-                                errors.address && touched.address
-                                  ? "error"
-                                  : "default"
-                              }
-                              stateRelatedMessage={
-                                errors.address && touched.address
-                                  ? errors.isAllowed
-                                  : ""
-                              }
-                              nativeInputProps={field}
-                            ></Input>
-                          );
-                        }}
-                      </Field>
-                    </>
+                    <Field name="address">
+                      {({ field }) => {
+                        return (
+                          <Input
+                            label="Adresse"
+                            disabled={!!companyInfos?.address}
+                            state={
+                              errors.address && touched.address
+                                ? "error"
+                                : "default"
+                            }
+                            stateRelatedMessage={
+                              errors.address && touched.address
+                                ? errors.isAllowed
+                                : ""
+                            }
+                            nativeInputProps={field}
+                          ></Input>
+                        );
+                      }}
+                    </Field>
                   )}
 
                   <Field name="contact">
@@ -789,7 +782,7 @@ export default function AccountCompanyAdd() {
                             ) && <AccountCompanyAddEcoOrganisme />,
                             [_CompanyType.WasteVehicles]: isVhu(
                               values.companyTypes
-                            ) && <AccountCompanyAddVhuAgrement />,
+                            ) && <AccountCompanyAddVhuAgrement />
                           }}
                         />
                       )}
@@ -855,9 +848,9 @@ export default function AccountCompanyAdd() {
                                   name: field.name,
                                   checked: field.value,
                                   onChange: field.onChange,
-                                  onBlur: field.onBlur,
-                                },
-                              },
+                                  onBlur: field.onBlur
+                                }
+                              }
                             ]}
                           />
                         );

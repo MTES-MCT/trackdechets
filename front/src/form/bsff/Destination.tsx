@@ -1,8 +1,8 @@
 import React from "react";
 import { Field } from "formik";
-import CompanySelector from "form/common/components/company/CompanySelector";
+import CompanySelector from "../common/components/company/CompanySelector";
 import { OPERATION } from "./utils/constants";
-import { RedErrorMessage } from "common/components";
+import { RedErrorMessage } from "../../common/components";
 
 export default function Destination({ disabled }) {
   return (

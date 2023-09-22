@@ -1,7 +1,7 @@
 import React from "react";
 import {
   filter_type_select_label,
-  filter_type_select_placeholder,
+  filter_type_select_placeholder
 } from "../../wordings/dashboard/wordingsDashboard";
 import { Filter } from "./filtersTypes";
 
@@ -16,10 +16,10 @@ const FilterSelector = ({
   filters,
   onChange,
   disabled = false,
-  value = "",
+  value = ""
 }: FilterSelectorProps) => {
   const filtersList = filters.map((filtersGroup, index) => {
-    let filtersElement = filtersGroup.map(filter => (
+    const filtersElement = filtersGroup.map(filter => (
       <option key={filter.name} value={filter.name} disabled={!filter.isActive}>
         {filter.label}
       </option>

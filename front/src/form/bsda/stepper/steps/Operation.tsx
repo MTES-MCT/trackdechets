@@ -1,11 +1,11 @@
-import { RedErrorMessage } from "common/components";
-import OperationModeSelect from "common/components/OperationModeSelect";
+import { RedErrorMessage } from "../../../../common/components";
+import OperationModeSelect from "../../../../common/components/OperationModeSelect";
 import { subMonths } from "date-fns";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import DateInput from "../../../common/components/custom-inputs/DateInput";
+import NumberInput from "../../../common/components/custom-inputs/NumberInput";
+import { RadioButton } from "../../../common/components/custom-inputs/RadioButton";
 import { Field, useFormikContext } from "formik";
-import { Bsda } from "generated/graphql/types";
+import { Bsda } from "codegen-ui";
 import React, { useEffect } from "react";
 
 type Props = {

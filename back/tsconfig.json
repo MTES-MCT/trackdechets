@@ -1,27 +1,16 @@
 {
+  "extends": "../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ],
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "lib": ["ES2020", "esnext.asynciterable"],
-    "outDir": "dist",
-    "moduleResolution": "node",
-    "module": "CommonJS",
-    "target": "es6",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-
-    "strict": false,
-    "noImplicitThis": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": true,
-    "strictFunctionTypes": false,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": false,
-    "jsx": "react",
-    "sourceMap": true,
-    "inlineSources": true,
-    "sourceRoot": "/"
-  },
-  "include": ["src/**/*", "prisma/**/*"]
+    "esModuleInterop": true
+  }
 }

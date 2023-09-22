@@ -40,7 +40,7 @@ import {
 } from "../common/converter";
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import { BsdasriForElastic } from "./elastic";
 
 export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {

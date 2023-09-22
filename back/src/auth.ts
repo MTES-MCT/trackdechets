@@ -133,11 +133,15 @@ passport.use(
       const passwordValid = await compare(password, user.password);
       if (passwordValid) {
         await clearUserLoginNeedsCaptcha(user.email);
-        return done(null, user);
+        return done(null, { ...user, auth: AuthType.Session });
       }
 
       if (req.user?.isAdmin) {
-        return done(null, user, { message: ADMIN_IS_PERSONIFYING });
+        return done(
+          null,
+          { ...user, auth: AuthType.Session },
+          { message: ADMIN_IS_PERSONIFYING }
+        );
       }
 
       // if password is not valid and user is not admin, set a redis count to require captcha after several failed login attemps

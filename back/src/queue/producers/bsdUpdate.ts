@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-named-as-default
 import Queue from "bull";
 
 const { REDIS_URL, NODE_ENV } = process.env;

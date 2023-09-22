@@ -5,7 +5,7 @@ import {
   TransportMode,
   IntermediaryFormAssociation
 } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import {
   chain,
   nullIfNoValues,

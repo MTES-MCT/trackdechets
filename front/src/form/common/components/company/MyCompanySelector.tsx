@@ -1,16 +1,12 @@
 import { gql, useQuery } from "@apollo/client";
-import { RedErrorMessage } from "common/components";
-import { InlineError } from "Apps/common/Components/Error/Error";
+import { RedErrorMessage } from "../../../../common/components";
+import { InlineError } from "../../../../Apps/common/Components/Error/Error";
 import { Field, useField, useFormikContext } from "formik";
-import {
-  CompanyPrivate,
-  CreateFormInput,
-  Query,
-} from "generated/graphql/types";
+import { CompanyPrivate, CreateFormInput, Query } from "codegen-ui";
 import styles from "./CompanySelector.module.scss";
 import React, { useCallback, useMemo } from "react";
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import { sortCompaniesByName } from "common/helper";
+import { getInitialCompany } from "../../../bsdd/utils/initial-state";
+import { sortCompaniesByName } from "../../../../common/helper";
 import { CompanyResult } from "./CompanyResults";
 
 export const GET_ME = gql`
@@ -43,7 +39,7 @@ export default function MyCompanySelector({
   fieldName,
   onSelect,
   siretEditable = true,
-  filter,
+  filter
 }: {
   fieldName: string;
   onSelect: (company) => void;
@@ -75,7 +71,7 @@ export default function MyCompanySelector({
         contact: privateCompany.contact ?? "",
         mail: privateCompany.contactEmail ?? "",
         phone: privateCompany.contactPhone ?? "",
-        address: privateCompany.address ?? "",
+        address: privateCompany.address ?? ""
       };
       setFieldValue(fieldName, company);
       if (onSelect) {
@@ -101,7 +97,7 @@ export default function MyCompanySelector({
           onCompanySelect(getInitialCompany());
         }
       }
-    },
+    }
   });
 
   const companies = useMemo(() => {

@@ -1,7 +1,7 @@
 import { gql, MutationHookOptions, useMutation } from "@apollo/client";
-import cogoToast from "cogo-toast";
-import { Mutation, MutationDuplicateBsdaArgs } from "generated/graphql/types";
-import { GET_BSDS } from "Apps/common/queries";
+import toast from "react-hot-toast";
+import { Mutation, MutationDuplicateBsdaArgs } from "codegen-ui";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
 
 const DUPLICATE_BSFF = gql`
   mutation DuplicateBsff($id: ID!) {
@@ -25,13 +25,13 @@ export function useDuplicate(
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: (...args) => {
-      cogoToast.success(
+      toast.success(
         `Le bordereau a été dupliqué, il est disponible dans l'onglet "Brouillons"`
       );
 
       if (options.onCompleted) {
         options.onCompleted(...args);
       }
-    },
+    }
   });
 }

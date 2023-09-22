@@ -20,7 +20,7 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 
       // Happens after a new release, when trying to load files that don't exist anymore
       // https://rollbar.com/blog/javascript-chunk-load-error
-      /Loading chunk [0-9]+ failed/,
-    ],
+      /Loading chunk [0-9]+ failed/
+    ]
   });
 }

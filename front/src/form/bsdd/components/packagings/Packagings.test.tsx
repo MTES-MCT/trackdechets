@@ -32,7 +32,7 @@ function renderForm(
             (injected = formikProps) && ui ? ui : null
           }
         </Formik>
-      ),
+      )
   };
 }
 

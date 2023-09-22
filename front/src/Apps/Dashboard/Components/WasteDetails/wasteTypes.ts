@@ -1,4 +1,4 @@
-import { BsdType } from "../../../../generated/graphql/types";
+import { BsdType } from "codegen-ui";
 
 export interface WasteDetailsProps {
   wasteType?: BsdType;

@@ -1,5 +1,5 @@
 import { gql, LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
-import { Query, QueryFormPdfArgs } from "generated/graphql/types";
+import { Query, QueryFormPdfArgs } from "codegen-ui";
 
 export const FORMS_PDF = gql`
   query FormPdf($id: ID!) {
@@ -21,6 +21,6 @@ export function useDownloadPdf(
         return;
       }
       window.open(formPdf.downloadLink, "_blank");
-    },
+    }
   });
 }

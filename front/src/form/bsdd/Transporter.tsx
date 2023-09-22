@@ -1,15 +1,12 @@
-import RedErrorMessage from "common/components/RedErrorMessage";
-import TdSwitch from "common/components/Switch";
-import { FieldTransportModeSelect } from "common/components";
-import CompanySelector from "form/common/components/company/CompanySelector";
+import RedErrorMessage from "../../common/components/RedErrorMessage";
+import TdSwitch from "../../common/components/Switch";
+import { FieldTransportModeSelect } from "../../common/components";
+import CompanySelector from "../common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
-import {
-  Transporter as TransporterType,
-  WasteDetailsInput,
-} from "generated/graphql/types";
+import { Transporter as TransporterType, WasteDetailsInput } from "codegen-ui";
 import React from "react";
 import styles from "./Transporter.module.scss";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
+import { isForeignVat } from "shared/constants";
 import { formTransportIsPipeline } from "./utils/packagings";
 import { onBsddTransporterCompanySelected } from "./utils/onBsddTransporterCompanySelected";
 
@@ -67,8 +64,6 @@ export default function Transporter() {
       </div>
     </>
   ) : (
-    <>
-      <h4 className="form__section-heading">Transport par pipeline</h4>
-    </>
+    <h4 className="form__section-heading">Transport par pipeline</h4>
   );
 }

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { generatePath, useParams, useLocation } from "react-router-dom";
 
-import routes from "Apps/routes";
+import routes from "../../../../../Apps/routes";
 import {
   IconAddCircle,
   IconDuplicateFile,
@@ -9,16 +9,16 @@ import {
   IconPdf,
   IconQrCode,
   IconTrash,
-  IconView,
-} from "Apps/common/Components/Icons/Icons";
-import { EmitterType, Form, FormStatus } from "generated/graphql/types";
+  IconView
+} from "../../../../../Apps/common/Components/Icons/Icons";
+import { EmitterType, Form, FormStatus } from "codegen-ui";
 import { DeleteModal } from "./DeleteModal";
 import { useDuplicate } from "./useDuplicate";
 import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
-import { Loader } from "Apps/common/Components";
+import { Loader } from "../../../../../Apps/common/Components";
 import { useDisplayRoadControlButton } from "../../RoadControlButton";
-import DropdownMenu from "Apps/common/Components/DropdownMenu/DropdownMenu";
+import DropdownMenu from "../../../../../Apps/common/Components/DropdownMenu/DropdownMenu";
 
 interface BSDDActionsProps {
   form: Form;
@@ -29,7 +29,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   const location = useLocation();
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
   const [duplicateForm, { loading: isDuplicating }] = useDuplicate({
-    variables: { id: form.id },
+    variables: { id: form.id }
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
 
@@ -48,7 +48,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   const canUpdate = [
     FormStatus.Draft,
     FormStatus.Sealed,
-    FormStatus.SignedByProducer,
+    FormStatus.SignedByProducer
   ].includes(form.status);
 
   const isAppendix1 = form.emitter?.type === EmitterType.Appendix1;
@@ -70,37 +70,37 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
       route: {
         pathname: generatePath(routes.dashboard.roadControl, {
           siret,
-          id: form.id,
+          id: form.id
         }),
-        state: { background: location },
+        state: { background: location }
       },
       icon: <IconQrCode color="blueLight" size="24px" />,
-      isVisible: useDisplayRoadControlButton(form),
+      isVisible: useDisplayRoadControlButton(form)
     },
     {
       title: "Aperçu",
       route: {
         pathname: generatePath(routes.dashboard.bsdds.view, {
           siret,
-          id: form.id,
+          id: form.id
         }),
-        state: { background: location },
+        state: { background: location }
       },
       icon: <IconView color="blueLight" size="24px" />,
-      isVisible: true,
+      isVisible: true
     },
     {
       title: "Annexe 1",
       route: {
         pathname: generatePath(routes.dashboard.bsdds.view, {
           siret,
-          id: form.id,
+          id: form.id
         }),
         search: "?selectedTab=0",
-        state: { background: location },
+        state: { background: location }
       },
       icon: <IconAddCircle size="24px" color="blueLight" />,
-      isVisible: showAppendix1Button,
+      isVisible: showAppendix1Button
     },
 
     {
@@ -109,7 +109,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
       icon: <IconPdf size="24px" color="blueLight" />,
       isVisible: form.status !== FormStatus.Draft,
       isButton: true,
-      handleClick: () => downloadPdf(),
+      handleClick: () => downloadPdf()
     },
     {
       title: "Dupliquer",
@@ -117,28 +117,28 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
       icon: <IconDuplicateFile size="24px" color="blueLight" />,
       isVisible: !isAppendix1Producer,
       isButton: true,
-      handleClick: () => duplicateForm(),
+      handleClick: () => duplicateForm()
     },
     {
       title: "Modifier",
       route: generatePath(routes.dashboard.bsdds.edit, {
         siret,
-        id: form.id,
+        id: form.id
       }),
       icon: <IconPaperWrite size="24px" color="blueLight" />,
-      isVisible: canUpdate && !isAppendix1Producer,
+      isVisible: canUpdate && !isAppendix1Producer
     },
     {
       title: "Révision",
       route: {
         pathname: generatePath(routes.dashboard.bsdds.review, {
           siret,
-          id: form.id,
+          id: form.id
         }),
-        state: { background: location },
+        state: { background: location }
       },
       icon: <IconPaperWrite size="24px" color="blueLight" />,
-      isVisible: canRequestRevision,
+      isVisible: canRequestRevision
     },
     {
       title: "Supprimer",
@@ -146,8 +146,8 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
       icon: <IconTrash color="blueLight" size="24px" />,
       isVisible: canDelete,
       isButton: true,
-      handleClick: () => setIsDeleting(true),
-    },
+      handleClick: () => setIsDeleting(true)
+    }
   ];
 
   return (

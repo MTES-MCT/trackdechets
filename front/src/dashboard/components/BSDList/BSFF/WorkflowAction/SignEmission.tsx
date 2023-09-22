@@ -6,14 +6,14 @@ import {
   Bsff,
   BsffSignatureType,
   Mutation,
-  MutationSignBsffArgs,
-} from "generated/graphql/types";
-import { RedErrorMessage } from "common/components";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { SIGN_BSFF } from "form/bsff/utils/queries";
+  MutationSignBsffArgs
+} from "codegen-ui";
+import { RedErrorMessage } from "../../../../../common/components";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import { SIGN_BSFF } from "../../../../../form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
-import { GET_BSDS } from "Apps/common/queries";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 
 const validationSchema = yup.object({
@@ -21,7 +21,7 @@ const validationSchema = yup.object({
   signatureAuthor: yup
     .string()
     .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis")
 });
 
 interface SignEmissionFormProps {
@@ -41,7 +41,7 @@ function SignEmissionForm({ bsff, onCancel }: SignEmissionFormProps) {
     <Formik
       initialValues={{
         signatureAuthor: "",
-        date: TODAY,
+        date: TODAY
       }}
       validationSchema={validationSchema}
       onSubmit={async values => {
@@ -51,9 +51,9 @@ function SignEmissionForm({ bsff, onCancel }: SignEmissionFormProps) {
             input: {
               type: BsffSignatureType.Emission,
               author: values.signatureAuthor,
-              date: values.date.toISOString(),
-            },
-          },
+              date: values.date.toISOString()
+            }
+          }
         });
         onCancel();
       }}
@@ -134,7 +134,7 @@ export function SignEmission({
   bsffId,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton,
+  displayActionButton
 }: SignEmissionProps) {
   return (
     <SignBsff

@@ -1,5 +1,5 @@
 import React from "react";
-import { IconTrash } from "Apps/common/Components/Icons/Icons";
+import { IconTrash } from "../../../common/Components/Icons/Icons";
 import { gql, useMutation } from "@apollo/client";
 import {
   BsdType,
@@ -8,12 +8,12 @@ import {
   MutationDeleteBsdasriArgs,
   MutationDeleteBsffArgs,
   MutationDeleteBsvhuArgs,
-  MutationDeleteFormArgs,
-} from "generated/graphql/types";
-import cogoToast from "cogo-toast";
-import TdModal from "Apps/common/Components/Modal/Modal";
-import { GET_BSDS } from "Apps/common/queries";
-import { Loader } from "Apps/common/Components";
+  MutationDeleteFormArgs
+} from "codegen-ui";
+import toast from "react-hot-toast";
+import TdModal from "../../../common/Components/Modal/Modal";
+import { GET_BSDS } from "../../../common/queries";
+import { Loader } from "../../../common/Components";
 
 const DELETE_BSDA = gql`
   mutation DeleteBsda($id: ID!) {
@@ -70,13 +70,13 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      cogoToast.success(messageSuccess, { hideAfter: 5 });
+      toast.success(messageSuccess, { duration: 5 });
       !!onClose && onClose();
     },
     onError: () =>
-      cogoToast.error(messageError, {
-        hideAfter: 5,
-      }),
+      toast.error(messageError, {
+        duration: 5
+      })
   });
   const [deleteBsdasri, { loading: deletingBsdasri }] = useMutation<
     Pick<Mutation, "deleteBsdasri">,
@@ -86,13 +86,13 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      cogoToast.success(messageSuccess, { hideAfter: 5 });
+      toast.success(messageSuccess, { duration: 5 });
       !!onClose && onClose();
     },
     onError: () =>
-      cogoToast.error(messageError, {
-        hideAfter: 5,
-      }),
+      toast.error(messageError, {
+        duration: 5
+      })
   });
 
   const [deleteBsdd, { loading: deletingBsdd }] = useMutation<
@@ -103,13 +103,13 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      cogoToast.success(messageSuccess, { hideAfter: 5 });
+      toast.success(messageSuccess, { duration: 5 });
       !!onClose && onClose();
     },
     onError: error =>
-      cogoToast.error(error.message, {
-        hideAfter: 5,
-      }),
+      toast.error(error.message, {
+        duration: 5
+      })
   });
 
   const [deleteBsff, { loading: deletingBsff }] = useMutation<
@@ -120,13 +120,13 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      cogoToast.success(messageSuccess, { hideAfter: 5 });
+      toast.success(messageSuccess, { duration: 5 });
       !!onClose && onClose();
     },
     onError: () =>
-      cogoToast.error(messageError, {
-        hideAfter: 5,
-      }),
+      toast.error(messageError, {
+        duration: 5
+      })
   });
 
   const [deleteBsvhu, { loading: deletingBsvhu }] = useMutation<
@@ -137,13 +137,13 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      cogoToast.success(messageSuccess, { hideAfter: 5 });
+      toast.success(messageSuccess, { duration: 5 });
       !!onClose && onClose();
     },
     onError: () =>
-      cogoToast.error(messageError, {
-        hideAfter: 5,
-      }),
+      toast.error(messageError, {
+        duration: 5
+      })
   });
 
   const loading =

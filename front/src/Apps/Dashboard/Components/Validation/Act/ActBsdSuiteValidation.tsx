@@ -1,4 +1,4 @@
-import TdModal from "Apps/common/Components/Modal/Modal";
+import TdModal from "../../../../common/Components/Modal/Modal";
 import React from "react";
 import MarkAsResealedModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/MarkAsResealedModalContent";
 

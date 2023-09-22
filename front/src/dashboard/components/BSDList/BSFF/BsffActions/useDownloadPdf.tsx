@@ -1,6 +1,6 @@
 import { LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
-import { PDF_BSFF_FORM } from "form/bsff/utils/queries";
-import { Query, QueryBsffPdfArgs } from "generated/graphql/types";
+import { PDF_BSFF_FORM } from "../../../../../form/bsff/utils/queries";
+import { Query, QueryBsffPdfArgs } from "codegen-ui";
 
 export function useDownloadPdf(
   options: LazyQueryHookOptions<Pick<Query, "bsffPdf">, QueryBsffPdfArgs>
@@ -13,6 +13,6 @@ export function useDownloadPdf(
         return;
       }
       window.open(bsffPdf.downloadLink, "_blank");
-    },
+    }
   });
 }

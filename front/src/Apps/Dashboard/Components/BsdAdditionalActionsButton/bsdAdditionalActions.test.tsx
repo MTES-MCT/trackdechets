@@ -1,13 +1,13 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import BsdAdditionalActionsButton from "./BsdAdditionalActionsButton";
-import { BsdDisplay, BsdStatusCode } from "Apps/common/types/bsdTypes";
-import { BsdType, EmitterType, UserPermission } from "generated/graphql/types";
+import { BsdDisplay, BsdStatusCode } from "../../../common/types/bsdTypes";
+import { BsdType, EmitterType, UserPermission } from "codegen-ui";
 
 const bsd = {
   id: "1",
   readableid: "1",
-  type: BsdType.Bsdd,
+  type: BsdType.Bsdd
 } as BsdDisplay;
 const currentSiret = "12345678901234";
 
@@ -41,7 +41,7 @@ describe("BsdAdditionalActionsButton", () => {
           onRevision,
           onPdf,
           onAppendix1,
-          onBsdSuite,
+          onBsdSuite
         }}
       />
     );
@@ -63,7 +63,7 @@ describe("BsdAdditionalActionsButton", () => {
           onRevision,
           onPdf,
           onAppendix1,
-          onBsdSuite,
+          onBsdSuite
         }}
       />
     );
@@ -105,7 +105,7 @@ describe("BsdAdditionalActionsButton", () => {
           onRevision,
           onPdf,
           onAppendix1,
-          onBsdSuite,
+          onBsdSuite
         }}
       />
     );
@@ -133,7 +133,7 @@ describe("BsdAdditionalActionsButton", () => {
           onRevision,
           onPdf,
           onAppendix1,
-          onBsdSuite,
+          onBsdSuite
         }}
       />
     );
@@ -161,7 +161,7 @@ describe("BsdAdditionalActionsButton", () => {
           onRevision,
           onPdf,
           onAppendix1,
-          onBsdSuite,
+          onBsdSuite
         }}
       />
     );
@@ -178,7 +178,7 @@ describe("BsdAdditionalActionsButton", () => {
     const bsdDelete = {
       ...bsd,
       status: BsdStatusCode.Draft,
-      type: BsdType.Bsdd,
+      type: BsdType.Bsdd
     } as BsdDisplay;
 
     const { getByTestId } = render(
@@ -194,7 +194,7 @@ describe("BsdAdditionalActionsButton", () => {
           onRevision,
           onPdf,
           onAppendix1,
-          onBsdSuite,
+          onBsdSuite
         }}
       />
     );
@@ -211,7 +211,7 @@ describe("BsdAdditionalActionsButton", () => {
     const bsdUpdate = {
       ...bsd,
       status: BsdStatusCode.Draft,
-      type: BsdType.Bsdd,
+      type: BsdType.Bsdd
     } as BsdDisplay;
 
     const { getByTestId } = render(
@@ -227,7 +227,7 @@ describe("BsdAdditionalActionsButton", () => {
           onRevision,
           onPdf,
           onAppendix1,
-          onBsdSuite,
+          onBsdSuite
         }}
       />
     );
@@ -244,7 +244,7 @@ describe("BsdAdditionalActionsButton", () => {
     const bsdReview = {
       ...bsd,
       status: BsdStatusCode.Processed,
-      type: BsdType.Bsdd,
+      type: BsdType.Bsdd
     } as BsdDisplay;
 
     const { getByTestId } = render(
@@ -260,7 +260,7 @@ describe("BsdAdditionalActionsButton", () => {
           onRevision,
           onPdf,
           onAppendix1,
-          onBsdSuite,
+          onBsdSuite
         }}
       />
     );
@@ -280,7 +280,7 @@ describe("BsdAdditionalActionsButton", () => {
       status: BsdStatusCode.Accepted,
       destination: { company: { siret: currentSiret } },
       isTempStorage: false,
-      type: BsdType.Bsdd,
+      type: BsdType.Bsdd
     } as BsdDisplay;
 
     const { getByTestId } = render(
@@ -296,7 +296,7 @@ describe("BsdAdditionalActionsButton", () => {
           onRevision,
           onPdf,
           onAppendix1,
-          onBsdSuite,
+          onBsdSuite
         }}
       />
     );
@@ -315,9 +315,9 @@ describe("BsdAdditionalActionsButton", () => {
       status: BsdStatusCode.TempStorerAccepted,
       destination: { company: { siret: currentSiret } },
       temporaryStorageDetail: {
-        transporter: { company: { siret: "1234567890" } },
+        transporter: { company: { siret: "1234567890" } }
       },
-      type: BsdType.Bsdd,
+      type: BsdType.Bsdd
     } as BsdDisplay;
 
     const { getByTestId } = render(
@@ -333,7 +333,7 @@ describe("BsdAdditionalActionsButton", () => {
           onRevision,
           onPdf,
           onAppendix1,
-          onBsdSuite,
+          onBsdSuite
         }}
       />
     );
@@ -351,7 +351,7 @@ describe("BsdAdditionalActionsButton", () => {
       ...bsd,
       emitterType: EmitterType.Appendix1,
       status: BsdStatusCode.Sent,
-      type: BsdType.Bsdd,
+      type: BsdType.Bsdd
     } as BsdDisplay;
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
@@ -366,7 +366,7 @@ describe("BsdAdditionalActionsButton", () => {
           onRevision,
           onPdf,
           onAppendix1,
-          onBsdSuite,
+          onBsdSuite
         }}
       />
     );

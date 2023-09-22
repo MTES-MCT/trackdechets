@@ -1,6 +1,6 @@
 import React from "react";
 import { FieldProps } from "formik";
-import { transportModeLabels } from "dashboard/constants";
+import { transportModeLabels } from "../../dashboard/constants";
 
 export function FieldTransportModeSelect({
   field,

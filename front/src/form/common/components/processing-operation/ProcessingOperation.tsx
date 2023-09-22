@@ -1,13 +1,13 @@
 import { FieldProps } from "formik";
 import React from "react";
-import { PROCESSING_OPERATIONS } from "generated/constants";
+import { PROCESSING_OPERATIONS } from "shared/constants";
 import styles from "./ProcessingOperation.module.scss";
 import classNames from "classnames";
-import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
+import ProcessingOperationSelect from "../../../../common/components/ProcessingOperationSelect";
 export default function ProcessingOperation({
   field: { value, name, onChange },
   enableReuse = false,
-  disabled,
+  disabled
 }: FieldProps & { enableReuse?: boolean; disabled?: boolean }) {
   const operationDetail = PROCESSING_OPERATIONS.find(
     operation => operation.code === value

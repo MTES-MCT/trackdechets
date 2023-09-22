@@ -6,7 +6,7 @@ import {
   isVat,
   isSiret,
   cleanClue
-} from "../../../common/constants/companySearchHelpers";
+} from "shared/constants";
 import { FormCompany } from "../../../generated/graphql/types";
 
 const FRENCH_COUNTRY = countries.find(country => country.cca2 === "FR");
@@ -98,7 +98,9 @@ export function FormCompanyFields({
   );
 }
 
-export function getcompanyCountry(company: FormCompany | null | undefined): Country | undefined {
+export function getcompanyCountry(
+  company: FormCompany | null | undefined
+): Country | undefined {
   if (!company) return FRENCH_COUNTRY; // default
 
   // forcer FR si le siret est valide

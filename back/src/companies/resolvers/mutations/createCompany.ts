@@ -6,7 +6,7 @@ import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
-import * as COMPANY_CONSTANTS from "../../../common/constants/COMPANY_CONSTANTS";
+import * as COMPANY_CONSTANTS from "shared/constants";
 import { renderMail } from "../../../mailer/templates/renderers";
 import {
   onboardingFirstStep,
@@ -20,7 +20,7 @@ import {
   isSiret,
   isVat,
   CLOSED_COMPANY_ERROR
-} from "../../../common/constants/companySearchHelpers";
+} from "shared/constants";
 import { searchCompany } from "../../search";
 import {
   addToGeocodeCompanyQueue,

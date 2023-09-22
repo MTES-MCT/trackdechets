@@ -1,27 +1,27 @@
 import { gql, useMutation } from "@apollo/client";
-import { RedErrorMessage } from "common/components";
-import { Loader } from "Apps/common/Components";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
-import { statusChangeFragment } from "Apps/common/queries/fragments";
-import { mergeDefaults } from "common/helper";
-import { GET_BSDS } from "Apps/common/queries";
-import Packagings from "form/bsdd/components/packagings/Packagings";
-import Transporter from "form/bsdd/Transporter";
-import CompanySelector from "form/common/components/company/CompanySelector";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import { RedErrorMessage } from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import ProcessingOperationSelect from "../../../../../common/components/ProcessingOperationSelect";
+import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
+import { mergeDefaults } from "../../../../../common/helper";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
+import Transporter from "../../../../../form/bsdd/Transporter";
+import CompanySelector from "../../../../../form/common/components/company/CompanySelector";
+import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
+import { RadioButton } from "../../../../../form/common/components/custom-inputs/RadioButton";
 import { Field, Form, Formik } from "formik";
-import { packagingsEqual } from "generated/constants/formHelpers";
+import { packagingsEqual } from "shared/constants";
 import {
   FormStatus,
   Mutation,
   QuantityType,
   ResealedFormInput,
-  TransportMode,
-} from "generated/graphql/types";
+  TransportMode
+} from "codegen-ui";
 import React, { useState } from "react";
-import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
+import EstimatedQuantityTooltip from "../../../../../common/components/EstimatedQuantityTooltip";
 
 const MARK_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
@@ -39,11 +39,11 @@ const emptyState = {
       address: "",
       contact: "",
       mail: "",
-      phone: "",
+      phone: ""
     },
     cap: "",
     processingOperation: "",
-    isFilledByEmitter: false,
+    isFilledByEmitter: false
   },
   transporter: {
     isExemptedOfReceipt: false,
@@ -56,15 +56,15 @@ const emptyState = {
       address: "",
       contact: "",
       mail: "",
-      phone: "",
-    },
+      phone: ""
+    }
   },
   wasteDetails: {
     onuCode: "",
     packagingInfos: [],
     quantity: null,
-    quantityType: QuantityType.Estimated,
-  },
+    quantityType: QuantityType.Estimated
+  }
 };
 
 const MarkAsResealedModalContent = ({ bsd, onClose }) => {
@@ -93,7 +93,7 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
     awaitRefetchQueries: true,
     onError: () => {
       // The error is handled in the UI
-    },
+    }
   });
   return (
     <div>
@@ -105,9 +105,9 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
               id: bsd.id,
               resealedInfos: {
                 ...values,
-                ...(isRefurbished ? { wasteDetails } : {}),
-              },
-            },
+                ...(isRefurbished ? { wasteDetails } : {})
+              }
+            }
           })
         }
       >

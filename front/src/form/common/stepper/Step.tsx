@@ -14,7 +14,7 @@ export function StepContainer(props: IStepContainerProps) {
     ? createElement(props.component, {
         disabled: props.disabled,
         status: props.status,
-        stepName: props.stepName,
+        stepName: props.stepName
       })
     : props.children
     ? props.children

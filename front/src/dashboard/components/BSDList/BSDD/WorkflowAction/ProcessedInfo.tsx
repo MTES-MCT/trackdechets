@@ -2,23 +2,23 @@ import React, { useEffect } from "react";
 import { Field, Form, useFormikContext } from "formik";
 import {
   PROCESSING_AND_REUSE_OPERATIONS,
-  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
-} from "generated/constants";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import CompanySelector from "form/common/components/company/CompanySelector";
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES
+} from "shared/constants";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
+import CompanySelector from "../../../../../form/common/components/company/CompanySelector";
 import {
   Form as TdForm,
   FormStatus,
-  MutationMarkAsProcessedArgs,
-} from "generated/graphql/types";
-import Tooltip from "common/components/Tooltip";
+  MutationMarkAsProcessedArgs
+} from "codegen-ui";
+import Tooltip from "../../../../../common/components/Tooltip";
 import { subMonths } from "date-fns";
-import OperationModeSelect from "common/components/OperationModeSelect";
+import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
 
 function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   const {
     values: { processingOperationDone, noTraceability, nextDestination },
-    setFieldValue,
+    setFieldValue
   } = useFormikContext<MutationMarkAsProcessedArgs["processedInfo"]>();
 
   const isGroupement =
@@ -38,8 +38,8 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
             address: "",
             contact: "",
             mail: "",
-            phone: "",
-          },
+            phone: ""
+          }
         });
       }
       if (noTraceability == null) {

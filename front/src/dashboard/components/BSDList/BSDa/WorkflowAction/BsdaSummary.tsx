@@ -1,9 +1,9 @@
 import * as React from "react";
-import { Bsda } from "generated/graphql/types";
+import { Bsda } from "codegen-ui";
 import { BsdaWasteSummary } from "./BsdaWasteSummary";
 import { BsdaJourneySummary } from "./BsdaJourneySummary";
-import { InitialBsdas } from "dashboard/detail/bsda/InitialBsdas";
-import { DataListTerm } from "common/components";
+import { InitialBsdas } from "../../../../detail/bsda/InitialBsdas";
+import { DataListTerm } from "../../../../../common/components";
 
 interface BsdaSummaryProps {
   bsda: Bsda;

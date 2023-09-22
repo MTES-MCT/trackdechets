@@ -1,5 +1,5 @@
-import CompanySelector from "form/common/components/company/CompanySelector";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import CompanySelector from "../common/components/company/CompanySelector";
+import { RadioButton } from "../common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
 import {
   CompanySearchPrivate,
@@ -7,21 +7,21 @@ import {
   EmitterType,
   Form,
   Query,
-  QueryCompanyPrivateInfosArgs,
-} from "generated/graphql/types";
+  QueryCompanyPrivateInfosArgs
+} from "codegen-ui";
 import React, { useEffect } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
-import WorkSite from "form/common/components/work-site/WorkSite";
-import { getInitialEmitterWorkSite } from "form/bsdd/utils/initial-state";
+import WorkSite from "../common/components/work-site/WorkSite";
+import { getInitialEmitterWorkSite } from "./utils/initial-state";
 import "./Emitter.scss";
-import MyCompanySelector from "form/common/components/company/MyCompanySelector";
-import { emitterTypeLabels } from "dashboard/constants";
-import { isForeignVat, isOmi } from "generated/constants/companySearchHelpers";
-import { RedErrorMessage } from "common/components";
-import Tooltip from "common/components/Tooltip";
+import MyCompanySelector from "../common/components/company/MyCompanySelector";
+import { emitterTypeLabels } from "../../dashboard/constants";
+import { isForeignVat, isOmi } from "shared/constants";
+import { RedErrorMessage } from "../../common/components";
+import Tooltip from "../../common/components/Tooltip";
 import { onBsddTransporterCompanySelected } from "./utils/onBsddTransporterCompanySelected";
 import { useQuery } from "@apollo/client";
-import { COMPANY_SELECTOR_PRIVATE_INFOS } from "Apps/common/queries/company/query";
+import { COMPANY_SELECTOR_PRIVATE_INFOS } from "../../Apps/common/queries/company/query";
 
 export default function Emitter({ disabled }) {
   const ctx = useFormikContext<Form>();
@@ -48,7 +48,7 @@ export default function Emitter({ disabled }) {
   }, [
     values.emitter?.isForeignShip,
     values.emitter?.isPrivateIndividual,
-    setFieldValue,
+    setFieldValue
   ]);
 
   const [emitterTypeField] = useField("emitter.type");
@@ -77,7 +77,7 @@ export default function Emitter({ disabled }) {
     QueryCompanyPrivateInfosArgs
   >(COMPANY_SELECTOR_PRIVATE_INFOS, {
     variables: {
-      clue: orgId!,
+      clue: orgId!
     },
     skip: !orgId,
     onCompleted: data => {
@@ -86,7 +86,7 @@ export default function Emitter({ disabled }) {
           data.companyPrivateInfos as CompanySearchPrivate
         );
       }
-    },
+    }
   });
 
   React.useCallback(() => {
@@ -349,7 +349,7 @@ export default function Emitter({ disabled }) {
                   CompanyType.Collector,
                   CompanyType.Transporter,
                   CompanyType.Wasteprocessor,
-                  CompanyType.WasteCenter,
+                  CompanyType.WasteCenter
                 ];
                 return companies.filter(
                   company =>

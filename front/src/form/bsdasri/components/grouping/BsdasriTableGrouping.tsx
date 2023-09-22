@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
 import { useQuery, gql } from "@apollo/client";
 import { useFormikContext } from "formik";
-import { InlineError } from "Apps/common/Components/Error/Error";
+import { InlineError } from "../../../../Apps/common/Components/Error/Error";
 import {
   Bsdasri,
   Query,
   QueryBsdasrisArgs,
   BsdasriStatus,
   DestinationOperationCodeTypes,
-  BsdasriPackaging,
-} from "generated/graphql/types";
-import { formatDate } from "common/datetime";
+  BsdasriPackaging
+} from "codegen-ui";
+import { formatDate } from "../../../../common/datetime";
 import { RefreshButton } from "./Common";
 import { aggregatePackagings } from "./utils";
 
@@ -55,7 +55,7 @@ const GET_GROUPABLE_BSDASRIS = gql`
 export default function BsdasriTableGrouping({
   selectedItems,
   onToggle,
-  regroupedInDB,
+  regroupedInDB
 }) {
   const { values, setFieldValue } = useFormikContext<
     Bsdasri & { dbRegroupedBsdasris: string[] }
@@ -75,15 +75,15 @@ export default function BsdasriTableGrouping({
             code: {
               _in: [
                 DestinationOperationCodeTypes.D12,
-                DestinationOperationCodeTypes.R12,
-              ],
-            },
-          },
+                DestinationOperationCodeTypes.R12
+              ]
+            }
+          }
         },
 
-        status: { _eq: BsdasriStatus.AwaitingGroup },
-      },
-    },
+        status: { _eq: BsdasriStatus.AwaitingGroup }
+      }
+    }
   });
   // fill weight and packaging fields
   useEffect(() => {
