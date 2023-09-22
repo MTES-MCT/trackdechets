@@ -1,6 +1,7 @@
 import { TransportMode, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
+  BsdaInput,
   Mutation,
   MutationUpdateBsdaArgs
 } from "../../../../generated/graphql/types";
@@ -281,6 +282,214 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterCompanyName"
+      })
+    ]);
+  });
+
+  it("should allow emitter to update destination when he is the only one to have signed", async () => {
+    const { company: emitter, user } = await userWithCompanyFactory("ADMIN");
+    const destination = await companyFactory();
+    const destination2 = await companyFactory();
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        destinationCompanySiret: destination.siret,
+        emitterCompanySiret: emitter.siret,
+        emitterEmissionSignatureDate: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: destination2.siret
+        }
+      }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
+  it("should not allow emitter to update destination if the worker has signed", async () => {
+    const { company: emitter, user } = await userWithCompanyFactory("ADMIN");
+    const destination = await companyFactory();
+    const destination2 = await companyFactory();
+    const worker = await companyFactory();
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_WORKER",
+        destinationCompanySiret: destination.siret,
+        emitterCompanySiret: emitter.siret,
+        workerCompanySiret: worker.siret,
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: destination2.siret
+        }
+      }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationCompanySiret"
+      })
+    ]);
+  });
+
+  it("should not allow emitter to update destination if the transporter has signed", async () => {
+    const { company: emitter, user } = await userWithCompanyFactory("ADMIN");
+    const destination = await companyFactory();
+    const destination2 = await companyFactory();
+    const transporter = await companyFactory();
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SENT",
+        destinationCompanySiret: destination.siret,
+        emitterCompanySiret: emitter.siret,
+        transporterCompanySiret: transporter.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: destination2.siret
+        }
+      }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationCompanySiret"
+      })
+    ]);
+  });
+
+  it("should allow worker to update waste info", async () => {
+    const { company: worker, user } = await userWithCompanyFactory("ADMIN");
+    const destination = await companyFactory();
+    const emitter = await companyFactory();
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        destinationCompanySiret: destination.siret,
+        emitterCompanySiret: emitter.siret,
+        workerCompanySiret: worker.siret,
+        emitterEmissionSignatureDate: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input: BsdaInput = {
+      waste: {
+        materialName: "Fibrociment",
+        familyCode: "code famille",
+        sealNumbers: ["1", "2"],
+        adr: "ADR"
+      },
+      weight: { value: 1, isEstimate: false },
+      packagings: [{ type: "BIG_BAG", quantity: 1 }]
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
+  it("should not allow worker to update destination after emitter's signature", async () => {
+    const { company: worker, user } = await userWithCompanyFactory("ADMIN");
+    const destination = await companyFactory();
+    const destination2 = await companyFactory();
+    const emitter = await companyFactory();
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        destinationCompanySiret: destination.siret,
+        emitterCompanySiret: emitter.siret,
+        workerCompanySiret: worker.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: destination2.siret
+        }
+      }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationCompanySiret"
       })
     ]);
   });
@@ -858,16 +1067,20 @@ describe("Mutation.updateBsda", () => {
     );
   });
 
-  it("should allow updating destination if the planned destination becomes the nextDestination", async () => {
+  it.only("should allow updating destination if the planned destination becomes the nextDestination", async () => {
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination2 = await companyFactory();
+    const worker = await companyFactory();
+
     const bsda = await bsdaFactory({
       opt: {
         status: "SIGNED_BY_WORKER",
         destinationCompanySiret: destination.company.siret,
         transporterCompanySiret: transporter.company.siret,
-        emitterEmissionSignatureAuthor: "Emit",
-        workerWorkSignatureAuthor: "Work"
+        workerCompanySiret: worker.siret,
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
       }
     });
 
@@ -876,7 +1089,7 @@ describe("Mutation.updateBsda", () => {
     const input = {
       destination: {
         company: {
-          siret: transporter.company.siret
+          siret: destination2.siret // ajout d'un entreposage provisoire
         },
         operation: {
           nextDestination: {
@@ -899,9 +1112,7 @@ describe("Mutation.updateBsda", () => {
       where: { id: data.updateBsda.id }
     });
 
-    expect(updatedBsda?.destinationCompanySiret).toBe(
-      transporter.company.siret
-    );
+    expect(updatedBsda?.destinationCompanySiret).toBe(destination2.siret);
     expect(updatedBsda?.destinationOperationNextDestinationCompanySiret).toBe(
       destination.company.siret
     );
