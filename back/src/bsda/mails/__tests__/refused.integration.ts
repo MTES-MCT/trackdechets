@@ -82,6 +82,32 @@ describe("renderBsdaRefusedEmail", () => {
     ]);
   });
 
+  test("when the bsda is refused by the destination and emitter is private individual", async () => {
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterIsPrivateIndividual: true,
+        emitterCompanySiret: null,
+        emitterCompanyName: "Jean Dupond",
+        emitterCompanyAddress: "",
+        emitterCompanyMail: "jean.dupond@dupond.fr",
+        destinationCompanySiret: destination.company.siret,
+        destinationCompanyName: destination.company.name,
+        destinationCompanyAddress: destination.company.address,
+        emitterEmissionSignatureDate: new Date("2022-01-01"),
+        destinationReceptionDate: new Date("2022-01-02"),
+        status: Status.REFUSED,
+        destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
+        destinationReceptionRefusalReason: "Parce que !!"
+      }
+    });
+    const email = await renderBsdaRefusedEmail(bsda, true);
+    expect(email!.to).toEqual([
+      { email: "jean.dupond@dupond.fr", name: "Jean Dupond" }
+    ]);
+  });
+
   test("when the bsda is partially refused by the destination", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
