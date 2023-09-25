@@ -64,7 +64,8 @@ export const getBsdView = (bsd): BsdDisplay | null => {
 export const getBsdStatusLabel = (
   status: string,
   isDraft: boolean | undefined,
-  bsdType?: BsdType
+  bsdType?: BsdType,
+  operationCode?: string
 ) => {
   switch (status) {
     case BsdStatusCode.Draft:
@@ -126,6 +127,9 @@ export const getBsdStatusLabel = (
       return SIGNER_PAR_ENTREPRISE_TRAVAUX;
     case BsdStatusCode.AwaitingGroup:
       if (bsdType === BsdType.Bsdasri) {
+        if (operationCode === "R12" || operationCode === "D12") {
+          return EN_ATTENTE_BSD_SUITE;
+        }
         return ANNEXE_BORDEREAU_SUITE;
       }
       return EN_ATTENTE_BSD_SUITE;
