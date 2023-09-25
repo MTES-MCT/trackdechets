@@ -332,6 +332,9 @@ function BsdCard({
                     isDraft={bsdDisplay.isDraft}
                     bsdType={bsdDisplay.type}
                     reviewStatus={bsdDisplay?.review?.status}
+                    operationCode={
+                      bsdDisplay?.destination?.["operation"]?.["code"]
+                    }
                   />
                 </div>
                 {isMobile && <div className="bsd-card-border" />}
