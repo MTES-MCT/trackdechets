@@ -130,6 +130,7 @@ export interface BsdDisplay {
   allowDirectTakeOver?: Maybe<Scalars["Boolean"]>;
   transporterCustomInfo?: string | Maybe<string[]>;
   transporterNumberPlate?: string | Maybe<string[]>;
+  packagings?: Array<BsffPackaging>;
 }
 
 export type BsdWithReview = Bsd & {
