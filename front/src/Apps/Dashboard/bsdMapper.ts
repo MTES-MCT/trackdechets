@@ -127,6 +127,11 @@ const truncateTransporterInfo = (text?: string) =>
 
 export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
   const statusCode = bsdasri?.status || bsdasri["bsdasriStatus"];
+  const wasteCode = bsdasri.waste?.code || bsdasri["bsdasriWaste"]?.code;
+  const wasteName =
+    wasteCode === "18 01 03*"
+      ? "DASRI origine humaine"
+      : "DASRI origine animale"; //18 02 02*
   const bsdasriFormatted: BsdDisplay = {
     id: bsdasri.id,
     readableid: bsdasri.id,
@@ -134,8 +139,9 @@ export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     isDraft: bsdasri.isDraft,
     status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
-      code: bsdasri.waste?.code || bsdasri["bsdasriWaste"]?.code,
+      code: wasteCode,
       weight: bsdasri.destination?.operation?.weight?.value,
+      name: wasteName,
     },
     emitter: bsdasri.emitter || bsdasri["bsdasriEmitter"],
     destination: bsdasri.destination || bsdasri["bsdasriDestination"],
@@ -160,6 +166,9 @@ export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
 
 const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
   const statusCode = bsvhu?.status || bsvhu["bsvhuStatus"];
+  const wasteCode = bsvhu?.wasteCode;
+  const wasteName =
+    wasteCode === "16 01 04*" ? "VHU non dépollués" : "VHU dépollués"; //16 01 06
   const bsvhuFormatted: BsdDisplay = {
     id: bsvhu.id,
     readableid: bsvhu.id,
@@ -169,6 +178,7 @@ const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     wasteDetails: {
       code: bsvhu?.wasteCode,
       weight: bsvhu?.destination?.reception?.weight || bsvhu?.weight?.value,
+      name: wasteName,
     },
     emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
     destination: bsvhu.destination || bsvhu["bsvhuDestination"],
