@@ -126,6 +126,7 @@ export const dashboardDasriFragment = gql`
         ...DashboardCompanyFragment
       }
       operation {
+        code
         weight {
           value
         }
