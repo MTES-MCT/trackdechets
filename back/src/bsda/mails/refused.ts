@@ -6,7 +6,7 @@ import { buildPdfAsBase64 } from "../pdf/generator";
 import DREALS from "../../common/constants/DREALS";
 import { formNotAccepted, formPartiallyRefused } from "../../mailer/templates";
 import { renderMail } from "../../mailer/templates/renderers";
-import Decimal from "decimal.js-light";
+import { Decimal } from "decimal.js-light";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
@@ -19,9 +19,9 @@ export async function renderBsdaRefusedEmail(
     name: `${bsda.id}.pdf`
   };
 
-  const emitterCompanyAdmins = await getCompanyAdminUsers(
-    bsda.emitterCompanySiret!
-  );
+  const emitterCompanyAdmins = bsda.emitterCompanySiret
+    ? await getCompanyAdminUsers(bsda.emitterCompanySiret)
+    : [];
   const destinationCompanyAdmins = await getCompanyAdminUsers(
     bsda.destinationCompanySiret!
   );
@@ -32,7 +32,9 @@ export async function renderBsdaRefusedEmail(
     const companies = await prisma.company.findMany({
       where: {
         siret: {
-          in: [bsda.emitterCompanySiret!, bsda.emitterCompanySiret!]
+          in: [bsda.emitterCompanySiret, bsda.destinationCompanySiret].filter(
+            Boolean
+          )
         }
       },
       select: { codeDepartement: true }
@@ -42,10 +44,17 @@ export async function renderBsdaRefusedEmail(
     drealsRecipients = DREALS.filter(d => formDepartments.includes(d.Dept));
   }
 
-  const to = emitterCompanyAdmins.map(admin => ({
-    email: admin.email,
-    name: admin.name ?? ""
-  }));
+  const to = bsda.emitterIsPrivateIndividual
+    ? [
+        {
+          email: bsda.emitterCompanyMail!, // requis dans le contexte d'appel de la fonction
+          name: bsda.emitterCompanyName! // requis par le schéma Zod
+        }
+      ]
+    : emitterCompanyAdmins.map(admin => ({
+        email: admin.email,
+        name: admin.name ?? ""
+      }));
 
   // include drealsRecipients if settings says so
   const cc = [
