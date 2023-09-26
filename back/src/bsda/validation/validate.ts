@@ -73,7 +73,9 @@ export function getContextualBsdaSchema(
 
         let fieldIsRequired = false;
         if (rule.isRequired instanceof Function) {
-          fieldIsRequired = rule.isRequired(val);
+          fieldIsRequired =
+            validationContext.currentSignatureType === rule.sealedBy &&
+            rule.isRequired(val);
         } else if (
           signaturesInOrder.includes(rule.isRequired as string) &&
           validationContext.currentSignatureType
@@ -82,7 +84,9 @@ export function getContextualBsdaSchema(
             signaturesInOrder.indexOf(validationContext.currentSignatureType) >=
             signaturesInOrder.indexOf(rule.isRequired as string);
         } else {
-          fieldIsRequired = rule.isRequired as boolean;
+          fieldIsRequired =
+            validationContext.currentSignatureType === rule.sealedBy &&
+            (rule.isRequired as boolean);
         }
 
         if (fieldIsRequired && val[field] == null) {
