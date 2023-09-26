@@ -134,14 +134,14 @@ function BsdCardList({
           ) {
             const path = routes.dashboardv2.bsdasris.sign.directTakeover;
             redirectToPath(path, bsd.id);
-          } else {
-            const path = routes.dashboardv2.bsdasris.sign.emissionSecretCode;
-            redirectToPath(path, bsd.id);
           }
           if (
             isSynthesis(formattedBsdAsBsdDisplay.bsdWorkflowType?.toString())
           ) {
             const path = routes.dashboardv2.bsdasris.sign.synthesisTakeover;
+            redirectToPath(path, bsd.id);
+          } else {
+            const path = routes.dashboardv2.bsdasris.sign.emissionSecretCode;
             redirectToPath(path, bsd.id);
           }
         }
