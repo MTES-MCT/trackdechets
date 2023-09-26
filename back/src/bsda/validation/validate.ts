@@ -24,6 +24,22 @@ export async function parseBsda(
   return contextualSchema.parseAsync(bsda);
 }
 
+const SIGNATURES_SORTED_BY_CHRONOLOGICAL_ORDER = [
+  "EMISSION",
+  "TRANSPORT",
+  "OPERATION",
+  "WORK"
+];
+
+const isStepAhead = (step1, step2) => {
+  if (!step1 || !step2) return false;
+
+  return (
+    SIGNATURES_SORTED_BY_CHRONOLOGICAL_ORDER.indexOf(step1) >=
+    SIGNATURES_SORTED_BY_CHRONOLOGICAL_ORDER.indexOf(step2)
+  );
+};
+
 export function getContextualBsdaSchema(
   validationContext: BsdaValidationContext,
   rules = editionRules
@@ -64,29 +80,28 @@ export function getContextualBsdaSchema(
       }
 
       for (const [field, rule] of Object.entries(rules)) {
-        const signaturesInOrder = [
-          "EMISSION",
-          "TRANSPORT",
-          "OPERATION",
-          "WORK"
-        ];
-
         let fieldIsRequired = false;
         if (rule.isRequired instanceof Function) {
           fieldIsRequired =
-            validationContext.currentSignatureType === rule.sealedBy &&
-            rule.isRequired(val);
+            isStepAhead(
+              validationContext.currentSignatureType,
+              rule.sealedBy
+            ) && rule.isRequired(val);
         } else if (
-          signaturesInOrder.includes(rule.isRequired as string) &&
-          validationContext.currentSignatureType
+          SIGNATURES_SORTED_BY_CHRONOLOGICAL_ORDER.includes(
+            rule.isRequired as string
+          )
         ) {
-          fieldIsRequired =
-            signaturesInOrder.indexOf(validationContext.currentSignatureType) >=
-            signaturesInOrder.indexOf(rule.isRequired as string);
+          fieldIsRequired = isStepAhead(
+            validationContext.currentSignatureType,
+            rule.isRequired
+          );
         } else {
           fieldIsRequired =
-            validationContext.currentSignatureType === rule.sealedBy &&
-            (rule.isRequired as boolean);
+            isStepAhead(
+              validationContext.currentSignatureType,
+              rule.sealedBy
+            ) && (rule.isRequired as boolean);
         }
 
         if (fieldIsRequired && val[field] == null) {
