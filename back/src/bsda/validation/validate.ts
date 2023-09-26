@@ -24,13 +24,16 @@ export async function parseBsda(
   return contextualSchema.parseAsync(bsda);
 }
 
-function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
+export function getContextualBsdaSchema(
+  validationContext: BsdaValidationContext,
+  rules = editionRules
+) {
   // Some signatures may be skipped, so always check all the hierarchy
   const signaturesToCheck = getSignatureHierarchy(
     validationContext.currentSignatureType
   );
   // We skip the rules for which the fields are not sealed yet
-  const sealedRules = Object.entries(editionRules).filter(([_, rule]) =>
+  const sealedRules = Object.entries(rules).filter(([_, rule]) =>
     signaturesToCheck.includes(rule.sealedBy)
   );
   const sealedFields = sealedRules.map(([field]) => field);
@@ -58,11 +61,29 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
           // @ts-expect-error TODO: superRefineWhenSealed first param is inferred as never ?
           rule.superRefineWhenSealed(val[field], ctx);
         }
+      }
 
-        const fieldIsRequired =
-          rule.isRequired instanceof Function
-            ? rule.isRequired(val)
-            : rule.isRequired;
+      for (const [field, rule] of Object.entries(rules)) {
+        const signaturesInOrder = [
+          "EMISSION",
+          "TRANSPORT",
+          "OPERATION",
+          "WORK"
+        ];
+
+        let fieldIsRequired: string | boolean = false;
+        if (rule.isRequired instanceof Function) {
+          fieldIsRequired = rule.isRequired(val);
+        } else if (
+          signaturesInOrder.includes(rule.isRequired as string) &&
+          validationContext.currentSignatureType
+        ) {
+          fieldIsRequired =
+            signaturesInOrder.indexOf(validationContext.currentSignatureType) >=
+            signaturesInOrder.indexOf(rule.isRequired as string);
+        } else {
+          fieldIsRequired = rule.isRequired;
+        }
 
         if (fieldIsRequired && val[field] == null) {
           const description = rule.name

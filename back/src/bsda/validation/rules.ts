@@ -5,7 +5,7 @@ import { PARTIAL_OPERATIONS } from "./constants";
 import { ZodBsda } from "./schema";
 import { isForeignVat } from "../../common/constants/companySearchHelpers";
 
-type EditableBsdaFields = Required<
+export type EditableBsdaFields = Required<
   Omit<
     Prisma.BsdaCreateInput,
     | "id"
@@ -31,15 +31,17 @@ type EditableBsdaFields = Required<
   >
 >;
 
-export const editionRules: {
+export type EditionRules = {
   [Key in keyof EditableBsdaFields]: {
     sealedBy: BsdaSignatureType; // The type of signature that seals the field
-    isRequired: boolean | ((val: ZodBsda) => boolean); // Whether or not the field is required when sealed. The rule can depend on other fields
+    isRequired: BsdaSignatureType | boolean | ((val: ZodBsda) => boolean); // Whether or not the field is required when sealed. The rule can depend on other fields
     superRefineWhenSealed?: (val: ZodBsda[Key], ctx: RefinementCtx) => void; // For custom rules to apply when the field is sealed
     name?: string; // A custom field name for errors
     suffix?: string; // A custom message at the end of the error
   };
-} = {
+};
+
+export const editionRules: EditionRules = {
   type: { sealedBy: "EMISSION", isRequired: true },
   emitterIsPrivateIndividual: { sealedBy: "EMISSION", isRequired: true },
   emitterCompanyName: {
