@@ -880,7 +880,9 @@ describe("Mutation.updateBsda", () => {
         },
         operation: {
           nextDestination: {
-            company: { siret: destination.company.siret }
+            company: { siret: destination.company.siret },
+            cap: "CAP",
+            plannedOperationCode: "R 1"
           }
         }
       }
@@ -929,7 +931,9 @@ describe("Mutation.updateBsda", () => {
         },
         operation: {
           nextDestination: {
-            company: { siret: transporter.company.siret }
+            company: { siret: transporter.company.siret },
+            cap: "CAP",
+            plannedOperationCode: "R 1"
           }
         }
       }

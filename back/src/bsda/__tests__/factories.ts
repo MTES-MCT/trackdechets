@@ -8,11 +8,27 @@ export const bsdaFactory = async ({
 }: {
   opt?: Partial<Prisma.BsdaCreateInput>;
 }) => {
-  const bsdaObject = getBsdaObject();
+  const bsdaObject = getBsdaObject(opt);
 
   await upsertBaseSiret(bsdaObject.transporterCompanySiret);
   await upsertBaseSiret(bsdaObject.destinationCompanySiret);
   await upsertBaseSiret(bsdaObject.workerCompanySiret);
+
+  // Transporter receipt
+  const transporterReceipt = await prisma.transporterReceipt.create({
+    data: {
+      department: "83",
+      receiptNumber: "a receipt",
+      validityLimit: "2019-11-27T00:00:00.000Z"
+    }
+  });
+  const transporter = await prisma.company.findFirst({
+    where: { siret: bsdaObject.transporterCompanySiret }
+  });
+  await prisma.company.update({
+    where: { id: transporter?.id },
+    data: { transporterReceipt: { connect: { id: transporterReceipt.id } } }
+  });
 
   const formParams = { ...bsdaObject, ...opt };
   const created = await prisma.bsda.create({
@@ -35,7 +51,9 @@ export const bsdaFactory = async ({
   return created;
 };
 
-const getBsdaObject = (): Prisma.BsdaCreateInput => ({
+const getBsdaObject = (
+  opt?: Partial<Prisma.BsdaCreateInput>
+): Prisma.BsdaCreateInput => ({
   id: getReadableId(ReadableIdPrefix.BSDA),
 
   type: BsdaType.OTHER_COLLECTIONS,
@@ -78,9 +96,6 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   transporterCompanyContact: "Henri Transport",
   transporterCompanyPhone: "06 06 06 06 06",
   transporterCompanyMail: "transporter@td.io",
-  transporterRecepisseNumber: "a receipt",
-  transporterRecepisseDepartment: "83",
-  transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
   transporterTransportMode: "ROAD",
   transporterTransportPlates: ["AA-00-XX"],
 
@@ -98,5 +113,7 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   workerCompanyAddress: "1 route du travail, Travaux city",
   workerCompanyContact: "Jack Travaux",
   workerCompanyPhone: "05 05 05 05 05",
-  workerCompanyMail: "travaux@td.io"
+  workerCompanyMail: "travaux@td.io",
+
+  ...opt
 });
