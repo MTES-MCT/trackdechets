@@ -71,7 +71,7 @@ export function getContextualBsdaSchema(
           "WORK"
         ];
 
-        let fieldIsRequired: string | boolean = false;
+        let fieldIsRequired = false;
         if (rule.isRequired instanceof Function) {
           fieldIsRequired = rule.isRequired(val);
         } else if (
@@ -82,7 +82,7 @@ export function getContextualBsdaSchema(
             signaturesInOrder.indexOf(validationContext.currentSignatureType) >=
             signaturesInOrder.indexOf(rule.isRequired as string);
         } else {
-          fieldIsRequired = rule.isRequired;
+          fieldIsRequired = rule.isRequired as boolean;
         }
 
         if (fieldIsRequired && val[field] == null) {
