@@ -209,6 +209,7 @@ const mapBsff = (bsff: Bsff): BsdDisplay => {
     grouping: bsff.grouping,
     transporterCustomInfo: bsff["bsffTransporter"]?.customInfo,
     transporterNumberPlate: bsff["bsffTransporter"]?.transport?.plates,
+    packagings: bsff?.packagings,
   };
   return bsffFormatted;
 };

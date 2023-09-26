@@ -5,6 +5,7 @@ import { SignTransport } from "dashboard/components/BSDList/BSFF/WorkflowAction/
 import { SignReception } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignReception";
 import { SignBsffAcceptationOnePackaging } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignAcceptation";
 import { SignPackagings } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignPackagings";
+import { SignBsffOperationOnePackaging } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignOperation";
 
 interface ActBsffValidationProps {
   bsd: Bsff;
@@ -47,7 +48,15 @@ const ActBsffValidation = ({
   };
 
   const renderAcceptedModal = () => {
-    return renderReceivedModal();
+    if (bsd.packagings?.length === 1) {
+      return (
+        <SignBsffOperationOnePackaging
+          bsffId={bsd.id}
+          {...actionButtonAdapterProps}
+        />
+      );
+    }
+    return <SignPackagings bsffId={bsd.id} {...actionButtonAdapterProps} />;
   };
   const renderPartiallyRefusedModal = () => {
     return <SignPackagings bsffId={bsd.id} {...actionButtonAdapterProps} />;

@@ -640,7 +640,9 @@ const getAcceptedBtnLabel = (
     isSameSiretDestination(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
-    // ajouter bsff status accepted with packagings see dashboard/components/BSDList/BSFF/WorkflowAction/WorkflowAction.tsx
+    if (bsd.packagings?.length === 1) {
+      return SIGNER;
+    }
     return SIGNATURE_ACCEPTATION_CONTENANT;
   }
   if (isBsdd(bsd.type) && isAppendix1Producer(bsd)) {
