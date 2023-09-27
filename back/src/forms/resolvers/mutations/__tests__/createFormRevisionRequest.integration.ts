@@ -10,7 +10,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
-import { EmitterType, Status, TransportMode } from "@prisma/client";
+import { EmitterType, Status } from "@prisma/client";
 import {
   CANCELLABLE_BSDD_STATUSES,
   NON_CANCELLABLE_BSDD_STATUSES
