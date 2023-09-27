@@ -4,7 +4,6 @@ import {
   transporterReceiptFactory
 } from "../../../__tests__/factories";
 import { bsdaFactory } from "../../__tests__/factories";
-import prisma from "../../../prisma";
 
 describe("BSDA Zod transformers", () => {
   describe("recipisseTransporterTransformer", () => {
