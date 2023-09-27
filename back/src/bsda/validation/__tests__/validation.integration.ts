@@ -2,7 +2,7 @@ import { Bsda, BsdaType } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { companyFactory } from "../../../__tests__/factories";
 
-import { bsdaFactory } from "../../__tests__/factories";
+import { addTransporterReceipt, bsdaFactory } from "../../__tests__/factories";
 import { rawBsdaSchema } from "../schema";
 import { parseBsda } from "../validate";
 
@@ -10,7 +10,7 @@ describe("BSDA validation", () => {
   let bsda: Bsda;
 
   beforeEach(async () => {
-    bsda = await bsdaFactory({});
+    bsda = await addTransporterReceipt(await bsdaFactory({}));
   });
 
   afterEach(resetDatabase);

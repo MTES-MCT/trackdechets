@@ -12,7 +12,10 @@ import {
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { bsdaFactory } from "../../../__tests__/factories";
+import {
+  addTransporterReceipt,
+  bsdaFactory
+} from "../../../__tests__/factories";
 
 const UPDATE_BSDA = `
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
@@ -861,15 +864,17 @@ describe("Mutation.updateBsda", () => {
   it("should allow updating destination if the planned destination becomes the nextDestination", async () => {
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsda = await bsdaFactory({
-      opt: {
-        status: "SIGNED_BY_WORKER",
-        destinationCompanySiret: destination.company.siret,
-        transporterCompanySiret: transporter.company.siret,
-        emitterEmissionSignatureAuthor: "Emit",
-        workerWorkSignatureAuthor: "Work"
-      }
-    });
+    const bsda = await addTransporterReceipt(
+      await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_WORKER",
+          destinationCompanySiret: destination.company.siret,
+          transporterCompanySiret: transporter.company.siret,
+          emitterEmissionSignatureAuthor: "Emit",
+          workerWorkSignatureAuthor: "Work"
+        }
+      })
+    );
 
     const { mutate } = makeClient(transporter.user);
 
@@ -912,15 +917,17 @@ describe("Mutation.updateBsda", () => {
   it("should disallow updating destination if the planned destination disappears", async () => {
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsda = await bsdaFactory({
-      opt: {
-        status: "SIGNED_BY_WORKER",
-        destinationCompanySiret: destination.company.siret,
-        transporterCompanySiret: transporter.company.siret,
-        emitterEmissionSignatureAuthor: "Emit",
-        workerWorkSignatureAuthor: "Work"
-      }
-    });
+    const bsda = await addTransporterReceipt(
+      await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_WORKER",
+          destinationCompanySiret: destination.company.siret,
+          transporterCompanySiret: transporter.company.siret,
+          emitterEmissionSignatureAuthor: "Emit",
+          workerWorkSignatureAuthor: "Work"
+        }
+      })
+    );
 
     const { mutate } = makeClient(transporter.user);
 
@@ -957,17 +964,19 @@ describe("Mutation.updateBsda", () => {
   it("should allow removing the nextDestination", async () => {
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsda = await bsdaFactory({
-      opt: {
-        status: "SIGNED_BY_WORKER",
-        destinationCompanySiret: transporter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
-        destinationOperationNextDestinationCompanySiret:
-          destination.company.siret,
-        emitterEmissionSignatureAuthor: "Emit",
-        workerWorkSignatureAuthor: "Work"
-      }
-    });
+    const bsda = await addTransporterReceipt(
+      await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_WORKER",
+          destinationCompanySiret: transporter.company.siret,
+          transporterCompanySiret: transporter.company.siret,
+          destinationOperationNextDestinationCompanySiret:
+            destination.company.siret,
+          emitterEmissionSignatureAuthor: "Emit",
+          workerWorkSignatureAuthor: "Work"
+        }
+      })
+    );
 
     const { mutate } = makeClient(transporter.user);
 
