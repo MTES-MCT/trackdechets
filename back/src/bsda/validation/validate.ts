@@ -27,8 +27,8 @@ export async function parseBsda(
 const SIGNATURES_SORTED_BY_CHRONOLOGICAL_ORDER = [
   "EMISSION",
   "TRANSPORT",
-  "OPERATION",
-  "WORK"
+  "WORK",
+  "OPERATION"
 ];
 
 const isStepAhead = (step1, step2) => {
