@@ -72,6 +72,8 @@ export function buildSetAppendix1({
             recipientCompanyContact: form.recipientCompanyContact,
             recipientCompanyPhone: form.recipientCompanyPhone,
             recipientCompanyMail: form.recipientCompanyMail,
+            recipientCap: form.recipientCap,
+            recipientProcessingOperation: form.recipientProcessingOperation,
             ecoOrganismeName: form.ecoOrganismeName,
             ecoOrganismeSiret: form.ecoOrganismeSiret,
             transporters: {
