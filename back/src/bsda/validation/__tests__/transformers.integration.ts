@@ -37,20 +37,11 @@ describe("BSDA Zod transformers", () => {
         opt: {
           transporterCompanySiret: company.siret,
           transporterCompanyVatNumber: company.vatNumber,
-          transporterRecepisseIsExempted: false
+          transporterRecepisseIsExempted: false,
+          transporterRecepisseNumber: "null",
+          transporterRecepisseDepartment: "42",
+          transporterRecepisseValidityLimit: new Date()
         }
-      });
-
-      expect(bsda.transporterRecepisseNumber).toBeDefined();
-
-      const transporterReceipt = await prisma.company
-        .findFirst({ where: { siret: bsda.transporterCompanySiret } })
-        .transporterReceipt();
-
-      expect(transporterReceipt).not.toBeNull();
-
-      await prisma.transporterReceipt.delete({
-        where: { id: transporterReceipt?.id }
       });
 
       const completedInput = await runTransformers(bsda as any, []);

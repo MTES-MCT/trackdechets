@@ -10,16 +10,14 @@ export const bsdaFactory = async ({
 }) => {
   const bsdaObject = getBsdaObject(opt);
 
-  await upsertBaseSiret(bsdaObject.transporterCompanySiret);
-  await upsertBaseSiret(bsdaObject.destinationCompanySiret);
-  await upsertBaseSiret(bsdaObject.workerCompanySiret);
+  if (bsdaObject.transporterCompanySiret)
+    await upsertBaseSiret(bsdaObject.transporterCompanySiret);
+  if (bsdaObject.destinationCompanySiret)
+    await upsertBaseSiret(bsdaObject.destinationCompanySiret);
+  if (bsdaObject.workerCompanySiret)
+    await upsertBaseSiret(bsdaObject.workerCompanySiret);
 
-  const bsdaWithTransporterReceipt = await addTransporterReceipt(
-    bsdaObject,
-    opt
-  );
-
-  const formParams = { ...bsdaWithTransporterReceipt, ...opt };
+  const formParams = { ...bsdaObject, ...opt };
   const created = await prisma.bsda.create({
     data: {
       ...formParams
@@ -40,7 +38,30 @@ export const bsdaFactory = async ({
   return created;
 };
 
-const addTransporterReceipt = async (bsda, opt) => {
+export const addTransporterReceipt = async (
+  bsda,
+  opt: Pick<
+    Prisma.BsdaCreateInput,
+    | "transporterRecepisseNumber"
+    | "transporterRecepisseDepartment"
+    | "transporterRecepisseValidityLimit"
+  > = {
+    transporterRecepisseNumber: "83",
+    transporterRecepisseDepartment: "a receipt",
+    transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z"
+  }
+) => {
+  if (bsda.id) {
+    await prisma.bsda.update({
+      where: { id: bsda?.id },
+      data: {
+        transporterRecepisseDepartment: opt.transporterRecepisseNumber,
+        transporterRecepisseNumber: opt.transporterRecepisseDepartment,
+        transporterRecepisseValidityLimit: opt.transporterRecepisseValidityLimit
+      }
+    });
+  }
+
   const existingReceipt = await prisma.company
     .findFirst({ where: { orgId: bsda.transporterCompanySiret } })
     .transporterReceipt();
@@ -56,18 +77,9 @@ const addTransporterReceipt = async (bsda, opt) => {
 
   const transporterReceipt = await prisma.transporterReceipt.create({
     data: {
-      department: "83",
-      receiptNumber: "a receipt",
-      validityLimit: "2019-11-27T00:00:00.000Z",
-      ...(opt?.transporterRecepisseDepartment && {
-        department: opt?.transporterRecepisseDepartment
-      }),
-      ...(opt?.transporterRecepisseNumber && {
-        receiptNumber: opt?.transporterRecepisseNumber
-      }),
-      ...(opt?.transporterRecepisseValidityLimit && {
-        validityLimit: opt?.transporterRecepisseValidityLimit
-      })
+      department: opt.transporterRecepisseDepartment || "",
+      receiptNumber: opt.transporterRecepisseNumber || "",
+      validityLimit: opt.transporterRecepisseValidityLimit || ""
     }
   });
 
