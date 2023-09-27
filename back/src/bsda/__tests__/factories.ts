@@ -14,23 +14,12 @@ export const bsdaFactory = async ({
   await upsertBaseSiret(bsdaObject.destinationCompanySiret);
   await upsertBaseSiret(bsdaObject.workerCompanySiret);
 
-  // Transporter receipt
-  const transporterReceipt = await prisma.transporterReceipt.create({
-    data: {
-      department: "83",
-      receiptNumber: "a receipt",
-      validityLimit: "2019-11-27T00:00:00.000Z"
-    }
-  });
-  const transporter = await prisma.company.findFirst({
-    where: { siret: bsdaObject.transporterCompanySiret }
-  });
-  await prisma.company.update({
-    where: { id: transporter?.id },
-    data: { transporterReceipt: { connect: { id: transporterReceipt.id } } }
-  });
+  const bsdaWithTransporterReceipt = await addTransporterReceipt(
+    bsdaObject,
+    opt
+  );
 
-  const formParams = { ...bsdaObject, ...opt };
+  const formParams = { ...bsdaWithTransporterReceipt, ...opt };
   const created = await prisma.bsda.create({
     data: {
       ...formParams
@@ -49,6 +38,54 @@ export const bsdaFactory = async ({
   }
 
   return created;
+};
+
+const addTransporterReceipt = async (bsda, opt) => {
+  const existingReceipt = await prisma.company
+    .findFirst({ where: { orgId: bsda.transporterCompanySiret } })
+    .transporterReceipt();
+
+  if (existingReceipt) {
+    return {
+      ...bsda,
+      transporterRecepisseDepartment: existingReceipt.department,
+      transporterRecepisseNumber: existingReceipt.receiptNumber,
+      transporterRecepisseValidityLimit: existingReceipt.validityLimit
+    };
+  }
+
+  const transporterReceipt = await prisma.transporterReceipt.create({
+    data: {
+      department: "83",
+      receiptNumber: "a receipt",
+      validityLimit: "2019-11-27T00:00:00.000Z",
+      ...(opt?.transporterRecepisseDepartment && {
+        department: opt?.transporterRecepisseDepartment
+      }),
+      ...(opt?.transporterRecepisseNumber && {
+        receiptNumber: opt?.transporterRecepisseNumber
+      }),
+      ...(opt?.transporterRecepisseValidityLimit && {
+        validityLimit: opt?.transporterRecepisseValidityLimit
+      })
+    }
+  });
+
+  const transporter = await prisma.company.findFirst({
+    where: { siret: bsda.transporterCompanySiret }
+  });
+
+  await prisma.company.update({
+    where: { id: transporter?.id },
+    data: { transporterReceipt: { connect: { id: transporterReceipt.id } } }
+  });
+
+  return {
+    ...bsda,
+    transporterRecepisseDepartment: transporterReceipt.department,
+    transporterRecepisseNumber: transporterReceipt.receiptNumber,
+    transporterRecepisseValidityLimit: transporterReceipt.validityLimit
+  };
 };
 
 const getBsdaObject = (
