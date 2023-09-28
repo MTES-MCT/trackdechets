@@ -142,17 +142,7 @@ async function createForm(opt: Partial<Prisma.FormCreateInput> = {}) {
   };
 }
 
-const validateIntermediariesInputMock = jest.fn();
-jest.mock("../../../validation", () => ({
-  validateIntermediariesInput: jest.fn((...args) =>
-    validateIntermediariesInputMock(...args)
-  )
-}));
-
 describe("Mutation.duplicateForm", () => {
-  beforeEach(() => {
-    validateIntermediariesInputMock.mockReset();
-  });
   afterEach(() => resetDatabase());
 
   it("should duplicate a form %s", async () => {
@@ -652,9 +642,6 @@ describe("Mutation.duplicateForm", () => {
   it("should duplicate the intermediary company", async () => {
     const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
     const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
-    validateIntermediariesInputMock.mockResolvedValueOnce([
-      toIntermediaryCompany(intermediary.company)
-    ]);
     const form = await formFactory({
       ownerId: user.id,
       opt: {

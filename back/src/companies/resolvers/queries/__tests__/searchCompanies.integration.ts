@@ -2,9 +2,9 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { companyFactory, siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import * as sirene from "../../../search";
+import { searchCompanies } from "../../../search";
 
-const searchCompanySpy = jest.spyOn(sirene, "searchCompanies");
+jest.mock("../../../search");
 
 describe("query { searchCompanies(clue, department) }", () => {
   let query: ReturnType<typeof makeClient>["query"];
@@ -15,13 +15,13 @@ describe("query { searchCompanies(clue, department) }", () => {
 
   afterEach(async () => {
     await resetDatabase();
-    searchCompanySpy.mockReset();
+    (searchCompanies as jest.Mock).mockReset();
   });
 
   it("should return list of companies based on clue", async () => {
     const siret = siretify(1);
 
-    searchCompanySpy.mockResolvedValueOnce([
+    (searchCompanies as jest.Mock).mockResolvedValueOnce([
       {
         siret,
         orgId: siret,
@@ -57,7 +57,7 @@ describe("query { searchCompanies(clue, department) }", () => {
   it("should merge info from SIRENE and ICPE", async () => {
     const siret = siretify(1);
 
-    searchCompanySpy.mockResolvedValueOnce([
+    (searchCompanies as jest.Mock).mockResolvedValueOnce([
       {
         siret,
         orgId: siret,
@@ -101,7 +101,7 @@ describe("query { searchCompanies(clue, department) }", () => {
   it("should fetch transporter and trader receipt info", async () => {
     const siret = siretify(1);
 
-    searchCompanySpy.mockResolvedValueOnce([
+    (searchCompanies as jest.Mock).mockResolvedValueOnce([
       {
         siret,
         orgId: siret,

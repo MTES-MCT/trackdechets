@@ -1,4 +1,4 @@
-import * as mailsHelper from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import makeClient from "../../../../__tests__/testClient";
 import {
   formFactory,
@@ -19,8 +19,8 @@ const APPENDIX_FORMS = gql`
 `;
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 describe("Test appendixForms", () => {
   afterEach(async () => {

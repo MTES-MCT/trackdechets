@@ -21,19 +21,16 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prepareDB, prepareRedis } from "../../../__tests__/helpers";
-import * as mailsHelper from "../../../../mailer/mailing";
-import * as generateBsddPdf from "../../../pdf/generateBsddPdf";
+import { sendMail } from "../../../../mailer/mailing";
+import { generateBsddPdfToBase64 } from "../../../pdf/generateBsddPdf";
 import getReadableId from "../../../readableId";
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
-const generateBsddPdfToBase64Spy = jest.spyOn(
-  generateBsddPdf,
-  "generateBsddPdfToBase64"
-);
-generateBsddPdfToBase64Spy.mockResolvedValue("");
+jest.mock("../../../pdf/generateBsddPdf");
+(generateBsddPdfToBase64 as jest.Mock).mockResolvedValue("");
 
 const MARK_AS_ACCEPTED = `
   mutation MarkAsAccepted($id: ID!, $acceptedInfo: AcceptedFormInput!){
@@ -224,7 +221,7 @@ describe("Test Form reception", () => {
     expect(logs.length).toBe(1);
     expect(logs[0].status).toBe("REFUSED");
 
-    expect(sendMailSpy).toHaveBeenCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
           "Refus de prise en charge de votre déchet de l'entreprise company_1"
@@ -323,7 +320,7 @@ describe("Test Form reception", () => {
     expect(logs.length).toBe(1);
     expect(logs[0].status).toBe("ACCEPTED");
 
-    expect(sendMailSpy).toHaveBeenCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
           "Refus partiel de prise en charge de votre déchet de l'entreprise company_1"

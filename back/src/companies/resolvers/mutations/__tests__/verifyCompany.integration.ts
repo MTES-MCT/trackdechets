@@ -12,7 +12,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import * as mailsHelper from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { verificationDone } from "../../../../mailer/templates";
@@ -27,14 +27,14 @@ const VERIFY_COMPANY = gql`
 `;
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 describe("mutation verifyCompany", () => {
   afterAll(resetDatabase);
 
   afterEach(() => {
-    sendMailSpy.mockClear();
+    (sendMail as jest.Mock).mockClear();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -151,7 +151,7 @@ describe("mutation verifyCompany", () => {
     expect(updatedCompany.verifiedAt).toBeDefined();
     expect(updatedCompany.verifiedAt).not.toBeNull();
 
-    expect(sendMailSpy).toHaveBeenCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       renderMail(verificationDone, {
         to: [{ email: user.email, name: user.name }],
         variables: {

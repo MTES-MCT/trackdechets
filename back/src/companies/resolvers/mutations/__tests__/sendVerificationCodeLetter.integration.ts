@@ -1,7 +1,7 @@
 import { CompanyVerificationStatus, UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import * as post from "../../../../common/post";
+import { sendVerificationCodeLetter } from "../../../../common/post";
 import prisma from "../../../../prisma";
 import {
   siretify,
@@ -10,11 +10,10 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-const sendVerificationCodeLetterSpy = jest.spyOn(
-  post,
-  "sendVerificationCodeLetter"
+jest.mock("../../../../common/post");
+(sendVerificationCodeLetter as jest.Mock).mockResolvedValueOnce(
+  Promise.resolve()
 );
-sendVerificationCodeLetterSpy.mockResolvedValueOnce(Promise.resolve());
 
 const SEND_VERIFICATION_CODE_LETTER = gql`
   mutation SendVerificationCodeLetter(
@@ -70,7 +69,9 @@ describe("mutation sendVerificationCodeLetter", () => {
     await mutate(SEND_VERIFICATION_CODE_LETTER, {
       variables: { input: { siret: company.siret } }
     });
-    expect(sendVerificationCodeLetterSpy).toHaveBeenCalledWith(company);
+    expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledWith(
+      company
+    );
     const updatedCompany = await prisma.company.findUniqueOrThrow({
       where: { siret: company.siret! }
     });

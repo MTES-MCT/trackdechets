@@ -33,11 +33,12 @@ import {
   createBsffAfterReception,
   createFicheIntervention
 } from "../../../__tests__/factories";
-import * as sirenify from "../../../sirenify";
+import { sirenifyBsffInput } from "../../../sirenify";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "sirenifyBsffInput")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenifyBsffInput as jest.Mock).mockImplementation(input =>
+  Promise.resolve(input)
+);
 
 const UPDATE_BSFF = gql`
   mutation UpdateBsff($id: ID!, $input: BsffInput!) {
@@ -51,7 +52,7 @@ const UPDATE_BSFF = gql`
 describe("Mutation.updateBsff", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
+    (sirenifyBsffInput as jest.Mock).mockClear();
   });
 
   it("should allow user to update a bsff", async () => {
@@ -78,7 +79,7 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toBeUndefined();
     expect(data.updateBsff.id).toBeTruthy();
     // check input is sirenified
-    expect(sirenifyMock).toHaveBeenCalledTimes(1);
+    expect(sirenifyBsffInput as jest.Mock).toHaveBeenCalledTimes(1);
   });
 
   it("should update a bsff transporter recepisse with data pulled from db", async () => {

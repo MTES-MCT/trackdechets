@@ -1,7 +1,7 @@
 import { UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
-import * as mailsHelper from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import {
   companyFactory,
   formFactory,
@@ -14,8 +14,8 @@ import { prepareDB, storeRedisCompanyInfo } from "../../../__tests__/helpers";
 import { Query } from "../../../../generated/graphql/types";
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 const FORMS_LIFECYCLE = `query FormsLifeCycle($loggedAfter: String, $loggedBefore: String, $formId: ID, $siret: String){
   formsLifeCycle(loggedAfter: $loggedAfter, loggedBefore: $loggedBefore, formId: $formId, siret: $siret){
