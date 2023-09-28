@@ -10,7 +10,7 @@ import {
   getReadonlyBsdasriRepository
 } from "../../repository";
 import { checkEditionRules } from "../../edition";
-import sirenify from "../../sirenify";
+import { sirenify } from "../../sirenify";
 import { recipify } from "../../recipify";
 import { UserInputError } from "../../../common/errors";
 

@@ -2,14 +2,14 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
 import { ErrorCode } from "../../../../common/errors";
-import * as mailsHelper from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import {
   companyFactory,
   siretify,
   userFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import * as geocode from "../../../geo/geocode";
+import { geocode } from "../../../geo/geocode";
 import { CompanyType } from "@prisma/client";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../../mailer/templates";
@@ -17,19 +17,19 @@ import {
   Mutation,
   StatutDiffusionEtablissement
 } from "../../../../generated/graphql/types";
-import * as search from "../../../search";
+import { searchCompany } from "../../../search";
 
 // Mock external search services
-const searchCompany = jest.spyOn(search, "searchCompany");
+jest.mock("../../../search");
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 // Mock calls to API adresse
-const geocodeSpy = jest.spyOn(geocode, "default");
+jest.mock("../../../geo/geocode");
 const geoInfo = { latitude: 43.302546, longitude: 5.384324 };
-geocodeSpy.mockResolvedValue(geoInfo);
+(geocode as jest.Mock).mockResolvedValue(geoInfo);
 
 const CREATE_COMPANY = `
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
@@ -62,7 +62,7 @@ const CREATE_COMPANY = `
 describe("Mutation.createCompany", () => {
   afterEach(async () => {
     await resetDatabase();
-    searchCompany.mockReset();
+    (searchCompany as jest.Mock).mockReset();
   });
 
   it("should create company and userAssociation", async () => {
@@ -76,7 +76,7 @@ describe("Mutation.createCompany", () => {
       companyTypes: ["PRODUCER"]
     };
 
-    searchCompany.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       orgId,
       siret: orgId,
       etatAdministratif: "A"
@@ -135,7 +135,7 @@ describe("Mutation.createCompany", () => {
       allowBsdasriTakeOverWithoutSignature: true
     };
 
-    searchCompany.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       orgId,
       siret: orgId,
       etatAdministratif: "A"
@@ -200,7 +200,7 @@ describe("Mutation.createCompany", () => {
       transporterReceiptId: transporterReceipt.id
     };
 
-    searchCompany.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       orgId,
       siret: orgId,
       etatAdministratif: "A"
@@ -246,7 +246,7 @@ describe("Mutation.createCompany", () => {
       traderReceiptId: traderReceipt.id
     };
 
-    searchCompany.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       orgId,
       siret: orgId,
       etatAdministratif: "A"
@@ -287,7 +287,7 @@ describe("Mutation.createCompany", () => {
       companyTypes: company.companyTypes
     };
 
-    searchCompany.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       orgId: company.siret!,
       siret: company.siret,
       etatAdministratif: "A"
@@ -307,7 +307,7 @@ describe("Mutation.createCompany", () => {
   it("should return an error when creating an unknown eco-organisme", async () => {
     const user = await userFactory();
     const siret = siretify(1);
-    searchCompany.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       orgId: siret,
       siret,
       etatAdministratif: "A"
@@ -342,7 +342,7 @@ describe("Mutation.createCompany", () => {
       address: "3 rue des granges",
       companyTypes: ["ECO_ORGANISME"]
     };
-    searchCompany.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       orgId: siret,
       siret,
       etatAdministratif: "A"
@@ -381,7 +381,7 @@ describe("Mutation.createCompany", () => {
       companyTypes: ["ECO_ORGANISME"],
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
-    searchCompany.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       orgId: siret,
       siret,
       etatAdministratif: "A"
@@ -421,7 +421,7 @@ describe("Mutation.createCompany", () => {
       companyTypes: ["PRODUCER"],
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
-    searchCompany.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       orgId: siret,
       siret,
       etatAdministratif: "A"
@@ -452,23 +452,28 @@ describe("Mutation.createCompany", () => {
     const server = require("../../../../server").server;
     await server.start();
     const makeClient = require("../../../../__tests__/testClient").default;
-    const mailsHelper = require("../../../../mailer/mailing");
-    const geocode = require("../../../geo/geocode");
-    const searchCompanyReload = require("../../../sirene/searchCompany");
-    const searchSireneMock = jest.spyOn(searchCompanyReload, "default");
+    const { sendMail } = require("../../../../mailer/mailing");
+    const { geocode } = require("../../../geo/geocode");
+    jest.mock("../../../search", () => ({
+      searchCompany: jest.fn().mockResolvedValue({ etatAdministratif: "A" })
+    }));
+    const searchSireneMock = jest.fn();
+    jest.mock("../../../sirene/searchCompany", () => ({
+      default: (...args) => searchSireneMock(...args)
+    }));
     const siret = siretify(8);
     searchSireneMock.mockResolvedValueOnce({
       siret,
       etatAdministratif: "A"
     });
     // No mails
-    const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-    sendMailSpy.mockImplementation(() => Promise.resolve());
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
     // Mock calls to API adresse
-    const geocodeSpy = jest.spyOn(geocode, "default");
+    jest.mock("../../../geo/geocode");
     const geoInfo = { latitude: 43.302546, longitude: 5.384324 };
-    geocodeSpy.mockResolvedValue(geoInfo);
+    (geocode as jest.Mock).mockResolvedValue(geoInfo);
 
     const user = await userFactory();
     const companyInput = {
@@ -491,7 +496,7 @@ describe("Mutation.createCompany", () => {
       where: { siret: companyInput.siret }
     });
 
-    expect(sendMailSpy).toHaveBeenCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       renderMail(verificationProcessInfo, {
         to: [{ email: user.email, name: user.name }],
         variables: { company: company as any }
@@ -520,7 +525,7 @@ describe("Mutation.createCompany", () => {
       statutDiffusionEtablissement: "O" as StatutDiffusionEtablissement,
       etatAdministratif: "A"
     };
-    searchCompany.mockResolvedValue(testValue);
+    (searchCompany as jest.Mock).mockResolvedValue(testValue);
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await mutate(CREATE_COMPANY, {
@@ -600,7 +605,7 @@ describe("Mutation.createCompany", () => {
   it("should return an error when creating a closed company ", async () => {
     const user = await userFactory();
     const orgId = siretify(8);
-    searchCompany.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       orgId,
       siret: orgId,
       etatAdministratif: "F"

@@ -21,13 +21,14 @@ import {
   UpdateFormInput
 } from "../../../../generated/graphql/types";
 import getReadableId from "../../../readableId";
-import * as sirenify from "../../../sirenify";
+import { sirenifyFormInput } from "../../../sirenify";
 import { sub } from "date-fns";
 import { getFirstTransporter, getTransportersSync } from "../../../database";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "sirenifyFormInput")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenifyFormInput as jest.Mock).mockImplementation(input =>
+  Promise.resolve(input)
+);
 
 const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {
@@ -105,7 +106,7 @@ const UPDATE_FORM = `
 describe("Mutation.updateForm", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
+    (sirenifyFormInput as jest.Mock).mockClear();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -401,7 +402,7 @@ describe("Mutation.updateForm", () => {
         updateFormInput.wasteDetails
       );
       // check input is sirenified
-      expect(sirenifyMock).toHaveBeenCalledTimes(1);
+      expect(sirenifyFormInput as jest.Mock).toHaveBeenCalledTimes(1);
     }
   );
 

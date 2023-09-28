@@ -26,11 +26,9 @@ import {
 
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 import { gql } from "graphql-tag";
+import { searchCompany } from "../../../../companies/search";
 
-const searchCompanyMock = jest.spyOn(
-  require("../../../../companies/search"),
-  "searchCompany"
-);
+jest.mock("../../../../companies/search");
 
 const GET_BSDS = `
   query GetBsds($where: BsdWhere) {
@@ -103,7 +101,7 @@ describe("Query.bsds workflow", () => {
         set: ["WASTEPROCESSOR"]
       }
     });
-    searchCompanyMock.mockResolvedValue({
+    (searchCompany as jest.Mock).mockResolvedValue({
       siret: intermediary.company.siret,
       name: intermediary.company.name,
       statutDiffusionEtablissement: "O",

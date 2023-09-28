@@ -12,10 +12,10 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../__tests__/factories";
-import * as generatePdf from "../../../pdf/generator";
+import { buildPdfAsBase64 } from "../../../pdf/generator";
 
-const buildPdfAsBase64Spy = jest.spyOn(generatePdf, "buildPdfAsBase64");
-buildPdfAsBase64Spy.mockResolvedValue("");
+jest.mock("../../../pdf/generator");
+(buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
 
 const SIGN_BSDA = `
 mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {

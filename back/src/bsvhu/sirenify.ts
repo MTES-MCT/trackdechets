@@ -25,6 +25,4 @@ const accessors = (input: BsvhuInput) => [
   }
 ];
 
-const sirenify = buildSirenify(accessors);
-
-export default sirenify;
+export const sirenify = buildSirenify(accessors);

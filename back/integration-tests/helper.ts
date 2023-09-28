@@ -1,32 +1,25 @@
-import { Server as HttpServer } from "http";
-import { Server as HttpsServer } from "https";
 import { redisClient } from "../src/common/redis";
 import prisma from "../src/prisma";
-import { app } from "../src/server";
 import { client as elasticSearch, index } from "../src/common/elastic";
 import { indexQueue } from "../src/queue/producers/elastic";
+import { closeMongoClient } from "../src/events/mongodb";
+import { closeQueues } from "../src/queue/producers";
+import { server, startApolloServer } from "../src/server";
 
-let httpServerInstance: HttpServer | HttpsServer | null = null;
+beforeAll(async () => {
+  await startApolloServer();
+});
 
-export function startServer() {
-  if (!httpServerInstance) {
-    httpServerInstance = app.listen(process.env.BACK_PORT);
-  }
-  return httpServerInstance;
-}
-
-export async function closeServer() {
-  return new Promise<void>(resolve => {
-    if (!httpServerInstance) {
-      return resolve();
-    }
-
-    httpServerInstance.close(() => {
-      httpServerInstance = null;
-      resolve();
-    });
-  });
-}
+afterAll(async () => {
+  await Promise.all([
+    closeMongoClient(),
+    closeQueues(),
+    elasticSearch.close(),
+    redisClient.disconnect(),
+    prisma.$disconnect(),
+    server.stop()
+  ])
+});
 
 /**
  * Special fast path to drop data from a postgres database.
@@ -37,20 +30,24 @@ export async function closeServer() {
  **/
 export async function truncateDatabase() {
   const dbSchemaName = "default$default";
-  const tables: Array<{ tablename: string }> =
+  const tablenames: Array<{ tablename: string }> =
     await prisma.$queryRaw`SELECT tablename FROM pg_tables WHERE schemaname=${dbSchemaName};`;
 
-  for (const { tablename } of tables) {
-    await prisma.$executeRawUnsafe(
-      `TRUNCATE TABLE \"${dbSchemaName}\".\"${tablename}\" CASCADE;`
-    );
-  }
-  const sequences: Array<{ relname: string }> =
-    await prisma.$queryRaw`SELECT c.relname FROM pg_class AS c JOIN pg_namespace AS n ON c.relnamespace = n.oid WHERE c.relkind='S' AND n.nspname=${dbSchemaName};`;
+  const tables = tablenames
+    .map(({ tablename }) => `"${dbSchemaName}"."${tablename}"`)
+    .join(", ");
 
-  for (const { relname } of sequences) {
-    await prisma.$queryRaw`ALTER SEQUENCE \"${dbSchemaName}\".\"${relname}\" RESTART WITH 1;`;
-  }
+  return Promise.all([
+    // Reset data
+    prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tables} CASCADE;`),
+    // Reset sequences
+    prisma.$executeRawUnsafe(`
+      SELECT SETVAL(c.oid, 1)
+      from pg_class c JOIN pg_namespace n 
+      on n.oid = c.relnamespace 
+      where c.relkind = 'S' and n.nspname = '${dbSchemaName}';
+    `)
+  ]);
 }
 
 export async function resetDatabase() {

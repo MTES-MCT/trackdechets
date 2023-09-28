@@ -7,7 +7,7 @@ import { validateBsdasri, BsdasriValidationContext } from "../../validation";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { BsdasriType } from "@prisma/client";
 import { getBsdasriRepository } from "../../repository";
-import sirenify from "../../sirenify";
+import { sirenify } from "../../sirenify";
 import { recipify } from "../../recipify";
 import { checkCanCreate } from "../../permissions";
 

@@ -13,11 +13,12 @@ import {
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import * as sirenify from "../../../sirenify";
+import { sirenifyBsffPackagingInput } from "../../../sirenify";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "sirenifyBsffPackagingInput")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenifyBsffPackagingInput as jest.Mock).mockImplementation(input =>
+  Promise.resolve(input)
+);
 
 const UPDATE_BSFF_PACKAGING = gql`
   mutation UpdateBsffPackaging($id: ID!, $input: UpdateBsffPackagingInput!) {
@@ -30,7 +31,7 @@ const UPDATE_BSFF_PACKAGING = gql`
 describe("Mutation.updateBsffPackaging", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
+    (sirenifyBsffPackagingInput as jest.Mock).mockClear();
   });
 
   test("before acceptation > it should be possible to update acceptation fields", async () => {
@@ -69,7 +70,7 @@ describe("Mutation.updateBsffPackaging", () => {
       WasteAcceptationStatus.ACCEPTED
     );
     // check input is sirenified
-    expect(sirenifyMock).toHaveBeenCalledTimes(1);
+    expect(sirenifyBsffPackagingInput as jest.Mock).toHaveBeenCalledTimes(1);
   });
 
   it("should throw error if the mutation is not called by the destination", async () => {

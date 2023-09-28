@@ -1,12 +1,12 @@
 import { CompanySearchResult } from "../../companies/types";
 import { userWithCompanyFactory } from "../../__tests__/factories";
-import * as search from "../../companies/search";
+import { searchCompany } from "../../companies/search";
 import { BsdasriInput } from "../../generated/graphql/types";
-import sirenify from "../sirenify";
+import { sirenify } from "../sirenify";
 import { AuthType } from "../../auth";
 import { resetDatabase } from "../../../integration-tests/helper";
 
-const searchCompanySpy = jest.spyOn(search, "searchCompany");
+jest.mock("../../companies/search");
 
 describe("sirenify", () => {
   afterEach(resetDatabase);
@@ -30,7 +30,7 @@ describe("sirenify", () => {
       [destination.company.siret!]: searchResult("destinataire")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 
@@ -102,7 +102,7 @@ describe("sirenify", () => {
       [destination.company.siret!]: searchResult("destinataire")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 

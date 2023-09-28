@@ -13,11 +13,10 @@ import { Mutation } from "../../../../generated/graphql/types";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
 import prisma from "../../../../prisma";
-import * as sirenify from "../../../sirenify";
+import { sirenify } from "../../../sirenify";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "default")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
 
 const CREATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
@@ -31,7 +30,7 @@ const CREATE_DASRI = gql`
 describe("Mutation.createDasri", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
+    (sirenify as jest.Mock).mockClear();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -181,7 +180,7 @@ describe("Mutation.createDasri", () => {
     expect(created.synthesisEmitterSirets).toEqual([]);
     expect(created.groupingEmitterSirets).toEqual([]);
     // check input is sirenified
-    expect(sirenifyMock).toHaveBeenCalledTimes(1);
+    expect(sirenify).toHaveBeenCalledTimes(1);
   });
 
   it("create a dasri with a default transport mode", async () => {
