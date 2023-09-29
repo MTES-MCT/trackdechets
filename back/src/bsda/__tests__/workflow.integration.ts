@@ -113,19 +113,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
     const { user: destinationUser, company: destinationCompany } =
       await userWithCompanyFactory("MEMBER");
 
-    const transporterReceipt = await prisma.transporterReceipt.create({
-      data: {
-        department: "TRANSPORTER-RECEPISSE-NBR",
-        receiptNumber: "a receipt",
-        validityLimit: "2019-11-27T00:00:00.000Z"
-      }
-    });
-
-    await prisma.company.update({
-      where: { id: transporterCompany?.id },
-      data: { transporterReceipt: { connect: { id: transporterReceipt.id } } }
-    });
-
     const workerToken = await apiKey(workerUser);
     const transporterToken = await apiKey(transporterUser);
     const destinationToken = await apiKey(destinationUser);
@@ -285,19 +272,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
       await userWithCompanyFactory("MEMBER");
     const { user: destinationUser, company: destinationCompany } =
       await userWithCompanyFactory("MEMBER");
-
-    const transporterReceipt = await prisma.transporterReceipt.create({
-      data: {
-        department: "TRANSPORTER-RECEPISSE-NBR",
-        receiptNumber: "a receipt",
-        validityLimit: "2019-11-27T00:00:00.000Z"
-      }
-    });
-
-    await prisma.company.update({
-      where: { id: transporterCompany?.id },
-      data: { transporterReceipt: { connect: { id: transporterReceipt.id } } }
-    });
 
     const producteurToken = await apiKey(producteurUser);
     const workerToken = await apiKey(workerUser);

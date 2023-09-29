@@ -26,8 +26,8 @@ export async function parseBsda(
 
 const SIGNATURES_SORTED_BY_CHRONOLOGICAL_ORDER = [
   "EMISSION",
-  "TRANSPORT",
   "WORK",
+  "TRANSPORT",
   "OPERATION"
 ];
 

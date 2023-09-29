@@ -8,14 +8,11 @@ export const bsdaFactory = async ({
 }: {
   opt?: Partial<Prisma.BsdaCreateInput>;
 }) => {
-  const bsdaObject = getBsdaObject(opt);
+  const bsdaObject = getBsdaObject();
 
-  if (bsdaObject.transporterCompanySiret)
-    await upsertBaseSiret(bsdaObject.transporterCompanySiret);
-  if (bsdaObject.destinationCompanySiret)
-    await upsertBaseSiret(bsdaObject.destinationCompanySiret);
-  if (bsdaObject.workerCompanySiret)
-    await upsertBaseSiret(bsdaObject.workerCompanySiret);
+  await upsertBaseSiret(bsdaObject.transporterCompanySiret);
+  await upsertBaseSiret(bsdaObject.destinationCompanySiret);
+  await upsertBaseSiret(bsdaObject.workerCompanySiret);
 
   const formParams = { ...bsdaObject, ...opt };
   const created = await prisma.bsda.create({
@@ -38,71 +35,7 @@ export const bsdaFactory = async ({
   return created;
 };
 
-export const addTransporterReceipt = async (
-  bsda,
-  opt: Pick<
-    Prisma.BsdaCreateInput,
-    | "transporterRecepisseNumber"
-    | "transporterRecepisseDepartment"
-    | "transporterRecepisseValidityLimit"
-  > = {
-    transporterRecepisseNumber: "83",
-    transporterRecepisseDepartment: "a receipt",
-    transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z"
-  }
-) => {
-  if (bsda.id) {
-    await prisma.bsda.update({
-      where: { id: bsda?.id },
-      data: {
-        transporterRecepisseDepartment: opt.transporterRecepisseNumber,
-        transporterRecepisseNumber: opt.transporterRecepisseDepartment,
-        transporterRecepisseValidityLimit: opt.transporterRecepisseValidityLimit
-      }
-    });
-  }
-
-  const existingReceipt = await prisma.company
-    .findFirst({ where: { orgId: bsda.transporterCompanySiret } })
-    .transporterReceipt();
-
-  if (existingReceipt) {
-    return {
-      ...bsda,
-      transporterRecepisseDepartment: existingReceipt.department,
-      transporterRecepisseNumber: existingReceipt.receiptNumber,
-      transporterRecepisseValidityLimit: existingReceipt.validityLimit
-    };
-  }
-
-  const transporterReceipt = await prisma.transporterReceipt.create({
-    data: {
-      department: opt.transporterRecepisseDepartment || "",
-      receiptNumber: opt.transporterRecepisseNumber || "",
-      validityLimit: opt.transporterRecepisseValidityLimit || ""
-    }
-  });
-
-  const transporter = await prisma.company.findFirst({
-    where: { siret: bsda.transporterCompanySiret }
-  });
-
-  await prisma.company.update({
-    where: { id: transporter?.id },
-    data: { transporterReceipt: { connect: { id: transporterReceipt.id } } }
-  });
-
-  return {
-    ...bsda,
-    transporterRecepisseDepartment: transporterReceipt.department,
-    transporterRecepisseNumber: transporterReceipt.receiptNumber,
-    transporterRecepisseValidityLimit: transporterReceipt.validityLimit
-  };
-};
-
-const getBsdaObject = (
-  opt?: Partial<Prisma.BsdaCreateInput>
-): Prisma.BsdaCreateInput => ({
+const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   id: getReadableId(ReadableIdPrefix.BSDA),
 
   type: BsdaType.OTHER_COLLECTIONS,
@@ -145,6 +78,9 @@ const getBsdaObject = (
   transporterCompanyContact: "Henri Transport",
   transporterCompanyPhone: "06 06 06 06 06",
   transporterCompanyMail: "transporter@td.io",
+  transporterRecepisseNumber: "a receipt",
+  transporterRecepisseDepartment: "83",
+  transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
   transporterTransportMode: "ROAD",
   transporterTransportPlates: ["AA-00-XX"],
 
@@ -162,7 +98,5 @@ const getBsdaObject = (
   workerCompanyAddress: "1 route du travail, Travaux city",
   workerCompanyContact: "Jack Travaux",
   workerCompanyPhone: "05 05 05 05 05",
-  workerCompanyMail: "travaux@td.io",
-
-  ...opt
+  workerCompanyMail: "travaux@td.io"
 });

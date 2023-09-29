@@ -11,10 +11,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  addTransporterReceipt,
-  bsdaFactory
-} from "../../../__tests__/factories";
+import { bsdaFactory } from "../../../__tests__/factories";
 import { buildPdfAsBase64 } from "../../../pdf/generator";
 
 jest.mock("../../../pdf/generator");
@@ -305,16 +302,14 @@ describe("Mutation.Bsda.sign", () => {
   describe("WORKER", () => {
     it("should allow worker to sign work", async () => {
       const worker = await userWithCompanyFactory(UserRole.ADMIN);
-      const bsda = await addTransporterReceipt(
-        await bsdaFactory({
-          opt: {
-            status: "SIGNED_BY_PRODUCER",
-            emitterEmissionSignatureAuthor: "Emétteur",
-            emitterEmissionSignatureDate: new Date(),
-            workerCompanySiret: worker.company.siret
-          }
-        })
-      );
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_PRODUCER",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerCompanySiret: worker.company.siret
+        }
+      });
 
       const { mutate } = makeClient(worker.user);
       const { data } = await mutate<
@@ -335,15 +330,13 @@ describe("Mutation.Bsda.sign", () => {
 
     it("should allow worker to sign work without emitter signature if worker has paper signature", async () => {
       const worker = await userWithCompanyFactory(UserRole.ADMIN);
-      const bsda = await addTransporterReceipt(
-        await bsdaFactory({
-          opt: {
-            status: "INITIAL",
-            workerWorkHasEmitterPaperSignature: true,
-            workerCompanySiret: worker.company.siret
-          }
-        })
-      );
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "INITIAL",
+          workerWorkHasEmitterPaperSignature: true,
+          workerCompanySiret: worker.company.siret
+        }
+      });
 
       const { mutate } = makeClient(worker.user);
       const { data } = await mutate<
@@ -602,22 +595,25 @@ describe("Mutation.Bsda.sign", () => {
 
     it("should allow transporter to sign bsda signed by emitter only if worker is disabled", async () => {
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-
-      const bsda = await addTransporterReceipt(
-        await bsdaFactory({
-          opt: {
-            status: "SIGNED_BY_PRODUCER",
-            emitterEmissionSignatureAuthor: "Emétteur",
-            emitterEmissionSignatureDate: new Date(),
-            workerIsDisabled: true,
-            workerCompanySiret: null,
-            workerCompanyName: null,
-            transporterCompanySiret: transporter.company.siret,
-            transporterTransportMode: "ROAD",
-            transporterTransportPlates: ["AA-00-XX"]
-          }
-        })
-      );
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_PRODUCER",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerIsDisabled: true,
+          workerCompanySiret: null,
+          workerCompanyName: null,
+          transporterCompanySiret: transporter.company.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: ["AA-00-XX"]
+        }
+      });
 
       const { mutate } = makeClient(transporter.user);
       const { data } = await mutate<
@@ -638,22 +634,25 @@ describe("Mutation.Bsda.sign", () => {
 
     it("should allow transporter to sign an initial bsda if the emitter is a private individual and the worker is disabled", async () => {
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-
-      const bsda = await addTransporterReceipt(
-        await bsdaFactory({
-          opt: {
-            status: "INITIAL",
-            emitterIsPrivateIndividual: true,
-            emitterCompanySiret: null,
-            workerIsDisabled: true,
-            workerCompanySiret: null,
-            workerCompanyName: null,
-            transporterCompanySiret: transporter.company.siret,
-            transporterTransportMode: "ROAD",
-            transporterTransportPlates: ["AA-00-XX"]
-          }
-        })
-      );
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "INITIAL",
+          emitterIsPrivateIndividual: true,
+          emitterCompanySiret: null,
+          workerIsDisabled: true,
+          workerCompanySiret: null,
+          workerCompanyName: null,
+          transporterCompanySiret: transporter.company.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: ["AA-00-XX"]
+        }
+      });
 
       const { mutate } = makeClient(transporter.user);
       const { data } = await mutate<
@@ -928,6 +927,7 @@ describe("Mutation.Bsda.sign", () => {
           workerCompanySiret: null
         }
       });
+
       const { mutate } = makeClient(user);
       const { errors } = await mutate<
         Pick<Mutation, "signBsda">,
@@ -952,17 +952,15 @@ describe("Mutation.Bsda.sign", () => {
 
     it("should throw an error when the worker tries to sign a bsda that has no packaging", async () => {
       const worker = await userWithCompanyFactory(UserRole.ADMIN);
-      const bsda = await addTransporterReceipt(
-        await bsdaFactory({
-          opt: {
-            status: "SIGNED_BY_PRODUCER",
-            emitterEmissionSignatureAuthor: "Emétteur",
-            emitterEmissionSignatureDate: new Date(),
-            workerCompanySiret: worker.company.siret,
-            packagings: []
-          }
-        })
-      );
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_PRODUCER",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerCompanySiret: worker.company.siret,
+          packagings: []
+        }
+      });
 
       const { mutate } = makeClient(worker.user);
       const { errors } = await mutate<
