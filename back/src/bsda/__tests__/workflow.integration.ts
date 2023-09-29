@@ -7,7 +7,6 @@ import {
   userWithCompanyFactory,
   transporterReceiptFactory
 } from "../../__tests__/factories";
-import prisma from "../../prisma";
 
 const request = supertest(app);
 
