@@ -37,8 +37,8 @@ describe("validate", () => {
         const bsda = {};
         const customEditionRules = {
           emitterCompanySiret: {
-            sealedBy: "WORK" as BsdaSignatureType,
-            isRequired: "TRANSPORT" as BsdaSignatureType
+            sealedBy: "OPERATION" as BsdaSignatureType,
+            isRequired: "WORK" as BsdaSignatureType
           }
         } as EditionRules;
 
