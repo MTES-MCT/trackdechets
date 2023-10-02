@@ -17,6 +17,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Wording: mise en conformité ADR2023 sur les quantités estimées [PR 2722](https://github.com/MTES-MCT/trackdechets/pull/2722)
+
 #### :house: Interne
 
 - Optimisation appendixForms : pré-calcul de quantityGrouped [PR 2701](https://github.com/MTES-MCT/trackdechets/pull/2701) 
