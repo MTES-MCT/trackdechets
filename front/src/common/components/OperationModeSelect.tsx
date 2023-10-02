@@ -7,6 +7,7 @@ import {
   getOperationModesFromOperationCode,
 } from "common/operationModes";
 import Tooltip from "./Tooltip";
+import { deepValue } from "dashboard/detail/common/utils";
 
 const OperationModeSelect = ({ operationCode, name }) => {
   const { setFieldValue, values } = useFormikContext();
@@ -16,8 +17,9 @@ const OperationModeSelect = ({ operationCode, name }) => {
   );
 
   useEffect(() => {
-    // @ts-ignore
-    if (!values[name] || !modes.includes(values[name])) {
+    const value = deepValue(values, name);
+
+    if (!value || !modes.includes(value)) {
       setFieldValue(name, modes[0]);
     }
   }, [modes, name, setFieldValue, values]);

@@ -732,6 +732,9 @@ type FormRevisionRequestContent {
   "Traitement réalisé (code D/R)"
   processingOperationDone: String
 
+  "Mode de traitement"
+  destinationOperationMode: OperationMode
+
   "Description de l'opération d’élimination / valorisation réalisée"
   processingOperationDescription: String
 

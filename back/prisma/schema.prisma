@@ -523,6 +523,7 @@ model BsddRevisionRequest {
   wasteDetailsPackagingInfos                      Json?
   quantityReceived                                Float?
   processingOperationDone                         String?
+  destinationOperationMode                        OperationMode?
   processingOperationDescription                  String?
   brokerCompanyName                               String?
   brokerCompanySiret                              String?
@@ -1506,6 +1507,7 @@ model BsdaRevisionRequest {
   destinationCap                  String?
   destinationReceptionWeight      Float?
   destinationOperationCode        String?
+  destinationOperationMode        OperationMode?
   destinationOperationDescription String?
 
   brokerCompanyName            String?

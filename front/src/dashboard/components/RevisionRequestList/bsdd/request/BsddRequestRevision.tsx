@@ -30,6 +30,7 @@ import { CREATE_FORM_REVISION_REQUEST } from "Apps/common/queries/reviews/BsddRe
 import styles from "./BsddRequestRevision.module.scss";
 import { ReviewableField } from "./ReviewableField";
 import { BsddRequestRevisionCancelationInput } from "../BsddRequestRevisionCancelationInput";
+import OperationModeSelect from "common/components/OperationModeSelect";
 
 type Props = {
   bsdd: Bsdd;
@@ -49,6 +50,7 @@ const initialReview = {
   },
   quantityReceived: null,
   processingOperationDone: "",
+  destinationOperationMode: null,
   processingOperationDescription: "",
   temporaryStorageDetail: {
     temporaryStorer: {
@@ -276,6 +278,11 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       component={ProcessingOperation}
                       name="content.processingOperationDone"
                       enableReuse
+                    />
+
+                    <OperationModeSelect
+                      operationCode={values.content.processingOperationDone}
+                      name="content.destinationOperationMode"
                     />
                   </ReviewableField>
 

@@ -66,6 +66,7 @@ const reviewFragment = gql`
         }
         operation {
           code
+          mode
           description
         }
       }
@@ -116,6 +117,7 @@ const reviewFragment = gql`
         }
         operation {
           code
+          mode
           description
         }
       }

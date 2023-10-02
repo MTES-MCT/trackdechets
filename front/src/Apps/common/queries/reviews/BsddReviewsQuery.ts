@@ -65,6 +65,7 @@ const reviewFragment = gql`
       }
       quantityReceived
       processingOperationDone
+      destinationOperationMode
       processingOperationDescription
       temporaryStorageDetail {
         temporaryStorer {
@@ -116,6 +117,7 @@ const reviewFragment = gql`
       }
       quantityReceived
       processingOperationDone
+      destinationOperationMode
       processingOperationDescription
       temporaryStorageDetail {
         temporaryStorer {

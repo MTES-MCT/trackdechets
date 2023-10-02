@@ -366,6 +366,10 @@ export function flattenBsddRevisionRequestInput(
       reviewContent,
       c => c.processingOperationDone
     ),
+    destinationOperationMode: chain(
+      reviewContent,
+      c => c.destinationOperationMode
+    ),
     processingOperationDescription: chain(
       reviewContent,
       c => c.processingOperationDescription
@@ -959,6 +963,7 @@ export function expandBsddRevisionRequestContent(
     }),
     quantityReceived: bsddRevisionRequest.quantityReceived,
     processingOperationDone: bsddRevisionRequest.processingOperationDone,
+    destinationOperationMode: bsddRevisionRequest.destinationOperationMode,
     processingOperationDescription:
       bsddRevisionRequest.processingOperationDescription,
     temporaryStorageDetail:
