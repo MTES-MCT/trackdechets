@@ -9,7 +9,6 @@ import React from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
-import { statusLabels } from "../../constants";
 import {
   DateRow,
   DetailRow,
@@ -19,6 +18,7 @@ import {
 import styles from "../common/BSDDetailContent.module.scss";
 import { getVerboseAcceptationStatus } from "../common/utils";
 import { getOperationModeLabel } from "common/operationModes";
+import { VHU_VERBOSE_STATUSES } from "generated/constants/statuses";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -44,7 +44,7 @@ export function BsvhuDetailContent({ form }: Props) {
         <h4 className={styles.detailTitle}>
           <IconBSVhu className="tw-mr-2" />
           <span className={styles.detailStatus}>
-            [{form.isDraft ? "Brouillon" : statusLabels[form.status]}]
+            [{form.isDraft ? "Brouillon" : VHU_VERBOSE_STATUSES[form.status]}]
           </span>
           {!form.isDraft && <span>{form.id}</span>}
         </h4>

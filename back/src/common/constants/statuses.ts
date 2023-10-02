@@ -1,11 +1,4 @@
-import {
-  BsffStatus,
-  BsdaStatus,
-  BsdasriStatus,
-  BsvhuStatus
-} from "@prisma/client";
-
-export const statusLabels: { [key: string]: string } = {
+export const STATUS_LABELS: { [key: string]: string } = {
   DRAFT: "Brouillon",
   SEALED: "En attente de signature par l'émetteur",
   SENT: "En attente de réception",
@@ -31,8 +24,8 @@ export const statusLabels: { [key: string]: string } = {
   CANCELED: "Annulé"
 };
 
-export const vhuVerboseStatuses: Record<BsvhuStatus, string> = {
-  ...statusLabels,
+export const VHU_VERBOSE_STATUSES: Record<string, string> = {
+  ...STATUS_LABELS,
   INITIAL: "Initial",
   SIGNED_BY_PRODUCER: "Signé par le producteur",
   SENT: "En cours d'acheminement",
@@ -40,8 +33,8 @@ export const vhuVerboseStatuses: Record<BsvhuStatus, string> = {
   REFUSED: "Refusé"
 };
 
-export const dasriVerboseStatuses: Record<BsdasriStatus, string> = {
-  ...statusLabels,
+export const DASRI_VERBOSE_STATUSES: Record<string, string> = {
+  ...STATUS_LABELS,
   INITIAL: "Initial",
   SIGNED_BY_PRODUCER: "Signé par l'émetteur",
   SENT: "Envoyé",
@@ -51,8 +44,8 @@ export const dasriVerboseStatuses: Record<BsdasriStatus, string> = {
   AWAITING_GROUP: "En attente de regroupement"
 };
 
-export const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
-  ...statusLabels,
+export const BSDA_VERBOSE_STATUSES: Record<string, string> = {
+  ...STATUS_LABELS,
   INITIAL: "Initial",
   SIGNED_BY_PRODUCER: "Signé par le producteur",
   SIGNED_BY_WORKER: "Signé par l'entreprise de travaux",
@@ -63,8 +56,8 @@ export const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
   CANCELED: "Annulé"
 };
 
-export const bsffVerboseStatuses: Record<BsffStatus, string> = {
-  ...statusLabels,
+export const BSFF_VERBOSE_STATUSES: Record<string, string> = {
+  ...STATUS_LABELS,
   INITIAL: "En attente de signature par l'émetteur",
   SIGNED_BY_EMITTER: "Signé par l'émetteur",
   SENT: "Signé par le transporteur",
@@ -77,10 +70,10 @@ export const bsffVerboseStatuses: Record<BsffStatus, string> = {
 };
 
 export const formatStatusLabel = (_, bsd) => {
-  if (bsd.bsdType === "BSDD") return statusLabels[bsd.status];
-  if (bsd.bsdType === "BSVHU") return vhuVerboseStatuses[bsd.status];
-  if (bsd.bsdType === "BSFF") return bsffVerboseStatuses[bsd.status];
-  if (bsd.bsdType === "BSDASRI") return dasriVerboseStatuses[bsd.status];
-  if (bsd.bsdType === "BSDA") return bsdaVerboseStatuses[bsd.status];
+  if (bsd.bsdType === "BSDD") return STATUS_LABELS[bsd.status];
+  if (bsd.bsdType === "BSVHU") return VHU_VERBOSE_STATUSES[bsd.status];
+  if (bsd.bsdType === "BSFF") return BSFF_VERBOSE_STATUSES[bsd.status];
+  if (bsd.bsdType === "BSDASRI") return DASRI_VERBOSE_STATUSES[bsd.status];
+  if (bsd.bsdType === "BSDA") return BSDA_VERBOSE_STATUSES[bsd.status];
   return "";
 };

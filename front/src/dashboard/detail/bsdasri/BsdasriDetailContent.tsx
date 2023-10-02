@@ -1,7 +1,7 @@
 import React from "react";
 import { useBsdasriDuplicate } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDuplicate";
 import { generatePath, useHistory, useParams } from "react-router-dom";
-import { statusLabels, getTransportModeLabel } from "dashboard/constants";
+import { getTransportModeLabel } from "dashboard/constants";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
   Bsdasri,
@@ -38,6 +38,7 @@ import {
 
 import classNames from "classnames";
 import { getOperationModeLabel } from "common/operationModes";
+import { DASRI_VERBOSE_STATUSES } from "generated/constants/statuses";
 
 const getVerboseWasteName = (code: string): string => {
   const desc = {
@@ -322,7 +323,11 @@ export default function BsdasriDetailContent({
           <IconBSDasri className="tw-mr-2" />
 
           <span className={styles.detailStatus}>
-            [{form.isDraft ? "Brouillon" : statusLabels[form["bsdasriStatus"]]}]
+            [
+            {form.isDraft
+              ? "Brouillon"
+              : DASRI_VERBOSE_STATUSES[form["bsdasriStatus"]]}
+            ]
           </span>
           {!form.isDraft && <span>{form.id}</span>}
           {form?.type === BsdasriType.Grouping && (
