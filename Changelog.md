@@ -12,10 +12,24 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Lorsqu'une demande de révision met à jour le code déchet, le champ `wasteDetailsIsDangerous` aussi se met à jour [PR 2708](https://github.com/MTES-MCT/trackdechets/pull/2708)
+- En préparation du bordereau PAOH, le profil d'entreprise "crématorium" est disponible [PR 2743](https://github.com/MTES-MCT/trackdechets/pull/2743)
+
+#### :bug: Corrections de bugs
+
+- Il n'est plus possible de corriger la quantité reçue avant réception par l'exutoire, et de dépasser 40T pour du transport routier [PR 2719](https://github.com/MTES-MCT/trackdechets/pull/2719)
+- Dans les PDFs des BSDDs, les totaux des conditionnements ont été corrigés [PR 2725](https://github.com/MTES-MCT/trackdechets/pull/2725)
 
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
+
+- Dans les demandes de révision, la hiérarchie des modes de traitement est proposée à côté des codes d'opération [PR 2727](https://github.com/MTES-MCT/trackdechets/pull/2727)
+- Ajout d'un colonne dans le registre avec une version lisible du statut des BSDs [PR 2707](https://github.com/MTES-MCT/trackdechets/pull/2707)
+- Wording: mise en conformité ADR2023 sur les quantités estimées [PR 2722](https://github.com/MTES-MCT/trackdechets/pull/2722)
+
+#### :house: Interne
+
+- Optimisation appendixForms : pré-calcul de quantityGrouped [PR 2701](https://github.com/MTES-MCT/trackdechets/pull/2701) 
 
 #### :house: Interne
 
@@ -24,18 +38,25 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Tous BSDs: l'exutoire peut désormais renseigner le mode de traitement. :warning: **Attention:** ce champ devra bientôt obligatoirement être renseigné à l'étape de traitement [PR 2673](https://github.com/MTES-MCT/trackdechets/pull/2673)
+- ETQ transporteur, je veux pouvoir ajouter / modifier des récépissés transporteur par API [PR 2688](https://github.com/MTES-MCT/trackdechets/pull/2688)
 
 #### :bug: Corrections de bugs
 
 - BSDD: un éco-organisme ne peut plus être sélectionné en tant qu'émetteur des déchets [PR 2665](https://github.com/MTES-MCT/trackdechets/pull/2665)
+- BSFF : ETQ émetteur je veux modifier mon BSD après l'avoir signé mais les modifications de contenant ne sont pas prises en compte [PR 2686](https://github.com/MTES-MCT/trackdechets/pull/2686)
+- Les BSDD regroupés devraient basculer dans l'onglet Archives et avoir le statut "Traité" lorsque le BSDD suite à été traité [PR 2712](https://github.com/MTES-MCT/trackdechets/pull/2712)
 
 #### :boom: Breaking changes
 
 - BSVHU: le numéro d'agrément du destinataire est obligatoire à la publication [PR 2683](https://github.com/MTES-MCT/trackdechets/pull/2683)
+- La plaque d'immatriculation est désormais obligatoire à la signature d'un transporteur multi-modal. Un champ `numberPlate` a été ajouté sur l'input `TakeOverInput` afin de pouvoir renseigner la valeur jusqu'au dernier moment [PR 2688](https://github.com/MTES-MCT/trackdechets/pull/2688).
+-
 
 #### :nail_care: Améliorations
 
 #### :house: Interne
+
+- Ajout de filtres à la query bsds pour filtrer sur les bordereaux ayant une demande de révision en cours ou passée [PR 2598](Ajout de filtres à la query bsds pour filtrer sur les bordereaux ayant une demande de révision en cours ou passée)
 
 # [2023.8.3] 29/08/2023
 

@@ -4,7 +4,7 @@ import { CompanyPrivate } from "generated/graphql/types";
 import DashboardCompanySelector from "./DashboardCompanySelector";
 import routes from "Apps/routes";
 import "./DashboardTabs.scss";
-import { useShowTransportTabs } from "./transport/hooks/useShowTransportTabs";
+import { useShowTransportTabs } from "../Apps/Dashboard/hooks/useShowTransportTabs";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;

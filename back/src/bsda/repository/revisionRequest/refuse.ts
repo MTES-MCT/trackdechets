@@ -6,6 +6,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 
 export type RefuseRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -30,7 +31,7 @@ export function buildRefuseRevisionRequestApproval(
     // We have a refusal:
     // - mark revision as refused
     // - mark every awaiting approval as skipped
-    await prisma.bsdaRevisionRequest.update({
+    const revisionRequest = await prisma.bsdaRevisionRequest.update({
       where: { id: revisionRequestApproval.revisionRequestId },
       data: { status: RevisionRequestStatus.REFUSED }
     });
@@ -56,5 +57,9 @@ export function buildRefuseRevisionRequestApproval(
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+
+    prisma.addAfterCommitCallback(() =>
+      enqueueUpdatedBsdToIndex(revisionRequest.bsdaId)
+    );
   };
 }

@@ -39,6 +39,7 @@ export function updateOperationR2(
         operation: {
           date: "2022-11-05",
           code: "R2",
+          mode: "REUTILISATION",
           description: "Régénération"
         }
       }

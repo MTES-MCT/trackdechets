@@ -10,7 +10,7 @@ import {
 import routes from "Apps/routes";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSDa/BSDaActions/useDownloadPdf";
 import { useDuplicate } from "dashboard/components/BSDList/BSDa/BSDaActions/useDuplicate";
-import { statusLabels, transportModeLabels } from "dashboard/constants";
+import { transportModeLabels } from "dashboard/constants";
 import styles from "dashboard/detail/common/BSDDetailContent.module.scss";
 import {
   DateRow,
@@ -33,6 +33,8 @@ import { generatePath, useHistory, useParams } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { InitialBsdas } from "./InitialBsdas";
 import { getOperationModeLabel } from "common/operationModes";
+import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
+import { BSDA_VERBOSE_STATUSES } from "generated/constants/statuses";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -438,7 +440,7 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
         <h4 className={styles.detailTitle}>
           <IconBSDa className="tw-mr-2" />
           <span className={styles.detailStatus}>
-            [{form.isDraft ? "Brouillon" : statusLabels[form.status]}]
+            [{form.isDraft ? "Brouillon" : BSDA_VERBOSE_STATUSES[form.status]}]
           </span>
           <span>
             {form.id} {form.isDraft && " (Brouillon)"}
@@ -478,7 +480,15 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
               ) : (
                 <>
                   {form?.weight?.value} tonne(s) (
-                  {form?.weight?.isEstimate ? "estimé" : "réel"})
+                  {form?.weight?.isEstimate ? (
+                    <>
+                      estimé
+                      <EstimatedQuantityTooltip />
+                    </>
+                  ) : (
+                    "réel"
+                  )}
+                  )
                 </>
               )}
             </dd>

@@ -10,7 +10,11 @@ import { receiptSchema } from "../../validation";
  */
 const createTransporterReceiptResolver: MutationResolvers["createTransporterReceipt"] =
   async (parent, args, context) => {
-    applyAuthStrategies(context, [AuthType.Session]);
+    applyAuthStrategies(context, [
+      AuthType.Session,
+      // On autorise la création de récépissé de transport par API
+      AuthType.Bearer
+    ]);
     checkIsAuthenticated(context);
     const { input } = args;
     await receiptSchema.validate(input);

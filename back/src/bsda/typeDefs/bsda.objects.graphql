@@ -413,6 +413,9 @@ type BsdaRevisionRequestOperation {
   "Code D/R"
   code: String
 
+  "Mode de traitement"
+  mode: OperationMode
+
   "Description de l'opération"
   description: String
 }

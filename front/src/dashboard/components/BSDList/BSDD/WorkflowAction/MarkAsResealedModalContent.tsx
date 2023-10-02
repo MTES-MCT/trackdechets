@@ -21,6 +21,7 @@ import {
   TransportMode,
 } from "generated/graphql/types";
 import React, { useState } from "react";
+import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
 
 const MARK_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
@@ -192,7 +193,11 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
                     <Field
                       name="wasteDetails.quantityType"
                       id="ESTIMATED"
-                      label="Estimée"
+                      label={
+                        <>
+                          Estimée <EstimatedQuantityTooltip />
+                        </>
+                      }
                       component={RadioButton}
                     />
                   </fieldset>

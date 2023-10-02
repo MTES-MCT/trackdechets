@@ -185,6 +185,7 @@ async function getUpdateFromFormRevisionRequest(
       : {
           quantityReceived: revisionRequest.quantityReceived,
           processingOperationDone: revisionRequest.processingOperationDone,
+          destinationOperationMode: revisionRequest.destinationOperationMode,
           processingOperationDescription:
             revisionRequest.processingOperationDescription
         }),

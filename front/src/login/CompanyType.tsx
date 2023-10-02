@@ -70,6 +70,12 @@ export const COMPANY_CONSTANTS = [
     helpText:
       "Entreprise qui réalise des travaux amiante relevant de la sous-section 3 ou 4, conformément aux dispositions des articles R.4412-94 à 146 du code du travail",
   },
+  {
+    value: CompanyType.Crematorium,
+    label: "Crématorium",
+    helpText:
+      "Un crématorium autorisé prend en charge l'incinération des pièces anatomiques d'origine humaine",
+  },
 ];
 
 interface CompanyTypeFieldProps {

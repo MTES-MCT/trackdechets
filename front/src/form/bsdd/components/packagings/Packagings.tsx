@@ -127,7 +127,14 @@ export default function Packagings({
                       <div className="tw-w-1/3 tw-px-2">
                         {p.type !== "PIPELINE" && (
                           <Field
-                            label="Colis"
+                            label={
+                              [
+                                PackagingsEnum.Citerne,
+                                PackagingsEnum.Benne,
+                              ].includes(p.type)
+                                ? "Quantité"
+                                : "Colis"
+                            }
                             disabled={props.disabled}
                             component={NumberInput}
                             className="td-input"

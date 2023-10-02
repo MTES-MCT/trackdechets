@@ -33,11 +33,12 @@ import {
   createBsffAfterReception,
   createFicheIntervention
 } from "../../../__tests__/factories";
-import * as sirenify from "../../../sirenify";
+import { sirenifyBsffInput } from "../../../sirenify";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "sirenifyBsffInput")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenifyBsffInput as jest.Mock).mockImplementation(input =>
+  Promise.resolve(input)
+);
 
 const UPDATE_BSFF = gql`
   mutation UpdateBsff($id: ID!, $input: BsffInput!) {
@@ -51,7 +52,7 @@ const UPDATE_BSFF = gql`
 describe("Mutation.updateBsff", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
+    (sirenifyBsffInput as jest.Mock).mockClear();
   });
 
   it("should allow user to update a bsff", async () => {
@@ -78,7 +79,7 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toBeUndefined();
     expect(data.updateBsff.id).toBeTruthy();
     // check input is sirenified
-    expect(sirenifyMock).toHaveBeenCalledTimes(1);
+    expect(sirenifyBsffInput as jest.Mock).toHaveBeenCalledTimes(1);
   });
 
   it("should update a bsff transporter recepisse with data pulled from db", async () => {
@@ -309,6 +310,176 @@ describe("Mutation.updateBsff", () => {
     ]);
   });
 
+  it("should allow emitter to update packagings after his own signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsff = await createBsffAfterEmission(
+      { emitter, destination },
+      {
+        packagings: {
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            weight: 1,
+            numero: "1",
+            emissionNumero: "1"
+          }
+        }
+      }
+    );
+
+    let packagings = await prisma.bsff
+      .findUniqueOrThrow({ where: { id: bsff.id } })
+      .packagings();
+
+    expect(packagings.length).toEqual(1);
+
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          packagings: [
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              numero: "2",
+              volume: 1
+            },
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              numero: "3",
+              volume: 1
+            }
+          ]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    packagings = await prisma.bsff
+      .findUniqueOrThrow({ where: { id: bsff.id } })
+      .packagings();
+
+    expect(packagings.length).toEqual(2); // previous packagings should be deleted
+    expect(packagings[0].numero).toEqual("2");
+    expect(packagings[1].numero).toEqual("3");
+    expect(data.updateBsff.packagings).toEqual([
+      expect.objectContaining({ name: "BOUTEILLE", weight: 1, numero: "2" }),
+      expect.objectContaining({ name: "BOUTEILLE", weight: 1, numero: "3" })
+    ]);
+  });
+
+  it("should not allow destination tu update packagings after emission signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsff = await createBsffAfterEmission(
+      { emitter, destination },
+      {
+        packagings: {
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            weight: 1,
+            numero: "1",
+            emissionNumero: "1"
+          }
+        }
+      }
+    );
+
+    const packagings = await prisma.bsff
+      .findUniqueOrThrow({ where: { id: bsff.id } })
+      .packagings();
+
+    expect(packagings.length).toEqual(1);
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          packagings: [
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              numero: "2",
+              volume: 1
+            },
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              numero: "3",
+              volume: 1
+            }
+          ]
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : packagings"
+      })
+    ]);
+  });
+
+  it("should allow destination to resend same packagings data after emitter signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsff = await createBsffAfterEmission(
+      { emitter, destination },
+      {
+        packagings: {
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            weight: 1,
+            numero: "1",
+            emissionNumero: "1",
+            volume: 1
+          }
+        }
+      }
+    );
+
+    const packagings = await prisma.bsff
+      .findUniqueOrThrow({ where: { id: bsff.id } })
+      .packagings();
+
+    expect(packagings.length).toEqual(1);
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          packagings: [
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              volume: 1,
+              numero: "1"
+            }
+          ]
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+  });
+
   it("should update fiche d'interventions", async () => {
     const operateur = await userWithCompanyFactory(UserRole.ADMIN);
     const detenteur1 = await userWithCompanyFactory(UserRole.ADMIN);
@@ -357,6 +528,132 @@ describe("Mutation.updateBsff", () => {
     expect(updatedBsff.detenteurCompanySirets).toEqual([
       detenteur2.company.siret
     ]);
+  });
+
+  it("should allow emitter to update fiche d'interventions after his own signatures", async () => {
+    const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur1 = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur2 = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const ficheIntervention1 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur1
+    });
+    const ficheIntervention2 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur2
+    });
+    const bsff = await createBsffAfterEmission(
+      { emitter: operateur, destination },
+      {
+        type: "COLLECTE_PETITES_QUANTITES",
+        ficheInterventions: { connect: { id: ficheIntervention1.id } }
+      }
+    );
+
+    const { mutate } = makeClient(operateur.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          ficheInterventions: [ficheIntervention2.id]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { ficheInterventions: true }
+    });
+
+    expect(updatedBsff.ficheInterventions.map(fi => fi.id)).toEqual([
+      ficheIntervention2.id
+    ]);
+    expect(updatedBsff.detenteurCompanySirets).toEqual([
+      detenteur2.company.siret
+    ]);
+  });
+
+  it("should not allow destination to update fiche d'interventions after emitter signature", async () => {
+    const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur1 = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur2 = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const ficheIntervention1 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur1
+    });
+    const ficheIntervention2 = await createFicheIntervention({
+      operateur,
+      detenteur: detenteur2
+    });
+    const bsff = await createBsffAfterEmission(
+      { emitter: operateur, destination },
+      {
+        type: "COLLECTE_PETITES_QUANTITES",
+        ficheInterventions: { connect: { id: ficheIntervention1.id } }
+      }
+    );
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          ficheInterventions: [ficheIntervention2.id]
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : ficheInterventions"
+      })
+    ]);
+  });
+
+  it("should allow destination to resend same fiche d'interventions data after emitter signature", async () => {
+    const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const ficheIntervention = await createFicheIntervention({
+      operateur,
+      detenteur
+    });
+    const bsff = await createBsffAfterEmission(
+      { emitter: operateur, destination },
+      {
+        type: "COLLECTE_PETITES_QUANTITES",
+        ficheInterventions: { connect: { id: ficheIntervention.id } }
+      }
+    );
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          ficheInterventions: [ficheIntervention.id]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
   });
 
   it("should disallow unauthenticated user from updating a bsff", async () => {
@@ -620,7 +917,7 @@ describe("Mutation.updateBsff", () => {
           " emitterCompanyName, emitterCompanyAddress, emitterCompanyContact, emitterCompanyPhone," +
           " emitterCompanyMail, destinationCompanyName," +
           " destinationCompanyAddress, destinationCompanyContact, destinationCompanyPhone," +
-          " destinationCompanyMail, wasteCode, wasteDescription, wasteAdr, weightValue"
+          " destinationCompanyMail, wasteCode, wasteDescription, wasteAdr, weightValue, packagings"
       })
     ]);
 
@@ -838,6 +1135,197 @@ describe("Mutation.updateBsff", () => {
     }
   });
 
+  it("should allow emitter to update the list of grouped BSFFs after his own signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const oldGroupingBsffs = await Promise.all([
+      createBsffAfterOperation(
+        {
+          emitter: await userWithCompanyFactory(UserRole.ADMIN),
+          transporter: await userWithCompanyFactory(UserRole.ADMIN),
+          destination: emitter
+        },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R12.code }
+      )
+    ]);
+    const newGroupingBsffs = await Promise.all([
+      createBsffAfterOperation(
+        {
+          emitter: await userWithCompanyFactory(UserRole.ADMIN),
+          transporter: await userWithCompanyFactory(UserRole.ADMIN),
+          destination: emitter
+        },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R12.code }
+      )
+    ]);
+
+    const bsff = await createBsffAfterEmission(
+      {
+        emitter,
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: await userWithCompanyFactory(UserRole.ADMIN),
+        previousPackagings: oldGroupingBsffs.flatMap(bsff => bsff.packagings)
+      },
+      {
+        type: BsffType.GROUPEMENT
+      }
+    );
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          grouping: newGroupingBsffs.flatMap(({ packagings }) =>
+            packagings.map(p => p.id)
+          )
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { packagings: true }
+    });
+
+    const previousPackagings =
+      await getReadonlyBsffPackagingRepository().findPreviousPackagings(
+        updatedBsff.packagings.map(p => p.id),
+        1
+      );
+
+    for (const packaging of previousPackagings) {
+      expect(
+        newGroupingBsffs.flatMap(bsff => bsff.packagings.map(p => p.id))
+      ).toContain(packaging.id);
+    }
+  });
+
+  it("should not allow destination to update the list of grouped BSFFs after emitter's signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const oldGroupingBsffs = await Promise.all([
+      createBsffAfterOperation(
+        {
+          emitter: await userWithCompanyFactory(UserRole.ADMIN),
+          transporter: await userWithCompanyFactory(UserRole.ADMIN),
+          destination: emitter
+        },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R12.code }
+      )
+    ]);
+    const newGroupingBsffs = await Promise.all([
+      createBsffAfterOperation(
+        {
+          emitter: await userWithCompanyFactory(UserRole.ADMIN),
+          transporter: await userWithCompanyFactory(UserRole.ADMIN),
+          destination: emitter
+        },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R12.code }
+      )
+    ]);
+
+    const bsff = await createBsffAfterEmission(
+      {
+        emitter,
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination,
+        previousPackagings: oldGroupingBsffs.flatMap(bsff => bsff.packagings)
+      },
+      {
+        type: BsffType.GROUPEMENT
+      }
+    );
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          grouping: newGroupingBsffs.flatMap(({ packagings }) =>
+            packagings.map(p => p.id)
+          )
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : grouping"
+      })
+    ]);
+  });
+
+  it("should allow destination to resend same grouped BSFFs data after emitter's signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const groupingBsffs = await Promise.all([
+      createBsffAfterOperation(
+        {
+          emitter: await userWithCompanyFactory(UserRole.ADMIN),
+          transporter: await userWithCompanyFactory(UserRole.ADMIN),
+          destination: emitter
+        },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R12.code }
+      )
+    ]);
+
+    const bsff = await createBsffAfterEmission(
+      {
+        emitter,
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination,
+        previousPackagings: groupingBsffs.flatMap(bsff => bsff.packagings)
+      },
+      {
+        type: BsffType.GROUPEMENT
+      }
+    );
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          grouping: groupingBsffs.flatMap(({ packagings }) =>
+            packagings.map(p => p.id)
+          )
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
   it("should update the forwarded BSFF", async () => {
     const ttr = await userWithCompanyFactory(UserRole.ADMIN);
     const oldForwarded = await createBsffAfterOperation(
@@ -904,6 +1392,177 @@ describe("Mutation.updateBsff", () => {
     expect(previousPackagings).toHaveLength(1);
 
     expect(previousPackagings[0].id).toEqual(newForwarded.packagings[0].id);
+  });
+
+  it("should allow emitter to update the forwarded BSFF after his own signature", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const oldForwarded = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.R13.code }
+    );
+
+    const newForwarded = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.R13.code }
+    );
+
+    const bsff = await createBsffAfterEmission(
+      {
+        emitter: ttr,
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: await userWithCompanyFactory(UserRole.ADMIN),
+        previousPackagings: oldForwarded.packagings
+      },
+      {
+        type: BsffType.REEXPEDITION
+      }
+    );
+
+    const { mutate } = makeClient(ttr.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          forwarding: newForwarded.packagings.map(p => p.id)
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { packagings: true }
+    });
+
+    const previousPackagings =
+      await getReadonlyBsffPackagingRepository().findPreviousPackagings(
+        updatedBsff.packagings.map(p => p.id),
+        1
+      );
+    expect(previousPackagings).toHaveLength(1);
+
+    expect(previousPackagings[0].id).toEqual(newForwarded.packagings[0].id);
+  });
+
+  it("should not allow destination to update the forwarded BSFF after emitter's signature", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const oldForwarded = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.R13.code }
+    );
+
+    const newForwarded = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.R13.code }
+    );
+
+    const bsff = await createBsffAfterEmission(
+      {
+        emitter: ttr,
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination,
+        previousPackagings: oldForwarded.packagings
+      },
+      {
+        type: BsffType.REEXPEDITION
+      }
+    );
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          forwarding: newForwarded.packagings.map(p => p.id)
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : forwarding"
+      })
+    ]);
+  });
+
+  it("should allow destination to resend same forwarded BSFF data after emitter's signature", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const forwarded = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.R13.code }
+    );
+
+    const bsff = await createBsffAfterEmission(
+      {
+        emitter: ttr,
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination,
+        previousPackagings: forwarded.packagings
+      },
+      {
+        type: BsffType.REEXPEDITION
+      }
+    );
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          forwarding: forwarded.packagings.map(p => p.id)
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
   });
 
   it("should update the list of repackaged BSFF", async () => {
@@ -982,6 +1641,211 @@ describe("Mutation.updateBsff", () => {
         previousPackaging.id
       );
     }
+  });
+
+  it("should allow emitter to update the list of repackaged BSFF after his own signature", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const oldRepackaged = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.D14.code }
+    );
+
+    const bsff = await createBsffAfterEmission(
+      {
+        emitter: ttr,
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: await userWithCompanyFactory(UserRole.ADMIN),
+        previousPackagings: oldRepackaged.packagings
+      },
+      {
+        type: BsffType.RECONDITIONNEMENT,
+        packagings: {
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            numero: "numero",
+            emissionNumero: "numero",
+            volume: 1,
+            weight: 1,
+            previousPackagings: {
+              connect: oldRepackaged.packagings.map(p => ({ id: p.id }))
+            }
+          }
+        }
+      }
+    );
+
+    const newRepackaged = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.D14.code }
+    );
+
+    const { mutate } = makeClient(ttr.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          repackaging: [newRepackaged.packagings[0].id]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const previousPackagings =
+      await getReadonlyBsffPackagingRepository().findPreviousPackagings(
+        bsff.packagings.map(p => p.id),
+        1
+      );
+
+    for (const previousPackaging of previousPackagings) {
+      expect(newRepackaged.packagings.map(p => p.id)).toContain(
+        previousPackaging.id
+      );
+    }
+  });
+
+  it("should not allow destination to update the list of repackaged BSFF after emitter's signature", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const oldRepackaged = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.D14.code }
+    );
+
+    const bsff = await createBsffAfterEmission(
+      {
+        emitter: ttr,
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination,
+        previousPackagings: oldRepackaged.packagings
+      },
+      {
+        type: BsffType.RECONDITIONNEMENT,
+        packagings: {
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            numero: "numero",
+            emissionNumero: "numero",
+            volume: 1,
+            weight: 1,
+            previousPackagings: {
+              connect: oldRepackaged.packagings.map(p => ({ id: p.id }))
+            }
+          }
+        }
+      }
+    );
+
+    const newRepackaged = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.D14.code }
+    );
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          repackaging: [newRepackaged.packagings[0].id]
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : repackaging"
+      })
+    ]);
+  });
+
+  it("should allow destination to resend same repackaged BSFF data after emitter's signature", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const repackaged = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.D14.code }
+    );
+
+    const bsff = await createBsffAfterEmission(
+      {
+        emitter: ttr,
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination,
+        previousPackagings: repackaged.packagings
+      },
+      {
+        type: BsffType.RECONDITIONNEMENT,
+        packagings: {
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            numero: "numero",
+            emissionNumero: "numero",
+            volume: 1,
+            weight: 1,
+            previousPackagings: {
+              connect: repackaged.packagings.map(p => ({ id: p.id }))
+            }
+          }
+        }
+      }
+    );
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          repackaging: [repackaged.packagings[0].id]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
   });
 
   it("should change the initial transporter", async () => {

@@ -95,12 +95,12 @@ function getWhere(bsvhu: Bsvhu): Pick<BsdElastic, WhereKeys> {
   return where;
 }
 
-export type RawBsvhu = Bsvhu;
+export type BsvhuForElastic = Bsvhu;
 
 /**
  * Convert a bsvhu from the bsvhu table to Elastic Search's BSD model.
  */
-export function toBsdElastic(bsvhu: RawBsvhu): BsdElastic {
+export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
   const where = getWhere(bsvhu);
 
   return {
@@ -174,6 +174,8 @@ export function toBsdElastic(bsvhu: RawBsvhu): BsdElastic {
     destinationAcceptationWeight: bsvhu.destinationReceptionWeight,
     destinationOperationDate: bsvhu.destinationOperationDate?.getTime(),
     ...where,
+    isInRevisionFor: [],
+    isRevisedFor: [],
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsvhu),
     rawBsd: bsvhu

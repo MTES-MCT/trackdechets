@@ -4,8 +4,7 @@ import { resetCache } from "../../../../../integration-tests/helper";
 import { setInCache } from "../../../../common/redis";
 import { siretify } from "../../../../__tests__/factories";
 
-const mockedAxiosPost = jest.spyOn(axios, "post");
-const mockedAxiosGet = jest.spyOn(axios, "get");
+jest.mock("axios");
 
 describe("authorizedAxiosGet", () => {
   afterEach(async () => {
@@ -23,7 +22,7 @@ describe("authorizedAxiosGet", () => {
     const validToken = "valid_token";
 
     // mock POST /token
-    mockedAxiosPost.mockResolvedValueOnce({
+    (axios.post as jest.Mock).mockResolvedValueOnce({
       status: 200,
       data: {
         access_token: validToken
@@ -31,7 +30,7 @@ describe("authorizedAxiosGet", () => {
     });
 
     // mock GET url
-    mockedAxiosGet.mockResolvedValueOnce({
+    (axios.get as jest.Mock).mockResolvedValueOnce({
       status: 200,
       data: {
         siret
@@ -50,7 +49,7 @@ describe("authorizedAxiosGet", () => {
     expect(token).toEqual(validToken);
 
     // check axios has been called with authorization header
-    expect(mockedAxiosGet).toHaveBeenCalledWith(url, {
+    expect(axios.get as jest.Mock).toHaveBeenCalledWith(url, {
       headers: { Authorization: `Bearer ${validToken}` }
     });
   });
@@ -68,14 +67,14 @@ describe("authorizedAxiosGet", () => {
     const validToken = "valid_token";
 
     // mock GET url returns 401
-    mockedAxiosGet.mockRejectedValueOnce({
+    (axios.get as jest.Mock).mockRejectedValueOnce({
       response: {
         status: 401
       }
     });
 
     // mock POST /token
-    mockedAxiosPost.mockResolvedValueOnce({
+    (axios.post as jest.Mock).mockResolvedValueOnce({
       status: 200,
       data: {
         access_token: validToken
@@ -83,7 +82,7 @@ describe("authorizedAxiosGet", () => {
     });
 
     // mock GET url return 200 and data
-    mockedAxiosGet.mockResolvedValueOnce({
+    (axios.get as jest.Mock).mockResolvedValueOnce({
       status: 200,
       data: {
         siret
@@ -103,7 +102,7 @@ describe("authorizedAxiosGet", () => {
 
     // check axios has been called first with invalidToken and
     // then with validToken
-    expect(mockedAxiosGet.mock.calls).toEqual([
+    expect((axios.get as jest.Mock).mock.calls).toEqual([
       [url, { headers: { Authorization: `Bearer ${invalidToken}` } }],
       [url, { headers: { Authorization: `Bearer ${validToken}` } }]
     ]);

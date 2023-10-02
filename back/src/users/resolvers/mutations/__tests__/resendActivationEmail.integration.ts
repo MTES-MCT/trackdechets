@@ -2,7 +2,7 @@ import { gql } from "graphql-tag";
 import prisma from "../../../../prisma";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import * as mailing from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { onSignup } from "../../../../mailer/templates";
@@ -16,12 +16,12 @@ const RESEND_ACTIVATION_EMAIL = gql`
 `;
 
 // No mails
-const sendMailSpy = jest.spyOn(mailing, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 describe("mutation resendActivationEmail", () => {
   afterAll(resetDatabase);
-  afterEach(sendMailSpy.mockClear);
+  afterEach((sendMail as jest.Mock).mockClear);
 
   it("should resend activation email to user", async () => {
     const user = await userFactory({ isActive: false });
@@ -44,7 +44,7 @@ describe("mutation resendActivationEmail", () => {
         }
       }
     );
-    expect(sendMailSpy).toHaveBeenCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       renderMail(onSignup, {
         to: [{ name: user.name, email: user.email }],
         variables: { activationHash: hash }
@@ -68,7 +68,7 @@ describe("mutation resendActivationEmail", () => {
     expect(data.resendActivationEmail).toEqual(true);
     expect(errors).toEqual(undefined);
     // no mail sent
-    expect(sendMailSpy).not.toHaveBeenCalled();
+    expect(sendMail as jest.Mock).not.toHaveBeenCalled();
   });
 
   it("should return true if user is already active", async () => {
@@ -92,7 +92,7 @@ describe("mutation resendActivationEmail", () => {
     expect(data.resendActivationEmail).toEqual(true);
 
     // no mail sent
-    expect(sendMailSpy).not.toHaveBeenCalled();
+    expect(sendMail as jest.Mock).not.toHaveBeenCalled();
   });
 
   it("should expect a valid captcha", async () => {
@@ -123,6 +123,6 @@ describe("mutation resendActivationEmail", () => {
       })
     ]);
     // no mail sent
-    expect(sendMailSpy).not.toHaveBeenCalled();
+    expect(sendMail as jest.Mock).not.toHaveBeenCalled();
   });
 });

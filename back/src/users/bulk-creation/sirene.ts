@@ -1,5 +1,5 @@
 import { CompanyRow, CompanyInfo } from "./types";
-import geocode from "../../companies/geo/geocode";
+import { geocode } from "../../companies/geo/geocode";
 import { searchCompany } from "../../companies/search";
 
 /**

@@ -4,8 +4,16 @@ import { RepositoryFnDeps } from "../../../common/repository/types";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import buildUpdateManyForms from "./updateMany";
+import { FormWithForwardedIn, FormWithForwardedInInclude } from "../../types";
+import { processBsdIdentifiersByChunk } from "../../../bsds/indexation/bulkIndexBsds";
 
-export type UpdateAppendix2Forms = (forms: Form[]) => Promise<void>;
+type FormForUpdateAppendix2Forms = Form & FormWithForwardedIn;
+
+export const FormForUpdateAppendix2FormsInclude = FormWithForwardedInInclude;
+
+export type UpdateAppendix2Forms = (
+  forms: FormForUpdateAppendix2Forms[]
+) => Promise<void>;
 
 const buildUpdateAppendix2Forms: (
   deps: RepositoryFnDeps
@@ -20,21 +28,30 @@ const buildUpdateAppendix2Forms: (
   });
 
   const formUpdatesByStatus = new Map<Status, string[]>();
+
+  // Quantité regroupée par identifiant de bordereau
+  const quantitGroupedByFormId: { [key: string]: number } = {};
+
   for (const form of forms) {
     if (![Status.AWAITING_GROUP, Status.GROUPED].includes(form.status as any)) {
       continue;
     }
-    const { id, quantityReceived } = form;
+
+    const quantityReceived = form.forwardedIn
+      ? form.forwardedIn.quantityReceived
+      : form.quantityReceived;
 
     const quantityGrouped = new Decimal(
       formGroupements
-        .filter(grp => grp.initialFormId === id)
+        .filter(grp => grp.initialFormId === form.id)
         .map(grp => grp.quantity)
         .reduce((prev, cur) => prev + cur, 0) ?? 0
     ).toDecimalPlaces(6); // set precision to gramme
 
+    quantitGroupedByFormId[form.id] = quantityGrouped.toNumber();
+
     const groupementForms = formGroupements
-      .filter(grp => grp.initialFormId === id)
+      .filter(grp => grp.initialFormId === form.id)
       .map(g => g.nextForm);
 
     const groupedInTotality =
@@ -76,7 +93,7 @@ const buildUpdateAppendix2Forms: (
 
       formUpdatesByStatus.set(status, [
         ...(formUpdatesByStatus.get(status) ?? []),
-        id
+        form.id
       ]);
     } else if (
       form.status === Status.AWAITING_GROUP &&
@@ -87,12 +104,12 @@ const buildUpdateAppendix2Forms: (
       });
       formUpdatesByStatus.set(status, [
         ...(formUpdatesByStatus.get(status) ?? []),
-        id
+        form.id
       ]);
     } else {
       formUpdatesByStatus.set(nextStatus, [
         ...(formUpdatesByStatus.get(nextStatus) ?? []),
-        id
+        form.id
       ]);
     }
   }
@@ -103,6 +120,23 @@ const buildUpdateAppendix2Forms: (
   }
 
   await Promise.all(promises);
+
+  // Ici on peut avoir 250 bordereaux à mettre à jour dans le pire des cas
+  // On batche donc les updates par 50 pour éviter un bottleneck
+  await processBsdIdentifiersByChunk(
+    Object.keys(quantitGroupedByFormId),
+    formIds =>
+      // met à jour la quantité regroupée sur chaque bordereau
+      Promise.all(
+        formIds.map(formId => {
+          return prisma.form.update({
+            where: { id: formId },
+            data: { quantityGrouped: quantitGroupedByFormId[formId] }
+          });
+        })
+      ),
+    50
+  );
 };
 
 export default buildUpdateAppendix2Forms;

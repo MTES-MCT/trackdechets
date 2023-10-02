@@ -231,7 +231,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               checked={bsdasri?.emitter?.emission?.weight?.isEstimate === true}
               readOnly
             />{" "}
-            estimée
+            estimée conformément à l'article 5.4.1.1.3.2 de l'ADR 2023
           </div>
         </div>
         {/* End PRED */}
@@ -366,7 +366,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               }
               readOnly
             />{" "}
-            estimée
+            estimée conformément à l'article 5.4.1.1.3.2 de l'ADR 2023
           </div>
         </div>
         {/* End Transporter */}
