@@ -1,7 +1,7 @@
 import { Updater, registerUpdater } from "./helper/helper";
 import prisma from "../../src/prisma";
 import { searchCompany } from "../../src/companies/search";
-import geocode from "../../src/companies/geo/geocode";
+import { geocode } from "../../src/companies/geo/geocode";
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));

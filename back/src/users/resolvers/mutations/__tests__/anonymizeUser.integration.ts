@@ -1,6 +1,5 @@
 import { gql } from "graphql-tag";
 import supertest from "supertest";
-import * as utils from "../../../../utils";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { app, sess } from "../../../../server";
 import { logIn } from "../../../../__tests__/auth.helper";
@@ -21,7 +20,15 @@ const cookieRegExp = new RegExp(
   }; Path=/; Expires=.+; HttpOnly`
 );
 
-jest.spyOn(utils, "getUIBaseURL").mockReturnValue("*");
+jest.mock("../../../../utils", () => {
+  const originalModule = jest.requireActual("../../../../utils");
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    getUIBaseURL: () => "*"
+  };
+});
 
 const ANONYMIZE_MUTATION = gql`
   mutation AnonymizeUser($id: ID!) {

@@ -13,7 +13,11 @@ import { removeEmptyKeys } from "../../../common/converter";
  */
 const updateTransporterReceiptResolver: MutationResolvers["updateTransporterReceipt"] =
   async (parent, args, context) => {
-    applyAuthStrategies(context, [AuthType.Session]);
+    applyAuthStrategies(context, [
+      AuthType.Session,
+      // On autorise une modification du récépissé de transport par API
+      AuthType.Bearer
+    ]);
     const user = checkIsAuthenticated(context);
     const {
       input: { id, ...data }

@@ -15,8 +15,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { Query } from "../../../../generated/graphql/types";
 import { WASTES_REGISTRY_XLS } from "./queries";
-import { indexForm } from "../../../../forms/elastic";
-import { getFullForm } from "../../../../forms/database";
+import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 
 function emitterFormFactory(ownerId: string, siret: string) {
   return formFactory({
@@ -125,7 +124,7 @@ describe("query { wastesRegistryXls }", () => {
           ? traderFormFactory
           : emitterFormFactory;
       const form = await customFormFactory(user.id, company.siret!);
-      await indexForm(await getFullForm(form));
+      await indexForm(await getFormForElastic(form));
       await refreshElasticSearch();
       const { query } = makeClient(user);
       const { data } = await query<Pick<Query, "wastesRegistryXls">>(

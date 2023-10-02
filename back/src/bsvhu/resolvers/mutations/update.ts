@@ -7,7 +7,7 @@ import { getBsvhuOrNotFound } from "../../database";
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import { checkEditionRules } from "../../edition";
-import sirenify from "../../sirenify";
+import { sirenify } from "../../sirenify";
 import { recipify } from "../../recipify";
 import { checkCanUpdate } from "../../permissions";
 

@@ -14,15 +14,14 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Query } from "../../../../generated/graphql/types";
-import { indexForm } from "../../../elastic";
-import { getFullForm } from "../../../database";
+import { getFormForElastic, indexForm } from "../../../elastic";
 
 async function emitterFormFactory(ownerId: string, siret: string) {
   const form = await formFactory({
     ownerId,
     opt: { emitterCompanySiret: siret, sentAt: new Date() }
   });
-  await indexForm(await getFullForm(form));
+  await indexForm(await getFormForElastic(form));
   return form;
 }
 
@@ -34,7 +33,7 @@ async function recipientFormFactory(ownerId: string, siret: string) {
       receivedAt: new Date()
     }
   });
-  await indexForm(await getFullForm(form));
+  await indexForm(await getFormForElastic(form));
   return form;
 }
 
@@ -51,7 +50,7 @@ async function transporterFormFactory(ownerId: string, siret: string) {
       }
     }
   });
-  await indexForm(await getFullForm(form));
+  await indexForm(await getFormForElastic(form));
   return form;
 }
 
@@ -60,7 +59,7 @@ async function traderFormFactory(ownerId: string, siret: string) {
     ownerId,
     opt: { traderCompanySiret: siret, sentAt: new Date() }
   });
-  await indexForm(await getFullForm(form));
+  await indexForm(await getFormForElastic(form));
   return form;
 }
 

@@ -9,7 +9,7 @@ import { getEligibleDasrisForSynthesis, aggregatePackagings } from "./utils";
 import { indexBsdasri } from "../../elastic";
 import { BsdasriType } from "@prisma/client";
 import { getBsdasriRepository } from "../../repository";
-import sirenify from "../../sirenify";
+import { sirenify } from "../../sirenify";
 import { checkCanCreateSynthesis } from "../../permissions";
 import { UserInputError } from "../../../common/errors";
 

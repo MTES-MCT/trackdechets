@@ -29,6 +29,10 @@ input BsdWhere {
   isArchivedFor: [String!]
   isToCollectFor: [String!]
   isCollectedFor: [String!]
+  # Révisions en cours
+  isInRevisionFor: [String!]
+  # Révisions passées
+  isRevisedFor: [String!]
 
   sirets: StringNullableListFilter
 

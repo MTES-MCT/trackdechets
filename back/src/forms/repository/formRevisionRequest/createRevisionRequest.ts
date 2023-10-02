@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { approveAndApplyRevisionRequest } from "./acceptRevisionRequestApproval";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 
 export type CreateRevisionRequestFn = (
   data: Prisma.BsddRevisionRequestCreateInput,
@@ -17,7 +18,7 @@ const buildCreateRevisionRequest: (
   async (data, logMetadata) => {
     const createdRevisionRequest = await prisma.bsddRevisionRequest.create({
       data,
-      include: { approvals: true }
+      include: { approvals: true, bsdd: { select: { readableId: true } } }
     });
 
     await prisma.event.create({
@@ -29,6 +30,10 @@ const buildCreateRevisionRequest: (
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+
+    prisma.addAfterCommitCallback(() =>
+      enqueueUpdatedBsdToIndex(createdRevisionRequest.bsdd.readableId)
+    );
 
     if (createdRevisionRequest.approvals.length > 0) {
       return createdRevisionRequest;

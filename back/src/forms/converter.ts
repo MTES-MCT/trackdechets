@@ -61,7 +61,7 @@ import {
 import prisma from "../prisma";
 import { extractPostalCode } from "../utils";
 import { getFirstTransporterSync } from "./database";
-import { RawForm } from "./elastic";
+import { FormForElastic } from "./elastic";
 import DataLoader from "dataloader";
 
 function flattenDestinationInput(input: {
@@ -707,7 +707,7 @@ export function expandFormFromDb(
     quantityReceived: forwardedIn
       ? forwardedIn.quantityReceived
       : form.quantityReceived,
-    quantityGrouped: null,
+    quantityGrouped: form.quantityGrouped,
     processingOperationDone: forwardedIn
       ? forwardedIn.processingOperationDone
       : form.processingOperationDone,
@@ -818,7 +818,7 @@ export function expandFormFromDb(
 }
 
 export async function expandFormFromElastic(
-  form: RawForm,
+  form: FormForElastic,
   formLoader?: DataLoader<
     string,
     PrismaFormWithForwardedInAndTransporters | undefined,
@@ -839,9 +839,10 @@ export async function expandFormFromElastic(
   const expanded = expandFormFromDb(formWithInclude);
   return {
     ...expanded,
-    transportSegments: (form.transporters ?? []).filter(
-      t => t.number && t.number >= 2
-    )
+    transportSegments: (form.transporters ?? [])
+      .filter(t => t.number && t.number >= 2)
+      .sort((s1, s2) => s1.number - s2.number)
+      .map(segment => expandTransportSegmentFromDb(segment))
   };
 }
 

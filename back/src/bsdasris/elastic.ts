@@ -111,12 +111,12 @@ function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
   return where;
 }
 
-export type RawBsdasri = Bsdasri;
+export type BsdasriForElastic = Bsdasri;
 
 /**
  * Convert a dasri from the bsdasri table to Elastic Search's BSD model.
  */
-export function toBsdElastic(bsdasri: RawBsdasri): BsdElastic {
+export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
   const where = getWhere(bsdasri);
 
   return {
@@ -189,6 +189,8 @@ export function toBsdElastic(bsdasri: RawBsdasri): BsdElastic {
     destinationAcceptationWeight: bsdasri.destinationReceptionWasteWeightValue,
     destinationOperationDate: bsdasri.destinationOperationDate?.getTime(),
     ...where,
+    isInRevisionFor: [],
+    isRevisedFor: [],
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),
     rawBsd: bsdasri

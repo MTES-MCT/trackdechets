@@ -155,14 +155,19 @@ export const bsvhuPublishDraft = `Cette action aura pour effet de démarrer le c
             signature n'a été apposée.`;
 
 // tabs
+export const ALL_BSDS = "Tous les bordereaux";
+export const ALL_REVIEWS = "Toutes les révisions";
 export const DRAFTS = "Brouillons";
 export const ACTS = "Pour action";
 export const FOLLOWS = "Suivi";
 export const ARCHIVES = "Archives";
 export const REVIEWS = "Révisions";
+export const TRANSPORT = "Transport";
 export const TO_COLLECT = "À collecter";
 export const COLLECTED = "Collecté";
 export const REGISTER = "Registre";
+export const TO_REVIEWED = "À Réviser";
+export const REVIEWED = "Révisé";
 
 // Reviews
 export const APPROUVER_REFUSER_REVISION = "Approuver / Refuser";

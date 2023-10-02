@@ -21,13 +21,14 @@ import {
   UpdateFormInput
 } from "../../../../generated/graphql/types";
 import getReadableId from "../../../readableId";
-import * as sirenify from "../../../sirenify";
+import { sirenifyFormInput } from "../../../sirenify";
 import { sub } from "date-fns";
 import { getFirstTransporter, getTransportersSync } from "../../../database";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "sirenifyFormInput")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenifyFormInput as jest.Mock).mockImplementation(input =>
+  Promise.resolve(input)
+);
 
 const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {
@@ -105,7 +106,7 @@ const UPDATE_FORM = `
 describe("Mutation.updateForm", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
+    (sirenifyFormInput as jest.Mock).mockClear();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -401,7 +402,7 @@ describe("Mutation.updateForm", () => {
         updateFormInput.wasteDetails
       );
       // check input is sirenified
-      expect(sirenifyMock).toHaveBeenCalledTimes(1);
+      expect(sirenifyFormInput as jest.Mock).toHaveBeenCalledTimes(1);
     }
   );
 
@@ -1465,7 +1466,8 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: "GROUPED",
         recipientCompanySiret: ttr.siret,
-        quantityReceived: 1
+        quantityReceived: 1,
+        quantityGrouped: 1
       }
     });
     const toBeAppendixForm = await formFactory({
@@ -1473,7 +1475,8 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: "AWAITING_GROUP",
         recipientCompanySiret: ttr.siret,
-        quantityReceived: 1
+        quantityReceived: 1,
+        quantityGrouped: 0
       }
     });
 
@@ -1508,12 +1511,16 @@ describe("Mutation.updateForm", () => {
       where: { id: appendixForm.id }
     });
     expect(oldAppendix2Form.status).toBe("AWAITING_GROUP");
+    expect(oldAppendix2Form.quantityGrouped).toEqual(0);
 
     // New appendix form is now GROUPED
     const newAppendix2Form = await prisma.form.findUniqueOrThrow({
       where: { id: toBeAppendixForm.id }
     });
     expect(newAppendix2Form.status).toBe("GROUPED");
+    expect(newAppendix2Form.quantityGrouped).toEqual(
+      newAppendix2Form.quantityReceived
+    );
   });
 
   it("should be possible to update data on a form containing appendix 2", async () => {
@@ -1967,7 +1974,8 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: "AWAITING_GROUP",
         recipientCompanySiret: ttr.siret,
-        quantityReceived: 1
+        quantityReceived: 1,
+        quantityGrouped: 1
       }
     });
 
@@ -2008,6 +2016,12 @@ describe("Mutation.updateForm", () => {
     });
 
     expect(data2.updateForm.appendix2Forms).toHaveLength(1);
+
+    const updatedAppendixForm = await prisma.form.findUniqueOrThrow({
+      where: { id: appendixForm.id }
+    });
+
+    expect(updatedAppendixForm.quantityGrouped).toEqual(1);
   });
 
   it("should be possible to re-associate same appendix2 (using UpdateFormInput.grouping)", async () => {
@@ -2095,6 +2109,11 @@ describe("Mutation.updateForm", () => {
       }
     });
     expect(data3.updateForm.grouping).toHaveLength(1);
+
+    const updatedAppendixForm = await prisma.form.findFirstOrThrow({
+      where: { id: appendixForm.id }
+    });
+    expect(updatedAppendixForm.quantityGrouped).toEqual(1);
   }, 30000);
 
   it("should default to quantity left when no quantity is specified in grouping", async () => {

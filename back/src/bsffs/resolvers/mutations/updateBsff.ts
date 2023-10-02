@@ -55,14 +55,6 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     );
   }
 
-  if (existingBsff.emitterEmissionSignatureDate) {
-    // discard related objects updates after emission signatures
-    delete input.packagings;
-    delete input.grouping;
-    delete input.forwarding;
-    delete input.repackaging;
-    delete input.ficheInterventions;
-  }
   const sirenifiedInput = await sirenifyBsffInput(input, user);
   const autocompletedInput = await recipify(sirenifiedInput);
   const flatInput = flattenBsffInput(autocompletedInput);

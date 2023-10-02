@@ -70,6 +70,7 @@ type EditableBsddFields = Required<
     | "intermediariesSirets"
     | "canAccessDraftSirets"
     | "forwarding"
+    | "quantityGrouped"
   >
 >;
 
