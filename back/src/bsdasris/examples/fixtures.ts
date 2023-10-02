@@ -105,6 +105,7 @@ const operationInput = {
     value: 1
   },
   code: "D10",
+  mode: "ELIMINATION",
   date: "2020-04-28"
 };
 

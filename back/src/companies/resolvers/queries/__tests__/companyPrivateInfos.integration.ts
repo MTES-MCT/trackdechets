@@ -10,9 +10,12 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { AnonymousCompanyError } from "../../../sirene/errors";
-import * as searchCompany from "../../../sirene/searchCompany";
 
-const searchSirene = jest.spyOn(searchCompany, "default");
+const mockSearchSirene = jest.fn();
+jest.mock("../../../sirene/searchCompany", () => ({
+  __esModule: true,
+  default: (...args) => mockSearchSirene(...args)
+}));
 
 describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   let query: ReturnType<typeof makeClient>["query"];
@@ -27,13 +30,13 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
   afterEach(async () => {
     await resetDatabase();
-    searchSirene.mockReset();
+    mockSearchSirene.mockReset();
   });
 
   it("Random company not registered in Trackdéchets", async () => {
     const siret = siretify(1);
 
-    searchSirene.mockResolvedValueOnce({
+    mockSearchSirene.mockResolvedValueOnce({
       siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -88,7 +91,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   it("ICPE registered in Trackdéchets", async () => {
     const siret = siretify(1);
 
-    searchSirene.mockResolvedValueOnce({
+    mockSearchSirene.mockResolvedValueOnce({
       siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -161,7 +164,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
   it("Transporter company with transporter receipt", async () => {
     const siret = siretify(9);
-    searchSirene.mockResolvedValueOnce({
+    mockSearchSirene.mockResolvedValueOnce({
       siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -213,7 +216,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   it("Trader company with trader receipt", async () => {
     const siret = siretify(1);
 
-    searchSirene.mockResolvedValueOnce({
+    mockSearchSirene.mockResolvedValueOnce({
       siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -259,7 +262,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   it("Company with direct dasri takeover allowance", async () => {
     const siret = siretify(1);
 
-    searchSirene.mockResolvedValueOnce({
+    mockSearchSirene.mockResolvedValueOnce({
       siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -299,7 +302,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   it("Closed company in INSEE public data", async () => {
     const siret = siretify(1);
 
-    searchSirene.mockResolvedValueOnce({
+    mockSearchSirene.mockResolvedValueOnce({
       siret,
       etatAdministratif: "F",
       name: "OPTIQUE LES AIX",
@@ -344,7 +347,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   it("Hidden company in INSEE and not registered", async () => {
     const siret = siretify(1);
 
-    searchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
+    mockSearchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const gqlquery = `
       query {
         companyPrivateInfos(clue: "${siret}") {
@@ -384,7 +387,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   it("Hidden company in INSEE and but registered without AnonymousCompany", async () => {
     const siret = siretify(1);
 
-    searchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
+    mockSearchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const company = await companyFactory({
       siret,
       name: "Code en Stock",

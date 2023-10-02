@@ -1,6 +1,6 @@
 import { CompanySearchResult } from "../../companies/types";
 import { userWithCompanyFactory } from "../../__tests__/factories";
-import * as search from "../../companies/search";
+import { searchCompany } from "../../companies/search";
 import {
   BsffFicheInterventionInput,
   BsffInput,
@@ -14,7 +14,7 @@ import {
 import { AuthType } from "../../auth";
 import { resetDatabase } from "../../../integration-tests/helper";
 
-const searchCompanySpy = jest.spyOn(search, "searchCompany");
+jest.mock("../../companies/search");
 
 describe("sirenifyBsffInput", () => {
   afterEach(resetDatabase);
@@ -38,7 +38,7 @@ describe("sirenifyBsffInput", () => {
       [destination.company.siret!]: searchResult("destinataire")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 
@@ -110,7 +110,7 @@ describe("sirenifyBsffInput", () => {
       [destination.company.siret!]: searchResult("destinataire")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 
@@ -176,7 +176,7 @@ describe("sirenifyBsffPackagingInput", () => {
       [nextDestination.company.siret!]: searchResult("destination ultérieure")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 
@@ -223,7 +223,7 @@ describe("sirenifyBsffPackagingInput", () => {
       [nextDestination.company.siret!]: searchResult("destination ultérieure")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 
@@ -274,7 +274,7 @@ describe("sirenifyBsffFicheInterventionInput", () => {
       [operateur.company.siret!]: searchResult("opérateur")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 
@@ -337,7 +337,7 @@ describe("sirenifyBsffFicheInterventionInput", () => {
       [operateur.company.siret!]: searchResult("opérateur")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 

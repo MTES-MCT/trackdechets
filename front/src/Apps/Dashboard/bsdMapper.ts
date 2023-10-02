@@ -65,7 +65,11 @@ export const mapBsdd = (bsdd: FormWithReview): BsdDisplay => {
     wasteDetails: {
       code: bsdd.wasteDetails?.code,
       name: bsdd.wasteDetails?.name,
-      weight: bsdd.quantityReceived || bsdd.wasteDetails?.quantity,
+      weight:
+        bsdd.review?.["content"]?.quantityReceived ||
+        bsdd.quantityReceived ||
+        bsdd.temporaryStorageDetail?.wasteDetails?.quantity ||
+        bsdd.wasteDetails?.quantity,
     },
     isTempStorage: bsdd.recipient?.isTempStorage,
     emitter: bsdd.emitter,
@@ -95,7 +99,10 @@ const mapBsda = (bsda: BsdaWithReview): BsdDisplay => {
     wasteDetails: {
       code: bsda.waste?.code || bsda.waste?.["bsdaCode"],
       name: bsda.waste?.materialName,
-      weight: bsda?.destination?.reception?.weight || bsda?.weight?.value,
+      weight:
+        bsda.review?.["content"]?.destination?.reception?.weight ||
+        bsda?.destination?.reception?.weight ||
+        bsda?.weight?.value,
     },
     emitter: bsda.emitter || bsda["bsdaEmitter"],
     destination: bsda.destination || bsda["bsdaDestination"],
@@ -120,6 +127,11 @@ const truncateTransporterInfo = (text?: string) =>
 
 export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
   const statusCode = bsdasri?.status || bsdasri["bsdasriStatus"];
+  const wasteCode = bsdasri.waste?.code || bsdasri["bsdasriWaste"]?.code;
+  const wasteName =
+    wasteCode === "18 01 03*"
+      ? "DASRI origine humaine"
+      : "DASRI origine animale"; //18 02 02*
   const bsdasriFormatted: BsdDisplay = {
     id: bsdasri.id,
     readableid: bsdasri.id,
@@ -127,8 +139,9 @@ export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     isDraft: bsdasri.isDraft,
     status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
-      code: bsdasri.waste?.code || bsdasri["bsdasriWaste"]?.code,
+      code: wasteCode,
       weight: bsdasri.destination?.operation?.weight?.value,
+      name: wasteName,
     },
     emitter: bsdasri.emitter || bsdasri["bsdasriEmitter"],
     destination: bsdasri.destination || bsdasri["bsdasriDestination"],
@@ -153,6 +166,9 @@ export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
 
 const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
   const statusCode = bsvhu?.status || bsvhu["bsvhuStatus"];
+  const wasteCode = bsvhu?.wasteCode;
+  const wasteName =
+    wasteCode === "16 01 04*" ? "VHU non dépollués" : "VHU dépollués"; //16 01 06
   const bsvhuFormatted: BsdDisplay = {
     id: bsvhu.id,
     readableid: bsvhu.id,
@@ -162,6 +178,7 @@ const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     wasteDetails: {
       code: bsvhu?.wasteCode,
       weight: bsvhu?.destination?.reception?.weight || bsvhu?.weight?.value,
+      name: wasteName,
     },
     emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
     destination: bsvhu.destination || bsvhu["bsvhuDestination"],
@@ -192,6 +209,7 @@ const mapBsff = (bsff: Bsff): BsdDisplay => {
     grouping: bsff.grouping,
     transporterCustomInfo: bsff["bsffTransporter"]?.customInfo,
     transporterNumberPlate: bsff["bsffTransporter"]?.transport?.plates,
+    packagings: bsff?.packagings,
   };
   return bsffFormatted;
 };

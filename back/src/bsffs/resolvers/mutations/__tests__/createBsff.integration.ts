@@ -14,13 +14,14 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { fullBsff } from "../../../fragments";
-import * as sirenify from "../../../sirenify";
+import { sirenifyBsffInput } from "../../../sirenify";
 import { createFicheIntervention } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "sirenifyBsffInput")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenifyBsffInput as jest.Mock).mockImplementation(input =>
+  Promise.resolve(input)
+);
 
 const CREATE_BSFF = gql`
   mutation CreateBsff($input: BsffInput!) {
@@ -86,7 +87,7 @@ const createInput = (emitter, transporter, destination) => ({
 describe("Mutation.createBsff", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
+    (sirenifyBsffInput as jest.Mock).mockClear();
   });
 
   it("should allow user to create a bsff", async () => {
@@ -113,7 +114,7 @@ describe("Mutation.createBsff", () => {
       })
     ]);
     // check input is sirenified
-    expect(sirenifyMock).toHaveBeenCalledTimes(1);
+    expect(sirenifyBsffInput as jest.Mock).toHaveBeenCalledTimes(1);
   });
 
   it("should create a bsff with a fiche d'intervention", async () => {

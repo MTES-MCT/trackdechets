@@ -1,29 +1,13 @@
-import axios from "axios";
 import templateIds from "../../mailer/templates/provider/templateIds";
-import * as mailing from "../../mailer/mailing";
+import { sendMail } from "../../mailer/mailing";
 import { Mail } from "../../mailer/types";
-import * as producer from "../producers/mail";
 import { mailQueue } from "../producers/mail";
-import { backend } from "../../mailer";
 import { resetCache } from "../../../integration-tests/helper";
+import { backend } from "../../mailer";
 
-// Intercept calls
-const mockedSendMailBackend = jest.spyOn(backend, "sendMail");
-const mockedSendMailSync = jest.spyOn(mailing, "sendMailSync");
-// Integration tests EMAIL_BACKEND is supposed to use axios.
-const axiosSpy = jest.spyOn(axios, "post");
-axiosSpy.mockResolvedValue(null);
-
-// Top level function with queue and sync fallback
-const { sendMail } = mailing;
+jest.mock("../../mailer");
 
 describe("Test the mail job queue", () => {
-  beforeEach(() => {
-    axiosSpy.mockClear();
-    mockedSendMailBackend.mockClear();
-    mockedSendMailSync.mockClear();
-  });
-
   afterAll(resetCache);
 
   it("sends the mail using the mail job queue", async () => {
@@ -59,9 +43,8 @@ describe("Test the mail job queue", () => {
   });
 
   it("fallback to sendMailSync when queue is broken which directly call axios.post", async () => {
-    // mocking the redis queue is down
-    const mockAddToMailQueue = jest.spyOn(producer, "addToMailQueue");
-    mockAddToMailQueue.mockRejectedValueOnce(new Error("any queue error"));
+    // Closing queue so add() fails
+    await mailQueue.close();
 
     // create the fake job
     const mail: Mail = {
@@ -72,7 +55,6 @@ describe("Test the mail job queue", () => {
     };
     // try to add to the queue but fallback to sendMailSync
     await sendMail(mail);
-    expect(axiosSpy).toHaveBeenCalledTimes(1);
-    expect(mockedSendMailBackend).toHaveBeenCalledTimes(1);
+    expect(backend.sendMail as jest.Mock).toHaveBeenCalledTimes(1);
   });
 });

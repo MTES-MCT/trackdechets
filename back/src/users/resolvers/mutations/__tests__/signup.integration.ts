@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
-import * as mailsHelper from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { onSignup } from "../../../../mailer/templates";
@@ -11,8 +11,8 @@ import makeClient from "../../../../__tests__/testClient";
 const viablePassword = "trackdechets#";
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 const SIGNUP = `
   mutation SignUp($userInfos: SignupInput!) {
@@ -33,7 +33,7 @@ describe("Mutation.signup", () => {
 
   afterEach(async () => {
     await resetDatabase();
-    sendMailSpy.mockClear();
+    (sendMail as jest.Mock).mockClear();
   });
 
   it("should create user, activation hash and send email", async () => {
@@ -66,7 +66,7 @@ describe("Mutation.signup", () => {
     });
     expect(activationHashes.length).toEqual(1);
 
-    expect(sendMailSpy).toHaveBeenCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       renderMail(onSignup, {
         to: [{ email: newUser.email, name: newUser.name }],
         variables: { activationHash: activationHashes[0].hash }

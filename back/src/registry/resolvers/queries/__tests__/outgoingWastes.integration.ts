@@ -17,7 +17,7 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../../../integration-tests/helper";
-import { indexBsda } from "../../../../bsda/elastic";
+import { getBsdaForElastic, indexBsda } from "../../../../bsda/elastic";
 import { bsdaFactory } from "../../../../bsda/__tests__/factories";
 import { indexBsdasri } from "../../../../bsdasris/elastic";
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
@@ -25,8 +25,7 @@ import { indexBsff } from "../../../../bsffs/elastic";
 import { createBsffAfterOperation } from "../../../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../../../bsvhu/elastic";
 import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
-import { getFullForm } from "../../../../forms/database";
-import { indexForm } from "../../../../forms/elastic";
+import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 import { Query } from "../../../../generated/graphql/types";
 import {
   formFactory,
@@ -171,8 +170,8 @@ describe("Outgoing wastes registry", () => {
     );
 
     await Promise.all([
-      indexForm(await getFullForm(bsd1)),
-      indexBsda({ ...bsd2, intermediaries: [] }),
+      indexForm(await getFormForElastic(bsd1)),
+      indexBsda(await getBsdaForElastic(bsd2)),
       indexBsdasri(bsd3),
       indexBsvhu(bsd4),
       indexBsff(bsd5)

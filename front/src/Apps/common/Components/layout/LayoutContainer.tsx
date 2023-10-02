@@ -13,7 +13,7 @@ import Loader from "Apps/common/Components/Loader/Loaders";
 import Layout from "./Layout";
 import routes from "Apps/routes";
 import { useQuery, gql } from "@apollo/client";
-import { Query } from "../generated/graphql/types";
+import { Query } from "../../../../generated/graphql/types";
 import ResendActivationEmail from "login/ResendActivationEmail";
 import Login from "login/Login";
 import { useFeatureFlags } from "common/contexts/FeatureFlagsContext";

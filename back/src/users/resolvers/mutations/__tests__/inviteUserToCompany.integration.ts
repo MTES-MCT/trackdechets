@@ -1,4 +1,4 @@
-import * as queue from "../../../../queue/producers/mail";
+import { addToMailQueue } from "../../../../queue/producers/mail";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   userWithCompanyFactory,
@@ -20,12 +20,11 @@ const INVITE_USER_TO_COMPANY = `
 `;
 
 // Intercept mail job creation
-const mockedAddToMailQueue = jest
-  .spyOn(queue, "addToMailQueue")
-  .mockImplementation(jest.fn());
+jest.mock("../../../../queue/producers/mail");
+(addToMailQueue as jest.Mock).mockImplementation(jest.fn());
 
 beforeEach(() => {
-  mockedAddToMailQueue.mockClear();
+  (addToMailQueue as jest.Mock).mockClear();
 });
 
 describe("mutation inviteUserToCompany", () => {
@@ -92,9 +91,11 @@ describe("mutation inviteUserToCompany", () => {
     const hashValue = hashes[0].hash;
 
     // Check that the job was added to the queue
-    expect(mockedAddToMailQueue as jest.Mock<any>).toHaveBeenCalledTimes(1);
+    expect(addToMailQueue as jest.Mock as jest.Mock<any>).toHaveBeenCalledTimes(
+      1
+    );
 
-    const addJobArgs: any = mockedAddToMailQueue.mock.calls[0];
+    const addJobArgs: any = (addToMailQueue as jest.Mock).mock.calls[0];
 
     // the right payload
     expect(addJobArgs[0]).toMatchObject({

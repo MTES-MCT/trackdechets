@@ -6,6 +6,7 @@ import { buildPdfAsBase64 } from "../pdf/generator";
 import DREALS from "../../common/constants/DREALS";
 import { formNotAccepted, formPartiallyRefused } from "../../mailer/templates";
 import { renderMail } from "../../mailer/templates/renderers";
+import Decimal from "decimal.js-light";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
@@ -79,6 +80,10 @@ export async function renderBsdaRefusedEmail(
         transporterReceipt: bsda.transporterRecepisseNumber,
         sentBy: bsda.emitterEmissionSignatureAuthor,
         quantityReceived: bsda.destinationReceptionWeight
+          ? new Decimal(bsda.destinationReceptionWeight)
+              .dividedBy(1000)
+              .toNumber()
+          : bsda.destinationReceptionWeight
       }
     },
     attachment: attachmentData

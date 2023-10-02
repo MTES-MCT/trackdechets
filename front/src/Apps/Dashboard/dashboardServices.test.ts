@@ -1096,7 +1096,7 @@ describe("dashboardServices", () => {
         UserPermission.BsdCanSignTransport,
       ];
       const result = getSignByProducerBtnLabel(
-        "currentSiret",
+        "currentSirett",
         {
           ...bsd,
           type: BsdType.Bsdasri,

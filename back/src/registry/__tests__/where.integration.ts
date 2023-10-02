@@ -3,7 +3,7 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../integration-tests/helper";
-import { indexBsda } from "../../bsda/elastic";
+import { getBsdaForElastic, indexBsda } from "../../bsda/elastic";
 import { bsdaFactory } from "../../bsda/__tests__/factories";
 import { indexBsdasri } from "../../bsdasris/elastic";
 import { bsdasriFactory } from "../../bsdasris/__tests__/factories";
@@ -12,8 +12,7 @@ import { createBsff } from "../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../bsvhu/elastic";
 import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
 import { client, index } from "../../common/elastic";
-import { getFullForm } from "../../forms/database";
-import { indexForm } from "../../forms/elastic";
+import { getFormForElastic, indexForm } from "../../forms/elastic";
 import { BsdType, WasteRegistryWhere } from "../../generated/graphql/types";
 import { formFactory, siretify, userFactory } from "../../__tests__/factories";
 import { toElasticFilter } from "../where";
@@ -35,15 +34,15 @@ describe("toElasticFilter", () => {
   it("should filter bsds by id (equality)", async () => {
     const user = await userFactory();
     const BSDS = {
-      BSDD: await getFullForm(await formFactory({ ownerId: user.id })),
-      BSDA: await bsdaFactory({}),
+      BSDD: await getFormForElastic(await formFactory({ ownerId: user.id })),
+      BSDA: await getBsdaForElastic(await bsdaFactory({})),
       BSDASRI: await bsdasriFactory({}),
       BSVHU: await bsvhuFactory({}),
       BSFF: await createBsff()
     };
     await Promise.all([
       indexForm(BSDS["BSDD"]),
-      indexBsda({ ...BSDS["BSDA"], intermediaries: [] }),
+      indexBsda({ ...BSDS["BSDA"] }),
       indexBsdasri(BSDS["BSDASRI"]),
       indexBsvhu(BSDS["BSVHU"]),
       indexBsff(BSDS["BSFF"])
@@ -76,8 +75,8 @@ describe("toElasticFilter", () => {
     async bsdType => {
       const user = await userFactory();
       const BSDS = {
-        BSDD: await getFullForm(await formFactory({ ownerId: user.id })),
-        BSDA: await bsdaFactory({}),
+        BSDD: await getFormForElastic(await formFactory({ ownerId: user.id })),
+        BSDA: await getBsdaForElastic(await bsdaFactory({})),
         BSDASRI: await bsdasriFactory({}),
         BSVHU: await bsvhuFactory({}),
         BSFF: await createBsff()
@@ -89,7 +88,7 @@ describe("toElasticFilter", () => {
 
       await Promise.all([
         indexForm(BSDS["BSDD"]),
-        indexBsda({ ...BSDS["BSDA"], intermediaries: [] }),
+        indexBsda({ ...BSDS["BSDA"] }),
         indexBsdasri(BSDS["BSDASRI"]),
         indexBsvhu(BSDS["BSVHU"]),
         indexBsff(BSDS["BSFF"])
@@ -105,8 +104,8 @@ describe("toElasticFilter", () => {
   it("should filter on bsdType (present in list)", async () => {
     const user = await userFactory();
     const BSDS = {
-      BSDD: await getFullForm(await formFactory({ ownerId: user.id })),
-      BSDA: await bsdaFactory({}),
+      BSDD: await getFormForElastic(await formFactory({ ownerId: user.id })),
+      BSDA: await getBsdaForElastic(await bsdaFactory({})),
       BSDASRI: await bsdasriFactory({}),
       BSVHU: await bsvhuFactory({}),
       BSFF: await createBsff()
@@ -118,7 +117,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all([
       indexForm(BSDS["BSDD"]),
-      indexBsda({ ...BSDS["BSDA"], intermediaries: [] }),
+      indexBsda({ ...BSDS["BSDA"] }),
       indexBsdasri(BSDS["BSDASRI"]),
       indexBsvhu(BSDS["BSVHU"]),
       indexBsff(BSDS["BSFF"])
@@ -172,7 +171,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3, form4].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -223,7 +222,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -500,7 +500,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3, form4].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -551,7 +551,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -832,7 +833,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3, form4].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -882,7 +883,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -1139,7 +1141,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3, form4].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -1175,7 +1177,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -1333,7 +1336,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3, form4].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -1369,7 +1372,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -1527,7 +1531,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3, form4].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -1562,7 +1566,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -1714,7 +1719,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -1746,7 +1751,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -1866,7 +1872,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -1896,7 +1902,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -2015,7 +2022,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -2044,7 +2051,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -2170,7 +2178,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -2200,7 +2208,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -2326,7 +2335,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -2359,7 +2368,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -2500,7 +2510,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -2529,7 +2539,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -2649,7 +2660,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -2679,7 +2690,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -2801,7 +2813,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -2834,7 +2846,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();
@@ -2967,7 +2980,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [form1, form2, form3].map(async f => {
-        return indexForm(await getFullForm(f));
+        return indexForm(await getFormForElastic(f));
       })
     );
     await refreshElasticSearch();
@@ -2996,7 +3009,8 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda({ ...bsda, intermediaries: [] });
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
       })
     );
     await refreshElasticSearch();

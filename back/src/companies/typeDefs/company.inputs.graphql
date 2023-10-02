@@ -1,0 +1,44 @@
+"""
+Payload de création d'un récépissé transporteur
+"""
+input CreateTransporterReceiptInput {
+  """
+  Numéro de récépissé transporteur
+  """
+  receiptNumber: String!
+
+  """
+  Limite de validité du récépissé
+  """
+  validityLimit: DateTime!
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String!
+}
+
+"""
+Payload d'édition d'un récépissé transporteur
+"""
+input UpdateTransporterReceiptInput {
+  """
+  The id of the transporter receipt to modify
+  """
+  id: ID!
+
+  """
+  Numéro de récépissé transporteur
+  """
+  receiptNumber: String
+
+  """
+  Limite de validité du récépissé
+  """
+  validityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String
+}

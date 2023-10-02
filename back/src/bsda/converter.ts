@@ -46,7 +46,7 @@ import {
 } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { Decimal } from "decimal.js-light";
-import { RawBsda } from "./elastic";
+import { BsdaForElastic } from "./elastic";
 
 export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
   return {
@@ -221,7 +221,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
   };
 }
 export function expandBsdaFromElastic(
-  bsda: RawBsda
+  bsda: BsdaForElastic
 ): GraphqlBsda & { groupedIn?: string; forwardedIn?: string } {
   const expanded = expandBsdaFromDb(bsda);
 

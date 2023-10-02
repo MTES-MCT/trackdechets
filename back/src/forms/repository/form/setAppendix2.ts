@@ -1,6 +1,8 @@
 import { Form } from "@prisma/client";
 import { RepositoryFnDeps } from "../../../common/repository/types";
-import buildUpdateAppendix2Forms from "./updateAppendix2Forms";
+import buildUpdateAppendix2Forms, {
+  FormForUpdateAppendix2FormsInclude
+} from "./updateAppendix2Forms";
 
 class FormFraction {
   form: Form;
@@ -113,7 +115,8 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
     ];
 
     const dirtyForms = await prisma.form.findMany({
-      where: { id: { in: dirtyFormIds } }
+      where: { id: { in: dirtyFormIds } },
+      include: FormForUpdateAppendix2FormsInclude
     });
 
     const updateAppendix2Forms = buildUpdateAppendix2Forms({ prisma, user });
