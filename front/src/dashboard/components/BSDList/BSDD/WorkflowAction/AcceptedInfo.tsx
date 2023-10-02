@@ -15,6 +15,7 @@ import {
 } from "generated/graphql/types";
 import { textConfig } from "./ReceivedInfo";
 import { RedErrorMessage } from "common/components";
+import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
 
 export type AcceptedInfoValues = {
   signedBy: string;
@@ -138,7 +139,11 @@ export default function AcceptedInfo({
               <Field
                 name="quantityType"
                 id="ESTIMATED"
-                label="Estimée"
+                label={
+                  <>
+                    Estimée <EstimatedQuantityTooltip />
+                  </>
+                }
                 component={RadioButton}
               />
             </fieldset>
