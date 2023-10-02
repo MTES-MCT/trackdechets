@@ -11,6 +11,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Dans les PDFs des BSDDs, les totaux des conditionnements ont été corrigés [PR 2725](https://github.com/MTES-MCT/trackdechets/pull/2725)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
