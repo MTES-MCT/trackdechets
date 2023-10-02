@@ -163,7 +163,7 @@ export function Destination({ disabled }) {
             <label>
               N° CAP:
               <Field
-                disabled={disabled}
+                disabled={hasNextDestination ? false : disabled}
                 type="text"
                 name={
                   hasNextDestination
@@ -187,7 +187,7 @@ export function Destination({ disabled }) {
               : "destination.plannedOperationCode"
           }
           className="td-select"
-          disabled={disabled}
+          disabled={hasNextDestination ? false : disabled}
         >
           <option />
           {isDechetterie && !hasNextDestination ? (

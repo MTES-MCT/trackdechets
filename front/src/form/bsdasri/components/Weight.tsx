@@ -6,6 +6,7 @@ import React from "react";
 
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { getNestedNode } from "common/helper";
+import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
 
 export default function WeightWidget({
   switchLabel,
@@ -63,7 +64,11 @@ export default function WeightWidget({
           <div className="form__row">
             <Field
               type="checkbox"
-              label="Il s'agit d'une estimation"
+              label={
+                <>
+                  Estimée <EstimatedQuantityTooltip />
+                </>
+              }
               component={FieldSwitch}
               name={`${weightPath}.isEstimate`}
               disabled={disabled}

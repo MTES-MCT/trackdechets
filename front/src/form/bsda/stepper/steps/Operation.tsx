@@ -113,6 +113,8 @@ export default function Operation({ bsda }: Props) {
               Date de l'opération
               <Field
                 component={DateInput}
+                minDate={subMonths(TODAY, 2)}
+                maxDate={TODAY}
                 name="destination.operation.date"
                 className={`td-input td-input--small`}
               />
