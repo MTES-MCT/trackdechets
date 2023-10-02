@@ -5,6 +5,20 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.10.1] 10/10/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Lorsqu'une demande de révision met à jour le code déchet, le champ `wasteDetailsIsDangerous` aussi se met à jour [PR 2708](https://github.com/MTES-MCT/trackdechets/pull/2708)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :house: Interne
+
 # [2023.9.1] 19/09/2023
 
 #### :rocket: Nouvelles fonctionnalités
