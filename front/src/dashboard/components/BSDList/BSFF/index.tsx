@@ -5,10 +5,10 @@ import { BsffActions } from "./BsffActions/BsffActions";
 import { BsffFragment } from "./types";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { WorkflowAction } from "./WorkflowAction";
-import { bsffVerboseStatuses } from "form/bsff/utils/constants";
 import { UpdateTransporterCustomInfo } from "./BsffActions/UpdateTransporterCustomInfo";
 import { UpdateTransporterPlates } from "./BsffActions/UpdateTransporterPlates";
 import { BsffStatus } from "generated/graphql/types";
+import { BSFF_VERBOSE_STATUSES } from "generated/constants/statuses";
 
 export const COLUMNS: Record<
   string,
@@ -85,7 +85,7 @@ export const COLUMNS: Record<
   },
   status: {
     accessor: bsff =>
-      bsff.isDraft ? "Brouillon" : bsffVerboseStatuses[bsff.bsffStatus],
+      bsff.isDraft ? "Brouillon" : BSFF_VERBOSE_STATUSES[bsff.bsffStatus],
   },
   workflow: {
     accessor: () => null,

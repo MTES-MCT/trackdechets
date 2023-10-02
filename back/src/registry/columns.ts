@@ -7,15 +7,23 @@ import {
   TransportedWaste
 } from "../generated/graphql/types";
 import { GenericWaste } from "./types";
+import { formatStatusLabel } from "../common/constants/statuses";
+
+// Type for custom fields that might not be in the DB
+// But that we still want to display (ie for user convenience)
+type CustomWaste = {
+  statusLabel: string;
+};
 
 type Column = {
   field: keyof (IncomingWaste &
     OutgoingWaste &
     TransportedWaste &
     ManagedWaste &
-    AllWaste);
+    AllWaste &
+    CustomWaste);
   label: string;
-  format?: (v: unknown) => string | number | null;
+  format?: (v: unknown, full: unknown) => string | number | null;
 };
 
 const formatDate = (d: Date | null) => d?.toISOString().slice(0, 10) ?? "";
@@ -58,7 +66,12 @@ const columns: Column[] = [
   },
   { field: "bsdType", label: "Type de bordereau" },
   { field: "customId", label: "Identifiant secondaire" },
-  { field: "status", label: "Statut du bordereau" },
+  { field: "status", label: "Statut du bordereau (code)" },
+  {
+    field: "status",
+    label: "Statut du bordereau",
+    format: formatStatusLabel
+  },
   { field: "wasteDescription", label: "Dénomination usuelle" },
   { field: "wasteCode", label: "Code du déchet" },
   {
@@ -211,7 +224,7 @@ export function formatRow(waste: GenericWaste, useLabelAsKey = false) {
       return {
         ...acc,
         [key]: column.format
-          ? column.format(waste[column.field])
+          ? column.format(waste[column.field], waste)
           : waste[column.field] ?? ""
       };
     }
