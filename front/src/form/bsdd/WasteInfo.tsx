@@ -17,6 +17,7 @@ import {
   bsddWasteCodeValidator,
 } from "./components/waste-code";
 import "./WasteInfo.scss";
+import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
 
 type Values = {
   wasteDetails: {
@@ -259,7 +260,11 @@ export default connect<{ disabled }, Values>(function WasteInfo({
               <Field
                 name="wasteDetails.quantityType"
                 id="ESTIMATED"
-                label="Estimée"
+                label={
+                  <>
+                    Estimée <EstimatedQuantityTooltip />
+                  </>
+                }
                 component={RadioButton}
                 disabled={disabled}
               />

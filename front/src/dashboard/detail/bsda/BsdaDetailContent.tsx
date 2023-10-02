@@ -33,6 +33,7 @@ import { generatePath, useHistory, useParams } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { InitialBsdas } from "./InitialBsdas";
 import { getOperationModeLabel } from "common/operationModes";
+import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -478,7 +479,15 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
               ) : (
                 <>
                   {form?.weight?.value} tonne(s) (
-                  {form?.weight?.isEstimate ? "estimé" : "réel"})
+                  {form?.weight?.isEstimate ? (
+                    <>
+                      estimé
+                      <EstimatedQuantityTooltip />
+                    </>
+                  ) : (
+                    "réel"
+                  )}
+                  )
                 </>
               )}
             </dd>

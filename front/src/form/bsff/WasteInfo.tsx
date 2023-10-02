@@ -6,6 +6,7 @@ import { BSFF_WASTES } from "generated/constants";
 import React, { useEffect, useMemo } from "react";
 import Packagings from "./components/packagings/Packagings";
 import { PreviousPackagingsPicker } from "./components/PreviousPackagingsPicker";
+import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
 
 export default function WasteInfo({ disabled }) {
   const { setFieldValue, values } = useFormikContext<
@@ -176,7 +177,11 @@ export default function WasteInfo({ disabled }) {
         </label>
         <Field
           type="checkbox"
-          label="Il s'agit d'une estimation"
+          label={
+            <>
+              Estimée <EstimatedQuantityTooltip />
+            </>
+          }
           component={FieldSwitch}
           name="weight.isEstimate"
           disabled={disabled}
