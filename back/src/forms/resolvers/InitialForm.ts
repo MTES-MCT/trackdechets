@@ -1,7 +1,6 @@
 import { InitialFormResolvers } from "../../generated/graphql/types";
 import prisma from "../../prisma";
 import { isFormReader } from "../permissions";
-import quantityGrouped from "./forms/quantityGrouped";
 
 const initialFormResolvers: InitialFormResolvers = {
   emitter: async (parent, _, { user }) => {
@@ -18,8 +17,7 @@ const initialFormResolvers: InitialFormResolvers = {
       return null;
     }
     return parent.emitter ?? null;
-  },
-  quantityGrouped
+  }
 };
 
 export default initialFormResolvers;

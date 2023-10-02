@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { CompanyType, EmitterType, Status, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
-import * as mailsHelper from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import {
   companyFactory,
   formFactory,
@@ -19,19 +19,16 @@ import {
   Mutation,
   MutationMarkAsReceivedArgs
 } from "../../../../generated/graphql/types";
-import * as generateBsddPdf from "../../../pdf/generateBsddPdf";
+import { generateBsddPdfToBase64 } from "../../../pdf/generateBsddPdf";
 import getReadableId from "../../../readableId";
 import { getFirstTransporter } from "../../../database";
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
-const generateBsddPdfToBase64Spy = jest.spyOn(
-  generateBsddPdf,
-  "generateBsddPdfToBase64"
-);
-generateBsddPdfToBase64Spy.mockResolvedValue("");
+jest.mock("../../../pdf/generateBsddPdf");
+(generateBsddPdfToBase64 as jest.Mock).mockResolvedValue("");
 
 const MARK_AS_RECEIVED = `
   mutation MarkAsReceived($id: ID!, $receivedInfo: ReceivedFormInput!){
@@ -280,7 +277,7 @@ describe("Test Form reception", () => {
     });
     expect(logs.length).toBe(1);
     expect(logs[0].status).toBe("REFUSED");
-    expect(sendMailSpy).toHaveBeenCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
           "Refus de prise en charge de votre déchet de l'entreprise company_1"

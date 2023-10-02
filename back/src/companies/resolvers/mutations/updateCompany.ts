@@ -15,7 +15,13 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   args,
   context
 ) => {
-  applyAuthStrategies(context, [AuthType.Session]);
+  const authStrategies = [AuthType.Session];
+  if (args.transporterReceiptId && Object.keys(args).length === 1) {
+    // Autorise une modification de l'établissement par API si elle
+    // porte sur le récépissé transporteur uniquement
+    authStrategies.push(AuthType.Bearer);
+  }
+  applyAuthStrategies(context, authStrategies);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ id: args.id });
 

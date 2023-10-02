@@ -75,27 +75,47 @@ interface SignBsffOperationProps {
   bsffId: string;
 }
 
+interface ModalAdapterProps {
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
+}
+
 /**
  * Bouton d'action permettant de signer l'opération d'un BSFF
  * avec un seul contenant
  */
 export function SignBsffOperationOnePackaging({
   bsffId,
-}: Pick<SignBsffOperationProps, "bsffId">) {
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton = true,
+}: Pick<SignBsffOperationProps, "bsffId"> & ModalAdapterProps): JSX.Element {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
     <>
-      <ActionButton
-        icon={<IconCheckCircle1 size="24px" />}
-        onClick={() => setIsOpen(true)}
-      >
-        Signer l'opération
-      </ActionButton>
-      {isOpen && (
+      {displayActionButton && (
+        <>
+          <ActionButton
+            icon={<IconCheckCircle1 size="24px" />}
+            onClick={() => setIsOpen(true)}
+          >
+            Signer l'opération
+          </ActionButton>
+          {isOpen && (
+            <SignBsffOperationOnePackagingModal
+              bsffId={bsffId}
+              onClose={() => setIsOpen(false)}
+            />
+          )}
+        </>
+      )}
+
+      {isModalOpenFromParent && (
         <SignBsffOperationOnePackagingModal
           bsffId={bsffId}
-          onClose={() => setIsOpen(false)}
+          onClose={onModalCloseFromParent!}
         />
       )}
     </>

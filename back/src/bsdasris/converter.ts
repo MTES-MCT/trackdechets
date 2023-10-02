@@ -41,7 +41,7 @@ import {
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
-import { RawBsdasri } from "./elastic";
+import { BsdasriForElastic } from "./elastic";
 
 export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
   return {
@@ -195,7 +195,9 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
   };
 }
 
-export function expandBsdasriFromElastic(bsdasri: RawBsdasri): GqlBsdasri {
+export function expandBsdasriFromElastic(
+  bsdasri: BsdasriForElastic
+): GqlBsdasri {
   const expanded = expandBsdasriFromDB(bsdasri);
 
   // pass down related field to sub-resolvers

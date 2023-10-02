@@ -1,4 +1,4 @@
-import * as mailsHelper from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import makeClient from "../../../../__tests__/testClient";
 import {
   formFactory,
@@ -9,6 +9,8 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { gql } from "graphql-tag";
 import prisma from "../../../../prisma";
+import { getFormRepository } from "../../../repository";
+import { AuthType } from "../../../../auth";
 
 const APPENDIX_FORMS = gql`
   query AppendixForm($siret: String!) {
@@ -19,8 +21,8 @@ const APPENDIX_FORMS = gql`
 `;
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 describe("Test appendixForms", () => {
   afterEach(async () => {
@@ -35,6 +37,11 @@ describe("Test appendixForms", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "ADMIN"
     );
+
+    const { updateAppendix2Forms } = getFormRepository({
+      ...ttr,
+      auth: AuthType.Session
+    });
 
     // This form is in AWAITING_GROUP and should be returned
     const awaitingGroupForm = await formFactory({
@@ -129,6 +136,8 @@ describe("Test appendixForms", () => {
         quantity: 0.5 // partially grouped,
       }
     });
+
+    await updateAppendix2Forms([initialForm1, initialForm2]);
 
     const { query } = makeClient(ttr);
     const {

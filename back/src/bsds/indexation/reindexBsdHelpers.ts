@@ -1,10 +1,9 @@
 import prisma from "../../prisma";
-import { indexBsda } from "../../bsda/elastic";
+import { BsdaForElasticInclude, indexBsda } from "../../bsda/elastic";
 import { indexBsdasri } from "../../bsdasris/elastic";
 import { indexBsff } from "../../bsffs/elastic";
 import { indexBsvhu } from "../../bsvhu/elastic";
-import { indexForm } from "../../forms/elastic";
-import { getFullForm } from "../../forms/database";
+import { getFormForElastic, indexForm } from "../../forms/elastic";
 import { deleteBsd } from "../../common/elastic";
 import { getReadonlyBsdaRepository } from "../../bsda/repository";
 import { getReadonlyBsvhuRepository } from "../../bsvhu/repository";
@@ -15,11 +14,7 @@ export async function reindex(bsdId, exitFn) {
     const bsda = await getReadonlyBsdaRepository().findUnique(
       { id: bsdId },
       {
-        include: {
-          forwardedIn: { select: { id: true } },
-          groupedIn: { select: { id: true } },
-          intermediaries: true
-        }
+        include: BsdaForElasticInclude
       }
     );
     if (!!bsda && !bsda.isDeleted) {
@@ -76,14 +71,11 @@ export async function reindex(bsdId, exitFn) {
   }
 
   if (bsdId.startsWith("BSD-") || bsdId.startsWith("TD-")) {
-    const bsdd = await prisma.form.findFirstOrThrow({
-      where: { readableId: bsdId }
-    });
-    if (bsdd.isDeleted) {
-      await deleteBsd({ id: bsdd.id });
+    const formForElastic = await getFormForElastic({ readableId: bsdId });
+    if (formForElastic.isDeleted) {
+      await deleteBsd({ id: formForElastic.id });
     } else {
-      const fullBsdd = await getFullForm(bsdd);
-      await indexForm(fullBsdd);
+      await indexForm(formForElastic);
     }
     return exitFn(true);
   }
