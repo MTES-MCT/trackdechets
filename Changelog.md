@@ -9,6 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- En préparation du bordereau PAOH, le profil d'entreprise "crématorium" est disponible [PR 2743](https://github.com/MTES-MCT/trackdechets/pull/2743)
+
 #### :bug: Corrections de bugs
 
 - Il n'est plus possible de corriger la quantité reçue avant réception par l'exutoire, et de dépasser 40T pour du transport routier [PR 2719](https://github.com/MTES-MCT/trackdechets/pull/2719)
@@ -24,6 +26,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Optimisation appendixForms : pré-calcul de quantityGrouped [PR 2701](https://github.com/MTES-MCT/trackdechets/pull/2701) 
+
+#### :house: Interne
 
 # [2023.9.1] 19/09/2023
 

@@ -19,6 +19,7 @@ enum CompanyType {
   BROKER
   ECO_ORGANISME
   WORKER
+  CREMATORIUM
 }
 
 enum CompanyVerificationMode {
