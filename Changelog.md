@@ -11,6 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Il n'est plus possible de corriger la quantité reçue avant réception par l'exutoire, et de dépasser 40T pour du transport routier [PR 2719](https://github.com/MTES-MCT/trackdechets/pull/2719)
 - Dans les PDFs des BSDDs, les totaux des conditionnements ont été corrigés [PR 2725](https://github.com/MTES-MCT/trackdechets/pull/2725)
 
 #### :boom: Breaking changes
