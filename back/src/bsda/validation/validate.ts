@@ -1,7 +1,7 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
 import { BsdaSignatureType } from "../../generated/graphql/types";
-import { SIGNATURES_HIERARCHY } from "./edition";
+import { SIGNATURES_HIERARCHY, SIGNATURES_HIERARCHY_KEYS } from "./edition";
 import { getReadonlyBsdaRepository } from "../repository";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { editionRules } from "./rules";
@@ -24,19 +24,12 @@ export async function parseBsda(
   return contextualSchema.parseAsync(bsda);
 }
 
-const SIGNATURES_SORTED_BY_CHRONOLOGICAL_ORDER = [
-  "EMISSION",
-  "WORK",
-  "TRANSPORT",
-  "OPERATION"
-];
-
 const isStepAhead = (step1, step2) => {
   if (!step1 || !step2) return false;
 
   return (
-    SIGNATURES_SORTED_BY_CHRONOLOGICAL_ORDER.indexOf(step1) >=
-    SIGNATURES_SORTED_BY_CHRONOLOGICAL_ORDER.indexOf(step2)
+    SIGNATURES_HIERARCHY_KEYS.indexOf(step1) >=
+    SIGNATURES_HIERARCHY_KEYS.indexOf(step2)
   );
 };
 
@@ -88,9 +81,7 @@ export function getContextualBsdaSchema(
               rule.sealedBy
             ) && rule.isRequired(val);
         } else if (
-          SIGNATURES_SORTED_BY_CHRONOLOGICAL_ORDER.includes(
-            rule.isRequired as string
-          )
+          SIGNATURES_HIERARCHY_KEYS.includes(rule.isRequired as string)
         ) {
           fieldIsRequired = isStepAhead(
             validationContext.currentSignatureType,

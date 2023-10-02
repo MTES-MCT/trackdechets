@@ -131,6 +131,7 @@ export const SIGNATURES_HIERARCHY: {
   },
   OPERATION: { field: "destinationOperationSignatureDate" }
 };
+export const SIGNATURES_HIERARCHY_KEYS = Object.keys(SIGNATURES_HIERARCHY);
 
 /**
  * Checks if the BSDA is awaiting a specific signature type
