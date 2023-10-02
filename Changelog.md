@@ -17,6 +17,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Ajout d'un colonne dans le registre avec une version lisible du statut des BSDs [PR 2707](https://github.com/MTES-MCT/trackdechets/pull/2707)
 - Wording: mise en conformité ADR2023 sur les quantités estimées [PR 2722](https://github.com/MTES-MCT/trackdechets/pull/2722)
 
 #### :house: Interne

@@ -23,11 +23,7 @@ import {
   QueryCompanyPrivateInfosArgs,
   OperationMode,
 } from "generated/graphql/types";
-import {
-  emitterTypeLabels,
-  getTransportModeLabel,
-  statusLabels,
-} from "../../constants";
+import { emitterTypeLabels, getTransportModeLabel } from "../../constants";
 import {
   IconWarehouseDelivery,
   IconWarehouseStorage,
@@ -72,6 +68,7 @@ import { useQuery } from "@apollo/client";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
 import { formTransportIsPipeline } from "form/bsdd/utils/packagings";
 import { getOperationModeLabel } from "common/operationModes";
+import { STATUS_LABELS } from "generated/constants/statuses";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -563,7 +560,7 @@ const Appendix1 = ({
                   <br />
                   {form.emitter?.company?.siret}
                 </td>
-                <td>{form.status ? statusLabels[form.status] : "-"}</td>
+                <td>{form.status ? STATUS_LABELS[form.status] : "-"}</td>
                 <td>
                   <WorkflowAction
                     siret={siret}
@@ -642,7 +639,7 @@ export default function BSDDetailContent({
             <IconBSDD className="tw-mr-2" />
 
             <span className={styles.detailStatus}>
-              [{statusLabels[form.status]}]
+              [{STATUS_LABELS[form.status]}]
             </span>
             {form.status !== "DRAFT" && <span>{form.readableId}</span>}
 
