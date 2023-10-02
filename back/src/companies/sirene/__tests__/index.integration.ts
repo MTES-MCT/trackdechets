@@ -1,14 +1,17 @@
 import prisma from "../../../prisma";
-import * as searchCompanyDecorated from "../searchCompany";
 import { searchCompany } from "../../search";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { AnonymousCompanyError } from "../errors";
 import { siretify } from "../../../__tests__/factories";
 import { removeEmptyKeys } from "../../../common/converter";
 
-const searchCompanySpy = jest.spyOn(searchCompanyDecorated, "default");
+const mockSearchCompany = jest.fn();
+jest.mock("../searchCompany", () => ({
+  __esModule: true,
+  default: (...args) => mockSearchCompany(...args)
+}));
 // Mock the fact a siret is not found in SIRENE API's
-searchCompanySpy.mockRejectedValue(new AnonymousCompanyError());
+mockSearchCompany.mockRejectedValue(new AnonymousCompanyError());
 
 describe("searchCompany", () => {
   const OLD_ENV = process.env;

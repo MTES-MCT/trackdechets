@@ -13,6 +13,7 @@ import {
   getPrimaryActionsLabelFromBsdStatus,
   getPrimaryActionsReviewsLabel,
   getWorkflowLabel,
+  isAppendix1,
   isBsdasri,
   isBsff,
   isBsvhu,
@@ -26,9 +27,7 @@ import {
   useBsffDownloadPdf,
   useBsvhuDownloadPdf,
 } from "Apps/Dashboard/Components/Pdf/useDownloadPdf";
-import { BsdType } from "generated/graphql/types";
-
-import "./bsdCard.scss";
+import { BsdType, Query, QueryFormArgs } from "generated/graphql/types";
 import {
   useBsdaDuplicate,
   useBsdasriDuplicate,
@@ -43,6 +42,10 @@ import { useMedia } from "use-media";
 import { MEDIA_QUERIES } from "common/config";
 import { usePermissions } from "common/contexts/PermissionsContext";
 import { UserPermission } from "generated/graphql/types";
+import { useLazyQuery } from "@apollo/client";
+import { GET_DETAIL_FORM } from "Apps/common/queries";
+
+import "./bsdCard.scss";
 
 function BsdCard({
   bsd,
@@ -106,6 +109,13 @@ function BsdCard({
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const [getDetails] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(
+    GET_DETAIL_FORM,
+    {
+      fetchPolicy: "network-only",
+    }
+  );
+
   const isDuplicating =
     isDuplicatingBsdd ||
     isDuplicatingBsda ||
@@ -143,7 +153,15 @@ function BsdCard({
   const handleValidationClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
-    onValidate(bsd);
+    if (isAppendix1(bsdDisplay!)) {
+      getDetails({ variables: { id: bsd.id, readableId: null } }).then(
+        ({ data }) => {
+          onValidate(data!.form);
+        }
+      );
+    } else {
+      onValidate(bsd);
+    }
   };
   const handleEditableInfoClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -314,6 +332,9 @@ function BsdCard({
                     isDraft={bsdDisplay.isDraft}
                     bsdType={bsdDisplay.type}
                     reviewStatus={bsdDisplay?.review?.status}
+                    operationCode={
+                      bsdDisplay?.destination?.["operation"]?.["code"]
+                    }
                   />
                 </div>
                 {isMobile && <div className="bsd-card-border" />}

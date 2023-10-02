@@ -15,7 +15,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import * as mailer from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import { contentAwaitsGuest } from "../../../../mailer/templates";
 import { renderMail } from "../../../../mailer/templates/renderers";
 
@@ -26,21 +26,24 @@ jest.mock("axios", () => ({
 }));
 
 // No mails
-const sendMailSpy = jest.spyOn(mailer, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 // Mock external search services
-import * as search from "../../../../companies/sirene/searchCompany";
 import { MARK_AS_SEALED } from "./mutations";
 
-const searchCompanyMock = jest.spyOn(search, "default");
+const mockSearchCompany = jest.fn();
+jest.mock("../../../../companies/sirene/searchCompany", () => ({
+  __esModule: true,
+  default: (...args) => mockSearchCompany(...args)
+}));
 
 describe("Mutation.markAsSealed", () => {
   const OLD_ENV = process.env;
 
   beforeEach(() => {
     jest.resetModules();
-    searchCompanyMock.mockReset();
+    mockSearchCompany.mockReset();
     process.env.VERIFY_COMPANY = "false";
   });
 
@@ -631,9 +634,19 @@ describe("Mutation.markAsSealed", () => {
   it("should mark appendix2 forms as grouped", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destination = await destinationFactory();
-    const appendix2 = await formFactory({
+    const groupedForm1 = await formFactory({
       ownerId: user.id,
       opt: { status: "AWAITING_GROUP", quantityReceived: 1 }
+    });
+
+    // it should also work for BSD with temporary storage
+    const groupedForm2 = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        quantityReceived: 0.02
+      },
+      forwardedInOpts: { quantityReceived: 0.007 }
     });
 
     const form = await formFactory({
@@ -644,10 +657,16 @@ describe("Mutation.markAsSealed", () => {
         emitterCompanySiret: company.siret,
         recipientCompanySiret: destination.siret,
         grouping: {
-          create: {
-            initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived!
-          }
+          create: [
+            {
+              initialFormId: groupedForm1.id,
+              quantity: groupedForm1.quantityReceived!
+            },
+            {
+              initialFormId: groupedForm2.id,
+              quantity: groupedForm2.forwardedIn!.quantityReceived!
+            }
+          ]
         }
       }
     });
@@ -658,10 +677,14 @@ describe("Mutation.markAsSealed", () => {
       variables: { id: form.id }
     });
 
-    const appendix2grouped = await prisma.form.findUniqueOrThrow({
-      where: { id: appendix2.id }
+    const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm1.id }
     });
-    expect(appendix2grouped.status).toEqual("GROUPED");
+    expect(updatedGroupedForm1.status).toEqual("GROUPED");
+    const updatedGroupedForm2 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm2.id }
+    });
+    expect(updatedGroupedForm2.status).toEqual("GROUPED");
   });
 
   it("should throw an error if destination is not registered in TD", async () => {
@@ -900,7 +923,7 @@ describe("Mutation.markAsSealed", () => {
       variables: { id: form.id }
     });
 
-    expect(sendMailSpy).toHaveBeenCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       renderMail(contentAwaitsGuest, {
         to: [
           { email: form.emitterCompanyMail!, name: form.emitterCompanyContact! }
@@ -952,7 +975,7 @@ describe("Mutation.markAsSealed", () => {
       variables: { id: form.id }
     });
 
-    expect(sendMailSpy).not.toHaveBeenCalled();
+    expect(sendMail as jest.Mock).not.toHaveBeenCalled();
   });
 
   it("should throw a ValidationError if missing broker contact info", async () => {

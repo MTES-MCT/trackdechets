@@ -1,6 +1,6 @@
 import prisma from "../../prisma";
 import { searchCompany } from "../../companies/sirene/insee/client";
-import geocode from "../../companies/geo/geocode";
+import { geocode } from "../../companies/geo/geocode";
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));

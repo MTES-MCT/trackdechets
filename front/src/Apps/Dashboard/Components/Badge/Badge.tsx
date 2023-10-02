@@ -13,6 +13,7 @@ function Badge({
   isDraft,
   bsdType,
   reviewStatus,
+  operationCode,
 }: BadgeProps): JSX.Element {
   return (
     <>
@@ -28,7 +29,7 @@ function Badge({
           "fr-badge--canceled": status === BsdStatusCode.Canceled,
         })}
       >
-        {getBsdStatusLabel(status, isDraft, bsdType)}
+        {getBsdStatusLabel(status, isDraft, bsdType, operationCode)}
       </p>
       {reviewStatus && (
         <>

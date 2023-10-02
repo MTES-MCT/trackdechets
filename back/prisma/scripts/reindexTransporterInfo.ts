@@ -1,7 +1,10 @@
 import { Updater, registerUpdater } from "./helper/helper";
 import prisma from "../../src/prisma";
 import { indexBsds, index } from "../../src/common/elastic";
-import { toBsdElastic as bsdaToBsdElastic } from "../../src/bsda/elastic";
+import {
+  BsdaForElasticInclude,
+  toBsdElastic as bsdaToBsdElastic
+} from "../../src/bsda/elastic";
 import { toBsdElastic as bsdasriToBsdElastic } from "../../src/bsdasris/elastic";
 import { toBsdElastic as bsffToBsdElastic } from "../../src/bsffs/elastic";
 
@@ -19,7 +22,7 @@ export class ReindexTransporterInfo implements Updater {
           { transporterTransportPlates: { isEmpty: false } }
         ]
       },
-      include: { intermediaries: true }
+      include: BsdaForElasticInclude
     });
 
     const bsdasris = await prisma.bsdasri.findMany({

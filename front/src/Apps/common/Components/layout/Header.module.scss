@@ -9,7 +9,6 @@
   justify-content: space-between;
 }
 .headerToggle {
-  padding-right: 1rem;
   background-color: $blue-dark;
   height: 100px;
   display: flex;
@@ -76,7 +75,6 @@
   padding-right: 0.5rem;
   position: fixed;
   left: 0;
-  background-color: #fff;
   border-right: 1px solid $grey-light;
 
   box-shadow: 10px 5px 5px rgba(0, 0, 0, 0.1);
@@ -154,7 +152,6 @@
 }
 
 .headerNavLink {
-  padding: 0.5rem 1rem;
   text-decoration: none;
   color: $blue;
   padding: 1rem 0 1rem 1rem;

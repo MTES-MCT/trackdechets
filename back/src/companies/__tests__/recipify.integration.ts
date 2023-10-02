@@ -1,11 +1,8 @@
 import { recipifyGeneric, findCompanyFailFast } from "../recipify";
-import logger from "../../logging/logger";
 import {
   companyFactory,
   transporterReceiptFactory
 } from "../../__tests__/factories";
-
-jest.spyOn(logger, "info");
 
 describe("Company Recipify Module", () => {
   it("findCompanyFailFast should return company transportReceiptId = null", async () => {

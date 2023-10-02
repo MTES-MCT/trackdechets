@@ -286,7 +286,7 @@ const Dreals = [
     DrealRegion: "DREAL Centre",
     name: "UD45 (Unité Départementale du Loiret)",
     Dept: "45",
-    email: "dreal-centre@developpement-durable.gouv.fr"
+    email: "ud45.dreal-centre@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Occitanie",

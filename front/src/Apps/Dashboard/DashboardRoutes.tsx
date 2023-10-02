@@ -1,6 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { Modal } from "common/components";
-import SideMenu from "common/components/SideMenu";
+import SideBar from "Apps/common/Components/SideBar/SideBar";
 import routes from "Apps/routes";
 import { RouteControlPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/RouteControlPdf";
 import { RoutePublishBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
@@ -38,6 +38,8 @@ import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
 import { usePermissions } from "common/contexts/PermissionsContext";
 
 import "./dashboard.scss";
+import { useMedia } from "use-media";
+import { MEDIA_QUERIES } from "common/config";
 
 export const GET_ME = gql`
   {
@@ -62,6 +64,7 @@ function DashboardRoutes() {
   const { updatePermissions } = usePermissions();
 
   const history = useHistory();
+  const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
 
   const goBack = useCallback(() => {
     history.goBack();
@@ -105,12 +108,12 @@ function DashboardRoutes() {
 
   // if the user is not part of the company whose siret is in the url
   // redirect them to their first company or account if they're not part of any company
-  if (currentCompany == null) {
+  if (!currentCompany) {
     return (
       <Redirect
         to={
           companies.length > 0
-            ? generatePath(routes.dashboardv2.bsds.drafts, {
+            ? generatePath(routes.dashboardv2.bsds.index, {
                 siret: companies[0].orgId,
               })
             : routes.account.companies.list
@@ -125,12 +128,14 @@ function DashboardRoutes() {
     <>
       <OnboardingSlideshow />
       <div id="dashboard" className="dashboard">
-        <SideMenu>
-          <DashboardTabs
-            currentCompany={currentCompany}
-            companies={companies}
-          />
-        </SideMenu>
+        {!isMobile && (
+          <SideBar>
+            <DashboardTabs
+              currentCompany={currentCompany}
+              companies={companies}
+            />
+          </SideBar>
+        )}
         <div className="dashboard-content">
           <Switch location={backgroundLocation ?? location}>
             <Route path="/v2/dashboard/:siret/slips/view/:id" exact>
@@ -180,11 +185,14 @@ function DashboardRoutes() {
 
             <Route
               path={[
+                routes.dashboardv2.bsds.index,
                 routes.dashboardv2.bsds.drafts,
                 routes.dashboardv2.bsds.act,
                 routes.dashboardv2.bsds.follow,
                 routes.dashboardv2.bsds.history,
                 routes.dashboardv2.bsds.reviews,
+                routes.dashboardv2.bsds.toReviewed,
+                routes.dashboardv2.bsds.reviewed,
                 routes.dashboardv2.transport.toCollect,
                 routes.dashboardv2.transport.collected,
               ]}
@@ -193,7 +201,7 @@ function DashboardRoutes() {
             </Route>
 
             <Redirect
-              to={generatePath(routes.dashboardv2.bsds.drafts, {
+              to={generatePath(routes.dashboardv2.bsds.index, {
                 siret,
               })}
             />

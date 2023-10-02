@@ -4,6 +4,8 @@ import { FullForm } from "./types";
 
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { getFirstTransporterSync } from "./database";
+import { FormForElastic } from "./elastic";
+import { getRevisionOrgIds } from "../common/elasticHelpers";
 
 /**
  * Computes which SIRET or VAT number should appear on which tab in the frontend
@@ -228,4 +230,14 @@ function getFormSirets(form: FullForm) {
   }
 
   return allFormSirets;
+}
+
+/**
+ * Pour un BSDD donné, retourne l'ensemble identifiants d'établissements
+ * pour lesquels il y a une demande de révision en cours ou passé.
+ */
+export function getFormRevisionOrgIds(
+  form: FormForElastic
+): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
+  return getRevisionOrgIds(form.bsddRevisionRequests);
 }

@@ -85,7 +85,8 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
       isRegistered: companyInfos.isRegistered,
       companyTypes: companyInfos.companyTypes,
       ecoOrganismeAgreements: companyInfos.ecoOrganismeAgreements,
-      statutDiffusionEtablissement: companyInfos.statutDiffusionEtablissement
+      statutDiffusionEtablissement: companyInfos.statutDiffusionEtablissement,
+      etatAdministratif: companyInfos.etatAdministratif
     };
   }
 };

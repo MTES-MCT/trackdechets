@@ -9,11 +9,10 @@ import {
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import * as sirenify from "../../../sirenify";
+import { sirenify } from "../../../sirenify";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "default")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
 
 const CREATE_VHU_FORM = `
 mutation CreateVhuForm($input: BsvhuInput!) {
@@ -54,7 +53,7 @@ mutation CreateVhuForm($input: BsvhuInput!) {
 describe("Mutation.Vhu.create", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
+    (sirenify as jest.Mock).mockClear();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -166,7 +165,7 @@ describe("Mutation.Vhu.create", () => {
       input.destination.company.siret
     );
     // check input is sirenified
-    expect(sirenifyMock).toHaveBeenCalledTimes(1);
+    expect(sirenify).toHaveBeenCalledTimes(1);
   });
 
   it("should create a bsvhu and autocomplete transporter recepisse", async () => {
