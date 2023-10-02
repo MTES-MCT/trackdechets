@@ -3,17 +3,17 @@ import {
   resetDatabase
 } from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
-import * as mailsHelper from "../../../mailer/mailing";
-import * as sirene from "../sirene";
+import { sendMail } from "../../../mailer/mailing";
+import { sirenify } from "../sirene";
 import { companyFactory, userFactory } from "../../../__tests__/factories";
 import { bulkCreate, Opts } from "../index";
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
-const sireneSpy = jest.spyOn(sirene, "sirenify");
-sireneSpy.mockImplementation(company =>
+jest.mock("../sirene");
+(sirenify as jest.Mock).mockImplementation(company =>
   Promise.resolve({
     ...company,
     name: "NAME FROM SIRENE",
@@ -34,9 +34,9 @@ export interface CompanyInfo {
 }
 
 describe("bulk create users and companies from csv files", () => {
-  const search = require("../../../companies/search");
-  const searchCompanySpy = jest.spyOn(search, "searchCompany");
-  searchCompanySpy
+  const { searchCompany } = require("../../../companies/search");
+  jest.mock("../../../companies/search");
+  (searchCompany as jest.Mock)
     .mockResolvedValue({
       siret: "85001946400013",
       name: "Code en stock",

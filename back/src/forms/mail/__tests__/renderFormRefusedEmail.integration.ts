@@ -5,11 +5,12 @@ import {
   userWithCompanyFactory
 } from "../../../__tests__/factories";
 import { renderFormRefusedEmail } from "../renderFormRefusedEmail";
-import * as generateBsddPdf from "../../pdf/generateBsddPdf";
+import { generateBsddPdfToBase64 } from "../../pdf/generateBsddPdf";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
 
-jest.spyOn(generateBsddPdf, "generateBsddPdfToBase64").mockResolvedValue("");
+jest.mock("../../pdf/generateBsddPdf");
+(generateBsddPdfToBase64 as jest.Mock).mockResolvedValue("");
 
 describe("renderFormRefusedEmail", () => {
   afterAll(resetDatabase);
@@ -59,9 +60,6 @@ describe("renderFormRefusedEmail", () => {
   });
 
   test("when the form is refused by the recipient and dreal notification is activated", async () => {
-    jest
-      .spyOn(generateBsddPdf, "generateBsddPdfToBase64")
-      .mockResolvedValue("");
     const { renderFormRefusedEmail } = require("../renderFormRefusedEmail");
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);

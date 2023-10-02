@@ -26,7 +26,11 @@ const FilterSelector = ({
     ));
 
     if (index !== filters.length - 1) {
-      filtersElement.push(<option disabled>──────────</option>);
+      filtersElement.push(
+        <option key="separator" disabled>
+          ──────────
+        </option>
+      );
     }
 
     return filtersElement;

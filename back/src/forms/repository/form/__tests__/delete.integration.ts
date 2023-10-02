@@ -16,10 +16,9 @@ import {
   index,
   indexBsd
 } from "../../../../common/elastic";
-import { indexForm, toBsdElastic } from "../../../elastic";
+import { getFormForElastic, indexForm, toBsdElastic } from "../../../elastic";
 import { getStream } from "../../../../activity-events";
 import { getFormRepository } from "../..";
-import { getFullForm } from "../../../database";
 
 describe("formRepository.delete", () => {
   afterEach(resetDatabase);
@@ -40,7 +39,7 @@ describe("formRepository.delete", () => {
 
     const form = await formFactory({ ownerId: user.id });
 
-    await indexForm(await getFullForm(form));
+    await indexForm(await getFormForElastic(form));
     await refreshElasticSearch();
 
     const hits = await searchBsds();
@@ -88,10 +87,12 @@ describe("formRepository.delete", () => {
     const user = await userFactory();
 
     const form = await formWithTempStorageFactory({ ownerId: user.id });
-    const fullForm = await getFullForm(form);
+    const fullForm = await getFormForElastic(form);
 
     await indexBsd(toBsdElastic(fullForm));
-    await indexBsd(toBsdElastic(await getFullForm(fullForm.forwardedIn!)));
+    await indexBsd(
+      toBsdElastic(await getFormForElastic(fullForm.forwardedIn!))
+    );
 
     await refreshElasticSearch();
 

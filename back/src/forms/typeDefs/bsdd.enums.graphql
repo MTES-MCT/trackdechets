@@ -190,18 +190,3 @@ enum FormsRegisterExportFormat {
   """
   XLSX
 }
-
-"""
-Qualification du traitement final vis-à-vis de la hiérarchie des modes
-de traitement définie à l'article L. 541-1 du code de l'environnement
-"""
-enum OperationMode {
-  "Réutilisation"
-  REUTILISATION
-  "Recyclage et autres formes de valorisation de la matière"
-  RECYCLAGE
-  "Valorisation énergétique"
-  VALORISATION_ENERGETIQUE
-  "Incinération sans valorisation énergétique ou stockage en décharge"
-  ELIMINATION
-}

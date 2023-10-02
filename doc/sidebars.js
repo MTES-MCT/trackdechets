@@ -127,6 +127,7 @@ module.exports = {
         "reference/permissions",
         "reference/identifiants",
         "reference/validation",
+        "reference/operationModes",
         "reference/errors",
         "reference/notifications",
         "reference/limitations",

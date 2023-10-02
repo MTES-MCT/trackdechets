@@ -14,13 +14,12 @@ import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
-import * as sirenify from "../../../sirenify";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
+import { sirenify } from "../../../sirenify";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "default")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
@@ -34,7 +33,8 @@ const UPDATE_DASRI = gql`
 describe("Mutation.updateBsdasri", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
+    (sirenify as jest.Mock).mockClear();
+    (sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
   });
 
   it("should disallow unauthenticated user to edit a dasri", async () => {
@@ -200,7 +200,7 @@ describe("Mutation.updateBsdasri", () => {
       expect(data.updateBsdasri.emitter!.company!.mail).toBe("test@test.test");
       expect(data.updateBsdasri.type).toBe("SIMPLE");
       // check input is sirenified
-      expect(sirenifyMock).toHaveBeenCalledTimes(1);
+      expect(sirenify).toHaveBeenCalledTimes(1);
     }
   );
 

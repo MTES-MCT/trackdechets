@@ -9,7 +9,7 @@ import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
-import sirenify from "../../sirenify";
+import { sirenify } from "../../sirenify";
 import { recipify } from "../../recipify";
 
 import { checkCanCreate } from "../../permissions";

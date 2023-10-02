@@ -17,12 +17,13 @@ import {
   MutationMarkAsResealedArgs
 } from "../../../../generated/graphql/types";
 import { gql } from "graphql-tag";
-import * as sirenify from "../../../sirenify";
+import { sirenifyResealedFormInput } from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "sirenifyResealedFormInput")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenifyResealedFormInput as jest.Mock).mockImplementation(input =>
+  Promise.resolve(input)
+);
 
 const MARK_AS_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
@@ -43,7 +44,7 @@ describe("Mutation markAsResealed", () => {
 
   afterEach(async () => {
     process.env = OLD_ENV;
-    sirenifyMock.mockClear();
+    (sirenifyResealedFormInput as jest.Mock).mockClear();
     await resetDatabase();
   });
 
@@ -81,7 +82,7 @@ describe("Mutation markAsResealed", () => {
     });
     expect(resealedForm.status).toEqual("RESEALED");
     // check input is sirenified
-    expect(sirenifyMock).toHaveBeenCalledTimes(1);
+    expect(sirenifyResealedFormInput as jest.Mock).toHaveBeenCalledTimes(1);
   });
 
   test("can convert a simple form to a form with temporary storage", async () => {
@@ -542,6 +543,11 @@ describe("Mutation markAsResealed", () => {
     const server = require("../../../../server").server;
     await server.start();
     const makeClient = require("../../../../__tests__/testClient").default;
+    jest.mock("../../../sirenify");
+    const { sirenifyResealedFormInput } = require("../../../sirenify");
+    (sirenifyResealedFormInput as jest.Mock).mockImplementation(input =>
+      Promise.resolve(input)
+    );
 
     const { user: owner, company: emitterCompany } =
       await userWithCompanyFactory("MEMBER");

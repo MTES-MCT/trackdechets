@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
-import * as mailsHelper from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import {
   userFactory,
   userWithCompanyFactory
@@ -12,8 +12,8 @@ import { membershipRequestAccepted } from "../../../../mailer/templates";
 import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 const ACCEPT_MEMBERSHIP_REQUEST = `
   mutation AcceptMembershipRequest($id: ID!, $role: UserRole!){
@@ -29,7 +29,7 @@ const ACCEPT_MEMBERSHIP_REQUEST = `
 
 describe("mutation acceptMembershipRequest", () => {
   afterAll(resetDatabase);
-  afterEach(sendMailSpy.mockClear);
+  afterEach((sendMail as jest.Mock).mockClear);
 
   it("should deny access to unauthenticated users", async () => {
     const { mutate } = makeClient();
@@ -155,7 +155,7 @@ describe("mutation acceptMembershipRequest", () => {
       // when a new user is invited and accepts invitation, `automaticallyAccepted` is false
       expect(companyAssociations[0].automaticallyAccepted).toEqual(false);
 
-      expect(sendMailSpy).toHaveBeenCalledWith(
+      expect(sendMail as jest.Mock).toHaveBeenCalledWith(
         renderMail(membershipRequestAccepted, {
           to: [{ email: requester.email, name: requester.name }],
           variables: { companyName: company.name, companySiret: company.siret }

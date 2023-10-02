@@ -12,7 +12,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { Query } from "../../../../generated/graphql/types";
 import getReadableId from "../../../../forms/readableId";
-import * as search from "../../../search";
+import { searchCompany } from "../../../search";
 import { CompanySearchResult } from "../../../types";
 
 const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
@@ -38,7 +38,7 @@ const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
   }
 }`;
 
-const searchCompanySpy = jest.spyOn(search, "searchCompany");
+jest.mock("../../../search");
 
 describe("query favorites", () => {
   afterEach(resetDatabase);
@@ -526,7 +526,7 @@ describe("query favorites", () => {
       contactPhone: "00 00 00 00 00",
       contact: "John Snow"
     };
-    searchCompanySpy.mockResolvedValueOnce(destination);
+    (searchCompany as jest.Mock).mockResolvedValueOnce(destination);
 
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
@@ -565,7 +565,7 @@ describe("query favorites", () => {
   });
 
   it("should not return next destinations not present in SIRENE database", async () => {
-    searchCompanySpy.mockRejectedValueOnce("Entreprise inconnue");
+    (searchCompany as jest.Mock).mockRejectedValueOnce("Entreprise inconnue");
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["PRODUCER"]
@@ -615,7 +615,7 @@ describe("query favorites", () => {
       contactPhone: "00 00 00 00 00",
       contact: "John Snow"
     };
-    searchCompanySpy.mockResolvedValueOnce(traderSirene);
+    (searchCompany as jest.Mock).mockResolvedValueOnce(traderSirene);
 
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
@@ -680,7 +680,7 @@ describe("query favorites", () => {
       contactPhone: "00 00 00 00 00",
       contact: "John Snow"
     };
-    searchCompanySpy.mockResolvedValueOnce(brokerSirene);
+    (searchCompany as jest.Mock).mockResolvedValueOnce(brokerSirene);
 
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
