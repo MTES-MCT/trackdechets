@@ -1260,6 +1260,14 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual(undefined);
     expect(data.createForm.appendix2Forms![0].id).toBe(appendix2.id);
+
+    const updatedAppendix2 = await prisma.form.findUniqueOrThrow({
+      where: { id: appendix2.id }
+    });
+
+    expect(updatedAppendix2.quantityGrouped).toEqual(
+      updatedAppendix2.quantityReceived
+    );
   });
 
   it("should allow creating a form with an appendix 2 (using CreateFormInput.grouping)", async () => {
@@ -1295,6 +1303,12 @@ describe("Mutation.createForm", () => {
     expect(data.createForm.grouping).toEqual([
       { form: { id: appendix2.id }, quantity: 0.5 }
     ]);
+
+    const updatedAppendix2 = await prisma.form.findUniqueOrThrow({
+      where: { id: appendix2.id }
+    });
+
+    expect(updatedAppendix2.quantityGrouped).toEqual(0.5);
   });
 
   it("should allow consuming a BSDD in several appendix2", async () => {
