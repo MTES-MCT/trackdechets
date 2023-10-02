@@ -15,6 +15,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Il n'est plus possible de corriger la quantité reçue avant réception par l'exutoire, et de dépasser 40T pour du transport routier [PR 2719](https://github.com/MTES-MCT/trackdechets/pull/2719)
 - Dans les PDFs des BSDDs, les totaux des conditionnements ont été corrigés [PR 2725](https://github.com/MTES-MCT/trackdechets/pull/2725)
+- Pour les BSDA avec destination finale, il est désormais possible d'éditer le code d'opération finale si celui-ci avait été oublié au moment de la signature du TTR [PR 2751](https://github.com/MTES-MCT/trackdechets/pull/2751)
+- Le champ "date d'opération" est contraint dans le temps sur le BSDA. Il n'est plus possible de saisir une date dans le futur [PR 2750](https://github.com/MTES-MCT/trackdechets/pull/2750)
 
 #### :boom: Breaking changes
 
@@ -23,6 +25,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Dans les demandes de révision, la hiérarchie des modes de traitement est proposée à côté des codes d'opération [PR 2727](https://github.com/MTES-MCT/trackdechets/pull/2727)
 - Ajout d'un colonne dans le registre avec une version lisible du statut des BSDs [PR 2707](https://github.com/MTES-MCT/trackdechets/pull/2707)
 - Wording: mise en conformité ADR2023 sur les quantités estimées [PR 2722](https://github.com/MTES-MCT/trackdechets/pull/2722)
+- Le CAP et le code d'opération portés par le bordereau chapeau sont désormais reportés sur les bordereaux d'annexe 1 [PR 2749](https://github.com/MTES-MCT/trackdechets/pull/2749)
 
 #### :house: Interne
 
