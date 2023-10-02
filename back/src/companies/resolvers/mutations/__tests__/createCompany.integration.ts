@@ -65,7 +65,15 @@ describe("Mutation.createCompany", () => {
     (searchCompany as jest.Mock).mockReset();
   });
 
-  it("should create company and userAssociation", async () => {
+  it.each([
+    CompanyType.PRODUCER,
+    CompanyType.COLLECTOR,
+    CompanyType.WASTE_VEHICLES,
+    CompanyType.WASTE_CENTER,
+    CompanyType.BROKER,
+    CompanyType.WORKER,
+    CompanyType.CREMATORIUM
+  ])("should create company and userAssociation", async companyType => {
     const user = await userFactory();
     const orgId = siretify(7);
     const companyInput = {
@@ -73,7 +81,7 @@ describe("Mutation.createCompany", () => {
       gerepId: "1234",
       companyName: "Acme",
       address: "3 rue des granges",
-      companyTypes: ["PRODUCER"]
+      companyTypes: [companyType]
     };
 
     (searchCompany as jest.Mock).mockResolvedValueOnce({
@@ -110,7 +118,10 @@ describe("Mutation.createCompany", () => {
 
     const newCompanyAssociationExists =
       (await prisma.companyAssociation.findFirst({
-        where: { company: { siret: companyInput.siret }, user: { id: user.id } }
+        where: {
+          company: { siret: companyInput.siret },
+          user: { id: user.id }
+        }
       })) != null;
     expect(newCompanyAssociationExists).toBe(true);
 

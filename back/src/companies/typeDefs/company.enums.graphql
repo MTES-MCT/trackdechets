@@ -29,6 +29,9 @@ enum CompanyType {
 
   "Entreprise de travaux"
   WORKER
+
+  "Crématorium"
+  CREMATORIUM
 }
 
 "État du processus de vérification de l'établissement"
