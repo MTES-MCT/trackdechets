@@ -314,10 +314,11 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   const { first = MAX_SIZE } = args;
   const size = Math.max(Math.min(first!, MAX_SIZE), MIN_SIZE);
   await bsdSearchSchema.validate(args.where, { abortEarly: false });
-
+  console.log("args", JSON.stringify(args));
   const query = await buildQuery(args, user);
   const sort = buildSort(args);
   const search_after = await buildSearchAfter(args, sort);
+  console.log("query", JSON.stringify(query));
 
   const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
     {

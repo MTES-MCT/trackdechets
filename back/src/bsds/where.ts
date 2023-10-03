@@ -6,7 +6,6 @@ import {
 } from "../common/constants/GET_BSDS_CONSTANTS";
 import {
   toElasticDateQuery,
-  toElasticSiretQuery,
   toElasticStringListQuery,
   toElasticStringQuery,
   toElasticTextQuery
