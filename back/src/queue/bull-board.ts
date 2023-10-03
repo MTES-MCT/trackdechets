@@ -2,6 +2,7 @@ import { createBullBoard } from "@bull-board/api";
 import { BullAdapter } from "@bull-board/api/bullAdapter";
 import { ExpressAdapter } from "@bull-board/express";
 import {
+  favoritesCompanyQueue,
   geocodeCompanyQueue,
   setCompanyDepartementQueue
 } from "./producers/company";
@@ -21,6 +22,7 @@ createBullBoard({
     new BullAdapter(updatesQueue),
     new BullAdapter(geocodeCompanyQueue),
     new BullAdapter(setCompanyDepartementQueue),
+    new BullAdapter(favoritesCompanyQueue),
     new BullAdapter(syncEventsQueue),
     new BullAdapter(webhooksQueue)
   ],

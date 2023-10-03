@@ -11,23 +11,49 @@ import {
   isFRVat,
   TEST_COMPANY_PREFIX,
   countries,
-  cleanClue
+  cleanClue,
+  isForeignVat
 } from "../common/constants/companySearchHelpers";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
 import { AnonymousCompanyError } from "./sirene/errors";
 import { removeEmptyKeys } from "../common/converter";
 import { UserInputError } from "../common/errors";
+import { SearchOptions } from "./sirene/trackdechets/types";
+import { Company } from "@prisma/client";
 
 interface SearchCompaniesDeps {
-  searchCompany: (clue: string) => Promise<CompanySearchResult>;
+  injectedSearchCompany: (clue: string) => Promise<CompanySearchResult>;
+  injectedSearchCompanies: (
+    clue: string,
+    department?: string | null,
+    options?: Partial<SearchOptions>,
+    requestOptions?
+  ) => Promise<SireneSearchResult[] | null>;
 }
 
 const SIRET_OR_VAT_ERROR =
   "Il est obligatoire de rechercher soit avec un SIRET de 14 caractères soit avec un numéro de TVA intracommunautaire valide";
 
+export const mergeCompanyToCompanySearchResult = (
+  orgId: string,
+  trackdechetsCompanyInfo: Partial<Company> | null,
+  companyInfo: SireneSearchResult | CompanyVatSearchResult | null
+): CompanySearchResult => ({
+  orgId,
+  // ensure compatibility with CompanyPublic
+  ecoOrganismeAgreements: [],
+  isRegistered: trackdechetsCompanyInfo != null,
+  trackdechetsId: trackdechetsCompanyInfo?.id,
+  companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
+  ...(trackdechetsCompanyInfo != null && {
+    ...convertUrls(trackdechetsCompanyInfo)
+  }),
+  // override database infos with Sirene or VAT search
+  ...companyInfo
+});
 /**
- * Search TD db and merge company info from search engines
+ * Search database and merge with company info from search engines
  */
 async function findCompanyAndMergeInfos(
   cleanClue: string,
@@ -54,24 +80,16 @@ async function findCompanyAndMergeInfos(
       allowBsdasriTakeOverWithoutSignature: true
     }
   });
-  return {
-    // ensure compatibility with CompanyPublic
-    ecoOrganismeAgreements: [],
-    isRegistered: trackdechetsCompanyInfo != null,
-    trackdechetsId: trackdechetsCompanyInfo?.id,
-    companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
-    orgId: cleanClue,
-    ...(trackdechetsCompanyInfo != null && {
-      ...convertUrls(trackdechetsCompanyInfo)
-    }),
-    // override database infos with Sirene or VAT search
-    ...companyInfo
-  };
+  return mergeCompanyToCompanySearchResult(
+    cleanClue,
+    trackdechetsCompanyInfo,
+    companyInfo
+  );
 }
 
 /**
- * Common entry-point for all Company search
- * Search one company by SIRET or VAT number
+ * Common Company search unique by orgId
+ * Search by SIRET or VAT number
  * Supports Test SIRET and AnonymousCompany
  */
 export async function searchCompany(
@@ -100,7 +118,7 @@ export async function searchCompany(
       orgId: cleanedClue
     }
   });
-  // Anonymous Company search
+  // Anonymous Company search by-pass SIRENE or VAT search
   if (anonymousCompany) {
     const companyInfo: SireneSearchResult = {
       ...removeEmptyKeys(anonymousCompany),
@@ -128,7 +146,7 @@ export async function searchCompany(
   if (isVat(cleanedClue)) {
     const company = await findCompanyAndMergeInfos(cleanedClue, {});
     if (company.isRegistered === true) {
-      // shorcut to return the result directly from database
+      // shorcut to return the result directly from database without hitting VIES
       const { country } = checkVAT(cleanedClue, countries);
       if (country) {
         return {
@@ -147,20 +165,26 @@ export async function searchCompany(
     };
   }
 
-  throw new Error(`Unhandled search company case for clue ${clue}`);
+  throw new UserInputError("Aucun établissement trouvé", {
+    invalidArgs: ["siret", "clue"]
+  });
 }
 
 // used for dependency injection in tests to easily mock `searchCompany`
 export const makeSearchCompanies =
-  ({ searchCompany }: SearchCompaniesDeps) =>
+  ({ injectedSearchCompany, injectedSearchCompanies }: SearchCompaniesDeps) =>
   (
     clue: string,
-    department?: string | null
+    department?: string | null,
+    allowForeignCompanies?: boolean | null
   ): Promise<CompanySearchResult[]> => {
     const cleanedClue = cleanClue(clue);
     // clue can be formatted like a SIRET or a VAT number
     if (isSiret(cleanedClue) || isVat(cleanedClue)) {
-      return searchCompany(cleanedClue)
+      if (isForeignVat(cleanedClue) && allowForeignCompanies === false) {
+        return Promise.resolve([]);
+      }
+      return injectedSearchCompany(cleanedClue)
         .then(c => {
           return (
             [c]
@@ -175,41 +199,14 @@ export const makeSearchCompanies =
         .catch(_ => []);
     }
     // fuzzy searching only for French companies
-    return decoratedSearchCompanies(clue, department).then(async results => {
+    return injectedSearchCompanies(clue, department).then(async results => {
       if (!results) {
         return [];
       }
-      const existingCompanies = results.length
-        ? await prisma.company.findMany({
-            where: {
-              orgId: { in: results.map(r => r.siret!) }
-            },
-            select: {
-              orgId: true,
-              companyTypes: true
-            }
-          })
-        : [];
-
-      const existingCompaniesOrgIds = existingCompanies.reduce(
-        (dic, company) => {
-          dic[company.orgId] = {
-            isRegistered: true,
-            companyTypes: company.companyTypes
-          };
-          return dic;
-        },
-        {}
-      );
 
       return results.map(company => ({
         ...company,
-        orgId: company.siret!,
-        isRegistered: Boolean(
-          existingCompaniesOrgIds[company.siret!]?.isRegistered
-        ),
-        companyTypes:
-          existingCompaniesOrgIds[company.siret!]?.companyTypes ?? []
+        orgId: company.siret!
       }));
     });
   };
@@ -287,4 +284,7 @@ async function searchVatFrOnlyOrNotFound(
   return viesResult;
 }
 
-export const searchCompanies = makeSearchCompanies({ searchCompany });
+export const searchCompanies = makeSearchCompanies({
+  injectedSearchCompany: searchCompany,
+  injectedSearchCompanies: decoratedSearchCompanies
+});

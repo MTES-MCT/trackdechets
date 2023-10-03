@@ -3,20 +3,8 @@ import { searchCompanies } from "../../search";
 
 const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
   _,
-  { clue, department },
-  context
-) =>
-  searchCompanies(clue, department).then(async results =>
-    results.map(async company => ({
-      ...company,
-      ...(company.siret
-        ? {
-            installation: await context.dataloaders.installations.load(
-              company.siret!
-            )
-          }
-        : {})
-    }))
-  );
+  { clue, department, allowForeignCompanies },
+  _context
+) => searchCompanies(clue, department, allowForeignCompanies);
 
 export default searchCompaniesResolver;

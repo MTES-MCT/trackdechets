@@ -1,4 +1,4 @@
-import { processBsdIdentifiersByChunk } from "../../bsds/indexation/bulkIndexBsds";
+import { processDbIdentifiersByChunk } from "../../bsds/indexation/bulkIndexBsds";
 import { getFormRepository } from "../../forms/repository";
 import { FormForUpdateAppendix2FormsInclude } from "../../forms/repository/form/updateAppendix2Forms";
 import prisma from "../../prisma";
@@ -19,7 +19,7 @@ export async function fixedGroupedFormsStatus() {
       ` entreposage provisoire annexés à des bordereaux de regroupement`
   );
 
-  await processBsdIdentifiersByChunk(
+  await processDbIdentifiersByChunk(
     formIds.map(f => f.id),
     async ids => {
       const forms = await prisma.form.findMany({
