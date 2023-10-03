@@ -8,12 +8,12 @@ import {
 } from "../../../__tests__/factories";
 import { CompanySearchResult } from "../../../companies/types";
 import getReadableId from "../../../forms/readableId";
-import * as search from "../../../companies/search";
+import { searchCompany } from "../../../companies/search";
 import { favoritesConstrutor } from "../indexFavorites";
 import { getFormForElastic, indexForm } from "../../../forms/elastic";
 import { index, client as elasticSearch } from "../../../common/elastic";
 
-const searchCompanySpy = jest.spyOn(search, "searchCompany");
+jest.mock("../../../companies/search");
 
 async function refreshIndices() {
   await elasticSearch.indices.refresh(
@@ -30,7 +30,7 @@ async function refreshIndices() {
 describe("Index favorites job", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
-    searchCompanySpy.mockReset();
+    (searchCompany as jest.Mock).mockReset();
   });
   it("should ignore drafts", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
@@ -52,7 +52,7 @@ describe("Index favorites job", () => {
         })
       )
     );
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: emitter.name,
       siret: emitter.siret,
       orgId: emitter.orgId,
@@ -125,7 +125,7 @@ describe("Index favorites job", () => {
         })
       )
     );
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: emitter.name,
       siret: emitter.siret,
       orgId: emitter.orgId,
@@ -184,7 +184,7 @@ describe("Index favorites job", () => {
       }
     });
     const emitter = await companyFactory();
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: emitter.name,
       siret: emitter.siret,
       orgId: emitter.orgId,
@@ -283,7 +283,7 @@ describe("Index favorites job", () => {
       )
     );
 
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: recipient.name,
       siret: recipient.siret,
       orgId: recipient.orgId,
@@ -369,7 +369,7 @@ describe("Index favorites job", () => {
         }
       }
     });
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: transporter.name,
       siret: transporter.siret,
       orgId: transporter.orgId,
@@ -440,7 +440,7 @@ describe("Index favorites job", () => {
       vatNumber: "IT09301420155",
       orgId: "IT09301420155"
     });
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: transporter.name,
       siret: null,
       vatNumber: transporter.vatNumber,
@@ -506,7 +506,7 @@ describe("Index favorites job", () => {
       }
     });
     const unknownSiret = siretify(1);
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: "name",
       siret: unknownSiret,
       vatNumber: null,
@@ -553,7 +553,7 @@ describe("Index favorites job", () => {
       }
     });
     const tempStorer = await companyFactory();
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: tempStorer.name,
       siret: tempStorer.siret,
       vatNumber: tempStorer.vatNumber,
@@ -626,7 +626,7 @@ describe("Index favorites job", () => {
       )
     );
 
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: "tempStorer.name",
       siret: unknownSiret,
       vatNumber: null,
@@ -671,7 +671,7 @@ describe("Index favorites job", () => {
       )
     );
 
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: destination.name,
       siret: destination.siret,
       vatNumber: destination.vatNumber,
@@ -730,7 +730,7 @@ describe("Index favorites job", () => {
       )
     );
 
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: "destination.name",
       siret: recipientCompanySiret,
       vatNumber: null,
@@ -771,7 +771,7 @@ describe("Index favorites job", () => {
       codePaysEtrangerEtablissement: "FR",
       etatAdministratif: "A"
     };
-    searchCompanySpy.mockResolvedValueOnce(destination);
+    (searchCompany as jest.Mock).mockResolvedValueOnce(destination);
 
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
@@ -817,7 +817,7 @@ describe("Index favorites job", () => {
   });
 
   it("should not return next destinations not present in SIRENE database", async () => {
-    searchCompanySpy.mockRejectedValueOnce("Entreprise inconnue");
+    (searchCompany as jest.Mock).mockRejectedValueOnce("Entreprise inconnue");
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["PRODUCER"]
@@ -873,7 +873,7 @@ describe("Index favorites job", () => {
       etatAdministratif: "A",
       codePaysEtrangerEtablissement: "FR"
     };
-    searchCompanySpy.mockResolvedValueOnce(traderSirene);
+    (searchCompany as jest.Mock).mockResolvedValueOnce(traderSirene);
 
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
@@ -953,7 +953,7 @@ describe("Index favorites job", () => {
       codePaysEtrangerEtablissement: "FR"
     };
 
-    searchCompanySpy.mockResolvedValueOnce(brokerSirene);
+    (searchCompany as jest.Mock).mockResolvedValueOnce(brokerSirene);
 
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
@@ -1011,7 +1011,7 @@ describe("Index favorites job", () => {
       }
     });
 
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       orgId: company.orgId,
       siret: company.orgId!,
       vatNumber: null,
@@ -1077,7 +1077,7 @@ describe("Index favorites job", () => {
     await indexForm(await getFormForElastic(secondForm));
     await refreshIndices();
 
-    searchCompanySpy
+    (searchCompany as jest.Mock)
       .mockResolvedValueOnce({
         orgId: emitter1.orgId,
         siret: emitter1.siret,
@@ -1199,7 +1199,7 @@ describe("Index favorites job", () => {
     await indexForm(await getFormForElastic(secondForm));
     await refreshIndices();
 
-    searchCompanySpy
+    (searchCompany as jest.Mock)
       .mockResolvedValueOnce({
         orgId: emitter1.orgId,
         siret: emitter1.siret,
@@ -1313,7 +1313,7 @@ describe("Index favorites job", () => {
     );
     await refreshIndices();
 
-    searchCompanySpy.mockResolvedValue({
+    (searchCompany as jest.Mock).mockResolvedValue({
       name: emitter.name,
       siret: emitter.siret,
       vatNumber: emitter.vatNumber,
@@ -1363,7 +1363,7 @@ describe("Index favorites job", () => {
       vatNumber: "IT09301420155",
       orgId: "IT09301420155"
     });
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: transporter.name,
       siret: null,
       vatNumber: transporter.vatNumber,
@@ -1446,7 +1446,7 @@ describe("Index favorites job", () => {
       }
     });
     const destination = await companyFactory();
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       name: destination.name,
       siret: null,
       vatNumber: destination.vatNumber,
