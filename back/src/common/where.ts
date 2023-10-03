@@ -270,6 +270,22 @@ export function toElasticTextQuery(
   };
 }
 
+export function toElasticSiretQuery(
+  fieldName: string,
+  stringFilter: StringFilter | null | undefined,
+  maxLength = 50
+): estypes.QueryContainer | undefined {
+  if (stringFilter?._contains?.length === 14) {
+    return toElasticStringQuery(
+      fieldName,
+      { _eq: stringFilter?._contains },
+      maxLength
+    );
+  }
+
+  return toElasticStringQuery(fieldName, stringFilter, maxLength);
+}
+
 export function toElasticStringQuery(
   fieldName: string,
   stringFilter: StringFilter | null | undefined,

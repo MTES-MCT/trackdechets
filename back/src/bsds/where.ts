@@ -6,6 +6,7 @@ import {
 } from "../common/constants/GET_BSDS_CONSTANTS";
 import {
   toElasticDateQuery,
+  toElasticSiretQuery,
   toElasticStringListQuery,
   toElasticStringQuery,
   toElasticTextQuery
@@ -106,7 +107,7 @@ export function toElasticSimpleQuery(where: BsdWhere) {
           "destinationCompanyName",
           where.destination?.company?.name
         ),
-        toElasticStringQuery(
+        toElasticSiretQuery(
           "destinationCompanySiret",
           where.destination?.company?.siret
         ),
