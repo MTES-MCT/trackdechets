@@ -9,6 +9,7 @@ import {
   TextFilter
 } from "../generated/graphql/types";
 import { UserInputError } from "./errors";
+import { isSiret } from "./constants/companySearchHelpers";
 
 type EnumFilter<E> = {
   _in?: E[] | null;
@@ -270,22 +271,6 @@ export function toElasticTextQuery(
   };
 }
 
-export function toElasticSiretQuery(
-  fieldName: string,
-  stringFilter: StringFilter | null | undefined,
-  maxLength = 50
-): estypes.QueryContainer | undefined {
-  if (stringFilter?._contains?.length === 14) {
-    return toElasticStringQuery(
-      fieldName,
-      { _eq: stringFilter?._contains },
-      maxLength
-    );
-  }
-
-  return toElasticStringQuery(fieldName, stringFilter, maxLength);
-}
-
 export function toElasticStringQuery(
   fieldName: string,
   stringFilter: StringFilter | null | undefined,
@@ -293,6 +278,15 @@ export function toElasticStringQuery(
 ): estypes.QueryContainer | undefined {
   if (!stringFilter) {
     return undefined;
+  }
+
+  // If the string is a full SIRET, discard _contains & replace by _eq
+  if (stringFilter?._contains && isSiret(stringFilter?._contains)) {
+    return toElasticStringQuery(
+      fieldName,
+      { _eq: stringFilter?._contains },
+      maxLength
+    );
   }
 
   if (

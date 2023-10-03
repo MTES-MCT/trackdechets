@@ -107,7 +107,7 @@ export function toElasticSimpleQuery(where: BsdWhere) {
           "destinationCompanyName",
           where.destination?.company?.name
         ),
-        toElasticSiretQuery(
+        toElasticStringQuery(
           "destinationCompanySiret",
           where.destination?.company?.siret
         ),
