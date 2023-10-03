@@ -5,7 +5,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import buildUpdateManyForms from "./updateMany";
 import { FormWithForwardedIn, FormWithForwardedInInclude } from "../../types";
-import { processBsdIdentifiersByChunk } from "../../../bsds/indexation/bulkIndexBsds";
+import { processDbIdentifiersByChunk } from "../../../bsds/indexation/bulkIndexBsds";
 
 type FormForUpdateAppendix2Forms = Form & FormWithForwardedIn;
 
@@ -123,18 +123,19 @@ const buildUpdateAppendix2Forms: (
 
   // Ici on peut avoir 250 bordereaux à mettre à jour dans le pire des cas
   // On batche donc les updates par 50 pour éviter un bottleneck
-  await processBsdIdentifiersByChunk(
+  await processDbIdentifiersByChunk(
     Object.keys(quantitGroupedByFormId),
-    formIds =>
+    async formIds => {
       // met à jour la quantité regroupée sur chaque bordereau
-      Promise.all(
+      await Promise.all(
         formIds.map(formId => {
           return prisma.form.update({
             where: { id: formId },
             data: { quantityGrouped: quantitGroupedByFormId[formId] }
           });
         })
-      ),
+      );
+    },
     50
   );
 };
