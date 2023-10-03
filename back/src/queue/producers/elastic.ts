@@ -53,11 +53,10 @@ indexQueue.on("completed", async job => {
     // on doit mettre à jour le cache des `favorites` pour chaque orgId
     // présent dansd ce BSD afin qu'en tant qu'éditeur dans le futur on lui
     // propose les favoris pré-calculés.
-    const uniqueOrgIds = Array.from(new Set(orgIdsToNotify));
 
     for (const favoriteType of allFavoriteTypes) {
       await favoritesCompanyQueue.addBulk(
-        uniqueOrgIds.map(orgId => ({
+        orgIdsToNotify.map(orgId => ({
           data: {
             orgId,
             type: favoriteType
