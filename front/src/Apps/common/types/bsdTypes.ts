@@ -5,6 +5,7 @@ import {
   BsdaEcoOrganisme,
   BsdaEmitter,
   BsdaRevisionRequestApproval,
+  Bsdasri,
   BsdasriDestination,
   BsdasriEcoOrganisme,
   BsdasriEmitter,
@@ -131,6 +132,7 @@ export interface BsdDisplay {
   transporterCustomInfo?: string | Maybe<string[]>;
   transporterNumberPlate?: string | Maybe<string[]>;
   packagings?: Array<BsffPackaging>;
+  synthesizedIn?: Maybe<Bsdasri>;
 }
 
 export type BsdWithReview = Bsd & {
