@@ -166,3 +166,27 @@ export const debounce = <F extends (...args: any) => any>(
 
   return debounced as (...args: Parameters<F>) => ReturnType<F>;
 };
+
+/**
+ * Remove orgId from CompanyInput when it was built from FormCompany
+ */
+export function retirerOrgId(obj: any, insideCompany: boolean = false): any {
+  if (typeof obj !== "object" || obj === null) {
+    return obj;
+  }
+
+  let newObj: any = Array.isArray(obj) ? [] : {};
+
+  for (let key of Object.keys(obj)) {
+    if (insideCompany && key === "orgId") {
+      continue;
+    }
+    if (key === "company") {
+      newObj[key] = retirerOrgId(obj[key], true);
+    } else {
+      newObj[key] = retirerOrgId(obj[key], insideCompany);
+    }
+  }
+
+  return newObj;
+}

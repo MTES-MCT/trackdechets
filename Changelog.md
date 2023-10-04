@@ -29,12 +29,15 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout d'un colonne dans le registre avec une version lisible du statut des BSDs [PR 2707](https://github.com/MTES-MCT/trackdechets/pull/2707)
 - Wording: mise en conformité ADR2023 sur les quantités estimées [PR 2722](https://github.com/MTES-MCT/trackdechets/pull/2722)
 - Le CAP et le code d'opération portés par le bordereau chapeau sont désormais reportés sur les bordereaux d'annexe 1 [PR 2749](https://github.com/MTES-MCT/trackdechets/pull/2749)
+- Réécriture de la requête `favorites` qui renvoie désormais le type `CompanySearchResult[]` (suppression du type interne `CompanyFavorite`) et améliorations de `searchCompanies`. Ajout d'un paramètre optionnel `allowForeignCompanies` pour filtrer les entreprises étrangères des requêtes. [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
+- Ajout d'un job asynchrone de pré-calcul des `favorites` par `orgId` et par `type` d'établissement. Le job se lance automatiquement à la suite d'un job `indexBsd` [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
 
 #### :house: Interne
 
 - Optimisation appendixForms : pré-calcul de quantityGrouped [PR 2701](https://github.com/MTES-MCT/trackdechets/pull/2701) 
 
 #### :house: Interne
+- Suppression du script `npm run queue:obliterate` [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
 
 # [2023.9.1] 19/09/2023
 
@@ -84,7 +87,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout des infos négociant à l'indexation BSDD [PR 2657](https://github.com/MTES-MCT/trackdechets/pull/2657)
 
-# [2023.8.2] 29/08/2023
+# [2023.8.2] 19/08/2023
 
 #### :rocket: Nouvelles fonctionnalités
 

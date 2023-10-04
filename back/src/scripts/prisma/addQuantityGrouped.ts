@@ -1,6 +1,6 @@
 import { Decimal } from "decimal.js-light";
 import prisma from "../../prisma";
-import { processBsdIdentifiersByChunk } from "../../bsds/indexation/bulkIndexBsds";
+import { processDbIdentifiersByChunk } from "../../bsds/indexation/bulkIndexBsds";
 
 export async function addQuantityGrouped() {
   // Récupère l'ensemble des bordereaux annexés à un bordereau
@@ -46,7 +46,7 @@ export async function addQuantityGrouped() {
     }
 
     // Met à jour le champ `quantityGrouped`
-    return Promise.all(
+    await Promise.all(
       formIds.map(formId =>
         prisma.form.update({
           where: { id: formId },
@@ -56,7 +56,7 @@ export async function addQuantityGrouped() {
     );
   }
 
-  await processBsdIdentifiersByChunk(
+  await processDbIdentifiersByChunk(
     groupedFormIds.map(f => f.id),
     processChunk,
     100 // process les bordereaux 100 par 100

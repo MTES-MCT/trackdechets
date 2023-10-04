@@ -26,6 +26,8 @@ import {
 import {
   blankstate_action_desc,
   blankstate_action_title,
+  blankstate_default_desc,
+  blankstate_default_title,
   blankstate_draft_desc,
   blankstate_draft_title,
   blankstate_follow_desc,
@@ -495,6 +497,7 @@ const DashboardPage = () => {
     if (isReviewsTab) {
       return blankstate_reviews_title;
     }
+    return blankstate_default_title;
   };
 
   const getBlankstateDescription = () => {
@@ -520,6 +523,7 @@ const DashboardPage = () => {
     if (isReviewsTab) {
       return blankstate_reviews_desc;
     }
+    return blankstate_default_desc;
   };
 
   const toggleFiltersBlock = () => {
@@ -578,14 +582,16 @@ const DashboardPage = () => {
       ) : (
         <>
           {!Boolean(bsdsTotalCount) && (
-            <Blankslate>
-              {getBlankstateTitle() && (
-                <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
-              )}
-              <BlankslateDescription>
-                {getBlankstateDescription()}
-              </BlankslateDescription>
-            </Blankslate>
+            <div className="dashboard-page__blankstate">
+              <Blankslate>
+                {getBlankstateTitle() && (
+                  <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
+                )}
+                <BlankslateDescription>
+                  {getBlankstateDescription()}
+                </BlankslateDescription>
+              </Blankslate>
+            </div>
           )}
 
           {Boolean(bsdsTotalCount) && (

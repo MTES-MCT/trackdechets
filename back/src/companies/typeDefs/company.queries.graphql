@@ -27,6 +27,12 @@ type Query {
     clue: String!
     "(Optionnel) Filtre les résultats par numéro de département français"
     department: String
+    """
+    (Optionnel) Filtre les résultats étrangers uniquement,
+    si 'clue' est un numéro de TVA intra-communautaire non-français et allowForeignCompanies,
+    alors aucun résultat ne sera retourné
+    """
+    allowForeignCompanies: Boolean
   ): [CompanySearchResult!]!
 
   """

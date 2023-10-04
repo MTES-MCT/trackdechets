@@ -1,4 +1,48 @@
-import { mergeDefaults } from "../helper";
+import { mergeDefaults, retirerOrgId } from "../helper";
+
+describe("retirerOrgId", () => {
+  it("should remove orgId keys inside company objects", () => {
+    const input = {
+      name: "Organisation1",
+      company: {
+        orgId: 123,
+        address: "123 rue ABC",
+        subCompany: {
+          orgId: 456,
+          contact: "contact@example.com",
+        },
+      },
+      orgId: 789,
+    };
+
+    const expected = {
+      name: "Organisation1",
+      company: {
+        address: "123 rue ABC",
+        subCompany: {
+          contact: "contact@example.com",
+        },
+      },
+      orgId: 789,
+    };
+
+    expect(retirerOrgId(input)).toEqual(expected);
+  });
+
+  it("should not remove orgId keys outside of company objects", () => {
+    const input = {
+      name: "Organisation1",
+      orgId: 789,
+    };
+
+    const expected = {
+      name: "Organisation1",
+      orgId: 789,
+    };
+
+    expect(retirerOrgId(input)).toEqual(expected);
+  });
+});
 
 describe("mergeDefaults", () => {
   it("should keep the defaults", () => {
