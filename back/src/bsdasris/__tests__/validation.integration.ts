@@ -388,15 +388,15 @@ describe("Mutation.signBsdasri emission", () => {
       }
     });
 
-    it.each(["", null, [], [""], [null], [undefined]])(
-      "transporter plate is required if transporter mode is ROAD - invalid values",
+    it.each([["", null, [null], [undefined], , [], ""]])(
+      "transporter plate is required if transporter mode is ROAD - invalid value %p",
       async invalidValue => {
         const data = {
           ...bsdasri,
           transporterTransportMode: "ROAD",
           transporterTransportPlates: invalidValue
         };
-        expect.assertions(1);
+        expect.assertions(2);
 
         try {
           await validateBsdasri(data as any, {
@@ -404,6 +404,13 @@ describe("Mutation.signBsdasri emission", () => {
           });
         } catch (err) {
           expect(err.errors.length).toBeTruthy();
+          expect(
+            [
+              "transporterTransportPlates[0] ne peut pas être null",
+              "transporterTransportPlates ne peut pas être null",
+              "La plaque d'immatriculation est requise"
+            ].includes(err.errors[0])
+          ).toBeTruthy();
         }
       }
     );
@@ -414,7 +421,7 @@ describe("Mutation.signBsdasri emission", () => {
         destinationOperationCode: "R1",
         destinationOperationMode: "RECYCLAGE"
       };
-      expect.assertions(1);
+      expect.assertions(2);
 
       try {
         await validateBsdasri(data as any, {
@@ -422,6 +429,28 @@ describe("Mutation.signBsdasri emission", () => {
         });
       } catch (err) {
         expect(err.errors.length).toBeTruthy();
+        expect(err.errors[0]).toBe(
+          "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+        );
+      }
+    });
+
+    test.only("if operation code has associated operation modes but none is specified", async () => {
+      const data = {
+        ...bsdasri,
+        destinationOperationCode: "D9",
+        destinationOperationMode: undefined
+      };
+
+      expect.assertions(2);
+
+      try {
+        await validateBsdasri(data as any, {
+          operationSignature: true
+        });
+      } catch (err) {
+        expect(err.errors.length).toBeTruthy();
+        expect(err.errors[0]).toBe("Vous devez préciser un mode de traitement");
       }
     });
   });

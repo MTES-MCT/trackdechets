@@ -348,13 +348,37 @@ describe("BSDA validation", () => {
     test("when operation mode is not compatible with operation code", async () => {
       const data = {
         ...bsda,
-        destinationOperationCode: "R 1",
-        destinationOperationMode: "RECYCLAGE"
+        destinationOperationCode: "R 5",
+        destinationOperationMode: "VALORISATION_ENERGETIQUE"
       };
 
-      const { success } = await rawBsdaSchema.safeParseAsync(data);
+      expect.assertions(2);
 
-      expect(success).toBe(false);
+      try {
+        await parseBsda(data, { currentSignatureType: "OPERATION" });
+      } catch (err) {
+        expect(err.errors.length).toBeTruthy();
+        expect(err.issues[0].message).toBe(
+          "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+        );
+      }
+    });
+
+    test("if operation code has associated operation modes but none is specified", async () => {
+      const data = {
+        ...bsda,
+        destinationOperationCode: "R 5",
+        destinationOperationMode: undefined
+      };
+
+      expect.assertions(2);
+
+      try {
+        await parseBsda(data, { currentSignatureType: "OPERATION" });
+      } catch (err) {
+        expect(err.errors.length).toBeTruthy();
+        expect(err.errors[0]).toBe("Vous devez préciser un mode de traitement");
+      }
     });
   });
 

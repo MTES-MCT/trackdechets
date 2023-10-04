@@ -1404,12 +1404,20 @@ const processedInfoSchemaFn: (
           const { processingOperationDone } = this.parent;
           const destinationOperationMode = item;
 
-          if (processingOperationDone && destinationOperationMode) {
+          if (processingOperationDone) {
             const modes = getOperationModesFromOperationCode(
               processingOperationDone
             );
 
-            return modes.includes(destinationOperationMode ?? "");
+            if (modes.length) {
+              if (!destinationOperationMode) {
+                return new yup.ValidationError(
+                  "Vous devez spécifier un mode de traitement"
+                );
+              }
+
+              return modes.includes(destinationOperationMode ?? "");
+            }
           }
 
           return true;

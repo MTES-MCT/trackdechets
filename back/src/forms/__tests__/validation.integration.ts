@@ -1737,4 +1737,42 @@ describe("processedInfoSchema", () => {
       "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
     );
   });
+
+  it("should not be valid if operationCode has potential operationModes associated and none is specified", async () => {
+    const processedInfo = {
+      nextDestination: null,
+      noTraceability: null,
+      processedAt: new Date(),
+      processedBy: "Test",
+      processingOperationDescription: "test",
+      processingOperationDone: "R 2",
+      destinationOperationMode: undefined
+    };
+
+    const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Vous devez spécifier un mode de traitement"
+    );
+  });
+
+  it("should be valid if operationCode has no potential operationModes associated and none is specified", async () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 13",
+      processingOperationDescription: "Regroupement",
+      noTraceability: false,
+      nextDestinationProcessingOperation: "D 8",
+      nextDestinationCompanyName: "Exutoire",
+      nextDestinationCompanySiret: siretify(1),
+      nextDestinationCompanyAddress: "4 rue du déchet",
+      nextDestinationCompanyCountry: "FR",
+      nextDestinationCompanyContact: "Arya Stark",
+      nextDestinationCompanyPhone: "06 XX XX XX XX",
+      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+    };
+
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
+  });
 });
