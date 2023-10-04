@@ -641,7 +641,7 @@ const getAcceptedBtnLabel = (
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
     if (bsd.packagings?.length === 1) {
-      return SIGNER;
+      return VALIDER_TRAITEMENT;
     }
     return SIGNATURE_ACCEPTATION_CONTENANT;
   }
