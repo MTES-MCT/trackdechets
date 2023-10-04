@@ -261,7 +261,9 @@ export function BsdaRequestRevision({ bsda }: Props) {
                     </Field>
 
                     <OperationModeSelect
-                      operationCode={bsda.destination?.operation?.code}
+                      operationCode={
+                        values?.content?.destination?.operation?.code
+                      }
                       name="content.destination.operation.mode"
                     />
                   </ReviewableField>
