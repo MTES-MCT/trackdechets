@@ -71,6 +71,7 @@ async function findCompanyAndMergeInfos(
   const where = {
     where: { orgId: cleanClue }
   };
+
   const trackdechetsCompanyInfo = await prisma.company.findUnique({
     ...where,
     select: {
@@ -162,7 +163,6 @@ export async function searchCompany(
           codePaysEtrangerEtablissement: country.isoCode.short,
           statutDiffusionEtablissement: "O",
           etatAdministratif: "A",
-          vatNumber: cleanedClue,
           ...company
         };
       }
