@@ -87,7 +87,7 @@ export function SignWork({
         ) : (
           <Formik
             initialValues={{
-              date: TODAY,
+              date: TODAY.toISOString(),
               author: "",
               ...getComputedState(
                 {
