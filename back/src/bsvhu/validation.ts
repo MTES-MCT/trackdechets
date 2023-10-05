@@ -201,12 +201,20 @@ const destinationSchema: FactorySchemaOf<
           const { destinationOperationCode } = this.parent;
           const destinationOperationMode = item;
 
-          if (destinationOperationCode && destinationOperationMode) {
+          if (destinationOperationCode) {
             const modes = getOperationModesFromOperationCode(
               destinationOperationCode
             );
 
-            return modes.includes(destinationOperationMode ?? "");
+            if (modes.length) {
+              if (!destinationOperationMode) {
+                return new yup.ValidationError(
+                  "Vous devez préciser un mode de traitement"
+                );
+              }
+
+              return modes.includes(destinationOperationMode ?? "");
+            }
           }
 
           return true;

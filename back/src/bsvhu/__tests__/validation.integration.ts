@@ -307,7 +307,7 @@ describe("BSVHU validation", () => {
         destinationOperationCode: "R 1",
         destinationOperationMode: OperationMode.RECYCLAGE
       };
-      expect.assertions(1);
+      expect.assertions(2);
 
       try {
         await validateBsvhu(data, {
@@ -315,6 +315,27 @@ describe("BSVHU validation", () => {
         });
       } catch (err) {
         expect(err.errors.length).toBeTruthy();
+        expect(err.errors[0]).toBe(
+          "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+        );
+      }
+    });
+
+    test("when operation code has associated operation modes but none is specified", async () => {
+      const data = {
+        ...bsvhu,
+        destinationOperationCode: "R 1",
+        destinationOperationMode: undefined
+      };
+      expect.assertions(2);
+
+      try {
+        await validateBsvhu(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors.length).toBeTruthy();
+        expect(err.errors[0]).toBe("Vous devez préciser un mode de traitement");
       }
     });
 
