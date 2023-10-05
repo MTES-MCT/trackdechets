@@ -34,6 +34,7 @@ import { machine } from "../../machine";
 import { renderBsdaRefusedEmail } from "../../mails/refused";
 import { BsdaRepository, getBsdaRepository } from "../../repository";
 import { parseBsda } from "../../validation/validate";
+import { Mail } from "../../../mailer/types";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,
@@ -214,20 +215,30 @@ async function signOperation(
     ...(nextStatus === BsdaStatus.REFUSED && { forwardingId: null })
   };
 
+  let refusedEmail: Mail | undefined = undefined;
+
   if (
     bsda.destinationReceptionAcceptationStatus &&
     [
       WasteAcceptationStatus.REFUSED,
       WasteAcceptationStatus.PARTIALLY_REFUSED
-    ].includes(bsda.destinationReceptionAcceptationStatus)
+    ].includes(bsda.destinationReceptionAcceptationStatus) &&
+    (!bsda.emitterIsPrivateIndividual ||
+      // N'envoie rien si on ne connait pas l'adresse e-mail de l'émetteur particulier
+      // FIXME il serait bien de quand même pouvoir envoyer l'email à la DREAL
+      // mais ça demande un refacto de renderBsdaRefusedEmail
+      (bsda.emitterIsPrivateIndividual && bsda.emitterCompanyMail))
   ) {
-    const refusedEmail = await renderBsdaRefusedEmail(bsda);
-    if (refusedEmail) {
-      sendMail(refusedEmail);
-    }
+    refusedEmail = await renderBsdaRefusedEmail(bsda);
   }
 
-  return updateBsda(user, bsda, updateInput);
+  const updated = await updateBsda(user, bsda, updateInput);
+
+  if (refusedEmail) {
+    sendMail(refusedEmail);
+  }
+
+  return updated;
 }
 
 /**
