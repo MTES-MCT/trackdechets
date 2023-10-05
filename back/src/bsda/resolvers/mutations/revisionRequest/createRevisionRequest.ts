@@ -1,6 +1,7 @@
 import {
   Bsda,
   BsdaStatus,
+  OperationMode,
   Prisma,
   RevisionRequestStatus
 } from "@prisma/client";
@@ -20,6 +21,7 @@ import { getBsdaRepository } from "../../../repository";
 import { OPERATIONS } from "../../../validation/constants";
 import { checkCanRequestRevision } from "../../../permissions";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
+import { getOperationModesFromOperationCode } from "../../../../common/operationModes";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
@@ -238,6 +240,36 @@ const revisionRequestContentSchema = yup.object({
       "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
     )
     .nullable(),
+  destinationOperationMode: yup
+    .mixed<OperationMode | null | undefined>()
+    .oneOf([...Object.values(OperationMode), null, undefined])
+    .nullable()
+    .test(
+      "processing-mode-matches-processing-operation",
+      "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
+      function (item) {
+        const { destinationOperationCode } = this.parent;
+        const destinationOperationMode = item;
+
+        if (destinationOperationCode) {
+          const modes = getOperationModesFromOperationCode(
+            destinationOperationCode
+          );
+
+          if (modes.length) {
+            if (!destinationOperationMode) {
+              return new yup.ValidationError(
+                "Vous devez préciser un mode de traitement"
+              );
+            }
+
+            return modes.includes(destinationOperationMode ?? "");
+          }
+        }
+
+        return true;
+      }
+    ),
   destinationOperationDescription: yup.string().nullable(),
   brokerCompanyName: yup.string().nullable(),
   brokerCompanySiret: yup.string().nullable(),
