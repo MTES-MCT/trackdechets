@@ -662,6 +662,7 @@ describe("operationSchema", () => {
     operationDate: new Date("2021-09-02"),
     operationNoTraceability: false,
     operationCode: "R2",
+    operationMode: "REUTILISATION",
     operationNextDestinationCompanyName: null,
     operationNextDestinationPlannedOperationCode: null,
     operationNextDestinationCap: null,
@@ -804,7 +805,8 @@ describe("operationSchema", () => {
   it("should be invalid when processing operation is not in the list", async () => {
     const data = {
       ...operation,
-      operationCode: "R8"
+      operationCode: "R8",
+      operationMode: "RECYCLAGE"
     };
     const validateFn = () => operationSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
@@ -812,13 +814,16 @@ describe("operationSchema", () => {
     );
   });
 
-  it("should fail if operation code and operation mode are incompatible", () => {
+  it("should fail if operation code and operation mode are incompatible", async () => {
     const data = {
       ...operation,
       operationCode: "R1",
       operationMode: "RECYCLAGE"
     };
-    expect(operationSchema.isValidSync(data)).toEqual(false);
+    const validateFn = () => operationSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+    );
   });
 
   it("should succeed if operation code and operation mode are compatible", async () => {
@@ -828,6 +833,19 @@ describe("operationSchema", () => {
       operationMode: "VALORISATION_ENERGETIQUE"
     };
     expect(operationSchema.isValidSync(data)).toEqual(true);
+  });
+
+  test("should fail if operation code has associated operation modes but none is specified", async () => {
+    const data = {
+      ...operation,
+      operationCode: "R1",
+      operationMode: undefined
+    };
+
+    const validateFn = () => operationSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "Vous devez préciser un mode de traitement"
+    );
   });
 });
 
