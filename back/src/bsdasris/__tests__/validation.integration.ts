@@ -419,13 +419,14 @@ describe("Mutation.signBsdasri emission", () => {
       const data = {
         ...bsdasri,
         destinationOperationCode: "R1",
-        destinationOperationMode: "RECYCLAGE"
+        destinationOperationMode: "RECYCLAGE",
+        destinationReceptionWasteWeightValue: 10
       };
       expect.assertions(2);
 
       try {
         await validateBsdasri(data as any, {
-          transportSignature: true
+          operationSignature: true
         });
       } catch (err) {
         expect(err.errors.length).toBeTruthy();

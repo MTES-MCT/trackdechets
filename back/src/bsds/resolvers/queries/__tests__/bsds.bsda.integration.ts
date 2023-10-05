@@ -178,6 +178,7 @@ describe("Query.bsds.bsda base workflow", () => {
               },
               operation: {
                 code: "D 9",
+                mode: "ELIMINATION",
                 date: new Date().toISOString() as any
               }
             }

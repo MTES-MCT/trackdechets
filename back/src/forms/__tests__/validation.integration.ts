@@ -1752,7 +1752,7 @@ describe("processedInfoSchema", () => {
     const validateFn = () => processedInfoSchema.validate(processedInfo);
 
     await expect(validateFn()).rejects.toThrow(
-      "Vous devez spécifier un mode de traitement"
+      "Vous devez préciser un mode de traitement"
     );
   });
 
