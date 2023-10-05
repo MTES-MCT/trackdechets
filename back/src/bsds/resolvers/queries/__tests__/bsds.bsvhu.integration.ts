@@ -459,7 +459,8 @@ describe("Query.bsds.vhus base workflow", () => {
           destinationReceptionWeight: 10.0,
           destinationReceptionAcceptationStatus:
             WasteAcceptationStatus.ACCEPTED,
-          destinationOperationCode: "R 4"
+          destinationOperationCode: "R 4",
+          destinationOperationMode: "REUTILISATION"
         }
       });
       await mutate<Pick<Mutation, "signBsvhu">, MutationSignBsvhuArgs>(

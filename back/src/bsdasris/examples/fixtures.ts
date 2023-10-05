@@ -114,6 +114,7 @@ const operationForGroupingInput = {
     value: 1
   },
   code: "D12",
+  mode: "ELIMINATION",
   date: "2020-04-28"
 };
 
