@@ -276,8 +276,8 @@ describe("Mutation.signBsdasri emission", () => {
       } catch (err) {
         expect(err.errors).toEqual([
           `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
-          " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
-          " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+            " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
         ]);
       }
     });
@@ -303,8 +303,8 @@ describe("Mutation.signBsdasri emission", () => {
       } catch (err) {
         expect(err.errors).toEqual([
           `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
-          " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
-          " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+            " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
         ]);
       }
     });
@@ -364,9 +364,9 @@ describe("Mutation.signBsdasri emission", () => {
       } catch (err) {
         expect(err.errors).toEqual([
           `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est pas inscrite` +
-          " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc" +
-          " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil" +
-          " de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+            " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc" +
+            " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil" +
+            " de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
         ]);
       }
     });
@@ -489,9 +489,9 @@ describe("Mutation.signBsdasri emission", () => {
       } catch (err) {
         expect(err.errors).toEqual([
           `Le transporteur saisi sur le bordereau (SIRET: ${bsdasri.emitterCompanySiret}) n'est pas inscrit sur Trackdéchets` +
-          ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
-          ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
-          ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+            ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
+            ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
+            ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
         ]);
       }
     });
