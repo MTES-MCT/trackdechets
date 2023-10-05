@@ -377,7 +377,9 @@ describe("BSDA validation", () => {
         await parseBsda(data, { currentSignatureType: "OPERATION" });
       } catch (err) {
         expect(err.errors.length).toBeTruthy();
-        expect(err.errors[0]).toBe("Vous devez préciser un mode de traitement");
+        expect(err.errors[0].message).toBe(
+          "Vous devez préciser un mode de traitement"
+        );
       }
     });
   });

@@ -669,7 +669,7 @@ export const operationSchema: FactorySchemaOf<
             if (modes.length) {
               if (!destinationOperationMode) {
                 return new yup.ValidationError(
-                  "Vous devez spécifier un mode de traitement"
+                  "Vous devez préciser un mode de traitement"
                 );
               }
 

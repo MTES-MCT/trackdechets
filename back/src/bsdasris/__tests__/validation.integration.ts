@@ -435,11 +435,12 @@ describe("Mutation.signBsdasri emission", () => {
       }
     });
 
-    test.only("if operation code has associated operation modes but none is specified", async () => {
+    test("if operation code has associated operation modes but none is specified", async () => {
       const data = {
         ...bsdasri,
         destinationOperationCode: "D9",
-        destinationOperationMode: undefined
+        destinationOperationMode: undefined,
+        destinationReceptionWasteWeightValue: 10
       };
 
       expect.assertions(2);
