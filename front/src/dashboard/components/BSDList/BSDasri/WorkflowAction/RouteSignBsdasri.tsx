@@ -182,7 +182,7 @@ export function RouteSignBsdasri({
       <Formik
         initialValues={{
           ...formState,
-          signature: { author: "", date: TODAY },
+          signature: { author: "", date: TODAY.toISOString() },
         }}
         validationSchema={() => signatureValidationSchema}
         onSubmit={async values => {
