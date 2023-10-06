@@ -82,7 +82,6 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
                     setFieldValue(field.name, {
                       name: eo.name,
                       siret: eo.siret,
-                      orgId: eo.orgId,
                     })
                   }
                   results={data.ecoOrganismes
