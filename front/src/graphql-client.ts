@@ -6,7 +6,7 @@ import {
 } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { relayStylePagination } from "@apollo/client/utilities";
-import { retirerOrgId } from "common/helper";
+import { removeOrgId } from "common/helper";
 
 /**
  * Automatically erase `__typename` from variables
@@ -32,7 +32,7 @@ const cleanTypeNameLink = new ApolloLink((operation, forward) => {
  */
 const cleanOrgIdLink = new ApolloLink((operation, forward) => {
   if (operation.variables) {
-    operation.variables = retirerOrgId(operation.variables);
+    operation.variables = removeOrgId(operation.variables);
   }
   return forward(operation);
 });
