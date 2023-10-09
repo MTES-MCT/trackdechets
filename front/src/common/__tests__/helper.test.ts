@@ -1,6 +1,6 @@
-import { mergeDefaults, retirerOrgId } from "../helper";
+import { mergeDefaults, removeOrgId } from "../helper";
 
-describe("retirerOrgId", () => {
+describe("removeOrgId", () => {
   it("should remove orgId keys inside company objects", () => {
     const input = {
       name: "Organisation1",
@@ -26,7 +26,7 @@ describe("retirerOrgId", () => {
       orgId: 789,
     };
 
-    expect(retirerOrgId(input)).toEqual(expected);
+    expect(removeOrgId(input)).toEqual(expected);
   });
 
   it("should not remove orgId keys outside of company objects", () => {
@@ -40,7 +40,7 @@ describe("retirerOrgId", () => {
       orgId: 789,
     };
 
-    expect(retirerOrgId(input)).toEqual(expected);
+    expect(removeOrgId(input)).toEqual(expected);
   });
 });
 

@@ -168,9 +168,9 @@ export const debounce = <F extends (...args: any) => any>(
 };
 
 /**
- * Remove orgId from CompanyInput when it was built from FormCompany
+ * Remove orgId from Input when it was built from FormCompany
  */
-export function retirerOrgId(obj: any, insideCompany: boolean = false): any {
+export function removeOrgId(obj: any, insideCompany: boolean = false): any {
   if (typeof obj !== "object" || obj === null) {
     return obj;
   }
@@ -181,10 +181,10 @@ export function retirerOrgId(obj: any, insideCompany: boolean = false): any {
     if (insideCompany && key === "orgId") {
       continue;
     }
-    if (key === "company") {
-      newObj[key] = retirerOrgId(obj[key], true);
+    if (["company", "intermediaries", "ecoOrganisme"].includes(key)) {
+      newObj[key] = removeOrgId(obj[key], true);
     } else {
-      newObj[key] = retirerOrgId(obj[key], insideCompany);
+      newObj[key] = removeOrgId(obj[key], insideCompany);
     }
   }
 
