@@ -24,15 +24,6 @@ export async function parseBsda(
   return contextualSchema.parseAsync(bsda);
 }
 
-const isStepAhead = (step1, step2) => {
-  if (!step1 || !step2) return false;
-
-  return (
-    SIGNATURES_HIERARCHY_KEYS.indexOf(step1) >=
-    SIGNATURES_HIERARCHY_KEYS.indexOf(step2)
-  );
-};
-
 export function getContextualBsdaSchema(
   validationContext: BsdaValidationContext,
   rules = editionRules
@@ -76,23 +67,18 @@ export function getContextualBsdaSchema(
         let fieldIsRequired = false;
         if (rule.isRequired instanceof Function) {
           fieldIsRequired =
-            isStepAhead(
-              validationContext.currentSignatureType,
-              rule.sealedBy
-            ) && rule.isRequired(val);
+            signaturesToCheck.includes(rule.sealedBy as string) &&
+            rule.isRequired(val);
         } else if (
-          SIGNATURES_HIERARCHY_KEYS.includes(rule.isRequired as string)
+          Object.keys(SIGNATURES_HIERARCHY).includes(rule.isRequired as string)
         ) {
-          fieldIsRequired = isStepAhead(
-            validationContext.currentSignatureType,
-            rule.isRequired
+          fieldIsRequired = signaturesToCheck.includes(
+            rule.isRequired as string
           );
         } else {
           fieldIsRequired =
-            isStepAhead(
-              validationContext.currentSignatureType,
-              rule.sealedBy
-            ) && (rule.isRequired as boolean);
+            signaturesToCheck.includes(rule.sealedBy as string) &&
+            (rule.isRequired as boolean);
         }
 
         if (fieldIsRequired && val[field] == null) {
