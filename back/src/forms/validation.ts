@@ -806,6 +806,16 @@ const wasteDetailsNormalSchemaFn: FactorySchemaOf<
           "is-valid-packaging-infos",
           "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
           isValidPackagingInfos
+        )
+        .test(
+          "is-required-packaging-infos",
+          "Le détail du conditionnement est obligatoire",
+          (infos: PackagingInfo[] | undefined) => {
+            if (isDraft) {
+              return true;
+            }
+            return infos != null && infos.length > 0;
+          }
         ),
       wasteDetailsQuantity: weight(WeightUnits.Tonne)
         .label("Déchet")
