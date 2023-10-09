@@ -928,6 +928,7 @@ describe("Query.bsds.bsda base workflow", () => {
         where: { id: bsdaId },
         data: {
           destinationOperationCode: "D 15",
+          destinationOperationMode: null,
           status: "SENT",
           destinationOperationSignatureDate: null,
           destinationOperationSignatureAuthor: null
