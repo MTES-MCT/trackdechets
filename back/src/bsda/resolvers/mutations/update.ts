@@ -50,15 +50,16 @@ export default async function edit(
     bsda.grouping && bsda.grouping.length > 0
       ? { set: bsda.grouping.map(id => ({ id })) }
       : undefined;
-  const intermediaries =
-    bsda.intermediaries && bsda.intermediaries.length > 0
-      ? {
-          deleteMany: {},
+  const intermediaries = bsda.intermediaries
+    ? {
+        deleteMany: {},
+        ...(bsda.intermediaries.length > 0 && {
           createMany: {
             data: companyToIntermediaryInput(bsda.intermediaries)
           }
-        }
-      : undefined;
+        })
+      }
+    : undefined;
 
   const bsdaRepository = getBsdaRepository(user);
   const updatedBsda = await bsdaRepository.update(
