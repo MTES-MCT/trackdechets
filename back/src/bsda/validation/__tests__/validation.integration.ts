@@ -344,44 +344,6 @@ describe("BSDA validation", () => {
         }
       }
     );
-
-    test("when operation mode is not compatible with operation code", async () => {
-      const data = {
-        ...bsda,
-        destinationOperationCode: "R 5",
-        destinationOperationMode: "VALORISATION_ENERGETIQUE"
-      };
-
-      expect.assertions(2);
-
-      try {
-        await parseBsda(data, { currentSignatureType: "OPERATION" });
-      } catch (err) {
-        expect(err.errors.length).toBeTruthy();
-        expect(err.issues[0].message).toBe(
-          "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
-        );
-      }
-    });
-
-    test("if operation code has associated operation modes but none is specified", async () => {
-      const data = {
-        ...bsda,
-        destinationOperationCode: "R 5",
-        destinationOperationMode: undefined
-      };
-
-      expect.assertions(2);
-
-      try {
-        await parseBsda(data, { currentSignatureType: "OPERATION" });
-      } catch (err) {
-        expect(err.errors.length).toBeTruthy();
-        expect(err.errors[0].message).toBe(
-          "Vous devez préciser un mode de traitement"
-        );
-      }
-    });
   });
 
   describe("Emitter transports own waste", () => {
@@ -429,6 +391,71 @@ describe("BSDA validation", () => {
           `Le transporteur saisi sur le bordereau (SIRET: ${emitterAndTransporter.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
             " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
             " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        );
+      }
+    });
+  });
+
+  describe("Operation modes", () => {
+    test.each([
+      ["R 5", "REUTILISATION"],
+      ["R 13", undefined]
+    ])(
+      "should work if operation code & mode are compatible (code: %p, mode: %p)",
+      async (code, mode) => {
+        const data = {
+          ...bsda,
+          destinationOperationCode: code,
+          destinationOperationMode: mode
+        };
+
+        const res = await parseBsda(data, {
+          currentSignatureType: "OPERATION"
+        });
+        expect(res).not.toBeUndefined();
+      }
+    );
+
+    test.each([
+      ["R 5", "VALORISATION_ENERGETIQUE"], // Correct modes are REUTILISATION or RECYCLAGE
+      ["R 13", "VALORISATION_ENERGETIQUE"] // R 13 has no associated mode
+    ])(
+      "should fail if operation mode is not compatible with operation code (code: %p, mode: %p)",
+      async (code, mode) => {
+        const data = {
+          ...bsda,
+          destinationOperationCode: code,
+          destinationOperationMode: mode
+        };
+
+        expect.assertions(2);
+
+        try {
+          await parseBsda(data, { currentSignatureType: "OPERATION" });
+        } catch (err) {
+          expect(err.errors.length).toBeTruthy();
+          expect(err.errors[0].message).toBe(
+            "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+          );
+        }
+      }
+    );
+
+    test("should fail if operation code has associated operation modes but none is specified", async () => {
+      const data = {
+        ...bsda,
+        destinationOperationCode: "R 5",
+        destinationOperationMode: undefined
+      };
+
+      expect.assertions(2);
+
+      try {
+        await parseBsda(data, { currentSignatureType: "OPERATION" });
+      } catch (err) {
+        expect(err.errors.length).toBeTruthy();
+        expect(err.errors[0].message).toBe(
+          "Vous devez préciser un mode de traitement"
         );
       }
     });

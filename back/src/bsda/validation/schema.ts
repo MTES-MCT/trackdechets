@@ -212,22 +212,25 @@ export const rawBsdaSchema = z
     const { destinationOperationCode, destinationOperationMode } = val;
     if (destinationOperationCode) {
       const modes = getOperationModesFromOperationCode(
-        destinationOperationCode ?? ""
+        destinationOperationCode
       );
 
-      if (modes.length) {
-        if (!destinationOperationMode) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Vous devez préciser un mode de traitement"
-          });
-        } else if (!modes.includes(destinationOperationMode)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message:
-              "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
-          });
-        }
+      if (modes.length && !destinationOperationMode) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Vous devez préciser un mode de traitement"
+        });
+      } else if (
+        (modes.length &&
+          destinationOperationMode &&
+          !modes.includes(destinationOperationMode)) ||
+        (!modes.length && destinationOperationMode)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+        });
       }
     }
 

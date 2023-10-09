@@ -23,7 +23,9 @@ describe("Mutation.signBsdasri emission", () => {
       orgId: "IT13029381004",
       vatNumber: "IT13029381004"
     });
-    const destination = await companyFactory();
+    const destination = await companyFactory({
+      companyTypes: ["COLLECTOR"]
+    });
     bsdasri = {
       ...initialData(emitter),
       ...readyToPublishData(destination),
@@ -494,6 +496,75 @@ describe("Mutation.signBsdasri emission", () => {
             ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
             ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
         ]);
+      }
+    });
+  });
+
+  describe("Operation modes", () => {
+    test.each([
+      ["D9", "ELIMINATION"],
+      ["R12", undefined]
+    ])(
+      "should work if operation code & mode are compatible (code: %p, mode: %p)",
+      async (code, mode) => {
+        const data = {
+          ...bsdasri,
+          destinationOperationCode: code,
+          destinationOperationMode: mode,
+          destinationOperationDate: new Date(),
+          destinationReceptionWasteWeightValue: 10
+        };
+
+        const res = await validateBsdasri(data as any, {
+          operationSignature: true
+        });
+        expect(res).not.toBeUndefined();
+      }
+    );
+
+    test.each([
+      ["D9", "VALORISATION_ENERGETIQUE"], // Correct mode is ELIMINATION
+      ["R12", "VALORISATION_ENERGETIQUE"] // R12 has no associated mode
+    ])(
+      "should not be valid if operation mode is not compatible with operation code (mode: %p, code: %p)",
+      async (code, mode) => {
+        const data = {
+          ...bsdasri,
+          destinationOperationCode: code,
+          destinationOperationMode: mode,
+          destinationOperationDate: new Date(),
+          destinationReceptionWasteWeightValue: 10
+        };
+
+        expect.assertions(2);
+
+        try {
+          await validateBsdasri(data as any, { operationSignature: true });
+        } catch (err) {
+          expect(err.errors.length).toBeTruthy();
+          expect(err.errors[0]).toBe(
+            "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+          );
+        }
+      }
+    );
+
+    test("should not be valid if operation code has associated operation modes but none is specified", async () => {
+      const data = {
+        ...bsdasri,
+        destinationOperationCode: "D9",
+        destinationOperationMode: undefined,
+        destinationOperationDate: new Date(),
+        destinationReceptionWasteWeightValue: 10
+      };
+
+      expect.assertions(2);
+
+      try {
+        await validateBsdasri(data as any, { operationSignature: true });
+      } catch (err) {
+        expect(err.errors.length).toBeTruthy();
+        expect(err.errors[0]).toBe("Vous devez préciser un mode de traitement");
       }
     });
   });

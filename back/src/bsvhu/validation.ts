@@ -206,14 +206,19 @@ const destinationSchema: FactorySchemaOf<
               destinationOperationCode
             );
 
-            if (modes.length) {
-              if (!destinationOperationMode) {
-                return new yup.ValidationError(
-                  "Vous devez préciser un mode de traitement"
-                );
-              }
-
-              return modes.includes(destinationOperationMode ?? "");
+            if (modes.length && !destinationOperationMode) {
+              return new yup.ValidationError(
+                "Vous devez préciser un mode de traitement"
+              );
+            } else if (
+              (modes.length &&
+                destinationOperationMode &&
+                !modes.includes(destinationOperationMode)) ||
+              (!modes.length && destinationOperationMode)
+            ) {
+              return new yup.ValidationError(
+                "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+              );
             }
           }
 

@@ -683,7 +683,8 @@ describe("operationSchema", () => {
     const data = {
       ...operation,
       operationNoTraceability: true,
-      operationCode: "D13"
+      operationCode: "D13",
+      operationMode: undefined
     };
     expect(operationSchema.isValidSync(data)).toEqual(true);
   });
@@ -692,6 +693,7 @@ describe("operationSchema", () => {
     const data = {
       ...operation,
       operationCode: "D13",
+      operationMode: undefined,
       operationNextDestinationCompanyName: "ACME INC",
       operationNextDestinationPlannedOperationCode: "R2",
       operationNextDestinationCap: "cap",
@@ -709,6 +711,7 @@ describe("operationSchema", () => {
     const data = {
       ...operation,
       operationCode: "D13",
+      operationMode: undefined,
       operationNextDestinationCompanyName: "ACME INC",
       operationNextDestinationPlannedOperationCode: "R2",
       operationNextDestinationCap: "cap",
@@ -726,6 +729,7 @@ describe("operationSchema", () => {
     const data = {
       ...operation,
       operationCode: "D13",
+      operationMode: undefined,
       operationNextDestinationCompanyName: "ACME INC",
       operationNextDestinationPlannedOperationCode: "R2",
       operationNextDestinationCap: "cap",
@@ -746,6 +750,7 @@ describe("operationSchema", () => {
     const data = {
       ...operation,
       operationCode: "D13",
+      operationMode: undefined,
       operationNextDestinationCompanyName: "ACME INC",
       operationNextDestinationPlannedOperationCode: "R2",
       operationNextDestinationCap: "cap",
@@ -767,6 +772,7 @@ describe("operationSchema", () => {
       ...operation,
       operationNoTraceability: true,
       operationCode: "D13",
+      operationMode: undefined,
       operationNextDestinationCompanyName: "ACME INC",
       operationNextDestinationPlannedOperationCode: "R2",
       operationNextDestinationCap: "cap",
@@ -814,38 +820,47 @@ describe("operationSchema", () => {
     );
   });
 
-  it("should fail if operation code and operation mode are incompatible", async () => {
-    const data = {
-      ...operation,
-      operationCode: "R1",
-      operationMode: "RECYCLAGE"
-    };
-    const validateFn = () => operationSchema.validate(data);
-    await expect(validateFn()).rejects.toThrow(
-      "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+  describe("Operation mode", () => {
+    it("should succeed if operation code and operation mode are compatible", async () => {
+      const data = {
+        ...operation,
+        operationCode: "R1",
+        operationMode: "VALORISATION_ENERGETIQUE"
+      };
+      expect(operationSchema.isValidSync(data)).toEqual(true);
+    });
+
+    test.each([
+      ["R 5", "VALORISATION_ENERGETIQUE"], // Correct modes are REUTILISATION or RECYCLAGE
+      ["R 13", "VALORISATION_ENERGETIQUE"] // R 13 has no associated mode
+    ])(
+      "should fail if operation mode is not compatible with operation code",
+      async (code, mode) => {
+        const data = {
+          ...operation,
+          operationCode: code,
+          operationMode: mode
+        };
+
+        const validateFn = () => operationSchema.validate(data);
+        await expect(validateFn()).rejects.toThrow(
+          "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+        );
+      }
     );
-  });
 
-  it("should succeed if operation code and operation mode are compatible", async () => {
-    const data = {
-      ...operation,
-      operationCode: "R1",
-      operationMode: "VALORISATION_ENERGETIQUE"
-    };
-    expect(operationSchema.isValidSync(data)).toEqual(true);
-  });
+    test("should fail if operation code has associated operation modes but none is specified", async () => {
+      const data = {
+        ...operation,
+        operationCode: "R1",
+        operationMode: undefined
+      };
 
-  test("should fail if operation code has associated operation modes but none is specified", async () => {
-    const data = {
-      ...operation,
-      operationCode: "R1",
-      operationMode: undefined
-    };
-
-    const validateFn = () => operationSchema.validate(data);
-    await expect(validateFn()).rejects.toThrow(
-      "Vous devez préciser un mode de traitement"
-    );
+      const validateFn = () => operationSchema.validate(data);
+      await expect(validateFn()).rejects.toThrow(
+        "Vous devez préciser un mode de traitement"
+      );
+    });
   });
 });
 
