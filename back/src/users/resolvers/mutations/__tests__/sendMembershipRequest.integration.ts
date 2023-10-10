@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
-import * as mailsHelper from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import {
   companyFactory,
   siretify,
@@ -18,8 +18,8 @@ import { Mutation } from "../../../../generated/graphql/types";
 import { subMinutes } from "date-fns";
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 const SEND_MEMBERSHIP_REQUEST = `
   mutation SendMembershipRequest($siret: String!){
@@ -36,7 +36,7 @@ const SEND_MEMBERSHIP_REQUEST = `
 describe("mutation sendMembershipRequest", () => {
   afterAll(resetDatabase);
 
-  afterEach(sendMailSpy.mockClear);
+  afterEach((sendMail as jest.Mock).mockClear);
 
   it("should deny access to unauthenticated users", async () => {
     const { mutate } = makeClient();
@@ -89,7 +89,7 @@ describe("mutation sendMembershipRequest", () => {
     expect(membershipRequest.status).toEqual("PENDING");
     expect(membershipRequest.statusUpdatedBy).toBeNull();
 
-    expect(sendMailSpy).toHaveBeenNthCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenNthCalledWith(
       1,
       renderMail(membershipRequestMail, {
         to: [{ email: admin.email, name: admin.name }],
@@ -102,7 +102,7 @@ describe("mutation sendMembershipRequest", () => {
       })
     );
     // admin emails are not displayed because they do not belong to the same domain
-    expect(sendMailSpy).toHaveBeenNthCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenNthCalledWith(
       2,
       renderMail(membershipRequestConfirmation, {
         to: [{ email: requester.email, name: requester.name }],
@@ -162,7 +162,7 @@ describe("mutation sendMembershipRequest", () => {
     expect(membershipRequest.status).toEqual("PENDING");
     expect(membershipRequest.statusUpdatedBy).toBeNull();
 
-    expect(sendMailSpy).toHaveBeenNthCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenNthCalledWith(
       1,
       renderMail(membershipRequestMail, {
         to: [{ email: admin.email, name: admin.name }],
@@ -175,7 +175,7 @@ describe("mutation sendMembershipRequest", () => {
       })
     );
     // admin emails   not displayed because they  belong to the same domain
-    expect(sendMailSpy).toHaveBeenNthCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenNthCalledWith(
       2,
       renderMail(membershipRequestConfirmation, {
         to: [{ email: requester.email, name: requester.name }],

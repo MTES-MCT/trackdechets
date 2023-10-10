@@ -26,6 +26,8 @@ import {
 import {
   blankstate_action_desc,
   blankstate_action_title,
+  blankstate_default_desc,
+  blankstate_default_title,
   blankstate_draft_desc,
   blankstate_draft_title,
   blankstate_follow_desc,
@@ -45,16 +47,16 @@ import {
   filterList,
   dropdownCreateLinks,
   filterPredicates,
+  getBsdCurrentTab,
 } from "../Apps/Dashboard/dashboardUtils";
 import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
-import { BsdCurrentTab } from "Apps/common/types/commonTypes";
 import { usePermissions } from "common/contexts/PermissionsContext";
 import { UserPermission } from "generated/graphql/types";
-
-import "./dashboard.scss";
 import { GET_BSDA_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsdaReviewQuery";
 import { GET_FORM_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsddReviewsQuery";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
+
+import "./dashboard.scss";
 
 const DashboardPage = () => {
   const { permissions } = usePermissions();
@@ -63,42 +65,28 @@ const DashboardPage = () => {
   const isFollowTab = !!useRouteMatch(routes.dashboardv2.bsds.follow);
   const isArchivesTab = !!useRouteMatch(routes.dashboardv2.bsds.history);
   const isReviewsTab = !!useRouteMatch(routes.dashboardv2.bsds.reviews);
+  // const isToReviewedTab = !!useRouteMatch(routes.dashboardv2.bsds.toReviewed);
+  // const isReviewedTab = !!useRouteMatch(routes.dashboardv2.bsds.reviewed);
   const isToCollectTab = !!useRouteMatch(
     routes.dashboardv2.transport.toCollect
   );
   const isCollectedTab = !!useRouteMatch(
     routes.dashboardv2.transport.collected
   );
+  const isAllBsdsTab = !!useRouteMatch(routes.dashboardv2.bsds.index);
+
   const BSD_PER_PAGE = 25;
-
-  const getBsdCurrentTab = (): BsdCurrentTab => {
-    if (isDraftTab) {
-      return "draftTab";
-    }
-    if (isActTab) {
-      return "actTab";
-    }
-    if (isFollowTab) {
-      return "followTab";
-    }
-    if (isArchivesTab) {
-      return "archivesTab";
-    }
-    if (isReviewsTab) {
-      return "reviewsTab";
-    }
-    if (isToCollectTab) {
-      return "toCollectTab";
-    }
-    if (isCollectedTab) {
-      return "collectedTab";
-    }
-    // default tab
-    return "draftTab";
-  };
-
-  const bsdCurrentTab = getBsdCurrentTab();
-
+  const bsdCurrentTab = getBsdCurrentTab({
+    isDraftTab,
+    isActTab,
+    isFollowTab,
+    isArchivesTab,
+    isReviewsTab,
+    isToCollectTab,
+    isCollectedTab,
+    // isReviewedTab,
+    // isToReviewedTab,
+  });
   const { siret } = useParams<{ siret: string }>();
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -134,6 +122,30 @@ const DashboardPage = () => {
         isCollectedFor: [siret],
       };
     }
+    if (isAllBsdsTab) {
+      return {
+        isDraftFor: [siret],
+        isForActionFor: [siret],
+        isFollowFor: [siret],
+        isArchivedFor: [siret],
+      };
+    }
+    // if (isReviewsTab) {
+    //   return {
+    //     isRevisedFor: [siret],
+    //     isInRevisionFor: [siret],
+    //   };
+    // }
+    // if (isToReviewedTab) {
+    //   return {
+    //     isInRevisionFor: [siret],
+    //   };
+    // }
+    // if (isReviewedTab) {
+    //   return {
+    //     isRevisedFor: [siret],
+    //   };
+    // }
   }, [
     isActTab,
     isDraftTab,
@@ -141,6 +153,10 @@ const DashboardPage = () => {
     isArchivesTab,
     isToCollectTab,
     isCollectedTab,
+    isAllBsdsTab,
+    // isReviewsTab,
+    // isToReviewedTab,
+    // isReviewedTab,
     siret,
   ]);
 
@@ -216,6 +232,7 @@ const DashboardPage = () => {
     fetchPolicy: "cache-and-network",
   });
 
+  // A supprimer quand on pourra afficher une révision avec la requete bsds
   const [
     fetchBsddRevisions,
     {
@@ -303,6 +320,7 @@ const DashboardPage = () => {
     });
   }, [data?.bsds.pageInfo.endCursor, fetchMore]);
 
+  // A supprimer quand on pourra afficher une révision avec la requete bsds
   const loadMoreBsddReviews = React.useCallback(() => {
     setIsFetchingMore(true);
 
@@ -339,6 +357,8 @@ const DashboardPage = () => {
     dataBsddReviews?.formRevisionRequests.pageInfo.endCursor,
     fetchMoreBsddReviews,
   ]);
+
+  // A supprimer quand on pourra afficher une révision avec la requete bsds
   const loadMoreBsdaReviews = React.useCallback(() => {
     setIsFetchingMore(true);
 
@@ -377,6 +397,7 @@ const DashboardPage = () => {
 
   const loadMore = () => {
     if (isReviewsTab) {
+      // A supprimer quand on pourra afficher une révision avec la requete bsds
       loadMoreBsddReviews();
       loadMoreBsdaReviews();
     } else {
@@ -386,6 +407,7 @@ const DashboardPage = () => {
 
   useEffect(() => {
     setIsFiltersOpen(false);
+    // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
     if (!isReviewsTab) {
       fetchWithDefaultWhere({ where: defaultWhere });
     }
@@ -402,11 +424,13 @@ const DashboardPage = () => {
   ]);
 
   useEffect(() => {
+    // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
     if (!isReviewsTab) {
       fetchBsds();
     }
   }, [isReviewsTab, bsdsVariables, fetchBsds]);
 
+  // A supprimer quand on pourra afficher une révision avec la requete bsds
   useEffect(() => {
     if (isReviewsTab) {
       setBsdsReview([]);
@@ -451,6 +475,7 @@ const DashboardPage = () => {
   }, [isReviewsTab, fetchBsddRevisions, fetchBsdaRevisions]);
 
   useEffect(() => {
+    // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
     if (!isReviewsTab && !isFiltersOpen) {
       fetchWithDefaultWhere({ where: defaultWhere });
     }
@@ -472,6 +497,7 @@ const DashboardPage = () => {
     if (isReviewsTab) {
       return blankstate_reviews_title;
     }
+    return blankstate_default_title;
   };
 
   const getBlankstateDescription = () => {
@@ -497,29 +523,31 @@ const DashboardPage = () => {
     if (isReviewsTab) {
       return blankstate_reviews_desc;
     }
+    return blankstate_default_desc;
   };
 
   const toggleFiltersBlock = () => {
     setIsFiltersOpen(!isFiltersOpen);
   };
 
+  // A supprimer la condition isReviewsTab quand on pourra afficher une révision avec la requete bsds
   const bsds = !isReviewsTab ? data?.bsds.edges : bsdsReview;
-
   const bsdsTotalCount = isReviewsTab
     ? bsdsReview?.length
     : cachedData?.bsds.totalCount;
-
   const hasNextPage = isReviewsTab
     ? dataBsdaReviews?.pageInfo?.hasNextPage! ||
       dataBsddReviews?.pageInfo?.hasNextPage!
     : data?.bsds.pageInfo.hasNextPage;
-
   const isLoadingBsds = isReviewsTab
     ? loadingBsdaReviews || loadingBsddReviews
     : loading;
 
   return (
     <div className="dashboard-page">
+      {/* A supprimer la condition isReviewsTab 
+          quand on pourra afficher une révision avec la requete bsds
+       */}
       {!isReviewsTab && (
         <div className="dashboard-page__actions">
           {permissions.includes(UserPermission.BsdCanCreate) && (
@@ -554,14 +582,16 @@ const DashboardPage = () => {
       ) : (
         <>
           {!Boolean(bsdsTotalCount) && (
-            <Blankslate>
-              {getBlankstateTitle() && (
-                <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
-              )}
-              <BlankslateDescription>
-                {getBlankstateDescription()}
-              </BlankslateDescription>
-            </Blankslate>
+            <div className="dashboard-page__blankstate">
+              <Blankslate>
+                {getBlankstateTitle() && (
+                  <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
+                )}
+                <BlankslateDescription>
+                  {getBlankstateDescription()}
+                </BlankslateDescription>
+              </Blankslate>
+            </div>
           )}
 
           {Boolean(bsdsTotalCount) && (

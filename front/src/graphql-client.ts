@@ -6,7 +6,7 @@ import {
 } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { relayStylePagination } from "@apollo/client/utilities";
-import omitDeep from "omit-deep-lodash";
+import { removeOrgId } from "common/helper";
 
 /**
  * Automatically erase `__typename` from variables
@@ -27,12 +27,12 @@ const cleanTypeNameLink = new ApolloLink((operation, forward) => {
 
 /**
  * Automatically erase `company.orgId` from variables
- * This enable devs to use FormCompany object from the server
- * and not worry about `orgId` breaking CompanyInput
+ * This enable devs to use FormCompany object (that has orgId) from the server
+ * and not worry about `orgId` breaking CompanyInput (that misses orgId)
  */
 const cleanOrgIdLink = new ApolloLink((operation, forward) => {
   if (operation.variables) {
-    operation.variables = omitDeep(operation.variables, "orgId");
+    operation.variables = removeOrgId(operation.variables);
   }
   return forward(operation);
 });

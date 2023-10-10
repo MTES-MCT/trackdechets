@@ -10,11 +10,11 @@ import { CellProps, CellValue } from "react-table";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { BSDDActions } from "dashboard/components/BSDList/BSDD/BSDDActions/BSDDActions";
 import { IconBSDD } from "Apps/common/Components/Icons/Icons";
-import { statusLabels } from "../../../constants";
 import TransporterInfoEdit from "./TransporterInfoEdit";
 import { WorkflowAction } from "./WorkflowAction";
 import { useQuery } from "@apollo/client";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
+import { STATUS_LABELS } from "generated/constants/statuses";
 
 export const COLUMNS: Record<
   string,
@@ -112,7 +112,7 @@ export const COLUMNS: Record<
           return `En attente de signature par le transporteur n° ${nextTransporter.segmentNumber!}`;
         }
       }
-      return statusLabels[form.status];
+      return STATUS_LABELS[form.status];
     },
   },
   workflow: {

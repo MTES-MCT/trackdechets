@@ -5,16 +5,12 @@ import {
   userFactory,
   userWithCompanyFactory
 } from "./factories";
-import * as permissions from "../permissions";
+import { getUserRoles, Permission, checkUserPermissions } from "../permissions";
 import { deleteCachedUserRoles } from "../common/redis/users";
-
-const getUserRolesFnSpy = jest.spyOn(permissions, "getUserRolesFn");
-const { getUserRoles, Permission, checkUserPermissions } = permissions;
 
 describe("getUserRoles", () => {
   afterEach(async () => {
     await resetDatabase();
-    getUserRolesFnSpy.mockRestore();
   });
 
   it(
@@ -32,17 +28,22 @@ describe("getUserRoles", () => {
         [company1.orgId]: "ADMIN",
         [company2.orgId]: "MEMBER"
       });
-      expect(getUserRolesFnSpy).toHaveBeenCalledTimes(1);
 
       // subsequent calls to getUserRoles should be cached
-      await getUserRoles(user.id);
-      expect(getUserRolesFnSpy).toHaveBeenCalledTimes(1);
+      const roles2 = await getUserRoles(user.id);
+      expect(roles2).toEqual({
+        [company1.orgId]: "ADMIN",
+        [company2.orgId]: "MEMBER"
+      });
 
       // calling deleteCachedUserRoles should erase the cash entry
       await deleteCachedUserRoles(user.id);
 
-      await getUserRoles(user.id);
-      expect(getUserRolesFnSpy).toHaveBeenCalledTimes(2);
+      const roles3 = await getUserRoles(user.id);
+      expect(roles3).toEqual({
+        [company1.orgId]: "ADMIN",
+        [company2.orgId]: "MEMBER"
+      });
     }
   );
 });

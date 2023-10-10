@@ -20,7 +20,6 @@ import React, { useState } from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
-import { bsffVerboseStatuses } from "form/bsff/utils/constants";
 import { DateRow, DetailRow, YesNoRow } from "../common/Components";
 
 import styles from "../common/BSDDetailContent.module.scss";
@@ -42,6 +41,7 @@ import { formatDate } from "common/datetime";
 import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
 import { getOperationModeLabel } from "common/operationModes";
+import { BSFF_VERBOSE_STATUSES } from "generated/constants/statuses";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -84,7 +84,8 @@ export function BsffDetailContent({ form: bsff }: Props) {
           <h4 className={styles.detailTitle}>
             <IconBSFF className="tw-mr-2" />
             <span className={styles.detailStatus}>
-              [{bsff.isDraft ? "Brouillon" : bsffVerboseStatuses[bsff.status]}]
+              [{bsff.isDraft ? "Brouillon" : BSFF_VERBOSE_STATUSES[bsff.status]}
+              ]
             </span>
             <span>{bsff.id}</span>
           </h4>

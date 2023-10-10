@@ -7,15 +7,24 @@ import {
   TransportedWaste
 } from "../generated/graphql/types";
 import { GenericWaste } from "./types";
+import { formatStatusLabel } from "../common/constants/statuses";
+
+// Type for custom fields that might not be in the DB
+// But that we still want to display (ie for user convenience)
+export const CUSTOM_WASTE_COLUMNS = ["statusLabel"];
+export type CustomWasteColumns = {
+  statusLabel: string;
+};
 
 type Column = {
   field: keyof (IncomingWaste &
     OutgoingWaste &
     TransportedWaste &
     ManagedWaste &
-    AllWaste);
+    AllWaste &
+    CustomWasteColumns);
   label: string;
-  format?: (v: unknown) => string | number | null;
+  format?: (v: unknown, full: unknown) => string | number | null;
 };
 
 const formatDate = (d: Date | null) => d?.toISOString().slice(0, 10) ?? "";
@@ -58,7 +67,12 @@ const columns: Column[] = [
   },
   { field: "bsdType", label: "Type de bordereau" },
   { field: "customId", label: "Identifiant secondaire" },
-  { field: "status", label: "Statut du bordereau" },
+  { field: "status", label: "Statut du bordereau (code)" },
+  {
+    field: "statusLabel",
+    label: "Statut du bordereau",
+    format: formatStatusLabel
+  },
   { field: "wasteDescription", label: "Dénomination usuelle" },
   { field: "wasteCode", label: "Code du déchet" },
   {
@@ -206,12 +220,15 @@ const columns: Column[] = [
 
 export function formatRow(waste: GenericWaste, useLabelAsKey = false) {
   return columns.reduce((acc, column) => {
-    if (column.field in waste) {
+    if (
+      column.field in waste ||
+      CUSTOM_WASTE_COLUMNS.includes(column.field || "")
+    ) {
       const key = useLabelAsKey ? column.label : column.field;
       return {
         ...acc,
         [key]: column.format
-          ? column.format(waste[column.field])
+          ? column.format(waste[column.field], waste)
           : waste[column.field] ?? ""
       };
     }
@@ -224,7 +241,10 @@ export function formatRow(waste: GenericWaste, useLabelAsKey = false) {
  */
 export function getXlsxHeaders(waste: GenericWaste): Partial<Excel.Column>[] {
   return columns.reduce<Partial<Excel.Column>[]>((acc, column) => {
-    if (column.field in waste) {
+    if (
+      column.field in waste ||
+      CUSTOM_WASTE_COLUMNS.includes(column.field || "")
+    ) {
       return [
         ...acc,
         {

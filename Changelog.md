@@ -5,6 +5,40 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.10.1] 10/10/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Lorsqu'une demande de révision met à jour le code déchet, le champ `wasteDetailsIsDangerous` aussi se met à jour [PR 2708](https://github.com/MTES-MCT/trackdechets/pull/2708)
+- En préparation du bordereau PAOH, le profil d'entreprise "crématorium" est disponible [PR 2743](https://github.com/MTES-MCT/trackdechets/pull/2743)
+
+#### :bug: Corrections de bugs
+
+- Il n'est plus possible de corriger la quantité reçue avant réception par l'exutoire, et de dépasser 40T pour du transport routier [PR 2719](https://github.com/MTES-MCT/trackdechets/pull/2719)
+- Dans les PDFs des BSDDs, les totaux des conditionnements ont été corrigés [PR 2725](https://github.com/MTES-MCT/trackdechets/pull/2725)
+- Pour les BSDA avec destination finale, il est désormais possible d'éditer le code d'opération finale si celui-ci avait été oublié au moment de la signature du TTR [PR 2751](https://github.com/MTES-MCT/trackdechets/pull/2751)
+- Le champ "date d'opération" est contraint dans le temps sur le BSDA. Il n'est plus possible de saisir une date dans le futur [PR 2750](https://github.com/MTES-MCT/trackdechets/pull/2750)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Dans les demandes de révision, la hiérarchie des modes de traitement est proposée à côté des codes d'opération [PR 2727](https://github.com/MTES-MCT/trackdechets/pull/2727)
+- Ajout d'un colonne dans le registre avec une version lisible du statut des BSDs [PR 2707](https://github.com/MTES-MCT/trackdechets/pull/2707)
+- Wording: mise en conformité ADR2023 sur les quantités estimées [PR 2722](https://github.com/MTES-MCT/trackdechets/pull/2722)
+- Le CAP et le code d'opération portés par le bordereau chapeau sont désormais reportés sur les bordereaux d'annexe 1 [PR 2749](https://github.com/MTES-MCT/trackdechets/pull/2749)
+- Réécriture de la requête `favorites` qui renvoie désormais le type `CompanySearchResult[]` (suppression du type interne `CompanyFavorite`) et améliorations de `searchCompanies`. Ajout d'un paramètre optionnel `allowForeignCompanies` pour filtrer les entreprises étrangères des requêtes. [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
+- Ajout d'un job asynchrone de pré-calcul des `favorites` par `orgId` et par `type` d'établissement. Le job se lance automatiquement à la suite d'un job `indexBsd` [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
+
+#### :house: Interne
+
+- Optimisation appendixForms : pré-calcul de quantityGrouped [PR 2701](https://github.com/MTES-MCT/trackdechets/pull/2701) 
+
+#### :house: Interne
+- Suppression du script `npm run queue:obliterate` [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
+
 # [2023.9.1] 19/09/2023
 
 #### :rocket: Nouvelles fonctionnalités
@@ -53,7 +87,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout des infos négociant à l'indexation BSDD [PR 2657](https://github.com/MTES-MCT/trackdechets/pull/2657)
 
-# [2023.8.2] 29/08/2023
+# [2023.8.2] 19/08/2023
 
 #### :rocket: Nouvelles fonctionnalités
 

@@ -1,10 +1,10 @@
 import { CompanySearchResult } from "../../../companies/types";
 import { userWithCompanyFactory } from "../../../__tests__/factories";
-import * as search from "../../../companies/search";
+import { searchCompany } from "../../../companies/search";
 import { sirenify } from "../sirenify";
 import { resetDatabase } from "../../../../integration-tests/helper";
 
-const searchCompanySpy = jest.spyOn(search, "searchCompany");
+jest.mock("../../../companies/search");
 
 describe("sirenify", () => {
   afterEach(resetDatabase);
@@ -34,7 +34,7 @@ describe("sirenify", () => {
       [intermediary2.company.siret!]: searchResult("intermédiaire 2")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 
@@ -132,7 +132,7 @@ describe("sirenify", () => {
       [intermediary2.company.siret!]: searchResult("intermédiaire 2")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 
@@ -216,7 +216,7 @@ describe("sirenify", () => {
       [intermediary2.company.siret!]: searchResult("intermédiaire 2")
     };
 
-    searchCompanySpy.mockImplementation((clue: string) => {
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
       return Promise.resolve(searchResults[clue]);
     });
 

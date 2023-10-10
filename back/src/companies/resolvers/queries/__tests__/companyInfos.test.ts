@@ -164,6 +164,7 @@ describe("companyInfos search with a VAT number", () => {
       name: "Code en stock",
       address: "une adresse",
       orgId: "IT09301420155",
+      vatNumber: "IT09301420155",
       contactEmail: "benoit.guigal@protonmail.com",
       contactPhone: "06 67 78 xx xx",
       website: "http://benoitguigal.fr"

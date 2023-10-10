@@ -28,11 +28,12 @@ import {
 import prisma from "../../../../prisma";
 import { associateUserToCompany } from "../../../../users/database";
 import { getReadonlyBsffPackagingRepository } from "../../../repository";
-import * as sirenify from "../../../sirenify";
+import { sirenifyBsffInput } from "../../../sirenify";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "sirenifyBsffInput")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenifyBsffInput as jest.Mock).mockImplementation(input =>
+  Promise.resolve(input)
+);
 
 const CREATE_DRAFT_BSFF = `
   mutation CreateDraftBsff($input: BsffInput!) {
@@ -54,7 +55,7 @@ const CREATE_DRAFT_BSFF = `
 describe("Mutation.createDraftBsff", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
+    (sirenifyBsffInput as jest.Mock).mockClear();
   });
 
   it.each(["emitter", "transporter", "destination"])(
@@ -81,7 +82,7 @@ describe("Mutation.createDraftBsff", () => {
       expect(errors).toBeUndefined();
       expect(data.createDraftBsff.id).toBeTruthy();
       // check input is sirenified
-      expect(sirenifyMock).toHaveBeenCalledTimes(1);
+      expect(sirenifyBsffInput as jest.Mock).toHaveBeenCalledTimes(1);
     }
   );
 

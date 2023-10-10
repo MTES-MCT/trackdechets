@@ -5,6 +5,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import buildUpdateManyForms from "./updateMany";
 import { FormWithForwardedIn, FormWithForwardedInInclude } from "../../types";
+import { processDbIdentifiersByChunk } from "../../../bsds/indexation/bulkIndexBsds";
 
 type FormForUpdateAppendix2Forms = Form & FormWithForwardedIn;
 
@@ -27,6 +28,10 @@ const buildUpdateAppendix2Forms: (
   });
 
   const formUpdatesByStatus = new Map<Status, string[]>();
+
+  // Quantité regroupée par identifiant de bordereau
+  const quantitGroupedByFormId: { [key: string]: number } = {};
+
   for (const form of forms) {
     if (![Status.AWAITING_GROUP, Status.GROUPED].includes(form.status as any)) {
       continue;
@@ -42,6 +47,8 @@ const buildUpdateAppendix2Forms: (
         .map(grp => grp.quantity)
         .reduce((prev, cur) => prev + cur, 0) ?? 0
     ).toDecimalPlaces(6); // set precision to gramme
+
+    quantitGroupedByFormId[form.id] = quantityGrouped.toNumber();
 
     const groupementForms = formGroupements
       .filter(grp => grp.initialFormId === form.id)
@@ -113,6 +120,24 @@ const buildUpdateAppendix2Forms: (
   }
 
   await Promise.all(promises);
+
+  // Ici on peut avoir 250 bordereaux à mettre à jour dans le pire des cas
+  // On batche donc les updates par 50 pour éviter un bottleneck
+  await processDbIdentifiersByChunk(
+    Object.keys(quantitGroupedByFormId),
+    async formIds => {
+      // met à jour la quantité regroupée sur chaque bordereau
+      await Promise.all(
+        formIds.map(formId => {
+          return prisma.form.update({
+            where: { id: formId },
+            data: { quantityGrouped: quantitGroupedByFormId[formId] }
+          });
+        })
+      );
+    },
+    50
+  );
 };
 
 export default buildUpdateAppendix2Forms;

@@ -608,6 +608,9 @@ export function flattenBsdaRevisionRequestInput(
     destinationOperationCode: chain(reviewContent, r =>
       chain(r.destination, d => chain(d.operation, o => o.code))
     ),
+    destinationOperationMode: chain(reviewContent, r =>
+      chain(r.destination, d => chain(d.operation, o => o.mode))
+    ),
     destinationOperationDescription: chain(reviewContent, r =>
       chain(r.destination, d => chain(d.operation, o => o.description))
     ),
@@ -665,6 +668,7 @@ export function expandBsdaRevisionRequestContent(
       cap: bsdaRevisionRequest.destinationCap,
       operation: nullIfNoValues<BsdaRevisionRequestOperation>({
         code: bsdaRevisionRequest.destinationOperationCode,
+        mode: bsdaRevisionRequest.destinationOperationMode,
         description: bsdaRevisionRequest.destinationOperationDescription
       }),
       reception: nullIfNoValues<BsdaRevisionRequestReception>({

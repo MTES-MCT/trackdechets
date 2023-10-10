@@ -22,6 +22,7 @@ import { formatDate } from "common/datetime";
 import { RevisionField } from "../../bsdd/approve/RevisionField";
 import { useParams, useRouteMatch } from "react-router-dom";
 import { PACKAGINGS_NAMES } from "form/bsda/components/packagings/Packagings";
+import { getOperationModeLabel } from "common/operationModes";
 
 type Props = {
   review: BsdaRevisionRequest;
@@ -240,7 +241,14 @@ export function DisplayRevision({ review }: Props) {
       <RevisionField
         label="Code d'opération réalisée"
         bsddValue={review.bsda.destination?.operation?.code}
-        reviewValue={review.content.destination?.operation?.code}
+        reviewValue={
+          review.content.destination?.operation?.code +
+          (review.content.destination?.operation?.mode
+            ? ` (${getOperationModeLabel(
+                review.content.destination?.operation?.mode ?? ""
+              )})`
+            : "")
+        }
       />
 
       <RevisionField

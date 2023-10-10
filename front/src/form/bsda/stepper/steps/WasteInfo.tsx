@@ -9,6 +9,7 @@ import { Bsda, BsdaConsistence, BsdaType } from "generated/graphql/types";
 import { FieldSwitch } from "common/components";
 import { BSDA_WASTES } from "generated/constants";
 import { BsdaContext } from "form/bsda/FormContainer";
+import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export function WasteInfo({ disabled }) {
@@ -200,7 +201,7 @@ export function WasteInfoWorker({ disabled }) {
               name="weight.isEstimate"
               className="td-checkbox"
             />
-            Ce poids est estimé
+            Ce poids est estimé <EstimatedQuantityTooltip />
           </label>
         </div>
       </div>

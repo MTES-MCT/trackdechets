@@ -134,14 +134,14 @@ function BsdCardList({
           ) {
             const path = routes.dashboardv2.bsdasris.sign.directTakeover;
             redirectToPath(path, bsd.id);
-          } else {
-            const path = routes.dashboardv2.bsdasris.sign.emissionSecretCode;
-            redirectToPath(path, bsd.id);
           }
           if (
             isSynthesis(formattedBsdAsBsdDisplay.bsdWorkflowType?.toString())
           ) {
             const path = routes.dashboardv2.bsdasris.sign.synthesisTakeover;
+            redirectToPath(path, bsd.id);
+          } else {
+            const path = routes.dashboardv2.bsdasris.sign.emissionSecretCode;
             redirectToPath(path, bsd.id);
           }
         }
@@ -368,9 +368,9 @@ function BsdCardList({
       <ul className="bsd-card-list">
         {bsds?.map(({ node }) => {
           let bsdNode = node;
+          // A supprimer le block isReviewsTab quand on pourra afficher une révision avec la requete bsds
           if (isReviewsTab) {
             // format reviews from bsdd and bsda in one list
-
             // BSDD
             const newBsddNode = { ...node?.form };
             const reviewBsdd = { ...node };
@@ -383,6 +383,7 @@ function BsdCardList({
             newBsddNode.review = reviewBsdd;
             bsdNode = { ...newBsddNode, ...newBsdaNode };
           }
+
           const hasAutomaticSignature = siretsWithAutomaticSignature?.includes(
             bsdNode?.emitter?.company?.siret
           );

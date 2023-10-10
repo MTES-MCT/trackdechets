@@ -10,11 +10,12 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import * as sirenify from "../../../sirenify";
+import { sirenifyBsffFicheInterventionInput } from "../../../sirenify";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "sirenifyBsffFicheInterventionInput")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenifyBsffFicheInterventionInput as jest.Mock).mockImplementation(input =>
+  Promise.resolve(input)
+);
 
 const ADD_FICHE_INTERVENTION = `
   mutation CreateFicheIntervention($input: BsffFicheInterventionInput!) {
@@ -64,7 +65,7 @@ const ficheInterventionInput: BsffFicheInterventionInput = {
 describe("Mutation.createFicheInterventionBsff", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
+    (sirenifyBsffFicheInterventionInput as jest.Mock).mockClear();
   });
 
   it("should allow user to create a fiche d'intervention with a company detenteur", async () => {
@@ -87,7 +88,9 @@ describe("Mutation.createFicheInterventionBsff", () => {
       ficheInterventionInput.numero
     );
     // check input is sirenified
-    expect(sirenifyMock).toHaveBeenCalledTimes(1);
+    expect(
+      sirenifyBsffFicheInterventionInput as jest.Mock
+    ).toHaveBeenCalledTimes(1);
   });
 
   it("should throw error if detenteur company info is missing", async () => {

@@ -3,7 +3,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
-import * as mailsHelper from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import { createPasswordResetRequest } from "../../../../mailer/templates";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { addMinutes } from "date-fns";
@@ -11,8 +11,8 @@ import { setCaptchaToken } from "../../../../common/redis/captcha";
 import { gql } from "graphql-tag";
 
 // Mails spy
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 const CREATE_PASSWORD_RESET_REQUEST = gql`
   mutation CreatePasswordResetRequest(
@@ -24,7 +24,7 @@ const CREATE_PASSWORD_RESET_REQUEST = gql`
 
 describe("mutation createPasswordResetRequest", () => {
   afterAll(resetDatabase);
-  afterEach(sendMailSpy.mockClear);
+  afterEach((sendMail as jest.Mock).mockClear);
 
   it("should initiate password reset process", async () => {
     const user = await userFactory();
@@ -52,7 +52,7 @@ describe("mutation createPasswordResetRequest", () => {
     // expires delta is 4 hour, let's check with a slightly smaller value (3H59)
     expect(resetHash.hashExpires > addMinutes(Date.now(), 239)).toEqual(true);
 
-    expect(sendMailSpy).toHaveBeenNthCalledWith(
+    expect(sendMail as jest.Mock).toHaveBeenNthCalledWith(
       1,
       renderMail(createPasswordResetRequest, {
         to: [{ email: user.email, name: user.name }],
@@ -95,7 +95,7 @@ describe("mutation createPasswordResetRequest", () => {
 
     expect(resetHash).toBe(null);
 
-    expect(sendMailSpy).not.toHaveBeenCalled();
+    expect(sendMail as jest.Mock).not.toHaveBeenCalled();
   });
   it("should silence not found email", async () => {
     const user = await userFactory();
@@ -121,6 +121,6 @@ describe("mutation createPasswordResetRequest", () => {
     });
     expect(resetHash).toBe(null);
 
-    expect(sendMailSpy).not.toHaveBeenCalled();
+    expect(sendMail as jest.Mock).not.toHaveBeenCalled();
   });
 });

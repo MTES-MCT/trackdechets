@@ -3,13 +3,13 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { createUserAccountHash } from "../../../database";
 import { AuthType } from "../../../../auth";
 import makeClient from "../../../../__tests__/testClient";
-import * as mailsHelper from "../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 import { inviteUserToJoin } from "../../../../mailer/templates";
 import { renderMail } from "../../../../mailer/templates/renderers";
 
 // No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 const RESEND_INVITATION = `
   mutation ResendInvitation($email: String!, $siret: String!){
@@ -39,8 +39,8 @@ describe("mutation resendInvitation", () => {
 
     expect(res).toEqual({ data: { resendInvitation: true } });
 
-    expect(sendMailSpy).toHaveBeenCalledTimes(1);
-    expect(sendMailSpy.mock.calls[0][0]).toEqual(
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+    expect((sendMail as jest.Mock).mock.calls[0][0]).toEqual(
       renderMail(inviteUserToJoin, {
         to: [{ name: usrToInvite, email: usrToInvite }],
         variables: { companyName: company.name, hash: invitation.hash }

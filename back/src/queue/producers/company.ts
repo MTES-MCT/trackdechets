@@ -6,7 +6,15 @@ const { REDIS_URL, QUEUE_NAME_COMPANY } = process.env;
 const queueNameCompany = QUEUE_NAME_COMPANY || "queue_company";
 
 export type GeocodeJobData = { siret: string; address?: string };
+
 export type SetDepartementJobData = { siret: string; codeCommune?: string };
+
+// default options can be overwritten by the calling function
+const defaultJobOptions: JobOptions = {
+  attempts: 3,
+  backoff: { type: "exponential", delay: 100 },
+  timeout: 10000
+};
 
 /**
  * This queue is used to off load retrieving latitude and longitude info for a company
@@ -49,29 +57,35 @@ export async function addToGeocodeCompanyQueue(
   data: GeocodeJobData,
   options?: JobOptions
 ) {
-  // default options can be overwritten by the calling function
-  const jobOptions: JobOptions = {
-    attempts: 3,
-    backoff: { type: "exponential", delay: 100 },
-    timeout: 10000,
+  await geocodeCompanyQueue.add(data, {
+    ...defaultJobOptions,
     ...options
-  };
-  await geocodeCompanyQueue.add(data, jobOptions);
+  });
 }
 
 export async function addToSetCompanyDepartementQueue(
   data: SetDepartementJobData,
   options?: JobOptions
 ) {
-  // default options can be overwritten by the calling function
-  const jobOptions: JobOptions = {
-    attempts: 3,
-    backoff: { type: "exponential", delay: 100 },
-    timeout: 10000,
+  await setCompanyDepartementQueue.add(data, {
+    ...defaultJobOptions,
     ...options
-  };
-  await setCompanyDepartementQueue.add(data, jobOptions);
+  });
 }
+
+/**
+ * This queue is used to process favorites cache
+ */
+export const favoritesCompanyQueue = new Queue(
+  `${queueNameCompany}_favorites`,
+  `${REDIS_URL}`,
+
+  {
+    defaultJobOptions: {
+      removeOnComplete: 10_000
+    }
+  }
+);
 
 /**
  * Close gracefully the queues
@@ -79,4 +93,5 @@ export async function addToSetCompanyDepartementQueue(
 export const closeCompanyQueues = () => {
   geocodeCompanyQueue.close();
   setCompanyDepartementQueue.close();
+  favoritesCompanyQueue.close();
 };

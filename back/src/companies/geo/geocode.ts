@@ -13,7 +13,7 @@ type Feature = {
   properties?: { score: number };
 };
 
-export default async function geocode(
+export async function geocode(
   address: string | null | undefined
 ): Promise<GeoInfo> {
   if (!address) {

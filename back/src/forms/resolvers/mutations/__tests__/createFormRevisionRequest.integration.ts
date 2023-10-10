@@ -664,4 +664,190 @@ describe("Mutation.createFormRevisionRequest", () => {
       "Impossible d'utiliser ce code déchet sur un bordereau de tournée d'annexe 1."
     );
   });
+
+  it("should fail if quantityReceived is modified and the bsd hasn't been received yet", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { quantityReceived: 10 },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "Impossible de réviser la quantité reçue si le bordereau n'a pas encore été réceptionné."
+    );
+  });
+
+  it("should work if quantityReceived is modified and the bsd has been received", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        status: "RECEIVED",
+        receivedAt: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { quantityReceived: 10 },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+      company.siret
+    );
+  });
+
+  it("should fail if quantityReceived > 40 tons and transportMode = ROAD", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        status: "RECEIVED",
+        receivedAt: new Date(),
+        transporters: {
+          create: {
+            transporterTransportMode: "ROAD",
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { quantityReceived: 41 },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "La quantité reçue ne peut dépasser 40 tonnes pour le transporter routier."
+    );
+  });
+
+  it("should work if quantityReceived <= 40 tons and transportMode = ROAD", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        status: "RECEIVED",
+        receivedAt: new Date(),
+        transporters: {
+          create: {
+            transporterTransportMode: "ROAD",
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { quantityReceived: 40 },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+      company.siret
+    );
+  });
+
+  it("should work if quantityReceived > 40 tons and transportMode != ROAD", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        status: "RECEIVED",
+        receivedAt: new Date(),
+        transporters: {
+          create: {
+            transporterTransportMode: "AIR",
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { quantityReceived: 40 },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+      company.siret
+    );
+  });
 });

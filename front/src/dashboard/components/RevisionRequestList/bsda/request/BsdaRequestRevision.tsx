@@ -25,6 +25,7 @@ import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../Apps/common/queries
 import styles from "./BsdaRequestRevision.module.scss";
 import { BSDA_WASTES } from "generated/constants";
 import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCancelationInput";
+import OperationModeSelect from "common/components/OperationModeSelect";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 type Props = {
@@ -63,6 +64,7 @@ const initialReview = {
     },
     operation: {
       code: "",
+      mode: null,
       description: "",
     },
   },
@@ -257,6 +259,13 @@ export function BsdaRequestRevision({ bsda }: Props) {
                         D 15 - Transit incluant le groupement sans transvasement
                       </option>
                     </Field>
+
+                    <OperationModeSelect
+                      operationCode={
+                        values?.content?.destination?.operation?.code
+                      }
+                      name="content.destination.operation.mode"
+                    />
                   </ReviewableField>
 
                   <ReviewableField

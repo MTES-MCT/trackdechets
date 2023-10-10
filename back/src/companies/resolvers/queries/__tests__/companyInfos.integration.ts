@@ -4,9 +4,12 @@ import prisma from "../../../../prisma";
 import { companyFactory, siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { AnonymousCompanyError } from "../../../sirene/errors";
-import * as searchCompany from "../../../sirene/searchCompany";
 
-const searchSirene = jest.spyOn(searchCompany, "default");
+const mockSearchSirene = jest.fn();
+jest.mock("../../../sirene/searchCompany", () => ({
+  __esModule: true,
+  default: (...args) => mockSearchSirene(...args)
+}));
 
 describe("query { companyInfos(siret: <SIRET>) }", () => {
   let query: ReturnType<typeof makeClient>["query"];
@@ -17,12 +20,12 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
 
   afterEach(async () => {
     await resetDatabase();
-    searchSirene.mockReset();
+    mockSearchSirene.mockReset();
   });
 
   it("Random company not registered in Trackdéchets", async () => {
     const siret = siretify(8);
-    searchSirene.mockResolvedValueOnce({
+    mockSearchSirene.mockResolvedValueOnce({
       siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -74,7 +77,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
 
   it("ICPE registered in Trackdéchets", async () => {
     const siret = siretify(8);
-    searchSirene.mockResolvedValueOnce({
+    mockSearchSirene.mockResolvedValueOnce({
       siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -145,7 +148,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
 
   it("Transporter company with transporter receipt", async () => {
     const siret = siretify(8);
-    searchSirene.mockResolvedValueOnce({
+    mockSearchSirene.mockResolvedValueOnce({
       siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -191,7 +194,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
   it("Trader company with trader receipt", async () => {
     const siret = siretify(8);
 
-    searchSirene.mockResolvedValueOnce({
+    mockSearchSirene.mockResolvedValueOnce({
       siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -237,7 +240,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
   it("Company with direct dasri takeover allowance", async () => {
     const siret = siretify(8);
 
-    searchSirene.mockResolvedValueOnce({
+    mockSearchSirene.mockResolvedValueOnce({
       siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -277,7 +280,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
   it("Shows etatAdministratif=F when company is closed in INSEE", async () => {
     const siret = siretify(8);
 
-    searchSirene.mockResolvedValueOnce({
+    mockSearchSirene.mockResolvedValueOnce({
       siret,
       etatAdministratif: "F",
       name: "OPTIQUE LES AIX",
@@ -322,7 +325,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
   it("Hides company infos if non-diffusible in INSEE and not registered in TD", async () => {
     const siret = siretify(8);
 
-    searchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
+    mockSearchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const gqlquery = `
       query {
         companyInfos(siret: "${siret}") {
@@ -347,7 +350,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: null,
       contactEmail: null,
       contactPhone: null,
-      etatAdministratif: null,
+      etatAdministratif: "A",
       installation: null,
       isRegistered: false,
       statutDiffusionEtablissement: "N",
@@ -360,7 +363,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
   });
 
   it("Hides company infos if non-diffusible in INSEE, even if registered in TD", async () => {
-    searchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
+    mockSearchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const siret = siretify(8);
 
     await companyFactory({
@@ -397,7 +400,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: null,
       contactEmail: null,
       contactPhone: null,
-      etatAdministratif: null,
+      etatAdministratif: "A",
       installation: null,
       isRegistered: true,
       statutDiffusionEtablissement: "N",

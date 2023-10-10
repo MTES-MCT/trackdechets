@@ -2,7 +2,7 @@ import React from "react";
 import { ApolloProvider } from "@apollo/client";
 import { BrowserRouter as Router } from "react-router-dom";
 import client from "./graphql-client";
-import LayoutContainer from "./layout/LayoutContainer";
+import LayoutContainer from "./Apps/common/Components/layout/LayoutContainer";
 import setYupLocale from "./common/setYupLocale";
 import BrowserDetect from "./BrowserDetect";
 import ErrorBoundary from "./ErrorBoundary";

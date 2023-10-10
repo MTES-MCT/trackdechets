@@ -1,11 +1,12 @@
 import { Status, UserRole, WasteAcceptationStatus } from "@prisma/client";
 import { userWithCompanyFactory } from "../../../__tests__/factories";
 import { renderBsdaRefusedEmail } from "../refused";
-import * as generatePdf from "../../pdf/generator";
+import { buildPdfAsBase64 } from "../../pdf/generator";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { bsdaFactory } from "../../__tests__/factories";
 
-jest.spyOn(generatePdf, "buildPdfAsBase64").mockResolvedValue("");
+jest.mock("../../pdf/generator");
+(buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
 
 describe("renderBsdaRefusedEmail", () => {
   afterAll(resetDatabase);

@@ -14,16 +14,16 @@ import {
   indexAllBsds,
   indexAllBsdTypeConcurrentJobs,
   indexAllBsdTypeSync,
-  processBsdIdentifiersByChunk
+  processDbIdentifiersByChunk
 } from "../bulkIndexBsds";
 
 type SearchResponse<Doc> = estypes.SearchResponse<Doc>;
 
-describe("processBsdIdentifiersByChunk", () => {
+describe("processDbIdentifiersByChunk", () => {
   it("should process every chunk", async () => {
     const ids = ["1", "2", "3", "4", "5"];
     const fn = jest.fn();
-    await processBsdIdentifiersByChunk(ids, fn, 2);
+    await processDbIdentifiersByChunk(ids, fn, 2);
     expect(fn).toHaveBeenCalledTimes(3);
     expect(fn).toHaveBeenNthCalledWith(1, ["1", "2"]);
     expect(fn).toHaveBeenNthCalledWith(2, ["3", "4"]);

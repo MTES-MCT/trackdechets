@@ -1,3 +1,5 @@
+import React from "react";
+import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
 import {
   Consistence,
   WasteAcceptationStatus,
@@ -36,23 +38,45 @@ export const getVerboseAcceptationStatus = (
 
 export const getVerboseQuantityType = (
   quantityType: QuantityType | null | undefined | ""
-): string => {
+): string | JSX.Element => {
   if (!quantityType) {
     return "";
   }
 
-  return quantityType === "REAL" ? "Réelle" : "Estimée";
+  return quantityType === "REAL" ? (
+    "Réelle"
+  ) : (
+    <>
+      Estimée <EstimatedQuantityTooltip />
+    </>
+  );
 };
 
 export const getVerboseWeightType = (
   isEstimate: Boolean | null | undefined | ""
-): string => {
+): string | JSX.Element => {
   if (isEstimate === true) {
-    return "Estimé";
+    return (
+      <>
+        Estimé <EstimatedQuantityTooltip />
+      </>
+    );
   }
   if (isEstimate === false) {
     return "Réel";
   }
 
   return "";
+};
+
+/**
+ * Enables to read the deep value of an object, passing the path as a string.
+ * For instance, deepValue(obj, "foo.bar.baz") to access obj.foo.bar.baz.
+ */
+export const deepValue = (obj, path) => {
+  // eslint-disable-next-line @typescript-eslint/no-redeclare
+  for (var i = 0, path = path.split("."), len = path.length; i < len; i++) {
+    obj = obj[path[i]];
+  }
+  return obj;
 };

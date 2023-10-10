@@ -8,7 +8,10 @@ import {
   Status,
   EmitterType
 } from "@prisma/client";
-import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../../common/constants";
+import {
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
+  isDangerous
+} from "../../../common/constants";
 import { removeEmpty } from "../../../common/converter";
 import {
   LogMetadata,
@@ -163,7 +166,10 @@ async function getUpdateFromFormRevisionRequest(
       revisionRequest.isCanceled
     ),
     recipientCap: revisionRequest.recipientCap,
-    wasteDetailsCode: revisionRequest.wasteDetailsCode,
+    ...(revisionRequest.wasteDetailsCode !== null && {
+      wasteDetailsCode: revisionRequest.wasteDetailsCode,
+      wasteDetailsIsDangerous: isDangerous(revisionRequest.wasteDetailsCode)
+    }),
     wasteDetailsName: revisionRequest.wasteDetailsName,
     ...(revisionRequest.wasteDetailsPop !== null && {
       wasteDetailsPop: revisionRequest.wasteDetailsPop
@@ -179,6 +185,7 @@ async function getUpdateFromFormRevisionRequest(
       : {
           quantityReceived: revisionRequest.quantityReceived,
           processingOperationDone: revisionRequest.processingOperationDone,
+          destinationOperationMode: revisionRequest.destinationOperationMode,
           processingOperationDescription:
             revisionRequest.processingOperationDescription
         }),

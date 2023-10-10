@@ -1,6 +1,8 @@
 import {
+  BsddTransporter,
   EmitterType,
   Form,
+  OperationMode,
   Prisma,
   RevisionRequestStatus,
   Status,
@@ -27,6 +29,7 @@ import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import { packagingInfoFn } from "../../validation";
 import { isSiret } from "../../../common/constants/companySearchHelpers";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
+import { getOperationModesFromOperationCode } from "../../../common/operationModes";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDD_STATUSES: Status[] = [
@@ -96,7 +99,10 @@ export default async function createFormRevisionRequest(
   const { formId, content, comment, authoringCompanySiret } = input;
 
   const user = checkIsAuthenticated(context);
-  const existingBsdd = await getFormOrFormNotFound({ id: formId });
+  const existingBsdd = await getFormOrFormNotFound(
+    { id: formId },
+    { transporters: true }
+  );
 
   const formRepository = getFormRepository(user);
 
@@ -211,7 +217,7 @@ async function checkIfUserCanRequestRevisionOnBsdd(
 
 async function getFlatContent(
   content: FormRevisionRequestContentInput,
-  bsdd: Form
+  bsdd: Form & { transporters: BsddTransporter[] }
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsddRevisionRequestInput(content);
 
@@ -242,6 +248,26 @@ async function getFlatContent(
   ) {
     throw new ForbiddenError(
       "Impossible d'annuler un bordereau qui a été réceptionné sur l'installation de destination."
+    );
+  }
+
+  // If the BSD has been received, you can modify the quantityReceived. Else, no
+  if (content.quantityReceived && !bsdd.receivedAt) {
+    throw new ForbiddenError(
+      "Impossible de réviser la quantité reçue si le bordereau n'a pas encore été réceptionné."
+    );
+  }
+
+  // No more than 40 tons by ROAD transport
+  if (
+    content &&
+    content?.quantityReceived &&
+    content?.quantityReceived > 40 &&
+    bsdd?.transporters?.length === 1 &&
+    bsdd?.transporters[0]?.transporterTransportMode === "ROAD"
+  ) {
+    throw new ForbiddenError(
+      "La quantité reçue ne peut dépasser 40 tonnes pour le transporter routier."
     );
   }
 
@@ -334,6 +360,28 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
         INVALID_PROCESSING_OPERATION
       )
       .nullable(),
+    destinationOperationMode: yup
+      .mixed<OperationMode | null | undefined>()
+      .oneOf([...Object.values(OperationMode), null, undefined])
+      .nullable()
+      .test(
+        "processing-mode-matches-processing-operation",
+        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
+        function (item) {
+          const { processingOperationDone } = this.parent;
+          const destinationOperationMode = item;
+
+          if (processingOperationDone && destinationOperationMode) {
+            const modes = getOperationModesFromOperationCode(
+              processingOperationDone
+            );
+
+            return modes.includes(destinationOperationMode ?? "");
+          }
+
+          return true;
+        }
+      ),
     processingOperationDescription: yup.string().nullable(),
     brokerCompanyName: yup.string().nullable(),
     brokerCompanySiret: yup

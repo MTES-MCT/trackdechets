@@ -1,8 +1,7 @@
 import axios from "axios";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { CompanyType, MembershipRequestStatus } from "@prisma/client";
-import * as producer from "../../queue/producers/mail";
-import { backend } from "../../mailer";
+import { addToMailQueue } from "../../queue/producers/mail";
 
 import {
   sendMembershipRequestDetailsEmail,
@@ -24,15 +23,14 @@ import prisma from "../../prisma";
 import { bsdaFactory } from "../../bsda/__tests__/factories";
 
 // Intercept calls
-const mockedSendMailBackend = jest.spyOn(backend, "sendMail");
 // Simulate queue error in order to test with sendMailSync
-const mockAddToMailQueue = jest.spyOn(producer, "addToMailQueue");
-mockAddToMailQueue.mockRejectedValue(
+jest.mock("../../queue/producers/mail");
+(addToMailQueue as jest.Mock).mockRejectedValue(
   new Error("any queue error to bypass job queue and sendmail synchronously")
 );
 // Integration tests EMAIL_BACKEND is supposed to use axios.
-const mockedAxiosPost = jest.spyOn(axios, "post");
-mockedAxiosPost.mockResolvedValue(null);
+jest.mock("axios");
+// (axios.post as jest.Mock).mockResolvedValue(null);
 
 const TODAY = new Date();
 const ONE_DAY_AGO = xDaysAgo(TODAY, 1);
@@ -43,9 +41,8 @@ const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
 describe("sendSecondOnboardingEmail", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
-    mockedAxiosPost.mockClear();
-    mockedSendMailBackend.mockClear();
-    mockAddToMailQueue.mockClear();
+    (axios.post as jest.Mock).mockClear();
+    (addToMailQueue as jest.Mock).mockClear();
   });
 
   it.each([ONE_DAY_AGO, TWO_DAYS_AGO, FOUR_DAYS_AGO])(
@@ -79,7 +76,7 @@ describe("sendSecondOnboardingEmail", () => {
         { createdAt: daysAgo }
       );
 
-      (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+      (axios.post as jest.Mock).mockImplementationOnce(() =>
         Promise.resolve({
           data: { results: "something" }
         })
@@ -87,7 +84,7 @@ describe("sendSecondOnboardingEmail", () => {
 
       await sendSecondOnboardingEmail(3);
 
-      expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(0);
+      expect(axios.post as jest.Mock).toHaveBeenCalledTimes(0);
     }
   );
 
@@ -106,7 +103,7 @@ describe("sendSecondOnboardingEmail", () => {
       { createdAt: THREE_DAYS_AGO }
     );
 
-    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+    (axios.post as jest.Mock<any>).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -114,8 +111,8 @@ describe("sendSecondOnboardingEmail", () => {
 
     await sendSecondOnboardingEmail(3);
 
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
-    expect(mockedAxiosPost).toHaveBeenCalledWith(
+    expect(axios.post as jest.Mock<any>).toHaveBeenCalledTimes(1);
+    expect(axios.post as jest.Mock).toHaveBeenCalledWith(
       "http://mailservice/smtp/email",
       {
         subject:
@@ -158,7 +155,7 @@ describe("sendSecondOnboardingEmail", () => {
       { createdAt: THREE_DAYS_AGO }
     );
 
-    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+    (axios.post as jest.Mock).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -166,8 +163,8 @@ describe("sendSecondOnboardingEmail", () => {
 
     await sendSecondOnboardingEmail(3);
 
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
-    expect(mockedAxiosPost).toHaveBeenCalledWith(
+    expect(axios.post as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(axios.post as jest.Mock).toHaveBeenCalledWith(
       "http://mailservice/smtp/email",
       {
         subject:
@@ -199,13 +196,12 @@ describe("sendSecondOnboardingEmail", () => {
 describe("sendMembershipRequestDetailsEmail", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
-    mockedAxiosPost.mockClear();
-    mockedSendMailBackend.mockClear();
-    mockAddToMailQueue.mockClear();
+    (axios.post as jest.Mock).mockClear();
+    (addToMailQueue as jest.Mock).mockClear();
   });
 
   it("no membership request > should not send any mail", async () => {
-    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+    (axios.post as jest.Mock).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -213,14 +209,14 @@ describe("sendMembershipRequestDetailsEmail", () => {
 
     await sendMembershipRequestDetailsEmail(3);
 
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(0);
+    expect(axios.post as jest.Mock).toHaveBeenCalledTimes(0);
   });
 
   it("new user without membership request > should send a mail", async () => {
     // Should be returned
     const user = await userFactory({ createdAt: THREE_DAYS_AGO });
 
-    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+    (axios.post as jest.Mock).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -228,8 +224,8 @@ describe("sendMembershipRequestDetailsEmail", () => {
 
     await sendMembershipRequestDetailsEmail(3);
 
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
-    expect(mockedAxiosPost).toHaveBeenCalledWith(
+    expect(axios.post as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(axios.post as jest.Mock).toHaveBeenCalledWith(
       "http://mailservice/smtp/email",
       {
         subject: "Passez à la prochaine étape sur Trackdéchets",
@@ -260,13 +256,12 @@ describe("sendMembershipRequestDetailsEmail", () => {
 describe("sendPendingMembershipRequestDetailsEmail", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
-    mockedAxiosPost.mockClear();
-    mockedSendMailBackend.mockClear();
-    mockAddToMailQueue.mockClear();
+    (axios.post as jest.Mock).mockClear();
+    (addToMailQueue as jest.Mock).mockClear();
   });
 
   it("no pending membership request > should not send any mail", async () => {
-    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+    (axios.post as jest.Mock).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -274,7 +269,7 @@ describe("sendPendingMembershipRequestDetailsEmail", () => {
 
     await sendPendingMembershipRequestDetailsEmail(3);
 
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(0);
+    expect(axios.post as jest.Mock).toHaveBeenCalledTimes(0);
   });
 
   it("pending membership > should send a mail", async () => {
@@ -287,7 +282,7 @@ describe("sendPendingMembershipRequestDetailsEmail", () => {
       createdAt: THREE_DAYS_AGO
     });
 
-    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+    (axios.post as jest.Mock).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -295,8 +290,8 @@ describe("sendPendingMembershipRequestDetailsEmail", () => {
 
     await sendPendingMembershipRequestDetailsEmail(3);
 
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
-    expect(mockedAxiosPost).toHaveBeenCalledWith(
+    expect(axios.post as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(axios.post as jest.Mock).toHaveBeenCalledWith(
       "http://mailservice/smtp/email",
       {
         subject: "Suite à votre demande de rattachement sur Trackdéchets",
@@ -327,13 +322,12 @@ describe("sendPendingMembershipRequestDetailsEmail", () => {
 describe("sendPendingMembershipRequestToAdminDetailsEmail", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
-    mockedAxiosPost.mockClear();
-    mockedSendMailBackend.mockClear();
-    mockAddToMailQueue.mockClear();
+    (axios.post as jest.Mock).mockClear();
+    (addToMailQueue as jest.Mock).mockClear();
   });
 
   it("no pending membership request > should not send any mail", async () => {
-    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+    (axios.post as jest.Mock).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -341,7 +335,7 @@ describe("sendPendingMembershipRequestToAdminDetailsEmail", () => {
 
     await sendPendingMembershipRequestToAdminDetailsEmail(3);
 
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(0);
+    expect(axios.post as jest.Mock).toHaveBeenCalledTimes(0);
   });
 
   it("pending membership > should send a mail to admin", async () => {
@@ -354,7 +348,7 @@ describe("sendPendingMembershipRequestToAdminDetailsEmail", () => {
       status: MembershipRequestStatus.PENDING
     });
 
-    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+    (axios.post as jest.Mock).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -362,8 +356,8 @@ describe("sendPendingMembershipRequestToAdminDetailsEmail", () => {
 
     await sendPendingMembershipRequestToAdminDetailsEmail(3);
 
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
-    expect(mockedAxiosPost).toHaveBeenCalledWith(
+    expect(axios.post as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(axios.post as jest.Mock).toHaveBeenCalledWith(
       "http://mailservice/smtp/email",
       {
         subject:
@@ -398,14 +392,13 @@ describe("sendPendingMembershipRequestToAdminDetailsEmail", () => {
 describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
-    mockedAxiosPost.mockClear();
-    mockedSendMailBackend.mockClear();
-    mockAddToMailQueue.mockClear();
+    (axios.post as jest.Mock).mockClear();
+    (addToMailQueue as jest.Mock).mockClear();
   });
 
   it("no request > should not send anything", async () => {
     // Given
-    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+    (axios.post as jest.Mock).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -415,7 +408,7 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
     await sendPendingRevisionRequestToAdminDetailsEmail(5);
 
     // Then
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(0);
+    expect(axios.post as jest.Mock).toHaveBeenCalledTimes(0);
   });
 
   it("requests > should not send mails", async () => {
@@ -467,7 +460,7 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
       }
     });
 
-    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+    (axios.post as jest.Mock).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -477,8 +470,8 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
     await sendPendingRevisionRequestToAdminDetailsEmail(2);
 
     // Then
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
-    expect(mockedAxiosPost).toHaveBeenCalledWith(
+    expect(axios.post as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(axios.post as jest.Mock).toHaveBeenCalledWith(
       "http://mailservice/smtp/email",
       {
         subject: "Votre action est attendue sur une demande de révision",

@@ -772,4 +772,48 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       expect(updatedBsda.status).toBe(testData.expectedBsdaStatus);
     }
   );
+
+  it("should update the operation code & mode", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        destinationOperationCode: "R 1",
+        destinationOperationMode: "VALORISATION_ENERGETIQUE"
+      }
+    });
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: bsda.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "",
+        destinationOperationCode: "R 4",
+        destinationOperationMode: "RECYCLAGE"
+      }
+    });
+
+    await mutate<Pick<Mutation, "submitBsdaRevisionRequestApproval">>(
+      SUBMIT_BSDA_REVISION_REQUEST_APPROVAL,
+      {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      }
+    );
+
+    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id }
+    });
+
+    expect(updatedBsda.destinationOperationCode).toBe("R 4");
+    expect(updatedBsda.destinationOperationMode).toBe("RECYCLAGE");
+  });
 });

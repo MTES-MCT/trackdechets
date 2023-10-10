@@ -22,12 +22,13 @@ import {
 } from "../../../../generated/graphql/types";
 import { EmitterType, Status, UserRole } from "@prisma/client";
 import getReadableId from "../../../readableId";
-import * as sirenify from "../../../sirenify";
+import { sirenifyFormInput } from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
 
-const sirenifyMock = jest
-  .spyOn(sirenify, "sirenifyFormInput")
-  .mockImplementation(input => Promise.resolve(input));
+jest.mock("../../../sirenify");
+(sirenifyFormInput as jest.Mock).mockImplementation(input =>
+  Promise.resolve(input)
+);
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -127,7 +128,7 @@ const CREATE_FORM = `
 describe("Mutation.createForm", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
+    (sirenifyFormInput as jest.Mock).mockClear();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -193,7 +194,7 @@ describe("Mutation.createForm", () => {
       });
       expect(data.createForm.id).toBeTruthy();
       // check input is sirenified
-      expect(sirenifyMock).toHaveBeenCalledTimes(1);
+      expect(sirenifyFormInput as jest.Mock).toHaveBeenCalledTimes(1);
     }
   );
 
@@ -397,9 +398,9 @@ describe("Mutation.createForm", () => {
         set: ["TRANSPORTER"]
       }
     });
-    const search = require("../../../../companies/search");
-    const searchCompanyMock = jest.spyOn(search, "searchCompany");
-    searchCompanyMock.mockResolvedValueOnce({
+    const { searchCompany } = require("../../../../companies/search");
+    jest.mock("../../../../companies/search");
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       siret: intermediary.company.siret,
       name: intermediary.company.name,
       statutDiffusionEtablissement: "O",
@@ -1259,6 +1260,14 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual(undefined);
     expect(data.createForm.appendix2Forms![0].id).toBe(appendix2.id);
+
+    const updatedAppendix2 = await prisma.form.findUniqueOrThrow({
+      where: { id: appendix2.id }
+    });
+
+    expect(updatedAppendix2.quantityGrouped).toEqual(
+      updatedAppendix2.quantityReceived
+    );
   });
 
   it("should allow creating a form with an appendix 2 (using CreateFormInput.grouping)", async () => {
@@ -1294,6 +1303,12 @@ describe("Mutation.createForm", () => {
     expect(data.createForm.grouping).toEqual([
       { form: { id: appendix2.id }, quantity: 0.5 }
     ]);
+
+    const updatedAppendix2 = await prisma.form.findUniqueOrThrow({
+      where: { id: appendix2.id }
+    });
+
+    expect(updatedAppendix2.quantityGrouped).toEqual(0.5);
   });
 
   it("should allow consuming a BSDD in several appendix2", async () => {

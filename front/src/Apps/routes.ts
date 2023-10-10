@@ -83,12 +83,14 @@ const routes = {
     exports: "/v2/dashboard/:siret/exports",
     roadControl: "/v2/dashboard/:siret/road-control/:id",
     bsds: {
-      index: "/v2/dashboard/:siret/bsds",
+      index: "/v2/dashboard/:siret/bsds/all",
       drafts: "/v2/dashboard/:siret/bsds/drafts",
       act: "/v2/dashboard/:siret/bsds/act",
       follow: "/v2/dashboard/:siret/bsds/follow",
       history: "/v2/dashboard/:siret/bsds/history",
       reviews: "/v2/dashboard/:siret/bsds/review",
+      toReviewed: "/v2/dashboard/:siret/bsds/to-review",
+      reviewed: "/v2/dashboard/:siret/bsds/reviewed",
     },
     bsdds: {
       create: "/v2/dashboard/:siret/bsdds/create",

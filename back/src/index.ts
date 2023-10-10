@@ -1,4 +1,4 @@
-import { app, startApolloServer } from "./server";
+import { httpServer, startApolloServer } from "./server";
 import { closeQueues } from "./queue/producers";
 import { cpuProfiling, memorySampling } from "./logging/heapSnapshot";
 import { envVariables } from "./env";
@@ -7,7 +7,7 @@ envVariables.parse(process.env);
 
 async function start() {
   await startApolloServer();
-  app.listen(process.env.API_PORT, () =>
+  httpServer.listen(process.env.API_PORT, () =>
     console.info(`Server is running on port ${process.env.API_PORT}`)
   );
 
