@@ -1,10 +1,10 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
 import { BsdaSignatureType } from "../../generated/graphql/types";
-import { SIGNATURES_HIERARCHY, SIGNATURES_HIERARCHY_KEYS } from "./edition";
+import { SIGNATURES_HIERARCHY } from "./edition";
 import { getReadonlyBsdaRepository } from "../repository";
 import { PARTIAL_OPERATIONS } from "./constants";
-import { editionRules } from "./rules";
+import { Check, FieldCheck, editionRules } from "./rules";
 import { ZodBsda, rawBsdaSchema } from "./schema";
 import { capitalize } from "../../common/strings";
 import { runTransformers } from "./transformers";
@@ -24,6 +24,43 @@ export async function parseBsda(
   return contextualSchema.parseAsync(bsda);
 }
 
+export const check = (val: ZodBsda, check?: Check) => {
+  if (check === undefined || check === null) return true;
+  if (check instanceof Function) return check(val);
+  return Boolean(check);
+};
+
+export const isAheadOfStepAndCheck = (
+  val: ZodBsda,
+  signatures: BsdaSignatureType[],
+  fieldCheck?: FieldCheck // Last param because rules.required can be undefined
+) => {
+  return (
+    !!fieldCheck &&
+    signatures.includes(fieldCheck.from) &&
+    check(val, fieldCheck.when)
+  );
+};
+
+export const getSealedRules = (
+  signatures: BsdaSignatureType[],
+  val: ZodBsda,
+  rules = editionRules
+) => {
+  return Object.entries(rules).filter(([_, rule]) =>
+    isAheadOfStepAndCheck(val, signatures, rule.sealed)
+  );
+};
+
+const getSealedFields = (
+  signatures: BsdaSignatureType[],
+  val: ZodBsda,
+  rules = editionRules
+) => {
+  const sealedRules = getSealedRules(signatures, val, rules);
+  return sealedRules.map(([field]) => field);
+};
+
 export function getContextualBsdaSchema(
   validationContext: BsdaValidationContext,
   rules = editionRules
@@ -32,14 +69,11 @@ export function getContextualBsdaSchema(
   const signaturesToCheck = getSignatureHierarchy(
     validationContext.currentSignatureType
   );
-  // We skip the rules for which the fields are not sealed yet
-  const sealedRules = Object.entries(rules).filter(([_, rule]) =>
-    signaturesToCheck.includes(rule.sealedBy)
-  );
-  const sealedFields = sealedRules.map(([field]) => field);
 
   return rawBsdaSchema
     .transform(async val => {
+      const sealedFields = getSealedFields(signaturesToCheck, val, rules);
+
       val.intermediariesOrgIds = val.intermediaries
         ? val.intermediaries
             .flatMap(intermediary => [
@@ -56,6 +90,8 @@ export function getContextualBsdaSchema(
       return val;
     })
     .superRefine(async (val, ctx) => {
+      const sealedRules = getSealedRules(signaturesToCheck, val, rules);
+
       for (const [field, rule] of sealedRules) {
         if (rule.superRefineWhenSealed instanceof Function) {
           // @ts-expect-error TODO: superRefineWhenSealed first param is inferred as never ?
@@ -64,22 +100,11 @@ export function getContextualBsdaSchema(
       }
 
       for (const [field, rule] of Object.entries(rules)) {
-        let fieldIsRequired = false;
-        if (rule.isRequired instanceof Function) {
-          fieldIsRequired =
-            signaturesToCheck.includes(rule.sealedBy as string) &&
-            rule.isRequired(val);
-        } else if (
-          Object.keys(SIGNATURES_HIERARCHY).includes(rule.isRequired as string)
-        ) {
-          fieldIsRequired = signaturesToCheck.includes(
-            rule.isRequired as string
-          );
-        } else {
-          fieldIsRequired =
-            signaturesToCheck.includes(rule.sealedBy as string) &&
-            (rule.isRequired as boolean);
-        }
+        const fieldIsRequired = isAheadOfStepAndCheck(
+          val,
+          signaturesToCheck,
+          rule.required
+        );
 
         if (fieldIsRequired && val[field] == null) {
           const description = rule.name
