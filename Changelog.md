@@ -5,6 +5,20 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.10.2] 11/10/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Query `favorites` : ignorer les items manquants dans l'index ElasticSearch `favorites`, évitant de renvoyer une erreur 500 à la place des 404.
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :house: Interne
+
 # [2023.10.1] 10/10/2023
 
 #### :rocket: Nouvelles fonctionnalités
@@ -13,9 +27,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Lorsqu'une demande de révision met à jour le code déchet, le champ `wasteDetailsIsDangerous` aussi se met à jour [PR 2708](https://github.com/MTES-MCT/trackdechets/pull/2708)
 - En préparation du bordereau PAOH, le profil d'entreprise "crématorium" est disponible [PR 2743](https://github.com/MTES-MCT/trackdechets/pull/2743)
-
-#### :bug: Corrections de bugs
-
 - Il n'est plus possible de corriger la quantité reçue avant réception par l'exutoire, et de dépasser 40T pour du transport routier [PR 2719](https://github.com/MTES-MCT/trackdechets/pull/2719)
 - Dans les PDFs des BSDDs, les totaux des conditionnements ont été corrigés [PR 2725](https://github.com/MTES-MCT/trackdechets/pull/2725)
 - Pour les BSDA avec destination finale, il est désormais possible d'éditer le code d'opération finale si celui-ci avait été oublié au moment de la signature du TTR [PR 2751](https://github.com/MTES-MCT/trackdechets/pull/2751)
@@ -35,8 +46,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Optimisation appendixForms : pré-calcul de quantityGrouped [PR 2701](https://github.com/MTES-MCT/trackdechets/pull/2701) 
-
-#### :house: Interne
 - Suppression du script `npm run queue:obliterate` [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
 
 # [2023.9.1] 19/09/2023

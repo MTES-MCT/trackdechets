@@ -395,4 +395,29 @@ describe("query favorites", () => {
 
     expect(data.favorites.length).toEqual(0);
   });
+
+  it("should NOT return any error when no favorites is found", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    await indexForm(
+      await getFormForElastic(
+        await formFactory({
+          ownerId: user.id,
+          opt: { recipientCompanySiret: company.orgId }
+        })
+      )
+    );
+    await refreshIndices();
+
+    // do not call indexFavorites
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        orgId: company.orgId,
+        type: "RECIPIENT"
+      }
+    });
+
+    expect(data.favorites.length).toEqual(0);
+    expect(errors).toBeUndefined();
+  });
 });
