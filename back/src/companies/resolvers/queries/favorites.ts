@@ -14,8 +14,9 @@ import {
   isSiret
 } from "../../../common/constants/companySearchHelpers";
 import { getCompanyOrCompanyNotFound } from "../../database";
-import { estypes } from "@elastic/elasticsearch";
-import { ResponseError } from "@elastic/elasticsearch/lib/errors";
+import { errors, estypes } from "@elastic/elasticsearch";
+
+const { ResponseError } = errors;
 
 const favoritesResolver: QueryResolvers["favorites"] = async (
   parent,
