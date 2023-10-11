@@ -7,16 +7,22 @@ import {
   FormCompany,
   Query,
   QueryCompanyPrivateInfosArgs,
-  CompanySearchResult
+  CompanySearchResult,
+  BsvhuEmitterInput
 } from "codegen-ui";
 import { useParams } from "react-router-dom";
 import { COMPANY_SELECTOR_PRIVATE_INFOS } from "../../Apps/common/queries/company/query";
-import React, { useMemo } from "react";
-import styles from "../common/components/company/CompanySelector.module.scss";
+import React, { useMemo, useState } from "react";
+import CompanySelectorFields from "../common/components/company/CompanySelectorFields";
 
 export default function Emitter({ disabled }) {
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue, values } = useFormikContext<{
+    emitter: BsvhuEmitterInput;
+  }>();
   const { siret } = useParams<{ siret: string }>();
+  const [currentCompany, setCurrentCompany] = useState<
+    CompanySearchResult | undefined
+  >();
 
   const [field] = useField<FormCompany>({ name: "emitter.company" });
   const orgId = useMemo(
@@ -32,7 +38,9 @@ export default function Emitter({ disabled }) {
           // Compatibility with intermediaries that don't have orgId
           clue: orgId!
         },
-        skip: !orgId
+        skip: !orgId,
+        onCompleted: data =>
+          setCurrentCompany(data.companyPrivateInfos as CompanySearchResult)
       }
     );
 
@@ -51,26 +59,11 @@ export default function Emitter({ disabled }) {
         favoriteType={FavoriteType.Emitter}
         disabled={disabled}
         currentCompany={
-          companyPrivateData?.companyPrivateInfos as CompanySearchResult
+          currentCompany ??
+          (companyPrivateData?.companyPrivateInfos as CompanySearchResult)
         }
         onCompanySelected={emitter => {
-          const fields = {
-            orgId: emitter?.orgId,
-            siret: emitter?.siret,
-            vatNumber: emitter?.vatNumber,
-            name:
-              emitter?.name && !(emitter.name === "---" || emitter.name === "")
-                ? emitter.name
-                : "",
-            address: emitter?.address ?? "",
-            contact: emitter?.contact ?? "",
-            phone: emitter?.contactPhone ?? "",
-            mail: emitter?.contactEmail ?? ""
-          };
-
-          Object.keys(fields).forEach(key => {
-            setFieldValue(`emitter.company.${key}`, fields[key]);
-          });
+          setCurrentCompany(emitter);
 
           setFieldValue(
             "emitter.agrementNumber",
@@ -79,46 +72,14 @@ export default function Emitter({ disabled }) {
         }}
       />
 
-      <div className="form__row">
-        <label>
-          Personne à contacter
-          <Field
-            type="text"
-            name="emitter.company.contact"
-            placeholder="NOM Prénom"
-            className="td-input"
-            disabled={disabled}
-          />
-        </label>
-        <RedErrorMessage name="emitter.company.contact" />
-      </div>
-      <div className="form__row">
-        <label>
-          Téléphone ou Fax
-          <Field
-            type="text"
-            name="emitter.company.phone"
-            placeholder="Numéro"
-            className={`td-input ${styles.companySelectorSearchPhone}`}
-            disabled={disabled}
-          />
-        </label>
-
-        <RedErrorMessage name="emitter.company.phone" />
-      </div>
-      <div className="form__row">
-        <label>
-          Mail
-          <Field
-            type="email"
-            name="emitter.company.mail"
-            className={`td-input ${styles.companySelectorSearchEmail}`}
-            disabled={disabled}
-          />
-        </label>
-
-        <RedErrorMessage name="emitter.company.mail" />
-      </div>
+      {currentCompany && (
+        <CompanySelectorFields
+          currentCompany={currentCompany}
+          name={"emitter.company"}
+          disabled={disabled}
+          key={currentCompany.orgId}
+        />
+      )}
 
       <div className="form__row">
         <label>

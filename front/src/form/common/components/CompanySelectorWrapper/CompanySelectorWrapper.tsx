@@ -8,6 +8,7 @@ import {
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs,
 } from "generated/graphql/types";
+import { NotificationError } from "Apps/common/Components/Error/Error";
 import {
   FAVORITES,
   SEARCH_COMPANIES,
@@ -80,14 +81,49 @@ export default function CompanySelectorWrapper({
   };
 
   return (
-    <CompanySelector
-      loading={isLoadingFavorites || isLoadingSearch}
-      onSelect={onSelectCompany}
-      onSearch={onSearchCompany}
-      favorites={favoritesData?.favorites}
-      companies={searchResults}
-      selectedCompany={selectedCompany ?? currentCompany}
-      disabled={disabled}
-    />
+    <>
+      {favoritesError && (
+        <NotificationError
+          apolloError={favoritesError}
+          message={error => error.message}
+        />
+      )}
+      {error && (
+        <NotificationError
+          apolloError={error}
+          message={error => {
+            if (
+              error.graphQLErrors.length &&
+              error.graphQLErrors[0].extensions?.code === "FORBIDDEN"
+            ) {
+              return (
+                `Nous n'avons pas pu récupérer les informations.` +
+                `Veuillez nous contacter via ` +
+                (
+                  <a
+                    href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    la FAQ
+                  </a>
+                ) +
+                ` pour pouvoir procéder à la création de l'établissement`
+              );
+            }
+            return error.message;
+          }}
+        />
+      )}
+      <CompanySelector
+        loading={isLoadingFavorites || isLoadingSearch}
+        onSelect={onSelectCompany}
+        onSearch={onSearchCompany}
+        favorites={favoritesData?.favorites}
+        companies={searchResults}
+        selectedCompany={selectedCompany ?? currentCompany}
+        disabled={disabled}
+      />
+    </>
   );
 }
