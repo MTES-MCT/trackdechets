@@ -38,7 +38,7 @@ export async function checkEditionRules(
       return checkSealedFields(
         "EMISSION",
         editableFields.filter(
-          field => editionRules[field].sealedBy !== "EMISSION"
+          field => editionRules[field].sealed.from !== "EMISSION"
         )
       );
     }
@@ -60,7 +60,7 @@ export async function checkEditionRules(
       return checkSealedFields(
         signature.next,
         editableFields.filter(
-          field => editionRules[field].sealedBy !== signature.next
+          field => editionRules[field].sealed.from !== signature.next
         )
       );
     }
