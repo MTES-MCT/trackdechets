@@ -4,7 +4,7 @@ import { BsdaSignatureType } from "../../generated/graphql/types";
 import { SIGNATURES_HIERARCHY } from "./edition";
 import { getReadonlyBsdaRepository } from "../repository";
 import { PARTIAL_OPERATIONS } from "./constants";
-import { Check, FieldCheck, editionRules } from "./rules";
+import { CheckFn, FieldCheck, editionRules } from "./rules";
 import { ZodBsda, rawBsdaSchema } from "./schema";
 import { capitalize } from "../../common/strings";
 import { runTransformers } from "./transformers";
@@ -24,10 +24,10 @@ export async function parseBsda(
   return contextualSchema.parseAsync(bsda);
 }
 
-export const check = (val: ZodBsda, check?: Check) => {
-  if (check === undefined || check === null) return true;
-  if (check instanceof Function) return check(val);
-  return Boolean(check);
+export const check = (val: ZodBsda, checkFn?: CheckFn) => {
+  if (checkFn === undefined || checkFn === null) return true;
+  if (checkFn && checkFn instanceof Function) return checkFn(val);
+  return false;
 };
 
 export const isAheadOfStepAndCheck = (

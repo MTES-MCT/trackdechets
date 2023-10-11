@@ -9,19 +9,6 @@ import { BsdaSignatureType } from "../../../generated/graphql/types";
 import { ZodBsda } from "../schema";
 
 describe("check", () => {
-  it.each([true, false])(
-    "if boolean > should return the boolean value '%p'",
-    value => {
-      // Given
-
-      // When
-      const res = check({} as ZodBsda, value);
-
-      // Then
-      expect(res).toEqual(value);
-    }
-  );
-
   it("if function > should return the result of the executed function", () => {
     // Given
     const bsda1 = { type: "GATHERING" } as ZodBsda;
@@ -53,9 +40,25 @@ describe("check", () => {
 describe("isAheadOfStepAndCheck", () => {
   it("if signature step is prior to seal step > should return false", () => {
     // Given
-    const fieldCheck = { from: "TRANSPORT" as BsdaSignatureType, when: true };
+    const fieldCheck = { from: "TRANSPORT" as BsdaSignatureType };
     const signatures: BsdaSignatureType[] = ["EMISSION"];
     const bsda = {} as ZodBsda;
+
+    // When
+    const res = isAheadOfStepAndCheck(bsda, signatures, fieldCheck);
+
+    // Then
+    expect(res).toEqual(false);
+  });
+
+  it("if signature step is prior to seal step and when=fn() > should return false", () => {
+    // Given
+    const fieldCheck = {
+      from: "TRANSPORT" as BsdaSignatureType,
+      when: bsda => bsda.type === "GATHERING"
+    };
+    const signatures: BsdaSignatureType[] = ["EMISSION"];
+    const bsda = { type: "GATHERING" } as ZodBsda;
 
     // When
     const res = isAheadOfStepAndCheck(bsda, signatures, fieldCheck);
@@ -68,7 +71,7 @@ describe("isAheadOfStepAndCheck", () => {
     "if signature step is ahead of seal step > should return true (step %p)",
     signature => {
       // Given
-      const fieldCheck = { from: signature as BsdaSignatureType, when: true };
+      const fieldCheck = { from: signature as BsdaSignatureType };
       const signatures: BsdaSignatureType[] = ["EMISSION", "WORK"];
       const bsda = {} as ZodBsda;
 
@@ -77,35 +80,6 @@ describe("isAheadOfStepAndCheck", () => {
 
       // Then
       expect(res).toStrictEqual(true);
-    }
-  );
-
-  it("if when is omitted > should default to true", () => {
-    // Given
-    const fieldCheck = { from: "EMISSION" as BsdaSignatureType };
-    const signatures: BsdaSignatureType[] = ["EMISSION", "WORK"];
-    const bsda = {} as ZodBsda;
-
-    // When
-    const res = isAheadOfStepAndCheck(bsda, signatures, fieldCheck);
-
-    // Then
-    expect(res).toStrictEqual(true);
-  });
-
-  it.each(["EMISSION", "WORK"])(
-    "if signature step is ahead of seal step but when=false > should return false (step %p) ",
-    signature => {
-      // Given
-      const fieldCheck = { from: signature as BsdaSignatureType, when: false };
-      const signatures: BsdaSignatureType[] = ["EMISSION", "WORK"];
-      const bsda = {} as ZodBsda;
-
-      // When
-      const res = isAheadOfStepAndCheck(bsda, signatures, fieldCheck);
-
-      // Then
-      expect(res).toEqual(false);
     }
   );
 
@@ -147,11 +121,28 @@ describe("getSealedRules", () => {
     // Given
     const rules = {
       type: {
-        sealed: { from: "TRANSPORT", when: true }
+        sealed: { from: "TRANSPORT" }
       }
     } as EditionRules;
     const signatures: BsdaSignatureType[] = ["EMISSION"];
     const bsda = {} as ZodBsda;
+
+    // When
+    const res = getSealedRules(signatures, bsda, rules);
+
+    // Then
+    expect(res).toEqual([]);
+  });
+
+  it("if signature step is prior to seal step and when=fn() > should not return the rule", () => {
+    // Given
+    const rules = {
+      type: {
+        sealed: { from: "TRANSPORT", when: bsda => bsda.type === "GATHERING" }
+      }
+    } as EditionRules;
+    const signatures: BsdaSignatureType[] = ["EMISSION"];
+    const bsda = { type: "GATHERING" } as ZodBsda;
 
     // When
     const res = getSealedRules(signatures, bsda, rules);
@@ -166,7 +157,7 @@ describe("getSealedRules", () => {
       // Given
       const rules = {
         type: {
-          sealed: { from: signature, when: true }
+          sealed: { from: signature }
         }
       } as EditionRules;
       const signatures: BsdaSignatureType[] = ["EMISSION", "WORK"];
@@ -177,43 +168,6 @@ describe("getSealedRules", () => {
 
       // Then
       expect(res).toStrictEqual([["type", rules.type]]);
-    }
-  );
-
-  it("if when is omitted > should default to true", () => {
-    // Given
-    const rules = {
-      type: {
-        sealed: { from: "EMISSION" }
-      }
-    } as EditionRules;
-    const signatures: BsdaSignatureType[] = ["EMISSION", "WORK"];
-    const bsda = {} as ZodBsda;
-
-    // When
-    const res = getSealedRules(signatures, bsda, rules);
-
-    // Then
-    expect(res).toStrictEqual([["type", rules.type]]);
-  });
-
-  it.each(["EMISSION", "WORK"])(
-    "if signature step is ahead of seal step but when=false > should not return the rule (step %p) ",
-    signature => {
-      // Given
-      const rules = {
-        type: {
-          sealed: { from: signature, when: false }
-        }
-      } as EditionRules;
-      const signatures: BsdaSignatureType[] = ["EMISSION", "WORK"];
-      const bsda = {} as ZodBsda;
-
-      // When
-      const res = getSealedRules(signatures, bsda, rules);
-
-      // Then
-      expect(res).toEqual([]);
     }
   );
 
@@ -267,7 +221,35 @@ describe("validate", () => {
         const bsda = {};
         const customEditionRules = {
           type: {
-            required: { from: "TRANSPORT" as BsdaSignatureType, when: true }
+            required: { from: "TRANSPORT" as BsdaSignatureType }
+          }
+        } as EditionRules;
+
+        // When
+        const schema = getContextualBsdaSchema(
+          {
+            currentSignatureType: signature as BsdaSignatureType
+          },
+          customEditionRules
+        );
+
+        // Then
+        const parsed = await schema.parseAsync(bsda);
+        expect(parsed).toBeDefined();
+      }
+    );
+
+    it.each(["EMISSION", "WORK"])(
+      "if signature step is prior to require step and when=fn() > should not be required (step: %p)",
+      async signature => {
+        // Given
+        const bsda = { type: "GATHERING" };
+        const customEditionRules = {
+          type: {
+            required: {
+              from: "TRANSPORT" as BsdaSignatureType,
+              when: bsda => bsda.type === "GATHERING"
+            }
           }
         } as EditionRules;
 
@@ -292,7 +274,7 @@ describe("validate", () => {
         const bsda = {};
         const customEditionRules = {
           type: {
-            required: { from: "EMISSION" as BsdaSignatureType, when: true }
+            required: { from: "EMISSION" as BsdaSignatureType }
           }
         } as EditionRules;
 
@@ -314,53 +296,6 @@ describe("validate", () => {
         }
       }
     );
-
-    it("if when is omitted > should default to true", async () => {
-      // Given
-      const bsda = {};
-      const customEditionRules = {
-        type: {
-          required: { from: "EMISSION" as BsdaSignatureType }
-        }
-      } as EditionRules;
-
-      // When
-      const schema = getContextualBsdaSchema(
-        {
-          currentSignatureType: "EMISSION" as BsdaSignatureType
-        },
-        customEditionRules
-      );
-
-      // Then
-      try {
-        await schema.parseAsync(bsda);
-      } catch (error) {
-        expect(error.issues[0].message).toBe("Le champ type est obligatoire.");
-      }
-    });
-
-    it("if signature step is ahead of require step but when=false > should not be required", async () => {
-      // Given
-      const bsda = {};
-      const customEditionRules = {
-        type: {
-          required: { from: "EMISSION" as BsdaSignatureType, when: false }
-        }
-      } as EditionRules;
-
-      // When
-      const schema = getContextualBsdaSchema(
-        {
-          currentSignatureType: "TRANSPORT"
-        },
-        customEditionRules
-      );
-
-      // Then
-      const parsed = await schema.parseAsync(bsda);
-      expect(parsed).toBeDefined();
-    });
 
     it("if when=fn() > should return result of fn()", async () => {
       // Given

@@ -31,10 +31,10 @@ export type EditableBsdaFields = Required<
   >
 >;
 
-export type Check = boolean | ((val: ZodBsda) => boolean);
+export type CheckFn = (val: ZodBsda) => boolean;
 export type FieldCheck = {
   from: BsdaSignatureType;
-  when?: Check; // Default to 'true'
+  when?: CheckFn;
 };
 
 export type EditionRules = {
