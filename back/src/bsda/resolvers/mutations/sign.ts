@@ -56,20 +56,20 @@ const signBsda: MutationResolvers["signBsda"] = async (
 
   checkSignatureTypeSpecificRules(bsda, input);
 
-  // Check that all necessary fields are filled
-  await parseBsdaInContext(
-    { persisted: bsda },
-    {
-      currentSignatureType: input.type
-    }
-  );
-  
   // TODO: should be replaced by code that get triggers when the
   // transporter receipt is set on the profile
   let transporterReceipt = {};
   if (input.type === "TRANSPORT") {
     transporterReceipt = await getTransporterReceipt(bsda);
   }
+
+  // Check that all necessary fields are filled
+  await parseBsdaInContext(
+    { persisted: { ...bsda, ...transporterReceipt } },
+    {
+      currentSignatureType: input.type
+    }
+  );
 
   const sign = signatures[input.type];
   const signedBsda = await sign(user, bsda, {

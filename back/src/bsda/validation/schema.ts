@@ -16,7 +16,6 @@ import {
   siretSchema,
   foreignVatNumberSchema,
   isDestinationRefinement,
-  isTransporterRefinement,
   isWorkerRefinement
 } from "../../common/validation/siret";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";

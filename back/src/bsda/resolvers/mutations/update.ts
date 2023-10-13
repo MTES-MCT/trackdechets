@@ -24,7 +24,8 @@ export default async function edit(
     {
       enableCompletionTransformers: true,
       enablePreviousBsdasChecks: true,
-      currentSignatureType: getCurrentSignatureType(existingBsda)
+      currentSignatureType: getCurrentSignatureType(existingBsda),
+      user
     }
   );
 
@@ -63,9 +64,9 @@ export default async function edit(
 
 function getCurrentSignatureType(bsda) {
   // TODO calculate from SIGNATURES_HIERARCHY
-  if (bsda.destinationOperationSignatureAuthor != null) return "OPERATION";
-  if (bsda.transporterTransportSignatureAuthor != null) return "TRANSPORT";
-  if (bsda.workerWorkSignatureAuthor != null) return "WORK";
-  if (bsda.emitterEmissionSignatureAuthor != null) return "EMISSION";
+  if (bsda.destinationOperationSignatureDate != null) return "OPERATION";
+  if (bsda.transporterTransportSignatureDate != null) return "TRANSPORT";
+  if (bsda.workerWorkSignatureDate != null) return "WORK";
+  if (bsda.emitterEmissionSignatureDate != null) return "EMISSION";
   return undefined;
 }
