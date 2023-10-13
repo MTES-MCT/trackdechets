@@ -303,7 +303,7 @@ export const editionRules: EditionRules = {
         hasTransporter(bsda) &&
         !bsda.transporterRecepisseIsExempted &&
         !isForeignVat(bsda.transporterCompanyVatNumber),
-      suffix: " L'établissement doit renseigner son récépissé dans Trackdéchets"
+      suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
     },
     readableFieldName: "Transporteur: le numéro de récépissé"
   },
@@ -315,7 +315,7 @@ export const editionRules: EditionRules = {
         hasTransporter(bsda) &&
         !bsda.transporterRecepisseIsExempted &&
         !isForeignVat(bsda.transporterCompanyVatNumber),
-      suffix: " L'établissement doit renseigner son récépissé dans Trackdéchets"
+      suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
     },
     readableFieldName: "Transporteur: le département de récépissé"
   },
@@ -327,7 +327,7 @@ export const editionRules: EditionRules = {
         hasTransporter(bsda) &&
         !bsda.transporterRecepisseIsExempted &&
         !isForeignVat(bsda.transporterCompanyVatNumber),
-      suffix: " L'établissement doit renseigner son récépissé dans Trackdéchets"
+      suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
     },
     readableFieldName: "Transporteur: la date de validité du récépissé"
   },
@@ -515,14 +515,30 @@ function isNotRefused(bsda: ZodBsda) {
   );
 }
 
-function isDestinationSealed(val, userFunctions) {
-  const isSealedFormEmitter = hasWorker(val)
-    ? val.workerWorkSignatureDate != null
-    : val.transporterTransportSignatureDate != null;
+function isDestinationSealed(val: ZodBsda, userFunctions: UserFunctions) {
+  const isSealedForEmitter = hasWorker(val)
+    ? val.workerWorkSignatureDate == null
+    : val.transporterTransportSignatureDate == null;
 
-  if (userFunctions.isEmitter && !isSealedFormEmitter) {
+  if (userFunctions.isEmitter && !isSealedForEmitter) {
     return false;
   }
+
+  // If I am worker, transporter or destination
+  // and the transporter hasn't signed
+  // and I am adding a nextDestinationCompanySiret,
+  // then I can edit the destination.
+  if (
+    (userFunctions.isEmitter ||
+      userFunctions.isWorker ||
+      userFunctions.isTransporter ||
+      userFunctions.isDestination) &&
+    val.transporterTransportSignatureDate == null &&
+    val.destinationOperationNextDestinationCompanySiret
+  ) {
+    return false;
+  }
+
   return true;
 }
 
@@ -578,7 +594,7 @@ export function checkSealedAndRequiredFields(
             sealedRule.suffix
           ]
             .filter(Boolean)
-            .join("")
+            .join(" ")
         });
       }
       // @ts-expect-error TODO: superRefineWhenSealed first param is inferred as never ?
@@ -595,7 +611,7 @@ export function checkSealedAndRequiredFields(
           path: [field],
           message: [`${fieldDescription} est obligatoire.`, requiredRule.suffix]
             .filter(Boolean)
-            .join("")
+            .join(" ")
         });
       }
       // @ts-expect-error TODO: superRefineWhenSealed first param is inferred as never ?

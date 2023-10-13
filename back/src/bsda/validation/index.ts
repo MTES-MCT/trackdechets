@@ -29,8 +29,9 @@ type BsdaForParsing = Prisma.BsdaGetPayload<{
 }>;
 
 export type UnparsedInputs = {
-  input?: (BsdaInput & { isDraft?: boolean }) | undefined;
+  input?: BsdaInput | undefined;
   persisted?: BsdaForParsing | undefined;
+  isDraft?: boolean;
 };
 
 export async function parseBsdaInContext(
@@ -43,11 +44,18 @@ export async function parseBsdaInContext(
   const signaturesToCheck = getSignatureAncestors(
     validationContext.currentSignatureType
   );
-  const userFunctions = await getUserFunctions(validationContext.user, unparsedBsda);
+  const userFunctions = await getUserFunctions(
+    validationContext.user,
+    unparsedBsda
+  );
 
   const contextualSchema = rawBsdaSchema
     .transform(async val => {
-      const sealedFields = getSealedFields({ bsda: val, userFunctions, signaturesToCheck });
+      const sealedFields = getSealedFields({
+        bsda: val,
+        userFunctions,
+        signaturesToCheck
+      });
       if (validationContext.enableCompletionTransformers) {
         val = await runTransformers(val, sealedFields);
       }

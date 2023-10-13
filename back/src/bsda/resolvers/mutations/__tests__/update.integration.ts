@@ -280,7 +280,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterCompanyName"
+          "Le champ emitterCompanyName a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -358,7 +358,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : workerCompanySiret"
+          "Le champ workerCompanySiret a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -523,7 +523,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporterCompanyName"
+          "Le champ transporterCompanyName a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -854,7 +854,7 @@ describe("Mutation.updateBsda", () => {
 
     expect(errors.length).toBe(1);
     expect(errors[0].message).toBe(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : intermediaries"
+      "Le champ intermediaries a été vérouillé via signature et ne peut pas être modifié."
     );
   });
 
@@ -915,8 +915,8 @@ describe("Mutation.updateBsda", () => {
         status: "SIGNED_BY_WORKER",
         destinationCompanySiret: destination.company.siret,
         transporterCompanySiret: transporter.company.siret,
-        emitterEmissionSignatureAuthor: "Emit",
-        workerWorkSignatureAuthor: "Work"
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
       }
     });
 

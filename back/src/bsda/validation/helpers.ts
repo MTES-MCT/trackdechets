@@ -10,11 +10,12 @@ import { getUserCompanies } from "../../users/database";
  * Computes an unparsed BSDA by merging the GQL input and
  * the currently persisted BSDA in the database
  */
-export function getUnparsedBsda({ input, persisted }: UnparsedInputs) {
+export function getUnparsedBsda({ input, persisted, isDraft }: UnparsedInputs) {
   const flattenedInput = input ? flattenBsdaInput(input) : {};
   return {
     ...persisted,
     ...flattenedInput,
+    isDraft,
     intermediaries: input?.intermediaries ?? persisted?.intermediaries,
     grouping: input?.grouping ?? persisted?.grouping.map(bsda => bsda.id),
     forwarding: input?.forwarding ?? persisted?.forwarding?.id

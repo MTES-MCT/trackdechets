@@ -1,4 +1,4 @@
-import { Bsda, BsdaStatus, BsdaType } from "@prisma/client";
+import { Bsda, BsdaStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
 import { isTransporterRefinement } from "../../common/validation/siret";
 import { BsdaSignatureType } from "../../generated/graphql/types";

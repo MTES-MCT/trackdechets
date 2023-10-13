@@ -2,7 +2,6 @@ import { Bsda, BsdaType, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   companyFactory,
-  siretify,
   userWithCompanyFactory
 } from "../../../__tests__/factories";
 
@@ -79,13 +78,12 @@ describe("BSDA validation", () => {
         transporterTransportMode: "AIR"
       };
 
-      const res = await parseBsdaInContext(
-        { input: data as any },
+      await parseBsdaInContext(
+        { persisted: data as any },
         {
           currentSignatureType: "TRANSPORT"
         }
       );
-      expect(res).toBeTruthy();
     });
 
     it("should work if transport mode is ROAD & plates are defined", async () => {
@@ -96,7 +94,7 @@ describe("BSDA validation", () => {
       };
 
       const res = await parseBsdaInContext(
-        { input: data as any },
+        { persisted: data as any },
         {
           currentSignatureType: "TRANSPORT"
         }
@@ -175,15 +173,18 @@ describe("BSDA validation", () => {
         ...bsda,
         transporterCompanySiret: "85001946400021"
       };
-      const result = await rawBsdaSchema.safeParseAsync(data);
 
-      if (result.success) {
-        throw new Error("Expected error.");
+      expect.assertions(1);
+      try {
+        await parseBsdaInContext({ persisted: data as any }, {});
+      } catch (error) {
+        expect(error.issues).toEqual([
+          expect.objectContaining({
+            message:
+              "L'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+          })
+        ]);
       }
-
-      expect(result.error.issues[0].message).toBe(
-        "L'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
-      );
     });
 
     test("when transporter is registered with wrong profile", async () => {
@@ -192,17 +193,20 @@ describe("BSDA validation", () => {
         ...bsda,
         transporterCompanySiret: company.siret
       };
-      const result = await rawBsdaSchema.safeParseAsync(data);
 
-      if (result.success) {
-        throw new Error("Expected error.");
+      expect.assertions(1);
+      try {
+        await parseBsdaInContext({ persisted: data as any }, {});
+      } catch (error) {
+        expect(error.issues).toEqual([
+          expect.objectContaining({
+            message:
+              `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
+              " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+              " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+          })
+        ]);
       }
-
-      expect(result.error.issues[0].message).toBe(
-        `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
-          " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
-          " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
-      );
     });
 
     test("when foreign transporter is not registered in Trackdéchets", async () => {
@@ -312,15 +316,22 @@ describe("BSDA validation", () => {
 
       try {
         await parseBsdaInContext(
-          { input: data as any },
+          { persisted: data as any },
           {
             currentSignatureType: "TRANSPORT"
           }
         );
       } catch (error) {
-        expect(error.issues[0].message).toBe(
-          "Transporteur: le numéro de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
-        );
+        expect(error.issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Transporteur: le numéro de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+          }),
+          expect.objectContaining({
+            message:
+              "Transporteur: le département de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+          })
+        ]);
       }
     });
 
@@ -334,13 +345,15 @@ describe("BSDA validation", () => {
 
       try {
         await parseBsdaInContext(
-          { input: data as any },
+          { persisted: data as any },
           { currentSignatureType: "TRANSPORT" }
         );
-      } catch (err) {
-        expect(err.issues[0].message).toBe(
-          "La plaque d'immatriculation est requise"
-        );
+      } catch (error) {
+        expect(error.issues).toEqual([
+          expect.objectContaining({
+            message: "La plaque d'immatriculation est requise"
+          })
+        ]);
       }
     });
 
@@ -394,7 +407,7 @@ describe("BSDA validation", () => {
       expect.assertions(1);
 
       const result = await parseBsdaInContext(
-        { input: data as any },
+        { persisted: data as any },
         {
           currentSignatureType: "TRANSPORT"
         }
@@ -419,7 +432,7 @@ describe("BSDA validation", () => {
 
       try {
         await parseBsdaInContext(
-          { input: data as any },
+          { persisted: data as any },
           {
             currentSignatureType: "TRANSPORT"
           }
@@ -433,16 +446,64 @@ describe("BSDA validation", () => {
       }
     });
   });
+});
 
-  describe("Sealed rules checks", () => {
-    afterAll(resetDatabase);
+describe("BSDA Sealed rules checks", () => {
+  afterAll(resetDatabase);
 
-    it("should be possible to update any fields when bsda status is INITIAL", async () => {
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "INITIAL"
-        }
-      });
+  it("should be possible to update any fields when bsda status is INITIAL", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "INITIAL"
+      }
+    });
+    await parseBsdaInContext(
+      {
+        input: {
+          emitter: { company: { name: "ACME" } }
+        },
+        persisted: bsda as any
+      },
+      {}
+    );
+  });
+
+  it("should be possible to update any fields when bsda status is SIGNED_BY_PRODUCER", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company: nextDestinationCompany } = await userWithCompanyFactory();
+    const { company: workerCompany } = await userWithCompanyFactory();
+    const bsda = await bsdaFactory({
+      opt: {
+        workerCompanySiret: company.siret,
+        destinationCompanySiret: company.siret,
+        transporterCompanySiret: company.siret,
+        destinationOperationNextDestinationCompanySiret:
+          nextDestinationCompany.siret,
+        status: "SIGNED_BY_PRODUCER"
+      }
+    });
+
+    await parseBsdaInContext(
+      {
+        input: {
+          worker: { company: { name: "ACME 2", siret: workerCompany.siret } }
+        },
+        persisted: bsda as any
+      },
+      { user }
+    );
+  });
+
+  it("should not be possible to update a field sealed by emission signature", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date()
+      }
+    });
+
+    expect.assertions(1);
+    try {
       await parseBsdaInContext(
         {
           input: {
@@ -450,310 +511,290 @@ describe("BSDA validation", () => {
           },
           persisted: bsda as any
         },
-        {}
+        { currentSignatureType: "WORK" }
       );
-    });
-
-    it("should be possible to update any fields when bsda status is SIGNED_BY_PRODUCER", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-      const bsda = await bsdaFactory({
-        opt: {
-          workerCompanySiret: company.siret,
-          destinationCompanySiret: company.siret,
-          transporterCompanySiret: company.siret,
-          destinationOperationNextDestinationCompanySiret: siretify(2),
-          status: "SIGNED_BY_PRODUCER"
-        }
-      });
-
-      await parseBsdaInContext(
-        {
-          input: {
-            worker: { company: { name: "ACME 2", siret: siretify(1) } }
-          },
-          persisted: bsda as any
-        },
-        { user }
+    } catch (error) {
+      expect(error.issues[0].message).toBe(
+        "Le champ emitterCompanyName a été vérouillé via signature et ne peut pas être modifié."
       );
-    });
+    }
+  });
 
-    it("should not be possible to update a field sealed by emission signature", async () => {
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SIGNED_BY_PRODUCER",
-          emitterEmissionSignatureDate: new Date()
-        }
-      });
-
-      expect.assertions(1);
-      try {
-        await parseBsdaInContext(
-          {
-            input: {
-              emitter: { company: { name: "ACME" } }
-            },
-            persisted: bsda as any
-          },
-          {}
-        );
-      } catch (error) {
-        expect(error.message).toBe(
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterCompanyName"
-        );
+  it("should be possible to set a sealed field to null if it was empty", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date(),
+        emitterPickupSiteAddress: ""
       }
     });
 
-    it("should be possible to set a sealed field to null if it was empty", async () => {
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SIGNED_BY_PRODUCER",
-          emitterEmissionSignatureDate: new Date(),
-          emitterPickupSiteAddress: ""
-        }
-      });
-
-      await parseBsdaInContext(
-        {
-          input: {
-            emitter: { pickupSite: { address: null } }
-          },
-          persisted: bsda as any
+    await parseBsdaInContext(
+      {
+        input: {
+          emitter: { pickupSite: { address: null } }
         },
-        {}
-      );
-    });
+        persisted: bsda as any
+      },
+      {}
+    );
+  });
 
-    it("should be possible to set a sealed field to an empty string if it was null", async () => {
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SIGNED_BY_PRODUCER",
-          emitterEmissionSignatureDate: new Date(),
-          emitterPickupSiteAddress: null
-        }
-      });
-
-      await parseBsdaInContext(
-        {
-          input: {
-            emitter: { pickupSite: { address: "" } }
-          },
-          persisted: bsda as any
-        },
-        {}
-      );
-    });
-
-    it("should be possible for the emitter to update a field sealed by emission signature", async () => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SIGNED_BY_PRODUCER",
-          emitterCompanySiret: company.siret,
-          emitterEmissionSignatureDate: new Date()
-        }
-      });
-
-      await parseBsdaInContext(
-        {
-          input: {
-            emitter: { company: { name: "ACME" } }
-          },
-          persisted: bsda as any
-        },
-        {}
-      );
-    });
-
-    it("should be possible to re-send same data on a field sealed by emission signature", async () => {
-      const grouping = [await bsdaFactory({})];
-      const forwarding = await bsdaFactory({});
-      const intermediary = await companyFactory();
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SIGNED_BY_PRODUCER",
-          emitterEmissionSignatureDate: new Date(),
-          grouping: { connect: grouping.map(bsda => ({ id: bsda.id })) },
-          forwarding: { connect: { id: forwarding.id } }
-        }
-      });
-      await prisma.intermediaryBsdaAssociation.create({
-        data: {
-          bsdaId: bsda.id,
-          siret: intermediary.siret!,
-          name: intermediary.name,
-          contact: "contact"
-        }
-      });
-
-      await parseBsdaInContext(
-        {
-          input: {
-            emitter: { company: { siret: bsda.emitterCompanySiret } },
-            forwarding: bsda.forwardingId,
-            grouping: grouping.map(bsda => bsda.id),
-            intermediaries: [
-              {
-                siret: intermediary.siret,
-                name: intermediary.name,
-                contact: "contact2"
-              }
-            ]
-          },
-          persisted: bsda as any
-        },
-        {}
-      );
-    });
-
-    it("should be possible to update a field not yet sealed by emission signature", async () => {
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SIGNED_BY_PRODUCER",
-          emitterEmissionSignatureDate: new Date()
-        }
-      });
-
-      await parseBsdaInContext(
-        {
-          input: {
-            transporter: { transport: { plates: ["AD-008-TS"] } }
-          },
-          persisted: bsda as any
-        },
-        {}
-      );
-    });
-
-    it("should not be possible to update a field sealed by worker signature", async () => {
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SIGNED_BY_WORKER",
-          emitterEmissionSignatureDate: new Date(),
-          workerWorkSignatureDate: new Date()
-        }
-      });
-
-      expect.assertions(1);
-      try {
-        await parseBsdaInContext(
-          {
-            input: {
-              worker: {
-                work: {
-                  hasEmitterPaperSignature:
-                    !bsda.workerWorkHasEmitterPaperSignature
-                }
-              }
-            },
-            persisted: bsda as any
-          },
-          {}
-        );
-      } catch (error) {
-        expect(error.message).toBe(
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : workerWorkHasEmitterPaperSignature"
-        );
+  it("should be possible to set a sealed field to an empty string if it was null", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date(),
+        emitterPickupSiteAddress: null
       }
     });
 
-    it("should be possible to update a field not yet sealed by worker signature", async () => {
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SIGNED_BY_WORKER",
-          emitterEmissionSignatureDate: new Date(),
-          workerWorkSignatureDate: new Date()
-        }
-      });
-
-      await parseBsdaInContext(
-        {
-          input: {
-            transporter: { transport: { plates: ["AD-008-TS"] } }
-          },
-          persisted: bsda as any
+    await parseBsdaInContext(
+      {
+        input: {
+          emitter: { pickupSite: { address: "" } }
         },
-        {}
-      );
-    });
+        persisted: bsda as any
+      },
+      {}
+    );
+  });
 
-    it("should not be possible to update a field sealed by transporter signature", async () => {
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SENT",
-          emitterEmissionSignatureDate: new Date(),
-          workerWorkSignatureDate: new Date(),
-          transporterTransportSignatureDate: new Date()
-        }
-      });
-
-      expect.assertions(1);
-      try {
-        await parseBsdaInContext(
-          {
-            input: {
-              transporter: {
-                transport: {
-                  plates: ["AD-008-YT"]
-                }
-              }
-            },
-            persisted: bsda as any
-          },
-          {}
-        );
-      } catch (error) {
-        expect(error.message).toBe(
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporterTransportPlates"
-        );
+  it("should be possible for the emitter to update a field sealed by emission signature", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureDate: new Date()
       }
     });
 
-    it("should be possible to re-send same data on a field sealed by transporter signature", async () => {
-      const intermediary = await companyFactory();
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SENT",
-          emitterEmissionSignatureDate: new Date(),
-          workerWorkSignatureDate: new Date()
-        }
-      });
-      await prisma.intermediaryBsdaAssociation.create({
-        data: {
-          bsdaId: bsda.id,
-          siret: intermediary.siret!,
-          name: intermediary.name,
-          contact: "contact"
-        }
-      });
+    await parseBsdaInContext(
+      {
+        input: {
+          emitter: { company: { name: "ACME" } }
+        },
+        persisted: bsda as any
+      },
+      { user }
+    );
+  });
 
+  it("should be possible to re-send same data on a field sealed by emission signature", async () => {
+    const grouping = [await bsdaFactory({})];
+    const intermediary = await companyFactory();
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date(),
+        grouping: { connect: grouping.map(bsda => ({ id: bsda.id })) }
+      }
+    });
+    await prisma.intermediaryBsdaAssociation.create({
+      data: {
+        bsdaId: bsda.id,
+        siret: intermediary.siret!,
+        name: intermediary.name,
+        contact: "contact"
+      }
+    });
+
+    await parseBsdaInContext(
+      {
+        input: {
+          emitter: { company: { siret: bsda.emitterCompanySiret } },
+          forwarding: bsda.forwardingId,
+          grouping: grouping.map(bsda => bsda.id),
+          intermediaries: [
+            {
+              siret: intermediary.siret,
+              name: intermediary.name,
+              contact: "contact2",
+              address: "adresse"
+            }
+          ]
+        },
+        persisted: bsda as any
+      },
+      {}
+    );
+  });
+
+  it("should be possible to update a field not yet sealed by emission signature", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date()
+      }
+    });
+
+    await parseBsdaInContext(
+      {
+        input: {
+          transporter: { transport: { plates: ["AD-008-TS"] } }
+        },
+        persisted: bsda as any
+      },
+      {}
+    );
+  });
+
+  it("should not be possible to update a field sealed by worker signature", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_WORKER",
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
+      }
+    });
+
+    expect.assertions(1);
+    try {
       await parseBsdaInContext(
         {
           input: {
-            transporter: { company: { siret: bsda.transporterCompanySiret } },
-            intermediaries: [
-              {
-                siret: intermediary.siret,
-                name: intermediary.name,
-                contact: "contact2"
+            worker: {
+              work: {
+                hasEmitterPaperSignature:
+                  !bsda.workerWorkHasEmitterPaperSignature
               }
-            ]
+            }
           },
           persisted: bsda as any
         },
-        {}
+        { currentSignatureType: "WORK" }
       );
+    } catch (error) {
+      expect(error.issues[0].message).toBe(
+        "Le champ workerWorkHasEmitterPaperSignature a été vérouillé via signature et ne peut pas être modifié."
+      );
+    }
+  });
+
+  it("should be possible to update a field not yet sealed by worker signature", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_WORKER",
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
+      }
     });
 
-    it("should be possible to update a field not yet sealed by transport signature", async () => {
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SENT",
-          emitterEmissionSignatureDate: new Date(),
-          workerWorkSignatureDate: new Date(),
-          transporterTransportSignatureDate: new Date()
-        }
-      });
+    await parseBsdaInContext(
+      {
+        input: {
+          transporter: { transport: { plates: ["AD-008-TS"] } }
+        },
+        persisted: bsda as any
+      },
+      {}
+    );
+  });
 
+  it("should not be possible to update a field sealed by transporter signature", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SENT",
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      }
+    });
+
+    expect.assertions(1);
+    try {
+      await parseBsdaInContext(
+        {
+          input: {
+            transporter: {
+              transport: {
+                plates: ["AD-008-YT"]
+              }
+            }
+          },
+          persisted: bsda as any
+        },
+        { currentSignatureType: "OPERATION" }
+      );
+    } catch (error) {
+      expect(error.issues[0].message).toBe(
+        "Le champ transporterTransportPlates a été vérouillé via signature et ne peut pas être modifié."
+      );
+    }
+  });
+
+  it("should be possible to re-send same data on a field sealed by transporter signature", async () => {
+    const intermediary = await companyFactory();
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SENT",
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
+      }
+    });
+    await prisma.intermediaryBsdaAssociation.create({
+      data: {
+        bsdaId: bsda.id,
+        siret: intermediary.siret!,
+        name: intermediary.name,
+        contact: "contact"
+      }
+    });
+
+    await parseBsdaInContext(
+      {
+        input: {
+          transporter: { company: { siret: bsda.transporterCompanySiret } },
+          intermediaries: [
+            {
+              siret: intermediary.siret,
+              name: intermediary.name,
+              contact: "contact2",
+              address: "adresse"
+            }
+          ]
+        },
+        persisted: bsda as any
+      },
+      {}
+    );
+  });
+
+  it("should be possible to update a field not yet sealed by transport signature", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SENT",
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      }
+    });
+
+    await parseBsdaInContext(
+      {
+        input: {
+          destination: { reception: { weight: 300 } }
+        },
+        persisted: bsda as any
+      },
+      {}
+    );
+  });
+
+  it("should not be possible to update a field sealed by operation signature", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "PROCESSED",
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date(),
+        destinationOperationSignatureDate: new Date()
+      }
+    });
+
+    expect.assertions(1);
+    try {
       await parseBsdaInContext(
         {
           input: {
@@ -761,37 +802,12 @@ describe("BSDA validation", () => {
           },
           persisted: bsda as any
         },
-        {}
+        { currentSignatureType: "OPERATION" }
       );
-    });
-
-    it("should not be possible to update a field sealed by operation signature", async () => {
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "PROCESSED",
-          emitterEmissionSignatureDate: new Date(),
-          workerWorkSignatureDate: new Date(),
-          transporterTransportSignatureDate: new Date(),
-          destinationOperationSignatureDate: new Date()
-        }
-      });
-
-      expect.assertions(1);
-      try {
-        await parseBsdaInContext(
-          {
-            input: {
-              destination: { reception: { weight: 300 } }
-            },
-            persisted: bsda as any
-          },
-          {}
-        );
-      } catch (error) {
-        expect(error.message).toBe(
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationReceptionWeight"
-        );
-      }
-    });
+    } catch (error) {
+      expect(error.issues[0].message).toBe(
+        "Le champ destinationReceptionWeight a été vérouillé via signature et ne peut pas être modifié."
+      );
+    }
   });
 });
