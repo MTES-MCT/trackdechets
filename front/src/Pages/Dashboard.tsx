@@ -53,6 +53,7 @@ import { UserPermission } from "generated/graphql/types";
 import { GET_BSDA_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsdaReviewQuery";
 import { GET_FORM_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsddReviewsQuery";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
+import QuickFilters from "Apps/common/Components/Filters/QuickFilters";
 
 import "./dashboard.scss";
 
@@ -572,6 +573,7 @@ const DashboardPage = () => {
       {isFiltersOpen && (
         <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
       )}
+      <QuickFilters />
       {isFetchingMore && <Loader />}
       {isLoadingBsds && !isFetchingMore ? (
         <Loader />
