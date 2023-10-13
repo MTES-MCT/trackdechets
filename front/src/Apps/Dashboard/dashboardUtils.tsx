@@ -101,6 +101,34 @@ enum FilterName {
   ficheInterventionNumbers = "ficheInterventionNumbers",
 }
 
+export const quickFilterList: Filter[] = [
+  {
+    name: FilterName.readableId,
+    label: filter_bsd_number,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.waste,
+    label: filter_waste_code,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.pickupSiteName,
+    label: filter_chantier_name,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.givenName,
+    label: filter_emitter_name,
+    type: FilterType.input,
+    isActive: true,
+  },
+  // TODO: CAP
+];
+
 export const filterList: Filter[][] = [
   [
     {
@@ -112,24 +140,6 @@ export const filterList: Filter[][] = [
       isActive: true,
     },
     {
-      name: FilterName.readableId,
-      label: filter_bsd_number,
-      type: FilterType.input,
-      isActive: true,
-    },
-    {
-      name: FilterName.waste,
-      label: filter_waste_code,
-      type: FilterType.input,
-      isActive: true,
-    },
-    {
-      name: FilterName.pickupSiteName,
-      label: filter_chantier_name,
-      type: FilterType.input,
-      isActive: true,
-    },
-    {
       name: FilterName.transporterNumberPlate,
       label: filter_immat_number,
       type: FilterType.input,
@@ -138,12 +148,6 @@ export const filterList: Filter[][] = [
     {
       name: FilterName.packagingNumbers,
       label: filter_contenant_number,
-      type: FilterType.input,
-      isActive: true,
-    },
-    {
-      name: FilterName.givenName,
-      label: filter_emitter_name,
       type: FilterType.input,
       isActive: true,
     },

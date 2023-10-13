@@ -14,6 +14,8 @@ export type Filter = {
 };
 
 export interface FiltersProps {
+  open?: boolean;
   filters: Filter[][];
+  quickFilters: Filter[];
   onApplyFilters: (values: { [key: string]: string }) => void;
 }

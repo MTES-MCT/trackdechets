@@ -8,8 +8,14 @@ import Select from "../Select/Select";
 import DatePickerWrapper from "../DatePicker/DatePickerWrapper";
 
 import "./filters.scss";
+import QuickFilters from "./QuickFilters";
 
-const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
+const Filters = ({
+  open = false,
+  filters,
+  quickFilters,
+  onApplyFilters,
+}: FiltersProps) => {
   const placeholderFilterRef = useRef<HTMLDivElement>(null);
   const [filterSelectedList, setFilterSelectedList] = useState<Filter[]>([]);
   const [isApplyDisabled, setIsApplyDisabled] = useState<boolean>(true);
@@ -253,34 +259,43 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
 
   return (
     <div className="filters">
-      {filterSelectedList.map((filter, i) => {
-        return (
-          <React.Fragment key={`${filter.name}_filter`}>
+      {open && (
+        <>
+          {filterSelectedList.map((filter, i) => {
+            return (
+              <React.Fragment key={`${filter.name}_filter`}>
+                <FilterLine
+                  filters={derivedFilters}
+                  onAddFilterType={onAddFilterType}
+                  onRemoveFilterType={onRemoveFilterType}
+                  value={filter.name}
+                  disabledSelect={true}
+                  isMaxLine={hasReachMaxFilter}
+                  isCurrentLine={i === filterSelectedList.length - 1}
+                >
+                  {displayFilterItem(filter)}
+                </FilterLine>
+              </React.Fragment>
+            );
+          })}
+          {/* filter selector */}
+          <div ref={placeholderFilterRef}>
             <FilterLine
               filters={derivedFilters}
+              onChange={onSelectFilterType}
               onAddFilterType={onAddFilterType}
               onRemoveFilterType={onRemoveFilterType}
-              value={filter.name}
-              disabledSelect={true}
               isMaxLine={hasReachMaxFilter}
-              isCurrentLine={i === filterSelectedList.length - 1}
-            >
-              {displayFilterItem(filter)}
-            </FilterLine>
-          </React.Fragment>
-        );
-      })}
-      {/* filter selector */}
-      <div ref={placeholderFilterRef}>
-        <FilterLine
-          filters={derivedFilters}
-          onChange={onSelectFilterType}
-          onAddFilterType={onAddFilterType}
-          onRemoveFilterType={onRemoveFilterType}
-          isMaxLine={hasReachMaxFilter}
-          isCurrentLine
-        />
-      </div>
+              isCurrentLine
+            />
+          </div>
+        </>
+      )}
+
+      <QuickFilters
+        filters={quickFilters}
+        onChange={(value, filterName) => onFilterValueChange(value, filterName)}
+      />
     </div>
   );
 };

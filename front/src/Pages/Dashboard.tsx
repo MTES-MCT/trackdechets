@@ -46,6 +46,7 @@ import {
   dropdownCreateLinks,
   filterPredicates,
   getBsdCurrentTab,
+  quickFilterList,
 } from "../Apps/Dashboard/dashboardUtils";
 import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
 import { usePermissions } from "common/contexts/PermissionsContext";
@@ -53,7 +54,6 @@ import { UserPermission } from "generated/graphql/types";
 import { GET_BSDA_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsdaReviewQuery";
 import { GET_FORM_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsddReviewsQuery";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
-import QuickFilters from "Apps/common/Components/Filters/QuickFilters";
 
 import "./dashboard.scss";
 
@@ -273,9 +273,9 @@ const DashboardPage = () => {
         variables.where = routePredicate;
       }
       const filterKeys = Object.keys(filterValues);
-      const filters = filterList
-        .flat()
-        .filter(filter => filterKeys.includes(filter.name));
+      const filters = [...filterList.flat(), ...quickFilterList].filter(
+        filter => filterKeys.includes(filter.name)
+      );
       filters.forEach(f => {
         const predicate = filterPredicates.find(
           filterPredicate => filterPredicate.filterName === f.name
@@ -570,10 +570,12 @@ const DashboardPage = () => {
           </div>
         </div>
       )}
-      {isFiltersOpen && (
-        <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
-      )}
-      <QuickFilters />
+      <Filters
+        filters={filterList}
+        quickFilters={quickFilterList}
+        onApplyFilters={handleFiltersSubmit}
+        open={isFiltersOpen}
+      />
       {isFetchingMore && <Loader />}
       {isLoadingBsds && !isFetchingMore ? (
         <Loader />
