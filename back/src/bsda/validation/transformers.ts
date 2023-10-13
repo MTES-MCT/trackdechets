@@ -1,5 +1,6 @@
 import { getTransporterCompanyOrgId } from "../../common/constants/companySearchHelpers";
 import prisma from "../../prisma";
+import { EditionRules } from "./rules";
 import { ZodBsda } from "./schema";
 import { sirenify } from "./sirenify";
 
@@ -10,7 +11,7 @@ import { sirenify } from "./sirenify";
  */
 export const runTransformers = async (
   val: ZodBsda,
-  sealedFields: string[] // Tranformations should not be run on sealed fields
+  sealedFields: Array<keyof EditionRules> // Tranformations should not be run on sealed fields
 ): Promise<ZodBsda> => {
   const transformers = [
     reshipmentBsdaTransformer,
@@ -24,10 +25,7 @@ export const runTransformers = async (
   return val;
 };
 
-async function reshipmentBsdaTransformer(
-  val: ZodBsda,
-  _: string[]
-): Promise<ZodBsda> {
+async function reshipmentBsdaTransformer(val: ZodBsda): Promise<ZodBsda> {
   if (
     val.type === "RESHIPMENT" &&
     !val?.wasteConsistence &&
@@ -45,7 +43,7 @@ async function reshipmentBsdaTransformer(
 
 async function recipisseTransporterTransformer(
   val: ZodBsda,
-  sealedFields: string[]
+  sealedFields: Array<keyof EditionRules>
 ): Promise<ZodBsda> {
   if (sealedFields.includes("transporterCompanySiret")) {
     return val;
@@ -74,7 +72,7 @@ async function recipisseTransporterTransformer(
   return val;
 }
 
-async function workerTransformer(val: ZodBsda, _: string[]): Promise<ZodBsda> {
+async function workerTransformer(val: ZodBsda): Promise<ZodBsda> {
   if (val.workerIsDisabled) {
     val.workerCertificationHasSubSectionFour = false;
     val.workerCertificationHasSubSectionThree = false;

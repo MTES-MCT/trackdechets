@@ -1,16 +1,11 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateBsdaArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-import {
-  companyToIntermediaryInput,
-  expandBsdaFromDb,
-  flattenBsdaInput
-} from "../../converter";
+import { companyToIntermediaryInput, expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
-import { checkEditionRules } from "../../validation/edition";
 import { checkCanUpdate } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
-import { parseBsda } from "../../validation/validate";
+import { parseBsdaInContext } from "../../validation";
 
 export default async function edit(
   _,
@@ -24,22 +19,14 @@ export default async function edit(
 
   await checkCanUpdate(user, existingBsda, input);
 
-  await checkEditionRules(existingBsda, input, user);
-
-  const flattenedInput = flattenBsdaInput(input);
-  const unparsedBsda = {
-    ...existingBsda,
-    ...flattenedInput,
-    intermediaries: input.intermediaries ?? existingBsda.intermediaries,
-    grouping: input.grouping || existingBsda.grouping.map(bsda => bsda.id),
-    forwarding: input.forwarding || existingBsda.forwarding?.id
-  };
-
-  const bsda = await parseBsda(unparsedBsda, {
-    enableCompletionTransformers: true,
-    enablePreviousBsdasChecks: true,
-    currentSignatureType: getCurrentSignatureType(unparsedBsda)
-  });
+  const bsda = await parseBsdaInContext(
+    { input, persisted: existingBsda },
+    {
+      enableCompletionTransformers: true,
+      enablePreviousBsdasChecks: true,
+      currentSignatureType: getCurrentSignatureType(existingBsda)
+    }
+  );
 
   const forwarding = !!bsda.forwarding
     ? { connect: { id: bsda.forwarding } }
@@ -74,13 +61,11 @@ export default async function edit(
   return expandBsdaFromDb(updatedBsda);
 }
 
-function getCurrentSignatureType(unparsedBsda) {
+function getCurrentSignatureType(bsda) {
   // TODO calculate from SIGNATURES_HIERARCHY
-  if (unparsedBsda.destinationOperationSignatureAuthor != null)
-    return "OPERATION";
-  if (unparsedBsda.transporterTransportSignatureAuthor != null)
-    return "TRANSPORT";
-  if (unparsedBsda.workerWorkSignatureAuthor != null) return "WORK";
-  if (unparsedBsda.emitterEmissionSignatureAuthor != null) return "EMISSION";
+  if (bsda.destinationOperationSignatureAuthor != null) return "OPERATION";
+  if (bsda.transporterTransportSignatureAuthor != null) return "TRANSPORT";
+  if (bsda.workerWorkSignatureAuthor != null) return "WORK";
+  if (bsda.emitterEmissionSignatureAuthor != null) return "EMISSION";
   return undefined;
 }
