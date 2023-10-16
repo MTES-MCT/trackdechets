@@ -1,6 +1,6 @@
 import { Prisma, User } from "@prisma/client";
 import { BsdaInput, BsdaSignatureType } from "../../generated/graphql/types";
-import { applyContextualAndAsyncRefinement } from "./dynamicRefinements";
+import { applyDynamicRefinement } from "./dynamicRefinements";
 import {
   getSignatureAncestors,
   getUnparsedBsda,
@@ -68,7 +68,7 @@ export async function parseBsdaInContext(
         ctx
       );
 
-      await applyContextualAndAsyncRefinement(val, validationContext, ctx);
+      await applyDynamicRefinement(val, validationContext, ctx);
     });
 
   return contextualSchema.parseAsync(unparsedBsda);

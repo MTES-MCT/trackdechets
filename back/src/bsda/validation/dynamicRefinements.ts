@@ -7,13 +7,11 @@ import { PARTIAL_OPERATIONS } from "./constants";
 import { BsdaValidationContext } from "./index";
 import { ZodBsda } from "./schema";
 
-export async function applyContextualAndAsyncRefinement(
+export async function applyDynamicRefinement(
   bsda: ZodBsda,
   validationContext: BsdaValidationContext,
   ctx: RefinementCtx
 ) {
-  validatePlates(bsda, validationContext.currentSignatureType, ctx);
-
   await isTransporterRefinement(
     {
       siret: bsda.transporterCompanySiret,
@@ -27,30 +25,6 @@ export async function applyContextualAndAsyncRefinement(
   }
 
   await validateDestination(bsda, validationContext.currentSignatureType, ctx);
-}
-
-function validatePlates(
-  bsda: ZodBsda,
-  currentSignatureType: BsdaSignatureType | undefined,
-  ctx: RefinementCtx
-) {
-  // Plates are mandatory at transporter signature's step
-  if (currentSignatureType !== "TRANSPORT") {
-    return;
-  }
-  const { transporterTransportMode, transporterTransportPlates } = bsda;
-
-  if (
-    transporterTransportMode === "ROAD" &&
-    (!transporterTransportPlates ||
-      !transporterTransportPlates?.filter(p => Boolean(p)).length)
-  ) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "La plaque d'immatriculation est requise",
-      path: ["transporterTransportPlates"]
-    });
-  }
 }
 
 async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
