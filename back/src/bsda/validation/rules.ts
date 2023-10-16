@@ -344,7 +344,16 @@ export const editionRules: EditionRules = {
     required: {
       from: "TRANSPORT",
       when: bsda =>
-        hasTransporter(bsda) && bsda.transporterTransportMode === "ROAD"
+        hasTransporter(bsda) && bsda.transporterTransportMode === "ROAD",
+      superRefine(val, ctx) {
+        if (val.filter(Boolean).length === 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "La plaque d'immatriculation est requise",
+            path: ["transporterTransportPlates"]
+          });
+        }
+      }
     }
   },
   transporterTransportTakenOverAt: {
