@@ -72,7 +72,13 @@ export const companyFactory = async (
       orgId: opts.vatNumber ?? siret,
       siret,
       companyTypes: {
-        set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR", "WORKER"]
+        set: [
+          "PRODUCER",
+          "TRANSPORTER",
+          "WASTEPROCESSOR",
+          "WORKER",
+          "WASTE_VEHICLES"
+        ]
       },
       name: `company_${companyIndex}`,
       contact: "Company Contact",

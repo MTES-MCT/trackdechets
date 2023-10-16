@@ -108,7 +108,7 @@ describe("Mutation.Vhu.create", () => {
   it("should allow creating a valid form for the producer signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTEPROCESSOR"]
+      companyTypes: ["WASTE_VEHICLES"]
     });
 
     const input = {
@@ -171,7 +171,7 @@ describe("Mutation.Vhu.create", () => {
   it("should create a bsvhu and autocomplete transporter recepisse", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTEPROCESSOR"]
+      companyTypes: ["WASTE_VEHICLES"]
     });
 
     const transporter = await companyFactory({
@@ -239,7 +239,7 @@ describe("Mutation.Vhu.create", () => {
   it("should create a bsvhu and ignore recepisse input", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTEPROCESSOR"]
+      companyTypes: ["WASTE_VEHICLES"]
     });
 
     const transporter = await companyFactory({
@@ -313,7 +313,7 @@ describe("Mutation.Vhu.create", () => {
   it("should fail if a required field like the emitter agrement is missing", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTEPROCESSOR"]
+      companyTypes: ["WASTE_VEHICLES"]
     });
 
     const input = {
@@ -369,7 +369,7 @@ describe("Mutation.Vhu.create", () => {
   it("should fail if a required field like the recipient agrement is missing", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTEPROCESSOR"]
+      companyTypes: ["WASTE_VEHICLES"]
     });
 
     const input = {

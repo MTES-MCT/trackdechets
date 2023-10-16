@@ -17,7 +17,7 @@ describe("BSVHU validation", () => {
       companyTypes: ["TRANSPORTER"]
     });
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTEPROCESSOR"]
+      companyTypes: ["WASTE_VEHICLES"]
     });
     foreignTransporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -269,8 +269,8 @@ describe("BSVHU validation", () => {
         });
       } catch (err) {
         expect(err.errors).toEqual([
-          `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est pas inscrite` +
-            " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc pas" +
+          `L'installation de destination avec le SIRET \"${company.siret}\" n'est pas inscrite` +
+            " sur Trackdéchets en tant qu'installation de traitement de VHU. Cette installation ne peut donc pas" +
             " être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
         ]);
       }
