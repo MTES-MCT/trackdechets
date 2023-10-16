@@ -34,6 +34,8 @@ import CompanySelector from "form/common/components/company/CompanySelector";
 import { companySchema } from "common/validation/schema";
 import { subMonths } from "date-fns";
 import OperationModeSelect from "common/components/OperationModeSelect";
+import { useRouteMatch } from "react-router-dom";
+import { ValidationBsdContext } from "Pages/Dashboard";
 
 const operationCode = yup
   .string()
@@ -271,7 +273,8 @@ export function SignBsffOperationOnePackagingModalContent({
 
   const loading = updateBsffPackagingResult.loading || signBsffResult.loading;
   const error = updateBsffPackagingResult.error ?? signBsffResult.error;
-
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const { setHasValidationApiError } = React.useContext(ValidationBsdContext);
   return (
     <>
       {bsff.packagings?.length > 1 && (
@@ -305,7 +308,7 @@ export function SignBsffOperationOnePackagingModalContent({
               },
             },
           });
-          await signBsff({
+          signBsff({
             variables: {
               id: bsff.id,
               input: {
@@ -315,6 +318,10 @@ export function SignBsffOperationOnePackagingModalContent({
                 packagingId: packaging.id,
               },
             },
+          }).then(() => {
+            if (isV2Routes) {
+              setHasValidationApiError(true);
+            }
           });
           onCancel();
         }}

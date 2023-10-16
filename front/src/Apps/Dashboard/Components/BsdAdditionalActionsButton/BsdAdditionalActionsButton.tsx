@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import classnames from "classnames";
 import FocusTrap from "focus-trap-react";
 import {
@@ -33,18 +33,33 @@ import { UserPermission } from "generated/graphql/types";
 
 import "./bsdAdditionalActionsButton.scss";
 import { BsdType } from "generated/graphql/types";
-
+import { generatePath, useHistory, useLocation } from "react-router-dom";
+import {
+  getOverviewPath,
+  getRevisionPath,
+  getUpdatePath,
+} from "Apps/Dashboard/dashboardUtils";
+import {
+  useBsdaDownloadPdf,
+  useBsdasriDownloadPdf,
+  useBsddDownloadPdf,
+  useBsffDownloadPdf,
+  useBsvhuDownloadPdf,
+} from "../Pdf/useDownloadPdf";
+import {
+  useBsdaDuplicate,
+  useBsdasriDuplicate,
+  useBsddDuplicate,
+  useBsffDuplicate,
+  useBsvhuDuplicate,
+} from "../Duplicate/useDuplicate";
+import Loader from "../../../common/Components/Loader/Loaders";
+import DeleteModal from "../DeleteModal/DeleteModal";
 function BsdAdditionalActionsButton({
   bsd,
   permissions,
   currentSiret,
   actionList: {
-    onOverview,
-    onDuplicate,
-    onPdf,
-    onDelete,
-    onUpdate,
-    onRevision,
     onAppendix1,
     onBsdSuite,
     onDeleteReview,
@@ -56,10 +71,13 @@ function BsdAdditionalActionsButton({
   hasAutomaticSignature = false,
 }: BsdAdditionalActionsButtonProps) {
   const [isOpen, setisOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLElement>(null);
   const { targetRef } = useOnClickOutsideRefTarget({
     onClickOutside: () => setisOpen(false),
   });
+  const history = useHistory();
+  const location = useLocation();
 
   useEffect(() => {
     const { current } = dropdownRef;
@@ -81,62 +99,168 @@ function BsdAdditionalActionsButton({
     }
   }, [isOpen]);
 
-  const toggleMenu = () => {
+  const toggleMenu = useCallback(() => {
     setisOpen(!isOpen);
-  };
+  }, [isOpen]);
 
   const closeMenu = () => {
     setisOpen(false);
   };
 
-  const handleOverview = () => {
-    closeMenu();
-    onOverview(bsd);
+  const redirectToPath = useCallback(
+    (path, id) => {
+      if (path) {
+        history.push({
+          pathname: generatePath(path, {
+            siret: currentSiret,
+            id,
+          }),
+          state: { background: location },
+        });
+      }
+    },
+    [history, location, currentSiret]
+  );
+  const options = {
+    variables: { id: bsd.id },
   };
-  const handlePdf = () => {
-    closeMenu();
-    onPdf!(bsd);
-  };
-  const handleUpdate = () => {
-    closeMenu();
-    onUpdate!(bsd);
-  };
-  const handleDuplicate = () => {
-    closeMenu();
-    onDuplicate(bsd);
-  };
-  const handleDelete = () => {
-    closeMenu();
-    onDelete!(bsd);
-  };
-  const handleRevision = () => {
-    closeMenu();
-    onRevision!(bsd);
-  };
+  const [downloadBsddPdf] = useBsddDownloadPdf({
+    ...options,
+  });
+  const [downloadBsdaPdf] = useBsdaDownloadPdf({
+    ...options,
+  });
+  const [downloadBsdasriPdf] = useBsdasriDownloadPdf({
+    ...options,
+  });
+  const [downloadBsffPdf] = useBsffDownloadPdf({
+    ...options,
+  });
+  const [downloadBsvhuPdf] = useBsvhuDownloadPdf({
+    ...options,
+  });
 
-  const handleBsdSuite = () => {
+  const [duplicateBsdd, { loading: isDuplicatingBsdd }] = useBsddDuplicate({
+    ...options,
+  });
+  const [duplicateBsda, { loading: isDuplicatingBsda }] = useBsdaDuplicate({
+    ...options,
+  });
+  const [duplicateBsdasri, { loading: isDuplicatingBsdasri }] =
+    useBsdasriDuplicate({
+      ...options,
+    });
+  const [duplicateBsff, { loading: isDuplicatingBsff }] = useBsffDuplicate({
+    ...options,
+  });
+  const [duplicateBsvhu, { loading: isDuplicatingBsvhu }] = useBsvhuDuplicate({
+    ...options,
+  });
+
+  const isDuplicating =
+    isDuplicatingBsdd ||
+    isDuplicatingBsda ||
+    isDuplicatingBsdasri ||
+    isDuplicatingBsff ||
+    isDuplicatingBsvhu;
+
+  const handleOverview = useCallback(() => {
+    closeMenu();
+    const path = getOverviewPath(bsd);
+    redirectToPath(path, bsd.id);
+  }, [redirectToPath, bsd]);
+  const handlePdf = useCallback(() => {
+    closeMenu();
+    if (bsd.type === BsdType.Bsdd) {
+      downloadBsddPdf();
+    }
+    if (bsd.type === BsdType.Bsda) {
+      downloadBsdaPdf();
+    }
+    if (bsd.type === BsdType.Bsdasri) {
+      downloadBsdasriPdf();
+    }
+    if (bsd.type === BsdType.Bsff) {
+      downloadBsffPdf();
+    }
+    if (bsd.type === BsdType.Bsvhu) {
+      downloadBsvhuPdf();
+    }
+  }, [
+    downloadBsdaPdf,
+    downloadBsdasriPdf,
+    downloadBsddPdf,
+    downloadBsffPdf,
+    downloadBsvhuPdf,
+    bsd,
+  ]);
+  const handleUpdate = useCallback(() => {
+    closeMenu();
+    const path = getUpdatePath(bsd);
+    redirectToPath(path, bsd.id);
+  }, [redirectToPath, bsd]);
+  const handleDuplicate = useCallback(() => {
+    closeMenu();
+    if (bsd.type === BsdType.Bsdd) {
+      duplicateBsdd();
+    }
+    if (bsd.type === BsdType.Bsda) {
+      duplicateBsda();
+    }
+    if (bsd.type === BsdType.Bsdasri) {
+      duplicateBsdasri();
+    }
+    if (bsd.type === BsdType.Bsff) {
+      duplicateBsff();
+    }
+    if (bsd.type === BsdType.Bsvhu) {
+      duplicateBsvhu();
+    }
+  }, [
+    duplicateBsda,
+    duplicateBsdasri,
+    duplicateBsdd,
+    duplicateBsff,
+    duplicateBsvhu,
+    bsd,
+  ]);
+  const handleDelete = useCallback(() => {
+    closeMenu();
+    setIsDeleteModalOpen(true);
+  }, []);
+  const handleRevision = useCallback(() => {
+    closeMenu();
+    const path = getRevisionPath(bsd);
+    redirectToPath(path, bsd.id);
+  }, [redirectToPath, bsd]);
+
+  const handleBsdSuite = useCallback(() => {
     closeMenu();
     onBsdSuite!(bsd);
-  };
-  const handleAppendix1 = () => {
+  }, [bsd, onBsdSuite]);
+  const handleAppendix1 = useCallback(() => {
     closeMenu();
     onAppendix1!(bsd);
-  };
+  }, [bsd, onAppendix1]);
 
-  const handleReviewDelete = () => {
+  const handleReviewDelete = useCallback(() => {
     closeMenu();
     onDeleteReview!(bsd);
-  };
+  }, [bsd, onDeleteReview]);
 
-  const handleDasriEmitterSign = () => {
+  const handleDasriEmitterSign = useCallback(() => {
     closeMenu();
     onEmitterDasriSign!(bsd);
-  };
+  }, [bsd, onEmitterDasriSign]);
 
-  const handleBsddEmitterSign = () => {
+  const handleBsddEmitterSign = useCallback(() => {
     closeMenu();
     onEmitterBsddSign!(bsd);
-  };
+  }, [bsd, onEmitterBsddSign]);
+
+  const onCloseDeleteModal = useCallback(() => {
+    setIsDeleteModalOpen(false);
+  }, []);
 
   const tabIndex = isOpen ? 0 : -1;
 
@@ -338,6 +462,13 @@ function BsdAdditionalActionsButton({
               </li>
             )}
         </ul>
+        {isDuplicating && <Loader />}
+        <DeleteModal
+          bsdId={bsd.id}
+          bsdType={bsd.type}
+          isOpen={isDeleteModalOpen}
+          onClose={onCloseDeleteModal}
+        />
       </div>
     </FocusTrap>
   );

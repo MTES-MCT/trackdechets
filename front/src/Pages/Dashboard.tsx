@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useState, useEffect } from "react";
+import React, {
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+  createContext,
+} from "react";
 import { useParams, useRouteMatch } from "react-router-dom";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import * as Sentry from "@sentry/browser";
@@ -21,8 +27,8 @@ import {
   Blankslate,
   BlankslateTitle,
   BlankslateDescription,
-  Loader,
 } from "Apps/common/Components";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import {
   blankstate_action_desc,
   blankstate_action_title,
@@ -58,7 +64,17 @@ import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/comp
 
 import "./dashboard.scss";
 
+export const ValidationBsdContext = createContext<{
+  hasValidationApiError: boolean;
+  setHasValidationApiError: React.Dispatch<React.SetStateAction<boolean>>;
+}>({ hasValidationApiError: false, setHasValidationApiError: () => {} });
+
 const DashboardPage = () => {
+  const [hasValidationApiError, setHasValidationApiError] = useState(false);
+  const contextValue = useMemo(
+    () => ({ hasValidationApiError, setHasValidationApiError }),
+    [hasValidationApiError]
+  );
   const { permissions } = usePermissions();
   const isActTab = !!useRouteMatch(routes.dashboardv2.bsds.act);
   const isDraftTab = !!useRouteMatch(routes.dashboardv2.bsds.drafts);
@@ -191,12 +207,12 @@ const DashboardPage = () => {
   );
 
   const fetchBsds = React.useCallback(() => {
-    if (!isReviewsTab) {
+    if (!isReviewsTab && !hasValidationApiError) {
       lazyFetchBsds({
         variables: bsdsVariables,
       });
     }
-  }, [lazyFetchBsds, bsdsVariables, isReviewsTab]);
+  }, [lazyFetchBsds, bsdsVariables, isReviewsTab, hasValidationApiError]);
 
   useNotifier(siret, fetchBsds);
 
@@ -395,7 +411,7 @@ const DashboardPage = () => {
     fetchMoreBsdaReviews,
   ]);
 
-  const loadMore = () => {
+  const loadMore = useCallback(() => {
     if (isReviewsTab) {
       // A supprimer quand on pourra afficher une révision avec la requete bsds
       loadMoreBsddReviews();
@@ -403,7 +419,7 @@ const DashboardPage = () => {
     } else {
       loadMoreBsds();
     }
-  };
+  }, [isReviewsTab, loadMoreBsdaReviews, loadMoreBsddReviews, loadMoreBsds]);
 
   useEffect(() => {
     setIsFiltersOpen(false);
@@ -481,7 +497,7 @@ const DashboardPage = () => {
     }
   }, [isFiltersOpen, defaultWhere, isReviewsTab, fetchWithDefaultWhere]);
 
-  const getBlankstateTitle = (): string | undefined => {
+  const getBlankstateTitle = useCallback((): string | undefined => {
     if (isActTab) {
       return blankstate_action_title;
     }
@@ -498,9 +514,9 @@ const DashboardPage = () => {
       return blankstate_reviews_title;
     }
     return blankstate_default_title;
-  };
+  }, [isActTab, isArchivesTab, isDraftTab, isFollowTab, isReviewsTab]);
 
-  const getBlankstateDescription = () => {
+  const getBlankstateDescription = useCallback(() => {
     if (isActTab) {
       return blankstate_action_desc;
     }
@@ -524,7 +540,7 @@ const DashboardPage = () => {
       return blankstate_reviews_desc;
     }
     return blankstate_default_desc;
-  };
+  }, [isActTab, isArchivesTab, isDraftTab, isFollowTab, isReviewsTab]);
 
   const toggleFiltersBlock = () => {
     setIsFiltersOpen(!isFiltersOpen);
@@ -543,80 +559,84 @@ const DashboardPage = () => {
     ? loadingBsdaReviews || loadingBsddReviews
     : loading;
 
+  const links = useMemo(() => dropdownCreateLinks(siret), [siret]);
+
   return (
-    <div className="dashboard-page">
-      {/* A supprimer la condition isReviewsTab 
+    <ValidationBsdContext.Provider value={contextValue}>
+      <div className="dashboard-page">
+        {/* A supprimer la condition isReviewsTab 
           quand on pourra afficher une révision avec la requete bsds
        */}
-      {!isReviewsTab && (
-        <div className="dashboard-page__actions">
-          {permissions.includes(UserPermission.BsdCanCreate) && (
-            <div className="create-btn">
-              <BsdCreateDropdown
-                links={dropdownCreateLinks(siret)}
-                isDisabled={loading}
-                menuTitle={dropdown_create_btn}
-                primary
-              />
-            </div>
-          )}
-          <div className="filter-btn">
-            <button
-              type="button"
-              className="fr-btn fr-btn--secondary"
-              aria-expanded={isFiltersOpen}
-              onClick={toggleFiltersBlock}
-              disabled={loading}
-            >
-              {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
-            </button>
-          </div>
-        </div>
-      )}
-      {isFiltersOpen && (
-        <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
-      )}
-      {isFetchingMore && <Loader />}
-      {isLoadingBsds && !isFetchingMore ? (
-        <Loader />
-      ) : (
-        <>
-          {!Boolean(bsdsTotalCount) && (
-            <div className="dashboard-page__blankstate">
-              <Blankslate>
-                {getBlankstateTitle() && (
-                  <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
-                )}
-                <BlankslateDescription>
-                  {getBlankstateDescription()}
-                </BlankslateDescription>
-              </Blankslate>
-            </div>
-          )}
-
-          {Boolean(bsdsTotalCount) && (
-            <BsdCardList
-              siret={siret}
-              bsds={bsds!}
-              bsdCurrentTab={bsdCurrentTab}
-              siretsWithAutomaticSignature={siretsWithAutomaticSignature}
-            />
-          )}
-
-          {hasNextPage && (
-            <div className="dashboard-page__loadmore">
+        {!isReviewsTab && (
+          <div className="dashboard-page__actions">
+            {permissions.includes(UserPermission.BsdCanCreate) && (
+              <div className="create-btn">
+                <BsdCreateDropdown
+                  links={links}
+                  isDisabled={loading}
+                  menuTitle={dropdown_create_btn}
+                  primary
+                />
+              </div>
+            )}
+            <div className="filter-btn">
               <button
-                className="fr-btn"
-                onClick={loadMore}
-                disabled={isFetchingMore}
+                type="button"
+                className="fr-btn fr-btn--secondary"
+                aria-expanded={isFiltersOpen}
+                onClick={toggleFiltersBlock}
+                disabled={loading}
               >
-                {load_more_bsds}
+                {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
               </button>
             </div>
-          )}
-        </>
-      )}
-    </div>
+          </div>
+        )}
+        {isFiltersOpen && (
+          <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
+        )}
+        {isFetchingMore && <Loader />}
+        {isLoadingBsds && !isFetchingMore ? (
+          <Loader />
+        ) : (
+          <>
+            {!Boolean(bsdsTotalCount) && (
+              <div className="dashboard-page__blankstate">
+                <Blankslate>
+                  {getBlankstateTitle() && (
+                    <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
+                  )}
+                  <BlankslateDescription>
+                    {getBlankstateDescription()}
+                  </BlankslateDescription>
+                </Blankslate>
+              </div>
+            )}
+
+            {Boolean(bsdsTotalCount) && (
+              <BsdCardList
+                siret={siret}
+                bsds={bsds!}
+                bsdCurrentTab={bsdCurrentTab}
+                siretsWithAutomaticSignature={siretsWithAutomaticSignature}
+              />
+            )}
+
+            {hasNextPage && (
+              <div className="dashboard-page__loadmore">
+                <button
+                  className="fr-btn"
+                  onClick={loadMore}
+                  disabled={isFetchingMore}
+                >
+                  {load_more_bsds}
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </ValidationBsdContext.Provider>
   );
 };
 

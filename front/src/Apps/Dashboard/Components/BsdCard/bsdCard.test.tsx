@@ -168,10 +168,7 @@ describe("Bsd card primary action label", () => {
                 currentSiret={siretEmmiter}
                 bsd={bsdd}
                 onValidate={onValidate}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
               />
             </MemoryRouter>
           </MockedProvider>
@@ -210,10 +207,7 @@ describe("Bsd card primary action label", () => {
                   { ...bsdd, emitter: { type: "APPENDIX1_PRODUCER" } } as Form
                 }
                 onValidate={onValidate}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
               />
             </MemoryRouter>
           </MockedProvider>
@@ -301,10 +295,7 @@ describe("Bsd card primary action label", () => {
                 currentSiret={siretEmmiter}
                 bsd={bsda}
                 onValidate={onValidate}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
               />
             </MemoryRouter>
           </MockedProvider>
@@ -455,10 +446,7 @@ describe("Bsd card primary action label", () => {
                 currentSiret={siretEmmiter}
                 bsd={bsvhu}
                 onValidate={onValidate}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
                 bsdCurrentTab="actTab"
               />
             </MemoryRouter>
@@ -494,10 +482,7 @@ describe("Bsd card primary action label", () => {
                 currentSiret={siretEmmiter}
                 bsd={bsvhuProcessed}
                 onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
               />
             </MemoryRouter>
           </MockedProvider>
@@ -518,10 +503,7 @@ describe("Bsd card primary action label", () => {
                 currentSiret={siretTransporter}
                 bsd={bsvhu}
                 onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
               />
             </MemoryRouter>
           </MockedProvider>
@@ -552,10 +534,7 @@ describe("Bsd card primary action label", () => {
                 bsd={bsff}
                 bsdCurrentTab="actTab"
                 onValidate={onValidate}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
               />
             </MemoryRouter>
           </MockedProvider>
@@ -597,10 +576,7 @@ describe("Bsd card primary action label", () => {
                 bsd={bsffDifferentSiret}
                 bsdCurrentTab={bsdCurrentTab}
                 onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
               />
             </MemoryRouter>
           </MockedProvider>
@@ -684,10 +660,7 @@ describe("Bsd card primary action label", () => {
                 currentSiret={siretEmmiter}
                 bsd={bsda}
                 onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
                 bsdCurrentTab="actTab"
               />
             </MemoryRouter>
@@ -796,10 +769,7 @@ describe("Bsd card primary action label", () => {
                 currentSiret={siretEmmiter}
                 bsd={bsdd}
                 onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
               />
             </MemoryRouter>
           </MockedProvider>
@@ -931,10 +901,7 @@ describe("Bsd card primary action label", () => {
                 bsd={bsdd}
                 bsdCurrentTab="actTab"
                 onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
               />
             </MemoryRouter>
           </MockedProvider>
@@ -1029,10 +996,7 @@ describe("Bsd card primary action label", () => {
                 bsd={bsdari}
                 bsdCurrentTab="actTab"
                 onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
               />
             </MemoryRouter>
           </MockedProvider>
@@ -1144,10 +1108,7 @@ describe("Bsd card primary action label", () => {
                 currentSiret={siretEmmiter}
                 bsd={bsdd}
                 onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
               />
             </MemoryRouter>
           </MockedProvider>
@@ -1185,10 +1146,7 @@ describe("Bsd card primary action label", () => {
                 currentSiret={siretEmmiter}
                 bsd={bsdd}
                 onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock,
-                }}
+                secondaryActions={{}}
               />
             </MemoryRouter>
           </MockedProvider>

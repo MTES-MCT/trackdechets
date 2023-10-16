@@ -2,9 +2,10 @@ import React from "react";
 import { NetworkStatus } from "@apollo/client";
 import styles from "./Loader.module.scss";
 
-export default function Loader() {
+function Loader() {
   return <div data-testid="loader" className={styles.loader}></div>;
 }
+export default React.memo(Loader);
 
 export const ModalLoader = () => (
   <div className={styles.loaderModal}>

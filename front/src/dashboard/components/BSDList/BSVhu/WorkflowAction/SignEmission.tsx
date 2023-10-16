@@ -9,7 +9,7 @@ import {
   SignatureTypeInput,
 } from "generated/graphql/types";
 import React from "react";
-import { generatePath, Link, useRouteMatch } from "react-router-dom";
+import { generatePath, Link } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 import DateInput from "form/common/components/custom-inputs/DateInput";
@@ -26,34 +26,17 @@ const validationSchema = yup.object({
 type Props = {
   siret: string;
   bsvhuId: string;
-  isModalOpenFromParent?: boolean;
-  onModalCloseFromParent?: () => void;
-  displayActionButton?: boolean;
 };
-export function SignEmission({
-  siret,
-  bsvhuId,
-  isModalOpenFromParent,
-  onModalCloseFromParent,
-  displayActionButton,
-}: Props) {
+export function SignEmission({ siret, bsvhuId }: Props) {
   const [signBsvhu, { loading }] = useMutation<
     Pick<Mutation, "signBsvhu">,
     MutationSignBsvhuArgs
   >(SIGN_BSVHU, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   const TODAY = new Date();
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
-  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
 
   return (
-    <SignBsvhu
-      title="Signer"
-      bsvhuId={bsvhuId}
-      isModalOpenFromParent={isModalOpenFromParent}
-      onModalCloseFromParent={onModalCloseFromParent}
-      displayActionButton={displayActionButton}
-    >
+    <SignBsvhu title="Signer" bsvhuId={bsvhuId}>
       {({ bsvhu, onClose }) =>
         bsvhu.metadata?.errors.some(
           error => error.requiredFor === SignatureTypeInput.Emission
@@ -69,7 +52,7 @@ export function SignEmission({
               ))}
             </ul>
             <Link
-              to={generatePath(routes[dashboardRoutePrefix].bsvhus.edit, {
+              to={generatePath(routes.dashboard.bsvhus.edit, {
                 siret,
                 id: bsvhu.id,
               })}

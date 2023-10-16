@@ -52,7 +52,7 @@ export function useBsddDownloadPdf(
     ...options,
     fetchPolicy: "network-only",
     onCompleted: ({ formPdf }) => {
-      if (formPdf.downloadLink == null) {
+      if (formPdf.downloadLink === null) {
         return;
       }
       window.open(formPdf.downloadLink, "_blank");
@@ -67,7 +67,7 @@ export function useBsdaDownloadPdf(
     ...options,
     fetchPolicy: "network-only",
     onCompleted: ({ bsdaPdf }) => {
-      if (bsdaPdf.downloadLink == null) {
+      if (bsdaPdf.downloadLink === null) {
         return;
       }
       window.open(bsdaPdf.downloadLink, "_blank");
@@ -84,7 +84,7 @@ export function useBsdasriDownloadPdf(
       ...options,
       fetchPolicy: "network-only",
       onCompleted: ({ bsdasriPdf }) => {
-        if (bsdasriPdf.downloadLink == null) {
+        if (bsdasriPdf.downloadLink === null) {
           return;
         }
         window.open(bsdasriPdf.downloadLink, "_blank");
@@ -100,7 +100,7 @@ export function useBsffDownloadPdf(
     ...options,
     fetchPolicy: "network-only",
     onCompleted: ({ bsffPdf }) => {
-      if (bsffPdf.downloadLink == null) {
+      if (bsffPdf.downloadLink === null) {
         return;
       }
       window.open(bsffPdf.downloadLink, "_blank");
@@ -115,7 +115,7 @@ export function useBsvhuDownloadPdf(
     ...options,
     fetchPolicy: "network-only",
     onCompleted: ({ bsvhuPdf }) => {
-      if (bsvhuPdf.downloadLink == null) {
+      if (bsvhuPdf.downloadLink === null) {
         return;
       }
       window.open(bsvhuPdf.downloadLink, "_blank");

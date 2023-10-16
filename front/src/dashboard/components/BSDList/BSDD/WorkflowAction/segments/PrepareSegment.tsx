@@ -1,7 +1,7 @@
 import { useMutation, gql } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import { Field, Form as FormikForm, Formik } from "formik";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Mutation,
   MutationPrepareSegmentArgs,
@@ -24,6 +24,8 @@ import {
   validationSchema,
 } from "dashboard/detail/bsdd/EditSegment";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
+import { useRouteMatch } from "react-router-dom";
+import { ValidationBsdContext } from "Pages/Dashboard";
 
 const PREPARE_SEGMENT = gql`
   mutation prepareSegment(
@@ -39,6 +41,8 @@ const PREPARE_SEGMENT = gql`
 `;
 
 export function PrepareSegment({ form, siret }: WorkflowActionProps) {
+  const { setHasValidationApiError } = useContext(ValidationBsdContext);
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   const [isOpen, setIsOpen] = useState(false);
   const [prepareSegment, { loading, error }] = useMutation<
     Pick<Mutation, "prepareSegment">,
@@ -53,7 +57,9 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
       });
     },
     onError: () => {
-      // The error is handled in the UI
+      if (isV2Routes) {
+        setHasValidationApiError(true);
+      }
     },
   });
 

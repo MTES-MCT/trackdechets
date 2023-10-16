@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { fullFormFragment } from "Apps/common/queries/fragments";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
@@ -25,6 +25,8 @@ import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCo
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
+import { useRouteMatch } from "react-router-dom";
+import { ValidationBsdContext } from "Pages/Dashboard";
 
 const validationSchema = yup.object({
   takenOverAt: yup.date().required("La date de prise en charge est requise"),
@@ -68,6 +70,9 @@ export default function SignTransportFormModalContent({
   formId,
   onClose,
 }: SignTransportFormModalProps) {
+  const { setHasValidationApiError } = useContext(ValidationBsdContext);
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+
   const {
     loading: formLoading,
     error: formError,
@@ -172,7 +177,11 @@ export default function SignTransportFormModalContent({
               },
             });
             onClose();
-          } catch (err) {}
+          } catch (err) {
+            if (isV2Routes) {
+              setHasValidationApiError(true);
+            }
+          }
         }}
       >
         {() => (

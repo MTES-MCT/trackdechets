@@ -7,6 +7,7 @@ import { GET_FORM } from "form/bsdd/utils/queries";
 import ActBsdSuiteValidation from "./ActBsdSuiteValidation";
 import { MemoryRouter } from "react-router-dom";
 import { Form } from "generated/graphql/types";
+const route = "/dashboard/12345678901235";
 
 describe("ActBsddValidation", () => {
   const onClose = jest.fn();
@@ -37,12 +38,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={resealedBsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={resealedBsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -118,12 +121,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={appendix1ProducerSealedBsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={appendix1ProducerSealedBsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -142,12 +147,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={appendix1ProducerSealedBsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={appendix1ProducerSealedBsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -170,12 +177,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={appendix1ProducerSealedBsdEcoOrg}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={appendix1ProducerSealedBsdEcoOrg}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -213,12 +222,14 @@ describe("ActBsddValidation", () => {
     ];
     render(
       <MockedProvider mocks={mocksResent} addTypename={false}>
-        <ActBsddValidation
-          bsd={resentBsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={resentBsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
@@ -238,12 +249,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={signedByProducerBsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={signedByProducerBsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
@@ -263,12 +276,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={tempStoredBsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={tempStoredBsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
@@ -291,12 +306,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={sentBsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={sentBsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
@@ -317,12 +334,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={sentBsdTempStorage}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={sentBsdTempStorage}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
@@ -352,12 +371,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={sentBsdSegmentDraft}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={sentBsdSegmentDraft}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -385,12 +406,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={sentBsdSegmetnTakenOverAt}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={sentBsdSegmetnTakenOverAt}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -422,12 +445,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={sentBsdSegmentReadyToTakenOver}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={sentBsdSegmentReadyToTakenOver}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -447,12 +472,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={tempStorerAcceptedBsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={tempStorerAcceptedBsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -468,12 +495,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={signedByTempStorerBsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={signedByTempStorerBsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -489,12 +518,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={receivedBsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={receivedBsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -513,12 +544,14 @@ describe("ActBsddValidation", () => {
     } as Form;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={acceptedBsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <ActBsddValidation
+            bsd={acceptedBsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 

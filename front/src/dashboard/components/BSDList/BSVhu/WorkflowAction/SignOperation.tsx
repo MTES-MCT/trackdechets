@@ -33,13 +33,7 @@ type Props = {
   onModalCloseFromParent?: () => void;
   displayActionButton?: boolean;
 };
-export function SignOperation({
-  siret,
-  bsvhuId,
-  isModalOpenFromParent,
-  onModalCloseFromParent,
-  displayActionButton,
-}: Props) {
+export function SignOperation({ siret, bsvhuId }: Props) {
   const [updateBsvhu, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsvhu">,
     MutationUpdateBsvhuArgs
@@ -52,13 +46,7 @@ export function SignOperation({
   const TODAY = new Date();
 
   return (
-    <SignBsvhu
-      title="Signer le traitement"
-      bsvhuId={bsvhuId}
-      isModalOpenFromParent={isModalOpenFromParent}
-      onModalCloseFromParent={onModalCloseFromParent}
-      displayActionButton={displayActionButton}
-    >
+    <SignBsvhu title="Signer le traitement" bsvhuId={bsvhuId}>
       {({ bsvhu, onClose }) => (
         <Formik
           initialValues={{

@@ -133,25 +133,11 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
 
 interface SignReceptionProps {
   bsffId: string;
-  isModalOpenFromParent?: boolean;
-  onModalCloseFromParent?: () => void;
-  displayActionButton?: boolean;
 }
 
-export function SignReception({
-  bsffId,
-  isModalOpenFromParent,
-  onModalCloseFromParent,
-  displayActionButton,
-}: SignReceptionProps) {
+export function SignReception({ bsffId }: SignReceptionProps) {
   return (
-    <SignBsff
-      title="Signer la réception"
-      bsffId={bsffId}
-      isModalOpenFromParent={isModalOpenFromParent}
-      onModalCloseFromParent={onModalCloseFromParent}
-      displayActionButton={displayActionButton}
-    >
+    <SignBsff title="Signer la réception" bsffId={bsffId}>
       {({ bsff, onClose }) => (
         <SignReceptionModal bsff={bsff} onCancel={onClose} />
       )}

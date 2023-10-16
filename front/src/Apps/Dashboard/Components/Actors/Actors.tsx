@@ -60,4 +60,4 @@ function Actors({
   );
 }
 
-export default Actors;
+export default React.memo(Actors);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Form as FormikForm, Formik } from "formik";
 import cogoToast from "cogo-toast";
@@ -14,6 +14,8 @@ import { NotificationError } from "Apps/common/Components/Error/Error";
 import { WorkflowActionProps } from "../WorkflowAction";
 import { GET_BSDS } from "Apps/common/queries";
 import { Loader } from "Apps/common/Components";
+import { useRouteMatch } from "react-router-dom";
+import { ValidationBsdContext } from "Pages/Dashboard";
 
 const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
   mutation markSegmentAsReadyToTakeOver($id: ID!) {
@@ -28,6 +30,8 @@ export function MarkSegmentAsReadyToTakeOver({
   form,
   siret,
 }: WorkflowActionProps) {
+  const { setHasValidationApiError } = useContext(ValidationBsdContext);
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   const [isOpen, setIsOpen] = useState(false);
   const [markSegmentAsReadyToTakeOver, { loading, error }] = useMutation<
     Pick<Mutation, "markSegmentAsReadyToTakeOver">,
@@ -43,7 +47,9 @@ export function MarkSegmentAsReadyToTakeOver({
       );
     },
     onError: () => {
-      // The error is handled in the UI
+      if (isV2Routes) {
+        setHasValidationApiError(true);
+      }
     },
   });
 

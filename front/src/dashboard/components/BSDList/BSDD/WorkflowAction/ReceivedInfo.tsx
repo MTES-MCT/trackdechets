@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Field, Form, Formik } from "formik";
 import { startOfDay } from "date-fns";
 import { parseDate } from "common/datetime";
@@ -25,6 +25,8 @@ import { statusChangeFragment } from "Apps/common/queries/fragments";
 import { GET_BSDS } from "Apps/common/queries";
 import { NotificationError } from "Apps/common/Components/Error/Error";
 import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
+import { useRouteMatch } from "react-router-dom";
+import { ValidationBsdContext } from "Pages/Dashboard";
 
 export const textConfig: {
   [id: string]: {
@@ -131,6 +133,8 @@ export default function ReceivedInfo({
   close: () => void;
   isTempStorage: boolean;
 }) {
+  const { setHasValidationApiError } = useContext(ValidationBsdContext);
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   const [
     markAsReceived,
     { loading: loadingMarkAsReceived, error: errorMarkAsReceived },
@@ -193,6 +197,10 @@ export default function ReceivedInfo({
                       WasteAcceptationStatus.Accepted,
                   },
                 },
+              }).catch(() => {
+                if (isV2Routes) {
+                  setHasValidationApiError(true);
+                }
               })
             : markAsReceived({
                 variables: {
@@ -203,6 +211,10 @@ export default function ReceivedInfo({
                     signedAt: parseDate(values.signedAt).toISOString(),
                   },
                 },
+              }).catch(() => {
+                if (isV2Routes) {
+                  setHasValidationApiError(true);
+                }
               })
         }
         validationSchema={() => validationSchema(form, TODAY)}

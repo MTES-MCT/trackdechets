@@ -16,7 +16,7 @@ import {
   TransportMode,
 } from "generated/graphql/types";
 import React from "react";
-import { generatePath, Link, useRouteMatch } from "react-router-dom";
+import { generatePath, Link } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsda, SIGN_BSDA } from "./SignBsda";
 import DateInput from "form/common/components/custom-inputs/DateInput";
@@ -33,17 +33,8 @@ const validationSchema = yup.object({
 type Props = {
   siret: string;
   bsdaId: string;
-  isModalOpenFromParent?: boolean;
-  onModalCloseFromParent?: () => void;
-  displayActionButton?: boolean;
 };
-export function SignTransport({
-  siret,
-  bsdaId,
-  isModalOpenFromParent,
-  onModalCloseFromParent,
-  displayActionButton,
-}: Props) {
+export function SignTransport({ siret, bsdaId }: Props) {
   const [updateBsda, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
@@ -54,17 +45,9 @@ export function SignTransport({
   >(SIGN_BSDA, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   const TODAY = new Date();
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
-  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
 
   return (
-    <SignBsda
-      title="Signer l'enlèvement"
-      bsdaId={bsdaId}
-      isModalOpenFromParent={isModalOpenFromParent}
-      onModalCloseFromParent={onModalCloseFromParent}
-      displayActionButton={displayActionButton}
-    >
+    <SignBsda title="Signer l'enlèvement" bsdaId={bsdaId}>
       {({ bsda, onClose }) =>
         bsda.metadata?.errors?.some(
           error =>
@@ -85,7 +68,7 @@ export function SignTransport({
               ))}
             </ul>
             <Link
-              to={generatePath(routes[dashboardRoutePrefix].bsdas.edit, {
+              to={generatePath(routes.dashboard.bsdas.edit, {
                 siret,
                 id: bsda.id,
               })}

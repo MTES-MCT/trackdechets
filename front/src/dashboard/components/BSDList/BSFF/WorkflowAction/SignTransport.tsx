@@ -167,20 +167,9 @@ interface SignTransportProps {
   displayActionButton?: boolean;
 }
 
-export function SignTransport({
-  bsffId,
-  isModalOpenFromParent,
-  onModalCloseFromParent,
-  displayActionButton,
-}: SignTransportProps) {
+export function SignTransport({ bsffId }: SignTransportProps) {
   return (
-    <SignBsff
-      title="Signer l'enlèvement"
-      bsffId={bsffId}
-      isModalOpenFromParent={isModalOpenFromParent}
-      onModalCloseFromParent={onModalCloseFromParent}
-      displayActionButton={displayActionButton}
-    >
+    <SignBsff title="Signer l'enlèvement" bsffId={bsffId}>
       {({ bsff, onClose }) => (
         <SignTransportForm bsff={bsff} onCancel={onClose} />
       )}

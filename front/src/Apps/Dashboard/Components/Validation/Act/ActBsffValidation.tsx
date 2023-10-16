@@ -1,8 +1,8 @@
 import React from "react";
 import { Bsff, BsffStatus } from "generated/graphql/types";
-import { SignEmission } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignEmission";
-import { SignTransport } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignTransport";
-import { SignReception } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignReception";
+import SignEmissionModal from "../Bsff/SignEmission/SignEmissionModal";
+import SignTransportModal from "../Bsff/SignTransport/SignTransportModal";
+import SignReceptionModal from "../Bsff/SignReception/SignReceptionModal";
 import { SignBsffAcceptationOnePackaging } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignAcceptation";
 import { SignPackagings } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignPackagings";
 import { SignBsffOperationOnePackaging } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignOperation";
@@ -24,15 +24,21 @@ const ActBsffValidation = ({
   };
 
   const renderInitialModal = () => {
-    return <SignEmission bsffId={bsd.id} {...actionButtonAdapterProps} />;
+    return (
+      <SignEmissionModal bsffId={bsd.id} isOpen={isOpen} onClose={onClose} />
+    );
   };
 
   const renderSignedByEmitterModal = () => {
-    return <SignTransport bsffId={bsd.id} {...actionButtonAdapterProps} />;
+    return (
+      <SignTransportModal bsffId={bsd.id} isOpen={isOpen} onClose={onClose} />
+    );
   };
 
   const renderSentModal = () => {
-    return <SignReception bsffId={bsd.id} {...actionButtonAdapterProps} />;
+    return (
+      <SignReceptionModal bsffId={bsd.id} isOpen={isOpen} onClose={onClose} />
+    );
   };
 
   const renderReceivedModal = () => {

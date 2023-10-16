@@ -9,13 +9,15 @@ import {
   MutationCreateFormArgs,
   MutationUpdateFormArgs,
 } from "generated/graphql/types";
-import React from "react";
+import React, { useContext } from "react";
 import {
   getInitialCompany,
   getInitialEmitterWorkSite,
 } from "../utils/initial-state";
 import { CREATE_FORM, UPDATE_FORM } from "../utils/queries";
 import WorkSite from "form/common/components/work-site/WorkSite";
+import { useRouteMatch } from "react-router-dom";
+import { ValidationBsdContext } from "Pages/Dashboard";
 
 export function Appendix1ProducerForm({
   container,
@@ -24,6 +26,8 @@ export function Appendix1ProducerForm({
   container: Bsdd;
   close: () => void;
 }) {
+  const { setHasValidationApiError } = useContext(ValidationBsdContext);
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   const [createForm] = useMutation<
     Pick<Mutation, "createForm">,
     MutationCreateFormArgs
@@ -73,10 +77,14 @@ export function Appendix1ProducerForm({
                 },
               },
             });
+
             close();
           } catch (err: any) {
             cogoToast.error(err.message, { hideAfter: 10 });
             setSubmitting(false);
+            if (isV2Routes) {
+              setHasValidationApiError(true);
+            }
           }
         }}
       >

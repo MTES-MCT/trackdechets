@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
-import { Loader } from "Apps/common/Components";
+import Loader from "Apps/common/Components/Loader/Loaders";
 import { NotificationError } from "Apps/common/Components/Error/Error";
 import TdModal from "Apps/common/Components/Modal/Modal";
 import { statusChangeFragment } from "Apps/common/queries/fragments";

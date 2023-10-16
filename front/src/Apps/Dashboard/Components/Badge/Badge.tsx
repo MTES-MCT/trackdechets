@@ -54,4 +54,4 @@ function Badge({
   );
 }
 
-export default Badge;
+export default React.memo(Badge);

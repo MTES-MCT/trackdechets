@@ -57,4 +57,4 @@ function WasteDetails({
   );
 }
 
-export default WasteDetails;
+export default React.memo(WasteDetails);

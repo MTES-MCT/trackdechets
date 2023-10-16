@@ -43,4 +43,4 @@ function InfoWithIcon({
   );
 }
 
-export default InfoWithIcon;
+export default React.memo(InfoWithIcon);

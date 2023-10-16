@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
 import { Loader } from "Apps/common/Components";
@@ -23,6 +23,8 @@ import { FormJourneySummary } from "dashboard/components/BSDList/BSDD/WorkflowAc
 import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
+import { useRouteMatch } from "react-router-dom";
+import { ValidationBsdContext } from "Pages/Dashboard";
 
 interface SignEmissionFormModalProps {
   title: string;
@@ -67,6 +69,8 @@ function SignEmissionFormModalContent({
   formId,
   onClose,
 }: SignEmissionFormModalProps) {
+  const { setHasValidationApiError } = useContext(ValidationBsdContext);
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   const {
     loading: formLoading,
     error: formError,
@@ -151,6 +155,9 @@ function SignEmissionFormModalContent({
             : undefined,
         },
       });
+      if (isV2Routes) {
+        setHasValidationApiError(true);
+      }
       onClose();
     } catch (err) {}
   };

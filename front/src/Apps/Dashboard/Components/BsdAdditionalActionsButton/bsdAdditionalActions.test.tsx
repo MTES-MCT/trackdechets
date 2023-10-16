@@ -3,6 +3,8 @@ import { render, fireEvent, waitFor } from "@testing-library/react";
 import BsdAdditionalActionsButton from "./BsdAdditionalActionsButton";
 import { BsdDisplay, BsdStatusCode } from "Apps/common/types/bsdTypes";
 import { BsdType, EmitterType, UserPermission } from "generated/graphql/types";
+import { MemoryRouter } from "react-router-dom";
+import { MockedProvider } from "@apollo/client/testing";
 
 const bsd = {
   id: "1",
@@ -11,14 +13,9 @@ const bsd = {
 } as BsdDisplay;
 const currentSiret = "12345678901234";
 
-const onOverview = jest.fn();
-const onDuplicate = jest.fn();
-const onPdf = jest.fn();
-const onDelete = jest.fn();
-const onUpdate = jest.fn();
-const onRevision = jest.fn();
 const onAppendix1 = jest.fn();
 const onBsdSuite = jest.fn();
+const route = "/dashboard/12345678901235";
 
 describe("BsdAdditionalActionsButton", () => {
   afterEach(() => {
@@ -29,21 +26,19 @@ describe("BsdAdditionalActionsButton", () => {
     const permissions = [];
 
     render(
-      <BsdAdditionalActionsButton
-        bsd={bsd}
-        permissions={permissions}
-        currentSiret={currentSiret}
-        actionList={{
-          onOverview,
-          onDelete,
-          onDuplicate,
-          onUpdate,
-          onRevision,
-          onPdf,
-          onAppendix1,
-          onBsdSuite,
-        }}
-      />
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={[route]}>
+          <BsdAdditionalActionsButton
+            bsd={bsd}
+            permissions={permissions}
+            currentSiret={currentSiret}
+            actionList={{
+              onAppendix1,
+              onBsdSuite,
+            }}
+          />
+        </MemoryRouter>
+      </MockedProvider>
     );
   });
 
@@ -51,21 +46,19 @@ describe("BsdAdditionalActionsButton", () => {
     const permissions = [];
 
     const { getByTestId, queryByTestId } = render(
-      <BsdAdditionalActionsButton
-        bsd={bsd}
-        permissions={permissions}
-        currentSiret={currentSiret}
-        actionList={{
-          onOverview,
-          onDelete,
-          onDuplicate,
-          onUpdate,
-          onRevision,
-          onPdf,
-          onAppendix1,
-          onBsdSuite,
-        }}
-      />
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={[route]}>
+          <BsdAdditionalActionsButton
+            bsd={bsd}
+            permissions={permissions}
+            currentSiret={currentSiret}
+            actionList={{
+              onAppendix1,
+              onBsdSuite,
+            }}
+          />{" "}
+        </MemoryRouter>
+      </MockedProvider>
     );
 
     expect(queryByTestId("bsd-actions-dropdown_1")).not.toHaveClass(
@@ -93,84 +86,66 @@ describe("BsdAdditionalActionsButton", () => {
     const permissions = [];
 
     const { getByTestId } = render(
-      <BsdAdditionalActionsButton
-        bsd={bsd}
-        permissions={permissions}
-        currentSiret={currentSiret}
-        actionList={{
-          onOverview,
-          onDelete,
-          onDuplicate,
-          onUpdate,
-          onRevision,
-          onPdf,
-          onAppendix1,
-          onBsdSuite,
-        }}
-      />
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={[route]}>
+          <BsdAdditionalActionsButton
+            bsd={bsd}
+            permissions={permissions}
+            currentSiret={currentSiret}
+            actionList={{
+              onAppendix1,
+              onBsdSuite,
+            }}
+          />
+        </MemoryRouter>
+      </MockedProvider>
     );
 
-    fireEvent.click(getByTestId("bsd-overview-btn"));
-
-    await waitFor(() => {
-      expect(onOverview).toHaveBeenCalledWith(bsd);
-    });
+    expect(getByTestId("bsd-overview-btn")).toBeInTheDocument();
   });
 
   it("calls the `onDuplicate` function when the 'Dupliquer' button is clicked", async () => {
     const permissions = [UserPermission.BsdCanCreate];
 
     const { getByTestId } = render(
-      <BsdAdditionalActionsButton
-        bsd={bsd}
-        permissions={permissions}
-        currentSiret={currentSiret}
-        actionList={{
-          onOverview,
-          onDelete,
-          onDuplicate,
-          onUpdate,
-          onRevision,
-          onPdf,
-          onAppendix1,
-          onBsdSuite,
-        }}
-      />
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={[route]}>
+          <BsdAdditionalActionsButton
+            bsd={bsd}
+            permissions={permissions}
+            currentSiret={currentSiret}
+            actionList={{
+              onAppendix1,
+              onBsdSuite,
+            }}
+          />
+        </MemoryRouter>
+      </MockedProvider>
     );
 
-    fireEvent.click(getByTestId("bsd-duplicate-btn"));
-
-    await waitFor(() => {
-      expect(onDuplicate).toHaveBeenCalledWith(bsd);
-    });
+    expect(getByTestId("bsd-duplicate-btn")).toBeInTheDocument();
   });
 
   it("calls the `onPdf` function when the 'PDF' button is clicked", async () => {
     const permissions = [UserPermission.BsdCanRead];
 
     const { getByTestId } = render(
-      <BsdAdditionalActionsButton
-        bsd={bsd}
-        permissions={permissions}
-        currentSiret={currentSiret}
-        actionList={{
-          onOverview,
-          onDelete,
-          onDuplicate,
-          onUpdate,
-          onRevision,
-          onPdf,
-          onAppendix1,
-          onBsdSuite,
-        }}
-      />
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={[route]}>
+          <BsdAdditionalActionsButton
+            bsd={bsd}
+            permissions={permissions}
+            currentSiret={currentSiret}
+            actionList={{
+              onAppendix1,
+              onBsdSuite,
+            }}
+          />
+        </MemoryRouter>
+      </MockedProvider>
     );
 
-    fireEvent.click(getByTestId("bsd-pdf-btn"));
-
-    await waitFor(() => {
-      expect(onPdf).toHaveBeenCalledWith(bsd);
-    });
+    expect(getByTestId("bsd-pdf-btn")).toBeInTheDocument();
   });
 
   it("calls the `onDelete` function when the 'Supprimer' button is clicked", async () => {
@@ -182,28 +157,22 @@ describe("BsdAdditionalActionsButton", () => {
     } as BsdDisplay;
 
     const { getByTestId } = render(
-      <BsdAdditionalActionsButton
-        bsd={bsdDelete}
-        permissions={permissions}
-        currentSiret={currentSiret}
-        actionList={{
-          onOverview,
-          onDelete,
-          onDuplicate,
-          onUpdate,
-          onRevision,
-          onPdf,
-          onAppendix1,
-          onBsdSuite,
-        }}
-      />
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={[route]}>
+          <BsdAdditionalActionsButton
+            bsd={bsdDelete}
+            permissions={permissions}
+            currentSiret={currentSiret}
+            actionList={{
+              onAppendix1,
+              onBsdSuite,
+            }}
+          />
+        </MemoryRouter>
+      </MockedProvider>
     );
 
-    fireEvent.click(getByTestId("bsd-delete-btn"));
-
-    await waitFor(() => {
-      expect(onDelete).toHaveBeenCalledWith(bsdDelete);
-    });
+    expect(getByTestId("bsd-delete-btn")).toBeInTheDocument();
   });
 
   it("calls the `onUpdate` function when the 'Modifier' button is clicked", async () => {
@@ -215,28 +184,22 @@ describe("BsdAdditionalActionsButton", () => {
     } as BsdDisplay;
 
     const { getByTestId } = render(
-      <BsdAdditionalActionsButton
-        bsd={bsdUpdate}
-        permissions={permissions}
-        currentSiret={currentSiret}
-        actionList={{
-          onOverview,
-          onDelete,
-          onDuplicate,
-          onUpdate,
-          onRevision,
-          onPdf,
-          onAppendix1,
-          onBsdSuite,
-        }}
-      />
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={[route]}>
+          <BsdAdditionalActionsButton
+            bsd={bsdUpdate}
+            permissions={permissions}
+            currentSiret={currentSiret}
+            actionList={{
+              onAppendix1,
+              onBsdSuite,
+            }}
+          />
+        </MemoryRouter>
+      </MockedProvider>
     );
 
-    fireEvent.click(getByTestId("bsd-update-btn"));
-
-    await waitFor(() => {
-      expect(onUpdate).toHaveBeenCalledWith(bsdUpdate);
-    });
+    expect(getByTestId("bsd-update-btn")).toBeInTheDocument();
   });
 
   it("calls the `onRevision` function when the 'Réviser' button is clicked", async () => {
@@ -248,28 +211,22 @@ describe("BsdAdditionalActionsButton", () => {
     } as BsdDisplay;
 
     const { getByTestId } = render(
-      <BsdAdditionalActionsButton
-        bsd={bsdReview}
-        permissions={permissions}
-        currentSiret={currentSiret}
-        actionList={{
-          onOverview,
-          onDelete,
-          onDuplicate,
-          onUpdate,
-          onRevision,
-          onPdf,
-          onAppendix1,
-          onBsdSuite,
-        }}
-      />
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={[route]}>
+          <BsdAdditionalActionsButton
+            bsd={bsdReview}
+            permissions={permissions}
+            currentSiret={currentSiret}
+            actionList={{
+              onAppendix1,
+              onBsdSuite,
+            }}
+          />
+        </MemoryRouter>
+      </MockedProvider>
     );
 
-    fireEvent.click(getByTestId("bsd-review-btn"));
-
-    await waitFor(() => {
-      expect(onRevision).toHaveBeenCalledWith(bsdReview);
-    });
+    expect(getByTestId("bsd-review-btn")).toBeInTheDocument();
   });
 
   it("calls the `onBsdSuite` function when the 'Compléter le bsd suite' button is clicked", async () => {
@@ -284,28 +241,22 @@ describe("BsdAdditionalActionsButton", () => {
     } as BsdDisplay;
 
     const { getByTestId } = render(
-      <BsdAdditionalActionsButton
-        bsd={bsdSuite}
-        permissions={permissions}
-        currentSiret={currentSiret}
-        actionList={{
-          onOverview,
-          onDelete,
-          onDuplicate,
-          onUpdate,
-          onRevision,
-          onPdf,
-          onAppendix1,
-          onBsdSuite,
-        }}
-      />
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={[route]}>
+          <BsdAdditionalActionsButton
+            bsd={bsdSuite}
+            permissions={permissions}
+            currentSiret={currentSiret}
+            actionList={{
+              onAppendix1,
+              onBsdSuite,
+            }}
+          />
+        </MemoryRouter>
+      </MockedProvider>
     );
 
-    fireEvent.click(getByTestId("bsd-suite-btn"));
-
-    await waitFor(() => {
-      expect(onBsdSuite).toHaveBeenCalledWith(bsdSuite);
-    });
+    expect(getByTestId("bsd-suite-btn")).toBeInTheDocument();
   });
   it("calls the `onBsdSuite` function when the 'Valider le traitement' button is clicked", async () => {
     const permissions = [UserPermission.BsdCanSignOperation];
@@ -321,28 +272,22 @@ describe("BsdAdditionalActionsButton", () => {
     } as BsdDisplay;
 
     const { getByTestId } = render(
-      <BsdAdditionalActionsButton
-        bsd={bsdSuite}
-        permissions={permissions}
-        currentSiret={currentSiret}
-        actionList={{
-          onOverview,
-          onDelete,
-          onDuplicate,
-          onUpdate,
-          onRevision,
-          onPdf,
-          onAppendix1,
-          onBsdSuite,
-        }}
-      />
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={[route]}>
+          <BsdAdditionalActionsButton
+            bsd={bsdSuite}
+            permissions={permissions}
+            currentSiret={currentSiret}
+            actionList={{
+              onAppendix1,
+              onBsdSuite,
+            }}
+          />
+        </MemoryRouter>
+      </MockedProvider>
     );
 
-    fireEvent.click(getByTestId("valider-traitement-btn"));
-
-    await waitFor(() => {
-      expect(onBsdSuite).toHaveBeenCalledWith(bsdSuite);
-    });
+    expect(getByTestId("valider-traitement-btn")).toBeInTheDocument();
   });
 
   it("calls the `onAppendix1` function when the 'Annexe 1' button is clicked", async () => {
@@ -354,21 +299,19 @@ describe("BsdAdditionalActionsButton", () => {
       type: BsdType.Bsdd,
     } as BsdDisplay;
     const { getByTestId } = render(
-      <BsdAdditionalActionsButton
-        bsd={bsdAppendix1}
-        permissions={permissions}
-        currentSiret={currentSiret}
-        actionList={{
-          onOverview,
-          onDelete,
-          onDuplicate,
-          onUpdate,
-          onRevision,
-          onPdf,
-          onAppendix1,
-          onBsdSuite,
-        }}
-      />
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={[route]}>
+          <BsdAdditionalActionsButton
+            bsd={bsdAppendix1}
+            permissions={permissions}
+            currentSiret={currentSiret}
+            actionList={{
+              onAppendix1,
+              onBsdSuite,
+            }}
+          />
+        </MemoryRouter>
+      </MockedProvider>
     );
 
     fireEvent.click(getByTestId("appendix1-btn"));

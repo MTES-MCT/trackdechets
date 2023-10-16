@@ -32,17 +32,8 @@ const validationSchema = yup.object({
 type Props = {
   siret: string;
   bsdaId: string;
-  isModalOpenFromParent?: boolean;
-  onModalCloseFromParent?: () => void;
-  displayActionButton?: boolean;
 };
-export function SignOperation({
-  siret,
-  bsdaId,
-  isModalOpenFromParent,
-  onModalCloseFromParent,
-  displayActionButton,
-}: Props) {
+export function SignOperation({ siret, bsdaId }: Props) {
   const [updateBsda, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
@@ -60,13 +51,7 @@ export function SignOperation({
   const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
 
   return (
-    <SignBsda
-      title="Signer le traitement"
-      bsdaId={bsdaId}
-      isModalOpenFromParent={isModalOpenFromParent}
-      onModalCloseFromParent={onModalCloseFromParent}
-      displayActionButton={displayActionButton}
-    >
+    <SignBsda title="Signer le traitement" bsdaId={bsdaId}>
       {({ bsda, onClose }) =>
         bsda.metadata?.errors?.some(
           error => error.requiredFor === SignatureTypeInput.Emission

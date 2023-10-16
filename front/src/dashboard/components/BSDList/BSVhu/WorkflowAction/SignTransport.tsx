@@ -13,7 +13,7 @@ import {
   SignatureTypeInput,
 } from "generated/graphql/types";
 import React from "react";
-import { generatePath, Link, useRouteMatch } from "react-router-dom";
+import { generatePath, Link } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 import { subMonths } from "date-fns";
@@ -29,17 +29,8 @@ const validationSchema = yup.object({
 type Props = {
   siret: string;
   bsvhuId: string;
-  isModalOpenFromParent?: boolean;
-  onModalCloseFromParent?: () => void;
-  displayActionButton?: boolean;
 };
-export function SignTransport({
-  siret,
-  bsvhuId,
-  isModalOpenFromParent,
-  onModalCloseFromParent,
-  displayActionButton,
-}: Props) {
+export function SignTransport({ siret, bsvhuId }: Props) {
   const [updateBsvhu, { loading: loadingUpdate, error: updateError }] =
     useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
       UPDATE_VHU_FORM
@@ -53,17 +44,8 @@ export function SignTransport({
 
   const loading = loadingUpdate || loadingSign;
 
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
-  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
-
   return (
-    <SignBsvhu
-      title="Signer l'enlèvement"
-      bsvhuId={bsvhuId}
-      isModalOpenFromParent={isModalOpenFromParent}
-      onModalCloseFromParent={onModalCloseFromParent}
-      displayActionButton={displayActionButton}
-    >
+    <SignBsvhu title="Signer l'enlèvement" bsvhuId={bsvhuId}>
       {({ bsvhu, onClose }) => {
         const TODAY = new Date();
 
@@ -84,7 +66,7 @@ export function SignTransport({
               ))}
             </ul>
             <Link
-              to={generatePath(routes[dashboardRoutePrefix].bsvhus.edit, {
+              to={generatePath(routes.dashboard.bsvhus.edit, {
                 siret,
                 id: bsvhu.id,
               })}

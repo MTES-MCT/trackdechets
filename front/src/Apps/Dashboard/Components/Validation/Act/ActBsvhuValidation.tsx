@@ -1,8 +1,8 @@
 import React from "react";
 import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
-import { SignEmission } from "dashboard/components/BSDList/BSVhu/WorkflowAction/SignEmission";
-import { SignTransport } from "dashboard/components/BSDList/BSVhu/WorkflowAction/SignTransport";
-import { SignOperation } from "dashboard/components/BSDList/BSVhu/WorkflowAction/SignOperation";
+import SignEmissionModal from "../Bsvhu/SignEmission/SignEmissionModal";
+import SignTransportModal from "../Bsvhu/SignTransport/SignTransportModal";
+import SignOperationModal from "../Bsvhu/SignOperation/SignOperationModal";
 
 interface ActBsvhuValidationProps {
   bsd: Bsvhu;
@@ -16,38 +16,35 @@ const ActBsvhuValidation = ({
   isOpen,
   onClose,
 }: ActBsvhuValidationProps) => {
-  const actionButtonAdapterProps = {
-    isModalOpenFromParent: isOpen,
-    onModalCloseFromParent: onClose,
-    displayActionButton: false,
-  };
-
   const renderInitialModal = () => {
     return (
-      <SignEmission
+      <SignEmissionModal
         bsvhuId={bsd.id}
         siret={currentSiret}
-        {...actionButtonAdapterProps}
+        onClose={onClose}
+        isOpen={isOpen}
       />
     );
   };
 
   const renderSignedByProducerModal = () => {
     return (
-      <SignTransport
+      <SignTransportModal
         bsvhuId={bsd.id}
         siret={currentSiret}
-        {...actionButtonAdapterProps}
+        onClose={onClose}
+        isOpen={isOpen}
       />
     );
   };
 
   const renderSentModal = () => {
     return (
-      <SignOperation
+      <SignOperationModal
         bsvhuId={bsd.id}
         siret={currentSiret}
-        {...actionButtonAdapterProps}
+        onClose={onClose}
+        isOpen={isOpen}
       />
     );
   };

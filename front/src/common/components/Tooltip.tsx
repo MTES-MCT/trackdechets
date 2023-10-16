@@ -42,4 +42,4 @@ const TdTooltip = ({ msg }: Props) => {
   ) : null;
 };
 
-export default TdTooltip;
+export default React.memo(TdTooltip);

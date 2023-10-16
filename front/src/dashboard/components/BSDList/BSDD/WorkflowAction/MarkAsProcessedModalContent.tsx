@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Formik } from "formik";
 import { Loader } from "Apps/common/Components";
 import {
@@ -14,6 +14,8 @@ import ProcessedInfo from "./ProcessedInfo";
 import { NotificationError } from "Apps/common/Components/Error/Error";
 import { GET_BSDS } from "Apps/common/queries";
 import cogoToast from "cogo-toast";
+import { useRouteMatch } from "react-router-dom";
+import { ValidationBsdContext } from "Pages/Dashboard";
 
 const MARK_AS_PROCESSED = gql`
   mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {
@@ -25,6 +27,8 @@ const MARK_AS_PROCESSED = gql`
 `;
 
 function MarkAsProcessedModalContent({ data, onClose }) {
+  const { setHasValidationApiError } = useContext(ValidationBsdContext);
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
   const [markAsProcessed, { loading, error }] = useMutation<
     Pick<Mutation, "markAsProcessed">,
     MutationMarkAsProcessedArgs
@@ -75,6 +79,10 @@ function MarkAsProcessedModalContent({ data, onClose }) {
                     nextDestination,
                   },
                 },
+              }).catch(() => {
+                if (isV2Routes) {
+                  setHasValidationApiError(true);
+                }
               });
             }}
           >

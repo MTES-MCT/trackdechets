@@ -13,7 +13,7 @@ import {
 import cogoToast from "cogo-toast";
 import TdModal from "Apps/common/Components/Modal/Modal";
 import { GET_BSDS } from "Apps/common/queries";
-import { Loader } from "Apps/common/Components";
+import Loader from "Apps/common/Components/Loader/Loaders";
 
 const DELETE_BSDA = gql`
   mutation DeleteBsda($id: ID!) {
@@ -193,4 +193,4 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
   );
 }
 
-export default DeleteModal;
+export default React.memo(DeleteModal);

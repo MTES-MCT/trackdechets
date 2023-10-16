@@ -35,6 +35,8 @@ import { BsffSummary } from "./BsffSummary";
 import TdTooltip from "common/components/Tooltip";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";
 import { subMonths } from "date-fns";
+import { useRouteMatch } from "react-router-dom";
+import { ValidationBsdContext } from "Pages/Dashboard";
 
 const validationSchema = yup.object({
   numero: yup.string(),
@@ -183,6 +185,9 @@ export function SignBsffAcceptationOnePackagingModalContent({
   const loading = updateBsffPackagingResult.loading || signBsffResult.loading;
   const error = updateBsffPackagingResult.error ?? signBsffResult.error;
 
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const { setHasValidationApiError } = React.useContext(ValidationBsdContext);
+
   return (
     <>
       {bsff.packagings?.length > 1 && (
@@ -222,7 +227,7 @@ export function SignBsffAcceptationOnePackagingModalContent({
               },
             },
           });
-          await signBsff({
+          signBsff({
             variables: {
               id: bsff.id,
               input: {
@@ -232,8 +237,15 @@ export function SignBsffAcceptationOnePackagingModalContent({
                 packagingId: packaging.id,
               },
             },
-          });
-          onCancel();
+          })
+            .then(() => {
+              onCancel();
+            })
+            .catch(() => {
+              if (isV2Routes) {
+                setHasValidationApiError(true);
+              }
+            });
         }}
       >
         {({ values, setValues }) => (

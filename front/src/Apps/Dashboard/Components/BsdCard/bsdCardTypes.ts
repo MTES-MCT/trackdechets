@@ -24,9 +24,6 @@ export interface BsdCardProps {
   onValidate: (bsd: Bsd) => void;
   onEditTransportInfo?: (bsd: Bsd, infoName: string) => void;
   secondaryActions: {
-    onUpdate?: Function;
-    onOverview: Function;
-    onRevision?: Function;
     onBsdSuite?: Function;
     onAppendix1?: Function;
     onDeleteReview?: Function;
