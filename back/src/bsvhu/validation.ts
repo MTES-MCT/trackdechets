@@ -227,7 +227,7 @@ const destinationSchema: FactorySchemaOf<
       ),
     destinationCompanySiret: siret
       .label("Destination")
-      .test(siretTests.isRegistered("DESTINATION"))
+      .test(siretTests.isRegistered("WASTE_VEHICLES"))
       .requiredIf(
         context.emissionSignature,
         `Destinataire: ${MISSING_COMPANY_SIRET}`
