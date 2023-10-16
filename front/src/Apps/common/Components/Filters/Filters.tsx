@@ -4,6 +4,10 @@ import QuickFilters from "./QuickFilters";
 import AdvancedFilters from "./AdvancedFilters";
 
 import "./filters.scss";
+import {
+  advancedFilterList,
+  quickFilterList,
+} from "Apps/Dashboard/dashboardUtils";
 
 const purgeEmptyValues = (obj: { [key: string]: string | string[] }) => {
   return Object.fromEntries(
@@ -37,10 +41,14 @@ const Filters = ({
     <div className="filters">
       <AdvancedFilters
         open={areAdvancedFiltersOpen}
+        filters={advancedFilterList}
         onApplyFilters={onApplyAdvancedFilters}
       />
 
-      <QuickFilters onApplyFilters={onApplyQuickFilters} />
+      <QuickFilters
+        filters={quickFilterList}
+        onApplyFilters={onApplyQuickFilters}
+      />
     </div>
   );
 };

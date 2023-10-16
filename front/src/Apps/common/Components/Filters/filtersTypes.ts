@@ -24,10 +24,12 @@ export interface FiltersProps {
 
 export interface AdvancedFiltersProps {
   open?: boolean;
+  filters: Filter[][];
   onApplyFilters: OnApplyFiltersFn;
 }
 
 export interface QuickFiltersProp {
+  filters: Filter[];
   onApplyFilters: OnApplyFiltersFn;
 }
 

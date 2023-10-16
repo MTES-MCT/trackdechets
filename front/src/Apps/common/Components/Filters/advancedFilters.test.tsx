@@ -1,10 +1,10 @@
 import React from "react";
 import { render, fireEvent, cleanup } from "@testing-library/react";
-import Filters from "./Filters";
+import AdvancedFilters from "./AdvancedFilters";
 import { filter_type_select_placeholder } from "Apps/common/wordings/dashboard/wordingsDashboard";
 import { FilterType } from "./filtersTypes";
 
-describe("Filters component", () => {
+describe("AdvancedFilters component", () => {
   const filters = [
     [
       {
@@ -28,7 +28,7 @@ describe("Filters component", () => {
   it("renders the component", () => {
     const onApplyFilters = jest.fn();
     const { container } = render(
-      <Filters filters={filters} onApplyFilters={onApplyFilters} />
+      <AdvancedFilters open filters={filters} onApplyFilters={onApplyFilters} />
     );
     expect(container).toBeTruthy();
   });
@@ -36,7 +36,7 @@ describe("Filters component", () => {
   it("displays the filter selector", () => {
     const onApplyFilters = jest.fn();
     const { getByText } = render(
-      <Filters filters={filters} onApplyFilters={onApplyFilters} />
+      <AdvancedFilters open filters={filters} onApplyFilters={onApplyFilters} />
     );
     expect(getByText(filter_type_select_placeholder)).toBeTruthy();
   });
@@ -44,7 +44,7 @@ describe("Filters component", () => {
   it("can select a filter", () => {
     const onApplyFilters = jest.fn();
     const { getByText } = render(
-      <Filters filters={filters} onApplyFilters={onApplyFilters} />
+      <AdvancedFilters open filters={filters} onApplyFilters={onApplyFilters} />
     );
     const addFilterButton = getByText("+");
     fireEvent.click(addFilterButton);

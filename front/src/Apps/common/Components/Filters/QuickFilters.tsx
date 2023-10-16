@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import QuickFilter from "./QuickFilter";
-import { quickFilterList } from "Apps/Dashboard/dashboardUtils";
 import { QuickFiltersProp } from "./filtersTypes";
 
-const QuickFilters = ({ onApplyFilters }: QuickFiltersProp) => {
+const QuickFilters = ({ onApplyFilters, filters }: QuickFiltersProp) => {
   const [filterValues, setFilterValues] = useState({});
 
   const onFilterValueChange = (e, filterName) => {
@@ -20,7 +19,7 @@ const QuickFilters = ({ onApplyFilters }: QuickFiltersProp) => {
   return (
     <div className={"fr-container-fluid fr-mb-2w"}>
       <div className={"fr-grid-row fr-grid-row--gutters"}>
-        {quickFilterList
+        {filters
           .filter(filter => filter.isActive)
           .map(filter => (
             <div

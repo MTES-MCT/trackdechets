@@ -1,24 +1,27 @@
 import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-import Filters from "./Filters";
+import AdvancedFilters from "./AdvancedFilters";
 import { FilterType } from "./filtersTypes";
 
 export default {
-  title: "COMPONENTS/COMMON/Filters",
-  component: Filters,
+  title: "COMPONENTS/COMMON/AdvancedFilters",
+  component: AdvancedFilters,
   design: {
     type: "figma",
     url: "https://www.figma.com/file/TZbRaWgchdAv8o7IxJWrKE/Trackd%C3%A9chets?node-id=2864%3A543748&t=AnkIpzoWgu1o8Cbc-4",
   },
-} as ComponentMeta<typeof Filters>;
+} as ComponentMeta<typeof AdvancedFilters>;
 
-const Template: ComponentStory<typeof Filters> = args => <Filters {...args} />;
+const Template: ComponentStory<typeof AdvancedFilters> = args => (
+  <AdvancedFilters {...args} />
+);
 
 export const Primary = Template.bind({});
 const values = {};
 const onApplyFilters = values => {};
 
 Primary.args = {
+  open: true,
   filters: [
     [
       {

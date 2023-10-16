@@ -5,11 +5,15 @@ import Input from "../Input/Input";
 import { inputType } from "../../types/commonTypes";
 import Select from "../Select/Select";
 import DatePickerWrapper from "../DatePicker/DatePickerWrapper";
-import { MAX_FILTER, advancedFilterList } from "Apps/Dashboard/dashboardUtils";
+import { MAX_FILTER } from "Apps/Dashboard/dashboardUtils";
 
 import "./filters.scss";
 
-const Filters = ({ open = false, onApplyFilters }: AdvancedFiltersProps) => {
+const Filters = ({
+  open = false,
+  filters,
+  onApplyFilters,
+}: AdvancedFiltersProps) => {
   const placeholderFilterRef = useRef<HTMLDivElement>(null);
   const [filterSelectedList, setFilterSelectedList] = useState<Filter[]>([]);
   const [isApplyDisabled, setIsApplyDisabled] = useState<boolean>(true);
@@ -31,7 +35,7 @@ const Filters = ({ open = false, onApplyFilters }: AdvancedFiltersProps) => {
   });
   const derivedFilters =
     filterSelectedIds.length > 0
-      ? advancedFilterList.map(filtersGroup =>
+      ? filters.map(filtersGroup =>
           filtersGroup.map(filter => {
             if (filterSelectedIds.includes(filter.name)) {
               return { ...filter, isActive: false };
@@ -39,7 +43,7 @@ const Filters = ({ open = false, onApplyFilters }: AdvancedFiltersProps) => {
             return filter;
           })
         )
-      : advancedFilterList;
+      : filters;
 
   const onSelectFilterType = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
