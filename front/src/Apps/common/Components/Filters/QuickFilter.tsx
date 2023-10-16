@@ -1,13 +1,9 @@
 import Input from "@codegouvfr/react-dsfr/Input";
 import { debounce } from "common/helper";
-import React, { ChangeEvent, useMemo } from "react";
+import React, { useMemo } from "react";
+import { QuickFilterProps } from "./filtersTypes";
 
 const DEBOUNCE_DELAY = 500;
-
-interface QuickFilterProps {
-  label: string;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-}
 
 const QuickFilter = ({ label, onChange }: QuickFilterProps) => {
   const debouncedOnChange = useMemo(

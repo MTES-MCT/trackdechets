@@ -115,21 +115,21 @@ export const quickFilterList: Filter[] = [
     isActive: true,
   },
   {
-    name: FilterName.pickupSiteName,
-    label: filter_chantier_name,
-    type: FilterType.input,
-    isActive: true,
-  },
-  {
     name: FilterName.givenName,
     label: filter_emitter_name,
     type: FilterType.input,
     isActive: true,
   },
   // TODO: CAP
+  {
+    name: FilterName.pickupSiteName,
+    label: filter_chantier_name,
+    type: FilterType.input,
+    isActive: true,
+  },
 ];
 
-export const filterList: Filter[][] = [
+export const advancedFilterList: Filter[][] = [
   [
     {
       name: FilterName.types,
@@ -257,6 +257,8 @@ export const filterList: Filter[][] = [
     },
   ],
 ];
+
+export const filterList = [...advancedFilterList.flat(), ...quickFilterList];
 
 export const filterPredicates: {
   filterName: string;

@@ -1,26 +1,38 @@
-import React, { ChangeEvent } from "react";
+import React, { useState } from "react";
 import QuickFilter from "./QuickFilter";
-import { Filter } from "./filtersTypes";
+import { quickFilterList } from "Apps/Dashboard/dashboardUtils";
+import { QuickFiltersProp } from "./filtersTypes";
 
-import "./quickFilters.scss";
+const QuickFilters = ({ onApplyFilters }: QuickFiltersProp) => {
+  const [filterValues, setFilterValues] = useState({});
 
-interface QuickFiltersProp {
-  filters: Filter[];
-  onChange: (e: ChangeEvent<HTMLInputElement>, filterName: string) => void;
-}
+  const onFilterValueChange = (e, filterName) => {
+    const { value } = e.target;
+    const newFilterValues = { ...filterValues };
+    if (!newFilterValues[filterName] || newFilterValues[filterName] !== value) {
+      newFilterValues[filterName] = value;
+      setFilterValues(newFilterValues);
 
-const QuickFilters = ({ filters, onChange }: QuickFiltersProp) => {
+      onApplyFilters(newFilterValues);
+    }
+  };
+
   return (
-    <div className={"fr-container-fluid fr-mb-2w quickFilters"}>
-      <div className={"fr-grid-row  fr-grid-row--gutters"}>
-        {filters.map(filter => (
-          <div className={"fr-col-12 fr-col-sm-6 fr-col-md"}>
-            <QuickFilter
-              label={filter.label}
-              onChange={e => onChange(e, filter.name)}
-            />
-          </div>
-        ))}
+    <div className={"fr-container-fluid fr-mb-2w"}>
+      <div className={"fr-grid-row fr-grid-row--gutters"}>
+        {quickFilterList
+          .filter(filter => filter.isActive)
+          .map(filter => (
+            <div
+              className={"fr-col-12 fr-col-sm-6 fr-col-md"}
+              key={`quickFilter-${filter.name}`}
+            >
+              <QuickFilter
+                label={filter.label}
+                onChange={e => onFilterValueChange(e, filter.name)}
+              />
+            </div>
+          ))}
       </div>
     </div>
   );

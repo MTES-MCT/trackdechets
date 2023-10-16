@@ -1,3 +1,5 @@
+import { ChangeEvent } from "react";
+
 export enum FilterType {
   input = "input",
   select = "select",
@@ -13,9 +15,23 @@ export type Filter = {
   isMultiple?: boolean;
 };
 
+type OnApplyFiltersFn = (values: { [key: string]: string | string[] }) => void;
+
 export interface FiltersProps {
+  areAdvancedFiltersOpen?: boolean;
+  onApplyFilters: OnApplyFiltersFn;
+}
+
+export interface AdvancedFiltersProps {
   open?: boolean;
-  filters: Filter[][];
-  quickFilters: Filter[];
-  onApplyFilters: (values: { [key: string]: string }) => void;
+  onApplyFilters: OnApplyFiltersFn;
+}
+
+export interface QuickFiltersProp {
+  onApplyFilters: OnApplyFiltersFn;
+}
+
+export interface QuickFilterProps {
+  label: string;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }

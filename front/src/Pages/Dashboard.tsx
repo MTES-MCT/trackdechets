@@ -42,11 +42,10 @@ import {
 import { IconDuplicateFile } from "Apps/common/Components/Icons/Icons";
 import Filters from "Apps/common/Components/Filters/Filters";
 import {
-  filterList,
   dropdownCreateLinks,
+  filterList,
   filterPredicates,
   getBsdCurrentTab,
-  quickFilterList,
 } from "../Apps/Dashboard/dashboardUtils";
 import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
 import { usePermissions } from "common/contexts/PermissionsContext";
@@ -87,7 +86,7 @@ const DashboardPage = () => {
     // isToReviewedTab,
   });
   const { siret } = useParams<{ siret: string }>();
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [areAdvancedFiltersOpen, setAreAdvancedFiltersOpen] = useState(false);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const withRoutePredicate = useCallback(() => {
@@ -273,8 +272,8 @@ const DashboardPage = () => {
         variables.where = routePredicate;
       }
       const filterKeys = Object.keys(filterValues);
-      const filters = [...filterList.flat(), ...quickFilterList].filter(
-        filter => filterKeys.includes(filter.name)
+      const filters = filterList.filter(filter =>
+        filterKeys.includes(filter.name)
       );
       filters.forEach(f => {
         const predicate = filterPredicates.find(
@@ -405,7 +404,7 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
-    setIsFiltersOpen(false);
+    setAreAdvancedFiltersOpen(false);
     // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
     if (!isReviewsTab) {
       fetchWithDefaultWhere({ where: defaultWhere });
@@ -475,10 +474,15 @@ const DashboardPage = () => {
 
   useEffect(() => {
     // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
-    if (!isReviewsTab && !isFiltersOpen) {
+    if (!isReviewsTab && !areAdvancedFiltersOpen) {
       fetchWithDefaultWhere({ where: defaultWhere });
     }
-  }, [isFiltersOpen, defaultWhere, isReviewsTab, fetchWithDefaultWhere]);
+  }, [
+    areAdvancedFiltersOpen,
+    defaultWhere,
+    isReviewsTab,
+    fetchWithDefaultWhere,
+  ]);
 
   const getBlankstateTitle = (): string | undefined => {
     if (isActTab) {
@@ -524,7 +528,7 @@ const DashboardPage = () => {
   };
 
   const toggleFiltersBlock = () => {
-    setIsFiltersOpen(!isFiltersOpen);
+    setAreAdvancedFiltersOpen(!areAdvancedFiltersOpen);
   };
 
   // A supprimer la condition isReviewsTab quand on pourra afficher une révision avec la requete bsds
@@ -561,20 +565,18 @@ const DashboardPage = () => {
             <button
               type="button"
               className="fr-btn fr-btn--secondary"
-              aria-expanded={isFiltersOpen}
+              aria-expanded={areAdvancedFiltersOpen}
               onClick={toggleFiltersBlock}
               disabled={loading}
             >
-              {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
+              {!areAdvancedFiltersOpen ? filter_show_btn : filter_reset_btn}
             </button>
           </div>
         </div>
       )}
       <Filters
-        filters={filterList}
-        quickFilters={quickFilterList}
         onApplyFilters={handleFiltersSubmit}
-        open={isFiltersOpen}
+        areAdvancedFiltersOpen={areAdvancedFiltersOpen}
       />
       {isFetchingMore && <Loader />}
       {isLoadingBsds && !isFetchingMore ? (
