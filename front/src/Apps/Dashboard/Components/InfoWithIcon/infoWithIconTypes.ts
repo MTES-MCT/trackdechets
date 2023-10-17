@@ -6,6 +6,7 @@ export enum InfoIconCode {
   LastModificationDate = "LastModificationDate",
   CustomInfo = "CustomInfo",
   TransporterNumberPlate = "TransporterNumberPlate",
+  PickupSite = "PickupSite",
   default = "",
 }
 export enum InfoIconValue {
@@ -14,12 +15,13 @@ export enum InfoIconValue {
   LastModificationDate = "Modifié le",
   CustomInfo = "Champ libre",
   TransporterNumberPlate = "Plaque d'immatriculation",
+  PickupSite = "",
   default = "",
 }
 
 export interface InfoWithIconProps {
   labelCode: InfoIconCode;
-  date?: string;
+  info?: string;
   hasEditableInfos?: boolean;
   isDisabled?: boolean;
   onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;

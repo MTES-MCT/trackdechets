@@ -27,7 +27,7 @@ EntreposageProvisoire.args = {
 };
 DateDeDerniereModification.args = {
   labelCode: InfoIconCode.LastModificationDate,
-  date: "21/12/2022",
+  info: "21/12/2022",
 };
 EcoOrganisme.args = {
   labelCode: InfoIconCode.EcoOrganism,

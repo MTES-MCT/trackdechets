@@ -244,7 +244,9 @@ function BsdCard({
     isBsdasri(bsdDisplay?.type!) || isBsff(bsdDisplay?.type!) ? "kg" : "t";
 
   const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
-
+  const pickupSiteName =
+    bsdDisplay?.emitter?.pickupSite?.name ||
+    bsdDisplay?.emitter?.workSite?.name;
   return (
     <>
       <div className="bsd-card" tabIndex={0}>
@@ -267,11 +269,17 @@ function BsdCard({
                   {updatedAt && (
                     <InfoWithIcon
                       labelCode={InfoIconCode.LastModificationDate}
-                      date={updatedAt}
+                      info={updatedAt}
                     />
                   )}
                   {bsdDisplay?.emittedByEcoOrganisme && (
                     <InfoWithIcon labelCode={InfoIconCode.EcoOrganism} />
+                  )}
+                  {pickupSiteName && (
+                    <InfoWithIcon
+                      labelCode={InfoIconCode.PickupSite}
+                      info={pickupSiteName}
+                    />
                   )}
                   {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
                     (isCollectedTab &&
