@@ -1,30 +1,31 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { InfoIconCode, InfoWithIconProps } from "./infoWithIconTypes";
 import { getLabelValue } from "./infoWithIconUtils";
 import "./infoWithIcon.scss";
 
-const formatTranporterPlates = (plates?: string | string[] | null): string => {
-  if (Array.isArray(plates)) {
-    return plates.join(", ");
-  }
-
-  return !!plates ? plates : "";
-};
-
 function InfoWithIcon({
   labelCode,
-  date,
+  info,
   editableInfos,
   hasEditableInfos,
   onClick,
   isDisabled,
 }: InfoWithIconProps) {
   const labelValue = getLabelValue(labelCode);
+
+  const formatTranporterPlates = useCallback(
+    (plates?: string | string[] | null): string => {
+      if (Array.isArray(plates)) {
+        return plates.join(", ");
+      }
+
+      return !!plates ? plates : "";
+    },
+    []
+  );
   return !hasEditableInfos ? (
     <p className={`label-icon label-icon__${labelCode}`}>
-      {labelCode !== InfoIconCode.LastModificationDate
-        ? labelValue
-        : `${labelValue} ${date}`}
+      {!info ? labelValue : `${labelValue} ${info}`}
     </p>
   ) : (
     <button
