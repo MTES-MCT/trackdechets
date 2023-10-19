@@ -162,7 +162,7 @@ export const getRevisionStatusLabel = (status: string) => {
   }
 };
 
-const hasSameEmitterTransporterAndEcoOrgSiret = (
+const hasEmitterTransporterAndEcoOrgSiret = (
   bsd: BsdDisplay,
   siret: string
 ): boolean => {
@@ -395,7 +395,7 @@ export const isSignEmission = (
   return (
     isAppendix1Producer(bsd) &&
     (hasAutomaticSignature ||
-      (hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret) &&
+      (hasEmitterTransporterAndEcoOrgSiret(bsd, currentSiret) &&
         !bsd.emitter?.isPrivateIndividual))
   );
 };
@@ -430,8 +430,8 @@ export const getSealedBtnLabel = (
       }
       return FAIRE_SIGNER;
     }
-    if (hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
-      return SIGNER;
+    if (hasEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
+      return FAIRE_SIGNER;
     }
   }
   if (
