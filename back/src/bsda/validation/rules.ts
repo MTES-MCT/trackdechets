@@ -5,7 +5,7 @@ import { PARTIAL_OPERATIONS } from "./constants";
 import { ZodBsda } from "./schema";
 import { isForeignVat } from "../../common/constants/companySearchHelpers";
 
-type EditableBsdaFields = Required<
+export type EditableBsdaFields = Required<
   Omit<
     Prisma.BsdaCreateInput,
     | "id"
@@ -31,300 +31,419 @@ type EditableBsdaFields = Required<
   >
 >;
 
-export const editionRules: {
+export type CheckFn = (val: ZodBsda) => boolean;
+export type FieldCheck = {
+  from: BsdaSignatureType;
+  when?: CheckFn;
+};
+
+export type EditionRules = {
   [Key in keyof EditableBsdaFields]: {
-    sealedBy: BsdaSignatureType; // The type of signature that seals the field
-    isRequired: boolean | ((val: ZodBsda) => boolean); // Whether or not the field is required when sealed. The rule can depend on other fields
+    // At what signature the field is sealed, and under which circumstances
+    sealed: FieldCheck;
+    // At what signature the field is required, and under which circumstances. If absent, field is never required
+    required?: FieldCheck;
     superRefineWhenSealed?: (val: ZodBsda[Key], ctx: RefinementCtx) => void; // For custom rules to apply when the field is sealed
     name?: string; // A custom field name for errors
     suffix?: string; // A custom message at the end of the error
   };
-} = {
-  type: { sealedBy: "EMISSION", isRequired: true },
-  emitterIsPrivateIndividual: { sealedBy: "EMISSION", isRequired: true },
+};
+
+export const editionRules: EditionRules = {
+  type: {
+    sealed: { from: "EMISSION" },
+    required: { from: "EMISSION" }
+  },
+  emitterIsPrivateIndividual: {
+    sealed: { from: "EMISSION" },
+    required: { from: "EMISSION" }
+  },
   emitterCompanyName: {
-    sealedBy: "EMISSION",
-    isRequired: true
+    sealed: { from: "EMISSION" },
+    required: { from: "EMISSION" }
   },
   emitterCompanySiret: {
-    sealedBy: "EMISSION",
-    isRequired: bsda => !bsda.emitterIsPrivateIndividual
+    sealed: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: bsda => !bsda.emitterIsPrivateIndividual
+    }
   },
   emitterCompanyAddress: {
-    sealedBy: "EMISSION",
-    isRequired: true
+    sealed: { from: "EMISSION" },
+    required: { from: "EMISSION" }
   },
   emitterCompanyContact: {
-    sealedBy: "EMISSION",
-    isRequired: bsda => !bsda.emitterIsPrivateIndividual
+    sealed: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: bsda => !bsda.emitterIsPrivateIndividual
+    }
   },
   emitterCompanyPhone: {
-    sealedBy: "EMISSION",
-    isRequired: bsda => !bsda.emitterIsPrivateIndividual
+    sealed: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: bsda => !bsda.emitterIsPrivateIndividual
+    }
   },
   emitterCompanyMail: {
-    sealedBy: "EMISSION",
-    isRequired: bsda => !bsda.emitterIsPrivateIndividual
+    sealed: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: bsda => !bsda.emitterIsPrivateIndividual
+    }
   },
-  emitterCustomInfo: { sealedBy: "EMISSION", isRequired: false },
-  emitterPickupSiteName: { sealedBy: "EMISSION", isRequired: false },
-  emitterPickupSiteAddress: { sealedBy: "EMISSION", isRequired: false },
-  emitterPickupSiteCity: { sealedBy: "EMISSION", isRequired: false },
+  emitterCustomInfo: { sealed: { from: "EMISSION" } },
+  emitterPickupSiteName: { sealed: { from: "EMISSION" } },
+  emitterPickupSiteAddress: { sealed: { from: "EMISSION" } },
+  emitterPickupSiteCity: { sealed: { from: "EMISSION" } },
   emitterPickupSitePostalCode: {
-    sealedBy: "EMISSION",
-    isRequired: false
+    sealed: { from: "EMISSION" }
   },
-  emitterPickupSiteInfos: { sealedBy: "EMISSION", isRequired: false },
+  emitterPickupSiteInfos: { sealed: { from: "EMISSION" } },
   ecoOrganismeName: {
-    sealedBy: "TRANSPORT",
-    isRequired: bsda => !!bsda.ecoOrganismeSiret
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: bsda => !!bsda.ecoOrganismeSiret
+    }
   },
-  ecoOrganismeSiret: { sealedBy: "TRANSPORT", isRequired: false },
-  destinationCompanyName: { sealedBy: "TRANSPORT", isRequired: true },
+  ecoOrganismeSiret: { sealed: { from: "TRANSPORT" } },
+  destinationCompanyName: {
+    sealed: { from: "TRANSPORT" },
+    required: { from: "TRANSPORT" }
+  },
   destinationCompanySiret: {
-    sealedBy: "TRANSPORT",
-    isRequired: true
+    sealed: { from: "TRANSPORT" },
+    required: { from: "TRANSPORT" }
   },
-  destinationCompanyAddress: { sealedBy: "TRANSPORT", isRequired: true },
-  destinationCompanyContact: { sealedBy: "TRANSPORT", isRequired: true },
-  destinationCompanyPhone: { sealedBy: "TRANSPORT", isRequired: true },
-  destinationCompanyMail: { sealedBy: "TRANSPORT", isRequired: true },
-  destinationCustomInfo: { sealedBy: "OPERATION", isRequired: false },
+  destinationCompanyAddress: {
+    sealed: { from: "TRANSPORT" },
+    required: { from: "TRANSPORT" }
+  },
+  destinationCompanyContact: {
+    sealed: { from: "TRANSPORT" },
+    required: { from: "TRANSPORT" }
+  },
+  destinationCompanyPhone: {
+    sealed: { from: "TRANSPORT" },
+    required: { from: "TRANSPORT" }
+  },
+  destinationCompanyMail: {
+    sealed: { from: "TRANSPORT" },
+    required: { from: "TRANSPORT" }
+  },
+  destinationCustomInfo: { sealed: { from: "OPERATION" } },
   destinationCap: {
-    sealedBy: "TRANSPORT",
-    isRequired: bsda =>
-      [BsdaType.COLLECTION_2710, BsdaType.GATHERING, BsdaType.RESHIPMENT].every(
-        type => bsda.type !== type
-      ) &&
-      PARTIAL_OPERATIONS.every(
-        op => bsda.destinationPlannedOperationCode !== op
-      )
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: bsda =>
+        [
+          BsdaType.COLLECTION_2710,
+          BsdaType.GATHERING,
+          BsdaType.RESHIPMENT
+        ].every(type => bsda.type !== type) &&
+        PARTIAL_OPERATIONS.every(
+          op => bsda.destinationPlannedOperationCode !== op
+        )
+    }
   },
   destinationPlannedOperationCode: {
-    sealedBy: "TRANSPORT",
-    isRequired: true
+    sealed: { from: "TRANSPORT" },
+    required: { from: "TRANSPORT" }
   },
-  destinationReceptionDate: { sealedBy: "OPERATION", isRequired: true },
-  destinationReceptionWeight: { sealedBy: "OPERATION", isRequired: true },
+  destinationReceptionDate: {
+    sealed: { from: "OPERATION" },
+    required: { from: "OPERATION" }
+  },
+  destinationReceptionWeight: {
+    sealed: { from: "OPERATION" },
+    required: { from: "OPERATION" }
+  },
   destinationReceptionAcceptationStatus: {
-    sealedBy: "OPERATION",
-    isRequired: true
+    sealed: { from: "OPERATION" },
+    required: { from: "OPERATION" }
   },
   destinationReceptionRefusalReason: {
-    sealedBy: "OPERATION",
-    isRequired: isRefusedOrPartiallyRefused
+    sealed: { from: "OPERATION" },
+    required: { from: "OPERATION", when: isRefusedOrPartiallyRefused }
   },
   destinationOperationCode: {
-    sealedBy: "OPERATION",
-    isRequired: isNotRefused
+    sealed: { from: "OPERATION" },
+    required: { from: "OPERATION", when: isNotRefused }
   },
   destinationOperationMode: {
-    sealedBy: "OPERATION",
-    isRequired: false
+    sealed: { from: "OPERATION" }
   },
   destinationOperationDescription: {
-    sealedBy: "OPERATION",
-    isRequired: false
+    sealed: { from: "OPERATION" }
   },
   destinationOperationDate: {
-    sealedBy: "OPERATION",
-    isRequired: isNotRefused
+    sealed: { from: "OPERATION" },
+    required: { from: "OPERATION", when: isNotRefused }
   },
   destinationOperationNextDestinationCompanyName: {
-    sealedBy: "OPERATION",
-    isRequired: false
+    sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCompanySiret: {
-    sealedBy: "OPERATION",
-    isRequired: false
+    sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCompanyVatNumber: {
-    sealedBy: "OPERATION",
-    isRequired: false
+    sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCompanyAddress: {
-    sealedBy: "OPERATION",
-    isRequired: false
+    sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCompanyContact: {
-    sealedBy: "OPERATION",
-    isRequired: false
+    sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCompanyPhone: {
-    sealedBy: "OPERATION",
-    isRequired: false
+    sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCompanyMail: {
-    sealedBy: "OPERATION",
-    isRequired: false
+    sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCap: {
-    sealedBy: "OPERATION",
-    isRequired: bsda =>
-      Boolean(bsda.destinationOperationNextDestinationCompanySiret)
+    sealed: { from: "OPERATION" },
+    required: {
+      from: "OPERATION",
+      when: bsda =>
+        Boolean(bsda.destinationOperationNextDestinationCompanySiret)
+    }
   },
   destinationOperationNextDestinationPlannedOperationCode: {
-    sealedBy: "OPERATION",
-    isRequired: bsda =>
-      Boolean(bsda.destinationOperationNextDestinationCompanySiret)
+    sealed: { from: "OPERATION" },
+    required: {
+      from: "OPERATION",
+      when: bsda =>
+        Boolean(bsda.destinationOperationNextDestinationCompanySiret)
+    }
   },
   transporterCompanyName: {
-    sealedBy: "TRANSPORT",
-    isRequired: hasTransporter
+    sealed: { from: "TRANSPORT" },
+    required: { from: "TRANSPORT", when: hasTransporter }
   },
   transporterCompanySiret: {
-    sealedBy: "TRANSPORT",
-    isRequired: bsda =>
-      !bsda.transporterCompanyVatNumber && hasTransporter(bsda)
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: bsda => !bsda.transporterCompanyVatNumber && hasTransporter(bsda)
+    }
   },
   transporterCompanyAddress: {
-    sealedBy: "TRANSPORT",
-    isRequired: hasTransporter
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: hasTransporter
+    }
   },
   transporterCompanyContact: {
-    sealedBy: "TRANSPORT",
-    isRequired: hasTransporter
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: hasTransporter
+    }
   },
   transporterCompanyPhone: {
-    sealedBy: "TRANSPORT",
-    isRequired: hasTransporter
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: hasTransporter
+    }
   },
   transporterCompanyMail: {
-    sealedBy: "TRANSPORT",
-    isRequired: hasTransporter
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: hasTransporter
+    }
   },
   transporterCompanyVatNumber: {
-    sealedBy: "TRANSPORT",
-    isRequired: bsda => !bsda.transporterCompanySiret && hasTransporter(bsda)
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: bsda => !bsda.transporterCompanySiret && hasTransporter(bsda)
+    }
   },
-  transporterCustomInfo: { sealedBy: "TRANSPORT", isRequired: false },
+  transporterCustomInfo: { sealed: { from: "TRANSPORT" } },
   transporterRecepisseIsExempted: {
-    sealedBy: "TRANSPORT",
-    isRequired: hasTransporter
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: hasTransporter
+    }
   },
   transporterRecepisseNumber: {
-    sealedBy: "TRANSPORT",
-    isRequired: bsda =>
-      hasTransporter(bsda) &&
-      !bsda.transporterRecepisseIsExempted &&
-      !isForeignVat(bsda.transporterCompanyVatNumber),
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: bsda =>
+        hasTransporter(bsda) &&
+        !bsda.transporterRecepisseIsExempted &&
+        !isForeignVat(bsda.transporterCompanyVatNumber)
+    },
     name: "Transporteur: le numéro de récépissé",
     suffix: " L'établissement doit renseigner son récépissé dans Trackdéchets"
   },
   transporterRecepisseDepartment: {
-    sealedBy: "TRANSPORT",
-    isRequired: bsda =>
-      hasTransporter(bsda) &&
-      !bsda.transporterRecepisseIsExempted &&
-      !isForeignVat(bsda.transporterCompanyVatNumber),
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: bsda =>
+        hasTransporter(bsda) &&
+        !bsda.transporterRecepisseIsExempted &&
+        !isForeignVat(bsda.transporterCompanyVatNumber)
+    },
     name: "Transporteur: le département de récépissé",
     suffix: " L'établissement doit renseigner son récépissé dans Trackdéchets"
   },
   transporterRecepisseValidityLimit: {
-    sealedBy: "TRANSPORT",
-    isRequired: bsda =>
-      hasTransporter(bsda) &&
-      !bsda.transporterRecepisseIsExempted &&
-      !isForeignVat(bsda.transporterCompanyVatNumber),
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: bsda =>
+        hasTransporter(bsda) &&
+        !bsda.transporterRecepisseIsExempted &&
+        !isForeignVat(bsda.transporterCompanyVatNumber)
+    },
     name: "Transporteur: la date de validité du récépissé",
     suffix: " L'établissement doit renseigner son récépissé dans Trackdéchets"
   },
   transporterTransportMode: {
-    sealedBy: "TRANSPORT",
-    isRequired: hasTransporter,
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: hasTransporter
+    },
     name: "le mode de transport"
   },
   transporterTransportPlates: {
-    sealedBy: "TRANSPORT",
-    isRequired: bsda =>
-      hasTransporter(bsda) && bsda.transporterTransportMode === "ROAD"
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT",
+      when: bsda =>
+        hasTransporter(bsda) && bsda.transporterTransportMode === "ROAD"
+    }
   },
   transporterTransportTakenOverAt: {
-    sealedBy: "TRANSPORT",
-    isRequired: false
+    sealed: { from: "TRANSPORT" }
   },
   workerIsDisabled: {
-    sealedBy: "EMISSION",
-    isRequired: hasWorker
+    sealed: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: hasWorker
+    }
   },
   workerCompanyName: {
-    sealedBy: "EMISSION",
-    isRequired: hasWorker
+    sealed: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: hasWorker
+    }
   },
   workerCompanySiret: {
-    sealedBy: "EMISSION",
-    isRequired: hasWorker
+    sealed: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: hasWorker
+    }
   },
   workerCompanyAddress: {
-    sealedBy: "EMISSION",
-    isRequired: hasWorker
+    sealed: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: hasWorker
+    }
   },
   workerCompanyContact: {
-    sealedBy: "EMISSION",
-    isRequired: hasWorker
+    sealed: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: hasWorker
+    }
   },
   workerCompanyPhone: {
-    sealedBy: "EMISSION",
-    isRequired: hasWorker
+    sealed: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: hasWorker
+    }
   },
   workerCompanyMail: {
-    sealedBy: "EMISSION",
-    isRequired: hasWorker
+    sealed: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: hasWorker
+    }
   },
   workerWorkHasEmitterPaperSignature: {
-    sealedBy: "WORK",
-    isRequired: false
+    sealed: { from: "WORK" }
   },
   workerCertificationHasSubSectionFour: {
-    sealedBy: "WORK",
-    isRequired: false
+    sealed: { from: "WORK" }
   },
   workerCertificationHasSubSectionThree: {
-    sealedBy: "WORK",
-    isRequired: false
+    sealed: { from: "WORK" }
   },
   workerCertificationCertificationNumber: {
-    sealedBy: "WORK",
-    isRequired: bsda => Boolean(bsda.workerCertificationHasSubSectionThree)
+    sealed: { from: "WORK" },
+    required: {
+      from: "WORK",
+      when: bsda => Boolean(bsda.workerCertificationHasSubSectionThree)
+    }
   },
   workerCertificationValidityLimit: {
-    sealedBy: "WORK",
-    isRequired: bsda => Boolean(bsda.workerCertificationHasSubSectionThree)
+    sealed: { from: "WORK" },
+    required: {
+      from: "WORK",
+      when: bsda => Boolean(bsda.workerCertificationHasSubSectionThree)
+    }
   },
   workerCertificationOrganisation: {
-    sealedBy: "WORK",
-    isRequired: bsda => Boolean(bsda.workerCertificationHasSubSectionThree)
+    sealed: { from: "WORK" },
+    required: {
+      from: "WORK",
+      when: bsda => Boolean(bsda.workerCertificationHasSubSectionThree)
+    }
   },
-  brokerCompanyName: { sealedBy: "EMISSION", isRequired: false },
-  brokerCompanySiret: { sealedBy: "EMISSION", isRequired: false },
-  brokerCompanyAddress: { sealedBy: "EMISSION", isRequired: false },
-  brokerCompanyContact: { sealedBy: "EMISSION", isRequired: false },
-  brokerCompanyPhone: { sealedBy: "EMISSION", isRequired: false },
-  brokerCompanyMail: { sealedBy: "EMISSION", isRequired: false },
-  brokerRecepisseNumber: { sealedBy: "EMISSION", isRequired: false },
-  brokerRecepisseDepartment: { sealedBy: "EMISSION", isRequired: false },
+  brokerCompanyName: { sealed: { from: "EMISSION" } },
+  brokerCompanySiret: { sealed: { from: "EMISSION" } },
+  brokerCompanyAddress: { sealed: { from: "EMISSION" } },
+  brokerCompanyContact: { sealed: { from: "EMISSION" } },
+  brokerCompanyPhone: { sealed: { from: "EMISSION" } },
+  brokerCompanyMail: { sealed: { from: "EMISSION" } },
+  brokerRecepisseNumber: { sealed: { from: "EMISSION" } },
+  brokerRecepisseDepartment: {
+    sealed: { from: "EMISSION" }
+  },
   brokerRecepisseValidityLimit: {
-    sealedBy: "EMISSION",
-    isRequired: false
+    sealed: { from: "EMISSION" }
   },
-  wasteCode: { sealedBy: "EMISSION", isRequired: true, name: "le code déchet" },
-  wasteAdr: { sealedBy: "WORK", isRequired: false },
+  wasteCode: {
+    sealed: { from: "EMISSION" },
+    required: { from: "EMISSION" },
+    name: "le code déchet"
+  },
+  wasteAdr: { sealed: { from: "WORK" } },
   wasteFamilyCode: {
-    sealedBy: "WORK",
-    isRequired: true,
+    sealed: { from: "WORK" },
+    required: { from: "WORK" },
     name: "le code famille"
   },
-  wasteMaterialName: { sealedBy: "WORK", isRequired: true },
+  wasteMaterialName: { sealed: { from: "WORK" }, required: { from: "WORK" } },
   wasteConsistence: {
-    sealedBy: "WORK",
-    isRequired: true,
+    sealed: { from: "WORK" },
+    required: { from: "WORK" },
     name: "la consistance"
   },
-  wasteSealNumbers: { sealedBy: "WORK", isRequired: true },
-  wastePop: { sealedBy: "WORK", isRequired: true },
+  wasteSealNumbers: { sealed: { from: "WORK" }, required: { from: "WORK" } },
+  wastePop: { sealed: { from: "WORK" }, required: { from: "WORK" } },
   packagings: {
-    sealedBy: "WORK",
-    isRequired: true,
+    sealed: { from: "WORK" },
+    required: { from: "WORK" },
     name: "le conditionnement",
     superRefineWhenSealed(val, ctx) {
       if (val.length === 0) {
@@ -338,11 +457,11 @@ export const editionRules: {
       }
     }
   },
-  weightIsEstimate: { sealedBy: "WORK", isRequired: true },
-  weightValue: { sealedBy: "WORK", isRequired: true },
-  grouping: { sealedBy: "EMISSION", isRequired: false },
-  forwarding: { sealedBy: "EMISSION", isRequired: false },
-  intermediaries: { sealedBy: "TRANSPORT", isRequired: false }
+  weightIsEstimate: { sealed: { from: "WORK" }, required: { from: "WORK" } },
+  weightValue: { sealed: { from: "WORK" }, required: { from: "WORK" } },
+  grouping: { sealed: { from: "EMISSION" } },
+  forwarding: { sealed: { from: "EMISSION" } },
+  intermediaries: { sealed: { from: "TRANSPORT" } }
 };
 
 function hasWorker(bsda: ZodBsda) {
