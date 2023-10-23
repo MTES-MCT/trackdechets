@@ -801,4 +801,57 @@ describe("Mutation.signedByTransporter", () => {
       })
     ]);
   });
+
+  it("should return an error if the signed form is an APPENDIX1_PRODUCER", async () => {
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    await transporterReceiptFactory({ company: transporter });
+    const emitter = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        emitterType: "APPENDIX1_PRODUCER",
+        emitterCompanySiret: emitter.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.siret,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "signedByTransporter">>(
+      SIGNED_BY_TRANSPORTER,
+      {
+        variables: {
+          id: form.id,
+          signingInfo: {
+            packagingInfos: form.wasteDetailsPackagingInfos,
+            quantity: form.wasteDetailsQuantity,
+            onuCode: "Code ONU",
+            sentAt: "2018-12-11T00:00:00.000Z",
+            signedByTransporter: true,
+            securityCode: emitter.securityCode,
+            sentBy: "Roger Lapince",
+            signedByProducer: true
+          }
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de signer un bordereau d'annexe 1 avec cette mutation dépréciée. Merci d'utiliser la mutation `signTransportForm`.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
 });

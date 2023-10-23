@@ -32,6 +32,14 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
 
     const fullForm = await getFullForm(form);
 
+    // APPENDIX1_PRODUCER has been added long after this mutation was deprecated.
+    // Instead of adding complex logic in both cases, just prevent from using this mutation.
+    if (fullForm.emitterType === "APPENDIX1_PRODUCER") {
+      throw new UserInputError(
+        "Impossible de signer un bordereau d'annexe 1 avec cette mutation dépréciée. Merci d'utiliser la mutation `signTransportForm`."
+      );
+    }
+
     // La mutation `signedByTransporter` ne peut être appelée que par
     // le premier transporteur contrairement à `signTransportForm`
     const transporter = getFirstTransporterSync(fullForm);
