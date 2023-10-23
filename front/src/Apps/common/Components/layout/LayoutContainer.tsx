@@ -71,21 +71,23 @@ export default function LayoutContainer() {
   const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
 
   const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isDashboardRoutes = !!useRouteMatch("/dashboard/");
   const dashboardRoutePrefix = isV2Routes ? "dashboardv2" : "dashboard";
 
   if (loading) {
     return <Loader />;
   }
 
-  const v2banner = isV2Routes ? (
-    <SurveyBanner
-      message="« Mes bordereaux » vous permet de découvrir le nouveau tableau de bord. Découvrez-le et partagez-nous vos suggestions."
-      button={{
-        title: "Partagez vos suggestions",
-        href: "https://tally.so/r/nG9QB2",
-      }}
-    ></SurveyBanner>
-  ) : undefined;
+  const v2banner =
+    isV2Routes || isDashboardRoutes ? (
+      <SurveyBanner
+        message="« Mes bordereaux » vous permet de découvrir le nouveau tableau de bord. Découvrez-le et partagez-nous vos suggestions."
+        button={{
+          title: "Partagez vos suggestions",
+          href: "https://tally.so/r/3xDDy9",
+        }}
+      ></SurveyBanner>
+    ) : undefined;
 
   return (
     <Suspense fallback={<Loader />}>
