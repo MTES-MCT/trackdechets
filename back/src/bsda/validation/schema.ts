@@ -210,12 +210,22 @@ export const rawBsdaSchema = z
     }
 
     const { destinationOperationCode, destinationOperationMode } = val;
-    if (destinationOperationCode && destinationOperationMode) {
+    if (destinationOperationCode) {
       const modes = getOperationModesFromOperationCode(
-        destinationOperationCode ?? ""
+        destinationOperationCode
       );
 
-      if (!modes.includes(destinationOperationMode)) {
+      if (modes.length && !destinationOperationMode) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Vous devez préciser un mode de traitement"
+        });
+      } else if (
+        (modes.length &&
+          destinationOperationMode &&
+          !modes.includes(destinationOperationMode)) ||
+        (!modes.length && destinationOperationMode)
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message:

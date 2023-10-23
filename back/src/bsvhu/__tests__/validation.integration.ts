@@ -301,23 +301,6 @@ describe("BSVHU validation", () => {
       }
     });
 
-    test("when operation mode is not compatible with operation code", async () => {
-      const data = {
-        ...bsvhu,
-        destinationOperationCode: "R 1",
-        destinationOperationMode: OperationMode.RECYCLAGE
-      };
-      expect.assertions(1);
-
-      try {
-        await validateBsvhu(data, {
-          transportSignature: true
-        });
-      } catch (err) {
-        expect(err.errors.length).toBeTruthy();
-      }
-    });
-
     test("when destination agrement number is missing", async () => {
       const data = {
         ...bsvhu,
@@ -336,42 +319,107 @@ describe("BSVHU validation", () => {
         );
       }
     });
-  });
 
-  describe("Emitter transports own waste", () => {
-    it("allowed if exemption", async () => {
-      const data = {
-        ...bsvhu,
-        transporterCompanySiret: bsvhu.emitterCompanySiret,
-        transporterRecepisseIsExempted: true
-      };
+    describe("Emitter transports own waste", () => {
+      it("allowed if exemption", async () => {
+        const data = {
+          ...bsvhu,
+          transporterCompanySiret: bsvhu.emitterCompanySiret,
+          transporterRecepisseIsExempted: true
+        };
 
-      expect.assertions(1);
+        expect.assertions(1);
 
-      const validated = await validateBsvhu(data, {
-        transportSignature: true
-      });
-
-      expect(validated).toBeDefined();
-    });
-
-    it("NOT allowed if no exemption", async () => {
-      const data = {
-        ...bsvhu,
-        transporterCompanySiret: bsvhu.emitterCompanySiret,
-        transporterRecepisseIsExempted: false
-      };
-
-      expect.assertions(1);
-
-      try {
-        await validateBsvhu(data, {
+        const validated = await validateBsvhu(data, {
           transportSignature: true
         });
+
+        expect(validated).toBeDefined();
+      });
+
+      it("NOT allowed if no exemption", async () => {
+        const data = {
+          ...bsvhu,
+          transporterCompanySiret: bsvhu.emitterCompanySiret,
+          transporterRecepisseIsExempted: false
+        };
+
+        expect.assertions(1);
+
+        try {
+          await validateBsvhu(data, {
+            transportSignature: true
+          });
+        } catch (err) {
+          expect(err.errors).toEqual([
+            `Le transporteur saisi sur le bordereau (SIRET: ${bsvhu.emitterCompanySiret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+          ]);
+        }
+      });
+    });
+  });
+
+  describe("Operation modes", () => {
+    test("should work if operation code & mode are compatible", async () => {
+      const data = {
+        ...bsvhu,
+        destinationOperationCode: "D 9",
+        destinationOperationMode: "ELIMINATION",
+        destinationReceptionWeight: 10,
+        destinationReceptionAcceptationStatus: "ACCEPTED"
+      };
+
+      const res = await validateBsvhu(data as any, {
+        operationSignature: true
+      });
+      expect(res).not.toBeUndefined();
+    });
+
+    test.each([
+      ["D 9", OperationMode.VALORISATION_ENERGETIQUE], // Correct modes are ELIMINATION
+      ["R 12", OperationMode.VALORISATION_ENERGETIQUE] // R12 has no associated mode
+    ])(
+      "should not be valid if operation mode is not compatible with operation code (mode: %p, code: %p)",
+      async (code, mode) => {
+        const data = {
+          ...bsvhu,
+          destinationOperationCode: code,
+          destinationOperationMode: mode,
+          destinationReceptionWeight: 10,
+          destinationReceptionAcceptationStatus: "ACCEPTED"
+        };
+        expect.assertions(2);
+
+        try {
+          await validateBsvhu(data as any, {
+            operationSignature: true
+          });
+        } catch (err) {
+          expect(err.errors.length).toBeTruthy();
+          expect(err.errors[0]).toBe(
+            "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+          );
+        }
+      }
+    );
+
+    test("should fail when operation code has associated operation modes but none is specified", async () => {
+      const data = {
+        ...bsvhu,
+        destinationOperationCode: "R 1",
+        destinationOperationMode: undefined,
+        destinationReceptionWeight: 10,
+        destinationReceptionAcceptationStatus: "ACCEPTED"
+      };
+      expect.assertions(2);
+
+      try {
+        await validateBsvhu(data as any, {
+          operationSignature: true
+        });
       } catch (err) {
-        expect(err.errors).toEqual([
-          `Le transporteur saisi sur le bordereau (SIRET: ${bsvhu.emitterCompanySiret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
-        ]);
+        expect(err.errors.length).toBeTruthy();
+        expect(err.errors[0]).toBe("Vous devez préciser un mode de traitement");
       }
     });
   });

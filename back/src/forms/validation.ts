@@ -1404,12 +1404,25 @@ const processedInfoSchemaFn: (
           const { processingOperationDone } = this.parent;
           const destinationOperationMode = item;
 
-          if (processingOperationDone && destinationOperationMode) {
+          if (processingOperationDone) {
             const modes = getOperationModesFromOperationCode(
               processingOperationDone
             );
 
-            return modes.includes(destinationOperationMode ?? "");
+            if (modes.length && !destinationOperationMode) {
+              return new yup.ValidationError(
+                "Vous devez préciser un mode de traitement"
+              );
+            } else if (
+              (modes.length &&
+                destinationOperationMode &&
+                !modes.includes(destinationOperationMode)) ||
+              (!modes.length && destinationOperationMode)
+            ) {
+              return new yup.ValidationError(
+                "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+              );
+            }
           }
 
           return true;
