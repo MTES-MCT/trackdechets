@@ -16,7 +16,7 @@ export const bsvhuFactory = async ({
     companyTypes: ["TRANSPORTER"]
   });
   const destinationCompany = await companyFactory({
-    companyTypes: ["WASTEPROCESSOR"]
+    companyTypes: ["WASTE_VEHICLES"]
   });
   return prisma.bsvhu.create({
     data: {

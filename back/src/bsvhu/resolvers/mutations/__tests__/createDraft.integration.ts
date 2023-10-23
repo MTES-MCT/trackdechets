@@ -102,7 +102,7 @@ describe("Mutation.Vhu.createDraft", () => {
   it("create a form with an emitter and a destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destination = await companyFactory({
-      companyTypes: ["WASTEPROCESSOR"]
+      companyTypes: ["WASTE_VEHICLES"]
     });
 
     const input = {
