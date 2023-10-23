@@ -481,12 +481,19 @@ export const getSentBtnLabel = (
     return "";
   }
   if (
-    ((isBsdasri(bsd.type) &&
-      isActTab &&
-      currentSiret === bsd.destination?.company?.siret) ||
-      (isBsff(bsd.type) &&
-        isActTab &&
-        isSameSiretDestination(currentSiret, bsd))) &&
+    isBsdasri(bsd.type) &&
+    currentSiret === bsd.destination?.company?.siret &&
+    isActTab &&
+    !bsd.synthesizedIn &&
+    permissions.includes(UserPermission.BsdCanSignAcceptation)
+  ) {
+    return VALIDER_RECEPTION;
+  }
+
+  if (
+    isBsff(bsd.type) &&
+    isActTab &&
+    isSameSiretDestination(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignAcceptation)
   ) {
     return VALIDER_RECEPTION;

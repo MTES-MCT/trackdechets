@@ -949,7 +949,7 @@ describe("Bsd card primary action label", () => {
       expect(buttonActions).toBeInTheDocument();
     });
 
-    test("Bsdasri", () => {
+    test("Bsdasri synthetized in", () => {
       const bsdari = {
         id: "DASRI-20220603-CFZ337QCS",
         bsdasriStatus: "SENT",
@@ -1016,6 +1016,98 @@ describe("Bsd card primary action label", () => {
           id: "DASRI-20220603-V61NMBREF",
           __typename: "Bsdasri",
         },
+        __typename: "Bsdasri",
+      } as unknown as Bsdasri;
+      const { queryByTestId } = render(
+        <PermissionsProvider
+          defaultPermissions={[UserPermission.BsdCanSignAcceptation]}
+        >
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretEmmiter}
+                bsd={bsdari}
+                bsdCurrentTab="actTab"
+                onValidate={functionMock}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock,
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
+      );
+
+      expect(queryByTestId(`bsd-card-btn-primary-${bsdari.id}`)).toBeFalsy();
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      expect(queryByTestId("bsd-delete-btn")).toBeFalsy();
+    });
+
+    test("Bsdasri simple", () => {
+      const bsdari = {
+        id: "DASRI-20220603-CFZ337QCS",
+        bsdasriStatus: "SENT",
+        type: "SIMPLE",
+        isDraft: false,
+        bsdasriWaste: {
+          code: "18 01 03*",
+          __typename: "BsdasriWaste",
+        },
+        emitter: {
+          company: {
+            name: "BOULANGERIE AU 148",
+            orgId: "81232991000010",
+            siret: "81232991000010",
+            vatNumber: null,
+            omiNumber: null,
+            __typename: "FormCompany",
+          },
+          emission: {
+            isTakenOverWithoutEmitterSignature: false,
+            isTakenOverWithSecretCode: false,
+            __typename: "BsdasriEmission",
+          },
+          __typename: "BsdasriEmitter",
+        },
+        ecoOrganisme: {
+          siret: "79250555400032",
+          emittedByEcoOrganisme: true,
+          __typename: "BsdasriEcoOrganisme",
+        },
+        transporter: {
+          company: {
+            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+            orgId: "13001045700013",
+            siret: "13001045700013",
+            vatNumber: null,
+            omiNumber: null,
+            __typename: "FormCompany",
+          },
+          customInfo: "houlalalal",
+          transport: {
+            plates: ["obligé"],
+            __typename: "BsdasriTransport",
+          },
+          __typename: "BsdasriTransporter",
+        },
+        destination: {
+          company: {
+            name: "L'ATELIER DE CELINE",
+            orgId: "53230142100022",
+            siret: "53230142100022",
+            vatNumber: null,
+            omiNumber: null,
+            __typename: "FormCompany",
+          },
+          __typename: "BsdasriDestination",
+        },
+        grouping: [],
+        synthesizing: [],
+        createdAt: "2022-06-03T07:12:29.490Z",
+        updatedAt: "2022-06-03T07:16:40.015Z",
+        allowDirectTakeOver: false,
         __typename: "Bsdasri",
       } as unknown as Bsdasri;
       const { queryByTestId } = render(
