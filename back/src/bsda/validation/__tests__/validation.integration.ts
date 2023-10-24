@@ -434,69 +434,79 @@ describe("BSDA validation", () => {
       }
     });
   });
-});
 
-describe("Operation modes", () => {
-  test.each([
-    ["R 5", "REUTILISATION"],
-    ["R 13", undefined]
-  ])(
-    "should work if operation code & mode are compatible (code: %p, mode: %p)",
-    async (code, mode) => {
+  describe("Operation modes", () => {
+    test.each([
+      ["R 5", "REUTILISATION"],
+      ["R 13", undefined]
+    ])(
+      "should work if operation code & mode are compatible (code: %p, mode: %p)",
+      async (code, mode) => {
+        const data = {
+          ...bsda,
+          destinationOperationCode: code,
+          destinationOperationMode: mode
+        };
+
+        const res = await parseBsdaInContext(
+          { persisted: data as any },
+          {
+            currentSignatureType: "OPERATION"
+          }
+        );
+        expect(res).not.toBeUndefined();
+      }
+    );
+
+    test.each([
+      ["R 5", "VALORISATION_ENERGETIQUE"], // Correct modes are REUTILISATION or RECYCLAGE
+      ["R 13", "VALORISATION_ENERGETIQUE"] // R 13 has no associated mode
+    ])(
+      "should fail if operation mode is not compatible with operation code (code: %p, mode: %p)",
+      async (code, mode) => {
+        const data = {
+          ...bsda,
+          destinationOperationCode: code,
+          destinationOperationMode: mode
+        };
+
+        expect.assertions(2);
+
+        try {
+          await parseBsdaInContext(
+            { persisted: data as any },
+            { currentSignatureType: "OPERATION" }
+          );
+        } catch (err) {
+          expect(err.errors.length).toBeTruthy();
+          expect(err.errors[0].message).toBe(
+            "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+          );
+        }
+      }
+    );
+
+    test("should fail if operation code has associated operation modes but none is specified", async () => {
       const data = {
         ...bsda,
-        destinationOperationCode: code,
-        destinationOperationMode: mode
-      };
-
-      const res = await parseBsda(data, {
-        currentSignatureType: "OPERATION"
-      });
-      expect(res).not.toBeUndefined();
-    }
-  );
-
-  test.each([
-    ["R 5", "VALORISATION_ENERGETIQUE"], // Correct modes are REUTILISATION or RECYCLAGE
-    ["R 13", "VALORISATION_ENERGETIQUE"] // R 13 has no associated mode
-  ])(
-    "should fail if operation mode is not compatible with operation code (code: %p, mode: %p)",
-    async (code, mode) => {
-      const data = {
-        ...bsda,
-        destinationOperationCode: code,
-        destinationOperationMode: mode
+        destinationOperationCode: "R 5",
+        destinationOperationMode: undefined
       };
 
       expect.assertions(2);
 
       try {
-        await parseBsda(data, { currentSignatureType: "OPERATION" });
+        await parseBsdaInContext(
+          { persisted: data as any },
+          { currentSignatureType: "OPERATION" }
+        );
       } catch (err) {
         expect(err.errors.length).toBeTruthy();
         expect(err.errors[0].message).toBe(
-          "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+          "Vous devez préciser un mode de traitement"
         );
       }
-    }
-  );
-
-  test("should fail if operation code has associated operation modes but none is specified", async () => {
-    const data = {
-      ...bsda,
-      destinationOperationCode: "R 5",
-      destinationOperationMode: undefined
-    };
-
-    expect.assertions(2);
-
-    try {
-      await parseBsda(data, { currentSignatureType: "OPERATION" });
-    } catch (err) {
-      expect(err.errors.length).toBeTruthy();
-      expect(err.errors[0].message).toBe(
-        "Vous devez préciser un mode de traitement" );
-    }
+    });
   });
 });
 
