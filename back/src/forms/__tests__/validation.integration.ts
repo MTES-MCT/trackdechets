@@ -307,16 +307,6 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    it("when there is no waste details packagingInfos", async () => {
-      const testForm = {
-        ...sealedForm,
-        wasteDetailsPackagingInfos: null
-      };
-
-      const isValid = await sealedFormSchema.isValid(testForm);
-      expect(isValid).toEqual(false);
-    });
-
     it("when there is no waste details quantity", async () => {
       const testForm = {
         ...sealedForm,

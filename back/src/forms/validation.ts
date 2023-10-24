@@ -806,16 +806,6 @@ const wasteDetailsNormalSchemaFn: FactorySchemaOf<
           "is-valid-packaging-infos",
           "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
           isValidPackagingInfos
-        )
-        .test(
-          "is-required-packaging-infos",
-          "Le détail du conditionnement est obligatoire",
-          (infos: PackagingInfo[] | undefined) => {
-            if (isDraft) {
-              return true;
-            }
-            return infos != null && infos.length > 0;
-          }
         ),
       wasteDetailsQuantity: weight(WeightUnits.Tonne)
         .label("Déchet")
@@ -1509,6 +1499,23 @@ export const draftFormSchema = baseFormSchemaFn({
 export const wasteDetailsSchema = wasteDetailsSchemaFn({
   isDraft: false
 });
+
+export async function validateBeforeEmission(form: PrismaForm) {
+  await wasteDetailsSchemaFn({ isDraft: false }).validate(form);
+
+  if (form.emitterType !== "APPENDIX1_PRODUCER") {
+    // Vérifie qu'au moins un packaging a été déini sauf dans le cas
+    // d'un bordereau d'annexe 1 pour lequel il est possible de ne pas définir
+    // de packaging
+    const wasteDetailsBeforeTransportSchema = yup.object({
+      wasteDetailsPackagingInfos: yup
+        .array()
+        .min(1, "Le nombre de contenants doit être supérieur à 0")
+    });
+    await wasteDetailsBeforeTransportSchema.validate(form);
+  }
+  return form;
+}
 
 export const beforeTransportSchemaFn = ({
   signingTransporterOrgId
