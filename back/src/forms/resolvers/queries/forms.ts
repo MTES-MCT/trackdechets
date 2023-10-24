@@ -10,6 +10,8 @@ import { expandFormFromDb, expandableFormIncludes } from "../../converter";
 import { getPrismaPaginationArgs } from "../../../common/pagination";
 import { checkCanList } from "../../permissions";
 
+const MAX_FORMS_LIMIT = 100;
+
 const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
 
@@ -43,7 +45,8 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
     after: rest.cursorAfter,
     last: rest.last,
     before: rest.cursorBefore,
-    skip: rest.skip
+    skip: rest.skip,
+    maxPaginateBy: MAX_FORMS_LIMIT
   };
 
   const paginationArgs = getPrismaPaginationArgs(gqlPaginationArgs);
