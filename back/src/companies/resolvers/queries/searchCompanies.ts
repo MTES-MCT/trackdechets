@@ -8,11 +8,6 @@ const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
   { clue, department, allowForeignCompanies },
   context
 ) => {
-  applyAuthStrategies(context, [
-    AuthType.Session,
-    // On autorise la recherche par API
-    AuthType.Bearer
-  ]);
   checkIsAuthenticated(context);
   return searchCompanies(clue, department, allowForeignCompanies);
 };
