@@ -81,7 +81,7 @@ describe("sirenify", () => {
   it("should by pass auto-completion of name and address if company is non diffusible", async () => {
     searchCompanySpy.mockResolvedValueOnce({
       ...searchResult,
-      statutDiffusionEtablissement: "N"
+      statutDiffusionEtablissement: "P"
     });
 
     const input: Input = {

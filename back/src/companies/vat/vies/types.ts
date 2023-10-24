@@ -13,6 +13,6 @@ export interface CompanyVatSearchResult {
   name: string;
   codePaysEtrangerEtablissement: string;
   // required to ensure compatibility with the common CompanySearchResult interface
-  statutDiffusionEtablissement: "O" | "N";
+  statutDiffusionEtablissement: "O" | "P";
   etatAdministratif: "A" | "F";
 }

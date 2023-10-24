@@ -238,7 +238,7 @@ async function searchSireneOrNotFound(
       return {
         ...removeEmptyKeys(anonymousCompany),
         // required to avoid leaking anonymous data to the public
-        statutDiffusionEtablissement: "N",
+        statutDiffusionEtablissement: "P",
         etatAdministratif: "A",
         naf: anonymousCompany.codeNaf,
         codePaysEtrangerEtablissement: "FR"
@@ -248,7 +248,7 @@ async function searchSireneOrNotFound(
       return {
         etatAdministratif: "A",
         siret,
-        statutDiffusionEtablissement: "N"
+        statutDiffusionEtablissement: "P"
       } as SireneSearchResult;
     }
 

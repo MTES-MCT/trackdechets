@@ -144,7 +144,7 @@ export const searchCompany = async (
       throw new Error(`No _source in ES body for id ${siret} & index ${index}`);
     }
     const company = searchResponseToCompany(response.body._source);
-    if (company.statutDiffusionEtablissement === "N") {
+    if (company.statutDiffusionEtablissement === "P") {
       throw new AnonymousCompanyError();
     }
     return company;

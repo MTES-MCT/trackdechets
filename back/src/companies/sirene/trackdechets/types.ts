@@ -2,7 +2,7 @@ export interface SearchStockEtablissement {
   siren: string;
   nic: string;
   siret: string;
-  statutDiffusionEtablissement: "O" | "N" | "P";
+  statutDiffusionEtablissement: "O" | "P";
   dateCreationEtablissement: string;
   trancheEffectifsEtablissement: string;
   anneeEffectifsEtablissement: string;

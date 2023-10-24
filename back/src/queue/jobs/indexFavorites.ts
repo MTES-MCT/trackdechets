@@ -365,7 +365,7 @@ export const favoritesConstrutor = async ({
         favorites.push(
           mergeCompanyToCompanySearchResult(orgId, company, {
             etatAdministratif: "A",
-            statutDiffusionEtablissement: "N",
+            statutDiffusionEtablissement: "P",
             codePaysEtrangerEtablissement: "FR"
           })
         );

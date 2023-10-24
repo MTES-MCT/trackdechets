@@ -649,7 +649,7 @@ enum EtatAdministratif {
 
 enum StatutDiffusionEtablissement {
   O
-  N
+  P
 }
 
 """

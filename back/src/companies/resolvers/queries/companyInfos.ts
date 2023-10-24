@@ -74,7 +74,7 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
   const companyInfos = (await getCompanyInfos(
     !!args.siret ? args.siret : args.clue!
   )) as CompanyPublic;
-  if (companyInfos.statutDiffusionEtablissement !== "N") {
+  if (companyInfos.statutDiffusionEtablissement !== "P") {
     return companyInfos;
   } else {
     // hide non-diffusible Company from public query
