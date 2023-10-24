@@ -19,7 +19,7 @@ export const bsdaFactory = async ({
     data: {
       ...formParams
     },
-    include: { intermediaries: true }
+    include: { intermediaries: true, grouping: true, forwarding: true }
   });
   if (created?.intermediaries) {
     return prisma.bsda.update({
@@ -28,7 +28,8 @@ export const bsdaFactory = async ({
         intermediariesOrgIds: created.intermediaries
           .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
           .filter(Boolean)
-      }
+      },
+      include: { intermediaries: true, grouping: true, forwarding: true }
     });
   }
 

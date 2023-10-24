@@ -5,7 +5,7 @@ import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { getBsdaRepository } from "../../repository";
 import { checkCanUpdate } from "../../permissions";
-import { parseBsda } from "../../validation/validate";
+import { parseBsdaInContext } from "../../validation";
 import { ForbiddenError } from "../../../common/errors";
 
 export default async function publish(
@@ -27,12 +27,8 @@ export default async function publish(
     );
   }
 
-  await parseBsda(
-    {
-      ...bsda,
-      grouping: bsda.grouping?.map(g => g.id),
-      forwarding: bsda.forwarding?.id
-    },
+  await parseBsdaInContext(
+    { persisted: bsda },
     { currentSignatureType: "EMISSION" }
   );
 

@@ -4,6 +4,8 @@ import { BsdaSignatureType } from "../../generated/graphql/types";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { ZodBsda } from "./schema";
 import { isForeignVat } from "../../common/constants/companySearchHelpers";
+import { capitalize } from "../../common/strings";
+import { getUserFunctions } from "./helpers";
 
 export type EditableBsdaFields = Required<
   Omit<
@@ -31,21 +33,21 @@ export type EditableBsdaFields = Required<
   >
 >;
 
-export type CheckFn = (val: ZodBsda) => boolean;
-export type FieldCheck = {
+export type CheckFn = (val: ZodBsda, userFunctions: UserFunctions) => boolean;
+export type FieldCheck<Key extends keyof EditableBsdaFields> = {
   from: BsdaSignatureType;
   when?: CheckFn;
+  superRefine?: (val: ZodBsda[Key], ctx: RefinementCtx) => void; // For state specific validation rules. eg array must have length > 0 when the field is required
+  suffix?: string; // A custom message at the end of the error
 };
 
 export type EditionRules = {
   [Key in keyof EditableBsdaFields]: {
     // At what signature the field is sealed, and under which circumstances
-    sealed: FieldCheck;
+    sealed: FieldCheck<Key>;
     // At what signature the field is required, and under which circumstances. If absent, field is never required
-    required?: FieldCheck;
-    superRefineWhenSealed?: (val: ZodBsda[Key], ctx: RefinementCtx) => void; // For custom rules to apply when the field is sealed
-    name?: string; // A custom field name for errors
-    suffix?: string; // A custom message at the end of the error
+    required?: FieldCheck<Key>;
+    readableFieldName?: string; // A custom field name for errors
   };
 };
 
@@ -111,34 +113,52 @@ export const editionRules: EditionRules = {
   },
   ecoOrganismeSiret: { sealed: { from: "TRANSPORT" } },
   destinationCompanyName: {
-    sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    sealed: {
+      from: "EMISSION",
+      when: isDestinationSealed
+    },
+    required: { from: "EMISSION" }
   },
   destinationCompanySiret: {
-    sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    sealed: {
+      from: "EMISSION",
+      when: isDestinationSealed
+    },
+    required: { from: "EMISSION" }
   },
   destinationCompanyAddress: {
-    sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    sealed: {
+      from: "EMISSION",
+      when: isDestinationSealed
+    },
+    required: { from: "EMISSION" }
   },
   destinationCompanyContact: {
-    sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    sealed: {
+      from: "EMISSION",
+      when: isDestinationSealed
+    },
+    required: { from: "EMISSION" }
   },
   destinationCompanyPhone: {
-    sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    sealed: {
+      from: "EMISSION",
+      when: isDestinationSealed
+    },
+    required: { from: "EMISSION" }
   },
   destinationCompanyMail: {
-    sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    sealed: {
+      from: "EMISSION",
+      when: isDestinationSealed
+    },
+    required: { from: "EMISSION" }
   },
   destinationCustomInfo: { sealed: { from: "OPERATION" } },
   destinationCap: {
     sealed: { from: "TRANSPORT" },
     required: {
-      from: "TRANSPORT",
+      from: "EMISSION",
       when: bsda =>
         [
           BsdaType.COLLECTION_2710,
@@ -152,7 +172,7 @@ export const editionRules: EditionRules = {
   },
   destinationPlannedOperationCode: {
     sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    required: { from: "EMISSION" }
   },
   destinationReceptionDate: {
     sealed: { from: "OPERATION" },
@@ -282,10 +302,10 @@ export const editionRules: EditionRules = {
       when: bsda =>
         hasTransporter(bsda) &&
         !bsda.transporterRecepisseIsExempted &&
-        !isForeignVat(bsda.transporterCompanyVatNumber)
+        !isForeignVat(bsda.transporterCompanyVatNumber),
+      suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
     },
-    name: "Transporteur: le numéro de récépissé",
-    suffix: " L'établissement doit renseigner son récépissé dans Trackdéchets"
+    readableFieldName: "Transporteur: le numéro de récépissé"
   },
   transporterRecepisseDepartment: {
     sealed: { from: "TRANSPORT" },
@@ -294,10 +314,10 @@ export const editionRules: EditionRules = {
       when: bsda =>
         hasTransporter(bsda) &&
         !bsda.transporterRecepisseIsExempted &&
-        !isForeignVat(bsda.transporterCompanyVatNumber)
+        !isForeignVat(bsda.transporterCompanyVatNumber),
+      suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
     },
-    name: "Transporteur: le département de récépissé",
-    suffix: " L'établissement doit renseigner son récépissé dans Trackdéchets"
+    readableFieldName: "Transporteur: le département de récépissé"
   },
   transporterRecepisseValidityLimit: {
     sealed: { from: "TRANSPORT" },
@@ -306,10 +326,10 @@ export const editionRules: EditionRules = {
       when: bsda =>
         hasTransporter(bsda) &&
         !bsda.transporterRecepisseIsExempted &&
-        !isForeignVat(bsda.transporterCompanyVatNumber)
+        !isForeignVat(bsda.transporterCompanyVatNumber),
+      suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
     },
-    name: "Transporteur: la date de validité du récépissé",
-    suffix: " L'établissement doit renseigner son récépissé dans Trackdéchets"
+    readableFieldName: "Transporteur: la date de validité du récépissé"
   },
   transporterTransportMode: {
     sealed: { from: "TRANSPORT" },
@@ -317,14 +337,23 @@ export const editionRules: EditionRules = {
       from: "TRANSPORT",
       when: hasTransporter
     },
-    name: "le mode de transport"
+    readableFieldName: "le mode de transport"
   },
   transporterTransportPlates: {
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
       when: bsda =>
-        hasTransporter(bsda) && bsda.transporterTransportMode === "ROAD"
+        hasTransporter(bsda) && bsda.transporterTransportMode === "ROAD",
+      superRefine(val, ctx) {
+        if (val.filter(Boolean).length === 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "La plaque d'immatriculation est requise",
+            path: ["transporterTransportPlates"]
+          });
+        }
+      }
     }
   },
   transporterTransportTakenOverAt: {
@@ -425,37 +454,39 @@ export const editionRules: EditionRules = {
   wasteCode: {
     sealed: { from: "EMISSION" },
     required: { from: "EMISSION" },
-    name: "le code déchet"
+    readableFieldName: "le code déchet"
   },
   wasteAdr: { sealed: { from: "WORK" } },
   wasteFamilyCode: {
     sealed: { from: "WORK" },
     required: { from: "WORK" },
-    name: "le code famille"
+    readableFieldName: "le code famille"
   },
   wasteMaterialName: { sealed: { from: "WORK" }, required: { from: "WORK" } },
   wasteConsistence: {
     sealed: { from: "WORK" },
     required: { from: "WORK" },
-    name: "la consistance"
+    readableFieldName: "la consistance"
   },
   wasteSealNumbers: { sealed: { from: "WORK" }, required: { from: "WORK" } },
   wastePop: { sealed: { from: "WORK" }, required: { from: "WORK" } },
   packagings: {
     sealed: { from: "WORK" },
-    required: { from: "WORK" },
-    name: "le conditionnement",
-    superRefineWhenSealed(val, ctx) {
-      if (val.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.too_small,
-          type: "array",
-          minimum: 1,
-          inclusive: true,
-          message: "Le conditionnement est obligatoire"
-        });
+    required: {
+      from: "WORK",
+      superRefine(val, ctx) {
+        if (val.length === 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.too_small,
+            type: "array",
+            minimum: 1,
+            inclusive: true,
+            message: "Le conditionnement est obligatoire"
+          });
+        }
       }
-    }
+    },
+    readableFieldName: "le conditionnement"
   },
   weightIsEstimate: { sealed: { from: "WORK" }, required: { from: "WORK" } },
   weightValue: { sealed: { from: "WORK" }, required: { from: "WORK" } },
@@ -491,4 +522,123 @@ function isNotRefused(bsda: ZodBsda) {
     bsda.destinationReceptionAcceptationStatus !==
     WasteAcceptationStatus.REFUSED
   );
+}
+
+function isDestinationSealed(val: ZodBsda, userFunctions: UserFunctions) {
+  const isSealedForEmitter = hasWorker(val)
+    ? val.workerWorkSignatureDate == null
+    : val.transporterTransportSignatureDate == null;
+
+  if (userFunctions.isEmitter && !isSealedForEmitter) {
+    return false;
+  }
+
+  // If I am worker, transporter or destination
+  // and the transporter hasn't signed
+  // and I am adding a nextDestinationCompanySiret,
+  // then I can edit the destination.
+  if (
+    (userFunctions.isEmitter ||
+      userFunctions.isWorker ||
+      userFunctions.isTransporter ||
+      userFunctions.isDestination) &&
+    val.transporterTransportSignatureDate == null &&
+    val.destinationOperationNextDestinationCompanySiret
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function noop() {
+  // do nothing.
+}
+
+type UserFunctions = Awaited<ReturnType<typeof getUserFunctions>>;
+type CheckParams = {
+  bsda: ZodBsda;
+  updatedFields: string[];
+  userFunctions: UserFunctions;
+  signaturesToCheck: BsdaSignatureType[];
+};
+
+type RulesEntries = {
+  [K in keyof EditionRules]: [K, EditionRules[K]];
+}[keyof EditionRules][];
+
+export function checkSealedAndRequiredFields(
+  { bsda, updatedFields, userFunctions, signaturesToCheck }: CheckParams,
+  ctx: RefinementCtx
+) {
+  for (const [field, rule] of Object.entries(editionRules) as RulesEntries) {
+    // Apply default values to rules
+    const sealedRule = {
+      from: rule.sealed.from,
+      when: rule.sealed.when ?? (() => true), // Default to true
+      superRefine: rule.sealed.superRefine ?? noop, // Default to no-op
+      suffix: rule.sealed.suffix
+    };
+    const requiredRule = {
+      from: rule.required?.from ?? "NO_CHECK_RULE",
+      when: rule.required?.when ?? (() => true), // Default to true
+      superRefine: rule.required?.superRefine ?? noop, // Default to no-op
+      suffix: rule.required?.suffix
+    };
+
+    const fieldDescription = rule.readableFieldName
+      ? capitalize(rule.readableFieldName)
+      : `Le champ ${field}`;
+
+    const isSealed =
+      signaturesToCheck.includes(sealedRule.from) &&
+      sealedRule.when(bsda, userFunctions);
+    if (isSealed) {
+      if (updatedFields.includes(field)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [field],
+          message: [
+            `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
+            sealedRule.suffix
+          ]
+            .filter(Boolean)
+            .join(" ")
+        });
+      }
+      // @ts-expect-error TODO: superRefineWhenSealed first param is inferred as never ?
+      sealedRule.superRefine(bsda[field], ctx);
+    }
+
+    const isRequired =
+      signaturesToCheck.includes(requiredRule.from) &&
+      requiredRule.when(bsda, userFunctions);
+    if (isRequired) {
+      if (bsda[field] == null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [field],
+          message: [`${fieldDescription} est obligatoire.`, requiredRule.suffix]
+            .filter(Boolean)
+            .join(" ")
+        });
+      }
+      // @ts-expect-error TODO: superRefineWhenSealed first param is inferred as never ?
+      requiredRule.superRefine(bsda[field], ctx);
+    }
+  }
+}
+
+export function getSealedFields({
+  bsda,
+  userFunctions,
+  signaturesToCheck
+}: Omit<CheckParams, "updatedFields">) {
+  return Object.entries(editionRules)
+    .filter(
+      ([_, rule]) =>
+        signaturesToCheck.includes(rule.sealed.from) &&
+        (!rule.sealed.when || rule.sealed.when(bsda, userFunctions))
+    )
+    .map(([field]) => field as keyof EditionRules);
 }

@@ -472,7 +472,7 @@ describe("Mutation.Bsda.sign", () => {
       );
     });
 
-    it("should disallow transporter to sign transport when receipt if missing", async () => {
+    it("should disallow transporter to sign transport when recepisse is missing", async () => {
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
 
       const bsda = await bsdaFactory({
@@ -484,7 +484,8 @@ describe("Mutation.Bsda.sign", () => {
           workerWorkSignatureDate: new Date(),
           transporterCompanySiret: transporter.company.siret,
           transporterTransportMode: "ROAD",
-          transporterTransportPlates: ["AA-00-XX"]
+          transporterTransportPlates: ["AA-00-XX"],
+          transporterRecepisseNumber: null
         }
       });
 
@@ -501,6 +502,7 @@ describe("Mutation.Bsda.sign", () => {
           }
         }
       });
+      console.log(errors);
       expect(errors).toEqual([
         expect.objectContaining({
           message: expect.stringContaining(
