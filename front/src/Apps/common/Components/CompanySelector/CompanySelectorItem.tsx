@@ -3,6 +3,8 @@ import { CompanySelectorItemProps } from "./companySelectorTypes";
 
 import "./companySelector.scss";
 import classNames from "classnames";
+import routes from "Apps/routes";
+import { generatePath } from "react-router-dom";
 
 const tdIcon = (
   <svg
@@ -87,7 +89,10 @@ const CompanySelectorItem = ({
         <div className="company-selector-item__info">{formatCompanyInfo()}</div>
         <div className="company-selector-item__link">
           <a
-            href="https://trackdechets.beta.gouv.fr/cgu"
+            href={generatePath(routes.company, {
+              orgId: company.orgId!,
+            })}
+            onClick={e => e.stopPropagation()}
             target="_blank"
             rel="noopener noreferrer"
             className="fr-link"
