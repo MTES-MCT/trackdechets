@@ -11,6 +11,7 @@ export function bsdaReducer(
         updatedAt,
         createdAt,
         grouping,
+        intermediaries,
         wasteSealNumbers,
         intermediariesOrgIds,
         ...bsda
@@ -27,6 +28,7 @@ export function bsdaReducer(
         updatedAt,
         createdAt,
         grouping,
+        intermediaries,
         intermediariesOrgIds,
         ...bsda
       } = event.data;
