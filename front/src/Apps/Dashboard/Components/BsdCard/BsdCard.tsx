@@ -247,7 +247,6 @@ function BsdCard({
   const pickupSiteName =
     bsdDisplay?.emitter?.pickupSite?.name ||
     bsdDisplay?.emitter?.workSite?.name;
-  const workerCompanyName = bsdDisplay?.worker?.company?.name;
   return (
     <>
       <div className="bsd-card" tabIndex={0}>
@@ -280,12 +279,6 @@ function BsdCard({
                     <InfoWithIcon
                       labelCode={InfoIconCode.PickupSite}
                       info={pickupSiteName}
-                    />
-                  )}
-                  {workerCompanyName && (
-                    <InfoWithIcon
-                      labelCode={InfoIconCode.PickupSite}
-                      info={workerCompanyName}
                     />
                   )}
                   {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
@@ -358,6 +351,7 @@ function BsdCard({
                   emitterName={bsdDisplay.emitter?.company?.name!}
                   transporterName={transporterName}
                   destinationName={bsdDisplay.destination?.company?.name!}
+                  workerCompanyName={bsdDisplay?.worker?.company?.name?.toString()}
                 />
               </div>
               <div className="bsd-card__content__cta">
