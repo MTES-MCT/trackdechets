@@ -496,6 +496,24 @@ describe("DateFilter to elastic query", () => {
     await refreshElasticSearch();
   });
 
+  it("should match when _lte and _gte are equal", async () => {
+    const dateFilter: BsdWhere = {
+      createdAt: { _lte: new Date("2023-01-01"), _gte: new Date("2023-01-01") }
+    };
+
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(dateFilter)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.id).toEqual("1");
+  });
+
   it("should match for _eq when value is equal", async () => {
     const dateFilter: BsdWhere = {
       createdAt: { _eq: new Date("2023-01-01") }
