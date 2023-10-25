@@ -58,8 +58,6 @@ const GET_ME = gql`
 `;
 
 export default function LayoutContainer() {
-  const { VITE_SENTRY_ENVIRONMENT } = import.meta.env;
-
   const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME, {
     onCompleted: ({ me }) => {
       if (import.meta.env.VITE_SENTRY_DSN && me.email) {
@@ -111,6 +109,7 @@ export default function LayoutContainer() {
             isAuthenticated={isAuthenticated}
             isAdmin={isAdmin}
             v2banner={v2banner}
+            defaultOrgId={data?.me.companies[0].orgId}
           >
             <Switch>
               <PrivateRoute

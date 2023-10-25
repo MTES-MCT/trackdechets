@@ -9,6 +9,7 @@ import downtimeIcon from "./assets/code-downtime.svg";
 interface AuthProps {
   isAuthenticated: boolean;
   isAdmin: boolean;
+  defaultOrgId?: string;
 }
 const { VITE_WARNING_MESSAGE, VITE_DOWNTIME_MESSAGE } = import.meta.env;
 
@@ -26,6 +27,7 @@ export default function Layout({
   isAuthenticated,
   isAdmin,
   v2banner,
+  defaultOrgId,
 }: AuthProps & {
   children: ReactNode;
   v2banner?: JSX.Element;
@@ -85,7 +87,11 @@ export default function Layout({
           {data.warningMessage}
         </div>
       )}
-      <Header isAuthenticated={isAuthenticated} isAdmin={isAdmin} />
+      <Header
+        isAuthenticated={isAuthenticated}
+        isAdmin={isAdmin}
+        defaultOrgId={defaultOrgId}
+      />
       {children}
     </>
   );
