@@ -194,6 +194,7 @@ const MenuLink = ({ entry, mobileCallback }) => {
 type HeaderProps = {
   isAuthenticated: boolean;
   isAdmin: boolean;
+  defaultOrgId?: string;
 };
 
 /**
@@ -206,8 +207,9 @@ export default withRouter(function Header({
   isAdmin,
   location,
   history,
+  defaultOrgId,
 }: RouteComponentProps & HeaderProps) {
-  const { VITE_API_ENDPOINT, VITE_SENTRY_ENVIRONMENT } = import.meta.env;
+  const { VITE_API_ENDPOINT } = import.meta.env;
 
   const [menuHidden, toggleMenu] = useState(true);
 
@@ -243,12 +245,15 @@ export default withRouter(function Header({
   const menuClass = menuHidden && isMobile ? styles.headerNavHidden : "";
 
   // Catching siret from url when not available from props (just after login)
-  let currentSiret = matchDashboard?.params["siret"];
+  let currentSiret = matchDashboard?.params["siret"] || defaultOrgId;
 
   if (matchDashboardV2) {
     currentSiret =
-      matchDashboard?.params["siret"] || matchDashboardV2?.params["siret"];
+      matchDashboard?.params["siret"] ||
+      matchDashboardV2?.params["siret"] ||
+      defaultOrgId;
   }
+
   const menuEntries = getMenuEntries(isAuthenticated, isAdmin, currentSiret);
 
   const mobileNav = () => {
