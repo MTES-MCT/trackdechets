@@ -472,22 +472,22 @@ describe("DateFilter to elastic query", () => {
     const bsds: Partial<BsdElastic>[] = [
       {
         id: "1",
-        createdAt: new Date("2023-01-01").getTime(),
+        createdAt: new Date("2023-01-01T15:00:00").getTime(),
         updatedAt: new Date().getTime()
       },
       {
         id: "2",
-        createdAt: new Date("2023-01-02").getTime(),
+        createdAt: new Date("2023-01-02T23:00:00").getTime(),
         updatedAt: new Date().getTime()
       },
       {
         id: "3",
-        createdAt: new Date("2023-01-03").getTime(),
+        createdAt: new Date("2023-01-03T09:00:00").getTime(),
         updatedAt: new Date().getTime()
       },
       {
         id: "4",
-        createdAt: new Date("2023-01-04").getTime(),
+        createdAt: new Date("2023-01-04T11:30:30").getTime(),
         updatedAt: new Date().getTime()
       }
     ];
