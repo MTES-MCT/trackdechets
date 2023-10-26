@@ -159,7 +159,7 @@ export const editionRules: EditionRules = {
     required: {
       from: "EMISSION",
       when: bsda =>
-        bsda.type === BsdaType.OTHER_COLLECTIONS &&
+        bsda.type !== BsdaType.COLLECTION_2710 &&
         !Boolean(bsda.destinationOperationNextDestinationCompanySiret)
     }
   },
@@ -261,8 +261,22 @@ export const editionRules: EditionRules = {
   transporterCompanySiret: {
     sealed: { from: "TRANSPORT" },
     required: {
-      from: "TRANSPORT",
-      when: bsda => !bsda.transporterCompanyVatNumber && hasTransporter(bsda)
+      from: "EMISSION",
+      when: bsda => {
+        // Transporter required if there is no worker and the emitter is a private individual
+        // This is to avoid usage of an OTHER_COLLECTIONS BSDA instead of a COLLECTION_2710
+        if (
+          bsda.emitterIsPrivateIndividual &&
+          bsda.type === BsdaType.OTHER_COLLECTIONS &&
+          bsda.workerIsDisabled
+        ) {
+          return true;
+        }
+
+        // Otherwise, the transporter is only required for the transporter signature.
+        // No specific check needed as anyway he cannot sign without being part of the bsda
+        return false;
+      }
     }
   },
   transporterCompanyAddress: {
@@ -509,11 +523,7 @@ export const editionRules: EditionRules = {
 };
 
 function hasWorker(bsda: ZodBsda) {
-  return (
-    [BsdaType.RESHIPMENT, BsdaType.GATHERING, BsdaType.COLLECTION_2710].every(
-      type => type !== bsda.type
-    ) && !bsda.workerIsDisabled
-  );
+  return bsda.type === BsdaType.OTHER_COLLECTIONS && !bsda.workerIsDisabled;
 }
 
 function hasTransporter(bsda: ZodBsda) {

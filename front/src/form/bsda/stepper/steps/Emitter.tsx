@@ -54,6 +54,15 @@ export function Emitter({ disabled }) {
         </div>
       )}
 
+      {values.emitter?.isPrivateIndividual &&
+        values.type === BsdaType.OtherCollections && (
+          <div className="notification notification--warning tw-mt-6">
+            Si le particulier est en charge du transport direct vers l'exutoire,
+            merci de bien vouloir utiliser un bordereau de collecte en
+            déchèterie.
+          </div>
+        )}
+
       {values.emitter?.isPrivateIndividual || isBsdaSuite ? (
         <>
           <div className="form__row">
@@ -93,7 +102,7 @@ export function Emitter({ disabled }) {
           </div>
           <div className="form__row">
             <label>
-              Téléphone (optionnel)
+              Téléphone
               <Field
                 type="text"
                 name="emitter.company.phone"
@@ -104,7 +113,7 @@ export function Emitter({ disabled }) {
           </div>
           <div className="form__row">
             <label>
-              Mail (optionnel)
+              Mail
               <Field
                 type="text"
                 name="emitter.company.mail"

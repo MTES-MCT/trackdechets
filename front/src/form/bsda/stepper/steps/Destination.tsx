@@ -217,65 +217,67 @@ export function Destination({ disabled }) {
         </Field>
       </div>
 
-      <div className="tw-mt-8 tw-pt-6 tw-border-t-2">
-        <div className="form__row">
-          <label>
-            <input
-              type="checkbox"
-              onChange={onNextDestinationToggle}
-              disabled={disabled}
-              checked={hasNextDestination}
-              className="td-checkbox"
-            />
-            Je souhaite ajouter une installation intermédiaire de transit ou de
-            groupement d'amiante
-          </label>
-        </div>
-
-        {hasNextDestination && (
-          <>
-            <CompanySelector
-              disabled={disabled}
-              name="destination.company"
-              heading="Installation de transit ou de groupement"
-              registeredOnlyCompanies={true}
-            />
-
-            <div className="form__row">
-              <label>
-                N° CAP: (optionnel)
-                <Field
-                  disabled={disabled}
-                  type="text"
-                  name="destination.cap"
-                  className="td-input td-input--medium"
-                />
-              </label>
-            </div>
-
-            <div className="form__row">
-              <label>
-                Opération d"élimination / valorisation prévue (code D/R)
-              </label>
-              <Field
-                as="select"
-                name="destination.plannedOperationCode"
-                className="td-select"
+      {values.type !== BsdaType.Collection_2710 && (
+        <div className="tw-mt-8 tw-pt-6 tw-border-t-2">
+          <div className="form__row">
+            <label>
+              <input
+                type="checkbox"
+                onChange={onNextDestinationToggle}
                 disabled={disabled}
-              >
-                <option />
-                <option value="R 13">
-                  R 13 - Opérations de transit incluant le groupement sans
-                  transvasement préalable à R 5
-                </option>
-                <option value="D 15">
-                  D 15 - Transit incluant le groupement sans transvasement
-                </option>
-              </Field>
-            </div>
-          </>
-        )}
-      </div>
+                checked={hasNextDestination}
+                className="td-checkbox"
+              />
+              Je souhaite ajouter une installation intermédiaire de transit ou
+              de groupement d'amiante
+            </label>
+          </div>
+
+          {hasNextDestination && (
+            <>
+              <CompanySelector
+                disabled={disabled}
+                name="destination.company"
+                heading="Installation de transit ou de groupement"
+                registeredOnlyCompanies={true}
+              />
+
+              <div className="form__row">
+                <label>
+                  N° CAP: (optionnel)
+                  <Field
+                    disabled={disabled}
+                    type="text"
+                    name="destination.cap"
+                    className="td-input td-input--medium"
+                  />
+                </label>
+              </div>
+
+              <div className="form__row">
+                <label>
+                  Opération d"élimination / valorisation prévue (code D/R)
+                </label>
+                <Field
+                  as="select"
+                  name="destination.plannedOperationCode"
+                  className="td-select"
+                  disabled={disabled}
+                >
+                  <option />
+                  <option value="R 13">
+                    R 13 - Opérations de transit incluant le groupement sans
+                    transvasement préalable à R 5
+                  </option>
+                  <option value="D 15">
+                    D 15 - Transit incluant le groupement sans transvasement
+                  </option>
+                </Field>
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       <h4 className="form__section-heading">Informations complémentaires</h4>
 
