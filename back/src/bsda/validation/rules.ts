@@ -1,7 +1,6 @@
 import { BsdaType, Prisma, WasteAcceptationStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
 import { BsdaSignatureType } from "../../generated/graphql/types";
-import { PARTIAL_OPERATIONS } from "./constants";
 import { ZodBsda } from "./schema";
 import { isForeignVat } from "../../common/constants/companySearchHelpers";
 import { capitalize } from "../../common/strings";
@@ -160,14 +159,8 @@ export const editionRules: EditionRules = {
     required: {
       from: "EMISSION",
       when: bsda =>
-        [
-          BsdaType.COLLECTION_2710,
-          BsdaType.GATHERING,
-          BsdaType.RESHIPMENT
-        ].every(type => bsda.type !== type) &&
-        PARTIAL_OPERATIONS.every(
-          op => bsda.destinationPlannedOperationCode !== op
-        )
+        bsda.type === BsdaType.OTHER_COLLECTIONS &&
+        !Boolean(bsda.destinationOperationNextDestinationCompanySiret)
     }
   },
   destinationPlannedOperationCode: {
@@ -214,21 +207,41 @@ export const editionRules: EditionRules = {
     sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCompanyAddress: {
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    required: {
+      from: "EMISSION",
+      when: bsda =>
+        Boolean(bsda.destinationOperationNextDestinationCompanySiret)
+    }
   },
   destinationOperationNextDestinationCompanyContact: {
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    required: {
+      from: "EMISSION",
+      when: bsda =>
+        Boolean(bsda.destinationOperationNextDestinationCompanySiret)
+    }
   },
   destinationOperationNextDestinationCompanyPhone: {
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    required: {
+      from: "EMISSION",
+      when: bsda =>
+        Boolean(bsda.destinationOperationNextDestinationCompanySiret)
+    }
   },
   destinationOperationNextDestinationCompanyMail: {
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    required: {
+      from: "EMISSION",
+      when: bsda =>
+        Boolean(bsda.destinationOperationNextDestinationCompanySiret)
+    }
   },
   destinationOperationNextDestinationCap: {
     sealed: { from: "OPERATION" },
     required: {
-      from: "OPERATION",
+      from: "EMISSION",
       when: bsda =>
         Boolean(bsda.destinationOperationNextDestinationCompanySiret)
     }
@@ -236,7 +249,7 @@ export const editionRules: EditionRules = {
   destinationOperationNextDestinationPlannedOperationCode: {
     sealed: { from: "OPERATION" },
     required: {
-      from: "OPERATION",
+      from: "EMISSION",
       when: bsda =>
         Boolean(bsda.destinationOperationNextDestinationCompanySiret)
     }

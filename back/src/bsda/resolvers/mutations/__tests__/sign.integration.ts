@@ -138,6 +138,61 @@ describe("Mutation.Bsda.sign", () => {
       ]);
     });
 
+    it("should throw error if the destination (exutoire) is not completed", async () => {
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: null,
+          destinationCompanyName: null,
+          destinationCompanyAddress: null,
+          destinationCompanyContact: null,
+          destinationCompanyPhone: null,
+          destinationCompanyMail: null,
+          destinationCap: null,
+          destinationPlannedOperationCode: null
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            author: user.name,
+            type: "EMISSION"
+          }
+        }
+      });
+
+      console.log(errors);
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le champ destinationCompanyName est obligatoire.\n" +
+            "Le champ destinationCompanySiret est obligatoire.\n" +
+            "Le champ destinationCompanyAddress est obligatoire.\n" +
+            "Le champ destinationCompanyContact est obligatoire.\n" +
+            "Le champ destinationCompanyPhone est obligatoire.\n" +
+            "Le champ destinationCompanyMail est obligatoire.\n" +
+            "Le champ destinationCap est obligatoire.\n" +
+            "Le champ destinationPlannedOperationCode est obligatoire."
+        })
+      ]);
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          extensions: expect.objectContaining({
+            code: "BAD_USER_INPUT"
+          })
+        })
+      ]);
+    });
+
     it("should allow the transporter to sign for the emitter with the security code", async () => {
       const emitter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
