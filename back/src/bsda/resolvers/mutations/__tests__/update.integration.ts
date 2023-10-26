@@ -361,7 +361,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationCompanySiret"
+          "Le champ destinationCompanySiret a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -379,6 +379,7 @@ describe("Mutation.updateBsda", () => {
         emitterCompanySiret: emitter.siret,
         transporterCompanySiret: transporter.siret,
         emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date(),
         transporterTransportSignatureDate: new Date()
       }
     });
@@ -405,7 +406,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationCompanySiret"
+          "Le champ destinationCompanySiret a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -489,7 +490,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationCompanySiret"
+          "Le champ destinationCompanySiret a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1093,12 +1094,20 @@ describe("Mutation.updateBsda", () => {
         },
         operation: {
           nextDestination: {
-            company: { siret: destination.company.siret }
+            company: {
+              siret: destination.company.siret,
+              address: "adresse",
+              contact: "contact",
+              phone: "0101010101",
+              mail: "o@o.fr"
+            },
+            plannedOperationCode: "R 5",
+            cap: "cap"
           }
         }
       }
     };
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
     >(UPDATE_BSDA, {
@@ -1107,6 +1116,8 @@ describe("Mutation.updateBsda", () => {
         input
       }
     });
+
+    console.log(errors);
 
     const updatedBsda = await prisma.bsda.findUnique({
       where: { id: data.updateBsda.id }
@@ -1140,7 +1151,15 @@ describe("Mutation.updateBsda", () => {
         },
         operation: {
           nextDestination: {
-            company: { siret: transporter.company.siret }
+            company: {
+              siret: transporter.company.siret,
+              address: "adresse",
+              contact: "contact",
+              phone: "0101010101",
+              mail: "o@o.fr"
+            },
+            plannedOperationCode: "R 5",
+            cap: "cap"
           }
         }
       }

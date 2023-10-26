@@ -539,8 +539,8 @@ function isNotRefused(bsda: ZodBsda) {
 
 function isDestinationSealed(val: ZodBsda, userFunctions: UserFunctions) {
   const isSealedForEmitter = hasWorker(val)
-    ? val.workerWorkSignatureDate == null
-    : val.transporterTransportSignatureDate == null;
+    ? val.workerWorkSignatureDate != null
+    : val.transporterTransportSignatureDate != null;
 
   if (userFunctions.isEmitter && !isSealedForEmitter) {
     return false;
