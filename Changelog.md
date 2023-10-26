@@ -11,20 +11,24 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
-#### :bug: Corrections de bugs
-
+- Correction d'un bug qui empêchait d'enlever tous les intermédiaires sur un BSDA [PR 2781](https://github.com/MTES-MCT/trackdechets/pull/2781)
 
 #### :boom: Breaking changes
 
 - Rendre authentifiée la requête api `searchCompanies` [PR 2781](https://github.com/MTES-MCT/trackdechets/pull/2781)
+- Abaissement du nombre maximum d'éléments renvoyés par page à 100 pour la query `forms` [PR 2782](https://github.com/MTES-MCT/trackdechets/pull/2782)
+- Le mode de traitement devient obligatoire pour l'étape de traitement de l'exutoire [PR 2765](https://github.com/MTES-MCT/trackdechets/pull/2765)
+- Le profil VHU est obligatoire pour les exutoires de VHU [PR 2780](https://github.com/MTES-MCT/trackdechets/pull/2780)
+- Les informations sur le conditionnement sont obligatoires lors de la signature prodcuteur sur le BSDD [PR 2770](https://github.com/MTES-MCT/trackdechets/pull/2770)
+- Dépréciation de la signature d'annexes 1 avec la mutation `signedByTransporter` [PR 2768](https://github.com/MTES-MCT/trackdechets/pull/2768)
 
 #### :nail_care: Améliorations
 
-#### :house: Interne
+- Amélioration des résultats renvoyés lors du filtre par SIRETs sur le tableau de bord [PR 2756](https://github.com/MTES-MCT/trackdechets/pull/2756)
 
 #### :house: Interne
 
-
+- Amélioration des règles de validation BSDA [PR 2789](https://github.com/MTES-MCT/trackdechets/pull/2789)
 
 # [2023.10.1] 10/10/2023
 
@@ -34,9 +38,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Lorsqu'une demande de révision met à jour le code déchet, le champ `wasteDetailsIsDangerous` aussi se met à jour [PR 2708](https://github.com/MTES-MCT/trackdechets/pull/2708)
 - En préparation du bordereau PAOH, le profil d'entreprise "crématorium" est disponible [PR 2743](https://github.com/MTES-MCT/trackdechets/pull/2743)
-
-#### :bug: Corrections de bugs
-
 - Il n'est plus possible de corriger la quantité reçue avant réception par l'exutoire, et de dépasser 40T pour du transport routier [PR 2719](https://github.com/MTES-MCT/trackdechets/pull/2719)
 - Dans les PDFs des BSDDs, les totaux des conditionnements ont été corrigés [PR 2725](https://github.com/MTES-MCT/trackdechets/pull/2725)
 - Pour les BSDA avec destination finale, il est désormais possible d'éditer le code d'opération finale si celui-ci avait été oublié au moment de la signature du TTR [PR 2751](https://github.com/MTES-MCT/trackdechets/pull/2751)
@@ -56,8 +57,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Optimisation appendixForms : pré-calcul de quantityGrouped [PR 2701](https://github.com/MTES-MCT/trackdechets/pull/2701) 
-
-#### :house: Interne
 - Suppression du script `npm run queue:obliterate` [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
 
 # [2023.9.1] 19/09/2023
