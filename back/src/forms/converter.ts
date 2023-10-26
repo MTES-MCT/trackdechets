@@ -3,7 +3,6 @@ import {
   Prisma,
   BsddTransporter,
   TransportMode,
-  Form,
   IntermediaryFormAssociation
 } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
@@ -846,7 +845,14 @@ export async function expandFormFromElastic(
   };
 }
 
-export function expandInitialFormFromDb(prismaForm: Form): InitialForm {
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+
+export function expandInitialFormFromDb(
+  prismaForm: Optional<
+    PrismaFormWithForwardedInAndTransporters,
+    "transporters" | "forwardedIn"
+  >
+): InitialForm {
   const {
     id,
     readableId,
@@ -860,7 +866,11 @@ export function expandInitialFormFromDb(prismaForm: Form): InitialForm {
     quantityReceived,
     processingOperationDone,
     quantityGrouped
-  } = expandFormFromDb({ ...prismaForm, transporters: [], forwardedIn: null });
+  } = expandFormFromDb({
+    ...prismaForm,
+    transporters: prismaForm.transporters ?? [],
+    forwardedIn: prismaForm.forwardedIn ?? null
+  });
 
   const hasPickupSite =
     emitter?.workSite?.postalCode && emitter.workSite.postalCode.length > 0;
