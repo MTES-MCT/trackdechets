@@ -577,7 +577,7 @@ const DashboardPage = () => {
         <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
       )}
       {(isFetchingMore || isLoadingBsds) && <Loader />}
-      {!Boolean(bsdsTotalCount) && (
+      {!Boolean(bsdsTotalCount) && !isLoadingBsds && (
         <div className="dashboard-page__blankstate">
           <Blankslate>
             {getBlankstateTitle() && (

@@ -162,8 +162,10 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 type="submit"
                 className="btn btn--primary"
                 onClick={async () => {
-                  await markAsSealed();
-                  onClose();
+                  const res = await markAsSealed();
+                  if (!res.errors) {
+                    onClose();
+                  }
                 }}
               >
                 Je valide
@@ -192,12 +194,14 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             <button
               className="btn btn--primary"
               onClick={async () => {
-                await publishBsda({
+                const res = await publishBsda({
                   variables: {
                     id: bsd.id,
                   },
                 });
-                onClose();
+                if (!res.errors) {
+                  onClose();
+                }
               }}
             >
               <span>Publier le bordereau</span>
@@ -237,8 +241,10 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             <button
               className="btn btn--primary"
               onClick={async () => {
-                await publishBsff();
-                onClose();
+                const res = await publishBsff();
+                if (!res.errors) {
+                  onClose();
+                }
               }}
             >
               <span>Publier le bordereau</span>
@@ -262,12 +268,14 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             <button
               className="btn btn--primary"
               onClick={async () => {
-                await publishBsvhu({
+                const res = await publishBsvhu({
                   variables: {
                     id: bsd.id,
                   },
                 });
-                onClose();
+                if (!res.errors) {
+                  onClose();
+                }
               }}
             >
               <span>Publier le bordereau</span>

@@ -1,6 +1,7 @@
 import { TransportMode, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
+  BsdaInput,
   Mutation,
   MutationUpdateBsdaArgs
 } from "../../../../generated/graphql/types";
@@ -281,6 +282,215 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Le champ emitterCompanyName a été vérouillé via signature et ne peut pas être modifié."
+      })
+    ]);
+  });
+
+  it("should allow emitter to update destination when he is the only one to have signed", async () => {
+    const { company: emitter, user } = await userWithCompanyFactory("ADMIN");
+    const destination = await companyFactory();
+    const destination2 = await companyFactory();
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        destinationCompanySiret: destination.siret,
+        emitterCompanySiret: emitter.siret,
+        emitterEmissionSignatureDate: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: destination2.siret
+        }
+      }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
+  it("should not allow emitter to update destination if the worker has signed", async () => {
+    const { company: emitter, user } = await userWithCompanyFactory("ADMIN");
+    const destination = await companyFactory();
+    const destination2 = await companyFactory();
+    const worker = await companyFactory();
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_WORKER",
+        destinationCompanySiret: destination.siret,
+        emitterCompanySiret: emitter.siret,
+        workerCompanySiret: worker.siret,
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: destination2.siret
+        }
+      }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le champ destinationCompanySiret a été vérouillé via signature et ne peut pas être modifié."
+      })
+    ]);
+  });
+
+  it("should not allow emitter to update destination if the transporter has signed", async () => {
+    const { company: emitter, user } = await userWithCompanyFactory("ADMIN");
+    const destination = await companyFactory();
+    const destination2 = await companyFactory();
+    const transporter = await companyFactory();
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SENT",
+        destinationCompanySiret: destination.siret,
+        emitterCompanySiret: emitter.siret,
+        transporterCompanySiret: transporter.siret,
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: destination2.siret
+        }
+      }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le champ destinationCompanySiret a été vérouillé via signature et ne peut pas être modifié."
+      })
+    ]);
+  });
+
+  it("should allow worker to update waste info", async () => {
+    const { company: worker, user } = await userWithCompanyFactory("ADMIN");
+    const destination = await companyFactory();
+    const emitter = await companyFactory();
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        destinationCompanySiret: destination.siret,
+        emitterCompanySiret: emitter.siret,
+        workerCompanySiret: worker.siret,
+        emitterEmissionSignatureDate: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input: BsdaInput = {
+      waste: {
+        materialName: "Fibrociment",
+        familyCode: "code famille",
+        sealNumbers: ["1", "2"],
+        adr: "ADR"
+      },
+      weight: { value: 1, isEstimate: false },
+      packagings: [{ type: "BIG_BAG", quantity: 1 }]
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
+  it("should not allow worker to update destination after emitter's signature", async () => {
+    const { company: worker, user } = await userWithCompanyFactory("ADMIN");
+    const destination = await companyFactory();
+    const destination2 = await companyFactory();
+    const emitter = await companyFactory();
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        destinationCompanySiret: destination.siret,
+        emitterCompanySiret: emitter.siret,
+        workerCompanySiret: worker.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: destination2.siret
+        }
+      }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le champ destinationCompanySiret a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -861,13 +1071,17 @@ describe("Mutation.updateBsda", () => {
   it("should allow updating destination if the planned destination becomes the nextDestination", async () => {
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination2 = await companyFactory();
+    const worker = await companyFactory();
+
     const bsda = await bsdaFactory({
       opt: {
         status: "SIGNED_BY_WORKER",
         destinationCompanySiret: destination.company.siret,
         transporterCompanySiret: transporter.company.siret,
-        emitterEmissionSignatureAuthor: "Emit",
-        workerWorkSignatureAuthor: "Work"
+        workerCompanySiret: worker.siret,
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
       }
     });
 
@@ -876,16 +1090,24 @@ describe("Mutation.updateBsda", () => {
     const input = {
       destination: {
         company: {
-          siret: transporter.company.siret
+          siret: destination2.siret
         },
         operation: {
           nextDestination: {
-            company: { siret: destination.company.siret }
+            company: {
+              siret: destination.company.siret,
+              address: "adresse",
+              contact: "contact",
+              phone: "0101010101",
+              mail: "o@o.fr"
+            },
+            plannedOperationCode: "R 5",
+            cap: "cap"
           }
         }
       }
     };
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
     >(UPDATE_BSDA, {
@@ -895,13 +1117,13 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
+    console.log(errors);
+
     const updatedBsda = await prisma.bsda.findUnique({
       where: { id: data.updateBsda.id }
     });
 
-    expect(updatedBsda?.destinationCompanySiret).toBe(
-      transporter.company.siret
-    );
+    expect(updatedBsda?.destinationCompanySiret).toBe(destination2.siret);
     expect(updatedBsda?.destinationOperationNextDestinationCompanySiret).toBe(
       destination.company.siret
     );
@@ -929,7 +1151,15 @@ describe("Mutation.updateBsda", () => {
         },
         operation: {
           nextDestination: {
-            company: { siret: transporter.company.siret }
+            company: {
+              siret: transporter.company.siret,
+              address: "adresse",
+              contact: "contact",
+              phone: "0101010101",
+              mail: "o@o.fr"
+            },
+            plannedOperationCode: "R 5",
+            cap: "cap"
           }
         }
       }
