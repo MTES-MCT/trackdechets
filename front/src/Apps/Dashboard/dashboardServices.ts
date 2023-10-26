@@ -256,7 +256,7 @@ export const isBsffSign = (
   currentSiret: string,
   bsdCurrentTab: BsdCurrentTab
 ) => {
-  const isActTab = bsdCurrentTab === "actTab";
+  const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
   return isBsff(bsd.type) && !isActTab && isSameSiretEmmiter(currentSiret, bsd);
 };
 
@@ -272,7 +272,7 @@ export const getIsNonDraftLabel = (
   permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
-  const isActTab = bsdCurrentTab === "actTab";
+  const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
   const isFollowTab = bsdCurrentTab === "followTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
 
@@ -446,7 +446,7 @@ export const getSentBtnLabel = (
   permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
-  const isActTab = bsdCurrentTab === "actTab";
+  const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
 
   if (hasRoadControlButton(bsd, isCollectedTab)) {
@@ -512,7 +512,7 @@ export const getReceivedBtnLabel = (
   permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
-  const isActTab = bsdCurrentTab === "actTab";
+  const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
 
   if (
     isBsdasri(bsd.type) &&
