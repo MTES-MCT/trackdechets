@@ -208,6 +208,7 @@ const hasTemporaryStorage = (currentSiret: string, bsd: BsdDisplay): boolean =>
   [
     bsd.destination?.company?.siret,
     bsd.temporaryStorageDetail?.transporter?.company?.siret,
+    bsd.temporaryStorageDetail?.transporter?.company?.orgId,
   ].includes(currentSiret);
 
 const isSameSiretTemporaryStorageTransporter = (
@@ -426,6 +427,9 @@ export const getSealedBtnLabel = (
         return SIGNER;
       }
       return FAIRE_SIGNER;
+    }
+    if (bsd.emitterType === EmitterType.Producer) {
+      return SIGNER;
     }
     if (hasEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
       return FAIRE_SIGNER;
@@ -693,7 +697,7 @@ export const getResealedBtnLabel = (
     hasTemporaryStorage(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignEmission)
   ) {
-    return SIGNER;
+    return FAIRE_SIGNER;
   }
   return "";
 };
