@@ -15,7 +15,7 @@ export function getUnparsedBsda({ input, persisted, isDraft }: UnparsedInputs) {
   return {
     ...persisted,
     ...flattenedInput,
-    isDraft,
+    isDraft: isDraft ?? persisted.isDraft,
     intermediaries: input?.intermediaries ?? persisted?.intermediaries,
     grouping: input?.grouping ?? persisted?.grouping.map(bsda => bsda.id),
     forwarding: input?.forwarding ?? persisted?.forwarding?.id
