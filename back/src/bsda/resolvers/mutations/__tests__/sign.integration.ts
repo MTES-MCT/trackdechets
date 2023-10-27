@@ -173,14 +173,14 @@ describe("Mutation.Bsda.sign", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Le champ destinationCompanyName est obligatoire.\n" +
-            "Le champ destinationCompanySiret est obligatoire.\n" +
-            "Le champ destinationCompanyAddress est obligatoire.\n" +
-            "Le champ destinationCompanyContact est obligatoire.\n" +
-            "Le champ destinationCompanyPhone est obligatoire.\n" +
-            "Le champ destinationCompanyMail est obligatoire.\n" +
-            "Le champ destinationCap est obligatoire.\n" +
-            "Le champ destinationPlannedOperationCode est obligatoire."
+            "Le nom de l'entreprise de destination est obligatoire.\n" +
+            "Le SIRET de l'entreprise de destination est obligatoire.\n" +
+            "L'adresse de l'entreprise de destination est obligatoire.\n" +
+            "Le contact de l'entreprise de destination est obligatoire.\n" +
+            "Le téléphone de l'entreprise de destination est obligatoire.\n" +
+            "L'email de l'entreprise de destination est obligatoire.\n" +
+            "Le CAP du destinataire est obligatoire.\n" +
+            "Le code d'opération de la destination est obligatoire."
         })
       ]);
 
