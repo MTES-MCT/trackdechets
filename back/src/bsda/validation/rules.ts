@@ -60,10 +60,12 @@ export const editionRules: EditionRules = {
     required: { from: "EMISSION" }
   },
   emitterCompanyName: {
+    readableFieldName: "le nom de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
     required: { from: "EMISSION" }
   },
   emitterCompanySiret: {
+    readableFieldName: "le SIRET de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
     required: {
       from: "EMISSION",
@@ -71,10 +73,12 @@ export const editionRules: EditionRules = {
     }
   },
   emitterCompanyAddress: {
+    readableFieldName: "l'adresse de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
     required: { from: "EMISSION" }
   },
   emitterCompanyContact: {
+    readableFieldName: "le contact de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
     required: {
       from: "EMISSION",
@@ -82,6 +86,7 @@ export const editionRules: EditionRules = {
     }
   },
   emitterCompanyPhone: {
+    readableFieldName: "le téléphone de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
     required: {
       from: "EMISSION",
@@ -89,6 +94,7 @@ export const editionRules: EditionRules = {
     }
   },
   emitterCompanyMail: {
+    readableFieldName: "l'email de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
     required: {
       from: "EMISSION",
@@ -112,6 +118,7 @@ export const editionRules: EditionRules = {
   },
   ecoOrganismeSiret: { sealed: { from: "TRANSPORT" } },
   destinationCompanyName: {
+    readableFieldName: "le nom de l'entreprise de destination",
     sealed: {
       from: "EMISSION",
       when: isDestinationSealed
@@ -119,6 +126,7 @@ export const editionRules: EditionRules = {
     required: { from: "EMISSION" }
   },
   destinationCompanySiret: {
+    readableFieldName: "le SIRET de l'entreprise de destination",
     sealed: {
       from: "EMISSION",
       when: isDestinationSealed
@@ -126,6 +134,7 @@ export const editionRules: EditionRules = {
     required: { from: "EMISSION" }
   },
   destinationCompanyAddress: {
+    readableFieldName: "l'adresse de l'entreprise de destination",
     sealed: {
       from: "EMISSION",
       when: isDestinationSealed
@@ -133,6 +142,7 @@ export const editionRules: EditionRules = {
     required: { from: "EMISSION" }
   },
   destinationCompanyContact: {
+    readableFieldName: "le contact de l'entreprise de destination",
     sealed: {
       from: "EMISSION",
       when: isDestinationSealed
@@ -140,6 +150,7 @@ export const editionRules: EditionRules = {
     required: { from: "EMISSION" }
   },
   destinationCompanyPhone: {
+    readableFieldName: "le téléphone de l'entreprise de destination",
     sealed: {
       from: "EMISSION",
       when: isDestinationSealed
@@ -147,6 +158,7 @@ export const editionRules: EditionRules = {
     required: { from: "EMISSION" }
   },
   destinationCompanyMail: {
+    readableFieldName: "l'email de l'entreprise de destination",
     sealed: {
       from: "EMISSION",
       when: isDestinationSealed
@@ -155,6 +167,7 @@ export const editionRules: EditionRules = {
   },
   destinationCustomInfo: { sealed: { from: "OPERATION" } },
   destinationCap: {
+    readableFieldName: "le CAP du destinataire",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "EMISSION",
@@ -164,6 +177,7 @@ export const editionRules: EditionRules = {
     }
   },
   destinationPlannedOperationCode: {
+    readableFieldName: "le code d'opération de la destination",
     sealed: { from: "TRANSPORT" },
     required: { from: "EMISSION" }
   },
@@ -198,15 +212,18 @@ export const editionRules: EditionRules = {
     required: { from: "OPERATION", when: isNotRefused }
   },
   destinationOperationNextDestinationCompanyName: {
+    readableFieldName: "le nom de l'exutoire",
     sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCompanySiret: {
+    readableFieldName: "le SIRET de l'exutoire",
     sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCompanyVatNumber: {
     sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCompanyAddress: {
+    readableFieldName: "l'adresse de l'exutoire",
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
@@ -215,6 +232,7 @@ export const editionRules: EditionRules = {
     }
   },
   destinationOperationNextDestinationCompanyContact: {
+    readableFieldName: "le contact de l'exutoire",
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
@@ -223,6 +241,7 @@ export const editionRules: EditionRules = {
     }
   },
   destinationOperationNextDestinationCompanyPhone: {
+    readableFieldName: "le téléphone de l'exutoire",
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
@@ -231,6 +250,7 @@ export const editionRules: EditionRules = {
     }
   },
   destinationOperationNextDestinationCompanyMail: {
+    readableFieldName: "l'email de l'exutoire",
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
@@ -239,6 +259,7 @@ export const editionRules: EditionRules = {
     }
   },
   destinationOperationNextDestinationCap: {
+    readableFieldName: "le CAP de l'exutoire",
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
@@ -247,6 +268,7 @@ export const editionRules: EditionRules = {
     }
   },
   destinationOperationNextDestinationPlannedOperationCode: {
+    readableFieldName: "le code d'opétation de l'exutoire",
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
@@ -259,16 +281,18 @@ export const editionRules: EditionRules = {
     required: { from: "TRANSPORT", when: hasTransporter }
   },
   transporterCompanySiret: {
+    readableFieldName: "le SIRET du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "EMISSION",
       when: bsda => {
-        // Transporter required if there is no worker and the emitter is a private individual
+        // Transporter is required if there is no worker and the emitter is a private individual.
         // This is to avoid usage of an OTHER_COLLECTIONS BSDA instead of a COLLECTION_2710
         if (
           bsda.emitterIsPrivateIndividual &&
           bsda.type === BsdaType.OTHER_COLLECTIONS &&
-          bsda.workerIsDisabled
+          bsda.workerIsDisabled &&
+          !bsda.transporterCompanyVatNumber
         ) {
           return true;
         }
@@ -276,10 +300,13 @@ export const editionRules: EditionRules = {
         // Otherwise, the transporter is only required for the transporter signature.
         // No specific check needed as anyway he cannot sign without being part of the bsda
         return false;
-      }
+      },
+      suffix:
+        "Si l'émetteur est un particulier et qu'aucune entreprise de travaux n'a été visée, l'ajout d'un transporteur est obligatoire."
     }
   },
   transporterCompanyAddress: {
+    readableFieldName: "l'adresse du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
@@ -287,6 +314,7 @@ export const editionRules: EditionRules = {
     }
   },
   transporterCompanyContact: {
+    readableFieldName: "le contact du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
@@ -294,6 +322,7 @@ export const editionRules: EditionRules = {
     }
   },
   transporterCompanyPhone: {
+    readableFieldName: "le téléphone du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
@@ -301,6 +330,7 @@ export const editionRules: EditionRules = {
     }
   },
   transporterCompanyMail: {
+    readableFieldName: "l'email du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
@@ -308,10 +338,24 @@ export const editionRules: EditionRules = {
     }
   },
   transporterCompanyVatNumber: {
+    readableFieldName: "le numéro de TVA du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
-      from: "TRANSPORT",
-      when: bsda => !bsda.transporterCompanySiret && hasTransporter(bsda)
+      from: "EMISSION",
+      when: bsda => {
+        // Transporter is required if there is no worker and the emitter is a private individual.
+        // This is to avoid usage of an OTHER_COLLECTIONS BSDA instead of a COLLECTION_2710
+        if (
+          bsda.emitterIsPrivateIndividual &&
+          bsda.type === BsdaType.OTHER_COLLECTIONS &&
+          bsda.workerIsDisabled &&
+          !bsda.transporterCompanySiret
+        ) {
+          return true;
+        }
+
+        return false;
+      }
     }
   },
   transporterCustomInfo: { sealed: { from: "TRANSPORT" } },
@@ -394,6 +438,7 @@ export const editionRules: EditionRules = {
     }
   },
   workerCompanyName: {
+    readableFieldName: "le nom de l'entreprise de travaux",
     sealed: { from: "EMISSION" },
     required: {
       from: "EMISSION",
@@ -401,6 +446,7 @@ export const editionRules: EditionRules = {
     }
   },
   workerCompanySiret: {
+    readableFieldName: "le SIRET de l'entreprise de travaux",
     sealed: { from: "EMISSION" },
     required: {
       from: "EMISSION",
@@ -408,6 +454,7 @@ export const editionRules: EditionRules = {
     }
   },
   workerCompanyAddress: {
+    readableFieldName: "l'adresse de l'entreprise de travaux",
     sealed: { from: "EMISSION" },
     required: {
       from: "EMISSION",
@@ -415,6 +462,7 @@ export const editionRules: EditionRules = {
     }
   },
   workerCompanyContact: {
+    readableFieldName: "le contact de l'entreprise de travaux",
     sealed: { from: "EMISSION" },
     required: {
       from: "EMISSION",
@@ -422,6 +470,7 @@ export const editionRules: EditionRules = {
     }
   },
   workerCompanyPhone: {
+    readableFieldName: "le téléphone de l'entreprise de travaux",
     sealed: { from: "EMISSION" },
     required: {
       from: "EMISSION",
@@ -429,6 +478,7 @@ export const editionRules: EditionRules = {
     }
   },
   workerCompanyMail: {
+    readableFieldName: "l'email de l'entreprise de travaux",
     sealed: { from: "EMISSION" },
     required: {
       from: "EMISSION",
@@ -445,6 +495,7 @@ export const editionRules: EditionRules = {
     sealed: { from: "WORK" }
   },
   workerCertificationCertificationNumber: {
+    readableFieldName: "le numéro de certification de l'entreprise de travaux",
     sealed: { from: "WORK" },
     required: {
       from: "WORK",

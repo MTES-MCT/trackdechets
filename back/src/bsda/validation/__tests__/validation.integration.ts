@@ -577,7 +577,7 @@ describe("BSDA Sealed rules checks", () => {
       );
     } catch (error) {
       expect(error.issues[0].message).toBe(
-        "Le champ emitterCompanyName a été vérouillé via signature et ne peut pas être modifié."
+        "Le nom de l'entreprise émettrice a été vérouillé via signature et ne peut pas être modifié."
       );
     }
   });

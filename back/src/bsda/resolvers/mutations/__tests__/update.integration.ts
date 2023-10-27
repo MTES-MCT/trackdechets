@@ -281,7 +281,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le champ emitterCompanyName a été vérouillé via signature et ne peut pas être modifié."
+          "Le nom de l'entreprise émettrice a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -361,7 +361,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le champ destinationCompanySiret a été vérouillé via signature et ne peut pas être modifié."
+          "Le SIRET de l'entreprise de destination a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -406,7 +406,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le champ destinationCompanySiret a été vérouillé via signature et ne peut pas être modifié."
+          "Le SIRET de l'entreprise de destination a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -490,7 +490,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le champ destinationCompanySiret a été vérouillé via signature et ne peut pas être modifié."
+          "Le SIRET de l'entreprise de destination a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -568,7 +568,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le champ workerCompanySiret a été vérouillé via signature et ne peut pas être modifié."
+          "Le SIRET de l'entreprise de travaux a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
