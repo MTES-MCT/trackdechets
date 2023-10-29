@@ -472,28 +472,46 @@ describe("DateFilter to elastic query", () => {
     const bsds: Partial<BsdElastic>[] = [
       {
         id: "1",
-        createdAt: new Date("2023-01-01").getTime(),
+        createdAt: new Date("2023-01-01T15:00:00").getTime(),
         updatedAt: new Date().getTime()
       },
       {
         id: "2",
-        createdAt: new Date("2023-01-02").getTime(),
+        createdAt: new Date("2023-01-02T23:00:00").getTime(),
         updatedAt: new Date().getTime()
       },
       {
         id: "3",
-        createdAt: new Date("2023-01-03").getTime(),
+        createdAt: new Date("2023-01-03T09:00:00").getTime(),
         updatedAt: new Date().getTime()
       },
       {
         id: "4",
-        createdAt: new Date("2023-01-04").getTime(),
+        createdAt: new Date("2023-01-04T11:30:30").getTime(),
         updatedAt: new Date().getTime()
       }
     ];
 
     await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
     await refreshElasticSearch();
+  });
+
+  it("should match when _lte and _gte are equal", async () => {
+    const dateFilter: BsdWhere = {
+      createdAt: { _lte: new Date("2023-01-01"), _gte: new Date("2023-01-01") }
+    };
+
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(dateFilter)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.id).toEqual("1");
   });
 
   it("should match for _eq when value is equal", async () => {
