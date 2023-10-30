@@ -1,4 +1,4 @@
-import { Bsff, BsffPackaging, BsffType } from "@prisma/client";
+import { Bsff, BsffPackaging, BsffType, OperationMode } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { BsdElastic } from "../common/elastic";
 import {
@@ -82,6 +82,7 @@ function toGenericWaste(
       ? bsffDestination.receptionWeight / 1000
       : bsffDestination.receptionWeight,
     destinationOperationCode: bsffDestination.operationCode,
+    destinationOperationMode: bsffDestination.operationMode as OperationMode,
     transporterRecepisseIsExempted: false,
     wasteAdr: bsff.wasteAdr,
     workerCompanyName: null,
@@ -135,6 +136,7 @@ export function toIncomingWaste(
     destinationReceptionDate: bsff.destinationReceptionDate,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
+    destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
     ...initialEmitter,

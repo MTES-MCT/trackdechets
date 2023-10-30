@@ -20,6 +20,7 @@ type BsffDestination = {
   receptionDate: Date;
   receptionRefusalReason: string;
   operationCode: string;
+  operationMode: string;
   operationDate: Date;
 };
 
@@ -103,6 +104,21 @@ export function toBsffDestination(
     ? [...new Set(operationCodes)].join(" ")
     : null;
 
+  const operationModes = hasAnyOperation
+    ? packagings
+        .filter(p => !!p.operationSignatureDate && !!p.operationMode)
+        .map(p => {
+          let res = p.operationMode;
+          if (p.operationMode)
+            res += " (" + getOperationModeLabel(p.operationMode) + ")";
+          return res;
+        })
+    : [];
+
+  const operationMode = hasAnyOperation
+    ? [...new Set(operationModes)].join(" ")
+    : null;
+
   // returns last date
   const operationDate = hasAnyOperation
     ? [...packagings.map(p => p.operationDate).filter(Boolean)].sort(
@@ -116,6 +132,7 @@ export function toBsffDestination(
     receptionAcceptationStatus,
     receptionRefusalReason,
     operationCode,
+    operationMode,
     operationDate
   };
 }

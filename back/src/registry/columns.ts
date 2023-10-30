@@ -167,13 +167,13 @@ const columns: Column[] = [
   },
   {
     field: "destinationPlannedOperationCode",
-    label: "Code opération prévue"
+    label: "Code opération prévu"
   },
   {
     field: "destinationOperationMode",
     label: "Mode de traitement réalisé"
   },
-  { field: "destinationOperationCode", label: "Code opération réalisée" },
+  { field: "destinationOperationCode", label: "Code opération réalisé" },
   {
     field: "destinationOperationNoTraceability",
     label: "Rupture de traçabilité autorisée",
