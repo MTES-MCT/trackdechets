@@ -1039,8 +1039,10 @@ export const canReviewBsdd = bsd =>
   ) &&
   bsd.emitterType !== EmitterType.Appendix1Producer;
 
-export const canReviewBsd = (bsd, siret) =>
-  canReviewBsdd(bsd) || canReviewBsda(bsd, siret);
+export const canReviewBsd = (bsd, siret) => {
+  const isTransporter = isSameSiretTransporter(siret, bsd);
+  return (canReviewBsdd(bsd) || canReviewBsda(bsd, siret)) && !isTransporter;
+};
 
 const canUpdateBsda = bsd =>
   bsd.type === BsdType.Bsda &&
