@@ -92,12 +92,7 @@ export function toBsffDestination(
   const operationCodes = hasAnyOperation
     ? packagings
         .filter(p => !!p.operationSignatureDate && !!p.operationCode)
-        .map(p => {
-          let res = p.operationCode;
-          if (p.operationMode)
-            res += " (" + getOperationModeLabel(p.operationMode) + ")";
-          return res;
-        })
+        .map(p => p.operationCode)
     : [];
 
   const operationCode = hasAnyOperation
@@ -107,12 +102,7 @@ export function toBsffDestination(
   const operationModes = hasAnyOperation
     ? packagings
         .filter(p => !!p.operationSignatureDate && !!p.operationMode)
-        .map(p => {
-          let res = p.operationMode;
-          if (p.operationMode)
-            res += " (" + getOperationModeLabel(p.operationMode) + ")";
-          return res;
-        })
+        .map(p => p.operationMode)
     : [];
 
   const operationMode = hasAnyOperation
