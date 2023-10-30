@@ -81,11 +81,33 @@ function toGenericWaste(bsdd: Bsdd): GenericWaste {
       bsdd.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsdd.destinationOperationDate,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
+    destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
+    destinationOperationCode: bsdd.destinationOperationCode,
+    destinationOperationMode: bsdd.destinationOperationMode,
     transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
     wasteAdr: bsdd.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
-    workerCompanyAddress: null
+    workerCompanyAddress: null,
+    transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
+    transporterCompanyAddress: bsdd.transporterCompanyAddress,
+    transporterCompanyName: bsdd.transporterCompanyName,
+    transporterCompanySiret: bsdd.transporterCompanySiret,
+    transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
+    transporterNumberPlates: bsdd.transporterNumberPlates,
+    transporterCompanyMail: bsdd.transporterCompanyMail,
+    transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
+    transporter2CompanyName: bsdd.transporter2CompanyName,
+    transporter2CompanySiret: bsdd.transporter2CompanySiret,
+    transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
+    transporter2NumberPlates: bsdd.transporter2NumberPlates,
+    transporter2CompanyMail: bsdd.transporter2CompanyMail,
+    transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
+    transporter3CompanyName: bsdd.transporter3CompanyName,
+    transporter3CompanySiret: bsdd.transporter3CompanySiret,
+    transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
+    transporter3NumberPlates: bsdd.transporter3NumberPlates,
+    transporter3CompanyMail: bsdd.transporter3CompanyMail
   };
 }
 
@@ -139,23 +161,8 @@ export function toIncomingWaste(
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
-    transporterCompanyName: bsdd.transporterCompanyName,
-    transporterCompanySiret: bsdd.transporterCompanySiret,
-    transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
-    transporterCompanyMail: bsdd.transporterCompanyMail,
-    destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
-    destinationOperationCode: bsdd.destinationOperationCode,
-    destinationOperationMode: bsdd.destinationOperationMode,
     destinationCustomInfo: null,
-    emitterCompanyMail: bsdd.emitterCompanyMail,
-    transporter2CompanyName: bsdd.transporter2CompanyName,
-    transporter2CompanySiret: bsdd.transporter2CompanySiret,
-    transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
-    transporter2CompanyMail: bsdd.transporter2CompanyMail,
-    transporter3CompanyName: bsdd.transporter3CompanyName,
-    transporter3CompanySiret: bsdd.transporter3CompanySiret,
-    transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
-    transporter3CompanyMail: bsdd.transporter3CompanyMail
+    emitterCompanyMail: bsdd.emitterCompanyMail
   };
 }
 
@@ -194,10 +201,7 @@ export function toOutgoingWaste(
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
-    destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationOperationCode: bsdd.destinationOperationCode,
-    destinationOperationMode: bsdd.destinationOperationMode,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
@@ -211,25 +215,9 @@ export function toOutgoingWaste(
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
-    transporterCompanyAddress: bsdd.transporterCompanyAddress,
-    transporterCompanyName: bsdd.transporterCompanyName,
-    transporterCompanySiret: bsdd.transporterCompanySiret,
-    transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
-    transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
-    transporterCompanyMail: bsdd.transporterCompanyMail,
     weight: bsdd.weightValue,
     emitterCustomInfo: null,
-    destinationCompanyMail: bsdd.destinationCompanyMail,
-    transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
-    transporter2CompanyName: bsdd.transporter2CompanyName,
-    transporter2CompanySiret: bsdd.transporter2CompanySiret,
-    transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
-    transporter2CompanyMail: bsdd.transporter2CompanyMail,
-    transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
-    transporter3CompanyName: bsdd.transporter3CompanyName,
-    transporter3CompanySiret: bsdd.transporter3CompanySiret,
-    transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
-    transporter3CompanyMail: bsdd.transporter3CompanyMail
+    destinationCompanyMail: bsdd.destinationCompanyMail
   };
 }
 
@@ -262,21 +250,8 @@ export function toTransportedWaste(
 
   return {
     ...genericWaste,
-    transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     weight: bsdd.weightValue,
-    transporterCompanyName: bsdd.transporterCompanyName,
-    transporterCompanySiret: bsdd.transporterCompanySiret,
-    transporterCompanyAddress: bsdd.transporterCompanyAddress,
-    transporterNumberPlates: bsdd.transporterNumberPlates,
-    transporter2CompanyName: bsdd.transporter2CompanyName,
-    transporter2CompanySiret: bsdd.transporter2CompanySiret,
-    transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
-    transporter2NumberPlates: bsdd.transporter2NumberPlates,
-    transporter3CompanyName: bsdd.transporter3CompanyName,
-    transporter3CompanySiret: bsdd.transporter3CompanySiret,
-    transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
-    transporter3NumberPlates: bsdd.transporter3NumberPlates,
     ...initialEmitter,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
@@ -296,7 +271,7 @@ export function toTransportedWaste(
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
-    transporterCustomInfo: bsdd.transporterCustomInfo,
+
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail
   };
@@ -340,7 +315,6 @@ export function toManagedWaste(
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
-    destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
@@ -352,21 +326,8 @@ export function toManagedWaste(
       bsdd.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    transporterCompanyAddress: bsdd.transporterCompanyAddress,
-    transporterCompanyName: bsdd.transporterCompanyName,
-    transporterCompanySiret: bsdd.transporterCompanySiret,
-    transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
     emitterCompanyMail: bsdd.emitterCompanyMail,
-    transporterCompanyMail: bsdd.transporterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail,
-    transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
-    transporter2CompanyName: bsdd.transporter2CompanyName,
-    transporter2CompanySiret: bsdd.transporter2CompanySiret,
-    transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
-    transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
-    transporter3CompanyName: bsdd.transporter3CompanyName,
-    transporter3CompanySiret: bsdd.transporter3CompanySiret,
-    transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber
+    destinationCompanyMail: bsdd.destinationCompanyMail
   };
 }
 
@@ -400,7 +361,6 @@ export function toAllWaste(
   return {
     ...genericWaste,
     createdAt: bsdd.createdAt,
-    transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
@@ -408,9 +368,6 @@ export function toAllWaste(
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
-    destinationOperationCode: bsdd.destinationOperationCode,
-    destinationOperationMode: bsdd.destinationOperationMode,
-    destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
@@ -422,12 +379,6 @@ export function toAllWaste(
       bsdd.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    transporterCompanyAddress: bsdd.transporterCompanyAddress,
-    transporterCompanyName: bsdd.transporterCompanyName,
-    transporterCompanySiret: bsdd.transporterCompanySiret,
-    transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
-    transporterNumberPlates: bsdd.transporterNumberPlates,
-    transporterCompanyMail: bsdd.transporterCompanyMail,
     weight: bsdd.weightValue,
     managedEndDate: null,
     managedStartDate: null,
@@ -435,18 +386,6 @@ export function toAllWaste(
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     emitterCompanyMail: bsdd.emitterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail,
-    transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
-    transporter2CompanyName: bsdd.transporter2CompanyName,
-    transporter2CompanySiret: bsdd.transporter2CompanySiret,
-    transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
-    transporter2NumberPlates: bsdd.transporter2NumberPlates,
-    transporter2CompanyMail: bsdd.transporter2CompanyMail,
-    transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
-    transporter3CompanyName: bsdd.transporter3CompanyName,
-    transporter3CompanySiret: bsdd.transporter3CompanySiret,
-    transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
-    transporter3NumberPlates: bsdd.transporter3NumberPlates,
-    transporter3CompanyMail: bsdd.transporter3CompanyMail
+    destinationCompanyMail: bsdd.destinationCompanyMail
   };
 }

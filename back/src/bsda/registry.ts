@@ -75,10 +75,20 @@ function toGenericWaste(bsda: Bsda): GenericWaste {
       ? bsda.destinationReceptionWeight / 1000
       : bsda.destinationReceptionWeight,
     transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted,
+    transporterNumberPlates: bsda.transporterTransportPlates,
+    transporterCompanyAddress: bsda.transporterCompanyAddress,
+    transporterCompanyName: bsda.transporterCompanyName,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
+    transporterRecepisseNumber: bsda.transporterRecepisseNumber,
+    transporterCompanyMail: bsda.transporterCompanyMail,
+    transporterCustomInfo: bsda.transporterCustomInfo,
     wasteAdr: bsda.wasteAdr,
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
-    workerCompanyAddress: bsda.workerCompanyAddress
+    workerCompanyAddress: bsda.workerCompanyAddress,
+    destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
+    destinationOperationCode: bsda.destinationOperationCode,
+    destinationOperationMode: bsda.destinationOperationMode
   };
 }
 
@@ -121,7 +131,6 @@ export function toIncomingWaste(
     destinationCompanySiret: bsda.destinationCompanySiret,
     destinationCompanyAddress: bsda.destinationCompanyAddress,
     destinationReceptionDate: bsda.destinationReceptionDate,
-    destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
@@ -140,14 +149,8 @@ export function toIncomingWaste(
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: null,
-    transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-    transporterRecepisseNumber: bsda.transporterRecepisseNumber,
-    destinationOperationCode: bsda.destinationOperationCode,
-    destinationOperationMode: bsda.destinationOperationMode,
     destinationCustomInfo: bsda.destinationCustomInfo,
-    emitterCompanyMail: bsda.emitterCompanyMail,
-    transporterCompanyMail: bsda.transporterCompanyMail
+    emitterCompanyMail: bsda.emitterCompanyMail
   };
 }
 
@@ -192,9 +195,6 @@ export function toOutgoingWaste(
     destinationCompanyAddress: bsda.destinationCompanyAddress,
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
-    destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
-    destinationOperationCode: bsda.destinationOperationCode,
-    destinationOperationMode: bsda.destinationOperationMode,
     destinationPlannedOperationMode: null,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
@@ -211,16 +211,8 @@ export function toOutgoingWaste(
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    transporterCompanyAddress: null,
-    transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-    transporterTakenOverAt:
-      bsda.transporterTransportTakenOverAt ??
-      bsda.transporterTransportSignatureDate,
-    transporterRecepisseNumber: bsda.transporterRecepisseNumber,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
     emitterCustomInfo: bsda.emitterCustomInfo,
-    transporterCompanyMail: bsda.transporterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail
   };
 }
@@ -260,15 +252,8 @@ export function toTransportedWaste(
 
   return {
     ...genericWaste,
-    transporterTakenOverAt:
-      bsda.transporterTransportTakenOverAt ??
-      bsda.transporterTransportSignatureDate,
     destinationReceptionDate: bsda.destinationReceptionDate,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
-    transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-    transporterCompanyAddress: bsda.transporterCompanyAddress,
-    transporterNumberPlates: bsda.transporterTransportPlates,
     ...initialEmitter,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
@@ -290,7 +275,6 @@ export function toTransportedWaste(
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
     destinationCompanyAddress: bsda.destinationCompanyAddress,
-    transporterCustomInfo: bsda.transporterCustomInfo,
     emitterCompanyMail: bsda.emitterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail
   };
@@ -340,7 +324,6 @@ export function toManagedWaste(
     destinationCompanyAddress: bsda.destinationCompanyAddress,
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
-    destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
@@ -354,12 +337,7 @@ export function toManagedWaste(
       ].filter(Boolean)
     ),
     ...initialEmitter,
-    transporterCompanyAddress: bsda.transporterCompanyAddress,
-    transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-    transporterRecepisseNumber: bsda.transporterRecepisseNumber,
     emitterCompanyMail: bsda.emitterCompanyMail,
-    transporterCompanyMail: bsda.transporterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail
   };
 }
@@ -400,9 +378,6 @@ export function toAllWaste(
   return {
     ...genericWaste,
     createdAt: bsda.createdAt,
-    transporterTakenOverAt:
-      bsda.transporterTransportTakenOverAt ??
-      bsda.transporterTransportSignatureDate,
     destinationReceptionDate: bsda.destinationReceptionDate,
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
@@ -410,9 +385,6 @@ export function toAllWaste(
     destinationCompanyAddress: bsda.destinationCompanyAddress,
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
-    destinationOperationCode: bsda.destinationOperationCode,
-    destinationOperationMode: bsda.destinationOperationMode,
-    destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
@@ -426,11 +398,6 @@ export function toAllWaste(
       ].filter(Boolean)
     ),
     ...initialEmitter,
-    transporterCompanyAddress: bsda.transporterCompanyAddress,
-    transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-    transporterRecepisseNumber: bsda.transporterRecepisseNumber,
-    transporterNumberPlates: bsda.transporterTransportPlates,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
     managedEndDate: null,
     managedStartDate: null,
@@ -438,7 +405,6 @@ export function toAllWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsda.emitterCompanyMail,
-    transporterCompanyMail: bsda.transporterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail
   };
 }

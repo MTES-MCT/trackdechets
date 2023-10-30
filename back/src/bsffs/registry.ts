@@ -83,11 +83,20 @@ function toGenericWaste(
       : bsffDestination.receptionWeight,
     destinationOperationCode: bsffDestination.operationCode,
     destinationOperationMode: bsffDestination.operationMode as OperationMode,
+    destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     transporterRecepisseIsExempted: false,
     wasteAdr: bsff.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
-    workerCompanyAddress: null
+    workerCompanyAddress: null,
+    transporterTakenOverAt: bsff.transporterTransportTakenOverAt,
+    transporterCompanyAddress: bsff.transporterCompanyAddress,
+    transporterCompanyName: bsff.transporterCompanyName,
+    transporterCompanySiret: bsff.transporterCompanySiret,
+    transporterRecepisseNumber: bsff.transporterRecepisseNumber,
+    transporterCompanyMail: bsff.transporterCompanyMail,
+    transporterCustomInfo: bsff.transporterCustomInfo,
+    transporterNumberPlates: bsff.transporterTransportPlates
   };
 }
 
@@ -136,7 +145,6 @@ export function toIncomingWaste(
     destinationReceptionDate: bsff.destinationReceptionDate,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
-    destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
@@ -146,12 +154,8 @@ export function toIncomingWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    transporterCompanyName: bsff.transporterCompanyName,
-    transporterCompanySiret: bsff.transporterCompanySiret,
-    transporterRecepisseNumber: bsff.transporterRecepisseNumber,
     destinationCustomInfo: bsff.destinationCustomInfo,
-    emitterCompanyMail: bsff.emitterCompanyMail,
-    transporterCompanyMail: bsff.transporterCompanyMail
+    emitterCompanyMail: bsff.emitterCompanyMail
   };
 }
 
@@ -207,7 +211,6 @@ export function toOutgoingWaste(
     destinationCompanyAddress: bsff.destinationCompanyAddress,
     destinationCompanyName: bsff.destinationCompanyName,
     destinationCompanySiret: bsff.destinationCompanySiret,
-    destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
@@ -217,14 +220,8 @@ export function toOutgoingWaste(
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    transporterCompanyAddress: null,
-    transporterCompanyName: bsff.transporterCompanyName,
-    transporterCompanySiret: bsff.transporterCompanySiret,
-    transporterTakenOverAt: bsff.transporterTransportSignatureDate,
-    transporterRecepisseNumber: bsff.transporterRecepisseNumber,
     weight: bsff.weightValue ? bsff.weightValue / 1000 : bsff.weightValue,
     emitterCustomInfo: bsff.emitterCustomInfo,
-    transporterCompanyMail: bsff.transporterCompanyMail,
     destinationCompanyMail: bsff.destinationCompanyMail
   };
 }
@@ -268,13 +265,8 @@ export function toTransportedWaste(
 
   return {
     ...genericWaste,
-    transporterTakenOverAt: bsff.transporterTransportSignatureDate,
     destinationReceptionDate: bsff.destinationReceptionDate,
     weight: bsff.weightValue ? bsff.weightValue / 1000 : bsff.weightValue,
-    transporterCompanyName: bsff.transporterCompanyName,
-    transporterCompanySiret: bsff.transporterCompanySiret,
-    transporterCompanyAddress: bsff.transporterCompanyAddress,
-    transporterNumberPlates: null,
     ...initialEmitter,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
@@ -289,7 +281,6 @@ export function toTransportedWaste(
     destinationCompanyName: bsff.destinationCompanyName,
     destinationCompanySiret: bsff.destinationCompanySiret,
     destinationCompanyAddress: bsff.destinationCompanyAddress,
-    transporterCustomInfo: bsff.transporterCustomInfo,
     emitterCompanyMail: bsff.emitterCompanyMail,
     destinationCompanyMail: bsff.destinationCompanyMail
   };
@@ -349,19 +340,13 @@ export function toManagedWaste(
     destinationCompanyAddress: bsff.destinationCompanyAddress,
     destinationCompanyName: bsff.destinationCompanyName,
     destinationCompanySiret: bsff.destinationCompanySiret,
-    destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
-    transporterCompanyAddress: bsff.transporterCompanyAddress,
-    transporterCompanyName: bsff.transporterCompanyName,
-    transporterCompanySiret: bsff.transporterCompanySiret,
-    transporterRecepisseNumber: bsff.transporterRecepisseNumber,
     emitterCompanyMail: bsff.emitterCompanyMail,
-    transporterCompanyMail: bsff.transporterCompanyMail,
     destinationCompanyMail: bsff.destinationCompanyMail
   };
 }
@@ -406,7 +391,6 @@ export function toAllWaste(
   return {
     ...genericWaste,
     createdAt: bsff.createdAt,
-    transporterTakenOverAt: bsff.transporterTransportTakenOverAt,
     destinationReceptionDate: bsff.destinationReceptionDate,
     brokerCompanyName: null,
     brokerCompanySiret: null,
@@ -414,17 +398,12 @@ export function toAllWaste(
     destinationCompanyAddress: bsff.destinationCompanyAddress,
     destinationCompanyName: bsff.destinationCompanyName,
     destinationCompanySiret: bsff.destinationCompanySiret,
-    destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
-    transporterCompanyAddress: bsff.transporterCompanyAddress,
-    transporterCompanyName: bsff.transporterCompanyName,
-    transporterCompanySiret: bsff.transporterCompanySiret,
-    transporterRecepisseNumber: bsff.transporterRecepisseNumber,
     weight: bsff.weightValue ? bsff.weightValue / 1000 : bsff.weightValue,
     managedEndDate: null,
     managedStartDate: null,
@@ -432,7 +411,6 @@ export function toAllWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsff.emitterCompanyMail,
-    transporterCompanyMail: bsff.transporterCompanyMail,
     destinationCompanyMail: bsff.destinationCompanyMail
   };
 }
