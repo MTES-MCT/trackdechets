@@ -321,7 +321,7 @@ export default function LayoutContainer() {
                 to={
                   data
                     ? data.me.companies.length > 0
-                      ? generatePath(routes.dashboard.index, {
+                      ? generatePath(routes.dashboardv2.index, {
                           siret: data.me.companies[0].orgId
                         })
                       : routes.account.companies.list
