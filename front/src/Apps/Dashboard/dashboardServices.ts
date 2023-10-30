@@ -697,6 +697,9 @@ export const getResealedBtnLabel = (
     hasTemporaryStorage(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignEmission)
   ) {
+    if (isSameSiretEmmiter(currentSiret, bsd)) {
+      return SIGNER;
+    }
     return FAIRE_SIGNER;
   }
   return "";
