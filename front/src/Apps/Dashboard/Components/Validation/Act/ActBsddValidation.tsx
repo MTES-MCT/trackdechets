@@ -260,7 +260,12 @@ const ActBsddValidation = ({
         <AcceptedInfo
           form={data?.form!}
           close={onClose}
-          onSubmit={values => onSubmit(values)}
+          onSubmit={async values => {
+            const res = await onSubmit(values);
+            if (!res.errors) {
+              onClose();
+            }
+          }}
         />
         {error && (
           <NotificationError className="action-error" apolloError={error} />

@@ -268,7 +268,7 @@ export const editionRules: EditionRules = {
     }
   },
   destinationOperationNextDestinationPlannedOperationCode: {
-    readableFieldName: "le code d'opétation de l'exutoire",
+    readableFieldName: "le code d'opération de l'exutoire",
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
