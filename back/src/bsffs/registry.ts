@@ -12,6 +12,32 @@ import { GenericWaste } from "../registry/types";
 import { extractPostalCode } from "../utils";
 import { toBsffDestination } from "./compat";
 
+const getOperationData = (
+  bsff: Bsff & {
+    packagings: BsffPackagingWithPrevious[];
+  }
+) => {
+  const bsffDestination = toBsffDestination(bsff.packagings);
+
+  return {
+    destinationOperationCode: bsffDestination.operationCode,
+    destinationOperationMode: bsffDestination.operationMode as OperationMode,
+    destinationPlannedOperationCode: bsff.destinationPlannedOperationCode
+  };
+};
+
+const getTransporterData = (bsff: Bsff) => ({
+  transporterRecepisseIsExempted: bsff.transporterRecepisseIsExempted,
+  transporterTakenOverAt: bsff.transporterTransportTakenOverAt,
+  transporterCompanyAddress: bsff.transporterCompanyAddress,
+  transporterCompanyName: bsff.transporterCompanyName,
+  transporterCompanySiret: bsff.transporterCompanySiret,
+  transporterRecepisseNumber: bsff.transporterRecepisseNumber,
+  transporterCompanyMail: bsff.transporterCompanyMail,
+  transporterCustomInfo: bsff.transporterCustomInfo,
+  transporterNumberPlates: bsff.transporterTransportPlates
+});
+
 type BsffPackagingWithPrevious = BsffPackaging & {
   previousPackagings: BsffPackaging & { bsff: Bsff };
 };
@@ -81,22 +107,12 @@ function toGenericWaste(
     destinationReceptionWeight: bsffDestination.receptionWeight
       ? bsffDestination.receptionWeight / 1000
       : bsffDestination.receptionWeight,
-    destinationOperationCode: bsffDestination.operationCode,
-    destinationOperationMode: bsffDestination.operationMode as OperationMode,
-    destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
-    transporterRecepisseIsExempted: false,
+
     wasteAdr: bsff.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    transporterTakenOverAt: bsff.transporterTransportTakenOverAt,
-    transporterCompanyAddress: bsff.transporterCompanyAddress,
-    transporterCompanyName: bsff.transporterCompanyName,
-    transporterCompanySiret: bsff.transporterCompanySiret,
-    transporterRecepisseNumber: bsff.transporterRecepisseNumber,
-    transporterCompanyMail: bsff.transporterCompanyMail,
-    transporterCustomInfo: bsff.transporterCustomInfo,
-    transporterNumberPlates: bsff.transporterTransportPlates
+    ...getTransporterData(bsff)
   };
 }
 
@@ -155,7 +171,8 @@ export function toIncomingWaste(
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
     destinationCustomInfo: bsff.destinationCustomInfo,
-    emitterCompanyMail: bsff.emitterCompanyMail
+    emitterCompanyMail: bsff.emitterCompanyMail,
+    ...getOperationData(bsff)
   };
 }
 
@@ -222,7 +239,8 @@ export function toOutgoingWaste(
     traderRecepisseNumber: null,
     weight: bsff.weightValue ? bsff.weightValue / 1000 : bsff.weightValue,
     emitterCustomInfo: bsff.emitterCustomInfo,
-    destinationCompanyMail: bsff.destinationCompanyMail
+    destinationCompanyMail: bsff.destinationCompanyMail,
+    ...getOperationData(bsff)
   };
 }
 
@@ -411,6 +429,7 @@ export function toAllWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsff.emitterCompanyMail,
-    destinationCompanyMail: bsff.destinationCompanyMail
+    destinationCompanyMail: bsff.destinationCompanyMail,
+    ...getOperationData(bsff)
   };
 }

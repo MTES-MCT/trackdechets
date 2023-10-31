@@ -12,6 +12,23 @@ import {
 import { GenericWaste } from "../registry/types";
 import { extractPostalCode } from "../utils";
 
+const getOperationData = (bsda: Bsda) => ({
+  destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
+  destinationOperationCode: bsda.destinationOperationCode,
+  destinationOperationMode: bsda.destinationOperationMode
+});
+
+const getTransporterData = (bsda: Bsda) => ({
+  transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted,
+  transporterNumberPlates: bsda.transporterTransportPlates,
+  transporterCompanyAddress: bsda.transporterCompanyAddress,
+  transporterCompanyName: bsda.transporterCompanyName,
+  transporterCompanySiret: getTransporterCompanyOrgId(bsda),
+  transporterRecepisseNumber: bsda.transporterRecepisseNumber,
+  transporterCompanyMail: bsda.transporterCompanyMail,
+  transporterCustomInfo: bsda.transporterCustomInfo
+});
+
 type RegistryFields =
   | "isIncomingWasteFor"
   | "isOutgoingWasteFor"
@@ -74,21 +91,12 @@ function toGenericWaste(bsda: Bsda): GenericWaste {
     destinationReceptionWeight: bsda.destinationReceptionWeight
       ? bsda.destinationReceptionWeight / 1000
       : bsda.destinationReceptionWeight,
-    transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted,
-    transporterNumberPlates: bsda.transporterTransportPlates,
-    transporterCompanyAddress: bsda.transporterCompanyAddress,
-    transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-    transporterRecepisseNumber: bsda.transporterRecepisseNumber,
-    transporterCompanyMail: bsda.transporterCompanyMail,
-    transporterCustomInfo: bsda.transporterCustomInfo,
+
     wasteAdr: bsda.wasteAdr,
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
     workerCompanyAddress: bsda.workerCompanyAddress,
-    destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
-    destinationOperationCode: bsda.destinationOperationCode,
-    destinationOperationMode: bsda.destinationOperationMode
+    ...getTransporterData(bsda)
   };
 }
 
@@ -150,7 +158,8 @@ export function toIncomingWaste(
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: null,
     destinationCustomInfo: bsda.destinationCustomInfo,
-    emitterCompanyMail: bsda.emitterCompanyMail
+    emitterCompanyMail: bsda.emitterCompanyMail,
+    ...getOperationData(bsda)
   };
 }
 
@@ -213,7 +222,8 @@ export function toOutgoingWaste(
     traderRecepisseNumber: null,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
     emitterCustomInfo: bsda.emitterCustomInfo,
-    destinationCompanyMail: bsda.destinationCompanyMail
+    destinationCompanyMail: bsda.destinationCompanyMail,
+    ...getOperationData(bsda)
   };
 }
 
@@ -405,6 +415,7 @@ export function toAllWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsda.emitterCompanyMail,
-    destinationCompanyMail: bsda.destinationCompanyMail
+    destinationCompanyMail: bsda.destinationCompanyMail,
+    ...getOperationData(bsda)
   };
 }
