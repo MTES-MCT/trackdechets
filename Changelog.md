@@ -11,6 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Query `favorites` : ignorer les items manquants dans l'index ElasticSearch `favorites`, évitant de renvoyer une erreur 500 à la place des 404.
 - Correction d'un bug qui empêchait d'enlever tous les intermédiaires sur un BSDA [PR 2781](https://github.com/MTES-MCT/trackdechets/pull/2781)
 
 #### :boom: Breaking changes
