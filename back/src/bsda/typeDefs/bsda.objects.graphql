@@ -146,7 +146,7 @@ type BsdaWaste {
   name: String @deprecated(reason: "Utiliser materialName")
   "Code famille"
   familyCode: String
-  "Nom du matériau"
+  "Nom usuel du matériau"
   materialName: String
   "Consistence"
   consistence: BsdaConsistence
@@ -424,7 +424,7 @@ type BsdaRevisionRequestWaste {
   "Rubrique Déchet"
   code: String
 
-  "Nom du matériau"
+  "Nom usuel du matériau"
   materialName: String
 
   "Numéros de scellés"

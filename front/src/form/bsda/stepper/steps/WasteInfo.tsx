@@ -108,7 +108,7 @@ export function WasteInfoWorker({ disabled }) {
 
       <div className="form__row">
         <label>
-          Nom du matériau
+          Nom usuel du matériau
           <Field
             disabled={disabled}
             type="text"
