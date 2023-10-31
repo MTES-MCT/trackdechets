@@ -5,6 +5,7 @@ import {
   IconDestination,
   IconEmitter,
   IconTransporter,
+  IconWorker,
 } from "../../../common/Components/Icons/Icons";
 import { MEDIA_QUERIES } from "../../../../common/config";
 
@@ -14,6 +15,7 @@ function Actors({
   emitterName,
   transporterName,
   destinationName,
+  workerCompanyName,
 }: ActorsProps) {
   const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
 
@@ -31,6 +33,17 @@ function Actors({
           <IconEmitter className="actors__emitter-icon" />
           <p className="actors__label" data-truncate={truncate(emitterName)}>
             <span>{emitterName}</span>
+          </p>
+        </div>
+      )}
+      {workerCompanyName && (
+        <div className="actors__item">
+          <IconWorker className="actors__worker-icon" />
+          <p
+            className="actors__label"
+            data-truncate={truncate(workerCompanyName)}
+          >
+            <span>{workerCompanyName}</span>
           </p>
         </div>
       )}

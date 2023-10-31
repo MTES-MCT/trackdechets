@@ -80,6 +80,7 @@ describe("Mutation.updateBsdasri", () => {
         transporterCompanySiret: transporterCompany.siret,
         destinationCompanySiret,
         destinationOperationCode: "D10",
+        destinationOperationMode: "ELIMINATION",
         transporterWastePackagings: [
           { type: "BOITE_CARTON", volume: 10, quantity: 6 },
           { type: "FUT", volume: 100, quantity: 3 }
@@ -94,6 +95,7 @@ describe("Mutation.updateBsdasri", () => {
         transporterCompanySiret: transporterCompany.siret,
         destinationCompanySiret,
         destinationOperationCode: "D10",
+        destinationOperationMode: "ELIMINATION",
         transporterWastePackagings: [
           { type: "BOITE_CARTON", volume: 10, quantity: 10 },
           { type: "FUT", volume: 100, quantity: 10 },
@@ -352,7 +354,9 @@ describe("Mutation.updateBsdasri", () => {
       await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
         variables: {
           id: dasri.id,
-          input: { destination: { operation: { code: "D10" } } }
+          input: {
+            destination: { operation: { code: "D10", mode: "ELIMINATION" } }
+          }
         }
       });
 
@@ -369,12 +373,16 @@ describe("Mutation.updateBsdasri", () => {
       expect(updatedDasri.transporterWasteVolume).toEqual(1234);
       expect(updatedDasri.synthesizing).toEqual([{ id: associated.id }]);
       expect(updatedDasri.destinationOperationCode).toEqual("D10");
+      expect(updatedDasri.destinationOperationMode).toEqual("ELIMINATION");
     }
   );
 
-  it.each(["R12", "D12"])(
+  it.each([
+    ["R12", undefined],
+    ["D12", "ELIMINATION"]
+  ])(
     "should forbid %p operation code on synthesis dasri",
-    async operationCode => {
+    async (operationCode, operationMode) => {
       const { company: emitterCompany } = await userWithCompanyFactory(
         "MEMBER"
       );
@@ -422,7 +430,11 @@ describe("Mutation.updateBsdasri", () => {
         {
           variables: {
             id: dasri.id,
-            input: { destination: { operation: { code: operationCode } } }
+            input: {
+              destination: {
+                operation: { code: operationCode, mode: operationMode }
+              }
+            }
           }
         }
       );
@@ -439,9 +451,13 @@ describe("Mutation.updateBsdasri", () => {
     }
   );
 
-  it.each(["D9", "D10", "R1"])(
+  it.each([
+    ["D9", "ELIMINATION"],
+    ["D10", "ELIMINATION"],
+    ["R1", "VALORISATION_ENERGETIQUE"]
+  ])(
     "should allow %p operation code on synthesis dasri",
-    async operationCode => {
+    async (operationCode, operationMode) => {
       const { company: emitterCompany } = await userWithCompanyFactory(
         "MEMBER"
       );
@@ -487,7 +503,11 @@ describe("Mutation.updateBsdasri", () => {
       await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
         variables: {
           id: dasri.id,
-          input: { destination: { operation: { code: operationCode } } }
+          input: {
+            destination: {
+              operation: { code: operationCode, mode: operationMode }
+            }
+          }
         }
       });
 
@@ -495,6 +515,7 @@ describe("Mutation.updateBsdasri", () => {
         where: { id: dasri.id }
       });
       expect(updatedDasri.destinationOperationCode).toEqual(operationCode);
+      expect(updatedDasri.destinationOperationMode).toEqual(operationMode);
     }
   );
 });

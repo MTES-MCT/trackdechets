@@ -28,7 +28,6 @@ import styles from "./Header.module.scss";
 import { useMedia } from "use-media";
 import { DashboardTabs } from "dashboard/DashboardTabs";
 import { default as DashboardTabsV2 } from "Apps/Dashboard/Components/DashboardTabs/DashboardTabs";
-import { useFeatureFlags } from "common/contexts/FeatureFlagsContext";
 
 export const GET_ME = gql`
   {
@@ -89,12 +88,7 @@ function MobileSubNav({ currentSiret }) {
   );
 }
 
-const getMenuEntries = (
-  isAuthenticated,
-  isAdmin,
-  currentSiret,
-  canAccessDashboardV2
-) => {
+const getMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
   const common = [
     {
       caption: "Ressources",
@@ -123,24 +117,22 @@ const getMenuEntries = (
       navlink: true,
     },
   ];
-  const dashboardV2 = [
-    {
-      caption: "Mes bordereaux 🆕",
-      href: currentSiret
-        ? generatePath(routes.dashboardv2.index, {
-            siret: currentSiret,
-          })
-        : "/",
-
-      navlink: true,
-    },
-  ];
 
   const connected = [
     {
       caption: "Mon espace",
       href: currentSiret
         ? generatePath(routes.dashboard.index, {
+            siret: currentSiret,
+          })
+        : "/",
+
+      navlink: true,
+    },
+    {
+      caption: "Mes bordereaux 🆕",
+      href: currentSiret
+        ? generatePath(routes.dashboardv2.index, {
             siret: currentSiret,
           })
         : "/",
@@ -159,7 +151,6 @@ const getMenuEntries = (
     ...common,
     ...(isAuthenticated ? connected : []),
     ...(isAdmin ? admin : []),
-    ...(canAccessDashboardV2 ? dashboardV2 : []),
   ];
 };
 
@@ -203,6 +194,7 @@ const MenuLink = ({ entry, mobileCallback }) => {
 type HeaderProps = {
   isAuthenticated: boolean;
   isAdmin: boolean;
+  defaultOrgId?: string;
 };
 
 /**
@@ -215,15 +207,9 @@ export default withRouter(function Header({
   isAdmin,
   location,
   history,
+  defaultOrgId,
 }: RouteComponentProps & HeaderProps) {
-  const { VITE_API_ENDPOINT, VITE_SENTRY_ENVIRONMENT } = import.meta.env;
-
-  const { featureFlags } = useFeatureFlags();
-
-  const canAccessDashboardV2 =
-    isAdmin ||
-    VITE_SENTRY_ENVIRONMENT === "sandbox" ||
-    featureFlags.dashboardV2;
+  const { VITE_API_ENDPOINT } = import.meta.env;
 
   const [menuHidden, toggleMenu] = useState(true);
 
@@ -250,30 +236,25 @@ export default withRouter(function Header({
     strict: false,
   });
 
-  let matchDashboardV2;
-  if (canAccessDashboardV2) {
-    matchDashboardV2 = matchPath(location.pathname, {
-      path: routes.dashboardv2.index,
-      exact: false,
-      strict: false,
-    });
-  }
+  const matchDashboardV2 = matchPath(location.pathname, {
+    path: routes.dashboardv2.index,
+    exact: false,
+    strict: false,
+  });
 
   const menuClass = menuHidden && isMobile ? styles.headerNavHidden : "";
 
   // Catching siret from url when not available from props (just after login)
-  let currentSiret = matchDashboard?.params["siret"];
+  let currentSiret = matchDashboard?.params["siret"] || defaultOrgId;
 
   if (matchDashboardV2) {
     currentSiret =
-      matchDashboard?.params["siret"] || matchDashboardV2?.params["siret"];
+      matchDashboard?.params["siret"] ||
+      matchDashboardV2?.params["siret"] ||
+      defaultOrgId;
   }
-  const menuEntries = getMenuEntries(
-    isAuthenticated,
-    isAdmin,
-    currentSiret,
-    canAccessDashboardV2
-  );
+
+  const menuEntries = getMenuEntries(isAuthenticated, isAdmin, currentSiret);
 
   const mobileNav = () => {
     if (!isAuthenticated || !isMobile) {

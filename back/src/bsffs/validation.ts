@@ -563,9 +563,23 @@ const operationSchemaFn: (value: any) => yup.SchemaOf<Operation> = value => {
           const { operationCode } = this.parent;
           const operationMode = item;
 
-          if (operationCode && operationMode) {
+          if (operationCode) {
             const modes = getOperationModesFromOperationCode(operationCode);
-            return modes.includes(operationMode ?? "");
+
+            if (modes.length && !operationMode) {
+              return new yup.ValidationError(
+                "Vous devez préciser un mode de traitement"
+              );
+            } else if (
+              (modes.length &&
+                operationMode &&
+                !modes.includes(operationMode)) ||
+              (!modes.length && operationMode)
+            ) {
+              return new yup.ValidationError(
+                "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+              );
+            }
           }
 
           return true;

@@ -9,6 +9,7 @@ import {
   TextFilter
 } from "../generated/graphql/types";
 import { UserInputError } from "./errors";
+import { isSiret } from "./constants/companySearchHelpers";
 
 type EnumFilter<E> = {
   _in?: E[] | null;
@@ -279,6 +280,15 @@ export function toElasticStringQuery(
     return undefined;
   }
 
+  // If the string is a full SIRET, discard _contains & replace by _eq
+  if (stringFilter?._contains && isSiret(stringFilter?._contains)) {
+    return toElasticStringQuery(
+      fieldName,
+      { _eq: stringFilter?._contains },
+      maxLength
+    );
+  }
+
   if (
     (stringFilter._eq && stringFilter._eq.length > maxLength) ||
     (stringFilter._contains && stringFilter._contains.length > maxLength) ||
@@ -367,7 +377,15 @@ export function toElasticDateQuery(
   }
 
   if (dateFilter._eq) {
-    return { match: { [fieldName]: dateFilter._eq.getTime() } };
+    // we use a range here to filter on the same day using ES date math
+    return {
+      range: {
+        [fieldName]: {
+          gte: `${new Date(dateFilter._eq).getTime()}||/d`,
+          lte: `${new Date(dateFilter._eq).getTime()}||/d`
+        }
+      }
+    };
   }
 
   if (dateFilter._gt && dateFilter._gte) {
@@ -382,14 +400,21 @@ export function toElasticDateQuery(
   }
 
   return {
+    // we use ES date math to auto round to correct boundary
     range: {
       [fieldName]: {
-        ...(dateFilter._gt ? { gt: new Date(dateFilter._gt).getTime() } : {}),
-        ...(dateFilter._gte
-          ? { gte: new Date(dateFilter._gte).getTime() }
+        ...(dateFilter._gt
+          ? { gt: `${new Date(dateFilter._gt).getTime()}||/d` }
           : {}),
-        ...(dateFilter._lt ? { lt: new Date(dateFilter._lt).getTime() } : {}),
-        ...(dateFilter._lte ? { lte: new Date(dateFilter._lte).getTime() } : {})
+        ...(dateFilter._gte
+          ? { gte: `${new Date(dateFilter._gte).getTime()}||/d` }
+          : {}),
+        ...(dateFilter._lt
+          ? { lt: `${new Date(dateFilter._lt).getTime()}||/d` }
+          : {}),
+        ...(dateFilter._lte
+          ? { lte: `${new Date(dateFilter._lte).getTime()}||/d` }
+          : {})
       }
     }
   };

@@ -576,45 +576,39 @@ const DashboardPage = () => {
       {isFiltersOpen && (
         <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
       )}
-      {isFetchingMore && <Loader />}
-      {isLoadingBsds && !isFetchingMore ? (
-        <Loader />
-      ) : (
-        <>
-          {!Boolean(bsdsTotalCount) && (
-            <div className="dashboard-page__blankstate">
-              <Blankslate>
-                {getBlankstateTitle() && (
-                  <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
-                )}
-                <BlankslateDescription>
-                  {getBlankstateDescription()}
-                </BlankslateDescription>
-              </Blankslate>
-            </div>
-          )}
+      {(isFetchingMore || isLoadingBsds) && <Loader />}
+      {!Boolean(bsdsTotalCount) && !isLoadingBsds && (
+        <div className="dashboard-page__blankstate">
+          <Blankslate>
+            {getBlankstateTitle() && (
+              <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
+            )}
+            <BlankslateDescription>
+              {getBlankstateDescription()}
+            </BlankslateDescription>
+          </Blankslate>
+        </div>
+      )}
 
-          {Boolean(bsdsTotalCount) && (
-            <BsdCardList
-              siret={siret}
-              bsds={bsds!}
-              bsdCurrentTab={bsdCurrentTab}
-              siretsWithAutomaticSignature={siretsWithAutomaticSignature}
-            />
-          )}
+      {Boolean(bsdsTotalCount) && (
+        <BsdCardList
+          siret={siret}
+          bsds={bsds!}
+          bsdCurrentTab={bsdCurrentTab}
+          siretsWithAutomaticSignature={siretsWithAutomaticSignature}
+        />
+      )}
 
-          {hasNextPage && (
-            <div className="dashboard-page__loadmore">
-              <button
-                className="fr-btn"
-                onClick={loadMore}
-                disabled={isFetchingMore}
-              >
-                {load_more_bsds}
-              </button>
-            </div>
-          )}
-        </>
+      {hasNextPage && (
+        <div className="dashboard-page__loadmore">
+          <button
+            className="fr-btn"
+            onClick={loadMore}
+            disabled={isFetchingMore}
+          >
+            {load_more_bsds}
+          </button>
+        </div>
       )}
     </div>
   );

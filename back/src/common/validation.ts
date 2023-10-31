@@ -145,7 +145,7 @@ type SiretConditions = {
 // Different tests that can be applied to a siret number
 type SiretTests = {
   isRegistered: (
-    role?: "DESTINATION" | "TRANSPORTER"
+    role?: "DESTINATION" | "TRANSPORTER" | "WASTE_VEHICLES"
   ) => yup.TestConfig<string>;
 };
 
@@ -200,13 +200,13 @@ export const siretTests: SiretTests = {
       if (company === null) {
         return false;
       }
-      if (role === "DESTINATION") {
+      if (role === "DESTINATION" || role === "WASTE_VEHICLES") {
         if (
+          role === "DESTINATION" &&
           !(
             isCollector(company) ||
             isWasteProcessor(company) ||
-            isWasteCenter(company) ||
-            isWasteVehicles(company)
+            isWasteCenter(company)
           )
         ) {
           return ctx.createError({
@@ -217,6 +217,17 @@ export const siretTests: SiretTests = {
               ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
           });
         }
+
+        if (role === "WASTE_VEHICLES" && !isWasteVehicles(company)) {
+          return ctx.createError({
+            message:
+              `L'installation de destination avec le SIRET "${siret}" n'est pas inscrite` +
+              ` sur Trackdéchets en tant qu'installation de traitement de VHU. Cette installation ne peut` +
+              ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
+              ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+          });
+        }
+
         if (
           VERIFY_COMPANY === "true" &&
           company.verificationStatus !== CompanyVerificationStatus.VERIFIED

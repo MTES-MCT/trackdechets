@@ -850,4 +850,95 @@ describe("Mutation.createFormRevisionRequest", () => {
       company.siret
     );
   });
+
+  it("should fail if operation code has corresponding modes but none is specified", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { processingOperationDone: "R 1" },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe("Vous devez préciser un mode de traitement");
+  });
+
+  it("should work if operation code has corresponding modes and one is specified", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: {
+            processingOperationDone: "R 1",
+            destinationOperationMode: "VALORISATION_ENERGETIQUE"
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
+  it("should work if operation code has no corresponding mode", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { processingOperationDone: "D 13" },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+  });
 });

@@ -1,21 +1,52 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
-import { companyFactory, siretify } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  siretify,
+  userFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { searchCompanies } from "../../../search";
+import { AuthType } from "../../../../auth";
 
 jest.mock("../../../search");
 
 describe("query { searchCompanies(clue, department) }", () => {
   let query: ReturnType<typeof makeClient>["query"];
-  beforeAll(() => {
-    const client = makeClient(null);
+  beforeAll(async () => {
+    const user = await userFactory();
+    const client = makeClient({
+      ...user,
+      auth: AuthType.Session
+    });
     query = client.query;
   });
 
   afterEach(async () => {
     await resetDatabase();
     (searchCompanies as jest.Mock).mockReset();
+  });
+
+  it("should deny access to unauthenticated requests", async () => {
+    const unauthenticatedClient = makeClient();
+    const gqlQuery = `
+      query {
+        searchCompanies(clue: "Code en Stock"){
+          siret
+          address
+          name
+        }
+      }
+    `;
+    const { errors } = await unauthenticatedClient.query<any>(gqlQuery);
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        extensions: expect.objectContaining({
+          code: "UNAUTHENTICATED"
+        })
+      })
+    ]);
   });
 
   it("should return list of companies based on clue", async () => {

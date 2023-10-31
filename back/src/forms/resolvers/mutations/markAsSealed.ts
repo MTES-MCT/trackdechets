@@ -6,7 +6,7 @@ import { checkCanMarkAsSealed } from "../../permissions";
 import {
   checkCanBeSealed,
   validateForwardedInCompanies,
-  wasteDetailsSchema
+  validateBeforeEmission
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
@@ -53,7 +53,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       ...form,
       ...formUpdateInput
     };
-    await wasteDetailsSchema.validate(futureForm);
+    await validateBeforeEmission(futureForm);
   }
 
   const emitterCompanyExists = form.emitterCompanySiret
