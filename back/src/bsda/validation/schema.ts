@@ -22,7 +22,7 @@ import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { OPERATIONS, WORKER_CERTIFICATION_ORGANISM } from "./constants";
 import { getOperationModesFromOperationCode } from "../../common/operationModes";
 
-const bsdaPackagingSchema = z
+export const bsdaPackagingSchema = z
   .object({
     type: z.enum([
       "BIG_BAG",
@@ -196,7 +196,8 @@ export const rawBsdaSchema = z
       .superRefine(intermediariesRefinement),
     intermediariesOrgIds: z.array(z.string()).optional()
   })
-  .superRefine((val, ctx) => {
+
+export const bsdaSchema = rawBsdaSchema.superRefine((val, ctx) => {
     if (
       val.destinationReceptionDate &&
       val.destinationOperationDate &&
