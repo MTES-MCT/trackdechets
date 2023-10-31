@@ -428,9 +428,6 @@ export const getSealedBtnLabel = (
       }
       return FAIRE_SIGNER;
     }
-    if (bsd.emitterType === EmitterType.Producer) {
-      return SIGNER;
-    }
     if (hasEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
       return FAIRE_SIGNER;
     }
