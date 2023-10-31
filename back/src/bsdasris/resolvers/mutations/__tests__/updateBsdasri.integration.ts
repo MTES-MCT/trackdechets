@@ -729,7 +729,7 @@ describe("Mutation.updateBsdasri", () => {
     const { mutate } = makeClient(user);
     const input = {
       destination: {
-        operation: { code: "D10", weight: { value: 20 } }
+        operation: { code: "D10", mode: "ELIMINATION", weight: { value: 20 } }
       }
     };
 

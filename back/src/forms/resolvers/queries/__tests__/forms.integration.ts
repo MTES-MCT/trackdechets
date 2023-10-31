@@ -561,7 +561,7 @@ describe("Query.forms", () => {
     expect(data.forms.length).toBe(50);
   });
 
-  it("should not accepted a first argument lower than 1 or greater than 500", async () => {
+  it("should not accepted a first argument lower than 1 or greater than 100", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     // The user has many forms, and a different role in each
     await createForms(user.id, [
@@ -605,7 +605,7 @@ describe("Query.forms", () => {
           }
         }
       `,
-      { variables: { first: 501 } }
+      { variables: { first: 101 } }
     );
     expect(tooBigErrors.length).toBe(1);
   });

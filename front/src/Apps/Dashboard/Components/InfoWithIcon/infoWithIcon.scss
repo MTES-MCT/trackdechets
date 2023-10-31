@@ -76,4 +76,15 @@
       background-image: url("/icons/dashboard/transporter-number-plate-icon.svg");
     }
   }
+  &__PickupSite {
+    text-transform: lowercase;
+    &:before {
+      display: inline-block;
+      content: "";
+      background-image: url("/icons/dashboard/icon-pickup-site.svg");
+      width: 19px;
+      height: 19px;
+      flex-shrink: 0;
+    }
+  }
 }

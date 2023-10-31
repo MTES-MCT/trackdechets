@@ -1404,12 +1404,25 @@ const processedInfoSchemaFn: (
           const { processingOperationDone } = this.parent;
           const destinationOperationMode = item;
 
-          if (processingOperationDone && destinationOperationMode) {
+          if (processingOperationDone) {
             const modes = getOperationModesFromOperationCode(
               processingOperationDone
             );
 
-            return modes.includes(destinationOperationMode ?? "");
+            if (modes.length && !destinationOperationMode) {
+              return new yup.ValidationError(
+                "Vous devez préciser un mode de traitement"
+              );
+            } else if (
+              (modes.length &&
+                destinationOperationMode &&
+                !modes.includes(destinationOperationMode)) ||
+              (!modes.length && destinationOperationMode)
+            ) {
+              return new yup.ValidationError(
+                "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+              );
+            }
           }
 
           return true;
@@ -1499,6 +1512,23 @@ export const draftFormSchema = baseFormSchemaFn({
 export const wasteDetailsSchema = wasteDetailsSchemaFn({
   isDraft: false
 });
+
+export async function validateBeforeEmission(form: PrismaForm) {
+  await wasteDetailsSchemaFn({ isDraft: false }).validate(form);
+
+  if (form.emitterType !== "APPENDIX1_PRODUCER") {
+    // Vérifie qu'au moins un packaging a été déini sauf dans le cas
+    // d'un bordereau d'annexe 1 pour lequel il est possible de ne pas définir
+    // de packaging
+    const wasteDetailsBeforeTransportSchema = yup.object({
+      wasteDetailsPackagingInfos: yup
+        .array()
+        .min(1, "Le nombre de contenants doit être supérieur à 0")
+    });
+    await wasteDetailsBeforeTransportSchema.validate(form);
+  }
+  return form;
+}
 
 export const beforeTransportSchemaFn = ({
   signingTransporterOrgId

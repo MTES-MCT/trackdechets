@@ -18,7 +18,7 @@
       display: inline-block;
       width: 150px;
       @include desktop {
-        width: 146px;
+        width: 170px;
       }
       white-space: nowrap;
       overflow: hidden;
@@ -30,7 +30,7 @@
       content: attr(data-truncate);
       left: 175px;
       @include desktop {
-        left: 162px;
+        left: 190px;
       }
       white-space: nowrap;
     }
@@ -54,6 +54,10 @@
   }
 
   &__destination-icon {
+    width: 19px;
+    height: 19px;
+  }
+  &__worker-icon {
     width: 19px;
     height: 19px;
   }

@@ -5,19 +5,31 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2023.10.2] 11/10/2023
+# [2023.10.2] 31/10/2023
 
 #### :rocket: Nouvelles fonctionnalités
 
 #### :bug: Corrections de bugs
 
 - Query `favorites` : ignorer les items manquants dans l'index ElasticSearch `favorites`, évitant de renvoyer une erreur 500 à la place des 404.
+- Correction d'un bug qui empêchait d'enlever tous les intermédiaires sur un BSDA [PR 2781](https://github.com/MTES-MCT/trackdechets/pull/2781)
 
 #### :boom: Breaking changes
 
+- Rendre authentifiée la requête api `searchCompanies` [PR 2781](https://github.com/MTES-MCT/trackdechets/pull/2781)
+- Abaissement du nombre maximum d'éléments renvoyés par page à 100 pour la query `forms` [PR 2782](https://github.com/MTES-MCT/trackdechets/pull/2782)
+- Le mode de traitement devient obligatoire pour l'étape de traitement de l'exutoire [PR 2765](https://github.com/MTES-MCT/trackdechets/pull/2765)
+- Le profil VHU est obligatoire pour les exutoires de VHU [PR 2780](https://github.com/MTES-MCT/trackdechets/pull/2780)
+- Les informations sur le conditionnement sont obligatoires lors de la signature prodcuteur sur le BSDD [PR 2770](https://github.com/MTES-MCT/trackdechets/pull/2770)
+- Dépréciation de la signature d'annexes 1 avec la mutation `signedByTransporter` [PR 2768](https://github.com/MTES-MCT/trackdechets/pull/2768)
+
 #### :nail_care: Améliorations
 
+- Amélioration des résultats renvoyés lors du filtre par SIRETs sur le tableau de bord [PR 2756](https://github.com/MTES-MCT/trackdechets/pull/2756)
+
 #### :house: Interne
+
+- Amélioration des règles de validation BSDA [PR 2789](https://github.com/MTES-MCT/trackdechets/pull/2789)
 
 # [2023.10.1] 10/10/2023
 

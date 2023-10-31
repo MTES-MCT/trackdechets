@@ -5,14 +5,10 @@ import {
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import {
-  companyToIntermediaryInput,
-  expandBsdaFromDb,
-  flattenBsdaInput
-} from "../../converter";
+import { companyToIntermediaryInput, expandBsdaFromDb } from "../../converter";
 import { getBsdaRepository } from "../../repository";
 import { checkCanCreate } from "../../permissions";
-import { parseBsda } from "../../validation/validate";
+import { parseBsdaInContext } from "../../validation";
 import { UserInputError } from "../../../common/errors";
 
 type CreateBsda = {
@@ -46,9 +42,8 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     );
   }
 
-  const unparsedBsda = flattenBsdaInput(input);
-  const bsda = await parseBsda(
-    { ...unparsedBsda, isDraft },
+  const bsda = await parseBsdaInContext(
+    { input, isDraft },
     {
       enableCompletionTransformers: true,
       enablePreviousBsdasChecks: true,

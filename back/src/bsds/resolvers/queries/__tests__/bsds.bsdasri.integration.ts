@@ -168,6 +168,7 @@ describe("Query.bsds.dasris base workflow", () => {
               operation: {
                 weight: { value: 99 },
                 code: "D10",
+                mode: "ELIMINATION",
                 date: new Date().toISOString() as any
               }
             }

@@ -13,6 +13,13 @@
     @include desktop {
       width: 170px;
     }
+    @include lg-desktop {
+      width: 180px;
+    }
+
+    @include xl-desktop {
+      width: 400px;
+    }
 
     &__code {
       margin: 0;
@@ -33,7 +40,16 @@
       width: fit-content;
     }
     &__name {
-      width: 130px;
+      width: 250px;
+      @include desktop {
+        width: 165px;
+      }
+      @include lg-desktop {
+        width: 175px;
+      }
+      @include xl-desktop {
+        width: 95%;
+      }
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;

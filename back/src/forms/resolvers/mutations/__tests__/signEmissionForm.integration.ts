@@ -635,4 +635,48 @@ describe("signEmissionForm", () => {
       "Impossible de signer le transport d'un bordereau chapeau. C'est en signant les bordereaux d'annexe 1 que le statut de ce bordereau évoluera."
     );
   });
+
+  it("should throw an error if packaging is empty", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SEALED",
+        wasteDetailsPackagingInfos: [],
+        signedByTransporter: null,
+        sentAt: null,
+        sentBy: null,
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signEmissionForm">,
+      MutationSignEmissionFormArgs
+    >(SIGN_EMISSION_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          emittedAt: "2018-12-11T00:00:00.000Z" as unknown as Date,
+          emittedBy: emitter.user.name,
+          quantity: 1
+        }
+      }
+    });
+
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Le nombre de contenants doit être supérieur à 0"
+    );
+  });
 });
