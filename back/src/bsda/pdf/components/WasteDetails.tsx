@@ -30,7 +30,7 @@ export function WasteDetails({ waste, weight }: Props) {
           checked={Boolean(weight?.isEstimate)}
           readOnly
         />{" "}
-        Estimée conformément à l'article 5.4.1.1.3.2 de l'ADR 2023
+        Estimée "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR 2023
       </p>
     </>
   );
