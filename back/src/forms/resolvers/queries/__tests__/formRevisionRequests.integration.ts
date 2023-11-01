@@ -23,6 +23,9 @@ const FORM_REVISION_REQUESTS = `
           id
           form {
             id
+            intermediaries {
+              name
+            }
           }
           status
         }
@@ -280,6 +283,50 @@ describe("Mutation.formRevisionRequests", () => {
       QueryFormRevisionRequestsArgs
     >(FORM_REVISION_REQUESTS, {
       variables: { siret: company.orgId, where: { bsddId: { _eq: bsdd1.id } } }
+    });
+
+    expect(data.formRevisionRequests.totalCount).toBe(1);
+    expect(data.formRevisionRequests.edges.map(_ => _.node)[0].id).toEqual(
+      bsdd1RevisionRequest.id
+    );
+  });
+
+  it("should work if the revised form has intermediaries that are requested in the query", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { company: intermediary } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: {
+            siret: intermediary.siret!,
+            name: intermediary.name,
+            address: intermediary.address,
+            contact: "John Doe"
+          }
+        }
+      }
+    });
+
+    const bsdd1RevisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: company.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "",
+        status: "ACCEPTED"
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<
+      Pick<Query, "formRevisionRequests">,
+      QueryFormRevisionRequestsArgs
+    >(FORM_REVISION_REQUESTS, {
+      variables: { siret: company.orgId, where: { bsddId: { _eq: bsdd.id } } }
     });
 
     expect(data.formRevisionRequests.totalCount).toBe(1);

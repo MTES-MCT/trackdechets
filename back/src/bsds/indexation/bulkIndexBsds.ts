@@ -282,9 +282,9 @@ export async function getBsdIdentifiers(
   return bsds.map(bsd => bsd.id);
 }
 
-export async function processBsdIdentifiersByChunk(
+export async function processDbIdentifiersByChunk(
   ids: string[],
-  fn: (chunk: string[]) => Promise<any>,
+  fn: (chunk: string[]) => Promise<void>,
   chunkSize = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100
 ) {
   for (let i = 0; i < ids.length; i += chunkSize) {
@@ -306,7 +306,7 @@ export async function indexAllBsdTypeSync({
 
   logger.info(`Starting synchronous indexation of ${ids.length} ${bsdName}`);
 
-  await processBsdIdentifiersByChunk(ids, chunk =>
+  await processDbIdentifiersByChunk(ids, chunk =>
     findManyAndIndexBsds({
       bsdName,
       index,
@@ -332,7 +332,7 @@ export async function indexAllBsdTypeConcurrentJobs({
   logger.info(`Starting indexation of ${ids.length} ${bsdName}`);
 
   // Prepare Job data payload to call indexQueue.addBulk
-  await processBsdIdentifiersByChunk(ids, async chunk => {
+  await processDbIdentifiersByChunk(ids, async chunk => {
     data.push({
       name: "indexChunk",
       data: JSON.stringify({

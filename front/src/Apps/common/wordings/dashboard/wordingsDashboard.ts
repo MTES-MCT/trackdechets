@@ -72,6 +72,9 @@ sur l'état précis du bordereau.`;
 export const blankstate_reviews_title = "Il n'y a aucun bordereau en révision";
 export const blankstate_reviews_desc =
   "Vous n'avez aucune révision en attente.";
+export const blankstate_default_title = "Il n'y a aucun bordereau";
+export const blankstate_default_desc =
+  "Si vous le souhaitez, vous pouvez créer un bordereau depuis le menu de création ci-dessus";
 
 // load more
 export const load_more_bsds = "Charger plus de bordereaux";

@@ -247,8 +247,11 @@ describe("Mutation.Bsda.duplicate", () => {
       "wasteSealNumbers",
       "packagings",
       "weightValue",
+      "forwarding",
       "forwardingId",
+      "grouping",
       "groupedInId",
+      "intermediaries",
       "intermediariesOrgIds"
     ];
 

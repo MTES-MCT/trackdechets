@@ -11,7 +11,8 @@ import { formatStatusLabel } from "../common/constants/statuses";
 
 // Type for custom fields that might not be in the DB
 // But that we still want to display (ie for user convenience)
-type CustomWaste = {
+export const CUSTOM_WASTE_COLUMNS = ["statusLabel"];
+export type CustomWasteColumns = {
   statusLabel: string;
 };
 
@@ -21,7 +22,7 @@ type Column = {
     TransportedWaste &
     ManagedWaste &
     AllWaste &
-    CustomWaste);
+    CustomWasteColumns);
   label: string;
   format?: (v: unknown, full: unknown) => string | number | null;
 };
@@ -68,7 +69,7 @@ const columns: Column[] = [
   { field: "customId", label: "Identifiant secondaire" },
   { field: "status", label: "Statut du bordereau (code)" },
   {
-    field: "status",
+    field: "statusLabel",
     label: "Statut du bordereau",
     format: formatStatusLabel
   },
@@ -219,7 +220,10 @@ const columns: Column[] = [
 
 export function formatRow(waste: GenericWaste, useLabelAsKey = false) {
   return columns.reduce((acc, column) => {
-    if (column.field in waste) {
+    if (
+      column.field in waste ||
+      CUSTOM_WASTE_COLUMNS.includes(column.field || "")
+    ) {
       const key = useLabelAsKey ? column.label : column.field;
       return {
         ...acc,
@@ -237,7 +241,10 @@ export function formatRow(waste: GenericWaste, useLabelAsKey = false) {
  */
 export function getXlsxHeaders(waste: GenericWaste): Partial<Excel.Column>[] {
   return columns.reduce<Partial<Excel.Column>[]>((acc, column) => {
-    if (column.field in waste) {
+    if (
+      column.field in waste ||
+      CUSTOM_WASTE_COLUMNS.includes(column.field || "")
+    ) {
       return [
         ...acc,
         {

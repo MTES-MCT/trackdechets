@@ -91,7 +91,7 @@ export function SignOperation({
           <Formik
             initialValues={{
               author: "",
-              date: TODAY,
+              date: TODAY.toISOString(),
               ...getComputedState(
                 {
                   destination: {

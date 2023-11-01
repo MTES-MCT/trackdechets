@@ -33,7 +33,8 @@ import { getBsdaHistory, getBsdaOrNotFound } from "../../database";
 import { machine } from "../../machine";
 import { renderBsdaRefusedEmail } from "../../mails/refused";
 import { BsdaRepository, getBsdaRepository } from "../../repository";
-import { parseBsda } from "../../validation/validate";
+import { parseBsdaInContext } from "../../validation";
+import { Mail } from "../../../mailer/types";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,
@@ -42,7 +43,9 @@ const signBsda: MutationResolvers["signBsda"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const bsda = await getBsdaOrNotFound(id);
+  const bsda = await getBsdaOrNotFound(id, {
+    include: { intermediaries: true, grouping: true, forwarding: true }
+  });
 
   const authorizedOrgIds = getAuthorizedOrgIds(bsda, input.type);
 
@@ -51,27 +54,18 @@ const signBsda: MutationResolvers["signBsda"] = async (
   // - provide the company security code
   await checkCanSignFor(user, input.type, authorizedOrgIds, input.securityCode);
 
-  if (bsda.type === BsdaType.COLLECTION_2710 && input.type !== "OPERATION") {
-    throw new UserInputError(
-      "Ce type de bordereau ne peut être signé qu'à la réception par la déchetterie."
-    );
-  }
+  checkSignatureTypeSpecificRules(bsda, input);
 
-  checkBsdaTypeSpecificRules(bsda, input);
-
+  // TODO: should be replaced by code that get triggers when the
+  // transporter receipt is set on the profile
   let transporterReceipt = {};
   if (input.type === "TRANSPORT") {
     transporterReceipt = await getTransporterReceipt(bsda);
   }
 
   // Check that all necessary fields are filled
-  await parseBsda(
-    {
-      ...bsda,
-      grouping: bsda.grouping?.map(g => g.id),
-      forwarding: bsda.forwarding?.id,
-      ...transporterReceipt
-    },
+  await parseBsdaInContext(
+    { persisted: { ...bsda, ...transporterReceipt } },
     {
       currentSignatureType: input.type
     }
@@ -214,20 +208,30 @@ async function signOperation(
     ...(nextStatus === BsdaStatus.REFUSED && { forwardingId: null })
   };
 
+  let refusedEmail: Mail | undefined = undefined;
+
   if (
     bsda.destinationReceptionAcceptationStatus &&
     [
       WasteAcceptationStatus.REFUSED,
       WasteAcceptationStatus.PARTIALLY_REFUSED
-    ].includes(bsda.destinationReceptionAcceptationStatus)
+    ].includes(bsda.destinationReceptionAcceptationStatus) &&
+    (!bsda.emitterIsPrivateIndividual ||
+      // N'envoie rien si on ne connait pas l'adresse e-mail de l'émetteur particulier
+      // FIXME il serait bien de quand même pouvoir envoyer l'email à la DREAL
+      // mais ça demande un refacto de renderBsdaRefusedEmail
+      (bsda.emitterIsPrivateIndividual && bsda.emitterCompanyMail))
   ) {
-    const refusedEmail = await renderBsdaRefusedEmail(bsda);
-    if (refusedEmail) {
-      sendMail(refusedEmail);
-    }
+    refusedEmail = await renderBsdaRefusedEmail(bsda);
   }
 
-  return updateBsda(user, bsda, updateInput);
+  const updated = await updateBsda(user, bsda, updateInput);
+
+  if (refusedEmail) {
+    sendMail(refusedEmail);
+  }
+
+  return updated;
 }
 
 /**
@@ -350,7 +354,10 @@ async function sendAlertIfFollowingBsdaChangedPlannedDestination(bsda: Bsda) {
   }
 }
 
-function checkBsdaTypeSpecificRules(bsda: Bsda, input: BsdaSignatureInput) {
+function checkSignatureTypeSpecificRules(
+  bsda: Bsda,
+  input: BsdaSignatureInput
+) {
   if (bsda.type === BsdaType.COLLECTION_2710 && input.type !== "OPERATION") {
     throw new UserInputError(
       "Ce type de bordereau ne peut être signé qu'à la réception par la déchetterie."
@@ -363,6 +370,12 @@ function checkBsdaTypeSpecificRules(bsda: Bsda, input: BsdaSignatureInput) {
   ) {
     throw new UserInputError(
       "Ce type de bordereau ne peut pas être signé par une entreprise de travaux."
+    );
+  }
+
+  if (bsda.type === BsdaType.COLLECTION_2710 && input.type !== "OPERATION") {
+    throw new UserInputError(
+      "Ce type de bordereau ne peut être signé qu'à la réception par la déchetterie."
     );
   }
 }

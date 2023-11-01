@@ -87,7 +87,7 @@ describe("Query.bsds.vhus base workflow", () => {
     await transporterReceiptFactory({ company: transporter.company });
     destination = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
-        set: ["WASTEPROCESSOR"]
+        set: ["WASTE_VEHICLES"]
       }
     });
   });
@@ -459,7 +459,8 @@ describe("Query.bsds.vhus base workflow", () => {
           destinationReceptionWeight: 10.0,
           destinationReceptionAcceptationStatus:
             WasteAcceptationStatus.ACCEPTED,
-          destinationOperationCode: "R 4"
+          destinationOperationCode: "R 4",
+          destinationOperationMode: "REUTILISATION"
         }
       });
       await mutate<Pick<Mutation, "signBsvhu">, MutationSignBsvhuArgs>(

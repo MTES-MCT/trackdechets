@@ -178,6 +178,7 @@ describe("Query.bsds.bsda base workflow", () => {
               },
               operation: {
                 code: "D 9",
+                mode: "ELIMINATION",
                 date: new Date().toISOString() as any
               }
             }
@@ -927,6 +928,7 @@ describe("Query.bsds.bsda base workflow", () => {
         where: { id: bsdaId },
         data: {
           destinationOperationCode: "D 15",
+          destinationOperationMode: null,
           status: "SENT",
           destinationOperationSignatureDate: null,
           destinationOperationSignatureAuthor: null

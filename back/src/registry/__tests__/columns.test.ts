@@ -1,9 +1,10 @@
 import { IncomingWaste } from "../../generated/graphql/types";
-import { formatRow } from "../columns";
+import { CUSTOM_WASTE_COLUMNS, formatRow } from "../columns";
 
 describe("formatRow", () => {
   it("should format waste", () => {
     const waste: IncomingWaste = {
+      bsdType: "BSDA",
       brokerCompanyName: "broker",
       brokerCompanySiret: "broker_siret",
       brokerRecepisseNumber: "broker_recepisse",
@@ -17,6 +18,7 @@ describe("formatRow", () => {
       emitterCompanyName: "emitter name",
       emitterCompanySiret: "emitter siret",
       emitterPickupsiteAddress: "pickup site address",
+      status: "DRAFT",
       id: "id",
       initialEmitterCompanyAddress: "initial emitter address",
       initialEmitterCompanyName: "initial emitter company name",
@@ -34,12 +36,18 @@ describe("formatRow", () => {
       wasteDescription: "déchets dangereux"
     };
     const formatted = formatRow(waste);
-    expect(Object.keys(waste).length).toEqual(Object.keys(formatted).length);
+    // Fields in the waste object + custom fields added for user convenience
+    expect(Object.keys(waste).length + CUSTOM_WASTE_COLUMNS.length).toEqual(
+      Object.keys(formatted).length
+    );
     expect(formatted).toEqual({
+      bsdType: "BSDA",
       id: waste.id,
       wasteDescription: "déchets dangereux",
       wasteCode: "01 01 01*",
       pop: "O",
+      status: "DRAFT",
+      statusLabel: "Brouillon",
       initialEmitterCompanyName: "initial emitter company name",
       initialEmitterCompanySiret: "initial emitter company siret",
       initialEmitterPostalCodes: "13001,13002",
@@ -67,6 +75,7 @@ describe("formatRow", () => {
     });
     const formattedWithLabels = formatRow(waste, true);
     expect(formattedWithLabels).toEqual({
+      "Type de bordereau": "BSDA",
       "N° de bordereau": "id",
       "Dénomination usuelle": "déchets dangereux",
       "Code du déchet": "01 01 01*",
@@ -78,6 +87,8 @@ describe("formatRow", () => {
       "Expéditeur raison sociale": "emitter name",
       "Expéditeur SIRET": "emitter siret",
       "Expéditeur adresse": "emitter address",
+      "Statut du bordereau (code)": "DRAFT",
+      "Statut du bordereau": "Brouillon",
       "Adresse de prise en charge": "pickup site address",
       "Éco-organisme raison sociale": "",
       "Éco-organisme SIREN": "",
@@ -97,7 +108,7 @@ describe("formatRow", () => {
       "Quantité de déchet entrant (t)": 1.2
     });
     expect(Object.keys(formattedWithLabels).length).toEqual(
-      Object.keys(waste).length
+      Object.keys(waste).length + CUSTOM_WASTE_COLUMNS.length
     );
   });
 });

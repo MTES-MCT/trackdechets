@@ -98,7 +98,7 @@ export function SignTransport({
           <Formik
             initialValues={{
               author: "",
-              date: TODAY,
+              date: TODAY.toISOString(),
               ...getComputedState(
                 {
                   transporter: {

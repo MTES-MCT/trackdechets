@@ -105,9 +105,6 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.Resent:
       return SIGNE_PAR_TRANSPORTEUR;
     case BsdStatusCode.SignedByProducer:
-      if (bsdType === BsdType.Bsdd) {
-        return INITIAL;
-      }
       return SIGNE_PAR_EMETTEUR;
     case BsdStatusCode.Initial:
       if (isDraft) {
@@ -162,7 +159,7 @@ export const getRevisionStatusLabel = (status: string) => {
   }
 };
 
-const hasSameEmitterTransporterAndEcoOrgSiret = (
+const hasEmitterTransporterAndEcoOrgSiret = (
   bsd: BsdDisplay,
   siret: string
 ): boolean => {
@@ -211,6 +208,7 @@ const hasTemporaryStorage = (currentSiret: string, bsd: BsdDisplay): boolean =>
   [
     bsd.destination?.company?.siret,
     bsd.temporaryStorageDetail?.transporter?.company?.siret,
+    bsd.temporaryStorageDetail?.transporter?.company?.orgId,
   ].includes(currentSiret);
 
 const isSameSiretTemporaryStorageTransporter = (
@@ -395,7 +393,7 @@ export const isSignEmission = (
   return (
     isAppendix1Producer(bsd) &&
     (hasAutomaticSignature ||
-      (hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret) &&
+      (hasEmitterTransporterAndEcoOrgSiret(bsd, currentSiret) &&
         !bsd.emitter?.isPrivateIndividual))
   );
 };
@@ -430,8 +428,8 @@ export const getSealedBtnLabel = (
       }
       return FAIRE_SIGNER;
     }
-    if (hasSameEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
-      return SIGNER;
+    if (hasEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
+      return FAIRE_SIGNER;
     }
   }
   if (
@@ -481,12 +479,19 @@ export const getSentBtnLabel = (
     return "";
   }
   if (
-    ((isBsdasri(bsd.type) &&
-      isActTab &&
-      currentSiret === bsd.destination?.company?.siret) ||
-      (isBsff(bsd.type) &&
-        isActTab &&
-        isSameSiretDestination(currentSiret, bsd))) &&
+    isBsdasri(bsd.type) &&
+    currentSiret === bsd.destination?.company?.siret &&
+    isActTab &&
+    !bsd.synthesizedIn &&
+    permissions.includes(UserPermission.BsdCanSignAcceptation)
+  ) {
+    return VALIDER_RECEPTION;
+  }
+
+  if (
+    isBsff(bsd.type) &&
+    isActTab &&
+    isSameSiretDestination(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignAcceptation)
   ) {
     return VALIDER_RECEPTION;
@@ -641,7 +646,7 @@ const getAcceptedBtnLabel = (
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
     if (bsd.packagings?.length === 1) {
-      return SIGNER;
+      return VALIDER_TRAITEMENT;
     }
     return SIGNATURE_ACCEPTATION_CONTENANT;
   }
@@ -689,7 +694,10 @@ export const getResealedBtnLabel = (
     hasTemporaryStorage(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignEmission)
   ) {
-    return SIGNER;
+    if (isSameSiretEmmiter(currentSiret, bsd)) {
+      return SIGNER;
+    }
+    return FAIRE_SIGNER;
   }
   return "";
 };

@@ -26,6 +26,8 @@ import {
 import {
   blankstate_action_desc,
   blankstate_action_title,
+  blankstate_default_desc,
+  blankstate_default_title,
   blankstate_draft_desc,
   blankstate_draft_title,
   blankstate_follow_desc,
@@ -500,6 +502,7 @@ const DashboardPage = () => {
     if (isReviewsTab) {
       return blankstate_reviews_title;
     }
+    return blankstate_default_title;
   };
 
   const getBlankstateDescription = () => {
@@ -525,6 +528,7 @@ const DashboardPage = () => {
     if (isReviewsTab) {
       return blankstate_reviews_desc;
     }
+    return blankstate_default_desc;
   };
 
   const toggleFiltersBlock = () => {
@@ -578,43 +582,39 @@ const DashboardPage = () => {
         onApplyFilters={handleFiltersSubmit}
         areAdvancedFiltersOpen={areAdvancedFiltersOpen}
       />
-      {isFetchingMore && <Loader />}
-      {isLoadingBsds && !isFetchingMore ? (
-        <Loader />
-      ) : (
-        <>
-          {!Boolean(bsdsTotalCount) && (
-            <Blankslate>
-              {getBlankstateTitle() && (
-                <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
-              )}
-              <BlankslateDescription>
-                {getBlankstateDescription()}
-              </BlankslateDescription>
-            </Blankslate>
-          )}
+      {(isFetchingMore || isLoadingBsds) && <Loader />}
+      {!Boolean(bsdsTotalCount) && !isLoadingBsds && (
+        <div className="dashboard-page__blankstate">
+          <Blankslate>
+            {getBlankstateTitle() && (
+              <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
+            )}
+            <BlankslateDescription>
+              {getBlankstateDescription()}
+            </BlankslateDescription>
+          </Blankslate>
+        </div>
+      )}
 
-          {Boolean(bsdsTotalCount) && (
-            <BsdCardList
-              siret={siret}
-              bsds={bsds!}
-              bsdCurrentTab={bsdCurrentTab}
-              siretsWithAutomaticSignature={siretsWithAutomaticSignature}
-            />
-          )}
+      {Boolean(bsdsTotalCount) && (
+        <BsdCardList
+          siret={siret}
+          bsds={bsds!}
+          bsdCurrentTab={bsdCurrentTab}
+          siretsWithAutomaticSignature={siretsWithAutomaticSignature}
+        />
+      )}
 
-          {hasNextPage && (
-            <div className="dashboard-page__loadmore">
-              <button
-                className="fr-btn"
-                onClick={loadMore}
-                disabled={isFetchingMore}
-              >
-                {load_more_bsds}
-              </button>
-            </div>
-          )}
-        </>
+      {hasNextPage && (
+        <div className="dashboard-page__loadmore">
+          <button
+            className="fr-btn"
+            onClick={loadMore}
+            disabled={isFetchingMore}
+          >
+            {load_more_bsds}
+          </button>
+        </div>
       )}
     </div>
   );

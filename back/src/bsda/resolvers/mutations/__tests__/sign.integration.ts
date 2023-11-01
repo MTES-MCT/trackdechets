@@ -138,6 +138,61 @@ describe("Mutation.Bsda.sign", () => {
       ]);
     });
 
+    it("should throw error if the destination (exutoire) is not completed", async () => {
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: null,
+          destinationCompanyName: null,
+          destinationCompanyAddress: null,
+          destinationCompanyContact: null,
+          destinationCompanyPhone: null,
+          destinationCompanyMail: null,
+          destinationCap: null,
+          destinationPlannedOperationCode: null
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            author: user.name,
+            type: "EMISSION"
+          }
+        }
+      });
+
+      console.log(errors);
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le nom de l'entreprise de destination est obligatoire.\n" +
+            "Le SIRET de l'entreprise de destination est obligatoire.\n" +
+            "L'adresse de l'entreprise de destination est obligatoire.\n" +
+            "Le contact de l'entreprise de destination est obligatoire.\n" +
+            "Le téléphone de l'entreprise de destination est obligatoire.\n" +
+            "L'email de l'entreprise de destination est obligatoire.\n" +
+            "Le CAP du destinataire est obligatoire.\n" +
+            "Le code d'opération de la destination est obligatoire."
+        })
+      ]);
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          extensions: expect.objectContaining({
+            code: "BAD_USER_INPUT"
+          })
+        })
+      ]);
+    });
+
     it("should allow the transporter to sign for the emitter with the security code", async () => {
       const emitter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
@@ -472,7 +527,7 @@ describe("Mutation.Bsda.sign", () => {
       );
     });
 
-    it("should disallow transporter to sign transport when receipt if missing", async () => {
+    it("should disallow transporter to sign transport when recepisse is missing", async () => {
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
 
       const bsda = await bsdaFactory({
@@ -484,7 +539,8 @@ describe("Mutation.Bsda.sign", () => {
           workerWorkSignatureDate: new Date(),
           transporterCompanySiret: transporter.company.siret,
           transporterTransportMode: "ROAD",
-          transporterTransportPlates: ["AA-00-XX"]
+          transporterTransportPlates: ["AA-00-XX"],
+          transporterRecepisseNumber: null
         }
       });
 
@@ -501,6 +557,7 @@ describe("Mutation.Bsda.sign", () => {
           }
         }
       });
+      console.log(errors);
       expect(errors).toEqual([
         expect.objectContaining({
           message: expect.stringContaining(

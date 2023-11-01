@@ -59,7 +59,7 @@ type Query {
     Permet en conjonction avec `cursorAfter` de paginer "en avant"
     (des bordereaux les plus récents aux bordereaux les plus anciens)
     Nombre de bordereaux retournés après le `cursorAfter`
-    Défaut à 50, maximum à 500
+    Défaut à 50, maximum à 100
     """
     first: Int
 
@@ -77,7 +77,7 @@ type Query {
     """
     (Optionnel) PAGINATION
     Nombre de bordereaux retournés avant le `cursorBefore`
-    Défaut à 50, maximum à 500
+    Défaut à 50, maximum à 100
     """
     last: Int
 

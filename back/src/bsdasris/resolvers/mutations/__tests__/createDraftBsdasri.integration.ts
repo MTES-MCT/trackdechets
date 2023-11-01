@@ -108,9 +108,12 @@ describe("Mutation.createDraftBsdasri", () => {
     );
   });
 
-  it.each(["R12", "D12"])(
+  it.each([
+    ["R12", undefined],
+    ["D12", "ELIMINATION"]
+  ])(
     "should disallow R12 & D12 for non waste processor destination ",
-    async code => {
+    async (code, mode) => {
       // both R12 & D12 operation codes require the destination to be a COLLECTOR
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -136,7 +139,8 @@ describe("Mutation.createDraftBsdasri", () => {
                   siret: destinationCompany.siret
                 },
                 operation: {
-                  code
+                  code,
+                  mode
                 }
               }
             }
@@ -155,43 +159,44 @@ describe("Mutation.createDraftBsdasri", () => {
       ]);
     }
   );
-  it.each(["R12", "D12"])(
-    "should allow R12 & D12 for waste processor ",
-    async code => {
-      // both R12 & D12 operation codes require the destination to be a COLLECTOR
+  it.each([
+    ["R12", undefined],
+    ["D12", "ELIMINATION"]
+  ])("should allow R12 & D12 for waste processor ", async (code, mode) => {
+    // both R12 & D12 operation codes require the destination to be a COLLECTOR
 
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const destinationCompany = await companyFactory({
-        companyTypes: {
-          set: [CompanyType.COLLECTOR]
-        }
-      });
-      const { mutate } = makeClient(user);
-      const { data } = await mutate<Pick<Mutation, "createDraftBsdasri">>(
-        CREATE_DRAFT_DASRI,
-        {
-          variables: {
-            input: {
-              emitter: {
-                company: {
-                  siret: company.siret
-                }
+    const destinationCompany = await companyFactory({
+      companyTypes: {
+        set: [CompanyType.COLLECTOR]
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createDraftBsdasri">>(
+      CREATE_DRAFT_DASRI,
+      {
+        variables: {
+          input: {
+            emitter: {
+              company: {
+                siret: company.siret
+              }
+            },
+            destination: {
+              company: {
+                siret: destinationCompany.siret
               },
-              destination: {
-                company: {
-                  siret: destinationCompany.siret
-                },
-                operation: {
-                  code
-                }
+              operation: {
+                code,
+                mode
               }
             }
           }
         }
-      );
+      }
+    );
 
-      expect(data.createDraftBsdasri.isDraft).toBe(true);
-    }
-  );
+    expect(data.createDraftBsdasri.isDraft).toBe(true);
+  });
 });

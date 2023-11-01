@@ -63,4 +63,8 @@
   .fr-breadcrumb__list li:not(:first-child):before {
     -webkit-mask-image: url("/icons/system/arrow-right-s-line.svg");
   }
+
+  &__blankstate {
+    margin-top: 100px;
+  }
 }

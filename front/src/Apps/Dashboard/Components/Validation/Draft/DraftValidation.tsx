@@ -161,7 +161,12 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
               <button
                 type="submit"
                 className="btn btn--primary"
-                onClick={() => markAsSealed()}
+                onClick={async () => {
+                  const res = await markAsSealed();
+                  if (!res.errors) {
+                    onClose();
+                  }
+                }}
               >
                 Je valide
               </button>
@@ -188,13 +193,16 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             </button>
             <button
               className="btn btn--primary"
-              onClick={() =>
-                publishBsda({
+              onClick={async () => {
+                const res = await publishBsda({
                   variables: {
                     id: bsd.id,
                   },
-                })
-              }
+                });
+                if (!res.errors) {
+                  onClose();
+                }
+              }}
             >
               <span>Publier le bordereau</span>
             </button>
@@ -230,7 +238,15 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             <button className="btn btn--outline-primary" onClick={onClose}>
               Annuler
             </button>
-            <button className="btn btn--primary" onClick={() => publishBsff()}>
+            <button
+              className="btn btn--primary"
+              onClick={async () => {
+                const res = await publishBsff();
+                if (!res.errors) {
+                  onClose();
+                }
+              }}
+            >
               <span>Publier le bordereau</span>
             </button>
           </div>
@@ -251,13 +267,16 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             </button>
             <button
               className="btn btn--primary"
-              onClick={() =>
-                publishBsvhu({
+              onClick={async () => {
+                const res = await publishBsvhu({
                   variables: {
                     id: bsd.id,
                   },
-                })
-              }
+                });
+                if (!res.errors) {
+                  onClose();
+                }
+              }}
             >
               <span>Publier le bordereau</span>
             </button>

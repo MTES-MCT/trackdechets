@@ -16,7 +16,6 @@ import {
   siretSchema,
   foreignVatNumberSchema,
   isDestinationRefinement,
-  isTransporterRefinement,
   isWorkerRefinement
 } from "../../common/validation/siret";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
@@ -197,7 +196,7 @@ export const rawBsdaSchema = z
       .superRefine(intermediariesRefinement),
     intermediariesOrgIds: z.array(z.string()).optional()
   })
-  .superRefine(async (val, ctx) => {
+  .superRefine((val, ctx) => {
     if (
       val.destinationReceptionDate &&
       val.destinationOperationDate &&
@@ -210,12 +209,22 @@ export const rawBsdaSchema = z
     }
 
     const { destinationOperationCode, destinationOperationMode } = val;
-    if (destinationOperationCode && destinationOperationMode) {
+    if (destinationOperationCode) {
       const modes = getOperationModesFromOperationCode(
-        destinationOperationCode ?? ""
+        destinationOperationCode
       );
 
-      if (!modes.includes(destinationOperationMode)) {
+      if (modes.length && !destinationOperationMode) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Vous devez préciser un mode de traitement"
+        });
+      } else if (
+        (modes.length &&
+          destinationOperationMode &&
+          !modes.includes(destinationOperationMode)) ||
+        (!modes.length && destinationOperationMode)
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message:
@@ -284,15 +293,6 @@ export const rawBsdaSchema = z
           "Les opérations d'entreposage provisoire et groupement ne sont pas compatibles entre elles"
       });
     }
-
-    // Additionnal checks on the transporterCompanySiret
-    await isTransporterRefinement(
-      {
-        siret: val.transporterCompanySiret,
-        transporterRecepisseIsExempted: val.transporterRecepisseIsExempted
-      },
-      ctx
-    );
   })
   .transform(val => {
     val.intermediariesOrgIds = val.intermediaries

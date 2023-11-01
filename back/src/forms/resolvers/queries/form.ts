@@ -30,7 +30,7 @@ const formResolver: QueryResolvers["form"] = async (_, args, context) => {
   const form = await getFormOrFormNotFound(validArgs, {
     ...expandableFormIncludes,
     intermediaries: true,
-    grouping: { include: { initialForm: true } }
+    grouping: { include: { initialForm: { include: { transporters: true } } } }
   });
 
   await checkCanRead(user, form);

@@ -1,124 +1,30 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
+import { isTransporterRefinement } from "../../common/validation/siret";
 import { BsdaSignatureType } from "../../generated/graphql/types";
-import { SIGNATURES_HIERARCHY } from "./edition";
 import { getReadonlyBsdaRepository } from "../repository";
 import { PARTIAL_OPERATIONS } from "./constants";
-import { editionRules } from "./rules";
-import { ZodBsda, rawBsdaSchema } from "./schema";
-import { capitalize } from "../../common/strings";
-import { runTransformers } from "./transformers";
+import { BsdaValidationContext } from "./index";
+import { ZodBsda } from "./schema";
 
-type BsdaValidationContext = {
-  enablePreviousBsdasChecks?: boolean;
-  enableCompletionTransformers?: boolean;
-  currentSignatureType?: BsdaSignatureType;
-};
-
-export async function parseBsda(
-  bsda: unknown,
-  validationContext: BsdaValidationContext
-): Promise<ZodBsda> {
-  const contextualSchema = getContextualBsdaSchema(validationContext);
-
-  return contextualSchema.parseAsync(bsda);
-}
-
-function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
-  // Some signatures may be skipped, so always check all the hierarchy
-  const signaturesToCheck = getSignatureHierarchy(
-    validationContext.currentSignatureType
+export async function applyDynamicRefinement(
+  bsda: ZodBsda,
+  validationContext: BsdaValidationContext,
+  ctx: RefinementCtx
+) {
+  await isTransporterRefinement(
+    {
+      siret: bsda.transporterCompanySiret,
+      transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted
+    },
+    ctx
   );
-  // We skip the rules for which the fields are not sealed yet
-  const sealedRules = Object.entries(editionRules).filter(([_, rule]) =>
-    signaturesToCheck.includes(rule.sealedBy)
-  );
-  const sealedFields = sealedRules.map(([field]) => field);
 
-  return rawBsdaSchema
-    .transform(async val => {
-      val.intermediariesOrgIds = val.intermediaries
-        ? val.intermediaries
-            .flatMap(intermediary => [
-              intermediary.siret,
-              intermediary.vatNumber
-            ])
-            .filter(Boolean)
-        : undefined;
+  if (validationContext.enablePreviousBsdasChecks) {
+    await validatePreviousBsdas(bsda, ctx);
+  }
 
-      if (validationContext.enableCompletionTransformers) {
-        val = await runTransformers(val, sealedFields);
-      }
-
-      return val;
-    })
-    .superRefine(async (val, ctx) => {
-      for (const [field, rule] of sealedRules) {
-        if (rule.superRefineWhenSealed instanceof Function) {
-          // @ts-expect-error TODO: superRefineWhenSealed first param is inferred as never ?
-          rule.superRefineWhenSealed(val[field], ctx);
-        }
-
-        const fieldIsRequired =
-          rule.isRequired instanceof Function
-            ? rule.isRequired(val)
-            : rule.isRequired;
-
-        if (fieldIsRequired && val[field] == null) {
-          const description = rule.name
-            ? capitalize(rule.name)
-            : `Le champ ${field}`;
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: [`${field}`],
-            message: `${description} est obligatoire.${rule.suffix ?? ""}`
-          });
-        }
-      }
-
-      // Custom validation, not part of the schema because it depends on the validationContext
-      if (validationContext.enablePreviousBsdasChecks) {
-        await validatePreviousBsdas(val, ctx);
-      }
-
-      await validateDestination(
-        val,
-        validationContext.currentSignatureType,
-        ctx
-      );
-
-      // Plates are mandatory at transporter signature's step
-      if (validationContext.currentSignatureType === "TRANSPORT") {
-        const { transporterTransportMode, transporterTransportPlates } = val;
-
-        if (
-          transporterTransportMode === "ROAD" &&
-          (!transporterTransportPlates ||
-            !transporterTransportPlates?.filter(p => Boolean(p)).length)
-        ) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "La plaque d'immatriculation est requise",
-            path: ["transporterTransportPlates"]
-          });
-        }
-      }
-    });
-}
-
-function getSignatureHierarchy(
-  targetSignature: BsdaSignatureType | undefined
-): BsdaSignatureType[] {
-  if (!targetSignature) return [];
-
-  const parent = Object.entries(SIGNATURES_HIERARCHY).find(
-    ([_, details]) => details.next === targetSignature
-  )?.[0];
-
-  return [
-    targetSignature,
-    ...getSignatureHierarchy(parent as BsdaSignatureType)
-  ];
+  await validateDestination(bsda, validationContext.currentSignatureType, ctx);
 }
 
 async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
