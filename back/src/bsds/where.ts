@@ -181,7 +181,21 @@ export function toElasticSimpleQuery(where: BsdWhere) {
           "destinationOperationDate",
           where.destination?.operation?.date
         ),
-        toElasticStringListQuery("sirets", where.sirets)
+        toElasticStringListQuery("sirets", where.sirets),
+        toElasticStringQuery("recipientCap", where.recipientCap),
+        toElasticStringQuery(
+          "temporaryStorageDestinationCap",
+          where.temporaryStorageDestinationCap
+        ),
+        toElasticStringQuery("destinationCap", where.destinationCap),
+        toElasticStringQuery(
+          "operationNextDestinationCap",
+          where.operationNextDestinationCap
+        ),
+        toElasticStringQuery(
+          "destinationOperationNextDestinationCap",
+          where.destinationOperationNextDestinationCap
+        )
       ].filter(Boolean)
     }
   };

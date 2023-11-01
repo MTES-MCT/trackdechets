@@ -16,6 +16,7 @@ import {
   filter_broker_siret,
   filter_bsd_number,
   filter_bsd_type,
+  filter_cap,
   filter_chantier_adress,
   filter_chantier_name,
   filter_contenant_number,
@@ -99,6 +100,7 @@ enum FilterName {
   givenName = "givenName",
   sealNumbers = "sealNumbers",
   ficheInterventionNumbers = "ficheInterventionNumbers",
+  cap = "cap",
 }
 
 export const quickFilterList: Filter[] = [
@@ -120,7 +122,12 @@ export const quickFilterList: Filter[] = [
     type: FilterType.input,
     isActive: true,
   },
-  // TODO: CAP
+  {
+    name: FilterName.cap,
+    label: filter_cap,
+    type: FilterType.input,
+    isActive: true,
+  },
   {
     name: FilterName.pickupSiteName,
     label: filter_chantier_name,
@@ -474,6 +481,23 @@ export const filterPredicates: {
       },
     }),
     order: "address",
+  },
+  {
+    filterName: FilterName.cap,
+    where: value => ({
+      _and: [
+        {
+          _or: [
+            { recipientCap: { _contains: value } },
+            { temporaryStorageDestinationCap: { _contains: value } },
+            { destinationCap: { _contains: value } },
+            { operationNextDestinationCap: { _contains: value } },
+            { destinationOperationNextDestinationCap: { _contains: value } },
+          ],
+        },
+      ],
+    }),
+    order: "cap",
   },
 ];
 

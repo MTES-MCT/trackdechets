@@ -104,6 +104,7 @@ export const filter_next_destination_siret = "SIRET du destinataire ultérieur";
 export const filter_trader_siret = "SIRET du négociant";
 export const filter_broker_siret = "SIRET du courtier";
 export const filter_emitter_name = "Raison sociale / SIRET";
+export const filter_cap = "Numéro de CAP";
 export const filter_seal_numbers = "Numéro du scellé (BSDA)";
 export const filter_fiche_intervention_numbers =
   "Numéro de fiche d'intervention (BSFF)";
