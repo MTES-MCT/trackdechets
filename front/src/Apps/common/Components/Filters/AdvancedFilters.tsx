@@ -154,7 +154,7 @@ const Filters = ({
       if (
         newFilterValues[filterName].startDate &&
         newFilterValues[filterName].endDate &&
-        newFilterValues[filterName].startDate <
+        newFilterValues[filterName].startDate <=
           newFilterValues[filterName].endDate
       ) {
         setIsApplyDisabled(false);
