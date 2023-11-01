@@ -308,8 +308,8 @@ function BsffQuantity({ bsff }: Pick<Props, "bsff">) {
                 defaultChecked={bsff.weight?.isEstimate}
                 readOnly
               />{" "}
-              Estimée "Quantité estimée conformément à l'article 5.4.1.1.3.2" de
-              l'ADR 2023
+              Estimée "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR
+              2023
             </span>
           </div>
           <div>Kilogramme(s) : {bsff.weight.value}</div>
