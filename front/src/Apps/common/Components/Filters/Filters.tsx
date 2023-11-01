@@ -33,8 +33,6 @@ const Filters = ({
   useEffect(() => {
     const filters = purgeEmptyValues({ ...advancedFilters, ...quickFilters });
     onApplyFilters(filters);
-
-    return () => onApplyFilters({});
   }, [advancedFilters, onApplyFilters, quickFilters]);
 
   return (
