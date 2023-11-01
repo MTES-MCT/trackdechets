@@ -5,6 +5,7 @@ import * as Sentry from "@sentry/browser";
 import routes from "../Apps/routes";
 import { GET_BSDS } from "../Apps/common/queries";
 import {
+  BsdWhere,
   BsdaRevisionRequestEdge,
   FormRevisionRequestEdge,
   OrderType,
@@ -266,7 +267,7 @@ const DashboardPage = () => {
   const handleFiltersSubmit = React.useCallback(
     filterValues => {
       const variables = {
-        where: {},
+        where: {} as BsdWhere,
         order: {},
       };
       const routePredicate = withRoutePredicate();
@@ -277,19 +278,33 @@ const DashboardPage = () => {
       const filters = filterList.filter(filter =>
         filterKeys.includes(filter.name)
       );
+
+      // Careful. Multiple filters might use '_and', let's not override
+      // it each loop iteration because of key uniqueness
+      let _ands: BsdWhere[] = [];
+
       filters.forEach(f => {
         const predicate = filterPredicates.find(
           filterPredicate => filterPredicate.filterName === f.name
         );
         if (predicate) {
           const filterValue = filterValues[f.name];
+          const { _and, ...ops } = predicate.where(filterValue);
+
+          // Store the '_and' filters separately
+          if (_and) _ands = [..._ands, ..._and];
+
           variables.where = {
             ...variables.where,
-            ...predicate.where(filterValue),
+            ...ops,
           };
           variables.order[predicate.order] = OrderType.Asc;
         }
       });
+
+      // Add all the compiled '_and', if any
+      if (_ands.length) variables.where._and = _ands;
+
       setBsdsVariables(variables);
     },
     [withRoutePredicate]
