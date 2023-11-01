@@ -279,12 +279,32 @@ export const filterPredicates: {
   },
   {
     filterName: FilterName.waste,
-    where: value => ({ waste: { code: { _contains: value } } }),
+    where: value => ({
+      _and: [
+        {
+          _or: [
+            { waste: { code: { _contains: value } } },
+            { waste: { description: { _match: value } } },
+          ],
+        },
+      ],
+    }),
     order: "wasteCode",
   },
   {
     filterName: FilterName.readableId,
-    where: value => ({ readableId: { _contains: value } }),
+    where: value => ({
+      _and: [
+        {
+          _or: [
+            { readableId: { _contains: value } },
+            { customId: { _contains: value } },
+            { packagingNumbers: { _hasSome: value } },
+            { packagingNumbers: { _itemContains: value } },
+          ],
+        },
+      ],
+    }),
     order: "readableId",
   },
   {
@@ -357,11 +377,27 @@ export const filterPredicates: {
   {
     filterName: FilterName.givenName,
     where: value => ({
-      emitter: {
-        company: {
-          name: { _match: value },
+      _and: [
+        {
+          _or: [
+            { emitter: { company: { name: { _match: value } } } },
+            { emitter: { company: { siret: { _contains: value } } } },
+            { emitter: { pickupSite: { name: { _match: value } } } },
+            { transporter: { company: { name: { _match: value } } } },
+            { transporter: { company: { siret: { _contains: value } } } },
+            { worker: { company: { name: { _match: value } } } },
+            { worker: { company: { siret: { _contains: value } } } },
+            { destination: { company: { name: { _match: value } } } },
+            { destination: { company: { siret: { _contains: value } } } },
+            { broker: { company: { name: { _match: value } } } },
+            { broker: { company: { siret: { _contains: value } } } },
+            { trader: { company: { name: { _match: value } } } },
+            { trader: { company: { siret: { _contains: value } } } },
+            { ecoOrganisme: { name: { _match: value } } },
+            { ecoOrganisme: { siret: { _contains: value } } },
+          ],
         },
-      },
+      ],
     }),
     order: "name",
   },
