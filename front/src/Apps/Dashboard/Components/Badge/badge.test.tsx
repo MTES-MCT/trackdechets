@@ -70,9 +70,29 @@ describe("Bsd Badge status", () => {
     render(<Badge status={BsdStatusCode.Processed} />);
     expect(screen.getByText(/Traité/i));
   });
+  test("PROCESSED bsff rupture traçabilité R12", () => {
+    render(
+      <Badge
+        status={BsdStatusCode.Processed}
+        bsdType={BsdType.Bsff}
+        operationCode="R12"
+      />
+    );
+    expect(screen.getByText("Traité (avec rupture de traçabilité)"));
+  });
+  test("PROCESSED bsff rupture traçabilité D13", () => {
+    render(
+      <Badge
+        status={BsdStatusCode.Processed}
+        bsdType={BsdType.Bsff}
+        operationCode="D13"
+      />
+    );
+    expect(screen.getByText("Traité (avec rupture de traçabilité)"));
+  });
   test("PROCESSED bsff", () => {
     render(<Badge status={BsdStatusCode.Processed} bsdType={BsdType.Bsff} />);
-    expect(screen.getByText("Traité (avec rupture de traçabilité)"));
+    expect(screen.getByText("Traité"));
   });
   test("AWAITING_GROUP", () => {
     render(<Badge status={BsdStatusCode.AwaitingGroup} />);

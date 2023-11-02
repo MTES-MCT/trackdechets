@@ -82,7 +82,10 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.Accepted:
       return ACCEPTE;
     case BsdStatusCode.Processed:
-      if (bsdType === BsdType.Bsff) {
+      if (
+        bsdType === BsdType.Bsff &&
+        (operationCode === "R12" || operationCode === "D13")
+      ) {
         return TRAITE_AVEC_RUPTURE_TRACABILITE;
       }
       return TRAITE;
