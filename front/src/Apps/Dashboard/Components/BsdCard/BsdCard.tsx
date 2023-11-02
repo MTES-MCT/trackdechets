@@ -247,6 +247,9 @@ function BsdCard({
   const pickupSiteName =
     bsdDisplay?.emitter?.pickupSite?.name ||
     bsdDisplay?.emitter?.workSite?.name;
+  const bsffPackaging = bsdDisplay?.packagings
+    ? bsdDisplay?.packagings[0]
+    : undefined;
   return (
     <>
       <div className="bsd-card" tabIndex={0}>
@@ -341,7 +344,8 @@ function BsdCard({
                     bsdType={bsdDisplay.type}
                     reviewStatus={bsdDisplay?.review?.status}
                     operationCode={
-                      bsdDisplay?.destination?.["operation"]?.["code"]
+                      bsdDisplay?.destination?.["operation"]?.["code"] ||
+                      bsffPackaging?.["operation"]?.["code"]
                     }
                   />
                 </div>
