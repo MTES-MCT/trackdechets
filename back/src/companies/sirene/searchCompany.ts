@@ -24,6 +24,8 @@ const decoratedSearchCompany = cache<SireneSearchResult | null>(
   redundant(...searchCompanyProviders)
 );
 
-export default function searchCompany(siret: string) {
+export default function searchCompany(
+  siret: string
+): Promise<SireneSearchResult | null> {
   return decoratedSearchCompany(siret);
 }
