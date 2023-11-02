@@ -66,7 +66,8 @@ export const getBsdStatusLabel = (
   status: string,
   isDraft: boolean | undefined,
   bsdType?: BsdType,
-  operationCode?: string
+  operationCode?: string,
+  bsdaAnnexed?: boolean
 ) => {
   switch (status) {
     case BsdStatusCode.Draft:
@@ -92,7 +93,13 @@ export const getBsdStatusLabel = (
       return TRAITE;
     case BsdStatusCode.AwaitingChild:
     case BsdStatusCode.Grouped:
-      if (bsdType === BsdType.Bsda || bsdType === BsdType.Bsff) {
+      if (bsdType === BsdType.Bsff) {
+        return EN_ATTENTE_BSD_SUITE;
+      }
+      if (bsdType === BsdType.Bsda) {
+        if (bsdaAnnexed) {
+          return ANNEXE_BORDEREAU_SUITE;
+        }
         return EN_ATTENTE_BSD_SUITE;
       }
       return ANNEXE_BORDEREAU_SUITE;
@@ -135,7 +142,13 @@ export const getBsdStatusLabel = (
       }
       return EN_ATTENTE_BSD_SUITE;
     case BsdStatusCode.IntermediatelyProcessed:
-      if (bsdType === BsdType.Bsdasri || bsdType === BsdType.Bsff) {
+      if (bsdType === BsdType.Bsff) {
+        const operationCodesBsff = ["R12", "R13", "D13", "D14", "D15"];
+        if (operationCode && operationCodesBsff.includes(operationCode)) {
+          return EN_ATTENTE_BSD_SUITE;
+        }
+      }
+      if (bsdType === BsdType.Bsdasri) {
         return ANNEXE_BORDEREAU_SUITE;
       }
       return EN_ATTENTE_BSD_SUITE;

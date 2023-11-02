@@ -120,6 +120,8 @@ export interface BsdDisplay {
     | Maybe<Array<InitialBsdasri>>
     | Array<BsffPackaging>
     | Maybe<Array<InitialBsda>>;
+  groupedIn?: Maybe<Bsda>;
+  forwardedIn?: Maybe<Bsda>;
   synthesizing?: Maybe<Array<InitialBsdasri>>;
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;
   review?: {
