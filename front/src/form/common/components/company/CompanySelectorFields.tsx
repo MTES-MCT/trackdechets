@@ -21,6 +21,7 @@ interface CompanySelectorFieldsProps {
   allowForeignCompanies?: boolean;
   disabled?: boolean;
   optionalMail?: boolean;
+  shouldUpdateFields?: boolean;
 }
 
 export default function CompanySelectorFields({
@@ -29,6 +30,7 @@ export default function CompanySelectorFields({
   name,
   disabled = false,
   optionalMail = false,
+  shouldUpdateFields = true,
 }: CompanySelectorFieldsProps) {
   const [field] = useField<FormCompany>({ name });
   const { setFieldError, setFieldValue, setFieldTouched, values } =
@@ -76,26 +78,28 @@ export default function CompanySelectorFields({
   }
 
   useEffect(() => {
-    const fields: FormCompany = {
-      orgId: currentCompany.orgId,
-      siret: currentCompany.siret,
-      vatNumber: currentCompany.vatNumber,
-      name:
-        currentCompany.name && !isUnknownCompanyName(currentCompany.name)
-          ? currentCompany.name
-          : "",
-      address: currentCompany.address ?? "",
-      contact: currentCompany.contact ?? "",
-      phone: currentCompany.contactPhone ?? "",
-      mail: currentCompany.contactEmail ?? "",
-      country: currentCompany.codePaysEtrangerEtablissement,
-    };
+    if (shouldUpdateFields) {
+      const fields: FormCompany = {
+        orgId: currentCompany.orgId,
+        siret: currentCompany.siret,
+        vatNumber: currentCompany.vatNumber,
+        name:
+          currentCompany.name && !isUnknownCompanyName(currentCompany.name)
+            ? currentCompany.name
+            : "",
+        address: currentCompany.address ?? "",
+        contact: currentCompany.contact ?? "",
+        phone: currentCompany.contactPhone ?? "",
+        mail: currentCompany.contactEmail ?? "",
+        country: currentCompany.codePaysEtrangerEtablissement,
+      };
 
-    Object.keys(fields).forEach(key => {
-      setFieldValue(`${field.name}.${key}`, fields[key]);
-    });
-    setFieldTouched(`${field.name}`, true, true);
-  }, [currentCompany]);
+      Object.keys(fields).forEach(key => {
+        setFieldValue(`${field.name}.${key}`, fields[key]);
+      });
+      setFieldTouched(`${field.name}`, true, true);
+    }
+  }, [currentCompany, shouldUpdateFields]);
 
   return (
     <>

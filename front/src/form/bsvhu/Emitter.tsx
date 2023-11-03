@@ -23,6 +23,7 @@ export default function Emitter({ disabled }) {
   const [currentCompany, setCurrentCompany] = useState<
     CompanySearchResult | undefined
   >();
+  const [shouldUpdateFields, setShouldUpdateFields] = useState(false);
 
   const [field] = useField<FormCompany>({ name: "emitter.company" });
   const orgId = useMemo(
@@ -64,6 +65,7 @@ export default function Emitter({ disabled }) {
         }
         onCompanySelected={emitter => {
           setCurrentCompany(emitter);
+          setShouldUpdateFields(true);
 
           setFieldValue(
             "emitter.agrementNumber",
@@ -78,6 +80,7 @@ export default function Emitter({ disabled }) {
           name={"emitter.company"}
           disabled={disabled}
           key={currentCompany.orgId}
+          shouldUpdateFields={shouldUpdateFields}
         />
       )}
 
