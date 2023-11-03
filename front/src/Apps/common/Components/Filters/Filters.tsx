@@ -10,8 +10,10 @@ import {
 } from "Apps/Dashboard/dashboardUtils";
 
 const purgeEmptyValues = (obj: { [key: string]: string | string[] }) => {
-  return Object.fromEntries(
-    Object.entries(obj).filter(([_, v]) => v != null && v !== "" && v.length)
+  return JSON.parse(
+    JSON.stringify(obj, (_, value) => {
+      return value === null || value === "" ? undefined : value;
+    })
   );
 };
 
