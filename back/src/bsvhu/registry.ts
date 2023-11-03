@@ -10,6 +10,23 @@ import {
 import { GenericWaste } from "../registry/types";
 import { getWasteDescription } from "./utils";
 
+const getOperationData = (bsvhu: Bsvhu) => ({
+  destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
+  destinationOperationCode: bsvhu.destinationOperationCode,
+  destinationOperationMode: bsvhu.destinationOperationMode
+});
+
+const getTransporterData = (bsvhu: Bsvhu) => ({
+  transporterRecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
+  transporterNumberPlates: bsvhu.transporterTransportPlates,
+  transporterCompanyName: bsvhu.transporterCompanyName,
+  transporterCompanySiret: bsvhu.transporterCompanySiret,
+  transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
+  transporterCompanyMail: bsvhu.transporterCompanyMail,
+  transporterCustomInfo: bsvhu.transporterCustomInfo,
+  transporterCompanyAddress: bsvhu.transporterCompanyAddress
+});
+
 type RegistryFields =
   | "isIncomingWasteFor"
   | "isOutgoingWasteFor"
@@ -69,11 +86,11 @@ function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     destinationReceptionWeight: bsvhu.destinationReceptionWeight
       ? bsvhu.destinationReceptionWeight / 1000
       : bsvhu.destinationReceptionWeight,
-    transporterRecepisseIsExempted: false,
     wasteAdr: null,
     workerCompanyName: null,
     workerCompanySiret: null,
-    workerCompanyAddress: null
+    workerCompanyAddress: null,
+    ...getTransporterData(bsvhu)
   };
 }
 
@@ -110,14 +127,9 @@ export function toIncomingWaste(bsvhu: Bsvhu): IncomingWaste {
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    transporterCompanyName: bsvhu.transporterCompanyName,
-    transporterCompanySiret: bsvhu.transporterCompanySiret,
-    transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
-    destinationOperationCode: bsvhu.destinationOperationCode,
-    destinationOperationMode: bsvhu.destinationOperationMode,
     destinationCustomInfo: bsvhu.destinationCustomInfo,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
-    transporterCompanyMail: bsvhu.transporterCompanyMail
+    ...getOperationData(bsvhu)
   };
 }
 
@@ -145,7 +157,6 @@ export function toOutgoingWaste(bsvhu: Bsvhu): OutgoingWaste {
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
     destinationCompanyName: bsvhu.destinationCompanyName,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
-    destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
@@ -155,15 +166,10 @@ export function toOutgoingWaste(bsvhu: Bsvhu): OutgoingWaste {
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    transporterCompanyAddress: null,
-    transporterCompanyName: bsvhu.transporterCompanyName,
-    transporterCompanySiret: bsvhu.transporterCompanySiret,
-    transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
-    transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     emitterCustomInfo: bsvhu.emitterCustomInfo,
-    transporterCompanyMail: bsvhu.transporterCompanyMail,
-    destinationCompanyMail: bsvhu.destinationCompanyMail
+    destinationCompanyMail: bsvhu.destinationCompanyMail,
+    ...getOperationData(bsvhu)
   };
 }
 
@@ -184,13 +190,8 @@ export function toTransportedWaste(bsvhu: Bsvhu): TransportedWaste {
 
   return {
     ...genericWaste,
-    transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
-    transporterCompanyName: bsvhu.transporterCompanyName,
-    transporterCompanySiret: bsvhu.transporterCompanySiret,
-    transporterCompanyAddress: bsvhu.transporterCompanyAddress,
-    transporterNumberPlates: bsvhu.transporterTransportPlates,
     ...initialEmitter,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterCompanyName: bsvhu.emitterCompanyName,
@@ -205,7 +206,6 @@ export function toTransportedWaste(bsvhu: Bsvhu): TransportedWaste {
     destinationCompanyName: bsvhu.destinationCompanyName,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
-    transporterCustomInfo: bsvhu.transporterCustomInfo,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     destinationCompanyMail: bsvhu.destinationCompanyMail
   };
@@ -242,19 +242,13 @@ export function toManagedWaste(bsvhu: Bsvhu): ManagedWaste {
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
     destinationCompanyName: bsvhu.destinationCompanyName,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
-    destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
-    transporterCompanyAddress: bsvhu.transporterCompanyAddress,
-    transporterCompanyName: bsvhu.transporterCompanyName,
-    transporterCompanySiret: bsvhu.transporterCompanySiret,
-    transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
-    transporterCompanyMail: bsvhu.transporterCompanyMail,
     destinationCompanyMail: bsvhu.destinationCompanyMail
   };
 }
@@ -278,7 +272,6 @@ export function toAllWaste(bsvhu: Bsvhu): AllWaste {
   return {
     ...genericWaste,
     createdAt: bsvhu.createdAt,
-    transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
     brokerCompanyName: null,
     brokerCompanySiret: null,
@@ -286,20 +279,12 @@ export function toAllWaste(bsvhu: Bsvhu): AllWaste {
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
     destinationCompanyName: bsvhu.destinationCompanyName,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
-    destinationOperationCode: bsvhu.destinationOperationCode,
-    destinationOperationMode: bsvhu.destinationOperationMode,
-    destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
-    transporterCompanyAddress: bsvhu.transporterCompanyAddress,
-    transporterCompanyName: bsvhu.transporterCompanyName,
-    transporterCompanySiret: bsvhu.transporterCompanySiret,
-    transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
-    transporterNumberPlates: bsvhu.transporterTransportPlates,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     managedEndDate: null,
     managedStartDate: null,
@@ -307,7 +292,7 @@ export function toAllWaste(bsvhu: Bsvhu): AllWaste {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
-    transporterCompanyMail: bsvhu.transporterCompanyMail,
-    destinationCompanyMail: bsvhu.destinationCompanyMail
+    destinationCompanyMail: bsvhu.destinationCompanyMail,
+    ...getOperationData(bsvhu)
   };
 }

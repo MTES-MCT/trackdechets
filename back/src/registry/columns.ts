@@ -36,6 +36,8 @@ const formatBoolean = (b: boolean | null) => {
 };
 const formatNumber = (n: number) => (!!n ? parseFloat(n.toFixed(3)) : null); // return as a number to allow xls cells formulas
 const formatArray = (arr: any[]) => (Array.isArray(arr) ? arr.join(",") : "");
+const formatOperationCode = (code?: string) =>
+  code ? code.replace(/ /g, "") : ""; // be consistent and remove all white spaces
 
 const columns: Column[] = [
   // Dénomination, nature et quantité :
@@ -168,13 +170,18 @@ const columns: Column[] = [
   },
   {
     field: "destinationPlannedOperationCode",
-    label: "Code opération prévue"
+    label: "Code opération prévu",
+    format: formatOperationCode
   },
   {
     field: "destinationOperationMode",
     label: "Mode de traitement réalisé"
   },
-  { field: "destinationOperationCode", label: "Code opération réalisée" },
+  {
+    field: "destinationOperationCode",
+    label: "Code opération réalisé",
+    format: formatOperationCode
+  },
   {
     field: "destinationOperationNoTraceability",
     label: "Rupture de traçabilité autorisée",

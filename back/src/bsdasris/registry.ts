@@ -13,6 +13,24 @@ import { GenericWaste } from "../registry/types";
 import { extractPostalCode } from "../utils";
 import { getWasteDescription } from "./utils";
 
+const getOperationData = (bsdasri: Bsdasri) => ({
+  destinationPlannedOperationCode: bsdasri.destinationOperationCode,
+  destinationOperationCode: bsdasri.destinationOperationCode,
+  destinationOperationMode: bsdasri.destinationOperationMode
+});
+
+const getTransporterData = (bsdasri: Bsdasri) => ({
+  transporterRecepisseIsExempted: bsdasri.transporterRecepisseIsExempted,
+  transporterNumberPlates: bsdasri.transporterTransportPlates,
+  transporterCompanyAddress: bsdasri.transporterCompanyAddress,
+  transporterCompanyName: bsdasri.transporterCompanyName,
+  transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
+  transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
+  transporterCompanyMail: bsdasri.transporterCompanyMail,
+  transporterCustomInfo: bsdasri.transporterCustomInfo,
+  transporterTakenOverAt: bsdasri.transporterTakenOverAt
+});
+
 type RegistryFields =
   | "isIncomingWasteFor"
   | "isOutgoingWasteFor"
@@ -76,11 +94,11 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
       ? bsdasri.destinationReceptionWasteWeightValue / 1000
       : bsdasri.destinationReceptionWasteWeightValue,
-    transporterRecepisseIsExempted: false,
     wasteAdr: bsdasri.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
-    workerCompanyAddress: null
+    workerCompanyAddress: null,
+    ...getTransporterData(bsdasri)
   };
 }
 
@@ -130,14 +148,9 @@ export function toIncomingWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-    transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
-    destinationOperationCode: bsdasri.destinationOperationCode,
-    destinationOperationMode: bsdasri.destinationOperationMode,
     destinationCustomInfo: bsdasri.destinationCustomInfo,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
-    transporterCompanyMail: bsdasri.transporterCompanyMail
+    ...getOperationData(bsdasri)
   };
 }
 
@@ -173,7 +186,6 @@ export function toOutgoingWaste(
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
-    destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
@@ -188,17 +200,12 @@ export function toOutgoingWaste(
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    transporterCompanyAddress: null,
-    transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-    transporterTakenOverAt: bsdasri.transporterTakenOverAt,
-    transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue / 1000
       : bsdasri.emitterWasteWeightValue,
     emitterCustomInfo: bsdasri.emitterCustomInfo,
-    transporterCompanyMail: bsdasri.transporterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail
+    destinationCompanyMail: bsdasri.destinationCompanyMail,
+    ...getOperationData(bsdasri)
   };
 }
 
@@ -228,15 +235,10 @@ export function toTransportedWaste(
 
   return {
     ...genericWaste,
-    transporterTakenOverAt: bsdasri.transporterTakenOverAt,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue / 1000
       : bsdasri.emitterWasteWeightValue,
-    transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-    transporterCompanyAddress: bsdasri.transporterCompanyAddress,
-    transporterNumberPlates: bsdasri.transporterTransportPlates,
     ...initialEmitter,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
@@ -256,7 +258,6 @@ export function toTransportedWaste(
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
-    transporterCustomInfo: bsdasri.transporterCustomInfo,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
     destinationCompanyMail: bsdasri.destinationCompanyMail
   };
@@ -301,7 +302,6 @@ export function toManagedWaste(
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
-    destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
@@ -313,12 +313,7 @@ export function toManagedWaste(
       bsdasri.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    transporterCompanyAddress: bsdasri.transporterCompanyAddress,
-    transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-    transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
-    transporterCompanyMail: bsdasri.transporterCompanyMail,
     destinationCompanyMail: bsdasri.destinationCompanyMail
   };
 }
@@ -350,7 +345,6 @@ export function toAllWaste(
   return {
     ...genericWaste,
     createdAt: bsdasri.createdAt,
-    transporterTakenOverAt: bsdasri.transporterTakenOverAt,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
     brokerCompanyName: null,
     brokerCompanySiret: null,
@@ -358,9 +352,6 @@ export function toAllWaste(
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
-    destinationOperationCode: bsdasri.destinationOperationCode,
-    destinationOperationMode: bsdasri.destinationOperationMode,
-    destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
@@ -372,11 +363,6 @@ export function toAllWaste(
       bsdasri.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    transporterCompanyAddress: bsdasri.transporterCompanyAddress,
-    transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-    transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
-    transporterNumberPlates: bsdasri.transporterTransportPlates,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue / 1000
       : bsdasri.emitterWasteWeightValue,
@@ -386,7 +372,7 @@ export function toAllWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
-    transporterCompanyMail: bsdasri.transporterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail
+    destinationCompanyMail: bsdasri.destinationCompanyMail,
+    ...getOperationData(bsdasri)
   };
 }
