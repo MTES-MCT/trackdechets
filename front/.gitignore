@@ -28,3 +28,13 @@ yarn-error.log*
 # generated files
 /src/generated
 /public/dsfr/
+
+# Playwright files
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
