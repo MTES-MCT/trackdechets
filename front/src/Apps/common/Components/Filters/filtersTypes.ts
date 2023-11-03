@@ -13,6 +13,7 @@ export type Filter = {
   isActive: boolean;
   options?: { value: string; label: string }[];
   isMultiple?: boolean;
+  placeholder?: string;
 };
 
 type OnApplyFiltersFn = (values: { [key: string]: string | string[] }) => void;
@@ -35,5 +36,6 @@ export interface QuickFiltersProp {
 
 export interface QuickFilterProps {
   label: string;
+  placeholder?: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }

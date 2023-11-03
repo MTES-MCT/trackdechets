@@ -28,6 +28,7 @@ const QuickFilters = ({ onApplyFilters, filters }: QuickFiltersProp) => {
             >
               <QuickFilter
                 label={filter.label}
+                placeholder={filter.placeholder}
                 onChange={e => onFilterValueChange(e, filter.name)}
               />
             </div>

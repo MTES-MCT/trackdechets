@@ -5,14 +5,17 @@ import { QuickFilterProps } from "./filtersTypes";
 
 const DEBOUNCE_DELAY = 500;
 
-const QuickFilter = ({ label, onChange }: QuickFilterProps) => {
+const QuickFilter = ({ label, placeholder, onChange }: QuickFilterProps) => {
   const debouncedOnChange = useMemo(
     () => debounce(onChange, DEBOUNCE_DELAY),
     [onChange]
   );
 
   return (
-    <Input label={label} nativeInputProps={{ onChange: debouncedOnChange }} />
+    <Input
+      label={label}
+      nativeInputProps={{ onChange: debouncedOnChange, placeholder }}
+    />
   );
 };
 
