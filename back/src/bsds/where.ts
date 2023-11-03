@@ -52,6 +52,10 @@ export function toElasticSimpleQuery(where: BsdWhere) {
           "emitterCompanySiret",
           where.emitter?.company?.siret
         ),
+        toElasticStringQuery(
+          "emitterCompanyVatNumber",
+          where.emitter?.company?.vatNumber
+        ),
         toElasticTextQuery(
           "emitterCompanyAddress",
           where.emitter?.company?.address
@@ -73,6 +77,10 @@ export function toElasticSimpleQuery(where: BsdWhere) {
         toElasticStringQuery(
           "workerCompanySiret",
           where.worker?.company?.siret
+        ),
+        toElasticStringQuery(
+          "workerCompanyVatNumber",
+          where.worker?.company?.vatNumber
         ),
         toElasticTextQuery("workerCompanyAddress", where.worker?.company?.name),
         toElasticTextQuery(
@@ -110,6 +118,10 @@ export function toElasticSimpleQuery(where: BsdWhere) {
           "destinationCompanySiret",
           where.destination?.company?.siret
         ),
+        toElasticStringQuery(
+          "destinationCompanyVatNumber",
+          where.destination?.company?.vatNumber
+        ),
         toElasticTextQuery(
           "destinationCompanyAddress",
           where.destination?.company?.address
@@ -125,6 +137,10 @@ export function toElasticSimpleQuery(where: BsdWhere) {
           "brokerCompanySiret",
           where.broker?.company?.siret
         ),
+        toElasticStringQuery(
+          "brokerCompanyVatNumber",
+          where.broker?.company?.vatNumber
+        ),
         toElasticTextQuery(
           "brokerCompanyAddress",
           where.broker?.company?.address
@@ -133,6 +149,10 @@ export function toElasticSimpleQuery(where: BsdWhere) {
         toElasticStringQuery(
           "traderCompanySiret",
           where.trader?.company?.siret
+        ),
+        toElasticStringQuery(
+          "traderCompanyVatNumber",
+          where.trader?.company?.vatNumber
         ),
         toElasticTextQuery(
           "traderCompanyAddress",

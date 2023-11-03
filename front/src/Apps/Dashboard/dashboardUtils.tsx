@@ -318,11 +318,63 @@ export const filterPredicates: {
   {
     filterName: FilterName.tvaIntra,
     where: value => ({
-      destination: {
-        operation: {
-          nextDestination: { company: { vatNumber: { _contains: value } } },
+      _and: [
+        {
+          _or: [
+            {
+              emitter: {
+                company: {
+                  vatNumber: { _contains: value },
+                },
+              },
+            },
+            {
+              transporter: {
+                company: {
+                  vatNumber: { _contains: value },
+                },
+              },
+            },
+            {
+              worker: {
+                company: {
+                  vatNumber: { _contains: value },
+                },
+              },
+            },
+            {
+              destination: {
+                company: {
+                  vatNumber: { _contains: value },
+                },
+              },
+            },
+            {
+              destination: {
+                operation: {
+                  nextDestination: {
+                    company: { vatNumber: { _contains: value } },
+                  },
+                },
+              },
+            },
+            {
+              broker: {
+                company: {
+                  vatNumber: { _contains: value },
+                },
+              },
+            },
+            {
+              trader: {
+                company: {
+                  vatNumber: { _contains: value },
+                },
+              },
+            },
+          ],
         },
-      },
+      ],
     }),
     order: "vatNumber",
   },

@@ -280,7 +280,7 @@ const DashboardPage = () => {
       );
 
       // Careful. Multiple filters might use '_and', let's not override
-      // it each loop iteration because of key uniqueness
+      // it each iteration because of key uniqueness
       let _ands: BsdWhere[] = [];
 
       filters.forEach(f => {
@@ -289,14 +289,14 @@ const DashboardPage = () => {
         );
         if (predicate) {
           const filterValue = filterValues[f.name];
-          const { _and, ...ops } = predicate.where(filterValue);
+          const { _and, ...wheres } = predicate.where(filterValue);
 
           // Store the '_and' filters separately
           if (_and) _ands = [..._ands, ..._and];
 
           variables.where = {
             ...variables.where,
-            ...ops,
+            ...wheres,
           };
           variables.order[predicate.order] = OrderType.Asc;
         }
