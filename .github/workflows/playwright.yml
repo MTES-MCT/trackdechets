@@ -16,25 +16,25 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       # Start containers (back + front)
-      - name: Start containers
-        env:
-          TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
-          TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
+      # - name: Start containers
+      #   env:
+      #     TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
+      #     TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
 
-        run: |
-          chmod +x ./run.sh
-          ./run.sh -u -c ${{ matrix.shard }}/${{ strategy.job-total }}
+      #   run: |
+      #     chmod +x ./run.sh
+      #     ./run.sh -u -c ${{ matrix.shard }}/${{ strategy.job-total }}
       # Install front dependencies
       - name: Set up Node.js (front)
         uses: actions/setup-node@v3
+        working-directory: front
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: front/package-lock.json
       - name: Install dependencies (front)
+        working-directory: front
         run: npm ci
-      - name: Generate files (front)
-        run: npm run generate
       # Install Playwright
       - name: Install Playwright Browsers
         working-directory: front
@@ -50,11 +50,11 @@ jobs:
           path: playwright-report/
           retention-days: 30
       # Stop the containers
-      - name: Stop containers
-        env:
-          TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
-          TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
+      # - name: Stop containers
+      #   env:
+      #     TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
+      #     TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
 
-        run: |
-          chmod +x ./run.sh
-          ./run.sh -d -c ${{ matrix.shard }}/${{ strategy.job-total }}
+      #   run: |
+      #     chmod +x ./run.sh
+      #     ./run.sh -d -c ${{ matrix.shard }}/${{ strategy.job-total }}
