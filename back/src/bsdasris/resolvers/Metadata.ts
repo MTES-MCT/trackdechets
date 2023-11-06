@@ -5,6 +5,7 @@ import {
 } from "../../generated/graphql/types";
 import { getBsdasriOrNotFound } from "../database";
 import { validateBsdasri, getRequiredFor } from "../validation";
+import { ValidationError } from "yup";
 
 const bsdasriMetadataResolvers: BsdasriMetadataResolvers = {
   errors: async (metadata: BsdasriMetadata & { id: string }) => {
@@ -19,9 +20,9 @@ const bsdasriMetadataResolvers: BsdasriMetadataResolvers = {
       });
       return [];
     } catch (errors) {
-      return errors.inner?.map(e => ({
+      return errors.inner?.map((e: ValidationError) => ({
         message: e.message,
-        path: e.path,
+        path: e.path ?? "",
         requiredFor: getRequiredFor(e.path)
       }));
     }
