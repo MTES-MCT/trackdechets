@@ -12,19 +12,6 @@ jobs:
         shard: [1]
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Node.js
-        working-directory: front
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: front/package-lock.json
-      - name: Install dependencies
-        working-directory: front
-        run: npm ci
-      - name: Install Playwright Browsers
-        working-directory: front
-        run: npx playwright install --with-deps
       - name: Start containers
         working-directory: back/integration-tests
         env:
@@ -34,6 +21,9 @@ jobs:
         run: |
           chmod +x ./run.sh
           ./run.sh -u -c ${{ matrix.shard }}/${{ strategy.job-total }}
+      - name: Install Playwright Browsers
+        working-directory: front
+        run: npx playwright install --with-deps
       - name: Run Playwright tests
         working-directory: front
         run: npx playwright test
