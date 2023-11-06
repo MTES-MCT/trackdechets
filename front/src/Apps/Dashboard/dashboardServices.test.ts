@@ -443,7 +443,7 @@ describe("dashboardServices", () => {
       ecoOrganisme: { siret: "2" },
     } as BsdDisplay;
 
-    test("returns SIGNER for BSDD type with valid conditions", () => {
+    test("returns SIGNER for BSDD type Appendix1Producer with valid conditions", () => {
       const currentSiret = "1234567890";
       const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       bsd.emitterType = EmitterType.Appendix1Producer;
@@ -452,7 +452,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(SIGNER);
     });
 
-    test("returns FAIRE_SIGNER for BSDD type with valid conditions", () => {
+    test("returns SIGNER for BSDD type Producer with valid conditions", () => {
       const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       bsd.emitterType = EmitterType.Producer;
       bsd.transporter!.company!.siret = "1234567890";
@@ -460,7 +460,7 @@ describe("dashboardServices", () => {
       bsd.ecoOrganisme!.siret = "1234567890";
       const currentSiret = "1234567890";
       const result = getSealedBtnLabel(currentSiret, bsd, permissions);
-      expect(result).toEqual(FAIRE_SIGNER);
+      expect(result).toEqual(SIGNER);
     });
 
     test("returns FAIRE_SIGNER for BSDD type with valid conditions", () => {
@@ -735,7 +735,7 @@ describe("dashboardServices", () => {
 
       const result = getResealedBtnLabel(currentSiret, bsd, permissions);
 
-      expect(result).toEqual(FAIRE_SIGNER);
+      expect(result).toEqual(SIGNER);
     });
 
     it("should return an empty string when siret is not same as temporary storage transporter", () => {

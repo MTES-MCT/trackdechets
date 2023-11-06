@@ -167,6 +167,7 @@ const hasEmitterTransporterAndEcoOrgSiret = (
     bsd.emitter?.company?.siret,
     bsd.ecoOrganisme?.siret,
     bsd.transporter?.company?.siret,
+    bsd.transporter?.company?.orgId,
   ].includes(siret);
 };
 
@@ -214,7 +215,11 @@ const hasTemporaryStorage = (currentSiret: string, bsd: BsdDisplay): boolean =>
 const isSameSiretTemporaryStorageTransporter = (
   currentSiret: string,
   bsd: BsdDisplay
-) => currentSiret === bsd.temporaryStorageDetail?.transporter?.company?.siret;
+) =>
+  [
+    bsd.temporaryStorageDetail?.transporter?.company?.siret,
+    bsd.temporaryStorageDetail?.transporter?.company?.orgId,
+  ].includes(currentSiret);
 
 const isSameSiretTemporaryStorageDestination = (
   currentSiret: string,
@@ -427,6 +432,9 @@ export const getSealedBtnLabel = (
         return SIGNER;
       }
       return FAIRE_SIGNER;
+    }
+    if (isSameSiretEmmiter(currentSiret, bsd)) {
+      return SIGNER;
     }
     if (hasEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
       return FAIRE_SIGNER;
@@ -695,6 +703,9 @@ export const getResealedBtnLabel = (
     permissions.includes(UserPermission.BsdCanSignEmission)
   ) {
     if (isSameSiretEmmiter(currentSiret, bsd)) {
+      return SIGNER;
+    }
+    if (currentSiret === bsd.destination?.company?.siret) {
       return SIGNER;
     }
     return FAIRE_SIGNER;
