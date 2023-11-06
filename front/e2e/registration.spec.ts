@@ -1,7 +1,7 @@
 import { test } from "@playwright/test";
 
 test("User ONE should be able to register", async ({ page }) => {
-  await page.goto("http://trackdechets.local/login");
+  await page.goto("https://trackdechets.local/login");
   await page.getByLabel("Email").click();
   await page.getByRole("link", { name: "Créer un compte" }).click();
   await page.getByLabel("Nom et prénom").click();
