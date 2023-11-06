@@ -844,3 +844,43 @@ describe("search on wasteCode", () => {
     expect(hits[0]._source.id).toEqual("1");
   });
 });
+
+describe("search on destinationCap", () => {
+  afterAll(resetDatabase);
+
+  beforeAll(async () => {
+    const bsds: Partial<BsdElastic>[] = [
+      {
+        id: "1",
+        destinationCap: "CAP-1"
+      },
+      {
+        id: "2",
+        destinationCap: "CAP-2"
+      },
+      {
+        id: "3"
+      }
+    ];
+
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
+    await refreshElasticSearch();
+  });
+
+  it("should return exact match", async () => {
+    const where: BsdWhere = {
+      destination: { cap: { _match: "CAP-1" } }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.id).toEqual("1");
+  });
+});

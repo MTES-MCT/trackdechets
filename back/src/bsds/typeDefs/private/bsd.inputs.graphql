@@ -35,13 +35,7 @@ input BsdWhere {
   isRevisedFor: [String!]
 
   sirets: StringNullableListFilter
-
-  # CAP
-  recipientCap: StringFilter
-  temporaryStorageDestinationCap: StringFilter
   destinationCap: StringFilter
-  operationNextDestinationCap: StringFilter
-  destinationOperationNextDestinationCap: StringFilter
 
   _and: [BsdWhere!]
   _or: [BsdWhere!]

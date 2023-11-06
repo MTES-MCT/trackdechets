@@ -551,19 +551,7 @@ export const filterPredicates: {
   },
   {
     filterName: FilterName.cap,
-    where: value => ({
-      _and: [
-        {
-          _or: [
-            { recipientCap: { _contains: value } },
-            { temporaryStorageDestinationCap: { _contains: value } },
-            { destinationCap: { _contains: value } },
-            { operationNextDestinationCap: { _contains: value } },
-            { destinationOperationNextDestinationCap: { _contains: value } },
-          ],
-        },
-      ],
-    }),
+    where: value => ({ destination: { cap: { _match: value } } }),
     order: "cap",
   },
 ];
