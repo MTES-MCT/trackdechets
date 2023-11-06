@@ -1,9 +1,7 @@
-name: Playwright Tests
-on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+name: End-to-end tests (Playwright)
+
+on: pull_request
+
 jobs:
   test:
     timeout-minutes: 60
@@ -17,7 +15,17 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+    - name: Start the application (back + front)
+        working-directory: back/integration-tests
+        env:
+          TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
+          TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
+
+        run: |
+          chmod +x ./run.sh
+          ./run.sh -u
     - name: Run Playwright tests
+      working-directory: front
       run: npx playwright test
     - uses: actions/upload-artifact@v3
       if: always()
@@ -25,3 +33,8 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
+    - name: Stop the application (back + front)
+        working-directory: back/integration-tests
+        run: |
+          chmod +x ./run.sh
+          ./run.sh -d
