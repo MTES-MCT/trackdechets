@@ -24,6 +24,17 @@ jobs:
         run: |
           chmod +x ./run.sh
           ./run.sh -u -c ${{ matrix.shard }}/${{ strategy.job-total }}
+      # Install front dependencies
+      - name: Set up Node.js (front)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: front/package-lock.json
+      - name: Install dependencies (front)
+        run: npm ci
+      - name: Generate files (front)
+        run: npm run generate
       # Install Playwright
       - name: Install Playwright Browsers
         working-directory: front
