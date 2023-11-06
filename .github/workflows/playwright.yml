@@ -15,6 +15,7 @@ jobs:
         working-directory: back/integration-tests
     steps:
       - uses: actions/checkout@v3
+      # Start containers (back + front)
       - name: Start containers
         env:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
@@ -23,6 +24,7 @@ jobs:
         run: |
           chmod +x ./run.sh
           ./run.sh -u -c ${{ matrix.shard }}/${{ strategy.job-total }}
+      # Install Playwright
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
@@ -34,6 +36,7 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+      # Stop the containers
       - name: Stop containers
         env:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
