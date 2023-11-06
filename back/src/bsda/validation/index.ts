@@ -53,6 +53,7 @@ export async function parseBsdaInContext(
     .transform(async val => {
       const sealedFields = getSealedFields({
         bsda: val,
+        persistedBsda: unparsedInputs.persisted,
         userFunctions,
         signaturesToCheck
       });
@@ -64,7 +65,13 @@ export async function parseBsdaInContext(
     })
     .superRefine(async (val, ctx) => {
       checkSealedAndRequiredFields(
-        { bsda: val, updatedFields, userFunctions, signaturesToCheck },
+        {
+          bsda: val,
+          persistedBsda: unparsedInputs.persisted,
+          updatedFields,
+          userFunctions,
+          signaturesToCheck
+        },
         ctx
       );
 
