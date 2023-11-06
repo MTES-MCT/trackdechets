@@ -12,15 +12,6 @@ jobs:
         shard: [1]
     steps:
       - uses: actions/checkout@v3
-      - name: Start containers
-        working-directory: back/integration-tests
-        env:
-          TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
-          TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
-
-        run: |
-          chmod +x ./run.sh
-          ./run.sh -u -c ${{ matrix.shard }}/${{ strategy.job-total }}
       - name: Set up Node.js
         working-directory: front
         uses: actions/setup-node@v3
@@ -34,6 +25,15 @@ jobs:
       - name: Install Playwright Browsers
         working-directory: front
         run: npx playwright install --with-deps
+      - name: Start containers
+        working-directory: back/integration-tests
+        env:
+          TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
+          TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
+
+        run: |
+          chmod +x ./run.sh
+          ./run.sh -u -c ${{ matrix.shard }}/${{ strategy.job-total }}
       - name: Run Playwright tests
         working-directory: front
         run: npx playwright test
