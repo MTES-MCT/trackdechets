@@ -126,6 +126,7 @@ function BsdCardList({
         if (isActTab) {
           const path = routes.dashboardv2.bsdasris.sign.emission;
           redirectToPath(path, bsd.id);
+          return;
         }
         if (isToCollectTab) {
           const formattedBsdAsBsdDisplay = mapBsdasri(bsd as Bsdasri);
@@ -134,6 +135,7 @@ function BsdCardList({
           ) {
             const path = routes.dashboardv2.bsdasris.sign.directTakeover;
             redirectToPath(path, bsd.id);
+            return;
           }
           if (
             isSynthesis(formattedBsdAsBsdDisplay.bsdWorkflowType?.toString())
