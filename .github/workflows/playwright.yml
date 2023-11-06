@@ -22,7 +22,7 @@ jobs:
 
         run: |
           chmod +x ./run.sh
-          ./run.sh -u
+          ./run.sh -u -c ${{ matrix.shard }}/${{ strategy.job-total }}
       - name: Stop containers
         env:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
@@ -30,4 +30,4 @@ jobs:
 
         run: |
           chmod +x ./run.sh
-          ./run.sh -d
+          ./run.sh -d -c ${{ matrix.shard }}/${{ strategy.job-total }}
