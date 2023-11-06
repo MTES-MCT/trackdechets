@@ -1,6 +1,11 @@
 import { test } from "@playwright/test";
 
 test("User ONE should be able to register", async ({ page }) => {
+  console.log("========================================================");
+  console.log("========================= E2E ==========================");
+  console.log("========================================================");
+  console.log("env", process.env);
+
   await page.goto("http://trackdechets.local/login");
   await page.getByLabel("Email").click();
   await page.getByRole("link", { name: "Créer un compte" }).click();
