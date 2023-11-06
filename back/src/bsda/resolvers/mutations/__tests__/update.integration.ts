@@ -1190,8 +1190,8 @@ describe("Mutation.updateBsda", () => {
         transporterCompanySiret: transporter.company.siret,
         destinationOperationNextDestinationCompanySiret:
           destination.company.siret,
-        emitterEmissionSignatureAuthor: "Emit",
-        workerWorkSignatureAuthor: "Work"
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
       }
     });
 
