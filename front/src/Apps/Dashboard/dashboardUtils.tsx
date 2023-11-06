@@ -327,28 +327,7 @@ export const filterPredicates: {
         {
           _or: [
             {
-              emitter: {
-                company: {
-                  vatNumber: { _contains: value },
-                },
-              },
-            },
-            {
               transporter: {
-                company: {
-                  vatNumber: { _contains: value },
-                },
-              },
-            },
-            {
-              worker: {
-                company: {
-                  vatNumber: { _contains: value },
-                },
-              },
-            },
-            {
-              destination: {
                 company: {
                   vatNumber: { _contains: value },
                 },
@@ -360,20 +339,6 @@ export const filterPredicates: {
                   nextDestination: {
                     company: { vatNumber: { _contains: value } },
                   },
-                },
-              },
-            },
-            {
-              broker: {
-                company: {
-                  vatNumber: { _contains: value },
-                },
-              },
-            },
-            {
-              trader: {
-                company: {
-                  vatNumber: { _contains: value },
                 },
               },
             },
