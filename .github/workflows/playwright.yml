@@ -3,7 +3,7 @@ name: End-to-end tests
 on: pull_request
 
 jobs:
-  back:
+  e2e:
     runs-on: ubuntu-latest
     name: End-to-end tests (chunk ${{ matrix.shard }}/${{ strategy.job-total }})
     strategy:
@@ -23,6 +23,17 @@ jobs:
         run: |
           chmod +x ./run.sh
           ./run.sh -u -c ${{ matrix.shard }}/${{ strategy.job-total }}
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        working-directory: front
+        run: npx playwright test
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
       - name: Stop containers
         env:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
