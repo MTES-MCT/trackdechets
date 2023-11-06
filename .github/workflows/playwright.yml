@@ -26,7 +26,9 @@ jobs:
           ./run.sh -u -c ${{ matrix.shard }}/${{ strategy.job-total }}
       # Install Playwright
       - name: Install Playwright Browsers
+        working-directory: front
         run: npx playwright install --with-deps
+      # Run e2e tests
       - name: Run Playwright tests
         working-directory: front
         run: npx playwright test
