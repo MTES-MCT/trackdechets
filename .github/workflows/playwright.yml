@@ -12,11 +12,12 @@ jobs:
         shard: [1]
     defaults:
       run:
-        working-directory: back/integration-tests
+        working-directory: front
     steps:
       - uses: actions/checkout@v3
       # Start containers (back + front)
       # - name: Start containers
+      #working-directory: back/integration-tests
       #   env:
       #     TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
       #     TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
@@ -27,21 +28,17 @@ jobs:
       # Install front dependencies
       - name: Set up Node.js (front)
         uses: actions/setup-node@v3
-        working-directory: front
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: front/package-lock.json
       - name: Install dependencies (front)
-        working-directory: front
         run: npm ci
       # Install Playwright
       - name: Install Playwright Browsers
-        working-directory: front
         run: npx playwright install --with-deps
       # Run e2e tests
       - name: Run Playwright tests
-        working-directory: front
         run: npx playwright test
       - uses: actions/upload-artifact@v3
         if: always()
@@ -51,6 +48,7 @@ jobs:
           retention-days: 30
       # Stop the containers
       # - name: Stop containers
+      # working-directory: back/integration-tests
       #   env:
       #     TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
       #     TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
