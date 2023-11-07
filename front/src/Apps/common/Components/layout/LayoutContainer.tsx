@@ -109,7 +109,7 @@ export default function LayoutContainer() {
             isAuthenticated={isAuthenticated}
             isAdmin={isAdmin}
             v2banner={v2banner}
-            defaultOrgId={data?.me.companies[0].orgId}
+            defaultOrgId={data?.me.companies[0]?.orgId}
           >
             <Switch>
               <PrivateRoute

@@ -1,11 +1,11 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
 import { isTransporterRefinement } from "../../common/validation/siret";
+import { BsdaSignatureType } from "../../generated/graphql/types";
 import { getReadonlyBsdaRepository } from "../repository";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { BsdaValidationContext } from "./index";
 import { ZodBsda } from "./schema";
-import { BsdaSignatureType } from "../../generated/graphql/types";
 
 export async function applyDynamicRefinement(
   bsda: ZodBsda,
