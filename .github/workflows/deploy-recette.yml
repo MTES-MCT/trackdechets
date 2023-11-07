@@ -20,7 +20,7 @@ jobs:
         run: npm ci
 
       - name: Run build
-        run: npn nx run-many -t build
+        run: npx nx run-many -t build
 
       - name: Create a Sentry Release
         uses: getsentry/action-release@v1.1.6
