@@ -8,7 +8,14 @@ import {
   OutgoingWaste,
   TransportedWaste
 } from "../generated/graphql/types";
-import { GenericWaste } from "../registry/types";
+import {
+  GenericWaste,
+  emptyAllWaste,
+  emptyIncomingWaste,
+  emptyManagedWaste,
+  emptyOutgoingWaste,
+  emptyTransportedWaste
+} from "../registry/types";
 import { extractPostalCode } from "../utils";
 import { toBsffDestination } from "./compat";
 
@@ -120,7 +127,7 @@ export function toIncomingWaste(
   bsff: Bsff & {
     packagings: BsffPackagingWithPrevious[];
   }
-): IncomingWaste {
+): Required<IncomingWaste> {
   const initialEmitter: Pick<
     IncomingWaste,
     | "initialEmitterCompanyAddress"
@@ -154,6 +161,8 @@ export function toIncomingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyIncomingWaste,
     ...genericWaste,
     destinationCompanyName: bsff.destinationCompanyName,
     destinationCompanySiret: bsff.destinationCompanySiret,
@@ -180,7 +189,7 @@ export function toOutgoingWaste(
   bsff: Bsff & {
     packagings: BsffPackagingWithPrevious[];
   }
-): OutgoingWaste {
+): Required<OutgoingWaste> {
   const initialEmitter: Pick<
     OutgoingWaste,
     | "initialEmitterCompanyAddress"
@@ -221,6 +230,8 @@ export function toOutgoingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyOutgoingWaste,
     ...genericWaste,
     brokerCompanyName: null,
     brokerCompanySiret: null,
@@ -248,7 +259,7 @@ export function toTransportedWaste(
   bsff: Bsff & {
     packagings: BsffPackagingWithPrevious[];
   }
-): TransportedWaste {
+): Required<TransportedWaste> {
   const initialEmitter: Pick<
     TransportedWaste,
     | "initialEmitterCompanyAddress"
@@ -282,6 +293,8 @@ export function toTransportedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsff.destinationReceptionDate,
     weight: bsff.weightValue ? bsff.weightValue / 1000 : bsff.weightValue,
@@ -312,7 +325,7 @@ export function toManagedWaste(
   bsff: Bsff & {
     packagings: BsffPackagingWithPrevious[];
   }
-): ManagedWaste {
+): Required<ManagedWaste> {
   const initialEmitter: Pick<
     ManagedWaste,
     | "initialEmitterCompanyAddress"
@@ -348,6 +361,8 @@ export function toManagedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyManagedWaste,
     ...genericWaste,
     managedStartDate: null,
     managedEndDate: null,
@@ -373,7 +388,7 @@ export function toAllWaste(
   bsff: Bsff & {
     packagings: BsffPackagingWithPrevious[];
   }
-): AllWaste {
+): Required<AllWaste> {
   const initialEmitter: Pick<
     IncomingWaste,
     | "initialEmitterCompanyAddress"
@@ -407,6 +422,8 @@ export function toAllWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyAllWaste,
     ...genericWaste,
     createdAt: bsff.createdAt,
     destinationReceptionDate: bsff.destinationReceptionDate,

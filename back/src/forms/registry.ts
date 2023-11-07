@@ -9,7 +9,14 @@ import {
   OutgoingWaste,
   TransportedWaste
 } from "../generated/graphql/types";
-import { GenericWaste } from "../registry/types";
+import {
+  GenericWaste,
+  emptyAllWaste,
+  emptyIncomingWaste,
+  emptyManagedWaste,
+  emptyOutgoingWaste,
+  emptyTransportedWaste
+} from "../registry/types";
 import { extractPostalCode } from "../utils";
 import { Bsdd } from "./types";
 
@@ -120,7 +127,7 @@ function toGenericWaste(bsdd: Bsdd): GenericWaste {
 
 export function toIncomingWaste(
   bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
-): IncomingWaste {
+): Required<IncomingWaste> {
   const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
@@ -146,6 +153,8 @@ export function toIncomingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyIncomingWaste,
     ...genericWaste,
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
@@ -176,7 +185,7 @@ export function toIncomingWaste(
 
 export function toOutgoingWaste(
   bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
-): OutgoingWaste {
+): Required<OutgoingWaste> {
   const initialEmitter: Record<string, string | string[] | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
@@ -202,6 +211,8 @@ export function toOutgoingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyOutgoingWaste,
     ...genericWaste,
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
@@ -232,7 +243,7 @@ export function toOutgoingWaste(
 
 export function toTransportedWaste(
   bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
-): TransportedWaste {
+): Required<TransportedWaste> {
   const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
@@ -258,6 +269,8 @@ export function toTransportedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     weight: bsdd.weightValue,
@@ -287,7 +300,7 @@ export function toTransportedWaste(
 
 export function toManagedWaste(
   bsdd: Bsdd & { forwarding: Bsdd | null } & { grouping: Bsdd[] }
-): ManagedWaste {
+): Required<ManagedWaste> {
   const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
@@ -313,6 +326,8 @@ export function toManagedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyManagedWaste,
     ...genericWaste,
     managedStartDate: null,
     managedEndDate: null,
@@ -341,7 +356,7 @@ export function toManagedWaste(
 
 export function toAllWaste(
   bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
-): AllWaste {
+): Required<AllWaste> {
   const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
@@ -367,6 +382,8 @@ export function toAllWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyAllWaste,
     ...genericWaste,
     createdAt: bsdd.createdAt,
     destinationReceptionDate: bsdd.destinationReceptionDate,

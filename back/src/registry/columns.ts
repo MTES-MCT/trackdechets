@@ -39,7 +39,7 @@ const formatArray = (arr: any[]) => (Array.isArray(arr) ? arr.join(",") : "");
 const formatOperationCode = (code?: string) =>
   code ? code.replace(/ /g, "") : ""; // be consistent and remove all white spaces
 
-const columns: Column[] = [
+export const columns: Column[] = [
   // Dénomination, nature et quantité :
   { field: "id", label: "N° de bordereau" },
   {

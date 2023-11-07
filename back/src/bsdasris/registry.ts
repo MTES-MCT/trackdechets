@@ -9,7 +9,14 @@ import {
   OutgoingWaste,
   TransportedWaste
 } from "../generated/graphql/types";
-import { GenericWaste } from "../registry/types";
+import {
+  GenericWaste,
+  emptyAllWaste,
+  emptyIncomingWaste,
+  emptyManagedWaste,
+  emptyOutgoingWaste,
+  emptyTransportedWaste
+} from "../registry/types";
 import { extractPostalCode } from "../utils";
 import { getWasteDescription } from "./utils";
 
@@ -104,7 +111,7 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
 
 export function toIncomingWaste(
   bsdasri: Bsdasri & { grouping: Bsdasri[] }
-): IncomingWaste {
+): Required<IncomingWaste> {
   const initialEmitter: Pick<
     IncomingWaste,
     | "initialEmitterCompanyAddress"
@@ -127,6 +134,8 @@ export function toIncomingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyIncomingWaste,
     ...genericWaste,
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
@@ -156,7 +165,7 @@ export function toIncomingWaste(
 
 export function toOutgoingWaste(
   bsdasri: Bsdasri & { grouping: Bsdasri[] }
-): OutgoingWaste {
+): Required<OutgoingWaste> {
   const initialEmitter: Pick<
     OutgoingWaste,
     | "initialEmitterCompanyAddress"
@@ -179,6 +188,8 @@ export function toOutgoingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyOutgoingWaste,
     ...genericWaste,
     brokerCompanyName: null,
     brokerCompanySiret: null,
@@ -211,7 +222,7 @@ export function toOutgoingWaste(
 
 export function toTransportedWaste(
   bsdasri: Bsdasri & { grouping: Bsdasri[] }
-): TransportedWaste {
+): Required<TransportedWaste> {
   const initialEmitter: Pick<
     TransportedWaste,
     | "initialEmitterCompanyAddress"
@@ -234,6 +245,8 @@ export function toTransportedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
     weight: bsdasri.emitterWasteWeightValue
@@ -269,7 +282,7 @@ export function toTransportedWaste(
  */
 export function toManagedWaste(
   bsdasri: Bsdasri & { grouping: Bsdasri[] }
-): ManagedWaste {
+): Required<ManagedWaste> {
   const initialEmitter: Pick<
     ManagedWaste,
     | "initialEmitterCompanyAddress"
@@ -292,6 +305,8 @@ export function toManagedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyManagedWaste,
     ...genericWaste,
     managedStartDate: null,
     managedEndDate: null,
@@ -320,7 +335,7 @@ export function toManagedWaste(
 
 export function toAllWaste(
   bsdasri: Bsdasri & { grouping: Bsdasri[] }
-): AllWaste {
+): Required<AllWaste> {
   const initialEmitter: Pick<
     AllWaste,
     | "initialEmitterCompanyAddress"
@@ -343,6 +358,8 @@ export function toAllWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyAllWaste,
     ...genericWaste,
     createdAt: bsdasri.createdAt,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
