@@ -153,7 +153,7 @@ export function toIncomingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
-    // Make sure all possible keys are in the exported sheet so that no column is missing 
+    // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyIncomingWaste,
     ...genericWaste,
     destinationCompanyName: bsdd.destinationCompanyName,
@@ -211,7 +211,7 @@ export function toOutgoingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
-    // Make sure all possible keys are in the exported sheet so that no column is missing 
+    // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyOutgoingWaste,
     ...genericWaste,
     brokerCompanyName: bsdd.brokerCompanyName,
@@ -269,7 +269,7 @@ export function toTransportedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
-    // Make sure all possible keys are in the exported sheet so that no column is missing 
+    // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsdd.destinationReceptionDate,
@@ -326,7 +326,7 @@ export function toManagedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
-    // Make sure all possible keys are in the exported sheet so that no column is missing 
+    // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyManagedWaste,
     ...genericWaste,
     managedStartDate: null,
@@ -382,7 +382,7 @@ export function toAllWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
-    // Make sure all possible keys are in the exported sheet so that no column is missing 
+    // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyAllWaste,
     ...genericWaste,
     createdAt: bsdd.createdAt,
