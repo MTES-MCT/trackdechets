@@ -7,7 +7,14 @@ import {
   OutgoingWaste,
   TransportedWaste
 } from "../generated/graphql/types";
-import { GenericWaste } from "../registry/types";
+import {
+  GenericWaste,
+  emptyAllWaste,
+  emptyIncomingWaste,
+  emptyManagedWaste,
+  emptyOutgoingWaste,
+  emptyTransportedWaste
+} from "../registry/types";
 import { getWasteDescription } from "./utils";
 
 const getOperationData = (bsvhu: Bsvhu) => ({
@@ -94,7 +101,7 @@ function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
   };
 }
 
-export function toIncomingWaste(bsvhu: Bsvhu): IncomingWaste {
+export function toIncomingWaste(bsvhu: Bsvhu): Required<IncomingWaste> {
   const initialEmitter: Pick<
     IncomingWaste,
     | "initialEmitterCompanyName"
@@ -111,6 +118,7 @@ export function toIncomingWaste(bsvhu: Bsvhu): IncomingWaste {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
+    ...emptyIncomingWaste,
     ...genericWaste,
     destinationCompanyName: bsvhu.destinationCompanyName,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
@@ -133,7 +141,7 @@ export function toIncomingWaste(bsvhu: Bsvhu): IncomingWaste {
   };
 }
 
-export function toOutgoingWaste(bsvhu: Bsvhu): OutgoingWaste {
+export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
   const initialEmitter: Pick<
     OutgoingWaste,
     | "initialEmitterCompanyName"
@@ -150,6 +158,7 @@ export function toOutgoingWaste(bsvhu: Bsvhu): OutgoingWaste {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
+    ...emptyOutgoingWaste,
     ...genericWaste,
     brokerCompanyName: null,
     brokerCompanySiret: null,
@@ -173,7 +182,7 @@ export function toOutgoingWaste(bsvhu: Bsvhu): OutgoingWaste {
   };
 }
 
-export function toTransportedWaste(bsvhu: Bsvhu): TransportedWaste {
+export function toTransportedWaste(bsvhu: Bsvhu): Required<TransportedWaste> {
   const initialEmitter: Pick<
     TransportedWaste,
     | "initialEmitterCompanyName"
@@ -189,6 +198,7 @@ export function toTransportedWaste(bsvhu: Bsvhu): TransportedWaste {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
+    ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
@@ -215,7 +225,7 @@ export function toTransportedWaste(bsvhu: Bsvhu): TransportedWaste {
  * BSVHU has no trader or broker so this function should not
  * be called. We implement it anyway in case it is added later on
  */
-export function toManagedWaste(bsvhu: Bsvhu): ManagedWaste {
+export function toManagedWaste(bsvhu: Bsvhu): Required<ManagedWaste> {
   const initialEmitter: Pick<
     ManagedWaste,
     | "initialEmitterCompanyName"
@@ -232,6 +242,7 @@ export function toManagedWaste(bsvhu: Bsvhu): ManagedWaste {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
+    ...emptyManagedWaste,
     ...genericWaste,
     managedStartDate: null,
     managedEndDate: null,
@@ -253,7 +264,7 @@ export function toManagedWaste(bsvhu: Bsvhu): ManagedWaste {
   };
 }
 
-export function toAllWaste(bsvhu: Bsvhu): AllWaste {
+export function toAllWaste(bsvhu: Bsvhu): Required<AllWaste> {
   const initialEmitter: Pick<
     AllWaste,
     | "initialEmitterCompanyName"
@@ -270,6 +281,7 @@ export function toAllWaste(bsvhu: Bsvhu): AllWaste {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
+    ...emptyAllWaste,
     ...genericWaste,
     createdAt: bsvhu.createdAt,
     destinationReceptionDate: bsvhu.destinationReceptionDate,

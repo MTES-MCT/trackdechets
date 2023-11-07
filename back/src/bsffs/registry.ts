@@ -8,7 +8,14 @@ import {
   OutgoingWaste,
   TransportedWaste
 } from "../generated/graphql/types";
-import { GenericWaste } from "../registry/types";
+import {
+  GenericWaste,
+  emptyAllWaste,
+  emptyIncomingWaste,
+  emptyManagedWaste,
+  emptyOutgoingWaste,
+  emptyTransportedWaste
+} from "../registry/types";
 import { extractPostalCode } from "../utils";
 import { toBsffDestination } from "./compat";
 
@@ -120,7 +127,7 @@ export function toIncomingWaste(
   bsff: Bsff & {
     packagings: BsffPackagingWithPrevious[];
   }
-): IncomingWaste {
+): Required<IncomingWaste> {
   const initialEmitter: Pick<
     IncomingWaste,
     | "initialEmitterCompanyAddress"
@@ -154,6 +161,7 @@ export function toIncomingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
+    ...emptyIncomingWaste,
     ...genericWaste,
     destinationCompanyName: bsff.destinationCompanyName,
     destinationCompanySiret: bsff.destinationCompanySiret,
@@ -180,7 +188,7 @@ export function toOutgoingWaste(
   bsff: Bsff & {
     packagings: BsffPackagingWithPrevious[];
   }
-): OutgoingWaste {
+): Required<OutgoingWaste> {
   const initialEmitter: Pick<
     OutgoingWaste,
     | "initialEmitterCompanyAddress"
@@ -221,6 +229,7 @@ export function toOutgoingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
+    ...emptyOutgoingWaste,
     ...genericWaste,
     brokerCompanyName: null,
     brokerCompanySiret: null,
@@ -248,7 +257,7 @@ export function toTransportedWaste(
   bsff: Bsff & {
     packagings: BsffPackagingWithPrevious[];
   }
-): TransportedWaste {
+): Required<TransportedWaste> {
   const initialEmitter: Pick<
     TransportedWaste,
     | "initialEmitterCompanyAddress"
@@ -282,6 +291,7 @@ export function toTransportedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
+    ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsff.destinationReceptionDate,
     weight: bsff.weightValue ? bsff.weightValue / 1000 : bsff.weightValue,
@@ -312,7 +322,7 @@ export function toManagedWaste(
   bsff: Bsff & {
     packagings: BsffPackagingWithPrevious[];
   }
-): ManagedWaste {
+): Required<ManagedWaste> {
   const initialEmitter: Pick<
     ManagedWaste,
     | "initialEmitterCompanyAddress"
@@ -348,6 +358,7 @@ export function toManagedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
+    ...emptyManagedWaste,
     ...genericWaste,
     managedStartDate: null,
     managedEndDate: null,
@@ -373,7 +384,7 @@ export function toAllWaste(
   bsff: Bsff & {
     packagings: BsffPackagingWithPrevious[];
   }
-): AllWaste {
+): Required<AllWaste> {
   const initialEmitter: Pick<
     IncomingWaste,
     | "initialEmitterCompanyAddress"
@@ -407,6 +418,7 @@ export function toAllWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
+    ...emptyAllWaste,
     ...genericWaste,
     createdAt: bsff.createdAt,
     destinationReceptionDate: bsff.destinationReceptionDate,

@@ -227,18 +227,19 @@ const columns: Column[] = [
 
 export function formatRow(waste: GenericWaste, useLabelAsKey = false) {
   return columns.reduce((acc, column) => {
-    const key = useLabelAsKey ? column.label : column.field;
-
-    if (!waste[column.field]) {
-      return { ...acc, [key]: "" };
+    if (
+      column.field in waste ||
+      CUSTOM_WASTE_COLUMNS.includes(column.field || "")
+    ) {
+      const key = useLabelAsKey ? column.label : column.field;
+      return {
+        ...acc,
+        [key]: column.format
+          ? column.format(waste[column.field], waste)
+          : waste[column.field] ?? ""
+      };
     }
-
-    return {
-      ...acc,
-      [key]: column.format
-        ? column.format(waste[column.field], waste)
-        : waste[column.field] ?? ""
-    };
+    return acc;
   }, {});
 }
 
