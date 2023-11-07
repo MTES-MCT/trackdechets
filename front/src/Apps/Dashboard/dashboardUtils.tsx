@@ -290,6 +290,8 @@ export const filterPredicates: {
             { customId: { _contains: value } },
             { packagingNumbers: { _hasSome: value } },
             { packagingNumbers: { _itemContains: value } },
+            { identificationNumbers: { _itemContains: value } },
+            { identificationNumbers: { _hasSome: value } },
           ],
         },
       ],

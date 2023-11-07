@@ -132,7 +132,7 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     wasteDescription: "",
     packagingNumbers: [],
     wasteSealNumbers: [],
-    identificationNumbers: [],
+    identificationNumbers: bsdasri.identificationNumbers ?? [],
     ficheInterventionNumbers: [],
     emitterCompanyName: bsdasri.emitterCompanyName ?? "",
     emitterCompanySiret: bsdasri.emitterCompanySiret ?? "",
