@@ -31,6 +31,12 @@
         "bundle": false,
         "main": "back/src/index.ts",
         "tsConfig": "back/tsconfig.app.json",
+        "additionalEntryPoints": [
+          "back/src/cron.js",
+          "back/src/queue/consumer.js",
+          "back/src/queue/consumerIndexation.js",
+          "back/src/queue/consumerWebhooks.js"
+        ],
         "assets": [
           {
             "input": "./back/src",
