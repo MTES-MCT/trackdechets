@@ -118,6 +118,7 @@ export function toIncomingWaste(bsvhu: Bsvhu): Required<IncomingWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing 
     ...emptyIncomingWaste,
     ...genericWaste,
     destinationCompanyName: bsvhu.destinationCompanyName,
@@ -158,6 +159,7 @@ export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing 
     ...emptyOutgoingWaste,
     ...genericWaste,
     brokerCompanyName: null,
@@ -198,6 +200,7 @@ export function toTransportedWaste(bsvhu: Bsvhu): Required<TransportedWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing 
     ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
@@ -242,6 +245,7 @@ export function toManagedWaste(bsvhu: Bsvhu): Required<ManagedWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing 
     ...emptyManagedWaste,
     ...genericWaste,
     managedStartDate: null,
@@ -281,6 +285,7 @@ export function toAllWaste(bsvhu: Bsvhu): Required<AllWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing 
     ...emptyAllWaste,
     ...genericWaste,
     createdAt: bsvhu.createdAt,
