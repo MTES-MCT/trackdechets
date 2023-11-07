@@ -1,4 +1,4 @@
-web: node ${STARTUP_FILE:-dist/back/back/src/index.js}
+web: node ${STARTUP_FILE:-dist/back/index.js}
 clock: node dist/back/back/src/cron.js
 queue: node dist/back/back/src/queue/consumer.js
 indexqueue: node dist/back/back/src/queue/consumerIndexation.js

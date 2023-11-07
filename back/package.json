@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "npm run watch:all",
     "dev:integration": "prisma generate && npm run watch:queue",
-    "start": "node ../dist/back/back/src/index.js",
+    "start": "node ../dist/back/index.js",
     "update": "node ../dist/back/back/prisma/scripts/index.js",
     "update:dev": "tsx -r dotenv/config prisma/scripts/index.ts",
     "migrate": "node ../dist/back/back/prisma/migrate.js",
