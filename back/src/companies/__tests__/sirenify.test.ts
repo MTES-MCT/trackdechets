@@ -3,10 +3,7 @@ import { AuthType } from "@prisma/client";
 import { CompanyInput } from "../../generated/graphql/types";
 import buildSirenify, { searchCompanyFailFast } from "../sirenify";
 
-const searchCompanySpy = jest.spyOn(
-  require("../../companies/search"),
-  "searchCompany"
-);
+const searchCompanySpy = jest.spyOn(require("../search"), "searchCompany");
 
 type Input = { company: CompanyInput };
 

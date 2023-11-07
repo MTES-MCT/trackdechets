@@ -356,7 +356,7 @@ const ActBsddValidation = ({
     if (bsd.currentTransporterSiret === currentSiret) {
       if (
         // there are no segments yet, current transporter can create one
-        lastSegment === null ||
+        !lastSegment ||
         // the last segment was taken over and current user is the current transporter
         // which means there are no pending transfers so they can create a new segment
         lastSegment.takenOverAt
