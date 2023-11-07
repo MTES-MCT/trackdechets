@@ -214,12 +214,7 @@ export const rawBsdaSchema = z
         destinationOperationCode
       );
 
-      if (modes.length && !destinationOperationMode) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Vous devez préciser un mode de traitement"
-        });
-      } else if (
+      if (
         (modes.length &&
           destinationOperationMode &&
           !modes.includes(destinationOperationMode)) ||

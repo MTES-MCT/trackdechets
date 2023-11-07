@@ -5,6 +5,7 @@ import { ZodBsda } from "./schema";
 import { isForeignVat } from "../../common/constants/companySearchHelpers";
 import { capitalize } from "../../common/strings";
 import { getUserFunctions } from "./helpers";
+import { getOperationModesFromOperationCode } from "../../common/operationModes";
 
 export type EditableBsdaFields = Required<
   Omit<
@@ -202,7 +203,22 @@ export const editionRules: EditionRules = {
     required: { from: "OPERATION", when: isNotRefused }
   },
   destinationOperationMode: {
-    sealed: { from: "OPERATION" }
+    readableFieldName: "le mode de traitement",
+    sealed: { from: "OPERATION" },
+    required: {
+      from: "OPERATION",
+      when: bsda => {
+        if (bsda.destinationOperationCode) {
+          const modes = getOperationModesFromOperationCode(
+            bsda.destinationOperationCode
+          );
+          if (modes.length && !bsda.destinationOperationMode) {
+            return true;
+          }
+        }
+        return false;
+      }
+    }
   },
   destinationOperationDescription: {
     sealed: { from: "OPERATION" }
