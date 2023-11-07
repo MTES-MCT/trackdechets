@@ -35,7 +35,7 @@ import {
 } from "../converter";
 import prisma from "../../prisma";
 import { buildAddress } from "../../companies/sirene/utils";
-import { packagingsEqual } from "../../common/constants/formHelpers";
+import { packagingsEqual } from "shared/constants";
 import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../common/operationModes";
 
@@ -1107,14 +1107,15 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
   return generatePdf(html);
 }
 
-export function generateBsddPdfToBase64(
+export async function generateBsddPdfToBase64(
   prismaForm: PrismaForm
 ): Promise<string> {
-  return new Promise(async (resolve, reject) => {
+  const readableStream = await generateBsddPdf(prismaForm);
+
+  return new Promise((resolve, reject) => {
     const convertToBase64 = concatStream(buffer =>
       resolve(buffer.toString("base64"))
     );
-    const readableStream = await generateBsddPdf(prismaForm);
 
     readableStream.on("error", reject);
     readableStream.pipe(convertToBase64);

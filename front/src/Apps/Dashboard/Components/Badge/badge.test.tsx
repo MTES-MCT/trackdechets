@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import Badge from "./Badge";
-import { BsdStatusCode } from "Apps/common/types/bsdTypes";
-import { BsdType } from "generated/graphql/types";
+import { BsdStatusCode } from "../../../common/types/bsdTypes";
+import { BsdType } from "codegen-ui";
 
 describe("Bsd Badge status", () => {
   describe("case: DRAFT/INITITAL(draft=true)", () => {

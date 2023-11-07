@@ -1,10 +1,10 @@
 import { gql, useMutation } from "@apollo/client";
-import { Modal, RedErrorMessage } from "common/components";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { IconClose } from "Apps/common/Components/Icons/Icons";
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import CompanySelector from "form/common/components/company/CompanySelector";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { Modal, RedErrorMessage } from "../../common/components";
+import { NotificationError } from "../../Apps/common/Components/Error/Error";
+import { IconClose } from "../../Apps/common/Components/Icons/Icons";
+import { getInitialCompany } from "../bsdd/utils/initial-state";
+import CompanySelector from "../common/components/company/CompanySelector";
+import NumberInput from "../common/components/custom-inputs/NumberInput";
 import { Field, Form, Formik, useFormikContext } from "formik";
 import {
   BsffDetenteurInput,
@@ -12,11 +12,11 @@ import {
   BsffFicheInterventionInput,
   CompanyInput,
   Mutation,
-  MutationCreateFicheInterventionBsffArgs,
-} from "generated/graphql/types";
+  MutationCreateFicheInterventionBsffArgs
+} from "codegen-ui";
 import * as React from "react";
 import * as yup from "yup";
-import { FicheInterventionFragment } from "Apps/common/queries/fragments";
+import { FicheInterventionFragment } from "../../Apps/common/queries/fragments";
 
 const CREATE_BSFF_FICHE_INTERVENTION = gql`
   mutation CreateBsffFicheIntervention($input: BsffFicheInterventionInput!) {
@@ -39,7 +39,7 @@ const companySchema: yup.SchemaOf<CompanyInput> = yup.object({
   vatNumber: yup.string().nullable(),
   country: yup.string().notRequired().nullable(),
   omiNumber: yup.string().nullable(),
-  orgId: yup.string().nullable(),
+  orgId: yup.string().nullable()
 });
 const detenteurSchema: yup.SchemaOf<BsffFicheInterventionInput["detenteur"]> =
   yup.object({
@@ -58,13 +58,13 @@ const detenteurSchema: yup.SchemaOf<BsffFicheInterventionInput["detenteur"]> =
             .ensure()
             .required("L'adresse du détenteur est requise"),
           mail: yup.string().nullable().notRequired(),
-          phone: yup.string().nullable().notRequired(),
-        }),
-    }),
+          phone: yup.string().nullable().notRequired()
+        })
+    })
   });
 const operateurSchema: yup.SchemaOf<BsffFicheInterventionInput["operateur"]> =
   yup.object({
-    company: companySchema,
+    company: companySchema
   });
 const ficheInterventionSchema: yup.SchemaOf<BsffFicheInterventionInput> =
   yup.object({
@@ -72,7 +72,7 @@ const ficheInterventionSchema: yup.SchemaOf<BsffFicheInterventionInput> =
     weight: yup.number().required(),
     postalCode: yup.string().required(),
     detenteur: detenteurSchema,
-    operateur: operateurSchema,
+    operateur: operateurSchema
   });
 
 interface AddFicheInterventionModalProps {
@@ -88,7 +88,7 @@ type Values = BsffFicheInterventionInput & {
 function AddFicheInterventionModal({
   initialOperateurCompany,
   onAddFicheIntervention,
-  onClose,
+  onClose
 }: AddFicheInterventionModalProps) {
   const [createFicheIntervention, { loading, error }] = useMutation<
     Pick<Mutation, "createFicheInterventionBsff">,
@@ -116,18 +116,18 @@ function AddFicheInterventionModal({
           numero: "",
           detenteur: {
             isPrivateIndividual: false,
-            company: getInitialCompany(),
+            company: getInitialCompany()
           },
           operateur: {
-            company: initialOperateurCompany,
+            company: initialOperateurCompany
           },
-          postalCode: "",
+          postalCode: ""
         }}
         onSubmit={async values => {
           const { data } = await createFicheIntervention({
             variables: {
-              input: values,
-            },
+              input: values
+            }
           });
 
           if (data) {
@@ -288,7 +288,7 @@ export function FicheInterventionList({
   initialOperateurCompany,
   onAddFicheIntervention,
   onRemoveFicheIntervention,
-  disabled,
+  disabled
 }: FicheInterventionListProps) {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
@@ -381,7 +381,7 @@ export function FicheInterventionList({
 
                 setIsModalOpen(true);
               })
-              .catch(e => {
+              .catch(_ => {
                 window.alert(
                   `Veuillez compléter les champs de l'opérateur avant l'ajout d'une fiche d'intervention.`
                 );

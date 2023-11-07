@@ -1,25 +1,19 @@
-import { IconClose } from "Apps/common/Components/Icons/Icons";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { IconClose } from "../../../../Apps/common/Components/Icons/Icons";
+import RedErrorMessage from "../../../../common/components/RedErrorMessage";
+import NumberInput from "../../../common/components/custom-inputs/NumberInput";
 import { Field, FieldArray, FieldProps, useFormikContext } from "formik";
-import {
-  BsdasriPackaging,
-  BsdasriPackagingType,
-} from "generated/graphql/types";
+import { BsdasriPackaging, BsdasriPackagingType } from "codegen-ui";
 import {
   PACKAGINGS_NAMES,
-  getDasriPackagingInfosSummary,
-} from "form/bsdasri/utils/packagings";
+  getDasriPackagingInfosSummary
+} from "../../utils/packagings";
 import React, { InputHTMLAttributes } from "react";
 import "./Packagings.scss";
 
 export default function DasriPackagings({
   field: { name, value },
-  form,
-  id,
   disabled,
-  summaryHint,
-  ...props
+  summaryHint
 }: FieldProps<BsdasriPackaging[] | null> & {
   summaryHint?: string;
 } & InputHTMLAttributes<HTMLInputElement>) {
@@ -85,7 +79,7 @@ export default function DasriPackagings({
                                     ? p.other
                                     : "",
                                 quantity: p.quantity,
-                                volume: p.volume || 0,
+                                volume: p.volume || 0
                               });
                             }}
                           >
@@ -163,7 +157,7 @@ export default function DasriPackagings({
                     type: BsdasriPackagingType.Autre,
                     other: "",
                     quantity: 1,
-                    volume: 1,
+                    volume: 1
                   })
                 }
               >
@@ -175,10 +169,8 @@ export default function DasriPackagings({
       />
       {value?.length > 0 && (
         <div className="tw-mt-4">
-          <>
-            {getDasriPackagingInfosSummary(value)}{" "}
-            {!!summaryHint && <span>{summaryHint}</span>}
-          </>
+          {getDasriPackagingInfosSummary(value)}{" "}
+          {!!summaryHint && <span>{summaryHint}</span>}
         </div>
       )}
     </div>

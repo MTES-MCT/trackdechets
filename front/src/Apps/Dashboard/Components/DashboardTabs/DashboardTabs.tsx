@@ -1,12 +1,12 @@
 import React, { useCallback, useState } from "react";
 import { NavLink, generatePath, useHistory } from "react-router-dom";
-import { CompanyPrivate } from "generated/graphql/types";
+import { CompanyPrivate } from "codegen-ui";
 import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
-import routes from "Apps/routes";
+import routes from "../../../routes";
 
-import { useShowTransportTabs } from "Apps/Dashboard/hooks/useShowTransportTabs";
-import { usePermissions } from "common/contexts/PermissionsContext";
-import { UserPermission } from "generated/graphql/types";
+import { useShowTransportTabs } from "../../hooks/useShowTransportTabs";
+import { usePermissions } from "../../../../common/contexts/PermissionsContext";
+import { UserPermission } from "codegen-ui";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import {
   ACTS,
@@ -21,8 +21,8 @@ import {
   REVIEWS,
   TO_COLLECT,
   // TO_REVIEWED,
-  TRANSPORT,
-} from "Apps/common/wordings/dashboard/wordingsDashboard";
+  TRANSPORT
+} from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import "./DashboardTabs.scss";
 
@@ -48,7 +48,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
     orgId => {
       history.push(
         generatePath(routes.dashboardv2.bsds.index, {
-          siret: orgId,
+          siret: orgId
         })
       );
     },
@@ -84,7 +84,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               <li>
                 <NavLink
                   to={generatePath(routes.dashboardv2.bsds.index, {
-                    siret: currentCompany.orgId,
+                    siret: currentCompany.orgId
                   })}
                   className="sidebarv2__item sidebarv2__item--indented"
                   activeClassName="sidebarv2__item--active"
@@ -95,7 +95,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               <li>
                 <NavLink
                   to={generatePath(routes.dashboardv2.bsds.drafts, {
-                    siret: currentCompany.orgId,
+                    siret: currentCompany.orgId
                   })}
                   className="sidebarv2__item sidebarv2__item--indented"
                   activeClassName="sidebarv2__item--active"
@@ -107,7 +107,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               <li>
                 <NavLink
                   to={generatePath(routes.dashboardv2.bsds.act, {
-                    siret: currentCompany.orgId,
+                    siret: currentCompany.orgId
                   })}
                   className="sidebarv2__item sidebarv2__item--indented"
                   activeClassName="sidebarv2__item--active"
@@ -119,7 +119,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               <li>
                 <NavLink
                   to={generatePath(routes.dashboardv2.bsds.follow, {
-                    siret: currentCompany.orgId,
+                    siret: currentCompany.orgId
                   })}
                   className="sidebarv2__item sidebarv2__item--indented"
                   activeClassName="sidebarv2__item--active"
@@ -130,7 +130,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               <li>
                 <NavLink
                   to={generatePath(routes.dashboardv2.bsds.history, {
-                    siret: currentCompany.orgId,
+                    siret: currentCompany.orgId
                   })}
                   className="sidebarv2__item sidebarv2__item--indented"
                   activeClassName="sidebarv2__item--active"
@@ -146,7 +146,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               <li>
                 <NavLink
                   to={generatePath(routes.dashboardv2.bsds.reviews, {
-                    siret: currentCompany.orgId,
+                    siret: currentCompany.orgId
                   })}
                   className="sidebarv2__item sidebarv2__item--indented"
                   activeClassName="sidebarv2__item--active"
@@ -188,7 +188,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             <li>
               <NavLink
                 to={generatePath(routes.dashboardv2.transport.toCollect, {
-                  siret: currentCompany.orgId,
+                  siret: currentCompany.orgId
                 })}
                 className="sidebarv2__item sidebarv2__item--indented"
                 activeClassName="sidebarv2__item--active"
@@ -199,7 +199,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             <li>
               <NavLink
                 to={generatePath(routes.dashboardv2.transport.collected, {
-                  siret: currentCompany.orgId,
+                  siret: currentCompany.orgId
                 })}
                 className="sidebarv2__item sidebarv2__item--indented"
                 activeClassName="sidebarv2__item--active"
@@ -213,7 +213,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
       {showRegisterTab && (
         <NavLink
           to={generatePath(routes.dashboardv2.exports, {
-            siret: currentCompany.orgId,
+            siret: currentCompany.orgId
           })}
           className="sidebarv2__item sidebarv2__item--chapter"
           activeClassName="sidebarv2__item--active"

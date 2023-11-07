@@ -3,7 +3,7 @@ module.exports = {
   prefix: "tw-",
   purge: {
     mode: "all",
-    content: ["./src/**/*.tsx"],
+    content: ["./src/**/*.tsx"]
   },
-  important: true,
+  important: true
 };

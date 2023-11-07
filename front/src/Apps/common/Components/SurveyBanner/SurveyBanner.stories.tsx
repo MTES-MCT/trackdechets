@@ -12,10 +12,10 @@ export const Primary: Story = {
       "Afin de mesurer votre ressenti vis à vis de l'application Trackdéchets, nous vous invitons à répondre à ce questionnaire.",
     button: {
       title: "Répondre au questionnaire",
-      href: "https://trackdechets.beta.gouv.fr",
+      href: "https://trackdechets.beta.gouv.fr"
     },
     onClickClose: () => {
       console.log("Fermer la fenêtre");
-    },
-  },
+    }
+  }
 };

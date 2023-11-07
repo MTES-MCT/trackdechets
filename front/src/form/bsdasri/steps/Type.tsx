@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { InlineError } from "Apps/common/Components/Error/Error";
+import { InlineError } from "../../../Apps/common/Components/Error/Error";
 
 import { Field, useField, useFormikContext } from "formik";
 import {
@@ -7,11 +7,11 @@ import {
   BsdasriType,
   Query,
   QueryCompanyInfosArgs,
-  CompanyType,
-} from "generated/graphql/types";
+  CompanyType
+} from "codegen-ui";
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Tooltip from "common/components/Tooltip";
+import Tooltip from "../../../common/components/Tooltip";
 
 type Props = { disabled: boolean };
 
@@ -38,15 +38,15 @@ const COMMON_OPTIONS = [
     title: "simple",
     explanation:
       "Bordereau nécessaire à la collecte initiale chez un producteur/détenteur",
-    value: BsdasriType.Simple,
+    value: BsdasriType.Simple
   },
   {
     title: "de groupement",
     explanation:
       "Bordereau qui permet de grouper les BSDASRI simples et les déchets associés depuis un site relevant de la rubrique ICPE 2718",
 
-    value: BsdasriType.Grouping,
-  },
+    value: BsdasriType.Grouping
+  }
 ];
 const TRANSPORTER_OPTIONS = [
   {
@@ -56,8 +56,8 @@ const TRANSPORTER_OPTIONS = [
       par le collecteur au statut "collecté" pour simplifier la prise en charge par le destinataire
       - ce bordereau ne peut être établi que par un collecteur/transporteur`,
 
-    value: BsdasriType.Synthesis,
-  },
+    value: BsdasriType.Synthesis
+  }
 ];
 
 const ALL_OPTIONS = [...COMMON_OPTIONS, ...TRANSPORTER_OPTIONS];
@@ -83,7 +83,7 @@ export function Type({ disabled }: Props) {
     QueryCompanyInfosArgs
   >(COMPANY_INFOS, {
     variables: { siret },
-    fetchPolicy: "no-cache",
+    fetchPolicy: "no-cache"
   });
 
   useEffect(() => {

@@ -13,7 +13,7 @@ type Props = {
 export default function AccountContentWrapper({
   title,
   button,
-  children,
+  children
 }: Props) {
   return (
     <div className={styles.content}>

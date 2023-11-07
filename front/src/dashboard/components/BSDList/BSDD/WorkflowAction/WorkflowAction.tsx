@@ -1,5 +1,5 @@
 import React from "react";
-import { EmitterType, Form, FormStatus } from "generated/graphql/types";
+import { EmitterType, Form, FormStatus } from "codegen-ui";
 import MarkAsSealed from "./MarkAsSealed";
 import MarkAsReceived from "./MarkAsReceived";
 import MarkAsAccepted from "./MarkAsAccepted";
@@ -9,13 +9,13 @@ import MarkAsResealed from "./MarkAsResealed";
 import MarkAsTempStorerAccepted from "./MarkAsTempStorerAccepted";
 import SignEmissionForm from "./SignEmissionForm";
 import SignTransportForm from "./SignTransportForm";
-import routes from "Apps/routes";
+import routes from "../../../../../Apps/routes";
 import { useRouteMatch } from "react-router-dom";
 
 import {
   PrepareSegment,
   MarkSegmentAsReadyToTakeOver,
-  TakeOverSegment,
+  TakeOverSegment
 } from "./segments";
 
 export interface WorkflowActionProps {
@@ -48,7 +48,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
             {[
               form.emitter?.company?.siret,
               form.ecoOrganisme?.siret,
-              form.transporter?.company?.orgId,
+              form.transporter?.company?.orgId
             ].includes(siret) &&
               !form.emitter?.isPrivateIndividual && (
                 <SignEmissionForm {...props} />
@@ -66,7 +66,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
         [
           form.emitter?.company?.siret,
           form.ecoOrganisme?.siret,
-          form.transporter?.company?.orgId,
+          form.transporter?.company?.orgId
         ].includes(siret)
       ) {
         return <SignEmissionForm {...props} />;
@@ -141,7 +141,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       if (
         [
           form.recipient?.company?.siret,
-          form.temporaryStorageDetail?.transporter?.company?.orgId,
+          form.temporaryStorageDetail?.transporter?.company?.orgId
         ].includes(siret)
       ) {
         return <SignEmissionForm {...props} />;

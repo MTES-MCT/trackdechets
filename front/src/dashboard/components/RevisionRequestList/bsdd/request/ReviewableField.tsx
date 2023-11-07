@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TdSwitch from "common/components/Switch";
+import TdSwitch from "../../../../../common/components/Switch";
 import { useField } from "formik";
 
 type Props = {
@@ -19,7 +19,7 @@ export function ReviewableField({
   name,
   defaultValue,
   initialValue,
-  children,
+  children
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [, , { setValue }] = useField(name);

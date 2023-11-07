@@ -1,7 +1,6 @@
 import React, { useState, ReactNode } from "react";
 import { gql } from "@apollo/client";
-import { filter } from "graphql-anywhere";
-import { IconPasswordKey } from "Apps/common/Components/Icons/Icons";
+import { IconPasswordKey } from "../Apps/common/Components/Icons/Icons";
 import AccountCompanyMenu from "./AccountCompanyMenu";
 import AccountCompanyInfo from "./AccountCompanyInfo";
 import AccountCompanySecurity from "./AccountCompanySecurity";
@@ -9,7 +8,7 @@ import AccountCompanyMemberList from "./AccountCompanyMemberList";
 import AccountCompanyContact from "./AccountCompanyContact";
 import AccountCompanyAdvanced from "./AccountCompanyAdvanced";
 import styles from "./AccountCompany.module.scss";
-import { CompanyPrivate, UserRole } from "generated/graphql/types";
+import { CompanyPrivate, UserRole } from "codegen-ui";
 
 type Props = {
   company: CompanyPrivate;
@@ -20,7 +19,7 @@ export enum Link {
   Signature = "Signature",
   Members = "Membres",
   Contact = "Contact",
-  Advanced = "Avancé",
+  Advanced = "Avancé"
 }
 
 AccountCompany.fragments = {
@@ -41,7 +40,7 @@ AccountCompany.fragments = {
     ${AccountCompanySecurity.fragments.company}
     ${AccountCompanyMemberList.fragments.company}
     ${AccountCompanyContact.fragments.company}
-  `,
+  `
 };
 
 export default function AccountCompany({ company }: Props) {
@@ -49,35 +48,15 @@ export default function AccountCompany({ company }: Props) {
 
   const isAdmin = company.userRole === UserRole.Admin;
 
-  const info = (
-    <AccountCompanyInfo
-      company={filter(AccountCompanyInfo.fragments.company, company)}
-    />
-  );
+  const info = <AccountCompanyInfo company={company} />;
 
-  const signature = (
-    <AccountCompanySecurity
-      company={filter(AccountCompanySecurity.fragments.company, company)}
-    />
-  );
+  const signature = <AccountCompanySecurity company={company} />;
 
-  const members = (
-    <AccountCompanyMemberList
-      company={filter(AccountCompanyMemberList.fragments.company, company)}
-    />
-  );
+  const members = <AccountCompanyMemberList company={company} />;
 
-  const contact = (
-    <AccountCompanyContact
-      company={filter(AccountCompanyContact.fragments.company, company)}
-    />
-  );
+  const contact = <AccountCompanyContact company={company} />;
 
-  const advanced = (
-    <AccountCompanyAdvanced
-      company={filter(AccountCompanyAdvanced.fragments.company, company)}
-    />
-  );
+  const advanced = <AccountCompanyAdvanced company={company} />;
 
   let activeContent: ReactNode = null;
 

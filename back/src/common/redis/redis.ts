@@ -82,8 +82,6 @@ export async function cachedGet<T>(
     setInCache(cacheKey, parser.stringify(dbValue), options).catch(_ => null);
 
     return dbValue;
-  } catch (err) {
-    throw err;
   } finally {
     // In case of a failure (getter or setInCache) we must release the lock.
     // When it succeeds, it's not mandatory but safer.

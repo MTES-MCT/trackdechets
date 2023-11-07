@@ -1,9 +1,9 @@
 import React from "react";
 import { Field, useFormikContext } from "formik";
-import CompanySelector from "form/common/components/company/CompanySelector";
-import { Bsda, BsdaType, BsdaPickupSite } from "generated/graphql/types";
-import WorkSite from "form/common/components/work-site/WorkSite";
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
+import CompanySelector from "../../../common/components/company/CompanySelector";
+import { Bsda, BsdaType, BsdaPickupSite } from "codegen-ui";
+import WorkSite from "../../../common/components/work-site/WorkSite";
+import { getInitialCompany } from "../../../bsdd/utils/initial-state";
 
 export function Emitter({ disabled }) {
   const { values, handleChange, setFieldValue } = useFormikContext<Bsda>();
@@ -153,6 +153,6 @@ export function getInitialEmitterPickupSite(
     address: pickupSite?.address ?? "",
     city: pickupSite?.city ?? "",
     postalCode: pickupSite?.postalCode ?? "",
-    infos: pickupSite?.infos ?? "",
+    infos: pickupSite?.infos ?? ""
   };
 }

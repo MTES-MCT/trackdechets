@@ -7,34 +7,30 @@ import {
   boolean,
   setLocale,
   mixed,
-  SchemaOf,
+  SchemaOf
 } from "yup";
 
-import { isDangerous } from "generated/constants";
+import { isDangerous } from "shared/constants";
 import {
   PackagingInfo,
   Packagings,
   Consistence,
   WasteAcceptationStatus,
   CompanyType,
-  CompanyInput,
-} from "generated/graphql/types";
-import graphlClient from "graphql-client";
-import { COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA } from "Apps/common/queries/company/query";
-import {
-  isVat,
-  isFRVat,
-  isSiret,
-} from "generated/constants/companySearchHelpers";
+  CompanyInput
+} from "codegen-ui";
+import graphlClient from "../../../graphql-client";
+import { COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA } from "../../../Apps/common/queries/company/query";
+import { isVat, isFRVat, isSiret } from "shared/constants";
 import {
   companySchema,
-  transporterCompanySchema,
-} from "common/validation/schema";
+  transporterCompanySchema
+} from "../../../common/validation/schema";
 
 setLocale({
   mixed: {
-    notType: "Ce champ ne peut pas être nul",
-  },
+    notType: "Ce champ ne peut pas être nul"
+  }
 });
 
 // Destination should be a company registered in TD with profile COLLECTOR or WASTEPROCESSOR
@@ -50,7 +46,7 @@ const companyRegistrationAndTypeSchema = companySchema.concat(
         if (value) {
           const { data } = await graphlClient.query({
             query: COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA,
-            variables: { siret: value },
+            variables: { siret: value }
           });
           // it should be registered to TD
           if (data.companyInfos?.isRegistered === false) {
@@ -67,14 +63,14 @@ const companyRegistrationAndTypeSchema = companySchema.concat(
         }
         return true;
       }
-    ),
+    )
   })
 );
 
 export const transporterSchema = object().shape({
   isExemptedOfReceipt: boolean().nullable(true),
   numberPlate: string().nullable(true),
-  company: transporterCompanySchema,
+  company: transporterCompanySchema
 });
 
 const packagingInfo: SchemaOf<Omit<PackagingInfo, "__typename">> =
@@ -109,7 +105,7 @@ const packagingInfo: SchemaOf<Omit<PackagingInfo, "__typename">> =
               "Le nombre de benne(s) ou de citerne(s) ne peut être supérieur à 2."
             )
           : schema
-      ),
+      )
   });
 
 const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
@@ -140,7 +136,7 @@ const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
     mail: string().notRequired().nullable(),
     country: string().notRequired().nullable(), // ignored only for compat with CompanyInput
     omiNumber: string().notRequired().nullable(), // ignored only for compat with CompanyInput
-    orgId: string().notRequired().nullable(), // ignored only for compat with CompanyInput
+    orgId: string().notRequired().nullable() // ignored only for compat with CompanyInput
   });
 
 export const formSchema = object().shape({
@@ -152,13 +148,13 @@ export const formSchema = object().shape({
       address: string().nullable(),
       city: string().nullable(),
       postalCode: string().nullable(),
-      infos: string().nullable(),
+      infos: string().nullable()
     }),
-    company: companySchema,
+    company: companySchema
   }),
   ecoOrganisme: object().notRequired().nullable().shape({
     name: string().required(),
-    siret: string().required(),
+    siret: string().required()
   }),
   recipient: object().shape({
     processingOperation: string()
@@ -183,7 +179,7 @@ export const formSchema = object().shape({
           return true;
         }
       ),
-    company: companyRegistrationAndTypeSchema,
+    company: companyRegistrationAndTypeSchema
   }),
   transporter: transporterSchema,
   trader: object()
@@ -195,7 +191,7 @@ export const formSchema = object().shape({
         "La date de limite de validité est obligatoire"
       ),
       department: string().required("Le département est obligatoire"),
-      receipt: string().required("Le numéro de récépissé est obligatoire"),
+      receipt: string().required("Le numéro de récépissé est obligatoire")
     }),
   broker: object()
     .notRequired()
@@ -206,7 +202,7 @@ export const formSchema = object().shape({
         "La date de limite de validité est obligatoire"
       ),
       department: string().required("Le département est obligatoire"),
-      receipt: string().required("Le numéro de récépissé est obligatoire"),
+      receipt: string().required("Le numéro de récépissé est obligatoire")
     }),
   wasteDetails: object().shape({
     code: string().required("Code déchet manquant"),
@@ -219,7 +215,7 @@ export const formSchema = object().shape({
           .required(
             `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
           ),
-      otherwise: () => string().nullable(),
+      otherwise: () => string().nullable()
     }),
     packagingInfos: array()
       .required()
@@ -254,17 +250,17 @@ export const formSchema = object().shape({
     consistence: string().oneOf(
       Object.values(Consistence),
       "La consistance du déchet doit être précisée"
-    ),
+    )
   }),
   temporaryStorageDetail: object()
     .notRequired()
     .nullable()
     .shape({
       destination: object().notRequired().nullable().shape({
-        company: companyRegistrationAndTypeSchema,
-      }),
+        company: companyRegistrationAndTypeSchema
+      })
     }),
-  intermediaries: array().required().min(0).of(intermediariesShape),
+  intermediaries: array().required().min(0).of(intermediariesShape)
 });
 
 export const receivedFormSchema = object().shape({
@@ -273,7 +269,7 @@ export const receivedFormSchema = object().shape({
   wasteAcceptationStatus: string().oneOf([
     WasteAcceptationStatus.Accepted,
     WasteAcceptationStatus.Refused,
-    WasteAcceptationStatus.PartiallyRefused,
+    WasteAcceptationStatus.PartiallyRefused
   ]),
   quantityReceived: number()
     .required("Le champ est requis et doit être un nombre")
@@ -292,7 +288,7 @@ export const receivedFormSchema = object().shape({
     (wasteAcceptationStatus, schema) =>
       [
         WasteAcceptationStatus.Refused,
-        WasteAcceptationStatus.PartiallyRefused,
+        WasteAcceptationStatus.PartiallyRefused
       ].includes(wasteAcceptationStatus)
         ? schema.required("Le champ doit être renseigné")
         : schema.test(
@@ -300,5 +296,5 @@ export const receivedFormSchema = object().shape({
             "Le champ ne doit pas être renseigné si le déchet est accepté",
             v => !v
           )
-  ),
+  )
 });

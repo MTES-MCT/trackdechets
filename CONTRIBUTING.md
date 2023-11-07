@@ -63,36 +63,46 @@
 
    > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `NOTIFIER_HOST`, `UI_HOST`, `DEVELOPERS_HOST`, `STORYBOOK_HOST` et `ELASTIC_SEARCH_HOST`
 
-4. Démarrer les containers
+4. Démarrer les containers de bases de données
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch mongodb storybook
+   docker-compose -f docker-compose.dev.yml up
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
 
-5. Synchroniser la base de données avec le schéma prisma.
+5. Installez les dépendances de l'application localement
+
+   ```bash
+   npm install
+   ```
+
+6. Synchroniser la base de données avec le schéma prisma.
 
    Les modèles de données sont définis dans les fichiers `back/prisma/schema.prisma`.
    Afin de synchroniser les tables PostgreSQL, il faut lancer une déploiement prisma
 
    ```bash
-   docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
-   npx prisma db push
+   npx prisma db push --schema back/prisma/schema.prisma
    ```
 
-6. Initialiser l'index Elastic Search.
+7. Initialiser l'index Elastic Search.
 
    Les données sont indexées dans une base de donnée Elastic Search pour la recherche.
    Il est nécessaire de créer l'index et l'alias afin de commencer à indexer des documents.
    À noter que ce script peut aussi être utiliser pour indexer tous les documents en base de donnée.
 
    ```bash
-   docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
-   npm run reindex-all-bsds-bulk:dev
+   npm --prefix back run reindex-all-bsds-bulk:dev
    ```
 
-7. Accéder aux différents services.
+8. Lancer les services.
+
+   ```bash
+   npx nx run-many -t serve
+   ```
+
+9. Accéder aux différents services.
 
    C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` (par ex: `http://trackdechets.local`) pour commencer à utiliser l'application ou sur `API_HOST` (par ex `http://api.trackdechets.local`) pour accéder au playground GraphQL.
 
@@ -241,12 +251,11 @@ cd front && nvm use && npm install
 9. Pousser le schéma de la base de données dans la table `prisma` et ajouter des données de tests en ajoutant un fichier `seed.dev.ts` dans le répertoire `back/prisma` (demander à un dev) :
 
 ```
-cd back
-npx prisma db push
-npx prisma db seed
+npx prisma db push --schema back/prisma/schema.prisma
+npx prisma db seed --schema back/prisma/schema.prisma
 ```
 
-10. Créer l'index Elasticsearch : `cd back && npm run reindex-all-bsds-bulk:dev -- -f`. Puis vérifier qu'un index a bien été crée : `curl localhost:9200/_cat/indices`
+10. Créer l'index Elasticsearch : `npm --prefix back run reindex-all-bsds-bulk:dev -- -f`. Puis vérifier qu'un index a bien été crée : `curl localhost:9200/_cat/indices`
 
 11. Créer un utilisateur Mongo :
 
@@ -259,15 +268,13 @@ mongosh
 12. Démarrer le `back` et le `front` :
 
 ```
-cd back && npm run dev
-cd front && npm run dev
+npx nx run-many -t serve
 ```
 
 13. (Optionnel) Démarrer Storybook
 
 ```bash
 cd front
-npm install
 npm run storybook
 ```
 
@@ -298,14 +305,12 @@ Il est également possible de faire tourner les tests unitaires sur l'environnem
    ```
 2. Faire tourner les tests back
    ```bash
-   docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
-   npm run test # run all the tests
-   npx jest path src/path/to/my-function.test.ts # run only one test
+   npx nx run back:test # run all the tests
+   npx nx run back:test src/path/to/my-function.test.ts # run only one test
    ```
 3. Faire tourner les tests front
    ```bash
-   docker exec -it $(docker ps -aqf "name=td-ui") sh
-   npm run test # run tests in watch mode
+   npx nx run front:test # run tests in watch mode
    ```
 
 ## Tests d'intégration
@@ -360,7 +365,7 @@ A noter que une fois que ces migrations ont été jouées, le contenu des fichie
 Pour les migrations scriptées, c'est dans `back/prisma/scripts`. Les migrations doivent prendre la forme d'une classe, implémentant `Updater` et décorée par `registerUpdater`.
 Attention, contrairement aux scripts SQL ces migrations ne sont pas jouées une seules fois. Il faut donc s'assurer qu'elles sont idempotentes, ou les désactiver après chaque mise en production.
 
-Toutes ces migrations sont jouées avec la commande `npm run update:dev`. (sans le suffixe `:dev` en production)
+Toutes ces migrations sont jouées avec la commande `npx nx run back:"update:dev"`. (sans le suffixe `:dev` en production)
 
 ## Réindexation Elasticsearch des BSDs
 
@@ -369,34 +374,34 @@ Depuis un one-off container de taille XL
 - Réindexation globale sans downtime en utilisant les workers d'indexation
   La réindexation ne sera déclenchée que si la version du mapping ES a changé
 
-`FORCE_LOGGER_CONSOLE=true npm run reindex-all-bsds-bulk -- --useQueue`
+`FORCE_LOGGER_CONSOLE=true npx nx run back:reindex-all-bsds-bulk -- --useQueue`
 
 - Réindexation globale sans downtime depuis la console (le travail ne sera pas parallélisé)
   La réindexation ne sera déclenchée que si la version du mapping ES a changé
 
-`FORCE_LOGGER_CONSOLE=true npm run reindex-all-bsds-bulk`
+`FORCE_LOGGER_CONSOLE=true npx nx run back:reindex-all-bsds-bulk`
 
 - Réindexation globale sans downtime en utilisant les workers d'indexation
   Le paramètre -f permet de forcer la réindexation même si le mapping n'a pas changé
 
-`FORCE_LOGGER_CONSOLE=true npm run reindex-all-bsds-bulk -- --useQueue -f`
+`FORCE_LOGGER_CONSOLE=true npx nx run back:reindex-all-bsds-bulk -- --useQueue -f`
 
 - Réindexation globale sans downtime depuis la console (le travail ne sera pas parallélisé)
   Le paramètre -f permet de forcer la réindexation même si le mapping n'a pas changé
 
-`FORCE_LOGGER_CONSOLE=true npm run reindex-all-bsds-bulk -- -f`
+`FORCE_LOGGER_CONSOLE=true npx nx run back:reindex-all-bsds-bulk -- -f`
 
 - Réindexation de tous les bordereaux d'un certain type (en place)
 
-`FORCE_LOGGER_CONSOLE=true npm run reindex-partial-in-place BSFF`
+`FORCE_LOGGER_CONSOLE=true npx nx run back:reindex-partial-in-place BSFF`
 
 - Réindexation de tous les bordereaux d'un certain type (en supprimant tous les bordereaux de ce type avant)
 
-`FORCE_LOGGER_CONSOLE=true npm run reindex-partial-in-place -- -f BSFF`
+`FORCE_LOGGER_CONSOLE=true npx nx run back:reindex-partial-in-place -- -f BSFF`
 
 - Réindexation de tous les bordereaux depuis une certaine date (en place)
 
-`FORCE_LOGGER_CONSOLE=true npm run reindex-partial-in-place -- --since 2023-03-01`
+`FORCE_LOGGER_CONSOLE=true npx nx run back:reindex-partial-in-place -- --since 2023-03-01`
 
 ### Réindexation complète sans downtime lors d'une mise en production
 
@@ -406,7 +411,7 @@ Depuis un one-off container de taille XL
   - BULK_INDEX_BATCH_SIZE=2500
   - BULK_INDEX_JOB_CONCURRENCY=1
 - Se connecter à la prod avec un one-off container de taille XL
-- Lancer la commande `FORCE_LOGGER_CONSOLE=true npm run reindex-all-bsds-bulk -- --useQueue -f` (si la version de l'index a été bump, on peut omettre le `-f`)
+- Lancer la commande `FORCE_LOGGER_CONSOLE=true npx nx run back:reindex-all-bsds-bulk -- --useQueue -f` (si la version de l'index a été bump, on peut omettre le `-f`)
 - Suivre l'évolution des jobs d'indexation sur le dashboard bull, l'URL est visible dans le fichier `src/queue/bull-board.ts``. Il est
   nécessaire de se connecter à l'UI Trackdéchets avec un compte admin pour y avoir accès.
 - Relancer au besoin les "indexChunk" jobs qui ont failed (c'est possible si ES se retrouve momentanément surchargé).

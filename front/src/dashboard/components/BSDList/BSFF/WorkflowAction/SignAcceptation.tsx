@@ -11,28 +11,28 @@ import {
   WasteAcceptationStatus,
   Bsff,
   Query,
-  QueryBsffArgs,
-} from "generated/graphql/types";
+  QueryBsffArgs
+} from "codegen-ui";
 import {
   ActionButton,
   Modal,
   RedErrorMessage,
-  Switch,
-} from "common/components";
-import { Loader } from "Apps/common/Components";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+  Switch
+} from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import {
   GET_BSFF_FORM,
   SIGN_BSFF,
-  UPDATE_BSFF_PACKAGING,
-} from "form/bsff/utils/queries";
-import { GET_BSDS } from "Apps/common/queries";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { BSFF_WASTES } from "generated/constants";
-import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
+  UPDATE_BSFF_PACKAGING
+} from "../../../../../form/bsff/utils/queries";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
+import { BSFF_WASTES } from "shared/constants";
+import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
 import { BsffSummary } from "./BsffSummary";
-import TdTooltip from "common/components/Tooltip";
+import TdTooltip from "../../../../../common/components/Tooltip";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";
 import { subMonths } from "date-fns";
 
@@ -47,7 +47,7 @@ const validationSchema = yup.object({
       "",
       null,
       WasteAcceptationStatus.Accepted,
-      WasteAcceptationStatus.Refused,
+      WasteAcceptationStatus.Refused
     ]),
   acceptationWeight: yup
     .number()
@@ -57,7 +57,7 @@ const validationSchema = yup.object({
       then: schema =>
         schema.max(0, "La quantité reçue doit être égale à 0 en cas de refus"),
       otherwise: schema =>
-        schema.moreThan(0, "Vous devez saisir une quantité supérieure à 0"),
+        schema.moreThan(0, "Vous devez saisir une quantité supérieure à 0")
     }),
   acceptationRefusalReason: yup.string().when("acceptationStatus", {
     is: value => value === WasteAcceptationStatus.Refused,
@@ -65,12 +65,12 @@ const validationSchema = yup.object({
       schema
         .ensure()
         .min(1, "Le motif du refus doit être complété en cas de refus"),
-    otherwise: schema => schema.nullable(),
+    otherwise: schema => schema.nullable()
   }),
   signatureAuthor: yup
     .string()
     .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis")
 });
 
 interface SignBsffAcceptationOnePackagingProps {
@@ -88,7 +88,7 @@ export function SignBsffAcceptationOnePackaging({
   bsffId,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton = true,
+  displayActionButton = true
 }: SignBsffAcceptationOnePackagingProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -128,12 +128,12 @@ interface SignBsffAcceptationOnePackagingModalProps {
 
 function SignBsffAcceptationOnePackagingModal({
   bsffId,
-  onClose,
+  onClose
 }: SignBsffAcceptationOnePackagingModalProps) {
   const { data } = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF_FORM, {
     variables: {
-      id: bsffId,
-    },
+      id: bsffId
+    }
   });
 
   if (data == null) {
@@ -167,7 +167,7 @@ interface SignBsffAcceptationOnePackagingModalContentProps {
 export function SignBsffAcceptationOnePackagingModalContent({
   bsff,
   packaging,
-  onCancel,
+  onCancel
 }: SignBsffAcceptationOnePackagingModalContentProps) {
   const [updateBsffPackaging, updateBsffPackagingResult] = useMutation<
     Pick<Mutation, "updateBsffPackaging">,
@@ -202,7 +202,7 @@ export function SignBsffAcceptationOnePackagingModalContent({
             packaging.acceptation?.date ?? new Date().toISOString(),
           acceptationWeight: packaging.weight,
           acceptationRefusalReason: "",
-          signatureAuthor: "",
+          signatureAuthor: ""
         }}
         validationSchema={validationSchema}
         onSubmit={async values => {
@@ -217,10 +217,10 @@ export function SignBsffAcceptationOnePackagingModalContent({
                   date: values.acceptationDate,
                   status: values.acceptationStatus,
                   weight: values.acceptationWeight,
-                  refusalReason: values.acceptationRefusalReason,
-                },
-              },
-            },
+                  refusalReason: values.acceptationRefusalReason
+                }
+              }
+            }
           });
           await signBsff({
             variables: {
@@ -229,9 +229,9 @@ export function SignBsffAcceptationOnePackagingModalContent({
                 type: BsffSignatureType.Acceptation,
                 author: values.signatureAuthor,
                 date: new Date().toISOString(),
-                packagingId: packaging.id,
-              },
-            },
+                packagingId: packaging.id
+              }
+            }
           });
           onCancel();
         }}
@@ -283,7 +283,7 @@ export function SignBsffAcceptationOnePackagingModalContent({
                       acceptationStatus: checked
                         ? WasteAcceptationStatus.Refused
                         : WasteAcceptationStatus.Accepted,
-                      acceptationWeight: 0,
+                      acceptationWeight: 0
                     })
                   }
                   checked={

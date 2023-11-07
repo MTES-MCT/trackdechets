@@ -9,7 +9,7 @@ function InfoWithIcon({
   editableInfos,
   hasEditableInfos,
   onClick,
-  isDisabled,
+  isDisabled
 }: InfoWithIconProps) {
   const labelValue = getLabelValue(labelCode);
 

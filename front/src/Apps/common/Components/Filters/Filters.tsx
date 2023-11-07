@@ -137,12 +137,12 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
       if (isStartDate) {
         newFilterValues[filterName] = {
           ...newFilterValues[filterName],
-          startDate: date,
+          startDate: date
         };
       } else {
         newFilterValues[filterName] = {
           ...newFilterValues[filterName],
-          endDate: date,
+          endDate: date
         };
       }
 

@@ -4,13 +4,13 @@ import {
   Link,
   useHistory,
   useLocation,
-  useParams,
+  useParams
 } from "react-router-dom";
 
-import { useDownloadPdf } from "dashboard/components/BSDList/BSDD/BSDDActions/useDownloadPdf";
-import { useDuplicate } from "dashboard/components/BSDList/BSDD/BSDDActions/useDuplicate";
+import { useDownloadPdf } from "../../components/BSDList/BSDD/BSDDActions/useDownloadPdf";
+import { useDuplicate } from "../../components/BSDList/BSDD/BSDDActions/useDuplicate";
 
-import { DeleteModal } from "dashboard/components/BSDList/BSDD/BSDDActions/DeleteModal";
+import { DeleteModal } from "../../components/BSDList/BSDD/BSDDActions/DeleteModal";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
   TransportSegment,
@@ -21,8 +21,8 @@ import {
   InitialFormFraction,
   Query,
   QueryCompanyPrivateInfosArgs,
-  OperationMode,
-} from "generated/graphql/types";
+  OperationMode
+} from "codegen-ui";
 import { emitterTypeLabels, getTransportModeLabel } from "../../constants";
 import {
   IconWarehouseDelivery,
@@ -34,41 +34,38 @@ import {
   IconPaperWrite,
   IconDuplicateFile,
   IconTrash,
-  IconBSDD,
-} from "Apps/common/Components/Icons/Icons";
-import routes from "Apps/routes";
+  IconBSDD
+} from "../../../Apps/common/Components/Icons/Icons";
+import routes from "../../../Apps/routes";
 
 import {
   getVerboseConsistence,
   getVerboseAcceptationStatus,
-  getVerboseQuantityType,
-} from "dashboard/detail/common/utils";
+  getVerboseQuantityType
+} from "../common/utils";
 import QRCodeIcon from "react-qr-code";
 
-import styles from "dashboard/detail/common/BSDDetailContent.module.scss";
+import styles from "../common/BSDDetailContent.module.scss";
 
 import {
   DateRow,
   DetailRow,
   YesNoRow,
-  PackagingRow,
-} from "dashboard/detail/common/Components";
-import { WorkflowAction } from "dashboard/components/BSDList";
+  PackagingRow
+} from "../common/Components";
+import { WorkflowAction } from "../../components/BSDList";
 import EditSegment from "./EditSegment";
-import { Modal } from "common/components";
-import { Loader } from "Apps/common/Components";
-import { isDangerous } from "generated/constants";
+import { Modal } from "../../../common/components";
+import { Loader } from "../../../Apps/common/Components";
+import { isDangerous } from "shared/constants";
 import { format } from "date-fns";
-import {
-  isForeignVat,
-  isSiret,
-} from "generated/constants/companySearchHelpers";
-import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
+import { isForeignVat, isSiret } from "shared/constants";
+import { Appendix1ProducerForm } from "../../../form/bsdd/appendix1Producer/form";
 import { useQuery } from "@apollo/client";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
-import { formTransportIsPipeline } from "form/bsdd/utils/packagings";
-import { getOperationModeLabel } from "common/operationModes";
-import { STATUS_LABELS } from "generated/constants/statuses";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../Apps/common/queries/company/query";
+import { formTransportIsPipeline } from "../../../form/bsdd/utils/packagings";
+import { getOperationModeLabel } from "../../../common/operationModes";
+import { STATUS_LABELS } from "shared/constants";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -144,7 +141,7 @@ const TransportSegmentDetail = ({ segment, siret }: SegmentProps) => {
       {!segment.readyToTakeOver &&
         [
           segment.transporter?.company?.orgId,
-          segment.previousTransporterCompanySiret,
+          segment.previousTransporterCompanySiret
         ].includes(siret) && <EditSegment segment={segment} siret={siret} />}
     </>
   );
@@ -261,93 +258,87 @@ const TempStorage = ({ form }) => {
   );
 };
 const Trader = ({ trader }) => (
-  <>
-    <div className={styles.detailColumns}>
-      <div className={styles.detailGrid}>
-        <dt>Négociant</dt>
-        <dd>{trader.company?.name}</dd>
+  <div className={styles.detailColumns}>
+    <div className={styles.detailGrid}>
+      <dt>Négociant</dt>
+      <dd>{trader.company?.name}</dd>
 
-        <dt>Siret</dt>
-        <dd>{trader.company?.siret}</dd>
+      <dt>Siret</dt>
+      <dd>{trader.company?.siret}</dd>
 
-        <dt>Adresse</dt>
-        <dd>{trader.company?.address}</dd>
+      <dt>Adresse</dt>
+      <dd>{trader.company?.address}</dd>
 
-        <dt>Tél</dt>
-        <dd>{trader.company?.phone}</dd>
+      <dt>Tél</dt>
+      <dd>{trader.company?.phone}</dd>
 
-        <dt>Mél</dt>
-        <dd>{trader.company?.mail}</dd>
+      <dt>Mél</dt>
+      <dd>{trader.company?.mail}</dd>
 
-        <dt>Contact</dt>
-        <dd>{trader.company?.contact}</dd>
-      </div>
-      <div className={styles.detailGrid}>
-        <DetailRow value={trader.receipt} label="Récépissé" />
-        <DetailRow value={trader.department} label="Départment" />
-        <DateRow value={trader.validityLimit} label="Date de validité" />
-      </div>
+      <dt>Contact</dt>
+      <dd>{trader.company?.contact}</dd>
     </div>
-  </>
+    <div className={styles.detailGrid}>
+      <DetailRow value={trader.receipt} label="Récépissé" />
+      <DetailRow value={trader.department} label="Départment" />
+      <DateRow value={trader.validityLimit} label="Date de validité" />
+    </div>
+  </div>
 );
 const Broker = ({ broker }) => (
-  <>
-    <div className={styles.detailColumns}>
-      <div className={styles.detailGrid}>
-        <dt>Courtier</dt>
-        <dd>{broker.company?.name}</dd>
+  <div className={styles.detailColumns}>
+    <div className={styles.detailGrid}>
+      <dt>Courtier</dt>
+      <dd>{broker.company?.name}</dd>
 
-        <dt>Siret</dt>
-        <dd>{broker.company?.siret}</dd>
+      <dt>Siret</dt>
+      <dd>{broker.company?.siret}</dd>
 
-        <dt>Adresse</dt>
-        <dd>{broker.company?.address}</dd>
+      <dt>Adresse</dt>
+      <dd>{broker.company?.address}</dd>
 
-        <dt>Tél</dt>
-        <dd>{broker.company?.phone}</dd>
+      <dt>Tél</dt>
+      <dd>{broker.company?.phone}</dd>
 
-        <dt>Mél</dt>
-        <dd>{broker.company?.mail}</dd>
+      <dt>Mél</dt>
+      <dd>{broker.company?.mail}</dd>
 
-        <dt>Contact</dt>
-        <dd>{broker.company?.contact}</dd>
-      </div>
-      <div className={styles.detailGrid}>
-        <DetailRow value={broker.receipt} label="Récépissé" />
-        <DetailRow value={broker.department} label="Départment" />
-        <DateRow value={broker.validityLimit} label="Date de validité" />
-      </div>
+      <dt>Contact</dt>
+      <dd>{broker.company?.contact}</dd>
     </div>
-  </>
+    <div className={styles.detailGrid}>
+      <DetailRow value={broker.receipt} label="Récépissé" />
+      <DetailRow value={broker.department} label="Départment" />
+      <DateRow value={broker.validityLimit} label="Date de validité" />
+    </div>
+  </div>
 );
 
 const Intermediary = ({ intermediary }) => (
-  <>
-    <div className={styles.detailColumns}>
-      <div className={styles.detailGrid}>
-        <dt>Établissement intermédiaire</dt>
-        <dd>{intermediary?.name}</dd>
+  <div className={styles.detailColumns}>
+    <div className={styles.detailGrid}>
+      <dt>Établissement intermédiaire</dt>
+      <dd>{intermediary?.name}</dd>
 
-        <dt>Siret</dt>
-        <dd>{intermediary?.siret}</dd>
+      <dt>Siret</dt>
+      <dd>{intermediary?.siret}</dd>
 
-        <dt>Numéro de TVA</dt>
-        <dd>{intermediary?.vatNumber}</dd>
+      <dt>Numéro de TVA</dt>
+      <dd>{intermediary?.vatNumber}</dd>
 
-        <dt>Adresse</dt>
-        <dd>{intermediary?.address}</dd>
+      <dt>Adresse</dt>
+      <dd>{intermediary?.address}</dd>
 
-        <dt>Tél</dt>
-        <dd>{intermediary?.phone}</dd>
+      <dt>Tél</dt>
+      <dd>{intermediary?.phone}</dd>
 
-        <dt>Mél</dt>
-        <dd>{intermediary?.mail}</dd>
+      <dt>Mél</dt>
+      <dd>{intermediary?.mail}</dd>
 
-        <dt>Contact</dt>
-        <dd>{intermediary?.contact}</dd>
-      </div>
+      <dt>Contact</dt>
+      <dd>{intermediary?.contact}</dd>
     </div>
-  </>
+  </div>
 );
 
 const EcoOrganisme = ({ ecoOrganisme }) => (
@@ -367,7 +358,7 @@ type BSDDetailContentProps = {
 
 const GroupedIn = ({ form }: { form: Form }) => {
   const [downloadPdf] = useDownloadPdf({
-    variables: { id: form.id },
+    variables: { id: form.id }
   });
   return (
     <DetailRow
@@ -390,7 +381,7 @@ const GroupedIn = ({ form }: { form: Form }) => {
  */
 const Recipient = ({
   form,
-  hasTempStorage,
+  hasTempStorage
 }: {
   form: Form;
   hasTempStorage: boolean;
@@ -450,7 +441,7 @@ const Recipient = ({
 };
 
 const Appendix2 = ({
-  grouping,
+  grouping
 }: {
   grouping: InitialFormFraction[] | null | undefined;
 }) => {
@@ -499,7 +490,7 @@ const Appendix2 = ({
 
 const Appendix1 = ({
   siret,
-  container,
+  container
 }: {
   siret: string;
   container: Form;
@@ -510,7 +501,7 @@ const Appendix1 = ({
     Pick<Query, "companyPrivateInfos">,
     QueryCompanyPrivateInfosArgs
   >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
-    variables: { clue: siret },
+    variables: { clue: siret }
   });
   const siretsWithAutomaticSignature = data
     ? data.companyPrivateInfos.receivedSignatureAutomations.map(
@@ -571,7 +562,7 @@ const Appendix1 = ({
                         siretsWithAutomaticSignature.includes(
                           form.emitter?.company?.siret
                         ) ||
-                        Boolean(form.emitter?.isPrivateIndividual),
+                        Boolean(form.emitter?.isPrivateIndividual)
                     }}
                   />
                 </td>
@@ -606,7 +597,7 @@ function useQueryString() {
 
 export default function BSDDetailContent({
   form,
-  children = null,
+  children = null
 }: BSDDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const query = useQueryString();
@@ -618,16 +609,16 @@ export default function BSDDetailContent({
     onCompleted: () => {
       history.push(
         generatePath(routes.dashboard.bsds.drafts, {
-          siret,
+          siret
         })
       );
-    },
+    }
   });
 
   const selectedTab = query.get("selectedTab");
 
-  const isMultiModal: boolean = !!form?.transportSegments?.length;
-  const hasTempStorage: boolean = !!form?.temporaryStorageDetail;
+  const isMultiModal = !!form?.transportSegments?.length;
+  const hasTempStorage = !!form?.temporaryStorageDetail;
   const isRegroupement: boolean = form?.emitter?.type === EmitterType.Appendix2;
   const isChapeau: boolean = form?.emitter?.type === EmitterType.Appendix1;
 
@@ -686,7 +677,7 @@ export default function BSDDetailContent({
                         pn.section,
                         pn.number,
                         pn.x ? `${pn.x}°` : null,
-                        pn.y ? `${pn.y}°` : null,
+                        pn.y ? `${pn.y}°` : null
                       ]
                         .filter(Boolean)
                         .join("/")}`
@@ -888,7 +879,7 @@ export default function BSDDetailContent({
                   </div>
 
                   <div className={styles.detailGrid}>
-                    {!isForeignVat(form?.transporter?.company?.vatNumber!!) && (
+                    {!isForeignVat(form?.transporter?.company?.vatNumber!) && (
                       <>
                         <YesNoRow
                           value={form?.transporter?.isExemptedOfReceipt}
@@ -995,7 +986,7 @@ export default function BSDDetailContent({
           {[
             FormStatus.Draft,
             FormStatus.Sealed,
-            FormStatus.SignedByProducer,
+            FormStatus.SignedByProducer
           ].includes(form.status) && (
             <>
               <button
@@ -1010,7 +1001,7 @@ export default function BSDDetailContent({
                 <Link
                   to={generatePath(routes.dashboard.bsdds.edit, {
                     siret,
-                    id: form.id,
+                    id: form.id
                   })}
                   className="btn btn--outline-primary"
                 >

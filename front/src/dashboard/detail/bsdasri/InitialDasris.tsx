@@ -1,5 +1,5 @@
 import React from "react";
-import { formatDate } from "common/datetime";
+import { formatDate } from "../../../common/datetime";
 import {
   Table,
   TableBody,
@@ -7,8 +7,8 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
-  TableRowDigest,
-} from "common/components";
+  TableRowDigest
+} from "../../../common/components";
 
 export const InitialDasris = ({ initialBsdasris }) => {
   if (!initialBsdasris?.length) {

@@ -122,9 +122,9 @@ describe("templates", () => {
       variables: { form },
       to
     });
-    expect(rendered.body).toContain(
-      "Exemption relevant de l'article R.541-50 du code de l'Environnement"
-    );
+    expect(rendered.body)
+      .toContain(`Exemption relevant de l'article R.541-50 du code de
+      l'Environnement`);
   });
 
   test("formNotAccepted with wasteRefusalReason nullish", () => {
@@ -205,9 +205,9 @@ describe("templates", () => {
       variables: { form },
       to
     });
-    expect(rendered.body).toContain(
-      "Exemption relevant de l'article R.541-50 du code de l'Environnement"
-    );
+    expect(rendered.body)
+      .toContain(`Exemption relevant de l'article R.541-50 du code de
+      l'Environnement`);
   });
 
   test("formPartiallyRefused with wasteRefusalReason nullish", () => {

@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:13.3-alpine
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    environment:
+      POSTGRES_USER: trackdechets
+      POSTGRES_PASSWORD: password
+
+  redis:
+    image: redis:5.0-alpine
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    sysctls:
+      - net.core.somaxconn=511
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.elasticsearch == true"
+
+  mongodb:
+    image: mongo:6
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=trackdechets
+      - MONGO_INITDB_ROOT_PASSWORD=password

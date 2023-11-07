@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Bsvhu } from "generated/graphql/types";
+import { Bsvhu } from "codegen-ui";
 import { BsvhuWasteSummary } from "./BsvhuWasteSummary";
 import { BsvhuJourneySummary } from "./BsvhuJourneySummary";
 

@@ -1,0 +1,155 @@
+{
+  "name": "back",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "back/src",
+  "projectType": "application",
+  "targets": {
+    "prisma": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx prisma generate --schema=back/prisma/schema.prisma"
+      }
+    },
+    "types": {
+      "command": "tsc -p back/tsconfig.app.json --noEmit"
+    },
+    "codegen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "graphql-codegen --config back/codegen.yml"
+      }
+    },
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "dependsOn": ["^build", "prisma", "codegen"],
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/back",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "back/src/index.ts",
+        "tsConfig": "back/tsconfig.app.json",
+        "assets": [
+          {
+            "input": "./back/src",
+            "glob": "**/*.{graphql,pdf,png,ttf,html,css,svg,wsdl,mp3}",
+            "output": "./back/src"
+          },
+          {
+            "input": "./back/src",
+            "glob": "**/assets/*.js",
+            "output": "./back/src"
+          },
+          {
+            "input": "./back/prisma",
+            "glob": "**/*.{prisma,sql}",
+            "output": "./back/prisma"
+          }
+        ],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {
+          "skipTypeCheck": true
+        },
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "serve-api": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["prisma"],
+      "options": {
+        "buildTarget": "back:build",
+        "inspect": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "back:build:development"
+        },
+        "production": {
+          "buildTarget": "back:build:production"
+        }
+      }
+    },
+    "serve-queues": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm --prefix back run watch:queue"
+      }
+    },
+    "serve-notifier": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm --prefix back run watch:notifier"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "nx serve-api back",
+          "nx serve-queues back",
+          "nx serve-notifier back"
+        ]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["back/src/**/*.{ts,tsx}"]
+      },
+      "configurations": {
+        "fix": {
+          "fix": true
+        }
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "dependsOn": ["codegen", "prisma"],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "back/jest.config.js",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "test-inte": {
+      "executor": "@nx/jest:jest",
+      "dependsOn": ["codegen"],
+      "options": {
+        "jestConfig": "back/integration-tests/jest.config.js",
+        "runInBand": true,
+        "forceExit": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true
+        }
+      }
+    }
+  },
+  "tags": []
+}

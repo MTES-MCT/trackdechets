@@ -1,10 +1,10 @@
 import * as React from "react";
 import { useQuery } from "@apollo/client";
-import { Bsff, Query, QueryBsffArgs } from "generated/graphql/types";
-import { ActionButton, Modal } from "common/components";
-import { Loader } from "Apps/common/Components";
-import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
-import { GET_BSFF_FORM } from "form/bsff/utils/queries";
+import { Bsff, Query, QueryBsffArgs } from "codegen-ui";
+import { ActionButton, Modal } from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
+import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
+import { GET_BSFF_FORM } from "../../../../../form/bsff/utils/queries";
 import { BsffSummary } from "./BsffSummary";
 
 interface ChildrenProps {
@@ -23,12 +23,12 @@ function SignBsffModal({
   title,
   bsffId,
   children,
-  onClose,
+  onClose
 }: SignEmissionModalProps) {
   const { data } = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF_FORM, {
     variables: {
-      id: bsffId,
-    },
+      id: bsffId
+    }
   });
 
   if (data == null) {
@@ -61,7 +61,7 @@ export function SignBsff({
   children,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton = true,
+  displayActionButton = true
 }: SignBsffProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 

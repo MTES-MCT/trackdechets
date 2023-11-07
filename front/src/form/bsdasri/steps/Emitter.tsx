@@ -1,26 +1,26 @@
-import { RedErrorMessage } from "common/components";
-import CompanySelector from "form/common/components/company/CompanySelector";
+import { RedErrorMessage } from "../../../common/components";
+import CompanySelector from "../../common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
 import React from "react";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import { RadioButton } from "../../common/components/custom-inputs/RadioButton";
 import Packagings from "../components/packagings/Packagings";
 import "./Bsdasri.scss";
 import {
   getInitialEmitterPickupSiteFn,
-  getInitialWeightFn,
+  getInitialWeightFn
 } from "../utils/initial-state";
-import WorkSite from "form/common/components/work-site/WorkSite";
+import WorkSite from "../../common/components/work-site/WorkSite";
 import BsdasriEcoOrganismes from "../components/eco-organismes/EcoOrganismes";
 import WeightWidget from "../components/Weight";
 
 import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
 import classNames from "classnames";
 
-import { BsdasriStatus, Bsdasri, BsdasriType } from "generated/graphql/types";
-import BsdasriGroupingSelector from "form/bsdasri/components/grouping/BsdasriGroupingSelector";
-import BsdasriSynthesisSelector from "form/bsdasri/components/grouping/BsdasriSynthesisSelector";
+import { BsdasriStatus, Bsdasri, BsdasriType } from "codegen-ui";
+import BsdasriGroupingSelector from "../components/grouping/BsdasriGroupingSelector";
+import BsdasriSynthesisSelector from "../components/grouping/BsdasriSynthesisSelector";
 import { useParams } from "react-router-dom";
-import Tooltip from "common/components/Tooltip";
+import Tooltip from "../../../common/components/Tooltip";
 
 export const customInfoToolTip =
   "Informations propres à l'entreprise. N'apparaît pas sur le bordereau.";
@@ -29,18 +29,13 @@ export default function GenericEmitter({ status, stepName, disabled = false }) {
 
   const isSynthesizing = values.type === BsdasriType.Synthesis;
   if (isSynthesizing) {
-    return SynthesisEmitter({ status, stepName, editionDisabled: disabled });
+    return SynthesisEmitter({ status });
   }
 
   return Emitter({ status, stepName, disabled });
 }
 
-export function SynthesisEmitter({
-  status,
-  stepName,
-  editionDisabled = false,
-  emissionEmphasis = false,
-}) {
+export function SynthesisEmitter({ status, emissionEmphasis = false }) {
   const { values } = useFormikContext<Bsdasri>();
   const disabled = !!status && status !== BsdasriStatus.Initial;
 
@@ -55,7 +50,7 @@ export function SynthesisEmitter({
 
       <div
         className={classNames("form__row", {
-          "field-emphasis": emissionEmphasis,
+          "field-emphasis": emissionEmphasis
         })}
       >
         <fieldset>
@@ -79,7 +74,7 @@ export function SynthesisEmitter({
       <BsdasriSynthesisSelector disabled={disabled} />
       <div
         className={classNames("form__row", {
-          "field-emphasis": emissionEmphasis,
+          "field-emphasis": emissionEmphasis
         })}
       >
         <label>
@@ -143,7 +138,7 @@ export function Emitter({ status, stepName, disabled = false }) {
 
       <div
         className={classNames("form__row", {
-          "field-emphasis": emissionEmphasis,
+          "field-emphasis": emissionEmphasis
         })}
       >
         <CompanySelector
@@ -169,7 +164,7 @@ export function Emitter({ status, stepName, disabled = false }) {
 
       <div
         className={classNames("form__row", {
-          "field-emphasis": emissionEmphasis,
+          "field-emphasis": emissionEmphasis
         })}
       >
         <fieldset>
@@ -197,7 +192,7 @@ export function Emitter({ status, stepName, disabled = false }) {
       <h4 className="form__section-heading">Conditionnement</h4>
       <div
         className={classNames("form__row", {
-          "field-emphasis": emissionEmphasis,
+          "field-emphasis": emissionEmphasis
         })}
       >
         {isRegrouping && (
@@ -215,7 +210,7 @@ export function Emitter({ status, stepName, disabled = false }) {
       <h4 className="form__section-heading">Quantité remise</h4>
       <div
         className={classNames("form__row", {
-          "field-emphasis": emissionEmphasis,
+          "field-emphasis": emissionEmphasis
         })}
       >
         <WeightWidget
@@ -227,7 +222,7 @@ export function Emitter({ status, stepName, disabled = false }) {
       </div>
       <div
         className={classNames("form__row", {
-          "field-emphasis": emissionEmphasis,
+          "field-emphasis": emissionEmphasis
         })}
       >
         <label>

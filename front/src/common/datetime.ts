@@ -16,6 +16,6 @@ export function formatDate(date: Date | number | string): string {
   if (!isValid(parsedDate)) return "";
 
   return format(parsedDate, "dd/MM/y", {
-    locale: fr,
+    locale: fr
   });
 }

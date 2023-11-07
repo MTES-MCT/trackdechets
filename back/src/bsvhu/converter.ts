@@ -28,7 +28,7 @@ import {
   Bsvhu as PrismaVhuForm,
   WasteAcceptationStatus
 } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 
 export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
   return {

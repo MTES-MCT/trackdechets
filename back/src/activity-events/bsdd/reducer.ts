@@ -113,7 +113,7 @@ export function bsddReducer(
     case "BsddDeleted":
       return { ...currentState, isDeleted: true };
 
-    case "BsddRevisionRequestApplied":
+    case "BsddRevisionRequestApplied": {
       const { wasteDetailsPackagingInfos, wasteDetailsPop, ...bsdd } =
         event.data.content;
 
@@ -132,6 +132,7 @@ export function bsddReducer(
           event.data.content as Partial<Prisma.FormCreateInput>
         )
       };
+    }
 
     default:
       throw "Unexpected event type";

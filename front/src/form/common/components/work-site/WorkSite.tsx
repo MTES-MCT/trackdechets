@@ -1,7 +1,7 @@
-import TdSwitch from "common/components/Switch";
+import TdSwitch from "../../../../common/components/Switch";
 
 import { Field, useFormikContext } from "formik";
-import { Form } from "generated/graphql/types";
+import { Form } from "codegen-ui";
 import React from "react";
 import WorkSiteAddress from "./WorkSiteAddress";
 
@@ -13,7 +13,7 @@ export default function WorkSite({
   designation,
   getInitialEmitterWorkSiteFn,
   disabled = false,
-  modelKey = DEFAULT_KEY,
+  modelKey = DEFAULT_KEY
 }: {
   switchLabel: string;
   headingTitle: string;

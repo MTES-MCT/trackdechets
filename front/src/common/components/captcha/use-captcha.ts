@@ -56,6 +56,6 @@ export function useCaptcha(displayCaptcha: boolean) {
     captchaLoading: loading,
     captchaError: error,
     captchaData,
-    refetchCaptcha,
+    refetchCaptcha
   };
 }

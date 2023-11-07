@@ -20,7 +20,7 @@ import {
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
-} from "../common/constants";
+} from "shared/constants";
 import {
   BAD_CHARACTERS_REGEXP,
   countries as vatCountries,
@@ -28,7 +28,7 @@ import {
   isOmi,
   isSiret,
   isVat
-} from "../common/constants/companySearchHelpers";
+} from "shared/constants";
 import {
   foreignVatNumber,
   REQUIRED_RECEIPT_DEPARTMENT,

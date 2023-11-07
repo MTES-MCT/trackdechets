@@ -5,42 +5,54 @@ import {
   Redirect,
   generatePath,
   RouteChildrenProps,
-  useRouteMatch,
+  useRouteMatch
 } from "react-router-dom";
-import PrivateRoute from "login/PrivateRoute";
+import PrivateRoute from "../../../../login/PrivateRoute";
 import * as Sentry from "@sentry/browser";
-import Loader from "Apps/common/Components/Loader/Loaders";
+import Loader from "../Loader/Loaders";
 import Layout from "./Layout";
-import routes from "Apps/routes";
+import routes from "../../../routes";
 import { useQuery, gql } from "@apollo/client";
-import { Query } from "../../../../generated/graphql/types";
-import ResendActivationEmail from "login/ResendActivationEmail";
-import Login from "login/Login";
-import SurveyBanner from "Apps/common/Components/SurveyBanner/SurveyBanner";
+import { Query } from "codegen-ui";
+import ResendActivationEmail from "../../../../login/ResendActivationEmail";
+import Login from "../../../../login/Login";
+import SurveyBanner from "../SurveyBanner/SurveyBanner";
 
-const Admin = lazy(() => import("admin/Admin"));
-const Dashboard = lazy(() => import("dashboard/Dashboard"));
-const DashboardV2Routes = lazy(() => import("Apps/Dashboard/DashboardRoutes"));
-const Account = lazy(() => import("account/Account"));
-const AccountMembershipRequest = lazy(
-  () => import("account/AccountMembershipRequest")
+const Admin = lazy(() => import("../../../../admin/Admin"));
+const Dashboard = lazy(() => import("../../../../dashboard/Dashboard"));
+const DashboardV2Routes = lazy(
+  () => import("../../../Dashboard/DashboardRoutes")
 );
-const FormContainer = lazy(() => import("form/bsdd/FormContainer"));
-const BsvhuFormContainer = lazy(() => import("form/bsvhu/FormContainer"));
-const BsffFormContainer = lazy(() => import("form/bsff/FormContainer"));
-const BsdasriFormContainer = lazy(() => import("form/bsdasri/FormContainer"));
-const BsdaFormContainer = lazy(() => import("form/bsda/FormContainer"));
-const WasteSelector = lazy(() => import("login/WasteSelector"));
+const Account = lazy(() => import("../../../../account/Account"));
+const AccountMembershipRequest = lazy(
+  () => import("../../../../account/AccountMembershipRequest")
+);
+const FormContainer = lazy(() => import("../../../../form/bsdd/FormContainer"));
+const BsvhuFormContainer = lazy(
+  () => import("../../../../form/bsvhu/FormContainer")
+);
+const BsffFormContainer = lazy(
+  () => import("../../../../form/bsff/FormContainer")
+);
+const BsdasriFormContainer = lazy(
+  () => import("../../../../form/bsdasri/FormContainer")
+);
+const BsdaFormContainer = lazy(
+  () => import("../../../../form/bsda/FormContainer")
+);
+const WasteSelector = lazy(() => import("../../../../login/WasteSelector"));
 
-const Invite = lazy(() => import("login/Invite"));
-const UserActivation = lazy(() => import("login/UserActivation"));
-const PasswordResetRequest = lazy(() => import("login/PasswordResetRequest"));
-const PasswordReset = lazy(() => import("login/PasswordReset"));
-const Signup = lazy(() => import("login/Signup"));
-const OauthDialog = lazy(() => import("oauth/Oauth2Dialog"));
-const OidcDialog = lazy(() => import("oauth/OidcDialog"));
-const Company = lazy(() => import("company/Company"));
-const WasteTree = lazy(() => import("search/WasteTree"));
+const Invite = lazy(() => import("../../../../login/Invite"));
+const UserActivation = lazy(() => import("../../../../login/UserActivation"));
+const PasswordResetRequest = lazy(
+  () => import("../../../../login/PasswordResetRequest")
+);
+const PasswordReset = lazy(() => import("../../../../login/PasswordReset"));
+const Signup = lazy(() => import("../../../../login/Signup"));
+const OauthDialog = lazy(() => import("../../../../oauth/Oauth2Dialog"));
+const OidcDialog = lazy(() => import("../../../../oauth/OidcDialog"));
+const Company = lazy(() => import("../../../../company/Company"));
+const WasteTree = lazy(() => import("../../../../search/WasteTree"));
 
 const GET_ME = gql`
   query GetMe {
@@ -63,7 +75,7 @@ export default function LayoutContainer() {
       if (import.meta.env.VITE_SENTRY_DSN && me.email) {
         Sentry.setUser({ email: me.email });
       }
-    },
+    }
   });
   const isAuthenticated = !loading && data != null;
   const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
@@ -82,7 +94,7 @@ export default function LayoutContainer() {
         message="« Mes bordereaux » vous permet de découvrir le nouveau tableau de bord. Découvrez-le et partagez-nous vos suggestions."
         button={{
           title: "Partagez vos suggestions",
-          href: "https://tally.so/r/3xDDy9",
+          href: "https://tally.so/r/3xDDy9"
         }}
       ></SurveyBanner>
     ) : undefined;
@@ -165,17 +177,17 @@ export default function LayoutContainer() {
               <Route
                 path={[
                   "/dashboard/:siret/bsds/edit/:id",
-                  "/v2/dashboard/:siret/bsds/edit/:id",
+                  "/v2/dashboard/:siret/bsds/edit/:id"
                 ]}
                 exact
               >
                 {({
-                  match,
+                  match
                 }: RouteChildrenProps<{ siret: string; id: string }>) => (
                   <Redirect
                     to={generatePath(routes[dashboardRoutePrefix].bsdds.edit, {
                       siret: match!.params.siret,
-                      id: match!.params.id,
+                      id: match!.params.id
                     })}
                   />
                 )}
@@ -192,7 +204,7 @@ export default function LayoutContainer() {
               <Route
                 path={[
                   "/dashboard/:siret/bsds/create",
-                  "/v2/dashboard/:siret/bsds/create",
+                  "/v2/dashboard/:siret/bsds/create"
                 ]}
                 exact
               >
@@ -201,7 +213,7 @@ export default function LayoutContainer() {
                     to={generatePath(
                       routes[dashboardRoutePrefix].bsdds.create,
                       {
-                        siret: match!.params.siret,
+                        siret: match!.params.siret
                       }
                     )}
                   />
@@ -310,7 +322,7 @@ export default function LayoutContainer() {
                   data
                     ? data.me.companies.length > 0
                       ? generatePath(routes.dashboard.index, {
-                          siret: data.me.companies[0].orgId,
+                          siret: data.me.companies[0].orgId
                         })
                       : routes.account.companies.list
                     : routes.login

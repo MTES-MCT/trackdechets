@@ -1,7 +1,7 @@
 import React from "react";
 import { Formik, Form, Field, FormikValues } from "formik";
 import { useMutation } from "@apollo/client";
-import RedErrorMessage from "common/components/RedErrorMessage";
+import RedErrorMessage from "../../../common/components/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
 import * as Yup from "yup";
 
@@ -25,16 +25,16 @@ export default function AccountFormCheckboxInput<
   mutation,
   mutationArgs,
   yupSchema = Yup.object(),
-  toggleEdition,
+  toggleEdition
 }: Props & { mutationArgs?: Variables }) {
   const [update, { loading }] = useMutation<any, Variables>(mutation, {
     onCompleted: () => {
       toggleEdition();
-    },
+    }
   });
 
   const initialValues = {
-    [name]: value,
+    [name]: value
   } as Variables;
 
   return (

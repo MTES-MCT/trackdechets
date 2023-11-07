@@ -1,4 +1,3 @@
 type Mutation {
- 
   reindexBsd(id: ID!): Boolean!
 }

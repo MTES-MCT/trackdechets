@@ -4,7 +4,7 @@
 import fs from "fs";
 import * as yup from "yup";
 import prisma from "../../prisma";
-import { nafCodes } from "../../common/constants/NAF";
+import { nafCodes } from "shared/constants";
 import { readCsv } from "../../users/bulk-creation/loaders";
 import logger from "../../logging/logger";
 

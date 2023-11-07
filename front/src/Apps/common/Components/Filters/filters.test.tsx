@@ -1,7 +1,7 @@
 import React from "react";
 import { render, fireEvent, cleanup } from "@testing-library/react";
 import Filters from "./Filters";
-import { filter_type_select_placeholder } from "Apps/common/wordings/dashboard/wordingsDashboard";
+import { filter_type_select_placeholder } from "../../wordings/dashboard/wordingsDashboard";
 import { FilterType } from "./filtersTypes";
 
 describe("Filters component", () => {
@@ -11,16 +11,16 @@ describe("Filters component", () => {
         name: "filter1",
         label: "Filter 1",
         type: FilterType.input,
-        isActive: true,
+        isActive: true
       },
       {
         name: "filter2",
         label: "Filter 2",
         type: FilterType.select,
         options: [{ value: "option1", label: "option 1" }],
-        isActive: true,
-      },
-    ],
+        isActive: true
+      }
+    ]
   ];
 
   afterEach(cleanup);

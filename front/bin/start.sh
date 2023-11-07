@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$STORYBOOK_ENV" = "STORYBOOK" ] ; then
-  npm run run-storybook
+  npm --prefix front run run-storybook
 else
-  npm run start
+  node front/server.js
 fi

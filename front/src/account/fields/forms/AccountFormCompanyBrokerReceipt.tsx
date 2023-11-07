@@ -1,10 +1,10 @@
 import React from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Formik, FormikProps, Form, Field } from "formik";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import { CompanyPrivate } from "generated/graphql/types";
+import RedErrorMessage from "../../../common/components/RedErrorMessage";
+import { NotificationError } from "../../../Apps/common/Components/Error/Error";
+import DateInput from "../../../form/common/components/custom-inputs/DateInput";
+import { CompanyPrivate } from "codegen-ui";
 
 type Props = {
   company: Pick<CompanyPrivate, "id" | "siret" | "brokerReceipt">;
@@ -67,20 +67,20 @@ export const DELETE_BROKER_RECEIPT = gql`
  */
 export default function AccountFormCompanyTransporterReceipt({
   company,
-  toggleEdition,
+  toggleEdition
 }: Props) {
   const brokerReceipt = company.brokerReceipt;
 
   const [
     createOrUpdateBrokerReceipt,
-    { loading: updateOrCreateLoading, error: updateOrCreateError },
+    { loading: updateOrCreateLoading, error: updateOrCreateError }
   ] = useMutation(
     brokerReceipt ? UPDATE_BROKER_RECEIPT : CREATE_BROKER_RECEIPT
   );
 
   const [
     updateCompany,
-    { loading: updateCompanyLoading, error: updateCompanyError },
+    { loading: updateCompanyLoading, error: updateCompanyError }
   ] = useMutation(UPDATE_COMPANY_BROKER_RECEIPT);
 
   const [deleteBrokerReceipt, { loading: deleteLoading, error: deleteError }] =
@@ -95,21 +95,21 @@ export default function AccountFormCompanyTransporterReceipt({
               }
             }
           `,
-          data: { brokerReceipt: null },
+          data: { brokerReceipt: null }
         });
-      },
+      }
     });
 
   const initialValues: V = brokerReceipt
     ? {
         receiptNumber: brokerReceipt.receiptNumber,
         validityLimit: brokerReceipt.validityLimit,
-        department: brokerReceipt.department,
+        department: brokerReceipt.department
       }
     : {
         receiptNumber: "",
         validityLimit: new Date().toISOString(),
-        department: "",
+        department: ""
       };
 
   return (
@@ -128,17 +128,17 @@ export default function AccountFormCompanyTransporterReceipt({
         onSubmit={async values => {
           const input = {
             ...(brokerReceipt?.id ? { id: brokerReceipt.id } : {}),
-            ...values,
+            ...values
           };
           const { data } = await createOrUpdateBrokerReceipt({
-            variables: { input },
+            variables: { input }
           });
           if (data.createBrokerReceipt) {
             await updateCompany({
               variables: {
                 id: company.id,
-                brokerReceiptId: data.createBrokerReceipt.id,
-              },
+                brokerReceiptId: data.createBrokerReceipt.id
+              }
             });
           }
           toggleEdition();
@@ -147,7 +147,7 @@ export default function AccountFormCompanyTransporterReceipt({
           return {
             ...(!values.receiptNumber ? { receiptNumber: "Champ requis" } : {}),
             ...(!values.validityLimit ? { validityLimit: "Champ requis" } : {}),
-            ...(!values.department ? { department: "Champ requis" } : {}),
+            ...(!values.department ? { department: "Champ requis" } : {})
           };
         }}
       >
@@ -204,8 +204,8 @@ export default function AccountFormCompanyTransporterReceipt({
                   onClick={async () => {
                     await deleteBrokerReceipt({
                       variables: {
-                        input: { id: brokerReceipt.id },
-                      },
+                        input: { id: brokerReceipt.id }
+                      }
                     });
                     toggleEdition();
                   }}

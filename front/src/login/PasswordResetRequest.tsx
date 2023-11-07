@@ -1,14 +1,11 @@
 import { useMutation, gql } from "@apollo/client";
 import React, { useState } from "react";
-import {
-  Mutation,
-  MutationCreatePasswordResetRequestArgs,
-} from "generated/graphql/types";
-import Loader from "Apps/common/Components/Loader/Loaders";
+import { Mutation, MutationCreatePasswordResetRequestArgs } from "codegen-ui";
+import Loader from "../Apps/common/Components/Loader/Loaders";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { Captcha, useCaptcha } from "common/components/captcha";
+import { Captcha, useCaptcha } from "../common/components/captcha";
 
 import styles from "./Login.module.scss";
 
@@ -37,8 +34,8 @@ export default function PasswordResetRequest() {
       variables: {
         input: {
           email,
-          captcha: { token: captchaData?.token ?? "", value: captchaInput },
-        },
+          captcha: { token: captchaData?.token ?? "", value: captchaInput }
+        }
       },
 
       onError: () => {
@@ -49,7 +46,7 @@ export default function PasswordResetRequest() {
         setCaptchaInput("");
         refetchCaptcha();
         setEmail("");
-      },
+      }
     });
   };
 
@@ -112,7 +109,7 @@ export default function PasswordResetRequest() {
                   name: "email",
                   value: email,
                   onChange: e => setEmail(e.target.value),
-                  required: true,
+                  required: true
                 }}
               />
             </div>

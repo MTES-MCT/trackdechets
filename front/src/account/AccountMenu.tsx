@@ -2,8 +2,8 @@ import React from "react";
 import SideMenu from "../common/components/SideMenu";
 import { NavLink } from "react-router-dom";
 import styles from "./AccountMenu.module.scss";
-import routes from "Apps/routes";
-import Tooltip from "common/components/Tooltip";
+import routes from "../Apps/routes";
+import Tooltip from "../common/components/Tooltip";
 
 export const AccountMenuContent = () => (
   <>

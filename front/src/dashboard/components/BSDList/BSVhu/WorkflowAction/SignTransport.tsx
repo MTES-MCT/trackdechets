@@ -1,17 +1,17 @@
 import { useMutation } from "@apollo/client";
-import { RedErrorMessage } from "common/components";
-import { GET_BSDS } from "Apps/common/queries";
-import routes from "Apps/routes";
-import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
-import TransporterReceipt from "form/common/components/company/TransporterReceipt";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import { RedErrorMessage } from "../../../../../common/components";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import routes from "../../../../../Apps/routes";
+import { UPDATE_VHU_FORM } from "../../../../../form/bsvhu/utils/queries";
+import TransporterReceipt from "../../../../../form/common/components/company/TransporterReceipt";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { Field, Form, Formik } from "formik";
 import {
   Mutation,
   MutationSignBsvhuArgs,
   MutationUpdateBsvhuArgs,
-  SignatureTypeInput,
-} from "generated/graphql/types";
+  SignatureTypeInput
+} from "codegen-ui";
 import React from "react";
 import { generatePath, Link, useRouteMatch } from "react-router-dom";
 import * as yup from "yup";
@@ -23,7 +23,7 @@ const validationSchema = yup.object({
   author: yup
     .string()
     .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis")
 });
 
 type Props = {
@@ -38,7 +38,7 @@ export function SignTransport({
   bsvhuId,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton,
+  displayActionButton
 }: Props) {
   const [updateBsvhu, { loading: loadingUpdate, error: updateError }] =
     useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
@@ -86,7 +86,7 @@ export function SignTransport({
             <Link
               to={generatePath(routes[dashboardRoutePrefix].bsvhus.edit, {
                 siret,
-                id: bsvhu.id,
+                id: bsvhu.id
               })}
               className="btn btn--primary"
             >
@@ -97,7 +97,7 @@ export function SignTransport({
           <Formik
             initialValues={{
               author: "",
-              takenOverAt: TODAY.toISOString(),
+              takenOverAt: TODAY.toISOString()
             }}
             validationSchema={validationSchema}
             onSubmit={async values => {
@@ -106,15 +106,15 @@ export function SignTransport({
               await updateBsvhu({
                 variables: {
                   id: bsvhuId,
-                  input: { transporter: { transport: { takenOverAt } } },
-                },
+                  input: { transporter: { transport: { takenOverAt } } }
+                }
               });
 
               await signBsvhu({
                 variables: {
                   id: bsvhu.id,
-                  input: { ...sign, type: SignatureTypeInput.Transport },
-                },
+                  input: { ...sign, type: SignatureTypeInput.Transport }
+                }
               });
               onClose();
             }}

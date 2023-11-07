@@ -1,9 +1,9 @@
-import CompanySelector from "form/common/components/company/CompanySelector";
+import CompanySelector from "../../../common/components/company/CompanySelector";
 import { useFormikContext } from "formik";
-import { Bsda, BsdaType } from "generated/graphql/types";
+import { Bsda, BsdaType } from "codegen-ui";
 import React from "react";
 import { Transport } from "./Transport";
-import TransporterReceiptEditionSwitch from "form/common/components/company/TransporterReceiptEditionSwitch";
+import TransporterReceiptEditionSwitch from "../../../common/components/company/TransporterReceiptEditionSwitch";
 
 export function Transporter({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Bsda>();

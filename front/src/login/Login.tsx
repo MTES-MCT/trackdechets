@@ -1,14 +1,14 @@
 import React, { useState, createRef, useEffect } from "react";
 import * as queryString from "query-string";
 import { useLocation, Redirect } from "react-router-dom";
-import routes from "Apps/routes";
-import { Captcha, useCaptcha } from "common/components/captcha";
+import routes from "../Apps/routes";
+import { Captcha, useCaptcha } from "../common/components/captcha";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { PasswordInput } from "@codegouvfr/react-dsfr/blocks/PasswordInput";
-import { Loader } from "Apps/common/Components";
+import { Loader } from "../Apps/common/Components";
 
 import styles from "./Login.module.scss";
 
@@ -78,7 +78,7 @@ export default function Login() {
     const { errorCode, returnTo, username } = queries;
     const state = {
       ...(queries.errorCode ? { errorCode, username } : {}),
-      ...(!!returnTo ? { returnTo } : {}),
+      ...(!!returnTo ? { returnTo } : {})
     };
 
     return <Redirect to={{ pathname: routes.login, state }} />;
@@ -128,7 +128,7 @@ export default function Login() {
                   value: email || username,
                   name: "email",
                   required: true,
-                  onChange: e => setEmail(e.target.value),
+                  onChange: e => setEmail(e.target.value)
                 }}
                 label="Email"
               />
@@ -137,7 +137,7 @@ export default function Login() {
                   name: "password",
                   value: password,
                   required: true,
-                  onChange: e => setPassword(e.target.value),
+                  onChange: e => setPassword(e.target.value)
                 }}
                 label="Mot de passe"
               />

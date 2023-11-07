@@ -1,10 +1,10 @@
 import React from "react";
-import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
+import { IconCheckCircle1 } from "../Apps/common/Components/Icons/Icons";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import styles from "./Dialog.module.scss";
 import { useOIDC, AuthorizePayload } from "./use-oidc";
 import * as queryString from "query-string";
-import { localAuthService } from "login/auth.service";
+import { localAuthService } from "../login/auth.service";
 
 import { useLocation } from "react-router-dom";
 export default function OidcDialog() {

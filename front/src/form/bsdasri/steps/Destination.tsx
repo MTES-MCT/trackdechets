@@ -1,15 +1,15 @@
-import CompanySelector from "form/common/components/company/CompanySelector";
+import CompanySelector from "../../common/components/company/CompanySelector";
 
 import { Field } from "formik";
 import React from "react";
-import { BsdasriStatus } from "generated/graphql/types";
+import { BsdasriStatus } from "codegen-ui";
 
 import Reception from "./Reception";
 import Operation from "./Operation";
 import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
 
 import classNames from "classnames";
-import Tooltip from "common/components/Tooltip";
+import Tooltip from "../../../common/components/Tooltip";
 import { customInfoToolTip } from "./Emitter";
 
 export default function Destination({ status, stepName, disabled = false }) {
@@ -24,7 +24,7 @@ export default function Destination({ status, stepName, disabled = false }) {
       {receptionDisabled && <DisabledFieldsInfo />}
       <div
         className={classNames("form__row", {
-          "field-emphasis": receptionEmphasis,
+          "field-emphasis": receptionEmphasis
         })}
       >
         <CompanySelector

@@ -4,17 +4,17 @@ import {
   EmitterType,
   Form,
   QuantityType,
-  SignEmissionFormInput,
-} from "generated/graphql/types";
+  SignEmissionFormInput
+} from "codegen-ui";
 import {
   DataList,
   DataListDescription,
   DataListItem,
-  DataListTerm,
-} from "common/components";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
-import Packagings from "form/bsdd/components/packagings/Packagings";
+  DataListTerm
+} from "../../../../../common/components";
+import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
+import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
+import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 
 interface FormWasteEmissionSummaryProps {
   form: Form;
@@ -58,11 +58,11 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
         <Field name="transporterNumberPlate" className="td-input" />
       </label>
     </div>
-  ),
+  )
 };
 
 export function FormWasteEmissionSummary({
-  form,
+  form
 }: FormWasteEmissionSummaryProps) {
   const { values } = useFormikContext<FormValues>();
 

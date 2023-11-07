@@ -29,7 +29,9 @@ stopcontainers(){
 }
 
 runtest(){
-    dockerexec "npm run integration-tests $1"
+    dockerexec "npx nx run back:codegen"
+    dockerexec "npm --prefix back run preintegration-tests"
+    dockerexec "npx nx run back:test-inte $1"
     EXIT_CODE=$?
 }
 

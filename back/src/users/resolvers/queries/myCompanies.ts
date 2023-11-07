@@ -1,5 +1,5 @@
 import { Company } from "@prisma/client";
-import { nafCodes } from "../../../common/constants/NAF";
+import { nafCodes } from "shared/constants";
 import { getConnection } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { convertUrls } from "../../../companies/database";
@@ -12,7 +12,7 @@ import { AuthType } from "../../../auth";
 import {
   MIN_MY_COMPANIES_SEARCH,
   MAX_MY_COMPANIES_SEARCH
-} from "../../../common/constants/COMPANY_CONSTANTS";
+} from "shared/constants";
 import { UserInputError } from "../../../common/errors";
 
 const myCompaniesResolver: QueryResolvers["myCompanies"] = async (

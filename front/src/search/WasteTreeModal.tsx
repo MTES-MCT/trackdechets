@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import WasteTree from "./WasteTree";
 import styles from "./WasteTreeModal.module.scss";
-import TdModal from "Apps/common/Components/Modal/Modal";
-import { BSDD_WASTES_TREE, WasteNode } from "generated/constants";
+import TdModal from "../Apps/common/Components/Modal/Modal";
+import { BSDD_WASTES_TREE, WasteNode } from "shared/constants";
 type Props = {
   wasteTree?: WasteNode[];
   open: boolean;
@@ -14,7 +14,7 @@ function WasteTreeModal({
   wasteTree = BSDD_WASTES_TREE,
   open = false,
   onClose = () => null,
-  onSelect = () => null,
+  onSelect = () => null
 }: Props) {
   const [selectedKeys, setSelectedKeys] = useState([]);
 

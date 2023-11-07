@@ -1,5 +1,5 @@
-import { BsdDisplay } from "Apps/common/types/bsdTypes";
-import { UserPermission } from "generated/graphql/types";
+import { BsdDisplay } from "../../../common/types/bsdTypes";
+import { UserPermission } from "codegen-ui";
 
 export interface BsdAdditionalActionsButtonProps {
   bsd: BsdDisplay;

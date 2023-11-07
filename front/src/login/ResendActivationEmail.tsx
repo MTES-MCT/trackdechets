@@ -1,11 +1,8 @@
 import { useMutation, gql } from "@apollo/client";
 import React, { useState } from "react";
-import {
-  Mutation,
-  MutationResendActivationEmailArgs,
-} from "generated/graphql/types";
-import Loader from "Apps/common/Components/Loader/Loaders";
-import { Captcha, useCaptcha } from "common/components/captcha";
+import { Mutation, MutationResendActivationEmailArgs } from "codegen-ui";
+import Loader from "../Apps/common/Components/Loader/Loaders";
+import { Captcha, useCaptcha } from "../common/components/captcha";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -36,8 +33,8 @@ export default function ResendActivationEmail() {
       variables: {
         input: {
           email,
-          captcha: { token: captchaData?.token ?? "", value: captchaInput },
-        },
+          captcha: { token: captchaData?.token ?? "", value: captchaInput }
+        }
       },
       onError: () => {
         setCaptchaInput("");
@@ -47,7 +44,7 @@ export default function ResendActivationEmail() {
         setCaptchaInput("");
         refetchCaptcha();
         setEmail("");
-      },
+      }
     });
   };
 
@@ -104,7 +101,7 @@ export default function ResendActivationEmail() {
                   name: "email",
                   required: true,
                   value: email,
-                  onChange: e => setEmail(e.target.value),
+                  onChange: e => setEmail(e.target.value)
                 }}
               />
             </div>

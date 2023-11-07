@@ -1,18 +1,14 @@
-import { IconClose } from "Apps/common/Components/Icons/Icons";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { IconClose } from "../../../../Apps/common/Components/Icons/Icons";
+import RedErrorMessage from "../../../../common/components/RedErrorMessage";
+import NumberInput from "../../../common/components/custom-inputs/NumberInput";
 import {
   Field,
   FieldArray,
   FieldProps,
   useField,
-  useFormikContext,
+  useFormikContext
 } from "formik";
-import {
-  BsffPackagingInput,
-  BsffPackagingType,
-  BsffType,
-} from "generated/graphql/types";
+import { BsffPackagingInput, BsffPackagingType, BsffType } from "codegen-ui";
 import React, { InputHTMLAttributes, ChangeEvent } from "react";
 import "./Packagings.scss";
 
@@ -20,15 +16,12 @@ export const PACKAGINGS_NAMES = {
   [BsffPackagingType.Bouteille]: "Bouteille",
   [BsffPackagingType.Citerne]: "Citerne",
   [BsffPackagingType.Conteneur]: "Conteneur",
-  [BsffPackagingType.Autre]: "Autre",
+  [BsffPackagingType.Autre]: "Autre"
 };
 
 export default function BsffPackagings({
   field: { name, value },
-  form,
-  id,
-  disabled,
-  ...props
+  disabled
 }: FieldProps<BsffPackagingInput[]> & InputHTMLAttributes<HTMLInputElement>) {
   const [{ value: type }] = useField<BsffType>("type");
 
@@ -162,7 +155,7 @@ export default function BsffPackagings({
                     numero: "",
                     other: "",
                     weight: 0,
-                    volume: null,
+                    volume: null
                   })
                 }
               >

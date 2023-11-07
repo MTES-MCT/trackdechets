@@ -6,8 +6,8 @@ import LayoutContainer from "./Apps/common/Components/layout/LayoutContainer";
 import setYupLocale from "./common/setYupLocale";
 import BrowserDetect from "./BrowserDetect";
 import ErrorBoundary from "./ErrorBoundary";
-import { FeatureFlagsProvider } from "common/contexts/FeatureFlagsContext";
-import { PermissionsProvider } from "common/contexts/PermissionsContext";
+import { FeatureFlagsProvider } from "./common/contexts/FeatureFlagsContext";
+import { PermissionsProvider } from "./common/contexts/PermissionsContext";
 
 // Defines app-wide french error messages for yup
 // See https://github.com/jquense/yup#using-a-custom-locale-dictionary

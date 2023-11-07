@@ -1,4 +1,4 @@
-import { StepContainer } from "form/common/stepper/Step";
+import { StepContainer } from "../common/stepper/Step";
 import StepList from "./BsdasriStepList";
 import React from "react";
 import { useParams, useLocation } from "react-router-dom";
@@ -7,7 +7,7 @@ import Destination from "./steps/Destination";
 import * as queryString from "query-string";
 
 import Transporter, {
-  TransporterShowingTakeOverFields,
+  TransporterShowingTakeOverFields
 } from "./steps/Transporter";
 import { Type } from "./steps/Type";
 
@@ -24,7 +24,7 @@ export default function FormContainer() {
     emission: 1,
     transport: 2,
     reception: 3,
-    operation: 4,
+    operation: 4
   };
 
   const initialStep = stepMapping[stepName] || 0;

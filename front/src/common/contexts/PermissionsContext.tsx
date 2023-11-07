@@ -1,5 +1,5 @@
 import React, { useContext, useState, useCallback } from "react";
-import { UserPermission } from "generated/graphql/types";
+import { UserPermission } from "codegen-ui";
 
 interface InterfacePermissions {
   children: React.ReactNode;
@@ -21,7 +21,7 @@ export function usePermissions() {
 
 export function PermissionsProvider({
   children,
-  defaultPermissions = [],
+  defaultPermissions = []
 }: InterfacePermissions) {
   const [permissions, setPermissions] =
     useState<UserPermission[]>(defaultPermissions);

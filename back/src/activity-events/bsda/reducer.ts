@@ -47,12 +47,13 @@ export function bsdaReducer(
     case "BsdaDeleted":
       return { ...currentState, isDeleted: true };
 
-    case "BsdaRevisionRequestApplied":
+    case "BsdaRevisionRequestApplied": {
       const { ...bsda } = event.data.content;
       return {
         ...currentState,
         ...fixMissTypings(bsda as Partial<Prisma.BsdaCreateInput>)
       };
+    }
 
     default:
       throw "Unexpected event type";

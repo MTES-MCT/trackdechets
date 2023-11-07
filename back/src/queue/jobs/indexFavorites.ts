@@ -11,7 +11,7 @@ import {
 } from "../../companies/search";
 import { CompanySearchResult } from "../../companies/types";
 import { FavoriteType } from "../../generated/graphql/types";
-import { getTransporterCompanyOrgId } from "../../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import { getCompanyOrCompanyNotFound } from "../../companies/database";
 import { BsdElastic, index } from "../../common/elastic";
 import { AnonymousCompanyError } from "../../companies/sirene/errors";

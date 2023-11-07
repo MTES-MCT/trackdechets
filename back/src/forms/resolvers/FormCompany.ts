@@ -4,7 +4,7 @@ import {
   isVat,
   isSiret,
   cleanClue
-} from "../../common/constants/companySearchHelpers";
+} from "shared/constants";
 import { FormCompanyResolvers } from "../../generated/graphql/types";
 
 const formCompanyResolvers: FormCompanyResolvers = {

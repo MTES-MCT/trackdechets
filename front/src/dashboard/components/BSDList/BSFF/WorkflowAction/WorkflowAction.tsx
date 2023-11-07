@@ -1,5 +1,5 @@
 import React from "react";
-import { BsffStatus } from "generated/graphql/types";
+import { BsffStatus } from "codegen-ui";
 import { BsffFragment } from "../types";
 import { PublishBsff } from "./PublishBsff";
 import { SignEmission } from "./SignEmission";
@@ -9,7 +9,7 @@ import { SignBsffOperationOnePackaging } from "./SignOperation";
 import { SignBsffAcceptationOnePackaging } from "./SignAcceptation";
 import { SignPackagings } from "./SignPackagings";
 import { useParams, useRouteMatch } from "react-router-dom";
-import routes from "Apps/routes";
+import routes from "../../../../../Apps/routes";
 
 export interface WorkflowActionProps {
   form: BsffFragment;

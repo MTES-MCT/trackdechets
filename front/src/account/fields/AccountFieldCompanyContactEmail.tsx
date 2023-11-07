@@ -7,8 +7,8 @@ import { object, string } from "yup";
 import {
   CompanyPrivate,
   UserRole,
-  MutationUpdateCompanyArgs,
-} from "generated/graphql/types";
+  MutationUpdateCompanyArgs
+} from "codegen-ui";
 
 type Props = {
   company: CompanyPrivate;
@@ -21,7 +21,7 @@ AccountFieldCompanyContactEmail.fragments = {
       contactEmail
       userRole
     }
-  `,
+  `
 };
 
 const UPDATE_CONTACT_EMAIL = gql`
@@ -35,42 +35,38 @@ const UPDATE_CONTACT_EMAIL = gql`
 `;
 
 const yupSchema = object().shape({
-  contactEmail: string().email(),
+  contactEmail: string().email()
 });
 
 export default function AccountFieldCompanyContactEmail({ company }: Props) {
   const fieldName = "contactEmail";
   const fieldLabel = "Email de contact";
 
-  return (
-    <>
-      {company.userRole === UserRole.Admin ? (
-        <AccountField
-          name={fieldName}
-          label={fieldLabel}
+  return company.userRole === UserRole.Admin ? (
+    <AccountField
+      name={fieldName}
+      label={fieldLabel}
+      value={company.contactEmail}
+      renderForm={toggleEdition => (
+        <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
+          name="contactEmail"
+          type="email"
           value={company.contactEmail}
-          renderForm={toggleEdition => (
-            <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
-              name="contactEmail"
-              type="email"
-              value={company.contactEmail}
-              placeHolder={fieldLabel}
-              mutation={UPDATE_CONTACT_EMAIL}
-              mutationArgs={{ id: company.id }}
-              yupSchema={yupSchema}
-              toggleEdition={() => {
-                toggleEdition();
-              }}
-            />
-          )}
-        />
-      ) : (
-        <AccountFieldNotEditable
-          name={fieldName}
-          label={fieldLabel}
-          value={company.contactEmail}
+          placeHolder={fieldLabel}
+          mutation={UPDATE_CONTACT_EMAIL}
+          mutationArgs={{ id: company.id }}
+          yupSchema={yupSchema}
+          toggleEdition={() => {
+            toggleEdition();
+          }}
         />
       )}
-    </>
+    />
+  ) : (
+    <AccountFieldNotEditable
+      name={fieldName}
+      label={fieldLabel}
+      value={company.contactEmail}
+    />
   );
 }

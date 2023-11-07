@@ -1,5 +1,5 @@
 import React from "react";
-import { Bsda, BsdaStatus } from "generated/graphql/types";
+import { Bsda, BsdaStatus } from "codegen-ui";
 import PublishBsda from "./PublishBsda";
 import { SignEmission } from "./SignEmission";
 import { SignWork } from "./SignWork";

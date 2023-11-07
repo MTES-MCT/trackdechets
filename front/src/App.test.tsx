@@ -4,7 +4,7 @@ import App from "./App";
 
 // mock old browser detection
 jest.mock("./supportedBrowsers", () => ({
-  test: jest.fn(() => true),
+  test: jest.fn(() => true)
 }));
 
 it("renders without crashing", () => {

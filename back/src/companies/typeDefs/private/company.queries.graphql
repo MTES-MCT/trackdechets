@@ -32,7 +32,9 @@ type Query {
   selon la même recherche par siret ou TVA que companyInfos
   """
   companyPrivateInfos(
-    """SIRET ou numéro TVA intracommunautaire"""
+    """
+    SIRET ou numéro TVA intracommunautaire
+    """
     clue: String!
   ): CompanySearchPrivate!
 }

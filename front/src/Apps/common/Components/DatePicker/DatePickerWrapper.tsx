@@ -36,7 +36,7 @@ const DatePickerWrapper = ({ onDateChange, label = "", errorMessage = "" }) => {
           stateRelatedMessage={errorMessage}
           nativeInputProps={{
             value: startDate ? format(startDate, "dd/MM/yyyy") : "",
-            readOnly: true,
+            readOnly: true
           }}
         />
       }

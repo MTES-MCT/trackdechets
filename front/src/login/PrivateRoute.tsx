@@ -1,4 +1,4 @@
-import routes from "Apps/routes";
+import routes from "../Apps/routes";
 import React from "react";
 import { Route, Redirect, RouteProps, useLocation } from "react-router-dom";
 
@@ -21,7 +21,7 @@ export default function PrivateRoute({
         <Redirect
           to={{
             pathname: routes.login,
-            state: { returnTo: location.pathname + location.search },
+            state: { returnTo: location.pathname + location.search }
           }}
         />
       )}

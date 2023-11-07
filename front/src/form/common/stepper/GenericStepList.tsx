@@ -5,11 +5,11 @@ import React, {
   ReactElement,
   useEffect,
   useRef,
-  useState,
+  useState
 } from "react";
 import { useHistory } from "react-router-dom";
-import { Stepper, StepperItem } from "common/components";
-import { InlineError } from "Apps/common/Components/Error/Error";
+import { Stepper, StepperItem } from "../../../common/components";
+import { InlineError } from "../../../Apps/common/Components/Error/Error";
 import "./GenericStepList.scss";
 import { IStepContainerProps } from "./Step";
 
@@ -30,7 +30,7 @@ export default function GenericStepList({
   onSubmit,
   initialValues,
   validationSchema,
-  initialStep = 0,
+  initialStep = 0
 }: Props) {
   const history = useHistory();
 

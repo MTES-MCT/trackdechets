@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import * as Sentry from "@sentry/browser";
-import ErrorPage from "Pages/ErrorPage";
+import ErrorPage from "./Pages/ErrorPage";
 
 // After a deploy, users navigating from one page to another without
 // refreshing the page will encounter the error "Failed to fetch dynamically
@@ -31,7 +31,7 @@ class ErrorBoundary extends Component<React.PropsWithChildren> {
       error: null,
       errorInfo: null,
       hideReloadPageCTA: true,
-      eventId: null,
+      eventId: null
     };
   }
 
@@ -40,7 +40,7 @@ class ErrorBoundary extends Component<React.PropsWithChildren> {
     return {
       hasError: true,
       hideReloadPageCTA: isBundleLoadingError(error) ? false : true,
-      error: error,
+      error: error
     };
   }
 
@@ -50,7 +50,7 @@ class ErrorBoundary extends Component<React.PropsWithChildren> {
       hasError: true,
       hideReloadPageCTA: isBundleLoadingError(error) ? false : true,
       error,
-      errorInfo,
+      errorInfo
     });
     // send the error to the error reporting service
     Sentry.addBreadcrumb({ message: "Captured by error boundary" });
@@ -102,7 +102,7 @@ class ErrorBoundary extends Component<React.PropsWithChildren> {
         <div
           style={{
             margin: "0 auto",
-            width: "90%",
+            width: "90%"
           }}
         >
           <ErrorPage hideReloadPageCTA={hideReloadPageCTA} message={message} />

@@ -5,28 +5,30 @@ import { useHistory } from "react-router";
 import { useParams } from "react-router-dom";
 import * as yup from "yup";
 import classNames from "classnames";
-import { FieldSwitch, RedErrorMessage } from "common/components";
+import { FieldSwitch, RedErrorMessage } from "../../../../../common/components";
 import Packagings, {
-  PACKAGINGS_NAMES,
-} from "form/bsda/components/packagings/Packagings";
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import CompanySelector from "form/common/components/company/CompanySelector";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import WorkSiteAddress from "form/common/components/work-site/WorkSiteAddress";
+  PACKAGINGS_NAMES
+} from "../../../../../form/bsda/components/packagings/Packagings";
+import { getInitialCompany } from "../../../../../form/bsdd/utils/initial-state";
+import CompanySelector from "../../../../../form/common/components/company/CompanySelector";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
+import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
+import WorkSiteAddress from "../../../../../form/common/components/work-site/WorkSiteAddress";
 import {
   Bsda,
   Mutation,
-  MutationCreateBsdaRevisionRequestArgs,
-} from "generated/graphql/types";
+  MutationCreateBsdaRevisionRequestArgs
+} from "codegen-ui";
 import { removeEmptyKeys } from "../../../../../common/helper";
 import { ReviewableField } from "../../bsdd/request/ReviewableField";
 import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../Apps/common/queries/reviews/BsdaReviewQuery";
 import styles from "./BsdaRequestRevision.module.scss";
-import { BSDA_WASTES } from "generated/constants";
+import { BSDA_WASTES } from "shared/constants";
 import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCancelationInput";
-import OperationModeSelect from "common/components/OperationModeSelect";
-const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
+import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
+const TagsInput = lazy(
+  () => import("../../../../../common/components/tags-input/TagsInput")
+);
 
 type Props = {
   bsda: Bsda;
@@ -39,14 +41,14 @@ const initialReview = {
       address: "",
       city: "",
       postalCode: "",
-      infos: "",
-    },
+      infos: ""
+    }
   },
   waste: {
     code: "",
     pop: "",
     sealNumbers: [],
-    materialName: "",
+    materialName: ""
   },
   packagings: [],
   broker: {
@@ -54,21 +56,21 @@ const initialReview = {
     recepisse: {
       number: "",
       department: "",
-      validityLimit: null,
-    },
+      validityLimit: null
+    }
   },
   destination: {
     cap: "",
     reception: {
-      weight: null,
+      weight: null
     },
     operation: {
       code: "",
       mode: null,
-      description: "",
-    },
+      description: ""
+    }
   },
-  isCanceled: false,
+  isCanceled: false
 };
 
 const validationSchema = yup.object({
@@ -76,7 +78,7 @@ const validationSchema = yup.object({
     .string()
     .required(
       "Vous devez ajouter un commentaire expliquant la demande de révision"
-    ),
+    )
 });
 
 export function BsdaRequestRevision({ bsda }: Props) {
@@ -108,9 +110,9 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 bsdaId: bsda.id,
                 content: cleanedContent ?? {},
                 comment,
-                authoringCompanySiret: siret,
-              },
-            },
+                authoringCompanySiret: siret
+              }
+            }
           });
           history.goBack();
         }}
@@ -130,7 +132,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
 
                 <div
                   style={{
-                    display: areModificationsDisabled ? "none" : "inline",
+                    display: areModificationsDisabled ? "none" : "inline"
                   }}
                 >
                   <hr />
@@ -378,7 +380,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                     value={[
                       bsda.emitter?.pickupSite?.address,
                       bsda.emitter?.pickupSite?.postalCode,
-                      bsda.emitter?.pickupSite?.city,
+                      bsda.emitter?.pickupSite?.city
                     ]
                       .filter(Boolean)
                       .join(" ")}

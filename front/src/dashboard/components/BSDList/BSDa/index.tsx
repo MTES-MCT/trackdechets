@@ -1,11 +1,11 @@
 import * as React from "react";
 import { CellProps, CellValue } from "react-table";
 
-import { Bsda, BsdaStatus, BsdaType } from "generated/graphql/types";
-import { IconBSDa } from "Apps/common/Components/Icons/Icons";
+import { Bsda, BsdaStatus, BsdaType } from "codegen-ui";
+import { IconBSDa } from "../../../../Apps/common/Components/Icons/Icons";
 import { BSDaActions } from "./BSDaActions/BSDaActions";
 import { useParams } from "react-router-dom";
-import { ActionButtonContext } from "common/components/ActionButton";
+import { ActionButtonContext } from "../../../../common/components/ActionButton";
 import { WorkflowAction } from "./WorkflowAction/WorkflowAction";
 import { TransporterInfoEdit } from "./WorkflowAction/TransporterInfoEdit";
 
@@ -17,7 +17,7 @@ const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
   PROCESSED: "Traité",
   REFUSED: "Refusé",
   AWAITING_CHILD: "En attente d'un BSDA suite",
-  CANCELED: "Annulé",
+  CANCELED: "Annulé"
 };
 
 export const COLUMNS: Record<
@@ -35,10 +35,10 @@ export const COLUMNS: Record<
         {value === BsdaType.Gathering && <span>Grp</span>}
         {value === BsdaType.Reshipment && <span>Transit</span>}
       </>
-    ),
+    )
   },
   readableId: {
-    accessor: bsda => bsda.id,
+    accessor: bsda => bsda.id
   },
   emitter: {
     accessor: bsda => (
@@ -52,7 +52,7 @@ export const COLUMNS: Record<
         )}
         <div>{bsda.emitter?.company?.siret}</div>
       </>
-    ),
+    )
   },
   recipient: {
     accessor: bsda => (
@@ -60,13 +60,13 @@ export const COLUMNS: Record<
         <div>{bsda?.destination?.company?.name ?? ""}</div>
         <div>{bsda?.destination?.company?.siret ?? ""}</div>
       </>
-    ),
+    )
   },
   waste: {
     accessor: bsda =>
       [bsda?.waste?.["bsdaCode"], bsda?.waste?.materialName]
         .filter(Boolean)
-        .join(" - "),
+        .join(" - ")
   },
   transporterCustomInfo: {
     accessor: bsda => bsda.transporter?.customInfo,
@@ -75,7 +75,7 @@ export const COLUMNS: Record<
         <span style={{ marginRight: "0.5rem" }}>{value}</span>
         <TransporterInfoEdit bsda={row.original} />
       </>
-    ),
+    )
   },
   transporterNumberPlate: {
     accessor: bsda => bsda.transporter?.transport?.plates ?? [],
@@ -84,7 +84,7 @@ export const COLUMNS: Record<
         <span> {value.join(", ")}</span>
         <TransporterInfoEdit bsda={row.original} />
       </>
-    ),
+    )
   },
   status: {
     accessor: bsda => {
@@ -97,7 +97,7 @@ export const COLUMNS: Record<
       )
         return "Annexé à un bordereau suite.";
       return bsdaVerboseStatuses[status];
-    },
+    }
   },
   workflow: {
     accessor: () => null,
@@ -108,10 +108,10 @@ export const COLUMNS: Record<
           <WorkflowAction siret={siret} form={row.original} />
         </ActionButtonContext.Provider>
       );
-    },
+    }
   },
   actions: {
     accessor: () => null,
-    Cell: ({ row }) => <BSDaActions form={row.original} />,
-  },
+    Cell: ({ row }) => <BSDaActions form={row.original} />
+  }
 };

@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import styles from "./AccountField.module.scss";
-import ToolTip from "common/components/Tooltip";
+import ToolTip from "../../common/components/Tooltip";
 
 type Props = {
   name: string;
@@ -13,7 +13,7 @@ export default function AccountFieldNotEditable({
   name,
   label,
   value,
-  tooltip,
+  tooltip
 }: Props) {
   const classes = [styles.field];
 

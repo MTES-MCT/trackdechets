@@ -1,5 +1,5 @@
 import { EmitterType, Prisma, TransportMode } from "@prisma/client";
-import { isDangerous, BSDD_WASTE_CODES } from "../../../common/constants";
+import { isDangerous, BSDD_WASTE_CODES } from "shared/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationUpdateFormArgs,

@@ -1,10 +1,10 @@
 import { Field } from "formik";
 import React from "react";
-import CompanySelector from "form/common/components/company/CompanySelector";
+import CompanySelector from "../../../common/components/company/CompanySelector";
 import styles from "./TemporaryStorage.module.scss";
 import classNames from "classnames";
-import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
-import TdTooltip from "common/components/Tooltip";
+import ProcessingOperationSelect from "../../../../common/components/ProcessingOperationSelect";
+import TdTooltip from "../../../../common/components/Tooltip";
 
 export default function TemporaryStorage(props) {
   const tooltipMsg =

@@ -5,11 +5,11 @@ import {
   TableCell,
   TableHead,
   TableHeaderCell,
-  TableRow,
-} from "common/components/Table";
-import { InitialBsda } from "generated/graphql/types";
-import { IconPdf } from "Apps/common/Components/Icons/Icons";
-import { useDownloadPdf } from "dashboard/components/BSDList/BSDa/BSDaActions/useDownloadPdf";
+  TableRow
+} from "../../../common/components/Table";
+import { InitialBsda } from "codegen-ui";
+import { IconPdf } from "../../../Apps/common/Components/Icons/Icons";
+import { useDownloadPdf } from "../../components/BSDList/BSDa/BSDaActions/useDownloadPdf";
 
 export function InitialBsdas({ bsdas }: { bsdas: InitialBsda[] }) {
   const [downloadPdf] = useDownloadPdf({});
@@ -40,7 +40,7 @@ export function InitialBsdas({ bsdas }: { bsdas: InitialBsda[] }) {
             <TableCell>
               {[
                 bsda?.destination?.operation?.nextDestination?.company?.name,
-                bsda?.destination?.operation?.nextDestination?.company?.siret,
+                bsda?.destination?.operation?.nextDestination?.company?.siret
               ]
                 .filter(Boolean)
                 .join(" - ")}

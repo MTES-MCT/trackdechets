@@ -1,16 +1,15 @@
 import { gql, useQuery } from "@apollo/client";
-import { Modal } from "common/components";
-import SideBar from "Apps/common/Components/SideBar/SideBar";
-import routes from "Apps/routes";
-import { RouteControlPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/RouteControlPdf";
-import { RoutePublishBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
-import { RouteSignBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
-import { RouteBSDasrisSignEmissionSecretCode } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
-import { OnboardingSlideshow } from "dashboard/components/OnboardingSlideshow";
-import { BsdasriSignatureType, Query } from "generated/graphql/types";
-import { filter } from "graphql-anywhere";
+import { Modal } from "../../common/components";
+import SideBar from "../common/Components/SideBar/SideBar";
+import routes from "../routes";
+import { RouteControlPdf } from "../../dashboard/components/BSDList/BSDasri/BSDasriActions/RouteControlPdf";
+import { RoutePublishBsdasri } from "../../dashboard/components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
+import { RouteSignBsdasri } from "../../dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
+import { RouteBSDasrisSignEmissionSecretCode } from "../../dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
+import { OnboardingSlideshow } from "../../dashboard/components/OnboardingSlideshow";
+import { BsdasriSignatureType, Query } from "codegen-ui";
 import { Location } from "history";
-import DashboardPage from "Pages/Dashboard";
+import DashboardPage from "../../Pages/Dashboard";
 import React, { useCallback, useEffect } from "react";
 import {
   generatePath,
@@ -20,7 +19,7 @@ import {
   Switch,
   useHistory,
   useLocation,
-  useParams,
+  useParams
 } from "react-router-dom";
 import Loader from "../common/Components/Loader/Loaders";
 import { ExtraSignatureType } from "../../dashboard/components/BSDList/BSDasri/types";
@@ -31,15 +30,15 @@ import {
   RouteBSDasView,
   RouteBSDDsView,
   RouteBsffsView,
-  RouteBsvhusView,
+  RouteBsvhusView
 } from "../../dashboard/detail";
 import Exports from "../../dashboard/exports/Exports";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
-import { usePermissions } from "common/contexts/PermissionsContext";
+import { usePermissions } from "../../common/contexts/PermissionsContext";
 
 import "./dashboard.scss";
-import { useMedia } from "use-media";
-import { MEDIA_QUERIES } from "common/config";
+import { useMedia } from "../../common/use-media";
+import { MEDIA_QUERIES } from "../../common/config";
 
 export const GET_ME = gql`
   {
@@ -64,7 +63,7 @@ function DashboardRoutes() {
   const { updatePermissions } = usePermissions();
 
   const history = useHistory();
-  const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
 
   const goBack = useCallback(() => {
     history.goBack();
@@ -76,16 +75,16 @@ function DashboardRoutes() {
   const goToCollectDashboard = useCallback(() => {
     history.push({
       pathname: generatePath(routes.dashboardv2.transport.toCollect, {
-        siret,
-      }),
+        siret
+      })
     });
   }, [history, siret]);
 
   const goToActionDashboard = useCallback(() => {
     history.push({
       pathname: generatePath(routes.dashboardv2.bsds.act, {
-        siret,
-      }),
+        siret
+      })
     });
   }, [history, siret]);
 
@@ -114,7 +113,7 @@ function DashboardRoutes() {
         to={
           companies.length > 0
             ? generatePath(routes.dashboardv2.bsds.index, {
-                siret: companies[0].orgId,
+                siret: companies[0].orgId
               })
             : routes.account.companies.list
         }
@@ -140,12 +139,12 @@ function DashboardRoutes() {
           <Switch location={backgroundLocation ?? location}>
             <Route path="/v2/dashboard/:siret/slips/view/:id" exact>
               {({
-                match,
+                match
               }: RouteChildrenProps<{ siret: string; id: string }>) => (
                 <Redirect
                   to={generatePath(routes.dashboardv2.bsdds.view, {
                     siret: match!.params.siret,
-                    id: match!.params.id,
+                    id: match!.params.id
                   })}
                 />
               )}
@@ -178,9 +177,7 @@ function DashboardRoutes() {
               <RouteBsffsView />
             </Route>
             <Route path={routes.dashboardv2.exports}>
-              <Exports
-                companies={filter(Exports.fragments.company, companies)}
-              />
+              <Exports companies={companies} />
             </Route>
 
             <Route
@@ -194,7 +191,7 @@ function DashboardRoutes() {
                 routes.dashboardv2.bsds.toReviewed,
                 routes.dashboardv2.bsds.reviewed,
                 routes.dashboardv2.transport.toCollect,
-                routes.dashboardv2.transport.collected,
+                routes.dashboardv2.transport.collected
               ]}
             >
               {dashboardPageComponent}
@@ -202,7 +199,7 @@ function DashboardRoutes() {
 
             <Redirect
               to={generatePath(routes.dashboardv2.bsds.index, {
-                siret,
+                siret
               })}
             />
           </Switch>

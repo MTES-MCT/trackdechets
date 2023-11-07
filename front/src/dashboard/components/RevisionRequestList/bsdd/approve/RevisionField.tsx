@@ -10,7 +10,7 @@ export function RevisionField({
   label,
   bsddValue,
   reviewValue,
-  formatter = value => value,
+  formatter = value => value
 }: Props) {
   const formattedBsddValue = useMemo(
     () => formatter(bsddValue),

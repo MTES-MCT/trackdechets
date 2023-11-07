@@ -1,11 +1,13 @@
 import React, { lazy } from "react";
-import { FieldTransportModeSelect, Switch } from "common/components";
-import TdTooltip from "common/components/Tooltip";
-import CompanySelector from "form/common/components/company/CompanySelector";
+import { FieldTransportModeSelect, Switch } from "../../common/components";
+import TdTooltip from "../../common/components/Tooltip";
+import CompanySelector from "../common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
-import { Bsff } from "generated/graphql/types";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
-const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
+import { Bsff } from "codegen-ui";
+import { isForeignVat } from "shared/constants";
+const TagsInput = lazy(
+  () => import("../../common/components/tags-input/TagsInput")
+);
 
 export default function Transporter({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsff>();
@@ -27,7 +29,7 @@ export default function Transporter({ disabled }) {
         registeredOnlyCompanies={true}
       />
 
-      {!isForeignVat(values?.transporter?.company?.vatNumber!!) && (
+      {!isForeignVat(values?.transporter?.company?.vatNumber!) && (
         <>
           <h4 className="form__section-heading">
             Exemption de récépissé de déclaration de transport de déchets

@@ -10,7 +10,7 @@ const tabbable = {
   isFocusable: (node, options) =>
     lib.isFocusable(node, { ...options, displayCheck: "none" }),
   isTabbable: (node, options) =>
-    lib.isTabbable(node, { ...options, displayCheck: "none" }),
+    lib.isTabbable(node, { ...options, displayCheck: "none" })
 };
 
 module.exports = tabbable;

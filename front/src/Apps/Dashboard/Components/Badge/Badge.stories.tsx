@@ -9,9 +9,9 @@ export default {
   argTypes: {
     status: {
       control: "select",
-      options: Object.values(BsdStatusCode),
-    },
-  },
+      options: Object.values(BsdStatusCode)
+    }
+  }
 } as ComponentMeta<typeof Badge>;
 
 const Template: ComponentStory<typeof Badge> = args => <Badge {...args} />;
@@ -26,35 +26,35 @@ export const Sealed = Template.bind({});
 export const Refused = Template.bind({});
 
 DraftBsdd.args = {
-  status: BsdStatusCode.Draft,
+  status: BsdStatusCode.Draft
 };
 
 Initial.args = {
   status: BsdStatusCode.Initial,
-  isDraft: true,
+  isDraft: true
 };
 
 InitialNotDraft.args = {
   status: BsdStatusCode.Initial,
-  isDraft: false,
+  isDraft: false
 };
 InitialDasriNotDraft.args = {
   status: BsdStatusCode.Initial,
-  isDraft: false,
+  isDraft: false
 };
 
 Received.args = {
-  status: BsdStatusCode.Received,
+  status: BsdStatusCode.Received
 };
 
 Processed.args = {
-  status: BsdStatusCode.Processed,
+  status: BsdStatusCode.Processed
 };
 
 Sealed.args = {
-  status: BsdStatusCode.Sealed,
+  status: BsdStatusCode.Sealed
 };
 
 Refused.args = {
-  status: BsdStatusCode.Refused,
+  status: BsdStatusCode.Refused
 };

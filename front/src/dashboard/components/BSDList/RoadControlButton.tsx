@@ -3,10 +3,10 @@ import {
   Link,
   generatePath,
   useLocation,
-  useRouteMatch,
+  useRouteMatch
 } from "react-router-dom";
-import { IconQrCode } from "Apps/common/Components/Icons/Icons";
-import routes from "Apps/routes";
+import { IconQrCode } from "../../../Apps/common/Components/Icons/Icons";
+import routes from "../../../Apps/routes";
 
 export const CardRoadControlButton = ({ siret, form }) => {
   const location = useLocation();
@@ -19,9 +19,9 @@ export const CardRoadControlButton = ({ siret, form }) => {
         pathname: generatePath(routes.dashboard.roadControl, {
           siret,
 
-          id: form.id,
+          id: form.id
         }),
-        state: { background: location },
+        state: { background: location }
       }}
       className="btn btn--outline-primary"
     >
@@ -44,9 +44,9 @@ export const TableRoadControlButton = ({ siret, form }) => {
         pathname: generatePath(routes.dashboard.roadControl, {
           siret,
 
-          id: form.id,
+          id: form.id
         }),
-        state: { background: location },
+        state: { background: location }
       }}
     >
       <IconQrCode color="blueLight" size="24px" />
@@ -65,7 +65,7 @@ export const useDisplayRoadControlButton = bsd => {
     Bsdasri: "bsdasriStatus",
     Bsff: "bsffStatus",
     Bsvhu: "bsvhuStatus",
-    Bsda: "bsdaStatus",
+    Bsda: "bsdaStatus"
   }[bsd.__typename];
   const isCollectedTab = !!useRouteMatch(routes.dashboard.transport.collected);
 

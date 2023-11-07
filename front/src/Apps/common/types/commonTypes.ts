@@ -1,5 +1,5 @@
 export enum inputType {
-  text = "text",
+  text = "text"
 }
 
 export type BsdCurrentTab =

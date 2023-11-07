@@ -6,7 +6,7 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { z } from "zod";
-import { BSDA_WASTE_CODES } from "../../common/constants";
+import { BSDA_WASTE_CODES } from "shared/constants";
 import {
   intermediariesRefinement,
   intermediarySchema

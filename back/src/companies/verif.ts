@@ -1,6 +1,6 @@
 import { CompanyType, CompanyVerificationStatus } from "@prisma/client";
 import { addDays } from "date-fns";
-import * as COMPANY_CONSTANTS from "../common/constants/COMPANY_CONSTANTS";
+import * as COMPANY_CONSTANTS from "shared/constants";
 import { sendVerificationCodeLetter } from "../common/post";
 import prisma from "../prisma";
 import { sameDayMidnight } from "../utils";

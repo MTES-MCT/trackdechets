@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
-import { Loader } from "Apps/common/Components";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { Query } from "generated/graphql/types";
+import { Loader } from "../../Apps/common/Components";
+import { NotificationError } from "../../Apps/common/Components/Error/Error";
+import { Query } from "codegen-ui";
 import React from "react";
 import AccountAuthorizedApp from "./AccountAuthorizedApp";
 import { AUTHORIZED_APPLICATIONS } from "./queries";

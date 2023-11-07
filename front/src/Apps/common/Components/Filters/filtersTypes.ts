@@ -1,7 +1,7 @@
 export enum FilterType {
   input = "input",
   select = "select",
-  date = "date",
+  date = "date"
 }
 
 export type Filter = {

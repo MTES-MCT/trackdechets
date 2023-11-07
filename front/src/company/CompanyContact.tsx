@@ -1,6 +1,6 @@
 import React from "react";
 import "./CompanyContact.scss";
-import { CompanySearchResult } from "generated/graphql/types";
+import { CompanySearchResult } from "codegen-ui";
 
 type Props = {
   company: Pick<

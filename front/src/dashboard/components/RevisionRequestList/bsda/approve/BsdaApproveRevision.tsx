@@ -6,23 +6,27 @@ import {
   BsdaRevisionRequest,
   Mutation,
   MutationSubmitBsdaRevisionRequestApprovalArgs,
-  PickupSite,
-} from "generated/graphql/types";
-import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
-import { ActionButton, Modal, RedErrorMessage } from "common/components";
-import { IconCogApproved } from "Apps/common/Components/Icons/Icons";
+  PickupSite
+} from "codegen-ui";
+import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
+import {
+  ActionButton,
+  Modal,
+  RedErrorMessage
+} from "../../../../../common/components";
+import { IconCogApproved } from "../../../../../Apps/common/Components/Icons/Icons";
 import { useMutation } from "@apollo/client";
 import {
   GET_BSDA_REVISION_REQUESTS,
-  SUBMIT_BSDA_REVISION_REQUEST_APPROVAL,
+  SUBMIT_BSDA_REVISION_REQUEST_APPROVAL
 } from "../../../../../Apps/common/queries/reviews/BsdaReviewQuery";
 import { Field, Form, Formik } from "formik";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
-import { formatDate } from "common/datetime";
+import { RadioButton } from "../../../../../form/common/components/custom-inputs/RadioButton";
+import { formatDate } from "../../../../../common/datetime";
 import { RevisionField } from "../../bsdd/approve/RevisionField";
 import { useParams, useRouteMatch } from "react-router-dom";
-import { PACKAGINGS_NAMES } from "form/bsda/components/packagings/Packagings";
-import { getOperationModeLabel } from "common/operationModes";
+import { PACKAGINGS_NAMES } from "../../../../../form/bsda/components/packagings/Packagings";
+import { getOperationModeLabel } from "../../../../../common/operationModes";
 
 type Props = {
   review: BsdaRevisionRequest;
@@ -31,13 +35,13 @@ type Props = {
 };
 
 const validationSchema = yup.object({
-  isApproved: yup.string().required(),
+  isApproved: yup.string().required()
 });
 
 export function BsdaApproveRevision({
   review,
   isModalOpenFromParent,
-  onModalCloseFromParent,
+  onModalCloseFromParent
 }: Props) {
   const { siret } = useParams<{ siret: string }>();
   const isV2Routes = !!useRouteMatch("/v2/dashboard/");
@@ -47,15 +51,15 @@ export function BsdaApproveRevision({
     MutationSubmitBsdaRevisionRequestApprovalArgs
   >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
     refetchQueries: [
-      { query: GET_BSDA_REVISION_REQUESTS, variables: { siret } },
-    ],
+      { query: GET_BSDA_REVISION_REQUESTS, variables: { siret } }
+    ]
   });
 
   const title = "Acceptation d'une révision";
   if (isV2Routes && isModalOpenFromParent) {
     const formatRevisionAdapter = {
       ...review["review"],
-      bsda: { ...review },
+      bsda: { ...review }
     };
     return (
       <Modal onClose={onModalCloseFromParent!} ariaLabel={title} isOpen>
@@ -93,7 +97,7 @@ function DisplayModalContent({
   review,
   close,
   submitBsdaRevisionRequestApproval,
-  loading,
+  loading
 }) {
   return (
     <div>
@@ -101,11 +105,11 @@ function DisplayModalContent({
 
       <Formik
         initialValues={{
-          isApproved: "",
+          isApproved: ""
         }}
         onSubmit={async ({ isApproved }) => {
           await submitBsdaRevisionRequestApproval({
-            variables: { id: review.id, isApproved: isApproved === "TRUE" },
+            variables: { id: review.id, isApproved: isApproved === "TRUE" }
           });
           close();
         }}

@@ -1,24 +1,22 @@
 import { Form, Formik } from "formik";
 import React, { useState, lazy } from "react";
-import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
+import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import { useMutation } from "@apollo/client";
-import {
-  Mutation,
-  MutationUpdateBsdasriArgs,
-  Bsdasri,
-} from "generated/graphql/types";
-import TdModal from "Apps/common/Components/Modal/Modal";
-import { UPDATE_BSDASRI } from "form/bsdasri/utils/queries";
+import { Mutation, MutationUpdateBsdasriArgs, Bsdasri } from "codegen-ui";
+import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
+import { UPDATE_BSDASRI } from "../../../../../form/bsdasri/utils/queries";
 
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import Tooltip from "common/components/Tooltip";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import Tooltip from "../../../../../common/components/Tooltip";
 import { useRouteMatch } from "react-router-dom";
-const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
+const TagsInput = lazy(
+  () => import("../../../../../common/components/tags-input/TagsInput")
+);
 
 export function UpdateBsdasriTransporterPlates({
   bsdasri,
   isModalOpenFromParent,
-  onModalCloseFromParent,
+  onModalCloseFromParent
 }: {
   bsdasri: Bsdasri;
   isModalOpenFromParent?: boolean;
@@ -59,7 +57,7 @@ export function UpdateBsdasriTransporterPlates({
 function UpdateTransporterPlatesModal({
   bsdasri,
   isOpen,
-  onClose,
+  onClose
 }: {
   bsdasri: Bsdasri;
   isOpen: boolean;
@@ -84,9 +82,9 @@ function UpdateTransporterPlatesModal({
             variables: {
               id: bsdasri.id,
               input: {
-                transporter: { transport: { plates: values.plates ?? [] } },
-              },
-            },
+                transporter: { transport: { plates: values.plates ?? [] } }
+              }
+            }
           });
         }}
       >

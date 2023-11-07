@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
-import { PROCESSING_OPERATIONS } from "../../../../common/constants";
+import { PROCESSING_OPERATIONS } from "shared/constants";
 import {
   companyFactory,
   formFactory,

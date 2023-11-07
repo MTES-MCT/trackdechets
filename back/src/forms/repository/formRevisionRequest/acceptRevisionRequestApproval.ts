@@ -11,7 +11,7 @@ import {
 import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
   isDangerous
-} from "../../../common/constants";
+} from "shared/constants";
 import { removeEmpty } from "../../../common/converter";
 import {
   LogMetadata,

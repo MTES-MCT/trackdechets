@@ -1,11 +1,11 @@
 import React from "react";
-import { IconTrash } from "Apps/common/Components/Icons/Icons";
+import { IconTrash } from "../../../../../Apps/common/Components/Icons/Icons";
 import { gql, useMutation } from "@apollo/client";
-import { Mutation, MutationDeleteBsdaArgs } from "generated/graphql/types";
-import cogoToast from "cogo-toast";
-import TdModal from "Apps/common/Components/Modal/Modal";
-import { GET_BSDS } from "Apps/common/queries";
-import { Loader } from "Apps/common/Components";
+import { Mutation, MutationDeleteBsdaArgs } from "codegen-ui";
+import toast from "react-hot-toast";
+import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import { Loader } from "../../../../../Apps/common/Components";
 
 const DELETE_BSDA = gql`
   mutation DeleteBsda($id: ID!) {
@@ -19,7 +19,7 @@ const DELETE_BSDA = gql`
 export function DeleteBsdaModal({
   formId,
   isOpen,
-  onClose,
+  onClose
 }: {
   formId: string;
   isOpen: boolean;
@@ -33,13 +33,13 @@ export function DeleteBsdaModal({
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      cogoToast.success("Bordereau supprimé", { hideAfter: 5 });
+      toast.success("Bordereau supprimé", { duration: 5 });
       !!onClose && onClose();
     },
     onError: () =>
-      cogoToast.error("Le bordereau n'a pas pu être supprimé", {
-        hideAfter: 5,
-      }),
+      toast.error("Le bordereau n'a pas pu être supprimé", {
+        duration: 5
+      })
   });
 
   return (

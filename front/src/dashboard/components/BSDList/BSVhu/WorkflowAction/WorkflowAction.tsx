@@ -1,5 +1,5 @@
 import React from "react";
-import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
+import { Bsvhu, BsvhuStatus } from "codegen-ui";
 import PublishBsvhu from "./PublishBsvhu";
 import { SignEmission } from "./SignEmission";
 import { SignTransport } from "./SignTransport";

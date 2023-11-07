@@ -3,14 +3,14 @@ import React, {
   createContext,
   HTMLAttributes,
   ReactNode,
-  useContext,
+  useContext
 } from "react";
 import styles from "./ActionButton.module.scss";
 import { Link } from "react-router-dom";
 export const ActionButtonContext = createContext<{
   size: "normal" | "small";
 }>({
-  size: "normal",
+  size: "normal"
 });
 
 interface ActionButtonProps extends HTMLAttributes<HTMLButtonElement> {
@@ -34,7 +34,7 @@ export default function ActionButton({
         `${secondary ? "btn--outline-primary" : "btn--primary"}`,
         {
           [styles.ActionButtonSmall]: size === "small",
-          [styles.ActionButton]: size === "normal",
+          [styles.ActionButton]: size === "normal"
         }
       )}
     >
@@ -57,7 +57,7 @@ export function ActionLink({ icon, children, to }: ActionLinkProps) {
       to={to}
       className={classNames("btn--primary", {
         [styles.ActionButtonSmall]: size === "small",
-        [styles.ActionButton]: size === "normal",
+        [styles.ActionButton]: size === "normal"
       })}
     >
       <span className={styles.ActionButtonIcon}>{icon}</span>

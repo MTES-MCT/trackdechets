@@ -1,48 +1,32 @@
-version: "3"
 services:
   postgres:
-    image: postgres:13.3-alpine
-    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
-    environment:
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: no_pass
+    extends:
+      file: ../../docker-compose.dbs.yml
+      service: postgres
 
   redis:
-    image: redis:5.0-alpine
-    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
-    sysctls:
-      - net.core.somaxconn=511
+    extends:
+      file: ../../docker-compose.dbs.yml
+      service: redis
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
-    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
-    environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - discovery.type=single-node
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    deploy:
-      placement:
-        constraints:
-          - "node.labels.elasticsearch == true"
+    extends:
+      file: ../../docker-compose.dbs.yml
+      service: elasticsearch
 
   mongodb:
-    image: mongo:6
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=test
-      - MONGO_INITDB_ROOT_PASSWORD=no_pass
+    extends:
+      file: ../../docker-compose.dbs.yml
+      service: mongodb
 
   td-api:
     image: td-api
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     build:
-      context: ../
-      dockerfile: Dockerfile.dev
-    command: [ "npm", "run", "dev:integration" ]
+      context: ../../
+      dockerfile: ./back/integration-tests/Dockerfile
     volumes:
-      - ../src:/usr/src/app/src
+      - ../src:/usr/src/app/back/src
     env_file:
       - .integration-tests-env
     environment:
@@ -59,6 +43,5 @@ services:
       SENDER_EMAIL_ADDRESS: "us@td.test"
       SENDER_NAME: "Wastetracker corp."
       POST_BACKEND: console
-      ELASTIC_SEARCH_URL: $ELASTIC_SEARCH_URL
       QUEUE_NAME_SENDMAIL: td-integration-tests-queue
       REGISTRY_WHITE_LIST_IP: "11.11.11.11"

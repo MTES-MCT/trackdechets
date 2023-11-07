@@ -1,12 +1,12 @@
 import * as React from "react";
-import { Bsda } from "generated/graphql/types";
+import { Bsda } from "codegen-ui";
 import {
   DataList,
   DataListItem,
   DataListTerm,
-  DataListDescription,
-} from "common/components";
-import { PACKAGINGS_NAMES } from "form/bsda/components/packagings/Packagings";
+  DataListDescription
+} from "../../../../../common/components";
+import { PACKAGINGS_NAMES } from "../../../../../form/bsda/components/packagings/Packagings";
 
 interface Props {
   bsda: Bsda;
@@ -50,7 +50,7 @@ export function BsdaWasteSummary({ bsda }: Props) {
           {bsda.destination?.reception?.weight == null ? (
             <>{bsda.weight?.value ?? 0} tonne(s)</>
           ) : (
-            <>{bsda.destination.reception.weight && <>(tonne(s))</>}</>
+            bsda.destination.reception.weight && <>(tonne(s))</>
           )}
         </DataListDescription>
       </DataListItem>

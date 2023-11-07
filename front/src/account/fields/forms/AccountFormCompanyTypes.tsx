@@ -2,22 +2,22 @@ import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Formik, Field, Form, FormikProps } from "formik";
 import CompanyTypes from "../../../login/CompanyType";
-import RedErrorMessage from "common/components/RedErrorMessage";
+import RedErrorMessage from "../../../common/components/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
-import { InlineError } from "Apps/common/Components/Error/Error";
+import { InlineError } from "../../../Apps/common/Components/Error/Error";
 import {
   CompanyPrivate,
   CompanyType,
   Mutation,
-  MutationUpdateCompanyArgs,
-} from "generated/graphql/types";
-import Tooltip from "common/components/Tooltip";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+  MutationUpdateCompanyArgs
+} from "codegen-ui";
+import Tooltip from "../../../common/components/Tooltip";
+import DateInput from "../../../form/common/components/custom-inputs/DateInput";
 import {
   CREATE_WORKER_CERTIFICATION,
   DELETE_WORKER_CERTIFICATION,
   UPDATE_COMPANY_WORKER_CERTIFICATION,
-  UPDATE_WORKER_CERTIFICATION,
+  UPDATE_WORKER_CERTIFICATION
 } from "./AccountFormCompanyWorkerCertification";
 
 type Props = {
@@ -51,7 +51,7 @@ export default function AccountFormCompanyTypes({
   name,
   company,
   companyTypes,
-  toggleEdition,
+  toggleEdition
 }: Props) {
   const [isWorkerChecked, setIsWorkerChecked] = useState(false);
 
@@ -61,12 +61,12 @@ export default function AccountFormCompanyTypes({
   >(UPDATE_COMPANY_TYPES, {
     onCompleted: () => {
       toggleEdition();
-    },
+    }
   });
 
   const [
     updateCompanyWorker,
-    { loading: loadingCompanyWorker, error: errorUpdateCompanyWorker },
+    { loading: loadingCompanyWorker, error: errorUpdateCompanyWorker }
   ] = useMutation(UPDATE_COMPANY_WORKER_CERTIFICATION);
 
   const workerCertification = company.workerCertification;
@@ -75,8 +75,8 @@ export default function AccountFormCompanyTypes({
     createOrUpdateWorkerCertification,
     {
       loading: loadingCreateOrUpdateCertif,
-      error: errorUpdateOrCreateWorkerCertif,
-    },
+      error: errorUpdateOrCreateWorkerCertif
+    }
   ] = useMutation(
     workerCertification
       ? UPDATE_WORKER_CERTIFICATION
@@ -85,7 +85,7 @@ export default function AccountFormCompanyTypes({
 
   const [
     deleteWorkerCertification,
-    { loading: deleteLoading, error: deleteError },
+    { loading: deleteLoading, error: deleteError }
   ] = useMutation(DELETE_WORKER_CERTIFICATION, {
     update(cache) {
       cache.writeFragment({
@@ -98,9 +98,9 @@ export default function AccountFormCompanyTypes({
             }
           }
         `,
-        data: { workerCertification: null },
+        data: { workerCertification: null }
       });
-    },
+    }
   });
 
   const initialValues = {} as V;
@@ -110,7 +110,7 @@ export default function AccountFormCompanyTypes({
     hasSubSectionThree: workerCertification?.hasSubSectionThree || false,
     certificationNumber: workerCertification?.certificationNumber || "",
     validityLimit: workerCertification?.validityLimit || null,
-    organisation: workerCertification?.organisation || "",
+    organisation: workerCertification?.organisation || ""
   };
 
   const handleChange = (e, arrayHelpers, companyType, value) => {
@@ -137,8 +137,8 @@ export default function AccountFormCompanyTypes({
     updateCompanyTypes({
       variables: {
         id: company.id,
-        companyTypes,
-      },
+        companyTypes
+      }
     }).catch(() => {
       setFieldError(name, "Erreur serveur");
       setSubmitting(false);
@@ -151,19 +151,19 @@ export default function AccountFormCompanyTypes({
         hasSubSectionThree: worker.hasSubSectionThree,
         certificationNumber: worker.certificationNumber,
         validityLimit: worker.validityLimit,
-        organisation: worker.organisation,
+        organisation: worker.organisation
       };
 
       const { data } = await createOrUpdateWorkerCertification({
-        variables: { input },
+        variables: { input }
       });
 
       if (data.createWorkerCertification) {
         await updateCompanyWorker({
           variables: {
             id: company.id,
-            workerCertificationId: data.createWorkerCertification.id,
-          },
+            workerCertificationId: data.createWorkerCertification.id
+          }
         });
       }
     } else {
@@ -171,8 +171,8 @@ export default function AccountFormCompanyTypes({
       if (workerCertification?.id) {
         await deleteWorkerCertification({
           variables: {
-            input: { id: workerCertification.id },
-          },
+            input: { id: workerCertification.id }
+          }
         });
       }
     }
@@ -182,16 +182,16 @@ export default function AccountFormCompanyTypes({
     const errors = {
       ...(values.worker.hasSubSectionThree &&
         !values.worker.certificationNumber && {
-          certificationNumber: "Champ obligatoire",
+          certificationNumber: "Champ obligatoire"
         }),
       ...(values.worker.hasSubSectionThree &&
         !values.worker.validityLimit && {
-          validityLimit: "Champ obligatoire",
+          validityLimit: "Champ obligatoire"
         }),
       ...(values.worker.hasSubSectionThree &&
         !values.worker.organisation && {
-          organisation: "Champ obligatoire",
-        }),
+          organisation: "Champ obligatoire"
+        })
     };
 
     return errors;

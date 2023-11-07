@@ -3,7 +3,7 @@ import {
   BsdStatusCode,
   BsdWithReview,
   ReviewStatusLabel,
-  WorkflowDisplayType,
+  WorkflowDisplayType
 } from "../common/types/bsdTypes";
 import { formatBsd } from "./bsdMapper";
 import {
@@ -14,8 +14,8 @@ import {
   EmitterType,
   Form,
   Maybe,
-  UserPermission,
-} from "../../generated/graphql/types";
+  UserPermission
+} from "codegen-ui";
 import {
   ACCEPTE,
   AJOUTER_ANNEXE_1,
@@ -52,9 +52,9 @@ import {
   VALIDER_RECEPTION,
   VALIDER_SYNTHESE_LABEL,
   VALIDER_TRAITEMENT,
-  completer_bsd_suite,
+  completer_bsd_suite
 } from "../common/wordings/dashboard/wordingsDashboard";
-import { BsdCurrentTab } from "Apps/common/types/commonTypes";
+import { BsdCurrentTab } from "../common/types/commonTypes";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
@@ -170,7 +170,7 @@ const hasEmitterTransporterAndEcoOrgSiret = (
     bsd.emitter?.company?.siret,
     bsd.ecoOrganisme?.siret,
     bsd.transporter?.company?.siret,
-    bsd.transporter?.company?.orgId,
+    bsd.transporter?.company?.orgId
   ].includes(siret);
 };
 
@@ -212,7 +212,7 @@ const hasTemporaryStorage = (currentSiret: string, bsd: BsdDisplay): boolean =>
   [
     bsd.destination?.company?.siret,
     bsd.temporaryStorageDetail?.transporter?.company?.siret,
-    bsd.temporaryStorageDetail?.transporter?.company?.orgId,
+    bsd.temporaryStorageDetail?.transporter?.company?.orgId
   ].includes(currentSiret);
 
 const isSameSiretTemporaryStorageTransporter = (
@@ -221,7 +221,7 @@ const isSameSiretTemporaryStorageTransporter = (
 ) =>
   [
     bsd.temporaryStorageDetail?.transporter?.company?.siret,
-    bsd.temporaryStorageDetail?.transporter?.company?.orgId,
+    bsd.temporaryStorageDetail?.transporter?.company?.orgId
   ].includes(currentSiret);
 
 const isSameSiretTemporaryStorageDestination = (
@@ -428,7 +428,7 @@ export const getSealedBtnLabel = (
     if (isSignEmission(currentSiret, bsd, hasAutomaticSignature)) {
       const emitterSirets = [
         bsd.emitter?.company?.siret,
-        bsd.ecoOrganisme?.siret,
+        bsd.ecoOrganisme?.siret
       ];
       const currentUserIsEmitter = emitterSirets.includes(currentSiret);
       if (currentUserIsEmitter) {
@@ -981,7 +981,7 @@ const canUpdateBsdd = bsd =>
   [
     BsdStatusCode.Draft,
     BsdStatusCode.Sealed,
-    BsdStatusCode.SignedByProducer,
+    BsdStatusCode.SignedByProducer
   ].includes(bsd.status);
 
 const canDeleteBsdd = bsd =>
@@ -1064,7 +1064,7 @@ const canUpdateBsda = bsd =>
   ![
     BsdStatusCode.Processed,
     BsdStatusCode.Refused,
-    BsdStatusCode.AwaitingChild,
+    BsdStatusCode.AwaitingChild
   ].includes(bsd.status);
 
 const canUpdateBsdasri = bsd =>
@@ -1153,7 +1153,7 @@ export const canEditCustomInfoOrTransporterNumberPlate = (
 };
 
 export const getOperationCodesFromSearchString = (value: any): string[] => {
-  let searchCodes: string[] = [];
+  const searchCodes: string[] = [];
 
   value.match(/[rRdD]{1}( )\d{1,2}/g)?.forEach(code => {
     const cleanCode = code.toUpperCase();
