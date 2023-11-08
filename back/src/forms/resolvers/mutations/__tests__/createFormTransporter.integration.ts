@@ -8,7 +8,6 @@ import {
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
-import * as search from "../../../../companies/search";
 
 const CREATE_FORM_TRANSPORTER = gql`
   mutation CreateFormTransporter($input: TransporterInput!) {
@@ -78,7 +77,16 @@ describe("Mutation.createFormTransporter", () => {
   it("should create a form transporter", async () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);
-    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          department: "13",
+          receiptNumber: "MON-RECEPISSE",
+          validityLimit: new Date("2024-01-01")
+        }
+      }
+    });
     const { errors, data } = await mutate<
       Pick<Mutation, "createFormTransporter">,
       MutationCreateFormTransporterArgs
@@ -92,9 +100,9 @@ describe("Mutation.createFormTransporter", () => {
             contact: transporter.contact
           },
           mode: "ROAD",
-          receipt: "receipt",
-          department: "07",
-          validityLimit: new Date().toISOString() as any
+          receipt: "receipt", // should be ignored
+          department: "07", // should be ignored
+          validityLimit: new Date().toISOString() as any // should be ignored
         }
       }
     });
@@ -110,8 +118,12 @@ describe("Mutation.createFormTransporter", () => {
       transporterCompanyName: transporter.name,
       transporterCompanyAddress: transporter.address,
       transporterCompanyContact: transporter.contact,
-      transporterReceipt: "receipt",
-      transporterDepartment: "07",
+      // Les informations de récépissé doivent correspondre
+      // aux informations du profil transporteur. Les données
+      // envoyées par l'utilisateur sont ignorées.
+      transporterReceipt: "MON-RECEPISSE",
+      transporterDepartment: "13",
+      transporterValidityLimit: new Date("2024-01-01"),
       formId: null,
       number: 0,
       readyToTakeOver: true
@@ -187,5 +199,50 @@ describe("Mutation.createFormTransporter", () => {
     expect(bsddTransporter.transporterCompanyAddress).toEqual(
       searchResult.address
     );
+  });
+
+  it("should not auto-complete recepisse information if transporter is exempted", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          department: "13",
+          receiptNumber: "MON-RECEPISSE",
+          validityLimit: new Date("2024-01-01")
+        }
+      }
+    });
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createFormTransporter">,
+      MutationCreateFormTransporterArgs
+    >(CREATE_FORM_TRANSPORTER, {
+      variables: {
+        input: {
+          company: {
+            siret: transporter.siret,
+            name: transporter.name,
+            address: transporter.address,
+            contact: transporter.contact
+          },
+          mode: "ROAD",
+          isExemptedOfReceipt: true
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    expect(data.createFormTransporter!.id).toBeDefined();
+
+    const bsddTransporter = await prisma.bsddTransporter.findUniqueOrThrow({
+      where: { id: data.createFormTransporter!.id }
+    });
+
+    expect(bsddTransporter).toMatchObject({
+      transporterIsExemptedOfReceipt: true,
+      transporterReceipt: null,
+      transporterDepartment: null,
+      transporterValidityLimit: null
+    });
   });
 });

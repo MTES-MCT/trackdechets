@@ -284,4 +284,57 @@ describe("Mutation.createFormTransporter", () => {
       searchResult.address
     );
   });
+
+  it("should auto-complete recepisse information when switching isExemptedOfReceipt from true to false", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          department: "13",
+          receiptNumber: "MON-RECEPISSE",
+          validityLimit: new Date("2024-01-01")
+        }
+      }
+    });
+    const bsddTransporter = await prisma.bsddTransporter.create({
+      data: {
+        number: 0,
+        readyToTakeOver: true,
+        transporterCompanySiret: transporter.siret,
+        transporterCompanyName: transporter.name,
+        transporterTransportMode: "ROAD",
+        transporterIsExemptedOfReceipt: true,
+        transporterReceipt: null,
+        transporterValidityLimit: null,
+        transporterDepartment: null
+      }
+    });
+    const { errors, data } = await mutate<
+      Pick<Mutation, "updateFormTransporter">,
+      MutationUpdateFormTransporterArgs
+    >(UPDATE_FORM_TRANSPORTER, {
+      variables: {
+        id: bsddTransporter.id,
+        input: {
+          isExemptedOfReceipt: false
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+
+    const updatedBsddTransporter =
+      await prisma.bsddTransporter.findUniqueOrThrow({
+        where: { id: data.updateFormTransporter!.id }
+      });
+
+    expect(updatedBsddTransporter.transporterReceipt).toEqual("MON-RECEPISSE");
+    expect(updatedBsddTransporter.transporterDepartment).toEqual("13");
+    expect(updatedBsddTransporter.transporterValidityLimit).toEqual(
+      new Date("2024-01-01")
+    );
+  });
+
+  it.skip("should auto-complete recepisse information when updating SIRET", async () => {});
 });
