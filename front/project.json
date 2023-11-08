@@ -65,7 +65,7 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "dependsOn": ["generators"],
+      "dependsOn": ["^build", "generators"],
       "options": {
         "passWithNoTests": true,
         "jestConfig": "front/jest.config.js"
