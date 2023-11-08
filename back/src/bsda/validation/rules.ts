@@ -1,4 +1,9 @@
-import { BsdaType, TransportMode, Prisma, WasteAcceptationStatus } from "@prisma/client";
+import {
+  BsdaType,
+  TransportMode,
+  Prisma,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { RefinementCtx, z } from "zod";
 import { BsdaSignatureType } from "../../generated/graphql/types";
 import { ZodBsda } from "./schema";
@@ -595,10 +600,12 @@ function hasTransporter(bsda: ZodBsda) {
 }
 
 function requireTransporterRecepisse(bsda: ZodBsda) {
-  return hasTransporter(bsda) &&
+  return (
+    hasTransporter(bsda) &&
     !bsda.transporterRecepisseIsExempted &&
     bsda.transporterTransportMode === TransportMode.ROAD &&
     !isForeignVat(bsda.transporterCompanyVatNumber)
+  );
 }
 
 function isRefusedOrPartiallyRefused(bsda: ZodBsda) {
