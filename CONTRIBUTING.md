@@ -306,7 +306,7 @@ Il est également possible de faire tourner les tests unitaires sur l'environnem
 2. Faire tourner les tests back
    ```bash
    npx nx run back:test # run all the tests
-   npx nx run back:test src/path/to/my-function.test.ts # run only one test
+   npx nx run back:test --testFile src/path/to/my-function.test.ts # run only one test
    ```
 3. Faire tourner les tests front
    ```bash

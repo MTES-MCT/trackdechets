@@ -1,4 +1,4 @@
-FROM node:20.7
+FROM node:20.2
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install --quiet
