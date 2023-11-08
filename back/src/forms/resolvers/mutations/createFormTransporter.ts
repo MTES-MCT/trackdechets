@@ -7,12 +7,16 @@ import {
   flattenTransporterInput
 } from "../../converter";
 import { transporterSchemaFn } from "../../validation";
+import { sirenifyTransporterInput } from "../../sirenify";
 
 const createFormTransporterResolver: MutationResolvers["createFormTransporter"] =
   async (parent, { input }, context) => {
-    checkIsAuthenticated(context);
+    const user = checkIsAuthenticated(context);
+
+    const sirenifiedInput = await sirenifyTransporterInput(input, user);
+
     const data: Prisma.BsddTransporterCreateInput = {
-      ...flattenTransporterInput({ transporter: input }),
+      ...flattenTransporterInput({ transporter: sirenifiedInput }),
       // Set a default number to 0 as long as the transporter is
       // not attached to a specific BSDD.
       number: 0,

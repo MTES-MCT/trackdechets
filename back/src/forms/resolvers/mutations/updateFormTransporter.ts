@@ -10,6 +10,7 @@ import { transporterSchemaFn } from "../../validation";
 import { getFormTransporterOrNotFound } from "../../database";
 import { checkCanUpdate } from "../../permissions";
 import { UserInputError } from "../../../common/errors";
+import { sirenifyTransporterInput } from "../../sirenify";
 
 const updateFormTransporterResolver: MutationResolvers["updateFormTransporter"] =
   async (parent, { id, input }, context) => {
@@ -30,8 +31,9 @@ const updateFormTransporterResolver: MutationResolvers["updateFormTransporter"] 
         .form({ include: { transporters: true } });
       await checkCanUpdate(user, form!, { id: form!.id });
     }
+    const sirenifiedInput = await sirenifyTransporterInput(input, user);
     const data: Prisma.BsddTransporterUpdateInput = flattenTransporterInput({
-      transporter: input
+      transporter: sirenifiedInput
     });
     await transporterSchemaFn({}).validate(
       { ...existingTransporter, ...data },

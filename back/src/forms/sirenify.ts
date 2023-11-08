@@ -4,6 +4,7 @@ import {
   CreateFormInput,
   NextSegmentInfoInput,
   ResealedFormInput,
+  TransporterInput,
   UpdateFormInput
 } from "../generated/graphql/types";
 
@@ -104,4 +105,18 @@ const transportSegmentInputAccessors = (input: NextSegmentInfoInput) => [
 
 export const sirenifyTransportSegmentInput = buildSirenify(
   transportSegmentInputAccessors
+);
+
+const bsddTransporterInputAccessors = (input: TransporterInput) => [
+  {
+    getter: () => input?.company,
+    setter: (input: TransporterInput, companyInput: CompanyInput) => ({
+      ...input,
+      company: companyInput
+    })
+  }
+];
+
+export const sirenifyTransporterInput = buildSirenify(
+  bsddTransporterInputAccessors
 );
