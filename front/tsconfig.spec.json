@@ -1,5 +1,4 @@
 {
-  "target": "ESNext",
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",

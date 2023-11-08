@@ -2,7 +2,7 @@ module.exports = {
   displayName: "front",
   preset: "../jest.preset.js",
   transform: {
-    "^.+\\.[tj]sx?$": ["ts-jest", { tsconfig: "<rootDir>/tsconfig.spec.json" }]
+    "^.+\\.[tj]sx?$": "babel-jest"
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "html"],
   moduleNameMapper: {
