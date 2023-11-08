@@ -46,7 +46,7 @@ import {
 } from "../common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
 import { BsdCurrentTab } from "../common/types/commonTypes";
-import { BsdType, BsdWhere } from "../../generated/graphql/types";
+import { BsdType, BsdWhere } from "codegen-ui";
 
 export const MAX_FILTER = 5;
 
