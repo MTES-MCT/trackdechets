@@ -2,6 +2,8 @@ import { makeSearchCompanies, searchCompany } from "../search";
 import { ErrorCode } from "../../common/errors";
 import prisma from "../../prisma";
 import { siretify } from "../../__tests__/factories";
+import { SireneSearchResult } from "../sirene/types";
+import decoratedSearchCompanies from "../sirene/searchCompanies";
 
 const testSiret = siretify(3);
 const createInput = {
@@ -23,6 +25,12 @@ jest.mock("../../prisma", () => ({
     findUnique: jest.fn(() => Promise.resolve(null)),
     findMany: jest.fn(() => Promise.resolve([]))
   }
+}));
+
+const mockSearchCompaniesBackend = jest.fn();
+jest.mock("../sirene/searchCompanies", () => ({
+  __esModule: true,
+  default: (...args) => mockSearchCompaniesBackend(...args)
 }));
 
 describe("searchCompany by org identifier", () => {
@@ -101,16 +109,15 @@ describe("searchCompany by org identifier", () => {
 });
 
 describe("searchCompanies", () => {
-  const searchCompaniesMockFn = jest.fn();
   const searchCompanyMock = jest.fn();
   const searchCompanies = makeSearchCompanies({
     injectedSearchCompany: searchCompanyMock,
-    injectedSearchCompanies: searchCompaniesMockFn
+    injectedSearchCompanies: decoratedSearchCompanies
   });
 
   beforeEach(() => {
     searchCompanyMock.mockReset();
-    searchCompaniesMockFn.mockReset();
+    mockSearchCompaniesBackend.mockReset();
   });
 
   it("should call searchCompany when the clue is formatted like a SIRET", async () => {
@@ -155,7 +162,7 @@ describe("searchCompanies", () => {
     expect(companies[0]).toStrictEqual(company);
   });
 
-  it("should call searchCompany when the clue is formatted like a SIRET but with commas", async () => {
+  it("should call searchCompany when the clue is formatted like a SIRET with bad characters", async () => {
     const siret = siretify(1);
     const company = {
       siret,
@@ -195,7 +202,7 @@ describe("searchCompanies", () => {
     expect(searchCompanyMock).toHaveBeenCalledTimes(1);
   });
 
-  it("should call searchCompany when the clue is formatted like a VAT number but without bad characters", async () => {
+  it("should call searchCompany when the clue is formatted like a VAT number with bad characters", async () => {
     const company = {
       siret: siretify(1),
       vatNumber: "IT09301420155",
@@ -214,9 +221,10 @@ describe("searchCompanies", () => {
     expect(searchCompanyMock).toHaveBeenCalledTimes(1);
   });
 
-  it("should call searchCompanies by name when the clue is formatted like a text and overwrite data from Sirene", async () => {
+  it("should call searchCompanies by name when the clue is formatted like a text and overwrite db data with Sirene data", async () => {
     const siret = siretify(1);
     const company = {
+      id: "test",
       siret,
       orgId: siret,
       name: "ACME OF TRACKDECHETS",
@@ -233,16 +241,9 @@ describe("searchCompanies", () => {
     (prisma.company.findMany as jest.Mock).mockResolvedValue(companies);
 
     // SIRENE return a different information
-    searchCompaniesMockFn.mockResolvedValueOnce([
+    mockSearchCompaniesBackend.mockResolvedValueOnce([
       {
         siret: company.siret,
-        denominationUniteLegale: company.name,
-        numeroVoieEtablissement: "4",
-        typeVoieEtablissement: "BD",
-        libelleVoieEtablissement: "LONGCHAMP",
-        codePostalEtablissement: "13001",
-        libelleCommuneEtablissement: "MARSEILLE",
-        activitePrincipaleEtablissement: "6201Z",
         address: "4 BD LONGCHAMP 13001 MARSEILLE",
         addressCity: "MARSEILLE",
         addressPostalCode: company.addressPostalCode,
@@ -251,15 +252,17 @@ describe("searchCompanies", () => {
         name: company.name,
         libelleNaf: "Programmation informatique",
         naf: "6201Z",
-        etatAdministratifEtablissement: company.etatAdministratif,
+        etatAdministratif: company.etatAdministratif,
         statutDiffusionEtablissement: "O",
         codePaysEtrangerEtablissement: undefined
       }
-    ]);
+    ] as SireneSearchResult[]);
     // check that searchCompanies return Sirene data instead of prisma.company data
     const companiesSearched = await searchCompanies("ACME OF TRACKDECHETS");
     expect(companiesSearched).toHaveLength(1);
     const expected = {
+      trackdechetsId: company.id,
+      vatNumber: undefined,
       siret: company.siret,
       orgId: company.siret,
       statutDiffusionEtablissement: "O",
@@ -272,18 +275,18 @@ describe("searchCompanies", () => {
       name: company.name,
       libelleNaf: "Programmation informatique",
       naf: "6201Z",
-      activitePrincipaleEtablissement: "6201Z",
-      codePostalEtablissement: "13001",
-      denominationUniteLegale: company.name,
-      etatAdministratifEtablissement: company.etatAdministratif,
-      libelleCommuneEtablissement: "MARSEILLE",
-      libelleVoieEtablissement: "LONGCHAMP",
-      numeroVoieEtablissement: "4",
-      typeVoieEtablissement: "BD"
+      allowBsdasriTakeOverWithoutSignature: undefined,
+      companyTypes: [],
+      contact: undefined,
+      contactEmail: undefined,
+      contactPhone: undefined,
+      ecoOrganismeAgreements: [],
+      etatAdministratif: "A",
+      isRegistered: true
     };
     expect(companiesSearched[0]).toEqual(expected);
-    expect(searchCompaniesMockFn).toHaveBeenCalledTimes(1);
-    expect(searchCompaniesMockFn).toHaveBeenCalledWith(
+    expect(mockSearchCompaniesBackend).toHaveBeenCalledTimes(1);
+    expect(mockSearchCompaniesBackend).toHaveBeenCalledWith(
       "ACME OF TRACKDECHETS",
       undefined
     );

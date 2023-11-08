@@ -1,7 +1,7 @@
 overwrite: true
-schema: ./src/**/*.graphql
+schema: back/src/**/*.graphql
 generates:
-  ./src/generated/graphql/types.ts:
+  back/src/generated/graphql/types.ts:
     plugins:
       - typescript
       - typescript-resolvers
@@ -14,6 +14,3 @@ generates:
       scalarDefaults:
         DateTime: new Date()
         URL: "https://example.com"
-    hooks:
-      afterOneFileWrite:
-        - prettier --config .prettierrc --write

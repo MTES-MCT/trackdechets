@@ -1,14 +1,14 @@
 import React from "react";
 import { useQuery, gql } from "@apollo/client";
 import { useFormikContext } from "formik";
-import { InlineError } from "Apps/common/Components/Error/Error";
+import { InlineError } from "../../../../Apps/common/Components/Error/Error";
 import {
   Bsdasri,
   Query,
   QueryBsdasrisArgs,
   BsdasriStatus,
-  BsdasriPackaging,
-} from "generated/graphql/types";
+  BsdasriPackaging
+} from "codegen-ui";
 import {
   Table,
   TableBody,
@@ -16,8 +16,8 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
-  TableRowDigest,
-} from "common/components";
+  TableRowDigest
+} from "../../../../common/components";
 import { RefreshButton } from "./Common";
 import { aggregatePackagings } from "./utils";
 
@@ -115,7 +115,7 @@ export default function BsdasriTableSynthesis({
   selectedItems,
   onToggle,
   regroupedInDB,
-  disabled = false,
+  disabled = false
 }) {
   const { values } = useFormikContext<
     Bsdasri & { dbRegroupedBsdasris: string[] }
@@ -129,20 +129,20 @@ export default function BsdasriTableSynthesis({
       where: {
         _or: [
           {
-            id: { _in: regroupedInDB },
+            id: { _in: regroupedInDB }
           },
           {
             status: { _eq: BsdasriStatus.Sent },
             groupable: true,
             transporter: {
               company: {
-                siret: { _eq: values.emitter?.company?.siret as string },
-              },
-            },
-          },
-        ],
-      },
-    },
+                siret: { _eq: values.emitter?.company?.siret as string }
+              }
+            }
+          }
+        ]
+      }
+    }
   });
 
   if (loading) return <p>Chargement...</p>;

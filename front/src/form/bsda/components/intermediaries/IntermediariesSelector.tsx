@@ -1,25 +1,25 @@
-import cogoToast from "cogo-toast";
-import { IconClose } from "Apps/common/Components/Icons/Icons";
-import CompanySelector from "form/common/components/company/CompanySelector";
+import toast from "react-hot-toast";
+import { IconClose } from "../../../../Apps/common/Components/Icons/Icons";
+import CompanySelector from "../../../common/components/company/CompanySelector";
 import { FieldArray, FieldProps } from "formik";
 import {
   CompanyInput,
   CompanySearchPrivate,
-  CompanySearchResult,
-} from "generated/graphql/types";
+  CompanySearchResult
+} from "codegen-ui";
 import React, { useCallback } from "react";
 
 export function IntermediariesSelector({
   field: { name, value },
-  maxNbOfIntermediaries,
+  maxNbOfIntermediaries
 }: FieldProps<CompanyInput[]> & { maxNbOfIntermediaries?: number }) {
   const onIntermediarySelectedCallback = useCallback(
     (company?: CompanySearchResult | CompanySearchPrivate) => {
       if (!company?.isRegistered) {
-        cogoToast.warn(
+        toast.error(
           `Intermédiaire: l'établissement sélectionné n'est pas enregistré sur Trackdéchets, le suivi du bordereau ne sera pas possible sur la plateforme`,
           {
-            position: "bottom-right",
+            position: "bottom-right"
           }
         );
       }
@@ -83,7 +83,7 @@ export function IntermediariesSelector({
                     mail: "",
                     phone: "",
                     vatNumber: "",
-                    country: "",
+                    country: ""
                   });
                 }}
               >

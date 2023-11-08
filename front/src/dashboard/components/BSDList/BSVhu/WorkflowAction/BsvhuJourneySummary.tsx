@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Bsvhu } from "generated/graphql/types";
+import { Bsvhu } from "codegen-ui";
 import {
   Journey,
   JourneyStop,
   JourneyStopName,
-  JourneyStopDescription,
-} from "common/components";
+  JourneyStopDescription
+} from "../../../../../common/components";
 
 interface Props {
   bsvhu: Bsvhu;

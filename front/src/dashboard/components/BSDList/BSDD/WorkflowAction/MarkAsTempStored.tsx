@@ -1,23 +1,23 @@
 import React from "react";
-import { Query, QueryFormArgs } from "generated/graphql/types";
+import { Query, QueryFormArgs } from "codegen-ui";
 import { useLazyQuery } from "@apollo/client";
 import { WorkflowActionProps } from "./WorkflowAction";
-import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
-import { ActionButton } from "common/components";
-import { Loader } from "Apps/common/Components";
-import { IconWarehouseStorage } from "Apps/common/Components/Icons/Icons";
+import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
+import { ActionButton } from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
+import { IconWarehouseStorage } from "../../../../../Apps/common/Components/Icons/Icons";
 import ReceivedInfo from "./ReceivedInfo";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { GET_FORM } from "form/bsdd/utils/queries";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 
 export default function MarkAsTempStored({ form }: WorkflowActionProps) {
   const [getBsdd, { error: bsddGetError, data, loading: bsddGetLoading }] =
     useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
       variables: {
         id: form.id,
-        readableId: null,
+        readableId: null
       },
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     });
 
   const actionLabel = "Valider l'entreposage provisoire";
@@ -59,7 +59,7 @@ export default function MarkAsTempStored({ form }: WorkflowActionProps) {
             );
           }
 
-          return <></>;
+          return null;
         }}
       />
     </div>

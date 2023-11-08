@@ -1,6 +1,6 @@
 import prisma from "../../../prisma";
 import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
-import { DASRI_GROUPING_OPERATIONS_CODES } from "../../../common/constants";
+import { DASRI_GROUPING_OPERATIONS_CODES } from "shared/constants";
 import { getReadonlyBsdasriRepository } from "../../repository";
 import { CompanyInput } from "../../../generated/graphql/types";
 import { UserInputError } from "../../../common/errors";

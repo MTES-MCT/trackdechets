@@ -1,9 +1,9 @@
 import React from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Formik, FormikProps, Form, Field } from "formik";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { CompanyPrivate } from "generated/graphql/types";
+import RedErrorMessage from "../../../common/components/RedErrorMessage";
+import { NotificationError } from "../../../Apps/common/Components/Error/Error";
+import { CompanyPrivate } from "codegen-ui";
 
 type Props = {
   company: Pick<CompanyPrivate, "id" | "siret" | "vhuAgrementDemolisseur">;
@@ -65,20 +65,20 @@ const DELETE_VHU_AGREMENT = gql`
  */
 export default function AccountFormCompanyAddVhuAgrementDemolisseur({
   company,
-  toggleEdition,
+  toggleEdition
 }: Props) {
   const vhuAgrementDemolisseur = company.vhuAgrementDemolisseur;
 
   const [
     createOrUpdateVhuAgrement,
-    { loading: updateOrCreateLoading, error: updateOrCreateError },
+    { loading: updateOrCreateLoading, error: updateOrCreateError }
   ] = useMutation(
     vhuAgrementDemolisseur ? UPDATE_VHU_AGREMENT : CREATE_VHU_AGREMENT
   );
 
   const [
     updateCompany,
-    { loading: updateCompanyLoading, error: updateCompanyError },
+    { loading: updateCompanyLoading, error: updateCompanyError }
   ] = useMutation(UPDATE_COMPANY_VHU_AGREMENT);
 
   const [deleteVhuAgrement, { loading: deleteLoading, error: deleteError }] =
@@ -94,19 +94,19 @@ export default function AccountFormCompanyAddVhuAgrementDemolisseur({
               }
             }
           `,
-          data: { vhuAgrementDemolisseur: null },
+          data: { vhuAgrementDemolisseur: null }
         });
-      },
+      }
     });
 
   const initialValues: V = vhuAgrementDemolisseur
     ? {
         agrementNumber: vhuAgrementDemolisseur.agrementNumber,
-        department: vhuAgrementDemolisseur.department,
+        department: vhuAgrementDemolisseur.department
       }
     : {
         agrementNumber: "",
-        department: "",
+        department: ""
       };
 
   return (
@@ -127,17 +127,17 @@ export default function AccountFormCompanyAddVhuAgrementDemolisseur({
             ...(vhuAgrementDemolisseur?.id
               ? { id: vhuAgrementDemolisseur.id }
               : {}),
-            ...values,
+            ...values
           };
           const { data } = await createOrUpdateVhuAgrement({
-            variables: { input },
+            variables: { input }
           });
           if (data.createVhuAgrement) {
             await updateCompany({
               variables: {
                 id: company.id,
-                vhuAgrementDemolisseurId: data.createVhuAgrement.id,
-              },
+                vhuAgrementDemolisseurId: data.createVhuAgrement.id
+              }
             });
           }
           toggleEdition();
@@ -147,7 +147,7 @@ export default function AccountFormCompanyAddVhuAgrementDemolisseur({
             ...(!values.agrementNumber
               ? { agrementNumber: "Champ requis" }
               : {}),
-            ...(!values.department ? { department: "Champ requis" } : {}),
+            ...(!values.department ? { department: "Champ requis" } : {})
           };
         }}
       >
@@ -192,8 +192,8 @@ export default function AccountFormCompanyAddVhuAgrementDemolisseur({
                   onClick={async () => {
                     await deleteVhuAgrement({
                       variables: {
-                        input: { id: vhuAgrementDemolisseur.id },
-                      },
+                        input: { id: vhuAgrementDemolisseur.id }
+                      }
                     });
                     toggleEdition();
                   }}

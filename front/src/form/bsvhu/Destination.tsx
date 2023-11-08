@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Field, useFormikContext } from "formik";
-import { RedErrorMessage } from "common/components";
-import CompanySelector from "form/common/components/company/CompanySelector";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import { RedErrorMessage } from "../../common/components";
+import CompanySelector from "../common/components/company/CompanySelector";
+import { RadioButton } from "../common/components/custom-inputs/RadioButton";
 import Operation from "./Operation";
-import { Bsvhu, CompanySearchResult } from "generated/graphql/types";
+import { Bsvhu, CompanySearchResult } from "codegen-ui";
 
 export default function Destination({ disabled }) {
   const [selectedDestination, setSelectedDestination] =

@@ -7,8 +7,8 @@ import { object, string } from "yup";
 import {
   CompanyPrivate,
   UserRole,
-  MutationUpdateCompanyArgs,
-} from "generated/graphql/types";
+  MutationUpdateCompanyArgs
+} from "codegen-ui";
 
 type Props = {
   company: CompanyPrivate;
@@ -21,7 +21,7 @@ AccountFieldCompanyContact.fragments = {
       contact
       userRole
     }
-  `,
+  `
 };
 
 const UPDATE_CONTACT = gql`
@@ -35,42 +35,38 @@ const UPDATE_CONTACT = gql`
 `;
 
 const yupSchema = object().shape({
-  contact: string().max(100),
+  contact: string().max(100)
 });
 
 export default function AccountFieldCompanyContact({ company }: Props) {
   const fieldName = "contact";
   const fieldLabel = "Prénom et nom du contact";
 
-  return (
-    <>
-      {company.userRole === UserRole.Admin ? (
-        <AccountField
-          name={fieldName}
-          label={fieldLabel}
+  return company.userRole === UserRole.Admin ? (
+    <AccountField
+      name={fieldName}
+      label={fieldLabel}
+      value={company.contact}
+      renderForm={toggleEdition => (
+        <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
+          name="contact"
+          type="text"
           value={company.contact}
-          renderForm={toggleEdition => (
-            <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
-              name="contact"
-              type="text"
-              value={company.contact}
-              placeHolder={fieldLabel}
-              mutation={UPDATE_CONTACT}
-              mutationArgs={{ id: company.id }}
-              yupSchema={yupSchema}
-              toggleEdition={() => {
-                toggleEdition();
-              }}
-            />
-          )}
-        />
-      ) : (
-        <AccountFieldNotEditable
-          name={fieldName}
-          label={fieldLabel}
-          value={company.contact}
+          placeHolder={fieldLabel}
+          mutation={UPDATE_CONTACT}
+          mutationArgs={{ id: company.id }}
+          yupSchema={yupSchema}
+          toggleEdition={() => {
+            toggleEdition();
+          }}
         />
       )}
-    </>
+    />
+  ) : (
+    <AccountFieldNotEditable
+      name={fieldName}
+      label={fieldLabel}
+      value={company.contact}
+    />
   );
 }

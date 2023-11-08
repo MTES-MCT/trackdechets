@@ -23,8 +23,8 @@ export function Modal({
   wide = false,
   ...props
 }: ModalProps) {
-  let ref = React.useRef(null);
-  let { modalProps, underlayProps } = useModalOverlay(props, state, ref);
+  const ref = React.useRef(null);
+  const { modalProps, underlayProps } = useModalOverlay(props, state, ref);
 
   return (
     <Overlay>
@@ -32,7 +32,7 @@ export function Modal({
         <div
           className={classNames(styles.tdModal, {
             [styles.tdModalWide]: wide,
-            [styles.tdModalPadding]: padding,
+            [styles.tdModalPadding]: padding
           })}
           aria-label={ariaLabel}
           {...modalProps}
@@ -68,36 +68,32 @@ export default function TdModal({
   ariaLabel,
   ...props
 }: Pick<ModalProps, "padding" | "ariaLabel" | "wide"> & TdModalProps) {
-  let state = useOverlayTriggerState({
+  const state = useOverlayTriggerState({
     isOpen: isOpen,
     onOpenChange: isOpen => {
       if (!isOpen) onClose();
     },
-    ...props,
+    ...props
   });
 
-  return (
-    <>
-      {state.isOpen && (
-        <Modal
-          ariaLabel={ariaLabel}
-          wide={wide}
-          padding={padding}
-          isDismissable
-          isKeyboardDismissDisabled
-          {...props}
-          state={state}
-        >
-          {children}
-        </Modal>
-      )}
-    </>
-  );
+  return state.isOpen ? (
+    <Modal
+      ariaLabel={ariaLabel}
+      wide={wide}
+      padding={padding}
+      isDismissable
+      isKeyboardDismissDisabled
+      {...props}
+      state={state}
+    >
+      {children}
+    </Modal>
+  ) : null;
 }
 
 type TdModalTriggerProps = {
   trigger: (open: () => void) => React.ReactElement;
-  modalContent: (close: () => void) => React.ReactElement;
+  modalContent: (close: () => void) => React.ReactElement | null;
 };
 
 export function TdModalTrigger({
@@ -108,11 +104,13 @@ export function TdModalTrigger({
   ariaLabel,
   ...props
 }: Pick<ModalProps, "padding" | "ariaLabel" | "wide"> & TdModalTriggerProps) {
-  let state = useOverlayTriggerState(props);
-  let { triggerProps, overlayProps } = useOverlayTrigger(
+  const state = useOverlayTriggerState(props);
+  const { triggerProps, overlayProps } = useOverlayTrigger(
     { type: "dialog" },
     state
   );
+
+  const modalContentValue = modalContent(state.close);
 
   return (
     <>
@@ -128,7 +126,8 @@ export function TdModalTrigger({
           state={state}
         >
           <h2 className="td-modal-title">{ariaLabel}</h2>
-          {React.cloneElement(modalContent(state.close), overlayProps)}
+          {modalContentValue != null &&
+            React.cloneElement(modalContentValue, overlayProps)}
         </Modal>
       )}
     </>

@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Bsdasri, BsdasriType } from "generated/graphql/types";
+import { Bsdasri, BsdasriType } from "codegen-ui";
 
-import { InitialDasris } from "dashboard/detail/bsdasri/InitialDasris";
+import { InitialDasris } from "../../../../detail/bsdasri/InitialDasris";
 
 export function BsdasriSynthesisSummary({ bsdasri }: { bsdasri: Bsdasri }) {
   if (bsdasri.type !== BsdasriType.Synthesis) {

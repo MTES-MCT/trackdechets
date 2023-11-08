@@ -8,13 +8,13 @@ const packagingsSchema = Yup.object({
       is: "OTHER",
       then: schema =>
         schema.required("Vous devez saisir la description du conditionnement"),
-      otherwise: schema => schema.optional().nullable(),
+      otherwise: schema => schema.optional().nullable()
     }),
   quantity: Yup.number()
     .min(1, "La quantité d'un conditionnement doit être supérieure à 1")
-    .required("La quantité associée à un conditionnement est obligatoire"),
+    .required("La quantité associée à un conditionnement est obligatoire")
 });
 
 export const bsdaValidationSchema = Yup.object({
-  packagings: Yup.array().of(packagingsSchema),
+  packagings: Yup.array().of(packagingsSchema)
 });

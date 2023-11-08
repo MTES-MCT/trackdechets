@@ -1,10 +1,10 @@
 /* eslint-disable import/no-anonymous-default-export */
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
+import { getInitialCompany } from "../../bsdd/utils/initial-state";
 
 export default {
   emitter: {
     company: getInitialCompany(),
-    agrementNumber: "",
+    agrementNumber: ""
   },
   destination: {
     type: "BROYEUR",
@@ -17,32 +17,32 @@ export default {
       refusalReason: "",
       quantity: null,
       identification: {
-        numbers: [],
-      },
+        numbers: []
+      }
     },
     operation: {
       date: null,
       code: "",
-      nextDestination: { company: getInitialCompany() },
-    },
+      nextDestination: { company: getInitialCompany() }
+    }
   },
   packaging: "UNITE",
   wasteCode: "16 01 06",
   identification: {
     numbers: [],
-    type: "NUMERO_ORDRE_REGISTRE_POLICE",
+    type: "NUMERO_ORDRE_REGISTRE_POLICE"
   },
   quantity: null,
   weight: {
     value: null,
-    isEstimate: false,
+    isEstimate: false
   },
   transporter: {
     company: {
-      ...getInitialCompany(),
+      ...getInitialCompany()
     },
     recepisse: {
-      isExempted: false,
-    },
-  },
+      isExempted: false
+    }
+  }
 };

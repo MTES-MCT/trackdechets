@@ -1,9 +1,9 @@
 import * as React from "react";
-import { Modal } from "common/components";
-import { AccessToken, NewAccessToken } from "generated/graphql/types";
+import { Modal } from "../../common/components";
+import { AccessToken, NewAccessToken } from "codegen-ui";
 import { useMutation } from "@apollo/client";
 import { ACCESS_TOKENS, REVOKE_ACCESS_TOKEN } from "./queries";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+import { NotificationError } from "../../Apps/common/Components/Error/Error";
 
 type AccountAccessTokenRevokeProps = {
   accessToken: AccessToken | NewAccessToken;
@@ -14,7 +14,7 @@ type AccountAccessTokenRevokeProps = {
 export default function AccountAccessTokenRevoke({
   accessToken,
   onClose,
-  onDelete,
+  onDelete
 }: AccountAccessTokenRevokeProps) {
   const [revokeAccessToken, { loading, error }] = useMutation(
     REVOKE_ACCESS_TOKEN,
@@ -25,7 +25,7 @@ export default function AccountAccessTokenRevoke({
           onDelete();
         }
         onClose();
-      },
+      }
     }
   );
 

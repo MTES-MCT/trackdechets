@@ -1,7 +1,7 @@
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
-import { IconTrash } from "Apps/common/Components/Icons/Icons";
-import { formatDate } from "common/datetime";
-import { SEARCH_COMPANIES } from "Apps/common/queries/company/query";
+import { IconTrash } from "../../../Apps/common/Components/Icons/Icons";
+import { formatDate } from "../../../common/datetime";
+import { SEARCH_COMPANIES } from "../../../Apps/common/queries/company/query";
 import {
   CompanyPrivate,
   CompanySearchResult,
@@ -9,8 +9,8 @@ import {
   MutationAddSignatureAutomationArgs,
   MutationRemoveSignatureAutomationArgs,
   Query,
-  QuerySearchCompaniesArgs,
-} from "generated/graphql/types";
+  QuerySearchCompaniesArgs
+} from "codegen-ui";
 import React, { useState } from "react";
 
 type Props = {
@@ -65,7 +65,7 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
               vatNumber
             }
           }
-        `,
+        `
       });
 
       cache.modify({
@@ -83,10 +83,10 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
             }
 
             return [...existingDelegationsRefs, newAutomationRef];
-          },
-        },
+          }
+        }
       });
-    },
+    }
   });
 
   const [removeSignatureAutomation, { loading: isRemoving }] = useMutation<
@@ -101,10 +101,10 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
             return existingDelegationsRefs.filter(
               commentRef => variables?.id !== readField("id", commentRef)
             );
-          },
-        },
+          }
+        }
       });
-    },
+    }
   });
 
   const [searchCompaniesQuery, { loading: isLoadingSearch, error }] =
@@ -113,7 +113,7 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
       {
         onCompleted: data => {
           setCompanies(data.searchCompanies);
-        },
+        }
       }
     );
 
@@ -129,9 +129,9 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
         variables: {
           input: {
             from: company.id,
-            to: result.trackdechetsId!,
-          },
-        },
+            to: result.trackdechetsId!
+          }
+        }
       });
       setClue("");
     }

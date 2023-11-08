@@ -109,12 +109,11 @@ describe("mutation inviteUserToCompany", () => {
         hash: encodeURIComponent(hashValue)
       }
     });
+    expect(addJobArgs[0].body).toContain(`invité à rejoindre Trackdéchets.`);
     expect(addJobArgs[0].body).toContain(
-      `vous a invité à rejoindre Trackdéchets.`
+      `<a href=\"http://trackdechets.local/invite?hash=${encodeURIComponent(
+        hashValue
+      )}\">`
     );
-    expect(addJobArgs[0].body).toContain(`<a
-    href=\"http://trackdechets.local/invite?hash=${encodeURIComponent(
-      hashValue
-    )}\">`);
   });
 });

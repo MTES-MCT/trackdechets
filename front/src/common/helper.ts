@@ -10,13 +10,13 @@ export function updateApolloCache<T>(
   {
     query,
     getNewData,
-    variables = {},
+    variables = {}
   }: { query: DocumentNode; getNewData: (d: T) => T; variables: any }
 ) {
   try {
     const existingData = store.readQuery<T>({
       query,
-      variables,
+      variables
     });
 
     if (!existingData) {
@@ -28,7 +28,7 @@ export function updateApolloCache<T>(
     store.writeQuery<T>({
       query,
       variables,
-      data: { ...existingData, ...newData },
+      data: { ...existingData, ...newData }
     });
   } catch (_) {
     console.info(`Cache miss, skipping update.`);
@@ -59,7 +59,7 @@ export function mergeDefaults<T>(defaults: T, options: Record<string, any>): T {
   return Object.keys(defaults as any).reduce((acc, key) => {
     if (options[key] == null) {
       return {
-        ...acc,
+        ...acc
       };
     }
 
@@ -67,7 +67,7 @@ export function mergeDefaults<T>(defaults: T, options: Record<string, any>): T {
       ...acc,
       [key]: isObject(acc[key])
         ? mergeDefaults(acc[key], options[key])
-        : options[key],
+        : options[key]
     };
   }, defaults);
 }
@@ -86,7 +86,7 @@ const traverse = ({ obj, paths, depth = 0 }) => {
  *   Retrieve an object node via its dotted path
  *  eg: getNestedValue(form, "emitter.emission.waste.weight")
  */
-export const getNestedNode = (obj: Object, path: String): any => {
+export const getNestedNode = (obj: Object, path: string): any => {
   const paths = path.split(".");
   try {
     return traverse({ obj, paths });
@@ -157,11 +157,11 @@ export const debounce = <F extends (...args: any) => any>(
   func: F,
   waitFor: number
 ) => {
-  let timeout: number = 0;
+  let timeout: NodeJS.Timeout;
 
   const debounced = (...args: any) => {
     clearTimeout(timeout);
-    timeout = window.setTimeout(() => func(...args), waitFor);
+    timeout = setTimeout(() => func(...args), waitFor);
   };
 
   return debounced as (...args: Parameters<F>) => ReturnType<F>;
@@ -170,14 +170,14 @@ export const debounce = <F extends (...args: any) => any>(
 /**
  * Remove orgId from Input when it was built from FormCompany
  */
-export function removeOrgId(obj: any, insideCompany: boolean = false): any {
+export function removeOrgId(obj: any, insideCompany = false): any {
   if (typeof obj !== "object" || obj === null) {
     return obj;
   }
 
-  let newObj: any = Array.isArray(obj) ? [] : {};
+  const newObj: any = Array.isArray(obj) ? [] : {};
 
-  for (let key of Object.keys(obj)) {
+  for (const key of Object.keys(obj)) {
     if (insideCompany && key === "orgId") {
       continue;
     }

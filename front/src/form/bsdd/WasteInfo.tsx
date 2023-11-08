@@ -1,23 +1,23 @@
-import { FieldSwitch } from "common/components";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import Tooltip from "common/components/Tooltip";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import { FieldSwitch } from "../../common/components";
+import RedErrorMessage from "../../common/components/RedErrorMessage";
+import Tooltip from "../../common/components/Tooltip";
+import NumberInput from "../common/components/custom-inputs/NumberInput";
+import { RadioButton } from "../common/components/custom-inputs/RadioButton";
 import { connect, Field } from "formik";
 import {
   isDangerous,
-  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
-} from "generated/constants";
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES
+} from "shared/constants";
 import React, { useEffect } from "react";
 import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import Packagings from "./components/packagings/Packagings";
 import { ParcelNumbersSelector } from "./components/parcel-number/ParcelNumber";
 import {
   WasteCodeSelect,
-  bsddWasteCodeValidator,
+  bsddWasteCodeValidator
 } from "./components/waste-code";
 import "./WasteInfo.scss";
-import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
+import EstimatedQuantityTooltip from "../../common/components/EstimatedQuantityTooltip";
 
 type Values = {
   wasteDetails: {
@@ -44,12 +44,12 @@ const SOIL_CODES = [
   "01 05 99",
   "02 01 01",
   "02 01 99",
-  "20 02 02",
+  "20 02 02"
 ];
 
 export default connect<{ disabled }, Values>(function WasteInfo({
   formik,
-  disabled,
+  disabled
 }) {
   const { values, setFieldValue } = formik;
 

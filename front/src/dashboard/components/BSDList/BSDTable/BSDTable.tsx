@@ -1,11 +1,6 @@
 import * as React from "react";
 import { useTable, useFilters, useSortBy } from "react-table";
-import {
-  Bsd,
-  BsdWhere,
-  OrderType,
-  QueryBsdsArgs,
-} from "generated/graphql/types";
+import { Bsd, BsdWhere, OrderType, QueryBsdsArgs } from "codegen-ui";
 import {
   Table,
   TableHead,
@@ -13,8 +8,8 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  TableSortIcon,
-} from "common/components";
+  TableSortIcon
+} from "../../../../common/components";
 import { Column, COLUMNS_PARAMETERS_NAME, createColumn } from "../columns";
 
 interface BSDTableProps {
@@ -28,14 +23,14 @@ const ADDITIONAL_COLUMNS: Column[] = [
     id: "workflow",
     Header: () => null,
     disableFilters: true,
-    disableSortBy: true,
+    disableSortBy: true
   }),
   createColumn({
     id: "actions",
     Header: () => null,
     disableFilters: true,
-    disableSortBy: true,
-  }),
+    disableSortBy: true
+  })
 ];
 
 export function BSDTable({ bsds, refetch, ...props }: BSDTableProps) {
@@ -49,13 +44,13 @@ export function BSDTable({ bsds, refetch, ...props }: BSDTableProps) {
     getTableBodyProps,
     rows,
     prepareRow,
-    state: { filters, sortBy },
+    state: { filters, sortBy }
   } = useTable(
     {
       columns,
       data: bsds,
       manualFilters: true,
-      manualSortBy: true,
+      manualSortBy: true
     },
     useFilters,
     useSortBy
@@ -72,7 +67,7 @@ export function BSDTable({ bsds, refetch, ...props }: BSDTableProps) {
 
     const variables = {
       where: {},
-      order: {},
+      order: {}
     };
 
     filters.forEach(filter => {
@@ -144,7 +139,7 @@ export function BSDTable({ bsds, refetch, ...props }: BSDTableProps) {
                 {column.canFilter
                   ? column.render("Filter", {
                       placeHolder: column["filterPlaceHolder"],
-                      maxLength: column["filterMaxLength"],
+                      maxLength: column["filterMaxLength"]
                     })
                   : null}
               </TableHeaderCell>

@@ -4,7 +4,6 @@ import redundantCachedSearchSirene from "./sirene/searchCompany";
 import decoratedSearchCompanies from "./sirene/searchCompanies";
 import { CompanySearchResult } from "./types";
 import { searchVat } from "./vat";
-import { convertUrls } from "./database";
 import {
   isSiret,
   isVat,
@@ -13,7 +12,7 @@ import {
   countries,
   cleanClue,
   isForeignVat
-} from "../common/constants/companySearchHelpers";
+} from "shared/constants";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
 import { AnonymousCompanyError } from "./sirene/errors";
@@ -41,7 +40,7 @@ export const mergeCompanyToCompanySearchResult = (
   companyInfo: SireneSearchResult | CompanyVatSearchResult | null
 ): CompanySearchResult => ({
   orgId,
-  // ensure compatibility with CompanyPublic
+  // expose only some of db Company
   siret: trackdechetsCompanyInfo?.siret,
   name: trackdechetsCompanyInfo?.name,
   address: trackdechetsCompanyInfo?.address,
@@ -50,48 +49,51 @@ export const mergeCompanyToCompanySearchResult = (
   contact: trackdechetsCompanyInfo?.contact,
   contactEmail: trackdechetsCompanyInfo?.contactEmail,
   contactPhone: trackdechetsCompanyInfo?.contactPhone,
+  website: trackdechetsCompanyInfo?.website,
+  ecoOrganismeAgreements:
+    trackdechetsCompanyInfo?.ecoOrganismeAgreements?.map(a => new URL(a)) ?? [],
   allowBsdasriTakeOverWithoutSignature:
     trackdechetsCompanyInfo?.allowBsdasriTakeOverWithoutSignature,
-  ecoOrganismeAgreements: [],
+  // specific data for CompanySearchResult
   isRegistered: trackdechetsCompanyInfo != null,
   trackdechetsId: trackdechetsCompanyInfo?.id,
-  ...(trackdechetsCompanyInfo != null && {
-    ...convertUrls(trackdechetsCompanyInfo)
-  }),
   // override database infos with Sirene or VAT search
   ...companyInfo
 });
+
+const companySelectedFields = {
+  id: true,
+  orgId: true,
+  siret: true,
+  name: true,
+  address: true,
+  vatNumber: true,
+  companyTypes: true,
+  contact: true,
+  contactEmail: true,
+  contactPhone: true,
+  website: true,
+  ecoOrganismeAgreements: true,
+  allowBsdasriTakeOverWithoutSignature: true
+};
+
 /**
  * Search database and merge with company info from search engines
  */
 async function findCompanyAndMergeInfos(
-  cleanClue: string,
+  orgId: string,
   companyInfo: SireneSearchResult | CompanyVatSearchResult | null
 ): Promise<CompanySearchResult> {
   const where = {
-    where: { orgId: cleanClue }
+    where: { orgId }
   };
 
   const trackdechetsCompanyInfo = await prisma.company.findUnique({
     ...where,
-    select: {
-      id: true,
-      orgId: true,
-      siret: true,
-      name: true,
-      address: true,
-      vatNumber: true,
-      companyTypes: true,
-      contact: true,
-      contactEmail: true,
-      contactPhone: true,
-      website: true,
-      ecoOrganismeAgreements: true,
-      allowBsdasriTakeOverWithoutSignature: true
-    }
+    select: companySelectedFields
   });
   return mergeCompanyToCompanySearchResult(
-    cleanClue,
+    orgId,
     trackdechetsCompanyInfo,
     companyInfo
   );
@@ -199,25 +201,49 @@ export const makeSearchCompanies =
             [c]
               // Exclude closed companies
               .filter(c => c.etatAdministratif && c.etatAdministratif === "A")
-              // Exclude anonymous company not registered in TD
-              .filter(
-                c => c.statutDiffusionEtablissement !== "N" || c.isRegistered
-              )
           );
         })
         .catch(_ => []);
     }
     // fuzzy searching only for French companies
-    return injectedSearchCompanies(clue, department).then(async results => {
-      if (!results) {
-        return [];
-      }
+    return injectedSearchCompanies(clue, department).then(
+      async resultsInsee => {
+        if (!resultsInsee) {
+          return [];
+        }
+        const orgIds = resultsInsee.map(r => r.siret as string);
+        // Initialize an object with all orgIds set to null
+        const companies = orgIds.reduce((acc, id) => {
+          acc[id] = null;
+          return acc;
+        }, {} as { [key: number]: any | null });
+        // Find all existing Companies in DB
+        const companiesInDb = await prisma.company.findMany({
+          where: {
+            orgId: { in: orgIds }
+          },
+          select: companySelectedFields
+        });
+        // Populate the object with the fetched organizations
+        companiesInDb.forEach(org => {
+          companies[org.orgId] = org;
+        });
 
-      return results.map(company => ({
-        ...company,
-        orgId: company.siret!
-      }));
-    });
+        return resultsInsee.map(companyInsee => ({
+          ...(companies[companyInsee.siret!]
+            ? mergeCompanyToCompanySearchResult(
+                companyInsee.siret!,
+                companies[companyInsee.siret!],
+                companyInsee
+              )
+            : {
+                ...companyInsee,
+                orgId: companyInsee.siret!,
+                isRegistered: false
+              })
+        }));
+      }
+    );
   };
 
 /**

@@ -3,10 +3,10 @@ import React, { useState } from "react";
 import {
   BSDD_WASTES,
   BSDD_APPENDIX1_WASTE_TREE,
-  BSDD_WASTES_TREE,
-} from "generated/constants";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import WasteTreeModal from "search/WasteTreeModal";
+  BSDD_WASTES_TREE
+} from "shared/constants";
+import RedErrorMessage from "../../../../common/components/RedErrorMessage";
+import WasteTreeModal from "../../../../search/WasteTreeModal";
 import styles from "./WasteCode.module.scss";
 
 function formatWasteCode(wasteCode: string) {
@@ -30,7 +30,7 @@ function formatWasteCode(wasteCode: string) {
 export function WasteCodeSelect({
   field,
   form,
-  disabled,
+  disabled
 }: FieldProps & { disabled: boolean }) {
   const [openModal, setOpenModal] = useState(false);
 

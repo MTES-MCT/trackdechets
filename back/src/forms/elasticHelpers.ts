@@ -2,7 +2,7 @@ import { EmitterType, Status } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
 import { FullForm } from "./types";
 
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import { getFirstTransporterSync } from "./database";
 import { FormForElastic } from "./elastic";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
@@ -129,8 +129,17 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
 
       break;
     }
-    case Status.RESENT:
+    case Status.RESENT: {
       setFieldTab("forwardedInTransporterCompanySiret", "isCollectedFor");
+      setFieldTab(
+        form.recipientIsTempStorage
+          ? "forwardedInDestinationCompanySiret"
+          : "recipientCompanySiret",
+        "isForActionFor"
+      );
+
+      break;
+    }
     case Status.RECEIVED:
     case Status.ACCEPTED: {
       setFieldTab(

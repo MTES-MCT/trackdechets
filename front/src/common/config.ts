@@ -1,5 +1,5 @@
 export const MEDIA_QUERIES = {
-  handHeld: "900px",
+  handHeld: "900px"
 };
 
 export const CONTACT_EMAIL =

@@ -1,13 +1,10 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import { gql, useMutation } from "@apollo/client";
-import RedErrorMessage from "common/components/RedErrorMessage";
+import RedErrorMessage from "../../../common/components/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
 import * as yup from "yup";
-import {
-  CompanyPrivate,
-  MutationVerifyCompanyArgs,
-} from "generated/graphql/types";
+import { CompanyPrivate, MutationVerifyCompanyArgs } from "codegen-ui";
 
 type Props = {
   siret: string;
@@ -24,12 +21,12 @@ const VERIFY_COMPANY = gql`
 `;
 
 const yupSchema = yup.object().shape({
-  code: yup.string().required(),
+  code: yup.string().required()
 });
 
 export default function AccountFormVerifyCompany({
   siret,
-  toggleEdition,
+  toggleEdition
 }: Props) {
   const [verifyCompany, { loading }] = useMutation<
     CompanyPrivate,
@@ -37,7 +34,7 @@ export default function AccountFormVerifyCompany({
   >(VERIFY_COMPANY, {
     onCompleted: () => {
       toggleEdition();
-    },
+    }
   });
 
   const initialValues = { code: "" };

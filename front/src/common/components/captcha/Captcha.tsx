@@ -3,7 +3,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import classNames from "classnames";
 import "./Captcha.scss";
-import { Loader } from "Apps/common/Components";
+import { Loader } from "../../../Apps/common/Components";
 
 const { VITE_API_ENDPOINT } = import.meta.env;
 
@@ -62,13 +62,13 @@ export const Captcha = ({
   captchaImg,
   refetch,
   captchaToken,
-  narrow = false,
+  narrow = false
 }) => {
   return (
     <>
       <div
         className={classNames("captcha__wrapper", {
-          "captcha__wrapper--narrow": narrow,
+          "captcha__wrapper--narrow": narrow
         })}
       >
         {!!captchaImg ? (
@@ -79,7 +79,7 @@ export const Captcha = ({
 
         <div
           className={classNames("captcha__components", {
-            "captcha__components--narrow": narrow,
+            "captcha__components--narrow": narrow
           })}
         >
           <Button
@@ -100,7 +100,7 @@ export const Captcha = ({
           required: true,
           name: "captchaInput",
           value: captchaInput,
-          onChange: e => setCaptchaInput(e.target.value),
+          onChange: e => setCaptchaInput(e.target.value)
         }}
       />
     </>

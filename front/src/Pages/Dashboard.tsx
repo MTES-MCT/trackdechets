@@ -14,16 +14,16 @@ import {
   QueryBsdaRevisionRequestsArgs,
   QueryBsdsArgs,
   QueryCompanyPrivateInfosArgs,
-  QueryFormRevisionRequestsArgs,
-} from "generated/graphql/types";
+  QueryFormRevisionRequestsArgs
+} from "codegen-ui";
 import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
-import BsdCardList from "Apps/Dashboard/Components/BsdCardList/BsdCardList";
+import BsdCardList from "../Apps/Dashboard/Components/BsdCardList/BsdCardList";
 import {
   Blankslate,
   BlankslateTitle,
   BlankslateDescription,
-  Loader,
-} from "Apps/common/Components";
+  Loader
+} from "../Apps/common/Components";
 import {
   blankstate_action_desc,
   blankstate_action_title,
@@ -40,22 +40,22 @@ import {
   dropdown_create_btn,
   filter_reset_btn,
   filter_show_btn,
-  load_more_bsds,
-} from "Apps/common/wordings/dashboard/wordingsDashboard";
-import { IconDuplicateFile } from "Apps/common/Components/Icons/Icons";
-import Filters from "Apps/common/Components/Filters/Filters";
+  load_more_bsds
+} from "../Apps/common/wordings/dashboard/wordingsDashboard";
+import { IconDuplicateFile } from "../Apps/common/Components/Icons/Icons";
+import Filters from "../Apps/common/Components/Filters/Filters";
 import {
   dropdownCreateLinks,
   filterList,
   filterPredicates,
-  getBsdCurrentTab,
+  getBsdCurrentTab
 } from "../Apps/Dashboard/dashboardUtils";
 import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
-import { usePermissions } from "common/contexts/PermissionsContext";
-import { UserPermission } from "generated/graphql/types";
-import { GET_BSDA_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsdaReviewQuery";
-import { GET_FORM_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsddReviewsQuery";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
+import { usePermissions } from "../common/contexts/PermissionsContext";
+import { UserPermission } from "codegen-ui";
+import { GET_BSDA_REVISION_REQUESTS } from "../Apps/common/queries/reviews/BsdaReviewQuery";
+import { GET_FORM_REVISION_REQUESTS } from "../Apps/common/queries/reviews/BsddReviewsQuery";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../Apps/common/queries/company/query";
 
 import "./dashboard.scss";
 
@@ -84,7 +84,7 @@ const DashboardPage = () => {
     isArchivesTab,
     isReviewsTab,
     isToCollectTab,
-    isCollectedTab,
+    isCollectedTab
     // isReviewedTab,
     // isToReviewedTab,
   });
@@ -95,32 +95,32 @@ const DashboardPage = () => {
   const withRoutePredicate = useCallback(() => {
     if (isActTab) {
       return {
-        isForActionFor: [siret],
+        isForActionFor: [siret]
       };
     }
     if (isDraftTab) {
       return {
-        isDraftFor: [siret],
+        isDraftFor: [siret]
       };
     }
     if (isFollowTab) {
       return {
-        isFollowFor: [siret],
+        isFollowFor: [siret]
       };
     }
     if (isArchivesTab) {
       return {
-        isArchivedFor: [siret],
+        isArchivedFor: [siret]
       };
     }
     if (isToCollectTab) {
       return {
-        isToCollectFor: [siret],
+        isToCollectFor: [siret]
       };
     }
     if (isCollectedTab) {
       return {
-        isCollectedFor: [siret],
+        isCollectedFor: [siret]
       };
     }
     if (isAllBsdsTab) {
@@ -128,7 +128,7 @@ const DashboardPage = () => {
         isDraftFor: [siret],
         isForActionFor: [siret],
         isFollowFor: [siret],
-        isArchivedFor: [siret],
+        isArchivedFor: [siret]
       };
     }
     // if (isReviewsTab) {
@@ -158,7 +158,7 @@ const DashboardPage = () => {
     // isReviewsTab,
     // isToReviewedTab,
     // isReviewedTab,
-    siret,
+    siret
   ]);
 
   const defaultWhere = useMemo(
@@ -168,7 +168,7 @@ const DashboardPage = () => {
 
   const [bsdsVariables, setBsdsVariables] = useState<QueryBsdsArgs>({
     first: BSD_PER_PAGE,
-    where: defaultWhere,
+    where: defaultWhere
   });
 
   const [bsdsReview, setBsdsReview] = useState<
@@ -180,21 +180,21 @@ const DashboardPage = () => {
     QueryBsdsArgs
   >(GET_BSDS, {
     fetchPolicy: "cache-and-network",
-    notifyOnNetworkStatusChange: true,
+    notifyOnNetworkStatusChange: true
   });
   const { data: cachedData } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
     GET_BSDS,
     {
       variables: bsdsVariables,
       // read from the cache only to avoid duplicate requests
-      fetchPolicy: "cache-only",
+      fetchPolicy: "cache-only"
     }
   );
 
   const fetchBsds = React.useCallback(() => {
     if (!isReviewsTab) {
       lazyFetchBsds({
-        variables: bsdsVariables,
+        variables: bsdsVariables
       });
     }
   }, [lazyFetchBsds, bsdsVariables, isReviewsTab]);
@@ -206,11 +206,11 @@ const DashboardPage = () => {
       const newVariables = {
         ...args,
         where: { ...where, ...defaultWhere },
-        first: BSD_PER_PAGE,
+        first: BSD_PER_PAGE
       };
       setBsdsVariables(newVariables);
       lazyFetchBsds({
-        variables: newVariables,
+        variables: newVariables
       });
     },
     [lazyFetchBsds, defaultWhere]
@@ -221,16 +221,16 @@ const DashboardPage = () => {
     {
       data: dataBsdaReviews,
       loading: loadingBsdaReviews,
-      fetchMore: fetchMoreBsdaReviews,
-    },
+      fetchMore: fetchMoreBsdaReviews
+    }
   ] = useLazyQuery<
     Pick<Query, "bsdaRevisionRequests"> & { pageInfo: PageInfo },
     QueryBsdaRevisionRequestsArgs
   >(GET_BSDA_REVISION_REQUESTS, {
     variables: {
-      siret,
+      siret
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-and-network"
   });
 
   // A supprimer quand on pourra afficher une révision avec la requete bsds
@@ -239,23 +239,23 @@ const DashboardPage = () => {
     {
       data: dataBsddReviews,
       loading: loadingBsddReviews,
-      fetchMore: fetchMoreBsddReviews,
-    },
+      fetchMore: fetchMoreBsddReviews
+    }
   ] = useLazyQuery<
     Pick<Query, "formRevisionRequests"> & { pageInfo: PageInfo },
     QueryFormRevisionRequestsArgs
   >(GET_FORM_REVISION_REQUESTS, {
     variables: {
-      siret,
+      siret
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-and-network"
   });
 
   const { data: companyData } = useQuery<
     Pick<Query, "companyPrivateInfos">,
     QueryCompanyPrivateInfosArgs
   >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
-    variables: { clue: siret },
+    variables: { clue: siret }
   });
 
   const siretsWithAutomaticSignature = companyData
@@ -314,7 +314,7 @@ const DashboardPage = () => {
     setIsFetchingMore(true);
     fetchMore({
       variables: {
-        after: data?.bsds.pageInfo.endCursor,
+        after: data?.bsds.pageInfo.endCursor
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (fetchMoreResult == null) {
@@ -326,10 +326,10 @@ const DashboardPage = () => {
           bsds: {
             ...prev.bsds,
             ...fetchMoreResult.bsds,
-            edges: prev.bsds.edges.concat(fetchMoreResult.bsds.edges),
-          },
+            edges: prev.bsds.edges.concat(fetchMoreResult.bsds.edges)
+          }
         };
-      },
+      }
     }).then(() => {
       setIsFetchingMore(false);
     });
@@ -342,7 +342,7 @@ const DashboardPage = () => {
     const reqBsddName = "formRevisionRequests";
     fetchMoreBsddReviews({
       variables: {
-        after: dataBsddReviews?.formRevisionRequests.pageInfo.endCursor,
+        after: dataBsddReviews?.formRevisionRequests.pageInfo.endCursor
       },
 
       updateQuery: (prev, { fetchMoreResult }) => {
@@ -357,10 +357,10 @@ const DashboardPage = () => {
             ...fetchMoreResult[reqBsddName],
             edges: prev[reqBsddName].edges.concat(
               fetchMoreResult[reqBsddName].edges
-            ),
-          },
+            )
+          }
         };
-      },
+      }
     })
       .then(() => {
         setIsFetchingMore(false);
@@ -370,7 +370,7 @@ const DashboardPage = () => {
       });
   }, [
     dataBsddReviews?.formRevisionRequests.pageInfo.endCursor,
-    fetchMoreBsddReviews,
+    fetchMoreBsddReviews
   ]);
 
   // A supprimer quand on pourra afficher une révision avec la requete bsds
@@ -379,7 +379,7 @@ const DashboardPage = () => {
 
     fetchMoreBsdaReviews({
       variables: {
-        after: dataBsdaReviews?.bsdaRevisionRequests.pageInfo.endCursor,
+        after: dataBsdaReviews?.bsdaRevisionRequests.pageInfo.endCursor
       },
 
       updateQuery: (prev, { fetchMoreResult }) => {
@@ -394,10 +394,10 @@ const DashboardPage = () => {
             ...fetchMoreResult[reqBsdaName],
             edges: prev[reqBsdaName].edges.concat(
               fetchMoreResult[reqBsdaName].edges
-            ),
-          },
+            )
+          }
         };
-      },
+      }
     })
       .then(() => {
         setIsFetchingMore(false);
@@ -407,7 +407,7 @@ const DashboardPage = () => {
       });
   }, [
     dataBsdaReviews?.bsdaRevisionRequests.pageInfo.endCursor,
-    fetchMoreBsdaReviews,
+    fetchMoreBsdaReviews
   ]);
 
   const loadMore = () => {
@@ -435,7 +435,7 @@ const DashboardPage = () => {
     isToCollectTab,
     isCollectedTab,
     defaultWhere,
-    fetchWithDefaultWhere,
+    fetchWithDefaultWhere
   ]);
 
   useEffect(() => {
@@ -461,8 +461,8 @@ const DashboardPage = () => {
                 return [
                   ...new Set([
                     ...prevState,
-                    ...dataBsdd["formRevisionRequests"].edges,
-                  ]),
+                    ...dataBsdd["formRevisionRequests"].edges
+                  ])
                 ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
               }
             );
@@ -476,8 +476,8 @@ const DashboardPage = () => {
                 return [
                   ...new Set([
                     ...prevState,
-                    ...dataBsda["bsdaRevisionRequests"].edges,
-                  ]),
+                    ...dataBsda["bsdaRevisionRequests"].edges
+                  ])
                 ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
               }
             );

@@ -1,5 +1,5 @@
 import { Bsdasri } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
@@ -9,9 +9,34 @@ import {
   OutgoingWaste,
   TransportedWaste
 } from "../generated/graphql/types";
-import { GenericWaste } from "../registry/types";
+import {
+  GenericWaste,
+  emptyAllWaste,
+  emptyIncomingWaste,
+  emptyManagedWaste,
+  emptyOutgoingWaste,
+  emptyTransportedWaste
+} from "../registry/types";
 import { extractPostalCode } from "../utils";
 import { getWasteDescription } from "./utils";
+
+const getOperationData = (bsdasri: Bsdasri) => ({
+  destinationPlannedOperationCode: bsdasri.destinationOperationCode,
+  destinationOperationCode: bsdasri.destinationOperationCode,
+  destinationOperationMode: bsdasri.destinationOperationMode
+});
+
+const getTransporterData = (bsdasri: Bsdasri) => ({
+  transporterRecepisseIsExempted: bsdasri.transporterRecepisseIsExempted,
+  transporterNumberPlates: bsdasri.transporterTransportPlates,
+  transporterCompanyAddress: bsdasri.transporterCompanyAddress,
+  transporterCompanyName: bsdasri.transporterCompanyName,
+  transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
+  transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
+  transporterCompanyMail: bsdasri.transporterCompanyMail,
+  transporterCustomInfo: bsdasri.transporterCustomInfo,
+  transporterTakenOverAt: bsdasri.transporterTakenOverAt
+});
 
 type RegistryFields =
   | "isIncomingWasteFor"
@@ -76,17 +101,17 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
       ? bsdasri.destinationReceptionWasteWeightValue / 1000
       : bsdasri.destinationReceptionWasteWeightValue,
-    transporterRecepisseIsExempted: false,
     wasteAdr: bsdasri.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
-    workerCompanyAddress: null
+    workerCompanyAddress: null,
+    ...getTransporterData(bsdasri)
   };
 }
 
 export function toIncomingWaste(
   bsdasri: Bsdasri & { grouping: Bsdasri[] }
-): IncomingWaste {
+): Required<IncomingWaste> {
   const initialEmitter: Pick<
     IncomingWaste,
     | "initialEmitterCompanyAddress"
@@ -109,6 +134,8 @@ export function toIncomingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyIncomingWaste,
     ...genericWaste,
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
@@ -130,20 +157,15 @@ export function toIncomingWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-    transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
-    destinationOperationCode: bsdasri.destinationOperationCode,
-    destinationOperationMode: bsdasri.destinationOperationMode,
     destinationCustomInfo: bsdasri.destinationCustomInfo,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
-    transporterCompanyMail: bsdasri.transporterCompanyMail
+    ...getOperationData(bsdasri)
   };
 }
 
 export function toOutgoingWaste(
   bsdasri: Bsdasri & { grouping: Bsdasri[] }
-): OutgoingWaste {
+): Required<OutgoingWaste> {
   const initialEmitter: Pick<
     OutgoingWaste,
     | "initialEmitterCompanyAddress"
@@ -166,6 +188,8 @@ export function toOutgoingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyOutgoingWaste,
     ...genericWaste,
     brokerCompanyName: null,
     brokerCompanySiret: null,
@@ -173,7 +197,6 @@ export function toOutgoingWaste(
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
-    destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
@@ -188,23 +211,18 @@ export function toOutgoingWaste(
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    transporterCompanyAddress: null,
-    transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-    transporterTakenOverAt: bsdasri.transporterTakenOverAt,
-    transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue / 1000
       : bsdasri.emitterWasteWeightValue,
     emitterCustomInfo: bsdasri.emitterCustomInfo,
-    transporterCompanyMail: bsdasri.transporterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail
+    destinationCompanyMail: bsdasri.destinationCompanyMail,
+    ...getOperationData(bsdasri)
   };
 }
 
 export function toTransportedWaste(
   bsdasri: Bsdasri & { grouping: Bsdasri[] }
-): TransportedWaste {
+): Required<TransportedWaste> {
   const initialEmitter: Pick<
     TransportedWaste,
     | "initialEmitterCompanyAddress"
@@ -227,16 +245,13 @@ export function toTransportedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyTransportedWaste,
     ...genericWaste,
-    transporterTakenOverAt: bsdasri.transporterTakenOverAt,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue / 1000
       : bsdasri.emitterWasteWeightValue,
-    transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-    transporterCompanyAddress: bsdasri.transporterCompanyAddress,
-    transporterNumberPlates: bsdasri.transporterTransportPlates,
     ...initialEmitter,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
@@ -256,7 +271,6 @@ export function toTransportedWaste(
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
-    transporterCustomInfo: bsdasri.transporterCustomInfo,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
     destinationCompanyMail: bsdasri.destinationCompanyMail
   };
@@ -268,7 +282,7 @@ export function toTransportedWaste(
  */
 export function toManagedWaste(
   bsdasri: Bsdasri & { grouping: Bsdasri[] }
-): ManagedWaste {
+): Required<ManagedWaste> {
   const initialEmitter: Pick<
     ManagedWaste,
     | "initialEmitterCompanyAddress"
@@ -291,6 +305,8 @@ export function toManagedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyManagedWaste,
     ...genericWaste,
     managedStartDate: null,
     managedEndDate: null,
@@ -301,7 +317,6 @@ export function toManagedWaste(
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
-    destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
@@ -313,19 +328,14 @@ export function toManagedWaste(
       bsdasri.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    transporterCompanyAddress: bsdasri.transporterCompanyAddress,
-    transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-    transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
-    transporterCompanyMail: bsdasri.transporterCompanyMail,
     destinationCompanyMail: bsdasri.destinationCompanyMail
   };
 }
 
 export function toAllWaste(
   bsdasri: Bsdasri & { grouping: Bsdasri[] }
-): AllWaste {
+): Required<AllWaste> {
   const initialEmitter: Pick<
     AllWaste,
     | "initialEmitterCompanyAddress"
@@ -348,9 +358,10 @@ export function toAllWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyAllWaste,
     ...genericWaste,
     createdAt: bsdasri.createdAt,
-    transporterTakenOverAt: bsdasri.transporterTakenOverAt,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
     brokerCompanyName: null,
     brokerCompanySiret: null,
@@ -358,9 +369,6 @@ export function toAllWaste(
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
-    destinationOperationCode: bsdasri.destinationOperationCode,
-    destinationOperationMode: bsdasri.destinationOperationMode,
-    destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
@@ -372,11 +380,6 @@ export function toAllWaste(
       bsdasri.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    transporterCompanyAddress: bsdasri.transporterCompanyAddress,
-    transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-    transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
-    transporterNumberPlates: bsdasri.transporterTransportPlates,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue / 1000
       : bsdasri.emitterWasteWeightValue,
@@ -386,7 +389,7 @@ export function toAllWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
-    transporterCompanyMail: bsdasri.transporterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail
+    destinationCompanyMail: bsdasri.destinationCompanyMail,
+    ...getOperationData(bsdasri)
   };
 }

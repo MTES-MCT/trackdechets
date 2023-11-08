@@ -3,8 +3,8 @@ import ActBsdaValidation from "./ActBsdaValidation";
 import { MockedProvider } from "@apollo/client/testing";
 import { screen } from "@testing-library/dom";
 import { render } from "@testing-library/react";
-import { SIGN_BSDA } from "dashboard/components/BSDList/BSDa/WorkflowAction/SignBsda";
-import { Bsda, BsdaSignatureType } from "generated/graphql/types";
+import { SIGN_BSDA } from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignBsda";
+import { Bsda, BsdaSignatureType } from "codegen-ui";
 import { MemoryRouter } from "react-router-dom";
 
 describe("ActBsdaValidation", () => {
@@ -19,24 +19,24 @@ describe("ActBsdaValidation", () => {
           id: "1",
           input: {
             author: "",
-            type: BsdaSignatureType.Operation,
-          },
-        },
+            type: BsdaSignatureType.Operation
+          }
+        }
       },
       result: {
         data: {
           form: {
             id: "1",
             readableId: "FORM-1",
-            status: "INITIAL",
-          },
-        },
-      },
-    },
+            status: "INITIAL"
+          }
+        }
+      }
+    }
   ];
   const bsd = {
     id: "1",
-    bsdaStatus: "INITIAL",
+    bsdaStatus: "INITIAL"
   } as unknown as Bsda;
 
   it("renders Initial modal same destination siret", async () => {
@@ -44,7 +44,7 @@ describe("ActBsdaValidation", () => {
     const initialCollection2710Bsda = {
       ...bsd,
       bsdaType: "COLLECTION_2710",
-      destination: { company: { siret: "12345678901234" } },
+      destination: { company: { siret: "12345678901234" } }
     } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -68,7 +68,7 @@ describe("ActBsdaValidation", () => {
       ...bsd,
       emitter: { isPrivateIndividual: true },
       worker: { isDisabled: true },
-      transporter: { company: { orgId: "12345678901234" } },
+      transporter: { company: { orgId: "12345678901234" } }
     };
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -91,7 +91,7 @@ describe("ActBsdaValidation", () => {
     const initialBsdaSameWorker = {
       ...bsd,
       emitter: { isPrivateIndividual: true },
-      worker: { company: { siret: "12345678901234" } },
+      worker: { company: { siret: "12345678901234" } }
     } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -113,7 +113,7 @@ describe("ActBsdaValidation", () => {
     const currentSiret = "12345678901234";
     const initialBsdaSameEmitter = {
       ...bsd,
-      emitter: { company: { siret: "12345678901234" } },
+      emitter: { company: { siret: "12345678901234" } }
     };
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -137,7 +137,7 @@ describe("ActBsdaValidation", () => {
       ...bsd,
       bsdaStatus: "SIGNED_BY_PRODUCER",
       bsdaType: "GATHERING",
-      worker: { isDisabled: true },
+      worker: { isDisabled: true }
     } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -161,7 +161,7 @@ describe("ActBsdaValidation", () => {
       ...bsd,
       bsdaStatus: "SIGNED_BY_PRODUCER",
       bsdaType: "RESHIPMENT",
-      worker: { isDisabled: true },
+      worker: { isDisabled: true }
     } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -183,7 +183,7 @@ describe("ActBsdaValidation", () => {
     const currentSiret = "12345678901234";
     const signedByProducerBsdaNoWorker = {
       ...bsd,
-      bsdaStatus: "SIGNED_BY_PRODUCER",
+      bsdaStatus: "SIGNED_BY_PRODUCER"
     } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -205,7 +205,7 @@ describe("ActBsdaValidation", () => {
     const currentSiret = "12345678901234";
     const signedByWorkerBsda = {
       ...bsd,
-      bsdaStatus: "SIGNED_BY_WORKER",
+      bsdaStatus: "SIGNED_BY_WORKER"
     } as Bsda;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>

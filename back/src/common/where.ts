@@ -9,7 +9,7 @@ import {
   TextFilter
 } from "../generated/graphql/types";
 import { UserInputError } from "./errors";
-import { isSiret } from "./constants/companySearchHelpers";
+import { isSiret } from "shared/constants";
 
 type EnumFilter<E> = {
   _in?: E[] | null;

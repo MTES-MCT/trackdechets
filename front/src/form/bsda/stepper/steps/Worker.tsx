@@ -1,13 +1,8 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { formatDate } from "common/datetime";
-import CompanySelector from "form/common/components/company/CompanySelector";
+import { formatDate } from "../../../../common/datetime";
+import CompanySelector from "../../../common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
-import {
-  Bsda,
-  BsdaType,
-  CompanySearchPrivate,
-  CompanyType,
-} from "generated/graphql/types";
+import { Bsda, BsdaType, CompanySearchPrivate, CompanyType } from "codegen-ui";
 import React, { useCallback, useState } from "react";
 import initialState from "../initial-state";
 
@@ -143,26 +138,22 @@ export function Worker({ disabled }) {
 
               <div className="form__row">
                 {worker?.workerCertification?.hasSubSectionFour && (
-                  <>
-                    <p>
-                      SS4 <span aria-hidden> ✅</span>
-                    </p>
-                  </>
+                  <p>
+                    SS4 <span aria-hidden> ✅</span>
+                  </p>
                 )}
               </div>
 
               <div className="form__row">
                 {worker?.workerCertification?.hasSubSectionThree && (
-                  <>
-                    <p>
-                      SS3 <span aria-hidden> ✅</span> numéro:{" "}
-                      {worker?.workerCertification?.certificationNumber} date de
-                      validité:{" "}
-                      {formatDate(worker?.workerCertification?.validityLimit!)}
-                      {" - "}
-                      organisme: {worker?.workerCertification?.organisation}
-                    </p>
-                  </>
+                  <p>
+                    SS3 <span aria-hidden> ✅</span> numéro:{" "}
+                    {worker?.workerCertification?.certificationNumber} date de
+                    validité:{" "}
+                    {formatDate(worker?.workerCertification?.validityLimit!)}
+                    {" - "}
+                    organisme: {worker?.workerCertification?.organisation}
+                  </p>
                 )}
               </div>
             </>

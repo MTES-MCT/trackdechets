@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "lib": ["ES2020", "esnext.asynciterable"],
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "target": "es6",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noImplicitThis": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": false,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": false,
+    "jsx": "react",
+    "sourceMap": true,
+    "inlineSources": true,
+    "baseUrl": ".",
+    "paths": {
+      "codegen-ui": ["codegen-ui/src/index.ts"],
+      "shared/constants": ["shared/constants/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

@@ -1,21 +1,21 @@
 import React from "react";
 import { Field, Form, Formik } from "formik";
 import * as yup from "yup";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import {
   InlineRadioButton,
-  RadioButton,
-} from "form/common/components/custom-inputs/RadioButton";
+  RadioButton
+} from "../../../../../form/common/components/custom-inputs/RadioButton";
 import {
   WasteAcceptationStatus,
   FormStatus,
   Form as TdForm,
-  QuantityType,
-} from "generated/graphql/types";
+  QuantityType
+} from "codegen-ui";
 import { textConfig } from "./ReceivedInfo";
-import { RedErrorMessage } from "common/components";
-import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
+import { RedErrorMessage } from "../../../../../common/components";
+import EstimatedQuantityTooltip from "../../../../../common/components/EstimatedQuantityTooltip";
 
 export type AcceptedInfoValues = {
   signedBy: string;
@@ -38,7 +38,7 @@ const validationSchema: yup.SchemaOf<AcceptedInfoValues> = yup.object({
     .oneOf(Object.values(WasteAcceptationStatus))
     .required("Le statut d'acceptation du lot est un champ requis"),
   wasteRefusalReason: yup.string().ensure(),
-  quantityType: yup.mixed<QuantityType>(),
+  quantityType: yup.mixed<QuantityType>()
 });
 
 /**
@@ -47,7 +47,7 @@ const validationSchema: yup.SchemaOf<AcceptedInfoValues> = yup.object({
 export default function AcceptedInfo({
   form,
   close,
-  onSubmit,
+  onSubmit
 }: {
   form: TdForm;
   close: () => void;
@@ -60,7 +60,7 @@ export default function AcceptedInfo({
         signedAt: new Date().toISOString(),
         quantityReceived: null,
         wasteAcceptationStatus: "" as WasteAcceptationStatus,
-        wasteRefusalReason: "",
+        wasteRefusalReason: ""
       }}
       onSubmit={onSubmit}
       validationSchema={validationSchema}
@@ -151,7 +151,7 @@ export default function AcceptedInfo({
           {/* Display wasteRefusalReason field if waste is refused or partially refused*/}
           {[
             WasteAcceptationStatus.Refused.toString(),
-            WasteAcceptationStatus.PartiallyRefused.toString(),
+            WasteAcceptationStatus.PartiallyRefused.toString()
           ].includes(values.wasteAcceptationStatus) && (
             <div className="form__row">
               <label>

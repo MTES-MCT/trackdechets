@@ -6,8 +6,8 @@ import {
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import prisma from "../../../prisma";
-import { nafCodes } from "../../../common/constants/NAF";
-import { isForeignVat } from "../../../common/constants/companySearchHelpers";
+import { nafCodes } from "shared/constants";
+import { isForeignVat } from "shared/constants";
 import {
   foreignVatNumber,
   siret,

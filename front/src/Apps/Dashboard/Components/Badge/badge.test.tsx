@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import Badge from "./Badge";
-import { BsdStatusCode } from "Apps/common/types/bsdTypes";
-import { BsdType } from "generated/graphql/types";
+import { BsdStatusCode } from "../../../common/types/bsdTypes";
+import { BsdType } from "codegen-ui";
 
 describe("Bsd Badge status", () => {
   describe("case: DRAFT/INITITAL(draft=true)", () => {
@@ -70,9 +70,29 @@ describe("Bsd Badge status", () => {
     render(<Badge status={BsdStatusCode.Processed} />);
     expect(screen.getByText(/Traité/i));
   });
+  test("PROCESSED bsff rupture traçabilité R12", () => {
+    render(
+      <Badge
+        status={BsdStatusCode.Processed}
+        bsdType={BsdType.Bsff}
+        operationCode="R12"
+      />
+    );
+    expect(screen.getByText("Traité (avec rupture de traçabilité)"));
+  });
+  test("PROCESSED bsff rupture traçabilité D13", () => {
+    render(
+      <Badge
+        status={BsdStatusCode.Processed}
+        bsdType={BsdType.Bsff}
+        operationCode="D13"
+      />
+    );
+    expect(screen.getByText("Traité (avec rupture de traçabilité)"));
+  });
   test("PROCESSED bsff", () => {
     render(<Badge status={BsdStatusCode.Processed} bsdType={BsdType.Bsff} />);
-    expect(screen.getByText("Traité (avec rupture de traçabilité)"));
+    expect(screen.getByText("Traité"));
   });
   test("AWAITING_GROUP", () => {
     render(<Badge status={BsdStatusCode.AwaitingGroup} />);

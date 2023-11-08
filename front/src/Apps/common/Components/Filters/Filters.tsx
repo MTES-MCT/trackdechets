@@ -4,10 +4,8 @@ import QuickFilters from "./QuickFilters";
 import AdvancedFilters from "./AdvancedFilters";
 
 import "./filters.scss";
-import {
-  advancedFilterList,
-  quickFilterList,
-} from "Apps/Dashboard/dashboardUtils";
+import { advancedFilterList, quickFilterList } from "../../../Dashboard/dashboardUtils";
+
 
 const purgeEmptyValues = (obj: { [key: string]: string | string[] }) => {
   return JSON.parse(

@@ -1,10 +1,10 @@
 import { MockedProvider } from "@apollo/client/testing";
 import { screen } from "@testing-library/dom";
 import { render } from "@testing-library/react";
-import { GET_BSFF_FORM } from "form/bsff/utils/queries";
+import { GET_BSFF_FORM } from "../../../../../form/bsff/utils/queries";
 import React from "react";
 import ActBsffValidation from "./ActBsffValidation";
-import { Bsff } from "generated/graphql/types";
+import { Bsff } from "codegen-ui";
 
 describe("ActBsffValidation", () => {
   const onClose = jest.fn();
@@ -14,24 +14,24 @@ describe("ActBsffValidation", () => {
       request: {
         query: GET_BSFF_FORM,
         variables: {
-          id: "1",
-        },
+          id: "1"
+        }
       },
       result: {
         data: {
           form: {
             id: "1",
             readableId: "FORM-1",
-            status: "INITIAL",
-          },
-        },
-      },
-    },
+            status: "INITIAL"
+          }
+        }
+      }
+    }
   ];
 
   const bsd = {
     id: "1",
-    bsffStatus: "INITIAL",
+    bsffStatus: "INITIAL"
   } as unknown as Bsff;
 
   it("renders Initial modal", async () => {
@@ -47,7 +47,7 @@ describe("ActBsffValidation", () => {
   it("renders SignedByEmitter modal", async () => {
     const signedByEmitterBsff = {
       ...bsd,
-      bsffStatus: "SIGNED_BY_EMITTER",
+      bsffStatus: "SIGNED_BY_EMITTER"
     } as Bsff;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -76,9 +76,9 @@ describe("ActBsffValidation", () => {
       packagings: [
         {
           numero: "F55",
-          __typename: "BsffPackaging",
-        },
-      ],
+          __typename: "BsffPackaging"
+        }
+      ]
     } as unknown as Bsff;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -96,13 +96,13 @@ describe("ActBsffValidation", () => {
       packagings: [
         {
           numero: "F55",
-          __typename: "BsffPackaging",
+          __typename: "BsffPackaging"
         },
         {
           numero: "4",
-          __typename: "BsffPackaging",
-        },
-      ],
+          __typename: "BsffPackaging"
+        }
+      ]
     } as unknown as Bsff;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -131,7 +131,7 @@ describe("ActBsffValidation", () => {
   it("renders PartiallyRefused modal", async () => {
     const partiallyRefusedBsff = {
       ...bsd,
-      bsffStatus: "PARTIALLY_REFUSED",
+      bsffStatus: "PARTIALLY_REFUSED"
     } as Bsff;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>

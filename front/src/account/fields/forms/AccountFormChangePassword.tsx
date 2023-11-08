@@ -1,13 +1,13 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import { useMutation, gql } from "@apollo/client";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import PasswordHelper from "common/components/PasswordHelper";
+import RedErrorMessage from "../../../common/components/RedErrorMessage";
+import PasswordHelper from "../../../common/components/PasswordHelper";
 import styles from "./AccountForm.module.scss";
 import { object, string } from "yup";
-import { MutationChangePasswordArgs, Mutation } from "generated/graphql/types";
+import { MutationChangePasswordArgs, Mutation } from "codegen-ui";
 import classNames from "classnames";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+import { NotificationError } from "../../../Apps/common/Components/Error/Error";
 
 type Props = {
   toggleEdition: () => void;
@@ -32,14 +32,14 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
   >(CHANGE_PASSWORD, {
     onCompleted: () => {
       toggleEdition();
-    },
+    }
   });
 
   const validate = (values: V) => {
     if (values.newPassword !== values.newPasswordConfirmation) {
       return {
         newPasswordConfirmation:
-          "Les deux mots de passe ne sont pas identiques.",
+          "Les deux mots de passe ne sont pas identiques."
       };
     }
   };
@@ -47,13 +47,13 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
   const yupSchema = object().shape({
     oldPassword: string().required(),
     newPassword: string().required(),
-    newPasswordConfirmation: string().required(),
+    newPasswordConfirmation: string().required()
   });
 
   const initialValues: V = {
     oldPassword: "",
     newPassword: "",
-    newPasswordConfirmation: "",
+    newPasswordConfirmation: ""
   };
 
   return (

@@ -1,11 +1,11 @@
 import React from "react";
-import TdSwitch from "common/components/Switch";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
+import TdSwitch from "../../../../common/components/Switch";
+import { isForeignVat } from "shared/constants";
 import {
   BsdaTransporterInput,
   BsdasriTransporterInput,
-  BsvhuTransporterInput,
-} from "generated/graphql/types";
+  BsvhuTransporterInput
+} from "codegen-ui";
 
 /**
  * Switch for BSDA, BSVHU and BSDASRI
@@ -13,7 +13,7 @@ import {
 export default function TransporterReceiptEditionSwitch({
   transporter,
   disabled,
-  setFieldValue,
+  setFieldValue
 }: {
   transporter:
     | BsdaTransporterInput
@@ -39,7 +39,5 @@ export default function TransporterReceiptEditionSwitch({
         />
       </div>
     </>
-  ) : (
-    <></>
-  );
+  ) : null;
 }

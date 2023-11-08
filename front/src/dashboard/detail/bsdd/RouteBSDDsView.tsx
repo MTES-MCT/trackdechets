@@ -1,12 +1,12 @@
 import React from "react";
 import BSDDetailContent from "./BSDDetailContent";
-import Loader from "Apps/common/Components/Loader/Loaders";
+import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { useQuery } from "@apollo/client";
-import { Query, QueryFormArgs } from "generated/graphql/types";
+import { Query, QueryFormArgs } from "codegen-ui";
 import { useParams } from "react-router-dom";
-import { GET_DETAIL_FORM } from "Apps/common/queries";
-import { InlineError } from "Apps/common/Components/Error/Error";
-import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
+import { GET_DETAIL_FORM } from "../../../Apps/common/queries";
+import { InlineError } from "../../../Apps/common/Components/Error/Error";
+import EmptyDetail from "../common/EmptyDetailView";
 
 export function RouteBSDDsView() {
   const { id: formId } = useParams<{ id: string }>();
@@ -15,10 +15,10 @@ export function RouteBSDDsView() {
     {
       variables: {
         id: formId,
-        readableId: null,
+        readableId: null
       },
       skip: !formId,
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     }
   );
 

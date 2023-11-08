@@ -3,8 +3,8 @@ import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import { object, string } from "yup";
-import { User, MutationEditProfileArgs } from "generated/graphql/types";
-import { SSTI_CHARS } from "generated/constants";
+import { User, MutationEditProfileArgs } from "codegen-ui";
+import { SSTI_CHARS } from "shared/constants";
 type Me = Pick<User, "name">;
 
 type Props = {
@@ -17,7 +17,7 @@ AccountFieldName.fragments = {
       id
       name
     }
-  `,
+  `
 };
 
 const UPDATE_NAME = gql`
@@ -36,7 +36,7 @@ const yupSchema = object().shape({
     function (value) {
       return !SSTI_CHARS.some(char => value?.includes(char));
     }
-  ),
+  )
 });
 
 export default function AccountFieldName({ me }: Props) {

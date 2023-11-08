@@ -6,7 +6,7 @@ import { startUpdatesConsumer } from "./consumer";
 import { sseHandler } from "./handlers/sse";
 
 const UI_BASE_URL = getUIBaseURL();
-const port = process.env.NOTIFIER_PORT || 82;
+const port = parseInt(process.env.NOTIFIER_PORT ?? "82", 10);
 
 export const sseApp = express();
 
@@ -24,6 +24,6 @@ sseApp.get("/updates/:siret", sseHandler);
 
 startUpdatesConsumer();
 
-sseApp.listen(port, () =>
-  console.info(`Updates server is running on port ${port}`)
+sseApp.listen(port, "0.0.0.0", () =>
+  console.info(`TD notifier server is running on port ${port}`)
 );

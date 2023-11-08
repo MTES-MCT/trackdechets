@@ -43,19 +43,23 @@ describe("renderFormRefusedEmail", () => {
       { email: destination.user.email, name: destination.user.name }
     ]);
     expect(email!.body).toContain(`<p>
-  Nous vous informons que la société ${destination.company.name} (${destination.company.siret}) a refusé le
-  2 janvier 2022, le déchet de la
-  société suivante :
+  Nous vous informons que la société ${destination.company.name}
+  (${destination.company.siret}) a refusé le 2 janvier 2022, le déchet de
+  la société suivante :
 </p>
 <br />
 <ul>
-  <li>${emitter.company.name} (${emitter.company.siret}) - ${emitter.company.address}</li>
+  <li>
+    ${emitter.company.name} (${emitter.company.siret}) -
+    ${emitter.company.address}
+  </li>
   <li>Informations relatives aux déchets refusés :</li>
   <ul>
     <li>Numéro du BSD: ${form.readableId}</li>
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
-    <li>Motif de refus :
+    <li>
+      Motif de refus :
       <span>${form.wasteRefusalReason}</span>`);
   });
 
@@ -119,20 +123,24 @@ describe("renderFormRefusedEmail", () => {
       { email: destination.user.email, name: destination.user.name }
     ]);
     expect(email!.body).toContain(`<p>
-  Nous vous informons que la société ${form.recipientCompanyName} (${form.recipientCompanySiret}) a refusé
-  partiellement le 2 janvier 2022, le
-  déchet de la société suivante :
+  Nous vous informons que la société ${form.recipientCompanyName}
+  (${form.recipientCompanySiret}) a refusé partiellement le 2 janvier 2022,
+  le déchet de la société suivante :
 </p>
 <br />
 <ul>
-  <li>${form.emitterCompanyName} (${form.emitterCompanySiret}) - ${form.emitterCompanyAddress}</li>
+  <li>
+    ${form.emitterCompanyName} (${form.emitterCompanySiret}) -
+    ${form.emitterCompanyAddress}
+  </li>
   <li>Informations relatives aux déchets refusés :</li>
   <ul>
     <li>Numéro du BSD : ${form.readableId}</li>
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
     <li>Quantité acceptée: ${form.quantityReceived} tonnes</li>
-    <li>Motif de refus :
+    <li>
+      Motif de refus :
       <span>${form.wasteRefusalReason}</span>`);
   });
 
@@ -172,19 +180,23 @@ describe("renderFormRefusedEmail", () => {
     ]);
     expect(email!.cc).toEqual([{ email: ttr.user.email, name: ttr.user.name }]);
     expect(email!.body).toContain(`<p>
-  Nous vous informons que la société ${ttr.company.name} (${ttr.company.siret}) a refusé le
-  2 janvier 2022, le déchet de la
-  société suivante :
+  Nous vous informons que la société ${ttr.company.name}
+  (${ttr.company.siret}) a refusé le 2 janvier 2022, le déchet de
+  la société suivante :
 </p>
 <br />
 <ul>
-  <li>${emitter.company.name} (${emitter.company.siret}) - ${emitter.company.address}</li>
+  <li>
+    ${emitter.company.name} (${emitter.company.siret}) -
+    ${emitter.company.address}
+  </li>
   <li>Informations relatives aux déchets refusés :</li>
   <ul>
     <li>Numéro du BSD: ${form.readableId}</li>
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
-    <li>Motif de refus :
+    <li>
+      Motif de refus :
       <span>${form.wasteRefusalReason}</span>`);
   });
 
@@ -234,23 +246,23 @@ describe("renderFormRefusedEmail", () => {
       { email: ttr.user.email, name: ttr.user.name }
     ]);
     expect(email!.body).toContain(`<p>
-  Nous vous informons que la société ${destination.company.name} (${
-      destination.company.siret
-    }) a refusé le
-  2 janvier 2022, le déchet de la
-  société suivante :
+  Nous vous informons que la société ${destination.company.name}
+  (${destination.company.siret}) a refusé le 2 janvier 2022, le déchet de
+  la société suivante :
 </p>
 <br />
 <ul>
-  <li>${emitter.company.name} (${emitter.company.siret}) - ${
-      emitter.company.address
-    }</li>
+  <li>
+    ${emitter.company.name} (${emitter.company.siret}) -
+    ${emitter.company.address}
+  </li>
   <li>Informations relatives aux déchets refusés :</li>
   <ul>
     <li>Numéro du BSD: ${form.readableId}</li>
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
-    <li>Motif de refus :
+    <li>
+      Motif de refus :
       <span>${forwardedIn!.wasteRefusalReason}</span>`);
   });
 });

@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  isForeignVat,
-  isSiret,
-  isVat
-} from "../constants/companySearchHelpers";
+import { isForeignVat, isSiret, isVat } from "shared/constants";
 import {
   isCollector,
   isTransporter,

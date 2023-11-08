@@ -6,7 +6,7 @@ import {
   RevisionRequestStatus
 } from "@prisma/client";
 import * as yup from "yup";
-import { BSDA_WASTE_CODES } from "../../../../common/constants/WASTES";
+import { BSDA_WASTE_CODES } from "shared/constants";
 import { checkIsAuthenticated } from "../../../../common/permissions";
 import { INVALID_WASTE_CODE } from "../../../../forms/errors";
 import {

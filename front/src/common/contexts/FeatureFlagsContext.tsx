@@ -24,7 +24,7 @@ export function useFeatureFlags() {
 
 export function FeatureFlagsProvider({
   children,
-  defaultFeatureFlags,
+  defaultFeatureFlags
 }: InterfaceFeatureFlags) {
   const [featureFlags, setFeatureFlags] =
     useState<InterfaceFlags>(defaultFeatureFlags);

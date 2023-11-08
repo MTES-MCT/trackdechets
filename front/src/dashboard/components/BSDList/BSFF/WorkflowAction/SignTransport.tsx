@@ -8,24 +8,27 @@ import {
   Mutation,
   MutationSignBsffArgs,
   MutationUpdateBsffArgs,
-  TransportMode,
-} from "generated/graphql/types";
-import { RedErrorMessage } from "common/components";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
+  TransportMode
+} from "codegen-ui";
+import { RedErrorMessage } from "../../../../../common/components";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import {
+  SIGN_BSFF,
+  UPDATE_BSFF_FORM
+} from "../../../../../form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
-import { GET_BSDS } from "Apps/common/queries";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import TransporterReceipt from "form/common/components/company/TransporterReceipt";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
+import TransporterReceipt from "../../../../../form/common/components/company/TransporterReceipt";
 import { subMonths } from "date-fns";
-import TagsInput from "common/components/tags-input/TagsInput";
+import TagsInput from "../../../../../common/components/tags-input/TagsInput";
 
 const validationSchema = yup.object({
   takenOverAt: yup.date().required("La date de prise en charge est requise"),
   signatureAuthor: yup
     .string()
     .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis")
 });
 
 interface SignTransportFormProps {
@@ -51,7 +54,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
       initialValues={{
         signatureAuthor: "",
         takenOverAt: TODAY.toISOString(),
-        transporterTransportPlates: bsff.transporter?.transport?.plates,
+        transporterTransportPlates: bsff.transporter?.transport?.plates
       }}
       validationSchema={validationSchema}
       onSubmit={async values => {
@@ -63,11 +66,11 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
                 transport: {
                   takenOverAt: values.takenOverAt,
                   plates: values.transporterTransportPlates,
-                  mode: bsff.transporter?.transport?.mode ?? TransportMode.Road,
-                },
-              },
-            },
-          },
+                  mode: bsff.transporter?.transport?.mode ?? TransportMode.Road
+                }
+              }
+            }
+          }
         });
         await signBsff({
           variables: {
@@ -75,9 +78,9 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
             input: {
               type: BsffSignatureType.Transport,
               author: values.signatureAuthor,
-              date: values.takenOverAt,
-            },
-          },
+              date: values.takenOverAt
+            }
+          }
         });
         onCancel();
       }}
@@ -171,7 +174,7 @@ export function SignTransport({
   bsffId,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton,
+  displayActionButton
 }: SignTransportProps) {
   return (
     <SignBsff

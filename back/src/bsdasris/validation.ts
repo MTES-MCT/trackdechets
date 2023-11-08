@@ -11,7 +11,7 @@ import {
   DASRI_ALL_OPERATIONS_CODES,
   DASRI_PROCESSING_OPERATIONS_CODES,
   DASRI_GROUPING_OPERATIONS_CODES
-} from "../common/constants";
+} from "shared/constants";
 import configureYup from "../common/yup/configureYup";
 import prisma from "../prisma";
 import {
@@ -731,7 +731,7 @@ export const select = (arr: string[], truthTable: boolean[]): string[] =>
 /**
  * Return wich operation requires the given path to be filled
  */
-export const getRequiredFor = (path: string) => {
+export const getRequiredFor = (path: string | undefined) => {
   const emission = Object.keys(
     emitterSchema({}).concat(emissionSchema({})).describe().fields
   );
@@ -744,7 +744,7 @@ export const getRequiredFor = (path: string) => {
 
   const operation = Object.keys(operationSchema({}).describe().fields);
   const truthTable = [emission, transport, reception, operation].map(el =>
-    el.includes(path)
+    path ? el.includes(path) : false
   );
   const steps = [
     "EMISSION",

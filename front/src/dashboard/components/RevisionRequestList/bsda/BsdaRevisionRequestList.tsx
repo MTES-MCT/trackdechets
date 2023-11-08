@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
-import { Query, QueryBsdaRevisionRequestsArgs } from "generated/graphql/types";
+import { Query, QueryBsdaRevisionRequestsArgs } from "codegen-ui";
 import { GET_BSDA_REVISION_REQUESTS } from "../../../../Apps/common/queries/reviews/BsdaReviewQuery";
 import { useParams } from "react-router-dom";
-import { Loader } from "Apps/common/Components";
+import { Loader } from "../../../../Apps/common/Components";
 import { BsdaRevisionRequestTable } from "./BsdaRevisionRequestTable";
 import buildUpdateQueryFn from "../fetchMore";
 export function BsdaRevisionRequestList() {
@@ -14,9 +14,9 @@ export function BsdaRevisionRequestList() {
     QueryBsdaRevisionRequestsArgs
   >(GET_BSDA_REVISION_REQUESTS, {
     variables: {
-      siret,
+      siret
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-and-network"
   });
   useEffect(() => {
     fetchRevisions();
@@ -40,13 +40,13 @@ export function BsdaRevisionRequestList() {
             onClick={() =>
               fetchMore({
                 variables: {
-                  after: data?.bsdaRevisionRequests.pageInfo.endCursor,
+                  after: data?.bsdaRevisionRequests.pageInfo.endCursor
                 },
 
                 updateQuery: (prev, { fetchMoreResult }) =>
                   buildUpdateQueryFn("bsdaRevisionRequests")(prev, {
-                    fetchMoreResult,
-                  }),
+                    fetchMoreResult
+                  })
               })
             }
           >

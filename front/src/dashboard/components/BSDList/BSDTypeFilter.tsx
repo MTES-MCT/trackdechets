@@ -1,38 +1,38 @@
 import * as React from "react";
 import { FilterProps } from "react-table";
-import { Bsd, BsdType } from "generated/graphql/types";
-import Select from "Apps/common/Components/Select/Select";
+import { Bsd, BsdType } from "codegen-ui";
+import Select from "../../../Apps/common/Components/Select/Select";
 import "./BSDTypeFilter.scss";
 
 const OPTIONS = [
   {
     value: BsdType.Bsdd,
-    label: "Déchets Dangereux",
+    label: "Déchets Dangereux"
   },
   {
     value: BsdType.Bsdasri,
-    label: "Déchets d'Activités de Soins à Risque Infectieux",
+    label: "Déchets d'Activités de Soins à Risque Infectieux"
   },
   {
     value: BsdType.Bsvhu,
-    label: "Véhicules Hors d'Usage",
+    label: "Véhicules Hors d'Usage"
   },
   {
     value: BsdType.Bsff,
-    label: "Déchets de Fluides Frigorigènes",
+    label: "Déchets de Fluides Frigorigènes"
   },
   {
     value: BsdType.Bsda,
-    label: "Déchets d'Amiante",
-  },
+    label: "Déchets d'Amiante"
+  }
 ];
 
 export function BSDTypeFilter({
   column: {
     // by default all types are returned so they're kinda "all checked"
     filterValue = OPTIONS,
-    setFilter,
-  },
+    setFilter
+  }
 }: FilterProps<Bsd>) {
   const [selected, setSelected] = React.useState(filterValue);
 

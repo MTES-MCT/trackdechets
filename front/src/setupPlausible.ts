@@ -11,7 +11,7 @@ if (!isDevelopment) {
       // Var d'ENV représentant l'identifiant de l'application sur Plausible
       domain: plausibleDomain,
       // URL de l'application Plausible self-hosted
-      apiHost: "https://plausible.trackdechets.beta.gouv.fr",
+      apiHost: "https://plausible.trackdechets.beta.gouv.fr"
     });
 
     enableAutoPageviews();

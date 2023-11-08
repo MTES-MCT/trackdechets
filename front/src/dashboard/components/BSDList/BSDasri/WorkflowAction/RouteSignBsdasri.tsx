@@ -1,5 +1,5 @@
 import React from "react";
-import { RedErrorMessage } from "common/components";
+import { RedErrorMessage } from "../../../../../common/components";
 import {
   Mutation,
   Query,
@@ -7,32 +7,35 @@ import {
   QueryBsdasriArgs,
   BsdasriSignatureType,
   MutationUpdateBsdasriArgs,
-  Bsdasri,
-} from "generated/graphql/types";
+  Bsdasri
+} from "codegen-ui";
 import {
   NotificationError,
-  InlineError,
-} from "Apps/common/Components/Error/Error";
-import {
-  ExtraSignatureType,
-  SignatureType,
-} from "dashboard/components/BSDList/BSDasri/types";
-import Loader from "Apps/common/Components/Loader/Loaders";
+  InlineError
+} from "../../../../../Apps/common/Components/Error/Error";
+import { ExtraSignatureType, SignatureType } from "../types";
+import Loader from "../../../../../Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
 import {
   useParams,
   useHistory,
   generatePath,
-  useRouteMatch,
+  useRouteMatch
 } from "react-router-dom";
-import { GET_DETAIL_DASRI_WITH_METADATA, GET_BSDS } from "Apps/common/queries";
+import {
+  GET_DETAIL_DASRI_WITH_METADATA,
+  GET_BSDS
+} from "../../../../../Apps/common/queries";
 
-import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
+import EmptyDetail from "../../../../detail/common/EmptyDetailView";
 import { Formik, Field, Form } from "formik";
-import { SIGN_BSDASRI, UPDATE_BSDASRI } from "form/bsdasri/utils/queries";
+import {
+  SIGN_BSDASRI,
+  UPDATE_BSDASRI
+} from "../../../../../form/bsdasri/utils/queries";
 
-import { getComputedState } from "form/common/getComputedState";
-import getInitialState from "form/bsdasri/utils/initial-state";
+import { getComputedState } from "../../../../../form/common/getComputedState";
+import getInitialState from "../../../../../form/bsdasri/utils/initial-state";
 import { signatureValidationSchema, prefillWasteDetails } from "./utils";
 import {
   EmitterSignatureForm,
@@ -40,12 +43,12 @@ import {
   SynthesisTransportSignatureForm,
   ReceptionSignatureForm,
   OperationSignatureForm,
-  removeSections,
+  removeSections
 } from "./PartialForms";
-import routes from "Apps/routes";
+import routes from "../../../../../Apps/routes";
 
-import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import { BdasriSummary } from "../Summary/BsdasriSummary";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 
 const forms = {
@@ -57,7 +60,7 @@ const forms = {
   [ExtraSignatureType.SynthesisTakeOver]: SynthesisTransportSignatureForm,
 
   [BsdasriSignatureType.Reception]: ReceptionSignatureForm,
-  [BsdasriSignatureType.Operation]: OperationSignatureForm,
+  [BsdasriSignatureType.Operation]: OperationSignatureForm
 };
 
 const UpdateForm = ({ signatureType }) => {
@@ -78,45 +81,45 @@ const settings: {
         : "Signature producteur",
     signatureType: BsdasriSignatureType.Emission,
     validationText:
-      "En signant, je confirme la remise du déchet au transporteur.",
+      "En signant, je confirme la remise du déchet au transporteur."
   },
   [ExtraSignatureType.SynthesisTakeOver]: {
     getLabel: () => "Signature bordereau de synthèse",
     signatureType: BsdasriSignatureType.Transport,
     validationText:
-      "En signant, je valide l'emport du bsd de synthèse et des bordereaux associés. Les bordereaux associés ne sont plus modifiables.",
+      "En signant, je valide l'emport du bsd de synthèse et des bordereaux associés. Les bordereaux associés ne sont plus modifiables."
   },
 
   [BsdasriSignatureType.Transport]: {
     getLabel: () => "Signature transporteur",
     signatureType: BsdasriSignatureType.Transport,
-    validationText: "En signant, je confirme l'emport du déchet.",
+    validationText: "En signant, je confirme l'emport du déchet."
   },
   [ExtraSignatureType.DirectTakeover]: {
     getLabel: () => "Emport direct transporteur",
     signatureType: BsdasriSignatureType.Transport,
     validationText: `L'émetteur de bordereau a autorisé son emport direct, en tant que
     transporteur vous pouvez donc emporter le déchet concerné.
-    En signant, je confirme l'emport du déchet. La signature est horodatée.`,
+    En signant, je confirme l'emport du déchet. La signature est horodatée.`
   },
 
   [BsdasriSignatureType.Reception]: {
     getLabel: () => "Signature réception",
     signatureType: BsdasriSignatureType.Reception,
     validationText:
-      "En signant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau.",
+      "En signant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau."
   },
 
   [BsdasriSignatureType.Operation]: {
     getLabel: () => "Signature traitement",
     signatureType: BsdasriSignatureType.Operation,
     validationText:
-      "En signant, je confirme le traitement des déchets pour la quantité indiquée dans ce bordereau.",
-  },
+      "En signant, je confirme le traitement des déchets pour la quantité indiquée dans ce bordereau."
+  }
 };
 
 export function RouteSignBsdasri({
-  UIsignatureType,
+  UIsignatureType
 }: {
   UIsignatureType: SignatureType;
 }) {
@@ -128,8 +131,8 @@ export function RouteSignBsdasri({
     : routes.dashboardv2.transport.toCollect;
   const transporterTab = {
     pathname: generatePath(transporterTabRoute, {
-      siret,
-    }),
+      siret
+    })
   };
 
   // in most cases, goBack works, but for combined signature (pred+transporter), it leads to an infinite loop
@@ -144,9 +147,9 @@ export function RouteSignBsdasri({
     QueryBsdasriArgs
   >(GET_DETAIL_DASRI_WITH_METADATA, {
     variables: {
-      id: formId,
+      id: formId
     },
-    fetchPolicy: "no-cache",
+    fetchPolicy: "no-cache"
   });
   const [updateBsdasri, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsdasri">,
@@ -182,7 +185,7 @@ export function RouteSignBsdasri({
       <Formik
         initialValues={{
           ...formState,
-          signature: { author: "", date: TODAY.toISOString() },
+          signature: { author: "", date: TODAY.toISOString() }
         }}
         validationSchema={() => signatureValidationSchema}
         onSubmit={async values => {
@@ -192,23 +195,23 @@ export function RouteSignBsdasri({
             variables: {
               id: id,
               input: {
-                ...removeSections(rest, UIsignatureType),
-              },
-            },
+                ...removeSections(rest, UIsignatureType)
+              }
+            }
           });
 
           await signBsdasri({
             variables: {
               id: bsdasri.id,
-              input: { ...signature, type: config.signatureType },
+              input: { ...signature, type: config.signatureType }
             },
             refetchQueries: [GET_BSDS],
-            awaitRefetchQueries: true,
+            awaitRefetchQueries: true
           });
           nextPage();
         }}
       >
-        {({ isSubmitting, handleReset, errors }) => {
+        {({ isSubmitting, handleReset }) => {
           return (
             <Form>
               <div className="notification success">

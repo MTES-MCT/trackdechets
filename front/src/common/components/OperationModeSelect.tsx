@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo } from "react";
 import { Field, Form, useFormikContext } from "formik";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import { RadioButton } from "../../form/common/components/custom-inputs/RadioButton";
 import RedErrorMessage from "./RedErrorMessage";
 import {
   getOperationModeLabel,
-  getOperationModesFromOperationCode,
-} from "common/operationModes";
+  getOperationModesFromOperationCode
+} from "../operationModes";
 import Tooltip from "./Tooltip";
-import { deepValue } from "dashboard/detail/common/utils";
+import { deepValue } from "../../dashboard/detail/common/utils";
 
 const OperationModeSelect = ({ operationCode, name }) => {
   const { setFieldValue, values } = useFormikContext();

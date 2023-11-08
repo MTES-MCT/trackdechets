@@ -1,16 +1,18 @@
 import React, { lazy, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { Field, useFormikContext } from "formik";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import Packagings from "form/bsda/components/packagings/Packagings";
-import { getBsdaEditionDisabledSteps } from "form/bsda/utils/getBsdaEditionDisabledSteps";
-import Tooltip from "common/components/Tooltip";
-import { Bsda, BsdaConsistence, BsdaType } from "generated/graphql/types";
-import { FieldSwitch } from "common/components";
-import { BSDA_WASTES } from "generated/constants";
-import { BsdaContext } from "form/bsda/FormContainer";
-import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
-const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
+import NumberInput from "../../../common/components/custom-inputs/NumberInput";
+import Packagings from "../../components/packagings/Packagings";
+import { getBsdaEditionDisabledSteps } from "../../utils/getBsdaEditionDisabledSteps";
+import Tooltip from "../../../../common/components/Tooltip";
+import { Bsda, BsdaConsistence, BsdaType } from "codegen-ui";
+import { FieldSwitch } from "../../../../common/components";
+import { BSDA_WASTES } from "shared/constants";
+import { BsdaContext } from "../../FormContainer";
+import EstimatedQuantityTooltip from "../../../../common/components/EstimatedQuantityTooltip";
+const TagsInput = lazy(
+  () => import("../../../../common/components/tags-input/TagsInput")
+);
 
 export function WasteInfo({ disabled }) {
   const bsdaContext = useContext(BsdaContext);

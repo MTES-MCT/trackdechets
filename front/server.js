@@ -1,5 +1,4 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
 const helmet = require("helmet");
 const path = require("path");
@@ -12,7 +11,7 @@ const SENTRY_DSN = process.env.VITE_SENTRY_DSN;
 const DEFAULT_SRC = [
   "'self'",
   "*.trackdechets.beta.gouv.fr",
-  "*.trackdechets.fr",
+  "*.trackdechets.fr"
 ];
 
 const CONNECT_SRC = [
@@ -20,7 +19,7 @@ const CONNECT_SRC = [
   "https://api-adresse.data.gouv.fr",
   "https://sentry.incubateur.net",
   "https://openmaptiles.geo.data.gouv.fr",
-  "https://openmaptiles.github.io",
+  "https://openmaptiles.github.io"
 ];
 
 const WORKER_SRC = ["blob:"]; // needed for MapBox
@@ -28,7 +27,7 @@ const WORKER_SRC = ["blob:"]; // needed for MapBox
 app.use(
   helmet({
     frameguard: {
-      action: "deny",
+      action: "deny"
     },
     crossOriginEmbedderPolicy: false,
     contentSecurityPolicy: {
@@ -44,16 +43,16 @@ app.use(
         imgSrc: ["'self'", "data:", "http:"], // allow oauth applications logos
         scriptSrc: ["'self'", "https:", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "https:", "'unsafe-inline'"],
-        mediaSrc: ["'self'", "data:"],
-      },
-    },
+        mediaSrc: ["'self'", "data:"]
+      }
+    }
   })
 );
 
-const directory = "/" + (process.env.STATIC_DIR || "build");
-app.use(express.static(__dirname + directory));
+const directory = path.join(__dirname, "../dist/front");
+app.use(express.static(directory));
 
-const pathToIndex = path.join(__dirname, directory, "index.html");
+const pathToIndex = path.join(directory, "index.html");
 
 const raw = fs.readFileSync(pathToIndex, "utf8");
 const indexContent =
@@ -64,7 +63,7 @@ const indexContent =
       )
     : raw;
 
-app.use(bodyParser.text());
+app.use(express.text());
 
 // Sentry tunnel to deal with ad blockers
 // https://docs.sentry.io/platforms/javascript/troubleshooting/#using-the-tunnel-option
@@ -82,7 +81,7 @@ app.post("/sentry", async function (req, res) {
     const sentryIngestURL = `https://${host}/api/${projectId}/envelope/`;
     const sentryResponse = await fetch(sentryIngestURL, {
       method: "POST",
-      body: envelope,
+      body: envelope
     });
     // Relay response from Sentry servers to front end
     sentryResponse.headers.forEach(h => res.setHeader(h[0], h[1]));

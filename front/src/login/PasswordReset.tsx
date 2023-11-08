@@ -3,19 +3,15 @@ import { useMutation, useQuery, gql } from "@apollo/client";
 import * as yup from "yup";
 import * as queryString from "query-string";
 import { useLocation, Link } from "react-router-dom";
-import { decodeHash } from "common/helper";
-import {
-  Mutation,
-  MutationResetPasswordArgs,
-  Query,
-} from "../generated/graphql/types";
-import Loader from "Apps/common/Components/Loader/Loaders";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+import { decodeHash } from "../common/helper";
+import { Mutation, MutationResetPasswordArgs, Query } from "codegen-ui";
+import Loader from "../Apps/common/Components/Loader/Loaders";
+import { NotificationError } from "../Apps/common/Components/Error/Error";
 import { Formik, Form, Field } from "formik";
-import PasswordHelper from "common/components/PasswordHelper";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import { IconLock1, IconView } from "Apps/common/Components/Icons/Icons";
-import routes from "Apps/routes";
+import PasswordHelper from "../common/components/PasswordHelper";
+import RedErrorMessage from "../common/components/RedErrorMessage";
+import { IconLock1, IconView } from "../Apps/common/Components/Icons/Icons";
+import routes from "../Apps/routes";
 
 const PASSWORD_RESET_REQUEST = gql`
   query PasswordResetRequest($hash: String!) {
@@ -41,9 +37,9 @@ export default function PasswordReset() {
   const {
     loading,
     error: queryError,
-    data: queryData,
+    data: queryData
   } = useQuery<Pick<Query, "passwordResetRequest">>(PASSWORD_RESET_REQUEST, {
-    variables: { hash },
+    variables: { hash }
   });
 
   // UPDATE PASSWORD MUTATION
@@ -85,14 +81,14 @@ export default function PasswordReset() {
   return (
     <Formik
       initialValues={{
-        password: "",
+        password: ""
       }}
       validationSchema={yup.object().shape({
         password: yup
           .string()
           .required("Le mot de passe est un champ requis")
           .min(10, "Le mot de passe doit faire au moins 10 caractères")
-          .max(64, "Le mot de passe doit faire au maximum 64 caractères"),
+          .max(64, "Le mot de passe doit faire au maximum 64 caractères")
       })}
       onSubmit={(values, { setSubmitting }) => {
         const { password } = values;

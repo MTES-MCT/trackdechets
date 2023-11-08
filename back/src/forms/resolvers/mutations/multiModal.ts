@@ -23,7 +23,7 @@ import { checkUserPermissions, Permission } from "../../../permissions";
 import {
   PartialTransporterCompany,
   getTransporterCompanyOrgId
-} from "../../../common/constants/companySearchHelpers";
+} from "shared/constants";
 import { MISSING_COMPANY_SIRET_OR_VAT } from "../../errors";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getTransporters } from "../../database";

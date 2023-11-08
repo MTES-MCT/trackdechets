@@ -5,11 +5,11 @@ import {
   TableCell,
   TableHead,
   TableHeaderCell,
-  TableRow,
-} from "common/components";
-import { Loader } from "Apps/common/Components";
-import { GET_BSDAS } from "form/bsda/stepper/queries";
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
+  TableRow
+} from "../../../../common/components";
+import { Loader } from "../../../../Apps/common/Components";
+import { GET_BSDAS } from "../../stepper/queries";
+import { getInitialCompany } from "../../../bsdd/utils/initial-state";
 import { FieldArray, useFormikContext } from "formik";
 import {
   Bsda,
@@ -18,8 +18,8 @@ import {
   BsdaStatus,
   PageInfo,
   Query,
-  QueryBsdasArgs,
-} from "generated/graphql/types";
+  QueryBsdasArgs
+} from "codegen-ui";
 import React from "react";
 import { useParams } from "react-router-dom";
 import initialState from "../../stepper/initial-state";
@@ -41,16 +41,16 @@ export function BsdaPicker({ name, bsdaId }: Props) {
           forwardedIn: { _eq: null },
           destination: {
             operation: { code: codeFilter },
-            company: { siret: { _eq: siret } },
-          },
-        },
+            company: { siret: { _eq: siret } }
+          }
+        }
       },
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     }
   );
   const {
     values: { forwarding, grouping },
-    setFieldValue,
+    setFieldValue
   } = useFormikContext<BsdaInput>();
 
   const isForwardingPicker = name === "forwarding";
@@ -170,7 +170,7 @@ export function BsdaPicker({ name, bsdaId }: Props) {
               push(bsda.id);
               onGroupingChange([
                 ...bsdas.filter(b => grouping?.includes(b.id)),
-                bsda,
+                bsda
               ]);
             }
           }}
@@ -202,7 +202,7 @@ function PickerTable({
   pickerType,
   selected,
   fetchMore,
-  pageInfo,
+  pageInfo
 }: PickerTableProps) {
   return (
     <div>
@@ -258,11 +258,11 @@ function PickerTable({
                         bsda.destination?.operation?.nextDestination?.company
                           ?.name,
                         bsda.destination?.operation?.nextDestination?.company
-                          ?.siret,
+                          ?.siret
                       ]
                     : [
                         bsda.destination?.company?.name,
-                        bsda.destination?.company?.siret,
+                        bsda.destination?.company?.siret
                       ]
                   )
                     .filter(Boolean)
@@ -289,7 +289,7 @@ function LoadMoreButton({ pageInfo, fetchMore }) {
         onClick={() =>
           fetchMore({
             variables: {
-              after: pageInfo.endCursor,
+              after: pageInfo.endCursor
             },
             updateQuery: (prev, { fetchMoreResult }) => {
               if (fetchMoreResult == null) {
@@ -301,10 +301,10 @@ function LoadMoreButton({ pageInfo, fetchMore }) {
                 bsdas: {
                   ...prev.bsdas,
                   ...fetchMoreResult.bsdas,
-                  edges: prev.bsdas.edges.concat(fetchMoreResult.bsdas.edges),
-                },
+                  edges: prev.bsdas.edges.concat(fetchMoreResult.bsdas.edges)
+                }
               };
-            },
+            }
           })
         }
       >

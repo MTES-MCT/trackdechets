@@ -1,17 +1,17 @@
 import Tooltip from "../../../../common/components/Tooltip";
-import { IconClose } from "Apps/common/Components/Icons/Icons";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { IconClose } from "../../../../Apps/common/Components/Icons/Icons";
+import RedErrorMessage from "../../../../common/components/RedErrorMessage";
+import NumberInput from "../../../common/components/custom-inputs/NumberInput";
 import { Field, FieldArray, FieldProps, useFormikContext } from "formik";
 import {
   EmitterType,
   PackagingInfo,
-  Packagings as PackagingsEnum,
-} from "generated/graphql/types";
+  Packagings as PackagingsEnum
+} from "codegen-ui";
 import {
   PACKAGINGS_NAMES,
-  getPackagingInfosSummary,
-} from "form/bsdd/utils/packagings";
+  getPackagingInfosSummary
+} from "../../utils/packagings";
 import React, { InputHTMLAttributes, useMemo } from "react";
 import "./Packagings.scss";
 
@@ -78,7 +78,7 @@ export default function Packagings({
                                   event.target.value === PackagingsEnum.Autre
                                     ? p.other
                                     : "",
-                                quantity: p.quantity,
+                                quantity: p.quantity
                               });
                             }}
                           >
@@ -91,7 +91,7 @@ export default function Packagings({
                                   (value?.length > 1 &&
                                     ([
                                       PackagingsEnum.Citerne,
-                                      PackagingsEnum.Benne,
+                                      PackagingsEnum.Benne
                                     ].includes(optionValue) ||
                                       value.some(p =>
                                         [
@@ -100,7 +100,7 @@ export default function Packagings({
                                           ...(optionValue !==
                                           PackagingsEnum.Autre
                                             ? [optionValue]
-                                            : []),
+                                            : [])
                                         ].includes(p.type)
                                       )))
                                 }
@@ -130,7 +130,7 @@ export default function Packagings({
                             label={
                               [
                                 PackagingsEnum.Citerne,
-                                PackagingsEnum.Benne,
+                                PackagingsEnum.Benne
                               ].includes(p.type)
                                 ? "Quantité"
                                 : "Colis"
@@ -144,7 +144,7 @@ export default function Packagings({
                             max={
                               [
                                 PackagingsEnum.Citerne,
-                                PackagingsEnum.Benne,
+                                PackagingsEnum.Benne
                               ].includes(p.type)
                                 ? 2
                                 : undefined
@@ -176,7 +176,7 @@ export default function Packagings({
                 arrayHelpers.push({
                   type: PackagingsEnum.Autre,
                   other: "",
-                  quantity: 1,
+                  quantity: 1
                 })
               }
             >

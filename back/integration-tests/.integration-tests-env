@@ -1,7 +1,7 @@
 NODE_ENV=test
-DATABASE_URL='postgresql://test:no_pass@postgres:5432/prisma?schema=default$default'
+DATABASE_URL='postgresql://trackdechets:password@postgres:5432/prisma?schema=default$default'
 REDIS_URL=redis://redis:6379
-MONGO_URL=mongodb://test:no_pass@mongodb:27017
+MONGO_URL=mongodb://trackdechets:password@mongodb:27017
 SESSION_SECRET=any_secret
 API_TOKEN_SECRET=any_secret
 API_HOST=api.trackdechets.local

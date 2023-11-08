@@ -1,8 +1,8 @@
 import React from "react";
-import { ActionButton, Modal } from "common/components";
-import { IconView } from "Apps/common/Components/Icons/Icons";
-import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
-import { FormRevisionRequest } from "generated/graphql/types";
+import { ActionButton, Modal } from "../../../../../common/components";
+import { IconView } from "../../../../../Apps/common/Components/Icons/Icons";
+import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
+import { FormRevisionRequest } from "codegen-ui";
 import { DisplayRevision } from "./BsddApproveRevision";
 import { useRouteMatch } from "react-router-dom";
 
@@ -15,14 +15,14 @@ type Props = {
 export function BsddConsultRevision({
   review,
   isModalOpenFromParent,
-  onModalCloseFromParent,
+  onModalCloseFromParent
 }: Props) {
   const isV2Routes = !!useRouteMatch("/v2/dashboard/");
 
   if (isV2Routes && isModalOpenFromParent) {
     const formatRevisionAdapter = {
       ...review["review"],
-      form: { ...review },
+      form: { ...review }
     };
     return (
       <Modal

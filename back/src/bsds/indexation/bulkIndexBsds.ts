@@ -83,7 +83,7 @@ const getIndexDateString = (dateStr?: string) => {
 
   return dateObj
     .toISOString()
-    .replace(/\:/g, INDEX_DATETIME_SEPARATOR)
+    .replace(/:/g, INDEX_DATETIME_SEPARATOR)
     .toLowerCase();
 };
 

@@ -3,7 +3,7 @@ import {
   BsdStatusCode,
   BsdWithReview,
   ReviewStatusLabel,
-  WorkflowDisplayType,
+  WorkflowDisplayType
 } from "../common/types/bsdTypes";
 import { formatBsd } from "./bsdMapper";
 import {
@@ -14,8 +14,8 @@ import {
   EmitterType,
   Form,
   Maybe,
-  UserPermission,
-} from "../../generated/graphql/types";
+  UserPermission
+} from "codegen-ui";
 import {
   ACCEPTE,
   AJOUTER_ANNEXE_1,
@@ -52,9 +52,9 @@ import {
   VALIDER_RECEPTION,
   VALIDER_SYNTHESE_LABEL,
   VALIDER_TRAITEMENT,
-  completer_bsd_suite,
+  completer_bsd_suite
 } from "../common/wordings/dashboard/wordingsDashboard";
-import { BsdCurrentTab } from "Apps/common/types/commonTypes";
+import { BsdCurrentTab } from "../common/types/commonTypes";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
@@ -82,7 +82,10 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.Accepted:
       return ACCEPTE;
     case BsdStatusCode.Processed:
-      if (bsdType === BsdType.Bsff) {
+      if (
+        bsdType === BsdType.Bsff &&
+        (operationCode === "R12" || operationCode === "D13")
+      ) {
         return TRAITE_AVEC_RUPTURE_TRACABILITE;
       }
       return TRAITE;
@@ -167,6 +170,7 @@ const hasEmitterTransporterAndEcoOrgSiret = (
     bsd.emitter?.company?.siret,
     bsd.ecoOrganisme?.siret,
     bsd.transporter?.company?.siret,
+    bsd.transporter?.company?.orgId
   ].includes(siret);
 };
 
@@ -208,13 +212,17 @@ const hasTemporaryStorage = (currentSiret: string, bsd: BsdDisplay): boolean =>
   [
     bsd.destination?.company?.siret,
     bsd.temporaryStorageDetail?.transporter?.company?.siret,
-    bsd.temporaryStorageDetail?.transporter?.company?.orgId,
+    bsd.temporaryStorageDetail?.transporter?.company?.orgId
   ].includes(currentSiret);
 
 const isSameSiretTemporaryStorageTransporter = (
   currentSiret: string,
   bsd: BsdDisplay
-) => currentSiret === bsd.temporaryStorageDetail?.transporter?.company?.siret;
+) =>
+  [
+    bsd.temporaryStorageDetail?.transporter?.company?.siret,
+    bsd.temporaryStorageDetail?.transporter?.company?.orgId
+  ].includes(currentSiret);
 
 const isSameSiretTemporaryStorageDestination = (
   currentSiret: string,
@@ -257,7 +265,7 @@ export const isBsffSign = (
   currentSiret: string,
   bsdCurrentTab: BsdCurrentTab
 ) => {
-  const isActTab = bsdCurrentTab === "actTab";
+  const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
   return isBsff(bsd.type) && !isActTab && isSameSiretEmmiter(currentSiret, bsd);
 };
 
@@ -273,7 +281,7 @@ export const getIsNonDraftLabel = (
   permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
-  const isActTab = bsdCurrentTab === "actTab";
+  const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
   const isFollowTab = bsdCurrentTab === "followTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
 
@@ -420,13 +428,16 @@ export const getSealedBtnLabel = (
     if (isSignEmission(currentSiret, bsd, hasAutomaticSignature)) {
       const emitterSirets = [
         bsd.emitter?.company?.siret,
-        bsd.ecoOrganisme?.siret,
+        bsd.ecoOrganisme?.siret
       ];
       const currentUserIsEmitter = emitterSirets.includes(currentSiret);
       if (currentUserIsEmitter) {
         return SIGNER;
       }
       return FAIRE_SIGNER;
+    }
+    if (isSameSiretEmmiter(currentSiret, bsd)) {
+      return SIGNER;
     }
     if (hasEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
       return FAIRE_SIGNER;
@@ -447,7 +458,7 @@ export const getSentBtnLabel = (
   permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
-  const isActTab = bsdCurrentTab === "actTab";
+  const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
 
   if (hasRoadControlButton(bsd, isCollectedTab)) {
@@ -513,7 +524,7 @@ export const getReceivedBtnLabel = (
   permissions: UserPermission[],
   bsdCurrentTab: BsdCurrentTab
 ): string => {
-  const isActTab = bsdCurrentTab === "actTab";
+  const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
 
   if (
     isBsdasri(bsd.type) &&
@@ -557,7 +568,10 @@ export const getReceivedBtnLabel = (
     isSameSiretDestination(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
-    // ajouter bsff status received with packagings see dashboard/components/BSDList/BSFF/WorkflowAction/WorkflowAction.tsx
+    if (bsd.packagings?.length === 1) {
+      return VALIDER_ACCEPTATION;
+    }
+
     return SIGNATURE_ACCEPTATION_CONTENANT;
   }
 
@@ -695,6 +709,9 @@ export const getResealedBtnLabel = (
     permissions.includes(UserPermission.BsdCanSignEmission)
   ) {
     if (isSameSiretEmmiter(currentSiret, bsd)) {
+      return SIGNER;
+    }
+    if (currentSiret === bsd.destination?.company?.siret) {
       return SIGNER;
     }
     return FAIRE_SIGNER;
@@ -964,7 +981,7 @@ const canUpdateBsdd = bsd =>
   [
     BsdStatusCode.Draft,
     BsdStatusCode.Sealed,
-    BsdStatusCode.SignedByProducer,
+    BsdStatusCode.SignedByProducer
   ].includes(bsd.status);
 
 const canDeleteBsdd = bsd =>
@@ -1047,7 +1064,7 @@ const canUpdateBsda = bsd =>
   ![
     BsdStatusCode.Processed,
     BsdStatusCode.Refused,
-    BsdStatusCode.AwaitingChild,
+    BsdStatusCode.AwaitingChild
   ].includes(bsd.status);
 
 const canUpdateBsdasri = bsd =>
@@ -1136,7 +1153,7 @@ export const canEditCustomInfoOrTransporterNumberPlate = (
 };
 
 export const getOperationCodesFromSearchString = (value: any): string[] => {
-  let searchCodes: string[] = [];
+  const searchCodes: string[] = [];
 
   value.match(/[rRdD]{1}( )\d{1,2}/g)?.forEach(code => {
     const cleanCode = code.toUpperCase();

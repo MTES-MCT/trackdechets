@@ -2,12 +2,12 @@ import React from "react";
 import {
   IconCheckCircle1,
   IconTrackDechetsCheck,
-  IconSignBadgeCircle,
-} from "Apps/common/Components/Icons/Icons";
+  IconSignBadgeCircle
+} from "../../../../Apps/common/Components/Icons/Icons";
 import styles from "./CompanyResult.module.scss";
-import { CompanySearchResult } from "../../../../generated/graphql/types";
+import { CompanySearchResult } from "codegen-ui";
 import { generatePath } from "react-router-dom";
-import routes from "Apps/routes";
+import routes from "../../../../Apps/routes";
 import classNames from "classnames";
 
 interface CompanyResultsProps<T> {
@@ -39,7 +39,7 @@ export default function CompanyResults<T extends CompanyResultBase>({
   results,
   onSelect,
   onUnselect,
-  selectedItem,
+  selectedItem
 }: CompanyResultsProps<T>) {
   // prepend selectedItem if it's not in the results
   if (
@@ -73,13 +73,13 @@ export function CompanyResult<T extends CompanyResultBase>({
   item,
   selectedItem,
   onSelect,
-  onUnselect,
+  onUnselect
 }: CompanyResultProp<T>) {
   return (
     <li
       key={item.orgId!}
       className={classNames(styles.resultsItem, {
-        [styles.isSelected]: isSelected(item, selectedItem),
+        [styles.isSelected]: isSelected(item, selectedItem)
       })}
       onClick={() =>
         isSelected(item, selectedItem) ? onUnselect?.() : onSelect(item)
@@ -105,7 +105,7 @@ export function CompanyResult<T extends CompanyResultBase>({
         <p>
           <a
             href={generatePath(routes.company, {
-              orgId: item.orgId!,
+              orgId: item.orgId!
             })}
             onClick={e => e.stopPropagation()}
             target="_blank"

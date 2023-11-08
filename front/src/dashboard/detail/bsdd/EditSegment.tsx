@@ -2,23 +2,26 @@ import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
 import { string, object, boolean } from "yup";
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
 import {
   Mutation,
   MutationEditSegmentArgs,
   NextSegmentInfoInput,
-  TransportSegment,
-} from "generated/graphql/types";
-import { segmentFragment } from "Apps/common/queries/fragments";
-import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import TdModal from "Apps/common/Components/Modal/Modal";
-import ActionButton from "common/components/ActionButton";
-import TdSwitch from "common/components/Switch";
-import CompanySelector from "form/common/components/company/CompanySelector";
-import { FieldTransportModeSelect, RedErrorMessage } from "common/components";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
-import { transporterCompanySchema } from "common/validation/schema";
+  TransportSegment
+} from "codegen-ui";
+import { segmentFragment } from "../../../Apps/common/queries/fragments";
+import { IconPaperWrite } from "../../../Apps/common/Components/Icons/Icons";
+import { NotificationError } from "../../../Apps/common/Components/Error/Error";
+import TdModal from "../../../Apps/common/Components/Modal/Modal";
+import ActionButton from "../../../common/components/ActionButton";
+import TdSwitch from "../../../common/components/Switch";
+import CompanySelector from "../../../form/common/components/company/CompanySelector";
+import {
+  FieldTransportModeSelect,
+  RedErrorMessage
+} from "../../../common/components";
+import { isForeignVat } from "shared/constants";
+import { transporterCompanySchema } from "../../../common/validation/schema";
 
 const EDIT_SEGMENT = gql`
   mutation editSegment(
@@ -42,8 +45,8 @@ export const validationSchema = object().shape({
   transporter: object().shape({
     isExemptedOfReceipt: boolean().nullable(),
     numberPlate: string().nullable(true),
-    company: transporterCompanySchema,
-  }),
+    company: transporterCompanySchema
+  })
 });
 
 /**
@@ -66,14 +69,14 @@ export default function EditSegment({ siret, segment }: Props) {
   >(EDIT_SEGMENT, {
     onCompleted: () => {
       setIsOpen(false);
-      cogoToast.success("Le segment de transport a été modifié", {
-        hideAfter: 5,
+      toast.success("Le segment de transport a été modifié", {
+        duration: 5
       });
-    },
+    }
   });
   const initialValues: NextSegmentInfoInput = {
     transporter: segment.transporter,
-    mode: segment.mode!,
+    mode: segment.mode!
   };
 
   return (
@@ -99,12 +102,12 @@ export default function EditSegment({ siret, segment }: Props) {
                 variables: {
                   id: segment.id,
                   siret,
-                  nextSegmentInfo: values,
-                },
+                  nextSegmentInfo: values
+                }
               })
             }
           >
-            {({ values, errors, setFieldValue }) => (
+            {({ values, setFieldValue }) => (
               <FormikForm>
                 <h3>Modifier un transfert multimodal</h3>
                 <div className="form__row">
@@ -125,45 +128,41 @@ export default function EditSegment({ siret, segment }: Props) {
                 </div>
                 <h4 className="form__section-heading">Transporteur</h4>
                 {!segment.readyToTakeOver ? (
-                  <>
-                    <CompanySelector
-                      name="transporter.company"
-                      allowForeignCompanies={true}
-                      registeredOnlyCompanies={true}
-                      initialAutoSelectFirstCompany={false}
-                      onCompanySelected={onCompanySelected(setFieldValue)}
-                    />
-                  </>
+                  <CompanySelector
+                    name="transporter.company"
+                    allowForeignCompanies={true}
+                    registeredOnlyCompanies={true}
+                    initialAutoSelectFirstCompany={false}
+                    onCompanySelected={onCompanySelected(setFieldValue)}
+                  />
                 ) : (
-                  <>
-                    <div className="form__row">
-                      <label>
-                        Personne à contacter
-                        <Field
-                          type="text"
-                          name="transporter.company.contact"
-                          placeholder="NOM Prénom"
-                        />
-                        <RedErrorMessage name="transporter.company.contact" />
-                      </label>
+                  <div className="form__row">
+                    <label>
+                      Personne à contacter
+                      <Field
+                        type="text"
+                        name="transporter.company.contact"
+                        placeholder="NOM Prénom"
+                      />
+                      <RedErrorMessage name="transporter.company.contact" />
+                    </label>
 
-                      <label>
-                        Téléphone ou Fax
-                        <Field
-                          type="text"
-                          name="transporter.company.phone"
-                          placeholder="Numéro"
-                        />
-                        <RedErrorMessage name="transporter.company.phone" />
-                      </label>
+                    <label>
+                      Téléphone ou Fax
+                      <Field
+                        type="text"
+                        name="transporter.company.phone"
+                        placeholder="Numéro"
+                      />
+                      <RedErrorMessage name="transporter.company.phone" />
+                    </label>
 
-                      <label>
-                        Mail
-                        <Field type="email" name="transporter.company.mail" />
-                      </label>
-                      <RedErrorMessage name="transporter.company.mail" />
-                    </div>
-                  </>
+                    <label>
+                      Mail
+                      <Field type="email" name="transporter.company.mail" />
+                    </label>
+                    <RedErrorMessage name="transporter.company.mail" />
+                  </div>
                 )}
                 {!isForeignVat(values.transporter?.company?.vatNumber!) && (
                   <>

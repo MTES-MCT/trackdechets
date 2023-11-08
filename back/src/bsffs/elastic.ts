@@ -9,7 +9,7 @@ import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { toBsffDestination } from "./compat";
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import { getReadonlyBsffRepository } from "./repository";
 
 export type BsffForElastic = Bsff & {

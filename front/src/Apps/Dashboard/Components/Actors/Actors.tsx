@@ -1,11 +1,11 @@
 import React from "react";
-import { useMedia } from "use-media";
+import { useMedia } from "../../../../common/use-media";
 import { ActorsProps } from "./actorsTypes";
 import {
   IconDestination,
   IconEmitter,
   IconTransporter,
-  IconWorker,
+  IconWorker
 } from "../../../common/Components/Icons/Icons";
 import { MEDIA_QUERIES } from "../../../../common/config";
 
@@ -15,9 +15,9 @@ function Actors({
   emitterName,
   transporterName,
   destinationName,
-  workerCompanyName,
+  workerCompanyName
 }: ActorsProps) {
-  const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
 
   const truncate = label => {
     const maxVisible = 30;

@@ -1,5 +1,5 @@
 import { Bsda } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
@@ -9,8 +9,32 @@ import {
   OutgoingWaste,
   TransportedWaste
 } from "../generated/graphql/types";
-import { GenericWaste } from "../registry/types";
+import {
+  GenericWaste,
+  emptyAllWaste,
+  emptyIncomingWaste,
+  emptyManagedWaste,
+  emptyOutgoingWaste,
+  emptyTransportedWaste
+} from "../registry/types";
 import { extractPostalCode } from "../utils";
+
+const getOperationData = (bsda: Bsda) => ({
+  destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
+  destinationOperationCode: bsda.destinationOperationCode,
+  destinationOperationMode: bsda.destinationOperationMode
+});
+
+const getTransporterData = (bsda: Bsda) => ({
+  transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted,
+  transporterNumberPlates: bsda.transporterTransportPlates,
+  transporterCompanyAddress: bsda.transporterCompanyAddress,
+  transporterCompanyName: bsda.transporterCompanyName,
+  transporterCompanySiret: getTransporterCompanyOrgId(bsda),
+  transporterRecepisseNumber: bsda.transporterRecepisseNumber,
+  transporterCompanyMail: bsda.transporterCompanyMail,
+  transporterCustomInfo: bsda.transporterCustomInfo
+});
 
 type RegistryFields =
   | "isIncomingWasteFor"
@@ -74,17 +98,18 @@ function toGenericWaste(bsda: Bsda): GenericWaste {
     destinationReceptionWeight: bsda.destinationReceptionWeight
       ? bsda.destinationReceptionWeight / 1000
       : bsda.destinationReceptionWeight,
-    transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted,
+
     wasteAdr: bsda.wasteAdr,
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
-    workerCompanyAddress: bsda.workerCompanyAddress
+    workerCompanyAddress: bsda.workerCompanyAddress,
+    ...getTransporterData(bsda)
   };
 }
 
 export function toIncomingWaste(
   bsda: Bsda & { forwarding: Bsda; grouping: Bsda[] }
-): IncomingWaste {
+): Required<IncomingWaste> {
   const initialEmitter: Pick<
     IncomingWaste,
     | "initialEmitterCompanyAddress"
@@ -116,6 +141,8 @@ export function toIncomingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsda);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyIncomingWaste,
     ...genericWaste,
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
@@ -139,20 +166,15 @@ export function toIncomingWaste(
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: null,
-    transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-    transporterRecepisseNumber: bsda.transporterRecepisseNumber,
-    destinationOperationCode: bsda.destinationOperationCode,
-    destinationOperationMode: bsda.destinationOperationMode,
     destinationCustomInfo: bsda.destinationCustomInfo,
     emitterCompanyMail: bsda.emitterCompanyMail,
-    transporterCompanyMail: bsda.transporterCompanyMail
+    ...getOperationData(bsda)
   };
 }
 
 export function toOutgoingWaste(
   bsda: Bsda & { forwarding: Bsda; grouping: Bsda[] }
-): OutgoingWaste {
+): Required<OutgoingWaste> {
   const initialEmitter: Pick<
     OutgoingWaste,
     | "initialEmitterCompanyAddress"
@@ -184,6 +206,8 @@ export function toOutgoingWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsda);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyOutgoingWaste,
     ...genericWaste,
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
@@ -191,7 +215,6 @@ export function toOutgoingWaste(
     destinationCompanyAddress: bsda.destinationCompanyAddress,
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
-    destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
@@ -208,23 +231,16 @@ export function toOutgoingWaste(
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    transporterCompanyAddress: null,
-    transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-    transporterTakenOverAt:
-      bsda.transporterTransportTakenOverAt ??
-      bsda.transporterTransportSignatureDate,
-    transporterRecepisseNumber: bsda.transporterRecepisseNumber,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
     emitterCustomInfo: bsda.emitterCustomInfo,
-    transporterCompanyMail: bsda.transporterCompanyMail,
-    destinationCompanyMail: bsda.destinationCompanyMail
+    destinationCompanyMail: bsda.destinationCompanyMail,
+    ...getOperationData(bsda)
   };
 }
 
 export function toTransportedWaste(
   bsda: Bsda & { forwarding: Bsda; grouping: Bsda[] }
-): TransportedWaste {
+): Required<TransportedWaste> {
   const initialEmitter: Pick<
     TransportedWaste,
     | "initialEmitterCompanyAddress"
@@ -256,16 +272,11 @@ export function toTransportedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsda);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyTransportedWaste,
     ...genericWaste,
-    transporterTakenOverAt:
-      bsda.transporterTransportTakenOverAt ??
-      bsda.transporterTransportSignatureDate,
     destinationReceptionDate: bsda.destinationReceptionDate,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
-    transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-    transporterCompanyAddress: bsda.transporterCompanyAddress,
-    transporterNumberPlates: bsda.transporterTransportPlates,
     ...initialEmitter,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
@@ -287,7 +298,6 @@ export function toTransportedWaste(
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
     destinationCompanyAddress: bsda.destinationCompanyAddress,
-    transporterCustomInfo: bsda.transporterCustomInfo,
     emitterCompanyMail: bsda.emitterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail
   };
@@ -295,7 +305,7 @@ export function toTransportedWaste(
 
 export function toManagedWaste(
   bsda: Bsda & { forwarding: Bsda; grouping: Bsda[] }
-): ManagedWaste {
+): Required<ManagedWaste> {
   const initialEmitter: Pick<
     ManagedWaste,
     | "initialEmitterCompanyAddress"
@@ -327,6 +337,8 @@ export function toManagedWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsda);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyManagedWaste,
     ...genericWaste,
     managedStartDate: null,
     managedEndDate: null,
@@ -337,7 +349,6 @@ export function toManagedWaste(
     destinationCompanyAddress: bsda.destinationCompanyAddress,
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
-    destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
@@ -351,19 +362,14 @@ export function toManagedWaste(
       ].filter(Boolean)
     ),
     ...initialEmitter,
-    transporterCompanyAddress: bsda.transporterCompanyAddress,
-    transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-    transporterRecepisseNumber: bsda.transporterRecepisseNumber,
     emitterCompanyMail: bsda.emitterCompanyMail,
-    transporterCompanyMail: bsda.transporterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail
   };
 }
 
 export function toAllWaste(
   bsda: Bsda & { forwarding: Bsda; grouping: Bsda[] }
-): AllWaste {
+): Required<AllWaste> {
   const initialEmitter: Pick<
     AllWaste,
     | "initialEmitterCompanyAddress"
@@ -395,11 +401,10 @@ export function toAllWaste(
   const { __typename, ...genericWaste } = toGenericWaste(bsda);
 
   return {
+    // Make sure all possible keys are in the exported sheet so that no column is missing
+    ...emptyAllWaste,
     ...genericWaste,
     createdAt: bsda.createdAt,
-    transporterTakenOverAt:
-      bsda.transporterTransportTakenOverAt ??
-      bsda.transporterTransportSignatureDate,
     destinationReceptionDate: bsda.destinationReceptionDate,
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
@@ -407,9 +412,6 @@ export function toAllWaste(
     destinationCompanyAddress: bsda.destinationCompanyAddress,
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
-    destinationOperationCode: bsda.destinationOperationCode,
-    destinationOperationMode: bsda.destinationOperationMode,
-    destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
@@ -423,11 +425,6 @@ export function toAllWaste(
       ].filter(Boolean)
     ),
     ...initialEmitter,
-    transporterCompanyAddress: bsda.transporterCompanyAddress,
-    transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-    transporterRecepisseNumber: bsda.transporterRecepisseNumber,
-    transporterNumberPlates: bsda.transporterTransportPlates,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
     managedEndDate: null,
     managedStartDate: null,
@@ -435,7 +432,7 @@ export function toAllWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsda.emitterCompanyMail,
-    transporterCompanyMail: bsda.transporterCompanyMail,
-    destinationCompanyMail: bsda.destinationCompanyMail
+    destinationCompanyMail: bsda.destinationCompanyMail,
+    ...getOperationData(bsda)
   };
 }

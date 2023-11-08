@@ -1,6 +1,6 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { isBsddTransporterFieldEditable } from "../../../common/constants/formHelpers";
+import { isBsddTransporterFieldEditable } from "shared/constants";
 import { getFormOrFormNotFound } from "../../database";
 import { checkCanUpdateTransporterFields } from "../../permissions";
 import { getAndExpandFormFromDb } from "../../converter";

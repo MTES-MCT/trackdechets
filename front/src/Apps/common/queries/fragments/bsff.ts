@@ -40,6 +40,9 @@ export const dashboardBsffFragment = gql`
     }
     packagings {
       numero
+      operation {
+        code
+      }
     }
     bsffWeight: weight {
       value

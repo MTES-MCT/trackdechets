@@ -1,10 +1,10 @@
 import React from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Formik, FormikProps, Form, Field } from "formik";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { CompanyPrivate } from "generated/graphql/types";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import Tooltip from "common/components/Tooltip";
+import { NotificationError } from "../../../Apps/common/Components/Error/Error";
+import { CompanyPrivate } from "codegen-ui";
+import DateInput from "../../../form/common/components/custom-inputs/DateInput";
+import Tooltip from "../../../common/components/Tooltip";
 
 type Props = {
   company: Pick<CompanyPrivate, "id" | "siret" | "workerCertification">;
@@ -71,13 +71,13 @@ export const DELETE_WORKER_CERTIFICATION = gql`
 
 export default function AccountFormCompanyAddWorkerCertification({
   company,
-  toggleEdition,
+  toggleEdition
 }: Props) {
   const workerCertification = company.workerCertification;
 
   const [
     createOrUpdateWorkerCertification,
-    { loading: updateOrCreateLoading, error: updateOrCreateError },
+    { loading: updateOrCreateLoading, error: updateOrCreateError }
   ] = useMutation(
     workerCertification
       ? UPDATE_WORKER_CERTIFICATION
@@ -86,12 +86,12 @@ export default function AccountFormCompanyAddWorkerCertification({
 
   const [
     updateCompany,
-    { loading: updateCompanyLoading, error: updateCompanyError },
+    { loading: updateCompanyLoading, error: updateCompanyError }
   ] = useMutation(UPDATE_COMPANY_WORKER_CERTIFICATION);
 
   const [
     deleteWorkerCertification,
-    { loading: deleteLoading, error: deleteError },
+    { loading: deleteLoading, error: deleteError }
   ] = useMutation(DELETE_WORKER_CERTIFICATION, {
     update(cache) {
       cache.writeFragment({
@@ -104,9 +104,9 @@ export default function AccountFormCompanyAddWorkerCertification({
             }
           }
         `,
-        data: { workerCertification: null },
+        data: { workerCertification: null }
       });
-    },
+    }
   });
 
   const initialValues: V = workerCertification
@@ -117,14 +117,14 @@ export default function AccountFormCompanyAddWorkerCertification({
         validityLimit: workerCertification.validityLimit
           ? new Date(workerCertification.validityLimit)
           : null,
-        organisation: workerCertification.organisation,
+        organisation: workerCertification.organisation
       }
     : {
         hasSubSectionFour: false,
         hasSubSectionThree: false,
         certificationNumber: "",
         validityLimit: null,
-        organisation: "",
+        organisation: ""
       };
 
   return (
@@ -143,17 +143,17 @@ export default function AccountFormCompanyAddWorkerCertification({
         onSubmit={async values => {
           const input = {
             ...(workerCertification?.id ? { id: workerCertification.id } : {}),
-            ...values,
+            ...values
           };
           const { data } = await createOrUpdateWorkerCertification({
-            variables: { input },
+            variables: { input }
           });
           if (data.createWorkerCertification) {
             await updateCompany({
               variables: {
                 id: company.id,
-                workerCertificationId: data.createWorkerCertification.id,
-              },
+                workerCertificationId: data.createWorkerCertification.id
+              }
             });
           }
           toggleEdition();
@@ -245,8 +245,8 @@ export default function AccountFormCompanyAddWorkerCertification({
                   onClick={async () => {
                     await deleteWorkerCertification({
                       variables: {
-                        input: { id: workerCertification.id },
-                      },
+                        input: { id: workerCertification.id }
+                      }
                     });
                     toggleEdition();
                   }}

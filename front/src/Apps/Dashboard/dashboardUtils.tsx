@@ -34,43 +34,43 @@ import {
   filter_tva_intra,
   filter_waste_code,
   filter_worker_operation_code,
-  filter_worker_sign_date,
+  filter_worker_sign_date
 } from "../common/wordings/dashboard/wordingsDashboard";
-import { BsdType, BsdWhere } from "../../generated/graphql/types";
+import { BsdType, BsdWhere } from "codegen-ui";
 import { Filter, FilterType } from "../common/Components/Filters/filtersTypes";
 import {
   IconBSFF,
   IconBSDa,
   IconBSVhu,
   IconBSDD,
-  IconBSDasri,
-} from "Apps/common/Components/Icons/Icons";
+  IconBSDasri
+} from "../common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
-import { BsdCurrentTab } from "Apps/common/types/commonTypes";
+import { BsdCurrentTab } from "../common/types/commonTypes";
 
 export const MAX_FILTER = 5;
 
 const bsdTypeFilterSelectOptions = [
   {
     value: BsdType.Bsdd,
-    label: bsd_type_option_bsdd,
+    label: bsd_type_option_bsdd
   },
   {
     value: BsdType.Bsdasri,
-    label: bsd_type_option_bsdasri,
+    label: bsd_type_option_bsdasri
   },
   {
     value: BsdType.Bsvhu,
-    label: bsd_type_option_bsvhu,
+    label: bsd_type_option_bsvhu
   },
   {
     value: BsdType.Bsff,
-    label: bsd_type_option_bsff,
+    label: bsd_type_option_bsff
   },
   {
     value: BsdType.Bsda,
-    label: bsd_type_option_bsda,
-  },
+    label: bsd_type_option_bsda
+  }
 ];
 
 enum FilterName {
@@ -145,113 +145,113 @@ export const advancedFilterList: Filter[][] = [
       type: FilterType.select,
       isMultiple: true,
       options: bsdTypeFilterSelectOptions,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.transporterNumberPlate,
       label: filter_immat_number,
       type: FilterType.input,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.transporterCustomInfo,
       label: filter_free_text,
       type: FilterType.input,
-      isActive: true,
-    },
+      isActive: true
+    }
   ],
   [
     {
       name: FilterName.pickupSiteAddress,
       label: filter_chantier_adress,
       type: FilterType.input,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.siretProductorAddress,
       label: filter_siret_productor_address,
       type: FilterType.input,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.operationCode,
       label: filter_worker_operation_code,
       type: FilterType.input,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.destinationAcceptationDate,
       label: filter_acceptation_sign_date,
       type: FilterType.date,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.transporterTransportSignDate,
       label: filter_transporter_sign_date,
       type: FilterType.date,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.destinationReceptionDate,
       label: filter_reception_sign_date,
       type: FilterType.date,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.workerSignDate,
       label: filter_worker_sign_date,
       type: FilterType.date,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.emitterSignDate,
       label: filter_emitter_sign_date,
       type: FilterType.date,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.destinationOperationSignDate,
       label: filter_operation_sign_date,
       type: FilterType.date,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.ficheInterventionNumbers,
       label: filter_fiche_intervention_numbers,
       type: FilterType.input,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.sealNumbers,
       label: filter_seal_numbers,
       type: FilterType.input,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.tvaIntra,
       label: filter_tva_intra,
       type: FilterType.input,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.brokerSiret,
       label: filter_broker_siret,
       type: FilterType.input,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.nextDestinationSiret,
       label: filter_next_destination_siret,
       type: FilterType.input,
-      isActive: true,
+      isActive: true
     },
     {
       name: FilterName.traderSiret,
       label: filter_trader_siret,
       type: FilterType.input,
-      isActive: true,
-    },
-  ],
+      isActive: true
+    }
+  ]
 ];
 
 export const filterList = [...advancedFilterList.flat(), ...quickFilterList];
@@ -264,7 +264,7 @@ export const filterPredicates: {
   {
     filterName: FilterName.types,
     where: value => ({ type: { _in: value } }),
-    order: "type",
+    order: "type"
   },
   {
     filterName: FilterName.waste,
@@ -302,25 +302,25 @@ export const filterPredicates: {
     filterName: FilterName.transporterNumberPlate,
     order: "transporterNumberPlate",
     where: value => ({
-      transporter: { transport: { plates: { _itemContains: value } } },
-    }),
+      transporter: { transport: { plates: { _itemContains: value } } }
+    })
   },
   {
     filterName: FilterName.transporterCustomInfo,
     where: value => ({ transporter: { customInfo: { _match: value } } }),
-    order: "transporterCustomInfo",
+    order: "transporterCustomInfo"
   },
   {
     filterName: FilterName.pickupSiteName,
     where: value => ({ emitter: { pickupSite: { name: { _match: value } } } }),
-    order: "name",
+    order: "name"
   },
   {
     filterName: FilterName.pickupSiteAddress,
     where: value => ({
-      emitter: { pickupSite: { address: { _match: value } } },
+      emitter: { pickupSite: { address: { _match: value } } }
     }),
-    order: "address",
+    order: "address"
   },
   {
     filterName: FilterName.tvaIntra,
@@ -348,29 +348,29 @@ export const filterPredicates: {
         },
       ],
     }),
-    order: "vatNumber",
+    order: "vatNumber"
   },
   {
     filterName: FilterName.traderSiret,
     where: value => ({
       trader: {
         company: {
-          siret: { _contains: value },
-        },
-      },
+          siret: { _contains: value }
+        }
+      }
     }),
-    order: "siret",
+    order: "siret"
   },
   {
     filterName: FilterName.brokerSiret,
     where: value => ({
       broker: {
         company: {
-          siret: { _contains: value },
-        },
-      },
+          siret: { _contains: value }
+        }
+      }
     }),
-    order: "siret",
+    order: "siret"
   },
   {
     filterName: FilterName.givenName,
@@ -397,36 +397,36 @@ export const filterPredicates: {
         },
       ],
     }),
-    order: "name",
+    order: "name"
   },
   {
     filterName: FilterName.sealNumbers,
     where: value => ({
       sealNumbers: {
-        _itemContains: value,
-      },
+        _itemContains: value
+      }
     }),
-    order: "sealNumbers",
+    order: "sealNumbers"
   },
   {
     filterName: FilterName.ficheInterventionNumbers,
     where: value => ({
       ficheInterventionNumbers: {
-        _itemContains: value,
-      },
+        _itemContains: value
+      }
     }),
-    order: "sealNumbers",
+    order: "sealNumbers"
   },
   {
     filterName: FilterName.nextDestinationSiret,
     where: value => ({
       destination: {
         operation: {
-          nextDestination: { company: { siret: { _contains: value } } },
-        },
-      },
+          nextDestination: { company: { siret: { _contains: value } } }
+        }
+      }
     }),
-    order: "siret",
+    order: "siret"
   },
   {
     filterName: FilterName.operationCode,
@@ -438,81 +438,81 @@ export const filterPredicates: {
           destination: {
             operation: {
               code: {
-                _in: operationCodes,
-              },
-            },
-          },
+                _in: operationCodes
+              }
+            }
+          }
         };
       }
 
       return {
-        destination: { operation: { code: { _contains: value } } },
+        destination: { operation: { code: { _contains: value } } }
       };
     },
-    order: "code",
+    order: "code"
   },
   {
     filterName: FilterName.emitterSignDate,
     where: value => ({
       emitter: {
-        emission: { date: { _lte: value.endDate, _gte: value.startDate } },
-      },
+        emission: { date: { _lte: value.endDate, _gte: value.startDate } }
+      }
     }),
-    order: "date",
+    order: "date"
   },
   {
     filterName: FilterName.workerSignDate,
     where: value => ({
       worker: {
-        work: { date: { _lte: value.endDate, _gte: value.startDate } },
-      },
+        work: { date: { _lte: value.endDate, _gte: value.startDate } }
+      }
     }),
-    order: "date",
+    order: "date"
   },
   {
     filterName: FilterName.transporterTransportSignDate,
     where: value => ({
       transporter: {
         transport: {
-          takenOverAt: { _lte: value.endDate, _gte: value.startDate },
-        },
-      },
+          takenOverAt: { _lte: value.endDate, _gte: value.startDate }
+        }
+      }
     }),
-    order: "takenOverAt",
+    order: "takenOverAt"
   },
   {
     filterName: FilterName.destinationReceptionDate,
     where: value => ({
       destination: {
-        reception: { date: { _lte: value.endDate, _gte: value.startDate } },
-      },
+        reception: { date: { _lte: value.endDate, _gte: value.startDate } }
+      }
     }),
-    order: "date",
+    order: "date"
   },
   {
     filterName: FilterName.destinationAcceptationDate,
     where: value => ({
       destination: {
-        acceptation: { date: { _lte: value.endDate, _gte: value.startDate } },
-      },
+        acceptation: { date: { _lte: value.endDate, _gte: value.startDate } }
+      }
     }),
-    order: "date",
+    order: "date"
   },
   {
     filterName: FilterName.destinationOperationSignDate,
     where: value => ({
       destination: {
-        operation: { date: { _lte: value.endDate, _gte: value.startDate } },
-      },
+        operation: { date: { _lte: value.endDate, _gte: value.startDate } }
+      }
     }),
-    order: "date",
+    order: "date"
   },
   {
     filterName: FilterName.siretProductorAddress,
     where: value => ({
       emitter: {
-        company: { address: { _match: value } },
-      },
+        company: { address: { _match: value } }
+      }
     }),
     order: "address",
   },
@@ -527,29 +527,29 @@ export const dropdownCreateLinks = siret => [
   {
     title: dropdown_create_bsdd,
     route: generatePath(routes.dashboardv2.bsdds.create, { siret }),
-    icon: <IconBSDD />,
+    icon: <IconBSDD />
   },
   {
     title: dropdown_create_bsdasri,
     route: generatePath(routes.dashboardv2.bsdasris.create, { siret }),
-    icon: <IconBSDasri />,
+    icon: <IconBSDasri />
   },
 
   {
     title: dropdown_create_bsvhu,
     route: generatePath(routes.dashboardv2.bsvhus.create, { siret }),
-    icon: <IconBSVhu />,
+    icon: <IconBSVhu />
   },
   {
     title: dropdown_create_bsff,
     route: generatePath(routes.dashboardv2.bsffs.create, { siret }),
-    icon: <IconBSFF />,
+    icon: <IconBSFF />
   },
   {
     title: dropdown_create_bsda,
     route: generatePath(routes.dashboardv2.bsdas.create, { siret }),
-    icon: <IconBSDa />,
-  },
+    icon: <IconBSDa />
+  }
 ];
 
 export const getOverviewPath = bsd => {
@@ -607,7 +607,7 @@ export const getBsdCurrentTab = ({
   isArchivesTab,
   isReviewsTab,
   isToCollectTab,
-  isCollectedTab,
+  isCollectedTab
   // isReviewedTab,
   // isToReviewedTab,
 }): BsdCurrentTab => {

@@ -15,7 +15,7 @@ export function List({ variant = "styled", children, ...props }: ListProps) {
       {...props}
       className={classNames(props.className, {
         [styles.ListUnstyled]: variant === "unstyled",
-        [styles.ListInline]: variant === "inline",
+        [styles.ListInline]: variant === "inline"
       })}
     >
       {children}
@@ -35,7 +35,7 @@ export function ListItem({ startIcon, children, ...props }: ListItemProps) {
     <li
       {...props}
       className={classNames(props.className, {
-        [styles.ListItemWithIcon]: Boolean(startIcon),
+        [styles.ListItemWithIcon]: Boolean(startIcon)
       })}
     >
       {startIcon ? (

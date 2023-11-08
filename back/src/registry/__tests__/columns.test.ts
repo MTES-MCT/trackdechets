@@ -33,7 +33,8 @@ describe("formatRow", () => {
       transporterCompanySiret: "transporter siret",
       transporterRecepisseNumber: "transporter recepisse",
       wasteCode: "01 01 01*",
-      wasteDescription: "déchets dangereux"
+      wasteDescription: "déchets dangereux",
+      destinationPlannedOperationCode: "R10"
     };
     const formatted = formatRow(waste);
     // Fields in the waste object + custom fields added for user convenience
@@ -71,7 +72,8 @@ describe("formatRow", () => {
       destinationOperationCode: "R10",
       destinationOperationMode: "RECYCLAGE",
       destinationReceptionDate: "2021-01-01",
-      destinationReceptionWeight: 1.2
+      destinationReceptionWeight: 1.2,
+      destinationPlannedOperationCode: "R10"
     });
     const formattedWithLabels = formatRow(waste, true);
     expect(formattedWithLabels).toEqual({
@@ -102,7 +104,8 @@ describe("formatRow", () => {
       "Transporteur raison sociale": "transporter name",
       "Transporteur SIRET ou numéro de TVA le cas échéant": "transporter siret",
       "Transporteur récépissé": "transporter recepisse",
-      "Code opération réalisée": "R10",
+      "Code opération réalisé": "R10",
+      "Code opération prévu": "R10",
       "Mode de traitement réalisé": "RECYCLAGE",
       "Date de réception": "2021-01-01",
       "Quantité de déchet entrant (t)": 1.2

@@ -32,7 +32,7 @@ export const IconChevronDown = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 128 128"
     xmlns="http://www.w3.org/2000/svg"
@@ -60,7 +60,7 @@ export const IconChevronUp = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 128 128"
     xmlns="http://www.w3.org/2000/svg"
@@ -88,7 +88,7 @@ export const IconDuplicateFile = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +122,7 @@ export const IconView = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
@@ -150,7 +150,7 @@ export const IconPdf = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 21 24"
     xmlns="http://www.w3.org/2000/svg"
@@ -178,7 +178,7 @@ export const IconRefresh = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
@@ -207,7 +207,7 @@ export const IconShipmentSignSmartphone = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
@@ -236,7 +236,7 @@ export const IconPaperWrite = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
@@ -264,7 +264,7 @@ export const IconTrash = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -294,7 +294,7 @@ export const IconWarehouseDelivery = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -328,7 +328,7 @@ export const IconWarehouseStorage = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -362,7 +362,7 @@ export const IconWaterDam = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -392,7 +392,7 @@ export const IconRenewableEnergyEarth = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -426,7 +426,7 @@ export const IconWarehousePackage = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -460,7 +460,7 @@ export const IconSearch = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -492,7 +492,7 @@ export const IconLoading = ({
       {
         [styles.blue]: color === "blue",
         [styles.blueLight]: color === "blueLight",
-        [styles.white]: color === "white",
+        [styles.white]: color === "white"
       },
       "tw-animate-spin"
     )}
@@ -528,7 +528,7 @@ export const IconTriangleDown = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 128 128"
     xmlns="http://www.w3.org/2000/svg"
@@ -553,7 +553,7 @@ export const IconTriangleUp = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 128 128"
     xmlns="http://www.w3.org/2000/svg"
@@ -578,7 +578,7 @@ export const IconTriangleUpAndDown = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 128 128"
     xmlns="http://www.w3.org/2000/svg"
@@ -606,7 +606,7 @@ export const IconLeftArrow = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -633,7 +633,7 @@ export const IconClose = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -663,7 +663,7 @@ export const IconLayout2 = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -693,7 +693,7 @@ export const IconLayoutModule1 = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -723,7 +723,7 @@ export const IconBusTransfer = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -758,7 +758,7 @@ export const IconCogApproved = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -792,7 +792,7 @@ export const IconProfile = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     viewBox="0 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
@@ -821,7 +821,7 @@ export const IconQuestionCircle = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -854,7 +854,7 @@ export const IconPasswordKey = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -890,7 +890,7 @@ export const IconEmailActionUnread = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -923,7 +923,7 @@ export const IconCopyPaste = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -959,7 +959,7 @@ export const IconLockShield = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -996,7 +996,7 @@ export const IconSignBadgeCircle = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -1024,7 +1024,7 @@ export const IconCheckCircle1 = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -1060,7 +1060,7 @@ export const IconLock1 = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -1092,7 +1092,7 @@ export const IconSingleNeutralIdCard4 = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -1128,7 +1128,7 @@ export const IconPhone = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -1156,7 +1156,7 @@ export const IconArrowLeft1 = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -1184,7 +1184,7 @@ export const IconArrowRight1 = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -1212,7 +1212,7 @@ export const IconDelete1 = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -1244,7 +1244,7 @@ export const IconCheckShield = ({
     className={classNames(props.className, {
       [styles.blue]: color === "blue",
       [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white",
+      [styles.white]: color === "white"
     })}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 140 140"
@@ -1766,7 +1766,7 @@ export function IconQrCode({
       className={classNames(props.className, {
         [styles.blue]: color === "blue",
         [styles.blueLight]: color === "blueLight",
-        [styles.white]: color === "white",
+        [styles.white]: color === "white"
       })}
       viewBox="0 0 48 48"
       xmlns="http://www.w3.org/2000/svg"
@@ -1785,11 +1785,7 @@ export function IconQrCode({
   );
 }
 
-export function IconTrackDechetsCheck({
-  color = "currentColor",
-  size = "1.5em",
-  ...props
-}: IconProps) {
+export function IconTrackDechetsCheck({ size = "1.5em", ...props }: IconProps) {
   return (
     <svg
       {...props}
@@ -1947,7 +1943,7 @@ export function IconAddCircle({
       className={classNames(props.className, {
         [styles.blue]: color === "blue",
         [styles.blueLight]: color === "blueLight",
-        [styles.white]: color === "white",
+        [styles.white]: color === "white"
       })}
     >
       <g

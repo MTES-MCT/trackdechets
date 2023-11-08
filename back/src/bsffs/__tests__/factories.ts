@@ -13,7 +13,7 @@ import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 import { UserWithCompany } from "../../__tests__/factories";
 import { OPERATION } from "../constants";
-import { BSFF_WASTE_CODES } from "../../common/constants";
+import { BSFF_WASTE_CODES } from "shared/constants";
 
 interface CreateBsffArgs {
   emitter?: UserWithCompany;

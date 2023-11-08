@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { BsdWhere } from "../generated/graphql/types";
-import { GET_BSDS_ACTOR_MAX_LENGTH } from "../common/constants/GET_BSDS_CONSTANTS";
+import { GET_BSDS_ACTOR_MAX_LENGTH } from "shared/constants";
 
 const maxLengthString = (maxLength: number) =>
   yup

@@ -1,12 +1,12 @@
 import * as React from "react";
-import { Form } from "generated/graphql/types";
+import { Form } from "codegen-ui";
 import {
   Journey,
   JourneyStop,
   JourneyStopDescription,
-  JourneyStopName,
-} from "common/components";
-import { formTransportIsPipeline } from "form/bsdd/utils/packagings";
+  JourneyStopName
+} from "../../../../../common/components";
+import { formTransportIsPipeline } from "../../../../../form/bsdd/utils/packagings";
 
 interface FormJourneySummaryProps {
   form: Form;
@@ -27,12 +27,12 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
     ? {
         isComplete: Boolean(form.receivedAt),
         isActive: Boolean(form.temporaryStorageDetail.takenOverAt),
-        company: form.temporaryStorageDetail.destination?.company,
+        company: form.temporaryStorageDetail.destination?.company
       }
     : {
         isComplete: Boolean(form.receivedAt),
         isActive: Boolean(form.takenOverAt),
-        company: form.recipient?.company,
+        company: form.recipient?.company
       };
   return (
     <Journey>

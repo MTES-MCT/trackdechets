@@ -1,10 +1,6 @@
 import React from "react";
-import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
-import {
-  Consistence,
-  WasteAcceptationStatus,
-  QuantityType,
-} from "generated/graphql/types";
+import EstimatedQuantityTooltip from "../../../common/components/EstimatedQuantityTooltip";
+import { Consistence, WasteAcceptationStatus, QuantityType } from "codegen-ui";
 
 export const getVerboseConsistence = (
   consistence: Consistence | null | undefined | ""
@@ -16,7 +12,7 @@ export const getVerboseConsistence = (
     SOLID: "Solide",
     LIQUID: "Liquide",
     GASEOUS: "Gazeux",
-    DOUGHY: "Pâteux",
+    DOUGHY: "Pâteux"
   };
   return verbose[consistence];
 };
@@ -30,7 +26,7 @@ export const getVerboseAcceptationStatus = (
   const verbose = {
     ACCEPTED: "Accepté",
     REFUSED: "Refusé",
-    "PARTIALLY REFUSED": "Accepté partiellement",
+    "PARTIALLY REFUSED": "Accepté partiellement"
   };
 
   return verbose[acceptationStatus];
@@ -74,9 +70,9 @@ export const getVerboseWeightType = (
  * For instance, deepValue(obj, "foo.bar.baz") to access obj.foo.bar.baz.
  */
 export const deepValue = (obj, path) => {
-  // eslint-disable-next-line @typescript-eslint/no-redeclare
-  for (var i = 0, path = path.split("."), len = path.length; i < len; i++) {
-    obj = obj[path[i]];
+  const pathParts = path.split(".");
+  for (let i = 0, len = pathParts.length; i < len; i++) {
+    obj = obj[pathParts[i]];
   }
   return obj;
 };

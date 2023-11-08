@@ -1,10 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
-import {
-  CompanyPrivate,
-  CompanyVerificationStatus,
-} from "generated/graphql/types";
+import { CompanyPrivate, CompanyVerificationStatus } from "codegen-ui";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 import AccountFormVerifyCompany from "./forms/AccountFormVerifyCompany";
 
@@ -19,7 +16,7 @@ AccountFieldCompanyVerificationStatus.fragments = {
       orgId
       verificationStatus
     }
-  `,
+  `
 };
 
 const fieldLabel = "Profil vérifié";
@@ -31,7 +28,7 @@ const tooltip =
   "a bien les droits pour effectuer des actions pour le compte de l'établissement.";
 
 export default function AccountFieldCompanyVerificationStatus({
-  company,
+  company
 }: Props) {
   return company.verificationStatus ===
     CompanyVerificationStatus.ToBeVerified ? (

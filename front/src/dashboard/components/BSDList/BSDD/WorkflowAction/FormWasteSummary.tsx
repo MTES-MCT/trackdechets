@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Form, QuantityType } from "generated/graphql/types";
+import { Form, QuantityType } from "codegen-ui";
 import {
   DataList,
   DataListDescription,
   DataListItem,
-  DataListTerm,
-} from "common/components";
+  DataListTerm
+} from "../../../../../common/components";
 
 interface FormWasteSummaryProps {
   form: Form;

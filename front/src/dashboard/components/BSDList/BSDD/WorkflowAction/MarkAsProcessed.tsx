@@ -1,12 +1,12 @@
 import React from "react";
-import { FormStatus, Query, QueryFormArgs } from "generated/graphql/types";
+import { FormStatus, Query, QueryFormArgs } from "codegen-ui";
 import { useLazyQuery } from "@apollo/client";
 import { WorkflowActionProps } from "./WorkflowAction";
-import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
-import { ActionButton } from "common/components";
-import { IconCogApproved } from "Apps/common/Components/Icons/Icons";
-import { GET_FORM } from "form/bsdd/utils/queries";
-import MarkAsProcessedModalContent from "dashboard/components/BSDList/BSDD/WorkflowAction/MarkAsProcessedModalContent";
+import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
+import { ActionButton } from "../../../../../common/components";
+import { IconCogApproved } from "../../../../../Apps/common/Components/Icons/Icons";
+import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
+import MarkAsProcessedModalContent from "./MarkAsProcessedModalContent";
 
 export default function MarkAsProcessed({ form }: WorkflowActionProps) {
   const [getBsdd, { data }] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(
@@ -14,9 +14,9 @@ export default function MarkAsProcessed({ form }: WorkflowActionProps) {
     {
       variables: {
         id: form.id,
-        readableId: null,
+        readableId: null
       },
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     }
   );
 

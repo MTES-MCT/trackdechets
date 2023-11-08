@@ -176,9 +176,18 @@ input BsvhuTransportInput {
 input BsvhuRecepisseInput {
   "Exemption de récépissé"
   isExempted: Boolean
-  number: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
-  department: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
-  validityLimit: DateTime @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
+  number: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport "
+    )
+  department: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport "
+    )
+  validityLimit: DateTime
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport "
+    )
 }
 
 input BsvhuSignatureInput {

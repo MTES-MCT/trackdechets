@@ -1,7 +1,7 @@
 import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { AuthType } from "../../../../auth";
-import { TEST_COMPANY_PREFIX } from "../../../../common/constants/companySearchHelpers";
+import { TEST_COMPANY_PREFIX } from "shared/constants";
 import prisma from "../../../../prisma";
 import {
   companyFactory,

@@ -5,8 +5,8 @@ import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import {
   CompanyPrivate,
   MutationUpdateCompanyArgs,
-  UserRole,
-} from "generated/graphql/types";
+  UserRole
+} from "codegen-ui";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
 type Props = {
@@ -20,7 +20,7 @@ AccountFieldCompanyGerepId.fragments = {
       gerepId
       userRole
     }
-  `,
+  `
 };
 
 const UPDATE_GEREP_ID = gql`
@@ -34,34 +34,30 @@ const UPDATE_GEREP_ID = gql`
 `;
 
 export default function AccountFieldCompanyGerepId({ company }: Props) {
-  return (
-    <>
-      {company.userRole === UserRole.Admin ? (
-        <AccountField
+  return company.userRole === UserRole.Admin ? (
+    <AccountField
+      name="gerepId"
+      label="Identifiant GEREP"
+      value={company.gerepId}
+      renderForm={toggleEdition => (
+        <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
           name="gerepId"
-          label="Identifiant GEREP"
+          type="text"
           value={company.gerepId}
-          renderForm={toggleEdition => (
-            <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
-              name="gerepId"
-              type="text"
-              value={company.gerepId}
-              placeHolder="Identifiant GEREP"
-              mutation={UPDATE_GEREP_ID}
-              mutationArgs={{ id: company.id }}
-              toggleEdition={() => {
-                toggleEdition();
-              }}
-            />
-          )}
-        />
-      ) : (
-        <AccountFieldNotEditable
-          name="gerepId"
-          label="Identifiant GEREP"
-          value={company.gerepId}
+          placeHolder="Identifiant GEREP"
+          mutation={UPDATE_GEREP_ID}
+          mutationArgs={{ id: company.id }}
+          toggleEdition={() => {
+            toggleEdition();
+          }}
         />
       )}
-    </>
+    />
+  ) : (
+    <AccountFieldNotEditable
+      name="gerepId"
+      label="Identifiant GEREP"
+      value={company.gerepId}
+    />
   );
 }

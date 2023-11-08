@@ -1,5 +1,5 @@
-import { RedErrorMessage } from "common/components";
-import CompanySelector from "form/common/components/company/CompanySelector";
+import { RedErrorMessage } from "../../common/components";
+import CompanySelector from "../common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
 import React from "react";
 

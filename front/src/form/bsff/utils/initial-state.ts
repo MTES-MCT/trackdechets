@@ -1,12 +1,12 @@
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
+import { getInitialCompany } from "../../bsdd/utils/initial-state";
 import {
   BsffInput,
   BsffOperationCode,
   BsffPackagingInput,
   BsffTransporterInput,
   BsffType,
-  TransportMode,
-} from "generated/graphql/types";
+  TransportMode
+} from "codegen-ui";
 
 export interface BsffFormInput extends BsffInput {
   transporter: BsffTransporterInput;
@@ -17,37 +17,37 @@ export interface BsffFormInput extends BsffInput {
 const initialState: BsffFormInput = {
   type: BsffType.CollectePetitesQuantites,
   emitter: {
-    company: getInitialCompany(),
+    company: getInitialCompany()
   },
   transporter: {
     company: {
-      ...getInitialCompany(),
+      ...getInitialCompany()
     },
     recepisse: {
-      isExempted: false,
+      isExempted: false
     },
     transport: {
       mode: TransportMode.Road,
-      plates: [],
-    },
+      plates: []
+    }
   },
   destination: {
     company: getInitialCompany(),
     cap: "",
-    plannedOperationCode: "" as BsffOperationCode,
+    plannedOperationCode: "" as BsffOperationCode
   },
   packagings: [],
   waste: {
     code: "14 06 01*",
     description: "",
-    adr: "UN 1078, Gaz frigorifique NSA (Gaz réfrigérant, NSA), 2.2 (C/E)",
+    adr: "UN 1078, Gaz frigorifique NSA (Gaz réfrigérant, NSA), 2.2 (C/E)"
   },
   weight: {
     value: 0,
-    isEstimate: true,
+    isEstimate: true
   },
   ficheInterventions: [],
-  previousPackagings: [],
+  previousPackagings: []
 };
 
 export default initialState;

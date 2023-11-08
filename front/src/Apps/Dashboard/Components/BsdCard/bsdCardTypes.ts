@@ -1,11 +1,11 @@
-import { TBsdStatusCode } from "Apps/common/types/bsdTypes";
-import { BsdCurrentTab } from "Apps/common/types/commonTypes";
+import { TBsdStatusCode } from "../../../common/types/bsdTypes";
+import { BsdCurrentTab } from "../../../common/types/commonTypes";
 import {
   Bsd,
   BsdaRevisionRequestApproval,
   FormCompany,
-  FormRevisionRequestApproval,
-} from "generated/graphql/types";
+  FormRevisionRequestApproval
+} from "codegen-ui";
 
 export interface BsdCardProps {
   bsd:

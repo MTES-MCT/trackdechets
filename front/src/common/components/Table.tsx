@@ -2,7 +2,7 @@ import * as React from "react";
 import classNames from "classnames";
 import {
   IconTriangleDown,
-  IconTriangleUp,
+  IconTriangleUp
 } from "../../Apps/common/Components/Icons/Icons";
 import styles from "./Table.module.scss";
 
@@ -23,7 +23,7 @@ export function Table({
       className={classNames(
         styles.Table,
         {
-          [styles.TableSelectable]: isSelectable,
+          [styles.TableSelectable]: isSelectable
         },
         className
       )}
@@ -69,11 +69,7 @@ export function TableRow({ children, className, ...props }: TableRowProps) {
   );
 }
 
-export function TableRowDigest({
-  children,
-  className,
-  ...props
-}: TableRowProps) {
+export function TableRowDigest({ children, className }: TableRowProps) {
   return (
     <TableRow className={classNames(styles.TableRowDigest, className)}>
       {children}
@@ -119,7 +115,7 @@ export function TableSortIcon({ sortBy }: TableSortIconProps) {
   return (
     <Icon
       className={classNames(styles.TableSortIcon, {
-        [styles.TableSortIconVisible]: sortBy != null,
+        [styles.TableSortIconVisible]: sortBy != null
       })}
     />
   );

@@ -1,4 +1,4 @@
-import { StepContainer } from "form/common/stepper/Step";
+import { StepContainer } from "../common/stepper/Step";
 import StepList from "./BsvhuStepList";
 import React from "react";
 import { useParams } from "react-router-dom";

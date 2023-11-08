@@ -15,6 +15,14 @@ import makeClient from "../../../../__tests__/testClient";
 import { Query } from "../../../../generated/graphql/types";
 import { WASTES_REGISTRY_CSV } from "./queries";
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
+import { bsdaFactory } from "../../../../bsda/__tests__/factories";
+import { indexBsda, getBsdaForElastic } from "../../../../bsda/elastic";
+import { columns } from "../../../columns";
+import {
+  emptyIncomingWaste,
+  emptyOutgoingWaste,
+  emptyTransportedWaste
+} from "../../../types";
 
 function emitterFormFactory(ownerId: string, siret: string) {
   return formFactory({
@@ -154,6 +162,86 @@ describe("query { wastesRegistryCsv }", () => {
           expect(rowCount).toEqual(1);
           const row = rows[0];
           expect(row["N° de bordereau"]).toEqual(form.readableId);
+        });
+    }
+  );
+
+  it.each(["INCOMING", "OUTGOING", "TRANSPORTED"])(
+    "[bugfix] should contain all the columns corresponding to registry %p",
+    async registryType => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const bsda = await bsdaFactory({
+        opt: {
+          wasteCode: "08 01 17*",
+          status: "PROCESSED",
+          createdAt: new Date(),
+          destinationCompanySiret: company.siret,
+          emitterCompanySiret: company.siret,
+          transporterCompanySiret: company.siret,
+          destinationReceptionWeight: 500,
+          emitterEmissionSignatureDate: new Date(),
+          transporterTransportSignatureDate: new Date(),
+          transporterTransportTakenOverAt: new Date(),
+          destinationReceptionDate: new Date(),
+          destinationOperationSignatureDate: new Date(),
+          destinationOperationDate: new Date(),
+          destinationOperationCode: "D 5"
+        }
+      });
+      await indexBsda(await getBsdaForElastic(bsda));
+      await refreshElasticSearch();
+
+      const { query } = makeClient(user);
+      const { data } = await query<Pick<Query, "wastesRegistryCsv">>(
+        WASTES_REGISTRY_CSV,
+        {
+          variables: {
+            registryType,
+            sirets: [company.siret]
+          }
+        }
+      );
+      expect(data.wastesRegistryCsv.token).not.toBeUndefined();
+      expect(data.wastesRegistryCsv.token).not.toBeNull();
+
+      // When
+      const request = supertest(app);
+      const res = await request
+        .get("/download")
+        .query({ token: data.wastesRegistryCsv.token });
+
+      expect(res.status).toBe(200);
+
+      const rows: any[] = [];
+
+      parseString(res.text, { headers: true, delimiter: ";" })
+        .on("data", row => rows.push(row))
+        .on("end", (rowCount: number) => {
+          expect(rowCount).toEqual(1);
+          const row = rows[0];
+
+          // Actual columns of the sheet
+          const worksheetColumns = Object.keys(row);
+
+          // Expected columns
+          let waste;
+          if (registryType === "INCOMING") waste = emptyIncomingWaste;
+          else if (registryType === "OUTGOING") waste = emptyOutgoingWaste;
+          else if (registryType === "TRANSPORTED")
+            waste = emptyTransportedWaste;
+
+          const expectedColumns = columns
+            .map(column => {
+              if (Object.keys(waste).includes(column.field))
+                return column.label;
+            })
+            .filter(c => Boolean(c)); // remove undefineds
+
+          expectedColumns.forEach(exepectedColumn =>
+            expect(worksheetColumns).toContain(exepectedColumn)
+          );
         });
     }
   );

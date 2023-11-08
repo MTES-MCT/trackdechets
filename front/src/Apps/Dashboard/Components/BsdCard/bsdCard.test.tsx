@@ -2,19 +2,12 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { fireEvent, waitFor, within } from "@testing-library/dom";
 import BsdCard from "./BsdCard";
-import {
-  Bsda,
-  Bsdasri,
-  Bsff,
-  Bsvhu,
-  Form,
-  UserPermission,
-} from "generated/graphql/types";
-import { BsdCurrentTab } from "Apps/common/types/commonTypes";
+import { Bsda, Bsdasri, Bsff, Bsvhu, Form, UserPermission } from "codegen-ui";
+import { BsdCurrentTab } from "../../../common/types/commonTypes";
 import { MockedProvider } from "@apollo/client/testing";
-import { BsdaWithReview, FormWithReview } from "Apps/common/types/bsdTypes";
+import { BsdaWithReview, FormWithReview } from "../../../common/types/bsdTypes";
 import { MemoryRouter } from "react-router-dom";
-import { PermissionsProvider } from "common/contexts/PermissionsContext";
+import { PermissionsProvider } from "../../../../common/contexts/PermissionsContext";
 
 describe("Bsd card primary action label", () => {
   const siretEmmiter = "53230142100022";
@@ -43,16 +36,16 @@ describe("Bsd card primary action label", () => {
             type: "GRV",
             other: "",
             quantity: 5,
-            __typename: "PackagingInfo",
+            __typename: "PackagingInfo"
           },
           {
             type: "AUTRE",
             other: "sac",
             quantity: 2,
-            __typename: "PackagingInfo",
-          },
+            __typename: "PackagingInfo"
+          }
         ],
-        __typename: "WasteDetails",
+        __typename: "WasteDetails"
       },
       emitter: {
         type: "OTHER",
@@ -61,32 +54,32 @@ describe("Bsd card primary action label", () => {
           siret: "81232991000010",
           name: "BOULANGERIE AU 148",
           omiNumber: null,
-          __typename: "FormCompany",
+          __typename: "FormCompany"
         },
         isForeignShip: false,
-        __typename: "Emitter",
+        __typename: "Emitter"
       },
       recipient: {
         company: {
           siret: "13001045700013",
           name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-          __typename: "FormCompany",
+          __typename: "FormCompany"
         },
         isTempStorage: true,
-        __typename: "Recipient",
+        __typename: "Recipient"
       },
       transporter: {
         company: {
           siret: "13001045700013",
-          __typename: "FormCompany",
+          __typename: "FormCompany"
         },
         numberPlate: null,
         customInfo: null,
-        __typename: "Transporter",
+        __typename: "Transporter"
       },
       ecoOrganisme: {
         siret: "42248908800035",
-        __typename: "FormEcoOrganisme",
+        __typename: "FormEcoOrganisme"
       },
       stateSummary: {
         transporterCustomInfo: null,
@@ -94,19 +87,19 @@ describe("Bsd card primary action label", () => {
         transporter: {
           siret: "13001045700013",
           name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-          __typename: "FormCompany",
+          __typename: "FormCompany"
         },
         recipient: {
           siret: "13001045700013",
           name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-          __typename: "FormCompany",
+          __typename: "FormCompany"
         },
         emitter: {
           siret: "81232991000010",
           name: "BOULANGERIE AU 148",
-          __typename: "FormCompany",
+          __typename: "FormCompany"
         },
-        __typename: "StateSummary",
+        __typename: "StateSummary"
       },
       temporaryStorageDetail: {
         destination: {
@@ -117,11 +110,11 @@ describe("Bsd card primary action label", () => {
             contact: "Céline",
             phone: "0145454545",
             mail: "hello@trackdechets.beta.gouv.fr",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           cap: "CAP2",
           processingOperation: "D 1",
-          __typename: "Destination",
+          __typename: "Destination"
         },
         transporter: null,
         wasteDetails: {
@@ -130,25 +123,25 @@ describe("Bsd card primary action label", () => {
               type: "GRV",
               other: "",
               quantity: 5,
-              __typename: "PackagingInfo",
+              __typename: "PackagingInfo"
             },
             {
               type: "AUTRE",
               other: "sac",
               quantity: 2,
-              __typename: "PackagingInfo",
-            },
+              __typename: "PackagingInfo"
+            }
           ],
           quantity: 19,
           quantityType: "ESTIMATED",
-          __typename: "WasteDetails",
+          __typename: "WasteDetails"
         },
-        __typename: "TemporaryStorageDetail",
+        __typename: "TemporaryStorageDetail"
       },
       transportSegments: [],
       currentTransporterSiret: null,
       nextTransporterSiret: null,
-      __typename: "Form",
+      __typename: "Form"
     } as unknown as FormWithReview;
 
     test("Bsdd", async () => {
@@ -159,7 +152,7 @@ describe("Bsd card primary action label", () => {
           defaultPermissions={[
             UserPermission.BsdCanUpdate,
             UserPermission.BsdCanDelete,
-            UserPermission.BsdCanCreate,
+            UserPermission.BsdCanCreate
           ]}
         >
           <MockedProvider mocks={mocks} addTypename={false}>
@@ -170,7 +163,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={onValidate}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>
@@ -212,7 +205,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={onValidate}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>
@@ -242,48 +235,48 @@ describe("Bsd card primary action label", () => {
           company: {
             name: "Emmanuel Flahaut",
             siret: null,
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
-          __typename: "BsdaEmitter",
+          __typename: "BsdaEmitter"
         },
         destination: {
           company: {
             name: "L'ATELIER DE CELINE",
             siret: "53230142100022",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
-          __typename: "BsdaDestination",
+          __typename: "BsdaDestination"
         },
         worker: {
           isDisabled: false,
           company: {
             name: "L'ATELIER DE CELINE",
             siret: "53230142100022",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
-          __typename: "BsdaWorker",
+          __typename: "BsdaWorker"
         },
         transporter: {
           company: {
             name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
             siret: "13001045700013",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           customInfo: null,
           transport: {
             plates: [],
-            __typename: "BsdaTransport",
+            __typename: "BsdaTransport"
           },
-          __typename: "BsdaTransporter",
+          __typename: "BsdaTransporter"
         },
         waste: {
           materialName: "amiante",
           bsdaCode: "08 01 17*",
-          __typename: "BsdaWaste",
+          __typename: "BsdaWaste"
         },
         forwardedIn: null,
         groupedIn: null,
-        __typename: "Bsda",
+        __typename: "Bsda"
       } as unknown as BsdaWithReview;
       const onValidate = functionMock;
       const { queryByTestId } = render(
@@ -292,7 +285,7 @@ describe("Bsd card primary action label", () => {
             UserPermission.BsdCanSignEmission,
             UserPermission.BsdCanDelete,
             UserPermission.BsdCanUpdate,
-            UserPermission.BsdCanCreate,
+            UserPermission.BsdCanCreate
           ]}
         >
           <MockedProvider mocks={mocks} addTypename={false}>
@@ -303,7 +296,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={onValidate}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>
@@ -342,9 +335,9 @@ describe("Bsd card primary action label", () => {
           siret: "53230142100022",
           vatNumber: null,
           omiNumber: null,
-          __typename: "FormCompany",
+          __typename: "FormCompany"
         },
-        __typename: "BsvhuEmitter",
+        __typename: "BsvhuEmitter"
       },
       transporter: {
         company: {
@@ -353,9 +346,9 @@ describe("Bsd card primary action label", () => {
           siret: "13001045700013",
           vatNumber: "",
           omiNumber: null,
-          __typename: "FormCompany",
+          __typename: "FormCompany"
         },
-        __typename: "BsvhuTransporter",
+        __typename: "BsvhuTransporter"
       },
       destination: {
         type: "DEMOLISSEUR",
@@ -365,12 +358,12 @@ describe("Bsd card primary action label", () => {
           siret: "13001045700013",
           vatNumber: null,
           omiNumber: null,
-          __typename: "FormCompany",
+          __typename: "FormCompany"
         },
-        __typename: "BsvhuDestination",
+        __typename: "BsvhuDestination"
       },
       wasteCode: "16 01 06",
-      __typename: "Bsvhu",
+      __typename: "Bsvhu"
     } as unknown as Bsvhu;
 
     const bsvhuProcessed = { ...bsvhu, bsvhuStatus: "PROCESSED" };
@@ -383,58 +376,58 @@ describe("Bsd card primary action label", () => {
         company: {
           siret: "53230142100022",
           name: "L'ATELIER DE CELINE",
-          __typename: "FormCompany",
+          __typename: "FormCompany"
         },
-        __typename: "BsffEmitter",
+        __typename: "BsffEmitter"
       },
       bsffTransporter: {
         company: {
           siret: "13001045700013",
           name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-          __typename: "FormCompany",
+          __typename: "FormCompany"
         },
         transport: {
           plates: [],
-          __typename: "BsffTransport",
+          __typename: "BsffTransport"
         },
         customInfo: null,
-        __typename: "BsffTransporter",
+        __typename: "BsffTransporter"
       },
       bsffDestination: {
         company: {
           siret: "13001045700013",
           name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-          __typename: "FormCompany",
+          __typename: "FormCompany"
         },
-        __typename: "BsffDestination",
+        __typename: "BsffDestination"
       },
       waste: {
         code: "14 06 01*",
         description: "DÉNO",
-        __typename: "BsffWaste",
+        __typename: "BsffWaste"
       },
       packagings: [
         {
           numero: "888",
-          __typename: "BsffPackaging",
+          __typename: "BsffPackaging"
         },
         {
           numero: "889",
-          __typename: "BsffPackaging",
+          __typename: "BsffPackaging"
         },
         {
           numero: "34",
-          __typename: "BsffPackaging",
-        },
+          __typename: "BsffPackaging"
+        }
       ],
-      __typename: "Bsff",
+      __typename: "Bsff"
     } as unknown as Bsff;
 
     const bsffDifferentSiret = {
       ...bsff,
       bsffDestination: { company: { siret: "53230142100025" } },
       bsffEmitter: { company: { siret: "53230142100028" } },
-      bsffTransporter: { company: { siret: "53230142100128" } },
+      bsffTransporter: { company: { siret: "53230142100128" } }
     };
 
     test("Bsvhu same siret", async () => {
@@ -446,7 +439,7 @@ describe("Bsd card primary action label", () => {
             UserPermission.BsdCanDelete,
             UserPermission.BsdCanRead,
             UserPermission.BsdCanSignEmission,
-            UserPermission.BsdCanCreate,
+            UserPermission.BsdCanCreate
           ]}
         >
           <MockedProvider mocks={mocks} addTypename={false}>
@@ -457,7 +450,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={onValidate}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
                 bsdCurrentTab="actTab"
               />
@@ -496,7 +489,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={functionMock}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>
@@ -520,7 +513,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={functionMock}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>
@@ -542,7 +535,7 @@ describe("Bsd card primary action label", () => {
             UserPermission.BsdCanRead,
             UserPermission.BsdCanDelete,
             UserPermission.BsdCanCreate,
-            UserPermission.BsdCanUpdate,
+            UserPermission.BsdCanUpdate
           ]}
         >
           <MockedProvider mocks={mocks} addTypename={false}>
@@ -554,7 +547,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={onValidate}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>
@@ -587,7 +580,7 @@ describe("Bsd card primary action label", () => {
         <PermissionsProvider
           defaultPermissions={[
             UserPermission.BsdCanSignEmission,
-            UserPermission.BsdCanRead,
+            UserPermission.BsdCanRead
           ]}
         >
           <MockedProvider mocks={mocks} addTypename={false}>
@@ -599,7 +592,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={functionMock}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>
@@ -634,44 +627,44 @@ describe("Bsd card primary action label", () => {
           company: {
             name: "L'ATELIER DE CELINE",
             siret: "53230142100022",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
-          __typename: "BsdaEmitter",
+          __typename: "BsdaEmitter"
         },
         destination: {
           company: {
             name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
             siret: "13001045700013",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
-          __typename: "BsdaDestination",
+          __typename: "BsdaDestination"
         },
         worker: {
           isDisabled: false,
           company: null,
-          __typename: "BsdaWorker",
+          __typename: "BsdaWorker"
         },
         transporter: {
           company: {
             name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
             siret: "13001045700013",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           customInfo: null,
           transport: {
             plates: [],
-            __typename: "BsdaTransport",
+            __typename: "BsdaTransport"
           },
-          __typename: "BsdaTransporter",
+          __typename: "BsdaTransporter"
         },
         waste: {
           materialName: "qsdoo",
           bsdaCode: "08 01 17*",
-          __typename: "BsdaWaste",
+          __typename: "BsdaWaste"
         },
         forwardedIn: null,
         groupedIn: null,
-        __typename: "Bsda",
+        __typename: "Bsda"
       } as unknown as Bsda;
 
       render(
@@ -686,7 +679,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={functionMock}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
                 bsdCurrentTab="actTab"
               />
@@ -724,10 +717,10 @@ describe("Bsd card primary action label", () => {
               type: "GRV",
               other: "",
               quantity: 50,
-              __typename: "PackagingInfo",
-            },
+              __typename: "PackagingInfo"
+            }
           ],
-          __typename: "WasteDetails",
+          __typename: "WasteDetails"
         },
         emitter: {
           type: "APPENDIX2",
@@ -736,28 +729,28 @@ describe("Bsd card primary action label", () => {
             siret: "53230142100022",
             name: "L'ATELIER DE CELINE",
             omiNumber: "",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           isForeignShip: false,
-          __typename: "Emitter",
+          __typename: "Emitter"
         },
         recipient: {
           company: {
             siret: "13001045700013",
             name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           isTempStorage: false,
-          __typename: "Recipient",
+          __typename: "Recipient"
         },
         transporter: {
           company: {
             siret: "13001045700013",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           numberPlate: "",
           customInfo: null,
-          __typename: "Transporter",
+          __typename: "Transporter"
         },
         ecoOrganisme: null,
         stateSummary: {
@@ -766,25 +759,25 @@ describe("Bsd card primary action label", () => {
           transporter: {
             siret: "13001045700013",
             name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           recipient: {
             siret: "13001045700013",
             name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           emitter: {
             siret: "53230142100022",
             name: "L'ATELIER DE CELINE",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
-          __typename: "StateSummary",
+          __typename: "StateSummary"
         },
         temporaryStorageDetail: null,
         transportSegments: [],
         currentTransporterSiret: null,
         nextTransporterSiret: null,
-        __typename: "Form",
+        __typename: "Form"
       } as unknown as Form;
       const { queryByTestId } = render(
         <PermissionsProvider
@@ -798,7 +791,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={functionMock}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>
@@ -808,7 +801,7 @@ describe("Bsd card primary action label", () => {
       const { getByText } = within(
         screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
       );
-      expect(getByText("Faire signer")).toBeInTheDocument();
+      expect(getByText("Signer")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -836,22 +829,22 @@ describe("Bsd card primary action label", () => {
               type: "FUT",
               other: "",
               quantity: 6,
-              __typename: "PackagingInfo",
+              __typename: "PackagingInfo"
             },
             {
               type: "GRV",
               other: "",
               quantity: 1,
-              __typename: "PackagingInfo",
+              __typename: "PackagingInfo"
             },
             {
               type: "AUTRE",
               other: "CAISSE 30 litres",
               quantity: 50,
-              __typename: "PackagingInfo",
-            },
+              __typename: "PackagingInfo"
+            }
           ],
-          __typename: "WasteDetails",
+          __typename: "WasteDetails"
         },
         emitter: {
           type: "PRODUCER",
@@ -860,30 +853,30 @@ describe("Bsd card primary action label", () => {
             siret: "13001045700013",
             name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
             omiNumber: null,
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           isForeignShip: false,
-          __typename: "Emitter",
+          __typename: "Emitter"
         },
         recipient: {
           company: {
             siret: "53230142100022",
             orgId: "53230142100022",
             name: "L'ATELIER DE CELINE",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           isTempStorage: false,
-          __typename: "Recipient",
+          __typename: "Recipient"
         },
         transporter: {
           company: {
             siret: "13001045700013",
             orgId: "13001045700013",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           numberPlate: null,
           customInfo: null,
-          __typename: "Transporter",
+          __typename: "Transporter"
         },
         ecoOrganisme: null,
         stateSummary: {
@@ -892,19 +885,19 @@ describe("Bsd card primary action label", () => {
           transporter: {
             siret: "13001045700013",
             name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           recipient: {
             siret: "53230142100022",
             name: "L'ATELIER DE CELINE",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           emitter: {
             siret: "13001045700013",
             name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
-          __typename: "StateSummary",
+          __typename: "StateSummary"
         },
         temporaryStorageDetail: null,
         transportSegments: [
@@ -913,12 +906,12 @@ describe("Bsd card primary action label", () => {
             readyToTakeOver: false,
             previousTransporterCompanySiret: "13001045700013",
             takenOverAt: null,
-            __typename: "TransportSegment",
-          },
+            __typename: "TransportSegment"
+          }
         ],
         currentTransporterSiret: "13001045700013",
         nextTransporterSiret: "13001045700013",
-        __typename: "Form",
+        __typename: "Form"
       } as unknown as Form;
       render(
         <PermissionsProvider
@@ -933,7 +926,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={functionMock}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>
@@ -957,7 +950,7 @@ describe("Bsd card primary action label", () => {
         isDraft: false,
         bsdasriWaste: {
           code: "18 01 03*",
-          __typename: "BsdasriWaste",
+          __typename: "BsdasriWaste"
         },
         emitter: {
           company: {
@@ -966,19 +959,19 @@ describe("Bsd card primary action label", () => {
             siret: "81232991000010",
             vatNumber: null,
             omiNumber: null,
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           emission: {
             isTakenOverWithoutEmitterSignature: false,
             isTakenOverWithSecretCode: false,
-            __typename: "BsdasriEmission",
+            __typename: "BsdasriEmission"
           },
-          __typename: "BsdasriEmitter",
+          __typename: "BsdasriEmitter"
         },
         ecoOrganisme: {
           siret: "79250555400032",
           emittedByEcoOrganisme: true,
-          __typename: "BsdasriEcoOrganisme",
+          __typename: "BsdasriEcoOrganisme"
         },
         transporter: {
           company: {
@@ -987,14 +980,14 @@ describe("Bsd card primary action label", () => {
             siret: "13001045700013",
             vatNumber: null,
             omiNumber: null,
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           customInfo: "houlalalal",
           transport: {
             plates: ["obligé"],
-            __typename: "BsdasriTransport",
+            __typename: "BsdasriTransport"
           },
-          __typename: "BsdasriTransporter",
+          __typename: "BsdasriTransporter"
         },
         destination: {
           company: {
@@ -1003,9 +996,9 @@ describe("Bsd card primary action label", () => {
             siret: "53230142100022",
             vatNumber: null,
             omiNumber: null,
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
-          __typename: "BsdasriDestination",
+          __typename: "BsdasriDestination"
         },
         grouping: [],
         synthesizing: [],
@@ -1014,9 +1007,9 @@ describe("Bsd card primary action label", () => {
         allowDirectTakeOver: false,
         synthesizedIn: {
           id: "DASRI-20220603-V61NMBREF",
-          __typename: "Bsdasri",
+          __typename: "Bsdasri"
         },
-        __typename: "Bsdasri",
+        __typename: "Bsdasri"
       } as unknown as Bsdasri;
       const { queryByTestId } = render(
         <PermissionsProvider
@@ -1031,7 +1024,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={functionMock}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>
@@ -1053,7 +1046,7 @@ describe("Bsd card primary action label", () => {
         isDraft: false,
         bsdasriWaste: {
           code: "18 01 03*",
-          __typename: "BsdasriWaste",
+          __typename: "BsdasriWaste"
         },
         emitter: {
           company: {
@@ -1062,19 +1055,19 @@ describe("Bsd card primary action label", () => {
             siret: "81232991000010",
             vatNumber: null,
             omiNumber: null,
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           emission: {
             isTakenOverWithoutEmitterSignature: false,
             isTakenOverWithSecretCode: false,
-            __typename: "BsdasriEmission",
+            __typename: "BsdasriEmission"
           },
-          __typename: "BsdasriEmitter",
+          __typename: "BsdasriEmitter"
         },
         ecoOrganisme: {
           siret: "79250555400032",
           emittedByEcoOrganisme: true,
-          __typename: "BsdasriEcoOrganisme",
+          __typename: "BsdasriEcoOrganisme"
         },
         transporter: {
           company: {
@@ -1083,14 +1076,14 @@ describe("Bsd card primary action label", () => {
             siret: "13001045700013",
             vatNumber: null,
             omiNumber: null,
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           customInfo: "houlalalal",
           transport: {
             plates: ["obligé"],
-            __typename: "BsdasriTransport",
+            __typename: "BsdasriTransport"
           },
-          __typename: "BsdasriTransporter",
+          __typename: "BsdasriTransporter"
         },
         destination: {
           company: {
@@ -1099,16 +1092,16 @@ describe("Bsd card primary action label", () => {
             siret: "53230142100022",
             vatNumber: null,
             omiNumber: null,
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
-          __typename: "BsdasriDestination",
+          __typename: "BsdasriDestination"
         },
         grouping: [],
         synthesizing: [],
         createdAt: "2022-06-03T07:12:29.490Z",
         updatedAt: "2022-06-03T07:16:40.015Z",
         allowDirectTakeOver: false,
-        __typename: "Bsdasri",
+        __typename: "Bsdasri"
       } as unknown as Bsdasri;
       const { queryByTestId } = render(
         <PermissionsProvider
@@ -1123,7 +1116,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={functionMock}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>
@@ -1161,10 +1154,10 @@ describe("Bsd card primary action label", () => {
               type: "AUTRE",
               other: "bouteilles",
               quantity: 3,
-              __typename: "PackagingInfo",
-            },
+              __typename: "PackagingInfo"
+            }
           ],
-          __typename: "WasteDetails",
+          __typename: "WasteDetails"
         },
         emitter: {
           type: "PRODUCER",
@@ -1173,30 +1166,30 @@ describe("Bsd card primary action label", () => {
             siret: "81232991000010",
             name: "BOULANGERIE AU 148",
             omiNumber: null,
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           isForeignShip: false,
-          __typename: "Emitter",
+          __typename: "Emitter"
         },
         recipient: {
           company: {
             siret: "53230142100022",
             orgId: "53230142100022",
             name: "L'ATELIER DE CELINE",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           isTempStorage: false,
-          __typename: "Recipient",
+          __typename: "Recipient"
         },
         transporter: {
           company: {
             siret: "13001045700013",
             orgId: "13001045700013",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           numberPlate: "",
           customInfo: null,
-          __typename: "Transporter",
+          __typename: "Transporter"
         },
         ecoOrganisme: null,
         stateSummary: {
@@ -1205,25 +1198,25 @@ describe("Bsd card primary action label", () => {
           transporter: {
             siret: "13001045700013",
             name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           recipient: {
             siret: "53230142100022",
             name: "L'ATELIER DE CELINE",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
           emitter: {
             siret: "81232991000010",
             name: "BOULANGERIE AU 148",
-            __typename: "FormCompany",
+            __typename: "FormCompany"
           },
-          __typename: "StateSummary",
+          __typename: "StateSummary"
         },
         temporaryStorageDetail: null,
         transportSegments: [],
         currentTransporterSiret: "",
         nextTransporterSiret: null,
-        __typename: "Form",
+        __typename: "Form"
       } as unknown as FormWithReview;
 
       render(
@@ -1238,7 +1231,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={functionMock}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>
@@ -1263,10 +1256,10 @@ describe("Bsd card primary action label", () => {
         readableId: "BSD-20220512-6609ESJPV",
         status: "SEALED",
         emitter: {
-          type: "APPENDIX1",
+          type: "APPENDIX1"
         },
 
-        __typename: "Form",
+        __typename: "Form"
       } as unknown as Form;
 
       render(
@@ -1279,7 +1272,7 @@ describe("Bsd card primary action label", () => {
                 onValidate={functionMock}
                 secondaryActions={{
                   onUpdate: functionMock,
-                  onOverview: functionMock,
+                  onOverview: functionMock
                 }}
               />
             </MemoryRouter>

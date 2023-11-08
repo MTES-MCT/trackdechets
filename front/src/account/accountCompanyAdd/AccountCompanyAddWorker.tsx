@@ -1,10 +1,10 @@
 import React from "react";
 import { Field, useFormikContext } from "formik";
-import RedErrorMessage from "common/components/RedErrorMessage";
+import RedErrorMessage from "../../common/components/RedErrorMessage";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import Tooltip from "common/components/Tooltip";
+import Tooltip from "../../common/components/Tooltip";
 
 import { Values } from "../AccountCompanyAdd";
 
@@ -29,9 +29,9 @@ export default function AccountCompanyAddBrokerReceipt() {
                         name: field.name,
                         checked: field.value,
                         onChange: field.onChange,
-                        onBlur: field.onBlur,
-                      },
-                    },
+                        onBlur: field.onBlur
+                      }
+                    }
                   ]}
                 />
               );
@@ -52,9 +52,9 @@ export default function AccountCompanyAddBrokerReceipt() {
                         name: field.name,
                         checked: field.value,
                         onChange: field.onChange,
-                        onBlur: field.onBlur,
-                      },
-                    },
+                        onBlur: field.onBlur
+                      }
+                    }
                   ]}
                 />
               );
@@ -76,7 +76,7 @@ export default function AccountCompanyAddBrokerReceipt() {
                     nativeInputProps={{
                       name: field.name,
                       onChange: field.onChange,
-                      onBlur: field.onBlur,
+                      onBlur: field.onBlur
                     }}
                   ></Input>
                 );
@@ -95,7 +95,7 @@ export default function AccountCompanyAddBrokerReceipt() {
                       name: field.name,
                       onChange: field.onChange,
                       onBlur: field.onBlur,
-                      max: "2999/12/31",
+                      max: "2999/12/31"
                     }}
                   ></Input>
                 );
@@ -113,21 +113,21 @@ export default function AccountCompanyAddBrokerReceipt() {
                     nativeSelectProps={{
                       name: field.name,
                       value: values.organisation,
-                      onChange: e => field.onChange(e),
+                      onChange: e => field.onChange(e)
                     }}
                     options={[
                       {
                         value: "AFNOR Certification",
-                        label: "AFNOR Certification",
+                        label: "AFNOR Certification"
                       },
                       {
                         value: "QUALIBAT",
-                        label: "QUALIBAT",
+                        label: "QUALIBAT"
                       },
                       {
                         value: "GLOBAL CERTIFICATION",
-                        label: "GLOBAL CERTIFICATION",
-                      },
+                        label: "GLOBAL CERTIFICATION"
+                      }
                     ]}
                   />
                 );

@@ -1,23 +1,20 @@
 import React, { useEffect } from "react";
-import { RedErrorMessage } from "common/components";
-import { BsdasriSignatureType, BsdasriStatus } from "generated/graphql/types";
-import Packagings from "form/bsdasri/components/packagings/Packagings";
-import WeightWidget from "form/bsdasri/components/Weight";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import {
-  ExtraSignatureType,
-  SignatureType,
-} from "dashboard/components/BSDList/BSDasri/types";
+import { RedErrorMessage } from "../../../../../common/components";
+import { BsdasriSignatureType, BsdasriStatus } from "codegen-ui";
+import Packagings from "../../../../../form/bsdasri/components/packagings/Packagings";
+import WeightWidget from "../../../../../form/bsdasri/components/Weight";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
+import Acceptation from "../../../../../form/bsdasri/components/acceptation/Acceptation";
+import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
+import { ExtraSignatureType, SignatureType } from "../types";
 import { Field, useFormikContext } from "formik";
 import omitDeep from "omit-deep-lodash";
-import { getInitialWeightFn } from "form/bsdasri/utils/initial-state";
-import { Bsdasri, BsdasriType } from "generated/graphql/types";
-import Transport from "form/bsdasri/steps/Transport";
-import TransporterReceipt from "form/common/components/company/TransporterReceipt";
+import { getInitialWeightFn } from "../../../../../form/bsdasri/utils/initial-state";
+import { Bsdasri, BsdasriType } from "codegen-ui";
+import Transport from "../../../../../form/bsdasri/steps/Transport";
+import TransporterReceipt from "../../../../../form/common/components/company/TransporterReceipt";
 import { subMonths } from "date-fns";
-import OperationModeSelect from "common/components/OperationModeSelect";
+import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
 
 export function EmitterSignatureForm() {
   return (
@@ -318,13 +315,13 @@ export const removeSections = (input, signatureType: SignatureType) => {
     groupingKey,
     synthesizingKey,
     synthesizedInKey,
-    transporterTransportVolumeKey,
+    transporterTransportVolumeKey
   ];
   const mapping = {
     [BsdasriSignatureType.Emission]: [
       transporterKey,
       destinationKey,
-      ...common,
+      ...common
     ],
 
     [ExtraSignatureType.SynthesisTakeOver]: [
@@ -333,19 +330,19 @@ export const removeSections = (input, signatureType: SignatureType) => {
       vatNumberKey,
       transporterTransportPackagingsKey,
 
-      ...common,
+      ...common
     ],
     [BsdasriSignatureType.Transport]: [emitterKey, destinationKey, ...common],
     [ExtraSignatureType.DirectTakeover]: [
       emitterKey,
       destinationKey,
-      ...common,
+      ...common
     ],
     [BsdasriSignatureType.Reception]: [
       emitterKey,
       transporterKey,
       operationKey,
-      ...common,
+      ...common
     ],
     [BsdasriSignatureType.Operation]: [
       emitterKey,
@@ -353,8 +350,8 @@ export const removeSections = (input, signatureType: SignatureType) => {
       receptionKey,
       wholeCompanyKey,
       identificationKey,
-      ...common,
-    ],
+      ...common
+    ]
   };
   const { type, ...payload } = input;
   return omitDeep(payload, mapping[signatureType]);

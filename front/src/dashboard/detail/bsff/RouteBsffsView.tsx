@@ -2,11 +2,11 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import { Query, QueryBsffArgs } from "generated/graphql/types";
-import Loader from "Apps/common/Components/Loader/Loaders";
-import { GET_BSFF_FORM } from "form/bsff/utils/queries";
-import { InlineError } from "Apps/common/Components/Error/Error";
-import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
+import { Query, QueryBsffArgs } from "codegen-ui";
+import Loader from "../../../Apps/common/Components/Loader/Loaders";
+import { GET_BSFF_FORM } from "../../../form/bsff/utils/queries";
+import { InlineError } from "../../../Apps/common/Components/Error/Error";
+import EmptyDetail from "../common/EmptyDetailView";
 
 import { BsffDetailContent } from "./BsffDetailContent";
 
@@ -16,10 +16,10 @@ export function RouteBsffsView() {
     GET_BSFF_FORM,
     {
       variables: {
-        id: formId,
+        id: formId
       },
       skip: !formId,
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     }
   );
 
