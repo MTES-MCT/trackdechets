@@ -30,7 +30,7 @@
     },
     "serve": {
       "executor": "@nx/vite:dev-server",
-      "dependsOn": ["generators"],
+      "dependsOn": ["^build", "generators"],
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "front:build",
