@@ -13,7 +13,6 @@ import {
   getPrimaryActionsLabelFromBsdStatus,
   getPrimaryActionsReviewsLabel,
   getWorkflowLabel,
-  isAppendix1,
   isBsdasri,
   isBsff,
   isBsvhu
@@ -27,7 +26,7 @@ import {
   useBsffDownloadPdf,
   useBsvhuDownloadPdf
 } from "../Pdf/useDownloadPdf";
-import { BsdType, Query, QueryFormArgs } from "codegen-ui";
+import { BsdType } from "codegen-ui";
 import {
   useBsdaDuplicate,
   useBsdasriDuplicate,
@@ -42,8 +41,6 @@ import { useMedia } from "../../../../common/use-media";
 import { MEDIA_QUERIES } from "../../../../common/config";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 import { UserPermission } from "codegen-ui";
-import { useLazyQuery } from "@apollo/client";
-import { GET_DETAIL_FORM } from "../../../common/queries";
 
 import "./bsdCard.scss";
 
@@ -109,13 +106,6 @@ function BsdCard({
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const [getDetails] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(
-    GET_DETAIL_FORM,
-    {
-      fetchPolicy: "network-only"
-    }
-  );
-
   const isDuplicating =
     isDuplicatingBsdd ||
     isDuplicatingBsda ||
@@ -153,15 +143,7 @@ function BsdCard({
   const handleValidationClick = (
     _: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
-    if (isAppendix1(bsdDisplay!)) {
-      getDetails({ variables: { id: bsd.id, readableId: null } }).then(
-        ({ data }) => {
-          onValidate(data!.form);
-        }
-      );
-    } else {
-      onValidate(bsd);
-    }
+    onValidate(bsd);
   };
   const handleEditableInfoClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,

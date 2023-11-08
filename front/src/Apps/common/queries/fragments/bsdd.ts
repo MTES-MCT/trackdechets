@@ -518,6 +518,49 @@ export const dashboardFormFragment = gql`
       takenOverAt
       segmentNumber
     }
+    grouping {
+      quantity
+      form {
+        id
+        readableId
+        status
+        takenOverAt
+        wasteDetails {
+          code
+          name
+          quantity
+          packagingInfos {
+            type
+            other
+            quantity
+          }
+        }
+        emitter {
+          company {
+            orgId
+            name
+            siret
+          }
+          isPrivateIndividual
+        }
+        transporter {
+          company {
+            orgId
+            siret
+          }
+        }
+        recipient {
+          company {
+            siret
+            orgId
+          }
+        }
+        signedAt
+        quantityReceived
+        quantityGrouped
+        processingOperationDone
+      }
+    }
     currentTransporterSiret
     nextTransporterSiret
   }
