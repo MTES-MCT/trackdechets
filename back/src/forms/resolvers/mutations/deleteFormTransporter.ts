@@ -1,4 +1,6 @@
+import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
+// import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import {
@@ -16,6 +18,11 @@ const deleteFormTransporterResolver: MutationResolvers["deleteFormTransporter"] 
 
     // TODO this should be done in a transaction
     if (transporter.formId) {
+      if (transporter.takenOverAt) {
+        throw new UserInputError(
+          `Ce transporteur BSDD ne peut-être supprimé car il a déjà signé l'enlèvement du déchet`
+        );
+      }
       const form = await getFormOrFormNotFound({ id: transporter.formId });
       const transporters = await getTransporters({ id: form.id });
       await checkCanUpdate(user, form, {
