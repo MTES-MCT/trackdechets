@@ -72,6 +72,23 @@ describe("BSDA validation", () => {
       expect(success).toBe(true);
     });
 
+    it("transporter recepisse is not required if transport mode is not ROAD", async () => {
+      const data = {
+        ...bsda,
+        transporterRecepisseNumber: null,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "AIR"
+      };
+
+      await parseBsdaInContext(
+        { persisted: data as any },
+        {
+          currentSignatureType: "TRANSPORT"
+        }
+      );
+    });
+
     it("transporter plate is not required if transport mode is not ROAD", async () => {
       const data = {
         ...bsda,
