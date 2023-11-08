@@ -1,6 +1,7 @@
 export const STATUS_LABELS: { [key: string]: string } = {
   DRAFT: "Brouillon",
   SEALED: "En attente de signature par l'émetteur",
+  SEALED_PRIVATE_INDIVIDUAL: "En attente de signature transporteur",
   SENT: "En attente de réception",
   RECEIVED: "Reçu, en attente d'acceptation ou de refus",
   ACCEPTED: "Accepté, en attente de traitement",
