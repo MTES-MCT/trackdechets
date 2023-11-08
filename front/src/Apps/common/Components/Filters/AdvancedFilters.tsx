@@ -9,7 +9,7 @@ import { MAX_FILTER } from "../../../Dashboard/dashboardUtils";
 
 import "./filters.scss";
 
-const Filters = ({
+const AdvancedFilters = ({
   open = false,
   filters,
   onApplyFilters
@@ -293,4 +293,4 @@ const Filters = ({
   return null;
 };
 
-export default React.memo(Filters);
+export default React.memo(AdvancedFilters);
