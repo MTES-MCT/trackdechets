@@ -18,7 +18,7 @@ const Template: ComponentStory<typeof QuickFilters> = args => (
 
 export const Primary = Template.bind({});
 const values = {};
-const onApplyFilters = values => {};
+const onApplyFilters = _ => {};
 
 Primary.args = {
   filters: [

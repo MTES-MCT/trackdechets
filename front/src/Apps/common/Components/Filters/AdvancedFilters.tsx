@@ -5,7 +5,7 @@ import Input from "../Input/Input";
 import { inputType } from "../../types/commonTypes";
 import Select from "../Select/Select";
 import DatePickerWrapper from "../DatePicker/DatePickerWrapper";
-import { MAX_FILTER } from "Apps/Dashboard/dashboardUtils";
+import { MAX_FILTER } from "../../../Dashboard/dashboardUtils";
 
 import "./filters.scss";
 
@@ -255,9 +255,8 @@ const Filters = ({
     }
   }, [filterValues, isApplyDisabled, onApplyFilters]);
 
-  return (
-    <>
-      {open && (
+  if(open) {
+      return  (
         <>
           {filterSelectedList.map((filter, i) => {
             return (
@@ -288,9 +287,10 @@ const Filters = ({
             />
           </div>
         </>
-      )}
-    </>
-  );
+      )
+    }
+
+    return null;
 };
 
 export default React.memo(Filters);

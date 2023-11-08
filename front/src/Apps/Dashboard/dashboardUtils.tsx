@@ -36,7 +36,6 @@ import {
   filter_worker_operation_code,
   filter_worker_sign_date
 } from "../common/wordings/dashboard/wordingsDashboard";
-import { BsdType, BsdWhere } from "codegen-ui";
 import { Filter, FilterType } from "../common/Components/Filters/filtersTypes";
 import {
   IconBSFF,
@@ -47,6 +46,7 @@ import {
 } from "../common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
 import { BsdCurrentTab } from "../common/types/commonTypes";
+import { BsdType, BsdWhere } from "../../generated/graphql/types";
 
 export const MAX_FILTER = 5;
 
