@@ -15,6 +15,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Le mode de traitement n'est obligatoire qu'à l'étape de traitement pour tous les BSDs [PR 2848](https://github.com/MTES-MCT/trackdechets/pull/2848)
+- Rendre impossible la suppression d'un transporteur BSDD via la mutation `deleteFormTransporter` si celui-ci a déjà signé le BSDD [PR 2836](https://github.com/MTES-MCT/trackdechets/pull/2836)
 
 #### :boom: Breaking changes
 
@@ -77,7 +78,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
-- Optimisation appendixForms : pré-calcul de quantityGrouped [PR 2701](https://github.com/MTES-MCT/trackdechets/pull/2701) 
+- Optimisation appendixForms : pré-calcul de quantityGrouped [PR 2701](https://github.com/MTES-MCT/trackdechets/pull/2701)
 - Suppression du script `npm run queue:obliterate` [PR 2475](https://github.com/MTES-MCT/trackdechets/pull/2475)
 
 # [2023.9.1] 19/09/2023
