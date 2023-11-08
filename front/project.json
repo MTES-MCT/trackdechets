@@ -4,9 +4,15 @@
   "sourceRoot": "front/src",
   "projectType": "application",
   "targets": {
+    "dsfr": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cd front && copy-dsfr-to-public && only-include-used-icons"
+      }
+    },
     "build": {
       "executor": "@nx/vite:build",
-      "dependsOn": ["^build", "generators"],
+      "dependsOn": ["^build", "dsfr", "generators"],
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
