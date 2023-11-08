@@ -1,21 +1,15 @@
 import Input from "@codegouvfr/react-dsfr/Input";
-import { debounce } from "common/helper";
-import React, { useMemo } from "react";
+import React from "react";
 import { QuickFilterProps } from "./filtersTypes";
 
-const DEBOUNCE_DELAY = 500;
-
-const QuickFilter = ({ label, placeholder, onChange }: QuickFilterProps) => {
-  const debouncedOnChange = useMemo(
-    () => debounce(onChange, DEBOUNCE_DELAY),
-    [onChange]
-  );
-
+const QuickFilter = ({
+  label,
+  placeholder,
+  value,
+  onChange,
+}: QuickFilterProps) => {
   return (
-    <Input
-      label={label}
-      nativeInputProps={{ onChange: debouncedOnChange, placeholder }}
-    />
+    <Input label={label} nativeInputProps={{ onChange, placeholder, value }} />
   );
 };
 

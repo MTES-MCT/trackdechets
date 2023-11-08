@@ -36,6 +36,7 @@ export interface QuickFiltersProp {
 
 export interface QuickFilterProps {
   label: string;
+  value: string;
   placeholder?: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
