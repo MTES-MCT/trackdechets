@@ -66,7 +66,7 @@
 4. Démarrer les containers de bases de données
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up
+   docker-compose docker-compose.yml up -d
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.

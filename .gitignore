@@ -12,3 +12,4 @@ docker-compose.override.yml
 /dist
 /out-tsc
 .nx/cache
+generated
