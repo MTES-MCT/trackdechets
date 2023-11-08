@@ -4,8 +4,10 @@ import QuickFilters from "./QuickFilters";
 import AdvancedFilters from "./AdvancedFilters";
 
 import "./filters.scss";
-import { advancedFilterList, quickFilterList } from "../../../Dashboard/dashboardUtils";
-
+import {
+  advancedFilterList,
+  quickFilterList
+} from "../../../Dashboard/dashboardUtils";
 
 const purgeEmptyValues = (obj: { [key: string]: string | string[] }) => {
   return JSON.parse(
@@ -17,7 +19,7 @@ const purgeEmptyValues = (obj: { [key: string]: string | string[] }) => {
 
 const Filters = ({
   areAdvancedFiltersOpen = false,
-  onApplyFilters,
+  onApplyFilters
 }: FiltersProps) => {
   const [advancedFilters, setAdvancedFilters] = useState({});
   const [quickFilters, setQuickFilters] = useState({});
@@ -33,7 +35,7 @@ const Filters = ({
   useEffect(() => {
     const filters = purgeEmptyValues({
       ...advancedFilters,
-      ...quickFilters,
+      ...quickFilters
     });
 
     onApplyFilters(filters);

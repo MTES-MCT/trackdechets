@@ -6,7 +6,7 @@ const QuickFilter = ({
   label,
   placeholder,
   value,
-  onChange,
+  onChange
 }: QuickFilterProps) => {
   return (
     <Input label={label} nativeInputProps={{ onChange, placeholder, value }} />

@@ -8,8 +8,8 @@ export default {
   component: QuickFilters,
   design: {
     type: "figma",
-    url: "https://www.figma.com/file/TZbRaWgchdAv8o7IxJWrKE/Trackd%C3%A9chets?node-id=2864%3A543748&t=AnkIpzoWgu1o8Cbc-4",
-  },
+    url: "https://www.figma.com/file/TZbRaWgchdAv8o7IxJWrKE/Trackd%C3%A9chets?node-id=2864%3A543748&t=AnkIpzoWgu1o8Cbc-4"
+  }
 } as ComponentMeta<typeof QuickFilters>;
 
 const Template: ComponentStory<typeof QuickFilters> = args => (
@@ -26,14 +26,14 @@ Primary.args = {
       name: "waste",
       label: "Code déchet",
       type: FilterType.input,
-      isActive: true,
+      isActive: true
     },
     {
       name: "givenName",
       label: "Raison sociale / SIRET",
       type: FilterType.input,
-      isActive: true,
-    },
+      isActive: true
+    }
   ],
-  onApplyFilters: () => onApplyFilters(values),
+  onApplyFilters: () => onApplyFilters(values)
 };

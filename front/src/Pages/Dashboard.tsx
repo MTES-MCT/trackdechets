@@ -268,7 +268,7 @@ const DashboardPage = () => {
     filterValues => {
       const variables = {
         where: {} as BsdWhere,
-        order: {},
+        order: {}
       };
       const routePredicate = withRoutePredicate();
       if (routePredicate) {
@@ -296,7 +296,7 @@ const DashboardPage = () => {
 
           variables.where = {
             ...variables.where,
-            ...wheres,
+            ...wheres
           };
           variables.order[predicate.order] = OrderType.Asc;
         }
@@ -498,7 +498,7 @@ const DashboardPage = () => {
     areAdvancedFiltersOpen,
     defaultWhere,
     isReviewsTab,
-    fetchWithDefaultWhere,
+    fetchWithDefaultWhere
   ]);
 
   const getBlankstateTitle = (): string | undefined => {

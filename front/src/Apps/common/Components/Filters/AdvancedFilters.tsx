@@ -12,7 +12,7 @@ import "./filters.scss";
 const Filters = ({
   open = false,
   filters,
-  onApplyFilters,
+  onApplyFilters
 }: AdvancedFiltersProps) => {
   const placeholderFilterRef = useRef<HTMLDivElement>(null);
   const [filterSelectedList, setFilterSelectedList] = useState<Filter[]>([]);
@@ -141,12 +141,12 @@ const Filters = ({
       if (isStartDate) {
         newFilterValues[filterName] = {
           ...newFilterValues[filterName],
-          startDate: date,
+          startDate: date
         };
       } else {
         newFilterValues[filterName] = {
           ...newFilterValues[filterName],
-          endDate: date,
+          endDate: date
         };
       }
 
@@ -255,42 +255,42 @@ const Filters = ({
     }
   }, [filterValues, isApplyDisabled, onApplyFilters]);
 
-  if(open) {
-      return  (
-        <>
-          {filterSelectedList.map((filter, i) => {
-            return (
-              <React.Fragment key={`${filter.name}_filter`}>
-                <FilterLine
-                  filters={derivedFilters}
-                  onAddFilterType={onAddFilterType}
-                  onRemoveFilterType={onRemoveFilterType}
-                  value={filter.name}
-                  disabledSelect={true}
-                  isMaxLine={hasReachMaxFilter}
-                  isCurrentLine={i === filterSelectedList.length - 1}
-                >
-                  {displayFilterItem(filter)}
-                </FilterLine>
-              </React.Fragment>
-            );
-          })}
-          {/* filter selector */}
-          <div ref={placeholderFilterRef}>
-            <FilterLine
-              filters={derivedFilters}
-              onChange={onSelectFilterType}
-              onAddFilterType={onAddFilterType}
-              onRemoveFilterType={onRemoveFilterType}
-              isMaxLine={hasReachMaxFilter}
-              isCurrentLine
-            />
-          </div>
-        </>
-      )
-    }
+  if (open) {
+    return (
+      <>
+        {filterSelectedList.map((filter, i) => {
+          return (
+            <React.Fragment key={`${filter.name}_filter`}>
+              <FilterLine
+                filters={derivedFilters}
+                onAddFilterType={onAddFilterType}
+                onRemoveFilterType={onRemoveFilterType}
+                value={filter.name}
+                disabledSelect={true}
+                isMaxLine={hasReachMaxFilter}
+                isCurrentLine={i === filterSelectedList.length - 1}
+              >
+                {displayFilterItem(filter)}
+              </FilterLine>
+            </React.Fragment>
+          );
+        })}
+        {/* filter selector */}
+        <div ref={placeholderFilterRef}>
+          <FilterLine
+            filters={derivedFilters}
+            onChange={onSelectFilterType}
+            onAddFilterType={onAddFilterType}
+            onRemoveFilterType={onRemoveFilterType}
+            isMaxLine={hasReachMaxFilter}
+            isCurrentLine
+          />
+        </div>
+      </>
+    );
+  }
 
-    return null;
+  return null;
 };
 
 export default React.memo(Filters);
