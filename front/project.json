@@ -30,7 +30,7 @@
     },
     "serve": {
       "executor": "@nx/vite:dev-server",
-      "dependsOn": ["generators"],
+      "dependsOn": ["^build", "generators"],
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "front:build",
@@ -65,7 +65,7 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "dependsOn": ["generators"],
+      "dependsOn": ["^build", "generators"],
       "options": {
         "passWithNoTests": true,
         "jestConfig": "front/jest.config.js"
