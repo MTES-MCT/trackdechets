@@ -37,22 +37,22 @@ export default function Oauth2Dialog() {
       <div className="tw-flex tw-justify-between tw-mt-4">
         <h4 className="text-center">Autoriser {client.name}</h4>
         <form
-            className={styles.headerConnexion}
-            name="logout"
-            action={`${VITE_API_ENDPOINT}/logout`}
-            method="post"
+          className={styles.headerConnexion}
+          name="logout"
+          action={`${VITE_API_ENDPOINT}/logout`}
+          method="post"
+        >
+          <button
+            className={`${styles.headerConnexion} btn btn--sqr`}
+            onClick={() => {
+              localAuthService.locallySignOut();
+              document.forms["logout"].submit();
+              return false;
+            }}
           >
-            <button
-              className={`${styles.headerConnexion} btn btn--sqr`}
-              onClick={() => {
-                localAuthService.locallySignOut();
-                document.forms["logout"].submit();
-                return false;
-              }}
-            >
-              <span>Se déconnecter</span>
-            </button>
-          </form>
+            <span>Se déconnecter</span>
+          </button>
+        </form>
       </div>
       <div className="panel tw-mt-2">
         <p className="text-center">
