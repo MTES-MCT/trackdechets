@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import QuickFilter from "./QuickFilter";
 import { QuickFiltersProp } from "./filtersTypes";
-import { useMedia } from "use-media";
+import { useMedia } from "../../../../common/use-media";
+import { MEDIA_QUERIES } from "../../../../common/config";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
-import { MEDIA_QUERIES } from "common/config";
-import { debounce } from "common/helper";
+import { debounce } from "../../../../common/helper";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -19,7 +19,7 @@ const QuickFilters = ({ onApplyFilters, filters }: QuickFiltersProp) => {
     filtersDefaultValue(filters)
   );
 
-  const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
 
   const onFilterValueChange = (e, filterName) => {
     const { value } = e.target;
