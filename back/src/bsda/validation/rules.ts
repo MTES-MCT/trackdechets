@@ -1,4 +1,9 @@
-import { BsdaType, Prisma, WasteAcceptationStatus } from "@prisma/client";
+import {
+  BsdaType,
+  TransportMode,
+  Prisma,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { RefinementCtx, z } from "zod";
 import { BsdaSignatureType } from "../../generated/graphql/types";
 import { ZodBsda } from "./schema";
@@ -6,6 +11,7 @@ import { isForeignVat } from "../../common/constants/companySearchHelpers";
 import { capitalize } from "../../common/strings";
 import { getUserFunctions } from "./helpers";
 import { getOperationModesFromOperationCode } from "../../common/operationModes";
+import { UnparsedInputs } from ".";
 
 export type EditableBsdaFields = Required<
   Omit<
@@ -33,7 +39,12 @@ export type EditableBsdaFields = Required<
   >
 >;
 
-export type CheckFn = (val: ZodBsda, userFunctions: UserFunctions) => boolean;
+type PersistedBsda = Pick<UnparsedInputs, "persisted">["persisted"];
+export type CheckFn = (
+  val: ZodBsda,
+  persistedBsda: PersistedBsda,
+  userFunctions: UserFunctions
+) => boolean;
 export type FieldCheck<Key extends keyof EditableBsdaFields> = {
   from: BsdaSignatureType;
   when?: CheckFn;
@@ -386,10 +397,7 @@ export const editionRules: EditionRules = {
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
-      when: bsda =>
-        hasTransporter(bsda) &&
-        !bsda.transporterRecepisseIsExempted &&
-        !isForeignVat(bsda.transporterCompanyVatNumber),
+      when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
     },
     readableFieldName: "Transporteur: le numéro de récépissé"
@@ -398,10 +406,7 @@ export const editionRules: EditionRules = {
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
-      when: bsda =>
-        hasTransporter(bsda) &&
-        !bsda.transporterRecepisseIsExempted &&
-        !isForeignVat(bsda.transporterCompanyVatNumber),
+      when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
     },
     readableFieldName: "Transporteur: le département de récépissé"
@@ -410,10 +415,7 @@ export const editionRules: EditionRules = {
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
-      when: bsda =>
-        hasTransporter(bsda) &&
-        !bsda.transporterRecepisseIsExempted &&
-        !isForeignVat(bsda.transporterCompanyVatNumber),
+      when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
     },
     readableFieldName: "Transporteur: la date de validité du récépissé"
@@ -597,6 +599,15 @@ function hasTransporter(bsda: ZodBsda) {
   return bsda.type !== BsdaType.COLLECTION_2710;
 }
 
+function requireTransporterRecepisse(bsda: ZodBsda) {
+  return (
+    hasTransporter(bsda) &&
+    !bsda.transporterRecepisseIsExempted &&
+    bsda.transporterTransportMode === TransportMode.ROAD &&
+    !isForeignVat(bsda.transporterCompanyVatNumber)
+  );
+}
+
 function isRefusedOrPartiallyRefused(bsda: ZodBsda) {
   return (
     !!bsda.destinationReceptionAcceptationStatus &&
@@ -614,7 +625,11 @@ function isNotRefused(bsda: ZodBsda) {
   );
 }
 
-function isDestinationSealed(val: ZodBsda, userFunctions: UserFunctions) {
+function isDestinationSealed(
+  val: ZodBsda,
+  persistedBsda: PersistedBsda,
+  userFunctions: UserFunctions
+) {
   const isSealedForEmitter = hasWorker(val)
     ? val.workerWorkSignatureDate != null
     : val.transporterTransportSignatureDate != null;
@@ -623,17 +638,21 @@ function isDestinationSealed(val: ZodBsda, userFunctions: UserFunctions) {
     return false;
   }
 
-  // If I am worker, transporter or destination
-  // and the transporter hasn't signed
-  // and I am adding a nextDestinationCompanySiret,
-  // then I can edit the destination.
+  // If I am worker, transporter or destination and the transporter hasn't signed,
+  // then I can either add or remove a nextDestination. To do so I need to edit the destination.
+  const isAddingNextDestination =
+    !persistedBsda?.destinationOperationNextDestinationCompanySiret &&
+    val.destinationOperationNextDestinationCompanySiret;
+  const isRemovingNextDestination =
+    persistedBsda?.destinationOperationNextDestinationCompanySiret &&
+    !val.destinationOperationNextDestinationCompanySiret;
   if (
     (userFunctions.isEmitter ||
       userFunctions.isWorker ||
       userFunctions.isTransporter ||
       userFunctions.isDestination) &&
     val.transporterTransportSignatureDate == null &&
-    val.destinationOperationNextDestinationCompanySiret
+    (isAddingNextDestination || isRemovingNextDestination)
   ) {
     return false;
   }
@@ -648,6 +667,7 @@ function noop() {
 type UserFunctions = Awaited<ReturnType<typeof getUserFunctions>>;
 type CheckParams = {
   bsda: ZodBsda;
+  persistedBsda: PersistedBsda;
   updatedFields: string[];
   userFunctions: UserFunctions;
   signaturesToCheck: BsdaSignatureType[];
@@ -658,7 +678,13 @@ type RulesEntries = {
 }[keyof EditionRules][];
 
 export function checkSealedAndRequiredFields(
-  { bsda, updatedFields, userFunctions, signaturesToCheck }: CheckParams,
+  {
+    bsda,
+    persistedBsda,
+    updatedFields,
+    userFunctions,
+    signaturesToCheck
+  }: CheckParams,
   ctx: RefinementCtx
 ) {
   for (const [field, rule] of Object.entries(editionRules) as RulesEntries) {
@@ -682,7 +708,7 @@ export function checkSealedAndRequiredFields(
 
     const isSealed =
       signaturesToCheck.includes(sealedRule.from) &&
-      sealedRule.when(bsda, userFunctions);
+      sealedRule.when(bsda, persistedBsda, userFunctions);
     if (isSealed) {
       if (updatedFields.includes(field)) {
         ctx.addIssue({
@@ -702,7 +728,7 @@ export function checkSealedAndRequiredFields(
 
     const isRequired =
       signaturesToCheck.includes(requiredRule.from) &&
-      requiredRule.when(bsda, userFunctions);
+      requiredRule.when(bsda, persistedBsda, userFunctions);
     if (isRequired) {
       if (bsda[field] == null) {
         ctx.addIssue({
@@ -721,6 +747,7 @@ export function checkSealedAndRequiredFields(
 
 export function getSealedFields({
   bsda,
+  persistedBsda,
   userFunctions,
   signaturesToCheck
 }: Omit<CheckParams, "updatedFields">) {
@@ -728,7 +755,8 @@ export function getSealedFields({
     .filter(
       ([_, rule]) =>
         signaturesToCheck.includes(rule.sealed.from) &&
-        (!rule.sealed.when || rule.sealed.when(bsda, userFunctions))
+        (!rule.sealed.when ||
+          rule.sealed.when(bsda, persistedBsda, userFunctions))
     )
     .map(([field]) => field as keyof EditionRules);
 }

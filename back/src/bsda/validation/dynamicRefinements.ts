@@ -1,11 +1,11 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
 import { isTransporterRefinement } from "../../common/validation/siret";
-import { BsdaSignatureType } from "../../generated/graphql/types";
 import { getReadonlyBsdaRepository } from "../repository";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { BsdaValidationContext } from "./index";
 import { ZodBsda } from "./schema";
+import { BsdaSignatureType } from "../../generated/graphql/types";
 
 export async function applyDynamicRefinement(
   bsda: ZodBsda,
@@ -163,8 +163,9 @@ async function validateDestination(
   currentSignatureType: BsdaSignatureType | undefined,
   ctx: RefinementCtx
 ) {
-  // If the bsda has no signature, fields are freeely editable.
-  // If the bsda is already transported, fields are not editable.
+  // Destination is freely editable until EMISSION signature.
+  // Once transported, destination is not editable for anyone.
+  // This is enforced by the sealing rules
   if (
     currentSignatureType === undefined ||
     currentSignatureType === "OPERATION"
@@ -189,6 +190,20 @@ async function validateDestination(
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comme destination finale.`,
+      fatal: true
+    });
+  }
+
+  // If we remove a temporary destination, the final destination must remain the same
+  if (
+    currentBsda.destinationOperationNextDestinationCompanySiret &&
+    !bsda.destinationOperationNextDestinationCompanySiret &&
+    bsda.destinationCompanySiret !==
+      currentBsda.destinationOperationNextDestinationCompanySiret
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Impossible de retirer un intermédiaire d'entreposage provisoire sans indiquer la destination finale prévue initialement comme destination.`,
       fatal: true
     });
   }
