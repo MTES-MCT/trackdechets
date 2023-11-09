@@ -183,8 +183,7 @@ export function FormWasteTransportSummary({
             </DataListDescription>
           )}
         </DataListItem>
-        {form.emitter?.type === EmitterType.Appendix1Producer &&
-          form.wasteDetails?.code &&
+        {form.wasteDetails?.code &&
           SAMPLE_NUMBER_WASTE_CODES.includes(form.wasteDetails.code) && (
             <DataListItem>
               <DataListTerm>Numéro d'échantillon</DataListTerm>
