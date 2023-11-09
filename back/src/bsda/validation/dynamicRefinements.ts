@@ -102,6 +102,20 @@ async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
     return z.NEVER;
   }
 
+  if (
+    bsda.type === "GATHERING" &&
+    previousBsdasWithDestination.some(
+      previousBsda => previousBsda.wasteCode !== bsda.wasteCode
+    )
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Tous les bordereaux groupés doivent avoir le même code déchet que le bordereau de groupement.`,
+      fatal: true
+    });
+    return z.NEVER;
+  }
+
   for (const previousBsda of previousBsdas) {
     if (previousBsda.status === BsdaStatus.PROCESSED) {
       ctx.addIssue({

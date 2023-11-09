@@ -23,6 +23,7 @@ export function WasteInfo({ disabled }) {
     siret
   );
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
+  const isGrouping = values?.type === BsdaType.Gathering;
 
   if (isEntreposageProvisoire) {
     return (
@@ -49,7 +50,7 @@ export function WasteInfo({ disabled }) {
           as="select"
           name="waste.code"
           className="td-select"
-          disabled={disabledAfterEmission}
+          disabled={disabledAfterEmission || isGrouping}
         >
           <option />
           {BSDA_WASTES.map(item => (
