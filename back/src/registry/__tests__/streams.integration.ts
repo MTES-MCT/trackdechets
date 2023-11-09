@@ -13,7 +13,7 @@ import { getFormForElastic, indexForm } from "../../forms/elastic";
 import { getBsdaForElastic, indexBsda } from "../../bsda/elastic";
 import { indexBsdasri } from "../../bsdasris/elastic";
 import { indexBsvhu } from "../../bsvhu/elastic";
-import { indexBsff } from "../../bsffs/elastic";
+import { getBsffForElastic, indexBsff } from "../../bsffs/elastic";
 
 describe("wastesReader", () => {
   let emitter: { user: User; company: Company };
@@ -134,7 +134,11 @@ describe("wastesReader", () => {
         )
     );
 
-    await Promise.all(bsffs.map(bsff => indexBsff(bsff)));
+    const bsffsForElastic = await Promise.all(
+      bsffs.map(bsff => getBsffForElastic(bsff))
+    );
+
+    await Promise.all(bsffsForElastic.map(bsff => indexBsff(bsff)));
 
     await refreshElasticSearch();
 

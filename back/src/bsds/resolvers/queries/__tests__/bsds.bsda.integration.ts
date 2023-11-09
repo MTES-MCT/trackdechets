@@ -1238,7 +1238,7 @@ describe("Query.bsds.bsdas mutations", () => {
   });
 });
 
-describe("query { bsds { forwardedIn groupedIn } }", () => {
+describe("Bsda sub-resolvers in query bsds", () => {
   afterEach(resetDatabase);
 
   const GET_BSDS = gql`

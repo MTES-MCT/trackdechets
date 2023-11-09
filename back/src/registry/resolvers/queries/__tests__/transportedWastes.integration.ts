@@ -22,7 +22,7 @@ import { bsdaFactory } from "../../../../bsda/__tests__/factories";
 import { indexBsdasri } from "../../../../bsdasris/elastic";
 
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
-import { indexBsff } from "../../../../bsffs/elastic";
+import { getBsffForElastic, indexBsff } from "../../../../bsffs/elastic";
 import { createBsffAfterOperation } from "../../../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../../../bsvhu/elastic";
 import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
@@ -173,7 +173,7 @@ describe("Transported wastes registry", () => {
       indexBsda(await getBsdaForElastic(bsd2)),
       indexBsdasri(bsd3),
       indexBsvhu(bsd4),
-      indexBsff(bsd5)
+      indexBsff(await getBsffForElastic(bsd5))
     ]);
     await refreshElasticSearch();
   });

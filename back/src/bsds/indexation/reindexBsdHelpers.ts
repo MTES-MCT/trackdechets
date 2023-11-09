@@ -1,7 +1,7 @@
 import prisma from "../../prisma";
 import { BsdaForElasticInclude, indexBsda } from "../../bsda/elastic";
 import { indexBsdasri } from "../../bsdasris/elastic";
-import { indexBsff } from "../../bsffs/elastic";
+import { getBsffForElastic, indexBsff } from "../../bsffs/elastic";
 import { indexBsvhu } from "../../bsvhu/elastic";
 import { getFormForElastic, indexForm } from "../../forms/elastic";
 import { deleteBsd } from "../../common/elastic";
@@ -50,7 +50,7 @@ export async function reindex(bsdId, exitFn) {
     });
 
     if (!!bsff) {
-      await indexBsff(bsff);
+      await indexBsff(await getBsffForElastic(bsff));
     } else {
       await deleteBsd({ id: bsdId });
     }
