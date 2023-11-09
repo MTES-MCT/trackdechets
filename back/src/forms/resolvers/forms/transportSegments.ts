@@ -1,9 +1,9 @@
 import { FormResolvers } from "../../../generated/graphql/types";
 import { expandTransportSegmentFromDb } from "../../converter";
-import { dashboardOperationName } from "../../../common/queries";
 import { isSessionUser } from "../../../auth";
 import { BsddTransporter } from "@prisma/client";
 import { getTransporters } from "../../database";
+import { isGetBsdsQuery } from "../../../bsds/resolvers/queries/bsds";
 
 const transportSegmentResolver: FormResolvers["transportSegments"] = async (
   form,
@@ -17,10 +17,7 @@ const transportSegmentResolver: FormResolvers["transportSegments"] = async (
   let segments: BsddTransporter[] = [];
 
   // use ES indexed field when requested from dashboard
-  if (
-    ctx?.req?.body?.operationName === dashboardOperationName &&
-    isSessionUser(ctx)
-  ) {
+  if (isGetBsdsQuery(ctx) && isSessionUser(ctx)) {
     segments = (form?.transportSegments as any) ?? [];
   } else {
     segments = (await getTransporters({ id: form.id })).filter(

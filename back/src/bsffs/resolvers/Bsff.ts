@@ -1,6 +1,5 @@
 import { BsffResolvers } from "../../generated/graphql/types";
 import { getFicheInterventions } from "../database";
-import { dashboardOperationName } from "../../common/queries";
 import { isSessionUser } from "../../auth";
 import { expandBsffPackagingFromDB } from "../converter";
 import { BsffPackaging, BsffType } from "@prisma/client";
@@ -8,6 +7,7 @@ import {
   getReadonlyBsffPackagingRepository,
   getReadonlyBsffRepository
 } from "../repository";
+import { isGetBsdsQuery } from "../../bsds/resolvers/queries/bsds";
 
 export const Bsff: BsffResolvers = {
   ficheInterventions: async ({ id }, _, context) => {
@@ -24,10 +24,7 @@ export const Bsff: BsffResolvers = {
   packagings: async (bsff, _, ctx) => {
     let packagings: BsffPackaging[] = [];
     // use ES indexed field when requested from dashboard
-    if (
-      ctx?.req?.body?.operationName === dashboardOperationName &&
-      isSessionUser(ctx)
-    ) {
+    if (isGetBsdsQuery(ctx) && isSessionUser(ctx)) {
       packagings = (bsff?.packagings as any) ?? [];
     }
     const { findUniqueGetPackagings } = getReadonlyBsffRepository();

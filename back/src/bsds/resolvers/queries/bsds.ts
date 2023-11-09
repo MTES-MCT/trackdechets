@@ -32,6 +32,7 @@ import { BsvhuForElastic } from "../../../bsvhu/elastic";
 import { BsdaForElastic } from "../../../bsda/elastic";
 import { BsffForElastic } from "../../../bsffs/elastic";
 import { QueryContainer } from "@elastic/elasticsearch/api/types";
+import { GraphQLContext } from "../../../types";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -393,5 +394,19 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
     totalCount: body.hits.total.value
   };
 };
+
+/**
+ * Fonction utilitaire permettant de déterminer au sein d'un resolver
+ * si la query parente est bien `bsds`. Voir par exemple le resolver `Bsda`
+ * dans lequel certains champs (`groupedIn`, `forwardedIn`) ne sont pas
+ * recalculé si la query est `bsds`.
+ */
+export function isGetBsdsQuery(context: GraphQLContext): boolean {
+  const gqlInfos = context?.req?.gqlInfos;
+  if (gqlInfos && gqlInfos.length === 1 && gqlInfos[0].name === "bsds") {
+    return true;
+  }
+  return false;
+}
 
 export default bsdsResolver;
