@@ -1261,7 +1261,7 @@ describe("Bsda sub-resolvers in query bsds", () => {
     }
   `;
 
-  test("Bsda.groupedIn should be made available from ES", async () => {
+  test("Bsda.groupedIn should resolve correctly", async () => {
     const ttr = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
       opt: {
@@ -1292,7 +1292,7 @@ describe("Bsda sub-resolvers in query bsds", () => {
     expect((queriedBsda as any)!.groupedIn!.id).toEqual(bsdaSuite.id);
   });
 
-  test("Bsda.forwardedIn should be made available from ES", async () => {
+  test("Bsda.forwardedIn should resolve correctly", async () => {
     const ttr = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
       opt: {

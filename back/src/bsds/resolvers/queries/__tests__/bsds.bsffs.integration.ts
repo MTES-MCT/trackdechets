@@ -29,7 +29,7 @@ const GET_BSDS = gql`
 describe("Bsff subresolver in query bsds", () => {
   afterEach(resetDatabase);
 
-  test("Bsff.packagings should be made available from ES", async () => {
+  test("Bsff.packagings should resolve correctly", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const bsff = await createBsffAfterEmission({ emitter });
     const packagings = await prisma.bsff
