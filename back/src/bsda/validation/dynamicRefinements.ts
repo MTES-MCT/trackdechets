@@ -163,7 +163,7 @@ async function validateDestination(
   currentSignatureType: BsdaSignatureType | undefined,
   ctx: RefinementCtx
 ) {
-  // Destination is freeely editable until EMISSION signature.
+  // Destination is freely editable until EMISSION signature.
   // Once transported, destination is not editable for anyone.
   // This is enforced by the sealing rules
   if (
