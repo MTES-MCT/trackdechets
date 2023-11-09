@@ -257,12 +257,15 @@ export function DisplayRevision({ review }: Props) {
         label="Opération réalisée"
         bsddValue={review.form.processingOperationDone}
         reviewValue={
-          review.content.processingOperationDone +
-          (review.content.destinationOperationMode
-            ? ` (${getOperationModeLabel(
+          [
+            review.content.processingOperationDone,
+            review.content.destinationOperationMode &&
+              `(${getOperationModeLabel(
                 review.content.destinationOperationMode ?? ""
               )})`
-            : "")
+          ]
+            .filter(Boolean)
+            .join(" ") || null
         }
       />
 
