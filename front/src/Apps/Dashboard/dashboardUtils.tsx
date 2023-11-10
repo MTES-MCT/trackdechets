@@ -16,19 +16,18 @@ import {
   filter_broker_siret,
   filter_bsd_number,
   filter_bsd_type,
+  filter_cap,
   filter_chantier_adress,
   filter_chantier_name,
-  filter_contenant_number,
-  filter_emitter_name,
   filter_emitter_sign_date,
   filter_fiche_intervention_numbers,
   filter_free_text,
+  filter_given_name,
   filter_immat_number,
   filter_next_destination_siret,
   filter_operation_sign_date,
   filter_reception_sign_date,
   filter_seal_numbers,
-  filter_siret,
   filter_siret_productor_address,
   filter_trader_siret,
   filter_transporter_sign_date,
@@ -37,7 +36,6 @@ import {
   filter_worker_operation_code,
   filter_worker_sign_date
 } from "../common/wordings/dashboard/wordingsDashboard";
-import { BsdType, BsdWhere } from "codegen-ui";
 import { Filter, FilterType } from "../common/Components/Filters/filtersTypes";
 import {
   IconBSFF,
@@ -48,6 +46,7 @@ import {
 } from "../common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
 import { BsdCurrentTab } from "../common/types/commonTypes";
+import { BsdType, BsdWhere } from "codegen-ui";
 
 export const MAX_FILTER = 5;
 
@@ -80,8 +79,6 @@ enum FilterName {
   readableId = "readableId",
   transporterNumberPlate = "transporterNumberPlate",
   transporterCustomInfo = "transporterCustomInfo",
-  sirets = "sirets",
-  packagingNumbers = "packagingNumbers",
   pickupSiteName = "name",
   pickupSiteAddress = "address",
   emitterSignDate = "emitterSignDate",
@@ -98,10 +95,49 @@ enum FilterName {
   brokerSiret = "brokerSiret",
   givenName = "givenName",
   sealNumbers = "sealNumbers",
-  ficheInterventionNumbers = "ficheInterventionNumbers"
+  ficheInterventionNumbers = "ficheInterventionNumbers",
+  cap = "cap"
 }
 
-export const filterList: Filter[][] = [
+export const quickFilterList: Filter[] = [
+  {
+    name: FilterName.readableId,
+    label: filter_bsd_number,
+    type: FilterType.input,
+    isActive: true,
+    placeholder: `ex: "BSDA-202311.... " ou "B123"`
+  },
+  {
+    name: FilterName.waste,
+    label: filter_waste_code,
+    type: FilterType.input,
+    isActive: true,
+    placeholder: `ex: "01 02 03*" ou "amiante"`
+  },
+  {
+    name: FilterName.givenName,
+    label: filter_given_name,
+    type: FilterType.input,
+    isActive: true,
+    placeholder: `ex: "Track" ou "5323014000..."`
+  },
+  {
+    name: FilterName.cap,
+    label: filter_cap,
+    type: FilterType.input,
+    isActive: true,
+    placeholder: `ex: "2023COL123"`
+  },
+  {
+    name: FilterName.pickupSiteName,
+    label: filter_chantier_name,
+    type: FilterType.input,
+    isActive: true,
+    placeholder: `ex: "Chantier du Parc"`
+  }
+];
+
+export const advancedFilterList: Filter[][] = [
   [
     {
       name: FilterName.types,
@@ -112,44 +148,8 @@ export const filterList: Filter[][] = [
       isActive: true
     },
     {
-      name: FilterName.readableId,
-      label: filter_bsd_number,
-      type: FilterType.input,
-      isActive: true
-    },
-    {
-      name: FilterName.waste,
-      label: filter_waste_code,
-      type: FilterType.input,
-      isActive: true
-    },
-    {
-      name: FilterName.pickupSiteName,
-      label: filter_chantier_name,
-      type: FilterType.input,
-      isActive: true
-    },
-    {
       name: FilterName.transporterNumberPlate,
       label: filter_immat_number,
-      type: FilterType.input,
-      isActive: true
-    },
-    {
-      name: FilterName.packagingNumbers,
-      label: filter_contenant_number,
-      type: FilterType.input,
-      isActive: true
-    },
-    {
-      name: FilterName.givenName,
-      label: filter_emitter_name,
-      type: FilterType.input,
-      isActive: true
-    },
-    {
-      name: FilterName.sirets,
-      label: filter_siret,
       type: FilterType.input,
       isActive: true
     },
@@ -254,6 +254,8 @@ export const filterList: Filter[][] = [
   ]
 ];
 
+export const filterList = [...advancedFilterList.flat(), ...quickFilterList];
+
 export const filterPredicates: {
   filterName: string;
   where: (value: any) => BsdWhere;
@@ -266,12 +268,34 @@ export const filterPredicates: {
   },
   {
     filterName: FilterName.waste,
-    where: value => ({ waste: { code: { _contains: value } } }),
+    where: value => ({
+      _and: [
+        {
+          _or: [
+            { waste: { code: { _contains: value } } },
+            { waste: { description: { _match: value } } }
+          ]
+        }
+      ]
+    }),
     order: "wasteCode"
   },
   {
     filterName: FilterName.readableId,
-    where: value => ({ readableId: { _contains: value } }),
+    where: value => ({
+      _and: [
+        {
+          _or: [
+            { readableId: { _contains: value } },
+            { customId: { _contains: value } },
+            { packagingNumbers: { _hasSome: value } },
+            { packagingNumbers: { _itemContains: value } },
+            { identificationNumbers: { _itemContains: value } },
+            { identificationNumbers: { _hasSome: value } }
+          ]
+        }
+      ]
+    }),
     order: "readableId"
   },
   {
@@ -285,16 +309,6 @@ export const filterPredicates: {
     filterName: FilterName.transporterCustomInfo,
     where: value => ({ transporter: { customInfo: { _match: value } } }),
     order: "transporterCustomInfo"
-  },
-  {
-    filterName: FilterName.sirets,
-    where: value => ({ sirets: { _itemContains: value } }),
-    order: "sirets"
-  },
-  {
-    filterName: FilterName.packagingNumbers,
-    where: value => ({ packagingNumbers: { _has: value } }),
-    order: "packagingNumbers"
   },
   {
     filterName: FilterName.pickupSiteName,
@@ -311,11 +325,28 @@ export const filterPredicates: {
   {
     filterName: FilterName.tvaIntra,
     where: value => ({
-      destination: {
-        operation: {
-          nextDestination: { company: { vatNumber: { _contains: value } } }
+      _and: [
+        {
+          _or: [
+            {
+              transporter: {
+                company: {
+                  vatNumber: { _contains: value }
+                }
+              }
+            },
+            {
+              destination: {
+                operation: {
+                  nextDestination: {
+                    company: { vatNumber: { _contains: value } }
+                  }
+                }
+              }
+            }
+          ]
         }
-      }
+      ]
     }),
     order: "vatNumber"
   },
@@ -344,11 +375,27 @@ export const filterPredicates: {
   {
     filterName: FilterName.givenName,
     where: value => ({
-      emitter: {
-        company: {
-          name: { _match: value }
+      _and: [
+        {
+          _or: [
+            { emitter: { company: { name: { _match: value } } } },
+            { emitter: { company: { siret: { _contains: value } } } },
+            { emitter: { pickupSite: { name: { _match: value } } } },
+            { transporter: { company: { name: { _match: value } } } },
+            { transporter: { company: { siret: { _contains: value } } } },
+            { worker: { company: { name: { _match: value } } } },
+            { worker: { company: { siret: { _contains: value } } } },
+            { destination: { company: { name: { _match: value } } } },
+            { destination: { company: { siret: { _contains: value } } } },
+            { broker: { company: { name: { _match: value } } } },
+            { broker: { company: { siret: { _contains: value } } } },
+            { trader: { company: { name: { _match: value } } } },
+            { trader: { company: { siret: { _contains: value } } } },
+            { ecoOrganisme: { name: { _match: value } } },
+            { ecoOrganisme: { siret: { _contains: value } } }
+          ]
         }
-      }
+      ]
     }),
     order: "name"
   },
@@ -468,6 +515,11 @@ export const filterPredicates: {
       }
     }),
     order: "address"
+  },
+  {
+    filterName: FilterName.cap,
+    where: value => ({ destination: { cap: { _match: value } } }),
+    order: "cap"
   }
 ];
 

@@ -5,6 +5,7 @@ import * as Sentry from "@sentry/browser";
 import routes from "../Apps/routes";
 import { GET_BSDS } from "../Apps/common/queries";
 import {
+  BsdWhere,
   BsdaRevisionRequestEdge,
   FormRevisionRequestEdge,
   OrderType,
@@ -44,8 +45,8 @@ import {
 import { IconDuplicateFile } from "../Apps/common/Components/Icons/Icons";
 import Filters from "../Apps/common/Components/Filters/Filters";
 import {
-  filterList,
   dropdownCreateLinks,
+  filterList,
   filterPredicates,
   getBsdCurrentTab
 } from "../Apps/Dashboard/dashboardUtils";
@@ -88,7 +89,7 @@ const DashboardPage = () => {
     // isToReviewedTab,
   });
   const { siret } = useParams<{ siret: string }>();
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [areAdvancedFiltersOpen, setAreAdvancedFiltersOpen] = useState(false);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const withRoutePredicate = useCallback(() => {
@@ -266,7 +267,7 @@ const DashboardPage = () => {
   const handleFiltersSubmit = React.useCallback(
     filterValues => {
       const variables = {
-        where: {},
+        where: {} as BsdWhere,
         order: {}
       };
       const routePredicate = withRoutePredicate();
@@ -274,22 +275,36 @@ const DashboardPage = () => {
         variables.where = routePredicate;
       }
       const filterKeys = Object.keys(filterValues);
-      const filters = filterList
-        .flat()
-        .filter(filter => filterKeys.includes(filter.name));
+      const filters = filterList.filter(filter =>
+        filterKeys.includes(filter.name)
+      );
+
+      // Careful. Multiple filters might use '_and', let's not override
+      // it each iteration because of key uniqueness
+      let _ands: BsdWhere[] = [];
+
       filters.forEach(f => {
         const predicate = filterPredicates.find(
           filterPredicate => filterPredicate.filterName === f.name
         );
         if (predicate) {
           const filterValue = filterValues[f.name];
+          const { _and, ...wheres } = predicate.where(filterValue);
+
+          // Store the '_and' filters separately
+          if (_and) _ands = [..._ands, ..._and];
+
           variables.where = {
             ...variables.where,
-            ...predicate.where(filterValue)
+            ...wheres
           };
           variables.order[predicate.order] = OrderType.Asc;
         }
       });
+
+      // Add all the compiled '_and', if any
+      if (_ands.length) variables.where._and = _ands;
+
       setBsdsVariables(variables);
     },
     [withRoutePredicate]
@@ -406,7 +421,7 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
-    setIsFiltersOpen(false);
+    setAreAdvancedFiltersOpen(false);
     // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
     if (!isReviewsTab) {
       fetchWithDefaultWhere({ where: defaultWhere });
@@ -476,10 +491,15 @@ const DashboardPage = () => {
 
   useEffect(() => {
     // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
-    if (!isReviewsTab && !isFiltersOpen) {
+    if (!isReviewsTab && !areAdvancedFiltersOpen) {
       fetchWithDefaultWhere({ where: defaultWhere });
     }
-  }, [isFiltersOpen, defaultWhere, isReviewsTab, fetchWithDefaultWhere]);
+  }, [
+    areAdvancedFiltersOpen,
+    defaultWhere,
+    isReviewsTab,
+    fetchWithDefaultWhere
+  ]);
 
   const getBlankstateTitle = (): string | undefined => {
     if (isActTab) {
@@ -527,7 +547,7 @@ const DashboardPage = () => {
   };
 
   const toggleFiltersBlock = () => {
-    setIsFiltersOpen(!isFiltersOpen);
+    setAreAdvancedFiltersOpen(!areAdvancedFiltersOpen);
   };
 
   // A supprimer la condition isReviewsTab quand on pourra afficher une révision avec la requete bsds
@@ -564,18 +584,19 @@ const DashboardPage = () => {
             <button
               type="button"
               className="fr-btn fr-btn--secondary"
-              aria-expanded={isFiltersOpen}
+              aria-expanded={areAdvancedFiltersOpen}
               onClick={toggleFiltersBlock}
               disabled={loading}
             >
-              {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
+              {!areAdvancedFiltersOpen ? filter_show_btn : filter_reset_btn}
             </button>
           </div>
         </div>
       )}
-      {isFiltersOpen && (
-        <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
-      )}
+      <Filters
+        onApplyFilters={handleFiltersSubmit}
+        areAdvancedFiltersOpen={areAdvancedFiltersOpen}
+      />
       {(isFetchingMore || isLoadingBsds) && <Loader />}
       {!Boolean(bsdsTotalCount) && !isLoadingBsds && (
         <div className="dashboard-page__blankstate">
