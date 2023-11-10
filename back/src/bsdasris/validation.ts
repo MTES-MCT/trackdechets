@@ -34,6 +34,7 @@ import {
   transporterRecepisseSchema
 } from "../common/validation";
 import { getOperationModesFromOperationCode } from "../common/operationModes";
+import { ContextLines } from "@sentry/node/types/integrations";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 
@@ -658,6 +659,8 @@ export const operationSchema: FactorySchemaOf<
         "processing-mode-matches-processing-operation",
         "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
         function (item) {
+          if(!context.operationSignature) return true;
+
           const { destinationOperationCode } = this.parent;
           const destinationOperationMode = item;
 
