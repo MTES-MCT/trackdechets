@@ -11,7 +11,8 @@ export class ReindexBsdasrisWithIdentificationNumbers implements Updater {
   async run() {
     // Fetch dasris with identification numbers
     const bsdasris = await prisma.bsdasri.findMany({
-      where: { identificationNumbers: { isEmpty: false } }
+      where: { identificationNumbers: { isEmpty: false } },
+      select: { id: true }
     });
 
     // Re-index
