@@ -34,7 +34,6 @@ import {
   transporterRecepisseSchema
 } from "../common/validation";
 import { getOperationModesFromOperationCode } from "../common/operationModes";
-import { ContextLines } from "@sentry/node/types/integrations";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 
