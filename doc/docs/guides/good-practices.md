@@ -34,4 +34,4 @@ Les webhooks permettent à un SI d'un utilisateur Trackdéchets d'être notifié
 
 L'utilisation des webhooks permet aux SI de limiter les lectures périodiques de l'api Trackdéchets.
 
-Pour plus de détails, se référer à la page [Utiliser les webhooks](https://developers.trackdechets.beta.gouv.fr/guides/webhooks/).
+Pour plus de détails, se référer à la page [Utiliser les webhooks](./webhooks.md).
