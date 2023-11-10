@@ -28,7 +28,7 @@ Cette méthode est applicable aux autres bordereaux en utilisant bsdas, bsdasris
 La query `formsLifecycle` renvoie les changements de statut des bordereaux de l'entreprise sélectionnée. Elle peut s'utiliser dans le même esprit que la requête `forms`, seuls les bsds dont le statut a changé dans l'intervalle de temps seront retournés. 
 Cette requête n'existe aujourd'hui que pour les bsdds.
 
-### Utiliser les webhooks.
+### Utiliser les webhooks
 
 Les webhooks permettent à un SI d'un utilisateur Trackdéchets d'être notifié d'un changement (création modification, suppression) d'un bordereau sur leqel il figure.
 
