@@ -35,7 +35,6 @@ input BsdWhere {
   isRevisedFor: [String!]
 
   sirets: StringNullableListFilter
-  destinationCap: StringFilter
 
   _and: [BsdWhere!]
   _or: [BsdWhere!]
