@@ -522,7 +522,7 @@ describe("Mutation.signBsdasri emission", () => {
       }
     );
 
-    test.only("should work if operation mode is missing but step is not operation",
+    test("should work if operation mode is missing but step is not operation",
       async () => {
         const data = {
           ...bsdasri,

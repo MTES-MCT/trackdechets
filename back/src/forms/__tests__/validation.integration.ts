@@ -1721,6 +1721,30 @@ describe("processedInfoSchema", () => {
       expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
     });
 
+    it.only("should be valid if operationMode is missing but step is not process", async () => {
+      const receivedInfo: ReceivedFormInput = {
+        wasteAcceptationStatus: "ACCEPTED",
+        quantityReceived: 12.5,
+        wasteRefusalReason: "",
+        receivedBy: "Jim",
+        receivedAt: new Date("2020-01-17T10:12:00+0100"),
+        signedAt: new Date("2020-01-17T10:12:00+0100")
+      };
+
+      const bsdd = {
+        nextDestination: null,
+        noTraceability: null,
+        processedAt: new Date(),
+        processedBy: "Test",
+        processingOperationDescription: "test",
+        processingOperationDone: "R 2", 
+        destinationOperationMode: undefined, // Should be REUTILISATION
+        ...receivedInfo
+      };
+
+      expect(await receivedInfoSchema.isValid(bsdd)).toEqual(true);
+    });
+
     test.each([
       ["D9", "VALORISATION_ENERGETIQUE"], // Correct modes are ELIMINATION
       ["R12", "VALORISATION_ENERGETIQUE"] // R12 has no associated mode
