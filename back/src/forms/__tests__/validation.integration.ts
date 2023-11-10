@@ -1737,7 +1737,7 @@ describe("processedInfoSchema", () => {
         processedAt: new Date(),
         processedBy: "Test",
         processingOperationDescription: "test",
-        processingOperationDone: "R 2", 
+        processingOperationDone: "R 2",
         destinationOperationMode: undefined, // Should be REUTILISATION
         ...receivedInfo
       };

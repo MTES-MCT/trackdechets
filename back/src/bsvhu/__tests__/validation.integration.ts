@@ -379,7 +379,7 @@ describe("BSVHU validation", () => {
       const data = {
         ...bsvhu,
         destinationOperationCode: "D 9",
-        destinationOperationMode: undefined,  // Correct modes is ELIMINATION
+        destinationOperationMode: undefined, // Correct modes is ELIMINATION
         destinationReceptionWeight: 10,
         destinationReceptionAcceptationStatus: "ACCEPTED"
       };

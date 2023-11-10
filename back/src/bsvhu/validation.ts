@@ -198,7 +198,7 @@ const destinationSchema: FactorySchemaOf<
         "processing-mode-matches-processing-operation",
         "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
         function (item) {
-          if(!context.operationSignature) return true;
+          if (!context.operationSignature) return true;
 
           const { destinationOperationCode } = this.parent;
           const destinationOperationMode = item;
