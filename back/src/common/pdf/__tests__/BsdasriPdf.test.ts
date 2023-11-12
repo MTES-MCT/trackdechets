@@ -1,6 +1,6 @@
-import { buildAddress } from "../BsdasriPdf";
+import { buildPdfAddress } from "../generatePdf";
 
-describe("buildAddress", () => {
+describe("buildPdfAddress", () => {
   test("should build address", () => {
     // Given
     const pickupSite = {
@@ -10,7 +10,7 @@ describe("buildAddress", () => {
     };
 
     // When
-    const result = buildAddress([
+    const result = buildPdfAddress([
       pickupSite.address,
       pickupSite.postalCode,
       pickupSite.city
@@ -29,7 +29,7 @@ describe("buildAddress", () => {
     };
 
     // When
-    const result = buildAddress([
+    const result = buildPdfAddress([
       pickupSite.address,
       pickupSite.postalCode,
       pickupSite.city
@@ -48,7 +48,7 @@ describe("buildAddress", () => {
     };
 
     // When
-    const result = buildAddress([
+    const result = buildPdfAddress([
       pickupSite.address,
       pickupSite.postalCode,
       pickupSite.city
@@ -62,7 +62,7 @@ describe("buildAddress", () => {
     // Given
 
     // When
-    const result = buildAddress([]);
+    const result = buildPdfAddress([]);
 
     // Then
     expect(result).toBe("");
@@ -77,7 +77,7 @@ describe("buildAddress", () => {
     };
 
     // When
-    const result = buildAddress([
+    const result = buildPdfAddress([
       pickupSite.address,
       pickupSite.postalCode,
       pickupSite.city
@@ -96,7 +96,7 @@ describe("buildAddress", () => {
     };
 
     // When
-    const result = buildAddress([
+    const result = buildPdfAddress([
       pickupSite.address,
       pickupSite.postalCode,
       pickupSite.city
@@ -115,7 +115,7 @@ describe("buildAddress", () => {
     };
 
     // When
-    const result = buildAddress([
+    const result = buildPdfAddress([
       pickupSite.address,
       pickupSite.postalCode,
       pickupSite.city
@@ -134,7 +134,7 @@ describe("buildAddress", () => {
     };
 
     // When
-    const result = buildAddress([
+    const result = buildPdfAddress([
       pickupSite.address,
       pickupSite.postalCode,
       pickupSite.city
@@ -153,7 +153,7 @@ describe("buildAddress", () => {
     };
 
     // When
-    const result = buildAddress([
+    const result = buildPdfAddress([
       pickupSite.address,
       pickupSite.postalCode,
       pickupSite.city

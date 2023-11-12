@@ -24,6 +24,7 @@ const referenceDefs = [
   { id: "bsdasri", label: "DASRI" },
   { id: "bsdd", label: "Déchets dangereux" },
   { id: "bsff", label: "Fluides Frigorigènes" },
+  { id: "bspaoh", label: "Pièces anatomiques d'origine humaine" },
   { id: "bsvhu", label: "VHU" },
 
   { id: "user-company", label: "Utilisateurs et Établissements" },
@@ -83,6 +84,11 @@ module.exports = {
                 "tutoriels/examples/bsda/collecte-chantier-particulier",
                 "tutoriels/examples/bsda/groupement",
               ],
+              BSPAOH: [
+                "tutoriels/examples/bspaoh/acheminement-direct",
+                "tutoriels/examples/bspaoh/acheminement-direct-brouillon",
+                "tutoriels/examples/bspaoh/acheminement-direct-depot",
+              ],
             },
           ],
         },
@@ -119,6 +125,7 @@ module.exports = {
             "reference/statuts/bsdasri",
             "reference/statuts/bsdd",
             "reference/statuts/bsff",
+            "reference/statuts/bspaoh",
           ],
         },
         "reference/multi-bsd",

@@ -143,6 +143,7 @@ enum BsdType {
   BSDASRI
   BSFF
   BSVHU
+  BSPAOH
 }
 
 // Qualification du traitement final vis-à-vis de la hiérarchie des modes
@@ -533,7 +534,7 @@ model BsddRevisionRequest {
   brokerCompanyMail                               String?
   brokerReceipt                                   String?
   brokerDepartment                                String?
-  brokerValidityLimit                             DateTime? @db.Timestamptz(6)
+  brokerValidityLimit                             DateTime?      @db.Timestamptz(6)
   traderCompanyName                               String?
   traderCompanySiret                              String?
   traderCompanyAddress                            String?
@@ -542,11 +543,11 @@ model BsddRevisionRequest {
   traderCompanyMail                               String?
   traderReceipt                                   String?
   traderDepartment                                String?
-  traderValidityLimit                             DateTime? @db.Timestamptz(6)
+  traderValidityLimit                             DateTime?      @db.Timestamptz(6)
   temporaryStorageDestinationCap                  String?
   temporaryStorageDestinationProcessingOperation  String?
   temporaryStorageTemporaryStorerQuantityReceived Float?
-  isCanceled                                      Boolean   @default(false)
+  isCanceled                                      Boolean        @default(false)
 
   comment String
 
@@ -1581,6 +1582,157 @@ model Event {
   metadata Json?
 
   actor String
+}
+
+// ----------------
+// BSPAOH FORM
+// ----------------
+enum BspaohStatus {
+  DRAFT
+  INITIAL
+  SIGNED_BY_PRODUCER
+  SENT
+  RECEIVED
+  PROCESSED
+  REFUSED
+  PARTIALLY_REFUSED
+  CANCELED
+}
+
+enum BspaohType {
+  PAOH
+  FOETUS
+}
+
+model Bspaoh {
+  id String @id
+
+  createdAt DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime     @updatedAt @db.Timestamptz(6)
+  isDeleted Boolean      @default(false)
+  status    BspaohStatus @default(INITIAL)
+
+  // Waste
+  wasteCode       String?
+  wasteAdr        String?
+  wastePackagings Json       @default("[]")
+  wasteType       BspaohType @default(PAOH)
+
+  //emitter 
+  emitterCompanyName    String?
+  emitterCompanySiret   String?
+  emitterCompanyAddress String?
+  emitterCompanyContact String?
+  emitterCompanyPhone   String?
+  emitterCompanyMail    String?
+  emitterCustomInfo     String?
+
+  // adresse de collecte
+  emitterPickupSiteName           String?
+  emitterPickupSiteAddress        String?
+  emitterPickupSiteCity           String?
+  emitterPickupSitePostalCode     String?
+  emitterPickupSiteInfos          String?
+  // emitter waste details
+  emitterWasteQuantityValue       Int?
+  emitterWasteWeightValue         Float? // kg
+  emitterWasteWeightIsEstimate    Boolean?
+  // date filled by emitter for take over, denormalized from BspaohTransporter.takenOverAt
+  transporterTransportTakenOverAt DateTime? @db.Timestamptz(6)
+  emitterEmissionSignatureAuthor  String?
+  emitterEmissionSignatureDate    DateTime? @db.Timestamptz(6)
+
+  // destination
+  destinationCompanyName    String?
+  destinationCompanySiret   String?
+  destinationCompanyAddress String?
+  destinationCompanyContact String?
+  destinationCompanyPhone   String?
+  destinationCompanyMail    String?
+  destinationCustomInfo     String?
+
+  destinationCap String?
+
+  // transporter handover fields
+  handedOverToDestinationDate            DateTime? @db.Timestamptz(6)
+  handedOverToDestinationSignatureDate   DateTime? @db.Timestamptz(6) // accepted or refused date
+  handedOverToDestinationSignatureAuthor String?
+
+  // reception
+  // reception waste details              
+  destinationReceptionWasteWeightValue           Float? // kg
+  destinationReceptionWasteWeightIsEstimate      Boolean?
+  destinationReceptionWasteQuantityValue         Int?
+  destinationReceptionAcceptationStatus          WasteAcceptationStatus?
+  destinationReceptionWasteRefusalReason         String? //todo reame
+  destinationReceptionWastePackagingsAcceptation Json                    @default("[]")
+
+  destinationReceptionDate            DateTime? @db.Timestamptz(6)
+  destinationReceptionSignatureDate   DateTime? @db.Timestamptz(6) // accepted or refused date @db.Timestamptz(6)
+  destinationReceptionSignatureAuthor String?
+
+  // processing
+  destinationOperationCode            String?
+  destinationOperationDate            DateTime? @db.Timestamptz(6)
+  destinationOperationSignatureDate   DateTime? @db.Timestamptz(6)
+  destinationOperationSignatureAuthor String?
+
+  currentTransporterOrgId String?
+  nextTransporterOrgId    String?
+
+  transporters BspaohTransporter[]
+
+  // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
+  transportersSirets   String[] @default([])
+  canAccessDraftSirets String[] @default([])
+
+  @@index([nextTransporterOrgId], map: "_BspaohNextTransporterOrgIdIdx")
+  @@index([emitterCompanySiret], map: "BspaohEmitterCompanySiretIdx")
+  @@index([destinationCompanySiret], map: "BspaohDestinationCompanySiretIdx")
+  @@index([status], map: "BspaohStatusIdx")
+  @@index([createdAt], map: "BspaohCreatedAtIdx")
+  @@index([currentTransporterOrgId], map: "BspaohCurrentTransporterOrgIdIdx")
+}
+
+model BspaohTransporter {
+  id     String @id @default(cuid())
+  // transporter
+  number Int
+
+  transporterCompanyName      String?
+  transporterCompanySiret     String?
+  transporterCompanyVatNumber String?
+  transporterCompanyAddress   String?
+  transporterCompanyContact   String?
+  transporterCompanyPhone     String?
+  transporterCompanyMail      String?
+
+  // recepisse
+  transporterRecepisseNumber        String?
+  transporterRecepisseDepartment    String?
+  transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
+  transporterRecepisseIsExempted    Boolean?
+
+  // custom
+  transporterCustomInfo String?
+
+  // Transport
+  // Immatriculations
+  transporterTransportPlates          String[]
+  transporterTransportMode            TransportMode?
+  transporterTakenOverAt              DateTime?      @db.Timestamptz(6)
+  transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)
+  transporterTransportSignatureAuthor String?
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  bspaohId String?
+  bspaoh   Bspaoh? @relation(fields: [bspaohId], references: [id], onDelete: Cascade)
+
+  @@index([bspaohId], map: "_BpaohTransporterBsdIdIdx")
+  @@index([transporterCompanySiret], map: "_BspaohTransporterCompanySiretIdx")
+  @@index([transporterCompanyVatNumber], map: "_BspaohTransporterCompanyVatNumberIdx")
 }
 
 // Short-lived token to access a bsd pdf

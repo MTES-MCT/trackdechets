@@ -1107,7 +1107,7 @@ describe("Mutation.updateBsda", () => {
         }
       }
     };
-    const { data, errors } = await mutate<
+    const { data } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
     >(UPDATE_BSDA, {
@@ -1116,8 +1116,6 @@ describe("Mutation.updateBsda", () => {
         input
       }
     });
-
-    console.log(errors);
 
     const updatedBsda = await prisma.bsda.findUnique({
       where: { id: data.updateBsda.id }

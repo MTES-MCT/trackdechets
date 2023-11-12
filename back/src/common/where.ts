@@ -208,6 +208,7 @@ type GenericWhereInput =
   | Prisma.BsdaWhereInput
   | Prisma.BsvhuWhereInput
   | Prisma.BsdasriWhereInput
+  | Prisma.BspaohWhereInput
   | Prisma.BsffPackagingWhereInput;
 
 /**

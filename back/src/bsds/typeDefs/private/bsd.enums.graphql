@@ -9,4 +9,5 @@ enum BsdType {
   BSFF
   BSDASRI
   BSVHU
+  BSPAOH
 }

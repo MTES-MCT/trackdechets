@@ -4,7 +4,9 @@ import bsdasriWorkflows from "../../back/src/bsdasris/examples/workflows";
 import bsvhuWorkflows from "../../back/src/bsvhu/examples/workflows";
 import bsffWorkflows from "../../back/src/bsffs/examples/workflows";
 import bsdaWorkflows from "../../back/src/bsda/examples/workflows";
+import bspaohWorkflows from "../../back/src/bspaoh/examples/workflows";
 import { Workflow } from "../../back/src/common/workflow";
+
 
 // parse workflow definition files
 function parseWorkflow(workflow: Workflow) {
@@ -69,6 +71,12 @@ export default function plugin(): Plugin<any> {
             bsdaWorkflows.collecteChantierParticulier
           ),
           groupement: parseWorkflow(bsdaWorkflows.groupement),
+        },
+        bspaoh: {
+          acheminementDirect: parseWorkflow(
+            bspaohWorkflows.acheminementDirect),
+          acheminementDirectAvecDepot: parseWorkflow(bspaohWorkflows.acheminementDirectAvecDepot),
+          acheminementDirectDepuisBrouillon: parseWorkflow(bspaohWorkflows.acheminementDirectDepuisBrouillon),
         },
       };
     },

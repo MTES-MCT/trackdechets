@@ -1,0 +1,81 @@
+"Statut du bordereau"
+enum BspaohStatus {
+  "Bordereau brouillon"
+  DRAFT
+  "Bordereau dans son état initial"
+  INITIAL
+  "Signé par le producteur"
+  SIGNED_BY_PRODUCER
+  "Pris en charge par le transporteur"
+  SENT
+  "Reçu"
+  RECEIVED
+  "Traité"
+  PROCESSED
+  "Refusé"
+  REFUSED
+  "Partiellement refusé"
+  PARTIALLY_REFUSED
+  "Bordereau annulé. L'annulation peut être demandée via le processus de révision"
+  CANCELED
+}
+
+"Type de packaging du déchet"
+enum BspaohType {
+  "Paoh"
+  PAOH
+  "Foetus"
+  FOETUS
+}
+
+"Type de packaging du déchet"
+enum BspaohPackagingType {
+  "Reliquaire"
+  RELIQUAIRE
+  "Petite boîte"
+  LITTLE_BOX
+  "Grosse boîte"
+  BIG_BOX
+}
+
+"Type de quantité"
+enum BspaohQuantityType {
+  "Réelle"
+  REAL
+  "Estimée"
+  ESTIMATED
+}
+
+"Consistance du déchet"
+enum BspaohConsistence {
+  "Solide"
+  SOLIDE
+  "Liquide"
+  LIQUIDE
+}
+
+"Type de signature apposée"
+enum BspaohSignatureType {
+  "Signature émetteur"
+  EMISSION
+  "Signature transporteur"
+  TRANSPORT
+  "Signature dépôt du transporteur (optionelle)"
+  DELIVERY
+  "Signature réceptionn"
+  RECEPTION
+  "Signature traitement"
+  OPERATION
+}
+
+"Acceptation d'un conditionnement"
+enum BspaohPackagingAcceptationStatus {
+  "En attente de réception"
+  PENDING
+
+  "Accepté"
+  ACCEPTED
+
+  "Refusé"
+  REFUSED
+}

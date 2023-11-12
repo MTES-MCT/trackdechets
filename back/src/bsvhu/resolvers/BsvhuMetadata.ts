@@ -1,5 +1,5 @@
 import { ValidationError } from "yup";
-import { getTransporterReceipt } from "../../bsdasris/recipify";
+import { getTransporterReceipt } from "../../companies/recipify";
 import {
   BsvhuMetadata,
   BsvhuMetadataResolvers,

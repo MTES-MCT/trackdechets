@@ -30,7 +30,7 @@ import {
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { runInTransaction } from "../../../common/repository/helper";
 import { BsdasriRepository, getBsdasriRepository } from "../../repository";
-import { getTransporterReceipt } from "../../recipify";
+import { getTransporterReceipt } from "../../../companies/recipify";
 import { UserInputError } from "../../../common/errors";
 
 const signBsdasri: MutationResolvers["signBsdasri"] = async (

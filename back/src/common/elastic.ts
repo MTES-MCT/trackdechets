@@ -11,6 +11,7 @@ import { BsdaForElastic } from "../bsda/elastic";
 import { BsdasriForElastic } from "../bsdasris/elastic";
 import { BsvhuForElastic } from "../bsvhu/elastic";
 import { BsffForElastic } from "../bsffs/elastic";
+import { BspaohForElastic } from "../bspaoh/elastic";
 
 export interface BsdElastic {
   type: BsdType;
@@ -112,7 +113,8 @@ export interface BsdElastic {
     | BsdaForElastic
     | BsdasriForElastic
     | BsvhuForElastic
-    | BsffForElastic;
+    | BsffForElastic
+    | BspaohForElastic;
 }
 
 const textField = {
@@ -444,7 +446,7 @@ export function groupByBsdType(
       ...acc,
       [bsdElastic.type]: [...acc[bsdElastic.type], bsdElastic]
     }),
-    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
+    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [], BSPAOH: [] }
   );
 }
 
