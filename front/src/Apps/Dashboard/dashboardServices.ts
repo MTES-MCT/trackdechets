@@ -55,6 +55,7 @@ import {
   completer_bsd_suite
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { BsdCurrentTab } from "../common/types/commonTypes";
+import { sub } from "date-fns";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
@@ -406,6 +407,30 @@ export const isSignEmission = (
   );
 };
 
+// s'inspire de https://github.com/MTES-MCT/trackdechets/blob/dev/back/src/forms/validation.ts#L1897
+const canAddAppendix1 = bsd => {
+  // Once one of the appendix has been signed by the transporter,
+  // you have 3 days maximum to add new appendix
+  const currentDate = new Date();
+  const firstTransporterSignatureDate = bsd.grouping?.reduce((date, form) => {
+    // @ts-ignore
+    const { takenOverAt } = form;
+
+    return takenOverAt && takenOverAt < date ? takenOverAt : date;
+  }, currentDate);
+
+  const limitDate = sub(currentDate, {
+    days: 2,
+    hours: currentDate.getHours(),
+    minutes: currentDate.getMinutes()
+  });
+
+  if (firstTransporterSignatureDate < limitDate) {
+    return false;
+  }
+  return true;
+};
+
 export const getSealedBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
@@ -416,7 +441,7 @@ export const getSealedBtnLabel = (
     isBsdd(bsd.type) &&
     permissions.includes(UserPermission.BsdCanSignEmission)
   ) {
-    if (isAppendix1(bsd)) {
+    if (isAppendix1(bsd) && canAddAppendix1(bsd)) {
       return AJOUTER_ANNEXE_1;
     }
 
@@ -482,7 +507,7 @@ export const getSentBtnLabel = (
         return VALIDER_RECEPTION;
       }
 
-      if (isAppendix1(bsd)) {
+      if (isAppendix1(bsd) && canAddAppendix1(bsd)) {
         return AJOUTER_ANNEXE_1;
       }
     }
