@@ -1054,7 +1054,11 @@ export const canReviewBsdd = bsd =>
   ![BsdStatusCode.Draft, BsdStatusCode.Sealed, BsdStatusCode.Refused].includes(
     bsd.status
   ) &&
-  bsd.emitterType !== EmitterType.Appendix1Producer;
+  bsd.emitterType !== EmitterType.Appendix1Producer &&
+  !(
+    bsd.emitterType === EmitterType.Producer &&
+    canUpdateBsd(bsd, bsd.emitterSiret)
+  );
 
 export const canReviewBsd = (bsd, siret) => {
   const isTransporter = isSameSiretTransporter(siret, bsd);
