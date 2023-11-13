@@ -51,13 +51,13 @@ const AdvancedFilters = ({
   const derivedFilters =
     filterSelectedIds.length > 0
       ? filters.map(filtersGroup =>
-        filtersGroup.map(filter => {
-          if (filterSelectedIds.includes(filter.name)) {
-            return { ...filter, isActive: false };
-          }
-          return filter;
-        })
-      )
+          filtersGroup.map(filter => {
+            if (filterSelectedIds.includes(filter.name)) {
+              return { ...filter, isActive: false };
+            }
+            return filter;
+          })
+        )
       : filters;
 
   const onSelectFilterType = useCallback(
@@ -123,7 +123,7 @@ const AdvancedFilters = ({
     if (!newFilterValues[filterName] || newFilterValues[filterName] !== value) {
       newFilterValues[filterName] = value;
       setFilterValues(newFilterValues);
-    } 
+    }
   };
 
   const onFilterSelectMultipleValueChange = (
@@ -135,12 +135,12 @@ const AdvancedFilters = ({
     const newFilterValue = selectList.map(selected => selected.value!);
 
     // If there are no values in the list, just completely remove the filter
-    if(!newFilterValue.length){
+    if (!newFilterValue.length) {
       delete newFilterValues[filterName];
-    }else{
+    } else {
       newFilterValues[filterName] = newFilterValue;
     }
-    
+
     setFilterValues(newFilterValues);
   };
 
@@ -168,7 +168,7 @@ const AdvancedFilters = ({
         newFilterValues[filterName].startDate &&
         newFilterValues[filterName].endDate &&
         newFilterValues[filterName].startDate <=
-        newFilterValues[filterName].endDate
+          newFilterValues[filterName].endDate
       ) {
         setIsApplyDisabled(false);
         setError({ [filterName]: false });
@@ -204,9 +204,9 @@ const AdvancedFilters = ({
             !filter.isMultiple
               ? onFilterValueChange(e, filter.name)
               : onFilterSelectMultipleValueChange(
-                e as unknown as { value: string; label: string }[],
-                filter.name
-              )
+                  e as unknown as { value: string; label: string }[],
+                  filter.name
+                )
           }
           defaultValue=""
           label={filter.label}
@@ -257,7 +257,7 @@ const AdvancedFilters = ({
   }, [filterSelectedList]);
 
   useEffect(() => {
-    // Some inputs justify not fetching data right away. For instance, 
+    // Some inputs justify not fetching data right away. For instance,
     // for date inputs, we need both start AND end date.
     if (!isApplyDisabled) {
       onApplyFilters(filterValues);

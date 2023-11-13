@@ -13,7 +13,6 @@ import {
   dropdown_create_bsff,
   dropdown_create_bsvhu,
   filter_acceptation_sign_date,
-  filter_broker_siret,
   filter_bsd_number,
   filter_bsd_type,
   filter_cap,
@@ -29,7 +28,6 @@ import {
   filter_reception_sign_date,
   filter_seal_numbers,
   filter_siret_productor_address,
-  filter_trader_siret,
   filter_transporter_sign_date,
   filter_tva_intra,
   filter_waste_code,
@@ -234,20 +232,8 @@ export const advancedFilterList: Filter[][] = [
       isActive: true
     },
     {
-      name: FilterName.brokerSiret,
-      label: filter_broker_siret,
-      type: FilterType.input,
-      isActive: true
-    },
-    {
       name: FilterName.nextDestinationSiret,
       label: filter_next_destination_siret,
-      type: FilterType.input,
-      isActive: true
-    },
-    {
-      name: FilterName.traderSiret,
-      label: filter_trader_siret,
       type: FilterType.input,
       isActive: true
     }
@@ -349,28 +335,6 @@ export const filterPredicates: {
       ]
     }),
     order: "vatNumber"
-  },
-  {
-    filterName: FilterName.traderSiret,
-    where: value => ({
-      trader: {
-        company: {
-          siret: { _contains: value }
-        }
-      }
-    }),
-    order: "siret"
-  },
-  {
-    filterName: FilterName.brokerSiret,
-    where: value => ({
-      broker: {
-        company: {
-          siret: { _contains: value }
-        }
-      }
-    }),
-    order: "siret"
   },
   {
     filterName: FilterName.givenName,

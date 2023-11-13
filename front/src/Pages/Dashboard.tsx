@@ -407,10 +407,10 @@ const DashboardPage = () => {
 
   useEffect(() => {
     // If revisions tab, close the filters
-    if(isReviewsTab){
+    if (isReviewsTab) {
       setAreAdvancedFiltersOpen(false);
     }
-  }, [ isReviewsTab ]);
+  }, [isReviewsTab]);
 
   useEffect(() => {
     // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
