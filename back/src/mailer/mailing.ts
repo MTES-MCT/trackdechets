@@ -1,7 +1,6 @@
-import { Mail, Contact } from "./types";
-import { backend } from ".";
+import { backend, Mail, Contact } from "@td/mail";
 import { addToMailQueue } from "../queue/producers/mail";
-import logger from "../logging/logger";
+import { logger } from "@td/logger";
 
 // push job to the job queue for the api server not to execute the sendMail itself
 export async function sendMail(mail: Mail): Promise<void> {

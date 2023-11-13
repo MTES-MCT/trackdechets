@@ -1,5 +1,5 @@
 import { Job, JobOptions } from "bull";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 import { index as defaultIndexConfig } from "../../common/elastic";
 import { indexQueue } from "../../queue/producers/elastic";
 

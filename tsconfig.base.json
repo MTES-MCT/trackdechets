@@ -21,6 +21,10 @@
     "inlineSources": true,
     "baseUrl": ".",
     "paths": {
+      "@td/env": ["libs/back/env/src/index.ts"],
+      "@td/logger": ["libs/back/logger/src/index.ts"],
+      "@td/mail": ["libs/back/mail/src/index.ts"],
+      "back": ["back/src/index.ts"],
       "codegen-ui": ["codegen-ui/src/index.ts"],
       "shared/constants": ["shared/constants/src/index.ts"]
     }

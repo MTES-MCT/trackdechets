@@ -1,4 +1,4 @@
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 import { client, BsdIndexationConfig } from "../../common/elastic";
 import {
   isIndexMappingsVersionChanged,
