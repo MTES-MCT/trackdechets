@@ -1,7 +1,7 @@
 import { BsddTransporter, CompanyVerificationMode, Form } from "@prisma/client";
 import { cleanupSpecialChars, toFrFormat } from "../helpers";
 import { MailTemplate } from "../types";
-import templateIds from "./provider/templateIds";
+import { templateIds } from "./provider/templateIds";
 import { mustacheRenderer } from "./renderers";
 
 export const onSignup: MailTemplate<{ activationHash: string }> = {

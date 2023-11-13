@@ -19,7 +19,6 @@
         "command": "graphql-codegen --config back/codegen.yml"
       }
     },
-
     "serve-api": {
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",

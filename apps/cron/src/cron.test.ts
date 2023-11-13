@@ -1,6 +1,6 @@
-import { validateOnbardingCronSchedule } from "../cron";
+import { validateOnbardingCronSchedule } from "./main";
 
-jest.mock("../commands/appendix1.helpers", () => ({
+jest.mock("./commands/appendix1.helpers", () => ({
   cleanUnusedAppendix1ProducerBsdds: jest.fn(() => Promise.resolve())
 }));
 

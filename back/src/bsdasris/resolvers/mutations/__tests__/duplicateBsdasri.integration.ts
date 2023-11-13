@@ -9,7 +9,7 @@ import { bsdasriFactory, initialData } from "../../../__tests__/factories";
 import { Mutation } from "../../../../generated/graphql/types";
 import { BsdasriType } from "@prisma/client";
 import prisma from "../../../../prisma";
-import { xDaysAgo } from "../../../../commands/onboarding.helpers";
+import { xDaysAgo } from "../../../../utils";
 
 const TODAY = new Date();
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);

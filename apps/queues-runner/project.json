@@ -6,6 +6,7 @@
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
+      "dependsOn": ["^codegen", "^prisma"],
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {

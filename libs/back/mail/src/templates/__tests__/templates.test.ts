@@ -14,7 +14,6 @@ import {
   verificationDone,
   contentAwaitsGuest
 } from "..";
-import { siretify } from "../../../__tests__/factories";
 import { toFrFormat } from "../../helpers";
 import { renderMail } from "../renderers";
 
@@ -31,7 +30,7 @@ describe("templates", () => {
   });
 
   test("contentAwaitsGuest", () => {
-    const company = { siret: siretify(1), name: "ACME" };
+    const company = { siret: "000000000000001", name: "ACME" };
     const rendered = renderMail(contentAwaitsGuest, {
       variables: { company },
       to
@@ -236,7 +235,7 @@ describe("templates", () => {
 
   test("membershipRequestConfirmation", () => {
     const companyName = "ACME";
-    const companySiret = siretify(1);
+    const companySiret = "000000000000001";
     const adminEmailsInfo = "emails info";
     const rendered = renderMail(membershipRequestConfirmation, {
       variables: { companyName, companySiret, adminEmailsInfo },
@@ -250,7 +249,7 @@ describe("templates", () => {
   test("membershipRequest", () => {
     const userEmail = "john.snow@trackdechets.fr";
     const companyName = "ACME";
-    const companySiret = siretify(1);
+    const companySiret = "000000000000001";
     const membershipRequestId = "4567";
     const rendered = renderMail(membershipRequest, {
       variables: {
@@ -268,7 +267,7 @@ describe("templates", () => {
 
   test("membershipRequestAccepted", () => {
     const companyName = "ACME";
-    const companySiret = siretify(1);
+    const companySiret = "000000000000001";
     const rendered = renderMail(membershipRequestAccepted, {
       variables: {
         companyName,
@@ -284,7 +283,7 @@ describe("templates", () => {
 
   test("membershipRequestRefused", () => {
     const companyName = "ACME";
-    const companySiret = siretify(1);
+    const companySiret = "000000000000001";
     const rendered = renderMail(membershipRequestRefused, {
       variables: {
         companyName,
@@ -298,7 +297,7 @@ describe("templates", () => {
 
   test("verificationProcessInfo", () => {
     const companyName = "ACME";
-    const companySiret = siretify(1);
+    const companySiret = "000000000000001";
     const rendered = renderMail(verificationProcessInfo, {
       variables: {
         company: {
@@ -314,7 +313,7 @@ describe("templates", () => {
 
   test("verificationDone by letter", () => {
     const companyName = "ACME";
-    const companySiret = siretify(1);
+    const companySiret = "000000000000001";
     const rendered = renderMail(verificationDone, {
       variables: {
         company: {
@@ -333,7 +332,7 @@ describe("templates", () => {
   });
   test("verificationDone by letter", () => {
     const companyName = "ACME";
-    const companySiret = siretify(1);
+    const companySiret = "000000000000001";
     const rendered = renderMail(verificationDone, {
       variables: {
         company: {

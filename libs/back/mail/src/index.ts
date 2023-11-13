@@ -30,3 +30,4 @@ if (!backend) {
 export * from "./types";
 export * from "./templates";
 export * from "./templates/renderers";
+export * from "./templates/provider/templateIds";

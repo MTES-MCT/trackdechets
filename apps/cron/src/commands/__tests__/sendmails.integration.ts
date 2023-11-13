@@ -1,7 +1,7 @@
 import axios from "axios";
-import { resetDatabase } from "../../../integration-tests/helper";
+import { resetDatabase } from "back/integration-tests/helper";
 import { CompanyType, MembershipRequestStatus } from "@prisma/client";
-import { addToMailQueue } from "../../queue/producers/mail";
+import { addToMailQueue } from "back/src/queue/producers/mail";
 
 import {
   sendMembershipRequestDetailsEmail,
@@ -18,9 +18,9 @@ import {
   formFactory,
   userFactory,
   userWithCompanyFactory
-} from "../../__tests__/factories";
-import prisma from "../../prisma";
-import { bsdaFactory } from "../../bsda/__tests__/factories";
+} from "back/src/__tests__/factories";
+import prisma from "back/src/prisma";
+import { bsdaFactory } from "back/src/bsda/__tests__/factories";
 
 // Intercept calls
 // Simulate queue error in order to test with sendMailSync

@@ -14,7 +14,7 @@ type templateInterface = {
   [key in TemplateNames]: number;
 };
 
-const templateIds: templateInterface = {
+export const templateIds: templateInterface = {
   [TemplateNames.LAYOUT]: parseInt(process.env.MAIN_TEMPLATE_ID, 10),
   [TemplateNames.FIRST_ONBOARDING]: parseInt(
     process.env.FIRST_ONBOARDING_TEMPLATE_ID,
@@ -33,5 +33,3 @@ const templateIds: templateInterface = {
     10
   )
 };
-
-export default templateIds;
