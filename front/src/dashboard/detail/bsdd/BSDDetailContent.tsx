@@ -551,7 +551,13 @@ const Appendix1 = ({
                   <br />
                   {form.emitter?.company?.siret}
                 </td>
-                <td>{form.status ? STATUS_LABELS[form.status] : "-"}</td>
+                <td>
+                  {form.status
+                    ? !Boolean(form.emitter?.isPrivateIndividual)
+                      ? STATUS_LABELS[form.status]
+                      : STATUS_LABELS["SEALED_PRIVATE_INDIVIDUAL"]
+                    : "-"}
+                </td>
                 <td>
                   <WorkflowAction
                     siret={siret}
@@ -621,6 +627,8 @@ export default function BSDDetailContent({
   const hasTempStorage = !!form?.temporaryStorageDetail;
   const isRegroupement: boolean = form?.emitter?.type === EmitterType.Appendix2;
   const isChapeau: boolean = form?.emitter?.type === EmitterType.Appendix1;
+  const isAppendix1Producer: boolean =
+    form?.emitter?.type === EmitterType.Appendix1Producer;
 
   return (
     <>
@@ -630,7 +638,11 @@ export default function BSDDetailContent({
             <IconBSDD className="tw-mr-2" />
 
             <span className={styles.detailStatus}>
-              [{STATUS_LABELS[form.status]}]
+              {!isAppendix1Producer
+                ? [STATUS_LABELS[form.status]]
+                : Boolean(form.emitter?.isPrivateIndividual)
+                ? [STATUS_LABELS["SEALED_PRIVATE_INDIVIDUAL"]]
+                : [STATUS_LABELS[form.status]]}
             </span>
             {form.status !== "DRAFT" && <span>{form.readableId}</span>}
 
