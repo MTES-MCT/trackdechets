@@ -522,6 +522,21 @@ describe("Mutation.signBsdasri emission", () => {
       }
     );
 
+    test("should work if operation mode is missing but step is not operation", async () => {
+      const data = {
+        ...bsdasri,
+        destinationOperationCode: "D9",
+        destinationOperationMode: undefined, // Correct mode is ELIMINATION
+        destinationOperationDate: new Date(),
+        destinationReceptionWasteWeightValue: 10
+      };
+
+      const res = await validateBsdasri(data as any, {
+        transportSignature: true
+      });
+      expect(res).not.toBeUndefined();
+    });
+
     test.each([
       ["D9", "VALORISATION_ENERGETIQUE"], // Correct mode is ELIMINATION
       ["R12", "VALORISATION_ENERGETIQUE"] // R12 has no associated mode

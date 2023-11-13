@@ -351,6 +351,20 @@ describe("transporterSchema", () => {
       expect(isValid).toBe(false);
     });
   });
+
+  it("should succeed if operation mode is missing because step is not operation", async () => {
+    const bsff = {
+      ...transporterData,
+      operationCode: "R1",
+      operationMode: undefined
+    };
+
+    expect.assertions(1);
+
+    const isValid = await transporterSchema.isValid(bsff);
+
+    expect(isValid).toBe(true);
+  });
 });
 
 describe("destinationSchema", () => {

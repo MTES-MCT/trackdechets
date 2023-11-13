@@ -7,22 +7,23 @@ import {
   getOperationModesFromOperationCode
 } from "../operationModes";
 import Tooltip from "./Tooltip";
-import { deepValue } from "../../dashboard/detail/common/utils";
 
 const OperationModeSelect = ({ operationCode, name }) => {
-  const { setFieldValue, values } = useFormikContext();
+  const { setFieldValue } = useFormikContext();
   const modes = useMemo(
     () => getOperationModesFromOperationCode(operationCode),
     [operationCode]
   );
 
   useEffect(() => {
-    const value = deepValue(values, name);
-
-    if (!value || !modes.includes(value)) {
+    // If the available modes change, and only ONE option is available,
+    // select it by default. Else, reset the selection
+    if (modes.length > 1) {
+      setFieldValue(name, undefined);
+    } else {
       setFieldValue(name, modes[0]);
     }
-  }, [modes, name, setFieldValue, values]);
+  }, [modes, name, setFieldValue]);
 
   if (!modes.length) return null;
 
