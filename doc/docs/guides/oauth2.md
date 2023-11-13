@@ -71,7 +71,7 @@ Les arguments suivants doivent être passés en "query string" de la requête (C
 
 - `client_id={client_id}`: L'identifiant de l'application cliente
 - `response_type=code`
-- `redirect_url={redirect_uri}`: URL de redirection
+- `redirect_uri={redirect_uri}`: URL de redirection
 
 Exemple: `https://app.trackdechets.beta.gouv.fr/oauth2/authorize/dialog?response_type=code&redirect_uri=https://client.example.com/cb&client_id=ck7d66y9s00x20784u4u7fp8l`
 
