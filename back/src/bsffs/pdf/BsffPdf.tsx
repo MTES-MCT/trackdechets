@@ -302,13 +302,15 @@ function BsffQuantity({ bsff }: Pick<Props, "bsff">) {
               />{" "}
               Réelle
             </span>{" "}
+            <br/>
             <span>
               <input
                 type="checkbox"
                 defaultChecked={bsff.weight?.isEstimate}
                 readOnly
               />{" "}
-              Estimée "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR
+              Estimée<br/>
+              "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR
               2023
             </span>
           </div>

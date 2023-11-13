@@ -225,14 +225,15 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               checked={bsdasri?.emitter?.emission?.weight?.isEstimate === false}
               readOnly
             />{" "}
-            réelle <span> - </span>
+            réelle
+            <br/>
             <input
               type="checkbox"
               checked={bsdasri?.emitter?.emission?.weight?.isEstimate === true}
               readOnly
             />{" "}
-            Estimée "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR
-            2023
+            Estimée<br/>
+            "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR 2023
           </div>
         </div>
         {/* End PRED */}
@@ -367,8 +368,8 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               }
               readOnly
             />{" "}
-            Estimée "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR
-            2023
+            Estimée<br/>
+            "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR 2023
           </div>
         </div>
         {/* End Transporter */}
