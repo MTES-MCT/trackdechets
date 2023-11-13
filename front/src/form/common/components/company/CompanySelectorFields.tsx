@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useMemo, useEffect } from "react";
 import { Field, useField, useFormikContext } from "formik";
 import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import {
@@ -33,28 +33,22 @@ export default function CompanySelectorFields({
   shouldUpdateFields = true
 }: CompanySelectorFieldsProps) {
   const [field] = useField<FormCompany>({ name });
-  const { setFieldError, setFieldValue, setFieldTouched, values } =
-    useFormikContext<{
-      transporter:
-        | Maybe<TransporterInput>
-        | Maybe<BsdaTransporterInput>
-        | Maybe<BsdasriTransporterInput>
-        | Maybe<BsvhuTransporterInput>
-        | Maybe<BsffTransporterInput>;
-    }>();
+  const { setFieldValue, setFieldTouched, values } = useFormikContext<{
+    transporter:
+      | Maybe<TransporterInput>
+      | Maybe<BsdaTransporterInput>
+      | Maybe<BsdasriTransporterInput>
+      | Maybe<BsvhuTransporterInput>
+      | Maybe<BsffTransporterInput>;
+  }>();
   // determine if the current Form company is foreign
-  const [isForeignCompany, setIsForeignCompany] = useState(
+  const isForeignCompany =
     (field.value?.country && field.value?.country !== "FR") ||
-      isForeignVat(field.value?.vatNumber!) ||
-      isForeignVat(currentCompany?.vatNumber!!)
-  );
-  const [
-    displayForeignCompanyWithUnknownInfos,
-    setDisplayForeignCompanyWithUnknownInfos
-  ] = useState<boolean>(
-    isForeignVat(currentCompany?.vatNumber!!) &&
-      isUnknownCompanyName(currentCompany?.name!)
-  );
+    isForeignVat(field.value?.vatNumber!) ||
+    isForeignVat(currentCompany.vatNumber!);
+  const displayForeignCompanyWithUnknownInfos =
+    isForeignVat(currentCompany.vatNumber!) &&
+    isUnknownCompanyName(currentCompany.name!);
 
   // Memoize for changes in field.value.siret and field.value.orgId
   // To support both FormCompany and Intermediary (which doesn't have orgId)
@@ -66,12 +60,12 @@ export default function CompanySelectorFields({
   // Disable the name field for foreign companies whose name is filled
   const disableNameField =
     disabled ||
-    (!!currentCompany?.name && !displayForeignCompanyWithUnknownInfos);
+    (!!currentCompany.name && !displayForeignCompanyWithUnknownInfos);
 
   // Disable the address field for foreign companies whose address is filled
   const disableAddressField =
     disabled ||
-    (!!currentCompany?.address && !displayForeignCompanyWithUnknownInfos);
+    (!!currentCompany.address && !displayForeignCompanyWithUnknownInfos);
 
   function isUnknownCompanyName(companyName?: string): boolean {
     return companyName === "---" || companyName === "";

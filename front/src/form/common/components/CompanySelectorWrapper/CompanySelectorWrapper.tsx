@@ -1,4 +1,4 @@
-import { useLazyQuery } from "@apollo/client";
+import { useLazyQuery, ApolloError } from "@apollo/client";
 import React, { useState } from "react";
 import CompanySelector from "../../../../Apps/common/Components/CompanySelector/CompanySelector";
 import {
@@ -41,17 +41,15 @@ export default function CompanySelectorWrapper({
     FAVORITES(favoriteType)
   );
 
-  const [
-    searchCompaniesQuery,
-    { loading: isLoadingSearch, data: searchData, error }
-  ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
-    SEARCH_COMPANIES,
-    {
-      onCompleted: data => {
-        setSearchResults(data?.searchCompanies.slice(0, 6));
+  const [searchCompaniesQuery, { loading: isLoadingSearch, data: _, error }] =
+    useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
+      SEARCH_COMPANIES,
+      {
+        onCompleted: data => {
+          setSearchResults(data?.searchCompanies.slice(0, 6));
+        }
       }
-    }
-  );
+    );
 
   const onSelectCompany = (company?: CompanySearchResult) => {
     setSelectedCompany(company);
@@ -80,6 +78,13 @@ export default function CompanySelectorWrapper({
     }
   };
 
+  const isForbiddenCompanyError = (error: ApolloError) => {
+    return (
+      error.graphQLErrors.length &&
+      error.graphQLErrors[0].extensions?.code === "FORBIDDEN"
+    );
+  };
+
   return (
     <>
       {favoritesError && (
@@ -92,10 +97,7 @@ export default function CompanySelectorWrapper({
         <NotificationError
           apolloError={error}
           message={error => {
-            if (
-              error.graphQLErrors.length &&
-              error.graphQLErrors[0].extensions?.code === "FORBIDDEN"
-            ) {
+            if (isForbiddenCompanyError(error)) {
               return (
                 `Nous n'avons pas pu récupérer les informations.` +
                 `Veuillez nous contacter via ` +

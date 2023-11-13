@@ -7,7 +7,7 @@ export default meta;
 type Story = StoryObj<typeof CompanySelector>;
 
 export const Primary: Story = {
-  args: {},
+  args: {}
 };
 
 export const SearchResults: Story = {
@@ -21,33 +21,33 @@ export const SearchResults: Story = {
         orgId: "11111111111111",
         address: "rue de Kronstadt",
         name: "Entreprise test",
-        isRegistered: true,
+        isRegistered: true
       },
       {
         siret: "22222222222222",
         orgId: "22222222222222",
         address: "rue des 4 chemins",
         name: "Déchetterie de Carolles",
-        isRegistered: true,
+        isRegistered: true
       },
       {
         siret: "33333333333333",
         orgId: "33333333333333",
         address: "Chemin des pécheurs",
         name: "Entreprise test",
-        isRegistered: true,
+        isRegistered: true
       },
       {
         siret: "44444444444444",
         orgId: "44444444444444",
         address: "rue Simone de Beauvoir",
         name: "Transporteur Montreuil",
-        isRegistered: true,
-      },
-    ],
-  },
+        isRegistered: true
+      }
+    ]
+  }
 };
 
 export const Selected: Story = {
-  args: {},
+  args: {}
 };

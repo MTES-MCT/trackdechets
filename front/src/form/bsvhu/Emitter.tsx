@@ -16,7 +16,7 @@ import React, { useMemo, useState } from "react";
 import CompanySelectorFields from "../common/components/company/CompanySelectorFields";
 
 export default function Emitter({ disabled }) {
-  const { setFieldValue, values } = useFormikContext<{
+  const { setFieldValue } = useFormikContext<{
     emitter: BsvhuEmitterInput;
   }>();
   const { siret } = useParams<{ siret: string }>();
@@ -31,19 +31,18 @@ export default function Emitter({ disabled }) {
     [field.value?.siret, field.value?.orgId]
   );
 
-  const { data: companyPrivateData, loading: isLoadingCompanyPrivateData } =
-    useQuery<Pick<Query, "companyPrivateInfos">, QueryCompanyPrivateInfosArgs>(
-      COMPANY_SELECTOR_PRIVATE_INFOS,
-      {
-        variables: {
-          // Compatibility with intermediaries that don't have orgId
-          clue: orgId!
-        },
-        skip: !orgId,
-        onCompleted: data =>
-          setCurrentCompany(data.companyPrivateInfos as CompanySearchResult)
-      }
-    );
+  const { data: companyPrivateData, loading: _ } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_SELECTOR_PRIVATE_INFOS, {
+    variables: {
+      // Compatibility with intermediaries that don't have orgId
+      clue: orgId!
+    },
+    skip: !orgId,
+    onCompleted: data =>
+      setCurrentCompany(data.companyPrivateInfos as CompanySearchResult)
+  });
 
   return (
     <>
