@@ -8,7 +8,7 @@ import {
   getUserFunctions
 } from "./helpers";
 import { checkSealedAndRequiredFields, getSealedFields } from "./rules";
-import { rawBsdaSchema } from "./schema";
+import { bsdaSchema } from "./schema";
 import { runTransformers } from "./transformers";
 
 export type BsdaValidationContext = {
@@ -49,7 +49,7 @@ export async function parseBsdaInContext(
     unparsedBsda
   );
 
-  const contextualSchema = rawBsdaSchema
+  const contextualSchema = bsdaSchema
     .transform(async val => {
       const sealedFields = getSealedFields({
         bsda: val,

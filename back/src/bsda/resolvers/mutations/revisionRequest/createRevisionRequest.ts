@@ -1,14 +1,13 @@
 import {
   Bsda,
   BsdaStatus,
-  OperationMode,
   Prisma,
   RevisionRequestStatus
 } from "@prisma/client";
-import * as yup from "yup";
-import { BSDA_WASTE_CODES } from "shared/constants";
+import { z } from "zod";
+import { ForbiddenError, UserInputError } from "../../../../common/errors";
+import { getOperationModesFromOperationCode } from "../../../../common/operationModes";
 import { checkIsAuthenticated } from "../../../../common/permissions";
-import { INVALID_WASTE_CODE } from "../../../../forms/errors";
 import {
   BsdaRevisionRequestContentInput,
   MutationCreateBsdaRevisionRequestArgs
@@ -17,11 +16,9 @@ import { GraphQLContext } from "../../../../types";
 import { getUserCompanies } from "../../../../users/database";
 import { flattenBsdaRevisionRequestInput } from "../../../converter";
 import { getBsdaOrNotFound } from "../../../database";
-import { getBsdaRepository } from "../../../repository";
-import { OPERATIONS } from "../../../validation/constants";
 import { checkCanRequestRevision } from "../../../permissions";
-import { ForbiddenError, UserInputError } from "../../../../common/errors";
-import { getOperationModesFromOperationCode } from "../../../../common/operationModes";
+import { getBsdaRepository } from "../../../repository";
+import { rawBsdaSchema } from "../../../validation/schema";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
@@ -198,7 +195,7 @@ async function getFlatContent(
   const flatContent = flattenBsdaRevisionRequestInput(content);
   const { isCanceled, ...fields } = flatContent;
 
-  if (Object.keys(flatContent).length === 0) {
+  if (!isCanceled && Object.keys(fields).length === 0) {
     throw new UserInputError(
       "Impossible de créer une révision sans modifications."
     );
@@ -217,73 +214,62 @@ async function getFlatContent(
     );
   }
 
-  await revisionRequestContentSchema.validate(flatContent);
+  schema.parse(flatContent); // Validate but don't parse as we want to keep empty fields empty
 
   return flatContent;
 }
 
-const revisionRequestContentSchema = yup.object({
-  wasteCode: yup
-    .string()
-    .oneOf([...BSDA_WASTE_CODES, "", null], INVALID_WASTE_CODE)
-    .nullable(),
-  wastePop: yup.boolean().nullable(),
-  packagings: yup.array().nullable(),
-  wasteSealNumbers: yup.array().of(yup.string()).nullable(),
-  wasteMaterialName: yup.string().nullable(),
-  destinationCap: yup.string().nullable(),
-  destinationReceptionWeight: yup.number().nullable(),
-  destinationOperationCode: yup
-    .string()
-    .oneOf(
-      [null, "", ...OPERATIONS],
-      "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
-    )
-    .nullable(),
-  destinationOperationMode: yup
-    .mixed<OperationMode | null | undefined>()
-    .oneOf([...Object.values(OperationMode), null, undefined])
-    .nullable()
-    .test(
-      "processing-mode-matches-processing-operation",
-      "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
-      function (item) {
-        const { destinationOperationCode } = this.parent;
-        const destinationOperationMode = item;
+const schema = rawBsdaSchema
+  .pick({
+    wasteCode: true,
+    wastePop: true,
+    wasteSealNumbers: true,
+    wasteMaterialName: true,
+    packagings: true,
+    destinationCap: true,
+    destinationOperationCode: true,
+    destinationOperationMode: true,
+    destinationOperationDescription: true,
+    destinationReceptionWeight: true,
+    brokerCompanyName: true,
+    brokerCompanySiret: true,
+    brokerCompanyAddress: true,
+    brokerCompanyContact: true,
+    brokerCompanyPhone: true,
+    brokerCompanyMail: true,
+    brokerRecepisseNumber: true,
+    brokerRecepisseDepartment: true,
+    brokerRecepisseValidityLimit: true,
+    emitterPickupSiteName: true,
+    emitterPickupSiteAddress: true,
+    emitterPickupSiteCity: true,
+    emitterPickupSitePostalCode: true,
+    emitterPickupSiteInfos: true
+  })
+  .merge(z.object({ isCanceled: z.boolean().nullish() }))
+  .superRefine((val, ctx) => {
+    const { destinationOperationCode, destinationOperationMode } = val;
+    if (destinationOperationCode) {
+      const modes = getOperationModesFromOperationCode(
+        destinationOperationCode
+      );
 
-        if (destinationOperationCode) {
-          const modes = getOperationModesFromOperationCode(
-            destinationOperationCode
-          );
-
-          if (modes.length) {
-            if (!destinationOperationMode) {
-              return new yup.ValidationError(
-                "Vous devez préciser un mode de traitement"
-              );
-            }
-
-            return modes.includes(destinationOperationMode ?? "");
-          }
-        }
-
-        return true;
+      if (modes.length && !destinationOperationMode) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Vous devez préciser un mode de traitement"
+        });
+      } else if (
+        (modes.length &&
+          destinationOperationMode &&
+          !modes.includes(destinationOperationMode)) ||
+        (!modes.length && destinationOperationMode)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+        });
       }
-    ),
-  destinationOperationDescription: yup.string().nullable(),
-  brokerCompanyName: yup.string().nullable(),
-  brokerCompanySiret: yup.string().nullable(),
-  brokerCompanyAddress: yup.string().nullable(),
-  brokerCompanyContact: yup.string().nullable(),
-  brokerCompanyPhone: yup.string().nullable(),
-  brokerCompanyMail: yup.string().nullable(),
-  brokerRecepisseNumber: yup.string().nullable(),
-  brokerRecepisseDepartment: yup.string().nullable(),
-  brokerRecepisseValidityLimit: yup.date().nullable(),
-  emitterPickupSiteName: yup.string().nullable(),
-  emitterPickupSiteAddress: yup.string().nullable(),
-  emitterPickupSiteCity: yup.string().nullable(),
-  emitterPickupSitePostalCode: yup.string().nullable(),
-  emitterPickupSiteInfos: yup.string().nullable(),
-  isCanceled: yup.bool().nullable()
-});
+    }
+  });
