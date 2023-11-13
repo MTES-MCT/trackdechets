@@ -201,21 +201,6 @@ const DashboardPage = () => {
 
   useNotifier(siret, fetchBsds);
 
-  const fetchWithDefaultWhere = React.useCallback(
-    ({ where, ...args }) => {
-      const newVariables = {
-        ...args,
-        where: { ...where, ...defaultWhere },
-        first: BSD_PER_PAGE
-      };
-      setBsdsVariables(newVariables);
-      lazyFetchBsds({
-        variables: newVariables
-      });
-    },
-    [lazyFetchBsds, defaultWhere]
-  );
-
   const [
     fetchBsdaRevisions,
     {
@@ -421,22 +406,11 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
-    setAreAdvancedFiltersOpen(false);
-    // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
-    if (!isReviewsTab) {
-      fetchWithDefaultWhere({ where: defaultWhere });
+    // If revisions tab, close the filters
+    if(isReviewsTab){
+      setAreAdvancedFiltersOpen(false);
     }
-  }, [
-    isActTab,
-    isDraftTab,
-    isFollowTab,
-    isArchivesTab,
-    isReviewsTab,
-    isToCollectTab,
-    isCollectedTab,
-    defaultWhere,
-    fetchWithDefaultWhere
-  ]);
+  }, [ isReviewsTab ]);
 
   useEffect(() => {
     // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
@@ -488,18 +462,6 @@ const DashboardPage = () => {
         });
     }
   }, [isReviewsTab, fetchBsddRevisions, fetchBsdaRevisions]);
-
-  useEffect(() => {
-    // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
-    if (!isReviewsTab && !areAdvancedFiltersOpen) {
-      fetchWithDefaultWhere({ where: defaultWhere });
-    }
-  }, [
-    areAdvancedFiltersOpen,
-    defaultWhere,
-    isReviewsTab,
-    fetchWithDefaultWhere
-  ]);
 
   const getBlankstateTitle = (): string | undefined => {
     if (isActTab) {
@@ -569,34 +531,36 @@ const DashboardPage = () => {
           quand on pourra afficher une révision avec la requete bsds
        */}
       {!isReviewsTab && (
-        <div className="dashboard-page__actions">
-          {permissions.includes(UserPermission.BsdCanCreate) && (
-            <div className="create-btn">
-              <BsdCreateDropdown
-                links={dropdownCreateLinks(siret)}
-                isDisabled={loading}
-                menuTitle={dropdown_create_btn}
-                primary
-              />
+        <>
+          <div className="dashboard-page__actions">
+            {permissions.includes(UserPermission.BsdCanCreate) && (
+              <div className="create-btn">
+                <BsdCreateDropdown
+                  links={dropdownCreateLinks(siret)}
+                  isDisabled={loading}
+                  menuTitle={dropdown_create_btn}
+                  primary
+                />
+              </div>
+            )}
+            <div className="filter-btn">
+              <button
+                type="button"
+                className="fr-btn fr-btn--secondary"
+                aria-expanded={areAdvancedFiltersOpen}
+                onClick={toggleFiltersBlock}
+                disabled={loading}
+              >
+                {!areAdvancedFiltersOpen ? filter_show_btn : filter_reset_btn}
+              </button>
             </div>
-          )}
-          <div className="filter-btn">
-            <button
-              type="button"
-              className="fr-btn fr-btn--secondary"
-              aria-expanded={areAdvancedFiltersOpen}
-              onClick={toggleFiltersBlock}
-              disabled={loading}
-            >
-              {!areAdvancedFiltersOpen ? filter_show_btn : filter_reset_btn}
-            </button>
           </div>
-        </div>
+          <Filters
+            onApplyFilters={handleFiltersSubmit}
+            areAdvancedFiltersOpen={areAdvancedFiltersOpen}
+          />
+        </>
       )}
-      <Filters
-        onApplyFilters={handleFiltersSubmit}
-        areAdvancedFiltersOpen={areAdvancedFiltersOpen}
-      />
       {(isFetchingMore || isLoadingBsds) && <Loader />}
       {!Boolean(bsdsTotalCount) && !isLoadingBsds && (
         <div className="dashboard-page__blankstate">

@@ -8,6 +8,7 @@ import DatePickerWrapper from "../DatePicker/DatePickerWrapper";
 import { MAX_FILTER } from "../../../Dashboard/dashboardUtils";
 
 import "./filters.scss";
+import usePrevious from "../../../../common/hooks/usePrevious";
 
 const AdvancedFilters = ({
   open = false,
@@ -16,15 +17,29 @@ const AdvancedFilters = ({
 }: AdvancedFiltersProps) => {
   const placeholderFilterRef = useRef<HTMLDivElement>(null);
   const [filterSelectedList, setFilterSelectedList] = useState<Filter[]>([]);
-  const [isApplyDisabled, setIsApplyDisabled] = useState<boolean>(true);
+  const [isApplyDisabled, setIsApplyDisabled] = useState<boolean>(false);
   const [filterValues, setFilterValues] = useState({});
   const [hasReachMaxFilter, setHasReachMaxFilter] = useState(false);
-  const [hasRemovedFilterLine, setHasRemovedFilterLine] =
-    useState<boolean>(false);
   const [selectMultipleValueArray, setSelectMultipleValueArray] = useState<
     { value: string; label: string }[]
   >([]);
   const [error, setError] = useState({});
+
+  const prevOpen = usePrevious(open);
+
+  // If the filter is closed, reset it completely
+  useEffect(() => {
+    if (prevOpen && !open) {
+      setFilterSelectedList([]);
+      setIsApplyDisabled(false);
+      setFilterValues({});
+      setHasReachMaxFilter(false);
+      setSelectMultipleValueArray([]);
+      setError({});
+
+      onApplyFilters({});
+    }
+  }, [onApplyFilters, open, prevOpen]);
 
   const newInputElementRef = useRef<HTMLInputElement>(null);
   const newSelectElementRef = useRef<HTMLSelectElement>(null);
@@ -36,13 +51,13 @@ const AdvancedFilters = ({
   const derivedFilters =
     filterSelectedIds.length > 0
       ? filters.map(filtersGroup =>
-          filtersGroup.map(filter => {
-            if (filterSelectedIds.includes(filter.name)) {
-              return { ...filter, isActive: false };
-            }
-            return filter;
-          })
-        )
+        filtersGroup.map(filter => {
+          if (filterSelectedIds.includes(filter.name)) {
+            return { ...filter, isActive: false };
+          }
+          return filter;
+        })
+      )
       : filters;
 
   const onSelectFilterType = useCallback(
@@ -65,7 +80,6 @@ const AdvancedFilters = ({
     if (filterSelectedList.length < MAX_FILTER) {
       showFilterSelector();
     }
-    setHasRemovedFilterLine(false);
   }, [filterSelectedList]);
 
   const onRemoveFilterType = useCallback(
@@ -86,7 +100,6 @@ const AdvancedFilters = ({
         const newFilterValues = { ...filterValues };
         delete newFilterValues[value];
         setFilterValues(newFilterValues);
-        setHasRemovedFilterLine(true);
       }
     },
     [filterSelectedList, filterValues]
@@ -110,10 +123,7 @@ const AdvancedFilters = ({
     if (!newFilterValues[filterName] || newFilterValues[filterName] !== value) {
       newFilterValues[filterName] = value;
       setFilterValues(newFilterValues);
-      setIsApplyDisabled(false);
-    } else {
-      setIsApplyDisabled(true);
-    }
+    } 
   };
 
   const onFilterSelectMultipleValueChange = (
@@ -122,13 +132,16 @@ const AdvancedFilters = ({
   ) => {
     setSelectMultipleValueArray(selectList);
     const newFilterValues = { ...filterValues };
-    newFilterValues[filterName] = selectList.map(selected => selected.value!);
-    setFilterValues(newFilterValues);
-    if (selectList.length) {
-      setIsApplyDisabled(false);
-    } else {
-      setIsApplyDisabled(true);
+    const newFilterValue = selectList.map(selected => selected.value!);
+
+    // If there are no values in the list, just completely remove the filter
+    if(!newFilterValue.length){
+      delete newFilterValues[filterName];
+    }else{
+      newFilterValues[filterName] = newFilterValue;
     }
+    
+    setFilterValues(newFilterValues);
   };
 
   const onDateChange = (
@@ -155,7 +168,7 @@ const AdvancedFilters = ({
         newFilterValues[filterName].startDate &&
         newFilterValues[filterName].endDate &&
         newFilterValues[filterName].startDate <=
-          newFilterValues[filterName].endDate
+        newFilterValues[filterName].endDate
       ) {
         setIsApplyDisabled(false);
         setError({ [filterName]: false });
@@ -191,9 +204,9 @@ const AdvancedFilters = ({
             !filter.isMultiple
               ? onFilterValueChange(e, filter.name)
               : onFilterSelectMultipleValueChange(
-                  e as unknown as { value: string; label: string }[],
-                  filter.name
-                )
+                e as unknown as { value: string; label: string }[],
+                filter.name
+              )
           }
           defaultValue=""
           label={filter.label}
@@ -244,12 +257,8 @@ const AdvancedFilters = ({
   }, [filterSelectedList]);
 
   useEffect(() => {
-    if (hasRemovedFilterLine && Object.keys(filterValues).length > 0) {
-      setIsApplyDisabled(false);
-    }
-  }, [filterValues, hasRemovedFilterLine]);
-
-  useEffect(() => {
+    // Some inputs justify not fetching data right away. For instance, 
+    // for date inputs, we need both start AND end date.
     if (!isApplyDisabled) {
       onApplyFilters(filterValues);
     }
