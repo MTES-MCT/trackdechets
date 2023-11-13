@@ -2,8 +2,7 @@ import {
   Prisma,
   BsvhuIdentificationType,
   BsvhuPackaging,
-  WasteAcceptationStatus,
-  OperationMode
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { PROCESSING_OPERATIONS_CODES } from "shared/constants";
 import {

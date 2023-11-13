@@ -1,9 +1,4 @@
-import {
-  WasteAcceptationStatus,
-  Prisma,
-  BsdasriType,
-  OperationMode
-} from "@prisma/client";
+import { WasteAcceptationStatus, Prisma, BsdasriType } from "@prisma/client";
 import { isCollector } from "../companies/validation";
 import * as yup from "yup";
 import {
