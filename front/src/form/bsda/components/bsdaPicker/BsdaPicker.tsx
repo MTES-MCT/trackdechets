@@ -56,6 +56,7 @@ export function BsdaPicker({ name, bsdaId }: Props) {
   const isForwardingPicker = name === "forwarding";
 
   function onGroupingChange(groupedBsdas: Bsda[]) {
+    setFieldValue("waste.code", groupedBsdas?.[0]?.waste?.code ?? "");
     setFieldValue(
       "weight.value",
       groupedBsdas?.reduce(
@@ -211,7 +212,8 @@ function PickerTable({
           <TableRow>
             <TableHeaderCell />
             <TableHeaderCell>Numéro</TableHeaderCell>
-            <TableHeaderCell>Déchet</TableHeaderCell>
+            <TableHeaderCell>Code déchet</TableHeaderCell>
+            <TableHeaderCell>Nom du matériau</TableHeaderCell>
             <TableHeaderCell>Poids reçu (tonnes)</TableHeaderCell>
             <TableHeaderCell>Émetteur</TableHeaderCell>
             <TableHeaderCell>CAP final</TableHeaderCell>
@@ -220,13 +222,18 @@ function PickerTable({
         </TableHead>
         <TableBody>
           {bsdas.map(bsda => {
-            const getNextDestinationSiret = b =>
-              b?.destination?.operation?.nextDestination?.company?.siret;
-            const isDisabled =
+            const firstSelectedBsda =
               Array.isArray(selected) &&
               selected.length > 0 &&
-              getNextDestinationSiret(bsdas.find(b => b.id === selected[0])) !==
-                getNextDestinationSiret(bsda);
+              bsdas.find(b => b.id === selected[0]);
+            const getNextDestinationSiret = b =>
+              b?.destination?.operation?.nextDestination?.company?.siret;
+
+            const isDisabled =
+              firstSelectedBsda &&
+              (getNextDestinationSiret(firstSelectedBsda) !==
+                getNextDestinationSiret(bsda) ||
+                bsda.waste?.code !== firstSelectedBsda?.waste?.code);
 
             return (
               <TableRow
@@ -243,9 +250,8 @@ function PickerTable({
                   />
                 </TableCell>
                 <TableCell>{bsda.id}</TableCell>
-                <TableCell>
-                  {bsda.waste?.code} - {bsda.waste?.materialName ?? "inconnue"}
-                </TableCell>
+                <TableCell>{bsda.waste?.code}</TableCell>
+                <TableCell>{bsda.waste?.materialName ?? "inconnu"}</TableCell>
                 <TableCell>{bsda.destination?.reception?.weight}</TableCell>
                 <TableCell>{bsda.emitter?.company?.name}</TableCell>
                 <TableCell>

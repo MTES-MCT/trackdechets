@@ -377,6 +377,45 @@ describe("BSDA validation", () => {
         }
       }
     );
+
+    it("cannot group BSDA if the grouped waste code are not equal to the grouping BSDA waste code", async () => {
+      const grouping = [
+        await bsdaFactory({
+          opt: {
+            wasteCode: "10 13 09*",
+            status: "AWAITING_CHILD",
+            destinationOperationCode: "D 15",
+            destinationCompanySiret: bsda.emitterCompanySiret
+          }
+        })
+      ];
+      expect.assertions(1);
+
+      const data = {
+        ...bsda,
+        type: "GATHERING"
+      };
+
+      try {
+        await parseBsdaInContext(
+          {
+            input: {
+              waste: { code: "17 05 03*" },
+              grouping: grouping.map(bsda => bsda.id)
+            },
+            persisted: data as any
+          },
+          { enablePreviousBsdasChecks: true }
+        );
+      } catch (error) {
+        expect(error.issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Tous les bordereaux groupés doivent avoir le même code déchet que le bordereau de groupement."
+          })
+        ]);
+      }
+    });
   });
 
   describe("Emitter transports own waste", () => {

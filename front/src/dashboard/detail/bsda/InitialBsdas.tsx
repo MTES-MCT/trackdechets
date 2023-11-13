@@ -19,8 +19,10 @@ export function InitialBsdas({ bsdas }: { bsdas: InitialBsda[] }) {
         <TableRow>
           <TableHeaderCell>Identifiant</TableHeaderCell>
           <TableHeaderCell>Code déchet</TableHeaderCell>
+          <TableHeaderCell>Nom du matériau</TableHeaderCell>
+          <TableHeaderCell>Code famille</TableHeaderCell>
           <TableHeaderCell>CAP (exutoire)</TableHeaderCell>
-          <TableHeaderCell>Quantité (en T)</TableHeaderCell>
+          <TableHeaderCell>Quantité (en t)</TableHeaderCell>
           <TableHeaderCell>Exutoire prévu</TableHeaderCell>
           <TableHeaderCell>Télécharger</TableHeaderCell>
         </TableRow>
@@ -29,9 +31,9 @@ export function InitialBsdas({ bsdas }: { bsdas: InitialBsda[] }) {
         {bsdas.map(bsda => (
           <TableRow key={bsda.id}>
             <TableCell>{bsda.id}</TableCell>
-            <TableCell>
-              {bsda.waste?.code} {bsda.waste?.materialName}
-            </TableCell>
+            <TableCell>{bsda.waste?.code}</TableCell>
+            <TableCell>{bsda.waste?.materialName}</TableCell>
+            <TableCell>{bsda.waste?.familyCode}</TableCell>
             <TableCell>
               {bsda.destination?.operation?.nextDestination?.cap ??
                 bsda.destination?.cap}
