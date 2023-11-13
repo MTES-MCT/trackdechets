@@ -27,9 +27,10 @@ export const schema = z.object({
   SESSION_COOKIE_SECURE: z.string(),
   SESSION_NAME: z.string(),
   UI_HOST: z.string(),
-  UI_URL_SCHEME: z.string(),
+  UI_URL_SCHEME: z.string().optional(),
   API_HOST: z.string(),
   API_PORT: z.string().optional().default("80").refine(isNumber),
+  API_URL_SCHEME: z.string().optional(),
   OIDC_PRIVATE_KEY: z.string(),
   // -------
   // Various
