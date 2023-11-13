@@ -638,14 +638,15 @@ export const getSignByProducerBtnLabel = (
     if (isBsdasri(bsd.type) && !isToCollectTab) {
       return "";
     }
+
+    if (
+      currentSiret === bsd.worker?.company?.siret ||
+      currentSiret === bsd.transporter?.company?.orgId
+    ) {
+      return SIGNER;
+    }
   }
 
-  if (
-    currentSiret === bsd.worker?.company?.siret ||
-    currentSiret === bsd.transporter?.company?.orgId
-  ) {
-    return SIGNER;
-  }
   return "";
 };
 
