@@ -84,7 +84,9 @@ function QuantityFields({ quantity, quantityType }: QuantityFieldsProps) {
         checked={quantityType === QuantityType.ESTIMATED}
         readOnly
       />{" "}
-      Estimée "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR 2023
+      Estimée
+      <br />
+      "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR 2023
     </p>
   );
 }
