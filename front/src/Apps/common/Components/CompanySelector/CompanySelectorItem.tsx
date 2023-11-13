@@ -3,7 +3,7 @@ import { CompanySelectorItemProps } from "./companySelectorTypes";
 
 import "./companySelector.scss";
 import classNames from "classnames";
-import routes from "Apps/routes";
+import routes from "../../../../Apps/routes";
 import { generatePath } from "react-router-dom";
 
 const tdIcon = (
@@ -40,7 +40,7 @@ const CompanySelectorItem = ({
   onSelect,
   company,
   searchClue = "",
-  postalCodeClue = "",
+  postalCodeClue = ""
 }: CompanySelectorItemProps) => {
   const formatCompanyInfo = () => {
     const highlight = (text, highlight) => {
@@ -78,7 +78,7 @@ const CompanySelectorItem = ({
   return (
     <div
       className={classNames("company-selector-item", {
-        "company-selector-item__selected": selected,
+        "company-selector-item__selected": selected
       })}
       onClick={() => onSelect(company)}
     >
@@ -90,7 +90,7 @@ const CompanySelectorItem = ({
         <div className="company-selector-item__link">
           <a
             href={generatePath(routes.company, {
-              orgId: company.orgId!,
+              orgId: company.orgId!
             })}
             onClick={e => e.stopPropagation()}
             target="_blank"

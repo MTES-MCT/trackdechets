@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Field, useField, useFormikContext } from "formik";
-import RedErrorMessage from "common/components/RedErrorMessage";
+import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import {
   FormCompany,
   CompanySearchResult,
@@ -9,9 +9,9 @@ import {
   BsvhuTransporterInput,
   TransporterInput,
   BsffTransporterInput,
-  Maybe,
-} from "generated/graphql/types";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
+  Maybe
+} from "codegen-ui";
+import { isForeignVat } from "shared/constants";
 import styles from "./CompanySelector.module.scss";
 import TransporterReceipt from "./TransporterReceipt";
 
@@ -30,7 +30,7 @@ export default function CompanySelectorFields({
   name,
   disabled = false,
   optionalMail = false,
-  shouldUpdateFields = true,
+  shouldUpdateFields = true
 }: CompanySelectorFieldsProps) {
   const [field] = useField<FormCompany>({ name });
   const { setFieldError, setFieldValue, setFieldTouched, values } =
@@ -50,7 +50,7 @@ export default function CompanySelectorFields({
   );
   const [
     displayForeignCompanyWithUnknownInfos,
-    setDisplayForeignCompanyWithUnknownInfos,
+    setDisplayForeignCompanyWithUnknownInfos
   ] = useState<boolean>(
     isForeignVat(currentCompany?.vatNumber!!) &&
       isUnknownCompanyName(currentCompany?.name!)
@@ -91,7 +91,7 @@ export default function CompanySelectorFields({
         contact: currentCompany.contact ?? "",
         phone: currentCompany.contactPhone ?? "",
         mail: currentCompany.contactEmail ?? "",
-        country: currentCompany.codePaysEtrangerEtablissement,
+        country: currentCompany.codePaysEtrangerEtablissement
       };
 
       Object.keys(fields).forEach(key => {

@@ -2,10 +2,10 @@ import React, { useState, useMemo } from "react";
 import { CompanySelectorProps } from "./companySelectorTypes";
 import CompanySelectorItem from "./CompanySelectorItem";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { InlineLoader } from "Apps/common/Components/Loader/Loaders";
-import { debounce } from "common/helper";
-import useOnClickOutsideRefTarget from "Apps/common/hooks/useOnClickOutsideRefTarget";
-import { CompanySearchResult } from "generated/graphql/types";
+import { InlineLoader } from "../../../../Apps/common/Components/Loader/Loaders";
+import { debounce } from "../../../../common/helper";
+import useOnClickOutsideRefTarget from "../../../../Apps/common/hooks/useOnClickOutsideRefTarget";
+import { CompanySearchResult } from "codegen-ui";
 
 import "./companySelector.scss";
 
@@ -77,14 +77,14 @@ const CompanySelector = ({
   companies,
   favorites,
   disabled = false,
-  selectedCompany,
+  selectedCompany
 }: CompanySelectorProps) => {
   const [searchString, setSearchString] = useState("");
   const [postalCodeString, setPostalCodeString] = useState("");
   const [shouldDisplayResults, setShouldDisplayResults] = useState(false);
 
   const { targetRef } = useOnClickOutsideRefTarget({
-    onClickOutside: () => setShouldDisplayResults(false),
+    onClickOutside: () => setShouldDisplayResults(false)
   });
 
   const handleOnFocus = () => {
@@ -165,10 +165,10 @@ const CompanySelector = ({
               onChange: e => {
                 debouncedSearch({
                   searchString: e.target.value,
-                  postalCodeString: postalCodeString,
+                  postalCodeString: postalCodeString
                 });
                 setSearchString(e.target.value);
-              },
+              }
             }}
           />
         </div>
@@ -183,10 +183,10 @@ const CompanySelector = ({
               onChange: e => {
                 debouncedSearch({
                   searchString: searchString,
-                  postalCodeString: e.target.value,
+                  postalCodeString: e.target.value
                 });
                 setPostalCodeString(e.target.value);
-              },
+              }
             }}
           />
         </div>

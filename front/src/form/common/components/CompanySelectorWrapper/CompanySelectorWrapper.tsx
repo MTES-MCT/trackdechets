@@ -1,17 +1,17 @@
 import { useLazyQuery } from "@apollo/client";
 import React, { useState } from "react";
-import CompanySelector from "Apps/common/Components/CompanySelector/CompanySelector";
+import CompanySelector from "../../../../Apps/common/Components/CompanySelector/CompanySelector";
 import {
   CompanySearchResult,
   FavoriteType,
   Query,
   QueryFavoritesArgs,
-  QuerySearchCompaniesArgs,
-} from "generated/graphql/types";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+  QuerySearchCompaniesArgs
+} from "codegen-ui";
+import { NotificationError } from "../../../../Apps/common/Components/Error/Error";
 import {
   FAVORITES,
-  SEARCH_COMPANIES,
+  SEARCH_COMPANIES
 } from "../../../../Apps/common/queries/company/query";
 
 interface CompanySelectorWrapperProps {
@@ -29,27 +29,27 @@ export default function CompanySelectorWrapper({
   allowForeignCompanies = false,
   siret,
   disabled = false,
-  onCompanySelected,
+  onCompanySelected
 }: CompanySelectorWrapperProps) {
   const [selectedCompany, setSelectedCompany] = useState<CompanySearchResult>();
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>();
 
   const [
     getFavoritesQuery,
-    { loading: isLoadingFavorites, data: favoritesData, error: favoritesError },
+    { loading: isLoadingFavorites, data: favoritesData, error: favoritesError }
   ] = useLazyQuery<Pick<Query, "favorites">, QueryFavoritesArgs>(
     FAVORITES(favoriteType)
   );
 
   const [
     searchCompaniesQuery,
-    { loading: isLoadingSearch, data: searchData, error },
+    { loading: isLoadingSearch, data: searchData, error }
   ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
     SEARCH_COMPANIES,
     {
       onCompleted: data => {
         setSearchResults(data?.searchCompanies.slice(0, 6));
-      },
+      }
     }
   );
 
@@ -66,16 +66,16 @@ export default function CompanySelectorWrapper({
           type: Object.values(FavoriteType).includes(favoriteType)
             ? favoriteType
             : FavoriteType.Emitter,
-          allowForeignCompanies,
-        },
+          allowForeignCompanies
+        }
       });
     } else {
       searchCompaniesQuery({
         variables: {
           clue: searchClue,
           ...(postalCodeClue &&
-            postalCodeClue.length >= 2 && { department: postalCodeClue }),
-        },
+            postalCodeClue.length >= 2 && { department: postalCodeClue })
+        }
       });
     }
   };

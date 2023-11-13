@@ -1,4 +1,4 @@
-import { CompanySearchResult } from "generated/graphql/types";
+import { CompanySearchResult } from "codegen-ui";
 
 export interface CompanySelectorProps {
   loading: boolean;
