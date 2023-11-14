@@ -11,7 +11,7 @@ import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
 import { createBsffAfterReception } from "../../bsffs/__tests__/factories";
 import { getFormForElastic, indexForm } from "../../forms/elastic";
 import { getBsdaForElastic, indexBsda } from "../../bsda/elastic";
-import { indexBsdasri } from "../../bsdasris/elastic";
+import { getBsdasriForElastic, indexBsdasri } from "../../bsdasris/elastic";
 import { indexBsvhu } from "../../bsvhu/elastic";
 import { getBsffForElastic, indexBsff } from "../../bsffs/elastic";
 
@@ -99,7 +99,10 @@ describe("wastesReader", () => {
         )
     );
 
-    await Promise.all(bsdasris.map(bsdasri => indexBsdasri(bsdasri)));
+    const bsdasrisForElastic = await Promise.all(
+      bsdasris.map(b => getBsdasriForElastic(b))
+    );
+    await Promise.all(bsdasrisForElastic.map(bsdasri => indexBsdasri(bsdasri)));
 
     // create 5 incoming BSVHUs
     const bsvhus = await Promise.all(

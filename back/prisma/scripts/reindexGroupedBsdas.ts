@@ -10,6 +10,9 @@ import { enqueueUpdatedBsdToIndex } from "../../src/queue/producers/elastic";
 export class ReindexGroupedBsdas implements Updater {
   async run() {
     const bsdas = await prisma.bsda.findMany({
+      // On souhaite réindexer les BSDAs inclut dans un regroupement
+      // car il y avait une erreur dans bsda/types@BsdaWithGroupedInInclude
+      // qui faisait qu'on indexait `forwardedIn` au lieu de `groupedIn`
       where: { groupedInId: { not: null } },
       select: { id: true }
     });

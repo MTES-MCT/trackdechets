@@ -203,10 +203,8 @@ export function expandBsdasriFromElastic(
   // pass down related field to sub-resolvers
   return {
     ...expanded,
-    grouping: [],
-    synthesizing: [],
-    groupedIn: undefined,
-    synthesizedIn: undefined
+    grouping: bsdasri.grouping,
+    synthesizing: bsdasri.synthesizing
   };
 }
 

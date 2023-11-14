@@ -1,6 +1,6 @@
 import prisma from "../../prisma";
 import { BsdaForElasticInclude, indexBsda } from "../../bsda/elastic";
-import { indexBsdasri } from "../../bsdasris/elastic";
+import { BsdasriForElasticInclude, indexBsdasri } from "../../bsdasris/elastic";
 import { getBsffForElastic, indexBsff } from "../../bsffs/elastic";
 import { indexBsvhu } from "../../bsvhu/elastic";
 import { getFormForElastic, indexForm } from "../../forms/elastic";
@@ -29,10 +29,7 @@ export async function reindex(bsdId, exitFn) {
     const bsdasri = await getReadonlyBsdasriRepository().findUnique(
       { id: bsdId },
       {
-        include: {
-          grouping: { select: { id: true } },
-          synthesizing: { select: { id: true } }
-        }
+        include: BsdasriForElasticInclude
       }
     );
 

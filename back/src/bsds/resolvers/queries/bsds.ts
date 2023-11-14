@@ -278,7 +278,7 @@ async function buildSearchAfter(
  * This function takes an array of dasris and, expand them and add `allowDirectTakeOver` boolean field by
  * requesting emittercompany to know wether direct takeover is allowed
  */
-async function buildDasris(dasris: Bsdasri[]) {
+async function buildDasris(dasris: BsdasriForElastic[]) {
   // build a list of emitter siret from dasris, non-INITIAL bsds are ignored
   const emitterSirets = dasris
     .filter(bsd => !!bsd.emitterCompanySiret && bsd.status === "INITIAL")

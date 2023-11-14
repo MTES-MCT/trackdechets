@@ -19,7 +19,10 @@ import {
 } from "../../../../../integration-tests/helper";
 import { getBsdaForElastic, indexBsda } from "../../../../bsda/elastic";
 import { bsdaFactory } from "../../../../bsda/__tests__/factories";
-import { indexBsdasri } from "../../../../bsdasris/elastic";
+import {
+  getBsdasriForElastic,
+  indexBsdasri
+} from "../../../../bsdasris/elastic";
 
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
 import { getBsffForElastic, indexBsff } from "../../../../bsffs/elastic";
@@ -171,7 +174,7 @@ describe("Transported wastes registry", () => {
     await Promise.all([
       indexForm(await getFormForElastic(bsd1)),
       indexBsda(await getBsdaForElastic(bsd2)),
-      indexBsdasri(bsd3),
+      indexBsdasri(await getBsdasriForElastic(bsd3)),
       indexBsvhu(bsd4),
       indexBsff(await getBsffForElastic(bsd5))
     ]);

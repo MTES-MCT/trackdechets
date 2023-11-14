@@ -5,7 +5,7 @@ import {
 } from "../../../integration-tests/helper";
 import { getBsdaForElastic, indexBsda } from "../../bsda/elastic";
 import { bsdaFactory } from "../../bsda/__tests__/factories";
-import { indexBsdasri } from "../../bsdasris/elastic";
+import { getBsdasriForElastic, indexBsdasri } from "../../bsdasris/elastic";
 import { bsdasriFactory } from "../../bsdasris/__tests__/factories";
 import { getBsffForElastic, indexBsff } from "../../bsffs/elastic";
 import {
@@ -260,7 +260,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         destinationReceptionSignatureDate: new Date()
       }
     });
-    await indexBsdasri(bsdasri);
+    await indexBsdasri(await getBsdasriForElastic(bsdasri));
     await refreshElasticSearch();
     const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
@@ -272,7 +272,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         destinationReceptionSignatureDate: null
       }
     });
-    await indexBsdasri(bsdasri);
+    await indexBsdasri(await getBsdasriForElastic(bsdasri));
     await refreshElasticSearch();
     const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds).toEqual([]);
@@ -446,7 +446,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         transporterTransportSignatureDate: new Date()
       }
     });
-    await indexBsdasri(bsdasri);
+    await indexBsdasri(await getBsdasriForElastic(bsdasri));
     await refreshElasticSearch();
     const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
@@ -459,7 +459,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         transporterTransportSignatureDate: null
       }
     });
-    await indexBsdasri(bsdasri);
+    await indexBsdasri(await getBsdasriForElastic(bsdasri));
     await refreshElasticSearch();
     const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds).toEqual([]);
@@ -644,7 +644,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         transporterTransportSignatureDate: new Date()
       }
     });
-    await indexBsdasri(bsdasri);
+    await indexBsdasri(await getBsdasriForElastic(bsdasri));
     await refreshElasticSearch();
     const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
@@ -657,7 +657,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         transporterTransportSignatureDate: null
       }
     });
-    await indexBsdasri(bsdasri);
+    await indexBsdasri(await getBsdasriForElastic(bsdasri));
     await refreshElasticSearch();
     const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret!]);
     expect(bsds).toEqual([]);
@@ -980,7 +980,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         transporterTransportSignatureDate: new Date()
       }
     });
-    await indexBsdasri(bsdasri);
+    await indexBsdasri(await getBsdasriForElastic(bsdasri));
     await refreshElasticSearch();
     const bsds = await searchBsds("ALL", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
@@ -993,7 +993,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         transporterTransportSignatureDate: new Date()
       }
     });
-    await indexBsdasri(bsdasri);
+    await indexBsdasri(await getBsdasriForElastic(bsdasri));
     await refreshElasticSearch();
     const bsds = await searchBsds("ALL", [transporter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
@@ -1007,7 +1007,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         destinationReceptionSignatureDate: new Date()
       }
     });
-    await indexBsdasri(bsdasri);
+    await indexBsdasri(await getBsdasriForElastic(bsdasri));
     await refreshElasticSearch();
     const bsds = await searchBsds("ALL", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);

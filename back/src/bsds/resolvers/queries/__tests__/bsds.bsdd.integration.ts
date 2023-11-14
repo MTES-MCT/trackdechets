@@ -21,8 +21,7 @@ import {
   userWithCompanyFactory,
   formFactory,
   toIntermediaryCompany,
-  transporterReceiptFactory,
-  bsddTransporterData
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
