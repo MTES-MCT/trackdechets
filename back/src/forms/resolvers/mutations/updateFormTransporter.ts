@@ -32,8 +32,25 @@ const updateFormTransporterResolver: MutationResolvers["updateFormTransporter"] 
         .form({ include: { transporters: true } });
       await checkCanUpdate(user, form!, { id: form!.id });
     }
+    const isUpdatingCompany =
+      input?.company?.siret || input?.company?.vatNumber;
+
     const sirenifiedInput = await sirenifyTransporterInput(input, user);
-    const recipifiedInput = await recipifyTransporterInput(sirenifiedInput);
+    const recipifiedInput = await recipifyTransporterInput({
+      ...sirenifiedInput,
+      ...(isUpdatingCompany
+        ? {}
+        : // Si on n'est pas en train de modifier l'établissement, il faut passer
+          // explicitement le SIRET et le VAT existant ici pour que le calcul du
+          // récépissé ait bien lieu quand on fait le changement isExemptedOfReceipt = true => false
+          {
+            company: {
+              siret: existingTransporter.transporterCompanySiret,
+              vatNumber: existingTransporter.transporterCompanyVatNumber
+            }
+          })
+    });
+
     const data: Prisma.BsddTransporterUpdateInput = flattenTransporterInput({
       transporter: recipifiedInput
     });

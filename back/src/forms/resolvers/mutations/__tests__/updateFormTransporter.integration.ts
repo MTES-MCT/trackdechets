@@ -336,5 +336,68 @@ describe("Mutation.createFormTransporter", () => {
     );
   });
 
-  it.skip("should auto-complete recepisse information when updating SIRET", async () => {});
+  it("should auto-complete recepisse information when updating SIRET", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+    const transporter1 = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          department: "13",
+          receiptNumber: "MON-RECEPISSE",
+          validityLimit: new Date("2024-01-01")
+        }
+      }
+    });
+    const transporter2 = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          department: "07",
+          receiptNumber: "MON-RECEPISSE-2",
+          validityLimit: new Date("2024-01-02")
+        }
+      }
+    });
+    const bsddTransporter = await prisma.bsddTransporter.create({
+      data: {
+        number: 0,
+        readyToTakeOver: true,
+        transporterCompanySiret: transporter1.siret,
+        transporterCompanyName: transporter1.name,
+        transporterTransportMode: "ROAD",
+        transporterIsExemptedOfReceipt: false,
+        transporterReceipt: null,
+        transporterValidityLimit: null,
+        transporterDepartment: null
+      }
+    });
+    const { errors, data } = await mutate<
+      Pick<Mutation, "updateFormTransporter">,
+      MutationUpdateFormTransporterArgs
+    >(UPDATE_FORM_TRANSPORTER, {
+      variables: {
+        id: bsddTransporter.id,
+        input: {
+          company: { siret: transporter2.siret },
+          receipt: "IGNORE-ME", // should not be be taken into account
+          department: "IGNORE-ME", // should not be be taken into account
+          validityLimit: new Date("2024-01-01").toISOString() as any // should not be be taken into account
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    const updatedBsddTransporter =
+      await prisma.bsddTransporter.findUniqueOrThrow({
+        where: { id: data.updateFormTransporter!.id }
+      });
+
+    expect(updatedBsddTransporter.transporterReceipt).toEqual(
+      "MON-RECEPISSE-2"
+    );
+    expect(updatedBsddTransporter.transporterDepartment).toEqual("07");
+    expect(updatedBsddTransporter.transporterValidityLimit).toEqual(
+      new Date("2024-01-02")
+    );
+  });
 });

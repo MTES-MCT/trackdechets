@@ -178,11 +178,7 @@ describe("Mutation.createFormTransporter", () => {
             name: transporter.name,
             address: transporter.address,
             contact: transporter.contact
-          },
-          mode: "ROAD",
-          receipt: "receipt",
-          department: "07",
-          validityLimit: new Date().toISOString() as any
+          }
         }
       }
     });
