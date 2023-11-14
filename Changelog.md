@@ -44,6 +44,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Amélioration des règles de validation BSDA [PR 2789](https://github.com/MTES-MCT/trackdechets/pull/2789)
+- Corrections diverses dans les sous-resolvers des bordereaux sur la query bsds [PR 2845](https://github.com/MTES-MCT/trackdechets/pull/2845)
 
 # [2023.10.1] 10/10/2023
 
