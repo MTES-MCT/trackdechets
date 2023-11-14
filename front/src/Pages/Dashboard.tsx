@@ -286,20 +286,21 @@ const DashboardPage = () => {
             ...wheres
           };
 
-          if(predicate.orderBy) {
+          if (predicate.orderBy) {
             variables.orderBy![predicate.orderBy] = OrderType.Asc;
           }
         }
       });
 
       // Add all the compiled '_and', if any
-      if (_ands.length) variables.where!._and = _ands;
+      if (_ands.length) variables.where._and = _ands;
 
-      if(!Object.keys(variables.orderBy ?? {}).length) delete variables.orderBy;
+      if (!Object.keys(variables.orderBy ?? {}).length)
+        delete variables.orderBy;
 
       // If variables are different, re-fetch the data. Else, don't.
       // Probably a side-effect re-render, should not hammer the API
-      if(!deepEqual(variables, bsdsVariables)){
+      if (!deepEqual(variables, bsdsVariables)) {
         setBsdsVariables(variables);
       }
     },

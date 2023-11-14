@@ -292,17 +292,17 @@ export const filterPredicates: {
   },
   {
     filterName: FilterName.transporterCustomInfo,
-    where: value => ({ transporter: { customInfo: { _match: value } } }),
+    where: value => ({ transporter: { customInfo: { _match: value } } })
   },
   {
     filterName: FilterName.pickupSiteName,
-    where: value => ({ emitter: { pickupSite: { name: { _match: value } } } }),
+    where: value => ({ emitter: { pickupSite: { name: { _match: value } } } })
   },
   {
     filterName: FilterName.pickupSiteAddress,
     where: value => ({
       emitter: { pickupSite: { address: { _match: value } } }
-    }),
+    })
   },
   {
     filterName: FilterName.tvaIntra,
@@ -329,7 +329,7 @@ export const filterPredicates: {
           ]
         }
       ]
-    }),
+    })
   },
   {
     filterName: FilterName.givenName,
@@ -355,7 +355,7 @@ export const filterPredicates: {
           ]
         }
       ]
-    }),
+    })
   },
   {
     filterName: FilterName.sealNumbers,
@@ -363,7 +363,7 @@ export const filterPredicates: {
       sealNumbers: {
         _itemContains: value
       }
-    }),
+    })
   },
   {
     filterName: FilterName.ficheInterventionNumbers,
@@ -371,7 +371,7 @@ export const filterPredicates: {
       ficheInterventionNumbers: {
         _itemContains: value
       }
-    }),
+    })
   },
   {
     filterName: FilterName.nextDestinationSiret,
@@ -381,7 +381,7 @@ export const filterPredicates: {
           nextDestination: { company: { siret: { _contains: value } } }
         }
       }
-    }),
+    })
   },
   {
     filterName: FilterName.operationCode,
@@ -403,7 +403,7 @@ export const filterPredicates: {
       return {
         destination: { operation: { code: { _contains: value } } }
       };
-    },
+    }
   },
   {
     filterName: FilterName.emitterSignDate,
@@ -411,7 +411,7 @@ export const filterPredicates: {
       emitter: {
         emission: { date: { _lte: value.endDate, _gte: value.startDate } }
       }
-    }),
+    })
   },
   {
     filterName: FilterName.workerSignDate,
@@ -419,7 +419,7 @@ export const filterPredicates: {
       worker: {
         work: { date: { _lte: value.endDate, _gte: value.startDate } }
       }
-    }),
+    })
   },
   {
     filterName: FilterName.transporterTransportSignDate,
@@ -429,7 +429,7 @@ export const filterPredicates: {
           takenOverAt: { _lte: value.endDate, _gte: value.startDate }
         }
       }
-    }),
+    })
   },
   {
     filterName: FilterName.destinationReceptionDate,
@@ -437,7 +437,7 @@ export const filterPredicates: {
       destination: {
         reception: { date: { _lte: value.endDate, _gte: value.startDate } }
       }
-    }),
+    })
   },
   {
     filterName: FilterName.destinationAcceptationDate,
@@ -445,7 +445,7 @@ export const filterPredicates: {
       destination: {
         acceptation: { date: { _lte: value.endDate, _gte: value.startDate } }
       }
-    }),
+    })
   },
   {
     filterName: FilterName.destinationOperationSignDate,
@@ -453,7 +453,7 @@ export const filterPredicates: {
       destination: {
         operation: { date: { _lte: value.endDate, _gte: value.startDate } }
       }
-    }),
+    })
   },
   {
     filterName: FilterName.siretProductorAddress,
@@ -461,11 +461,11 @@ export const filterPredicates: {
       emitter: {
         company: { address: { _match: value } }
       }
-    }),
+    })
   },
   {
     filterName: FilterName.cap,
-    where: value => ({ destination: { cap: { _match: value } } }),
+    where: value => ({ destination: { cap: { _match: value } } })
   }
 ];
 
