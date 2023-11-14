@@ -15,7 +15,6 @@ import {
   index,
   groupByBsdType
 } from "../../../common/elastic";
-import { Bsdasri } from "@prisma/client";
 import prisma from "../../../prisma";
 import { expandFormFromElastic } from "../../../forms/converter";
 import { expandBsdasriFromElastic } from "../../../bsdasris/converter";
