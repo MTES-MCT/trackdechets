@@ -33,7 +33,7 @@ export function MarkSegmentAsReadyToTakeOver({ form }: WorkflowActionProps) {
       setIsOpen(false);
       toast.success(
         "Le bordereau est prêt à être pris en charge par le transporteur suivant",
-        { duration: 5 }
+        { duration: 2000 }
       );
     },
     onError: () => {

@@ -61,7 +61,7 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
     MutationInviteUserToCompanyArgs
   >(INVITE_USER_TO_COMPANY, {
     onCompleted: () => {
-      toast.success("Invitation envoyée", { duration: 5 });
+      toast.success("Invitation envoyée", { duration: 2000 });
     },
     onError: () => {
       toast.error(

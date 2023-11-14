@@ -32,7 +32,7 @@ export default function PublishBsvhu({ form, siret }: WorkflowActionProps) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success(`Bordereau ${form.id} publié`, { duration: 5 });
+      toast.success(`Bordereau ${form.id} publié`, { duration: 2000 });
     },
     onError: () =>
       toast.error(`Le bordereau ${form.id} n'a pas pu être publié`, {

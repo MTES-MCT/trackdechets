@@ -120,7 +120,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
         refetchQueries: [GET_BSDS],
         awaitRefetchQueries: true,
         onCompleted: () => {
-          toast.success(`Bordereau ${bsd.id} publié`, { duration: 5 });
+          toast.success(`Bordereau ${bsd.id} publié`, { duration: 2000 });
         },
         onError: () =>
           toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {

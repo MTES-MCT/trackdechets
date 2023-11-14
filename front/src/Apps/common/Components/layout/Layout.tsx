@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { Query } from "codegen-ui";
 import Header from "./Header";
-
+import { Toaster } from "react-hot-toast";
 import sandboxIcon from "./assets/code-sandbox.svg";
 import downtimeIcon from "./assets/code-downtime.svg";
 
@@ -38,6 +38,7 @@ export default function Layout({
 
   return (
     <>
+      <Toaster />
       {isIE11 && (
         <div
           className="notification notification--error tw-text-center"
