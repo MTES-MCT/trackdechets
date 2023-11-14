@@ -150,10 +150,7 @@ export const getBlankstateDescription = ({
   return blankstate_default_desc;
 };
 
-export const filtersToQueryBsdsArgs = (
-  filterValues,
-  previousBsdsArgs
-) => {
+export const filtersToQueryBsdsArgs = (filterValues, previousBsdsArgs) => {
   const variables: QueryBsdsArgs = {
     ...previousBsdsArgs,
     where: {} as BsdWhere,

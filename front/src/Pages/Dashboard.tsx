@@ -82,7 +82,7 @@ const DashboardPage = () => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const [bsdsVariables, setBsdsVariables] = useState<QueryBsdsArgs>({
-    first: BSD_PER_PAGE,
+    first: BSD_PER_PAGE
   });
 
   const [bsdsReview, setBsdsReview] = useState<
@@ -97,34 +97,47 @@ const DashboardPage = () => {
     notifyOnNetworkStatusChange: true
   });
 
-  const tabs: Tabs = useMemo(() => ({
-    isActTab,
-    isDraftTab,
-    isFollowTab,
-    isArchivesTab,
-    isToCollectTab,
-    isCollectedTab,
-    isAllBsdsTab,
-    isReviewsTab
-  }), [isActTab, isAllBsdsTab, isArchivesTab, isCollectedTab, isDraftTab, isFollowTab, isReviewsTab, isToCollectTab]);
+  const tabs: Tabs = useMemo(
+    () => ({
+      isActTab,
+      isDraftTab,
+      isFollowTab,
+      isArchivesTab,
+      isToCollectTab,
+      isCollectedTab,
+      isAllBsdsTab,
+      isReviewsTab
+    }),
+    [
+      isActTab,
+      isAllBsdsTab,
+      isArchivesTab,
+      isCollectedTab,
+      isDraftTab,
+      isFollowTab,
+      isReviewsTab,
+      isToCollectTab
+    ]
+  );
 
   // Fetches the BSDs, building up the query. Query includes:
   // - Current company SIRET
   // - Current active tab
   // - Current filters
-  const fetchBsds = useCallback((newSiret, newVariables, newTabs) => {
-    const variables = {
-      ...newVariables
-    };
+  const fetchBsds = useCallback(
+    (newSiret, newVariables, newTabs) => {
+      const variables = { ...newVariables };
 
-    const routePredicate = getRoutePredicate({ ...newTabs, siret: newSiret });
+      const routePredicate = getRoutePredicate({ ...newTabs, siret: newSiret });
 
-    if (routePredicate) {
-      variables.where = { ...newVariables.where, ...routePredicate };
-    }
+      if (routePredicate) {
+        variables.where = { ...newVariables.where, ...routePredicate };
+      }
 
-    lazyFetchBsds({ variables });
-  }, [lazyFetchBsds]);
+      lazyFetchBsds({ variables });
+    },
+    [lazyFetchBsds]
+  );
 
   // Fetch the data again if any of the 3 changes:
   // - Current company SIRET
@@ -148,7 +161,7 @@ const DashboardPage = () => {
     if (tabs.isReviewsTab) {
       setAreAdvancedFiltersOpen(false);
       setBsdsVariables({
-        first: BSD_PER_PAGE,
+        first: BSD_PER_PAGE
       });
     }
   }, [tabs]);
@@ -197,8 +210,8 @@ const DashboardPage = () => {
 
   const siretsWithAutomaticSignature = companyData
     ? companyData.companyPrivateInfos.receivedSignatureAutomations.map(
-      automation => automation.from.siret
-    )
+        automation => automation.from.siret
+      )
     : [];
 
   const loadMoreBsds = React.useCallback(() => {
@@ -366,7 +379,7 @@ const DashboardPage = () => {
     : data?.bsds.totalCount;
   const hasNextPage = isReviewsTab
     ? dataBsdaReviews?.pageInfo?.hasNextPage! ||
-    dataBsddReviews?.pageInfo?.hasNextPage!
+      dataBsddReviews?.pageInfo?.hasNextPage!
     : data?.bsds.pageInfo.hasNextPage;
   const isLoadingBsds = isReviewsTab
     ? loadingBsdaReviews || loadingBsddReviews
@@ -413,9 +426,7 @@ const DashboardPage = () => {
         <div className="dashboard-page__blankstate">
           <Blankslate>
             {getBlankstateTitle(tabs) && (
-              <BlankslateTitle>
-                {getBlankstateTitle(tabs)}
-              </BlankslateTitle>
+              <BlankslateTitle>{getBlankstateTitle(tabs)}</BlankslateTitle>
             )}
             <BlankslateDescription>
               {getBlankstateDescription(tabs)}
