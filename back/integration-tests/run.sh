@@ -71,12 +71,12 @@ while getopts "hudp:r:c:" OPTION; do
         ;;
     u)
         startcontainers
-        exit 1
+        exit 0
         ;;
     d)
         echo "down"
         stopcontainers
-        exit 1
+        exit 0
         ;;
     r)
         runtest $OPTARG

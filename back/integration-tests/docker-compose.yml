@@ -19,6 +19,11 @@ services:
       file: ../../docker-compose.dbs.yml
       service: mongodb
 
+  nginx:
+    extends:
+      file: ../../docker-compose.yml
+      service: nginx
+
   td-api:
     image: td-api
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
