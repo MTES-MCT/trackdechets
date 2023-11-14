@@ -166,4 +166,37 @@ describe("Mutation.deleteFormTransporter", () => {
       })
     ]);
   });
+
+  it("should not be possible to delete a form transporter that has already signed", async () => {
+    const transporter = await companyFactory();
+    const emitter = await userWithCompanyFactory();
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        status: "SENT",
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.siret,
+            takenOverAt: new Date()
+          }
+        }
+      }
+    });
+    const bsddTransporter = (await getTransporters(form))[0];
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "deleteFormTransporter">,
+      MutationDeleteFormTransporterArgs
+    >(DELETE_FORM_TRANSPORTER, {
+      variables: { id: bsddTransporter.id }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Ce transporteur BSDD ne peut-être supprimé car il a déjà signé l'enlèvement du déchet"
+      })
+    ]);
+  });
 });
