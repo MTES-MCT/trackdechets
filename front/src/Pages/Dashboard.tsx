@@ -58,6 +58,7 @@ import { GET_FORM_REVISION_REQUESTS } from "../Apps/common/queries/reviews/BsddR
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../Apps/common/queries/company/query";
 
 import "./dashboard.scss";
+import { deepEqual } from "../dashboard/detail/common/utils";
 
 const DashboardPage = () => {
   const { permissions } = usePermissions();
@@ -251,9 +252,10 @@ const DashboardPage = () => {
 
   const handleFiltersSubmit = React.useCallback(
     filterValues => {
-      const variables = {
+      const variables: QueryBsdsArgs = {
+        ...bsdsVariables,
         where: {} as BsdWhere,
-        order: {}
+        orderBy: {}
       };
       const routePredicate = withRoutePredicate();
       if (routePredicate) {
@@ -283,16 +285,25 @@ const DashboardPage = () => {
             ...variables.where,
             ...wheres
           };
-          variables.order[predicate.order] = OrderType.Asc;
+
+          if(predicate.orderBy) {
+            variables.orderBy![predicate.orderBy] = OrderType.Asc;
+          }
         }
       });
 
       // Add all the compiled '_and', if any
-      if (_ands.length) variables.where._and = _ands;
+      if (_ands.length) variables.where!._and = _ands;
 
-      setBsdsVariables(variables);
+      if(!Object.keys(variables.orderBy ?? {}).length) delete variables.orderBy;
+
+      // If variables are different, re-fetch the data. Else, don't.
+      // Probably a side-effect re-render, should not hammer the API
+      if(!deepEqual(variables, bsdsVariables)){
+        setBsdsVariables(variables);
+      }
     },
-    [withRoutePredicate]
+    [withRoutePredicate, bsdsVariables]
   );
 
   const loadMoreBsds = React.useCallback(() => {
