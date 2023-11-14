@@ -21,7 +21,7 @@ export class ReindexGroupedBsdas implements Updater {
     for (const bsda of bsdas) {
       // ~ 23 000 bordereaux en prod
       // select count(*) from "default$default"."Bsda" where "groupedInId" is not null;
-      enqueueUpdatedBsdToIndex(bsda.id);
+      await enqueueUpdatedBsdToIndex(bsda.id);
     }
   }
 }
