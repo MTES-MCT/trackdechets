@@ -2,20 +2,23 @@
 
 /* Absolute Center Spinner */
 .loader {
-  position: fixed;
-  z-index: 999;
-  overflow: show;
   margin: auto;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
   border: 8px solid $grey-lighter; /* Light grey */
   border-top: 8px solid $grey-dark; /* Blue */
   border-radius: 50%;
   width: 60px;
   height: 60px;
   animation: spin 1s linear infinite;
+}
+
+.loaderAbsolute {
+  position: fixed;
+  overflow: show;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
 
 .loaderModal {
