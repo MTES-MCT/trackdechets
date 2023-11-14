@@ -8,6 +8,7 @@ import {
   advancedFilterList,
   quickFilterList
 } from "../../../Dashboard/dashboardUtils";
+import { deepEqual } from "../../../../dashboard/detail/common/utils";
 
 const purgeEmptyValues = (obj: { [key: string]: string | string[] }) => {
   return JSON.parse(
@@ -24,6 +25,9 @@ const Filters = ({
   const [advancedFilters, setAdvancedFilters] = useState({});
   const [quickFilters, setQuickFilters] = useState({});
 
+  // Combination & purge of advanced & quick filters
+  const [filters, setFilters] = useState({});
+
   const onApplyAdvancedFilters = filters => {
     setAdvancedFilters(filters);
   };
@@ -33,13 +37,18 @@ const Filters = ({
   };
 
   useEffect(() => {
-    const filters = purgeEmptyValues({
+    // Aggregate quick & advanced filters and remove empty values
+    const newFilters = purgeEmptyValues({
       ...advancedFilters,
       ...quickFilters
     });
 
-    onApplyFilters(filters);
-  }, [advancedFilters, onApplyFilters, quickFilters]);
+    // If filters have actually changed, bubble up
+    if (!deepEqual(filters, newFilters)) {
+      onApplyFilters(newFilters);
+      setFilters(newFilters);
+    }
+  }, [advancedFilters, onApplyFilters, quickFilters, filters]);
 
   return (
     <div className="filters">

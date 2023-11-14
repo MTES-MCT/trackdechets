@@ -293,7 +293,7 @@ const DashboardPage = () => {
       });
 
       // Add all the compiled '_and', if any
-      if (_ands.length) variables.where._and = _ands;
+      if (_ands.length) variables.where!._and = _ands;
 
       if (!Object.keys(variables.orderBy ?? {}).length)
         delete variables.orderBy;
