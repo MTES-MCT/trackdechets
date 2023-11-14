@@ -58,7 +58,6 @@ import { GET_FORM_REVISION_REQUESTS } from "../Apps/common/queries/reviews/BsddR
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../Apps/common/queries/company/query";
 
 import "./dashboard.scss";
-import { deepEqual } from "../dashboard/detail/common/utils";
 
 const DashboardPage = () => {
   const { permissions } = usePermissions();
@@ -295,16 +294,9 @@ const DashboardPage = () => {
       // Add all the compiled '_and', if any
       if (_ands.length) variables.where!._and = _ands;
 
-      if (!Object.keys(variables.orderBy ?? {}).length)
-        delete variables.orderBy;
-
-      // If variables are different, re-fetch the data. Else, don't.
-      // Probably a side-effect re-render, should not hammer the API
-      if (!deepEqual(variables, bsdsVariables)) {
-        setBsdsVariables(variables);
-      }
+      setBsdsVariables(variables);
     },
-    [withRoutePredicate, bsdsVariables]
+    [bsdsVariables, withRoutePredicate]
   );
 
   const loadMoreBsds = React.useCallback(() => {
@@ -417,12 +409,20 @@ const DashboardPage = () => {
     }
   };
 
-  useEffect(() => {
-    // If revisions tab, close the filters
-    if (isReviewsTab) {
-      setAreAdvancedFiltersOpen(false);
-    }
-  }, [isReviewsTab]);
+  const fetchWithDefaultWhere = React.useCallback(
+    ({ where, ...args }) => {
+      const newVariables = {
+        ...args,
+        where: { ...where, ...defaultWhere },
+        first: BSD_PER_PAGE
+      };
+      setBsdsVariables(newVariables);
+      lazyFetchBsds({
+        variables: newVariables
+      });
+    },
+    [lazyFetchBsds, defaultWhere]
+  );
 
   useEffect(() => {
     // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
@@ -430,6 +430,25 @@ const DashboardPage = () => {
       fetchBsds();
     }
   }, [isReviewsTab, bsdsVariables, fetchBsds]);
+
+  useEffect(() => {
+    // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
+    if (!isReviewsTab) {
+      fetchWithDefaultWhere({ where: defaultWhere });
+    } else {
+      setAreAdvancedFiltersOpen(false);
+    }
+  }, [
+    isActTab,
+    isDraftTab,
+    isFollowTab,
+    isArchivesTab,
+    isReviewsTab,
+    isToCollectTab,
+    isCollectedTab,
+    defaultWhere,
+    fetchWithDefaultWhere
+  ]);
 
   // A supprimer quand on pourra afficher une révision avec la requete bsds
   useEffect(() => {
