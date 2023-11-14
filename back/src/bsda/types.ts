@@ -19,7 +19,7 @@ export type BsdaWithForwardedIn = Prisma.BsdaGetPayload<{
 }>;
 
 export const BsdaWithGroupedInInclude = Prisma.validator<Prisma.BsdaInclude>()({
-  forwardedIn: { select: { id: true } }
+  groupedIn: { select: { id: true } }
 });
 
 export type BsdaWithGroupedIn = Prisma.BsdaGetPayload<{

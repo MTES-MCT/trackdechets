@@ -1,22 +1,34 @@
-import {
-  Bsff,
-  BsffStatus,
-  BsffPackaging,
-  BsffFicheIntervention,
-  BsdType
-} from "@prisma/client";
+import { Bsff, BsffStatus, BsdType } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { toBsffDestination } from "./compat";
 import { getTransporterCompanyOrgId } from "shared/constants";
-import { getReadonlyBsffRepository } from "./repository";
+import {
+  BsffWithFicheInterventions,
+  BsffWithPackagings,
+  BsffWithPackagingsInclude,
+  BsffWithFicheInterventionInclude
+} from "./types";
+import prisma from "../prisma";
 
-export type BsffForElastic = Bsff & {
-  packagings: BsffPackaging[];
-} & {
-  ficheInterventions: BsffFicheIntervention[];
+export type BsffForElastic = Bsff &
+  BsffWithPackagings &
+  BsffWithFicheInterventions;
+
+export const BsffForElasticInclude = {
+  ...BsffWithPackagingsInclude,
+  ...BsffWithFicheInterventionInclude
 };
+
+export async function getBsffForElastic(
+  bsda: Pick<Bsff, "id">
+): Promise<BsffForElastic> {
+  return prisma.bsff.findUniqueOrThrow({
+    where: { id: bsda.id },
+    include: BsffForElasticInclude
+  });
+}
 
 export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
   const bsffDestination = toBsffDestination(bsff.packagings);
@@ -204,17 +216,6 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
   return bsd;
 }
 
-export async function indexBsff(bsff: Bsff, ctx?: GraphQLContext) {
-  const { findUnique } = getReadonlyBsffRepository();
-  const fullBsff = await findUnique({
-    where: { id: bsff.id }
-  });
-
-  if (!fullBsff) {
-    throw new Error(
-      `Cannot index BSDD ${bsff.id} as it could not be found in DB.`
-    );
-  }
-
-  return indexBsd(toBsdElastic(fullBsff), ctx);
+export async function indexBsff(bsff: BsffForElastic, ctx?: GraphQLContext) {
+  return indexBsd(toBsdElastic(bsff), ctx);
 }

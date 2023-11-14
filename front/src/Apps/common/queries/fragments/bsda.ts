@@ -57,9 +57,15 @@ export const bsdaFragment = gql`
       materialName
       bsdaCode: code
     }
+    # Attention, pour des raisons de performance, seul
+    # l'identifiant est exposé ici. Requêter d'autres champs sur
+    # forwardedIn ne fonctionnera pas
     forwardedIn {
       id
     }
+    # Attention, pour des raisons de performance, seul
+    # l'identifiant est exposé ici. Requêter d'autres champs sur
+    # groupedIn ne fonctionnera pas
     groupedIn {
       id
     }

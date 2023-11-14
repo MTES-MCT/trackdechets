@@ -203,10 +203,11 @@ export function expandBsdasriFromElastic(
   // pass down related field to sub-resolvers
   return {
     ...expanded,
-    grouping: [],
-    synthesizing: [],
-    groupedIn: undefined,
-    synthesizedIn: undefined
+    // Dans le cas de la requête `bsds`, et pour des raisons de perfs,
+    // on souhaite utiliser directement les champs `grouping` et `synthesizing`
+    // du BsdasriForElastic (Cf resolver Bsdasri).
+    grouping: bsdasri.grouping,
+    synthesizing: bsdasri.synthesizing
   };
 }
 

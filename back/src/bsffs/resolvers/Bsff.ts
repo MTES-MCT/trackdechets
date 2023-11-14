@@ -1,13 +1,13 @@
 import { BsffResolvers } from "../../generated/graphql/types";
 import { getFicheInterventions } from "../database";
-import { dashboardOperationName } from "../../common/queries";
 import { isSessionUser } from "../../auth";
 import { expandBsffPackagingFromDB } from "../converter";
-import { BsffPackaging, BsffType } from "@prisma/client";
+import { BsffType } from "@prisma/client";
 import {
   getReadonlyBsffPackagingRepository,
   getReadonlyBsffRepository
 } from "../repository";
+import { isGetBsdsQuery } from "../../bsds/resolvers/queries/bsds";
 
 export const Bsff: BsffResolvers = {
   ficheInterventions: async ({ id }, _, context) => {
@@ -22,16 +22,15 @@ export const Bsff: BsffResolvers = {
     return ficheInterventions;
   },
   packagings: async (bsff, _, ctx) => {
-    let packagings: BsffPackaging[] = [];
     // use ES indexed field when requested from dashboard
-    if (
-      ctx?.req?.body?.operationName === dashboardOperationName &&
-      isSessionUser(ctx)
-    ) {
-      packagings = (bsff?.packagings as any) ?? [];
+    if (isGetBsdsQuery(ctx) && isSessionUser(ctx)) {
+      // Dans ce cas de figure, bsff.packagings est pré-calculé dans
+      // bsffs/converter@expandBsffFromElastic, on peut donc renvoyer
+      // directement le résultat
+      return bsff.packagings;
     }
     const { findUniqueGetPackagings } = getReadonlyBsffRepository();
-    packagings =
+    const packagings =
       (await findUniqueGetPackagings(
         {
           where: { id: bsff.id }

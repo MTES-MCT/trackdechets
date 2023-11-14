@@ -835,14 +835,7 @@ export async function expandFormFromElastic(
     return null;
   }
 
-  const expanded = expandFormFromDb(formWithInclude);
-  return {
-    ...expanded,
-    transportSegments: (form.transporters ?? [])
-      .filter(t => t.number && t.number >= 2)
-      .sort((s1, s2) => s1.number - s2.number)
-      .map(segment => expandTransportSegmentFromDb(segment))
-  };
+  return expandFormFromDb(formWithInclude);
 }
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;

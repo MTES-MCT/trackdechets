@@ -217,7 +217,10 @@ export const getDestinationCompanyInfo = async () => {
   };
 };
 
-const bsddTransporterData: Omit<Prisma.BsddTransporterCreateInput, "number"> = {
+export const bsddTransporterData: Omit<
+  Prisma.BsddTransporterCreateInput,
+  "number"
+> = {
   transporterCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
   transporterCompanyContact: "transporter",
   transporterCompanyMail: "transporter@td.io",

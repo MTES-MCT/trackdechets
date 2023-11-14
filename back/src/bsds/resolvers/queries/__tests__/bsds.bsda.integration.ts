@@ -1237,3 +1237,89 @@ describe("Query.bsds.bsdas mutations", () => {
     );
   });
 });
+
+describe("Bsda sub-resolvers in query bsds", () => {
+  afterEach(resetDatabase);
+
+  const GET_BSDS = gql`
+    query GetBsds($where: BsdWhere) {
+      bsds(where: $where) {
+        edges {
+          node {
+            ... on Bsda {
+              id
+              groupedIn {
+                id
+              }
+              forwardedIn {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  test("Bsda.groupedIn should resolve correctly", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_CHILD"
+      }
+    });
+    const bsdaSuite = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: ttr.company.siret,
+        status: "INITIAL",
+        grouping: { connect: { id: bsda.id } }
+      }
+    });
+    await indexBsda(await getBsdaForElastic(bsda));
+    await indexBsda(await getBsdaForElastic(bsdaSuite));
+    await refreshElasticSearch();
+
+    const { query } = makeClient(ttr.user);
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    const bsdas = data.bsds!.edges.map(e => e.node);
+    expect(bsdas).toHaveLength(2);
+    const queriedBsda = bsdas.find(bsd => bsd.id === bsda.id);
+    expect(queriedBsda).toBeDefined();
+    expect((queriedBsda as any)!.groupedIn!.id).toEqual(bsdaSuite.id);
+  });
+
+  test("Bsda.forwardedIn should resolve correctly", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_CHILD"
+      }
+    });
+    const bsdaSuite = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: ttr.company.siret,
+        status: "INITIAL",
+        forwarding: { connect: { id: bsda.id } }
+      }
+    });
+    await indexBsda(await getBsdaForElastic(bsda));
+    await indexBsda(await getBsdaForElastic(bsdaSuite));
+    await refreshElasticSearch();
+
+    const { query } = makeClient(ttr.user);
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    const bsdas = data.bsds!.edges.map(e => e.node);
+    expect(bsdas).toHaveLength(2);
+    const queriedBsda = bsdas.find(bsd => bsd.id === bsda.id);
+    expect(queriedBsda).toBeDefined();
+    expect((queriedBsda as any)!.forwardedIn!.id).toEqual(bsdaSuite.id);
+  });
+});

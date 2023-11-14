@@ -13,8 +13,14 @@ import {
   BsdaForElasticInclude,
   toBsdElastic as bsdaToBsdElastic
 } from "../../bsda/elastic";
-import { toBsdElastic as bsdasriToBsdElastic } from "../../bsdasris/elastic";
-import { toBsdElastic as bsffToBsdElastic } from "../../bsffs/elastic";
+import {
+  BsdasriForElasticInclude,
+  toBsdElastic as bsdasriToBsdElastic
+} from "../../bsdasris/elastic";
+import {
+  BsffForElasticInclude,
+  toBsdElastic as bsffToBsdElastic
+} from "../../bsffs/elastic";
 import {
   FormForElasticInclude,
   toBsdElastic as formToBsdElastic
@@ -53,17 +59,14 @@ const prismaModels = {
 
 const prismaFindManyOptions = {
   bsff: {
-    include: { packagings: true, ficheInterventions: true }
+    include: BsffForElasticInclude
   },
   bsvhu: {},
   bsda: {
     include: BsdaForElasticInclude
   },
   bsdasri: {
-    include: {
-      grouping: { select: { id: true } },
-      synthesizing: { select: { id: true } }
-    }
+    include: BsdasriForElasticInclude
   },
   bsdd: {
     include: FormForElasticInclude

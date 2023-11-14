@@ -37,7 +37,8 @@ import {
   BsdaRevisionRequestOperation,
   BsdaRevisionRequestReception,
   BsdaWorkerCertification,
-  CompanyInput
+  CompanyInput,
+  Bsda
 } from "../generated/graphql/types";
 import {
   Prisma,
@@ -220,16 +221,29 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
     metadata: undefined as any
   };
 }
-export function expandBsdaFromElastic(
-  bsda: BsdaForElastic
-): GraphqlBsda & { groupedIn?: string; forwardedIn?: string } {
+export function expandBsdaFromElastic(bsda: BsdaForElastic): GraphqlBsda {
   const expanded = expandBsdaFromDb(bsda);
 
-  // pass down related field to sub-resolvers
+  const groupedIn = bsda.groupedIn
+    ? // Dans le cas de la requête `bsds`, et pour des raisons de perfs, on souhaite utiliser directement le champ
+      // `groupedIn` du BsdaForElastic (Cf resolver Bsda). Or ce champ ne contient que l'identifiant du
+      // Bsda. On est donc obligé de faire un typecasting ici en gardant bien en tête côté front qu'on ne peut
+      // requêter que l'identifiant
+      (bsda.groupedIn as Bsda)
+    : null;
+
+  const forwardedIn = bsda.forwardedIn
+    ? // Dans le cas de la requête `bsds`, et pour des raisons de perfs, on souhaite utiliser directement le champ
+      // `groupedIn` du BsdaForElastic (Cf resolver Bsda). Or ce champ ne contient que l'identifiant du
+      // Bsda. On est donc obligé de faire un typecasting ici en gardant bien en tête côté front qu'on ne peut
+      // requêter que l'identifiant
+      (bsda.forwardedIn as Bsda)
+    : null;
+
   return {
     ...expanded,
-    groupedIn: undefined,
-    forwardedIn: undefined
+    groupedIn,
+    forwardedIn
   };
 }
 

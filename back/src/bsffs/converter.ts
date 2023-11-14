@@ -379,7 +379,7 @@ export function expandBsffFromElastic(bsff: BsffForElastic): GraphQL.Bsff {
   // pass down related field to sub-resolvers
   return {
     ...expanded,
-    packagings: []
+    packagings: bsff.packagings.map(expandBsffPackagingFromDB)
   };
 }
 

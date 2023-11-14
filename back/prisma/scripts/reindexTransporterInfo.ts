@@ -5,7 +5,10 @@ import {
   BsdaForElasticInclude,
   toBsdElastic as bsdaToBsdElastic
 } from "../../src/bsda/elastic";
-import { toBsdElastic as bsdasriToBsdElastic } from "../../src/bsdasris/elastic";
+import {
+  BsdasriForElasticInclude,
+  toBsdElastic as bsdasriToBsdElastic
+} from "../../src/bsdasris/elastic";
 import { toBsdElastic as bsffToBsdElastic } from "../../src/bsffs/elastic";
 
 @registerUpdater(
@@ -26,7 +29,8 @@ export class ReindexTransporterInfo implements Updater {
     });
 
     const bsdasris = await prisma.bsdasri.findMany({
-      where: { transporterCustomInfo: { not: null } }
+      where: { transporterCustomInfo: { not: null } },
+      include: BsdasriForElasticInclude
     });
 
     const bsffs = await prisma.bsff.findMany({
