@@ -15,6 +15,7 @@ import {
   MutationPublishBsdaArgs,
   MutationSignBsdaArgs,
   MutationSubmitBsdaRevisionRequestApprovalArgs,
+  MutationUpdateBsdaArgs,
   Query,
   QueryBsdsArgs
 } from "../../../../generated/graphql/types";
@@ -1261,6 +1262,14 @@ describe("Bsda sub-resolvers in query bsds", () => {
     }
   `;
 
+  const UPDATE_BSDA = gql`
+    mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
+      updateBsda(id: $id, input: $input) {
+        id
+      }
+    }
+  `;
+
   test("Bsda.groupedIn should resolve correctly", async () => {
     const ttr = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
@@ -1271,6 +1280,7 @@ describe("Bsda sub-resolvers in query bsds", () => {
     });
     const bsdaSuite = await bsdaFactory({
       opt: {
+        type: "GATHERING",
         emitterCompanySiret: ttr.company.siret,
         status: "INITIAL",
         grouping: { connect: { id: bsda.id } }
@@ -1292,16 +1302,73 @@ describe("Bsda sub-resolvers in query bsds", () => {
     expect((queriedBsda as any)!.groupedIn!.id).toEqual(bsdaSuite.id);
   });
 
+  test("Bsda.groupedIn should be null when the bsda is removed from the groupement", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_CHILD",
+        destinationOperationCode: "R 13"
+      }
+    });
+
+    const anotherBsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_CHILD",
+        destinationOperationCode: "R 13"
+      }
+    });
+
+    const bsdaSuite = await bsdaFactory({
+      opt: {
+        type: "GATHERING",
+        emitterCompanySiret: ttr.company.siret,
+        status: "INITIAL",
+        grouping: { connect: { id: bsda.id } }
+      }
+    });
+    await indexBsda(await getBsdaForElastic(bsda));
+    await indexBsda(await getBsdaForElastic(bsdaSuite));
+    await refreshElasticSearch();
+
+    const { query, mutate } = makeClient(ttr.user);
+
+    // Le BSDA initial est dissocié du BSDA de regroupement
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: { id: bsdaSuite.id, input: { grouping: [anotherBsda.id] } }
+    });
+
+    expect(errors).toBeUndefined();
+    await refreshElasticSearch();
+
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+
+    const bsdas = data.bsds!.edges.map(e => e.node);
+    expect(bsdas).toHaveLength(3);
+    const queriedBsda = bsdas.find(bsd => bsd.id === bsda.id);
+    expect(queriedBsda).toBeDefined();
+    expect((queriedBsda as any)!.groupedIn).toBeNull();
+  });
+
   test("Bsda.forwardedIn should resolve correctly", async () => {
     const ttr = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
       opt: {
         destinationCompanySiret: ttr.company.siret,
-        status: "AWAITING_CHILD"
+        status: "AWAITING_CHILD",
+        destinationOperationCode: "R 13"
       }
     });
     const bsdaSuite = await bsdaFactory({
       opt: {
+        type: "RESHIPMENT",
         emitterCompanySiret: ttr.company.siret,
         status: "INITIAL",
         forwarding: { connect: { id: bsda.id } }
@@ -1321,5 +1388,57 @@ describe("Bsda sub-resolvers in query bsds", () => {
     const queriedBsda = bsdas.find(bsd => bsd.id === bsda.id);
     expect(queriedBsda).toBeDefined();
     expect((queriedBsda as any)!.forwardedIn!.id).toEqual(bsdaSuite.id);
+  });
+
+  test("Bsda.forwardedIn should be null when removed from the réexpedition", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_CHILD",
+        destinationOperationCode: "R 13"
+      }
+    });
+    const anoterBsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_CHILD",
+        destinationOperationCode: "R 13"
+      }
+    });
+    const bsdaSuite = await bsdaFactory({
+      opt: {
+        type: "RESHIPMENT",
+        emitterCompanySiret: ttr.company.siret,
+        status: "INITIAL",
+        forwarding: { connect: { id: bsda.id } }
+      }
+    });
+    await indexBsda(await getBsdaForElastic(bsda));
+    await indexBsda(await getBsdaForElastic(bsdaSuite));
+    await refreshElasticSearch();
+
+    const { query, mutate } = makeClient(ttr.user);
+
+    // Le BSDA initial est dissocié du BSDA de réexpedition
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: { id: bsdaSuite.id, input: { forwarding: anoterBsda.id } }
+    });
+
+    expect(errors).toBeUndefined();
+    await refreshElasticSearch();
+
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    const bsdas = data.bsds!.edges.map(e => e.node);
+    expect(bsdas).toHaveLength(3);
+    const queriedBsda = bsdas.find(bsd => bsd.id === bsda.id);
+    expect(queriedBsda).toBeDefined();
+    expect((queriedBsda as any)!.forwardedIn).toBeNull();
   });
 });
