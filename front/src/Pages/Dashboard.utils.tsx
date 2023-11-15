@@ -96,7 +96,7 @@ export const getRoutePredicate = (props: Tabs & { siret }) => {
   // }
 };
 
-export const getBlankstateTitle = (tabs: Tabs): string | undefined => {
+export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
   const { isActTab, isDraftTab, isFollowTab, isArchivesTab, isReviewsTab } =
     tabs;
 
@@ -118,7 +118,7 @@ export const getBlankstateTitle = (tabs: Tabs): string | undefined => {
   return blankstate_default_title;
 };
 
-export const getBlankstateDescription = ({
+export const getBlankslateDescription = ({
   isActTab,
   isDraftTab,
   isFollowTab,

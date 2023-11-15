@@ -42,8 +42,8 @@ import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../Apps/common/queries/c
 import "./dashboard.scss";
 import {
   filtersToQueryBsdsArgs,
-  getBlankstateDescription,
-  getBlankstateTitle,
+  getBlankslateDescription,
+  getBlankslateTitle,
   getRoutePredicate,
   Tabs
 } from "./Dashboard.utils";
@@ -425,11 +425,11 @@ const DashboardPage = () => {
       {!Boolean(bsdsTotalCount) && !isLoadingBsds && (
         <div className="dashboard-page__blankstate">
           <Blankslate>
-            {getBlankstateTitle(tabs) && (
-              <BlankslateTitle>{getBlankstateTitle(tabs)}</BlankslateTitle>
+            {getBlankslateTitle(tabs) && (
+              <BlankslateTitle>{getBlankslateTitle(tabs)}</BlankslateTitle>
             )}
             <BlankslateDescription>
-              {getBlankstateDescription(tabs)}
+              {getBlankslateDescription(tabs)}
             </BlankslateDescription>
           </Blankslate>
         </div>
