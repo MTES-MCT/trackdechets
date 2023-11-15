@@ -33,6 +33,22 @@ export { addToMailQueue } from "./queue/producers/mail";
 export { geocodeJob } from "./queue/jobs/geocode";
 export { setDepartementJob } from "./queue/jobs/setDepartement";
 export { syncEventsJob } from "./queue/jobs/syncEvents";
+export { indexBsdJob } from "./queue/jobs";
+export { favoritesCompanyQueue } from "./queue/producers/company";
+export {
+  DELETE_JOB_NAME,
+  INDEX_JOB_NAME,
+  INDEX_CREATED_JOB_NAME,
+  INDEX_UPDATED_JOB_NAME
+} from "./queue/producers/jobNames";
+export { deleteBsdJob } from "./queue/jobs/deleteBsd";
+export { indexFavoritesJob } from "./queue/jobs/indexFavorites";
+export { indexChunkBsdJob, indexAllInBulkJob } from "./queue/jobs/indexAllBsds";
+export { sendHookJob } from "./queue/jobs/sendHook";
+export {
+  webhooksQueue,
+  SEND_WEBHOOK_JOB_NAME
+} from "./queue/producers/webhooks";
 export { associateUserToCompany } from "./users/database";
 export { Mutation, MutationDeleteCompanyArgs } from "./generated/graphql/types";
 export { redisClient } from "./common/redis";

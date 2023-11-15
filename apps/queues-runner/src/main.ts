@@ -1,4 +1,3 @@
-import "@total-typescript/ts-reset";
 import {
   sendMailJob,
   mailQueue,
