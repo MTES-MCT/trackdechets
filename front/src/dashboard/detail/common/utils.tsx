@@ -76,12 +76,3 @@ export const deepValue = (obj, path) => {
   }
   return obj;
 };
-
-/**
- * Simple test of deep equality between two objects. Careful, quite fragile as
- * the order of the properties is important
- * https://stackoverflow.com/questions/1068834/object-comparison-in-javascript
- */
-export const deepEqual = (obj1, obj2) => {
-  return JSON.stringify(obj1) === JSON.stringify(obj2);
-};

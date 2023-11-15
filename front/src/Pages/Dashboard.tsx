@@ -145,7 +145,10 @@ const DashboardPage = () => {
   // - Current active tab
   // - Current filters
   useEffect(() => {
-    fetchBsds(siret, bsdsVariables, tabs);
+    // Only exception: the reviews tab. Fix incoming
+    if (!tabs.isReviewsTab) {
+      fetchBsds(siret, bsdsVariables, tabs);
+    }
   }, [bsdsVariables, siret, tabs, fetchBsds]);
 
   const handleFiltersSubmit = filterValues => {

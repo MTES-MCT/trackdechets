@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { FiltersProps } from "./filtersTypes";
 import QuickFilters from "./QuickFilters";
 import AdvancedFilters from "./AdvancedFilters";
+import { isEqual } from "lodash";
 
 import "./filters.scss";
 import {
   advancedFilterList,
   quickFilterList
 } from "../../../Dashboard/dashboardUtils";
-import { deepEqual } from "../../../../dashboard/detail/common/utils";
 
 const purgeEmptyValues = (obj: { [key: string]: string | string[] }) => {
   return JSON.parse(
@@ -44,7 +44,7 @@ const Filters = ({
     });
 
     // If filters have actually changed, bubble up
-    if (!deepEqual(filters, newFilters)) {
+    if (!isEqual(filters, newFilters)) {
       onApplyFilters(newFilters);
       setFilters(newFilters);
     }
