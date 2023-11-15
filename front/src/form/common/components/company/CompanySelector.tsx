@@ -168,12 +168,6 @@ export default function CompanySelector({
     }
   );
 
-  useEffect(() => {
-    if (searchData || favoritesData) {
-      setSearchResults(mergedResults.current || []);
-    }
-  }, [searchData, favoritesData]);
-
   /**
    * CompanyPrivateInfos pour completer les informations
    * de la Company courante enregistrée dans le BSD à son ouverture
@@ -305,32 +299,30 @@ export default function CompanySelector({
 
       return results;
     },
-    [
-      disabled,
-      initialAutoSelectFirstCompany,
-      optional,
-      orgId,
-      selectCompany,
-      skipFavorite
-    ]
+    [disabled, skipFavorite]
   );
 
   useEffect(() => {
-    const results = mergedResults.current;
+    if (searchData || favoritesData) {
+      setSearchResults(mergedResults.current || []);
+    }
+
     // If the form is empty, we auto-select the first result.
     if (
       initialAutoSelectFirstCompany &&
       !optional &&
-      results &&
-      results.length >= 1 &&
+      searchResults &&
+      searchResults.length >= 1 &&
       !orgId
     ) {
-      selectCompany(results[0]);
+      selectCompany(searchResults[0]);
     }
   }, [
-    mergedResults.current,
+    searchData,
+    favoritesData,
     initialAutoSelectFirstCompany,
     optional,
+    searchResults,
     orgId,
     selectCompany
   ]);
