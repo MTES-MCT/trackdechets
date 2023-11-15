@@ -93,7 +93,13 @@ export default function CompanySelectorFields({
       });
       setFieldTouched(`${field.name}`, true, true);
     }
-  }, [currentCompany, shouldUpdateFields]);
+  }, [
+    currentCompany,
+    shouldUpdateFields,
+    field.name,
+    setFieldTouched,
+    setFieldValue
+  ]);
 
   return (
     <>
