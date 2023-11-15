@@ -44,7 +44,7 @@ import {
 } from "../common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
 import { BsdCurrentTab } from "../common/types/commonTypes";
-import { BsdType, BsdWhere } from "codegen-ui";
+import { BsdType, BsdWhere, OrderBy } from "codegen-ui";
 
 export const MAX_FILTER = 5;
 
@@ -245,12 +245,12 @@ export const filterList = [...advancedFilterList.flat(), ...quickFilterList];
 export const filterPredicates: {
   filterName: string;
   where: (value: any) => BsdWhere;
-  order: string;
+  orderBy?: keyof OrderBy;
 }[] = [
   {
     filterName: FilterName.types,
     where: value => ({ type: { _in: value } }),
-    order: "type"
+    orderBy: "type"
   },
   {
     filterName: FilterName.waste,
@@ -264,7 +264,7 @@ export const filterPredicates: {
         }
       ]
     }),
-    order: "wasteCode"
+    orderBy: "wasteCode"
   },
   {
     filterName: FilterName.readableId,
@@ -282,31 +282,27 @@ export const filterPredicates: {
         }
       ]
     }),
-    order: "readableId"
+    orderBy: "readableId"
   },
   {
     filterName: FilterName.transporterNumberPlate,
-    order: "transporterNumberPlate",
     where: value => ({
       transporter: { transport: { plates: { _itemContains: value } } }
     })
   },
   {
     filterName: FilterName.transporterCustomInfo,
-    where: value => ({ transporter: { customInfo: { _match: value } } }),
-    order: "transporterCustomInfo"
+    where: value => ({ transporter: { customInfo: { _match: value } } })
   },
   {
     filterName: FilterName.pickupSiteName,
-    where: value => ({ emitter: { pickupSite: { name: { _match: value } } } }),
-    order: "name"
+    where: value => ({ emitter: { pickupSite: { name: { _match: value } } } })
   },
   {
     filterName: FilterName.pickupSiteAddress,
     where: value => ({
       emitter: { pickupSite: { address: { _match: value } } }
-    }),
-    order: "address"
+    })
   },
   {
     filterName: FilterName.tvaIntra,
@@ -333,8 +329,7 @@ export const filterPredicates: {
           ]
         }
       ]
-    }),
-    order: "vatNumber"
+    })
   },
   {
     filterName: FilterName.givenName,
@@ -360,8 +355,7 @@ export const filterPredicates: {
           ]
         }
       ]
-    }),
-    order: "name"
+    })
   },
   {
     filterName: FilterName.sealNumbers,
@@ -369,8 +363,7 @@ export const filterPredicates: {
       sealNumbers: {
         _itemContains: value
       }
-    }),
-    order: "sealNumbers"
+    })
   },
   {
     filterName: FilterName.ficheInterventionNumbers,
@@ -378,8 +371,7 @@ export const filterPredicates: {
       ficheInterventionNumbers: {
         _itemContains: value
       }
-    }),
-    order: "sealNumbers"
+    })
   },
   {
     filterName: FilterName.nextDestinationSiret,
@@ -389,8 +381,7 @@ export const filterPredicates: {
           nextDestination: { company: { siret: { _contains: value } } }
         }
       }
-    }),
-    order: "siret"
+    })
   },
   {
     filterName: FilterName.operationCode,
@@ -412,8 +403,7 @@ export const filterPredicates: {
       return {
         destination: { operation: { code: { _contains: value } } }
       };
-    },
-    order: "code"
+    }
   },
   {
     filterName: FilterName.emitterSignDate,
@@ -421,8 +411,7 @@ export const filterPredicates: {
       emitter: {
         emission: { date: { _lte: value.endDate, _gte: value.startDate } }
       }
-    }),
-    order: "date"
+    })
   },
   {
     filterName: FilterName.workerSignDate,
@@ -430,8 +419,7 @@ export const filterPredicates: {
       worker: {
         work: { date: { _lte: value.endDate, _gte: value.startDate } }
       }
-    }),
-    order: "date"
+    })
   },
   {
     filterName: FilterName.transporterTransportSignDate,
@@ -441,8 +429,7 @@ export const filterPredicates: {
           takenOverAt: { _lte: value.endDate, _gte: value.startDate }
         }
       }
-    }),
-    order: "takenOverAt"
+    })
   },
   {
     filterName: FilterName.destinationReceptionDate,
@@ -450,8 +437,7 @@ export const filterPredicates: {
       destination: {
         reception: { date: { _lte: value.endDate, _gte: value.startDate } }
       }
-    }),
-    order: "date"
+    })
   },
   {
     filterName: FilterName.destinationAcceptationDate,
@@ -459,8 +445,7 @@ export const filterPredicates: {
       destination: {
         acceptation: { date: { _lte: value.endDate, _gte: value.startDate } }
       }
-    }),
-    order: "date"
+    })
   },
   {
     filterName: FilterName.destinationOperationSignDate,
@@ -468,8 +453,7 @@ export const filterPredicates: {
       destination: {
         operation: { date: { _lte: value.endDate, _gte: value.startDate } }
       }
-    }),
-    order: "date"
+    })
   },
   {
     filterName: FilterName.siretProductorAddress,
@@ -477,13 +461,11 @@ export const filterPredicates: {
       emitter: {
         company: { address: { _match: value } }
       }
-    }),
-    order: "address"
+    })
   },
   {
     filterName: FilterName.cap,
-    where: value => ({ destination: { cap: { _match: value } } }),
-    order: "cap"
+    where: value => ({ destination: { cap: { _match: value } } })
   }
 ];
 

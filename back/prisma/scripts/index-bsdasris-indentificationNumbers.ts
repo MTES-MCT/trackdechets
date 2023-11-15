@@ -19,7 +19,7 @@ export class ReindexBsdasrisWithIdentificationNumbers implements Updater {
     for (const bsdasri of bsdasris) {
       // ~ 5000 bordereaux en prod
       // select count(*) from "default$default"."Bsdasri" where array_length("identificationNumbers", 1) > 0;
-      enqueueUpdatedBsdToIndex(bsdasri.id);
+      await enqueueUpdatedBsdToIndex(bsdasri.id);
     }
   }
 }
