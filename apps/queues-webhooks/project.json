@@ -1,5 +1,5 @@
 {
-  "name": "apps/queues-webhooks",
+  "name": "queues-webhooks",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/queues-webhooks/src",
   "projectType": "application",
@@ -15,7 +15,28 @@
         "bundle": false,
         "main": "apps/queues-webhooks/src/main.ts",
         "tsConfig": "apps/queues-webhooks/tsconfig.app.json",
-        "assets": ["apps/queues-webhooks/src/assets"],
+        "assets": [
+          {
+            "input": "./libs/back/mail/src",
+            "glob": "**/*.html",
+            "output": "./libs/back/mail/src"
+          },
+          {
+            "input": "./back/src",
+            "glob": "**/*.{graphql,pdf,png,ttf,html,css,svg,wsdl,mp3}",
+            "output": "./back/src"
+          },
+          {
+            "input": "./back/src",
+            "glob": "**/assets/*.js",
+            "output": "./back/src"
+          },
+          {
+            "input": "./back/prisma",
+            "glob": "**/*.{prisma,sql}",
+            "output": "./back/prisma"
+          }
+        ],
         "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
@@ -42,15 +63,15 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "apps/queues-webhooks:build",
+        "buildTarget": "queues-webhooks:build",
         "inspect": false
       },
       "configurations": {
         "development": {
-          "buildTarget": "apps/queues-webhooks:build:development"
+          "buildTarget": "queues-webhooks:build:development"
         },
         "production": {
-          "buildTarget": "apps/queues-webhooks:build:production"
+          "buildTarget": "queues-webhooks:build:production"
         }
       }
     },
@@ -76,5 +97,5 @@
       }
     }
   },
-  "tags": []
+  "tags": ["backend:queues", "backend:background"]
 }

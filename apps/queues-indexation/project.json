@@ -63,15 +63,15 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "apps/queues-indexation:build",
+        "buildTarget": "queues-indexation:build",
         "inspect": false
       },
       "configurations": {
         "development": {
-          "buildTarget": "apps/queues-indexation:build:development"
+          "buildTarget": "queues-indexation:build:development"
         },
         "production": {
-          "buildTarget": "apps/queues-indexation:build:production"
+          "buildTarget": "queues-indexation:build:production"
         }
       }
     },
@@ -97,5 +97,5 @@
       }
     }
   },
-  "tags": []
+  "tags": ["backend:queues", "backend:background"]
 }

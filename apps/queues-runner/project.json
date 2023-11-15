@@ -98,5 +98,5 @@
       }
     }
   },
-  "tags": []
+  "tags": ["backend:queues", "backend:background"]
 }

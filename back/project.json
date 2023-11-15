@@ -19,45 +19,6 @@
         "command": "graphql-codegen --config back/codegen.yml"
       }
     },
-    "serve-api": {
-      "executor": "@nx/js:node",
-      "defaultConfiguration": "development",
-      "dependsOn": ["prisma"],
-      "options": {
-        "buildTarget": "back:build",
-        "inspect": false
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "back:build:development"
-        },
-        "production": {
-          "buildTarget": "back:build:production"
-        }
-      }
-    },
-    "serve-queues": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npm --prefix back run watch:queue"
-      }
-    },
-    "serve-notifier": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npm --prefix back run watch:notifier"
-      }
-    },
-    "serve": {
-      "executor": "nx:run-commands",
-      "options": {
-        "commands": [
-          "nx serve-api back",
-          "nx serve-queues back",
-          "nx serve-notifier back"
-        ]
-      }
-    },
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
