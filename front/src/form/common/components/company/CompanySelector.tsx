@@ -208,73 +208,51 @@ export default function CompanySelector({
    * Selection d'un établissement dans le formulaire
    */
 
-  const selectCompany = useCallback(
-    (company?: CompanySearchResult) => {
-      function isUnknownCompanyName(companyName?: string): boolean {
-        return companyName === "---" || companyName === "";
-      }
-
-      if (disabled) return;
-      // empty the fields
-      if (!company) {
-        setFieldValue(field.name, getInitialCompany());
-        setFieldTouched(`${field.name}`, true, true);
-        onCompanySelected?.();
-        return;
-      }
-
-      // Side effects
-      const notVoidCompany = Object.keys(company).length !== 0; // unselect returns emtpy object {}
-      setMustBeRegistered(
-        notVoidCompany && !company.isRegistered && registeredOnlyCompanies
-      );
-
-      // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
-      setDisplayForeignCompanyWithUnknownInfos(
-        isForeignVat(company.vatNumber!) && isUnknownCompanyName(company.name!)
-      );
-
-      setIsForeignCompany(isForeignVat(company.vatNumber!));
-      // Prépare la mise à jour du Form
-      const fields: FormCompany = {
-        orgId: company.orgId,
-        siret: company.siret,
-        vatNumber: company.vatNumber,
-        name:
-          company.name && !isUnknownCompanyName(company.name)
-            ? company.name
-            : "",
-        address: company.address ?? "",
-        contact: company.contact ?? "",
-        phone: company.contactPhone ?? "",
-        mail: company.contactEmail ?? "",
-        country: company.codePaysEtrangerEtablissement
-      };
-
-      Object.keys(fields).forEach(key => {
-        setFieldValue(`${field.name}.${key}`, fields[key]);
-      });
+  const selectCompany = (company?: CompanySearchResult) => {
+    function isUnknownCompanyName(companyName?: string): boolean {
+      return companyName === "---" || companyName === "";
+    }
+    if (disabled) return;
+    // empty the fields
+    if (!company) {
+      setFieldValue(field.name, getInitialCompany());
       setFieldTouched(`${field.name}`, true, true);
-      onCompanySelected?.(company);
-
-      setSelectedCompanyDetails({
-        name: company.name,
-        address: company.address
-      });
-    },
-    [
-      setSelectedCompanyDetails,
-      onCompanySelected,
-      setFieldTouched,
-      setFieldValue,
-      setIsForeignCompany,
-      setDisplayForeignCompanyWithUnknownInfos,
-      setMustBeRegistered,
-      disabled,
-      field.name,
-      registeredOnlyCompanies
-    ]
-  );
+      onCompanySelected?.();
+      return;
+    }
+    // Side effects
+    const notVoidCompany = Object.keys(company).length !== 0; // unselect returns emtpy object {}
+    setMustBeRegistered(
+      notVoidCompany && !company.isRegistered && registeredOnlyCompanies
+    );
+    // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
+    setDisplayForeignCompanyWithUnknownInfos(
+      isForeignVat(company.vatNumber!) && isUnknownCompanyName(company.name!)
+    );
+    setIsForeignCompany(isForeignVat(company.vatNumber!));
+    // Prépare la mise à jour du Form
+    const fields: FormCompany = {
+      orgId: company.orgId,
+      siret: company.siret,
+      vatNumber: company.vatNumber,
+      name:
+        company.name && !isUnknownCompanyName(company.name) ? company.name : "",
+      address: company.address ?? "",
+      contact: company.contact ?? "",
+      phone: company.contactPhone ?? "",
+      mail: company.contactEmail ?? "",
+      country: company.codePaysEtrangerEtablissement
+    };
+    Object.keys(fields).forEach(key => {
+      setFieldValue(`${field.name}.${key}`, fields[key]);
+    });
+    setFieldTouched(`${field.name}`, true, true);
+    onCompanySelected?.(company);
+    setSelectedCompanyDetails({
+      name: company.name,
+      address: company.address
+    });
+  };
 
   /**
    * Merge searchCompanies et favoritesData
