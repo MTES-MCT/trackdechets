@@ -33,6 +33,7 @@ export const dashboardBsffFragment = gql`
         orgId
         name
       }
+      plannedOperationCode
     }
     waste {
       code

@@ -7,4 +7,5 @@ export interface BadgeProps {
   bsdType?: BsdType;
   reviewStatus?: TBsdStatusCode | null;
   operationCode?: string;
+  bsdaAnnexed?: boolean;
 }

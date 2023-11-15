@@ -112,6 +112,8 @@ const mapBsda = (bsda: BsdaWithReview): BsdDisplay => {
     emittedByEcoOrganisme: bsda.ecoOrganisme,
     worker: bsda.worker,
     bsdWorkflowType: bsda.type || bsda["bsdaType"],
+    groupedIn: bsda.groupedIn,
+    forwardedIn: bsda.forwardedIn,
     grouping: bsda.grouping,
     review: bsda?.review,
     transporterCustomInfo:

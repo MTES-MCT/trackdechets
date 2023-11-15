@@ -163,7 +163,7 @@ describe("Bsd Badge status", () => {
         bsdType={BsdType.Bsff}
       />
     );
-    expect(screen.getByText(/Annexé à un bordereau suite/i));
+    expect(screen.getByText(/En attente d'un bordereau suite/i));
   });
   test("INTERMEDIATELY_PROCESSED bsdasri", () => {
     render(
@@ -200,11 +200,21 @@ describe("Bsd Badge status", () => {
     render(<Badge status={BsdStatusCode.AwaitingChild} />);
     expect(screen.getByText(/Annexé à un bordereau suite/i));
   });
-  test("AWAITING_CHILD bsda", () => {
+  test("AWAITING_CHILD bsda not groupedIn", () => {
     render(
       <Badge status={BsdStatusCode.AwaitingChild} bsdType={BsdType.Bsda} />
     );
     expect(screen.getByText(/En attente d'un bordereau suite/i));
+  });
+  test("AWAITING_CHILD bsda groupedIn", () => {
+    render(
+      <Badge
+        status={BsdStatusCode.AwaitingChild}
+        bsdType={BsdType.Bsda}
+        bsdaAnnexed
+      />
+    );
+    expect(screen.getByText(/Annexé à un bordereau suite/i));
   });
   test("AWAITING_CHILD bsff", () => {
     render(
