@@ -42,7 +42,7 @@ export default function CompanyVerifyModal({
     MutationVerifyCompanyByAdminArgs
   >(VERIFY_COMPANY_BY_ADMIN, {
     onCompleted: () => {
-      toast.success("Verification envoyée", { duration: 5 });
+      toast.success("Verification envoyée", { duration: 2000 });
       return onClose();
     },
     onError: () => {

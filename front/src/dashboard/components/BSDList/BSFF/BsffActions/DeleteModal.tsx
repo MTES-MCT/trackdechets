@@ -33,7 +33,7 @@ export function DeleteBsffModal({
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success("Bordereau supprimé", { duration: 5 });
+      toast.success("Bordereau supprimé", { duration: 2000 });
       !!onClose && onClose();
     },
     onError: () =>

@@ -35,7 +35,7 @@ export default function SendVerificationCodeLetterModal({
     any
   >(SEND_VERIFICATION_CODE_LETTER, {
     onCompleted: () => {
-      toast.success("Verification envoyée", { duration: 5 });
+      toast.success("Verification envoyée", { duration: 2000 });
       return onClose();
     },
     onError: () => {

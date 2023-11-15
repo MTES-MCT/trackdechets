@@ -70,7 +70,7 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success(messageSuccess, { duration: 5 });
+      toast.success(messageSuccess, { duration: 2000 });
       !!onClose && onClose();
     },
     onError: () =>
@@ -86,7 +86,7 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success(messageSuccess, { duration: 5 });
+      toast.success(messageSuccess, { duration: 2000 });
       !!onClose && onClose();
     },
     onError: () =>
@@ -103,7 +103,7 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success(messageSuccess, { duration: 5 });
+      toast.success(messageSuccess, { duration: 2000 });
       !!onClose && onClose();
     },
     onError: error =>
@@ -120,7 +120,7 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success(messageSuccess, { duration: 5 });
+      toast.success(messageSuccess, { duration: 2000 });
       !!onClose && onClose();
     },
     onError: () =>
@@ -137,7 +137,7 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success(messageSuccess, { duration: 5 });
+      toast.success(messageSuccess, { duration: 2000 });
       !!onClose && onClose();
     },
     onError: () =>

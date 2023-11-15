@@ -81,7 +81,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
     MutationDeleteInvitationArgs
   >(DELETE_INVITATION, {
     onCompleted: () => {
-      toast.success("Invitation supprimée", { duration: 5 });
+      toast.success("Invitation supprimée", { duration: 2000 });
     },
     onError: () => {
       toast.error("L'invitation n'a pas pu être supprimée", {
@@ -93,7 +93,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
     RESEND_INVITATION,
     {
       onCompleted: () => {
-        toast.success("Invitation renvoyée", { duration: 5 });
+        toast.success("Invitation renvoyée", { duration: 2000 });
       },
       onError: () => {
         toast.error(

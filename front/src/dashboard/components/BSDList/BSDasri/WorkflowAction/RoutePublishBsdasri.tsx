@@ -56,7 +56,7 @@ export function RoutePublishBsdasri() {
         refetchQueries: [GET_BSDS],
         awaitRefetchQueries: true,
         onCompleted: () => {
-          toast.success(`Bordereau ${formId} publié`, { duration: 5 });
+          toast.success(`Bordereau ${formId} publié`, { duration: 2000 });
           history.goBack();
         },
         onError: () =>
