@@ -1,5 +1,9 @@
-import prisma from "back/src/prisma";
-import { sendMail } from "back/src/mailer/mailing";
+import {
+  prisma,
+  getCompaniesAndActiveAdminsByCompanyOrgIds,
+  formatDate,
+  sendMail
+} from "back";
 import {
   CompanyType,
   MembershipRequestStatus,
@@ -23,8 +27,6 @@ import {
   producersSecondOnboardingEmail,
   pendingRevisionRequestAdminDetailsEmail
 } from "@td/mail";
-import { getCompaniesAndActiveAdminsByCompanyOrgIds } from "back/src/companies/database";
-import { formatDate } from "back/src/common/pdf";
 
 /**
  * Compute a past date relative to baseDate

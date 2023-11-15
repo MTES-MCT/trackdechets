@@ -82,6 +82,11 @@
         "ci": {
           "ci": true,
           "codeCoverage": true
+        },
+        "integration": {
+          "jestConfig": "back/jest.config.integration.js",
+          "runInBand": true,
+          "forceExit": true
         }
       }
     },

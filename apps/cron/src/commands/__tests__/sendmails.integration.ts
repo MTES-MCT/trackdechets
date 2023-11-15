@@ -1,7 +1,16 @@
 import axios from "axios";
-import { resetDatabase } from "back/integration-tests/helper";
+import { resetDatabase } from "libs/back/tests-integration";
 import { CompanyType, MembershipRequestStatus } from "@prisma/client";
-import { addToMailQueue } from "back/src/queue/producers/mail";
+import { addToMailQueue, prisma } from "back";
+
+import {
+  companyFactory,
+  createMembershipRequest,
+  formFactory,
+  userFactory,
+  userWithCompanyFactory
+} from "back/src/__tests__/factories";
+import { bsdaFactory } from "back/src/bsda/__tests__/factories";
 
 import {
   sendMembershipRequestDetailsEmail,
@@ -12,19 +21,9 @@ import {
   xDaysAgo
 } from "../onboarding.helpers";
 
-import {
-  companyFactory,
-  createMembershipRequest,
-  formFactory,
-  userFactory,
-  userWithCompanyFactory
-} from "back/src/__tests__/factories";
-import prisma from "back/src/prisma";
-import { bsdaFactory } from "back/src/bsda/__tests__/factories";
-
 // Intercept calls
 // Simulate queue error in order to test with sendMailSync
-jest.mock("../../queue/producers/mail");
+jest.mock("back");
 (addToMailQueue as jest.Mock).mockRejectedValue(
   new Error("any queue error to bypass job queue and sendmail synchronously")
 );

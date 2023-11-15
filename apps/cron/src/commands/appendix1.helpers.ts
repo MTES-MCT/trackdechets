@@ -1,7 +1,6 @@
 import { AuthType, EmitterType, Status } from "@prisma/client";
 import { sub } from "date-fns";
-import { deleteBsd } from "back/src/common/elastic";
-import prisma from "back/src/prisma";
+import { deleteBsd, prisma } from "back";
 
 /**
  * After you sign the first appendix1 on a container, you have 3 days to sign the rest.

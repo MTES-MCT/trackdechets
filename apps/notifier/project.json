@@ -16,7 +16,28 @@
         "bundle": false,
         "main": "apps/notifier/src/main.ts",
         "tsConfig": "apps/notifier/tsconfig.app.json",
-        "assets": [],
+        "assets": [
+          {
+            "input": "./libs/back/mail/src",
+            "glob": "**/*.html",
+            "output": "./libs/back/mail/src"
+          },
+          {
+            "input": "./back/src",
+            "glob": "**/*.{graphql,pdf,png,ttf,html,css,svg,wsdl,mp3}",
+            "output": "./back/src"
+          },
+          {
+            "input": "./back/src",
+            "glob": "**/assets/*.js",
+            "output": "./back/src"
+          },
+          {
+            "input": "./back/prisma",
+            "glob": "**/*.{prisma,sql}",
+            "output": "./back/prisma"
+          }
+        ],
         "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
@@ -26,7 +47,9 @@
         }
       },
       "configurations": {
-        "development": {},
+        "development": {
+          "skipTypeCheck": true
+        },
         "production": {
           "esbuildOptions": {
             "sourcemap": false,
@@ -41,14 +64,15 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "apps/notifier:build"
+        "buildTarget": "notifier:build",
+        "inspect": false
       },
       "configurations": {
         "development": {
-          "buildTarget": "apps/notifier:build:development"
+          "buildTarget": "notifier:build:development"
         },
         "production": {
-          "buildTarget": "apps/notifier:build:production"
+          "buildTarget": "notifier:build:production"
         }
       }
     },

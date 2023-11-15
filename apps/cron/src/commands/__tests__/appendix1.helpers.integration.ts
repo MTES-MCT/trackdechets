@@ -1,10 +1,10 @@
 import { EmitterType, Status } from "@prisma/client";
-import { resetDatabase } from "back/integration-tests/helper";
+import { prisma } from "back";
 import {
   formFactory,
   userWithCompanyFactory
 } from "back/src/__tests__/factories";
-import prisma from "back/src/prisma";
+import { resetDatabase } from "libs/back/tests-integration";
 import { cleanUnusedAppendix1ProducerBsdds } from "../appendix1.helpers";
 
 describe("cleanUnusedAppendix1ProducerBsdds", () => {

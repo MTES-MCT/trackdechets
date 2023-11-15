@@ -3,7 +3,14 @@ import {
   MembershipRequestStatus,
   UserRole
 } from "@prisma/client";
-import { resetDatabase } from "back/integration-tests/helper";
+import {
+  prisma,
+  associateUserToCompany,
+  Mutation,
+  MutationDeleteCompanyArgs
+} from "back";
+import { resetDatabase } from "libs/back/tests-integration";
+import makeClient from "back/src/__tests__/testClient";
 import {
   companyAssociatedToExistingUserFactory,
   companyFactory,
@@ -12,6 +19,7 @@ import {
   userFactory,
   userWithCompanyFactory
 } from "back/src/__tests__/factories";
+import { bsdaFactory } from "back/src/bsda/__tests__/factories";
 import {
   BsddRevisionRequestWithReadableId,
   addPendingApprovalsCompanyAdmins,
@@ -24,14 +32,6 @@ import {
   getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
   xDaysAgo
 } from "../onboarding.helpers";
-import prisma from "back/src/prisma";
-import { bsdaFactory } from "back/src/bsda/__tests__/factories";
-import { associateUserToCompany } from "back/src/users/database";
-import {
-  Mutation,
-  MutationDeleteCompanyArgs
-} from "back/src/generated/graphql/types";
-import makeClient from "back/src/__tests__/testClient";
 
 const TODAY = new Date();
 const ONE_DAY_AGO = xDaysAgo(TODAY, 1);
