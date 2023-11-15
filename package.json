@@ -16,7 +16,7 @@
   "scripts": {
     "scalingo-postbuild": "bash scripts/build/scalingo.sh",
     "nx": "nx",
-    "precommit": "npx nx format:write"
+    "prepare": "husky install"
   },
   "engines": {
     "node": "^20"
