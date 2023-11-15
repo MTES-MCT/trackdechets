@@ -531,14 +531,14 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               Cas lié au mouvement de contenant(s)
             </strong>
           </p>
-          <p>
-            <input
-              type="checkbox"
-              checked={bsdasri?.type === BsdasriType.GROUPING}
-              readOnly
-            />{" "}
-            Groupement de DASRI sur un site relevant de la rubrique 2718
-          </p>
+                            <p>
+                              <input
+                                type="checkbox"
+                                checked={bsdasri?.type === BsdasriType.GROUPING}
+                                readOnly
+                              />{" "}
+                              Groupementeee de DASRI sur un site relevant de la rubrique 2718
+                            </p>
           <p>
             <input
               type="checkbox"
