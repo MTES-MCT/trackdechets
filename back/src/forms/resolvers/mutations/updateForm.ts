@@ -107,6 +107,7 @@ const updateFormResolver = async (
     // On supprime le premier transporteur en gardant les suivants (s'ils existent)
     // L'ordre des transporteurs se décale.
     transporters = { delete: { id: existingFirstTransporter.id } };
+    transportersForValidation.shift();
   } else if (formContent.transporter) {
     const transporterData = flattenTransporterInput(formContent);
     if (existingFirstTransporter) {
