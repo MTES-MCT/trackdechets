@@ -49,6 +49,9 @@
         "development": {
           "skipTypeCheck": true
         },
+        "integration": {
+          "skipTypeCheck": true
+        },
         "production": {
           "esbuildOptions": {
             "sourcemap": false,
@@ -69,6 +72,9 @@
       "configurations": {
         "development": {
           "buildTarget": "queues-webhooks:build:development"
+        },
+        "integration": {
+          "buildTarget": "queues-webhooks:build:integration"
         },
         "production": {
           "buildTarget": "queues-webhooks:build:production"

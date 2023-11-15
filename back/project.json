@@ -47,7 +47,8 @@
         "integration": {
           "jestConfig": "back/jest.config.integration.js",
           "runInBand": true,
-          "forceExit": true
+          "forceExit": true,
+          "codeCoverage": false
         }
       }
     },
