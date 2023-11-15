@@ -303,15 +303,6 @@ export default function CompanySelector({
 
       const results = [...reshapedSearchResults, ...reshapedFavorites];
 
-      // If the form is empty, we auto-select the first result.
-      if (
-        initialAutoSelectFirstCompany &&
-        !optional &&
-        results.length >= 1 &&
-        !orgId
-      ) {
-        selectCompany(results[0]);
-      }
       return results;
     },
     [
@@ -323,6 +314,26 @@ export default function CompanySelector({
       skipFavorite
     ]
   );
+
+  useEffect(() => {
+    const results = mergedResults.current;
+    // If the form is empty, we auto-select the first result.
+    if (
+      initialAutoSelectFirstCompany &&
+      !optional &&
+      results &&
+      results.length >= 1 &&
+      !orgId
+    ) {
+      selectCompany(results[0]);
+    }
+  }, [
+    mergedResults.current,
+    initialAutoSelectFirstCompany,
+    optional,
+    orgId,
+    selectCompany
+  ]);
 
   const onSearch = useMemo(() => {
     async function triggerSearch(
