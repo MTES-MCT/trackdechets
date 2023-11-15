@@ -14,7 +14,7 @@ import {
   blankstate_reviews_desc,
   blankstate_reviews_title
 } from "../Apps/common/wordings/dashboard/wordingsDashboard";
-import { BsdWhere, OrderType, QueryBsdsArgs } from "../generated/graphql/types";
+import { BsdWhere, OrderType, QueryBsdsArgs } from "codegen-ui";
 import { filterList, filterPredicates } from "../Apps/Dashboard/dashboardUtils";
 
 export type Tabs = {

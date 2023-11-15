@@ -47,6 +47,7 @@ import {
   getRoutePredicate,
   Tabs
 } from "./Dashboard.utils";
+import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 
 const DashboardPage = () => {
   const { permissions } = usePermissions();
@@ -165,6 +166,9 @@ const DashboardPage = () => {
       });
     }
   }, [tabs]);
+
+  // Be notified if someone else modifies bsds
+  useNotifier(siret, () => fetchBsds(siret, bsdsVariables, tabs));
 
   const [
     fetchBsdaRevisions,
