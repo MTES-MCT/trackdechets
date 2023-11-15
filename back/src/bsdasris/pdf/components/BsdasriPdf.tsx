@@ -537,7 +537,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               checked={bsdasri?.type === BsdasriType.GROUPING}
               readOnly
             />{" "}
-            Groupementeee de DASRI sur un site relevant de la rubrique 2718
+            Groupement de DASRI sur un site relevant de la rubrique 2718
           </p>
           <p>
             <input
