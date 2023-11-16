@@ -128,7 +128,7 @@ export const dropdown_create_bsdd = "Déchets dangereux";
 export const dropdown_create_bsda = "Amiante";
 export const dropdown_create_bsdasri = "DASRI";
 export const dropdown_create_bsvhu = "Véhicule Hors d’Usage";
-export const dropdown_create_bsff = "Fluide Frigorifique";
+export const dropdown_create_bsff = "Fluide Frigorigène";
 
 export const bsddValidationDraftText = `Cette action aura pour effet de valider les données du bordereau et
             de le faire apparaitre dans l'onglet "Pour action" de l'émetteur
