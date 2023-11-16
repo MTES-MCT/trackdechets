@@ -66,6 +66,8 @@ import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../Apps/common/que
 import { formTransportIsPipeline } from "../../../form/bsdd/utils/packagings";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { STATUS_LABELS } from "shared/constants";
+import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
+import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -509,6 +511,7 @@ const Appendix1 = ({
       )
     : [];
 
+  const formToBsdDisplay = mapBsdd(container);
   return (
     <div className="tw-w-full">
       {container.status === FormStatus.Draft && (
@@ -520,18 +523,19 @@ const Appendix1 = ({
       )}
       {[FormStatus.Sealed, FormStatus.Sent].some(
         status => status === container.status
-      ) && (
-        <div className="tw-pb-2 tw-flex tw-justify-end">
-          <button
-            type="button"
-            className="btn btn--outline-primary"
-            onClick={() => setIsOpen(true)}
-          >
-            <IconPdf size="16px" color="blueLight" />
-            <span>Ajouter une annexe 1</span>
-          </button>
-        </div>
-      )}
+      ) &&
+        canAddAppendix1(formToBsdDisplay) && (
+          <div className="tw-pb-2 tw-flex tw-justify-end">
+            <button
+              type="button"
+              className="btn btn--outline-primary"
+              onClick={() => setIsOpen(true)}
+            >
+              <IconPdf size="16px" color="blueLight" />
+              <span>Ajouter une annexe 1</span>
+            </button>
+          </div>
+        )}
       {container?.grouping && container.grouping.length > 0 ? (
         <table className="td-table">
           <thead>
