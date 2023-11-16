@@ -120,7 +120,7 @@ const updateFormResolver = async (
         }
       };
       // on remplace le premier transporteur par la fusion du trs en db et du payload
-      // on conserve la chaîne eventuelle de transporteurs caraceratins validations portent sur l'ensemble des transporteurs
+      // on conserve la chaîne eventuelle de transporteurs car certaines validations portent sur l'ensemble des transporteurs
       // (eg. poids max et mode de transport)
       transportersForValidation[0] = {
         ...existingFirstTransporter,
