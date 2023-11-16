@@ -421,7 +421,7 @@ export const isSignEmission = (
 };
 
 // s'inspire de https://github.com/MTES-MCT/trackdechets/blob/dev/back/src/forms/validation.ts#L1897
-const canAddAppendix1 = bsd => {
+export const canAddAppendix1 = bsd => {
   // Once one of the appendix has been signed by the transporter,
   // you have 3 days maximum to add new appendix
   const currentDate = new Date();

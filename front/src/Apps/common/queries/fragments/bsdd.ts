@@ -370,6 +370,7 @@ export const detailFormFragment = gql`
       form {
         status
         readableId
+        takenOverAt
         emitter {
           type
         }
