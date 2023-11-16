@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import toast from "react-hot-toast";
 import classNames from "classnames";
 import Select from "react-select";
@@ -26,7 +26,7 @@ type IntermediariesSelect = {
   label: string;
 };
 
-export default function Recipient({ disabled }) {
+function Recipient({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Form>();
   const hasTrader = !!values.trader;
   const hasBroker = !!values.broker;
@@ -114,6 +114,41 @@ export default function Recipient({ disabled }) {
       setFieldValue("temporaryStorageDetail", null, false);
     }
   }
+
+  const onCompanyTraderSelected = useCallback(
+    trader => {
+      if (trader?.traderReceipt) {
+        setFieldValue("trader.receipt", trader.traderReceipt.receiptNumber);
+        setFieldValue(
+          "trader.validityLimit",
+          trader.traderReceipt.validityLimit
+        );
+        setFieldValue("trader.department", trader.traderReceipt.department);
+      } else {
+        setFieldValue("trader.receipt", "");
+        setFieldValue("trader.validityLimit", null);
+        setFieldValue("trader.department", "");
+      }
+    },
+    [setFieldValue]
+  );
+  const onCompanyBrokerSelected = useCallback(
+    broker => {
+      if (broker?.brokerReceipt) {
+        setFieldValue("broker.receipt", broker.brokerReceipt.receiptNumber);
+        setFieldValue(
+          "broker.validityLimit",
+          broker.brokerReceipt.validityLimit
+        );
+        setFieldValue("broker.department", broker.brokerReceipt.department);
+      } else {
+        setFieldValue("broker.receipt", "");
+        setFieldValue("broker.validityLimit", null);
+        setFieldValue("broker.department", "");
+      }
+    },
+    [setFieldValue]
+  );
 
   return (
     <>
@@ -224,26 +259,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           <h4 className="form__section-heading">Négociant</h4>
           <CompanySelector
             name="trader.company"
-            onCompanySelected={trader => {
-              if (trader?.traderReceipt) {
-                setFieldValue(
-                  "trader.receipt",
-                  trader.traderReceipt.receiptNumber
-                );
-                setFieldValue(
-                  "trader.validityLimit",
-                  trader.traderReceipt.validityLimit
-                );
-                setFieldValue(
-                  "trader.department",
-                  trader.traderReceipt.department
-                );
-              } else {
-                setFieldValue("trader.receipt", "");
-                setFieldValue("trader.validityLimit", null);
-                setFieldValue("trader.department", "");
-              }
-            }}
+            onCompanySelected={onCompanyTraderSelected}
           />
 
           <div className="form__row">
@@ -300,26 +316,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           <h4 className="form__section-heading">Courtier</h4>
           <CompanySelector
             name="broker.company"
-            onCompanySelected={broker => {
-              if (broker?.brokerReceipt) {
-                setFieldValue(
-                  "broker.receipt",
-                  broker.brokerReceipt.receiptNumber
-                );
-                setFieldValue(
-                  "broker.validityLimit",
-                  broker.brokerReceipt.validityLimit
-                );
-                setFieldValue(
-                  "broker.department",
-                  broker.brokerReceipt.department
-                );
-              } else {
-                setFieldValue("broker.receipt", "");
-                setFieldValue("broker.validityLimit", null);
-                setFieldValue("broker.department", "");
-              }
-            }}
+            onCompanySelected={onCompanyBrokerSelected}
           />
 
           <div className="form__row">
@@ -393,3 +390,4 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
     </>
   );
 }
+export default React.memo(Recipient);

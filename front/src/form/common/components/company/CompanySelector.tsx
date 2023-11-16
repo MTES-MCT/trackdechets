@@ -70,7 +70,7 @@ interface CompanySelectorProps {
   initialAutoSelectFirstCompany?: boolean;
 }
 
-export default function CompanySelector({
+function CompanySelector({
   name,
   onCompanySelected,
   allowForeignCompanies = false,
@@ -203,6 +203,33 @@ export default function CompanySelector({
   const isUnknownCompanyName = (companyName?: string): boolean => {
     return companyName === "---" || companyName === "";
   };
+
+  const updateFields = useCallback(
+    company => {
+      // Prépare la mise à jour du Form
+      const fields: FormCompany = {
+        orgId: company.orgId,
+        siret: company.siret,
+        vatNumber: company.vatNumber,
+        name:
+          company.name && !isUnknownCompanyName(company.name)
+            ? company.name
+            : "",
+        address: company.address ?? "",
+        contact: company.contact ?? "",
+        phone: company.contactPhone ?? "",
+        mail: company.contactEmail ?? "",
+        country: company.codePaysEtrangerEtablissement
+      };
+      Object.keys(fields).forEach(key => {
+        setFieldValue(`${field.name}.${key}`, fields[key]);
+      });
+
+      setFieldTouched(`${field.name}`, true, true);
+    },
+    [field.name, setFieldTouched, setFieldValue]
+  );
+
   const selectCompany = useCallback(
     (company?: CompanySearchResult) => {
       if (disabled) return;
@@ -223,25 +250,7 @@ export default function CompanySelector({
         isForeignVat(company.vatNumber!) && isUnknownCompanyName(company.name!)
       );
       setIsForeignCompany(isForeignVat(company.vatNumber!));
-      // Prépare la mise à jour du Form
-      const fields: FormCompany = {
-        orgId: company.orgId,
-        siret: company.siret,
-        vatNumber: company.vatNumber,
-        name:
-          company.name && !isUnknownCompanyName(company.name)
-            ? company.name
-            : "",
-        address: company.address ?? "",
-        contact: company.contact ?? "",
-        phone: company.contactPhone ?? "",
-        mail: company.contactEmail ?? "",
-        country: company.codePaysEtrangerEtablissement
-      };
-      Object.keys(fields).forEach(key => {
-        setFieldValue(`${field.name}.${key}`, fields[key]);
-      });
-      setFieldTouched(`${field.name}`, true, true);
+      updateFields(company);
       onCompanySelected?.(company);
       setSelectedCompanyDetails({
         name: company.name,
@@ -254,9 +263,20 @@ export default function CompanySelector({
       onCompanySelected,
       registeredOnlyCompanies,
       setFieldTouched,
-      setFieldValue
+      setFieldValue,
+      updateFields
     ]
   );
+
+  const handleSelect = useCallback(
+    company => {
+      selectCompany(company);
+    },
+    [selectCompany]
+  );
+  const handleUnselect = useCallback(() => {
+    selectCompany();
+  }, [selectCompany]);
 
   /**
    * Merge searchCompanies et favoritesData
@@ -386,6 +406,19 @@ export default function CompanySelector({
     (!!selectedCompanyDetails.address &&
       !displayForeignCompanyWithUnknownInfos);
 
+  const seletedItem = {
+    orgId,
+    siret: field.value?.siret,
+    vatNumber: field.value?.vatNumber,
+    name: field.value?.name,
+    address: field.value?.address,
+    codePaysEtrangerEtablissement: field.value?.country,
+    // complete with companyPrivateInfos data
+    ...(savedCompanyInfos && {
+      ...savedCompanyInfos
+    })
+  } as CompanySearchResult;
+
   return (
     <>
       {favoritesError && (
@@ -512,29 +545,17 @@ export default function CompanySelector({
             }
           />
         )}
-        {searchData?.searchCompanies.length === 0 && !isLoadingSearch && (
-          <span>Aucun établissement ne correspond à cette recherche...</span>
-        )}
+        {memoizedSearchData?.searchCompanies.length === 0 &&
+          !isLoadingSearch && (
+            <span>Aucun établissement ne correspond à cette recherche...</span>
+          )}
         <RedErrorMessage name={`${field.name}.siret`} />
         {!isLoadingCompanyPrivateData && (
           <CompanyResults<CompanySearchResult>
-            onSelect={company => selectCompany(company)}
-            onUnselect={() => selectCompany()}
+            onSelect={handleSelect}
+            onUnselect={handleUnselect}
             results={searchResults || []}
-            selectedItem={
-              {
-                orgId,
-                siret: field.value?.siret,
-                vatNumber: field.value?.vatNumber,
-                name: field.value?.name,
-                address: field.value?.address,
-                codePaysEtrangerEtablissement: field.value?.country,
-                // complete with companyPrivateInfos data
-                ...(savedCompanyInfos && {
-                  ...savedCompanyInfos
-                })
-              } as CompanySearchResult
-            }
+            selectedItem={seletedItem}
           />
         )}
         <div className="form__row">
@@ -625,3 +646,5 @@ export default function CompanySelector({
     </>
   );
 }
+
+export default React.memo(CompanySelector);
