@@ -1330,7 +1330,7 @@ describe("Bsda sub-resolvers in query bsds", () => {
 
     const bsdaSuite = createBsda;
 
-    await refreshElasticSearch();
+    await refreshElasticSearch(2000);
 
     const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
       GET_BSDS,
@@ -1404,7 +1404,7 @@ describe("Bsda sub-resolvers in query bsds", () => {
     );
 
     const bsdaSuite = createBsda;
-    await refreshElasticSearch();
+    await refreshElasticSearch(2000);
 
     // Le BSDA initial est dissocié du BSDA de regroupement
     const { errors } = await mutate<
@@ -1478,7 +1478,7 @@ describe("Bsda sub-resolvers in query bsds", () => {
     );
     const bsdaSuite = createBsda;
 
-    await refreshElasticSearch();
+    await refreshElasticSearch(2000);
 
     const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
       GET_BSDS,
@@ -1549,7 +1549,7 @@ describe("Bsda sub-resolvers in query bsds", () => {
     );
     const bsdaSuite = createBsda;
 
-    await refreshElasticSearch();
+    await refreshElasticSearch(2000);
 
     // Le BSDA initial est dissocié du BSDA de réexpedition
     const { errors } = await mutate<
