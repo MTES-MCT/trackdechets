@@ -33,21 +33,34 @@ export async function truncateDatabase() {
   const tablenames: Array<{ tablename: string }> =
     await prisma.$queryRaw`SELECT tablename FROM pg_tables WHERE schemaname=${dbSchemaName};`;
 
-  const tables = tablenames
-    .map(({ tablename }) => `"${dbSchemaName}"."${tablename}"`)
-    .join(", ");
+  // Reset data
+  await Promise.all(
+    tablenames.map(({ tablename }) =>
+      prisma.$executeRawUnsafe(
+        `ALTER TABLE "${dbSchemaName}"."${tablename}" DISABLE TRIGGER ALL;`
+      )
+    )
+  );
+  await Promise.all(
+    tablenames.map(({ tablename }) =>
+      prisma.$executeRawUnsafe(`DELETE FROM "${dbSchemaName}"."${tablename}";`)
+    )
+  );
+  await Promise.all(
+    tablenames.map(({ tablename }) =>
+      prisma.$executeRawUnsafe(
+        `ALTER TABLE "${dbSchemaName}"."${tablename}" ENABLE TRIGGER ALL;`
+      )
+    )
+  );
 
-  return Promise.all([
-    // Reset data
-    prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tables} CASCADE;`),
-    // Reset sequences
-    prisma.$executeRawUnsafe(`
-      SELECT SETVAL(c.oid, 1)
-      from pg_class c JOIN pg_namespace n 
-      on n.oid = c.relnamespace 
-      where c.relkind = 'S' and n.nspname = '${dbSchemaName}';
-    `)
-  ]);
+  // Reset sequences
+  await prisma.$executeRawUnsafe(`
+    SELECT SETVAL(c.oid, 1)
+    from pg_class c JOIN pg_namespace n 
+    on n.oid = c.relnamespace 
+    where c.relkind = 'S' and n.nspname = '${dbSchemaName}';
+  `);
 }
 
 export async function resetDatabase() {
