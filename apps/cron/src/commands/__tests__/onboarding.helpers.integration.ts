@@ -30,8 +30,8 @@ import {
   getRecentlyRegisteredProducers,
   getRecentlyRegisteredProfesionals,
   getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
-  xDaysAgo
 } from "../onboarding.helpers";
+import { xDaysAgo } from "../helpers";
 
 const TODAY = new Date();
 const ONE_DAY_AGO = xDaysAgo(TODAY, 1);

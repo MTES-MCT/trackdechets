@@ -1,4 +1,4 @@
-import { xDaysAgo } from "../onboarding.helpers";
+import { xDaysAgo } from "../helpers";
 
 jest.mock("back", () => ({
   initSentry: jest.fn()

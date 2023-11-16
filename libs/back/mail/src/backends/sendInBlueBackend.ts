@@ -57,7 +57,7 @@ const sendInBlueBackend = {
       templateId: mail.templateId,
       params: params
     };
-    if (!!mail.attachment) {
+    if (mail.attachment) {
       payload["attachment"] = [
         {
           name: mail.attachment.name,
@@ -95,7 +95,7 @@ const sendInBlueBackend = {
         }
       })
       .catch(err => {
-        if (!!SENTRY_DSN) {
+        if (SENTRY_DSN) {
           Sentry.captureException(err, {
             tags: {
               Mailer: "SendInBlue",

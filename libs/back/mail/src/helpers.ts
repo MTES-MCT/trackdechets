@@ -1,4 +1,4 @@
-const unwantedChars = /\*|\//g;
+const unwantedChars = /[*/]/g;
 /**
  * Remove * and / special chars appearing on some individual companies
  * @param name string
