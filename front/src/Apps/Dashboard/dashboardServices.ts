@@ -425,13 +425,16 @@ const canAddAppendix1 = bsd => {
   // Once one of the appendix has been signed by the transporter,
   // you have 3 days maximum to add new appendix
   const currentDate = new Date();
-  const firstTransporterSignatureDate = bsd.grouping?.reduce((date, form) => {
-    // @ts-ignore
-    const { takenOverAt } = form;
-
-    return takenOverAt && takenOverAt < date ? takenOverAt : date;
-  }, currentDate);
-
+  const { grouping } = bsd;
+  const firstFormSignatureDate = grouping?.find(({ form }) => {
+    if (form.takenOverAt) {
+      return form.takenOverAt;
+    }
+    return "";
+  });
+  const firstTransporterSignatureDate = !!firstFormSignatureDate
+    ? new Date(firstFormSignatureDate.form.takenOverAt)
+    : currentDate;
   const limitDate = sub(currentDate, {
     days: 2,
     hours: currentDate.getHours(),
