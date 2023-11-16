@@ -375,6 +375,21 @@ describe("BSVHU validation", () => {
       expect(res).not.toBeUndefined();
     });
 
+    test("should work if operation mode is missing but step is not operation", async () => {
+      const data = {
+        ...bsvhu,
+        destinationOperationCode: "D 9",
+        destinationOperationMode: undefined, // Correct modes is ELIMINATION
+        destinationReceptionWeight: 10,
+        destinationReceptionAcceptationStatus: "ACCEPTED"
+      };
+
+      const res = await validateBsvhu(data as any, {
+        transportSignature: true
+      });
+      expect(res).not.toBeUndefined();
+    });
+
     test.each([
       ["D 9", OperationMode.VALORISATION_ENERGETIQUE], // Correct modes are ELIMINATION
       ["R 12", OperationMode.VALORISATION_ENERGETIQUE] // R12 has no associated mode
