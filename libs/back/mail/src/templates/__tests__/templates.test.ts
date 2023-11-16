@@ -16,6 +16,7 @@ import {
 } from "..";
 import { toFrFormat } from "../../helpers";
 import { renderMail } from "../renderers";
+import "@td/env";
 
 const to = [{ name: "John Snow", email: "john.snow@trackdechets.fr" }];
 
