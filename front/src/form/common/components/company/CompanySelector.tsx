@@ -111,8 +111,9 @@ export default function CompanySelector({
   const departmentInputRef = useRef<HTMLInputElement>(null);
   const clueInputRef = useRef<HTMLInputElement>(null);
   const [mustBeRegistered, setMustBeRegistered] = useState<boolean>(false);
-  const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
-  const mergedResults = useRef<CompanySearchResult[]>();
+  const [searchResults, setSearchResults] = useState<
+    CompanySearchResult[] | undefined
+  >([]);
 
   const [
     displayForeignCompanyWithUnknownInfos,
@@ -141,11 +142,7 @@ export default function CompanySelector({
           : FavoriteType.Emitter,
         allowForeignCompanies
       },
-      skip: skipFavorite || !siret,
-      onCompleted: data => {
-        const results = mergeResults([], data?.favorites ?? []);
-        mergedResults.current = results;
-      }
+      skip: skipFavorite || !siret
     }
   );
 
@@ -156,16 +153,7 @@ export default function CompanySelector({
     searchCompaniesQuery,
     { loading: isLoadingSearch, data: searchData, error }
   ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
-    SEARCH_COMPANIES,
-    {
-      onCompleted: data => {
-        const results = mergeResults(
-          data?.searchCompanies ?? [],
-          favoritesData?.favorites ?? []
-        );
-        mergedResults.current = results;
-      }
-    }
+    SEARCH_COMPANIES
   );
 
   /**
@@ -302,11 +290,31 @@ export default function CompanySelector({
     [disabled, skipFavorite]
   );
 
-  useEffect(() => {
-    if (searchData || favoritesData) {
-      setSearchResults(mergedResults.current || []);
-    }
+  const memoizedSearchData = useMemo(() => searchData, [searchData]);
+  const memoizedFavoritesData = useMemo(() => favoritesData, [favoritesData]);
 
+  useEffect(() => {
+    if (memoizedSearchData?.searchCompanies?.length) {
+      const results = mergeResults(
+        memoizedSearchData?.searchCompanies ?? [],
+        memoizedFavoritesData?.favorites ?? []
+      );
+      setSearchResults(results);
+    }
+  }, [
+    memoizedFavoritesData?.favorites,
+    mergeResults,
+    memoizedSearchData?.searchCompanies
+  ]);
+
+  useEffect(() => {
+    if (memoizedFavoritesData?.favorites?.length) {
+      const results = mergeResults([], memoizedFavoritesData?.favorites ?? []);
+      setSearchResults(results);
+    }
+  }, [memoizedFavoritesData?.favorites, mergeResults]);
+
+  useEffect(() => {
     // If the form is empty, we auto-select the first result.
     if (
       initialAutoSelectFirstCompany &&
@@ -318,12 +326,10 @@ export default function CompanySelector({
       selectCompany(searchResults[0]);
     }
   }, [
-    searchData,
-    favoritesData,
     initialAutoSelectFirstCompany,
     optional,
-    searchResults,
     orgId,
+    searchResults,
     selectCompany
   ]);
 
@@ -514,7 +520,7 @@ export default function CompanySelector({
           <CompanyResults<CompanySearchResult>
             onSelect={company => selectCompany(company)}
             onUnselect={() => selectCompany()}
-            results={searchResults}
+            results={searchResults || []}
             selectedItem={
               {
                 orgId,
