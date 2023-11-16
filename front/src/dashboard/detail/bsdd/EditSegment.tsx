@@ -22,6 +22,7 @@ import {
 } from "../../../common/components";
 import { isForeignVat } from "shared/constants";
 import { transporterCompanySchema } from "../../../common/validation/schema";
+import { TOAST_DURATION } from "../../../common/config";
 
 const EDIT_SEGMENT = gql`
   mutation editSegment(
@@ -70,7 +71,7 @@ export default function EditSegment({ siret, segment }: Props) {
     onCompleted: () => {
       setIsOpen(false);
       toast.success("Le segment de transport a été modifié", {
-        duration: 5
+        duration: TOAST_DURATION
       });
     }
   });

@@ -27,6 +27,8 @@ import {
   GET_BSDASRI,
   UPDATE_BSDASRI
 } from "./utils/queries";
+import { TOAST_DURATION } from "../../common/config";
+
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (dasriForm: Bsdasri | undefined) => ReactElement;
@@ -201,7 +203,7 @@ export default function BsdasriStepsList(props: Props) {
     ) {
       if (!values?.grouping?.length) {
         toast.error("Vous devez sélectionner des bordereaux à grouper", {
-          duration: 7
+          duration: TOAST_DURATION
         });
         return;
       }

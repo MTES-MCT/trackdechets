@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 import { GET_BSDS } from "../../../../../Apps/common/queries";
 import { Loader } from "../../../../../Apps/common/Components";
+import { TOAST_DURATION } from "../../../../../common/config";
 
 const DELETE_BSDASRI = gql`
   mutation DeleteBsdasri($id: ID!) {
@@ -33,12 +34,12 @@ export function DeleteBsdasriModal({
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success("Bordereau supprimé", { duration: 2000 });
+      toast.success("Bordereau supprimé", { duration: TOAST_DURATION });
       !!onClose && onClose();
     },
     onError: () =>
       toast.error("Le bordereau n'a pas pu être supprimé", {
-        duration: 5
+        duration: TOAST_DURATION
       })
   });
 

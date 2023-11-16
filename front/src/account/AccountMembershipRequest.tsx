@@ -8,6 +8,7 @@ import Loader from "../Apps/common/Components/Loader/Loaders";
 import { MembershipRequestStatus, Mutation, Query, UserRole } from "codegen-ui";
 import { useHistory, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { TOAST_DURATION } from "../common/config";
 
 const MEMBERSHIP_REQUEST = gql`
   query MembershipRequest($id: ID!) {
@@ -66,7 +67,7 @@ export default function AccountMembershipRequest() {
     {
       onCompleted: () => {
         toast.success("La demande de rattachement a bien été acceptée", {
-          duration: 5
+          duration: TOAST_DURATION
         });
         history.push("/");
       }
@@ -81,7 +82,7 @@ export default function AccountMembershipRequest() {
     {
       onCompleted: () => {
         toast.success("La demande de rattachement a bien été refusée", {
-          duration: 5
+          duration: TOAST_DURATION
         });
         history.push("/");
       }

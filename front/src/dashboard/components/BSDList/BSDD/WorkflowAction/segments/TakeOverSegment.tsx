@@ -21,6 +21,7 @@ import { WorkflowActionProps } from "../WorkflowAction";
 import { GET_BSDS } from "../../../../../../Apps/common/queries";
 import { Loader } from "../../../../../../Apps/common/Components";
 import { GET_FORM } from "../../../../../../form/bsdd/utils/queries";
+import { TOAST_DURATION } from "../../../../../../common/config";
 
 const TAKE_OVER_SEGMENT = gql`
   mutation takeOverSegment($id: ID!, $takeOverInfo: TakeOverInput!) {
@@ -57,7 +58,7 @@ function TakeOverSegmentModal({ formId, onClose }: TakeOverSegmentModalProps) {
     onCompleted: () => {
       onClose();
       toast.success("La prise en charge du bordereau est validée", {
-        duration: 5
+        duration: TOAST_DURATION
       });
     },
     onError: () => {

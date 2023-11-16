@@ -22,6 +22,7 @@ import {
 } from "../../../../common/wordings/dashboard/wordingsDashboard";
 import { generatePath, Link } from "react-router-dom";
 import routes from "../../../../routes";
+import { TOAST_DURATION } from "../../../../../common/config";
 
 const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
   const MARK_AS_SEALED = gql`
@@ -93,12 +94,12 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
       awaitRefetchQueries: true,
       onCompleted: () => {
         toast.success(`Bordereau ${bsd.id} publié`, {
-          duration: 5
+          duration: TOAST_DURATION
         });
       },
       onError: () =>
         toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
-          duration: 5
+          duration: TOAST_DURATION
         })
     }
   );
@@ -120,11 +121,13 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
         refetchQueries: [GET_BSDS],
         awaitRefetchQueries: true,
         onCompleted: () => {
-          toast.success(`Bordereau ${bsd.id} publié`, { duration: 2000 });
+          toast.success(`Bordereau ${bsd.id} publié`, {
+            duration: TOAST_DURATION
+          });
         },
         onError: () =>
           toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
-            duration: 5
+            duration: TOAST_DURATION
           })
       }
     );

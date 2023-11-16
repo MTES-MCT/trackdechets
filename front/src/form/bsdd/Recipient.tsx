@@ -19,6 +19,7 @@ import {
   getInitialTrader
 } from "./utils/initial-state";
 import { IntermediariesSelector } from "../bsda/components/intermediaries/IntermediariesSelector";
+import { TOAST_DURATION } from "../../common/config";
 
 type IntermediariesSelect = {
   value: string;
@@ -92,7 +93,7 @@ export default function Recipient({ disabled }) {
     toast.success(
       "Nouvel intermédiaire ajouté en bas de page: merci de chercher un SIRET ou un nom d'entreprise pour lancer une recherche.",
       {
-        duration: 3,
+        duration: TOAST_DURATION,
         position: "bottom-right"
       }
     );

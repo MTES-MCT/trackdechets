@@ -1,5 +1,6 @@
 import { ApolloError } from "@apollo/client";
 import toast from "react-hot-toast";
+import { TOAST_DURATION } from "../../../common/config";
 
 /**
  * Common toaster display for ApolloError on form submission
@@ -11,7 +12,7 @@ export const formInputToastError = (err: ApolloError) => {
       if (gqerr.message === err.message) {
         return;
       }
-      toast.error(gqerr.message, { duration: 7 });
+      toast.error(gqerr.message, { duration: TOAST_DURATION });
     });
-  err.message && toast.error(err.message, { duration: 7 });
+  err.message && toast.error(err.message, { duration: TOAST_DURATION });
 };

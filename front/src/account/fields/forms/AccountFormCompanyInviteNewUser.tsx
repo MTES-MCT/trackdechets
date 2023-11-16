@@ -13,6 +13,7 @@ import {
 } from "codegen-ui";
 import toast from "react-hot-toast";
 import TdTooltip from "../../../common/components/Tooltip";
+import { TOAST_DURATION } from "../../../common/config";
 
 type Props = {
   company: CompanyPrivate;
@@ -61,13 +62,13 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
     MutationInviteUserToCompanyArgs
   >(INVITE_USER_TO_COMPANY, {
     onCompleted: () => {
-      toast.success("Invitation envoyée", { duration: 2000 });
+      toast.success("Invitation envoyée", { duration: TOAST_DURATION });
     },
     onError: () => {
       toast.error(
         "L'invitation n'a pas pu être envoyée. Veuillez réessayer dans quelques minutes.",
         {
-          duration: 5
+          duration: TOAST_DURATION
         }
       );
     }

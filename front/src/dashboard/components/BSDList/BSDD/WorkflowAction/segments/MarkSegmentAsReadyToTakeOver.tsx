@@ -11,6 +11,7 @@ import { NotificationError } from "../../../../../../Apps/common/Components/Erro
 import { WorkflowActionProps } from "../WorkflowAction";
 import { GET_BSDS } from "../../../../../../Apps/common/queries";
 import { Loader } from "../../../../../../Apps/common/Components";
+import { TOAST_DURATION } from "../../../../../../common/config";
 
 const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
   mutation markSegmentAsReadyToTakeOver($id: ID!) {
@@ -33,7 +34,7 @@ export function MarkSegmentAsReadyToTakeOver({ form }: WorkflowActionProps) {
       setIsOpen(false);
       toast.success(
         "Le bordereau est prêt à être pris en charge par le transporteur suivant",
-        { duration: 2000 }
+        { duration: TOAST_DURATION }
       );
     },
     onError: () => {
