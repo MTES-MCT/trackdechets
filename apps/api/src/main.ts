@@ -1,5 +1,4 @@
-import { httpServer, startApolloServer } from "back";
-import { closeQueues } from "back";
+import { httpServer, startApolloServer, closeQueues } from "back";
 import { cpuProfiling, memorySampling } from "./heapSnapshot";
 import { envVariables } from "@td/env";
 
