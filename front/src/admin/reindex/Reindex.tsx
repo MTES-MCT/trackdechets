@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { gql, useMutation } from "@apollo/client";
 import { Mutation, MutationReindexBsdArgs } from "codegen-ui";
 import { InlineError } from "../../Apps/common/Components/Error/Error";
+import { TOAST_DURATION } from "../../common/config";
 
 const REINDEX_BSD = gql`
   mutation reindexBsd($id: ID!) {
@@ -26,9 +27,11 @@ function Reindex() {
           const res = await reindexBsd({ variables: { id: values.bsdid } });
           resetForm();
           !!res?.data?.reindexBsd
-            ? toast.success(`Réindexation effectuée`, { duration: 3 })
+            ? toast.success(`Réindexation effectuée`, {
+                duration: TOAST_DURATION
+              })
             : toast.error(`Cet identifiant ne correspond pas à un bordereau`, {
-                duration: 3
+                duration: TOAST_DURATION
               });
         }}
       >

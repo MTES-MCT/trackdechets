@@ -14,6 +14,7 @@ import {
   MutationRemoveUserFromCompanyArgs,
   MutationDeleteInvitationArgs
 } from "codegen-ui";
+import { TOAST_DURATION } from "../common/config";
 
 type Props = {
   company: CompanyPrivate;
@@ -81,11 +82,11 @@ export default function AccountCompanyMember({ company, user }: Props) {
     MutationDeleteInvitationArgs
   >(DELETE_INVITATION, {
     onCompleted: () => {
-      toast.success("Invitation supprimée", { duration: 2000 });
+      toast.success("Invitation supprimée", { duration: TOAST_DURATION });
     },
     onError: () => {
       toast.error("L'invitation n'a pas pu être supprimée", {
-        duration: 5
+        duration: TOAST_DURATION
       });
     }
   });
@@ -93,13 +94,13 @@ export default function AccountCompanyMember({ company, user }: Props) {
     RESEND_INVITATION,
     {
       onCompleted: () => {
-        toast.success("Invitation renvoyée", { duration: 2000 });
+        toast.success("Invitation renvoyée", { duration: TOAST_DURATION });
       },
       onError: () => {
         toast.error(
           "L'invitation n'a pas pu être renvoyée. Veuillez réessayer dans quelques minutes.",
           {
-            duration: 5
+            duration: TOAST_DURATION
           }
         );
       }

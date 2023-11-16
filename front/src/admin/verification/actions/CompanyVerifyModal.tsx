@@ -10,6 +10,7 @@ import {
   MutationVerifyCompanyByAdminArgs
 } from "codegen-ui";
 import { NotificationError } from "../../../Apps/common/Components/Error/Error";
+import { TOAST_DURATION } from "../../../common/config";
 
 type VerifyModalProps = {
   isOpen: boolean;
@@ -42,12 +43,12 @@ export default function CompanyVerifyModal({
     MutationVerifyCompanyByAdminArgs
   >(VERIFY_COMPANY_BY_ADMIN, {
     onCompleted: () => {
-      toast.success("Verification envoyée", { duration: 2000 });
+      toast.success("Verification envoyée", { duration: TOAST_DURATION });
       return onClose();
     },
     onError: () => {
       toast.error("La vérification n'a pas pu être envoyée", {
-        duration: 5
+        duration: TOAST_DURATION
       });
     }
   });

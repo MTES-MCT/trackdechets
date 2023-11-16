@@ -16,6 +16,7 @@ import {
 } from "../utils/initial-state";
 import { CREATE_FORM, UPDATE_FORM } from "../utils/queries";
 import WorkSite from "../../common/components/work-site/WorkSite";
+import { TOAST_DURATION } from "../../../common/config";
 
 export function Appendix1ProducerForm({
   container,
@@ -75,7 +76,7 @@ export function Appendix1ProducerForm({
             });
             close();
           } catch (err: any) {
-            toast.error(err.message, { duration: 10 });
+            toast.error(err.message, { duration: TOAST_DURATION });
             setSubmitting(false);
           }
         }}

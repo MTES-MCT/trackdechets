@@ -7,6 +7,7 @@ import { Loader } from "../../../../../Apps/common/Components";
 
 import { useParams, useHistory } from "react-router-dom";
 import { InlineError } from "../../../../../Apps/common/Components/Error/Error";
+import { TOAST_DURATION } from "../../../../../common/config";
 
 import toast from "react-hot-toast";
 
@@ -29,7 +30,7 @@ export function RouteControlPdf() {
   >(CREATE_PDF_ACCESS_TOKEN, {
     onError: () =>
       toast.error(`Le QR-code n'a pas pu être affiché`, {
-        duration: 5
+        duration: TOAST_DURATION
       })
   });
 

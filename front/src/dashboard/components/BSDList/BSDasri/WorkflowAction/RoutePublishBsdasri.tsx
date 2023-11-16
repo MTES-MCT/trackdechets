@@ -19,6 +19,7 @@ import {
   GET_DETAIL_DASRI_WITH_METADATA,
   GET_BSDS
 } from "../../../../../Apps/common/queries";
+import { TOAST_DURATION } from "../../../../../common/config";
 
 import EmptyDetail from "../../../../detail/common/EmptyDetailView";
 import toast from "react-hot-toast";
@@ -56,12 +57,14 @@ export function RoutePublishBsdasri() {
         refetchQueries: [GET_BSDS],
         awaitRefetchQueries: true,
         onCompleted: () => {
-          toast.success(`Bordereau ${formId} publié`, { duration: 2000 });
+          toast.success(`Bordereau ${formId} publié`, {
+            duration: TOAST_DURATION
+          });
           history.goBack();
         },
         onError: () =>
           toast.error(`Le bordereau ${formId} n'a pas pu être publié`, {
-            duration: 5
+            duration: TOAST_DURATION
           })
       }
     );

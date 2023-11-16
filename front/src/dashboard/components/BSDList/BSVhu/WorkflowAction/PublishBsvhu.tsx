@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { generatePath, Link } from "react-router-dom";
 import routes from "../../../../../Apps/routes";
 import { GET_BSDS } from "../../../../../Apps/common/queries";
+import { TOAST_DURATION } from "../../../../../common/config";
 
 const PUBLISH_BSVHU = gql`
   mutation PublishBsvhu($id: ID!) {
@@ -32,11 +33,13 @@ export default function PublishBsvhu({ form, siret }: WorkflowActionProps) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success(`Bordereau ${form.id} publié`, { duration: 2000 });
+      toast.success(`Bordereau ${form.id} publié`, {
+        duration: TOAST_DURATION
+      });
     },
     onError: () =>
       toast.error(`Le bordereau ${form.id} n'a pas pu être publié`, {
-        duration: 5
+        duration: TOAST_DURATION
       })
   });
 

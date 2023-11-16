@@ -1,5 +1,6 @@
 import React from "react";
 import { IconTrash } from "../../../common/Components/Icons/Icons";
+import { TOAST_DURATION } from "../../../../common/config";
 import { gql, useMutation } from "@apollo/client";
 import {
   BsdType,
@@ -70,12 +71,12 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success(messageSuccess, { duration: 2000 });
+      toast.success(messageSuccess, { duration: TOAST_DURATION });
       !!onClose && onClose();
     },
     onError: () =>
       toast.error(messageError, {
-        duration: 5
+        duration: TOAST_DURATION
       })
   });
   const [deleteBsdasri, { loading: deletingBsdasri }] = useMutation<
@@ -86,12 +87,12 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success(messageSuccess, { duration: 2000 });
+      toast.success(messageSuccess, { duration: TOAST_DURATION });
       !!onClose && onClose();
     },
     onError: () =>
       toast.error(messageError, {
-        duration: 5
+        duration: TOAST_DURATION
       })
   });
 
@@ -103,12 +104,12 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success(messageSuccess, { duration: 2000 });
+      toast.success(messageSuccess, { duration: TOAST_DURATION });
       !!onClose && onClose();
     },
     onError: error =>
       toast.error(error.message, {
-        duration: 5
+        duration: TOAST_DURATION
       })
   });
 
@@ -120,12 +121,12 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success(messageSuccess, { duration: 2000 });
+      toast.success(messageSuccess, { duration: TOAST_DURATION });
       !!onClose && onClose();
     },
     onError: () =>
       toast.error(messageError, {
-        duration: 5
+        duration: TOAST_DURATION
       })
   });
 
@@ -137,12 +138,12 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      toast.success(messageSuccess, { duration: 2000 });
+      toast.success(messageSuccess, { duration: TOAST_DURATION });
       !!onClose && onClose();
     },
     onError: () =>
       toast.error(messageError, {
-        duration: 5
+        duration: TOAST_DURATION
       })
   });
 

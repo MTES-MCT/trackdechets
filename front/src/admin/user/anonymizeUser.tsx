@@ -5,6 +5,7 @@ import { gql, useMutation } from "@apollo/client";
 import { Mutation, MutationAnonymizeUserArgs } from "codegen-ui";
 import { InlineError } from "../../Apps/common/Components/Error/Error";
 import RedErrorMessage from "../../common/components/RedErrorMessage";
+import { TOAST_DURATION } from "../../common/config";
 
 const ANONYMIZE_USER = gql`
   mutation anonymizeUser($id: ID!) {
@@ -37,12 +38,12 @@ function AnonymizeUser() {
             ? toast.success(
                 `Suppression effectuée, notez l'email anonymisé si besoin immédiatement car il sera impossible de le récupérer : ${res?.data?.anonymizeUser}\nNe divulguez cet email à personne !`,
                 {
-                  duration: 60
+                  duration: 60000
                 }
               )
             : toast.error(
                 `Cet utilisateur ne peut pas être supprimé, soit il n'existe pas, soit il doit être lié à des applications ou des établissements existants en base de données, tentez de les supprimer si possible et réessayer de supprimer s'il vous plaît.`,
-                { duration: 3 }
+                { duration: TOAST_DURATION }
               );
         }}
       >

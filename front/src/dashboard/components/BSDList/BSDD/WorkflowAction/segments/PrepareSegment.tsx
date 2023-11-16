@@ -30,6 +30,7 @@ import {
   validationSchema
 } from "../../../../../detail/bsdd/EditSegment";
 import { isForeignVat } from "shared/constants";
+import { TOAST_DURATION } from "../../../../../../common/config";
 
 const PREPARE_SEGMENT = gql`
   mutation prepareSegment(
@@ -55,7 +56,7 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
     onCompleted: () => {
       setIsOpen(false);
       toast.success("Le segment a été créé", {
-        duration: 5
+        duration: TOAST_DURATION
       });
     },
     onError: () => {

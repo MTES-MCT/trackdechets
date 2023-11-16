@@ -6,6 +6,7 @@ import styles from "./CompanyVerifyModal.module.scss";
 import { CompanyForVerification, Mutation } from "codegen-ui";
 import { NotificationError } from "../../../Apps/common/Components/Error/Error";
 import { isSiret } from "shared/constants";
+import { TOAST_DURATION } from "../../../common/config";
 
 type VerifyModalProps = {
   isOpen: boolean;
@@ -35,12 +36,12 @@ export default function SendVerificationCodeLetterModal({
     any
   >(SEND_VERIFICATION_CODE_LETTER, {
     onCompleted: () => {
-      toast.success("Verification envoyée", { duration: 2000 });
+      toast.success("Verification envoyée", { duration: TOAST_DURATION });
       return onClose();
     },
     onError: () => {
       toast.error("La vérification n'a pas pu être envoyée", {
-        duration: 5
+        duration: TOAST_DURATION
       });
     }
   });
@@ -58,7 +59,7 @@ export default function SendVerificationCodeLetterModal({
       toast.error(
         "La vérification n'a pas pu être envoyée, l'établissement ne possède pas de SIRET valide",
         {
-          duration: 5
+          duration: TOAST_DURATION
         }
       );
     }

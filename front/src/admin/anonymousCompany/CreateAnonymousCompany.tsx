@@ -12,6 +12,7 @@ import { InlineError } from "../../Apps/common/Components/Error/Error";
 import { RedErrorMessage } from "../../common/components";
 import { isFRVat, isSiret, isVat } from "shared/constants";
 import { nafCodes } from "shared/constants";
+import { TOAST_DURATION } from "../../common/config";
 
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 export const MISSING_COMPANY_VAT =
@@ -92,7 +93,7 @@ export function CreateAnonymousCompany() {
         if (data) {
           toast.success(
             `L'entreprise "${data?.createAnonymousCompany.orgId}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
-            { duration: 6 }
+            { duration: TOAST_DURATION }
           );
         }
       }}

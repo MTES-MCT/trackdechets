@@ -13,3 +13,5 @@ export const SENDER_EMAIL =
 export const DEVELOPERS_DOCUMENTATION_URL =
   (import.meta.env.VITE_DEVELOPERS_DOCUMENTATION_URL as string) ||
   "https://developers.trackdechets.beta.gouv.fr";
+
+export const TOAST_DURATION = 2000; // ms
