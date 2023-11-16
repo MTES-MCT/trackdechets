@@ -1,6 +1,8 @@
 import { xDaysAgo } from "../onboarding.helpers";
 
-jest.mock("back");
+jest.mock("back", () => ({
+  initSentry: jest.fn()
+}));
 
 describe("xDaysAgo", () => {
   it("should return a relative past date", () => {
