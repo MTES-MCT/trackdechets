@@ -27,9 +27,9 @@ jobs:
           npx nx run back:codegen
           npx nx run back:prisma
           TERM=xterm bash ./scripts/deploy-db.sh
-      - name: Start processing queue
+      - name: Start queues
         run: |
-          npx nx run queues-indexation:serve:integration &
+          npx nx run-many -t serve --projects=tag:backend:queues --configuration=integration &
           sleep 5
       - name: Run integration tests
         run: |
@@ -65,7 +65,7 @@ env:
   TD_COMPANY_ELASTICSEARCH_INDEX: stocketablissement-production
   ALLOW_TEST_COMPANY: true
   OIDC_PRIVATE_KEY: |
-    "-----BEGIN PRIVATE KEY-----
+    -----BEGIN PRIVATE KEY-----
     MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDCFg4UrY5xtulv
     /NXKmL1J4qI1SopAfTNMo3X7p+kJO7plqUYjzaztcre1qfh0m33Sm1Q8oPbO/GpP
     MU1/HgcceytgJ/b4UwufVVMl9BrMDYG8moDBylbVupFQS3Ly1L9i/iFG9Z9A9xzY
@@ -92,10 +92,10 @@ env:
     59lLWBCsocvvbd1cvDMNlRywAAyhsCb1SuX4nEAK9mrSBdfmoF2Nm3eilfsOds0f
     K5mX069IKG82CMqh3Mzptd7e7lyb9lsoGO0BAtjho3cWtha/UZ70vfaMzGuZ6JmQ
     ak6k+8+UFd93M4z0Qo74OhXB
-    -----END PRIVATE KEY----"
+    -----END PRIVATE KEY----
   # Public key only for testing purposes
   OIDC_PUBLIC_KEY: |
-    "-----BEGIN PUBLIC KEY-----
+    -----BEGIN PUBLIC KEY-----
     MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwhYOFK2Ocbbpb/zVypi9
     SeKiNUqKQH0zTKN1+6fpCTu6ZalGI82s7XK3tan4dJt90ptUPKD2zvxqTzFNfx4H
     HHsrYCf2+FMLn1VTJfQazA2BvJqAwcpW1bqRUEty8tS/Yv4hRvWfQPcc2Gc3+/fQ
@@ -103,6 +103,6 @@ env:
     +KgDPjymkMGoJlO3aKppsjfbt/AH6GGdRghYRLOUwQU+h+ofWHR3lbYiKtXPn5dN
     24kiHy61e3VAQ9/YAZlwXC/99GGtw/NpghFAuM4P1JDn0DppJldy3PGFC0GfBCZA
     SwIDAQAB
-    -----END PUBLIC KEY-----"
+    -----END PUBLIC KEY-----
   WEBHOOK_TOKEN_ENCRYPTION_KEY: abcdefgh12345678abcdefgh12345678
 
