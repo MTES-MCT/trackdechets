@@ -1091,7 +1091,7 @@ const canUpdateBsff = (bsd, siret) =>
 const canReviewBsda = (bsd, siret) =>
   bsd.type === BsdType.Bsda && !canDeleteBsda(bsd, siret);
 
-export const canReviewBsdd = bsd =>
+export const canReviewBsdd = (bsd, siret) =>
   bsd.type === BsdType.Bsdd &&
   ![BsdStatusCode.Draft, BsdStatusCode.Sealed, BsdStatusCode.Refused].includes(
     bsd.status
@@ -1099,12 +1099,20 @@ export const canReviewBsdd = bsd =>
   bsd.emitterType !== EmitterType.Appendix1Producer &&
   !(
     bsd.emitterType === EmitterType.Producer &&
-    canUpdateBsd(bsd, bsd.emitterSiret)
+    isSameSiretEmmiter(siret, bsd) &&
+    canUpdateBsd(bsd, siret)
+  ) &&
+  !(
+    bsd.emitterType === EmitterType.Appendix2 &&
+    isSameSiretDestination(siret, bsd) &&
+    canUpdateBsd(bsd, siret)
   );
 
 export const canReviewBsd = (bsd, siret) => {
   const isTransporter = isSameSiretTransporter(siret, bsd);
-  return (canReviewBsdd(bsd) || canReviewBsda(bsd, siret)) && !isTransporter;
+  return (
+    (canReviewBsdd(bsd, siret) || canReviewBsda(bsd, siret)) && !isTransporter
+  );
 };
 
 const canUpdateBsda = bsd =>
