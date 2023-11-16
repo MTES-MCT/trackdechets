@@ -74,6 +74,7 @@
           "buildTarget": "queues-webhooks:build:development"
         },
         "integration": {
+          "watch": false,
           "buildTarget": "queues-webhooks:build:integration"
         },
         "production": {

@@ -27,10 +27,13 @@ jobs:
         run: |
           npx nx run back:codegen
           npx nx run back:prisma
-          TERM=xterm bash ./scripts/deploy-db.sh         
-      - name: Run integration tests
+          TERM=xterm bash ./scripts/deploy-db.sh
+      - name: Start queues
         run: |
           npx nx run-many -t serve --projects=tag:backend:queues --configuration=integration &
+          sleep 5
+      - name: Run integration tests
+        run: |
           npx nx run back:test:integration -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
 env:

@@ -75,6 +75,7 @@
           "buildTarget": "queues-runner:build:development"
         },
         "integration": {
+          "watch": false,
           "buildTarget": "queues-runner:build:integration"
         },
         "production": {

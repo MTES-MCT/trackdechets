@@ -74,6 +74,7 @@
           "buildTarget": "queues-indexation:build:development"
         },
         "integration": {
+          "watch": false,
           "buildTarget": "queues-indexation:build:integration"
         },
         "production": {
