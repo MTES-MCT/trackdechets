@@ -5,17 +5,29 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2023.11.1]
+# [2023.11.1] 21/11/2023
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout des filtres rapides au dashboard v2 [PR 2778](https://github.com/MTES-MCT/trackdechets/pull/2778)
+- Oauth2: ajout d'un bouton de déconnexion [PR 2838](https://github.com/MTES-MCT/trackdechets/pull/2838)
+- Le numéro d'échantillon devient disponible pour tous les BSDDs ayant un code déchet éligible [PR 2847](https://github.com/MTES-MCT/trackdechets/pull/2847)
+
 #### :bug: Corrections de bugs
 
+- Le mode de traitement n'est obligatoire qu'à l'étape de traitement pour tous les BSDs [PR 2848](https://github.com/MTES-MCT/trackdechets/pull/2848)
 - Rendre impossible la suppression d'un transporteur BSDD via la mutation `deleteFormTransporter` si celui-ci a déjà signé le BSDD [PR 2836](https://github.com/MTES-MCT/trackdechets/pull/2836)
+- Révisions BSDA & BSDD: le champ opération réalisée s'affichait à tort même lorsqu'il était vide [PR 2846](https://github.com/MTES-MCT/trackdechets/pull/2846)
 
 #### :boom: Breaking changes
 
+- Groupement BSDA: on ne permet de grouper que des BSDAs ayant le même code déchet et la même destination [PR 2844](https://github.com/MTES-MCT/trackdechets/pull/2844)
+
 #### :nail_care: Améliorations
+
+- Harmonisation des colonnes 'Code opération prévue', 'Mode de traitement réalisé' et 'Code opération réalisée', et ajout des infos transporteurs dans les différents registres [PR 2805](https://github.com/MTES-MCT/trackdechets/pull/2805)
+- Wording: mise en conformité ADR2023 sur les quantités estimées [PR 2722](https://github.com/MTES-MCT/trackdechets/pull/2722)
+- Révision BSDA: amélioration des contrôles de cohérence sur les données passées en révision [PR 2809](https://github.com/MTES-MCT/trackdechets/pull/2809)
 
 #### :house: Interne
 
@@ -34,7 +46,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Abaissement du nombre maximum d'éléments renvoyés par page à 100 pour la query `forms` [PR 2782](https://github.com/MTES-MCT/trackdechets/pull/2782)
 - Le mode de traitement devient obligatoire pour l'étape de traitement de l'exutoire [PR 2765](https://github.com/MTES-MCT/trackdechets/pull/2765)
 - Le profil VHU est obligatoire pour les exutoires de VHU [PR 2780](https://github.com/MTES-MCT/trackdechets/pull/2780)
-- Les informations sur le conditionnement sont obligatoires lors de la signature prodcuteur sur le BSDD [PR 2770](https://github.com/MTES-MCT/trackdechets/pull/2770)
+- Les informations sur le conditionnement sont obligatoires lors de la signature producteur sur le BSDD [PR 2770](https://github.com/MTES-MCT/trackdechets/pull/2770)
 - Dépréciation de la signature d'annexes 1 avec la mutation `signedByTransporter` [PR 2768](https://github.com/MTES-MCT/trackdechets/pull/2768)
 
 #### :nail_care: Améliorations
