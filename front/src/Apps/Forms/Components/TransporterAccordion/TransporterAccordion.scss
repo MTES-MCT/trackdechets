@@ -1,0 +1,52 @@
+@import "../../../../scss/Breakpoints.scss";
+
+.transporter {
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 5px 0;
+
+    border: 1px lightgray;
+    border-style: solid none;
+
+    @include desktop {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    &__label {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+
+      @include desktop {
+        margin-bottom: 0;
+      }
+    }
+
+    &__buttons {
+      display: flex;
+      flex-direction: column;
+
+      // En attente de l'implémentation du multi-modal
+      visibility: hidden;
+
+      @include phone {
+        flex-direction: row;
+        justify-content: flex-end;
+      }
+    }
+
+    &__button {
+      margin: 0 7px;
+    }
+  }
+
+  @media (max-width: 800px) {
+    &__header {
+      flex-direction: column;
+    }
+  }
+}

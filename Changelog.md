@@ -21,6 +21,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Rendre accessibles les champs `takenOverAt` et `takenOverAt` via l'objet Transporter (BSDD). [PR 2865](https://github.com/MTES-MCT/trackdechets/pull/2865)
+- Mise à jour du design de l'onglet transporteur du formulaire BSDD [PR 2877](https://github.com/MTES-MCT/trackdechets/pull/2877)
 
 #### :house: Interne
 

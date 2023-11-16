@@ -96,7 +96,7 @@ type SegmentProps = {
 };
 const TransportSegmentDetail = ({ segment, siret }: SegmentProps) => {
   const label = !!segment.segmentNumber
-    ? `N° ${segment.segmentNumber + 1}`
+    ? `Transporteur N° ${segment.segmentNumber}`
     : "";
   return (
     <>

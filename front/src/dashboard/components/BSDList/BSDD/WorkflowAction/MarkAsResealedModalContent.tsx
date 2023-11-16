@@ -7,7 +7,6 @@ import { statusChangeFragment } from "../../../../../Apps/common/queries/fragmen
 import { mergeDefaults } from "../../../../../common/helper";
 import { GET_BSDS } from "../../../../../Apps/common/queries";
 import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
-import Transporter from "../../../../../form/bsdd/Transporter";
 import CompanySelector from "../../../../../form/common/components/company/CompanySelector";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "../../../../../form/common/components/custom-inputs/RadioButton";
@@ -22,6 +21,8 @@ import {
 } from "codegen-ui";
 import React, { useState } from "react";
 import EstimatedQuantityTooltip from "../../../../../common/components/EstimatedQuantityTooltip";
+import { TransporterForm } from "../../../../../Apps/Forms/Components/TransporterForm/TransporterForm";
+import { useParams } from "react-router-dom";
 
 const MARK_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
@@ -95,11 +96,15 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
       // The error is handled in the UI
     }
   });
+
+  const { siret: orgId } = useParams<{ siret: string }>();
+
   return (
     <div>
       <Formik<ResealedFormInput>
         initialValues={initialValues}
         onSubmit={async ({ wasteDetails, ...values }) => {
+          console.log(values);
           const { errors } = await markAsResealed({
             variables: {
               id: bsd.id,
@@ -225,7 +230,7 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
               Collecteur-transporteur après entreposage ou reconditionnement
             </h5>
 
-            <Transporter />
+            <TransporterForm fieldName="transporter" orgId={orgId} />
 
             <div className="form__actions">
               <button

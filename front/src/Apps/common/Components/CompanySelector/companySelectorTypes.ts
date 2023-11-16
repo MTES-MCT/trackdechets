@@ -2,12 +2,13 @@ import { CompanySearchResult } from "codegen-ui";
 
 export interface CompanySelectorProps {
   loading: boolean;
-  onSearch: (search: string, postalCode: string) => void;
-  onSelect: (company?: CompanySearchResult) => void;
+  selectedCompany?: CompanySearchResult;
   companies?: CompanySearchResult[];
   favorites?: CompanySearchResult[];
-  selectedCompany?: CompanySearchResult;
   disabled?: boolean;
+  searchLabel?: string;
+  onSearch: (search: string, postalCode: string) => void;
+  onSelect: (company?: CompanySearchResult) => void;
 }
 
 export interface CompanySelectorItemProps {
