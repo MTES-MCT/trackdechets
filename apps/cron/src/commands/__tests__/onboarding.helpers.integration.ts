@@ -29,7 +29,7 @@ import {
   getPendingMembershipRequestsAndAssociatedAdmins,
   getRecentlyRegisteredProducers,
   getRecentlyRegisteredProfesionals,
-  getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
+  getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest
 } from "../onboarding.helpers";
 import { xDaysAgo } from "../helpers";
 
