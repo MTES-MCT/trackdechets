@@ -1,5 +1,10 @@
 import React, { useCallback, useState } from "react";
-import { generatePath, useHistory, useLocation } from "react-router-dom";
+import {
+  generatePath,
+  useHistory,
+  useLocation,
+  useRouteMatch
+} from "react-router-dom";
 import { BsdCardListProps } from "./bsdCardListTypes";
 import BsdCard from "../BsdCard/BsdCard";
 import {
@@ -61,6 +66,7 @@ function BsdCardList({
   const isActTab = bsdCurrentTab === "actTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
+  const isAllBsdsTab = !!useRouteMatch(routes.dashboardv2.bsds.index);
 
   const redirectToPath = useCallback(
     (path, id) => {
@@ -123,7 +129,7 @@ function BsdCardList({
     (bsd: Bsd) => {
       const status = bsd["bsdasriStatus"];
       if (status === BsdasriStatus.Initial) {
-        if (isActTab) {
+        if (isActTab || isAllBsdsTab) {
           const path = routes.dashboardv2.bsdasris.sign.emission;
           redirectToPath(path, bsd.id);
           return;
@@ -161,7 +167,7 @@ function BsdCardList({
         redirectToPath(path, bsd.id);
       }
     },
-    [redirectToPath, isActTab, isToCollectTab, siret]
+    [redirectToPath, isActTab, isToCollectTab, isAllBsdsTab, siret]
   );
 
   const handleActValidation = useCallback(
