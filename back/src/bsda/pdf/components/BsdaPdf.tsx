@@ -143,22 +143,13 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
           </div>
           <div className="BoxCol">
             <p>
-              Total type de conditionnements : {bsda?.packagings?.length ?? 0}
+              Total type de conditionnements : 
               <br />
-              Total colis :{" "}
-              {bsda?.packagings?.reduce((cur, p) => cur + p.quantity, 0)}
+              Total colis : 
               <br />
               Détail Conditionnement/nombre :
             </p>
             <p>
-              {bsda?.packagings
-                ?.map(
-                  p =>
-                    `${p.quantity} x ${PACKAGINGS_NAMES[p.type]} ${
-                      p.other ?? ""
-                    }`
-                )
-                .join(", ")}
             </p>
           </div>
           <div className="BoxCol">

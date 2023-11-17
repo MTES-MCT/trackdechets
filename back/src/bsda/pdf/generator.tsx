@@ -7,6 +7,7 @@ import { expandBsdaFromDb } from "../converter";
 import { getBsdaHistory } from "../database";
 import { BsdaPdf } from "./components/BsdaPdf";
 import concatStream from "concat-stream";
+import { emptyValues } from "../../common/pdf/utils";
 
 export async function buildPdf(bsda: Bsda) {
   const qrCode = await QRCode.toString(bsda.id, { type: "svg" });
@@ -17,9 +18,9 @@ export async function buildPdf(bsda: Bsda) {
 
   const html = ReactDOMServer.renderToStaticMarkup(
     <BsdaPdf
-      bsda={expandedBsda}
+      bsda={emptyValues(expandedBsda)}
       qrCode={qrCode}
-      previousBsdas={previousBsdas}
+      previousBsdas={emptyValues(previousBsdas)}
     />
   );
   return generatePdf(html);

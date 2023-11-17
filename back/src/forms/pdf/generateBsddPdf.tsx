@@ -7,7 +7,7 @@ import {
   WasteAcceptationStatus,
   EmitterType,
   Status,
-  OperationMode
+  OperationMode,
 } from "@prisma/client";
 import * as QRCode from "qrcode";
 import concatStream from "concat-stream";
@@ -31,13 +31,14 @@ import {
   expandInitialFormFromDb,
   expandFormFromDb,
   expandTransportSegmentFromDb,
-  expandableFormIncludes
+  expandableFormIncludes,
 } from "../converter";
 import prisma from "../../prisma";
 import { buildAddress } from "../../companies/sirene/utils";
 import { packagingsEqual } from "shared/constants";
 import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../common/operationModes";
+import { emptyValues } from "../../common/pdf/utils";
 
 type ReceiptFieldsProps = Partial<
   Pick<
@@ -305,7 +306,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
     })
   ).map(g => ({ readableId: g.nextForm.readableId }));
 
-  const form: GraphQLForm = {
+  let form: GraphQLForm = {
     ...(await expandFormFromDb(fullPrismaForm)),
     transportSegments: fullPrismaForm.transporters
       ?.filter(transporter => transporter.number >= 2)
@@ -327,6 +328,9 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
       form.wasteDetails?.packagingInfos
     );
   const qrCode = await QRCode.toString(form.readableId, { type: "svg" });
+
+  form = emptyValues(form);
+
   const html = ReactDOMServer.renderToStaticMarkup(
     <Document title={form.readableId}>
       <div className="Page">
@@ -512,7 +516,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               <br />
               <input
                 type="checkbox"
-                checked={Boolean(form.temporaryStorageDetail)}
+                checked={false}
                 readOnly
               />{" "}
               oui (cadres 13 à 19 à remplir)
@@ -555,13 +559,13 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               Déchet contenant des POP{" "}
               <input
                 type="checkbox"
-                checked={Boolean(form.wasteDetails?.pop)}
+                checked={false}
                 readOnly
               />{" "}
               oui{" "}
               <input
                 type="checkbox"
-                checked={!form.wasteDetails?.pop}
+                checked={false}
                 readOnly
               />{" "}
               non

@@ -10,6 +10,7 @@ import {
   expandBsffPackagingFromDB,
   expandFicheInterventionBsffFromDB
 } from "../converter";
+import { emptyValues } from "../../common/pdf/utils";
 
 export async function buildPdf(
   bsff: Bsff & { packagings: BsffPackaging[] } & {
@@ -19,7 +20,7 @@ export async function buildPdf(
   const qrCode = await QRCode.toString(bsff.id, { type: "svg" });
   const html = ReactDOMServer.renderToStaticMarkup(
     <BsffPdf
-      bsff={{
+      bsff={emptyValues({
         ...expandBsffFromDB(bsff),
         packagings: bsff.packagings.map(expandBsffPackagingFromDB),
         ficheInterventions: bsff.ficheInterventions.map(
@@ -29,7 +30,7 @@ export async function buildPdf(
           ...expandBsffFromDB(previous),
           packagings: previous.packagings.map(expandBsffPackagingFromDB)
         }))
-      }}
+      })}
       qrCode={qrCode}
     />
   );

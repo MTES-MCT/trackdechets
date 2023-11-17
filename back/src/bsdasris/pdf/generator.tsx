@@ -6,6 +6,7 @@ import { generatePdf } from "../../common/pdf";
 import { expandBsdasriFromDB, expandSynthesizingDasri } from "../converter";
 import prisma from "../../prisma";
 import { BsdasriPdf } from "./components/BsdasriPdf";
+import { emptyValues } from "../../common/pdf/utils";
 
 const getAssociatedBsdasris = async (bsdasri: Bsdasri) => {
   if (bsdasri.type === BsdasriType.SYNTHESIS) {
@@ -35,9 +36,9 @@ export async function buildPdf(bsdasri: Bsdasri) {
 
   const html = ReactDOMServer.renderToStaticMarkup(
     <BsdasriPdf
-      bsdasri={expandedBsdasri}
+      bsdasri={emptyValues(expandedBsdasri)}
       qrCode={qrCode}
-      associatedBsdasris={associatedBsdasris}
+      associatedBsdasris={emptyValues(associatedBsdasris)}
     />
   );
   return generatePdf(html);

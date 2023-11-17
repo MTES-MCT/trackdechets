@@ -297,7 +297,7 @@ function BsffQuantity({ bsff }: Pick<Props, "bsff">) {
             <span>
               <input
                 type="checkbox"
-                defaultChecked={!bsff.weight?.isEstimate}
+                defaultChecked={false}
                 readOnly
               />{" "}
               Réelle
@@ -306,7 +306,7 @@ function BsffQuantity({ bsff }: Pick<Props, "bsff">) {
             <span>
               <input
                 type="checkbox"
-                defaultChecked={bsff.weight?.isEstimate}
+                defaultChecked={false}
                 readOnly
               />{" "}
               Estimée
