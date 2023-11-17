@@ -33,11 +33,14 @@ type FormValues = Pick<SignTransportFormInput, "transporterNumberPlate"> & {
 type FormKeys = "transporterNumberPlate" | keyof FormValues["update"];
 
 const SAMPLE_NUMBER_WASTE_CODES = [
-  "13 02 04*",
   "13 02 05*",
   "13 02 06*",
   "13 02 07*",
-  "13 02 08*"
+  "13 02 08*",
+  "13 01 10*",
+  "13 01 11*",
+  "13 01 12*",
+  "13 01 13*"
 ];
 const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
   transporterNumberPlate: () => (
