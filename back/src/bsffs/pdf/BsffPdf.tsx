@@ -295,21 +295,11 @@ function BsffQuantity({ bsff }: Pick<Props, "bsff">) {
         <>
           <div>
             <span>
-              <input
-                type="checkbox"
-                defaultChecked={false}
-                readOnly
-              />{" "}
-              Réelle
+              <input type="checkbox" defaultChecked={false} readOnly /> Réelle
             </span>{" "}
             <br />
             <span>
-              <input
-                type="checkbox"
-                defaultChecked={false}
-                readOnly
-              />{" "}
-              Estimée
+              <input type="checkbox" defaultChecked={false} readOnly /> Estimée
               <br />
               "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR 2023
             </span>

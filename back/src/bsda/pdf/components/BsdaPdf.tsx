@@ -143,14 +143,13 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
           </div>
           <div className="BoxCol">
             <p>
-              Total type de conditionnements : 
+              Total type de conditionnements :
               <br />
-              Total colis : 
+              Total colis :
               <br />
               Détail Conditionnement/nombre :
             </p>
-            <p>
-            </p>
+            <p></p>
           </div>
           <div className="BoxCol">
             <p>

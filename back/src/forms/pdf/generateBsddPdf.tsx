@@ -7,7 +7,7 @@ import {
   WasteAcceptationStatus,
   EmitterType,
   Status,
-  OperationMode,
+  OperationMode
 } from "@prisma/client";
 import * as QRCode from "qrcode";
 import concatStream from "concat-stream";
@@ -31,7 +31,7 @@ import {
   expandInitialFormFromDb,
   expandFormFromDb,
   expandTransportSegmentFromDb,
-  expandableFormIncludes,
+  expandableFormIncludes
 } from "../converter";
 import prisma from "../../prisma";
 import { buildAddress } from "../../companies/sirene/utils";
@@ -514,12 +514,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               Entreposage provisoire ou reconditionnement
               <br />
-              <input
-                type="checkbox"
-                checked={false}
-                readOnly
-              />{" "}
-              oui (cadres 13 à 19 à remplir)
+              <input type="checkbox" checked={false} readOnly /> oui (cadres 13
+              à 19 à remplir)
               <br />
               <input
                 type="checkbox"
@@ -557,18 +553,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               non
               <br />
               Déchet contenant des POP{" "}
-              <input
-                type="checkbox"
-                checked={false}
-                readOnly
-              />{" "}
-              oui{" "}
-              <input
-                type="checkbox"
-                checked={false}
-                readOnly
-              />{" "}
-              non
+              <input type="checkbox" checked={false} readOnly /> oui{" "}
+              <input type="checkbox" checked={false} readOnly /> non
             </p>
             <p>
               Consistance du déchet :<br />
