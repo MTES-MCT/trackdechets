@@ -62,12 +62,12 @@ function MarkAsProcessedModalContent({ data, onClose }) {
               nextDestination: null,
               noTraceability: null
             }}
-            onSubmit={({ nextDestination, ...values }) => {
+            onSubmit={async ({ nextDestination, ...values }) => {
               if (nextDestination?.company) {
                 // Avoid crashing type InternationalCompanyInput
                 delete (nextDestination.company as CompanyInput).omiNumber;
               }
-              return markAsProcessed({
+              const { errors } = await markAsProcessed({
                 variables: {
                   id: data?.form.id,
                   processedInfo: {
@@ -76,6 +76,9 @@ function MarkAsProcessedModalContent({ data, onClose }) {
                   }
                 }
               });
+              if (!errors) {
+                onClose();
+              }
             }}
           >
             <ProcessedInfo form={data.form} close={onClose} />

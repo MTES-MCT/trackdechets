@@ -177,8 +177,8 @@ export default function ReceivedInfo({
               quantityType: QuantityType.Real
             })
         }}
-        onSubmit={values =>
-          isTempStorage
+        onSubmit={async values => {
+          const { errors } = await (isTempStorage
             ? markAsTempStored({
                 variables: {
                   id: form.id,
@@ -203,8 +203,11 @@ export default function ReceivedInfo({
                     signedAt: parseDate(values.signedAt).toISOString()
                   }
                 }
-              })
-        }
+              }));
+          if (!errors) {
+            close();
+          }
+        }}
         validationSchema={() => validationSchema(form, TODAY)}
       >
         {({ values, isSubmitting, handleReset, setFieldValue }) => (

@@ -99,8 +99,8 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
     <div>
       <Formik<ResealedFormInput>
         initialValues={initialValues}
-        onSubmit={({ wasteDetails, ...values }) =>
-          markAsResealed({
+        onSubmit={async ({ wasteDetails, ...values }) => {
+          const { errors } = await markAsResealed({
             variables: {
               id: bsd.id,
               resealedInfos: {
@@ -108,8 +108,11 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
                 ...(isRefurbished ? { wasteDetails } : {})
               }
             }
-          })
-        }
+          });
+          if (!errors) {
+            onClose();
+          }
+        }}
       >
         {() => (
           <Form>
