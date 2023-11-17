@@ -112,8 +112,6 @@ export default function CompanySelector({
   const clueInputRef = useRef<HTMLInputElement>(null);
   const [mustBeRegistered, setMustBeRegistered] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
-  const mergedResults = useRef<CompanySearchResult[]>();
-
   const [
     displayForeignCompanyWithUnknownInfos,
     setDisplayForeignCompanyWithUnknownInfos
@@ -143,8 +141,7 @@ export default function CompanySelector({
       },
       skip: skipFavorite || !siret,
       onCompleted: data => {
-        const results = mergeResults([], data?.favorites ?? []);
-        mergedResults.current = results;
+        mergeResults([], data?.favorites ?? []);
       }
     }
   );
@@ -159,11 +156,10 @@ export default function CompanySelector({
     SEARCH_COMPANIES,
     {
       onCompleted: data => {
-        const results = mergeResults(
+        mergeResults(
           data?.searchCompanies ?? [],
           favoritesData?.favorites ?? []
         );
-        mergedResults.current = results;
       }
     }
   );
@@ -212,11 +208,12 @@ export default function CompanySelector({
    * Selection d'un établissement dans le formulaire
    */
 
-  const isUnknownCompanyName = (companyName?: string): boolean => {
-    return companyName === "---" || companyName === "";
-  };
   const selectCompany = useCallback(
     (company?: CompanySearchResult) => {
+      function isUnknownCompanyName(companyName?: string): boolean {
+        return companyName === "---" || companyName === "";
+      }
+
       if (disabled) return;
       // empty the fields
       if (!company) {
@@ -225,15 +222,18 @@ export default function CompanySelector({
         onCompanySelected?.();
         return;
       }
+
       // Side effects
       const notVoidCompany = Object.keys(company).length !== 0; // unselect returns emtpy object {}
       setMustBeRegistered(
         notVoidCompany && !company.isRegistered && registeredOnlyCompanies
       );
+
       // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
       setDisplayForeignCompanyWithUnknownInfos(
         isForeignVat(company.vatNumber!) && isUnknownCompanyName(company.name!)
       );
+
       setIsForeignCompany(isForeignVat(company.vatNumber!));
       // Prépare la mise à jour du Form
       const fields: FormCompany = {
@@ -250,82 +250,69 @@ export default function CompanySelector({
         mail: company.contactEmail ?? "",
         country: company.codePaysEtrangerEtablissement
       };
+
       Object.keys(fields).forEach(key => {
         setFieldValue(`${field.name}.${key}`, fields[key]);
       });
       setFieldTouched(`${field.name}`, true, true);
       onCompanySelected?.(company);
+
       setSelectedCompanyDetails({
         name: company.name,
         address: company.address
       });
     },
     [
+      setSelectedCompanyDetails,
+      onCompanySelected,
+      setFieldTouched,
+      setFieldValue,
+      setIsForeignCompany,
+      setDisplayForeignCompanyWithUnknownInfos,
+      setMustBeRegistered,
       disabled,
       field.name,
-      onCompanySelected,
-      registeredOnlyCompanies,
-      setFieldTouched,
-      setFieldValue
+      registeredOnlyCompanies
     ]
   );
 
   /**
    * Merge searchCompanies et favoritesData
    */
-  const mergeResults = useCallback(
-    (
-      searchCompanies: CompanySearchResult[],
-      favorites: CompanySearchResult[]
-    ) => {
-      if (disabled) return;
+  function mergeResults(
+    searchCompanies: CompanySearchResult[],
+    favorites: CompanySearchResult[]
+  ) {
+    if (disabled) return;
 
-      const reshapedFavorites = favorites.filter(
-        fav =>
-          !skipFavorite &&
-          !searchCompanies.some(company => company.orgId === fav.orgId)
-      );
+    const reshapedFavorites = favorites.filter(
+      fav =>
+        !skipFavorite &&
+        !searchCompanies.some(company => company.orgId === fav.orgId)
+    );
 
-      const reshapedSearchResults =
-        searchCompanies
-          .filter(company => company.etatAdministratif === "A")
-          .map(company => ({
-            ...company,
-            codePaysEtrangerEtablissement:
-              company.codePaysEtrangerEtablissement || "FR"
-          })) ?? [];
+    const reshapedSearchResults =
+      searchCompanies
+        .filter(company => company.etatAdministratif === "A")
+        .map(company => ({
+          ...company,
+          codePaysEtrangerEtablissement:
+            company.codePaysEtrangerEtablissement || "FR"
+        })) ?? [];
 
-      const results = [...reshapedSearchResults, ...reshapedFavorites];
-
-      return results;
-    },
-    [disabled, skipFavorite]
-  );
-
-  useEffect(() => {
-    if (searchData || favoritesData) {
-      setSearchResults(mergedResults.current || []);
-    }
+    const results = [...reshapedSearchResults, ...reshapedFavorites];
+    setSearchResults(results);
 
     // If the form is empty, we auto-select the first result.
     if (
       initialAutoSelectFirstCompany &&
       !optional &&
-      searchResults &&
-      searchResults.length >= 1 &&
+      results.length >= 1 &&
       !orgId
     ) {
-      selectCompany(searchResults[0]);
+      selectCompany(results[0]);
     }
-  }, [
-    searchData,
-    favoritesData,
-    initialAutoSelectFirstCompany,
-    optional,
-    searchResults,
-    orgId,
-    selectCompany
-  ]);
+  }
 
   const onSearch = useMemo(() => {
     async function triggerSearch(
