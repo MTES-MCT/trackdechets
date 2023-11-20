@@ -1,3 +1,4 @@
+import { ValidationError } from "yup";
 import { getTransporterReceipt } from "../../bsdasris/recipify";
 import {
   BsvhuMetadata,
@@ -61,10 +62,10 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
         );
         return [];
       } catch (errors) {
-        return errors.inner?.map(e => {
+        return errors.inner?.map((e: ValidationError) => {
           return {
             message: e.message,
-            path: e.path,
+            path: e.path ?? "",
             requiredFor
           };
         });
