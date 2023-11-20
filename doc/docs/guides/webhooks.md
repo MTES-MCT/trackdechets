@@ -1,64 +1,55 @@
 ---
-title: Utiliser les webhooks
+title: Utilisation des Webhooks de l'API Trackdéchets
 ---
 
-:::note
-Cette fonctionalité est en phase de beta test.
-:::
 
-Les webhooks permettent à un SI d'un utilisateur Trackdéchets d'être notifié d'un changement (création modification, suppression) d'un bordereau sur leqel il figure.
+Les Webhooks permettent au Système d'Information (SI) d'un utilisateur Trackdéchets de recevoir des notifications lorsqu'un bordereau auquel il est associé subit une modification (création, modification ou suppression).
 
-L'utilisation des webhooks permet aux SI de limiter les lectures périodiques de l'api Trackdéchets.
+L'utilisation des Webhooks permet aux Systèmes d'Information de réduire la nécessité de faire des lectures périodiques de l'API Trackdéchets.
 
-##  Principes:
+## Principes:
 
-Pour recevoir des webhooks vous devez:
+Pour recevoir des Webhooks, vous devez suivre ces étapes :
 
-- les configurer grâce à l'api des webhookSettings
-- permettre à votre SI de recevoir les requêtes HTTP de Trackdéchets
-- effectuer des modifications ou attendre que d'autres acteurs en fassent sur des bsds comprenant les établissements correpondant aux webhookSettings.
+1. Configurer les Webhooks en utilisant l'API des ["WebhookSettings"](../reference/api-reference/webhooks/mutations#createwebhooksetting).
+2. Autoriser votre SI à recevoir des requêtes HTTP de Trackdéchets.
+3. Effectuer des modifications sur les bordereaux contenant les établissements correspondants aux "WebhookSettings" ou attendre que d'autres acteurs le fassent.
+4. Recevez la requête dde notification de mise à jour sur l'URL de votre SI configuré comme Webhook.
 
 ## Configuration
 
-L'api des webhookSettings vous permet de configurer l'envoi des webhooks
+L'API des "WebhookSettings" vous permet de configurer l'envoi des Webhooks avec les principes suivants :
 
-Principes:
-- l'api est accessible aux utilisateurs ADMIN
-- Un webhook maximum par établissement
-- une url de notification par webhook
-- un token d'au moins 20 caractères est requis à la création du webhookSetting, il sera passé en header de la requête du webhook (Authorization: Bearer: token)
-- le token n'est pas lisible par les queries, mais vous pouvez le mettre à jour à tout moment
-- l'id de l'établissement n'est pas modifiable
+- L'API est accessible uniquement aux utilisateurs ADMIN.
+- Un seul Webhook est autorisé par établissement (identifié par [`companyId`](../reference/api-reference/webhooks/inputObjects#webhooksettingcreateinput)).
+- Une URL de notification sur votre SI est associée à chaque Webhook.
+- Un token d'au moins 20 caractères est requis lors de la création du "WebhookSetting" et sera transmis en tant qu'en-tête de la requête du Webhook (Authorization: Bearer: token).
+- Le token n'est pas visible dans les requêtes, mais vous pouvez le mettre à jour à tout moment.
+- L'identifiant de l'établissement ne peut pas être modifié.
 
-### Mise en place du endpoint
+### Configuration du point de terminaison (endpoint)
 
-Votre SI doit être en mesure de recevoir les appels HTTP de Trackdéchets
+Votre SI doit être capable de recevoir les appels HTTP ou HTTPS de Trackdéchets à l'adresse suivante :
 
 - https://monentreprise.fr/webhooks/
 
-Vous pouvez associer une url à chaque siret si vous êtes ADMIN de plusieurs établissements
+Si vous êtes administrateur de plusieurs établissements, vous pouvez associer une URL distincte à chaque SIRET :
 
 - https://monentreprise.fr/webhooks/siret1
 - https://monentreprise.fr/webhooks/siret2
 
- 
-### Désactivation des webhooks
+### Désactivation des Webhooks
 
-Le endpoint doit toujours répondre par un status code HTTP 200. Dans le cas contraire, nous considérons que votre SI est en avarie. À la suite d'un nombre trop important de réponses non conformes (plus de 5 en 10mn), le webhooks est automatiquement désactivé
+L'URL du point de terminaison ("endpoint") doit toujours renvoyer un code HTTP 200. Dans le cas contraire, nous considérons que votre SI rencontre un dysfonctionnement. Après un certain nombre de réponses non conformes (plus de 5 en 10 minutes), le Webhook est automatiquement désactivé. Vous pourrez le réactiver en utilisant une mutation de mise à jour.
 
-Vous pourrez le réactiver par une mutation d'update.
+## Réception des Webhooks
 
+### Payload du Webhook
 
-## Réception des webhooks
-### Payload du webhook
+Le payload est minimal et se présente sous la forme d'un tableau JSON contenant un objet {"action", "id"}. L'ID correspond à l'identifiant lisible du bordereau de suivi des déchets (BSD), et l'action peut être l'une des chaînes suivantes : "CREATED", "UPDATED", "DELETED". Actuellement, un seul objet est renvoyé dans le tableau, mais à l'avenir, il est possible que nous regroupions les informations de plusieurs BSD dans un seul Webhook.
 
-Le payload est minimal: il est sous la forme d'un tableau JSON contenant un object {"action", "id"}.
-
-L'ID correspondant à l'identifiant lisible du bsd, l'action étant une des chaînes suivantes: "CREATED", "UPDATED", "DELETED".
-
-Actuellement un seul objet est renvoyé dans le tableau, à l'avenir il est possible que nous groupions les informations de plusieurs bsds dans un même webhook.
-
-```
+Exemple de requête :
+```json
 POST / HTTP/1.1
 
 Host: votre-si.com
@@ -71,9 +62,8 @@ Content-Type: application/json
 [{"action":"CREATED","id":"BSD-20230412-JYE9095HY"}]
 ```
 
-NB: Si votre siret est retiré d'un BSD ou ajouté à un BSD existant, vous recevrez une action "UPDATED"
+Remarque: Si votre SIRET est retiré d'un BSD ou ajouté à un BSD existant, vous recevrez une action "UPDATED".
 
 ### Sécurité
 
-Un token est requis pour configurer vos webhooks, néanmoins vous êtes responsables de l'implémentation du contrôle d'accès sur votre SI.
-Gardez en mémoire qu'un enpoint non protégé représente un risque pour votre SI et pour Trackdéchets.
+Un token est requis pour configurer vos Webhooks, cependant, vous êtes responsables de la mise en place du contrôle d'accès sur votre SI. Assurez-vous qu'un endpoint non protégé représente un risque de sécurité pour votre SI et pour Trackdéchets.
