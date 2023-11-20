@@ -63,4 +63,4 @@ export const splitArrayIntoChunks = <T>(arr: T[], maxChunkSize: number) => {
  * Based on https://stackoverflow.com/questions/4374822/remove-all-special-characters-with-regexp
  */
 export const sanitize = (str: string): string =>
-  str.replace(/[`~!#$%^&*()|+=?;:'",<>\{\}\[\]\\\/]/gi, "");
+  str.replace(/[`~!#$%^&*()|+=?;:'",<>{}[\]\\/]/gi, "");
