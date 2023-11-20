@@ -9,6 +9,7 @@ import {
   MessageVersion,
   Recipient
 } from "../types";
+import { sanitize } from "../helpers";
 
 const TEMPLATE_DIR = `${__dirname}/mustache`;
 
@@ -46,6 +47,13 @@ export type MailRendererInput<V> = {
 // These variables will be made available to all templates
 const context = { UI_URL: getUIBaseURL(), API_URL: getAPIBaseURL() };
 
+const sanitizeMailProps = (props) => {
+  return {
+    ...props,
+    ...{ to: props.to ? props.to.map((to) => ({ email: sanitize(to.email), name: sanitize(to.name) })): undefined }
+  }
+};
+
 /**
  * Render a mail definition into a fully featured mail that can
  * be passed to the mail backend
@@ -75,7 +83,7 @@ export function renderMail<V>(
     body,
     subject,
     templateId: mailTemplate.templateId,
-    ...mailProps,
+    ...sanitizeMailProps(mailProps),
     vars // pass vars to mail provider
   };
 }
