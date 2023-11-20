@@ -54,22 +54,22 @@ describe("splitArrayIntoChunks", () => {
 describe.only("sanitize", () => {
   // Base on the payloads at https://book.hacktricks.xyz/pentesting-web/ssti-server-side-template-injection
   test.each`
-    input                  | expected
-    ${"John Doe"}          | ${"John Doe"}
-    ${"John-Doe"}          | ${"John-Doe"}
-    ${"John_Doe"}          | ${"John_Doe"}
-    ${"john@doe.com"}      | ${"john@doe.com"}
-    ${"Jöhn Dôe"}          | ${"Jöhn Dôe"}
-    ${"j0hn D03"}          | ${"j0hn D03"}
-    ${"{{7*7}}}}"}         | ${"77"}
-    ${"${7*7}"}            | ${"77"}
-    ${"<%=7*7%>"}          | ${"77"}
-    ${"${{7*7}}"}          | ${"77"}
-    ${"#{7*7}"}            | ${"77"}
-    ${"*{7*7}"}            | ${"77"}
-  `("$input should become $expected", ({input, expected}) => {
-    console.log("input", input)
-    console.log("expected", expected)
+    input             | expected
+    ${"John Doe"}     | ${"John Doe"}
+    ${"John-Doe"}     | ${"John-Doe"}
+    ${"John_Doe"}     | ${"John_Doe"}
+    ${"john@doe.com"} | ${"john@doe.com"}
+    ${"Jöhn Dôe"}     | ${"Jöhn Dôe"}
+    ${"j0hn D03"}     | ${"j0hn D03"}
+    ${"{{7*7}}}}"}    | ${"77"}
+    ${"${7*7}"}       | ${"77"}
+    ${"<%=7*7%>"}     | ${"77"}
+    ${"${{7*7}}"}     | ${"77"}
+    ${"#{7*7}"}       | ${"77"}
+    ${"*{7*7}"}       | ${"77"}
+  `("$input should become $expected", ({ input, expected }) => {
+    console.log("input", input);
+    console.log("expected", expected);
     expect(sanitize(input)).toEqual(expected);
   });
 });

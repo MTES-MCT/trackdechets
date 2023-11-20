@@ -53,13 +53,14 @@ export const splitArrayIntoChunks = <T>(arr: T[], maxChunkSize: number) => {
 };
 
 /**
- * Method to sanitize user inputs and prevent attacks like SSTI. 
+ * Method to sanitize user inputs and prevent attacks like SSTI.
  * This will simply remove special chars from the string, except:
  * - '-' for names like Jean-Edouard
  * - '_' for emails like jean_edouard@mail.com
  * - '.' for emails like jean.edouard@mail.com
  * - '@' for emails
- * 
+ *
  * Based on https://stackoverflow.com/questions/4374822/remove-all-special-characters-with-regexp
  */
-export const sanitize = (str: string): string => str.replace(/[`~!#$%^&*()|+=?;:'",<>\{\}\[\]\\\/]/gi, '');
+export const sanitize = (str: string): string =>
+  str.replace(/[`~!#$%^&*()|+=?;:'",<>\{\}\[\]\\\/]/gi, "");

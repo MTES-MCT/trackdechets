@@ -47,11 +47,18 @@ export type MailRendererInput<V> = {
 // These variables will be made available to all templates
 const context = { UI_URL: getUIBaseURL(), API_URL: getAPIBaseURL() };
 
-const sanitizeMailProps = (props) => {
+const sanitizeMailProps = props => {
   return {
     ...props,
-    ...{ to: props.to ? props.to.map((to) => ({ email: sanitize(to.email), name: sanitize(to.name) })): undefined }
-  }
+    ...{
+      to: props.to
+        ? props.to.map(to => ({
+            email: sanitize(to.email),
+            name: sanitize(to.name)
+          }))
+        : undefined
+    }
+  };
 };
 
 /**
