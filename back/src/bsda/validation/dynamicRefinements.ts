@@ -103,6 +103,8 @@ async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
   }
 
   if (
+    // This rule only applies to BSDA that have not been signed before 2023-11-23
+    (!bsda.emitterEmissionSignatureDate || bsda.emitterEmissionSignatureDate >= new Date("2023-11-23")) &&
     bsda.type === "GATHERING" &&
     previousBsdasWithDestination.some(
       previousBsda => previousBsda.wasteCode !== bsda.wasteCode
