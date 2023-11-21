@@ -12,7 +12,7 @@
     },
     "build": {
       "executor": "@nx/vite:build",
-      "dependsOn": ["^build", "dsfr", "generators"],
+      "dependsOn": ["^build", "dsfr", "generate-tw"],
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
@@ -30,7 +30,7 @@
     },
     "serve": {
       "executor": "@nx/vite:dev-server",
-      "dependsOn": ["^build", "generators"],
+      "dependsOn": ["^build"],
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "front:build",
@@ -65,7 +65,7 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "dependsOn": ["^build", "generators"],
+      "dependsOn": ["^build", "generate-tw"],
       "options": {
         "passWithNoTests": true,
         "jestConfig": "front/jest.config.js"
@@ -78,8 +78,8 @@
         "lintFilePatterns": ["front/**/*.{ts,tsx,js,jsx}"]
       }
     },
-    "generators": {
-      "command": "npm --prefix front run generate"
+    "generate-tw": {
+      "command": "tailwindcss build front/src/tailwind.css -o front/src/generated/css/tailwind.generated.css"
     }
   },
   "tags": []
