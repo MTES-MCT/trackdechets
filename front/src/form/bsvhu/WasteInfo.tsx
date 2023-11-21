@@ -1,11 +1,13 @@
 import { Field, useFormikContext } from "formik";
 import React, { useEffect, lazy } from "react";
-import { RedErrorMessage } from "common/components";
-import Tooltip from "common/components/Tooltip";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import { RedErrorMessage } from "../../common/components";
+import Tooltip from "../../common/components/Tooltip";
+import NumberInput from "../common/components/custom-inputs/NumberInput";
+import { RadioButton } from "../common/components/custom-inputs/RadioButton";
 import "./WasteInfo.scss";
-const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
+const TagsInput = lazy(
+  () => import("../../common/components/tags-input/TagsInput")
+);
 
 export default function WasteInfo({ disabled }) {
   const { values, setFieldValue } = useFormikContext<any>();

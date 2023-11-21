@@ -1,7 +1,7 @@
 import React, { createContext, useState } from "react";
 import * as queryString from "query-string";
 import { useLocation, useParams } from "react-router-dom";
-import { StepContainer } from "form/common/stepper/Step";
+import { StepContainer } from "../common/stepper/Step";
 
 import StepList from "./stepper/BsdaStepList";
 import {
@@ -9,11 +9,11 @@ import {
   Destination,
   Transporter,
   Worker,
-  WasteInfo,
+  WasteInfo
 } from "./stepper/steps";
 import { Type } from "./stepper/steps/Type";
 import { getBsdaEditionDisabledSteps } from "./utils/getBsdaEditionDisabledSteps";
-import { Bsda } from "generated/graphql/types";
+import { Bsda } from "codegen-ui";
 
 export const BsdaContext = createContext<Bsda | undefined>(undefined);
 

@@ -1,17 +1,9 @@
 import React from "react";
-import { filter } from "graphql-anywhere";
 import { useQuery, gql } from "@apollo/client";
 import AccountMenu from "./AccountMenu";
-import {
-  Route,
-  withRouter,
-  RouteComponentProps,
-  Redirect,
-  Switch,
-  Link,
-} from "react-router-dom";
-import Loader from "Apps/common/Components/Loader/Loaders";
-import { InlineError } from "Apps/common/Components/Error/Error";
+import { Route, withRouter, Redirect, Switch, Link } from "react-router-dom";
+import Loader from "../Apps/common/Components/Loader/Loaders";
+import { InlineError } from "../Apps/common/Components/Error/Error";
 import AccountInfo from "./AccountInfo";
 import AccountAccessTokenList from "./accessTokens/AccountAccessTokenList";
 import AccountCompanyList from "./AccountCompanyList";
@@ -21,8 +13,8 @@ import AccountCompanyAddProducer from "./AccountCompanyAddProducer";
 import AccountCompanyAddForeign from "./AccountCompanyAddForeign";
 import AccountOauth2AppList from "./oauth2/AccountOauth2AppList";
 import AccountOAuth2AppCreateUpdate from "./oauth2/AccountOauth2AppCreateUpdate";
-import { Query } from "generated/graphql/types";
-import routes from "Apps/routes";
+import { Query } from "codegen-ui";
+import routes from "../Apps/routes";
 import AccountAuthorizedAppList from "./apps/AccountAuthorizedAppList";
 import AccountCompanyOrientation from "./AccountCompanyOrientation";
 
@@ -35,7 +27,7 @@ export const GET_ME = gql`
   ${AccountInfo.fragments.me}
 `;
 
-export default withRouter(function Account({ match }: RouteComponentProps) {
+export default withRouter(function Account() {
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME);
 
   if (loading) return <Loader />;
@@ -52,7 +44,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
               path={routes.account.info}
               render={() => (
                 <AccountContentWrapper title="Informations générales">
-                  <AccountInfo me={filter(AccountInfo.fragments.me, data.me)} />
+                  <AccountInfo me={data.me} />
                 </AccountContentWrapper>
               )}
             />

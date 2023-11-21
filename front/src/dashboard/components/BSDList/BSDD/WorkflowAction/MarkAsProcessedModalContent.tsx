@@ -1,19 +1,19 @@
 import React from "react";
 import { Formik } from "formik";
-import { Loader } from "Apps/common/Components";
+import { Loader } from "../../../../../Apps/common/Components";
 import {
   CompanyInput,
   FormStatus,
   Mutation,
   MutationMarkAsProcessedArgs,
-  ProcessedFormInput,
-} from "generated/graphql/types";
+  ProcessedFormInput
+} from "codegen-ui";
 import { gql, useMutation } from "@apollo/client";
-import { statusChangeFragment } from "Apps/common/queries/fragments";
+import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
 import ProcessedInfo from "./ProcessedInfo";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { GET_BSDS } from "Apps/common/queries";
-import cogoToast from "cogo-toast";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import toast from "react-hot-toast";
 
 const MARK_AS_PROCESSED = gql`
   mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {
@@ -36,14 +36,14 @@ function MarkAsProcessedModalContent({ data, onClose }) {
         data.markAsProcessed &&
         data.markAsProcessed.status === FormStatus.Processed
       ) {
-        cogoToast.success(
+        toast.success(
           `Le traitement du déchet a bien été validé. Vous pouvez retrouver ce bordereau dans l'onglet "Archives".`
         );
       }
     },
     onError: () => {
       // The error is handled in the UI
-    },
+    }
   });
 
   return (
@@ -60,22 +60,25 @@ function MarkAsProcessedModalContent({ data, onClose }) {
               processedBy: "",
               processedAt: new Date().toISOString(),
               nextDestination: null,
-              noTraceability: null,
+              noTraceability: null
             }}
-            onSubmit={({ nextDestination, ...values }) => {
+            onSubmit={async ({ nextDestination, ...values }) => {
               if (nextDestination?.company) {
                 // Avoid crashing type InternationalCompanyInput
                 delete (nextDestination.company as CompanyInput).omiNumber;
               }
-              return markAsProcessed({
+              const { errors } = await markAsProcessed({
                 variables: {
                   id: data?.form.id,
                   processedInfo: {
                     ...values,
-                    nextDestination,
-                  },
-                },
+                    nextDestination
+                  }
+                }
               });
+              if (!errors) {
+                onClose();
+              }
             }}
           >
             <ProcessedInfo form={data.form} close={onClose} />

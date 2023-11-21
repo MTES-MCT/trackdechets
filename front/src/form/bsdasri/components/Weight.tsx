@@ -1,18 +1,18 @@
-import TdSwitch from "common/components/Switch";
-import { RedErrorMessage, FieldSwitch } from "common/components";
+import TdSwitch from "../../../common/components/Switch";
+import { RedErrorMessage, FieldSwitch } from "../../../common/components";
 import { Field, useFormikContext } from "formik";
-import { Bsdasri } from "generated/graphql/types";
+import { Bsdasri } from "codegen-ui";
 import React from "react";
 
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { getNestedNode } from "common/helper";
-import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
+import NumberInput from "../../common/components/custom-inputs/NumberInput";
+import { getNestedNode } from "../../../common/helper";
+import EstimatedQuantityTooltip from "../../../common/components/EstimatedQuantityTooltip";
 
 export default function WeightWidget({
   switchLabel,
   dasriPath,
   getInitialWeightFn,
-  disabled = false,
+  disabled = false
 }: {
   switchLabel: string;
   dasriPath: "emitter.emission" | "transporter.transport";

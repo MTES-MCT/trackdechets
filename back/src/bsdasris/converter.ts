@@ -40,7 +40,7 @@ import {
 } from "../common/converter";
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import { BsdasriForElastic } from "./elastic";
 
 export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
@@ -203,10 +203,11 @@ export function expandBsdasriFromElastic(
   // pass down related field to sub-resolvers
   return {
     ...expanded,
-    grouping: [],
-    synthesizing: [],
-    groupedIn: undefined,
-    synthesizedIn: undefined
+    // Dans le cas de la requête `bsds`, et pour des raisons de perfs,
+    // on souhaite utiliser directement les champs `grouping` et `synthesizing`
+    // du BsdasriForElastic (Cf resolver Bsdasri).
+    grouping: bsdasri.grouping,
+    synthesizing: bsdasri.synthesizing
   };
 }
 

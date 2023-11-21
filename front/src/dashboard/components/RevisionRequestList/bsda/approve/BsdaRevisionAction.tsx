@@ -2,8 +2,8 @@ import React from "react";
 import {
   BsdaRevisionRequest,
   RevisionRequestApprovalStatus,
-  RevisionRequestStatus,
-} from "generated/graphql/types";
+  RevisionRequestStatus
+} from "codegen-ui";
 import { useParams } from "react-router-dom";
 import { BsdaApproveRevision } from "./BsdaApproveRevision";
 import { BsdaCancelRevision } from "./BsdaCancelRevision";

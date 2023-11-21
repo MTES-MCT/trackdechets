@@ -2,30 +2,30 @@ import React from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { Formik, Form, Field, FieldArray } from "formik";
 import * as yup from "yup";
-import { Label, RedErrorMessage } from "common/components";
-import { Loader } from "Apps/common/Components";
-import { IconTrash } from "Apps/common/Components/Icons/Icons";
+import { Label, RedErrorMessage } from "../../common/components";
+import { Loader } from "../../Apps/common/Components";
+import { IconTrash } from "../../Apps/common/Components/Icons/Icons";
 import {
   ApplicationGoal,
   CreateApplicationInput,
   Mutation,
   MutationCreateApplicationArgs,
   MutationUpdateApplicationArgs,
-  Query,
-} from "generated/graphql/types";
+  Query
+} from "codegen-ui";
 import styles from "./AccountOauth2AppCreateUpdate.module.scss";
 import { useHistory } from "react-router";
-import routes from "Apps/routes";
+import routes from "../../Apps/routes";
 import {
   NotificationError,
-  SimpleNotificationError,
-} from "Apps/common/Components/Error/Error";
-import Tooltip from "common/components/Tooltip";
+  SimpleNotificationError
+} from "../../Apps/common/Components/Error/Error";
+import Tooltip from "../../common/components/Tooltip";
 import {
   APPLICATION,
   MY_APPLICATIONS,
   CREATE_APPLICATION,
-  UPDATE_APPLICATION,
+  UPDATE_APPLICATION
 } from "./queries";
 
 const ApplicationInputSchema: yup.SchemaOf<CreateApplicationInput> = yup.object(
@@ -45,7 +45,7 @@ const ApplicationInputSchema: yup.SchemaOf<CreateApplicationInput> = yup.object(
           .required("L'URL ne peut pas être vide")
       )
       .required()
-      .min(1, "Vous devez préciser au moins une URL de redirection"),
+      .min(1, "Vous devez préciser au moins une URL de redirection")
   }
 );
 
@@ -54,19 +54,19 @@ type AccountOauth2AppCreateUpdateProps = {
 };
 
 export default function AccountOauth2AppCreateUpdate({
-  id,
+  id
 }: AccountOauth2AppCreateUpdateProps) {
   const { data, loading: getApplicationLoading } = useQuery<
     Pick<Query, "application">
   >(APPLICATION, {
     skip: !id,
     variables: { id },
-    fetchPolicy: "network-only",
+    fetchPolicy: "network-only"
   });
 
   const [
     createApplication,
-    { loading: createApplicationLoading, error: createApplicationError },
+    { loading: createApplicationLoading, error: createApplicationError }
   ] = useMutation<
     Pick<Mutation, "createApplication">,
     MutationCreateApplicationArgs
@@ -82,15 +82,15 @@ export default function AccountOauth2AppCreateUpdate({
         fields: {
           myApplications(_, { DELETE }) {
             return DELETE;
-          },
-        },
+          }
+        }
       });
-    },
+    }
   });
 
   const [
     updateApplication,
-    { loading: updateApplicationLoading, error: updateApplicationError },
+    { loading: updateApplicationLoading, error: updateApplicationError }
   ] = useMutation<
     Pick<Mutation, "updateApplication">,
     MutationUpdateApplicationArgs
@@ -102,7 +102,7 @@ export default function AccountOauth2AppCreateUpdate({
     name: data?.application?.name ?? "",
     logoUrl: data?.application?.logoUrl ?? "",
     goal: data?.application?.goal ?? ApplicationGoal.Personnal,
-    redirectUris: data?.application?.redirectUris ?? [],
+    redirectUris: data?.application?.redirectUris ?? []
   };
 
   if (getApplicationLoading) {
@@ -132,12 +132,12 @@ export default function AccountOauth2AppCreateUpdate({
             await updateApplication({
               variables: {
                 id: data.application.id,
-                input: values,
-              },
+                input: values
+              }
             });
           } else {
             const res = await createApplication({
-              variables: { input: values },
+              variables: { input: values }
             });
             console.log(res);
           }

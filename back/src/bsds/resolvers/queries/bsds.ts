@@ -15,7 +15,6 @@ import {
   index,
   groupByBsdType
 } from "../../../common/elastic";
-import { Bsdasri } from "@prisma/client";
 import prisma from "../../../prisma";
 import { expandFormFromElastic } from "../../../forms/converter";
 import { expandBsdasriFromElastic } from "../../../bsdasris/converter";
@@ -32,6 +31,7 @@ import { BsvhuForElastic } from "../../../bsvhu/elastic";
 import { BsdaForElastic } from "../../../bsda/elastic";
 import { BsffForElastic } from "../../../bsffs/elastic";
 import { QueryContainer } from "@elastic/elasticsearch/api/types";
+import { GraphQLContext } from "../../../types";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -277,7 +277,7 @@ async function buildSearchAfter(
  * This function takes an array of dasris and, expand them and add `allowDirectTakeOver` boolean field by
  * requesting emittercompany to know wether direct takeover is allowed
  */
-async function buildDasris(dasris: Bsdasri[]) {
+async function buildDasris(dasris: BsdasriForElastic[]) {
   // build a list of emitter siret from dasris, non-INITIAL bsds are ignored
   const emitterSirets = dasris
     .filter(bsd => !!bsd.emitterCompanySiret && bsd.status === "INITIAL")
@@ -393,5 +393,19 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
     totalCount: body.hits.total.value
   };
 };
+
+/**
+ * Fonction utilitaire permettant de déterminer au sein d'un resolver
+ * si la query parente est bien `bsds`. Voir par exemple le resolver `Bsda`
+ * dans lequel certains champs (`groupedIn`, `forwardedIn`) ne sont pas
+ * recalculé si la query est `bsds`.
+ */
+export function isGetBsdsQuery(context: GraphQLContext): boolean {
+  const gqlInfos = context?.req?.gqlInfos;
+  if (gqlInfos && gqlInfos.length === 1 && gqlInfos[0].name === "bsds") {
+    return true;
+  }
+  return false;
+}
 
 export default bsdsResolver;

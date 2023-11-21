@@ -5,13 +5,13 @@ module.exports = {
       "@babel/preset-env",
       {
         useBuiltIns: "usage",
-        corejs: "3.21",
-      },
+        corejs: "3.21"
+      }
     ],
     "@babel/preset-react",
-    "@babel/preset-typescript",
+    "@babel/preset-typescript"
   ],
-  plugins: [importMetaToProcessPlugin],
+  plugins: [importMetaToProcessPlugin]
 };
 
 function importMetaToProcessPlugin() {
@@ -19,7 +19,7 @@ function importMetaToProcessPlugin() {
     visitor: {
       MetaProperty(path) {
         path.replaceWithSourceString("process");
-      },
-    },
+      }
+    }
   };
 }

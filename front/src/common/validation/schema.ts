@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import countries from "world-countries";
-import { isOmi, isVat } from "generated/constants/companySearchHelpers";
+import { isOmi, isVat } from "shared/constants";
 
 /**
  * Company Schema for the general case (FR company)
@@ -12,7 +12,7 @@ export const companySchema = yup.object().shape({
     then: yup
       .string()
       .required("La sélection d'une entreprise est obligatoire"),
-    otherwise: yup.string().nullable(),
+    otherwise: yup.string().nullable()
   }),
   vatNumber: yup
     .string()
@@ -31,7 +31,7 @@ export const companySchema = yup.object().shape({
 
       // .oneOf() has a weird behavior with .nullable(), see:
       // https://github.com/jquense/yup/issues/104
-      null,
+      null
     ])
     .nullable(),
   contact: yup
@@ -54,7 +54,7 @@ export const companySchema = yup.object().shape({
       "is-omi",
       ({ originalValue }) => `${originalValue} n'est pas un numéro OMI valide`,
       value => !value || isOmi(value)
-    ),
+    )
 });
 
 /**
@@ -68,7 +68,7 @@ export const transporterCompanySchema = companySchema.concat(
         schema.required(
           "La sélection d'une entreprise par SIRET ou numéro de TVA (si l'entreprise n'est pas française) est obligatoire"
         ),
-      otherwise: schema => schema.nullable(),
-    }),
+      otherwise: schema => schema.nullable()
+    })
   })
 );

@@ -3,7 +3,7 @@ import { formatDate, SignatureStamp } from "../../../common/pdf";
 import { Signature } from "../../../generated/graphql/types";
 
 type Props = {
-  signature: Signature | null| undefined;
+  signature: Signature | null | undefined;
 };
 export function Signature({ signature }: Props) {
   return (

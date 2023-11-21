@@ -8,7 +8,7 @@ import {
   genericGetter
 } from "../common/validation/recipify";
 import { Bsda, Bsdasri, Bsff, Bsvhu } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import prisma from "../prisma";
 
 const dasriAccessors = (input: BsdasriInput) => [

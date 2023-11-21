@@ -1,58 +1,37 @@
 services:
   postgres:
-    image: postgres:13.3-alpine
-    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
-    environment:
-      POSTGRES_USER: trackdechets
-      POSTGRES_PASSWORD: password
+    extends:
+      file: docker-compose.dbs.yml
+      service: postgres
     ports:
-      - "5432:5432"
+      - 5432:5432
     volumes:
       - postgres:/var/lib/postgresql/data
 
   redis:
-    image: redis:5.0-alpine
-    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
-    sysctls:
-      - net.core.somaxconn=511
+    extends:
+      file: docker-compose.dbs.yml
+      service: redis
     ports:
-      - "6379:6379"
+      - 6379:6379
 
-  td-api:
-    image: td-api
-    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
-    build:
-      context: ./back
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./back/src:/usr/src/app/src
-      - ./doc/docs:/usr/src/doc/docs
-      - ./front/src/generated:/usr/src/front/src/generated
-      - ./back/prisma:/usr/src/app/prisma
-    env_file:
-      - .env
-    environment:
-      NODE_ENV: dev
+  elasticsearch:
+    extends:
+      file: docker-compose.dbs.yml
+      service: elasticsearch
     ports:
-      - "4000:$API_PORT"
-      - "4001:$NOTIFIER_PORT"
-    depends_on:
-      - redis
-      - postgres
+      - 9200:9200
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
 
-  td-ui:
-    stdin_open: true
-    image: node:18
-    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
-    working_dir: /usr/src/front
-    command: sh -c "npm install && npm run dev"
-    expose:
-      - "3000"
+  mongodb:
+    extends:
+      file: docker-compose.dbs.yml
+      service: mongodb
     volumes:
-      - ./front:/usr/src/front
-      - ./back/src:/usr/src/back/src
+      - mongo:/data/db
     ports:
-      - "3000:3000"
+      - 27017:27017
 
   storybook:
     stdin_open: true
@@ -66,35 +45,6 @@ services:
       - ./front:/usr/src/front
     ports:
       - "6006:6006"
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
-    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
-    environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - discovery.type=single-node
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - elasticsearch:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-    deploy:
-      placement:
-        constraints:
-          - "node.labels.elasticsearch == true"
-
-  mongodb:
-    image: mongo:6
-    ports:
-      - 27017:27017
-    volumes:
-      - ~/apps/mongo:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=trackdechets
-      - MONGO_INITDB_ROOT_PASSWORD=password
 
   nginx:
     image: nginx:1.19.6
@@ -117,3 +67,4 @@ services:
 volumes:
   postgres:
   elasticsearch:
+  mongo:

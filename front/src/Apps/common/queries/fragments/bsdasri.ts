@@ -132,9 +132,15 @@ export const dashboardDasriFragment = gql`
         }
       }
     }
+    # Attention, pour des raisons de performance, seul
+    # l'identifiant est exposé ici. Requêter d'autres champs sur
+    # grouping ne fonctionnera pas
     grouping {
       id
     }
+    # Attention, pour des raisons de performance, seul
+    # l'identifiant est exposé ici. Requêter d'autres champs sur
+    # synthesizing ne fonctionnera pas
     synthesizing {
       id
     }

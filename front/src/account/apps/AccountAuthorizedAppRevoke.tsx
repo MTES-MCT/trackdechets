@@ -1,12 +1,12 @@
 import * as React from "react";
-import { Modal } from "common/components";
-import { AuthorizedApplication } from "generated/graphql/types";
+import { Modal } from "../../common/components";
+import { AuthorizedApplication } from "codegen-ui";
 import { useMutation } from "@apollo/client";
 import {
   REVOKE_AUTHORIZED_APPLICATION,
-  AUTHORIZED_APPLICATIONS,
+  AUTHORIZED_APPLICATIONS
 } from "./queries";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+import { NotificationError } from "../../Apps/common/Components/Error/Error";
 
 type AccountAuthorizedAppRevokeProps = {
   authorizedApplication: AuthorizedApplication;
@@ -15,12 +15,12 @@ type AccountAuthorizedAppRevokeProps = {
 
 export default function AccountAuthorizedAppRevoke({
   authorizedApplication,
-  onClose,
+  onClose
 }: AccountAuthorizedAppRevokeProps) {
   const [revokeAuthorizedApplication, { loading, error }] = useMutation(
     REVOKE_AUTHORIZED_APPLICATION,
     {
-      refetchQueries: [AUTHORIZED_APPLICATIONS],
+      refetchQueries: [AUTHORIZED_APPLICATIONS]
     }
   );
 
@@ -38,7 +38,7 @@ export default function AccountAuthorizedAppRevoke({
           className="btn btn--danger"
           onClick={() =>
             revokeAuthorizedApplication({
-              variables: { id: authorizedApplication.id },
+              variables: { id: authorizedApplication.id }
             })
           }
           disabled={loading}

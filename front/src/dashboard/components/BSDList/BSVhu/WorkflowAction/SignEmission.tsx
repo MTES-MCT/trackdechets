@@ -1,18 +1,18 @@
 import { useMutation } from "@apollo/client";
-import { RedErrorMessage } from "common/components";
-import { GET_BSDS } from "Apps/common/queries";
-import routes from "Apps/routes";
+import { RedErrorMessage } from "../../../../../common/components";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import routes from "../../../../../Apps/routes";
 import { Field, Form, Formik } from "formik";
 import {
   Mutation,
   MutationSignBsvhuArgs,
-  SignatureTypeInput,
-} from "generated/graphql/types";
+  SignatureTypeInput
+} from "codegen-ui";
 import React from "react";
 import { generatePath, Link, useRouteMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 
 const validationSchema = yup.object({
@@ -20,7 +20,7 @@ const validationSchema = yup.object({
   author: yup
     .string()
     .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis")
 });
 
 type Props = {
@@ -35,7 +35,7 @@ export function SignEmission({
   bsvhuId,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton,
+  displayActionButton
 }: Props) {
   const [signBsvhu, { loading }] = useMutation<
     Pick<Mutation, "signBsvhu">,
@@ -71,7 +71,7 @@ export function SignEmission({
             <Link
               to={generatePath(routes[dashboardRoutePrefix].bsvhus.edit, {
                 siret,
-                id: bsvhu.id,
+                id: bsvhu.id
               })}
               className="btn btn--primary"
             >
@@ -82,7 +82,7 @@ export function SignEmission({
           <Formik
             initialValues={{
               author: "",
-              date: TODAY.toISOString(),
+              date: TODAY.toISOString()
             }}
             validationSchema={validationSchema}
             onSubmit={async values => {
@@ -91,9 +91,9 @@ export function SignEmission({
                   id: bsvhu.id,
                   input: {
                     ...values,
-                    type: SignatureTypeInput.Emission,
-                  },
-                },
+                    type: SignatureTypeInput.Emission
+                  }
+                }
               });
               onClose();
             }}

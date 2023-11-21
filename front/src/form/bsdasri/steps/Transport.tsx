@@ -1,17 +1,19 @@
 import { Field, useFormikContext } from "formik";
 import React, { lazy } from "react";
 import classNames from "classnames";
-import Tooltip from "common/components/Tooltip";
+import Tooltip from "../../../common/components/Tooltip";
 import WeightWidget from "../components/Weight";
-import { FieldTransportModeSelect } from "common/components";
+import { FieldTransportModeSelect } from "../../../common/components";
 import Packagings from "../components/packagings/Packagings";
 import { getInitialWeightFn } from "../utils/initial-state";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import { BsdasriStatus, Bsdasri, BsdasriType } from "generated/graphql/types";
-import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
+import DateInput from "../../common/components/custom-inputs/DateInput";
+import { BsdasriStatus, Bsdasri, BsdasriType } from "codegen-ui";
+import Acceptation from "../components/acceptation/Acceptation";
 import { customInfoToolTip } from "./Emitter";
 import { subMonths } from "date-fns";
-const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
+const TagsInput = lazy(
+  () => import("../../../common/components/tags-input/TagsInput")
+);
 
 export default function Transport({ status, editionDisabled = false }) {
   function handleTransportMode(e) {
@@ -27,7 +29,7 @@ export default function Transport({ status, editionDisabled = false }) {
       BsdasriStatus.SignedByProducer,
       BsdasriStatus.Sent,
       BsdasriStatus.Processed,
-      BsdasriStatus.Refused,
+      BsdasriStatus.Refused
     ].includes(status) || values.type === BsdasriType.Synthesis;
 
   const showTransportePlates = values?.transporter?.transport?.mode === "ROAD";
@@ -77,7 +79,7 @@ export default function Transport({ status, editionDisabled = false }) {
         <>
           <div
             className={classNames("form__row", {
-              "field-emphasis": transportEmphasis,
+              "field-emphasis": transportEmphasis
             })}
           >
             {values.type !== BsdasriType.Synthesis && (
@@ -90,7 +92,7 @@ export default function Transport({ status, editionDisabled = false }) {
           </div>
           <div
             className={classNames("form__row", {
-              "field-emphasis": transportEmphasis,
+              "field-emphasis": transportEmphasis
             })}
           >
             <label>
@@ -110,7 +112,7 @@ export default function Transport({ status, editionDisabled = false }) {
           {values.type !== BsdasriType.Synthesis && (
             <div
               className={classNames("form__row", {
-                "field-emphasis": transportEmphasis,
+                "field-emphasis": transportEmphasis
               })}
             >
               <Field

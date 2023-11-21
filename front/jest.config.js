@@ -1,16 +1,18 @@
 module.exports = {
-  moduleDirectories: ["node_modules", "src"],
+  displayName: "front",
+  preset: "../jest.preset.js",
+  transform: {
+    "^.+\\.[tj]sx?$": "babel-jest"
+  },
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "html"],
   moduleNameMapper: {
     "^.+\\.(css|less|scss)$": "identity-obj-proxy",
-    "^.+.(svg)$": "jest-transform-stub",
-    // Force module uuid to resolve with the CJS entry point, because Jest does not support package.json.exports. See https://github.com/uuidjs/uuid/issues/451
-    // not required with UUID v9, so it can be removed after @dataesr/react-dsfr upgrade
-    uuid: require.resolve("uuid"),
+    "^.+.(svg)$": "jest-transform-stub"
   },
   testEnvironment: "jsdom",
   setupFilesAfterEnv: [
     "@testing-library/jest-dom/extend-expect",
-    "./jest.setup.js",
+    "./jest.setup.js"
   ],
-  transformIgnorePatterns: ["node_modules/(?!@codegouvfr/react-dsfr)"],
+  transformIgnorePatterns: ["node_modules/(?!@codegouvfr/react-dsfr)"]
 };

@@ -7,3 +7,9 @@ logs/
 .data
 docker-compose.override.yml
 .nvmrc
+/node_modules
+/tmp
+/dist
+/out-tsc
+.nx/cache
+generated

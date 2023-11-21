@@ -8,7 +8,7 @@ describe("DraftBsdsValidation", () => {
     const currentSiret = "12345678901234";
     const bsd = {
       id: "1",
-      __typename: "Form",
+      __typename: "Form"
     };
     const onClose = jest.fn();
 
@@ -30,7 +30,7 @@ describe("DraftBsdsValidation", () => {
     const currentSiret = "12345678901234";
     const bsd = {
       id: "1",
-      __typename: "Bsda",
+      __typename: "Bsda"
     };
     const onClose = jest.fn();
 
@@ -53,7 +53,7 @@ describe("DraftBsdsValidation", () => {
     const currentSiret = "12345678901234";
     const bsd = {
       id: "1",
-      __typename: "Bsff",
+      __typename: "Bsff"
     };
     const onClose = jest.fn();
 
@@ -76,7 +76,7 @@ describe("DraftBsdsValidation", () => {
     const currentSiret = "12345678901234";
     const bsd = {
       id: "1",
-      __typename: "Bsvhu",
+      __typename: "Bsvhu"
     };
     const onClose = jest.fn();
 

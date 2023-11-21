@@ -8,7 +8,7 @@ import {
 } from "../common/converter";
 import * as GraphQL from "../generated/graphql/types";
 import { BsffPackaging, BsffPackagingType } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import { BsffForElastic } from "./elastic";
 
 function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter | null }) {
@@ -379,7 +379,7 @@ export function expandBsffFromElastic(bsff: BsffForElastic): GraphQL.Bsff {
   // pass down related field to sub-resolvers
   return {
     ...expanded,
-    packagings: []
+    packagings: bsff.packagings.map(expandBsffPackagingFromDB)
   };
 }
 

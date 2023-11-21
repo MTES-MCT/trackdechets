@@ -17,7 +17,7 @@ Pour recevoir des webhooks vous devez:
 - les configurer grâce à l'api des webhookSettings
 - permettre à votre SI de recevoir les requêtes HTTP de Trackdéchets
 - effectuer des modifications ou attendre que d'autres acteurs en fassent sur des bsds comprenant les établissements correpondant aux webhookSettings.
-- 
+
 ## Configuration
 
 L'api des webhookSettings vous permet de configurer l'envoi des webhooks

@@ -1,0 +1,42 @@
+{
+  "affected": {
+    "defaultBase": "dev"
+  },
+  "targetDefaults": {
+    "test": {
+      "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"]
+    },
+    "lint": {
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/.eslintignore",
+        "{workspaceRoot}/eslint.config.js"
+      ]
+    }
+  },
+  "workspaceLayout": {
+    "projectNameAndRootFormat": "as-provided"
+  },
+  "generators": {
+    "@nx/react": {
+      "application": {
+        "style": "scss",
+        "linter": "eslint",
+        "bundler": "vite",
+        "babel": true
+      },
+      "component": {
+        "style": "scss"
+      },
+      "library": {
+        "style": "scss",
+        "linter": "eslint"
+      }
+    },
+    "@nx/workspace:move": {
+      "projectNameAndRootFormat": "as-provided"
+    }
+  },
+  "nxCloudAccessToken": "ZTY4ZmZjODUtYTk5Ni00ZGZlLWJjNmMtZjMwN2MwZGM3ODg0fHJlYWQ="
+}

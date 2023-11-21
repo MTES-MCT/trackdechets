@@ -4,7 +4,7 @@ import {
   BsvhuPackaging,
   WasteAcceptationStatus
 } from "@prisma/client";
-import { PROCESSING_OPERATIONS_CODES } from "../common/constants";
+import { PROCESSING_OPERATIONS_CODES } from "shared/constants";
 import {
   MISSING_COMPANY_ADDRESS,
   MISSING_COMPANY_CONTACT,

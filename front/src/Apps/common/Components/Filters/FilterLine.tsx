@@ -2,7 +2,7 @@ import React, { Children, ReactElement } from "react";
 import {
   max_filter_autorized_label,
   sr_btn_add_filter_line,
-  sr_btn_delete_filter_line,
+  sr_btn_delete_filter_line
 } from "../../wordings/dashboard/wordingsDashboard";
 import FilterSelector from "./FilterSelector";
 import { Filter } from "./filtersTypes";
@@ -33,7 +33,7 @@ const FilterLine = ({
   value,
   children,
   isMaxLine,
-  isCurrentLine,
+  isCurrentLine
 }: FilterLineProps) => (
   <div className="filters__line">
     <div className="filters__line__item">

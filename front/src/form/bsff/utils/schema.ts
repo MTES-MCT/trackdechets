@@ -1,15 +1,15 @@
 import * as yup from "yup";
 import {
   companySchema,
-  transporterCompanySchema,
-} from "common/validation/schema";
-import { BsffPackagingType } from "generated/graphql/types";
+  transporterCompanySchema
+} from "../../../common/validation/schema";
+import { BsffPackagingType } from "codegen-ui";
 import { OPERATION } from "./constants";
 
 export const transporterSchema = yup.object().shape({
   isExemptedOfReceipt: yup.boolean().nullable(true),
   numberPlate: yup.string().nullable(true),
-  company: transporterCompanySchema,
+  company: transporterCompanySchema
 });
 
 const destinationSchema = yup.object().shape({
@@ -21,14 +21,14 @@ const destinationSchema = yup.object().shape({
       ["", ...Object.keys(OPERATION)],
       "Le code de l'opération de traitement / valorisation prévue est invalide"
     )
-    .min(1, "Champ requis"),
+    .min(1, "Champ requis")
 });
 
 export const validationSchema = yup.object({
   emitter: yup.object().shape({ company: companySchema }),
   waste: yup.object({
     code: yup.string().required(),
-    description: yup.string().required(),
+    description: yup.string().required()
   }),
   packagings: yup
     .array(
@@ -62,7 +62,7 @@ export const validationSchema = yup.object({
           .number()
           .nullable()
           .required("Le poids du contenu est un champ requis")
-          .positive("La masse du contenu doit être supérieur 0"),
+          .positive("La masse du contenu doit être supérieur 0")
       })
     )
     .min(1, "Le nombre de contenants doit être supérieur ou égal à 1"),
@@ -70,8 +70,8 @@ export const validationSchema = yup.object({
     value: yup
       .number()
       .required()
-      .positive("La quantité totale doit être supérieure à 0"),
+      .positive("La quantité totale doit être supérieure à 0")
   }),
   transporter: transporterSchema,
-  destination: destinationSchema,
+  destination: destinationSchema
 });

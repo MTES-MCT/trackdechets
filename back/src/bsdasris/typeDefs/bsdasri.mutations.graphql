@@ -124,6 +124,7 @@ type Mutation {
         value
       }
       code
+      mode
       date
     }
   }

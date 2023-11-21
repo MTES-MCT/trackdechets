@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
-import { GET_BSDS } from "Apps/common/queries";
-import { useNotifier } from "dashboard/components/BSDList/useNotifier";
-import { CompanyType, Query, QueryBsdsArgs } from "generated/graphql/types";
+import { GET_BSDS } from "../../common/queries";
+import { useNotifier } from "../../../dashboard/components/BSDList/useNotifier";
+import { CompanyType, Query, QueryBsdsArgs } from "codegen-ui";
 
 const hasTransporterProfile = companyTypes =>
   companyTypes.includes(CompanyType.Transporter);
@@ -18,29 +18,29 @@ export const useShowTransportTabs = (companyTypes, companySiret) => {
   const {
     loading: loadingIsToCollectForData,
     data: isToCollectForData,
-    refetch: refetchIsToCollectForData,
+    refetch: refetchIsToCollectForData
   } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
     skip: isTransporter,
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
     variables: {
       first: 1,
-      where: { isToCollectFor: [companySiret] },
-    },
+      where: { isToCollectFor: [companySiret] }
+    }
   });
 
   const {
     loading: loadingIsCollectedForData,
     data: isCollectedForData,
-    refetch: refetchIsCollectedForData,
+    refetch: refetchIsCollectedForData
   } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
     skip: isTransporter,
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
     variables: {
       first: 1,
-      where: { isCollectedFor: [companySiret] },
-    },
+      where: { isCollectedFor: [companySiret] }
+    }
   });
 
   useNotifier(companySiret, () => {
@@ -54,6 +54,6 @@ export const useShowTransportTabs = (companyTypes, companySiret) => {
     showTransportTabs:
       isTransporter ||
       hasBsds(loadingIsToCollectForData, isToCollectForData) ||
-      hasBsds(loadingIsCollectedForData, isCollectedForData),
+      hasBsds(loadingIsCollectedForData, isCollectedForData)
   };
 };

@@ -21,12 +21,17 @@ import {
 } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
-import { indexBsdasri } from "../../../../bsdasris/elastic";
+import {
+  BsdasriForElasticInclude,
+  getBsdasriForElastic,
+  indexBsdasri
+} from "../../../../bsdasris/elastic";
 import {
   userWithCompanyFactory,
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
+import gql from "graphql-tag";
 
 const CREATE_DRAFT_DASRI = `
 mutation CreateDraftDasri($input: BsdasriInput!) {
@@ -618,7 +623,8 @@ describe("Query.bsds.dasris base workflow", () => {
     beforeAll(async () => {
       const refusedDasri = await prisma.bsdasri.update({
         where: { id: dasriId },
-        data: { status: "REFUSED" }
+        data: { status: "REFUSED" },
+        include: BsdasriForElasticInclude
       });
       await indexBsdasri(refusedDasri);
       await refreshElasticSearch();
@@ -696,7 +702,7 @@ describe("Query.bsds.dasris mutations", () => {
       }
     });
 
-    await indexBsdasri(dasri);
+    await indexBsdasri(await getBsdasriForElastic(dasri));
     await refreshElasticSearch();
 
     const { query } = makeClient(emitter.user);
@@ -745,7 +751,7 @@ describe("Query.bsds.dasris mutations", () => {
         emitterCompanySiret: emitter.company.siret
       }
     });
-    await indexBsdasri(dasri);
+    await indexBsdasri(await getBsdasriForElastic(dasri));
 
     //duplicate dasri
     const { mutate } = makeClient(emitter.user);
@@ -771,7 +777,7 @@ describe("Query.bsds.dasris mutations", () => {
       }
     });
 
-    await indexBsdasri(dasri);
+    await indexBsdasri(await getBsdasriForElastic(dasri));
     await refreshElasticSearch();
 
     const { query } = makeClient(emitter.user);
@@ -788,5 +794,97 @@ describe("Query.bsds.dasris mutations", () => {
         expect.objectContaining({ node: { id: duplicateBsdasri!.id } })
       ])
     );
+  });
+});
+
+describe("Bsdasri sub-resolvers in query bsds", () => {
+  afterEach(resetDatabase);
+
+  const GET_BSDS = gql`
+    query GetBsds($where: BsdWhere) {
+      bsds(where: $where) {
+        edges {
+          node {
+            ... on Bsdasri {
+              id
+              grouping {
+                id
+              }
+              synthesizing {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  test("Bsdasri.grouping should resolve correctly", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const intialBsdasri = await bsdasriFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_GROUP"
+      }
+    });
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        type: "GROUPING",
+        emitterCompanySiret: ttr.company.siret,
+        status: "INITIAL",
+        grouping: { connect: { id: intialBsdasri.id } }
+      }
+    });
+    await indexBsdasri(await getBsdasriForElastic(intialBsdasri));
+    await indexBsdasri(await getBsdasriForElastic(bsdasri));
+    await refreshElasticSearch();
+
+    const { query } = makeClient(ttr.user);
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    const bsdasris = data.bsds!.edges.map(e => e.node);
+    expect(bsdasris).toHaveLength(2);
+    const queriedBsdasri = bsdasris.find(bsd => bsd.id === bsdasri.id);
+    expect(queriedBsdasri).toBeDefined();
+    const grouping = (queriedBsdasri as any)!.grouping!;
+    expect(grouping).toHaveLength(1);
+    expect(grouping[0].id).toEqual(intialBsdasri.id);
+  });
+
+  test("Bsdasri.synthesizing should resolve correctly", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const intialBsdasri = await bsdasriFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_GROUP"
+      }
+    });
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        type: "SYNTHESIS",
+        emitterCompanySiret: ttr.company.siret,
+        status: "INITIAL",
+        synthesizing: { connect: { id: intialBsdasri.id } }
+      }
+    });
+    await indexBsdasri(await getBsdasriForElastic(intialBsdasri));
+    await indexBsdasri(await getBsdasriForElastic(bsdasri));
+    await refreshElasticSearch();
+
+    const { query } = makeClient(ttr.user);
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    const bsdasris = data.bsds!.edges.map(e => e.node);
+    expect(bsdasris).toHaveLength(2);
+    const queriedBsdasri = bsdasris.find(bsd => bsd.id === bsdasri.id);
+    expect(queriedBsdasri).toBeDefined();
+    const synthesizing = (queriedBsdasri as any)!.synthesizing!;
+    expect(synthesizing).toHaveLength(1);
+    expect(synthesizing[0].id).toEqual(intialBsdasri.id);
   });
 });

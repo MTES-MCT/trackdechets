@@ -5,8 +5,8 @@ import {
   IconRenewableEnergyEarth,
   IconTrash,
   IconWarehouseDelivery,
-  IconWaterDam,
-} from "Apps/common/Components/Icons/Icons";
+  IconWaterDam
+} from "../../../Apps/common/Components/Icons/Icons";
 import {
   Bsff,
   BsffPackagingType,
@@ -14,8 +14,8 @@ import {
   BsffType,
   FormCompany,
   OperationMode,
-  WasteAcceptationStatus,
-} from "generated/graphql/types";
+  WasteAcceptationStatus
+} from "codegen-ui";
 import React, { useState } from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -24,24 +24,24 @@ import { DateRow, DetailRow, YesNoRow } from "../common/Components";
 
 import styles from "../common/BSDDetailContent.module.scss";
 import { generatePath, Link, useParams } from "react-router-dom";
-import routes from "Apps/routes";
-import { WorkflowAction } from "dashboard/components/BSDList/BSFF/WorkflowAction";
-import { DeleteBsffModal } from "dashboard/components/BSDList/BSFF/BsffActions/DeleteModal";
-import { useDownloadPdf } from "dashboard/components/BSDList/BSFF/BsffActions/useDownloadPdf";
-import { transportModeLabels } from "dashboard/constants";
+import routes from "../../../Apps/routes";
+import { WorkflowAction } from "../../components/BSDList/BSFF/WorkflowAction";
+import { DeleteBsffModal } from "../../components/BSDList/BSFF/BsffActions/DeleteModal";
+import { useDownloadPdf } from "../../components/BSDList/BSFF/BsffActions/useDownloadPdf";
+import { transportModeLabels } from "../../constants";
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeaderCell,
-  TableRow,
-} from "common/components";
-import { formatDate } from "common/datetime";
-import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
-import { getOperationModeLabel } from "common/operationModes";
-import { BSFF_VERBOSE_STATUSES } from "generated/constants/statuses";
+  TableRow
+} from "../../../common/components";
+import { formatDate } from "../../../common/datetime";
+import { PACKAGINGS_NAMES } from "../../../form/bsff/components/packagings/Packagings";
+import { isForeignVat } from "shared/constants";
+import { getOperationModeLabel } from "../../../common/operationModes";
+import { BSFF_VERBOSE_STATUSES } from "shared/constants";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -65,7 +65,7 @@ export function BsffDetailContent({ form: bsff }: Props) {
   const isBsffContributor = [
     bsff.emitter?.company?.siret,
     bsff.transporter?.company?.orgId,
-    bsff?.destination?.company?.siret,
+    bsff?.destination?.company?.siret
   ]
     .filter(Boolean)
     .includes(siret);
@@ -101,7 +101,7 @@ export function BsffDetailContent({ form: bsff }: Props) {
               {[
                 BsffType.Groupement,
                 BsffType.Reconditionnement,
-                BsffType.Reexpedition,
+                BsffType.Reexpedition
               ].includes(bsff.type) && (
                 <DetailRow
                   value={
@@ -212,7 +212,7 @@ export function BsffDetailContent({ form: bsff }: Props) {
               <Link
                 to={generatePath(routes.dashboard.bsffs.edit, {
                   siret,
-                  id: bsff.id,
+                  id: bsff.id
                 })}
                 className="btn btn--outline-primary"
               >
@@ -229,26 +229,26 @@ export function BsffDetailContent({ form: bsff }: Props) {
               bsffDestination: {
                 company: {
                   siret: bsff.destination?.company?.siret ?? undefined,
-                  name: bsff.destination?.company?.name ?? undefined,
-                },
+                  name: bsff.destination?.company?.name ?? undefined
+                }
               },
               bsffEmitter: {
                 company: {
                   siret: bsff.emitter?.company?.siret ?? undefined,
-                  name: bsff.emitter?.company?.name ?? undefined,
-                },
+                  name: bsff.emitter?.company?.name ?? undefined
+                }
               },
               bsffTransporter: {
                 company: {
                   orgId: bsff.transporter?.company?.orgId!,
                   siret: bsff.transporter?.company?.orgId ?? undefined,
-                  name: bsff.transporter?.company?.name ?? undefined,
-                },
+                  name: bsff.transporter?.company?.name ?? undefined
+                }
               },
               waste: {
                 code: bsff.waste?.code,
-                description: bsff.waste?.description ?? undefined,
-              },
+                description: bsff.waste?.description ?? undefined
+              }
             }}
           />
         </div>
@@ -320,7 +320,7 @@ function Transporter({ form }: { form: Bsff }) {
         <Company label="Raison sociale" company={form.transporter?.company} />
       </div>
       <div className={styles.detailGrid}>
-        {!isForeignVat(form?.transporter?.company?.vatNumber!!) && (
+        {!isForeignVat(form?.transporter?.company?.vatNumber!) && (
           <>
             <YesNoRow
               value={form?.transporter?.recepisse?.isExempted}

@@ -6,8 +6,8 @@ import styles from "./AccountField.module.scss";
 import {
   CompanyPrivate,
   UserRole,
-  MutationUpdateCompanyArgs,
-} from "generated/graphql/types";
+  MutationUpdateCompanyArgs
+} from "codegen-ui";
 
 import AccountFormCheckboxInput from "./forms/AccountFormCheckboxInput";
 
@@ -23,7 +23,7 @@ AccountFieldCompanyDasriDirectTakeOver.fragments = {
       userRole
       allowBsdasriTakeOverWithoutSignature
     }
-  `,
+  `
 };
 const UPDATE_DASRI_DIRECT_TAKEOVER = gql`
   mutation UpdateCompany(
@@ -48,36 +48,34 @@ const explanation = `En cochant cette case, j'atteste avoir signé une conventio
 Dans ce cas, je suis informé que je pourrais suivre les bordereaux sur Trackdéchets et disposer de leur archivage sur la plateforme`;
 
 export default function AccountFieldCompanyDasriDirectTakeOver({
-  company,
+  company
 }: Props) {
   return (
-    <>
-      <AccountBooleanField
-        name={fieldName}
-        editable={company.userRole === UserRole.Admin}
-        title={fieldTitle}
-        tooltip={explanation}
-        value={company.allowBsdasriTakeOverWithoutSignature}
-        renderForm={(toggleEdition, isEditing) =>
-          isEditing ? (
-            <AccountFormCheckboxInput<Partial<MutationUpdateCompanyArgs>>
-              name="allowBsdasriTakeOverWithoutSignature"
-              label={`${fieldLabel} - ${explanation}`}
-              value={company.allowBsdasriTakeOverWithoutSignature}
-              mutation={UPDATE_DASRI_DIRECT_TAKEOVER}
-              mutationArgs={{ id: company.id }}
-              isEditing={isEditing}
-              toggleEdition={() => {
-                toggleEdition();
-              }}
-            />
-          ) : (
-            <span className={styles.field__value}>
-              {company.allowBsdasriTakeOverWithoutSignature ? "Oui" : "Non"}
-            </span>
-          )
-        }
-      />
-    </>
+    <AccountBooleanField
+      name={fieldName}
+      editable={company.userRole === UserRole.Admin}
+      title={fieldTitle}
+      tooltip={explanation}
+      value={company.allowBsdasriTakeOverWithoutSignature}
+      renderForm={(toggleEdition, isEditing) =>
+        isEditing ? (
+          <AccountFormCheckboxInput<Partial<MutationUpdateCompanyArgs>>
+            name="allowBsdasriTakeOverWithoutSignature"
+            label={`${fieldLabel} - ${explanation}`}
+            value={company.allowBsdasriTakeOverWithoutSignature}
+            mutation={UPDATE_DASRI_DIRECT_TAKEOVER}
+            mutationArgs={{ id: company.id }}
+            isEditing={isEditing}
+            toggleEdition={() => {
+              toggleEdition();
+            }}
+          />
+        ) : (
+          <span className={styles.field__value}>
+            {company.allowBsdasriTakeOverWithoutSignature ? "Oui" : "Non"}
+          </span>
+        )
+      }
+    />
   );
 }

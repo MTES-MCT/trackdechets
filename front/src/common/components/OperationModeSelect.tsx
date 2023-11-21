@@ -4,7 +4,7 @@ import { RadioButton } from "../../form/common/components/custom-inputs/RadioBut
 import RedErrorMessage from "./RedErrorMessage";
 import {
   getOperationModeLabel,
-  getOperationModesFromOperationCode,
+  getOperationModesFromOperationCode
 } from "../operationModes";
 import Tooltip from "./Tooltip";
 

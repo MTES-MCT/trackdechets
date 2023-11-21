@@ -1,5 +1,5 @@
 import { gql, LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
-import { Query, QueryBsdaPdfArgs } from "generated/graphql/types";
+import { Query, QueryBsdaPdfArgs } from "codegen-ui";
 
 export const BSDA_PDF = gql`
   query Bsdasridf($id: ID!) {
@@ -21,6 +21,6 @@ export function useDownloadPdf(
         return;
       }
       window.open(bsdaPdf.downloadLink, "_blank");
-    },
+    }
   });
 }

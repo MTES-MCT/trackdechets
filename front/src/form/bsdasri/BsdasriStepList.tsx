@@ -1,13 +1,13 @@
 import { useMutation, useQuery } from "@apollo/client";
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
 import omitDeep from "omit-deep-lodash";
 import React, { lazy, ReactElement, useMemo } from "react";
 import { useHistory } from "react-router-dom";
-import { Loader } from "Apps/common/Components";
-import { getComputedState } from "form/common/getComputedState";
+import { Loader } from "../../Apps/common/Components";
+import { getComputedState } from "../common/getComputedState";
 
-import { IStepContainerProps } from "form/common/stepper/Step";
-import { formInputToastError } from "form/common/stepper/toaster";
+import { IStepContainerProps } from "../common/stepper/Step";
+import { formInputToastError } from "../common/stepper/toaster";
 import {
   Mutation,
   MutationCreateBsdasriArgs,
@@ -18,18 +18,18 @@ import {
   Bsdasri,
   BsdasriInput,
   BsdasriStatus,
-  BsdasriType,
-} from "generated/graphql/types";
+  BsdasriType
+} from "codegen-ui";
 import getInitialState from "./utils/initial-state";
 import {
   CREATE_DRAFT_BSDASRI,
   CREATE_BSDASRI,
   GET_BSDASRI,
-  UPDATE_BSDASRI,
+  UPDATE_BSDASRI
 } from "./utils/queries";
-const GenericStepList = lazy(
-  () => import("form/common/stepper/GenericStepList")
-);
+import { TOAST_DURATION } from "../../common/config";
+
+const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (dasriForm: Bsdasri | undefined) => ReactElement;
   formId?: string;
@@ -62,7 +62,7 @@ const getCommonKeys = (bsdasriType: BsdasriType): string[] => {
       transporterCompanyVatNumberKey,
       transporterTransportPackagingsKey,
       transporterTransportVolumeKey,
-      emittedByEcoOrganismeKey,
+      emittedByEcoOrganismeKey
     ];
   }
   if (bsdasriType === BsdasriType.Grouping) {
@@ -92,7 +92,7 @@ const removeSections = (
       transporterKey,
       synthesizingKey,
       groupingKey,
-      ...commonKeys,
+      ...commonKeys
     ],
     RECEIVED: [
       wasteKey,
@@ -103,8 +103,8 @@ const removeSections = (
       identificationKey,
       synthesizingKey,
       groupingKey,
-      ...commonKeys,
-    ],
+      ...commonKeys
+    ]
   };
 
   return omitDeep(input, mapping[status]);
@@ -116,17 +116,17 @@ export default function BsdasriStepsList(props: Props) {
     GET_BSDASRI,
     {
       variables: {
-        id: props.formId!,
+        id: props.formId!
       },
       skip: !props.formId,
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     }
   );
 
   const mapRegrouped = dasri => ({
     ...dasri,
     grouping: dasri?.grouping.map(d => d.id),
-    synthesizing: dasri?.synthesizing?.map(d => d.id),
+    synthesizing: dasri?.synthesizing?.map(d => d.id)
   });
 
   const formState = useMemo(
@@ -170,15 +170,15 @@ export default function BsdasriStepsList(props: Props) {
         return updateBsdasri({
           variables: {
             id: formState.id,
-            input: removeSections(cleanedInput, status, type),
-          },
+            input: removeSections(cleanedInput, status, type)
+          }
         });
       }
       return updateBsdasri({
         variables: {
           id: formState.id,
-          input: removeSections(input, status, type),
-        },
+          input: removeSections(input, status, type)
+        }
       });
     }
 
@@ -187,7 +187,7 @@ export default function BsdasriStepsList(props: Props) {
         groupingKey,
         emitterKey,
         ecoOrganismeKey,
-        transporterTransportPackagingsKey,
+        transporterTransportPackagingsKey
       ]);
       // synthesis bsdasri are  never created in draft state
       return createBsdasri({ variables: { input: cleanedInput } });
@@ -202,8 +202,8 @@ export default function BsdasriStepsList(props: Props) {
       formQuery.data?.bsdasri?.type === "GROUPING"
     ) {
       if (!values?.grouping?.length) {
-        cogoToast.error("Vous devez sélectionner des bordereaux à grouper", {
-          hideAfter: 7,
+        toast.error("Vous devez sélectionner des bordereaux à grouper", {
+          duration: TOAST_DURATION
         });
         return;
       }

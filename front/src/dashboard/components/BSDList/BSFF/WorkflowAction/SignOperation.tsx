@@ -14,26 +14,30 @@ import {
   BsffOperationCode,
   BsffType,
   BsffPackagingOperationInput,
-  SignatureInput,
-} from "generated/graphql/types";
-import { ActionButton, Modal, RedErrorMessage } from "common/components";
-import { Loader } from "Apps/common/Components";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+  SignatureInput
+} from "codegen-ui";
+import {
+  ActionButton,
+  Modal,
+  RedErrorMessage
+} from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import {
   GET_BSFF_FORM,
   SIGN_BSFF,
-  UPDATE_BSFF_PACKAGING,
-} from "form/bsff/utils/queries";
-import { GET_BSDS } from "Apps/common/queries";
-import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
+  UPDATE_BSFF_PACKAGING
+} from "../../../../../form/bsff/utils/queries";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
 import { BsffSummary } from "./BsffSummary";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";
-import { OPERATION } from "form/bsff/utils/constants";
-import CompanySelector from "form/common/components/company/CompanySelector";
-import { companySchema } from "common/validation/schema";
+import { OPERATION } from "../../../../../form/bsff/utils/constants";
+import CompanySelector from "../../../../../form/common/components/company/CompanySelector";
+import { companySchema } from "../../../../../common/validation/schema";
 import { subMonths } from "date-fns";
-import OperationModeSelect from "common/components/OperationModeSelect";
+import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
 
 const operationCode = yup
   .string()
@@ -64,11 +68,11 @@ const validationSchema = yup.object({
           schema.shape({
             plannedOperationCode: operationCode,
             company: companySchema,
-            cap: yup.string().nullable().notRequired(),
-          }),
+            cap: yup.string().nullable().notRequired()
+          })
       }),
-    otherwise: schema => schema.nullable(),
-  }),
+    otherwise: schema => schema.nullable()
+  })
 });
 
 interface SignBsffOperationProps {
@@ -89,7 +93,7 @@ export function SignBsffOperationOnePackaging({
   bsffId,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton = true,
+  displayActionButton = true
 }: Pick<SignBsffOperationProps, "bsffId"> & ModalAdapterProps): JSX.Element {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -129,12 +133,12 @@ interface SignBsffOperationOnePackagingModalProps {
 
 function SignBsffOperationOnePackagingModal({
   bsffId,
-  onClose,
+  onClose
 }: SignBsffOperationOnePackagingModalProps) {
   const { data } = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF_FORM, {
     variables: {
-      id: bsffId,
-    },
+      id: bsffId
+    }
   });
 
   if (data == null) {
@@ -166,7 +170,7 @@ function NoTraceabilityField(props) {
   const {
     values: { code },
     touched,
-    setFieldValue,
+    setFieldValue
   } = useFormikContext<BsffPackagingOperationInput>();
 
   const isGroupement = OPERATION[code]?.successors.includes(
@@ -200,7 +204,7 @@ function NoTraceabilityField(props) {
 function NextDestinationField(props) {
   const {
     values: { code, noTraceability, nextDestination },
-    setFieldValue,
+    setFieldValue
   } = useFormikContext<BsffPackagingOperationInput>();
 
   const hasNextDestination =
@@ -213,7 +217,7 @@ function NextDestinationField(props) {
       setFieldValue(props.name, {
         plannedOperationCode: "",
         company: {},
-        cap: "",
+        cap: ""
       });
     }
   }, [hasNextDestination, props.name, setFieldValue]);
@@ -256,7 +260,7 @@ function NextDestinationField(props) {
 export function SignBsffOperationOnePackagingModalContent({
   bsff,
   packaging,
-  onCancel,
+  onCancel
 }: SignBsffOperationOnePackagingModalContentProps) {
   const [updateBsffPackaging, updateBsffPackagingResult] = useMutation<
     Pick<Mutation, "updateBsffPackaging">,
@@ -286,7 +290,7 @@ export function SignBsffOperationOnePackagingModalContent({
           date: new Date().toISOString(),
           noTraceability: false,
           nextDestination: null,
-          author: "",
+          author: ""
         }}
         validationSchema={validationSchema}
         onSubmit={async values => {
@@ -300,10 +304,10 @@ export function SignBsffOperationOnePackagingModalContent({
                   description: values.description,
                   date: values.date,
                   noTraceability: values.noTraceability,
-                  nextDestination: values.nextDestination,
-                },
-              },
-            },
+                  nextDestination: values.nextDestination
+                }
+              }
+            }
           });
           await signBsff({
             variables: {
@@ -312,14 +316,14 @@ export function SignBsffOperationOnePackagingModalContent({
                 type: BsffSignatureType.Operation,
                 author: values.author,
                 date: new Date().toISOString(),
-                packagingId: packaging.id,
-              },
-            },
+                packagingId: packaging.id
+              }
+            }
           });
           onCancel();
         }}
       >
-        {({ values, setValues }) => (
+        {({ values }) => (
           <Form>
             <div className="form__row">
               <label>

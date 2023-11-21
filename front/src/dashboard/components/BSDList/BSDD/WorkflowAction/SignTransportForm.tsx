@@ -1,12 +1,12 @@
 import * as React from "react";
-import { ActionButton, Modal } from "common/components";
-import { IconShipmentSignSmartphone } from "Apps/common/Components/Icons/Icons";
+import { ActionButton, Modal } from "../../../../../common/components";
+import { IconShipmentSignSmartphone } from "../../../../../Apps/common/Components/Icons/Icons";
 import { WorkflowActionProps } from "./WorkflowAction";
-import SignTransportFormModalContent from "dashboard/components/BSDList/BSDD/WorkflowAction/SignTransportFormModalContent";
+import SignTransportFormModalContent from "./SignTransportFormModalContent";
 
 export default function SignTransportForm({
   siret,
-  form,
+  form
 }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const title = "Signature transporteur";

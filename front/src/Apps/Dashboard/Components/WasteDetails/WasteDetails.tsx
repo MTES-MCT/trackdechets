@@ -5,17 +5,17 @@ import {
   IconBSVhuThin as IconBSVhu,
   IconBSDDThin as IconBSDD,
   IconBSDasriThin as IconBSDasri,
-  IconWeight,
+  IconWeight
 } from "../../../common/Components/Icons/Icons";
 import { WasteDetailsProps } from "./wasteTypes";
-import { BsdType } from "../../../../generated/graphql/types";
+import { BsdType } from "codegen-ui";
 import "./wasteDetails.scss";
 
 function WasteDetails({
   wasteType,
   code,
   name,
-  weight,
+  weight
 }: WasteDetailsProps): JSX.Element {
   const displayIconWaste = () => {
     switch (wasteType) {

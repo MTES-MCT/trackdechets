@@ -1,8 +1,8 @@
 import React from "react";
 import { generatePath, NavLink, useHistory } from "react-router-dom";
-import { CompanyPrivate } from "generated/graphql/types";
+import { CompanyPrivate } from "codegen-ui";
 import DashboardCompanySelector from "./DashboardCompanySelector";
-import routes from "Apps/routes";
+import routes from "../Apps/routes";
 import "./DashboardTabs.scss";
 import { useShowTransportTabs } from "../Apps/Dashboard/hooks/useShowTransportTabs";
 
@@ -13,7 +13,7 @@ interface DashboardTabsProps {
 
 export function DashboardTabs({
   currentCompany,
-  companies,
+  companies
 }: DashboardTabsProps) {
   const history = useHistory();
 
@@ -32,7 +32,7 @@ export function DashboardTabs({
             handleCompanyChange={orgId =>
               history.push(
                 generatePath(routes.dashboard.bsds.drafts, {
-                  siret: orgId,
+                  siret: orgId
                 })
               )
             }
@@ -48,7 +48,7 @@ export function DashboardTabs({
           <li>
             <NavLink
               to={generatePath(routes.dashboard.bsds.drafts, {
-                siret: currentCompany.orgId,
+                siret: currentCompany.orgId
               })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
@@ -60,7 +60,7 @@ export function DashboardTabs({
           <li>
             <NavLink
               to={generatePath(routes.dashboard.bsds.act, {
-                siret: currentCompany.orgId,
+                siret: currentCompany.orgId
               })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
@@ -72,7 +72,7 @@ export function DashboardTabs({
           <li>
             <NavLink
               to={generatePath(routes.dashboard.bsds.follow, {
-                siret: currentCompany.orgId,
+                siret: currentCompany.orgId
               })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
@@ -83,7 +83,7 @@ export function DashboardTabs({
           <li>
             <NavLink
               to={generatePath(routes.dashboard.bsds.history, {
-                siret: currentCompany.orgId,
+                siret: currentCompany.orgId
               })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
@@ -94,7 +94,7 @@ export function DashboardTabs({
           <li>
             <NavLink
               to={generatePath(routes.dashboard.bsds.reviews, {
-                siret: currentCompany.orgId,
+                siret: currentCompany.orgId
               })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
@@ -111,7 +111,7 @@ export function DashboardTabs({
               <li>
                 <NavLink
                   to={generatePath(routes.dashboard.transport.toCollect, {
-                    siret: currentCompany.orgId,
+                    siret: currentCompany.orgId
                   })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
@@ -122,7 +122,7 @@ export function DashboardTabs({
               <li>
                 <NavLink
                   to={generatePath(routes.dashboard.transport.collected, {
-                    siret: currentCompany.orgId,
+                    siret: currentCompany.orgId
                   })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
@@ -138,7 +138,7 @@ export function DashboardTabs({
           <li>
             <NavLink
               to={generatePath(routes.dashboard.exports, {
-                siret: currentCompany.orgId,
+                siret: currentCompany.orgId
               })}
               className="sidebar__link sidebar__link--chapter"
               activeClassName="sidebar__link--active"

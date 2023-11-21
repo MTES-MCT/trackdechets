@@ -49,7 +49,7 @@ import {
   UseSortByHooks,
   UseSortByInstanceProps,
   UseSortByOptions,
-  UseSortByState,
+  UseSortByState
 } from "react-table";
 /* eslint-enable */
 declare module "react-table" {
@@ -58,7 +58,7 @@ declare module "react-table" {
       UsePaginationOptions<D>,
       UseSortByOptions<D> {}
 
-  export interface Hooks<D extends object = {}> extends UseSortByHooks<D> {}
+  export type Hooks<D extends object = {}> = UseSortByHooks<D>;
 
   export interface TableInstance<D extends object = {}>
     extends UseFiltersInstanceProps<D>,

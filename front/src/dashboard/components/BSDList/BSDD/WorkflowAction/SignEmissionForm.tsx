@@ -1,9 +1,9 @@
 import * as React from "react";
-import { FormStatus } from "generated/graphql/types";
-import { ActionButton, Modal } from "common/components";
-import { IconShipmentSignSmartphone } from "Apps/common/Components/Icons/Icons";
+import { FormStatus } from "codegen-ui";
+import { ActionButton, Modal } from "../../../../../common/components";
+import { IconShipmentSignSmartphone } from "../../../../../Apps/common/Components/Icons/Icons";
 import { WorkflowActionProps } from "./WorkflowAction";
-import SignEmissionFormModalContent from "dashboard/components/BSDList/BSDD/WorkflowAction/SignEmissionFormModalContent";
+import SignEmissionFormModalContent from "./SignEmissionFormModalContent";
 
 export default function SignEmissionForm({ siret, form }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = React.useState(false);

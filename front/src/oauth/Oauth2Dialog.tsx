@@ -1,8 +1,9 @@
 import React from "react";
-import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
+import { IconCheckCircle1 } from "../Apps/common/Components/Icons/Icons";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import styles from "./Dialog.module.scss";
 import { useOAuth2, AuthorizePayload } from "./use-oauth2";
+import { localAuthService } from "../login/auth.service";
 
 export default function Oauth2Dialog() {
   const { VITE_API_ENDPOINT } = import.meta.env;
@@ -33,7 +34,26 @@ export default function Oauth2Dialog() {
         <IconCheckCircle1 size="40px" />
         <img src="/trackdechets.png" alt="trackdechets" width="100px" />
       </div>
-      <h4 className="text-center">Autoriser {client.name}</h4>
+      <div className="tw-flex tw-justify-between tw-mt-4">
+        <h4 className="text-center">Autoriser {client.name}</h4>
+        <form
+          className={styles.headerConnexion}
+          name="logout"
+          action={`${VITE_API_ENDPOINT}/logout`}
+          method="post"
+        >
+          <button
+            className={`${styles.headerConnexion} btn btn--sqr`}
+            onClick={() => {
+              localAuthService.locallySignOut();
+              document.forms["logout"].submit();
+              return false;
+            }}
+          >
+            <span>Se déconnecter</span>
+          </button>
+        </form>
+      </div>
       <div className="panel tw-mt-2">
         <p className="text-center">
           {user.name}, l'application {client.name} souhaite accéder à votre

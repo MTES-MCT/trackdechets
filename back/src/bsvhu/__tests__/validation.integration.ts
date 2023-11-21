@@ -391,7 +391,7 @@ describe("BSVHU validation", () => {
     });
 
     test.each([
-      ["D 9", OperationMode.VALORISATION_ENERGETIQUE], // Correct modes are ELIMINATION
+      ["D 9", OperationMode.VALORISATION_ENERGETIQUE], // Correct modes is ELIMINATION
       ["R 12", OperationMode.VALORISATION_ENERGETIQUE] // R12 has no associated mode
     ])(
       "should not be valid if operation mode is not compatible with operation code (mode: %p, code: %p)",

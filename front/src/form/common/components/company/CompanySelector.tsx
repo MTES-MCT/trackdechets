@@ -1,27 +1,26 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
 import {
   NotificationError,
-  SimpleNotificationError,
-} from "Apps/common/Components/Error/Error";
-import { IconLoading, IconSearch } from "Apps/common/Components/Icons/Icons";
-import RedErrorMessage from "common/components/RedErrorMessage";
+  SimpleNotificationError
+} from "../../../../Apps/common/Components/Error/Error";
+import {
+  IconLoading,
+  IconSearch
+} from "../../../../Apps/common/Components/Icons/Icons";
+import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import { constantCase } from "constant-case";
 import { Field, useField, useFormikContext } from "formik";
-import {
-  isFRVat,
-  isVat,
-  isForeignVat,
-} from "generated/constants/companySearchHelpers";
+import { isFRVat, isVat, isForeignVat } from "shared/constants";
 import React, {
   useCallback,
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from "react";
 
-import { debounce } from "common/helper";
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
+import { debounce } from "../../../../common/helper";
+import { getInitialCompany } from "../../../bsdd/utils/initial-state";
 import {
   BsdasriTransporterInput,
   BsdaTransporterInput,
@@ -36,8 +35,8 @@ import {
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs,
   TransporterInput,
-  BsffTransporterInput,
-} from "generated/graphql/types";
+  BsffTransporterInput
+} from "codegen-ui";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import CompanyResults from "./CompanyResults";
@@ -45,7 +44,7 @@ import styles from "./CompanySelector.module.scss";
 import {
   COMPANY_SELECTOR_PRIVATE_INFOS,
   FAVORITES,
-  SEARCH_COMPANIES,
+  SEARCH_COMPANIES
 } from "../../../../Apps/common/queries/company/query";
 import TransporterReceipt from "./TransporterReceipt";
 
@@ -83,7 +82,7 @@ export default function CompanySelector({
   isBsdaTransporter = false,
   optional = false,
   initialAutoSelectFirstCompany = true,
-  onCompanyPrivateInfos = undefined,
+  onCompanyPrivateInfos = undefined
 }: CompanySelectorProps) {
   // siret is the current active company
   const { siret } = useParams<{ siret: string }>();
@@ -91,7 +90,7 @@ export default function CompanySelector({
   const [field] = useField<FormCompany>({ name });
   const [selectedCompanyDetails, setSelectedCompanyDetails] = useState({
     name: field.value?.name,
-    address: field.value?.address,
+    address: field.value?.address
   });
   const { setFieldError, setFieldValue, setFieldTouched, values } =
     useFormikContext<{
@@ -115,7 +114,7 @@ export default function CompanySelector({
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
   const [
     displayForeignCompanyWithUnknownInfos,
-    setDisplayForeignCompanyWithUnknownInfos,
+    setDisplayForeignCompanyWithUnknownInfos
   ] = useState<boolean>(false);
 
   // Memoize for changes in field.value.siret and field.value.orgId
@@ -129,7 +128,7 @@ export default function CompanySelector({
   const {
     loading: isLoadingFavorites,
     data: favoritesData,
-    error: favoritesError,
+    error: favoritesError
   } = useQuery<Pick<Query, "favorites">, QueryFavoritesArgs>(
     FAVORITES(favoriteType),
     {
@@ -138,12 +137,12 @@ export default function CompanySelector({
         type: Object.values(FavoriteType).includes(favoriteType)
           ? favoriteType
           : FavoriteType.Emitter,
-        allowForeignCompanies,
+        allowForeignCompanies
       },
       skip: skipFavorite || !siret,
       onCompleted: data => {
         mergeResults([], data?.favorites ?? []);
-      },
+      }
     }
   );
 
@@ -152,7 +151,7 @@ export default function CompanySelector({
    */
   const [
     searchCompaniesQuery,
-    { loading: isLoadingSearch, data: searchData, error },
+    { loading: isLoadingSearch, data: searchData, error }
   ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
     SEARCH_COMPANIES,
     {
@@ -161,7 +160,7 @@ export default function CompanySelector({
           data?.searchCompanies ?? [],
           favoritesData?.favorites ?? []
         );
-      },
+      }
     }
   );
 
@@ -175,9 +174,9 @@ export default function CompanySelector({
       {
         variables: {
           // Compatibility with intermediaries that don't have orgId
-          clue: orgId!,
+          clue: orgId!
         },
-        skip: !orgId,
+        skip: !orgId
       }
     );
 
@@ -232,10 +231,10 @@ export default function CompanySelector({
 
       // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
       setDisplayForeignCompanyWithUnknownInfos(
-        isForeignVat(company.vatNumber!!) && isUnknownCompanyName(company.name!)
+        isForeignVat(company.vatNumber!) && isUnknownCompanyName(company.name!)
       );
 
-      setIsForeignCompany(isForeignVat(company.vatNumber!!));
+      setIsForeignCompany(isForeignVat(company.vatNumber!));
       // Prépare la mise à jour du Form
       const fields: FormCompany = {
         orgId: company.orgId,
@@ -249,7 +248,7 @@ export default function CompanySelector({
         contact: company.contact ?? "",
         phone: company.contactPhone ?? "",
         mail: company.contactEmail ?? "",
-        country: company.codePaysEtrangerEtablissement,
+        country: company.codePaysEtrangerEtablissement
       };
 
       Object.keys(fields).forEach(key => {
@@ -260,7 +259,7 @@ export default function CompanySelector({
 
       setSelectedCompanyDetails({
         name: company.name,
-        address: company.address,
+        address: company.address
       });
     },
     [
@@ -273,7 +272,7 @@ export default function CompanySelector({
       setMustBeRegistered,
       disabled,
       field.name,
-      registeredOnlyCompanies,
+      registeredOnlyCompanies
     ]
   );
 
@@ -298,7 +297,7 @@ export default function CompanySelector({
         .map(company => ({
           ...company,
           codePaysEtrangerEtablissement:
-            company.codePaysEtrangerEtablissement || "FR",
+            company.codePaysEtrangerEtablissement || "FR"
         })) ?? [];
 
     const results = [...reshapedSearchResults, ...reshapedFavorites];
@@ -343,8 +342,8 @@ export default function CompanySelector({
       await searchCompaniesQuery({
         variables: {
           clue,
-          ...(department && department.length >= 2 && { department }),
-        },
+          ...(department && department.length >= 2 && { department })
+        }
       });
     }
 
@@ -354,7 +353,7 @@ export default function CompanySelector({
     setFieldTouched,
     searchCompaniesQuery,
     field.name,
-    allowForeignCompanies,
+    allowForeignCompanies
   ]);
 
   // Disable the name field for foreign companies whose name is filled
@@ -463,40 +462,34 @@ export default function CompanySelector({
         {displayForeignCompanyWithUnknownInfos && (
           <SimpleNotificationError
             message={
-              <>
-                <span>
-                  Cet établissement existe mais nous ne pouvons pas remplir
-                  automatiquement le formulaire car les informations sont
-                  cachées par le service de recherche administratif externe à
-                  Trackdéchets.{" "}
-                  <b>Merci de compléter les informations dans le formulaire.</b>
-                </span>
-              </>
+              <span>
+                Cet établissement existe mais nous ne pouvons pas remplir
+                automatiquement le formulaire car les informations sont cachées
+                par le service de recherche administratif externe à
+                Trackdéchets.{" "}
+                <b>Merci de compléter les informations dans le formulaire.</b>
+              </span>
             }
           />
         )}
         {!isLoadingFavorites && !isLoadingSearch && !orgId && !optional && (
           <SimpleNotificationError
             message={
-              <>
-                <span>
-                  {isBsdaTransporter
-                    ? "La sélection d'un transporteur sera obligatoire avant la signature de l'entreprise de travaux"
-                    : "La sélection d'un établissement est obligatoire"}
-                </span>
-              </>
+              <span>
+                {isBsdaTransporter
+                  ? "La sélection d'un transporteur sera obligatoire avant la signature de l'entreprise de travaux"
+                  : "La sélection d'un établissement est obligatoire"}
+              </span>
             }
           />
         )}
         {mustBeRegistered && (
           <SimpleNotificationError
             message={
-              <>
-                <span>
-                  Cet établissement n'est pas inscrit sur Trackdéchets, nous ne
-                  pouvons pas l'ajouter dans ce formulaire
-                </span>
-              </>
+              <span>
+                Cet établissement n'est pas inscrit sur Trackdéchets, nous ne
+                pouvons pas l'ajouter dans ce formulaire
+              </span>
             }
           />
         )}
@@ -519,8 +512,8 @@ export default function CompanySelector({
                 codePaysEtrangerEtablissement: field.value?.country,
                 // complete with companyPrivateInfos data
                 ...(savedCompanyInfos && {
-                  ...savedCompanyInfos,
-                }),
+                  ...savedCompanyInfos
+                })
               } as CompanySearchResult
             }
           />

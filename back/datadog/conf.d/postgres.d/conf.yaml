@@ -12,6 +12,6 @@ instances:
       - service.name:postgres
       - env:%%env_DD_ENV%%
     relations:
-      - relation_regex: '.*'
+      - relation_regex: ".*"
         schemas:
-        - 'default$default'
+          - "default$default"

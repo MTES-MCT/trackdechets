@@ -12,7 +12,7 @@ export const NextButton = ({ onClick, caption = "Suivant" }: ButtonProps) => (
 );
 export const PreviousButton = ({
   onClick,
-  caption = "Précédent",
+  caption = "Précédent"
 }: ButtonProps) => (
   <button
     className="btn btn--outline-primary"

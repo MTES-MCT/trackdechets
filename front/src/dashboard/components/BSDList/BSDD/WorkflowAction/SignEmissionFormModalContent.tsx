@@ -1,27 +1,27 @@
 import React from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { RedErrorMessage } from "common/components";
-import { Loader } from "Apps/common/Components";
+import { RedErrorMessage } from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
 import {
   InlineError,
   NotificationError,
-  SimpleNotificationError,
-} from "Apps/common/Components/Error/Error";
-import { fullFormFragment } from "Apps/common/queries/fragments";
-import { GET_FORM } from "form/bsdd/utils/queries";
+  SimpleNotificationError
+} from "../../../../../Apps/common/Components/Error/Error";
+import { fullFormFragment } from "../../../../../Apps/common/queries/fragments";
+import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import {
   FormStatus,
   Mutation,
   MutationSignEmissionFormArgs,
   Query,
-  QueryFormArgs,
-} from "generated/graphql/types";
+  QueryFormArgs
+} from "codegen-ui";
 import * as yup from "yup";
 import { Field, Form as FormikForm, Formik } from "formik";
-import { FormWasteEmissionSummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormWasteEmissionSummary";
-import { FormJourneySummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormJourneySummary";
-import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import { FormWasteEmissionSummary } from "./FormWasteEmissionSummary";
+import { FormJourneySummary } from "./FormJourneySummary";
+import SignatureCodeInput from "../../../../../form/common/components/custom-inputs/SignatureCodeInput";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 
 interface SignEmissionFormModalProps {
@@ -40,12 +40,12 @@ const validationSchema = yup.object({
   securityCode: yup
     .string()
     .nullable()
-    .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
+    .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres")
 });
 
 enum EmitterType {
   Emitter = "Emitter",
-  EcoOrganisme = "EcoOrganisme",
+  EcoOrganisme = "EcoOrganisme"
 }
 
 const SIGN_EMISSION_FORM = gql`
@@ -65,18 +65,18 @@ function SignEmissionFormModalContent({
   title,
   siret,
   formId,
-  onClose,
+  onClose
 }: SignEmissionFormModalProps) {
   const {
     loading: formLoading,
     error: formError,
-    data,
+    data
   } = useQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
     variables: {
       id: formId,
-      readableId: null,
+      readableId: null
     },
-    fetchPolicy: "no-cache",
+    fetchPolicy: "no-cache"
   });
 
   const [signEmissionForm, { loading, error }] = useMutation<
@@ -93,9 +93,9 @@ function SignEmissionFormModalContent({
             status
           }
         `,
-        data: { id: formId, status: data?.signEmissionForm.status },
+        data: { id: formId, status: data?.signEmissionForm.status }
       });
-    },
+    }
   });
 
   const TODAY = new Date();
@@ -121,14 +121,14 @@ function SignEmissionFormModalContent({
           quantity: form.temporaryStorageDetail?.wasteDetails?.quantity ?? 0,
           onuCode: form.temporaryStorageDetail?.wasteDetails?.onuCode ?? "",
           transporterNumberPlate:
-            form.temporaryStorageDetail?.transporter?.numberPlate ?? "",
+            form.temporaryStorageDetail?.transporter?.numberPlate ?? ""
         }
       : {
           packagingInfos: form.wasteDetails?.packagingInfos,
           quantity: form.wasteDetails?.quantity ?? 0,
           onuCode: form.wasteDetails?.onuCode ?? "",
-          transporterNumberPlate: form.transporter?.numberPlate ?? "",
-        }),
+          transporterNumberPlate: form.transporter?.numberPlate ?? ""
+        })
   };
 
   const handlesubmit = async values => {
@@ -144,142 +144,142 @@ function SignEmissionFormModalContent({
             emittedAt: values.emittedAt,
             emittedBy: values.emittedBy,
             emittedByEcoOrganisme:
-              values.emittedByType === EmitterType.EcoOrganisme,
+              values.emittedByType === EmitterType.EcoOrganisme
           },
           securityCode: values.securityCode
             ? Number(values.securityCode)
-            : undefined,
-        },
+            : undefined
+        }
       });
       onClose();
-    } catch (err) {}
+    } catch (err) {
+      // Ignore error
+    }
   };
 
   return (
-    <>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handlesubmit}
-      >
-        {({ values }) => {
-          let signatureAuthorSiret: string | null | undefined = undefined;
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={handlesubmit}
+    >
+      {({ values }) => {
+        let signatureAuthorSiret: string | null | undefined = undefined;
 
-          if (form.status === FormStatus.Resealed) {
-            signatureAuthorSiret = form.recipient?.company?.siret;
+        if (form.status === FormStatus.Resealed) {
+          signatureAuthorSiret = form.recipient?.company?.siret;
+        } else {
+          if (values.emittedByType === EmitterType.EcoOrganisme) {
+            signatureAuthorSiret = form.ecoOrganisme?.siret;
           } else {
-            if (values.emittedByType === EmitterType.EcoOrganisme) {
-              signatureAuthorSiret = form.ecoOrganisme?.siret;
-            } else {
-              signatureAuthorSiret = form.emitter?.company?.siret;
-            }
+            signatureAuthorSiret = form.emitter?.company?.siret;
           }
+        }
 
-          const EMITTER_TYPE_LABEL: Record<EmitterType, string> = {
-            [EmitterType.Emitter]:
-              form.status === FormStatus.Sealed
-                ? "émetteur du déchet"
-                : "entreposage provisoire",
-            [EmitterType.EcoOrganisme]: "éco-organisme",
-          };
-          const emitterLabel = EMITTER_TYPE_LABEL[values.emittedByType];
+        const EMITTER_TYPE_LABEL: Record<EmitterType, string> = {
+          [EmitterType.Emitter]:
+            form.status === FormStatus.Sealed
+              ? "émetteur du déchet"
+              : "entreposage provisoire",
+          [EmitterType.EcoOrganisme]: "éco-organisme"
+        };
+        const emitterLabel = EMITTER_TYPE_LABEL[values.emittedByType];
 
-          return (
-            <FormikForm>
-              <FormWasteEmissionSummary form={form} />
-              <FormJourneySummary form={form} />
+        return (
+          <FormikForm>
+            <FormWasteEmissionSummary form={form} />
+            <FormJourneySummary form={form} />
 
-              {form.status === FormStatus.Sealed && form.ecoOrganisme && (
-                <>
-                  {Object.entries(EMITTER_TYPE_LABEL).map(([value, label]) => (
-                    <div key={value} className="form__row">
-                      <label>
-                        <Field
-                          type="radio"
-                          name="emittedByType"
-                          value={value}
-                          className="td-radio"
-                        />
-                        Signer en tant que <strong>{label}</strong>
-                      </label>
-                    </div>
-                  ))}
-                </>
-              )}
-
-              <p className="tw-mt-4">
-                En qualité d'<strong>{emitterLabel}</strong>, j'atteste que les
-                informations ci-dessus sont correctes. En signant ce document,
-                je déclare transférer le déchet.
-              </p>
-
-              <div className="form__row">
-                <label>
-                  Date d'émission
-                  <div className="td-date-wrapper">
-                    <Field
-                      name="emittedAt"
-                      component={DateInput}
-                      minDate={subMonths(TODAY, 2)}
-                      maxDate={TODAY}
-                      required
-                      className="td-input"
-                    />
+            {form.status === FormStatus.Sealed && form.ecoOrganisme && (
+              <>
+                {Object.entries(EMITTER_TYPE_LABEL).map(([value, label]) => (
+                  <div key={value} className="form__row">
+                    <label>
+                      <Field
+                        type="radio"
+                        name="emittedByType"
+                        value={value}
+                        className="td-radio"
+                      />
+                      Signer en tant que <strong>{label}</strong>
+                    </label>
                   </div>
-                </label>
-                <RedErrorMessage name="emittedAt" />
-              </div>
+                ))}
+              </>
+            )}
 
+            <p className="tw-mt-4">
+              En qualité d'<strong>{emitterLabel}</strong>, j'atteste que les
+              informations ci-dessus sont correctes. En signant ce document, je
+              déclare transférer le déchet.
+            </p>
+
+            <div className="form__row">
+              <label>
+                Date d'émission
+                <div className="td-date-wrapper">
+                  <Field
+                    name="emittedAt"
+                    component={DateInput}
+                    minDate={subMonths(TODAY, 2)}
+                    maxDate={TODAY}
+                    required
+                    className="td-input"
+                  />
+                </div>
+              </label>
+              <RedErrorMessage name="emittedAt" />
+            </div>
+
+            <div className="form__row">
+              <label>
+                NOM et prénom du signataire
+                <Field
+                  className="td-input"
+                  name="emittedBy"
+                  placeholder="NOM Prénom"
+                />
+              </label>
+              <RedErrorMessage name="emittedBy" />
+            </div>
+
+            {siret !== signatureAuthorSiret && (
               <div className="form__row">
                 <label>
-                  NOM et prénom du signataire
+                  Code de signature de l'{emitterLabel}
                   <Field
+                    component={SignatureCodeInput}
                     className="td-input"
-                    name="emittedBy"
-                    placeholder="NOM Prénom"
+                    name="securityCode"
+                    placeholder="1234"
                   />
                 </label>
-                <RedErrorMessage name="emittedBy" />
+                <RedErrorMessage name="securityCode" />
               </div>
+            )}
 
-              {siret !== signatureAuthorSiret && (
-                <div className="form__row">
-                  <label>
-                    Code de signature de l'{emitterLabel}
-                    <Field
-                      component={SignatureCodeInput}
-                      className="td-input"
-                      name="securityCode"
-                      placeholder="1234"
-                    />
-                  </label>
-                  <RedErrorMessage name="securityCode" />
-                </div>
-              )}
+            {error && <NotificationError apolloError={error} />}
 
-              {error && <NotificationError apolloError={error} />}
-
-              <div className="td-modal-actions">
-                <button
-                  type="button"
-                  className="btn btn--outline-primary"
-                  onClick={onClose}
-                >
-                  Annuler
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn--primary"
-                  disabled={loading}
-                >
-                  <span>{loading ? "Signature en cours..." : title}</span>
-                </button>
-              </div>
-            </FormikForm>
-          );
-        }}
-      </Formik>
-    </>
+            <div className="td-modal-actions">
+              <button
+                type="button"
+                className="btn btn--outline-primary"
+                onClick={onClose}
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={loading}
+              >
+                <span>{loading ? "Signature en cours..." : title}</span>
+              </button>
+            </div>
+          </FormikForm>
+        );
+      }}
+    </Formik>
   );
 }
 

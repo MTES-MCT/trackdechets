@@ -5,11 +5,11 @@ import {
   TableCell,
   TableHead,
   TableHeaderCell,
-  TableRow,
-} from "common/components";
-import { Loader } from "Apps/common/Components";
-import { GET_BSDAS } from "form/bsda/stepper/queries";
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
+  TableRow
+} from "../../../../common/components";
+import { Loader } from "../../../../Apps/common/Components";
+import { GET_BSDAS } from "../../stepper/queries";
+import { getInitialCompany } from "../../../bsdd/utils/initial-state";
 import { FieldArray, useFormikContext } from "formik";
 import {
   Bsda,
@@ -18,8 +18,8 @@ import {
   BsdaStatus,
   PageInfo,
   Query,
-  QueryBsdasArgs,
-} from "generated/graphql/types";
+  QueryBsdasArgs
+} from "codegen-ui";
 import React from "react";
 import { useParams } from "react-router-dom";
 import initialState from "../../stepper/initial-state";
@@ -41,21 +41,22 @@ export function BsdaPicker({ name, bsdaId }: Props) {
           forwardedIn: { _eq: null },
           destination: {
             operation: { code: codeFilter },
-            company: { siret: { _eq: siret } },
-          },
-        },
+            company: { siret: { _eq: siret } }
+          }
+        }
       },
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     }
   );
   const {
     values: { forwarding, grouping },
-    setFieldValue,
+    setFieldValue
   } = useFormikContext<BsdaInput>();
 
   const isForwardingPicker = name === "forwarding";
 
   function onGroupingChange(groupedBsdas: Bsda[]) {
+    setFieldValue("waste.code", groupedBsdas?.[0]?.waste?.code ?? "");
     setFieldValue(
       "weight.value",
       groupedBsdas?.reduce(
@@ -170,7 +171,7 @@ export function BsdaPicker({ name, bsdaId }: Props) {
               push(bsda.id);
               onGroupingChange([
                 ...bsdas.filter(b => grouping?.includes(b.id)),
-                bsda,
+                bsda
               ]);
             }
           }}
@@ -202,7 +203,7 @@ function PickerTable({
   pickerType,
   selected,
   fetchMore,
-  pageInfo,
+  pageInfo
 }: PickerTableProps) {
   return (
     <div>
@@ -211,7 +212,8 @@ function PickerTable({
           <TableRow>
             <TableHeaderCell />
             <TableHeaderCell>Numéro</TableHeaderCell>
-            <TableHeaderCell>Déchet</TableHeaderCell>
+            <TableHeaderCell>Code déchet</TableHeaderCell>
+            <TableHeaderCell>Nom du matériau</TableHeaderCell>
             <TableHeaderCell>Poids reçu (tonnes)</TableHeaderCell>
             <TableHeaderCell>Émetteur</TableHeaderCell>
             <TableHeaderCell>CAP final</TableHeaderCell>
@@ -220,13 +222,18 @@ function PickerTable({
         </TableHead>
         <TableBody>
           {bsdas.map(bsda => {
-            const getNextDestinationSiret = b =>
-              b?.destination?.operation?.nextDestination?.company?.siret;
-            const isDisabled =
+            const firstSelectedBsda =
               Array.isArray(selected) &&
               selected.length > 0 &&
-              getNextDestinationSiret(bsdas.find(b => b.id === selected[0])) !==
-                getNextDestinationSiret(bsda);
+              bsdas.find(b => b.id === selected[0]);
+            const getNextDestinationSiret = b =>
+              b?.destination?.operation?.nextDestination?.company?.siret;
+
+            const isDisabled =
+              firstSelectedBsda &&
+              (getNextDestinationSiret(firstSelectedBsda) !==
+                getNextDestinationSiret(bsda) ||
+                bsda.waste?.code !== firstSelectedBsda?.waste?.code);
 
             return (
               <TableRow
@@ -243,9 +250,8 @@ function PickerTable({
                   />
                 </TableCell>
                 <TableCell>{bsda.id}</TableCell>
-                <TableCell>
-                  {bsda.waste?.code} - {bsda.waste?.materialName ?? "inconnue"}
-                </TableCell>
+                <TableCell>{bsda.waste?.code}</TableCell>
+                <TableCell>{bsda.waste?.materialName ?? "inconnu"}</TableCell>
                 <TableCell>{bsda.destination?.reception?.weight}</TableCell>
                 <TableCell>{bsda.emitter?.company?.name}</TableCell>
                 <TableCell>
@@ -258,11 +264,11 @@ function PickerTable({
                         bsda.destination?.operation?.nextDestination?.company
                           ?.name,
                         bsda.destination?.operation?.nextDestination?.company
-                          ?.siret,
+                          ?.siret
                       ]
                     : [
                         bsda.destination?.company?.name,
-                        bsda.destination?.company?.siret,
+                        bsda.destination?.company?.siret
                       ]
                   )
                     .filter(Boolean)
@@ -289,7 +295,7 @@ function LoadMoreButton({ pageInfo, fetchMore }) {
         onClick={() =>
           fetchMore({
             variables: {
-              after: pageInfo.endCursor,
+              after: pageInfo.endCursor
             },
             updateQuery: (prev, { fetchMoreResult }) => {
               if (fetchMoreResult == null) {
@@ -301,10 +307,10 @@ function LoadMoreButton({ pageInfo, fetchMore }) {
                 bsdas: {
                   ...prev.bsdas,
                   ...fetchMoreResult.bsdas,
-                  edges: prev.bsdas.edges.concat(fetchMoreResult.bsdas.edges),
-                },
+                  edges: prev.bsdas.edges.concat(fetchMoreResult.bsdas.edges)
+                }
               };
-            },
+            }
           })
         }
       >

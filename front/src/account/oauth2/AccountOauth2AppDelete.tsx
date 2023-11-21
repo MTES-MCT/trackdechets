@@ -1,9 +1,9 @@
 import * as React from "react";
-import { Modal } from "common/components";
-import { Application } from "generated/graphql/types";
+import { Modal } from "../../common/components";
+import { Application } from "codegen-ui";
 import { useMutation } from "@apollo/client";
 import { MY_APPLICATIONS, DELETE_APPLICATION } from "./queries";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+import { NotificationError } from "../../Apps/common/Components/Error/Error";
 
 type AccountOauth2AppDeleteProps = {
   application: Application;
@@ -12,7 +12,7 @@ type AccountOauth2AppDeleteProps = {
 
 export default function AccountOauth2AppDelete({
   application,
-  onClose,
+  onClose
 }: AccountOauth2AppDeleteProps) {
   const [deleteApplication, { loading, error }] = useMutation(
     DELETE_APPLICATION,

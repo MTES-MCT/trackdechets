@@ -1,8 +1,8 @@
 import React, { ReactNode } from "react";
 import { gql, useQuery } from "@apollo/client";
-import { Query } from "generated/graphql/types";
+import { Query } from "codegen-ui";
 import Header from "./Header";
-
+import { Toaster } from "react-hot-toast";
 import sandboxIcon from "./assets/code-sandbox.svg";
 import downtimeIcon from "./assets/code-downtime.svg";
 
@@ -27,7 +27,7 @@ export default function Layout({
   isAuthenticated,
   isAdmin,
   v2banner,
-  defaultOrgId,
+  defaultOrgId
 }: AuthProps & {
   children: ReactNode;
   v2banner?: JSX.Element;
@@ -38,6 +38,7 @@ export default function Layout({
 
   return (
     <>
+      <Toaster />
       {isIE11 && (
         <div
           className="notification notification--error tw-text-center"
@@ -66,7 +67,7 @@ export default function Layout({
           <img src={downtimeIcon} alt="" />
           <div
             dangerouslySetInnerHTML={{
-              __html: VITE_DOWNTIME_MESSAGE as string,
+              __html: VITE_DOWNTIME_MESSAGE as string
             }}
           ></div>
         </div>
@@ -81,7 +82,7 @@ export default function Layout({
             margin: 0,
             backgroundColor: "red",
             color: "white",
-            fontWeight: "bold",
+            fontWeight: "bold"
           }}
         >
           {data.warningMessage}

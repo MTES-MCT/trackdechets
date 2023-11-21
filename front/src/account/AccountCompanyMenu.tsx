@@ -11,7 +11,7 @@ type Props = {
 export default function AccountCompanyMenu({
   links,
   activeLink,
-  setActiveLink,
+  setActiveLink
 }: Props) {
   return (
     <div className={styles.menu}>

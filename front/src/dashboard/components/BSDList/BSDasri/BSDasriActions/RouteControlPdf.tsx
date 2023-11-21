@@ -1,17 +1,15 @@
 import React from "react";
 
-import {
-  Mutation,
-  MutationCreatePdfAccessTokenArgs,
-} from "generated/graphql/types";
+import { Mutation, MutationCreatePdfAccessTokenArgs } from "codegen-ui";
 import QRCodeIcon from "react-qr-code";
 import { useMutation, gql } from "@apollo/client";
-import { Loader } from "Apps/common/Components";
+import { Loader } from "../../../../../Apps/common/Components";
 
 import { useParams, useHistory } from "react-router-dom";
-import { InlineError } from "Apps/common/Components/Error/Error";
+import { InlineError } from "../../../../../Apps/common/Components/Error/Error";
+import { TOAST_DURATION } from "../../../../../common/config";
 
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
 
 const CREATE_PDF_ACCESS_TOKEN = gql`
   mutation CreatePdfAccessToken($input: CreatePdfAccessTokenInput!) {
@@ -31,9 +29,9 @@ export function RouteControlPdf() {
     MutationCreatePdfAccessTokenArgs
   >(CREATE_PDF_ACCESS_TOKEN, {
     onError: () =>
-      cogoToast.error(`Le QR-code n'a pas pu être affiché`, {
-        hideAfter: 5,
-      }),
+      toast.error(`Le QR-code n'a pas pu être affiché`, {
+        duration: TOAST_DURATION
+      })
   });
 
   return (
@@ -65,8 +63,8 @@ export function RouteControlPdf() {
           onClick={() =>
             createPdfAccessToken({
               variables: {
-                input: { bsdId: id },
-              },
+                input: { bsdId: id }
+              }
             })
           }
         >

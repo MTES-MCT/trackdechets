@@ -1,9 +1,9 @@
 import React from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Formik, FormikProps, Form, Field } from "formik";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { CompanyPrivate } from "generated/graphql/types";
+import RedErrorMessage from "../../../common/components/RedErrorMessage";
+import { NotificationError } from "../../../Apps/common/Components/Error/Error";
+import { CompanyPrivate } from "codegen-ui";
 
 type Props = {
   company: Pick<CompanyPrivate, "id" | "siret" | "vhuAgrementBroyeur">;
@@ -62,20 +62,20 @@ const DELETE_VHU_AGREMENT = gql`
  */
 export default function AccountFormCompanyAddVhuAgrementBroyeur({
   company,
-  toggleEdition,
+  toggleEdition
 }: Props) {
   const vhuAgrementBroyeur = company.vhuAgrementBroyeur;
 
   const [
     createOrUpdateVhuAgrement,
-    { loading: updateOrCreateLoading, error: updateOrCreateError },
+    { loading: updateOrCreateLoading, error: updateOrCreateError }
   ] = useMutation(
     vhuAgrementBroyeur ? UPDATE_VHU_AGREMENT : CREATE_VHU_AGREMENT
   );
 
   const [
     updateCompany,
-    { loading: updateCompanyLoading, error: updateCompanyError },
+    { loading: updateCompanyLoading, error: updateCompanyError }
   ] = useMutation(UPDATE_COMPANY_VHU_AGREMENT);
 
   const [deleteVhuAgrement, { loading: deleteLoading, error: deleteError }] =
@@ -91,19 +91,19 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
               }
             }
           `,
-          data: { vhuAgrementBroyeur: null },
+          data: { vhuAgrementBroyeur: null }
         });
-      },
+      }
     });
 
   const initialValues: V = vhuAgrementBroyeur
     ? {
         agrementNumber: vhuAgrementBroyeur.agrementNumber,
-        department: vhuAgrementBroyeur.department,
+        department: vhuAgrementBroyeur.department
       }
     : {
         agrementNumber: "",
-        department: "",
+        department: ""
       };
 
   return (
@@ -122,17 +122,17 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
         onSubmit={async values => {
           const input = {
             ...(vhuAgrementBroyeur?.id ? { id: vhuAgrementBroyeur.id } : {}),
-            ...values,
+            ...values
           };
           const { data } = await createOrUpdateVhuAgrement({
-            variables: { input },
+            variables: { input }
           });
           if (data.createVhuAgrement) {
             await updateCompany({
               variables: {
                 id: company.id,
-                vhuAgrementBroyeurId: data.createVhuAgrement.id,
-              },
+                vhuAgrementBroyeurId: data.createVhuAgrement.id
+              }
             });
           }
           toggleEdition();
@@ -142,7 +142,7 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
             ...(!values.agrementNumber
               ? { agrementNumber: "Champ requis" }
               : {}),
-            ...(!values.department ? { department: "Champ requis" } : {}),
+            ...(!values.department ? { department: "Champ requis" } : {})
           };
         }}
       >
@@ -187,8 +187,8 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
                   onClick={async () => {
                     await deleteVhuAgrement({
                       variables: {
-                        input: { id: vhuAgrementBroyeur.id },
-                      },
+                        input: { id: vhuAgrementBroyeur.id }
+                      }
                     });
                     toggleEdition();
                   }}

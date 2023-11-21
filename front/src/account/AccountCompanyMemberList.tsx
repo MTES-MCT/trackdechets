@@ -1,13 +1,9 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { filter } from "graphql-anywhere";
 import AccountFormCompanyInviteNewUser from "./fields/forms/AccountFormCompanyInviteNewUser";
 import AccountCompanyMember from "./AccountCompanyMember";
-import {
-  CompanyPrivate,
-  CompanyVerificationStatus,
-} from "generated/graphql/types";
-import * as COMPANY_CONSTANTS from "generated/constants/COMPANY_CONSTANTS";
+import { CompanyPrivate, CompanyVerificationStatus } from "codegen-ui";
+import * as COMPANY_CONSTANTS from "shared/constants";
 
 const { VITE_VERIFY_COMPANY } = import.meta.env;
 
@@ -27,7 +23,7 @@ AccountCompanyMemberList.fragments = {
     ${AccountFormCompanyInviteNewUser.fragments.company}
     ${AccountCompanyMember.fragments.company}
     ${AccountCompanyMember.fragments.user}
-  `,
+  `
 };
 
 export default function AccountCompanyMemberList({ company }: Props) {
@@ -43,12 +39,7 @@ export default function AccountCompanyMemberList({ company }: Props) {
       {VITE_VERIFY_COMPANY !== "true" ||
       !isProfessional ||
       (isProfessional && isVerified) ? (
-        <AccountFormCompanyInviteNewUser
-          company={filter(
-            AccountFormCompanyInviteNewUser.fragments.company,
-            company
-          )}
-        />
+        <AccountFormCompanyInviteNewUser company={company} />
       ) : (
         <div className="notification">
           Vous ne pouvez pas inviter de nouveaux membres car l'établissement n'a
@@ -62,11 +53,8 @@ export default function AccountCompanyMemberList({ company }: Props) {
             {company.users.map(user => (
               <AccountCompanyMember
                 key={user.id}
-                company={filter(
-                  AccountCompanyMember.fragments.company,
-                  company
-                )}
-                user={filter(AccountCompanyMember.fragments.user, user)}
+                company={company}
+                user={user}
               />
             ))}
           </tbody>

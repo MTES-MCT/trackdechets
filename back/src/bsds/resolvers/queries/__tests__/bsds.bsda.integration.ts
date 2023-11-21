@@ -8,6 +8,7 @@ import { bsdaFactory } from "../../../../bsda/__tests__/factories";
 import { ErrorCode } from "../../../../common/errors";
 import {
   Mutation,
+  MutationCreateBsdaArgs,
   MutationCreateBsdaRevisionRequestArgs,
   MutationCreateDraftBsdaArgs,
   MutationDeleteBsdaArgs,
@@ -15,6 +16,7 @@ import {
   MutationPublishBsdaArgs,
   MutationSignBsdaArgs,
   MutationSubmitBsdaRevisionRequestApprovalArgs,
+  MutationUpdateBsdaArgs,
   Query,
   QueryBsdsArgs
 } from "../../../../generated/graphql/types";
@@ -1235,5 +1237,339 @@ describe("Query.bsds.bsdas mutations", () => {
         expect.objectContaining({ node: { id: duplicateBsda.id } })
       ])
     );
+  });
+});
+
+describe("Bsda sub-resolvers in query bsds", () => {
+  afterEach(resetDatabase);
+
+  const GET_BSDS = gql`
+    query GetBsds($where: BsdWhere) {
+      bsds(where: $where) {
+        edges {
+          node {
+            ... on Bsda {
+              id
+              groupedIn {
+                id
+              }
+              forwardedIn {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const CREATE_BSDA = gql`
+    mutation CreateBsda($input: BsdaInput!) {
+      createBsda(input: $input) {
+        id
+      }
+    }
+  `;
+
+  const UPDATE_BSDA = gql`
+    mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
+      updateBsda(id: $id, input: $input) {
+        id
+      }
+    }
+  `;
+
+  test("Bsda.groupedIn should resolve correctly", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const { query, mutate } = makeClient(ttr.user);
+    const bsda = await bsdaFactory({
+      opt: {
+        wasteCode: "06 07 01*",
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_CHILD",
+        destinationOperationCode: "R 13"
+      }
+    });
+    const {
+      data: { createBsda }
+    } = await mutate<Pick<Mutation, "createBsda">, MutationCreateBsdaArgs>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input: {
+            type: "GATHERING",
+            waste: { code: "06 07 01*" },
+            emitter: {
+              company: {
+                siret: ttr.company.siret,
+                name: ttr.company.name,
+                contact: ttr.company.contact,
+                phone: ttr.company.contactPhone,
+                mail: ttr.company.contactEmail,
+                address: ttr.company.address
+              }
+            },
+            destination: {
+              company: {
+                siret: destination.company.siret,
+                name: destination.company.name,
+                contact: destination.company.contact,
+                phone: destination.company.contactPhone,
+                mail: destination.company.contactEmail,
+                address: destination.company.address
+              },
+              cap: "CAP",
+              plannedOperationCode: "R 5"
+            },
+            grouping: [bsda.id]
+          }
+        }
+      }
+    );
+
+    const bsdaSuite = createBsda;
+
+    await refreshElasticSearch();
+
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    const bsdas = data.bsds!.edges.map(e => e.node);
+    expect(bsdas).toHaveLength(2);
+    const queriedBsda = bsdas.find(bsd => bsd.id === bsda.id);
+    expect(queriedBsda).toBeDefined();
+    expect((queriedBsda as any)!.groupedIn!.id).toEqual(bsdaSuite.id);
+  });
+
+  test("Bsda.groupedIn should be null when the bsda is removed from the groupement", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const { query, mutate } = makeClient(ttr.user);
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_CHILD",
+        wasteCode: "06 07 01*",
+        destinationOperationCode: "R 13"
+      }
+    });
+
+    const anotherBsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_CHILD",
+        wasteCode: "06 07 01*",
+        destinationOperationCode: "R 13"
+      }
+    });
+
+    const {
+      data: { createBsda }
+    } = await mutate<Pick<Mutation, "createBsda">, MutationCreateBsdaArgs>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input: {
+            type: "GATHERING",
+            waste: { code: "06 07 01*" },
+            emitter: {
+              company: {
+                siret: ttr.company.siret,
+                name: ttr.company.name,
+                contact: ttr.company.contact,
+                phone: ttr.company.contactPhone,
+                mail: ttr.company.contactEmail,
+                address: ttr.company.address
+              }
+            },
+            destination: {
+              company: {
+                siret: destination.company.siret,
+                name: destination.company.name,
+                contact: destination.company.contact,
+                phone: destination.company.contactPhone,
+                mail: destination.company.contactEmail,
+                address: destination.company.address
+              },
+              cap: "CAP",
+              plannedOperationCode: "R 5"
+            },
+            grouping: [bsda.id]
+          }
+        }
+      }
+    );
+
+    const bsdaSuite = createBsda;
+    await refreshElasticSearch();
+
+    // Le BSDA initial est dissocié du BSDA de regroupement
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: { id: bsdaSuite.id, input: { grouping: [anotherBsda.id] } }
+    });
+
+    expect(errors).toBeUndefined();
+    await refreshElasticSearch();
+
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+
+    const bsdas = data.bsds!.edges.map(e => e.node);
+    expect(bsdas).toHaveLength(3);
+    const queriedBsda = bsdas.find(bsd => bsd.id === bsda.id);
+    expect(queriedBsda).toBeDefined();
+    expect((queriedBsda as any)!.groupedIn).toBeNull();
+  });
+
+  test("Bsda.forwardedIn should resolve correctly", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const { query, mutate } = makeClient(ttr.user);
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_CHILD",
+        destinationOperationCode: "R 13"
+      }
+    });
+    const {
+      data: { createBsda }
+    } = await mutate<Pick<Mutation, "createBsda">, MutationCreateBsdaArgs>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input: {
+            type: "RESHIPMENT",
+            waste: { code: "06 07 01*" },
+            emitter: {
+              company: {
+                siret: ttr.company.siret,
+                name: ttr.company.name,
+                contact: ttr.company.contact,
+                phone: ttr.company.contactPhone,
+                mail: ttr.company.contactEmail,
+                address: ttr.company.address
+              }
+            },
+            destination: {
+              company: {
+                siret: destination.company.siret,
+                name: destination.company.name,
+                contact: destination.company.contact,
+                phone: destination.company.contactPhone,
+                mail: destination.company.contactEmail,
+                address: destination.company.address
+              },
+              cap: "CAP",
+              plannedOperationCode: "R 5"
+            },
+            forwarding: bsda.id
+          }
+        }
+      }
+    );
+    const bsdaSuite = createBsda;
+
+    await refreshElasticSearch();
+
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    const bsdas = data.bsds!.edges.map(e => e.node);
+    expect(bsdas).toHaveLength(2);
+    const queriedBsda = bsdas.find(bsd => bsd.id === bsda.id);
+    expect(queriedBsda).toBeDefined();
+    expect((queriedBsda as any)!.forwardedIn!.id).toEqual(bsdaSuite.id);
+  });
+
+  test("Bsda.forwardedIn should be null when removed from the réexpedition", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const { query, mutate } = makeClient(ttr.user);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_CHILD",
+        destinationOperationCode: "R 13"
+      }
+    });
+    const anoterBsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: ttr.company.siret,
+        status: "AWAITING_CHILD",
+        destinationOperationCode: "R 13"
+      }
+    });
+    const {
+      data: { createBsda }
+    } = await mutate<Pick<Mutation, "createBsda">, MutationCreateBsdaArgs>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input: {
+            type: "RESHIPMENT",
+            waste: { code: "06 07 01*" },
+            emitter: {
+              company: {
+                siret: ttr.company.siret,
+                name: ttr.company.name,
+                contact: ttr.company.contact,
+                phone: ttr.company.contactPhone,
+                mail: ttr.company.contactEmail,
+                address: ttr.company.address
+              }
+            },
+            destination: {
+              company: {
+                siret: destination.company.siret,
+                name: destination.company.name,
+                contact: destination.company.contact,
+                phone: destination.company.contactPhone,
+                mail: destination.company.contactEmail,
+                address: destination.company.address
+              },
+              cap: "CAP",
+              plannedOperationCode: "R 5"
+            },
+            forwarding: bsda.id
+          }
+        }
+      }
+    );
+    const bsdaSuite = createBsda;
+
+    await refreshElasticSearch();
+
+    // Le BSDA initial est dissocié du BSDA de réexpedition
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: { id: bsdaSuite.id, input: { forwarding: anoterBsda.id } }
+    });
+
+    expect(errors).toBeUndefined();
+    await refreshElasticSearch();
+
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    const bsdas = data.bsds!.edges.map(e => e.node);
+    expect(bsdas).toHaveLength(3);
+    const queriedBsda = bsdas.find(bsd => bsd.id === bsda.id);
+    expect(queriedBsda).toBeDefined();
+    expect((queriedBsda as any)!.forwardedIn).toBeNull();
   });
 });

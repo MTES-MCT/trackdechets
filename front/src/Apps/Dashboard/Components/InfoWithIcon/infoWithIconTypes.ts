@@ -1,4 +1,4 @@
-import { Maybe } from "generated/graphql/types";
+import { Maybe } from "codegen-ui";
 
 export enum InfoIconCode {
   TempStorage = "TempStorage",
@@ -7,7 +7,7 @@ export enum InfoIconCode {
   CustomInfo = "CustomInfo",
   TransporterNumberPlate = "TransporterNumberPlate",
   PickupSite = "PickupSite",
-  default = "",
+  default = ""
 }
 export enum InfoIconValue {
   TempStorage = "Entreposage provisoire",
@@ -16,7 +16,7 @@ export enum InfoIconValue {
   CustomInfo = "Champ libre",
   TransporterNumberPlate = "Plaque d'immatriculation",
   PickupSite = "",
-  default = "",
+  default = ""
 }
 
 export interface InfoWithIconProps {

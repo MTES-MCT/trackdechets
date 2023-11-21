@@ -9,23 +9,21 @@ export function InlineRadioButton({
 }: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement>) {
   const cssId = `id_${name}_${id}`;
   return (
-    <>
-      <label className={styles.labelInline} htmlFor={cssId}>
-        <input
-          id={cssId}
-          name={name}
-          type="radio"
-          value={id}
-          checked={id === value}
-          onChange={onChange}
-          onBlur={onBlur}
-          className="td-radio"
-          {...props}
-        />
+    <label className={styles.labelInline} htmlFor={cssId}>
+      <input
+        id={cssId}
+        name={name}
+        type="radio"
+        value={id}
+        checked={id === value}
+        onChange={onChange}
+        onBlur={onBlur}
+        className="td-radio"
+        {...props}
+      />
 
-        {label}
-      </label>
-    </>
+      {label}
+    </label>
   );
 }
 

@@ -1,26 +1,27 @@
 import React, { useState } from "react";
 import { useMutation, gql, useQuery } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
 import {
   Mutation,
   MutationTakeOverSegmentArgs,
   QueryFormArgs,
-  Query,
-} from "generated/graphql/types";
-import { IconBusTransfer } from "Apps/common/Components/Icons/Icons";
-import ActionButton from "common/components/ActionButton";
-import TdModal from "Apps/common/Components/Modal/Modal";
+  Query
+} from "codegen-ui";
+import { IconBusTransfer } from "../../../../../../Apps/common/Components/Icons/Icons";
+import ActionButton from "../../../../../../common/components/ActionButton";
+import TdModal from "../../../../../../Apps/common/Components/Modal/Modal";
 import {
   NotificationError,
   SimpleNotificationError,
-  InlineError,
-} from "Apps/common/Components/Error/Error";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+  InlineError
+} from "../../../../../../Apps/common/Components/Error/Error";
+import DateInput from "../../../../../../form/common/components/custom-inputs/DateInput";
 import { WorkflowActionProps } from "../WorkflowAction";
-import { GET_BSDS } from "Apps/common/queries";
-import { Loader } from "Apps/common/Components";
-import { GET_FORM } from "form/bsdd/utils/queries";
+import { GET_BSDS } from "../../../../../../Apps/common/queries";
+import { Loader } from "../../../../../../Apps/common/Components";
+import { GET_FORM } from "../../../../../../form/bsdd/utils/queries";
+import { TOAST_DURATION } from "../../../../../../common/config";
 
 const TAKE_OVER_SEGMENT = gql`
   mutation takeOverSegment($id: ID!, $takeOverInfo: TakeOverInput!) {
@@ -39,13 +40,13 @@ function TakeOverSegmentModal({ formId, onClose }: TakeOverSegmentModalProps) {
   const {
     loading: formLoading,
     error: formError,
-    data,
+    data
   } = useQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
     variables: {
       id: formId,
-      readableId: null,
+      readableId: null
     },
-    fetchPolicy: "no-cache",
+    fetchPolicy: "no-cache"
   });
 
   const [takeOverSegment, { loading, error }] = useMutation<
@@ -56,13 +57,13 @@ function TakeOverSegmentModal({ formId, onClose }: TakeOverSegmentModalProps) {
     awaitRefetchQueries: true,
     onCompleted: () => {
       onClose();
-      cogoToast.success("La prise en charge du bordereau est validée", {
-        hideAfter: 5,
+      toast.success("La prise en charge du bordereau est validée", {
+        duration: TOAST_DURATION
       });
     },
     onError: () => {
       // The error is handled in the UI
-    },
+    }
   });
   if (formLoading) return <Loader />;
   if (formError) return <InlineError apolloError={formError} />;
@@ -77,7 +78,7 @@ function TakeOverSegmentModal({ formId, onClose }: TakeOverSegmentModalProps) {
   const initialValues = {
     takenOverBy: "",
     takenOverAt: new Date().toISOString(),
-    numberPlate: segment.transporter?.numberPlate ?? "",
+    numberPlate: segment.transporter?.numberPlate ?? ""
   };
 
   return (
@@ -88,13 +89,13 @@ function TakeOverSegmentModal({ formId, onClose }: TakeOverSegmentModalProps) {
         onSubmit={values => {
           const variables = {
             takeOverInfo: { ...values },
-            id: segment.id,
+            id: segment.id
           };
 
           takeOverSegment({ variables });
         }}
       >
-        {({ values }) => (
+        {() => (
           <FormikForm>
             <div className="form__row">
               <label>

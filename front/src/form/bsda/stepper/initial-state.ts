@@ -1,9 +1,5 @@
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import {
-  BsdaConsistence,
-  BsdaType,
-  TransportMode,
-} from "generated/graphql/types";
+import { getInitialCompany } from "../../bsdd/utils/initial-state";
+import { BsdaConsistence, BsdaType, TransportMode } from "codegen-ui";
 import { getInitialEmitterPickupSite } from "./steps/Emitter";
 
 const initialState = {
@@ -11,7 +7,7 @@ const initialState = {
   emitter: {
     company: getInitialCompany(),
     isPrivateIndividual: false,
-    pickupSite: getInitialEmitterPickupSite(),
+    pickupSite: getInitialEmitterPickupSite()
   },
   waste: {
     code: "",
@@ -20,12 +16,12 @@ const initialState = {
     consistence: BsdaConsistence.Solide,
     sealNumbers: [],
     adr: "",
-    pop: false,
+    pop: false
   },
   packagings: [],
   weight: {
     isEstimate: false,
-    value: null,
+    value: null
   },
   worker: {
     isDisabled: false,
@@ -35,25 +31,25 @@ const initialState = {
       hasSubSectionThree: false,
       certificationNumber: "",
       validityLimit: null,
-      organisation: "",
+      organisation: ""
     },
     work: {
-      hasEmitterPaperSignature: false,
-    },
+      hasEmitterPaperSignature: false
+    }
   },
   broker: null,
   transporter: {
     company: {
-      ...getInitialCompany(),
+      ...getInitialCompany()
     },
     recepisse: {
-      isExempted: false,
+      isExempted: false
     },
     transport: {
       takenOverAt: null,
       plates: [],
-      mode: TransportMode.Road,
-    },
+      mode: TransportMode.Road
+    }
   },
   destination: {
     cap: "",
@@ -61,12 +57,12 @@ const initialState = {
     company: getInitialCompany(),
     operation: {
       description: "",
-      nextDestination: null,
-    },
+      nextDestination: null
+    }
   },
   grouping: [],
   forwarding: null,
-  intermediaries: [],
+  intermediaries: []
 };
 
 export default initialState;

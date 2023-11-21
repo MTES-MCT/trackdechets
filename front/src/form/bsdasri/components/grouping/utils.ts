@@ -1,4 +1,4 @@
-import { BsdasriPackaging } from "generated/graphql/types";
+import { BsdasriPackaging } from "codegen-ui";
 
 export const aggregatePackagings = (packagingsArray: BsdasriPackaging[][]) => {
   return packagingsArray.reduce((prev, cur) => {
@@ -13,7 +13,7 @@ export const aggregatePackagings = (packagingsArray: BsdasriPackaging[][]) => {
         const found = prev[idx];
         prev.splice(idx, 1, {
           ...found,
-          quantity: found.quantity + packaging.quantity,
+          quantity: found.quantity + packaging.quantity
         });
       } else {
         prev.push(packaging);

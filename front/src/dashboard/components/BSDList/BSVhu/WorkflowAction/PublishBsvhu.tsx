@@ -1,18 +1,19 @@
 import React from "react";
-import { Mutation, MutationPublishBsvhuArgs } from "generated/graphql/types";
+import { Mutation, MutationPublishBsvhuArgs } from "codegen-ui";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation } from "@apollo/client";
 
-import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
-import { ActionButton } from "common/components";
-import { Loader } from "Apps/common/Components";
-import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
+import { ActionButton } from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
+import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
 import { generatePath, Link } from "react-router-dom";
-import routes from "Apps/routes";
-import { GET_BSDS } from "Apps/common/queries";
+import routes from "../../../../../Apps/routes";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import { TOAST_DURATION } from "../../../../../common/config";
 
 const PUBLISH_BSVHU = gql`
   mutation PublishBsvhu($id: ID!) {
@@ -32,12 +33,14 @@ export default function PublishBsvhu({ form, siret }: WorkflowActionProps) {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      cogoToast.success(`Bordereau ${form.id} publié`, { hideAfter: 5 });
+      toast.success(`Bordereau ${form.id} publié`, {
+        duration: TOAST_DURATION
+      });
     },
     onError: () =>
-      cogoToast.error(`Le bordereau ${form.id} n'a pas pu être publié`, {
-        hideAfter: 5,
-      }),
+      toast.error(`Le bordereau ${form.id} n'a pas pu être publié`, {
+        duration: TOAST_DURATION
+      })
   });
 
   const actionLabel = "Publier le bordereau";
@@ -68,8 +71,8 @@ export default function PublishBsvhu({ form, siret }: WorkflowActionProps) {
               onClick={() =>
                 publishBsvhu({
                   variables: {
-                    id: form.id,
-                  },
+                    id: form.id
+                  }
                 })
               }
             >
@@ -83,7 +86,7 @@ export default function PublishBsvhu({ form, siret }: WorkflowActionProps) {
               <Link
                 to={generatePath(routes.dashboard.bsvhus.edit, {
                   siret,
-                  id: form.id,
+                  id: form.id
                 })}
                 className="btn btn--primary"
               >

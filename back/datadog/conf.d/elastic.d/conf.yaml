@@ -5,5 +5,5 @@ instances:
     tls_verify: false
     tls_ignore_warning: true
     tags:
-    - service.name:elasticsearch
-    - env:%%env_DD_ENV%%
+      - service.name:elasticsearch
+      - env:%%env_DD_ENV%%

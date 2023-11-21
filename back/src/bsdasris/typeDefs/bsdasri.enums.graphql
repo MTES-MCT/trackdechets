@@ -62,7 +62,7 @@ enum destinationOperationCodeTypes {
 enum BsdasriSignatureType {
   "Signature du cadre émetteur (PRED)"
   EMISSION
-  
+
   "Signature du cadre collecteur transporteur"
   TRANSPORT
 

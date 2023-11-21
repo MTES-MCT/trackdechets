@@ -1,14 +1,14 @@
 import React from "react";
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
 import classNames from "classnames";
 import Select from "react-select";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import TdSwitch from "common/components/Switch";
-import Tooltip from "common/components/Tooltip";
-import ProcessingOperation from "form/common/components/processing-operation/ProcessingOperation";
+import RedErrorMessage from "../../common/components/RedErrorMessage";
+import TdSwitch from "../../common/components/Switch";
+import Tooltip from "../../common/components/Tooltip";
+import ProcessingOperation from "../common/components/processing-operation/ProcessingOperation";
 import { Field, useFormikContext } from "formik";
-import { isDangerous } from "generated/constants";
-import { Form } from "generated/graphql/types";
+import { isDangerous } from "shared/constants";
+import { Form } from "codegen-ui";
 import CompanySelector from "../common/components/company/CompanySelector";
 import DateInput from "../common/components/custom-inputs/DateInput";
 import TemporaryStorage from "./components/temporaryStorage/TemporaryStorage";
@@ -16,9 +16,10 @@ import styles from "./Recipient.module.scss";
 import {
   getInitialBroker,
   getInitialTemporaryStorageDetail,
-  getInitialTrader,
+  getInitialTrader
 } from "./utils/initial-state";
-import { IntermediariesSelector } from "form/bsda/components/intermediaries/IntermediariesSelector";
+import { IntermediariesSelector } from "../bsda/components/intermediaries/IntermediariesSelector";
+import { TOAST_DURATION } from "../../common/config";
 
 type IntermediariesSelect = {
   value: string;
@@ -42,26 +43,26 @@ export default function Recipient({ disabled }) {
       ? [
           {
             value: "TRADER",
-            label: "Je suis passé par un négociant",
-          },
+            label: "Je suis passé par un négociant"
+          }
         ]
       : []),
     ...(!hasTrader && !hasBroker
       ? [
           {
             value: "BROKER",
-            label: "Je suis passé par un courtier",
-          },
+            label: "Je suis passé par un courtier"
+          }
         ]
       : []),
     ...(isAddIntermediaryButtonEnabled
       ? [
           {
             value: "INTERMEDIARY",
-            label: "Ajouter un autre type d'intermédiaire",
-          },
+            label: "Ajouter un autre type d'intermédiaire"
+          }
         ]
-      : []),
+      : [])
   ];
 
   function handleTraderToggle() {
@@ -85,18 +86,15 @@ export default function Recipient({ disabled }) {
           mail: "",
           phone: "",
           vatNumber: "",
-          country: "",
-        },
+          country: ""
+        }
       ])
     );
-    const { hide } = cogoToast.success(
+    toast.success(
       "Nouvel intermédiaire ajouté en bas de page: merci de chercher un SIRET ou un nom d'entreprise pour lancer une recherche.",
       {
-        hideAfter: 3,
-        position: "bottom-right",
-        onClick: () => {
-          if (hide) hide();
-        },
+        duration: TOAST_DURATION,
+        position: "bottom-right"
       }
     );
   }

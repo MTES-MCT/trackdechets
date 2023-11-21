@@ -1,29 +1,36 @@
 import { useMutation, gql } from "@apollo/client";
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
 import { Field, Form as FormikForm, Formik } from "formik";
 import React, { useState } from "react";
 import {
   Mutation,
   MutationPrepareSegmentArgs,
   NextSegmentInfoInput,
-  TransportMode,
-} from "generated/graphql/types";
-import { segmentFragment } from "Apps/common/queries/fragments";
-import TdModal from "Apps/common/Components/Modal/Modal";
-import ActionButton from "common/components/ActionButton";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { IconBusTransfer } from "Apps/common/Components/Icons/Icons";
-import CompanySelector from "form/common/components/company/CompanySelector";
+  TransportMode
+} from "codegen-ui";
+import { segmentFragment } from "../../../../../../Apps/common/queries/fragments";
+import TdModal from "../../../../../../Apps/common/Components/Modal/Modal";
+import ActionButton from "../../../../../../common/components/ActionButton";
+import { NotificationError } from "../../../../../../Apps/common/Components/Error/Error";
+import { IconBusTransfer } from "../../../../../../Apps/common/Components/Icons/Icons";
+import CompanySelector from "../../../../../../form/common/components/company/CompanySelector";
 import { WorkflowActionProps } from "../WorkflowAction";
-import TdSwitch from "common/components/Switch";
-import { GET_BSDS, GET_DETAIL_FORM } from "Apps/common/queries";
-import { FieldTransportModeSelect, RedErrorMessage } from "common/components";
-import { Loader } from "Apps/common/Components";
+import TdSwitch from "../../../../../../common/components/Switch";
+import {
+  GET_BSDS,
+  GET_DETAIL_FORM
+} from "../../../../../../Apps/common/queries";
+import {
+  FieldTransportModeSelect,
+  RedErrorMessage
+} from "../../../../../../common/components";
+import { Loader } from "../../../../../../Apps/common/Components";
 import {
   onCompanySelected,
-  validationSchema,
-} from "dashboard/detail/bsdd/EditSegment";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
+  validationSchema
+} from "../../../../../detail/bsdd/EditSegment";
+import { isForeignVat } from "shared/constants";
+import { TOAST_DURATION } from "../../../../../../common/config";
 
 const PREPARE_SEGMENT = gql`
   mutation prepareSegment(
@@ -48,13 +55,13 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
     awaitRefetchQueries: true,
     onCompleted: () => {
       setIsOpen(false);
-      cogoToast.success("Le segment a été créé", {
-        hideAfter: 5,
+      toast.success("Le segment a été créé", {
+        duration: TOAST_DURATION
       });
     },
     onError: () => {
       // The error is handled in the UI
-    },
+    }
   });
 
   const initialValues: NextSegmentInfoInput = {
@@ -66,13 +73,13 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
         contact: "",
         mail: "",
         phone: "",
-        vatNumber: "",
+        vatNumber: ""
       },
       isExemptedOfReceipt: false,
-      numberPlate: null,
+      numberPlate: null
     },
 
-    mode: "ROAD" as TransportMode,
+    mode: "ROAD" as TransportMode
   };
 
   return (
@@ -105,11 +112,11 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
                     transporter: {
                       ...transporter,
                       customInfo: null,
-                      validityLimit: validityLimit || null,
+                      validityLimit: validityLimit || null
                     },
-                    ...rst,
-                  },
-                },
+                    ...rst
+                  }
+                }
               });
             }}
           >
@@ -149,7 +156,7 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
                   initialAutoSelectFirstCompany={false}
                   onCompanySelected={onCompanySelected(setFieldValue)}
                 />
-                {!isForeignVat(values.transporter?.company?.vatNumber!!) && (
+                {!isForeignVat(values.transporter?.company?.vatNumber!) && (
                   <>
                     <h4 className="form__section-heading">
                       Exemption de récépissé de déclaration de transport de

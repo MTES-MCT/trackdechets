@@ -1,4 +1,4 @@
-import { isForeignVat } from "../common/constants/companySearchHelpers";
+import { isForeignVat } from "shared/constants";
 import { Workflow } from "../common/workflow";
 import {
   userWithCompanyFactory,

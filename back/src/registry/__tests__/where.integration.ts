@@ -5,9 +5,9 @@ import {
 } from "../../../integration-tests/helper";
 import { getBsdaForElastic, indexBsda } from "../../bsda/elastic";
 import { bsdaFactory } from "../../bsda/__tests__/factories";
-import { indexBsdasri } from "../../bsdasris/elastic";
+import { getBsdasriForElastic, indexBsdasri } from "../../bsdasris/elastic";
 import { bsdasriFactory } from "../../bsdasris/__tests__/factories";
-import { indexBsff } from "../../bsffs/elastic";
+import { getBsffForElastic, indexBsff } from "../../bsffs/elastic";
 import { createBsff } from "../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../bsvhu/elastic";
 import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
@@ -36,9 +36,9 @@ describe("toElasticFilter", () => {
     const BSDS = {
       BSDD: await getFormForElastic(await formFactory({ ownerId: user.id })),
       BSDA: await getBsdaForElastic(await bsdaFactory({})),
-      BSDASRI: await bsdasriFactory({}),
+      BSDASRI: await getBsdasriForElastic(await bsdasriFactory({})),
       BSVHU: await bsvhuFactory({}),
-      BSFF: await createBsff()
+      BSFF: await getBsffForElastic(await createBsff())
     };
     await Promise.all([
       indexForm(BSDS["BSDD"]),
@@ -77,9 +77,9 @@ describe("toElasticFilter", () => {
       const BSDS = {
         BSDD: await getFormForElastic(await formFactory({ ownerId: user.id })),
         BSDA: await getBsdaForElastic(await bsdaFactory({})),
-        BSDASRI: await bsdasriFactory({}),
+        BSDASRI: await getBsdasriForElastic(await bsdasriFactory({})),
         BSVHU: await bsvhuFactory({}),
-        BSFF: await createBsff()
+        BSFF: await getBsffForElastic(await createBsff())
       };
 
       const where: WasteRegistryWhere = {
@@ -106,9 +106,9 @@ describe("toElasticFilter", () => {
     const BSDS = {
       BSDD: await getFormForElastic(await formFactory({ ownerId: user.id })),
       BSDA: await getBsdaForElastic(await bsdaFactory({})),
-      BSDASRI: await bsdasriFactory({}),
+      BSDASRI: await getBsdasriForElastic(await bsdasriFactory({})),
       BSVHU: await bsvhuFactory({}),
-      BSFF: await createBsff()
+      BSFF: await getBsffForElastic(await createBsff())
     };
 
     const where: WasteRegistryWhere = {
@@ -274,7 +274,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsdasri1, bsdasri2, bsdasri3, bsdasri4].map(async bsda => {
-        return indexBsdasri(bsda);
+        return indexBsdasri(await getBsdasriForElastic(bsda));
       })
     );
     await refreshElasticSearch();
@@ -382,7 +382,7 @@ describe("toElasticFilter", () => {
 
       await Promise.all(
         [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
-          return indexBsff(bsff);
+          return indexBsff(await getBsffForElastic(bsff));
         })
       );
       await refreshElasticSearch();
@@ -443,7 +443,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -602,8 +602,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3, bsdasri4].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3, bsdasri4].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -715,7 +715,7 @@ describe("toElasticFilter", () => {
 
       await Promise.all(
         [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
-          return indexBsff(bsff);
+          return indexBsff(await getBsffForElastic(bsff));
         })
       );
       await refreshElasticSearch();
@@ -776,7 +776,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -933,8 +933,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3, bsdasri4].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3, bsdasri4].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -1040,7 +1040,7 @@ describe("toElasticFilter", () => {
 
       await Promise.all(
         [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
-          return indexBsff(bsff);
+          return indexBsff(await getBsffForElastic(bsff));
         })
       );
       await refreshElasticSearch();
@@ -1100,7 +1100,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -1213,8 +1213,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3, bsdasri4].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3, bsdasri4].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -1294,7 +1294,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -1408,8 +1408,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3, bsdasri4].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3, bsdasri4].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -1489,7 +1489,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -1601,8 +1601,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3, bsdasri4].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3, bsdasri4].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -1680,7 +1680,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -1782,8 +1782,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -1837,7 +1837,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -1933,8 +1933,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -1988,7 +1988,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -2079,8 +2079,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -2130,7 +2130,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -2237,8 +2237,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -2296,7 +2296,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -2401,8 +2401,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -2465,7 +2465,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -2567,8 +2567,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -2624,7 +2624,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -2719,8 +2719,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -2778,7 +2778,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -2879,8 +2879,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -2943,7 +2943,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();
@@ -3037,8 +3037,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsdasri1, bsdasri2, bsdasri3].map(async bsda => {
-        return indexBsdasri(bsda);
+      [bsdasri1, bsdasri2, bsdasri3].map(async bsdasri => {
+        return indexBsdasri(await getBsdasriForElastic(bsdasri));
       })
     );
     await refreshElasticSearch();
@@ -3094,7 +3094,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
-        return indexBsff(bsff);
+        return indexBsff(await getBsffForElastic(bsff));
       })
     );
     await refreshElasticSearch();

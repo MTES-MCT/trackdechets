@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FilterProps } from "react-table";
-import { Bsd } from "generated/graphql/types";
+import { Bsd } from "codegen-ui";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -11,10 +11,10 @@ const DEBOUNCE_DELAY = 500;
 export function TextInputFilter({
   column: { filterValue = "", setFilter },
   placeHolder = "Filtrer...",
-  maxLength = 0,
+  maxLength = 0
 }: FilterProps<Bsd> & { placeHolder?: string; maxLength?: number }) {
   const [value, setValue] = React.useState(filterValue);
-  const timeout = React.useRef<number | null>();
+  const timeout = React.useRef<NodeJS.Timeout | null>();
   const ref = React.useRef<{ value: string; filterValue: string }>();
   ref.current = { value, filterValue };
 
@@ -40,14 +40,14 @@ export function TextInputFilter({
       return;
     }
 
-    timeout.current = window.setTimeout(() => {
+    timeout.current = setTimeout(() => {
       setFilter(value);
       timeout.current = null;
     }, DEBOUNCE_DELAY);
 
     return () => {
       if (timeout.current) {
-        window.clearTimeout(timeout.current);
+        clearTimeout(timeout.current);
         timeout.current = null;
       }
     };
@@ -55,7 +55,7 @@ export function TextInputFilter({
     value,
     // note: setFilter is not well memoized by react-table
     //       it's not so bad because exit early when values are in sync anyway
-    setFilter,
+    setFilter
   ]);
 
   return (

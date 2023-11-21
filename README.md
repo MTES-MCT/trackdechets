@@ -22,10 +22,10 @@ Ce `README` s'adresse aux intervenant·es techniques sur le projet. Pour plus d'
 
 Le projet est constitué de trois briques logicielles principales :
 
-| | back  | front | doc |
-|:---------------| :--------------- |:---------------| :-----|
-| Description | API Trackdéchets | Interface graphique (SPA)| Documentation technique |
-| Technologies | Node.js <br/> Typescript <br/> Express.js <br/> Apollo Server <br/> Prisma ORM <br/> PostgreSQL </br> Elasticsearch | React.js <br/> Typescript <br/> Apollo Client | Docusaurus |
+|              | back                                                                                                                | front                                         | doc                     |
+| :----------- | :------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------- | :---------------------- |
+| Description  | API Trackdéchets                                                                                                    | Interface graphique (SPA)                     | Documentation technique |
+| Technologies | Node.js <br/> Typescript <br/> Express.js <br/> Apollo Server <br/> Prisma ORM <br/> PostgreSQL </br> Elasticsearch | React.js <br/> Typescript <br/> Apollo Client | Docusaurus              |
 
 ## Dépôts de code connexes
 
@@ -38,18 +38,18 @@ Le projet est constitué de trois briques logicielles principales :
 ## Services externes
 
 l'API Trackdéchets fait appel à plusieurs services externes :
+
 - Sendinblue pour l'envoi d'e-mails transactionnels.
 - MySendingBox pour l'envoi de courrier papier.
 - Serveur Gotenberg (auto-hébergé) pour le rendu des PDFs
 - Serveur Metabase (auto-hebergé) pour les analytics
-- Serveur Dash (auto-hebergé) pour les stats publiques
+- Application distincte (auto-hebergée) pour les stats publiques
 
 ## Infrastructure
 
 L'applicatif et les bases de données sont hebergés en mode PaaS chez Scalingo.
 
-![Infra TD](https://user-images.githubusercontent.com/2269165/154451580-e601abb4-40a2-41a6-9727-ff9b446a3594.png)
-
+![Infra TD](./archi-nov-2023.png)
 
 ## Outillage
 
@@ -61,10 +61,10 @@ L'applicatif et les bases de données sont hebergés en mode PaaS chez Scalingo.
 - [Updown](https://updown.io/) pour la page de statuts et les alertes
 - [graphql-codegen](https://graphql-code-generator.com/) pour générer la référence de l'API et le typage Typescript à partir des fichiers de définition GraphQL.
 
-
 ## Environnements
 
 Trois environnements sont déployés en parallèle :
+
 - Recette (usage interne pour les tests de l'équipe)
   - back : https://api.trackdechets.fr
   - front : https://recette.trackdechets.fr
@@ -74,9 +74,11 @@ Trois environnements sont déployés en parallèle :
 - Production
   - back : https://api.trackdechets.beta.gouv.fr
   - front : https://app.trackdechets.beta.gouv.fr
+
 ## Monitoring
 
 Deux pages de monitoring sont accessibles:
+
 - [Statut API GraphQL Production](https://status.trackdechets.beta.gouv.fr)
 - [Statut API GraphQL Sandbox](https://status.sandbox.trackdechets.beta.gouv.fr)
 

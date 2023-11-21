@@ -12,7 +12,7 @@ import {
   modifier_action_label,
   pdf_action_label,
   revision_action_label,
-  supprimer_action_label,
+  supprimer_action_label
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 import { BsdAdditionalActionsButtonProps } from "./bsdAdditionalActionsButtonTypes";
 import useOnClickOutsideRefTarget from "../../../common/hooks/useOnClickOutsideRefTarget";
@@ -27,12 +27,12 @@ import {
   canDeleteReview,
   hasBsdasriEmitterSign,
   isSignTransportCanSkipEmission,
-  isSignEmission,
+  isSignEmission
 } from "../../dashboardServices";
-import { UserPermission } from "generated/graphql/types";
+import { UserPermission } from "codegen-ui";
 
 import "./bsdAdditionalActionsButton.scss";
-import { BsdType } from "generated/graphql/types";
+import { BsdType } from "codegen-ui";
 
 function BsdAdditionalActionsButton({
   bsd,
@@ -49,16 +49,16 @@ function BsdAdditionalActionsButton({
     onBsdSuite,
     onDeleteReview,
     onEmitterDasriSign,
-    onEmitterBsddSign,
+    onEmitterBsddSign
   },
   hideReviewCta,
   isToCollectTab = false,
-  hasAutomaticSignature = false,
+  hasAutomaticSignature = false
 }: BsdAdditionalActionsButtonProps) {
   const [isOpen, setisOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLElement>(null);
   const { targetRef } = useOnClickOutsideRefTarget({
-    onClickOutside: () => setisOpen(false),
+    onClickOutside: () => setisOpen(false)
   });
 
   useEffect(() => {
@@ -168,7 +168,7 @@ function BsdAdditionalActionsButton({
           aria-hidden={!isOpen}
           ref={dropdownRef as React.RefObject<HTMLUListElement>}
           className={classnames("bsd-actions-kebab-menu__dropdown", {
-            "bsd-actions-kebab-menu__dropdown--active": isOpen,
+            "bsd-actions-kebab-menu__dropdown--active": isOpen
           })}
         >
           {permissions.includes(UserPermission.BsdCanSignOperation) &&

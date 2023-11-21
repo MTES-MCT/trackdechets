@@ -1,11 +1,6 @@
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
+import { getInitialCompany } from "../../bsdd/utils/initial-state";
 
-import {
-  BsdasriWeight,
-  Bsdasri,
-  PickupSite,
-  BsdasriType,
-} from "generated/graphql/types";
+import { BsdasriWeight, Bsdasri, PickupSite, BsdasriType } from "codegen-ui";
 
 export function getInitialEmitterPickupSiteFn(pickupSite?: PickupSite | null) {
   return {
@@ -13,20 +8,20 @@ export function getInitialEmitterPickupSiteFn(pickupSite?: PickupSite | null) {
     address: pickupSite?.address ?? "",
     city: pickupSite?.city ?? "",
     postalCode: pickupSite?.postalCode ?? "",
-    infos: pickupSite?.infos ?? "",
+    infos: pickupSite?.infos ?? ""
   };
 }
 
 export const getInitialWeightFn = (weight?: BsdasriWeight | null) => ({
   value: weight?.value,
-  isEstimate: weight?.isEstimate ?? false,
+  isEstimate: weight?.isEstimate ?? false
 });
 
 const getInitialState = (f?: Bsdasri | null) => ({
   type: BsdasriType.Simple,
   waste: {
     code: "18 01 03*",
-    adr: "",
+    adr: ""
   },
   identification: { numbers: null },
   ecoOrganisme: null,
@@ -40,14 +35,14 @@ const getInitialState = (f?: Bsdasri | null) => ({
 
       weight: !!f?.emitter?.emission?.weight
         ? getInitialWeightFn(f?.emitter?.emission?.weight)
-        : null,
-    },
+        : null
+    }
   },
   transporter: {
     company: getInitialCompany(),
     customInfo: "",
     recepisse: {
-      isExempted: false,
+      isExempted: false
     },
     transport: {
       mode: "ROAD",
@@ -61,9 +56,9 @@ const getInitialState = (f?: Bsdasri | null) => ({
       acceptation: {
         status: null,
         refusalReason: null,
-        refusedWeight: null,
-      },
-    },
+        refusedWeight: null
+      }
+    }
   },
   destination: {
     company: getInitialCompany(),
@@ -71,16 +66,16 @@ const getInitialState = (f?: Bsdasri | null) => ({
     reception: {
       packagings: [],
       acceptation: null,
-      date: null,
+      date: null
     },
     operation: {
       code: null,
       date: null,
-      weight: null,
-    },
+      weight: null
+    }
   },
   grouping: [],
-  synthesizing: [],
+  synthesizing: []
 });
 
 export default getInitialState;

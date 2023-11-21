@@ -17,10 +17,10 @@ jobs:
           fetch-depth: 0
 
       - name: Run npm ci
-        run: npm --prefix back ci & npm --prefix front ci
+        run: npm ci
 
       - name: Run build
-        run: npm --prefix back run build & npm --prefix front run build
+        run: npx nx run-many -t build
 
       - name: Create a Sentry Release
         uses: getsentry/action-release@v1.1.6
@@ -30,6 +30,6 @@ jobs:
           SENTRY_URL: https://sentry.incubateur.net/
         with:
           environment: recette
-          sourcemaps: ./back/dist/src ./front/build/assets
+          sourcemaps: ./dist/back/back/src ./dist/front/assets
           projects: trackdechets-api trackdechets-front
           ignore_missing: true

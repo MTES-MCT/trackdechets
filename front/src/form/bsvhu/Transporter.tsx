@@ -1,8 +1,8 @@
 import React from "react";
 import { useFormikContext } from "formik";
-import CompanySelector from "form/common/components/company/CompanySelector";
-import { Bsvhu } from "generated/graphql/types";
-import TransporterReceiptEditionSwitch from "form/common/components/company/TransporterReceiptEditionSwitch";
+import CompanySelector from "../common/components/company/CompanySelector";
+import { Bsvhu } from "codegen-ui";
+import TransporterReceiptEditionSwitch from "../common/components/company/TransporterReceiptEditionSwitch";
 
 export default function Transporter({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsvhu>();

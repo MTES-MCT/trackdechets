@@ -7,14 +7,17 @@ import {
   BsffSignatureType,
   Mutation,
   MutationSignBsffArgs,
-  MutationUpdateBsffArgs,
-} from "generated/graphql/types";
-import { RedErrorMessage } from "common/components";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
+  MutationUpdateBsffArgs
+} from "codegen-ui";
+import { RedErrorMessage } from "../../../../../common/components";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
+import {
+  SIGN_BSFF,
+  UPDATE_BSFF_FORM
+} from "../../../../../form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
-import { GET_BSDS } from "Apps/common/queries";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
 import { subMonths } from "date-fns";
 
 const validationSchema = yup.object({
@@ -22,7 +25,7 @@ const validationSchema = yup.object({
   signatureAuthor: yup
     .string()
     .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis")
 });
 
 interface SignReceptionModalProps {
@@ -49,7 +52,7 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
     <Formik
       initialValues={{
         receptionDate: bsff.destination?.reception?.date ?? TODAY.toISOString(),
-        signatureAuthor: "",
+        signatureAuthor: ""
       }}
       validationSchema={validationSchema}
       onSubmit={async values => {
@@ -59,11 +62,11 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
             input: {
               destination: {
                 reception: {
-                  date: values.receptionDate,
-                },
-              },
-            },
-          },
+                  date: values.receptionDate
+                }
+              }
+            }
+          }
         });
         await signBsff({
           variables: {
@@ -71,9 +74,9 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
             input: {
               type: BsffSignatureType.Reception,
               author: values.signatureAuthor,
-              date: values.receptionDate,
-            },
-          },
+              date: values.receptionDate
+            }
+          }
         });
         onCancel();
       }}
@@ -142,7 +145,7 @@ export function SignReception({
   bsffId,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton,
+  displayActionButton
 }: SignReceptionProps) {
   return (
     <SignBsff

@@ -1,5 +1,4 @@
 import { useQuery, gql } from "@apollo/client";
-import { filter } from "graphql-anywhere";
 import React from "react";
 import {
   generatePath,
@@ -9,40 +8,40 @@ import {
   Switch,
   useHistory,
   useLocation,
-  useParams,
+  useParams
 } from "react-router-dom";
 import { Location } from "history";
-import routes from "Apps/routes";
-import { Modal } from "common/components";
+import routes from "../Apps/routes";
+import { Modal } from "../common/components";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import "./Dashboard.scss";
 import Exports from "./exports/Exports";
 import { OnboardingSlideshow } from "./components/OnboardingSlideshow";
-import { ExtraSignatureType } from "dashboard/components/BSDList/BSDasri/types";
+import { ExtraSignatureType } from "./components/BSDList/BSDasri/types";
 
-import { Query, BsdasriSignatureType } from "generated/graphql/types";
+import { Query, BsdasriSignatureType } from "codegen-ui";
 import {
   RouteBsdsAct,
   RouteBsdsDrafts,
   RouteBsdsFollow,
-  RouteBsdsHistory,
+  RouteBsdsHistory
 } from "./bsds";
-import { RouteBSDasrisSignEmissionSecretCode } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
-import { RoutePublishBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
-import { RouteSignBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
-import { RouteControlPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/RouteControlPdf";
+import { RouteBSDasrisSignEmissionSecretCode } from "./components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
+import { RoutePublishBsdasri } from "./components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
+import { RouteSignBsdasri } from "./components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
+import { RouteControlPdf } from "./components/BSDList/BSDasri/BSDasriActions/RouteControlPdf";
 import {
   RouteBSDasrisView,
   RouteBsvhusView,
   RouteBsffsView,
   RouteBSDDsView,
-  RouteBSDasView,
+  RouteBSDasView
 } from "./detail";
 import { RouteTransportToCollect, RouteTransportCollected } from "./transport";
 import { RouteBsdsReview } from "./bsds/review";
 import { RouteBsddRequestRevision } from "./components/RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
 import { DashboardTabs } from "./DashboardTabs";
-import SideMenu from "common/components/SideMenu";
+import SideMenu from "../common/components/SideMenu";
 import { RouteBsdaRequestRevision } from "./components/RevisionRequestList/bsda/request";
 
 export const GET_ME = gql`
@@ -71,13 +70,13 @@ export default function Dashboard() {
   const backgroundLocation = location.state?.background;
   const toCollectDashboard = {
     pathname: generatePath(routes.dashboard.transport.toCollect, {
-      siret,
-    }),
+      siret
+    })
   };
   const actionDashboard = {
     pathname: generatePath(routes.dashboard.bsds.act, {
-      siret,
-    }),
+      siret
+    })
   };
 
   if (data?.me == null) {
@@ -95,7 +94,7 @@ export default function Dashboard() {
         to={
           companies.length > 0
             ? generatePath(routes.dashboard.bsds.drafts, {
-                siret: companies[0].orgId,
+                siret: companies[0].orgId
               })
             : routes.account.companies.list
         }
@@ -118,12 +117,12 @@ export default function Dashboard() {
           <Switch location={backgroundLocation ?? location}>
             <Route path="/dashboard/:siret/slips/view/:id" exact>
               {({
-                match,
+                match
               }: RouteChildrenProps<{ siret: string; id: string }>) => (
                 <Redirect
                   to={generatePath(routes.dashboard.bsdds.view, {
                     siret: match!.params.siret,
-                    id: match!.params.id,
+                    id: match!.params.id
                   })}
                 />
               )}
@@ -177,13 +176,11 @@ export default function Dashboard() {
               <RouteTransportCollected />
             </Route>
             <Route path={routes.dashboard.exports}>
-              <Exports
-                companies={filter(Exports.fragments.company, companies)}
-              />
+              <Exports companies={companies} />
             </Route>
             <Redirect
               to={generatePath(routes.dashboard.bsds.drafts, {
-                siret,
+                siret
               })}
             />
           </Switch>

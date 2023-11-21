@@ -18,7 +18,7 @@ const MultiSelectWrapper = ({
   selected,
   placeholder,
   disableSearch,
-  showRendererText = true,
+  showRendererText = true
 }: MultiSelectWrapperProps) => {
   const valueRenderer = (selected: typeof options) => {
     if (!selected.length || !showRendererText) {
@@ -42,7 +42,7 @@ const MultiSelectWrapper = ({
       disableSearch={disableSearch}
       overrideStrings={{
         allItemsAreSelected: "",
-        selectAll: multi_select_select_all_label,
+        selectAll: multi_select_select_all_label
       }}
     />
   );

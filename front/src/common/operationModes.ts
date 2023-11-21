@@ -1,4 +1,4 @@
-import { OperationMode } from "generated/graphql/types";
+import { OperationMode } from "codegen-ui";
 
 export const getOperationModesFromOperationCode = (
   operationCode: string
@@ -23,7 +23,7 @@ export const getOperationModesFromOperationCode = (
       "D9F",
       "D10",
       "D11",
-      "D12",
+      "D12"
     ].includes(trimmed)
   ) {
     return [OperationMode.Elimination];

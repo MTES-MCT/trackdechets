@@ -20,7 +20,7 @@ export function JourneyStop({ variant, children }: JourneyStopProps) {
     <li
       className={classNames(styles.JourneyStop, {
         [styles.JourneyStopComplete]: variant === "complete",
-        [styles.JourneyStopActive]: variant === "active",
+        [styles.JourneyStopActive]: variant === "active"
       })}
     >
       {children}
@@ -41,7 +41,7 @@ interface JourneyStopDescriptionProps {
 }
 
 export function JourneyStopDescription({
-  children,
+  children
 }: JourneyStopDescriptionProps) {
   return <p>{children}</p>;
 }

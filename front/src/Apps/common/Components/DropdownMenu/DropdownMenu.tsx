@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import FocusTrap from "focus-trap-react";
-import useOnClickOutsideRefTarget from "Apps/common/hooks/useOnClickOutsideRefTarget";
+import useOnClickOutsideRefTarget from "../../hooks/useOnClickOutsideRefTarget";
 import { DropdownMenuProps } from "./dropdownMenuTypes";
 import classNames from "classnames";
 
@@ -12,11 +12,11 @@ const DropdownMenu = ({
   links,
   isDisabled,
   iconAlone,
-  primary,
+  primary
 }: DropdownMenuProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { targetRef } = useOnClickOutsideRefTarget({
-    onClickOutside: () => closeMenu(),
+    onClickOutside: () => closeMenu()
   });
 
   const toggleMenu = () => {
@@ -32,7 +32,7 @@ const DropdownMenu = ({
       <div
         ref={targetRef as React.RefObject<HTMLDivElement>}
         className={classNames("dropdown-menu", {
-          "dropdown-menu--primary": primary,
+          "dropdown-menu--primary": primary
         })}
       >
         <button
@@ -40,7 +40,7 @@ const DropdownMenu = ({
             `menu-btn fr-btn fr-btn--${primary ? "primary" : "secondary"}`,
             {
               isOpen: isOpen,
-              "menu-btn__iconAlone": iconAlone,
+              "menu-btn__iconAlone": iconAlone
             }
           )}
           disabled={isDisabled}
@@ -51,7 +51,7 @@ const DropdownMenu = ({
         {isOpen && (
           <ul
             className={classNames("dropdown-menu__content", {
-              "dropdown-menu__content__iconAlone": iconAlone,
+              "dropdown-menu__content__iconAlone": iconAlone
             })}
           >
             {links.map(link => {

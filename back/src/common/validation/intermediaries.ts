@@ -1,5 +1,5 @@
 import { RefinementCtx, z } from "zod";
-import { isFRVat, isVat } from "../constants/companySearchHelpers";
+import { isFRVat, isVat } from "shared/constants";
 import { siretSchema } from "./siret";
 
 export const intermediarySchema = z.object({

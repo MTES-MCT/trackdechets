@@ -12,7 +12,7 @@ import {
   RevisionRequestStatus,
   User
 } from "@prisma/client";
-import * as COMPANY_CONSTANTS from "../common/constants/COMPANY_CONSTANTS";
+import * as COMPANY_CONSTANTS from "shared/constants";
 import {
   membershipRequestDetailsEmail,
   pendingMembershipRequestDetailsEmail,

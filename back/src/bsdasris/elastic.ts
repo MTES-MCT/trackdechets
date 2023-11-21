@@ -2,8 +2,33 @@ import { BsdasriStatus, Bsdasri, BsdasriType, BsdType } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import { buildAddress } from "../companies/sirene/utils";
+import {
+  BsdasriWithGrouping,
+  BsdasriWithSynthesizing,
+  BsdasriWithGroupingInclude,
+  BsdasriWithSynthesizingInclude
+} from "./types";
+import prisma from "../prisma";
+
+export type BsdasriForElastic = Bsdasri &
+  BsdasriWithGrouping &
+  BsdasriWithSynthesizing;
+
+export const BsdasriForElasticInclude = {
+  ...BsdasriWithGroupingInclude,
+  ...BsdasriWithSynthesizingInclude
+};
+
+export async function getBsdasriForElastic(
+  bsdasri: Pick<Bsdasri, "id">
+): Promise<BsdasriForElastic> {
+  return prisma.bsdasri.findUniqueOrThrow({
+    where: { id: bsdasri.id },
+    include: BsdasriForElasticInclude
+  });
+}
 
 type WhereKeys =
   | "isDraftFor"
@@ -111,8 +136,6 @@ function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
   return where;
 }
 
-export type BsdasriForElastic = Bsdasri;
-
 /**
  * Convert a dasri from the bsdasri table to Elastic Search's BSD model.
  */
@@ -132,7 +155,7 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     wasteDescription: "",
     packagingNumbers: [],
     wasteSealNumbers: [],
-    identificationNumbers: [],
+    identificationNumbers: bsdasri.identificationNumbers ?? [],
     ficheInterventionNumbers: [],
     emitterCompanyName: bsdasri.emitterCompanyName ?? "",
     emitterCompanySiret: bsdasri.emitterCompanySiret ?? "",
@@ -197,6 +220,6 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
   };
 }
 
-export function indexBsdasri(bsdasri: Bsdasri, ctx?: GraphQLContext) {
+export function indexBsdasri(bsdasri: BsdasriForElastic, ctx?: GraphQLContext) {
   return indexBsd(toBsdElastic(bsdasri), ctx);
 }

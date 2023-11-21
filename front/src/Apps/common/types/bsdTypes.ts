@@ -43,15 +43,15 @@ import {
   RevisionRequestStatus,
   Scalars,
   TemporaryStorageDetail,
-  Transporter,
-} from "generated/graphql/types";
+  Transporter
+} from "codegen-ui";
 
 export enum BsdTypename {
   Bsdd = "Form",
   Bsda = "Bsda",
   Bsdasri = "Bsdasri",
   Bsvhu = "Bsvhu",
-  Bsff = "Bsff",
+  Bsff = "Bsff"
 }
 
 export const BsdStatusCode = {
@@ -61,14 +61,14 @@ export const BsdStatusCode = {
   ...BsdasriStatus,
   ...BsvhuStatus,
   ...RevisionRequestStatus,
-  ...RevisionRequestApprovalStatus,
+  ...RevisionRequestApprovalStatus
 };
 
 export enum ReviewStatusLabel {
   Pending = "En attente de révision",
   Accepted = "Révision approuvée",
   Refused = "Révision refusée",
-  Cancelled = "Révision annulée",
+  Cancelled = "Révision annulée"
 }
 
 type TBsdStatusCodeKeys = keyof typeof BsdStatusCode;
@@ -120,6 +120,8 @@ export interface BsdDisplay {
     | Maybe<Array<InitialBsdasri>>
     | Array<BsffPackaging>
     | Maybe<Array<InitialBsda>>;
+  groupedIn?: Maybe<Bsda>;
+  forwardedIn?: Maybe<Bsda>;
   synthesizing?: Maybe<Array<InitialBsdasri>>;
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;
   review?: {
@@ -168,5 +170,5 @@ export enum WorkflowDisplayType {
   ANNEXE_1 = "Annexe 1",
   ANNEXE_2 = "Regroupement",
 
-  DEFAULT = "",
+  DEFAULT = ""
 }

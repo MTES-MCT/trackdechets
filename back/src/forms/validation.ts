@@ -20,7 +20,7 @@ import {
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
-} from "../common/constants";
+} from "shared/constants";
 import {
   BAD_CHARACTERS_REGEXP,
   countries as vatCountries,
@@ -28,7 +28,7 @@ import {
   isOmi,
   isSiret,
   isVat
-} from "../common/constants/companySearchHelpers";
+} from "shared/constants";
 import {
   foreignVatNumber,
   REQUIRED_RECEIPT_DEPARTMENT,
@@ -808,6 +808,11 @@ const wasteDetailsNormalSchemaFn: FactorySchemaOf<
           isValidPackagingInfos
         ),
       wasteDetailsQuantity: weight(WeightUnits.Tonne)
+        .test(
+          "is-not-zero",
+          "${path} : le poids doit être supérieur à 0",
+          value => isDraft || (value != null && value > 0)
+        )
         .label("Déchet")
         .when(
           ["transporters", "createdAt"],
@@ -1517,7 +1522,7 @@ export async function validateBeforeEmission(form: PrismaForm) {
   await wasteDetailsSchemaFn({ isDraft: false }).validate(form);
 
   if (form.emitterType !== "APPENDIX1_PRODUCER") {
-    // Vérifie qu'au moins un packaging a été déini sauf dans le cas
+    // Vérifie qu'au moins un packaging a été défini sauf dans le cas
     // d'un bordereau d'annexe 1 pour lequel il est possible de ne pas définir
     // de packaging
     const wasteDetailsBeforeTransportSchema = yup.object({

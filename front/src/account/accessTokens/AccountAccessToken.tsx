@@ -1,4 +1,4 @@
-import { AccessToken } from "generated/graphql/types";
+import { AccessToken } from "codegen-ui";
 import React, { useState } from "react";
 import { format } from "date-fns";
 import AccountAccessTokenRevoke from "./AccountAccessTokenRevoke";
@@ -9,7 +9,7 @@ type AccountAccessTokenProps = {
 };
 
 export default function AccountAccessToken({
-  accessToken,
+  accessToken
 }: AccountAccessTokenProps) {
   const [isRevoking, setIsRevoking] = useState(false);
 

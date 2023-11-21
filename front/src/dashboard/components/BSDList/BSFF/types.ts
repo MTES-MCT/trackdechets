@@ -1,4 +1,4 @@
-import { BsffStatus } from "generated/graphql/types";
+import { BsffStatus } from "codegen-ui";
 
 export interface BsffFragment {
   id: string;

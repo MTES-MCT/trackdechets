@@ -1,8 +1,8 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { formatDate } from "common/datetime";
+import { formatDate } from "../../common/datetime";
 import AccountField from "./AccountField";
-import { CompanyPrivate, UserRole } from "generated/graphql/types";
+import { CompanyPrivate, UserRole } from "codegen-ui";
 import AccountFormCompanyTransporterReceipt from "./forms/AccountFormCompanyTransporterReceipt";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
@@ -26,11 +26,11 @@ AccountFieldCompanyTransporterReceipt.fragments = {
         department
       }
     }
-  `,
+  `
 };
 
 export default function AccountFieldCompanyTransporterReceipt({
-  company,
+  company
 }: Props) {
   const transporterReceipt = company.transporterReceipt ? (
     <table>

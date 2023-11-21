@@ -33,6 +33,7 @@ export const dashboardBsffFragment = gql`
         orgId
         name
       }
+      plannedOperationCode
     }
     waste {
       code
@@ -40,6 +41,9 @@ export const dashboardBsffFragment = gql`
     }
     packagings {
       numero
+      operation {
+        code
+      }
     }
     bsffWeight: weight {
       value

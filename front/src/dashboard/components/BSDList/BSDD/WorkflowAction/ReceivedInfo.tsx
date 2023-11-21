@@ -1,16 +1,16 @@
 import React from "react";
 import { Field, Form, Formik } from "formik";
 import { startOfDay } from "date-fns";
-import { parseDate } from "common/datetime";
+import { parseDate } from "../../../../../common/datetime";
 import * as yup from "yup";
-import { RedErrorMessage } from "common/components";
-import { Loader } from "Apps/common/Components";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import { RedErrorMessage } from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
+import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import {
   InlineRadioButton,
-  RadioButton,
-} from "form/common/components/custom-inputs/RadioButton";
+  RadioButton
+} from "../../../../../form/common/components/custom-inputs/RadioButton";
 import {
   WasteAcceptationStatus,
   FormStatus,
@@ -18,13 +18,13 @@ import {
   QuantityType,
   MutationMarkAsReceivedArgs,
   Mutation,
-  MutationMarkAsTempStoredArgs,
-} from "generated/graphql/types";
+  MutationMarkAsTempStoredArgs
+} from "codegen-ui";
 import { gql, useMutation } from "@apollo/client";
-import { statusChangeFragment } from "Apps/common/queries/fragments";
-import { GET_BSDS } from "Apps/common/queries";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
+import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import EstimatedQuantityTooltip from "../../../../../common/components/EstimatedQuantityTooltip";
 
 export const textConfig: {
   [id: string]: {
@@ -34,18 +34,18 @@ export const textConfig: {
 } = {
   [WasteAcceptationStatus.Accepted]: {
     validationText:
-      "En validant, je confirme la réception des déchets indiqués dans ce bordereau.",
+      "En validant, je confirme la réception des déchets indiqués dans ce bordereau."
   },
   [WasteAcceptationStatus.Refused]: {
     validationText:
       "En refusant ce déchet, je le retourne à son producteur. Un mail automatique Trackdéchets, informera le producteur de ce refus, accompagné du récépissé en PDF. L'inspection des ICPE et ma société en recevront une copie",
-    refusalReasonText: "Motif du refus",
+    refusalReasonText: "Motif du refus"
   },
   [WasteAcceptationStatus.PartiallyRefused]: {
     validationText:
       "En validant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau. Un mail automatique Trackdéchets informera le producteur de ce refus partiel, accompagné du récépissé en PDF. L'inspection des ICPE et ma société en recevront une copie",
-    refusalReasonText: "Motif du refus partiel",
-  },
+    refusalReasonText: "Motif du refus partiel"
+  }
 };
 
 export type ReceivedInfoValues = {
@@ -97,7 +97,7 @@ const validationSchema = (form: TdForm, today: Date) => {
       // we only care about the day, not the exact time
       .transform(value => {
         startOfDay(value);
-      }),
+      })
   });
 };
 
@@ -125,7 +125,7 @@ const MARK_AS_TEMP_STORED = gql`
 export default function ReceivedInfo({
   form,
   close,
-  isTempStorage,
+  isTempStorage
 }: {
   form: TdForm;
   close: () => void;
@@ -133,7 +133,7 @@ export default function ReceivedInfo({
 }) {
   const [
     markAsReceived,
-    { loading: loadingMarkAsReceived, error: errorMarkAsReceived },
+    { loading: loadingMarkAsReceived, error: errorMarkAsReceived }
   ] = useMutation<Pick<Mutation, "markAsReceived">, MutationMarkAsReceivedArgs>(
     MARK_AS_RECEIVED,
     {
@@ -142,13 +142,13 @@ export default function ReceivedInfo({
       onError: () => {
         // The error is handled in the UI
       },
-      onCompleted: close,
+      onCompleted: close
     }
   );
 
   const [
     markAsTempStored,
-    { loading: loadingMarkAsTempStored, error: errorMarkAsTempStored },
+    { loading: loadingMarkAsTempStored, error: errorMarkAsTempStored }
   ] = useMutation<
     Pick<Mutation, "markAsTempStored">,
     MutationMarkAsTempStoredArgs
@@ -157,7 +157,7 @@ export default function ReceivedInfo({
     awaitRefetchQueries: true,
     onError: () => {
       // The error is handled in the UI
-    },
+    }
   });
 
   const TODAY = new Date();
@@ -174,11 +174,11 @@ export default function ReceivedInfo({
           wasteRefusalReason: "",
           ...(form.recipient?.isTempStorage &&
             form.status === FormStatus.Sent && {
-              quantityType: QuantityType.Real,
-            }),
+              quantityType: QuantityType.Real
+            })
         }}
-        onSubmit={values =>
-          isTempStorage
+        onSubmit={async values => {
+          const { errors } = await (isTempStorage
             ? markAsTempStored({
                 variables: {
                   id: form.id,
@@ -190,9 +190,9 @@ export default function ReceivedInfo({
                     quantityReceived: values.quantityReceived ?? 0,
                     wasteAcceptationStatus:
                       values.wasteAcceptationStatus ??
-                      WasteAcceptationStatus.Accepted,
-                  },
-                },
+                      WasteAcceptationStatus.Accepted
+                  }
+                }
               })
             : markAsReceived({
                 variables: {
@@ -200,11 +200,14 @@ export default function ReceivedInfo({
                   receivedInfo: {
                     ...values,
                     receivedAt: parseDate(values.receivedAt).toISOString(),
-                    signedAt: parseDate(values.signedAt).toISOString(),
-                  },
-                },
-              })
-        }
+                    signedAt: parseDate(values.signedAt).toISOString()
+                  }
+                }
+              }));
+          if (!errors) {
+            close();
+          }
+        }}
         validationSchema={() => validationSchema(form, TODAY)}
       >
         {({ values, isSubmitting, handleReset, setFieldValue }) => (
@@ -308,7 +311,7 @@ export default function ReceivedInfo({
             {values.wasteAcceptationStatus &&
               [
                 WasteAcceptationStatus.Refused.toString(),
-                WasteAcceptationStatus.PartiallyRefused.toString(),
+                WasteAcceptationStatus.PartiallyRefused.toString()
               ].includes(values.wasteAcceptationStatus) && (
                 <div className="form__row">
                   <label>

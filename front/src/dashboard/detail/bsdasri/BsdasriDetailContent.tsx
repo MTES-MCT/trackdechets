@@ -1,17 +1,17 @@
 import React from "react";
-import { useBsdasriDuplicate } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDuplicate";
+import { useBsdasriDuplicate } from "../../components/BSDList/BSDasri/BSDasriActions/useDuplicate";
 import { generatePath, useHistory, useParams } from "react-router-dom";
-import { getTransportModeLabel } from "dashboard/constants";
+import { getTransportModeLabel } from "../../constants";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
   Bsdasri,
   FormCompany,
   BsdasriPackaging,
   BsdasriType,
-  OperationMode,
-} from "generated/graphql/types";
-import routes from "Apps/routes";
-import { useDownloadPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDownloadPdf";
+  OperationMode
+} from "codegen-ui";
+import routes from "../../../Apps/routes";
+import { useDownloadPdf } from "../../components/BSDList/BSDasri/BSDasriActions/useDownloadPdf";
 
 import {
   IconWarehouseDelivery,
@@ -19,31 +19,31 @@ import {
   IconRenewableEnergyEarth,
   IconBSDasri,
   IconDuplicateFile,
-  IconPdf,
-} from "Apps/common/Components/Icons/Icons";
+  IconPdf
+} from "../../../Apps/common/Components/Icons/Icons";
 import { InitialDasris } from "./InitialDasris";
 import QRCodeIcon from "react-qr-code";
 
-import styles from "dashboard/detail/common/BSDDetailContent.module.scss";
+import styles from "../common/BSDDetailContent.module.scss";
 
 import {
   getVerboseWeightType,
-  getVerboseAcceptationStatus,
-} from "dashboard/detail/common/utils";
+  getVerboseAcceptationStatus
+} from "../common/utils";
 import {
   DateRow,
   DetailRow,
-  TransporterReceiptDetails,
-} from "dashboard/detail/common/Components";
+  TransporterReceiptDetails
+} from "../common/Components";
 
 import classNames from "classnames";
-import { getOperationModeLabel } from "common/operationModes";
-import { DASRI_VERBOSE_STATUSES } from "generated/constants/statuses";
+import { getOperationModeLabel } from "../../../common/operationModes";
+import { DASRI_VERBOSE_STATUSES } from "shared/constants";
 
 const getVerboseWasteName = (code: string): string => {
   const desc = {
     "18 01 03*": "DASRI origine humaine ",
-    "18 02 02*": "DASRI origine animale",
+    "18 02 02*": "DASRI origine animale"
   }[code];
   return !!desc ? desc : "";
 };
@@ -297,11 +297,7 @@ const Recipient = ({ form }: { form: Bsdasri }) => {
   );
 };
 
-export default function BsdasriDetailContent({
-  form,
-  children = null,
-  refetch,
-}: SlipDetailContentProps) {
+export default function BsdasriDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
@@ -310,10 +306,10 @@ export default function BsdasriDetailContent({
     onCompleted: () => {
       history.push(
         generatePath(routes.dashboard.bsds.drafts, {
-          siret,
+          siret
         })
       );
-    },
+    }
   });
 
   return (
@@ -472,7 +468,7 @@ const DasriIdentificationNumbers = ({ identificationNumbers }) =>
   ) : null;
 
 const Dasripackaging = ({
-  packagings,
+  packagings
 }: {
   packagings: BsdasriPackaging[] | null | undefined;
 }) => {
@@ -480,35 +476,33 @@ const Dasripackaging = ({
     return null;
   }
   return (
-    <>
-      <div className={classNames(styles.spanWidth)}>
-        <table className={classNames(styles.WastePackaging)}>
-          <caption>Conditionnement</caption>
-          <thead>
-            <tr className="td-table__head-trs">
-              <th>Type</th>
-              <th>Qté.</th>
-              <th>Vol.</th>
-            </tr>
-          </thead>
-          <tbody>
-            {packagings.map((row, idx) => (
-              <tr className="td-table__tr" key={idx}>
-                <td>
-                  {`${getVerbosePackagingType(row.type)
-                    .substring(0, 20)
-                    .trim()}…`}
-                  {row.other}
-                </td>
+    <div className={classNames(styles.spanWidth)}>
+      <table className={classNames(styles.WastePackaging)}>
+        <caption>Conditionnement</caption>
+        <thead>
+          <tr className="td-table__head-trs">
+            <th>Type</th>
+            <th>Qté.</th>
+            <th>Vol.</th>
+          </tr>
+        </thead>
+        <tbody>
+          {packagings.map((row, idx) => (
+            <tr className="td-table__tr" key={idx}>
+              <td>
+                {`${getVerbosePackagingType(row.type)
+                  .substring(0, 20)
+                  .trim()}…`}
+                {row.other}
+              </td>
 
-                <td>{row.quantity}</td>
-                <td className="tw-whitespace-no-wrap">{row.volume} l</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+              <td>{row.quantity}</td>
+              <td className="tw-whitespace-no-wrap">{row.volume} l</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
@@ -518,12 +512,12 @@ const verbosePackagings = {
   BOITE_PERFORANTS: "Boîtes et Mini-collecteurs pour déchets perforants",
   GRAND_EMBALLAGE: "Grand emballage",
   GRV: "Grand récipient pour vrac",
-  AUTRE: "Autre",
+  AUTRE: "Autre"
 };
 const getVerbosePackagingType = (type: string) => verbosePackagings[type];
 
 const AcceptationStatusRow = ({
-  value = null,
+  value = null
 }: {
   value?: string | undefined | null;
 }) => {
@@ -537,7 +531,7 @@ const AcceptationStatusRow = ({
 
 const AssociatedTo = ({ formId, label }: { formId: string; label: string }) => {
   const [downloadPdf] = useDownloadPdf({
-    variables: { id: formId },
+    variables: { id: formId }
   });
 
   return (

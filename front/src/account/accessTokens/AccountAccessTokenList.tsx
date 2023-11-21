@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { DEVELOPERS_DOCUMENTATION_URL } from "common/config";
+import { DEVELOPERS_DOCUMENTATION_URL } from "../../common/config";
 import { useQuery } from "@apollo/client";
-import { NewAccessToken, Query } from "generated/graphql/types";
-import { Loader } from "Apps/common/Components";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import AccountContentWrapper from "account/AccountContentWrapper";
+import { NewAccessToken, Query } from "codegen-ui";
+import { Loader } from "../../Apps/common/Components";
+import { NotificationError } from "../../Apps/common/Components/Error/Error";
+import AccountContentWrapper from "../AccountContentWrapper";
 import AccountAccessToken from "./AccountAccessToken";
 import { ACCESS_TOKENS } from "./queries";
 import AccountAccessTokenCreate from "./AccountAccessTokenCreate";
@@ -72,7 +72,7 @@ type AccountAccessTokenListContentProps = {
 
 function AccountAccessTokenListContent({
   newAccessToken,
-  onNewAccessTokenDelete,
+  onNewAccessTokenDelete
 }: AccountAccessTokenListContentProps) {
   const { loading, error, data } =
     useQuery<Pick<Query, "accessTokens">>(ACCESS_TOKENS);

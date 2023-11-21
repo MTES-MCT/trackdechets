@@ -1,8 +1,8 @@
 import React from "react";
 import { Formik, Form, FieldArray, Field } from "formik";
 import { useMutation, gql } from "@apollo/client";
-import { IconTrash } from "Apps/common/Components/Icons/Icons";
-import { InlineError } from "Apps/common/Components/Error/Error";
+import { IconTrash } from "../../../Apps/common/Components/Icons/Icons";
+import { InlineError } from "../../../Apps/common/Components/Error/Error";
 import styles from "./AccountForm.module.scss";
 
 interface AccountFormAgreementsProps {
@@ -29,7 +29,7 @@ export default function AccountFormAgreements({
   name,
   ecoOrganismeAgreements,
   id,
-  toggleEdition,
+  toggleEdition
 }: AccountFormAgreementsProps) {
   const [updateAgreements, { loading, error }] = useMutation<
     {},
@@ -48,8 +48,8 @@ export default function AccountFormAgreements({
             id,
             ecoOrganismeAgreements:
               // Filter out empty inputs
-              values.ecoOrganismeAgreements.filter(Boolean),
-          },
+              values.ecoOrganismeAgreements.filter(Boolean)
+          }
         });
         toggleEdition();
       }}

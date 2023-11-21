@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { ActionButton } from "common/components";
-import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
+import { ActionButton } from "../../../../../common/components";
+import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
 import React, { useState } from "react";
 import { SignBsdaModal } from "./SignBsdaModal";
 
@@ -28,7 +28,7 @@ export function SignBsda({
   children,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton = true,
+  displayActionButton = true
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 

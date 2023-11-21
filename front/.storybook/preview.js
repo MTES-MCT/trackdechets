@@ -6,15 +6,15 @@ export const parameters = {
   controls: {
     matchers: {
       color: /(background|color)$/i,
-      date: /Date$/,
-    },
+      date: /Date$/
+    }
   },
   apolloClient: {
-    MockedProvider,
-  },
+    MockedProvider
+  }
 };
 
 // Initialize global jest.fn override
 window.jest = {
-  fn: fnc => fnc,
+  fn: fnc => fnc
 };

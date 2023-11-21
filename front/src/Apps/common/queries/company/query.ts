@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { FavoriteType } from "generated/graphql/types";
+import { FavoriteType } from "codegen-ui";
 
 export const COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA = gql`
   query CompanyInfos($siret: String!) {

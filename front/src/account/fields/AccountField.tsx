@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from "react";
 import styles from "./AccountField.module.scss";
-import Tooltip from "common/components/Tooltip";
+import Tooltip from "../../common/components/Tooltip";
 
 type Props = {
   // the name of the field
@@ -30,7 +30,7 @@ export default function AccountField({
   value,
   renderForm,
   tooltip,
-  modifier = "Modifier",
+  modifier = "Modifier"
 }: Props) {
   const [editing, setEditing] = useState(false);
 

@@ -4,7 +4,7 @@ import {
   dashboardVhuFragment,
   dashboardBsdaFragment,
   dashboardBsffFragment,
-  dashboardFormFragment,
+  dashboardFormFragment
 } from "../fragments";
 
 export const GET_BSDS = gql`

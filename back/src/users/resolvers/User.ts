@@ -4,7 +4,7 @@ import {
   CompanyPrivate,
   UserRole
 } from "../../generated/graphql/types";
-import { nafCodes } from "../../common/constants/NAF";
+import { nafCodes } from "shared/constants";
 import prisma from "../../prisma";
 
 const userResolvers: UserResolvers = {

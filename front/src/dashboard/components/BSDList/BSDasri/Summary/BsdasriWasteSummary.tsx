@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Bsdasri } from "generated/graphql/types";
+import { Bsdasri } from "codegen-ui";
 import {
   DataList,
   DataListItem,
   DataListTerm,
-  DataListDescription,
-} from "common/components";
+  DataListDescription
+} from "../../../../../common/components";
 
 interface BsdasriWasteSummaryProps {
   bsdasri: Bsdasri;
@@ -17,7 +17,7 @@ export function BsdasriWasteSummary({ bsdasri }: BsdasriWasteSummaryProps) {
     SIGNED_BY_PRODUCER: ["emitter", "emission"],
     SENT: ["transporter", "transport"],
     RECEIVED: ["destination", "reception"],
-    PROCESSED: ["destination", "reception"],
+    PROCESSED: ["destination", "reception"]
   }[bsdasri["bsdasriStatus"]];
 
   const packagings = bsdasri?.[section[0]]?.[section[1]]?.packagings;

@@ -3,7 +3,7 @@ import { Bsda } from "@prisma/client";
 import { getCompanyAdminUsers } from "../../companies/database";
 import prisma from "../../prisma";
 import { buildPdfAsBase64 } from "../pdf/generator";
-import DREALS from "../../common/constants/DREALS";
+import { Dreals } from "shared/constants";
 import { formNotAccepted, formPartiallyRefused } from "../../mailer/templates";
 import { renderMail } from "../../mailer/templates/renderers";
 import { Decimal } from "decimal.js-light";
@@ -26,7 +26,7 @@ export async function renderBsdaRefusedEmail(
     bsda.destinationCompanySiret!
   );
 
-  let drealsRecipients: typeof DREALS = [];
+  let drealsRecipients: typeof Dreals = [];
 
   if (notifyDreal) {
     const companies = await prisma.company.findMany({
@@ -41,7 +41,7 @@ export async function renderBsdaRefusedEmail(
     });
     const formDepartments = companies.map(c => c.codeDepartement);
     // get recipients from dreals list
-    drealsRecipients = DREALS.filter(d => formDepartments.includes(d.Dept));
+    drealsRecipients = Dreals.filter(d => formDepartments.includes(d.Dept));
   }
 
   const to = bsda.emitterIsPrivateIndividual

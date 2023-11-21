@@ -14,7 +14,7 @@ export default function AutoFormattingCompanyInfosInput({
     <Cleave
       options={{
         uppercase: true,
-        stripLeadingZeroes: false,
+        stripLeadingZeroes: false
       }}
       {...field}
       {...props}

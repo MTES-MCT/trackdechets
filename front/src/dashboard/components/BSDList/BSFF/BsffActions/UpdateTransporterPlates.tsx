@@ -1,20 +1,22 @@
 import { Form, Formik } from "formik";
 import React, { useState, lazy } from "react";
-import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
+import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import { useMutation } from "@apollo/client";
-import { Mutation, MutationUpdateBsffArgs } from "generated/graphql/types";
-import TdModal from "Apps/common/Components/Modal/Modal";
-import { UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
+import { Mutation, MutationUpdateBsffArgs } from "codegen-ui";
+import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
+import { UPDATE_BSFF_FORM } from "../../../../../form/bsff/utils/queries";
 import { BsffFragment } from "../types";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import Tooltip from "common/components/Tooltip";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import Tooltip from "../../../../../common/components/Tooltip";
 import { useRouteMatch } from "react-router-dom";
-const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
+const TagsInput = lazy(
+  () => import("../../../../../common/components/tags-input/TagsInput")
+);
 
 export function UpdateTransporterPlates({
   bsff,
   isModalOpenFromParent,
-  onModalCloseFromParent,
+  onModalCloseFromParent
 }: {
   bsff: BsffFragment;
   isModalOpenFromParent?: boolean;
@@ -55,7 +57,7 @@ export function UpdateTransporterPlates({
 function UpdateTransporterPlatesModal({
   bsff,
   isOpen,
-  onClose,
+  onClose
 }: {
   bsff: BsffFragment;
   isOpen: boolean;
@@ -80,9 +82,9 @@ function UpdateTransporterPlatesModal({
             variables: {
               id: bsff.id,
               input: {
-                transporter: { transport: { plates: values.plates ?? [] } },
-              },
-            },
+                transporter: { transport: { plates: values.plates ?? [] } }
+              }
+            }
           });
         }}
       >

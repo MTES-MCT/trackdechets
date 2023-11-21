@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { BsdaRevisionRequest } from "generated/graphql/types";
+import { BsdaRevisionRequest } from "codegen-ui";
 import { useTable, useFilters, useSortBy } from "react-table";
 import {
   Table,
@@ -7,8 +7,8 @@ import {
   TableHeaderCell,
   TableBody,
   TableRow,
-  TableCell,
-} from "common/components";
+  TableCell
+} from "../../../../common/components";
 import { BsdaRevisionAction } from "./approve/BsdaRevisionAction";
 import { BsdaRevisionStatus } from "./approve/BsdaRevisionStatus";
 
@@ -19,23 +19,23 @@ type Props = {
 const COLUMNS = [
   {
     Header: "Bordereau",
-    accessor: "bsda.id",
+    accessor: "bsda.id"
   },
   {
     Header: "Demandeur",
     accessor: row =>
-      `${row.authoringCompany.name} (${row.authoringCompany.siret})`,
+      `${row.authoringCompany.name} (${row.authoringCompany.siret})`
   },
   {
     Header: "Statut",
     accessor: () => null,
-    Cell: ({ row }) => <BsdaRevisionStatus review={row.original} />,
+    Cell: ({ row }) => <BsdaRevisionStatus review={row.original} />
   },
   {
     Header: "Actions",
     accessor: () => null,
-    Cell: ({ row }) => <BsdaRevisionAction review={row.original} />,
-  },
+    Cell: ({ row }) => <BsdaRevisionAction review={row.original} />
+  }
 ];
 
 export function BsdaRevisionRequestTable({ revisions }: Props) {
@@ -47,7 +47,7 @@ export function BsdaRevisionRequestTable({ revisions }: Props) {
         columns,
         data: revisions,
         manualFilters: true,
-        manualSortBy: true,
+        manualSortBy: true
       },
       useFilters,
       useSortBy

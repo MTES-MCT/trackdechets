@@ -102,6 +102,23 @@ async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
     return z.NEVER;
   }
 
+  if (
+    // This rule only applies to BSDA that have not been signed before 2023-11-23
+    (!bsda.emitterEmissionSignatureDate ||
+      bsda.emitterEmissionSignatureDate >= new Date("2023-11-23")) &&
+    bsda.type === "GATHERING" &&
+    previousBsdasWithDestination.some(
+      previousBsda => previousBsda.wasteCode !== bsda.wasteCode
+    )
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Tous les bordereaux groupés doivent avoir le même code déchet que le bordereau de groupement.`,
+      fatal: true
+    });
+    return z.NEVER;
+  }
+
   for (const previousBsda of previousBsdas) {
     if (previousBsda.status === BsdaStatus.PROCESSED) {
       ctx.addIssue({
@@ -163,6 +180,7 @@ async function validateDestination(
   currentSignatureType: BsdaSignatureType | undefined,
   ctx: RefinementCtx
 ) {
+
   // Destination is freely editable until EMISSION signature.
   // Once transported, destination is not editable for anyone.
   // This is enforced by the sealing rules

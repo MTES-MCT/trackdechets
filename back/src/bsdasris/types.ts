@@ -1,4 +1,4 @@
-import { Bsdasri } from "@prisma/client";
+import { Bsdasri, Prisma } from "@prisma/client";
 
 /**
  * A Prisma Dasri with owner user type
@@ -17,3 +17,21 @@ export interface FullDbBsdasri extends Bsdasri {
   grouping: { id: string }[];
   synthesizing: { id: string }[];
 }
+
+export const BsdasriWithGroupingInclude =
+  Prisma.validator<Prisma.BsdasriInclude>()({
+    grouping: { select: { id: true } }
+  });
+
+export type BsdasriWithGrouping = Prisma.BsdasriGetPayload<{
+  include: typeof BsdasriWithGroupingInclude;
+}>;
+
+export const BsdasriWithSynthesizingInclude =
+  Prisma.validator<Prisma.BsdasriInclude>()({
+    synthesizing: { select: { id: true } }
+  });
+
+export type BsdasriWithSynthesizing = Prisma.BsdasriGetPayload<{
+  include: typeof BsdasriWithSynthesizingInclude;
+}>;

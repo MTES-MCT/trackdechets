@@ -1,4 +1,4 @@
-import { Bsff, Bsdasri, Bsvhu, BsdType } from "../../generated/graphql/types";
+import { Bsff, Bsdasri, Bsvhu, BsdType } from "codegen-ui";
 import {
   BsdDisplay,
   BsdStatusCode,
@@ -6,7 +6,7 @@ import {
   BsdWithReview,
   BsdaWithReview,
   FormWithReview,
-  TBsdStatusCode,
+  TBsdStatusCode
 } from "../common/types/bsdTypes";
 
 const mapBsdStatusToBsdStatusEnum = (status: string): TBsdStatusCode => {
@@ -69,7 +69,7 @@ export const mapBsdd = (bsdd: FormWithReview): BsdDisplay => {
         bsdd.review?.["content"]?.quantityReceived ||
         bsdd.quantityReceived ||
         bsdd.temporaryStorageDetail?.wasteDetails?.quantity ||
-        bsdd.wasteDetails?.quantity,
+        bsdd.wasteDetails?.quantity
     },
     isTempStorage: bsdd.recipient?.isTempStorage,
     emitter: bsdd.emitter,
@@ -83,7 +83,7 @@ export const mapBsdd = (bsdd: FormWithReview): BsdDisplay => {
     bsdWorkflowType: bsdd.emitter?.type,
     review: bsdd?.review,
     transporterCustomInfo: bsdd.stateSummary?.transporterCustomInfo,
-    transporterNumberPlate: bsdd.stateSummary?.transporterNumberPlate,
+    transporterNumberPlate: bsdd.stateSummary?.transporterNumberPlate
   } as BsdDisplay;
   return bsddFormatted;
 };
@@ -102,7 +102,7 @@ const mapBsda = (bsda: BsdaWithReview): BsdDisplay => {
       weight:
         bsda.review?.["content"]?.destination?.reception?.weight ||
         bsda?.destination?.reception?.weight ||
-        bsda?.weight?.value,
+        bsda?.weight?.value
     },
     emitter: bsda.emitter || bsda["bsdaEmitter"],
     destination: bsda.destination || bsda["bsdaDestination"],
@@ -112,13 +112,15 @@ const mapBsda = (bsda: BsdaWithReview): BsdDisplay => {
     emittedByEcoOrganisme: bsda.ecoOrganisme,
     worker: bsda.worker,
     bsdWorkflowType: bsda.type || bsda["bsdaType"],
+    groupedIn: bsda.groupedIn,
+    forwardedIn: bsda.forwardedIn,
     grouping: bsda.grouping,
     review: bsda?.review,
     transporterCustomInfo:
       bsda.transporter?.customInfo || bsda["bsdaTransporter"]?.customInfo,
     transporterNumberPlate:
       bsda.transporter?.transport?.plates ||
-      bsda["bsdaTransporter"]?.transport?.plates,
+      bsda["bsdaTransporter"]?.transport?.plates
   };
   return bsdaFormatted;
 };
@@ -141,7 +143,7 @@ export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     wasteDetails: {
       code: wasteCode,
       weight: bsdasri.destination?.operation?.weight?.value,
-      name: wasteName,
+      name: wasteName
     },
     emitter: bsdasri.emitter || bsdasri["bsdasriEmitter"],
     destination: bsdasri.destination || bsdasri["bsdasriDestination"],
@@ -160,7 +162,7 @@ export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     transporterNumberPlate:
       bsdasri.transporter?.transport?.plates ||
       bsdasri["bsdasriTransporter"]?.transport?.plates,
-    synthesizedIn: bsdasri.synthesizedIn,
+    synthesizedIn: bsdasri.synthesizedIn
   };
   return bsdasriFormatted;
 };
@@ -179,12 +181,12 @@ const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     wasteDetails: {
       code: bsvhu?.wasteCode,
       weight: bsvhu?.destination?.reception?.weight || bsvhu?.weight?.value,
-      name: wasteName,
+      name: wasteName
     },
     emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
     destination: bsvhu.destination || bsvhu["bsvhuDestination"],
     transporter: bsvhu.transporter || bsvhu["bsvhuTransporter"],
-    updatedAt: bsvhu["bsvhuUpdatedAt"],
+    updatedAt: bsvhu["bsvhuUpdatedAt"]
   };
   return bsvhuFormatted;
 };
@@ -200,7 +202,7 @@ const mapBsff = (bsff: Bsff): BsdDisplay => {
     wasteDetails: {
       code: bsff.waste?.code,
       name: bsff.waste?.description,
-      weight: bsff["bsffWeight"]?.value,
+      weight: bsff["bsffWeight"]?.value
     },
     emitter: bsff.emitter || bsff["bsffEmitter"],
     destination: bsff.destination || bsff["bsffDestination"],
@@ -210,7 +212,7 @@ const mapBsff = (bsff: Bsff): BsdDisplay => {
     grouping: bsff.grouping,
     transporterCustomInfo: bsff["bsffTransporter"]?.customInfo,
     transporterNumberPlate: bsff["bsffTransporter"]?.transport?.plates,
-    packagings: bsff?.packagings,
+    packagings: bsff?.packagings
   };
   return bsffFormatted;
 };

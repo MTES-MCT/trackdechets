@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "types": ["vite/client", "node", "jest", "@testing-library/jest-dom"]
+  },
+  "include": ["src/**/*"],
+  "types": ["@nx/react/typings/cssmodule.d.ts", "@nx/react/typings/image.d.ts"]
+}

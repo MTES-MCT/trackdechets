@@ -1,10 +1,10 @@
 import React from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Formik, FormikProps, Form, Field } from "formik";
-import RedErrorMessage from "common/components/RedErrorMessage";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import { CompanyPrivate } from "generated/graphql/types";
+import RedErrorMessage from "../../../common/components/RedErrorMessage";
+import { NotificationError } from "../../../Apps/common/Components/Error/Error";
+import DateInput from "../../../form/common/components/custom-inputs/DateInput";
+import { CompanyPrivate } from "codegen-ui";
 
 type Props = {
   company: Pick<CompanyPrivate, "id" | "siret" | "transporterReceipt">;
@@ -67,25 +67,25 @@ export const DELETE_TRANSPORTER_RECEIPT = gql`
  */
 export default function AccountFormCompanyTransporterReceipt({
   company,
-  toggleEdition,
+  toggleEdition
 }: Props) {
   const transporterReceipt = company.transporterReceipt;
 
   const [
     createOrUpdateTransporterReceipt,
-    { loading: updateOrCreateLoading, error: updateOrCreateError },
+    { loading: updateOrCreateLoading, error: updateOrCreateError }
   ] = useMutation(
     transporterReceipt ? UPDATE_TRANSPORTER_RECEIPT : CREATE_TRANSPORTER_RECEIPT
   );
 
   const [
     updateCompany,
-    { loading: updateCompanyLoading, error: updateCompanyError },
+    { loading: updateCompanyLoading, error: updateCompanyError }
   ] = useMutation(UPDATE_COMPANY_TRANSPORTER_RECEIPT);
 
   const [
     deleteTransporterReceipt,
-    { loading: deleteLoading, error: deleteError },
+    { loading: deleteLoading, error: deleteError }
   ] = useMutation(DELETE_TRANSPORTER_RECEIPT, {
     update(cache) {
       cache.writeFragment({
@@ -98,21 +98,21 @@ export default function AccountFormCompanyTransporterReceipt({
             }
           }
         `,
-        data: { transporterReceipt: null },
+        data: { transporterReceipt: null }
       });
-    },
+    }
   });
 
   const initialValues: V = transporterReceipt
     ? {
         receiptNumber: transporterReceipt.receiptNumber,
         validityLimit: transporterReceipt.validityLimit,
-        department: transporterReceipt.department,
+        department: transporterReceipt.department
       }
     : {
         receiptNumber: "",
         validityLimit: new Date().toISOString(),
-        department: "",
+        department: ""
       };
 
   return (
@@ -131,17 +131,17 @@ export default function AccountFormCompanyTransporterReceipt({
         onSubmit={async values => {
           const input = {
             ...(transporterReceipt?.id ? { id: transporterReceipt.id } : {}),
-            ...values,
+            ...values
           };
           const { data } = await createOrUpdateTransporterReceipt({
-            variables: { input },
+            variables: { input }
           });
           if (data.createTransporterReceipt) {
             await updateCompany({
               variables: {
                 id: company.id,
-                transporterReceiptId: data.createTransporterReceipt.id,
-              },
+                transporterReceiptId: data.createTransporterReceipt.id
+              }
             });
           }
           toggleEdition();
@@ -150,7 +150,7 @@ export default function AccountFormCompanyTransporterReceipt({
           return {
             ...(!values.receiptNumber ? { receiptNumber: "Champ requis" } : {}),
             ...(!values.validityLimit ? { validityLimit: "Champ requis" } : {}),
-            ...(!values.department ? { department: "Champ requis" } : {}),
+            ...(!values.department ? { department: "Champ requis" } : {})
           };
         }}
       >
@@ -206,8 +206,8 @@ export default function AccountFormCompanyTransporterReceipt({
                   onClick={async () => {
                     await deleteTransporterReceipt({
                       variables: {
-                        input: { id: transporterReceipt.id },
-                      },
+                        input: { id: transporterReceipt.id }
+                      }
                     });
                     toggleEdition();
                   }}

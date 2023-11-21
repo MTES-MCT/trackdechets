@@ -1,5 +1,5 @@
 import { EmitterType, Prisma, TransportMode } from "@prisma/client";
-import { isDangerous, BSDD_WASTE_CODES } from "../../../common/constants";
+import { isDangerous, BSDD_WASTE_CODES } from "shared/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationUpdateFormArgs,
@@ -107,6 +107,7 @@ const updateFormResolver = async (
     // On supprime le premier transporteur en gardant les suivants (s'ils existent)
     // L'ordre des transporteurs se décale.
     transporters = { delete: { id: existingFirstTransporter.id } };
+    transportersForValidation.shift();
   } else if (formContent.transporter) {
     const transporterData = flattenTransporterInput(formContent);
     if (existingFirstTransporter) {
@@ -118,10 +119,13 @@ const updateFormResolver = async (
           data: transporterData
         }
       };
-      transportersForValidation.push({
+      // on remplace le premier transporteur par la fusion du trs en db et du payload
+      // on conserve la chaîne eventuelle de transporteurs car certaines validations portent sur l'ensemble des transporteurs
+      // (eg. poids max et mode de transport)
+      transportersForValidation[0] = {
         ...existingFirstTransporter,
         ...transporterData
-      });
+      };
     } else {
       // Aucun transporteur n'a encore été associé, let's create one
       transporters.create = {

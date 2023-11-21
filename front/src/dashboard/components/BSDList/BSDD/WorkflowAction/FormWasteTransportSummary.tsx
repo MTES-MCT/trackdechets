@@ -6,18 +6,18 @@ import {
   FormStatus,
   QuantityType,
   SignTransportFormInput,
-  WasteDetailsInput,
-} from "generated/graphql/types";
+  WasteDetailsInput
+} from "codegen-ui";
 import {
   DataList,
   DataListDescription,
   DataListItem,
   DataListTerm,
-  RedErrorMessage,
-} from "common/components";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
-import Packagings from "form/bsdd/components/packagings/Packagings";
+  RedErrorMessage
+} from "../../../../../common/components";
+import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
+import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
+import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 import { useEffect } from "react";
 
 interface FormWasteTransportSummaryProps {
@@ -33,11 +33,14 @@ type FormValues = Pick<SignTransportFormInput, "transporterNumberPlate"> & {
 type FormKeys = "transporterNumberPlate" | keyof FormValues["update"];
 
 const SAMPLE_NUMBER_WASTE_CODES = [
-  "13 02 04*",
   "13 02 05*",
   "13 02 06*",
   "13 02 07*",
   "13 02 08*",
+  "13 01 10*",
+  "13 01 11*",
+  "13 01 12*",
+  "13 01 13*"
 ];
 const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
   transporterNumberPlate: () => (
@@ -76,11 +79,11 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
         <Field name="update.sampleNumber" type="text" className="td-input" />
       </label>
     </div>
-  ),
+  )
 };
 
 export function FormWasteTransportSummary({
-  form,
+  form
 }: FormWasteTransportSummaryProps) {
   const { values } = useFormikContext<FormValues>();
   const [fields, setFields] = React.useState<FormKeys[]>([]);
@@ -183,8 +186,7 @@ export function FormWasteTransportSummary({
             </DataListDescription>
           )}
         </DataListItem>
-        {form.emitter?.type === EmitterType.Appendix1Producer &&
-          form.wasteDetails?.code &&
+        {form.wasteDetails?.code &&
           SAMPLE_NUMBER_WASTE_CODES.includes(form.wasteDetails.code) && (
             <DataListItem>
               <DataListTerm>Numéro d'échantillon</DataListTerm>

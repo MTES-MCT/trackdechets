@@ -19,20 +19,20 @@ const getPasswordHint = (password: string): PasswordHintResult => {
     return {
       title: "Trop court",
       hintType: "error",
-      message: `Votre mot de passe est trop court (${password.length} caractères), la longueur minimale est de 10 caractères`,
+      message: `Votre mot de passe est trop court (${password.length} caractères), la longueur minimale est de 10 caractères`
     };
   const { score } = zxcvbn(password);
   return score >= MIN_SCORE
     ? {
         title: "Parfait",
         hintType: "success",
-        message: "Votre mot de passe est robuste",
+        message: "Votre mot de passe est robuste"
       }
     : {
         title: "Insuffisant",
         hintType: "error",
         message: `Votre mot de passe est trop simple, ajoutez de la diversité dans les caractères. 
-          Veuillez suivre les conseils ci-dessus.`,
+          Veuillez suivre les conseils ci-dessus.`
       };
 };
 export default function PasswordHelper({ password }: Props) {

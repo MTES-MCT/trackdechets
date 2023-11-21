@@ -2,17 +2,13 @@ import React, { useState } from "react";
 import { useQuery, useMutation, gql } from "@apollo/client";
 import {
   InlineError,
-  NotificationError,
-} from "Apps/common/Components/Error/Error";
-import Loader from "Apps/common/Components/Loader/Loaders";
-import {
-  MembershipRequestStatus,
-  Mutation,
-  Query,
-  UserRole,
-} from "generated/graphql/types";
+  NotificationError
+} from "../Apps/common/Components/Error/Error";
+import Loader from "../Apps/common/Components/Loader/Loaders";
+import { MembershipRequestStatus, Mutation, Query, UserRole } from "codegen-ui";
 import { useHistory, useParams } from "react-router-dom";
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
+import { TOAST_DURATION } from "../common/config";
 
 const MEMBERSHIP_REQUEST = gql`
   query MembershipRequest($id: ID!) {
@@ -59,37 +55,37 @@ export default function AccountMembershipRequest() {
   const { loading, error, data } = useQuery<Pick<Query, "membershipRequest">>(
     MEMBERSHIP_REQUEST,
     {
-      variables: { id },
+      variables: { id }
     }
   );
 
   const [
     acceptMembershipRequest,
-    { loading: acceptLoading, error: acceptError },
+    { loading: acceptLoading, error: acceptError }
   ] = useMutation<Pick<Mutation, "acceptMembershipRequest">>(
     ACCEPT_MEMBERSHIP_REQUEST,
     {
       onCompleted: () => {
-        cogoToast.success("La demande de rattachement a bien été acceptée", {
-          hideAfter: 5,
+        toast.success("La demande de rattachement a bien été acceptée", {
+          duration: TOAST_DURATION
         });
         history.push("/");
-      },
+      }
     }
   );
 
   const [
     refuseMembershipRequest,
-    { loading: refuseLoading, error: refuseError },
+    { loading: refuseLoading, error: refuseError }
   ] = useMutation<Pick<Mutation, "refuseMembershipRequest">>(
     REFUSE_MEMBERSHIP_REQUEST,
     {
       onCompleted: () => {
-        cogoToast.success("La demande de rattachement a bien été refusée", {
-          hideAfter: 5,
+        toast.success("La demande de rattachement a bien été refusée", {
+          duration: TOAST_DURATION
         });
         history.push("/");
-      },
+      }
     }
   );
 

@@ -1,5 +1,5 @@
 export const MEDIA_QUERIES = {
-  handHeld: "900px",
+  handHeld: "900px"
 };
 
 export const CONTACT_EMAIL =
@@ -13,3 +13,5 @@ export const SENDER_EMAIL =
 export const DEVELOPERS_DOCUMENTATION_URL =
   (import.meta.env.VITE_DEVELOPERS_DOCUMENTATION_URL as string) ||
   "https://developers.trackdechets.beta.gouv.fr";
+
+export const TOAST_DURATION = 6000; // ms

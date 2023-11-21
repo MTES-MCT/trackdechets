@@ -2,7 +2,6 @@ import * as React from "react";
 import { Document, formatDate, SignatureStamp } from "../../../common/pdf";
 import { Bsvhu, OperationMode } from "../../../generated/graphql/types";
 import { Recepisse } from "./Recepisse";
-import bsdasri from "../../../bsdasris/resolvers/queries/bsdasri";
 import { getOperationModeLabel } from "../../../common/operationModes";
 
 const IDENTIFICATION_TYPES_LABELS = {

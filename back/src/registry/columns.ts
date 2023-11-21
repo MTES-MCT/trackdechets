@@ -7,7 +7,7 @@ import {
   TransportedWaste
 } from "../generated/graphql/types";
 import { GenericWaste } from "./types";
-import { formatStatusLabel } from "../common/constants/statuses";
+import { formatStatusLabel } from "shared/constants";
 
 // Type for custom fields that might not be in the DB
 // But that we still want to display (ie for user convenience)
@@ -36,8 +36,10 @@ const formatBoolean = (b: boolean | null) => {
 };
 const formatNumber = (n: number) => (!!n ? parseFloat(n.toFixed(3)) : null); // return as a number to allow xls cells formulas
 const formatArray = (arr: any[]) => (Array.isArray(arr) ? arr.join(",") : "");
+const formatOperationCode = (code?: string) =>
+  code ? code.replace(/ /g, "") : ""; // be consistent and remove all white spaces
 
-const columns: Column[] = [
+export const columns: Column[] = [
   // Dénomination, nature et quantité :
   { field: "id", label: "N° de bordereau" },
   {
@@ -168,13 +170,18 @@ const columns: Column[] = [
   },
   {
     field: "destinationPlannedOperationCode",
-    label: "Code opération prévue"
+    label: "Code opération prévu",
+    format: formatOperationCode
   },
   {
     field: "destinationOperationMode",
     label: "Mode de traitement réalisé"
   },
-  { field: "destinationOperationCode", label: "Code opération réalisée" },
+  {
+    field: "destinationOperationCode",
+    label: "Code opération réalisé",
+    format: formatOperationCode
+  },
   {
     field: "destinationOperationNoTraceability",
     label: "Rupture de traçabilité autorisée",

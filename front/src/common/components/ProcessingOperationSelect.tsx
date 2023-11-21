@@ -2,13 +2,13 @@ import React from "react";
 import classNames from "classnames";
 import {
   PROCESSING_OPERATIONS,
-  PROCESSING_AND_REUSE_OPERATIONS,
-} from "generated/constants";
+  PROCESSING_AND_REUSE_OPERATIONS
+} from "shared/constants";
 import styles from "./ProcessingOperationSelect.module.scss";
 
 const ProcessingOperationSelect = ({
   field: { value, name, onChange, enableReuse = false },
-  disabled,
+  disabled
 }) => {
   const operations = enableReuse
     ? PROCESSING_AND_REUSE_OPERATIONS

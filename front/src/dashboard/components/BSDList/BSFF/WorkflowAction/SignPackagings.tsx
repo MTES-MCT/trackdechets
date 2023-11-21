@@ -7,19 +7,19 @@ import {
   TableCell,
   TableHead,
   TableHeaderCell,
-  TableRow,
-} from "common/components";
-import { Loader } from "Apps/common/Components";
-import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
-import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
-import { GET_BSFF_FORM } from "form/bsff/utils/queries";
+  TableRow
+} from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
+import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
+import { PACKAGINGS_NAMES } from "../../../../../form/bsff/components/packagings/Packagings";
+import { GET_BSFF_FORM } from "../../../../../form/bsff/utils/queries";
 import {
   Bsff,
   BsffPackaging,
   Query,
   QueryBsffArgs,
-  WasteAcceptationStatus,
-} from "generated/graphql/types";
+  WasteAcceptationStatus
+} from "codegen-ui";
 import React from "react";
 import { Column, useFilters, useTable } from "react-table";
 import { BsffWasteSummary } from "./BsffWasteSummary";
@@ -40,7 +40,7 @@ export function SignPackagings({
   bsffId,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton = true,
+  displayActionButton = true
 }: SignPackagingsProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -81,8 +81,8 @@ interface SignPackagingsModalProps {
 function SignPackagingsModal({ bsffId, onClose }: SignPackagingsModalProps) {
   const { data } = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF_FORM, {
     variables: {
-      id: bsffId,
-    },
+      id: bsffId
+    }
   });
 
   if (data == null) {
@@ -123,31 +123,30 @@ function BsffPackagingTable({ bsff }: BsffPackagingTableProps) {
           bsffPackaging.type === "AUTRE"
             ? bsffPackaging.other
             : PACKAGINGS_NAMES[bsffPackaging.type],
-        filter: "text",
+        filter: "text"
       },
       {
         id: "numero",
         Header: "Numéro",
         accessor: bsffPackaging => bsffPackaging.numero,
-        filter: "text",
+        filter: "text"
       },
       {
         id: "weight",
         Header: "Masse du contenu (kg)",
-        accessor: bsffPackaging => bsffPackaging.weight,
+        accessor: bsffPackaging => bsffPackaging.weight
       },
       {
         id: "wasteCode",
         Header: "Code déchet",
         accessor: bsffPackaging =>
-          bsffPackaging.acceptation?.wasteCode ?? bsff.waste?.code,
+          bsffPackaging.acceptation?.wasteCode ?? bsff.waste?.code
       },
       {
         id: "wasteDescription",
         Header: "Dénomination usuelle",
         accessor: bsffPackaging =>
-          bsffPackaging.acceptation?.wasteDescription ??
-          bsff.waste?.description,
+          bsffPackaging.acceptation?.wasteDescription ?? bsff.waste?.description
       },
       {
         id: "acceptation",
@@ -158,7 +157,7 @@ function BsffPackagingTable({ bsff }: BsffPackagingTableProps) {
               WasteAcceptationStatus.Accepted
               ? bsffPackaging?.acceptation?.weight
               : `Refusé (${bsffPackaging?.acceptation?.refusalReason})`
-            : "",
+            : ""
       },
       {
         id: "operation",
@@ -170,8 +169,8 @@ function BsffPackagingTable({ bsff }: BsffPackagingTableProps) {
                   ? " (rupture de traçabilité)"
                   : ""
               }`
-            : "",
-      },
+            : ""
+      }
     ],
     [bsff.waste]
   );
@@ -189,7 +188,7 @@ function BsffPackagingTable({ bsff }: BsffPackagingTableProps) {
                 .includes(String(filterValue).toLowerCase())
             : true;
         });
-      },
+      }
     }),
     []
   );
@@ -211,17 +210,17 @@ function BsffPackagingTable({ bsff }: BsffPackagingTableProps) {
   const defaultColumn = React.useMemo(
     () => ({
       // Let's set up our default Filter UI
-      Filter: DefaultColumnFilter,
+      Filter: DefaultColumnFilter
     }),
     []
   );
   const { getTableProps, getTableBodyProps, headers, rows, prepareRow } =
-    useTable(
+    useTable<BsffPackaging>(
       {
         columns,
         data,
         filterTypes,
-        defaultColumn,
+        defaultColumn
       },
       useFilters
     );

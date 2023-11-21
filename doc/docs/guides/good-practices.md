@@ -23,11 +23,15 @@ La requête `forms` dispose d'un paramètre updatedAfter. Vous pouvez ainsi vér
 Dans les 2 cas, vous ne requêterez que les bordereaux mis à jour, ce qui constituera un gain significatif pour votre SI comme pour Trackdéchets.
 Cette méthode est applicable aux autres bordereaux en utilisant bsdas, bsdasris, bsffs, bsvhus.
 
-### Utiliser la query formsLifecycle.
+### Utiliser la query formsLifecycle
 
 La query `formsLifecycle` renvoie les changements de statut des bordereaux de l'entreprise sélectionnée. Elle peut s'utiliser dans le même esprit que la requête `forms`, seuls les bsds dont le statut a changé dans l'intervalle de temps seront retournés. 
 Cette requête n'existe aujourd'hui que pour les bsdds.
 
-### Utiliser les webhooks (à venir).
+### Utiliser les webhooks
 
-Dans les semaines qui viennent, nous allons implémenter un système de webhooks pour notifier les SI qui le souhaitent des changements survenus sur leur jeu de bsds. Chaque SI abonné pourra ainsi recevoir sur une url dédiée la liste des bsds mis à jour en temps quasi-réél.
+Les webhooks permettent à un SI d'un utilisateur Trackdéchets d'être notifié d'un changement (création modification, suppression) d'un bordereau sur leqel il figure.
+
+L'utilisation des webhooks permet aux SI de limiter les lectures périodiques de l'api Trackdéchets.
+
+Pour plus de détails, se référer à la page [Utiliser les webhooks](./webhooks.md).

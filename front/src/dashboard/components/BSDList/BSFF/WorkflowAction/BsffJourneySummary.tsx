@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Bsff, BsffStatus } from "generated/graphql/types";
+import { Bsff, BsffStatus } from "codegen-ui";
 import {
   Journey,
   JourneyStop,
   JourneyStopName,
-  JourneyStopDescription,
-} from "common/components";
+  JourneyStopDescription
+} from "../../../../../common/components";
 
 interface BsffJourneySummaryProps {
   bsff: Bsff;
@@ -44,7 +44,7 @@ export function BsffJourneySummary({ bsff }: BsffJourneySummaryProps) {
           [
             BsffStatus.Processed,
             BsffStatus.IntermediatelyProcessed,
-            BsffStatus.Refused,
+            BsffStatus.Refused
           ].includes(bsff.status)
             ? "complete"
             : bsff.transporter?.transport?.signature

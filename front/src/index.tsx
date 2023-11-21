@@ -26,7 +26,7 @@ try {
   }
 } catch (error) {
   Sentry.addBreadcrumb({
-    message: "Blank screen",
+    message: "Blank screen"
   });
   Sentry.captureException(error);
 }

@@ -4,7 +4,8 @@
 # -------------------------------------
 
 psql_container_id=$(docker ps -qf name=^/trackdechets.postgres)
-api_container_id=$(docker ps -qf name=^/trackdechets.td-api)
+
+read -erp $'\e[1m! Before running this script, make sure you closed all open connections to the DB (app, queue, notifier, SQL soft...)\e[m'
 
 read -erp $'\e[1m? Do you wish to download the latest backup of your chosen database \e[m (Y/n) ' -e downloadBackup
 downloadBackup=${downloadBackup:-Y}
@@ -42,9 +43,6 @@ read -rp $'\e[1m? Postgres User:\e[m ' -i "trackdechets" -e psqlUser
 echo "Copying backup file to postgres"
 docker cp "$backupPath" "$psql_container_id":/tmp/dump.sql
 
-echo -e "\e[1m→ Stopping \e[36mtd-api\e[m"
-docker stop "$api_container_id"
-
 echo -e "\e[1m→ Recreating DB \e[36mprisma\e[m"
 docker exec -t "$psql_container_id" bash -c "psql -U $psqlUser -c \"DROP DATABASE IF EXISTS prisma;\"";
 docker exec -t "$psql_container_id" bash -c "psql -U $psqlUser -c \"CREATE DATABASE prisma;\"";
@@ -53,8 +51,5 @@ docker exec -t "$psql_container_id" bash -c "psql -U $psqlUser -d prisma -c 'CRE
 echo -e "\e[1m→ Restoring dump"
 docker exec -t "$psql_container_id" bash -c "pg_restore -U $psqlUser -d prisma --clean /tmp/dump.sql 2>/dev/null";
 
-echo -e "\e[1m→ Restarting \e[36mtd-api\e[m"
-docker start "$api_container_id"
-
-echo -e "\e[1m→ Running SQL migrations on \e[36mtd-api\e[m"
-docker exec -it "$api_container_id" bash -c "npm run migrate:dev"
+echo -e "\e[1m→ Running SQL migrations"
+npx nx run back:"migrate:dev"

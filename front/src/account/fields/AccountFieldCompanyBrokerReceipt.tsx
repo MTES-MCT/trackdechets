@@ -1,9 +1,9 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { formatDate } from "common/datetime";
+import { formatDate } from "../../common/datetime";
 import AccountField from "./AccountField";
 import AccountFormCompanyBrokerReceipt from "./forms/AccountFormCompanyBrokerReceipt";
-import { CompanyPrivate, UserRole } from "generated/graphql/types";
+import { CompanyPrivate, UserRole } from "codegen-ui";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
 type Props = {
@@ -23,7 +23,7 @@ AccountFieldCompanyBrokerReceipt.fragments = {
         department
       }
     }
-  `,
+  `
 };
 
 export default function AccountFieldCompanyBrokerReceipt({ company }: Props) {
@@ -46,27 +46,23 @@ export default function AccountFieldCompanyBrokerReceipt({ company }: Props) {
     </table>
   ) : null;
 
-  return (
-    <>
-      {company.userRole === UserRole.Admin ? (
-        <AccountField
-          name="brokerReceipt"
-          label="Récépissé courtier"
-          value={brokerReceipt}
-          renderForm={toggleEdition => (
-            <AccountFormCompanyBrokerReceipt
-              company={company}
-              toggleEdition={toggleEdition}
-            />
-          )}
-        />
-      ) : (
-        <AccountFieldNotEditable
-          name="brokerReceipt"
-          label="Récépissé courtier"
-          value={brokerReceipt}
+  return company.userRole === UserRole.Admin ? (
+    <AccountField
+      name="brokerReceipt"
+      label="Récépissé courtier"
+      value={brokerReceipt}
+      renderForm={toggleEdition => (
+        <AccountFormCompanyBrokerReceipt
+          company={company}
+          toggleEdition={toggleEdition}
         />
       )}
-    </>
+    />
+  ) : (
+    <AccountFieldNotEditable
+      name="brokerReceipt"
+      label="Récépissé courtier"
+      value={brokerReceipt}
+    />
   );
 }

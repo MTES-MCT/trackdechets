@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useParams, useRouteMatch } from "react-router-dom";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import * as Sentry from "@sentry/browser";
@@ -7,56 +7,47 @@ import { GET_BSDS } from "../Apps/common/queries";
 import {
   BsdaRevisionRequestEdge,
   FormRevisionRequestEdge,
-  OrderType,
   PageInfo,
   Query,
   QueryBsdaRevisionRequestsArgs,
   QueryBsdsArgs,
   QueryCompanyPrivateInfosArgs,
-  QueryFormRevisionRequestsArgs,
-} from "generated/graphql/types";
-import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
-import BsdCardList from "Apps/Dashboard/Components/BsdCardList/BsdCardList";
+  QueryFormRevisionRequestsArgs
+} from "codegen-ui";
+import BsdCardList from "../Apps/Dashboard/Components/BsdCardList/BsdCardList";
 import {
   Blankslate,
   BlankslateTitle,
   BlankslateDescription,
-  Loader,
-} from "Apps/common/Components";
+  Loader
+} from "../Apps/common/Components";
 import {
-  blankstate_action_desc,
-  blankstate_action_title,
-  blankstate_default_desc,
-  blankstate_default_title,
-  blankstate_draft_desc,
-  blankstate_draft_title,
-  blankstate_follow_desc,
-  blankstate_follow_title,
-  blankstate_history_desc,
-  blankstate_history_title,
-  blankstate_reviews_desc,
-  blankstate_reviews_title,
   dropdown_create_btn,
   filter_reset_btn,
   filter_show_btn,
-  load_more_bsds,
-} from "Apps/common/wordings/dashboard/wordingsDashboard";
-import { IconDuplicateFile } from "Apps/common/Components/Icons/Icons";
-import Filters from "Apps/common/Components/Filters/Filters";
+  load_more_bsds
+} from "../Apps/common/wordings/dashboard/wordingsDashboard";
+import Filters from "../Apps/common/Components/Filters/Filters";
 import {
-  filterList,
   dropdownCreateLinks,
-  filterPredicates,
-  getBsdCurrentTab,
+  getBsdCurrentTab
 } from "../Apps/Dashboard/dashboardUtils";
 import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
-import { usePermissions } from "common/contexts/PermissionsContext";
-import { UserPermission } from "generated/graphql/types";
-import { GET_BSDA_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsdaReviewQuery";
-import { GET_FORM_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsddReviewsQuery";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
+import { usePermissions } from "../common/contexts/PermissionsContext";
+import { UserPermission } from "codegen-ui";
+import { GET_BSDA_REVISION_REQUESTS } from "../Apps/common/queries/reviews/BsdaReviewQuery";
+import { GET_FORM_REVISION_REQUESTS } from "../Apps/common/queries/reviews/BsddReviewsQuery";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../Apps/common/queries/company/query";
 
 import "./dashboard.scss";
+import {
+  filtersToQueryBsdsArgs,
+  getBlankslateDescription,
+  getBlankslateTitle,
+  getRoutePredicate,
+  Tabs
+} from "./Dashboard.utils";
+import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 
 const DashboardPage = () => {
   const { permissions } = usePermissions();
@@ -83,91 +74,16 @@ const DashboardPage = () => {
     isArchivesTab,
     isReviewsTab,
     isToCollectTab,
-    isCollectedTab,
+    isCollectedTab
     // isReviewedTab,
     // isToReviewedTab,
   });
   const { siret } = useParams<{ siret: string }>();
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [areAdvancedFiltersOpen, setAreAdvancedFiltersOpen] = useState(false);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
-  const withRoutePredicate = useCallback(() => {
-    if (isActTab) {
-      return {
-        isForActionFor: [siret],
-      };
-    }
-    if (isDraftTab) {
-      return {
-        isDraftFor: [siret],
-      };
-    }
-    if (isFollowTab) {
-      return {
-        isFollowFor: [siret],
-      };
-    }
-    if (isArchivesTab) {
-      return {
-        isArchivedFor: [siret],
-      };
-    }
-    if (isToCollectTab) {
-      return {
-        isToCollectFor: [siret],
-      };
-    }
-    if (isCollectedTab) {
-      return {
-        isCollectedFor: [siret],
-      };
-    }
-    if (isAllBsdsTab) {
-      return {
-        isDraftFor: [siret],
-        isForActionFor: [siret],
-        isFollowFor: [siret],
-        isArchivedFor: [siret],
-      };
-    }
-    // if (isReviewsTab) {
-    //   return {
-    //     isRevisedFor: [siret],
-    //     isInRevisionFor: [siret],
-    //   };
-    // }
-    // if (isToReviewedTab) {
-    //   return {
-    //     isInRevisionFor: [siret],
-    //   };
-    // }
-    // if (isReviewedTab) {
-    //   return {
-    //     isRevisedFor: [siret],
-    //   };
-    // }
-  }, [
-    isActTab,
-    isDraftTab,
-    isFollowTab,
-    isArchivesTab,
-    isToCollectTab,
-    isCollectedTab,
-    isAllBsdsTab,
-    // isReviewsTab,
-    // isToReviewedTab,
-    // isReviewedTab,
-    siret,
-  ]);
-
-  const defaultWhere = useMemo(
-    () => withRoutePredicate(),
-    [withRoutePredicate]
-  );
-
   const [bsdsVariables, setBsdsVariables] = useState<QueryBsdsArgs>({
-    first: BSD_PER_PAGE,
-    where: defaultWhere,
+    first: BSD_PER_PAGE
   });
 
   const [bsdsReview, setBsdsReview] = useState<
@@ -179,57 +95,99 @@ const DashboardPage = () => {
     QueryBsdsArgs
   >(GET_BSDS, {
     fetchPolicy: "cache-and-network",
-    notifyOnNetworkStatusChange: true,
+    notifyOnNetworkStatusChange: true
   });
-  const { data: cachedData } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
-    GET_BSDS,
-    {
-      variables: bsdsVariables,
-      // read from the cache only to avoid duplicate requests
-      fetchPolicy: "cache-only",
-    }
+
+  const tabs: Tabs = useMemo(
+    () => ({
+      isActTab,
+      isDraftTab,
+      isFollowTab,
+      isArchivesTab,
+      isToCollectTab,
+      isCollectedTab,
+      isAllBsdsTab,
+      isReviewsTab
+    }),
+    [
+      isActTab,
+      isAllBsdsTab,
+      isArchivesTab,
+      isCollectedTab,
+      isDraftTab,
+      isFollowTab,
+      isReviewsTab,
+      isToCollectTab
+    ]
   );
 
-  const fetchBsds = React.useCallback(() => {
-    if (!isReviewsTab) {
-      lazyFetchBsds({
-        variables: bsdsVariables,
-      });
-    }
-  }, [lazyFetchBsds, bsdsVariables, isReviewsTab]);
+  // Fetches the BSDs, building up the query. Query includes:
+  // - Current company SIRET
+  // - Current active tab
+  // - Current filters
+  const fetchBsds = useCallback(
+    (newSiret, newVariables, newTabs) => {
+      const variables = { ...newVariables };
 
-  useNotifier(siret, fetchBsds);
+      const routePredicate = getRoutePredicate({ ...newTabs, siret: newSiret });
 
-  const fetchWithDefaultWhere = React.useCallback(
-    ({ where, ...args }) => {
-      const newVariables = {
-        ...args,
-        where: { ...where, ...defaultWhere },
-        first: BSD_PER_PAGE,
-      };
-      setBsdsVariables(newVariables);
-      lazyFetchBsds({
-        variables: newVariables,
-      });
+      if (routePredicate) {
+        variables.where = { ...newVariables.where, ...routePredicate };
+      }
+
+      lazyFetchBsds({ variables });
     },
-    [lazyFetchBsds, defaultWhere]
+    [lazyFetchBsds]
   );
+
+  // Fetch the data again if any of the 3 changes:
+  // - Current company SIRET
+  // - Current active tab
+  // - Current filters
+  useEffect(() => {
+    // Only exception: the reviews tab. Fix incoming
+    if (!tabs.isReviewsTab) {
+      fetchBsds(siret, bsdsVariables, tabs);
+    }
+  }, [bsdsVariables, siret, tabs, fetchBsds]);
+
+  const handleFiltersSubmit = filterValues => {
+    // Transform the filters into a GQL query
+    const variables = filtersToQueryBsdsArgs(filterValues, bsdsVariables);
+
+    // Store the new filters
+    setBsdsVariables(variables);
+  };
+
+  // Current tab has changed
+  useEffect(() => {
+    // Reviews are special: no filter, reset everything and fetch the fresh data
+    if (tabs.isReviewsTab) {
+      setAreAdvancedFiltersOpen(false);
+      setBsdsVariables({
+        first: BSD_PER_PAGE
+      });
+    }
+  }, [tabs]);
+
+  // Be notified if someone else modifies bsds
+  useNotifier(siret, () => fetchBsds(siret, bsdsVariables, tabs));
 
   const [
     fetchBsdaRevisions,
     {
       data: dataBsdaReviews,
       loading: loadingBsdaReviews,
-      fetchMore: fetchMoreBsdaReviews,
-    },
+      fetchMore: fetchMoreBsdaReviews
+    }
   ] = useLazyQuery<
     Pick<Query, "bsdaRevisionRequests"> & { pageInfo: PageInfo },
     QueryBsdaRevisionRequestsArgs
   >(GET_BSDA_REVISION_REQUESTS, {
     variables: {
-      siret,
+      siret
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-and-network"
   });
 
   // A supprimer quand on pourra afficher une révision avec la requete bsds
@@ -238,23 +196,23 @@ const DashboardPage = () => {
     {
       data: dataBsddReviews,
       loading: loadingBsddReviews,
-      fetchMore: fetchMoreBsddReviews,
-    },
+      fetchMore: fetchMoreBsddReviews
+    }
   ] = useLazyQuery<
     Pick<Query, "formRevisionRequests"> & { pageInfo: PageInfo },
     QueryFormRevisionRequestsArgs
   >(GET_FORM_REVISION_REQUESTS, {
     variables: {
-      siret,
+      siret
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-and-network"
   });
 
   const { data: companyData } = useQuery<
     Pick<Query, "companyPrivateInfos">,
     QueryCompanyPrivateInfosArgs
   >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
-    variables: { clue: siret },
+    variables: { clue: siret }
   });
 
   const siretsWithAutomaticSignature = companyData
@@ -263,43 +221,11 @@ const DashboardPage = () => {
       )
     : [];
 
-  const handleFiltersSubmit = React.useCallback(
-    filterValues => {
-      const variables = {
-        where: {},
-        order: {},
-      };
-      const routePredicate = withRoutePredicate();
-      if (routePredicate) {
-        variables.where = routePredicate;
-      }
-      const filterKeys = Object.keys(filterValues);
-      const filters = filterList
-        .flat()
-        .filter(filter => filterKeys.includes(filter.name));
-      filters.forEach(f => {
-        const predicate = filterPredicates.find(
-          filterPredicate => filterPredicate.filterName === f.name
-        );
-        if (predicate) {
-          const filterValue = filterValues[f.name];
-          variables.where = {
-            ...variables.where,
-            ...predicate.where(filterValue),
-          };
-          variables.order[predicate.order] = OrderType.Asc;
-        }
-      });
-      setBsdsVariables(variables);
-    },
-    [withRoutePredicate]
-  );
-
   const loadMoreBsds = React.useCallback(() => {
     setIsFetchingMore(true);
     fetchMore({
       variables: {
-        after: data?.bsds.pageInfo.endCursor,
+        after: data?.bsds.pageInfo.endCursor
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (fetchMoreResult == null) {
@@ -311,10 +237,10 @@ const DashboardPage = () => {
           bsds: {
             ...prev.bsds,
             ...fetchMoreResult.bsds,
-            edges: prev.bsds.edges.concat(fetchMoreResult.bsds.edges),
-          },
+            edges: prev.bsds.edges.concat(fetchMoreResult.bsds.edges)
+          }
         };
-      },
+      }
     }).then(() => {
       setIsFetchingMore(false);
     });
@@ -327,7 +253,7 @@ const DashboardPage = () => {
     const reqBsddName = "formRevisionRequests";
     fetchMoreBsddReviews({
       variables: {
-        after: dataBsddReviews?.formRevisionRequests.pageInfo.endCursor,
+        after: dataBsddReviews?.formRevisionRequests.pageInfo.endCursor
       },
 
       updateQuery: (prev, { fetchMoreResult }) => {
@@ -342,10 +268,10 @@ const DashboardPage = () => {
             ...fetchMoreResult[reqBsddName],
             edges: prev[reqBsddName].edges.concat(
               fetchMoreResult[reqBsddName].edges
-            ),
-          },
+            )
+          }
         };
-      },
+      }
     })
       .then(() => {
         setIsFetchingMore(false);
@@ -355,7 +281,7 @@ const DashboardPage = () => {
       });
   }, [
     dataBsddReviews?.formRevisionRequests.pageInfo.endCursor,
-    fetchMoreBsddReviews,
+    fetchMoreBsddReviews
   ]);
 
   // A supprimer quand on pourra afficher une révision avec la requete bsds
@@ -364,7 +290,7 @@ const DashboardPage = () => {
 
     fetchMoreBsdaReviews({
       variables: {
-        after: dataBsdaReviews?.bsdaRevisionRequests.pageInfo.endCursor,
+        after: dataBsdaReviews?.bsdaRevisionRequests.pageInfo.endCursor
       },
 
       updateQuery: (prev, { fetchMoreResult }) => {
@@ -379,10 +305,10 @@ const DashboardPage = () => {
             ...fetchMoreResult[reqBsdaName],
             edges: prev[reqBsdaName].edges.concat(
               fetchMoreResult[reqBsdaName].edges
-            ),
-          },
+            )
+          }
         };
-      },
+      }
     })
       .then(() => {
         setIsFetchingMore(false);
@@ -392,7 +318,7 @@ const DashboardPage = () => {
       });
   }, [
     dataBsdaReviews?.bsdaRevisionRequests.pageInfo.endCursor,
-    fetchMoreBsdaReviews,
+    fetchMoreBsdaReviews
   ]);
 
   const loadMore = () => {
@@ -404,31 +330,6 @@ const DashboardPage = () => {
       loadMoreBsds();
     }
   };
-
-  useEffect(() => {
-    setIsFiltersOpen(false);
-    // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
-    if (!isReviewsTab) {
-      fetchWithDefaultWhere({ where: defaultWhere });
-    }
-  }, [
-    isActTab,
-    isDraftTab,
-    isFollowTab,
-    isArchivesTab,
-    isReviewsTab,
-    isToCollectTab,
-    isCollectedTab,
-    defaultWhere,
-    fetchWithDefaultWhere,
-  ]);
-
-  useEffect(() => {
-    // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
-    if (!isReviewsTab) {
-      fetchBsds();
-    }
-  }, [isReviewsTab, bsdsVariables, fetchBsds]);
 
   // A supprimer quand on pourra afficher une révision avec la requete bsds
   useEffect(() => {
@@ -446,8 +347,8 @@ const DashboardPage = () => {
                 return [
                   ...new Set([
                     ...prevState,
-                    ...dataBsdd["formRevisionRequests"].edges,
-                  ]),
+                    ...dataBsdd["formRevisionRequests"].edges
+                  ])
                 ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
               }
             );
@@ -461,8 +362,8 @@ const DashboardPage = () => {
                 return [
                   ...new Set([
                     ...prevState,
-                    ...dataBsda["bsdaRevisionRequests"].edges,
-                  ]),
+                    ...dataBsda["bsdaRevisionRequests"].edges
+                  ])
                 ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
               }
             );
@@ -474,67 +375,15 @@ const DashboardPage = () => {
     }
   }, [isReviewsTab, fetchBsddRevisions, fetchBsdaRevisions]);
 
-  useEffect(() => {
-    // A supprimer la condition !isReviewsTab quand on pourra afficher une révision avec la requete bsds
-    if (!isReviewsTab && !isFiltersOpen) {
-      fetchWithDefaultWhere({ where: defaultWhere });
-    }
-  }, [isFiltersOpen, defaultWhere, isReviewsTab, fetchWithDefaultWhere]);
-
-  const getBlankstateTitle = (): string | undefined => {
-    if (isActTab) {
-      return blankstate_action_title;
-    }
-    if (isDraftTab) {
-      return blankstate_draft_title;
-    }
-    if (isFollowTab) {
-      return blankstate_follow_title;
-    }
-    if (isArchivesTab) {
-      return blankstate_history_title;
-    }
-    if (isReviewsTab) {
-      return blankstate_reviews_title;
-    }
-    return blankstate_default_title;
-  };
-
-  const getBlankstateDescription = () => {
-    if (isActTab) {
-      return blankstate_action_desc;
-    }
-    if (isDraftTab) {
-      return (
-        <>
-          <span>{blankstate_draft_desc}</span>{" "}
-          <span className="tw-inline-flex tw-ml-1">
-            <IconDuplicateFile color="blueLight" />
-          </span>
-        </>
-      );
-    }
-    if (isFollowTab) {
-      return blankstate_follow_desc;
-    }
-    if (isArchivesTab) {
-      return blankstate_history_desc;
-    }
-    if (isReviewsTab) {
-      return blankstate_reviews_desc;
-    }
-    return blankstate_default_desc;
-  };
-
   const toggleFiltersBlock = () => {
-    setIsFiltersOpen(!isFiltersOpen);
+    setAreAdvancedFiltersOpen(!areAdvancedFiltersOpen);
   };
 
   // A supprimer la condition isReviewsTab quand on pourra afficher une révision avec la requete bsds
   const bsds = !isReviewsTab ? data?.bsds.edges : bsdsReview;
   const bsdsTotalCount = isReviewsTab
     ? bsdsReview?.length
-    : cachedData?.bsds.totalCount;
+    : data?.bsds.totalCount;
   const hasNextPage = isReviewsTab
     ? dataBsdaReviews?.pageInfo?.hasNextPage! ||
       dataBsddReviews?.pageInfo?.hasNextPage!
@@ -549,42 +398,45 @@ const DashboardPage = () => {
           quand on pourra afficher une révision avec la requete bsds
        */}
       {!isReviewsTab && (
-        <div className="dashboard-page__actions">
-          {permissions.includes(UserPermission.BsdCanCreate) && (
-            <div className="create-btn">
-              <BsdCreateDropdown
-                links={dropdownCreateLinks(siret)}
-                isDisabled={loading}
-                menuTitle={dropdown_create_btn}
-                primary
-              />
+        <>
+          <div className="dashboard-page__actions">
+            {permissions.includes(UserPermission.BsdCanCreate) && (
+              <div className="create-btn">
+                <BsdCreateDropdown
+                  links={dropdownCreateLinks(siret)}
+                  isDisabled={loading}
+                  menuTitle={dropdown_create_btn}
+                  primary
+                />
+              </div>
+            )}
+            <div className="filter-btn">
+              <button
+                type="button"
+                className="fr-btn fr-btn--secondary"
+                aria-expanded={areAdvancedFiltersOpen}
+                onClick={toggleFiltersBlock}
+                disabled={loading}
+              >
+                {!areAdvancedFiltersOpen ? filter_show_btn : filter_reset_btn}
+              </button>
             </div>
-          )}
-          <div className="filter-btn">
-            <button
-              type="button"
-              className="fr-btn fr-btn--secondary"
-              aria-expanded={isFiltersOpen}
-              onClick={toggleFiltersBlock}
-              disabled={loading}
-            >
-              {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
-            </button>
           </div>
-        </div>
-      )}
-      {isFiltersOpen && (
-        <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
+          <Filters
+            onApplyFilters={handleFiltersSubmit}
+            areAdvancedFiltersOpen={areAdvancedFiltersOpen}
+          />
+        </>
       )}
       {(isFetchingMore || isLoadingBsds) && <Loader />}
       {!Boolean(bsdsTotalCount) && !isLoadingBsds && (
         <div className="dashboard-page__blankstate">
           <Blankslate>
-            {getBlankstateTitle() && (
-              <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
+            {getBlankslateTitle(tabs) && (
+              <BlankslateTitle>{getBlankslateTitle(tabs)}</BlankslateTitle>
             )}
             <BlankslateDescription>
-              {getBlankstateDescription()}
+              {getBlankslateDescription(tabs)}
             </BlankslateDescription>
           </Blankslate>
         </div>

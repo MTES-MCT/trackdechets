@@ -7,7 +7,7 @@ import {
 import { RefinementCtx, z } from "zod";
 import { BsdaSignatureType } from "../../generated/graphql/types";
 import { ZodBsda } from "./schema";
-import { isForeignVat } from "../../common/constants/companySearchHelpers";
+import { isForeignVat } from "shared/constants";
 import { capitalize } from "../../common/strings";
 import { getUserFunctions } from "./helpers";
 import { getOperationModesFromOperationCode } from "../../common/operationModes";

@@ -13,10 +13,9 @@ import {
   getPrimaryActionsLabelFromBsdStatus,
   getPrimaryActionsReviewsLabel,
   getWorkflowLabel,
-  isAppendix1,
   isBsdasri,
   isBsff,
-  isBsvhu,
+  isBsvhu
 } from "../../dashboardServices";
 import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditionalActionsButton";
 import Actors from "../Actors/Actors";
@@ -25,25 +24,23 @@ import {
   useBsdasriDownloadPdf,
   useBsddDownloadPdf,
   useBsffDownloadPdf,
-  useBsvhuDownloadPdf,
-} from "Apps/Dashboard/Components/Pdf/useDownloadPdf";
-import { BsdType, Query, QueryFormArgs } from "generated/graphql/types";
+  useBsvhuDownloadPdf
+} from "../Pdf/useDownloadPdf";
+import { BsdType } from "codegen-ui";
 import {
   useBsdaDuplicate,
   useBsdasriDuplicate,
   useBsddDuplicate,
   useBsffDuplicate,
-  useBsvhuDuplicate,
-} from "Apps/Dashboard/Components/Duplicate/useDuplicate";
-import { Loader } from "Apps/common/Components";
-import { BsdDisplay } from "Apps/common/types/bsdTypes";
+  useBsvhuDuplicate
+} from "../Duplicate/useDuplicate";
+import { Loader } from "../../../common/Components";
+import { BsdDisplay } from "../../../common/types/bsdTypes";
 import DeleteModal from "../DeleteModal/DeleteModal";
-import { useMedia } from "use-media";
-import { MEDIA_QUERIES } from "common/config";
-import { usePermissions } from "common/contexts/PermissionsContext";
-import { UserPermission } from "generated/graphql/types";
-import { useLazyQuery } from "@apollo/client";
-import { GET_DETAIL_FORM } from "Apps/common/queries";
+import { useMedia } from "../../../../common/use-media";
+import { MEDIA_QUERIES } from "../../../../common/config";
+import { usePermissions } from "../../../../common/contexts/PermissionsContext";
+import { UserPermission } from "codegen-ui";
 
 import "./bsdCard.scss";
 
@@ -61,9 +58,9 @@ function BsdCard({
     onAppendix1,
     onDeleteReview,
     onEmitterDasriSign,
-    onEmitterBsddSign,
+    onEmitterBsddSign
   },
-  hasAutomaticSignature,
+  hasAutomaticSignature
 }: BsdCardProps) {
   const { permissions } = usePermissions();
   const isReviewsTab = bsdCurrentTab === "reviewsTab";
@@ -72,49 +69,42 @@ function BsdCard({
   const bsdDisplay = getBsdView(bsd);
 
   const options = {
-    variables: { id: bsd.id },
+    variables: { id: bsd.id }
   };
   const [downloadBsddPdf] = useBsddDownloadPdf({
-    ...options,
+    ...options
   });
   const [downloadBsdaPdf] = useBsdaDownloadPdf({
-    ...options,
+    ...options
   });
   const [downloadBsdasriPdf] = useBsdasriDownloadPdf({
-    ...options,
+    ...options
   });
   const [downloadBsffPdf] = useBsffDownloadPdf({
-    ...options,
+    ...options
   });
   const [downloadBsvhuPdf] = useBsvhuDownloadPdf({
-    ...options,
+    ...options
   });
 
   const [duplicateBsdd, { loading: isDuplicatingBsdd }] = useBsddDuplicate({
-    ...options,
+    ...options
   });
   const [duplicateBsda, { loading: isDuplicatingBsda }] = useBsdaDuplicate({
-    ...options,
+    ...options
   });
   const [duplicateBsdasri, { loading: isDuplicatingBsdasri }] =
     useBsdasriDuplicate({
-      ...options,
+      ...options
     });
   const [duplicateBsff, { loading: isDuplicatingBsff }] = useBsffDuplicate({
-    ...options,
+    ...options
   });
   const [duplicateBsvhu, { loading: isDuplicatingBsvhu }] = useBsvhuDuplicate({
-    ...options,
+    ...options
   });
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const [getDetails] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(
-    GET_DETAIL_FORM,
-    {
-      fetchPolicy: "network-only",
-    }
-  );
 
   const isDuplicating =
     isDuplicatingBsdd ||
@@ -141,7 +131,7 @@ function BsdCard({
       bsdDisplay,
       currentSiret,
       hasAutomaticSignature,
-      permissions,
+      permissions
     ]
   );
   const ctaPrimaryLabel = bsdDisplay?.type ? actionsLabel : "";
@@ -151,17 +141,9 @@ function BsdCard({
     : "";
 
   const handleValidationClick = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    _: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
-    if (isAppendix1(bsdDisplay!)) {
-      getDetails({ variables: { id: bsd.id, readableId: null } }).then(
-        ({ data }) => {
-          onValidate(data!.form);
-        }
-      );
-    } else {
-      onValidate(bsd);
-    }
+    onValidate(bsd);
   };
   const handleEditableInfoClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -193,7 +175,7 @@ function BsdCard({
       downloadBsdasriPdf,
       downloadBsddPdf,
       downloadBsffPdf,
-      downloadBsvhuPdf,
+      downloadBsvhuPdf
     ]
   );
 
@@ -220,7 +202,7 @@ function BsdCard({
       duplicateBsdasri,
       duplicateBsdd,
       duplicateBsff,
-      duplicateBsvhu,
+      duplicateBsvhu
     ]
   );
 
@@ -243,7 +225,7 @@ function BsdCard({
   const unitOfMeasure =
     isBsdasri(bsdDisplay?.type!) || isBsff(bsdDisplay?.type!) ? "kg" : "t";
 
-  const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
   const pickupSiteName =
     bsdDisplay?.emitter?.pickupSite?.name ||
     bsdDisplay?.emitter?.workSite?.name;
@@ -287,7 +269,7 @@ function BsdCard({
                     <InfoWithIcon
                       labelCode={InfoIconCode.CustomInfo}
                       editableInfos={{
-                        customInfo: bsdDisplay?.transporterCustomInfo,
+                        customInfo: bsdDisplay?.transporterCustomInfo
                       }}
                       hasEditableInfos
                       isDisabled={
@@ -306,7 +288,7 @@ function BsdCard({
                       labelCode={InfoIconCode.TransporterNumberPlate}
                       editableInfos={{
                         transporterNumberPlate:
-                          bsdDisplay?.transporterNumberPlate,
+                          bsdDisplay?.transporterNumberPlate
                       }}
                       hasEditableInfos
                       isDisabled={
@@ -341,7 +323,12 @@ function BsdCard({
                     bsdType={bsdDisplay.type}
                     reviewStatus={bsdDisplay?.review?.status}
                     operationCode={
-                      bsdDisplay?.destination?.["operation"]?.["code"]
+                      bsdDisplay?.destination?.["operation"]?.["code"] ||
+                      bsdDisplay?.destination?.["plannedOperationCode"]
+                    }
+                    bsdaAnnexed={
+                      !!bsdDisplay?.forwardedIn?.id ||
+                      !!bsdDisplay?.groupedIn?.id
                     }
                   />
                 </div>
@@ -395,7 +382,7 @@ function BsdCard({
                     onBsdSuite,
                     onDeleteReview,
                     onEmitterDasriSign,
-                    onEmitterBsddSign,
+                    onEmitterBsddSign
                   }}
                   hideReviewCta={isReviewsTab}
                   isToCollectTab={isToCollectTab}

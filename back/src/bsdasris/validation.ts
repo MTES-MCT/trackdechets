@@ -6,7 +6,7 @@ import {
   DASRI_ALL_OPERATIONS_CODES,
   DASRI_PROCESSING_OPERATIONS_CODES,
   DASRI_GROUPING_OPERATIONS_CODES
-} from "../common/constants";
+} from "shared/constants";
 import configureYup from "../common/yup/configureYup";
 import prisma from "../prisma";
 import {

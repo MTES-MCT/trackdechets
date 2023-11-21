@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Bsda } from "generated/graphql/types";
+import { Bsda } from "codegen-ui";
 import {
   Journey,
   JourneyStop,
   JourneyStopName,
-  JourneyStopDescription,
-} from "common/components";
+  JourneyStopDescription
+} from "../../../../../common/components";
 
 interface Props {
   bsda: Bsda;

@@ -1,8 +1,8 @@
 import React from "react";
-import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
-import { SignEmission } from "dashboard/components/BSDList/BSVhu/WorkflowAction/SignEmission";
-import { SignTransport } from "dashboard/components/BSDList/BSVhu/WorkflowAction/SignTransport";
-import { SignOperation } from "dashboard/components/BSDList/BSVhu/WorkflowAction/SignOperation";
+import { Bsvhu, BsvhuStatus } from "codegen-ui";
+import { SignEmission } from "../../../../../dashboard/components/BSDList/BSVhu/WorkflowAction/SignEmission";
+import { SignTransport } from "../../../../../dashboard/components/BSDList/BSVhu/WorkflowAction/SignTransport";
+import { SignOperation } from "../../../../../dashboard/components/BSDList/BSVhu/WorkflowAction/SignOperation";
 
 interface ActBsvhuValidationProps {
   bsd: Bsvhu;
@@ -14,12 +14,12 @@ const ActBsvhuValidation = ({
   bsd,
   currentSiret,
   isOpen,
-  onClose,
+  onClose
 }: ActBsvhuValidationProps) => {
   const actionButtonAdapterProps = {
     isModalOpenFromParent: isOpen,
     onModalCloseFromParent: onClose,
-    displayActionButton: false,
+    displayActionButton: false
   };
 
   const renderInitialModal = () => {

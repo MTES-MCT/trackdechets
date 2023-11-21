@@ -1,7 +1,7 @@
 import React from "react";
-import { CompanyPrivate } from "generated/graphql/types";
-import { sortCompaniesByName } from "common/helper";
-import { usePermissions } from "common/contexts/PermissionsContext";
+import { CompanyPrivate } from "codegen-ui";
+import { sortCompaniesByName } from "../common/helper";
+import { usePermissions } from "../common/contexts/PermissionsContext";
 
 interface IProps {
   orgId: string;
@@ -14,7 +14,7 @@ export const SIRET_STORAGE_KEY = "td-selectedSiret";
 export default function DashboardCompanySelector({
   orgId,
   companies,
-  handleCompanyChange,
+  handleCompanyChange
 }: IProps) {
   const { updatePermissions } = usePermissions();
 

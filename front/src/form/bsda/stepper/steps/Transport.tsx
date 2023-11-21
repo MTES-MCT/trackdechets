@@ -1,11 +1,13 @@
 import React, { lazy } from "react";
 import { Field } from "formik";
-import { FieldTransportModeSelect } from "common/components";
-import Tooltip from "common/components/Tooltip";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import { FieldTransportModeSelect } from "../../../../common/components";
+import Tooltip from "../../../../common/components/Tooltip";
+import DateInput from "../../../common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 
-const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
+const TagsInput = lazy(
+  () => import("../../../../common/components/tags-input/TagsInput")
+);
 
 type Props = { disabled: boolean; required?: boolean };
 

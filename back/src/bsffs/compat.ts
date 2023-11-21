@@ -12,7 +12,6 @@ import { isFinalOperation } from "./constants";
 import { getReadonlyBsffPackagingRepository } from "./repository";
 import { Nullable } from "../types";
 import { UserInputError } from "../common/errors";
-import { getOperationModeLabel } from "../common/operationModes";
 
 type BsffDestination = {
   receptionWeight: number;
@@ -20,6 +19,7 @@ type BsffDestination = {
   receptionDate: Date;
   receptionRefusalReason: string;
   operationCode: string;
+  operationMode: string;
   operationDate: Date;
 };
 
@@ -91,16 +91,21 @@ export function toBsffDestination(
   const operationCodes = hasAnyOperation
     ? packagings
         .filter(p => !!p.operationSignatureDate && !!p.operationCode)
-        .map(p => {
-          let res = p.operationCode;
-          if (p.operationMode)
-            res += " (" + getOperationModeLabel(p.operationMode) + ")";
-          return res;
-        })
+        .map(p => p.operationCode)
     : [];
 
   const operationCode = hasAnyOperation
     ? [...new Set(operationCodes)].join(" ")
+    : null;
+
+  const operationModes = hasAnyOperation
+    ? packagings
+        .filter(p => !!p.operationSignatureDate && !!p.operationMode)
+        .map(p => p.operationMode)
+    : [];
+
+  const operationMode = hasAnyOperation
+    ? [...new Set(operationModes)].join(" ")
     : null;
 
   // returns last date
@@ -116,6 +121,7 @@ export function toBsffDestination(
     receptionAcceptationStatus,
     receptionRefusalReason,
     operationCode,
+    operationMode,
     operationDate
   };
 }
