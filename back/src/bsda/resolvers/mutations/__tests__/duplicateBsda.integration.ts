@@ -435,7 +435,7 @@ describe("Mutation.Bsda.duplicate", () => {
       }
     });
 
-    // No INSEE data, just return DB objects
+    // No SIRENE data, just return DB objects
     (searchCompany as jest.Mock).mockImplementation(async (clue: string) => {
       const company = await prisma.company.findFirstOrThrow({
         where: { orgId: clue },
