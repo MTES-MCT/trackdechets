@@ -1,8 +1,8 @@
-const express = require("express");
-const fetch = require("node-fetch");
-const helmet = require("helmet");
-const path = require("path");
-const fs = require("fs");
+import express from "express";
+import helmet from "helmet";
+import fetch from "node-fetch";
+import fs from "node:fs";
+import path from "node:path";
 
 const app = express();
 
@@ -49,14 +49,14 @@ app.use(
   })
 );
 
-const directory = path.join(__dirname, "../dist/front");
+const directory = path.join(__dirname, "../../front");
 app.use(express.static(directory));
 
 const pathToIndex = path.join(directory, "index.html");
 
 const raw = fs.readFileSync(pathToIndex, "utf8");
 const indexContent =
-  process.env.NO_INDEX === true
+  process.env.NO_INDEX === "true"
     ? raw.replace(
         '<meta name="robots" content="all" />',
         '<meta name="robots" content="noindex nofollow" />'
