@@ -36,7 +36,6 @@ export const schema = z.object({
   // Various
   USERS_BLACKLIST: z.string().optional(),
   MAX_REQUESTS_PER_WINDOW: z.string().optional().default("1000"),
-  STARTUP_FILE: z.string().optional(),
   TRUST_PROXY_HOPS: z.string().optional().default("1").refine(isNumber),
   CRON_ONBOARDING_SCHEDULE: z.string().optional(),
   LOG_TO_HTTP: z.string().optional().default("false").refine(isBoolean),
