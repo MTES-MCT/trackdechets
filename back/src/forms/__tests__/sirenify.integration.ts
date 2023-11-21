@@ -13,7 +13,6 @@ import {
 import { AuthType } from "../../auth";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { EmitterType, Prisma, Status } from "@prisma/client";
-import ecoOrganisme from "../../bsdasris/examples/workflows/ecoOrganisme";
 
 jest.mock("../../companies/search");
 
