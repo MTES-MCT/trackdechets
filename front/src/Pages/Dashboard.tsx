@@ -228,7 +228,7 @@ const DashboardPage = () => {
         after: data?.bsds.pageInfo.endCursor
       },
       updateQuery: (prev, { fetchMoreResult }) => {
-        if (fetchMoreResult == null) {
+        if (fetchMoreResult === null) {
           return prev;
         }
 
@@ -257,7 +257,7 @@ const DashboardPage = () => {
       },
 
       updateQuery: (prev, { fetchMoreResult }) => {
-        if (fetchMoreResult == null) {
+        if (fetchMoreResult === null) {
           return prev;
         }
 
@@ -294,7 +294,7 @@ const DashboardPage = () => {
       },
 
       updateQuery: (prev, { fetchMoreResult }) => {
-        if (fetchMoreResult == null) {
+        if (fetchMoreResult === null) {
           return prev;
         }
         const reqBsdaName = "bsdaRevisionRequests";
@@ -321,7 +321,7 @@ const DashboardPage = () => {
     fetchMoreBsdaReviews
   ]);
 
-  const loadMore = () => {
+  const loadMore = useCallback(() => {
     if (isReviewsTab) {
       // A supprimer quand on pourra afficher une révision avec la requete bsds
       loadMoreBsddReviews();
@@ -329,7 +329,7 @@ const DashboardPage = () => {
     } else {
       loadMoreBsds();
     }
-  };
+  }, [isReviewsTab, loadMoreBsdaReviews, loadMoreBsddReviews, loadMoreBsds]);
 
   // A supprimer quand on pourra afficher une révision avec la requete bsds
   useEffect(() => {
@@ -385,8 +385,8 @@ const DashboardPage = () => {
     ? bsdsReview?.length
     : data?.bsds.totalCount;
   const hasNextPage = isReviewsTab
-    ? dataBsdaReviews?.pageInfo?.hasNextPage! ||
-      dataBsddReviews?.pageInfo?.hasNextPage!
+    ? dataBsdaReviews?.bsdaRevisionRequests?.pageInfo?.hasNextPage ||
+      dataBsddReviews?.formRevisionRequests.pageInfo?.hasNextPage
     : data?.bsds.pageInfo.hasNextPage;
   const isLoadingBsds = isReviewsTab
     ? loadingBsdaReviews || loadingBsddReviews
