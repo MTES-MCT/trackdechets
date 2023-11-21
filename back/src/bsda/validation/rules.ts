@@ -1,10 +1,16 @@
-import { BsdaType, Prisma, WasteAcceptationStatus } from "@prisma/client";
+import {
+  BsdaType,
+  TransportMode,
+  Prisma,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { RefinementCtx, z } from "zod";
 import { BsdaSignatureType } from "../../generated/graphql/types";
 import { ZodBsda } from "./schema";
 import { isForeignVat } from "shared/constants";
 import { capitalize } from "../../common/strings";
 import { getUserFunctions } from "./helpers";
+import { getOperationModesFromOperationCode } from "../../common/operationModes";
 import { UnparsedInputs } from ".";
 
 export type EditableBsdaFields = Required<
@@ -208,7 +214,22 @@ export const editionRules: EditionRules = {
     required: { from: "OPERATION", when: isNotRefused }
   },
   destinationOperationMode: {
-    sealed: { from: "OPERATION" }
+    readableFieldName: "le mode de traitement",
+    sealed: { from: "OPERATION" },
+    required: {
+      from: "OPERATION",
+      when: bsda => {
+        if (bsda.destinationOperationCode) {
+          const modes = getOperationModesFromOperationCode(
+            bsda.destinationOperationCode
+          );
+          if (modes.length && !bsda.destinationOperationMode) {
+            return true;
+          }
+        }
+        return false;
+      }
+    }
   },
   destinationOperationDescription: {
     sealed: { from: "OPERATION" }
@@ -376,10 +397,7 @@ export const editionRules: EditionRules = {
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
-      when: bsda =>
-        hasTransporter(bsda) &&
-        !bsda.transporterRecepisseIsExempted &&
-        !isForeignVat(bsda.transporterCompanyVatNumber),
+      when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
     },
     readableFieldName: "Transporteur: le numéro de récépissé"
@@ -388,10 +406,7 @@ export const editionRules: EditionRules = {
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
-      when: bsda =>
-        hasTransporter(bsda) &&
-        !bsda.transporterRecepisseIsExempted &&
-        !isForeignVat(bsda.transporterCompanyVatNumber),
+      when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
     },
     readableFieldName: "Transporteur: le département de récépissé"
@@ -400,10 +415,7 @@ export const editionRules: EditionRules = {
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
-      when: bsda =>
-        hasTransporter(bsda) &&
-        !bsda.transporterRecepisseIsExempted &&
-        !isForeignVat(bsda.transporterCompanyVatNumber),
+      when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
     },
     readableFieldName: "Transporteur: la date de validité du récépissé"
@@ -585,6 +597,15 @@ function hasWorker(bsda: ZodBsda) {
 
 function hasTransporter(bsda: ZodBsda) {
   return bsda.type !== BsdaType.COLLECTION_2710;
+}
+
+function requireTransporterRecepisse(bsda: ZodBsda) {
+  return (
+    hasTransporter(bsda) &&
+    !bsda.transporterRecepisseIsExempted &&
+    bsda.transporterTransportMode === TransportMode.ROAD &&
+    !isForeignVat(bsda.transporterCompanyVatNumber)
+  );
 }
 
 function isRefusedOrPartiallyRefused(bsda: ZodBsda) {
