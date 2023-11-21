@@ -107,6 +107,8 @@ export const sirenifyTransportSegmentInput = buildSirenify(
   transportSegmentInputAccessors
 );
 
+// Careful! This takes a Prisma.FormCreateInput as input,
+// and not all possible use-cases are covered yet (ie, transporters.createMany, intermediaries.create etc.)
 const formCreateInputAccessors = (
   formCreateInput: Prisma.FormCreateInput,
   sealedFields: string[] = [] // Tranformations should not be run on sealed fields
