@@ -1,12 +1,18 @@
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation } from "../../../../generated/graphql/types";
+import {
+  CompanySearchResult,
+  Mutation
+} from "../../../../generated/graphql/types";
 import { gql } from "graphql-tag";
 import { Prisma } from "@prisma/client";
 import prisma from "../../../../prisma";
 import { xDaysAgo } from "../../../../commands/onboarding.helpers";
 import { bsdaFactory } from "../../../__tests__/factories";
+import { searchCompany } from "../../../../companies/search";
+
+jest.mock("../../../../companies/search");
 
 const TODAY = new Date();
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
@@ -341,7 +347,7 @@ describe("Mutation.Bsda.duplicate", () => {
     );
   });
 
-  test("duplicated BSDD should have the updated data when company info changes", async () => {
+  test("duplicated BSDA should have the updated data when company info changes", async () => {
     // Given
 
     const { bsda, transporter, emitter, worker, broker } = await createBsda();
@@ -427,6 +433,24 @@ describe("Mutation.Bsda.duplicate", () => {
           }
         }
       }
+    });
+
+    // No INSEE data, just return DB objects
+    (searchCompany as jest.Mock).mockImplementation(async (clue: string) => {
+      const company = await prisma.company.findFirstOrThrow({
+        where: { orgId: clue },
+        include: {
+          transporterReceipt: true,
+          brokerReceipt: true,
+          workerCertification: true
+        }
+      });
+
+      return {
+        name: company.name,
+        address: company.address,
+        statutDiffusionEtablissement: "O"
+      } as CompanySearchResult;
     });
 
     const { mutate } = makeClient(emitter.user);
@@ -545,5 +569,121 @@ describe("Mutation.Bsda.duplicate", () => {
     expect(duplicatedBsda2.transporterRecepisseNumber).toBeNull();
     expect(duplicatedBsda2.transporterRecepisseValidityLimit).toBeNull();
     expect(duplicatedBsda2.transporterRecepisseDepartment).toBeNull();
+  });
+
+  test("duplicated BSDA should have the sirenified data when company info changes", async () => {
+    // Given
+    const intermediary1 = await userWithCompanyFactory("MEMBER");
+    const intermediary2 = await userWithCompanyFactory("MEMBER");
+    const { bsda, transporter, emitter, worker, broker, destination } =
+      await createBsda({
+        intermediaries: {
+          createMany: {
+            data: [
+              {
+                siret: intermediary1.company.siret ?? "",
+                contact: "Mr intermédiaire 1",
+                name: intermediary1.company.name,
+                address: "Nawak"
+              },
+              {
+                siret: intermediary2.company.siret ?? "",
+                contact: "Mr intermédiaire 2",
+                name: intermediary1.company.name,
+                address: "Nawak"
+              }
+            ]
+          }
+        }
+      });
+
+    function searchResult(companyName: string) {
+      return {
+        name: `updated ${companyName} name`,
+        address: `updated ${companyName} address`,
+        statutDiffusionEtablissement: "O"
+      } as CompanySearchResult;
+    }
+
+    const searchResults = {
+      [emitter.company.siret!]: searchResult("emitter"),
+      [transporter.company.siret!]: searchResult("transporter"),
+      [destination.company.siret!]: searchResult("destination"),
+      [worker.company.siret!]: searchResult("worker"),
+      [intermediary1.company.siret!]: searchResult("intermediary1"),
+      [intermediary2.company.siret!]: searchResult("intermediary2"),
+      [broker.company.siret!]: searchResult("broker")
+    };
+
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
+      return Promise.resolve(searchResults[clue]);
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    const { errors, data } = await mutate<Pick<Mutation, "duplicateBsda">>(
+      DUPLICATE_BSDA,
+      {
+        variables: {
+          id: bsda.id
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const duplicatedBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: data.duplicateBsda.id },
+      include: { intermediaries: true }
+    });
+
+    // Check transporter info is updated
+    expect(duplicatedBsda.transporterCompanyName).toEqual(
+      "updated transporter name"
+    );
+    expect(duplicatedBsda.transporterCompanyAddress).toEqual(
+      "updated transporter address"
+    );
+
+    // Check broker info is updated
+    expect(duplicatedBsda.brokerCompanyName).toEqual("updated broker name");
+    expect(duplicatedBsda.brokerCompanyAddress).toEqual(
+      "updated broker address"
+    );
+
+    // Check emitter info is updated
+    expect(duplicatedBsda.emitterCompanyName).toEqual("updated emitter name");
+    expect(duplicatedBsda.emitterCompanyAddress).toEqual(
+      "updated emitter address"
+    );
+
+    // Check worker info is updated
+    expect(duplicatedBsda.workerCompanyName).toEqual("updated worker name");
+    expect(duplicatedBsda.workerCompanyAddress).toEqual(
+      "updated worker address"
+    );
+
+    // Check destination info is updated
+    expect(duplicatedBsda.destinationCompanyName).toEqual(
+      "updated destination name"
+    );
+    expect(duplicatedBsda.destinationCompanyAddress).toEqual(
+      "updated destination address"
+    );
+
+    // Intermediaries
+    expect(duplicatedBsda.intermediaries[0].name).toEqual(
+      "updated intermediary1 name"
+    );
+    expect(duplicatedBsda.intermediaries[0].address).toEqual(
+      "updated intermediary1 address"
+    );
+    expect(duplicatedBsda.intermediaries[1].name).toEqual(
+      "updated intermediary2 name"
+    );
+    expect(duplicatedBsda.intermediaries[1].address).toEqual(
+      "updated intermediary2 address"
+    );
   });
 });
