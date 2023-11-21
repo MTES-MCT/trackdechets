@@ -145,6 +145,13 @@ const formCreateInputAccessors = (
       formCreateInput.brokerCompanyAddress = companyInput.address;
     }
   },
+  {
+    siret: formCreateInput?.ecoOrganismeSiret,
+    skip: sealedFields.includes("ecoOrganismeSiret"),
+    setter: (formCreateInput, companyInput: CompanyInput) => {
+      formCreateInput.ecoOrganismeName = companyInput.name;
+    }
+  },
   ...(
     (formCreateInput?.intermediaries?.createMany
       ?.data as Prisma.IntermediaryFormAssociationCreateManyFormInput[]) ?? []

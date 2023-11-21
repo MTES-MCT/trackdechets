@@ -490,7 +490,8 @@ describe("sirenifyFormCreateInput", () => {
       [trader.company.siret!]: searchResult("négociant"),
       [exutoire.company.siret!]: searchResult("destinataire final"),
       [intermediary1.company.siret!]: searchResult("intermédiaire 1"),
-      [intermediary2.company.siret!]: searchResult("intermédiaire 2")
+      [intermediary2.company.siret!]: searchResult("intermédiaire 2"),
+      [ecoOrganisme.company.siret!]: searchResult("ecoOrganisme")
     };
 
     (searchCompany as jest.Mock).mockImplementation((clue: string) => {
@@ -560,7 +561,7 @@ describe("sirenifyFormCreateInput", () => {
       brokerDepartment: "",
       brokerValidityLimit: new Date(),
       ecoOrganismeName: ecoOrganisme.company.name,
-      ecoOrganismeSiret: ecoOrganisme.company.address,
+      ecoOrganismeSiret: ecoOrganisme.company.siret,
       transporters: {
         create: {
           transporterCompanyName: transporter.company.name,
@@ -660,6 +661,11 @@ describe("sirenifyFormCreateInput", () => {
     );
     expect(sirenified.intermediaries.createMany.data[1].address).toEqual(
       searchResults[intermediary2.company.siret!].address
+    );
+
+    // Eco-organisme
+    expect(sirenified.ecoOrganismeName).toEqual(
+      searchResults[ecoOrganisme.company.siret!].name
     );
   });
 });
