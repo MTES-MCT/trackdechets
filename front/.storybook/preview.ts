@@ -13,8 +13,3 @@ export const parameters = {
     MockedProvider
   }
 };
-
-// Initialize global jest.fn override
-window.jest = {
-  fn: fnc => fnc
-};
