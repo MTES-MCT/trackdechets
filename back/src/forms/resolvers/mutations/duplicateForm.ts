@@ -9,6 +9,7 @@ import { getFormRepository } from "../../repository";
 import { FullForm } from "../../types";
 import { prismaJsonNoNull } from "../../../common/converter";
 import prisma from "../../../prisma";
+import { sirenifyFormCreateInput } from "../../sirenify";
 
 /**
  * Retrieves companies present on the form that a registered in TD
@@ -193,7 +194,7 @@ async function getDuplicateFormInput(
 async function getDuplicateFormForwardedInInput(
   user: User,
   form: FullForm
-): Promise<Omit<Prisma.FormCreateInput, "readableId">> {
+): Promise<Prisma.FormCreateInput> {
   const forwardedIn = form.forwardedIn;
 
   if (!forwardedIn) {
@@ -204,7 +205,8 @@ async function getDuplicateFormForwardedInInput(
 
   const { emitter, recipient } = await getFormCompanies(forwardedIn);
 
-  return {
+  const formCreateInput = {
+    readableId: "",
     status: Status.DRAFT,
     owner: { connect: { id: user.id } },
     emitterType: forwardedIn.emitterType,
@@ -239,6 +241,9 @@ async function getDuplicateFormForwardedInInput(
     wasteDetailsName: forwardedIn.wasteDetailsName,
     wasteDetailsConsistence: forwardedIn.wasteDetailsConsistence
   };
+
+  const sirenified = await sirenifyFormCreateInput(formCreateInput, []);
+  return sirenified;
 }
 
 /**
@@ -292,7 +297,9 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
     };
   }
 
-  const newForm = await formRepository.create(newFormInput, {
+  const sirenified = await sirenifyFormCreateInput(newFormInput, []);
+
+  const newForm = await formRepository.create(sirenified, {
     duplicate: { id: existingForm.id }
   });
 
