@@ -616,8 +616,6 @@ describe("sirenifyFormCreateInput", () => {
       searchResults[emitter.company.siret!].address
     );
 
-    console.log("sirenified", sirenified);
-
     // Transporter
     expect(sirenified.transporters.create.transporterCompanyName).toEqual(
       searchResults[transporter.company.siret!].name
