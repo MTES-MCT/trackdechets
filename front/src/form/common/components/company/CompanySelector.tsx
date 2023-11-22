@@ -111,10 +111,7 @@ export default function CompanySelector({
   const departmentInputRef = useRef<HTMLInputElement>(null);
   const clueInputRef = useRef<HTMLInputElement>(null);
   const [mustBeRegistered, setMustBeRegistered] = useState<boolean>(false);
-  const [searchResults, setSearchResults] = useState<
-    CompanySearchResult[] | undefined
-  >([]);
-
+  const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
   const [
     displayForeignCompanyWithUnknownInfos,
     setDisplayForeignCompanyWithUnknownInfos
@@ -142,7 +139,10 @@ export default function CompanySelector({
           : FavoriteType.Emitter,
         allowForeignCompanies
       },
-      skip: skipFavorite || !siret
+      skip: skipFavorite || !siret,
+      onCompleted: data => {
+        mergeResults([], data?.favorites ?? []);
+      }
     }
   );
 
@@ -153,7 +153,15 @@ export default function CompanySelector({
     searchCompaniesQuery,
     { loading: isLoadingSearch, data: searchData, error }
   ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
-    SEARCH_COMPANIES
+    SEARCH_COMPANIES,
+    {
+      onCompleted: data => {
+        mergeResults(
+          data?.searchCompanies ?? [],
+          favoritesData?.favorites ?? []
+        );
+      }
+    }
   );
 
   /**
@@ -200,11 +208,12 @@ export default function CompanySelector({
    * Selection d'un établissement dans le formulaire
    */
 
-  const isUnknownCompanyName = (companyName?: string): boolean => {
-    return companyName === "---" || companyName === "";
-  };
   const selectCompany = useCallback(
     (company?: CompanySearchResult) => {
+      function isUnknownCompanyName(companyName?: string): boolean {
+        return companyName === "---" || companyName === "";
+      }
+
       if (disabled) return;
       // empty the fields
       if (!company) {
@@ -213,15 +222,18 @@ export default function CompanySelector({
         onCompanySelected?.();
         return;
       }
+
       // Side effects
       const notVoidCompany = Object.keys(company).length !== 0; // unselect returns emtpy object {}
       setMustBeRegistered(
         notVoidCompany && !company.isRegistered && registeredOnlyCompanies
       );
+
       // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
       setDisplayForeignCompanyWithUnknownInfos(
         isForeignVat(company.vatNumber!) && isUnknownCompanyName(company.name!)
       );
+
       setIsForeignCompany(isForeignVat(company.vatNumber!));
       // Prépare la mise à jour du Form
       const fields: FormCompany = {
@@ -238,100 +250,69 @@ export default function CompanySelector({
         mail: company.contactEmail ?? "",
         country: company.codePaysEtrangerEtablissement
       };
+
       Object.keys(fields).forEach(key => {
         setFieldValue(`${field.name}.${key}`, fields[key]);
       });
       setFieldTouched(`${field.name}`, true, true);
       onCompanySelected?.(company);
+
       setSelectedCompanyDetails({
         name: company.name,
         address: company.address
       });
     },
     [
+      setSelectedCompanyDetails,
+      onCompanySelected,
+      setFieldTouched,
+      setFieldValue,
+      setIsForeignCompany,
+      setDisplayForeignCompanyWithUnknownInfos,
+      setMustBeRegistered,
       disabled,
       field.name,
-      onCompanySelected,
-      registeredOnlyCompanies,
-      setFieldTouched,
-      setFieldValue
+      registeredOnlyCompanies
     ]
   );
 
   /**
    * Merge searchCompanies et favoritesData
    */
-  const mergeResults = useCallback(
-    (
-      searchCompanies: CompanySearchResult[],
-      favorites: CompanySearchResult[]
-    ) => {
-      if (disabled) return;
+  function mergeResults(
+    searchCompanies: CompanySearchResult[],
+    favorites: CompanySearchResult[]
+  ) {
+    if (disabled) return;
 
-      const reshapedFavorites = favorites.filter(
-        fav =>
-          !skipFavorite &&
-          !searchCompanies.some(company => company.orgId === fav.orgId)
-      );
+    const reshapedFavorites = favorites.filter(
+      fav =>
+        !skipFavorite &&
+        !searchCompanies.some(company => company.orgId === fav.orgId)
+    );
 
-      const reshapedSearchResults =
-        searchCompanies
-          .filter(company => company.etatAdministratif === "A")
-          .map(company => ({
-            ...company,
-            codePaysEtrangerEtablissement:
-              company.codePaysEtrangerEtablissement || "FR"
-          })) ?? [];
+    const reshapedSearchResults =
+      searchCompanies
+        .filter(company => company.etatAdministratif === "A")
+        .map(company => ({
+          ...company,
+          codePaysEtrangerEtablissement:
+            company.codePaysEtrangerEtablissement || "FR"
+        })) ?? [];
 
-      const results = [...reshapedSearchResults, ...reshapedFavorites];
+    const results = [...reshapedSearchResults, ...reshapedFavorites];
+    setSearchResults(results);
 
-      return results;
-    },
-    [disabled, skipFavorite]
-  );
-
-  const memoizedSearchData = useMemo(() => searchData, [searchData]);
-  const memoizedFavoritesData = useMemo(() => favoritesData, [favoritesData]);
-
-  useEffect(() => {
-    if (memoizedSearchData?.searchCompanies?.length) {
-      const results = mergeResults(
-        memoizedSearchData?.searchCompanies ?? [],
-        memoizedFavoritesData?.favorites ?? []
-      );
-      setSearchResults(results);
-    }
-  }, [
-    memoizedFavoritesData?.favorites,
-    mergeResults,
-    memoizedSearchData?.searchCompanies
-  ]);
-
-  useEffect(() => {
-    if (memoizedFavoritesData?.favorites?.length) {
-      const results = mergeResults([], memoizedFavoritesData?.favorites ?? []);
-      setSearchResults(results);
-    }
-  }, [memoizedFavoritesData?.favorites, mergeResults]);
-
-  useEffect(() => {
     // If the form is empty, we auto-select the first result.
     if (
       initialAutoSelectFirstCompany &&
       !optional &&
-      searchResults &&
-      searchResults.length >= 1 &&
+      results.length >= 1 &&
       !orgId
     ) {
-      selectCompany(searchResults[0]);
+      selectCompany(results[0]);
     }
-  }, [
-    initialAutoSelectFirstCompany,
-    optional,
-    orgId,
-    searchResults,
-    selectCompany
-  ]);
+  }
 
   const onSearch = useMemo(() => {
     async function triggerSearch(
@@ -520,7 +501,7 @@ export default function CompanySelector({
           <CompanyResults<CompanySearchResult>
             onSelect={company => selectCompany(company)}
             onUnselect={() => selectCompany()}
-            results={searchResults || []}
+            results={searchResults}
             selectedItem={
               {
                 orgId,

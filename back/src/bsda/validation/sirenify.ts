@@ -43,6 +43,14 @@ const accessors = (
       input.workerCompanyAddress = companyInput.address;
     }
   },
+  {
+    siret: input?.brokerCompanySiret,
+    skip: sealedFields.includes("brokerCompanySiret"),
+    setter: (input, companyInput: CompanyInput) => {
+      input.brokerCompanyName = companyInput.name;
+      input.brokerCompanyAddress = companyInput.address;
+    }
+  },
   ...(input.intermediaries ?? []).map((_, idx) => ({
     siret: input.intermediaries![idx].siret,
     skip: sealedFields.includes("intermediaries"),

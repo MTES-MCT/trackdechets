@@ -133,10 +133,9 @@ export default function SignTransportFormModalContent({
         try {
           const { update } = values;
           if (
-            form.emitter?.type === EmitterType.Appendix1Producer &&
-            (update.quantity ||
-              update.sampleNumber ||
-              update.packagingInfos.length > 0)
+            update.sampleNumber ||
+            (form.emitter?.type === EmitterType.Appendix1Producer &&
+              (update.quantity || update.packagingInfos.length > 0))
           ) {
             await updateForm({
               variables: {
