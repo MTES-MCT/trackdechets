@@ -5,7 +5,7 @@ import { enqueueUpdatedBsdToIndex } from "../../src/queue/producers/elastic";
 @registerUpdater(
   "Reindex BSDASRIs with identificationNumbers",
   "Reindex BSDASRIs with identificationNumbers",
-  false
+  true
 )
 export class ReindexBsdasrisWithIdentificationNumbers implements Updater {
   async run() {

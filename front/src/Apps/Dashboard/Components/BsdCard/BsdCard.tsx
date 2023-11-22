@@ -214,14 +214,11 @@ function BsdCard({
     setIsDeleteModalOpen(true);
   };
 
-  const emitterIsTransporter =
-    bsdDisplay?.emitter?.company?.siret !== null &&
-    bsdDisplay?.transporter?.company?.siret !== null &&
+  const transporterNameEmmiter =
     bsdDisplay?.emitter?.company?.siret ===
-      bsdDisplay?.transporter?.company?.siret;
-  const transporterNameEmmiter = emitterIsTransporter
-    ? bsdDisplay?.emitter?.company?.name
-    : bsdDisplay?.transporter?.company?.name;
+    bsdDisplay?.transporter?.company?.siret
+      ? bsdDisplay?.emitter?.company?.name
+      : bsdDisplay?.transporter?.company?.name;
 
   const transporterName = transporterNameEmmiter || "Non renseigné";
 

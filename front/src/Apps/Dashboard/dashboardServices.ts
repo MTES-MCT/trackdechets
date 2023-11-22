@@ -570,7 +570,6 @@ export const getReceivedBtnLabel = (
   if (
     isBsdasri(bsd.type) &&
     isActTab &&
-    !bsd.synthesizedIn &&
     isSameSiretDestination(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
