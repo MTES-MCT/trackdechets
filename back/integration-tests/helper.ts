@@ -18,7 +18,7 @@ afterAll(async () => {
     redisClient.disconnect(),
     prisma.$disconnect(),
     server.stop()
-  ])
+  ]);
 });
 
 /**
