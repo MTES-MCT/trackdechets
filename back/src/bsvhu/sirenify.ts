@@ -35,7 +35,7 @@ const bsvhuCreateInputAccessors = (
   {
     siret: input?.emitterCompanySiret,
     skip: sealedFields.includes("emitterCompanySiret"),
-    setter: (input: Prisma.BsdasriCreateInput, companyInput: CompanyInput) => {
+    setter: (input: Prisma.BsvhuCreateInput, companyInput: CompanyInput) => {
       input.emitterCompanyName = companyInput.name;
       input.emitterCompanyAddress = companyInput.address;
     }
@@ -43,7 +43,7 @@ const bsvhuCreateInputAccessors = (
   {
     siret: input?.transporterCompanySiret,
     skip: sealedFields.includes("transporterCompanySiret"),
-    setter: (input: Prisma.BsdasriCreateInput, companyInput: CompanyInput) => {
+    setter: (input: Prisma.BsvhuCreateInput, companyInput: CompanyInput) => {
       input.transporterCompanyName = companyInput.name;
       input.transporterCompanyAddress = companyInput.address;
     }
@@ -51,7 +51,7 @@ const bsvhuCreateInputAccessors = (
   {
     siret: input?.destinationCompanySiret,
     skip: sealedFields.includes("destinationCompanySiret"),
-    setter: (input: Prisma.BsdasriCreateInput, companyInput: CompanyInput) => {
+    setter: (input: Prisma.BsvhuCreateInput, companyInput: CompanyInput) => {
       input.destinationCompanyName = companyInput.name;
       input.destinationCompanyAddress = companyInput.address;
     }
