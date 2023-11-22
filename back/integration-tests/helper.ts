@@ -18,7 +18,7 @@ afterAll(async () => {
     redisClient.disconnect(),
     prisma.$disconnect(),
     server.stop()
-  ])
+  ]);
 });
 
 /**
@@ -74,19 +74,9 @@ export async function resetDatabase() {
 }
 
 export async function refreshElasticSearch() {
-  const drainedPromise = new Promise<void>(resolve =>
-    indexQueue.once("global:drained", resolve)
-  );
-
-  // Wait for the processing queue to index all bsds
-  const jobsCount = await indexQueue.getJobCounts();
-  if (jobsCount.active || jobsCount.waiting || jobsCount.delayed) {
-    await Promise.race([
-      drainedPromise,
-      new Promise(resolve => setTimeout(resolve, 1000))
-    ]);
-  }
-  indexQueue.removeAllListeners("global:drained");
+  // Wait for all indexation jobs to finish
+  const activeJobs = await indexQueue.getActive();
+  await Promise.all(activeJobs.map(job => job.finished()));
 
   return elasticSearch.indices.refresh(
     {
