@@ -5,7 +5,7 @@ import { enqueueUpdatedBsdToIndex } from "../../src/queue/producers/elastic";
 @registerUpdater(
   "Ré-indexe les BSDA présents dans un regroupement",
   "Ré-indexe les BSDA présents dans un regroupement",
-  true
+  false
 )
 export class ReindexGroupedBsdas implements Updater {
   async run() {
