@@ -189,10 +189,13 @@ describe("sirenifyBsdasriCreateInput", () => {
       // Transporter company info
       transporterCompanySiret: transporter.company.siret,
       transporterCompanyAddress: transporter.company.address,
-      transporterCompanyName: transporter.company.name,
+      transporterCompanyName: transporter.company.name
     } as Prisma.BsdasriCreateInput;
 
-    const sirenified = await sirenifyBsdasriCreateInput(bsdasriPrismaCreateInput, []);
+    const sirenified = await sirenifyBsdasriCreateInput(
+      bsdasriPrismaCreateInput,
+      []
+    );
 
     // Emitter
     expect(sirenified.emitterCompanyName).toEqual(
@@ -201,7 +204,7 @@ describe("sirenifyBsdasriCreateInput", () => {
     expect(sirenified.emitterCompanyAddress).toEqual(
       searchResults[emitter.company.siret!].address
     );
-    
+
     // Destination
     expect(sirenified.destinationCompanyName).toEqual(
       searchResults[destination.company.siret!].name

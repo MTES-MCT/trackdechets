@@ -6,7 +6,10 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
-import { CompanySearchResult, Mutation } from "../../../../generated/graphql/types";
+import {
+  CompanySearchResult,
+  Mutation
+} from "../../../../generated/graphql/types";
 import { BsdasriType } from "@prisma/client";
 import prisma from "../../../../prisma";
 import { xDaysAgo } from "../../../../commands/onboarding.helpers";
@@ -377,7 +380,7 @@ describe("Mutation.duplicateBsdasri", () => {
     const searchResults = {
       [emitter.company.siret!]: searchResult("emitter"),
       [transporterCompany.siret!]: searchResult("transporter"),
-      [destinationCompany.siret!]: searchResult("destination"),
+      [destinationCompany.siret!]: searchResult("destination")
     };
 
     (searchCompany as jest.Mock).mockImplementation((clue: string) => {

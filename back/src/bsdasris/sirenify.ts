@@ -28,9 +28,10 @@ const accessors = (input: BsdasriInput) => [
 
 export const sirenify = buildSirenify(accessors);
 
-const bsdasriCreateInputAccessors = (input: Prisma.BsdasriCreateInput, 
+const bsdasriCreateInputAccessors = (
+  input: Prisma.BsdasriCreateInput,
   sealedFields: string[] = [] // Tranformations should not be run on sealed fields
-  ) => [
+) => [
   {
     siret: input?.emitterCompanySiret,
     skip: sealedFields.includes("emitterCompanySiret"),
@@ -54,7 +55,9 @@ const bsdasriCreateInputAccessors = (input: Prisma.BsdasriCreateInput,
       input.destinationCompanyName = companyInput.name;
       input.destinationCompanyAddress = companyInput.address;
     }
-  },
+  }
 ];
 
-export const sirenifyBsdasriCreateInput = nextBuildSirenify(bsdasriCreateInputAccessors);
+export const sirenifyBsdasriCreateInput = nextBuildSirenify(
+  bsdasriCreateInputAccessors
+);

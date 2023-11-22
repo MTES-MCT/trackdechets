@@ -9,10 +9,12 @@ import {
 import {
   sirenifyBsffInput,
   sirenifyBsffPackagingInput,
-  sirenifyBsffFicheInterventionInput
+  sirenifyBsffFicheInterventionInput,
+  sirenifyBsffCreateInput
 } from "../sirenify";
 import { AuthType } from "../../auth";
 import { resetDatabase } from "../../../integration-tests/helper";
+import { Prisma } from "@prisma/client";
 
 jest.mock("../../companies/search");
 
@@ -376,6 +378,75 @@ describe("sirenifyBsffFicheInterventionInput", () => {
     );
     expect(sirenified.operateur.company.address).toEqual(
       searchResults[operateur.company.siret!].address
+    );
+  });
+});
+
+describe("sirenifyBsffCreateInput", () => {
+  afterEach(resetDatabase);
+
+  it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` are provided", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+
+    function searchResult(companyName: string) {
+      return {
+        name: companyName,
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
+      } as CompanySearchResult;
+    }
+
+    const searchResults = {
+      [emitter.company.siret!]: searchResult("émetteur"),
+      [transporter.company.siret!]: searchResult("transporteur"),
+      [destination.company.siret!]: searchResult("destinataire")
+    };
+
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
+      return Promise.resolve(searchResults[clue]);
+    });
+
+    const bsffPrismaCreateInput = {
+      // Emitter company info
+      emitterCompanySiret: emitter.company.siret,
+      emitterCompanyAddress: emitter.company.address,
+      emitterCompanyName: emitter.company.name,
+      // Destination company info
+      destinationCompanySiret: destination.company.siret,
+      destinationCompanyAddress: destination.company.address,
+      destinationCompanyName: destination.company.name,
+      // Transporter company info
+      transporterCompanySiret: transporter.company.siret,
+      transporterCompanyAddress: transporter.company.address,
+      transporterCompanyName: transporter.company.name
+    } as Prisma.BsffCreateInput;
+
+    const sirenified = await sirenifyBsffCreateInput(bsffPrismaCreateInput, []);
+
+    // Emitter
+    expect(sirenified.emitterCompanyName).toEqual(
+      searchResults[emitter.company.siret!].name
+    );
+    expect(sirenified.emitterCompanyAddress).toEqual(
+      searchResults[emitter.company.siret!].address
+    );
+
+    // Destination
+    expect(sirenified.destinationCompanyName).toEqual(
+      searchResults[destination.company.siret!].name
+    );
+    expect(sirenified.destinationCompanyAddress).toEqual(
+      searchResults[destination.company.siret!].address
+    );
+
+    // Transporter
+    expect(sirenified.transporterCompanyName).toEqual(
+      searchResults[transporter.company.siret!].name
+    );
+    expect(sirenified.transporterCompanyAddress).toEqual(
+      searchResults[transporter.company.siret!].address
     );
   });
 });
