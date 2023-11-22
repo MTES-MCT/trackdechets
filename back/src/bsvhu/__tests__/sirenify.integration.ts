@@ -7,6 +7,14 @@ import { AuthType } from "../../auth";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { Prisma } from "@prisma/client";
 
+const searchResult = (companyName: string) => {
+  return {
+    name: companyName,
+    address: `Adresse ${companyName}`,
+    statutDiffusionEtablissement: "O"
+  } as CompanySearchResult;
+};
+
 jest.mock("../../companies/search");
 
 describe("sirenify", () => {
@@ -16,14 +24,6 @@ describe("sirenify", () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporter = await userWithCompanyFactory("MEMBER");
     const destination = await userWithCompanyFactory("MEMBER");
-
-    function searchResult(companyName: string) {
-      return {
-        name: companyName,
-        address: `Adresse ${companyName}`,
-        statutDiffusionEtablissement: "O"
-      } as CompanySearchResult;
-    }
 
     const searchResults = {
       [emitter.company.siret!]: searchResult("émetteur"),
@@ -89,14 +89,6 @@ describe("sirenify", () => {
     const transporter = await userWithCompanyFactory("MEMBER");
     const destination = await userWithCompanyFactory("MEMBER");
 
-    function searchResult(companyName: string) {
-      return {
-        name: companyName,
-        address: `Adresse ${companyName}`,
-        statutDiffusionEtablissement: "O"
-      } as CompanySearchResult;
-    }
-
     const searchResults = {
       [emitter.company.siret!]: searchResult("émetteur"),
       [transporter.company.siret!]: searchResult("transporteur"),
@@ -158,14 +150,6 @@ describe("sirenifyBsvhuCreateInput", () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporter = await userWithCompanyFactory("MEMBER");
     const destination = await userWithCompanyFactory("MEMBER");
-
-    function searchResult(companyName: string) {
-      return {
-        name: companyName,
-        address: `Adresse ${companyName}`,
-        statutDiffusionEtablissement: "O"
-      } as CompanySearchResult;
-    }
 
     const searchResults = {
       [emitter.company.siret!]: searchResult("émetteur"),

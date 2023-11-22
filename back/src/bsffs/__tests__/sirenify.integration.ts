@@ -16,6 +16,14 @@ import { AuthType } from "../../auth";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { Prisma } from "@prisma/client";
 
+const searchResult = (companyName: string) => {
+  return {
+    name: companyName,
+    address: `Adresse ${companyName}`,
+    statutDiffusionEtablissement: "O"
+  } as CompanySearchResult;
+};
+
 jest.mock("../../companies/search");
 
 describe("sirenifyBsffInput", () => {
@@ -25,14 +33,6 @@ describe("sirenifyBsffInput", () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporter = await userWithCompanyFactory("MEMBER");
     const destination = await userWithCompanyFactory("MEMBER");
-
-    function searchResult(companyName: string) {
-      return {
-        name: companyName,
-        address: `Adresse ${companyName}`,
-        statutDiffusionEtablissement: "O"
-      } as CompanySearchResult;
-    }
 
     const searchResults = {
       [emitter.company.siret!]: searchResult("émetteur"),
@@ -98,14 +98,6 @@ describe("sirenifyBsffInput", () => {
     const transporter = await userWithCompanyFactory("MEMBER");
     const destination = await userWithCompanyFactory("MEMBER");
 
-    function searchResult(companyName: string) {
-      return {
-        name: companyName,
-        address: `Adresse ${companyName}`,
-        statutDiffusionEtablissement: "O"
-      } as CompanySearchResult;
-    }
-
     const searchResults = {
       [emitter.company.siret!]: searchResult("émetteur"),
       [transporter.company.siret!]: searchResult("transporteur"),
@@ -166,14 +158,6 @@ describe("sirenifyBsffPackagingInput", () => {
   it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` are provided", async () => {
     const nextDestination = await userWithCompanyFactory("MEMBER");
 
-    function searchResult(companyName: string) {
-      return {
-        name: companyName,
-        address: `Adresse ${companyName}`,
-        statutDiffusionEtablissement: "O"
-      } as CompanySearchResult;
-    }
-
     const searchResults = {
       [nextDestination.company.siret!]: searchResult("destination ultérieure")
     };
@@ -212,14 +196,6 @@ describe("sirenifyBsffPackagingInput", () => {
 
   it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` are not provided", async () => {
     const nextDestination = await userWithCompanyFactory("MEMBER");
-
-    function searchResult(companyName: string) {
-      return {
-        name: companyName,
-        address: `Adresse ${companyName}`,
-        statutDiffusionEtablissement: "O"
-      } as CompanySearchResult;
-    }
 
     const searchResults = {
       [nextDestination.company.siret!]: searchResult("destination ultérieure")
@@ -262,14 +238,6 @@ describe("sirenifyBsffFicheInterventionInput", () => {
   it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` are provided", async () => {
     const detenteur = await userWithCompanyFactory("MEMBER");
     const operateur = await userWithCompanyFactory("MEMBER");
-
-    function searchResult(companyName: string) {
-      return {
-        name: companyName,
-        address: `Adresse ${companyName}`,
-        statutDiffusionEtablissement: "O"
-      } as CompanySearchResult;
-    }
 
     const searchResults = {
       [detenteur.company.siret!]: searchResult("détenteur"),
@@ -325,14 +293,6 @@ describe("sirenifyBsffFicheInterventionInput", () => {
   it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` are not provided", async () => {
     const detenteur = await userWithCompanyFactory("MEMBER");
     const operateur = await userWithCompanyFactory("MEMBER");
-
-    function searchResult(companyName: string) {
-      return {
-        name: companyName,
-        address: `Adresse ${companyName}`,
-        statutDiffusionEtablissement: "O"
-      } as CompanySearchResult;
-    }
 
     const searchResults = {
       [detenteur.company.siret!]: searchResult("détenteur"),
