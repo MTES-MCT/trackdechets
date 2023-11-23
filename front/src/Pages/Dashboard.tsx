@@ -170,8 +170,6 @@ const DashboardPage = () => {
   useNotifier(siret, () => {
     if (!isReviewsTab) {
       fetchBsds(siret, bsdsVariables, tabs);
-    } else {
-      fetchReviews();
     }
   });
 
