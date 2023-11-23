@@ -414,6 +414,12 @@ type Transporter {
 
   "Mode de transport"
   mode: TransportMode
+
+  "Date de prise en charge"
+  takenOverAt: DateTime
+
+  "Reponsable de la prise en charge"
+  takenOverBy: String
 }
 
 "Destination ultérieure prévue (case 12)"
