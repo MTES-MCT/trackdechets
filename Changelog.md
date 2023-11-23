@@ -17,6 +17,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Rendre accessibles les champs `takenOverAt` et `takenOverAt` via l'objet Transporter (BSDD). [PR 2865](https://github.com/MTES-MCT/trackdechets/pull/2865)
+
 #### :house: Interne
 
 # [2023.11.1] 21/11/2023
