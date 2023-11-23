@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { gql, useQuery } from "@apollo/client";
 import AccountCompany from "./AccountCompany";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Query } from "codegen-ui";
 import { Loader } from "../Apps/common/Components";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
@@ -44,7 +44,7 @@ export default function AccountCompanyList() {
   const [searchClue, setSearchClue] = useState("");
   const [displayPreloader, setDisplayPreloader] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { data, loading, error, refetch, fetchMore } = useQuery<
     Pick<Query, "myCompanies">
@@ -135,9 +135,7 @@ export default function AccountCompanyList() {
       }
 
       // No results and we're not filtering, redirect to the create company screen
-      history.push({
-        pathname: routes.account.companies.orientation
-      });
+      navigate(routes.account.companies.orientation);
       return <Loader />;
     }
 

@@ -5,7 +5,7 @@ import QRCodeIcon from "react-qr-code";
 import { useMutation, gql } from "@apollo/client";
 import { Loader } from "../../../../../Apps/common/Components";
 
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { InlineError } from "../../../../../Apps/common/Components/Error/Error";
 import { TOAST_DURATION } from "../../../../../common/config";
 
@@ -22,7 +22,7 @@ export function RouteControlPdf() {
     id: string;
     siret: string;
   }>();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [createPdfAccessToken, { data, loading, error }] = useMutation<
     Pick<Mutation, "createPdfAccessToken">,
@@ -54,7 +54,12 @@ export function RouteControlPdf() {
       )}
 
       <div className="td-modal-actions">
-        <button className="btn btn--outline-primary" onClick={history.goBack}>
+        <button
+          className="btn btn--outline-primary"
+          onClick={() => {
+            navigate(-1);
+          }}
+        >
           Annuler
         </button>
         <button
@@ -63,7 +68,7 @@ export function RouteControlPdf() {
           onClick={() =>
             createPdfAccessToken({
               variables: {
-                input: { bsdId: id }
+                input: { bsdId: id! }
               }
             })
           }

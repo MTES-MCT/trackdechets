@@ -16,7 +16,7 @@ export function RouteBsdsDrafts() {
   const { siret } = useParams<{ siret: string }>();
   const defaultWhere = useMemo(
     () => ({
-      isDraftFor: [siret]
+      isDraftFor: [siret!]
     }),
     [siret]
   );
@@ -30,7 +30,7 @@ export function RouteBsdsDrafts() {
 
       <BSDList
         key={siret}
-        siret={siret}
+        siret={siret!}
         defaultWhere={defaultWhere}
         blankslate={
           <Blankslate>

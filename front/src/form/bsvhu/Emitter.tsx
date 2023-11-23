@@ -55,7 +55,7 @@ export default function Emitter({ disabled }) {
       <h4 className="form__section-heading">Entreprise émettrice</h4>
 
       <CompanySelectorWrapper
-        siret={siret}
+        siret={siret!}
         favoriteType={FavoriteType.Emitter}
         disabled={disabled}
         currentCompany={

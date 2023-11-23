@@ -14,7 +14,7 @@ export function RouteBsdsAct() {
   const { siret } = useParams<{ siret: string }>();
   const defaultWhere = useMemo(
     () => ({
-      isForActionFor: [siret]
+      isForActionFor: [siret!]
     }),
     [siret]
   );
@@ -28,7 +28,7 @@ export function RouteBsdsAct() {
 
       <BSDList
         key={siret}
-        siret={siret}
+        siret={siret!}
         defaultWhere={defaultWhere}
         blankslate={
           <Blankslate>

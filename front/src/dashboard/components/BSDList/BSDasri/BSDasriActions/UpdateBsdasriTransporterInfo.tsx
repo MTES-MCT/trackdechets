@@ -7,7 +7,7 @@ import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 
 import { UPDATE_BSDASRI } from "../../../../../form/bsdasri/utils/queries";
 import { Bsdasri, Mutation, MutationUpdateBsdasriArgs } from "codegen-ui";
-import { useRouteMatch } from "react-router-dom";
+import { useMatch } from "react-router-dom";
 
 type Props = {
   bsdasri: Bsdasri;
@@ -22,7 +22,7 @@ export function UpdateBsdasriTransporterInfo({
 }: Props) {
   console.log(bsdasri);
   const [isOpen, setIsOpen] = useState(false);
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/");
   const [updateBsdasri, { error }] = useMutation<
     Pick<Mutation, "updateBsdasri">,
     MutationUpdateBsdasriArgs

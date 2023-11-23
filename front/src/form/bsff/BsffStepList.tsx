@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React, { ReactElement, useMemo, lazy } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Loader } from "../../Apps/common/Components";
 import { getComputedState } from "../common/getComputedState";
 import { IStepContainerProps } from "../common/stepper/Step";
@@ -30,7 +30,7 @@ interface Props {
 }
 
 export default function BsffStepsList(props: Props) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const formQuery = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(
     GET_BSFF_FORM,
@@ -121,7 +121,7 @@ export default function BsffStepsList(props: Props) {
         type === BsffType.Groupement ? previousPackagings.map(p => p.id) : []
     })
       .then(_ => {
-        history.goBack();
+        navigate(-1);
       })
       .catch(err => formInputToastError(err));
   }

@@ -14,7 +14,7 @@ export function RouteBsdsHistory() {
   const { siret } = useParams<{ siret: string }>();
   const defaultWhere = useMemo(
     () => ({
-      isArchivedFor: [siret]
+      isArchivedFor: [siret!]
     }),
     [siret]
   );
@@ -28,7 +28,7 @@ export function RouteBsdsHistory() {
 
       <BSDList
         key={siret}
-        siret={siret}
+        siret={siret!}
         defaultWhere={defaultWhere}
         blankslate={
           <Blankslate>

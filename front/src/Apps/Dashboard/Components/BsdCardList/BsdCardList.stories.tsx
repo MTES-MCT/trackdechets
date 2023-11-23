@@ -20,9 +20,7 @@ export default {
   decorators: [
     Story => (
       <MemoryRouter>
-        <Route>
-          <Story />
-        </Route>
+        <Route element={<Story />} />
       </MemoryRouter>
     )
   ]

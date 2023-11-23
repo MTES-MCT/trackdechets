@@ -22,7 +22,7 @@ import { Field, Form, Formik } from "formik";
 import { RadioButton } from "../../../../../form/common/components/custom-inputs/RadioButton";
 import { formatDate } from "../../../../../common/datetime";
 import { getPackagingInfosSummary } from "../../../../../form/bsdd/utils/packagings";
-import { useRouteMatch } from "react-router-dom";
+import { useMatch } from "react-router-dom";
 import { getOperationModeLabel } from "../../../../../common/operationModes";
 
 type Props = {
@@ -40,7 +40,7 @@ export function BsddApproveRevision({
   isModalOpenFromParent,
   onModalCloseFromParent
 }: Props) {
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/");
 
   const [submitFormRevisionRequestApproval, { loading, error }] = useMutation<
     Pick<Mutation, "submitFormRevisionRequestApproval">,

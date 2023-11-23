@@ -162,4 +162,8 @@ const routes = {
   }
 };
 
+export function getRelativeRoute(index, route) {
+  return route.replace(`${index}/`, "");
+}
+
 export default routes;
