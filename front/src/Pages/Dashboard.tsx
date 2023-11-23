@@ -273,8 +273,17 @@ const DashboardPage = () => {
         };
       }
     })
-      .then(() => {
+      .then(({ data }) => {
         setIsFetchingMore(false);
+        setBsdsReview(
+          (
+            prevState
+          ): FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[] => {
+            return [
+              ...new Set([...prevState, ...data["formRevisionRequests"].edges])
+            ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
+          }
+        );
       })
       .catch(error => {
         Sentry.captureException(error);
@@ -310,8 +319,17 @@ const DashboardPage = () => {
         };
       }
     })
-      .then(() => {
+      .then(({ data }) => {
         setIsFetchingMore(false);
+        setBsdsReview(
+          (
+            prevState
+          ): FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[] => {
+            return [
+              ...new Set([...prevState, ...data["bsdaRevisionRequests"].edges])
+            ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
+          }
+        );
       })
       .catch(error => {
         Sentry.captureException(error);
