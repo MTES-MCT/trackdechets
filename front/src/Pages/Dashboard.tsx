@@ -86,10 +86,6 @@ const DashboardPage = () => {
     first: BSD_PER_PAGE
   });
 
-  const [bsdsReview, setBsdsReview] = useState<
-    FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[]
-  >([]);
-
   const [lazyFetchBsds, { data, loading, fetchMore }] = useLazyQuery<
     Pick<Query, "bsds">,
     QueryBsdsArgs
@@ -171,7 +167,13 @@ const DashboardPage = () => {
   }, [tabs]);
 
   // Be notified if someone else modifies bsds
-  useNotifier(siret, () => fetchBsds(siret, bsdsVariables, tabs));
+  useNotifier(siret, () => {
+    if (!isReviewsTab) {
+      fetchBsds(siret, bsdsVariables, tabs);
+    } else {
+      fetchReviews();
+    }
+  });
 
   const [
     fetchBsdaRevisions,
@@ -273,17 +275,8 @@ const DashboardPage = () => {
         };
       }
     })
-      .then(({ data }) => {
+      .then(() => {
         setIsFetchingMore(false);
-        setBsdsReview(
-          (
-            prevState
-          ): FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[] => {
-            return [
-              ...new Set([...prevState, ...data["formRevisionRequests"].edges])
-            ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
-          }
-        );
       })
       .catch(error => {
         Sentry.captureException(error);
@@ -319,17 +312,8 @@ const DashboardPage = () => {
         };
       }
     })
-      .then(({ data }) => {
+      .then(() => {
         setIsFetchingMore(false);
-        setBsdsReview(
-          (
-            prevState
-          ): FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[] => {
-            return [
-              ...new Set([...prevState, ...data["bsdaRevisionRequests"].edges])
-            ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
-          }
-        );
       })
       .catch(error => {
         Sentry.captureException(error);
@@ -349,55 +333,28 @@ const DashboardPage = () => {
     }
   }, [isReviewsTab, loadMoreBsdaReviews, loadMoreBsddReviews, loadMoreBsds]);
 
+  const fetchReviews = useCallback(() => {
+    Promise.all([fetchBsddRevisions(), fetchBsdaRevisions()]).catch(error => {
+      Sentry.captureException(error);
+    });
+  }, [fetchBsdaRevisions, fetchBsddRevisions]);
+
   // A supprimer quand on pourra afficher une révision avec la requete bsds
   useEffect(() => {
     if (isReviewsTab) {
-      setBsdsReview([]);
-      Promise.all([fetchBsddRevisions(), fetchBsdaRevisions()])
-        .then(res => {
-          const dataBsdd = res[0].data;
-          const dataBsda = res[1].data;
-          if (!!dataBsdd && dataBsdd["formRevisionRequests"]?.edges?.length) {
-            setBsdsReview(
-              (
-                prevState
-              ): FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[] => {
-                return [
-                  ...new Set([
-                    ...prevState,
-                    ...dataBsdd["formRevisionRequests"].edges
-                  ])
-                ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
-              }
-            );
-          }
-
-          if (!!dataBsda && dataBsda["bsdaRevisionRequests"]?.edges?.length) {
-            setBsdsReview(
-              (
-                prevState
-              ): FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[] => {
-                return [
-                  ...new Set([
-                    ...prevState,
-                    ...dataBsda["bsdaRevisionRequests"].edges
-                  ])
-                ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
-              }
-            );
-          }
-        })
-        .catch(error => {
-          Sentry.captureException(error);
-        });
+      fetchReviews();
     }
-  }, [isReviewsTab, fetchBsddRevisions, fetchBsdaRevisions]);
+  }, [isReviewsTab, fetchReviews]);
 
   const toggleFiltersBlock = () => {
     setAreAdvancedFiltersOpen(!areAdvancedFiltersOpen);
   };
 
   // A supprimer la condition isReviewsTab quand on pourra afficher une révision avec la requete bsds
+  const bsdsReview = [
+    ...(dataBsddReviews?.formRevisionRequests.edges || []),
+    ...(dataBsdaReviews?.bsdaRevisionRequests.edges || [])
+  ] as FormRevisionRequestEdge[] | BsdaRevisionRequestEdge[];
   const bsds = !isReviewsTab ? data?.bsds.edges : bsdsReview;
   const bsdsTotalCount = isReviewsTab
     ? bsdsReview?.length

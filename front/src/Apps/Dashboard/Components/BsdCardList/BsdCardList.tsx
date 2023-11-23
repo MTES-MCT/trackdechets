@@ -374,8 +374,9 @@ function BsdCardList({
   return (
     <>
       <ul className="bsd-card-list">
-        {bsds?.map(({ node }) => {
+        {bsds?.map(({ node }, index) => {
           let bsdNode = node;
+          let key = `${node.id}${node.status}`;
           // A supprimer le block isReviewsTab quand on pourra afficher une révision avec la requete bsds
           if (isReviewsTab) {
             // format reviews from bsdd and bsda in one list
@@ -390,6 +391,7 @@ function BsdCardList({
             delete reviewBsda?.bsda;
             newBsddNode.review = reviewBsdd;
             bsdNode = { ...newBsddNode, ...newBsdaNode };
+            key = `${node.id}${node.status}${index}`;
           }
 
           const hasAutomaticSignature = siretsWithAutomaticSignature?.includes(
@@ -397,10 +399,7 @@ function BsdCardList({
           );
 
           return (
-            <li
-              className="bsd-card-list__item"
-              key={`${node.id}${node.status}`}
-            >
+            <li className="bsd-card-list__item" key={key}>
               <BsdCard
                 bsd={bsdNode}
                 currentSiret={siret}
