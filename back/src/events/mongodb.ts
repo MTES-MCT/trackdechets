@@ -8,28 +8,7 @@ const { MONGO_URL } = process.env;
 
 const EVENTS_COLLECTION = "events";
 
-let lazyMongoClient: MongoClient;
-// We use a Proxy to lazily initialize the MongoDB client
-// This allows us to not have to initialize the MongoDB client if we don't need it
-// (eg: when running side services that don't have all the env variables and for which initialization would fail)
-const mongodbClient = new Proxy({} as MongoClient, {
-  get: function (_, name) {
-    if (!MONGO_URL) {
-      throw new Error("No MONGO_URL env, cannot initialize MongoDB client");
-    }
-    lazyMongoClient = lazyMongoClient || new MongoClient(MONGO_URL);
-
-    const item = lazyMongoClient[name];
-    // If it's a function call, bypass the proxy and call the function on the lazyMongoClient directly
-    if (typeof item === "function") {
-      return function (...args: any[]) {
-        return item.call(lazyMongoClient, ...args);
-      };
-    }
-
-    return lazyMongoClient[name];
-  }
-});
+const mongodbClient = new MongoClient(MONGO_URL);
 
 const database = mongodbClient.db();
 const eventsCollection =
