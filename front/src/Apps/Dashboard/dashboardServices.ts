@@ -215,6 +215,9 @@ const isGathering = (bsdWorkflowType: string | undefined): boolean =>
 const isReshipment = (bsdWorkflowType: string | undefined): boolean =>
   bsdWorkflowType === BsdaType.Reshipment;
 
+const isOtherCollection = (bsdWorkflowType: string | undefined): boolean =>
+  bsdWorkflowType === BsdaType.OtherCollections;
+
 const isSimple = (bsdWorkflowType: string | undefined): boolean =>
   bsdWorkflowType === BsdasriType.Simple;
 
@@ -642,9 +645,9 @@ export const getSignByProducerBtnLabel = (
 
     if (
       (isBsda(bsd.type) &&
-        currentSiret === bsd.transporter?.company?.orgId &&
         (isGathering(bsd.bsdWorkflowType?.toString()) ||
           isReshipment(bsd.bsdWorkflowType?.toString()) ||
+          isOtherCollection(bsd.bsdWorkflowType?.toString()) ||
           bsd.worker?.isDisabled)) ||
       isBsvhu(bsd.type)
     ) {
@@ -1110,8 +1113,12 @@ export const canReviewBsdd = (bsd, siret) =>
 
 export const canReviewBsd = (bsd, siret) => {
   const isTransporter = isSameSiretTransporter(siret, bsd);
+  const isDestination = isSameSiretDestination(siret, bsd);
+  const isTransporterOnly = isTransporter && !isDestination;
+
   return (
-    (canReviewBsdd(bsd, siret) || canReviewBsda(bsd, siret)) && !isTransporter
+    (canReviewBsdd(bsd, siret) || canReviewBsda(bsd, siret)) &&
+    !isTransporterOnly
   );
 };
 
