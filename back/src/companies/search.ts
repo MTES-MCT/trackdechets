@@ -249,7 +249,7 @@ export const makeSearchCompanies =
 /**
  * Search Sirene and handle anonymous companies
  */
-async function searchSireneOrNotFound(
+export async function searchSireneOrNotFound(
   siret: string
 ): Promise<SireneSearchResult | null> {
   try {
@@ -317,6 +317,22 @@ async function searchVatFrOnlyOrNotFound(
   if (viesResult && viesResult.name === "") delete viesResult.name;
   if (viesResult && viesResult.address === "") delete viesResult.address;
   return viesResult;
+}
+
+/**
+ * Narrow search for companies via VIES EU VAT service
+ * @param vatNumber
+ * @returns
+ */
+export async function searchVatFrOnlyOrNotFoundFailFast(
+  vatNumber: string
+): Promise<PartialCompanyVatSearchResult | null> {
+  // make sure we do not wait more thant 1s here to avoid bottlenecks
+  const raceWith = new Promise<null>(resolve =>
+    setTimeout(resolve, 1000, null)
+  );
+
+  return await Promise.race([searchVatFrOnlyOrNotFound(vatNumber), raceWith]);
 }
 
 export const searchCompanies = makeSearchCompanies({

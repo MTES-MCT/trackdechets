@@ -549,8 +549,8 @@ describe("Mutation.createCompany", () => {
       companyTypes: ["TRANSPORTER"],
       ecoOrganismeAgreements: [],
       gerepId: null,
-      name: "Acme in EU",
-      address: "Transporter street",
+      name: testValue.name,
+      address: testValue.address,
       traderReceipt: null,
       transporterReceipt: null,
       vatNumber: "RO17579668"

@@ -79,7 +79,8 @@ function searchResponseToCompany({
  * @param siret
  */
 export async function searchCompany(
-  siret: string
+  siret: string,
+  _source_includes?: string[] // ignored
 ): Promise<SireneSearchResult> {
   const searchUrl = `${SIRENE_API_BASE_URL}/siret/${siret}`;
 
