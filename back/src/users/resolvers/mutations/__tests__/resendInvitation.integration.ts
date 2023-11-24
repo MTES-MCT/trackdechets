@@ -4,8 +4,7 @@ import { createUserAccountHash } from "../../../database";
 import { AuthType } from "../../../../auth";
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
-import { inviteUserToJoin } from "../../../../mailer/templates";
-import { renderMail } from "../../../../mailer/templates/renderers";
+import { renderMail, inviteUserToJoin } from "@td/mail";
 
 // No mails
 jest.mock("../../../../mailer/mailing");

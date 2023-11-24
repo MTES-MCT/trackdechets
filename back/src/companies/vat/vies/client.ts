@@ -3,7 +3,7 @@ import path from "path";
 import { createClientAsync, Client, IOptions } from "soap";
 import { CompanyVatSearchResult, ViesResult } from "./types";
 import { countries, isVat } from "shared/constants";
-import logger from "../../../logging/logger";
+import { logger } from "@td/logger";
 import { ErrorCode, UserInputError } from "../../../common/errors";
 import { GraphQLError } from "graphql";
 

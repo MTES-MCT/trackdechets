@@ -1,4 +1,4 @@
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 import prisma from "../../prisma";
 import { RepositoryFnBuilder, RepositoryTransaction } from "./types";
 

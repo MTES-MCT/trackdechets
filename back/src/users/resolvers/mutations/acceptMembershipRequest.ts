@@ -12,8 +12,7 @@ import {
   MembershipRequestAlreadyRefused
 } from "../../errors";
 import { convertUrls } from "../../../companies/database";
-import { renderMail } from "../../../mailer/templates/renderers";
-import { membershipRequestAccepted } from "../../../mailer/templates";
+import { membershipRequestAccepted, renderMail } from "@td/mail";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 

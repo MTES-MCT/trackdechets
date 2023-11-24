@@ -1,4 +1,4 @@
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 import { client, index as defaultIndexConfig } from "../../common/elastic";
 import { IndexElasticSearchOpts } from "./types";
 import { reindexAllBsdsNoDowntime } from "./reindexAllBsdsNoDowntime";

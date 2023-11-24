@@ -1,6 +1,6 @@
 import { isValid, parseISO } from "date-fns";
 import prompts from "prompts";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 import prisma from "../../prisma";
 import { reindexPartialInPlace } from "../../bsds/indexation/reindexPartialInPlace";
 import { index } from "../../common/elastic";

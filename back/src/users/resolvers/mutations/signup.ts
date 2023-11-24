@@ -14,8 +14,7 @@ import {
   createUser
 } from "../../database";
 import { hashPassword, checkPasswordCriteria } from "../../utils";
-import { onSignup } from "../../../mailer/templates";
-import { renderMail } from "../../../mailer/templates/renderers";
+import { onSignup, renderMail } from "@td/mail";
 import { UserInputError } from "../../../common/errors";
 
 function validateArgs(args: MutationSignupArgs) {

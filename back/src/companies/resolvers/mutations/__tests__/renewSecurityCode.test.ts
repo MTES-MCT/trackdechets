@@ -1,7 +1,6 @@
 import { renewSecurityCodeFn as renewSecurityCode } from "../renewSecurityCodeService";
 import { ErrorCode } from "../../../../common/errors";
-import { renderMail } from "../../../../mailer/templates/renderers";
-import { securityCodeRenewal } from "../../../../mailer/templates";
+import { renderMail, securityCodeRenewal } from "@td/mail";
 import * as utils from "../../../../utils";
 import { siretify } from "../../../../__tests__/factories";
 

@@ -4,6 +4,7 @@ import { GqlInfo } from "./common/plugins/gqlInfosPlugin";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { createFormDataLoaders } from "./forms/dataloader";
 import { createUserDataLoaders } from "./users/dataloaders";
+import "express-session";
 
 export type AppDataloaders = ReturnType<typeof createUserDataLoaders> &
   ReturnType<typeof createCompanyDataLoaders> &

@@ -4,7 +4,8 @@ import {
   daysBetween,
   base32Encode,
   hashToken,
-  extractPostalCode
+  extractPostalCode,
+  xDaysAgo
 } from "../utils";
 
 test("getUid returns a unique identifier of fixed length", () => {
@@ -65,5 +66,13 @@ describe("extractPostalCode", () => {
 
   test("when address is null", () => {
     expect(extractPostalCode(null)).toEqual("");
+  });
+});
+
+describe("xDaysAgo", () => {
+  it("should return a relative past date", () => {
+    const someDate = new Date("2019-10-03T00:00:00.000Z");
+    const threeDaysBefore = xDaysAgo(someDate, 3);
+    expect(threeDaysBefore).toEqual(new Date("2019-09-30T00:00:00.000Z"));
   });
 });

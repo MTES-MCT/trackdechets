@@ -8,7 +8,7 @@ import {
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { createBsff } from "../../../__tests__/factories";
-import { xDaysAgo } from "../../../../commands/onboarding.helpers";
+import { xDaysAgo } from "../../../../utils";
 import prisma from "../../../../prisma";
 
 const TODAY = new Date();

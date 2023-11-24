@@ -2,7 +2,7 @@ import { MongoBulkWriteError, MongoClient } from "mongodb";
 import { Event } from "@prisma/client";
 import { EventCollection } from "./types";
 import { WriteErrors } from "./writeErrors";
-import logger from "../logging/logger";
+import { logger } from "@td/logger";
 
 const { MONGO_URL } = process.env;
 

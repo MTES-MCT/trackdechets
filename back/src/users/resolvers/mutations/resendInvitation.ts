@@ -4,8 +4,7 @@ import { sendMail } from "../../../mailer/mailing";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import { renderMail } from "../../../mailer/templates/renderers";
-import { inviteUserToJoin } from "../../../mailer/templates";
+import { renderMail, inviteUserToJoin } from "@td/mail";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import {
   NotCompanyAdminErrorMsg,
