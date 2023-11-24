@@ -3,24 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "update": "node ../dist/back/back/prisma/scripts/index.js",
-    "update:dev": "tsx --tsconfig tsconfig.lib.json prisma/scripts/index.ts",
-    "migrate": "node ../dist/back/back/prisma/migrate.js",
-    "migrate:dev": "tsx --tsconfig tsconfig.lib.json prisma/migrate.ts",
+    "update": "tsx --tsconfig tsconfig.lib.json prisma/scripts/index.ts",
+    "migrate": "tsx --tsconfig tsconfig.lib.json prisma/migrate.ts",
     "check:migrations": "pg-validate-migrations ./prisma/migrations",
     "preintegration-tests": "prisma db push && npm run reindex-all-bsds-bulk:dev",
-    "bulk-create-account": "node ../dist/back/back/src/users/bulk-creation/index.js",
-    "bulk-create-account:dev": "tsx src/users/bulk-creation/index.ts",
-    "reindex-partial-in-place": "node ../dist/back/back/src/scripts/bin/reindexPartialInPlace.js",
-    "reindex-partial-in-place:dev": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexPartialInPlace.ts",
-    "reindex-all-bsds-bulk": "LOG_TO_HTTP=1 node ../dist/back/back/src/scripts/bin/reindexAllInBulk.js",
-    "reindex-all-bsds-bulk:dev": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexAllInBulk.ts -- -d",
-    "reindex-bsd": "node ../dist/back/back/src/scripts/bin/reindexBsd.js $bsdId",
-    "reindex-bsd:dev": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexBsd.ts $bsdId",
-    "purge-pdf-token": "node ../dist/back/back/src/scripts/bin/purgePdfAccessToken.js",
-    "purge-pdf-token:dev": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/purgePdfAccessToken.ts",
-    "storeAllWebhookSettings.ts": "node ../dist/back/back/src/webhooks/commands/storeAllWebhookSettings.js",
-    "storeAllWebhookSettings.ts:dev": "tsx --tsconfig tsconfig.lib.json ./src/webhooks/commands/storeAllWebhookSettings.ts"
+    "bulk-create-account": "tsx src/users/bulk-creation/index.ts",
+    "reindex-partial-in-place": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexPartialInPlace.ts",
+    "reindex-all-bsds-bulk": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexAllInBulk.ts",
+    "reindex-bsd": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexBsd.ts $bsdId",
+    "purge-pdf-token": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/purgePdfAccessToken.ts",
+    "storeAllWebhookSettings.ts": "tsx --tsconfig tsconfig.lib.json ./src/webhooks/commands/storeAllWebhookSettings.ts"
   },
   "engines": {
     "node": "^20"
