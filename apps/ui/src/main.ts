@@ -49,7 +49,7 @@ app.use(
   })
 );
 
-const directory = path.join(__dirname, "../../front");
+const directory = path.join(__dirname, "../../../../../front");
 app.use(express.static(directory));
 
 const pathToIndex = path.join(directory, "index.html");
