@@ -1,4 +1,5 @@
-import buildSirenify from "../companies/sirenify";
+import { Prisma } from "@prisma/client";
+import buildSirenify, { nextBuildSirenify } from "../companies/sirenify";
 import {
   BsffFicheInterventionInput,
   BsffInput,
@@ -77,4 +78,38 @@ const bsffFicheInterventionAccessors = (input: BsffFicheInterventionInput) => [
 
 export const sirenifyBsffFicheInterventionInput = buildSirenify(
   bsffFicheInterventionAccessors
+);
+
+const bsffCreateInputAccessors = (
+  input: Prisma.BsffCreateInput,
+  sealedFields: string[] = [] // Tranformations should not be run on sealed fields
+) => [
+  {
+    siret: input?.emitterCompanySiret,
+    skip: sealedFields.includes("emitterCompanySiret"),
+    setter: (input: Prisma.BsffCreateInput, companyInput: CompanyInput) => {
+      input.emitterCompanyName = companyInput.name;
+      input.emitterCompanyAddress = companyInput.address;
+    }
+  },
+  {
+    siret: input?.transporterCompanySiret,
+    skip: sealedFields.includes("transporterCompanySiret"),
+    setter: (input: Prisma.BsffCreateInput, companyInput: CompanyInput) => {
+      input.transporterCompanyName = companyInput.name;
+      input.transporterCompanyAddress = companyInput.address;
+    }
+  },
+  {
+    siret: input?.destinationCompanySiret,
+    skip: sealedFields.includes("destinationCompanySiret"),
+    setter: (input: Prisma.BsffCreateInput, companyInput: CompanyInput) => {
+      input.destinationCompanyName = companyInput.name;
+      input.destinationCompanyAddress = companyInput.address;
+    }
+  }
+];
+
+export const sirenifyBsffCreateInput = nextBuildSirenify(
+  bsffCreateInputAccessors
 );

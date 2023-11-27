@@ -1,4 +1,5 @@
-import buildSirenify from "../companies/sirenify";
+import { Prisma } from "@prisma/client";
+import buildSirenify, { nextBuildSirenify } from "../companies/sirenify";
 import {
   CompanyInput,
   CreateFormInput,
@@ -119,4 +120,88 @@ const bsddTransporterInputAccessors = (input: TransporterInput) => [
 
 export const sirenifyTransporterInput = buildSirenify(
   bsddTransporterInputAccessors
+);
+
+// Careful! This takes a Prisma.FormCreateInput as input,
+// and not all possible use-cases are covered yet (ie, transporters.createMany, intermediaries.create etc.)
+const formCreateInputAccessors = (
+  formCreateInput: Prisma.FormCreateInput,
+  sealedFields: string[] = [] // Tranformations should not be run on sealed fields
+) => [
+  {
+    siret: formCreateInput?.emitterCompanySiret,
+    skip: sealedFields.includes("emitterCompanySiret"),
+    setter: (formCreateInput, companyInput: CompanyInput) => {
+      formCreateInput.emitterCompanyName = companyInput.name;
+      formCreateInput.emitterCompanyAddress = companyInput.address;
+    }
+  },
+  {
+    siret: formCreateInput?.traderCompanySiret,
+    skip: sealedFields.includes("traderCompanySiret"),
+    setter: (formCreateInput, companyInput: CompanyInput) => {
+      formCreateInput.traderCompanyName = companyInput.name;
+      formCreateInput.traderCompanyAddress = companyInput.address;
+    }
+  },
+  {
+    siret: formCreateInput?.recipientCompanySiret,
+    skip: sealedFields.includes("recipientCompanySiret"),
+    setter: (formCreateInput, companyInput: CompanyInput) => {
+      formCreateInput.recipientCompanyName = companyInput.name;
+      formCreateInput.recipientCompanyAddress = companyInput.address;
+    }
+  },
+  {
+    siret: formCreateInput?.brokerCompanySiret,
+    skip: sealedFields.includes("brokerCompanySiret"),
+    setter: (formCreateInput, companyInput: CompanyInput) => {
+      formCreateInput.brokerCompanyName = companyInput.name;
+      formCreateInput.brokerCompanyAddress = companyInput.address;
+    }
+  },
+  {
+    siret: formCreateInput?.ecoOrganismeSiret,
+    skip: sealedFields.includes("ecoOrganismeSiret"),
+    setter: (formCreateInput, companyInput: CompanyInput) => {
+      formCreateInput.ecoOrganismeName = companyInput.name;
+    }
+  },
+  ...(
+    (formCreateInput?.intermediaries?.createMany
+      ?.data as Prisma.IntermediaryFormAssociationCreateManyFormInput[]) ?? []
+  ).map((_, idx) => ({
+    siret: formCreateInput?.intermediaries?.createMany?.data![idx].siret,
+    skip: sealedFields.includes("intermediaryCompanySiret"),
+    setter: (formCreateInput, companyInput: CompanyInput) => {
+      const intermediary =
+        formCreateInput?.intermediaries?.createMany?.data![idx];
+
+      intermediary.name = companyInput.name;
+      intermediary.address = companyInput.address;
+    }
+  })),
+  {
+    siret: (
+      formCreateInput?.transporters
+        ?.create as Prisma.BsddTransporterCreateWithoutFormInput
+    )?.transporterCompanySiret,
+    skip:
+      !formCreateInput?.transporters?.create ||
+      !(
+        formCreateInput?.transporters
+          ?.create as Prisma.BsddTransporterCreateWithoutFormInput
+      )?.transporterCompanySiret ||
+      sealedFields.includes("transporterCompanySiret"),
+    setter: (formCreateInput, companyInput: CompanyInput) => {
+      formCreateInput.transporters.create.transporterCompanyName =
+        companyInput.name;
+      formCreateInput.transporters.create.transporterCompanyAddress =
+        companyInput.address;
+    }
+  }
+];
+
+export const sirenifyFormCreateInput = nextBuildSirenify(
+  formCreateInputAccessors
 );

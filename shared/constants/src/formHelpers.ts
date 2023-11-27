@@ -13,8 +13,8 @@ const arraysEqual = (a1, a2) =>
 
 export const packagingsEqual = (p1, p2) =>
   arraysEqual(
-    (p1 ?? []).sort((p11, p12) => p11.type.localeCompare(p12.type)),
-    (p2 ?? []).sort((p21, p22) => p21.type.localeCompare(p22.type))
+    (p1 ? [...p1] : []).sort((p11, p12) => p11.type.localeCompare(p12.type)),
+    (p2 ? [...p2] : []).sort((p21, p22) => p21.type.localeCompare(p22.type))
   );
 
 function isObject(o) {

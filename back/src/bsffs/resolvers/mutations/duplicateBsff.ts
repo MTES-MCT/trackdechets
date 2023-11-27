@@ -7,6 +7,7 @@ import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { Bsff, BsffStatus, Prisma } from "@prisma/client";
 import { getBsffRepository } from "../../repository";
 import prisma from "../../../prisma";
+import { sirenifyBsffCreateInput } from "../../sirenify";
 
 const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
   _,
@@ -81,8 +82,10 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
 
   const { create: createBsff } = getBsffRepository(user);
 
+  const sirenified = await sirenifyBsffCreateInput(createInput, []);
+
   const duplicatedBsff = await createBsff(
-    { data: createInput },
+    { data: sirenified },
     {
       duplicate: { id: existingBsff.id }
     }

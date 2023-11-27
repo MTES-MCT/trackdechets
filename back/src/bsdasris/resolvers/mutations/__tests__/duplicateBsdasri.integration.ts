@@ -6,10 +6,16 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
-import { Mutation } from "../../../../generated/graphql/types";
+import {
+  CompanySearchResult,
+  Mutation
+} from "../../../../generated/graphql/types";
 import { BsdasriType } from "@prisma/client";
 import prisma from "../../../../prisma";
 import { xDaysAgo } from "../../../../utils";
+import { searchCompany } from "../../../../companies/search";
+
+jest.mock("../../../../companies/search");
 
 const TODAY = new Date();
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
@@ -318,5 +324,104 @@ describe("Mutation.duplicateBsdasri", () => {
     expect(duplicatedBsdasri2.transporterRecepisseNumber).toBeNull();
     expect(duplicatedBsdasri2.transporterRecepisseValidityLimit).toBeNull();
     expect(duplicatedBsdasri2.transporterRecepisseDepartment).toBeNull();
+  });
+
+  test("duplicated BSDASRI should have the updated SIRENE data when company info changes", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporterCompany = await companyFactory({
+      transporterReceipt: {
+        create: {
+          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString(),
+          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+    const transporterReceipt =
+      await prisma.transporterReceipt.findUniqueOrThrow({
+        where: { id: transporterCompany.transporterReceiptId! }
+      });
+    const destinationCompany = await companyFactory();
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        emitterCompanyAddress: emitter.company.address,
+        emitterCompanyContact: emitter.company.contact,
+        emitterCompanyMail: emitter.company.contactEmail,
+        emitterCompanyPhone: emitter.company.contactPhone,
+        transporterCompanySiret: transporterCompany.siret,
+        transporterCompanyName: transporterCompany.name,
+        transporterCompanyAddress: transporterCompany.address,
+        transporterCompanyContact: transporterCompany.contact,
+        transporterCompanyMail: transporterCompany.contactEmail,
+        transporterCompanyPhone: transporterCompany.contactPhone,
+        transporterRecepisseNumber: transporterReceipt.receiptNumber,
+        transporterRecepisseDepartment: transporterReceipt.department,
+        transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+        destinationCompanySiret: destinationCompany.siret,
+        destinationCompanyName: destinationCompany.name,
+        destinationCompanyAddress: destinationCompany.address,
+        destinationCompanyContact: destinationCompany.contact,
+        destinationCompanyMail: destinationCompany.contactEmail,
+        destinationCompanyPhone: destinationCompany.contactPhone
+      }
+    });
+    const { mutate } = makeClient(emitter.user);
+
+    function searchResult(companyName: string) {
+      return {
+        name: `updated ${companyName} name`,
+        address: `updated ${companyName} address`,
+        statutDiffusionEtablissement: "O"
+      } as CompanySearchResult;
+    }
+
+    const searchResults = {
+      [emitter.company.siret!]: searchResult("emitter"),
+      [transporterCompany.siret!]: searchResult("transporter"),
+      [destinationCompany.siret!]: searchResult("destination")
+    };
+
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
+      return Promise.resolve(searchResults[clue]);
+    });
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
+      DUPLICATE_DASRI,
+      {
+        variables: {
+          id: bsdasri.id
+        }
+      }
+    );
+
+    const duplicatedBsdasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: data.duplicateBsdasri.id }
+    });
+
+    // Emitter
+    expect(duplicatedBsdasri.emitterCompanyName).toEqual(
+      "updated emitter name"
+    );
+    expect(duplicatedBsdasri.emitterCompanyAddress).toEqual(
+      "updated emitter address"
+    );
+
+    // Transporter
+    expect(duplicatedBsdasri.transporterCompanyName).toEqual(
+      "updated transporter name"
+    );
+    expect(duplicatedBsdasri.transporterCompanyAddress).toEqual(
+      "updated transporter address"
+    );
+
+    // Destination
+    expect(duplicatedBsdasri.destinationCompanyName).toEqual(
+      "updated destination name"
+    );
+    expect(duplicatedBsdasri.destinationCompanyAddress).toEqual(
+      "updated destination address"
+    );
   });
 });

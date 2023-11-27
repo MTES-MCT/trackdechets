@@ -2,6 +2,7 @@ import { UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
+  CompanySearchResult,
   Mutation,
   MutationDuplicateBsffArgs
 } from "../../../../generated/graphql/types";
@@ -10,6 +11,9 @@ import makeClient from "../../../../__tests__/testClient";
 import { createBsff } from "../../../__tests__/factories";
 import { xDaysAgo } from "../../../../utils";
 import prisma from "../../../../prisma";
+import { searchCompany } from "../../../../companies/search";
+
+jest.mock("../../../../companies/search");
 
 const TODAY = new Date();
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
@@ -269,5 +273,76 @@ describe("Mutation.duplicateBsff", () => {
     expect(duplicatedBsff2.transporterRecepisseNumber).toBeNull();
     expect(duplicatedBsff2.transporterRecepisseValidityLimit).toBeNull();
     expect(duplicatedBsff2.transporterRecepisseDepartment).toBeNull();
+  });
+
+  test("duplicated BSFF should have the updated SIRENE data when company info changes", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+
+    const transporter = await userWithCompanyFactory("MEMBER", {
+      transporterReceipt: {
+        create: {
+          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString(),
+          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsff = await createBsff({ emitter, transporter, destination });
+    const { mutate } = makeClient(emitter.user);
+
+    function searchResult(companyName: string) {
+      return {
+        name: `updated ${companyName} name`,
+        address: `updated ${companyName} address`,
+        statutDiffusionEtablissement: "O"
+      } as CompanySearchResult;
+    }
+
+    const searchResults = {
+      [emitter.company.siret!]: searchResult("emitter"),
+      [transporter.company.siret!]: searchResult("transporter"),
+      [destination.company.siret!]: searchResult("destination")
+    };
+
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
+      return Promise.resolve(searchResults[clue]);
+    });
+
+    const { data } = await mutate<
+      Pick<Mutation, "duplicateBsff">,
+      MutationDuplicateBsffArgs
+    >(DUPLICATE_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+
+    const duplicatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: data.duplicateBsff.id }
+    });
+
+    // Emitter
+    expect(duplicatedBsff.emitterCompanyName).toEqual("updated emitter name");
+    expect(duplicatedBsff.emitterCompanyAddress).toEqual(
+      "updated emitter address"
+    );
+
+    // Transporter
+    expect(duplicatedBsff.transporterCompanyName).toEqual(
+      "updated transporter name"
+    );
+    expect(duplicatedBsff.transporterCompanyAddress).toEqual(
+      "updated transporter address"
+    );
+
+    // Destination
+    expect(duplicatedBsff.destinationCompanyName).toEqual(
+      "updated destination name"
+    );
+    expect(duplicatedBsff.destinationCompanyAddress).toEqual(
+      "updated destination address"
+    );
   });
 });

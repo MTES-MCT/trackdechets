@@ -1,6 +1,9 @@
 import { Prisma, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Mutation } from "../../../../generated/graphql/types";
+import {
+  CompanySearchResult,
+  Mutation
+} from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
   companyFactory,
@@ -16,6 +19,9 @@ import {
   getFirstTransporter,
   getFirstTransporterSync
 } from "../../../database";
+import { searchCompany } from "../../../../companies/search";
+
+jest.mock("../../../../companies/search");
 
 const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
@@ -454,7 +460,7 @@ describe("Mutation.duplicateForm", () => {
     } = forwardedIn ?? {};
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+    const { data, errors } = await mutate<Pick<Mutation, "duplicateForm">>(
       DUPLICATE_FORM,
       {
         variables: {
@@ -462,6 +468,9 @@ describe("Mutation.duplicateForm", () => {
         }
       }
     );
+
+    expect(errors).toBeUndefined();
+
     const duplicatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: data.duplicateForm.id }
     });
@@ -824,6 +833,24 @@ describe("Mutation.duplicateForm", () => {
       }
     });
 
+    // No SIRENE data, just return DB objects
+    (searchCompany as jest.Mock).mockImplementation(async (clue: string) => {
+      const company = await prisma.company.findFirstOrThrow({
+        where: { orgId: clue },
+        include: {
+          transporterReceipt: true,
+          brokerReceipt: true,
+          workerCertification: true
+        }
+      });
+
+      return {
+        name: company.name,
+        address: company.address,
+        statutDiffusionEtablissement: "O"
+      } as CompanySearchResult;
+    });
+
     const { mutate } = makeClient(emitter.user);
     const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
       DUPLICATE_FORM,
@@ -1024,6 +1051,195 @@ describe("Mutation.duplicateForm", () => {
       );
       expect(duplicatedForwardedIn?.recipientCompanyMail).toEqual(
         "UPDATED-DESTINATION-MAIL"
+      );
+    }
+  );
+
+  test("duplicated BSDD should have the updated SIRENE data when company info changes", async () => {
+    const intermediary1 = await companyFactory();
+    const intermediary2 = await companyFactory();
+    const { form, emitter, transporter, recipient, trader, broker } =
+      await createForm({
+        intermediaries: {
+          createMany: {
+            data: [
+              {
+                name: intermediary1.name,
+                siret: intermediary1.siret ?? "",
+                address: intermediary1.address,
+                contact: intermediary1.contact ?? ""
+              },
+              {
+                name: intermediary2.name,
+                siret: intermediary2.siret ?? "",
+                address: intermediary2.address,
+                contact: intermediary2.contact ?? ""
+              }
+            ]
+          }
+        }
+      });
+
+    function searchResult(companyName: string) {
+      return {
+        name: `updated ${companyName} name`,
+        address: `updated ${companyName} address`,
+        statutDiffusionEtablissement: "O"
+      } as CompanySearchResult;
+    }
+
+    const searchResults = {
+      [emitter.company.siret!]: searchResult("emitter"),
+      [transporter.company.siret!]: searchResult("transporter"),
+      [recipient.company.siret!]: searchResult("recipient"),
+      [trader.company.siret!]: searchResult("trader"),
+      [broker.company.siret!]: searchResult("broker"),
+      [intermediary1.siret!]: searchResult("intermediary1"),
+      [intermediary2.siret!]: searchResult("intermediary2")
+    };
+
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
+      return Promise.resolve(searchResults[clue]);
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<Pick<Mutation, "duplicateForm">>(
+      DUPLICATE_FORM,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+
+    expect(errors).toBeUndefined();
+
+    const duplicatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.duplicateForm.id },
+      include: { transporters: true, intermediaries: true }
+    });
+
+    const duplicatedTransporter = getFirstTransporterSync(duplicatedForm);
+
+    // Emitter
+    expect(duplicatedForm.emitterCompanyName).toEqual("updated emitter name");
+    expect(duplicatedForm.emitterCompanyAddress).toEqual(
+      "updated emitter address"
+    );
+
+    // Transporter
+    expect(duplicatedTransporter?.transporterCompanyName).toEqual(
+      "updated transporter name"
+    );
+    expect(duplicatedTransporter?.transporterCompanyAddress).toEqual(
+      "updated transporter address"
+    );
+
+    // Recipient
+    expect(duplicatedForm.recipientCompanyName).toEqual(
+      "updated recipient name"
+    );
+    expect(duplicatedForm.recipientCompanyAddress).toEqual(
+      "updated recipient address"
+    );
+
+    // Trader
+    expect(duplicatedForm.traderCompanyName).toEqual("updated trader name");
+    expect(duplicatedForm.traderCompanyAddress).toEqual(
+      "updated trader address"
+    );
+
+    // Broker
+    expect(duplicatedForm.brokerCompanyName).toEqual("updated broker name");
+    expect(duplicatedForm.brokerCompanyAddress).toEqual(
+      "updated broker address"
+    );
+
+    // Intermediaries
+    expect(duplicatedForm.intermediaries[0].name).toEqual(
+      "updated intermediary1 name"
+    );
+    expect(duplicatedForm.intermediaries[0].address).toEqual(
+      "updated intermediary1 address"
+    );
+    expect(duplicatedForm.intermediaries[1].name).toEqual(
+      "updated intermediary2 name"
+    );
+    expect(duplicatedForm.intermediaries[1].address).toEqual(
+      "updated intermediary2 address"
+    );
+  });
+
+  test(
+    "duplicated BSDD with temp storage should have updated data" +
+      " in temp storage detail when company SIRENE info changes",
+    async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const ttr = await companyFactory();
+      const destination = await companyFactory();
+      const form = await formWithTempStorageFactory({
+        ownerId: user.id,
+        opt: { emitterCompanySiret: company.siret },
+        forwardedInOpts: {
+          emitterCompanySiret: ttr.siret,
+          emitterCompanyName: ttr.name,
+          emitterCompanyAddress: ttr.address,
+          emitterCompanyContact: ttr.contact,
+          emitterCompanyPhone: ttr.contactPhone,
+          emitterCompanyMail: ttr.contactEmail,
+          recipientCompanySiret: destination.siret,
+          recipientCompanyName: destination.name,
+          recipientCompanyAddress: destination.address,
+          recipientCompanyContact: destination.contact,
+          recipientCompanyPhone: destination.contactPhone,
+          recipientCompanyMail: destination.contactEmail
+        }
+      });
+      const { mutate } = makeClient(user);
+
+      function searchResult(companyName: string) {
+        return {
+          name: `updated ${companyName} name`,
+          address: `updated ${companyName} address`,
+          statutDiffusionEtablissement: "O"
+        } as CompanySearchResult;
+      }
+
+      const searchResults = {
+        [ttr.siret!]: searchResult("ttr"),
+        [destination.siret!]: searchResult("destination")
+      };
+
+      (searchCompany as jest.Mock).mockImplementation((clue: string) => {
+        return Promise.resolve(searchResults[clue]);
+      });
+
+      const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+        DUPLICATE_FORM,
+        {
+          variables: {
+            id: form.id
+          }
+        }
+      );
+      const duplicatedForwardedIn = await prisma.form
+        .findUniqueOrThrow({
+          where: { id: data.duplicateForm.id }
+        })
+        .forwardedIn();
+
+      expect(duplicatedForwardedIn?.emitterCompanyName).toEqual(
+        "updated ttr name"
+      );
+      expect(duplicatedForwardedIn?.emitterCompanyAddress).toEqual(
+        "updated ttr address"
+      );
+
+      expect(duplicatedForwardedIn?.recipientCompanyName).toEqual(
+        "updated destination name"
+      );
+      expect(duplicatedForwardedIn?.recipientCompanyAddress).toEqual(
+        "updated destination address"
       );
     }
   );
