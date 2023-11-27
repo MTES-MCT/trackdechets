@@ -416,12 +416,6 @@ const Intermediaries = ({ intermediaries }) => (
   </>
 );
 
-const displayArrayElementsCount = elements => {
-  if (!elements || !elements.length || elements.length < 10) return null;
-
-  return `(${elements.length})`;
-};
-
 export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
