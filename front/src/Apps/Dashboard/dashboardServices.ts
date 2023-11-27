@@ -196,6 +196,9 @@ const isSameSiretDestination = (
   bsd: BsdDisplay
 ): boolean => currentSiret === bsd.destination?.company?.siret;
 
+const isSameSiretWorker = (currentSiret: string, bsd: BsdDisplay): boolean =>
+  currentSiret === bsd.worker?.company?.siret;
+
 export const isSameSiretTransporter = (
   currentSiret: string,
   bsd: BsdDisplay | Form
@@ -1114,7 +1117,10 @@ export const canReviewBsdd = (bsd, siret) =>
 export const canReviewBsd = (bsd, siret) => {
   const isTransporter = isSameSiretTransporter(siret, bsd);
   const isDestination = isSameSiretDestination(siret, bsd);
-  const isTransporterOnly = isTransporter && !isDestination;
+  const isProducer = isSameSiretEmmiter(siret, bsd);
+  const isWorker = isSameSiretWorker(siret, bsd);
+  const isTransporterOnly =
+    isTransporter && !isDestination && !isProducer && !isWorker;
 
   return (
     (canReviewBsdd(bsd, siret) || canReviewBsda(bsd, siret)) &&
