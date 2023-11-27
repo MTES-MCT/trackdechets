@@ -1,6 +1,6 @@
 import { ApolloServerPlugin } from "@apollo/server";
 import { GraphQLContext } from "../../types";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 import {
   MutationResolvers,
   QueryResolvers

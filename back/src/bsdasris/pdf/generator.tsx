@@ -3,7 +3,11 @@ import * as QRCode from "qrcode";
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
 import { generatePdf } from "../../common/pdf";
-import { expandBsdasriFromDB, expandSynthesizingDasri } from "../converter";
+import {
+  expandBsdasriFromDB,
+  expandGroupingDasri,
+  expandSynthesizingDasri
+} from "../converter";
 import prisma from "../../prisma";
 import { BsdasriPdf } from "./components/BsdasriPdf";
 import { emptyValues } from "../../common/pdf/utils";
@@ -23,7 +27,7 @@ const getAssociatedBsdasris = async (bsdasri: Bsdasri) => {
         groupedInId: bsdasri.id
       }
     });
-    return associated.map(bsd => expandSynthesizingDasri(bsd));
+    return associated.map(bsd => expandGroupingDasri(bsd));
   }
   return null;
 };

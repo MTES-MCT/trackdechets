@@ -8,11 +8,11 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { sendMail } from "../../../mailer/mailing";
 import {
+  renderMail,
   onboardingFirstStep,
   verificationDone,
   verifiedForeignTransporterCompany
-} from "../../../mailer/templates";
-import { renderMail } from "../../../mailer/templates/renderers";
+} from "@td/mail";
 import prisma from "../../../prisma";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
 import { isForeignVat } from "shared/constants";

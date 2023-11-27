@@ -6,7 +6,7 @@ import {
 import { aesDecrypt } from "../../utils";
 import { WebhookQueueItem } from "../producers/webhooks";
 import { Job } from "bull";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 
 class WebhookRequestError extends Error {
   constructor(message: string) {

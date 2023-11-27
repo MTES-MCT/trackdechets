@@ -36,7 +36,7 @@ resource "scalingo_app" "front" {
   name = "trackdechets-${var.scalingo_app_name}-front"
 
   environment = {
-    PROJECT_DIR="front"
+    PROCFILE="apps/Procfile.front"
     NO_INDEX="true"
     BUILD_ENV="recette"
     VITE_ALLOW_TEST_COMPANY="true"
@@ -57,6 +57,7 @@ resource "scalingo_app" "api" {
   name = "trackdechets-${var.scalingo_app_name}-api"
 
   environment = merge({
+    PROCFILE="apps/Procfile.back"
     API_PORT="$PORT"
     API_HOST="api.${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
     UI_HOST="${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
@@ -64,7 +65,6 @@ resource "scalingo_app" "api" {
     REDIS_URL="$SCALINGO_REDIS_URL"
     ELASTIC_SEARCH_URL="$SCALINGO_ELASTICSEARCH_URL"
     DATABASE_URL="$SCALINGO_POSTGRESQL_URL"
-    PROJECT_DIR="back"
     NPM_CONFIG_PRODUCTION="false"
     TZ="Europe/Paris"
     API_URL_SCHEME="https"
@@ -87,14 +87,13 @@ resource "scalingo_app" "notifier" {
   name = "trackdechets-${var.scalingo_app_name}-notifier"
 
   environment = {
-    STARTUP_FILE="dist/src/notifier/index.js"
+    PROCFILE="apps/Procfile.notifier"
     NOTIFIER_PORT="$PORT"
     NOTIFIER_HOST="notifier.${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
     UI_HOST="${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
     UI_URL_SCHEME="https"
     REDIS_URL="${lookup(scalingo_app.api.all_environment, "SCALINGO_REDIS_URL", "n/c")}"
     NODE_ENV="demo"
-    PROJECT_DIR="back"
     NPM_CONFIG_PRODUCTION="false"
     TZ="Europe/Paris"
   }

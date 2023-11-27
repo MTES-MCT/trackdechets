@@ -14,6 +14,7 @@ describe("sirenify", () => {
     const transporter = await userWithCompanyFactory("MEMBER");
     const destination = await userWithCompanyFactory("MEMBER");
     const worker = await userWithCompanyFactory("MEMBER");
+    const broker = await userWithCompanyFactory("MEMBER");
     const intermediary1 = await userWithCompanyFactory("MEMBER");
     const intermediary2 = await userWithCompanyFactory("MEMBER");
 
@@ -30,6 +31,7 @@ describe("sirenify", () => {
       [transporter.company.siret!]: searchResult("transporteur"),
       [destination.company.siret!]: searchResult("destinataire"),
       [worker.company.siret!]: searchResult("courtier"),
+      [broker.company.siret!]: searchResult("broker"),
       [intermediary1.company.siret!]: searchResult("intermédiaire 1"),
       [intermediary2.company.siret!]: searchResult("intermédiaire 2")
     };
@@ -51,6 +53,9 @@ describe("sirenify", () => {
       workerCompanySiret: worker.company.siret,
       workerCompanyName: "N'importe",
       workerCompanyAddress: "Nawak",
+      brokerCompanySiret: broker.company.siret,
+      brokerCompanyName: "N'importe",
+      brokerCompanyAddress: "Nawak",
       intermediaries: [
         {
           siret: intermediary1.company.siret,
@@ -93,6 +98,12 @@ describe("sirenify", () => {
     expect(sirenified.workerCompanyAddress).toEqual(
       searchResults[worker.company.siret!].address
     );
+    expect(sirenified.brokerCompanyName).toEqual(
+      searchResults[broker.company.siret!].name
+    );
+    expect(sirenified.brokerCompanyAddress).toEqual(
+      searchResults[broker.company.siret!].address
+    );
     expect(sirenified.intermediaries![0].name).toEqual(
       searchResults[intermediary1.company.siret!].name
     );
@@ -112,6 +123,7 @@ describe("sirenify", () => {
     const transporter = await userWithCompanyFactory("MEMBER");
     const destination = await userWithCompanyFactory("MEMBER");
     const worker = await userWithCompanyFactory("MEMBER");
+    const broker = await userWithCompanyFactory("MEMBER");
     const intermediary1 = await userWithCompanyFactory("MEMBER");
     const intermediary2 = await userWithCompanyFactory("MEMBER");
 
@@ -128,6 +140,7 @@ describe("sirenify", () => {
       [transporter.company.siret!]: searchResult("transporteur"),
       [destination.company.siret!]: searchResult("destinataire"),
       [worker.company.siret!]: searchResult("courtier"),
+      [broker.company.siret!]: searchResult("broker"),
       [intermediary1.company.siret!]: searchResult("intermédiaire 1"),
       [intermediary2.company.siret!]: searchResult("intermédiaire 2")
     };
@@ -141,6 +154,7 @@ describe("sirenify", () => {
       transporterCompanySiret: transporter.company.siret,
       destinationCompanySiret: destination.company.siret,
       workerCompanySiret: worker.company.siret,
+      brokerCompanySiret: broker.company.siret,
       intermediaries: [
         {
           siret: intermediary1.company.siret
@@ -177,6 +191,12 @@ describe("sirenify", () => {
     expect(sirenified.workerCompanyAddress).toEqual(
       searchResults[worker.company.siret!].address
     );
+    expect(sirenified.brokerCompanyName).toEqual(
+      searchResults[broker.company.siret!].name
+    );
+    expect(sirenified.brokerCompanyAddress).toEqual(
+      searchResults[broker.company.siret!].address
+    );
     expect(sirenified.intermediaries![0].name).toEqual(
       searchResults[intermediary1.company.siret!].name
     );
@@ -196,6 +216,7 @@ describe("sirenify", () => {
     const transporter = await userWithCompanyFactory("MEMBER");
     const destination = await userWithCompanyFactory("MEMBER");
     const worker = await userWithCompanyFactory("MEMBER");
+    const broker = await userWithCompanyFactory("MEMBER");
     const intermediary1 = await userWithCompanyFactory("MEMBER");
     const intermediary2 = await userWithCompanyFactory("MEMBER");
 
@@ -212,6 +233,7 @@ describe("sirenify", () => {
       [transporter.company.siret!]: searchResult("transporteur"),
       [destination.company.siret!]: searchResult("destinataire"),
       [worker.company.siret!]: searchResult("courtier"),
+      [broker.company.siret!]: searchResult("broker"),
       [intermediary1.company.siret!]: searchResult("intermédiaire 1"),
       [intermediary2.company.siret!]: searchResult("intermédiaire 2")
     };
@@ -233,6 +255,9 @@ describe("sirenify", () => {
       workerCompanySiret: worker.company.siret,
       workerCompanyName: "N'importe",
       workerCompanyAddress: "Nawak",
+      brokerCompanySiret: broker.company.siret,
+      brokerCompanyName: "N'importe",
+      brokerCompanyAddress: "Nawak",
       intermediaries: [
         {
           siret: intermediary1.company.siret,
@@ -276,6 +301,12 @@ describe("sirenify", () => {
     );
     expect(sirenified.workerCompanyAddress).toEqual(
       searchResults[worker.company.siret!].address
+    );
+    expect(sirenified.brokerCompanyName).toEqual(
+      searchResults[broker.company.siret!].name
+    );
+    expect(sirenified.brokerCompanyAddress).toEqual(
+      searchResults[broker.company.siret!].address
     );
     expect(sirenified.intermediaries![0].name).toEqual(
       searchResults[intermediary1.company.siret!].name

@@ -9,11 +9,11 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { associateUserToCompany } from "../../../database";
-import { renderMail } from "../../../../mailer/templates/renderers";
 import {
   membershipRequestConfirmation,
-  membershipRequest as membershipRequestMail
-} from "../../../../mailer/templates";
+  membershipRequest as membershipRequestMail,
+  renderMail
+} from "@td/mail";
 import { Mutation } from "../../../../generated/graphql/types";
 import { subMinutes } from "date-fns";
 
