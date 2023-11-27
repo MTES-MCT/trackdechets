@@ -43,13 +43,13 @@ l'API Trackdéchets fait appel à plusieurs services externes :
 - MySendingBox pour l'envoi de courrier papier.
 - Serveur Gotenberg (auto-hébergé) pour le rendu des PDFs
 - Serveur Metabase (auto-hebergé) pour les analytics
-- Serveur Dash (auto-hebergé) pour les stats publiques
+- Application distincte (auto-hebergée) pour les stats publiques
 
 ## Infrastructure
 
 L'applicatif et les bases de données sont hebergés en mode PaaS chez Scalingo.
 
-![Infra TD](https://user-images.githubusercontent.com/2269165/154451580-e601abb4-40a2-41a6-9727-ff9b446a3594.png)
+![Infra TD](./archi-nov-2023.png)
 
 ## Outillage
 

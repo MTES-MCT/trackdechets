@@ -7,8 +7,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { renderMail } from "../../../../mailer/templates/renderers";
-import { membershipRequestAccepted } from "../../../../mailer/templates";
+import { renderMail, membershipRequestAccepted } from "@td/mail";
 import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails

@@ -1,1 +1,0 @@
-web: bash front/bin/start.sh

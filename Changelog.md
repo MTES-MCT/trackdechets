@@ -5,6 +5,22 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.12.1] 12/12/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Complétion des informations légales lors de l'ajout d'un transporteur via `createFormTransporter` et `updateFormTransporter` [PR 2861](https://github.com/MTES-MCT/trackdechets/pull/2861)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Rendre accessibles les champs `takenOverAt` et `takenOverAt` via l'objet Transporter (BSDD). [PR 2865](https://github.com/MTES-MCT/trackdechets/pull/2865)
+
+#### :house: Interne
+
 # [2023.11.1] 21/11/2023
 
 #### :rocket: Nouvelles fonctionnalités

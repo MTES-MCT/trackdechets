@@ -13,6 +13,9 @@
         "{workspaceRoot}/.eslintignore",
         "{workspaceRoot}/eslint.config.js"
       ]
+    },
+    "build-storybook": {
+      "cache": true
     }
   },
   "workspaceLayout": {
@@ -38,5 +41,12 @@
       "projectNameAndRootFormat": "as-provided"
     }
   },
-  "nxCloudAccessToken": "ZTY4ZmZjODUtYTk5Ni00ZGZlLWJjNmMtZjMwN2MwZGM3ODg0fHJlYWQ="
+  "nxCloudAccessToken": "ZTY4ZmZjODUtYTk5Ni00ZGZlLWJjNmMtZjMwN2MwZGM3ODg0fHJlYWQ=",
+  "tasksRunnerOptions": {
+    "default": {
+      "options": {
+        "cacheableOperations": ["build-storybook"]
+      }
+    }
+  }
 }

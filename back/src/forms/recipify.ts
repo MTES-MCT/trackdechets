@@ -1,7 +1,8 @@
 import {
   FormInput,
   ResealedFormInput,
-  NextSegmentInfoInput
+  NextSegmentInfoInput,
+  TransporterInput
 } from "../generated/graphql/types";
 
 import { recipifyGeneric } from "../companies/recipify";
@@ -85,6 +86,26 @@ const transportSegmentInputAccessors = (input: NextSegmentInfoInput) => [
 
 export const recipifyTransportSegmentInput = recipifyGeneric(
   transportSegmentInputAccessors
+);
+
+const transporterInputAccessors = (input: TransporterInput) => [
+  {
+    getter: () => (input.isExemptedOfReceipt !== true ? input.company : null),
+    setter: (
+      input: TransporterInput,
+      transporterAutocompleted: Receipt
+    ): TransporterInput => {
+      const { number, department, validityLimit } = transporterAutocompleted;
+      return {
+        ...input,
+        ...{ receipt: number, department, validityLimit }
+      };
+    }
+  }
+];
+
+export const recipifyTransporterInput = recipifyGeneric(
+  transporterInputAccessors
 );
 
 /**

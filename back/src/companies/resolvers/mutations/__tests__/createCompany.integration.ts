@@ -11,8 +11,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { geocode } from "../../../geo/geocode";
 import { CompanyType } from "@prisma/client";
-import { renderMail } from "../../../../mailer/templates/renderers";
-import { verificationProcessInfo } from "../../../../mailer/templates";
+import { renderMail, verificationProcessInfo } from "@td/mail";
 import {
   Mutation,
   StatutDiffusionEtablissement

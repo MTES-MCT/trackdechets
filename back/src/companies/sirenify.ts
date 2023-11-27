@@ -3,7 +3,7 @@ import { UserInputError } from "../common/errors";
 import { searchCompany } from "../companies/search";
 import { CompanySearchResult } from "../companies/types";
 import { CompanyInput } from "../generated/graphql/types";
-import logger from "../logging/logger";
+import { logger } from "@td/logger";
 import { escapeRegExp } from "../utils";
 
 /**

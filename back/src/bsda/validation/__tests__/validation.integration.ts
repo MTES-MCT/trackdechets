@@ -72,6 +72,23 @@ describe("BSDA validation", () => {
       expect(success).toBe(true);
     });
 
+    it("transporter recepisse is not required if transport mode is not ROAD", async () => {
+      const data = {
+        ...bsda,
+        transporterRecepisseNumber: null,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "AIR"
+      };
+
+      await parseBsdaInContext(
+        { persisted: data as any },
+        {
+          currentSignatureType: "TRANSPORT"
+        }
+      );
+    });
+
     it("transporter plate is not required if transport mode is not ROAD", async () => {
       const data = {
         ...bsda,
@@ -490,7 +507,29 @@ describe("BSDA validation", () => {
         const res = await parseBsdaInContext(
           { persisted: data as any },
           {
-            currentSignatureType: "OPERATION"
+            currentSignatureType: "EMISSION"
+          }
+        );
+        expect(res).not.toBeUndefined();
+      }
+    );
+
+    test.each([
+      ["R 5", "REUTILISATION"],
+      ["R 13", undefined]
+    ])(
+      "should work if operation code & mode are compatible (code: %p, mode: %p)",
+      async (code, mode) => {
+        const data = {
+          ...bsda,
+          destinationOperationCode: code,
+          destinationOperationMode: mode
+        };
+
+        const res = await parseBsdaInContext(
+          { persisted: data as any },
+          {
+            currentSignatureType: "TRANSPORT"
           }
         );
         expect(res).not.toBeUndefined();
@@ -525,6 +564,22 @@ describe("BSDA validation", () => {
       }
     );
 
+    test("should not fail if operation code has associated operation modes but none is specified", async () => {
+      const data = {
+        ...bsda,
+        destinationOperationCode: "R 5",
+        destinationOperationMode: undefined
+      };
+
+      expect.assertions(1);
+
+      const res = await parseBsdaInContext(
+        { persisted: data as any },
+        { currentSignatureType: "EMISSION" }
+      );
+      expect(res).not.toBeUndefined();
+    });
+
     test("should fail if operation code has associated operation modes but none is specified", async () => {
       const data = {
         ...bsda,
@@ -542,7 +597,7 @@ describe("BSDA validation", () => {
       } catch (err) {
         expect(err.errors.length).toBeTruthy();
         expect(err.errors[0].message).toBe(
-          "Vous devez préciser un mode de traitement"
+          "Le mode de traitement est obligatoire."
         );
       }
     });

@@ -1,11 +1,11 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
 import { isTransporterRefinement } from "../../common/validation/siret";
-import { BsdaSignatureType } from "../../generated/graphql/types";
 import { getReadonlyBsdaRepository } from "../repository";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { BsdaValidationContext } from "./index";
 import { ZodBsda } from "./schema";
+import { BsdaSignatureType } from "../../generated/graphql/types";
 
 export async function applyDynamicRefinement(
   bsda: ZodBsda,
@@ -103,6 +103,9 @@ async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
   }
 
   if (
+    // This rule only applies to BSDA that have not been signed before 2023-11-23
+    (!bsda.emitterEmissionSignatureDate ||
+      bsda.emitterEmissionSignatureDate >= new Date("2023-11-23")) &&
     bsda.type === "GATHERING" &&
     previousBsdasWithDestination.some(
       previousBsda => previousBsda.wasteCode !== bsda.wasteCode
@@ -177,7 +180,8 @@ async function validateDestination(
   currentSignatureType: BsdaSignatureType | undefined,
   ctx: RefinementCtx
 ) {
-  // Destination is freeely editable until EMISSION signature.
+
+  // Destination is freely editable until EMISSION signature.
   // Once transported, destination is not editable for anyone.
   // This is enforced by the sealing rules
   if (

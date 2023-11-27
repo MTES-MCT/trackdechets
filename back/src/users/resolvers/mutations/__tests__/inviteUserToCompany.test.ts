@@ -1,9 +1,5 @@
 import { User } from "@prisma/client";
-import {
-  inviteUserToJoin,
-  notifyUserOfInvite
-} from "../../../../mailer/templates";
-import { renderMail } from "../../../../mailer/templates/renderers";
+import { inviteUserToJoin, notifyUserOfInvite, renderMail } from "@td/mail";
 import { siretify } from "../../../../__tests__/factories";
 import { inviteUserToCompanyFn as inviteUserToCompany } from "../inviteUserToCompanyService";
 
