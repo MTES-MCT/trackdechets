@@ -10,11 +10,11 @@ interface Props {
 const ExpandableList = ({ elements }: Props) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  if (!elements || !elements.length){
+  if (!elements || !elements.length) {
     return null;
-  } 
-  
-  if(elements.length <= DEFAULT_DISPLAY_NBR) {
+  }
+
+  if (elements.length <= DEFAULT_DISPLAY_NBR) {
     return elements.join(", ");
   }
 
