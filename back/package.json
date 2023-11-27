@@ -10,6 +10,7 @@
     "bulk-create-account": "tsx src/users/bulk-creation/index.ts",
     "reindex-partial-in-place": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexPartialInPlace.ts",
     "reindex-all-bsds-bulk": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexAllInBulk.ts",
+    "reindex-favorites": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexFavorites.ts",
     "reindex-bsd": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexBsd.ts $bsdId",
     "purge-pdf-token": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/purgePdfAccessToken.ts",
     "storeAllWebhookSettings.ts": "tsx --tsconfig tsconfig.lib.json ./src/webhooks/commands/storeAllWebhookSettings.ts"
