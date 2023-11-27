@@ -4,10 +4,10 @@ import React, { useState } from "react";
 const DEFAULT_DISPLAY_NBR = 10;
 
 interface Props {
-  elements: any[];
+  elements?: any[] | null;
 }
 
-const ExpandableList = ({ elements }: Props) => {
+const ExpandableList = ({ elements = [] }: Props) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   if (!elements || !elements.length) {
@@ -15,7 +15,7 @@ const ExpandableList = ({ elements }: Props) => {
   }
 
   if (elements.length <= DEFAULT_DISPLAY_NBR) {
-    return elements.join(", ");
+    return <>{elements.join(", ")}</>;
   }
 
   if (isExpanded) {
