@@ -55,14 +55,14 @@ fi
 psql_container_id=$(docker ps -qf name=^/trackdechets.postgres)
 
 # Wait for psql to be ready
-until PGPASSWORD="password" docker exec -t "$psql_container_id" bash -c "psql -U \"trackdechets\" -c '\q' 2>/dev/null"; do
+until PGPASSWORD="password" docker exec -t "$psql_container_id" bash -c "psql -U \"trackdechets\" -d postgres -c '\q' 2>/dev/null"; do
   >&2 echo "⏳ Postgres is unavailable - sleeping"
   sleep 1
 done
 
 echo "1/3 - Drop and Create prisma DB";
-docker exec -t "$psql_container_id" bash -c "psql -U trackdechets -c \"DROP DATABASE IF EXISTS $database;\"";
-docker exec -t "$psql_container_id" bash -c "psql -U trackdechets -c \"CREATE DATABASE $database;\"";
+docker exec -t "$psql_container_id" bash -c "psql -U trackdechets -d postgres -c \"DROP DATABASE IF EXISTS $database;\"";
+docker exec -t "$psql_container_id" bash -c "psql -U trackdechets -d postgres -c \"CREATE DATABASE $database;\"";
 
 echo "2/3 - Wait for Elastic Search";
 until curl -XGET "$ELASTIC_SEARCH_URL" 2> /dev/null; do
@@ -70,5 +70,7 @@ until curl -XGET "$ELASTIC_SEARCH_URL" 2> /dev/null; do
   sleep 1
 done
 
+# Escape $ sign in DATABASE_URL, otherwise NX tries to interpret it as a variable and schema becomes "default"
+DATABASE_URL="${DATABASE_URL//$/\\$}"
 echo "3/3 - Create tables & index";
 npx nx run back:"preintegration-tests"

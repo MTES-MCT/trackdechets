@@ -3,6 +3,7 @@
 # Helper to restore a DB backup locally
 # -------------------------------------
 
+BASEDIR=$(realpath "$0" | sed 's|\(.*\)/.*|\1|')
 psql_container_id=$(docker ps -qf name=^/trackdechets.postgres)
 
 read -erp $'\e[1m! Before running this script, make sure you closed all open connections to the DB (app, queue, notifier, SQL soft...)\e[m'
@@ -14,15 +15,15 @@ if [ "$downloadBackup" != "${downloadBackup#[Yy]}" ]; then
     echo -e "\e[90m"
 
     backupName="db_backup.pgsql"
-    backupPath="$(pwd)/$backupName"
+    backupPath="$BASEDIR/$backupName"
     backupTarName="db_backup.tar.gz"
-    backupTarPath="$(pwd)/$backupTarName"
+    backupTarPath="$BASEDIR/$backupTarName"
 
     node ./get-db-backup-link.js | xargs wget -O "$backupTarPath"
     tar xvf "$backupTarPath"
     for name in *pgsql
     do
-      mv $name $backupName
+      mv "$name" $backupName
     done
     rm $backupTarName
     echo -e "\e[m"
@@ -51,5 +52,12 @@ docker exec -t "$psql_container_id" bash -c "psql -U $psqlUser -d prisma -c 'CRE
 echo -e "\e[1m→ Restoring dump"
 docker exec -t "$psql_container_id" bash -c "pg_restore -U $psqlUser -d prisma --clean /tmp/dump.sql 2>/dev/null";
 
+PWD=$(pwd)
+if [ "$BASEDIR"  == "$PWD" ]; then
+  APP_DIR=$(dirname "$PWD")
+  echo -e "\e[1m→ Changing directory to $APP_DIR, as migrate needs to access envs\e[m"
+  cd "$APP_DIR" || exit
+fi
+
 echo -e "\e[1m→ Running SQL migrations"
-npx nx run back:"migrate:dev"
+npx nx run back:migrate
