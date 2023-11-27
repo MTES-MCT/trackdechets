@@ -6,7 +6,7 @@
     "update": "tsx --tsconfig tsconfig.lib.json prisma/scripts/index.ts",
     "migrate": "tsx --tsconfig tsconfig.lib.json prisma/migrate.ts",
     "check:migrations": "pg-validate-migrations ./prisma/migrations",
-    "preintegration-tests": "prisma db push && npm run reindex-all-bsds-bulk:dev",
+    "preintegration-tests": "prisma db push && npm run reindex-all-bsds-bulk",
     "bulk-create-account": "tsx src/users/bulk-creation/index.ts",
     "reindex-partial-in-place": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexPartialInPlace.ts",
     "reindex-all-bsds-bulk": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexAllInBulk.ts",
