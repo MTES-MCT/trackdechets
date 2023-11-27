@@ -3,8 +3,11 @@ import {
   companyFactory,
   transporterReceiptFactory
 } from "../../__tests__/factories";
+import { resetDatabase } from "../../../integration-tests/helper";
 
 describe("Bsdasri Recipify Module", () => {
+  afterAll(() => resetDatabase());
+
   it("recipify should correctly process input and return completedInput with transporter receipt", async () => {
     const company = await companyFactory();
     const mockInput = {
