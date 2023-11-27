@@ -40,7 +40,9 @@ export function BsddRequestRevisionCancelationInput({
   bsdd,
   onChange
 }: Props) {
-  const canBeCancelled = CANCELLABLE_BSDD_STATUSES.includes(bsdd.status);
+  const canBeCancelled =
+    CANCELLABLE_BSDD_STATUSES.includes(bsdd.status) &&
+    bsdd.emitter?.type !== "APPENDIX1";
 
   return (
     <Switch
