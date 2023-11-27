@@ -8,6 +8,8 @@ red=$(tput setaf 9)
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+USING_ENV_FILE=false
+
 if [ -z "$DATABASE_URL" ]
 then
   echo "${bold}! No ${green}\$DATABASE_URL${reset}${bold} env variable found.${reset}"
@@ -16,7 +18,7 @@ then
   sourceEnv=${sourceEnv:-Y}
 
   if [ "$sourceEnv" == "Y" ]; then
-
+    USING_ENV_FILE=true
     suggestedEnv="$(dirname "$SCRIPT_DIR")/.env.integration"
 
     while read -rp $"${bold}? Enter local env path [${reset} $suggestedEnv ${bold}] :${reset} " pathToEnv; do
@@ -31,6 +33,9 @@ then
           echo -"${red}$pathToEnv is not a valid path.${reset}"
       fi 
     done
+  else
+    echo "${bold}! You need to set the ${green}\$DATABASE_URL${reset}${bold} env variable.${reset}"
+    exit 1
   fi
 fi
 
@@ -55,20 +60,27 @@ fi
 psql_container_id=$(docker ps -qf name=^/trackdechets.postgres)
 
 # Wait for psql to be ready
-until PGPASSWORD="password" docker exec -t "$psql_container_id" bash -c "psql -U \"trackdechets\" -c '\q' 2>/dev/null"; do
+until PGPASSWORD="password" docker exec -t "$psql_container_id" bash -c "psql -U \"trackdechets\" -d postgres -c '\q' 2>/dev/null"; do
   >&2 echo "⏳ Postgres is unavailable - sleeping"
   sleep 1
 done
 
 echo "1/3 - Drop and Create prisma DB";
-docker exec -t "$psql_container_id" bash -c "psql -U trackdechets -c \"DROP DATABASE IF EXISTS $database;\"";
-docker exec -t "$psql_container_id" bash -c "psql -U trackdechets -c \"CREATE DATABASE $database;\"";
+docker exec -t "$psql_container_id" bash -c "psql -U trackdechets -d postgres -c \"DROP DATABASE IF EXISTS $database;\"";
+docker exec -t "$psql_container_id" bash -c "psql -U trackdechets -d postgres -c \"CREATE DATABASE $database;\"";
 
 echo "2/3 - Wait for Elastic Search";
 until curl -XGET "$ELASTIC_SEARCH_URL" 2> /dev/null; do
   >&2 echo "⏳ Elastic Search is unavailable - sleeping"
   sleep 1
 done
+
+# Escape $ sign in DATABASE_URL if the env has been loaded from a .env file
+# This is because NX expands env variables in .env files
+if [ "$USING_ENV_FILE" = true ] ; then
+  echo "Using env file, escaping \$ sign in DATABASE_URL"
+  DATABASE_URL="${DATABASE_URL//$/\\$}"
+fi
 
 echo "3/3 - Create tables & index";
 npx nx run back:"preintegration-tests"
