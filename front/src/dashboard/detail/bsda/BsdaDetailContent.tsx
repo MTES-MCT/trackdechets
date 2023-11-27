@@ -35,6 +35,7 @@ import { InitialBsdas } from "./InitialBsdas";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import EstimatedQuantityTooltip from "../../../common/components/EstimatedQuantityTooltip";
 import { BSDA_VERBOSE_STATUSES } from "shared/constants";
+import ExpandableList from "./ExpandableList";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -415,6 +416,12 @@ const Intermediaries = ({ intermediaries }) => (
   </>
 );
 
+const displayArrayElementsCount = elements => {
+  if (!elements || !elements.length || elements.length < 10) return null;
+
+  return `(${elements.length})`;
+};
+
 export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
@@ -504,7 +511,9 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             </dd>
 
             <dt>Scellés</dt>
-            <dd>{form?.waste?.sealNumbers?.join(", ")}</dd>
+            <dd>
+              <ExpandableList elements={form?.waste?.sealNumbers} />
+            </dd>
 
             <dt>Présence de POP</dt>
             <dd>{form?.waste?.pop ? "Oui" : "Non"}</dd>
@@ -513,8 +522,10 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
           <div className={styles.detailGrid}>
             {Boolean(form?.grouping?.length) && (
               <>
-                <dt>Bordereaux groupés:</dt>
-                <dd> {form?.grouping?.map(g => g.id).join(", ")}</dd>
+                <dt>Bordereaux groupés</dt>
+                <dd>
+                  <ExpandableList elements={form?.grouping?.map(g => g.id)} />
+                </dd>
               </>
             )}
           </div>
