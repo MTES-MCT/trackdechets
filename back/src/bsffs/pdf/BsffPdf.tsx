@@ -32,8 +32,8 @@ type Props = {
 };
 
 export function BsffPdf({ bsff, qrCode }: Props) {
-  const hasFicheInterventions = bsff.ficheInterventions?.length > 0;
-  const hasPreviousBsffs = bsff.previousBsffs?.length > 0;
+  const hasFicheInterventions = true;
+  const hasPreviousBsffs = true;
 
   return (
     <Document title={bsff.id}>
@@ -639,23 +639,18 @@ function BsffPackagingAcceptationOperation({ bsff }: Pick<Props, "bsff">) {
                   <BsffPackagingFull packaging={packaging} />
                 </td>
                 <td>
-                  {packaging?.acceptation?.signature?.date && (
+                  
                     <div className="Flex SpaceBetween">
                       <BsffPackagingAcceptation
                         bsff={bsff}
                         packaging={packaging}
                       />
-                      <SignatureStampSmall />
                     </div>
-                  )}
                 </td>
                 <td>
-                  {packaging?.operation?.signature?.date && (
                     <div className="Flex SpaceBetween">
                       <BsffPackagingOperation packaging={packaging} />
-                      <SignatureStampSmall />
                     </div>
-                  )}
                 </td>
               </tr>
             ))}

@@ -405,7 +405,6 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                       "de tournée dédiée"}{" "}
                     n° :
                   </strong>{" "}
-                  {groupedIn.map(bsd => bsd.readableId)}
                 </>
               )}
               {form.status === Status.CANCELED && <CancelationStamp />}
@@ -519,7 +518,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               <br />
               <input
                 type="checkbox"
-                checked={!form.temporaryStorageDetail}
+                checked={false}
                 readOnly
               />{" "}
               non
@@ -946,7 +945,6 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
         )}
       </div>
 
-      {form.transportSegments && form.transportSegments.length > 0 && (
         <div className="Page">
           <div className="BoxRow">
             <div className="BoxCol">
@@ -958,10 +956,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
 
           {(
             [
-              ...form.transportSegments,
-              ...Array.from({
-                length: 2 - form.transportSegments.length
-              }).fill(undefined)
+              {}, {}
             ] as Array<TransportSegment | undefined>
           ).map((transportSegment, index) => (
             <div className="BoxRow" key={index}>
@@ -981,7 +976,6 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </div>
           ))}
         </div>
-      )}
 
       {form.grouping && form.grouping.length > 0 && (
         <div className="Page">
