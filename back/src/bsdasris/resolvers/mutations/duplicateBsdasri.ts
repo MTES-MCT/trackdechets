@@ -55,6 +55,11 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     emitterEmissionSignatureDate,
     emitterEmissionSignatureAuthor,
 
+    emitterWasteWeightValue,
+    emitterWastePackagings,
+    emitterWasteWeightIsEstimate,
+    emitterWasteVolume,
+
     isEmissionDirectTakenOver,
     isEmissionTakenOverWithSecretCode,
 
@@ -104,10 +109,7 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
 
   const input: Prisma.BsdasriCreateInput = {
     ...fieldsToCopy,
-    emitterWastePackagings:
-      fieldsToCopy.emitterWastePackagings === null
-        ? Prisma.JsonNull
-        : fieldsToCopy.emitterWastePackagings,
+    emitterWastePackagings: Prisma.JsonNull,
     id: getReadableId(ReadableIdPrefix.DASRI),
     status: BsdasriStatus.INITIAL,
     isDraft: true,
