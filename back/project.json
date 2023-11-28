@@ -51,20 +51,6 @@
           "codeCoverage": false
         }
       }
-    },
-    "test-inte": {
-      "executor": "@nx/jest:jest",
-      "dependsOn": ["codegen"],
-      "options": {
-        "jestConfig": "back/integration-tests/jest.config.js",
-        "runInBand": true,
-        "forceExit": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true
-        }
-      }
     }
   },
   "tags": []
