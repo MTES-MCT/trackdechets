@@ -1,8 +1,7 @@
 import prisma from "../../../prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { renderMail } from "../../../mailer/templates/renderers";
-import { onSignup } from "../../../mailer/templates";
+import { onSignup, renderMail } from "@td/mail";
 import { object, string } from "yup";
 import { checkCaptcha } from "../../../captcha/captchaGen";
 import { UserInputError } from "../../../common/errors";

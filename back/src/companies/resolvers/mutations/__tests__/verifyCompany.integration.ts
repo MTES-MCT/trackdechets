@@ -14,8 +14,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { renderMail } from "../../../../mailer/templates/renderers";
-import { verificationDone } from "../../../../mailer/templates";
+import { renderMail, verificationDone } from "@td/mail";
 import { Mutation } from "../../../../generated/graphql/types";
 
 const VERIFY_COMPANY = gql`

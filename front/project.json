@@ -12,7 +12,7 @@
     },
     "build": {
       "executor": "@nx/vite:build",
-      "dependsOn": ["^build", "dsfr", "generators"],
+      "dependsOn": ["^build", "dsfr", "generate-tw"],
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
@@ -30,7 +30,7 @@
     },
     "serve": {
       "executor": "@nx/vite:dev-server",
-      "dependsOn": ["^build", "generators"],
+      "dependsOn": ["^build"],
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "front:build",
@@ -65,7 +65,7 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "dependsOn": ["^build", "generators"],
+      "dependsOn": ["^build", "generate-tw"],
       "options": {
         "passWithNoTests": true,
         "jestConfig": "front/jest.config.js"
@@ -78,8 +78,45 @@
         "lintFilePatterns": ["front/**/*.{ts,tsx,js,jsx}"]
       }
     },
-    "generators": {
-      "command": "npm --prefix front run generate"
+    "generate-tw": {
+      "command": "tailwindcss build front/src/tailwind.css -o front/src/generated/css/tailwind.generated.css"
+    },
+    "storybook": {
+      "executor": "@nx/storybook:storybook",
+      "options": {
+        "port": 4400,
+        "configDir": "front/.storybook"
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "build-storybook": {
+      "executor": "@nx/storybook:build",
+      "outputs": ["{options.outputDir}"],
+      "options": {
+        "outputDir": "dist/storybook/front",
+        "configDir": "front/.storybook"
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "static-storybook": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "front:build-storybook",
+        "staticFilePath": "dist/storybook/front"
+      },
+      "configurations": {
+        "ci": {
+          "buildTarget": "front:build-storybook:ci"
+        }
+      }
     }
   },
   "tags": []

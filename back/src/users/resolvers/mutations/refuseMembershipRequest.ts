@@ -9,8 +9,7 @@ import {
   MembershipRequestAlreadyAccepted,
   MembershipRequestAlreadyRefused
 } from "../../errors";
-import { membershipRequestRefused } from "../../../mailer/templates";
-import { renderMail } from "../../../mailer/templates/renderers";
+import { renderMail, membershipRequestRefused } from "@td/mail";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 

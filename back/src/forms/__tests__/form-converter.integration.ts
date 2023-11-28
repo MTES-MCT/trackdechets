@@ -1,4 +1,5 @@
 import {
+  bsddTransporterData,
   formFactory,
   formWithTempStorageFactory,
   userFactory
@@ -10,13 +11,25 @@ import { getFirstTransporter } from "../database";
 describe("expandFormFromDb", () => {
   it("should expand normal form from db", async () => {
     const user = await userFactory();
-    const form = await formFactory({ ownerId: user.id });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        transporters: {
+          create: {
+            ...bsddTransporterData,
+            number: 1,
+            takenOverAt: new Date("2023-01-01"),
+            takenOverBy: "Roger"
+          }
+        }
+      }
+    });
+    const transporter = await getFirstTransporter(form);
     const fullForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: expandableFormIncludes
     });
-    const transporter = await getFirstTransporter(form);
-    const expanded = await expandFormFromDb(fullForm);
+    const expanded = expandFormFromDb(fullForm);
     expect(expanded).toEqual({
       id: form.id,
       readableId: form.readableId,
@@ -71,7 +84,9 @@ describe("expandFormFromDb", () => {
         validityLimit: transporter!.transporterValidityLimit,
         numberPlate: transporter!.transporterNumberPlate,
         customInfo: transporter!.transporterCustomInfo,
-        mode: transporter!.transporterTransportMode
+        mode: transporter!.transporterTransportMode,
+        takenOverAt: new Date("2023-01-01T00:00:00.000Z"),
+        takenOverBy: "Roger"
       },
       transporters: [
         {
@@ -92,7 +107,9 @@ describe("expandFormFromDb", () => {
           validityLimit: transporter!.transporterValidityLimit,
           numberPlate: transporter!.transporterNumberPlate,
           customInfo: transporter!.transporterCustomInfo,
-          mode: transporter!.transporterTransportMode
+          mode: transporter!.transporterTransportMode,
+          takenOverAt: new Date("2023-01-01T00:00:00.000Z"),
+          takenOverBy: "Roger"
         }
       ],
       wasteDetails: {
@@ -213,7 +230,9 @@ describe("expandFormFromDb", () => {
         validityLimit: transporter!.transporterValidityLimit,
         numberPlate: transporter!.transporterNumberPlate,
         customInfo: null,
-        mode: transporter!.transporterTransportMode
+        mode: transporter!.transporterTransportMode,
+        takenOverAt: null,
+        takenOverBy: null
       },
       emittedAt: null,
       emittedBy: null,
@@ -262,7 +281,9 @@ describe("expandFormFromDb", () => {
       department: transporter!.transporterDepartment,
       validityLimit: transporter!.transporterValidityLimit,
       numberPlate: transporter!.transporterNumberPlate,
-      customInfo: transporter!.transporterCustomInfo
+      customInfo: transporter!.transporterCustomInfo,
+      takenOverAt: null,
+      takenOverBy: null
     });
   });
 
@@ -303,7 +324,9 @@ describe("expandFormFromDb", () => {
       department: transporter!.transporterDepartment,
       validityLimit: transporter!.transporterValidityLimit,
       numberPlate: transporter!.transporterNumberPlate,
-      customInfo: transporter!.transporterCustomInfo
+      customInfo: transporter!.transporterCustomInfo,
+      takenOverAt: null,
+      takenOverBy: null
     });
   });
 });

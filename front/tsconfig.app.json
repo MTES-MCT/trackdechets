@@ -15,7 +15,11 @@
     "src/**/*.test.tsx",
     "src/**/*.test.ts",
     "src/**/*.stories.tsx",
-    "src/**/__mocks__/*"
+    "src/**/__mocks__/*",
+    "**/*.stories.ts",
+    "**/*.stories.js",
+    "**/*.stories.jsx",
+    "**/*.stories.tsx"
   ],
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
 }

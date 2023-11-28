@@ -4,8 +4,7 @@ import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { renderMail } from "../../../../mailer/templates/renderers";
-import { onSignup } from "../../../../mailer/templates";
+import { onSignup, renderMail } from "@td/mail";
 import { setCaptchaToken } from "../../../../common/redis/captcha";
 import { Mutation } from "../../../../generated/graphql/types";
 

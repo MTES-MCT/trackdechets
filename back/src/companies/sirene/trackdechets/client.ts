@@ -1,5 +1,5 @@
 import { errors, estypes } from "@elastic/elasticsearch";
-import logger from "../../../logging/logger";
+import { logger } from "@td/logger";
 import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
 import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
 import { SireneSearchResult } from "../types";

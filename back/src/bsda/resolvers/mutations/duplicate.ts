@@ -12,6 +12,7 @@ import { getBsdaOrNotFound } from "../../database";
 import { getBsdaRepository } from "../../repository";
 import { checkCanDuplicate } from "../../permissions";
 import prisma from "../../../prisma";
+import { sirenify } from "../../validation/sirenify";
 
 export default async function duplicate(
   _,
@@ -26,7 +27,10 @@ export default async function duplicate(
 
   await checkCanDuplicate(user, prismaBsda);
 
-  const data = await duplicateBsda(prismaBsda);
+  const sirenified = await sirenify(prismaBsda, []);
+
+  const data = await duplicateBsda(sirenified);
+
   const newBsda = await getBsdaRepository(user).create(data);
 
   return expandBsdaFromDb(newBsda);
@@ -136,29 +140,21 @@ async function duplicateBsda({
       intermediariesOrgIds
     }),
     // Emitter company info
-    emitterCompanyAddress: emitter?.address ?? bsda.emitterCompanyAddress,
     emitterCompanyMail: emitter?.contactEmail ?? bsda.emitterCompanyMail,
     emitterCompanyPhone: emitter?.contactPhone ?? bsda.emitterCompanyPhone,
-    emitterCompanyName: emitter?.name ?? bsda.emitterCompanyName,
     emitterCompanyContact: emitter?.contact ?? bsda.emitterCompanyContact,
     // Destination company info
-    destinationCompanyAddress:
-      destination?.address ?? bsda.destinationCompanyAddress,
     destinationCompanyMail:
       destination?.contactEmail ?? bsda.destinationCompanyMail,
     destinationCompanyPhone:
       destination?.contactPhone ?? bsda.destinationCompanyPhone,
-    destinationCompanyName: destination?.name ?? bsda.destinationCompanyName,
     destinationCompanyContact:
       destination?.contact ?? bsda.destinationCompanyContact,
     // Transporter company info
-    transporterCompanyAddress:
-      transporter?.address ?? bsda.transporterCompanyAddress,
     transporterCompanyMail:
       transporter?.contactEmail ?? bsda.transporterCompanyMail,
     transporterCompanyPhone:
       transporter?.contactPhone ?? bsda.transporterCompanyPhone,
-    transporterCompanyName: transporter?.name ?? bsda.transporterCompanyName,
     transporterCompanyContact:
       transporter?.contact ?? bsda.transporterCompanyContact,
     // Transporter recepisse
@@ -169,10 +165,8 @@ async function duplicateBsda({
     transporterRecepisseDepartment:
       transporter?.transporterReceipt?.department ?? null,
     // Broker company info
-    brokerCompanyAddress: broker?.address ?? bsda.brokerCompanyAddress,
     brokerCompanyMail: broker?.contactEmail ?? bsda.brokerCompanyMail,
     brokerCompanyPhone: broker?.contactPhone ?? bsda.brokerCompanyPhone,
-    brokerCompanyName: broker?.name ?? bsda.brokerCompanyName,
     brokerCompanyContact: broker?.contact ?? bsda.brokerCompanyContact,
     // Broker recepisse
     brokerRecepisseNumber:
@@ -182,10 +176,8 @@ async function duplicateBsda({
     brokerRecepisseDepartment:
       broker?.brokerReceipt?.department ?? bsda.brokerRecepisseDepartment,
     // Worker company info
-    workerCompanyAddress: worker?.address ?? bsda.workerCompanyAddress,
     workerCompanyMail: worker?.contactEmail ?? bsda.workerCompanyMail,
     workerCompanyPhone: worker?.contactPhone ?? bsda.workerCompanyPhone,
-    workerCompanyName: worker?.name ?? bsda.workerCompanyName,
     workerCompanyContact: worker?.contact ?? bsda.workerCompanyContact,
     // Worker certification
     workerCertificationHasSubSectionFour:

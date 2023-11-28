@@ -1,34 +1,56 @@
-import { httpServer, startApolloServer } from "./server";
-import { closeQueues } from "./queue/producers";
-import { cpuProfiling, memorySampling } from "./logging/heapSnapshot";
-import { envVariables } from "./env";
+import "@total-typescript/ts-reset";
+import { envVariables } from "@td/env";
+import { z } from "zod";
 
-envVariables.parse(process.env);
-
-async function start() {
-  await startApolloServer();
-  httpServer.listen(parseInt(process.env.API_PORT, 10), "0.0.0.0", () =>
-    console.info(`TD API server is running on port ${process.env.API_PORT}`)
-  );
-
-  function shutdown() {
-    return closeQueues().finally(() => {
-      httpServer.close(() => process.exit());
-    });
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace NodeJS {
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    interface ProcessEnv extends z.infer<typeof envVariables> {}
   }
-
-  process.on("SIGTERM", shutdown);
-  process.on("SIGINT", shutdown);
-
-  process.on("SIGUSR1", memorySampling);
-  process.on("SIGUSR2", cpuProfiling);
 }
+import prisma from "./prisma";
 
-if (process.env.TZ !== "Europe/Paris") {
-  console.warn(
-    "Please explicitly set the `TZ` env variable to `Europe/Paris`."
-  );
-  process.env.TZ = "Europe/Paris";
-}
-
-start();
+export { httpServer, server, startApolloServer } from "./server";
+export { closeQueues } from "./queue/producers";
+export { initSentry } from "./common/sentry";
+export * from "./utils";
+export { prisma };
+export { deleteBsd } from "./common/elastic";
+export { getCompaniesAndActiveAdminsByCompanyOrgIds } from "./companies/database";
+export { formatDate } from "./common/pdf";
+export { sendMail } from "./mailer/mailing";
+export { BsdUpdateQueueItem, updatesQueue } from "./queue/producers/bsdUpdate";
+export { sendMailJob } from "./queue/jobs";
+export { indexQueue } from "./queue/producers/elastic";
+export { mailQueue } from "./queue/producers/mail";
+export { syncEventsQueue } from "./queue/producers/events";
+export {
+  geocodeCompanyQueue,
+  setCompanyDepartementQueue
+} from "./queue/producers/company";
+export { addToMailQueue } from "./queue/producers/mail";
+export { geocodeJob } from "./queue/jobs/geocode";
+export { setDepartementJob } from "./queue/jobs/setDepartement";
+export { syncEventsJob } from "./queue/jobs/syncEvents";
+export { indexBsdJob } from "./queue/jobs";
+export { favoritesCompanyQueue } from "./queue/producers/company";
+export {
+  DELETE_JOB_NAME,
+  INDEX_JOB_NAME,
+  INDEX_CREATED_JOB_NAME,
+  INDEX_UPDATED_JOB_NAME
+} from "./queue/producers/jobNames";
+export { deleteBsdJob } from "./queue/jobs/deleteBsd";
+export { indexFavoritesJob } from "./queue/jobs/indexFavorites";
+export { indexChunkBsdJob, indexAllInBulkJob } from "./queue/jobs/indexAllBsds";
+export { sendHookJob } from "./queue/jobs/sendHook";
+export {
+  webhooksQueue,
+  SEND_WEBHOOK_JOB_NAME
+} from "./queue/producers/webhooks";
+export { associateUserToCompany } from "./users/database";
+export { Mutation, MutationDeleteCompanyArgs } from "./generated/graphql/types";
+export { redisClient } from "./common/redis";
+export { client as esClient, index as esIndex } from "./common/elastic";
+export { closeMongoClient } from "./events/mongodb";

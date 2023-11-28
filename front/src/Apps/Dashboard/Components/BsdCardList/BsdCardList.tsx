@@ -1,5 +1,10 @@
 import React, { useCallback, useState } from "react";
-import { generatePath, useHistory, useLocation } from "react-router-dom";
+import {
+  generatePath,
+  useHistory,
+  useLocation,
+  useRouteMatch
+} from "react-router-dom";
 import { BsdCardListProps } from "./bsdCardListTypes";
 import BsdCard from "../BsdCard/BsdCard";
 import {
@@ -61,6 +66,7 @@ function BsdCardList({
   const isActTab = bsdCurrentTab === "actTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
+  const isAllBsdsTab = !!useRouteMatch(routes.dashboardv2.bsds.index);
 
   const redirectToPath = useCallback(
     (path, id) => {
@@ -123,7 +129,7 @@ function BsdCardList({
     (bsd: Bsd) => {
       const status = bsd["bsdasriStatus"];
       if (status === BsdasriStatus.Initial) {
-        if (isActTab) {
+        if (isActTab || isAllBsdsTab) {
           const path = routes.dashboardv2.bsdasris.sign.emission;
           redirectToPath(path, bsd.id);
           return;
@@ -161,7 +167,7 @@ function BsdCardList({
         redirectToPath(path, bsd.id);
       }
     },
-    [redirectToPath, isActTab, isToCollectTab, siret]
+    [redirectToPath, isActTab, isToCollectTab, isAllBsdsTab, siret]
   );
 
   const handleActValidation = useCallback(
@@ -368,8 +374,9 @@ function BsdCardList({
   return (
     <>
       <ul className="bsd-card-list">
-        {bsds?.map(({ node }) => {
+        {bsds?.map(({ node }, index) => {
           let bsdNode = node;
+          let key = `${node.id}${node.status}`;
           // A supprimer le block isReviewsTab quand on pourra afficher une révision avec la requete bsds
           if (isReviewsTab) {
             // format reviews from bsdd and bsda in one list
@@ -384,6 +391,7 @@ function BsdCardList({
             delete reviewBsda?.bsda;
             newBsddNode.review = reviewBsdd;
             bsdNode = { ...newBsddNode, ...newBsdaNode };
+            key = `${node.id}${node.status}${index}`;
           }
 
           const hasAutomaticSignature = siretsWithAutomaticSignature?.includes(
@@ -391,10 +399,7 @@ function BsdCardList({
           );
 
           return (
-            <li
-              className="bsd-card-list__item"
-              key={`${node.id}${node.status}`}
-            >
+            <li className="bsd-card-list__item" key={key}>
               <BsdCard
                 bsd={bsdNode}
                 currentSiret={siret}

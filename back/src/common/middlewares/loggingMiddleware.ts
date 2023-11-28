@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 import { getUid } from "../../utils";
 
 /**

@@ -1,6 +1,6 @@
 import prisma from "../../prisma";
 import { closeQueues } from "../../queue/producers";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 import { allFavoriteTypes } from "../../companies/types";
 import { favoritesCompanyQueue } from "../../queue/producers/company";
 import { processDbIdentifiersByChunk } from "../../bsds/indexation/bulkIndexBsds";

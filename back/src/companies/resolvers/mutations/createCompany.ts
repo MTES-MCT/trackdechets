@@ -7,11 +7,11 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
 import * as COMPANY_CONSTANTS from "shared/constants";
-import { renderMail } from "../../../mailer/templates/renderers";
 import {
+  renderMail,
   onboardingFirstStep,
   verificationProcessInfo
-} from "../../../mailer/templates";
+} from "@td/mail";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
   cleanClue,

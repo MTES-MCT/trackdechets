@@ -3,17 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "generate": "npm run generate:tailwind",
-    "generate:tailwind": "NODE_ENV=production tailwindcss build src/tailwind.css -o src/generated/css/tailwind.generated.css",
-    "postinstall": "copy-dsfr-to-public",
-    "prebuild": "only-include-used-icons && npm run generate && tsc",
-    "build": "bash bin/build.sh",
-    "build-prod": "NODE_ENV=production vite build",
-    "start": "node server.js",
-    "supportedBrowsers": "echo \"// eslint-disable-next-line\nmodule.exports = $(browserslist-useragent-regexp --allowHigherVersions);\" > src/supportedBrowsers.js",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "run-storybook": "npx http-server storybook-static/"
+    "supportedBrowsers": "echo \"// eslint-disable-next-line\nmodule.exports = $(browserslist-useragent-regexp --allowHigherVersions);\" > src/supportedBrowsers.js"
   },
   "engines": {
     "node": "^20"
