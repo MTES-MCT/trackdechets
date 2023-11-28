@@ -15,7 +15,10 @@
   "author": "",
   "scripts": {
     "scalingo-postbuild": "bash scripts/build/scalingo.sh",
-    "nx": "nx"
+    "nx": "nx",
+    "dev": "nx run-many -t serve --parallel=8",
+    "preintegration-tests": "npx nx run back:prisma --configuration=integration && npx nx run back:codegen --configuration=integration",
+    "start-queue-tests": "nx run-many -t serve --configuration=integration --projects=tag:backend:queues"
   },
   "engines": {
     "node": "^20"

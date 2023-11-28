@@ -51,6 +51,40 @@
           "codeCoverage": false
         }
       }
+    },
+    "start-test-background": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "./back/integration-tests/start-queue-tests-if-not-started.sh"
+      }
+    },
+    "stop-test-background": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx pm2 stop npm --name start-queue-tests"
+      }
+    },
+    "fast-test": {
+      "executor": "@nx/jest:jest",
+      "dependsOn": [
+        {
+          "target": "start-test-background",
+          "projects": "self"
+        }
+      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "back/jest.config.js",
+        "passWithNoTests": false
+      },
+      "configurations": {
+        "integration": {
+          "jestConfig": "back/jest.config.integration.js",
+          "runInBand": true,
+          "forceExit": true,
+          "codeCoverage": false
+        }
+      }
     }
   },
   "tags": []
