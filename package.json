@@ -232,7 +232,6 @@
     "concurrently": "^6.4.0",
     "copyfiles": "^2.4.1",
     "core-js": "^3.21.1",
-    "dotenv": "^16.0.0",
     "esbuild": "0.19.5",
     "eslint": "~8.46.0",
     "eslint-config-prettier": "9.0.0",
@@ -267,5 +266,9 @@
     "vite": "~4.3.9",
     "vite-plugin-svgr": "^4.0.0",
     "ws": "^8.2.3"
+  },
+  "prisma": {
+    "seed": "tsx --tsconfig back/tsconfig.lib.json back/prisma/seed.ts",
+    "schema": "back/prisma/schema.prisma"
   }
 }
