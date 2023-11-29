@@ -662,7 +662,9 @@ describe("Mutation.createFormRevisionRequest", () => {
     // Because the error messages vary depending on the status,
     // let's just check that there is an error and not focus on the msg
     expect(errors.length).toBeGreaterThan(0);
-    expect(errors[0].message).toBe("Impossible d'annuler un bordereau de tournée dédiée.");
+    expect(errors[0].message).toBe(
+      "Impossible d'annuler un bordereau de tournée dédiée."
+    );
   });
 
   it("should fail if trying to use a forbidden waste code on EmitterType.APPENDIX1 bsdd", async () => {
