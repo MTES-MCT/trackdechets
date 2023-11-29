@@ -55,6 +55,7 @@ jobs:
         run: |
           ping -c 2 trackdechets.local
           curl trackdechets.local/login
+          curl trackdechets.local/src/index.tsx
       - name: Testing ES resolution
         run: |
           ping -c 2 es.trackdechets.local
