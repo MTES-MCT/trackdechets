@@ -1,0 +1,119 @@
+name: Tests e2e
+
+on: pull_request
+
+jobs:
+  back:
+    runs-on: ubuntu-latest
+    name: Tests e2e
+    strategy:
+      fail-fast: false
+    steps:
+      # Trackdéchets
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Start containers with docker
+        run: docker-compose up -d
+      - name: Init DB & ES index
+        run: |
+          npx nx run back:codegen
+          npx nx run back:prisma
+          TERM=xterm bash ./scripts/deploy-db.sh
+      - name: Start queues
+        run: |
+          npx nx run api:serve &
+          npx nx run front:serve &
+          npx nx run-many -t serve --parallel=4 --projects=tag:backend:background &
+          sleep 15
+      - name: Install dependencies
+        run: npm ci
+      # Playwright
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx nx run front:e2e
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+env:
+  TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
+  TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
+  NODE_ENV: test
+  VIRTUAL_HOST: $API_HOST
+  LETSENCRYPT_HOST: $API_HOST
+  EMAIL_BACKEND: "sendinblue"
+  SIB_BASE_URL: "http://mailservice"
+  MAIN_TEMPLATE_ID: "9"
+  FIRST_ONBOARDING_TEMPLATE_ID: "246"
+  PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID: "248"
+  PROFESIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "250"
+  VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID: "247"
+  SENDER_EMAIL_ADDRESS: "us@td.test"
+  SENDER_NAME: "Wastetracker corp."
+  POST_BACKEND: console
+  QUEUE_NAME_SENDMAIL: td-integration-tests-queue
+  REGISTRY_WHITE_LIST_IP: "11.11.11.11"
+  DATABASE_URL: 'postgresql://trackdechets:password@localhost:5432/prisma?schema=default$default'
+  REDIS_URL: redis://localhost:6379
+  MONGO_URL: mongodb://trackdechets:password@localhost:27017
+  SESSION_SECRET: any_secret
+  API_TOKEN_SECRET: any_secret
+  API_HOST: api.trackdechets.local
+  UI_HOST: trackdechets.local
+  ELASTIC_SEARCH_URL: http://localhost:9200
+  DD_TRACE_ENABLED: false
+  TD_COMPANY_ELASTICSEARCH_INDEX: stocketablissement-production
+  ALLOW_TEST_COMPANY: true
+  OIDC_PRIVATE_KEY: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDCFg4UrY5xtulv
+    /NXKmL1J4qI1SopAfTNMo3X7p+kJO7plqUYjzaztcre1qfh0m33Sm1Q8oPbO/GpP
+    MU1/HgcceytgJ/b4UwufVVMl9BrMDYG8moDBylbVupFQS3Ly1L9i/iFG9Z9A9xzY
+    Zzf799A45bnvNXL6s2glzvjiRvfQ2NDF0anTcnZLcYtC7ugq1IMM+ihAcPfw8Qw2
+    chN/SmP4qAM+PKaQwagmU7doqmmyN9u38AfoYZ1GCFhEs5TBBT6H6h9YdHeVtiIq
+    1c+fl03biSIfLrV7dUBD39gBmXBcL/30Ya3D82mCEUC4zg/UkOfQOmkmV3Lc8YUL
+    QZ8EJkBLAgMBAAECggEAVuVE/KEP6323WjpbBdAIv7HGahGrgGANvbxZsIhm34ls
+    VOPK0XDegZkhAybMZHjRhp+gwVxX5ChC+J3cUpOBH5FNxElgW6HizD2Jcq6t6LoL
+    YgPSrfEHm71iHg8JsgrqfUnGYFzMJmv88C6WdCtpgG/qJV1K00/Ly1G1QKoBffEs
+    +v4fAMJrCbUdCz1qWto+PU+HLMEo+krfEpGgcmtZeRlDADh8cETMQlgQfQX2VWq/
+    aAP4a1SXmo+j0cvRU4W5Fj0RVwNesIpetX2ZFz4p/JmB5sWFEj/fC7h5z2lq+6Bm
+    e2T3BHtXkIxoBW0/pYVnASC8P2puO5FnVxDmWuHDYQKBgQDTuuBd3+0tSFVEX+DU
+    5qpFmHm5nyGItZRJTS+71yg5pBxq1KqNCUjAtbxR0q//fwauakh+BwRVCPOrqsUG
+    jBSb3NYE70Srp6elqxgkE54PwQx4Mr6exJPnseM9U4K+hULllf5yjM9edreJE1nV
+    NVgFjeyafQhrHKwgr7PERJ/ikwKBgQDqqsT1M+EJLmI1HtCspOG6cu7q3gf/wKRh
+    E8tu84i3YyBnI8uJkKy92RNVI5fvpBARe3tjSdM25rr2rcrcmF/5g6Q9ImxZPGCt
+    86eOgO9ErNtbc4TEgybsP319UE4O41aKeNiBTAZKoYCxv/dMqG0j4avmWzd+foHq
+    gSNUvR2maQKBgQCYeqOsV2B6VPY7KIVFLd0AA9/dwvEmgAYLiA/RShDI+hwQ/5jX
+    uxDu37KAhqeC65sHLrmIMUt4Zdr+DRyZK3aIDNEAesPMjw/X6lCXYp1ZISD2yyym
+    MFGH8X8CIkstI9Faf9vf6PJKSFrC1/HA7wq17VCwrUzLvrljTMW8meM/CwKBgCpo
+    2leGHLFQFKeM/iF1WuYbR1pi7gcmhY6VyTowARFDdOOu8GXYI5/bz0afvCGvAMho
+    DJCREv7lC/zww6zCTPYG+HOj+PjXlJFba3ixjIxYwPvyEJiDK1Ge18sB7Fl8dHNq
+    C5ayaqCqN1voWYUdGzxU2IA1E/5kVo5O8FesJeOhAoGBAImJbZFf+D5kA32Xxhac
+    59lLWBCsocvvbd1cvDMNlRywAAyhsCb1SuX4nEAK9mrSBdfmoF2Nm3eilfsOds0f
+    K5mX069IKG82CMqh3Mzptd7e7lyb9lsoGO0BAtjho3cWtha/UZ70vfaMzGuZ6JmQ
+    ak6k+8+UFd93M4z0Qo74OhXB
+    -----END PRIVATE KEY----
+  # Public key only for testing purposes
+  OIDC_PUBLIC_KEY: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwhYOFK2Ocbbpb/zVypi9
+    SeKiNUqKQH0zTKN1+6fpCTu6ZalGI82s7XK3tan4dJt90ptUPKD2zvxqTzFNfx4H
+    HHsrYCf2+FMLn1VTJfQazA2BvJqAwcpW1bqRUEty8tS/Yv4hRvWfQPcc2Gc3+/fQ
+    OOW57zVy+rNoJc744kb30NjQxdGp03J2S3GLQu7oKtSDDPooQHD38PEMNnITf0pj
+    +KgDPjymkMGoJlO3aKppsjfbt/AH6GGdRghYRLOUwQU+h+ofWHR3lbYiKtXPn5dN
+    24kiHy61e3VAQ9/YAZlwXC/99GGtw/NpghFAuM4P1JDn0DppJldy3PGFC0GfBCZA
+    SwIDAQAB
+    -----END PUBLIC KEY-----
+  WEBHOOK_TOKEN_ENCRYPTION_KEY: abcdefgh12345678abcdefgh12345678
+

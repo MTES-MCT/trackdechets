@@ -4,6 +4,12 @@
   "sourceRoot": "front/src",
   "projectType": "application",
   "targets": {
+    "e2e": {
+      "command": "cd front && npx playwright test"
+    },
+    "e2e-ui": {
+      "command": "cd front && npx playwright test --ui"
+    },
     "dsfr": {
       "executor": "nx:run-commands",
       "options": {
