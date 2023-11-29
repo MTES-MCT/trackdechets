@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-    
+
       # Trackdéchets
       - uses: actions/checkout@v4
         with:
@@ -27,14 +27,18 @@ jobs:
           npx nx run back:codegen
           npx nx run back:prisma
           TERM=xterm bash ./scripts/deploy-db.sh
-      - name: Start queues
+      - name: Start api
         run: |
           npx nx run api:serve &
-          npx nx run front:serve &
+          sleep 10
+      - name: Start backend queues
+        run: |
           npx nx run-many -t serve --parallel=4 --projects=tag:backend:background &
-          sleep 15
-      - name: Install dependencies
-        run: npm ci
+          sleep 10
+      - name: Start front
+        run: |
+          npx nx run front:serve &
+          sleep 10
 
       # Playwright
       - name: Install Playwright Browsers
