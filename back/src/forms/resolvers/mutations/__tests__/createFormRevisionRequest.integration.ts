@@ -631,6 +631,40 @@ describe("Mutation.createFormRevisionRequest", () => {
     }
   );
 
+  it("should fail if the emitter type is APPENDIX1", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterType: EmitterType.APPENDIX1,
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { isCanceled: true },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    // Because the error messages vary depending on the status,
+    // let's just check that there is an error and not focus on the msg
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors[0].message).toBe("Impossible d'annuler un bordereau de tournée dédiée.");
+  });
+
   it("should fail if trying to use a forbidden waste code on EmitterType.APPENDIX1 bsdd", async () => {
     const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
