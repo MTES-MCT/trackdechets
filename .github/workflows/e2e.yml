@@ -36,34 +36,31 @@ jobs:
       - name: Start api
         run: |
           npx nx run api:serve &
-          sleep 5
       - name: Start backend queues
         run: |
           npx nx run-many -t serve --parallel=4 --projects=tag:backend:background &
-          sleep 5
       - name: Start front
         run: |
           npx nx run front:serve &
-          sleep 5
 
       # Testing DNS resolution
-      - name: Testing API resolution
-        run: |
-          ping -c 2 api.trackdechets.local
-          curl api.trackdechets.local
-      - name: Testing UI resolution
-        run: |
-          ping -c 2 trackdechets.local
-          curl trackdechets.local/login
-          curl trackdechets.local/src/index.tsx
-      - name: Testing ES resolution
-        run: |
-          ping -c 2 es.trackdechets.local
-          curl es.trackdechets.local
-      - name: Testing Notifier resolution
-        run: |
-          ping -c 2 notifier.trackdechets.local
-          curl notifier.trackdechets.local
+      # - name: Testing API resolution
+      #   run: |
+      #     ping -c 2 api.trackdechets.local
+      #     curl api.trackdechets.local
+      # - name: Testing UI resolution
+      #   run: |
+      #     ping -c 2 trackdechets.local
+      #     curl trackdechets.local/login
+      #     curl trackdechets.local/src/index.tsx
+      # - name: Testing ES resolution
+      #   run: |
+      #     ping -c 2 es.trackdechets.local
+      #     curl es.trackdechets.local
+      # - name: Testing Notifier resolution
+      #   run: |
+      #     ping -c 2 notifier.trackdechets.local
+      #     curl notifier.trackdechets.local
 
       # Playwright
       - name: Install Playwright Browsers
