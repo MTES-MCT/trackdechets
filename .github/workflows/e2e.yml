@@ -42,7 +42,7 @@ jobs:
 
       # Playwright
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install chromium --with-deps
       - name: Run Playwright tests
         run: npx nx run front:e2e
       - uses: actions/upload-artifact@v3
@@ -139,7 +139,7 @@ env:
   SCALINGO_CERT: unset
 
   # Redis
-  REDIS_URL: redis://redis:6379
+  REDIS_URL: redis://localhost:6379
   BULK_INDEX_BATCH_SIZE: 100
 
   # Mongo
