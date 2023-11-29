@@ -1,14 +1,14 @@
 import { test } from "@playwright/test";
 import { uid } from "./utils";
 
-const UID = `e2e-${uid()}`;
-const USER_NAME = `User ${UID}`;
-const USER_MAIL = `user.${UID}@mail.com`;
-
-console.log("USER_NAME", USER_NAME);
-console.log("USER_MAIL", USER_MAIL);
-
 test("create an account", async ({ page }) => {
+  const UID = `e2e-${uid()}`;
+  const USER_NAME = `User ${UID}`;
+  const USER_MAIL = `user.${UID}@mail.com`;
+
+  console.log("USER_NAME", USER_NAME);
+  console.log("USER_MAIL", USER_MAIL);
+
   await page.goto("/");
   await page.goto("/login");
   await page.getByRole("link", { name: "Créer un compte" }).click();

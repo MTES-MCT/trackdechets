@@ -6,9 +6,11 @@ jobs:
   back:
     runs-on: ubuntu-latest
     name: Tests e2e
-    strategy:
-      fail-fast: false
     steps:
+      # Hosts
+      - name: Add hosts to /etc/hosts
+        run: |
+            sudo echo "127.0.0.1 trackdechets.local" | sudo tee -a /etc/hosts
 
       # Trackdéchets
       - uses: actions/checkout@v4
@@ -30,15 +32,15 @@ jobs:
       - name: Start api
         run: |
           npx nx run api:serve &
-          sleep 10
+          sleep 5
       - name: Start backend queues
         run: |
           npx nx run-many -t serve --parallel=4 --projects=tag:backend:background &
-          sleep 10
+          sleep 5
       - name: Start front
         run: |
           npx nx run front:serve &
-          sleep 10
+          sleep 5
 
       # Playwright
       - name: Install Playwright Browsers
