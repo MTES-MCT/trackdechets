@@ -163,6 +163,7 @@
     "@nx/storybook": "17.0.1",
     "@nx/vite": "17.0.1",
     "@nx/web": "17.0.1",
+    "@playwright/test": "^1.40.1",
     "@storybook/addon-a11y": "^7.0.17",
     "@storybook/addon-actions": "^7.0.17",
     "@storybook/addon-essentials": "7.4.5",
@@ -265,8 +266,7 @@
     "typescript": "^5.0.2",
     "vite": "~4.3.9",
     "vite-plugin-svgr": "^4.0.0",
-    "ws": "^8.2.3",
-    "@playwright/test": "^1.40.1"
+    "ws": "^8.2.3"
   },
   "prisma": {
     "seed": "tsx --tsconfig back/tsconfig.lib.json back/prisma/seed.ts",
