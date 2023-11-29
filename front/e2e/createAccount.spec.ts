@@ -11,6 +11,11 @@ test("create an account", async ({ page }) => {
 
   await page.goto("/");
   await page.goto("/login");
+
+  const buffer = await page.screenshot();
+  console.log('>> SCREENSHOT');
+  console.log(buffer.toString('base64'));
+
   await page.getByRole("link", { name: "Créer un compte" }).click();
   await page.getByLabel("Nom et prénom").click();
   await page.getByLabel("Nom et prénom").fill(USER_NAME);

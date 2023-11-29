@@ -27,8 +27,7 @@ export default defineConfig({
     baseURL: "http://trackdechets.local",
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
-    headless: false, 
-    screenshot: "only-on-failure"
+    headless: false,
   },
   // Start the docker containers
   globalSetup: require.resolve("./e2e/global-setup"),
