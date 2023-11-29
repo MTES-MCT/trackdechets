@@ -10,7 +10,11 @@ jobs:
       # Hosts
       - name: Add hosts to /etc/hosts
         run: |
+            sudo echo "127.0.0.1 api.trackdechets.local" | sudo tee -a /etc/hosts
             sudo echo "127.0.0.1 trackdechets.local" | sudo tee -a /etc/hosts
+            sudo echo "127.0.0.1 es.trackdechets.local" | sudo tee -a /etc/hosts
+            sudo echo "127.0.0.1 notifier.trackdechets.local" | sudo tee -a /etc/hosts
+            sudo echo "127.0.0.1 redis postgres elasticsearch mongodb" | sudo tee -a /etc/hosts
 
       # Trackdéchets
       - uses: actions/checkout@v4
@@ -63,7 +67,7 @@ env:
   #DEBUG: prisma*
   SESSION_COOKIE_SECURE: false
   QUEUE_MONITOR_TOKEN: token
-  DATABASE_URL: 'postgresql://trackdechets:password@localhost:5432/e2e?schema=default$default'
+  DATABASE_URL: 'postgresql://trackdechets:password@postgres:5432/e2e?schema=default$default'
   API_TOKEN_SECRET: any_secret
   INSEE_SECRET: unset
   SESSION_SECRET: any_secret
@@ -115,7 +119,7 @@ env:
   NGINX_NETWORK_MODE: bridge
 
   # Elastic Search
-  ELASTIC_SEARCH_URL: http://localhost:9200
+  ELASTIC_SEARCH_URL: http://elasticsearch:9200
   ELASTICSEARCH_BSDS_ALIAS_NAME: bsds-e2e
   ELASTIC_SEARCH_HOST: es.trackdechets.local
   TD_COMPANY_ELASTICSEARCH_IGNORE_SSL: false
@@ -141,11 +145,11 @@ env:
   SCALINGO_CERT: unset
 
   # Redis
-  REDIS_URL: redis://localhost:6379
+  REDIS_URL: redis://redis:6379
   BULK_INDEX_BATCH_SIZE: 100
 
   # Mongo
-  MONGO_URL: mongodb://trackdechets:password@localhost:27017
+  MONGO_URL: mongodb://trackdechets:password@mongodb:27017
 
   # Storybook
   STORYBOOK_HOST: sb.trackdechets.local
