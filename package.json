@@ -265,7 +265,8 @@
     "typescript": "^5.0.2",
     "vite": "~4.3.9",
     "vite-plugin-svgr": "^4.0.0",
-    "ws": "^8.2.3"
+    "ws": "^8.2.3",
+    "@playwright/test": "^1.40.1"
   },
   "prisma": {
     "seed": "tsx --tsconfig back/tsconfig.lib.json back/prisma/seed.ts",
