@@ -5,6 +5,8 @@
   "projectType": "library",
   "targets": {
     "prisma": {
+      "inputs": ["{projectRoot}/prisma/schema.prisma"],
+      "cache": true,
       "executor": "nx:run-commands",
       "options": {
         "command": "npx prisma generate --schema=back/prisma/schema.prisma"
@@ -14,6 +16,8 @@
       "command": "tsc -p back/tsconfig.lib.json --noEmit"
     },
     "codegen": {
+      "inputs": ["{projectRoot}/**/*.gql"],
+      "cache": true,
       "executor": "nx:run-commands",
       "options": {
         "command": "graphql-codegen --config back/codegen.yml"
