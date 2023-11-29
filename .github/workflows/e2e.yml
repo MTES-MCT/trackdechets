@@ -153,7 +153,7 @@ env:
   VERIFY_COMPANY: false
   ALLOW_TEST_COMPANY: true
   STARTUP_FILE: unset
-  TRUST_PROXY_HOPS: unset
+  TRUST_PROXY_HOPS: true
   CONTAINER: unset
   DD_ENV: unset
   DD_API_KEY: unset
