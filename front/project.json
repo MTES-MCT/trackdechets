@@ -4,8 +4,11 @@
   "sourceRoot": "front/src",
   "projectType": "application",
   "targets": {
-    "e2e": {
+    "e2e-ci": {
       "command": "cd front && npx playwright test"
+    },
+    "e2e": {
+      "command": "cd front && npx playwright test && npx playwright show-report"
     },
     "e2e-ui": {
       "command": "cd front && npx playwright test --ui"

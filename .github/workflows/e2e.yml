@@ -68,7 +68,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
       - name: Run Playwright tests
-        run: npx nx run front:e2e
+        run: npx nx run front:e2e-ci
       - uses: actions/upload-artifact@v3
         if: always()
         with:
