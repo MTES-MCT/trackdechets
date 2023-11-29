@@ -5,7 +5,7 @@
   "projectType": "application",
   "targets": {
     "e2e-ci": {
-      "command": "cd front && npx playwright test"
+      "command": "cd front && xvfb-run npx playwright test"
     },
     "e2e": {
       "command": "cd front && npx playwright test && npx playwright show-report"
