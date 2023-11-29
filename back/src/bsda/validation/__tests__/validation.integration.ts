@@ -966,4 +966,27 @@ describe("BSDA Sealed rules checks", () => {
       );
     }
   });
+
+  it("should be possible to update the destination contact & mail fields when the bsda status is signed by the emitter", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER"
+      }
+    });
+    await parseBsdaInContext(
+      {
+        input: {
+          destination: {
+            company: {
+              contact: "New John",
+              phone: "0101010199",
+              mail: "new@mail.com"
+            }
+          }
+        },
+        persisted: bsda as any
+      },
+      {}
+    );
+  });
 });
