@@ -64,10 +64,8 @@ export async function truncateDatabase() {
 }
 
 export async function resetDatabase() {
-  // We need a longer than 5sec timeout...
-  jest.setTimeout(10000);
+  await indexQueue.obliterate({ force: true });
 
-  await refreshElasticSearch();
   await elasticSearch.deleteByQuery(
     {
       index: index.alias,
@@ -88,8 +86,8 @@ export async function resetDatabase() {
 
 export async function refreshElasticSearch() {
   // Wait for all indexation jobs to finish
-  const activeJobs = await indexQueue.getActive();
-  await Promise.all(activeJobs.map(job => job.finished()));
+  const jobs = await indexQueue.getJobs(["active", "waiting"]);
+  await Promise.all(jobs.map(job => job.finished()));
 
   return elasticSearch.indices.refresh(
     {
