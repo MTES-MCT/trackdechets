@@ -1,1 +1,1 @@
-web: npx --yes serve -s dist/storybook/front -l $PORT
+web: npx --yes http-server dist/storybook/front
