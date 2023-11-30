@@ -1,1 +1,1 @@
-web: npx --yes serve -s dist/storybook/front
+web: npx --yes serve -s dist/storybook/front -l $PORT
