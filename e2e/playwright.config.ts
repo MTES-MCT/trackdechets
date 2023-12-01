@@ -10,7 +10,7 @@ import { defineConfig, devices } from "@playwright/test";
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: "./e2e",
+  testDir: "./src",
   /* Run tests in files in parallel */
   fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -27,12 +27,13 @@ export default defineConfig({
     baseURL: "http://trackdechets.local",
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
-    headless: false
+    /* Use headless mode if you need to debug with screenshots in the CI */
+    headless: true,
   },
   // Start the docker containers
-  globalSetup: require.resolve("./e2e/global-setup"),
+  globalSetup: require.resolve("./src/global-setup"),
   // Stop the docker containers
-  globalTeardown: require.resolve("./e2e/global-teardown"),
+  globalTeardown: require.resolve("./src/global-teardown"),
   /* Configure projects for major browsers */
   projects: [
     {

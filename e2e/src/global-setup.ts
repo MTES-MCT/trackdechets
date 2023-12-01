@@ -1,7 +1,8 @@
-// import { execSync } from 'child_process';
+import { logger } from "@td/logger";
 
 const setup = async () => {
-  console.log("> Playwright global-setup");
+  logger.info("Playwright global-setup");
+  logger.info("Database: ", process.env.DATABASE_URL);
 };
 
 export default setup;

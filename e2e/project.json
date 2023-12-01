@@ -4,83 +4,14 @@
   "sourceRoot": "e2e/src",
   "projectType": "application",
   "targets": {
-    "e2e-ci": {
-      "command": "cd front && xvfb-run npx playwright test"
-    },
-    "e2e": {
-      "command": "cd front && npx playwright test && npx playwright show-report"
-    },
-    "e2e-ui": {
-      "command": "cd front && npx playwright test --ui"
-    },
-    "build": {
-      "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
-      "options": {
-        "platform": "node",
-        "outputPath": "dist/e2e",
-        "format": ["cjs"],
-        "bundle": false,
-        "main": "e2e/src/main.ts",
-        "tsConfig": "e2e/tsconfig.app.json",
-        "assets": ["e2e/src/assets"],
-        "generatePackageJson": true,
-        "esbuildOptions": {
-          "sourcemap": true,
-          "outExtension": {
-            ".js": ".js"
-          }
-        }
-      },
-      "configurations": {
-        "integration": {},
-        "development": {},
-        "production": {
-          "esbuildOptions": {
-            "sourcemap": false,
-            "outExtension": {
-              ".js": ".js"
-            }
-          }
-        }
-      }
-    },
-    "serve": {
-      "executor": "@nx/js:node",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "e2e:build"
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "e2e:build:development"
-        },
-        "production": {
-          "buildTarget": "e2e:build:production"
-        }
-      }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["e2e/**/*.ts"]
-      }
+    "ci": {
+      "command": "cd e2e && xvfb-run npx playwright test"
     },
     "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "e2e/jest.config.ts",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
-      }
+      "command": "cd e2e && npx playwright test && npx playwright show-report"
+    },
+    "test-ui": {
+      "command": "cd e2e && npx playwright test --ui"
     }
   },
   "tags": []
