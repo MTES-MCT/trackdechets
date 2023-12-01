@@ -27,7 +27,7 @@ export default defineConfig({
     baseURL: "http://trackdechets.local",
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
-    headless: false,
+    headless: false
   },
   // Start the docker containers
   globalSetup: require.resolve("./e2e/global-setup"),
@@ -37,8 +37,8 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { 
-        ...devices["Desktop Chrome"], 
+      use: {
+        ...devices["Desktop Chrome"]
       }
     }
   ]

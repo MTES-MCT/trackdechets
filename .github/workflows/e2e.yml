@@ -43,25 +43,6 @@ jobs:
         run: |
           npx nx run front:serve &
 
-      # Testing DNS resolution
-      # - name: Testing API resolution
-      #   run: |
-      #     ping -c 2 api.trackdechets.local
-      #     curl api.trackdechets.local
-      # - name: Testing UI resolution
-      #   run: |
-      #     ping -c 2 trackdechets.local
-      #     curl trackdechets.local/login
-      #     curl trackdechets.local/src/index.tsx
-      # - name: Testing ES resolution
-      #   run: |
-      #     ping -c 2 es.trackdechets.local
-      #     curl es.trackdechets.local
-      # - name: Testing Notifier resolution
-      #   run: |
-      #     ping -c 2 notifier.trackdechets.local
-      #     curl notifier.trackdechets.local
-
       # Playwright
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
@@ -80,7 +61,6 @@ env:
   API_PORT: 4000
   API_URL_SCHEME: http
   USE_XFF_HEADER: true
-  #DEBUG: prisma*
   SESSION_COOKIE_SECURE: false
   QUEUE_MONITOR_TOKEN: token
   DATABASE_URL: 'postgresql://trackdechets:password@postgres:5432/e2e?schema=default$default'
