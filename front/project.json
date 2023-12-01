@@ -25,7 +25,8 @@
         },
         "production": {
           "mode": "production"
-        }
+        },
+        "integration": {}
       }
     },
     "serve": {
@@ -80,7 +81,10 @@
       }
     },
     "generate-tw": {
-      "command": "tailwindcss build -c front/tailwind.config.js front/src/tailwind.css -o front/src/generated/css/tailwind.generated.css"
+      "command": "tailwindcss build -c front/tailwind.config.js front/src/tailwind.css -o front/src/generated/css/tailwind.generated.css",
+      "configurations": {
+        "integration": {}
+      }
     },
     "storybook": {
       "executor": "@nx/storybook:storybook",

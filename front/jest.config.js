@@ -14,6 +14,5 @@ module.exports = {
     "@testing-library/jest-dom/extend-expect",
     "./jest.setup.js"
   ],
-  transformIgnorePatterns: ["node_modules/(?!@codegouvfr/react-dsfr)"],
-  modulePathIgnorePatterns: ["e2e"]
+  transformIgnorePatterns: ["node_modules/(?!@codegouvfr/react-dsfr)"]
 };

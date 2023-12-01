@@ -94,7 +94,7 @@
         "ci": {
           "ci": true,
           "codeCoverage": true
-        },
+        }
       }
     }
   },
