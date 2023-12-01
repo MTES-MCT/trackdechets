@@ -63,7 +63,7 @@ env:
   USE_XFF_HEADER: true
   SESSION_COOKIE_SECURE: false
   QUEUE_MONITOR_TOKEN: token
-  DATABASE_URL: 'postgresql://trackdechets:password@postgres:5432/e2e'
+  DATABASE_URL: 'postgresql://trackdechets:password@postgres:5432/e2e?schema=default$default'
   API_TOKEN_SECRET: any_secret
   INSEE_SECRET: unset
   SESSION_SECRET: any_secret
