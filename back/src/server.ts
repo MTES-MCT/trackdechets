@@ -144,7 +144,7 @@ export const server = new ApolloServer<GraphQLContext>({
         maxRequestsPerWindow: 10 // 10 requests each 3 minutes
       },
       renewSecurityCode: {
-        // Hacker might massively generate new codes to spam 
+        // Hacker might massively generate new codes to spam
         windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
         maxRequestsPerWindow: 10 // 10 requests each 3 minutes
       }
