@@ -28,7 +28,7 @@ export default function AccountFieldNotEditable({
       <div id={name} className={styles.field__value}>
         {value}
       </div>
-      {insideForm && insideForm}
+      {insideForm}
     </div>
   );
 }

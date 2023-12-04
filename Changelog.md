@@ -16,7 +16,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Complétion des informations légales lors de l'ajout d'un transporteur via `createFormTransporter` et `updateFormTransporter` [PR 2861](https://github.com/MTES-MCT/trackdechets/pull/2861)
 - Mise à jour automatique informations d'un établissement dans les `Favorites` affichés dans le champ de recherhe `CompanySelector` [PR 2910](https://github.com/MTES-MCT/trackdechets/pull/2910)
 
-
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations

@@ -1,4 +1,3 @@
-import { Formik, Form, FormikValues } from "formik";
 import { NotificationError } from "../../Apps/common/Components/Error/Error";
 import {
   CompanyPrivate,
@@ -78,41 +77,24 @@ export default function AccountInfoAutoUpdate({ company }: Props) {
     MutationUpdateCompanyArgs
   >(UPDATE_COMPANY_NAME_ADRESS, { variables: { id: company.id } });
 
-  const initialValues = {} as FormikValues;
-  const name = "updateCompanyNameAddressFromSirene";
   return (
-    <Formik<FormikValues>
-      initialValues={initialValues}
-      onSubmit={(_values, { setFieldError, setSubmitting }) => {
-        update()
-          .then(() => {
-            setSubmitting(false);
-          })
-          .catch(() => {
-            setFieldError(name, "Erreur serveur, merci de réessayer plus tard");
-            setSubmitting(false);
-          });
-      }}
-    >
-      {({ isSubmitting }) => (
-        <Form className="tw-max-w-md">
-          <button
-            className="btn btn--primary"
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {loading
-              ? "Requête en cours..."
-              : isSiret(
-                  company.siret!,
-                  import.meta.env.VITE_ALLOW_TEST_COMPANY === "true"
-                )
-              ? "Synchroniser avec l'INSEE"
-              : "Synchroniser avec le registre européen"}
-          </button>
-          {error && <NotificationError apolloError={error} />}
-        </Form>
-      )}
-    </Formik>
+    <>
+      <button
+        onClick={() => update()}
+        className="btn btn--primary"
+        type="submit"
+        disabled={loading}
+      >
+        {loading
+          ? "Requête en cours..."
+          : isSiret(
+              company.siret!,
+              import.meta.env.VITE_ALLOW_TEST_COMPANY === "true"
+            )
+          ? "Synchroniser avec l'INSEE"
+          : "Synchroniser avec le registre européen"}
+      </button>
+      {error && <NotificationError apolloError={error} />}
+    </>
   );
 }
