@@ -26,6 +26,13 @@ const createPasswordResetRequestResolver: MutationResolvers["createPasswordReset
       // for security reason, do not leak  any clue
       return true;
     }
+
+    // First, delete all previous password reset hashes
+    await prisma.userResetPasswordHash.deleteMany({
+      where: { userId: user.id }
+    });
+
+    // Then generate a new hash
     const resetHash = (await promisify(crypto.randomBytes)(20)).toString("hex");
 
     const hashExpires = addHours(new Date(), 4);
