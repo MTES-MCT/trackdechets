@@ -7,7 +7,7 @@ test("create an account", async ({ page }) => {
   const USER_PASSWORD = "Us3r_E2E_0ne$$$";
 
   page.on('request', request => console.log('>>', request.method(), request.url(), request.postData()));
-  page.on('response', async response => console.log('<<', response.status(), response.url(), await response.body()));
+  page.on('response', async response => console.log('<<', response.status(), response.url(), await response.json()));
 
   // Create the account
   await createAccount(page, {
