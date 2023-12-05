@@ -17,7 +17,7 @@ import CompanyContactInfo from "../../../../form/common/components/company/Compa
 
 type TransporterFormProps = {
   // SIRET ou VAT de l'établissement courant
-  orgId: string;
+  orgId?: string;
   fieldName: string;
 };
 
@@ -97,7 +97,7 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
   return (
     <div>
       <CompanySelectorWrapper
-        siret={orgId}
+        orgId={orgId}
         formOrgId={transporterOrgId}
         favoriteType={FavoriteType.Transporter}
         allowForeignCompanies={true}

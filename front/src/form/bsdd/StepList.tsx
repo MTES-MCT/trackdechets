@@ -102,7 +102,7 @@ export default function StepsList(props: Props) {
       ...rest
     } = values;
 
-    const formTransportersIds = await Promise.all(
+    const formTransportersIds: string[] = await Promise.all(
       transporters.map(async t => {
         if (t.id) {
           const { id, ...input } = t;
@@ -114,12 +114,12 @@ export default function StepsList(props: Props) {
           const { data } = await createFormTransporter({
             variables: { input: t }
           });
-          return data?.createFormTransporter?.id;
+          return data?.createFormTransporter?.id ?? "";
         }
       })
     );
 
-    const formInput = {
+    const formInput: FormInput = {
       ...rest,
       // discard temporaryStorageDetail if recipient.isTempStorage === false
       ...(values.recipient?.isTempStorage === true
@@ -135,7 +135,7 @@ export default function StepsList(props: Props) {
             }))
           }
         : {}),
-      transporters: formTransportersIds.filter(Boolean)
+      transporters: formTransportersIds
     };
 
     saveForm(formInput)

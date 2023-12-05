@@ -13,7 +13,7 @@ import {
 
 type TransporterListProps = {
   // SIRET ou VAT de l'établissement courant
-  orgId: string;
+  orgId?: string;
   fieldName: string;
 };
 

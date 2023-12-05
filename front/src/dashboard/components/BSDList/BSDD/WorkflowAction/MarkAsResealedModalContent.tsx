@@ -230,7 +230,7 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
               Collecteur-transporteur après entreposage ou reconditionnement
             </h5>
 
-            <TransporterForm fieldName="transporter" orgId={orgId} />
+            <TransporterForm fieldName="transporter" orgId={orgId!} />
 
             <div className="form__actions">
               <button

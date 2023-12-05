@@ -22,8 +22,8 @@ interface CompanySelectorWrapperProps {
   favoriteType?: FavoriteType;
   allowForeignCompanies?: boolean;
   onCompanySelected?: (company?: CompanySearchResult) => void;
-  // Numéro SIRET de l'établissement courant (utile pour le calcul des favoris)
-  siret: string;
+  // Numéro SIRET ou VAT de l'établissement courant (utile pour le calcul des favoris)
+  orgId?: string;
   disabled?: boolean;
 }
 
@@ -40,7 +40,7 @@ export default function CompanySelectorWrapper({
   formOrgId,
   favoriteType = FavoriteType.Emitter,
   allowForeignCompanies = false,
-  siret,
+  orgId,
   disabled = false,
   onCompanySelected
 }: CompanySelectorWrapperProps) {
@@ -86,10 +86,10 @@ export default function CompanySelectorWrapper({
   }, [selectedCompany, formOrgId, searchCompaniesQuery, onSelectCompany]);
 
   const onSearchCompany = (searchClue, postalCodeClue) => {
-    if (searchClue.length === 0 && postalCodeClue.length === 0) {
+    if (searchClue.length === 0 && postalCodeClue.length === 0 && orgId) {
       getFavoritesQuery({
         variables: {
-          orgId: siret,
+          orgId,
           type: Object.values(FavoriteType).includes(favoriteType)
             ? favoriteType
             : FavoriteType.Emitter,
