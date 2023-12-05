@@ -15,7 +15,8 @@
   "author": "",
   "scripts": {
     "scalingo-postbuild": "bash scripts/build/scalingo.sh",
-    "nx": "nx"
+    "nx": "nx",
+    "dev": "npx nx run-many -t serve --parallel=6 --projects=front,api,tag:backend:background"
   },
   "engines": {
     "node": "^20"
