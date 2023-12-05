@@ -13,8 +13,8 @@ if (fs.existsSync(certPath)) {
 }
 
 // bypass ssl verif
-if (!!ssl && process.env.TD_COMPANY_ELASTICSEARCH_IGNORE_SSL === "true") {
-  ssl.rejectUnauthorized = false;
+if (process.env.TD_COMPANY_ELASTICSEARCH_IGNORE_SSL === "true") {
+  ssl = { rejectUnauthorized: false };
 }
 
 /**

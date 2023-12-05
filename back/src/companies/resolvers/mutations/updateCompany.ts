@@ -3,7 +3,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../database";
 import { updateCompanyFn } from "./updateCompanyService";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat, nafCodes } from "shared/constants";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import {
   NotCompanyAdminErrorMsg,
@@ -24,7 +24,6 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   applyAuthStrategies(context, authStrategies);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ id: args.id });
-
   await checkUserPermissions(
     user,
     company.orgId,
@@ -62,7 +61,16 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     );
   }
 
-  return updateCompanyFn(args);
+  const updatedCompany = await updateCompanyFn(args, company);
+  // conversion to CompanyPrivate type
+  const naf = company.codeNaf;
+  const libelleNaf = naf && naf in nafCodes ? nafCodes[naf] : "";
+
+  return {
+    ...updatedCompany,
+    naf,
+    libelleNaf
+  };
 };
 
 export default updateCompanyResolver;

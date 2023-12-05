@@ -94,7 +94,7 @@ export interface SearchOptions {
   sort?: string | string[];
   _source?: string | string[];
   _source_excludes?: string | string[];
-  _source_includes?: string | string[];
+  _source_includes?: string[];
 }
 
 export interface SearchResponse {

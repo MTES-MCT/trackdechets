@@ -43,6 +43,9 @@ async function exitScript() {
   process.exit(0);
 }
 
+/**
+ * Reindex all BSD with ou without the async job queue (--useQueue)
+ */
 (async function () {
   const force = process.argv.includes("--force") || process.argv.includes("-f");
   try {

@@ -8,6 +8,17 @@ jest.mock("../../../../prisma", () => ({
   }
 }));
 
+const mockGetUpdatedCompanyNameAndAddress = jest.fn();
+// Mock external search services
+jest.mock("../../../database", () => ({
+  // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
+  ...jest.requireActual("../../../database"),
+  getUpdatedCompanyNameAndAddress: (...args) =>
+    mockGetUpdatedCompanyNameAndAddress(...args)
+}));
+
+const anyCompany = { orgId: "123", name: "name", address: "address" };
+
 describe("updateCompany", () => {
   beforeEach(() => {
     updateCompanyMock.mockReset();
@@ -19,7 +30,7 @@ describe("updateCompany", () => {
       id: "85001946400013",
       gerepId: "gerepId"
     };
-    await updateCompany(payload);
+    await updateCompany(payload, anyCompany);
     expect(updateCompanyMock).toHaveBeenCalledWith({
       where: { id: "85001946400013" },
       data: { gerepId: "gerepId" }
@@ -30,7 +41,7 @@ describe("updateCompany", () => {
       companyTypes: ["PRODUCER"]
     };
 
-    await updateCompany(payload);
+    await updateCompany(payload, anyCompany);
 
     expect(updateCompanyMock).toHaveBeenCalledWith({
       where: { id: "85001946400013" },
@@ -42,7 +53,7 @@ describe("updateCompany", () => {
       website: ""
     };
 
-    await updateCompany(payload);
+    await updateCompany(payload, anyCompany);
 
     expect(updateCompanyMock).toHaveBeenCalledWith({
       where: { id: "85001946400013" },
