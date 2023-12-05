@@ -1,7 +1,8 @@
-import { logger } from "@td/logger";
+// import { logger } from "@td/logger";
 
 const setup = async () => {
-  logger.error("Playwright global-setup");
+  console.log("Playwright global-setup");
+  console.log("DATABASE_URL", process.env.DATABASE_URL);
 };
 
 export default setup;

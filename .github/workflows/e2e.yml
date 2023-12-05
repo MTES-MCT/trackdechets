@@ -50,7 +50,6 @@ jobs:
       - name: Testing Notifier resolution
         run: |
           ping -c 2 notifier.trackdechets.local
-          curl notifier.trackdechets.local
 
       # Playwright
       - name: Install Playwright Browsers

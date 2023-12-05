@@ -1,11 +1,11 @@
-import { logger } from "@td/logger";
-import { clearData } from "./utils";
+// import { logger } from "@td/logger";
+import { clearData } from "./utils/data";
 
 const teardown = async () => {
-  logger.info("Playwright global-teardown");
+  console.log("Playwright global-teardown");
 
-  logger.error("Cleaning database & cache");
-  logger.error("DATABASE_URL", process.env.DATABASE_URL);
+  console.log("Cleaning database & cache");
+  console.log("DATABASE_URL", process.env.DATABASE_URL);
   await clearData();
 };
 
