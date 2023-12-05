@@ -33,15 +33,9 @@ jobs:
           npx nx run back:codegen
           npx nx run back:prisma
           TERM=xterm bash ./scripts/deploy-db.sh
-      - name: Start api
+      - name: Start TD applications
         run: |
-          npx nx run api:serve &
-      - name: Start backend queues
-        run: |
-          npx nx run-many -t serve --parallel=4 --projects=tag:backend:background &
-      - name: Start front
-        run: |
-          npx nx run front:serve &
+          npx nx run-many -t serve --configuration=integration --projects=api,front,tag:backend:background --parallel=6 &
 
       # Playwright
       - name: Install Playwright Browsers
