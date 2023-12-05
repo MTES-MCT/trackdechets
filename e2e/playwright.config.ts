@@ -28,7 +28,11 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
     /* Use headless mode if you need to debug with screenshots in the CI */
-    headless: false
+    headless: false,
+    viewport: {
+      height: 1080,
+      width: 1920
+    }
   },
   // Start the docker containers
   globalSetup: require.resolve("./src/global-setup"),
