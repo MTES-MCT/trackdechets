@@ -1,19 +1,18 @@
 import { test } from "@playwright/test";
+import { createAccount, confirmAccount } from "./utils/user";
 
 test("create an account", async ({ page }) => {
-  const USER_NAME = `User 1`;
-  const USER_MAIL = `user.1@mail.com`;
-  const USER_PASSWORD = "Us3r0ne$$$";
+  const USER_NAME = `User e2e n°1`;
+  const USER_EMAIL = `user.e2e.n1@mail.com`;
+  const USER_PASSWORD = "Us3r_E2E_0ne$$$";
 
-  await page.goto("/");
-  await page.goto("/login");
-  await page.getByRole("link", { name: "Créer un compte" }).click();
-  await page.getByLabel("Nom et prénom").click();
-  await page.getByLabel("Nom et prénom").fill(USER_NAME);
-  await page.getByLabel("Nom et prénom").press("Tab");
-  await page.getByLabel("Email").fill(USER_MAIL);
-  await page.getByLabel("Email").press("Tab");
-  await page.getByLabel("Mot de passe", { exact: true }).fill(USER_PASSWORD);
-  await page.getByText("Je certifie avoir lu les conditions générales").click();
-  await page.getByRole("button", { name: "Créer mon compte" }).click();
+  // Create the account
+  await createAccount(page, {
+    username: USER_NAME,
+    email: USER_EMAIL,
+    password: USER_PASSWORD
+  });
+
+  // Confirm the account via email link
+  await confirmAccount(page, { email: USER_EMAIL });
 });
