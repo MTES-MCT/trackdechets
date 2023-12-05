@@ -1,9 +1,8 @@
 {
-    "name": "e2e",
-    "version": "1.0.0",
-    "description": "",
-    "engines": {
-      "node": "^20"
-    }
+  "name": "e2e",
+  "version": "1.0.0",
+  "description": "",
+  "engines": {
+    "node": "^20"
   }
-  
+}
