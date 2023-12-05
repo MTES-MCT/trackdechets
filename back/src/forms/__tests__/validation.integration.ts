@@ -932,7 +932,7 @@ describe("beforeTransportSchema", () => {
     expect(isValid).toBeTruthy();
   });
 
-  it("transporter receipt is not required if transport mode is ROAD", async () => {
+  it("transporter receipt is not required if transport mode is not ROAD", async () => {
     const testForm: Partial<Form> & {
       transporters: Partial<BsddTransporter>[];
     } = {
@@ -940,10 +940,10 @@ describe("beforeTransportSchema", () => {
       transporters: [
         {
           ...transporterData,
-          transporterTransportMode: "ROAD",
-          transporterReceipt: undefined,
-          transporterDepartment: undefined,
-          transporterValidityLimit: undefined
+          transporterTransportMode: "AIR",
+          transporterReceipt: "",
+          transporterDepartment: "",
+          transporterValidityLimit: null
         }
       ]
     };
