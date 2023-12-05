@@ -6,7 +6,7 @@ import {
 } from "../Apps/common/Components/Error/Error";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import { MembershipRequestStatus, Mutation, Query, UserRole } from "codegen-ui";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { TOAST_DURATION } from "../common/config";
 
@@ -48,7 +48,7 @@ const REFUSE_MEMBERSHIP_REQUEST = gql`
 export default function AccountMembershipRequest() {
   const { id } = useParams<{ id: string }>();
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [userRole, setUserRole] = useState<UserRole>(UserRole.Member);
 
@@ -69,7 +69,7 @@ export default function AccountMembershipRequest() {
         toast.success("La demande de rattachement a bien été acceptée", {
           duration: TOAST_DURATION
         });
-        history.push("/");
+        navigate("/");
       }
     }
   );
@@ -84,7 +84,7 @@ export default function AccountMembershipRequest() {
         toast.success("La demande de rattachement a bien été refusée", {
           duration: TOAST_DURATION
         });
-        history.push("/");
+        navigate("/");
       }
     }
   );

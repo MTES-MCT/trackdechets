@@ -34,7 +34,7 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
     Pick<Query, "companyPrivateInfos">,
     QueryCompanyPrivateInfosArgs
   >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
-    variables: { clue: siret }
+    variables: { clue: siret! }
   });
   const siretsWithAutomaticSignature = data
     ? data.companyPrivateInfos.receivedSignatureAutomations.map(
@@ -78,9 +78,9 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
                     pathname: generatePath(getViewRoute(form.__typename), {
                       siret,
                       id: form.id
-                    }),
-                    state: { background: location }
+                    })
                   }}
+                  state={{ background: location }}
                   className="btn btn--outline-primary"
                 >
                   <IconView size="24px" style={{ marginRight: "1rem" }} />
@@ -92,7 +92,7 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
             )}
             {form.__typename === "Form" ? (
               <WorkflowAction
-                siret={siret}
+                siret={siret!}
                 form={form}
                 options={{
                   canSkipEmission:
@@ -106,16 +106,16 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
               />
             ) : null}
             {form.__typename === "Bsdasri" ? (
-              <BsdasriWorkflowAction siret={siret} form={form} />
+              <BsdasriWorkflowAction siret={siret!} form={form} />
             ) : null}
             {form.__typename === "Bsff" ? (
               <BsffWorkflowAction form={form as unknown as BsffFragment} />
             ) : null}
             {form.__typename === "Bsvhu" ? (
-              <BsvhuWorkflowAction siret={siret} form={form} />
+              <BsvhuWorkflowAction siret={siret!} form={form} />
             ) : null}
             {form.__typename === "Bsda" ? (
-              <BsdaWorkflowAction siret={siret} form={form} />
+              <BsdaWorkflowAction siret={siret!} form={form} />
             ) : null}
           </div>
         </div>

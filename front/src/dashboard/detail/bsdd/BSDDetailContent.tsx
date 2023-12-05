@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   generatePath,
   Link,
-  useHistory,
+  useNavigate,
   useLocation,
   useParams
 } from "react-router-dom";
@@ -96,7 +96,7 @@ type SegmentProps = {
 };
 const TransportSegmentDetail = ({ segment, siret }: SegmentProps) => {
   const label = !!segment.segmentNumber
-    ? `N° ${segment.segmentNumber + 1}`
+    ? `Transporteur N° ${segment.segmentNumber}`
     : "";
   return (
     <>
@@ -611,13 +611,13 @@ export default function BSDDetailContent({
 }: BSDDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const query = useQueryString();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
   const [duplicate, { loading: isDuplicating }] = useDuplicate({
     variables: { id: form.id },
     onCompleted: () => {
-      history.push(
+      navigate(
         generatePath(routes.dashboard.bsds.drafts, {
           siret
         })
@@ -815,7 +815,7 @@ export default function BSDDetailContent({
             {/* Appendix 1 */}
             {isChapeau && (
               <TabPanel className={styles.detailTabPanel}>
-                <Appendix1 container={form} siret={siret} />
+                <Appendix1 container={form} siret={siret!} />
               </TabPanel>
             )}
             {/* Emitter tab panel */}
@@ -953,7 +953,7 @@ export default function BSDDetailContent({
               <TabPanel className={styles.detailTabPanel} key={idx}>
                 <TransportSegmentDetail
                   segment={segment}
-                  siret={siret}
+                  siret={siret!}
                   key={segment.id}
                 />
               </TabPanel>
@@ -1028,7 +1028,7 @@ export default function BSDDetailContent({
             </>
           )}
 
-          <WorkflowAction siret={siret} form={form} />
+          <WorkflowAction siret={siret!} form={form} />
           {children}
         </div>
       </div>

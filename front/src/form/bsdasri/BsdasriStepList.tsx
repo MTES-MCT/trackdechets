@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import toast from "react-hot-toast";
 import omitDeep from "omit-deep-lodash";
 import React, { lazy, ReactElement, useMemo } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Loader } from "../../Apps/common/Components";
 import { getComputedState } from "../common/getComputedState";
 
@@ -110,7 +110,7 @@ const removeSections = (
   return omitDeep(input, mapping[status]);
 };
 export default function BsdasriStepsList(props: Props) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const formQuery = useQuery<Pick<Query, "bsdasri">, QueryBsdasriArgs>(
     GET_BSDASRI,
@@ -211,7 +211,7 @@ export default function BsdasriStepsList(props: Props) {
 
     saveForm(input, type)
       .then(_ => {
-        history.goBack();
+        navigate(-1);
       })
       .catch(err => formInputToastError(err));
   }

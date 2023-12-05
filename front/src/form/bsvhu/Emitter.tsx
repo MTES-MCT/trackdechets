@@ -1,48 +1,22 @@
 import { RedErrorMessage } from "../../common/components";
-import { useQuery } from "@apollo/client";
 import CompanySelectorWrapper from "../common/components/CompanySelectorWrapper/CompanySelectorWrapper";
-import { Field, useFormikContext, useField } from "formik";
-import {
-  FavoriteType,
-  FormCompany,
-  Query,
-  QueryCompanyPrivateInfosArgs,
-  CompanySearchResult,
-  BsvhuEmitterInput
-} from "codegen-ui";
+import { Field, useField } from "formik";
+import { FavoriteType, BsvhuEmitter } from "codegen-ui";
 import { useParams } from "react-router-dom";
-import { COMPANY_SELECTOR_PRIVATE_INFOS } from "../../Apps/common/queries/company/query";
-import React, { useMemo, useState } from "react";
-import CompanySelectorFields from "../common/components/company/CompanySelectorFields";
+import React, { useMemo } from "react";
+import CompanyContactInfo from "../common/components/company/CompanyContactInfo";
 
 export default function Emitter({ disabled }) {
-  const { setFieldValue } = useFormikContext<{
-    emitter: BsvhuEmitterInput;
-  }>();
   const { siret } = useParams<{ siret: string }>();
-  const [currentCompany, setCurrentCompany] = useState<
-    CompanySearchResult | undefined
-  >();
-  const [shouldUpdateFields, setShouldUpdateFields] = useState(false);
 
-  const [field] = useField<FormCompany>({ name: "emitter.company" });
+  const [field, _, { setValue }] = useField<BsvhuEmitter>({ name: "emitter" });
+
+  const emitter = field.value;
+
   const orgId = useMemo(
-    () => field.value?.orgId ?? field.value?.siret ?? null,
-    [field.value?.siret, field.value?.orgId]
+    () => emitter?.company?.orgId ?? emitter?.company?.siret ?? null,
+    [emitter?.company?.orgId, emitter?.company?.siret]
   );
-
-  const { data: companyPrivateData, loading: _ } = useQuery<
-    Pick<Query, "companyPrivateInfos">,
-    QueryCompanyPrivateInfosArgs
-  >(COMPANY_SELECTOR_PRIVATE_INFOS, {
-    variables: {
-      // Compatibility with intermediaries that don't have orgId
-      clue: orgId!
-    },
-    skip: !orgId,
-    onCompleted: data =>
-      setCurrentCompany(data.companyPrivateInfos as CompanySearchResult)
-  });
 
   return (
     <>
@@ -55,33 +29,41 @@ export default function Emitter({ disabled }) {
       <h4 className="form__section-heading">Entreprise émettrice</h4>
 
       <CompanySelectorWrapper
-        siret={siret}
+        orgId={siret}
         favoriteType={FavoriteType.Emitter}
         disabled={disabled}
-        currentCompany={
-          currentCompany ??
-          (companyPrivateData?.companyPrivateInfos as CompanySearchResult)
-        }
-        onCompanySelected={emitter => {
-          setCurrentCompany(emitter);
-          setShouldUpdateFields(true);
+        formOrgId={orgId}
+        onCompanySelected={company => {
+          if (company) {
+            const companyData = {
+              orgId: company.orgId,
+              siret: company.siret,
+              vatNumber: company.vatNumber,
+              name: company.name ?? "",
+              address: company.address ?? "",
+              contact: company.contact ?? "",
+              phone: company.contactPhone ?? "",
+              mail: company.contactEmail ?? "",
+              country: company.codePaysEtrangerEtablissement
+            };
 
-          setFieldValue(
-            "emitter.agrementNumber",
-            emitter?.vhuAgrementDemolisseur?.agrementNumber
-          );
+            setValue({
+              ...emitter,
+              company: {
+                ...emitter.company,
+                ...companyData
+              },
+              agrementNumber: company?.vhuAgrementDemolisseur?.agrementNumber
+            });
+          }
         }}
       />
 
-      {currentCompany && (
-        <CompanySelectorFields
-          currentCompany={currentCompany}
-          name={"emitter.company"}
-          disabled={disabled}
-          key={currentCompany.orgId}
-          shouldUpdateFields={shouldUpdateFields}
-        />
-      )}
+      <CompanyContactInfo
+        fieldName={"emitter.company"}
+        disabled={disabled}
+        key={orgId}
+      />
 
       <div className="form__row">
         <label>

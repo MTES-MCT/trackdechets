@@ -1,5 +1,5 @@
 import React from "react";
-import { generatePath, NavLink, useHistory } from "react-router-dom";
+import { generatePath, NavLink, useNavigate } from "react-router-dom";
 import { CompanyPrivate } from "codegen-ui";
 import DashboardCompanySelector from "./DashboardCompanySelector";
 import routes from "../Apps/routes";
@@ -15,7 +15,7 @@ export function DashboardTabs({
   currentCompany,
   companies
 }: DashboardTabsProps) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { showTransportTabs } = useShowTransportTabs(
     currentCompany.companyTypes,
@@ -30,7 +30,7 @@ export function DashboardTabs({
             orgId={currentCompany.orgId}
             companies={companies}
             handleCompanyChange={orgId =>
-              history.push(
+              navigate(
                 generatePath(routes.dashboard.bsds.drafts, {
                   siret: orgId
                 })
@@ -50,8 +50,11 @@ export function DashboardTabs({
               to={generatePath(routes.dashboard.bsds.drafts, {
                 siret: currentCompany.orgId
               })}
-              className="sidebar__link sidebar__link--indented"
-              activeClassName="sidebar__link--active"
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebar__link sidebar__link--indented sidebar__link--active"
+                  : "sidebar__link sidebar__link--indented"
+              }
             >
               Brouillons
             </NavLink>
@@ -62,8 +65,11 @@ export function DashboardTabs({
               to={generatePath(routes.dashboard.bsds.act, {
                 siret: currentCompany.orgId
               })}
-              className="sidebar__link sidebar__link--indented"
-              activeClassName="sidebar__link--active"
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebar__link sidebar__link--indented sidebar__link--active"
+                  : "sidebar__link sidebar__link--indented"
+              }
             >
               Pour action
             </NavLink>
@@ -74,8 +80,11 @@ export function DashboardTabs({
               to={generatePath(routes.dashboard.bsds.follow, {
                 siret: currentCompany.orgId
               })}
-              className="sidebar__link sidebar__link--indented"
-              activeClassName="sidebar__link--active"
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebar__link sidebar__link--indented sidebar__link--active"
+                  : "sidebar__link sidebar__link--indented"
+              }
             >
               Suivi
             </NavLink>
@@ -85,8 +94,11 @@ export function DashboardTabs({
               to={generatePath(routes.dashboard.bsds.history, {
                 siret: currentCompany.orgId
               })}
-              className="sidebar__link sidebar__link--indented"
-              activeClassName="sidebar__link--active"
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebar__link sidebar__link--indented sidebar__link--active"
+                  : "sidebar__link sidebar__link--indented"
+              }
             >
               Archives
             </NavLink>
@@ -96,8 +108,11 @@ export function DashboardTabs({
               to={generatePath(routes.dashboard.bsds.reviews, {
                 siret: currentCompany.orgId
               })}
-              className="sidebar__link sidebar__link--indented"
-              activeClassName="sidebar__link--active"
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebar__link sidebar__link--indented sidebar__link--active"
+                  : "sidebar__link sidebar__link--indented"
+              }
             >
               Révisions
             </NavLink>
@@ -113,8 +128,11 @@ export function DashboardTabs({
                   to={generatePath(routes.dashboard.transport.toCollect, {
                     siret: currentCompany.orgId
                   })}
-                  className="sidebar__link sidebar__link--indented"
-                  activeClassName="sidebar__link--active"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "sidebar__link sidebar__link--indented sidebar__link--active"
+                      : "sidebar__link sidebar__link--indented"
+                  }
                 >
                   À collecter
                 </NavLink>
@@ -124,8 +142,11 @@ export function DashboardTabs({
                   to={generatePath(routes.dashboard.transport.collected, {
                     siret: currentCompany.orgId
                   })}
-                  className="sidebar__link sidebar__link--indented"
-                  activeClassName="sidebar__link--active"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "sidebar__link sidebar__link--indented sidebar__link--active"
+                      : "sidebar__link sidebar__link--indented"
+                  }
                 >
                   Collecté
                 </NavLink>
@@ -140,8 +161,11 @@ export function DashboardTabs({
               to={generatePath(routes.dashboard.exports, {
                 siret: currentCompany.orgId
               })}
-              className="sidebar__link sidebar__link--chapter"
-              activeClassName="sidebar__link--active"
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebar__link sidebar__link--indented sidebar__link--active"
+                  : "sidebar__link sidebar__link--indented"
+              }
             >
               Registre
             </NavLink>

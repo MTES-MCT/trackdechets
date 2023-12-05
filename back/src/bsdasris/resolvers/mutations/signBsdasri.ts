@@ -196,9 +196,12 @@ async function signTransport(
       );
     }
 
-    const emitterCompany = await getCompanyOrCompanyNotFound({
-      siret: bsdasri.emitterCompanySiret!
-    });
+    const emitterCompany = await getCompanyOrCompanyNotFound(
+      {
+        siret: bsdasri.emitterCompanySiret!
+      },
+      { allowBsdasriTakeOverWithoutSignature: true }
+    );
     if (!emitterCompany.allowBsdasriTakeOverWithoutSignature) {
       throw new UserInputError(
         "Erreur, l'émetteur n'a pas autorisé l'emport par le transporteur sans l'avoir préalablement signé"

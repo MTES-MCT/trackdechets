@@ -15,7 +15,8 @@
   "author": "",
   "scripts": {
     "scalingo-postbuild": "bash scripts/build/scalingo.sh",
-    "nx": "nx"
+    "nx": "nx",
+    "dev": "npx nx run-many -t serve --parallel=6 --projects=front,api,tag:backend:background"
   },
   "engines": {
     "node": "^20"
@@ -119,7 +120,7 @@
     "react-multi-select-component": "^4.3.4",
     "react-popper-tooltip": "^4.4.2",
     "react-qr-code": "^2.0.12",
-    "react-router-dom": "5.3.4",
+    "react-router-dom": "^6.19.0",
     "react-select": "^5.7.5",
     "react-stately": "^3.22.0",
     "react-switch": "7.0.0",

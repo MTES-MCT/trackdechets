@@ -7,6 +7,7 @@ import AccountFieldCompanyGivenName, {
   tooltip as givenNameTooltip
 } from "./fields/AccountFieldCompanyGivenName";
 import { CompanyPrivate, UserRole, CompanyType } from "codegen-ui";
+
 import AccountFieldCompanyTransporterReceipt from "./fields/AccountFieldCompanyTransporterReceipt";
 import AccountFieldCompanyTraderReceipt from "./fields/AccountFieldCompanyTraderReceipt";
 import AccountFieldCompanyBrokerReceipt from "./fields/AccountFieldCompanyBrokerReceipt";
@@ -16,6 +17,7 @@ import AccountFieldCompanyVhuAgrementDemolisseur from "./fields/AccountFieldComp
 import AccountFieldCompanyWorkerCertification from "./fields/AccountFieldCompanyWorkerCertification";
 import * as COMPANY_CONSTANTS from "shared/constants";
 import { isSiret, isVat } from "shared/constants";
+import AccountInfoAutoUpdate from "./fields/AccountInfoAutoUpdate";
 
 type Props = { company: CompanyPrivate };
 
@@ -24,6 +26,7 @@ AccountCompanyInfo.fragments = {
     fragment AccountCompanyInfoFragment on CompanyPrivate {
       id
       orgId
+      name
       siret
       vatNumber
       address
@@ -61,29 +64,38 @@ AccountCompanyInfo.fragments = {
 const { VITE_VERIFY_COMPANY } = import.meta.env;
 
 export default function AccountCompanyInfo({ company }: Props) {
+  const isAdmin = company.userRole === UserRole.Admin;
+
   const isWasteProfessional = company.companyTypes.some(ct =>
     COMPANY_CONSTANTS.PROFESSIONALS.includes(ct)
   );
-
   return (
     <>
-      {isSiret(
-        company.siret!,
-        import.meta.env.VITE_ALLOW_TEST_COMPANY === "true"
-      ) && (
-        <AccountFieldNotEditable
-          name="siret"
-          label="Numéro SIRET"
-          value={company.siret}
-        />
-      )}
-      {isVat(company.vatNumber!) && (
-        <AccountFieldNotEditable
-          name="vatNumber"
-          label="Numéro de TVA intra-communautaire"
-          value={company.vatNumber}
-        />
-      )}
+      <div className="tw-flex">
+        {isSiret(
+          company.siret!,
+          import.meta.env.VITE_ALLOW_TEST_COMPANY === "true"
+        ) && (
+          <AccountFieldNotEditable
+            name="siret"
+            label="Numéro SIRET"
+            value={company.siret}
+            insideForm={
+              isAdmin ? <AccountInfoAutoUpdate company={company} /> : undefined
+            }
+          />
+        )}
+        {isVat(company.vatNumber!) && (
+          <AccountFieldNotEditable
+            name="vatNumber"
+            label="Numéro de TVA intra-communautaire"
+            value={company.vatNumber}
+            insideForm={
+              isAdmin ? <AccountInfoAutoUpdate company={company} /> : undefined
+            }
+          />
+        )}
+      </div>
       <AccountFieldNotEditable
         name="naf"
         label="Code NAF"
@@ -132,7 +144,7 @@ export default function AccountCompanyInfo({ company }: Props) {
       {company.companyTypes.includes(CompanyType.Worker) && (
         <AccountFieldCompanyWorkerCertification company={company} />
       )}
-      {company.userRole === UserRole.Admin ? (
+      {isAdmin ? (
         <AccountFieldCompanyGivenName company={company} />
       ) : (
         company.givenName && (

@@ -1,6 +1,6 @@
 import React from "react";
 import { useBsdasriDuplicate } from "../../components/BSDList/BSDasri/BSDasriActions/useDuplicate";
-import { generatePath, useHistory, useParams } from "react-router-dom";
+import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { getTransportModeLabel } from "../../constants";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
@@ -299,12 +299,12 @@ const Recipient = ({ form }: { form: Bsdasri }) => {
 
 export default function BsdasriDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [duplicate] = useBsdasriDuplicate({
     variables: { id: form.id },
     onCompleted: () => {
-      history.push(
+      navigate(
         generatePath(routes.dashboard.bsds.drafts, {
           siret
         })

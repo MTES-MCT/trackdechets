@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React, { lazy, ReactElement, useMemo } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Loader } from "../../../Apps/common/Components";
 import { GET_BSDS } from "../../../Apps/common/queries";
 import { getComputedState } from "../../common/getComputedState";
@@ -39,7 +39,7 @@ const prefillTransportMode = state => {
 };
 
 export default function BsdaStepsList(props: Props) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const formQuery = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
     variables: {
@@ -119,7 +119,7 @@ export default function BsdaStepsList(props: Props) {
     const { id, ...input } = values;
     saveForm(input)
       .then(_ => {
-        history.goBack();
+        navigate(-1);
       })
       .catch(err => formInputToastError(err));
   }

@@ -4,19 +4,26 @@ import {
   FormInput,
   Mutation,
   MutationCreateFormArgs,
+  MutationCreateFormTransporterArgs,
   MutationUpdateFormArgs,
+  MutationUpdateFormTransporterArgs,
   Query,
   QueryFormArgs
 } from "codegen-ui";
 import React, { ReactElement, useMemo, lazy } from "react";
-import { useHistory } from "react-router-dom";
-import { getInitialState } from "./utils/initial-state";
+import { useNavigate } from "react-router-dom";
+import { FormFormikValues, getInitialState } from "./utils/initial-state";
 import { formSchema } from "./utils/schema";
 import { CREATE_FORM, GET_FORM, UPDATE_FORM } from "./utils/queries";
 import { GET_BSDS } from "../../Apps/common/queries";
 import { Loader } from "../../Apps/common/Components";
 import { formInputToastError } from "../common/stepper/toaster";
 import { IStepContainerProps } from "../common/stepper/Step";
+import {
+  CREATE_FORM_TRANSPORTER,
+  UPDATE_FORM_TRANSPORTER
+} from "../../Apps/Forms/Components/query";
+import { NotificationError } from "../../Apps/common/Components/Error/Error";
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (form: Form | undefined) => ReactElement;
@@ -24,7 +31,7 @@ interface Props {
 }
 
 export default function StepsList(props: Props) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const formQuery = useQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
     variables: {
@@ -40,15 +47,42 @@ export default function StepsList(props: Props) {
     [formQuery.data]
   );
 
-  const [createForm, { loading: creating }] = useMutation<
-    Pick<Mutation, "createForm">,
-    MutationCreateFormArgs
-  >(CREATE_FORM, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+  const [createForm, { loading: creating, error: createFormError }] =
+    useMutation<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
+      CREATE_FORM,
+      { refetchQueries: [GET_BSDS], awaitRefetchQueries: true }
+    );
 
-  const [updateForm, { loading: updating }] = useMutation<
-    Pick<Mutation, "updateForm">,
-    MutationUpdateFormArgs
-  >(UPDATE_FORM, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+  const [updateForm, { loading: updating, error: updateFormError }] =
+    useMutation<Pick<Mutation, "updateForm">, MutationUpdateFormArgs>(
+      UPDATE_FORM,
+      { refetchQueries: [GET_BSDS], awaitRefetchQueries: true }
+    );
+
+  const [
+    createFormTransporter,
+    { loading: creatingFormTransporter, error: createFormTransporterError }
+  ] = useMutation<
+    Pick<Mutation, "createFormTransporter">,
+    MutationCreateFormTransporterArgs
+  >(CREATE_FORM_TRANSPORTER);
+
+  const [
+    updateFormTransporter,
+    { loading: updatingFormTransporter, error: updateFormTransporterError }
+  ] = useMutation<
+    Pick<Mutation, "updateFormTransporter">,
+    MutationUpdateFormTransporterArgs
+  >(UPDATE_FORM_TRANSPORTER);
+
+  const loading =
+    creating || updating || creatingFormTransporter || updatingFormTransporter;
+
+  const error =
+    createFormError ||
+    updateFormError ||
+    createFormTransporterError ||
+    updateFormTransporterError;
 
   function saveForm(formInput: FormInput): Promise<any> {
     const { id, ...input } = formInput;
@@ -59,10 +93,33 @@ export default function StepsList(props: Props) {
       : createForm({ variables: { createFormInput: input } });
   }
 
-  function onSubmit(values) {
-    const { temporaryStorageDetail, ecoOrganisme, grouping, ...rest } = values;
+  async function onSubmit(values: FormFormikValues) {
+    const {
+      temporaryStorageDetail,
+      ecoOrganisme,
+      grouping,
+      transporters,
+      ...rest
+    } = values;
 
-    const formInput = {
+    const formTransportersIds: string[] = await Promise.all(
+      transporters.map(async t => {
+        if (t.id) {
+          const { id, ...input } = t;
+          await updateFormTransporter({
+            variables: { id: t.id, input }
+          });
+          return id;
+        } else {
+          const { data } = await createFormTransporter({
+            variables: { input: t }
+          });
+          return data?.createFormTransporter?.id ?? "";
+        }
+      })
+    );
+
+    const formInput: FormInput = {
       ...rest,
       // discard temporaryStorageDetail if recipient.isTempStorage === false
       ...(values.recipient?.isTempStorage === true
@@ -77,11 +134,12 @@ export default function StepsList(props: Props) {
               quantity
             }))
           }
-        : {})
+        : {}),
+      transporters: formTransportersIds
     };
 
     saveForm(formInput)
-      .then(_ => history.goBack())
+      .then(_ => navigate(-1))
       .catch(err => formInputToastError(err));
   }
 
@@ -101,7 +159,8 @@ export default function StepsList(props: Props) {
         initialValues={formState}
         validationSchema={formSchema}
       />
-      {(creating || updating) && <Loader />}
+      {loading && <Loader />}
+      {error && <NotificationError apolloError={error} />}
     </>
   );
 }

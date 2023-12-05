@@ -163,7 +163,7 @@ describe("Bsd Badge status", () => {
         bsdType={BsdType.Bsff}
       />
     );
-    expect(screen.getByText(/En attente d'un bordereau suite/i));
+    expect(screen.getByText(/En attente de traitement/i));
   });
   test("INTERMEDIATELY_PROCESSED bsdasri", () => {
     render(
@@ -220,6 +220,6 @@ describe("Bsd Badge status", () => {
     render(
       <Badge status={BsdStatusCode.AwaitingChild} bsdType={BsdType.Bsff} />
     );
-    expect(screen.getByText(/En attente d'un bordereau suite/i));
+    expect(screen.getByText(/En attente de traitement/i));
   });
 });

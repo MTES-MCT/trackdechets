@@ -133,7 +133,7 @@ export default function CompanySelector({
     FAVORITES(favoriteType),
     {
       variables: {
-        orgId: siret,
+        orgId: siret!,
         type: Object.values(FavoriteType).includes(favoriteType)
           ? favoriteType
           : FavoriteType.Emitter,

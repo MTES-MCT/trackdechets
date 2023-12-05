@@ -22,7 +22,7 @@ import {
   MutationCreateFormRevisionRequestArgs
 } from "codegen-ui";
 import React from "react";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
 import * as yup from "yup";
 import { removeEmptyKeys } from "../../../../../common/helper";
@@ -74,7 +74,7 @@ const validationSchema = yup.object({
 
 export function BsddRequestRevision({ bsdd }: Props) {
   const { siret } = useParams<{ siret: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [createFormRevisionRequest, { loading, error }] = useMutation<
     Pick<Mutation, "createFormRevisionRequest">,
     MutationCreateFormRevisionRequestArgs
@@ -107,11 +107,11 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 formId: bsdd.id,
                 content: cleanedContent ?? {},
                 comment,
-                authoringCompanySiret: siret
+                authoringCompanySiret: siret!
               }
             }
           });
-          history.goBack();
+          navigate(-1);
         }}
       >
         {({ setFieldValue, values }) => {
@@ -480,7 +480,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 <button
                   className="btn btn--outline-primary"
                   onClick={() => {
-                    history.goBack();
+                    navigate(-1);
                   }}
                   type="button"
                 >

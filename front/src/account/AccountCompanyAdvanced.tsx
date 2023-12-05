@@ -9,7 +9,7 @@ import {
 import AccountField from "./fields/AccountField";
 import { MY_COMPANIES } from "./AccountCompanyList";
 import routes from "../Apps/routes";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 AccountCompanyAdvanced.fragments = {
   company: gql`
@@ -34,7 +34,7 @@ const DELETE_COMPANY = gql`
 export default function AccountCompanyAdvanced({
   company
 }: AccountCompanyAdvancedProps) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [deleteCompany, { loading }] = useMutation<
     Pick<Mutation, "deleteCompany">,
@@ -44,7 +44,7 @@ export default function AccountCompanyAdvanced({
     refetchQueries: [GET_ME, { query: MY_COMPANIES, variables: { first: 10 } }],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      history.push(routes.account.companies.list);
+      navigate(routes.account.companies.list);
     }
   });
 

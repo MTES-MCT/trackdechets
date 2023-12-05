@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from "react";
 import {
   generatePath,
-  useHistory,
+  useNavigate,
   useLocation,
-  useRouteMatch
+  useMatch
 } from "react-router-dom";
 import { BsdCardListProps } from "./bsdCardListTypes";
 import BsdCard from "../BsdCard/BsdCard";
@@ -60,27 +60,29 @@ function BsdCardList({
   bsdCurrentTab,
   siretsWithAutomaticSignature
 }: BsdCardListProps): JSX.Element {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const isReviewsTab = bsdCurrentTab === "reviewsTab";
   const isActTab = bsdCurrentTab === "actTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
-  const isAllBsdsTab = !!useRouteMatch(routes.dashboardv2.bsds.index);
+  const isAllBsdsTab = !!useMatch(routes.dashboardv2.bsds.index);
 
   const redirectToPath = useCallback(
     (path, id) => {
       if (path) {
-        history.push({
-          pathname: generatePath(path, {
+        navigate(
+          generatePath(path, {
             siret,
             id
           }),
-          state: { background: location }
-        });
+          {
+            state: { background: location }
+          }
+        );
       }
     },
-    [history, location, siret]
+    [navigate, location, siret]
   );
 
   const [validationWorkflowType, setValidationWorkflowType] =

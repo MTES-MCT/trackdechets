@@ -24,7 +24,7 @@ import { Field, Form, Formik } from "formik";
 import { RadioButton } from "../../../../../form/common/components/custom-inputs/RadioButton";
 import { formatDate } from "../../../../../common/datetime";
 import { RevisionField } from "../../bsdd/approve/RevisionField";
-import { useParams, useRouteMatch } from "react-router-dom";
+import { useParams, useMatch } from "react-router-dom";
 import { PACKAGINGS_NAMES } from "../../../../../form/bsda/components/packagings/Packagings";
 import { getOperationModeLabel } from "../../../../../common/operationModes";
 
@@ -44,7 +44,7 @@ export function BsdaApproveRevision({
   onModalCloseFromParent
 }: Props) {
   const { siret } = useParams<{ siret: string }>();
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   const [submitBsdaRevisionRequestApproval, { loading }] = useMutation<
     Pick<Mutation, "submitBsdaRevisionRequestApproval">,

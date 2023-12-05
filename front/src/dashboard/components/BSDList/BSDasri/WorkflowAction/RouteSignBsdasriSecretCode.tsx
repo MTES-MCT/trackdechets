@@ -8,9 +8,9 @@ import Packagings from "../../../../../form/bsdasri/components/packagings/Packag
 import WeightWidget from "../../../../../form/bsdasri/components/Weight";
 import {
   useParams,
-  useHistory,
+  useNavigate,
   generatePath,
-  useRouteMatch
+  useMatch
 } from "react-router-dom";
 import { BdasriSummary } from "../Summary/BsdasriSummary";
 import Loader from "../../../../../Apps/common/Components/Loader/Loaders";
@@ -49,14 +49,14 @@ import {
 import SignatureCodeInput from "../../../../../form/common/components/custom-inputs/SignatureCodeInput";
 
 export function RouteBSDasrisSignEmissionSecretCode() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const { error, data, loading } = useQuery<
     Pick<Query, "bsdasri">,
     QueryBsdasriArgs
   >(GET_DETAIL_DASRI, {
     variables: {
-      id: formId
+      id: formId!
     },
 
     fetchPolicy: "no-cache"
@@ -70,7 +70,7 @@ export function RouteBSDasrisSignEmissionSecretCode() {
     MutationSignBsdasriEmissionWithSecretCodeArgs
   >(SIGN_BSDASRI_EMISSION_WITH_SECRET_CODE);
 
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
   const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
   const toCollectDashboard = {
     pathname: generatePath(routes[dashboardRoutePrefix].transport.toCollect, {
@@ -82,7 +82,7 @@ export function RouteBSDasrisSignEmissionSecretCode() {
       routes[dashboardRoutePrefix].bsdasris.sign.transporter,
       {
         siret,
-        id: formId
+        id: formId!
       }
     ),
     state: { background: toCollectDashboard }
@@ -148,7 +148,7 @@ export function RouteBSDasrisSignEmissionSecretCode() {
             }
           });
 
-          history.push(signTransporterRedirection);
+          navigate(signTransporterRedirection);
         }}
       >
         {({ isSubmitting, handleReset }) => {
@@ -205,7 +205,7 @@ export function RouteBSDasrisSignEmissionSecretCode() {
                   className="btn btn--outline-primary"
                   onClick={() => {
                     handleReset();
-                    history.push(toCollectDashboard);
+                    navigate(toCollectDashboard);
                   }}
                 >
                   Annuler

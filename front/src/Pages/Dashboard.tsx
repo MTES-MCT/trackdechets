@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
-import { useParams, useRouteMatch } from "react-router-dom";
+import { useParams, useMatch } from "react-router-dom";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import * as Sentry from "@sentry/browser";
 import routes from "../Apps/routes";
@@ -51,20 +51,16 @@ import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 
 const DashboardPage = () => {
   const { permissions } = usePermissions();
-  const isActTab = !!useRouteMatch(routes.dashboardv2.bsds.act);
-  const isDraftTab = !!useRouteMatch(routes.dashboardv2.bsds.drafts);
-  const isFollowTab = !!useRouteMatch(routes.dashboardv2.bsds.follow);
-  const isArchivesTab = !!useRouteMatch(routes.dashboardv2.bsds.history);
-  const isReviewsTab = !!useRouteMatch(routes.dashboardv2.bsds.reviews);
-  // const isToReviewedTab = !!useRouteMatch(routes.dashboardv2.bsds.toReviewed);
-  // const isReviewedTab = !!useRouteMatch(routes.dashboardv2.bsds.reviewed);
-  const isToCollectTab = !!useRouteMatch(
-    routes.dashboardv2.transport.toCollect
-  );
-  const isCollectedTab = !!useRouteMatch(
-    routes.dashboardv2.transport.collected
-  );
-  const isAllBsdsTab = !!useRouteMatch(routes.dashboardv2.bsds.index);
+  const isActTab = !!useMatch(routes.dashboardv2.bsds.act);
+  const isDraftTab = !!useMatch(routes.dashboardv2.bsds.drafts);
+  const isFollowTab = !!useMatch(routes.dashboardv2.bsds.follow);
+  const isArchivesTab = !!useMatch(routes.dashboardv2.bsds.history);
+  const isReviewsTab = !!useMatch(routes.dashboardv2.bsds.reviews);
+  // const isToReviewedTab = !!useMatch(routes.dashboardv2.bsds.toReviewed);
+  // const isReviewedTab = !!useMatch(routes.dashboardv2.bsds.reviewed);
+  const isToCollectTab = !!useMatch(routes.dashboardv2.transport.toCollect);
+  const isCollectedTab = !!useMatch(routes.dashboardv2.transport.collected);
+  const isAllBsdsTab = !!useMatch(routes.dashboardv2.bsds.index);
 
   const BSD_PER_PAGE = 25;
   const bsdCurrentTab = getBsdCurrentTab({
@@ -167,7 +163,7 @@ const DashboardPage = () => {
   }, [tabs]);
 
   // Be notified if someone else modifies bsds
-  useNotifier(siret, () => {
+  useNotifier(siret!, () => {
     if (!isReviewsTab) {
       fetchBsds(siret, bsdsVariables, tabs);
     }
@@ -185,7 +181,7 @@ const DashboardPage = () => {
     QueryBsdaRevisionRequestsArgs
   >(GET_BSDA_REVISION_REQUESTS, {
     variables: {
-      siret
+      siret: siret!
     },
     fetchPolicy: "cache-and-network"
   });
@@ -203,7 +199,7 @@ const DashboardPage = () => {
     QueryFormRevisionRequestsArgs
   >(GET_FORM_REVISION_REQUESTS, {
     variables: {
-      siret
+      siret: siret!
     },
     fetchPolicy: "cache-and-network"
   });
@@ -212,7 +208,7 @@ const DashboardPage = () => {
     Pick<Query, "companyPrivateInfos">,
     QueryCompanyPrivateInfosArgs
   >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
-    variables: { clue: siret }
+    variables: { clue: siret! }
   });
 
   const siretsWithAutomaticSignature = companyData
@@ -417,7 +413,7 @@ const DashboardPage = () => {
 
       {Boolean(bsdsTotalCount) && (
         <BsdCardList
-          siret={siret}
+          siret={siret!}
           bsds={bsds!}
           bsdCurrentTab={bsdCurrentTab}
           siretsWithAutomaticSignature={siretsWithAutomaticSignature}
