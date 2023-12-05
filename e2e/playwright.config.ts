@@ -29,6 +29,7 @@ export default defineConfig({
     trace: "on-first-retry",
     /* Use headless mode if you need to debug with screenshots in the CI */
     headless: false,
+    deviceScaleFactor: 1,
     viewport: {
       height: 1080,
       width: 1920
