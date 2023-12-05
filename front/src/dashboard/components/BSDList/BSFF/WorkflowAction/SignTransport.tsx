@@ -19,7 +19,7 @@ import {
 import { SignBsff } from "./SignBsff";
 import { GET_BSDS } from "../../../../../Apps/common/queries";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
-import TransporterReceipt from "../../../../../form/common/components/company/TransporterReceipt";
+import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import { subMonths } from "date-fns";
 import TagsInput from "../../../../../common/components/tags-input/TagsInput";
 
@@ -92,7 +92,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
             les informations ci-dessus sont correctes. En signant ce document,
             je déclare prendre en charge le déchet.
           </p>
-          <TransporterReceipt transporter={bsff.transporter!} />
+          <TransporterRecepisseWrapper transporter={bsff.transporter!} />
 
           {!bsff.transporter?.transport?.mode ||
             (bsff.transporter?.transport?.mode === TransportMode.Road && (

@@ -11,9 +11,10 @@ import {
   Transporter as FormTransporter,
   Transporter
 } from "codegen-ui";
-import TransporterReceipt from "../../../../form/common/components/company/TransporterReceipt";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import CompanyContactInfo from "../../../../form/common/components/company/CompanyContactInfo";
+import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
+import TransporterRecepisse from "../TransporterRecepisse/TransporterRecepisse";
+import { isForeignVat } from "shared/constants";
 
 type TransporterFormProps = {
   // SIRET ou VAT de l'établissement courant
@@ -40,6 +41,11 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
   const transporterOrgId = React.useMemo(
     () => transporter?.company?.orgId ?? transporter?.company?.siret ?? null,
     [transporter?.company?.orgId, transporter?.company?.siret]
+  );
+
+  const isForeign = React.useMemo(
+    () => isForeignVat(transporterOrgId),
+    [transporterOrgId]
   );
 
   // Callback qui est passé au CompanySelector et qui permet de
@@ -138,8 +144,12 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
         )}
       </Field>
 
-      {!!transporterOrgId && !transporter.isExemptedOfReceipt && (
-        <TransporterReceipt transporter={transporter} />
+      {!!transporterOrgId && !isForeign && !transporter.isExemptedOfReceipt && (
+        <TransporterRecepisse
+          number={transporter.receipt}
+          department={transporter.department}
+          validityLimit={transporter.validityLimit}
+        />
       )}
 
       <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">

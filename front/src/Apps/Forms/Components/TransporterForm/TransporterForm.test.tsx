@@ -4,6 +4,8 @@ import { TransporterForm } from "./TransporterForm";
 import { Formik } from "formik";
 import { MockedProvider } from "@apollo/client/testing";
 import { Transporter } from "codegen-ui/src";
+import { formatDate } from "../../../../common/datetime";
+import { SEARCH_COMPANIES } from "../../../common/queries/company/query";
 
 const defaultTransporter: Transporter = {
   id: "clpju9r3c000dljj5gcpkvlgu",
@@ -24,11 +26,56 @@ const defaultTransporter: Transporter = {
   validityLimit: "2023-12-31T23:00:00.000Z"
 };
 
+const mocks = (transporter: Transporter) => [
+  {
+    request: {
+      query: SEARCH_COMPANIES,
+      variables: {
+        clue: transporter.company?.orgId
+      }
+    },
+    result: () => {
+      return {
+        data: {
+          searchCompanies: [
+            {
+              __typename: "CompanySearchResult",
+              orgId: transporter?.company?.orgId,
+              siret: transporter?.company?.siret,
+              vatNumber: transporter?.company?.vatNumber,
+              name: transporter?.company?.name,
+              address: transporter?.company?.address,
+              etatAdministratif: "A",
+              codePaysEtrangerEtablissement: null,
+              isRegistered: true,
+              trackdechetsId: "cloo373tc000gljph1c11vtan",
+              contact: transporter?.company?.contact,
+              contactPhone: transporter?.company?.phone,
+              contactEmail: transporter?.company?.mail,
+              companyTypes: ["TRANSPORTER"],
+              traderReceipt: null,
+              brokerReceipt: null,
+              transporterReceipt: {
+                receiptNumber: transporter?.receipt,
+                validityLimit: transporter?.validityLimit,
+                department: transporter?.department
+              },
+              vhuAgrementDemolisseur: null,
+              vhuAgrementBroyeur: null,
+              workerCertification: null
+            }
+          ]
+        }
+      };
+    }
+  }
+];
+
 describe("TransporterForm", () => {
   afterEach(jest.resetAllMocks);
 
   const Component = (data: Transporter) => (
-    <MockedProvider mocks={[]} addTypename={false}>
+    <MockedProvider mocks={mocks(data)} addTypename={false}>
       <Formik initialValues={{ transporter: data }} onSubmit={jest.fn()}>
         <TransporterForm fieldName="transporter" orgId="38128881000033" />
       </Formik>
@@ -46,5 +93,54 @@ describe("TransporterForm", () => {
     expect(transportModeInput).toBeInTheDocument();
     const plateInput = screen.getByLabelText("Immatriculation");
     expect(plateInput).toBeInTheDocument();
+  });
+
+  test("transporter receipt info is displayed", () => {
+    render(Component(defaultTransporter));
+    expect(
+      screen.getByText("Récépissé de déclaration de transport de déchets")
+    ).toBeInTheDocument();
+    const expected = `Numéro: ${defaultTransporter.receipt}, département: ${
+      defaultTransporter?.department
+    }, date limite de validité: ${formatDate(
+      defaultTransporter.validityLimit!
+    )}`;
+    expect(screen.getByText(expected, { exact: false })).toBeInTheDocument();
+  });
+
+  test("transporter receipt error is displayed if recepisse is not present", () => {
+    render(
+      Component({
+        ...defaultTransporter,
+        receipt: null,
+        department: null,
+        validityLimit: null
+      })
+    );
+    expect(
+      screen.getByText("Récépissé de déclaration de transport de déchets")
+    ).toBeInTheDocument();
+    const expected =
+      "L'entreprise de transport n'a pas complété ces informations dans" +
+      " son profil Trackdéchets. Nous ne pouvons pas les afficher. Il lui" +
+      " appartient de les compléter.";
+    expect(screen.getByText(expected, { exact: false })).toBeInTheDocument();
+  });
+
+  test("transporter receipt is not displayed if company is foreign", () => {
+    render(
+      Component({
+        ...defaultTransporter,
+        company: {
+          ...defaultTransporter.company,
+          siret: null,
+          orgId: "IT13029381004",
+          vatNumber: "IT13029381004"
+        }
+      })
+    );
+    expect(
+      screen.queryByText("Récépissé de déclaration de transport de déchets")
+    ).not.toBeInTheDocument();
   });
 });

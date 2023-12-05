@@ -46,7 +46,7 @@ import {
   FAVORITES,
   SEARCH_COMPANIES
 } from "../../../../Apps/common/queries/company/query";
-import TransporterReceipt from "./TransporterReceipt";
+import TransporterRecepisseWrapper from "./TransporterRecepisseWrapper";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -602,7 +602,7 @@ export default function CompanySelector({
         </div>
 
         {values.transporter && !!orgId && name === "transporter.company" && (
-          <TransporterReceipt transporter={values.transporter!} />
+          <TransporterRecepisseWrapper transporter={values.transporter!} />
         )}
       </div>
     </>
