@@ -88,7 +88,7 @@ export const COLUMNS: Record<
       const { siret } = useParams<{ siret: string }>();
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret} form={row.original} />
+          <WorkflowAction siret={siret!} form={row.original} />
         </ActionButtonContext.Provider>
       );
     }

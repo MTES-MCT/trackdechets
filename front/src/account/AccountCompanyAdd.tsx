@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import routes from "../Apps/routes";
 import { GET_ME } from "../dashboard/Dashboard";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
@@ -49,14 +49,14 @@ export const CREATE_COMPANY = gql`
   }
 `;
 
-export const CREATE_COMPANY_HOOK_OPTIONS = history => ({
+export const CREATE_COMPANY_HOOK_OPTIONS = navigate => ({
   refetchQueries: [
     { query: GET_ME },
     { query: MY_COMPANIES, variables: { first: 10 } }
   ],
   awaitRefetchQueries: true,
   onCompleted: () => {
-    history.push(routes.account.companies.list);
+    navigate(routes.account.companies.list);
   }
 });
 
@@ -119,7 +119,7 @@ export interface Values extends FormikValues {
  * the logged in user admin of it
  */
 export default function AccountCompanyAdd() {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   // STATE
   const [companyInfos, setCompanyInfos] = useState<CompanySearchResult | null>(
@@ -130,7 +130,7 @@ export default function AccountCompanyAdd() {
   const [createCompany, { error: savingError }] = useMutation<
     Pick<Mutation, "createCompany">,
     MutationCreateCompanyArgs
-  >(CREATE_COMPANY, CREATE_COMPANY_HOOK_OPTIONS(history));
+  >(CREATE_COMPANY, CREATE_COMPANY_HOOK_OPTIONS(navigate));
 
   const [createTransporterReceipt, { error: createTransporterReceiptError }] =
     useMutation(CREATE_TRANSPORTER_RECEIPT);
@@ -430,8 +430,7 @@ export default function AccountCompanyAdd() {
               <Button
                 priority="tertiary"
                 onClick={() => {
-                  history.push({
-                    pathname: routes.account.companies.create.foreign,
+                  navigate(routes.account.companies.create.foreign, {
                     state: { vatNumber: companyInfos.vatNumber }
                   });
                 }}
@@ -889,7 +888,7 @@ export default function AccountCompanyAdd() {
                       type="button"
                       disabled={isSubmitting}
                       onClick={() => {
-                        history.goBack();
+                        navigate(-1);
                       }}
                     >
                       Annuler

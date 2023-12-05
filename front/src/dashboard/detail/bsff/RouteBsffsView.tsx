@@ -16,7 +16,7 @@ export function RouteBsffsView() {
     GET_BSFF_FORM,
     {
       variables: {
-        id: formId
+        id: formId!
       },
       skip: !formId,
       fetchPolicy: "network-only"

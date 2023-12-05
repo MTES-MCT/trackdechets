@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React, { ReactElement, useMemo, lazy } from "react";
-import { generatePath, useHistory, useParams } from "react-router-dom";
+import { generatePath, useNavigate, useParams } from "react-router-dom";
 import routes from "../../Apps/routes";
 import { getComputedState } from "../common/getComputedState";
 import { IStepContainerProps } from "../common/stepper/Step";
@@ -28,7 +28,7 @@ interface Props {
 
 export default function BsvhuStepsList(props: Props) {
   const { siret } = useParams<{ siret: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const formQuery = useQuery<Pick<Query, "bsvhu">, QueryBsvhuArgs>(
     GET_VHU_FORM,
@@ -72,7 +72,7 @@ export default function BsvhuStepsList(props: Props) {
         const redirectTo = generatePath(routes.dashboard.bsds.drafts, {
           siret
         });
-        history.push(redirectTo);
+        navigate(redirectTo);
       })
       .catch(err => formInputToastError(err));
   }

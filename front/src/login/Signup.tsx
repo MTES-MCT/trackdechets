@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { Mutation, MutationSignupArgs } from "codegen-ui";
 import { SIGNUP } from "./mutations";
@@ -31,7 +31,7 @@ export default function Signup() {
     SIGNUP
   );
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = `Créer un compte | ${document.title}`;
@@ -65,9 +65,7 @@ export default function Signup() {
   };
 
   const onConnectClick = () => {
-    history.push({
-      pathname: routes.login
-    });
+    navigate(routes.login);
   };
 
   useEffect(() => {

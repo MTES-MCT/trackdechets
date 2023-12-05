@@ -1,6 +1,6 @@
 import React, { createRef, useEffect } from "react";
 import * as queryString from "query-string";
-import { useLocation, Redirect } from "react-router-dom";
+import { useLocation, Navigate } from "react-router-dom";
 import routes from "../Apps/routes";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
@@ -16,9 +16,7 @@ function getErrorMessage(errorCode: string) {
 }
 
 export default function UserActivation() {
-  const location = useLocation<{
-    errorCode?: string;
-  }>();
+  const location = useLocation();
 
   useEffect(() => {
     document.title = `Activation du compte | ${document.title}`;
@@ -35,7 +33,7 @@ export default function UserActivation() {
       ...(queries.errorCode ? { errorCode } : {})
     };
 
-    return <Redirect to={{ pathname: routes.userActivation, state }} />;
+    return <Navigate to={{ pathname: routes.userActivation }} state={state} />;
   }
 
   const { errorCode } = location.state || {};

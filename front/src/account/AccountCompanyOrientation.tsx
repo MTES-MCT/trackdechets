@@ -1,11 +1,11 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import routes from "../Apps/routes";
 
 import { CallOut } from "@codegouvfr/react-dsfr/CallOut";
 
 export default function AccountCompanyOrientation() {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <div className="fr-container-fluid">
@@ -19,9 +19,7 @@ export default function AccountCompanyOrientation() {
               iconId: "ri-arrow-right-line",
               iconPosition: "right",
               onClick: () => {
-                history.push({
-                  pathname: routes.account.companies.create.simple
-                });
+                navigate(routes.account.companies.create.simple);
               }
             }}
           >
@@ -45,9 +43,7 @@ export default function AccountCompanyOrientation() {
               iconId: "ri-arrow-right-line",
               iconPosition: "right",
               onClick: () => {
-                history.push({
-                  pathname: routes.account.companies.join,
-                });
+                navigate(routes.account.companies.join);
               },
             }}
           >
@@ -64,9 +60,7 @@ export default function AccountCompanyOrientation() {
               iconId: "ri-arrow-right-line",
               iconPosition: "right",
               onClick: () => {
-                history.push({
-                  pathname: routes.account.companies.create.pro
-                });
+                navigate(routes.account.companies.create.pro);
               }
             }}
           >
@@ -87,9 +81,7 @@ export default function AccountCompanyOrientation() {
               iconId: "ri-arrow-right-line",
               iconPosition: "right",
               onClick: () => {
-                history.push({
-                  pathname: routes.account.companies.create.foreign
-                });
+                navigate(routes.account.companies.create.foreign);
               }
             }}
           >

@@ -15,7 +15,7 @@ export function BsddRevisionRequestList() {
     QueryFormRevisionRequestsArgs
   >(GET_FORM_REVISION_REQUESTS, {
     variables: {
-      siret
+      siret: siret!
     },
     fetchPolicy: "cache-and-network"
   });

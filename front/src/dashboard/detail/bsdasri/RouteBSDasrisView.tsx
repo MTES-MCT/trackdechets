@@ -14,7 +14,7 @@ export function RouteBSDasrisView() {
     QueryBsdasriArgs
   >(GET_DETAIL_DASRI, {
     variables: {
-      id: formId
+      id: formId!
     },
     skip: !formId,
     fetchPolicy: "no-cache"

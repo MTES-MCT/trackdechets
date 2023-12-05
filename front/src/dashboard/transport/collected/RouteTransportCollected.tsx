@@ -25,7 +25,7 @@ export function RouteTransportCollected() {
   const { siret } = useParams<{ siret: string }>();
   const defaultWhere = React.useMemo(
     () => ({
-      isCollectedFor: [siret]
+      isCollectedFor: [siret!]
     }),
     [siret]
   );
@@ -41,7 +41,7 @@ export function RouteTransportCollected() {
 
       <BSDList
         key={siret}
-        siret={siret}
+        siret={siret!}
         defaultWhere={defaultWhere}
         columns={COLLECTED_COLUMNS}
         blankslate={

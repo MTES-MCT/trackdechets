@@ -9,7 +9,7 @@ import {
   QueryFormArgs
 } from "codegen-ui";
 import React, { ReactElement, useMemo, lazy } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getInitialState } from "./utils/initial-state";
 import { formSchema } from "./utils/schema";
 import { CREATE_FORM, GET_FORM, UPDATE_FORM } from "./utils/queries";
@@ -24,7 +24,7 @@ interface Props {
 }
 
 export default function StepsList(props: Props) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const formQuery = useQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
     variables: {
@@ -81,7 +81,7 @@ export default function StepsList(props: Props) {
     };
 
     saveForm(formInput)
-      .then(_ => history.goBack())
+      .then(_ => navigate(-1))
       .catch(err => formInputToastError(err));
   }
 

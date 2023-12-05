@@ -29,7 +29,7 @@ import {
 } from "codegen-ui";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
-import { generatePath, useHistory, useParams } from "react-router-dom";
+import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { InitialBsdas } from "./InitialBsdas";
 import { getOperationModeLabel } from "../../../common/operationModes";
@@ -418,12 +418,12 @@ const Intermediaries = ({ intermediaries }) => (
 
 export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [duplicate] = useDuplicate({
     variables: { id: form.id },
     onCompleted: () => {
-      history.push(
+      navigate(
         generatePath(routes.dashboard.bsds.drafts, {
           siret
         })
