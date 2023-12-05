@@ -8,10 +8,16 @@
       "command": "cd e2e && xvfb-run npx playwright test"
     },
     "test": {
-      "command": "cd e2e && npx playwright test && npx playwright show-report"
+      "command": "cd e2e && npx playwright test && npx playwright show-report",
+      "configurations": {
+        "integration": {}
+      }
     },
     "test-ui": {
-      "command": "cd e2e && npx playwright test --ui"
+      "command": "cd e2e && npx playwright test --ui",
+      "configurations": {
+        "integration": {}
+      }
     }
   },
   "tags": []

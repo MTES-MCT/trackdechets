@@ -33,11 +33,20 @@ export const createAccount = async (
 };
 
 export const confirmAccount = async (page: Page, { email }) => {
-  const userAccountHash = await prisma.userAccountHash.findFirstOrThrow({
-    where: { email }
+  // Fetch activation link in the DB
+  const user = await prisma.user.findFirstOrThrow({ where: { email } });
+  const userAccountHash = await prisma.userActivationHash.findFirstOrThrow({
+    where: { userId: user.id }
   });
 
+  // Go to activation link
   await page.goto(`/user-activation?hash=${userAccountHash.hash}`);
+
+  // Activate account
+  await page.getByRole("button", { name: "Activer mon compte" }).click();
+
+  // Make sure activation message is visible
+  await expect(page.getByText("Votre compte est créé !")).toBeVisible();
 
   return { email, userAccountHash };
 };
