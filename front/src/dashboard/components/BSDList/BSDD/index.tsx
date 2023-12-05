@@ -4,17 +4,17 @@ import {
   EmitterType,
   Form,
   Query,
-  QueryCompanyPrivateInfosArgs,
-} from "generated/graphql/types";
+  QueryCompanyPrivateInfosArgs
+} from "codegen-ui";
 import { CellProps, CellValue } from "react-table";
-import { ActionButtonContext } from "common/components/ActionButton";
-import { BSDDActions } from "dashboard/components/BSDList/BSDD/BSDDActions/BSDDActions";
-import { IconBSDD } from "Apps/common/Components/Icons/Icons";
+import { ActionButtonContext } from "../../../../common/components/ActionButton";
+import { BSDDActions } from "./BSDDActions/BSDDActions";
+import { IconBSDD } from "../../../../Apps/common/Components/Icons/Icons";
 import TransporterInfoEdit from "./TransporterInfoEdit";
 import { WorkflowAction } from "./WorkflowAction";
 import { useQuery } from "@apollo/client";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
-import { STATUS_LABELS } from "generated/constants/statuses";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../../Apps/common/queries/company/query";
+import { STATUS_LABELS } from "shared/constants";
 
 export const COLUMNS: Record<
   string,
@@ -32,7 +32,7 @@ export const COLUMNS: Record<
         {value === EmitterType.Appendix1 && <span>Tournée</span>}
         {value === EmitterType.Appendix1Producer && <span>Annexe 1</span>}
       </>
-    ),
+    )
   },
   readableId: {
     accessor: form => {
@@ -40,7 +40,7 @@ export const COLUMNS: Record<
         return `${form.readableId} | ${form.customId}`;
       }
       return form.readableId;
-    },
+    }
   },
   emitter: {
     accessor: form => (
@@ -59,7 +59,7 @@ export const COLUMNS: Record<
             : ""}
         </div>
       </>
-    ),
+    )
   },
   recipient: {
     accessor: form => (
@@ -67,13 +67,13 @@ export const COLUMNS: Record<
         <div>{form.stateSummary?.recipient?.name ?? ""}</div>
         <div>{form.stateSummary?.recipient?.siret ?? ""}</div>
       </>
-    ),
+    )
   },
   waste: {
     accessor: form =>
       [form.wasteDetails?.code, form.wasteDetails?.name]
         .filter(Boolean)
-        .join(" "),
+        .join(" ")
   },
   transporterCustomInfo: {
     accessor: form => form.stateSummary?.transporterCustomInfo ?? "",
@@ -86,7 +86,7 @@ export const COLUMNS: Record<
           form={row.original}
         />
       </>
-    ),
+    )
   },
   transporterNumberPlate: {
     accessor: form => form.stateSummary?.transporterNumberPlate ?? "",
@@ -99,7 +99,7 @@ export const COLUMNS: Record<
           form={row.original}
         />
       </>
-    ),
+    )
   },
   status: {
     accessor: form => {
@@ -113,7 +113,7 @@ export const COLUMNS: Record<
         }
       }
       return STATUS_LABELS[form.status];
-    },
+    }
   },
   workflow: {
     accessor: () => null,
@@ -123,7 +123,7 @@ export const COLUMNS: Record<
         Pick<Query, "companyPrivateInfos">,
         QueryCompanyPrivateInfosArgs
       >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
-        variables: { clue: siret },
+        variables: { clue: siret! }
       });
       const siretsWithAutomaticSignature = data
         ? data.companyPrivateInfos.receivedSignatureAutomations.map(
@@ -135,7 +135,7 @@ export const COLUMNS: Record<
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
           <WorkflowAction
-            siret={siret}
+            siret={siret!}
             form={form}
             options={{
               canSkipEmission:
@@ -144,15 +144,15 @@ export const COLUMNS: Record<
                   siretsWithAutomaticSignature.includes(
                     form.emitter?.company?.siret
                   ) ||
-                  Boolean(form.emitter?.isPrivateIndividual)),
+                  Boolean(form.emitter?.isPrivateIndividual))
             }}
           />
         </ActionButtonContext.Provider>
       );
-    },
+    }
   },
   actions: {
     accessor: () => null,
-    Cell: ({ row }) => <BSDDActions form={row.original} />,
-  },
+    Cell: ({ row }) => <BSDDActions form={row.original} />
+  }
 };

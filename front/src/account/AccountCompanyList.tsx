@@ -1,17 +1,16 @@
 import React, { useState, useMemo } from "react";
 import { gql, useQuery } from "@apollo/client";
-import { filter } from "graphql-anywhere";
 import AccountCompany from "./AccountCompany";
-import { useHistory } from "react-router-dom";
-import { Query } from "generated/graphql/types";
-import { Loader } from "Apps/common/Components";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import routes from "Apps/routes";
-import { debounce } from "common/helper";
+import { useNavigate } from "react-router-dom";
+import { Query } from "codegen-ui";
+import { Loader } from "../Apps/common/Components";
+import { NotificationError } from "../Apps/common/Components/Error/Error";
+import routes from "../Apps/routes";
+import { debounce } from "../common/helper";
 import {
   MIN_MY_COMPANIES_SEARCH,
-  MAX_MY_COMPANIES_SEARCH,
-} from "generated/constants/COMPANY_CONSTANTS";
+  MAX_MY_COMPANIES_SEARCH
+} from "shared/constants";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
@@ -45,7 +44,7 @@ export default function AccountCompanyList() {
   const [searchClue, setSearchClue] = useState("");
   const [displayPreloader, setDisplayPreloader] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { data, loading, error, refetch, fetchMore } = useQuery<
     Pick<Query, "myCompanies">
@@ -65,7 +64,7 @@ export default function AccountCompanyList() {
       setDisplayPreloader(true);
       setIsFiltered(true);
       debouncedSearch({
-        search: newSearchClue,
+        search: newSearchClue
       });
     }
 
@@ -94,7 +93,7 @@ export default function AccountCompanyList() {
                 setInputValue(e.target.value);
                 handleOnChangeSearch(e.target.value);
               },
-              value: inputValue,
+              value: inputValue
             }}
           ></Input>
         </div>
@@ -136,9 +135,7 @@ export default function AccountCompanyList() {
       }
 
       // No results and we're not filtering, redirect to the create company screen
-      history.push({
-        pathname: routes.account.companies.orientation,
-      });
+      navigate(routes.account.companies.orientation);
       return <Loader />;
     }
 
@@ -152,10 +149,7 @@ export default function AccountCompanyList() {
       <>
         <div className="tw-mb-3">{listTitle}</div>
         {companies.map(company => (
-          <AccountCompany
-            key={company.orgId}
-            company={filter(AccountCompany.fragments.company, company)}
-          />
+          <AccountCompany key={company.orgId} company={company} />
         ))}
         {data.myCompanies?.pageInfo.hasNextPage && (
           <div style={{ textAlign: "center" }}>
@@ -165,8 +159,8 @@ export default function AccountCompanyList() {
                 fetchMore({
                   variables: {
                     first: 10,
-                    after: data.myCompanies?.pageInfo.endCursor,
-                  },
+                    after: data.myCompanies?.pageInfo.endCursor
+                  }
                 })
               }
             >

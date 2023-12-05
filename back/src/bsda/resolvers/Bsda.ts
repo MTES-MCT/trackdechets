@@ -1,16 +1,13 @@
 import { BsdaResolvers } from "../../generated/graphql/types";
 import { expandBsdaFromDb, toInitialBsda } from "../converter";
 import { getReadonlyBsdaRepository } from "../repository";
-import { dashboardOperationName } from "../../common/queries";
 import { isSessionUser } from "../../auth";
+import { isGetBsdsQuery } from "../../bsds/resolvers/queries/bsds";
 
 export const Bsda: BsdaResolvers = {
   forwardedIn: async (bsda, _, ctx) => {
     // use ES indexed field when requested from dashboard
-    if (
-      ctx?.req?.body?.operationName === dashboardOperationName &&
-      isSessionUser(ctx)
-    ) {
+    if (isGetBsdsQuery(ctx) && isSessionUser(ctx)) {
       return !!bsda?.forwardedIn ? bsda?.forwardedIn : null;
     }
     const forwardingBsda = await getReadonlyBsdaRepository()
@@ -35,10 +32,7 @@ export const Bsda: BsdaResolvers = {
   },
   groupedIn: async (bsda, _, ctx) => {
     // use ES indexed field when requested from dashboard
-    if (
-      ctx?.req?.body?.operationName === dashboardOperationName &&
-      isSessionUser(ctx)
-    ) {
+    if (isGetBsdsQuery(ctx) && isSessionUser(ctx)) {
       return !!bsda?.groupedIn ? bsda?.groupedIn : null;
     }
     const groupedIn = await getReadonlyBsdaRepository()

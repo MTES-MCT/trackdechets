@@ -1,15 +1,15 @@
-import { CompanyForVerification } from "generated/graphql/types";
+import { CompanyForVerification } from "codegen-ui";
 import React, { useState } from "react";
 import CompanyVerifyModal from "./CompanyVerifyModal";
 import SendVerificationCodeLetterModal from "./SendVerificationCodeLetterModal";
-import { isSiret } from "generated/constants/companySearchHelpers";
+import { isSiret } from "shared/constants";
 
 type VerificationActionsProps = {
   company: CompanyForVerification;
 };
 
 export default function CompanyVerificationActions({
-  company,
+  company
 }: VerificationActionsProps) {
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const openVerifyModal = () => setShowVerifyModal(true);
@@ -17,7 +17,7 @@ export default function CompanyVerificationActions({
 
   const [
     showSendVerificationCodeLetterModal,
-    setSendVerificationCodeLetterModal,
+    setSendVerificationCodeLetterModal
   ] = useState(false);
   const openSendVerificationCodeModal = () =>
     setSendVerificationCodeLetterModal(true);

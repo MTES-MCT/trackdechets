@@ -1,5 +1,5 @@
 import { Bsda, BsdaStatus, BsdType } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import { GraphQLContext } from "../types";

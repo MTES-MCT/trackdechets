@@ -235,7 +235,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     });
 
     expect(errors[0].message).toBe(
-      "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
+      "Invalid enum value. Expected '06 07 01*' | '06 13 04*' | '10 13 09*' | '16 01 11*' | '16 02 12*' | '17 06 01*' | '17 06 05*' | '08 01 17*' | '08 04 09*' | '12 01 16*' | '15 01 11*' | '15 02 02*' | '16 02 13*' | '16 03 03*' | '17 01 06*' | '17 02 04*' | '17 03 01*' | '17 04 09*' | '17 04 10*' | '17 05 03*' | '17 05 05*' | '17 05 07*' | '17 06 03*' | '17 08 01*' | '17 09 03*', received 'Made up code'"
     );
   });
 

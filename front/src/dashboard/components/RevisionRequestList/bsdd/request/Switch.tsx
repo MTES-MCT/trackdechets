@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TdSwitch from "common/components/Switch";
+import TdSwitch from "../../../../../common/components/Switch";
 
 type Props = {
   title: string;
@@ -14,7 +14,7 @@ export function Switch({
   defaultValue,
   onChange,
   disabled = false,
-  children,
+  children
 }: Props) {
   const [isToggled, setIsToggled] = useState(defaultValue);
 

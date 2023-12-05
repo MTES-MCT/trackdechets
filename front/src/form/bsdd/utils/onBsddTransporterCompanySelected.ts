@@ -1,7 +1,4 @@
-import {
-  CompanySearchPrivate,
-  CompanySearchResult,
-} from "generated/graphql/types";
+import { CompanySearchPrivate, CompanySearchResult } from "codegen-ui";
 import { getInitialState } from "./initial-state";
 
 /**

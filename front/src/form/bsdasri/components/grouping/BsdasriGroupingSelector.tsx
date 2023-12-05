@@ -1,7 +1,7 @@
 import { getIn, useFormikContext } from "formik";
 import React, { useEffect, useReducer } from "react";
 
-import { Bsdasri } from "generated/graphql/types";
+import { Bsdasri } from "codegen-ui";
 import BsdasriTableGrouping from "./BsdasriTableGrouping";
 
 type State = { selected: string[] };
@@ -13,22 +13,25 @@ type Action =
 
 function reducer(state: State, action: Action) {
   switch (action.type) {
-    case "select":
+    case "select": {
       const sp = action.payload;
       return {
         selected: [sp.id, ...state.selected],
-        weights: [],
+        weights: []
       };
-    case "unselect":
+    }
+    case "unselect": {
       const usp = action.payload;
       return {
-        selected: state.selected.filter(v => v !== usp.id),
+        selected: state.selected.filter(v => v !== usp.id)
       };
-    case "selectAll":
+    }
+    case "selectAll": {
       const sap = action.payload;
       return {
-        selected: sap.map(v => v.id),
+        selected: sap.map(v => v.id)
       };
+    }
     default:
       throw new Error("Unknown action type");
   }
@@ -38,7 +41,7 @@ export default function BsdasriGroupingSelector({ name }) {
   const { values, setFieldValue } = useFormikContext<Bsdasri>();
 
   const [state, dispatch] = useReducer(reducer, {
-    selected: getIn(values, name),
+    selected: getIn(values, name)
   });
 
   // memoize stored regrouped dasris
@@ -52,7 +55,7 @@ export default function BsdasriGroupingSelector({ name }) {
     if (Array.isArray(payload)) {
       return dispatch({
         type: "selectAll",
-        payload,
+        payload
       });
     }
 

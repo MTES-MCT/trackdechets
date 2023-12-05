@@ -1,11 +1,12 @@
-import cogoToast from "cogo-toast";
-import TdModal from "Apps/common/Components/Modal/Modal";
+import toast from "react-hot-toast";
+import TdModal from "../../../Apps/common/Components/Modal/Modal";
 import { gql, useMutation } from "@apollo/client";
 import React from "react";
 import styles from "./CompanyVerifyModal.module.scss";
-import { CompanyForVerification, Mutation } from "generated/graphql/types";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { isSiret } from "generated/constants/companySearchHelpers";
+import { CompanyForVerification, Mutation } from "codegen-ui";
+import { NotificationError } from "../../../Apps/common/Components/Error/Error";
+import { isSiret } from "shared/constants";
+import { TOAST_DURATION } from "../../../common/config";
 
 type VerifyModalProps = {
   isOpen: boolean;
@@ -28,21 +29,21 @@ const SEND_VERIFICATION_CODE_LETTER = gql`
 export default function SendVerificationCodeLetterModal({
   isOpen,
   onClose,
-  company,
+  company
 }: VerifyModalProps) {
   const [sendVerificationCodeLetter, { error, loading }] = useMutation<
     Pick<Mutation, "sendVerificationCodeLetter">,
     any
   >(SEND_VERIFICATION_CODE_LETTER, {
     onCompleted: () => {
-      cogoToast.success("Verification envoyée", { hideAfter: 5 });
+      toast.success("Verification envoyée", { duration: TOAST_DURATION });
       return onClose();
     },
     onError: () => {
-      cogoToast.error("La vérification n'a pas pu être envoyée", {
-        hideAfter: 5,
+      toast.error("La vérification n'a pas pu être envoyée", {
+        duration: TOAST_DURATION
       });
-    },
+    }
   });
 
   function onSubmit() {
@@ -50,15 +51,15 @@ export default function SendVerificationCodeLetterModal({
       return sendVerificationCodeLetter({
         variables: {
           input: {
-            siret: company.siret!,
-          },
-        },
+            siret: company.siret!
+          }
+        }
       });
     } else {
-      cogoToast.error(
+      toast.error(
         "La vérification n'a pas pu être envoyée, l'établissement ne possède pas de SIRET valide",
         {
-          hideAfter: 5,
+          duration: TOAST_DURATION
         }
       );
     }

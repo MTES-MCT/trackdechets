@@ -2,8 +2,8 @@ import React from "react";
 import {
   FormRevisionRequest,
   RevisionRequestApprovalStatus,
-  RevisionRequestStatus,
-} from "generated/graphql/types";
+  RevisionRequestStatus
+} from "codegen-ui";
 import { useParams } from "react-router-dom";
 import { BsddApproveRevision } from ".";
 import { BsddCancelRevision } from "./BsddCancelRevision";

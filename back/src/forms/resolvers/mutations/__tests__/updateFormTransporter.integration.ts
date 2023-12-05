@@ -13,6 +13,7 @@ import {
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { getFirstTransporter } from "../../../database";
+import { AuthType } from "../../../../auth";
 
 const UPDATE_FORM_TRANSPORTER = gql`
   mutation UpdateFormTransporter($id: ID!, $input: TransporterInput!) {
@@ -196,5 +197,207 @@ describe("Mutation.createFormTransporter", () => {
         message: "Vous n'êtes pas autorisé à modifier ce bordereau"
       })
     ]);
+  });
+
+  it("should auto-complete name and address from SIRENE database", async () => {
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+
+    const emitter = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        status: "SENT",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.siret,
+            number: 1
+          }
+        }
+      }
+    });
+    const bsddTransporter = await getFirstTransporter(form);
+
+    const transporter2 = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+
+    const searchResult = {
+      siret: transporter2.siret,
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O",
+      address: "4 bis BD LONGCHAMP Bat G 13001 MARSEILLE",
+      addressVoie: "4 bis BD LONGCHAMP Bat G",
+      addressPostalCode: "13001",
+      addressCity: "MARSEILLE",
+      codeCommune: "13201",
+      name: "CODE EN STOCK",
+      naf: "62.01Z",
+      libelleNaf: "Programmation informatique",
+      codePaysEtrangerEtablissement: ""
+    };
+
+    const searchCompanyMock = jest.fn().mockResolvedValue(searchResult);
+
+    jest.mock("../../../../companies/search", () => ({
+      // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
+      ...jest.requireActual("../../../../companies/search"),
+      searchCompany: searchCompanyMock
+    }));
+
+    // ré-importe makeClient pour que searchCompany soit bien mocké
+    jest.resetModules();
+    const makeClientLocal = require("../../../../__tests__/testClient")
+      .default as typeof makeClient;
+
+    const { mutate } = makeClientLocal({
+      ...emitter.user,
+      auth: AuthType.Bearer
+    });
+
+    const { errors, data } = await mutate<
+      Pick<Mutation, "updateFormTransporter">,
+      MutationUpdateFormTransporterArgs
+    >(UPDATE_FORM_TRANSPORTER, {
+      variables: {
+        id: bsddTransporter!.id,
+        input: {
+          company: { siret: transporter2.siret }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    expect(searchCompanyMock).toHaveBeenCalledWith(transporter2.siret);
+
+    const updatedBsddTransporter =
+      await prisma.bsddTransporter.findUniqueOrThrow({
+        where: { id: data.updateFormTransporter!.id }
+      });
+
+    expect(updatedBsddTransporter.transporterCompanyName).toEqual(
+      searchResult.name
+    );
+    expect(updatedBsddTransporter.transporterCompanyAddress).toEqual(
+      searchResult.address
+    );
+  });
+
+  it("should auto-complete recepisse information when switching isExemptedOfReceipt from true to false", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          department: "13",
+          receiptNumber: "MON-RECEPISSE",
+          validityLimit: new Date("2024-01-01")
+        }
+      }
+    });
+    const bsddTransporter = await prisma.bsddTransporter.create({
+      data: {
+        number: 0,
+        readyToTakeOver: true,
+        transporterCompanySiret: transporter.siret,
+        transporterCompanyName: transporter.name,
+        transporterTransportMode: "ROAD",
+        transporterIsExemptedOfReceipt: true,
+        transporterReceipt: null,
+        transporterValidityLimit: null,
+        transporterDepartment: null
+      }
+    });
+    const { errors, data } = await mutate<
+      Pick<Mutation, "updateFormTransporter">,
+      MutationUpdateFormTransporterArgs
+    >(UPDATE_FORM_TRANSPORTER, {
+      variables: {
+        id: bsddTransporter.id,
+        input: {
+          isExemptedOfReceipt: false
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+
+    const updatedBsddTransporter =
+      await prisma.bsddTransporter.findUniqueOrThrow({
+        where: { id: data.updateFormTransporter!.id }
+      });
+
+    expect(updatedBsddTransporter.transporterReceipt).toEqual("MON-RECEPISSE");
+    expect(updatedBsddTransporter.transporterDepartment).toEqual("13");
+    expect(updatedBsddTransporter.transporterValidityLimit).toEqual(
+      new Date("2024-01-01")
+    );
+  });
+
+  it("should auto-complete recepisse information when updating SIRET", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+    const transporter1 = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          department: "13",
+          receiptNumber: "MON-RECEPISSE",
+          validityLimit: new Date("2024-01-01")
+        }
+      }
+    });
+    const transporter2 = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          department: "07",
+          receiptNumber: "MON-RECEPISSE-2",
+          validityLimit: new Date("2024-01-02")
+        }
+      }
+    });
+    const bsddTransporter = await prisma.bsddTransporter.create({
+      data: {
+        number: 0,
+        readyToTakeOver: true,
+        transporterCompanySiret: transporter1.siret,
+        transporterCompanyName: transporter1.name,
+        transporterTransportMode: "ROAD",
+        transporterIsExemptedOfReceipt: false,
+        transporterReceipt: null,
+        transporterValidityLimit: null,
+        transporterDepartment: null
+      }
+    });
+    const { errors, data } = await mutate<
+      Pick<Mutation, "updateFormTransporter">,
+      MutationUpdateFormTransporterArgs
+    >(UPDATE_FORM_TRANSPORTER, {
+      variables: {
+        id: bsddTransporter.id,
+        input: {
+          company: { siret: transporter2.siret },
+          receipt: "IGNORE-ME", // should not be be taken into account
+          department: "IGNORE-ME", // should not be be taken into account
+          validityLimit: new Date("2024-01-01").toISOString() as any // should not be be taken into account
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    const updatedBsddTransporter =
+      await prisma.bsddTransporter.findUniqueOrThrow({
+        where: { id: data.updateFormTransporter!.id }
+      });
+
+    expect(updatedBsddTransporter.transporterReceipt).toEqual(
+      "MON-RECEPISSE-2"
+    );
+    expect(updatedBsddTransporter.transporterDepartment).toEqual("07");
+    expect(updatedBsddTransporter.transporterValidityLimit).toEqual(
+      new Date("2024-01-02")
+    );
   });
 });

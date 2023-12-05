@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
-import { Query, QueryFormRevisionRequestsArgs } from "generated/graphql/types";
-import { GET_FORM_REVISION_REQUESTS } from "Apps/common/queries/reviews/BsddReviewsQuery";
+import { Query, QueryFormRevisionRequestsArgs } from "codegen-ui";
+import { GET_FORM_REVISION_REQUESTS } from "../../../../Apps/common/queries/reviews/BsddReviewsQuery";
 import { useParams } from "react-router-dom";
-import { Loader } from "Apps/common/Components";
+import { Loader } from "../../../../Apps/common/Components";
 import { BsddRevisionRequestTable } from "./BsddRevisionRequestTable";
 import buildUpdateQueryFn from "../fetchMore";
 
@@ -15,9 +15,9 @@ export function BsddRevisionRequestList() {
     QueryFormRevisionRequestsArgs
   >(GET_FORM_REVISION_REQUESTS, {
     variables: {
-      siret,
+      siret: siret!
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-and-network"
   });
 
   useEffect(() => {
@@ -42,13 +42,13 @@ export function BsddRevisionRequestList() {
             onClick={() =>
               fetchMore({
                 variables: {
-                  after: data?.formRevisionRequests.pageInfo.endCursor,
+                  after: data?.formRevisionRequests.pageInfo.endCursor
                 },
 
                 updateQuery: (prev, { fetchMoreResult }) =>
                   buildUpdateQueryFn("formRevisionRequests")(prev, {
-                    fetchMoreResult,
-                  }),
+                    fetchMoreResult
+                  })
               })
             }
           >

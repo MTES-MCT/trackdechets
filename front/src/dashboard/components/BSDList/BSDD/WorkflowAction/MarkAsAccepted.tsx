@@ -3,19 +3,19 @@ import {
   Mutation,
   MutationMarkAsAcceptedArgs,
   Query,
-  QueryFormArgs,
-} from "generated/graphql/types";
+  QueryFormArgs
+} from "codegen-ui";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation, useLazyQuery } from "@apollo/client";
-import { statusChangeFragment } from "Apps/common/queries/fragments";
-import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
-import { ActionButton } from "common/components";
-import { Loader } from "Apps/common/Components";
-import { IconWaterDam } from "Apps/common/Components/Icons/Icons";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
+import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
+import { ActionButton } from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
+import { IconWaterDam } from "../../../../../Apps/common/Components/Icons/Icons";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import AcceptedInfo from "./AcceptedInfo";
-import { GET_BSDS } from "Apps/common/queries";
-import { GET_FORM } from "form/bsdd/utils/queries";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 
 const MARK_AS_ACCEPTED = gql`
   mutation MarkAsAccepted($id: ID!, $acceptedInfo: AcceptedFormInput!) {
@@ -31,9 +31,9 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
     useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
       variables: {
         id: form.id,
-        readableId: null,
+        readableId: null
       },
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     });
   const [markAsAccepted, { loading, error }] = useMutation<
     Pick<Mutation, "markAsAccepted">,
@@ -43,7 +43,7 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
     awaitRefetchQueries: true,
     onError: () => {
       // The error is handled in the UI
-    },
+    }
   });
 
   const actionLabel = "Valider l'acceptation";
@@ -87,9 +87,9 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
                       id: form.id,
                       acceptedInfo: {
                         ...values,
-                        quantityReceived: values.quantityReceived ?? 0,
-                      },
-                    },
+                        quantityReceived: values.quantityReceived ?? 0
+                      }
+                    }
                   })
                 }
               />
@@ -105,7 +105,7 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
           );
         }
 
-        return <></>;
+        return null;
       }}
     />
   );

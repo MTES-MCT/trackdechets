@@ -1,12 +1,12 @@
 import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { Breadcrumb, BreadcrumbItem } from "common/components";
+import { Breadcrumb, BreadcrumbItem } from "../../../common/components";
 import {
   Blankslate,
   BlankslateImg,
   BlankslateTitle,
-  BlankslateDescription,
-} from "Apps/common/Components";
+  BlankslateDescription
+} from "../../../Apps/common/Components";
 import { BSDList } from "../../components/BSDList";
 import illustration from "./assets/blankslateHistory.svg";
 
@@ -14,7 +14,7 @@ export function RouteBsdsHistory() {
   const { siret } = useParams<{ siret: string }>();
   const defaultWhere = useMemo(
     () => ({
-      isArchivedFor: [siret],
+      isArchivedFor: [siret!]
     }),
     [siret]
   );
@@ -28,7 +28,7 @@ export function RouteBsdsHistory() {
 
       <BSDList
         key={siret}
-        siret={siret}
+        siret={siret!}
         defaultWhere={defaultWhere}
         blankslate={
           <Blankslate>

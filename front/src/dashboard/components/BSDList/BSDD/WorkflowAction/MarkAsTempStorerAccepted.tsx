@@ -4,20 +4,20 @@ import {
   QuantityType,
   MutationMarkAsTempStorerAcceptedArgs,
   Query,
-  QueryFormArgs,
-} from "generated/graphql/types";
+  QueryFormArgs
+} from "codegen-ui";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation, useLazyQuery } from "@apollo/client";
 
-import { statusChangeFragment } from "Apps/common/queries/fragments";
-import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
-import { ActionButton } from "common/components";
-import { Loader } from "Apps/common/Components";
-import { IconWarehouseStorage } from "Apps/common/Components/Icons/Icons";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
+import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
+import { ActionButton } from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
+import { IconWarehouseStorage } from "../../../../../Apps/common/Components/Icons/Icons";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import AcceptedInfo from "./AcceptedInfo";
-import { GET_BSDS } from "Apps/common/queries";
-import { GET_FORM } from "form/bsdd/utils/queries";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 
 const MARK_TEMP_STORER_ACCEPTED = gql`
   mutation MarkAsTempStorerAccepted(
@@ -35,15 +35,15 @@ const MARK_TEMP_STORER_ACCEPTED = gql`
 `;
 
 export default function MarkAsTempStorerAccepted({
-  form,
+  form
 }: WorkflowActionProps) {
   const [getBsdd, { error: bsddGetError, data, loading: bsddGetLoading }] =
     useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
       variables: {
         id: form.id,
-        readableId: null,
+        readableId: null
       },
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     });
   const [markAsTempStorerAccepted, { loading, error }] = useMutation<
     Pick<Mutation, "markAsTempStorerAccepted">,
@@ -53,7 +53,7 @@ export default function MarkAsTempStorerAccepted({
     awaitRefetchQueries: true,
     onError: () => {
       // The error is handled in the UI
-    },
+    }
   });
 
   const actionLabel = "Valider l'acceptation de l'entreposage provisoire";
@@ -97,9 +97,9 @@ export default function MarkAsTempStorerAccepted({
                       tempStorerAcceptedInfo: {
                         ...values,
                         quantityReceived: values.quantityReceived ?? 0,
-                        quantityType: values.quantityType ?? QuantityType.Real,
-                      },
-                    },
+                        quantityType: values.quantityType ?? QuantityType.Real
+                      }
+                    }
                   })
                 }
               />
@@ -114,7 +114,7 @@ export default function MarkAsTempStorerAccepted({
           );
         }
 
-        return <></>;
+        return null;
       }}
     />
   );

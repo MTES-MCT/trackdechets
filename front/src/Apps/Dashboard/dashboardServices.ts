@@ -3,7 +3,7 @@ import {
   BsdStatusCode,
   BsdWithReview,
   ReviewStatusLabel,
-  WorkflowDisplayType,
+  WorkflowDisplayType
 } from "../common/types/bsdTypes";
 import { formatBsd } from "./bsdMapper";
 import {
@@ -14,8 +14,8 @@ import {
   EmitterType,
   Form,
   Maybe,
-  UserPermission,
-} from "../../generated/graphql/types";
+  UserPermission
+} from "codegen-ui";
 import {
   ACCEPTE,
   AJOUTER_ANNEXE_1,
@@ -52,9 +52,10 @@ import {
   VALIDER_RECEPTION,
   VALIDER_SYNTHESE_LABEL,
   VALIDER_TRAITEMENT,
-  completer_bsd_suite,
+  completer_bsd_suite
 } from "../common/wordings/dashboard/wordingsDashboard";
-import { BsdCurrentTab } from "Apps/common/types/commonTypes";
+import { BsdCurrentTab } from "../common/types/commonTypes";
+import { sub } from "date-fns";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
@@ -65,7 +66,8 @@ export const getBsdStatusLabel = (
   status: string,
   isDraft: boolean | undefined,
   bsdType?: BsdType,
-  operationCode?: string
+  operationCode?: string,
+  bsdaAnnexed?: boolean
 ) => {
   switch (status) {
     case BsdStatusCode.Draft:
@@ -91,7 +93,13 @@ export const getBsdStatusLabel = (
       return TRAITE;
     case BsdStatusCode.AwaitingChild:
     case BsdStatusCode.Grouped:
-      if (bsdType === BsdType.Bsda || bsdType === BsdType.Bsff) {
+      if (bsdType === BsdType.Bsff) {
+        return EN_ATTENTE_BSD_SUITE;
+      }
+      if (bsdType === BsdType.Bsda) {
+        if (bsdaAnnexed) {
+          return ANNEXE_BORDEREAU_SUITE;
+        }
         return EN_ATTENTE_BSD_SUITE;
       }
       return ANNEXE_BORDEREAU_SUITE;
@@ -134,7 +142,13 @@ export const getBsdStatusLabel = (
       }
       return EN_ATTENTE_BSD_SUITE;
     case BsdStatusCode.IntermediatelyProcessed:
-      if (bsdType === BsdType.Bsdasri || bsdType === BsdType.Bsff) {
+      if (bsdType === BsdType.Bsff) {
+        const operationCodesBsff = ["R12", "R13", "D13", "D14", "D15"];
+        if (operationCode && operationCodesBsff.includes(operationCode)) {
+          return EN_ATTENTE_BSD_SUITE;
+        }
+      }
+      if (bsdType === BsdType.Bsdasri) {
         return ANNEXE_BORDEREAU_SUITE;
       }
       return EN_ATTENTE_BSD_SUITE;
@@ -170,7 +184,7 @@ const hasEmitterTransporterAndEcoOrgSiret = (
     bsd.emitter?.company?.siret,
     bsd.ecoOrganisme?.siret,
     bsd.transporter?.company?.siret,
-    bsd.transporter?.company?.orgId,
+    bsd.transporter?.company?.orgId
   ].includes(siret);
 };
 
@@ -201,6 +215,9 @@ const isGathering = (bsdWorkflowType: string | undefined): boolean =>
 const isReshipment = (bsdWorkflowType: string | undefined): boolean =>
   bsdWorkflowType === BsdaType.Reshipment;
 
+const isOtherCollection = (bsdWorkflowType: string | undefined): boolean =>
+  bsdWorkflowType === BsdaType.OtherCollections;
+
 const isSimple = (bsdWorkflowType: string | undefined): boolean =>
   bsdWorkflowType === BsdasriType.Simple;
 
@@ -212,7 +229,7 @@ const hasTemporaryStorage = (currentSiret: string, bsd: BsdDisplay): boolean =>
   [
     bsd.destination?.company?.siret,
     bsd.temporaryStorageDetail?.transporter?.company?.siret,
-    bsd.temporaryStorageDetail?.transporter?.company?.orgId,
+    bsd.temporaryStorageDetail?.transporter?.company?.orgId
   ].includes(currentSiret);
 
 const isSameSiretTemporaryStorageTransporter = (
@@ -221,7 +238,7 @@ const isSameSiretTemporaryStorageTransporter = (
 ) =>
   [
     bsd.temporaryStorageDetail?.transporter?.company?.siret,
-    bsd.temporaryStorageDetail?.transporter?.company?.orgId,
+    bsd.temporaryStorageDetail?.transporter?.company?.orgId
   ].includes(currentSiret);
 
 const isSameSiretTemporaryStorageDestination = (
@@ -406,6 +423,33 @@ export const isSignEmission = (
   );
 };
 
+// s'inspire de https://github.com/MTES-MCT/trackdechets/blob/dev/back/src/forms/validation.ts#L1897
+export const canAddAppendix1 = bsd => {
+  // Once one of the appendix has been signed by the transporter,
+  // you have 3 days maximum to add new appendix
+  const currentDate = new Date();
+  const { grouping } = bsd;
+  const firstFormSignatureDate = grouping?.find(({ form }) => {
+    if (form.takenOverAt) {
+      return form.takenOverAt;
+    }
+    return "";
+  });
+  const firstTransporterSignatureDate = !!firstFormSignatureDate
+    ? new Date(firstFormSignatureDate.form.takenOverAt)
+    : currentDate;
+  const limitDate = sub(currentDate, {
+    days: 2,
+    hours: currentDate.getHours(),
+    minutes: currentDate.getMinutes()
+  });
+
+  if (firstTransporterSignatureDate < limitDate) {
+    return false;
+  }
+  return true;
+};
+
 export const getSealedBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
@@ -416,7 +460,7 @@ export const getSealedBtnLabel = (
     isBsdd(bsd.type) &&
     permissions.includes(UserPermission.BsdCanSignEmission)
   ) {
-    if (isAppendix1(bsd)) {
+    if (isAppendix1(bsd) && canAddAppendix1(bsd)) {
       return AJOUTER_ANNEXE_1;
     }
 
@@ -428,7 +472,7 @@ export const getSealedBtnLabel = (
     if (isSignEmission(currentSiret, bsd, hasAutomaticSignature)) {
       const emitterSirets = [
         bsd.emitter?.company?.siret,
-        bsd.ecoOrganisme?.siret,
+        bsd.ecoOrganisme?.siret
       ];
       const currentUserIsEmitter = emitterSirets.includes(currentSiret);
       if (currentUserIsEmitter) {
@@ -482,7 +526,7 @@ export const getSentBtnLabel = (
         return VALIDER_RECEPTION;
       }
 
-      if (isAppendix1(bsd)) {
+      if (isAppendix1(bsd) && canAddAppendix1(bsd)) {
         return AJOUTER_ANNEXE_1;
       }
     }
@@ -529,6 +573,7 @@ export const getReceivedBtnLabel = (
   if (
     isBsdasri(bsd.type) &&
     isActTab &&
+    !bsd.synthesizedIn &&
     isSameSiretDestination(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
@@ -601,9 +646,9 @@ export const getSignByProducerBtnLabel = (
 
     if (
       (isBsda(bsd.type) &&
-        currentSiret === bsd.transporter?.company?.orgId &&
         (isGathering(bsd.bsdWorkflowType?.toString()) ||
           isReshipment(bsd.bsdWorkflowType?.toString()) ||
+          isOtherCollection(bsd.bsdWorkflowType?.toString()) ||
           bsd.worker?.isDisabled)) ||
       isBsvhu(bsd.type)
     ) {
@@ -613,14 +658,15 @@ export const getSignByProducerBtnLabel = (
     if (isBsdasri(bsd.type) && !isToCollectTab) {
       return "";
     }
+
+    if (
+      currentSiret === bsd.worker?.company?.siret ||
+      currentSiret === bsd.transporter?.company?.orgId
+    ) {
+      return SIGNER;
+    }
   }
 
-  if (
-    currentSiret === bsd.worker?.company?.siret ||
-    currentSiret === bsd.transporter?.company?.orgId
-  ) {
-    return SIGNER;
-  }
   return "";
 };
 
@@ -981,7 +1027,7 @@ const canUpdateBsdd = bsd =>
   [
     BsdStatusCode.Draft,
     BsdStatusCode.Sealed,
-    BsdStatusCode.SignedByProducer,
+    BsdStatusCode.SignedByProducer
   ].includes(bsd.status);
 
 const canDeleteBsdd = bsd =>
@@ -1049,22 +1095,40 @@ const canUpdateBsff = (bsd, siret) =>
 const canReviewBsda = (bsd, siret) =>
   bsd.type === BsdType.Bsda && !canDeleteBsda(bsd, siret);
 
-export const canReviewBsdd = bsd =>
+export const canReviewBsdd = (bsd, siret) =>
   bsd.type === BsdType.Bsdd &&
   ![BsdStatusCode.Draft, BsdStatusCode.Sealed, BsdStatusCode.Refused].includes(
     bsd.status
   ) &&
-  bsd.emitterType !== EmitterType.Appendix1Producer;
+  bsd.emitterType !== EmitterType.Appendix1Producer &&
+  !(
+    bsd.emitterType === EmitterType.Producer &&
+    isSameSiretEmmiter(siret, bsd) &&
+    canUpdateBsd(bsd, siret)
+  ) &&
+  !(
+    bsd.emitterType === EmitterType.Appendix2 &&
+    isSameSiretDestination(siret, bsd) &&
+    canUpdateBsd(bsd, siret)
+  );
 
-export const canReviewBsd = (bsd, siret) =>
-  canReviewBsdd(bsd) || canReviewBsda(bsd, siret);
+export const canReviewBsd = (bsd, siret) => {
+  const isTransporter = isSameSiretTransporter(siret, bsd);
+  const isDestination = isSameSiretDestination(siret, bsd);
+  const isTransporterOnly = isTransporter && !isDestination;
+
+  return (
+    (canReviewBsdd(bsd, siret) || canReviewBsda(bsd, siret)) &&
+    !isTransporterOnly
+  );
+};
 
 const canUpdateBsda = bsd =>
   bsd.type === BsdType.Bsda &&
   ![
     BsdStatusCode.Processed,
     BsdStatusCode.Refused,
-    BsdStatusCode.AwaitingChild,
+    BsdStatusCode.AwaitingChild
   ].includes(bsd.status);
 
 const canUpdateBsdasri = bsd =>
@@ -1153,7 +1217,7 @@ export const canEditCustomInfoOrTransporterNumberPlate = (
 };
 
 export const getOperationCodesFromSearchString = (value: any): string[] => {
-  let searchCodes: string[] = [];
+  const searchCodes: string[] = [];
 
   value.match(/[rRdD]{1}( )\d{1,2}/g)?.forEach(code => {
     const cleanCode = code.toUpperCase();

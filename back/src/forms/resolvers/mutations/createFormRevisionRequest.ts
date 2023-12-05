@@ -13,7 +13,7 @@ import {
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   BSDD_WASTE_CODES,
   BSDD_APPENDIX1_WASTE_CODES
-} from "../../../common/constants";
+} from "shared/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   FormRevisionRequestContentInput,
@@ -27,7 +27,7 @@ import { checkCanRequestRevision } from "../../permissions";
 import { getFormRepository } from "../../repository";
 import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import { packagingInfoFn } from "../../validation";
-import { isSiret } from "../../../common/constants/companySearchHelpers";
+import { isSiret } from "shared/constants";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../common/operationModes";
 
@@ -238,6 +238,13 @@ async function getFlatContent(
   if (flatContent.isCanceled && Object.values(revisionFields).length > 0) {
     throw new UserInputError(
       "Impossible d'annuler et de modifier un bordereau."
+    );
+  }
+
+  // One cannot request a CANCELATION on an appendix1
+  if (flatContent.isCanceled && bsdd.emitterType === EmitterType.APPENDIX1) {
+    throw new ForbiddenError(
+      "Impossible d'annuler un bordereau de tournée dédiée."
     );
   }
 

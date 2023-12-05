@@ -1,12 +1,11 @@
 module.exports = {
-  preset: "ts-jest",
+  displayName: "back",
+  preset: "../jest.preset.js",
   testEnvironment: "node",
-  testTimeout: 60000,
+  transform: {
+    "^.+\\.[tj]sx?$": ["ts-jest", { tsconfig: "<rootDir>/tsconfig.spec.json" }]
+  },
   testPathIgnorePatterns: ["<rootDir>/dist/"],
   testMatch: ["**/__tests__/**/?(*.)+(spec|test).[jt]s?(x)"],
-  moduleNameMapper: {
-    "^src/(.*)$": "<rootDir>/src/$1",
-    "^integration-tests/(.*)$": "<rootDir>/integration-tests/$1"
-  },
   reporters: ["default", "github-actions"]
 };

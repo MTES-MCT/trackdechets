@@ -3,13 +3,8 @@ import { useField, useFormikContext } from "formik";
 import React from "react";
 import CompanyResults from "../../../common/components/company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
-import {
-  Query,
-  EcoOrganisme,
-  Bsdasri,
-  BsdasriEcoOrganisme,
-} from "../../../../generated/graphql/types";
-import TdSwitch from "common/components/Switch";
+import { Query, EcoOrganisme, Bsdasri, BsdasriEcoOrganisme } from "codegen-ui";
+import TdSwitch from "../../../../common/components/Switch";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -28,7 +23,7 @@ export function getInitialEcoOrganisme(
 ) {
   return {
     siret: ecoOrganisme?.siret ?? "",
-    name: ecoOrganisme?.name ?? "",
+    name: ecoOrganisme?.name ?? ""
   };
 }
 
@@ -85,20 +80,20 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
                     setFieldValue(field.name, {
                       name: eo.name,
                       siret: eo.siret,
-                      orgId: eo.orgId,
+                      orgId: eo.orgId
                     })
                   }
                   results={data.ecoOrganismes
                     .filter(eo => !!eo.handleBsdasri)
                     .map(eo => ({
                       ...eo,
-                      orgId: eo.siret,
+                      orgId: eo.siret
                     }))}
                   selectedItem={
                     data.ecoOrganismes
                       .map(eo => ({
                         ...eo,
-                        orgId: eo.siret,
+                        orgId: eo.siret
                       }))
                       .find(eo => eo.siret === field.value?.siret) || null
                   }

@@ -9,16 +9,14 @@ export default {
   decorators: [
     Story => (
       <MemoryRouter>
-        <Route>
-          <Story />
-        </Route>
+        <Route element={<Story />} />
       </MemoryRouter>
-    ),
+    )
   ],
   design: {
     type: "figma",
-    url: "https://www.figma.com/file/TZbRaWgchdAv8o7IxJWrKE/Trackd%C3%A9chets?node-id=2864%3A543748&t=AnkIpzoWgu1o8Cbc-4",
-  },
+    url: "https://www.figma.com/file/TZbRaWgchdAv8o7IxJWrKE/Trackd%C3%A9chets?node-id=2864%3A543748&t=AnkIpzoWgu1o8Cbc-4"
+  }
 } as ComponentMeta<typeof DropdownMenu>;
 
 const Template: ComponentStory<typeof DropdownMenu> = args => (
@@ -30,15 +28,15 @@ export const Primary = Template.bind({});
 const links = [
   {
     route: "/dashboard/create/some-route",
-    title: "Some route",
+    title: "Some route"
   },
   {
     route: "/dashboard/create/some-other-route",
-    title: "Some other route",
-  },
+    title: "Some other route"
+  }
 ];
 
 Primary.args = {
   links,
-  menuTitle: "the title",
+  menuTitle: "the title"
 };

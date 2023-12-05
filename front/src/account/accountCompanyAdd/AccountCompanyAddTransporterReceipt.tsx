@@ -1,6 +1,6 @@
 import React from "react";
 import { Field } from "formik";
-import RedErrorMessage from "common/components/RedErrorMessage";
+import RedErrorMessage from "../../common/components/RedErrorMessage";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
@@ -42,7 +42,7 @@ export default function AccountCompanyAddTransporterReceipt() {
                   nativeInputProps={{
                     name: field.name,
                     onChange: field.onChange,
-                    onBlur: field.onBlur,
+                    onBlur: field.onBlur
                   }}
                 ></Input>
               );
@@ -62,7 +62,7 @@ export default function AccountCompanyAddTransporterReceipt() {
                     min: minDate,
                     name: field.name,
                     onChange: field.onChange,
-                    onBlur: field.onBlur,
+                    onBlur: field.onBlur
                   }}
                 ></Input>
               );
@@ -80,7 +80,7 @@ export default function AccountCompanyAddTransporterReceipt() {
                     placeholder: "75",
                     name: field.name,
                     onChange: field.onChange,
-                    onBlur: field.onBlur,
+                    onBlur: field.onBlur
                   }}
                 ></Input>
               );

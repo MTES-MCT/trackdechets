@@ -1,10 +1,11 @@
 import * as React from "react";
 import { Formik, Form, Field } from "formik";
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
 import { gql, useMutation } from "@apollo/client";
-import { Mutation, MutationAnonymizeUserArgs } from "generated/graphql/types";
-import { InlineError } from "Apps/common/Components/Error/Error";
-import RedErrorMessage from "common/components/RedErrorMessage";
+import { Mutation, MutationAnonymizeUserArgs } from "codegen-ui";
+import { InlineError } from "../../Apps/common/Components/Error/Error";
+import RedErrorMessage from "../../common/components/RedErrorMessage";
+import { TOAST_DURATION } from "../../common/config";
 
 const ANONYMIZE_USER = gql`
   mutation anonymizeUser($id: ID!) {
@@ -21,7 +22,7 @@ function AnonymizeUser() {
     <div className="tw-mx-2">
       <Formik
         initialValues={{
-          id: "",
+          id: ""
         }}
         onSubmit={async (values, { resetForm }) => {
           if (
@@ -34,15 +35,15 @@ function AnonymizeUser() {
           const res = await anonymizeUser({ variables: { id: values.id } });
           resetForm();
           !!res?.data?.anonymizeUser
-            ? cogoToast.success(
+            ? toast.success(
                 `Suppression effectuée, notez l'email anonymisé si besoin immédiatement car il sera impossible de le récupérer : ${res?.data?.anonymizeUser}\nNe divulguez cet email à personne !`,
                 {
-                  hideAfter: 60,
+                  duration: 60000
                 }
               )
-            : cogoToast.error(
+            : toast.error(
                 `Cet utilisateur ne peut pas être supprimé, soit il n'existe pas, soit il doit être lié à des applications ou des établissements existants en base de données, tentez de les supprimer si possible et réessayer de supprimer s'il vous plaît.`,
-                { hideAfter: 3 }
+                { duration: TOAST_DURATION }
               );
         }}
       >

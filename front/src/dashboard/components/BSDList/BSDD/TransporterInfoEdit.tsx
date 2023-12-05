@@ -2,13 +2,13 @@ import { useMutation, gql } from "@apollo/client";
 import { useFormik } from "formik";
 import React, { useState } from "react";
 
-import { Form as FormModel } from "generated/graphql/types";
-import { isBsddTransporterFieldEditable } from "generated/constants/formHelpers";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { capitalize } from "common/helper";
-import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
-import TdModal from "Apps/common/Components/Modal/Modal";
-import { useRouteMatch } from "react-router-dom";
+import { Form as FormModel } from "codegen-ui";
+import { isBsddTransporterFieldEditable } from "shared/constants";
+import { NotificationError } from "../../../../Apps/common/Components/Error/Error";
+import { capitalize } from "../../../../common/helper";
+import { IconPaperWrite } from "../../../../Apps/common/Components/Icons/Icons";
+import TdModal from "../../../../Apps/common/Components/Modal/Modal";
+import { useMatch } from "react-router-dom";
 
 const UPDATE_PLATE = gql`
   mutation updateTransporterFields(
@@ -48,28 +48,28 @@ export default function TransporterInfoEdit({
   fieldName,
   verboseFieldName,
   isModalOpenFromParent,
-  onModalCloseFromParent,
+  onModalCloseFromParent
 }: Props) {
   const mutationFieldName = `transporter${capitalize(fieldName)}`;
 
   const [isOpen, setIsOpen] = useState(false);
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/");
 
   const [updateTransporterPlate, { error }] = useMutation(UPDATE_PLATE, {
-    onCompleted: () => handleClose(),
+    onCompleted: () => handleClose()
   });
 
   const formik = useFormik({
     initialValues: {
       [fieldName]: form.stateSummary
         ? form.stateSummary[mutationFieldName]
-        : null,
+        : null
     },
     onSubmit: values => {
       return updateTransporterPlate({
-        variables: { id: form.id, [mutationFieldName]: values[fieldName] },
+        variables: { id: form.id, [mutationFieldName]: values[fieldName] }
       });
-    },
+    }
   });
 
   if (!isBsddTransporterFieldEditable(form.status)) {

@@ -85,12 +85,10 @@ export const filter_reset_btn = "Annuler les filtres";
 export const filter_type_select_placeholder = "Sélectionner un type de filtre";
 export const filter_type_select_label = "Type de filtre";
 export const filter_bsd_type = "Type de bordereau";
-export const filter_siret = "SIRET";
-export const filter_waste_code = "Code déchet";
-export const filter_bsd_number = "Numéro du bordereau";
-export const filter_contenant_number = "Numéro de contenant (BSFF)";
+export const filter_waste_code = "N° de déchet / nom usuel";
+export const filter_bsd_number = "N° de BSD / contenant";
 export const filter_immat_number = "Numéro d'immatriculation";
-export const filter_chantier_name = "Nom du chantier";
+export const filter_chantier_name = "Nom de chantier";
 export const filter_chantier_adress = "Adresse du chantier";
 export const filter_free_text = "Champs libres";
 export const filter_worker_operation_code = "Code d'opération";
@@ -101,9 +99,8 @@ export const filter_acceptation_sign_date = "Date d'acceptation";
 export const filter_operation_sign_date = "Date de traitement / d'opération";
 export const filter_tva_intra = "Numéro de TVA intracommunautaire";
 export const filter_next_destination_siret = "SIRET du destinataire ultérieur";
-export const filter_trader_siret = "SIRET du négociant";
-export const filter_broker_siret = "SIRET du courtier";
-export const filter_emitter_name = "Raison sociale";
+export const filter_given_name = "Raison sociale / SIRET";
+export const filter_cap = "Numéro de CAP";
 export const filter_seal_numbers = "Numéro du scellé (BSDA)";
 export const filter_fiche_intervention_numbers =
   "Numéro de fiche d'intervention (BSFF)";
@@ -131,7 +128,7 @@ export const dropdown_create_bsdd = "Déchets dangereux";
 export const dropdown_create_bsda = "Amiante";
 export const dropdown_create_bsdasri = "DASRI";
 export const dropdown_create_bsvhu = "Véhicule Hors d’Usage";
-export const dropdown_create_bsff = "Fluide Frigorifique";
+export const dropdown_create_bsff = "Fluide Frigorigène";
 
 export const bsddValidationDraftText = `Cette action aura pour effet de valider les données du bordereau et
             de le faire apparaitre dans l'onglet "Pour action" de l'émetteur

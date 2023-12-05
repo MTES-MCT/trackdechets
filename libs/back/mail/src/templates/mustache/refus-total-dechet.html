@@ -1,0 +1,55 @@
+<p>
+  Nous vous informons que la société {{form.recipientCompanyName}}
+  ({{form.recipientCompanySiret}}) a refusé le {{form.signedAt}}, le déchet de
+  la société suivante :
+</p>
+<br />
+<ul>
+  <li>
+    {{form.emitterCompanyName}} ({{form.emitterCompanySiret}}) -
+    {{form.emitterCompanyAddress}}
+  </li>
+  <li>Informations relatives aux déchets refusés :</li>
+  <ul>
+    <li>Numéro du BSD: {{form.readableId}}</li>
+    <li>Appellation du déchet : {{form.wasteDetailsName}}</li>
+    <li>Code déchet : {{form.wasteDetailsCode}}</li>
+    <li>
+      Motif de refus :
+      {{#form.wasteRefusalReason}}<span>{{form.wasteRefusalReason}}</span>{{/form.wasteRefusalReason}}
+      {{^form.wasteRefusalReason}}<span>Non précisé</span
+      >{{/form.wasteRefusalReason}}
+    </li>
+  </ul>
+  <li>
+    Transporteur : {{form.transporterCompanyName}}
+    ({{form.transporterCompanySiret}}). {{#form.transporterIsExemptedOfReceipt}}
+    <span>
+      Récépissé transport : Exemption relevant de l'article R.541-50 du code de
+      l'Environnement</span
+    >{{/form.transporterIsExemptedOfReceipt}}
+    {{^form.transporterIsExemptedOfReceipt}}
+    <span> Récépissé transport : {{form.transporterReceipt}}</span>
+    {{/form.transporterIsExemptedOfReceipt}}
+  </li>
+  <li>Responsable du site : {{form.sentBy}}</li>
+</ul>
+<br />
+<p>
+  Vous trouverez ci-joint la copie du BSD correspondant au refus mentionné
+  ci-dessus.
+</p>
+<br />
+<p>
+  Comme le prévoit l'article R541-45 du code de l'environnement, l'expéditeur
+  initial du déchet et l'inspection des installations classées sont tenus
+  informés de ce refus.
+</p>
+<br />
+<p>
+  <strong
+    >Ce message est transmis par Trackdéchets automatiquement lors d'un refus de
+    déchets. Merci de prendre les dispositions nécessaires pour vous assurer du
+    bon traitement de votre déchet.</strong
+  >
+</p>

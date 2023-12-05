@@ -24,11 +24,12 @@ describe("acceptPendingInvitations", () => {
         }
       });
       await acceptPendingInvitations();
-      const untouchedInvitation = await prisma.userAccountHash.findUniqueOrThrow({
-        where: {
-          id: invitation.id
-        }
-      });
+      const untouchedInvitation =
+        await prisma.userAccountHash.findUniqueOrThrow({
+          where: {
+            id: invitation.id
+          }
+        });
       expect(untouchedInvitation).not.toBeNull();
       expect(untouchedInvitation.acceptedAt).toBeNull();
     }
@@ -72,11 +73,13 @@ describe("acceptPendingInvitations", () => {
         }
       });
       await acceptPendingInvitations();
-      const acceptedInvitation = await prisma.userAccountHash.findUniqueOrThrow({
-        where: {
-          id: invitation.id
+      const acceptedInvitation = await prisma.userAccountHash.findUniqueOrThrow(
+        {
+          where: {
+            id: invitation.id
+          }
         }
-      });
+      );
       expect(acceptedInvitation.acceptedAt).not.toBeNull();
     }
   );

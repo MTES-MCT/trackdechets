@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { CompanyPrivate, UserRole } from "generated/graphql/types";
+import { CompanyPrivate, UserRole } from "codegen-ui";
 import React from "react";
 import AccountField from "./AccountField";
 import { AccountFormCompanySignatureAutomation } from "./forms/AccountFormCompanySignatureAutomation";
@@ -23,7 +23,7 @@ AccountFieldCompanySignatureAutomation.fragments = {
         }
       }
     }
-  `,
+  `
 };
 
 export function AccountFieldCompanySignatureAutomation({ company }: Props) {

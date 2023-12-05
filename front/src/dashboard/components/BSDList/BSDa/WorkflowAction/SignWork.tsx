@@ -1,10 +1,10 @@
 import { useMutation } from "@apollo/client";
-import { RedErrorMessage } from "common/components";
-import { GET_BSDS } from "Apps/common/queries";
-import routes from "Apps/routes";
-import { UPDATE_BSDA } from "form/bsda/stepper/queries";
-import { WasteInfoWorker } from "form/bsda/stepper/steps/WasteInfo";
-import { getComputedState } from "form/common/getComputedState";
+import { RedErrorMessage } from "../../../../../common/components";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
+import routes from "../../../../../Apps/routes";
+import { UPDATE_BSDA } from "../../../../../form/bsda/stepper/queries";
+import { WasteInfoWorker } from "../../../../../form/bsda/stepper/steps/WasteInfo";
+import { getComputedState } from "../../../../../form/common/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
   BsdaConsistence,
@@ -12,13 +12,13 @@ import {
   Mutation,
   MutationSignBsdaArgs,
   MutationUpdateBsdaArgs,
-  SignatureTypeInput,
-} from "generated/graphql/types";
+  SignatureTypeInput
+} from "codegen-ui";
 import React from "react";
-import { generatePath, Link, useRouteMatch } from "react-router-dom";
+import { generatePath, Link, useMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsda, SIGN_BSDA } from "./SignBsda";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 
 const validationSchema = yup.object({
@@ -26,7 +26,7 @@ const validationSchema = yup.object({
   author: yup
     .string()
     .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    .min(1, "Le nom et prénom de l'auteur de la signature est requis")
 });
 
 type Props = {
@@ -41,7 +41,7 @@ export function SignWork({
   bsdaId,
   isModalOpenFromParent,
   onModalCloseFromParent,
-  displayActionButton,
+  displayActionButton
 }: Props) {
   const [updateBsda, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsda">,
@@ -53,7 +53,7 @@ export function SignWork({
   >(SIGN_BSDA, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   const TODAY = new Date();
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/");
   const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
 
   return (
@@ -77,7 +77,7 @@ export function SignWork({
             <Link
               to={generatePath(routes[dashboardRoutePrefix].bsdas.edit, {
                 siret,
-                id: bsda.id,
+                id: bsda.id
               })}
               className="btn btn--primary"
             >
@@ -96,16 +96,16 @@ export function SignWork({
                     materialName: "",
                     adr: "",
                     consistence: BsdaConsistence.Solide,
-                    sealNumbers: [],
+                    sealNumbers: []
                   },
                   weight: {
                     value: null,
-                    isEstimate: false,
+                    isEstimate: false
                   },
-                  packagings: [],
+                  packagings: []
                 },
                 bsda
-              ),
+              )
             }}
             validationSchema={validationSchema}
             onSubmit={async values => {
@@ -113,8 +113,8 @@ export function SignWork({
               await updateBsda({
                 variables: {
                   id: bsda.id,
-                  input: update,
-                },
+                  input: update
+                }
               });
               await signBsda({
                 variables: {
@@ -122,9 +122,9 @@ export function SignWork({
                   input: {
                     author,
                     date,
-                    type: BsdaSignatureType.Work,
-                  },
-                },
+                    type: BsdaSignatureType.Work
+                  }
+                }
               });
               onClose();
             }}

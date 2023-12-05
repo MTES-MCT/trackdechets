@@ -14,7 +14,7 @@ export const isFunction = (obj: any): obj is Function =>
 
 export const ErrorProvider: FunctionComponent<Props> = ({
   apolloError,
-  children,
+  children
 }) => {
   if (!children || !isFunction(children)) {
     console.info("ErrorProvider only accepts a function as a child.");
@@ -66,7 +66,7 @@ export function NotificationError({ apolloError, className, message }: Props) {
 
 export function SimpleNotificationError({
   className,
-  message,
+  message
 }: {
   className?: string;
   message: string | ReactElement;

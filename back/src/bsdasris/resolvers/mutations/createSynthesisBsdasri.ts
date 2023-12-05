@@ -6,7 +6,7 @@ import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { validateBsdasri } from "../../validation";
 import { getEligibleDasrisForSynthesis, aggregatePackagings } from "./utils";
-import { indexBsdasri } from "../../elastic";
+import { getBsdasriForElastic, indexBsdasri } from "../../elastic";
 import { BsdasriType } from "@prisma/client";
 import { getBsdasriRepository } from "../../repository";
 import { sirenify } from "../../sirenify";
@@ -88,11 +88,10 @@ const createSynthesisBsdasri = async (
     ...flattenedInput,
     id: getReadableId(ReadableIdPrefix.DASRI),
     type: BsdasriType.SYNTHESIS,
-
     synthesizing: { connect: synthesizedBsdasrisId }
   });
   const expandeBsdasri = expandBsdasriFromDB(newDasri);
-  await indexBsdasri(newDasri, context);
+  await indexBsdasri(await getBsdasriForElastic(newDasri), context);
 
   return expandeBsdasri;
 };

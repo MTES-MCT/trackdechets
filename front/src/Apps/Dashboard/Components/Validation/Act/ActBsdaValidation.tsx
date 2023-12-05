@@ -1,10 +1,10 @@
 import React from "react";
-import { SignEmission } from "dashboard/components/BSDList/BSDa/WorkflowAction/SignEmission";
-import SignOperation from "dashboard/components/BSDList/BSDa/WorkflowAction/SignOperation";
-import SignTransport from "dashboard/components/BSDList/BSDa/WorkflowAction/SignTransport";
-import SignWork from "dashboard/components/BSDList/BSDa/WorkflowAction/SignWork";
-import { Bsda, BsdaStatus } from "generated/graphql/types";
-import { isCollection_2710 } from "Apps/Dashboard/dashboardServices";
+import { SignEmission } from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignEmission";
+import SignOperation from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignOperation";
+import SignTransport from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignTransport";
+import SignWork from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignWork";
+import { Bsda, BsdaStatus } from "codegen-ui";
+import { isCollection_2710 } from "../../../dashboardServices";
 
 interface ActBsdaValidationProps {
   bsd: Bsda;
@@ -16,12 +16,12 @@ const ActBsdaValidation = ({
   bsd,
   currentSiret,
   isOpen,
-  onClose,
+  onClose
 }: ActBsdaValidationProps) => {
   const actionButtonAdapterProps = {
     isModalOpenFromParent: isOpen,
     onModalCloseFromParent: onClose,
-    displayActionButton: false,
+    displayActionButton: false
   };
 
   const renderInitialModal = () => {

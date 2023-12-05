@@ -1,19 +1,19 @@
 import { gql, MutationHookOptions, useMutation } from "@apollo/client";
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
 import {
   Mutation,
   MutationDuplicateBsdaArgs,
   MutationDuplicateBsdasriArgs,
   MutationDuplicateBsvhuArgs,
-  MutationDuplicateFormArgs,
-} from "generated/graphql/types";
+  MutationDuplicateFormArgs
+} from "codegen-ui";
 import {
   bsdaFragment,
   fullDasriFragment,
   fullFormFragment,
-  vhuFragment,
-} from "Apps/common/queries/fragments";
-import { GET_BSDS } from "Apps/common/queries";
+  vhuFragment
+} from "../../../common/queries/fragments";
+import { GET_BSDS } from "../../../common/queries";
 
 const DUPLICATE_BSDASRI = gql`
   mutation DuplicateBsdasri($id: ID!) {
@@ -75,12 +75,12 @@ export function useBsdasriDuplicate(
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: (...args) => {
-      cogoToast.success(message);
+      toast.success(message);
 
       if (options.onCompleted) {
         options.onCompleted(...args);
       }
-    },
+    }
   });
 }
 
@@ -98,12 +98,12 @@ export function useBsdaDuplicate(
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: (...args) => {
-      cogoToast.success(message);
+      toast.success(message);
 
       if (options.onCompleted) {
         options.onCompleted(...args);
       }
-    },
+    }
   });
 }
 
@@ -121,12 +121,12 @@ export function useBsddDuplicate(
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: (...args) => {
-      cogoToast.success(message);
+      toast.success(message);
 
       if (options.onCompleted) {
         options.onCompleted(...args);
       }
-    },
+    }
   });
 }
 
@@ -144,12 +144,12 @@ export function useBsffDuplicate(
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: (...args) => {
-      cogoToast.success(message);
+      toast.success(message);
 
       if (options.onCompleted) {
         options.onCompleted(...args);
       }
-    },
+    }
   });
 }
 
@@ -167,11 +167,11 @@ export function useBsvhuDuplicate(
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: (...args) => {
-      cogoToast.success(message);
+      toast.success(message);
 
       if (options.onCompleted) {
         options.onCompleted(...args);
       }
-    },
+    }
   });
 }

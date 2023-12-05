@@ -1,4 +1,4 @@
-import { getTransporterCompanyOrgId } from "../../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import prisma from "../../prisma";
 import { EditionRules } from "./rules";
 import { ZodBsda } from "./schema";

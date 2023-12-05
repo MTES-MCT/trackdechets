@@ -2,7 +2,11 @@ import { Updater, registerUpdater } from "./helper/helper";
 import prisma from "../../src/prisma";
 import { enqueueUpdatedBsdToIndex } from "../../src/queue/producers/elastic";
 
-@registerUpdater("Reindex BSDD with traders", "Reindex BSDD with traders", true)
+@registerUpdater(
+  "Reindex BSDD with traders",
+  "Reindex BSDD with traders",
+  false
+)
 export class ReindexBsddWitTrader implements Updater {
   async run() {
     const bsds = await prisma.form.findMany({

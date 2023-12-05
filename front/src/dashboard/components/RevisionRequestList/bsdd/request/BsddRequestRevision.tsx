@@ -1,36 +1,36 @@
 import { useMutation } from "@apollo/client";
 import classNames from "classnames";
-import { FieldSwitch, RedErrorMessage } from "common/components";
-import Packagings from "form/bsdd/components/packagings/Packagings";
+import { FieldSwitch, RedErrorMessage } from "../../../../../common/components";
+import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 import {
   WasteCodeSelect,
-  bsddWasteCodeValidator,
-} from "form/bsdd/components/waste-code";
+  bsddWasteCodeValidator
+} from "../../../../../form/bsdd/components/waste-code";
 import {
   getInitialBroker,
-  getInitialTrader,
-} from "form/bsdd/utils/initial-state";
-import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
-import CompanySelector from "form/common/components/company/CompanySelector";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import ProcessingOperation from "form/common/components/processing-operation/ProcessingOperation";
+  getInitialTrader
+} from "../../../../../form/bsdd/utils/initial-state";
+import { getPackagingInfosSummary } from "../../../../../form/bsdd/utils/packagings";
+import CompanySelector from "../../../../../form/common/components/company/CompanySelector";
+import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
+import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
+import ProcessingOperation from "../../../../../form/common/components/processing-operation/ProcessingOperation";
 import { Field, Form, Formik } from "formik";
 import {
   Form as Bsdd,
   Mutation,
-  MutationCreateFormRevisionRequestArgs,
-} from "generated/graphql/types";
+  MutationCreateFormRevisionRequestArgs
+} from "codegen-ui";
 import React from "react";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
 import * as yup from "yup";
 import { removeEmptyKeys } from "../../../../../common/helper";
-import { CREATE_FORM_REVISION_REQUEST } from "Apps/common/queries/reviews/BsddReviewsQuery";
+import { CREATE_FORM_REVISION_REQUEST } from "../../../../../Apps/common/queries/reviews/BsddReviewsQuery";
 import styles from "./BsddRequestRevision.module.scss";
 import { ReviewableField } from "./ReviewableField";
 import { BsddRequestRevisionCancelationInput } from "../BsddRequestRevisionCancelationInput";
-import OperationModeSelect from "common/components/OperationModeSelect";
+import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
 
 type Props = {
   bsdd: Bsdd;
@@ -41,12 +41,12 @@ const initialReview = {
     code: "",
     name: "",
     pop: "",
-    packagingInfos: [],
+    packagingInfos: []
   },
   trader: getInitialTrader(),
   broker: getInitialBroker(),
   recipient: {
-    cap: "",
+    cap: ""
   },
   quantityReceived: null,
   processingOperationDone: "",
@@ -54,14 +54,14 @@ const initialReview = {
   processingOperationDescription: "",
   temporaryStorageDetail: {
     temporaryStorer: {
-      quantityReceived: null,
+      quantityReceived: null
     },
     destination: {
       cap: "",
-      processingOperation: "",
-    },
+      processingOperation: ""
+    }
   },
-  isCanceled: false,
+  isCanceled: false
 };
 
 const validationSchema = yup.object({
@@ -69,12 +69,12 @@ const validationSchema = yup.object({
     .string()
     .required(
       "Vous devez ajouter un commentaire expliquant la demande de révision"
-    ),
+    )
 });
 
 export function BsddRequestRevision({ bsdd }: Props) {
   const { siret } = useParams<{ siret: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [createFormRevisionRequest, { loading, error }] = useMutation<
     Pick<Mutation, "createFormRevisionRequest">,
     MutationCreateFormRevisionRequestArgs
@@ -92,7 +92,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
         initialValues={{
           comment: "",
           content: initialReview,
-          emitter: { type: bsdd?.emitter?.type },
+          emitter: { type: bsdd?.emitter?.type }
         }}
         validationSchema={validationSchema}
         onSubmit={async ({ content, comment }) => {
@@ -107,11 +107,11 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 formId: bsdd.id,
                 content: cleanedContent ?? {},
                 comment,
-                authoringCompanySiret: siret,
-              },
-            },
+                authoringCompanySiret: siret!
+              }
+            }
           });
-          history.goBack();
+          navigate(-1);
         }}
       >
         {({ setFieldValue, values }) => {
@@ -129,7 +129,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
 
                 <div
                   style={{
-                    display: areModificationsDisabled ? "none" : "inline",
+                    display: areModificationsDisabled ? "none" : "inline"
                   }}
                 >
                   <hr />
@@ -480,7 +480,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 <button
                   className="btn btn--outline-primary"
                   onClick={() => {
-                    history.goBack();
+                    navigate(-1);
                   }}
                   type="button"
                 >

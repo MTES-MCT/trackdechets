@@ -4,9 +4,9 @@ import {
   Blankslate,
   BlankslateDescription,
   BlankslateImg,
-  BlankslateTitle,
-} from "Apps/common/Components";
-import { Breadcrumb, BreadcrumbItem } from "common/components";
+  BlankslateTitle
+} from "../../../Apps/common/Components";
+import { Breadcrumb, BreadcrumbItem } from "../../../common/components";
 import { BSDList, COLUMNS } from "../../components/BSDList";
 import illustration from "./assets/blankslateToCollect.svg";
 
@@ -18,14 +18,14 @@ const TO_COLLECT_COLUMNS = [
   COLUMNS.waste,
   COLUMNS.transporterCustomInfo,
   COLUMNS.transporterNumberPlate,
-  COLUMNS.status,
+  COLUMNS.status
 ];
 
 export function RouteTransportToCollect() {
   const { siret } = useParams<{ siret: string }>();
   const defaultWhere = React.useMemo(
     () => ({
-      isToCollectFor: [siret],
+      isToCollectFor: [siret!]
     }),
     [siret]
   );
@@ -39,7 +39,7 @@ export function RouteTransportToCollect() {
 
       <BSDList
         key={siret}
-        siret={siret}
+        siret={siret!}
         defaultWhere={defaultWhere}
         columns={TO_COLLECT_COLUMNS}
         blankslate={

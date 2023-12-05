@@ -27,6 +27,7 @@ import {
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 import { gql } from "graphql-tag";
 import { searchCompany } from "../../../../companies/search";
+import prisma from "../../../../prisma";
 
 jest.mock("../../../../companies/search");
 
@@ -846,5 +847,67 @@ describe("Query.bsds edge cases", () => {
     const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS);
 
     expect(data.bsds.edges).toHaveLength(0);
+  });
+});
+
+describe("Form sub-resolvers in query bsds", () => {
+  afterEach(resetDatabase);
+
+  const GET_BSDS = gql`
+    query GetBsds($where: BsdWhere) {
+      bsds(where: $where) {
+        edges {
+          node {
+            ... on Form {
+              id
+              transportSegments {
+                id
+                transporter {
+                  company {
+                    siret
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  test("Form.transportSgemnts should resolve correctly", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter2 = await userWithCompanyFactory("ADMIN");
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret
+      }
+    });
+
+    // ajoute un second transporteur
+    const bsddTransporter2 = await prisma.bsddTransporter.create({
+      data: {
+        transporterCompanySiret: transporter2.company.siret,
+        number: 2,
+        formId: form.id
+      }
+    });
+
+    await indexForm(await getFormForElastic(form));
+    await refreshElasticSearch();
+    const { query } = makeClient(emitter.user);
+    const { data, errors } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    expect(errors).toBeUndefined();
+    const forms = data.bsds!.edges.map(e => e.node);
+    expect(forms).toHaveLength(1);
+    expect((forms[0] as any).transportSegments).toHaveLength(1);
+    expect(
+      (forms[0] as any).transportSegments[0].transporter.company.siret
+    ).toEqual(bsddTransporter2.transporterCompanySiret);
   });
 });

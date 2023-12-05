@@ -1,19 +1,15 @@
 import { gql, useMutation } from "@apollo/client";
 import React from "react";
-import { statusChangeFragment } from "Apps/common/queries/fragments";
-import { ActionButton } from "common/components";
-import { Loader } from "Apps/common/Components";
-import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
-import {
-  FormStatus,
-  Mutation,
-  MutationMarkAsSealedArgs,
-} from "generated/graphql/types";
+import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
+import { ActionButton } from "../../../../../common/components";
+import { Loader } from "../../../../../Apps/common/Components";
+import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
+import { FormStatus, Mutation, MutationMarkAsSealedArgs } from "codegen-ui";
 import { WorkflowActionProps } from "./WorkflowAction";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
-import cogoToast from "cogo-toast";
-import { GET_BSDS } from "Apps/common/queries";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
+import toast from "react-hot-toast";
+import { GET_BSDS } from "../../../../../Apps/common/queries";
 
 const MARK_AS_SEALED = gql`
   mutation MarkAsSealed($id: ID!) {
@@ -37,14 +33,14 @@ export default function MarkAsSealed({ form }: WorkflowActionProps) {
       if (data.markAsSealed) {
         const sealedForm = data.markAsSealed;
         if (sealedForm.status === FormStatus.Sealed)
-          cogoToast.success(
+          toast.success(
             `Le numéro #${sealedForm.readableId} a été affecté au bordereau. Vous pouvez le retrouver dans l'onglet "Pour action".`
           );
       }
     },
     onError: () => {
       // The error is handled in the UI
-    },
+    }
   });
 
   const actionLabel = "Valider le bordereau";

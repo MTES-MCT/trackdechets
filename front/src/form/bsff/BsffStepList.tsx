@@ -1,10 +1,10 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React, { ReactElement, useMemo, lazy } from "react";
-import { useHistory } from "react-router-dom";
-import { Loader } from "Apps/common/Components";
-import { getComputedState } from "form/common/getComputedState";
-import { IStepContainerProps } from "form/common/stepper/Step";
-import { formInputToastError } from "form/common/stepper/toaster";
+import { useNavigate } from "react-router-dom";
+import { Loader } from "../../Apps/common/Components";
+import { getComputedState } from "../common/getComputedState";
+import { IStepContainerProps } from "../common/stepper/Step";
+import { formInputToastError } from "../common/stepper/toaster";
 import {
   Mutation,
   MutationCreateDraftBsffArgs,
@@ -13,35 +13,33 @@ import {
   Query,
   Bsff,
   BsffInput,
-  BsffType,
-} from "generated/graphql/types";
+  BsffType
+} from "codegen-ui";
 import initialState from "./utils/initial-state";
 import {
   CREATE_DRAFT_BSFF,
   UPDATE_BSFF_FORM,
-  GET_BSFF_FORM,
+  GET_BSFF_FORM
 } from "./utils/queries";
 import { validationSchema } from "./utils/schema";
 
-const GenericStepList = lazy(
-  () => import("form/common/stepper/GenericStepList")
-);
+const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (bsff: Bsff | undefined) => ReactElement;
   formId?: string;
 }
 
 export default function BsffStepsList(props: Props) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const formQuery = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(
     GET_BSFF_FORM,
     {
       variables: {
-        id: props.formId!,
+        id: props.formId!
       },
       skip: !props.formId,
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     }
   );
 
@@ -52,7 +50,7 @@ export default function BsffStepsList(props: Props) {
       return {
         ...formQuery.data?.bsff,
         previousPackagings,
-        transporter,
+        transporter
       };
     }
     const bsff = formQuery.data?.bsff;
@@ -73,7 +71,7 @@ export default function BsffStepsList(props: Props) {
   function saveForm(input: BsffInput): Promise<any> {
     return formState.id
       ? updateBsffForm({
-          variables: { id: formState.id, input },
+          variables: { id: formState.id, input }
         })
       : createDraftBsff({ variables: { input } });
   }
@@ -96,7 +94,7 @@ export default function BsffStepsList(props: Props) {
       destination: {
         ...destination,
         plannedOperationCode:
-          plannedOperationCode?.length > 0 ? plannedOperationCode : null,
+          plannedOperationCode?.length > 0 ? plannedOperationCode : null
       },
       // packagings is computed by the backend in case of groupement or reexpedition
       ...([BsffType.Groupement, BsffType.Reexpedition].includes(type)
@@ -107,8 +105,8 @@ export default function BsffStepsList(props: Props) {
               other: p.other,
               numero: p.numero,
               volume: p.volume,
-              weight: p.weight,
-            })),
+              weight: p.weight
+            }))
           }),
       ficheInterventions: ficheInterventions.map(
         ficheIntervention => ficheIntervention.id
@@ -120,10 +118,10 @@ export default function BsffStepsList(props: Props) {
           ? previousPackagings.map(p => p.id)
           : [],
       grouping:
-        type === BsffType.Groupement ? previousPackagings.map(p => p.id) : [],
+        type === BsffType.Groupement ? previousPackagings.map(p => p.id) : []
     })
       .then(_ => {
-        history.goBack();
+        navigate(-1);
       })
       .catch(err => formInputToastError(err));
   }

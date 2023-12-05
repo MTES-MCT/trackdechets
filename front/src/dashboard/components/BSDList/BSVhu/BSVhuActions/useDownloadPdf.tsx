@@ -1,5 +1,5 @@
 import { gql, LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
-import { Query, QueryBsvhuPdfArgs } from "generated/graphql/types";
+import { Query, QueryBsvhuPdfArgs } from "codegen-ui";
 
 export const BSVHU_PDF = gql`
   query Bsdasridf($id: ID!) {
@@ -21,6 +21,6 @@ export function useDownloadPdf(
         return;
       }
       window.open(bsvhuPdf.downloadLink, "_blank");
-    },
+    }
   });
 }

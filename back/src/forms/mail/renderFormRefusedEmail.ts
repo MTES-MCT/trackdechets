@@ -1,12 +1,15 @@
 import { BsddTransporter, Form } from "@prisma/client";
 import prisma from "../../prisma";
 import { getCompanyAdminUsers } from "../../companies/database";
-import { Mail } from "../../mailer/types";
 import { generateBsddPdfToBase64 } from "../pdf";
-import DREALS from "../../common/constants/DREALS";
-import { formNotAccepted, formPartiallyRefused } from "../../mailer/templates";
-import { renderMail } from "../../mailer/templates/renderers";
-import { getTransporterCompanyOrgId } from "../../common/constants/companySearchHelpers";
+import { Dreals } from "shared/constants";
+import {
+  Mail,
+  renderMail,
+  formNotAccepted,
+  formPartiallyRefused
+} from "@td/mail";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import { getFirstTransporter } from "../database";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
@@ -46,7 +49,7 @@ export async function renderFormRefusedEmail(
     ? await getCompanyAdminUsers(form.recipientCompanySiret!)
     : [];
 
-  let drealsRecipients: typeof DREALS = [];
+  let drealsRecipients: typeof Dreals = [];
 
   if (notifyDreal) {
     const companies = await prisma.company.findMany({
@@ -59,7 +62,7 @@ export async function renderFormRefusedEmail(
     });
     const formDepartments = companies.map(c => c.codeDepartement);
     // get recipients from dreals list
-    drealsRecipients = DREALS.filter(d => formDepartments.includes(d.Dept));
+    drealsRecipients = Dreals.filter(d => formDepartments.includes(d.Dept));
   }
 
   const to = emitterCompanyAdmins.map(admin => ({

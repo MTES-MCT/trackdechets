@@ -1,4 +1,23 @@
 type Query {
+  """
+  Requête interne multi-bordereaux pour l'affichage du tableau de bord.
+  Les champs suivants sont calculés directement depuis Elasticsearch sans
+  passer par la base de données pour des raisons de performance.
+
+  bsds {
+    ...on Bsda {
+      groupedIn  {...} // seul l'id est disponible
+      forwardedIn {...} // seul l'id est disponible
+    }
+    ...on Bsdasri {
+      grouping {...} // seul l'id est disponible
+      synthesizing {...} // seul l'id est disponible
+    }
+    ...on Bsff {
+      packagings {...} // tous les champs sont disponibles
+    }
+  }
+  """
   bsds(
     clue: String
     where: BsdWhere

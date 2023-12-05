@@ -1,7 +1,7 @@
 import { useMutation, gql } from "@apollo/client";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+import { NotificationError } from "../../Apps/common/Components/Error/Error";
 import React from "react";
-import { cleanClue } from "../../generated/constants/companySearchHelpers";
+import { cleanClue } from "shared/constants";
 
 const SEND_MEMBERSHIP_REQUEST = gql`
   mutation SendMembershipRequest($siret: String!) {
@@ -37,7 +37,7 @@ export default function AccountCompanyAddInvitationRequest({ siret }) {
     {
       onError: () => {
         // The error is handled in the UI
-      },
+      }
     }
   );
 
@@ -63,7 +63,7 @@ export default function AccountCompanyAddInvitationRequest({ siret }) {
         className="btn btn--primary tw-mt-5"
         onClick={() =>
           sendMembershipRequest({
-            variables: { siret: cleanClue(siret) },
+            variables: { siret: cleanClue(siret) }
           })
         }
       >

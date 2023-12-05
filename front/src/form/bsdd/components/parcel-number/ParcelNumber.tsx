@@ -3,21 +3,23 @@ import {
   FieldArray,
   FieldArrayRenderProps,
   FieldProps,
-  useFormikContext,
+  useFormikContext
 } from "formik";
 import React, { useMemo, lazy } from "react";
-import TdSwitch from "common/components/Switch";
-import { Form, ParcelNumber } from "generated/graphql/types";
-import Tooltip from "common/components/Tooltip";
-import { IconDelete1 } from "Apps/common/Components/Icons/Icons";
-const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
+import TdSwitch from "../../../../common/components/Switch";
+import { Form, ParcelNumber } from "codegen-ui";
+import Tooltip from "../../../../common/components/Tooltip";
+import { IconDelete1 } from "../../../../Apps/common/Components/Icons/Icons";
+const TagsInput = lazy(
+  () => import("../../../../common/components/tags-input/TagsInput")
+);
 
 const newParcelNumber = {
   city: "",
   postalCode: "",
   prefix: "",
   number: "",
-  section: "",
+  section: ""
 };
 export function ParcelNumbersSelector({ field }: FieldProps) {
   const { setFieldValue } = useFormikContext<Form>();
@@ -138,7 +140,7 @@ function ParcelDetails({ index, parcelNumber, arrayHelpers }) {
         city: parcelNumber.city,
         postalCode: parcelNumber.postalCode,
         x: 0,
-        y: 0,
+        y: 0
       });
     } else {
       arrayHelpers.replace(index, {
@@ -146,7 +148,7 @@ function ParcelDetails({ index, parcelNumber, arrayHelpers }) {
         postalCode: parcelNumber.postalCode,
         prefix: "",
         number: "",
-        section: "",
+        section: ""
       });
     }
   }

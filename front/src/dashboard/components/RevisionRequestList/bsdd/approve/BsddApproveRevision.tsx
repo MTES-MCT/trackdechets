@@ -6,20 +6,24 @@ import {
   Mutation,
   MutationSubmitFormRevisionRequestApprovalArgs,
   PackagingInfo,
-  Trader,
-} from "generated/graphql/types";
-import { TdModalTrigger } from "Apps/common/Components/Modal/Modal";
-import { ActionButton, Modal, RedErrorMessage } from "common/components";
-import { IconCogApproved } from "Apps/common/Components/Icons/Icons";
+  Trader
+} from "codegen-ui";
+import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
+import {
+  ActionButton,
+  Modal,
+  RedErrorMessage
+} from "../../../../../common/components";
+import { IconCogApproved } from "../../../../../Apps/common/Components/Icons/Icons";
 import { RevisionField } from "./RevisionField";
 import { useMutation } from "@apollo/client";
-import { SUBMIT_FORM_REVISION_REQUEST_APPROVAL } from "Apps/common/queries/reviews/BsddReviewsQuery";
+import { SUBMIT_FORM_REVISION_REQUEST_APPROVAL } from "../../../../../Apps/common/queries/reviews/BsddReviewsQuery";
 import { Field, Form, Formik } from "formik";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
-import { formatDate } from "common/datetime";
-import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
-import { useRouteMatch } from "react-router-dom";
-import { getOperationModeLabel } from "common/operationModes";
+import { RadioButton } from "../../../../../form/common/components/custom-inputs/RadioButton";
+import { formatDate } from "../../../../../common/datetime";
+import { getPackagingInfosSummary } from "../../../../../form/bsdd/utils/packagings";
+import { useMatch } from "react-router-dom";
+import { getOperationModeLabel } from "../../../../../common/operationModes";
 
 type Props = {
   review: FormRevisionRequest;
@@ -28,15 +32,15 @@ type Props = {
 };
 
 const validationSchema = yup.object({
-  isApproved: yup.string().required(),
+  isApproved: yup.string().required()
 });
 
 export function BsddApproveRevision({
   review,
   isModalOpenFromParent,
-  onModalCloseFromParent,
+  onModalCloseFromParent
 }: Props) {
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/");
 
   const [submitFormRevisionRequestApproval, { loading, error }] = useMutation<
     Pick<Mutation, "submitFormRevisionRequestApproval">,
@@ -46,7 +50,7 @@ export function BsddApproveRevision({
   if (isV2Routes && isModalOpenFromParent) {
     const formatRevisionAdapter = {
       ...review["review"],
-      form: { ...review },
+      form: { ...review }
     };
     return (
       <Modal onClose={onModalCloseFromParent!} ariaLabel={title} isOpen>
@@ -86,7 +90,7 @@ function DisplayModalContent({
   close,
   submitFormRevisionRequestApproval,
   error,
-  loading,
+  loading
 }) {
   return (
     <div>
@@ -94,11 +98,11 @@ function DisplayModalContent({
 
       <Formik
         initialValues={{
-          isApproved: "",
+          isApproved: ""
         }}
         onSubmit={async ({ isApproved }) => {
           await submitFormRevisionRequestApproval({
-            variables: { id: review.id, isApproved: isApproved === "TRUE" },
+            variables: { id: review.id, isApproved: isApproved === "TRUE" }
           });
           close();
         }}
@@ -253,12 +257,15 @@ export function DisplayRevision({ review }: Props) {
         label="Opération réalisée"
         bsddValue={review.form.processingOperationDone}
         reviewValue={
-          review.content.processingOperationDone +
-          (review.content.destinationOperationMode
-            ? ` (${getOperationModeLabel(
+          [
+            review.content.processingOperationDone,
+            review.content.destinationOperationMode &&
+              `(${getOperationModeLabel(
                 review.content.destinationOperationMode ?? ""
               )})`
-            : "")
+          ]
+            .filter(Boolean)
+            .join(" ") || null
         }
       />
 

@@ -1,4 +1,4 @@
-import { parseDate } from "common/datetime";
+import { parseDate } from "../../../../common/datetime";
 import { format, isValid } from "date-fns";
 import fr from "date-fns/locale/fr";
 import { FieldProps } from "formik";
@@ -6,7 +6,7 @@ import React from "react";
 import DatePicker, {
   ReactDatePickerProps,
   registerLocale,
-  setDefaultLocale,
+  setDefaultLocale
 } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./DateInput.module.scss";

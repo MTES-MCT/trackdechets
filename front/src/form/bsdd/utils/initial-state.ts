@@ -10,8 +10,8 @@ import {
   Trader,
   Broker,
   WorkSite,
-  TransportMode,
-} from "generated/graphql/types";
+  TransportMode
+} from "codegen-ui";
 
 /**
  * Computes initial values for trader fields in Formik's form
@@ -22,7 +22,7 @@ export function getInitialTrader(trader?: Trader | null) {
     receipt: trader?.receipt ?? "",
     department: trader?.department ?? "",
     validityLimit: trader?.validityLimit ?? null,
-    company: getInitialCompany(trader?.company),
+    company: getInitialCompany(trader?.company)
   };
 }
 
@@ -35,7 +35,7 @@ export function getInitialBroker(broker?: Broker | null) {
     receipt: broker?.receipt ?? "",
     department: broker?.department ?? "",
     validityLimit: broker?.validityLimit ?? null,
-    company: getInitialCompany(broker?.company),
+    company: getInitialCompany(broker?.company)
   };
 }
 
@@ -54,7 +54,7 @@ export function getInitialCompany(company?: FormCompany | null) {
     phone: company?.phone ?? "",
     vatNumber: company?.vatNumber ?? "",
     country: company?.country ?? "",
-    omiNumber: company?.omiNumber ?? "",
+    omiNumber: company?.omiNumber ?? ""
   };
 }
 
@@ -70,8 +70,8 @@ export function getInitialTemporaryStorageDetail(
       company: getInitialCompany(temporaryStorageDetail?.destination?.company),
       cap: temporaryStorageDetail?.destination?.cap ?? "",
       processingOperation:
-        temporaryStorageDetail?.destination?.processingOperation ?? "",
-    },
+        temporaryStorageDetail?.destination?.processingOperation ?? ""
+    }
   };
 }
 
@@ -85,7 +85,7 @@ export function getInitialEmitterWorkSite(workSite?: WorkSite | null) {
     address: workSite?.address ?? "",
     city: workSite?.city ?? "",
     postalCode: workSite?.postalCode ?? "",
-    infos: workSite?.infos ?? "",
+    infos: workSite?.infos ?? ""
   };
 }
 
@@ -96,7 +96,7 @@ export function getInitialEmitterWorkSite(workSite?: WorkSite | null) {
 export function getInitialEcoOrganisme(ecoOrganisme?: FormEcoOrganisme | null) {
   return {
     siret: ecoOrganisme?.siret ?? "",
-    name: ecoOrganisme?.name ?? "",
+    name: ecoOrganisme?.name ?? ""
   };
 }
 
@@ -114,7 +114,7 @@ export function getInitialIntermediaries(intermediaries?: FormCompany[]) {
         mail: company?.mail ?? "",
         phone: company?.phone ?? "",
         vatNumber: company?.vatNumber ?? "",
-        country: company?.country ?? "",
+        country: company?.country ?? ""
       }))
     : [];
 }
@@ -136,27 +136,27 @@ export function getInitialState(f?: Form | null): FormInput {
         : null,
       company: getInitialCompany(f?.emitter?.company),
       isForeignShip: f?.emitter?.isForeignShip ?? false,
-      isPrivateIndividual: f?.emitter?.isPrivateIndividual ?? false,
+      isPrivateIndividual: f?.emitter?.isPrivateIndividual ?? false
     },
     recipient: {
       cap: f?.recipient?.cap ?? "",
       processingOperation: f?.recipient?.processingOperation ?? "",
       isTempStorage: f?.recipient?.isTempStorage ?? false,
-      company: getInitialCompany(f?.recipient?.company),
+      company: getInitialCompany(f?.recipient?.company)
     },
     transporter: {
       isExemptedOfReceipt: f?.transporter?.isExemptedOfReceipt ?? false,
       numberPlate: f?.transporter?.numberPlate ?? "",
       customInfo: f?.transporter?.customInfo ?? null,
       company: getInitialCompany(f?.transporter?.company),
-      mode: f?.transporter?.mode ?? TransportMode.Road,
+      mode: f?.transporter?.mode ?? TransportMode.Road
     },
     trader: f?.trader
       ? {
           receipt: f?.trader?.receipt ?? "",
           department: f?.trader?.department ?? "",
           validityLimit: f?.trader?.validityLimit ?? null,
-          company: getInitialCompany(f?.trader?.company),
+          company: getInitialCompany(f?.trader?.company)
         }
       : null,
     broker: f?.broker
@@ -164,7 +164,7 @@ export function getInitialState(f?: Form | null): FormInput {
           receipt: f?.broker?.receipt ?? "",
           department: f?.broker?.department ?? "",
           validityLimit: f?.broker?.validityLimit ?? null,
-          company: getInitialCompany(f?.broker?.company),
+          company: getInitialCompany(f?.broker?.company)
         }
       : null,
     wasteDetails: {
@@ -182,7 +182,7 @@ export function getInitialState(f?: Form | null): FormInput {
       landIdentifiers: f?.wasteDetails?.landIdentifiers ?? [],
       packagings: null, // deprecated
       otherPackaging: null, // deprecated
-      numberOfPackages: null, // deprecated
+      numberOfPackages: null // deprecated
     },
     grouping: f?.grouping ?? [],
     ecoOrganisme: f?.ecoOrganisme
@@ -191,6 +191,6 @@ export function getInitialState(f?: Form | null): FormInput {
     temporaryStorageDetail: f?.temporaryStorageDetail
       ? getInitialTemporaryStorageDetail(f?.temporaryStorageDetail)
       : null,
-    intermediaries: getInitialIntermediaries(f?.intermediaries),
+    intermediaries: getInitialIntermediaries(f?.intermediaries)
   };
 }

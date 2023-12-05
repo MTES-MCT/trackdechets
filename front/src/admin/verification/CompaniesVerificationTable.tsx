@@ -1,8 +1,8 @@
 import {
   CompanyForVerification,
   CompanyVerificationStatus,
-  CompanyVerificationMode,
-} from "generated/graphql/types";
+  CompanyVerificationMode
+} from "codegen-ui";
 import React, { useMemo, useEffect } from "react";
 import { useTable, usePagination, useFilters } from "react-table";
 import { format } from "date-fns";
@@ -22,7 +22,7 @@ export default function CompaniesVerificationTable({
   fetchData,
   loading,
   totalCount,
-  pageSize,
+  pageSize
 }: Props) {
   const columns = useMemo(
     () => [
@@ -31,7 +31,7 @@ export default function CompaniesVerificationTable({
         accessor: "createdAt" as const,
         disableFilters: true,
         Cell: ({ value: createdAt }) =>
-          createdAt && format(new Date(createdAt), "yyyy-MM-dd"),
+          createdAt && format(new Date(createdAt), "yyyy-MM-dd")
       },
       {
         Header: "Établissement",
@@ -42,7 +42,7 @@ export default function CompaniesVerificationTable({
             <div>{value.orgId}</div>
             <div>{value.name}</div>
           </>
-        ),
+        )
       },
       {
         Header: "Profil",
@@ -56,23 +56,20 @@ export default function CompaniesVerificationTable({
               ))}
             </ul>
           );
-        },
+        }
       },
       {
         Header: "Admin",
         accessor: "admin" as const,
         disableFilters: true,
-        Cell: ({ value: admin }) => (
-          <>
-            {admin && (
-              <>
-                <div>{admin.email}</div>
-                {admin?.name && <div>{admin?.name}</div>}
-                {admin?.phone && <div>{admin?.phone}</div>}
-              </>
-            )}
-          </>
-        ),
+        Cell: ({ value: admin }) =>
+          admin && (
+            <>
+              <div>{admin.email}</div>
+              {admin?.name && <div>{admin?.name}</div>}
+              {admin?.phone && <div>{admin?.phone}</div>}
+            </>
+          )
       },
       {
         Header: "Statut de vérification",
@@ -102,8 +99,8 @@ export default function CompaniesVerificationTable({
               );
             }
           }
-        },
-      },
+        }
+      }
     ],
     []
   );
@@ -111,7 +108,7 @@ export default function CompaniesVerificationTable({
   const defaultColumn = useMemo(
     () => ({
       // Let's set up our default Filter UI
-      Filter: DefaultColumnFilter,
+      Filter: DefaultColumnFilter
     }),
     []
   );
@@ -126,7 +123,7 @@ export default function CompaniesVerificationTable({
       manualPagination: true,
       manualFilters: true,
       pageCount,
-      defaultColumn,
+      defaultColumn
     },
     useFilters,
     usePagination
@@ -145,7 +142,7 @@ export default function CompaniesVerificationTable({
     nextPage,
     previousPage,
     // Get the state from the instance
-    state: { pageIndex, filters },
+    state: { pageIndex, filters }
   } = tableInstance;
 
   // Listen for changes in pagination and filters and use the state to fetch our new data
@@ -273,10 +270,10 @@ function VerificationStatusFilter({ column: { filterValue, setFilter } }) {
   const options = [
     {
       value: CompanyVerificationStatus.Verified,
-      label: "Vérifié",
+      label: "Vérifié"
     },
     { value: CompanyVerificationStatus.ToBeVerified, label: "À vérifier" },
-    { value: CompanyVerificationStatus.LetterSent, label: "Courrier envoyé" },
+    { value: CompanyVerificationStatus.LetterSent, label: "Courrier envoyé" }
   ];
 
   return (
@@ -297,9 +294,7 @@ function VerificationStatusFilter({ column: { filterValue, setFilter } }) {
 }
 
 // Define a default UI for filtering
-function DefaultColumnFilter({
-  column: { filterValue, preFilteredRows, setFilter },
-}) {
+function DefaultColumnFilter({ column: { filterValue, setFilter } }) {
   return (
     <input
       value={filterValue || ""}

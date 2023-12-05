@@ -1,5 +1,5 @@
 import { gql } from "graphql-tag";
-import { xDaysAgo } from "../../../../commands/onboarding.helpers";
+import { xDaysAgo } from "../../../../utils";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   companyFactory,
@@ -8,9 +8,15 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsvhuFactory } from "../../../__tests__/factories.vhu";
-import { Mutation } from "../../../../generated/graphql/types";
+import {
+  CompanySearchResult,
+  Mutation
+} from "../../../../generated/graphql/types";
 import { ErrorCode } from "../../../../common/errors";
 import prisma from "../../../../prisma";
+import { searchCompany } from "../../../../companies/search";
+
+jest.mock("../../../../companies/search");
 
 const TODAY = new Date();
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
@@ -283,6 +289,111 @@ describe("mutaion.duplicateBsvhu", () => {
     );
     expect(duplicatedBsvhu.destinationCompanyPhone).toEqual(
       "UPDATED-DESTINATION-PHONE"
+    );
+  });
+
+  test("duplicated BSVHU should have the updated SIRENE data when company info changes", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporterCompany = await companyFactory({
+      transporterReceipt: {
+        create: {
+          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString(),
+          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+    const transporterReceipt =
+      await prisma.transporterReceipt.findUniqueOrThrow({
+        where: { id: transporterCompany.transporterReceiptId! }
+      });
+    const destinationCompany = await companyFactory({
+      vhuAgrementDemolisseur: {
+        create: {
+          agrementNumber: "UPDATED-AGREEMENT-NUMBER",
+          department: "UPDATED-DEPARTMENT"
+        }
+      }
+    });
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        emitterCompanyAddress: emitter.company.address,
+        emitterCompanyContact: emitter.company.contact,
+        emitterCompanyMail: emitter.company.contactEmail,
+        emitterCompanyPhone: emitter.company.contactPhone,
+        transporterCompanySiret: transporterCompany.siret,
+        transporterCompanyName: transporterCompany.name,
+        transporterCompanyAddress: transporterCompany.address,
+        transporterCompanyContact: transporterCompany.contact,
+        transporterCompanyMail: transporterCompany.contactEmail,
+        transporterCompanyPhone: transporterCompany.contactPhone,
+        transporterRecepisseNumber: transporterReceipt.receiptNumber,
+        transporterRecepisseDepartment: transporterReceipt.department,
+        transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+        destinationCompanySiret: destinationCompany.siret,
+        destinationCompanyName: destinationCompany.name,
+        destinationCompanyAddress: destinationCompany.address,
+        destinationCompanyContact: destinationCompany.contact,
+        destinationCompanyMail: destinationCompany.contactEmail,
+        destinationCompanyPhone: destinationCompany.contactPhone
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    function searchResult(companyName: string) {
+      return {
+        name: `updated ${companyName} name`,
+        address: `updated ${companyName} address`,
+        statutDiffusionEtablissement: "O"
+      } as CompanySearchResult;
+    }
+
+    const searchResults = {
+      [emitter.company.siret!]: searchResult("emitter"),
+      [transporterCompany.siret!]: searchResult("transporter"),
+      [destinationCompany.siret!]: searchResult("destination")
+    };
+
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
+      return Promise.resolve(searchResults[clue]);
+    });
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
+      DUPLICATE_BVHU,
+      {
+        variables: {
+          id: bsvhu.id
+        }
+      }
+    );
+
+    const duplicatedBsvhu = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: data.duplicateBsvhu.id }
+    });
+
+    // Emitter
+    expect(duplicatedBsvhu.emitterCompanyName).toEqual("updated emitter name");
+    expect(duplicatedBsvhu.emitterCompanyAddress).toEqual(
+      "updated emitter address"
+    );
+
+    // Transporter
+    expect(duplicatedBsvhu.transporterCompanyName).toEqual(
+      "updated transporter name"
+    );
+    expect(duplicatedBsvhu.transporterCompanyAddress).toEqual(
+      "updated transporter address"
+    );
+
+    // Destination
+    expect(duplicatedBsvhu.destinationCompanyName).toEqual(
+      "updated destination name"
+    );
+    expect(duplicatedBsvhu.destinationCompanyAddress).toEqual(
+      "updated destination address"
     );
   });
 });

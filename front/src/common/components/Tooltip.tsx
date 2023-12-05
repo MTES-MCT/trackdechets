@@ -1,6 +1,6 @@
 import React from "react";
 import { usePopperTooltip } from "react-popper-tooltip";
-import { IconQuestionCircle } from "Apps/common/Components/Icons/Icons";
+import { IconQuestionCircle } from "../../Apps/common/Components/Icons/Icons";
 import style from "./Tooltip.module.scss";
 
 type Props = {
@@ -18,10 +18,10 @@ const TdTooltip = ({ msg }: Props) => {
     getTooltipProps,
     setTooltipRef,
     setTriggerRef,
-    visible,
+    visible
   } = usePopperTooltip({
     offset: [0, 10],
-    placement: "top",
+    placement: "top"
   });
 
   return !!msg ? (

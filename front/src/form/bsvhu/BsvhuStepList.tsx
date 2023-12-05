@@ -1,10 +1,10 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React, { ReactElement, useMemo, lazy } from "react";
-import { generatePath, useHistory, useParams } from "react-router-dom";
-import routes from "Apps/routes";
-import { getComputedState } from "form/common/getComputedState";
-import { IStepContainerProps } from "form/common/stepper/Step";
-import { formInputToastError } from "form/common/stepper/toaster";
+import { generatePath, useNavigate, useParams } from "react-router-dom";
+import routes from "../../Apps/routes";
+import { getComputedState } from "../common/getComputedState";
+import { IStepContainerProps } from "../common/stepper/Step";
+import { formInputToastError } from "../common/stepper/toaster";
 import {
   Mutation,
   MutationCreateBsvhuArgs,
@@ -12,17 +12,15 @@ import {
   QueryBsvhuArgs,
   Query,
   Bsvhu,
-  BsvhuInput,
-} from "generated/graphql/types";
+  BsvhuInput
+} from "codegen-ui";
 import initialState from "./utils/initial-state";
 import {
   CREATE_VHU_FORM,
   UPDATE_VHU_FORM,
-  GET_VHU_FORM,
+  GET_VHU_FORM
 } from "./utils/queries";
-const GenericStepList = lazy(
-  () => import("form/common/stepper/GenericStepList")
-);
+const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (vhuForm: Bsvhu | undefined) => ReactElement;
   formId?: string;
@@ -30,16 +28,16 @@ interface Props {
 
 export default function BsvhuStepsList(props: Props) {
   const { siret } = useParams<{ siret: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const formQuery = useQuery<Pick<Query, "bsvhu">, QueryBsvhuArgs>(
     GET_VHU_FORM,
     {
       variables: {
-        id: props.formId!,
+        id: props.formId!
       },
       skip: !props.formId,
-      fetchPolicy: "network-only",
+      fetchPolicy: "network-only"
     }
   );
 
@@ -61,7 +59,7 @@ export default function BsvhuStepsList(props: Props) {
   function saveForm(input: BsvhuInput): Promise<any> {
     return formState.id
       ? updateVhuForm({
-          variables: { id: formState.id, input },
+          variables: { id: formState.id, input }
         })
       : createVhuForm({ variables: { input } });
   }
@@ -72,9 +70,9 @@ export default function BsvhuStepsList(props: Props) {
       .then(_ => {
         // TODO VHU redirect to the correct dashboard
         const redirectTo = generatePath(routes.dashboard.bsds.drafts, {
-          siret,
+          siret
         });
-        history.push(redirectTo);
+        navigate(redirectTo);
       })
       .catch(err => formInputToastError(err));
   }

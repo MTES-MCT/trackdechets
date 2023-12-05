@@ -1,5 +1,5 @@
 import React from "react";
-import { BsffStatus } from "generated/graphql/types";
+import { BsffStatus } from "codegen-ui";
 import { BsffFragment } from "../types";
 import { PublishBsff } from "./PublishBsff";
 import { SignEmission } from "./SignEmission";
@@ -8,8 +8,8 @@ import { SignReception } from "./SignReception";
 import { SignBsffOperationOnePackaging } from "./SignOperation";
 import { SignBsffAcceptationOnePackaging } from "./SignAcceptation";
 import { SignPackagings } from "./SignPackagings";
-import { useParams, useRouteMatch } from "react-router-dom";
-import routes from "Apps/routes";
+import { useParams, useMatch } from "react-router-dom";
+import routes from "../../../../../Apps/routes";
 
 export interface WorkflowActionProps {
   form: BsffFragment;
@@ -19,8 +19,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const { siret } = useParams<{ siret: string }>();
   const { form } = props;
 
-  const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
-  const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
+  const isActTab = !!useMatch(routes.dashboard.bsds.act);
+  const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
   const emitterSiret = form.bsffEmitter?.company?.siret;
   const transporterSiret = form.bsffTransporter?.company?.orgId;
   const destinationSiret = form.bsffDestination?.company?.siret;

@@ -149,7 +149,7 @@ const SurveyBanner = ({ message, button, onClickClose }: SurveyBannerProps) => {
               iconPosition="right"
               linkProps={{
                 target: "_blank",
-                href: button.href,
+                href: button.href
               }}
               className="survey-banner__link__a"
               priority="tertiary"

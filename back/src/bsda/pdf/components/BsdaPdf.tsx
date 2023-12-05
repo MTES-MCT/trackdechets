@@ -406,6 +406,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
           </p>
           <p>
             <strong>Code déchet : {bsda?.waste?.code}</strong>
+            <strong>Nom du matériau : {bsda?.waste?.materialName}</strong>
           </p>
           <p className="TextAlignCenter">
             <strong>

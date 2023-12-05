@@ -1,17 +1,13 @@
 import React from "react";
-import { useLocation, useHistory } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, gql } from "@apollo/client";
 import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
-import {
-  Mutation,
-  MutationJoinWithInviteArgs,
-  Query,
-} from "../generated/graphql/types";
-import Loader from "Apps/common/Components/Loader/Loaders";
+import { Mutation, MutationJoinWithInviteArgs, Query } from "codegen-ui";
+import Loader from "../Apps/common/Components/Loader/Loaders";
 import * as queryString from "query-string";
-import { decodeHash } from "common/helper";
-import routes from "Apps/routes";
+import { decodeHash } from "../common/helper";
+import routes from "../Apps/routes";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -49,7 +45,7 @@ const JOIN_WITH_INVITE = gql`
 export default function Invite() {
   // Extract invitation hash from URL
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   // parse qs and get rid of extra parameters
   const parsedQs = queryString.parse(location.search);
@@ -62,9 +58,9 @@ export default function Invite() {
   const {
     loading,
     error: queryError,
-    data: queryData,
+    data: queryData
   } = useQuery<Pick<Query, "invitation">>(INVITATION, {
-    variables: { hash },
+    variables: { hash }
   });
 
   // JOIN_WITH_INVITE MUTATION
@@ -131,9 +127,7 @@ export default function Invite() {
             <Button
               size="medium"
               onClick={() => {
-                history.push({
-                  pathname: routes.login,
-                });
+                navigate(routes.login);
               }}
             >
               Se connecter
@@ -183,9 +177,7 @@ export default function Invite() {
               <Button
                 size="medium"
                 onClick={() => {
-                  history.push({
-                    pathname: routes.login,
-                  });
+                  navigate(routes.login);
                 }}
               >
                 Se connecter
@@ -201,7 +193,7 @@ export default function Invite() {
         initialValues={{
           email: email ?? "",
           name: "",
-          password: "",
+          password: ""
         }}
         validationSchema={yup.object().shape({
           email: yup.string().email().required("L'email est un champ requis"),
@@ -209,12 +201,12 @@ export default function Invite() {
           password: yup
             .string()
             .required("Le mot de passe est un champ requis")
-            .min(8, "Le mot de passe doit faire au moins 8 caractères"),
+            .min(8, "Le mot de passe doit faire au moins 8 caractères")
         })}
         onSubmit={(values, { setSubmitting }) => {
           const { name, password } = values;
           joinWithInvite({
-            variables: { inviteHash: hash, name, password },
+            variables: { inviteHash: hash, name, password }
           }).then(_ => setSubmitting(false));
         }}
       >
@@ -242,7 +234,7 @@ export default function Invite() {
                         }
                         nativeInputProps={{
                           required: true,
-                          ...field,
+                          ...field
                         }}
                       />
                     );
@@ -256,7 +248,7 @@ export default function Invite() {
                         nativeInputProps={{
                           required: true,
                           readOnly: true,
-                          ...field,
+                          ...field
                         }}
                       />
                     );
@@ -270,7 +262,7 @@ export default function Invite() {
                         messages={[
                           {
                             severity: "info",
-                            message: "8 caractères minimum",
+                            message: "8 caractères minimum"
                           },
                           {
                             severity:
@@ -280,8 +272,8 @@ export default function Invite() {
                             message:
                               errors.password && touched.password
                                 ? errors.password
-                                : "",
-                          },
+                                : ""
+                          }
                         ]}
                         nativeInputProps={{ required: true, ...field }}
                       />

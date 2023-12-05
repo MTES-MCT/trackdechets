@@ -1,4 +1,4 @@
-import { Bsda } from "generated/graphql/types";
+import { Bsda } from "codegen-ui";
 
 /**
  * BSDA Edition permissions

@@ -1,19 +1,17 @@
 import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Form as FormikForm, Formik } from "formik";
-import cogoToast from "cogo-toast";
-import {
-  Mutation,
-  MutationMarkSegmentAsReadyToTakeOverArgs,
-} from "generated/graphql/types";
-import { segmentFragment } from "Apps/common/queries/fragments";
-import TdModal from "Apps/common/Components/Modal/Modal";
-import ActionButton from "common/components/ActionButton";
-import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
-import { NotificationError } from "Apps/common/Components/Error/Error";
+import toast from "react-hot-toast";
+import { Mutation, MutationMarkSegmentAsReadyToTakeOverArgs } from "codegen-ui";
+import { segmentFragment } from "../../../../../../Apps/common/queries/fragments";
+import TdModal from "../../../../../../Apps/common/Components/Modal/Modal";
+import ActionButton from "../../../../../../common/components/ActionButton";
+import { IconPaperWrite } from "../../../../../../Apps/common/Components/Icons/Icons";
+import { NotificationError } from "../../../../../../Apps/common/Components/Error/Error";
 import { WorkflowActionProps } from "../WorkflowAction";
-import { GET_BSDS } from "Apps/common/queries";
-import { Loader } from "Apps/common/Components";
+import { GET_BSDS } from "../../../../../../Apps/common/queries";
+import { Loader } from "../../../../../../Apps/common/Components";
+import { TOAST_DURATION } from "../../../../../../common/config";
 
 const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
   mutation markSegmentAsReadyToTakeOver($id: ID!) {
@@ -24,10 +22,7 @@ const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
   ${segmentFragment}
 `;
 
-export function MarkSegmentAsReadyToTakeOver({
-  form,
-  siret,
-}: WorkflowActionProps) {
+export function MarkSegmentAsReadyToTakeOver({ form }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [markSegmentAsReadyToTakeOver, { loading, error }] = useMutation<
     Pick<Mutation, "markSegmentAsReadyToTakeOver">,
@@ -37,14 +32,14 @@ export function MarkSegmentAsReadyToTakeOver({
     awaitRefetchQueries: true,
     onCompleted: () => {
       setIsOpen(false);
-      cogoToast.success(
+      toast.success(
         "Le bordereau est prêt à être pris en charge par le transporteur suivant",
-        { hideAfter: 5 }
+        { duration: TOAST_DURATION }
       );
     },
     onError: () => {
       // The error is handled in the UI
-    },
+    }
   });
 
   const segments = form.transportSegments!;
@@ -70,7 +65,7 @@ export function MarkSegmentAsReadyToTakeOver({
             initialValues={{}}
             onSubmit={() => {
               const variables = {
-                id: segment.id,
+                id: segment.id
               };
               markSegmentAsReadyToTakeOver({ variables }).catch(() => {});
             }}

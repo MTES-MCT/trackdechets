@@ -2,17 +2,13 @@ import React, { useState } from "react";
 import { useQuery, useMutation, gql } from "@apollo/client";
 import {
   InlineError,
-  NotificationError,
-} from "Apps/common/Components/Error/Error";
-import Loader from "Apps/common/Components/Loader/Loaders";
-import {
-  MembershipRequestStatus,
-  Mutation,
-  Query,
-  UserRole,
-} from "generated/graphql/types";
-import { useHistory, useParams } from "react-router-dom";
-import cogoToast from "cogo-toast";
+  NotificationError
+} from "../Apps/common/Components/Error/Error";
+import Loader from "../Apps/common/Components/Loader/Loaders";
+import { MembershipRequestStatus, Mutation, Query, UserRole } from "codegen-ui";
+import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import { TOAST_DURATION } from "../common/config";
 
 const MEMBERSHIP_REQUEST = gql`
   query MembershipRequest($id: ID!) {
@@ -52,44 +48,44 @@ const REFUSE_MEMBERSHIP_REQUEST = gql`
 export default function AccountMembershipRequest() {
   const { id } = useParams<{ id: string }>();
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [userRole, setUserRole] = useState<UserRole>(UserRole.Member);
 
   const { loading, error, data } = useQuery<Pick<Query, "membershipRequest">>(
     MEMBERSHIP_REQUEST,
     {
-      variables: { id },
+      variables: { id }
     }
   );
 
   const [
     acceptMembershipRequest,
-    { loading: acceptLoading, error: acceptError },
+    { loading: acceptLoading, error: acceptError }
   ] = useMutation<Pick<Mutation, "acceptMembershipRequest">>(
     ACCEPT_MEMBERSHIP_REQUEST,
     {
       onCompleted: () => {
-        cogoToast.success("La demande de rattachement a bien été acceptée", {
-          hideAfter: 5,
+        toast.success("La demande de rattachement a bien été acceptée", {
+          duration: TOAST_DURATION
         });
-        history.push("/");
-      },
+        navigate("/");
+      }
     }
   );
 
   const [
     refuseMembershipRequest,
-    { loading: refuseLoading, error: refuseError },
+    { loading: refuseLoading, error: refuseError }
   ] = useMutation<Pick<Mutation, "refuseMembershipRequest">>(
     REFUSE_MEMBERSHIP_REQUEST,
     {
       onCompleted: () => {
-        cogoToast.success("La demande de rattachement a bien été refusée", {
-          hideAfter: 5,
+        toast.success("La demande de rattachement a bien été refusée", {
+          duration: TOAST_DURATION
         });
-        history.push("/");
-      },
+        navigate("/");
+      }
     }
   );
 

@@ -1,12 +1,12 @@
 import * as React from "react";
 
-import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
-import { ActionButtonContext } from "common/components/ActionButton";
+import { Bsdasri, BsdasriStatus } from "codegen-ui";
+import { ActionButtonContext } from "../../../../common/components/ActionButton";
 import { useParams } from "react-router";
 
-import { IconBSDasri } from "Apps/common/Components/Icons/Icons";
+import { IconBSDasri } from "../../../../Apps/common/Components/Icons/Icons";
 import { CellProps, CellValue } from "react-table";
-import { BSDAsriActions } from "dashboard/components/BSDList/BSDasri/BSDasriActions/BSDasriActions";
+import { BSDAsriActions } from "./BSDasriActions/BSDasriActions";
 import { WorkflowAction } from "./WorkflowAction";
 
 const dasriVerboseStatuses: Record<BsdasriStatus, string> = {
@@ -16,7 +16,7 @@ const dasriVerboseStatuses: Record<BsdasriStatus, string> = {
   RECEIVED: "Reçu",
   PROCESSED: "Traité",
   REFUSED: "Refusé",
-  AWAITING_GROUP: "En attente de regroupement",
+  AWAITING_GROUP: "En attente de regroupement"
 };
 
 const getDasriVerboseStatus = (bsdasri: Bsdasri): string => {
@@ -43,10 +43,10 @@ export const COLUMNS: Record<
         {value === "GROUPING" && <span>Grp</span>}
         {value === "SYNTHESIS" && <span>Synth</span>}
       </>
-    ),
+    )
   },
   readableId: {
-    accessor: dasri => dasri.id,
+    accessor: dasri => dasri.id
   },
   emitter: {
     accessor: dasri => (
@@ -57,7 +57,7 @@ export const COLUMNS: Record<
         )}
         <div>{dasri.emitter?.company?.siret ?? ""}</div>
       </>
-    ),
+    )
   },
   recipient: {
     accessor: dasri => (
@@ -65,29 +65,21 @@ export const COLUMNS: Record<
         <div>{dasri?.destination?.company?.name ?? ""}</div>
         <div>{dasri?.destination?.company?.siret ?? ""}</div>
       </>
-    ),
+    )
   },
   waste: {
-    accessor: dasri => dasri["bsdasriWaste"]?.code ?? "",
+    accessor: dasri => dasri["bsdasriWaste"]?.code ?? ""
   },
   transporterCustomInfo: {
     accessor: dasri => dasri.transporter?.customInfo ?? "",
-    Cell: ({ value }) => (
-      <>
-        <span style={{ marginRight: "0.5rem" }}>{value}</span>
-      </>
-    ),
+    Cell: ({ value }) => <span style={{ marginRight: "0.5rem" }}>{value}</span>
   },
   transporterNumberPlate: {
     accessor: dasri => dasri.transporter?.transport?.plates ?? [],
-    Cell: ({ value }) => (
-      <>
-        <span> {value.join(", ")}</span>
-      </>
-    ),
+    Cell: ({ value }) => <span> {value.join(", ")}</span>
   },
   status: {
-    accessor: dasri => getDasriVerboseStatus(dasri),
+    accessor: dasri => getDasriVerboseStatus(dasri)
   },
 
   workflow: {
@@ -96,13 +88,13 @@ export const COLUMNS: Record<
       const { siret } = useParams<{ siret: string }>();
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret} form={row.original} />
+          <WorkflowAction siret={siret!} form={row.original} />
         </ActionButtonContext.Provider>
       );
-    },
+    }
   },
   actions: {
     accessor: () => null,
-    Cell: ({ row }) => <BSDAsriActions form={row.original} />,
-  },
+    Cell: ({ row }) => <BSDAsriActions form={row.original} />
+  }
 };

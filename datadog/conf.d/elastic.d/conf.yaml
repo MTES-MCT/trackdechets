@@ -1,0 +1,9 @@
+init_config:
+instances:
+  - url: "%%env_ELASTIC_SEARCH_URL%%"
+    cluster_stats: true
+    tls_verify: false
+    tls_ignore_warning: true
+    tags:
+      - service.name:elasticsearch
+      - env:%%env_DD_ENV%%

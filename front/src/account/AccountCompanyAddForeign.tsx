@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
-import { useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import styles from "./AccountCompanyAdd.module.scss";
@@ -9,13 +9,13 @@ import {
   Mutation,
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
-  CompanySearchResult,
-} from "generated/graphql/types";
+  CompanySearchResult
+} from "codegen-ui";
 import {
   CREATE_COMPANY,
-  CREATE_COMPANY_HOOK_OPTIONS,
+  CREATE_COMPANY_HOOK_OPTIONS
 } from "./AccountCompanyAdd";
-import { isSiret, isVat } from "generated/constants/companySearchHelpers";
+import { isSiret, isVat } from "shared/constants";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -35,7 +35,7 @@ interface Values extends FormikValues {
 
 enum Language {
   FR = "fr",
-  EN = "en",
+  EN = "en"
 }
 
 const localizedStrings = {
@@ -44,7 +44,7 @@ const localizedStrings = {
     vatNumber: {
       label: "Intra-community VAT number",
       hint: "Example: BE1234567890",
-      error: "Intra-community VAT number must be valid",
+      error: "Intra-community VAT number must be valid"
     },
     companyName: "Company name",
     address: "Address",
@@ -52,7 +52,7 @@ const localizedStrings = {
     contactEmail: "Contact email",
     contactPhone: {
       label: "Contact phone",
-      hint: "Example: +3212234567",
+      hint: "Example: +3212234567"
     },
     isAllowed: {
       label:
@@ -74,20 +74,20 @@ const localizedStrings = {
           company, and to ensure that, at all times, at least one administrator
           is available to manage this company on Trackdéchets.
         </>
-      ),
+      )
     },
     submit: {
       submitting: "Creating...",
-      label: "Create",
+      label: "Create"
     },
-    cancel: "Cancel",
+    cancel: "Cancel"
   },
   fr: {
     translateButton: "Translate in English 🇬🇧",
     vatNumber: {
       label: "N° de TVA intracommunautaire",
       hint: "Exemple : BE1234567890",
-      error: "Le N° de TVA intracommunautaire doit être valide.",
+      error: "Le N° de TVA intracommunautaire doit être valide."
     },
     companyName: "Nom de l'entreprise",
     address: "Adresse",
@@ -95,7 +95,7 @@ const localizedStrings = {
     contactEmail: "Mail de la personne responsable",
     contactPhone: {
       label: "Téléphone",
-      hint: "Exemple : +3212234567",
+      hint: "Exemple : +3212234567"
     },
     isAllowed: {
       label:
@@ -118,14 +118,14 @@ const localizedStrings = {
           rattachement et à ce que, à tout moment, au moins un administrateur
           ait accès à cet établissement dans Trackdéchets.
         </>
-      ),
+      )
     },
     submit: {
       submitting: "Création...",
-      label: "Créer",
+      label: "Créer"
     },
-    cancel: "Annuler",
-  },
+    cancel: "Annuler"
+  }
 };
 
 /**
@@ -133,8 +133,8 @@ const localizedStrings = {
  * the logged in user admin of it
  */
 export default function AccountCompanyAddForeign() {
-  const history = useHistory();
-  const location = useLocation<{ vatNumber?: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const defaultVatNumber = location.state?.vatNumber;
 
   const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.FR);
@@ -148,7 +148,7 @@ export default function AccountCompanyAddForeign() {
   const [createCompany, { error: savingError }] = useMutation<
     Pick<Mutation, "createCompany">,
     MutationCreateCompanyArgs
-  >(CREATE_COMPANY, CREATE_COMPANY_HOOK_OPTIONS(history));
+  >(CREATE_COMPANY, CREATE_COMPANY_HOOK_OPTIONS(navigate));
 
   const memoizedStrings = useMemo(() => {
     return localizedStrings[currentLanguage];
@@ -164,9 +164,9 @@ export default function AccountCompanyAddForeign() {
     return createCompany({
       variables: {
         companyInput: {
-          ...companyValues,
-        },
-      },
+          ...companyValues
+        }
+      }
     });
   }
 
@@ -196,7 +196,7 @@ export default function AccountCompanyAddForeign() {
             defaultQuery={defaultVatNumber}
             onlyForeignVAT
             {...{
-              onCompanyInfos: companyInfos => setCompanyInfos(companyInfos),
+              onCompanyInfos: companyInfos => setCompanyInfos(companyInfos)
             }}
             label={memoizedStrings.vatNumber.label}
             hintText=""
@@ -215,18 +215,18 @@ export default function AccountCompanyAddForeign() {
                 contact: "",
                 contactPhone: "",
                 contactEmail: "",
-                isAllowed: false,
+                isAllowed: false
               }}
               validate={values => {
                 return {
                   ...(!values.isAllowed && {
-                    isAllowed: memoizedStrings.isAllowed.error,
+                    isAllowed: memoizedStrings.isAllowed.error
                   }),
                   ...(!(
                     isSiret(values.vatNumber) || isVat(values.vatNumber)
                   ) && {
-                    siret: memoizedStrings.vatNumber.error,
-                  }),
+                    siret: memoizedStrings.vatNumber.error
+                  })
                 };
               }}
               onSubmit={onSubmit}
@@ -336,9 +336,9 @@ export default function AccountCompanyAddForeign() {
                                 name: field.name,
                                 checked: field.value,
                                 onChange: field.onChange,
-                                onBlur: field.onBlur,
-                              },
-                            },
+                                onBlur: field.onBlur
+                              }
+                            }
                           ]}
                         />
                       );
@@ -350,7 +350,7 @@ export default function AccountCompanyAddForeign() {
                       priority="tertiary"
                       disabled={isSubmitting}
                       onClick={() => {
-                        history.goBack();
+                        navigate(-1);
                       }}
                     >
                       {memoizedStrings.cancel}

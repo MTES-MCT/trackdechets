@@ -1,13 +1,13 @@
 import { gql, LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
-import { PDF_BSFF_FORM } from "form/bsff/utils/queries";
+import { PDF_BSFF_FORM } from "../../../../form/bsff/utils/queries";
 import {
   Query,
   QueryBsdaPdfArgs,
   QueryBsdasriPdfArgs,
   QueryBsffPdfArgs,
   QueryBsvhuPdfArgs,
-  QueryFormPdfArgs,
-} from "generated/graphql/types";
+  QueryFormPdfArgs
+} from "codegen-ui";
 
 const FORMS_PDF = gql`
   query FormPdf($id: ID!) {
@@ -56,7 +56,7 @@ export function useBsddDownloadPdf(
         return;
       }
       window.open(formPdf.downloadLink, "_blank");
-    },
+    }
   });
 }
 
@@ -71,7 +71,7 @@ export function useBsdaDownloadPdf(
         return;
       }
       window.open(bsdaPdf.downloadLink, "_blank");
-    },
+    }
   });
 }
 
@@ -88,7 +88,7 @@ export function useBsdasriDownloadPdf(
           return;
         }
         window.open(bsdasriPdf.downloadLink, "_blank");
-      },
+      }
     }
   );
 }
@@ -104,7 +104,7 @@ export function useBsffDownloadPdf(
         return;
       }
       window.open(bsffPdf.downloadLink, "_blank");
-    },
+    }
   });
 }
 
@@ -119,6 +119,6 @@ export function useBsvhuDownloadPdf(
         return;
       }
       window.open(bsvhuPdf.downloadLink, "_blank");
-    },
+    }
   });
 }

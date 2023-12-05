@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { formatDate } from "common/datetime";
+import { formatDate } from "../../../../common/datetime";
 import {
   Transporter,
   BsffTransporterInput,
@@ -13,10 +13,10 @@ import {
   BsvhuTransporter,
   TransporterReceipt,
   Query,
-  QueryCompanyPrivateInfosArgs,
-} from "generated/graphql/types";
+  QueryCompanyPrivateInfosArgs
+} from "codegen-ui";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
+import { isForeignVat } from "shared/constants";
 import { TRANSPORTER_RECEIPT } from "../../../../Apps/common/queries/company/query";
 import { useQuery } from "@apollo/client";
 
@@ -32,7 +32,7 @@ type UniversalTransporter =
   | BsffTransporter;
 
 export default function TransporterReceiptComponent({
-  transporter,
+  transporter
 }: {
   transporter: UniversalTransporter;
 }) {
@@ -69,9 +69,9 @@ export default function TransporterReceiptComponent({
   >(TRANSPORTER_RECEIPT, {
     variables: {
       // Compatibility with intermediaries that don't have orgId
-      clue: transporter.company?.siret!,
+      clue: transporter.company?.siret!
     },
-    skip: !transporter.company?.siret,
+    skip: !transporter.company?.siret
   });
 
   const receipt: TransporterReceipt | null =
@@ -79,38 +79,34 @@ export default function TransporterReceiptComponent({
 
   return !loading &&
     !isExemptedOfReceipt &&
-    !isForeignVat(transporter.company?.vatNumber!!) ? (
+    !isForeignVat(transporter.company?.vatNumber!) ? (
     <div className="fr-grid-row fr-mb-2w fr-mt-2w">
       <Alert
         title={"Récépissé de déclaration de transport de déchets"}
         severity={receipt?.receiptNumber?.length ? "info" : "error"}
         description={
-          <>
-            {receipt?.receiptNumber ? (
-              <p>
-                Numéro: {receipt?.receiptNumber}, département:{" "}
-                {receipt?.department}, date limite de validité:{" "}
-                {formatDate(receipt?.validityLimit!)}.
-                <br />
-                Informations complétées par le transporteur dans son profil
-                Trackdéchets.
-              </p>
-            ) : (
-              <p>
-                L'entreprise de transport n'a pas complété ces informations dans
-                son profil Trackdéchets. Nous ne pouvons pas les afficher. Il
-                lui appartient de les compléter.{" "}
-                <span className="tw-text-red-500">
-                  Dans le cas contraire, elle ne pourra pas signer la prise en
-                  charge des déchets.
-                </span>
-              </p>
-            )}
-          </>
+          receipt?.receiptNumber ? (
+            <p>
+              Numéro: {receipt?.receiptNumber}, département:{" "}
+              {receipt?.department}, date limite de validité:{" "}
+              {formatDate(receipt?.validityLimit!)}.
+              <br />
+              Informations complétées par le transporteur dans son profil
+              Trackdéchets.
+            </p>
+          ) : (
+            <p>
+              L'entreprise de transport n'a pas complété ces informations dans
+              son profil Trackdéchets. Nous ne pouvons pas les afficher. Il lui
+              appartient de les compléter.{" "}
+              <span className="tw-text-red-500">
+                Dans le cas contraire, elle ne pourra pas signer la prise en
+                charge des déchets.
+              </span>
+            </p>
+          )
         }
       />
     </div>
-  ) : (
-    <></>
-  );
+  ) : null;
 }

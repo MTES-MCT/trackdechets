@@ -1,5 +1,5 @@
 import React from "react";
-import { Installation } from "generated/graphql/types";
+import { Installation } from "codegen-ui";
 
 type Props = { installation: Installation };
 
@@ -20,7 +20,7 @@ export default function CompanyActivity({ installation }: Props) {
       "Installation de collecte de déchets apportés par le producteur initial",
     WASTE_VEHICLES:
       "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
-    WASTEPROCESSOR: "Installation de traitement",
+    WASTEPROCESSOR: "Installation de traitement"
   };
 
   return (

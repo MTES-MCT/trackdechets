@@ -1,9 +1,6 @@
 import React from "react";
 import { useMutation, gql } from "@apollo/client";
-import {
-  Mutation,
-  MutationRenewSecurityCodeArgs,
-} from "generated/graphql/types";
+import { Mutation, MutationRenewSecurityCodeArgs } from "codegen-ui";
 
 type Props = {
   toggleEdition: () => void;
@@ -21,7 +18,7 @@ const RENEW_SECURITY_CODE = gql`
 
 export default function AccountFormCompanySecurityCode({
   toggleEdition,
-  mutationArgs,
+  mutationArgs
 }: Props) {
   const [renewSecurityCode, { loading }] = useMutation<
     Pick<Mutation, "renewSecurityCode">,
@@ -29,7 +26,7 @@ export default function AccountFormCompanySecurityCode({
   >(RENEW_SECURITY_CODE, {
     onCompleted: () => {
       toggleEdition();
-    },
+    }
   });
 
   const cautionMessage =

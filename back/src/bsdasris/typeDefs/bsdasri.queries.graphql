@@ -47,7 +47,6 @@ type Query {
     where: BsdasriWhere
   ): BsdasriConnection!
 
- 
   bsdasri(
     """
     Identifiant du BSD

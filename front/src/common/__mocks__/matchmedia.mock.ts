@@ -2,7 +2,7 @@ export const mockMatchMediaWidth = (width: number) => {
   Object.defineProperty(window, "innerWidth", {
     writable: true,
     configurable: true,
-    value: width,
+    value: width
   });
   window.matchMedia = jest.fn().mockImplementation(query => {
     return {
@@ -10,7 +10,7 @@ export const mockMatchMediaWidth = (width: number) => {
       media: query,
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn(),
+      removeListener: jest.fn()
     };
   });
 

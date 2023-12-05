@@ -8,7 +8,7 @@ export default function SearchInput({
   placeholder = "",
   className = "",
   value = "",
-  disabled = false,
+  disabled = false
 }: {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   id: string;

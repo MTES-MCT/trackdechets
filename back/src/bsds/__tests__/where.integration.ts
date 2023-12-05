@@ -844,3 +844,196 @@ describe("search on wasteCode", () => {
     expect(hits[0]._source.id).toEqual("1");
   });
 });
+
+describe("search on destinationCap", () => {
+  afterAll(resetDatabase);
+
+  beforeAll(async () => {
+    const bsds: Partial<BsdElastic>[] = [
+      {
+        id: "1",
+        updatedAt: new Date().getTime(),
+        destinationCap: "CAP-1"
+      },
+      {
+        id: "2",
+        updatedAt: new Date().getTime(),
+        destinationCap: "CAP-2"
+      },
+      {
+        id: "3",
+        updatedAt: new Date().getTime()
+      }
+    ];
+
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
+    await refreshElasticSearch();
+  });
+
+  it("should return exact match", async () => {
+    const where: BsdWhere = {
+      destination: { cap: { _match: "CAP-1" } }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.id).toEqual("1");
+  });
+
+  it("should return partial matches", async () => {
+    const where: BsdWhere = {
+      destination: { cap: { _match: "CAP-" } }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(2);
+    expect(hits[0]._source.id).toEqual("1");
+    expect(hits[1]._source.id).toEqual("2");
+  });
+});
+
+describe("search on transporterCompanyVatNumber", () => {
+  afterAll(resetDatabase);
+
+  beforeAll(async () => {
+    const bsds: Partial<BsdElastic>[] = [
+      {
+        id: "1",
+        updatedAt: new Date().getTime(),
+        transporterCompanyVatNumber: "TRANS-COMP-VAT-1"
+      },
+      {
+        id: "2",
+        updatedAt: new Date().getTime(),
+        transporterCompanyVatNumber: "TRANS-COMP-VAT-2"
+      },
+      {
+        id: "3",
+        updatedAt: new Date().getTime()
+      }
+    ];
+
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
+    await refreshElasticSearch();
+  });
+
+  it("should return exact match", async () => {
+    const where: BsdWhere = {
+      transporter: { company: { vatNumber: { _contains: "TRANS-COMP-VAT-1" } } }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.id).toEqual("1");
+  });
+
+  it("should return partial matches", async () => {
+    const where: BsdWhere = {
+      transporter: { company: { vatNumber: { _contains: "TRANS-COMP-VAT-" } } }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(2);
+    expect(hits[0]._source.id).toEqual("1");
+    expect(hits[1]._source.id).toEqual("2");
+  });
+});
+
+describe("search on nextDestinationCompanyVatNumber", () => {
+  afterAll(resetDatabase);
+
+  beforeAll(async () => {
+    const bsds: Partial<BsdElastic>[] = [
+      {
+        id: "1",
+        updatedAt: new Date().getTime(),
+        nextDestinationCompanyVatNumber: "NEXT-DEST-VAT-1"
+      },
+      {
+        id: "2",
+        updatedAt: new Date().getTime(),
+        nextDestinationCompanyVatNumber: "NEXT-DEST-VAT-2"
+      },
+      {
+        id: "3",
+        updatedAt: new Date().getTime()
+      }
+    ];
+
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
+    await refreshElasticSearch();
+  });
+
+  it("should return exact match", async () => {
+    const where: BsdWhere = {
+      destination: {
+        operation: {
+          nextDestination: {
+            company: { vatNumber: { _contains: "NEXT-DEST-VAT-1" } }
+          }
+        }
+      }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+    const hits = result.body.hits.hits;
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.id).toEqual("1");
+  });
+
+  it("should return partial matches", async () => {
+    const where: BsdWhere = {
+      destination: {
+        operation: {
+          nextDestination: {
+            company: { vatNumber: { _contains: "NEXT-DEST-VAT-" } }
+          }
+        }
+      }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(2);
+    expect(hits[0]._source.id).toEqual("1");
+    expect(hits[1]._source.id).toEqual("2");
+  });
+});

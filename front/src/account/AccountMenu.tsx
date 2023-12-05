@@ -2,8 +2,8 @@ import React from "react";
 import SideMenu from "../common/components/SideMenu";
 import { NavLink } from "react-router-dom";
 import styles from "./AccountMenu.module.scss";
-import routes from "Apps/routes";
-import Tooltip from "common/components/Tooltip";
+import routes from "../Apps/routes";
+import Tooltip from "../common/components/Tooltip";
 
 export const AccountMenuContent = () => (
   <>
@@ -12,8 +12,9 @@ export const AccountMenuContent = () => (
       <li className="tw-mb-1">
         <NavLink
           to={routes.account.info}
-          className="sidebar__link  "
-          activeClassName="sidebar__link--active"
+          className={({ isActive }) =>
+            isActive ? "sidebar__link sidebar__link--active" : "sidebar__link"
+          }
         >
           Informations générales
         </NavLink>
@@ -21,8 +22,9 @@ export const AccountMenuContent = () => (
       <li className="tw-mb-1">
         <NavLink
           to={routes.account.companies.list}
-          className="sidebar__link"
-          activeClassName="sidebar__link--active"
+          className={({ isActive }) =>
+            isActive ? "sidebar__link sidebar__link--active" : "sidebar__link"
+          }
         >
           Établissements
         </NavLink>
@@ -37,8 +39,9 @@ export const AccountMenuContent = () => (
       <li>
         <NavLink
           to={routes.account.tokens.list}
-          className="sidebar__link"
-          activeClassName="sidebar__link--active"
+          className={({ isActive }) =>
+            isActive ? "sidebar__link sidebar__link--active" : "sidebar__link"
+          }
         >
           Jetons d'accès API
         </NavLink>
@@ -46,8 +49,9 @@ export const AccountMenuContent = () => (
       <li className="tw-mb-1">
         <NavLink
           to={routes.account.authorizedApplications}
-          className="sidebar__link"
-          activeClassName="sidebar__link--active"
+          className={({ isActive }) =>
+            isActive ? "sidebar__link sidebar__link--active" : "sidebar__link"
+          }
         >
           Applications autorisées
         </NavLink>
@@ -55,8 +59,9 @@ export const AccountMenuContent = () => (
       <li>
         <NavLink
           to={routes.account.oauth2.list}
-          className="sidebar__link"
-          activeClassName="sidebar__link--active"
+          className={({ isActive }) =>
+            isActive ? "sidebar__link sidebar__link--active" : "sidebar__link"
+          }
         >
           Mes applications
         </NavLink>

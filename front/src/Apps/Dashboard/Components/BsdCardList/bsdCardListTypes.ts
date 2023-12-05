@@ -1,9 +1,9 @@
-import { BsdCurrentTab } from "Apps/common/types/commonTypes";
+import { BsdCurrentTab } from "../../../common/types/commonTypes";
 import {
   BsdEdge,
   BsdaRevisionRequestEdge,
-  FormRevisionRequestEdge,
-} from "generated/graphql/types";
+  FormRevisionRequestEdge
+} from "codegen-ui";
 import { Maybe } from "graphql/jsutils/Maybe";
 
 export interface BsdCardListProps {

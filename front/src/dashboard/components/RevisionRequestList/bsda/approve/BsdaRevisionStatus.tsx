@@ -1,9 +1,6 @@
 import React from "react";
-import {
-  BsdaRevisionRequest,
-  RevisionRequestApprovalStatus,
-} from "generated/graphql/types";
-import Tooltip from "common/components/Tooltip";
+import { BsdaRevisionRequest, RevisionRequestApprovalStatus } from "codegen-ui";
+import Tooltip from "../../../../../common/components/Tooltip";
 
 type Props = {
   review: BsdaRevisionRequest;
@@ -13,7 +10,7 @@ const STATUS_LABELS = {
   PENDING: "En attente de validation",
   ACCEPTED: "Approuvée",
   REFUSED: "Refusée",
-  CANCELLED: "Annulée",
+  CANCELLED: "Annulée"
 };
 
 export function BsdaRevisionStatus({ review }: Props) {

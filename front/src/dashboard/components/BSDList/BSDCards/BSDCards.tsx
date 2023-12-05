@@ -5,10 +5,10 @@ import {
   Bsd,
   EmitterType,
   Query,
-  QueryCompanyPrivateInfosArgs,
-} from "generated/graphql/types";
-import routes from "Apps/routes";
-import { IconView } from "Apps/common/Components/Icons/Icons";
+  QueryCompanyPrivateInfosArgs
+} from "codegen-ui";
+import routes from "../../../../Apps/routes";
+import { IconView } from "../../../../Apps/common/Components/Icons/Icons";
 import { WorkflowAction } from "../BSDD/WorkflowAction";
 import { WorkflowAction as BsdasriWorkflowAction } from "../BSDasri/WorkflowAction";
 import { WorkflowAction as BsffWorkflowAction } from "../BSFF/WorkflowAction";
@@ -16,10 +16,10 @@ import { WorkflowAction as BsvhuWorkflowAction } from "../BSVhu/WorkflowAction";
 import { WorkflowAction as BsdaWorkflowAction } from "../BSDa/WorkflowAction";
 import { Column } from "../columns";
 import styles from "./BSDCards.module.scss";
-import { BsdTypename } from "dashboard/constants";
+import { BsdTypename } from "../../../constants";
 import { BsffFragment } from "../BSFF";
 import { CardRoadControlButton } from "../RoadControlButton";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "Apps/common/queries/company/query";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../../Apps/common/queries/company/query";
 import { useQuery } from "@apollo/client";
 interface BSDCardsProps {
   bsds: Bsd[];
@@ -34,7 +34,7 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
     Pick<Query, "companyPrivateInfos">,
     QueryCompanyPrivateInfosArgs
   >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
-    variables: { clue: siret },
+    variables: { clue: siret! }
   });
   const siretsWithAutomaticSignature = data
     ? data.companyPrivateInfos.receivedSignatureAutomations.map(
@@ -60,7 +60,7 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
                       value={column.accessor!(form, 0, {
                         data: bsds,
                         depth: 0,
-                        subRows: [],
+                        subRows: []
                       })}
                       // @ts-ignore
                       row={{ original: form }}
@@ -77,10 +77,10 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
                   to={{
                     pathname: generatePath(getViewRoute(form.__typename), {
                       siret,
-                      id: form.id,
-                    }),
-                    state: { background: location },
+                      id: form.id
+                    })
                   }}
+                  state={{ background: location }}
                   className="btn btn--outline-primary"
                 >
                   <IconView size="24px" style={{ marginRight: "1rem" }} />
@@ -92,7 +92,7 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
             )}
             {form.__typename === "Form" ? (
               <WorkflowAction
-                siret={siret}
+                siret={siret!}
                 form={form}
                 options={{
                   canSkipEmission:
@@ -101,21 +101,21 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
                       siretsWithAutomaticSignature.includes(
                         form.emitter?.company?.siret
                       ) ||
-                      Boolean(form.emitter?.isPrivateIndividual)),
+                      Boolean(form.emitter?.isPrivateIndividual))
                 }}
               />
             ) : null}
             {form.__typename === "Bsdasri" ? (
-              <BsdasriWorkflowAction siret={siret} form={form} />
+              <BsdasriWorkflowAction siret={siret!} form={form} />
             ) : null}
             {form.__typename === "Bsff" ? (
               <BsffWorkflowAction form={form as unknown as BsffFragment} />
             ) : null}
             {form.__typename === "Bsvhu" ? (
-              <BsvhuWorkflowAction siret={siret} form={form} />
+              <BsvhuWorkflowAction siret={siret!} form={form} />
             ) : null}
             {form.__typename === "Bsda" ? (
-              <BsdaWorkflowAction siret={siret} form={form} />
+              <BsdaWorkflowAction siret={siret!} form={form} />
             ) : null}
           </div>
         </div>
@@ -130,5 +130,5 @@ const getViewRoute = (bsdTypename: BsdTypename): string =>
     Bsdasri: routes.dashboard.bsdasris.view,
     Bsff: routes.dashboard.bsffs.view,
     Bsvhu: routes.dashboard.bsvhus.view,
-    Bsda: routes.dashboard.bsdas.view,
+    Bsda: routes.dashboard.bsdas.view
   }[bsdTypename]);

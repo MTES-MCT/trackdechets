@@ -1,17 +1,13 @@
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
-import { NotificationError } from "Apps/common/Components/Error/Error";
-import { IconPaperWrite } from "Apps/common/Components/Icons/Icons";
-import TdModal from "Apps/common/Components/Modal/Modal";
+import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
+import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
+import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 
-import { UPDATE_BSDASRI } from "form/bsdasri/utils/queries";
-import {
-  Bsdasri,
-  Mutation,
-  MutationUpdateBsdasriArgs,
-} from "generated/graphql/types";
-import { useRouteMatch } from "react-router-dom";
+import { UPDATE_BSDASRI } from "../../../../../form/bsdasri/utils/queries";
+import { Bsdasri, Mutation, MutationUpdateBsdasriArgs } from "codegen-ui";
+import { useMatch } from "react-router-dom";
 
 type Props = {
   bsdasri: Bsdasri;
@@ -22,11 +18,11 @@ type Props = {
 export function UpdateBsdasriTransporterInfo({
   bsdasri,
   isModalOpenFromParent,
-  onModalCloseFromParent,
+  onModalCloseFromParent
 }: Props) {
   console.log(bsdasri);
   const [isOpen, setIsOpen] = useState(false);
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/");
   const [updateBsdasri, { error }] = useMutation<
     Pick<Mutation, "updateBsdasri">,
     MutationUpdateBsdasriArgs
@@ -66,15 +62,15 @@ export function UpdateBsdasriTransporterInfo({
         <Formik
           initialValues={{
             transporter: {
-              customInfo: bsdasri.transporter?.customInfo ?? "",
-            },
+              customInfo: bsdasri.transporter?.customInfo ?? ""
+            }
           }}
           onSubmit={async values => {
             await updateBsdasri({
               variables: {
                 id: bsdasri.id,
-                input: values,
-              },
+                input: values
+              }
             });
             handleClose();
           }}

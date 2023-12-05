@@ -19,9 +19,12 @@ import {
 } from "../../../../../integration-tests/helper";
 import { getBsdaForElastic, indexBsda } from "../../../../bsda/elastic";
 import { bsdaFactory } from "../../../../bsda/__tests__/factories";
-import { indexBsdasri } from "../../../../bsdasris/elastic";
+import {
+  getBsdasriForElastic,
+  indexBsdasri
+} from "../../../../bsdasris/elastic";
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
-import { indexBsff } from "../../../../bsffs/elastic";
+import { getBsffForElastic, indexBsff } from "../../../../bsffs/elastic";
 import { createBsffAfterOperation } from "../../../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../../../bsvhu/elastic";
 import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
@@ -163,9 +166,9 @@ describe("All wastes registry", () => {
     await Promise.all([
       indexForm(await getFormForElastic(bsd1)),
       indexBsda(await getBsdaForElastic(bsd2)),
-      indexBsdasri(bsd3),
+      indexBsdasri(await getBsdasriForElastic(bsd3)),
       indexBsvhu(bsd4),
-      indexBsff(bsd5)
+      indexBsff(await getBsffForElastic(bsd5))
     ]);
     await refreshElasticSearch();
   });

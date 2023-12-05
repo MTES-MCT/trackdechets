@@ -89,6 +89,7 @@ type Mutation {
     }
     operation {
       code
+      mode
     }
     agrementNumber
   }

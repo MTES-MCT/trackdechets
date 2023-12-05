@@ -107,6 +107,7 @@ type Mutation {
     }
     operation {
       code
+      mode
       date
     }
   }

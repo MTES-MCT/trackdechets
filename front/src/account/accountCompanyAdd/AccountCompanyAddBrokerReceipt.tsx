@@ -1,6 +1,6 @@
 import React from "react";
 import { Field } from "formik";
-import RedErrorMessage from "common/components/RedErrorMessage";
+import RedErrorMessage from "../../common/components/RedErrorMessage";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
 /**

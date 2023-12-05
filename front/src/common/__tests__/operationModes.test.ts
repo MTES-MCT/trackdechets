@@ -1,4 +1,4 @@
-import { OperationMode } from "generated/graphql/types";
+import { OperationMode } from "codegen-ui";
 import { getOperationModesFromOperationCode } from "../operationModes";
 
 const test = (code: string, expectedModes: OperationMode[]) => {
@@ -27,7 +27,7 @@ describe("getOperationModesFromOperationCode", () => {
     "D 9 F",
     "D 10",
     "D 11",
-    "D 12",
+    "D 12"
   ])("Code %p > [ELIMINATION]", code => {
     test(code, [OperationMode.Elimination]);
   });

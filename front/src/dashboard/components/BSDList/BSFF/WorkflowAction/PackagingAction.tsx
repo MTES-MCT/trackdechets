@@ -1,10 +1,6 @@
-import { ActionButton, Modal } from "common/components";
-import { IconCheckCircle1 } from "Apps/common/Components/Icons/Icons";
-import {
-  Bsff,
-  BsffPackaging,
-  WasteAcceptationStatus,
-} from "generated/graphql/types";
+import { ActionButton, Modal } from "../../../../../common/components";
+import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
+import { Bsff, BsffPackaging, WasteAcceptationStatus } from "codegen-ui";
 import React from "react";
 import { SignBsffAcceptationOnePackagingModalContent } from "./SignAcceptation";
 import { SignBsffOperationOnePackagingModalContent } from "./SignOperation";
@@ -16,7 +12,7 @@ interface WorkflowPackagingActionProps {
 
 export function PackagingAction({
   bsff,
-  packaging,
+  packaging
 }: WorkflowPackagingActionProps) {
   if (packaging.operation?.signature?.date) {
     return null;
@@ -37,7 +33,7 @@ interface SignBsffPackagingProps {
 
 export function SignBsffPackagingAcceptation({
   bsff,
-  packaging,
+  packaging
 }: SignBsffPackagingProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -72,7 +68,7 @@ export function SignBsffPackagingAcceptation({
 
 export function SignBsffPackagingOperation({
   bsff,
-  packaging,
+  packaging
 }: SignBsffPackagingProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 

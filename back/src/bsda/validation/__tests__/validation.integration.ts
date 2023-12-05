@@ -6,7 +6,7 @@ import {
 } from "../../../__tests__/factories";
 
 import { bsdaFactory } from "../../__tests__/factories";
-import { rawBsdaSchema } from "../schema";
+import { bsdaSchema } from "../schema";
 import { parseBsdaInContext } from "../index";
 import prisma from "../../../prisma";
 
@@ -22,7 +22,7 @@ describe("BSDA validation", () => {
   describe("BSDA should be valid - transitory empty strings", () => {
     test("when type is COLLECTION_2710 and unused company fields are nulls", async () => {
       // on COLLECTION_2710 Bsdas worker and trasporter fields are not used
-      const { success } = await rawBsdaSchema.safeParseAsync({
+      const { success } = await bsdaSchema.safeParseAsync({
         ...bsda,
         type: BsdaType.COLLECTION_2710,
         transporterCompanySiret: null,
@@ -37,7 +37,7 @@ describe("BSDA validation", () => {
 
   describe("BSDA should be valid", () => {
     test("when all data is present", async () => {
-      const { success } = await rawBsdaSchema.safeParseAsync(bsda);
+      const { success } = await bsdaSchema.safeParseAsync(bsda);
       expect(success).toBe(true);
     });
 
@@ -46,7 +46,7 @@ describe("BSDA validation", () => {
         orgId: "BE0541696005",
         vatNumber: "BE0541696005"
       });
-      const { success } = await rawBsdaSchema.safeParseAsync({
+      const { success } = await bsdaSchema.safeParseAsync({
         ...bsda,
         transporterCompanyVatNumber: foreignTransporter.vatNumber,
         transporterCompanyName: "transporteur BE",
@@ -68,8 +68,25 @@ describe("BSDA validation", () => {
         transporterCompanyVatNumber: foreignTransporter.vatNumber
       };
 
-      const { success } = await rawBsdaSchema.safeParseAsync(data);
+      const { success } = await bsdaSchema.safeParseAsync(data);
       expect(success).toBe(true);
+    });
+
+    it("transporter recepisse is not required if transport mode is not ROAD", async () => {
+      const data = {
+        ...bsda,
+        transporterRecepisseNumber: null,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "AIR"
+      };
+
+      await parseBsdaInContext(
+        { persisted: data as any },
+        {
+          currentSignatureType: "TRANSPORT"
+        }
+      );
     });
 
     it("transporter plate is not required if transport mode is not ROAD", async () => {
@@ -108,7 +125,7 @@ describe("BSDA validation", () => {
 
     test("when type is COLLECTION_2710 and unused company fields are empty strings", async () => {
       // on COLLECTION_2710 Bsdas worker and trasporter fields are not used
-      const { success } = await rawBsdaSchema.safeParseAsync({
+      const { success } = await bsdaSchema.safeParseAsync({
         ...bsda,
         type: BsdaType.COLLECTION_2710,
         transporterCompanySiret: "",
@@ -125,7 +142,7 @@ describe("BSDA validation", () => {
         ...bsda,
         emitterCompanySiret: "1"
       };
-      const result = await rawBsdaSchema.safeParseAsync(data);
+      const result = await bsdaSchema.safeParseAsync(data);
 
       if (result.success) {
         throw new Error("Expected error.");
@@ -141,7 +158,7 @@ describe("BSDA validation", () => {
         ...bsda,
         transporterCompanySiret: "1"
       };
-      const result = await rawBsdaSchema.safeParseAsync(data);
+      const result = await bsdaSchema.safeParseAsync(data);
 
       if (result.success) {
         throw new Error("Expected error.");
@@ -157,7 +174,7 @@ describe("BSDA validation", () => {
         ...bsda,
         transporterCompanyVatNumber: "FR35552049447"
       };
-      const result = await rawBsdaSchema.safeParseAsync(data);
+      const result = await bsdaSchema.safeParseAsync(data);
 
       if (result.success) {
         throw new Error("Expected error.");
@@ -215,7 +232,7 @@ describe("BSDA validation", () => {
         trasnporterCompanySiret: null,
         transporterCompanyVatNumber: "IT13029381004"
       };
-      const result = await rawBsdaSchema.safeParseAsync(data);
+      const result = await bsdaSchema.safeParseAsync(data);
 
       if (result.success) {
         throw new Error("Expected error.");
@@ -236,7 +253,7 @@ describe("BSDA validation", () => {
         ...bsda,
         transporterCompanyVatNumber: company.vatNumber
       };
-      const result = await rawBsdaSchema.safeParseAsync(data);
+      const result = await bsdaSchema.safeParseAsync(data);
 
       if (result.success) {
         throw new Error("Expected error.");
@@ -254,7 +271,7 @@ describe("BSDA validation", () => {
         ...bsda,
         destinationCompanySiret: "1"
       };
-      const result = await rawBsdaSchema.safeParseAsync(data);
+      const result = await bsdaSchema.safeParseAsync(data);
 
       if (result.success) {
         throw new Error("Expected error.");
@@ -270,7 +287,7 @@ describe("BSDA validation", () => {
         ...bsda,
         destinationCompanySiret: "85001946400021"
       };
-      const result = await rawBsdaSchema.safeParseAsync(data);
+      const result = await bsdaSchema.safeParseAsync(data);
       if (result.success) {
         throw new Error("Expected error.");
       }
@@ -286,7 +303,7 @@ describe("BSDA validation", () => {
         ...bsda,
         destinationCompanySiret: company.siret
       };
-      const result = await rawBsdaSchema.safeParseAsync(data);
+      const result = await bsdaSchema.safeParseAsync(data);
       if (result.success) {
         throw new Error("Expected error.");
       }
@@ -377,6 +394,45 @@ describe("BSDA validation", () => {
         }
       }
     );
+
+    it("cannot group BSDA if the grouped waste code are not equal to the grouping BSDA waste code", async () => {
+      const grouping = [
+        await bsdaFactory({
+          opt: {
+            wasteCode: "10 13 09*",
+            status: "AWAITING_CHILD",
+            destinationOperationCode: "D 15",
+            destinationCompanySiret: bsda.emitterCompanySiret
+          }
+        })
+      ];
+      expect.assertions(1);
+
+      const data = {
+        ...bsda,
+        type: "GATHERING"
+      };
+
+      try {
+        await parseBsdaInContext(
+          {
+            input: {
+              waste: { code: "17 05 03*" },
+              grouping: grouping.map(bsda => bsda.id)
+            },
+            persisted: data as any
+          },
+          { enablePreviousBsdasChecks: true }
+        );
+      } catch (error) {
+        expect(error.issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Tous les bordereaux groupés doivent avoir le même code déchet que le bordereau de groupement."
+          })
+        ]);
+      }
+    });
   });
 
   describe("Emitter transports own waste", () => {
@@ -451,7 +507,29 @@ describe("BSDA validation", () => {
         const res = await parseBsdaInContext(
           { persisted: data as any },
           {
-            currentSignatureType: "OPERATION"
+            currentSignatureType: "EMISSION"
+          }
+        );
+        expect(res).not.toBeUndefined();
+      }
+    );
+
+    test.each([
+      ["R 5", "REUTILISATION"],
+      ["R 13", undefined]
+    ])(
+      "should work if operation code & mode are compatible (code: %p, mode: %p)",
+      async (code, mode) => {
+        const data = {
+          ...bsda,
+          destinationOperationCode: code,
+          destinationOperationMode: mode
+        };
+
+        const res = await parseBsdaInContext(
+          { persisted: data as any },
+          {
+            currentSignatureType: "TRANSPORT"
           }
         );
         expect(res).not.toBeUndefined();
@@ -486,6 +564,22 @@ describe("BSDA validation", () => {
       }
     );
 
+    test("should not fail if operation code has associated operation modes but none is specified", async () => {
+      const data = {
+        ...bsda,
+        destinationOperationCode: "R 5",
+        destinationOperationMode: undefined
+      };
+
+      expect.assertions(1);
+
+      const res = await parseBsdaInContext(
+        { persisted: data as any },
+        { currentSignatureType: "EMISSION" }
+      );
+      expect(res).not.toBeUndefined();
+    });
+
     test("should fail if operation code has associated operation modes but none is specified", async () => {
       const data = {
         ...bsda,
@@ -503,7 +597,7 @@ describe("BSDA validation", () => {
       } catch (err) {
         expect(err.errors.length).toBeTruthy();
         expect(err.errors[0].message).toBe(
-          "Vous devez préciser un mode de traitement"
+          "Le mode de traitement est obligatoire."
         );
       }
     });
@@ -871,5 +965,28 @@ describe("BSDA Sealed rules checks", () => {
         "Le champ destinationReceptionWeight a été vérouillé via signature et ne peut pas être modifié."
       );
     }
+  });
+
+  it("should be possible to update the destination contact & mail fields when the bsda status is signed by the emitter", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER"
+      }
+    });
+    await parseBsdaInContext(
+      {
+        input: {
+          destination: {
+            company: {
+              contact: "New John",
+              phone: "0101010199",
+              mail: "new@mail.com"
+            }
+          }
+        },
+        persisted: bsda as any
+      },
+      {}
+    );
   });
 });

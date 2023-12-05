@@ -8,16 +8,16 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { sendMail } from "../../../mailer/mailing";
 import {
+  renderMail,
   onboardingFirstStep,
   verificationDone,
   verifiedForeignTransporterCompany
-} from "../../../mailer/templates";
-import { renderMail } from "../../../mailer/templates/renderers";
+} from "@td/mail";
 import prisma from "../../../prisma";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
-import { isForeignVat } from "../../../common/constants/companySearchHelpers";
+import { isForeignVat } from "shared/constants";
 import { isTransporter } from "../../validation";
-import * as COMPANY_CONSTANTS from "../../../common/constants/COMPANY_CONSTANTS";
+import * as COMPANY_CONSTANTS from "shared/constants";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import {
   NotCompanyAdminErrorMsg,

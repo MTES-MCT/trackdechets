@@ -1,5 +1,10 @@
 import React, { useCallback, useState } from "react";
-import { generatePath, useHistory, useLocation } from "react-router-dom";
+import {
+  generatePath,
+  useNavigate,
+  useLocation,
+  useMatch
+} from "react-router-dom";
 import { BsdCardListProps } from "./bsdCardListTypes";
 import BsdCard from "../BsdCard/BsdCard";
 import {
@@ -11,70 +16,73 @@ import {
   Bsvhu,
   Form,
   FormStatus,
-  Bsdasri,
-} from "../../../../generated/graphql/types";
+  Bsdasri
+} from "codegen-ui";
 
 import "./bsdCardList.scss";
 import {
   getOverviewPath,
   getRevisionPath,
-  getUpdatePath,
+  getUpdatePath
 } from "../../dashboardUtils";
-import DraftValidation from "Apps/Dashboard/Components/Validation/Draft/DraftValidation";
-import routes from "Apps/routes";
-import ActBsddValidation from "Apps/Dashboard/Components/Validation/Act/ActBsddValidation";
-import ActBsdSuiteValidation from "Apps/Dashboard/Components/Validation/Act/ActBsdSuiteValidation";
-import ActBsdaValidation from "Apps/Dashboard/Components/Validation/Act/ActBsdaValidation";
-import ActBsffValidation from "Apps/Dashboard/Components/Validation/Act/ActBsffValidation";
-import ActBsvhuValidation from "Apps/Dashboard/Components/Validation/Act/ActBsvhuValidation";
-import { BsdDisplay, BsdWithReview } from "Apps/common/types/bsdTypes";
-import { BsddCancelRevision } from "dashboard/components/RevisionRequestList/bsdd/approve/BsddCancelRevision";
-import { BsdaCancelRevision } from "dashboard/components/RevisionRequestList/bsda/approve/BsdaCancelRevision";
+import DraftValidation from "../Validation/Draft/DraftValidation";
+import routes from "../../../routes";
+import ActBsddValidation from "../Validation/Act/ActBsddValidation";
+import ActBsdSuiteValidation from "../Validation/Act/ActBsdSuiteValidation";
+import ActBsdaValidation from "../Validation/Act/ActBsdaValidation";
+import ActBsffValidation from "../Validation/Act/ActBsffValidation";
+import ActBsvhuValidation from "../Validation/Act/ActBsvhuValidation";
+import { BsdDisplay, BsdWithReview } from "../../../common/types/bsdTypes";
+import { BsddCancelRevision } from "../../../../dashboard/components/RevisionRequestList/bsdd/approve/BsddCancelRevision";
+import { BsdaCancelRevision } from "../../../../dashboard/components/RevisionRequestList/bsda/approve/BsdaCancelRevision";
 import {
   canApproveOrRefuseReview,
   hasEmportDirect,
   hasRoadControlButton,
-  isSynthesis,
-} from "Apps/Dashboard/dashboardServices";
-import { BsddApproveRevision } from "dashboard/components/RevisionRequestList/bsdd/approve";
-import { BsdaApproveRevision } from "dashboard/components/RevisionRequestList/bsda/approve/BsdaApproveRevision";
-import { BsddConsultRevision } from "dashboard/components/RevisionRequestList/bsdd/approve/BsddConsultRevision";
-import { BsdaConsultRevision } from "dashboard/components/RevisionRequestList/bsda/approve/BsdaConsultRevision";
-import { default as TransporterInfoEditBsdd } from "dashboard/components/BSDList/BSDD/TransporterInfoEdit";
-import { TransporterInfoEdit as TransporterInfoEditBsda } from "dashboard/components/BSDList/BSDa/WorkflowAction/TransporterInfoEdit";
-import { UpdateTransporterCustomInfo } from "dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterCustomInfo";
-import { BsffFragment } from "dashboard/components/BSDList/BSFF";
-import { UpdateTransporterPlates } from "dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterPlates";
-import { UpdateBsdasriTransporterPlates } from "dashboard/components/BSDList/BSDasri/BSDasriActions/UpdateBsdasriTransporterPlates";
-import { UpdateBsdasriTransporterInfo } from "dashboard/components/BSDList/BSDasri/BSDasriActions/UpdateBsdasriTransporterInfo";
-import { mapBsdasri } from "Apps/Dashboard/bsdMapper";
+  isSynthesis
+} from "../../dashboardServices";
+import { BsddApproveRevision } from "../../../../dashboard/components/RevisionRequestList/bsdd/approve";
+import { BsdaApproveRevision } from "../../../../dashboard/components/RevisionRequestList/bsda/approve/BsdaApproveRevision";
+import { BsddConsultRevision } from "../../../../dashboard/components/RevisionRequestList/bsdd/approve/BsddConsultRevision";
+import { BsdaConsultRevision } from "../../../../dashboard/components/RevisionRequestList/bsda/approve/BsdaConsultRevision";
+import { default as TransporterInfoEditBsdd } from "../../../../dashboard/components/BSDList/BSDD/TransporterInfoEdit";
+import { TransporterInfoEdit as TransporterInfoEditBsda } from "../../../../dashboard/components/BSDList/BSDa/WorkflowAction/TransporterInfoEdit";
+import { UpdateTransporterCustomInfo } from "../../../../dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterCustomInfo";
+import { BsffFragment } from "../../../../dashboard/components/BSDList/BSFF";
+import { UpdateTransporterPlates } from "../../../../dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterPlates";
+import { UpdateBsdasriTransporterPlates } from "../../../../dashboard/components/BSDList/BSDasri/BSDasriActions/UpdateBsdasriTransporterPlates";
+import { UpdateBsdasriTransporterInfo } from "../../../../dashboard/components/BSDList/BSDasri/BSDasriActions/UpdateBsdasriTransporterInfo";
+import { mapBsdasri } from "../../bsdMapper";
 
 function BsdCardList({
   siret,
   bsds,
   bsdCurrentTab,
-  siretsWithAutomaticSignature,
+  siretsWithAutomaticSignature
 }: BsdCardListProps): JSX.Element {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const isReviewsTab = bsdCurrentTab === "reviewsTab";
   const isActTab = bsdCurrentTab === "actTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
+  const isAllBsdsTab = !!useMatch(routes.dashboardv2.bsds.index);
 
   const redirectToPath = useCallback(
     (path, id) => {
       if (path) {
-        history.push({
-          pathname: generatePath(path, {
+        navigate(
+          generatePath(path, {
             siret,
-            id,
+            id
           }),
-          state: { background: location },
-        });
+          {
+            state: { background: location }
+          }
+        );
       }
     },
-    [history, location, siret]
+    [navigate, location, siret]
   );
 
   const [validationWorkflowType, setValidationWorkflowType] =
@@ -123,7 +131,7 @@ function BsdCardList({
     (bsd: Bsd) => {
       const status = bsd["bsdasriStatus"];
       if (status === BsdasriStatus.Initial) {
-        if (isActTab) {
+        if (isActTab || isAllBsdsTab) {
           const path = routes.dashboardv2.bsdasris.sign.emission;
           redirectToPath(path, bsd.id);
           return;
@@ -161,7 +169,7 @@ function BsdCardList({
         redirectToPath(path, bsd.id);
       }
     },
-    [redirectToPath, isActTab, isToCollectTab, siret]
+    [redirectToPath, isActTab, isToCollectTab, isAllBsdsTab, siret]
   );
 
   const handleActValidation = useCallback(
@@ -261,7 +269,7 @@ function BsdCardList({
       handleDraftValidation,
       handleActValidation,
       handleReviewsValidation,
-      redirectToPath,
+      redirectToPath
     ]
   );
 
@@ -368,8 +376,9 @@ function BsdCardList({
   return (
     <>
       <ul className="bsd-card-list">
-        {bsds?.map(({ node }) => {
+        {bsds?.map(({ node }, index) => {
           let bsdNode = node;
+          let key = `${node.id}${node.status}`;
           // A supprimer le block isReviewsTab quand on pourra afficher une révision avec la requete bsds
           if (isReviewsTab) {
             // format reviews from bsdd and bsda in one list
@@ -384,6 +393,7 @@ function BsdCardList({
             delete reviewBsda?.bsda;
             newBsddNode.review = reviewBsdd;
             bsdNode = { ...newBsddNode, ...newBsdaNode };
+            key = `${node.id}${node.status}${index}`;
           }
 
           const hasAutomaticSignature = siretsWithAutomaticSignature?.includes(
@@ -391,10 +401,7 @@ function BsdCardList({
           );
 
           return (
-            <li
-              className="bsd-card-list__item"
-              key={`${node.id}${node.status}`}
-            >
+            <li className="bsd-card-list__item" key={key}>
               <BsdCard
                 bsd={bsdNode}
                 currentSiret={siret}
@@ -409,7 +416,7 @@ function BsdCardList({
                   onAppendix1,
                   onDeleteReview,
                   onEmitterDasriSign,
-                  onEmitterBsddSign,
+                  onEmitterBsddSign
                 }}
                 hasAutomaticSignature={hasAutomaticSignature}
               />

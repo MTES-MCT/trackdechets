@@ -1,21 +1,21 @@
 import React, { ReactNode, useMemo } from "react";
-import { formatDate } from "common/datetime";
+import { formatDate } from "../../../common/datetime";
 import styles from "./BSDDetailContent.module.scss";
 
 import {
   PackagingInfo,
   BsvhuTransporter,
   BsdaTransporter,
-  BsdasriTransporter,
-} from "generated/graphql/types";
-import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
+  BsdasriTransporter
+} from "codegen-ui";
+import { getPackagingInfosSummary } from "../../../form/bsdd/utils/packagings";
+import { isForeignVat } from "shared/constants";
 const nbsp = "\u00A0";
 export const DetailRow = ({
   value,
   label,
   units = null,
-  showEmpty = false,
+  showEmpty = false
 }: {
   value: string | number | ReactNode | undefined | null;
   label: string;
@@ -61,7 +61,7 @@ export const DateRow = ({ value, label }) => {
   );
 };
 export const PackagingRow = ({
-  packagingInfos,
+  packagingInfos
 }: {
   packagingInfos?: PackagingInfo[] | null;
 }) => {
@@ -82,11 +82,11 @@ export const PackagingRow = ({
  * Transporter Recepisse details overview for BSDA, BSVHU and BSDASRI
  */
 export const TransporterReceiptDetails = ({
-  transporter,
+  transporter
 }: {
   transporter?: BsvhuTransporter | BsdaTransporter | BsdasriTransporter | null;
 }) => {
-  return !isForeignVat(transporter?.company?.vatNumber!!) ? (
+  return !isForeignVat(transporter?.company?.vatNumber!) ? (
     <div className={styles.detailGrid}>
       <YesNoRow
         value={transporter?.recepisse?.isExempted}
@@ -114,7 +114,5 @@ export const TransporterReceiptDetails = ({
         </>
       )}
     </div>
-  ) : (
-    <></>
-  );
+  ) : null;
 };

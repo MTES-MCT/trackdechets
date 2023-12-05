@@ -1,8 +1,8 @@
 import {
   BsdDisplay,
   BsdStatusCode,
-  WorkflowDisplayType,
-} from "Apps/common/types/bsdTypes";
+  WorkflowDisplayType
+} from "../common/types/bsdTypes";
 import {
   canPublishBsd,
   canReviewBsdd,
@@ -25,7 +25,7 @@ import {
   isEcoOrgSign,
   isEmetteurSign,
   isSignTransportCanSkipEmission,
-  getOperationCodesFromSearchString,
+  getOperationCodesFromSearchString
 } from "./dashboardServices";
 import {
   BsdType,
@@ -33,10 +33,10 @@ import {
   EmitterType,
   BsdasriType,
   BsdaType,
-  UserPermission,
-} from "generated/graphql/types";
+  UserPermission
+} from "codegen-ui";
 
-import { BsdCurrentTab } from "Apps/common/types/commonTypes";
+import { BsdCurrentTab } from "../common/types/commonTypes";
 import {
   FAIRE_SIGNER,
   PUBLIER,
@@ -50,8 +50,8 @@ import {
   VALIDER_RECEPTION,
   VALIDER_SYNTHESE_LABEL,
   VALIDER_TRAITEMENT,
-  completer_bsd_suite,
-} from "Apps/common/wordings/dashboard/wordingsDashboard";
+  completer_bsd_suite
+} from "../common/wordings/dashboard/wordingsDashboard";
 
 describe("dashboardServices", () => {
   describe("isBsdaSign", () => {
@@ -59,14 +59,14 @@ describe("dashboardServices", () => {
       type: BsdType.Bsda,
       bsdWorkflowType: BsdaType.Collection_2710,
       emitter: {
-        isPrivateIndividual: true,
+        isPrivateIndividual: true
       },
       transporter: {
-        company: { siret: "11111111111111" },
+        company: { siret: "11111111111111" }
       },
       worker: {
-        isDisabled: true,
-      },
+        isDisabled: true
+      }
     } as BsdDisplay;
 
     it('should return true if bsd.type is "bsda", bsd.bsdWorkflowType is "2710", and currentSiret matches the destination siret', () => {
@@ -101,7 +101,7 @@ describe("dashboardServices", () => {
   describe("isBsvhuSign", () => {
     const bsd: BsdDisplay = {
       type: BsdType.Bsvhu,
-      emitter: { company: { siret: "11111111111111" } },
+      emitter: { company: { siret: "11111111111111" } }
     } as BsdDisplay;
 
     it('should return true if bsd.type is "bsvhu" and currentSiret matches the emitter siret', () => {
@@ -128,7 +128,7 @@ describe("dashboardServices", () => {
   describe("isBsffSign", () => {
     const bsd: BsdDisplay = {
       type: BsdType.Bsff,
-      emitter: { company: { siret: "11111111111111" } },
+      emitter: { company: { siret: "11111111111111" } }
     } as BsdDisplay;
     const bsdCurrentTab: BsdCurrentTab = "draftTab";
 
@@ -162,7 +162,7 @@ describe("dashboardServices", () => {
 
   describe("isEmetteurSign", () => {
     const bsd: BsdDisplay = {
-      bsdWorkflowType: BsdaType.Collection_2710,
+      bsdWorkflowType: BsdaType.Collection_2710
     } as BsdDisplay;
 
     it('should return true if isTransporter is true and bsd.bsdWorkflowType is not "synthesis"', () => {
@@ -187,7 +187,7 @@ describe("dashboardServices", () => {
 
   describe("isEcoOrgSign", () => {
     const bsd: BsdDisplay = {
-      bsdWorkflowType: BsdaType.Collection_2710,
+      bsdWorkflowType: BsdaType.Collection_2710
     } as BsdDisplay;
 
     it('should return true if isHolder is true and bsd.bsdWorkflowType is not "synthesis"', () => {
@@ -214,10 +214,10 @@ describe("dashboardServices", () => {
     const bsd: BsdDisplay = {
       ecoOrganisme: {
         name: "eco org",
-        siret: "123456789",
+        siret: "123456789"
       },
       emitter: {},
-      emitterType: EmitterType.Appendix1Producer,
+      emitterType: EmitterType.Appendix1Producer
     } as BsdDisplay;
 
     it("should return true if bsd.ecoOrganisme.siret is set", () => {
@@ -228,7 +228,7 @@ describe("dashboardServices", () => {
     it("should return true if isPrivateIndividual is true", () => {
       const bsdPrivateIndividual = {
         ...bsd,
-        emitter: { isPrivateIndividual: true },
+        emitter: { isPrivateIndividual: true }
       };
       const result = canSkipEmission(bsdPrivateIndividual, false);
       expect(result).toBe(true);
@@ -246,8 +246,8 @@ describe("dashboardServices", () => {
         worker: { isDisabled: true },
         emitter: { isPrivateIndividual: true },
         transporter: {
-          company: { siret: "987654321" },
-        },
+          company: { siret: "987654321" }
+        }
       } as BsdDisplay;
       const result = getIsNonDraftLabel(
         bsd,
@@ -266,8 +266,8 @@ describe("dashboardServices", () => {
         type: BsdType.Bsda,
         bsdWorkflowType: BsdaType.Collection_2710,
         destination: {
-          company: { siret: "987654321" },
-        },
+          company: { siret: "987654321" }
+        }
       } as BsdDisplay;
       const result = getIsNonDraftLabel(
         bsd,
@@ -286,17 +286,17 @@ describe("dashboardServices", () => {
         type: BsdType.Bsdasri,
         ecoOrganisme: {
           name: "eco org",
-          siret: "987654321",
+          siret: "987654321"
         },
         emitter: {
-          company: { siret: "987654321" },
+          company: { siret: "987654321" }
         },
         destination: {
-          company: { siret: "987654321" },
+          company: { siret: "987654321" }
         },
         transporter: {
-          company: { siret: "987654321" },
-        },
+          company: { siret: "987654321" }
+        }
       } as BsdDisplay;
       const result = getIsNonDraftLabel(
         bsd,
@@ -314,14 +314,14 @@ describe("dashboardServices", () => {
       const bsd: BsdDisplay = {
         type: BsdType.Bsdasri,
         emitter: {
-          company: { siret: "987654321" },
+          company: { siret: "987654321" }
         },
         destination: {
-          company: { siret: "987654321" },
+          company: { siret: "987654321" }
         },
         transporter: {
-          company: { siret: "987654321" },
-        },
+          company: { siret: "987654321" }
+        }
       } as BsdDisplay;
       const result = getIsNonDraftLabel(
         bsd,
@@ -337,17 +337,17 @@ describe("dashboardServices", () => {
       bsdCurrentTab = "toCollectTab";
       const currentSiret = "987654321";
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignTransport,
+        UserPermission.BsdCanSignTransport
       ];
       const bsd: BsdDisplay = {
         type: BsdType.Bsdasri,
         emitter: {
-          company: { siret: "987654321" },
+          company: { siret: "987654321" }
         },
         transporter: {
-          company: { siret: "987654321" },
+          company: { siret: "987654321" }
         },
-        bsdWorkflowType: "SYNTHESIS",
+        bsdWorkflowType: "SYNTHESIS"
       } as BsdDisplay;
       const result = getIsNonDraftLabel(
         bsd,
@@ -366,8 +366,8 @@ describe("dashboardServices", () => {
       const bsd: BsdDisplay = {
         type: BsdType.Bsff,
         emitter: {
-          company: { siret: "987654321" },
-        },
+          company: { siret: "987654321" }
+        }
       } as BsdDisplay;
       const result = getIsNonDraftLabel(
         bsd,
@@ -385,8 +385,8 @@ describe("dashboardServices", () => {
       const bsd: BsdDisplay = {
         type: BsdType.Bsdd,
         emitter: {
-          company: { siret: "987654321" },
-        },
+          company: { siret: "987654321" }
+        }
       } as BsdDisplay;
       const result = getIsNonDraftLabel(
         bsd,
@@ -402,7 +402,7 @@ describe("dashboardServices", () => {
   describe("getDraftOrInitialBtnLabel", () => {
     const currentSiret = "123456789";
     const bsd: BsdDisplay = {
-      isDraft: true,
+      isDraft: true
     } as BsdDisplay;
 
     it("should return the correct label when isDraft is true", () => {
@@ -440,7 +440,7 @@ describe("dashboardServices", () => {
       emitter: { company: { siret: "1" } },
       transporter: { company: { siret: "2" } },
       destination: { company: { siret: "3" } },
-      ecoOrganisme: { siret: "2" },
+      ecoOrganisme: { siret: "2" }
     } as BsdDisplay;
 
     test("returns SIGNER for BSDD type Appendix1Producer with valid conditions", () => {
@@ -505,7 +505,7 @@ describe("dashboardServices", () => {
       const permissions: UserPermission[] = [];
       const bsd = {
         type: BsdType.Bsdd,
-        emitterType: EmitterType.Appendix1Producer,
+        emitterType: EmitterType.Appendix1Producer
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
@@ -522,12 +522,12 @@ describe("dashboardServices", () => {
     it("should return VALIDER_ENTREPOSAGE_PROVISOIRE for BSDD with temp storage in actTab and same destination siret", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignAcceptation,
+        UserPermission.BsdCanSignAcceptation
       ];
       const bsd = {
         type: BsdType.Bsdd,
         destination: { company: { siret: "123456789" } },
-        isTempStorage: true,
+        isTempStorage: true
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
@@ -544,12 +544,12 @@ describe("dashboardServices", () => {
     it("should return VALIDER_RECEPTION for BSDD in actTab and same destination siret", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignAcceptation,
+        UserPermission.BsdCanSignAcceptation
       ];
       const bsd = {
         type: BsdType.Bsdd,
         isTempStorage: false,
-        destination: { company: { siret: "123456789" } },
+        destination: { company: { siret: "123456789" } }
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
@@ -566,12 +566,12 @@ describe("dashboardServices", () => {
     it("should return VALIDER_RECEPTION for BSDASRI in actTab and same destination siret", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignAcceptation,
+        UserPermission.BsdCanSignAcceptation
       ];
       const bsd = {
         type: BsdType.Bsdasri,
         isTempStorage: false,
-        destination: { company: { siret: "123456789" } },
+        destination: { company: { siret: "123456789" } }
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
@@ -588,12 +588,12 @@ describe("dashboardServices", () => {
     it("should return VALIDER_RECEPTION for BSFF in actTab and same destination siret", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignAcceptation,
+        UserPermission.BsdCanSignAcceptation
       ];
       const bsd = {
         type: BsdType.Bsff,
         isTempStorage: false,
-        destination: { company: { siret: "123456789" } },
+        destination: { company: { siret: "123456789" } }
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
@@ -610,12 +610,12 @@ describe("dashboardServices", () => {
     it("should return VALIDER_TRAITEMENT for BSDA in actTab and same destination siret", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignOperation,
+        UserPermission.BsdCanSignOperation
       ];
       const bsd = {
         type: BsdType.Bsda,
         isTempStorage: false,
-        destination: { company: { siret: "123456789" } },
+        destination: { company: { siret: "123456789" } }
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
@@ -632,12 +632,12 @@ describe("dashboardServices", () => {
     it("should return VALIDER_TRAITEMENT for BSVHU in actTab and same destination siret", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignOperation,
+        UserPermission.BsdCanSignOperation
       ];
       const bsd = {
         type: BsdType.Bsvhu,
         isTempStorage: false,
-        destination: { company: { siret: "123456789" } },
+        destination: { company: { siret: "123456789" } }
       } as BsdDisplay;
       const bsdCurrentTab: BsdCurrentTab = "actTab";
 
@@ -656,11 +656,11 @@ describe("dashboardServices", () => {
     const bsd = {
       type: BsdType.Bsdd,
       temporaryStorageDetail: {
-        destination: { company: { siret: "1234567890" } },
-      },
+        destination: { company: { siret: "1234567890" } }
+      }
     } as BsdDisplay;
     const permissions: UserPermission[] = [
-      UserPermission.BsdCanSignAcceptation,
+      UserPermission.BsdCanSignAcceptation
     ];
     it('should return the correct label when bsd type is "Bsdd" and siret is same as temporary storage destination', () => {
       const currentSiret = "1234567890";
@@ -726,8 +726,8 @@ describe("dashboardServices", () => {
       type: BsdType.Bsdd,
       destination: { company: { siret: "1234567890" } },
       temporaryStorageDetail: {
-        transporter: { company: { siret: "1234567890" } },
-      },
+        transporter: { company: { siret: "1234567890" } }
+      }
     } as BsdDisplay;
     const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
     it('should return the correct label when bsd type is "Bsdd" and siret is same as temporary storage transporter', () => {
@@ -757,10 +757,10 @@ describe("dashboardServices", () => {
   describe("getTempStoredBtnLabel", () => {
     const bsd = {
       type: BsdType.Bsdd,
-      destination: { company: { siret: "1234567890" } },
+      destination: { company: { siret: "1234567890" } }
     } as BsdDisplay;
     const permissions: UserPermission[] = [
-      UserPermission.BsdCanSignAcceptation,
+      UserPermission.BsdCanSignAcceptation
     ];
     it('should return the correct label when bsd type is "Bsdd" and siret is same as destination', () => {
       const currentSiret = "1234567890";
@@ -788,18 +788,18 @@ describe("dashboardServices", () => {
   describe("getTempStorerAcceptedBtnLabel", () => {
     const bsd = {
       type: BsdType.Bsdd,
-      destination: { company: { siret: "1234567890" } },
+      destination: { company: { siret: "1234567890" } }
     } as BsdDisplay;
     const withBsdSuite = {
       type: BsdType.Bsdd,
       destination: { company: { siret: "1234567890" } },
       temporaryStorageDetail: {
-        transporter: { company: { siret: "1234567890" } },
-      },
+        transporter: { company: { siret: "1234567890" } }
+      }
     } as BsdDisplay;
     const permissions: UserPermission[] = [
       UserPermission.BsdCanSignOperation,
-      UserPermission.BsdCanUpdate,
+      UserPermission.BsdCanUpdate
     ];
     it('should return the correct label when bsd type is "Bsdd" and siret is same as destination', () => {
       const currentSiret = "1234567890";
@@ -850,8 +850,8 @@ describe("dashboardServices", () => {
     const bsd = {
       type: BsdType.Bsdd,
       temporaryStorageDetail: {
-        transporter: { company: { siret: "1234567890" } },
-      },
+        transporter: { company: { siret: "1234567890" } }
+      }
     } as BsdDisplay;
     const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
     it('should return the correct label when bsd type is "Bsdd" and siret is same as transporter', () => {
@@ -881,13 +881,13 @@ describe("dashboardServices", () => {
     const currentSiret = "123456789";
     const bsd = {
       type: BsdType.Bsdd,
-      isTempStorage: false,
+      isTempStorage: false
     } as BsdDisplay;
     const bsdCurrentTab = "actTab";
 
     it("should return an empty string for bsdd type with appendix1Producer", () => {
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignAcceptation,
+        UserPermission.BsdCanSignAcceptation
       ];
       const result = getReceivedBtnLabel(
         currentSiret,
@@ -900,7 +900,7 @@ describe("dashboardServices", () => {
 
     it("should return VALIDER_ACCEPTATION for bsdd type with same siret temporary storage destination", () => {
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignAcceptation,
+        UserPermission.BsdCanSignAcceptation
       ];
       const result = getReceivedBtnLabel(
         currentSiret,
@@ -908,8 +908,8 @@ describe("dashboardServices", () => {
           ...bsd,
           isTempStorage: true,
           temporaryStorageDetail: {
-            destination: { company: { siret: "123456789" } },
-          },
+            destination: { company: { siret: "123456789" } }
+          }
         },
         permissions,
         bsdCurrentTab
@@ -919,13 +919,13 @@ describe("dashboardServices", () => {
 
     it("should return VALIDER_ACCEPTATION for bsdd type with same siret destination", () => {
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignAcceptation,
+        UserPermission.BsdCanSignAcceptation
       ];
       const result = getReceivedBtnLabel(
         currentSiret,
         {
           ...bsd,
-          destination: { company: { siret: "123456789" } },
+          destination: { company: { siret: "123456789" } }
         },
         permissions,
         bsdCurrentTab
@@ -935,7 +935,7 @@ describe("dashboardServices", () => {
 
     it("should return VALIDER_TRAITEMENT for bsda type", () => {
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignOperation,
+        UserPermission.BsdCanSignOperation
       ];
       const result = getReceivedBtnLabel(
         currentSiret,
@@ -948,7 +948,7 @@ describe("dashboardServices", () => {
 
     it("should return VALIDER_TRAITEMENT for bsvhu type", () => {
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignOperation,
+        UserPermission.BsdCanSignOperation
       ];
       const result = getReceivedBtnLabel(
         currentSiret,
@@ -961,14 +961,14 @@ describe("dashboardServices", () => {
 
     it("should return SIGNATURE_ACCEPTATION_CONTENANT for bsff type with actTab and same siret destination", () => {
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignOperation,
+        UserPermission.BsdCanSignOperation
       ];
       const result = getReceivedBtnLabel(
         currentSiret,
         {
           ...bsd,
           type: BsdType.Bsff,
-          destination: { company: { siret: "123456789" } },
+          destination: { company: { siret: "123456789" } }
         },
         permissions,
         bsdCurrentTab
@@ -978,14 +978,14 @@ describe("dashboardServices", () => {
 
     it("should return VALIDER_TRAITEMENT for bsdasri type with actTab and same siret destination", () => {
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignOperation,
+        UserPermission.BsdCanSignOperation
       ];
       const result = getReceivedBtnLabel(
         currentSiret,
         {
           ...bsd,
           type: BsdType.Bsdasri,
-          destination: { company: { siret: "123456789" } },
+          destination: { company: { siret: "123456789" } }
         },
         permissions,
         bsdCurrentTab
@@ -999,20 +999,20 @@ describe("dashboardServices", () => {
       type: BsdType.Bsdd,
       transporter: {
         company: {
-          orgId: "currentSiret",
-        },
+          orgId: "currentSiret"
+        }
       },
       worker: {
         isDisabled: true,
         company: {
-          siret: "currentSiret",
-        },
-      },
+          siret: "currentSiret"
+        }
+      }
     } as BsdDisplay;
 
     it("should return SIGNER when currentSiret is same as transporter and bsd type is bsdd", () => {
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignTransport,
+        UserPermission.BsdCanSignTransport
       ];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
@@ -1020,8 +1020,8 @@ describe("dashboardServices", () => {
           ...bsd,
           transporter: {
             ...bsd.transporter,
-            company: { siret: "currentSiret" },
-          },
+            company: { siret: "currentSiret" }
+          }
         },
         permissions,
         "actTab"
@@ -1031,7 +1031,7 @@ describe("dashboardServices", () => {
 
     it("should return SIGNER when currentSiret is same as transporter and bsd type is bsdasri but not synthesis workflow type", () => {
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignTransport,
+        UserPermission.BsdCanSignTransport
       ];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
@@ -1039,7 +1039,7 @@ describe("dashboardServices", () => {
           ...bsd,
           type: BsdType.Bsdasri,
           bsdWorkflowType: BsdasriType.Simple,
-          transporter: { company: { siret: "currentSiret" } },
+          transporter: { company: { siret: "currentSiret" } }
         },
         permissions,
         "actTab"
@@ -1049,7 +1049,7 @@ describe("dashboardServices", () => {
 
     it("should return SIGNER when currentSiret is same as transporter, bsd type is bsda, and bsd workflow type is gathering", () => {
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignTransport,
+        UserPermission.BsdCanSignTransport
       ];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
@@ -1058,16 +1058,16 @@ describe("dashboardServices", () => {
           type: BsdType.Bsda,
           bsdWorkflowType: BsdaType.Gathering,
           transporter: {
-            company: { siret: "currentSiret", orgId: "currentSiret" },
+            company: { siret: "currentSiret", orgId: "currentSiret" }
           },
 
           worker: {
             ...bsd.worker,
             isDisabled: true,
             company: {
-              siret: "otherSiret",
-            },
-          },
+              siret: "otherSiret"
+            }
+          }
         },
         permissions,
         "actTab"
@@ -1077,14 +1077,14 @@ describe("dashboardServices", () => {
 
     it("should return SIGNER when bsd type is bsvhu", () => {
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignTransport,
+        UserPermission.BsdCanSignTransport
       ];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
         {
           ...bsd,
           type: BsdType.Bsvhu,
-          transporter: { company: { siret: "currentSiret" } },
+          transporter: { company: { siret: "currentSiret" } }
         },
         permissions,
         "actTab"
@@ -1094,13 +1094,13 @@ describe("dashboardServices", () => {
 
     it("should return an empty string when currentSiret is not same as transporter and bsd type is bsdasri and current tab is not toCollectTab", () => {
       const permissions: UserPermission[] = [
-        UserPermission.BsdCanSignTransport,
+        UserPermission.BsdCanSignTransport
       ];
       const result = getSignByProducerBtnLabel(
         "currentSirett",
         {
           ...bsd,
-          type: BsdType.Bsdasri,
+          type: BsdType.Bsdasri
         },
         permissions,
         "actTab"
@@ -1138,7 +1138,7 @@ describe("dashboardServices", () => {
         isDraft: true,
         bsdWorkflowType: BsdasriType.Grouping,
         synthesizing: null,
-        grouping: null,
+        grouping: null
       } as BsdDisplay;
       const currentSiret = "123456789";
 
@@ -1155,14 +1155,14 @@ describe("dashboardServices", () => {
         grouping: [
           {
             id: "DASRI-20220624-CM1W0KN47",
-            __typename: "InitialBsdasri",
+            __typename: "InitialBsdasri"
           },
           {
             id: "DASRI-20220816-K1VSMNY2J",
-            __typename: "InitialBsdasri",
-          },
+            __typename: "InitialBsdasri"
+          }
         ],
-        synthesizing: null,
+        synthesizing: null
       } as BsdDisplay;
       const currentSiret = "123456789";
 
@@ -1176,14 +1176,14 @@ describe("dashboardServices", () => {
         type: BsdType.Bsff,
         isDraft: true,
         emitter: {
-          company: { siret: "123456789" },
+          company: { siret: "123456789" }
         },
         transporter: {
-          company: { siret: "987654321" },
+          company: { siret: "987654321" }
         },
         destination: {
-          company: { siret: "555555555" },
-        },
+          company: { siret: "555555555" }
+        }
       } as BsdDisplay;
       const currentSiret = "987654321";
 
@@ -1272,7 +1272,7 @@ describe("dashboardServices", () => {
       const bsd = {
         type: BsdType.Bsdd,
         status: BsdStatusCode.Accepted,
-        emitterType: EmitterType.Producer,
+        emitterType: EmitterType.Producer
       };
 
       const result = canReviewBsdd(bsd);
@@ -1284,7 +1284,7 @@ describe("dashboardServices", () => {
       const bsd = {
         type: BsdType.Bsda,
         status: BsdStatusCode.Accepted,
-        emitterType: EmitterType.Producer,
+        emitterType: EmitterType.Producer
       };
 
       const result = canReviewBsdd(bsd);
@@ -1296,7 +1296,7 @@ describe("dashboardServices", () => {
       const bsd = {
         type: BsdType.Bsdd,
         status: BsdStatusCode.Draft,
-        emitterType: EmitterType.Producer,
+        emitterType: EmitterType.Producer
       };
 
       const result = canReviewBsdd(bsd);
@@ -1308,7 +1308,7 @@ describe("dashboardServices", () => {
       const bsd = {
         type: BsdType.Bsdd,
         status: BsdStatusCode.Accepted,
-        emitterType: EmitterType.Appendix1Producer,
+        emitterType: EmitterType.Appendix1Producer
       };
 
       const result = canReviewBsdd(bsd);
@@ -1323,7 +1323,7 @@ describe("dashboardServices", () => {
       emitterType: "APPENDIX1_PRODUCER",
       emitter: { isPrivateIndividual: false },
       transporter: { company: { siret: "123456789" } },
-      ecoOrganisme: { siret: "1" },
+      ecoOrganisme: { siret: "1" }
     } as BsdDisplay;
 
     it("returns true if can Skip Emission and is Same Siret Transporter", () => {
@@ -1338,7 +1338,7 @@ describe("dashboardServices", () => {
         {
           ...bsd,
           ecoOrganisme: null,
-          emitter: { isPrivateIndividual: false },
+          emitter: { isPrivateIndividual: false }
         },
         false
       );
@@ -1351,7 +1351,7 @@ describe("dashboardServices", () => {
         currentSiret,
         {
           ...bsd,
-          transporter: { company: { siret: "2" } },
+          transporter: { company: { siret: "2" } }
         },
         false
       );
@@ -1375,7 +1375,7 @@ describe("dashboardServices", () => {
         "R15",
         "R 15",
         "D13",
-        "D 13",
+        "D 13"
       ]);
     });
 

@@ -1,8 +1,9 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { gql, useQuery } from "@apollo/client";
-import { Query } from "generated/graphql/types";
+import { Query } from "codegen-ui";
+import { Outlet } from "react-router-dom";
 import Header from "./Header";
-
+import { Toaster } from "react-hot-toast";
 import sandboxIcon from "./assets/code-sandbox.svg";
 import downtimeIcon from "./assets/code-downtime.svg";
 
@@ -23,13 +24,11 @@ const GET_WARNING_MESSAGE = gql`
  * Layout with common elements to all routes
  */
 export default function Layout({
-  children,
   isAuthenticated,
   isAdmin,
   v2banner,
-  defaultOrgId,
+  defaultOrgId
 }: AuthProps & {
-  children: ReactNode;
   v2banner?: JSX.Element;
 }) {
   const { data } = useQuery<Pick<Query, "warningMessage">>(GET_WARNING_MESSAGE);
@@ -38,6 +37,7 @@ export default function Layout({
 
   return (
     <>
+      <Toaster />
       {isIE11 && (
         <div
           className="notification notification--error tw-text-center"
@@ -66,7 +66,7 @@ export default function Layout({
           <img src={downtimeIcon} alt="" />
           <div
             dangerouslySetInnerHTML={{
-              __html: VITE_DOWNTIME_MESSAGE as string,
+              __html: VITE_DOWNTIME_MESSAGE as string
             }}
           ></div>
         </div>
@@ -81,7 +81,7 @@ export default function Layout({
             margin: 0,
             backgroundColor: "red",
             color: "white",
-            fontWeight: "bold",
+            fontWeight: "bold"
           }}
         >
           {data.warningMessage}
@@ -92,7 +92,7 @@ export default function Layout({
         isAdmin={isAdmin}
         defaultOrgId={defaultOrgId}
       />
-      {children}
+      <Outlet />
     </>
   );
 }

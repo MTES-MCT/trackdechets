@@ -1,12 +1,7 @@
 import * as React from "react";
-import {
-  Link,
-  generatePath,
-  useLocation,
-  useRouteMatch,
-} from "react-router-dom";
-import { IconQrCode } from "Apps/common/Components/Icons/Icons";
-import routes from "Apps/routes";
+import { Link, generatePath, useLocation, useMatch } from "react-router-dom";
+import { IconQrCode } from "../../../Apps/common/Components/Icons/Icons";
+import routes from "../../../Apps/routes";
 
 export const CardRoadControlButton = ({ siret, form }) => {
   const location = useLocation();
@@ -19,10 +14,10 @@ export const CardRoadControlButton = ({ siret, form }) => {
         pathname: generatePath(routes.dashboard.roadControl, {
           siret,
 
-          id: form.id,
-        }),
-        state: { background: location },
+          id: form.id
+        })
       }}
+      state={{ background: location }}
       className="btn btn--outline-primary"
     >
       <IconQrCode size="32px" style={{ marginRight: "1rem" }} />
@@ -44,10 +39,10 @@ export const TableRoadControlButton = ({ siret, form }) => {
         pathname: generatePath(routes.dashboard.roadControl, {
           siret,
 
-          id: form.id,
-        }),
-        state: { background: location },
+          id: form.id
+        })
       }}
+      state={{ background: location }}
     >
       <IconQrCode color="blueLight" size="24px" />
       <span className="tw-m-1 tw-leading-tight tw-text-center">
@@ -65,9 +60,9 @@ export const useDisplayRoadControlButton = bsd => {
     Bsdasri: "bsdasriStatus",
     Bsff: "bsffStatus",
     Bsvhu: "bsvhuStatus",
-    Bsda: "bsdaStatus",
+    Bsda: "bsdaStatus"
   }[bsd.__typename];
-  const isCollectedTab = !!useRouteMatch(routes.dashboard.transport.collected);
+  const isCollectedTab = !!useMatch(routes.dashboard.transport.collected);
 
   return ["SENT", "RESENT"].includes(bsd[statusKey]) && isCollectedTab;
 };

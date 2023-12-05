@@ -3,58 +3,24 @@ name: Build & Test
 on: pull_request
 
 jobs:
-  front:
+  main:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: front
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: front/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-      - name: Generate files
-        run: npm run generate
-      - name: Run linter
-        run: npm run lint
-      - name: Run typecheck
-        run: npm run types
-      - name: Run tests
-        run: npm test
-
-  back:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: back
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+          node-version: 20
+      - uses: nrwl/nx-set-shas@v3
         with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: back/package-lock.json
+          main-branch-name: 'dev'
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
-      - name: Generate files
-        run: npm run generate
-      - name: Run linter
-        run: npm run lint
-      - name: Run typecheck
-        run: npm run types
-      - name: Check migrations
-        run: npm run check:migrations
-      - name: Run tests
-        run: npm test -- --forceExit
+      - run: npx nx format:check
+      - run: npx nx affected -t lint --parallel=3
+      - run: npx nx affected -t test --parallel=3
         env:
           EMAIL_BACKEND: "console"
           SIB_BASE_URL: "http://mailservice"
@@ -65,9 +31,12 @@ jobs:
           PROFESIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "250"
           VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID: "247"
           DATABASE_URL: "postgresql://user:password@postgres:5432/db"
+          UI_HOST: "http://ui.td.local"
+          API_HOST: "http://api.td.local"
           TD_COMPANY_ELASTICSEARCH_INDEX: "stocketablissement-production"
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
+      - run: npx nx affected -t build --parallel=3
 
   doc:
     runs-on: ubuntu-latest
@@ -80,8 +49,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
-          cache: 'yarn'
+          node-version: "16"
+          cache: "yarn"
           cache-dependency-path: doc/yarn.lock
 
       - run: yarn install --frozen-lockfile

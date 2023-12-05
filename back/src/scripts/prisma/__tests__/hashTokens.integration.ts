@@ -1,4 +1,4 @@
-import {  resetDatabase } from "../../../../integration-tests/helper";
+import { resetDatabase } from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
 import {
   userWithAccessTokenFactory,
@@ -6,7 +6,6 @@ import {
 } from "../../../__tests__/factories";
 import { getUid, hashToken } from "../../../utils";
 import { hashTokens } from "../hashTokens";
-
 
 describe("hashTokens", () => {
   afterAll(async () => {

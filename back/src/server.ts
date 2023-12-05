@@ -20,7 +20,7 @@ import { ZodError } from "zod";
 import { createEventsDataLoaders } from "./activity-events/dataloader";
 import { passportBearerMiddleware } from "./auth";
 import { captchaGen, captchaSound } from "./captcha/captchaGen";
-import { ROAD_CONTROL_SLUG } from "./common/constants";
+import { ROAD_CONTROL_SLUG } from "shared/constants";
 import { ErrorCode, UserInputError } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
@@ -140,6 +140,11 @@ export const server = new ApolloServer<GraphQLContext>({
         maxRequestsPerWindow: 10 // 10 requests each 3 minutes
       },
       resendInvitation: {
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+        maxRequestsPerWindow: 10 // 10 requests each 3 minutes
+      },
+      renewSecurityCode: {
+        // Hacker might massively generate new codes to spam
         windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
         maxRequestsPerWindow: 10 // 10 requests each 3 minutes
       }

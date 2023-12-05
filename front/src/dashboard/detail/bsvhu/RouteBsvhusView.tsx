@@ -2,11 +2,11 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import { Query, QueryBsvhuArgs } from "generated/graphql/types";
-import Loader from "Apps/common/Components/Loader/Loaders";
-import { GET_VHU_FORM } from "form/bsvhu/utils/queries";
-import { InlineError } from "Apps/common/Components/Error/Error";
-import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
+import { Query, QueryBsvhuArgs } from "codegen-ui";
+import Loader from "../../../Apps/common/Components/Loader/Loaders";
+import { GET_VHU_FORM } from "../../../form/bsvhu/utils/queries";
+import { InlineError } from "../../../Apps/common/Components/Error/Error";
+import EmptyDetail from "../common/EmptyDetailView";
 
 import { BsvhuDetailContent } from "./BsvhuDetailContent";
 
@@ -17,10 +17,10 @@ export function RouteBsvhusView() {
     QueryBsvhuArgs
   >(GET_VHU_FORM, {
     variables: {
-      id: formId,
+      id: formId!
     },
     skip: !formId,
-    fetchPolicy: "network-only",
+    fetchPolicy: "network-only"
   });
 
   if (error) {

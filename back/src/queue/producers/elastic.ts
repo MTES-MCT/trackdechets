@@ -1,6 +1,5 @@
-// eslint-disable-next-line import/no-named-as-default
 import Queue, { JobOptions } from "bull";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 import { scheduleWebhook } from "./webhooks";
 import {
   INDEX_JOB_NAME,

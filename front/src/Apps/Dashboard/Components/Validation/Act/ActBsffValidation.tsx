@@ -1,11 +1,11 @@
 import React from "react";
-import { Bsff, BsffStatus } from "generated/graphql/types";
-import { SignEmission } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignEmission";
-import { SignTransport } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignTransport";
-import { SignReception } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignReception";
-import { SignBsffAcceptationOnePackaging } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignAcceptation";
-import { SignPackagings } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignPackagings";
-import { SignBsffOperationOnePackaging } from "dashboard/components/BSDList/BSFF/WorkflowAction/SignOperation";
+import { Bsff, BsffStatus } from "codegen-ui";
+import { SignEmission } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignEmission";
+import { SignTransport } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignTransport";
+import { SignReception } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignReception";
+import { SignBsffAcceptationOnePackaging } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignAcceptation";
+import { SignPackagings } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignPackagings";
+import { SignBsffOperationOnePackaging } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignOperation";
 
 interface ActBsffValidationProps {
   bsd: Bsff;
@@ -15,12 +15,12 @@ interface ActBsffValidationProps {
 const ActBsffValidation = ({
   bsd,
   isOpen,
-  onClose,
+  onClose
 }: ActBsffValidationProps) => {
   const actionButtonAdapterProps = {
     isModalOpenFromParent: isOpen,
     onModalCloseFromParent: onClose,
-    displayActionButton: false,
+    displayActionButton: false
   };
 
   const renderInitialModal = () => {

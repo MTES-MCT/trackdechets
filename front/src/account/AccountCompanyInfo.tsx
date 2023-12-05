@@ -1,13 +1,12 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { filter } from "graphql-anywhere";
 import AccountFieldCompanyTypes from "./fields/AccountFieldCompanyTypes";
 import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
 import AccountFieldCompanyGerepId from "./fields/AccountFieldCompanyGerepId";
 import AccountFieldCompanyGivenName, {
-  tooltip as givenNameTooltip,
+  tooltip as givenNameTooltip
 } from "./fields/AccountFieldCompanyGivenName";
-import { CompanyPrivate, UserRole, CompanyType } from "generated/graphql/types";
+import { CompanyPrivate, UserRole, CompanyType } from "codegen-ui";
 import AccountFieldCompanyTransporterReceipt from "./fields/AccountFieldCompanyTransporterReceipt";
 import AccountFieldCompanyTraderReceipt from "./fields/AccountFieldCompanyTraderReceipt";
 import AccountFieldCompanyBrokerReceipt from "./fields/AccountFieldCompanyBrokerReceipt";
@@ -15,8 +14,8 @@ import AccountFieldCompanyVerificationStatus from "./fields/AccountFieldCompanyV
 import AccountFieldCompanyVhuAgrementBroyeur from "./fields/AccountFieldCompanyVhuAgrementBroyeur";
 import AccountFieldCompanyVhuAgrementDemolisseur from "./fields/AccountFieldCompanyVhuAgrementDemolisseur";
 import AccountFieldCompanyWorkerCertification from "./fields/AccountFieldCompanyWorkerCertification";
-import * as COMPANY_CONSTANTS from "generated/constants/COMPANY_CONSTANTS";
-import { isSiret, isVat } from "generated/constants/companySearchHelpers";
+import * as COMPANY_CONSTANTS from "shared/constants";
+import { isSiret, isVat } from "shared/constants";
 
 type Props = { company: CompanyPrivate };
 
@@ -56,7 +55,7 @@ AccountCompanyInfo.fragments = {
     ${AccountFieldCompanyVhuAgrementBroyeur.fragments.company}
     ${AccountFieldCompanyVhuAgrementDemolisseur.fragments.company}
     ${AccountFieldCompanyWorkerCertification.fragments.company}
-  `,
+  `
 };
 
 const { VITE_VERIFY_COMPANY } = import.meta.env;
@@ -96,93 +95,45 @@ export default function AccountCompanyInfo({ company }: Props) {
         value={company.address}
       />
       {company.installation && company.installation.urlFiche && (
-        <>
-          <AccountFieldNotEditable
-            name="fiche_ic"
-            label="Fiche ICPE"
-            value={
-              <a
-                href={company.installation.urlFiche}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Lien
-              </a>
-            }
-          />
-        </>
-      )}
-      <AccountFieldCompanyGerepId
-        company={filter(AccountFieldCompanyGerepId.fragments.company, company)}
-      />
-      <AccountFieldCompanyTypes
-        company={filter(AccountFieldCompanyTypes.fragments.company, company)}
-      />
-      {isWasteProfessional && VITE_VERIFY_COMPANY === "true" && (
-        <AccountFieldCompanyVerificationStatus
-          company={filter(
-            AccountFieldCompanyVerificationStatus.fragments.company,
-            company
-          )}
+        <AccountFieldNotEditable
+          name="fiche_ic"
+          label="Fiche ICPE"
+          value={
+            <a
+              href={company.installation.urlFiche}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Lien
+            </a>
+          }
         />
+      )}
+      <AccountFieldCompanyGerepId company={company} />
+      <AccountFieldCompanyTypes company={company} />
+      {isWasteProfessional && VITE_VERIFY_COMPANY === "true" && (
+        <AccountFieldCompanyVerificationStatus company={company} />
       )}
       {company.companyTypes.includes(CompanyType.Transporter) && (
-        <AccountFieldCompanyTransporterReceipt
-          company={filter(
-            AccountFieldCompanyTransporterReceipt.fragments.company,
-            company
-          )}
-        />
+        <AccountFieldCompanyTransporterReceipt company={company} />
       )}
       {company.companyTypes.includes(CompanyType.Trader) && (
-        <AccountFieldCompanyTraderReceipt
-          company={filter(
-            AccountFieldCompanyTraderReceipt.fragments.company,
-            company
-          )}
-        />
+        <AccountFieldCompanyTraderReceipt company={company} />
       )}
       {company.companyTypes.includes(CompanyType.Broker) && (
-        <AccountFieldCompanyBrokerReceipt
-          company={filter(
-            AccountFieldCompanyBrokerReceipt.fragments.company,
-            company
-          )}
-        />
+        <AccountFieldCompanyBrokerReceipt company={company} />
       )}
       {company.companyTypes.includes(CompanyType.WasteVehicles) && (
         <>
-          <AccountFieldCompanyVhuAgrementBroyeur
-            company={filter(
-              AccountFieldCompanyVhuAgrementBroyeur.fragments.company,
-              company
-            )}
-          />
-          <AccountFieldCompanyVhuAgrementDemolisseur
-            company={filter(
-              AccountFieldCompanyVhuAgrementDemolisseur.fragments.company,
-              company
-            )}
-          />
+          <AccountFieldCompanyVhuAgrementBroyeur company={company} />
+          <AccountFieldCompanyVhuAgrementDemolisseur company={company} />
         </>
       )}
       {company.companyTypes.includes(CompanyType.Worker) && (
-        <>
-          <AccountFieldCompanyWorkerCertification
-            company={filter(
-              AccountFieldCompanyWorkerCertification.fragments.company,
-              company
-            )}
-          />
-        </>
+        <AccountFieldCompanyWorkerCertification company={company} />
       )}
       {company.userRole === UserRole.Admin ? (
-        <AccountFieldCompanyGivenName
-          company={filter(
-            AccountFieldCompanyGivenName.fragments.company,
-            company
-          )}
-        />
+        <AccountFieldCompanyGivenName company={company} />
       ) : (
         company.givenName && (
           <AccountFieldNotEditable

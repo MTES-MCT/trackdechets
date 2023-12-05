@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import styles from "./AccountCompanyAdd.module.scss";
@@ -9,9 +9,9 @@ import {
   Mutation,
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
-  CompanySearchResult,
-} from "generated/graphql/types";
-import { isSiret, isVat } from "generated/constants/companySearchHelpers";
+  CompanySearchResult
+} from "codegen-ui";
+import { isSiret, isVat } from "shared/constants";
 
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
@@ -21,7 +21,7 @@ import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 
 import {
   CREATE_COMPANY,
-  CREATE_COMPANY_HOOK_OPTIONS,
+  CREATE_COMPANY_HOOK_OPTIONS
 } from "./AccountCompanyAdd";
 
 interface Values extends FormikValues {
@@ -41,7 +41,7 @@ interface Values extends FormikValues {
  * the logged in user admin of it
  */
 export default function AccountCompanyAddProducer() {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   // STATE
   const [companyInfos, setCompanyInfos] = useState<CompanySearchResult | null>(
@@ -52,7 +52,7 @@ export default function AccountCompanyAddProducer() {
   const [createCompany, { error: savingError }] = useMutation<
     Pick<Mutation, "createCompany">,
     MutationCreateCompanyArgs
-  >(CREATE_COMPANY, CREATE_COMPANY_HOOK_OPTIONS(history));
+  >(CREATE_COMPANY, CREATE_COMPANY_HOOK_OPTIONS(navigate));
 
   /**
    * Form submission callback
@@ -65,9 +65,9 @@ export default function AccountCompanyAddProducer() {
       variables: {
         companyInput: {
           ...companyValues,
-          allowBsdasriTakeOverWithoutSignature: willManageDasris,
-        },
-      },
+          allowBsdasriTakeOverWithoutSignature: willManageDasris
+        }
+      }
     });
   }
 
@@ -78,7 +78,7 @@ export default function AccountCompanyAddProducer() {
           <AccountCompanyAddSiret
             showIndividualInfo
             {...{
-              onCompanyInfos: companyInfos => setCompanyInfos(companyInfos),
+              onCompanyInfos: companyInfos => setCompanyInfos(companyInfos)
             }}
           />
         </div>
@@ -96,13 +96,13 @@ export default function AccountCompanyAddProducer() {
                 address: companyInfos?.address ?? "",
                 codeNaf: companyInfos?.naf ?? "",
                 isAllowed: false,
-                willManageDasris: false,
+                willManageDasris: false
               }}
               validate={values => {
                 return {
                   ...(!values.isAllowed && {
                     isAllowed:
-                      "Vous devez certifier être autorisé à créer ce compte pour votre entreprise",
+                      "Vous devez certifier être autorisé à créer ce compte pour votre entreprise"
                   }),
                   ...(!isSiret(
                     values.siret,
@@ -110,8 +110,8 @@ export default function AccountCompanyAddProducer() {
                   ) &&
                     !isVat(values.vatNumber) && {
                       siret:
-                        "Le SIRET ou le numéro de TVA intracommunautaire doit être valides. (seuls les caractères alphanumériques sont acceptés, pas d'espaces ni de signes de ponctuation)",
-                    }),
+                        "Le SIRET ou le numéro de TVA intracommunautaire doit être valides. (seuls les caractères alphanumériques sont acceptés, pas d'espaces ni de signes de ponctuation)"
+                    })
                 };
               }}
               onSubmit={onSubmit}
@@ -280,9 +280,9 @@ export default function AccountCompanyAddProducer() {
                                 name: field.name,
                                 checked: field.value,
                                 onChange: field.onChange,
-                                onBlur: field.onBlur,
-                              },
-                            },
+                                onBlur: field.onBlur
+                              }
+                            }
                           ]}
                         />
                       );
@@ -294,7 +294,7 @@ export default function AccountCompanyAddProducer() {
                       priority="tertiary"
                       disabled={isSubmitting}
                       onClick={() => {
-                        history.goBack();
+                        navigate(-1);
                       }}
                       nativeButtonProps={{ type: "button" }}
                     >

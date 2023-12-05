@@ -1,12 +1,12 @@
-import { FieldSwitch, RedErrorMessage } from "common/components";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { FieldSwitch, RedErrorMessage } from "../../common/components";
+import NumberInput from "../common/components/custom-inputs/NumberInput";
 import { Field, useFormikContext } from "formik";
-import { Bsff, BsffPackaging, BsffType } from "generated/graphql/types";
-import { BSFF_WASTES } from "generated/constants";
+import { Bsff, BsffPackaging, BsffType } from "codegen-ui";
+import { BSFF_WASTES } from "shared/constants";
 import React, { useEffect, useMemo } from "react";
 import Packagings from "./components/packagings/Packagings";
 import { PreviousPackagingsPicker } from "./components/PreviousPackagingsPicker";
-import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
+import EstimatedQuantityTooltip from "../../common/components/EstimatedQuantityTooltip";
 
 export default function WasteInfo({ disabled }) {
   const { setFieldValue, values } = useFormikContext<
@@ -23,7 +23,7 @@ export default function WasteInfo({ disabled }) {
           "packagings",
           values.previousPackagings.map(p => ({
             ...p,
-            weight: p.acceptation?.weight ?? p.weight,
+            weight: p.acceptation?.weight ?? p.weight
           }))
         );
       }
@@ -33,7 +33,7 @@ export default function WasteInfo({ disabled }) {
     values.type,
     values.id,
     hasPreviousPackagingsChanged,
-    setFieldValue,
+    setFieldValue
   ]);
 
   // Compute the sum of packagings weight to prefill `weight.value`
@@ -67,7 +67,7 @@ export default function WasteInfo({ disabled }) {
 
   const wasteCodeDisabled = [
     BsffType.Groupement,
-    BsffType.Reexpedition,
+    BsffType.Reexpedition
   ].includes(values.type);
 
   return (
@@ -82,7 +82,7 @@ export default function WasteInfo({ disabled }) {
       {[
         BsffType.Reconditionnement,
         BsffType.Groupement,
-        BsffType.Reexpedition,
+        BsffType.Reexpedition
       ].includes(values.type) && (
         <>
           <h4 className="form__section-heading">

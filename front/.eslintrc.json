@@ -1,0 +1,23 @@
+{
+  "extends": ["plugin:@nx/react", "../.eslintrc.json"],
+  "ignorePatterns": ["!**/*", "public/dsfr/"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "rules": {}
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": "off",
+        "@typescript-eslint/ban-types": "off",
+        "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
+        "@typescript-eslint/no-empty-function": "off"
+      }
+    },
+    {
+      "files": ["*.js", "*.jsx"],
+      "rules": {}
+    }
+  ]
+}

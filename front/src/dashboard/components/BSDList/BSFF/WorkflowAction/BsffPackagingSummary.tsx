@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Bsff, BsffPackaging } from "generated/graphql/types";
+import { Bsff, BsffPackaging } from "codegen-ui";
 import {
   DataList,
   DataListItem,
   DataListTerm,
-  DataListDescription,
-} from "common/components";
+  DataListDescription
+} from "../../../../../common/components";
 
 interface BsffPackagingSummaryProps {
   bsff: Bsff;
@@ -14,7 +14,7 @@ interface BsffPackagingSummaryProps {
 
 export function BsffPackagingSummary({
   bsff,
-  packaging,
+  packaging
 }: BsffPackagingSummaryProps) {
   return (
     <DataList>

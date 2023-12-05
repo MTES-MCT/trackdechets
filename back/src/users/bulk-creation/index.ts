@@ -12,7 +12,7 @@ import {
   acceptNewUserCompanyInvitations,
   createUser
 } from "../database";
-import templateIds from "../../mailer/templates/provider/templateIds";
+import { templateIds } from "@td/mail";
 import {
   CompanyType,
   CompanyVerificationMode,

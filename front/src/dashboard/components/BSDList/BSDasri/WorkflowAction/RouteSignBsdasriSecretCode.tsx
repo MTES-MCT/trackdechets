@@ -1,15 +1,19 @@
 import React from "react";
-import { RedErrorMessage, Label, FieldSwitch } from "common/components";
-import Packagings from "form/bsdasri/components/packagings/Packagings";
-import WeightWidget from "form/bsdasri/components/Weight";
+import {
+  RedErrorMessage,
+  Label,
+  FieldSwitch
+} from "../../../../../common/components";
+import Packagings from "../../../../../form/bsdasri/components/packagings/Packagings";
+import WeightWidget from "../../../../../form/bsdasri/components/Weight";
 import {
   useParams,
-  useHistory,
+  useNavigate,
   generatePath,
-  useRouteMatch,
+  useMatch
 } from "react-router-dom";
-import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
-import Loader from "Apps/common/Components/Loader/Loaders";
+import { BdasriSummary } from "../Summary/BsdasriSummary";
+import Loader from "../../../../../Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
 
 import {
@@ -18,44 +22,44 @@ import {
   Mutation,
   MutationSignBsdasriEmissionWithSecretCodeArgs,
   MutationUpdateBsdasriArgs,
-  BsdasriSignatureType,
-} from "generated/graphql/types";
-import { getComputedState } from "form/common/getComputedState";
+  BsdasriSignatureType
+} from "codegen-ui";
+import { getComputedState } from "../../../../../form/common/getComputedState";
 import getInitialState, {
-  getInitialWeightFn,
-} from "form/bsdasri/utils/initial-state";
+  getInitialWeightFn
+} from "../../../../../form/bsdasri/utils/initial-state";
 
-import { GET_DETAIL_DASRI } from "Apps/common/queries";
+import { GET_DETAIL_DASRI } from "../../../../../Apps/common/queries";
 import {
   InlineError,
-  NotificationError,
-} from "Apps/common/Components/Error/Error";
-import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
+  NotificationError
+} from "../../../../../Apps/common/Components/Error/Error";
+import EmptyDetail from "../../../../detail/common/EmptyDetailView";
 import { Formik, Field, Form } from "formik";
-import routes from "Apps/routes";
+import routes from "../../../../../Apps/routes";
 import { removeSections } from "./PartialForms";
 import {
   SIGN_BSDASRI_EMISSION_WITH_SECRET_CODE,
-  UPDATE_BSDASRI,
-} from "form/bsdasri/utils/queries";
+  UPDATE_BSDASRI
+} from "../../../../../form/bsdasri/utils/queries";
 import {
   emissionSignatureSecretCodeValidationSchema,
-  prefillWasteDetails,
+  prefillWasteDetails
 } from "./utils";
-import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
+import SignatureCodeInput from "../../../../../form/common/components/custom-inputs/SignatureCodeInput";
 
 export function RouteBSDasrisSignEmissionSecretCode() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const { error, data, loading } = useQuery<
     Pick<Query, "bsdasri">,
     QueryBsdasriArgs
   >(GET_DETAIL_DASRI, {
     variables: {
-      id: formId,
+      id: formId!
     },
 
-    fetchPolicy: "no-cache",
+    fetchPolicy: "no-cache"
   });
   const [updateBsdasri, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsdasri">,
@@ -66,22 +70,22 @@ export function RouteBSDasrisSignEmissionSecretCode() {
     MutationSignBsdasriEmissionWithSecretCodeArgs
   >(SIGN_BSDASRI_EMISSION_WITH_SECRET_CODE);
 
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/");
   const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
   const toCollectDashboard = {
     pathname: generatePath(routes[dashboardRoutePrefix].transport.toCollect, {
-      siret,
-    }),
+      siret
+    })
   };
   const signTransporterRedirection = {
     pathname: generatePath(
       routes[dashboardRoutePrefix].bsdasris.sign.transporter,
       {
         siret,
-        id: formId,
+        id: formId!
       }
     ),
-    state: { background: toCollectDashboard },
+    state: { background: toCollectDashboard }
   };
 
   if (error) {
@@ -115,8 +119,8 @@ export function RouteBSDasrisSignEmissionSecretCode() {
           signature: {
             author: "",
             securityCode: "",
-            signatureAuthor: false,
-          },
+            signatureAuthor: false
+          }
         }}
         validationSchema={emissionSignatureSecretCodeValidationSchema}
         onSubmit={async values => {
@@ -126,9 +130,9 @@ export function RouteBSDasrisSignEmissionSecretCode() {
             variables: {
               id: id,
               input: {
-                ...removeSections(rest, BsdasriSignatureType.Emission),
-              },
-            },
+                ...removeSections(rest, BsdasriSignatureType.Emission)
+              }
+            }
           });
           await signBsdasriEmissionWithSecretCode({
             variables: {
@@ -139,12 +143,12 @@ export function RouteBSDasrisSignEmissionSecretCode() {
 
                 signatureAuthor: !!signature.signatureAuthor
                   ? "ECO_ORGANISME"
-                  : "EMITTER",
-              },
-            },
+                  : "EMITTER"
+              }
+            }
           });
 
-          history.push(signTransporterRedirection);
+          navigate(signTransporterRedirection);
         }}
       >
         {({ isSubmitting, handleReset }) => {
@@ -201,7 +205,7 @@ export function RouteBSDasrisSignEmissionSecretCode() {
                   className="btn btn--outline-primary"
                   onClick={() => {
                     handleReset();
-                    history.push(toCollectDashboard);
+                    navigate(toCollectDashboard);
                   }}
                 >
                   Annuler

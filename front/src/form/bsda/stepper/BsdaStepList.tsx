@@ -1,11 +1,11 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React, { lazy, ReactElement, useMemo } from "react";
-import { useHistory } from "react-router-dom";
-import { Loader } from "Apps/common/Components";
-import { GET_BSDS } from "Apps/common/queries";
-import { getComputedState } from "form/common/getComputedState";
+import { useNavigate } from "react-router-dom";
+import { Loader } from "../../../Apps/common/Components";
+import { GET_BSDS } from "../../../Apps/common/queries";
+import { getComputedState } from "../../common/getComputedState";
 
-import { IStepContainerProps } from "form/common/stepper/Step";
+import { IStepContainerProps } from "../../common/stepper/Step";
 import {
   Mutation,
   MutationCreateBsdaArgs,
@@ -13,16 +13,16 @@ import {
   QueryBsdaArgs,
   Query,
   Bsda,
-  BsdaInput,
-} from "generated/graphql/types";
+  BsdaInput
+} from "codegen-ui";
 import initialState from "./initial-state";
 import { CREATE_BSDA, UPDATE_BSDA, GET_BSDA } from "./queries";
 import omitDeep from "omit-deep-lodash";
-import { formInputToastError } from "form/common/stepper/toaster";
+import { formInputToastError } from "../../common/stepper/toaster";
 import { bsdaValidationSchema } from "./schema";
 
 const GenericStepList = lazy(
-  () => import("form/common/stepper/GenericStepList")
+  () => import("../../common/stepper/GenericStepList")
 );
 
 interface Props {
@@ -39,14 +39,14 @@ const prefillTransportMode = state => {
 };
 
 export default function BsdaStepsList(props: Props) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const formQuery = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
     variables: {
-      id: props.formId!,
+      id: props.formId!
     },
     skip: !props.formId,
-    fetchPolicy: "network-only",
+    fetchPolicy: "network-only"
   });
 
   const formState = useMemo(() => {
@@ -85,7 +85,7 @@ export default function BsdaStepsList(props: Props) {
     MutationCreateBsdaArgs
   >(CREATE_BSDA, {
     refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
+    awaitRefetchQueries: true
   });
 
   const [updateBsda, { loading: updating }] = useMutation<
@@ -93,7 +93,7 @@ export default function BsdaStepsList(props: Props) {
     MutationUpdateBsdaArgs
   >(UPDATE_BSDA, {
     refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
+    awaitRefetchQueries: true
   });
 
   const cleanupFields = (input: BsdaInput): BsdaInput => {
@@ -110,7 +110,7 @@ export default function BsdaStepsList(props: Props) {
   function saveForm(input: BsdaInput): Promise<any> {
     return formState.id
       ? updateBsda({
-          variables: { id: formState.id, input: cleanupFields(input) },
+          variables: { id: formState.id, input: cleanupFields(input) }
         })
       : createBsda({ variables: { input } });
   }
@@ -119,7 +119,7 @@ export default function BsdaStepsList(props: Props) {
     const { id, ...input } = values;
     saveForm(input)
       .then(_ => {
-        history.goBack();
+        navigate(-1);
       })
       .catch(err => formInputToastError(err));
   }

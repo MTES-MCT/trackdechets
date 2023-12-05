@@ -1,48 +1,46 @@
-import { useQuery, gql } from "@apollo/client";
-import { filter } from "graphql-anywhere";
 import React from "react";
+import { useQuery, gql } from "@apollo/client";
 import {
   generatePath,
-  Redirect,
+  Navigate,
   Route,
-  RouteChildrenProps,
-  Switch,
-  useHistory,
+  Routes,
+  useNavigate,
   useLocation,
-  useParams,
+  useParams
 } from "react-router-dom";
-import { Location } from "history";
-import routes from "Apps/routes";
-import { Modal } from "common/components";
+import routes, { getRelativeRoute } from "../Apps/routes";
+import { Modal } from "../common/components";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import "./Dashboard.scss";
 import Exports from "./exports/Exports";
 import { OnboardingSlideshow } from "./components/OnboardingSlideshow";
-import { ExtraSignatureType } from "dashboard/components/BSDList/BSDasri/types";
+import { ExtraSignatureType } from "./components/BSDList/BSDasri/types";
+import { Redirect } from "../Apps/utils/routerUtils";
 
-import { Query, BsdasriSignatureType } from "generated/graphql/types";
+import { Query, BsdasriSignatureType } from "codegen-ui";
 import {
   RouteBsdsAct,
   RouteBsdsDrafts,
   RouteBsdsFollow,
-  RouteBsdsHistory,
+  RouteBsdsHistory
 } from "./bsds";
-import { RouteBSDasrisSignEmissionSecretCode } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
-import { RoutePublishBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
-import { RouteSignBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
-import { RouteControlPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/RouteControlPdf";
+import { RouteBSDasrisSignEmissionSecretCode } from "./components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
+import { RoutePublishBsdasri } from "./components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
+import { RouteSignBsdasri } from "./components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
+import { RouteControlPdf } from "./components/BSDList/BSDasri/BSDasriActions/RouteControlPdf";
 import {
   RouteBSDasrisView,
   RouteBsvhusView,
   RouteBsffsView,
   RouteBSDDsView,
-  RouteBSDasView,
+  RouteBSDasView
 } from "./detail";
 import { RouteTransportToCollect, RouteTransportCollected } from "./transport";
 import { RouteBsdsReview } from "./bsds/review";
 import { RouteBsddRequestRevision } from "./components/RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
 import { DashboardTabs } from "./DashboardTabs";
-import SideMenu from "common/components/SideMenu";
+import SideMenu from "../common/components/SideMenu";
 import { RouteBsdaRequestRevision } from "./components/RevisionRequestList/bsda/request";
 
 export const GET_ME = gql`
@@ -62,22 +60,26 @@ export const GET_ME = gql`
   }
 `;
 
+const toRelative = route => {
+  return getRelativeRoute(routes.dashboard.index, route);
+};
+
 export default function Dashboard() {
-  const { siret } = useParams<{ siret: string }>();
+  const { siret } = useParams<{ siret: string; id: string }>();
   const { data } = useQuery<Pick<Query, "me">>(GET_ME);
 
-  const history = useHistory();
-  const location = useLocation<{ background?: Location }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const backgroundLocation = location.state?.background;
   const toCollectDashboard = {
     pathname: generatePath(routes.dashboard.transport.toCollect, {
-      siret,
-    }),
+      siret
+    })
   };
   const actionDashboard = {
     pathname: generatePath(routes.dashboard.bsds.act, {
-      siret,
-    }),
+      siret
+    })
   };
 
   if (data?.me == null) {
@@ -91,11 +93,11 @@ export default function Dashboard() {
   // redirect them to their first company or account if they're not part of any company
   if (currentCompany == null) {
     return (
-      <Redirect
+      <Navigate
         to={
           companies.length > 0
             ? generatePath(routes.dashboard.bsds.drafts, {
-                siret: companies[0].orgId,
+                siret: companies[0].orgId
               })
             : routes.account.companies.list
         }
@@ -115,253 +117,348 @@ export default function Dashboard() {
         </SideMenu>
 
         <div className="dashboard-content">
-          <Switch location={backgroundLocation ?? location}>
-            <Route path="/dashboard/:siret/slips/view/:id" exact>
-              {({
-                match,
-              }: RouteChildrenProps<{ siret: string; id: string }>) => (
-                <Redirect
-                  to={generatePath(routes.dashboard.bsdds.view, {
-                    siret: match!.params.siret,
-                    id: match!.params.id,
-                  })}
-                />
-              )}
-            </Route>
-            <Route path="/dashboard/:siret/slips">
-              {({ location }) => (
-                <Redirect to={location.pathname.replace(/slips/, "bsds")} />
-              )}
-            </Route>
-
-            <Route path={routes.dashboard.bsdds.view}>
-              <RouteBSDDsView />
-            </Route>
-            <Route path={routes.dashboard.bsdds.review}>
-              <RouteBsddRequestRevision />
-            </Route>
-            <Route path={routes.dashboard.bsdasris.view}>
-              <RouteBSDasrisView />
-            </Route>
-            <Route path={routes.dashboard.bsvhus.view}>
-              <RouteBsvhusView />
-            </Route>
-            <Route path={routes.dashboard.bsdas.view}>
-              <RouteBSDasView />
-            </Route>
-            <Route path={routes.dashboard.bsdas.review}>
-              <RouteBsdaRequestRevision />
-            </Route>
-            <Route path={routes.dashboard.bsffs.view}>
-              <RouteBsffsView />
-            </Route>
-            <Route path={routes.dashboard.bsds.drafts}>
-              <RouteBsdsDrafts />
-            </Route>
-            <Route path={routes.dashboard.bsds.act}>
-              <RouteBsdsAct />
-            </Route>
-            <Route path={routes.dashboard.bsds.follow}>
-              <RouteBsdsFollow />
-            </Route>
-            <Route path={routes.dashboard.bsds.history}>
-              <RouteBsdsHistory />
-            </Route>
-            <Route path={routes.dashboard.bsds.reviews}>
-              <RouteBsdsReview />
-            </Route>
-            <Route path={routes.dashboard.transport.toCollect}>
-              <RouteTransportToCollect />
-            </Route>
-            <Route path={routes.dashboard.transport.collected}>
-              <RouteTransportCollected />
-            </Route>
-            <Route path={routes.dashboard.exports}>
-              <Exports
-                companies={filter(Exports.fragments.company, companies)}
-              />
-            </Route>
-            <Redirect
-              to={generatePath(routes.dashboard.bsds.drafts, {
-                siret,
-              })}
+          <Routes location={backgroundLocation ?? location}>
+            <Route
+              index
+              element={<Redirect path={routes.dashboard.bsds.drafts} />}
             />
-          </Switch>
+
+            <Route
+              path=":siret/slips/view/:id"
+              element={<Redirect path={routes.dashboard.bsdds.view} />}
+            />
+
+            <Route
+              path=":siret/slips"
+              element={
+                <Navigate
+                  to={location.pathname.replace(/slips/, "bsds")}
+                  replace
+                />
+              }
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsdds.view)}
+              element={<RouteBSDDsView />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsdds.review)}
+              element={<RouteBsddRequestRevision />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsdasris.view)}
+              element={<RouteBSDasrisView />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsvhus.view)}
+              element={<RouteBsvhusView />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsdas.view)}
+              element={<RouteBSDasView />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsdas.review)}
+              element={<RouteBsdaRequestRevision />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsffs.view)}
+              element={<RouteBsffsView />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsds.drafts)}
+              element={<RouteBsdsDrafts />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsds.act)}
+              element={<RouteBsdsAct />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsds.follow)}
+              element={<RouteBsdsFollow />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsds.history)}
+              element={<RouteBsdsHistory />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsds.reviews)}
+              element={<RouteBsdsReview />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.transport.toCollect)}
+              element={<RouteTransportToCollect />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.transport.collected)}
+              element={<RouteTransportCollected />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.exports)}
+              element={<Exports companies={companies} />}
+            />
+
+            <Route
+              path={`${routes.dashboard.index}/*`}
+              element={<Redirect path={routes.dashboard.bsds.drafts} />}
+            />
+          </Routes>
 
           {backgroundLocation && (
-            <Switch location={location}>
-              <Route path={routes.dashboard.bsdds.view}>
-                <Modal
-                  onClose={() => history.goBack()}
-                  ariaLabel="Aperçu du bordereau"
-                  isOpen
-                  padding={false}
-                  wide={true}
-                >
-                  <RouteBSDDsView />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsdds.review}>
-                <Modal
-                  onClose={() => history.goBack()}
-                  ariaLabel="Demande de révision"
-                  isOpen
-                  padding={false}
-                  wide={true}
-                >
-                  <RouteBsddRequestRevision />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.roadControl}>
-                <Modal
-                  onClose={() => history.goBack()}
-                  ariaLabel="Contrôle routier"
-                  isOpen
-                >
-                  <RouteControlPdf />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsdasris.sign.publish}>
-                <Modal
-                  onClose={() => history.goBack()}
-                  ariaLabel="Publier un dasri"
-                  isOpen
-                >
-                  <RoutePublishBsdasri />
-                </Modal>
-              </Route>
+            <Routes location={location}>
+              <Route
+                path={toRelative(routes.dashboard.bsdds.view)}
+                element={
+                  <Modal
+                    onClose={() => navigate(-1)}
+                    ariaLabel="Aperçu du bordereau"
+                    isOpen
+                    padding={false}
+                    wide={true}
+                  >
+                    <RouteBSDDsView />
+                  </Modal>
+                }
+              />
 
-              <Route path={routes.dashboard.bsdasris.sign.emissionSecretCode}>
-                <Modal
-                  onClose={() => history.push(toCollectDashboard)}
-                  ariaLabel="Signature producteur avec code de sécurité"
-                  isOpen
-                >
-                  <RouteBSDasrisSignEmissionSecretCode />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsdasris.sign.directTakeover}>
-                <Modal
-                  onClose={() => history.push(toCollectDashboard)}
-                  ariaLabel="Emport direct transporteur"
-                  isOpen
-                >
-                  <RouteSignBsdasri
-                    UIsignatureType={ExtraSignatureType.DirectTakeover}
-                  />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsdasris.sign.synthesisTakeover}>
-                <Modal
-                  onClose={() => history.push(toCollectDashboard)}
-                  ariaLabel="Bordereau de synthèse: Transporteur"
-                  isOpen
-                >
-                  <RouteSignBsdasri
-                    UIsignatureType={ExtraSignatureType.SynthesisTakeOver}
-                  />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsdasris.sign.transporter}>
-                <Modal
-                  onClose={() => history.push(toCollectDashboard)}
-                  ariaLabel="Signature transporteur"
-                  isOpen
-                >
-                  <RouteSignBsdasri
-                    UIsignatureType={BsdasriSignatureType.Transport}
-                  />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsdasris.sign.emission}>
-                <Modal
-                  onClose={() => history.push(actionDashboard)}
-                  ariaLabel="Signature producteur"
-                  isOpen
-                >
-                  <RouteSignBsdasri
-                    UIsignatureType={BsdasriSignatureType.Emission}
-                  />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsdasris.sign.reception}>
-                <Modal
-                  onClose={() => history.push(actionDashboard)}
-                  ariaLabel="Signature réception"
-                  isOpen
-                >
-                  <RouteSignBsdasri
-                    UIsignatureType={BsdasriSignatureType.Reception}
-                  />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsdasris.sign.operation}>
-                <Modal
-                  onClose={() => history.push(actionDashboard)}
-                  ariaLabel="Signature traitement"
-                  isOpen
-                >
-                  <RouteSignBsdasri
-                    UIsignatureType={BsdasriSignatureType.Operation}
-                  />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsdasris.view}>
-                <Modal
-                  onClose={() => history.goBack()}
-                  ariaLabel="Aperçu du bordereau"
-                  isOpen
-                  padding={false}
-                  wide={true}
-                >
-                  <RouteBSDasrisView />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsvhus.view}>
-                <Modal
-                  onClose={() => history.goBack()}
-                  ariaLabel="Aperçu du bordereau"
-                  isOpen
-                  padding={false}
-                  wide={true}
-                >
-                  <RouteBsvhusView />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsdas.view}>
-                <Modal
-                  onClose={() => history.goBack()}
-                  ariaLabel="Aperçu du bordereau"
-                  isOpen
-                  padding={false}
-                  wide={true}
-                >
-                  <RouteBSDasView />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsdas.review}>
-                <Modal
-                  onClose={() => history.goBack()}
-                  ariaLabel="Demande de révision"
-                  isOpen
-                  padding={false}
-                  wide={true}
-                >
-                  <RouteBsdaRequestRevision />
-                </Modal>
-              </Route>
-              <Route path={routes.dashboard.bsffs.view}>
-                <Modal
-                  onClose={() => history.goBack()}
-                  ariaLabel="Aperçu du bordereau"
-                  isOpen
-                  padding={false}
-                  wide={true}
-                >
-                  <RouteBsffsView />
-                </Modal>
-              </Route>
-            </Switch>
+              <Route
+                path={toRelative(routes.dashboard.bsdds.review)}
+                element={
+                  <Modal
+                    onClose={() => navigate(-1)}
+                    ariaLabel="Demande de révision"
+                    isOpen
+                    padding={false}
+                    wide={true}
+                  >
+                    <RouteBsddRequestRevision />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(routes.dashboard.roadControl)}
+                element={
+                  <Modal
+                    onClose={() => navigate(-1)}
+                    ariaLabel="Contrôle routier"
+                    isOpen
+                  >
+                    <RouteControlPdf />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(routes.dashboard.bsdasris.sign.publish)}
+                element={
+                  <Modal
+                    onClose={() => navigate(-1)}
+                    ariaLabel="Publier un dasri"
+                    isOpen
+                  >
+                    <RoutePublishBsdasri />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(
+                  routes.dashboard.bsdasris.sign.emissionSecretCode
+                )}
+                element={
+                  <Modal
+                    onClose={() => navigate(toCollectDashboard)}
+                    ariaLabel="Signature producteur avec code de sécurité"
+                    isOpen
+                  >
+                    <RouteBSDasrisSignEmissionSecretCode />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(routes.dashboard.bsdasris.sign.directTakeover)}
+                element={
+                  <Modal
+                    onClose={() => navigate(toCollectDashboard)}
+                    ariaLabel="Emport direct transporteur"
+                    isOpen
+                  >
+                    <RouteSignBsdasri
+                      UIsignatureType={ExtraSignatureType.DirectTakeover}
+                    />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(
+                  routes.dashboard.bsdasris.sign.synthesisTakeover
+                )}
+                element={
+                  <Modal
+                    onClose={() => navigate(toCollectDashboard)}
+                    ariaLabel="Bordereau de synthèse: Transporteur"
+                    isOpen
+                  >
+                    <RouteSignBsdasri
+                      UIsignatureType={ExtraSignatureType.SynthesisTakeOver}
+                    />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(routes.dashboard.bsdasris.sign.transporter)}
+                element={
+                  <Modal
+                    onClose={() => navigate(toCollectDashboard)}
+                    ariaLabel="Signature transporteur"
+                    isOpen
+                  >
+                    <RouteSignBsdasri
+                      UIsignatureType={BsdasriSignatureType.Transport}
+                    />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(routes.dashboard.bsdasris.sign.emission)}
+                element={
+                  <Modal
+                    onClose={() => navigate(actionDashboard)}
+                    ariaLabel="Signature producteur"
+                    isOpen
+                  >
+                    <RouteSignBsdasri
+                      UIsignatureType={BsdasriSignatureType.Emission}
+                    />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(routes.dashboard.bsdasris.sign.reception)}
+                element={
+                  <Modal
+                    onClose={() => navigate(actionDashboard)}
+                    ariaLabel="Signature réception"
+                    isOpen
+                  >
+                    <RouteSignBsdasri
+                      UIsignatureType={BsdasriSignatureType.Reception}
+                    />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(routes.dashboard.bsdasris.sign.operation)}
+                element={
+                  <Modal
+                    onClose={() => navigate(actionDashboard)}
+                    ariaLabel="Signature traitement"
+                    isOpen
+                  >
+                    <RouteSignBsdasri
+                      UIsignatureType={BsdasriSignatureType.Operation}
+                    />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(routes.dashboard.bsdasris.view)}
+                element={
+                  <Modal
+                    onClose={() => navigate(-1)}
+                    ariaLabel="Aperçu du bordereau"
+                    isOpen
+                    padding={false}
+                    wide={true}
+                  >
+                    <RouteBSDasrisView />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(routes.dashboard.bsvhus.view)}
+                element={
+                  <Modal
+                    onClose={() => navigate(-1)}
+                    ariaLabel="Aperçu du bordereau"
+                    isOpen
+                    padding={false}
+                    wide={true}
+                  >
+                    <RouteBsvhusView />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(routes.dashboard.bsdas.view)}
+                element={
+                  <Modal
+                    onClose={() => navigate(-1)}
+                    ariaLabel="Aperçu du bordereau"
+                    isOpen
+                    padding={false}
+                    wide={true}
+                  >
+                    <RouteBSDasView />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(routes.dashboard.bsdas.review)}
+                element={
+                  <Modal
+                    onClose={() => navigate(-1)}
+                    ariaLabel="Demande de révision"
+                    isOpen
+                    padding={false}
+                    wide={true}
+                  >
+                    <RouteBsdaRequestRevision />
+                  </Modal>
+                }
+              />
+
+              <Route
+                path={toRelative(routes.dashboard.bsffs.view)}
+                element={
+                  <Modal
+                    onClose={() => navigate(-1)}
+                    ariaLabel="Aperçu du bordereau"
+                    isOpen
+                    padding={false}
+                    wide={true}
+                  >
+                    <RouteBsffsView />
+                  </Modal>
+                }
+              />
+            </Routes>
           )}
         </div>
       </div>

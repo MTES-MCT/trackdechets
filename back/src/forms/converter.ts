@@ -5,7 +5,7 @@ import {
   TransportMode,
   IntermediaryFormAssociation
 } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getTransporterCompanyOrgId } from "shared/constants";
 import {
   chain,
   nullIfNoValues,
@@ -536,7 +536,9 @@ export function expandTransporterFromDb(
       !transporter.transporterCompanySiret &&
       transporter.transporterTransportMode === TransportMode.ROAD
         ? null
-        : transporter.transporterTransportMode
+        : transporter.transporterTransportMode,
+    takenOverAt: transporter.takenOverAt,
+    takenOverBy: transporter.takenOverBy
   });
 }
 
@@ -835,14 +837,7 @@ export async function expandFormFromElastic(
     return null;
   }
 
-  const expanded = expandFormFromDb(formWithInclude);
-  return {
-    ...expanded,
-    transportSegments: (form.transporters ?? [])
-      .filter(t => t.number && t.number >= 2)
-      .sort((s1, s2) => s1.number - s2.number)
-      .map(segment => expandTransportSegmentFromDb(segment))
-  };
+  return expandFormFromDb(formWithInclude);
 }
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;

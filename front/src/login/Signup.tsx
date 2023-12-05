@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
-import { Mutation, MutationSignupArgs } from "generated/graphql/types";
+import { Mutation, MutationSignupArgs } from "codegen-ui";
 import { SIGNUP } from "./mutations";
-import PasswordHelper from "common/components/PasswordHelper";
+import PasswordHelper from "../common/components/PasswordHelper";
 
-import routes from "Apps/routes";
+import routes from "../Apps/routes";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -14,7 +14,7 @@ import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { PasswordInput } from "@codegouvfr/react-dsfr/blocks/PasswordInput";
 import styles from "./Login.module.scss";
 
-import { SENDER_EMAIL } from "common/config";
+import { SENDER_EMAIL } from "../common/config";
 
 export default function Signup() {
   const [submittable, setSubmittable] = useState(false);
@@ -31,7 +31,7 @@ export default function Signup() {
     SIGNUP
   );
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = `Créer un compte | ${document.title}`;
@@ -45,7 +45,7 @@ export default function Signup() {
     const userInfos = {
       email: emailValue || "",
       name: nameValue || "",
-      password: passwordValue || "",
+      password: passwordValue || ""
     };
 
     setSubmitting(true);
@@ -65,9 +65,7 @@ export default function Signup() {
   };
 
   const onConnectClick = () => {
-    history.push({
-      pathname: routes.login,
-    });
+    navigate(routes.login);
   };
 
   useEffect(() => {
@@ -117,7 +115,7 @@ export default function Signup() {
               label="Nom et prénom"
               nativeInputProps={{
                 required: true,
-                onChange: e => setNameValue(e.target.value),
+                onChange: e => setNameValue(e.target.value)
               }}
             />
             <Input
@@ -125,14 +123,14 @@ export default function Signup() {
               nativeInputProps={{
                 required: true,
                 type: "email",
-                onBlur: handleEmailChange,
+                onBlur: handleEmailChange
               }}
             />
             <PasswordInput
               label="Mot de passe"
               nativeInputProps={{
                 required: true,
-                onChange: e => setPasswordValue(e.target.value),
+                onChange: e => setPasswordValue(e.target.value)
               }}
             />
 
@@ -148,9 +146,9 @@ export default function Signup() {
                   nativeInputProps: {
                     onChange: e => {
                       setCguValue(e.currentTarget.checked);
-                    },
-                  },
-                },
+                    }
+                  }
+                }
               ]}
             />
             <a
@@ -191,15 +189,29 @@ export default function Signup() {
             <strong>{emailValue}</strong> 📨
           </p>
           <p className="fr-text--md">
-            👉 Il peut mettre quelques minutes à arriver
+            <span role="img" aria-label="emoji finger">
+              👉
+            </span>{" "}
+            Il peut mettre quelques minutes à arriver
           </p>
-          <p className="fr-text--md">👉 Vérifiez vos spams ou indésirables</p>
           <p className="fr-text--md">
-            👉 Ajoutez {SENDER_EMAIL} à vos contacts
+            <span role="img" aria-label="emoji finger">
+              👉
+            </span>{" "}
+            Vérifiez vos spams ou indésirables
           </p>
           <p className="fr-text--md">
-            👉 Si vous n'avez pas reçu l'email de confirmation au bout d'une
-            heure, vous pouvez le renvoyer depuis{" "}
+            <span role="img" aria-label="emoji finger">
+              👉
+            </span>{" "}
+            Ajoutez {SENDER_EMAIL} à vos contacts
+          </p>
+          <p className="fr-text--md">
+            <span role="img" aria-label="emoji finger">
+              👉
+            </span>{" "}
+            Si vous n'avez pas reçu l'email de confirmation au bout d'une heure,
+            vous pouvez le renvoyer depuis{" "}
             <a href={routes.resendActivationEmail} className="fr-link">
               cette page
             </a>
@@ -212,7 +224,10 @@ export default function Signup() {
           <p className="fr-text--md">
             Pour finaliser votre inscription, cliquez sur le lien qui vous a été
             envoyé par email. Vous pourrez ensuite vous connecter à
-            Trackdéchets. 🚀
+            Trackdéchets.{" "}
+            <span role="img" aria-label="emoji rocket">
+              🚀
+            </span>
           </p>
           <p className="fr-text--md">
             Des questions, des interrogations ? N'hésitez pas à nous contacter

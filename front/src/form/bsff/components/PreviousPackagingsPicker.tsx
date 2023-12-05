@@ -7,8 +7,8 @@ import {
   BsffPackagingWhere,
   BsffType,
   Query,
-  QueryBsffPackagingsArgs,
-} from "generated/graphql/types";
+  QueryBsffPackagingsArgs
+} from "codegen-ui";
 import { GET_PREVIOUS_PACKAGINGS } from "../utils/queries";
 import {
   Table,
@@ -16,9 +16,9 @@ import {
   TableCell,
   TableHead,
   TableHeaderCell,
-  TableRow,
-} from "common/components";
-import { Loader } from "Apps/common/Components";
+  TableRow
+} from "../../../common/components";
+import { Loader } from "../../../Apps/common/Components";
 import { OPERATION } from "../utils/constants";
 import { useTable, Column, useFilters } from "react-table";
 
@@ -29,7 +29,7 @@ interface PreviousBsffsPickerProps {
 
 export function PreviousPackagingsPicker({
   bsff,
-  onAddOrRemove,
+  onAddOrRemove
 }: PreviousBsffsPickerProps) {
   const code_in = Object.values(OPERATION)
     .filter(operation => operation.successors.includes(bsff.type))
@@ -42,14 +42,14 @@ export function PreviousPackagingsPicker({
         Header: "Numéro BSFF",
         accessor: bsffPackaging => bsffPackaging.bsff?.id, // TODO
         canFilter: true,
-        filter: "text",
+        filter: "text"
       },
       {
         id: "packagingsNumero",
         Header: "Numéro(s) de contenant(s)",
         accessor: bsffPackaging => bsffPackaging.numero,
         canFilter: true,
-        filter: "text",
+        filter: "text"
       },
       {
         id: "wasteCode",
@@ -63,7 +63,7 @@ export function PreviousPackagingsPicker({
             bsffPackaging.bsff?.waste?.description
           }`,
         canFilter: true,
-        filter: "text",
+        filter: "text"
       },
       {
         id: "emitter",
@@ -71,8 +71,8 @@ export function PreviousPackagingsPicker({
         accessor: bsffPackaging =>
           `${bsffPackaging.bsff?.emitter?.company?.name} (${bsffPackaging.bsff?.emitter?.company?.siret})`,
         canFilter: true,
-        filter: "text",
-      },
+        filter: "text"
+      }
     ],
     []
   );
@@ -93,7 +93,7 @@ export function PreviousPackagingsPicker({
 
   // En cas de regroupement ou de réexpédition, tous les contenants sélectionnés
   // doivent avoir le même code déchet
-  let wasteCode = React.useMemo(() => {
+  const wasteCode = React.useMemo(() => {
     if (
       previousPackagings?.length &&
       [BsffType.Groupement, BsffType.Reexpedition].includes(bsff.type)
@@ -110,18 +110,18 @@ export function PreviousPackagingsPicker({
     bsff: {
       destination: {
         company: {
-          siret: { _eq: bsff.emitter?.company?.siret },
-        },
-      },
+          siret: { _eq: bsff.emitter?.company?.siret }
+        }
+      }
     },
-    nextBsff: null,
+    nextBsff: null
   };
 
   // On autorise uniquement les réexpéditions de contenants présents sur le même BSFF
   if (bsff.type === BsffType.Reexpedition && previousPackagings?.length > 0) {
     where = {
       ...where,
-      bsff: { ...where.bsff, id: { _eq: previousPackagings[0].bsffId } },
+      bsff: { ...where.bsff, id: { _eq: previousPackagings[0].bsffId } }
     };
   }
 
@@ -137,11 +137,11 @@ export function PreviousPackagingsPicker({
     variables: {
       // pagination does not play well with bsff picking
       first: 500,
-      where,
+      where
     },
     // make sure we have fresh data here
     fetchPolicy: "cache-and-network",
-    skip: !bsff.emitter?.company?.siret?.length,
+    skip: !bsff.emitter?.company?.siret?.length
   });
 
   if (loading) {
@@ -225,7 +225,7 @@ function BsffPackagingTable({
   data,
   selected,
   push,
-  remove,
+  remove
 }: BsffPackagingTableProps) {
   const filterTypes = React.useMemo(
     () => ({
@@ -238,7 +238,7 @@ function BsffPackagingTable({
                 .includes(String(filterValue).toLowerCase())
             : true;
         });
-      },
+      }
     }),
     []
   );
@@ -246,18 +246,18 @@ function BsffPackagingTable({
   const defaultColumn = React.useMemo(
     () => ({
       // Let's set up our default Filter UI
-      Filter: DefaultColumnFilter,
+      Filter: DefaultColumnFilter
     }),
     []
   );
 
   const { getTableProps, headerGroups, getTableBodyProps, rows, prepareRow } =
-    useTable(
+    useTable<BsffPackaging>(
       {
         columns,
         data,
         filterTypes,
-        defaultColumn,
+        defaultColumn
       },
       useFilters
     );

@@ -1,7 +1,7 @@
 import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { MemoryRouter, Route } from "react-router-dom";
-import { BsdEdge } from "generated/graphql/types";
+import { BsdEdge } from "codegen-ui";
 
 import BsdCardList from "./BsdCardList";
 import bsdListDraft from "../../__mocks__/bsdListDraft.json";
@@ -15,17 +15,15 @@ export default {
   component: BsdCardList,
   design: {
     type: "figma",
-    url: "https://www.figma.com/file/tyefue5qFChEpujrFU1Jiz/Librairie-TD-dashboard?node-id=1%3A2418&t=MpuaN0XSsy6M6dxe-4",
+    url: "https://www.figma.com/file/tyefue5qFChEpujrFU1Jiz/Librairie-TD-dashboard?node-id=1%3A2418&t=MpuaN0XSsy6M6dxe-4"
   },
   decorators: [
     Story => (
       <MemoryRouter>
-        <Route>
-          <Story />
-        </Route>
+        <Route element={<Story />} />
       </MemoryRouter>
-    ),
-  ],
+    )
+  ]
 } as ComponentMeta<typeof BsdCardList>;
 
 const Template: ComponentStory<typeof BsdCardList> = args => (
@@ -41,20 +39,20 @@ const bsdCurrentTab: BsdCurrentTab = "draftTab";
 Brouillon.args = {
   siret: siret,
   bsds: bsdListDraft as unknown as BsdEdge[],
-  bsdCurrentTab,
+  bsdCurrentTab
 };
 PourAction.args = {
   siret: siret,
   bsds: bsdListActJson as unknown as BsdEdge[],
-  bsdCurrentTab,
+  bsdCurrentTab
 };
 Suvi.args = {
   siret: "13001045700013", // dreal
   bsds: bsdListFollowJson as unknown as BsdEdge[],
-  bsdCurrentTab,
+  bsdCurrentTab
 };
 Archives.args = {
   siret: siret,
   bsds: bsdListArchiveJson as unknown as BsdEdge[],
-  bsdCurrentTab,
+  bsdCurrentTab
 };

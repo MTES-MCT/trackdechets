@@ -2,9 +2,9 @@ import {
   IconBSVhu,
   IconRenewableEnergyEarth,
   IconWarehouseDelivery,
-  IconWaterDam,
-} from "Apps/common/Components/Icons/Icons";
-import { Bsvhu, FormCompany, OperationMode } from "generated/graphql/types";
+  IconWaterDam
+} from "../../../Apps/common/Components/Icons/Icons";
+import { Bsvhu, FormCompany, OperationMode } from "codegen-ui";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -12,13 +12,13 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   DateRow,
   DetailRow,
-  TransporterReceiptDetails,
+  TransporterReceiptDetails
 } from "../common/Components";
 
 import styles from "../common/BSDDetailContent.module.scss";
 import { getVerboseAcceptationStatus } from "../common/utils";
-import { getOperationModeLabel } from "common/operationModes";
-import { VHU_VERBOSE_STATUSES } from "generated/constants/statuses";
+import { getOperationModeLabel } from "../../../common/operationModes";
+import { VHU_VERBOSE_STATUSES } from "shared/constants";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -30,11 +30,11 @@ type Props = { form: Bsvhu };
 const IDENTIFICATION_TYPES_LABELS = {
   NUMERO_ORDRE_REGISTRE_POLICE:
     "N° d'ordre tels qu'ils figurent dans le registre de police",
-  NUMERO_ORDRE_LOTS_SORTANTS: "N° d'ordre des lots sortants",
+  NUMERO_ORDRE_LOTS_SORTANTS: "N° d'ordre des lots sortants"
 };
 const PACKAGING_LABELS = {
   UNITE: "En unités",
-  LOT: "En lots",
+  LOT: "En lots"
 };
 
 export function BsvhuDetailContent({ form }: Props) {

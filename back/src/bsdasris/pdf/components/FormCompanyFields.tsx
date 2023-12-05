@@ -12,7 +12,7 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
   return (
     <>
       <p>
-        Entreprise {" "}
+        Entreprise{" "}
         <input
           type="checkbox"
           checked={companyCountry && companyCountry?.cca2 === "FR"}

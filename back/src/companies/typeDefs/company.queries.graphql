@@ -6,9 +6,13 @@ type Query {
   ainsi que de la base des installations classées pour la protection de l'environnement (ICPE)
   """
   companyInfos(
-    """SIRET de l'établissement, supporte aussi un numéro TVA intracommunautaire"""
+    """
+    SIRET de l'établissement, supporte aussi un numéro TVA intracommunautaire
+    """
     siret: String
-    """Autre identifiant, par ex. numéro TVA intracommunautaire"""
+    """
+    Autre identifiant, par ex. numéro TVA intracommunautaire
+    """
     clue: String
   ): CompanyPublic!
 

@@ -1,12 +1,12 @@
 import * as React from "react";
-import { Bsff } from "generated/graphql/types";
+import { Bsff } from "codegen-ui";
 import {
   DataList,
   DataListItem,
   DataListTerm,
-  DataListDescription,
-} from "common/components";
-import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
+  DataListDescription
+} from "../../../../../common/components";
+import { PACKAGINGS_NAMES } from "../../../../../form/bsff/components/packagings/Packagings";
 
 interface BsffWasteSummaryProps {
   bsff: Bsff;

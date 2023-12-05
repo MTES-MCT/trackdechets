@@ -168,8 +168,6 @@ describe("Mutation.Bsda.sign", () => {
         }
       });
 
-      console.log(errors);
-
       expect(errors).toEqual([
         expect.objectContaining({
           message:
@@ -557,7 +555,7 @@ describe("Mutation.Bsda.sign", () => {
           }
         }
       });
-      console.log(errors);
+
       expect(errors).toEqual([
         expect.objectContaining({
           message: expect.stringContaining(

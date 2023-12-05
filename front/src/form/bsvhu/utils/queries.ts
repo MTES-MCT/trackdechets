@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { FullBsvhuFragment } from "Apps/common/queries/fragments";
+import { FullBsvhuFragment } from "../../../Apps/common/queries/fragments";
 
 export const GET_VHU_FORM = gql`
   query Bsvhu($id: ID!) {

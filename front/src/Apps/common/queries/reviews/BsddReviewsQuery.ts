@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { companyFragment } from "Apps/common/queries/fragments";
+import { companyFragment } from "../fragments";
 
 const reviewFragment = gql`
   fragment FormRevisionRequestFragment on FormRevisionRequest {

@@ -1,8 +1,5 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
-import {
-  isSiret,
-  cleanClue as cleanClueFn
-} from "../../../common/constants/companySearchHelpers";
+import { isSiret, cleanClue as cleanClueFn } from "shared/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   CompanySearchPrivate,

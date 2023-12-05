@@ -1,6 +1,6 @@
 import React from "react";
 import { Field, FieldArray, useField } from "formik";
-import RedErrorMessage from "common/components/RedErrorMessage";
+import RedErrorMessage from "../../common/components/RedErrorMessage";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 
@@ -33,7 +33,7 @@ export default function AccountCompanyAddEcoOrganisme() {
                           nativeInputProps={{
                             type: "text",
                             placeholder: "https://",
-                            ...field,
+                            ...field
                           }}
                         ></Input>
                       );

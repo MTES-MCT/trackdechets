@@ -1,5 +1,5 @@
 import { errors, estypes } from "@elastic/elasticsearch";
-import logger from "../../../logging/logger";
+import { logger } from "@td/logger";
 import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
 import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
 import { SireneSearchResult } from "../types";
@@ -10,6 +10,7 @@ import {
   SearchStockEtablissement
 } from "./types";
 import client from "./esClient";
+import { SEARCH_COMPANIES_MAX_SIZE } from "../insee/client";
 
 const { ResponseError } = errors;
 /**
@@ -208,7 +209,7 @@ export const searchCompanies = (
   const searchRequest: SearchOptions = {
     ...options,
     _source_excludes: "td_search_companies",
-    size: 20,
+    size: SEARCH_COMPANIES_MAX_SIZE,
     index,
     body: {
       // QueryDSL docs https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html

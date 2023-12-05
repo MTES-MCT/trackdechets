@@ -4,23 +4,27 @@ import {
   Mutation,
   Query,
   QueryBsdasriArgs,
-  MutationPublishBsdasriArgs,
-} from "generated/graphql/types";
+  MutationPublishBsdasriArgs
+} from "codegen-ui";
 import {
   NotificationError,
-  InlineError,
-} from "Apps/common/Components/Error/Error";
+  InlineError
+} from "../../../../../Apps/common/Components/Error/Error";
 
-import Loader from "Apps/common/Components/Loader/Loaders";
+import Loader from "../../../../../Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation, gql } from "@apollo/client";
-import routes from "Apps/routes";
-import { useParams, useHistory, generatePath, Link } from "react-router-dom";
-import { GET_DETAIL_DASRI_WITH_METADATA, GET_BSDS } from "Apps/common/queries";
+import routes from "../../../../../Apps/routes";
+import { useParams, useNavigate, generatePath, Link } from "react-router-dom";
+import {
+  GET_DETAIL_DASRI_WITH_METADATA,
+  GET_BSDS
+} from "../../../../../Apps/common/queries";
+import { TOAST_DURATION } from "../../../../../common/config";
 
-import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
-import cogoToast from "cogo-toast";
+import EmptyDetail from "../../../../detail/common/EmptyDetailView";
+import toast from "react-hot-toast";
 
-import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
+import { BdasriSummary } from "../Summary/BsdasriSummary";
 
 const PUBLISH_BSDASRI = gql`
   mutation PublishBsdasri($id: ID!) {
@@ -32,34 +36,36 @@ const PUBLISH_BSDASRI = gql`
 `;
 export function RoutePublishBsdasri() {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { error, data, loading } = useQuery<
     Pick<Query, "bsdasri">,
     QueryBsdasriArgs
   >(GET_DETAIL_DASRI_WITH_METADATA, {
     variables: {
-      id: formId,
+      id: formId!
     },
 
-    fetchPolicy: "no-cache",
+    fetchPolicy: "no-cache"
   });
 
   const [publishBsdasri, { loading: mutationLoading, error: publishError }] =
     useMutation<Pick<Mutation, "publishBsdasri">, MutationPublishBsdasriArgs>(
       PUBLISH_BSDASRI,
       {
-        variables: { id: formId },
+        variables: { id: formId! },
         refetchQueries: [GET_BSDS],
         awaitRefetchQueries: true,
         onCompleted: () => {
-          cogoToast.success(`Bordereau ${formId} publié`, { hideAfter: 5 });
-          history.goBack();
+          toast.success(`Bordereau ${formId} publié`, {
+            duration: TOAST_DURATION
+          });
+          navigate(-1);
         },
         onError: () =>
-          cogoToast.error(`Le bordereau ${formId} n'a pas pu être publié`, {
-            hideAfter: 5,
-          }),
+          toast.error(`Le bordereau ${formId} n'a pas pu être publié`, {
+            duration: TOAST_DURATION
+          })
       }
     );
   if (error) {
@@ -90,7 +96,12 @@ export function RoutePublishBsdasri() {
         Une fois publié, le bordereau sera prêt pour l'enlèvement.
       </p>
       <div className="td-modal-actions">
-        <button className="btn btn--outline-primary" onClick={history.goBack}>
+        <button
+          className="btn btn--outline-primary"
+          onClick={() => {
+            navigate(-1);
+          }}
+        >
           Annuler
         </button>
         <button
@@ -99,8 +110,8 @@ export function RoutePublishBsdasri() {
           onClick={() =>
             publishBsdasri({
               variables: {
-                id: formId,
-              },
+                id: formId!
+              }
             })
           }
         >
@@ -122,7 +133,7 @@ export function RoutePublishBsdasri() {
           <Link
             to={generatePath(routes.dashboard.bsdasris.edit, {
               siret,
-              id: formId,
+              id: formId
             })}
             className="btn btn--primary"
           >

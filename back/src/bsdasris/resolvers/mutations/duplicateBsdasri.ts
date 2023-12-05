@@ -11,6 +11,7 @@ import { getBsdasriRepository } from "../../repository";
 import { checkCanDuplicate } from "../../permissions";
 import prisma from "../../../prisma";
 import { ForbiddenError } from "../../../common/errors";
+import { sirenifyBsdasriCreateInput } from "../../sirenify";
 
 /**
  *
@@ -53,6 +54,11 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     emissionSignatoryId,
     emitterEmissionSignatureDate,
     emitterEmissionSignatureAuthor,
+
+    emitterWasteWeightValue,
+    emitterWastePackagings,
+    emitterWasteWeightIsEstimate,
+    emitterWasteVolume,
 
     isEmissionDirectTakenOver,
     isEmissionTakenOverWithSecretCode,
@@ -101,12 +107,9 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     bsdasri
   );
 
-  return bsdasriRepository.create({
+  const input: Prisma.BsdasriCreateInput = {
     ...fieldsToCopy,
-    emitterWastePackagings:
-      fieldsToCopy.emitterWastePackagings === null
-        ? Prisma.JsonNull
-        : fieldsToCopy.emitterWastePackagings,
+    emitterWastePackagings: Prisma.JsonNull,
     id: getReadableId(ReadableIdPrefix.DASRI),
     status: BsdasriStatus.INITIAL,
     isDraft: true,
@@ -143,7 +146,11 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
       transporter?.transporterReceipt?.validityLimit ?? null,
     transporterRecepisseDepartment:
       transporter?.transporterReceipt?.department ?? null
-  });
+  };
+
+  const sirenified = await sirenifyBsdasriCreateInput(input, []);
+
+  return bsdasriRepository.create(sirenified);
 }
 
 async function getBsdasriCompanies(bsdasri: Bsdasri) {

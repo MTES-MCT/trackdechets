@@ -1,4 +1,4 @@
-import { EmitterType, TransportMode } from "generated/graphql/types";
+import { EmitterType, TransportMode } from "codegen-ui";
 
 export const ITEMS_PER_PAGE = 50;
 
@@ -11,14 +11,14 @@ enum PublicTransportMode {
   Rail = "RAIL",
   River = "RIVER",
   Road = "ROAD",
-  Sea = "SEA",
+  Sea = "SEA"
 }
 export const transportModeLabels: Record<PublicTransportMode, string> = {
   [TransportMode.Road]: "Route",
   [TransportMode.Air]: "Voie aérienne",
   [TransportMode.Rail]: "Voie ferrée",
   [TransportMode.River]: "Voie fluviale",
-  [TransportMode.Sea]: "Voie maritime",
+  [TransportMode.Sea]: "Voie maritime"
 };
 
 export function getTransportModeLabel(mode: string | null | undefined) {
@@ -36,5 +36,5 @@ export const emitterTypeLabels = {
   [EmitterType.Appendix2]:
     "Personne ayant transformé ou réalisé un traitement dont la provenance reste identifiable",
   [EmitterType.Appendix1]:
-    "Collecteur d'un bordereau de tournée dédiée (Annexe 1)",
+    "Collecteur d'un bordereau de tournée dédiée (Annexe 1)"
 };

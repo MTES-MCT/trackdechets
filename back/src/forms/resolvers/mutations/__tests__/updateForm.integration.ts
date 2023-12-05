@@ -2350,6 +2350,96 @@ describe("Mutation.updateForm", () => {
     ]);
   });
 
+  it("should be possible to update a weight > 40 T when transport mode is not ROAD", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX2,
+        wasteDetailsCode: "01 03 04*",
+        wasteDetailsQuantity: 10,
+        transporters: {
+          create: {
+            transporterTransportMode: "ROAD",
+            number: 1
+          }
+        }
+      }
+    });
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          wasteDetails: { quantity: 50 },
+          transporter: { mode: "RIVER" }
+        }
+      }
+    });
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.updateForm.id },
+      include: { transporters: true }
+    });
+    expect(updatedForm.wasteDetailsQuantity).toEqual(50);
+
+    expect(updatedForm.transporters).toHaveLength(1);
+    expect(updatedForm.transporters[0]?.transporterTransportMode).toEqual(
+      "RIVER"
+    );
+  });
+
+  it("should be possible to update a weight > 40 T when deleting first transporter by road", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX2,
+        wasteDetailsCode: "01 03 04*",
+        wasteDetailsQuantity: 10,
+        transporters: {
+          create: { transporterTransportMode: "ROAD", number: 1 }
+        }
+      }
+    });
+    // crée un second transporter fluivale
+    await prisma.bsddTransporter.create({
+      data: { transporterTransportMode: "RIVER", number: 2, formId: form.id }
+    });
+
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          wasteDetails: { quantity: 50 },
+          // supprime le premier transporteur mais conserve les transporteurs suivants
+          transporter: null
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.updateForm.id },
+      include: { transporters: true }
+    });
+    expect(updatedForm.wasteDetailsQuantity).toEqual(50);
+
+    expect(updatedForm.transporters).toHaveLength(1);
+    expect(updatedForm.transporters[0]?.transporterTransportMode).toEqual(
+      "RIVER"
+    );
+  });
+
   it("should clean appendix1 items on update", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: producerCompany } = await userWithCompanyFactory("MEMBER");

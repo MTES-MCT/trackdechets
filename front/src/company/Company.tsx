@@ -2,14 +2,14 @@ import { useQuery, gql } from "@apollo/client";
 import React, { useEffect, useState } from "react";
 import * as Sentry from "@sentry/browser";
 import { useParams } from "react-router-dom";
-import { InlineError } from "Apps/common/Components/Error/Error";
+import { InlineError } from "../Apps/common/Components/Error/Error";
 import "./Company.scss";
 import CompanyContact from "./CompanyContact";
 import CompanyDisclaimer from "./CompanyDisclaimer";
 import CompanyHeader from "./CompanyHeader";
 import CompanyMap from "./CompanyMap";
 import CompanyRegistration from "./CompanyRegistration";
-import { Query, QueryCompanyInfosArgs } from "generated/graphql/types";
+import { Query, QueryCompanyInfosArgs } from "codegen-ui";
 
 const COMPANY_INFOS = gql`
   query CompanyInfos($clue: String!) {
@@ -61,7 +61,7 @@ export default function CompanyInfo() {
     QueryCompanyInfosArgs
   >(COMPANY_INFOS, {
     variables: { clue: orgId },
-    fetchPolicy: "no-cache",
+    fetchPolicy: "no-cache"
   });
 
   const [geoInfo, setGeoInfo] = useState<GeoInfo | null>(null);
@@ -88,7 +88,7 @@ export default function CompanyInfo() {
               if (coordinates && coordinates.length === 2) {
                 setGeoInfo({
                   longitude: coordinates[0],
-                  latitude: coordinates[1],
+                  latitude: coordinates[1]
                 });
               }
             }

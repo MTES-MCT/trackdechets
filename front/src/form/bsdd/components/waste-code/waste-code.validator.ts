@@ -1,5 +1,5 @@
-import { wasteCodeValidator } from "form/common/wasteCode";
-import { BSDD_WASTES } from "generated/constants";
+import { wasteCodeValidator } from "../../../common/wasteCode";
+import { BSDD_WASTES } from "shared/constants";
 
 export function bsddWasteCodeValidator(wasteCode: string) {
   const error = wasteCodeValidator(wasteCode);

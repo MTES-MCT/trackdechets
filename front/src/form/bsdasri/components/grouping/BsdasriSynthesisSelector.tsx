@@ -1,11 +1,11 @@
 import { getIn, useFormikContext } from "formik";
 import React, { useEffect, useReducer } from "react";
 import { useQuery } from "@apollo/client";
-import { Bsdasri } from "generated/graphql/types";
+import { Bsdasri } from "codegen-ui";
 import BsdasriTableSynthesis from "./BsdasriTableSynthesis";
-import { GET_DETAIL_DASRI } from "Apps/common/queries";
+import { GET_DETAIL_DASRI } from "../../../../Apps/common/queries";
 
-import { Query, QueryBsdasriArgs } from "generated/graphql/types";
+import { Query, QueryBsdasriArgs } from "codegen-ui";
 type State = { selected: string[] };
 
 type Action =
@@ -15,22 +15,25 @@ type Action =
 
 function reducer(state: State, action: Action) {
   switch (action.type) {
-    case "select":
+    case "select": {
       const sp = action.payload;
       return {
-        selected: [sp.id, ...state.selected],
+        selected: [sp.id, ...state.selected]
       };
-    case "unselect":
+    }
+    case "unselect": {
       const usp = action.payload;
 
       return {
-        selected: state.selected.filter(v => v !== usp.id),
+        selected: state.selected.filter(v => v !== usp.id)
       };
-    case "selectAll":
+    }
+    case "selectAll": {
       const sap = action.payload;
       return {
-        selected: sap.map(v => v.id),
+        selected: sap.map(v => v.id)
       };
+    }
     default:
       throw new Error("Unknown action type");
   }
@@ -43,15 +46,15 @@ export default function BsdasriSelectorForSynthesis({ disabled }) {
     GET_DETAIL_DASRI,
     {
       variables: {
-        id: values?.id,
+        id: values?.id
       },
       fetchPolicy: "network-only",
-      skip: !values?.id,
+      skip: !values?.id
     }
   );
 
   const [state, dispatch] = useReducer(reducer, {
-    selected: getIn(values, "synthesizing"),
+    selected: getIn(values, "synthesizing")
   });
 
   const regroupedInDB = !!data
@@ -69,7 +72,7 @@ export default function BsdasriSelectorForSynthesis({ disabled }) {
     if (Array.isArray(payload)) {
       return dispatch({
         type: "selectAll",
-        payload,
+        payload
       });
     }
 

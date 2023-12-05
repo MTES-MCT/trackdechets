@@ -9,6 +9,7 @@ import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
 import { format } from "date-fns";
 
 const SIRENE_API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V3";
+export const SEARCH_COMPANIES_MAX_SIZE = 20;
 
 /**
  * Build a company object from a search response
@@ -149,7 +150,7 @@ export function searchCompanies(
   // the date parameter allows to apply the filter on current period
   const q = `${filters.join(" AND ")} &date=${today}`;
 
-  const searchUrl = `${SIRENE_API_BASE_URL}/siret?q=${q}`;
+  const searchUrl = `${SIRENE_API_BASE_URL}/siret?q=${q}&nombre=${SEARCH_COMPANIES_MAX_SIZE}`;
 
   // API docs https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/pages/item-info.jag?name=Sirene&version=V3&provider=insee#!/Etablissement/findSiretByQ
   // Nombre d'éléments demandés dans la réponse, défaut 20

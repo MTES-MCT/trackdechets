@@ -2,20 +2,17 @@ import * as React from "react";
 import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
 import { gql, useMutation } from "@apollo/client";
-import cogoToast from "cogo-toast";
+import toast from "react-hot-toast";
 import {
   AnonymousCompanyInput,
   Mutation,
-  MutationCreateAnonymousCompanyArgs,
-} from "generated/graphql/types";
-import { InlineError } from "Apps/common/Components/Error/Error";
-import { RedErrorMessage } from "common/components";
-import {
-  isFRVat,
-  isSiret,
-  isVat,
-} from "generated/constants/companySearchHelpers";
-import { nafCodes } from "generated/constants/NAF";
+  MutationCreateAnonymousCompanyArgs
+} from "codegen-ui";
+import { InlineError } from "../../Apps/common/Components/Error/Error";
+import { RedErrorMessage } from "../../common/components";
+import { isFRVat, isSiret, isVat } from "shared/constants";
+import { nafCodes } from "shared/constants";
+import { TOAST_DURATION } from "../../common/config";
 
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 export const MISSING_COMPANY_VAT =
@@ -60,7 +57,7 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       .when("vatNumber", {
         is: vatNumber => !vatNumber,
         then: schema => schema.required(),
-        otherwise: schema => schema.ensure(),
+        otherwise: schema => schema.ensure()
       })
       .test(
         "is-siret",
@@ -68,7 +65,7 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
         value =>
           !value ||
           isSiret(value, import.meta.env.VITE_ALLOW_TEST_COMPANY === "true")
-      ),
+      )
   });
 
 export function CreateAnonymousCompany() {
@@ -85,18 +82,18 @@ export function CreateAnonymousCompany() {
         codeNaf: "",
         name: "",
         siret: "",
-        vatNumber: "",
+        vatNumber: ""
       }}
       validationSchema={AnonymousCompanyInputSchema}
       onSubmit={async (values, { resetForm }) => {
         const { data } = await createAnonymousCompany({
-          variables: { input: values },
+          variables: { input: values }
         });
         resetForm();
         if (data) {
-          cogoToast.success(
+          toast.success(
             `L'entreprise "${data?.createAnonymousCompany.orgId}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
-            { hideAfter: 6 }
+            { duration: TOAST_DURATION }
           );
         }
       }}

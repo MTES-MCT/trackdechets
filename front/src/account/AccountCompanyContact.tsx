@@ -1,14 +1,13 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { filter } from "graphql-anywhere";
 import AccountFieldCompanyContact from "./fields/AccountFieldCompanyContact";
 import AccountFieldCompanyContactEmail from "./fields/AccountFieldCompanyContactEmail";
 import AccountFieldCompanyContactPhone from "./fields/AccountFieldCompanyContactPhone";
 import AccountFieldCompanyWebsite from "./fields/AccountFieldCompanyWebsite";
 import AccountFieldCompanyAgreements from "./fields/AccountFieldCompanyAgreements";
-import { CompanyPrivate, CompanyType } from "../generated/graphql/types";
+import { CompanyPrivate, CompanyType } from "codegen-ui";
 import { generatePath } from "react-router-dom";
-import routes from "Apps/routes";
+import routes from "../Apps/routes";
 
 type Props = {
   company: CompanyPrivate;
@@ -32,7 +31,7 @@ AccountCompanyContact.fragments = {
     ${AccountFieldCompanyContactPhone.fragments.company}
     ${AccountFieldCompanyWebsite.fragments.company}
     ${AccountFieldCompanyAgreements.fragments.company}
-  `,
+  `
 };
 
 export default function AccountCompanyContact({ company }: Props) {
@@ -52,24 +51,10 @@ export default function AccountCompanyContact({ company }: Props) {
         pour compléter automatiquement les informations de contact sur les
         bordereaux lorsque votre n°SIRET est visé.
       </div>
-      <AccountFieldCompanyContact
-        company={filter(AccountFieldCompanyContact.fragments.company, company)}
-      />
-      <AccountFieldCompanyContactEmail
-        company={filter(
-          AccountFieldCompanyContactEmail.fragments.company,
-          company
-        )}
-      />
-      <AccountFieldCompanyContactPhone
-        company={filter(
-          AccountFieldCompanyContactPhone.fragments.company,
-          company
-        )}
-      />
-      <AccountFieldCompanyWebsite
-        company={filter(AccountFieldCompanyWebsite.fragments.company, company)}
-      />
+      <AccountFieldCompanyContact company={company} />
+      <AccountFieldCompanyContactEmail company={company} />
+      <AccountFieldCompanyContactPhone company={company} />
+      <AccountFieldCompanyWebsite company={company} />
       {company.companyTypes.includes(CompanyType.EcoOrganisme) && (
         <AccountFieldCompanyAgreements company={company} />
       )}

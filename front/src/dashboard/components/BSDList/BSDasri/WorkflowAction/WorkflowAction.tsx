@@ -1,17 +1,17 @@
 import React from "react";
 
-import { ActionLink } from "common/components";
-import { generatePath, useLocation, useRouteMatch } from "react-router-dom";
+import { ActionLink } from "../../../../../common/components";
+import { generatePath, useLocation, useMatch } from "react-router-dom";
 
 import {
   IconCheckCircle1,
   IconShipmentSignSmartphone,
-  IconPaperWrite,
-} from "Apps/common/Components/Icons/Icons";
+  IconPaperWrite
+} from "../../../../../Apps/common/Components/Icons/Icons";
 
-import routes from "Apps/routes";
+import routes from "../../../../../Apps/routes";
 
-import { Bsdasri, BsdasriStatus, BsdasriType } from "generated/graphql/types";
+import { Bsdasri, BsdasriStatus, BsdasriType } from "codegen-ui";
 
 export interface WorkflowActionProps {
   form: Bsdasri;
@@ -34,8 +34,8 @@ const isPublishable = (form: Bsdasri) => {
 export function WorkflowAction(props: WorkflowActionProps) {
   const { form, siret } = props;
   const location = useLocation();
-  const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
-  const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
+  const isActTab = !!useMatch(routes.dashboard.bsds.act);
+  const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
 
   const isSynthesis = form.type === BsdasriType.Synthesis;
   const isAssociatedToSynthesis = !!form?.synthesizedIn?.id;
@@ -56,9 +56,9 @@ export function WorkflowAction(props: WorkflowActionProps) {
         to={{
           pathname: generatePath(routes.dashboard.bsdasris.sign.publish, {
             siret,
-            id: form.id,
+            id: form.id
           }),
-          state: { background: location },
+          state: { background: location }
         }}
       >
         Publier le bordereau
@@ -74,25 +74,20 @@ export function WorkflowAction(props: WorkflowActionProps) {
       if (isHolder && isActTab && !isSynthesis) {
         // no emitter signature for synthesis bsds
         return (
-          <>
-            <ActionLink
-              icon={<IconCheckCircle1 size="24px" />}
-              to={{
-                pathname: generatePath(
-                  routes.dashboard.bsdasris.sign.emission,
-                  {
-                    siret,
-                    id: form.id,
-                  }
-                ),
-                state: { background: location },
-              }}
-            >
-              {isEcoOrganisme
-                ? "Signature Éco-organisme"
-                : "Signature producteur"}
-            </ActionLink>
-          </>
+          <ActionLink
+            icon={<IconCheckCircle1 size="24px" />}
+            to={{
+              pathname: generatePath(routes.dashboard.bsdasris.sign.emission, {
+                siret,
+                id: form.id
+              }),
+              state: { background: location }
+            }}
+          >
+            {isEcoOrganisme
+              ? "Signature Éco-organisme"
+              : "Signature producteur"}
+          </ActionLink>
         );
       }
 
@@ -108,10 +103,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
                     routes.dashboard.bsdasris.sign.emissionSecretCode,
                     {
                       siret,
-                      id: form.id,
+                      id: form.id
                     }
                   ),
-                  state: { background: location },
+                  state: { background: location }
                 }}
               >
                 Signature émetteur
@@ -127,10 +122,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
                       routes.dashboard.bsdasris.sign.directTakeover,
                       {
                         siret,
-                        id: form.id,
+                        id: form.id
                       }
                     ),
-                    state: { background: location },
+                    state: { background: location }
                   }}
                 >
                   Emport direct transporteur
@@ -144,10 +139,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
                     routes.dashboard.bsdasris.sign.synthesisTakeover,
                     {
                       siret,
-                      id: form.id,
+                      id: form.id
                     }
                   ),
-                  state: { background: location },
+                  state: { background: location }
                 }}
               >
                 Validation emport (Synthèse)
@@ -174,10 +169,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
                 routes.dashboard.bsdasris.sign.transporter,
                 {
                   siret,
-                  id: form.id,
+                  id: form.id
                 }
               ),
-              state: { background: location },
+              state: { background: location }
             }}
           >
             Signature transporteur
@@ -195,9 +190,9 @@ export function WorkflowAction(props: WorkflowActionProps) {
             to={{
               pathname: generatePath(routes.dashboard.bsdasris.sign.reception, {
                 siret,
-                id: form.id,
+                id: form.id
               }),
-              state: { background: location },
+              state: { background: location }
             }}
           >
             Signature réception
@@ -209,23 +204,18 @@ export function WorkflowAction(props: WorkflowActionProps) {
     case BsdasriStatus.Received: {
       if (isDestination && isActTab) {
         return (
-          <>
-            <ActionLink
-              icon={<IconCheckCircle1 size="24px" />}
-              to={{
-                pathname: generatePath(
-                  routes.dashboard.bsdasris.sign.operation,
-                  {
-                    siret,
-                    id: form.id,
-                  }
-                ),
-                state: { background: location },
-              }}
-            >
-              Signature traitement
-            </ActionLink>
-          </>
+          <ActionLink
+            icon={<IconCheckCircle1 size="24px" />}
+            to={{
+              pathname: generatePath(routes.dashboard.bsdasris.sign.operation, {
+                siret,
+                id: form.id
+              }),
+              state: { background: location }
+            }}
+          >
+            Signature traitement
+          </ActionLink>
         );
       }
       return null;

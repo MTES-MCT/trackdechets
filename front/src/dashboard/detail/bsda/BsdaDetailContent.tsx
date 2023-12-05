@@ -5,36 +5,37 @@ import {
   IconRenewableEnergyEarth,
   IconWarehouseDelivery,
   IconWarehousePackage,
-  IconWaterDam,
-} from "Apps/common/Components/Icons/Icons";
-import routes from "Apps/routes";
-import { useDownloadPdf } from "dashboard/components/BSDList/BSDa/BSDaActions/useDownloadPdf";
-import { useDuplicate } from "dashboard/components/BSDList/BSDa/BSDaActions/useDuplicate";
-import { transportModeLabels } from "dashboard/constants";
-import styles from "dashboard/detail/common/BSDDetailContent.module.scss";
+  IconWaterDam
+} from "../../../Apps/common/Components/Icons/Icons";
+import routes from "../../../Apps/routes";
+import { useDownloadPdf } from "../../components/BSDList/BSDa/BSDaActions/useDownloadPdf";
+import { useDuplicate } from "../../components/BSDList/BSDa/BSDaActions/useDuplicate";
+import { transportModeLabels } from "../../constants";
+import styles from "../common/BSDDetailContent.module.scss";
 import {
   DateRow,
   DetailRow,
   TransporterReceiptDetails,
-  YesNoRow,
-} from "dashboard/detail/common/Components";
-import { getVerboseAcceptationStatus } from "dashboard/detail/common/utils";
-import { PACKAGINGS_NAMES } from "form/bsda/components/packagings/Packagings";
+  YesNoRow
+} from "../common/Components";
+import { getVerboseAcceptationStatus } from "../common/utils";
+import { PACKAGINGS_NAMES } from "../../../form/bsda/components/packagings/Packagings";
 import {
   Bsda,
   BsdaNextDestination,
   BsdaType,
   FormCompany,
-  OperationMode,
-} from "generated/graphql/types";
+  OperationMode
+} from "codegen-ui";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
-import { generatePath, useHistory, useParams } from "react-router-dom";
+import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { InitialBsdas } from "./InitialBsdas";
-import { getOperationModeLabel } from "common/operationModes";
-import EstimatedQuantityTooltip from "common/components/EstimatedQuantityTooltip";
-import { BSDA_VERBOSE_STATUSES } from "generated/constants/statuses";
+import { getOperationModeLabel } from "../../../common/operationModes";
+import EstimatedQuantityTooltip from "../../../common/components/EstimatedQuantityTooltip";
+import { BSDA_VERBOSE_STATUSES } from "shared/constants";
+import ExpandableList from "./ExpandableList";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -280,43 +281,41 @@ const Recipient = ({ form }: { form: Bsda }) => {
 };
 
 const Broker = ({ broker }) => (
-  <>
-    <div className={styles.detailColumns}>
-      <div className={styles.detailGrid}>
-        <dt>Courtier</dt>
-        <dd>{broker.company?.name}</dd>
+  <div className={styles.detailColumns}>
+    <div className={styles.detailGrid}>
+      <dt>Courtier</dt>
+      <dd>{broker.company?.name}</dd>
 
-        <dt>Siret</dt>
-        <dd>{broker.company?.siret}</dd>
+      <dt>Siret</dt>
+      <dd>{broker.company?.siret}</dd>
 
-        <dt>Adresse</dt>
-        <dd>{broker.company?.address}</dd>
+      <dt>Adresse</dt>
+      <dd>{broker.company?.address}</dd>
 
-        <dt>Tél</dt>
-        <dd>{broker.company?.phone}</dd>
+      <dt>Tél</dt>
+      <dd>{broker.company?.phone}</dd>
 
-        <dt>Mél</dt>
-        <dd>{broker.company?.mail}</dd>
+      <dt>Mél</dt>
+      <dd>{broker.company?.mail}</dd>
 
-        <dt>Contact</dt>
-        <dd>{broker.company?.contact}</dd>
-      </div>
-      <div className={styles.detailGrid}>
-        <DetailRow value={broker.recepisse?.number} label="Récépissé" />
-        <DetailRow value={broker.recepisse?.department} label="Départment" />
-        <DateRow
-          value={broker.recepisse?.validityLimit}
-          label="Date de validité"
-        />
-      </div>
+      <dt>Contact</dt>
+      <dd>{broker.company?.contact}</dd>
     </div>
-  </>
+    <div className={styles.detailGrid}>
+      <DetailRow value={broker.recepisse?.number} label="Récépissé" />
+      <DetailRow value={broker.recepisse?.department} label="Départment" />
+      <DateRow
+        value={broker.recepisse?.validityLimit}
+        label="Date de validité"
+      />
+    </div>
+  </div>
 );
 
 const NextDestination = ({
   nextDestination,
   forwardedIn,
-  groupedIn,
+  groupedIn
 }: {
   nextDestination: BsdaNextDestination;
   forwardedIn?: Bsda | null;
@@ -419,17 +418,17 @@ const Intermediaries = ({ intermediaries }) => (
 
 export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [duplicate] = useDuplicate({
     variables: { id: form.id },
     onCompleted: () => {
-      history.push(
+      navigate(
         generatePath(routes.dashboard.bsds.drafts, {
-          siret,
+          siret
         })
       );
-    },
+    }
   });
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
   const initialBsdas = form.forwarding ? [form.forwarding] : form.grouping;
@@ -506,7 +505,9 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             </dd>
 
             <dt>Scellés</dt>
-            <dd>{form?.waste?.sealNumbers?.join(", ")}</dd>
+            <dd>
+              <ExpandableList elements={form?.waste?.sealNumbers} />
+            </dd>
 
             <dt>Présence de POP</dt>
             <dd>{form?.waste?.pop ? "Oui" : "Non"}</dd>
@@ -515,8 +516,10 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
           <div className={styles.detailGrid}>
             {Boolean(form?.grouping?.length) && (
               <>
-                <dt>Bordereaux groupés:</dt>
-                <dd> {form?.grouping?.map(g => g.id).join(", ")}</dd>
+                <dt>Bordereaux groupés</dt>
+                <dd>
+                  <ExpandableList elements={form?.grouping?.map(g => g.id)} />
+                </dd>
               </>
             )}
           </div>

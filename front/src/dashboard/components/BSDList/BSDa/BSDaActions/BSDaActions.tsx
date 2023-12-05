@@ -1,23 +1,23 @@
 import * as React from "react";
 import { generatePath, useParams, useLocation } from "react-router-dom";
-import routes from "Apps/routes";
+import routes from "../../../../../Apps/routes";
 import {
   IconView,
   IconPaperWrite,
   IconPdf,
   IconDuplicateFile,
   IconTrash,
-  IconQrCode,
-} from "Apps/common/Components/Icons/Icons";
-import { Bsda, BsdaStatus } from "generated/graphql/types";
+  IconQrCode
+} from "../../../../../Apps/common/Components/Icons/Icons";
+import { Bsda, BsdaStatus } from "codegen-ui";
 import { DeleteBsdaModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
 import { useDuplicate } from "./useDuplicate";
 import { useDisplayRoadControlButton } from "../../RoadControlButton";
 
 import styles from "../../BSDActions.module.scss";
-import { Loader } from "Apps/common/Components";
-import DropdownMenu from "Apps/common/Components/DropdownMenu/DropdownMenu";
+import { Loader } from "../../../../../Apps/common/Components";
+import DropdownMenu from "../../../../../Apps/common/Components/DropdownMenu/DropdownMenu";
 
 interface BSdaActionsProps {
   form: Bsda;
@@ -28,7 +28,7 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
   const location = useLocation();
 
   const [duplicateBsda, { loading }] = useDuplicate({
-    variables: { id: form.id },
+    variables: { id: form.id }
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
@@ -44,24 +44,24 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
       route: {
         pathname: generatePath(routes.dashboard.roadControl, {
           siret,
-          id: form.id,
+          id: form.id
         }),
-        state: { background: location },
+        state: { background: location }
       },
       icon: <IconQrCode color="blueLight" size="24px" />,
-      isVisible: useDisplayRoadControlButton(form),
+      isVisible: useDisplayRoadControlButton(form)
     },
     {
       title: "Aperçu",
       route: {
         pathname: generatePath(routes.dashboard.bsdas.view, {
           siret,
-          id: form.id,
+          id: form.id
         }),
-        state: { background: location },
+        state: { background: location }
       },
       icon: <IconView color="blueLight" size="24px" />,
-      isVisible: true,
+      isVisible: true
     },
     {
       title: "Pdf",
@@ -69,7 +69,7 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
       icon: <IconPdf size="24px" color="blueLight" />,
       isVisible: !form.isDraft,
       isButton: true,
-      handleClick: () => downloadPdf(),
+      handleClick: () => downloadPdf()
     },
     {
       title: "Dupliquer",
@@ -77,20 +77,20 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
       icon: <IconDuplicateFile size="24px" color="blueLight" />,
       isVisible: true,
       isButton: true,
-      handleClick: () => duplicateBsda(),
+      handleClick: () => duplicateBsda()
     },
     {
       title: "Modifier",
       route: generatePath(routes.dashboard.bsdas.edit, {
         siret,
-        id: form.id,
+        id: form.id
       }),
       icon: <IconPaperWrite size="24px" color="blueLight" />,
       isVisible: ![
         BsdaStatus.Processed,
         BsdaStatus.Refused,
-        BsdaStatus.AwaitingChild,
-      ].includes(form["bsdaStatus"]),
+        BsdaStatus.AwaitingChild
+      ].includes(form["bsdaStatus"])
     },
     {
       title: "Supprimer",
@@ -98,21 +98,21 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
       icon: <IconTrash color="blueLight" size="24px" />,
       isVisible: canDelete,
       isButton: true,
-      handleClick: () => setIsDeleting(true),
+      handleClick: () => setIsDeleting(true)
     },
     {
       title: "Révision",
       route: {
         pathname: generatePath(routes.dashboard.bsdas.review, {
           siret,
-          id: form.id,
+          id: form.id
         }),
-        state: { background: location },
+        state: { background: location }
       },
       icon: <IconPaperWrite size="24px" color="blueLight" />,
 
-      isVisible: !canDelete,
-    },
+      isVisible: !canDelete
+    }
   ];
 
   return (

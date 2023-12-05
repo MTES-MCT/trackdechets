@@ -1,4 +1,4 @@
-import { SimpleNotificationError } from "Apps/common/Components/Error/Error";
+import { SimpleNotificationError } from "../Apps/common/Components/Error/Error";
 import React, { ReactElement } from "react";
 
 interface ErrorProps {

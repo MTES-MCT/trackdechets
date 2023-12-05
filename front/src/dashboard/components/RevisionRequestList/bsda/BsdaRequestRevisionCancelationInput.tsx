@@ -1,4 +1,4 @@
-import { Bsda, BsdaStatus } from "generated/graphql/types";
+import { Bsda, BsdaStatus } from "codegen-ui";
 import React from "react";
 import { Switch } from "../bsdd/request/Switch";
 
@@ -7,7 +7,7 @@ const CANCELLABLE_BSDA_STATUSES = [
   // BsdaStatus.Initial,
   // BsdaStatus.SignedByProducer,
   BsdaStatus.SignedByWorker,
-  BsdaStatus.Sent,
+  BsdaStatus.Sent
   // BsdaStatus.Processed,
   // BsdaStatus.Refused,
   // BsdaStatus.AwaitingChild,
@@ -28,20 +28,18 @@ const CANCELATION_NOT_POSSIBLE_MSG = `Impossible d'annuler ce bordereau. Il est 
 export function BsdaRequestRevisionCancelationInput({
   defaultValue = false,
   bsda,
-  onChange,
+  onChange
 }: Props) {
   const canBeCancelled = CANCELLABLE_BSDA_STATUSES.includes(bsda.status);
 
   return (
-    <>
-      <Switch
-        title="Annuler le bordereau"
-        defaultValue={defaultValue}
-        disabled={!canBeCancelled}
-        onChange={onChange}
-      >
-        {canBeCancelled ? CANCELATION_MSG : CANCELATION_NOT_POSSIBLE_MSG}
-      </Switch>
-    </>
+    <Switch
+      title="Annuler le bordereau"
+      defaultValue={defaultValue}
+      disabled={!canBeCancelled}
+      onChange={onChange}
+    >
+      {canBeCancelled ? CANCELATION_MSG : CANCELATION_NOT_POSSIBLE_MSG}
+    </Switch>
   );
 }

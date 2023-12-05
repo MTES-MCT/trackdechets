@@ -1,5 +1,5 @@
 import axios from "axios";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 
 const API_ADRESSE_URL = "https://api-adresse.data.gouv.fr/search/";
 

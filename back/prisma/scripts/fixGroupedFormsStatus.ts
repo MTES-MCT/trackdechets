@@ -4,7 +4,7 @@ import { Updater, registerUpdater } from "./helper/helper";
 @registerUpdater(
   "Fix status of grouped BSDs with temp storage",
   "Fix status of grouped BSDs with temp storage",
-  true
+  false
 )
 export class FixGroupedFormsStatusUpdater implements Updater {
   async run() {

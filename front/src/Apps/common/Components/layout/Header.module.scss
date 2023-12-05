@@ -1,5 +1,5 @@
-@import "src/scss/Constants.scss";
-@import "src/scss/Breakpoints.scss";
+@import "../../../../scss/Constants.scss";
+@import "../../../../scss/Breakpoints.scss";
 
 .header {
   background-color: #fff;
@@ -187,6 +187,7 @@
     transform: rotate(180deg);
   }
 }
+
 .headerNavLinkActive + .headerNavActive {
   @include desktop {
     border-color: $black;
