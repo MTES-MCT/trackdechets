@@ -1,6 +1,6 @@
-import { Page } from "@playwright/test";
+// import { Page } from "@playwright/test";
 
-export const logScreenshot = async (page: Page) => {
-    const buffer = await page.screenshot();
-    console.log(buffer.toString("base64"));
+export const logScreenshot = async () => {
+    // const buffer = await page.screenshot();
+    // console.log(buffer.toString("base64"));
 };
