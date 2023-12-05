@@ -8,7 +8,7 @@ red=$(tput setaf 9)
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-USING_ENV_FILE=false
+USING_ENV_FILE=true
 
 if [ -z "$DATABASE_URL" ]
 then
@@ -31,7 +31,7 @@ then
           break
       else
           echo -"${red}$pathToEnv is not a valid path.${reset}"
-      fi 
+      fi
     done
   else
     echo "${bold}! You need to set the ${green}\$DATABASE_URL${reset}${bold} env variable.${reset}"
@@ -75,12 +75,5 @@ until curl -XGET "$ELASTIC_SEARCH_URL" 2> /dev/null; do
   sleep 1
 done
 
-# Escape $ sign in DATABASE_URL if the env has been loaded from a .env file
-# This is because NX expands env variables in .env files
-if [ "$USING_ENV_FILE" = true ] ; then
-  echo "Using env file, escaping \$ sign in DATABASE_URL"
-  DATABASE_URL="${DATABASE_URL//$/\\$}"
-fi
-
 echo "3/3 - Create tables & index";
-npx nx run back:"preintegration-tests"
+npm --prefix back run preintegration-tests
