@@ -1,3 +1,4 @@
+import { logger } from "@td/logger";
 import {
   redisClient,
   prisma,
@@ -103,3 +104,10 @@ export async function refreshElasticSearch(timeout = 1000) {
 export function resetCache() {
   return redisClient.flushdb();
 }
+
+export const clearData = async () => {
+  logger.info("Cleaning database & cache");
+
+  await resetDatabase();
+  await resetCache();
+};

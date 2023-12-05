@@ -1,12 +1,5 @@
 import { logger } from "@td/logger";
-import { resetCache, resetDatabase } from "./utils";
-
-const clearData = async () => {
-  logger.info("Cleaning database & cache");
-
-  await resetDatabase();
-  await resetCache();
-};
+import { clearData } from "./utils";
 
 const teardown = async () => {
   logger.info("Playwright global-teardown");
