@@ -15,7 +15,7 @@ export const createAccount = async (
 
   // Password. Strength should be indicated
   await page.getByLabel("Mot de passe", { exact: true }).fill(password);
-  await expect(page.getByText("ParfaitVotre mot de passe est")).toBeVisible();
+  await expect(page.getByText("Votre mot de passe est robuste")).toBeVisible();
 
   // Terms + confirmation
   await page.getByText("Je certifie avoir lu les conditions générales").click();
