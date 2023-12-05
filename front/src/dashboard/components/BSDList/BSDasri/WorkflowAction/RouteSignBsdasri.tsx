@@ -125,7 +125,7 @@ export function RouteSignBsdasri({
 }) {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const navigate = useNavigate();
-  const isV2Routes = !!useMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
   const transporterTabRoute = !isV2Routes
     ? routes.dashboard.transport.toCollect
     : routes.dashboardv2.transport.toCollect;

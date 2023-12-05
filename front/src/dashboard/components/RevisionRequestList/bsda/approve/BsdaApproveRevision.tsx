@@ -44,7 +44,7 @@ export function BsdaApproveRevision({
   onModalCloseFromParent
 }: Props) {
   const { siret } = useParams<{ siret: string }>();
-  const isV2Routes = !!useMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   const [submitBsdaRevisionRequestApproval, { loading }] = useMutation<
     Pick<Mutation, "submitBsdaRevisionRequestApproval">,

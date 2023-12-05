@@ -40,7 +40,7 @@ export function BsddApproveRevision({
   isModalOpenFromParent,
   onModalCloseFromParent
 }: Props) {
-  const isV2Routes = !!useMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   const [submitFormRevisionRequestApproval, { loading, error }] = useMutation<
     Pick<Mutation, "submitFormRevisionRequestApproval">,

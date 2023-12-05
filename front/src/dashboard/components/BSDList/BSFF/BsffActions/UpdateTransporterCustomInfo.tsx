@@ -19,7 +19,7 @@ export function UpdateTransporterCustomInfo({
   onModalCloseFromParent?: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const isV2Routes = !!useMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   const isOpened = isOpen || isModalOpenFromParent!;
   const handleClose = () => {

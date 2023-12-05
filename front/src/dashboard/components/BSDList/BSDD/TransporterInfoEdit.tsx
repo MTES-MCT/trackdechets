@@ -53,7 +53,7 @@ export default function TransporterInfoEdit({
   const mutationFieldName = `transporter${capitalize(fieldName)}`;
 
   const [isOpen, setIsOpen] = useState(false);
-  const isV2Routes = !!useMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   const [updateTransporterPlate, { error }] = useMutation(UPDATE_PLATE, {
     onCompleted: () => handleClose()
