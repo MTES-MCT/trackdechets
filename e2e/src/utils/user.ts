@@ -1,6 +1,6 @@
 import { Page, expect } from "@playwright/test";
 import { prisma } from "back";
-// import { logScreenshot } from "./debug";
+import { logScreenshot } from "./debug";
 
 export const createAccount = async (
   page: Page,
@@ -30,7 +30,7 @@ export const createAccount = async (
 
   // If successful, we should see the page with email confirmation info
   console.log(">>>> CREER")
-  //await logScreenshot(page);
+  await logScreenshot(page);
   await expect(
     page.getByRole("heading", { name: "On y est presque !" })
   ).toBeVisible();
