@@ -79,7 +79,7 @@
       }
     },
     "generate-tw": {
-      "command": "tailwindcss build -c front/tailwind.config.js front/src/tailwind.css -o front/src/generated/css/tailwind.generated.css"
+      "command": "tailwindcss build front/src/tailwind.css -c front/tailwind.config.js -o front/src/generated/css/tailwind.generated.css"
     },
     "storybook": {
       "executor": "@nx/storybook:storybook",
