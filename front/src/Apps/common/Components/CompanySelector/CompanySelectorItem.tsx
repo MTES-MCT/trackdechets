@@ -35,12 +35,13 @@ const CompanySelectorItem = ({
       );
     };
 
+    const name = company.name ?? "[Raison sociale inconnue]";
     const address = company.address ?? "[Adresse inconnue]";
     const countryCode = company.codePaysEtrangerEtablissement ?? "FR";
 
     return (
       <p>
-        <b>{highlight(company.name, searchClue)}</b> -{" "}
+        <b>{highlight(name, searchClue)}</b> -{" "}
         {highlight(company.orgId, searchClue)} -{" "}
         {highlight(address, postalCodeClue)} - {countryCode}{" "}
       </p>

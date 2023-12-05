@@ -1,5 +1,5 @@
 import { useLazyQuery, ApolloError } from "@apollo/client";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import CompanySelector from "../../../../Apps/common/Components/CompanySelector/CompanySelector";
 import {
   CompanySearchResult,
@@ -15,23 +15,39 @@ import {
 } from "../../../../Apps/common/queries/company/query";
 
 interface CompanySelectorWrapperProps {
-  currentCompany?: CompanySearchResult;
+  // Expose le state Formik depuis le composant parent
+  // afin d'initialiser le `selectedCompany` au premier
+  // render lorsqu'on est dans le cas d'un update de bordereau
+  formOrgId?: string | null;
   favoriteType?: FavoriteType;
   allowForeignCompanies?: boolean;
   onCompanySelected?: (company?: CompanySearchResult) => void;
-  siret: string;
+  // Numéro SIRET ou VAT de l'établissement courant (utile pour le calcul des favoris)
+  orgId?: string;
   disabled?: boolean;
 }
 
+/**
+ * Ce wrapper autour de CompanySelector a plusieurs rôles :
+ * - Il stocke l'établissement sélectionné et les résultats de recherche
+ * pour piloter l'affiche du CompanySelector.
+ * - Il implémente le search et gère les erreurs.
+ * - Il initialise l'établissement sélectionné à partir des données du store (Formik).
+ * - Il propage l'événement de sélection d'un établissement au parent pour modifier.
+ * les données du store (Formik)
+ */
 export default function CompanySelectorWrapper({
-  currentCompany,
+  formOrgId,
   favoriteType = FavoriteType.Emitter,
   allowForeignCompanies = false,
-  siret,
+  orgId,
   disabled = false,
   onCompanySelected
 }: CompanySelectorWrapperProps) {
+  // Établissement sélectionné
   const [selectedCompany, setSelectedCompany] = useState<CompanySearchResult>();
+
+  // Résultats de recherche
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>();
 
   const [
@@ -43,24 +59,37 @@ export default function CompanySelectorWrapper({
 
   const [searchCompaniesQuery, { loading: isLoadingSearch, data: _, error }] =
     useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
-      SEARCH_COMPANIES,
-      {
-        onCompleted: data => {
-          setSearchResults(data?.searchCompanies.slice(0, 6));
-        }
-      }
+      SEARCH_COMPANIES
     );
 
-  const onSelectCompany = (company?: CompanySearchResult) => {
-    setSelectedCompany(company);
-    onCompanySelected && onCompanySelected(company);
-  };
+  const onSelectCompany = useCallback(
+    (company?: CompanySearchResult) => {
+      setSelectedCompany(company);
+      // propage l'événement au parent pour modifier les données du store (Formik)
+      onCompanySelected && onCompanySelected(company);
+    },
+    [setSelectedCompany, onCompanySelected]
+  );
+
+  // Initialise `selectedCompany` à partir des données du store (Formik)
+  useEffect(() => {
+    if (!selectedCompany && formOrgId) {
+      searchCompaniesQuery({
+        variables: { clue: formOrgId },
+        onCompleted: result => {
+          if (result.searchCompanies?.length > 0) {
+            onSelectCompany(result.searchCompanies[0]);
+          }
+        }
+      });
+    }
+  }, [selectedCompany, formOrgId, searchCompaniesQuery, onSelectCompany]);
 
   const onSearchCompany = (searchClue, postalCodeClue) => {
-    if (searchClue.length === 0 && postalCodeClue.length === 0) {
+    if (searchClue.length === 0 && postalCodeClue.length === 0 && orgId) {
       getFavoritesQuery({
         variables: {
-          orgId: siret,
+          orgId,
           type: Object.values(FavoriteType).includes(favoriteType)
             ? favoriteType
             : FavoriteType.Emitter,
@@ -73,6 +102,9 @@ export default function CompanySelectorWrapper({
           clue: searchClue,
           ...(postalCodeClue &&
             postalCodeClue.length >= 2 && { department: postalCodeClue })
+        },
+        onCompleted: data => {
+          setSearchResults(data?.searchCompanies.slice(0, 6));
         }
       });
     }
@@ -123,8 +155,13 @@ export default function CompanySelectorWrapper({
         onSearch={onSearchCompany}
         favorites={favoritesData?.favorites}
         companies={searchResults}
-        selectedCompany={selectedCompany ?? currentCompany}
+        selectedCompany={selectedCompany}
         disabled={disabled}
+        searchLabel={
+          allowForeignCompanies
+            ? "N°SIRET ou n°TVA intracom ou raison sociale"
+            : "N°SIRET ou raison sociale"
+        }
       />
     </>
   );

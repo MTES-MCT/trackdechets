@@ -10,6 +10,7 @@ import {
   Trader,
   Broker,
   WorkSite,
+  TransporterInput,
   TransportMode
 } from "codegen-ui";
 
@@ -119,12 +120,44 @@ export function getInitialIntermediaries(intermediaries?: FormCompany[]) {
     : [];
 }
 
+export const initialFormTransporter: TransporterInput = {
+  mode: TransportMode.Road,
+  isExemptedOfReceipt: false,
+  company: {
+    siret: "",
+    name: "",
+    address: "",
+    contact: "",
+    mail: "",
+    phone: "",
+    vatNumber: "",
+    country: "",
+    omiNumber: ""
+  }
+};
+
+// Les données transporteurs du formulaire représente soit un transporteur BSDD
+// déjà crée en base de données qui dispose d'un identifiant, soit un transporteur
+// non encore crée en base ne disposant pas encore d'identifiant
+export type CreateOrUpdateTransporterInput = TransporterInput & {
+  id?: string;
+};
+
+export type FormFormikValues = Omit<FormInput, "transporters"> & {
+  transporters: CreateOrUpdateTransporterInput[];
+};
+
 /**
  * Computes initial values of Formik's form by merging
  * default values to the current draft form (if any)
  * @param f current BSD
  */
-export function getInitialState(f?: Form | null): FormInput {
+export function getInitialState(f?: Form | null): FormFormikValues {
+  const initialTransporters =
+    f?.transporters && f?.transporters.length > 0
+      ? f.transporters
+      : [initialFormTransporter];
+
   return {
     id: f?.id ?? null,
     customId: f?.customId ?? "",
@@ -144,13 +177,7 @@ export function getInitialState(f?: Form | null): FormInput {
       isTempStorage: f?.recipient?.isTempStorage ?? false,
       company: getInitialCompany(f?.recipient?.company)
     },
-    transporter: {
-      isExemptedOfReceipt: f?.transporter?.isExemptedOfReceipt ?? false,
-      numberPlate: f?.transporter?.numberPlate ?? "",
-      customInfo: f?.transporter?.customInfo ?? null,
-      company: getInitialCompany(f?.transporter?.company),
-      mode: f?.transporter?.mode ?? TransportMode.Road
-    },
+    transporters: initialTransporters,
     trader: f?.trader
       ? {
           receipt: f?.trader?.receipt ?? "",
