@@ -152,6 +152,12 @@ env:
   # Storybook
   STORYBOOK_HOST: sb.trackdechets.local
 
+  # Vite
+  VITE_API_ENDPOINT: api.trackdechets.local
+  VITE_NOTIFIER_ENDPOINT: notifier.trackdechets.local
+  VITE_URL_SCHEME: http
+  VITE_HOSTNAME: trackdechets.local
+
   # Misc
   CRON_ONBOARDING_SCHEDULE: false
   VERIFY_COMPANY: false
@@ -211,4 +217,5 @@ env:
     SwIDAQAB
     -----END PUBLIC KEY-----
   WEBHOOK_TOKEN_ENCRYPTION_KEY: abcdefgh12345678abcdefgh12345678
+
 
