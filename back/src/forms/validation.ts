@@ -972,37 +972,70 @@ export const transporterSchemaFn: FactorySchemaOf<
     transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
     transporterReceipt: yup
       .string()
-      .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
-        is: (isExempted, vat) => isForeignVat(vat) || isExempted,
-        then: schema => schema.notRequired().nullable(),
-        otherwise: schema =>
-          schema.when(
-            ["transporterCompanySiret", "transporterCompanyVatNumber"],
-            requiredWhenTransporterSign(context, REQUIRED_RECEIPT_NUMBER)
-          )
-      }),
+      .when(
+        [
+          "transporterIsExemptedOfReceipt",
+          "transporterCompanyVatNumber",
+          "transporterTransportMode"
+        ],
+        {
+          is: (isExempted, vat, transportMode) =>
+            isForeignVat(vat) ||
+            isExempted ||
+            transportMode !== TransportMode.ROAD,
+          then: schema => schema.notRequired().nullable(),
+          otherwise: schema =>
+            schema.when(
+              ["transporterCompanySiret", "transporterCompanyVatNumber"],
+              requiredWhenTransporterSign(context, REQUIRED_RECEIPT_NUMBER)
+            )
+        }
+      ),
     transporterDepartment: yup
       .string()
-      .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
-        is: (isExempted, vat) => isForeignVat(vat) || isExempted,
-        then: schema => schema.notRequired().nullable(),
-        otherwise: schema =>
-          schema.when(
-            ["transporterCompanySiret", "transporterCompanyVatNumber"],
-            requiredWhenTransporterSign(context, REQUIRED_RECEIPT_DEPARTMENT)
-          )
-      }),
+      .when(
+        [
+          "transporterIsExemptedOfReceipt",
+          "transporterCompanyVatNumber",
+          "transporterTransportMode"
+        ],
+        {
+          is: (isExempted, vat, transportMode) =>
+            isForeignVat(vat) ||
+            isExempted ||
+            transportMode !== TransportMode.ROAD,
+          then: schema => schema.notRequired().nullable(),
+          otherwise: schema =>
+            schema.when(
+              ["transporterCompanySiret", "transporterCompanyVatNumber"],
+              requiredWhenTransporterSign(context, REQUIRED_RECEIPT_DEPARTMENT)
+            )
+        }
+      ),
     transporterValidityLimit: yup
       .string()
-      .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
-        is: (isExempted, vat) => isForeignVat(vat) || isExempted,
-        then: schema => schema.notRequired().nullable(),
-        otherwise: schema =>
-          schema.when(
-            ["transporterCompanySiret", "transporterCompanyVatNumber"],
-            requiredWhenTransporterSign(context, REQUIRED_RECEIPT_VALIDITYLIMIT)
-          )
-      }),
+      .when(
+        [
+          "transporterIsExemptedOfReceipt",
+          "transporterCompanyVatNumber",
+          "transporterTransportMode"
+        ],
+        {
+          is: (isExempted, vat, transportMode) =>
+            isForeignVat(vat) ||
+            isExempted ||
+            transportMode !== TransportMode.ROAD,
+          then: schema => schema.notRequired().nullable(),
+          otherwise: schema =>
+            schema.when(
+              ["transporterCompanySiret", "transporterCompanyVatNumber"],
+              requiredWhenTransporterSign(
+                context,
+                REQUIRED_RECEIPT_VALIDITYLIMIT
+              )
+            )
+        }
+      ),
     transporterTransportMode: yup.mixed<TransportMode>()
   });
 

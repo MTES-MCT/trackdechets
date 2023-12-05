@@ -298,6 +298,18 @@ describe("transporterSchema", () => {
     expect(validated).toBeDefined();
   });
 
+  it("transporter recepisse is not required if transport mode is ROAD", async () => {
+    const bsff = {
+      ...transporterData,
+      transporterTransportMode: "ROAD",
+      transporterRecepisseDepartment: undefined,
+      transporterRecepisseNumber: undefined,
+      transporterRecepisseValidityLimit: undefined
+    };
+    const validated = await transporterSchema.isValid(bsff);
+    expect(validated).toBeDefined();
+  });
+
   it("should work if transport mode is ROAD & plates are defined", async () => {
     const bsff = {
       ...transporterData,
