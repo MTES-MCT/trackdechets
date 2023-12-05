@@ -17,7 +17,7 @@ export function BsdaConsultRevision({
   isModalOpenFromParent,
   onModalCloseFromParent
 }: Props) {
-  const isV2Routes = !!useMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   if (isV2Routes && isModalOpenFromParent) {
     const formatRevisionAdapter = {

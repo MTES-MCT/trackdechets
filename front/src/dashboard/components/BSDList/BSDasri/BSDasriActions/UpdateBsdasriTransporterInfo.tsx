@@ -22,7 +22,7 @@ export function UpdateBsdasriTransporterInfo({
 }: Props) {
   console.log(bsdasri);
   const [isOpen, setIsOpen] = useState(false);
-  const isV2Routes = !!useMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
   const [updateBsdasri, { error }] = useMutation<
     Pick<Mutation, "updateBsdasri">,
     MutationUpdateBsdasriArgs

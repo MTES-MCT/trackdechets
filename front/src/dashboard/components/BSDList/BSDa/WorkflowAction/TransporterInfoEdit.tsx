@@ -23,7 +23,7 @@ export function TransporterInfoEdit({
   onModalCloseFromParent
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const isV2Routes = !!useMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
   const [updateBsda, { error }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs

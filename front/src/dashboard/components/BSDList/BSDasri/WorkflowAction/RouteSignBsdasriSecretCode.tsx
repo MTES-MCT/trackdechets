@@ -70,7 +70,7 @@ export function RouteBSDasrisSignEmissionSecretCode() {
     MutationSignBsdasriEmissionWithSecretCodeArgs
   >(SIGN_BSDASRI_EMISSION_WITH_SECRET_CODE);
 
-  const isV2Routes = !!useMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
   const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
   const toCollectDashboard = {
     pathname: generatePath(routes[dashboardRoutePrefix].transport.toCollect, {

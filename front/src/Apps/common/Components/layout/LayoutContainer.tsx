@@ -80,9 +80,8 @@ export default function LayoutContainer() {
   const isAuthenticated = !loading && data != null;
   const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
 
-  const isV2Routes = !!useMatch("/v2/dashboard/");
-  const isDashboardRoutes = !!useMatch("/dashboard/");
-  const dashboardRoutePrefix = isV2Routes ? "dashboardv2" : "dashboard";
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
+  const isDashboardRoutes = !!useMatch("/dashboard/*");
 
   if (loading) {
     return <Loader />;
@@ -180,7 +179,16 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes[dashboardRoutePrefix].bsdds.edit}
+            path={routes.dashboard.bsdds.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <FormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboardv2.bsdds.edit}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <FormContainer />
@@ -199,7 +207,7 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes[dashboardRoutePrefix].bsdds.create}
+            path={routes.dashboard.bsdds.create}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <FormContainer />
@@ -208,7 +216,16 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes[dashboardRoutePrefix].bsvhus.create}
+            path={routes.dashboardv2.bsdds.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <FormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboard.bsvhus.create}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsvhuFormContainer />
@@ -217,7 +234,7 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes[dashboardRoutePrefix].bsvhus.edit}
+            path={routes.dashboardv2.bsvhus.create}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsvhuFormContainer />
@@ -226,7 +243,25 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes[dashboardRoutePrefix].bsffs.create}
+            path={routes.dashboard.bsvhus.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsvhuFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboardv2.bsvhus.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsvhuFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboard.bsffs.create}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsffFormContainer />
@@ -235,7 +270,7 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes[dashboardRoutePrefix].bsffs.edit}
+            path={routes.dashboardv2.bsffs.create}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsffFormContainer />
@@ -244,7 +279,25 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes[dashboardRoutePrefix].bsdasris.create}
+            path={routes.dashboard.bsffs.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsffFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboardv2.bsffs.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsffFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboard.bsdasris.create}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsdasriFormContainer />
@@ -253,7 +306,7 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes[dashboardRoutePrefix].bsdasris.edit}
+            path={routes.dashboardv2.bsdasris.create}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsdasriFormContainer />
@@ -262,7 +315,25 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes[dashboardRoutePrefix].bsdas.create}
+            path={routes.dashboard.bsdasris.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsdasriFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboardv2.bsdasris.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsdasriFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboard.bsdas.create}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsdaFormContainer />
@@ -271,7 +342,25 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes[dashboardRoutePrefix].bsdas.edit}
+            path={routes.dashboardv2.bsdas.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsdaFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboard.bsdas.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsdaFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboardv2.bsdas.edit}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsdaFormContainer />

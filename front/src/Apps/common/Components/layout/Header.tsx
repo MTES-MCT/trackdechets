@@ -51,7 +51,7 @@ export const GET_ME = gql`
 function MobileSubNav({ currentSiret }) {
   const { updatePermissions } = usePermissions();
   const { error, data } = useQuery<Pick<Query, "me">>(GET_ME, {});
-  const isV2Routes = !!useMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   useEffect(() => {
     if (data) {
