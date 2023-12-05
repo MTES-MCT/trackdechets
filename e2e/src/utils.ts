@@ -1,13 +1,9 @@
-import { logger } from "@td/logger";
 import {
   redisClient,
   prisma,
   esClient,
   esIndex,
   indexQueue
-  // closeMongoClient,
-  // closeQueues,
-  // server
 } from "back";
 
 /**
@@ -106,8 +102,6 @@ export function resetCache() {
 }
 
 export const clearData = async () => {
-  logger.info("Cleaning database & cache");
-
   await resetDatabase();
   await resetCache();
 };

@@ -37,6 +37,21 @@ jobs:
         run: |
           npx nx run-many -t serve --projects=api,front,tag:backend:background --parallel=6 &
 
+      # Testing DNS resolution
+      - name: Testing API resolution
+        run: |
+          ping -c 2 api.trackdechets.local
+      - name: Testing UI resolution
+        run: |
+          ping -c 2 trackdechets.local
+      - name: Testing ES resolution
+        run: |
+          ping -c 2 es.trackdechets.local
+      - name: Testing Notifier resolution
+        run: |
+          ping -c 2 notifier.trackdechets.local
+          curl notifier.trackdechets.local
+
       # Playwright
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
