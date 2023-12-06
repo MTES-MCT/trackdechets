@@ -1,6 +1,7 @@
 @import "../../../../scss/Breakpoints.scss";
 
 .transporter {
+
   &__header {
     display: flex;
     flex-direction: column;
@@ -42,6 +43,10 @@
     &__button {
       margin: 0 7px;
     }
+  }
+
+  &__form {
+    padding-top: 15px;
   }
 
   @media (max-width: 800px) {

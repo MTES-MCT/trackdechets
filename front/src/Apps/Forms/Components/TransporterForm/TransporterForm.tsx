@@ -101,7 +101,7 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
   };
 
   return (
-    <div>
+    <div className="fr-container">
       <CompanySelectorWrapper
         orgId={orgId}
         formOrgId={transporterOrgId}
