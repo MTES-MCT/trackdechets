@@ -112,7 +112,11 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
       />
 
       {companyError && (
-        <Alert title="Entreprise" description={companyError} severity="error" />
+        <Alert
+          title={transporter.company?.name ?? "Entreprise"}
+          description={companyError}
+          severity="error"
+        />
       )}
 
       <CompanyContactInfo fieldName={`${fieldName}.company`} />

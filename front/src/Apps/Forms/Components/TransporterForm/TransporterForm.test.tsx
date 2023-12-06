@@ -301,9 +301,9 @@ describe("TransporterForm", () => {
         mocks
       })
     );
-    const searchInput = screen.getByLabelText(
-      "N°SIRET ou n°TVA intracom ou raison sociale"
-    );
+    const searchInput = screen.getByLabelText("N°SIRET ou raison sociale", {
+      exact: false
+    });
 
     fireEvent.focus(searchInput);
     fireEvent.change(searchInput, { target: { value: "CODE EN STOCK" } });
@@ -417,9 +417,9 @@ describe("TransporterForm", () => {
         mocks
       })
     );
-    const searchInput = screen.getByLabelText(
-      "N°SIRET ou n°TVA intracom ou raison sociale"
-    );
+    const searchInput = screen.getByLabelText("N°SIRET ou raison sociale", {
+      exact: false
+    });
 
     fireEvent.focus(searchInput);
     const favorite = await screen.findByText("CODE EN STOCK", { exact: false });
