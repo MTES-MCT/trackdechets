@@ -109,7 +109,7 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
 
   const input: Prisma.BsdasriCreateInput = {
     ...fieldsToCopy,
-    emitterWastePackagings: Prisma.JsonNull,
+    emitterWastePackagings: [],
     id: getReadableId(ReadableIdPrefix.DASRI),
     status: BsdasriStatus.INITIAL,
     isDraft: true,

@@ -454,6 +454,6 @@ describe("Mutation.duplicateBsdasri", () => {
     expect(duplicatedDasri.emitterWasteWeightValue).toBeNull();
     expect(duplicatedDasri.emitterWasteWeightIsEstimate).toBeNull();
     expect(duplicatedDasri.emitterWasteVolume).toBeNull();
-    expect(duplicatedDasri.emitterWastePackagings).toBeNull();
+    expect(duplicatedDasri.emitterWastePackagings).toStrictEqual([]);
   });
 });
