@@ -6,7 +6,10 @@ export interface CompanySelectorProps {
   companies?: CompanySearchResult[];
   favorites?: CompanySearchResult[];
   disabled?: boolean;
-  searchLabel?: string;
+  // Texte qui s'affiche en petit sous le label de la barre de recherche
+  searchHint?: string;
+  // Texte qui s'affiche en petit sous le label du filtre de département
+  departmentHint?: string;
   onSearch: (search: string, postalCode: string) => void;
   onSelect: (company?: CompanySearchResult) => void;
 }

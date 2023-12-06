@@ -157,10 +157,13 @@ export default function CompanySelectorWrapper({
         companies={searchResults}
         selectedCompany={selectedCompany}
         disabled={disabled}
-        searchLabel={
+        searchHint={
           allowForeignCompanies
-            ? "N°SIRET ou n°TVA intracom ou raison sociale"
-            : "N°SIRET ou raison sociale"
+            ? "ou numéro de TVA intracommunautaire pour les entreprises étrangères"
+            : undefined
+        }
+        departmentHint={
+          allowForeignCompanies ? "si l'entreprise est française" : undefined
         }
       />
     </>
