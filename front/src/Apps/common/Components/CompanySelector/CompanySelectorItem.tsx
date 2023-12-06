@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode, useMemo } from "react";
 import { CompanySelectorItemProps } from "./companySelectorTypes";
 
 import "./companySelector.scss";
@@ -7,6 +7,29 @@ import routes from "../../../../Apps/routes";
 import { generatePath } from "react-router-dom";
 import { IconTDCompany } from "../Icons/Icons";
 
+function highlight(text: string, highlight: string): ReactNode {
+  if (highlight?.length > 0) {
+    const parts = text.split(new RegExp(`(${highlight})`, "gi"));
+    return (
+      <span>
+        {parts.map((part, i) => (
+          <span
+            key={i}
+            style={
+              part.toLowerCase() === highlight.toLowerCase()
+                ? { backgroundColor: "#B8FEC9" }
+                : {}
+            }
+          >
+            {part}
+          </span>
+        ))}
+      </span>
+    );
+  }
+  return text;
+}
+
 const CompanySelectorItem = ({
   selected,
   onSelect,
@@ -14,39 +37,9 @@ const CompanySelectorItem = ({
   searchClue = "",
   postalCodeClue = ""
 }: CompanySelectorItemProps) => {
-  const formatCompanyInfo = () => {
-    const highlight = (text, highlight) => {
-      const parts = text.split(new RegExp(`(${highlight})`, "gi"));
-      return (
-        <span>
-          {parts.map((part, i) => (
-            <span
-              key={i}
-              style={
-                part.toLowerCase() === highlight.toLowerCase()
-                  ? { backgroundColor: "#B8FEC9" }
-                  : {}
-              }
-            >
-              {part}
-            </span>
-          ))}
-        </span>
-      );
-    };
-
-    const name = company.name ?? "[Raison sociale inconnue]";
-    const address = company.address ?? "[Adresse inconnue]";
-    const countryCode = company.codePaysEtrangerEtablissement ?? "FR";
-
-    return (
-      <p>
-        <b>{highlight(name, searchClue)}</b> -{" "}
-        {highlight(company.orgId, searchClue)} -{" "}
-        {highlight(address, postalCodeClue)} - {countryCode}{" "}
-      </p>
-    );
-  };
+  const name = company.name ?? "[Raison sociale inconnue]";
+  const address = company.address ?? "[Adresse inconnue]";
+  const countryCode = company.codePaysEtrangerEtablissement ?? "FR";
 
   const handleClick = () => {
     onSelect(company);
@@ -57,6 +50,19 @@ const CompanySelectorItem = ({
       handleClick();
     }
   };
+
+  const highlightedName = useMemo(
+    () => (selected ? name : highlight(name, searchClue)),
+    [selected, name, searchClue]
+  );
+  const highlightedOrgId = useMemo(
+    () => (selected ? company.orgId : highlight(company.orgId, searchClue)),
+    [selected, company.orgId, searchClue]
+  );
+  const highlightedAdress = useMemo(
+    () => (selected ? address : highlight(address, postalCodeClue)),
+    [selected, address, postalCodeClue]
+  );
 
   return (
     <div
@@ -72,7 +78,12 @@ const CompanySelectorItem = ({
         {company.isRegistered ? <IconTDCompany /> : null}
       </div>
       <div className="company-selector-item__content">
-        <div className="company-selector-item__info">{formatCompanyInfo()}</div>
+        <div className="company-selector-item__info">
+          <p>
+            <b>{highlightedName}</b> - {highlightedOrgId} - {highlightedAdress}{" "}
+            - {countryCode}
+          </p>
+        </div>
         <div className="company-selector-item__link">
           <a
             href={generatePath(routes.company, {
