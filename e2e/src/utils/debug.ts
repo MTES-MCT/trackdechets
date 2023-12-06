@@ -1,8 +1,8 @@
 import { Page } from "@playwright/test";
 
 /**
- * Will take a screenshot of the page and log it to the console in base64, 
- * which is handy when trying to debug the CI. 
+ * Will take a screenshot of the page and log it to the console in base64,
+ * which is handy when trying to debug the CI.
  * Use a website like https://base64.guru/converter/decode/image to decode.
  */
 export const logScreenshot = async (page: Page) => {
