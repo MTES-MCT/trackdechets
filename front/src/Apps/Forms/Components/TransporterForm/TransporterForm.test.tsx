@@ -291,7 +291,7 @@ describe("TransporterForm", () => {
           }
         },
         result: () => ({
-          data: { __typename: "CompanySearchResult", favorites: [] }
+          data: { favorites: [] }
         })
       }
     ];
@@ -367,5 +367,62 @@ describe("TransporterForm", () => {
     );
 
     expect(notRegisteredError).toBeInTheDocument();
+  });
+
+  test("favorites should be displayed when we focus the search bar", async () => {
+    const mocks = [
+      searchCompaniesMock(defaultTransporter),
+      {
+        request: {
+          query: FAVORITES(FavoriteType.Transporter),
+          variables: {
+            orgId: "88792840600024",
+            type: "TRANSPORTER",
+            allowForeignCompanies: true
+          }
+        },
+        result: () => ({
+          data: {
+            favorites: [
+              {
+                __typename: "CompanySearchResult",
+                orgId: "85001946400021",
+                siret: "85001946400021",
+                vatNumber: null,
+                name: "CODE EN STOCK",
+                address: "adresse",
+                etatAdministratif: "A",
+                codePaysEtrangerEtablissement: null,
+                isRegistered: true,
+                trackdechetsId: "clpibhy5y0002lj9ar30nilpl",
+                contact: "BG",
+                contactPhone: "00 00 00 00 00",
+                contactEmail: "hello+detenteur@benoitguigal.fr",
+                companyTypes: ["TRANSPORTER"],
+                transporterReceipt: null,
+                traderReceipt: null,
+                brokerReceipt: null,
+                vhuAgrementDemolisseur: null,
+                vhuAgrementBroyeur: null,
+                workerCertification: null
+              }
+            ]
+          }
+        })
+      }
+    ];
+    render(
+      Component({
+        data: defaultTransporter,
+        mocks
+      })
+    );
+    const searchInput = screen.getByLabelText(
+      "N°SIRET ou n°TVA intracom ou raison sociale"
+    );
+
+    fireEvent.focus(searchInput);
+    const favorite = await screen.findByText("CODE EN STOCK", { exact: false });
+    expect(favorite).toBeInTheDocument();
   });
 });
