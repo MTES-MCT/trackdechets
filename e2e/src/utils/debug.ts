@@ -5,11 +5,11 @@ export const logScreenshot = async (page: Page) => {
   console.log(buffer.toString("base64"));
 };
 
-export const debugApiCalls = (page: Page) => {
+export const debugApiCalls = async (page: Page) => {
   // Requests
-  page.on("request", request => {
+  page.on("request", async request => {
     if (request.url().includes(process.env.API_HOST)) {
-      console.log(">>", request.method(), request.url(), request.postData());
+      console.log(">>", request.method(), request.url(), await request.allHeaders(), request.postData());
     }
   });
 
