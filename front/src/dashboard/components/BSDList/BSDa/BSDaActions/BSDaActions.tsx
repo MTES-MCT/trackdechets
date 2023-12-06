@@ -41,25 +41,21 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
   const links = [
     {
       title: "Contrôle routier",
-      route: {
-        pathname: generatePath(routes.dashboard.roadControl, {
-          siret,
-          id: form.id
-        }),
-        state: { background: location }
-      },
+      route: generatePath(routes.dashboard.roadControl, {
+        siret,
+        id: form.id
+      }),
+      state: { background: location },
       icon: <IconQrCode color="blueLight" size="24px" />,
       isVisible: useDisplayRoadControlButton(form)
     },
     {
       title: "Aperçu",
-      route: {
-        pathname: generatePath(routes.dashboard.bsdas.view, {
-          siret,
-          id: form.id
-        }),
-        state: { background: location }
-      },
+      route: generatePath(routes.dashboard.bsdas.view, {
+        siret,
+        id: form.id
+      }),
+      state: { background: location },
       icon: <IconView color="blueLight" size="24px" />,
       isVisible: true
     },
@@ -102,13 +98,11 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
     },
     {
       title: "Révision",
-      route: {
-        pathname: generatePath(routes.dashboard.bsdas.review, {
-          siret,
-          id: form.id
-        }),
-        state: { background: location }
-      },
+      route: generatePath(routes.dashboard.bsdas.review, {
+        siret,
+        id: form.id
+      }),
+      state: { background: location },
       icon: <IconPaperWrite size="24px" color="blueLight" />,
 
       isVisible: !canDelete

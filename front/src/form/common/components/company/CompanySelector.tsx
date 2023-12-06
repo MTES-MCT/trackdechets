@@ -88,6 +88,7 @@ export default function CompanySelector({
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
+  const [hasAutoselected, setHasAutoselected] = useState(false);
   const [selectedCompanyDetails, setSelectedCompanyDetails] = useState({
     name: field.value?.name,
     address: field.value?.address
@@ -139,10 +140,7 @@ export default function CompanySelector({
           : FavoriteType.Emitter,
         allowForeignCompanies
       },
-      skip: skipFavorite || !siret,
-      onCompleted: data => {
-        mergeResults([], data?.favorites ?? []);
-      }
+      skip: skipFavorite || !siret
     }
   );
 
@@ -153,16 +151,36 @@ export default function CompanySelector({
     searchCompaniesQuery,
     { loading: isLoadingSearch, data: searchData, error }
   ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
-    SEARCH_COMPANIES,
-    {
-      onCompleted: data => {
-        mergeResults(
-          data?.searchCompanies ?? [],
-          favoritesData?.favorites ?? []
-        );
-      }
-    }
+    SEARCH_COMPANIES
   );
+
+  /**
+   * Merge searchCompanies et favoritesData
+   */
+  useEffect(() => {
+    if (disabled) return;
+
+    const searchCompanies = searchData?.searchCompanies ?? [];
+    const favorites = favoritesData?.favorites ?? [];
+
+    const reshapedFavorites = favorites.filter(
+      fav =>
+        !skipFavorite &&
+        !searchCompanies.some(company => company.orgId === fav.orgId)
+    );
+
+    const reshapedSearchResults =
+      searchCompanies
+        .filter(company => company.etatAdministratif === "A")
+        .map(company => ({
+          ...company,
+          codePaysEtrangerEtablissement:
+            company.codePaysEtrangerEtablissement || "FR"
+        })) ?? [];
+
+    const results = [...reshapedSearchResults, ...reshapedFavorites];
+    setSearchResults(results);
+  }, [favoritesData, searchData, disabled, skipFavorite]);
 
   /**
    * CompanyPrivateInfos pour completer les informations
@@ -187,6 +205,7 @@ export default function CompanySelector({
     () => companyPrivateData?.companyPrivateInfos,
     [companyPrivateData]
   );
+
   /**
    * Fonctions du changement de companyPrivateData
    */
@@ -276,43 +295,26 @@ export default function CompanySelector({
     ]
   );
 
-  /**
-   * Merge searchCompanies et favoritesData
-   */
-  function mergeResults(
-    searchCompanies: CompanySearchResult[],
-    favorites: CompanySearchResult[]
-  ) {
-    if (disabled) return;
-
-    const reshapedFavorites = favorites.filter(
-      fav =>
-        !skipFavorite &&
-        !searchCompanies.some(company => company.orgId === fav.orgId)
-    );
-
-    const reshapedSearchResults =
-      searchCompanies
-        .filter(company => company.etatAdministratif === "A")
-        .map(company => ({
-          ...company,
-          codePaysEtrangerEtablissement:
-            company.codePaysEtrangerEtablissement || "FR"
-        })) ?? [];
-
-    const results = [...reshapedSearchResults, ...reshapedFavorites];
-    setSearchResults(results);
-
+  useEffect(() => {
     // If the form is empty, we auto-select the first result.
     if (
       initialAutoSelectFirstCompany &&
       !optional &&
-      results.length >= 1 &&
-      !orgId
+      searchResults.length >= 1 &&
+      !orgId &&
+      !hasAutoselected
     ) {
-      selectCompany(results[0]);
+      setHasAutoselected(true);
+      selectCompany(searchResults[0]);
     }
-  }
+  }, [
+    searchResults,
+    initialAutoSelectFirstCompany,
+    optional,
+    orgId,
+    selectCompany,
+    hasAutoselected
+  ]);
 
   const onSearch = useMemo(() => {
     async function triggerSearch(
