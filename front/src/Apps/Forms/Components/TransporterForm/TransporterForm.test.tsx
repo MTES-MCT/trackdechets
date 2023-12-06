@@ -3,7 +3,12 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { TransporterForm } from "./TransporterForm";
 import { Formik } from "formik";
 import { MockedProvider } from "@apollo/client/testing";
-import { FavoriteType, Transporter } from "codegen-ui";
+import {
+  CompanySearchResult,
+  CompanyType,
+  FavoriteType,
+  Transporter
+} from "codegen-ui";
 import { formatDate } from "../../../../common/datetime";
 import {
   FAVORITES,
@@ -29,50 +34,52 @@ const defaultTransporter: Transporter = {
   validityLimit: "2023-12-31T23:00:00.000Z"
 };
 
-const mocksFactory = (transporter: Transporter) => [
-  {
-    request: {
-      query: SEARCH_COMPANIES,
-      variables: {
-        clue: transporter.company?.orgId
-      }
-    },
-    result: () => {
-      return {
-        data: {
-          searchCompanies: [
-            {
-              __typename: "CompanySearchResult",
-              orgId: transporter?.company?.orgId,
-              siret: transporter?.company?.siret,
-              vatNumber: transporter?.company?.vatNumber,
-              name: transporter?.company?.name,
-              address: transporter?.company?.address,
-              etatAdministratif: "A",
-              codePaysEtrangerEtablissement: null,
-              isRegistered: true,
-              trackdechetsId: "cloo373tc000gljph1c11vtan",
-              contact: transporter?.company?.contact,
-              contactPhone: transporter?.company?.phone,
-              contactEmail: transporter?.company?.mail,
-              companyTypes: ["TRANSPORTER"],
-              traderReceipt: null,
-              brokerReceipt: null,
-              transporterReceipt: {
-                receiptNumber: transporter?.receipt,
-                validityLimit: transporter?.validityLimit,
-                department: transporter?.department
-              },
-              vhuAgrementDemolisseur: null,
-              vhuAgrementBroyeur: null,
-              workerCertification: null
-            }
-          ]
-        }
-      };
+const searchCompaniesMock = (
+  transporter: Transporter,
+  opts: Partial<CompanySearchResult> = {}
+) => ({
+  request: {
+    query: SEARCH_COMPANIES,
+    variables: {
+      clue: transporter.company?.orgId
     }
+  },
+  result: () => {
+    return {
+      data: {
+        searchCompanies: [
+          {
+            __typename: "CompanySearchResult",
+            orgId: transporter?.company?.orgId,
+            siret: transporter?.company?.siret,
+            vatNumber: transporter?.company?.vatNumber,
+            name: transporter?.company?.name,
+            address: transporter?.company?.address,
+            etatAdministratif: "A",
+            codePaysEtrangerEtablissement: null,
+            isRegistered: true,
+            trackdechetsId: "cloo373tc000gljph1c11vtan",
+            contact: transporter?.company?.contact,
+            contactPhone: transporter?.company?.phone,
+            contactEmail: transporter?.company?.mail,
+            companyTypes: ["TRANSPORTER"],
+            traderReceipt: null,
+            brokerReceipt: null,
+            transporterReceipt: {
+              receiptNumber: transporter?.receipt,
+              validityLimit: transporter?.validityLimit,
+              department: transporter?.department
+            },
+            vhuAgrementDemolisseur: null,
+            vhuAgrementBroyeur: null,
+            workerCertification: null,
+            ...opts
+          }
+        ]
+      }
+    };
   }
-];
+});
 
 describe("TransporterForm", () => {
   afterEach(jest.resetAllMocks);
@@ -83,7 +90,10 @@ describe("TransporterForm", () => {
   };
 
   const Component = ({ data, mocks }: ComponentProps) => (
-    <MockedProvider mocks={mocks ?? mocksFactory(data)} addTypename={false}>
+    <MockedProvider
+      mocks={mocks ?? [searchCompaniesMock(data)]}
+      addTypename={false}
+    >
       <Formik initialValues={{ transporter: data }} onSubmit={jest.fn()}>
         <TransporterForm fieldName="transporter" orgId="88792840600024" />
       </Formik>
@@ -137,6 +147,24 @@ describe("TransporterForm", () => {
     expect(screen.getByText(expected, { exact: false })).toBeInTheDocument();
   });
 
+  test("transporter recepisse error is not displayed if exemption is true", () => {
+    render(
+      Component({
+        data: {
+          ...defaultTransporter,
+          isExemptedOfReceipt: true,
+          receipt: null,
+          department: null,
+          validityLimit: null
+        }
+      })
+    );
+
+    expect(
+      screen.queryByText("Récépissé de déclaration de transport de déchets")
+    ).not.toBeInTheDocument();
+  });
+
   test("transporter recepisse is not displayed if company is foreign", () => {
     render(
       Component({
@@ -160,12 +188,14 @@ describe("TransporterForm", () => {
     render(
       Component({
         data: defaultTransporter,
-        mocks: mocksFactory({
-          ...defaultTransporter,
-          receipt: "NOUVEAU-RECEPISSE",
-          department: "NOUVEAU-DEPARTEMENT",
-          validityLimit: "2024-10-11"
-        })
+        mocks: [
+          searchCompaniesMock({
+            ...defaultTransporter,
+            receipt: "NOUVEAU-RECEPISSE",
+            department: "NOUVEAU-DEPARTEMENT",
+            validityLimit: "2024-10-11"
+          })
+        ]
       })
     );
     const expected = `Numéro: NOUVEAU-RECEPISSE, département: NOUVEAU-DEPARTEMENT, date limite de validité: ${formatDate(
@@ -181,15 +211,17 @@ describe("TransporterForm", () => {
     render(
       Component({
         data: defaultTransporter,
-        mocks: mocksFactory({
-          ...defaultTransporter,
-          company: {
-            ...defaultTransporter.company,
-            contact: "NOUVEAU-CONTACT",
-            phone: "NOUVEAU-TELEPHONE",
-            mail: "NOUVEL-EMAIL"
-          }
-        })
+        mocks: [
+          searchCompaniesMock({
+            ...defaultTransporter,
+            company: {
+              ...defaultTransporter.company,
+              contact: "NOUVEAU-CONTACT",
+              phone: "NOUVEAU-TELEPHONE",
+              mail: "NOUVEL-EMAIL"
+            }
+          })
+        ]
       })
     );
 
@@ -206,7 +238,7 @@ describe("TransporterForm", () => {
 
   test("contact info and transporter receipt should be auto-completed when another company is selected", async () => {
     const mocks = [
-      ...mocksFactory(defaultTransporter),
+      searchCompaniesMock(defaultTransporter),
       {
         request: {
           query: SEARCH_COMPANIES,
@@ -299,5 +331,41 @@ describe("TransporterForm", () => {
     expect(
       await screen.findByDisplayValue("NOUVEAU-EMAIL", { exact: false })
     ).toBeInTheDocument();
+  });
+
+  test("an error message should be displayed if company is not registered in Trackdéchets", async () => {
+    render(
+      Component({
+        data: defaultTransporter,
+        mocks: [
+          searchCompaniesMock(defaultTransporter, { isRegistered: false })
+        ]
+      })
+    );
+
+    const notRegisteredError = await screen.findByText(
+      "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau."
+    );
+
+    expect(notRegisteredError).toBeInTheDocument();
+  });
+
+  test("an error message should be displayed if company has not the TRANSPORTER profile", async () => {
+    render(
+      Component({
+        data: defaultTransporter,
+        mocks: [
+          searchCompaniesMock(defaultTransporter, {
+            companyTypes: [CompanyType.Producer]
+          })
+        ]
+      })
+    );
+
+    const notRegisteredError = await screen.findByText(
+      "Cet établissement est bien inscrit sur Trackdéchets mais n'a pas le profil Transporteur, il ne peut pas être ajouté sur le bordereau."
+    );
+
+    expect(notRegisteredError).toBeInTheDocument();
   });
 });
