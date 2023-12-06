@@ -41,25 +41,21 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
   const links = [
     {
       title: "Contrôle routier",
-      route: {
-        pathname: generatePath(routes.dashboard.roadControl, {
-          siret,
-          id: form.id
-        }),
-        state: { background: location }
-      },
+      route: generatePath(routes.dashboard.roadControl, {
+        siret,
+        id: form.id
+      }),
+      state: { background: location },
       icon: <IconQrCode color="blueLight" size="24px" />,
       isVisible: useDisplayRoadControlButton(form)
     },
     {
       title: "Aperçu",
-      route: {
-        pathname: generatePath(routes.dashboard.bsdasris.view, {
-          siret,
-          id: form.id
-        }),
-        state: { background: location }
-      },
+      route: generatePath(routes.dashboard.bsdasris.view, {
+        siret,
+        id: form.id
+      }),
+      state: { background: location },
       icon: <IconView color="blueLight" size="24px" />,
       isVisible: true
     },
