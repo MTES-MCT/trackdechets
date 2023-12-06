@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
 import AccountCompany from "./AccountCompany";
 import { useNavigate } from "react-router-dom";
@@ -80,6 +80,20 @@ export default function AccountCompanyList() {
     debouncedSearch({ search: "" });
   };
 
+  useEffect(() => {
+    if (data) {
+      const companies = data.myCompanies?.edges.map(({ node }) => node);
+      const totalCount = data.myCompanies?.totalCount ?? 0;
+
+      if (!companies || totalCount === 0) {
+        if (!isFiltered) {
+          // No results and we're not filtering, redirect to the create company screen
+          navigate(routes.account.companies.orientation);
+        }
+      }
+    }
+  }, [navigate, data, isFiltered]);
+
   const getPageContent = content => (
     <div className="fr-container-fluid">
       <div className="fr-grid-row mb-4w fr-grid-row--bottom">
@@ -134,8 +148,6 @@ export default function AccountCompanyList() {
         );
       }
 
-      // No results and we're not filtering, redirect to the create company screen
-      navigate(routes.account.companies.orientation);
       return <Loader />;
     }
 
