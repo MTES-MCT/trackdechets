@@ -29,7 +29,7 @@ export const createAccount = async (
   await page.getByRole("button", { name: "Créer mon compte" }).click();
 
   // If successful, we should see the page with email confirmation info
-  console.log(">>>> CREER")
+  console.log(">>>> CREER");
   await logScreenshot(page);
   await expect(
     page.getByRole("heading", { name: "On y est presque !" })

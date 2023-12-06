@@ -1,19 +1,13 @@
 import { test } from "@playwright/test";
 import { createAccount, confirmAccount } from "./utils/user";
+import { debugApiCalls } from "./utils/debug";
 
 test("create an account", async ({ page }) => {
   const USER_NAME = `User e2e n°1`;
   const USER_EMAIL = `user.e2e.n1@mail.com`;
   const USER_PASSWORD = "Us3r_E2E_0ne$$$";
 
-  page.on('request', request => console.log('>>', request.method(), request.url(), request.postData()));
-  page.on('response', async response => {
-    try {
-      console.log('<<', response.status(), response.url(), await response.json())
-    }catch(e){
-      console.log('<<', response.status(), response.url())
-    }
-  });
+  debugApiCalls(page);
 
   // Create the account
   await createAccount(page, {
