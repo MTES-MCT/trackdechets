@@ -1,10 +1,11 @@
 import { Page, expect } from "@playwright/test";
 import { prisma } from "back";
 
-export const createAccount = async (
-  page: Page,
-  { username, email, password }
-) => {
+/**
+ * Creates an account with provided credentials.
+ * Will *not* activate the account via email link.
+ */
+export const signup = async (page: Page, { username, email, password }) => {
   await page.goto("/signup");
 
   // Name
@@ -32,7 +33,10 @@ export const createAccount = async (
   return { username, email, password };
 };
 
-export const confirmAccount = async (page: Page, { email }) => {
+/**
+ * Activates a created account via the activation hash sent by mail.
+ */
+export const activateUser = async (page: Page, { email }) => {
   // Fetch activation link in the DB
   const user = await prisma.user.findFirstOrThrow({ where: { email } });
   const userAccountHash = await prisma.userActivationHash.findFirstOrThrow({
@@ -49,4 +53,25 @@ export const confirmAccount = async (page: Page, { email }) => {
   await expect(page.getByText("Votre compte est créé !")).toBeVisible();
 
   return { email, userAccountHash };
+};
+
+/**
+ * Logs a user in with provided credentials.
+ */
+export const login = async (page: Page, { email, password }) => {
+  // Go to login page
+  await page.goto("/login");
+
+  // Fill credentials and click button
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Mot de passe", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Se connecter" }).click();
+
+  // Make sure we are redirected to the account page & Disconnect button is visible
+  await page.waitForURL("/account/companies/create");
+  await expect(
+    page.getByRole("button", { name: "Se déconnecter" })
+  ).toBeVisible();
+
+  return { email, password };
 };

@@ -38,9 +38,9 @@ jobs:
           npx nx run-many -t serve --projects=api,front,tag:backend:background --parallel=6 &
 
       # Testing DNS resolution
-      - name: Testing API resolution
-        run: |
-          ping -c 2 api.trackdechets.local
+      # - name: Testing API resolution
+      #   run: |
+      #     ping -c 2 api.trackdechets.local
       # - name: Testing UI resolution
       #   run: |
       #     ping -c 2 trackdechets.local

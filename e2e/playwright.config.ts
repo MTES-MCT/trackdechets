@@ -1,12 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// require('dotenv').config();
-
-/**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
@@ -28,7 +22,8 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
     /* Use headless mode if you need to debug with screenshots in the CI */
-    headless: false,
+    headless: true,
+    /* Manually setup dimensions or the window will be cropped */
     deviceScaleFactor: 1,
     viewport: {
       height: 1080,
