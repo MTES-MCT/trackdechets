@@ -225,7 +225,7 @@ function DashboardRoutes() {
 
             <Route
               path={toRelative(routes.dashboardv2.bsds.reviews)}
-              element={<DashboardPage />}
+              element={<DashboardPage key="reviewsPage" />}
             />
 
             <Route
