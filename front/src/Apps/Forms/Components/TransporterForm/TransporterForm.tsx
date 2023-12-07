@@ -11,7 +11,6 @@ import {
   Transporter as FormTransporter,
   Transporter
 } from "codegen-ui";
-import Alert from "@codegouvfr/react-dsfr/Alert";
 import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
 import TransporterRecepisse from "../TransporterRecepisse/TransporterRecepisse";
 import { isForeignVat } from "shared/constants";
@@ -30,11 +29,6 @@ type TransporterFormProps = {
  */
 export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
   const [field, _, { setValue }] = useField<FormTransporter>(fieldName);
-
-  // message d'erreur lié à la sélection d'un établissement. Ex :
-  // - établissement non inscrit sur Trackdéchets
-  // - établissement inscrit mais sans le profil transporteur
-  const [companyError, setCompanyError] = React.useState<string | null>(null);
 
   const transporter = field.value;
 
@@ -80,24 +74,27 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
         validityLimit: company.transporterReceipt?.validityLimit,
         department: company.transporterReceipt?.department
       };
-
       setValue(updatedTransporter);
+    }
+  };
 
+  const selectedCompanyError = (company?: CompanySearchResult) => {
+    if (company) {
       if (!company.isRegistered) {
-        setCompanyError(
-          "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau."
-        );
+        return "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau.";
       } else if (
-        company.isRegistered &&
+        !transporter.isExemptedOfReceipt &&
         !company.companyTypes?.includes(CompanyType.Transporter)
       ) {
-        setCompanyError(
-          "Cet établissement est bien inscrit sur Trackdéchets mais n'a pas le profil Transporteur, il ne peut pas être ajouté sur le bordereau."
+        return (
+          "Cet établissement est bien inscrit sur Trackdéchets mais n'a pas le profil Transporteur." +
+          " Il ne peut pas être ajouté sur le bordereau." +
+          " Si vous transportez vos propres déchets, veuillez cocher la case d'exemption après avoir vérifié" +
+          " que vous remplissez bien les conditions."
         );
-      } else {
-        setCompanyError(null);
       }
     }
+    return null;
   };
 
   return (
@@ -107,17 +104,10 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
         formOrgId={transporterOrgId}
         favoriteType={FavoriteType.Transporter}
         allowForeignCompanies={true}
+        selectedCompanyError={selectedCompanyError}
         disabled={false}
         onCompanySelected={onCompanySelected}
       />
-
-      {companyError && (
-        <Alert
-          title={transporter.company?.name ?? "Entreprise"}
-          description={companyError}
-          severity="error"
-        />
-      )}
 
       <CompanyContactInfo fieldName={`${fieldName}.company`} />
 

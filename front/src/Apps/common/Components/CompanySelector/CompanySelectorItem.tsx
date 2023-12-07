@@ -32,6 +32,7 @@ function highlight(text: string, highlight: string): ReactNode {
 
 const CompanySelectorItem = ({
   selected,
+  selectedError,
   onSelect,
   company,
   searchClue = "",
@@ -65,40 +66,46 @@ const CompanySelectorItem = ({
   );
 
   return (
-    <div
-      className={classNames("company-selector-item", {
-        "company-selector-item__selected": selected
-      })}
-      role={"button"}
-      tabIndex={0}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-    >
-      <div className="company-selector-item__icon">
-        {company.isRegistered ? <IconTDCompany /> : null}
-      </div>
-      <div className="company-selector-item__content">
-        <div className="company-selector-item__info">
-          <p>
-            <b>{highlightedName}</b> - {highlightedOrgId} - {highlightedAdress}{" "}
-            - {countryCode}
-          </p>
+    <>
+      <div
+        className={classNames("company-selector-item", {
+          "company-selector-item__selected": selected,
+          "company-selector-item__selected__error": Boolean(selectedError)
+        })}
+        role={"button"}
+        tabIndex={0}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+      >
+        <div className="company-selector-item__icon">
+          {company.isRegistered ? <IconTDCompany /> : null}
         </div>
-        <div className="company-selector-item__link">
-          <a
-            href={generatePath(routes.company, {
-              orgId: company.orgId!
-            })}
-            onClick={e => e.stopPropagation()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="fr-link"
-          >
-            Lien vers la page entreprise
-          </a>
+        <div className="company-selector-item__content">
+          <div className="company-selector-item__info">
+            <p>
+              <b>{highlightedName}</b> - {highlightedOrgId} -{" "}
+              {highlightedAdress} - {countryCode}
+            </p>
+          </div>
+          <div className="company-selector-item__link">
+            <a
+              href={generatePath(routes.company, {
+                orgId: company.orgId!
+              })}
+              onClick={e => e.stopPropagation()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="fr-link"
+            >
+              Lien vers la page entreprise
+            </a>
+          </div>
         </div>
       </div>
-    </div>
+      {selectedError ? (
+        <div className="fr-error-text">{selectedError}</div>
+      ) : null}
+    </>
   );
 };
 

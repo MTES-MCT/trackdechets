@@ -14,6 +14,7 @@ const isSearchValid = searchClue => searchClue.length >= 3;
 const CompanySelector = ({
   loading,
   selectedCompany,
+  selectedCompanyError,
   companies,
   favorites,
   disabled = false,
@@ -147,6 +148,7 @@ const CompanySelector = ({
             <CompanySelectorItem
               company={selectedCompany}
               selected
+              selectedError={selectedCompanyError}
               onSelect={handleOnSelect}
             ></CompanySelectorItem>
           </div>

@@ -3,6 +3,10 @@ import { CompanySearchResult } from "codegen-ui";
 export interface CompanySelectorProps {
   loading: boolean;
   selectedCompany?: CompanySearchResult;
+  // Erreur relative à l'établissement sélectionneé. Exemple :
+  // Le transporteur n'est pas inscrit sur Trackdéchets ou n'a pas le
+  // bon profil.
+  selectedCompanyError?: string | null;
   companies?: CompanySearchResult[];
   favorites?: CompanySearchResult[];
   disabled?: boolean;
@@ -16,6 +20,10 @@ export interface CompanySelectorProps {
 
 export interface CompanySelectorItemProps {
   selected?: boolean;
+  // Erreur relative à l'établissement sélectionneé. Exemple :
+  // Le transporteur n'est pas inscrit sur Trackdéchets ou n'a pas le
+  // bon profil.
+  selectedError?: string | null;
   company: CompanySearchResult;
   onSelect: (company?: CompanySearchResult) => void;
   searchClue?: string;

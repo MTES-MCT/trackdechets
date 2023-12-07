@@ -20,8 +20,15 @@ interface CompanySelectorWrapperProps {
   // render lorsqu'on est dans le cas d'un update de bordereau
   formOrgId?: string | null;
   favoriteType?: FavoriteType;
-  allowForeignCompanies?: boolean;
+  // Paramètre qui est passée à `searchCompanies`, les données sont
+  // filtrées directement côté serveur
+  allowForeignCompanies: boolean;
+  // Callback spécifié par le composant parent pour modifier les données
+  // du store
   onCompanySelected?: (company?: CompanySearchResult) => void;
+  // Permet de valider que l'établissement sélectionné satisfait certains
+  // critères (ex : inscrit sur Trackdéchets avec un profil spécifique)
+  selectedCompanyError?: (company?: CompanySearchResult) => string | null;
   // Numéro SIRET ou VAT de l'établissement courant (utile pour le calcul des favoris)
   orgId?: string;
   disabled?: boolean;
@@ -40,6 +47,7 @@ export default function CompanySelectorWrapper({
   formOrgId,
   favoriteType = FavoriteType.Emitter,
   allowForeignCompanies = false,
+  selectedCompanyError,
   orgId,
   disabled = false,
   onCompanySelected
@@ -110,6 +118,13 @@ export default function CompanySelectorWrapper({
     }
   };
 
+  const memoizedSelectedCompanyError = React.useMemo(() => {
+    if (selectedCompanyError && selectedCompany) {
+      return selectedCompanyError(selectedCompany);
+    }
+    return null;
+  }, [selectedCompany, selectedCompanyError]);
+
   const isForbiddenCompanyError = (error: ApolloError) => {
     return (
       error.graphQLErrors.length &&
@@ -156,10 +171,11 @@ export default function CompanySelectorWrapper({
         favorites={favoritesData?.favorites}
         companies={searchResults}
         selectedCompany={selectedCompany}
+        selectedCompanyError={memoizedSelectedCompanyError}
         disabled={disabled}
         searchHint={
           allowForeignCompanies
-            ? "ou numéro de TVA intracommunautaire pour les entreprises étrangères"
+            ? "ou numéro TVA pour un transporteur de l'UE"
             : undefined
         }
         departmentHint={
