@@ -362,14 +362,36 @@ describe("TransporterForm", () => {
       })
     );
 
-    const notRegisteredError = await screen.findByText(
+    const notRegisteredWithTransporterProfile = await screen.findByText(
       "Cet établissement est bien inscrit sur Trackdéchets mais n'a pas le profil Transporteur." +
         " Il ne peut pas être ajouté sur le bordereau." +
         " Si vous transportez vos propres déchets, veuillez cocher la case d'exemption après avoir vérifié" +
         " que vous remplissez bien les conditions."
     );
 
-    expect(notRegisteredError).toBeInTheDocument();
+    expect(notRegisteredWithTransporterProfile).toBeInTheDocument();
+  });
+
+  test("no error message should be displayed if company has not the TRANSPORTER profile but exemption is active", async () => {
+    render(
+      Component({
+        data: { ...defaultTransporter, isExemptedOfReceipt: true },
+        mocks: [
+          searchCompaniesMock(defaultTransporter, {
+            companyTypes: [CompanyType.Producer]
+          })
+        ]
+      })
+    );
+
+    await expect(() =>
+      screen.findByText(
+        "Cet établissement est bien inscrit sur Trackdéchets mais n'a pas le profil Transporteur." +
+          " Il ne peut pas être ajouté sur le bordereau." +
+          " Si vous transportez vos propres déchets, veuillez cocher la case d'exemption après avoir vérifié" +
+          " que vous remplissez bien les conditions."
+      )
+    ).rejects.toThrow();
   });
 
   test("favorites should be displayed when we focus the search bar", async () => {
