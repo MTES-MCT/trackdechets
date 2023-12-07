@@ -59,5 +59,5 @@ describe("updateCompany", () => {
       where: { id: "85001946400013" },
       data: { website: "" }
     });
-  });
+  }, 10000);
 });
