@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import { formatDate } from "../../../../common/datetime";
 import {
   Transporter,
   BsffTransporterInput,
@@ -15,10 +14,10 @@ import {
   Query,
   QueryCompanyPrivateInfosArgs
 } from "codegen-ui";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { isForeignVat } from "shared/constants";
 import { TRANSPORTER_RECEIPT } from "../../../../Apps/common/queries/company/query";
 import { useQuery } from "@apollo/client";
+import TransporterRecepisse from "../../../../Apps/Forms/Components/TransporterRecepisse/TransporterRecepisse";
 
 export type NotFormTransporter =
   | BsdaTransporterInput
@@ -31,7 +30,12 @@ type UniversalTransporter =
   | NotFormTransporter
   | BsffTransporter;
 
-export default function TransporterReceiptComponent({
+/**
+ * Ce wrapper autour de TransporterRecepisse est en charge
+ * de calculer la valeur de `isExemptedOfReceipt` pour tous les types de bordereau
+ * et de requêter `companyPrivateInfos` pour avoir les infos de récépissé à jour.
+ */
+export default function TransporterRecepisseWrapper({
   transporter
 }: {
   transporter: UniversalTransporter;
@@ -80,33 +84,10 @@ export default function TransporterReceiptComponent({
   return !loading &&
     !isExemptedOfReceipt &&
     !isForeignVat(transporter.company?.vatNumber!) ? (
-    <div className="fr-grid-row fr-mb-2w fr-mt-2w">
-      <Alert
-        title={"Récépissé de déclaration de transport de déchets"}
-        severity={receipt?.receiptNumber?.length ? "info" : "error"}
-        description={
-          receipt?.receiptNumber ? (
-            <p>
-              Numéro: {receipt?.receiptNumber}, département:{" "}
-              {receipt?.department}, date limite de validité:{" "}
-              {formatDate(receipt?.validityLimit!)}.
-              <br />
-              Informations complétées par le transporteur dans son profil
-              Trackdéchets.
-            </p>
-          ) : (
-            <p>
-              L'entreprise de transport n'a pas complété ces informations dans
-              son profil Trackdéchets. Nous ne pouvons pas les afficher. Il lui
-              appartient de les compléter.{" "}
-              <span className="tw-text-red-500">
-                Dans le cas contraire, elle ne pourra pas signer la prise en
-                charge des déchets.
-              </span>
-            </p>
-          )
-        }
-      />
-    </div>
+    <TransporterRecepisse
+      number={receipt?.receiptNumber}
+      department={receipt?.department}
+      validityLimit={receipt?.validityLimit}
+    />
   ) : null;
 }

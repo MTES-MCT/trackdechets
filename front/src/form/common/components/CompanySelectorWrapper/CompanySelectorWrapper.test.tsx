@@ -56,7 +56,7 @@ describe("CompanySelectorWrapper", () => {
   it("renders without errors", async () => {
     const { container } = render(
       <MockedProvider mocks={mocks}>
-        <CompanySelectorWrapper siret={testSiret} />
+        <CompanySelectorWrapper orgId={testSiret} />
       </MockedProvider>
     );
     expect(container).toBeTruthy();
@@ -65,7 +65,7 @@ describe("CompanySelectorWrapper", () => {
   it("should set selectedCompany at render if `formOrgId` is specified", async () => {
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <CompanySelectorWrapper siret={testSiret} formOrgId={formOrgId} />
+        <CompanySelectorWrapper orgId={testSiret} formOrgId={formOrgId} />
       </MockedProvider>
     );
 
