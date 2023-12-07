@@ -22,7 +22,7 @@ interface CompanySelectorWrapperProps {
   favoriteType?: FavoriteType;
   // Paramètre qui est passée à `searchCompanies`, les données sont
   // filtrées directement côté serveur
-  allowForeignCompanies: boolean;
+  allowForeignCompanies?: boolean;
   // Callback spécifié par le composant parent pour modifier les données
   // du store
   onCompanySelected?: (company?: CompanySearchResult) => void;
