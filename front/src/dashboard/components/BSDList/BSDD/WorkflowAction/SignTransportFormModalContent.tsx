@@ -22,7 +22,7 @@ import {
 import { FormWasteTransportSummary } from "./FormWasteTransportSummary";
 import { FormJourneySummary } from "./FormJourneySummary";
 import SignatureCodeInput from "../../../../../form/common/components/custom-inputs/SignatureCodeInput";
-import TransporterReceipt from "../../../../../form/common/components/company/TransporterReceipt";
+import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 
@@ -179,7 +179,7 @@ export default function SignTransportFormModalContent({
           <FormWasteTransportSummary form={form} />
           <FormJourneySummary form={form} />
           {form.emitter?.type !== EmitterType.Appendix1Producer && (
-            <TransporterReceipt transporter={form.transporter!} />
+            <TransporterRecepisseWrapper transporter={form.transporter!} />
           )}
           <p>
             En qualité de <strong>transporteur du déchet</strong>, j'atteste que

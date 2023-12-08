@@ -4,7 +4,7 @@ import { Field, useField } from "formik";
 import { FavoriteType, BsvhuEmitter } from "codegen-ui";
 import { useParams } from "react-router-dom";
 import React, { useMemo } from "react";
-import CompanyContactInfo from "../common/components/company/CompanyContactInfo";
+import CompanyContactInfo from "../../Apps/Forms/Components/CompanyContactInfo/CompanyContactInfo";
 
 export default function Emitter({ disabled }) {
   const { siret } = useParams<{ siret: string }>();

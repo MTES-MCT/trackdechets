@@ -44,6 +44,10 @@
     }
   }
 
+  &__form {
+    padding-top: 15px;
+  }
+
   @media (max-width: 800px) {
     &__header {
       flex-direction: column;

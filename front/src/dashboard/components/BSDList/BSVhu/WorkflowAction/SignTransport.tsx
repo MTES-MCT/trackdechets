@@ -3,7 +3,7 @@ import { RedErrorMessage } from "../../../../../common/components";
 import { GET_BSDS } from "../../../../../Apps/common/queries";
 import routes from "../../../../../Apps/routes";
 import { UPDATE_VHU_FORM } from "../../../../../form/bsvhu/utils/queries";
-import TransporterReceipt from "../../../../../form/common/components/company/TransporterReceipt";
+import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { Field, Form, Formik } from "formik";
 import {
@@ -126,7 +126,7 @@ export function SignTransport({
                   j'atteste que les informations ci-dessus sont correctes. En
                   signant ce document, je déclare prendre en charge le déchet.
                 </p>
-                <TransporterReceipt transporter={bsvhu.transporter!} />
+                <TransporterRecepisseWrapper transporter={bsvhu.transporter!} />
 
                 <div className="form__row">
                   <label>

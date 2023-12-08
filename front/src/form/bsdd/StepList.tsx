@@ -24,6 +24,7 @@ import {
   UPDATE_FORM_TRANSPORTER
 } from "../../Apps/Forms/Components/query";
 import { NotificationError } from "../../Apps/common/Components/Error/Error";
+import { isForeignVat } from "shared/constants";
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (form: Form | undefined) => ReactElement;
@@ -102,8 +103,22 @@ export default function StepsList(props: Props) {
       ...rest
     } = values;
 
+    // S'assure que les données de récépissé transport sont nulles
+    // lorsque l'exemption est cochée ou que le transporteur est étranger
+    const cleanTransporters = transporters.map(transporter => ({
+      ...transporter,
+      ...(transporter.isExemptedOfReceipt ||
+      isForeignVat(transporter?.company?.vatNumber)
+        ? {
+            receipt: null,
+            validityLimit: null,
+            department: null
+          }
+        : {})
+    }));
+
     const formTransportersIds: string[] = await Promise.all(
-      transporters.map(async t => {
+      cleanTransporters.map(async t => {
         if (t.id) {
           const { id, ...input } = t;
           await updateFormTransporter({

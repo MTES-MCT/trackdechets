@@ -38,7 +38,10 @@ export function TransporterAccordion({
   const collapseElementId = `transporter__${numero}__form`;
 
   return (
-    <section className="fr-accordion">
+    <section
+    // En attente de l'activation du multi-modal
+    // className="fr-accordion"
+    >
       <div className="transporter__header">
         <label className="transporter__header__label">{name}</label>
         <div className="transporter__header__buttons">
@@ -94,7 +97,12 @@ export function TransporterAccordion({
           />
         </div>
       </div>
-      <div id={collapseElementId} className="fr-collapse fr-collapse--expanded">
+      <div
+        id={collapseElementId}
+        // En attente de l'activation du multi-modal
+        // className="fr-collapse fr-collapse--expanded"
+        className="transporter__form"
+      >
         {children}
       </div>
     </section>
