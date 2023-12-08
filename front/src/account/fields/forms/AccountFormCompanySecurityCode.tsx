@@ -30,7 +30,7 @@ export default function AccountFormCompanySecurityCode({
   });
 
   const cautionMessage =
-    "Attention, vous êtes sur le point de demander un nouveau code de signature qui va vous être attribué de façon aléatoire; vous veillerez à en informer les personnes en charge de la validation du BSD auprès du transporteur";
+    "Attention, un nouveau code de signature va vous être attribué de façon aléatoire; vous veillerez à en informer les personnes en charge de la validation du BSD auprès du transporteur. Notez qu'il est prudent de le renouveler si vous pensez qu'il est connu d'un tiers et que le nombre de renouvellement par minute est limité.";
 
   if (loading) {
     return <div>Renouvellement en cours...</div>;
