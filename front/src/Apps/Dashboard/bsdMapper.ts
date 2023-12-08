@@ -208,7 +208,7 @@ const mapBsff = (bsff: Bsff): BsdDisplay => {
     destination: bsff.destination || bsff["bsffDestination"],
     transporter: bsff.transporter || bsff["bsffTransporter"],
     updatedAt: bsff["bsffUpdatedAt"],
-    bsdWorkflowType: bsff.type,
+    bsdWorkflowType: bsff["bsffType"] || bsff.type,
     grouping: bsff.grouping,
     transporterCustomInfo: bsff["bsffTransporter"]?.customInfo,
     transporterNumberPlate: bsff["bsffTransporter"]?.transport?.plates,
