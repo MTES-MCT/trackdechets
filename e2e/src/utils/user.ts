@@ -1,12 +1,13 @@
 import { Page, expect } from "@playwright/test";
 import { prisma } from "back";
+import { goTo } from "./navigation";
 
 /**
  * Logs a user in with provided credentials. Makes no assertion.
  */
 export const login = async (page: Page, { email, password }) => {
   // Go to login page
-  await page.goto("/login");
+  await goTo(page, "/login");
 
   // Fill credentials and click button
   await page.getByLabel("Email").fill(email);
@@ -56,7 +57,7 @@ export const successfulLogin = async (page: Page, { email, password }) => {
  * Will *not* activate the account via email link.
  */
 export const signup = async (page: Page, { username, email, password }) => {
-  await page.goto("/signup");
+  await goTo(page, "/signup");
 
   // Name
   await page.getByLabel("Nom et prénom").fill(username);
@@ -146,7 +147,7 @@ export const activateUser = async (page: Page, { email }) => {
   });
 
   // Go to activation link
-  await page.goto(`/user-activation?hash=${userAccountHash.hash}`);
+  await goTo(page, `/user-activation?hash=${userAccountHash.hash}`);
 
   // Activate account
   await page.getByRole("button", { name: "Activer mon compte" }).click();
@@ -155,4 +156,100 @@ export const activateUser = async (page: Page, { email }) => {
   await expect(page.getByText("Votre compte est créé !")).toBeVisible();
 
   return { email, userAccountHash };
+};
+
+/**
+ * Will navigate to the account page and verify that account data is accurate.
+ * You can pass any of the input params to check them separately.
+ */
+interface TestAccountInfoProps {
+  email?: string;
+  username?: string;
+  phone?: string;
+}
+export const testAccountInfo = async (
+  page: Page,
+  { email, username, phone }: TestAccountInfoProps
+) => {
+  // Go to account page
+  await goTo(page, "/account/info");
+
+  // Verify account data
+  if (email) await expect(page.getByText(`Email${email}`)).toBeVisible();
+  if (username)
+    await expect(page.getByText(`Nom utilisateur${username}`)).toBeVisible();
+  if (phone) await expect(page.getByText(`Téléphone${phone}`)).toBeVisible();
+
+  return { email, username, phone };
+};
+
+/**
+ * Modifies the phone number on the account page. Does not make any assertion.
+ */
+export const updatePhoneNbr = async (page, { phone }) => {
+  // Go to account page
+  await goTo(page, "/account/info");
+
+  const phoneInput = page.getByPlaceholder("Téléphone");
+  if (!(await phoneInput.isVisible())) {
+    // Click on the button to modify phone number. Tricky: can either
+    // be labelled "Ajouter" or "Modifier", and is a div, not a button
+    await page
+      .locator("text=Téléphone")
+      .locator("..")
+      .locator('div:has-text("Ajouter"), div:has-text("Modifier")')
+      .click();
+  }
+
+  // Fill in new phone number and validate
+  await page.getByPlaceholder("Téléphone").click();
+  await page.getByPlaceholder("Téléphone").fill(phone);
+  await page.getByRole("button", { name: "Valider" }).click();
+};
+
+/**
+ * Tests the constraints on the phone input, with invalid and valid phone numbers.
+ * Will ultimately clear the input.
+ */
+export const testPhoneNbrUpdate = async page => {
+  // Regular numbers
+
+  // Too long
+  await updatePhoneNbr(page, { phone: "04710000000" });
+  await expect(
+    page.getByText("Merci de renseigner un numéro de téléphone valide")
+  ).toBeVisible();
+
+  // Too short
+  await updatePhoneNbr(page, { phone: "047100000" });
+  await expect(
+    page.getByText("Merci de renseigner un numéro de téléphone valide")
+  ).toBeVisible();
+
+  // Valid
+  await updatePhoneNbr(page, { phone: "0471000000" });
+  await testAccountInfo(page, { phone: "0471000000" });
+
+  // +33 Number
+
+  // Too long
+  await updatePhoneNbr(page, { phone: "+336000000000" });
+  await expect(
+    page.getByText("Merci de renseigner un numéro de téléphone valide")
+  ).toBeVisible();
+
+  // Too short
+  await updatePhoneNbr(page, { phone: "+3360000000" });
+  await expect(
+    page.getByText("Merci de renseigner un numéro de téléphone valide")
+  ).toBeVisible();
+
+  // Valid
+  await updatePhoneNbr(page, { phone: "+33600000000" });
+  await testAccountInfo(page, { phone: "+33600000000" });
+
+  // Empty field
+  await updatePhoneNbr(page, { phone: "" });
+  // TODO: does not work because have to validate twice (bug)
+  await testAccountInfo(page, { phone: "" });
 };

@@ -20,3 +20,13 @@ export const testNavigation = async (
 
   return { linkLabel, targetUrl, targetPageLabel };
 };
+
+/**
+ * Goes to a given URL if not already there. Avoids useless loading times.
+ */
+export const goTo = async (page, path) => {
+  const currentPath = new URL(page.url()).pathname;
+  if (currentPath !== path) {
+    await page.goto(path);
+  }
+};

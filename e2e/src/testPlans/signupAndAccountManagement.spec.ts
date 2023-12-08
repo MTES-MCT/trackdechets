@@ -3,12 +3,15 @@ import {
   activateUser,
   failedLogin,
   successfulLogin,
-  successfulSignup
+  successfulSignup,
+  testAccountInfo,
+  testPhoneNbrUpdate
 } from "../utils/user";
 import { testNavigation } from "../utils/navigation";
 
 test.describe
   .serial("Cahier de recette Inscription / gestion de compte", async () => {
+  // User credentials
   const USER_NAME = `User e2e n°1`;
   const USER_EMAIL = `user.e2e.n1@mail.com`;
   const USER_PASSWORD = "Us3r_E2E_0ne$$$";
@@ -85,6 +88,17 @@ test.describe
         targetUrl: "/account/info",
         targetPageLabel: "Informations générales"
       });
+    });
+
+    await test.step("Onglet'Mon compte' > les bonnes informations sont affichées", async () => {
+      await testAccountInfo(page, {
+        username: USER_NAME,
+        email: USER_EMAIL
+      });
+    });
+
+    await test.step("Onglet'Mon compte' > Modification du numéro de téléphone", async () => {
+      await testPhoneNbrUpdate(page);
     });
   });
 });
