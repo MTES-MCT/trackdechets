@@ -31,7 +31,7 @@
       flex-direction: column;
 
       // En attente de l'implémentation du multi-modal
-      visibility: hidden;
+      //visibility: hidden;
 
       @include phone {
         flex-direction: row;
