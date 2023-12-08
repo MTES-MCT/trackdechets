@@ -1,0 +1,90 @@
+import { test } from "@playwright/test";
+import {
+  activateUser,
+  failedLogin,
+  successfulLogin,
+  successfulSignup
+} from "../utils/user";
+import { testNavigation } from "../utils/navigation";
+
+test.describe
+  .serial("Cahier de recette Inscription / gestion de compte", async () => {
+  const USER_NAME = `User e2e n°1`;
+  const USER_EMAIL = `user.e2e.n1@mail.com`;
+  const USER_PASSWORD = "Us3r_E2E_0ne$$$";
+
+  test("Tentative de connexion avec un compte non-existant", async ({
+    page
+  }) => {
+    await failedLogin(page, {
+      email: USER_EMAIL,
+      password: USER_PASSWORD
+    });
+  });
+
+  // TODO: re-enable me when bug is fixed!
+  // test("Création de compte > Force du mot de passe", async ({ page }) => {
+  //   await testSignupPasswordPolicy(page);
+  // });
+
+  test("Création de compte", async ({ page }) => {
+    await successfulSignup(page, {
+      username: USER_NAME,
+      email: USER_EMAIL,
+      password: USER_PASSWORD
+    });
+  });
+
+  test("Activation du compte", async ({ page }) => {
+    await activateUser(page, { email: USER_EMAIL });
+  });
+
+  test("Connexion avec un compte valide > Mauvais mot de passe", async ({
+    page
+  }) => {
+    await failedLogin(page, {
+      email: USER_EMAIL,
+      password: USER_PASSWORD + "e"
+    });
+  });
+
+  test("Connexion avec un compte valide > Mauvais email", async ({ page }) => {
+    await failedLogin(page, {
+      email: "e" + USER_EMAIL,
+      password: USER_PASSWORD
+    });
+  });
+
+  test("Utilisateur connecté", async ({ page }) => {
+    await test.step("Connexion avec un compte valide", async () => {
+      await successfulLogin(page, {
+        email: USER_EMAIL,
+        password: USER_PASSWORD
+      });
+    });
+
+    await test.step("Clic sur 'Mon espace' > redirige vers la page 'Etablissements'", async () => {
+      await testNavigation(page, {
+        linkLabel: "Mon espace",
+        targetUrl: "/account/companies",
+        targetPageLabel: "Établissements"
+      });
+    });
+
+    await test.step("Clic sur 'Mes bordereaux' > redirige vers la page 'Etablissements'", async () => {
+      await testNavigation(page, {
+        linkLabel: "Mes bordereaux",
+        targetUrl: "/account/companies",
+        targetPageLabel: "Établissements"
+      });
+    });
+
+    await test.step("Clic sur 'Mon compte' > redirige vers la page 'Informations générales'", async () => {
+      await testNavigation(page, {
+        linkLabel: "Mon compte",
+        targetUrl: "/account/info",
+        targetPageLabel: "Informations générales"
+      });
+    });
+  });
+});

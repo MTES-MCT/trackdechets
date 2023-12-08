@@ -3,18 +3,20 @@ import { Page, expect } from "@playwright/test";
 /**
  * Tests that clicking on a link redirects to the expected page, testing both URL & page label
  */
-export const testClicRedirectsTo = async (
+export const testNavigation = async (
   page: Page,
-  { linkLabel, url, pageLabel }
+  { linkLabel, targetUrl, targetPageLabel }
 ) => {
   // Click on button
   await page.getByRole("link", { name: linkLabel }).click();
 
   // Check redirection
-  await page.waitForURL(url);
+  await page.waitForURL(targetUrl);
 
   // Check page label
-  await expect(page.getByRole("heading", { name: pageLabel })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: targetPageLabel })
+  ).toBeVisible();
 
-  return { linkLabel, url, pageLabel };
+  return { linkLabel, targetUrl, targetPageLabel };
 };
