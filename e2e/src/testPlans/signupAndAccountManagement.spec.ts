@@ -61,7 +61,9 @@ test.describe
     });
   });
 
-  test("Utilisateur connecté: modification des informations de compte", async ({ page }) => {
+  test("Utilisateur connecté: modification des informations de compte", async ({
+    page
+  }) => {
     await test.step("Connexion avec un compte valide", async () => {
       await successfulLogin(page, {
         email: USER_EMAIL,
@@ -105,7 +107,10 @@ test.describe
     });
 
     await test.step("Onglet'Mon compte' > Modification du mot de passe", async () => {
-      await testPasswordUpdate(page, { oldPassword: USER_PASSWORD, newPassword: NEW_USER_PASSWORD});
+      await testPasswordUpdate(page, {
+        oldPassword: USER_PASSWORD,
+        newPassword: NEW_USER_PASSWORD
+      });
     });
 
     await test.step("Onglet'Mon compte' > Logout", async () => {
@@ -113,14 +118,18 @@ test.describe
     });
   });
 
-  test("Onglet'Mon compte' > Tentative de connexion avec l'ancien mot de passe", async ({ page }) => {
+  test("Onglet'Mon compte' > Tentative de connexion avec l'ancien mot de passe", async ({
+    page
+  }) => {
     await failedLogin(page, {
       email: USER_EMAIL,
       password: USER_PASSWORD
     });
   });
 
-  test("Onglet'Mon compte' > Connexion avec le nouveau mot de passe", async ({ page }) => {
+  test("Onglet'Mon compte' > Connexion avec le nouveau mot de passe", async ({
+    page
+  }) => {
     await successfulLogin(page, {
       email: USER_EMAIL,
       password: NEW_USER_PASSWORD
