@@ -333,7 +333,7 @@ describe("TransporterForm", () => {
     ).toBeInTheDocument();
   });
 
-  test.only("exemption of recepisse should be disabled when transporter is foreign", async () => {
+  test("exemption of recepisse should be disabled when transporter is foreign", async () => {
     const foreignTransporter = {
       ...defaultTransporter,
       company: {
