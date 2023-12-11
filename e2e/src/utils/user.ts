@@ -1,6 +1,7 @@
 import { Page, expect } from "@playwright/test";
 import { prisma } from "back";
 import { goTo } from "./navigation";
+import { wait } from "./time";
 
 /**
  * Logs a user in with provided credentials. Makes no assertion.
@@ -15,6 +16,13 @@ export const login = async (page: Page, { email, password }) => {
   await page.getByRole("button", { name: "Se connecter" }).click();
 
   return { email, password };
+};
+
+/**
+ * Logs a user out.
+ */
+export const logout = async (page: Page) => {
+  await page.getByRole('button', { name: 'Se déconnecter' }).click();
 };
 
 /**
@@ -166,10 +174,11 @@ interface TestAccountInfoProps {
   email?: string;
   username?: string;
   phone?: string;
+  password?: string;
 }
 export const testAccountInfo = async (
   page: Page,
-  { email, username, phone }: TestAccountInfoProps
+  { email, username, phone, password }: TestAccountInfoProps
 ) => {
   // Go to account page
   await goTo(page, "/account/info");
@@ -179,6 +188,7 @@ export const testAccountInfo = async (
   if (username)
     await expect(page.getByText(`Nom utilisateur${username}`)).toBeVisible();
   if (phone) await expect(page.getByText(`Téléphone${phone}`)).toBeVisible();
+  if (password) await expect(page.getByText(`Mot de passe${password}`)).toBeVisible();
 
   return { email, username, phone };
 };
@@ -190,8 +200,8 @@ export const updatePhoneNbr = async (page, { phone }) => {
   // Go to account page
   await goTo(page, "/account/info");
 
-  const phoneInput = page.getByPlaceholder("Téléphone");
-  if (!(await phoneInput.isVisible())) {
+  const updatePhoneInput = page.getByPlaceholder("Téléphone");
+  if (!(await updatePhoneInput.isVisible())) {
     // Click on the button to modify phone number. Tricky: can either
     // be labelled "Ajouter" or "Modifier", and is a div, not a button
     await page
@@ -202,13 +212,20 @@ export const updatePhoneNbr = async (page, { phone }) => {
   }
 
   // Fill in new phone number and validate
-  await page.getByPlaceholder("Téléphone").click();
   await page.getByPlaceholder("Téléphone").fill(phone);
-  await page.getByRole("button", { name: "Valider" }).click();
+
+  const validatePhoneInput = page.getByRole("button", { name: "Valider" });
+  await validatePhoneInput.click();
+  
+  // TODO: fix the bug! Sometimes we have to submit twice...
+  await wait(500);
+  if(await validatePhoneInput.isVisible()){
+    await validatePhoneInput.click();
+  }
 };
 
 /**
- * Tests the constraints on the phone input, with invalid and valid phone numbers.
+ * Tests the validation on the phone input, with invalid and valid phone numbers.
  * Will ultimately clear the input.
  */
 export const testPhoneNbrUpdate = async page => {
@@ -250,6 +267,63 @@ export const testPhoneNbrUpdate = async page => {
 
   // Empty field
   await updatePhoneNbr(page, { phone: "" });
-  // TODO: does not work because have to validate twice (bug)
   await testAccountInfo(page, { phone: "" });
+};
+
+/**
+ * Modifies the password on the account page. Does not make any assertion.
+ */
+ export const updatePassword = async (page, { oldPassword, newPassword, confirmNewPassword }) => {
+  // Go to account page
+  await goTo(page, "/account/info");
+
+  const updatePasswordInput = page
+  .locator("text=Mot de passe")
+  .locator("..")
+  .locator('div:has-text("Modifier")');
+
+  // If we are not already editing the password, click on Modify
+  if (await updatePasswordInput.isVisible()) {
+    await updatePasswordInput.click();
+  }
+
+  // Old password
+  await page.getByLabel('Ancien mot de passe:').fill(oldPassword);
+
+  // New password
+  await page.getByLabel('Nouveau mot de passe:', { exact: true }).fill(newPassword);
+
+  // Confirm new password
+  await page.getByLabel('Confirmation du nouveau mot de passe:').fill(confirmNewPassword);
+
+  const validatePasswordInput = page.getByRole("button", { name: "Valider" });
+  await validatePasswordInput.click();
+
+  // TODO: fix the bug! Sometimes we have to submit twice...
+  await wait(500);
+  if(await validatePasswordInput.isVisible()){
+    await validatePasswordInput.click();
+  }
+};
+
+/**
+ * Tests the validation on the phone input, with invalid and valid phone numbers.
+ * Will ultimately try to save the passed 'password' input
+ */
+export const testPasswordUpdate = async (page, { oldPassword, newPassword }) => {
+  // Old password is incorrect
+  await updatePassword(page, { oldPassword: oldPassword + 'e', newPassword, confirmNewPassword: newPassword });
+  await expect(page.getByText('L\'ancien mot de passe est incorrect')).toBeVisible();
+
+  // New password is not strong enough
+  await updatePassword(page, { oldPassword, newPassword: "123456789", confirmNewPassword: "123456789" });
+  await expect(page.getByText('Votre mot de passe est trop court (9 caractères), la longueur minimale est de 10 caractères')).toBeVisible();
+
+  // New password & confirmation don't match
+  await updatePassword(page, { oldPassword, newPassword, confirmNewPassword: newPassword + 'e' });
+  await expect(page.getByText('Les deux mots de passe ne sont pas identiques.')).toBeVisible();
+
+  // Valid
+  await updatePassword(page, { oldPassword, newPassword, confirmNewPassword: newPassword });
+  await testAccountInfo(page, { password: "**********" });
 };

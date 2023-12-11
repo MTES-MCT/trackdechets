@@ -2,9 +2,11 @@ import { test } from "@playwright/test";
 import {
   activateUser,
   failedLogin,
+  logout,
   successfulLogin,
   successfulSignup,
   testAccountInfo,
+  testPasswordUpdate,
   testPhoneNbrUpdate
 } from "../utils/user";
 import { testNavigation } from "../utils/navigation";
@@ -12,9 +14,10 @@ import { testNavigation } from "../utils/navigation";
 test.describe
   .serial("Cahier de recette Inscription / gestion de compte", async () => {
   // User credentials
-  const USER_NAME = `User e2e n°1`;
-  const USER_EMAIL = `user.e2e.n1@mail.com`;
+  const USER_NAME = "User e2e n°1";
+  const USER_EMAIL = "user.e2e.n1@mail.com";
   const USER_PASSWORD = "Us3r_E2E_0ne$$$";
+  const NEW_USER_PASSWORD = "Us3r_E2E_0ne$$$Bis";
 
   test("Tentative de connexion avec un compte non-existant", async ({
     page
@@ -58,7 +61,7 @@ test.describe
     });
   });
 
-  test("Utilisateur connecté", async ({ page }) => {
+  test("Utilisateur connecté: modification des informations de compte", async ({ page }) => {
     await test.step("Connexion avec un compte valide", async () => {
       await successfulLogin(page, {
         email: USER_EMAIL,
@@ -99,6 +102,28 @@ test.describe
 
     await test.step("Onglet'Mon compte' > Modification du numéro de téléphone", async () => {
       await testPhoneNbrUpdate(page);
+    });
+
+    await test.step("Onglet'Mon compte' > Modification du mot de passe", async () => {
+      await testPasswordUpdate(page, { oldPassword: USER_PASSWORD, newPassword: NEW_USER_PASSWORD});
+    });
+
+    await test.step("Onglet'Mon compte' > Logout", async () => {
+      await logout(page);
+    });
+  });
+
+  test("Onglet'Mon compte' > Tentative de connexion avec l'ancien mot de passe", async ({ page }) => {
+    await failedLogin(page, {
+      email: USER_EMAIL,
+      password: USER_PASSWORD
+    });
+  });
+
+  test("Onglet'Mon compte' > Connexion avec le nouveau mot de passe", async ({ page }) => {
+    await successfulLogin(page, {
+      email: USER_EMAIL,
+      password: NEW_USER_PASSWORD
     });
   });
 });
