@@ -12,7 +12,6 @@ import {
 import { CompanySearchResult } from "../../companies/types";
 import { FavoriteType } from "../../generated/graphql/types";
 import { getTransporterCompanyOrgId } from "shared/constants";
-import { getCompanyOrCompanyNotFound } from "../../companies/database";
 import { BsdElastic, index } from "../../common/elastic";
 import { AnonymousCompanyError } from "../../companies/sirene/errors";
 
@@ -338,7 +337,12 @@ export const favoritesConstrutor = async ({
   orgId,
   type
 }: FavoritesInput): Promise<CompanySearchResult[]> => {
-  const company = await getCompanyOrCompanyNotFound({ orgId });
+  const company = await prisma.company.findUnique({
+    where: { orgId }
+  });
+  if (!company) {
+    return [];
+  }
   const favorites = company.orgId
     ? await getRecentPartners(company.orgId, type)
     : [];
