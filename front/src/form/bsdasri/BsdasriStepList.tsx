@@ -7,7 +7,7 @@ import { Loader } from "../../Apps/common/Components";
 import { getComputedState } from "../common/getComputedState";
 
 import { IStepContainerProps } from "../common/stepper/Step";
-import { formInputToastError } from "../common/stepper/toaster";
+import { toastApolloError } from "../common/stepper/toaster";
 import {
   Mutation,
   MutationCreateBsdasriArgs,
@@ -213,7 +213,7 @@ export default function BsdasriStepsList(props: Props) {
       .then(_ => {
         navigate(-1);
       })
-      .catch(err => formInputToastError(err));
+      .catch(err => toastApolloError(err));
   }
 
   // As it's a render function, the steps are nested into a `<></>` block

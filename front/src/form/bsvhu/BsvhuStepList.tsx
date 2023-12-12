@@ -4,7 +4,7 @@ import { generatePath, useNavigate, useParams } from "react-router-dom";
 import routes from "../../Apps/routes";
 import { getComputedState } from "../common/getComputedState";
 import { IStepContainerProps } from "../common/stepper/Step";
-import { formInputToastError } from "../common/stepper/toaster";
+import { toastApolloError } from "../common/stepper/toaster";
 import {
   Mutation,
   MutationCreateBsvhuArgs,
@@ -74,7 +74,7 @@ export default function BsvhuStepsList(props: Props) {
         });
         navigate(redirectTo);
       })
-      .catch(err => formInputToastError(err));
+      .catch(err => toastApolloError(err));
   }
 
   // As it's a render function, the steps are nested into a `<></>` block

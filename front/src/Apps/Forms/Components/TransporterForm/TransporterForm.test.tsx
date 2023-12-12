@@ -333,6 +333,29 @@ describe("TransporterForm", () => {
     ).toBeInTheDocument();
   });
 
+  test("exemption of recepisse should be disabled when transporter is foreign", async () => {
+    const foreignTransporter = {
+      ...defaultTransporter,
+      company: {
+        ...defaultTransporter.company,
+        orgId: "IT13029381004",
+        siret: null,
+        vatNumber: "IT13029381004"
+      }
+    };
+    render(
+      Component({
+        data: foreignTransporter,
+        mocks: [searchCompaniesMock(foreignTransporter)]
+      })
+    );
+    const exemptionInput = screen.getByLabelText(
+      "Le transporteur déclare être exempté de récépissé conformément aux dispositions de l'",
+      { exact: false }
+    );
+    expect(exemptionInput).toBeDisabled();
+  });
+
   test("an error message should be displayed if company is not registered in Trackdéchets", async () => {
     render(
       Component({

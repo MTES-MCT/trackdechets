@@ -32,9 +32,19 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
 
   const transporter = field.value;
 
+  // transporter.company.orgId should always be defined
+  // but let's not take the risk
   const transporterOrgId = React.useMemo(
-    () => transporter?.company?.orgId ?? transporter?.company?.siret ?? null,
-    [transporter?.company?.orgId, transporter?.company?.siret]
+    () =>
+      transporter?.company?.orgId ??
+      transporter?.company?.siret ??
+      transporter?.company?.vatNumber ??
+      null,
+    [
+      transporter?.company?.orgId,
+      transporter?.company?.siret,
+      transporter?.company?.vatNumber
+    ]
   );
 
   const isForeign = React.useMemo(
@@ -72,7 +82,12 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
         // auto-complétion du récépissé de transport
         receipt: company.transporterReceipt?.receiptNumber,
         validityLimit: company.transporterReceipt?.validityLimit,
-        department: company.transporterReceipt?.department
+        department: company.transporterReceipt?.department,
+        isExemptedOfReceipt: isForeignVat(company.vatNumber)
+          ? // l'obligation de récépissé ne concerne pas les transporteurs étrangers
+            // on force la valeur à `false` et on désactive le champ
+            false
+          : transporter.isExemptedOfReceipt
       };
       setValue(updatedTransporter);
     }
@@ -130,6 +145,7 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
             }
             inputTitle="terms"
             checked={field.value}
+            disabled={isForeign}
             onChange={checked =>
               form.setFieldValue(`${fieldName}.isExemptedOfReceipt`, checked)
             }
