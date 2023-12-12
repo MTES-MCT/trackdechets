@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
-import React, { lazy } from "react";
+import React from "react";
 import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
 import * as yup from "yup";
