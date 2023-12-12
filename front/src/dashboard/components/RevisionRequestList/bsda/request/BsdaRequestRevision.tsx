@@ -26,9 +26,7 @@ import styles from "./BsdaRequestRevision.module.scss";
 import { BSDA_WASTES } from "shared/constants";
 import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCancelationInput";
 import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
-const TagsInput = lazy(
-  () => import("../../../../../common/components/tags-input/TagsInput")
-);
+import TagsInput from "../../../../../common/components/tags-input/TagsInput";
 
 type Props = {
   bsda: Bsda;
