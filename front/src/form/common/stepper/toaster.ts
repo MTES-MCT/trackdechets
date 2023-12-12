@@ -5,7 +5,7 @@ import { TOAST_DURATION } from "../../../common/config";
 /**
  * Common toaster display for ApolloError on form submission
  */
-export const formInputToastError = (err: ApolloError) => {
+export const toastApolloError = (err: ApolloError) => {
   err.graphQLErrors.length &&
     err.graphQLErrors.forEach(gqerr => {
       // avoid duplicate error

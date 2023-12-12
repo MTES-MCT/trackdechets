@@ -12,7 +12,7 @@ import {
 } from "../../../../generated/graphql/types";
 import { BsdasriType } from "@prisma/client";
 import prisma from "../../../../prisma";
-import { xDaysAgo } from "../../../../commands/onboarding.helpers";
+import { xDaysAgo } from "../../../../utils";
 import { searchCompany } from "../../../../companies/search";
 
 jest.mock("../../../../companies/search");
@@ -423,5 +423,37 @@ describe("Mutation.duplicateBsdasri", () => {
     expect(duplicatedBsdasri.destinationCompanyAddress).toEqual(
       "updated destination address"
     );
+  });
+
+  it("should *not* duplicate waste details", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company)
+      }
+    });
+
+    const { mutate } = makeClient(user); // emitter
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
+      DUPLICATE_DASRI,
+      {
+        variables: {
+          id: dasri.id
+        }
+      }
+    );
+    expect(data.duplicateBsdasri.status).toBe("INITIAL");
+    expect(data.duplicateBsdasri.isDraft).toBe(true);
+
+    const duplicatedDasri = await prisma.bsdasri.findFirstOrThrow({
+      where: { id: data.duplicateBsdasri.id }
+    });
+
+    expect(duplicatedDasri.emitterWasteWeightValue).toBeNull();
+    expect(duplicatedDasri.emitterWasteWeightIsEstimate).toBeNull();
+    expect(duplicatedDasri.emitterWasteVolume).toBeNull();
+    expect(duplicatedDasri.emitterWastePackagings).toStrictEqual([]);
   });
 });

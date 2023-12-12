@@ -4,12 +4,14 @@ import {
   MutationMarkSegmentAsReadyToTakeOverArgs,
   MutationTakeOverSegmentArgs,
   NextSegmentInfoInput,
-  TransportSegment
+  TransportSegment,
+  TransporterInput
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import {
   expandTransportSegmentFromDb,
-  flattenTransportSegmentInput
+  flattenTransportSegmentInput,
+  flattenTransporterInput
 } from "../../converter";
 import { Prisma } from "@prisma/client";
 import { getFormRepository } from "../../repository";
@@ -183,6 +185,10 @@ export async function markSegmentAsReadyToTakeOver(
   const form = nextTransporter.form!;
 
   const formUpdateInput = await recipifyTransporterInDb(nextTransporter);
+  const data: Prisma.BsddTransporterUpdateInput = flattenTransporterInput({
+    transporter: nextTransporter as TransporterInput
+  });
+
   const formRepository = getFormRepository(user);
 
   if (form.status !== "SENT") {
@@ -201,12 +207,11 @@ export async function markSegmentAsReadyToTakeOver(
     throw new ForbiddenError(SEGMENT_ALREADY_SEALED);
   }
 
-  const transporterSchema = transporterSchemaFn({
-    signingTransporterOrgId: null
-  });
-
   try {
-    await transporterSchema.validate(nextTransporter, { abortEarly: false });
+    // validate the updated recipified version
+    await transporterSchemaFn({
+      signingTransporterOrgId: getTransporterCompanyOrgId(nextTransporter)
+    }).validate({ ...nextTransporter, ...data }, { abortEarly: false });
   } catch (err) {
     throw new UserInputError(
       `Erreur, impossible de finaliser la préparation du transfert multi-modal car des champs sont manquants ou mal renseignés. \nErreur(s): ${err.errors.join(

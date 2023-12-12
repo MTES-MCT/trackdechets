@@ -40,7 +40,7 @@ const initialState: BsffFormInput = {
   waste: {
     code: "14 06 01*",
     description: "",
-    adr: "UN 1078, Gaz frigorifique NSA (Gaz réfrigérant, NSA), 2.2 (C/E)"
+    adr: ""
   },
   weight: {
     value: 0,

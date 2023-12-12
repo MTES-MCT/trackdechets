@@ -4,7 +4,7 @@ import { GET_BSDS } from "../../../../../Apps/common/queries";
 import routes from "../../../../../Apps/routes";
 import { UPDATE_BSDA } from "../../../../../form/bsda/stepper/queries";
 import { Transport } from "../../../../../form/bsda/stepper/steps/Transport";
-import TransporterReceipt from "../../../../../form/common/components/company/TransporterReceipt";
+import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import { getComputedState } from "../../../../../form/common/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
@@ -16,7 +16,7 @@ import {
   TransportMode
 } from "codegen-ui";
 import React from "react";
-import { generatePath, Link, useRouteMatch } from "react-router-dom";
+import { generatePath, Link, useMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsda, SIGN_BSDA } from "./SignBsda";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
@@ -54,7 +54,7 @@ export function SignTransport({
   >(SIGN_BSDA, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   const TODAY = new Date();
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
   const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
 
   return (
@@ -158,7 +158,7 @@ export function SignTransport({
                   j'atteste que les informations ci-dessus sont correctes. En
                   signant ce document, je déclare prendre en charge le déchet.
                 </p>
-                <TransporterReceipt transporter={bsda.transporter!} />
+                <TransporterRecepisseWrapper transporter={bsda.transporter!} />
 
                 <div className="form__row">
                   <label>

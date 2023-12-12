@@ -1,0 +1,109 @@
+{
+  "name": "queues-runner",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/queues-runner/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "dependsOn": ["^codegen", "^prisma"],
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/queues-runner",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "apps/queues-runner/src/main.ts",
+        "tsConfig": "apps/queues-runner/tsconfig.app.json",
+        "assets": [
+          {
+            "input": "./libs/back/mail/src",
+            "glob": "**/*.html",
+            "output": "./libs/back/mail/src"
+          },
+          {
+            "input": "./back/src",
+            "glob": "**/*.{graphql,pdf,png,ttf,html,css,svg,wsdl,mp3}",
+            "output": "./back/src"
+          },
+          {
+            "input": "./back/src",
+            "glob": "**/assets/*.js",
+            "output": "./back/src"
+          },
+          {
+            "input": "./back/prisma",
+            "glob": "**/*.{prisma,sql}",
+            "output": "./back/prisma"
+          }
+        ],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {
+          "skipTypeCheck": true
+        },
+        "integration": {
+          "skipTypeCheck": true
+        },
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "queues-runner:build",
+        "inspect": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "queues-runner:build:development"
+        },
+        "integration": {
+          "watch": false,
+          "buildTarget": "queues-runner:build:integration"
+        },
+        "production": {
+          "buildTarget": "queues-runner:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/queues-runner/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/queues-runner/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    }
+  },
+  "tags": ["backend:queues", "backend:background"]
+}

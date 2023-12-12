@@ -10,7 +10,7 @@ import MarkAsTempStorerAccepted from "./MarkAsTempStorerAccepted";
 import SignEmissionForm from "./SignEmissionForm";
 import SignTransportForm from "./SignTransportForm";
 import routes from "../../../../../Apps/routes";
-import { useRouteMatch } from "react-router-dom";
+import { useMatch } from "react-router-dom";
 
 import {
   PrepareSegment,
@@ -27,7 +27,7 @@ export interface WorkflowActionProps {
 export function WorkflowAction(props: WorkflowActionProps) {
   // siret prop contains either SIRET or a VAT number
   const { form, siret } = props;
-  const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
+  const isActTab = !!useMatch(routes.dashboard.bsds.act);
 
   const isTempStorage = form.recipient?.isTempStorage;
   const isAppendix1 = form.emitter?.type === EmitterType.Appendix1;

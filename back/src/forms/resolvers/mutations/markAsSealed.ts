@@ -11,8 +11,7 @@ import {
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { sendMail } from "../../../mailer/mailing";
-import { renderMail } from "../../../mailer/templates/renderers";
-import { contentAwaitsGuest } from "../../../mailer/templates";
+import { renderMail, contentAwaitsGuest } from "@td/mail";
 import { EmitterType, Form, Status } from "@prisma/client";
 import { FormRepository, getFormRepository } from "../../repository";
 import prisma from "../../../prisma";

@@ -14,7 +14,7 @@ export function RouteBsdsFollow() {
   const { siret } = useParams<{ siret: string }>();
   const defaultWhere = useMemo(
     () => ({
-      isFollowFor: [siret]
+      isFollowFor: [siret!]
     }),
     [siret]
   );
@@ -28,7 +28,7 @@ export function RouteBsdsFollow() {
 
       <BSDList
         key={siret}
-        siret={siret}
+        siret={siret!}
         defaultWhere={defaultWhere}
         blankslate={
           <Blankslate>

@@ -1,5 +1,5 @@
 import axios from "axios";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 
 const GEO_API_BASE_URL = "https://geo.api.gouv.fr";
 

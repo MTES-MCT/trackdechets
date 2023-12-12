@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { NavLink, generatePath, useHistory } from "react-router-dom";
+import { NavLink, generatePath, useNavigate } from "react-router-dom";
 import { CompanyPrivate } from "codegen-ui";
 import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
 import routes from "../../../routes";
@@ -35,7 +35,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
   const [expanded, setExpanded] = useState(false);
 
   const { permissions } = usePermissions();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { showTransportTabs } = useShowTransportTabs(
     currentCompany.companyTypes,
@@ -46,13 +46,13 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
 
   const handleCompanyChange = useCallback(
     orgId => {
-      history.push(
+      navigate(
         generatePath(routes.dashboardv2.bsds.index, {
           siret: orgId
         })
       );
     },
-    [history]
+    [navigate]
   );
 
   const handleToggle = () => {
@@ -86,8 +86,11 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                   to={generatePath(routes.dashboardv2.bsds.index, {
                     siret: currentCompany.orgId
                   })}
-                  className="sidebarv2__item sidebarv2__item--indented"
-                  activeClassName="sidebarv2__item--active"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                      : "sidebarv2__item sidebarv2__item--indented"
+                  }
                 >
                   {ALL_BSDS}
                 </NavLink>
@@ -97,8 +100,11 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                   to={generatePath(routes.dashboardv2.bsds.drafts, {
                     siret: currentCompany.orgId
                   })}
-                  className="sidebarv2__item sidebarv2__item--indented"
-                  activeClassName="sidebarv2__item--active"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                      : "sidebarv2__item sidebarv2__item--indented"
+                  }
                 >
                   {DRAFTS}
                 </NavLink>
@@ -109,8 +115,11 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                   to={generatePath(routes.dashboardv2.bsds.act, {
                     siret: currentCompany.orgId
                   })}
-                  className="sidebarv2__item sidebarv2__item--indented"
-                  activeClassName="sidebarv2__item--active"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                      : "sidebarv2__item sidebarv2__item--indented"
+                  }
                 >
                   {ACTS}
                 </NavLink>
@@ -121,8 +130,11 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                   to={generatePath(routes.dashboardv2.bsds.follow, {
                     siret: currentCompany.orgId
                   })}
-                  className="sidebarv2__item sidebarv2__item--indented"
-                  activeClassName="sidebarv2__item--active"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                      : "sidebarv2__item sidebarv2__item--indented"
+                  }
                 >
                   {FOLLOWS}
                 </NavLink>
@@ -132,8 +144,11 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                   to={generatePath(routes.dashboardv2.bsds.history, {
                     siret: currentCompany.orgId
                   })}
-                  className="sidebarv2__item sidebarv2__item--indented"
-                  activeClassName="sidebarv2__item--active"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                      : "sidebarv2__item sidebarv2__item--indented"
+                  }
                 >
                   {ARCHIVES}
                 </NavLink>
@@ -148,8 +163,11 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                   to={generatePath(routes.dashboardv2.bsds.reviews, {
                     siret: currentCompany.orgId
                   })}
-                  className="sidebarv2__item sidebarv2__item--indented"
-                  activeClassName="sidebarv2__item--active"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                      : "sidebarv2__item sidebarv2__item--indented"
+                  }
                 >
                   {ALL_REVIEWS}
                 </NavLink>
@@ -160,8 +178,11 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                   to={generatePath(routes.dashboardv2.bsds.toReviewed, {
                     siret: currentCompany.orgId,
                   })}
-                  className="sidebarv2__item sidebarv2__item--indented"
-                  activeClassName="sidebarv2__item--active"
+                  className={({isActive}) =>
+                    isActive
+                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                      : "sidebarv2__item sidebarv2__item--indented"
+                  }
                 >
                   {TO_REVIEWED}
                 </NavLink>
@@ -171,8 +192,11 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                   to={generatePath(routes.dashboardv2.bsds.reviewed, {
                     siret: currentCompany.orgId,
                   })}
-                  className="sidebarv2__item sidebarv2__item--indented"
-                  activeClassName="sidebarv2__item--active"
+                  className={({isActive}) =>
+                    isActive
+                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                      : "sidebarv2__item sidebarv2__item--indented"
+                  }
                 >
                   {REVIEWED}
                 </NavLink>
@@ -190,8 +214,11 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 to={generatePath(routes.dashboardv2.transport.toCollect, {
                   siret: currentCompany.orgId
                 })}
-                className="sidebarv2__item sidebarv2__item--indented"
-                activeClassName="sidebarv2__item--active"
+                className={({ isActive }) =>
+                  isActive
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
+                }
               >
                 {TO_COLLECT}
               </NavLink>
@@ -201,8 +228,11 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 to={generatePath(routes.dashboardv2.transport.collected, {
                   siret: currentCompany.orgId
                 })}
-                className="sidebarv2__item sidebarv2__item--indented"
-                activeClassName="sidebarv2__item--active"
+                className={({ isActive }) =>
+                  isActive
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
+                }
               >
                 {COLLECTED}
               </NavLink>
@@ -215,8 +245,11 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
           to={generatePath(routes.dashboardv2.exports, {
             siret: currentCompany.orgId
           })}
-          className="sidebarv2__item sidebarv2__item--chapter"
-          activeClassName="sidebarv2__item--active"
+          className={({ isActive }) =>
+            isActive
+              ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+              : "sidebarv2__item sidebarv2__item--indented"
+          }
         >
           {REGISTER}
         </NavLink>

@@ -155,26 +155,17 @@ export const editionRules: EditionRules = {
   },
   destinationCompanyContact: {
     readableFieldName: "le contact de l'entreprise de destination",
-    sealed: {
-      from: "EMISSION",
-      when: isDestinationSealed
-    },
+    sealed: { from: "TRANSPORT" },
     required: { from: "EMISSION" }
   },
   destinationCompanyPhone: {
     readableFieldName: "le téléphone de l'entreprise de destination",
-    sealed: {
-      from: "EMISSION",
-      when: isDestinationSealed
-    },
+    sealed: { from: "TRANSPORT" },
     required: { from: "EMISSION" }
   },
   destinationCompanyMail: {
     readableFieldName: "l'email de l'entreprise de destination",
-    sealed: {
-      from: "EMISSION",
-      when: isDestinationSealed
-    },
+    sealed: { from: "TRANSPORT" },
     required: { from: "EMISSION" }
   },
   destinationCustomInfo: { sealed: { from: "OPERATION" } },

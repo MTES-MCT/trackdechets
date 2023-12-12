@@ -1,11 +1,9 @@
-import templateIds from "../../mailer/templates/provider/templateIds";
 import { sendMail } from "../../mailer/mailing";
-import { Mail } from "../../mailer/types";
+import { backend, Mail, templateIds } from "@td/mail";
 import { mailQueue } from "../producers/mail";
 import { resetCache } from "../../../integration-tests/helper";
-import { backend } from "../../mailer";
 
-jest.mock("../../mailer");
+jest.mock("@td/mail");
 
 describe("Test the mail job queue", () => {
   afterAll(resetCache);

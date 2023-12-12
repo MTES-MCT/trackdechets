@@ -24,8 +24,7 @@ import {
   MutationSignBsdaArgs
 } from "../../../generated/graphql/types";
 import { sendMail } from "../../../mailer/mailing";
-import { finalDestinationModified } from "../../../mailer/templates";
-import { renderMail } from "../../../mailer/templates/renderers";
+import { Mail, finalDestinationModified, renderMail } from "@td/mail";
 import { checkCanSignFor } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
@@ -34,7 +33,6 @@ import { machine } from "../../machine";
 import { renderBsdaRefusedEmail } from "../../mails/refused";
 import { BsdaRepository, getBsdaRepository } from "../../repository";
 import { parseBsdaInContext } from "../../validation";
-import { Mail } from "../../../mailer/types";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,

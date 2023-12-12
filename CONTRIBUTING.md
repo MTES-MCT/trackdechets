@@ -98,8 +98,12 @@
 
 8. Lancer les services.
 
+   Il est conseiller de lancer les services dans différents terminaux pour plus de lisibilité:
+
    ```bash
-   npx nx run-many -t serve
+   > npx nx run api:serve # API
+   > npx nx run front:serve # Frontend
+   > npx nx run-many --parallel=4 -t serve --projects=tag:backend:background # Services annexes: notifier & queues
    ```
 
 9. Accéder aux différents services.

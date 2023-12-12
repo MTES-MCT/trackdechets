@@ -15,13 +15,13 @@ type WhereKeys =
 // | state              | emitter | transporter | destination |
 // |--------------------|---------|-------------|-------------|
 // | initial (draft)    | draft   | draft       | draft       |
-// | initial            | action  | to collect  | follow      |
+// | initial            | action  | follow      | follow      |
 // | signed_by_producer | follow  | to collect  | follow      |
 // | sent               | follow  | collected   | action      |
 // | processed          | archive | archive     | archive     |
 // | refused            | archive | archive     | archive     |
 
-function getWhere(bsvhu: Bsvhu): Pick<BsdElastic, WhereKeys> {
+export function getWhere(bsvhu: Bsvhu): Pick<BsdElastic, WhereKeys> {
   const where: Record<WhereKeys, string[]> = {
     isDraftFor: [],
     isForActionFor: [],
@@ -59,7 +59,7 @@ function getWhere(bsvhu: Bsvhu): Pick<BsdElastic, WhereKeys> {
         }
       } else {
         setTab(siretsFilters, "emitterCompanySiret", "isForActionFor");
-        setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
+        setTab(siretsFilters, "transporterCompanySiret", "isFollowFor");
       }
       break;
     }

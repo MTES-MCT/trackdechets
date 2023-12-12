@@ -1,13 +1,11 @@
 import React, { lazy, Suspense } from "react";
 import {
   Route,
-  Switch,
-  Redirect,
+  Routes,
+  Navigate,
   generatePath,
-  RouteChildrenProps,
-  useRouteMatch
+  useMatch
 } from "react-router-dom";
-import PrivateRoute from "../../../../login/PrivateRoute";
 import * as Sentry from "@sentry/browser";
 import Loader from "../Loader/Loaders";
 import Layout from "./Layout";
@@ -17,6 +15,7 @@ import { Query } from "codegen-ui";
 import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
+import { RequireAuth, Redirect } from "../../../utils/routerUtils";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const Dashboard = lazy(() => import("../../../../dashboard/Dashboard"));
@@ -77,12 +76,12 @@ export default function LayoutContainer() {
       }
     }
   });
+
   const isAuthenticated = !loading && data != null;
   const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
 
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
-  const isDashboardRoutes = !!useRouteMatch("/dashboard/");
-  const dashboardRoutePrefix = isV2Routes ? "dashboardv2" : "dashboard";
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
+  const isDashboardRoutes = !!useMatch("/dashboard/*");
 
   if (loading) {
     return <Loader />;
@@ -101,223 +100,314 @@ export default function LayoutContainer() {
 
   return (
     <Suspense fallback={<Loader />}>
-      <Switch>
-        <PrivateRoute
-          exact
+      <Routes>
+        <Route
           path="/oauth2/authorize/dialog"
-          isAuthenticated={isAuthenticated}
-        >
-          <OauthDialog />
-        </PrivateRoute>
-        <PrivateRoute
-          exact
+          element={
+            <RequireAuth isAuthenticated={isAuthenticated}>
+              <OauthDialog />
+            </RequireAuth>
+          }
+        />
+
+        <Route
           path="/oidc/authorize/dialog"
-          isAuthenticated={isAuthenticated}
+          element={
+            <RequireAuth isAuthenticated={isAuthenticated}>
+              <OidcDialog />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          element={
+            <Layout
+              isAuthenticated={isAuthenticated}
+              isAdmin={isAdmin}
+              v2banner={v2banner}
+              defaultOrgId={data?.me.companies[0]?.orgId}
+            />
+          }
         >
-          <OidcDialog />
-        </PrivateRoute>
-        <Route>
-          <Layout
-            isAuthenticated={isAuthenticated}
-            isAdmin={isAdmin}
-            v2banner={v2banner}
-            defaultOrgId={data?.me.companies[0]?.orgId}
-          >
-            <Switch>
-              <PrivateRoute
-                path={routes.admin.index}
-                isAuthenticated={isAuthenticated}
-              >
+          <Route
+            path={`${routes.admin.index}/*`}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 {isAdmin ? (
                   <Admin />
                 ) : (
                   <div>Vous n'êtes pas autorisé à consulter cette page</div>
                 )}
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <Route exact path={routes.login}>
-                <Login />
-              </Route>
+          <Route path={routes.login} element={<Login />} />
 
-              <Route exact path={routes.invite}>
-                <Invite />
-              </Route>
+          <Route path={routes.invite} element={<Invite />} />
 
-              <Route exact path={routes.signup.index}>
-                <Signup />
-              </Route>
+          <Route path={routes.signup.index} element={<Signup />} />
 
-              <Route exact path={routes.signup.details}>
-                <WasteSelector />
-              </Route>
+          <Route path={routes.signup.details} element={<WasteSelector />} />
 
-              <Route exact path={routes.passwordResetRequest}>
-                <PasswordResetRequest />
-              </Route>
+          <Route
+            path={routes.passwordResetRequest}
+            element={<PasswordResetRequest />}
+          />
 
-              <Route exact path={routes.passwordReset}>
-                <PasswordReset />
-              </Route>
+          <Route path={routes.passwordReset} element={<PasswordReset />} />
 
-              <Route exact path={routes.userActivation}>
-                <UserActivation />
-              </Route>
-              <Route exact path={routes.resendActivationEmail}>
-                <ResendActivationEmail />
-              </Route>
+          <Route path={routes.userActivation} element={<UserActivation />} />
 
-              <Route exact path={routes.company}>
-                <Company />
-              </Route>
+          <Route
+            path={routes.resendActivationEmail}
+            element={<ResendActivationEmail />}
+          />
 
-              <Route exact path={routes.wasteTree}>
-                <WasteTree />
-              </Route>
+          <Route path={routes.company} element={<Company />} />
 
-              <Route
-                path={[
-                  "/dashboard/:siret/bsds/edit/:id",
-                  "/v2/dashboard/:siret/bsds/edit/:id"
-                ]}
-                exact
-              >
-                {({
-                  match
-                }: RouteChildrenProps<{ siret: string; id: string }>) => (
-                  <Redirect
-                    to={generatePath(routes[dashboardRoutePrefix].bsdds.edit, {
-                      siret: match!.params.siret,
-                      id: match!.params.id
-                    })}
-                  />
-                )}
-              </Route>
+          <Route path={routes.wasteTree} element={<WasteTree />} />
 
-              <PrivateRoute
-                path={routes[dashboardRoutePrefix].bsdds.edit}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
+          <Route
+            path={"/dashboard/:siret/bsds/edit/:id"}
+            element={<Redirect path={routes.dashboard.bsdds.edit} />}
+          />
+
+          <Route
+            path={"/v2/dashboard/:siret/bsds/edit/:id"}
+            element={<Redirect path={routes.dashboardv2.bsdds.edit} />}
+          />
+
+          <Route
+            path={routes.dashboard.bsdds.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <FormContainer />
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <Route
-                path={[
-                  "/dashboard/:siret/bsds/create",
-                  "/v2/dashboard/:siret/bsds/create"
-                ]}
-                exact
-              >
-                {({ match }: RouteChildrenProps<{ siret: string }>) => (
-                  <Redirect
-                    to={generatePath(
-                      routes[dashboardRoutePrefix].bsdds.create,
-                      {
-                        siret: match!.params.siret
-                      }
-                    )}
-                  />
-                )}
-              </Route>
-              <PrivateRoute
-                path={routes[dashboardRoutePrefix].bsdds.create}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
+          <Route
+            path={routes.dashboardv2.bsdds.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <FormContainer />
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <PrivateRoute
-                path={routes[dashboardRoutePrefix].bsvhus.create}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
+          <Route
+            path={"/dashboard/:siret/bsds/create"}
+            element={<Redirect path={routes.dashboard.bsdds.create} />}
+          />
+
+          <Route
+            path={"/v2/dashboard/:siret/bsds/create"}
+            element={<Redirect path={routes.dashboardv2.bsdds.create} />}
+          />
+
+          <Route
+            path={routes.dashboard.bsdds.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <FormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboardv2.bsdds.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <FormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboard.bsvhus.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsvhuFormContainer />
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <PrivateRoute
-                path={routes[dashboardRoutePrefix].bsvhus.edit}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
+          <Route
+            path={routes.dashboardv2.bsvhus.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsvhuFormContainer />
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <PrivateRoute
-                path={routes[dashboardRoutePrefix].bsffs.create}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
+          <Route
+            path={routes.dashboard.bsvhus.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsvhuFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboardv2.bsvhus.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsvhuFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboard.bsffs.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsffFormContainer />
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <PrivateRoute
-                path={routes[dashboardRoutePrefix].bsffs.edit}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
+          <Route
+            path={routes.dashboardv2.bsffs.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsffFormContainer />
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <PrivateRoute
-                path={routes[dashboardRoutePrefix].bsdasris.create}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
+          <Route
+            path={routes.dashboard.bsffs.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsffFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboardv2.bsffs.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsffFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboard.bsdasris.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsdasriFormContainer />
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <PrivateRoute
-                path={routes[dashboardRoutePrefix].bsdasris.edit}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
+          <Route
+            path={routes.dashboardv2.bsdasris.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsdasriFormContainer />
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <PrivateRoute
-                path={routes[dashboardRoutePrefix].bsdas.create}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
+          <Route
+            path={routes.dashboard.bsdasris.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsdasriFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboardv2.bsdasris.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsdasriFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboard.bsdas.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsdaFormContainer />
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <PrivateRoute
-                path={routes[dashboardRoutePrefix].bsdas.edit}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
+          <Route
+            path={routes.dashboardv2.bsdas.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsdaFormContainer />
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <PrivateRoute
-                path={routes.dashboard.index}
-                isAuthenticated={isAuthenticated}
-              >
+          <Route
+            path={routes.dashboard.bsdas.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsdaFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboardv2.bsdas.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BsdaFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={`${routes.dashboard.index}/*`}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <Dashboard />
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <PrivateRoute
-                path={routes.dashboardv2.index}
-                isAuthenticated={isAuthenticated}
-              >
+          <Route
+            path={`${routes.dashboardv2.index}/*`}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <DashboardV2Routes />
-              </PrivateRoute>
+              </RequireAuth>
+            }
+          />
 
-              <PrivateRoute
-                path={routes.account.index}
-                isAuthenticated={isAuthenticated}
-              >
+          <Route
+            path={`${routes.account.index}/*`}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <Account />
-              </PrivateRoute>
-              <PrivateRoute
-                path={routes.membershipRequest}
-                isAuthenticated={isAuthenticated}
-              >
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.membershipRequest}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
                 <AccountMembershipRequest />
-              </PrivateRoute>
-              <Redirect
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="*"
+            element={
+              <Navigate
                 to={
                   data
                     ? data.me.companies.length > 0
@@ -327,11 +417,12 @@ export default function LayoutContainer() {
                       : routes.account.companies.list
                     : routes.login
                 }
+                replace
               />
-            </Switch>
-          </Layout>
+            }
+          />
         </Route>
-      </Switch>
+      </Routes>
     </Suspense>
   );
 }

@@ -33,19 +33,6 @@ services:
     ports:
       - 27017:27017
 
-  storybook:
-    stdin_open: true
-    image: node:18
-    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
-    working_dir: /usr/src/front
-    command: sh -c "npm install && npm run storybook"
-    expose:
-      - "6006"
-    volumes:
-      - ./front:/usr/src/front
-    ports:
-      - "6006:6006"
-
   nginx:
     image: nginx:1.19.6
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"

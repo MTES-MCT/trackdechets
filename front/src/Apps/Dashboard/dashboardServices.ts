@@ -29,6 +29,7 @@ import {
   EMPORT_DIRECT_LABEL,
   ENTREPOS_TEMPORAIREMENT,
   EN_ATTENTE_BSD_SUITE,
+  EN_ATTENTE_TRAITEMENT,
   FAIRE_SIGNER,
   INITIAL,
   PARTIELLEMENT_REFUSE,
@@ -94,7 +95,7 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.AwaitingChild:
     case BsdStatusCode.Grouped:
       if (bsdType === BsdType.Bsff) {
-        return EN_ATTENTE_BSD_SUITE;
+        return EN_ATTENTE_TRAITEMENT;
       }
       if (bsdType === BsdType.Bsda) {
         if (bsdaAnnexed) {
@@ -143,10 +144,7 @@ export const getBsdStatusLabel = (
       return EN_ATTENTE_BSD_SUITE;
     case BsdStatusCode.IntermediatelyProcessed:
       if (bsdType === BsdType.Bsff) {
-        const operationCodesBsff = ["R12", "R13", "D13", "D14", "D15"];
-        if (operationCode && operationCodesBsff.includes(operationCode)) {
-          return EN_ATTENTE_BSD_SUITE;
-        }
+        return EN_ATTENTE_TRAITEMENT;
       }
       if (bsdType === BsdType.Bsdasri) {
         return ANNEXE_BORDEREAU_SUITE;
@@ -576,6 +574,7 @@ export const getReceivedBtnLabel = (
   if (
     isBsdasri(bsd.type) &&
     isActTab &&
+    !bsd.synthesizedIn &&
     isSameSiretDestination(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {

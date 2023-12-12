@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
-import { useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import styles from "./AccountCompanyAdd.module.scss";
@@ -133,8 +133,8 @@ const localizedStrings = {
  * the logged in user admin of it
  */
 export default function AccountCompanyAddForeign() {
-  const history = useHistory();
-  const location = useLocation<{ vatNumber?: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const defaultVatNumber = location.state?.vatNumber;
 
   const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.FR);
@@ -148,7 +148,7 @@ export default function AccountCompanyAddForeign() {
   const [createCompany, { error: savingError }] = useMutation<
     Pick<Mutation, "createCompany">,
     MutationCreateCompanyArgs
-  >(CREATE_COMPANY, CREATE_COMPANY_HOOK_OPTIONS(history));
+  >(CREATE_COMPANY, CREATE_COMPANY_HOOK_OPTIONS(navigate));
 
   const memoizedStrings = useMemo(() => {
     return localizedStrings[currentLanguage];
@@ -350,7 +350,7 @@ export default function AccountCompanyAddForeign() {
                       priority="tertiary"
                       disabled={isSubmitting}
                       onClick={() => {
-                        history.goBack();
+                        navigate(-1);
                       }}
                     >
                       {memoizedStrings.cancel}

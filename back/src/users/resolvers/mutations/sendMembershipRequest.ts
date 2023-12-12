@@ -7,11 +7,11 @@ import {
   isCompanyMember
 } from "../../../companies/database";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { renderMail } from "../../../mailer/templates/renderers";
 import {
+  renderMail,
   membershipRequest as membershipRequestMail,
   membershipRequestConfirmation
-} from "../../../mailer/templates";
+} from "@td/mail";
 import { getEmailDomain, canSeeEmail } from "../../utils";
 import { UserInputError } from "../../../common/errors";
 

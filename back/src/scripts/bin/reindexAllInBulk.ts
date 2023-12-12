@@ -1,26 +1,7 @@
 import { Job, JobOptions } from "bull";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 import { index as defaultIndexConfig } from "../../common/elastic";
 import { indexQueue } from "../../queue/producers/elastic";
-
-// only meant to be executed for the api deployment, not notifier, except if --dev is passed
-// notifier deployment has STARTUP_FILE set to "dist/src/notifier/index.js"
-const { STARTUP_FILE } = process.env;
-const dev = process.argv.includes("--dev") || process.argv.includes("-d");
-
-if (STARTUP_FILE && STARTUP_FILE !== "dist/src/index.js") {
-  if (!!dev) {
-    logger.info(
-      "Starting reindexAllInBulk with --dev bypassing api deployment protection"
-    );
-  } else {
-    logger.error(
-      "Abort reindexAllInBulk: not in a TD api deployment ($STARTUP_FILE is not targeting the api server index.js)"
-    );
-    process.exit(0);
-  }
-}
-
 import prisma from "../../prisma";
 import { closeQueues } from "../../queue/producers";
 import { reindexAllBsdsInBulk } from "../../bsds/indexation";
@@ -62,6 +43,9 @@ async function exitScript() {
   process.exit(0);
 }
 
+/**
+ * Reindex all BSD with ou without the async job queue (--useQueue)
+ */
 (async function () {
   const force = process.argv.includes("--force") || process.argv.includes("-f");
   try {

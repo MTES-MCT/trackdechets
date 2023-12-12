@@ -7,11 +7,11 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
 import * as COMPANY_CONSTANTS from "shared/constants";
-import { renderMail } from "../../../mailer/templates/renderers";
 import {
+  renderMail,
   onboardingFirstStep,
   verificationProcessInfo
-} from "../../../mailer/templates";
+} from "@td/mail";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
   cleanClue,
@@ -134,9 +134,9 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     vatNumber,
     codeNaf,
     gerepId,
-    name,
+    name: companyInfo?.name ?? name,
     givenName,
-    address,
+    address: companyInfo?.address ?? address,
     companyTypes: { set: companyTypes },
     securityCode: randomNumber(4),
     verificationCode: randomNumber(5).toString(),

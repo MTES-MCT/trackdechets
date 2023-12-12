@@ -14,7 +14,7 @@ import {
   Query
 } from "codegen-ui";
 import styles from "./AccountOauth2AppCreateUpdate.module.scss";
-import { useHistory } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import routes from "../../Apps/routes";
 import {
   NotificationError,
@@ -49,13 +49,8 @@ const ApplicationInputSchema: yup.SchemaOf<CreateApplicationInput> = yup.object(
   }
 );
 
-type AccountOauth2AppCreateUpdateProps = {
-  id?: string;
-};
-
-export default function AccountOauth2AppCreateUpdate({
-  id
-}: AccountOauth2AppCreateUpdateProps) {
+export default function AccountOauth2AppCreateUpdate() {
+  const { id } = useParams();
   const { data, loading: getApplicationLoading } = useQuery<
     Pick<Query, "application">
   >(APPLICATION, {
@@ -96,7 +91,7 @@ export default function AccountOauth2AppCreateUpdate({
     MutationUpdateApplicationArgs
   >(UPDATE_APPLICATION);
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const initialValues = {
     name: data?.application?.name ?? "",
@@ -141,7 +136,7 @@ export default function AccountOauth2AppCreateUpdate({
             });
             console.log(res);
           }
-          history.push(routes.account.oauth2.list);
+          navigate(routes.account.oauth2.list);
         }}
       >
         {({ values, errors }) => (
@@ -280,7 +275,7 @@ export default function AccountOauth2AppCreateUpdate({
             <div className="td-modal-actions">
               <button
                 className="btn btn--outline-primary"
-                onClick={() => history.goBack()}
+                onClick={() => navigate(-1)}
               >
                 Annuler
               </button>

@@ -1,4 +1,5 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
+import { AuthType } from "../../../auth";
 import {
   userWithCompanyFactory,
   formFactory,
@@ -12,6 +13,19 @@ import { searchCompany } from "../../../companies/search";
 import { favoritesConstrutor } from "../indexFavorites";
 import { getFormForElastic, indexForm } from "../../../forms/elastic";
 import { index, client as elasticSearch } from "../../../common/elastic";
+import makeClient from "../../../__tests__/testClient";
+import { Mutation } from "../../../generated/graphql/types";
+
+const mockUpdateFavorites = jest.fn();
+const mockGetUpdatedCompanyNameAndAddress = jest.fn();
+// Mock external search services
+jest.mock("../../../companies/database", () => ({
+  // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
+  ...jest.requireActual("../../../companies/database"),
+  getUpdatedCompanyNameAndAddress: (...args) =>
+    mockGetUpdatedCompanyNameAndAddress(...args),
+  updateFavorites: (...args) => mockUpdateFavorites(...args)
+}));
 
 jest.mock("../../../companies/search");
 
@@ -1506,5 +1520,100 @@ describe("Index favorites job", () => {
         statutDiffusionEtablissement: "O"
       })
     ]);
+  });
+
+  it("should return the modified company if it was updated", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    (searchCompany as jest.Mock).mockResolvedValue({
+      orgId: company.orgId,
+      siret: company.orgId!,
+      vatNumber: null,
+      address: "rue des 4 chemins",
+      name: company.name,
+      isRegistered: true,
+      companyTypes: company.companyTypes,
+      statutDiffusionEtablissement: "O",
+      codePaysEtrangerEtablissement: "FR",
+      contactEmail: company.contactEmail,
+      contactPhone: company.contactPhone,
+      contact: company.contact,
+      etatAdministratif: "A"
+    });
+    await refreshIndices();
+    const favorites = await favoritesConstrutor({
+      orgId: company.orgId,
+      type: "EMITTER"
+    });
+    expect(favorites).toEqual([
+      expect.objectContaining({
+        orgId: company.orgId,
+        siret: company.siret,
+        name: company.name,
+        address: "rue des 4 chemins",
+        vatNumber: null,
+        contactEmail: company.contactEmail,
+        contactPhone: company.contactPhone,
+        contact: company.contact,
+        codePaysEtrangerEtablissement: "FR",
+        companyTypes: company.companyTypes,
+        isRegistered: true,
+        etatAdministratif: "A",
+        statutDiffusionEtablissement: "O"
+      })
+    ]);
+
+    const UPDATE_COMPANY = `
+      mutation UpdateCompany(
+        $id: String!,
+        $gerepId: String,
+        $contactEmail: String,
+        $contactPhone: String,
+        $website: String,
+        $companyTypes: [CompanyType!],
+        $givenName: String,
+        $transporterReceiptId: String,
+        $traderReceiptId: String,
+        $ecoOrganismeAgreements: [URL!],
+        $allowBsdasriTakeOverWithoutSignature: Boolean
+        ){
+          updateCompany(
+            id: $id,
+            gerepId: $gerepId,
+            contactEmail: $contactEmail,
+            contactPhone: $contactPhone,
+            companyTypes: $companyTypes,
+            website: $website,
+            givenName: $givenName,
+            transporterReceiptId: $transporterReceiptId,
+            traderReceiptId: $traderReceiptId,
+            ecoOrganismeAgreements: $ecoOrganismeAgreements,
+            allowBsdasriTakeOverWithoutSignature: $allowBsdasriTakeOverWithoutSignature,
+          ){
+            id
+            name
+            address
+          }
+        }
+    `;
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const variables = {
+      id: company.id
+    };
+
+    mockGetUpdatedCompanyNameAndAddress.mockResolvedValueOnce({
+      name: "nom de sirene",
+      address: "l'adresse de sirene"
+    });
+    await mutate<Pick<Mutation, "updateCompany">>(UPDATE_COMPANY, {
+      variables
+    });
+    expect(mockUpdateFavorites).toHaveBeenCalled();
   });
 });

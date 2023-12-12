@@ -3,8 +3,7 @@ import { promisify } from "util";
 import prisma from "../../../prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { renderMail } from "../../../mailer/templates/renderers";
-import { createPasswordResetRequest } from "../../../mailer/templates";
+import { renderMail, createPasswordResetRequest } from "@td/mail";
 import { sanitizeEmail } from "../../../utils";
 import { addHours } from "date-fns";
 import { checkCaptcha } from "../../../captcha/captchaGen";
@@ -27,6 +26,13 @@ const createPasswordResetRequestResolver: MutationResolvers["createPasswordReset
       // for security reason, do not leak  any clue
       return true;
     }
+
+    // First, delete all previous password reset hashes
+    await prisma.userResetPasswordHash.deleteMany({
+      where: { userId: user.id }
+    });
+
+    // Then generate a new hash
     const resetHash = (await promisify(crypto.randomBytes)(20)).toString("hex");
 
     const hashExpires = addHours(new Date(), 4);

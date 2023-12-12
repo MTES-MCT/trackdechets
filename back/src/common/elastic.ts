@@ -3,7 +3,7 @@ import path from "path";
 import { Client, RequestParams } from "@elastic/elasticsearch";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
-import logger from "../logging/logger";
+import { logger } from "@td/logger";
 import { BsdType, FormCompany } from "../generated/graphql/types";
 import { OperationMode } from "@prisma/client";
 import { FormForElastic } from "../forms/elastic";

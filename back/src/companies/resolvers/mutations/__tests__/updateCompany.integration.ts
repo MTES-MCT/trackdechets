@@ -5,6 +5,15 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 
+const mockGetUpdatedCompanyNameAndAddress = jest.fn();
+// Mock external search services
+jest.mock("../../../database", () => ({
+  // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
+  ...jest.requireActual("../../../database"),
+  getUpdatedCompanyNameAndAddress: (...args) =>
+    mockGetUpdatedCompanyNameAndAddress(...args)
+}));
+
 const UPDATE_COMPANY = `
   mutation UpdateCompany(
     $id: String!,
@@ -33,12 +42,17 @@ const UPDATE_COMPANY = `
         allowBsdasriTakeOverWithoutSignature: $allowBsdasriTakeOverWithoutSignature,
       ){
         id
+        name
+        address
       }
     }
 `;
 
 describe("mutation updateCompany", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    mockGetUpdatedCompanyNameAndAddress.mockReset();
+  });
 
   it("should update a company information", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -66,6 +80,73 @@ describe("mutation updateCompany", () => {
       where: { id: company.id }
     });
     expect(updatedCompany).toMatchObject(variables);
+  });
+
+  it("should update a french company information with name and adresse from Sirene index", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const variables = {
+      id: company.id
+    };
+    mockGetUpdatedCompanyNameAndAddress.mockResolvedValueOnce({
+      name: "nom de sirene",
+      address: "l'adresse de sirene"
+    });
+    const { data } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY,
+      {
+        variables
+      }
+    );
+    expect(data.updateCompany.id).toEqual(company.id);
+    expect(data.updateCompany.name).toEqual("nom de sirene");
+    expect(data.updateCompany.address).toEqual("l'adresse de sirene");
+
+    const updatedCompany = await prisma.company.findUnique({
+      where: { id: company.id }
+    });
+    expect(updatedCompany).toMatchObject({
+      name: updatedCompany?.name,
+      address: updatedCompany?.address
+    });
+  });
+
+  it("should update a foreign company information with name and adresse from Sirene index", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      vatNumber: "RO17579668",
+      name: "Acme in EU",
+      address: "Transporter street",
+      companyTypes: ["TRANSPORTER"]
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const variables = {
+      id: company.id
+    };
+    mockGetUpdatedCompanyNameAndAddress.mockResolvedValueOnce({
+      name: "nom de vies",
+      address: "l'adresse de vies"
+    });
+    const { data } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY,
+      {
+        variables
+      }
+    );
+    expect(data.updateCompany.id).toEqual(company.id);
+    expect(data.updateCompany.name).toEqual("nom de vies");
+    expect(data.updateCompany.address).toEqual("l'adresse de vies");
+
+    const updatedCompany = await prisma.company.findUnique({
+      where: { id: company.id }
+    });
+    expect(updatedCompany).toMatchObject({
+      name: updatedCompany?.name,
+      address: updatedCompany?.address
+    });
   });
 
   it("should forbid xss injection on website field", async () => {

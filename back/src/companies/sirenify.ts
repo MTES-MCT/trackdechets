@@ -3,8 +3,10 @@ import { UserInputError } from "../common/errors";
 import { searchCompany } from "../companies/search";
 import { CompanySearchResult } from "../companies/types";
 import { CompanyInput } from "../generated/graphql/types";
-import logger from "../logging/logger";
+import { logger } from "@td/logger";
 import { escapeRegExp } from "../utils";
+import { SireneSearchResult } from "./sirene/types";
+import { searchCompany as searchCompanyTD } from "./sirene/trackdechets/client";
 
 /**
  * List of emails or regular expressions of email of API
@@ -176,4 +178,21 @@ export async function searchCompanyFailFast(
     logger.info(`Sirenify failed for siret ${siret}. Reason : ${e.message}`);
     return null;
   }
+}
+
+/**
+ * Narrow search for Trackdéchets Sirene index
+ * @param siret
+ * @param _source_includes
+ * @returns
+ */
+export async function searchTDSireneFailFast(
+  siret: string
+): Promise<SireneSearchResult | null> {
+  // make sure we do not wait more thant 1s here to avoid bottlenecks
+  const raceWith = new Promise<null>(resolve =>
+    setTimeout(resolve, 1000, null)
+  );
+
+  return await Promise.race([searchCompanyTD(siret), raceWith]);
 }

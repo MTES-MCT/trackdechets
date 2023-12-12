@@ -12,7 +12,7 @@ import omitDeep from "omit-deep-lodash";
 import { getInitialWeightFn } from "../../../../../form/bsdasri/utils/initial-state";
 import { Bsdasri, BsdasriType } from "codegen-ui";
 import Transport from "../../../../../form/bsdasri/steps/Transport";
-import TransporterReceipt from "../../../../../form/common/components/company/TransporterReceipt";
+import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import { subMonths } from "date-fns";
 import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
 
@@ -96,7 +96,7 @@ export function TransportSignatureForm() {
       </div>
 
       <Transport status={BsdasriStatus.SignedByProducer} />
-      <TransporterReceipt transporter={values.transporter!} />
+      <TransporterRecepisseWrapper transporter={values.transporter!} />
     </>
   );
 }
@@ -111,7 +111,7 @@ export function SynthesisTransportSignatureForm() {
 
   return (
     <>
-      <TransporterReceipt transporter={values.transporter!} />
+      <TransporterRecepisseWrapper transporter={values.transporter!} />
       <div className="form__row">
         <label>
           Date de prise en charge

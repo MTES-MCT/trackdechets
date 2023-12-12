@@ -31,6 +31,8 @@ jobs:
           PROFESIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "250"
           VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID: "247"
           DATABASE_URL: "postgresql://user:password@postgres:5432/db"
+          UI_HOST: "http://ui.td.local"
+          API_HOST: "http://api.td.local"
           TD_COMPANY_ELASTICSEARCH_INDEX: "stocketablissement-production"
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}

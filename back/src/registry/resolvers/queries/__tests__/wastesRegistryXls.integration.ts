@@ -1,5 +1,7 @@
 import * as Excel from "exceljs";
 import fs, { createWriteStream } from "fs";
+import { tmpdir } from "node:os";
+import { join, sep } from "node:path";
 import {
   refreshElasticSearch,
   resetDatabase
@@ -152,7 +154,7 @@ describe("query { wastesRegistryXls }", () => {
         .get("/download")
         .query({ token: data.wastesRegistryXls.token });
 
-      const tmpFolder = fs.mkdtempSync("/");
+      const tmpFolder = fs.mkdtempSync(join(tmpdir(), sep));
       const filename = `${tmpFolder}/registre.xlsx`;
       const writeStream = createWriteStream(filename);
 
@@ -220,7 +222,7 @@ describe("query { wastesRegistryXls }", () => {
         .get("/download")
         .query({ token: data.wastesRegistryXls.token });
 
-      const tmpFolder = fs.mkdtempSync("/");
+      const tmpFolder = fs.mkdtempSync(join(tmpdir(), sep));
       const filename = `${tmpFolder}/registre.xlsx`;
       const writeStream = createWriteStream(filename);
 

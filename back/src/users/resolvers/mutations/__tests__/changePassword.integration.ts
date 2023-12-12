@@ -96,4 +96,44 @@ describe("mutation changePassword", () => {
     );
     expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
+
+  it("should invalidate all user reset password hashes", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const oldPassword = "pass";
+    const newPassword = "new-pass-123$";
+
+    // create a few redis sessions entries
+    const sessionId1 = `xyz123`;
+    const sessionKey1 = `sess:${sessionId1}`;
+    await redisClient.set(sessionKey1, "data");
+    // reference them
+    await storeUserSessionsId(user.id, sessionId1);
+
+    // Create a user reset password hash
+    await prisma.userResetPasswordHash.create({
+      data: { userId: user.id, hash: "HASH", hashExpires: new Date() }
+    });
+
+    // Change the password
+    const { data, errors } = await mutate<Pick<Mutation, "changePassword">>(
+      CHANGE_PASSWORD,
+      {
+        variables: { oldPassword, newPassword }
+      }
+    );
+    expect(errors).toBeUndefined();
+    expect(data.changePassword.id).toEqual(user.id);
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+    expect(await compare(newPassword, updatedUser.password)).toEqual(true);
+
+    // Password reset hash should have been deleted
+    const hashes = await prisma.userResetPasswordHash.findMany({
+      where: { userId: user.id }
+    });
+    expect(hashes.length).toEqual(0);
+  });
 });

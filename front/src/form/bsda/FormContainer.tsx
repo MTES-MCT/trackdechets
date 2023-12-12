@@ -32,7 +32,7 @@ export default function FormContainer() {
             {bsda => {
               setBsdaContext(bsda);
               const { disabledAfterEmission, workerSigned, transporterSigned } =
-                getBsdaEditionDisabledSteps(bsda, siret);
+                getBsdaEditionDisabledSteps(bsda, siret!);
 
               return (
                 <>
