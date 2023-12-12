@@ -7,8 +7,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
 import { AuthType } from "../../../../auth";
-import { renderMail } from "../../../../mailer/templates/renderers";
-import { membershipRequestRefused } from "../../../../mailer/templates";
+import { renderMail, membershipRequestRefused } from "@td/mail";
 import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails

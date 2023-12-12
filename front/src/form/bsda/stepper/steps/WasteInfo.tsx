@@ -20,7 +20,7 @@ export function WasteInfo({ disabled }) {
   const { siret } = useParams<{ siret: string }>();
   const { disabledAfterEmission } = getBsdaEditionDisabledSteps(
     bsdaContext!,
-    siret
+    siret!
   );
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
   const isGrouping = values?.type === BsdaType.Gathering;

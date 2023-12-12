@@ -8,7 +8,7 @@ import {
 import { gql } from "graphql-tag";
 import { Prisma } from "@prisma/client";
 import prisma from "../../../../prisma";
-import { xDaysAgo } from "../../../../commands/onboarding.helpers";
+import { xDaysAgo } from "../../../../utils";
 import { bsdaFactory } from "../../../__tests__/factories";
 import { searchCompany } from "../../../../companies/search";
 

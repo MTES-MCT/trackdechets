@@ -4,8 +4,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 import { sendMail } from "../../../../mailer/mailing";
-import { createPasswordResetRequest } from "../../../../mailer/templates";
-import { renderMail } from "../../../../mailer/templates/renderers";
+import { renderMail, createPasswordResetRequest } from "@td/mail";
 import { addMinutes } from "date-fns";
 import { setCaptchaToken } from "../../../../common/redis/captcha";
 import { gql } from "graphql-tag";
@@ -122,5 +121,59 @@ describe("mutation createPasswordResetRequest", () => {
     expect(resetHash).toBe(null);
 
     expect(sendMail as jest.Mock).not.toHaveBeenCalled();
+  });
+
+  it("should invalidate all previously generated password reset links", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient();
+    const token = "xyz987";
+    const captcha = "TD1234";
+    await setCaptchaToken(token, captcha);
+
+    // Create 1st hash
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createPasswordResetRequest">
+    >(CREATE_PASSWORD_RESET_REQUEST, {
+      variables: {
+        input: {
+          email: user.email,
+          captcha: { value: captcha, token: token }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.createPasswordResetRequest).toEqual(true);
+
+    const hash1 = await prisma.userResetPasswordHash.findFirstOrThrow({
+      where: { userId: user.id }
+    });
+
+    // Create 2nd hash
+    const token2 = "xyz123";
+    const captcha2 = "TD4321";
+    await setCaptchaToken(token2, captcha2);
+
+    const { data: data2, errors: errors2 } = await mutate<
+      Pick<Mutation, "createPasswordResetRequest">
+    >(CREATE_PASSWORD_RESET_REQUEST, {
+      variables: {
+        input: {
+          email: user.email,
+          captcha: { value: captcha2, token: token2 }
+        }
+      }
+    });
+
+    expect(errors2).toBeUndefined();
+    expect(data2.createPasswordResetRequest).toEqual(true);
+
+    // First hash should have been deleted, only 2nd one should remain
+    const hashes = await prisma.userResetPasswordHash.findMany({
+      where: { userId: user.id }
+    });
+
+    expect(hashes.length).toEqual(1);
+    expect(hashes.find(hashes => hashes.id === hash1.id)).toBeUndefined();
   });
 });

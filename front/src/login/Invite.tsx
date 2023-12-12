@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useHistory } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, gql } from "@apollo/client";
 import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
@@ -45,7 +45,7 @@ const JOIN_WITH_INVITE = gql`
 export default function Invite() {
   // Extract invitation hash from URL
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   // parse qs and get rid of extra parameters
   const parsedQs = queryString.parse(location.search);
@@ -127,9 +127,7 @@ export default function Invite() {
             <Button
               size="medium"
               onClick={() => {
-                history.push({
-                  pathname: routes.login
-                });
+                navigate(routes.login);
               }}
             >
               Se connecter
@@ -179,9 +177,7 @@ export default function Invite() {
               <Button
                 size="medium"
                 onClick={() => {
-                  history.push({
-                    pathname: routes.login
-                  });
+                  navigate(routes.login);
                 }}
               >
                 Se connecter

@@ -13,12 +13,15 @@ const isSearchValid = searchClue => searchClue.length >= 3;
 
 const CompanySelector = ({
   loading,
-  onSelect,
-  onSearch,
+  selectedCompany,
+  selectedCompanyError,
   companies,
   favorites,
   disabled = false,
-  selectedCompany
+  searchHint,
+  departmentHint,
+  onSelect,
+  onSearch
 }: CompanySelectorProps) => {
   const [searchString, setSearchString] = useState("");
   const [postalCodeString, setPostalCodeString] = useState("");
@@ -95,9 +98,10 @@ const CompanySelector = ({
       className="fr-container--fluid company-selector"
     >
       <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom company-selector-search">
-        <div className="fr-col-8">
+        <div className="fr-col-12 fr-col-md-8">
           <Input
-            label="Numéro de SIRET ou nom de l'entreprise"
+            label="N°SIRET ou raison sociale"
+            hintText={searchHint}
             disabled={disabled}
             nativeInputProps={{
               value: searchString,
@@ -113,9 +117,10 @@ const CompanySelector = ({
             }}
           />
         </div>
-        <div className="fr-col-4">
+        <div className="fr-col-12 fr-col-md-4">
           <Input
             label="Département ou code postal"
+            hintText={departmentHint}
             disabled={disabled}
             nativeInputProps={{
               value: postalCodeString,
@@ -143,6 +148,7 @@ const CompanySelector = ({
             <CompanySelectorItem
               company={selectedCompany}
               selected
+              selectedError={selectedCompanyError}
               onSelect={handleOnSelect}
             ></CompanySelectorItem>
           </div>

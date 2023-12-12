@@ -33,21 +33,34 @@ export async function truncateDatabase() {
   const tablenames: Array<{ tablename: string }> =
     await prisma.$queryRaw`SELECT tablename FROM pg_tables WHERE schemaname=${dbSchemaName};`;
 
-  const tables = tablenames
-    .map(({ tablename }) => `"${dbSchemaName}"."${tablename}"`)
-    .join(", ");
+  // Reset data
+  await Promise.all(
+    tablenames.map(({ tablename }) =>
+      prisma.$executeRawUnsafe(
+        `ALTER TABLE "${dbSchemaName}"."${tablename}" DISABLE TRIGGER ALL;`
+      )
+    )
+  );
+  await Promise.all(
+    tablenames.map(({ tablename }) =>
+      prisma.$executeRawUnsafe(`DELETE FROM "${dbSchemaName}"."${tablename}";`)
+    )
+  );
+  await Promise.all(
+    tablenames.map(({ tablename }) =>
+      prisma.$executeRawUnsafe(
+        `ALTER TABLE "${dbSchemaName}"."${tablename}" ENABLE TRIGGER ALL;`
+      )
+    )
+  );
 
-  return Promise.all([
-    // Reset data
-    prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tables} CASCADE;`),
-    // Reset sequences
-    prisma.$executeRawUnsafe(`
-      SELECT SETVAL(c.oid, 1)
-      from pg_class c JOIN pg_namespace n 
-      on n.oid = c.relnamespace 
-      where c.relkind = 'S' and n.nspname = '${dbSchemaName}';
-    `)
-  ]);
+  // Reset sequences
+  await prisma.$executeRawUnsafe(`
+    SELECT SETVAL(c.oid, 1)
+    from pg_class c JOIN pg_namespace n 
+    on n.oid = c.relnamespace 
+    where c.relkind = 'S' and n.nspname = '${dbSchemaName}';
+  `);
 }
 
 export async function resetDatabase() {
@@ -74,19 +87,9 @@ export async function resetDatabase() {
 }
 
 export async function refreshElasticSearch() {
-  const drainedPromise = new Promise<void>(resolve =>
-    indexQueue.once("global:drained", resolve)
-  );
-
-  // Wait for the processing queue to index all bsds
-  const jobsCount = await indexQueue.getJobCounts();
-  if (jobsCount.active || jobsCount.waiting || jobsCount.delayed) {
-    await Promise.race([
-      drainedPromise,
-      new Promise(resolve => setTimeout(resolve, 1000))
-    ]);
-  }
-  indexQueue.removeAllListeners("global:drained");
+  // Wait for all indexation jobs to finish
+  const activeJobs = await indexQueue.getActive();
+  await Promise.all(activeJobs.map(job => job.finished()));
 
   return elasticSearch.indices.refresh(
     {

@@ -7,13 +7,15 @@ type Props = {
   label: string;
   value: string | ReactNode | undefined;
   tooltip?: string;
+  insideForm?: ReactNode;
 };
 
 export default function AccountFieldNotEditable({
   name,
   label,
   value,
-  tooltip
+  tooltip,
+  insideForm
 }: Props) {
   const classes = [styles.field];
 
@@ -26,6 +28,7 @@ export default function AccountFieldNotEditable({
       <div id={name} className={styles.field__value}>
         {value}
       </div>
+      {insideForm}
     </div>
   );
 }

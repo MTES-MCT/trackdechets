@@ -1,6 +1,6 @@
 import { Job, JobOptions } from "bull";
 import type { ApiResponse } from "@elastic/elasticsearch";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 import prisma from "../../prisma";
 import {
   client,

@@ -6,7 +6,7 @@ import * as yup from "yup";
 import prisma from "../../prisma";
 import { nafCodes } from "shared/constants";
 import { readCsv } from "../../users/bulk-creation/loaders";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 
 type AnonymousCompanyRow = {
   siret: string;

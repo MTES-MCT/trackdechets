@@ -81,6 +81,7 @@ const DropdownMenu = ({
                           : { ...link.route }
                       }
                       onClick={closeMenu}
+                      state={link.state && { ...link.state }}
                     >
                       {link.icon && (
                         <span className="dropdown-menu__content__icon">

@@ -14,7 +14,7 @@ import {
 import Loader from "../../../../../Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation, gql } from "@apollo/client";
 import routes from "../../../../../Apps/routes";
-import { useParams, useHistory, generatePath, Link } from "react-router-dom";
+import { useParams, useNavigate, generatePath, Link } from "react-router-dom";
 import {
   GET_DETAIL_DASRI_WITH_METADATA,
   GET_BSDS
@@ -36,14 +36,14 @@ const PUBLISH_BSDASRI = gql`
 `;
 export function RoutePublishBsdasri() {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { error, data, loading } = useQuery<
     Pick<Query, "bsdasri">,
     QueryBsdasriArgs
   >(GET_DETAIL_DASRI_WITH_METADATA, {
     variables: {
-      id: formId
+      id: formId!
     },
 
     fetchPolicy: "no-cache"
@@ -53,14 +53,14 @@ export function RoutePublishBsdasri() {
     useMutation<Pick<Mutation, "publishBsdasri">, MutationPublishBsdasriArgs>(
       PUBLISH_BSDASRI,
       {
-        variables: { id: formId },
+        variables: { id: formId! },
         refetchQueries: [GET_BSDS],
         awaitRefetchQueries: true,
         onCompleted: () => {
           toast.success(`Bordereau ${formId} publié`, {
             duration: TOAST_DURATION
           });
-          history.goBack();
+          navigate(-1);
         },
         onError: () =>
           toast.error(`Le bordereau ${formId} n'a pas pu être publié`, {
@@ -96,7 +96,12 @@ export function RoutePublishBsdasri() {
         Une fois publié, le bordereau sera prêt pour l'enlèvement.
       </p>
       <div className="td-modal-actions">
-        <button className="btn btn--outline-primary" onClick={history.goBack}>
+        <button
+          className="btn btn--outline-primary"
+          onClick={() => {
+            navigate(-1);
+          }}
+        >
           Annuler
         </button>
         <button
@@ -105,7 +110,7 @@ export function RoutePublishBsdasri() {
           onClick={() =>
             publishBsdasri({
               variables: {
-                id: formId
+                id: formId!
               }
             })
           }

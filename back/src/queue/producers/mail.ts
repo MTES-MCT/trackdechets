@@ -1,5 +1,5 @@
 import Queue, { JobOptions } from "bull";
-import { Mail } from "../../mailer/types";
+import { Mail } from "@td/mail";
 
 const { REDIS_URL, QUEUE_NAME_SENDMAIL } = process.env;
 

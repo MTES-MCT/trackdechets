@@ -266,14 +266,14 @@ describe("Query.bsds.vhus base workflow", () => {
       ]);
     });
 
-    it("published vhu should be isToCollectFor transporter", async () => {
+    it("published vhu should be isFollowFor transporter", async () => {
       const { query } = makeClient(transporter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
         {
           variables: {
             where: {
-              isToCollectFor: [transporter.company.siret!]
+              isFollowFor: [transporter.company.siret!]
             }
           }
         }

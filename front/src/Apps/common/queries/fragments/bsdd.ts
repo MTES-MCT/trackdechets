@@ -94,6 +94,7 @@ export const wasteDetailsFragment = gql`
 
 export const transporterFragment = gql`
   fragment TransporterFragment on Transporter {
+    id
     isExemptedOfReceipt
     receipt
     department
@@ -224,6 +225,9 @@ const mutableFieldsFragment = gql`
       ...RecipientFragment
     }
     transporter {
+      ...TransporterFragment
+    }
+    transporters {
       ...TransporterFragment
     }
     trader {

@@ -16,14 +16,19 @@ import { CompanyMember, UserRole } from "../generated/graphql/types";
 import { AppDataloaders } from "../types";
 import { differenceInDays } from "date-fns";
 import { UserInputError } from "../common/errors";
+import { allFavoriteTypes } from "./types";
+import { favoritesCompanyQueue } from "../queue/producers/company";
+import { searchTDSireneFailFast } from "./sirenify";
+import { isSiret, isVat } from "shared/constants";
+import { searchVatFrOnlyOrNotFoundFailFast } from "./search";
+
 /**
  * Retrieves a company by any unique identifier or throw a CompanyNotFound error
  */
-export async function getCompanyOrCompanyNotFound({
-  id,
-  orgId,
-  siret
-}: Prisma.CompanyWhereUniqueInput) {
+export async function getCompanyOrCompanyNotFound(
+  { id, orgId, siret }: Prisma.CompanyWhereUniqueInput,
+  select?: Prisma.CompanySelect
+) {
   if (!id && !siret && !orgId) {
     throw new UserInputError("You should specify an id or a siret or an orgId");
   }
@@ -36,7 +41,8 @@ export async function getCompanyOrCompanyNotFound({
     where = { orgId };
   }
   const company = await prisma.company.findUnique({
-    where
+    where,
+    ...(select ? { select } : {})
   });
   if (company == null) {
     throw new CompanyNotFound();
@@ -352,4 +358,43 @@ export function convertUrls<T extends Partial<Company>>(
     receivedSignatureAutomations: [],
     userPermissions: []
   };
+}
+
+export async function updateFavorites(orgIds: string[]) {
+  for (const favoriteType of allFavoriteTypes) {
+    await favoritesCompanyQueue.addBulk(
+      orgIds.map(orgId => ({
+        data: {
+          orgId,
+          type: favoriteType
+        }
+      }))
+    );
+  }
+}
+
+export async function getUpdatedCompanyNameAndAddress(
+  company: Pick<Company, "name" | "address" | "orgId">
+): Promise<Pick<Company, "name" | "address"> | null> {
+  // TODO try to support SIRENIFY_BYPASS_USER_EMAILS
+  let searchResult;
+  if (isSiret(company.orgId)) {
+    searchResult = await searchTDSireneFailFast(company.orgId);
+  } else if (isVat(company.orgId)) {
+    searchResult = await searchVatFrOnlyOrNotFoundFailFast(company.orgId);
+  }
+  if (searchResult) {
+    return {
+      name:
+        searchResult.name && searchResult.name !== company.name
+          ? searchResult.name
+          : company.name,
+      address:
+        searchResult.address && searchResult.address !== company.address
+          ? searchResult.address
+          : company.address
+    };
+  }
+  // return existing and unchanged values
+  return null;
 }

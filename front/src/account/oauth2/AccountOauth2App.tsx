@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { List, ListItem } from "../../common/components";
 import styles from "./AccountOauth2App.module.scss";
-import { generatePath, useHistory } from "react-router";
+import { generatePath, useNavigate } from "react-router";
 import routes from "../../Apps/routes";
 import { Application, ApplicationGoal } from "codegen-ui";
 import AccountOauth2AppDelete from "./AccountOauth2AppDelete";
@@ -13,7 +13,7 @@ type AccountOauth2AppProps = {
 export default function AccountOauth2App({
   application
 }: AccountOauth2AppProps) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -53,7 +53,7 @@ export default function AccountOauth2App({
           <button
             className="btn btn--primary tw-mr-2"
             onClick={() =>
-              history.push(
+              navigate(
                 generatePath(routes.account.oauth2.edit, {
                   id: application.id
                 })

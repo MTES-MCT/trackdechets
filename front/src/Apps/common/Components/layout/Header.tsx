@@ -2,11 +2,10 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   NavLink,
   Link,
-  withRouter,
   matchPath,
-  RouteComponentProps,
+  useLocation,
   generatePath,
-  useRouteMatch
+  useMatch
 } from "react-router-dom";
 
 import { localAuthService } from "../../../../login/auth.service";
@@ -52,7 +51,7 @@ export const GET_ME = gql`
 function MobileSubNav({ currentSiret }) {
   const { updatePermissions } = usePermissions();
   const { error, data } = useQuery<Pick<Query, "me">>(GET_ME, {});
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   useEffect(() => {
     if (data) {
@@ -165,13 +164,15 @@ const MenuLink = ({ entry, mobileCallback }) => {
     <>
       {entry.navlink ? (
         <NavLink
-          className={styles.headerNavLink}
+          className={({ isActive }) =>
+            isActive
+              ? `${styles.headerNavLink} ${styles.headerNavLinkActive}`
+              : styles.headerNavLink
+          }
           to={entry.href}
-          exact={entry.href === "/"}
           onClick={() => {
             mobileCallback && mobileCallback();
           }}
-          activeClassName={styles.headerNavLinkActive}
         >
           {content}
         </NavLink>
@@ -201,14 +202,14 @@ type HeaderProps = {
  * Contains External and internal links
  * On mobile appear as a sliding panel and includes other items
  */
-export default withRouter(function Header({
+export default function Header({
   isAuthenticated,
   isAdmin,
-  location,
-  history,
   defaultOrgId
-}: RouteComponentProps & HeaderProps) {
+}: HeaderProps) {
   const { VITE_API_ENDPOINT } = import.meta.env;
+
+  const location = useLocation();
 
   const [menuHidden, toggleMenu] = useState(true);
 
@@ -219,27 +220,35 @@ export default withRouter(function Header({
   );
 
   useEffect(() => {
-    return history.listen(() => {
-      closeMobileMenu();
-    });
-  }, [history, closeMobileMenu]);
+    closeMobileMenu();
+  }, [location, closeMobileMenu]);
 
-  const matchAccount = matchPath(location.pathname, {
-    path: routes.account.index,
-    exact: false,
-    strict: false
-  });
-  const matchDashboard = matchPath(location.pathname, {
-    path: routes.dashboard.index,
-    exact: false,
-    strict: false
-  });
+  const matchAccount = matchPath(
+    {
+      path: routes.account.index,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
 
-  const matchDashboardV2 = matchPath(location.pathname, {
-    path: routes.dashboardv2.index,
-    exact: false,
-    strict: false
-  });
+  const matchDashboard = matchPath(
+    {
+      path: routes.dashboard.index,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+
+  const matchDashboardV2 = matchPath(
+    {
+      path: routes.dashboardv2.index,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
 
   const menuClass = menuHidden && isMobile ? styles.headerNavHidden : "";
 
@@ -378,4 +387,4 @@ export default withRouter(function Header({
       </div>
     </nav>
   );
-});
+}

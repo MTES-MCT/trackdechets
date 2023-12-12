@@ -18,9 +18,9 @@ import Loader from "../../../../../Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
 import {
   useParams,
-  useHistory,
+  useNavigate,
   generatePath,
-  useRouteMatch
+  useMatch
 } from "react-router-dom";
 import {
   GET_DETAIL_DASRI_WITH_METADATA,
@@ -124,8 +124,8 @@ export function RouteSignBsdasri({
   UIsignatureType: SignatureType;
 }) {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
-  const history = useHistory();
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const navigate = useNavigate();
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
   const transporterTabRoute = !isV2Routes
     ? routes.dashboard.transport.toCollect
     : routes.dashboardv2.transport.toCollect;
@@ -139,15 +139,15 @@ export function RouteSignBsdasri({
   // so we explicitly redirect to transporter tab
   const nextPage =
     UIsignatureType === BsdasriSignatureType.Transport
-      ? () => history.push(transporterTab)
-      : () => history.goBack();
+      ? () => navigate(transporterTab)
+      : () => navigate(-1);
 
   const { error, data, loading } = useQuery<
     Pick<Query, "bsdasri">,
     QueryBsdasriArgs
   >(GET_DETAIL_DASRI_WITH_METADATA, {
     variables: {
-      id: formId
+      id: formId!
     },
     fetchPolicy: "no-cache"
   });
@@ -180,7 +180,7 @@ export function RouteSignBsdasri({
 
   return (
     <div>
-      <h2 className="td-modal-title">{config.getLabel(bsdasri, siret)}</h2>
+      <h2 className="td-modal-title">{config.getLabel(bsdasri, siret!)}</h2>
       <BdasriSummary bsdasri={bsdasri} />
       <Formik
         initialValues={{

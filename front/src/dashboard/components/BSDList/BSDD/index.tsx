@@ -123,7 +123,7 @@ export const COLUMNS: Record<
         Pick<Query, "companyPrivateInfos">,
         QueryCompanyPrivateInfosArgs
       >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
-        variables: { clue: siret }
+        variables: { clue: siret! }
       });
       const siretsWithAutomaticSignature = data
         ? data.companyPrivateInfos.receivedSignatureAutomations.map(
@@ -135,7 +135,7 @@ export const COLUMNS: Record<
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
           <WorkflowAction
-            siret={siret}
+            siret={siret!}
             form={form}
             options={{
               canSkipEmission:

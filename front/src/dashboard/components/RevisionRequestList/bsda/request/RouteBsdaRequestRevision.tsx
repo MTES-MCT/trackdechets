@@ -13,7 +13,7 @@ export function RouteBsdaRequestRevision() {
     GET_BSDA,
     {
       variables: {
-        id
+        id: id!
       }
     }
   );

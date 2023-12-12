@@ -14,7 +14,7 @@ export function BsdaRevisionRequestList() {
     QueryBsdaRevisionRequestsArgs
   >(GET_BSDA_REVISION_REQUESTS, {
     variables: {
-      siret
+      siret: siret!
     },
     fetchPolicy: "cache-and-network"
   });

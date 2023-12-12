@@ -48,7 +48,8 @@ const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (
       verificationCode: company?.verificationCode,
       givenName: company?.givenName
     },
-    isAnonymousCompany: isAnonymousCompany > 0
+    isAnonymousCompany: isAnonymousCompany > 0,
+    receivedSignatureAutomations: []
   } as CompanySearchPrivate;
 };
 

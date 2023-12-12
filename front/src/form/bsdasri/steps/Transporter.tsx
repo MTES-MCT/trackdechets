@@ -18,7 +18,7 @@ import Transport from "./Transport";
 import { Loader } from "../../../Apps/common/Components";
 import companyStyles from "../../common/components/company/CompanyResult.module.scss";
 import RedErrorMessage from "../../../common/components/RedErrorMessage";
-import TransporterReceipt from "../../common/components/company/TransporterReceipt";
+import TransporterRecepisseWrapper from "../../common/components/company/TransporterRecepisseWrapper";
 import TransporterReceiptEditionSwitch from "../../common/components/company/TransporterReceiptEditionSwitch";
 
 /**
@@ -171,7 +171,7 @@ function CurrentCompanyWidget({ disabled = false }) {
     return (
       <div>
         <h4 className="form__section-heading">Entreprise de transport</h4>
-        <TransporterReceipt transporter={values.transporter!} />
+        <TransporterRecepisseWrapper transporter={values.transporter!} />
         <div
           className={`${companyStyles.resultsItem}  ${companyStyles.isSelected}`}
         >

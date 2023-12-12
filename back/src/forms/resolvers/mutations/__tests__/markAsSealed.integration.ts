@@ -16,8 +16,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
-import { contentAwaitsGuest } from "../../../../mailer/templates";
-import { renderMail } from "../../../../mailer/templates/renderers";
+import { renderMail, contentAwaitsGuest } from "@td/mail";
 
 jest.mock("axios", () => ({
   default: {

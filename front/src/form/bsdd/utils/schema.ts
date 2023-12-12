@@ -181,7 +181,7 @@ export const formSchema = object().shape({
       ),
     company: companyRegistrationAndTypeSchema
   }),
-  transporter: transporterSchema,
+  transporters: array(transporterSchema),
   trader: object()
     .notRequired()
     .nullable()

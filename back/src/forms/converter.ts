@@ -536,7 +536,9 @@ export function expandTransporterFromDb(
       !transporter.transporterCompanySiret &&
       transporter.transporterTransportMode === TransportMode.ROAD
         ? null
-        : transporter.transporterTransportMode
+        : transporter.transporterTransportMode,
+    takenOverAt: transporter.takenOverAt,
+    takenOverBy: transporter.takenOverBy
   });
 }
 

@@ -25,7 +25,10 @@ export const bsdaRevisionRequests: QueryResolvers["bsdaRevisionRequests"] =
       Permission.BsdCanList,
       `Vous n'avez pas la permission de lister les demandes de révision de l'établissement ${siret}`
     );
-    const company = await getCompanyOrCompanyNotFound({ orgId: siret });
+    const company = await getCompanyOrCompanyNotFound(
+      { orgId: siret },
+      { id: true, orgId: true }
+    );
 
     const pageSize = Math.max(Math.min(first ?? 0, MAX_SIZE), MIN_SIZE);
 

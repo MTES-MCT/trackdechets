@@ -187,6 +187,7 @@
     transform: rotate(180deg);
   }
 }
+
 .headerNavLinkActive + .headerNavActive {
   @include desktop {
     border-color: $black;
