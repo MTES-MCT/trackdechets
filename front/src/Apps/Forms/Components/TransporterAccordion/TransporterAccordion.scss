@@ -30,9 +30,6 @@
       display: flex;
       flex-direction: column;
 
-      // En attente de l'implémentation du multi-modal
-      visibility: hidden;
-
       @include phone {
         flex-direction: row;
         justify-content: flex-end;
@@ -45,8 +42,12 @@
   }
 
   &__form {
+    margin: auto;
     padding-top: 15px;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
   }
+
 
   @media (max-width: 800px) {
     &__header {

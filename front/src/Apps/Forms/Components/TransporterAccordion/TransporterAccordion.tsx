@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-
 import "./TransporterAccordion.scss";
 
 export type TransporterAccordionProps = {
@@ -37,11 +36,23 @@ export function TransporterAccordion({
 
   const collapseElementId = `transporter__${numero}__form`;
 
+  const [expandedHeight, setExpandedHeight] = React.useState(0);
+
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    if (ref.current) {
+      // Cf https://www.w3schools.com/howto/howto_js_collapsible.asp
+      // "Animated Collapsible (Slide Down)"
+      // On a besoin de connaitre la hauteur de l'élément déplié
+      // pour définir la valeur de maxHeight
+      const scrolleHeight = (ref.current as any).scrollHeight;
+      setExpandedHeight(scrolleHeight);
+    }
+  }, [setExpandedHeight]);
+
   return (
-    <section
-    // En attente de l'activation du multi-modal
-    // className="fr-accordion"
-    >
+    <section>
       <div className="transporter__header">
         <label className="transporter__header__label">{name}</label>
         <div className="transporter__header__buttons">
@@ -99,9 +110,15 @@ export function TransporterAccordion({
       </div>
       <div
         id={collapseElementId}
-        // En attente de l'activation du multi-modal
-        // className="fr-collapse fr-collapse--expanded"
+        ref={ref}
         className="transporter__form"
+        style={
+          expandedState
+            ? expandedHeight
+              ? { maxHeight: expandedHeight }
+              : {} // avoid having an animation on first render
+            : { maxHeight: 0 }
+        }
       >
         {children}
       </div>

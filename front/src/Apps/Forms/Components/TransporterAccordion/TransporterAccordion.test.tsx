@@ -33,9 +33,6 @@ describe("TransporterAccordion", () => {
   it("should renders the component", () => {
     const { container } = render(Component);
     expect(container).toBeTruthy();
-    const foldable = getByText(container, foldableContent);
-    // foldable content should be visible by default
-    expect(foldable).toBeVisible();
   });
 
   test("clicking the add button should call the `onTransporterAdd callback`", () => {
