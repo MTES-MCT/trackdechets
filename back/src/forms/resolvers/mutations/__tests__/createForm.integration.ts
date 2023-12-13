@@ -10,7 +10,8 @@ import {
   userFactory,
   userWithCompanyFactory,
   transporterReceiptFactory,
-  ecoOrganismeFactory
+  ecoOrganismeFactory,
+  bsddTransporterData
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
@@ -197,6 +198,35 @@ describe("Mutation.createForm", () => {
       expect(sirenifyFormInput as jest.Mock).toHaveBeenCalledTimes(1);
     }
   );
+
+  it("should allow a transporter listed in the transporters list to create a form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+
+    const bsddTransporter = await prisma.bsddTransporter.create({
+      data: {
+        ...bsddTransporterData,
+        number: 1,
+        transporterCompanySiret: company.siret
+      }
+    });
+
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          transporters: [bsddTransporter.id]
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    expect(data.createForm.id).toBeTruthy();
+    // check input is sirenified
+    expect(sirenifyFormInput as jest.Mock).toHaveBeenCalledTimes(1);
+  });
 
   it("should allow to create a form with a regular company as emitter", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
