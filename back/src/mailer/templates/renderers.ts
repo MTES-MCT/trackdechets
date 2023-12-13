@@ -53,7 +53,7 @@ const sanitizeMailProps = props => {
     ...{
       to: props.to
         ? props.to.map(to => ({
-            email: sanitize(to.email),
+            email: to.email,
             name: sanitize(to.name)
           }))
         : undefined

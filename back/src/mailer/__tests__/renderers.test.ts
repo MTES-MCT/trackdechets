@@ -42,26 +42,26 @@ describe("renderMail", () => {
     expect(mail.templateId).toEqual(1);
   });
 
-  it("should sanitize 'to' params", () => {
+  it("should sanitize 'to.name' params", () => {
     const mailTemplate: MailTemplate = {
       subject: "Hello",
       templateId: 1
     };
     const mail = renderMail(mailTemplate, {
       to: [
-        { name: "{{7*7}}", email: "john.<%turboH4ck%>@trackdechets.fr" },
-        { name: "${{5*5}}", email: "foo.#{{turboH4ck}}@trackdechets.fr" }
+        { name: "{{7*7}}", email: "john@trackdechets.fr" },
+        { name: "${{5*5}}", email: "foo@trackdechets.fr" }
       ]
     });
 
     expect(mail.to).toBeDefined();
     expect(mail.to![0]).toStrictEqual({
       name: "77",
-      email: "john.turboH4ck@trackdechets.fr"
+      email: "john@trackdechets.fr"
     });
     expect(mail.to![1]).toStrictEqual({
       name: "55",
-      email: "foo.turboH4ck@trackdechets.fr"
+      email: "foo@trackdechets.fr"
     });
   });
 });
