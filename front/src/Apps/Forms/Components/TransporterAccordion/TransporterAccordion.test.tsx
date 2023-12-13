@@ -3,7 +3,8 @@ import {
   fireEvent,
   getByText,
   getByTitle,
-  render
+  render,
+  waitFor
 } from "@testing-library/react";
 import { TransporterAccordion } from "./TransporterAccordion";
 
@@ -61,5 +62,24 @@ describe("TransporterAccordion", () => {
     const downButton = getByTitle(container, "Descendre");
     fireEvent.click(downButton);
     expect(onTransporterShiftDown).toHaveBeenCalledTimes(1);
+  });
+
+  test("clicking the caret should fold the content", async () => {
+    const { container } = render(Component);
+    const caret = getByTitle(container, "Replier");
+    await waitFor(() =>
+      expect(
+        getComputedStyle(getByText(container, foldableContent)).maxHeight
+      ).toEqual("")
+    );
+    console.log(getComputedStyle(getByText(container, foldableContent)));
+    fireEvent.click(caret);
+    await waitFor(() =>
+      expect(
+        parseFloat(
+          getComputedStyle(getByText(container, foldableContent)).maxHeight
+        )
+      ).toEqual(0)
+    );
   });
 });
