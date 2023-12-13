@@ -79,9 +79,13 @@ export default function CompanySelectorWrapper({
     [setSelectedCompany, onCompanySelected]
   );
 
-  // Initialise `selectedCompany` à partir des données du store (Formik)
+  // S'assure que `selectedCompany` reste sync avec les données
+  // du store Formik lors du render initial ou en cas modification
+  // des données provoquée par un autre événement que la sélection d'un établissement
+  // dans le CompanySelector (par exemple si on permute deux transporteurs
+  // dans la liste des transporteurs multi-modaux)
   useEffect(() => {
-    if (!selectedCompany && formOrgId) {
+    if (formOrgId && formOrgId !== selectedCompany?.orgId) {
       searchCompaniesQuery({
         variables: { clue: formOrgId },
         onCompleted: result => {

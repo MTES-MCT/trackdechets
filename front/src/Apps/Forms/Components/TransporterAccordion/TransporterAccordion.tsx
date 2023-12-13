@@ -57,7 +57,7 @@ export function TransporterAccordion({
       // Cf https://www.w3schools.com/howto/howto_js_collapsible.asp
       // "Animated Collapsible (Slide Down)"
       // On a besoin de connaitre la hauteur de l'élément déplié
-      // pour définir la valeur de maxHeight
+      // pour définir la valeur de maxHeight et avoir une animation fluide.
       return (ref.current as any).scrollHeight;
     }
     return 0;
