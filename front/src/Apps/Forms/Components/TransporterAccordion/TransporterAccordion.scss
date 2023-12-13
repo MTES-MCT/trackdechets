@@ -1,6 +1,9 @@
 @import "../../../../scss/Breakpoints.scss";
 
 .transporter {
+
+  margin-bottom: 15px;
+
   &__header {
     display: flex;
     flex-direction: column;
@@ -43,9 +46,13 @@
 
   &__form {
     margin: auto;
-    padding-top: 15px;
     overflow: hidden;
-    transition: max-height 0.4s ease-out;
+    transition: max-height 0.3s ease-out;
+    
+    > div {
+      padding-top: 15px;
+    }
+
   }
 
 

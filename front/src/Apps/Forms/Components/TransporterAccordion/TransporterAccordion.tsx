@@ -13,6 +13,7 @@ export type TransporterAccordionProps = {
   disableUp?: boolean;
   disableDown?: boolean;
   disableFold?: boolean;
+  defaultExpanded?: boolean;
   children: NonNullable<React.ReactNode>;
 };
 
@@ -34,9 +35,10 @@ export function TransporterAccordion({
   disableUp = false,
   disableDown = false,
   disableFold = false,
+  defaultExpanded = true,
   children
 }: TransporterAccordionProps) {
-  const [expandedState, setExpandedState] = React.useState(true);
+  const [expandedState, setExpandedState] = React.useState(defaultExpanded);
 
   const onExtendButtonClick = () => {
     setExpandedState(!expandedState);
@@ -62,7 +64,7 @@ export function TransporterAccordion({
   })();
 
   return (
-    <section>
+    <section className="transporter">
       <div className="transporter__header">
         <label className="transporter__header__label">{name}</label>
         <div className="transporter__header__buttons">
@@ -73,7 +75,12 @@ export function TransporterAccordion({
             iconPosition="right"
             iconId="ri-add-line"
             title="Ajouter"
-            onClick={onTransporterAdd}
+            onClick={() => {
+              // Replie le transporteur courant pour faire
+              // apparaitre le formulaire du transporteur suivant
+              setExpandedState(false);
+              onTransporterAdd();
+            }}
           >
             Ajouter
           </Button>

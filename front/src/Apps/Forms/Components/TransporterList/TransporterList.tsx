@@ -14,6 +14,10 @@ import {
 type TransporterListProps = {
   // SIRET ou VAT de l'établissement courant
   orgId?: string;
+  // Identifiant du bordereau (le cas échant)
+  bsdId?: string | null;
+  // Liste des transporteurs
+  transporters: CreateOrUpdateTransporterInput[];
   fieldName: string;
 };
 
@@ -22,18 +26,24 @@ type TransporterListProps = {
  * - l'ajout et la suppression de transporteurs à la liste.
  * - la permutation de deux transporteurs dans la liste.
  */
-export function TransporterList({ orgId, fieldName }: TransporterListProps) {
-  const [field] = useField<CreateOrUpdateTransporterInput[]>({
-    name: fieldName
-  });
-
-  const transporters = field.value;
-
+export function TransporterList({
+  orgId,
+  fieldName,
+  bsdId,
+  transporters
+}: TransporterListProps) {
   const [deleteFormTransporter, { loading: deleteFormTransporterLoading }] =
     useMutation<
       Pick<Mutation, "deleteFormTransporter">,
       MutationDeleteFormTransporterArgs
     >(DELETE_FORM_TRANSPORTER);
+
+  // `defaultExpanded` contrôle l'état initial des accordéons
+  const [defaultExpanded, setDefaultExpanded] = React.useState(
+    // Tous les accordéons sont repliés en cas d'update du bordereau
+    // s'il y a plusieurs transporteurs
+    !(Boolean(bsdId) && transporters.length > 1)
+  );
 
   return (
     <>
@@ -48,6 +58,9 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
               // moment de la soumission du formulaire.
               const onTransporterAdd = () => {
                 arrayHelpers.insert(idx + 1, initialFormTransporter);
+                // lorsqu'on ajoute un nouveau transporteur, on souhaite
+                // que le formulaire soit déplié
+                setDefaultExpanded(true);
               };
 
               const onTransporterDelete = () => {
@@ -78,7 +91,7 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
                 transporters.length === 1 || idx === transporters.length - 1;
 
               // Désactive la possibilité de replier le formulaire transporteur
-              // s'il est le seul
+              // s'il y un seul transporteur
               const disableFold = transporters.length === 1;
 
               const numero = idx + 1;
@@ -113,6 +126,7 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
                   disableUp={disableUp}
                   disableDown={disableDown}
                   disableFold={disableFold}
+                  defaultExpanded={defaultExpanded}
                 >
                   <TransporterForm
                     orgId={orgId}

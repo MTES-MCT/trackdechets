@@ -145,7 +145,7 @@ export type CreateOrUpdateTransporterInput = TransporterInput & {
 
 export type FormFormikValues = Omit<FormInput, "transporters"> & {
   transporters: CreateOrUpdateTransporterInput[];
-};
+} & { id?: string | null };
 
 /**
  * Computes initial values of Formik's form by merging
