@@ -60,7 +60,7 @@ import {
 import prisma from "../prisma";
 import { extractPostalCode } from "../utils";
 import { getFirstTransporterSync } from "./database";
-import { FormForElastic } from "./elastic";
+import { FormInElastic } from "./elastic";
 import DataLoader from "dataloader";
 
 function flattenDestinationInput(input: {
@@ -819,7 +819,7 @@ export function expandFormFromDb(
 }
 
 export async function expandFormFromElastic(
-  form: FormForElastic,
+  form: FormInElastic,
   formLoader?: DataLoader<
     string,
     PrismaFormWithForwardedInAndTransporters | undefined,
@@ -837,7 +837,15 @@ export async function expandFormFromElastic(
     return null;
   }
 
-  return expandFormFromDb(formWithInclude);
+  const expandedForm = expandFormFromDb(formWithInclude);
+
+  return {
+    ...expandedForm,
+    revisionsInfos: {
+      hasBeenRevised: form.isRevisedFor.length > 0,
+      activeRevision: form.activeRevisionInfos
+    }
+  };
 }
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;

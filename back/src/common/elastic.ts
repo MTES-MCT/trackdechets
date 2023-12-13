@@ -6,8 +6,8 @@ import { AuthType } from "../auth";
 import { logger } from "@td/logger";
 import { BsdType, FormCompany } from "../generated/graphql/types";
 import { OperationMode } from "@prisma/client";
-import { FormForElastic } from "../forms/elastic";
-import { BsdaForElastic } from "../bsda/elastic";
+import { FormInElastic } from "../forms/elastic";
+import { BsdaInElastic } from "../bsda/elastic";
 import { BsdasriForElastic } from "../bsdasris/elastic";
 import { BsvhuForElastic } from "../bsvhu/elastic";
 import { BsffForElastic } from "../bsffs/elastic";
@@ -104,8 +104,8 @@ export interface BsdElastic {
   intermediaries?: FormCompany[] | null;
 
   rawBsd:
-    | FormForElastic
-    | BsdaForElastic
+    | FormInElastic
+    | BsdaInElastic
     | BsdasriForElastic
     | BsvhuForElastic
     | BsffForElastic;

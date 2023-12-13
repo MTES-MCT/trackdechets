@@ -17,12 +17,13 @@ import { getRegistryFields } from "./registry";
 import {
   getSiretsByTab,
   getRecipient,
-  getFormRevisionOrgIds
+  getFormRevisionsInfos
 } from "./elasticHelpers";
 
 import { buildAddress } from "../companies/sirene/utils";
 import { getFirstTransporterSync } from "./database";
 import prisma from "../prisma";
+import { ActiveRevisionInfos } from "../common/elasticHelpers";
 
 export type FormForElastic = Form &
   FormWithTransporters &
@@ -30,6 +31,11 @@ export type FormForElastic = Form &
   FormWithIntermediaries &
   FormWithForwarding &
   FormWithRevisionRequests;
+
+export type FormInElastic = FormForElastic &
+  Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> & {
+    activeRevisionInfos: ActiveRevisionInfos | undefined;
+  };
 
 export const FormForElasticInclude = {
   ...FormWithForwardedInWithTransportersInclude,
@@ -143,7 +149,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
           isInRevisionFor: []
         }
       : siretsByTab),
-    ...getFormRevisionOrgIds(form),
+    ...getFormRevisionsInfos(form),
     sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form),
     intermediaries: form.intermediaries,

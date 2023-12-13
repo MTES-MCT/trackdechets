@@ -15,13 +15,21 @@ import {
   BsdaWithRevisionRequestsInclude
 } from "./types";
 import prisma from "../prisma";
-import { getRevisionOrgIds } from "../common/elasticHelpers";
+import {
+  ActiveRevisionInfos,
+  getRevisionsInfos
+} from "../common/elasticHelpers";
 
 export type BsdaForElastic = Bsda &
   BsdaWithIntermediaries &
   BsdaWithForwardedIn &
   BsdaWithGroupedIn &
   BsdaWithRevisionRequests;
+
+export type BsdaInElastic = BsdaForElastic &
+  Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> & {
+    activeRevisionInfos: ActiveRevisionInfos | undefined;
+  };
 
 export const BsdaForElasticInclude = {
   ...BsdaWithIntermediariesInclude,
@@ -177,6 +185,9 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
 export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
   const where = getWhere(bsda);
 
+  const { isInRevisionFor, isRevisedFor, activeRevisionInfos } =
+    getBsdaRevisionsInfos(bsda);
+
   return {
     type: BsdType.BSDA,
     createdAt: bsda.createdAt?.getTime(),
@@ -255,11 +266,17 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     destinationAcceptationWeight: bsda.destinationReceptionWeight,
     destinationOperationDate: bsda.destinationOperationDate?.getTime(),
     ...where,
-    ...getBsdaRevisionOrgIds(bsda),
+    isInRevisionFor,
+    isRevisedFor,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda),
     intermediaries: bsda.intermediaries,
-    rawBsd: bsda
+    rawBsd: {
+      ...bsda,
+      isInRevisionFor,
+      isRevisedFor,
+      activeRevisionInfos
+    }
   };
 }
 
@@ -271,8 +288,8 @@ export function indexBsda(bsda: BsdaForElastic, ctx?: GraphQLContext) {
  * Pour un BSDD donné, retourne l'ensemble des identifiants d'établissements
  * pour lesquels il y a une demande de révision en cours ou passée.
  */
-export function getBsdaRevisionOrgIds(
+export function getBsdaRevisionsInfos(
   bsda: BsdaForElastic
-): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
-  return getRevisionOrgIds(bsda.BsdaRevisionRequest);
+): ReturnType<typeof getRevisionsInfos> {
+  return getRevisionsInfos(bsda.BsdaRevisionRequest);
 }

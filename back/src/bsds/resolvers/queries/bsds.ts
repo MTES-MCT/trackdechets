@@ -25,10 +25,10 @@ import { bsdSearchSchema } from "../../validation";
 import { toElasticQuery } from "../../where";
 import { Permission, can, getUserRoles } from "../../../permissions";
 import { distinct } from "../../../common/arrays";
-import { FormForElastic } from "../../../forms/elastic";
+import { FormInElastic } from "../../../forms/elastic";
 import { BsdasriForElastic } from "../../../bsdasris/elastic";
 import { BsvhuForElastic } from "../../../bsvhu/elastic";
-import { BsdaForElastic } from "../../../bsda/elastic";
+import { BsdaInElastic } from "../../../bsda/elastic";
 import { BsffForElastic } from "../../../bsffs/elastic";
 import { QueryContainer } from "@elastic/elasticsearch/api/types";
 import { GraphQLContext } from "../../../types";
@@ -51,26 +51,26 @@ export interface GetResponse<T> {
 }
 
 type PrismaBsdMap = {
-  bsdds: FormForElastic[];
+  bsdds: FormInElastic[];
   bsdasris: BsdasriForElastic[];
   bsvhus: BsvhuForElastic[];
-  bsdas: BsdaForElastic[];
+  bsdas: BsdaInElastic[];
   bsffs: BsffForElastic[];
 };
 
 /**
  * Convert a list of BsdElastic to a mapping of prisma-like Bsds by retrieving rawBsd elastic field
  */
-async function toRawBsds(bsdsElastic: BsdElastic[]): Promise<PrismaBsdMap> {
+function toRawBsds(bsdsElastic: BsdElastic[]): PrismaBsdMap {
   const { BSDD, BSDA, BSDASRI, BSFF, BSVHU } = groupByBsdType(bsdsElastic);
 
   return {
-    bsdds: BSDD.map(bsdElastic => bsdElastic.rawBsd as FormForElastic),
+    bsdds: BSDD.map(bsdElastic => bsdElastic.rawBsd as FormInElastic),
     bsdasris: BSDASRI.map(
       bsdsElastic => bsdsElastic.rawBsd as BsdasriForElastic
     ),
     bsvhus: BSVHU.map(bsdElastic => bsdElastic.rawBsd as BsvhuForElastic),
-    bsdas: BSDA.map(bsdElastic => bsdElastic.rawBsd as BsdaForElastic),
+    bsdas: BSDA.map(bsdElastic => bsdElastic.rawBsd as BsdaInElastic),
     bsffs: BSFF.map(bsdsElastic => bsdsElastic.rawBsd as BsffForElastic)
   };
 }
@@ -343,7 +343,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
     bsvhus: concreteBsvhus,
     bsdas: concreteBsdas,
     bsffs: concreteBsffs
-  } = await toRawBsds(hits.map(hit => hit._source));
+  } = toRawBsds(hits.map(hit => hit._source));
 
   const bsds: Record<BsdType, Bsd[]> = {
     BSDD: (

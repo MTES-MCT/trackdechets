@@ -61,3 +61,19 @@ type Signature {
   date: DateTime
   author: String
 }
+
+type RevisionsInfos {
+  "La révision a-t-elle déjà été révisée ?"
+  hasBeenRevised: Boolean!
+  """
+  Sirets des entreprises ayant apposé une approbation sur la révision active.
+  Tableau vide si aucune approbation n'a été apposée.
+  Tableau nul s'il n'y a pas de révision active.
+  """
+  activeRevision: ActiveRevisionInfos
+}
+
+type ActiveRevisionInfos {
+  author: String!
+  approvedBy: [String!]!
+}

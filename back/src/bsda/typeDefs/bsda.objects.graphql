@@ -320,6 +320,7 @@ type BsdaBroker {
 
 type BsdaMetadata {
   errors: [BsdaError]
+  revisionsInfos: RevisionsInfos!
 }
 
 type BsdaError {

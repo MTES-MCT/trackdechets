@@ -4,6 +4,7 @@ import appendix2Forms from "./forms/appendix2Forms";
 import groupedIn from "./forms/groupedIn";
 import grouping from "./forms/grouping";
 import intermediaries from "./forms/intermediary";
+import revisionsInfos from "./forms/revisionsInfos";
 
 const formResolvers: FormResolvers = {
   appendix2Forms,
@@ -11,7 +12,8 @@ const formResolvers: FormResolvers = {
   stateSummary,
   groupedIn,
   grouping,
-  intermediaries
+  intermediaries,
+  revisionsInfos
 };
 
 export default formResolvers;

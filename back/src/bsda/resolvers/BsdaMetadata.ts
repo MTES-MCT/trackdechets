@@ -6,6 +6,7 @@ import {
 } from "../../generated/graphql/types";
 import { getBsdaOrNotFound } from "../database";
 import { parseBsdaInContext } from "../validation";
+import prisma from "../../prisma";
 
 function getNextSignature(bsda) {
   if (bsda.destinationOperationSignatureAuthor != null) return "OPERATION";
@@ -40,5 +41,32 @@ export const Metadata: BsdaMetadataResolvers = {
         };
       });
     }
+  },
+  revisionsInfos: async (metadata: BsdaMetadata & { id: string }) => {
+    // When we load a BSDA from ES, the revision metadata are already hydrated
+    if (metadata.revisionsInfos) {
+      return metadata.revisionsInfos;
+    }
+
+    const revisions = await prisma.bsda
+      .findUnique({ where: { id: metadata.id } })
+      .bsdaRevisionRequests({ include: { approvals: true } });
+
+    const hasBeenRevised = revisions?.some(
+      revision => revision.status !== "PENDING"
+    );
+    const activeRevision = revisions?.find(
+      revision => revision.status === "PENDING"
+    );
+
+    return {
+      hasBeenRevised: Boolean(hasBeenRevised),
+      activeRevision: activeRevision
+        ? {
+            author: activeRevision.authoringCompanyId,
+            approvedBy: activeRevision.approvals.map(a => a.approverSiret)
+          }
+        : undefined
+    };
   }
 };
