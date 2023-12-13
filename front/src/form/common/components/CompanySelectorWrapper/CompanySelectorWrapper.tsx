@@ -18,7 +18,7 @@ interface CompanySelectorWrapperProps {
   // Expose le state Formik depuis le composant parent
   // afin d'initialiser le `selectedCompany` au premier
   // render lorsqu'on est dans le cas d'un update de bordereau
-  formOrgId?: string | null;
+  transporterOrgId?: string | null;
   favoriteType?: FavoriteType;
   // Paramètre qui est passée à `searchCompanies`, les données sont
   // filtrées directement côté serveur
@@ -44,7 +44,7 @@ interface CompanySelectorWrapperProps {
  * les données du store (Formik)
  */
 export default function CompanySelectorWrapper({
-  formOrgId,
+  transporterOrgId,
   favoriteType = FavoriteType.Emitter,
   allowForeignCompanies = false,
   selectedCompanyError,
@@ -85,9 +85,9 @@ export default function CompanySelectorWrapper({
   // dans le CompanySelector (par exemple si on permute deux transporteurs
   // dans la liste des transporteurs multi-modaux)
   useEffect(() => {
-    if (formOrgId && formOrgId !== selectedCompany?.orgId) {
+    if (transporterOrgId && transporterOrgId !== selectedCompany?.orgId) {
       searchCompaniesQuery({
-        variables: { clue: formOrgId },
+        variables: { clue: transporterOrgId },
         onCompleted: result => {
           if (result.searchCompanies?.length > 0) {
             onSelectCompany(result.searchCompanies[0]);
@@ -95,7 +95,12 @@ export default function CompanySelectorWrapper({
         }
       });
     }
-  }, [selectedCompany, formOrgId, searchCompaniesQuery, onSelectCompany]);
+  }, [
+    selectedCompany,
+    transporterOrgId,
+    searchCompaniesQuery,
+    onSelectCompany
+  ]);
 
   const onSearchCompany = (searchClue, postalCodeClue) => {
     if (searchClue.length === 0 && postalCodeClue.length === 0 && orgId) {
