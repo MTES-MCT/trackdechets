@@ -68,12 +68,10 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
 
               // Lorsqu'aucun établissement n'a été sélectionné, on affiche "Transporteur N"
               // où N est le numéro du transporteur dans la liste
-              // const accordionName =
-              //   t?.company?.name ?? `Transporteur ${numero}`;
-
-              // On affiche uniquement `Transporteur` en attente de l'implémentation
-              // du multi-modal
-              const accordionName = "Transporteur";
+              const accordionName =
+                t?.company?.name && t.company.name.length > 0
+                  ? t.company.name
+                  : `Transporteur ${numero}`;
 
               return (
                 <TransporterAccordion
