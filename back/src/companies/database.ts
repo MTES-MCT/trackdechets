@@ -28,7 +28,7 @@ import { searchVatFrOnlyOrNotFoundFailFast } from "./search";
 export async function getCompanyOrCompanyNotFound(
   { id, orgId, siret }: Prisma.CompanyWhereUniqueInput,
   select?: Prisma.CompanySelect
-) {
+): Promise<Company> {
   if (!id && !siret && !orgId) {
     throw new UserInputError("You should specify an id or a siret or an orgId");
   }
