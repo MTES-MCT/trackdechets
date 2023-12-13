@@ -1,10 +1,14 @@
 import { BsdElastic } from "./elastic";
-import { RevisionRequestStatus } from "@prisma/client";
+import {
+  RevisionRequestApprovalStatus,
+  RevisionRequestStatus
+} from "@prisma/client";
 
 type RevisionRequest = {
   status: RevisionRequestStatus;
   approvals: {
     approverSiret: string;
+    status: RevisionRequestApprovalStatus;
   }[];
   authoringCompany: {
     orgId: string;
@@ -53,7 +57,12 @@ export function getRevisionsInfos(revisionRequests: RevisionRequest[]): Pick<
               isRevisedFor,
               activeRevisionInfos: {
                 author: revisionRequest.authoringCompany.orgId,
-                approvedBy: revisionRequest.approvals.map(a => a.approverSiret)
+                approvedBy: revisionRequest.approvals
+                  .filter(
+                    approval =>
+                      approval.status === RevisionRequestApprovalStatus.ACCEPTED
+                  )
+                  .map(a => a.approverSiret)
               }
             }
           : {

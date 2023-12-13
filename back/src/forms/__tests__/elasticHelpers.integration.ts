@@ -48,6 +48,7 @@ describe("getFormRevisionsInfos", () => {
 
     expect(revisionOrgIds.isInRevisionFor).toHaveLength(0);
     expect(revisionOrgIds.isRevisedFor).toHaveLength(0);
+    expect(revisionOrgIds.activeRevisionInfos).toBeUndefined();
 
     const { errors, data } = await mutate<
       Pick<Mutation, "createFormRevisionRequest">,
@@ -76,6 +77,10 @@ describe("getFormRevisionsInfos", () => {
     expect(revisionOrgIds2.isInRevisionFor).toContain(emitter.company.siret);
     expect(revisionOrgIds2.isInRevisionFor).toContain(recipient.company.siret);
     expect(revisionOrgIds2.isRevisedFor).toHaveLength(0);
+    expect(revisionOrgIds2.activeRevisionInfos?.approvedBy).toEqual([]);
+    expect(revisionOrgIds2.activeRevisionInfos?.author).toBe(
+      emitter.company.siret
+    );
 
     await prisma.bsddRevisionRequest.update({
       where: { id: revisionRequest.id },
@@ -91,6 +96,7 @@ describe("getFormRevisionsInfos", () => {
     expect(revisionOrgIds3.isRevisedFor).toHaveLength(2);
     expect(revisionOrgIds3.isRevisedFor).toContain(emitter.company.siret);
     expect(revisionOrgIds3.isRevisedFor).toContain(recipient.company.siret);
+    expect(revisionOrgIds3.activeRevisionInfos).toBeUndefined();
 
     await mutate<
       Pick<Mutation, "createFormRevisionRequest">,
@@ -115,5 +121,9 @@ describe("getFormRevisionsInfos", () => {
     expect(revisionOrgIds4.isInRevisionFor).toContain(emitter.company.siret);
     expect(revisionOrgIds4.isInRevisionFor).toContain(recipient.company.siret);
     expect(revisionOrgIds4.isRevisedFor).toHaveLength(0);
+    expect(revisionOrgIds4.activeRevisionInfos?.approvedBy).toEqual([]);
+    expect(revisionOrgIds4.activeRevisionInfos?.author).toBe(
+      emitter.company.siret
+    );
   });
 });

@@ -38,7 +38,7 @@ export type BsdaRevisionRequestWithAuthoringCompany =
 
 export const BsdaRevisionRequestWithApprovalsInclude =
   Prisma.validator<Prisma.BsdaRevisionRequestInclude>()({
-    approvals: { select: { approverSiret: true } }
+    approvals: { select: { approverSiret: true, status: true } }
   });
 
 export type BsdaRevisionRequestWithApprovals =
