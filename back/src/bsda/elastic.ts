@@ -291,5 +291,5 @@ export function indexBsda(bsda: BsdaForElastic, ctx?: GraphQLContext) {
 export function getBsdaRevisionsInfos(
   bsda: BsdaForElastic
 ): ReturnType<typeof getRevisionsInfos> {
-  return getRevisionsInfos(bsda.BsdaRevisionRequest);
+  return getRevisionsInfos(bsda.bsdaRevisionRequests);
 }

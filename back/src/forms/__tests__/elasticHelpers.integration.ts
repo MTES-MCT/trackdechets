@@ -5,7 +5,7 @@ import {
   Mutation,
   MutationCreateFormRevisionRequestArgs
 } from "../../generated/graphql/types";
-import { getFormRevisionOrgIds } from "../elasticHelpers";
+import { getFormRevisionsInfos } from "../elasticHelpers";
 import { getFormForElastic } from "../elastic";
 import prisma from "../../prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
@@ -18,7 +18,7 @@ const CREATE_FORM_REVISION_REQUEST = gql`
   }
 `;
 
-describe("getFormRevisionOrgIds", () => {
+describe("getFormRevisionsInfos", () => {
   afterEach(resetDatabase);
 
   it("should list organisation identifiers in `isInRevisionFor` and `isRevisedFor`", async () => {
@@ -44,7 +44,7 @@ describe("getFormRevisionOrgIds", () => {
     const { mutate } = makeClient(emitter.user);
 
     const formForElastic = await getFormForElastic(form);
-    const revisionOrgIds = getFormRevisionOrgIds(formForElastic);
+    const revisionOrgIds = getFormRevisionsInfos(formForElastic);
 
     expect(revisionOrgIds.isInRevisionFor).toHaveLength(0);
     expect(revisionOrgIds.isRevisedFor).toHaveLength(0);
@@ -68,7 +68,7 @@ describe("getFormRevisionOrgIds", () => {
     expect(errors).toBeUndefined();
 
     const formForElastic2 = await getFormForElastic(form);
-    const revisionOrgIds2 = getFormRevisionOrgIds(formForElastic2);
+    const revisionOrgIds2 = getFormRevisionsInfos(formForElastic2);
 
     // Une demande de révision est en cours, les bordereaux doivent apparaitre dans
     // l'onglet "Révision en cours"
@@ -83,7 +83,7 @@ describe("getFormRevisionOrgIds", () => {
     });
 
     const formForElastic3 = await getFormForElastic(form);
-    const revisionOrgIds3 = getFormRevisionOrgIds(formForElastic3);
+    const revisionOrgIds3 = getFormRevisionsInfos(formForElastic3);
 
     // La demande de révision a été accepté, les bordereaux doivent apparaitre
     // dans l'onglet "Révisions passés"
@@ -107,7 +107,7 @@ describe("getFormRevisionOrgIds", () => {
     });
 
     const formForElastic4 = await getFormForElastic(form);
-    const revisionOrgIds4 = getFormRevisionOrgIds(formForElastic4);
+    const revisionOrgIds4 = getFormRevisionsInfos(formForElastic4);
 
     // Une nouvelle demande de révision a été effectuée, le bordereau doit
     // rebasculer dans l'onglet "Révision en cours"

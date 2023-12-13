@@ -763,6 +763,7 @@ export function expandFormFromDb(
           quantity
         }))
       : null,
+    revisionsInfos: undefined as any, // This field will be loaded by a sub resolver on demand
     temporaryStorageDetail: forwardedIn
       ? {
           temporaryStorer: {

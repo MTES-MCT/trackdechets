@@ -63,6 +63,8 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
   const recipient = getRecipient(form);
 
   const transporter1 = getFirstTransporterSync(form);
+  const { isInRevisionFor, isRevisedFor, activeRevisionInfos } =
+    getFormRevisionsInfos(form);
 
   return {
     type: "BSDD",
@@ -149,11 +151,17 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
           isInRevisionFor: []
         }
       : siretsByTab),
-    ...getFormRevisionsInfos(form),
+    isInRevisionFor,
+    isRevisedFor,
     sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form),
     intermediaries: form.intermediaries,
-    rawBsd: form
+    rawBsd: {
+      ...form,
+      isInRevisionFor,
+      isRevisedFor,
+      activeRevisionInfos
+    }
   };
 }
 
