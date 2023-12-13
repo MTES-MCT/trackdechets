@@ -72,7 +72,6 @@ describe("TransporterAccordion", () => {
         getComputedStyle(getByText(container, foldableContent)).maxHeight
       ).toEqual("")
     );
-    console.log(getComputedStyle(getByText(container, foldableContent)));
     fireEvent.click(caret);
     await waitFor(() =>
       expect(

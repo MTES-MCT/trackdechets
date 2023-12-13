@@ -36,20 +36,22 @@ export function TransporterAccordion({
 
   const collapseElementId = `transporter__${numero}__form`;
 
-  const [expandedHeight, setExpandedHeight] = React.useState(0);
-
   const ref = React.useRef(null);
 
-  React.useEffect(() => {
+  // FIXME scrollHeight est recalculé à chaque render
+  // Idéalement il faudrait utiliser ResizeObserver pour être notifié
+  // lorsque l'élément change de taille tel que décrit ici
+  // https://legacy.reactjs.org/docs/hooks-faq.html#how-can-i-measure-a-dom-node
+  const scrollHeight = (() => {
     if (ref.current) {
       // Cf https://www.w3schools.com/howto/howto_js_collapsible.asp
       // "Animated Collapsible (Slide Down)"
       // On a besoin de connaitre la hauteur de l'élément déplié
       // pour définir la valeur de maxHeight
-      const scrolleHeight = (ref.current as any).scrollHeight;
-      setExpandedHeight(scrolleHeight);
+      return (ref.current as any).scrollHeight;
     }
-  }, [setExpandedHeight]);
+    return 0;
+  })();
 
   return (
     <section>
@@ -114,8 +116,8 @@ export function TransporterAccordion({
         className="transporter__form"
         style={
           expandedState
-            ? expandedHeight
-              ? { maxHeight: expandedHeight }
+            ? scrollHeight
+              ? { maxHeight: scrollHeight }
               : {} // avoid having an animation on first render
             : { maxHeight: 0 }
         }
