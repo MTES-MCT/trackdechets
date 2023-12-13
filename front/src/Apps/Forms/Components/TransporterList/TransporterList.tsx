@@ -64,6 +64,23 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
                 }
               };
 
+              // On désactive la possibilité de supprimer le transporteur
+              // s'il est le seul dans la liste
+              const disableDelete = transporters.length === 1;
+
+              // Désactive le bouton permettant de remonter le transporteur dans
+              // la liste s'il est le seul ou le premier
+              const disableUp = transporters.length === 1 || idx === 0;
+
+              // Désactive le bouton permettant de descendre le transporteur dans
+              // la liste s'il est le seul ou le dernier
+              const disableDown =
+                transporters.length === 1 || idx === transporters.length - 1;
+
+              // Désactive la possibilité de replier le formulaire transporteur
+              // s'il est le seul
+              const disableFold = transporters.length === 1;
+
               const numero = idx + 1;
 
               // Lorsqu'aucun établissement n'a été sélectionné, on affiche "Transporteur N"
@@ -92,6 +109,10 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
                       arrayHelpers.swap(idx, nextIndex);
                     }
                   }}
+                  disableDelete={disableDelete}
+                  disableUp={disableUp}
+                  disableDown={disableDown}
+                  disableFold={disableFold}
                 >
                   <TransporterForm
                     orgId={orgId}

@@ -9,6 +9,10 @@ export type TransporterAccordionProps = {
   onTransporterDelete: () => void;
   onTransporterShiftDown: () => void;
   onTransporterShiftUp: () => void;
+  disableDelete?: boolean;
+  disableUp?: boolean;
+  disableDown?: boolean;
+  disableFold?: boolean;
   children: NonNullable<React.ReactNode>;
 };
 
@@ -26,6 +30,10 @@ export function TransporterAccordion({
   onTransporterDelete,
   onTransporterShiftDown,
   onTransporterShiftUp,
+  disableDelete = false,
+  disableUp = false,
+  disableDown = false,
+  disableFold = false,
   children
 }: TransporterAccordionProps) {
   const [expandedState, setExpandedState] = React.useState(true);
@@ -77,6 +85,7 @@ export function TransporterAccordion({
             iconId="ri-delete-bin-line"
             title="Supprimer"
             onClick={onTransporterDelete}
+            disabled={disableDelete}
           >
             Supprimer
           </Button>
@@ -87,6 +96,7 @@ export function TransporterAccordion({
             priority="secondary"
             title="Remonter"
             onClick={onTransporterShiftUp}
+            disabled={disableUp}
           />
           <Button
             type="button"
@@ -95,6 +105,7 @@ export function TransporterAccordion({
             priority="secondary"
             title="Descendre"
             onClick={onTransporterShiftDown}
+            disabled={disableDown}
           />
           <Button
             type="button"
@@ -107,6 +118,7 @@ export function TransporterAccordion({
             aria-expanded={expandedState}
             aria-controls={collapseElementId}
             onClick={onExtendButtonClick}
+            disabled={disableFold}
           />
         </div>
       </div>
