@@ -3,8 +3,7 @@ import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
 import { sendMail } from "../../../../mailer/mailing";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
-import { renderMail } from "../../../../mailer/templates/renderers";
-import { onSignup } from "../../../../mailer/templates";
+import { renderMail, onSignup } from "@td/mail";
 import { Mutation } from "../../../../generated/graphql/types";
 import makeClient from "../../../../__tests__/testClient";
 

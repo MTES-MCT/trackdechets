@@ -14,7 +14,7 @@ export function RouteBSDasView() {
     GET_BSDA,
     {
       variables: {
-        id: formId
+        id: formId!
       },
       skip: !formId,
       fetchPolicy: "network-only"

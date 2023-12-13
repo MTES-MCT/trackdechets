@@ -4,11 +4,15 @@ import { hashPassword } from "../../../utils";
 
 const userMock = jest.fn();
 const updateUserMock = jest.fn();
+const deleteManyMock = jest.fn();
 
 jest.mock("../../../../prisma", () => ({
   user: {
     findUnique: jest.fn((...args) => userMock(...args)),
     update: jest.fn((...args) => updateUserMock(...args))
+  },
+  userResetPasswordHash: {
+    deleteMany: jest.fn((...args) => deleteManyMock(...args))
   }
 }));
 

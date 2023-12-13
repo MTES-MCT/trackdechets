@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
-import React, { lazy } from "react";
-import { useHistory } from "react-router";
+import React from "react";
+import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
 import * as yup from "yup";
 import classNames from "classnames";
@@ -26,9 +26,7 @@ import styles from "./BsdaRequestRevision.module.scss";
 import { BSDA_WASTES } from "shared/constants";
 import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCancelationInput";
 import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
-const TagsInput = lazy(
-  () => import("../../../../../common/components/tags-input/TagsInput")
-);
+import TagsInput from "../../../../../common/components/tags-input/TagsInput";
 
 type Props = {
   bsda: Bsda;
@@ -83,7 +81,7 @@ const validationSchema = yup.object({
 
 export function BsdaRequestRevision({ bsda }: Props) {
   const { siret } = useParams<{ siret: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [createBsdaRevisionRequest, { loading, error }] = useMutation<
     Pick<Mutation, "createBsdaRevisionRequest">,
     MutationCreateBsdaRevisionRequestArgs
@@ -110,11 +108,11 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 bsdaId: bsda.id,
                 content: cleanedContent ?? {},
                 comment,
-                authoringCompanySiret: siret
+                authoringCompanySiret: siret!
               }
             }
           });
-          history.goBack();
+          navigate(-1);
         }}
       >
         {({ setFieldValue, values }) => {
@@ -444,7 +442,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 <button
                   className="btn btn--outline-primary"
                   onClick={() => {
-                    history.goBack();
+                    navigate(-1);
                   }}
                   type="button"
                 >

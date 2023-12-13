@@ -38,6 +38,7 @@ export const SIGNER_PAR_ENTREPRISE_TRAVAUX =
   "Signé par l'entreprise de travaux";
 export const EN_ATTENTE_BSD_SUITE = "En attente d'un bordereau suite";
 export const ANNULE = "Annulé";
+export const EN_ATTENTE_TRAITEMENT = "En attente de traitement";
 
 // Additional actions buttons
 export const apercu_action_label = "Aperçu";

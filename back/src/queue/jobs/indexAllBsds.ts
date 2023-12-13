@@ -4,7 +4,7 @@ import { BsdIndexationConfig } from "../../common/elastic";
 import { findManyAndIndexBsds } from "../../bsds/indexation/bulkIndexBsds";
 import { FindManyAndIndexBsdsFnSignature } from "../../bsds/indexation/types";
 import { reindexAllBsdsInBulk } from "../../bsds/indexation";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 
 const {
   SCALINGO_API_URL,

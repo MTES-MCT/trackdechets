@@ -1,5 +1,5 @@
 import { sendVerificationCodeLetters } from "../companies/verif";
-import logger from "../logging/logger";
+import { logger } from "@td/logger";
 
 sendVerificationCodeLetters()
   .then(() => {

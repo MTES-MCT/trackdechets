@@ -17,7 +17,7 @@ export function RouteBsvhusView() {
     QueryBsvhuArgs
   >(GET_VHU_FORM, {
     variables: {
-      id: formId
+      id: formId!
     },
     skip: !formId,
     fetchPolicy: "network-only"

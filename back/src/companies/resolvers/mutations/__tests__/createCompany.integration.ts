@@ -11,8 +11,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { geocode } from "../../../geo/geocode";
 import { CompanyType } from "@prisma/client";
-import { renderMail } from "../../../../mailer/templates/renderers";
-import { verificationProcessInfo } from "../../../../mailer/templates";
+import { renderMail, verificationProcessInfo } from "@td/mail";
 import {
   Mutation,
   StatutDiffusionEtablissement
@@ -550,8 +549,8 @@ describe("Mutation.createCompany", () => {
       companyTypes: ["TRANSPORTER"],
       ecoOrganismeAgreements: [],
       gerepId: null,
-      name: "Acme in EU",
-      address: "Transporter street",
+      name: testValue.name,
+      address: testValue.address,
       traderReceipt: null,
       transporterReceipt: null,
       vatNumber: "RO17579668"

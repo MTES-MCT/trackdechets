@@ -29,6 +29,7 @@ import {
   EMPORT_DIRECT_LABEL,
   ENTREPOS_TEMPORAIREMENT,
   EN_ATTENTE_BSD_SUITE,
+  EN_ATTENTE_TRAITEMENT,
   FAIRE_SIGNER,
   INITIAL,
   PARTIELLEMENT_REFUSE,
@@ -94,7 +95,7 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.AwaitingChild:
     case BsdStatusCode.Grouped:
       if (bsdType === BsdType.Bsff) {
-        return EN_ATTENTE_BSD_SUITE;
+        return EN_ATTENTE_TRAITEMENT;
       }
       if (bsdType === BsdType.Bsda) {
         if (bsdaAnnexed) {
@@ -143,10 +144,7 @@ export const getBsdStatusLabel = (
       return EN_ATTENTE_BSD_SUITE;
     case BsdStatusCode.IntermediatelyProcessed:
       if (bsdType === BsdType.Bsff) {
-        const operationCodesBsff = ["R12", "R13", "D13", "D14", "D15"];
-        if (operationCode && operationCodesBsff.includes(operationCode)) {
-          return EN_ATTENTE_BSD_SUITE;
-        }
+        return EN_ATTENTE_TRAITEMENT;
       }
       if (bsdType === BsdType.Bsdasri) {
         return ANNEXE_BORDEREAU_SUITE;
@@ -196,6 +194,9 @@ const isSameSiretDestination = (
   bsd: BsdDisplay
 ): boolean => currentSiret === bsd.destination?.company?.siret;
 
+const isSameSiretWorker = (currentSiret: string, bsd: BsdDisplay): boolean =>
+  currentSiret === bsd.worker?.company?.siret;
+
 export const isSameSiretTransporter = (
   currentSiret: string,
   bsd: BsdDisplay | Form
@@ -214,6 +215,9 @@ const isGathering = (bsdWorkflowType: string | undefined): boolean =>
 
 const isReshipment = (bsdWorkflowType: string | undefined): boolean =>
   bsdWorkflowType === BsdaType.Reshipment;
+
+const isOtherCollection = (bsdWorkflowType: string | undefined): boolean =>
+  bsdWorkflowType === BsdaType.OtherCollections;
 
 const isSimple = (bsdWorkflowType: string | undefined): boolean =>
   bsdWorkflowType === BsdasriType.Simple;
@@ -570,6 +574,7 @@ export const getReceivedBtnLabel = (
   if (
     isBsdasri(bsd.type) &&
     isActTab &&
+    !bsd.synthesizedIn &&
     isSameSiretDestination(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
@@ -642,9 +647,9 @@ export const getSignByProducerBtnLabel = (
 
     if (
       (isBsda(bsd.type) &&
-        currentSiret === bsd.transporter?.company?.orgId &&
         (isGathering(bsd.bsdWorkflowType?.toString()) ||
           isReshipment(bsd.bsdWorkflowType?.toString()) ||
+          isOtherCollection(bsd.bsdWorkflowType?.toString()) ||
           bsd.worker?.isDisabled)) ||
       isBsvhu(bsd.type)
     ) {
@@ -1110,8 +1115,15 @@ export const canReviewBsdd = (bsd, siret) =>
 
 export const canReviewBsd = (bsd, siret) => {
   const isTransporter = isSameSiretTransporter(siret, bsd);
+  const isDestination = isSameSiretDestination(siret, bsd);
+  const isProducer = isSameSiretEmmiter(siret, bsd);
+  const isWorker = isSameSiretWorker(siret, bsd);
+  const isTransporterOnly =
+    isTransporter && !isDestination && !isProducer && !isWorker;
+
   return (
-    (canReviewBsdd(bsd, siret) || canReviewBsda(bsd, siret)) && !isTransporter
+    (canReviewBsdd(bsd, siret) || canReviewBsda(bsd, siret)) &&
+    !isTransporterOnly
   );
 };
 

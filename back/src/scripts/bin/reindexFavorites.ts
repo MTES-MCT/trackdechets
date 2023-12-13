@@ -1,10 +1,12 @@
 import prisma from "../../prisma";
 import { closeQueues } from "../../queue/producers";
-import logger from "../../logging/logger";
-import { allFavoriteTypes } from "../../companies/types";
-import { favoritesCompanyQueue } from "../../queue/producers/company";
+import { logger } from "@td/logger";
 import { processDbIdentifiersByChunk } from "../../bsds/indexation/bulkIndexBsds";
+import { updateFavorites } from "../../companies/database";
 
+/**
+ * Reindex al favorites using the async job
+ */
 async function exitScript() {
   logger.info("Done adding indexFavorites job the job queue, exiting");
   await prisma.$disconnect();
@@ -22,16 +24,7 @@ async function exitScript() {
     `Starting indexation of favorites for ${orgIds.length} Companies`
   );
   await processDbIdentifiersByChunk(orgIds, async chunk => {
-    for (const favoriteType of allFavoriteTypes) {
-      await favoritesCompanyQueue.addBulk(
-        chunk.map(orgId => ({
-          data: {
-            orgId,
-            type: favoriteType
-          }
-        }))
-      );
-    }
+    await updateFavorites(chunk);
   });
   return exitScript();
 })();

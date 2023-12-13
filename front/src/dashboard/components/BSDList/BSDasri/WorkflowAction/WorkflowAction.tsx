@@ -1,7 +1,7 @@
 import React from "react";
 
 import { ActionLink } from "../../../../../common/components";
-import { generatePath, useLocation, useRouteMatch } from "react-router-dom";
+import { generatePath, useLocation, useMatch } from "react-router-dom";
 
 import {
   IconCheckCircle1,
@@ -34,8 +34,8 @@ const isPublishable = (form: Bsdasri) => {
 export function WorkflowAction(props: WorkflowActionProps) {
   const { form, siret } = props;
   const location = useLocation();
-  const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
-  const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
+  const isActTab = !!useMatch(routes.dashboard.bsds.act);
+  const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
 
   const isSynthesis = form.type === BsdasriType.Synthesis;
   const isAssociatedToSynthesis = !!form?.synthesizedIn?.id;

@@ -1,6 +1,6 @@
 import React, { useState, createRef, useEffect } from "react";
 import * as queryString from "query-string";
-import { useLocation, Redirect } from "react-router-dom";
+import { useLocation, Navigate } from "react-router-dom";
 import routes from "../Apps/routes";
 import { Captcha, useCaptcha } from "../common/components/captcha";
 
@@ -36,11 +36,7 @@ function displayCaptcha(errorCode?: string) {
 }
 
 export default function Login() {
-  const location = useLocation<{
-    errorCode?: string;
-    returnTo?: string;
-    username?: string;
-  }>();
+  const location = useLocation();
 
   useEffect(() => {
     document.title = `Se connecter | ${document.title}`;
@@ -81,7 +77,7 @@ export default function Login() {
       ...(!!returnTo ? { returnTo } : {})
     };
 
-    return <Redirect to={{ pathname: routes.login, state }} />;
+    return <Navigate to={{ pathname: routes.login }} state={state} />;
   }
 
   const { returnTo, errorCode, username } = location.state || {};

@@ -67,25 +67,21 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   const links = [
     {
       title: "Contrôle routier",
-      route: {
-        pathname: generatePath(routes.dashboard.roadControl, {
-          siret,
-          id: form.id
-        }),
-        state: { background: location }
-      },
+      route: generatePath(routes.dashboard.roadControl, {
+        siret,
+        id: form.id
+      }),
+      state: { background: location },
       icon: <IconQrCode color="blueLight" size="24px" />,
       isVisible: useDisplayRoadControlButton(form)
     },
     {
       title: "Aperçu",
-      route: {
-        pathname: generatePath(routes.dashboard.bsdds.view, {
-          siret,
-          id: form.id
-        }),
-        state: { background: location }
-      },
+      route: generatePath(routes.dashboard.bsdds.view, {
+        siret,
+        id: form.id
+      }),
+      state: { background: location },
       icon: <IconView color="blueLight" size="24px" />,
       isVisible: true
     },
@@ -96,9 +92,9 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
           siret,
           id: form.id
         }),
-        search: "?selectedTab=0",
-        state: { background: location }
+        search: "?selectedTab=0"
       },
+      state: { background: location },
       icon: <IconAddCircle size="24px" color="blueLight" />,
       isVisible: showAppendix1Button
     },
@@ -130,13 +126,11 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     },
     {
       title: "Révision",
-      route: {
-        pathname: generatePath(routes.dashboard.bsdds.review, {
-          siret,
-          id: form.id
-        }),
-        state: { background: location }
-      },
+      route: generatePath(routes.dashboard.bsdds.review, {
+        siret,
+        id: form.id
+      }),
+      state: { background: location },
       icon: <IconPaperWrite size="24px" color="blueLight" />,
       isVisible: canRequestRevision
     },

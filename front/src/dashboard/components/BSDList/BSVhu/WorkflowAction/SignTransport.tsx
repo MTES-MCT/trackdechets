@@ -3,7 +3,7 @@ import { RedErrorMessage } from "../../../../../common/components";
 import { GET_BSDS } from "../../../../../Apps/common/queries";
 import routes from "../../../../../Apps/routes";
 import { UPDATE_VHU_FORM } from "../../../../../form/bsvhu/utils/queries";
-import TransporterReceipt from "../../../../../form/common/components/company/TransporterReceipt";
+import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { Field, Form, Formik } from "formik";
 import {
@@ -13,7 +13,7 @@ import {
   SignatureTypeInput
 } from "codegen-ui";
 import React from "react";
-import { generatePath, Link, useRouteMatch } from "react-router-dom";
+import { generatePath, Link, useMatch } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 import { subMonths } from "date-fns";
@@ -53,7 +53,7 @@ export function SignTransport({
 
   const loading = loadingUpdate || loadingSign;
 
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
   const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
 
   return (
@@ -126,7 +126,7 @@ export function SignTransport({
                   j'atteste que les informations ci-dessus sont correctes. En
                   signant ce document, je déclare prendre en charge le déchet.
                 </p>
-                <TransporterReceipt transporter={bsvhu.transporter!} />
+                <TransporterRecepisseWrapper transporter={bsvhu.transporter!} />
 
                 <div className="form__row">
                   <label>

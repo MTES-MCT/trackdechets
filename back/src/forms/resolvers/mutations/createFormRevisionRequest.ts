@@ -241,6 +241,13 @@ async function getFlatContent(
     );
   }
 
+  // One cannot request a CANCELATION on an appendix1
+  if (flatContent.isCanceled && bsdd.emitterType === EmitterType.APPENDIX1) {
+    throw new ForbiddenError(
+      "Impossible d'annuler un bordereau de tournée dédiée."
+    );
+  }
+
   // One cannot request a CANCELATION if the BSDD has advanced too far in the workflow
   if (
     flatContent.isCanceled &&

@@ -31,6 +31,11 @@ export async function changePasswordFn(
     });
   }
 
+  // Delete all password reset hashes
+  await prisma.userResetPasswordHash.deleteMany({
+    where: { userId: user.id }
+  });
+
   const trimmedPassword = newPassword.trim();
 
   checkPasswordCriteria(trimmedPassword);

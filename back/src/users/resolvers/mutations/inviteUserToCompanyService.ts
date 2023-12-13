@@ -14,11 +14,7 @@ import {
 import { sanitizeEmail } from "../../../utils";
 import { associateUserToCompany, createUserAccountHash } from "../../database";
 
-import {
-  inviteUserToJoin,
-  notifyUserOfInvite
-} from "../../../mailer/templates";
-import { renderMail } from "../../../mailer/templates/renderers";
+import { inviteUserToJoin, notifyUserOfInvite, renderMail } from "@td/mail";
 
 export async function inviteUserToCompanyFn(
   adminUser: User,

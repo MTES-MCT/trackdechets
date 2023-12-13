@@ -3,40 +3,19 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "npm run watch:all",
-    "dev:integration": "prisma generate && npm run watch:queue",
-    "start": "node ../dist/back/index.js",
-    "update": "node ../dist/back/back/prisma/scripts/index.js",
-    "update:dev": "tsx -r dotenv/config prisma/scripts/index.ts",
-    "migrate": "node ../dist/back/back/prisma/migrate.js",
-    "migrate:dev": "tsx -r dotenv/config prisma/migrate.ts",
+    "update": "tsx --tsconfig tsconfig.lib.json prisma/scripts/index.ts",
+    "migrate": "tsx --tsconfig tsconfig.lib.json prisma/migrate.ts",
     "check:migrations": "pg-validate-migrations ./prisma/migrations",
-    "preintegration-tests": "prisma db push && npm run reindex-all-bsds-bulk:dev",
-    "build:esbuild": "node esbuild.js",
-    "scalingo-postbuild": "./src/scripts/build/scalingo.sh",
-    "bulk-create-account": "node ../dist/back/back/src/users/bulk-creation/index.js",
-    "bulk-create-account:dev": "tsx src/users/bulk-creation/index.ts",
-    "reindex-partial-in-place": "node ../dist/back/back/src/scripts/bin/reindexPartialInPlace.js",
-    "reindex-partial-in-place:dev": "tsx -r dotenv/config ./src/scripts/bin/reindexPartialInPlace.ts",
-    "reindex-all-bsds-bulk": "LOG_TO_HTTP=1 node ../dist/back/back/src/scripts/bin/reindexAllInBulk.js",
-    "reindex-all-bsds-bulk:dev": "tsx -r dotenv/config ./src/scripts/bin/reindexAllInBulk.ts -- -d",
-    "reindex-bsd": "node ../dist/back/back/src/scripts/bin/reindexBsd.js $bsdId",
-    "reindex-bsd:dev": "tsx -r dotenv/config ./src/scripts/bin/reindexBsd.ts $bsdId",
-    "watch:apiqueue": "tsx watch -r dotenv/config src/queue/consumer.ts -e ts",
-    "watch:indexationqueue": "tsx watch -r dotenv/config src/queue/consumerIndexation.ts -e ts",
-    "watch:webhooksqueue": "tsx watch -r dotenv/config src/queue/consumerWebhooks.ts -e ts",
-    "watch:queue": "concurrently -k -p \"[{name}]\" -n \"Api Queue,Indexation Queue,Webhooks Queue\" -c \"yellow.bold,cyan.bold,magenta.bold\" \"npm run watch:apiqueue\" \"npm run watch:indexationqueue\" \"npm run watch:webhooksqueue\"",
-    "watch:notifier": "tsx watch -r dotenv/config src/notifier/index.ts -e ts",
-    "queue": "node ../dist/back/back/src/queue/consumer.js",
-    "purge-pdf-token": "node ../dist/back/back/src/scripts/bin/purgePdfAccessToken.js",
-    "purge-pdf-token:dev": "tsx -r dotenv/config ./src/scripts/bin/purgePdfAccessToken.ts",
-    "storeAllWebhookSettings.ts": "node ../dist/back/back/src/webhooks/commands/storeAllWebhookSettings.js",
-    "storeAllWebhookSettings.ts:dev": "tsx -r dotenv/config ./src/webhooks/commands/storeAllWebhookSettings.ts"
+    "preintegration-tests": "prisma db push && npm run reindex-all-bsds-bulk",
+    "bulk-create-account": "tsx src/users/bulk-creation/index.ts",
+    "reindex-partial-in-place": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexPartialInPlace.ts",
+    "reindex-all-bsds-bulk": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexAllInBulk.ts",
+    "reindex-favorites": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexFavorites.ts",
+    "reindex-bsd": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexBsd.ts $bsdId",
+    "purge-pdf-token": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/purgePdfAccessToken.ts",
+    "storeAllWebhookSettings.ts": "tsx --tsconfig tsconfig.lib.json ./src/webhooks/commands/storeAllWebhookSettings.ts"
   },
   "engines": {
     "node": "^20"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   }
 }

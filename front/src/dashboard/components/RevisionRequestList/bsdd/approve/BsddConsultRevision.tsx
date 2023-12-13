@@ -4,7 +4,7 @@ import { IconView } from "../../../../../Apps/common/Components/Icons/Icons";
 import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
 import { FormRevisionRequest } from "codegen-ui";
 import { DisplayRevision } from "./BsddApproveRevision";
-import { useRouteMatch } from "react-router-dom";
+import { useMatch } from "react-router-dom";
 
 type Props = {
   review: FormRevisionRequest;
@@ -17,7 +17,7 @@ export function BsddConsultRevision({
   isModalOpenFromParent,
   onModalCloseFromParent
 }: Props) {
-  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   if (isV2Routes && isModalOpenFromParent) {
     const formatRevisionAdapter = {

@@ -6,8 +6,7 @@ import { CompanyPrivate } from "../../../generated/graphql/types";
 
 import { randomNumber } from "../../../utils";
 import { convertUrls, getCompanyActiveUsers } from "../../database";
-import { renderMail } from "../../../mailer/templates/renderers";
-import { securityCodeRenewal } from "../../../mailer/templates";
+import { renderMail, securityCodeRenewal } from "@td/mail";
 import { isSiret, isVat } from "shared/constants";
 import { UserInputError } from "../../../common/errors";
 

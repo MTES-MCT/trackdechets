@@ -1,5 +1,5 @@
 import Queue, { JobOptions } from "bull";
-import logger from "../../logging/logger";
+import { logger } from "@td/logger";
 import { scheduleWebhook } from "./webhooks";
 import {
   INDEX_JOB_NAME,
@@ -8,8 +8,7 @@ import {
   DELETE_JOB_NAME
 } from "./jobNames";
 import { updatesQueue } from "./bsdUpdate";
-import { favoritesCompanyQueue } from "./company";
-import { allFavoriteTypes } from "../../companies/types";
+import { updateFavorites } from "../../companies/database";
 
 const { REDIS_URL, NODE_ENV } = process.env;
 export const INDEX_QUEUE_NAME = `queue_index_elastic_${NODE_ENV}`;
@@ -53,16 +52,7 @@ indexQueue.on("completed", async job => {
     // présent dansd ce BSD afin qu'en tant qu'éditeur dans le futur on lui
     // propose les favoris pré-calculés.
 
-    for (const favoriteType of allFavoriteTypes) {
-      await favoritesCompanyQueue.addBulk(
-        orgIdsToNotify.map(orgId => ({
-          data: {
-            orgId,
-            type: favoriteType
-          }
-        }))
-      );
-    }
+    await updateFavorites(orgIdsToNotify);
   }
 });
 
