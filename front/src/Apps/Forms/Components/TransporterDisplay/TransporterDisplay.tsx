@@ -108,6 +108,14 @@ export default function TransporterDisplay({ transporter }: TransporterProps) {
             value={transporter.numberPlate}
           />
         </div>
+        <div className="fr-col-12 fr-col-md-4">
+          <TransporterField
+            label="Date de prise en charge"
+            value={
+              transporter.takenOverAt ? formatDate(transporter.takenOverAt) : ""
+            }
+          />
+        </div>
       </div>
     </div>
   );

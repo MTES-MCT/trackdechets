@@ -46,6 +46,8 @@ export function TransporterList({
     !(Boolean(bsdId) && transporters.length > 1)
   );
 
+  const disableAdd = transporters.length >= 5;
+
   return (
     <>
       <FieldArray
@@ -75,16 +77,22 @@ export function TransporterList({
               };
 
               const hasTakenOver = Boolean(t.takenOverAt);
+              const previousHasTakenOver =
+                idx > 0 ? Boolean(transporters[idx - 1].takenOverAt) : false;
 
-              // On désactive la possibilité de supprimer le transporteur
-              // s'il est le seul dans la liste
+              // Désactive la possibilité de supprimer le transporteur
+              // s'il est le seul dans la liste ou s'il a déjà pris en charge le déchet
               const disableDelete = hasTakenOver || transporters.length === 1;
 
               // Désactive le bouton permettant de remonter le transporteur dans
               // la liste s'il est le seul ou le premier, ou s'il a déjà pris en
+              // charge le déchet, ou si le transporteur précédent a déjà pris en
               // charge le déchet
               const disableUp =
-                hasTakenOver || transporters.length === 1 || idx === 0;
+                hasTakenOver ||
+                previousHasTakenOver ||
+                transporters.length === 1 ||
+                idx === 0;
 
               // Désactive le bouton permettant de descendre le transporteur dans
               // la liste s'il est le seul ou le dernier, ou s'il a déjà pris en charge
@@ -100,12 +108,13 @@ export function TransporterList({
 
               const numero = idx + 1;
 
-              // Lorsqu'aucun établissement n'a été sélectionné, on affiche "Transporteur N"
-              // où N est le numéro du transporteur dans la liste
-              const accordionName =
+              // Lorsqu'aucun établissement n'a été sélectionné, on affiche simplement
+              // "N - Transporteur" où N est le numéro du transporteur dans la liste
+              const accordionName = `${numero} - ${
                 t?.company?.name && t.company.name.length > 0
                   ? t.company.name
-                  : `Transporteur ${numero}`;
+                  : "Transporteur"
+              }`;
 
               return (
                 <TransporterAccordion
@@ -126,6 +135,7 @@ export function TransporterList({
                       arrayHelpers.swap(idx, nextIndex);
                     }
                   }}
+                  disableAdd={disableAdd}
                   disableDelete={disableDelete}
                   disableUp={disableUp}
                   disableDown={disableDown}

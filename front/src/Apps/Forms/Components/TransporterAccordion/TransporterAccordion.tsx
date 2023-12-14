@@ -9,6 +9,7 @@ export type TransporterAccordionProps = {
   onTransporterDelete: () => void;
   onTransporterShiftDown: () => void;
   onTransporterShiftUp: () => void;
+  disableAdd?: boolean;
   disableDelete?: boolean;
   disableUp?: boolean;
   disableDown?: boolean;
@@ -31,6 +32,7 @@ export function TransporterAccordion({
   onTransporterDelete,
   onTransporterShiftDown,
   onTransporterShiftUp,
+  disableAdd = false,
   disableDelete = false,
   disableUp = false,
   disableDown = false,
@@ -75,6 +77,7 @@ export function TransporterAccordion({
             iconPosition="right"
             iconId="ri-add-line"
             title="Ajouter"
+            disabled={disableAdd}
             onClick={() => {
               // Replie le transporteur courant pour faire
               // apparaitre le formulaire du transporteur suivant
