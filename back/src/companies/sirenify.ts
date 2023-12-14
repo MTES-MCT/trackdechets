@@ -86,7 +86,7 @@ export default function buildSirenify<T>(
 
         if (
           companySearchResult.statutDiffusionEtablissement === "O" ||
-          // on auto-complète également nom et adresse si l'établissement est non diffusible
+          // auto-complète aussi nom et adresse si l'établissement est non diffusible
           // mais inscrit sur Trackdéchets
           companySearchResult.isRegistered
         ) {

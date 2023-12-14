@@ -70,7 +70,7 @@ export default function CompanyInfo() {
   // Retrieves geo information from api-adresse.data.gouv.fr
   useEffect(() => {
     if (
-      data?.companyInfos.statutDiffusionEtablissement === "N" ||
+      data?.companyInfos.statutDiffusionEtablissement !== "O" ||
       data?.companyInfos.name === ""
     ) {
       setNonDiffusible(true);

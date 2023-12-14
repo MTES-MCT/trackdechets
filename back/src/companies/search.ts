@@ -20,6 +20,7 @@ import { removeEmptyKeys } from "../common/converter";
 import { UserInputError } from "../common/errors";
 import { SearchOptions } from "./sirene/trackdechets/types";
 import { Company } from "@prisma/client";
+import { StatutDiffusionEtablissement } from "../generated/graphql/types";
 
 interface SearchCompaniesDeps {
   injectedSearchCompany: (clue: string) => Promise<CompanySearchResult>;
@@ -136,7 +137,7 @@ export async function searchCompany(
       ...removeEmptyKeys(anonymousCompany),
       statutDiffusionEtablissement: cleanedClue.startsWith(TEST_COMPANY_PREFIX)
         ? "O"
-        : "N",
+        : ("P" as StatutDiffusionEtablissement),
       etatAdministratif: "A",
       naf: anonymousCompany.codeNaf,
       codePaysEtrangerEtablissement: "FR"
@@ -264,7 +265,7 @@ export async function searchSireneOrNotFound(
       return {
         ...removeEmptyKeys(anonymousCompany),
         // required to avoid leaking anonymous data to the public
-        statutDiffusionEtablissement: "N",
+        statutDiffusionEtablissement: "P" as StatutDiffusionEtablissement,
         etatAdministratif: "A",
         naf: anonymousCompany.codeNaf,
         codePaysEtrangerEtablissement: "FR"
@@ -274,7 +275,7 @@ export async function searchSireneOrNotFound(
       return {
         etatAdministratif: "A",
         siret,
-        statutDiffusionEtablissement: "N"
+        statutDiffusionEtablissement: "P" as StatutDiffusionEtablissement
       } as SireneSearchResult;
     }
 

@@ -159,7 +159,7 @@ export default function AccountCompanyAddSiret({
         if (!isClosedCompany(companyInfos)) {
           // Non-diffusible mais pas encore inscrit en AnonymousCompany
           if (
-            companyInfos?.statutDiffusionEtablissement === "N" &&
+            companyInfos?.statutDiffusionEtablissement !== "O" &&
             !companyInfos?.isAnonymousCompany
           ) {
             setIsNonDiffusible(true);

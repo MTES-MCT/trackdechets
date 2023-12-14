@@ -50,10 +50,7 @@ function searchResponseToCompany({
     libelleNaf: libelleFromCodeNaf(
       lastPeriod?.activitePrincipaleEtablissement ?? ""
     ),
-    statutDiffusionEtablissement:
-      etablissement.statutDiffusionEtablissement === "P"
-        ? "N" // Patch https://www.insee.fr/fr/information/6683782 for retro-compatibility
-        : etablissement.statutDiffusionEtablissement
+    statutDiffusionEtablissement: etablissement.statutDiffusionEtablissement
   };
 
   if (company.naf) {
@@ -89,7 +86,7 @@ export async function searchCompany(
   try {
     const response = await authorizedAxiosGet<SearchResponseInsee>(searchUrl);
     const company = searchResponseToCompany(response.data);
-    if (company.statutDiffusionEtablissement === "N") {
+    if (company.statutDiffusionEtablissement !== "O") {
       throw new AnonymousCompanyError();
     }
     return company;

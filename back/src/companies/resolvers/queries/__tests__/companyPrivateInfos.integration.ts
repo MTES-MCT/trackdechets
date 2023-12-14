@@ -375,7 +375,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       etatAdministratif: "A",
       installation: null,
       isRegistered: false,
-      statutDiffusionEtablissement: "N",
+      statutDiffusionEtablissement: "P",
       libelleNaf: null,
       naf: null,
       name: null,
@@ -426,7 +426,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       companyTypes: [CompanyType.WASTEPROCESSOR],
       etatAdministratif: "A",
       isRegistered: true,
-      statutDiffusionEtablissement: "N",
+      statutDiffusionEtablissement: "P",
       isAnonymousCompany: false,
       libelleNaf: null,
       naf: null
@@ -473,7 +473,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       libelleNaf: anoCompany.libelleNaf,
       etatAdministratif: "A",
       isRegistered: false,
-      statutDiffusionEtablissement: "N",
+      statutDiffusionEtablissement: "P",
       isAnonymousCompany: true
     });
   });
@@ -580,7 +580,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       libelleNaf: createInput.libelleNaf,
       etatAdministratif: "A",
       isRegistered: true,
-      statutDiffusionEtablissement: "N",
+      statutDiffusionEtablissement: "P",
       isAnonymousCompany: true
     });
   });

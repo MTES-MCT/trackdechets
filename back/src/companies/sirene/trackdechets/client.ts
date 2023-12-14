@@ -102,10 +102,7 @@ const searchResponseToCompany = (
     libelleNaf: libelleFromCodeNaf(
       etablissement.activitePrincipaleEtablissement
     ),
-    statutDiffusionEtablissement:
-      etablissement.statutDiffusionEtablissement === "P"
-        ? "N" // Patch https://www.insee.fr/fr/information/6683782 for retro-compatibility
-        : etablissement.statutDiffusionEtablissement,
+    statutDiffusionEtablissement: etablissement.statutDiffusionEtablissement,
     // La variable codePaysEtrangerEtablissement commence toujours par 99 si elle est renseignée dans la base sirene INSEE
     // Les 3 caractères suivants sont le code du pays étranger.
     codePaysEtrangerEtablissement: etablissement.codePaysEtrangerEtablissement
@@ -145,7 +142,7 @@ export const searchCompany = async (
       throw new Error(`No _source in ES body for id ${siret} & index ${index}`);
     }
     const company = searchResponseToCompany(response.body._source);
-    if (company.statutDiffusionEtablissement === "N") {
+    if (company.statutDiffusionEtablissement !== "O") {
       throw new AnonymousCompanyError();
     }
     return company;
