@@ -1,7 +1,6 @@
 @import "../../../../scss/Breakpoints.scss";
 
 .transporter {
-
   margin-bottom: 15px;
 
   &__header {
@@ -48,13 +47,11 @@
     margin: auto;
     overflow: hidden;
     transition: max-height 0.3s ease-out;
-    
+
     > div {
       padding-top: 15px;
     }
-
   }
-
 
   @media (max-width: 800px) {
     &__header {
