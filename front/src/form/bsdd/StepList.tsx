@@ -103,17 +103,20 @@ export default function StepsList(props: Props) {
         : {})
     };
 
-    if (id && !takenOverAt) {
+    if (id) {
       // Le transporteur existe déjà en base de données, on met
-      // juste à jour les infos et on renvoie l'identifiant
-      const { errors } = await updateFormTransporter({
-        variables: { id, input: cleanInput },
-        onError: err => {
-          toastApolloError(err);
+      // à jour les infos (uniquement si le transporteur n'a pas encore
+      // pris en charge le déchet) et on renvoie l'identifiant
+      if (!takenOverAt) {
+        const { errors } = await updateFormTransporter({
+          variables: { id, input: cleanInput },
+          onError: err => {
+            toastApolloError(err);
+          }
+        });
+        if (errors) {
+          throw new Error(errors.map(e => e.message).join("\n"));
         }
-      });
-      if (errors) {
-        throw new Error(errors.map(e => e.message).join("\n"));
       }
       return id;
     } else {

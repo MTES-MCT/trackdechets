@@ -74,18 +74,25 @@ export function TransporterList({
                 }
               };
 
+              const hasTakenOver = Boolean(t.takenOverAt);
+
               // On désactive la possibilité de supprimer le transporteur
               // s'il est le seul dans la liste
-              const disableDelete = transporters.length === 1;
+              const disableDelete = hasTakenOver || transporters.length === 1;
 
               // Désactive le bouton permettant de remonter le transporteur dans
-              // la liste s'il est le seul ou le premier
-              const disableUp = transporters.length === 1 || idx === 0;
+              // la liste s'il est le seul ou le premier, ou s'il a déjà pris en
+              // charge le déchet
+              const disableUp =
+                hasTakenOver || transporters.length === 1 || idx === 0;
 
               // Désactive le bouton permettant de descendre le transporteur dans
-              // la liste s'il est le seul ou le dernier
+              // la liste s'il est le seul ou le dernier, ou s'il a déjà pris en charge
+              // le déchet
               const disableDown =
-                transporters.length === 1 || idx === transporters.length - 1;
+                hasTakenOver ||
+                transporters.length === 1 ||
+                idx === transporters.length - 1;
 
               // Désactive la possibilité de replier le formulaire transporteur
               // s'il y un seul transporteur
