@@ -14,6 +14,7 @@ import {
   vhuFragment
 } from "../../../common/queries/fragments";
 import { GET_BSDS } from "../../../common/queries";
+import { toastApolloError } from "../../../../form/common/stepper/toaster";
 
 const DUPLICATE_BSDASRI = gql`
   mutation DuplicateBsdasri($id: ID!) {
@@ -60,7 +61,7 @@ const DUPLICATE_BSVHU = gql`
 `;
 
 const message = `Le bordereau a été dupliqué, il est disponible dans l'onglet "Brouillons"`;
-
+const startErrorMessage = "Impossible de dupliquer,";
 export function useBsdasriDuplicate(
   options: MutationHookOptions<
     Pick<Mutation, "duplicateBsdasri">,
@@ -80,6 +81,9 @@ export function useBsdasriDuplicate(
       if (options.onCompleted) {
         options.onCompleted(...args);
       }
+    },
+    onError: err => {
+      toastApolloError(err, startErrorMessage);
     }
   });
 }
@@ -103,6 +107,9 @@ export function useBsdaDuplicate(
       if (options.onCompleted) {
         options.onCompleted(...args);
       }
+    },
+    onError: err => {
+      toastApolloError(err, startErrorMessage);
     }
   });
 }
@@ -126,6 +133,9 @@ export function useBsddDuplicate(
       if (options.onCompleted) {
         options.onCompleted(...args);
       }
+    },
+    onError: err => {
+      toastApolloError(err, startErrorMessage);
     }
   });
 }
@@ -149,6 +159,9 @@ export function useBsffDuplicate(
       if (options.onCompleted) {
         options.onCompleted(...args);
       }
+    },
+    onError: err => {
+      toastApolloError(err, startErrorMessage);
     }
   });
 }
@@ -172,6 +185,9 @@ export function useBsvhuDuplicate(
       if (options.onCompleted) {
         options.onCompleted(...args);
       }
+    },
+    onError: err => {
+      toastApolloError(err, startErrorMessage);
     }
   });
 }
