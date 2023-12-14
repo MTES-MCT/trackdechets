@@ -179,6 +179,10 @@ function getKeywordFieldNameFromName(fieldName: keyof BsdElastic): string {
     return fieldName;
   }
 
+  if (property.type === "date") {
+    return fieldName;
+  }
+
   // look for a sub field with the type "keyword"
   const [subFieldName] =
     Object.entries(property.fields || {}).find(
@@ -346,13 +350,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   } = toRawBsds(hits.map(hit => hit._source));
 
   const bsds: Record<BsdType, Bsd[]> = {
-    BSDD: (
-      await Promise.all(
-        concreteBsdds.map(bsdd =>
-          expandFormFromElastic(bsdd, context.dataloaders.forms)
-        )
-      )
-    ).filter(Boolean),
+    BSDD: concreteBsdds.map(expandFormFromElastic),
     BSDASRI: await buildDasris(concreteBsdasris),
     BSVHU: concreteBsvhus.map(expandVhuFormFromDb),
     BSDA: concreteBsdas.map(expandBsdaFromElastic),

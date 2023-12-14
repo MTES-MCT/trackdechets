@@ -52,6 +52,7 @@ input OrderBy {
   emitterCompanyName: OrderType
   destinationCompanyName: OrderType
   wasteCode: OrderType
+  latestRevisionCreatedAt: OrderType
 }
 
 input BsdCompanyWhere {

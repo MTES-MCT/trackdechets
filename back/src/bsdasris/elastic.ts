@@ -214,6 +214,7 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     ...where,
     isInRevisionFor: [],
     isRevisedFor: [],
+    latestRevisionCreatedAt: undefined,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),
     rawBsd: bsdasri

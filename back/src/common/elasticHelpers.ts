@@ -5,6 +5,7 @@ import {
 } from "@prisma/client";
 
 type RevisionRequest = {
+  createdAt: Date;
   status: RevisionRequestStatus;
   approvals: {
     approverSiret: string;
@@ -29,59 +30,76 @@ export function getRevisionsInfos(revisionRequests: RevisionRequest[]): Pick<
   BsdElastic,
   "isInRevisionFor" | "isRevisedFor"
 > & {
+  latestRevisionCreatedAt: Date | undefined;
   hasBeenRevised: boolean;
   activeRevisionInfos: ActiveRevisionInfos | undefined;
 } {
-  const { isInRevisionFor, isRevisedFor, activeRevisionInfos } =
-    revisionRequests.reduce<
-      Omit<ReturnType<typeof getRevisionsInfos>, "hasBeenRevised">
-    >(
-      // Pour chaque demande de révision en cours ou passés sur le bordereau
-      (
-        { isInRevisionFor, isRevisedFor, activeRevisionInfos },
-        revisionRequest
-      ) => {
-        // On commence par calculer la liste des identifiants d'établissements
-        // concernés par la demande de révision. En théorie cette liste est plus ou
-        // moins la même d'une demande de révision à l'autre
-        const revisionRequestOrgIds = [
-          revisionRequest.authoringCompany.orgId,
-          ...revisionRequest.approvals.map(a => a.approverSiret)
-        ];
-        // En fonction du statut de la demande de révision, on affecte les identifiants
-        // d'établissements soit à `isInRevisionFor`, soit à `isRevisedFor`. L'utilisation
-        // de `new Set(...)` permet de s'assurer que les identifiants sont uniques dans la liste.
-
-        return revisionRequest.status === "PENDING"
-          ? {
-              isInRevisionFor: [
-                ...new Set([...isInRevisionFor, ...revisionRequestOrgIds])
-              ],
-              isRevisedFor,
-              activeRevisionInfos: {
-                author: revisionRequest.authoringCompany.orgId,
-                approvedBy: revisionRequest.approvals
-                  .filter(
-                    approval =>
-                      approval.status === RevisionRequestApprovalStatus.ACCEPTED
-                  )
-                  .map(a => a.approverSiret)
-              }
-            }
-          : {
-              isInRevisionFor,
-              isRevisedFor: [
-                ...new Set([...isRevisedFor, ...revisionRequestOrgIds])
-              ],
-              activeRevisionInfos
-            };
-      },
+  const {
+    isInRevisionFor,
+    isRevisedFor,
+    latestRevisionCreatedAt,
+    activeRevisionInfos
+  } = revisionRequests.reduce<
+    Omit<ReturnType<typeof getRevisionsInfos>, "hasBeenRevised">
+  >(
+    // Pour chaque demande de révision en cours ou passés sur le bordereau
+    (
       {
-        isInRevisionFor: [],
-        isRevisedFor: [],
-        activeRevisionInfos: undefined
-      }
-    );
+        isInRevisionFor,
+        isRevisedFor,
+        latestRevisionCreatedAt,
+        activeRevisionInfos
+      },
+      revisionRequest
+    ) => {
+      // On commence par calculer la liste des identifiants d'établissements
+      // concernés par la demande de révision. En théorie cette liste est plus ou
+      // moins la même d'une demande de révision à l'autre
+      const revisionRequestOrgIds = [
+        revisionRequest.authoringCompany.orgId,
+        ...revisionRequest.approvals.map(a => a.approverSiret)
+      ];
+      // En fonction du statut de la demande de révision, on affecte les identifiants
+      // d'établissements soit à `isInRevisionFor`, soit à `isRevisedFor`. L'utilisation
+      // de `new Set(...)` permet de s'assurer que les identifiants sont uniques dans la liste.
+
+      return revisionRequest.status === "PENDING"
+        ? {
+            isInRevisionFor: [
+              ...new Set([...isInRevisionFor, ...revisionRequestOrgIds])
+            ],
+            isRevisedFor,
+            latestRevisionCreatedAt: revisionRequest.createdAt,
+            activeRevisionInfos: {
+              author: revisionRequest.authoringCompany.orgId,
+              approvedBy: revisionRequest.approvals
+                .filter(
+                  approval =>
+                    approval.status === RevisionRequestApprovalStatus.ACCEPTED
+                )
+                .map(a => a.approverSiret)
+            }
+          }
+        : {
+            isInRevisionFor,
+            isRevisedFor: [
+              ...new Set([...isRevisedFor, ...revisionRequestOrgIds])
+            ],
+            latestRevisionCreatedAt:
+              !latestRevisionCreatedAt ||
+              revisionRequest.createdAt < latestRevisionCreatedAt
+                ? revisionRequest.createdAt
+                : latestRevisionCreatedAt,
+            activeRevisionInfos
+          };
+    },
+    {
+      isInRevisionFor: [],
+      isRevisedFor: [],
+      activeRevisionInfos: undefined,
+      latestRevisionCreatedAt: undefined
+    }
+  );
 
   // Si on a à la fois une demande de révision en cours et des demandes de révision passées
   // on veut que le bordereau apparaisse uniquement dans l'onglet `En révision`. On ajoute donc
@@ -93,6 +111,7 @@ export function getRevisionsInfos(revisionRequests: RevisionRequest[]): Pick<
       orgId => !isInRevisionFor.includes(orgId)
     ),
     hasBeenRevised: isRevisedFor.length > 0,
-    activeRevisionInfos
+    activeRevisionInfos,
+    latestRevisionCreatedAt
   };
 }

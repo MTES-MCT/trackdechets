@@ -100,6 +100,7 @@ export interface BsdElastic {
   isInRevisionFor: string[];
   // Liste des établissements concernés par une demande de révision passée sur ce bordereau
   isRevisedFor: string[];
+  latestRevisionCreatedAt: number | undefined;
 
   intermediaries?: FormCompany[] | null;
 
@@ -274,6 +275,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   isManagedWasteFor: stringField,
   isInRevisionFor: stringField,
   isRevisedFor: stringField,
+  latestRevisionCreatedAt: dateField,
 
   intermediaries: {
     properties: {

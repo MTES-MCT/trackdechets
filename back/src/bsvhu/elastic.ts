@@ -176,6 +176,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     ...where,
     isInRevisionFor: [],
     isRevisedFor: [],
+    latestRevisionCreatedAt: undefined,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsvhu),
     rawBsd: bsvhu

@@ -61,7 +61,6 @@ import prisma from "../prisma";
 import { extractPostalCode } from "../utils";
 import { getFirstTransporterSync } from "./database";
 import { FormInElastic } from "./elastic";
-import DataLoader from "dataloader";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput | null;
@@ -819,26 +818,8 @@ export function expandFormFromDb(
   };
 }
 
-export async function expandFormFromElastic(
-  form: FormInElastic,
-  formLoader?: DataLoader<
-    string,
-    PrismaFormWithForwardedInAndTransporters | undefined,
-    string
-  >
-): Promise<GraphQLForm | null> {
-  const formWithInclude = await (formLoader
-    ? formLoader.load(form.id)
-    : prisma.form.findUniqueOrThrow({
-        where: { id: form.id },
-        include: expandableFormIncludes
-      }));
-
-  if (!formWithInclude) {
-    return null;
-  }
-
-  const expandedForm = expandFormFromDb(formWithInclude);
+export function expandFormFromElastic(form: FormInElastic): GraphQLForm {
+  const expandedForm = expandFormFromDb(form);
 
   return {
     ...expandedForm,

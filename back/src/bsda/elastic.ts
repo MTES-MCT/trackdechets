@@ -186,8 +186,13 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
 export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
   const where = getWhere(bsda);
 
-  const { isInRevisionFor, isRevisedFor, hasBeenRevised, activeRevisionInfos } =
-    getBsdaRevisionsInfos(bsda);
+  const {
+    isInRevisionFor,
+    isRevisedFor,
+    latestRevisionCreatedAt,
+    hasBeenRevised,
+    activeRevisionInfos
+  } = getBsdaRevisionsInfos(bsda);
 
   return {
     type: BsdType.BSDA,
@@ -269,6 +274,7 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     ...where,
     isInRevisionFor,
     isRevisedFor,
+    latestRevisionCreatedAt: latestRevisionCreatedAt?.getTime(),
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda),
     intermediaries: bsda.intermediaries,

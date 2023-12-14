@@ -109,6 +109,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     isCollectedFor: [] as string[],
     isInRevisionFor: [] as string[],
     isRevisedFor: [] as string[],
+    latestRevisionCreatedAt: undefined,
     sirets: [
       bsff.emitterCompanySiret,
       bsff.transporterCompanySiret,
