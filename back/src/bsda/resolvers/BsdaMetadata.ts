@@ -7,6 +7,7 @@ import {
 import { getBsdaOrNotFound } from "../database";
 import { parseBsdaInContext } from "../validation";
 import prisma from "../../prisma";
+import { RevisionRequestApprovalStatus } from "@prisma/client";
 
 function getNextSignature(bsda) {
   if (bsda.destinationOperationSignatureAuthor != null) return "OPERATION";
@@ -64,7 +65,12 @@ export const Metadata: BsdaMetadataResolvers = {
       activeRevision: activeRevision
         ? {
             author: activeRevision.authoringCompanyId,
-            approvedBy: activeRevision.approvals.map(a => a.approverSiret)
+            approvedBy: activeRevision.approvals
+              .filter(
+                approval =>
+                  approval.status === RevisionRequestApprovalStatus.ACCEPTED
+              )
+              .map(a => a.approverSiret)
           }
         : undefined
     };

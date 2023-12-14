@@ -1,3 +1,4 @@
+import { RevisionRequestApprovalStatus } from "@prisma/client";
 import { FormResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 
@@ -23,7 +24,12 @@ const revisionsInfosResolver: FormResolvers["revisionsInfos"] = async form => {
     activeRevision: activeRevision
       ? {
           author: activeRevision.authoringCompanyId,
-          approvedBy: activeRevision.approvals.map(a => a.approverSiret)
+          approvedBy: activeRevision.approvals
+            .filter(
+              approval =>
+                approval.status === RevisionRequestApprovalStatus.ACCEPTED
+            )
+            .map(a => a.approverSiret)
         }
       : undefined
   };
