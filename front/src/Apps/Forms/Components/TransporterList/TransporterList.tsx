@@ -17,8 +17,7 @@ type TransporterListProps = {
   orgId?: string;
   // Identifiant du bordereau (le cas échant)
   bsdId?: string | null;
-  // Liste des transporteurs
-  transporters: CreateOrUpdateTransporterInput[];
+  // Nom du champ Formik stockant la liste des transporteurs
   fieldName: string;
 };
 
@@ -30,9 +29,14 @@ type TransporterListProps = {
 export function TransporterList({
   orgId,
   fieldName,
-  bsdId,
-  transporters
+  bsdId
 }: TransporterListProps) {
+  const [field] = useField<CreateOrUpdateTransporterInput[]>({
+    name: fieldName
+  });
+
+  const transporters = field.value;
+
   const [deleteFormTransporter, { loading: deleteFormTransporterLoading }] =
     useMutation<
       Pick<Mutation, "deleteFormTransporter">,
@@ -102,10 +106,6 @@ export function TransporterList({
                 transporters.length === 1 ||
                 idx === transporters.length - 1;
 
-              // Désactive la possibilité de replier le formulaire transporteur
-              // s'il y un seul transporteur
-              const disableFold = transporters.length === 1;
-
               const numero = idx + 1;
 
               // Lorsqu'aucun établissement n'a été sélectionné, on affiche simplement
@@ -139,7 +139,6 @@ export function TransporterList({
                   disableDelete={disableDelete}
                   disableUp={disableUp}
                   disableDown={disableDown}
-                  disableFold={disableFold}
                   defaultExpanded={defaultExpanded}
                 >
                   {t.takenOverAt ? (

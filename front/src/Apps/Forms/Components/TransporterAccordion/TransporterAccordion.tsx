@@ -13,7 +13,6 @@ export type TransporterAccordionProps = {
   disableDelete?: boolean;
   disableUp?: boolean;
   disableDown?: boolean;
-  disableFold?: boolean;
   defaultExpanded?: boolean;
   children: NonNullable<React.ReactNode>;
 };
@@ -36,13 +35,12 @@ export function TransporterAccordion({
   disableDelete = false,
   disableUp = false,
   disableDown = false,
-  disableFold = false,
   defaultExpanded = true,
   children
 }: TransporterAccordionProps) {
   const [expandedState, setExpandedState] = React.useState(defaultExpanded);
 
-  const onExtendButtonClick = () => {
+  const onExpandButtonClick = () => {
     setExpandedState(!expandedState);
   };
 
@@ -124,11 +122,10 @@ export function TransporterAccordion({
             iconId={
               expandedState ? "ri-arrow-up-s-line" : "ri-arrow-down-s-line"
             }
-            title="Replier"
+            title={expandedState ? "Replier" : "Déplier"}
             aria-expanded={expandedState}
             aria-controls={collapseElementId}
-            onClick={onExtendButtonClick}
-            disabled={disableFold}
+            onClick={onExpandButtonClick}
           />
         </div>
       </div>
