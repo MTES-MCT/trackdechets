@@ -128,7 +128,7 @@ export default function Signup() {
               nativeInputProps={{
                 required: true,
                 type: "email",
-                onBlur: handleEmailChange
+                onChange: handleEmailChange
               }}
             />
             <PasswordInput
