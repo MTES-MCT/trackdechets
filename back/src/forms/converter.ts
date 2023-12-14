@@ -843,7 +843,7 @@ export async function expandFormFromElastic(
   return {
     ...expandedForm,
     revisionsInfos: {
-      hasBeenRevised: form.isRevisedFor.length > 0,
+      hasBeenRevised: form.hasBeenRevised,
       activeRevision: form.activeRevisionInfos
     }
   };

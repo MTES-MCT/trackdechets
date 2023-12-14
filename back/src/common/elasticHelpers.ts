@@ -29,10 +29,13 @@ export function getRevisionsInfos(revisionRequests: RevisionRequest[]): Pick<
   BsdElastic,
   "isInRevisionFor" | "isRevisedFor"
 > & {
+  hasBeenRevised: boolean;
   activeRevisionInfos: ActiveRevisionInfos | undefined;
 } {
   const { isInRevisionFor, isRevisedFor, activeRevisionInfos } =
-    revisionRequests.reduce<ReturnType<typeof getRevisionsInfos>>(
+    revisionRequests.reduce<
+      Omit<ReturnType<typeof getRevisionsInfos>, "hasBeenRevised">
+    >(
       // Pour chaque demande de révision en cours ou passés sur le bordereau
       (
         { isInRevisionFor, isRevisedFor, activeRevisionInfos },
@@ -89,6 +92,7 @@ export function getRevisionsInfos(revisionRequests: RevisionRequest[]): Pick<
     isRevisedFor: isRevisedFor.filter(
       orgId => !isInRevisionFor.includes(orgId)
     ),
+    hasBeenRevised: isRevisedFor.length > 0,
     activeRevisionInfos
   };
 }

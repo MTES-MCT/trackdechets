@@ -28,6 +28,7 @@ export type BsdaForElastic = Bsda &
 
 export type BsdaInElastic = BsdaForElastic &
   Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> & {
+    hasBeenRevised: boolean;
     activeRevisionInfos: ActiveRevisionInfos | undefined;
   };
 
@@ -185,7 +186,7 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
 export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
   const where = getWhere(bsda);
 
-  const { isInRevisionFor, isRevisedFor, activeRevisionInfos } =
+  const { isInRevisionFor, isRevisedFor, hasBeenRevised, activeRevisionInfos } =
     getBsdaRevisionsInfos(bsda);
 
   return {
@@ -275,6 +276,7 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
       ...bsda,
       isInRevisionFor,
       isRevisedFor,
+      hasBeenRevised,
       activeRevisionInfos
     }
   };

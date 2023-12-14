@@ -34,6 +34,7 @@ export type FormForElastic = Form &
 
 export type FormInElastic = FormForElastic &
   Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> & {
+    hasBeenRevised: boolean;
     activeRevisionInfos: ActiveRevisionInfos | undefined;
   };
 
@@ -63,7 +64,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
   const recipient = getRecipient(form);
 
   const transporter1 = getFirstTransporterSync(form);
-  const { isInRevisionFor, isRevisedFor, activeRevisionInfos } =
+  const { isInRevisionFor, isRevisedFor, hasBeenRevised, activeRevisionInfos } =
     getFormRevisionsInfos(form);
 
   return {
@@ -160,6 +161,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
       ...form,
       isInRevisionFor,
       isRevisedFor,
+      hasBeenRevised,
       activeRevisionInfos
     }
   };

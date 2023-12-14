@@ -246,7 +246,7 @@ export function expandBsdaFromElastic(bsda: BsdaInElastic): GraphqlBsda {
     forwardedIn,
     metadata: {
       revisionsInfos: {
-        hasBeenRevised: bsda.isRevisedFor.length > 0,
+        hasBeenRevised: bsda.hasBeenRevised,
         activeRevision: bsda.activeRevisionInfos
       }
     }

@@ -868,6 +868,13 @@ describe("Form sub-resolvers in query bsds", () => {
                   }
                 }
               }
+              revisionsInfos {
+                hasBeenRevised
+                activeRevision {
+                  author
+                  approvedBy
+                }
+              }
             }
           }
         }
@@ -909,5 +916,128 @@ describe("Form sub-resolvers in query bsds", () => {
     expect(
       (forms[0] as any).transportSegments[0].transporter.company.siret
     ).toEqual(bsddTransporter2.transporterCompanySiret);
+  });
+
+  test("Form.revisionsInfos should resolve correctly when there is no revision", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret
+      }
+    });
+
+    await indexForm(await getFormForElastic(form));
+    await refreshElasticSearch();
+    const { query } = makeClient(emitter.user);
+    const { data, errors } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    expect(errors).toBeUndefined();
+    const forms = data.bsds!.edges.map(e => e.node);
+    expect(forms).toHaveLength(1);
+    expect((forms[0] as any)!.revisionsInfos.hasBeenRevised).toBe(false);
+    expect((forms[0] as any)!.revisionsInfos.activeRevision).toBeNull();
+  });
+
+  test("Form.revisionsInfos should resolve correctly when there are past revisions but no active", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret
+      }
+    });
+
+    await prisma.bsddRevisionRequest.create({
+      data: {
+        comment: "a comment",
+        bsddId: form.id,
+        authoringCompanyId: emitter.company.id,
+        wasteDetailsName: "waste name",
+        status: "ACCEPTED"
+      }
+    });
+
+    await indexForm(await getFormForElastic(form));
+    await refreshElasticSearch();
+    const { query } = makeClient(emitter.user);
+    const { data, errors } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    expect(errors).toBeUndefined();
+    const forms = data.bsds!.edges.map(e => e.node);
+    expect(forms).toHaveLength(1);
+    expect((forms[0] as any)!.revisionsInfos.hasBeenRevised).toBe(true);
+    expect((forms[0] as any)!.revisionsInfos.activeRevision).toBeNull();
+  });
+
+  test("Form.revisionsInfos should resolve correctly when there are past and active revisions", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+    const broker = await userWithCompanyFactory("ADMIN");
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret,
+        brokerCompanySiret: broker.company.siret
+      }
+    });
+
+    // Accepted revision
+    await prisma.bsddRevisionRequest.create({
+      data: {
+        comment: "a comment",
+        bsddId: form.id,
+        authoringCompanyId: emitter.company.id,
+        wasteDetailsName: "waste name",
+        status: "ACCEPTED"
+      }
+    });
+    // Pending revision
+    await prisma.bsddRevisionRequest.create({
+      data: {
+        comment: "a comment",
+        bsddId: form.id,
+        authoringCompanyId: emitter.company.id,
+        wasteDetailsName: "waste name 2",
+        status: "PENDING",
+        approvals: {
+          createMany: {
+            data: [
+              {
+                status: "PENDING",
+                approverSiret: destination.company.siret!
+              },
+              { status: "ACCEPTED", approverSiret: broker.company.siret! }
+            ]
+          }
+        }
+      }
+    });
+
+    await indexForm(await getFormForElastic(form));
+    await refreshElasticSearch();
+    const { query } = makeClient(emitter.user);
+    const { data, errors } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    expect(errors).toBeUndefined();
+    const forms = data.bsds!.edges.map(e => e.node);
+    expect(forms).toHaveLength(1);
+    expect((forms[0] as any)!.revisionsInfos.hasBeenRevised).toBe(true);
+    expect((forms[0] as any)!.revisionsInfos.activeRevision.author).toBe(
+      emitter.company.orgId
+    );
+    expect((forms[0] as any)!.revisionsInfos.activeRevision.approvedBy).toEqual(
+      [broker.company.siret]
+    );
   });
 });
