@@ -102,6 +102,7 @@ export const transporterFragment = gql`
     numberPlate
     customInfo
     mode
+    takenOverAt
     company {
       ...CompanyFragment
     }

@@ -88,7 +88,7 @@ export default function StepsList(props: Props) {
   async function saveFormTransporter(
     transporterInput: CreateOrUpdateTransporterInput
   ): Promise<string> {
-    const { id, ...input } = transporterInput;
+    const { id, takenOverAt, ...input } = transporterInput;
 
     // S'assure que les données de récépissé transport sont nulles
     // lorsque l'exemption est cochée ou que le transporteur est étranger
@@ -103,7 +103,7 @@ export default function StepsList(props: Props) {
         : {})
     };
 
-    if (id) {
+    if (id && !takenOverAt) {
       // Le transporteur existe déjà en base de données, on met
       // juste à jour les infos et on renvoie l'identifiant
       const { errors } = await updateFormTransporter({

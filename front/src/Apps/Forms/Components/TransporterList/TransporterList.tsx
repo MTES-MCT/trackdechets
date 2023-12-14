@@ -10,6 +10,7 @@ import {
   CreateOrUpdateTransporterInput,
   initialFormTransporter
 } from "../../../../form/bsdd/utils/initial-state";
+import TransporterDisplay from "../TransporterDisplay/TransporterDisplay";
 
 type TransporterListProps = {
   // SIRET ou VAT de l'établissement courant
@@ -52,10 +53,6 @@ export function TransporterList({
         render={arrayHelpers => (
           <>
             {transporters.map((t, idx) => {
-              // On crée un transporteur BSD en base qui nous permet d'initialiser le
-              // state Formik. Les modifications qui sont faites ensuite dans le formulaire
-              // ainsi que l'association du transporteur au bordereau sont gérés au
-              // moment de la soumission du formulaire.
               const onTransporterAdd = () => {
                 arrayHelpers.insert(idx + 1, initialFormTransporter);
                 // lorsqu'on ajoute un nouveau transporteur, on souhaite
@@ -128,10 +125,14 @@ export function TransporterList({
                   disableFold={disableFold}
                   defaultExpanded={defaultExpanded}
                 >
-                  <TransporterForm
-                    orgId={orgId}
-                    fieldName={`${fieldName}[${idx}]`}
-                  />
+                  {t.takenOverAt ? (
+                    <TransporterDisplay transporter={t} />
+                  ) : (
+                    <TransporterForm
+                      orgId={orgId}
+                      fieldName={`${fieldName}[${idx}]`}
+                    />
+                  )}
                 </TransporterAccordion>
               );
             })}
