@@ -109,7 +109,9 @@ describe("mutation updateCompany", () => {
     expect(data.updateCompany.name).toEqual("nom de sirene");
     expect(data.updateCompany.address).toEqual("l'adresse de sirene");
     expect(data.updateCompany.naf).toEqual(company.codeNaf);
-    expect(data.updateCompany.libelleNaf).toEqual(libelleFromCodeNaf(company.codeNaf!));
+    expect(data.updateCompany.libelleNaf).toEqual(
+      libelleFromCodeNaf(company.codeNaf!)
+    );
 
     const updatedCompany = await prisma.company.findUnique({
       where: { id: company.id }
@@ -149,7 +151,9 @@ describe("mutation updateCompany", () => {
     expect(data.updateCompany.name).toEqual("nom de vies");
     expect(data.updateCompany.address).toEqual("l'adresse de vies");
     expect(data.updateCompany.naf).toEqual(company.codeNaf);
-    expect(data.updateCompany.libelleNaf).toEqual(libelleFromCodeNaf(company.codeNaf!));
+    expect(data.updateCompany.libelleNaf).toEqual(
+      libelleFromCodeNaf(company.codeNaf!)
+    );
 
     const updatedCompany = await prisma.company.findUnique({
       where: { id: company.id }

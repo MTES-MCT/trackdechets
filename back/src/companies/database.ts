@@ -20,7 +20,11 @@ import { allFavoriteTypes } from "./types";
 import { favoritesCompanyQueue } from "../queue/producers/company";
 import { searchTDSireneFailFast } from "./sirenify";
 import { isSiret, isVat } from "shared/constants";
-import { searchVatFrOnlyOrNotFoundFailFast } from "./search";
+import {
+  PartialCompanyVatSearchResult,
+  searchVatFrOnlyOrNotFoundFailFast
+} from "./search";
+import { SireneSearchResult } from "./sirene/types";
 
 /**
  * Retrieves a company by any unique identifier or throw a CompanyNotFound error
@@ -375,9 +379,9 @@ export async function updateFavorites(orgIds: string[]) {
 
 export async function getUpdatedCompanyNameAndAddress(
   company: Pick<Company, "name" | "address" | "orgId">
-): Promise<Pick<Company, "name" | "address"> | null> {
-  // TODO try to support SIRENIFY_BYPASS_USER_EMAILS
-  let searchResult;
+): Promise<Pick<Company, "name" | "address" | "codeNaf"> | null> {
+  let searchResult: null | SireneSearchResult | PartialCompanyVatSearchResult =
+    null;
   if (isSiret(company.orgId)) {
     searchResult = await searchTDSireneFailFast(company.orgId);
   } else if (isVat(company.orgId)) {
@@ -392,7 +396,8 @@ export async function getUpdatedCompanyNameAndAddress(
       address:
         searchResult.address && searchResult.address !== company.address
           ? searchResult.address
-          : company.address
+          : company.address,
+      codeNaf: (searchResult as SireneSearchResult).naf ?? null
     };
   }
   // return existing and unchanged values

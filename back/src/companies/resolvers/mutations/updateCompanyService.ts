@@ -1,12 +1,8 @@
 import prisma from "../../../prisma";
 import { Company, Prisma } from "@prisma/client";
-import {
-  MutationUpdateCompanyArgs,
-  CompanyPrivate
-} from "../../../generated/graphql/types";
+import { MutationUpdateCompanyArgs } from "../../../generated/graphql/types";
 import * as yup from "yup";
 import {
-  convertUrls,
   updateFavorites,
   getUpdatedCompanyNameAndAddress
 } from "../../database";
@@ -16,7 +12,7 @@ import { SiretNotFoundError } from "../../sirene/errors";
 export async function updateCompanyFn(
   args: MutationUpdateCompanyArgs,
   existingCompany: Pick<Company, "name" | "address" | "orgId">
-): Promise<CompanyPrivate> {
+): Promise<Company> {
   const {
     id,
     companyTypes,
@@ -82,14 +78,17 @@ export async function updateCompanyFn(
   await companySchema.validate(data);
 
   // Trigger update name and address
-  let correctedNameAndAddress: Pick<Company, "name" | "address"> | null;
   try {
-    correctedNameAndAddress = await getUpdatedCompanyNameAndAddress(
+    const updateFromExternalService = await getUpdatedCompanyNameAndAddress(
       existingCompany
     );
-    if (correctedNameAndAddress) {
-      data.name = correctedNameAndAddress.name;
-      data.address = correctedNameAndAddress.address;
+    if (updateFromExternalService) {
+      data.name = updateFromExternalService.name;
+      data.address = updateFromExternalService.address;
+
+      if (updateFromExternalService.codeNaf) {
+        data.codeNaf = updateFromExternalService.codeNaf;
+      }
     }
   } catch (err) {
     // update was only for name and address
@@ -110,5 +109,5 @@ export async function updateCompanyFn(
     data
   });
   await updateFavorites([company.orgId]);
-  return convertUrls(company);
+  return company;
 }

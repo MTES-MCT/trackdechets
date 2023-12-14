@@ -99,7 +99,9 @@ const searchResponseToCompany = (
     codeCommune: etablissement.codeCommuneEtablissement,
     name: companyName,
     naf: etablissement.activitePrincipaleEtablissement,
-    libelleNaf: libelleFromCodeNaf(etablissement.activitePrincipaleEtablissement),
+    libelleNaf: libelleFromCodeNaf(
+      etablissement.activitePrincipaleEtablissement
+    ),
     statutDiffusionEtablissement:
       etablissement.statutDiffusionEtablissement === "P"
         ? "N" // Patch https://www.insee.fr/fr/information/6683782 for retro-compatibility

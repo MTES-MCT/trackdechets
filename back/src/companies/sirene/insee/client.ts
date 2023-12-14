@@ -47,7 +47,9 @@ function searchResponseToCompany({
     codeCommune: etablissement.adresseEtablissement.codeCommuneEtablissement,
     name: etablissement.uniteLegale.denominationUniteLegale,
     naf: lastPeriod?.activitePrincipaleEtablissement,
-    libelleNaf: libelleFromCodeNaf(lastPeriod?.activitePrincipaleEtablissement ?? ""),
+    libelleNaf: libelleFromCodeNaf(
+      lastPeriod?.activitePrincipaleEtablissement ?? ""
+    ),
     statutDiffusionEtablissement:
       etablissement.statutDiffusionEtablissement === "P"
         ? "N" // Patch https://www.insee.fr/fr/information/6683782 for retro-compatibility
