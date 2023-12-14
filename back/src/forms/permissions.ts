@@ -134,11 +134,27 @@ function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
 /**
  * Retrieves companies allowed to create a form of the given payload
  */
-function formCreators(input: CreateFormInput): string[] {
+async function formCreators(input: CreateFormInput): Promise<string[]> {
+  let transporterOrgsIds: string[] = [];
+
+  if (input.transporters && input.transporters.length > 0) {
+    const transporters = await prisma.bsddTransporter.findMany({
+      where: { id: { in: input.transporters } },
+      select: {
+        transporterCompanySiret: true,
+        transporterCompanyVatNumber: true
+      }
+    });
+    transporterOrgsIds = transporters
+      .flatMap(t => [t.transporterCompanySiret, t.transporterCompanyVatNumber])
+      .filter(Boolean);
+  }
+
   return [
     input.emitter?.company?.siret,
     input.recipient?.company?.siret,
     input.transporter?.company?.siret,
+    ...transporterOrgsIds,
     input.transporter?.company?.vatNumber,
     input.trader?.company?.siret,
     input.broker?.company?.siret,
@@ -203,7 +219,7 @@ export async function checkCanList(user: User, orgId: string) {
 }
 
 export async function checkCanCreate(user: User, input: CreateFormInput) {
-  const authorizedOrgIds = formCreators(input);
+  const authorizedOrgIds = await formCreators(input);
 
   return checkUserPermissions(
     user,
