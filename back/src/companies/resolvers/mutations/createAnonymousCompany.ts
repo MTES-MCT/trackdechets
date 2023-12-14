@@ -14,6 +14,7 @@ import {
   siretConditions
 } from "../../../common/validation";
 import { UserInputError } from "../../../common/errors";
+import { libelleFromCodeNaf } from "../../sirene/utils";
 
 const anonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
   yup.object({
@@ -61,7 +62,7 @@ const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"
       data: {
         orgId: input.siret ?? input.vatNumber!,
         ...input,
-        libelleNaf: nafCodes[input.codeNaf]
+        libelleNaf: libelleFromCodeNaf(input.codeNaf)
       }
     });
 

@@ -1,7 +1,10 @@
 import { libellesCodesNaf } from "./fixtures/libellesCodesNaf";
 
-/** */
-export function libelleFromCodeNaf(codeNaf: string) {
+/**
+ * Libellés NAF
+ */
+export function libelleFromCodeNaf(codeNaf: string): string {
+  if (!codeNaf) return "";
   const formattedNaf = codeNaf.replace(/[.-]/g, "");
   const libelle = libellesCodesNaf[formattedNaf];
   return libelle || "";
