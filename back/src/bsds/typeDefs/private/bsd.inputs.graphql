@@ -36,6 +36,9 @@ input BsdWhere {
 
   sirets: StringNullableListFilter
 
+  companiesSirets: StringNullableListFilter
+  companiesNames: StringNullableListFilter
+
   _and: [BsdWhere!]
   _or: [BsdWhere!]
 }

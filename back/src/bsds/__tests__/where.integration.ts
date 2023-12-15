@@ -1037,3 +1037,90 @@ describe("search on nextDestinationCompanyVatNumber", () => {
     expect(hits[1]._source.id).toEqual("2");
   });
 });
+
+describe.only("search on companiesNames", () => {
+  afterAll(resetDatabase);
+
+  beforeAll(async () => {
+    const bsds: Partial<BsdElastic>[] = [
+      {
+        id: "1",
+        readableId: "BSD-1",
+        updatedAt: new Date().getTime(),
+        companiesNames: ["Name 1", "Name 2"]
+      },
+      {
+        id: "2",
+        readableId: "BSD-2",
+        updatedAt: new Date().getTime(),
+        companiesNames: ["Name 2"]
+      },
+      {
+        id: "3",
+        readableId: "BSD-3",
+        updatedAt: new Date().getTime()
+      }
+    ];
+
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
+    await refreshElasticSearch();
+  });
+
+  it("should return exact match", async () => {
+    const where: BsdWhere = {
+      companiesNames: {
+        _has: "Name 1"
+      }
+    };
+    
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+    console.log("result", result.body.hits.hits[0]._source)
+    
+    const hits = result.body.hits.hits;
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.id).toEqual("1");
+  });
+
+  it("should return partial matches", async () => {
+    const where: BsdWhere = {
+      companiesNames: {
+        _has: "Name"
+      }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(2);
+    expect(hits[0]._source.id).toEqual("1");
+    expect(hits[1]._source.id).toEqual("2");
+  });
+
+  it("should return nothing", async () => {
+    const where: BsdWhere = {
+      companiesNames: {
+        _has: "X"
+      }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(0);
+  });
+});

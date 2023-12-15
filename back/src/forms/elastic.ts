@@ -147,7 +147,31 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
     sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form),
     intermediaries: form.intermediaries,
-    rawBsd: form
+    rawBsd: form,
+
+    // ALL actors from the BSDD, for quick search
+    companiesNames: [
+      form.emitterCompanyName,
+      form.nextDestinationCompanyName,
+      form.traderCompanyName,
+      form.brokerCompanyName,
+      form.ecoOrganismeName,
+      form.recipientCompanyName,
+      ...form.intermediaries.map(intermediary => intermediary.name),
+      ...form.transporters.map(transporter => transporter.transporterCompanyName),
+      form.forwardedIn?.recipientCompanyName,
+    ].filter(Boolean),
+    companiesSirets: [
+      form.emitterCompanySiret,
+      form.nextDestinationCompanySiret,
+      form.traderCompanySiret,
+      form.brokerCompanySiret,
+      form.ecoOrganismeSiret,
+      form.recipientCompanySiret,
+      ...form.intermediaries.map(intermediary => intermediary.siret),
+      ...form.transporters.map(transporter => transporter.transporterCompanySiret),
+      form.forwardedIn?.recipientCompanySiret,
+    ].filter(Boolean),
   };
 }
 
