@@ -157,7 +157,7 @@ export async function searchCompany(
 
   // Search by VAT number first in our db, inder to to optimize response times
   if (isVat(cleanedClue)) {
-    const company = await findCompanyAndMergeInfos(cleanedClue, {});
+    const company = await findCompanyAndMergeInfos(cleanedClue, null);
     if (company.isRegistered === true) {
       // shorcut to return the result directly from database without hitting VIES
       const { country } = checkVAT(cleanedClue, countries);
