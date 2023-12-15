@@ -1045,19 +1045,16 @@ describe.only("search on companiesNames", () => {
     const bsds: Partial<BsdElastic>[] = [
       {
         id: "1",
-        readableId: "BSD-1",
         updatedAt: new Date().getTime(),
-        companiesNames: ["Name 1", "Name 2"]
+        companiesNames: "Name 1\nName 2"
       },
       {
         id: "2",
-        readableId: "BSD-2",
         updatedAt: new Date().getTime(),
-        companiesNames: ["Name 2"]
+        companiesNames: "Name 2"
       },
       {
         id: "3",
-        readableId: "BSD-3",
         updatedAt: new Date().getTime()
       }
     ];
@@ -1069,7 +1066,7 @@ describe.only("search on companiesNames", () => {
   it("should return exact match", async () => {
     const where: BsdWhere = {
       companiesNames: {
-        _has: "Name 1"
+        _contains: "Name 1"
       }
     };
     
@@ -1079,7 +1076,6 @@ describe.only("search on companiesNames", () => {
         query: toElasticQuery(where)
       }
     });
-    console.log("result", result.body.hits.hits[0]._source)
     
     const hits = result.body.hits.hits;
     expect(hits).toHaveLength(1);
@@ -1089,7 +1085,7 @@ describe.only("search on companiesNames", () => {
   it("should return partial matches", async () => {
     const where: BsdWhere = {
       companiesNames: {
-        _has: "Name"
+        _contains: "Name"
       }
     };
     const result = await client.search({
@@ -1109,7 +1105,7 @@ describe.only("search on companiesNames", () => {
   it("should return nothing", async () => {
     const where: BsdWhere = {
       companiesNames: {
-        _has: "X"
+        _contains: "X"
       }
     };
     const result = await client.search({

@@ -160,7 +160,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
       ...form.intermediaries.map(intermediary => intermediary.name),
       ...form.transporters.map(transporter => transporter.transporterCompanyName),
       form.forwardedIn?.recipientCompanyName,
-    ].filter(Boolean),
+    ].filter(Boolean).join("\n"),
     companiesSirets: [
       form.emitterCompanySiret,
       form.nextDestinationCompanySiret,

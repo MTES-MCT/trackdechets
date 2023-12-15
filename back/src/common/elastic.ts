@@ -104,8 +104,8 @@ export interface BsdElastic {
   intermediaries?: FormCompany[] | null;
 
   // List of all companies taking part in the BSD's lifecycle, for quick search
+  companiesNames: string;
   companiesSirets: string[];
-  companiesNames: string[];
 
   rawBsd:
     | FormForElastic
@@ -298,7 +298,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   rawBsd: rawField,
 
   companiesNames: textField,
-  companiesSirets: textField
+  companiesSirets: stringField
 };
 
 export type BsdIndexationConfig = {
