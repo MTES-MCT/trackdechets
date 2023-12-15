@@ -74,6 +74,9 @@ type Bsda {
   collectivité, etc.) Il pourra lire ce bordereau, sans étape de signature.
   """
   intermediaries: [FormCompany!]
+
+  "Révisions associées au bordereau"
+  revisionRequests: [BsdaRevisionRequest!]
 }
 
 type InitialBsda {

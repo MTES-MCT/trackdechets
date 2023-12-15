@@ -52,5 +52,17 @@ export const Bsda: BsdaResolvers = {
       id: bsda.id,
       status: bsda.status
     } as any;
+  },
+  revisionRequests: async (bsda, _, ctx) => {
+    // use ES indexed field when requested from dashboard
+    if (isGetBsdsQuery(ctx) && isSessionUser(ctx)) {
+      return (bsda as any)?.bsdaRevisionRequests ?? [];
+    }
+
+    // Subfields are loaded by a separate resolver, and are missing in the return type.
+    // Hence the any.
+    return getReadonlyBsdaRepository()
+      .findRelatedEntity({ id: bsda.id })
+      .bsdaRevisionRequests() as any;
   }
 };

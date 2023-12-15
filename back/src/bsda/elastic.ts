@@ -274,5 +274,5 @@ export function indexBsda(bsda: BsdaForElastic, ctx?: GraphQLContext) {
 export function getBsdaRevisionOrgIds(
   bsda: BsdaForElastic
 ): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
-  return getRevisionOrgIds(bsda.BsdaRevisionRequest);
+  return getRevisionOrgIds(bsda.bsdaRevisionRequests);
 }

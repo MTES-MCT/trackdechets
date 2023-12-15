@@ -34,7 +34,7 @@ export type EditableBsdaFields = Required<
     | "forwardingId"
     | "groupedIn"
     | "forwardedIn"
-    | "BsdaRevisionRequest"
+    | "bsdaRevisionRequests"
     | "intermediariesOrgIds"
   >
 >;
