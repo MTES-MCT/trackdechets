@@ -2,7 +2,10 @@ import { AuthType } from "../auth";
 import { UserInputError } from "../common/errors";
 import { searchCompany } from "../companies/search";
 import { CompanySearchResult } from "../companies/types";
-import { CompanyInput, StatutDiffusionEtablissement } from "../generated/graphql/types";
+import {
+  CompanyInput,
+  StatutDiffusionEtablissement
+} from "../generated/graphql/types";
 import { logger } from "@td/logger";
 import { escapeRegExp } from "../utils";
 import { SireneSearchResult } from "./sirene/types";
@@ -139,7 +142,8 @@ export function nextBuildSirenify<T>(
     for (const [idx, companySearchResult] of companySearchResults.entries()) {
       if (
         !companySearchResult ||
-        companySearchResult.statutDiffusionEtablissement === "P" as StatutDiffusionEtablissement
+        companySearchResult.statutDiffusionEtablissement ===
+          ("P" as StatutDiffusionEtablissement)
       )
         continue;
       if (companySearchResult.etatAdministratif === "F") {

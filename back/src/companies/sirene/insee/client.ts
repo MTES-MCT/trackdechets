@@ -87,7 +87,10 @@ export async function searchCompany(
   try {
     const response = await authorizedAxiosGet<SearchResponseInsee>(searchUrl);
     const company = searchResponseToCompany(response.data);
-    if (company.statutDiffusionEtablissement === "P" as StatutDiffusionEtablissement) {
+    if (
+      company.statutDiffusionEtablissement ===
+      ("P" as StatutDiffusionEtablissement)
+    ) {
       throw new AnonymousCompanyError();
     }
     return company;
