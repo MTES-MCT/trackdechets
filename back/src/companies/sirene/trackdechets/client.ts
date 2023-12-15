@@ -11,6 +11,7 @@ import {
 } from "./types";
 import client from "./esClient";
 import { SEARCH_COMPANIES_MAX_SIZE } from "../insee/client";
+import { StatutDiffusionEtablissement } from "../../../generated/graphql/types";
 
 const { ResponseError } = errors;
 /**
@@ -142,7 +143,7 @@ export const searchCompany = async (
       throw new Error(`No _source in ES body for id ${siret} & index ${index}`);
     }
     const company = searchResponseToCompany(response.body._source);
-    if (company.statutDiffusionEtablissement !== "O") {
+    if (company.statutDiffusionEtablissement === "P" as StatutDiffusionEtablissement) {
       throw new AnonymousCompanyError();
     }
     return company;
