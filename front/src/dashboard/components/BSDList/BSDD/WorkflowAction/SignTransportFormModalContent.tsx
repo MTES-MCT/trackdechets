@@ -218,6 +218,7 @@ export default function SignTransportFormModalContent({
 
           {![
             form.transporter?.company?.orgId,
+            ...(form.transporters ?? []).map(t => t.company?.orgId),
             form.temporaryStorageDetail?.transporter?.company?.orgId
           ].includes(siret) && (
             <div className="form__row">

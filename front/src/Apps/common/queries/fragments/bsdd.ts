@@ -460,6 +460,12 @@ export const dashboardFormFragment = gql`
       numberPlate
       customInfo
     }
+    transporters {
+      company {
+        orgId
+      }
+      takenOverAt
+    }
     ecoOrganisme {
       siret
     }
