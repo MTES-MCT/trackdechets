@@ -413,8 +413,8 @@ describe("toBsdElastic > companies Names & Sirets", () => {
     // Then
     expect(elasticBsd.companiesNames).toContain(emitter.name);
     expect(elasticBsd.companiesNames).toContain(nextDestination.name);
-    expect(elasticBsd.companiesNames).toContain(form.traderCompanyName);
-    expect(elasticBsd.companiesNames).toContain(form.brokerCompanyName);
+    expect(elasticBsd.companiesNames).toContain(trader.name);
+    expect(elasticBsd.companiesNames).toContain(broker.name);
     expect(elasticBsd.companiesNames).toContain(ecoOrganisme.name);
     expect(elasticBsd.companiesNames).toContain(recipient.name);
     expect(elasticBsd.companiesNames).toContain(transporter1.name);

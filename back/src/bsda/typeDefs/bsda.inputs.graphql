@@ -24,6 +24,10 @@ input BsdaWhere {
   groupedIn: IdFilter
   "Filtre sur le champ forwardedIn."
   forwardedIn: IdFilter
+  "Filtre sur les raisons sociales des entreprises du BSD"
+  companiesNames: TextFilter
+  "Filtre sur les sirets des entreprises du BSD"
+  companiesSirets: StringNullableListFilter
   "ET logique"
   _and: [BsdaWhere!]
   "OU logique"

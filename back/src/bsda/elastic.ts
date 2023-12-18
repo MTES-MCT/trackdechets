@@ -260,8 +260,28 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     ...getRegistryFields(bsda),
     intermediaries: bsda.intermediaries,
     rawBsd: bsda,
-    companiesNames: "",
-    companiesSirets: []
+
+    // ALL actors from the BSDA, for quick search
+    companiesNames: [
+      bsda.emitterCompanyName,
+      bsda.workerCompanyName,
+      bsda.transporterCompanyName,
+      bsda.destinationCompanyName,
+      bsda.brokerCompanyName,
+      bsda.ecoOrganismeName,
+      bsda.destinationOperationNextDestinationCompanyName,
+      ...bsda.intermediaries.map(intermediary => intermediary.name),
+    ].filter(Boolean).join("\n"),
+    companiesSirets: [
+      bsda.emitterCompanySiret,
+      bsda.workerCompanySiret,
+      bsda.transporterCompanySiret,
+      bsda.destinationCompanySiret,
+      bsda.brokerCompanySiret,
+      bsda.ecoOrganismeSiret,
+      bsda.destinationOperationNextDestinationCompanySiret,
+      ...bsda.intermediaries.map(intermediary => intermediary.siret),
+    ].filter(Boolean),
   };
 }
 
