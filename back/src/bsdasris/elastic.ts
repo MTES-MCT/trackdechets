@@ -218,8 +218,21 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     ...getRegistryFields(bsdasri),
     rawBsd: bsdasri,
 
-    companiesNames: "",
-    companiesSirets: []
+    // ALL actors from the BSDASRI, for quick search
+    companiesNames: [
+      bsdasri.emitterCompanyName,
+      bsdasri.ecoOrganismeName,
+      bsdasri.transporterCompanyName,
+      bsdasri.destinationCompanyName
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    companiesSirets: [
+      bsdasri.emitterCompanySiret,
+      bsdasri.ecoOrganismeSiret,
+      bsdasri.transporterCompanySiret,
+      bsdasri.destinationCompanySiret
+    ].filter(Boolean)
   };
 }
 
