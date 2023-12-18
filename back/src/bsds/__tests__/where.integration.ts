@@ -967,7 +967,7 @@ describe("search on transporterCompanyVatNumber", () => {
   });
 });
 
-describe("search on nextDestinationCompanyVatNumber", () => {
+describe.only("search on nextDestinationCompanyVatNumber", () => {
   afterAll(resetDatabase);
 
   beforeAll(async () => {
@@ -1002,6 +1002,8 @@ describe("search on nextDestinationCompanyVatNumber", () => {
         }
       }
     };
+
+    console.log('query', JSON.stringify(toElasticQuery(where), null, 4))
     const result = await client.search({
       index: index.alias,
       body: {
@@ -1038,7 +1040,7 @@ describe("search on nextDestinationCompanyVatNumber", () => {
   });
 });
 
-describe.only("search on companiesNames", () => {
+describe("search on companiesNames", () => {
   afterAll(resetDatabase);
 
   beforeAll(async () => {
@@ -1046,16 +1048,17 @@ describe.only("search on companiesNames", () => {
       {
         id: "1",
         updatedAt: new Date().getTime(),
-        companiesNames: "Name 1\nName 2"
+        companiesNames: "Foo\nBar"
       },
       {
         id: "2",
         updatedAt: new Date().getTime(),
-        companiesNames: "Name 2"
+        companiesNames: "Foo"
       },
       {
         id: "3",
-        updatedAt: new Date().getTime()
+        updatedAt: new Date().getTime(),
+        companiesNames: ""
       }
     ];
 
@@ -1063,13 +1066,13 @@ describe.only("search on companiesNames", () => {
     await refreshElasticSearch();
   });
 
-  it("should return exact match", async () => {
+  it("should return one result", async () => {
     const where: BsdWhere = {
       companiesNames: {
-        _contains: "Name 1"
+        _match: "Bar"
       }
     };
-    
+
     const result = await client.search({
       index: index.alias,
       body: {
@@ -1082,10 +1085,10 @@ describe.only("search on companiesNames", () => {
     expect(hits[0]._source.id).toEqual("1");
   });
 
-  it("should return partial matches", async () => {
+  it("should return several results", async () => {
     const where: BsdWhere = {
       companiesNames: {
-        _contains: "Name"
+        _match: "Foo"
       }
     };
     const result = await client.search({
@@ -1098,14 +1101,14 @@ describe.only("search on companiesNames", () => {
     const hits = result.body.hits.hits;
 
     expect(hits).toHaveLength(2);
-    expect(hits[0]._source.id).toEqual("1");
-    expect(hits[1]._source.id).toEqual("2");
+    expect(hits.map(h => h._source.id)).toContain("1");
+    expect(hits.map(h => h._source.id)).toContain("2");
   });
 
   it("should return nothing", async () => {
     const where: BsdWhere = {
       companiesNames: {
-        _contains: "X"
+        _match: "X"
       }
     };
     const result = await client.search({

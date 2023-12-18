@@ -182,7 +182,7 @@ export function toElasticSimpleQuery(where: BsdWhere) {
           where.destination?.operation?.date
         ),
         toElasticStringListQuery("sirets", where.sirets),
-        toElasticStringQuery("companiesNames", where.companiesNames),
+        toElasticTextQuery("companiesNames", where.companiesNames),
         toElasticStringListQuery("companiesSirets", where.companiesSirets),
       ].filter(Boolean)
     }
