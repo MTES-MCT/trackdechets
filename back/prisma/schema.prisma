@@ -1465,8 +1465,8 @@ model Bsda {
   forwardingId String? @unique
   forwardedIn  Bsda?   @relation("BsdaForwarding")
 
-  BsdaRevisionRequest BsdaRevisionRequest[]
-  intermediaries      IntermediaryBsdaAssociation[]
+  bsdaRevisionRequests BsdaRevisionRequest[]
+  intermediaries       IntermediaryBsdaAssociation[]
 
   // denormalization - sirets and vats from intermediaries
   intermediariesOrgIds String[] @default([])
