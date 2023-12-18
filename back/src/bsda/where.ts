@@ -58,7 +58,7 @@ function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
     forwardedIn: toPrismaRelationIdFilter(where.forwardedIn) as Prisma.XOR<
       Prisma.BsdaRelationFilter,
       Prisma.BsdaWhereInput
-    >,
+    >
   });
 }
 

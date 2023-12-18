@@ -1078,7 +1078,7 @@ describe("search on companiesNames", () => {
         query: toElasticQuery(where)
       }
     });
-    
+
     const hits = result.body.hits.hits;
     expect(hits).toHaveLength(1);
     expect(hits[0]._source.id).toEqual("1");
@@ -1163,7 +1163,7 @@ describe("search on companiesSirets", () => {
         query: toElasticQuery(where)
       }
     });
-    
+
     const hits = result.body.hits.hits;
     expect(hits).toHaveLength(1);
     expect(hits[0]._source.id).toEqual("1");

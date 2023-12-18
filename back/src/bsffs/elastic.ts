@@ -117,8 +117,21 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     ].filter(Boolean),
     ...getRegistryFields(bsff),
     rawBsd: bsff,
-    companiesNames: "",
-    companiesSirets: []
+
+    // ALL actors from the BSDA, for quick search
+    // TODO: quid détenteurs?
+    companiesNames: [
+      bsff.emitterCompanyName,
+      bsff.transporterCompanyName,
+      bsff.destinationCompanyName
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    companiesSirets: [
+      bsff.emitterCompanySiret,
+      bsff.transporterCompanySiret,
+      bsff.destinationCompanySiret
+    ].filter(Boolean)
   };
 
   const transporterCompanyOrgId = getTransporterCompanyOrgId(bsff);

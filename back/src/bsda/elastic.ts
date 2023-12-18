@@ -270,8 +270,10 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
       bsda.brokerCompanyName,
       bsda.ecoOrganismeName,
       bsda.destinationOperationNextDestinationCompanyName,
-      ...bsda.intermediaries.map(intermediary => intermediary.name),
-    ].filter(Boolean).join("\n"),
+      ...bsda.intermediaries.map(intermediary => intermediary.name)
+    ]
+      .filter(Boolean)
+      .join("\n"),
     companiesSirets: [
       bsda.emitterCompanySiret,
       bsda.workerCompanySiret,
@@ -280,8 +282,8 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
       bsda.brokerCompanySiret,
       bsda.ecoOrganismeSiret,
       bsda.destinationOperationNextDestinationCompanySiret,
-      ...bsda.intermediaries.map(intermediary => intermediary.siret),
-    ].filter(Boolean),
+      ...bsda.intermediaries.map(intermediary => intermediary.siret)
+    ].filter(Boolean)
   };
 }
 

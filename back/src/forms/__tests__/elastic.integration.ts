@@ -341,11 +341,13 @@ describe("toBsdElastic > companies Names & Sirets", () => {
     ecoOrganisme = await companyFactory({ name: "Eco organisme" });
     trader = await companyFactory({ name: "Trader" });
     broker = await companyFactory({ name: "Broker" });
-    forwardedInNextDestination = await companyFactory({ name: "ForwardedIn next destination" });
+    forwardedInNextDestination = await companyFactory({
+      name: "ForwardedIn next destination"
+    });
 
     // const form = await formWithTempStorageFactory({
     form = await formWithTempStorageFactory({
-      opt: { 
+      opt: {
         emitterCompanyName: emitter.name,
         emitterCompanySiret: emitter.siret,
         recipientCompanyName: recipient.name,
@@ -357,12 +359,12 @@ describe("toBsdElastic > companies Names & Sirets", () => {
         traderCompanyName: trader.name,
         traderCompanySiret: trader.siret,
         brokerCompanyName: broker.name,
-        brokerCompanySiret: broker.siret,
+        brokerCompanySiret: broker.siret
       },
       ownerId: user.id,
       forwardedInOpts: {
         recipientCompanyName: forwardedInNextDestination.name,
-        recipientCompanySiret: forwardedInNextDestination.siret,
+        recipientCompanySiret: forwardedInNextDestination.siret
       }
     });
 
@@ -372,36 +374,40 @@ describe("toBsdElastic > companies Names & Sirets", () => {
       data: {
         transporters: {
           createMany: {
-            data: [{
-              transporterCompanySiret: transporter1.siret,
-              transporterCompanyName: transporter1.name,
-              readyToTakeOver: false,
-              number: 2,
-            },
-            {
-              transporterCompanySiret: transporter2.siret,
-              transporterCompanyName: transporter2.name,
-              readyToTakeOver: false,
-              number: 3,
-            },
-          ]}
+            data: [
+              {
+                transporterCompanySiret: transporter1.siret,
+                transporterCompanyName: transporter1.name,
+                readyToTakeOver: false,
+                number: 2
+              },
+              {
+                transporterCompanySiret: transporter2.siret,
+                transporterCompanyName: transporter2.name,
+                readyToTakeOver: false,
+                number: 3
+              }
+            ]
+          }
         },
         intermediaries: {
           createMany: {
-            data: [{
-              siret: intermediary1.siret!,
-              name: intermediary1.name!,
-              contact: intermediary1.contact!,
-            },
-            {
-              siret: intermediary2.siret!,
-              name: intermediary2.name!,
-              contact: intermediary2.contact!,
-            },
-          ]}
-        },
+            data: [
+              {
+                siret: intermediary1.siret!,
+                name: intermediary1.name!,
+                contact: intermediary1.contact!
+              },
+              {
+                siret: intermediary2.siret!,
+                name: intermediary2.name!,
+                contact: intermediary2.contact!
+              }
+            ]
+          }
+        }
       }
-    })
+    });
 
     const formForElastic = await getFormForElastic(form);
 
@@ -421,7 +427,9 @@ describe("toBsdElastic > companies Names & Sirets", () => {
     expect(elasticBsd.companiesNames).toContain(transporter2.name);
     expect(elasticBsd.companiesNames).toContain(intermediary1.name);
     expect(elasticBsd.companiesNames).toContain(intermediary2.name);
-    expect(elasticBsd.companiesNames).toContain(forwardedInNextDestination.name);
+    expect(elasticBsd.companiesNames).toContain(
+      forwardedInNextDestination.name
+    );
   });
 
   test("companiesSirets > should contain the sirets of ALL BSD companies", async () => {
@@ -436,6 +444,8 @@ describe("toBsdElastic > companies Names & Sirets", () => {
     expect(elasticBsd.companiesSirets).toContain(transporter2.siret);
     expect(elasticBsd.companiesSirets).toContain(intermediary1.siret);
     expect(elasticBsd.companiesSirets).toContain(intermediary2.siret);
-    expect(elasticBsd.companiesSirets).toContain(forwardedInNextDestination.siret);
+    expect(elasticBsd.companiesSirets).toContain(
+      forwardedInNextDestination.siret
+    );
   });
 });

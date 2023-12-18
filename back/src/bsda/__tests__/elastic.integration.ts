@@ -1,8 +1,7 @@
 import { Company } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import prisma from "../../prisma";
-import {
-  companyFactory} from "../../__tests__/factories";
+import { companyFactory } from "../../__tests__/factories";
 import { getBsdaForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
 import { bsdaFactory } from "./factories";
@@ -35,7 +34,7 @@ describe("toBsdElastic > companies Names & Sirets", () => {
     broker = await companyFactory({ name: "Broker" });
 
     bsda = await bsdaFactory({
-      opt: { 
+      opt: {
         emitterCompanyName: emitter.name,
         emitterCompanySiret: emitter.siret,
         workerCompanyName: worker.name,
@@ -49,7 +48,7 @@ describe("toBsdElastic > companies Names & Sirets", () => {
         ecoOrganismeName: ecoOrganisme.name,
         ecoOrganismeSiret: ecoOrganisme.siret,
         brokerCompanyName: broker.name,
-        brokerCompanySiret: broker.siret,
+        brokerCompanySiret: broker.siret
       }
     });
 
@@ -59,20 +58,22 @@ describe("toBsdElastic > companies Names & Sirets", () => {
       data: {
         intermediaries: {
           createMany: {
-            data: [{
-              siret: intermediary1.siret!,
-              name: intermediary1.name!,
-              contact: intermediary1.contact!,
-            },
-            {
-              siret: intermediary2.siret!,
-              name: intermediary2.name!,
-              contact: intermediary2.contact!,
-            },
-          ]}
-        },
+            data: [
+              {
+                siret: intermediary1.siret!,
+                name: intermediary1.name!,
+                contact: intermediary1.contact!
+              },
+              {
+                siret: intermediary2.siret!,
+                name: intermediary2.name!,
+                contact: intermediary2.contact!
+              }
+            ]
+          }
+        }
       }
-    })
+    });
 
     const bsdaForElastic = await getBsdaForElastic(bsda);
 

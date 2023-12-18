@@ -158,9 +158,13 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
       form.ecoOrganismeName,
       form.recipientCompanyName,
       ...form.intermediaries.map(intermediary => intermediary.name),
-      ...form.transporters.map(transporter => transporter.transporterCompanyName),
-      form.forwardedIn?.recipientCompanyName,
-    ].filter(Boolean).join("\n"),
+      ...form.transporters.map(
+        transporter => transporter.transporterCompanyName
+      ),
+      form.forwardedIn?.recipientCompanyName
+    ]
+      .filter(Boolean)
+      .join("\n"),
     companiesSirets: [
       form.emitterCompanySiret,
       form.nextDestinationCompanySiret,
@@ -169,9 +173,11 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
       form.ecoOrganismeSiret,
       form.recipientCompanySiret,
       ...form.intermediaries.map(intermediary => intermediary.siret),
-      ...form.transporters.map(transporter => transporter.transporterCompanySiret),
-      form.forwardedIn?.recipientCompanySiret,
-    ].filter(Boolean),
+      ...form.transporters.map(
+        transporter => transporter.transporterCompanySiret
+      ),
+      form.forwardedIn?.recipientCompanySiret
+    ].filter(Boolean)
   };
 }
 
