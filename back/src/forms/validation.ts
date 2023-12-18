@@ -1895,15 +1895,15 @@ export async function validateAppendix1Groupement(
     };
   });
 
-  // Once one of the appendix has been signed by the transporter,
-  // you have 3 days maximum to add new appendix
+  // Once the first appendix has been signed by the transporter,
+  // you have maximum 5 calendar days to add and sign new appendix. 
   const currentDate = new Date();
   const firstTransporterSignatureDate = initialForms.reduce((date, form) => {
     const { takenOverAt } = form;
     return takenOverAt && takenOverAt < date ? takenOverAt : date;
   }, currentDate);
   const limitDate = sub(currentDate, {
-    days: 2,
+    days: 4, // The 5 days start at 00h00 on the day you sign the first appendix
     hours: currentDate.getHours(),
     minutes: currentDate.getMinutes()
   });
