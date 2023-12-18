@@ -90,7 +90,7 @@ export const editionRules: EditionRules = {
     required: { from: "EMISSION" }
   },
   emitterCompanyContact: {
-    readableFieldName: "le contact de l'entreprise émettrice",
+    readableFieldName: "le nom de contact de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
     required: {
       from: "EMISSION",
@@ -113,22 +113,43 @@ export const editionRules: EditionRules = {
       when: bsda => !bsda.emitterIsPrivateIndividual
     }
   },
-  emitterCustomInfo: { sealed: { from: "EMISSION" } },
-  emitterPickupSiteName: { sealed: { from: "EMISSION" } },
-  emitterPickupSiteAddress: { sealed: { from: "EMISSION" } },
-  emitterPickupSiteCity: { sealed: { from: "EMISSION" } },
-  emitterPickupSitePostalCode: {
+  emitterCustomInfo: {
+    readableFieldName:
+      "les champs d'informations complémentaires de l'entreprise émettrice",
     sealed: { from: "EMISSION" }
   },
-  emitterPickupSiteInfos: { sealed: { from: "EMISSION" } },
+  emitterPickupSiteName: {
+    readableFieldName: "le nom de l'adresse de chantier ou de collecte",
+    sealed: { from: "EMISSION" }
+  },
+  emitterPickupSiteAddress: {
+    readableFieldName: "l'adresse de collecte ou de chantier",
+    sealed: { from: "EMISSION" }
+  },
+  emitterPickupSiteCity: {
+    readableFieldName: "la ville de l'adresse de collecte ou de chantier",
+    sealed: { from: "EMISSION" }
+  },
+  emitterPickupSitePostalCode: {
+    readableFieldName: "le code postal de l'adresse de collecte ou de chantier",
+    sealed: { from: "EMISSION" }
+  },
+  emitterPickupSiteInfos: {
+    readableFieldName: "les informations de l'adresse de collecte",
+    sealed: { from: "EMISSION" }
+  },
   ecoOrganismeName: {
+    readableFieldName: "le nom de l'éco-organisme",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
       when: bsda => !!bsda.ecoOrganismeSiret
     }
   },
-  ecoOrganismeSiret: { sealed: { from: "TRANSPORT" } },
+  ecoOrganismeSiret: {
+    readableFieldName: "le SIRET de l'éco-organisme",
+    sealed: { from: "TRANSPORT" }
+  },
   destinationCompanyName: {
     readableFieldName: "le nom de l'entreprise de destination",
     sealed: {
@@ -154,7 +175,7 @@ export const editionRules: EditionRules = {
     required: { from: "EMISSION" }
   },
   destinationCompanyContact: {
-    readableFieldName: "le contact de l'entreprise de destination",
+    readableFieldName: "le nom de contact de l'entreprise de destination",
     sealed: { from: "TRANSPORT" },
     required: { from: "EMISSION" }
   },
@@ -168,7 +189,11 @@ export const editionRules: EditionRules = {
     sealed: { from: "TRANSPORT" },
     required: { from: "EMISSION" }
   },
-  destinationCustomInfo: { sealed: { from: "OPERATION" } },
+  destinationCustomInfo: {
+    readableFieldName:
+      "les champs d'informations complémentaires de l'entreprise de destination",
+    sealed: { from: "OPERATION" }
+  },
   destinationCap: {
     readableFieldName: "le CAP du destinataire",
     sealed: { from: "TRANSPORT" },
@@ -180,27 +205,32 @@ export const editionRules: EditionRules = {
     }
   },
   destinationPlannedOperationCode: {
-    readableFieldName: "le code d'opération de la destination",
+    readableFieldName: "le code d'opération prévu",
     sealed: { from: "TRANSPORT" },
     required: { from: "EMISSION" }
   },
   destinationReceptionDate: {
+    readableFieldName: "la date de réception",
     sealed: { from: "OPERATION" },
     required: { from: "OPERATION" }
   },
   destinationReceptionWeight: {
+    readableFieldName: "le poids du déchet",
     sealed: { from: "OPERATION" },
     required: { from: "OPERATION" }
   },
   destinationReceptionAcceptationStatus: {
+    readableFieldName: "l'acceptation du déchet",
     sealed: { from: "OPERATION" },
     required: { from: "OPERATION" }
   },
   destinationReceptionRefusalReason: {
+    readableFieldName: "la raison du refus du déchet",
     sealed: { from: "OPERATION" },
     required: { from: "OPERATION", when: isRefusedOrPartiallyRefused }
   },
   destinationOperationCode: {
+    readableFieldName: "le code d'opération réalisé",
     sealed: { from: "OPERATION" },
     required: { from: "OPERATION", when: isNotRefused }
   },
@@ -223,9 +253,11 @@ export const editionRules: EditionRules = {
     }
   },
   destinationOperationDescription: {
+    readableFieldName: "la description de l'opération réalisée",
     sealed: { from: "OPERATION" }
   },
   destinationOperationDate: {
+    readableFieldName: "la date de l'opération",
     sealed: { from: "OPERATION" },
     required: { from: "OPERATION", when: isNotRefused }
   },
@@ -238,6 +270,7 @@ export const editionRules: EditionRules = {
     sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCompanyVatNumber: {
+    readableFieldName: "le numéro de TVA de l'exutoire",
     sealed: { from: "OPERATION" }
   },
   destinationOperationNextDestinationCompanyAddress: {
@@ -250,7 +283,7 @@ export const editionRules: EditionRules = {
     }
   },
   destinationOperationNextDestinationCompanyContact: {
-    readableFieldName: "le contact de l'exutoire",
+    readableFieldName: "le nom de contact de l'exutoire",
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
@@ -295,6 +328,7 @@ export const editionRules: EditionRules = {
     }
   },
   transporterCompanyName: {
+    readableFieldName: "le nom du transporteur",
     sealed: { from: "TRANSPORT" },
     required: { from: "TRANSPORT", when: hasTransporter }
   },
@@ -332,7 +366,7 @@ export const editionRules: EditionRules = {
     }
   },
   transporterCompanyContact: {
-    readableFieldName: "le contact du transporteur",
+    readableFieldName: "le nom de contact du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
@@ -376,8 +410,13 @@ export const editionRules: EditionRules = {
       }
     }
   },
-  transporterCustomInfo: { sealed: { from: "TRANSPORT" } },
+  transporterCustomInfo: {
+    readableFieldName:
+      "les champs d'informations complémentaires du transporteur",
+    sealed: { from: "TRANSPORT" }
+  },
   transporterRecepisseIsExempted: {
+    readableFieldName: "l'exemption de récépissé du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
@@ -385,41 +424,42 @@ export const editionRules: EditionRules = {
     }
   },
   transporterRecepisseNumber: {
+    readableFieldName: "le numéro de récépissé du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
       when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    },
-    readableFieldName: "Transporteur: le numéro de récépissé"
+    }
   },
   transporterRecepisseDepartment: {
+    readableFieldName: "le département de récépissé du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
       when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    },
-    readableFieldName: "Transporteur: le département de récépissé"
+    }
   },
   transporterRecepisseValidityLimit: {
+    readableFieldName: "la date de validaté du récépissé du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
       when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    },
-    readableFieldName: "Transporteur: la date de validité du récépissé"
+    }
   },
   transporterTransportMode: {
+    readableFieldName: "le mode de transport",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
       when: hasTransporter
-    },
-    readableFieldName: "le mode de transport"
+    }
   },
   transporterTransportPlates: {
+    readableFieldName: "l'immatriculation du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
@@ -437,6 +477,7 @@ export const editionRules: EditionRules = {
     }
   },
   transporterTransportTakenOverAt: {
+    readableFieldName: "la date d'enlèvement du transporteur",
     sealed: { from: "TRANSPORT" }
   },
   workerIsDisabled: {
@@ -471,7 +512,7 @@ export const editionRules: EditionRules = {
     }
   },
   workerCompanyContact: {
-    readableFieldName: "le contact de l'entreprise de travaux",
+    readableFieldName: "le nom de contact de l'entreprise de travaux",
     sealed: { from: "EMISSION" },
     required: {
       from: "EMISSION",
@@ -498,9 +539,11 @@ export const editionRules: EditionRules = {
     sealed: { from: "WORK" }
   },
   workerCertificationHasSubSectionFour: {
+    readableFieldName: "travaux relevant de la sous-section 4",
     sealed: { from: "WORK" }
   },
   workerCertificationHasSubSectionThree: {
+    readableFieldName: "travaux relevant de la sous-section 3",
     sealed: { from: "WORK" }
   },
   workerCertificationCertificationNumber: {
@@ -512,6 +555,8 @@ export const editionRules: EditionRules = {
     }
   },
   workerCertificationValidityLimit: {
+    readableFieldName:
+      "la date de validité de la certification de l'entreprise de travaux",
     sealed: { from: "WORK" },
     required: {
       from: "WORK",
@@ -519,23 +564,49 @@ export const editionRules: EditionRules = {
     }
   },
   workerCertificationOrganisation: {
+    readableFieldName:
+      "l'organisme de la certification de l'entreprise de travaux",
     sealed: { from: "WORK" },
     required: {
       from: "WORK",
       when: bsda => Boolean(bsda.workerCertificationHasSubSectionThree)
     }
   },
-  brokerCompanyName: { sealed: { from: "EMISSION" } },
-  brokerCompanySiret: { sealed: { from: "EMISSION" } },
-  brokerCompanyAddress: { sealed: { from: "EMISSION" } },
-  brokerCompanyContact: { sealed: { from: "EMISSION" } },
-  brokerCompanyPhone: { sealed: { from: "EMISSION" } },
-  brokerCompanyMail: { sealed: { from: "EMISSION" } },
-  brokerRecepisseNumber: { sealed: { from: "EMISSION" } },
+  brokerCompanyName: {
+    readableFieldName: "le nom du courtier",
+    sealed: { from: "EMISSION" }
+  },
+  brokerCompanySiret: {
+    readableFieldName: "le SIRET du courtier",
+    sealed: { from: "EMISSION" }
+  },
+  brokerCompanyAddress: {
+    readableFieldName: "l'adresse du courtier",
+    sealed: { from: "EMISSION" }
+  },
+  brokerCompanyContact: {
+    readableFieldName: "le nom de contact du courtier",
+    sealed: { from: "EMISSION" }
+  },
+  brokerCompanyPhone: {
+    readableFieldName: "le téléphone du courtier",
+    sealed: { from: "EMISSION" }
+  },
+  brokerCompanyMail: {
+    readableFieldName: "le mail du courtier",
+    sealed: { from: "EMISSION" }
+  },
+  brokerRecepisseNumber: {
+    readableFieldName: "le numéro de récépissé du courtier",
+    sealed: { from: "EMISSION" }
+  },
   brokerRecepisseDepartment: {
+    readableFieldName: "le département du récépissé du courtier",
     sealed: { from: "EMISSION" }
   },
   brokerRecepisseValidityLimit: {
+    readableFieldName:
+      "la date de validité de la certification de l'entreprise de travaux",
     sealed: { from: "EMISSION" }
   },
   wasteCode: {
@@ -543,20 +614,32 @@ export const editionRules: EditionRules = {
     required: { from: "EMISSION" },
     readableFieldName: "le code déchet"
   },
-  wasteAdr: { sealed: { from: "WORK" } },
+  wasteAdr: { readableFieldName: "la mention ADR", sealed: { from: "WORK" } },
   wasteFamilyCode: {
     sealed: { from: "WORK" },
     required: { from: "WORK" },
     readableFieldName: "le code famille"
   },
-  wasteMaterialName: { sealed: { from: "WORK" }, required: { from: "WORK" } },
+  wasteMaterialName: {
+    readableFieldName: "le nom de matériau",
+    sealed: { from: "WORK" },
+    required: { from: "WORK" }
+  },
   wasteConsistence: {
     sealed: { from: "WORK" },
     required: { from: "WORK" },
     readableFieldName: "la consistance"
   },
-  wasteSealNumbers: { sealed: { from: "WORK" }, required: { from: "WORK" } },
-  wastePop: { sealed: { from: "WORK" }, required: { from: "WORK" } },
+  wasteSealNumbers: {
+    readableFieldName: "le(s) numéro(s) de scellés",
+    sealed: { from: "WORK" },
+    required: { from: "WORK" }
+  },
+  wastePop: {
+    readableFieldName: "le champ sur les polluants organiques persistants",
+    sealed: { from: "WORK" },
+    required: { from: "WORK" }
+  },
   packagings: {
     sealed: { from: "WORK" },
     required: {
@@ -575,11 +658,22 @@ export const editionRules: EditionRules = {
     },
     readableFieldName: "le conditionnement"
   },
-  weightIsEstimate: { sealed: { from: "WORK" }, required: { from: "WORK" } },
-  weightValue: { sealed: { from: "WORK" }, required: { from: "WORK" } },
+  weightIsEstimate: {
+    readableFieldName: "le champ pour indiquer sile poids est estimé",
+    sealed: { from: "WORK" },
+    required: { from: "WORK" }
+  },
+  weightValue: {
+    readableFieldName: "le poids",
+    sealed: { from: "WORK" },
+    required: { from: "WORK" }
+  },
   grouping: { sealed: { from: "EMISSION" } },
   forwarding: { sealed: { from: "EMISSION" } },
-  intermediaries: { sealed: { from: "TRANSPORT" } }
+  intermediaries: {
+    readableFieldName: "les intermédiaires",
+    sealed: { from: "TRANSPORT" }
+  }
 };
 
 function hasWorker(bsda: ZodBsda) {
