@@ -1,4 +1,4 @@
-import { Company, Form, Status } from "@prisma/client";
+import { Company, Status } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import prisma from "../../prisma";
 import {
@@ -10,7 +10,7 @@ import {
 } from "../../__tests__/factories";
 import { getFirstTransporterSync, getFullForm } from "../database";
 import { getSiretsByTab } from "../elasticHelpers";
-import { FormForElastic, getFormForElastic, toBsdElastic } from "../elastic";
+import { getFormForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
 
 describe("getSiretsByTab", () => {

@@ -180,8 +180,19 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     ...getRegistryFields(bsvhu),
     rawBsd: bsvhu,
 
-    companiesNames: "",
-    companiesSirets: []
+    // ALL actors from the BSVHU, for quick search
+    companiesNames: [
+      bsvhu.emitterCompanyName,
+      bsvhu.transporterCompanyName,
+      bsvhu.destinationCompanyName
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    companiesSirets: [
+      bsvhu.emitterCompanySiret,
+      bsvhu.transporterCompanySiret,
+      bsvhu.destinationCompanySiret
+    ].filter(Boolean)
   };
 }
 
