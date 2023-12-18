@@ -1,4 +1,4 @@
-import { Status } from "@prisma/client";
+import { Company, Form, Status } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import prisma from "../../prisma";
 import {
@@ -10,7 +10,8 @@ import {
 } from "../../__tests__/factories";
 import { getFirstTransporterSync, getFullForm } from "../database";
 import { getSiretsByTab } from "../elasticHelpers";
-import { getFormForElastic, toBsdElastic } from "../elastic";
+import { FormForElastic, getFormForElastic, toBsdElastic } from "../elastic";
+import { BsdElastic } from "../../common/elastic";
 
 describe("getSiretsByTab", () => {
   afterEach(resetDatabase);
@@ -310,108 +311,131 @@ describe("getSiretsByTab", () => {
   });
 });
 
-describe.only("toBsdElastic", () => {
+describe("toBsdElastic > companies Names & Sirets", () => {
   afterEach(resetDatabase);
 
-  test("companiesNames > should contain the companies names of ALL BSD companies", async () => {
+  let emitter: Company;
+  let recipient: Company;
+  let intermediary1: Company;
+  let intermediary2: Company;
+  let transporter1: Company;
+  let transporter2: Company;
+  let nextDestination: Company;
+  let ecoOrganisme: Company;
+  let trader: Company;
+  let broker: Company;
+  let forwardedInNextDestination: Company;
+  let form: any;
+  let elasticBsd: BsdElastic;
+
+  beforeAll(async () => {
     // Given
     const user = await userFactory();
-    const intermediary1 = await companyFactory({ name: "Intermediaire 1" });
-    const intermediary2 = await companyFactory({ name: "Intermediaire 2" });
-    const transporter1 = await companyFactory({ name: "Transporter 1" });
-    const transporter2 = await companyFactory({ name: "Transporter 2" });
-    const nextDestination = await companyFactory({ name: "Next destination" });
-    const ecoOrganisme = await companyFactory({ name: "Eco organisme" });
+    emitter = await companyFactory({ name: "Emitter" });
+    recipient = await companyFactory({ name: "Recipient" });
+    intermediary1 = await companyFactory({ name: "Intermediaire 1" });
+    intermediary2 = await companyFactory({ name: "Intermediaire 2" });
+    transporter1 = await companyFactory({ name: "Transporter 1" });
+    transporter2 = await companyFactory({ name: "Transporter 2" });
+    nextDestination = await companyFactory({ name: "Next destination" });
+    ecoOrganisme = await companyFactory({ name: "Eco organisme" });
+    trader = await companyFactory({ name: "Trader" });
+    broker = await companyFactory({ name: "Broker" });
+    forwardedInNextDestination = await companyFactory({ name: "ForwardedIn next destination" });
 
-    const form = await formWithTempStorageFactory({
+    // const form = await formWithTempStorageFactory({
+    form = await formWithTempStorageFactory({
       opt: { 
-        status: Status.RESENT,
+        emitterCompanyName: emitter.name,
+        emitterCompanySiret: emitter.siret,
+        recipientCompanyName: recipient.name,
+        recipientCompanySiret: recipient.siret,
+        nextDestinationCompanyName: nextDestination.name,
+        nextDestinationCompanySiret: nextDestination.siret,
+        ecoOrganismeName: ecoOrganisme.name,
+        ecoOrganismeSiret: ecoOrganisme.siret,
+        traderCompanyName: trader.name,
+        traderCompanySiret: trader.siret,
+        brokerCompanyName: broker.name,
+        brokerCompanySiret: broker.siret,
+      },
+      ownerId: user.id,
+      forwardedInOpts: {
+        recipientCompanyName: forwardedInNextDestination.name,
+        recipientCompanySiret: forwardedInNextDestination.siret,
+      }
+    });
+
+    // Add transporters & intermediaries
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
         transporters: {
-          connect: [{
-              id: transporter1.id
+          createMany: {
+            data: [{
+              transporterCompanySiret: transporter1.siret,
+              transporterCompanyName: transporter1.name,
+              readyToTakeOver: false,
+              number: 2,
             },
             {
-              id: transporter2.id
+              transporterCompanySiret: transporter2.siret,
+              transporterCompanyName: transporter2.name,
+              readyToTakeOver: false,
+              number: 3,
             },
-          ]
-          // create: [{
-          //   transporterCompanySiret: transporter1.siret,
-          //   number: 2
-          // }, {
-          //   transporterCompanySiret: transporter2.siret,
-          //   number: 3
-          // }]
+          ]}
         },
-        // intermediaries: {
-        //   connect: [{
-        //       id: intermediary1.id
-        //     },
-        //     {
-        //       id: intermediary2.id
-        //     },
-        //   ]
-        // },
-        // transportersSirets: [ transporter1.siret!, transporter2.siret! ],
-        // intermediariesSirets: [ intermediary1.siret!, intermediary2.siret! ],
-        nextDestinationCompanyName: nextDestination.name,
-        ecoOrganismeName: ecoOrganisme.name
-       },
-      ownerId: user.id,
-    });
+        intermediaries: {
+          createMany: {
+            data: [{
+              siret: intermediary1.siret!,
+              name: intermediary1.name!,
+              contact: intermediary1.contact!,
+            },
+            {
+              siret: intermediary2.siret!,
+              name: intermediary2.name!,
+              contact: intermediary2.contact!,
+            },
+          ]}
+        },
+      }
+    })
 
     const formForElastic = await getFormForElastic(form);
 
-    console.log("formForElastic", formForElastic)
-
     // When
-    const elasticBsd = toBsdElastic(formForElastic);
+    elasticBsd = toBsdElastic(formForElastic);
+  });
 
+  test("companiesNames > should contain the names of ALL BSD companies", async () => {
     // Then
-    expect(elasticBsd.companiesNames).toContain(form.emitterCompanyName);
-    expect(elasticBsd.companiesNames).toContain(form.nextDestinationCompanyName);
+    expect(elasticBsd.companiesNames).toContain(emitter.name);
+    expect(elasticBsd.companiesNames).toContain(nextDestination.name);
     expect(elasticBsd.companiesNames).toContain(form.traderCompanyName);
     expect(elasticBsd.companiesNames).toContain(form.brokerCompanyName);
-    expect(elasticBsd.companiesNames).toContain(form.ecoOrganismeName);
-    expect(elasticBsd.companiesNames).toContain(form.recipientCompanyName);
+    expect(elasticBsd.companiesNames).toContain(ecoOrganisme.name);
+    expect(elasticBsd.companiesNames).toContain(recipient.name);
     expect(elasticBsd.companiesNames).toContain(transporter1.name);
     expect(elasticBsd.companiesNames).toContain(transporter2.name);
     expect(elasticBsd.companiesNames).toContain(intermediary1.name);
     expect(elasticBsd.companiesNames).toContain(intermediary2.name);
-    expect(elasticBsd.companiesNames).toContain(form.forwardedIn?.recipientCompanyName);
+    expect(elasticBsd.companiesNames).toContain(forwardedInNextDestination.name);
   });
 
-  // test("companiesSirets > should contain the companies names of ALL BSD companies", async () => {
-  //   // Given
-  //   const user = await userFactory();
-  //   const intermediary1 = await companyFactory();
-  //   const intermediary2 = await companyFactory();
-  //   const transporter1 = await companyFactory();
-  //   const transporter2 = await companyFactory();
-  //   const form = await formWithTempStorageFactory({
-  //     opt: { 
-  //       status: Status.RESENT, 
-  //       transportersSirets: [ transporter1.siret!, transporter2.siret! ],
-  //       intermediariesSirets: [ intermediary1.siret!, intermediary2.siret! ],
-  //      },
-  //     ownerId: user.id
-  //   });
-
-  //   const formForElastic = await getFormForElastic(form);
-
-  //   // When
-  //   const elasticBsd = toBsdElastic(formForElastic);
-
-  //   // Then
-  //   expect(elasticBsd.companiesSirets).toContain(form.emitterCompanySiret);
-  //   expect(elasticBsd.companiesSirets).toContain(form.nextDestinationCompanySiret);
-  //   expect(elasticBsd.companiesSirets).toContain(form.traderCompanySiret);
-  //   expect(elasticBsd.companiesSirets).toContain(form.brokerCompanySiret);
-  //   expect(elasticBsd.companiesSirets).toContain(form.ecoOrganismeSiret);
-  //   expect(elasticBsd.companiesSirets).toContain(form.recipientCompanySiret);
-  //   expect(elasticBsd.companiesSirets).toContain(intermediary1.siret);
-  //   expect(elasticBsd.companiesSirets).toContain(intermediary2.siret);
-  //   expect(elasticBsd.companiesSirets).toContain(transporter1.siret);
-  //   expect(elasticBsd.companiesSirets).toContain(transporter2.siret);
-  //   expect(elasticBsd.companiesSirets).toContain(form.forwardedIn?.recipientCompanySiret);
-  // });
+  test("companiesSirets > should contain the sirets of ALL BSD companies", async () => {
+    // Then
+    expect(elasticBsd.companiesSirets).toContain(emitter.siret);
+    expect(elasticBsd.companiesSirets).toContain(nextDestination.siret);
+    expect(elasticBsd.companiesSirets).toContain(trader.siret);
+    expect(elasticBsd.companiesSirets).toContain(broker.siret);
+    expect(elasticBsd.companiesSirets).toContain(ecoOrganisme.siret);
+    expect(elasticBsd.companiesSirets).toContain(recipient.siret);
+    expect(elasticBsd.companiesSirets).toContain(transporter1.siret);
+    expect(elasticBsd.companiesSirets).toContain(transporter2.siret);
+    expect(elasticBsd.companiesSirets).toContain(intermediary1.siret);
+    expect(elasticBsd.companiesSirets).toContain(intermediary2.siret);
+    expect(elasticBsd.companiesSirets).toContain(forwardedInNextDestination.siret);
+  });
 });
