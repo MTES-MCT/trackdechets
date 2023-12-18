@@ -1896,7 +1896,7 @@ export async function validateAppendix1Groupement(
   });
 
   // Once the first appendix has been signed by the transporter,
-  // you have maximum 5 calendar days to add and sign new appendix. 
+  // you have maximum 5 calendar days to add and sign new appendix.
   const currentDate = new Date();
   const firstTransporterSignatureDate = initialForms.reduce((date, form) => {
     const { takenOverAt } = form;
