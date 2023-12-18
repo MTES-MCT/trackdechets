@@ -337,21 +337,8 @@ export const filterPredicates: {
       _and: [
         {
           _or: [
-            { emitter: { company: { name: { _match: value } } } },
-            { emitter: { company: { siret: { _contains: value } } } },
-            { emitter: { pickupSite: { name: { _match: value } } } },
-            { transporter: { company: { name: { _match: value } } } },
-            { transporter: { company: { siret: { _contains: value } } } },
-            { worker: { company: { name: { _match: value } } } },
-            { worker: { company: { siret: { _contains: value } } } },
-            { destination: { company: { name: { _match: value } } } },
-            { destination: { company: { siret: { _contains: value } } } },
-            { broker: { company: { name: { _match: value } } } },
-            { broker: { company: { siret: { _contains: value } } } },
-            { trader: { company: { name: { _match: value } } } },
-            { trader: { company: { siret: { _contains: value } } } },
-            { ecoOrganisme: { name: { _match: value } } },
-            { ecoOrganisme: { siret: { _contains: value } } }
+            { companiesNames: { _match: value } },
+            { companiesSirets: { _has: value } }
           ]
         }
       ]
