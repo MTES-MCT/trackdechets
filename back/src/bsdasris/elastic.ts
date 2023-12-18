@@ -216,7 +216,10 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     isRevisedFor: [],
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),
-    rawBsd: bsdasri
+    rawBsd: bsdasri,
+
+    companiesNames: "",
+    companiesSirets: []
   };
 }
 

@@ -967,7 +967,7 @@ describe("search on transporterCompanyVatNumber", () => {
   });
 });
 
-describe.only("search on nextDestinationCompanyVatNumber", () => {
+describe("search on nextDestinationCompanyVatNumber", () => {
   afterAll(resetDatabase);
 
   beforeAll(async () => {
@@ -1003,7 +1003,6 @@ describe.only("search on nextDestinationCompanyVatNumber", () => {
       }
     };
 
-    console.log('query', JSON.stringify(toElasticQuery(where), null, 4))
     const result = await client.search({
       index: index.alias,
       body: {
@@ -1101,14 +1100,100 @@ describe("search on companiesNames", () => {
     const hits = result.body.hits.hits;
 
     expect(hits).toHaveLength(2);
-    expect(hits.map(h => h._source.id)).toContain("1");
-    expect(hits.map(h => h._source.id)).toContain("2");
+    const resultsIds = hits.map(h => h._source.id);
+    expect(resultsIds).toContain("1");
+    expect(resultsIds).toContain("2");
   });
 
   it("should return nothing", async () => {
     const where: BsdWhere = {
       companiesNames: {
         _match: "X"
+      }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(0);
+  });
+});
+
+describe("search on companiesSirets", () => {
+  afterAll(resetDatabase);
+
+  beforeAll(async () => {
+    const bsds: Partial<BsdElastic>[] = [
+      {
+        id: "1",
+        updatedAt: new Date().getTime(),
+        companiesSirets: ["SIRET1", "SIRET2"]
+      },
+      {
+        id: "2",
+        updatedAt: new Date().getTime(),
+        companiesSirets: ["SIRET1"]
+      },
+      {
+        id: "3",
+        updatedAt: new Date().getTime(),
+        companiesSirets: []
+      }
+    ];
+
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
+    await refreshElasticSearch();
+  });
+
+  it("should return one result", async () => {
+    const where: BsdWhere = {
+      companiesSirets: {
+        _has: "SIRET2"
+      }
+    };
+
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+    
+    const hits = result.body.hits.hits;
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.id).toEqual("1");
+  });
+
+  it("should return several results", async () => {
+    const where: BsdWhere = {
+      companiesSirets: {
+        _has: "SIRET1"
+      }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(2);
+    const resultsIds = hits.map(h => h._source.id);
+    expect(resultsIds).toContain("1");
+    expect(resultsIds).toContain("2");
+  });
+
+  it("should return nothing", async () => {
+    const where: BsdWhere = {
+      companiesSirets: {
+        _has: "SIRET3"
       }
     };
     const result = await client.search({

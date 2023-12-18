@@ -116,7 +116,9 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
       ...bsff.detenteurCompanySirets
     ].filter(Boolean),
     ...getRegistryFields(bsff),
-    rawBsd: bsff
+    rawBsd: bsff,
+    companiesNames: "",
+    companiesSirets: []
   };
 
   const transporterCompanyOrgId = getTransporterCompanyOrgId(bsff);

@@ -178,7 +178,10 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     isRevisedFor: [],
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsvhu),
-    rawBsd: bsvhu
+    rawBsd: bsvhu,
+
+    companiesNames: "",
+    companiesSirets: []
   };
 }
 

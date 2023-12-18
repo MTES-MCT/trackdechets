@@ -259,7 +259,9 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda),
     intermediaries: bsda.intermediaries,
-    rawBsd: bsda
+    rawBsd: bsda,
+    companiesNames: "",
+    companiesSirets: []
   };
 }
 
