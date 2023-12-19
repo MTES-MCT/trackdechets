@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { NavLink, generatePath, useNavigate } from "react-router-dom";
-import { CompanyPrivate, UserPermission } from "@td/codegen-ui";
+import { CompanyPrivate, UserPermission, UserRole } from "@td/codegen-ui";
 import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
 import routes from "../../../routes";
 
@@ -33,15 +33,18 @@ interface DashboardTabsProps {
 const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
   const [expanded, setExpanded] = useState(false);
 
-  const { permissions } = usePermissions();
+  const { permissions, role } = usePermissions();
   const navigate = useNavigate();
 
   const { showTransportTabs } = useShowTransportTabs(
     currentCompany.companyTypes,
     currentCompany.siret
   );
-  const showRegisterTab = permissions.includes(UserPermission.RegistryCanRead);
-  const showMyBsds = permissions.includes(UserPermission.BsdCanList);
+  const showRegisterTab =
+    permissions.includes(UserPermission.RegistryCanRead) &&
+    [UserRole.Admin, UserRole.Member].includes(role!);
+  const showMyBsds =
+    permissions.includes(UserPermission.BsdCanList) && role !== UserRole.Driver;
 
   const handleCompanyChange = useCallback(
     orgId => {

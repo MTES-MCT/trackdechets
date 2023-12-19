@@ -140,7 +140,7 @@ export const userWithCompanyFactory = async (
     companyAssociations: {
       create: {
         company: { connect: { id: company.id } },
-        role: role as UserRole,
+        role: role,
         ...companyAssociationOpts
       }
     }
