@@ -8,7 +8,7 @@ import {
   DASRI_GROUPING_OPERATIONS_CODES
 } from "shared/constants";
 import configureYup from "../common/yup/configureYup";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import {
   BsdasriPackagingType,
   BsdasriSignatureType

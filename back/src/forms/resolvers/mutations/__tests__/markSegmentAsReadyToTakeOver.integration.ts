@@ -7,7 +7,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 
 jest.mock("axios", () => ({
   default: {

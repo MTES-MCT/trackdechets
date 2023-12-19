@@ -7,7 +7,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 
 const CREATE_BSDA = `
 mutation CreateDraftBsda($input: BsdaInput!) {

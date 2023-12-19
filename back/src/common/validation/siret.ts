@@ -10,7 +10,7 @@ import {
   isCrematorium
 } from "../../companies/validation";
 import { CompanyVerificationStatus } from "@prisma/client";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 const { VERIFY_COMPANY } = process.env;
 

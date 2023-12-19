@@ -1,5 +1,5 @@
 import { Job } from "bull";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { SetDepartementJobData } from "../producers/company";
 import { getDepartement } from "../../companies/geo/getDepartement";
 import searchCompany from "../../companies/sirene/searchCompany";

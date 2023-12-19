@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 export default async function decodeAmpersandsInCompanyNames() {
   const companies = await prisma.company.findMany({

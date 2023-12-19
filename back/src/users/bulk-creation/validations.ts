@@ -1,6 +1,6 @@
 import { CompanyType, UserRole } from "@prisma/client";
 import * as yup from "yup";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { CompanyRow } from "./types";
 import { searchCompany } from "../../companies/search";
 import { isClosedCompany } from "shared/constants";

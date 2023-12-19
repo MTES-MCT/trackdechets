@@ -1,4 +1,4 @@
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { addMinutes } from "date-fns";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { ReadableIdPrefix } from "../../../forms/readableId";

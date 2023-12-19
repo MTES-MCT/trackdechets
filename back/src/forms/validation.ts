@@ -49,7 +49,7 @@ import {
   PackagingInfo,
   Packagings
 } from "../generated/graphql/types";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import {
   EXTRANEOUS_NEXT_DESTINATION,
   INVALID_COMPANY_OMI_NUMBER,

@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 export default async function mergeUsers(user: User, heir: User) {
   await transferUserForms(user, heir);

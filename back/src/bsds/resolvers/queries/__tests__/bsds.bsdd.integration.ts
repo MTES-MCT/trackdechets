@@ -27,7 +27,7 @@ import {
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 import { gql } from "graphql-tag";
 import { searchCompany } from "../../../../companies/search";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 
 jest.mock("../../../../companies/search");
 

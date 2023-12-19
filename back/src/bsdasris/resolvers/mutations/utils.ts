@@ -1,4 +1,4 @@
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
 import { DASRI_GROUPING_OPERATIONS_CODES } from "shared/constants";
 import { getReadonlyBsdasriRepository } from "../../repository";

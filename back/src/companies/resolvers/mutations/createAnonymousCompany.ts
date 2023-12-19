@@ -5,7 +5,7 @@ import {
 } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { nafCodes } from "shared/constants";
 import { isForeignVat } from "shared/constants";
 import {

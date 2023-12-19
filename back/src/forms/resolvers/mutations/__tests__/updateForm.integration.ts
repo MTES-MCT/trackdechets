@@ -1,6 +1,6 @@
 import { EmitterType, Status, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { ErrorCode } from "../../../../common/errors";
 import {
   bsddTransporterFactory,

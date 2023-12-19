@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { PROCESSING_OPERATIONS } from "shared/constants";
 import {
   companyFactory,

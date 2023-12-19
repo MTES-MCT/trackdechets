@@ -9,7 +9,7 @@
       "cache": true,
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx prisma generate --schema=back/prisma/schema.prisma"
+        "command": "npx prisma generate"
       }
     },
     "types": {

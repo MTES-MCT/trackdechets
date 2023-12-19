@@ -1,9 +1,9 @@
 import {
-  prisma,
   getCompaniesAndActiveAdminsByCompanyOrgIds,
   formatDate,
   sendMail
 } from "back";
+import { prisma } from "@td/prisma";
 import {
   CompanyType,
   MembershipRequestStatus,

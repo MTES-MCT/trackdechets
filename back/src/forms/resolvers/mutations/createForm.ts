@@ -28,7 +28,7 @@ import { sirenifyFormInput } from "../../sirenify";
 import { recipifyFormInput } from "../../recipify";
 import { checkCanCreate } from "../../permissions";
 import { UserInputError } from "../../../common/errors";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],

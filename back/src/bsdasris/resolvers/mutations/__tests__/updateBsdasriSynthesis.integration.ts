@@ -6,7 +6,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus, BsdasriType, CompanyType } from "@prisma/client";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { ErrorCode } from "../../../../common/errors";
 import {
   bsdasriFactory,

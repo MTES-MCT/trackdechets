@@ -2,7 +2,7 @@ import {
   CompanyInput,
   BsdasriRecepisseInput
 } from "../generated/graphql/types";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { Bsda, Bsdasri, Bsff, Bsvhu, BspaohTransporter } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "shared/constants";
 

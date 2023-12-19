@@ -1,5 +1,5 @@
 import { compare } from "bcrypt";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {

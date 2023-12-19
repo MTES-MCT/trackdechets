@@ -5,7 +5,7 @@ import {
   CompanySearchPrivate,
   QueryResolvers
 } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { getCompanyInfos } from "./companyInfos";
 
 const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (

@@ -6,7 +6,7 @@ import { BsdType } from "@prisma/client";
 import supertest from "supertest";
 import { app } from "../../server";
 import { ROAD_CONTROL_SLUG } from "shared/constants";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 const { API_HOST } = process.env;
 

@@ -1,5 +1,5 @@
 import { checkVAT } from "jsvat";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import redundantCachedSearchSirene from "./sirene/searchCompany";
 import decoratedSearchCompanies from "./sirene/searchCompanies";
 import { CompanySearchResult } from "./types";

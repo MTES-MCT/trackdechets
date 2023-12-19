@@ -1,5 +1,5 @@
 import { Form, User, Status } from "@prisma/client";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { ErrorCode } from "../../common/errors";
 import {

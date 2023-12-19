@@ -10,7 +10,7 @@ import {
   BsdasriWithGroupingInclude,
   BsdasriWithSynthesizingInclude
 } from "./types";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 
 export type BsdasriForElastic = Bsdasri &
   BsdasriWithGrouping &

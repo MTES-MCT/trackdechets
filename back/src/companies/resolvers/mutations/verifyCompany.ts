@@ -13,7 +13,7 @@ import {
   verificationDone,
   verifiedForeignTransporterCompany
 } from "@td/mail";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
 import { isForeignVat } from "shared/constants";
 import { isTransporter } from "../../validation";

@@ -27,7 +27,7 @@ import {
   sealedFormSchema,
   validateGroupement
 } from "../../validation";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
 import { sirenifyFormInput } from "../../sirenify";

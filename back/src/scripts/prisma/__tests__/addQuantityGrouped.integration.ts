@@ -3,7 +3,7 @@ import {
   formFactory,
   userWithCompanyFactory
 } from "../../../__tests__/factories";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { addQuantityGrouped } from "../addQuantityGrouped";
 
 describe("addQuantityGrouped", () => {

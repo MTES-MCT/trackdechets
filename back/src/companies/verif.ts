@@ -2,7 +2,7 @@ import { CompanyType, CompanyVerificationStatus } from "@prisma/client";
 import { addDays } from "date-fns";
 import * as COMPANY_CONSTANTS from "shared/constants";
 import { sendVerificationCodeLetter } from "../common/post";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { sameDayMidnight } from "../utils";
 
 export const anomalies = {

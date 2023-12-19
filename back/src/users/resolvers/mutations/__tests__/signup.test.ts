@@ -1,5 +1,5 @@
 import { signupFn as signup } from "../signup";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import configureYup from "../../../../common/yup/configureYup";
 import * as redisUser from "../../../../common/redis/users";
 

@@ -4,7 +4,7 @@ import {
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   Query,
   QueryBsdsArgs,

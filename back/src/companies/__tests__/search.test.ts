@@ -1,6 +1,6 @@
 import { makeSearchCompanies, searchCompany } from "../search";
 import { ErrorCode } from "../../common/errors";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { siretify } from "../../__tests__/factories";
 import { SireneSearchResult } from "../sirene/types";
 import decoratedSearchCompanies from "../sirene/searchCompanies";

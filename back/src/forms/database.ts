@@ -3,7 +3,7 @@
  */
 
 import { BsddTransporter, Form, Prisma } from "@prisma/client";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { FormRole } from "../generated/graphql/types";
 import { FormNotFound, FormTransporterNotFound } from "./errors";
 import { FullForm } from "./types";

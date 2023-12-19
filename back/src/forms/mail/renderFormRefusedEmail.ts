@@ -1,5 +1,5 @@
 import { BsddTransporter, Form } from "@prisma/client";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { getCompanyAdminUsers } from "../../companies/database";
 import { generateBsddPdfToBase64 } from "../pdf";
 import { Dreals } from "shared/constants";

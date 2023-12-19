@@ -1,4 +1,4 @@
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { GovernmentPermission } from "@prisma/client";
 
 /**

@@ -33,7 +33,7 @@ import {
   expandTransportSegmentFromDb,
   expandableFormIncludes
 } from "../converter";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { buildAddress } from "../../companies/sirene/utils";
 import { packagingsEqual } from "shared/constants";
 import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";

@@ -10,7 +10,7 @@ import {
   BsffWithPackagingsInclude,
   BsffWithFicheInterventionInclude
 } from "./types";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 
 export type BsffForElastic = Bsff &
   BsffWithPackagings &

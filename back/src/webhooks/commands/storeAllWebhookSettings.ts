@@ -2,7 +2,7 @@ import {
   setWebhookSetting,
   clearWebhookSetting
 } from "../../common/redis/webhooksettings";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 /**
  * Clear exsting redis webhooks settings and store current webhookSettings in redis

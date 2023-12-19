@@ -1,7 +1,7 @@
 import { processDbIdentifiersByChunk } from "../../bsds/indexation/bulkIndexBsds";
 import { getFormRepository } from "../../forms/repository";
 import { FormForUpdateAppendix2FormsInclude } from "../../forms/repository/form/updateAppendix2Forms";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 export async function fixedGroupedFormsStatus() {
   const formIds = await prisma.form.findMany({

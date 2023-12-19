@@ -14,7 +14,7 @@ import {
   BsdaWithRevisionRequests,
   BsdaWithRevisionRequestsInclude
 } from "./types";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
 
 export type BsdaForElastic = Bsda &

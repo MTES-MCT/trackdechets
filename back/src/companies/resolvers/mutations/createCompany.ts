@@ -1,6 +1,6 @@
 import { CompanyType, Prisma } from "@prisma/client";
 import { convertUrls } from "../../database";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";

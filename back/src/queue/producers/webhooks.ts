@@ -1,5 +1,5 @@
 import Queue from "bull";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import {
   INDEX_CREATED_JOB_NAME,
   INDEX_UPDATED_JOB_NAME,

@@ -1,4 +1,4 @@
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import supertest from "supertest";
 import { resetDatabase } from "../../integration-tests/helper";
 import { tokenErrorMessages } from "../oauth/oidc";

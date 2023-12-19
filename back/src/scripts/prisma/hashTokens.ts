@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { hashToken } from "../../utils";
 import * as readline from "readline";
 export async function hashTokens() {

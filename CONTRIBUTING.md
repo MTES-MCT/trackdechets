@@ -79,11 +79,11 @@
 
 6. Synchroniser la base de données avec le schéma prisma.
 
-   Les modèles de données sont définis dans les fichiers `back/prisma/schema.prisma`.
+   Les modèles de données sont définis dans les fichiers `libs/back/prisma/src/schema.prisma`.
    Afin de synchroniser les tables PostgreSQL, il faut lancer une déploiement prisma
 
    ```bash
-   npx prisma db push --schema back/prisma/schema.prisma
+   npx prisma db push
    ```
 
 7. Initialiser l'index Elastic Search.
@@ -255,8 +255,8 @@ cd front && nvm use && npm install
 9. Pousser le schéma de la base de données dans la table `prisma` et ajouter des données de tests en ajoutant un fichier `seed.dev.ts` dans le répertoire `back/prisma` (demander à un dev) :
 
 ```
-npx prisma db push --schema back/prisma/schema.prisma
-npx prisma db seed --schema back/prisma/schema.prisma
+npx prisma db push
+npx prisma db seed
 ```
 
 10. Créer l'index Elasticsearch : `npm --prefix back run reindex-all-bsds-bulk:dev -- -f`. Puis vérifier qu'un index a bien été crée : `curl localhost:9200/_cat/indices`

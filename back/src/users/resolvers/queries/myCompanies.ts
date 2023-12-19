@@ -6,7 +6,7 @@ import {
   CompanyPrivate,
   QueryResolvers
 } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { AuthType } from "../../../auth";
 import {
   MIN_MY_COMPANIES_SEARCH,

@@ -10,7 +10,7 @@ import { getUserRoles } from "../permissions";
 import { SealedFieldError } from "../common/errors";
 import { getFirstTransporterSync } from "./database";
 import { FullForm } from "./types";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { Decimal } from "decimal.js-light";
 
 type EditableBsddFields = Required<

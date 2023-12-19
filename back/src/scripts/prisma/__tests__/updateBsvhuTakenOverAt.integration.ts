@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { getStream } from "../../../activity-events";
 import { bsvhuFactory } from "../../../bsvhu/__tests__/factories.vhu";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { userWithCompanyFactory } from "../../../__tests__/factories";
 import { updateBsvhuTakenOverAt } from "../updateBsvhuTakenOverAt";
 

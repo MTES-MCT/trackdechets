@@ -7,7 +7,7 @@ import {
 } from "../../../../generated/graphql/types";
 import { gql } from "graphql-tag";
 import { Prisma } from "@prisma/client";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { xDaysAgo } from "../../../../utils";
 import { bsdaFactory } from "../../../__tests__/factories";
 import { searchCompany } from "../../../../companies/search";

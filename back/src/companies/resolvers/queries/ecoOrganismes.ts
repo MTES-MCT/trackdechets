@@ -1,4 +1,4 @@
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { QueryResolvers } from "../../../generated/graphql/types";
 
 const ecoOrganismeResolver: QueryResolvers["ecoOrganismes"] = () => {

@@ -11,7 +11,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { BsdaStatus } from "@prisma/client";
 import { bsdaFactory } from "../../../__tests__/factories";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 
 const CREATE_BSDA = `
 mutation CreateBsda($input: BsdaInput!) {

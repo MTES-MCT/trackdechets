@@ -12,7 +12,7 @@ import {
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { isFinalOperation, OPERATION } from "./constants";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { BSFF_WASTE_CODES } from "shared/constants";
 import {

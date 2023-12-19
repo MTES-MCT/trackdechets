@@ -2,7 +2,7 @@
  * PRISMA HELPER FUNCTIONS
  */
 
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { User, Prisma, Company, CompanyAssociation } from "@prisma/client";
 import {
   CompanyNotFound,
