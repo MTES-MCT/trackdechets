@@ -105,7 +105,7 @@ export interface BsdElastic {
 
   // List of all companies taking part in the BSD's lifecycle, for quick search
   companiesNames: string;
-  companiesSirets: string[];
+  companiesOrgIds: string[];
 
   rawBsd:
     | FormForElastic

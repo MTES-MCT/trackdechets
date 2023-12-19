@@ -6,7 +6,7 @@ import { getBsdaForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
 import { bsdaFactory } from "./factories";
 
-describe("toBsdElastic > companies Names & Sirets", () => {
+describe("toBsdElastic > companies Names & OrgIds", () => {
   afterEach(resetDatabase);
 
   let emitter: Company;
@@ -28,7 +28,10 @@ describe("toBsdElastic > companies Names & Sirets", () => {
     destination = await companyFactory({ name: "Destination" });
     intermediary1 = await companyFactory({ name: "Intermediaire 1" });
     intermediary2 = await companyFactory({ name: "Intermediaire 2" });
-    transporter = await companyFactory({ name: "Transporter" });
+    transporter = await companyFactory({
+      name: "Transporter",
+      vatNumber: "VAT Transporter"
+    });
     nextDestination = await companyFactory({ name: "Next destination" });
     ecoOrganisme = await companyFactory({ name: "Eco organisme" });
     broker = await companyFactory({ name: "Broker" });
@@ -41,6 +44,7 @@ describe("toBsdElastic > companies Names & Sirets", () => {
         workerCompanySiret: worker.siret,
         transporterCompanyName: transporter.name,
         transporterCompanySiret: transporter.siret,
+        transporterCompanyVatNumber: transporter.vatNumber,
         destinationCompanyName: destination.name,
         destinationCompanySiret: destination.siret,
         destinationOperationNextDestinationCompanyName: nextDestination.name,
@@ -94,16 +98,17 @@ describe("toBsdElastic > companies Names & Sirets", () => {
     expect(elasticBsda.companiesNames).toContain(intermediary2.name);
   });
 
-  test("companiesSirets > should contain the sirets of ALL BSDA companies", async () => {
+  test("companiesOrgIds > should contain the orgIds of ALL BSDA companies", async () => {
     // Then
-    expect(elasticBsda.companiesSirets).toContain(emitter.siret);
-    expect(elasticBsda.companiesSirets).toContain(worker.siret);
-    expect(elasticBsda.companiesSirets).toContain(transporter.siret);
-    expect(elasticBsda.companiesSirets).toContain(destination.siret);
-    expect(elasticBsda.companiesSirets).toContain(broker.siret);
-    expect(elasticBsda.companiesSirets).toContain(ecoOrganisme.siret);
-    expect(elasticBsda.companiesSirets).toContain(nextDestination.siret);
-    expect(elasticBsda.companiesSirets).toContain(intermediary1.siret);
-    expect(elasticBsda.companiesSirets).toContain(intermediary2.siret);
+    expect(elasticBsda.companiesOrgIds).toContain(emitter.siret);
+    expect(elasticBsda.companiesOrgIds).toContain(worker.siret);
+    expect(elasticBsda.companiesOrgIds).toContain(transporter.siret);
+    expect(elasticBsda.companiesOrgIds).toContain(transporter.vatNumber);
+    expect(elasticBsda.companiesOrgIds).toContain(destination.siret);
+    expect(elasticBsda.companiesOrgIds).toContain(broker.siret);
+    expect(elasticBsda.companiesOrgIds).toContain(ecoOrganisme.siret);
+    expect(elasticBsda.companiesOrgIds).toContain(nextDestination.siret);
+    expect(elasticBsda.companiesOrgIds).toContain(intermediary1.siret);
+    expect(elasticBsda.companiesOrgIds).toContain(intermediary2.siret);
   });
 });

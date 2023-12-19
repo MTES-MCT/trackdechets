@@ -227,10 +227,11 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     ]
       .filter(Boolean)
       .join("\n"),
-    companiesSirets: [
+    companiesOrgIds: [
       bsdasri.emitterCompanySiret,
       bsdasri.ecoOrganismeSiret,
       bsdasri.transporterCompanySiret,
+      bsdasri.transporterCompanyVatNumber,
       bsdasri.destinationCompanySiret
     ].filter(Boolean)
   };

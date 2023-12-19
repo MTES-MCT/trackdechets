@@ -118,19 +118,21 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     ...getRegistryFields(bsff),
     rawBsd: bsff,
 
-    // ALL actors from the BSDA, for quick search
-    // TODO: quid détenteurs?
+    // ALL actors from the BSFF, for quick search
     companiesNames: [
       bsff.emitterCompanyName,
       bsff.transporterCompanyName,
-      bsff.destinationCompanyName
+      bsff.destinationCompanyName,
+      ...bsff.ficheInterventions.map(fiche => fiche.detenteurCompanyName)
     ]
       .filter(Boolean)
       .join("\n"),
-    companiesSirets: [
+    companiesOrgIds: [
       bsff.emitterCompanySiret,
       bsff.transporterCompanySiret,
-      bsff.destinationCompanySiret
+      bsff.transporterCompanyVatNumber,
+      bsff.destinationCompanySiret,
+      ...bsff.ficheInterventions.map(fiche => fiche.detenteurCompanySiret)
     ].filter(Boolean)
   };
 

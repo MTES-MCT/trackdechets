@@ -5,7 +5,7 @@ import { BsdElastic } from "../../common/elastic";
 import { bsdasriFactory } from "./factories";
 import { Company } from "@prisma/client";
 
-describe("toBsdElastic > companies Names & Sirets", () => {
+describe("toBsdElastic > companies Names & OrgIds", () => {
   afterEach(resetDatabase);
 
   let emitter: Company;
@@ -18,7 +18,10 @@ describe("toBsdElastic > companies Names & Sirets", () => {
   beforeAll(async () => {
     // Given
     emitter = await companyFactory({ name: "Emitter" });
-    transporter = await companyFactory({ name: "Transporter" });
+    transporter = await companyFactory({
+      name: "Transporter",
+      vatNumber: "VAT Transporter"
+    });
     destination = await companyFactory({ name: "Destination" });
     ecoOrganisme = await companyFactory({ name: "EcoOrganisme" });
 
@@ -49,11 +52,12 @@ describe("toBsdElastic > companies Names & Sirets", () => {
     expect(elasticBsdasri.companiesNames).toContain(ecoOrganisme.name);
   });
 
-  test("companiesSirets > should contain the sirets of ALL BSFF companies", async () => {
+  test("companiesOrgIds > should contain the orgIds of ALL BSFF companies", async () => {
     // Then
-    expect(elasticBsdasri.companiesSirets).toContain(emitter.siret);
-    expect(elasticBsdasri.companiesSirets).toContain(transporter.siret);
-    expect(elasticBsdasri.companiesSirets).toContain(destination.siret);
-    expect(elasticBsdasri.companiesSirets).toContain(ecoOrganisme.siret);
+    expect(elasticBsdasri.companiesOrgIds).toContain(emitter.siret);
+    expect(elasticBsdasri.companiesOrgIds).toContain(transporter.siret);
+    expect(elasticBsdasri.companiesOrgIds).toContain(transporter.vatNumber);
+    expect(elasticBsdasri.companiesOrgIds).toContain(destination.siret);
+    expect(elasticBsdasri.companiesOrgIds).toContain(ecoOrganisme.siret);
   });
 });

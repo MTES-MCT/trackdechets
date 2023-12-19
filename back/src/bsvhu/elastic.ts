@@ -188,9 +188,10 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     ]
       .filter(Boolean)
       .join("\n"),
-    companiesSirets: [
+    companiesOrgIds: [
       bsvhu.emitterCompanySiret,
       bsvhu.transporterCompanySiret,
+      bsvhu.transporterCompanyVatNumber,
       bsvhu.destinationCompanySiret
     ].filter(Boolean)
   };

@@ -161,11 +161,14 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
       ...form.transporters.map(
         transporter => transporter.transporterCompanyName
       ),
-      form.forwardedIn?.recipientCompanyName
+      form.forwardedIn?.recipientCompanyName,
+      form.forwardedIn?.transporters?.map(
+        transporter => transporter.transporterCompanyName
+      )
     ]
       .filter(Boolean)
       .join("\n"),
-    companiesSirets: [
+    companiesOrgIds: [
       form.emitterCompanySiret,
       form.nextDestinationCompanySiret,
       form.traderCompanySiret,
@@ -173,10 +176,15 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
       form.ecoOrganismeSiret,
       form.recipientCompanySiret,
       ...form.intermediaries.map(intermediary => intermediary.siret),
-      ...form.transporters.map(
-        transporter => transporter.transporterCompanySiret
-      ),
-      form.forwardedIn?.recipientCompanySiret
+      ...form.transporters.flatMap(transporter => [
+        transporter.transporterCompanySiret,
+        transporter.transporterCompanyVatNumber
+      ]),
+      form.forwardedIn?.recipientCompanySiret,
+      ...(form.forwardedIn?.transporters ?? []).flatMap(transporter => [
+        transporter.transporterCompanySiret,
+        transporter.transporterCompanyVatNumber
+      ])
     ].filter(Boolean)
   };
 }

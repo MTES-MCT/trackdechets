@@ -274,10 +274,11 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     ]
       .filter(Boolean)
       .join("\n"),
-    companiesSirets: [
+    companiesOrgIds: [
       bsda.emitterCompanySiret,
       bsda.workerCompanySiret,
       bsda.transporterCompanySiret,
+      bsda.transporterCompanyVatNumber,
       bsda.destinationCompanySiret,
       bsda.brokerCompanySiret,
       bsda.ecoOrganismeSiret,

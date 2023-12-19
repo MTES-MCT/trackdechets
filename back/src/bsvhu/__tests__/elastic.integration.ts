@@ -20,7 +20,7 @@ describe("getWhere", () => {
   });
 });
 
-describe("toBsdElastic > companies Names & Sirets", () => {
+describe("toBsdElastic > companies Names & OrgIds", () => {
   afterEach(resetDatabase);
 
   let emitter: Company;
@@ -33,7 +33,8 @@ describe("toBsdElastic > companies Names & Sirets", () => {
     // Given
     emitter = await companyFactory({ name: "Emitter" });
     transporter = await companyFactory({
-      name: "Transporter"
+      name: "Transporter",
+      vatNumber: "VAT Transporter"
     });
     destination = await companyFactory({
       name: "Destination"
@@ -61,10 +62,11 @@ describe("toBsdElastic > companies Names & Sirets", () => {
     expect(elasticBsvhu.companiesNames).toContain(destination.name);
   });
 
-  test("companiesSirets > should contain the sirets of ALL BSVHU companies", async () => {
+  test("companiesOrgIds > should contain the orgIds of ALL BSVHU companies", async () => {
     // Then
-    expect(elasticBsvhu.companiesSirets).toContain(emitter.siret);
-    expect(elasticBsvhu.companiesSirets).toContain(transporter.siret);
-    expect(elasticBsvhu.companiesSirets).toContain(destination.siret);
+    expect(elasticBsvhu.companiesOrgIds).toContain(emitter.siret);
+    expect(elasticBsvhu.companiesOrgIds).toContain(transporter.siret);
+    expect(elasticBsvhu.companiesOrgIds).toContain(transporter.vatNumber);
+    expect(elasticBsvhu.companiesOrgIds).toContain(destination.siret);
   });
 });
