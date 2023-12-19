@@ -356,7 +356,6 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
       vatNumber: "VAT Transporter FwdIn"
     });
 
-    // const form = await formWithTempStorageFactory({
     form = await formWithTempStorageFactory({
       opt: {
         emitterCompanyName: emitter.name,

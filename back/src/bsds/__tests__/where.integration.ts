@@ -1124,7 +1124,7 @@ describe("search on companiesNames", () => {
   });
 });
 
-describe("search on companiesSirets", () => {
+describe("search on companiesOrgIds", () => {
   afterAll(resetDatabase);
 
   beforeAll(async () => {
@@ -1132,17 +1132,17 @@ describe("search on companiesSirets", () => {
       {
         id: "1",
         updatedAt: new Date().getTime(),
-        companiesSirets: ["SIRET1", "SIRET2"]
+        companiesOrgIds: ["SIRET1", "SIRET2"]
       },
       {
         id: "2",
         updatedAt: new Date().getTime(),
-        companiesSirets: ["SIRET1"]
+        companiesOrgIds: ["SIRET1"]
       },
       {
         id: "3",
         updatedAt: new Date().getTime(),
-        companiesSirets: []
+        companiesOrgIds: []
       }
     ];
 
@@ -1152,7 +1152,7 @@ describe("search on companiesSirets", () => {
 
   it("should return one result", async () => {
     const where: BsdWhere = {
-      companiesSirets: {
+      companiesOrgIds: {
         _has: "SIRET2"
       }
     };
@@ -1171,7 +1171,7 @@ describe("search on companiesSirets", () => {
 
   it("should return several results", async () => {
     const where: BsdWhere = {
-      companiesSirets: {
+      companiesOrgIds: {
         _has: "SIRET1"
       }
     };
@@ -1192,7 +1192,7 @@ describe("search on companiesSirets", () => {
 
   it("should return nothing", async () => {
     const where: BsdWhere = {
-      companiesSirets: {
+      companiesOrgIds: {
         _has: "SIRET3"
       }
     };

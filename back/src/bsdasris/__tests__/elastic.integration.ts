@@ -52,7 +52,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsdasri.companiesNames).toContain(ecoOrganisme.name);
   });
 
-  test("companiesOrgIds > should contain the orgIds of ALL BSFF companies", async () => {
+  test("companiesOrgIds > should contain the orgIds of ALL BSDASRI companies", async () => {
     // Then
     expect(elasticBsdasri.companiesOrgIds).toContain(emitter.siret);
     expect(elasticBsdasri.companiesOrgIds).toContain(transporter.siret);
