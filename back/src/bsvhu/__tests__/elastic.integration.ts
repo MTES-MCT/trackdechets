@@ -46,6 +46,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         emitterCompanySiret: emitter.siret,
         transporterCompanyName: transporter.name,
         transporterCompanySiret: transporter.siret,
+        transporterCompanyVatNumber: transporter.vatNumber,
         destinationCompanyName: destination.name,
         destinationCompanySiret: destination.siret
       }
