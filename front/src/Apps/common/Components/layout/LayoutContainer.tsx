@@ -1,11 +1,5 @@
 import React, { lazy, Suspense } from "react";
-import {
-  Route,
-  Routes,
-  Navigate,
-  generatePath,
-  useMatch
-} from "react-router-dom";
+import { Route, Routes, Navigate, generatePath } from "react-router-dom";
 import * as Sentry from "@sentry/browser";
 import Loader from "../Loader/Loaders";
 import Layout from "./Layout";
@@ -14,7 +8,6 @@ import { useQuery, gql } from "@apollo/client";
 import { Query } from "codegen-ui";
 import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
-import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
@@ -80,23 +73,9 @@ export default function LayoutContainer() {
   const isAuthenticated = !loading && data != null;
   const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
 
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
-  const isDashboardRoutes = !!useMatch("/dashboard/*");
-
   if (loading) {
     return <Loader />;
   }
-
-  const v2banner =
-    isV2Routes || isDashboardRoutes ? (
-      <SurveyBanner
-        message="« Mes bordereaux » vous permet de découvrir le nouveau tableau de bord. Découvrez-le et partagez-nous vos suggestions."
-        button={{
-          title: "Partagez vos suggestions",
-          href: "https://tally.so/r/3xDDy9"
-        }}
-      ></SurveyBanner>
-    ) : undefined;
 
   return (
     <Suspense fallback={<Loader />}>
@@ -124,7 +103,6 @@ export default function LayoutContainer() {
             <Layout
               isAuthenticated={isAuthenticated}
               isAdmin={isAdmin}
-              v2banner={v2banner}
               defaultOrgId={data?.me.companies[0]?.orgId}
             />
           }
