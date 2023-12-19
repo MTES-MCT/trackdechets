@@ -93,6 +93,33 @@ describe("Query.form", () => {
     expect(data.form.id).toBe(form.id);
   });
 
+  it("should allow a foreign multi-modal transporter N>1 to read their form", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      siret: null,
+      vatNumber: "IT13029381004"
+    });
+    const form = await createForm({});
+
+    await bsddTransporterFactory({
+      formId: form.id,
+      opts: {
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: company.vatNumber
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data, errors } = await query<Pick<Query, "form">>(GET_FORM_QUERY, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    expect(data.form.id).toBe(form.id);
+  });
+
   it("should disallow a user with no meaningful relation to read a form", async () => {
     const user = await userFactory();
     const form = await createForm({});

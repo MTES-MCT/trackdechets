@@ -105,9 +105,10 @@ function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
       ? form.intermediaries.flatMap(i => [i.siret, i.vatNumber])
       : [];
 
-  const multiModalTransporters = (form.transporters ?? []).map(
-    s => s.transporterCompanySiret
-  );
+  const multiModalTransporters = (form.transporters ?? []).flatMap(s => [
+    s.transporterCompanySiret,
+    s.transporterCompanyVatNumber
+  ]);
 
   const contributors = [
     emitterCompanySiret,
@@ -179,7 +180,10 @@ function formReaders(form: FormForReadCheck): string[] {
   return [
     ...formContributors(form),
     ...(form.transporters
-      ? form.transporters.map(s => s.transporterCompanySiret)
+      ? form.transporters.flatMap(s => [
+          s.transporterCompanySiret,
+          s.transporterCompanyVatNumber
+        ])
       : []),
     ...(form.grouping
       ? form.grouping.map(f => f.initialForm.emitterCompanySiret)
