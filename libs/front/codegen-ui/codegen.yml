@@ -1,7 +1,7 @@
 overwrite: true
 schema: "back/src/**/*.graphql"
 generates:
-  codegen-ui/src/generated/ui.ts:
+  libs/front/codegen-ui/src/generated/ui.ts:
     plugins:
       - typescript
       - typescript-operations

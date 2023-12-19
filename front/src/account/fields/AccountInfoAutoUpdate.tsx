@@ -3,7 +3,7 @@ import {
   CompanyPrivate,
   Mutation,
   MutationUpdateCompanyArgs
-} from "@td/codegen-ui/src/generated/ui";
+} from "@td/codegen-ui";
 import { useMutation } from "@apollo/client";
 import gql from "graphql-tag";
 import React from "react";

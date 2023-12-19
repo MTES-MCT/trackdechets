@@ -5,6 +5,8 @@
   "projectType": "library",
   "targets": {
     "build": {
+      "inputs": ["{workspaceRoot}/back/src/**/*.gql"],
+      "cache": true,
       "executor": "nx:run-commands",
       "options": {
         "command": "graphql-codegen --config {projectRoot}/codegen.yml"
