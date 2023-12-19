@@ -24,7 +24,9 @@
       "@td/env": ["libs/back/env/src/index.ts"],
       "@td/logger": ["libs/back/logger/src/index.ts"],
       "@td/mail": ["libs/back/mail/src/index.ts"],
+      "@td/prisma": ["libs/back/prisma/src/index.ts"],
       "@td/queues": ["lib/back/queues/src/index.ts"],
+      "@td/tracer": ["libs/back/tracer/src/index.ts"],
       "back": ["back/src/index.ts"],
       "codegen-ui": ["codegen-ui/src/index.ts"],
       "libs/back/tests-integration": [

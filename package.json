@@ -24,6 +24,10 @@
   "volta": {
     "node": "20.7.0"
   },
+  "prisma": {
+    "seed": "tsx --tsconfig back/tsconfig.lib.json back/prisma/seed.ts",
+    "schema": "libs/back/prisma/src/schema.prisma"
+  },
   "nx": {
     "targets": {}
   },
@@ -40,7 +44,10 @@
     "@graphql-tools/load-files": "^6.6.1",
     "@graphql-tools/merge": "^8.4.0",
     "@graphql-tools/schema": "^9.0.17",
+    "@opentelemetry/context-async-hooks": "^1.19.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.46.0",
     "@opentelemetry/instrumentation": "^0.41.0",
+    "@opentelemetry/sdk-trace-base": "^1.19.0",
     "@prisma/client": "5.0.0",
     "@prisma/instrumentation": "5.0.0",
     "@sentry/browser": "^6.19.7",
@@ -267,9 +274,5 @@
     "vite": "~4.3.9",
     "vite-plugin-svgr": "^4.0.0",
     "ws": "^8.2.3"
-  },
-  "prisma": {
-    "seed": "tsx --tsconfig back/tsconfig.lib.json back/prisma/seed.ts",
-    "schema": "back/prisma/schema.prisma"
   }
 }

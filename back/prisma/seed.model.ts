@@ -1,5 +1,4 @@
 import { hashPassword, passwordVersion } from "../src/users/utils";
-
 import prisma from "../src/prisma";
 import { siretify } from "../src/__tests__/factories";
 
