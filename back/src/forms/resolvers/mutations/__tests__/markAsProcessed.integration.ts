@@ -451,7 +451,7 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  it("should mark a form as NO_TRACEABILITY when user declares it and with foreign destination", async () => {
+  it("should mark a form as NO_TRACEABILITY when user declares it and with non-french EU destination", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -495,7 +495,50 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  it("should allow empty company as nextDestination when NO_TRACEABILITY is true", async () => {
+  it("should mark a form as NO_TRACEABILITY when user declares it and with foreign non-EU destination, with optional company infos", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 13",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          noTraceability: true,
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              extraEUCompanyId: "IE9513674T",
+              country: "RU",
+              name: "RU company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A fresh place..."
+            }
+          }
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(resultingForm.status).toBe("NO_TRACEABILITY");
+  });
+
+  it("should allow empty company as nextDestination when noTraceability is true", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -904,7 +947,7 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.processedAt).toEqual(processedAt);
   });
 
-  test("nextDestination.company should be optional when noTraceability is true", async () => {
+  test("French nextDestination.company input should be optional when noTraceability is true ", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -938,7 +981,124 @@ describe("mutation.markAsProcessed", () => {
     expect(data.markAsProcessed.nextDestination!.company).toBeNull();
   });
 
-  test("nextDestination.company should be mandatory when noTraceability is not true", async () => {
+  test("French nextDestination.company input should be optional when noTraceability is true ", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "markAsProcessed">,
+      MutationMarkAsProcessedArgs
+    >(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z" as any,
+          noTraceability: true,
+          nextDestination: {
+            processingOperation: "D 1",
+          }
+        }
+      }
+    });
+
+    expect(data.markAsProcessed.nextDestination!.company).toBeNull();
+  });
+
+  test("Foreign nextDestination.company should be optional but notificationNumber should be mandatory when noTraceability is true", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "markAsProcessed">,
+      MutationMarkAsProcessedArgs
+    >(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z" as any,
+          noTraceability: true,
+          nextDestination: {
+            processingOperation: "D 1",
+            notificationNumber: "123456AZERTY" // required if extra-EU
+          }
+        }
+      }
+    });
+
+    expect(data.markAsProcessed.nextDestination!.company).toBeNull();
+
+    const resultingForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(resultingForm.status).toBe("NO_TRACEABILITY");
+  });
+
+  test("Foreign nextDestination.company should be optional except for notificationNumber when noTraceability is true", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsProcessed">,
+      MutationMarkAsProcessedArgs
+    >(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z" as any,
+          noTraceability: true,
+          nextDestination: {
+            processingOperation: "D 1",
+            // notificationNumber: "123456AZERTY"  // soon to be required if intra-EU (breaking-change to be annonced)
+            company: {
+              extraEUCompanyId: "123456AZERTY"
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Destination ultérieure : le numéro de notification GISTRID est obligatoire"
+      })
+    ]);
+  });
+
+  test("nextDestination.company should be mandatory when noTraceability is false by default", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -977,6 +1137,141 @@ describe("mutation.markAsProcessed", () => {
           "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
           "Destination ultérieure : L'email de l'entreprise est obligatoire"
+      })
+    ]);
+  });
+
+  test("nextDestination.company should be mandatory noTraceability is false explicitly", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsProcessed">,
+      MutationMarkAsProcessedArgs
+    >(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z" as any,
+          noTraceability: false,
+          nextDestination: {
+            processingOperation: "D 1"
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Destination ultérieure : Le nom de l'entreprise est obligatoire\n" +
+          "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : L'adresse de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
+          "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : L'email de l'entreprise est obligatoire"
+      })
+    ]);
+  });
+
+
+  test("nextDestination.company should be mandatory when noTraceability is false (by default)", async () => {
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "ACCEPTED",
+          recipientCompanyName: company.name,
+          recipientCompanySiret: company.siret
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+      Pick<Mutation, "markAsProcessed">,
+      MutationMarkAsProcessedArgs
+    >(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z" as any,
+          nextDestination: {
+            processingOperation: "D 1"
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Destination ultérieure : Le nom de l'entreprise est obligatoire\n" +
+          "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : L'adresse de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
+          "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : L'email de l'entreprise est obligatoire"
+      })
+    ]);
+  });
+
+  test("nextDestination.company and notificationNumber should be mandatory when company is extra-EU and when noTraceability is false", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsProcessed">,
+      MutationMarkAsProcessedArgs
+    >(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z" as any,
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              extraEUCompanyId: "some internation id"
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Destination ultérieure : Le nom de l'entreprise est obligatoire\n" +
+          "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : L'adresse de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
+          "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : L'email de l'entreprise est obligatoire" +
+          "Destination ultérieure : le numéro de notification GISTRID est obligatoire"
       })
     ]);
   });

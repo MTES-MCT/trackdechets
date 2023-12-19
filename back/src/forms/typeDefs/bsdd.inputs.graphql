@@ -424,9 +424,12 @@ input DestinationInput {
 
 """
 Payload d'un établissement pouvant se situer en France
-ou à l'étranger
+ou à l'étranger uniquement pour NextDestinationInput
 """
 input InternationalCompanyInput {
+  "Un identifiant d'établissement hors EU"
+  extraEUCompanyId: String
+
   "SIRET de l'établissement, optionnel dans le cas d'un établissement à l'étranger"
   siret: String
 
