@@ -1,5 +1,5 @@
 import { TBsdStatusCode } from "../../../common/types/bsdTypes";
-import { BsdType } from "codegen-ui";
+import { BsdType } from "@td/codegen-ui";
 
 export interface BadgeProps {
   status: TBsdStatusCode;

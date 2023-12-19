@@ -19,7 +19,7 @@ import {
   BsdasriInput,
   BsdasriStatus,
   BsdasriType
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import getInitialState from "./utils/initial-state";
 import {
   CREATE_DRAFT_BSDASRI,

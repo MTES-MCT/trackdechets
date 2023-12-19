@@ -8,7 +8,7 @@ import {
   QueryBsdasrisArgs,
   BsdasriStatus,
   BsdasriPackaging
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   Table,
   TableBody,

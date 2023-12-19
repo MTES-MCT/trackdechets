@@ -13,7 +13,7 @@ import {
   TransporterReceipt,
   Query,
   QueryCompanyPrivateInfosArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { isForeignVat } from "shared/constants";
 import { TRANSPORTER_RECEIPT } from "../../../../Apps/common/queries/company/query";
 import { useQuery } from "@apollo/client";

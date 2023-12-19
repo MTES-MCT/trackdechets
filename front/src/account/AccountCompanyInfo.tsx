@@ -6,7 +6,7 @@ import AccountFieldCompanyGerepId from "./fields/AccountFieldCompanyGerepId";
 import AccountFieldCompanyGivenName, {
   tooltip as givenNameTooltip
 } from "./fields/AccountFieldCompanyGivenName";
-import { CompanyPrivate, UserRole, CompanyType } from "codegen-ui";
+import { CompanyPrivate, UserRole, CompanyType } from "@td/codegen-ui";
 
 import AccountFieldCompanyTransporterReceipt from "./fields/AccountFieldCompanyTransporterReceipt";
 import AccountFieldCompanyTraderReceipt from "./fields/AccountFieldCompanyTraderReceipt";

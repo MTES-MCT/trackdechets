@@ -15,7 +15,7 @@ import {
   FormCompany,
   OperationMode,
   WasteAcceptationStatus
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React, { useState } from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";

@@ -10,7 +10,7 @@ import {
   FavoriteType,
   Transporter as FormTransporter,
   Transporter
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
 import TransporterRecepisse from "../TransporterRecepisse/TransporterRecepisse";
 import { isForeignVat } from "shared/constants";

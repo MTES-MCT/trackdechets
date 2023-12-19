@@ -1,7 +1,7 @@
 import TdSwitch from "../../../common/components/Switch";
 import { RedErrorMessage, FieldSwitch } from "../../../common/components";
 import { Field, useFormikContext } from "formik";
-import { Bsdasri } from "codegen-ui";
+import { Bsdasri } from "@td/codegen-ui";
 import React from "react";
 
 import NumberInput from "../../common/components/custom-inputs/NumberInput";

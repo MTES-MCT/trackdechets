@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { COMPANY_ACCOUNT_ADD_PRIVATE_INFOS } from "../../Apps/common/queries/company/query";
 import AccountCompanyAddMembershipRequest from "./AccountCompanyAddMembershipRequest";
 import styles from "../AccountCompanyAdd.module.scss";
-import { Mutation, Query } from "codegen-ui";
+import { Mutation, Query } from "@td/codegen-ui";
 import {
   isFRVat,
   isSiret,

@@ -18,7 +18,7 @@ import {
   Bsda,
   Mutation,
   MutationCreateBsdaRevisionRequestArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { removeEmptyKeys } from "../../../../../common/helper";
 import { ReviewableField } from "../../bsdd/request/ReviewableField";
 import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../Apps/common/queries/reviews/BsdaReviewQuery";

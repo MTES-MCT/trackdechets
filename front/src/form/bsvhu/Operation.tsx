@@ -5,7 +5,7 @@ import Tooltip from "../../common/components/Tooltip";
 import DateInput from "../common/components/custom-inputs/DateInput";
 import NumberInput from "../common/components/custom-inputs/NumberInput";
 import { RadioButton } from "../common/components/custom-inputs/RadioButton";
-import { Bsvhu, BsvhuDestinationType } from "codegen-ui";
+import { Bsvhu, BsvhuDestinationType } from "@td/codegen-ui";
 import { subMonths } from "date-fns";
 import OperationModeSelect from "../../common/components/OperationModeSelect";
 const TagsInput = lazy(

@@ -6,7 +6,7 @@ import {
   CompanyInput,
   CompanySearchPrivate,
   CompanySearchResult
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React, { useCallback } from "react";
 
 export function IntermediariesSelector({

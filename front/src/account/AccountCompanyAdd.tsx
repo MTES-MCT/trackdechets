@@ -22,7 +22,7 @@ import {
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
   CompanySearchResult
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import classNames from "classnames";
 import { MY_COMPANIES } from "./AccountCompanyList";
 import { isFRVat, isSiret, isVat, isForeignVat } from "shared/constants";

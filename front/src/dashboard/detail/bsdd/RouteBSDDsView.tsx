@@ -2,7 +2,7 @@ import React from "react";
 import BSDDetailContent from "./BSDDetailContent";
 import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { useQuery } from "@apollo/client";
-import { Query, QueryFormArgs } from "codegen-ui";
+import { Query, QueryFormArgs } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import { GET_DETAIL_FORM } from "../../../Apps/common/queries";
 import { InlineError } from "../../../Apps/common/Components/Error/Error";

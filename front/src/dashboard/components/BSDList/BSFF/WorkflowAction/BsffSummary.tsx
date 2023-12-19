@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Bsff } from "codegen-ui";
+import { Bsff } from "@td/codegen-ui";
 import { BsffWasteSummary } from "./BsffWasteSummary";
 import { BsffJourneySummary } from "./BsffJourneySummary";
 

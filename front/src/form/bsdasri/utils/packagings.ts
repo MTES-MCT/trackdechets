@@ -1,4 +1,4 @@
-import { BsdasriPackaging, BsdasriPackagingType } from "codegen-ui";
+import { BsdasriPackaging, BsdasriPackagingType } from "@td/codegen-ui";
 import { Decimal } from "decimal.js-light";
 
 export const PACKAGINGS_NAMES = {

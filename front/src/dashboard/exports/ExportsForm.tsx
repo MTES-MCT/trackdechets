@@ -7,7 +7,7 @@ import {
   CompanyType,
   Query,
   WasteRegistryType
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import WasteTreeModal from "../../search/WasteTreeModal";
 
 import { ALL_WASTES, ALL_WASTES_TREE } from "shared/constants";

@@ -20,7 +20,7 @@ import {
   Form as Bsdd,
   Mutation,
   MutationCreateFormRevisionRequestArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React from "react";
 import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";

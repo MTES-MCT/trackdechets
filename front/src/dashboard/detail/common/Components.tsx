@@ -7,7 +7,7 @@ import {
   BsvhuTransporter,
   BsdaTransporter,
   BsdasriTransporter
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { getPackagingInfosSummary } from "../../../form/bsdd/utils/packagings";
 import { isForeignVat } from "shared/constants";
 const nbsp = "\u00A0";

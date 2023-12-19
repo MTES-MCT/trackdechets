@@ -1,6 +1,6 @@
 import { gql, MutationHookOptions, useMutation } from "@apollo/client";
 import toast from "react-hot-toast";
-import { Mutation, MutationDuplicateFormArgs } from "codegen-ui";
+import { Mutation, MutationDuplicateFormArgs } from "@td/codegen-ui";
 import { fullFormFragment } from "../../../../../Apps/common/queries/fragments";
 import { GET_BSDS } from "../../../../../Apps/common/queries";
 

@@ -2,7 +2,7 @@ import { useMutation, gql } from "@apollo/client";
 import { useFormik } from "formik";
 import React, { useState } from "react";
 
-import { Form as FormModel } from "codegen-ui";
+import { Form as FormModel } from "@td/codegen-ui";
 import { isBsddTransporterFieldEditable } from "shared/constants";
 import { NotificationError } from "../../../../Apps/common/Components/Error/Error";
 import { capitalize } from "../../../../common/helper";

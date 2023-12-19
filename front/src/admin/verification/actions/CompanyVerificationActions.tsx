@@ -1,4 +1,4 @@
-import { CompanyForVerification } from "codegen-ui";
+import { CompanyForVerification } from "@td/codegen-ui";
 import React, { useState } from "react";
 import CompanyVerifyModal from "./CompanyVerifyModal";
 import SendVerificationCodeLetterModal from "./SendVerificationCodeLetterModal";

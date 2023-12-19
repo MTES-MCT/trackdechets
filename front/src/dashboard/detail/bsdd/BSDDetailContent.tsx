@@ -22,7 +22,7 @@ import {
   Query,
   QueryCompanyPrivateInfosArgs,
   OperationMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { emitterTypeLabels, getTransportModeLabel } from "../../constants";
 import {
   IconWarehouseDelivery,

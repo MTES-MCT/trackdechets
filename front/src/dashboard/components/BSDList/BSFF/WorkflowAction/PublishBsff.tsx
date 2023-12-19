@@ -1,6 +1,6 @@
 import React from "react";
 import { gql, useMutation } from "@apollo/client";
-import { Mutation, MutationPublishBsffArgs } from "codegen-ui";
+import { Mutation, MutationPublishBsffArgs } from "@td/codegen-ui";
 import { ActionButton } from "../../../../../common/components";
 import { Loader } from "../../../../../Apps/common/Components";
 import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";

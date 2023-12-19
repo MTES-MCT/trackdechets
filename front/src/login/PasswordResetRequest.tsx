@@ -1,6 +1,6 @@
 import { useMutation, gql } from "@apollo/client";
 import React, { useState } from "react";
-import { Mutation, MutationCreatePasswordResetRequestArgs } from "codegen-ui";
+import { Mutation, MutationCreatePasswordResetRequestArgs } from "@td/codegen-ui";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";

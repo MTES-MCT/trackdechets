@@ -17,7 +17,7 @@ import {
   Form,
   FormStatus,
   Bsdasri
-} from "codegen-ui";
+} from "@td/codegen-ui";
 
 import "./bsdCardList.scss";
 import {

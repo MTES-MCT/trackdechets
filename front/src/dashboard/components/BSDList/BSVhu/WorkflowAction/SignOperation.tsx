@@ -11,7 +11,7 @@ import {
   MutationSignBsvhuArgs,
   MutationUpdateBsvhuArgs,
   SignatureTypeInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React from "react";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";

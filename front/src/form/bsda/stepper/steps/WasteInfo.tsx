@@ -5,7 +5,7 @@ import NumberInput from "../../../common/components/custom-inputs/NumberInput";
 import Packagings from "../../components/packagings/Packagings";
 import { getBsdaEditionDisabledSteps } from "../../utils/getBsdaEditionDisabledSteps";
 import Tooltip from "../../../../common/components/Tooltip";
-import { Bsda, BsdaConsistence, BsdaType } from "codegen-ui";
+import { Bsda, BsdaConsistence, BsdaType } from "@td/codegen-ui";
 import { FieldSwitch } from "../../../../common/components";
 import { BSDA_WASTES } from "shared/constants";
 import { BsdaContext } from "../../FormContainer";

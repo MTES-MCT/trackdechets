@@ -7,7 +7,7 @@ import { ActionButtonContext } from "../../../../common/components/ActionButton"
 import { WorkflowAction } from "./WorkflowAction";
 import { UpdateTransporterCustomInfo } from "./BsffActions/UpdateTransporterCustomInfo";
 import { UpdateTransporterPlates } from "./BsffActions/UpdateTransporterPlates";
-import { BsffStatus } from "codegen-ui";
+import { BsffStatus } from "@td/codegen-ui";
 import { BSFF_VERBOSE_STATUSES } from "shared/constants";
 
 export const COLUMNS: Record<

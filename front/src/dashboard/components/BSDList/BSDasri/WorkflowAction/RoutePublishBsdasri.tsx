@@ -5,7 +5,7 @@ import {
   Query,
   QueryBsdasriArgs,
   MutationPublishBsdasriArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   NotificationError,
   InlineError

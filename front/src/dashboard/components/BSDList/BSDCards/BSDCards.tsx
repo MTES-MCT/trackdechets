@@ -6,7 +6,7 @@ import {
   EmitterType,
   Query,
   QueryCompanyPrivateInfosArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import routes from "../../../../Apps/routes";
 import { IconView } from "../../../../Apps/common/Components/Icons/Icons";
 import { WorkflowAction } from "../BSDD/WorkflowAction";

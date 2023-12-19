@@ -7,7 +7,7 @@ import {
   Query,
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { NotificationError } from "../../../../Apps/common/Components/Error/Error";
 import {
   FAVORITES,

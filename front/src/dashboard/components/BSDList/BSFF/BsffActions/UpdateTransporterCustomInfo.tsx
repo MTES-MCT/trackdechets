@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import { useMutation } from "@apollo/client";
-import { Mutation, MutationUpdateBsffArgs } from "codegen-ui";
+import { Mutation, MutationUpdateBsffArgs } from "@td/codegen-ui";
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 import { UPDATE_BSFF_FORM } from "../../../../../form/bsff/utils/queries";
 import { Field, Form, Formik } from "formik";

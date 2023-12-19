@@ -1,11 +1,11 @@
 import { getIn, useFormikContext } from "formik";
 import React, { useEffect, useReducer } from "react";
 import { useQuery } from "@apollo/client";
-import { Bsdasri } from "codegen-ui";
+import { Bsdasri } from "@td/codegen-ui";
 import BsdasriTableSynthesis from "./BsdasriTableSynthesis";
 import { GET_DETAIL_DASRI } from "../../../../Apps/common/queries";
 
-import { Query, QueryBsdasriArgs } from "codegen-ui";
+import { Query, QueryBsdasriArgs } from "@td/codegen-ui";
 type State = { selected: string[] };
 
 type Action =

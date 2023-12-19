@@ -26,7 +26,7 @@ import {
   BsdaType,
   FormCompany,
   OperationMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
 import { generatePath, useNavigate, useParams } from "react-router-dom";

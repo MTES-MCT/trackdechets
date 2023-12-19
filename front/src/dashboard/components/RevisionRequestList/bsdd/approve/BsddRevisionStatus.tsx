@@ -1,5 +1,5 @@
 import React from "react";
-import { FormRevisionRequest, RevisionRequestApprovalStatus } from "codegen-ui";
+import { FormRevisionRequest, RevisionRequestApprovalStatus } from "@td/codegen-ui";
 import Tooltip from "../../../../../common/components/Tooltip";
 
 type Props = {

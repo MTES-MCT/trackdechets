@@ -1,5 +1,5 @@
 import React from "react";
-import { CompanyPrivate } from "codegen-ui";
+import { CompanyPrivate } from "@td/codegen-ui";
 import { sortCompaniesByName } from "../common/helper";
 import { usePermissions } from "../common/contexts/PermissionsContext";
 

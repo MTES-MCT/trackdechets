@@ -1,5 +1,5 @@
 import React from "react";
-import { FormStatus } from "codegen-ui";
+import { FormStatus } from "@td/codegen-ui";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
 import { ActionButton } from "../../../../../common/components";

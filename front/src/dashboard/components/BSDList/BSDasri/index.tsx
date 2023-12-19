@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Bsdasri, BsdasriStatus } from "codegen-ui";
+import { Bsdasri, BsdasriStatus } from "@td/codegen-ui";
 import { ActionButtonContext } from "../../../../common/components/ActionButton";
 import { useParams } from "react-router";
 

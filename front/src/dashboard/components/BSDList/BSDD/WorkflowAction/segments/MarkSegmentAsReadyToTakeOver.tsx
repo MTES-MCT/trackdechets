@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Form as FormikForm, Formik } from "formik";
 import toast from "react-hot-toast";
-import { Mutation, MutationMarkSegmentAsReadyToTakeOverArgs } from "codegen-ui";
+import { Mutation, MutationMarkSegmentAsReadyToTakeOverArgs } from "@td/codegen-ui";
 import { segmentFragment } from "../../../../../../Apps/common/queries/fragments";
 import TdModal from "../../../../../../Apps/common/Components/Modal/Modal";
 import ActionButton from "../../../../../../common/components/ActionButton";

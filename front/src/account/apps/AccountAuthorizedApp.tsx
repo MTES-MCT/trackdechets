@@ -1,5 +1,5 @@
 import { formatDate } from "../../common/datetime";
-import { AuthorizedApplication } from "codegen-ui";
+import { AuthorizedApplication } from "@td/codegen-ui";
 import React, { useState } from "react";
 import styles from "./AccountAuthorizedApp.module.scss";
 import AccountAuthorizedAppRevoke from "./AccountAuthorizedAppRevoke";

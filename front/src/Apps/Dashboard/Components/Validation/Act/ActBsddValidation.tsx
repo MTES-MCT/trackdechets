@@ -21,7 +21,7 @@ import {
   QuantityType,
   Query,
   QueryFormArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   isAppendix1,
   isSignTransportCanSkipEmission

@@ -4,7 +4,7 @@ import {
   IconWarehouseDelivery,
   IconWaterDam
 } from "../../../Apps/common/Components/Icons/Icons";
-import { Bsvhu, FormCompany, OperationMode } from "codegen-ui";
+import { Bsvhu, FormCompany, OperationMode } from "@td/codegen-ui";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";

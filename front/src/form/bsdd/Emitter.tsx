@@ -1,7 +1,7 @@
 import CompanySelector from "../common/components/company/CompanySelector";
 import { RadioButton } from "../common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
-import { CompanyType, EmitterType, Form } from "codegen-ui";
+import { CompanyType, EmitterType, Form } from "@td/codegen-ui";
 import React, { useEffect } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WorkSite from "../common/components/work-site/WorkSite";

@@ -5,7 +5,7 @@ import {
   Form,
   Query,
   QueryCompanyPrivateInfosArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { CellProps, CellValue } from "react-table";
 import { ActionButtonContext } from "../../../../common/components/ActionButton";
 import { BSDDActions } from "./BSDDActions/BSDDActions";

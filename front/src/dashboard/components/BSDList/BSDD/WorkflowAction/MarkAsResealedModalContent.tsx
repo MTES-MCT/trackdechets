@@ -18,7 +18,7 @@ import {
   QuantityType,
   ResealedFormInput,
   TransportMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React, { useState } from "react";
 import EstimatedQuantityTooltip from "../../../../../common/components/EstimatedQuantityTooltip";
 import { TransporterForm } from "../../../../../Apps/Forms/Components/TransporterForm/TransporterForm";

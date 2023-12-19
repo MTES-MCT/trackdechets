@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
 import AccountCompany from "./AccountCompany";
 import { useNavigate } from "react-router-dom";
-import { Query } from "codegen-ui";
+import { Query } from "@td/codegen-ui";
 import { Loader } from "../Apps/common/Components";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 import routes from "../Apps/routes";

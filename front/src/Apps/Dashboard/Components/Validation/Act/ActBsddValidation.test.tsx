@@ -6,7 +6,7 @@ import ActBsddValidation from "./ActBsddValidation";
 import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import ActBsdSuiteValidation from "./ActBsdSuiteValidation";
 import { MemoryRouter } from "react-router-dom";
-import { Form } from "codegen-ui";
+import { Form } from "@td/codegen-ui";
 
 describe("ActBsddValidation", () => {
   const onClose = jest.fn();

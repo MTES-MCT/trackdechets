@@ -10,7 +10,7 @@ import {
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
   CompanySearchResult
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { isSiret, isVat } from "shared/constants";
 
 import { Button } from "@codegouvfr/react-dsfr/Button";

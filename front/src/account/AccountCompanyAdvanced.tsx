@@ -5,7 +5,7 @@ import {
   CompanyPrivate,
   Mutation,
   MutationDeleteCompanyArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import AccountField from "./fields/AccountField";
 import { MY_COMPANIES } from "./AccountCompanyList";
 import routes from "../Apps/routes";

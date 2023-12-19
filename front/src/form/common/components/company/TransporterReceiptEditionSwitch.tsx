@@ -5,7 +5,7 @@ import {
   BsdaTransporterInput,
   BsdasriTransporterInput,
   BsvhuTransporterInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 
 /**
  * Switch for BSDA, BSVHU and BSDASRI

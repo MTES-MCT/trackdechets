@@ -12,7 +12,7 @@ import {
   WorkSite,
   TransporterInput,
   TransportMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 
 /**
  * Computes initial values for trader fields in Formik's form

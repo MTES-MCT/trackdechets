@@ -2,7 +2,7 @@ import { RedErrorMessage } from "../../../common/components";
 
 import { Field, useFormikContext } from "formik";
 import React from "react";
-import { BsdasriStatus, Bsdasri, BsdasriType } from "codegen-ui";
+import { BsdasriStatus, Bsdasri, BsdasriType } from "@td/codegen-ui";
 import DateInput from "../../common/components/custom-inputs/DateInput";
 import NumberInput from "../../common/components/custom-inputs/NumberInput";
 import classNames from "classnames";

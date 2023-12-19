@@ -7,7 +7,7 @@ import {
   BsdaRevisionRequest,
   Mutation,
   MutationCancelBsdaRevisionRequestArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   CANCEL_BSDA_REVISION_REQUEST,
   GET_BSDA_REVISION_REQUESTS

@@ -8,7 +8,7 @@ import {
   Mutation,
   MutationCreateFormArgs,
   MutationUpdateFormArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React from "react";
 import {
   getInitialCompany,

@@ -7,7 +7,7 @@ import {
   MutationPrepareSegmentArgs,
   NextSegmentInfoInput,
   TransportMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { segmentFragment } from "../../../../../../Apps/common/queries/fragments";
 import TdModal from "../../../../../../Apps/common/Components/Modal/Modal";
 import ActionButton from "../../../../../../common/components/ActionButton";

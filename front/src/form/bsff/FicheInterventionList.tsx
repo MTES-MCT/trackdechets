@@ -13,7 +13,7 @@ import {
   CompanyInput,
   Mutation,
   MutationCreateFicheInterventionBsffArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import * as React from "react";
 import * as yup from "yup";
 import { FicheInterventionFragment } from "../../Apps/common/queries/fragments";

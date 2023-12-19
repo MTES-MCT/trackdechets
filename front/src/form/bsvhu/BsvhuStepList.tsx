@@ -13,7 +13,7 @@ import {
   Query,
   Bsvhu,
   BsvhuInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import initialState from "./utils/initial-state";
 import {
   CREATE_VHU_FORM,

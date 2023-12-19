@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import CompanyResults from "../../../common/components/company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
 import SearchInput from "../../../../common/components/SearchInput";
-import { Query, EcoOrganisme, Form } from "codegen-ui";
+import { Query, EcoOrganisme, Form } from "@td/codegen-ui";
 import TdSwitch from "../../../../common/components/Switch";
 import { getInitialEcoOrganisme } from "../../utils/initial-state";
 

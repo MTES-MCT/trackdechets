@@ -1,5 +1,5 @@
 import React from "react";
-import { CompanySearchResult } from "codegen-ui";
+import { CompanySearchResult } from "@td/codegen-ui";
 
 type Props = Pick<CompanySearchResult, "name" | "siret" | "naf" | "libelleNaf">;
 

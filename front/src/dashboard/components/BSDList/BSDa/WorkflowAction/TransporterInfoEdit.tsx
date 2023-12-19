@@ -6,7 +6,7 @@ import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icon
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 import Tooltip from "../../../../../common/components/Tooltip";
 import { UPDATE_BSDA } from "../../../../../form/bsda/stepper/queries";
-import { Bsda, Mutation, MutationUpdateBsdaArgs } from "codegen-ui";
+import { Bsda, Mutation, MutationUpdateBsdaArgs } from "@td/codegen-ui";
 import { useMatch } from "react-router-dom";
 const TagsInput = lazy(
   () => import("../../../../../common/components/tags-input/TagsInput")

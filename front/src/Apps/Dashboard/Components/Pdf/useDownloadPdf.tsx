@@ -7,7 +7,7 @@ import {
   QueryBsffPdfArgs,
   QueryBsvhuPdfArgs,
   QueryFormPdfArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 
 const FORMS_PDF = gql`
   query FormPdf($id: ID!) {

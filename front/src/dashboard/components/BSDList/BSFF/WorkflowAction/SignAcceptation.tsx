@@ -12,7 +12,7 @@ import {
   Bsff,
   Query,
   QueryBsffArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   ActionButton,
   Modal,

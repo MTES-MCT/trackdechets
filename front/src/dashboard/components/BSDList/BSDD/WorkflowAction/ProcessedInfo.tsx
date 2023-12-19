@@ -10,7 +10,7 @@ import {
   Form as TdForm,
   FormStatus,
   MutationMarkAsProcessedArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import Tooltip from "../../../../../common/components/Tooltip";
 import { subMonths } from "date-fns";
 import OperationModeSelect from "../../../../../common/components/OperationModeSelect";

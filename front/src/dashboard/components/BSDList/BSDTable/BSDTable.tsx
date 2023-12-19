@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useTable, useFilters, useSortBy } from "react-table";
-import { Bsd, BsdWhere, OrderType, QueryBsdsArgs } from "codegen-ui";
+import { Bsd, BsdWhere, OrderType, QueryBsdsArgs } from "@td/codegen-ui";
 import {
   Table,
   TableHead,

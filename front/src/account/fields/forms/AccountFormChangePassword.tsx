@@ -5,7 +5,7 @@ import RedErrorMessage from "../../../common/components/RedErrorMessage";
 import PasswordHelper from "../../../common/components/PasswordHelper";
 import styles from "./AccountForm.module.scss";
 import { object, string } from "yup";
-import { MutationChangePasswordArgs, Mutation } from "codegen-ui";
+import { MutationChangePasswordArgs, Mutation } from "@td/codegen-ui";
 import classNames from "classnames";
 import { NotificationError } from "../../../Apps/common/Components/Error/Error";
 

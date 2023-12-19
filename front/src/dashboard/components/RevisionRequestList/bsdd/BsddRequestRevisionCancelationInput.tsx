@@ -1,4 +1,4 @@
-import { Form as Bsdd, FormStatus } from "codegen-ui";
+import { Form as Bsdd, FormStatus } from "@td/codegen-ui";
 import React from "react";
 import { Switch } from "./request/Switch";
 

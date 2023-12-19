@@ -15,7 +15,7 @@ import {
   BsffType,
   BsffPackagingOperationInput,
   SignatureInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   ActionButton,
   Modal,

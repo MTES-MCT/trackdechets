@@ -10,7 +10,7 @@ import {
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
   CompanySearchResult
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   CREATE_COMPANY,
   CREATE_COMPANY_HOOK_OPTIONS

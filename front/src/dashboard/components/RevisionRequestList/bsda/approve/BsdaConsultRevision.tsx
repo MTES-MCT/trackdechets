@@ -2,7 +2,7 @@ import React from "react";
 import { ActionButton, Modal } from "../../../../../common/components";
 import { IconView } from "../../../../../Apps/common/Components/Icons/Icons";
 import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
-import { BsdaRevisionRequest } from "codegen-ui";
+import { BsdaRevisionRequest } from "@td/codegen-ui";
 import { DisplayRevision } from "./BsdaApproveRevision";
 import { useMatch } from "react-router-dom";
 

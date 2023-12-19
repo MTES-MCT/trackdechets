@@ -8,7 +8,7 @@ import Tooltip from "../../common/components/Tooltip";
 import ProcessingOperation from "../common/components/processing-operation/ProcessingOperation";
 import { Field, useFormikContext } from "formik";
 import { isDangerous } from "shared/constants";
-import { Form } from "codegen-ui";
+import { Form } from "@td/codegen-ui";
 import CompanySelector from "../common/components/company/CompanySelector";
 import DateInput from "../common/components/custom-inputs/DateInput";
 import TemporaryStorage from "./components/temporaryStorage/TemporaryStorage";

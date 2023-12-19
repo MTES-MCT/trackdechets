@@ -9,7 +9,7 @@ import {
   MutationUpdateFormTransporterArgs,
   Query,
   QueryFormArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React, { ReactElement, useMemo, lazy } from "react";
 import { useNavigate } from "react-router-dom";
 import {

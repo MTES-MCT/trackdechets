@@ -1,5 +1,5 @@
 import React from "react";
-import { EmitterType, Form, FormStatus } from "codegen-ui";
+import { EmitterType, Form, FormStatus } from "@td/codegen-ui";
 import MarkAsSealed from "./MarkAsSealed";
 import MarkAsReceived from "./MarkAsReceived";
 import MarkAsAccepted from "./MarkAsAccepted";

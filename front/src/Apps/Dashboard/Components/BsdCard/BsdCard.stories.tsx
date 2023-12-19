@@ -1,6 +1,6 @@
 import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-import { Bsdasri } from "codegen-ui";
+import { Bsdasri } from "@td/codegen-ui";
 
 import BsdCard from "./BsdCard";
 import { BsdCurrentTab } from "../../../common/types/commonTypes";

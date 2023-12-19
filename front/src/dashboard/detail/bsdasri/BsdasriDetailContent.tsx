@@ -9,7 +9,7 @@ import {
   BsdasriPackaging,
   BsdasriType,
   OperationMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import routes from "../../../Apps/routes";
 import { useDownloadPdf } from "../../components/BSDList/BSDasri/BSDasriActions/useDownloadPdf";
 

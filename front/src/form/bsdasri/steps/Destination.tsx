@@ -2,7 +2,7 @@ import CompanySelector from "../../common/components/company/CompanySelector";
 
 import { Field } from "formik";
 import React from "react";
-import { BsdasriStatus } from "codegen-ui";
+import { BsdasriStatus } from "@td/codegen-ui";
 
 import Reception from "./Reception";
 import Operation from "./Operation";

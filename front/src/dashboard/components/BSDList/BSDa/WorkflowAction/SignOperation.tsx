@@ -14,7 +14,7 @@ import {
   MutationSignBsdaArgs,
   MutationUpdateBsdaArgs,
   SignatureTypeInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React from "react";
 import { generatePath, Link, useMatch } from "react-router-dom";
 import * as yup from "yup";

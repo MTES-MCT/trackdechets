@@ -5,7 +5,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { InlineLoader } from "../../../../Apps/common/Components/Loader/Loaders";
 import { debounce } from "../../../../common/helper";
 import useOnClickOutsideRefTarget from "../../../../Apps/common/hooks/useOnClickOutsideRefTarget";
-import { CompanySearchResult } from "codegen-ui";
+import { CompanySearchResult } from "@td/codegen-ui";
 import { IconEmptyCompany } from "../Icons/Icons";
 import "./companySelector.scss";
 

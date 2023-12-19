@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FilterProps } from "react-table";
-import { Bsd } from "codegen-ui";
+import { Bsd } from "@td/codegen-ui";
 
 const DEBOUNCE_DELAY = 500;
 

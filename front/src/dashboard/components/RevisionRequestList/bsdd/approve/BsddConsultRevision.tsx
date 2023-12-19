@@ -2,7 +2,7 @@ import React from "react";
 import { ActionButton, Modal } from "../../../../../common/components";
 import { IconView } from "../../../../../Apps/common/Components/Icons/Icons";
 import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
-import { FormRevisionRequest } from "codegen-ui";
+import { FormRevisionRequest } from "@td/codegen-ui";
 import { DisplayRevision } from "./BsddApproveRevision";
 import { useMatch } from "react-router-dom";
 

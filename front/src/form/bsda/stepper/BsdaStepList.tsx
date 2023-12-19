@@ -14,7 +14,7 @@ import {
   Query,
   Bsda,
   BsdaInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import initialState from "./initial-state";
 import { CREATE_BSDA, UPDATE_BSDA, GET_BSDA } from "./queries";
 import omitDeep from "omit-deep-lodash";

@@ -34,7 +34,7 @@ import {
   BsdasriType,
   BsdaType,
   UserPermission
-} from "codegen-ui";
+} from "@td/codegen-ui";
 
 import { BsdCurrentTab } from "../common/types/commonTypes";
 import {

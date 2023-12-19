@@ -1,6 +1,6 @@
 import React from "react";
 import { gql, useQuery } from "@apollo/client";
-import { Query } from "codegen-ui";
+import { Query } from "@td/codegen-ui";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import { Toaster } from "react-hot-toast";

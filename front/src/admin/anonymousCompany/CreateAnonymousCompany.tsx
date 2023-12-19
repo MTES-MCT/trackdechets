@@ -7,7 +7,7 @@ import {
   AnonymousCompanyInput,
   Mutation,
   MutationCreateAnonymousCompanyArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { InlineError } from "../../Apps/common/Components/Error/Error";
 import { RedErrorMessage } from "../../common/components";
 import { isFRVat, isSiret, isVat } from "shared/constants";

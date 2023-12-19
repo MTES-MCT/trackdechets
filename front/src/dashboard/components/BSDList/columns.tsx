@@ -5,7 +5,7 @@ import {
   FilterProps,
   CellProps
 } from "react-table";
-import { Bsd, Bsdasri, Bsda, Form, Bsvhu } from "codegen-ui";
+import { Bsd, Bsdasri, Bsda, Form, Bsvhu } from "@td/codegen-ui";
 import { BSDTypeFilter } from "./BSDTypeFilter";
 import { TextInputFilter } from "./TextInputFilter";
 import {

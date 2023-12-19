@@ -11,7 +11,7 @@ import {
 
 import routes from "../../../../../Apps/routes";
 
-import { Bsdasri, BsdasriStatus, BsdasriType } from "codegen-ui";
+import { Bsdasri, BsdasriStatus, BsdasriType } from "@td/codegen-ui";
 
 export interface WorkflowActionProps {
   form: Bsdasri;

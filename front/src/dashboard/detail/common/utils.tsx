@@ -1,6 +1,6 @@
 import React from "react";
 import EstimatedQuantityTooltip from "../../../common/components/EstimatedQuantityTooltip";
-import { Consistence, WasteAcceptationStatus, QuantityType } from "codegen-ui";
+import { Consistence, WasteAcceptationStatus, QuantityType } from "@td/codegen-ui";
 
 export const getVerboseConsistence = (
   consistence: Consistence | null | undefined | ""
