@@ -8,7 +8,7 @@ import { WorkflowAction } from "./WorkflowAction";
 import { UpdateTransporterCustomInfo } from "./BsffActions/UpdateTransporterCustomInfo";
 import { UpdateTransporterPlates } from "./BsffActions/UpdateTransporterPlates";
 import { BsffStatus } from "@td/codegen-ui";
-import { BSFF_VERBOSE_STATUSES } from "shared/constants";
+import { BSFF_VERBOSE_STATUSES } from "@td/constants";
 
 export const COLUMNS: Record<
   string,

@@ -11,7 +11,7 @@ import { AuthType } from "../../../auth";
 import {
   MIN_MY_COMPANIES_SEARCH,
   MAX_MY_COMPANIES_SEARCH
-} from "shared/constants";
+} from "@td/constants";
 import { UserInputError } from "../../../common/errors";
 import { libelleFromCodeNaf } from "../../../companies/sirene/utils";
 

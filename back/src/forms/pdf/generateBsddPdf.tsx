@@ -35,7 +35,7 @@ import {
 } from "../converter";
 import { prisma } from "@td/prisma";
 import { buildAddress } from "../../companies/sirene/utils";
-import { packagingsEqual } from "shared/constants";
+import { packagingsEqual } from "@td/constants";
 import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../common/operationModes";
 

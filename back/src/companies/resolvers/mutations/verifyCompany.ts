@@ -15,9 +15,9 @@ import {
 } from "@td/mail";
 import { prisma } from "@td/prisma";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 import { isTransporter } from "../../validation";
-import * as COMPANY_CONSTANTS from "shared/constants";
+import * as COMPANY_CONSTANTS from "@td/constants";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import {
   NotCompanyAdminErrorMsg,

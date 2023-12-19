@@ -11,7 +11,7 @@ import {
   CompanyType as _CompanyType,
   CompanySearchResult
 } from "@td/codegen-ui";
-import { isSiret, isVat } from "shared/constants";
+import { isSiret, isVat } from "@td/constants";
 
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";

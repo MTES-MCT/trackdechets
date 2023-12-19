@@ -29,7 +29,7 @@ import {
   onCompanySelected,
   validationSchema
 } from "../../../../../detail/bsdd/EditSegment";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 import { TOAST_DURATION } from "../../../../../../common/config";
 
 const PREPARE_SEGMENT = gql`

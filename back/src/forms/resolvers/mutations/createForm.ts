@@ -1,5 +1,5 @@
 import { EmitterType, Prisma, TransportMode } from "@prisma/client";
-import { isDangerous } from "shared/constants";
+import { isDangerous } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationCreateFormArgs,

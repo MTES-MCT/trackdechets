@@ -14,7 +14,7 @@ import TransporterInfoEdit from "./TransporterInfoEdit";
 import { WorkflowAction } from "./WorkflowAction";
 import { useQuery } from "@apollo/client";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../../Apps/common/queries/company/query";
-import { STATUS_LABELS } from "shared/constants";
+import { STATUS_LABELS } from "@td/constants";
 
 export const COLUMNS: Record<
   string,

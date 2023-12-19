@@ -7,7 +7,7 @@ import TdSwitch from "../../common/components/Switch";
 import Tooltip from "../../common/components/Tooltip";
 import ProcessingOperation from "../common/components/processing-operation/ProcessingOperation";
 import { Field, useFormikContext } from "formik";
-import { isDangerous } from "shared/constants";
+import { isDangerous } from "@td/constants";
 import { Form } from "@td/codegen-ui";
 import CompanySelector from "../common/components/company/CompanySelector";
 import DateInput from "../common/components/custom-inputs/DateInput";

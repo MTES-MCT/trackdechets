@@ -2,7 +2,7 @@ import { BsdasriStatus, Bsdasri, BsdasriType, BsdType } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { buildAddress } from "../companies/sirene/utils";
 import {
   BsdasriWithGrouping,

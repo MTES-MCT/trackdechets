@@ -38,7 +38,7 @@ import {
 
 import classNames from "classnames";
 import { getOperationModeLabel } from "../../../common/operationModes";
-import { DASRI_VERBOSE_STATUSES } from "shared/constants";
+import { DASRI_VERBOSE_STATUSES } from "@td/constants";
 
 const getVerboseWasteName = (code: string): string => {
   const desc = {

@@ -2,14 +2,14 @@ import { BsddTransporter, Form } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { getCompanyAdminUsers } from "../../companies/database";
 import { generateBsddPdfToBase64 } from "../pdf";
-import { Dreals } from "shared/constants";
+import { Dreals } from "@td/constants";
 import {
   Mail,
   renderMail,
   formNotAccepted,
   formPartiallyRefused
 } from "@td/mail";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { getFirstTransporter } from "../database";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;

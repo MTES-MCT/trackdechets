@@ -23,7 +23,7 @@ import { removeEmptyKeys } from "../../../../../common/helper";
 import { ReviewableField } from "../../bsdd/request/ReviewableField";
 import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../Apps/common/queries/reviews/BsdaReviewQuery";
 import styles from "./BsdaRequestRevision.module.scss";
-import { BSDA_WASTES } from "shared/constants";
+import { BSDA_WASTES } from "@td/constants";
 import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCancelationInput";
 import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
 import TagsInput from "../../../../../common/components/tags-input/TagsInput";

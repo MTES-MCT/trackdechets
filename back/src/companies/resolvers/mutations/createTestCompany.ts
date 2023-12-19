@@ -2,7 +2,7 @@ import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { TEST_COMPANY_PREFIX } from "shared/constants";
+import { TEST_COMPANY_PREFIX } from "@td/constants";
 
 /**
  * Generate a new test siret by incrementing last generated siret

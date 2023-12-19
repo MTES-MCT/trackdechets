@@ -39,9 +39,9 @@ import {
 } from "../../../common/components";
 import { formatDate } from "../../../common/datetime";
 import { PACKAGINGS_NAMES } from "../../../form/bsff/components/packagings/Packagings";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 import { getOperationModeLabel } from "../../../common/operationModes";
-import { BSFF_VERBOSE_STATUSES } from "shared/constants";
+import { BSFF_VERBOSE_STATUSES } from "@td/constants";
 
 type CompanyProps = {
   company?: FormCompany | null;

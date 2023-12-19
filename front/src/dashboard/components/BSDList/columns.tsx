@@ -14,7 +14,7 @@ import {
   GET_BSDS_PLATES_MAX_LENGTH,
   GET_BSDS_CUSTOM_INFO_MAX_LENGTH,
   GET_BSDS_WASTE_MAX_LENGTH
-} from "shared/constants";
+} from "@td/constants";
 import * as bsdd from "./BSDD";
 import * as bsdasri from "./BSDasri";
 import * as bsvhu from "./BSVhu";

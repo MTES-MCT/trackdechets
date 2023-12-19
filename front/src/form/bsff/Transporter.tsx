@@ -4,7 +4,7 @@ import TdTooltip from "../../common/components/Tooltip";
 import CompanySelector from "../common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
 import { Bsff } from "@td/codegen-ui";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 const TagsInput = lazy(
   () => import("../../common/components/tags-input/TagsInput")
 );

@@ -10,7 +10,7 @@ import { debounce } from "../common/helper";
 import {
   MIN_MY_COMPANIES_SEARCH,
   MAX_MY_COMPANIES_SEARCH
-} from "shared/constants";
+} from "@td/constants";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 

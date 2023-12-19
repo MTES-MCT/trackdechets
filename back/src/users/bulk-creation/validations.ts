@@ -3,7 +3,7 @@ import * as yup from "yup";
 import { prisma } from "@td/prisma";
 import { CompanyRow } from "./types";
 import { searchCompany } from "../../companies/search";
-import { isClosedCompany } from "shared/constants";
+import { isClosedCompany } from "@td/constants";
 
 /**
  * Validation schema for company

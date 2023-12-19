@@ -29,7 +29,7 @@ import {
 } from "../../../../../form/bsff/utils/queries";
 import { GET_BSDS } from "../../../../../Apps/common/queries";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
-import { BSFF_WASTES } from "shared/constants";
+import { BSFF_WASTES } from "@td/constants";
 import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
 import { BsffSummary } from "./BsffSummary";
 import TdTooltip from "../../../../../common/components/Tooltip";

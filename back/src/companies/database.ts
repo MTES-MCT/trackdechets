@@ -19,7 +19,7 @@ import { UserInputError } from "../common/errors";
 import { allFavoriteTypes } from "./types";
 import { favoritesCompanyQueue } from "../queue/producers/company";
 import { searchTDSireneFailFast } from "./sirenify";
-import { isSiret, isVat } from "shared/constants";
+import { isSiret, isVat } from "@td/constants";
 import {
   PartialCompanyVatSearchResult,
   searchVatFrOnlyOrNotFoundFailFast

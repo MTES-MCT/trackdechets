@@ -11,7 +11,7 @@ import CompanySelector from "../../../../../form/common/components/company/Compa
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "../../../../../form/common/components/custom-inputs/RadioButton";
 import { Field, Form, Formik } from "formik";
-import { packagingsEqual } from "shared/constants";
+import { packagingsEqual } from "@td/constants";
 import {
   FormStatus,
   Mutation,

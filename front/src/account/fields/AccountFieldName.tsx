@@ -4,7 +4,7 @@ import AccountField from "./AccountField";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import { object, string } from "yup";
 import { User, MutationEditProfileArgs } from "@td/codegen-ui";
-import { SSTI_CHARS } from "shared/constants";
+import { SSTI_CHARS } from "@td/constants";
 type Me = Pick<User, "name">;
 
 type Props = {

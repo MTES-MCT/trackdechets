@@ -7,7 +7,7 @@ import { getBsdaEditionDisabledSteps } from "../../utils/getBsdaEditionDisabledS
 import Tooltip from "../../../../common/components/Tooltip";
 import { Bsda, BsdaConsistence, BsdaType } from "@td/codegen-ui";
 import { FieldSwitch } from "../../../../common/components";
-import { BSDA_WASTES } from "shared/constants";
+import { BSDA_WASTES } from "@td/constants";
 import { BsdaContext } from "../../FormContainer";
 import EstimatedQuantityTooltip from "../../../../common/components/EstimatedQuantityTooltip";
 const TagsInput = lazy(

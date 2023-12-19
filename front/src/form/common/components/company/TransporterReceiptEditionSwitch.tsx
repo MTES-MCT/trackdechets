@@ -1,6 +1,6 @@
 import React from "react";
 import TdSwitch from "../../../../common/components/Switch";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 import {
   BsdaTransporterInput,
   BsdasriTransporterInput,

@@ -6,7 +6,7 @@ import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
-import * as COMPANY_CONSTANTS from "shared/constants";
+import * as COMPANY_CONSTANTS from "@td/constants";
 import {
   renderMail,
   onboardingFirstStep,
@@ -20,7 +20,7 @@ import {
   isSiret,
   isVat,
   CLOSED_COMPANY_ERROR
-} from "shared/constants";
+} from "@td/constants";
 import { searchCompany } from "../../search";
 import {
   addToGeocodeCompanyQueue,

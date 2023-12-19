@@ -10,7 +10,7 @@ import {
 import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import { constantCase } from "constant-case";
 import { Field, useField, useFormikContext } from "formik";
-import { isFRVat, isVat, isForeignVat } from "shared/constants";
+import { isFRVat, isVat, isForeignVat } from "@td/constants";
 import React, {
   useCallback,
   useEffect,

@@ -15,8 +15,8 @@ import AccountFieldCompanyVerificationStatus from "./fields/AccountFieldCompanyV
 import AccountFieldCompanyVhuAgrementBroyeur from "./fields/AccountFieldCompanyVhuAgrementBroyeur";
 import AccountFieldCompanyVhuAgrementDemolisseur from "./fields/AccountFieldCompanyVhuAgrementDemolisseur";
 import AccountFieldCompanyWorkerCertification from "./fields/AccountFieldCompanyWorkerCertification";
-import * as COMPANY_CONSTANTS from "shared/constants";
-import { isSiret, isVat } from "shared/constants";
+import * as COMPANY_CONSTANTS from "@td/constants";
+import { isSiret, isVat } from "@td/constants";
 import AccountInfoAutoUpdate from "./fields/AccountInfoAutoUpdate";
 
 type Props = { company: CompanyPrivate };

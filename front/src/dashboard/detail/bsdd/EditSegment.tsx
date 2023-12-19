@@ -20,7 +20,7 @@ import {
   FieldTransportModeSelect,
   RedErrorMessage
 } from "../../../common/components";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 import { transporterCompanySchema } from "../../../common/validation/schema";
 import { TOAST_DURATION } from "../../../common/config";
 

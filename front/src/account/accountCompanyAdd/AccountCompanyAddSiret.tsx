@@ -11,7 +11,7 @@ import {
   isVat,
   isClosedCompany,
   CLOSED_COMPANY_ERROR
-} from "shared/constants";
+} from "@td/constants";
 
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";

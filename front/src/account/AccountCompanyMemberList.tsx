@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import AccountFormCompanyInviteNewUser from "./fields/forms/AccountFormCompanyInviteNewUser";
 import AccountCompanyMember from "./AccountCompanyMember";
 import { CompanyPrivate, CompanyVerificationStatus } from "@td/codegen-ui";
-import * as COMPANY_CONSTANTS from "shared/constants";
+import * as COMPANY_CONSTANTS from "@td/constants";
 
 const { VITE_VERIFY_COMPANY } = import.meta.env;
 

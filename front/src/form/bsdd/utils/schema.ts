@@ -10,7 +10,7 @@ import {
   SchemaOf
 } from "yup";
 
-import { isDangerous } from "shared/constants";
+import { isDangerous } from "@td/constants";
 import {
   PackagingInfo,
   Packagings,
@@ -21,7 +21,7 @@ import {
 } from "@td/codegen-ui";
 import graphlClient from "../../../graphql-client";
 import { COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA } from "../../../Apps/common/queries/company/query";
-import { isVat, isFRVat, isSiret } from "shared/constants";
+import { isVat, isFRVat, isSiret } from "@td/constants";
 import {
   companySchema,
   transporterCompanySchema

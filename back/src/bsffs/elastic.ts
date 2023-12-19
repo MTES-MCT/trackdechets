@@ -3,7 +3,7 @@ import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { toBsffDestination } from "./compat";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   BsffWithFicheInterventions,
   BsffWithPackagings,

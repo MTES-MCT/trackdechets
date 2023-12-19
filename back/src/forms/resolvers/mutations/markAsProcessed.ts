@@ -1,5 +1,5 @@
 import { EmitterType, Prisma, Status } from "@prisma/client";
-import { PROCESSING_OPERATIONS } from "shared/constants";
+import { PROCESSING_OPERATIONS } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
@@ -15,7 +15,7 @@ import { getFormRepository } from "../../repository";
 import machine from "../../workflow/machine";
 import { runInTransaction } from "../../../common/repository/helper";
 import { checkVAT } from "jsvat";
-import { cleanClue, countries, isSiret, isVat } from "shared/constants";
+import { cleanClue, countries, isSiret, isVat } from "@td/constants";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,

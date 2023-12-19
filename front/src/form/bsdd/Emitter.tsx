@@ -12,7 +12,7 @@ import {
 import "./Emitter.scss";
 import MyCompanySelector from "../common/components/company/MyCompanySelector";
 import { emitterTypeLabels } from "../../dashboard/constants";
-import { isForeignVat, isOmi } from "shared/constants";
+import { isForeignVat, isOmi } from "@td/constants";
 import { RedErrorMessage } from "../../common/components";
 import Tooltip from "../../common/components/Tooltip";
 

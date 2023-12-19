@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isForeignVat, isSiret, isVat } from "shared/constants";
+import { isForeignVat, isSiret, isVat } from "@td/constants";
 import {
   isCollector,
   isTransporter,

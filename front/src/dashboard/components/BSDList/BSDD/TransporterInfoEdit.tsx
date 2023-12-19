@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import React, { useState } from "react";
 
 import { Form as FormModel } from "@td/codegen-ui";
-import { isBsddTransporterFieldEditable } from "shared/constants";
+import { isBsddTransporterFieldEditable } from "@td/constants";
 import { NotificationError } from "../../../../Apps/common/Components/Error/Error";
 import { capitalize } from "../../../../common/helper";
 import { IconPaperWrite } from "../../../../Apps/common/Components/Icons/Icons";

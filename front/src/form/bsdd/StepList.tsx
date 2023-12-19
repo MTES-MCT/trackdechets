@@ -27,7 +27,7 @@ import {
   CREATE_FORM_TRANSPORTER,
   UPDATE_FORM_TRANSPORTER
 } from "../../Apps/Forms/Components/query";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (form: Form | undefined) => ReactElement;

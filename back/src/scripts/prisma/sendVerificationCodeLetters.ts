@@ -1,6 +1,6 @@
 import { CompanyVerificationStatus } from "@prisma/client";
 import { sendVerificationCodeLetter } from "../../common/post";
-import * as COMPANY_CONSTANTS from "shared/constants";
+import * as COMPANY_CONSTANTS from "@td/constants";
 import { prisma } from "@td/prisma";
 import { CompanyType } from "@prisma/client";
 

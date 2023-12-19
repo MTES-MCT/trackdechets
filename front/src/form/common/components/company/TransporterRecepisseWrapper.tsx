@@ -14,7 +14,7 @@ import {
   Query,
   QueryCompanyPrivateInfosArgs
 } from "@td/codegen-ui";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 import { TRANSPORTER_RECEIPT } from "../../../../Apps/common/queries/company/query";
 import { useQuery } from "@apollo/client";
 import TransporterRecepisse from "../../../../Apps/Forms/Components/TransporterRecepisse/TransporterRecepisse";

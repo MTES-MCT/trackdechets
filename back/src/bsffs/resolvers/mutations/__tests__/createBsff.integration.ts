@@ -1,7 +1,7 @@
 import { BsffPackagingType, BsffType, UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { BSFF_WASTE_CODES } from "shared/constants";
+import { BSFF_WASTE_CODES } from "@td/constants";
 import {
   Mutation,
   MutationCreateBsffArgs,

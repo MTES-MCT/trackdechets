@@ -34,7 +34,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { InitialBsdas } from "./InitialBsdas";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import EstimatedQuantityTooltip from "../../../common/components/EstimatedQuantityTooltip";
-import { BSDA_VERBOSE_STATUSES } from "shared/constants";
+import { BSDA_VERBOSE_STATUSES } from "@td/constants";
 import ExpandableList from "./ExpandableList";
 
 type CompanyProps = {

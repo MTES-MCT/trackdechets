@@ -57,15 +57,15 @@ import { WorkflowAction } from "../../components/BSDList";
 import EditSegment from "./EditSegment";
 import { Modal } from "../../../common/components";
 import { Loader } from "../../../Apps/common/Components";
-import { isDangerous } from "shared/constants";
+import { isDangerous } from "@td/constants";
 import { format } from "date-fns";
-import { isForeignVat, isSiret } from "shared/constants";
+import { isForeignVat, isSiret } from "@td/constants";
 import { Appendix1ProducerForm } from "../../../form/bsdd/appendix1Producer/form";
 import { useQuery } from "@apollo/client";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../Apps/common/queries/company/query";
 import { formTransportIsPipeline } from "../../../form/bsdd/utils/packagings";
 import { getOperationModeLabel } from "../../../common/operationModes";
-import { STATUS_LABELS } from "shared/constants";
+import { STATUS_LABELS } from "@td/constants";
 import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
 import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
 
