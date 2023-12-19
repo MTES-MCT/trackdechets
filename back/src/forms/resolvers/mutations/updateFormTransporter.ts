@@ -8,7 +8,7 @@ import {
 } from "../../converter";
 import { transporterSchemaFn } from "../../validation";
 import { getFormTransporterOrNotFound } from "../../database";
-import { checkCanUpdate } from "../../permissions";
+import { checkCanUpdateFormTransporter } from "../../permissions";
 import { UserInputError } from "../../../common/errors";
 import { sirenifyTransporterInput } from "../../sirenify";
 import { recipifyTransporterInput } from "../../recipify";
@@ -29,8 +29,8 @@ const updateFormTransporterResolver: MutationResolvers["updateFormTransporter"] 
         .findUniqueOrThrow({
           where: { id }
         })
-        .form({ include: { transporters: true } });
-      await checkCanUpdate(user, form!, { id: form!.id });
+        .form();
+      await checkCanUpdateFormTransporter(user, form!, id, input);
     }
     const isUpdatingCompany =
       input?.company?.siret || input?.company?.vatNumber;
