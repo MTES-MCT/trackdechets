@@ -22,6 +22,7 @@
     "baseUrl": ".",
     "paths": {
       "@td/codegen-ui": ["libs/front/codegen-ui/src/index.ts"],
+      "@td/constants": ["libs/shared/constants/src/index.ts"],
       "@td/env": ["libs/back/env/src/index.ts"],
       "@td/logger": ["libs/back/logger/src/index.ts"],
       "@td/mail": ["libs/back/mail/src/index.ts"],
@@ -31,8 +32,7 @@
       "back": ["back/src/index.ts"],
       "libs/back/tests-integration": [
         "libs/back/tests-integration/src/index.ts"
-      ],
-      "shared/constants": ["shared/constants/src/index.ts"]
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]
