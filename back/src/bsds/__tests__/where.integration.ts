@@ -1039,7 +1039,7 @@ describe("search on nextDestinationCompanyVatNumber", () => {
   });
 });
 
-describe("search on companiesNames", () => {
+describe("search on companyNames", () => {
   afterAll(resetDatabase);
 
   beforeAll(async () => {
@@ -1047,17 +1047,17 @@ describe("search on companiesNames", () => {
       {
         id: "1",
         updatedAt: new Date().getTime(),
-        companiesNames: "Foo\nBar"
+        companyNames: "Foo\nBar"
       },
       {
         id: "2",
         updatedAt: new Date().getTime(),
-        companiesNames: "Foo"
+        companyNames: "Foo"
       },
       {
         id: "3",
         updatedAt: new Date().getTime(),
-        companiesNames: ""
+        companyNames: ""
       }
     ];
 
@@ -1067,7 +1067,7 @@ describe("search on companiesNames", () => {
 
   it("should return one result", async () => {
     const where: BsdWhere = {
-      companiesNames: {
+      companyNames: {
         _match: "Bar"
       }
     };
@@ -1086,7 +1086,7 @@ describe("search on companiesNames", () => {
 
   it("should return several results", async () => {
     const where: BsdWhere = {
-      companiesNames: {
+      companyNames: {
         _match: "Foo"
       }
     };
@@ -1107,7 +1107,7 @@ describe("search on companiesNames", () => {
 
   it("should return nothing", async () => {
     const where: BsdWhere = {
-      companiesNames: {
+      companyNames: {
         _match: "X"
       }
     };
@@ -1124,7 +1124,7 @@ describe("search on companiesNames", () => {
   });
 });
 
-describe("search on companiesOrgIds", () => {
+describe("search on companyOrgIds", () => {
   afterAll(resetDatabase);
 
   beforeAll(async () => {
@@ -1132,17 +1132,17 @@ describe("search on companiesOrgIds", () => {
       {
         id: "1",
         updatedAt: new Date().getTime(),
-        companiesOrgIds: ["SIRET1", "SIRET2"]
+        companyOrgIds: ["SIRET1", "SIRET2"]
       },
       {
         id: "2",
         updatedAt: new Date().getTime(),
-        companiesOrgIds: ["SIRET1"]
+        companyOrgIds: ["SIRET1"]
       },
       {
         id: "3",
         updatedAt: new Date().getTime(),
-        companiesOrgIds: []
+        companyOrgIds: []
       }
     ];
 
@@ -1152,7 +1152,7 @@ describe("search on companiesOrgIds", () => {
 
   it("should return one result", async () => {
     const where: BsdWhere = {
-      companiesOrgIds: {
+      companyOrgIds: {
         _has: "SIRET2"
       }
     };
@@ -1171,7 +1171,7 @@ describe("search on companiesOrgIds", () => {
 
   it("should return several results", async () => {
     const where: BsdWhere = {
-      companiesOrgIds: {
+      companyOrgIds: {
         _has: "SIRET1"
       }
     };
@@ -1192,7 +1192,7 @@ describe("search on companiesOrgIds", () => {
 
   it("should return nothing", async () => {
     const where: BsdWhere = {
-      companiesOrgIds: {
+      companyOrgIds: {
         _has: "SIRET3"
       }
     };

@@ -45,20 +45,20 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     elasticBsdasri = toBsdElastic(bsdasriForElastic);
   });
 
-  test("companiesNames > should contain the names of ALL BSDASRI companies", async () => {
+  test("companyNames > should contain the names of ALL BSDASRI companies", async () => {
     // Then
-    expect(elasticBsdasri.companiesNames).toContain(emitter.name);
-    expect(elasticBsdasri.companiesNames).toContain(transporter.name);
-    expect(elasticBsdasri.companiesNames).toContain(destination.name);
-    expect(elasticBsdasri.companiesNames).toContain(ecoOrganisme.name);
+    expect(elasticBsdasri.companyNames).toContain(emitter.name);
+    expect(elasticBsdasri.companyNames).toContain(transporter.name);
+    expect(elasticBsdasri.companyNames).toContain(destination.name);
+    expect(elasticBsdasri.companyNames).toContain(ecoOrganisme.name);
   });
 
-  test("companiesOrgIds > should contain the orgIds of ALL BSDASRI companies", async () => {
+  test("companyOrgIds > should contain the orgIds of ALL BSDASRI companies", async () => {
     // Then
-    expect(elasticBsdasri.companiesOrgIds).toContain(emitter.siret);
-    expect(elasticBsdasri.companiesOrgIds).toContain(transporter.siret);
-    expect(elasticBsdasri.companiesOrgIds).toContain(transporter.vatNumber);
-    expect(elasticBsdasri.companiesOrgIds).toContain(destination.siret);
-    expect(elasticBsdasri.companiesOrgIds).toContain(ecoOrganisme.siret);
+    expect(elasticBsdasri.companyOrgIds).toContain(emitter.siret);
+    expect(elasticBsdasri.companyOrgIds).toContain(transporter.siret);
+    expect(elasticBsdasri.companyOrgIds).toContain(transporter.vatNumber);
+    expect(elasticBsdasri.companyOrgIds).toContain(destination.siret);
+    expect(elasticBsdasri.companyOrgIds).toContain(ecoOrganisme.siret);
   });
 });

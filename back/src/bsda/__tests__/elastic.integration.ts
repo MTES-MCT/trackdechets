@@ -85,30 +85,30 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     elasticBsda = toBsdElastic(bsdaForElastic);
   });
 
-  test("companiesNames > should contain the names of ALL BSDA companies", async () => {
+  test("companyNames > should contain the names of ALL BSDA companies", async () => {
     // Then
-    expect(elasticBsda.companiesNames).toContain(emitter.name);
-    expect(elasticBsda.companiesNames).toContain(worker.name);
-    expect(elasticBsda.companiesNames).toContain(transporter.name);
-    expect(elasticBsda.companiesNames).toContain(destination.name);
-    expect(elasticBsda.companiesNames).toContain(broker.name);
-    expect(elasticBsda.companiesNames).toContain(ecoOrganisme.name);
-    expect(elasticBsda.companiesNames).toContain(nextDestination.name);
-    expect(elasticBsda.companiesNames).toContain(intermediary1.name);
-    expect(elasticBsda.companiesNames).toContain(intermediary2.name);
+    expect(elasticBsda.companyNames).toContain(emitter.name);
+    expect(elasticBsda.companyNames).toContain(worker.name);
+    expect(elasticBsda.companyNames).toContain(transporter.name);
+    expect(elasticBsda.companyNames).toContain(destination.name);
+    expect(elasticBsda.companyNames).toContain(broker.name);
+    expect(elasticBsda.companyNames).toContain(ecoOrganisme.name);
+    expect(elasticBsda.companyNames).toContain(nextDestination.name);
+    expect(elasticBsda.companyNames).toContain(intermediary1.name);
+    expect(elasticBsda.companyNames).toContain(intermediary2.name);
   });
 
-  test("companiesOrgIds > should contain the orgIds of ALL BSDA companies", async () => {
+  test("companyOrgIds > should contain the orgIds of ALL BSDA companies", async () => {
     // Then
-    expect(elasticBsda.companiesOrgIds).toContain(emitter.siret);
-    expect(elasticBsda.companiesOrgIds).toContain(worker.siret);
-    expect(elasticBsda.companiesOrgIds).toContain(transporter.siret);
-    expect(elasticBsda.companiesOrgIds).toContain(transporter.vatNumber);
-    expect(elasticBsda.companiesOrgIds).toContain(destination.siret);
-    expect(elasticBsda.companiesOrgIds).toContain(broker.siret);
-    expect(elasticBsda.companiesOrgIds).toContain(ecoOrganisme.siret);
-    expect(elasticBsda.companiesOrgIds).toContain(nextDestination.siret);
-    expect(elasticBsda.companiesOrgIds).toContain(intermediary1.siret);
-    expect(elasticBsda.companiesOrgIds).toContain(intermediary2.siret);
+    expect(elasticBsda.companyOrgIds).toContain(emitter.siret);
+    expect(elasticBsda.companyOrgIds).toContain(worker.siret);
+    expect(elasticBsda.companyOrgIds).toContain(transporter.siret);
+    expect(elasticBsda.companyOrgIds).toContain(transporter.vatNumber);
+    expect(elasticBsda.companyOrgIds).toContain(destination.siret);
+    expect(elasticBsda.companyOrgIds).toContain(broker.siret);
+    expect(elasticBsda.companyOrgIds).toContain(ecoOrganisme.siret);
+    expect(elasticBsda.companyOrgIds).toContain(nextDestination.siret);
+    expect(elasticBsda.companyOrgIds).toContain(intermediary1.siret);
+    expect(elasticBsda.companyOrgIds).toContain(intermediary2.siret);
   });
 });

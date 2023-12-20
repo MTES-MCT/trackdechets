@@ -337,8 +337,8 @@ export const filterPredicates: {
       _and: [
         {
           _or: [
-            { companiesNames: { _match: value } },
-            { companiesOrgIds: { _itemContains: value } }
+            { companyNames: { _match: value } },
+            { companyOrgIds: { _itemContains: value } }
           ]
         }
       ]

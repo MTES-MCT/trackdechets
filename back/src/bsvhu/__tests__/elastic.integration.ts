@@ -56,18 +56,18 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     elasticBsvhu = toBsdElastic(bsvhu);
   });
 
-  test("companiesNames > should contain the names of ALL BSVHU companies", async () => {
+  test("companyNames > should contain the names of ALL BSVHU companies", async () => {
     // Then
-    expect(elasticBsvhu.companiesNames).toContain(emitter.name);
-    expect(elasticBsvhu.companiesNames).toContain(transporter.name);
-    expect(elasticBsvhu.companiesNames).toContain(destination.name);
+    expect(elasticBsvhu.companyNames).toContain(emitter.name);
+    expect(elasticBsvhu.companyNames).toContain(transporter.name);
+    expect(elasticBsvhu.companyNames).toContain(destination.name);
   });
 
-  test("companiesOrgIds > should contain the orgIds of ALL BSVHU companies", async () => {
+  test("companyOrgIds > should contain the orgIds of ALL BSVHU companies", async () => {
     // Then
-    expect(elasticBsvhu.companiesOrgIds).toContain(emitter.siret);
-    expect(elasticBsvhu.companiesOrgIds).toContain(transporter.siret);
-    expect(elasticBsvhu.companiesOrgIds).toContain(transporter.vatNumber);
-    expect(elasticBsvhu.companiesOrgIds).toContain(destination.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(emitter.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(transporter.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(transporter.vatNumber);
+    expect(elasticBsvhu.companyOrgIds).toContain(destination.siret);
   });
 });

@@ -150,7 +150,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
     rawBsd: form,
 
     // ALL actors from the BSDD, for quick search
-    companiesNames: [
+    companyNames: [
       form.emitterCompanyName,
       form.nextDestinationCompanyName,
       form.traderCompanyName,
@@ -167,8 +167,8 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
       )
     ]
       .filter(Boolean)
-      .join("\n"),
-    companiesOrgIds: [
+      .join(" "),
+    companyOrgIds: [
       form.emitterCompanySiret,
       form.nextDestinationCompanySiret,
       form.traderCompanySiret,

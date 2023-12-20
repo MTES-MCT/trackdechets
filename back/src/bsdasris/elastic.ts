@@ -219,15 +219,15 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     rawBsd: bsdasri,
 
     // ALL actors from the BSDASRI, for quick search
-    companiesNames: [
+    companyNames: [
       bsdasri.emitterCompanyName,
       bsdasri.ecoOrganismeName,
       bsdasri.transporterCompanyName,
       bsdasri.destinationCompanyName
     ]
       .filter(Boolean)
-      .join("\n"),
-    companiesOrgIds: [
+      .join(" "),
+    companyOrgIds: [
       bsdasri.emitterCompanySiret,
       bsdasri.ecoOrganismeSiret,
       bsdasri.transporterCompanySiret,

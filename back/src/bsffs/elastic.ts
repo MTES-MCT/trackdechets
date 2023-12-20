@@ -119,15 +119,15 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     rawBsd: bsff,
 
     // ALL actors from the BSFF, for quick search
-    companiesNames: [
+    companyNames: [
       bsff.emitterCompanyName,
       bsff.transporterCompanyName,
       bsff.destinationCompanyName,
       ...bsff.ficheInterventions.map(fiche => fiche.detenteurCompanyName)
     ]
       .filter(Boolean)
-      .join("\n"),
-    companiesOrgIds: [
+      .join(" "),
+    companyOrgIds: [
       bsff.emitterCompanySiret,
       bsff.transporterCompanySiret,
       bsff.transporterCompanyVatNumber,

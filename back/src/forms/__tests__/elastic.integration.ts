@@ -437,42 +437,40 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     elasticBsd = toBsdElastic(formForElastic);
   });
 
-  test("companiesNames > should contain the names of ALL BSD companies", async () => {
+  test("companyNames > should contain the names of ALL BSD companies", async () => {
     // Then
-    expect(elasticBsd.companiesNames).toContain(emitter.name);
-    expect(elasticBsd.companiesNames).toContain(nextDestination.name);
-    expect(elasticBsd.companiesNames).toContain(trader.name);
-    expect(elasticBsd.companiesNames).toContain(broker.name);
-    expect(elasticBsd.companiesNames).toContain(ecoOrganisme.name);
-    expect(elasticBsd.companiesNames).toContain(recipient.name);
-    expect(elasticBsd.companiesNames).toContain(transporter1.name);
-    expect(elasticBsd.companiesNames).toContain(transporter2.name);
-    expect(elasticBsd.companiesNames).toContain(intermediary1.name);
-    expect(elasticBsd.companiesNames).toContain(intermediary2.name);
-    expect(elasticBsd.companiesNames).toContain(
-      forwardedInNextDestination.name
-    );
+    expect(elasticBsd.companyNames).toContain(emitter.name);
+    expect(elasticBsd.companyNames).toContain(nextDestination.name);
+    expect(elasticBsd.companyNames).toContain(trader.name);
+    expect(elasticBsd.companyNames).toContain(broker.name);
+    expect(elasticBsd.companyNames).toContain(ecoOrganisme.name);
+    expect(elasticBsd.companyNames).toContain(recipient.name);
+    expect(elasticBsd.companyNames).toContain(transporter1.name);
+    expect(elasticBsd.companyNames).toContain(transporter2.name);
+    expect(elasticBsd.companyNames).toContain(intermediary1.name);
+    expect(elasticBsd.companyNames).toContain(intermediary2.name);
+    expect(elasticBsd.companyNames).toContain(forwardedInNextDestination.name);
   });
 
-  test("companiesOrgIds > should contain the orgIds of ALL BSD companies", async () => {
+  test("companyOrgIds > should contain the orgIds of ALL BSD companies", async () => {
     // Then
-    expect(elasticBsd.companiesOrgIds).toContain(emitter.siret);
-    expect(elasticBsd.companiesOrgIds).toContain(nextDestination.siret);
-    expect(elasticBsd.companiesOrgIds).toContain(trader.siret);
-    expect(elasticBsd.companiesOrgIds).toContain(broker.siret);
-    expect(elasticBsd.companiesOrgIds).toContain(ecoOrganisme.siret);
-    expect(elasticBsd.companiesOrgIds).toContain(recipient.siret);
-    expect(elasticBsd.companiesOrgIds).toContain(transporter1.siret);
-    expect(elasticBsd.companiesOrgIds).toContain(transporter1.vatNumber);
-    expect(elasticBsd.companiesOrgIds).toContain(transporter2.siret);
-    expect(elasticBsd.companiesOrgIds).toContain(transporter2.vatNumber);
-    expect(elasticBsd.companiesOrgIds).toContain(intermediary1.siret);
-    expect(elasticBsd.companiesOrgIds).toContain(intermediary2.siret);
-    expect(elasticBsd.companiesOrgIds).toContain(
+    expect(elasticBsd.companyOrgIds).toContain(emitter.siret);
+    expect(elasticBsd.companyOrgIds).toContain(nextDestination.siret);
+    expect(elasticBsd.companyOrgIds).toContain(trader.siret);
+    expect(elasticBsd.companyOrgIds).toContain(broker.siret);
+    expect(elasticBsd.companyOrgIds).toContain(ecoOrganisme.siret);
+    expect(elasticBsd.companyOrgIds).toContain(recipient.siret);
+    expect(elasticBsd.companyOrgIds).toContain(transporter1.siret);
+    expect(elasticBsd.companyOrgIds).toContain(transporter1.vatNumber);
+    expect(elasticBsd.companyOrgIds).toContain(transporter2.siret);
+    expect(elasticBsd.companyOrgIds).toContain(transporter2.vatNumber);
+    expect(elasticBsd.companyOrgIds).toContain(intermediary1.siret);
+    expect(elasticBsd.companyOrgIds).toContain(intermediary2.siret);
+    expect(elasticBsd.companyOrgIds).toContain(
       forwardedInNextDestination.siret
     );
-    expect(elasticBsd.companiesOrgIds).toContain(forwardedInTransporter.siret);
-    expect(elasticBsd.companiesOrgIds).toContain(
+    expect(elasticBsd.companyOrgIds).toContain(forwardedInTransporter.siret);
+    expect(elasticBsd.companyOrgIds).toContain(
       forwardedInTransporter.vatNumber
     );
   });

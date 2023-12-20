@@ -262,7 +262,7 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     rawBsd: bsda,
 
     // ALL actors from the BSDA, for quick search
-    companiesNames: [
+    companyNames: [
       bsda.emitterCompanyName,
       bsda.workerCompanyName,
       bsda.transporterCompanyName,
@@ -273,8 +273,8 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
       ...bsda.intermediaries.map(intermediary => intermediary.name)
     ]
       .filter(Boolean)
-      .join("\n"),
-    companiesOrgIds: [
+      .join(" "),
+    companyOrgIds: [
       bsda.emitterCompanySiret,
       bsda.workerCompanySiret,
       bsda.transporterCompanySiret,

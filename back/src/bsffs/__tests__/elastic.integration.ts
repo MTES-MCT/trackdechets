@@ -68,25 +68,23 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     elasticBsff = toBsdElastic(bsffForElastic);
   });
 
-  test("companiesNames > should contain the names of ALL BSFF companies", async () => {
+  test("companyNames > should contain the names of ALL BSFF companies", async () => {
     // Then
-    expect(elasticBsff.companiesNames).toContain(emitter.company.name);
-    expect(elasticBsff.companiesNames).toContain(transporter.company.name);
-    expect(elasticBsff.companiesNames).toContain(destination.company.name);
-    expect(elasticBsff.companiesNames).toContain(destination.company.name);
-    expect(elasticBsff.companiesNames).toContain(detenteur1.company.name);
-    expect(elasticBsff.companiesNames).toContain(detenteur2.company.name);
+    expect(elasticBsff.companyNames).toContain(emitter.company.name);
+    expect(elasticBsff.companyNames).toContain(transporter.company.name);
+    expect(elasticBsff.companyNames).toContain(destination.company.name);
+    expect(elasticBsff.companyNames).toContain(destination.company.name);
+    expect(elasticBsff.companyNames).toContain(detenteur1.company.name);
+    expect(elasticBsff.companyNames).toContain(detenteur2.company.name);
   });
 
-  test("companiesOrgIds > should contain the orgIds of ALL BSFF companies", async () => {
+  test("companyOrgIds > should contain the orgIds of ALL BSFF companies", async () => {
     // Then
-    expect(elasticBsff.companiesOrgIds).toContain(emitter.company.siret);
-    expect(elasticBsff.companiesOrgIds).toContain(transporter.company.siret);
-    expect(elasticBsff.companiesOrgIds).toContain(
-      transporter.company.vatNumber
-    );
-    expect(elasticBsff.companiesOrgIds).toContain(destination.company.siret);
-    expect(elasticBsff.companiesOrgIds).toContain(detenteur1.company.siret);
-    expect(elasticBsff.companiesOrgIds).toContain(detenteur2.company.siret);
+    expect(elasticBsff.companyOrgIds).toContain(emitter.company.siret);
+    expect(elasticBsff.companyOrgIds).toContain(transporter.company.siret);
+    expect(elasticBsff.companyOrgIds).toContain(transporter.company.vatNumber);
+    expect(elasticBsff.companyOrgIds).toContain(destination.company.siret);
+    expect(elasticBsff.companyOrgIds).toContain(detenteur1.company.siret);
+    expect(elasticBsff.companyOrgIds).toContain(detenteur2.company.siret);
   });
 });

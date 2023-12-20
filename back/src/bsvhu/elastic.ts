@@ -181,14 +181,14 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     rawBsd: bsvhu,
 
     // ALL actors from the BSVHU, for quick search
-    companiesNames: [
+    companyNames: [
       bsvhu.emitterCompanyName,
       bsvhu.transporterCompanyName,
       bsvhu.destinationCompanyName
     ]
       .filter(Boolean)
-      .join("\n"),
-    companiesOrgIds: [
+      .join(" "),
+    companyOrgIds: [
       bsvhu.emitterCompanySiret,
       bsvhu.transporterCompanySiret,
       bsvhu.transporterCompanyVatNumber,
