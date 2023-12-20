@@ -150,34 +150,6 @@ export const temporaryStorageDetailFragment = gql`
   ${transporterFragment}
 `;
 
-export const segmentFragment = gql`
-  fragment Segment on TransportSegment {
-    id
-    readyToTakeOver
-    transporter {
-      validityLimit
-      numberPlate
-      isExemptedOfReceipt
-      department
-      receipt
-      company {
-        siret
-        vatNumber
-        orgId
-        name
-        address
-        contact
-        mail
-        phone
-      }
-    }
-    mode
-    takenOverAt
-    takenOverBy
-    previousTransporterCompanySiret
-    segmentNumber
-  }
-`;
 export const staticFieldsFragment = gql`
   fragment StaticFieldsFragment on Form {
     readableId
@@ -300,9 +272,6 @@ const mutableFieldsFragment = gql`
     }
     currentTransporterSiret
     nextTransporterSiret
-    transportSegments {
-      ...Segment
-    }
     intermediaries {
       ...CompanyFragment
     }
@@ -314,7 +283,6 @@ const mutableFieldsFragment = gql`
   ${wasteDetailsFragment}
   ${emitterFragment}
   ${recipientFragment}
-  ${segmentFragment}
   ${companyFragment}
 `;
 export const fullFormFragment = gql`
@@ -332,13 +300,9 @@ export const transporterFormFragment = gql`
     ...StaticFieldsFragment
     currentTransporterSiret
     nextTransporterSiret
-    transportSegments {
-      ...Segment
-    }
   }
   ${mutableFieldsFragment}
   ${staticFieldsFragment}
-  ${segmentFragment}
 `;
 
 export const detailFormFragment = gql`
@@ -522,13 +486,6 @@ export const dashboardFormFragment = gql`
         quantity
         quantityType
       }
-    }
-    transportSegments {
-      id
-      readyToTakeOver
-      previousTransporterCompanySiret
-      takenOverAt
-      segmentNumber
     }
     grouping {
       quantity

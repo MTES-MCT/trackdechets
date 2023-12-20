@@ -7,6 +7,7 @@ import {
   CreateOrUpdateTransporterInput,
   initialFormTransporter
 } from "../../../../form/bsdd/utils/initial-state";
+import { TransportMode, Transporter } from "codegen-ui/src";
 
 describe("<TransporterList />", () => {
   const mocks = [];
@@ -17,7 +18,7 @@ describe("<TransporterList />", () => {
   ) => (
     <MockedProvider mocks={mocks} addTypename={false}>
       <Formik initialValues={{ transporters, bsdId }} onSubmit={jest.fn()}>
-        <TransporterList fieldName="transporters" />
+        <TransporterList fieldName="transporters" bsdId={bsdId} />
       </Formik>
     </MockedProvider>
   );
@@ -107,28 +108,70 @@ describe("<TransporterList />", () => {
   });
 
   test("transporter detail is displayed when the transporter has already signed", () => {
+    const transporter1: CreateOrUpdateTransporterInput = {
+      id: "id",
+      mode: TransportMode.Road,
+      isExemptedOfReceipt: false,
+      company: {
+        siret: "11111111111111",
+        name: "Transport qui roule",
+        contact: "Mr T",
+        phone: "01 01 01 01 01",
+        mail: "contact@transportquiroule.fr",
+        address: "Somewhere"
+      },
+      receipt: "Rec",
+      department: "07",
+      validityLimit: new Date().toISOString(),
+      takenOverAt: new Date().toISOString(),
+      numberPlate: "FOO"
+    };
+
     render(
       component([
-        { ...initialFormTransporter, takenOverAt: new Date().toISOString() },
+        transporter1,
         { ...initialFormTransporter },
         { ...initialFormTransporter }
       ])
     );
+
     expect(screen.getByText("Raison sociale")).toBeInTheDocument();
+    expect(screen.getByText(transporter1.company!.name!)).toBeInTheDocument();
+
     expect(screen.getByText("SIRET")).toBeInTheDocument();
+    expect(screen.getByText(transporter1.company!.siret!)).toBeInTheDocument();
+
     expect(screen.getByText("Adresse")).toBeInTheDocument();
+    expect(
+      screen.getByText(transporter1.company!.address!)
+    ).toBeInTheDocument();
+
     expect(screen.getByText("Contact")).toBeInTheDocument();
-    expect(screen.getByText("Téléphone")).toBeInTheDocument();
+    expect(
+      screen.getByText(transporter1.company!.contact!)
+    ).toBeInTheDocument();
+
+    expect(screen.getAllByText("Téléphone")).toHaveLength(3);
+    expect(screen.getByText(transporter1.company!.phone!)).toBeInTheDocument();
+
     expect(screen.getByText("E-mail")).toBeInTheDocument();
+    expect(screen.getByText(transporter1.company!.mail!)).toBeInTheDocument();
+
     expect(screen.getByText("Récépissé n°")).toBeInTheDocument();
+    expect(screen.getByText(transporter1.receipt!)).toBeInTheDocument();
+
     expect(screen.getByText("Récépissé département")).toBeInTheDocument();
+    expect(screen.getByText(transporter1.department!)).toBeInTheDocument();
+
     expect(screen.getByText("Récépissé valide jusqu'au")).toBeInTheDocument();
-    expect(screen.getByText("Mode de transport")).toBeInTheDocument();
-    expect(screen.getByText("Immatriculation")).toBeInTheDocument();
+    expect(screen.getAllByText("Mode de transport")).toHaveLength(3);
+    expect(screen.getAllByText("Immatriculation")).toHaveLength(3);
+    expect(screen.getByText(transporter1.numberPlate!)).toBeInTheDocument();
+
     expect(screen.getByText("Date de prise en charge")).toBeInTheDocument();
-    const deleteButtons = screen.getByTitle("Supprimer");
+    const deleteButtons = screen.getAllByTitle("Supprimer");
     expect(deleteButtons[0]).toBeDisabled();
-    const upButtons = screen.getByTitle("Remonter");
+    const upButtons = screen.getAllByTitle("Remonter");
     expect(upButtons[0]).toBeDisabled();
     // on ne peut pas permuter un transporteur qui a déjà signé
     expect(upButtons[1]).toBeDisabled();

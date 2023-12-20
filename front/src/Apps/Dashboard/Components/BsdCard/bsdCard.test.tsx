@@ -145,7 +145,6 @@ describe("Bsd card primary action label", () => {
         },
         __typename: "TemporaryStorageDetail"
       },
-      transportSegments: [],
       currentTransporterSiret: null,
       nextTransporterSiret: null,
       __typename: "Form"
@@ -781,7 +780,6 @@ describe("Bsd card primary action label", () => {
           __typename: "StateSummary"
         },
         temporaryStorageDetail: null,
-        transportSegments: [],
         currentTransporterSiret: null,
         nextTransporterSiret: null,
         __typename: "Form"
@@ -907,15 +905,6 @@ describe("Bsd card primary action label", () => {
           __typename: "StateSummary"
         },
         temporaryStorageDetail: null,
-        transportSegments: [
-          {
-            id: "ckyef9g3a2924349syhsqc1wa",
-            readyToTakeOver: false,
-            previousTransporterCompanySiret: "13001045700013",
-            takenOverAt: null,
-            __typename: "TransportSegment"
-          }
-        ],
         currentTransporterSiret: "13001045700013",
         nextTransporterSiret: "13001045700013",
         __typename: "Form"
@@ -1059,15 +1048,6 @@ describe("Bsd card primary action label", () => {
           __typename: "StateSummary"
         },
         temporaryStorageDetail: null,
-        transportSegments: [
-          {
-            id: "ckyef9g3a2924349syhsqc1wa",
-            readyToTakeOver: false,
-            previousTransporterCompanySiret: "13001045700013",
-            takenOverAt: null,
-            __typename: "TransportSegment"
-          }
-        ],
         currentTransporterSiret: "13001045700013",
         nextTransporterSiret: "13001045700013",
         __typename: "Form"
@@ -1377,7 +1357,6 @@ describe("Bsd card primary action label", () => {
           __typename: "StateSummary"
         },
         temporaryStorageDetail: null,
-        transportSegments: [],
         currentTransporterSiret: "",
         nextTransporterSiret: null,
         __typename: "Form"
