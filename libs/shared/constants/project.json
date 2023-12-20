@@ -4,18 +4,6 @@
   "sourceRoot": "libs/shared/constants/src",
   "projectType": "library",
   "targets": {
-    "build": {
-      "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/shared/constants",
-        "main": "libs/shared/constants/src/index.ts",
-        "tsConfig": "libs/shared/constants/tsconfig.lib.json",
-        "assets": ["libs/shared/constants/*.md"],
-        "generatePackageJson": true,
-        "format": ["cjs"]
-      }
-    },
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
