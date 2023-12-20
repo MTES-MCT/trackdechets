@@ -11,12 +11,7 @@ export default function Transporter() {
   const { siret } = useParams<{ siret: string }>();
 
   return !formTransportIsPipeline(values) ? (
-    <TransporterList
-      fieldName="transporters"
-      orgId={siret}
-      bsdId={values.id}
-      transporters={values.transporters}
-    />
+    <TransporterList fieldName="transporters" orgId={siret} />
   ) : (
     <h4 className="form__section-heading">Transport par pipeline</h4>
   );

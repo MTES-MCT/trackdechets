@@ -7,18 +7,15 @@ import {
   CreateOrUpdateTransporterInput,
   initialFormTransporter
 } from "../../../../form/bsdd/utils/initial-state";
-import { TransportMode, Transporter } from "codegen-ui/src";
+import { TransportMode } from "codegen-ui/src";
 
 describe("<TransporterList />", () => {
   const mocks = [];
 
-  const component = (
-    transporters: CreateOrUpdateTransporterInput[],
-    bsdId?: string
-  ) => (
+  const component = (transporters: CreateOrUpdateTransporterInput[]) => (
     <MockedProvider mocks={mocks} addTypename={false}>
-      <Formik initialValues={{ transporters, bsdId }} onSubmit={jest.fn()}>
-        <TransporterList fieldName="transporters" bsdId={bsdId} />
+      <Formik initialValues={{ transporters }} onSubmit={jest.fn()}>
+        <TransporterList fieldName="transporters" />
       </Formik>
     </MockedProvider>
   );
@@ -93,18 +90,26 @@ describe("<TransporterList />", () => {
     expect(upButtons[1]).toBeDisabled();
   });
 
-  test("accordions are folded by default when there is several transporters on bsd update", () => {
-    render(
-      component([initialFormTransporter, initialFormTransporter], "bsdId")
-    );
+  test("accordions are folded by default when there is several transporters", () => {
+    render(component([initialFormTransporter, initialFormTransporter]));
     const unfoldButtons = screen.getAllByTitle("Déplier");
     expect(unfoldButtons).toHaveLength(2);
   });
 
-  test("accordion is expanded by default when there is only one transporter on bsd update", () => {
-    render(component([initialFormTransporter], "bsdId"));
+  test("accordion is expanded by default when there is only one transporter", () => {
+    render(component([initialFormTransporter]));
     const foldButton = screen.getByTitle("Replier");
     expect(foldButton).toBeInTheDocument();
+  });
+
+  test("only one accordion can be expanded at once", async () => {
+    render(component([initialFormTransporter, initialFormTransporter]));
+    const expandButtons = screen.getAllByTitle("Déplier");
+    expect(expandButtons).toHaveLength(2);
+    fireEvent.click(expandButtons[0]);
+    fireEvent.click(expandButtons[1]);
+    const foldButtons = screen.getAllByTitle("Replier");
+    expect(foldButtons).toHaveLength(1);
   });
 
   test("transporter detail is displayed when the transporter has already signed", () => {

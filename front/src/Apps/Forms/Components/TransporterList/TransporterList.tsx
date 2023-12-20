@@ -15,8 +15,6 @@ import TransporterDisplay from "../TransporterDisplay/TransporterDisplay";
 type TransporterListProps = {
   // SIRET ou VAT de l'établissement courant
   orgId?: string;
-  // Identifiant du bordereau (le cas échant)
-  bsdId?: string | null;
   // Nom du champ Formik stockant la liste des transporteurs
   fieldName: string;
 };
@@ -26,11 +24,7 @@ type TransporterListProps = {
  * - l'ajout et la suppression de transporteurs à la liste.
  * - la permutation de deux transporteurs dans la liste.
  */
-export function TransporterList({
-  orgId,
-  fieldName,
-  bsdId
-}: TransporterListProps) {
+export function TransporterList({ orgId, fieldName }: TransporterListProps) {
   const [field] = useField<CreateOrUpdateTransporterInput[]>({
     name: fieldName
   });
@@ -43,11 +37,12 @@ export function TransporterList({
       MutationDeleteFormTransporterArgs
     >(DELETE_FORM_TRANSPORTER);
 
-  // `defaultExpanded` contrôle l'état initial des accordéons
-  const [defaultExpanded, setDefaultExpanded] = React.useState(
-    // Tous les accordéons sont repliés en cas d'update du bordereau
-    // s'il y a plusieurs transporteurs
-    !(Boolean(bsdId) && transporters.length > 1)
+  // Le fonctionnement du groupe d'accordéons fait qu'un seul à la fois
+  // peut être déplié. Cette variable permet d'enregistrer l'index du transporteur
+  // qui doit être déplié. Si null, tous les accordéons sont repliés.
+  const [expandedIdx, setExpandedIdx] = React.useState<number | null>(
+    // Tous les accordéons sont repliés par défaut s'il y a plusieurs transporteurs
+    transporters.length === 1 ? 0 : null
   );
 
   const disableAdd = transporters.length >= 5;
@@ -61,9 +56,9 @@ export function TransporterList({
             {transporters.map((t, idx) => {
               const onTransporterAdd = () => {
                 arrayHelpers.insert(idx + 1, initialFormTransporter);
-                // lorsqu'on ajoute un nouveau transporteur, on souhaite
-                // que le formulaire soit déplié
-                setDefaultExpanded(true);
+                // replie tous les formulaire sauf celui du nouveau
+                // transporteur qui vient d'être crée
+                setExpandedIdx(idx + 1);
               };
 
               const onTransporterDelete = () => {
@@ -135,11 +130,18 @@ export function TransporterList({
                       arrayHelpers.swap(idx, nextIndex);
                     }
                   }}
+                  onExpanded={() => {
+                    if (expandedIdx === idx) {
+                      setExpandedIdx(null);
+                    } else {
+                      setExpandedIdx(idx);
+                    }
+                  }}
                   disableAdd={disableAdd}
                   disableDelete={disableDelete}
                   disableUp={disableUp}
                   disableDown={disableDown}
-                  defaultExpanded={defaultExpanded}
+                  expanded={idx === expandedIdx}
                 >
                   {t.takenOverAt ? (
                     <TransporterDisplay transporter={t} />

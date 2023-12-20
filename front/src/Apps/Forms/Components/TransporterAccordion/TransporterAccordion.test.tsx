@@ -17,15 +17,18 @@ describe("TransporterAccordion", () => {
   const onTransporterDelete = jest.fn();
   const onTransporterShiftUp = jest.fn();
   const onTransporterShiftDown = jest.fn();
+  const onExpanded = jest.fn();
 
   const Component = (
     <TransporterAccordion
       name="Transporteur"
       numero={1}
+      expanded={true}
       onTransporterAdd={onTransporterAdd}
       onTransporterDelete={onTransporterDelete}
       onTransporterShiftUp={onTransporterShiftUp}
       onTransporterShiftDown={onTransporterShiftDown}
+      onExpanded={onExpanded}
     >
       {foldableContent}
     </TransporterAccordion>
@@ -64,21 +67,10 @@ describe("TransporterAccordion", () => {
     expect(onTransporterShiftDown).toHaveBeenCalledTimes(1);
   });
 
-  test("clicking the caret should fold the content", async () => {
+  test("clicking the caret should call the `onExpanded` callback`", () => {
     const { container } = render(Component);
-    const caret = getByTitle(container, "Replier");
-    await waitFor(() =>
-      expect(
-        getComputedStyle(getByText(container, foldableContent)).maxHeight
-      ).toEqual("")
-    );
-    fireEvent.click(caret);
-    await waitFor(() =>
-      expect(
-        parseFloat(
-          getComputedStyle(getByText(container, foldableContent)).maxHeight
-        )
-      ).toEqual(0)
-    );
+    const caretButton = getByTitle(container, "Replier");
+    fireEvent.click(caretButton);
+    expect(onExpanded).toHaveBeenCalledTimes(1);
   });
 });

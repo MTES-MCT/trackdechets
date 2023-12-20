@@ -9,11 +9,12 @@ export type TransporterAccordionProps = {
   onTransporterDelete: () => void;
   onTransporterShiftDown: () => void;
   onTransporterShiftUp: () => void;
+  onExpanded: () => void;
   disableAdd?: boolean;
   disableDelete?: boolean;
   disableUp?: boolean;
   disableDown?: boolean;
-  defaultExpanded?: boolean;
+  expanded?: boolean;
   children: NonNullable<React.ReactNode>;
 };
 
@@ -22,28 +23,23 @@ export type TransporterAccordionProps = {
  * mode "accordéon". C'est une version modifiée du composant
  * <Accordion /> du react-dsfr qui permet d'afficher ce que l'on veut dans
  * la barre de label. Les événements au clic sur les boutons "Ajouter",
- * "Supprimer", "Avancer" et "Reculer" sont propagés vers <TransporterList />
+ * "Supprimer", "Avancer", "Reculer" et "Déplier" sont propagés vers <TransporterList />
  */
 export function TransporterAccordion({
   name,
   numero,
+  expanded,
   onTransporterAdd,
   onTransporterDelete,
   onTransporterShiftDown,
   onTransporterShiftUp,
+  onExpanded,
   disableAdd = false,
   disableDelete = false,
   disableUp = false,
   disableDown = false,
-  defaultExpanded = true,
   children
 }: TransporterAccordionProps) {
-  const [expandedState, setExpandedState] = React.useState(defaultExpanded);
-
-  const onExpandButtonClick = () => {
-    setExpandedState(!expandedState);
-  };
-
   const collapseElementId = `transporter__${numero}__form`;
 
   const ref = React.useRef(null);
@@ -76,12 +72,7 @@ export function TransporterAccordion({
             iconId="ri-add-line"
             title="Ajouter"
             disabled={disableAdd}
-            onClick={() => {
-              // Replie le transporteur courant pour faire
-              // apparaitre le formulaire du transporteur suivant
-              setExpandedState(false);
-              onTransporterAdd();
-            }}
+            onClick={onTransporterAdd}
           >
             Ajouter
           </Button>
@@ -119,13 +110,11 @@ export function TransporterAccordion({
             type="button"
             className="transporter__header__button"
             // FIXME Ce serait bien ici d'arriver à reproduire l'animation de l'accordéon du DSFR
-            iconId={
-              expandedState ? "ri-arrow-up-s-line" : "ri-arrow-down-s-line"
-            }
-            title={expandedState ? "Replier" : "Déplier"}
-            aria-expanded={expandedState}
+            iconId={expanded ? "ri-arrow-up-s-line" : "ri-arrow-down-s-line"}
+            title={expanded ? "Replier" : "Déplier"}
+            aria-expanded={expanded}
             aria-controls={collapseElementId}
-            onClick={onExpandButtonClick}
+            onClick={onExpanded}
           />
         </div>
       </div>
@@ -134,7 +123,7 @@ export function TransporterAccordion({
         ref={ref}
         className="transporter__form"
         style={
-          expandedState
+          expanded
             ? scrollHeight
               ? { maxHeight: scrollHeight }
               : {} // avoid having an animation on first render
