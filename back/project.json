@@ -35,6 +35,12 @@
         }
       }
     },
+    "integration-setup": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["prisma db push", "npm --prefix back run reindex-all-bsds-bulk"]
+      }
+    },
     "test": {
       "executor": "@nx/jest:jest",
       "dependsOn": ["codegen", "prisma"],
