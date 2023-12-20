@@ -1050,7 +1050,8 @@ const canUpdateBsdd = bsd =>
   [
     BsdStatusCode.Draft,
     BsdStatusCode.Sealed,
-    BsdStatusCode.SignedByProducer
+    BsdStatusCode.SignedByProducer,
+    BsdStatusCode.Sent
   ].includes(bsd.status);
 
 const canDeleteBsdd = bsd =>
