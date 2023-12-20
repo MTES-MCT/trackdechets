@@ -25,6 +25,14 @@
         }
       }
     },
+    "build": {
+      "inputs": ["{projectRoot}/src/schema.prisma"],
+      "cache": true,
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prisma generate"
+      }
+    },
     "migrate": {
       "executor": "nx:run-commands",
       "options": {
