@@ -1078,7 +1078,9 @@ export const canDuplicate = (bsd, siret) =>
 
 const canDeleteBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
-  bsd.status === BsdStatusCode.Initial &&
+  (bsd.status === BsdStatusCode.Initial ||
+    (isSameSiretEmmiter(siret, bsd) &&
+      bsd.status === BsdStatusCode.SignedByEmitter)) &&
   canDuplicateBsff(bsd, siret);
 
 export const canDeleteBsd = (bsd, siret) =>

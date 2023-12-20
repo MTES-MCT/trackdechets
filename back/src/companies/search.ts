@@ -282,7 +282,7 @@ export async function searchSireneOrNotFound(
   }
 }
 
-interface PartialCompanyVatSearchResult
+export interface PartialCompanyVatSearchResult
   extends Pick<
     CompanyVatSearchResult,
     | "vatNumber"

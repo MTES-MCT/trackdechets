@@ -9,6 +9,7 @@ import {
 import {
   CreateFormInput,
   ImportPaperFormInput,
+  TransporterInput,
   UpdateFormInput
 } from "../generated/graphql/types";
 import {
@@ -26,6 +27,7 @@ import {
 import { checkSecurityCode } from "../common/permissions";
 import { FullForm } from "./types";
 import { ForbiddenError } from "../common/errors";
+import { flattenTransporterInput } from "./converter";
 
 /**
  * Retrieves companies allowed to update, delete or duplicate an existing BSDD.
@@ -103,9 +105,10 @@ function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
       ? form.intermediaries.flatMap(i => [i.siret, i.vatNumber])
       : [];
 
-  const multiModalTransporters = (form.transporters ?? []).map(
-    s => s.transporterCompanySiret
-  );
+  const multiModalTransporters = (form.transporters ?? []).flatMap(s => [
+    s.transporterCompanySiret,
+    s.transporterCompanyVatNumber
+  ]);
 
   const contributors = [
     emitterCompanySiret,
@@ -134,11 +137,27 @@ function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
 /**
  * Retrieves companies allowed to create a form of the given payload
  */
-function formCreators(input: CreateFormInput): string[] {
+async function formCreators(input: CreateFormInput): Promise<string[]> {
+  let transporterOrgsIds: string[] = [];
+
+  if (input.transporters && input.transporters.length > 0) {
+    const transporters = await prisma.bsddTransporter.findMany({
+      where: { id: { in: input.transporters } },
+      select: {
+        transporterCompanySiret: true,
+        transporterCompanyVatNumber: true
+      }
+    });
+    transporterOrgsIds = transporters
+      .flatMap(t => [t.transporterCompanySiret, t.transporterCompanyVatNumber])
+      .filter(Boolean);
+  }
+
   return [
     input.emitter?.company?.siret,
     input.recipient?.company?.siret,
     input.transporter?.company?.siret,
+    ...transporterOrgsIds,
     input.transporter?.company?.vatNumber,
     input.trader?.company?.siret,
     input.broker?.company?.siret,
@@ -161,7 +180,10 @@ function formReaders(form: FormForReadCheck): string[] {
   return [
     ...formContributors(form),
     ...(form.transporters
-      ? form.transporters.map(s => s.transporterCompanySiret)
+      ? form.transporters.flatMap(s => [
+          s.transporterCompanySiret,
+          s.transporterCompanyVatNumber
+        ])
       : []),
     ...(form.grouping
       ? form.grouping.map(f => f.initialForm.emitterCompanySiret)
@@ -203,7 +225,7 @@ export async function checkCanList(user: User, orgId: string) {
 }
 
 export async function checkCanCreate(user: User, input: CreateFormInput) {
-  const authorizedOrgIds = formCreators(input);
+  const authorizedOrgIds = await formCreators(input);
 
   return checkUserPermissions(
     user,
@@ -240,6 +262,47 @@ export async function checkCanUpdate(
   }
 
   return true;
+}
+
+export async function checkCanUpdateFormTransporter(
+  user: User,
+  form: Form,
+  transporterId: string,
+  input: TransporterInput
+) {
+  const fullForm = await getFullForm(form);
+
+  const authorizedOrgIds = formContributors(fullForm);
+
+  await checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanUpdate,
+    "Vous n'êtes pas autorisé à modifier ce transporteur BSDD"
+  );
+
+  if (input) {
+    const futureTransporters = fullForm.transporters.map(transporter => {
+      if (transporter.id === transporterId) {
+        return {
+          ...transporter,
+          ...flattenTransporterInput({ transporter: input })
+        };
+      }
+      return transporter;
+    });
+    const futureContributors = formContributors({
+      ...fullForm,
+      transporters: futureTransporters
+    });
+
+    return checkUserPermissions(
+      user,
+      futureContributors,
+      Permission.BsdCanUpdate,
+      "Vous ne pouvez pas enlever votre établissement du bordereau"
+    );
+  }
 }
 
 export async function checkCanDuplicate(user: User, form: Form) {

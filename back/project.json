@@ -16,7 +16,7 @@
       "command": "tsc -p back/tsconfig.lib.json --noEmit"
     },
     "codegen": {
-      "inputs": ["{projectRoot}/**/*.gql"],
+      "inputs": ["{projectRoot}/**/*.graphql"],
       "cache": true,
       "executor": "nx:run-commands",
       "options": {

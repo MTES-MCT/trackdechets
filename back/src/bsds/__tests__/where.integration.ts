@@ -1002,6 +1002,7 @@ describe("search on nextDestinationCompanyVatNumber", () => {
         }
       }
     };
+
     const result = await client.search({
       index: index.alias,
       body: {
@@ -1035,5 +1036,175 @@ describe("search on nextDestinationCompanyVatNumber", () => {
     expect(hits).toHaveLength(2);
     expect(hits[0]._source.id).toEqual("1");
     expect(hits[1]._source.id).toEqual("2");
+  });
+});
+
+describe("search on companyNames", () => {
+  afterAll(resetDatabase);
+
+  beforeAll(async () => {
+    const bsds: Partial<BsdElastic>[] = [
+      {
+        id: "1",
+        updatedAt: new Date().getTime(),
+        companyNames: "Foo\nBar"
+      },
+      {
+        id: "2",
+        updatedAt: new Date().getTime(),
+        companyNames: "Foo"
+      },
+      {
+        id: "3",
+        updatedAt: new Date().getTime(),
+        companyNames: ""
+      }
+    ];
+
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
+    await refreshElasticSearch();
+  });
+
+  it("should return one result", async () => {
+    const where: BsdWhere = {
+      companyNames: {
+        _match: "Bar"
+      }
+    };
+
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.id).toEqual("1");
+  });
+
+  it("should return several results", async () => {
+    const where: BsdWhere = {
+      companyNames: {
+        _match: "Foo"
+      }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(2);
+    const resultsIds = hits.map(h => h._source.id);
+    expect(resultsIds).toContain("1");
+    expect(resultsIds).toContain("2");
+  });
+
+  it("should return nothing", async () => {
+    const where: BsdWhere = {
+      companyNames: {
+        _match: "X"
+      }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(0);
+  });
+});
+
+describe("search on companyOrgIds", () => {
+  afterAll(resetDatabase);
+
+  beforeAll(async () => {
+    const bsds: Partial<BsdElastic>[] = [
+      {
+        id: "1",
+        updatedAt: new Date().getTime(),
+        companyOrgIds: ["SIRET1", "SIRET2"]
+      },
+      {
+        id: "2",
+        updatedAt: new Date().getTime(),
+        companyOrgIds: ["SIRET1"]
+      },
+      {
+        id: "3",
+        updatedAt: new Date().getTime(),
+        companyOrgIds: []
+      }
+    ];
+
+    await indexBsds(index.alias, bsds as any, index.elasticSearchUrl);
+    await refreshElasticSearch();
+  });
+
+  it("should return one result", async () => {
+    const where: BsdWhere = {
+      companyOrgIds: {
+        _has: "SIRET2"
+      }
+    };
+
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.id).toEqual("1");
+  });
+
+  it("should return several results", async () => {
+    const where: BsdWhere = {
+      companyOrgIds: {
+        _has: "SIRET1"
+      }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(2);
+    const resultsIds = hits.map(h => h._source.id);
+    expect(resultsIds).toContain("1");
+    expect(resultsIds).toContain("2");
+  });
+
+  it("should return nothing", async () => {
+    const where: BsdWhere = {
+      companyOrgIds: {
+        _has: "SIRET3"
+      }
+    };
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(where)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(0);
   });
 });

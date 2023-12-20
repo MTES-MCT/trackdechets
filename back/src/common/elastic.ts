@@ -103,6 +103,10 @@ export interface BsdElastic {
 
   intermediaries?: FormCompany[] | null;
 
+  // List of all companies taking part in the BSD's lifecycle, for quick search
+  companyNames: string;
+  companyOrgIds: string[];
+
   rawBsd:
     | FormForElastic
     | BsdaForElastic
@@ -291,7 +295,10 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
     }
   },
 
-  rawBsd: rawField
+  rawBsd: rawField,
+
+  companyNames: textField,
+  companyOrgIds: stringField
 };
 
 export type BsdIndexationConfig = {
@@ -312,7 +319,7 @@ export const index: BsdIndexationConfig = {
   // increment when mapping has changed to trigger re-indexation on release
   // only use vX.Y.Z that matches regexp "v\d\.\d\.\d"
   // no special characters that are not supported by ES index names (like ":")
-  mappings_version: "v1.1.0",
+  mappings_version: "v1.1.1",
   mappings: {
     properties
   },

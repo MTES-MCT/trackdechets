@@ -49,6 +49,7 @@ export const dashboardBsffFragment = gql`
       value
     }
     bsffUpdatedAt: updatedAt
+    bsffType: type
   }
 `;
 
