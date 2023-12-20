@@ -38,7 +38,10 @@
     "integration-setup": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["prisma db push", "npm --prefix back run reindex-all-bsds-bulk"]
+        "commands": [
+          "prisma db push",
+          "npm --prefix back run reindex-all-bsds-bulk"
+        ]
       }
     },
     "test": {
