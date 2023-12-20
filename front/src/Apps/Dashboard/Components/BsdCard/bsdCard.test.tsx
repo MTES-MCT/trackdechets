@@ -2,7 +2,14 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { fireEvent, waitFor, within } from "@testing-library/dom";
 import BsdCard from "./BsdCard";
-import { Bsda, Bsdasri, Bsff, Bsvhu, Form, UserPermission } from "@td/codegen-ui";
+import {
+  Bsda,
+  Bsdasri,
+  Bsff,
+  Bsvhu,
+  Form,
+  UserPermission
+} from "@td/codegen-ui";
 import { BsdCurrentTab } from "../../../common/types/commonTypes";
 import { MockedProvider } from "@apollo/client/testing";
 import { BsdaWithReview, FormWithReview } from "../../../common/types/bsdTypes";

@@ -5,7 +5,12 @@ import {
   NotificationError
 } from "../Apps/common/Components/Error/Error";
 import Loader from "../Apps/common/Components/Loader/Loaders";
-import { MembershipRequestStatus, Mutation, Query, UserRole } from "@td/codegen-ui";
+import {
+  MembershipRequestStatus,
+  Mutation,
+  Query,
+  UserRole
+} from "@td/codegen-ui";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { TOAST_DURATION } from "../common/config";
