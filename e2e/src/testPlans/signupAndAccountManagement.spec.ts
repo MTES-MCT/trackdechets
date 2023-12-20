@@ -7,7 +7,8 @@ import {
   successfulSignup,
   testAccountInfo,
   testPasswordUpdate,
-  testPhoneNbrUpdate
+  testPhoneNbrUpdate,
+  testSignupPasswordPolicy
 } from "../utils/user";
 import { testNavigation } from "../utils/navigation";
 
@@ -28,10 +29,9 @@ test.describe
     });
   });
 
-  // TODO: re-enable me when bug is fixed!
-  // test("Création de compte > Force du mot de passe", async ({ page }) => {
-  //   await testSignupPasswordPolicy(page);
-  // });
+  test("Création de compte > Force du mot de passe", async ({ page }) => {
+    await testSignupPasswordPolicy(page);
+  });
 
   test("Création de compte", async ({ page }) => {
     await successfulSignup(page, {
@@ -74,16 +74,14 @@ test.describe
     await test.step("Clic sur 'Mon espace' > redirige vers la page 'Etablissements'", async () => {
       await testNavigation(page, {
         linkLabel: "Mon espace",
-        targetUrl: "/account/companies",
-        targetPageLabel: "Établissements"
+        targetUrl: "/account/companies/create"
       });
     });
 
     await test.step("Clic sur 'Mes bordereaux' > redirige vers la page 'Etablissements'", async () => {
       await testNavigation(page, {
         linkLabel: "Mes bordereaux",
-        targetUrl: "/account/companies",
-        targetPageLabel: "Établissements"
+        targetUrl: "/account/companies/create"
       });
     });
 

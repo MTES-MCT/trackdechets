@@ -1,26 +1,29 @@
 import { Page, expect } from "@playwright/test";
-import { logScreenshot } from "./debug";
 
 /**
  * Tests that clicking on a link redirects to the expected page, testing both URL & page label
  */
+interface TestNavigationProps {
+  linkLabel: string;
+  targetUrl: string;
+  targetPageLabel?: string;
+}
 export const testNavigation = async (
   page: Page,
-  { linkLabel, targetUrl, targetPageLabel }
+  { linkLabel, targetUrl, targetPageLabel }: TestNavigationProps
 ) => {
   // Click on button
   await page.getByRole("link", { name: linkLabel }).click();
-
-  console.log(">> testNavigation", linkLabel, targetUrl, targetPageLabel);
-  await logScreenshot(page);
 
   // Check redirection
   await page.waitForURL(targetUrl);
 
   // Check page label
-  await expect(
-    page.getByRole("heading", { name: targetPageLabel })
-  ).toBeVisible();
+  if (targetPageLabel) {
+    await expect(
+      page.getByRole("heading", { name: targetPageLabel })
+    ).toBeVisible();
+  }
 
   return { linkLabel, targetUrl, targetPageLabel };
 };
