@@ -216,7 +216,24 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     isRevisedFor: [],
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),
-    rawBsd: bsdasri
+    rawBsd: bsdasri,
+
+    // ALL actors from the BSDASRI, for quick search
+    companyNames: [
+      bsdasri.emitterCompanyName,
+      bsdasri.ecoOrganismeName,
+      bsdasri.transporterCompanyName,
+      bsdasri.destinationCompanyName
+    ]
+      .filter(Boolean)
+      .join(" "),
+    companyOrgIds: [
+      bsdasri.emitterCompanySiret,
+      bsdasri.ecoOrganismeSiret,
+      bsdasri.transporterCompanySiret,
+      bsdasri.transporterCompanyVatNumber,
+      bsdasri.destinationCompanySiret
+    ].filter(Boolean)
   };
 }
 

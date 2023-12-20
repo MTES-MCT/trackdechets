@@ -116,7 +116,24 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
       ...bsff.detenteurCompanySirets
     ].filter(Boolean),
     ...getRegistryFields(bsff),
-    rawBsd: bsff
+    rawBsd: bsff,
+
+    // ALL actors from the BSFF, for quick search
+    companyNames: [
+      bsff.emitterCompanyName,
+      bsff.transporterCompanyName,
+      bsff.destinationCompanyName,
+      ...bsff.ficheInterventions.map(fiche => fiche.detenteurCompanyName)
+    ]
+      .filter(Boolean)
+      .join(" "),
+    companyOrgIds: [
+      bsff.emitterCompanySiret,
+      bsff.transporterCompanySiret,
+      bsff.transporterCompanyVatNumber,
+      bsff.destinationCompanySiret,
+      ...bsff.ficheInterventions.map(fiche => fiche.detenteurCompanySiret)
+    ].filter(Boolean)
   };
 
   const transporterCompanyOrgId = getTransporterCompanyOrgId(bsff);

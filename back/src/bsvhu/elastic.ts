@@ -178,7 +178,22 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     isRevisedFor: [],
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsvhu),
-    rawBsd: bsvhu
+    rawBsd: bsvhu,
+
+    // ALL actors from the BSVHU, for quick search
+    companyNames: [
+      bsvhu.emitterCompanyName,
+      bsvhu.transporterCompanyName,
+      bsvhu.destinationCompanyName
+    ]
+      .filter(Boolean)
+      .join(" "),
+    companyOrgIds: [
+      bsvhu.emitterCompanySiret,
+      bsvhu.transporterCompanySiret,
+      bsvhu.transporterCompanyVatNumber,
+      bsvhu.destinationCompanySiret
+    ].filter(Boolean)
   };
 }
 

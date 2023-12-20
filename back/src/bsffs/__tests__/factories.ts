@@ -60,7 +60,8 @@ export async function createBsff(
       transporterCompanyAddress: transporter.company.address,
       transporterCompanyContact: transporter.user.name,
       transporterCompanyPhone: transporter.company.contactPhone,
-      transporterCompanyMail: transporter.company.contactEmail
+      transporterCompanyMail: transporter.company.contactEmail,
+      transporterCompanyVatNumber: transporter.company.vatNumber
     });
     const transporterReceipt = await prisma.company
       .findUnique({
