@@ -1,5 +1,4 @@
 import { Company } from "@prisma/client";
-import { nafCodes } from "shared/constants";
 import { getConnection } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { convertUrls } from "../../../companies/database";
@@ -14,6 +13,7 @@ import {
   MAX_MY_COMPANIES_SEARCH
 } from "shared/constants";
 import { UserInputError } from "../../../common/errors";
+import { libelleFromCodeNaf } from "../../../companies/sirene/utils";
 
 const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
   _parent,
@@ -88,7 +88,7 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
     formatNode: (company: Company) => {
       const companyPrivate: CompanyPrivate = convertUrls(company);
       const { codeNaf: naf, address } = company;
-      const libelleNaf = naf && naf in nafCodes ? nafCodes[naf] : "";
+      const libelleNaf = libelleFromCodeNaf(naf!);
       return { ...companyPrivate, naf, libelleNaf, address };
     },
     ...paginationArgs

@@ -1,10 +1,10 @@
+import { libelleFromCodeNaf } from "../../companies/sirene/utils";
 import { convertUrls } from "../../companies/database";
 import {
   UserResolvers,
   CompanyPrivate,
   UserRole
 } from "../../generated/graphql/types";
-import { nafCodes } from "shared/constants";
 import prisma from "../../prisma";
 
 const userResolvers: UserResolvers = {
@@ -25,7 +25,7 @@ const userResolvers: UserResolvers = {
       const companyPrivate: CompanyPrivate = convertUrls(company);
 
       const { codeNaf: naf, address } = company;
-      const libelleNaf = naf && naf in nafCodes ? nafCodes[naf] : "";
+      const libelleNaf = libelleFromCodeNaf(naf!);
 
       return { ...companyPrivate, naf, libelleNaf, address };
     });

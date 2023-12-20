@@ -4,6 +4,7 @@ import { AuthType } from "../../../../auth";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
+import { libelleFromCodeNaf } from "../../../sirene/utils";
 
 const mockGetUpdatedCompanyNameAndAddress = jest.fn();
 // Mock external search services
@@ -44,6 +45,8 @@ const UPDATE_COMPANY = `
         id
         name
         address
+        naf
+        libelleNaf
       }
     }
 `;
@@ -83,7 +86,9 @@ describe("mutation updateCompany", () => {
   });
 
   it("should update a french company information with name and adresse from Sirene index", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      codeNaf: "0112Z"
+    });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
@@ -103,13 +108,18 @@ describe("mutation updateCompany", () => {
     expect(data.updateCompany.id).toEqual(company.id);
     expect(data.updateCompany.name).toEqual("nom de sirene");
     expect(data.updateCompany.address).toEqual("l'adresse de sirene");
+    expect(data.updateCompany.naf).toEqual(company.codeNaf);
+    expect(data.updateCompany.libelleNaf).toEqual(
+      libelleFromCodeNaf(company.codeNaf!)
+    );
 
     const updatedCompany = await prisma.company.findUnique({
       where: { id: company.id }
     });
     expect(updatedCompany).toMatchObject({
-      name: updatedCompany?.name,
-      address: updatedCompany?.address
+      name: data.updateCompany?.name,
+      address: data.updateCompany?.address,
+      codeNaf: data.updateCompany?.naf
     });
   });
 
@@ -118,7 +128,8 @@ describe("mutation updateCompany", () => {
       vatNumber: "RO17579668",
       name: "Acme in EU",
       address: "Transporter street",
-      companyTypes: ["TRANSPORTER"]
+      companyTypes: ["TRANSPORTER"],
+      codeNaf: "0112Z"
     });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
@@ -139,13 +150,18 @@ describe("mutation updateCompany", () => {
     expect(data.updateCompany.id).toEqual(company.id);
     expect(data.updateCompany.name).toEqual("nom de vies");
     expect(data.updateCompany.address).toEqual("l'adresse de vies");
+    expect(data.updateCompany.naf).toEqual(company.codeNaf);
+    expect(data.updateCompany.libelleNaf).toEqual(
+      libelleFromCodeNaf(company.codeNaf!)
+    );
 
     const updatedCompany = await prisma.company.findUnique({
       where: { id: company.id }
     });
     expect(updatedCompany).toMatchObject({
-      name: updatedCompany?.name,
-      address: updatedCompany?.address
+      name: data.updateCompany.name,
+      address: data.updateCompany.address,
+      codeNaf: data.updateCompany?.naf
     });
   });
 

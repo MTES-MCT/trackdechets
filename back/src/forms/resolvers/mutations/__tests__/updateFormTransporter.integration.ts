@@ -88,6 +88,43 @@ describe("Mutation.createFormTransporter", () => {
     expect(updatedBsddTransporter.transporterTransportMode).toEqual("RAIL");
   });
 
+  it("should be possible to update the siret of an existing transporter", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        status: "SEALED"
+      }
+    });
+    const bsddTransporter = await getFirstTransporter(form);
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateFormTransporter">,
+      MutationUpdateFormTransporterArgs
+    >(UPDATE_FORM_TRANSPORTER, {
+      variables: {
+        id: bsddTransporter!.id,
+        input: {
+          company: { siret: transporter.siret }
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    const updatedBsddTransporter = await getFirstTransporter(form);
+    expect(updatedBsddTransporter?.transporterCompanySiret).toEqual(
+      transporter.siret
+    );
+
+    /// TODO vérifier ici que :
+    // - transportersSirets est bien mis à jour
+    // - le BSDD est réindexé
+    // Le problème n'est pas très grave pour l'instant car depuis l'UI Trackdéchets l'update d'un
+    // transporteur BSDD est toujours suivi d'un update BSDD qui met à jour `transporterSiets` et
+    // réindexe le BSDD.
+  });
+
   it("should throw error if data does not pass validation", async () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);
@@ -194,7 +231,48 @@ describe("Mutation.createFormTransporter", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Vous n'êtes pas autorisé à modifier ce bordereau"
+        message: "Vous n'êtes pas autorisé à modifier ce transporteur BSDD"
+      })
+    ]);
+  });
+
+  it("should not be possible for a transporter to remove himself from a BSDD", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
+    });
+    const anotherTransporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        status: "SENT",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
+          }
+        }
+      }
+    });
+    const bsddTransporter = await getFirstTransporter(form);
+    const { mutate } = makeClient(transporter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateFormTransporter">,
+      MutationUpdateFormTransporterArgs
+    >(UPDATE_FORM_TRANSPORTER, {
+      variables: {
+        id: bsddTransporter!.id,
+        input: {
+          company: { siret: anotherTransporter.siret }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous ne pouvez pas enlever votre établissement du bordereau"
       })
     ]);
   });

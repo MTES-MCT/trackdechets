@@ -4,9 +4,9 @@
 import fs from "fs";
 import * as yup from "yup";
 import prisma from "../../prisma";
-import { nafCodes } from "shared/constants";
 import { readCsv } from "../../users/bulk-creation/loaders";
 import { logger } from "@td/logger";
+import { libelleFromCodeNaf } from "../../companies/sirene/utils";
 
 type AnonymousCompanyRow = {
   siret: string;
@@ -52,7 +52,7 @@ async function runImport() {
         data: {
           orgId: company.siret,
           ...company,
-          libelleNaf: nafCodes[company.codeNaf]
+          libelleNaf: libelleFromCodeNaf(company.codeNaf)
         }
       });
       logger.info(`Created ${company.siret}`);
