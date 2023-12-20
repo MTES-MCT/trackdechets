@@ -11,9 +11,9 @@ import {
   Transporter as FormTransporter,
   Transporter
 } from "codegen-ui";
-import TransporterReceipt from "../../../../form/common/components/company/TransporterReceipt";
-import Alert from "@codegouvfr/react-dsfr/Alert";
-import CompanyContactInfo from "../../../../form/common/components/company/CompanyContactInfo";
+import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
+import TransporterRecepisse from "../TransporterRecepisse/TransporterRecepisse";
+import { isForeignVat } from "shared/constants";
 
 type TransporterFormProps = {
   // SIRET ou VAT de l'établissement courant
@@ -30,16 +30,26 @@ type TransporterFormProps = {
 export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
   const [field, _, { setValue }] = useField<FormTransporter>(fieldName);
 
-  // message d'erreur lié à la sélection d'un établissement. Ex :
-  // - établissement non inscrit sur Trackdéchets
-  // - établissement inscrit mais sans le profil transporteur
-  const [companyError, setCompanyError] = React.useState<string | null>(null);
-
   const transporter = field.value;
 
+  // transporter.company.orgId should always be defined
+  // but let's not take the risk
   const transporterOrgId = React.useMemo(
-    () => transporter?.company?.orgId ?? transporter?.company?.siret ?? null,
-    [transporter?.company?.orgId, transporter?.company?.siret]
+    () =>
+      transporter?.company?.orgId ??
+      transporter?.company?.siret ??
+      transporter?.company?.vatNumber ??
+      null,
+    [
+      transporter?.company?.orgId,
+      transporter?.company?.siret,
+      transporter?.company?.vatNumber
+    ]
+  );
+
+  const isForeign = React.useMemo(
+    () => isForeignVat(transporterOrgId),
+    [transporterOrgId]
   );
 
   // Callback qui est passé au CompanySelector et qui permet de
@@ -72,42 +82,47 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
         // auto-complétion du récépissé de transport
         receipt: company.transporterReceipt?.receiptNumber,
         validityLimit: company.transporterReceipt?.validityLimit,
-        department: company.transporterReceipt?.department
+        department: company.transporterReceipt?.department,
+        isExemptedOfReceipt: isForeignVat(company.vatNumber)
+          ? // l'obligation de récépissé ne concerne pas les transporteurs étrangers
+            // on force la valeur à `false` et on désactive le champ
+            false
+          : transporter.isExemptedOfReceipt
       };
-
       setValue(updatedTransporter);
-
-      if (!company.isRegistered) {
-        setCompanyError(
-          "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau."
-        );
-      } else if (
-        company.isRegistered &&
-        !company.companyTypes?.includes(CompanyType.Transporter)
-      ) {
-        setCompanyError(
-          "Cet établissement est bien inscrit sur Trackdéchets mais n'a pas le profil Transporteur, il ne peut pas être ajouté sur le bordereau."
-        );
-      } else {
-        setCompanyError(null);
-      }
     }
   };
 
+  const selectedCompanyError = (company?: CompanySearchResult) => {
+    if (company) {
+      if (!company.isRegistered) {
+        return "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau.";
+      } else if (
+        !transporter.isExemptedOfReceipt &&
+        !company.companyTypes?.includes(CompanyType.Transporter)
+      ) {
+        return (
+          "Cet établissement est bien inscrit sur Trackdéchets mais n'a pas le profil Transporteur." +
+          " Il ne peut pas être ajouté sur le bordereau." +
+          " Si vous transportez vos propres déchets, veuillez cocher la case d'exemption après avoir vérifié" +
+          " que vous remplissez bien les conditions."
+        );
+      }
+    }
+    return null;
+  };
+
   return (
-    <div>
+    <div className="fr-container">
       <CompanySelectorWrapper
         orgId={orgId}
         formOrgId={transporterOrgId}
         favoriteType={FavoriteType.Transporter}
         allowForeignCompanies={true}
+        selectedCompanyError={selectedCompanyError}
         disabled={false}
         onCompanySelected={onCompanySelected}
       />
-
-      {companyError && (
-        <Alert title="Entreprise" description={companyError} severity="error" />
-      )}
 
       <CompanyContactInfo fieldName={`${fieldName}.company`} />
 
@@ -130,6 +145,7 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
             }
             inputTitle="terms"
             checked={field.value}
+            disabled={isForeign}
             onChange={checked =>
               form.setFieldValue(`${fieldName}.isExemptedOfReceipt`, checked)
             }
@@ -138,8 +154,12 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
         )}
       </Field>
 
-      {!!transporterOrgId && !transporter.isExemptedOfReceipt && (
-        <TransporterReceipt transporter={transporter} />
+      {!!transporterOrgId && !isForeign && !transporter.isExemptedOfReceipt && (
+        <TransporterRecepisse
+          number={transporter.receipt}
+          department={transporter.department}
+          validityLimit={transporter.validityLimit}
+        />
       )}
 
       <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">

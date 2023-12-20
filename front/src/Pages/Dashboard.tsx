@@ -132,17 +132,6 @@ const DashboardPage = () => {
     [lazyFetchBsds]
   );
 
-  // Fetch the data again if any of the 3 changes:
-  // - Current company SIRET
-  // - Current active tab
-  // - Current filters
-  useEffect(() => {
-    // Only exception: the reviews tab. Fix incoming
-    if (!tabs.isReviewsTab) {
-      fetchBsds(siret, bsdsVariables, tabs);
-    }
-  }, [bsdsVariables, siret, tabs, fetchBsds]);
-
   const handleFiltersSubmit = filterValues => {
     // Transform the filters into a GQL query
     const variables = filtersToQueryBsdsArgs(filterValues, bsdsVariables);
@@ -151,20 +140,9 @@ const DashboardPage = () => {
     setBsdsVariables(variables);
   };
 
-  // Current tab has changed
-  useEffect(() => {
-    // Reviews are special: no filter, reset everything and fetch the fresh data
-    if (tabs.isReviewsTab) {
-      setAreAdvancedFiltersOpen(false);
-      setBsdsVariables({
-        first: BSD_PER_PAGE
-      });
-    }
-  }, [tabs]);
-
   // Be notified if someone else modifies bsds
   useNotifier(siret!, () => {
-    if (!isReviewsTab) {
+    if (!tabs.isReviewsTab) {
       fetchBsds(siret, bsdsVariables, tabs);
     }
   });
@@ -204,6 +182,24 @@ const DashboardPage = () => {
     fetchPolicy: "cache-and-network"
   });
 
+  useEffect(() => {
+    // Reviews are special: no filter, reset everything and fetch the fresh data. Fix incoming
+    if (tabs.isReviewsTab) {
+      setAreAdvancedFiltersOpen(false);
+      fetchBsddRevisions();
+      fetchBsdaRevisions();
+    } else {
+      fetchBsds(siret, bsdsVariables, tabs);
+    }
+  }, [
+    bsdsVariables,
+    siret,
+    tabs,
+    fetchBsds,
+    fetchBsddRevisions,
+    fetchBsdaRevisions
+  ]);
+
   const { data: companyData } = useQuery<
     Pick<Query, "companyPrivateInfos">,
     QueryCompanyPrivateInfosArgs
@@ -218,7 +214,6 @@ const DashboardPage = () => {
     : [];
 
   const loadMoreBsds = React.useCallback(() => {
-    setIsFetchingMore(true);
     fetchMore({
       variables: {
         after: data?.bsds.pageInfo.endCursor
@@ -237,8 +232,6 @@ const DashboardPage = () => {
           }
         };
       }
-    }).then(() => {
-      setIsFetchingMore(false);
     });
   }, [data?.bsds.pageInfo.endCursor, fetchMore]);
 
@@ -317,28 +310,11 @@ const DashboardPage = () => {
     fetchMoreBsdaReviews
   ]);
 
-  const loadMore = useCallback(() => {
-    if (isReviewsTab) {
-      // A supprimer quand on pourra afficher une révision avec la requete bsds
-      loadMoreBsddReviews();
-      loadMoreBsdaReviews();
-    } else {
-      loadMoreBsds();
-    }
-  }, [isReviewsTab, loadMoreBsdaReviews, loadMoreBsddReviews, loadMoreBsds]);
-
-  const fetchReviews = useCallback(() => {
-    Promise.all([fetchBsddRevisions(), fetchBsdaRevisions()]).catch(error => {
-      Sentry.captureException(error);
-    });
-  }, [fetchBsdaRevisions, fetchBsddRevisions]);
-
-  // A supprimer quand on pourra afficher une révision avec la requete bsds
-  useEffect(() => {
-    if (isReviewsTab) {
-      fetchReviews();
-    }
-  }, [isReviewsTab, fetchReviews]);
+  const loadMoreReviews = () => {
+    // A supprimer quand on pourra afficher une révision avec la requete bsds
+    loadMoreBsddReviews();
+    loadMoreBsdaReviews();
+  };
 
   const toggleFiltersBlock = () => {
     setAreAdvancedFiltersOpen(!areAdvancedFiltersOpen);
@@ -358,7 +334,7 @@ const DashboardPage = () => {
       dataBsddReviews?.formRevisionRequests.pageInfo?.hasNextPage
     : data?.bsds.pageInfo.hasNextPage;
   const isLoadingBsds = isReviewsTab
-    ? loadingBsdaReviews || loadingBsddReviews
+    ? loadingBsdaReviews || loadingBsddReviews || isFetchingMore
     : loading;
 
   return (
@@ -397,7 +373,7 @@ const DashboardPage = () => {
           />
         </>
       )}
-      {(isFetchingMore || isLoadingBsds) && <Loader />}
+      {isLoadingBsds && <Loader />}
       {!Boolean(bsdsTotalCount) && !isLoadingBsds && (
         <div className="dashboard-page__blankstate">
           <Blankslate>
@@ -424,8 +400,8 @@ const DashboardPage = () => {
         <div className="dashboard-page__loadmore">
           <button
             className="fr-btn"
-            onClick={loadMore}
-            disabled={isFetchingMore}
+            onClick={tabs.isReviewsTab ? loadMoreReviews : loadMoreBsds}
+            disabled={isLoadingBsds}
           >
             {load_more_bsds}
           </button>

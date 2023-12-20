@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
-import React, { lazy } from "react";
+import React from "react";
 import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
 import * as yup from "yup";
@@ -26,9 +26,7 @@ import styles from "./BsdaRequestRevision.module.scss";
 import { BSDA_WASTES } from "shared/constants";
 import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCancelationInput";
 import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
-const TagsInput = lazy(
-  () => import("../../../../../common/components/tags-input/TagsInput")
-);
+import TagsInput from "../../../../../common/components/tags-input/TagsInput";
 
 type Props = {
   bsda: Bsda;

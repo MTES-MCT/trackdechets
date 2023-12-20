@@ -41,7 +41,7 @@ export default function CompanyContactInfo({
   });
 
   return (
-    <div className="fr-container--fluid">
+    <div>
       <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
         <div className="fr-col-12 fr-col-md-6">
           <Field name={`${fieldName}.contact`}>

@@ -137,7 +137,7 @@ export default function WasteInfo({ disabled }) {
 
       <div className="form__row">
         <label>
-          Mention ADR
+          Mentions au titre des règlements ADR, RID, ADNR, IMDG
           <Field
             type="text"
             name="waste.adr"

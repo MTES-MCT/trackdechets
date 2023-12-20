@@ -14,7 +14,8 @@ jest.mock("../../../database", () => ({
   // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
   ...jest.requireActual("../../../database"),
   getUpdatedCompanyNameAndAddress: (...args) =>
-    mockGetUpdatedCompanyNameAndAddress(...args)
+    mockGetUpdatedCompanyNameAndAddress(...args),
+  updateFavorites: () => jest.fn()
 }));
 
 const anyCompany = { orgId: "123", name: "name", address: "address" };

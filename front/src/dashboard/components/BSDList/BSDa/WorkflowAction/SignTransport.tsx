@@ -4,7 +4,7 @@ import { GET_BSDS } from "../../../../../Apps/common/queries";
 import routes from "../../../../../Apps/routes";
 import { UPDATE_BSDA } from "../../../../../form/bsda/stepper/queries";
 import { Transport } from "../../../../../form/bsda/stepper/steps/Transport";
-import TransporterReceipt from "../../../../../form/common/components/company/TransporterReceipt";
+import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import { getComputedState } from "../../../../../form/common/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
@@ -158,7 +158,7 @@ export function SignTransport({
                   j'atteste que les informations ci-dessus sont correctes. En
                   signant ce document, je déclare prendre en charge le déchet.
                 </p>
-                <TransporterReceipt transporter={bsda.transporter!} />
+                <TransporterRecepisseWrapper transporter={bsda.transporter!} />
 
                 <div className="form__row">
                   <label>

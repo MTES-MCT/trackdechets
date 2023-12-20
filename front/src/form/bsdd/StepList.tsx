@@ -12,18 +12,22 @@ import {
 } from "codegen-ui";
 import React, { ReactElement, useMemo, lazy } from "react";
 import { useNavigate } from "react-router-dom";
-import { FormFormikValues, getInitialState } from "./utils/initial-state";
+import {
+  CreateOrUpdateTransporterInput,
+  FormFormikValues,
+  getInitialState
+} from "./utils/initial-state";
 import { formSchema } from "./utils/schema";
 import { CREATE_FORM, GET_FORM, UPDATE_FORM } from "./utils/queries";
 import { GET_BSDS } from "../../Apps/common/queries";
 import { Loader } from "../../Apps/common/Components";
-import { formInputToastError } from "../common/stepper/toaster";
+import { toastApolloError } from "../common/stepper/toaster";
 import { IStepContainerProps } from "../common/stepper/Step";
 import {
   CREATE_FORM_TRANSPORTER,
   UPDATE_FORM_TRANSPORTER
 } from "../../Apps/Forms/Components/query";
-import { NotificationError } from "../../Apps/common/Components/Error/Error";
+import { isForeignVat } from "shared/constants";
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (form: Form | undefined) => ReactElement;
@@ -47,42 +51,30 @@ export default function StepsList(props: Props) {
     [formQuery.data]
   );
 
-  const [createForm, { loading: creating, error: createFormError }] =
-    useMutation<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
-      CREATE_FORM,
-      { refetchQueries: [GET_BSDS], awaitRefetchQueries: true }
-    );
+  const [createForm, { loading: creating }] = useMutation<
+    Pick<Mutation, "createForm">,
+    MutationCreateFormArgs
+  >(CREATE_FORM, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
-  const [updateForm, { loading: updating, error: updateFormError }] =
-    useMutation<Pick<Mutation, "updateForm">, MutationUpdateFormArgs>(
-      UPDATE_FORM,
-      { refetchQueries: [GET_BSDS], awaitRefetchQueries: true }
-    );
+  const [updateForm, { loading: updating }] = useMutation<
+    Pick<Mutation, "updateForm">,
+    MutationUpdateFormArgs
+  >(UPDATE_FORM, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
-  const [
-    createFormTransporter,
-    { loading: creatingFormTransporter, error: createFormTransporterError }
-  ] = useMutation<
-    Pick<Mutation, "createFormTransporter">,
-    MutationCreateFormTransporterArgs
-  >(CREATE_FORM_TRANSPORTER);
+  const [createFormTransporter, { loading: creatingFormTransporter }] =
+    useMutation<
+      Pick<Mutation, "createFormTransporter">,
+      MutationCreateFormTransporterArgs
+    >(CREATE_FORM_TRANSPORTER);
 
-  const [
-    updateFormTransporter,
-    { loading: updatingFormTransporter, error: updateFormTransporterError }
-  ] = useMutation<
-    Pick<Mutation, "updateFormTransporter">,
-    MutationUpdateFormTransporterArgs
-  >(UPDATE_FORM_TRANSPORTER);
+  const [updateFormTransporter, { loading: updatingFormTransporter }] =
+    useMutation<
+      Pick<Mutation, "updateFormTransporter">,
+      MutationUpdateFormTransporterArgs
+    >(UPDATE_FORM_TRANSPORTER);
 
   const loading =
     creating || updating || creatingFormTransporter || updatingFormTransporter;
-
-  const error =
-    createFormError ||
-    updateFormError ||
-    createFormTransporterError ||
-    updateFormTransporterError;
 
   function saveForm(formInput: FormInput): Promise<any> {
     const { id, ...input } = formInput;
@@ -91,6 +83,56 @@ export default function StepsList(props: Props) {
           variables: { updateFormInput: { ...input, id } }
         })
       : createForm({ variables: { createFormInput: input } });
+  }
+
+  async function saveFormTransporter(
+    transporterInput: CreateOrUpdateTransporterInput
+  ): Promise<string> {
+    const { id, ...input } = transporterInput;
+
+    // S'assure que les données de récépissé transport sont nulles
+    // lorsque l'exemption est cochée ou que le transporteur est étranger
+    const cleanInput = {
+      ...input,
+      ...(input.isExemptedOfReceipt || isForeignVat(input?.company?.vatNumber)
+        ? {
+            receipt: null,
+            validityLimit: null,
+            department: null
+          }
+        : {})
+    };
+
+    if (id) {
+      // Le transporteur existe déjà en base de données, on met
+      // juste à jour les infos et on renvoie l'identifiant
+      const { errors } = await updateFormTransporter({
+        variables: { id, input: cleanInput },
+        onError: err => {
+          toastApolloError(err);
+        }
+      });
+      if (errors) {
+        throw new Error(errors.map(e => e.message).join("\n"));
+      }
+      return id;
+    } else {
+      // Le transporteur n'existe pas encore en base, on le crée
+      // et on renvoie l'identifiant retourné
+      const { data, errors } = await createFormTransporter({
+        variables: { input: cleanInput },
+        onError: err => {
+          toastApolloError(err);
+        }
+      });
+      if (errors) {
+        throw new Error(errors.map(e => e.message).join("\n"));
+      }
+      // if `errors` is not defined then data?.createFormTransporter?.id
+      // should be defined. For type safety we return "" if it is not, but
+      // it should not hapen
+      return data?.createFormTransporter?.id ?? "";
+    }
   }
 
   async function onSubmit(values: FormFormikValues) {
@@ -102,22 +144,17 @@ export default function StepsList(props: Props) {
       ...rest
     } = values;
 
-    const formTransportersIds: string[] = await Promise.all(
-      transporters.map(async t => {
-        if (t.id) {
-          const { id, ...input } = t;
-          await updateFormTransporter({
-            variables: { id: t.id, input }
-          });
-          return id;
-        } else {
-          const { data } = await createFormTransporter({
-            variables: { input: t }
-          });
-          return data?.createFormTransporter?.id ?? "";
-        }
-      })
-    );
+    let transporterIds: string[] = [];
+
+    try {
+      transporterIds = await Promise.all(
+        transporters.map(t => saveFormTransporter(t))
+      );
+    } catch (_) {
+      // Si une erreur survient pendant la sauvegarde des données
+      // transporteur, on n'essaye même pas de sauvgarder le bordereau
+      return;
+    }
 
     const formInput: FormInput = {
       ...rest,
@@ -135,12 +172,12 @@ export default function StepsList(props: Props) {
             }))
           }
         : {}),
-      transporters: formTransportersIds
+      transporters: transporterIds
     };
 
     saveForm(formInput)
       .then(_ => navigate(-1))
-      .catch(err => formInputToastError(err));
+      .catch(err => toastApolloError(err));
   }
 
   // As it's a render function, the steps are nested into a `<></>` block
@@ -160,7 +197,6 @@ export default function StepsList(props: Props) {
         validationSchema={formSchema}
       />
       {loading && <Loader />}
-      {error && <NotificationError apolloError={error} />}
     </>
   );
 }

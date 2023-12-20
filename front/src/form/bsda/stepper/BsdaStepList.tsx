@@ -18,7 +18,7 @@ import {
 import initialState from "./initial-state";
 import { CREATE_BSDA, UPDATE_BSDA, GET_BSDA } from "./queries";
 import omitDeep from "omit-deep-lodash";
-import { formInputToastError } from "../../common/stepper/toaster";
+import { toastApolloError } from "../../common/stepper/toaster";
 import { bsdaValidationSchema } from "./schema";
 
 const GenericStepList = lazy(
@@ -121,7 +121,7 @@ export default function BsdaStepsList(props: Props) {
       .then(_ => {
         navigate(-1);
       })
-      .catch(err => formInputToastError(err));
+      .catch(err => toastApolloError(err));
   }
 
   // As it's a render function, the steps are nested into a `<></>` block
