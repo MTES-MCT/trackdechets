@@ -25,7 +25,7 @@
         }
       }
     },
-    "build": {
+    "generate": {
       "inputs": ["{projectRoot}/src/schema.prisma"],
       "cache": true,
       "executor": "nx:run-commands",

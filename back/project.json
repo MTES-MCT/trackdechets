@@ -40,7 +40,7 @@
       "executor": "@nx/jest:jest",
       "dependsOn": [
         "codegen",
-        { "projects": ["@td/prisma"], "target": "build" }
+        { "projects": ["@td/prisma"], "target": "generate" }
       ],
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {

@@ -25,7 +25,7 @@ jobs:
       - name: Init DB & ES index
         run: |
           npx nx run back:codegen
-          npx nx run @td/prisma:build
+          npx nx run @td/prisma:generate
           TERM=xterm bash ./scripts/deploy-db.sh
       - name: Start queues
         run: |

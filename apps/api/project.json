@@ -33,9 +33,9 @@
             "output": "./back/src"
           },
           {
-            "input": "./back/prisma",
+            "input": "./libs/back/prisma/src",
             "glob": "**/*.{prisma,sql}",
-            "output": "./back/prisma"
+            "output": "./libs/back/prisma/src"
           }
         ],
         "generatePackageJson": true,
