@@ -4,13 +4,16 @@ set -e
 bold=$(tput bold)
 reset=$(tput sgr0)
 green=$(tput setaf 2)
+red=$(tput setaf 9)
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+USING_ENV_FILE=false
 
 if [ -z "$DATABASE_URL" ]
 then
   echo "${bold}! No ${green}\$DATABASE_URL${reset}${bold} env variable found.${reset}"
   integrationEnvPath="$(dirname "$SCRIPT_DIR")/.env.integration"
+  USING_ENV_FILE=true
 
   if [ -f "$integrationEnvPath" ]; then
     echo "${bold}! Sourcing ${green}$integrationEnvPath${reset}${bold}...${reset}"
@@ -60,5 +63,10 @@ until curl -XGET "$ELASTIC_SEARCH_URL" 2> /dev/null; do
 done
 
 echo "3/3 - Create tables & index";
-escapedDatabaseUrl="${DATABASE_URL//$/\\$}"
+if [ "$USING_ENV_FILE" = true ] ; then
+  escapedDatabaseUrl="${DATABASE_URL//$/\\$}"
+else
+  escapedDatabaseUrl=$DATABASE_URL
+fi
+
 DATABASE_URL=$escapedDatabaseUrl npx nx run back:integration-setup
