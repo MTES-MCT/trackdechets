@@ -17,11 +17,13 @@ const ASSOCIATIONS = [
   }
 ];
 
-jest.mock("../../prisma", () => ({
-  company: {
-    findUniqueOrThrow: jest.fn(() => ({
-      companyAssociations: () => Promise.resolve(ASSOCIATIONS)
-    }))
+jest.mock("@td/prisma", () => ({
+  prisma: {
+    company: {
+      findUniqueOrThrow: jest.fn(() => ({
+        companyAssociations: () => Promise.resolve(ASSOCIATIONS)
+      }))
+    }
   }
 }));
 

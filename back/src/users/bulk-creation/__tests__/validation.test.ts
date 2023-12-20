@@ -6,9 +6,11 @@ import { siretify } from "../../../__tests__/factories";
 const mockCompanyExists = jest.fn();
 const mockUserExists = jest.fn();
 
-jest.mock("../../../prisma", () => ({
-  company: { findFirst: jest.fn(() => mockCompanyExists()) },
-  user: { findFirst: jest.fn(() => mockUserExists()) }
+jest.mock("@td/prisma", () => ({
+  prisma: {
+    company: { findFirst: jest.fn(() => mockCompanyExists()) },
+    user: { findFirst: jest.fn(() => mockUserExists()) }
+  }
 }));
 
 const mockSirene = jest.fn();
