@@ -5,7 +5,7 @@ import { envVariables } from "@td/env";
 envVariables.parse(process.env);
 
 async function start() {
-  console.log("Startint the API");
+  console.log(">> Starting the API");
   console.log("DATABASE", process.env.DATABASE_URL);
 
   await startApolloServer();

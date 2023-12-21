@@ -74,7 +74,9 @@
         "production": {
           "buildTarget": "notifier:build:production"
         },
-        "integration": {}
+        "integration": {
+          "buildTarget": "notifier:build:development"
+        }
       }
     },
     "lint": {

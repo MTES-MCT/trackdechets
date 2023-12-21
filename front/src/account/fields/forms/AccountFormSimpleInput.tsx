@@ -39,7 +39,6 @@ export default function AccountFormSimpleInput<Variables extends FormikValues>({
     <Formik<Variables>
       initialValues={initialValues}
       onSubmit={(values, { setFieldError, setSubmitting }) => {
-        console.log("SUBMIT!!!");
         const variables = { ...values, ...mutationArgs };
         update({ variables }).catch(() => {
           setFieldError(name, "Erreur serveur");

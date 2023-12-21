@@ -26,7 +26,10 @@
         "production": {
           "mode": "production"
         },
-        "integration": {}
+        "integration": {
+          "mode": "development",
+          "skipTypeCheck": true
+        }
       }
     },
     "serve": {

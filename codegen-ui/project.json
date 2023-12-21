@@ -8,9 +8,6 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "npx graphql-codegen --config codegen-ui/codegen.yml"
-      },
-      "configurations": {
-        "integration": {}
       }
     }
   },

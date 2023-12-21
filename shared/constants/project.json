@@ -14,9 +14,6 @@
         "assets": ["shared/constants/*.md"],
         "generatePackageJson": true,
         "format": ["cjs"]
-      },
-      "configurations": {
-        "integration": {}
       }
     },
     "lint": {
