@@ -35,7 +35,7 @@ jobs:
           TERM=xterm bash ./scripts/deploy-db.sh
       - name: Start TD applications
         run: |
-          npx nx run-many -t serve --projects=api,front,tag:backend:background --parallel=6 &
+          npx nx dev
 
       # Debug
       - name: Testing API resolution
