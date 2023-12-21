@@ -59,6 +59,7 @@ jobs:
       # Show logs
       - name: Show logs
         run: |
+          sleep 60s
           cat /tmp/trackdechets.log
 
       # Playwright
