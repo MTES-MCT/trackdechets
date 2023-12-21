@@ -35,7 +35,8 @@ import {
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs,
   TransporterInput,
-  BsffTransporterInput
+  BsffTransporterInput,
+  TransportMode
 } from "codegen-ui";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -102,6 +103,15 @@ export default function CompanySelector({
         | Maybe<BsvhuTransporterInput>
         | Maybe<BsffTransporterInput>;
     }>();
+
+  const isRoadTransport =
+    (values.transporter as TransporterInput).mode === TransportMode.Road ||
+    (
+      values.transporter as
+        | BsdaTransporterInput
+        | BsdasriTransporterInput
+        | BsffTransporterInput
+    ).transport?.mode === TransportMode.Road;
 
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
@@ -601,9 +611,12 @@ export default function CompanySelector({
           <RedErrorMessage name={`${field.name}.mail`} />
         </div>
 
-        {values.transporter && !!orgId && name === "transporter.company" && (
-          <TransporterRecepisseWrapper transporter={values.transporter!} />
-        )}
+        {values.transporter &&
+          !!orgId &&
+          name === "transporter.company" &&
+          isRoadTransport && (
+            <TransporterRecepisseWrapper transporter={values.transporter!} />
+          )}
       </div>
     </>
   );
