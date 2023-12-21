@@ -68,8 +68,6 @@ describe.only("sanitize", () => {
     ${"#{7*7}"}       | ${"77"}
     ${"*{7*7}"}       | ${"77"}
   `("$input should become $expected", ({ input, expected }) => {
-    console.log("input", input);
-    console.log("expected", expected);
     expect(sanitize(input)).toEqual(expected);
   });
 });
