@@ -105,13 +105,13 @@ export default function CompanySelector({
     }>();
 
   const isRoadTransport =
-    (values.transporter as TransporterInput).mode === TransportMode.Road ||
+    (values.transporter as TransporterInput)?.mode === TransportMode.Road ||
     (
       values.transporter as
         | BsdaTransporterInput
         | BsdasriTransporterInput
         | BsffTransporterInput
-    ).transport?.mode === TransportMode.Road;
+    )?.transport?.mode === TransportMode.Road;
 
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
