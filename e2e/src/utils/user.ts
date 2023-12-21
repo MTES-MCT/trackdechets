@@ -38,7 +38,6 @@ export const failedLogin = async (page: Page, { email, password }) => {
   await expect(page.getByRole("heading", { name: "Erreur" })).toBeVisible();
   await expect(page.getByText("Email ou mot de passe incorrect")).toBeVisible();
 
-
   // Login button still visible
   await expect(
     page.getByRole("button", { name: "Se connecter" })

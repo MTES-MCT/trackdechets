@@ -6,9 +6,10 @@ envVariables.parse(process.env);
 
 async function start() {
   await startApolloServer();
-  httpServer.listen(parseInt(process.env.API_PORT, 10), "0.0.0.0", () =>
-    console.info(`TD API server is running on port ${process.env.API_PORT}`)
-  );
+  httpServer.listen(parseInt(process.env.API_PORT, 10), "0.0.0.0", () => {
+    console.info(`TD API server is running on port ${process.env.API_PORT}`);
+    console.log("DATABASE", process.env.DATABASE_URL);
+  });
 
   function shutdown() {
     return closeQueues().finally(() => {
