@@ -41,7 +41,7 @@ jobs:
       - name: Testing API resolution
         run: |
           ping -c 2 api.trackdechets.local
-          curl api.trackdechets.local
+          timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' api.trackdechets.local)" != "200" ]]; do sleep 5; done' || false
       - name: Testing UI resolution
         run: |
           ping -c 2 trackdechets.local
