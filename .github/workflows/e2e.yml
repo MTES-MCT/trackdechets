@@ -40,7 +40,7 @@ jobs:
       # Wait
       - name: Wait
         run: |
-          sleep 300s
+          sleep 60s
 
       # Debug
       - name: Testing API resolution

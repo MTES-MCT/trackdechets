@@ -2,7 +2,6 @@ import { Page, expect } from "@playwright/test";
 import { prisma } from "back";
 import { goTo } from "./navigation";
 import { wait } from "./time";
-import { logScreenshot } from "./debug";
 
 /**
  * Logs a user in with provided credentials. Makes no assertion.
@@ -33,7 +32,6 @@ export const failedLogin = async (page: Page, { email, password }) => {
   // Login
   await login(page, { email, password });
 
-  await logScreenshot(page);
   // Error should pop
   await expect(page.getByRole("heading", { name: "Erreur" })).toBeVisible();
   await expect(page.getByText("Email ou mot de passe incorrect")).toBeVisible();
