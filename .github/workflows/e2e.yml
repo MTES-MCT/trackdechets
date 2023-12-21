@@ -10,11 +10,11 @@ jobs:
       # Hosts
       - name: Add hosts to /etc/hosts
         run: |
-            sudo echo "127.0.0.1 api.trackdechets.local" | sudo tee -a /etc/hosts
-            sudo echo "127.0.0.1 trackdechets.local" | sudo tee -a /etc/hosts
-            sudo echo "127.0.0.1 es.trackdechets.local" | sudo tee -a /etc/hosts
-            sudo echo "127.0.0.1 notifier.trackdechets.local" | sudo tee -a /etc/hosts
-            sudo echo "127.0.0.1 redis postgres elasticsearch mongodb" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 api.trackdechets.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 trackdechets.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 es.trackdechets.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 notifier.trackdechets.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 redis postgres elasticsearch mongodb" | sudo tee -a /etc/hosts
 
       # Trackdéchets
       - uses: actions/checkout@v4
@@ -35,13 +35,13 @@ jobs:
           TERM=xterm bash ./scripts/deploy-db.sh
       - name: Start TD applications
         run: |
-          npx nx dev &
+          npx nx dev >> /tmp/trackdechets.log &
 
       # Debug
       - name: Testing API resolution
         run: |
           ping -c 2 api.trackdechets.local
-          timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' api.trackdechets.local)" != "200" ]]; do sleep 5; done' || false
+          curl api.trackdechets.local
       - name: Testing UI resolution
         run: |
           ping -c 2 trackdechets.local
@@ -55,6 +55,11 @@ jobs:
         run: |
           ping -c 2 notifier.trackdechets.local
           curl notifier.trackdechets.local
+
+      # Show logs
+      - name: Show logs
+        run: |
+          cat /tmp/trackdechets.log
 
       # Playwright
       - name: Install Playwright Browsers
@@ -76,7 +81,7 @@ env:
   USE_XFF_HEADER: true
   SESSION_COOKIE_SECURE: false
   QUEUE_MONITOR_TOKEN: token
-  DATABASE_URL: 'postgresql://trackdechets:password@postgres:5432/e2e?schema=default$default'
+  DATABASE_URL: "postgresql://trackdechets:password@postgres:5432/e2e?schema=default$default"
   API_TOKEN_SECRET: any_secret
   INSEE_SECRET: unset
   SESSION_SECRET: any_secret
@@ -228,5 +233,3 @@ env:
     SwIDAQAB
     -----END PUBLIC KEY-----
   WEBHOOK_TOKEN_ENCRYPTION_KEY: abcdefgh12345678abcdefgh12345678
-
-
