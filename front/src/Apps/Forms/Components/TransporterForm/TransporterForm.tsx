@@ -116,7 +116,7 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
     <div className="fr-container">
       <CompanySelectorWrapper
         orgId={orgId}
-        transporterOrgId={transporterOrgId}
+        selectedCompanyOrgId={transporterOrgId}
         favoriteType={FavoriteType.Transporter}
         allowForeignCompanies={true}
         selectedCompanyError={selectedCompanyError}
