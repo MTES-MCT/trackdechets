@@ -65,7 +65,10 @@ describe("CompanySelectorWrapper", () => {
   it("should set selectedCompany at render if `formOrgId` is specified", async () => {
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <CompanySelectorWrapper orgId={testSiret} formOrgId={formOrgId} />
+        <CompanySelectorWrapper
+          orgId={testSiret}
+          transporterOrgId={formOrgId}
+        />
       </MockedProvider>
     );
 
