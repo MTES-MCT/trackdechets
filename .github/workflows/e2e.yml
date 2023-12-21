@@ -35,7 +35,7 @@ jobs:
           TERM=xterm bash ./scripts/deploy-db.sh
       - name: Start TD applications
         run: |
-          npx nx run-many -t serve:production --projects=api,front,tag:backend:background --parallel=6 >> /tmp/trackdechets.log &
+          npm run dev >> /tmp/trackdechets.log &
 
       # Wait
       - name: Wait
