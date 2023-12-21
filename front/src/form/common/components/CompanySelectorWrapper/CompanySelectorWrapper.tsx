@@ -53,7 +53,8 @@ export default function CompanySelectorWrapper({
   onCompanySelected
 }: CompanySelectorWrapperProps) {
   // Établissement sélectionné
-  const [selectedCompany, setSelectedCompany] = useState<CompanySearchResult>();
+  const [selectedCompany, setSelectedCompany] =
+    useState<CompanySearchResult | null>(null);
 
   // Résultats de recherche
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>();
@@ -71,7 +72,7 @@ export default function CompanySelectorWrapper({
     );
 
   const onSelectCompany = useCallback(
-    (company?: CompanySearchResult) => {
+    (company: CompanySearchResult) => {
       setSelectedCompany(company);
       // propage l'événement au parent pour modifier les données du store (Formik)
       onCompanySelected && onCompanySelected(company);
@@ -94,6 +95,9 @@ export default function CompanySelectorWrapper({
           }
         }
       });
+    }
+    if (!transporterOrgId && selectedCompany) {
+      setSelectedCompany(null);
     }
   }, [
     selectedCompany,
