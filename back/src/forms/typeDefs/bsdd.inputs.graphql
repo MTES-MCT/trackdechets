@@ -428,7 +428,7 @@ ou à l'étranger uniquement pour NextDestinationInput
 """
 input InternationalCompanyInput {
   "Un identifiant d'établissement hors EU"
-  extraEUCompanyId: String
+  extraEuropeanId: String
 
   "SIRET de l'établissement, optionnel dans le cas d'un établissement à l'étranger"
   siret: String

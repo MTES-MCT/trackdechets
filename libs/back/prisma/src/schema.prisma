@@ -409,6 +409,7 @@ model Form {
   nextDestinationCompanyMail         String?
   nextDestinationCompanyCountry      String?
   nextDestinationCompanyVatNumber    String?
+  nextDestinationCompanyExtraEuropeanId  String?
   nextDestinationNotificationNumber  String?
   emitterWorkSiteName                String?
   emitterWorkSiteAddress             String?
@@ -445,7 +446,7 @@ model Form {
   canAccessDraftSirets String[] @default([])
 
   // Fraction du bordereau regroupée dans des bordereaux de regroupement
-  // La quantité restante à regrouper s'obtient en faisant quantityReceived - quantityGrouped 
+  // La quantité restante à regrouper s'obtient en faisant quantityReceived - quantityGrouped
   quantityGrouped Float @default(0)
 
   // partial index _FormIsDeletedIdx see migration82_missing_indices.sql

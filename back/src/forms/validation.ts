@@ -1346,14 +1346,37 @@ const withNextDestination = (required: boolean) =>
         required,
         `Destination ultérieure : ${MISSING_COMPANY_EMAIL}`
       ),
-    nextDestinationNotificationNumber: yup
+    nextDestinationCompanyExtraEuropeanId: yup
       .string()
       .notRequired()
       .nullable()
+      .when("nextDestinationCompanyVatNumber", {
+        is: nextDestinationCompanyVatNumber => !!nextDestinationCompanyVatNumber,
+        then: schema => schema.oneOf([null, ""],
+          `Destination ultérieure : le numéro d'identification extra-européen ne doit pas être renseigné en même temps qu'un TVA intra-communautaire`
+        ),
+        otherwise: schema => schema.notRequired().nullable()
+      })
+      .when("nextDestinationCompanySiret", {
+        is: nextDestinationCompanySiret => !!nextDestinationCompanySiret,
+        then: schema => schema.oneOf([null, ""],
+          `Destination ultérieure : le numéro d'identification extra-européen ne doit pas être renseigné en même temps qu'un SIRET`
+        ),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    nextDestinationNotificationNumber: yup
+      .string()
       .matches(
         /^[a-zA-Z]{2}[0-9]{4}$|^$/,
         "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
       )
+      .when("nextDestinationCompanyExtraEuropeanId", {
+        is: nextDestinationCompanyExtraEuropeanId => !!nextDestinationCompanyExtraEuropeanId,
+        then: schema => schema.required(
+          `Destination ultérieure : le numéro de notification GISTRID est obligatoire`
+        ),
+        otherwise: schema => schema.notRequired().nullable()
+      })
   });
 
 const withoutNextDestination = yup.object().shape({

@@ -475,14 +475,7 @@ describe("mutation.markAsProcessed", () => {
           nextDestination: {
             processingOperation: "D 1",
             company: {
-              mail: "m@m.fr",
-              siret: null,
-              vatNumber: "IE9513674T",
-              country: "IE",
-              name: "IE company",
-              phone: "0101010101",
-              contact: "The famous bot",
-              address: "A beautiful place..."
+              vatNumber: "IE9513674T"
             }
           }
         }
@@ -519,13 +512,7 @@ describe("mutation.markAsProcessed", () => {
           nextDestination: {
             processingOperation: "D 1",
             company: {
-              mail: "m@m.fr",
-              extraEUCompanyId: "IE9513674T",
-              country: "RU",
-              name: "RU company",
-              phone: "0101010101",
-              contact: "The famous bot",
-              address: "A fresh place..."
+              extraEuropeanId: "IE9513674T"
             }
           }
         }
@@ -1006,7 +993,7 @@ describe("mutation.markAsProcessed", () => {
           processedAt: "2018-12-11T00:00:00.000Z" as any,
           noTraceability: true,
           nextDestination: {
-            processingOperation: "D 1",
+            processingOperation: "D 1"
           }
         }
       }
@@ -1041,6 +1028,9 @@ describe("mutation.markAsProcessed", () => {
           noTraceability: true,
           nextDestination: {
             processingOperation: "D 1",
+            company: {
+              extraEuropeanId: "AZERTY"
+            },
             notificationNumber: "123456AZERTY" // required if extra-EU
           }
         }
@@ -1083,7 +1073,7 @@ describe("mutation.markAsProcessed", () => {
             processingOperation: "D 1",
             // notificationNumber: "123456AZERTY"  // soon to be required if intra-EU (breaking-change to be annonced)
             company: {
-              extraEUCompanyId: "123456AZERTY"
+              extraEuropeanId: "123456AZERTY"
             }
           }
         }
@@ -1185,20 +1175,19 @@ describe("mutation.markAsProcessed", () => {
     ]);
   });
 
-
   test("nextDestination.company should be mandatory when noTraceability is false (by default)", async () => {
-      const { user, company } = await userWithCompanyFactory("ADMIN");
-      const form = await formFactory({
-        ownerId: user.id,
-        opt: {
-          status: "ACCEPTED",
-          recipientCompanyName: company.name,
-          recipientCompanySiret: company.siret
-        }
-      });
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
 
-      const { mutate } = makeClient(user);
-      const { errors } = await mutate<
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
       Pick<Mutation, "markAsProcessed">,
       MutationMarkAsProcessedArgs
     >(MARK_AS_PROCESSED, {
@@ -1255,7 +1244,7 @@ describe("mutation.markAsProcessed", () => {
           nextDestination: {
             processingOperation: "D 1",
             company: {
-              extraEUCompanyId: "some internation id"
+              extraEuropeanId: "some internation id"
             }
           }
         }

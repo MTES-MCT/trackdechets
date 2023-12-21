@@ -39,7 +39,7 @@ type FormCompany {
   omiNumber: String
 
   "Un identifiant d'établissement hors EU"
-  extraEUCompanyId: String
+  extraEuropeanId: String
 }
 
 "Informations sur une adresse chantier"
