@@ -33,7 +33,8 @@
         "commands": [
           "prisma db push",
           "npm --prefix back run reindex-all-bsds-bulk"
-        ]
+        ],
+        "parallel": false
       }
     },
     "test": {
