@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  fireEvent,
-  getByText,
-  getByTitle,
-  render,
-  waitFor
-} from "@testing-library/react";
+import { fireEvent, getByTitle, render } from "@testing-library/react";
 import { TransporterAccordion } from "./TransporterAccordion";
 
 describe("TransporterAccordion", () => {
