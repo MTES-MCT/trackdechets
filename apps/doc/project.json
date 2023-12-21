@@ -1,0 +1,50 @@
+{
+  "name": "doc",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/doc/src",
+  "targets": {
+    "build": {
+      "dependsOn": ["gql-docs", "build-workflows"],
+      "executor": "@nx-plus/docusaurus:browser",
+      "options": {
+        "outputPath": "dist/apps/doc"
+      }
+    },
+    "serve": {
+      "dependsOn": ["gql-docs", "build-workflows"],
+      "executor": "@nx-plus/docusaurus:dev-server",
+      "options": {
+        "port": 3000
+      }
+    },
+    "build-workflows": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsc --project {projectRoot}/plugin/tsconfig.json",
+          "copyfiles back/src/**/*.gql {projectRoot}/plugin/build"
+        ]
+      }
+    },
+    "gql-docs": {
+      "inputs": ["{workspaceRoot}/back/src/**/*.graphql"],
+      "cache": true,
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "cd apps/doc && docusaurus docs:generate:graphql:user-company",
+          "cd apps/doc && docusaurus docs:generate:graphql:bsdd",
+          "cd apps/doc && docusaurus docs:generate:graphql:bsdasri",
+          "cd apps/doc && docusaurus docs:generate:graphql:bsff",
+          "cd apps/doc && docusaurus docs:generate:graphql:bsda",
+          "cd apps/doc && docusaurus docs:generate:graphql:bsvhu",
+          "cd apps/doc && docusaurus docs:generate:graphql:registry",
+          "cd apps/doc && docusaurus docs:generate:graphql:webhooks",
+          "cd apps/doc && docusaurus docs:generate:graphql:bspaoh"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

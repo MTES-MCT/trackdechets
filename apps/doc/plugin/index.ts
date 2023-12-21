@@ -1,11 +1,11 @@
 import { Plugin } from "@docusaurus/types";
-import bsdWorkflows from "../../back/src/forms/examples/workflows";
-import bsdasriWorkflows from "../../back/src/bsdasris/examples/workflows";
-import bsvhuWorkflows from "../../back/src/bsvhu/examples/workflows";
-import bsffWorkflows from "../../back/src/bsffs/examples/workflows";
-import bsdaWorkflows from "../../back/src/bsda/examples/workflows";
-import bspaohWorkflows from "../../back/src/bspaoh/examples/workflows";
-import { Workflow } from "../../back/src/common/workflow";
+import bsdWorkflows from "../../../back/src/forms/examples/workflows";
+import bsdasriWorkflows from "../../../back/src/bsdasris/examples/workflows";
+import bsvhuWorkflows from "../../../back/src/bsvhu/examples/workflows";
+import bsffWorkflows from "../../../back/src/bsffs/examples/workflows";
+import bsdaWorkflows from "../../../back/src/bsda/examples/workflows";
+import bspaohWorkflows from "../../../back/src/bspaoh/examples/workflows";
+import { Workflow } from "../../../back/src/common/workflow";
 
 
 // parse workflow definition files

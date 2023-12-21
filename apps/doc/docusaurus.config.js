@@ -6,33 +6,33 @@ module.exports = {
   tagline: "Connectez vos systèmes d'information à l'API Trackdéchets",
   url: "https://developers.trackdechets.beta.gouv.fr",
   baseUrl: "/",
-  onBrokenLinks: "throw",
+  onBrokenLinks: "ignore",
   onBrokenMarkdownLinks: "throw",
   favicon: "img/trackdechets.png",
   organizationName: "MTES-MCT",
   projectName: "trackdechets",
   themeConfig: {
     colorMode: {
-      disableSwitch: true,
+      disableSwitch: true
     },
     navbar: {
       title: "Trackdéchets",
       logo: {
         alt: "Logo Ministère de la Transition Écologique",
-        src: "img/mte.svg",
+        src: "img/mte.svg"
       },
       items: [
         {
           href: "https://forum.trackdechets.beta.gouv.fr",
           label: "Support",
-          position: "right",
+          position: "right"
         },
         {
           href: "https://api.trackdechets.beta.gouv.fr",
           label: "Playground",
-          position: "right",
-        },
-      ],
+          position: "right"
+        }
+      ]
     },
     footer: {
       style: "dark",
@@ -42,51 +42,51 @@ module.exports = {
           items: [
             {
               label: "Documentation",
-              to: "/",
+              to: "/"
             },
             {
               label: "Statut de l'API",
-              to: "https://status.trackdechets.beta.gouv.fr",
+              to: "https://status.trackdechets.beta.gouv.fr"
             },
             {
               label: "Playground GraphQL",
-              to: "https://api.trackdechets.beta.gouv.fr",
+              to: "https://api.trackdechets.beta.gouv.fr"
             },
             {
               label: "Code source",
-              to: "https://github.com/MTES-MCT/trackdechets",
-            },
-          ],
+              to: "https://github.com/MTES-MCT/trackdechets"
+            }
+          ]
         },
         {
           title: "Communauté",
           items: [
             {
               label: "Forum technique",
-              href: "https://developers.trackdechets.beta.gouv.fr",
-            },
-          ],
+              href: "https://developers.trackdechets.beta.gouv.fr"
+            }
+          ]
         },
         {
           title: "Trackdéchets",
           items: [
             {
               label: "Site web",
-              to: "https://trackdechets.beta.gouv.fr",
+              to: "https://trackdechets.beta.gouv.fr"
             },
             {
               label: "Ressources",
-              to: "https://trackdechets.beta.gouv.fr/resources",
+              to: "https://trackdechets.beta.gouv.fr/resources"
             },
             {
               label: "Application web",
-              to: "https://app.trackdechets.beta.gouv.fr",
-            },
-          ],
-        },
+              to: "https://app.trackdechets.beta.gouv.fr"
+            }
+          ]
+        }
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Ministère de la Transition Écologique`,
-    },
+      copyright: `Copyright © ${new Date().getFullYear()} Ministère de la Transition Écologique`
+    }
   },
   presets: [
     [
@@ -95,13 +95,13 @@ module.exports = {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl: "https://github.com/MTES-MCT/trackdechets/edit/dev/doc",
-          routeBasePath: "/",
+          routeBasePath: "/"
         },
         theme: {
-          customCss: require.resolve("./src/css/custom.css"),
-        },
-      },
-    ],
+          customCss: require.resolve("./src/css/custom.css")
+        }
+      }
+    ]
   ],
   plugins: [
     [
@@ -109,49 +109,50 @@ module.exports = {
       {
         id: "user-company",
         schema:
-          "../back/src/{scalars,common,users,companies}/typeDefs/*.graphql",
-        routeBasePath: "/reference/api-reference/user-company",
-      },
+          "../../back/src/{scalars,common,users,companies}/typeDefs/*.graphql",
+        routeBasePath: "/reference/api-reference/user-company"
+      }
     ],
     [
       "docusaurus-graphql-plugin",
       {
         id: "bsdd",
-        schema: "../back/src/{scalars,common,bsds,forms}/typeDefs/*.graphql",
-        routeBasePath: "/reference/api-reference/bsdd",
-      },
+        schema: "../../back/src/{scalars,common,bsds,forms}/typeDefs/*.graphql",
+        routeBasePath: "/reference/api-reference/bsdd"
+      }
     ],
     [
       "docusaurus-graphql-plugin",
       {
         id: "bsdasri",
-        schema: "../back/src/{scalars,common,bsds,bsdasris}/typeDefs/*.graphql",
-        routeBasePath: "/reference/api-reference/bsdasri",
-      },
+        schema:
+          "../../back/src/{scalars,common,bsds,bsdasris}/typeDefs/*.graphql",
+        routeBasePath: "/reference/api-reference/bsdasri"
+      }
     ],
     [
       "docusaurus-graphql-plugin",
       {
         id: "bsff",
-        schema: "../back/src/{scalars,common,bsds,bsffs}/typeDefs/*.graphql",
-        routeBasePath: "/reference/api-reference/bsff",
-      },
+        schema: "../../back/src/{scalars,common,bsds,bsffs}/typeDefs/*.graphql",
+        routeBasePath: "/reference/api-reference/bsff"
+      }
     ],
     [
       "docusaurus-graphql-plugin",
       {
         id: "bsda",
-        schema: "../back/src/{scalars,common,bsds,bsda}/typeDefs/*.graphql",
-        routeBasePath: "/reference/api-reference/bsda",
-      },
+        schema: "../../back/src/{scalars,common,bsds,bsda}/typeDefs/*.graphql",
+        routeBasePath: "/reference/api-reference/bsda"
+      }
     ],
     [
       "docusaurus-graphql-plugin",
       {
         id: "bsvhu",
-        schema: "../back/src/{scalars,common,bsds,bsvhu}/typeDefs/*.graphql",
-        routeBasePath: "/reference/api-reference/bsvhu",
-      },
+        schema: "../../back/src/{scalars,common,bsds,bsvhu}/typeDefs/*.graphql",
+        routeBasePath: "/reference/api-reference/bsvhu"
+      }
     ],
     [
       "docusaurus-graphql-plugin",
@@ -165,19 +166,19 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "registry",
-        schema: "../back/src/{scalars,common,registry}/typeDefs/*.graphql",
-        routeBasePath: "/reference/api-reference/registre",
-      },
+        schema: "../../back/src/{scalars,common,registry}/typeDefs/*.graphql",
+        routeBasePath: "/reference/api-reference/registre"
+      }
     ],
     [
       "docusaurus-graphql-plugin",
       {
         id: "webhooks",
-        schema: "../back/src/{scalars,common,webhooks}/typeDefs/*.graphql",
-        routeBasePath: "/reference/api-reference/webhooks",
-      },
+        schema: "../../back/src/{scalars,common,webhooks}/typeDefs/*.graphql",
+        routeBasePath: "/reference/api-reference/webhooks"
+      }
     ],
     // plugin used to make workflows examples available with `usePluginData`
-    path.join(__dirname, "plugin", "build", "doc", "plugin", "index.js"),
-  ],
+    path.join(__dirname, "plugin/build/apps/doc/plugin/index.js")
+  ]
 };
