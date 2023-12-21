@@ -61,10 +61,12 @@ export const successfulLogin = async (page: Page, { email, password }) => {
 };
 
 /**
- * Creates an account with provided credentials. Makes no assertion.
- * Will *not* activate the account via email link.
+ * Will fill the signup form but NOT submit it
  */
-export const signup = async (page: Page, { username, email, password }) => {
+export const fillSignupInfo = async (
+  page: Page,
+  { username, email, password }
+) => {
   await goTo(page, "/signup");
 
   // Name
@@ -76,8 +78,21 @@ export const signup = async (page: Page, { username, email, password }) => {
   // Password
   await page.getByLabel("Mot de passe", { exact: true }).fill(password);
 
-  // Terms + confirmation
+  // Terms
   await page.getByText("Je certifie avoir lu les conditions générales").click();
+
+  return { username, email, password };
+};
+
+/**
+ * Creates an account with provided credentials. Makes no assertion.
+ * Will *not* activate the account via email link.
+ */
+export const signup = async (page: Page, { username, email, password }) => {
+  // Fill the info
+  await fillSignupInfo(page, { username, email, password });
+
+  // Try to click on 'create account' button, if enabled
   await page.getByRole("button", { name: "Créer mon compte" }).click();
 
   return { username, email, password };
@@ -88,7 +103,7 @@ export const signup = async (page: Page, { username, email, password }) => {
  */
 export const testSignupPasswordPolicy = async (page: Page) => {
   // Password is too short
-  await signup(page, {
+  await fillSignupInfo(page, {
     username: "Username",
     email: "user@mail.com",
     password: "aa"
@@ -99,7 +114,7 @@ export const testSignupPasswordPolicy = async (page: Page) => {
   ).toBeDisabled();
 
   // Password is too weak
-  await signup(page, {
+  await fillSignupInfo(page, {
     username: "Username",
     email: "user@mail.com",
     password: "aaaaaaaaaaa"
@@ -112,7 +127,7 @@ export const testSignupPasswordPolicy = async (page: Page) => {
   ).toBeDisabled();
 
   // Strong password
-  await signup(page, {
+  await fillSignupInfo(page, {
     username: "Username",
     email: "user@mail.com",
     password: "AMmlN098Y1$$19081N"

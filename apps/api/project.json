@@ -73,7 +73,9 @@
         "production": {
           "buildTarget": "api:build:production"
         },
-        "integration": {}
+        "integration": {
+          "buildTarget": "api:build:development"
+        }
       }
     },
     "lint": {
