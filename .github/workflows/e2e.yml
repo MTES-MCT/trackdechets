@@ -37,6 +37,11 @@ jobs:
         run: |
           npx nx dev >> /tmp/trackdechets.log &
 
+      # Wait
+      - name: Wait
+        run: |
+          sleep 300s
+
       # Debug
       - name: Testing API resolution
         run: |
@@ -59,7 +64,6 @@ jobs:
       # Show logs
       - name: Show logs
         run: |
-          sleep 60s
           cat /tmp/trackdechets.log
 
       # Playwright
