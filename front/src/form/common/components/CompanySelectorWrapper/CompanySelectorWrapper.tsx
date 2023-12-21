@@ -18,7 +18,7 @@ interface CompanySelectorWrapperProps {
   // Expose le state Formik depuis le composant parent
   // afin d'initialiser le `selectedCompany` au premier
   // render lorsqu'on est dans le cas d'un update de bordereau
-  transporterOrgId?: string | null;
+  selectedCompanyOrgId?: string | null;
   favoriteType?: FavoriteType;
   // Paramètre qui est passée à `searchCompanies`, les données sont
   // filtrées directement côté serveur
@@ -44,7 +44,7 @@ interface CompanySelectorWrapperProps {
  * les données du store (Formik)
  */
 export default function CompanySelectorWrapper({
-  transporterOrgId,
+  selectedCompanyOrgId,
   favoriteType = FavoriteType.Emitter,
   allowForeignCompanies = false,
   selectedCompanyError,
@@ -86,9 +86,12 @@ export default function CompanySelectorWrapper({
   // dans le CompanySelector (par exemple si on permute deux transporteurs
   // dans la liste des transporteurs multi-modaux)
   useEffect(() => {
-    if (transporterOrgId && transporterOrgId !== selectedCompany?.orgId) {
+    if (
+      selectedCompanyOrgId &&
+      selectedCompanyOrgId !== selectedCompany?.orgId
+    ) {
       searchCompaniesQuery({
-        variables: { clue: transporterOrgId },
+        variables: { clue: selectedCompanyOrgId },
         onCompleted: result => {
           if (result.searchCompanies?.length > 0) {
             onSelectCompany(result.searchCompanies[0]);
@@ -96,12 +99,12 @@ export default function CompanySelectorWrapper({
         }
       });
     }
-    if (!transporterOrgId && selectedCompany) {
+    if (!selectedCompanyOrgId && selectedCompany) {
       setSelectedCompany(null);
     }
   }, [
     selectedCompany,
-    transporterOrgId,
+    selectedCompanyOrgId,
     searchCompaniesQuery,
     onSelectCompany
   ]);

@@ -32,7 +32,7 @@ export default function Emitter({ disabled }) {
         orgId={siret}
         favoriteType={FavoriteType.Emitter}
         disabled={disabled}
-        formOrgId={orgId}
+        selectedCompanyOrgId={orgId}
         onCompanySelected={company => {
           if (company) {
             const companyData = {
