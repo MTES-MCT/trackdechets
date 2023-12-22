@@ -220,6 +220,7 @@ type ProcessedInfo = Pick<
   | "nextDestinationCompanyPhone"
   | "nextDestinationCompanyMail"
   | "nextDestinationCompanyVatNumber"
+  | "nextDestinationCompanyExtraEuropeanId"
   | "nextDestinationNotificationNumber"
 >;
 
@@ -1278,16 +1279,10 @@ const withNextDestination = (required: boolean) =>
       .requiredIf(required, `Destination ultérieure : ${MISSING_COMPANY_NAME}`),
     nextDestinationCompanySiret: siret
       .label("Destination ultérieure prévue")
-      .when("nextDestinationCompanyVatNumber", (vat, schema) => {
-        return !isVat(vat) && required
-          ? schema.required(
-              `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
-            )
-          : schema.notRequired().nullable();
-      }),
-    nextDestinationCompanyVatNumber: vatNumber.label(
-      "Destination ultérieure prévue"
-    ),
+      .nullable(),
+    nextDestinationCompanyVatNumber: vatNumber
+      .label("Destination ultérieure prévue")
+      .nullable(),
     nextDestinationCompanyAddress: yup
       .string()
       .ensure()
@@ -1348,22 +1343,7 @@ const withNextDestination = (required: boolean) =>
       ),
     nextDestinationCompanyExtraEuropeanId: yup
       .string()
-      .notRequired()
-      .nullable()
-      .when("nextDestinationCompanyVatNumber", {
-        is: nextDestinationCompanyVatNumber => !!nextDestinationCompanyVatNumber,
-        then: schema => schema.oneOf([null, ""],
-          `Destination ultérieure : le numéro d'identification extra-européen ne doit pas être renseigné en même temps qu'un TVA intra-communautaire`
-        ),
-        otherwise: schema => schema.notRequired().nullable()
-      })
-      .when("nextDestinationCompanySiret", {
-        is: nextDestinationCompanySiret => !!nextDestinationCompanySiret,
-        then: schema => schema.oneOf([null, ""],
-          `Destination ultérieure : le numéro d'identification extra-européen ne doit pas être renseigné en même temps qu'un SIRET`
-        ),
-        otherwise: schema => schema.notRequired().nullable()
-      }),
+      .nullable(),
     nextDestinationNotificationNumber: yup
       .string()
       .matches(
@@ -1377,7 +1357,16 @@ const withNextDestination = (required: boolean) =>
         ),
         otherwise: schema => schema.notRequired().nullable()
       })
-  });
+  }).test(
+      'XORIdRequired',
+      `Destination ultérieure : ${MISSING_COMPANY_SIRET} (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)`,
+    (obj: Partial<Form>) => {
+      const ids = [obj.nextDestinationCompanyExtraEuropeanId, obj.nextDestinationCompanySiret, obj.nextDestinationCompanyVatNumber];
+      const definedIds = ids.filter(id => id != null);
+      // Check if only one ID is defined
+      return !required || definedIds.length === 1;
+    }
+  );
 
 const withoutNextDestination = yup.object().shape({
   nextDestinationProcessingOperation: yup
@@ -1417,6 +1406,10 @@ const withoutNextDestination = yup.object().shape({
     .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION),
   nextDestinationNotificationNumber: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationCompanyExtraEuropeanId: yup
     .string()
     .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION)
