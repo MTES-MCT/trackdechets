@@ -488,7 +488,7 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  it("should mark a form as NO_TRACEABILITY when user declares it and with foreign non-EU destination, with optional company infos", async () => {
+  it("should mark a form as NO_TRACEABILITY when user declares it and with foreign extraEuropean destination, with optional company infos", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -511,8 +511,9 @@ describe("mutation.markAsProcessed", () => {
           noTraceability: true,
           nextDestination: {
             processingOperation: "D 1",
+            notificationNumber: "GB1235",
             company: {
-              extraEuropeanId: "IE9513674T"
+              extraEuropeanId: "ANYTHING"
             }
           }
         }
@@ -780,7 +781,7 @@ describe("mutation.markAsProcessed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire"
+          "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"
       })
     ]);
   });
@@ -1028,10 +1029,7 @@ describe("mutation.markAsProcessed", () => {
           noTraceability: true,
           nextDestination: {
             processingOperation: "D 1",
-            company: {
-              extraEuropeanId: "AZERTY"
-            },
-            notificationNumber: "123456AZERTY" // required if extra-EU
+            notificationNumber: "RU1234" // required if extra-EU
           }
         }
       }
@@ -1045,7 +1043,7 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  test("Foreign nextDestination.company should be optional except for notificationNumber when noTraceability is true", async () => {
+  test("NotificationNumber should have the right format (country-code + 4 numbers) and should be mandatory when noTraceability is true", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -1071,7 +1069,48 @@ describe("mutation.markAsProcessed", () => {
           noTraceability: true,
           nextDestination: {
             processingOperation: "D 1",
-            // notificationNumber: "123456AZERTY"  // soon to be required if intra-EU (breaking-change to be annonced)
+            company: {
+              extraEuropeanId: "AZERTY"
+            },
+            notificationNumber: "123456AZERTY" // required if extra-EU
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
+      })
+    ]);
+  });
+
+  test("notificationNumber should be mandatory when nextDestination.company is foreign when noTraceability is true", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsProcessed">,
+      MutationMarkAsProcessedArgs
+    >(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z" as any,
+          noTraceability: true,
+          nextDestination: {
+            processingOperation: "D 1",
             company: {
               extraEuropeanId: "123456AZERTY"
             }
@@ -1122,11 +1161,11 @@ describe("mutation.markAsProcessed", () => {
       expect.objectContaining({
         message:
           "Destination ultérieure : Le nom de l'entreprise est obligatoire\n" +
-          "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire\n" +
           "Destination ultérieure : L'adresse de l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
-          "Destination ultérieure : L'email de l'entreprise est obligatoire"
+          "Destination ultérieure : L'email de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"
       })
     ]);
   });
@@ -1166,11 +1205,11 @@ describe("mutation.markAsProcessed", () => {
       expect.objectContaining({
         message:
           "Destination ultérieure : Le nom de l'entreprise est obligatoire\n" +
-          "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire\n" +
           "Destination ultérieure : L'adresse de l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
-          "Destination ultérieure : L'email de l'entreprise est obligatoire"
+          "Destination ultérieure : L'email de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"
       })
     ]);
   });
@@ -1209,11 +1248,11 @@ describe("mutation.markAsProcessed", () => {
       expect.objectContaining({
         message:
           "Destination ultérieure : Le nom de l'entreprise est obligatoire\n" +
-          "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire\n" +
           "Destination ultérieure : L'adresse de l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
-          "Destination ultérieure : L'email de l'entreprise est obligatoire"
+          "Destination ultérieure : L'email de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"
       })
     ]);
   });
@@ -1255,11 +1294,10 @@ describe("mutation.markAsProcessed", () => {
       expect.objectContaining({
         message:
           "Destination ultérieure : Le nom de l'entreprise est obligatoire\n" +
-          "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire\n" +
           "Destination ultérieure : L'adresse de l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
-          "Destination ultérieure : L'email de l'entreprise est obligatoire" +
+          "Destination ultérieure : L'email de l'entreprise est obligatoire\n" +
           "Destination ultérieure : le numéro de notification GISTRID est obligatoire"
       })
     ]);

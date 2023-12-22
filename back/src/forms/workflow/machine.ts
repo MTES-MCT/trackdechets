@@ -319,6 +319,11 @@ const machine = Machine<any, Event>(
  */
 function isForeignNextDestination(update: Prisma.FormUpdateInput) {
   if (
+    update.nextDestinationCompanyExtraEuropeanId
+  ) {
+    return true;
+  }
+  if (
     update.nextDestinationCompanyVatNumber &&
     isForeignVat(update.nextDestinationCompanyVatNumber as string)
   ) {
