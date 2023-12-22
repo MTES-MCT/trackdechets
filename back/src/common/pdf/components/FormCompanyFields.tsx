@@ -43,8 +43,10 @@ export function FormCompanyFields({
         <input
           type="checkbox"
           checked={
-            !!company?.vatNumber &&
-            company.vatNumber.length > 0 &&
+            (!!company?.extraEuropeanId &&
+              company.extraEuropeanId.length > 0) &&
+            (!!company?.vatNumber &&
+            company.vatNumber.length > 0) &&
             companyCountry?.cca2 !== "FR"
           }
           readOnly
@@ -52,7 +54,7 @@ export function FormCompanyFields({
         Entreprise étrangère
       </p>
       <p>
-        {!isForeignShip && !isPrivateIndividual && !company?.vatNumber && (
+        {!isForeignShip && !isPrivateIndividual && !company?.vatNumber && !company?.extraEuropeanId && (
           <div>
             N° SIRET : {company?.siret}
             <br />
@@ -64,13 +66,19 @@ export function FormCompanyFields({
             <br />
           </div>
         )}
+        {!!company?.extraEuropeanId && company.extraEuropeanId.length > 0 && !isForeignShip && !isPrivateIndividual && (
+          <div>
+            Identifiant d'entreprise extra-européenne : {company?.extraEuropeanId}
+            <br />
+          </div>
+        )}
         {company?.omiNumber && (
           <div>
             Numéro navire OMI : {company?.omiNumber}
             <br />
           </div>
         )}
-        {!company?.siret && !company?.vatNumber
+        {!company?.siret && !company?.vatNumber && !company?.extraEuropeanId
           ? "Nom Prénom"
           : "RAISON SOCIALE"}{" "}
         : {company?.name}
