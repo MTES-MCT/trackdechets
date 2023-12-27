@@ -997,6 +997,8 @@ export const getWorkflowLabel = (
       return WorkflowDisplayType.GRP;
     case BsffType.Reexpedition:
       return WorkflowDisplayType.TRANSIT;
+    case BsffType.Reconditionnement:
+      return WorkflowDisplayType.RECONDITIONNEMENT;
 
     case EmitterType.Appendix2:
       return WorkflowDisplayType.ANNEXE_2;

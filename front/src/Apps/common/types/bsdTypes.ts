@@ -169,6 +169,7 @@ export enum WorkflowDisplayType {
   TOURNEE = "Tournée dédiée",
   ANNEXE_1 = "Annexe 1",
   ANNEXE_2 = "Regroupement",
+  RECONDITIONNEMENT = "Reconditionnement",
 
   DEFAULT = ""
 }
