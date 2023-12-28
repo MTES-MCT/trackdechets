@@ -1,0 +1,46 @@
+---
+title: BSPAOH
+---
+
+import Mermaid from '../../../src/components/Mermaid';
+
+Au cours de son cycle de vie, le BSPAOH peut passer par différents états décrits [ici](../api-reference/bspaoh/enums#bspaohstatus).
+
+
+- `INITIAL` (initial): C'est l'état dans lequel le dasri est créé.
+- `SIGNED_BY_PRODUCER` (prêt à être emporté) : Dasri signé par l'émetteur
+- `SENT` (envoyé): BSPAOH en transit vers l'installation de destination, d'entreposage ou de reconditionnement
+- `RECEIVED` (reçu): BSPAOH reçu sur l'installation de destination, d'entreposage ou de reconditionnement
+- `ACCEPTED` (accepté): BSPAOH accepté sur l'installation de destination, d'entreposage ou de reconditionnement
+- `PROCESSED` (traité): BSPAOH dont l'opération de traitement a été effectué
+- `REFUSED` (refusé): BSPAOH refusé, par le tranporteur ou le destinataire
+
+
+Le diagramme ci dessous retrace le cycle de vie d'un BSPAOH dans Trackdéchets:
+
+<Mermaid chart={`
+graph TD
+AO(NO STATE) -->|createDraftBspaoh| A
+AO(NO STATE) -->|createBspaoh| B
+A -->|"updateBspaoh"| A
+B -->|"updateBspaoh"| B
+C-->|"updateBspaoh"| C
+D-->|"updateBspaoh"| D
+E-->|"updateBspaoh"| E
+A["INITIAL (isDraft=true)"] -->|publishBspaoh| B("INITIAL (isDraft=false)")
+B -->|"signBspaoh (EMISSION)"| C(SIGNED_BY_PRODUCER)
+C -->|"signBspaoh (TRANSPORT)"| D(SENT)
+D -->|"signBspaoh (DELIVERY)"| D(SENT)
+D -->|"signBspaoh (RECEPTION)"| E(RECEIVED)
+E -->|"signBspaoh (OPERATION)"| F(PROCESSED)
+D -->|"signBspaoh (RECEPTION *)"| G(REFUSED)
+`}/>
+
+ \* si champ acceptation correspondant est REFUSED
+
+ 
+
+- `INITIAL` (initial): C'est l'état dans lequel le dasri est créé. `readableId` est affecté.
+- `SENT` (envoyé): BSPAOH en transit vers l'installation de destination, d'entreposage ou de reconditionnement
+- `RECEIVED` (reçu): BSPAOH reçu sur l'installation de destination, d'entreposage ou de reconditionnement
+- `PROCESSED` (traité): BSPAOH dont l'opération de traitement a été effectué

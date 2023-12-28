@@ -1,0 +1,62 @@
+type Query {
+  """
+  Expérimental
+  Retourne un bordereau avec l'identifiant donné.
+  """
+  bspaoh("Identifiant du bordereau à retrouver." id: ID!): Bspaoh!
+
+  """
+  Expérimental
+  Retourne tous les bordereaux de l'utilisateur connecté, en respectant les différents filtres.
+  """
+  bspaohs(
+    """
+    Expérimental
+
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `first` de paginer "en avant"
+    (des bordereaux les plus récents aux bordereaux les plus anciens)
+    Curseur après lequel les bordereaux doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les bordereaux les plus récents
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    after: ID
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `cursorAfter` de paginer "en avant"
+    (des bordereaux les plus récents aux bordereaux les plus anciens)
+    Nombre de bordereaux retournés après le `cursorAfter`
+    Défaut à 50, maximum à 500
+    """
+    first: Int
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `last` de paginer "en arrière"
+    (des bordereaux les plus anciens aux bordereaux les plus récents)
+    Curseur avant lequel les bordereaux doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les bordereaux les plus anciens
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    before: ID
+
+    """
+    (Optionnel) PAGINATION
+    Nombre de bordereaux retournés avant le `cursorBefore`
+    Défaut à 50, maximum à 500
+    """
+    last: Int
+
+    where: BspaohWhere
+  ): BspaohConnection!
+
+  """
+  Renvoie un token pour télécharger un pdf de bordereau
+  Ce token doit être transmis à la route /download pour obtenir le fichier.
+  Il est valable 10 secondes
+  """
+  bspaohPdf("ID d'un bordereau" id: ID!): FileDownload!
+}

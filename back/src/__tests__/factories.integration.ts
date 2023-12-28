@@ -57,7 +57,8 @@ describe("Test Factories", () => {
       "TRANSPORTER",
       "WASTEPROCESSOR",
       "WORKER",
-      "WASTE_VEHICLES"
+      "WASTE_VEHICLES",
+      "CREMATORIUM"
     ]);
     expect(companyAssociations[0].company.siret).toBe(company.siret);
   });

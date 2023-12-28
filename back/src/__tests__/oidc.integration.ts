@@ -343,7 +343,6 @@ describe("/oidc/token - id/secret auth", () => {
 
   it("should exchange a valid code grant for a token - base scope", async () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
-    console.log(process.env.OIDC_PUBLIC_KEY);
     const alg = "RS256";
 
     const publicKey = await jose.importSPKI(spki!, alg);
@@ -584,7 +583,8 @@ describe("/oidc/token - id/secret auth", () => {
           "TRANSPORTER",
           "WASTEPROCESSOR",
           "WORKER",
-          "WASTE_VEHICLES"
+          "WASTE_VEHICLES",
+          "CREMATORIUM"
         ],
         verified: false
       }
@@ -1086,7 +1086,8 @@ describe("/oidc/token - basic auth", () => {
           "TRANSPORTER",
           "WASTEPROCESSOR",
           "WORKER",
-          "WASTE_VEHICLES"
+          "WASTE_VEHICLES",
+          "CREMATORIUM"
         ],
         verified: true
       }

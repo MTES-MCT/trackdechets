@@ -45,6 +45,7 @@ export type CheckFn = (
   persistedBsda: PersistedBsda,
   userFunctions: UserFunctions
 ) => boolean;
+
 export type FieldCheck<Key extends keyof EditableBsdaFields> = {
   from: BsdaSignatureType;
   when?: CheckFn;

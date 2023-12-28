@@ -21,6 +21,7 @@ import { expandBsdasriFromElastic } from "../../../bsdasris/converter";
 import { expandVhuFormFromDb } from "../../../bsvhu/converter";
 import { expandBsdaFromElastic } from "../../../bsda/converter";
 import { expandBsffFromElastic } from "../../../bsffs/converter";
+import { expandBspaohFromElastic } from "../../../bspaoh/converter";
 import { bsdSearchSchema } from "../../validation";
 import { toElasticQuery } from "../../where";
 import { Permission, can, getUserRoles } from "../../../permissions";
@@ -30,6 +31,7 @@ import { BsdasriForElastic } from "../../../bsdasris/elastic";
 import { BsvhuForElastic } from "../../../bsvhu/elastic";
 import { BsdaForElastic } from "../../../bsda/elastic";
 import { BsffForElastic } from "../../../bsffs/elastic";
+import { BspaohForElastic } from "../../../bspaoh/elastic";
 import { QueryContainer } from "@elastic/elasticsearch/api/types";
 import { GraphQLContext } from "../../../types";
 
@@ -56,13 +58,17 @@ type PrismaBsdMap = {
   bsvhus: BsvhuForElastic[];
   bsdas: BsdaForElastic[];
   bsffs: BsffForElastic[];
+  bspaohs: BspaohForElastic[];
 };
+
+const FLAG_PAOH_ACTIVATED = process.env.FLAG_PAOH_ACTIVATED === "true";
 
 /**
  * Convert a list of BsdElastic to a mapping of prisma-like Bsds by retrieving rawBsd elastic field
  */
 async function toRawBsds(bsdsElastic: BsdElastic[]): Promise<PrismaBsdMap> {
-  const { BSDD, BSDA, BSDASRI, BSFF, BSVHU } = groupByBsdType(bsdsElastic);
+  const { BSDD, BSDA, BSDASRI, BSFF, BSVHU, BSPAOH } =
+    groupByBsdType(bsdsElastic);
 
   return {
     bsdds: BSDD.map(bsdElastic => bsdElastic.rawBsd as FormForElastic),
@@ -71,7 +77,10 @@ async function toRawBsds(bsdsElastic: BsdElastic[]): Promise<PrismaBsdMap> {
     ),
     bsvhus: BSVHU.map(bsdElastic => bsdElastic.rawBsd as BsvhuForElastic),
     bsdas: BSDA.map(bsdElastic => bsdElastic.rawBsd as BsdaForElastic),
-    bsffs: BSFF.map(bsdsElastic => bsdsElastic.rawBsd as BsffForElastic)
+    bsffs: BSFF.map(bsdsElastic => bsdsElastic.rawBsd as BsffForElastic),
+    bspaohs: FLAG_PAOH_ACTIVATED
+      ? BSPAOH.map(bsdsElastic => bsdsElastic.rawBsd as BspaohForElastic)
+      : []
   };
 }
 
@@ -342,7 +351,8 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
     bsdasris: concreteBsdasris,
     bsvhus: concreteBsvhus,
     bsdas: concreteBsdas,
-    bsffs: concreteBsffs
+    bsffs: concreteBsffs,
+    bspaohs: concreteBspaohs
   } = await toRawBsds(hits.map(hit => hit._source));
 
   const bsds: Record<BsdType, Bsd[]> = {
@@ -356,8 +366,10 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
     BSDASRI: await buildDasris(concreteBsdasris),
     BSVHU: concreteBsvhus.map(expandVhuFormFromDb),
     BSDA: concreteBsdas.map(expandBsdaFromElastic),
-    BSFF: concreteBsffs.map(expandBsffFromElastic)
+    BSFF: concreteBsffs.map(expandBsffFromElastic),
+    BSPAOH: concreteBspaohs.map(expandBspaohFromElastic)
   };
+
   const edges = hits
     .reduce<Array<Bsd>>((acc, { _source: { type, id } }) => {
       const bsd = bsds[type].find(bsd => bsd.id === id);

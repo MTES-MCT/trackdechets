@@ -1,0 +1,7 @@
+mutation CreateDraftBspaoh($input: BspaohInput!) {
+  createDraftBspaoh(input: $input) {
+    id
+    status
+    isDraft
+  }
+}
