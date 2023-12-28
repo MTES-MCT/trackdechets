@@ -11,7 +11,7 @@ export const CardRoadControlButton = ({ siret, form }) => {
   return (
     <Link
       to={{
-        pathname: generatePath(routes.dashboard.roadControl, {
+        pathname: generatePath(routes.dashboardv2.roadControl, {
           siret,
 
           id: form.id
@@ -36,7 +36,7 @@ export const TableRoadControlButton = ({ siret, form }) => {
   return (
     <Link
       to={{
-        pathname: generatePath(routes.dashboard.roadControl, {
+        pathname: generatePath(routes.dashboardv2.roadControl, {
           siret,
 
           id: form.id
@@ -62,7 +62,7 @@ export const useDisplayRoadControlButton = bsd => {
     Bsvhu: "bsvhuStatus",
     Bsda: "bsdaStatus"
   }[bsd.__typename];
-  const isCollectedTab = !!useMatch(routes.dashboard.transport.collected);
+  const isCollectedTab = !!useMatch(routes.dashboardv2.transport.collected);
 
   return ["SENT", "RESENT"].includes(bsd[statusKey]) && isCollectedTab;
 };

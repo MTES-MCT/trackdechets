@@ -67,7 +67,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   const links = [
     {
       title: "Contrôle routier",
-      route: generatePath(routes.dashboard.roadControl, {
+      route: generatePath(routes.dashboardv2.roadControl, {
         siret,
         id: form.id
       }),
@@ -77,7 +77,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     },
     {
       title: "Aperçu",
-      route: generatePath(routes.dashboard.bsdds.view, {
+      route: generatePath(routes.dashboardv2.bsdds.view, {
         siret,
         id: form.id
       }),
@@ -88,7 +88,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     {
       title: "Annexe 1",
       route: {
-        pathname: generatePath(routes.dashboard.bsdds.view, {
+        pathname: generatePath(routes.dashboardv2.bsdds.view, {
           siret,
           id: form.id
         }),
@@ -117,7 +117,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     },
     {
       title: "Modifier",
-      route: generatePath(routes.dashboard.bsdds.edit, {
+      route: generatePath(routes.dashboardv2.bsdds.edit, {
         siret,
         id: form.id
       }),
@@ -126,7 +126,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     },
     {
       title: "Révision",
-      route: generatePath(routes.dashboard.bsdds.review, {
+      route: generatePath(routes.dashboardv2.bsdds.review, {
         siret,
         id: form.id
       }),
