@@ -163,6 +163,8 @@ describe("Mutation.Bspaoh.create", () => {
       );
       expect(created.status).toBe("INITIAL");
       expect(created.isDraft).toBe(false);
+      // check transporter is populated
+      expect(created.transporter?.company?.siret).toEqual(company.siret);
     }
   );
 

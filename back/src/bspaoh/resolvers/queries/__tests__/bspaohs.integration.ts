@@ -94,6 +94,12 @@ describe("Query.Bspaohs", () => {
     expect(data.bspaohs.pageInfo.startCursor).toBe(paoh3.id);
     expect(data.bspaohs.pageInfo.endCursor).toBe(paoh1.id);
     expect(data.bspaohs.pageInfo.hasNextPage).toBe(false);
+    // check transporters are populated
+    const trsSirets = data.bspaohs.edges
+      .map(edge => edge.node.transporter?.company?.siret)
+      .filter(Boolean);
+
+    expect(trsSirets.length).toBe(3);
   });
 
   it("should not return deleted bspaohs", async () => {

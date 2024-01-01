@@ -13,17 +13,18 @@ import {
   Mutation
 } from "../../../../generated/graphql/types";
 import { searchCompany } from "../../../../companies/search";
+import { fullBspaoh } from "../../../fragments";
+import { gql } from "graphql-tag";
 
 jest.mock("../../../../companies/search");
 
-const DUPLICATE_BSPAOH = `
-mutation DuplicateBspaoh($id: ID!){
-  duplicateBspaoh(id: $id)  {
-    id
-    status
-    isDraft
+const DUPLICATE_BSPAOH = gql`
+  mutation DuplicateBspaoh($id: ID!) {
+    duplicateBspaoh(id: $id) {
+      ...FullBspaoh
+    }
   }
-}
+  ${fullBspaoh}
 `;
 
 const TODAY = new Date();
@@ -122,6 +123,8 @@ describe("Mutation.duplicateBspaoh", () => {
     expect(duplicated?.transporters[0]?.transporterCompanySiret).toEqual(
       bspaoh.transporters[0]?.transporterCompanySiret
     );
+    // check transporter is populated
+    expect(data.duplicateBspaoh?.transporter?.company?.siret).toBeTruthy();
   });
 
   test("duplicated BSPAOH should have the updated data when company info changes", async () => {

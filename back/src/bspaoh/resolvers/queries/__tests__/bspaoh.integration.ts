@@ -79,6 +79,8 @@ describe("Query.Bspaoh", () => {
     });
 
     expect(data.bspaoh.id).toBe(bsd.id);
+    // check transporter is populated
+    expect(data.bspaoh.transporter?.company?.siret).toBeTruthy();
   });
 
   it("should not get a draft bspaoh if user siret does not belong to allowed draft sirets", async () => {
