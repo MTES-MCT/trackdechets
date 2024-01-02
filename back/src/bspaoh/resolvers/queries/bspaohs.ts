@@ -51,6 +51,7 @@ export default async function bspaohs(
     totalCount,
     findMany: prismaPaginationArgs =>
       bspaohRepository.findMany(where, {
+        include: { transporters: true },
         ...prismaPaginationArgs,
         orderBy: { createdAt: "desc" }
       }),

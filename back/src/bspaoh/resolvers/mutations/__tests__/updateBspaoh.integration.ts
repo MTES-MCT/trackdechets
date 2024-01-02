@@ -64,6 +64,8 @@ describe("Mutation.updateBspaoh", () => {
     });
 
     expect(data.updateBspaoh.id).toBeTruthy();
+    // check transporter is populated
+    expect(data.updateBspaoh?.transporter?.company?.siret).toBeTruthy();
 
     // check input is sirenified
     expect(sirenifyBspaohInput as jest.Mock).toHaveBeenCalledTimes(1);

@@ -5,15 +5,16 @@ import makeClient from "../../../../__tests__/testClient";
 import { bspaohFactory } from "../../../__tests__/factories";
 import { Mutation } from "../../../../generated/graphql/types";
 import { BspaohStatus } from "@prisma/client";
+import { fullBspaoh } from "../../../fragments";
+import { gql } from "graphql-tag";
 
-const PUBLISH_BSPAOH = `
-mutation PublishBspaoh($id: ID!){
-  publishBspaoh(id: $id)  {
-    id
-    status
-    isDraft
+const PUBLISH_BSPAOH = gql`
+  ${fullBspaoh}
+  mutation PublishBspaoh($id: ID!) {
+    publishBspaoh(id: $id) {
+      ...FullBspaoh
+    }
   }
-}
 `;
 describe("Mutation.publishBspaoh", () => {
   afterEach(resetDatabase);
@@ -70,6 +71,8 @@ describe("Mutation.publishBspaoh", () => {
 
     expect(data.publishBspaoh.status).toBe("INITIAL");
     expect(data.publishBspaoh.isDraft).toBe(false);
+    // check transporter is populated
+    expect(data.publishBspaoh?.transporter?.company?.siret).toBeTruthy();
   });
 
   it("should forbid users other than inital creator to publish a draft bspaoh", async () => {

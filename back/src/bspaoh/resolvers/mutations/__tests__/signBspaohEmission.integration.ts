@@ -49,6 +49,8 @@ describe("Mutation.Bspaoh.sign", () => {
       });
 
       expect(data.signBspaoh.id).toBeTruthy();
+      // check transporter is populated
+      expect(data.signBspaoh?.transporter?.company?.siret).toBeTruthy();
     });
 
     it("should throw an error if the bspaoh is missing required data when the emitter tries to sign", async () => {
