@@ -124,7 +124,7 @@ export const editionRules: BspaohEditionRules = {
     required: { from: "EMISSION" }
   },
   emitterCompanyContact: {
-    readableFieldName: "le contact de l'entreprise émettrice",
+    readableFieldName: "le nom de contact de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
     required: { from: "EMISSION" }
   },
@@ -140,13 +140,30 @@ export const editionRules: BspaohEditionRules = {
     required: { from: "EMISSION" }
   },
   emitterCustomInfo: {
+    readableFieldName:
+      "les champs d'informations complémentaires de l'entreprise émettrice",
     sealed: { from: "EMISSION" }
   },
-  emitterPickupSiteName: { sealed: { from: "EMISSION" } },
-  emitterPickupSiteAddress: { sealed: { from: "EMISSION" } },
-  emitterPickupSiteCity: { sealed: { from: "EMISSION" } },
-  emitterPickupSitePostalCode: { sealed: { from: "EMISSION" } },
-  emitterPickupSiteInfos: { sealed: { from: "EMISSION" } },
+  emitterPickupSiteName: {
+    readableFieldName: "le nom de l'adresse de chantier ou de collecte",
+    sealed: { from: "EMISSION" }
+  },
+  emitterPickupSiteAddress: {
+    readableFieldName: "l'adresse de collecte ou de chantier",
+    sealed: { from: "EMISSION" }
+  },
+  emitterPickupSiteCity: {
+    readableFieldName: "la ville de l'adresse de collecte ou de chantier",
+    sealed: { from: "EMISSION" }
+  },
+  emitterPickupSitePostalCode: {
+    readableFieldName: "le code postal de l'adresse de collecte ou de chantier",
+    sealed: { from: "EMISSION" }
+  },
+  emitterPickupSiteInfos: {
+    readableFieldName: "les informations de l'adresse de collecte",
+    sealed: { from: "EMISSION" }
+  },
   emitterWasteWeightValue: {
     readableFieldName: "le poids du déchet émis",
     sealed: { from: "EMISSION" },
@@ -200,7 +217,7 @@ export const editionRules: BspaohEditionRules = {
     required: { from: "EMISSION" }
   },
   destinationCompanyContact: {
-    readableFieldName: "le contact de l'entreprise de destination",
+    readableFieldName: "le nom de contact de l'entreprise de destination",
     sealed: {
       from: "EMISSION",
       when: isDestinationSealed
@@ -223,7 +240,11 @@ export const editionRules: BspaohEditionRules = {
     },
     required: { from: "EMISSION" }
   },
-  destinationCustomInfo: { sealed: { from: "OPERATION" } },
+  destinationCustomInfo: {
+    readableFieldName:
+      "les champs d'informations complémentaires de l'entreprise de destination",
+    sealed: { from: "OPERATION" }
+  },
   destinationCap: {
     readableFieldName: "le CAP du destinataire",
     sealed: { from: "TRANSPORT" },
@@ -315,7 +336,7 @@ export const editionRules: BspaohEditionRules = {
     required: { from: "TRANSPORT" }
   },
   transporterCompanyContact: {
-    readableFieldName: "le contact du transporteur",
+    readableFieldName: "le nom de contact du transporteur",
     sealed: { from: "TRANSPORT" },
     required: { from: "TRANSPORT" }
   },
@@ -337,37 +358,42 @@ export const editionRules: BspaohEditionRules = {
       when: bspaoh => !bspaoh.transporterCompanySiret
     }
   },
-  transporterCustomInfo: { sealed: { from: "TRANSPORT" } },
+  transporterCustomInfo: {
+    readableFieldName:
+      "les champs d'informations complémentaires du transporteur",
+    sealed: { from: "TRANSPORT" }
+  },
   transporterRecepisseIsExempted: {
+    readableFieldName: "l'exemption de récépissé du transporteur",
     sealed: { from: "TRANSPORT" },
     required: { from: "TRANSPORT" }
   },
   transporterRecepisseNumber: {
+    readableFieldName: "le numéro de récépissé du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
       when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    },
-    readableFieldName: "Transporteur: le numéro de récépissé"
+    }
   },
   transporterRecepisseDepartment: {
+    readableFieldName: "le département de récépissé du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
       when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    },
-    readableFieldName: "Transporteur: le département de récépissé"
+    }
   },
   transporterRecepisseValidityLimit: {
+    readableFieldName: "la date de validaté du récépissé du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
       when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    },
-    readableFieldName: "Transporteur: la date de validité du récépissé"
+    }
   },
   transporterTransportMode: {
     sealed: { from: "TRANSPORT" },
