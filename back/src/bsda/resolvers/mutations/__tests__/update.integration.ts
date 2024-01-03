@@ -733,7 +733,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le champ transporterCompanyName a été vérouillé via signature et ne peut pas être modifié."
+          "Le nom du transporteur a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1064,7 +1064,7 @@ describe("Mutation.updateBsda", () => {
 
     expect(errors.length).toBe(1);
     expect(errors[0].message).toBe(
-      "Le champ intermediaries a été vérouillé via signature et ne peut pas être modifié."
+      "Les intermédiaires a été vérouillé via signature et ne peut pas être modifié."
     );
   });
 
