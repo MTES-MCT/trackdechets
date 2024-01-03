@@ -1,4 +1,4 @@
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { Bspaoh, BspaohTransporter } from "@prisma/client";
 import { BspaohNotFound } from "./errors";
 import { UserInputError } from "../common/errors";

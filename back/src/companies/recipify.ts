@@ -4,7 +4,7 @@ import {
 } from "../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import { Bsda, Bsdasri, Bsff, Bsvhu, BspaohTransporter } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 
 type RecipifyOutput = {
   number: string | null;

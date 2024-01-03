@@ -158,7 +158,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bspaoh",
-        schema: "../back/src/{scalars,common,bsds,bspaoh}/typeDefs/*.graphql",
+        schema: "../../back/src/{scalars,common,bsds,bspaoh}/typeDefs/*.graphql",
         routeBasePath: "/reference/api-reference/bspaoh",
       },
     ],

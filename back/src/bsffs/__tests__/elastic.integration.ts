@@ -6,7 +6,7 @@ import {
 import { getBsffForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
 import { createBsff, createFicheIntervention } from "./factories";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 describe("toBsdElastic > companies Names & OrgIds", () => {
   afterEach(resetDatabase);

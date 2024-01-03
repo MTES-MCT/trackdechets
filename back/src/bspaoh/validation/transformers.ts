@@ -1,7 +1,7 @@
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { ZodBspaohTransporter, ZodFullBspaoh } from "./schema";
 import { sirenify } from "./sirenify";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 
 /**
  *

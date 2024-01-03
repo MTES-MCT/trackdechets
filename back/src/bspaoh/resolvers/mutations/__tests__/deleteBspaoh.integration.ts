@@ -7,7 +7,7 @@ import {
   Mutation,
   MutationDeleteBspaohArgs
 } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { BspaohStatus } from "@prisma/client";
 
 const DELETE_BSPAOH = `

@@ -12,7 +12,7 @@ import {
   getCurrentSignatureType
 } from "./utils";
 import { getBspaohRepository } from "../../repository";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 
 export default async function edit(
   _,
