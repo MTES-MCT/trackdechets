@@ -48,12 +48,14 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
           </div>
         </div>
         <div className="BoxRow">
-          <p>
-            Document utilisé pour les PAOH, pour toutes prises en charge de
-            déchets anatomiques et organes, y compris sacs de sang et réserves
-            de sang. Les déchets présentant un risque d’infection (18 01 03*)
-            doivent être tracés avec un BSDASRI via Trackdéchets.
-          </p>
+          <div className="BoxCol">
+            <p>
+              Document utilisé pour les PAOH, pour toutes prises en charge de
+              déchets anatomiques et organes, y compris sacs de sang et réserves
+              de sang. Les déchets présentant un risque d’infection (18 01 03*)
+              doivent être tracés avec un BSDASRI via Trackdéchets.
+            </p>
+          </div>
         </div>
         {/* Paoh ID */}
         <div className="BoxRow">
@@ -96,11 +98,6 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
                 {formatDateTime(bspaoh.transporter?.transport?.takenOverAt)}
               </strong>
             </p>
-            <hr />
-            <p>
-              <strong>Nom et signature du responsable :</strong>
-            </p>
-            <Signature signature={bspaoh?.emitter?.emission?.signature} />
           </div>
           <div className="BoxCol">
             <p>
@@ -112,29 +109,40 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
               <br />
               <strong>Mention ADR : </strong> {bspaoh?.waste?.adr}
               <br />
-              <strong>Type déchet : </strong>
+              <strong>Désignation : </strong>
               {bspaoh?.waste?.type}
             </p>
-            <hr />
-            <p>
-              <strong>Conditionnement / Quantité initiale </strong>
-            </p>
-            <PackagingInfosTable
-              packagingInfos={bspaoh?.waste?.packagings ?? []}
-            />
-            <br />
+
             <Quantity
               label="Quantité remise"
               weight={bspaoh?.emitter?.emission?.detail?.weight}
             />
+            <hr />
+            <p>
+              <strong>Nom et signature du responsable :</strong>
+            </p>
+            <Signature signature={bspaoh?.emitter?.emission?.signature} />
           </div>
         </div>
-        {/* End Produceteur */}
+        {/* End Producteur */}
+        {/* Packagings */}
+        <div className="BoxRow">
+          <div className="BoxCol">
+            <p>
+              <strong>2. Tableau des conditionnements</strong>
+            </p>
+            <PackagingInfosTable
+              packagingInfos={bspaoh?.waste?.packagings ?? []}
+              showAcceptation={true}
+            />
+          </div>
+        </div>
+        {/* End Packagings */}
         {/* Transporter */}
         <div className="BoxRow">
           <div className="BoxCol">
             <p>
-              <strong>2. Collecteur/transporteur</strong>
+              <strong>3. Collecteur/transporteur</strong>
             </p>
             <FormCompanyFields
               company={bspaoh?.transporter?.company}
@@ -166,25 +174,31 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
           </div>
           <div className="BoxCol">
             <p>
-              <strong>2.1 Déchets</strong>
+              <strong>3.1 Transport</strong>
             </p>
 
             <hr />
-            <p>
-              <strong>Date et heure de prise en charge : </strong>
-              {formatDateTime(bspaoh?.transporter?.transport?.takenOverAt)}
-            </p>
-            <p>
-              <strong>Signature</strong>
-              <Signature
-                signature={bspaoh?.transporter?.transport?.signature}
-              />
-            </p>
+            <section style={{ position: "relative" }}>
+              <p>
+                <strong>3.2 Prise en charge</strong>
+              </p>
+              <p>
+                <strong>Date et heure : </strong>
+                {formatDateTime(bspaoh?.transporter?.transport?.takenOverAt)}
+              </p>
+              <p>
+                <strong>Signature </strong>
+                <Signature
+                  signature={bspaoh?.transporter?.transport?.signature}
+                />
+              </p>
+            </section>
             <hr />
             <p>
-              <strong>
-                Date et heure de remise à l’installation de destination :
-              </strong>
+              <strong>3.3 Remise à l’installation de destination</strong>
+            </p>
+            <p>
+              <strong>Date et heure : </strong>
               {formatDateTime(
                 bspaoh?.destination?.handedOverToDestination?.date
               )}
@@ -192,9 +206,7 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
             <p>
               <strong>Signature</strong>
               <Signature
-                signature={
-                  bspaoh?.destination?.handedOverToDestination?.signature
-                }
+                signature={bspaoh?.transporter?.transport?.signature}
               />
             </p>
           </div>
@@ -204,7 +216,7 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
         <div className="BoxRow">
           <div className="BoxCol">
             <p>
-              <strong>3. Crématorium destinataire</strong>
+              <strong>4. Crématorium destinataire</strong>
             </p>
             <FormCompanyFields
               company={bspaoh.destination?.company}
@@ -213,7 +225,7 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
           </div>
           <div className="BoxCol">
             <p>
-              <strong>3.1 Déchets</strong>
+              <strong>4.1 Réception</strong>
             </p>
             <p>
               <strong>Lot accepté : </strong>
@@ -234,7 +246,7 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
                 }
                 readOnly
               />{" "}
-              Non{" "}
+              Non (Refus){" "}
               <input
                 type="checkbox"
                 checked={
@@ -243,40 +255,32 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
                 }
                 readOnly
               />{" "}
-              Partiellement
+              Partiellement (cf. tableau §2)
               <br />
               {bspaoh?.destination?.reception?.acceptation?.status ===
-                "PARTIALLY_REFUSED" && (
-                <p>
-                  Motif de refus:{" "}
-                  {bspaoh?.destination?.reception?.acceptation?.refusalReason}
-                </p>
-              )}
+                "PARTIALLY_REFUSED" ||
+                (bspaoh?.destination?.reception?.acceptation?.status ===
+                  "REFUSED" && (
+                  <p>
+                    Motif de refus:{" "}
+                    {bspaoh?.destination?.reception?.acceptation?.refusalReason}
+                  </p>
+                ))}
+              <Quantity
+                label="Quantité réceptionnée"
+                weight={bspaoh?.destination?.reception?.detail?.weight}
+              />
               <p>
-                Date et heure de réception et d’acceptation (ou de refus):{" "}
+                Date et heure de réception/acceptation/refus:{" "}
                 {formatDateTime(bspaoh?.destination?.reception?.date)}
               </p>
+              <p>
+                <strong>Signature du responsable de l'exploitation :</strong>
+              </p>
+              <Signature
+                signature={bspaoh?.destination?.reception?.signature}
+              />
             </p>
-
-            <p>
-              <strong>Conditionnement / Quantité réceptionée </strong>
-            </p>
-            {bspaoh?.destination?.reception?.signature?.date && (
-              <>
-                <PackagingInfosTable
-                  packagingInfos={bspaoh?.waste?.packagings ?? []}
-                  showAcceptation={true}
-                />
-                <br />
-                <Quantity
-                  label="Quantité réceptionnée"
-                  weight={bspaoh?.destination?.reception?.detail?.weight}
-                />
-                <Signature
-                  signature={bspaoh?.destination?.reception?.signature}
-                />
-              </>
-            )}
           </div>
         </div>
         <div className="BoxRow">
@@ -287,14 +291,14 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
             </p>
             <p>
               <strong>
-                Nom et Signature du responsable de l'exploitation :
+                Nom et signature du responsable de l'exploitation :
               </strong>
             </p>
             <Signature signature={bspaoh?.destination?.operation?.signature} />
           </div>
           <div className="BoxCol">
             <p>
-              <strong>3.2 Opération réalisée</strong>
+              <strong>4.2 Opération réalisée</strong>
             </p>
 
             <p>

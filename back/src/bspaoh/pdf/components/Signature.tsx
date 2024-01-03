@@ -9,10 +9,10 @@ export function Signature({ signature }: SignatureProps) {
   return (
     <>
       <p>
-        <span className="Row">
-          <span className="Col">Nom : {signature?.author}</span>
-          <span className="Col">Date : {formatDateTime(signature?.date)}</span>
-        </span>
+        <span>Nom : {signature?.author}</span>
+      </p>
+      <p>
+        <span>Horodatage signature : {formatDateTime(signature?.date)}</span>
       </p>
       {signature?.date && <SignatureStamp />}
     </>
