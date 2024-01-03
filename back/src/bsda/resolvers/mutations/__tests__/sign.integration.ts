@@ -174,11 +174,11 @@ describe("Mutation.Bsda.sign", () => {
             "Le nom de l'entreprise de destination est obligatoire.\n" +
             "Le SIRET de l'entreprise de destination est obligatoire.\n" +
             "L'adresse de l'entreprise de destination est obligatoire.\n" +
-            "Le contact de l'entreprise de destination est obligatoire.\n" +
+            "Le nom de contact de l'entreprise de destination est obligatoire.\n" +
             "Le téléphone de l'entreprise de destination est obligatoire.\n" +
             "L'email de l'entreprise de destination est obligatoire.\n" +
             "Le CAP du destinataire est obligatoire.\n" +
-            "Le code d'opération de la destination est obligatoire."
+            "Le code d'opération prévu est obligatoire."
         })
       ]);
 
@@ -559,7 +559,7 @@ describe("Mutation.Bsda.sign", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message: expect.stringContaining(
-            "Transporteur: le numéro de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+            "Le numéro de récépissé du transporteur est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
           )
         })
       ]);

@@ -342,11 +342,11 @@ describe("BSDA validation", () => {
         expect(error.issues).toEqual([
           expect.objectContaining({
             message:
-              "Transporteur: le numéro de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+              "Le numéro de récépissé du transporteur est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
           }),
           expect.objectContaining({
             message:
-              "Transporteur: le département de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+              "Le département de récépissé du transporteur est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
           })
         ]);
       }
@@ -875,7 +875,7 @@ describe("BSDA Sealed rules checks", () => {
       );
     } catch (error) {
       expect(error.issues[0].message).toBe(
-        "Le champ transporterTransportPlates a été vérouillé via signature et ne peut pas être modifié."
+        "L'immatriculation du transporteur a été vérouillé via signature et ne peut pas être modifié."
       );
     }
   });
@@ -962,7 +962,7 @@ describe("BSDA Sealed rules checks", () => {
       );
     } catch (error) {
       expect(error.issues[0].message).toBe(
-        "Le champ destinationReceptionWeight a été vérouillé via signature et ne peut pas être modifié."
+        "Le poids du déchet a été vérouillé via signature et ne peut pas être modifié."
       );
     }
   });
