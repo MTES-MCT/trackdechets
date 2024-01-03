@@ -203,7 +203,7 @@ describe("Mutation.Bspaoh.sign", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message: expect.stringContaining(
-            "Transporteur: le numéro de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+            "Le numéro de récépissé du transporteur est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
           )
         })
       ]);

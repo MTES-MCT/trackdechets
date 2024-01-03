@@ -399,11 +399,11 @@ describe("BSPAOH validation", () => {
         expect(error.issues).toEqual([
           expect.objectContaining({
             message:
-              "Transporteur: le numéro de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+              "Le numéro de récépissé du transporteur est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
           }),
           expect.objectContaining({
             message:
-              "Transporteur: le département de récépissé est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+              "Le département de récépissé du transporteur est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
           })
         ]);
       }

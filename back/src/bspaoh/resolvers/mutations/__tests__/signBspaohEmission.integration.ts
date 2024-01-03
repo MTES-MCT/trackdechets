@@ -121,7 +121,7 @@ describe("Mutation.Bspaoh.sign", () => {
             "Le nom de l'entreprise de destination est obligatoire.\n" +
             "Le SIRET de l'entreprise de destination est obligatoire.\n" +
             "L'adresse de l'entreprise de destination est obligatoire.\n" +
-            "Le contact de l'entreprise de destination est obligatoire.\n" +
+            "Le nom de contact de l'entreprise de destination est obligatoire.\n" +
             "Le téléphone de l'entreprise de destination est obligatoire.\n" +
             "L'email de l'entreprise de destination est obligatoire.\n" +
             "Le CAP du destinataire est obligatoire."
