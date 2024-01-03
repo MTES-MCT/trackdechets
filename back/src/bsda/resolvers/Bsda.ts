@@ -50,7 +50,7 @@ export const Bsda: BsdaResolvers = {
   metadata: bsda => {
     return {
       ...bsda.metadata,
-      id: bsda.id,
+      id: bsda.id
     } as any;
   }
 };
