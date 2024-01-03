@@ -217,6 +217,7 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),
     rawBsd: bsdasri,
+    revisionRequests: [],
 
     // ALL actors from the BSDASRI, for quick search
     companyNames: [

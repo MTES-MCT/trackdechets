@@ -7,6 +7,7 @@ import FormCompany from "./FormCompany";
 import InitialForm from "./InitialForm";
 import Bsd from "./Bsd";
 import FormRevisionRequest from "./FormRevisionRequest";
+import { Metadata as FormMetadata } from "./forms/metadata";
 
 export default {
   Query,
@@ -17,5 +18,6 @@ export default {
   FormCompany,
   InitialForm,
   Bsd,
-  FormRevisionRequest
+  FormRevisionRequest,
+  FormMetadata
 };

@@ -243,7 +243,23 @@ export function expandBsdaFromElastic(bsda: BsdaForElastic): GraphqlBsda {
   return {
     ...expanded,
     groupedIn,
-    forwardedIn
+    forwardedIn,
+    metadata: {
+      latestRevision:
+        bsda.bsdaRevisionRequests?.length > 0
+          ? (bsda.bsdaRevisionRequests.reduce(
+              (latestRevision, currentRevision) => {
+                if (
+                  !latestRevision ||
+                  currentRevision.updatedAt > latestRevision.updatedAt
+                ) {
+                  return currentRevision;
+                }
+                return latestRevision;
+              }
+            ) as any)
+          : null
+    }
   };
 }
 

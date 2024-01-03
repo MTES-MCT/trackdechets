@@ -179,6 +179,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsvhu),
     rawBsd: bsvhu,
+    revisionRequests: [],
 
     // ALL actors from the BSVHU, for quick search
     companyNames: [

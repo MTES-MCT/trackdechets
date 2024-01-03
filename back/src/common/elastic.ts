@@ -5,7 +5,11 @@ import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import { logger } from "@td/logger";
 import { BsdType, FormCompany } from "../generated/graphql/types";
-import { OperationMode } from "@prisma/client";
+import {
+  BsdaRevisionRequest,
+  BsddRevisionRequest,
+  OperationMode
+} from "@prisma/client";
 import { FormForElastic } from "../forms/elastic";
 import { BsdaForElastic } from "../bsda/elastic";
 import { BsdasriForElastic } from "../bsdasris/elastic";
@@ -107,6 +111,8 @@ export interface BsdElastic {
   // List of all companies taking part in the BSD's lifecycle, for quick search
   companyNames: string;
   companyOrgIds: string[];
+
+  revisionRequests: BsdaRevisionRequest[] | BsddRevisionRequest[];
 
   rawBsd:
     | FormForElastic
@@ -297,6 +303,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
     }
   },
 
+  revisionRequests: rawField,
   rawBsd: rawField,
 
   companyNames: textField,

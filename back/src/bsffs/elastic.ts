@@ -117,6 +117,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     ].filter(Boolean),
     ...getRegistryFields(bsff),
     rawBsd: bsff,
+    revisionRequests: [],
 
     // ALL actors from the BSFF, for quick search
     companyNames: [

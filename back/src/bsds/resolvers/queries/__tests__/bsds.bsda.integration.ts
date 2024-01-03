@@ -1256,6 +1256,11 @@ describe("Bsda sub-resolvers in query bsds", () => {
               forwardedIn {
                 id
               }
+              metadata {
+                latestRevision {
+                  status
+                }
+              }
             }
           }
         }
@@ -1571,5 +1576,237 @@ describe("Bsda sub-resolvers in query bsds", () => {
     const queriedBsda = bsdas.find(bsd => bsd.id === bsda.id);
     expect(queriedBsda).toBeDefined();
     expect((queriedBsda as any)!.forwardedIn).toBeNull();
+  });
+
+  test("Bsda.metadata.latestRevision should resolve correctly when there are no revisions", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const worker = await userWithCompanyFactory(UserRole.ADMIN);
+    const { query, mutate } = makeClient(emitter.user);
+    await mutate<Pick<Mutation, "createBsda">, MutationCreateBsdaArgs>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input: {
+            type: "OTHER_COLLECTIONS",
+            waste: { code: "06 07 01*" },
+            emitter: {
+              company: {
+                siret: emitter.company.siret,
+                name: emitter.company.name,
+                contact: emitter.company.contact,
+                phone: emitter.company.contactPhone,
+                mail: emitter.company.contactEmail,
+                address: emitter.company.address
+              }
+            },
+            destination: {
+              company: {
+                siret: destination.company.siret,
+                name: destination.company.name,
+                contact: destination.company.contact,
+                phone: destination.company.contactPhone,
+                mail: destination.company.contactEmail,
+                address: destination.company.address
+              },
+              cap: "CAP",
+              plannedOperationCode: "R 5"
+            },
+            worker: {
+              company: {
+                siret: worker.company.siret,
+                name: worker.company.name,
+                contact: worker.company.contact,
+                phone: worker.company.contactPhone,
+                mail: worker.company.contactEmail,
+                address: worker.company.address
+              }
+            }
+          }
+        }
+      }
+    );
+
+    await refreshElasticSearch();
+
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    const bsdas = data.bsds!.edges.map(e => e.node);
+    expect(bsdas).toHaveLength(1);
+    expect((bsdas[0] as any)!.metadata.latestRevision).toBeNull();
+  });
+
+  test("Bsda.metadata.latestRevision should resolve correctly when there are past revisions but no active", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const worker = await userWithCompanyFactory(UserRole.ADMIN);
+    const { query, mutate } = makeClient(emitter.user);
+    const {
+      data: { createBsda }
+    } = await mutate<Pick<Mutation, "createBsda">, MutationCreateBsdaArgs>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input: {
+            type: "OTHER_COLLECTIONS",
+            waste: { code: "06 07 01*" },
+            emitter: {
+              company: {
+                siret: emitter.company.siret,
+                name: emitter.company.name,
+                contact: emitter.company.contact,
+                phone: emitter.company.contactPhone,
+                mail: emitter.company.contactEmail,
+                address: emitter.company.address
+              }
+            },
+            destination: {
+              company: {
+                siret: destination.company.siret,
+                name: destination.company.name,
+                contact: destination.company.contact,
+                phone: destination.company.contactPhone,
+                mail: destination.company.contactEmail,
+                address: destination.company.address
+              },
+              cap: "CAP",
+              plannedOperationCode: "R 5"
+            },
+            worker: {
+              company: {
+                siret: worker.company.siret,
+                name: worker.company.name,
+                contact: worker.company.contact,
+                phone: worker.company.contactPhone,
+                mail: worker.company.contactEmail,
+                address: worker.company.address
+              }
+            }
+          }
+        }
+      }
+    );
+
+    await prisma.bsdaRevisionRequest.create({
+      data: {
+        comment: "a comment",
+        bsdaId: createBsda.id,
+        authoringCompanyId: emitter.company.id,
+        wasteCode: "06 07 02*",
+        status: "ACCEPTED"
+      }
+    });
+
+    const bsdaElastic = await getBsdaForElastic(createBsda);
+    await indexBsda(bsdaElastic);
+    await refreshElasticSearch();
+
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    const bsdas = data.bsds!.edges.map(e => e.node);
+    expect(bsdas).toHaveLength(1);
+    expect((bsdas[0] as any)!.metadata.latestRevision).toBeDefined();
+    expect((bsdas[0] as any)!.metadata.latestRevision.status).toBe("ACCEPTED");
+  });
+
+  test("Bsda.metadata.latestRevision should resolve correctly when there are past and active revisions", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const worker = await userWithCompanyFactory(UserRole.ADMIN);
+    const { query, mutate } = makeClient(emitter.user);
+    const {
+      data: { createBsda }
+    } = await mutate<Pick<Mutation, "createBsda">, MutationCreateBsdaArgs>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input: {
+            type: "OTHER_COLLECTIONS",
+            waste: { code: "06 07 01*" },
+            emitter: {
+              company: {
+                siret: emitter.company.siret,
+                name: emitter.company.name,
+                contact: emitter.company.contact,
+                phone: emitter.company.contactPhone,
+                mail: emitter.company.contactEmail,
+                address: emitter.company.address
+              }
+            },
+            destination: {
+              company: {
+                siret: destination.company.siret,
+                name: destination.company.name,
+                contact: destination.company.contact,
+                phone: destination.company.contactPhone,
+                mail: destination.company.contactEmail,
+                address: destination.company.address
+              },
+              cap: "CAP",
+              plannedOperationCode: "R 5"
+            },
+            worker: {
+              company: {
+                siret: worker.company.siret,
+                name: worker.company.name,
+                contact: worker.company.contact,
+                phone: worker.company.contactPhone,
+                mail: worker.company.contactEmail,
+                address: worker.company.address
+              }
+            }
+          }
+        }
+      }
+    );
+
+    // Accepted revision
+    await prisma.bsdaRevisionRequest.create({
+      data: {
+        comment: "a comment",
+        bsdaId: createBsda.id,
+        authoringCompanyId: emitter.company.id,
+        wasteCode: "06 07 02*",
+        status: "ACCEPTED"
+      }
+    });
+    // Pending revision
+    await prisma.bsdaRevisionRequest.create({
+      data: {
+        comment: "a comment",
+        bsdaId: createBsda.id,
+        authoringCompanyId: emitter.company.id,
+        wasteCode: "06 07 02*",
+        status: "PENDING",
+        approvals: {
+          createMany: {
+            data: [
+              {
+                status: "PENDING",
+                approverSiret: destination.company.siret!
+              },
+              { status: "ACCEPTED", approverSiret: worker.company.siret! }
+            ]
+          }
+        }
+      }
+    });
+
+    const bsdaElastic = await getBsdaForElastic(createBsda);
+    await indexBsda(bsdaElastic);
+    await refreshElasticSearch();
+
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+    const bsdas = data.bsds!.edges.map(e => e.node);
+    expect(bsdas).toHaveLength(1);
+    expect((bsdas[0] as any)!.metadata.latestRevision).toBeDefined();
+    expect((bsdas[0] as any)!.metadata.latestRevision.status).toBe("PENDING");
   });
 });

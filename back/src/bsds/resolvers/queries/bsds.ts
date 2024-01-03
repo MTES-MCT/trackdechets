@@ -356,13 +356,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   } = await toRawBsds(hits.map(hit => hit._source));
 
   const bsds: Record<BsdType, Bsd[]> = {
-    BSDD: (
-      await Promise.all(
-        concreteBsdds.map(bsdd =>
-          expandFormFromElastic(bsdd, context.dataloaders.forms)
-        )
-      )
-    ).filter(Boolean),
+    BSDD: concreteBsdds.map(expandFormFromElastic),
     BSDASRI: await buildDasris(concreteBsdasris),
     BSVHU: concreteBsvhus.map(expandVhuFormFromDb),
     BSDA: concreteBsdas.map(expandBsdaFromElastic),
