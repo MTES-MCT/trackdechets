@@ -932,6 +932,28 @@ describe("beforeTransportSchema", () => {
     expect(isValid).toBeTruthy();
   });
 
+  it("transporter receipt is not required if transport mode is not ROAD", async () => {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
+      ...beforeTransportForm,
+      transporters: [
+        {
+          ...transporterData,
+          transporterTransportMode: "AIR",
+          transporterReceipt: "",
+          transporterDepartment: "",
+          transporterValidityLimit: null
+        }
+      ]
+    };
+    const isValid = beforeTransportSchemaFn({
+      signingTransporterOrgId: transporterData.transporterCompanySiret
+    }).isValid(testForm);
+
+    expect(isValid).toBeTruthy();
+  });
+
   it("should work if transport mode is ROAD & plates are defined", async () => {
     const testForm: Partial<Form> & {
       transporters: Partial<BsddTransporter>[];
