@@ -204,6 +204,21 @@ export const isSameSiretTransporter = (
   currentSiret === bsd.transporter?.company?.siret ||
   currentSiret === bsd.transporter?.company?.orgId;
 
+// Cas du transport multi-modal BSDD, vérifie si l'établissement
+// courant est le prochain transporteur dans la liste des transporteurs
+// multi-modaux à devoir prendre en charge le déchet.
+export const isSameSiretNextTransporter = (
+  currentSiret: string,
+  bsd: BsdDisplay
+): boolean => {
+  // Premier transporteur de la liste qui n'a pas encore pris en charge le déchet.
+  const nextTransporter = (bsd.transporters ?? []).find(t => !t.takenOverAt);
+  if (nextTransporter) {
+    return currentSiret === nextTransporter.company?.orgId;
+  }
+  return false;
+};
+
 export const isSynthesis = (bsdWorkflowType: string | undefined): boolean =>
   bsdWorkflowType === BsdasriType.Synthesis;
 
@@ -505,6 +520,7 @@ export const getSentBtnLabel = (
 ): string => {
   const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
+  const isToCollectTab = bsdCurrentTab === "toCollectTab";
 
   if (hasRoadControlButton(bsd, isCollectedTab)) {
     return ROAD_CONTROL;
@@ -513,6 +529,10 @@ export const getSentBtnLabel = (
   if (isBsdd(bsd.type)) {
     if (isAppendix1Producer(bsd)) {
       return "";
+    }
+
+    if (isToCollectTab && isSameSiretNextTransporter(currentSiret, bsd)) {
+      return SIGNER;
     }
 
     if (isActTab) {
@@ -1030,7 +1050,8 @@ const canUpdateBsdd = bsd =>
   [
     BsdStatusCode.Draft,
     BsdStatusCode.Sealed,
-    BsdStatusCode.SignedByProducer
+    BsdStatusCode.SignedByProducer,
+    BsdStatusCode.Sent
   ].includes(bsd.status);
 
 const canDeleteBsdd = bsd =>

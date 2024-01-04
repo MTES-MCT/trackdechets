@@ -10,10 +10,12 @@ import {
   CreateOrUpdateTransporterInput,
   initialFormTransporter
 } from "../../../../form/bsdd/utils/initial-state";
+import TransporterDisplay from "../TransporterDisplay/TransporterDisplay";
 
 type TransporterListProps = {
   // SIRET ou VAT de l'établissement courant
   orgId?: string;
+  // Nom du champ Formik stockant la liste des transporteurs
   fieldName: string;
 };
 
@@ -35,6 +37,16 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
       MutationDeleteFormTransporterArgs
     >(DELETE_FORM_TRANSPORTER);
 
+  // Le fonctionnement du groupe d'accordéons fait qu'un seul à la fois
+  // peut être déplié. Cette variable permet d'enregistrer l'index du transporteur
+  // qui doit être déplié. Si null, tous les accordéons sont repliés.
+  const [expandedIdx, setExpandedIdx] = React.useState<number | null>(
+    // Tous les accordéons sont repliés par défaut s'il y a plusieurs transporteurs
+    transporters.length === 1 ? 0 : null
+  );
+
+  const disableAdd = transporters.length >= 5;
+
   return (
     <>
       <FieldArray
@@ -42,12 +54,11 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
         render={arrayHelpers => (
           <>
             {transporters.map((t, idx) => {
-              // On crée un transporteur BSD en base qui nous permet d'initialiser le
-              // state Formik. Les modifications qui sont faites ensuite dans le formulaire
-              // ainsi que l'association du transporteur au bordereau sont gérés au
-              // moment de la soumission du formulaire.
               const onTransporterAdd = () => {
                 arrayHelpers.insert(idx + 1, initialFormTransporter);
+                // replie tous les formulaire sauf celui du nouveau
+                // transporteur qui vient d'être crée
+                setExpandedIdx(idx + 1);
               };
 
               const onTransporterDelete = () => {
@@ -64,16 +75,41 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
                 }
               };
 
+              const hasTakenOver = Boolean(t.takenOverAt);
+              const previousHasTakenOver =
+                idx > 0 ? Boolean(transporters[idx - 1].takenOverAt) : false;
+
+              // Désactive la possibilité de supprimer le transporteur
+              // s'il est le seul dans la liste ou s'il a déjà pris en charge le déchet
+              const disableDelete = hasTakenOver || transporters.length === 1;
+
+              // Désactive le bouton permettant de remonter le transporteur dans
+              // la liste s'il est le seul ou le premier, ou s'il a déjà pris en
+              // charge le déchet, ou si le transporteur précédent a déjà pris en
+              // charge le déchet
+              const disableUp =
+                hasTakenOver ||
+                previousHasTakenOver ||
+                transporters.length === 1 ||
+                idx === 0;
+
+              // Désactive le bouton permettant de descendre le transporteur dans
+              // la liste s'il est le seul ou le dernier, ou s'il a déjà pris en charge
+              // le déchet
+              const disableDown =
+                hasTakenOver ||
+                transporters.length === 1 ||
+                idx === transporters.length - 1;
+
               const numero = idx + 1;
 
-              // Lorsqu'aucun établissement n'a été sélectionné, on affiche "Transporteur N"
-              // où N est le numéro du transporteur dans la liste
-              // const accordionName =
-              //   t?.company?.name ?? `Transporteur ${numero}`;
-
-              // On affiche uniquement `Transporteur` en attente de l'implémentation
-              // du multi-modal
-              const accordionName = "Transporteur";
+              // Lorsqu'aucun établissement n'a été sélectionné, on affiche simplement
+              // "N - Transporteur" où N est le numéro du transporteur dans la liste
+              const accordionName = `${numero} - ${
+                t?.company?.name && t.company.name.length > 0
+                  ? t.company.name
+                  : "Transporteur"
+              }`;
 
               return (
                 <TransporterAccordion
@@ -94,11 +130,27 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
                       arrayHelpers.swap(idx, nextIndex);
                     }
                   }}
+                  onExpanded={() => {
+                    if (expandedIdx === idx) {
+                      setExpandedIdx(null);
+                    } else {
+                      setExpandedIdx(idx);
+                    }
+                  }}
+                  disableAdd={disableAdd}
+                  disableDelete={disableDelete}
+                  disableUp={disableUp}
+                  disableDown={disableDown}
+                  expanded={idx === expandedIdx}
                 >
-                  <TransporterForm
-                    orgId={orgId}
-                    fieldName={`${fieldName}[${idx}]`}
-                  />
+                  {t.takenOverAt ? (
+                    <TransporterDisplay transporter={t} />
+                  ) : (
+                    <TransporterForm
+                      orgId={orgId}
+                      fieldName={`${fieldName}[${idx}]`}
+                    />
+                  )}
                 </TransporterAccordion>
               );
             })}

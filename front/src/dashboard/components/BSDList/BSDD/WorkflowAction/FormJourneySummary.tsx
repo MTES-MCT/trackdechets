@@ -31,9 +31,10 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
       }
     : {
         isComplete: Boolean(form.receivedAt),
-        isActive: Boolean(form.takenOverAt),
+        isActive: (form.transporters ?? []).every(t => Boolean(t.takenOverAt)),
         company: form.recipient?.company
       };
+
   return (
     <Journey>
       <JourneyStop variant={form.emittedAt ? "complete" : "active"}>
@@ -45,29 +46,42 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
           </JourneyStopDescription>
         )}
       </JourneyStop>
-      <JourneyStop
-        variant={
-          form.takenOverAt
-            ? "complete"
-            : form.emittedAt
-            ? "active"
-            : "incomplete"
-        }
-      >
-        <JourneyStopName>Transporteur</JourneyStopName>
-        {form.transporter?.company && !formTransportIsPipeline(form) && (
-          <JourneyStopDescription>
-            {form.transporter.company.name} ({form.transporter.company.orgId})
-            <br />
-            {form.transporter.company.address}
-          </JourneyStopDescription>
-        )}
-        {formTransportIsPipeline(form) && (
-          <JourneyStopDescription>
-            Conditionné pour Pipeline
-          </JourneyStopDescription>
-        )}
-      </JourneyStop>
+      {form.transporters.map((transporter, idx) => {
+        console.log(transporter);
+        return (
+          <JourneyStop
+            key={idx}
+            variant={
+              transporter.takenOverAt
+                ? "complete"
+                : // Le transporteur est considéré actif s'il est le premier
+                // dans la liste des transporteurs à ne pas encore avoir pris
+                // en charge le déchet après la signature émetteur
+                (idx > 0 && form.transporters[idx - 1].takenOverAt) ||
+                  (form.emittedAt && idx === 0)
+                ? "active"
+                : "incomplete"
+            }
+          >
+            <JourneyStopName>
+              Transporteur{form.transporters.length > 1 ? ` n° ${idx + 1}` : ""}
+            </JourneyStopName>
+            {transporter.company && !formTransportIsPipeline(form) && (
+              <JourneyStopDescription>
+                {transporter.company.name} ({transporter.company.orgId})
+                <br />
+                {transporter.company.address}
+              </JourneyStopDescription>
+            )}
+            {formTransportIsPipeline(form) && (
+              <JourneyStopDescription>
+                Conditionné pour Pipeline
+              </JourneyStopDescription>
+            )}
+          </JourneyStop>
+        );
+      })}
+
       {form.temporaryStorageDetail && (
         <>
           <JourneyStop

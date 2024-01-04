@@ -2,7 +2,7 @@ import { CompanySearchResult } from "@td/codegen-ui";
 
 export interface CompanySelectorProps {
   loading: boolean;
-  selectedCompany?: CompanySearchResult;
+  selectedCompany?: CompanySearchResult | null;
   // Erreur relative à l'établissement sélectionneé. Exemple :
   // Le transporteur n'est pas inscrit sur Trackdéchets ou n'a pas le
   // bon profil.
@@ -15,7 +15,7 @@ export interface CompanySelectorProps {
   // Texte qui s'affiche en petit sous le label du filtre de département
   departmentHint?: string;
   onSearch: (search: string, postalCode: string) => void;
-  onSelect: (company?: CompanySearchResult) => void;
+  onSelect: (company: CompanySearchResult) => void;
 }
 
 export interface CompanySelectorItemProps {
@@ -25,7 +25,7 @@ export interface CompanySelectorItemProps {
   // bon profil.
   selectedError?: string | null;
   company: CompanySearchResult;
-  onSelect: (company?: CompanySearchResult) => void;
+  onSelect: (company: CompanySearchResult) => void;
   searchClue?: string;
   postalCodeClue?: string;
 }

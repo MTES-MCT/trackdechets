@@ -18,7 +18,7 @@ interface CompanySelectorWrapperProps {
   // Expose le state Formik depuis le composant parent
   // afin d'initialiser le `selectedCompany` au premier
   // render lorsqu'on est dans le cas d'un update de bordereau
-  formOrgId?: string | null;
+  selectedCompanyOrgId?: string | null;
   favoriteType?: FavoriteType;
   // Paramètre qui est passée à `searchCompanies`, les données sont
   // filtrées directement côté serveur
@@ -44,7 +44,7 @@ interface CompanySelectorWrapperProps {
  * les données du store (Formik)
  */
 export default function CompanySelectorWrapper({
-  formOrgId,
+  selectedCompanyOrgId,
   favoriteType = FavoriteType.Emitter,
   allowForeignCompanies = false,
   selectedCompanyError,
@@ -53,7 +53,8 @@ export default function CompanySelectorWrapper({
   onCompanySelected
 }: CompanySelectorWrapperProps) {
   // Établissement sélectionné
-  const [selectedCompany, setSelectedCompany] = useState<CompanySearchResult>();
+  const [selectedCompany, setSelectedCompany] =
+    useState<CompanySearchResult | null>(null);
 
   // Résultats de recherche
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>();
@@ -71,7 +72,7 @@ export default function CompanySelectorWrapper({
     );
 
   const onSelectCompany = useCallback(
-    (company?: CompanySearchResult) => {
+    (company: CompanySearchResult) => {
       setSelectedCompany(company);
       // propage l'événement au parent pour modifier les données du store (Formik)
       onCompanySelected && onCompanySelected(company);
@@ -79,11 +80,18 @@ export default function CompanySelectorWrapper({
     [setSelectedCompany, onCompanySelected]
   );
 
-  // Initialise `selectedCompany` à partir des données du store (Formik)
+  // S'assure que `selectedCompany` reste sync avec les données
+  // du store Formik lors du render initial ou en cas modification
+  // des données provoquée par un autre événement que la sélection d'un établissement
+  // dans le CompanySelector (par exemple si on permute deux transporteurs
+  // dans la liste des transporteurs multi-modaux)
   useEffect(() => {
-    if (!selectedCompany && formOrgId) {
+    if (
+      selectedCompanyOrgId &&
+      selectedCompanyOrgId !== selectedCompany?.orgId
+    ) {
       searchCompaniesQuery({
-        variables: { clue: formOrgId },
+        variables: { clue: selectedCompanyOrgId },
         onCompleted: result => {
           if (result.searchCompanies?.length > 0) {
             onSelectCompany(result.searchCompanies[0]);
@@ -91,7 +99,15 @@ export default function CompanySelectorWrapper({
         }
       });
     }
-  }, [selectedCompany, formOrgId, searchCompaniesQuery, onSelectCompany]);
+    if (!selectedCompanyOrgId && selectedCompany) {
+      setSelectedCompany(null);
+    }
+  }, [
+    selectedCompany,
+    selectedCompanyOrgId,
+    searchCompaniesQuery,
+    onSelectCompany
+  ]);
 
   const onSearchCompany = (searchClue, postalCodeClue) => {
     if (searchClue.length === 0 && postalCodeClue.length === 0 && orgId) {

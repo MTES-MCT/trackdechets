@@ -47,7 +47,7 @@ const CompanySelector = ({
     [onSearch]
   );
 
-  const handleOnSelect = (company?: CompanySearchResult) => {
+  const handleOnSelect = (company: CompanySearchResult) => {
     setShouldDisplayResults(false);
     onSelect(company);
   };

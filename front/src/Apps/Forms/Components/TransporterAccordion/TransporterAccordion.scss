@@ -1,6 +1,8 @@
 @import "../../../../scss/Breakpoints.scss";
 
 .transporter {
+  margin-bottom: 15px;
+
   &__header {
     display: flex;
     flex-direction: column;
@@ -30,9 +32,6 @@
       display: flex;
       flex-direction: column;
 
-      // En attente de l'implémentation du multi-modal
-      visibility: hidden;
-
       @include phone {
         flex-direction: row;
         justify-content: flex-end;
@@ -45,7 +44,13 @@
   }
 
   &__form {
-    padding-top: 15px;
+    margin: auto;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+
+    > div {
+      padding-top: 15px;
+    }
   }
 
   @media (max-width: 800px) {
