@@ -29,5 +29,5 @@ elif echo "$APP" | grep -q 'storybook'; then
 
 elif echo "$APP" | grep -q 'doc'; then
     npx nx run doc:build
-    cp "$ROOT_DIR/.slugignore.front" "$ROOT_DIR/.slugignore"
+    cp "$ROOT_DIR/.slugignore.documentation" "$ROOT_DIR/.slugignore"
 fi
