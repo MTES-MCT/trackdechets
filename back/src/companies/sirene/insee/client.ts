@@ -7,6 +7,7 @@ import { libelleFromCodeNaf, buildAddress } from "../utils";
 import { authorizedAxiosGet } from "./token";
 import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
 import { format } from "date-fns";
+import { StatutDiffusionEtablissement } from "../../../generated/graphql/types";
 
 const SIRENE_API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V3";
 export const SEARCH_COMPANIES_MAX_SIZE = 20;
@@ -50,10 +51,7 @@ function searchResponseToCompany({
     libelleNaf: libelleFromCodeNaf(
       lastPeriod?.activitePrincipaleEtablissement ?? ""
     ),
-    statutDiffusionEtablissement:
-      etablissement.statutDiffusionEtablissement === "P"
-        ? "N" // Patch https://www.insee.fr/fr/information/6683782 for retro-compatibility
-        : etablissement.statutDiffusionEtablissement
+    statutDiffusionEtablissement: etablissement.statutDiffusionEtablissement
   };
 
   if (company.naf) {
@@ -89,7 +87,10 @@ export async function searchCompany(
   try {
     const response = await authorizedAxiosGet<SearchResponseInsee>(searchUrl);
     const company = searchResponseToCompany(response.data);
-    if (company.statutDiffusionEtablissement === "N") {
+    if (
+      company.statutDiffusionEtablissement ===
+      ("P" as StatutDiffusionEtablissement)
+    ) {
       throw new AnonymousCompanyError();
     }
     return company;

@@ -14,7 +14,7 @@ Pour retourner les établissement étrangers quand on cherche par `clue : "NUMER
 
 Pour rechercher par raison sociale un établissement français, en filtrant par département, il faut utiliser le paramètre `department`
 
-Même si l'établissement a demandé à l'INSEE que ses informations (par exemple coordonnées, raison sociale) soient "non-diffusibles" (c'est-à-dire protégées si `statutDiffusionEtablissement` ne renvoie pas "O"), nous les renverrons dans cette requête `searchCompanies` car elle est protégée par un token d'API Trackdechets et que ces informations sont renseignées dans la base Trackdéchets.
+Même si l'établissement demandé est enregistré aurpès de l'INSEE comme "non-diffusible" ou "protégé" (c'est-à-dire si `statutDiffusionEtablissement` ne renvoie pas "O"), nous les renverrons dans cette requête `searchCompanies` car elle est protégée par authentification sur l'API Trackdechets et que ces informations sont renseignées dans la base Trackdéchets.
 
 Exemple d'utilisation avec `clue` comme recherfche plein-texte dans le nom d'établissement ou d'unité légale:
 
@@ -49,7 +49,7 @@ query {
 
 Nous exposons une query [`companyInfos`](../reference/api-reference/user-company/queries#companyinfos) qui interroge la base SIRENE (via [les données ouvertes de l'INSEE](https://files.data.gouv.fr/insee-sirene/)), ou la base VIES (via [le service la commission européenne](https://ec.europa.eu/taxation_customs/vies/)) la base des installations classées pour la protection de l'environnement (ICPE) et la base Trackdéchets pour obtenir des informations sur un établissement à partir de son numéro SIRET.
 
-La query renvoie un objet de type [`CompanyPublic`](../reference/api-reference/user-company/objects#companypublic) et permet notamment de savoir si un établissement est inscrit sur Trackdéchets grâce au champ `isRegistered`. Si l'établissement a demandé à l'INSEE que ses informations soient "non-diffusibles" (c'est-à-dire protégées si `statutDiffusionEtablissement` ne renvoie pas "O"), nous ne les révèlerons pas dans cette requête `companyInfos`. Il faudra utiliser la requête authentifiée privée documentée sur cette page.
+La requête renvoie un objet de type [`CompanyPublic`](../reference/api-reference/user-company/objects#companypublic) et permet notamment de savoir si un établissement est inscrit sur Trackdéchets grâce au champ `isRegistered`. Si l'établissement demandé est enregistré auprès de l'INSEE comme  "non-diffusible" ou "protégé" (c'est-à-dire si `statutDiffusionEtablissement` ne renvoie pas "O"), nous ne les révèlerons pas dans cette requête `companyInfos`. Il faudra utiliser la requête authentifiée `searchCompanies` documentée sur cette page en passant le siret comme valeur de la variable `clue`.
 
 Exemple d'utilisation:
 
