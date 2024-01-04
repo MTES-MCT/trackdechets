@@ -2,9 +2,7 @@ import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import { Field, useField } from "formik";
 import React from "react";
 
-import {
-  FormCompany
-} from "codegen-ui";
+import { FormCompany } from "codegen-ui";
 
 interface ExtraEuropeanCompanyManualProps {
   name: string;
@@ -25,15 +23,15 @@ export default function ExtraEuropeanCompanyManualInput({
     <div className="tw-my-6">
       <h4 className="form__section-heading">Entreprise extra-européenne</h4>
       <div className="form__row">
-          <label>
-              Identifiant de l'entreprise
-              <input
-                type="text"
-                value={extraEuropeanCompanyId!}
-                onChange={(e) => onExtraEuropeanCompanyId(e.target.value)}
-                className="td-input"
-              />
-          </label>
+        <label>
+          Identifiant de l'entreprise
+          <input
+            type="text"
+            value={extraEuropeanCompanyId!}
+            onChange={e => onExtraEuropeanCompanyId(e.target.value)}
+            className="td-input"
+          />
+        </label>
       </div>
       <div className="form__row">
         <label>
@@ -108,7 +106,6 @@ export default function ExtraEuropeanCompanyManualInput({
 
         <RedErrorMessage name={`${field.name}.mail`} />
       </div>
-
     </div>
   );
 }

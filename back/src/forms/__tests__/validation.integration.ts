@@ -1586,7 +1586,8 @@ describe("processedInfoSchema", () => {
     const validateFn = () => processedInfoSchema.validate(processedInfo);
 
     await expect(validateFn()).rejects.toThrow(
-      "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"    );
+      "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"
+    );
   });
 
   it("nextDestinationCompany return an error when a foreign extraEuropeanId is given with a SIRET number", async () => {
@@ -1607,7 +1608,8 @@ describe("processedInfoSchema", () => {
     const validateFn = () => processedInfoSchema.validate(processedInfo);
 
     await expect(validateFn()).rejects.toThrow(
-      "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"    );
+      "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"
+    );
   });
 
   it("noTraceability cannot be true when processing operation is not groupement", async () => {
@@ -1742,7 +1744,8 @@ describe("processedInfoSchema", () => {
         "Destination ultérieure : Le contact dans l'entreprise est obligatoire",
         "Destination ultérieure : Le téléphone de l'entreprise est obligatoire",
         "Destination ultérieure : L'email de l'entreprise est obligatoire",
-        "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"      ]);
+        "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"
+      ]);
     }
   });
 

@@ -21,21 +21,28 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
     values: { processingOperationDone, noTraceability, nextDestination },
     setFieldValue
   } = useFormikContext<MutationMarkAsProcessedArgs["processedInfo"]>();
-  const initNextDestination = useMemo(() => ({
-    processingOperation: "",
-    destinationOperationMode: undefined,
-    notificationNumber: "",
-    company: {
-      siret: "",
-      name: "",
-      address: "",
-      contact: "",
-      mail: "",
-      phone: ""
-    }
-  }), []);
-  const [isExtraEuropeanCompany, setIsExtraEuropeanCompany] = useState(nextDestination?.company?.extraEuropeanId ? true : false);
-  const [extraEuropeanCompany, setExtraEuropeanCompany] = useState(nextDestination?.company?.extraEuropeanId);
+  const initNextDestination = useMemo(
+    () => ({
+      processingOperation: "",
+      destinationOperationMode: undefined,
+      notificationNumber: "",
+      company: {
+        siret: "",
+        name: "",
+        address: "",
+        contact: "",
+        mail: "",
+        phone: ""
+      }
+    }),
+    []
+  );
+  const [isExtraEuropeanCompany, setIsExtraEuropeanCompany] = useState(
+    nextDestination?.company?.extraEuropeanId ? true : false
+  );
+  const [extraEuropeanCompany, setExtraEuropeanCompany] = useState(
+    nextDestination?.company?.extraEuropeanId
+  );
 
   /**
    * Hack the API requirement for any value in nextDestination.company.extraEuropeanId
@@ -43,14 +50,24 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   useEffect(() => {
     if (isExtraEuropeanCompany) {
       /**
-      * Hack the API requirement for "any" value in nextDestination.company.extraEuropeanId
-      * in order to require notificationNumber
-      * Soon notificationNumber will be required for intra-european companies too
-      */
+       * Hack the API requirement for "any" value in nextDestination.company.extraEuropeanId
+       * in order to require notificationNumber
+       * Soon notificationNumber will be required for intra-european companies too
+       */
       setFieldValue("nextDestination.company", initNextDestination.company);
-      setFieldValue("nextDestination.company.extraEuropeanId", !extraEuropeanCompany ? "UNIDENTIFIED_EXTRA_EUROPEAN_COMPANY": extraEuropeanCompany);
+      setFieldValue(
+        "nextDestination.company.extraEuropeanId",
+        !extraEuropeanCompany
+          ? "UNIDENTIFIED_EXTRA_EUROPEAN_COMPANY"
+          : extraEuropeanCompany
+      );
     }
-  }, [isExtraEuropeanCompany, setFieldValue, extraEuropeanCompany, initNextDestination.company]);
+  }, [
+    isExtraEuropeanCompany,
+    setFieldValue,
+    extraEuropeanCompany,
+    initNextDestination.company
+  ]);
 
   const isGroupement =
     processingOperationDone &&
@@ -68,7 +85,13 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
       setFieldValue("nextDestination", null);
       setFieldValue("noTraceability", null);
     }
-  }, [initNextDestination, isGroupement, nextDestination, noTraceability, setFieldValue]);
+  }, [
+    initNextDestination,
+    isGroupement,
+    nextDestination,
+    noTraceability,
+    setFieldValue
+  ]);
 
   const TODAY = new Date();
 
@@ -190,7 +213,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
               <input
                 type="checkbox"
                 checked={isExtraEuropeanCompany}
-                onChange={(e) => setIsExtraEuropeanCompany(e.target.checked)}
+                onChange={e => setIsExtraEuropeanCompany(e.target.checked)}
                 className="td-checkbox"
               />
 
@@ -217,7 +240,8 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
 
           <div className="form__row">
             <label>
-              Numéro de notification ou de document {!isExtraEuropeanCompany ? "(optionnel)" : ""}{" "}
+              Numéro de notification ou de document{" "}
+              {!isExtraEuropeanCompany ? "(optionnel)" : ""}{" "}
               <Tooltip msg="En cas d'export, indiquer ici le N° du document prévu ou le numéro de notification prévue à l'annexe I-B du règlement N°1013/2006 - Format PPNNNN (PP: code pays NNNN: numéro d'ordre)" />
             </label>
             <Field

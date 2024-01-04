@@ -1080,7 +1080,8 @@ describe("mutation.markAsProcessed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
+        message:
+          "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
       })
     ]);
   });
