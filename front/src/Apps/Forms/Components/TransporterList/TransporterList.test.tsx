@@ -7,7 +7,7 @@ import {
   CreateOrUpdateTransporterInput,
   initialFormTransporter
 } from "../../../../form/bsdd/utils/initial-state";
-import { TransportMode } from "codegen-ui/src";
+import { TransportMode } from "@td/codegen-ui";
 
 describe("<TransporterList />", () => {
   const mocks = [];
