@@ -1,7 +1,10 @@
 import { Prisma, Status, WasteAcceptationStatus } from "@prisma/client";
 import { Machine } from "xstate";
-import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "@td/constants";
-import { isForeignVat, isSiret } from "@td/constants";
+import {
+  isForeignVat,
+  isSiret,
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES
+} from "@td/constants";
 import { Event, EventType } from "./types";
 import { hasPipeline } from "../validation";
 

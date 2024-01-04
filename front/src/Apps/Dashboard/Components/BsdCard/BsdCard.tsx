@@ -26,7 +26,7 @@ import {
   useBsffDownloadPdf,
   useBsvhuDownloadPdf
 } from "../Pdf/useDownloadPdf";
-import { BsdType } from "@td/codegen-ui";
+import { BsdType, UserPermission } from "@td/codegen-ui";
 import {
   useBsdaDuplicate,
   useBsdasriDuplicate,
@@ -40,7 +40,6 @@ import DeleteModal from "../DeleteModal/DeleteModal";
 import { useMedia } from "../../../../common/use-media";
 import { MEDIA_QUERIES } from "../../../../common/config";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
-import { UserPermission } from "@td/codegen-ui";
 
 import "./bsdCard.scss";
 

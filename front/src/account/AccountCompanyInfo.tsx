@@ -15,8 +15,7 @@ import AccountFieldCompanyVerificationStatus from "./fields/AccountFieldCompanyV
 import AccountFieldCompanyVhuAgrementBroyeur from "./fields/AccountFieldCompanyVhuAgrementBroyeur";
 import AccountFieldCompanyVhuAgrementDemolisseur from "./fields/AccountFieldCompanyVhuAgrementDemolisseur";
 import AccountFieldCompanyWorkerCertification from "./fields/AccountFieldCompanyWorkerCertification";
-import * as COMPANY_CONSTANTS from "@td/constants";
-import { isSiret, isVat } from "@td/constants";
+import { isSiret, isVat, PROFESSIONALS } from "@td/constants";
 import AccountInfoAutoUpdate from "./fields/AccountInfoAutoUpdate";
 
 type Props = { company: CompanyPrivate };
@@ -67,7 +66,7 @@ export default function AccountCompanyInfo({ company }: Props) {
   const isAdmin = company.userRole === UserRole.Admin;
 
   const isWasteProfessional = company.companyTypes.some(ct =>
-    COMPANY_CONSTANTS.PROFESSIONALS.includes(ct)
+    PROFESSIONALS.includes(ct)
   );
   return (
     <>

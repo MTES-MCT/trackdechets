@@ -6,7 +6,6 @@ import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
-import * as COMPANY_CONSTANTS from "@td/constants";
 import {
   renderMail,
   onboardingFirstStep,
@@ -19,7 +18,8 @@ import {
   isFRVat,
   isSiret,
   isVat,
-  CLOSED_COMPANY_ERROR
+  CLOSED_COMPANY_ERROR,
+  PROFESSIONALS
 } from "@td/constants";
 import { searchCompany } from "../../search";
 import {
@@ -202,7 +202,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   if (VERIFY_COMPANY === "true") {
     const isProfessional = company.companyTypes.some(ct => {
-      return COMPANY_CONSTANTS.PROFESSIONALS.includes(ct);
+      return PROFESSIONALS.includes(ct);
     });
     if (isProfessional) {
       await sendMail(
@@ -227,11 +227,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   // If the company is NOT professional, send onboarding email
   // (professional onboarding mail is sent on verify)
-  if (
-    ![...company.companyTypes].some(ct =>
-      COMPANY_CONSTANTS.PROFESSIONALS.includes(ct)
-    )
-  ) {
+  if (![...company.companyTypes].some(ct => PROFESSIONALS.includes(ct))) {
     await sendMail(
       renderMail(onboardingFirstStep, {
         to: [{ email: user.email, name: user.name }],

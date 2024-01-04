@@ -6,8 +6,7 @@ import {
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { prisma } from "@td/prisma";
-import { nafCodes } from "@td/constants";
-import { isForeignVat } from "@td/constants";
+import { isForeignVat, nafCodes } from "@td/constants";
 import {
   foreignVatNumber,
   siret,
