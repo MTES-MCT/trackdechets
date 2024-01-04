@@ -296,7 +296,7 @@ interface CompanySearchPrivateCommon {
   """
   vhuAgrementBroyeur: VhuAgrement
   """
-  Statut de diffusion des informations de l'établisement selon l'INSEE. . O = Oui, P = Non ou Partiel
+  Statut de diffusion des informations de l'établisement selon l'INSEE. O = Oui, P = Non ou Partiel
   """
   statutDiffusionEtablissement: StatutDiffusionEtablissement
 
@@ -396,7 +396,7 @@ type CompanySearchResult implements CompanySearchPrivateCommon {
   """
   vhuAgrementBroyeur: VhuAgrement
   """
-  Statut de diffusion des informations de l'établisement selon l'INSEE. . O = Oui, P = Non ou Partiel
+  Statut de diffusion des informations de l'établisement selon l'INSEE. O = Oui, P = Non ou Partiel
   """
   statutDiffusionEtablissement: StatutDiffusionEtablissement
 
