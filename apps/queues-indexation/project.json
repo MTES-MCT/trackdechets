@@ -6,6 +6,10 @@
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
+      "dependsOn": [
+        "^codegen",
+        { "projects": ["@td/prisma"], "target": "generate" }
+      ],
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
