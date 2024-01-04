@@ -1,7 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
-import { CompanyPrivate, UserRole } from "codegen-ui";
+import { CompanyPrivate, UserRole } from "@td/codegen-ui";
 import AccountFormCompanyVhuAgrementDemolisseur from "./forms/AccountFormCompanyAddVhuAgrementDemolisseur";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 

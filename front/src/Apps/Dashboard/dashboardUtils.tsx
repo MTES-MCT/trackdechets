@@ -44,7 +44,7 @@ import {
 } from "../common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
 import { BsdCurrentTab } from "../common/types/commonTypes";
-import { BsdType, BsdWhere, OrderBy } from "codegen-ui";
+import { BsdType, BsdWhere, OrderBy } from "@td/codegen-ui";
 
 export const MAX_FILTER = 5;
 

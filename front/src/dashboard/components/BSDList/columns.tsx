@@ -5,7 +5,7 @@ import {
   FilterProps,
   CellProps
 } from "react-table";
-import { Bsd, Bsdasri, Bsda, Form, Bsvhu } from "codegen-ui";
+import { Bsd, Bsdasri, Bsda, Form, Bsvhu } from "@td/codegen-ui";
 import { BSDTypeFilter } from "./BSDTypeFilter";
 import { TextInputFilter } from "./TextInputFilter";
 import {
@@ -14,7 +14,7 @@ import {
   GET_BSDS_PLATES_MAX_LENGTH,
   GET_BSDS_CUSTOM_INFO_MAX_LENGTH,
   GET_BSDS_WASTE_MAX_LENGTH
-} from "shared/constants";
+} from "@td/constants";
 import * as bsdd from "./BSDD";
 import * as bsdasri from "./BSDasri";
 import * as bsvhu from "./BSVhu";

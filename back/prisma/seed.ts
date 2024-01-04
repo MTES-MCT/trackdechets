@@ -1,5 +1,5 @@
 import path from "path";
-import prisma from "../src/prisma";
+import { prisma } from "@td/prisma";
 
 let exitCode = 0;
 

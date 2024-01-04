@@ -2,7 +2,7 @@ import * as React from "react";
 import { Formik, Form, Field } from "formik";
 import toast from "react-hot-toast";
 import { gql, useMutation } from "@apollo/client";
-import { Mutation, MutationAnonymizeUserArgs } from "codegen-ui";
+import { Mutation, MutationAnonymizeUserArgs } from "@td/codegen-ui";
 import { InlineError } from "../../Apps/common/Components/Error/Error";
 import RedErrorMessage from "../../common/components/RedErrorMessage";
 import { TOAST_DURATION } from "../../common/config";

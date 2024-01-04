@@ -5,7 +5,7 @@ import DateInput from "../../../common/components/custom-inputs/DateInput";
 import NumberInput from "../../../common/components/custom-inputs/NumberInput";
 import { RadioButton } from "../../../common/components/custom-inputs/RadioButton";
 import { Field, useFormikContext } from "formik";
-import { Bsda } from "codegen-ui";
+import { Bsda } from "@td/codegen-ui";
 import React, { useEffect } from "react";
 
 type Props = {

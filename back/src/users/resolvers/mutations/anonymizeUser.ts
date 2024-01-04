@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAdmin } from "../../../common/permissions";
 import { applyAuthStrategies, AuthType } from "../../../auth";

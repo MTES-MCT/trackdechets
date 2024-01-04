@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import Loader from "../../Apps/common/Components/Loader/Loaders";
-import { QueryCompaniesForVerificationArgs, Query } from "codegen-ui";
+import { QueryCompaniesForVerificationArgs, Query } from "@td/codegen-ui";
 import React, { useCallback } from "react";
 import CompaniesVerificationTable from "./CompaniesVerificationTable";
 import { COMPANIES_FOR_VERIFICATION } from "./queries";

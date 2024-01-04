@@ -3,7 +3,7 @@ import {
   GET_BSDS_PLATES_MAX_LENGTH,
   GET_BSDS_READABLE_ID_MAX_LENGTH,
   GET_BSDS_WASTE_MAX_LENGTH
-} from "shared/constants";
+} from "@td/constants";
 import {
   toElasticDateQuery,
   toElasticStringListQuery,

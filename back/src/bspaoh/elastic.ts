@@ -8,10 +8,10 @@ import {
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { buildAddress } from "../companies/sirene/utils";
 import { getFirstTransporterSync } from "./converter";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { distinct } from "../common/arrays";
 import { BspaohIncludes } from "./types";
 

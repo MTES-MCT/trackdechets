@@ -1,5 +1,5 @@
 #!/usr/bin/env ts-node
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 // delete expired and unused pdfAccesTokens
 (async function () {

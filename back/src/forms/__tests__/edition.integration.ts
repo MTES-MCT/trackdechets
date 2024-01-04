@@ -8,7 +8,7 @@ import {
 import { UpdateFormInput } from "../../generated/graphql/types";
 import { getFirstTransporterSync, getFullForm } from "../database";
 import { checkEditionRules } from "../edition";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 describe("checkEditionRules", () => {
   it.each([Status.DRAFT, Status.SEALED])(

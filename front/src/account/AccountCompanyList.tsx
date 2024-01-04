@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
 import AccountCompany from "./AccountCompany";
 import { useNavigate } from "react-router-dom";
-import { Query } from "codegen-ui";
+import { Query } from "@td/codegen-ui";
 import { Loader } from "../Apps/common/Components";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 import routes from "../Apps/routes";
@@ -10,7 +10,7 @@ import { debounce } from "../common/helper";
 import {
   MIN_MY_COMPANIES_SEARCH,
   MAX_MY_COMPANIES_SEARCH
-} from "shared/constants";
+} from "@td/constants";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 

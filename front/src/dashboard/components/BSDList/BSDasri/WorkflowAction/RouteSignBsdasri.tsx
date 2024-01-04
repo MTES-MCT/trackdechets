@@ -8,7 +8,7 @@ import {
   BsdasriSignatureType,
   MutationUpdateBsdasriArgs,
   Bsdasri
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   NotificationError,
   InlineError

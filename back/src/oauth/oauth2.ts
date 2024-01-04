@@ -1,5 +1,5 @@
 import { createServer, grant, exchange, TokenError } from "oauth2orize";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { getUid, hashToken } from "../utils";
 import { isExpired } from "./utils";
 

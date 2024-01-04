@@ -18,7 +18,7 @@ import {
   getUserRoles,
   can
 } from "../permissions";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import {
   getFirstTransporter,
   getFirstTransporterSync,

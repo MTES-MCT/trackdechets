@@ -14,21 +14,19 @@ import { checkVAT } from "jsvat";
 import countries from "world-countries";
 import * as yup from "yup";
 import {
+  BAD_CHARACTERS_REGEXP,
+  countries as vatCountries,
+  isForeignVat,
+  isOmi,
+  isSiret,
+  isVat,
   BSDD_APPENDIX1_WASTE_CODES,
   BSDD_WASTE_CODES,
   isDangerous,
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
-} from "shared/constants";
-import {
-  BAD_CHARACTERS_REGEXP,
-  countries as vatCountries,
-  isForeignVat,
-  isOmi,
-  isSiret,
-  isVat
-} from "shared/constants";
+} from "@td/constants";
 import {
   foreignVatNumber,
   REQUIRED_RECEIPT_DEPARTMENT,
@@ -49,7 +47,7 @@ import {
   PackagingInfo,
   Packagings
 } from "../generated/graphql/types";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import {
   EXTRANEOUS_NEXT_DESTINATION,
   INVALID_COMPANY_OMI_NUMBER,

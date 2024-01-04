@@ -7,7 +7,7 @@ import {
   foreignVatNumberSchema,
   isRegisteredVatNumberRefinement
 } from "../../common/validation/siret";
-import { BSPAOH_WASTE_CODES, BSPAOH_WASTE_TYPES } from "shared/constants";
+import { BSPAOH_WASTE_CODES, BSPAOH_WASTE_TYPES } from "@td/constants";
 
 export const BSPAOH_OPERATIONS = ["R 1", "D 10"] as const;
 

@@ -1,6 +1,6 @@
 import React from "react";
 import "./CompanyContact.scss";
-import { CompanySearchResult } from "codegen-ui";
+import { CompanySearchResult } from "@td/codegen-ui";
 
 type Props = {
   company: Pick<

@@ -37,22 +37,3 @@ jobs:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
       - run: npx nx affected -t build --parallel=3
-
-  doc:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: doc
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "16"
-          cache: "yarn"
-          cache-dependency-path: doc/yarn.lock
-
-      - run: yarn install --frozen-lockfile
-      - name: Test Build
-        run: yarn build

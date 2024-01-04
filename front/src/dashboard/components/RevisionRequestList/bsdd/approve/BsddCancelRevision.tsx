@@ -7,7 +7,7 @@ import {
   FormRevisionRequest,
   Mutation,
   MutationCancelFormRevisionRequestArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   CANCEL_FORM_REVISION_REQUEST,
   GET_FORM_REVISION_REQUESTS

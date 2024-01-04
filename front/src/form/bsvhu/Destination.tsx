@@ -4,7 +4,7 @@ import { RedErrorMessage } from "../../common/components";
 import CompanySelector from "../common/components/company/CompanySelector";
 import { RadioButton } from "../common/components/custom-inputs/RadioButton";
 import Operation from "./Operation";
-import { Bsvhu, CompanySearchResult } from "codegen-ui";
+import { Bsvhu, CompanySearchResult } from "@td/codegen-ui";
 
 export default function Destination({ disabled }) {
   const [selectedDestination, setSelectedDestination] =

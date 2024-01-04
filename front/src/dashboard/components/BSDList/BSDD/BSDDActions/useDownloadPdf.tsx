@@ -1,5 +1,5 @@
 import { gql, LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
-import { Query, QueryFormPdfArgs } from "codegen-ui";
+import { Query, QueryFormPdfArgs } from "@td/codegen-ui";
 
 export const FORMS_PDF = gql`
   query FormPdf($id: ID!) {

@@ -1,4 +1,4 @@
-import { ALL_WASTES } from "shared/constants";
+import { ALL_WASTES } from "@td/constants";
 
 export function wasteCodeValidator(wasteCode: string) {
   const wasteCodeWithoutSpaces = wasteCode.replace(/\s+/g, "");

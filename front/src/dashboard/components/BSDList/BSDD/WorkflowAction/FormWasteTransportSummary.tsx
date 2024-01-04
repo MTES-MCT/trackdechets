@@ -7,7 +7,7 @@ import {
   QuantityType,
   SignTransportFormInput,
   WasteDetailsInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   DataList,
   DataListDescription,

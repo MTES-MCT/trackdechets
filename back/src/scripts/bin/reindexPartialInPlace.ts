@@ -1,7 +1,7 @@
 import { isValid, parseISO } from "date-fns";
 import prompts from "prompts";
 import { logger } from "@td/logger";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { reindexPartialInPlace } from "../../bsds/indexation/reindexPartialInPlace";
 import { index } from "../../common/elastic";
 import { BsdType } from "../../generated/graphql/types";

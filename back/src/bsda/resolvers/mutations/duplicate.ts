@@ -11,7 +11,7 @@ import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { getBsdaRepository } from "../../repository";
 import { checkCanDuplicate } from "../../permissions";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { sirenify } from "../../validation/sirenify";
 
 export default async function duplicate(

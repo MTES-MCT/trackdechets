@@ -1,4 +1,4 @@
-import { EmitterType, TransportMode } from "codegen-ui";
+import { EmitterType, TransportMode } from "@td/codegen-ui";
 
 export const ITEMS_PER_PAGE = 50;
 

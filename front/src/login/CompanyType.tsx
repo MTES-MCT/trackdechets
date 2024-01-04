@@ -1,7 +1,7 @@
 import { FieldArray, FieldProps } from "formik";
 import React, { InputHTMLAttributes } from "react";
 import Tooltip from "../common/components/Tooltip";
-import { CompanyType } from "codegen-ui";
+import { CompanyType } from "@td/codegen-ui";
 import styles from "./CompanyType.module.scss";
 
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";

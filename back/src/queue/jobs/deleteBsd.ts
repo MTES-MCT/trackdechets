@@ -18,7 +18,7 @@ import {
 } from "../../bspaoh/elastic";
 
 import { BsdElastic, deleteBsd } from "../../common/elastic";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
   const bsdId = job.data;

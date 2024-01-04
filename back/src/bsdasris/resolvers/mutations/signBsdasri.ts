@@ -17,7 +17,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsdasriOrNotFound } from "../../database";
 import { expandBsdasriFromDB } from "../../converter";
 import { checkCanEditBsdasri } from "../../permissions";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { FullDbBsdasri } from "../../types";
 import { validateBsdasri } from "../../validation";
 import { getNextStatus } from "../../workflow/dasriTransition";

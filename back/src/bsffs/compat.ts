@@ -5,7 +5,7 @@ import {
   BsffStatus,
   WasteAcceptationStatus
 } from "@prisma/client";
-import prismaClient from "../prisma";
+import { prisma as prismaClient } from "@td/prisma";
 import { RepositoryFnDeps } from "../common/repository/types";
 import { BsffPackagingInput } from "../generated/graphql/types";
 import { isFinalOperation } from "./constants";

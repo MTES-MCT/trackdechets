@@ -8,7 +8,7 @@ import {
   CompanyForVerification,
   Mutation,
   MutationVerifyCompanyByAdminArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { NotificationError } from "../../../Apps/common/Components/Error/Error";
 import { TOAST_DURATION } from "../../../common/config";
 

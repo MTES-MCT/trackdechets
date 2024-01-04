@@ -2,7 +2,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { ForbiddenError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { getApplicationOrApplicationNotFound } from "../../database";
 
 const deleteApplicationResolver: MutationResolvers["deleteApplication"] =

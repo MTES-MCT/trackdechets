@@ -2,7 +2,7 @@ import * as React from "react";
 import { FieldArray, useField } from "formik";
 import { TransporterForm } from "../TransporterForm/TransporterForm";
 import { TransporterAccordion } from "../TransporterAccordion/TransporterAccordion";
-import { Mutation, MutationDeleteFormTransporterArgs } from "codegen-ui";
+import { Mutation, MutationDeleteFormTransporterArgs } from "@td/codegen-ui";
 import { useMutation } from "@apollo/client";
 import { DELETE_FORM_TRANSPORTER } from "../query";
 import { Loader } from "../../../common/Components";

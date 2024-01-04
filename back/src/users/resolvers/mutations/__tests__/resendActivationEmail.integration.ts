@@ -1,5 +1,5 @@
 import { gql } from "graphql-tag";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";

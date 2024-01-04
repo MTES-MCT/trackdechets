@@ -10,7 +10,7 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { createBsff } from "../../../__tests__/factories";
 import { xDaysAgo } from "../../../../utils";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { searchCompany } from "../../../../companies/search";
 
 jest.mock("../../../../companies/search");

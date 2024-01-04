@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FilterProps } from "react-table";
-import { Bsd, BsdType } from "codegen-ui";
+import { Bsd, BsdType } from "@td/codegen-ui";
 import Select from "../../../Apps/common/Components/Select/Select";
 import "./BSDTypeFilter.scss";
 

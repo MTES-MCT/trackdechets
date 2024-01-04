@@ -1,8 +1,8 @@
 import { FieldSwitch, RedErrorMessage } from "../../common/components";
 import NumberInput from "../common/components/custom-inputs/NumberInput";
 import { Field, useFormikContext } from "formik";
-import { Bsff, BsffPackaging, BsffType } from "codegen-ui";
-import { BSFF_WASTES } from "shared/constants";
+import { Bsff, BsffPackaging, BsffType } from "@td/codegen-ui";
+import { BSFF_WASTES } from "@td/constants";
 import React, { useEffect, useMemo } from "react";
 import Packagings from "./components/packagings/Packagings";
 import { PreviousPackagingsPicker } from "./components/PreviousPackagingsPicker";

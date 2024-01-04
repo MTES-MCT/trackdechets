@@ -9,7 +9,7 @@ import CompanyDisclaimer from "./CompanyDisclaimer";
 import CompanyHeader from "./CompanyHeader";
 import CompanyMap from "./CompanyMap";
 import CompanyRegistration from "./CompanyRegistration";
-import { Query, QueryCompanyInfosArgs } from "codegen-ui";
+import { Query, QueryCompanyInfosArgs } from "@td/codegen-ui";
 
 const COMPANY_INFOS = gql`
   query CompanyInfos($clue: String!) {

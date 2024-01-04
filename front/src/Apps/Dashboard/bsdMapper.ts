@@ -1,4 +1,4 @@
-import { Bsff, Bsdasri, Bsvhu, BsdType } from "codegen-ui";
+import { Bsff, Bsdasri, Bsvhu, BsdType } from "@td/codegen-ui";
 import {
   BsdDisplay,
   BsdStatusCode,

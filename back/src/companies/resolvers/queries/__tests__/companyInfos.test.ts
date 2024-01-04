@@ -14,9 +14,11 @@ jest.mock("../../../vat", () => ({
 }));
 
 const companyMock = jest.fn();
-jest.mock("../../../../prisma", () => ({
-  company: { findUnique: jest.fn((...args) => companyMock(...args)) },
-  anonymousCompany: { findUnique: jest.fn(() => null) }
+jest.mock("@td/prisma", () => ({
+  prisma: {
+    company: { findUnique: jest.fn((...args) => companyMock(...args)) },
+    anonymousCompany: { findUnique: jest.fn(() => null) }
+  }
 }));
 
 const installationMock = jest.fn();

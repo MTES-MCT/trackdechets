@@ -3,7 +3,7 @@ import {
   FormRevisionRequest,
   FormRevisionRequestResolvers
 } from "../../generated/graphql/types";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import {
   expandBsddRevisionRequestContent,
   expandableFormIncludes,

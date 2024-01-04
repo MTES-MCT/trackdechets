@@ -3,7 +3,7 @@ import {
   BsdEdge,
   BsdaRevisionRequestEdge,
   FormRevisionRequestEdge
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { Maybe } from "graphql/jsutils/Maybe";
 
 export interface BsdCardListProps {

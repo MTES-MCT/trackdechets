@@ -13,8 +13,8 @@ import {
   isWasteVehicles
 } from "../companies/validation";
 import { CompanyInput } from "../generated/graphql/types";
-import prisma from "../prisma";
-import { isForeignVat, isFRVat, isSiret, isVat } from "shared/constants";
+import { prisma } from "@td/prisma";
+import { isForeignVat, isFRVat, isSiret, isVat } from "@td/constants";
 import { UserInputError } from "./errors";
 
 // Poids maximum en tonnes tout mode de transport confondu

@@ -2,7 +2,7 @@ import queryString from "querystring";
 import supertest from "supertest";
 import { resetDatabase } from "../../integration-tests/helper";
 import { getLoginError } from "../auth";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { app, sess } from "../server";
 import { getUid, hashToken } from "../utils";
 import { userFactory, userWithAccessTokenFactory } from "./factories";

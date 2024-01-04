@@ -8,7 +8,7 @@ import {
 import { bsdaFactory } from "../../__tests__/factories";
 import { bsdaSchema } from "../schema";
 import { parseBsdaInContext } from "../index";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 
 describe("BSDA validation", () => {
   let bsda: Bsda;

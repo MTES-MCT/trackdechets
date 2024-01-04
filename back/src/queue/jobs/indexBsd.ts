@@ -9,7 +9,7 @@ import { toBsdElastic as toBsffElastic } from "../../bsffs/elastic";
 import { toBsdElastic as toBspaohElastic } from "../../bspaoh/elastic";
 import { BsdElastic, indexBsd, getElasticBsdById } from "../../common/elastic";
 import { getFormForElastic, indexForm } from "../../forms/elastic";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 export async function indexBsdJob(
   job: Job<string>

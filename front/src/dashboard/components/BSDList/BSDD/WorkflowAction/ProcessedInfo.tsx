@@ -3,14 +3,14 @@ import { Field, Form, useFormikContext } from "formik";
 import {
   PROCESSING_AND_REUSE_OPERATIONS,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
-} from "shared/constants";
+} from "@td/constants";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import CompanySelector from "../../../../../form/common/components/company/CompanySelector";
 import {
   Form as TdForm,
   FormStatus,
   MutationMarkAsProcessedArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import Tooltip from "../../../../../common/components/Tooltip";
 import { subMonths } from "date-fns";
 import OperationModeSelect from "../../../../../common/components/OperationModeSelect";

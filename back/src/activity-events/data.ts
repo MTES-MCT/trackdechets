@@ -1,5 +1,5 @@
 import { ActivityEvent } from ".";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { Event, Prisma } from "@prisma/client";
 import { getStreamEvents } from "../events/mongodb";
 import { EventCollection } from "../events/types";

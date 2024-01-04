@@ -23,7 +23,7 @@ import {
   MutationSignBsdasriEmissionWithSecretCodeArgs,
   MutationUpdateBsdasriArgs,
   BsdasriSignatureType
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { getComputedState } from "../../../../../form/common/getComputedState";
 import getInitialState, {
   getInitialWeightFn

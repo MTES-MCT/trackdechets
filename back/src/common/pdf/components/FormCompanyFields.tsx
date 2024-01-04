@@ -6,7 +6,7 @@ import {
   isVat,
   isSiret,
   cleanClue
-} from "shared/constants";
+} from "@td/constants";
 import { FormCompany } from "../../../generated/graphql/types";
 
 const FRENCH_COUNTRY = countries.find(country => country.cca2 === "FR");

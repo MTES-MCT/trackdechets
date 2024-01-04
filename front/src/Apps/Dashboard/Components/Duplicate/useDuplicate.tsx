@@ -6,7 +6,7 @@ import {
   MutationDuplicateBsdasriArgs,
   MutationDuplicateBsvhuArgs,
   MutationDuplicateFormArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   bsdaFragment,
   fullDasriFragment,

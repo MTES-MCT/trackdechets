@@ -8,7 +8,7 @@ import {
   MutationEditSegmentArgs,
   NextSegmentInfoInput,
   TransportSegment
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { segmentFragment } from "../../../Apps/common/queries/fragments";
 import { IconPaperWrite } from "../../../Apps/common/Components/Icons/Icons";
 import { NotificationError } from "../../../Apps/common/Components/Error/Error";
@@ -20,7 +20,7 @@ import {
   FieldTransportModeSelect,
   RedErrorMessage
 } from "../../../common/components";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 import { transporterCompanySchema } from "../../../common/validation/schema";
 import { TOAST_DURATION } from "../../../common/config";
 

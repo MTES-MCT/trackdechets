@@ -1,6 +1,6 @@
 import { userFactory } from "../../../../__tests__/factories";
 import { AuthType } from "../../../../auth";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { getBsffRepository } from "../..";
 import { resetDatabase } from "../../../../../integration-tests/helper";

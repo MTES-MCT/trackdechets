@@ -6,7 +6,7 @@ import {
 import { webhookSettingFactory } from "../../../webhooks/__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { companyFactory } from "../../../__tests__/factories";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 
 describe("webhooksettings redis", () => {
   afterEach(async () => {

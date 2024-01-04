@@ -22,7 +22,7 @@ import {
   Query,
   QueryCompanyPrivateInfosArgs,
   OperationMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { emitterTypeLabels, getTransportModeLabel } from "../../constants";
 import {
   IconWarehouseDelivery,
@@ -57,15 +57,18 @@ import { WorkflowAction } from "../../components/BSDList";
 import EditSegment from "./EditSegment";
 import { Modal } from "../../../common/components";
 import { Loader } from "../../../Apps/common/Components";
-import { isDangerous } from "shared/constants";
 import { format } from "date-fns";
-import { isForeignVat, isSiret } from "shared/constants";
+import {
+  isForeignVat,
+  isSiret,
+  isDangerous,
+  STATUS_LABELS
+} from "@td/constants";
 import { Appendix1ProducerForm } from "../../../form/bsdd/appendix1Producer/form";
 import { useQuery } from "@apollo/client";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../Apps/common/queries/company/query";
 import { formTransportIsPipeline } from "../../../form/bsdd/utils/packagings";
 import { getOperationModeLabel } from "../../../common/operationModes";
-import { STATUS_LABELS } from "shared/constants";
 import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
 import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
 

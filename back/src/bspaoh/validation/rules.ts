@@ -3,7 +3,7 @@ import { RefinementCtx, z } from "zod";
 import { BspaohSignatureType } from "../../generated/graphql/types";
 import { capitalize } from "../../common/strings";
 import { ZodFullBspaoh } from "./schema";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 import { UnparsedInputs } from ".";
 import { getUserFunctions } from "./helpers";
 

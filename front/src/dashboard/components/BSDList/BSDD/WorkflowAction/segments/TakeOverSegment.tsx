@@ -7,7 +7,7 @@ import {
   MutationTakeOverSegmentArgs,
   QueryFormArgs,
   Query
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { IconBusTransfer } from "../../../../../../Apps/common/Components/Icons/Icons";
 import ActionButton from "../../../../../../common/components/ActionButton";
 import TdModal from "../../../../../../Apps/common/Components/Modal/Modal";

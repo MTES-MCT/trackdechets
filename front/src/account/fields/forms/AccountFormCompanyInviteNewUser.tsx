@@ -10,7 +10,7 @@ import {
   UserRole,
   Mutation,
   MutationInviteUserToCompanyArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import toast from "react-hot-toast";
 import TdTooltip from "../../../common/components/Tooltip";
 import { TOAST_DURATION } from "../../../common/config";

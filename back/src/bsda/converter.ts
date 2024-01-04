@@ -45,7 +45,7 @@ import {
   Bsda as PrismaBsda,
   BsdaRevisionRequest
 } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { Decimal } from "decimal.js-light";
 import { BsdaForElastic } from "./elastic";
 

@@ -10,7 +10,7 @@ import {
   IconTrash,
   IconQrCode
 } from "../../../../../Apps/common/Components/Icons/Icons";
-import { Bsvhu, BsvhuStatus } from "codegen-ui";
+import { Bsvhu, BsvhuStatus } from "@td/codegen-ui";
 import { DeleteBsvhuModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
 import { useDuplicate } from "./useDuplicate";

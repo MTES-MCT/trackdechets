@@ -13,7 +13,7 @@ import {
   Company,
   TransportMode
 } from "@prisma/client";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { hashToken } from "../utils";
 import { createUser, getUserCompanies } from "../users/database";
 

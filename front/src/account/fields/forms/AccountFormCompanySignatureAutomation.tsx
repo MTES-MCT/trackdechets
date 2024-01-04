@@ -10,7 +10,7 @@ import {
   MutationRemoveSignatureAutomationArgs,
   Query,
   QuerySearchCompaniesArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React, { useState } from "react";
 
 type Props = {

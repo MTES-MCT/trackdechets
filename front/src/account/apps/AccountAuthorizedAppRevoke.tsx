@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Modal } from "../../common/components";
-import { AuthorizedApplication } from "codegen-ui";
+import { AuthorizedApplication } from "@td/codegen-ui";
 import { useMutation } from "@apollo/client";
 import {
   REVOKE_AUTHORIZED_APPLICATION,

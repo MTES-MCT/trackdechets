@@ -15,7 +15,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { bspaohFactory } from "../../../__tests__/factories";
 import { fullBspaoh } from "../../../fragments";
 import { gql } from "graphql-tag";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { sirenify as sirenifyBspaohInput } from "../../../validation/sirenify";
 
 jest.mock("../../../validation/sirenify");

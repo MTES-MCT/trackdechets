@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { BsdaForElasticInclude, indexBsda } from "../../bsda/elastic";
 import { BsdasriForElasticInclude, indexBsdasri } from "../../bsdasris/elastic";
 import { getBsffForElastic, indexBsff } from "../../bsffs/elastic";

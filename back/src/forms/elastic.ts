@@ -22,7 +22,7 @@ import {
 
 import { buildAddress } from "../companies/sirene/utils";
 import { getFirstTransporterSync } from "./database";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 
 export type FormForElastic = Form &
   FormWithTransporters &

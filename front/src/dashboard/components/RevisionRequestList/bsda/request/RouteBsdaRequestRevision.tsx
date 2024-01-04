@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import { Loader } from "../../../../../Apps/common/Components";
 import { InlineError } from "../../../../../Apps/common/Components/Error/Error";
 import { GET_BSDA } from "../../../../../form/bsda/stepper/queries";
-import { Query, QueryBsdaArgs } from "codegen-ui";
+import { Query, QueryBsdaArgs } from "@td/codegen-ui";
 import React from "react";
 import { useParams } from "react-router-dom";
 import { BsdaRequestRevision } from "./BsdaRequestRevision";

@@ -1,6 +1,6 @@
 import CompanySelector from "../../../common/components/company/CompanySelector";
 import { useFormikContext } from "formik";
-import { Bsda, BsdaType } from "codegen-ui";
+import { Bsda, BsdaType } from "@td/codegen-ui";
 import React from "react";
 import { Transport } from "./Transport";
 import TransporterReceiptEditionSwitch from "../../../common/components/company/TransporterReceiptEditionSwitch";

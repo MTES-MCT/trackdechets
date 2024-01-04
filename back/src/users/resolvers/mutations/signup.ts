@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import { hash } from "bcrypt";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import * as yup from "yup";
 import { sendMail } from "../../../mailer/mailing";
 import {

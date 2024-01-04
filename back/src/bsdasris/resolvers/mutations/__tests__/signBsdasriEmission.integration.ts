@@ -12,7 +12,7 @@ import {
   initialData,
   readyToPublishData
 } from "../../../__tests__/factories";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 
 describe("Mutation.signBsdasri emission", () => {

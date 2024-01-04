@@ -1,5 +1,5 @@
 import DataLoader from "dataloader";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 
 export function createUserDataLoaders() {
   return {

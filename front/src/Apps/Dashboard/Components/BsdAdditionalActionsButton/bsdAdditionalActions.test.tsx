@@ -2,7 +2,7 @@ import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import BsdAdditionalActionsButton from "./BsdAdditionalActionsButton";
 import { BsdDisplay, BsdStatusCode } from "../../../common/types/bsdTypes";
-import { BsdType, EmitterType, UserPermission } from "codegen-ui";
+import { BsdType, EmitterType, UserPermission } from "@td/codegen-ui";
 
 const bsd = {
   id: "1",

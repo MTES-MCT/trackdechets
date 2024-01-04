@@ -1,5 +1,5 @@
 import React from "react";
-import { CompanySearchResult } from "codegen-ui";
+import { CompanySearchResult } from "@td/codegen-ui";
 import routes from "../Apps/routes";
 import { COMPANY_CONSTANTS } from "../login/CompanyType";
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Form } from "codegen-ui";
+import { Form } from "@td/codegen-ui";
 import {
   Journey,
   JourneyStop,

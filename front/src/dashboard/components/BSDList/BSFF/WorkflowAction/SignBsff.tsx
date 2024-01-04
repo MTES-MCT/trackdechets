@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useQuery } from "@apollo/client";
-import { Bsff, Query, QueryBsffArgs } from "codegen-ui";
+import { Bsff, Query, QueryBsffArgs } from "@td/codegen-ui";
 import { ActionButton, Modal } from "../../../../../common/components";
 import { Loader } from "../../../../../Apps/common/Components";
 import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";

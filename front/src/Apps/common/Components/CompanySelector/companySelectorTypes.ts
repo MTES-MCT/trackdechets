@@ -1,4 +1,4 @@
-import { CompanySearchResult } from "codegen-ui";
+import { CompanySearchResult } from "@td/codegen-ui";
 
 export interface CompanySelectorProps {
   loading: boolean;

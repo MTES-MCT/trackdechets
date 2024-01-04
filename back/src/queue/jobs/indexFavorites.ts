@@ -4,14 +4,14 @@ import { Job } from "bull";
 import { SearchResponse } from "@elastic/elasticsearch/api/types";
 import { ApiResponse, Client } from "@elastic/elasticsearch";
 import { CompanyType } from "@prisma/client";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import {
   mergeCompanyToCompanySearchResult,
   searchCompany
 } from "../../companies/search";
 import { CompanySearchResult } from "../../companies/types";
 import { FavoriteType } from "../../generated/graphql/types";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic, index } from "../../common/elastic";
 import { AnonymousCompanyError } from "../../companies/sirene/errors";
 

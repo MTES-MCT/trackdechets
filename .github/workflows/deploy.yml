@@ -37,26 +37,23 @@ jobs:
           ignore_missing: true
 
   doc:
-    # Taken from https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: doc
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
-          cache: 'yarn'
-          cache-dependency-path: doc/yarn.lock
-
-      - run: yarn install --frozen-lockfile
-      - run: yarn build
-
+          node-version: 20
+      - run: npm ci
+      - run: npx nx run doc:build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./doc/build
+          publish_dir: ./dist/apps/doc/build
+

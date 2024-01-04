@@ -5,7 +5,7 @@ import {
   CompanyPrivate,
   UserRole
 } from "../../generated/graphql/types";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 const userResolvers: UserResolvers = {
   // Returns the list of companies a user belongs to

@@ -7,7 +7,7 @@ import {
   Mutation,
   MutationDeleteBsdasriArgs
 } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 
 const DELETE_DASRI = `
 mutation DeleteDasri($id: ID!){

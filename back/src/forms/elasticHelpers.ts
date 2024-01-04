@@ -2,7 +2,7 @@ import { EmitterType, Status } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
 import { FullForm } from "./types";
 
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { getFirstTransporterSync } from "./database";
 import { FormForElastic } from "./elastic";
 import { getRevisionOrgIds } from "../common/elasticHelpers";

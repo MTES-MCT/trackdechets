@@ -19,7 +19,7 @@ import {
   MutationMarkAsReceivedArgs,
   Mutation,
   MutationMarkAsTempStoredArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
 import { GET_BSDS } from "../../../../../Apps/common/queries";

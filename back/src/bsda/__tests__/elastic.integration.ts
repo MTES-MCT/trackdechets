@@ -1,6 +1,6 @@
 import { Company } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { companyFactory } from "../../__tests__/factories";
 import { getBsdaForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";

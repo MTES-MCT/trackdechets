@@ -15,7 +15,7 @@ import {
   Form,
   Maybe,
   UserPermission
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   ACCEPTE,
   AJOUTER_ANNEXE_1,

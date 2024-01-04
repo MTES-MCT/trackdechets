@@ -1,5 +1,5 @@
 import { BsdaPackaging } from "../../src/generated/graphql/types";
-import prisma from "../../src/prisma";
+import { prisma } from "@td/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 
 type SqlRowToUpdate = {

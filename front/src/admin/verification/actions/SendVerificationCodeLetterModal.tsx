@@ -3,9 +3,9 @@ import TdModal from "../../../Apps/common/Components/Modal/Modal";
 import { gql, useMutation } from "@apollo/client";
 import React from "react";
 import styles from "./CompanyVerifyModal.module.scss";
-import { CompanyForVerification, Mutation } from "codegen-ui";
+import { CompanyForVerification, Mutation } from "@td/codegen-ui";
 import { NotificationError } from "../../../Apps/common/Components/Error/Error";
-import { isSiret } from "shared/constants";
+import { isSiret } from "@td/constants";
 import { TOAST_DURATION } from "../../../common/config";
 
 type VerifyModalProps = {

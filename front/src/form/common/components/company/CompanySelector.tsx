@@ -10,7 +10,7 @@ import {
 import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import { constantCase } from "constant-case";
 import { Field, useField, useFormikContext } from "formik";
-import { isFRVat, isVat, isForeignVat } from "shared/constants";
+import { isFRVat, isVat, isForeignVat } from "@td/constants";
 import React, {
   useCallback,
   useEffect,
@@ -37,7 +37,7 @@ import {
   TransporterInput,
   BsffTransporterInput,
   TransportMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import CompanyResults from "./CompanyResults";

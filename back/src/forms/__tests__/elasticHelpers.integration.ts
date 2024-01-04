@@ -7,7 +7,7 @@ import {
 } from "../../generated/graphql/types";
 import { getFormRevisionOrgIds } from "../elasticHelpers";
 import { getFormForElastic } from "../elastic";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 
 const CREATE_FORM_REVISION_REQUEST = gql`

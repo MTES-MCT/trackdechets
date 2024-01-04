@@ -8,7 +8,7 @@ import {
   CompanyType,
   FavoriteType,
   Transporter
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { formatDate } from "../../../../common/datetime";
 import {
   FAVORITES,

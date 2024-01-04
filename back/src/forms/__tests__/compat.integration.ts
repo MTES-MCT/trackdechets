@@ -4,7 +4,7 @@ import {
   formWithTempStorageFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { RegistryFormInclude } from "../../registry/elastic";
 import { formToBsdd } from "../compat";
 

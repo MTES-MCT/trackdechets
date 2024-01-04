@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { CompanyPrivate, UserRole } from "codegen-ui";
+import { CompanyPrivate, UserRole } from "@td/codegen-ui";
 import React from "react";
 import AccountField from "./AccountField";
 import { AccountFormCompanySignatureAutomation } from "./forms/AccountFormCompanySignatureAutomation";

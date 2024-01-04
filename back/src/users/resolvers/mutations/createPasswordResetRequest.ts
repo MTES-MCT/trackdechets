@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { promisify } from "util";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { renderMail, createPasswordResetRequest } from "@td/mail";

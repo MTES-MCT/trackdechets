@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Bsda } from "codegen-ui";
+import { Bsda } from "@td/codegen-ui";
 import { BsdaWasteSummary } from "./BsdaWasteSummary";
 import { BsdaJourneySummary } from "./BsdaJourneySummary";
 import { InitialBsdas } from "../../../../detail/bsda/InitialBsdas";

@@ -11,7 +11,7 @@ import {
   MutationUpdateFormTransporterArgs
 } from "../../../../generated/graphql/types";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { getFirstTransporter } from "../../../database";
 import { AuthType } from "../../../../auth";
 

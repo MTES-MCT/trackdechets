@@ -9,7 +9,7 @@ import {
   MutationUpdateFormTransporterArgs,
   Query,
   QueryFormArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React, { ReactElement, useMemo, lazy } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -27,7 +27,7 @@ import {
   CREATE_FORM_TRANSPORTER,
   UPDATE_FORM_TRANSPORTER
 } from "../../Apps/Forms/Components/query";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (form: Form | undefined) => ReactElement;

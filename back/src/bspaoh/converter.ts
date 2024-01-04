@@ -42,7 +42,7 @@ import {
   BspaohType
 } from "@prisma/client";
 import { BspaohForElastic } from "./elastic";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { PrismaBspaohWithTransporters } from "./types";
 
 export function getFirstTransporterSync(bspaoh: {

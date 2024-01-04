@@ -18,7 +18,7 @@ import { OnboardingSlideshow } from "./components/OnboardingSlideshow";
 import { ExtraSignatureType } from "./components/BSDList/BSDasri/types";
 import { Redirect } from "../Apps/utils/routerUtils";
 
-import { Query, BsdasriSignatureType } from "codegen-ui";
+import { Query, BsdasriSignatureType } from "@td/codegen-ui";
 import {
   RouteBsdsAct,
   RouteBsdsDrafts,

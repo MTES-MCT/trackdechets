@@ -9,7 +9,7 @@ import { expandBspaohFromDb } from "../../converter";
 import { getBspaohOrNotFound, getBspaohFirstTransporter } from "../../database";
 
 import { checkCanDuplicate } from "../../permissions";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { getBspaohRepository } from "../../repository";
 
 import { prepareBspaohForParsing, prepareBspaohInputs } from "./utils";

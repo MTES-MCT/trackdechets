@@ -4,7 +4,7 @@ import {
 } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 
 const authorizedApplicationsResolver: QueryResolvers["authorizedApplications"] =
   async (_parent, _args, context) => {

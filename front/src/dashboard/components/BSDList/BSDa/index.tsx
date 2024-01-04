@@ -1,7 +1,7 @@
 import * as React from "react";
 import { CellProps, CellValue } from "react-table";
 
-import { Bsda, BsdaStatus, BsdaType } from "codegen-ui";
+import { Bsda, BsdaStatus, BsdaType } from "@td/codegen-ui";
 import { IconBSDa } from "../../../../Apps/common/Components/Icons/Icons";
 import { BSDaActions } from "./BSDaActions/BSDaActions";
 import { useParams } from "react-router-dom";

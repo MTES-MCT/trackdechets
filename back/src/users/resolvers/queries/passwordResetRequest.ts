@@ -1,5 +1,5 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 /**
  * This query is used to check if the invitation hash is valid
  * or if the user has already joined when clicking the invitation

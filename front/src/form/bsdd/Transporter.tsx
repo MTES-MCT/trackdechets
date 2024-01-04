@@ -1,5 +1,8 @@
 import { useFormikContext } from "formik";
-import { Transporter as TransporterType, WasteDetailsInput } from "codegen-ui";
+import {
+  Transporter as TransporterType,
+  WasteDetailsInput
+} from "@td/codegen-ui";
 import React from "react";
 import { formTransportIsPipeline } from "./utils/packagings";
 import { TransporterList } from "../../Apps/Forms/Components/TransporterList/TransporterList";

@@ -44,7 +44,7 @@ import {
   Scalars,
   TemporaryStorageDetail,
   Transporter
-} from "codegen-ui";
+} from "@td/codegen-ui";
 
 export enum BsdTypename {
   Bsdd = "Form",
