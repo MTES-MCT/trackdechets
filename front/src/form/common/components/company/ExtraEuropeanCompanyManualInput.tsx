@@ -2,7 +2,7 @@ import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import { Field, useField } from "formik";
 import React from "react";
 
-import { FormCompany } from "codegen-ui";
+import { FormCompany } from "@td/codegen-ui";
 
 interface ExtraEuropeanCompanyManualProps {
   name: string;

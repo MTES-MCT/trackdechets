@@ -1283,11 +1283,9 @@ const withNextDestination = (required: boolean) =>
           `Destination ultérieure : ${MISSING_COMPANY_NAME}`
         ),
       nextDestinationCompanySiret: siret
-        .label("Destination ultérieure prévue")
-        .nullable(),
+        .label("Destination ultérieure prévue"),
       nextDestinationCompanyVatNumber: vatNumber
-        .label("Destination ultérieure prévue")
-        .nullable(),
+        .label("Destination ultérieure prévue"),
       nextDestinationCompanyAddress: yup
         .string()
         .ensure()
