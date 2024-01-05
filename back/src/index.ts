@@ -1,5 +1,5 @@
 import "@total-typescript/ts-reset";
-import * as _ from "@td/tracer";
+import "@td/tracer";
 import { envVariables } from "@td/env";
 import { z } from "zod";
 
