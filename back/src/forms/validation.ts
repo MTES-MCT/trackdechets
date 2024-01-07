@@ -981,7 +981,7 @@ export const transporterSchemaFn: FactorySchemaOf<
           is: (isExempted, vat, transportMode) =>
             isForeignVat(vat) ||
             isExempted ||
-            transportMode !== TransportMode.ROAD,
+            (transportMode && transportMode !== TransportMode.ROAD),
           then: schema => schema.notRequired().nullable(),
           otherwise: schema =>
             schema.when(
@@ -1002,7 +1002,7 @@ export const transporterSchemaFn: FactorySchemaOf<
           is: (isExempted, vat, transportMode) =>
             isForeignVat(vat) ||
             isExempted ||
-            transportMode !== TransportMode.ROAD,
+            (transportMode && transportMode !== TransportMode.ROAD),
           then: schema => schema.notRequired().nullable(),
           otherwise: schema =>
             schema.when(
@@ -1023,7 +1023,7 @@ export const transporterSchemaFn: FactorySchemaOf<
           is: (isExempted, vat, transportMode) =>
             isForeignVat(vat) ||
             isExempted ||
-            transportMode !== TransportMode.ROAD,
+            (transportMode && transportMode !== TransportMode.ROAD),
           then: schema => schema.notRequired().nullable(),
           otherwise: schema =>
             schema.when(
@@ -1282,10 +1282,10 @@ const withNextDestination = (required: boolean) =>
           required,
           `Destination ultérieure : ${MISSING_COMPANY_NAME}`
         ),
-      nextDestinationCompanySiret: siret
-        .label("Destination ultérieure prévue"),
-      nextDestinationCompanyVatNumber: vatNumber
-        .label("Destination ultérieure prévue"),
+      nextDestinationCompanySiret: siret.label("Destination ultérieure prévue"),
+      nextDestinationCompanyVatNumber: vatNumber.label(
+        "Destination ultérieure prévue"
+      ),
       nextDestinationCompanyAddress: yup
         .string()
         .ensure()
