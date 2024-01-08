@@ -6,7 +6,7 @@ import {
   BsffPackagingInput,
   BsffType,
   CompanyInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import CompanySelector from "../common/components/company/CompanySelector";
 import { FicheInterventionList } from "./FicheInterventionList";
 import MyCompanySelector from "../common/components/company/MyCompanySelector";

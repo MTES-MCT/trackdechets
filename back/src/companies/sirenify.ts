@@ -2,7 +2,10 @@ import { AuthType } from "../auth";
 import { UserInputError } from "../common/errors";
 import { searchCompany } from "../companies/search";
 import { CompanySearchResult } from "../companies/types";
-import { CompanyInput } from "../generated/graphql/types";
+import {
+  CompanyInput,
+  StatutDiffusionEtablissement
+} from "../generated/graphql/types";
 import { logger } from "@td/logger";
 import { escapeRegExp } from "../utils";
 import { SireneSearchResult } from "./sirene/types";
@@ -86,7 +89,7 @@ export default function buildSirenify<T>(
 
         if (
           companySearchResult.statutDiffusionEtablissement === "O" ||
-          // on auto-complète également nom et adresse si l'établissement est non diffusible
+          // auto-complète aussi nom et adresse si l'établissement est non diffusible
           // mais inscrit sur Trackdéchets
           companySearchResult.isRegistered
         ) {
@@ -139,7 +142,8 @@ export function nextBuildSirenify<T>(
     for (const [idx, companySearchResult] of companySearchResults.entries()) {
       if (
         !companySearchResult ||
-        companySearchResult.statutDiffusionEtablissement !== "O"
+        companySearchResult.statutDiffusionEtablissement ===
+          ("P" as StatutDiffusionEtablissement)
       )
         continue;
       if (companySearchResult.etatAdministratif === "F") {

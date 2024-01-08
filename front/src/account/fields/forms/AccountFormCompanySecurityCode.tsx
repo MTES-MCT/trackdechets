@@ -1,6 +1,6 @@
 import React from "react";
 import { useMutation, gql } from "@apollo/client";
-import { Mutation, MutationRenewSecurityCodeArgs } from "codegen-ui";
+import { Mutation, MutationRenewSecurityCodeArgs } from "@td/codegen-ui";
 
 type Props = {
   toggleEdition: () => void;

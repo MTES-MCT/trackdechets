@@ -3,7 +3,10 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { enqueueBsdToDelete } from "../../../queue/producers/elastic";
+import {
+  enqueueBsdToDelete,
+  enqueueUpdatedBsdToIndex
+} from "../../../queue/producers/elastic";
 import { bsdaEventTypes } from "./eventTypes";
 
 export type DeleteBsdaFn = (
@@ -14,6 +17,12 @@ export type DeleteBsdaFn = (
 export function buildDeleteBsda(deps: RepositoryFnDeps): DeleteBsdaFn {
   return async (where, logMetadata) => {
     const { user, prisma } = deps;
+
+    const linkedBsdas = await prisma.bsda.findUniqueOrThrow({
+      where,
+      select: { forwardingId: true, grouping: { select: { id: true } } }
+    });
+
     const deletedBsda = await prisma.bsda.update({
       where,
       data: { isDeleted: true, forwardingId: null }
@@ -37,6 +46,17 @@ export function buildDeleteBsda(deps: RepositoryFnDeps): DeleteBsdaFn {
     });
 
     prisma.addAfterCommitCallback(() => enqueueBsdToDelete(deletedBsda.id));
+
+    const linkedBsdaIds = [
+      linkedBsdas.forwardingId,
+      linkedBsdas.grouping?.map(g => g.id)
+    ]
+      .flat()
+      .filter(Boolean);
+
+    for (const id of linkedBsdaIds) {
+      prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(id));
+    }
 
     return deletedBsda;
   };

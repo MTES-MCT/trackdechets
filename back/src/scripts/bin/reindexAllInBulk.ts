@@ -2,7 +2,7 @@ import { Job, JobOptions } from "bull";
 import { logger } from "@td/logger";
 import { index as defaultIndexConfig } from "../../common/elastic";
 import { indexQueue } from "../../queue/producers/elastic";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { closeQueues } from "../../queue/producers";
 import { reindexAllBsdsInBulk } from "../../bsds/indexation";
 

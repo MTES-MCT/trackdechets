@@ -4,7 +4,7 @@ import {
   CompanySearchResult,
   Mutation
 } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   companyFactory,
   formFactory,
@@ -275,6 +275,7 @@ describe("Mutation.duplicateForm", () => {
       "nextDestinationCompanyMail",
       "nextDestinationCompanyCountry",
       "nextDestinationCompanyVatNumber",
+      "nextDestinationCompanyExtraEuropeanId",
       "nextDestinationNotificationNumber",
       "signedAt",
       "currentTransporterOrgId",
@@ -585,6 +586,7 @@ describe("Mutation.duplicateForm", () => {
       "nextDestinationCompanyMail",
       "nextDestinationCompanyCountry",
       "nextDestinationCompanyVatNumber",
+      "nextDestinationCompanyExtraEuropeanId",
       "nextDestinationNotificationNumber",
       "signedAt",
       "currentTransporterOrgId",

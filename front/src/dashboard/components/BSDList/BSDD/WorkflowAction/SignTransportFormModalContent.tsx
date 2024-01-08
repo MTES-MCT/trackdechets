@@ -10,7 +10,7 @@ import {
   MutationUpdateFormArgs,
   Query,
   QueryFormArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { GET_FORM, UPDATE_FORM } from "../../../../../form/bsdd/utils/queries";
 import { RedErrorMessage } from "../../../../../common/components";
 import { Loader } from "../../../../../Apps/common/Components";
@@ -218,6 +218,7 @@ export default function SignTransportFormModalContent({
 
           {![
             form.transporter?.company?.orgId,
+            ...(form.transporters ?? []).map(t => t.company?.orgId),
             form.temporaryStorageDetail?.transporter?.company?.orgId
           ].includes(siret) && (
             <div className="form__row">

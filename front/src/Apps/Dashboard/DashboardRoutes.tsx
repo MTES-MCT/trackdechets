@@ -8,7 +8,7 @@ import { RoutePublishBsdasri } from "../../dashboard/components/BSDList/BSDasri/
 import { RouteSignBsdasri } from "../../dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
 import { RouteBSDasrisSignEmissionSecretCode } from "../../dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
 import { OnboardingSlideshow } from "../../dashboard/components/OnboardingSlideshow";
-import { BsdasriSignatureType, Query } from "codegen-ui";
+import { BsdasriSignatureType, Query } from "@td/codegen-ui";
 import DashboardPage from "../../Pages/Dashboard";
 import { Redirect } from "../utils/routerUtils";
 import {

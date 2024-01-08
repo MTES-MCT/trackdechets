@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { GET_BSDS } from "../../common/queries";
 import { useNotifier } from "../../../dashboard/components/BSDList/useNotifier";
-import { CompanyType, Query, QueryBsdsArgs } from "codegen-ui";
+import { CompanyType, Query, QueryBsdsArgs } from "@td/codegen-ui";
 
 const hasTransporterProfile = companyTypes =>
   companyTypes.includes(CompanyType.Transporter);

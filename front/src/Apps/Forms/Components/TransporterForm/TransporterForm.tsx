@@ -10,10 +10,10 @@ import {
   FavoriteType,
   Transporter as FormTransporter,
   Transporter
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
 import TransporterRecepisse from "../TransporterRecepisse/TransporterRecepisse";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 
 type TransporterFormProps = {
   // SIRET ou VAT de l'établissement courant
@@ -116,7 +116,7 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
     <div className="fr-container">
       <CompanySelectorWrapper
         orgId={orgId}
-        formOrgId={transporterOrgId}
+        selectedCompanyOrgId={transporterOrgId}
         favoriteType={FavoriteType.Transporter}
         allowForeignCompanies={true}
         selectedCompanyError={selectedCompanyError}

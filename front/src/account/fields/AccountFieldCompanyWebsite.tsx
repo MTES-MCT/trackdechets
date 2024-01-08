@@ -8,7 +8,7 @@ import {
   CompanyPrivate,
   UserRole,
   MutationUpdateCompanyArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 
 type Props = {
   company: CompanyPrivate;

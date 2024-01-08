@@ -1,6 +1,6 @@
 import axios from "axios";
 import { resetDatabase } from "../../../../integration-tests/helper";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { companyFactory, siretify } from "../../../__tests__/factories";
 import { setCompanyName } from "../set-company-name";
 

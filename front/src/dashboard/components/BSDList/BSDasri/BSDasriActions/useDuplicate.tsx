@@ -1,6 +1,6 @@
 import { gql, MutationHookOptions, useMutation } from "@apollo/client";
 import toast from "react-hot-toast";
-import { Mutation, MutationDuplicateBsdasriArgs } from "codegen-ui";
+import { Mutation, MutationDuplicateBsdasriArgs } from "@td/codegen-ui";
 import { fullDasriFragment } from "../../../../../Apps/common/queries/fragments";
 import { GET_BSDS } from "../../../../../Apps/common/queries";
 

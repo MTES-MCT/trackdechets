@@ -4,7 +4,7 @@ import {
   Prisma
 } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { companyFactory, siretify } from "../../__tests__/factories";
 
 export const bsvhuFactory = async ({

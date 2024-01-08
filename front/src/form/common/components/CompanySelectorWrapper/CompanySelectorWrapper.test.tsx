@@ -6,14 +6,14 @@ import { SEARCH_COMPANIES } from "../../../../Apps/common/queries/company/query"
 
 describe("CompanySelectorWrapper", () => {
   const testSiret = "85001946400021";
-  const formOrgId = "38128881000033";
+  const selectedCompanyOrgId = "38128881000033";
 
   const mocks = [
     {
       request: {
         query: SEARCH_COMPANIES,
         variables: {
-          clue: formOrgId
+          clue: selectedCompanyOrgId
         }
       },
       result: () => {
@@ -22,8 +22,8 @@ describe("CompanySelectorWrapper", () => {
             searchCompanies: [
               {
                 __typename: "CompanySearchResult",
-                orgId: formOrgId,
-                siret: formOrgId,
+                orgId: selectedCompanyOrgId,
+                siret: selectedCompanyOrgId,
                 vatNumber: null,
                 name: "TRANS MASSILIA",
                 address: "69 RUE DU ROUET 13008 MARSEILLE 8",
@@ -62,15 +62,21 @@ describe("CompanySelectorWrapper", () => {
     expect(container).toBeTruthy();
   });
 
-  it("should set selectedCompany at render if `formOrgId` is specified", async () => {
+  it("should set selectedCompany at render if `selectedCompanyOrgId` is specified", async () => {
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <CompanySelectorWrapper orgId={testSiret} formOrgId={formOrgId} />
+        <CompanySelectorWrapper
+          orgId={testSiret}
+          selectedCompanyOrgId={selectedCompanyOrgId}
+        />
       </MockedProvider>
     );
 
     const companyLink = await screen.findByText("Lien vers la page entreprise");
     expect(companyLink).toBeInTheDocument();
-    expect(companyLink).toHaveAttribute("href", `/company/${formOrgId}`);
+    expect(companyLink).toHaveAttribute(
+      "href",
+      `/company/${selectedCompanyOrgId}`
+    );
   });
 });

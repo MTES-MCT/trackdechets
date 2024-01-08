@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { getUid } from "../../utils";
 import { addMinutes } from "date-fns";
 import {

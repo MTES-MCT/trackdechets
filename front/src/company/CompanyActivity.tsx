@@ -1,5 +1,5 @@
 import React from "react";
-import { Installation } from "codegen-ui";
+import { Installation } from "@td/codegen-ui";
 
 type Props = { installation: Installation };
 

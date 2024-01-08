@@ -1,5 +1,5 @@
 import { gql } from "graphql-tag";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   bsddTransporterFactory,
   companyFactory,

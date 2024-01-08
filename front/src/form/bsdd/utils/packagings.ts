@@ -1,4 +1,4 @@
-import { FormInput, PackagingInfo, Packagings } from "codegen-ui";
+import { FormInput, PackagingInfo, Packagings } from "@td/codegen-ui";
 
 export const PACKAGINGS_NAMES = {
   [Packagings.Benne]: "Benne(s)",

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { CellProps, CellValue } from "react-table";
 import { IconBSVhu } from "../../../../Apps/common/Components/Icons/Icons";
-import { Bsvhu, BsvhuStatus } from "codegen-ui";
+import { Bsvhu, BsvhuStatus } from "@td/codegen-ui";
 import { BSVhuActions } from "./BSVhuActions/BSVhuActions";
 import { useParams } from "react-router-dom";
 import { ActionButtonContext } from "../../../../common/components/ActionButton";

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Modal } from "../../common/components";
-import { AccessToken, NewAccessToken } from "codegen-ui";
+import { AccessToken, NewAccessToken } from "@td/codegen-ui";
 import { useMutation } from "@apollo/client";
 import { ACCESS_TOKENS, REVOKE_ACCESS_TOKEN } from "./queries";
 import { NotificationError } from "../../Apps/common/Components/Error/Error";

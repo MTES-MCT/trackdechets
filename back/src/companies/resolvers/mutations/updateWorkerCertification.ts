@@ -2,7 +2,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { removeEmptyKeys } from "../../../common/converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateWorkerCertificationArgs } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { GraphQLContext } from "../../../types";
 import { getWorkerCertificationOrNotFound } from "../../database";
 import { checkCanReadUpdateDeleteWorkerCertification } from "../../permissions";

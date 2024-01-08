@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Bsvhu } from "codegen-ui";
+import { Bsvhu } from "@td/codegen-ui";
 import {
   DataList,
   DataListItem,

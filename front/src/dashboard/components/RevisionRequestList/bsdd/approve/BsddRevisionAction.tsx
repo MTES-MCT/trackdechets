@@ -3,7 +3,7 @@ import {
   FormRevisionRequest,
   RevisionRequestApprovalStatus,
   RevisionRequestStatus
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import { BsddApproveRevision } from ".";
 import { BsddCancelRevision } from "./BsddCancelRevision";

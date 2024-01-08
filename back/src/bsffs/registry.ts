@@ -1,5 +1,5 @@
 import { Bsff, BsffPackaging, BsffType, OperationMode } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,

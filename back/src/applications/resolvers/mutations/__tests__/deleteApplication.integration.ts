@@ -1,6 +1,6 @@
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   applicationFactory,
   userFactory

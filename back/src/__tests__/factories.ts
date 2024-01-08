@@ -13,7 +13,7 @@ import {
   Company,
   TransportMode
 } from "@prisma/client";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { hashToken } from "../utils";
 import { createUser, getUserCompanies } from "../users/database";
 
@@ -77,7 +77,8 @@ export const companyFactory = async (
           "TRANSPORTER",
           "WASTEPROCESSOR",
           "WORKER",
-          "WASTE_VEHICLES"
+          "WASTE_VEHICLES",
+          "CREMATORIUM"
         ]
       },
       name: `company_${companyIndex}`,
@@ -370,7 +371,7 @@ export const upsertBaseSiret = async siret => {
           orgId: siret,
           siret,
           companyTypes: {
-            set: ["TRANSPORTER", "WASTEPROCESSOR", "WORKER"]
+            set: ["TRANSPORTER", "WASTEPROCESSOR", "WORKER", "CREMATORIUM"]
           },
           name: `company_${siret}`,
           securityCode: 1234,

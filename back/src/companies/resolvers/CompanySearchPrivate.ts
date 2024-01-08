@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { CompanySearchPrivateResolvers } from "../../generated/graphql/types";
 import { CompanyBaseIdentifiers } from "../types";
 import { whereSiretOrVatNumber } from "./CompanySearchResult";

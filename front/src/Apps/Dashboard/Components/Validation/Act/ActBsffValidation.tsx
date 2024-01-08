@@ -1,5 +1,5 @@
 import React from "react";
-import { Bsff, BsffStatus } from "codegen-ui";
+import { Bsff, BsffStatus } from "@td/codegen-ui";
 import { SignEmission } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignEmission";
 import { SignTransport } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignTransport";
 import { SignReception } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignReception";

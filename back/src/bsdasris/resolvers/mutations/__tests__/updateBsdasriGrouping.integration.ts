@@ -12,7 +12,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 const UPDATE_DASRI = `
 mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
   updateBsdasri(id: $id, input: $input) {

@@ -7,7 +7,7 @@ import { FieldTransportModeSelect } from "../../../common/components";
 import Packagings from "../components/packagings/Packagings";
 import { getInitialWeightFn } from "../utils/initial-state";
 import DateInput from "../../common/components/custom-inputs/DateInput";
-import { BsdasriStatus, Bsdasri, BsdasriType } from "codegen-ui";
+import { BsdasriStatus, Bsdasri, BsdasriType } from "@td/codegen-ui";
 import Acceptation from "../components/acceptation/Acceptation";
 import { customInfoToolTip } from "./Emitter";
 import { subMonths } from "date-fns";

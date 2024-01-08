@@ -9,7 +9,7 @@ import {
   TextFilter
 } from "../generated/graphql/types";
 import { UserInputError } from "./errors";
-import { isSiret } from "shared/constants";
+import { isSiret } from "@td/constants";
 
 type EnumFilter<E> = {
   _in?: E[] | null;
@@ -208,6 +208,7 @@ type GenericWhereInput =
   | Prisma.BsdaWhereInput
   | Prisma.BsvhuWhereInput
   | Prisma.BsdasriWhereInput
+  | Prisma.BspaohWhereInput
   | Prisma.BsffPackagingWhereInput;
 
 /**

@@ -1,5 +1,8 @@
 import React from "react";
-import { BsdaRevisionRequest, RevisionRequestApprovalStatus } from "codegen-ui";
+import {
+  BsdaRevisionRequest,
+  RevisionRequestApprovalStatus
+} from "@td/codegen-ui";
 import Tooltip from "../../../../../common/components/Tooltip";
 
 type Props = {

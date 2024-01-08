@@ -16,7 +16,7 @@ import WeightWidget from "../components/Weight";
 import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
 import classNames from "classnames";
 
-import { BsdasriStatus, Bsdasri, BsdasriType } from "codegen-ui";
+import { BsdasriStatus, Bsdasri, BsdasriType } from "@td/codegen-ui";
 import BsdasriGroupingSelector from "../components/grouping/BsdasriGroupingSelector";
 import BsdasriSynthesisSelector from "../components/grouping/BsdasriSynthesisSelector";
 import { useParams } from "react-router-dom";

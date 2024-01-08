@@ -1,7 +1,7 @@
 import { RedErrorMessage } from "../../common/components";
 import CompanySelectorWrapper from "../common/components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { Field, useField } from "formik";
-import { FavoriteType, BsvhuEmitter } from "codegen-ui";
+import { FavoriteType, BsvhuEmitter } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import React, { useMemo } from "react";
 import CompanyContactInfo from "../../Apps/Forms/Components/CompanyContactInfo/CompanyContactInfo";
@@ -32,7 +32,7 @@ export default function Emitter({ disabled }) {
         orgId={siret}
         favoriteType={FavoriteType.Emitter}
         disabled={disabled}
-        formOrgId={orgId}
+        selectedCompanyOrgId={orgId}
         onCompanySelected={company => {
           if (company) {
             const companyData = {

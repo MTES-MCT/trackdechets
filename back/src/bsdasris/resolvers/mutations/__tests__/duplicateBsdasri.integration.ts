@@ -11,7 +11,7 @@ import {
   Mutation
 } from "../../../../generated/graphql/types";
 import { BsdasriType } from "@prisma/client";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { xDaysAgo } from "../../../../utils";
 import { searchCompany } from "../../../../companies/search";
 

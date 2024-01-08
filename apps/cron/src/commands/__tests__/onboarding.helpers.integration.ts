@@ -3,8 +3,8 @@ import {
   MembershipRequestStatus,
   UserRole
 } from "@prisma/client";
+import { prisma } from "@td/prisma";
 import {
-  prisma,
   associateUserToCompany,
   Mutation,
   MutationDeleteCompanyArgs

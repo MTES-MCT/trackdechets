@@ -14,7 +14,7 @@ import { sendMail } from "../../../mailer/mailing";
 import { renderMail, contentAwaitsGuest } from "@td/mail";
 import { EmitterType, Form, Status } from "@prisma/client";
 import { FormRepository, getFormRepository } from "../../repository";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { runInTransaction } from "../../../common/repository/helper";
 
 const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (

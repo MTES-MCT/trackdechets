@@ -1,7 +1,7 @@
 import React from "react";
 import { IconTrash } from "../../../../../Apps/common/Components/Icons/Icons";
 import { gql, useMutation } from "@apollo/client";
-import { Mutation, MutationDeleteBsdasriArgs } from "codegen-ui";
+import { Mutation, MutationDeleteBsdasriArgs } from "@td/codegen-ui";
 import toast from "react-hot-toast";
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 import { GET_BSDS } from "../../../../../Apps/common/queries";

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FormStatus } from "codegen-ui";
+import { FormStatus } from "@td/codegen-ui";
 import { ActionButton, Modal } from "../../../../../common/components";
 import { IconShipmentSignSmartphone } from "../../../../../Apps/common/Components/Icons/Icons";
 import { WorkflowActionProps } from "./WorkflowAction";

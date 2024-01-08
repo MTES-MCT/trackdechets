@@ -1,4 +1,4 @@
-import { QueryBsdsArgs } from "codegen-ui";
+import { QueryBsdsArgs } from "@td/codegen-ui";
 import { useState, useEffect } from "react";
 
 const host = import.meta.env.VITE_NOTIFIER_ENDPOINT;

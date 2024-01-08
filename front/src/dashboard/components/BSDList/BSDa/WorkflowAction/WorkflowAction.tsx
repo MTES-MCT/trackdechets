@@ -1,5 +1,5 @@
 import React from "react";
-import { Bsda, BsdaStatus } from "codegen-ui";
+import { Bsda, BsdaStatus } from "@td/codegen-ui";
 import PublishBsda from "./PublishBsda";
 import { SignEmission } from "./SignEmission";
 import { SignWork } from "./SignWork";

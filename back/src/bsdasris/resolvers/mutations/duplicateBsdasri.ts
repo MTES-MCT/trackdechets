@@ -9,7 +9,7 @@ import { expandBsdasriFromDB } from "../../converter";
 import { getBsdasriOrNotFound } from "../../database";
 import { getBsdasriRepository } from "../../repository";
 import { checkCanDuplicate } from "../../permissions";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { ForbiddenError } from "../../../common/errors";
 import { sirenifyBsdasriCreateInput } from "../../sirenify";
 

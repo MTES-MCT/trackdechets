@@ -1,5 +1,5 @@
 import { EmitterType, Status } from "@prisma/client";
-import { prisma } from "back";
+import { prisma } from "@td/prisma";
 import {
   formFactory,
   userWithCompanyFactory

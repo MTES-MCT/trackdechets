@@ -5,8 +5,10 @@ configureYup();
 
 const mockUpdateUser = jest.fn();
 
-jest.mock("../../../../prisma", () => ({
-  user: { update: jest.fn((...args) => mockUpdateUser(...args)) }
+jest.mock("@td/prisma", () => ({
+  prisma: {
+    user: { update: jest.fn((...args) => mockUpdateUser(...args)) }
+  }
 }));
 
 describe("editProfile", () => {

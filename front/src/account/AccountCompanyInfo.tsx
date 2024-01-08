@@ -6,7 +6,7 @@ import AccountFieldCompanyGerepId from "./fields/AccountFieldCompanyGerepId";
 import AccountFieldCompanyGivenName, {
   tooltip as givenNameTooltip
 } from "./fields/AccountFieldCompanyGivenName";
-import { CompanyPrivate, UserRole, CompanyType } from "codegen-ui";
+import { CompanyPrivate, UserRole, CompanyType } from "@td/codegen-ui";
 
 import AccountFieldCompanyTransporterReceipt from "./fields/AccountFieldCompanyTransporterReceipt";
 import AccountFieldCompanyTraderReceipt from "./fields/AccountFieldCompanyTraderReceipt";
@@ -15,8 +15,7 @@ import AccountFieldCompanyVerificationStatus from "./fields/AccountFieldCompanyV
 import AccountFieldCompanyVhuAgrementBroyeur from "./fields/AccountFieldCompanyVhuAgrementBroyeur";
 import AccountFieldCompanyVhuAgrementDemolisseur from "./fields/AccountFieldCompanyVhuAgrementDemolisseur";
 import AccountFieldCompanyWorkerCertification from "./fields/AccountFieldCompanyWorkerCertification";
-import * as COMPANY_CONSTANTS from "shared/constants";
-import { isSiret, isVat } from "shared/constants";
+import { isSiret, isVat, PROFESSIONALS } from "@td/constants";
 import AccountInfoAutoUpdate from "./fields/AccountInfoAutoUpdate";
 
 type Props = { company: CompanyPrivate };
@@ -67,7 +66,7 @@ export default function AccountCompanyInfo({ company }: Props) {
   const isAdmin = company.userRole === UserRole.Admin;
 
   const isWasteProfessional = company.companyTypes.some(ct =>
-    COMPANY_CONSTANTS.PROFESSIONALS.includes(ct)
+    PROFESSIONALS.includes(ct)
   );
   return (
     <>

@@ -1,5 +1,5 @@
-import { getTransporterCompanyOrgId } from "shared/constants";
-import prisma from "../../prisma";
+import { getTransporterCompanyOrgId } from "@td/constants";
+import { prisma } from "@td/prisma";
 import { EditionRules } from "./rules";
 import { ZodBsda } from "./schema";
 import { sirenify } from "./sirenify";

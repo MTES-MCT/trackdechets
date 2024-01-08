@@ -161,7 +161,9 @@ describe("query { wastesRegistryXls }", () => {
       req.pipe(writeStream);
 
       await new Promise<void>(resolve => {
-        req.on("end", resolve);
+        req.on("end", async () => {
+          writeStream.on("finish", () => resolve());
+        });
       });
 
       const workbook = new Excel.Workbook();
@@ -229,7 +231,9 @@ describe("query { wastesRegistryXls }", () => {
       req.pipe(writeStream);
 
       await new Promise<void>(resolve => {
-        req.on("end", resolve);
+        req.on("end", async () => {
+          writeStream.on("finish", () => resolve());
+        });
       });
 
       // Then

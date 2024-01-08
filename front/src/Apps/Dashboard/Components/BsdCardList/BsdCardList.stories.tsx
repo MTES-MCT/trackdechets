@@ -1,7 +1,7 @@
 import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { MemoryRouter, Route } from "react-router-dom";
-import { BsdEdge } from "codegen-ui";
+import { BsdEdge } from "@td/codegen-ui";
 
 import BsdCardList from "./BsdCardList";
 import bsdListDraft from "../../__mocks__/bsdListDraft.json";

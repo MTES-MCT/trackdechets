@@ -10,7 +10,7 @@ import {
   IconDuplicateFile,
   IconQrCode
 } from "../../../../../Apps/common/Components/Icons/Icons";
-import { BsffStatus } from "codegen-ui";
+import { BsffStatus } from "@td/codegen-ui";
 import { BsffFragment } from "../types";
 import { DeleteBsffModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";

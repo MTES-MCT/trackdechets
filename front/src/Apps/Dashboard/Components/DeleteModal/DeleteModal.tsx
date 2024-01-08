@@ -10,7 +10,7 @@ import {
   MutationDeleteBsffArgs,
   MutationDeleteBsvhuArgs,
   MutationDeleteFormArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import toast from "react-hot-toast";
 import TdModal from "../../../common/Components/Modal/Modal";
 import { GET_BSDS } from "../../../common/queries";

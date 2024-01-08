@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Bsff, BsffStatus } from "codegen-ui";
+import { Bsff, BsffStatus } from "@td/codegen-ui";
 import {
   Journey,
   JourneyStop,

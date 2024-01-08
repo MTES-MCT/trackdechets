@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
-import { Mutation, MutationSignupArgs } from "codegen-ui";
+import { Mutation, MutationSignupArgs } from "@td/codegen-ui";
 import { SIGNUP } from "./mutations";
 import PasswordHelper, {
   getPasswordHint

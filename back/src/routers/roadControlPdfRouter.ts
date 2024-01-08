@@ -1,4 +1,4 @@
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { getAPIBaseURL, getUid } from "../utils";
 import { setInCache, SetOptions } from "../common/redis";
 import { BsdType } from "@prisma/client";

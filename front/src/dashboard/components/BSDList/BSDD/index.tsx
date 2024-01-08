@@ -5,7 +5,7 @@ import {
   Form,
   Query,
   QueryCompanyPrivateInfosArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { CellProps, CellValue } from "react-table";
 import { ActionButtonContext } from "../../../../common/components/ActionButton";
 import { BSDDActions } from "./BSDDActions/BSDDActions";
@@ -14,7 +14,7 @@ import TransporterInfoEdit from "./TransporterInfoEdit";
 import { WorkflowAction } from "./WorkflowAction";
 import { useQuery } from "@apollo/client";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../../Apps/common/queries/company/query";
-import { STATUS_LABELS } from "shared/constants";
+import { STATUS_LABELS } from "@td/constants";
 
 export const COLUMNS: Record<
   string,
@@ -102,18 +102,7 @@ export const COLUMNS: Record<
     )
   },
   status: {
-    accessor: form => {
-      // Cas spécial pour le transport multi-modal
-      if (form.transportSegments && form.transportSegments.length > 0) {
-        const nextTransporter = form.transportSegments.find(
-          t => t.readyToTakeOver && !t.takenOverAt
-        );
-        if (nextTransporter) {
-          return `En attente de signature par le transporteur n° ${nextTransporter.segmentNumber!}`;
-        }
-      }
-      return STATUS_LABELS[form.status];
-    }
+    accessor: form => STATUS_LABELS[form.status]
   },
   workflow: {
     accessor: () => null,

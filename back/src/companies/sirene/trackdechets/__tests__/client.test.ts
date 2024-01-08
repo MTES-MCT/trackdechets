@@ -82,7 +82,7 @@ describe("searchCompany", () => {
       body: {
         _source: {
           siret,
-          statutDiffusionEtablissement: "N"
+          statutDiffusionEtablissement: "P"
         }
       }
     });

@@ -1,7 +1,7 @@
 import React from "react";
 import { useQuery } from "@apollo/client";
 import { Loader } from "../../Apps/common/Components";
-import { Query } from "codegen-ui";
+import { Query } from "@td/codegen-ui";
 import AccountOauth2App from "./AccountOauth2App";
 import { MY_APPLICATIONS } from "./queries";
 

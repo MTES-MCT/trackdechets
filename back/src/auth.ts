@@ -15,7 +15,7 @@ import {
   Strategy as ClientPasswordStrategy,
   VerifyFunction
 } from "passport-oauth2-client-password";
-import prisma from "./prisma";
+import { prisma } from "@td/prisma";
 import { GraphQLContext } from "./types";
 import {
   daysBetween,

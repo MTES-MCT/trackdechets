@@ -143,7 +143,7 @@ type CompanySearchPrivate implements CompanySearchPrivateCommon {
   "État administratif de l'établissement. A = Actif, F = Fermé"
   etatAdministratif: String
 
-  "Statut de diffusion de l'établissement selon l'INSEE. O = Oui, N = Non"
+  "Statut de diffusion de l'établissement selon l'INSEE. O = Oui, P = Non ou Partiel"
   statutDiffusionEtablissement: StatutDiffusionEtablissement
 
   """

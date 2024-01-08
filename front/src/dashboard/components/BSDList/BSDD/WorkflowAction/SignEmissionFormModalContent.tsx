@@ -15,7 +15,7 @@ import {
   MutationSignEmissionFormArgs,
   Query,
   QueryFormArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import * as yup from "yup";
 import { Field, Form as FormikForm, Formik } from "formik";
 import { FormWasteEmissionSummary } from "./FormWasteEmissionSummary";

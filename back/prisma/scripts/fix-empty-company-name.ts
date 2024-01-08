@@ -1,5 +1,5 @@
 import { Updater, registerUpdater } from "./helper/helper";
-import prisma from "../../src/prisma";
+import { prisma } from "@td/prisma";
 import { searchCompany } from "../../src/companies/search";
 
 function sleep(ms) {

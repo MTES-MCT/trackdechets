@@ -1,4 +1,4 @@
-import { Maybe } from "codegen-ui";
+import { Maybe } from "@td/codegen-ui";
 
 export enum InfoIconCode {
   TempStorage = "TempStorage",

@@ -5,7 +5,7 @@ import AccountFieldCompanyContactEmail from "./fields/AccountFieldCompanyContact
 import AccountFieldCompanyContactPhone from "./fields/AccountFieldCompanyContactPhone";
 import AccountFieldCompanyWebsite from "./fields/AccountFieldCompanyWebsite";
 import AccountFieldCompanyAgreements from "./fields/AccountFieldCompanyAgreements";
-import { CompanyPrivate, CompanyType } from "codegen-ui";
+import { CompanyPrivate, CompanyType } from "@td/codegen-ui";
 import { generatePath } from "react-router-dom";
 import routes from "../Apps/routes";
 

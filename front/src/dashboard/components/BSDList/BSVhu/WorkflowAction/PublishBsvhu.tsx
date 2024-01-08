@@ -1,5 +1,5 @@
 import React from "react";
-import { Mutation, MutationPublishBsvhuArgs } from "codegen-ui";
+import { Mutation, MutationPublishBsvhuArgs } from "@td/codegen-ui";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation } from "@apollo/client";
 

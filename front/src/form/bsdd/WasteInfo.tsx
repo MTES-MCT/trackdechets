@@ -7,7 +7,7 @@ import { connect, Field } from "formik";
 import {
   isDangerous,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
-} from "shared/constants";
+} from "@td/constants";
 import React, { useEffect } from "react";
 import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import Packagings from "./components/packagings/Packagings";

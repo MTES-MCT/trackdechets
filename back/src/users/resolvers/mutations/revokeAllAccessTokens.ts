@@ -1,7 +1,7 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 
 const revokeAllAccessTokensResolver: MutationResolvers["revokeAllAccessTokens"] =
   async (_parent, _, context) => {

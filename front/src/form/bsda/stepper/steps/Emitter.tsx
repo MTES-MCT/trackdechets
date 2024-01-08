@@ -1,7 +1,7 @@
 import React from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "../../../common/components/company/CompanySelector";
-import { Bsda, BsdaType, BsdaPickupSite } from "codegen-ui";
+import { Bsda, BsdaType, BsdaPickupSite } from "@td/codegen-ui";
 import WorkSite from "../../../common/components/work-site/WorkSite";
 import { getInitialCompany } from "../../../bsdd/utils/initial-state";
 

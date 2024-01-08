@@ -1,5 +1,5 @@
 import { gql, LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
-import { Query, QueryBsvhuPdfArgs } from "codegen-ui";
+import { Query, QueryBsvhuPdfArgs } from "@td/codegen-ui";
 
 export const BSVHU_PDF = gql`
   query Bsdasridf($id: ID!) {

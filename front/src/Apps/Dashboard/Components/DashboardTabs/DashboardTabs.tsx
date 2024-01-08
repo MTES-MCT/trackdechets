@@ -1,12 +1,11 @@
 import React, { useCallback, useState } from "react";
 import { NavLink, generatePath, useNavigate } from "react-router-dom";
-import { CompanyPrivate } from "codegen-ui";
+import { CompanyPrivate, UserPermission } from "@td/codegen-ui";
 import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
 import routes from "../../../routes";
 
 import { useShowTransportTabs } from "../../hooks/useShowTransportTabs";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
-import { UserPermission } from "codegen-ui";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import {
   ACTS,

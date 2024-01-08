@@ -1,7 +1,7 @@
 import { Job, JobOptions } from "bull";
 import type { ApiResponse } from "@elastic/elasticsearch";
 import { logger } from "@td/logger";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import {
   client,
   BsdIndexationConfig,

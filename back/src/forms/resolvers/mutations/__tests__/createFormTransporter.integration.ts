@@ -6,7 +6,7 @@ import {
   MutationCreateFormTransporterArgs
 } from "../../../../generated/graphql/types";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { AuthType } from "../../../../auth";
 
 const CREATE_FORM_TRANSPORTER = gql`

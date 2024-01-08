@@ -7,7 +7,7 @@ import {
   BsffSignatureType,
   Mutation,
   MutationSignBsffArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { RedErrorMessage } from "../../../../../common/components";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import { SIGN_BSFF } from "../../../../../form/bsff/utils/queries";

@@ -1,16 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Field, Form, useFormikContext } from "formik";
 import {
   PROCESSING_AND_REUSE_OPERATIONS,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
-} from "shared/constants";
+} from "@td/constants";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import CompanySelector from "../../../../../form/common/components/company/CompanySelector";
+import ExtraEuropeanCompanyManualInput from "../../../../../form/common/components/company/ExtraEuropeanCompanyManualInput";
 import {
   Form as TdForm,
   FormStatus,
   MutationMarkAsProcessedArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import Tooltip from "../../../../../common/components/Tooltip";
 import { subMonths } from "date-fns";
 import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
@@ -20,6 +21,53 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
     values: { processingOperationDone, noTraceability, nextDestination },
     setFieldValue
   } = useFormikContext<MutationMarkAsProcessedArgs["processedInfo"]>();
+  const initNextDestination = useMemo(
+    () => ({
+      processingOperation: "",
+      destinationOperationMode: undefined,
+      notificationNumber: "",
+      company: {
+        siret: "",
+        name: "",
+        address: "",
+        contact: "",
+        mail: "",
+        phone: ""
+      }
+    }),
+    []
+  );
+  const [isExtraEuropeanCompany, setIsExtraEuropeanCompany] = useState(
+    nextDestination?.company?.extraEuropeanId ? true : false
+  );
+  const [extraEuropeanCompany, setExtraEuropeanCompany] = useState(
+    nextDestination?.company?.extraEuropeanId
+  );
+
+  /**
+   * Hack the API requirement for any value in nextDestination.company.extraEuropeanId
+   */
+  useEffect(() => {
+    if (isExtraEuropeanCompany) {
+      /**
+       * Hack the API requirement for "any" value in nextDestination.company.extraEuropeanId
+       * in order to require notificationNumber
+       * Soon notificationNumber will be required for intra-european companies too
+       */
+      setFieldValue("nextDestination.company", initNextDestination.company);
+      setFieldValue(
+        "nextDestination.company.extraEuropeanId",
+        !extraEuropeanCompany
+          ? "UNIDENTIFIED_EXTRA_EUROPEAN_COMPANY"
+          : extraEuropeanCompany
+      );
+    }
+  }, [
+    isExtraEuropeanCompany,
+    setFieldValue,
+    extraEuropeanCompany,
+    initNextDestination.company
+  ]);
 
   const isGroupement =
     processingOperationDone &&
@@ -28,19 +76,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   useEffect(() => {
     if (isGroupement) {
       if (nextDestination == null) {
-        setFieldValue("nextDestination", {
-          processingOperation: "",
-          destinationOperationMode: undefined,
-          notificationNumber: "",
-          company: {
-            siret: "",
-            name: "",
-            address: "",
-            contact: "",
-            mail: "",
-            phone: ""
-          }
-        });
+        setFieldValue("nextDestination", initNextDestination);
       }
       if (noTraceability == null) {
         setFieldValue("noTraceability", false);
@@ -49,7 +85,13 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
       setFieldValue("nextDestination", null);
       setFieldValue("noTraceability", null);
     }
-  }, [isGroupement, nextDestination, noTraceability, setFieldValue]);
+  }, [
+    initNextDestination,
+    isGroupement,
+    nextDestination,
+    noTraceability,
+    setFieldValue
+  ]);
 
   const TODAY = new Date();
 
@@ -167,16 +209,39 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
                 </option>
               ))}
             </Field>
+            <div className="form__row form__row--inline">
+              <input
+                type="checkbox"
+                checked={isExtraEuropeanCompany}
+                onChange={e => setIsExtraEuropeanCompany(e.target.checked)}
+                className="td-checkbox"
+              />
+
+              <label htmlFor="id_isExtraEuropeanId">
+                Destinataire hors U.E.
+              </label>
+            </div>
           </div>
-          <CompanySelector
-            name="nextDestination.company"
-            allowForeignCompanies={true}
-            skipFavorite={noTraceability === true}
-            optional={noTraceability === true}
-          />
+          {isExtraEuropeanCompany ? (
+            <ExtraEuropeanCompanyManualInput
+              name="nextDestination.company"
+              optional={noTraceability === true}
+              extraEuropeanCompanyId={extraEuropeanCompany}
+              onExtraEuropeanCompanyId={setExtraEuropeanCompany}
+            />
+          ) : (
+            <CompanySelector
+              name="nextDestination.company"
+              allowForeignCompanies={true}
+              skipFavorite={noTraceability === true}
+              optional={noTraceability === true}
+            />
+          )}
+
           <div className="form__row">
             <label>
-              Numéro de notification ou de document (optionnel){" "}
+              Numéro de notification ou de document{" "}
+              {!isExtraEuropeanCompany ? "(optionnel)" : ""}{" "}
               <Tooltip msg="En cas d'export, indiquer ici le N° du document prévu ou le numéro de notification prévue à l'annexe I-B du règlement N°1013/2006 - Format PPNNNN (PP: code pays NNNN: numéro d'ordre)" />
             </label>
             <Field
@@ -184,6 +249,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
               name="nextDestination.notificationNumber"
               className="td-input"
               placeholder="PPNNNN (PP: code pays, NNNN: numéro d'ordre)"
+              required={isExtraEuropeanCompany}
             />
           </div>
         </div>

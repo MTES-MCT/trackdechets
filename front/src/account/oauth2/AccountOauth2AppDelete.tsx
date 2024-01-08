@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Modal } from "../../common/components";
-import { Application } from "codegen-ui";
+import { Application } from "@td/codegen-ui";
 import { useMutation } from "@apollo/client";
 import { MY_APPLICATIONS, DELETE_APPLICATION } from "./queries";
 import { NotificationError } from "../../Apps/common/Components/Error/Error";

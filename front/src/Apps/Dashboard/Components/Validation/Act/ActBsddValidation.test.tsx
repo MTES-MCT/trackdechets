@@ -6,7 +6,7 @@ import ActBsddValidation from "./ActBsddValidation";
 import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import ActBsdSuiteValidation from "./ActBsdSuiteValidation";
 import { MemoryRouter } from "react-router-dom";
-import { Form } from "codegen-ui";
+import { Form } from "@td/codegen-ui";
 
 describe("ActBsddValidation", () => {
   const onClose = jest.fn();
@@ -330,110 +330,6 @@ describe("ActBsddValidation", () => {
     await waitFor(async () => {
       expect(
         await screen.getByText("Valider l'entreposage provisoire")
-      ).toBeInTheDocument();
-    });
-  });
-
-  it("renders with expected text when status is Sent with segments still a draft", async () => {
-    const currentSiret = "12345678901234";
-    const sentBsdSegmentDraft = {
-      id: "1",
-      status: "SENT",
-      currentTransporterSiret: "12345678901234",
-      transportSegments: [
-        {
-          id: "ckyef9g3a2924349syhsqc1wa",
-          readyToTakeOver: false,
-          previousTransporterCompanySiret: "12345678901234",
-          takenOverAt: null,
-          __typename: "TransportSegment"
-        }
-      ]
-    } as Form;
-    render(
-      <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={sentBsdSegmentDraft}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
-      </MockedProvider>
-    );
-
-    await waitFor(async () => {
-      expect(
-        await screen.getByText("Finaliser pour transférer")
-      ).toBeInTheDocument();
-    });
-  });
-
-  it("renders with expected text when status is Sent with segments taken over at", async () => {
-    const currentSiret = "12345678901234";
-    const sentBsdSegmetnTakenOverAt = {
-      id: "1",
-      status: "SENT",
-      currentTransporterSiret: "12345678901234",
-      transportSegments: [
-        {
-          id: "ckyef9g3a2924349syhsqc1wa",
-          previousTransporterCompanySiret: "12345678901234",
-          takenOverAt: "2023-03-17",
-          __typename: "TransportSegment"
-        }
-      ]
-    } as Form;
-    render(
-      <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={sentBsdSegmetnTakenOverAt}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
-      </MockedProvider>
-    );
-
-    await waitFor(async () => {
-      expect(
-        await screen.getByText(
-          "Préparer le transfert à un autre transporteur (multimodal)"
-        )
-      ).toBeInTheDocument();
-    });
-  });
-
-  it("renders with expected text when status is Sent with segments ready to take over", async () => {
-    const currentSiret = "12345678901234";
-    const sentBsdSegmentReadyToTakenOver = {
-      id: "1",
-      status: "SENT",
-      currentTransporterSiret: "12345678901234",
-      nextTransporterSiret: "12345678901234",
-      transportSegments: [
-        {
-          id: "ckyef9g3a2924349syhsqc1wa",
-          previousTransporterCompanySiret: "12345678901234",
-          takenOverAt: null,
-          readyToTakeOver: true,
-          __typename: "TransportSegment"
-        }
-      ]
-    } as Form;
-    render(
-      <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsddValidation
-          bsd={sentBsdSegmentReadyToTakenOver}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
-      </MockedProvider>
-    );
-
-    await waitFor(async () => {
-      expect(
-        await screen.getByText("Prendre en charge le déchet")
       ).toBeInTheDocument();
     });
   });

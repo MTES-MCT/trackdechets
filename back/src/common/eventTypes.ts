@@ -5,6 +5,7 @@ type BsdPrefix =
   | "Bsda"
   | "Bsff"
   | "BsffFicheIntervention"
+  | "Bspaoh"
   | "";
 
 export type eventTypes = {

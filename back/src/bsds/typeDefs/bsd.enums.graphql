@@ -1,6 +1,6 @@
 "Type de quantité lors de l'émission"
 enum QuantityType {
-  "Quntité réelle"
+  "Quantité réelle"
   REAL
 
   "Quantité estimée"

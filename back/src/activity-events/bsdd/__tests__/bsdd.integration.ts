@@ -4,7 +4,7 @@ import {
   Mutation,
   MutationSubmitFormRevisionRequestApprovalArgs
 } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   formFactory,
   userWithCompanyFactory,

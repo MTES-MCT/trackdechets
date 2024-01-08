@@ -2,7 +2,7 @@
  * PRISMA HELPER FUNCTIONS
  */
 
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { User, Prisma, Company, CompanyAssociation } from "@prisma/client";
 import {
   CompanyNotFound,
@@ -19,7 +19,7 @@ import { UserInputError } from "../common/errors";
 import { allFavoriteTypes } from "./types";
 import { favoritesCompanyQueue } from "../queue/producers/company";
 import { searchTDSireneFailFast } from "./sirenify";
-import { isSiret, isVat } from "shared/constants";
+import { isSiret, isVat } from "@td/constants";
 import {
   PartialCompanyVatSearchResult,
   searchVatFrOnlyOrNotFoundFailFast

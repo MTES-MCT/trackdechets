@@ -8,7 +8,7 @@ import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FullForm } from "../../types";
 import { prismaJsonNoNull } from "../../../common/converter";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { sirenifyFormCreateInput } from "../../sirenify";
 
 /**

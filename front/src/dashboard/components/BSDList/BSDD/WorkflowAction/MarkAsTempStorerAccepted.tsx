@@ -5,7 +5,7 @@ import {
   MutationMarkAsTempStorerAcceptedArgs,
   Query,
   QueryFormArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation, useLazyQuery } from "@apollo/client";
 

@@ -4,7 +4,7 @@ import { gql, useMutation } from "@apollo/client";
 import RedErrorMessage from "../../../common/components/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
 import * as yup from "yup";
-import { CompanyPrivate, MutationVerifyCompanyArgs } from "codegen-ui";
+import { CompanyPrivate, MutationVerifyCompanyArgs } from "@td/codegen-ui";
 
 type Props = {
   siret: string;

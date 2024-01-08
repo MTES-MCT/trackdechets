@@ -10,7 +10,7 @@ import {
   CompanyType,
   Mutation,
   MutationUpdateCompanyArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import Tooltip from "../../../common/components/Tooltip";
 import DateInput from "../../../form/common/components/custom-inputs/DateInput";
 import {

@@ -12,7 +12,7 @@ import {
   IconPdf,
   IconQrCode
 } from "../../../../../Apps/common/Components/Icons/Icons";
-import { Bsdasri, BsdasriStatus, BsdasriType } from "codegen-ui";
+import { Bsdasri, BsdasriStatus, BsdasriType } from "@td/codegen-ui";
 import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
 import { Loader } from "../../../../../Apps/common/Components";

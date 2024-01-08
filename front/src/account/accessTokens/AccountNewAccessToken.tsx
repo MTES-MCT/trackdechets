@@ -4,7 +4,7 @@ import {
   IconCheckCircle1,
   IconCopyPaste
 } from "../../Apps/common/Components/Icons/Icons";
-import { NewAccessToken } from "codegen-ui";
+import { NewAccessToken } from "@td/codegen-ui";
 import AccountAccessTokenRevoke from "./AccountAccessTokenRevoke";
 import styles from "./AccountAccessToken.module.scss";
 import { DEVELOPERS_DOCUMENTATION_URL } from "../../common/config";
