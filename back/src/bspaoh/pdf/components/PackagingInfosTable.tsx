@@ -28,13 +28,13 @@ export function PackagingInfosTable({
     <table>
       <thead>
         <tr>
-          <th>N°</th>
-          <th>Type</th>
-          <th>Volume</th>
+          <th>N° de ligne</th>
+          <th>Type de contenant</th>
+          <th>Volume (l)</th>
           <th>N° de contenant</th>
           <th>Consistance</th>
-          <th>Codes d'identification</th>
-          {showAcceptation && <th>Accepté</th>}
+          <th>Codes d'identification des pièces</th>
+          {showAcceptation && <th>Statut final</th>}
         </tr>
       </thead>
       <tbody>
