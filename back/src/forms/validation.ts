@@ -220,6 +220,7 @@ type ProcessedInfo = Pick<
   | "nextDestinationCompanyPhone"
   | "nextDestinationCompanyMail"
   | "nextDestinationCompanyVatNumber"
+  | "nextDestinationCompanyExtraEuropeanId"
   | "nextDestinationNotificationNumber"
 >;
 
@@ -980,7 +981,7 @@ export const transporterSchemaFn: FactorySchemaOf<
           is: (isExempted, vat, transportMode) =>
             isForeignVat(vat) ||
             isExempted ||
-            transportMode !== TransportMode.ROAD,
+            (transportMode && transportMode !== TransportMode.ROAD),
           then: schema => schema.notRequired().nullable(),
           otherwise: schema =>
             schema.when(
@@ -1001,7 +1002,7 @@ export const transporterSchemaFn: FactorySchemaOf<
           is: (isExempted, vat, transportMode) =>
             isForeignVat(vat) ||
             isExempted ||
-            transportMode !== TransportMode.ROAD,
+            (transportMode && transportMode !== TransportMode.ROAD),
           then: schema => schema.notRequired().nullable(),
           otherwise: schema =>
             schema.when(
@@ -1022,7 +1023,7 @@ export const transporterSchemaFn: FactorySchemaOf<
           is: (isExempted, vat, transportMode) =>
             isForeignVat(vat) ||
             isExempted ||
-            transportMode !== TransportMode.ROAD,
+            (transportMode && transportMode !== TransportMode.ROAD),
           then: schema => schema.notRequired().nullable(),
           otherwise: schema =>
             schema.when(
@@ -1264,97 +1265,116 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
 });
 
 const withNextDestination = (required: boolean) =>
-  yup.object().shape({
-    nextDestinationProcessingOperation: yup
-      .string()
-      .required(`Destination ultérieure : ${MISSING_PROCESSING_OPERATION}`)
-      .oneOf(
-        PROCESSING_AND_REUSE_OPERATIONS_CODES,
-        `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`
+  yup
+    .object()
+    .shape({
+      nextDestinationProcessingOperation: yup
+        .string()
+        .required(`Destination ultérieure : ${MISSING_PROCESSING_OPERATION}`)
+        .oneOf(
+          PROCESSING_AND_REUSE_OPERATIONS_CODES,
+          `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`
+        ),
+      nextDestinationCompanyName: yup
+        .string()
+        .ensure()
+        .requiredIf(
+          required,
+          `Destination ultérieure : ${MISSING_COMPANY_NAME}`
+        ),
+      nextDestinationCompanySiret: siret.label("Destination ultérieure prévue"),
+      nextDestinationCompanyVatNumber: vatNumber.label(
+        "Destination ultérieure prévue"
       ),
-    nextDestinationCompanyName: yup
-      .string()
-      .ensure()
-      .requiredIf(required, `Destination ultérieure : ${MISSING_COMPANY_NAME}`),
-    nextDestinationCompanySiret: siret
-      .label("Destination ultérieure prévue")
-      .when("nextDestinationCompanyVatNumber", (vat, schema) => {
-        return !isVat(vat) && required
-          ? schema.required(
-              `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
-            )
-          : schema.notRequired().nullable();
-      }),
-    nextDestinationCompanyVatNumber: vatNumber.label(
-      "Destination ultérieure prévue"
-    ),
-    nextDestinationCompanyAddress: yup
-      .string()
-      .ensure()
-      .requiredIf(
-        required,
-        `Destination ultérieure : ${MISSING_COMPANY_ADDRESS}`
-      ),
-    nextDestinationCompanyCountry: yup
-      .string()
-      .ensure()
-      .oneOf(
-        ["", ...countries.map(country => country.cca2)],
-        "Destination ultérieure : le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu"
-      )
-      .when("nextDestinationCompanyVatNumber", (vat, schema) => {
-        return isVat(vat) && required
-          ? schema.test(
-              "is-country-valid",
-              "Destination ultérieure : le code du pays de l'entreprise ne correspond pas au numéro de TVA entré",
-              value =>
-                !value ||
-                checkVAT(vat.replace(BAD_CHARACTERS_REGEXP, ""), vatCountries)
-                  ?.country?.isoCode.short ===
-                  value.replace(BAD_CHARACTERS_REGEXP, "")
-            )
-          : schema;
-      })
-      .when("nextDestinationCompanySiret", (siret, schema) => {
-        return isSiret(siret) && required
-          ? schema.test(
-              "is-fr-country-valid",
-              "Destination ultérieure : le code du pays de l'entreprise ne peut pas être différent de FR",
-              value => !value || value === "FR"
-            )
-          : schema;
-      }),
-    nextDestinationCompanyContact: yup
-      .string()
-      .ensure()
-      .requiredIf(
-        required,
-        `Destination ultérieure : ${MISSING_COMPANY_CONTACT}`
-      ),
-    nextDestinationCompanyPhone: yup
-      .string()
-      .ensure()
-      .requiredIf(
-        required,
-        `Destination ultérieure : ${MISSING_COMPANY_PHONE}`
-      ),
-    nextDestinationCompanyMail: yup
-      .string()
-      .email()
-      .ensure()
-      .requiredIf(
-        required,
-        `Destination ultérieure : ${MISSING_COMPANY_EMAIL}`
-      ),
-    nextDestinationNotificationNumber: yup
-      .string()
-      .notRequired()
-      .nullable()
-      .matches(
-        /^[a-zA-Z]{2}[0-9]{4}$|^$/,
-        "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
-      )
-  });
+      nextDestinationCompanyAddress: yup
+        .string()
+        .ensure()
+        .requiredIf(
+          required,
+          `Destination ultérieure : ${MISSING_COMPANY_ADDRESS}`
+        ),
+      nextDestinationCompanyCountry: yup
+        .string()
+        .ensure()
+        .oneOf(
+          ["", ...countries.map(country => country.cca2)],
+          "Destination ultérieure : le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu"
+        )
+        .when("nextDestinationCompanyVatNumber", (vat, schema) => {
+          return isVat(vat) && required
+            ? schema.test(
+                "is-country-valid",
+                "Destination ultérieure : le code du pays de l'entreprise ne correspond pas au numéro de TVA entré",
+                value =>
+                  !value ||
+                  checkVAT(vat.replace(BAD_CHARACTERS_REGEXP, ""), vatCountries)
+                    ?.country?.isoCode.short ===
+                    value.replace(BAD_CHARACTERS_REGEXP, "")
+              )
+            : schema;
+        })
+        .when("nextDestinationCompanySiret", (siret, schema) => {
+          return isSiret(siret) && required
+            ? schema.test(
+                "is-fr-country-valid",
+                "Destination ultérieure : le code du pays de l'entreprise ne peut pas être différent de FR",
+                value => !value || value === "FR"
+              )
+            : schema;
+        }),
+      nextDestinationCompanyContact: yup
+        .string()
+        .ensure()
+        .requiredIf(
+          required,
+          `Destination ultérieure : ${MISSING_COMPANY_CONTACT}`
+        ),
+      nextDestinationCompanyPhone: yup
+        .string()
+        .ensure()
+        .requiredIf(
+          required,
+          `Destination ultérieure : ${MISSING_COMPANY_PHONE}`
+        ),
+      nextDestinationCompanyMail: yup
+        .string()
+        .email()
+        .ensure()
+        .requiredIf(
+          required,
+          `Destination ultérieure : ${MISSING_COMPANY_EMAIL}`
+        ),
+      nextDestinationCompanyExtraEuropeanId: yup.string().nullable(),
+      nextDestinationNotificationNumber: yup
+        .string()
+        .matches(
+          /^[a-zA-Z]{2}[0-9]{4}$|^$/,
+          "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
+        )
+        .when("nextDestinationCompanyExtraEuropeanId", {
+          is: nextDestinationCompanyExtraEuropeanId =>
+            !!nextDestinationCompanyExtraEuropeanId,
+          then: schema =>
+            schema.required(
+              `Destination ultérieure : le numéro de notification GISTRID est obligatoire`
+            ),
+          otherwise: schema => schema.notRequired().nullable()
+        })
+    })
+    .test(
+      "XORIdRequired",
+      `Destination ultérieure : ${MISSING_COMPANY_SIRET} (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)`,
+      (obj: Partial<Form>) => {
+        const ids = [
+          obj.nextDestinationCompanyExtraEuropeanId,
+          obj.nextDestinationCompanySiret,
+          obj.nextDestinationCompanyVatNumber
+        ];
+        const definedIds = ids.filter(id => id != null);
+        // Check if only one ID is defined
+        return !required || definedIds.length === 1;
+      }
+    );
 
 const withoutNextDestination = yup.object().shape({
   nextDestinationProcessingOperation: yup
@@ -1394,6 +1414,10 @@ const withoutNextDestination = yup.object().shape({
     .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION),
   nextDestinationNotificationNumber: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationCompanyExtraEuropeanId: yup
     .string()
     .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION)

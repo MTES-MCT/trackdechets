@@ -37,6 +37,9 @@ type FormCompany {
   Il est composé des trois lettres IMO suivi d'un nombre de sept chiffres (ex: IMO 1234567).
   """
   omiNumber: String
+
+  "Un identifiant d'établissement hors EU"
+  extraEuropeanId: String
 }
 
 "Informations sur une adresse chantier"

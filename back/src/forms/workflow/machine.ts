@@ -318,6 +318,9 @@ const machine = Machine<any, Event>(
  * Determine whether nextDestionation is foreign based on a priority guessing system
  */
 function isForeignNextDestination(update: Prisma.FormUpdateInput) {
+  if (update.nextDestinationCompanyExtraEuropeanId) {
+    return true;
+  }
   if (
     update.nextDestinationCompanyVatNumber &&
     isForeignVat(update.nextDestinationCompanyVatNumber as string)

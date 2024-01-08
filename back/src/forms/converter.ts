@@ -335,6 +335,9 @@ function flattenNextDestinationInput(input: {
     ),
     nextDestinationCompanyVatNumber: chain(input.nextDestination, nd =>
       chain(nd.company, c => c.vatNumber)
+    ),
+    nextDestinationCompanyExtraEuropeanId: chain(input.nextDestination, nd =>
+      chain(nd.company, c => c.extraEuropeanId)
     )
   };
 }

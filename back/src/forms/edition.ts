@@ -50,6 +50,7 @@ type EditableBsddFields = Required<
     | "nextDestinationCompanyMail"
     | "nextDestinationCompanyCountry"
     | "nextDestinationCompanyVatNumber"
+    | "nextDestinationCompanyExtraEuropeanId"
     | "nextDestinationNotificationNumber"
     | "nextDestinationProcessingOperation"
     | "wasteAcceptationStatus"
