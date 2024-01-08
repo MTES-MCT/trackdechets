@@ -1,7 +1,7 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationRemoveSignatureAutomationArgs } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { GraphQLContext } from "../../../types";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import {

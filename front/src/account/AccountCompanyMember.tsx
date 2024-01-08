@@ -13,7 +13,7 @@ import {
   Mutation,
   MutationRemoveUserFromCompanyArgs,
   MutationDeleteInvitationArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { TOAST_DURATION } from "../common/config";
 
 type Props = {

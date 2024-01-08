@@ -18,7 +18,7 @@ import {
   BsffPackaging,
   BsffFicheIntervention
 } from "../../generated/graphql/types";
-import { BSFF_WASTES } from "shared/constants";
+import { BSFF_WASTES } from "@td/constants";
 import { extractPostalCode } from "../../utils";
 import { Decimal } from "decimal.js-light";
 import { Recepisse } from "./Recepisse";

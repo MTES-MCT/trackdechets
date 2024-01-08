@@ -1,5 +1,5 @@
 import React from "react";
-import { Bsvhu, BsvhuStatus } from "codegen-ui";
+import { Bsvhu, BsvhuStatus } from "@td/codegen-ui";
 import PublishBsvhu from "./PublishBsvhu";
 import { SignEmission } from "./SignEmission";
 import { SignTransport } from "./SignTransport";

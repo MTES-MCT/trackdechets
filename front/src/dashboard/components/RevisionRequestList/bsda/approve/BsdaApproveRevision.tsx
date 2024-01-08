@@ -7,7 +7,7 @@ import {
   Mutation,
   MutationSubmitBsdaRevisionRequestApprovalArgs,
   PickupSite
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
 import {
   ActionButton,

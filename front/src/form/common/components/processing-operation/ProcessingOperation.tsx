@@ -1,6 +1,6 @@
 import { FieldProps } from "formik";
 import React from "react";
-import { PROCESSING_OPERATIONS } from "shared/constants";
+import { PROCESSING_OPERATIONS } from "@td/constants";
 import styles from "./ProcessingOperation.module.scss";
 import classNames from "classnames";
 import ProcessingOperationSelect from "../../../../common/components/ProcessingOperationSelect";

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, gql } from "@apollo/client";
 import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
-import { Mutation, MutationJoinWithInviteArgs, Query } from "codegen-ui";
+import { Mutation, MutationJoinWithInviteArgs, Query } from "@td/codegen-ui";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import * as queryString from "query-string";
 import { decodeHash } from "../common/helper";

@@ -1,7 +1,7 @@
 import { getIn, useFormikContext } from "formik";
 import React, { useEffect, useReducer } from "react";
 
-import { Bsdasri } from "codegen-ui";
+import { Bsdasri } from "@td/codegen-ui";
 import BsdasriTableGrouping from "./BsdasriTableGrouping";
 
 type State = { selected: string[] };

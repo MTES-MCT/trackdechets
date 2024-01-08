@@ -5,7 +5,8 @@ export enum ReadableIdPrefix {
   DASRI = "DASRI", // Bordereau de suivi des déchets d'activités de soins à risque infectieux
   FF = "FF", // Bordereau de suivi de déchets fluides frigorigènes
   VHU = "VHU", // Bordereau de suivi des véhicules hors d'usage
-  BSDA = "BSDA" // Bordereau de suivi des déchets d'amiante
+  BSDA = "BSDA", // Bordereau de suivi des déchets d'amiante
+  PAOH = "PAOH" // Bordereau de suivi des déchets d'amiante
 }
 
 /**

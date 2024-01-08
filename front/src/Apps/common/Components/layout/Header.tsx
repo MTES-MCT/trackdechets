@@ -14,7 +14,7 @@ import { AccountMenuContent } from "../../../../account/AccountMenu";
 import { useQuery, gql } from "@apollo/client";
 import Loader from "../Loader/Loaders";
 import { InlineError } from "../Error/Error";
-import { Query } from "codegen-ui";
+import { Query } from "@td/codegen-ui";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 
 import routes from "../../../routes";

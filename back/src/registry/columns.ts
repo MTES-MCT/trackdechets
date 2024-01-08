@@ -7,7 +7,7 @@ import {
   TransportedWaste
 } from "../generated/graphql/types";
 import { GenericWaste } from "./types";
-import { formatStatusLabel } from "shared/constants";
+import { formatStatusLabel } from "@td/constants";
 
 // Type for custom fields that might not be in the DB
 // But that we still want to display (ie for user convenience)

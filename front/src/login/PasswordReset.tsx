@@ -4,7 +4,7 @@ import * as yup from "yup";
 import * as queryString from "query-string";
 import { useLocation, Link } from "react-router-dom";
 import { decodeHash } from "../common/helper";
-import { Mutation, MutationResetPasswordArgs, Query } from "codegen-ui";
+import { Mutation, MutationResetPasswordArgs, Query } from "@td/codegen-ui";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 import { Formik, Form, Field } from "formik";

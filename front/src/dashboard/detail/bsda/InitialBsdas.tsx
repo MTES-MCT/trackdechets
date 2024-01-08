@@ -7,7 +7,7 @@ import {
   TableHeaderCell,
   TableRow
 } from "../../../common/components/Table";
-import { InitialBsda } from "codegen-ui";
+import { InitialBsda } from "@td/codegen-ui";
 import { IconPdf } from "../../../Apps/common/Components/Icons/Icons";
 import { useDownloadPdf } from "../../components/BSDList/BSDa/BSDaActions/useDownloadPdf";
 

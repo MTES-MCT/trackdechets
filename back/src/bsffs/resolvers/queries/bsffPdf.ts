@@ -9,7 +9,7 @@ import { checkCanRead } from "../../permissions";
 import { createPDFResponse } from "../../../common/pdf";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { buildPdf } from "../../pdf/generator";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { getReadonlyBsffPackagingRepository } from "../../repository";
 import { UserInputError } from "../../../common/errors";
 

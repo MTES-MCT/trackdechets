@@ -6,7 +6,7 @@ import { getBsffOrNotFound } from "../../database";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { Bsff, BsffStatus, Prisma } from "@prisma/client";
 import { getBsffRepository } from "../../repository";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { sirenifyBsffCreateInput } from "../../sirenify";
 
 const duplicateBsff: MutationResolvers["duplicateBsff"] = async (

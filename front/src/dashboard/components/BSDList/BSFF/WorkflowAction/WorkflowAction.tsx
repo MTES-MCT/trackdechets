@@ -1,5 +1,5 @@
 import React from "react";
-import { BsffStatus } from "codegen-ui";
+import { BsffStatus } from "@td/codegen-ui";
 import { BsffFragment } from "../types";
 import { PublishBsff } from "./PublishBsff";
 import { SignEmission } from "./SignEmission";

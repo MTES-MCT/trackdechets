@@ -67,7 +67,7 @@ input[type="radio"]:checked::before {
 
 .fr-checkbox-group {
   input[type="checkbox"]:checked {
-    opacity: 0;
+    opacity: 0 !important;
   }
 }
 

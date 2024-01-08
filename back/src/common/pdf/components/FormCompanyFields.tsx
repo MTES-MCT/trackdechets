@@ -6,7 +6,7 @@ import {
   isVat,
   isSiret,
   cleanClue
-} from "shared/constants";
+} from "@td/constants";
 import { FormCompany } from "../../../generated/graphql/types";
 
 const FRENCH_COUNTRY = countries.find(country => country.cca2 === "FR");
@@ -43,6 +43,8 @@ export function FormCompanyFields({
         <input
           type="checkbox"
           checked={
+            !!company?.extraEuropeanId &&
+            company.extraEuropeanId.length > 0 &&
             !!company?.vatNumber &&
             company.vatNumber.length > 0 &&
             companyCountry?.cca2 !== "FR"
@@ -52,25 +54,38 @@ export function FormCompanyFields({
         Entreprise étrangère
       </p>
       <p>
-        {!isForeignShip && !isPrivateIndividual && !company?.vatNumber && (
-          <div>
-            N° SIRET : {company?.siret}
-            <br />
-          </div>
-        )}
+        {!isForeignShip &&
+          !isPrivateIndividual &&
+          !company?.vatNumber &&
+          !company?.extraEuropeanId && (
+            <div>
+              N° SIRET : {company?.siret}
+              <br />
+            </div>
+          )}
         {!isForeignShip && !isPrivateIndividual && (
           <div>
             N° TVA intracommunautaire (le cas échéant) : {company?.vatNumber}
             <br />
           </div>
         )}
+        {!!company?.extraEuropeanId &&
+          company.extraEuropeanId.length > 0 &&
+          !isForeignShip &&
+          !isPrivateIndividual && (
+            <div>
+              Identifiant d'entreprise extra-européenne :{" "}
+              {company?.extraEuropeanId}
+              <br />
+            </div>
+          )}
         {company?.omiNumber && (
           <div>
             Numéro navire OMI : {company?.omiNumber}
             <br />
           </div>
         )}
-        {!company?.siret && !company?.vatNumber
+        {!company?.siret && !company?.vatNumber && !company?.extraEuropeanId
           ? "Nom Prénom"
           : "RAISON SOCIALE"}{" "}
         : {company?.name}

@@ -12,7 +12,7 @@ import {
   MutationCreateApplicationArgs,
   MutationUpdateApplicationArgs,
   Query
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import styles from "./AccountOauth2AppCreateUpdate.module.scss";
 import { useNavigate, useParams } from "react-router";
 import routes from "../../Apps/routes";

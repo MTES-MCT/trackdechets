@@ -3,7 +3,7 @@ import {
   RepositoryFnBuilder,
   RepositoryTransaction
 } from "../../common/repository/types";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import buildCountForms from "./form/count";
 import buildCreateForm from "./form/create";
 import buildDeleteForm from "./form/delete";

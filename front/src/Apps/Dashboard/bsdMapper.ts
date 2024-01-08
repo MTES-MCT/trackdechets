@@ -1,4 +1,4 @@
-import { Bsff, Bsdasri, Bsvhu, BsdType } from "codegen-ui";
+import { Bsff, Bsdasri, Bsvhu, BsdType } from "@td/codegen-ui";
 import {
   BsdDisplay,
   BsdStatusCode,
@@ -75,6 +75,7 @@ export const mapBsdd = (bsdd: FormWithReview): BsdDisplay => {
     emitter: bsdd.emitter,
     destination: bsdd.recipient,
     transporter: bsdd.transporter,
+    transporters: bsdd.transporters,
     ecoOrganisme: bsdd.ecoOrganisme,
     updatedAt: bsdd.stateSummary?.lastActionOn,
     emittedByEcoOrganisme: bsdd.emittedByEcoOrganisme,

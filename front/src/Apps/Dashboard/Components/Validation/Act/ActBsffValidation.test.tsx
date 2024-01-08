@@ -4,7 +4,7 @@ import { render } from "@testing-library/react";
 import { GET_BSFF_FORM } from "../../../../../form/bsff/utils/queries";
 import React from "react";
 import ActBsffValidation from "./ActBsffValidation";
-import { Bsff } from "codegen-ui";
+import { Bsff } from "@td/codegen-ui";
 
 describe("ActBsffValidation", () => {
   const onClose = jest.fn();

@@ -79,11 +79,11 @@
 
 6. Synchroniser la base de données avec le schéma prisma.
 
-   Les modèles de données sont définis dans les fichiers `back/prisma/schema.prisma`.
+   Les modèles de données sont définis dans les fichiers `libs/back/prisma/src/schema.prisma`.
    Afin de synchroniser les tables PostgreSQL, il faut lancer une déploiement prisma
 
    ```bash
-   npx prisma db push --schema back/prisma/schema.prisma
+   npx prisma db push
    ```
 
 7. Initialiser l'index Elastic Search.
@@ -255,8 +255,8 @@ cd front && nvm use && npm install
 9. Pousser le schéma de la base de données dans la table `prisma` et ajouter des données de tests en ajoutant un fichier `seed.dev.ts` dans le répertoire `back/prisma` (demander à un dev) :
 
 ```
-npx prisma db push --schema back/prisma/schema.prisma
-npx prisma db seed --schema back/prisma/schema.prisma
+npx prisma db push
+npx prisma db seed
 ```
 
 10. Créer l'index Elasticsearch : `npm --prefix back run reindex-all-bsds-bulk:dev -- -f`. Puis vérifier qu'un index a bien été crée : `curl localhost:9200/_cat/indices`
@@ -278,8 +278,7 @@ npx nx run-many -t serve
 13. (Optionnel) Démarrer Storybook
 
 ```bash
-cd front
-npm run storybook
+npx nx run front:storybook
 ```
 
 - URL API : http://api.trackdechets.local/
@@ -291,7 +290,7 @@ npm run storybook
 - Formatage/analyse du code avec prettier et eslint.
 - Typage du code avec les fichiers générées par GraphQL Codegen
   - `back/src/generated/graphql/types.ts` pour le back
-  - `front/src/generated/graphql/types.ts` pour le front
+  - `libs/front/codegen-ui/src/generated/graphql/types.ts` pour le front
 
 ## Tests unitaires
 
@@ -305,7 +304,7 @@ Il est également possible de faire tourner les tests unitaires sur l'environnem
 
 1. Démarrer les différents services
    ```
-   docker-compose -f docker-compose.dev.yml up postgres prisma redis td-api td-ui
+   docker-compose up -d
    ```
 2. Faire tourner les tests back
    ```bash
@@ -314,25 +313,22 @@ Il est également possible de faire tourner les tests unitaires sur l'environnem
    ```
 3. Faire tourner les tests front
    ```bash
-   npx nx run front:test # run tests in watch mode
+   npx nx run front:test
    ```
 
 ## Tests d'intégration
 
-Ce sont tous les tests ayant l'extension `.integration.ts` et nécessitant le setup d'une base de données de test.
+Ce sont tous les tests ayant l'extension `.integration.ts` et nécessitant le setup d'une base de données de test. Ils nécessitent de démarrer les containers Docker (ou d'avoir un setup local), puis de lancer les queues.
 
 ```bash
-cd back/integration-tests
-./run.sh # run all the tests at once and exit
+npm run bg:integration # Démarrage des queues en background, nécessaires aux tests
+npx nx run back:test:integration # Lancement des tests d'intégration
 ```
 
 Il est également possible de faire tourner chaque test de façon indépendante:
 
 ```bash
-cd back/integration-tests
-./run.sh -u # start the containers
-./run.sh -r workflow.integration.ts
-./run.sh -d # remove the containers
+npx nx run back:test:integration --testFile workflow.integration.ts
 ```
 
 ## Créer une PR
@@ -363,13 +359,14 @@ Chaque update de la branche `dev` déclenche un déploiement sur l'environnement
 ## Migrations
 
 Les migrations de base peuvent se faire soit en SQL, soit via des script TypeScript.
-Pour le SQL elles sont situées dans `back/prisma/migrations`. Les fichiers sont numérotés dans l'ordre croissant. Ils doivent être nommé `XX_any-namme.sql`.
+Pour le SQL elles sont situées dans `libs/back/prisma/migrate/migrations`. Les fichiers sont numérotés dans l'ordre croissant. Ils doivent être nommé `XX_any-namme.sql`.
 A noter que une fois que ces migrations ont été jouées, le contenu des fichiers est hashé dans la table migration et il ne faut donc surtout pas les modifier.
 
 Pour les migrations scriptées, c'est dans `back/prisma/scripts`. Les migrations doivent prendre la forme d'une classe, implémentant `Updater` et décorée par `registerUpdater`.
 Attention, contrairement aux scripts SQL ces migrations ne sont pas jouées une seules fois. Il faut donc s'assurer qu'elles sont idempotentes, ou les désactiver après chaque mise en production.
 
-Toutes ces migrations sont jouées avec la commande `npx nx run back:"update:dev"`. (sans le suffixe `:dev` en production)
+Les scripts sont joués avec la commande `npx nx run back:update`.
+Les migrations SQL sont joués avec la commande `npx nx run @td/prisma:migrate`.
 
 ## Réindexation Elasticsearch des BSDs
 
@@ -534,13 +531,13 @@ Le contenu de publickey.crt est destiné aux applications clientes d'OpenId conn
 ### Reindexer un bordereau individuel
 
 ```
-   npm run reindex-bsd BSD-XYZ123
+   npx nx run back:reindex-bsd BSD-XYZ123
 ```
 
 ### Réindexer un type de bordereau
 
 ```
-   npm run reindex-partial-in-place -- bsdasri -f
+   npx nx run back:reindex-partial-in-place -- bsdasri -f
 ```
 
 ## Dépannage
@@ -570,7 +567,7 @@ docker exec -it $(docker ps -qf "name=td-api") bash
 
 export FORCE_LOGGER_CONSOLE=true
 
-npm run reindex-all-bsds-bulk:dev -- -f
+npx nx run back:reindex-all-bsds-bulk -- -f
 ```
 
 Si le problème remonté est un "Segmentation fault", il est probable que la mémoire allouée au container soit insuffisante. Vous pouvez contourner le problème en limitant la taille des batches (dans votre .env):

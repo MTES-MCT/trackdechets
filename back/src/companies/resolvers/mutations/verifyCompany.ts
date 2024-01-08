@@ -13,11 +13,10 @@ import {
   verificationDone,
   verifiedForeignTransporterCompany
 } from "@td/mail";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat, PROFESSIONALS } from "@td/constants";
 import { isTransporter } from "../../validation";
-import * as COMPANY_CONSTANTS from "shared/constants";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import {
   NotCompanyAdminErrorMsg,
@@ -41,11 +40,7 @@ export const sendPostVerificationFirstOnboardingEmail = async (
   }
 
   // If professional company
-  if (
-    [...company.companyTypes].some(ct =>
-      COMPANY_CONSTANTS.PROFESSIONALS.includes(ct)
-    )
-  ) {
+  if ([...company.companyTypes].some(ct => PROFESSIONALS.includes(ct))) {
     await sendMail(
       renderMail(onboardingFirstStep, {
         to: [{ email: admin.email, name: admin.name ?? "" }],

@@ -3,7 +3,7 @@
 
 import fs from "fs";
 import * as yup from "yup";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { readCsv } from "../../users/bulk-creation/loaders";
 import { logger } from "@td/logger";
 import { libelleFromCodeNaf } from "../../companies/sirene/utils";

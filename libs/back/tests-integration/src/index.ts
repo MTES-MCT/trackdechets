@@ -1,6 +1,5 @@
 import {
   redisClient,
-  prisma,
   esClient,
   esIndex,
   indexQueue,
@@ -8,6 +7,7 @@ import {
   closeQueues,
   server
 } from "back";
+import { prisma } from "@td/prisma";
 
 afterAll(async () => {
   await Promise.all([

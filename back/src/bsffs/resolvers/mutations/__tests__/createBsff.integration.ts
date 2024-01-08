@@ -1,7 +1,7 @@
 import { BsffPackagingType, BsffType, UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { BSFF_WASTE_CODES } from "shared/constants";
+import { BSFF_WASTE_CODES } from "@td/constants";
 import {
   Mutation,
   MutationCreateBsffArgs,
@@ -16,7 +16,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { fullBsff } from "../../../fragments";
 import { sirenifyBsffInput } from "../../../sirenify";
 import { createFicheIntervention } from "../../../__tests__/factories";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 
 jest.mock("../../../sirenify");
 (sirenifyBsffInput as jest.Mock).mockImplementation(input =>

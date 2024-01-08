@@ -1,6 +1,6 @@
 import { useMutation, gql } from "@apollo/client";
 import React, { useState } from "react";
-import { Mutation, MutationResendActivationEmailArgs } from "codegen-ui";
+import { Mutation, MutationResendActivationEmailArgs } from "@td/codegen-ui";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import { Captcha, useCaptcha } from "../common/components/captcha";
 

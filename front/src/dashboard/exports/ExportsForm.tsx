@@ -7,10 +7,10 @@ import {
   CompanyType,
   Query,
   WasteRegistryType
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import WasteTreeModal from "../../search/WasteTreeModal";
 
-import { ALL_WASTES, ALL_WASTES_TREE } from "shared/constants";
+import { ALL_WASTES, ALL_WASTES_TREE } from "@td/constants";
 import { useLazyQuery, gql } from "@apollo/client";
 import { NotificationError } from "../../Apps/common/Components/Error/Error";
 import RedErrorMessage from "../../common/components/RedErrorMessage";

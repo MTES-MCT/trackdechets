@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Bsdasri, BsdasriType } from "codegen-ui";
+import { Bsdasri, BsdasriType } from "@td/codegen-ui";
 
 import { InitialDasris } from "../../../../detail/bsdasri/InitialDasris";
 

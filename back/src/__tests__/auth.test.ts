@@ -8,9 +8,11 @@ import { GraphQLContext } from "../types";
 import { sameDayMidnight } from "../utils";
 
 const updateAccessTokenMock = jest.fn();
-jest.mock("../prisma", () => ({
-  accessToken: {
-    update: jest.fn((...args) => updateAccessTokenMock(...args))
+jest.mock("@td/prisma", () => ({
+  prisma: {
+    accessToken: {
+      update: jest.fn((...args) => updateAccessTokenMock(...args))
+    }
   }
 }));
 

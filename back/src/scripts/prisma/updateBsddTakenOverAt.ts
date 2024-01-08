@@ -1,5 +1,5 @@
 import { getFormRepository } from "../../forms/repository";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 type QueryRawReturnType = {
   id: string;

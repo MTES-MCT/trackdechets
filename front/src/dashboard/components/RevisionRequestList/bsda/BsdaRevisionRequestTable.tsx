@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { BsdaRevisionRequest } from "codegen-ui";
+import { BsdaRevisionRequest } from "@td/codegen-ui";
 import { useTable, useFilters, useSortBy } from "react-table";
 import {
   Table,

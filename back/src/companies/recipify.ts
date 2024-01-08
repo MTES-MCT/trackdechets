@@ -2,7 +2,9 @@ import {
   CompanyInput,
   BsdasriRecepisseInput
 } from "../generated/graphql/types";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
+import { Bsda, Bsdasri, Bsff, Bsvhu, BspaohTransporter } from "@prisma/client";
+import { getTransporterCompanyOrgId } from "@td/constants";
 
 type RecipifyOutput = {
   number: string | null;
@@ -93,5 +95,31 @@ export function recipifyGeneric<T>(
     }
 
     return completedInput;
+  };
+}
+
+export interface BsdTransporterReceiptPart {
+  transporterRecepisseNumber: string | null;
+  transporterRecepisseDepartment: string | null;
+  transporterRecepisseValidityLimit: Date | null;
+}
+
+export async function getTransporterReceipt(
+  existingBsd: Bsdasri | Bsvhu | Bsda | Bsff | BspaohTransporter
+): Promise<BsdTransporterReceiptPart> {
+  // fetch TransporterReceipt
+  const orgId = getTransporterCompanyOrgId(existingBsd);
+  let transporterReceipt;
+  if (orgId) {
+    transporterReceipt = await prisma.company
+      .findUnique({
+        where: { orgId }
+      })
+      .transporterReceipt();
+  }
+  return {
+    transporterRecepisseNumber: transporterReceipt?.receiptNumber ?? null,
+    transporterRecepisseDepartment: transporterReceipt?.department ?? null,
+    transporterRecepisseValidityLimit: transporterReceipt?.validityLimit ?? null
   };
 }

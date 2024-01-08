@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
-import { Query, QueryFormRevisionRequestsArgs } from "codegen-ui";
+import { Query, QueryFormRevisionRequestsArgs } from "@td/codegen-ui";
 import { GET_FORM_REVISION_REQUESTS } from "../../../../Apps/common/queries/reviews/BsddReviewsQuery";
 import { useParams } from "react-router-dom";
 import { Loader } from "../../../../Apps/common/Components";

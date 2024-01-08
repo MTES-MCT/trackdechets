@@ -4,7 +4,7 @@ import {
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   Query,
   QueryBsdsArgs,
@@ -35,7 +35,7 @@ import gql from "graphql-tag";
 
 const CREATE_DRAFT_DASRI = `
 mutation CreateDraftDasri($input: BsdasriInput!) {
-  createDraftBsdasri(input: $input)  {
+   createDraftBsdasri(input: $input)  {
     id
   }
 }

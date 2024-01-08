@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-
 import "./TransporterAccordion.scss";
 
 export type TransporterAccordionProps = {
@@ -10,6 +9,12 @@ export type TransporterAccordionProps = {
   onTransporterDelete: () => void;
   onTransporterShiftDown: () => void;
   onTransporterShiftUp: () => void;
+  onExpanded: () => void;
+  disableAdd?: boolean;
+  disableDelete?: boolean;
+  disableUp?: boolean;
+  disableDown?: boolean;
+  expanded?: boolean;
   children: NonNullable<React.ReactNode>;
 };
 
@@ -18,30 +23,44 @@ export type TransporterAccordionProps = {
  * mode "accordéon". C'est une version modifiée du composant
  * <Accordion /> du react-dsfr qui permet d'afficher ce que l'on veut dans
  * la barre de label. Les événements au clic sur les boutons "Ajouter",
- * "Supprimer", "Avancer" et "Reculer" sont propagés vers <TransporterList />
+ * "Supprimer", "Avancer", "Reculer" et "Déplier" sont propagés vers <TransporterList />
  */
 export function TransporterAccordion({
   name,
   numero,
+  expanded,
   onTransporterAdd,
   onTransporterDelete,
   onTransporterShiftDown,
   onTransporterShiftUp,
+  onExpanded,
+  disableAdd = false,
+  disableDelete = false,
+  disableUp = false,
+  disableDown = false,
   children
 }: TransporterAccordionProps) {
-  const [expandedState, setExpandedState] = React.useState(true);
-
-  const onExtendButtonClick = () => {
-    setExpandedState(!expandedState);
-  };
-
   const collapseElementId = `transporter__${numero}__form`;
 
+  const ref = React.useRef(null);
+
+  // FIXME scrollHeight est recalculé à chaque render
+  // Idéalement il faudrait utiliser ResizeObserver pour être notifié
+  // lorsque l'élément change de taille tel que décrit ici
+  // https://legacy.reactjs.org/docs/hooks-faq.html#how-can-i-measure-a-dom-node
+  const scrollHeight = (() => {
+    if (ref.current) {
+      // Cf https://www.w3schools.com/howto/howto_js_collapsible.asp
+      // "Animated Collapsible (Slide Down)"
+      // On a besoin de connaitre la hauteur de l'élément déplié
+      // pour définir la valeur de maxHeight et avoir une animation fluide.
+      return (ref.current as any).scrollHeight;
+    }
+    return 0;
+  })();
+
   return (
-    <section
-    // En attente de l'activation du multi-modal
-    // className="fr-accordion"
-    >
+    <section className="transporter">
       <div className="transporter__header">
         <label className="transporter__header__label">{name}</label>
         <div className="transporter__header__buttons">
@@ -52,6 +71,7 @@ export function TransporterAccordion({
             iconPosition="right"
             iconId="ri-add-line"
             title="Ajouter"
+            disabled={disableAdd}
             onClick={onTransporterAdd}
           >
             Ajouter
@@ -64,6 +84,7 @@ export function TransporterAccordion({
             iconId="ri-delete-bin-line"
             title="Supprimer"
             onClick={onTransporterDelete}
+            disabled={disableDelete}
           >
             Supprimer
           </Button>
@@ -74,6 +95,7 @@ export function TransporterAccordion({
             priority="secondary"
             title="Remonter"
             onClick={onTransporterShiftUp}
+            disabled={disableUp}
           />
           <Button
             type="button"
@@ -82,26 +104,31 @@ export function TransporterAccordion({
             priority="secondary"
             title="Descendre"
             onClick={onTransporterShiftDown}
+            disabled={disableDown}
           />
           <Button
             type="button"
             className="transporter__header__button"
             // FIXME Ce serait bien ici d'arriver à reproduire l'animation de l'accordéon du DSFR
-            iconId={
-              expandedState ? "ri-arrow-up-s-line" : "ri-arrow-down-s-line"
-            }
-            title="Replier"
-            aria-expanded={expandedState}
+            iconId={expanded ? "ri-arrow-up-s-line" : "ri-arrow-down-s-line"}
+            title={expanded ? "Replier" : "Déplier"}
+            aria-expanded={expanded}
             aria-controls={collapseElementId}
-            onClick={onExtendButtonClick}
+            onClick={onExpanded}
           />
         </div>
       </div>
       <div
         id={collapseElementId}
-        // En attente de l'activation du multi-modal
-        // className="fr-collapse fr-collapse--expanded"
+        ref={ref}
         className="transporter__form"
+        style={
+          expanded
+            ? scrollHeight
+              ? { maxHeight: scrollHeight }
+              : {} // avoid having an animation on first render
+            : { maxHeight: 0 }
+        }
       >
         {children}
       </div>

@@ -22,10 +22,10 @@ import {
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
   CompanySearchResult
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import classNames from "classnames";
 import { MY_COMPANIES } from "./AccountCompanyList";
-import { isFRVat, isSiret, isVat, isForeignVat } from "shared/constants";
+import { isFRVat, isSiret, isVat, isForeignVat } from "@td/constants";
 import {
   CREATE_WORKER_CERTIFICATION,
   UPDATE_COMPANY_WORKER_CERTIFICATION

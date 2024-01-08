@@ -27,6 +27,7 @@ enum BsdType {
   BSVHU
   BSDA
   BSFF
+  BSPAOH
 }
 
 "Statut d'acceptation d'un déchet"

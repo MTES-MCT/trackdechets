@@ -4,7 +4,7 @@ import { MutationCancelBsdaRevisionRequestArgs } from "../../../../generated/gra
 import { GraphQLContext } from "../../../../types";
 import { getBsdaRepository } from "../../../repository";
 import { Permission, can, getUserRoles } from "../../../../permissions";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 
 export async function cancelBsdaRevisionRequest(

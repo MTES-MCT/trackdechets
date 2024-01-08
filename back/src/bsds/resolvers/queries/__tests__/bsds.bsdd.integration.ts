@@ -6,11 +6,12 @@ import {
   MutationCreateFormArgs,
   MutationMarkAsSealedArgs,
   MutationSignedByTransporterArgs,
-  MutationMarkAsReceivedArgs,
   MutationMarkAsProcessedArgs,
   CreateFormInput,
   MutationCreateFormRevisionRequestArgs,
-  MutationSubmitFormRevisionRequestApprovalArgs
+  MutationSubmitFormRevisionRequestApprovalArgs,
+  MutationMarkAsReceivedArgs,
+  MutationSignTransportFormArgs
 } from "../../../../generated/graphql/types";
 import {
   resetDatabase,
@@ -21,13 +22,16 @@ import {
   userWithCompanyFactory,
   formFactory,
   toIntermediaryCompany,
-  transporterReceiptFactory
+  transporterReceiptFactory,
+  bsddTransporterData,
+  bsddTransporterFactory,
+  UserWithCompany
 } from "../../../../__tests__/factories";
 
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 import { gql } from "graphql-tag";
 import { searchCompany } from "../../../../companies/search";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 
 jest.mock("../../../../companies/search");
 
@@ -739,6 +743,295 @@ describe("Query.bsds workflow", () => {
       ]);
     }
   );
+
+  it("should list bsds in the right transporter and recipient tabs in multi-modal workflow", async () => {
+    const SIGN_TRANSPORT_FORM = gql`
+      mutation SignTransporterForm($id: ID!, $input: SignTransportFormInput!) {
+        signTransportForm(id: $id, input: $input) {
+          id
+        }
+      }
+    `;
+
+    const MARK_AS_RECEIVED = gql`
+      mutation MarkAsReceived($id: ID!, $receivedInfo: ReceivedFormInput!) {
+        markAsReceived(id: $id, receivedInfo: $receivedInfo) {
+          id
+        }
+      }
+    `;
+
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const transporter1 = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          receiptNumber: "T1",
+          department: "07",
+          validityLimit: new Date()
+        }
+      }
+    });
+    const transporter2 = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          receiptNumber: "T2",
+          department: "13",
+          validityLimit: new Date()
+        }
+      }
+    });
+    const transporter3 = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          receiptNumber: "T3",
+          department: "84",
+          validityLimit: new Date()
+        }
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret,
+        status: "SIGNED_BY_PRODUCER",
+        emittedAt: new Date(),
+        transporters: {
+          create: {
+            ...bsddTransporterData,
+            number: 1,
+            transporterCompanySiret: transporter1.company.siret
+          }
+        }
+      }
+    });
+
+    await bsddTransporterFactory({
+      formId: form.id,
+      opts: { transporterCompanySiret: transporter2.company.siret }
+    });
+    await bsddTransporterFactory({
+      formId: form.id,
+      opts: { transporterCompanySiret: transporter3.company.siret }
+    });
+
+    function signTransport({ user }: UserWithCompany) {
+      const { mutate } = makeClient(user);
+      return mutate<
+        Pick<Mutation, "signTransportForm">,
+        MutationSignTransportFormArgs
+      >(SIGN_TRANSPORT_FORM, {
+        variables: {
+          id: form.id,
+          input: {
+            takenOverAt: new Date().toISOString() as any,
+            takenOverBy: "Transporteur"
+          }
+        }
+      });
+    }
+
+    function markAsReceived({ user }: UserWithCompany) {
+      const { mutate } = makeClient(user);
+      return mutate<
+        Pick<Mutation, "markAsAccepted">,
+        MutationMarkAsReceivedArgs
+      >(MARK_AS_RECEIVED, {
+        variables: {
+          id: form.id,
+          receivedInfo: {
+            wasteAcceptationStatus: "ACCEPTED",
+            receivedAt: new Date().toISOString() as any,
+            signedAt: new Date().toISOString() as any,
+            receivedBy: "Destination",
+            quantityReceived: 1
+          }
+        }
+      });
+    }
+
+    async function isToCollectFor({ user, company }: UserWithCompany) {
+      const { query } = makeClient(user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isToCollectFor: [company.siret!]
+            }
+          }
+        }
+      );
+      return data.bsds.edges.map(e => e.node);
+    }
+
+    async function isCollectedFor({ user, company }: UserWithCompany) {
+      const { query } = makeClient(user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isCollectedFor: [company.siret!]
+            }
+          }
+        }
+      );
+      return data.bsds.edges.map(e => e.node);
+    }
+
+    async function isFollowFor({ user, company }: UserWithCompany) {
+      const { query } = makeClient(user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [company.siret!]
+            }
+          }
+        }
+      );
+      return data.bsds.edges.map(e => e.node);
+    }
+
+    async function isForActionFor({ user, company }: UserWithCompany) {
+      const { query } = makeClient(user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isForActionFor: [company.siret!]
+            }
+          }
+        }
+      );
+      return data.bsds.edges.map(e => e.node);
+    }
+
+    // Expected tabs after emitter signature
+    // - Transporter 1 => "À collecter"
+    // - Transporter 2 => "Suivi"
+    // - Transporter 3 => "Suivi"
+
+    await indexForm(await getFormForElastic(form));
+    await refreshElasticSearch();
+
+    expect(await isToCollectFor(transporter1)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+
+    expect(await isFollowFor(transporter2)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+
+    expect(await isFollowFor(transporter3)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+
+    expect(await isFollowFor(destination)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+
+    await signTransport(transporter1);
+
+    const formAfterTransporter1Signature = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+
+    expect(formAfterTransporter1Signature.status).toEqual("SENT");
+
+    // Expected tabs after first transporter signature
+    // - Transporter 1 => "Collecté"
+    // - Transporter 2 => "À collecter"
+    // - Transporter 3 => "Suivi"
+    // - Destination => "Pour Action"
+    await refreshElasticSearch();
+
+    expect(await isCollectedFor(transporter1)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+    expect(await isToCollectFor(transporter2)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+    expect(await isFollowFor(transporter3)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+    expect(await isForActionFor(destination)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+
+    await signTransport(transporter2);
+
+    // Expected tabs after second transporter signature
+    // - Transporter 1 => "Suivi"
+    // - Transporter 2 => "Collecté"
+    // - Transporter 3 => "À collecter"
+    // - Destination => "Pour Action"
+    await refreshElasticSearch();
+
+    expect(await isFollowFor(transporter1)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+    expect(await isCollectedFor(transporter2)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+    expect(await isToCollectFor(transporter3)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+    expect(await isForActionFor(destination)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+
+    await signTransport(transporter3);
+
+    // Expected tabs after third transporter signature
+    // - Transporter 1 => "Suivi"
+    // - Transporter 2 => "Suivi"
+    // - Transporter 3 => "Collecté"
+    // - Destination => "Pour Action"
+    await refreshElasticSearch();
+
+    expect(await isFollowFor(transporter1)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+    expect(await isFollowFor(transporter2)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+    expect(await isCollectedFor(transporter3)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+    expect(await isForActionFor(destination)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+
+    await markAsReceived(destination);
+    // Expected tabs after destination acceptation
+    // - Transporter 1 => "Suivi"
+    // - Transporter 2 => "Suivi"
+    // - Transporter 3 => "Suivi"
+    // - Destination => "Pour Action"
+    await refreshElasticSearch();
+
+    expect(await isFollowFor(transporter1)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+    expect(await isFollowFor(transporter2)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+    expect(await isFollowFor(transporter3)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+    expect(await isForActionFor(destination)).toEqual([
+      expect.objectContaining({ id: form.id })
+    ]);
+  });
 });
 
 describe("Query.bsds edge cases", () => {
@@ -769,6 +1062,7 @@ describe("Query.bsds edge cases", () => {
         transporters: {
           create: {
             transporterCompanySiret: recipientAndTransporter.company.siret,
+            takenOverAt: new Date(),
             number: 1
           }
         },

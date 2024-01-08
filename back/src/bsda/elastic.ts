@@ -1,5 +1,5 @@
 import { Bsda, BsdaStatus, BsdType } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import { GraphQLContext } from "../types";
@@ -14,7 +14,7 @@ import {
   BsdaWithRevisionRequests,
   BsdaWithRevisionRequestsInclude
 } from "./types";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
 
 export type BsdaForElastic = Bsda &

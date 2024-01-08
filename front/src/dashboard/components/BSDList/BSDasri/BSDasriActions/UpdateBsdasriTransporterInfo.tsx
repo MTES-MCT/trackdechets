@@ -6,7 +6,7 @@ import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icon
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 
 import { UPDATE_BSDASRI } from "../../../../../form/bsdasri/utils/queries";
-import { Bsdasri, Mutation, MutationUpdateBsdasriArgs } from "codegen-ui";
+import { Bsdasri, Mutation, MutationUpdateBsdasriArgs } from "@td/codegen-ui";
 import { useMatch } from "react-router-dom";
 
 type Props = {

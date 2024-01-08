@@ -1,4 +1,4 @@
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { GraphQLContext } from "../types";
 import { InvaliSecurityCode, NotAdmin, NotLoggedIn } from "./errors";
 

@@ -1,6 +1,5 @@
 import { hashPassword, passwordVersion } from "../src/users/utils";
-
-import prisma from "../src/prisma";
+import { prisma } from "@td/prisma";
 import { siretify } from "../src/__tests__/factories";
 
 export default async () => {

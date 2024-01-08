@@ -13,7 +13,7 @@ import {
   QueryBsdsArgs,
   QueryCompanyPrivateInfosArgs,
   QueryFormRevisionRequestsArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import BsdCardList from "../Apps/Dashboard/Components/BsdCardList/BsdCardList";
 import {
   Blankslate,
@@ -34,7 +34,7 @@ import {
 } from "../Apps/Dashboard/dashboardUtils";
 import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
 import { usePermissions } from "../common/contexts/PermissionsContext";
-import { UserPermission } from "codegen-ui";
+import { UserPermission } from "@td/codegen-ui";
 import { GET_BSDA_REVISION_REQUESTS } from "../Apps/common/queries/reviews/BsdaReviewQuery";
 import { GET_FORM_REVISION_REQUESTS } from "../Apps/common/queries/reviews/BsddReviewsQuery";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../Apps/common/queries/company/query";

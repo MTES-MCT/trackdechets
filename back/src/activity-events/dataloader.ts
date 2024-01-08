@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { getStreamsEvents } from "../events/mongodb";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { dbEventToActivityEvent } from "./data";
 import { ActivityEvent } from "./types";
 import { EventCollection } from "../events/types";

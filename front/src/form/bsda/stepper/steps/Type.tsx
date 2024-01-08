@@ -10,7 +10,7 @@ import {
   CompanyType,
   Query,
   QueryCompanyInfosArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 

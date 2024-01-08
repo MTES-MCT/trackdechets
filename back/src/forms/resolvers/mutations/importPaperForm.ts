@@ -19,7 +19,7 @@ import { EventType } from "../../workflow/types";
 import {
   isDangerous,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
-} from "shared/constants";
+} from "@td/constants";
 import { UserInputError } from "../../../common/errors";
 
 /**

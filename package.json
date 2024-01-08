@@ -24,6 +24,10 @@
   "volta": {
     "node": "20.7.0"
   },
+  "prisma": {
+    "seed": "tsx --tsconfig back/tsconfig.lib.json back/prisma/seed.ts",
+    "schema": "libs/back/prisma/src/schema.prisma"
+  },
   "nx": {
     "targets": {}
   },
@@ -35,12 +39,18 @@
     "@bull-board/api": "^4.12.2",
     "@bull-board/express": "^4.12.2",
     "@codegouvfr/react-dsfr": "^0.75.4",
+    "@docusaurus/core": "3.0.1",
+    "@docusaurus/preset-classic": "3.0.1",
     "@elastic/elasticsearch": "7.13",
     "@fast-csv/format": "^4.3.0",
     "@graphql-tools/load-files": "^6.6.1",
     "@graphql-tools/merge": "^8.4.0",
     "@graphql-tools/schema": "^9.0.17",
+    "@mdx-js/react": "^3.0.0",
+    "@opentelemetry/context-async-hooks": "^1.19.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.46.0",
     "@opentelemetry/instrumentation": "^0.41.0",
+    "@opentelemetry/sdk-trace-base": "^1.19.0",
     "@prisma/client": "5.0.0",
     "@prisma/instrumentation": "5.0.0",
     "@sentry/browser": "^6.19.7",
@@ -56,6 +66,7 @@
     "canvas": "^2.10.2",
     "classnames": "^2.2.6",
     "cleave.js": "^1.6.0",
+    "clsx": "^1.2.1",
     "concat-stream": "^2.0.0",
     "connect-redis": "^6.0.0",
     "constant-case": "^3.0.3",
@@ -105,6 +116,7 @@
     "pg": "^8.11.0",
     "plausible-tracker": "^0.3.8",
     "postgres-migrations": "^5.1.0",
+    "prism-react-renderer": "2.3.1",
     "prisma": "5.0.0",
     "prompts": "^2.4.2",
     "qrcode": "^1.4.4",
@@ -148,12 +160,14 @@
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.21.0",
     "@babel/runtime": "^7.21.0",
+    "@docusaurus/module-type-aliases": "2.1.0",
     "@faker-js/faker": "^7.6.0",
     "@fast-csv/parse": "^4.3.0",
     "@graphql-codegen/cli": "^3.2.2",
     "@graphql-codegen/typescript": "^3.0.2",
     "@graphql-codegen/typescript-operations": "^3.0.2",
     "@graphql-codegen/typescript-resolvers": "^3.1.1",
+    "@nx-plus/docusaurus": "^15.0.0-rc.0",
     "@nx/esbuild": "17.0.1",
     "@nx/eslint": "17.0.1",
     "@nx/eslint-plugin": "17.0.1",
@@ -234,6 +248,7 @@
     "concurrently": "^6.4.0",
     "copyfiles": "^2.4.1",
     "core-js": "^3.21.1",
+    "docusaurus-graphql-plugin": "^0.9.0",
     "esbuild": "0.19.5",
     "eslint": "~8.46.0",
     "eslint-config-prettier": "9.0.0",
@@ -254,7 +269,9 @@
     "jsdom": "~22.1.0",
     "node-mocks-http": "^1.11.0",
     "nx": "17.0.1",
+    "mermaid": "10.6.1",
     "prettier": "^2.8.6",
+    "raw-loader": "^4.0.2",
     "sass": "^1.55.0",
     "storybook": "^7.0.17",
     "storybook-addon-apollo-client": "^4.1.4",
@@ -268,9 +285,5 @@
     "vite": "~4.3.9",
     "vite-plugin-svgr": "^4.0.0",
     "ws": "^8.2.3"
-  },
-  "prisma": {
-    "seed": "tsx --tsconfig back/tsconfig.lib.json back/prisma/seed.ts",
-    "schema": "back/prisma/schema.prisma"
   }
 }

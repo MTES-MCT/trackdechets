@@ -1,6 +1,6 @@
 import { gql, MutationHookOptions, useMutation } from "@apollo/client";
 import toast from "react-hot-toast";
-import { Mutation, MutationDuplicateBsdaArgs } from "codegen-ui";
+import { Mutation, MutationDuplicateBsdaArgs } from "@td/codegen-ui";
 import { GET_BSDS } from "../../../../../Apps/common/queries";
 
 const DUPLICATE_BSFF = gql`

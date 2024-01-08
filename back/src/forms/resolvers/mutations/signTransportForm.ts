@@ -18,7 +18,7 @@ import { EventType } from "../../workflow/types";
 import { checkCanSignFor, hasSignatureAutomation } from "../../permissions";
 import { getAndExpandFormFromDb } from "../../converter";
 import { getFormRepository } from "../../repository";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { runInTransaction } from "../../../common/repository/helper";
 import { sumPackagingInfos } from "../../repository/helper";
 import { validateBeforeTransport } from "../../validation";

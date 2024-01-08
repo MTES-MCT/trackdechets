@@ -1,6 +1,6 @@
 import { makeSearchCompanies, searchCompany } from "../search";
 import { ErrorCode } from "../../common/errors";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { siretify } from "../../__tests__/factories";
 import { SireneSearchResult } from "../sirene/types";
 import decoratedSearchCompanies from "../sirene/searchCompanies";
@@ -16,14 +16,16 @@ const createInput = {
   codeCommune: "00000"
 };
 
-jest.mock("../../prisma", () => ({
-  anonymousCompany: {
-    create: jest.fn(() => Promise.resolve(createInput)),
-    findUnique: jest.fn(() => Promise.resolve(createInput))
-  },
-  company: {
-    findUnique: jest.fn(() => Promise.resolve(null)),
-    findMany: jest.fn(() => Promise.resolve([]))
+jest.mock("@td/prisma", () => ({
+  prisma: {
+    anonymousCompany: {
+      create: jest.fn(() => Promise.resolve(createInput)),
+      findUnique: jest.fn(() => Promise.resolve(createInput))
+    },
+    company: {
+      findUnique: jest.fn(() => Promise.resolve(null)),
+      findMany: jest.fn(() => Promise.resolve([]))
+    }
   }
 }));
 

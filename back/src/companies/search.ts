@@ -1,5 +1,5 @@
 import { checkVAT } from "jsvat";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import redundantCachedSearchSirene from "./sirene/searchCompany";
 import decoratedSearchCompanies from "./sirene/searchCompanies";
 import { CompanySearchResult } from "./types";
@@ -12,7 +12,7 @@ import {
   countries,
   cleanClue,
   isForeignVat
-} from "shared/constants";
+} from "@td/constants";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
 import { AnonymousCompanyError } from "./sirene/errors";
@@ -20,6 +20,7 @@ import { removeEmptyKeys } from "../common/converter";
 import { UserInputError } from "../common/errors";
 import { SearchOptions } from "./sirene/trackdechets/types";
 import { Company } from "@prisma/client";
+import { StatutDiffusionEtablissement } from "../generated/graphql/types";
 
 interface SearchCompaniesDeps {
   injectedSearchCompany: (clue: string) => Promise<CompanySearchResult>;
@@ -136,7 +137,7 @@ export async function searchCompany(
       ...removeEmptyKeys(anonymousCompany),
       statutDiffusionEtablissement: cleanedClue.startsWith(TEST_COMPANY_PREFIX)
         ? "O"
-        : "N",
+        : ("P" as StatutDiffusionEtablissement),
       etatAdministratif: "A",
       naf: anonymousCompany.codeNaf,
       codePaysEtrangerEtablissement: "FR"
@@ -156,7 +157,7 @@ export async function searchCompany(
 
   // Search by VAT number first in our db, inder to to optimize response times
   if (isVat(cleanedClue)) {
-    const company = await findCompanyAndMergeInfos(cleanedClue, {});
+    const company = await findCompanyAndMergeInfos(cleanedClue, null);
     if (company.isRegistered === true) {
       // shorcut to return the result directly from database without hitting VIES
       const { country } = checkVAT(cleanedClue, countries);
@@ -264,7 +265,7 @@ export async function searchSireneOrNotFound(
       return {
         ...removeEmptyKeys(anonymousCompany),
         // required to avoid leaking anonymous data to the public
-        statutDiffusionEtablissement: "N",
+        statutDiffusionEtablissement: "P" as StatutDiffusionEtablissement,
         etatAdministratif: "A",
         naf: anonymousCompany.codeNaf,
         codePaysEtrangerEtablissement: "FR"
@@ -274,7 +275,7 @@ export async function searchSireneOrNotFound(
       return {
         etatAdministratif: "A",
         siret,
-        statutDiffusionEtablissement: "N"
+        statutDiffusionEtablissement: "P" as StatutDiffusionEtablissement
       } as SireneSearchResult;
     }
 

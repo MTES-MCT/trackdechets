@@ -1,4 +1,4 @@
-import prisma from "../../src/prisma";
+import { prisma } from "@td/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 import { BsdasriType, BsdasriStatus } from "@prisma/client";
 import { enqueueUpdatedBsdToIndex } from "../../src/queue/producers/elastic";

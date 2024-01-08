@@ -4,14 +4,14 @@ import React, { useEffect, useState } from "react";
 import { COMPANY_ACCOUNT_ADD_PRIVATE_INFOS } from "../../Apps/common/queries/company/query";
 import AccountCompanyAddMembershipRequest from "./AccountCompanyAddMembershipRequest";
 import styles from "../AccountCompanyAdd.module.scss";
-import { Mutation, Query } from "codegen-ui";
+import { Mutation, Query } from "@td/codegen-ui";
 import {
   isFRVat,
   isSiret,
   isVat,
   isClosedCompany,
   CLOSED_COMPANY_ERROR
-} from "shared/constants";
+} from "@td/constants";
 
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
@@ -159,7 +159,7 @@ export default function AccountCompanyAddSiret({
         if (!isClosedCompany(companyInfos)) {
           // Non-diffusible mais pas encore inscrit en AnonymousCompany
           if (
-            companyInfos?.statutDiffusionEtablissement === "N" &&
+            companyInfos?.statutDiffusionEtablissement === "P" &&
             !companyInfos?.isAnonymousCompany
           ) {
             setIsNonDiffusible(true);

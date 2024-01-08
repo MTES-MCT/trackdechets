@@ -1,6 +1,6 @@
 import React from "react";
 import { generatePath, NavLink, useNavigate } from "react-router-dom";
-import { CompanyPrivate } from "codegen-ui";
+import { CompanyPrivate } from "@td/codegen-ui";
 import DashboardCompanySelector from "./DashboardCompanySelector";
 import routes from "../Apps/routes";
 import "./DashboardTabs.scss";

@@ -1,4 +1,4 @@
-import { BsffStatus } from "codegen-ui";
+import { BsffStatus } from "@td/codegen-ui";
 
 export interface BsffFragment {
   id: string;

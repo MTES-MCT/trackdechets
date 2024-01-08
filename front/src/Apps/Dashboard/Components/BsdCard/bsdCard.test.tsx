@@ -2,7 +2,14 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { fireEvent, waitFor, within } from "@testing-library/dom";
 import BsdCard from "./BsdCard";
-import { Bsda, Bsdasri, Bsff, Bsvhu, Form, UserPermission } from "codegen-ui";
+import {
+  Bsda,
+  Bsdasri,
+  Bsff,
+  Bsvhu,
+  Form,
+  UserPermission
+} from "@td/codegen-ui";
 import { BsdCurrentTab } from "../../../common/types/commonTypes";
 import { MockedProvider } from "@apollo/client/testing";
 import { BsdaWithReview, FormWithReview } from "../../../common/types/bsdTypes";
@@ -138,7 +145,6 @@ describe("Bsd card primary action label", () => {
         },
         __typename: "TemporaryStorageDetail"
       },
-      transportSegments: [],
       currentTransporterSiret: null,
       nextTransporterSiret: null,
       __typename: "Form"
@@ -774,7 +780,6 @@ describe("Bsd card primary action label", () => {
           __typename: "StateSummary"
         },
         temporaryStorageDetail: null,
-        transportSegments: [],
         currentTransporterSiret: null,
         nextTransporterSiret: null,
         __typename: "Form"
@@ -900,15 +905,6 @@ describe("Bsd card primary action label", () => {
           __typename: "StateSummary"
         },
         temporaryStorageDetail: null,
-        transportSegments: [
-          {
-            id: "ckyef9g3a2924349syhsqc1wa",
-            readyToTakeOver: false,
-            previousTransporterCompanySiret: "13001045700013",
-            takenOverAt: null,
-            __typename: "TransportSegment"
-          }
-        ],
         currentTransporterSiret: "13001045700013",
         nextTransporterSiret: "13001045700013",
         __typename: "Form"
@@ -937,6 +933,154 @@ describe("Bsd card primary action label", () => {
         screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
       );
       expect(getByText("Valider la réception")).toBeInTheDocument();
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+    });
+
+    test("Bsdd multi-modal - Signature par un transporteur N > 1", () => {
+      const siretNextTransporter = "85001946400021";
+
+      const bsdd = {
+        id: "ckou9ctpn073534ozmk0mreuu",
+        readableId: "BSD-20210518-DRX5BG957",
+        customId: null,
+        sentAt: "2021-07-09T08:50:17.494Z",
+        emittedAt: "2021-07-09T08:50:17.494Z",
+        emittedBy: "EF",
+        emittedByEcoOrganisme: false,
+        takenOverAt: "2021-07-09T08:50:17.494Z",
+        status: "SENT",
+        wasteDetails: {
+          code: "16 04 01*",
+          name: "Munitions",
+          packagingInfos: [
+            {
+              type: "FUT",
+              other: "",
+              quantity: 6,
+              __typename: "PackagingInfo"
+            },
+            {
+              type: "GRV",
+              other: "",
+              quantity: 1,
+              __typename: "PackagingInfo"
+            },
+            {
+              type: "AUTRE",
+              other: "CAISSE 30 litres",
+              quantity: 50,
+              __typename: "PackagingInfo"
+            }
+          ],
+          __typename: "WasteDetails"
+        },
+        emitter: {
+          type: "PRODUCER",
+          isPrivateIndividual: false,
+          company: {
+            siret: "13001045700013",
+            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+            omiNumber: null,
+            __typename: "FormCompany"
+          },
+          isForeignShip: false,
+          __typename: "Emitter"
+        },
+        recipient: {
+          company: {
+            siret: "53230142100022",
+            orgId: "53230142100022",
+            name: "L'ATELIER DE CELINE",
+            __typename: "FormCompany"
+          },
+          isTempStorage: false,
+          __typename: "Recipient"
+        },
+        transporter: {
+          company: {
+            siret: "13001045700013",
+            orgId: "13001045700013",
+            __typename: "FormCompany"
+          },
+          numberPlate: null,
+          customInfo: null,
+          __typename: "Transporter"
+        },
+        transporters: [
+          {
+            company: {
+              orgId: "13001045700013",
+              __typename: "FormCompany"
+            },
+            takenOverAt: "2021-07-09T08:50:17.494Z",
+            __typename: "Transporter"
+          },
+          {
+            company: {
+              orgId: siretNextTransporter,
+              __typename: "FormCompany"
+            },
+            takenOverAt: null,
+            __typename: "Transporter"
+          }
+        ],
+        ecoOrganisme: null,
+        stateSummary: {
+          transporterCustomInfo: null,
+          transporterNumberPlate: null,
+          transporter: {
+            siret: "13001045700013",
+            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+            __typename: "FormCompany"
+          },
+          recipient: {
+            siret: "53230142100022",
+            name: "L'ATELIER DE CELINE",
+            __typename: "FormCompany"
+          },
+          emitter: {
+            siret: "13001045700013",
+            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+            __typename: "FormCompany"
+          },
+          __typename: "StateSummary"
+        },
+        temporaryStorageDetail: null,
+        currentTransporterSiret: "13001045700013",
+        nextTransporterSiret: "13001045700013",
+        __typename: "Form"
+      } as unknown as Form;
+
+      render(
+        <PermissionsProvider
+          defaultPermissions={[UserPermission.BsdCanSignTransport]}
+        >
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <MemoryRouter initialEntries={[route]}>
+              <BsdCard
+                currentSiret={siretNextTransporter}
+                bsd={bsdd}
+                bsdCurrentTab="toCollectTab"
+                onValidate={functionMock}
+                secondaryActions={{
+                  onUpdate: functionMock,
+                  onOverview: functionMock
+                }}
+              />
+            </MemoryRouter>
+          </MockedProvider>
+        </PermissionsProvider>
+      );
+
+      const { getByText } = within(
+        screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
+      );
+
+      const signerBtn = getByText("Signer");
+
+      expect(signerBtn).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -1213,7 +1357,6 @@ describe("Bsd card primary action label", () => {
           __typename: "StateSummary"
         },
         temporaryStorageDetail: null,
-        transportSegments: [],
         currentTransporterSiret: "",
         nextTransporterSiret: null,
         __typename: "Form"

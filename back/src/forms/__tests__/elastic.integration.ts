@@ -1,7 +1,8 @@
 import { Company, Status } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import {
+  bsddTransporterData,
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
@@ -49,8 +50,14 @@ describe("getSiretsByTab", () => {
     const user = await userFactory();
     const form = await formFactory({
       ownerId: user.id,
-      opt: { status: Status.SENT }
+      opt: {
+        status: Status.SENT,
+        transporters: {
+          create: { ...bsddTransporterData, number: 1, takenOverAt: new Date() }
+        }
+      }
     });
+
     const fullForm = await getFullForm(form);
     const transporter = getFirstTransporterSync(fullForm);
     const { isFollowFor, isCollectedFor, isForActionFor } =
@@ -78,7 +85,10 @@ describe("getSiretsByTab", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        status: Status.SENT
+        status: Status.SENT,
+        transporters: {
+          create: { ...bsddTransporterData, number: 1, takenOverAt: new Date() }
+        }
       }
     });
 
@@ -175,9 +185,9 @@ describe("getSiretsByTab", () => {
     expect(isForActionFor).toContain(form.recipientCompanySiret);
     expect(isToCollectFor).toContain(transporter3.vatNumber);
 
-    // waste is taken over by transporter n°2. BSDD should
-    // be in transporter n°1 "Follow" tab and in transporter n°2
-    // "Collected" tab
+    // waste is taken over by transporter n°3. BSDD should
+    // be in transporter n°1 and transporter n°2 "Follow" tab and
+    // in transporter n°3 "Collected" tab
     await prisma.bsddTransporter.updateMany({
       where: {
         formId: form.id,
@@ -194,16 +204,21 @@ describe("getSiretsByTab", () => {
     isForActionFor = tabs.isForActionFor;
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(transporter!.transporterCompanySiret);
+    expect(isFollowFor).toContain(transporter2.siret);
     expect(isForActionFor).toContain(form.recipientCompanySiret);
     expect(isCollectedFor).toContain(transporter3.vatNumber);
-    expect(isCollectedFor).toContain(transporter2.siret);
   });
 
   test("SENT with temporary storage", async () => {
     const user = await userFactory();
     const form = await formWithTempStorageFactory({
       ownerId: user.id,
-      opt: { status: Status.SENT }
+      opt: {
+        status: Status.SENT,
+        transporters: {
+          create: { ...bsddTransporterData, number: 1, takenOverAt: new Date() }
+        }
+      }
     });
     const fullForm = await getFullForm(form);
     const transporter = getFirstTransporterSync(fullForm);

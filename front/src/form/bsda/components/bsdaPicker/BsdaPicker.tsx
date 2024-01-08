@@ -19,7 +19,7 @@ import {
   PageInfo,
   Query,
   QueryBsdasArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React from "react";
 import { useParams } from "react-router-dom";
 import initialState from "../../stepper/initial-state";

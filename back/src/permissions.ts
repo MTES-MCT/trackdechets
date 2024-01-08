@@ -1,12 +1,13 @@
 import { User, UserRole } from "@prisma/client";
 import { cachedGet } from "./common/redis";
-import prisma from "./prisma";
+import { prisma } from "@td/prisma";
 import {
   BsdaSignatureType,
   BsdasriSignatureType,
   BsffSignatureType,
   SignatureTypeInput,
-  UserPermission
+  UserPermission,
+  BspaohSignatureType
 } from "./generated/graphql/types";
 import { checkSecurityCode } from "./common/permissions";
 import { ForbiddenError } from "./common/errors";
@@ -204,13 +205,15 @@ type AllSignatureType =
   | BsdaSignatureType
   | BsdasriSignatureType
   | SignatureTypeInput // BSVHU
-  | BsffSignatureType;
+  | BsffSignatureType
+  | BspaohSignatureType;
 
 export const signatureTypeToPermission: {
   [Key in AllSignatureType]: Permission;
 } = {
   EMISSION: Permission.BsdCanSignEmission,
   TRANSPORT: Permission.BsdCanSignTransport,
+  DELIVERY: Permission.BsdCanSignTransport,
   WORK: Permission.BsdCanSignWork,
   RECEPTION: Permission.BsdCanSignAcceptation,
   ACCEPTATION: Permission.BsdCanSignAcceptation,

@@ -6,9 +6,10 @@ import {
 import { toBsdElastic as toBsdasriElastic } from "../../bsdasris/elastic";
 import { toBsdElastic as toBsvhuElastic } from "../../bsvhu/elastic";
 import { toBsdElastic as toBsffElastic } from "../../bsffs/elastic";
+import { toBsdElastic as toBspaohElastic } from "../../bspaoh/elastic";
 import { BsdElastic, indexBsd, getElasticBsdById } from "../../common/elastic";
 import { getFormForElastic, indexForm } from "../../forms/elastic";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 export async function indexBsdJob(
   job: Job<string>
@@ -72,6 +73,19 @@ export async function indexBsdJob(
     await indexBsd(elasticBsff);
 
     return { ...elasticBsff, siretsBeforeUpdate };
+  }
+
+  if (bsdId.startsWith("PAOH-")) {
+    const bspaoh = await prisma.bspaoh.findUniqueOrThrow({
+      where: { id: bsdId },
+      include: { transporters: true }
+    });
+
+    const elasticBspaoh = toBspaohElastic(bspaoh);
+
+    await indexBsd(elasticBspaoh);
+
+    return { ...elasticBspaoh, siretsBeforeUpdate };
   }
 
   throw new Error("Indexing this type of BSD is not handled by this worker.");

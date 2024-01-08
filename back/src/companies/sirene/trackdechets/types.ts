@@ -1,8 +1,10 @@
+import { StatutDiffusionEtablissement } from "../../../generated/graphql/types";
+
 export interface SearchStockEtablissement {
   siren: string;
   nic: string;
   siret: string;
-  statutDiffusionEtablissement: "O" | "N" | "P";
+  statutDiffusionEtablissement: StatutDiffusionEtablissement;
   dateCreationEtablissement: string;
   trancheEffectifsEtablissement: string;
   anneeEffectifsEtablissement: string;

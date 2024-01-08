@@ -3,7 +3,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
 import { updateCompanyFn } from "./updateCompanyService";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import {
   NotCompanyAdminErrorMsg,

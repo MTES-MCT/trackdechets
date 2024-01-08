@@ -4,7 +4,7 @@ import {
   userFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,

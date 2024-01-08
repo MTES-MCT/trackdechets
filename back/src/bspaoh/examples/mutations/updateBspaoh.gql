@@ -1,0 +1,11 @@
+mutation UpdateBspaoh($id: ID!, $input: BspaohInput!) {
+  updateBspaoh(id: $id, input: $input) {
+    id
+    status
+    transporter {
+      transport {
+        takenOverAt
+      }
+    }
+  }
+}

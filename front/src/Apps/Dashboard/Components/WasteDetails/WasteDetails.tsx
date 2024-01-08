@@ -8,7 +8,7 @@ import {
   IconWeight
 } from "../../../common/Components/Icons/Icons";
 import { WasteDetailsProps } from "./wasteTypes";
-import { BsdType } from "codegen-ui";
+import { BsdType } from "@td/codegen-ui";
 import "./wasteDetails.scss";
 
 function WasteDetails({

@@ -5,7 +5,7 @@ import {
 } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { AuthType } from "../../../../auth";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   companyFactory,
   siretify,

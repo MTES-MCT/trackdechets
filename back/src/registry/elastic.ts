@@ -7,7 +7,7 @@ import {
 } from "../generated/graphql/types";
 import { toElasticFilter } from "./where";
 import { Bsvhu, Prisma } from "@prisma/client";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 
 export function buildQuery(
   registryType: WasteRegistryType,

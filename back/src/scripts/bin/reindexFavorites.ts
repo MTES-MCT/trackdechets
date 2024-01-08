@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { closeQueues } from "../../queue/producers";
 import { logger } from "@td/logger";
 import { processDbIdentifiersByChunk } from "../../bsds/indexation/bulkIndexBsds";

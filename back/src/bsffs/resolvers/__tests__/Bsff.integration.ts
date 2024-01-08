@@ -1,7 +1,7 @@
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { Query } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { userWithCompanyFactory } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { createBsff, createFicheIntervention } from "../../__tests__/factories";

@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { buildCountBsdas } from "./bsda/count";
 import { buildCreateBsda } from "./bsda/create";
 import { buildDeleteBsda } from "./bsda/delete";

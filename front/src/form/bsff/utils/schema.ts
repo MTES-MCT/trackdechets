@@ -3,7 +3,7 @@ import {
   companySchema,
   transporterCompanySchema
 } from "../../../common/validation/schema";
-import { BsffPackagingType } from "codegen-ui";
+import { BsffPackagingType } from "@td/codegen-ui";
 import { OPERATION } from "./constants";
 
 export const transporterSchema = yup.object().shape({

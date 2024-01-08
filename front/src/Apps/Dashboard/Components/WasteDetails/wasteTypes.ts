@@ -1,4 +1,4 @@
-import { BsdType } from "codegen-ui";
+import { BsdType } from "@td/codegen-ui";
 
 export interface WasteDetailsProps {
   wasteType?: BsdType;

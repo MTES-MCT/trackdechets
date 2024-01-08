@@ -1,5 +1,3 @@
-import "./tracer";
-
 import { ApolloServer } from "@apollo/server";
 import { unwrapResolverError } from "@apollo/server/errors";
 import { expressMiddleware } from "@apollo/server/express4";
@@ -20,7 +18,7 @@ import { ZodError } from "zod";
 import { createEventsDataLoaders } from "./activity-events/dataloader";
 import { passportBearerMiddleware } from "./auth";
 import { captchaGen, captchaSound } from "./captcha/captchaGen";
-import { ROAD_CONTROL_SLUG } from "shared/constants";
+import { ROAD_CONTROL_SLUG } from "@td/constants";
 import { ErrorCode, UserInputError } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";

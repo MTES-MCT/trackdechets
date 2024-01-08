@@ -6,7 +6,7 @@ import {
   BsffTransporterInput,
   BsffType,
   TransportMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 
 export interface BsffFormInput extends BsffInput {
   transporter: BsffTransporterInput;

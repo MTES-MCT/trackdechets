@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { Company } from "@prisma/client";
 import { setWebhookSetting } from "../../common/redis/webhooksettings";
 

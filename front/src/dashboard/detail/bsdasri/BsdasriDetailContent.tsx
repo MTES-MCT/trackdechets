@@ -9,7 +9,7 @@ import {
   BsdasriPackaging,
   BsdasriType,
   OperationMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import routes from "../../../Apps/routes";
 import { useDownloadPdf } from "../../components/BSDList/BSDasri/BSDasriActions/useDownloadPdf";
 
@@ -38,7 +38,7 @@ import {
 
 import classNames from "classnames";
 import { getOperationModeLabel } from "../../../common/operationModes";
-import { DASRI_VERBOSE_STATUSES } from "shared/constants";
+import { DASRI_VERBOSE_STATUSES } from "@td/constants";
 
 const getVerboseWasteName = (code: string): string => {
   const desc = {

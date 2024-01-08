@@ -8,7 +8,7 @@ import {
   Mutation,
   MutationSignBsffArgs,
   MutationUpdateBsffArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { RedErrorMessage } from "../../../../../common/components";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";

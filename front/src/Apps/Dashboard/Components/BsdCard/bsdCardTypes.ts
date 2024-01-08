@@ -5,7 +5,7 @@ import {
   BsdaRevisionRequestApproval,
   FormCompany,
   FormRevisionRequestApproval
-} from "codegen-ui";
+} from "@td/codegen-ui";
 
 export interface BsdCardProps {
   bsd:

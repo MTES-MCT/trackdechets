@@ -1,5 +1,5 @@
 import React, { useContext, useState, useCallback } from "react";
-import { UserPermission } from "codegen-ui";
+import { UserPermission } from "@td/codegen-ui";
 
 interface InterfacePermissions {
   children: React.ReactNode;

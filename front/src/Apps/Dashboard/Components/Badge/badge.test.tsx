@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import Badge from "./Badge";
 import { BsdStatusCode } from "../../../common/types/bsdTypes";
-import { BsdType } from "codegen-ui";
+import { BsdType } from "@td/codegen-ui";
 
 describe("Bsd Badge status", () => {
   describe("case: DRAFT/INITITAL(draft=true)", () => {

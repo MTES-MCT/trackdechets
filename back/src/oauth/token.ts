@@ -5,7 +5,7 @@ import {
   User,
   CompanyVerificationStatus
 } from "@prisma/client";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { EMAIL_SCOPE, PROFILE_SCOPE, COMPANIES_SCOPE } from "./scopes";
 
 const { OIDC_PRIVATE_KEY } = process.env;

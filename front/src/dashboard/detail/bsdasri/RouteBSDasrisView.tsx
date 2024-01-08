@@ -2,7 +2,7 @@ import React from "react";
 import BsdasriDetailContent from "./BsdasriDetailContent";
 import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { useQuery } from "@apollo/client";
-import { Query, QueryBsdasriArgs } from "codegen-ui";
+import { Query, QueryBsdasriArgs } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import { GET_DETAIL_DASRI } from "../../../Apps/common/queries";
 import { InlineError } from "../../../Apps/common/Components/Error/Error";

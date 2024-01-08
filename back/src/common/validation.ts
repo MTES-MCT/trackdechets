@@ -13,8 +13,8 @@ import {
   isWasteVehicles
 } from "../companies/validation";
 import { CompanyInput } from "../generated/graphql/types";
-import prisma from "../prisma";
-import { isForeignVat, isFRVat, isSiret, isVat } from "shared/constants";
+import { prisma } from "@td/prisma";
+import { isForeignVat, isFRVat, isSiret, isVat } from "@td/constants";
 import { UserInputError } from "./errors";
 
 // Poids maximum en tonnes tout mode de transport confondu
@@ -397,32 +397,62 @@ export const transporterRecepisseSchema = context => ({
   transporterRecepisseIsExempted: yup.boolean().nullable(),
   transporterRecepisseDepartment: yup
     .string()
-    .when(["transporterRecepisseIsExempted", "transporterCompanyVatNumber"], {
-      is: (isExempted, vat) => isExempted || isForeignVat(vat),
-      then: schema => schema.nullable().notRequired(),
-      otherwise: schema =>
-        schema.requiredIf(
-          context.transportSignature,
-          REQUIRED_RECEIPT_DEPARTMENT
-        )
-    }),
+    .when(
+      [
+        "transporterRecepisseIsExempted",
+        "transporterCompanyVatNumber",
+        "transporterTransportMode"
+      ],
+      {
+        is: (isExempted, vat, transportMode) =>
+          isExempted ||
+          isForeignVat(vat) ||
+          (transportMode && transportMode !== TransportMode.ROAD),
+        then: schema => schema.nullable().notRequired(),
+        otherwise: schema =>
+          schema.requiredIf(
+            context.transportSignature,
+            REQUIRED_RECEIPT_DEPARTMENT
+          )
+      }
+    ),
   transporterRecepisseNumber: yup
     .string()
-    .when(["transporterRecepisseIsExempted", "transporterCompanyVatNumber"], {
-      is: (isExempted, vat) => isExempted || isForeignVat(vat),
-      then: schema => schema.nullable().notRequired(),
-      otherwise: schema =>
-        schema.requiredIf(context.transportSignature, REQUIRED_RECEIPT_NUMBER)
-    }),
+    .when(
+      [
+        "transporterRecepisseIsExempted",
+        "transporterCompanyVatNumber",
+        "transporterTransportMode"
+      ],
+      {
+        is: (isExempted, vat, transportMode) =>
+          isExempted ||
+          isForeignVat(vat) ||
+          (transportMode && transportMode !== TransportMode.ROAD),
+        then: schema => schema.nullable().notRequired(),
+        otherwise: schema =>
+          schema.requiredIf(context.transportSignature, REQUIRED_RECEIPT_NUMBER)
+      }
+    ),
   transporterRecepisseValidityLimit: yup
     .date()
-    .when(["transporterRecepisseIsExempted", "transporterCompanyVatNumber"], {
-      is: (isExempted, vat) => isExempted || isForeignVat(vat),
-      then: schema => schema.nullable().notRequired(),
-      otherwise: schema =>
-        schema.requiredIf(
-          context.transportSignature,
-          REQUIRED_RECEIPT_VALIDITYLIMIT
-        )
-    })
+    .when(
+      [
+        "transporterRecepisseIsExempted",
+        "transporterCompanyVatNumber",
+        "transporterTransportMode"
+      ],
+      {
+        is: (isExempted, vat, transportMode) =>
+          isExempted ||
+          isForeignVat(vat) ||
+          (transportMode && transportMode !== TransportMode.ROAD),
+        then: schema => schema.nullable().notRequired(),
+        otherwise: schema =>
+          schema.requiredIf(
+            context.transportSignature,
+            REQUIRED_RECEIPT_VALIDITYLIMIT
+          )
+      }
+    )
 });

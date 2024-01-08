@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   formFactory,
   formWithTempStorageFactory,

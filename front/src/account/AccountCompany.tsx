@@ -8,7 +8,7 @@ import AccountCompanyMemberList from "./AccountCompanyMemberList";
 import AccountCompanyContact from "./AccountCompanyContact";
 import AccountCompanyAdvanced from "./AccountCompanyAdvanced";
 import styles from "./AccountCompany.module.scss";
-import { CompanyPrivate, UserRole } from "codegen-ui";
+import { CompanyPrivate, UserRole } from "@td/codegen-ui";
 
 type Props = {
   company: CompanyPrivate;

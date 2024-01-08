@@ -13,7 +13,7 @@ import {
   Mutation
 } from "../../../../generated/graphql/types";
 import { ErrorCode } from "../../../../common/errors";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { searchCompany } from "../../../../companies/search";
 
 jest.mock("../../../../companies/search");

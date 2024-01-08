@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import { Modal } from "../../../../../common/components";
 import { Loader } from "../../../../../Apps/common/Components";
 import { GET_VHU_FORM } from "../../../../../form/bsvhu/utils/queries";
-import { Query, QueryBsvhuArgs } from "codegen-ui";
+import { Query, QueryBsvhuArgs } from "@td/codegen-ui";
 import React from "react";
 import { BsvhuSummary } from "./BsvhuSummary";
 

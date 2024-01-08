@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { Updater, registerUpdater } from "./helper/helper";
-import prisma from "../../src/prisma";
+import { prisma } from "@td/prisma";
 import { Prisma } from "@prisma/client";
 
 @registerUpdater(

@@ -4,7 +4,7 @@ import {
   userFactory
 } from "../../../../__tests__/factories";
 import { AuthType } from "../../../../auth";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   refreshElasticSearch,
   resetDatabase

@@ -7,7 +7,7 @@ import {
   Mutation,
   MutationMarkAsProcessedArgs,
   ProcessedFormInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
 import ProcessedInfo from "./ProcessedInfo";

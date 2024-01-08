@@ -5,7 +5,7 @@ import {
 } from "../../../../../__tests__/factories";
 import makeClient from "../../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../../__tests__/factories";
-import prisma from "../../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   Mutation,
   MutationSubmitBsdaRevisionRequestApprovalArgs

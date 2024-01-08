@@ -1,5 +1,5 @@
 import { Updater, registerUpdater } from "./helper/helper";
-import prisma from "../../src/prisma";
+import { prisma } from "@td/prisma";
 
 @registerUpdater(
   "Migrate the forms to received forms to the new accepted status",

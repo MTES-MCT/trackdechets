@@ -1,4 +1,4 @@
-import { OperationMode } from "codegen-ui";
+import { OperationMode } from "@td/codegen-ui";
 import { getOperationModesFromOperationCode } from "../operationModes";
 
 const test = (code: string, expectedModes: OperationMode[]) => {

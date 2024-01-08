@@ -6,7 +6,7 @@ import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
 import { getBsvhuRepository } from "../../repository";
 import { checkCanDuplicate } from "../../permissions";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { sirenifyBsvhuCreateInput } from "../../sirenify";
 
 export default async function duplicate(

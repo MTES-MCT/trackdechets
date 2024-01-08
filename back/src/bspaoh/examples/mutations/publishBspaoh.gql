@@ -1,0 +1,7 @@
+mutation PublishBspaoh($id: ID!) {
+  publishBspaoh(id: $id) {
+    id
+    status
+    isDraft
+  }
+}

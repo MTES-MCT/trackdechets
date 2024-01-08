@@ -5,7 +5,7 @@ import {
   Form,
   QuantityType,
   SignEmissionFormInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   DataList,
   DataListDescription,
