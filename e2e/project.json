@@ -7,13 +7,13 @@
     "ci": {
       "command": "cd e2e && xvfb-run npx playwright test"
     },
-    "test-cli": {
+    "cli": {
       "command": "cd e2e && npx playwright test && npx playwright show-report",
       "configurations": {
         "integration": {}
       }
     },
-    "test-ui": {
+    "ui": {
       "command": "cd e2e && npx playwright test --ui",
       "configurations": {
         "integration": {}
