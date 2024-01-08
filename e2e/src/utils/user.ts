@@ -1,5 +1,5 @@
 import { Page, expect } from "@playwright/test";
-import { prisma } from "back";
+import { prisma } from "@td/prisma";
 import { goTo } from "./navigation";
 import { wait } from "./time";
 

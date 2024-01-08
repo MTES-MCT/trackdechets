@@ -1,4 +1,5 @@
-import { redisClient, prisma, esClient, esIndex, indexQueue } from "back";
+import { redisClient, esClient, esIndex, indexQueue } from "back";
+import { prisma } from "@td/prisma";
 
 /**
  * Special fast path to drop data from a postgres database.
