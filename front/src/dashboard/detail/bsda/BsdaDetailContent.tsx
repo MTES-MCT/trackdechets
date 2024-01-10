@@ -430,7 +430,7 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
     variables: { id: form.id },
     onCompleted: () => {
       navigate(
-        generatePath(routes.dashboardv2.bsds.drafts, {
+        generatePath(routes.dashboard.bsds.drafts, {
           siret
         })
       );
