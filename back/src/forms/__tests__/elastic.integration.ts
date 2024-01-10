@@ -207,6 +207,37 @@ describe("getSiretsByTab", () => {
     expect(isFollowFor).toContain(transporter2.siret);
     expect(isForActionFor).toContain(form.recipientCompanySiret);
     expect(isCollectedFor).toContain(transporter3.vatNumber);
+
+    // cas spécial où le transporteur N+1 est aussi le destinataire
+    // et où le bordereau ne doit pas apparaitre dans l'onglet
+    // "Pour Action" de l'installation de destination / transporteur N+1
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        transporters: {
+          create: {
+            transporterCompanySiret: form.recipientCompanySiret,
+            readyToTakeOver: true,
+            takenOverAt: null,
+            number: 4
+          }
+        }
+      }
+    });
+
+    fullForm = await getFullForm(form);
+    transporter = getFirstTransporterSync(fullForm);
+    tabs = getSiretsByTab(fullForm);
+    isFollowFor = tabs.isFollowFor;
+    isCollectedFor = tabs.isCollectedFor;
+    isToCollectFor = tabs.isToCollectFor;
+    isForActionFor = tabs.isForActionFor;
+    expect(isFollowFor).toContain(form.emitterCompanySiret);
+    expect(isFollowFor).toContain(transporter!.transporterCompanySiret);
+    expect(isFollowFor).toContain(transporter2.siret);
+    expect(isCollectedFor).toContain(transporter3.vatNumber);
+    expect(isForActionFor).not.toContain(form.recipientCompanySiret);
+    expect(isToCollectFor).toContain(form.recipientCompanySiret);
   });
 
   test("SENT with temporary storage", async () => {
