@@ -577,6 +577,20 @@ export default function BSDDetailContent({
   const isAppendix1Producer: boolean =
     form?.emitter?.type === EmitterType.Appendix1Producer;
 
+  const canDelete =
+    [FormStatus.Draft, FormStatus.Sealed].includes(form.status) ||
+    (form.status === FormStatus.SignedByProducer &&
+      siret === form.emitter?.company?.orgId);
+
+  const canUpdate =
+    [
+      FormStatus.Draft,
+      FormStatus.Sealed,
+      FormStatus.SignedByProducer,
+      FormStatus.Sent
+    ].includes(form.status) &&
+    EmitterType.Appendix1Producer !== form.emitter?.type;
+
   return (
     <>
       <div className={styles.detail}>
@@ -932,35 +946,27 @@ export default function BSDDetailContent({
             <IconDuplicateFile size="24px" color="blueLight" />
             <span>Dupliquer</span>
           </button>
-          {[
-            FormStatus.Draft,
-            FormStatus.Sealed,
-            FormStatus.SignedByProducer
-          ].includes(form.status) && (
-            <>
-              <button
-                className="btn btn--outline-primary"
-                onClick={() => setIsDeleting(true)}
-              >
-                <IconTrash color="blueLight" size="24px" />
-                <span>Supprimer</span>
-              </button>
-
-              {EmitterType.Appendix1Producer !== form.emitter?.type && (
-                <Link
-                  to={generatePath(routes.dashboard.bsdds.edit, {
-                    siret,
-                    id: form.id
-                  })}
-                  className="btn btn--outline-primary"
-                >
-                  <IconPaperWrite size="24px" color="blueLight" />
-                  <span>Modifier</span>
-                </Link>
-              )}
-            </>
+          {canDelete && (
+            <button
+              className="btn btn--outline-primary"
+              onClick={() => setIsDeleting(true)}
+            >
+              <IconTrash color="blueLight" size="24px" />
+              <span>Supprimer</span>
+            </button>
           )}
-
+          {canUpdate && (
+            <Link
+              to={generatePath(routes.dashboard.bsdds.edit, {
+                siret,
+                id: form.id
+              })}
+              className="btn btn--outline-primary"
+            >
+              <IconPaperWrite size="24px" color="blueLight" />
+              <span>Modifier</span>
+            </Link>
+          )}
           <WorkflowAction siret={siret!} form={form} />
           {children}
         </div>
