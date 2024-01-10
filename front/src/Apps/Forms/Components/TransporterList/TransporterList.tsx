@@ -45,8 +45,6 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
     transporters.length === 1 ? 0 : null
   );
 
-  const disableAdd = transporters.length >= 5;
-
   return (
     <>
       <FieldArray
@@ -78,6 +76,14 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
               const hasTakenOver = Boolean(t.takenOverAt);
               const previousHasTakenOver =
                 idx > 0 ? Boolean(transporters[idx - 1].takenOverAt) : false;
+              const nextHasTakenOver =
+                idx < transporters.length - 1 &&
+                Boolean(transporters[idx + 1].takenOverAt);
+
+              // Désactive la possiblité d'ajouter un transporteur après le transporteur courant
+              // si le nombre total de transporteurs est égal à 5 ou si le transporteur d'après
+              // a pris en charge le déchet.
+              const disableAdd = transporters.length >= 5 || nextHasTakenOver;
 
               // Désactive la possibilité de supprimer le transporteur
               // s'il est le seul dans la liste ou s'il a déjà pris en charge le déchet
