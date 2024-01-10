@@ -10,14 +10,19 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Implémentation de l'api BSPAOH (expérimentale) [PR 2948](https://github.com/MTES-MCT/trackdechets/pull/2948)
+- ETQ TTR, je veux pouvoir viser une destination ultérieure à l'étranger hors Union Européenne [PR 2984](https://github.com/MTES-MCT/trackdechets/pull/2984)
 
 #### :bug: Corrections de bugs
 
 #### :boom: Breaking changes
 
+- Modifier les variables INSEE sur statutDiffusionEtablissement / Répercuter les changements INSEE dans notre API[PR 2973](https://github.com/MTES-MCT/trackdechets/pull/2973)
+
 #### :nail_care: Améliorations
 
 #### :house: Interne
+
+- Suppression de l'input GraphQL `InternationalCompanyInput` au profit de `CompanyInput` [PR 2984](https://github.com/MTES-MCT/trackdechets/pull/2984)
 
 # [2023.12.1] 12/12/2023
 

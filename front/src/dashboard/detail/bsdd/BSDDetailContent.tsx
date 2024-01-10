@@ -79,11 +79,24 @@ const Company = ({ company, label }: CompanyProps) => (
     <dt>{label}</dt> <dd>{company?.name}</dd>
     <dt>Siret</dt> <dd>{company?.siret}</dd>
     <dt>Numéro de TVA</dt> <dd>{company?.vatNumber}</dd>
-    <dt>
-      Numéro OMI <br />
-      (Organisation maritime internationale)
-    </dt>{" "}
-    <dd>{company?.omiNumber}</dd>
+    {company?.omiNumber && (
+      <>
+        <dt>
+          Numéro OMI <br />
+          (Organisation maritime internationale)
+        </dt>{" "}
+        <dd>{company?.omiNumber}</dd>
+      </>
+    )}
+    {company?.extraEuropeanId && (
+      <>
+        <dt>
+          Identifiant extra-européen <br />
+          (Si hors Union Européenne en l'absence de numéro de TVA)
+        </dt>{" "}
+        <dd>{company?.extraEuropeanId}</dd>
+      </>
+    )}
     <dt>Adresse</dt> <dd>{company?.address}</dd>
     <dt>Tél</dt> <dd>{company?.phone}</dd>
     <dt>Mél</dt> <dd>{company?.mail}</dd>
@@ -334,7 +347,6 @@ const Recipient = ({
   const recipient = hasTempStorage
     ? form.temporaryStorageDetail?.destination
     : form.recipient;
-
   return (
     <>
       {" "}
@@ -381,6 +393,24 @@ const Recipient = ({
             <GroupedIn form={form} key={form.id} />
           ))}
       </div>
+      {form.nextDestination?.company && (
+        <div className={styles.detailGrid}>
+          <DetailRow
+            value={form.nextDestination?.processingOperation}
+            label="Opération ultérieure prévue"
+          />
+          {form.nextDestination.notificationNumber && (
+            <DetailRow
+              value={form.nextDestination?.notificationNumber}
+              label="Numéro de notification"
+            />
+          )}
+          <Company
+            label="Destination ultérieure prévue"
+            company={form.nextDestination?.company}
+          />
+        </div>
+      )}
     </>
   );
 };

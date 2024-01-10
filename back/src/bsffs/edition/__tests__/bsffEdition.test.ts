@@ -30,7 +30,8 @@ describe("edition", () => {
       mail: "",
       vatNumber: "",
       omiNumber: "",
-      country: ""
+      country: "",
+      extraEuropeanId: ""
     };
 
     const waste: Required<BsffWasteInput> = {

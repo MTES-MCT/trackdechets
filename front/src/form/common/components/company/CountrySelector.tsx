@@ -9,14 +9,12 @@ interface CountrySelectorProps {
 }
 
 export default function CountrySelector(props: CountrySelectorProps) {
-  const currentCountry = countries.find(
-    country => country.cca2 === props.value
-  );
-
+  const currentCountry =
+    countries.find(country => country.cca2 === props.value) ?? null;
   return (
     <Select
       {...props}
-      options={countries.filter(country => country.cca2 !== "FR")}
+      options={countries}
       onChange={option =>
         props.onChange(
           // option can be null, an option or an array of options
