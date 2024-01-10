@@ -41,7 +41,7 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
   const links = [
     {
       title: "Contrôle routier",
-      route: generatePath(routes.dashboardv2.roadControl, {
+      route: generatePath(routes.dashboard.roadControl, {
         siret,
         id: form.id
       }),
@@ -51,7 +51,7 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
     },
     {
       title: "Aperçu",
-      route: generatePath(routes.dashboardv2.bsdasris.view, {
+      route: generatePath(routes.dashboard.bsdasris.view, {
         siret,
         id: form.id
       }),
@@ -77,7 +77,7 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
     },
     {
       title: "Modifier",
-      route: generatePath(routes.dashboardv2.bsdasris.edit, {
+      route: generatePath(routes.dashboard.bsdasris.edit, {
         siret,
         id: form.id
       }),

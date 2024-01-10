@@ -84,7 +84,7 @@ export default function PublishBsda({ form, siret }: WorkflowActionProps) {
             <>
               <NotificationError className="action-error" apolloError={error} />
               <Link
-                to={generatePath(routes.dashboardv2.bsdas.edit, {
+                to={generatePath(routes.dashboard.bsdas.edit, {
                   siret,
                   id: form.id
                 })}

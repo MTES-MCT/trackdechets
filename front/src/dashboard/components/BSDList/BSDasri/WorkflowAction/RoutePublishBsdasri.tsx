@@ -131,7 +131,7 @@ export function RoutePublishBsdasri() {
           )}
 
           <Link
-            to={generatePath(routes.dashboardv2.bsdasris.edit, {
+            to={generatePath(routes.dashboard.bsdasris.edit, {
               siret,
               id: formId
             })}

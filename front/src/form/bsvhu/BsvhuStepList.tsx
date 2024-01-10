@@ -69,7 +69,7 @@ export default function BsvhuStepsList(props: Props) {
     saveForm(input)
       .then(_ => {
         // TODO VHU redirect to the correct dashboard
-        const redirectTo = generatePath(routes.dashboardv2.bsds.drafts, {
+        const redirectTo = generatePath(routes.dashboard.bsds.drafts, {
           siret
         });
         navigate(redirectTo);

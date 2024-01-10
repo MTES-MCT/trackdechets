@@ -209,7 +209,7 @@ export function BsffDetailContent({ form: bsff }: Props) {
               </button>
 
               <Link
-                to={generatePath(routes.dashboardv2.bsffs.edit, {
+                to={generatePath(routes.dashboard.bsffs.edit, {
                   siret,
                   id: bsff.id
                 })}
