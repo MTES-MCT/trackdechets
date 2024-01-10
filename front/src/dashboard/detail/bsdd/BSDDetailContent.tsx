@@ -561,7 +561,7 @@ export default function BSDDetailContent({
     variables: { id: form.id },
     onCompleted: () => {
       navigate(
-        generatePath(routes.dashboard.bsds.drafts, {
+        generatePath(routes.dashboardv2.bsds.drafts, {
           siret
         })
       );
@@ -948,7 +948,7 @@ export default function BSDDetailContent({
 
               {EmitterType.Appendix1Producer !== form.emitter?.type && (
                 <Link
-                  to={generatePath(routes.dashboard.bsdds.edit, {
+                  to={generatePath(routes.dashboardv2.bsdds.edit, {
                     siret,
                     id: form.id
                   })}

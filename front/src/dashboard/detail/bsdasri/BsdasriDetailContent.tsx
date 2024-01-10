@@ -305,7 +305,7 @@ export default function BsdasriDetailContent({ form }: SlipDetailContentProps) {
     variables: { id: form.id },
     onCompleted: () => {
       navigate(
-        generatePath(routes.dashboard.bsds.drafts, {
+        generatePath(routes.dashboardv2.bsds.drafts, {
           siret
         })
       );

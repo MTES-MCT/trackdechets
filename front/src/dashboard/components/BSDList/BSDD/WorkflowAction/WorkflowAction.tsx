@@ -21,7 +21,7 @@ export interface WorkflowActionProps {
 export function WorkflowAction(props: WorkflowActionProps) {
   // siret prop contains either SIRET or a VAT number
   const { form, siret } = props;
-  const isActTab = !!useMatch(routes.dashboard.bsds.act);
+  const isActTab = !!useMatch(routes.dashboardv2.bsds.act);
 
   const isTempStorage = form.recipient?.isTempStorage;
   const isAppendix1 = form.emitter?.type === EmitterType.Appendix1;

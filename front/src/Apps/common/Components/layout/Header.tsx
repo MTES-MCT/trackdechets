@@ -4,8 +4,7 @@ import {
   Link,
   matchPath,
   useLocation,
-  generatePath,
-  useMatch
+  generatePath
 } from "react-router-dom";
 
 import { localAuthService } from "../../../../login/auth.service";
@@ -24,8 +23,7 @@ import {
 } from "../../../../common/config";
 import styles from "./Header.module.scss";
 import { useMedia } from "../../../../common/use-media";
-import { DashboardTabs } from "../../../../dashboard/DashboardTabs";
-import { default as DashboardTabsV2 } from "../../../Dashboard/Components/DashboardTabs/DashboardTabs";
+import { default as DashboardTabs } from "../../../Dashboard/Components/DashboardTabs/DashboardTabs";
 
 export const GET_ME = gql`
   {
@@ -51,7 +49,6 @@ export const GET_ME = gql`
 function MobileSubNav({ currentSiret }) {
   const { updatePermissions } = usePermissions();
   const { error, data } = useQuery<Pick<Query, "me">>(GET_ME, {});
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   useEffect(() => {
     if (data) {
@@ -79,10 +76,8 @@ function MobileSubNav({ currentSiret }) {
     return null;
   }
 
-  return !isV2Routes ? (
+  return (
     <DashboardTabs currentCompany={currentCompany} companies={companies} />
-  ) : (
-    <DashboardTabsV2 currentCompany={currentCompany} companies={companies} />
   );
 }
 
@@ -117,16 +112,6 @@ const getMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
   ];
 
   const connected = [
-    {
-      caption: "Mon espace",
-      href: currentSiret
-        ? generatePath(routes.dashboard.index, {
-            siret: currentSiret
-          })
-        : "/",
-
-      navlink: true
-    },
     {
       caption: "Mes bordereaux 🆕",
       href: currentSiret
@@ -232,15 +217,6 @@ export default function Header({
     location.pathname
   );
 
-  const matchDashboard = matchPath(
-    {
-      path: routes.dashboard.index,
-      caseSensitive: false,
-      end: false
-    },
-    location.pathname
-  );
-
   const matchDashboardV2 = matchPath(
     {
       path: routes.dashboardv2.index,
@@ -253,14 +229,7 @@ export default function Header({
   const menuClass = menuHidden && isMobile ? styles.headerNavHidden : "";
 
   // Catching siret from url when not available from props (just after login)
-  let currentSiret = matchDashboard?.params["siret"] || defaultOrgId;
-
-  if (matchDashboardV2) {
-    currentSiret =
-      matchDashboard?.params["siret"] ||
-      matchDashboardV2?.params["siret"] ||
-      defaultOrgId;
-  }
+  const currentSiret = matchDashboardV2?.params["siret"] || defaultOrgId;
 
   const menuEntries = getMenuEntries(isAuthenticated, isAdmin, currentSiret);
 

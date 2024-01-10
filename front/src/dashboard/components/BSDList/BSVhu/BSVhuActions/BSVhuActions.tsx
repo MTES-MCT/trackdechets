@@ -45,7 +45,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
   const links = [
     {
       title: "Contrôle routier",
-      route: generatePath(routes.dashboard.roadControl, {
+      route: generatePath(routes.dashboardv2.roadControl, {
         siret,
         id: form.id
       }),
@@ -55,7 +55,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
     },
     {
       title: "Aperçu",
-      route: generatePath(routes.dashboard.bsvhus.view, {
+      route: generatePath(routes.dashboardv2.bsvhus.view, {
         siret,
         id: form.id
       }),
@@ -81,7 +81,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
     },
     {
       title: "Modifier",
-      route: generatePath(routes.dashboard.bsvhus.edit, {
+      route: generatePath(routes.dashboardv2.bsvhus.edit, {
         siret,
         id: form.id
       }),
