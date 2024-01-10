@@ -312,6 +312,13 @@ const ActBsddValidation = ({
 
   const renderContentSent = () => {
     const isTempStorage = bsd.recipient?.isTempStorage;
+
+    const nextTransporter = (bsd.transporters ?? []).find(t => !t.takenOverAt);
+
+    if (nextTransporter && nextTransporter.company?.orgId === currentSiret) {
+      return renderSignTransportFormModal();
+    }
+
     if (currentSiret === bsd.recipient?.company?.siret) {
       if (!!bsddGetLoading) {
         return <Loader />;
@@ -341,12 +348,6 @@ const ActBsddValidation = ({
           return renderAddAppendix1Modal();
         }
       }
-    }
-
-    const nextTransporter = (bsd.transporters ?? []).find(t => !t.takenOverAt);
-
-    if (nextTransporter && nextTransporter.company?.orgId === currentSiret) {
-      return renderSignTransportFormModal();
     }
   };
 
