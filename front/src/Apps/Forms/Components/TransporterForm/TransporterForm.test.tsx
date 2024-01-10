@@ -186,6 +186,21 @@ describe("TransporterForm", () => {
     ).not.toBeInTheDocument();
   });
 
+  test("transporter recepisse error is not displayed if transport mode is not road", () => {
+    render(
+      Component({
+        data: {
+          ...defaultTransporter,
+          mode: TransportMode.Rail
+        }
+      })
+    );
+
+    expect(
+      screen.queryByText("Récépissé de déclaration de transport de déchets")
+    ).not.toBeInTheDocument();
+  });
+
   test("transporter recepisse is updated based on searchCompanies result", async () => {
     render(
       Component({
