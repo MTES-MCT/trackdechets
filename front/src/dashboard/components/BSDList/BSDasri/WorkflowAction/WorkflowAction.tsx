@@ -34,8 +34,8 @@ const isPublishable = (form: Bsdasri) => {
 export function WorkflowAction(props: WorkflowActionProps) {
   const { form, siret } = props;
   const location = useLocation();
-  const isActTab = !!useMatch(routes.dashboardv2.bsds.act);
-  const isToCollectTab = !!useMatch(routes.dashboardv2.transport.toCollect);
+  const isActTab = !!useMatch(routes.dashboard.bsds.act);
+  const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
 
   const isSynthesis = form.type === BsdasriType.Synthesis;
   const isAssociatedToSynthesis = !!form?.synthesizedIn?.id;
@@ -54,7 +54,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       <ActionLink
         icon={<IconPaperWrite size="24px" />}
         to={{
-          pathname: generatePath(routes.dashboardv2.bsdasris.sign.publish, {
+          pathname: generatePath(routes.dashboard.bsdasris.sign.publish, {
             siret,
             id: form.id
           }),
@@ -77,13 +77,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
           <ActionLink
             icon={<IconCheckCircle1 size="24px" />}
             to={{
-              pathname: generatePath(
-                routes.dashboardv2.bsdasris.sign.emission,
-                {
-                  siret,
-                  id: form.id
-                }
-              ),
+              pathname: generatePath(routes.dashboard.bsdasris.sign.emission, {
+                siret,
+                id: form.id
+              }),
               state: { background: location }
             }}
           >
@@ -103,7 +100,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                 icon={<IconShipmentSignSmartphone size="24px" />}
                 to={{
                   pathname: generatePath(
-                    routes.dashboardv2.bsdasris.sign.emissionSecretCode,
+                    routes.dashboard.bsdasris.sign.emissionSecretCode,
                     {
                       siret,
                       id: form.id
@@ -122,7 +119,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                   icon={<IconCheckCircle1 size="24px" />}
                   to={{
                     pathname: generatePath(
-                      routes.dashboardv2.bsdasris.sign.directTakeover,
+                      routes.dashboard.bsdasris.sign.directTakeover,
                       {
                         siret,
                         id: form.id
@@ -139,7 +136,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                 icon={<IconCheckCircle1 size="24px" />}
                 to={{
                   pathname: generatePath(
-                    routes.dashboardv2.bsdasris.sign.synthesisTakeover,
+                    routes.dashboard.bsdasris.sign.synthesisTakeover,
                     {
                       siret,
                       id: form.id
@@ -169,7 +166,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
             icon={<IconCheckCircle1 size="24px" />}
             to={{
               pathname: generatePath(
-                routes.dashboardv2.bsdasris.sign.transporter,
+                routes.dashboard.bsdasris.sign.transporter,
                 {
                   siret,
                   id: form.id
@@ -191,13 +188,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
           <ActionLink
             icon={<IconCheckCircle1 size="24px" />}
             to={{
-              pathname: generatePath(
-                routes.dashboardv2.bsdasris.sign.reception,
-                {
-                  siret,
-                  id: form.id
-                }
-              ),
+              pathname: generatePath(routes.dashboard.bsdasris.sign.reception, {
+                siret,
+                id: form.id
+              }),
               state: { background: location }
             }}
           >
@@ -213,13 +207,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
           <ActionLink
             icon={<IconCheckCircle1 size="24px" />}
             to={{
-              pathname: generatePath(
-                routes.dashboardv2.bsdasris.sign.operation,
-                {
-                  siret,
-                  id: form.id
-                }
-              ),
+              pathname: generatePath(routes.dashboard.bsdasris.sign.operation, {
+                siret,
+                id: form.id
+              }),
               state: { background: location }
             }}
           >

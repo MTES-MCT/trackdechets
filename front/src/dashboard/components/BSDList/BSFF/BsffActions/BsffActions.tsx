@@ -44,7 +44,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
   const links = [
     {
       title: "Contrôle routier",
-      route: generatePath(routes.dashboardv2.roadControl, {
+      route: generatePath(routes.dashboard.roadControl, {
         siret,
         id: form.id
       }),
@@ -54,7 +54,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
     },
     {
       title: "Aperçu",
-      route: generatePath(routes.dashboardv2.bsffs.view, {
+      route: generatePath(routes.dashboard.bsffs.view, {
         siret,
         id: form.id
       }),
@@ -80,7 +80,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
     },
     {
       title: "Modifier",
-      route: generatePath(routes.dashboardv2.bsffs.edit, {
+      route: generatePath(routes.dashboard.bsffs.edit, {
         siret,
         id: form.id
       }),

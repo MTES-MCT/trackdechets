@@ -66,12 +66,12 @@ export function RouteBSDasrisSignEmissionSecretCode() {
   >(SIGN_BSDASRI_EMISSION_WITH_SECRET_CODE);
 
   const toCollectDashboard = {
-    pathname: generatePath(routes.dashboardv2.transport.toCollect, {
+    pathname: generatePath(routes.dashboard.transport.toCollect, {
       siret
     })
   };
   const signTransporterRedirection = {
-    pathname: generatePath(routes.dashboardv2.bsdasris.sign.transporter, {
+    pathname: generatePath(routes.dashboard.bsdasris.sign.transporter, {
       siret,
       id: formId!
     }),

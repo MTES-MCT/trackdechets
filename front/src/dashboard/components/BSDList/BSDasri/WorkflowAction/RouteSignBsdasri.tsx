@@ -120,7 +120,7 @@ export function RouteSignBsdasri({
 }) {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const navigate = useNavigate();
-  const transporterTabRoute = routes.dashboardv2.transport.toCollect;
+  const transporterTabRoute = routes.dashboard.transport.toCollect;
   const transporterTab = {
     pathname: generatePath(transporterTabRoute, {
       siret

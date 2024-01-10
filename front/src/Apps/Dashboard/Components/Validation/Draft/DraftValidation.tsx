@@ -218,7 +218,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 apolloError={errorPublishBsda}
               />
               <Link
-                to={generatePath(routes.dashboardv2.bsdas.edit, {
+                to={generatePath(routes.dashboard.bsdas.edit, {
                   siret: currentSiret,
                   id: bsd.id
                 })}
@@ -292,7 +292,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 apolloError={errorBsvhu}
               />
               <Link
-                to={generatePath(routes.dashboardv2.bsvhus.edit, {
+                to={generatePath(routes.dashboard.bsvhus.edit, {
                   siret: currentSiret,
                   id: bsd.id
                 })}

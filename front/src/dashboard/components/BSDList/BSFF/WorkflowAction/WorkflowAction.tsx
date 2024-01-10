@@ -19,8 +19,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const { siret } = useParams<{ siret: string }>();
   const { form } = props;
 
-  const isActTab = !!useMatch(routes.dashboardv2.bsds.act);
-  const isToCollectTab = !!useMatch(routes.dashboardv2.transport.toCollect);
+  const isActTab = !!useMatch(routes.dashboard.bsds.act);
+  const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
   const emitterSiret = form.bsffEmitter?.company?.siret;
   const transporterSiret = form.bsffTransporter?.company?.orgId;
   const destinationSiret = form.bsffDestination?.company?.siret;

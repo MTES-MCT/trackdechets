@@ -8,13 +8,7 @@ import {
   MutationSubmitBsdaRevisionRequestApprovalArgs,
   PickupSite
 } from "@td/codegen-ui";
-import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
-import {
-  ActionButton,
-  Modal,
-  RedErrorMessage
-} from "../../../../../common/components";
-import { IconCogApproved } from "../../../../../Apps/common/Components/Icons/Icons";
+import { Modal, RedErrorMessage } from "../../../../../common/components";
 import { useMutation } from "@apollo/client";
 import {
   GET_BSDA_REVISION_REQUESTS,
@@ -24,7 +18,7 @@ import { Field, Form, Formik } from "formik";
 import { RadioButton } from "../../../../../form/common/components/custom-inputs/RadioButton";
 import { formatDate } from "../../../../../common/datetime";
 import { RevisionField } from "../../bsdd/approve/RevisionField";
-import { useParams, useMatch } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { PACKAGINGS_NAMES } from "../../../../../form/bsda/components/packagings/Packagings";
 import { getOperationModeLabel } from "../../../../../common/operationModes";
 
@@ -44,7 +38,6 @@ export function BsdaApproveRevision({
   onModalCloseFromParent
 }: Props) {
   const { siret } = useParams<{ siret: string }>();
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   const [submitBsdaRevisionRequestApproval, { loading }] = useMutation<
     Pick<Mutation, "submitBsdaRevisionRequestApproval">,
@@ -56,7 +49,7 @@ export function BsdaApproveRevision({
   });
 
   const title = "Acceptation d'une révision";
-  if (isV2Routes && isModalOpenFromParent) {
+  if (isModalOpenFromParent) {
     const formatRevisionAdapter = {
       ...review["review"],
       bsda: { ...review }
@@ -73,24 +66,7 @@ export function BsdaApproveRevision({
     );
   }
 
-  return !isV2Routes ? (
-    <TdModalTrigger
-      ariaLabel={title}
-      trigger={open => (
-        <ActionButton icon={<IconCogApproved size="24px" />} onClick={open}>
-          Approuver / Refuser
-        </ActionButton>
-      )}
-      modalContent={close => (
-        <DisplayModalContent
-          review={review}
-          close={close}
-          submitBsdaRevisionRequestApproval={submitBsdaRevisionRequestApproval}
-          loading={loading}
-        />
-      )}
-    />
-  ) : null;
+  return null;
 }
 
 function DisplayModalContent({

@@ -115,7 +115,7 @@ const getMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
     {
       caption: "Mes bordereaux 🆕",
       href: currentSiret
-        ? generatePath(routes.dashboardv2.index, {
+        ? generatePath(routes.dashboard.index, {
             siret: currentSiret
           })
         : "/",
@@ -217,9 +217,9 @@ export default function Header({
     location.pathname
   );
 
-  const matchDashboardV2 = matchPath(
+  const matchDashboard = matchPath(
     {
-      path: routes.dashboardv2.index,
+      path: routes.dashboard.index,
       caseSensitive: false,
       end: false
     },
@@ -229,7 +229,7 @@ export default function Header({
   const menuClass = menuHidden && isMobile ? styles.headerNavHidden : "";
 
   // Catching siret from url when not available from props (just after login)
-  const currentSiret = matchDashboardV2?.params["siret"] || defaultOrgId;
+  const currentSiret = matchDashboard?.params["siret"] || defaultOrgId;
 
   const menuEntries = getMenuEntries(isAuthenticated, isAdmin, currentSiret);
 

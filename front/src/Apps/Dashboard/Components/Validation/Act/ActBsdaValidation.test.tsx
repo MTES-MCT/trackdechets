@@ -9,7 +9,7 @@ import { MemoryRouter } from "react-router-dom";
 
 describe("ActBsdaValidation", () => {
   const onClose = jest.fn();
-  const v2Route = "v2/dashboard";
+  const v2Route = "dashboard";
 
   const mocks = [
     {
