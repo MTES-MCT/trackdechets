@@ -1,10 +1,6 @@
 import { libelleFromCodeNaf } from "../../companies/sirene/utils";
 import { convertUrls } from "../../companies/database";
-import {
-  UserResolvers,
-  CompanyPrivate,
-  UserRole
-} from "../../generated/graphql/types";
+import { UserResolvers, CompanyPrivate } from "../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 
 const userResolvers: UserResolvers = {
@@ -18,7 +14,7 @@ const userResolvers: UserResolvers = {
     });
     const companies = companyAssociations.map(association => ({
       ...association.company,
-      userRole: association.role as UserRole
+      userRole: association.role
     }));
 
     return companies.map(async company => {

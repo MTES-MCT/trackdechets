@@ -47,6 +47,7 @@ export const GET_ME = gql`
         id
         name
         givenName
+        userRole
         siret
         orgId
         companyTypes
@@ -96,7 +97,10 @@ function DashboardRoutes() {
       const companies = data.me.companies;
       const currentCompany = companies.find(company => company.orgId === siret);
       if (currentCompany) {
-        updatePermissions(currentCompany.userPermissions);
+        updatePermissions(
+          currentCompany.userPermissions,
+          currentCompany.userRole!
+        );
       }
     }
   }, [updatePermissions, data, siret]);
