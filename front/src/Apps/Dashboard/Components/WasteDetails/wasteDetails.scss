@@ -4,7 +4,7 @@
   display: flex;
   box-sizing: border-box;
   padding: 5px 0;
-
+  width: 100%;
   &__infos {
     display: flex;
     flex-direction: column;
@@ -18,7 +18,7 @@
     }
 
     @include xl-desktop {
-      width: 400px;
+      width: 215px;
     }
 
     &__code {
@@ -27,14 +27,14 @@
       font-size: 0.875rem; //14px
       font-weight: 700;
       line-height: 24px;
-      color: #000091;
+      color: #161616;
       width: fit-content;
     }
     &__name,
     &__workflow {
       margin: 0;
       padding: 0;
-      font-size: 0.75rem; //12px
+      font-size: 0.875rem; //14px
       line-height: 20px;
       color: #3a3a3a;
       width: fit-content;
@@ -62,7 +62,7 @@
       align-items: center;
       position: relative;
       font-weight: 400;
-      font-size: 0.75rem; //12px
+      font-size: 0.875rem; //14px
       line-height: 20px;
       color: #161616;
       margin: 0 0 0 -35px;

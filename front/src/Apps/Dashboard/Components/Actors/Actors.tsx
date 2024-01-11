@@ -1,5 +1,4 @@
 import React from "react";
-import { useMedia } from "../../../../common/use-media";
 import { ActorsProps } from "./actorsTypes";
 import {
   IconDestination,
@@ -7,7 +6,6 @@ import {
   IconTransporter,
   IconWorker
 } from "../../../common/Components/Icons/Icons";
-import { MEDIA_QUERIES } from "../../../../common/config";
 
 import "./actors.scss";
 
@@ -17,11 +15,9 @@ function Actors({
   destinationName,
   workerCompanyName
 }: ActorsProps) {
-  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
-
   const truncate = label => {
-    const maxVisible = 30;
-    const maxSubstract = isMobile ? 10 : 9;
+    const maxVisible = 40;
+    const maxSubstract = 9;
     return label.length > maxVisible
       ? label.substring(label.length - maxSubstract, label.length)
       : "";

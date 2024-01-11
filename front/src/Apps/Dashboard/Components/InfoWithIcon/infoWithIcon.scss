@@ -8,6 +8,17 @@
   &:disabled {
     color: initial;
   }
+
+  .edition-pencil-icon {
+    &:before {
+      display: inline-block;
+      content: "";
+      width: 32px;
+      height: 32px;
+      vertical-align: middle;
+      background-image: url("/icons/dashboard/pencil.svg");
+    }
+  }
 }
 .label-icon {
   margin: 0;
@@ -50,13 +61,10 @@
   &__CustomInfo,
   &__TransporterNumberPlate {
     &:before {
-      display: inline-flex;
-      align-items: center;
+      display: inline-block;
       content: "";
       width: 24px;
-      height: 24px;
-      margin-right: 5px;
-      flex-shrink: 0;
+      height: 25px;
       vertical-align: middle;
     }
     display: inline-block;
