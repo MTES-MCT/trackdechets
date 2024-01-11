@@ -23,6 +23,8 @@ import React, { useState } from "react";
 import EstimatedQuantityTooltip from "../../../../../common/components/EstimatedQuantityTooltip";
 import { TransporterForm } from "../../../../../Apps/Forms/Components/TransporterForm/TransporterForm";
 import { useParams } from "react-router-dom";
+import * as yup from "yup";
+import { companySchema } from "../../../../../common/validation/schema";
 
 const MARK_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
@@ -68,6 +70,10 @@ const emptyState = {
   }
 };
 
+const validationSchema = yup.object({
+  transporter: yup.object({ company: companySchema })
+});
+
 const MarkAsResealedModalContent = ({ bsd, onClose }) => {
   const initialValues = mergeDefaults(
     emptyState,
@@ -103,8 +109,8 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
     <div>
       <Formik<ResealedFormInput>
         initialValues={initialValues}
+        validationSchema={validationSchema}
         onSubmit={async ({ wasteDetails, ...values }) => {
-          console.log(values);
           const { errors } = await markAsResealed({
             variables: {
               id: bsd.id,
@@ -230,6 +236,7 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
               Collecteur-transporteur après entreposage ou reconditionnement
             </h5>
 
+            <RedErrorMessage name="transporter.company.name" />
             <TransporterForm fieldName="transporter" orgId={orgId!} />
 
             <div className="form__actions">
