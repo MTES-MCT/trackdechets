@@ -88,7 +88,8 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
               form.temporaryStorageDetail.emittedAt
                 ? "complete"
                 : (form.transporters ?? []).every(t => Boolean(t.takenOverAt))
-                ? "active"
+                ? // Actif si tous les transporteurs ont signé, sinon en attente
+                  "active"
                 : "incomplete"
             }
           >
