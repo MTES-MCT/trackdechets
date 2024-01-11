@@ -357,8 +357,16 @@ export const detailFormFragment = gql`
     intermediaries {
       ...CompanyFragment
     }
+    nextDestination {
+      company {
+        ...CompanyFragment
+      }
+      processingOperation
+      notificationNumber
+    }
   }
   ${transporterFormFragment}
+  ${companyFragment}
 `;
 
 export const statusChangeFragment = gql`

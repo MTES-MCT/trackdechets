@@ -781,7 +781,7 @@ describe("mutation.markAsProcessed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"
+          "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant d'un pays hors Union Européenne)"
       })
     ]);
   });
@@ -1166,7 +1166,7 @@ describe("mutation.markAsProcessed", () => {
           "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
           "Destination ultérieure : L'email de l'entreprise est obligatoire\n" +
-          "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"
+          "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant d'un pays hors Union Européenne)"
       })
     ]);
   });
@@ -1210,7 +1210,7 @@ describe("mutation.markAsProcessed", () => {
           "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
           "Destination ultérieure : L'email de l'entreprise est obligatoire\n" +
-          "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"
+          "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant d'un pays hors Union Européenne)"
       })
     ]);
   });
@@ -1253,7 +1253,7 @@ describe("mutation.markAsProcessed", () => {
           "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
           "Destination ultérieure : L'email de l'entreprise est obligatoire\n" +
-          "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)"
+          "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant d'un pays hors Union Européenne)"
       })
     ]);
   });

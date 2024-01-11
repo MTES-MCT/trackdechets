@@ -36,7 +36,8 @@ describe("rules", () => {
       mail: "",
       phone: "",
       country: "",
-      omiNumber: ""
+      omiNumber: "",
+      extraEuropeanId: ""
     };
     const weight: Required<BspaohWasteWeightInput> = {
       value: 1,

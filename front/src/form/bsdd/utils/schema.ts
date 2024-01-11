@@ -135,7 +135,8 @@ const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
     mail: string().notRequired().nullable(),
     country: string().notRequired().nullable(), // ignored only for compat with CompanyInput
     omiNumber: string().notRequired().nullable(), // ignored only for compat with CompanyInput
-    orgId: string().notRequired().nullable() // ignored only for compat with CompanyInput
+    orgId: string().notRequired().nullable(), // ignored only for compat with CompanyInput
+    extraEuropeanId: string().notRequired().nullable() // ignored only for compat with CompanyInput
   });
 
 export const formSchema = object().shape({
