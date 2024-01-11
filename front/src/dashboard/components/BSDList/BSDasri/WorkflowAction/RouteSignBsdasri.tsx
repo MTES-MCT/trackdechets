@@ -16,12 +16,7 @@ import {
 import { ExtraSignatureType, SignatureType } from "../types";
 import Loader from "../../../../../Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
-import {
-  useParams,
-  useNavigate,
-  generatePath,
-  useMatch
-} from "react-router-dom";
+import { useParams, useNavigate, generatePath } from "react-router-dom";
 import {
   GET_DETAIL_DASRI_WITH_METADATA,
   GET_BSDS
@@ -125,10 +120,7 @@ export function RouteSignBsdasri({
 }) {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const navigate = useNavigate();
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
-  const transporterTabRoute = !isV2Routes
-    ? routes.dashboard.transport.toCollect
-    : routes.dashboardv2.transport.toCollect;
+  const transporterTabRoute = routes.dashboard.transport.toCollect;
   const transporterTab = {
     pathname: generatePath(transporterTabRoute, {
       siret

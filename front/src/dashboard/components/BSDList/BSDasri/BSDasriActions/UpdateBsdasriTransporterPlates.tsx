@@ -8,7 +8,6 @@ import { UPDATE_BSDASRI } from "../../../../../form/bsdasri/utils/queries";
 
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import Tooltip from "../../../../../common/components/Tooltip";
-import { useMatch } from "react-router-dom";
 const TagsInput = lazy(
   () => import("../../../../../common/components/tags-input/TagsInput")
 );
@@ -23,7 +22,6 @@ export function UpdateBsdasriTransporterPlates({
   onModalCloseFromParent?: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   const isOpened = isOpen || isModalOpenFromParent!;
   const handleClose = () => {
@@ -36,7 +34,7 @@ export function UpdateBsdasriTransporterPlates({
 
   return (
     <>
-      {!isV2Routes && !isModalOpenFromParent && (
+      {!isModalOpenFromParent && (
         <button
           className="link__ icon__ btn--no-style"
           onClick={() => setIsOpen(true)}

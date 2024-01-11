@@ -8,7 +8,6 @@ import { NotificationError } from "../../../../Apps/common/Components/Error/Erro
 import { capitalize } from "../../../../common/helper";
 import { IconPaperWrite } from "../../../../Apps/common/Components/Icons/Icons";
 import TdModal from "../../../../Apps/common/Components/Modal/Modal";
-import { useMatch } from "react-router-dom";
 
 const UPDATE_PLATE = gql`
   mutation updateTransporterFields(
@@ -53,7 +52,6 @@ export default function TransporterInfoEdit({
   const mutationFieldName = `transporter${capitalize(fieldName)}`;
 
   const [isOpen, setIsOpen] = useState(false);
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   const [updateTransporterPlate, { error }] = useMutation(UPDATE_PLATE, {
     onCompleted: () => handleClose()
@@ -86,7 +84,7 @@ export default function TransporterInfoEdit({
   };
   return (
     <>
-      {!isV2Routes && !isModalOpenFromParent && (
+      {!isModalOpenFromParent && (
         <button
           className="link__ icon__ btn--no-style"
           onClick={() => setIsOpen(true)}
