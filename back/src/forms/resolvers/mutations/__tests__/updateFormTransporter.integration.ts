@@ -23,7 +23,7 @@ const UPDATE_FORM_TRANSPORTER = gql`
   }
 `;
 
-describe("Mutation.createFormTransporter", () => {
+describe("Mutation.updateFormTransporter", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
@@ -117,12 +117,11 @@ describe("Mutation.createFormTransporter", () => {
       transporter.siret
     );
 
-    /// TODO vérifier ici que :
-    // - transportersSirets est bien mis à jour
-    // - le BSDD est réindexé
-    // Le problème n'est pas très grave pour l'instant car depuis l'UI Trackdéchets l'update d'un
-    // transporteur BSDD est toujours suivi d'un update BSDD qui met à jour `transporterSiets` et
-    // réindexe le BSDD.
+    // S'assure que le champ dé-normalisé `transporterSirets` soit bien à jour
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(updatedForm.transportersSirets).toEqual([transporter.siret]);
   });
 
   it("should throw error if data does not pass validation", async () => {
