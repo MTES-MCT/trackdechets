@@ -539,7 +539,7 @@ export function expandTransporterFromDb(
       transporter.transporterTransportMode === TransportMode.ROAD
         ? null
         : transporter.transporterTransportMode,
-    takenOverAt: transporter.takenOverAt,
+    takenOverAt: processDate(transporter.takenOverAt),
     takenOverBy: transporter.takenOverBy
   });
 }
