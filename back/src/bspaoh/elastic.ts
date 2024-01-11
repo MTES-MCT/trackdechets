@@ -215,6 +215,7 @@ export function toBsdElastic(bspaoh: BspaohForElastic): BsdElastic {
     sirets: distinct(Object.values(where).flat()),
     ...getRegistryFields(bspaoh),
     rawBsd: bspaoh,
+    revisionRequests: [],
 
     // ALL actors from the BSPAOH, for quick search
     companyNames: distinct(

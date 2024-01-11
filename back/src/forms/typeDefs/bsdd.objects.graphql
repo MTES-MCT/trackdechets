@@ -158,6 +158,14 @@ type Form {
   collectivité, etc.) Il pourra lire ce bordereau, sans étape de signature.
   """
   intermediaries: [FormCompany!]!
+
+  "Metadonnées associées au bordereau"
+  metadata: FormMetadata!
+}
+
+type FormMetadata {
+  "EXPERIMENTAL, ne pas utiliser - Dernière révision du bordereau"
+  latestRevision: FormRevisionRequest
 }
 
 """

@@ -239,7 +239,7 @@ model Company {
   MembershipRequest                    MembershipRequest[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
   bsddRevisionRequests                 BsddRevisionRequest[]
-  BsdaRevisionRequest                  BsdaRevisionRequest[]
+  bsdaRevisionRequests                 BsdaRevisionRequest[]
   givenSignatureAutomations            SignatureAutomation[]     @relation("SignatureAutomationFrom")
   receivedSignatureAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
 
@@ -1467,8 +1467,8 @@ model Bsda {
   forwardingId String? @unique
   forwardedIn  Bsda?   @relation("BsdaForwarding")
 
-  BsdaRevisionRequest BsdaRevisionRequest[]
-  intermediaries      IntermediaryBsdaAssociation[]
+  bsdaRevisionRequests BsdaRevisionRequest[]
+  intermediaries       IntermediaryBsdaAssociation[]
 
   // denormalization - sirets and vats from intermediaries
   intermediariesOrgIds String[] @default([])

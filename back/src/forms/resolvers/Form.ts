@@ -11,7 +11,13 @@ const formResolvers: FormResolvers = {
   stateSummary,
   groupedIn,
   grouping,
-  intermediaries
+  intermediaries,
+  metadata: bsdd => {
+    return {
+      ...bsdd.metadata,
+      id: bsdd.id
+    } as any;
+  }
 };
 
 export default formResolvers;
