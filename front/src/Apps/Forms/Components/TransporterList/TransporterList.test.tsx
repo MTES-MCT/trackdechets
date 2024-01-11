@@ -181,4 +181,49 @@ describe("<TransporterList />", () => {
     // on ne peut pas permuter un transporteur qui a déjà signé
     expect(upButtons[1]).toBeDisabled();
   });
+
+  test("Add button is disabled when next transporter has already signed", async () => {
+    const transporter1: CreateOrUpdateTransporterInput = {
+      id: "id",
+      mode: TransportMode.Road,
+      isExemptedOfReceipt: false,
+      company: {
+        siret: "11111111111111",
+        name: "Transporteur 1",
+        contact: "Mr T1",
+        phone: "01 01 01 01 01",
+        mail: "contact@ttransporter1.fr",
+        address: "Somewhere"
+      },
+      receipt: "Rec",
+      department: "07",
+      validityLimit: new Date().toISOString(),
+      takenOverAt: new Date().toISOString(),
+      numberPlate: "FOO"
+    };
+
+    const transporter2: CreateOrUpdateTransporterInput = {
+      id: "id",
+      mode: TransportMode.Road,
+      isExemptedOfReceipt: false,
+      company: {
+        siret: "22222222222222",
+        name: "Transporteur 2",
+        contact: "Mr T2",
+        phone: "01 01 01 01 01",
+        mail: "contact@transporter2.fr",
+        address: "Somewhere"
+      },
+      receipt: "Rec",
+      department: "07",
+      validityLimit: new Date().toISOString(),
+      takenOverAt: new Date().toISOString(),
+      numberPlate: "FOO"
+    };
+
+    render(component([transporter1, transporter2]));
+    const addButtons = screen.getAllByTitle("Ajouter");
+    expect(addButtons[0]).toBeDisabled();
+    expect(addButtons[1]).not.toBeDisabled();
+  });
 });

@@ -3,7 +3,11 @@ import { BsdElastic } from "../common/elastic";
 import { FullForm } from "./types";
 
 import { getTransporterCompanyOrgId } from "@td/constants";
-import { getFirstTransporterSync, getTransportersSync } from "./database";
+import {
+  getFirstTransporterSync,
+  getNextTransporterSync,
+  getTransportersSync
+} from "./database";
 import { FormForElastic } from "./elastic";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
 
@@ -110,8 +114,15 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
       // tra-1294 ETQ destination, je souhaite avoir la possibilité de signer la réception
       // même si l'ensemble des transporteurs visés dans le bordereau n'ont pas pris en charge le déchet,
       // pouvoir gérer au mieux la réception, et éviter le cas où le bordereau serait bloqué en absence
-      // d'un des transporteurs.
-      setFieldTab("recipientCompanySiret", "isForActionFor");
+      // d'un des transporteurs. On fait une exception à la règle dans le cas où l'installation de destination
+      // est également le transporteur N+1.
+      const nextTransporter = getNextTransporterSync(form);
+      if (
+        !nextTransporter ||
+        nextTransporter.transporterCompanySiret !== form.recipientCompanySiret
+      ) {
+        setFieldTab("recipientCompanySiret", "isForActionFor");
+      }
 
       const transporters = getTransportersSync(form);
 

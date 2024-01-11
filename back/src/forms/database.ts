@@ -216,3 +216,12 @@ export function getFirstTransporterSync(form: {
   const firstTransporter = transporters.find(t => t.number === 1);
   return firstTransporter ?? null;
 }
+
+// Renvoie le premier transporteur qui n'a pas encor signé
+export function getNextTransporterSync(form: {
+  transporters: BsddTransporter[] | null;
+}): BsddTransporter | null {
+  const transporters = getTransportersSync(form);
+  const nextTransporter = transporters.find(t => !t.takenOverAt);
+  return nextTransporter ?? null;
+}

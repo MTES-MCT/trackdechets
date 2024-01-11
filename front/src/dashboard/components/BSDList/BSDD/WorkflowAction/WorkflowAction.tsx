@@ -85,6 +85,16 @@ export function WorkflowAction(props: WorkflowActionProps) {
         return <MarkAsReceived {...props} />;
       }
 
+      if (form.transporters?.length > 1) {
+        // Premier transporteur de la liste qui n'a pas encore pris en charge le déchet.
+        const nextTransporter = (form.transporters ?? []).find(
+          t => !t.takenOverAt
+        );
+        if (nextTransporter && siret === nextTransporter.company?.orgId) {
+          return <SignTransportForm {...props} />;
+        }
+      }
+
       return null;
     }
     case FormStatus.TempStored: {

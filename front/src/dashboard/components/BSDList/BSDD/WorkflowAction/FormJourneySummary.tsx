@@ -47,7 +47,6 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
         )}
       </JourneyStop>
       {form.transporters.map((transporter, idx) => {
-        console.log(transporter);
         return (
           <JourneyStop
             key={idx}
@@ -88,8 +87,9 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
             variant={
               form.temporaryStorageDetail.emittedAt
                 ? "complete"
-                : form.takenOverAt
-                ? "active"
+                : (form.transporters ?? []).every(t => Boolean(t.takenOverAt))
+                ? // Actif si tous les transporteurs ont signé, sinon en attente
+                  "active"
                 : "incomplete"
             }
           >

@@ -7,6 +7,7 @@ import {
   CompanySearchResult,
   CompanyType,
   FavoriteType,
+  TransportMode,
   Transporter
 } from "@td/codegen-ui";
 import { formatDate } from "../../../../common/datetime";
@@ -31,7 +32,8 @@ const defaultTransporter: Transporter = {
   },
   receipt: "0101010101",
   department: "13",
-  validityLimit: "2023-12-31T23:00:00.000Z"
+  validityLimit: "2023-12-31T23:00:00.000Z",
+  mode: TransportMode.Road
 };
 
 const searchCompaniesMock = (
@@ -179,6 +181,21 @@ describe("TransporterForm", () => {
         }
       })
     );
+    expect(
+      screen.queryByText("Récépissé de déclaration de transport de déchets")
+    ).not.toBeInTheDocument();
+  });
+
+  test("transporter recepisse error is not displayed if transport mode is not road", () => {
+    render(
+      Component({
+        data: {
+          ...defaultTransporter,
+          mode: TransportMode.Rail
+        }
+      })
+    );
+
     expect(
       screen.queryByText("Récépissé de déclaration de transport de déchets")
     ).not.toBeInTheDocument();
