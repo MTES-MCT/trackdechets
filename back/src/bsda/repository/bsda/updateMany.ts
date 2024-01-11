@@ -19,16 +19,16 @@ export function buildUpdateManyBsdas(deps: RepositoryFnDeps): UpdateManyBsdaFn {
   return async (where, data, logMetadata) => {
     const { prisma, user } = deps;
 
-    const update = await prisma.bsda.updateMany({
-      where,
-      data
-    });
-
     const updatedBsdas = await prisma.bsda.findMany({
       where,
       select: { id: true }
     });
     const ids = updatedBsdas.map(({ id }) => id);
+
+    const update = await prisma.bsda.updateMany({
+      where,
+      data
+    });
 
     for (const id of ids) {
       await prisma.event.create({
