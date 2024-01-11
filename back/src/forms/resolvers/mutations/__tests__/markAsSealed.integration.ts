@@ -86,6 +86,7 @@ describe("Mutation.markAsSealed", () => {
           emitter: CompanyType.PRODUCER,
           recipient: CompanyType.WASTEPROCESSOR,
           trader: CompanyType.TRADER,
+          broker: CompanyType.BROKER,
           transporter: CompanyType.TRANSPORTER
         }[role]);
 

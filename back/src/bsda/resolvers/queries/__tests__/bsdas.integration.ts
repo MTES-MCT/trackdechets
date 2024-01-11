@@ -8,6 +8,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../__tests__/factories";
+import { prisma } from "@td/prisma";
 
 const GET_BSDAS = `
   query GetBsdas($after: ID, $first: Int, $before: ID, $last: Int, $where: BsdaWhere) {
@@ -20,6 +21,14 @@ const GET_BSDAS = `
           }
           forwarding {
             id
+          }
+          metadata {
+            latestRevision {
+              authoringCompany {
+                siret
+              }
+              status
+            }
           }
         }
       }
@@ -278,5 +287,61 @@ describe("Query.bsdas", () => {
     );
 
     expect(data.bsdas.edges.length).toBe(0);
+  });
+
+  it("should return latest revision as metadata", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const worker = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        destinationCompanySiret: destination.company.siret,
+        workerCompanySiret: worker.company.siret
+      }
+    });
+
+    // Accepted revision
+    await prisma.bsdaRevisionRequest.create({
+      data: {
+        comment: "a comment",
+        bsdaId: bsda.id,
+        authoringCompanyId: emitter.company.id,
+        wasteCode: "06 07 02*",
+        status: "ACCEPTED"
+      }
+    });
+    // Pending revision
+    await prisma.bsdaRevisionRequest.create({
+      data: {
+        comment: "a comment",
+        bsdaId: bsda.id,
+        authoringCompanyId: emitter.company.id,
+        wasteCode: "06 07 02*",
+        status: "PENDING",
+        approvals: {
+          createMany: {
+            data: [
+              {
+                status: "PENDING",
+                approverSiret: destination.company.siret!
+              },
+              { status: "ACCEPTED", approverSiret: worker.company.siret! }
+            ]
+          }
+        }
+      }
+    });
+
+    const { query } = makeClient(emitter.user);
+    const { data } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
+      GET_BSDAS
+    );
+
+    expect(data.bsdas.edges.length).toBe(1);
+    expect(data.bsdas.edges[0].node.metadata.latestRevision).toBeDefined();
+    expect(
+      data.bsdas.edges[0].node.metadata.latestRevision?.authoringCompany?.siret
+    ).toBe(emitter.company.siret);
   });
 });

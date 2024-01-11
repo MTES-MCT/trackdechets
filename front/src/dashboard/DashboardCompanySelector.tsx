@@ -21,7 +21,10 @@ export default function DashboardCompanySelector({
   const handleChange = (orgId: string) => {
     const currentCompany = companies.find(company => company.orgId === orgId);
     if (currentCompany) {
-      updatePermissions(currentCompany?.userPermissions);
+      updatePermissions(
+        currentCompany?.userPermissions,
+        currentCompany.userRole!
+      );
     }
 
     handleCompanyChange(orgId);

@@ -144,6 +144,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
         }
       : siretsByTab),
     ...getFormRevisionOrgIds(form),
+    revisionRequests: form.bsddRevisionRequests,
     sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form),
     intermediaries: form.intermediaries,

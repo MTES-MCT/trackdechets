@@ -12,7 +12,7 @@ import {
   VhuAgrementNotFound,
   WorkerCertificationNotFound
 } from "./errors";
-import { CompanyMember, UserRole } from "../generated/graphql/types";
+import { CompanyMember } from "../generated/graphql/types";
 import { AppDataloaders } from "../types";
 import { differenceInDays } from "date-fns";
 import { UserInputError } from "../common/errors";
@@ -186,9 +186,7 @@ export async function getCompanyActiveUsers(
     return {
       ...a.user,
       name: userNameDisplay(a, requestingUserid),
-      // type casting is necessary here as long as we
-      // do not expose READER and DRIVER role in the API
-      role: a.role as UserRole,
+      role: a.role,
       isPendingInvitation: false
     };
   });
@@ -209,9 +207,7 @@ export async function getCompanyInvitedUsers(
       id: h.id,
       name: "Invité",
       email: h.email,
-      // type casting is necessary here as long as we
-      // do not expose READER and DRIVER role in the API
-      role: h.role as UserRole,
+      role: h.role,
       isActive: false,
       isPendingInvitation: true
     };

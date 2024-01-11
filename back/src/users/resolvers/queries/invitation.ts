@@ -1,4 +1,4 @@
-import { QueryResolvers, UserRole } from "../../../generated/graphql/types";
+import { QueryResolvers } from "../../../generated/graphql/types";
 import { getUserAccountHashOrNotFound } from "../../database";
 
 /**
@@ -13,7 +13,7 @@ const invitationResolver: QueryResolvers["invitation"] = async (
   const h = await getUserAccountHashOrNotFound({ hash });
   // type casting is necessary here as long as we
   // do not expose READER and DRIVER role in the API
-  return { ...h, role: h.role as UserRole };
+  return { ...h, role: h.role };
 };
 
 export default invitationResolver;

@@ -33,6 +33,7 @@ export const GET_ME = gql`
         id
         name
         givenName
+        userRole
         orgId
         companyTypes
         userPermissions
@@ -57,7 +58,10 @@ function MobileSubNav({ currentSiret }) {
         company => company.orgId === currentSiret
       );
       if (currentCompany) {
-        updatePermissions(currentCompany.userPermissions);
+        updatePermissions(
+          currentCompany.userPermissions,
+          currentCompany.userRole!
+        );
       }
     }
   }, [updatePermissions, data, currentSiret]);
