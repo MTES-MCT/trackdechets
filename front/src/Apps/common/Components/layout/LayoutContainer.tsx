@@ -86,10 +86,10 @@ export default function LayoutContainer() {
 
   const v2banner = isDashboard ? (
     <SurveyBanner
-      message="« Mes bordereaux » vous permet de découvrir le nouveau tableau de bord. Découvrez-le et partagez-nous vos suggestions."
+      message="Trackdéchets évolue ! L’onglet « Mon Espace » cède sa place au nouveau tableau de bord (« Mes bordereaux ») et de nouvelles fonctionnalités sont disponibles depuis la dernière mise à jour. Pour en savoir plus sur ces dernières évolutions, consultez notre FAQ."
       button={{
-        title: "Partagez vos suggestions",
-        href: "https://tally.so/r/3xDDy9"
+        title: "Voir la FAQ",
+        href: "https://faq.trackdechets.fr/pour-aller-plus-loin/les-dernieres-evolutions-de-trackdechets"
       }}
     ></SurveyBanner>
   ) : undefined;
