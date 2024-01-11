@@ -7,10 +7,10 @@ Nous vous invitons à construire cet input en récupérant les informations rela
 Dans le cas où le nom ou l'adresse ne correspondent pas aux informations du répertoire SIRENE de l'INSEE,
 Trackdéchets les corrigera automatiquement. Une erreur sera levée si vous tentez d'ajouter un établissement qui est fermé selon le répertoire SIRENE.
 
-Dans le cas d'une entreprise extra-européenne sans SIRET ni numéro de TVA intra-communautaire, autorisé seulement pour la destination ultérieures prévue du BSDD,
+Dans le cas d'une entreprise hors Union Européenne sans SIRET ni numéro de TVA intra-communautaire, autorisé seulement pour la destination ultérieures prévue du BSDD,
 le champ `extraEuropeanId` vous permet de renseigner l'identifiant selon le pays d'origine.
 
-Dans le cas d'un navire extra-européen sans SIRET ni numéro de TVA intra-communautaire, autorisé seulement pour les émétteur d'un BSDD,
+Dans le cas d'un navire hors Union Européenne sans SIRET ni numéro de TVA intra-communautaire, autorisé seulement pour les émétteur d'un BSDD,
 le champ `omiNumber` vous permet de renseigner l'identifiant selon l'OMI (International Maritime Organization).
 """
 input CompanyInput {

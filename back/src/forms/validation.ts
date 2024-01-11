@@ -1363,7 +1363,7 @@ const withNextDestination = (required: boolean) =>
     })
     .test(
       "XORIdRequired",
-      `Destination ultérieure : ${MISSING_COMPANY_SIRET} (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant extra-européen)`,
+      `Destination ultérieure : ${MISSING_COMPANY_SIRET} (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant d'un pays hors Union Européenne)`,
       (obj: Partial<Form>) => {
         const ids = [
           obj.nextDestinationCompanyExtraEuropeanId,

@@ -91,8 +91,8 @@ const Company = ({ company, label }: CompanyProps) => (
     {company?.extraEuropeanId && (
       <>
         <dt>
-          Identifiant extra-européen <br />
-          (Si hors Union Européenne en l'absence de numéro de TVA)
+          Identifiant si hors Union Européenne <br />
+          (en l'absence de numéro de TVA)
         </dt>{" "}
         <dd>{company?.extraEuropeanId}</dd>
       </>
