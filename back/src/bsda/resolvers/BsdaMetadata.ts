@@ -5,7 +5,8 @@ import {
 } from "../../generated/graphql/types";
 import { getBsdaOrNotFound } from "../database";
 import { parseBsdaInContext } from "../validation";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
+import { computeLatestRevision } from "../converter";
 
 function getNextSignature(bsda) {
   if (bsda.destinationOperationSignatureAuthor != null) return "OPERATION";
@@ -50,16 +51,6 @@ export const Metadata: BsdaMetadataResolvers = {
       .findUnique({ where: { id: metadata.id } })
       .bsdaRevisionRequests();
 
-    return revisions && revisions.length > 0
-      ? (revisions.reduce((latestRevision, currentRevision) => {
-          if (
-            !latestRevision ||
-            currentRevision.updatedAt > latestRevision.updatedAt
-          ) {
-            return currentRevision;
-          }
-          return latestRevision;
-        }) as any)
-      : null; // Typing as any because some properties are loaded in sub resolvers. Hence the type is not complete.
+    return computeLatestRevision(revisions) as any; // Typing as any because some properties are loaded in sub resolvers. Hence the type is not complete.
   }
 };

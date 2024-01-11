@@ -245,22 +245,27 @@ export function expandBsdaFromElastic(bsda: BsdaForElastic): GraphqlBsda {
     groupedIn,
     forwardedIn,
     metadata: {
-      latestRevision:
-        bsda.bsdaRevisionRequests?.length > 0
-          ? (bsda.bsdaRevisionRequests.reduce(
-              (latestRevision, currentRevision) => {
-                if (
-                  !latestRevision ||
-                  currentRevision.updatedAt > latestRevision.updatedAt
-                ) {
-                  return currentRevision;
-                }
-                return latestRevision;
-              }
-            ) as any)
-          : null
+      latestRevision: computeLatestRevision(bsda.bsdaRevisionRequests) as any
     }
   };
+}
+
+export function computeLatestRevision(
+  revisionRequests: BsdaRevisionRequest[] | null
+) {
+  if (!revisionRequests || revisionRequests.length === 0) {
+    return null;
+  }
+
+  return revisionRequests.reduce((latestRevision, currentRevision) => {
+    if (
+      !latestRevision ||
+      currentRevision.updatedAt > latestRevision.updatedAt
+    ) {
+      return currentRevision;
+    }
+    return latestRevision;
+  });
 }
 
 export function flattenBsdaInput(formInput: BsdaInput) {
