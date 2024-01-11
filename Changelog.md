@@ -17,6 +17,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Amélioration du workflow multi-modal front sur le BSDD [PR 2974](https://github.com/MTES-MCT/trackdechets/pull/2974)
+
 #### :house: Interne
 
 # [2023.12.1] 12/12/2023
