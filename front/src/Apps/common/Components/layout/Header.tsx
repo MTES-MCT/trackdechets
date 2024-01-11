@@ -117,7 +117,7 @@ const getMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
 
   const connected = [
     {
-      caption: "Mes bordereaux 🆕",
+      caption: "Mes bordereaux",
       href: currentSiret
         ? generatePath(routes.dashboard.index, {
             siret: currentSiret
