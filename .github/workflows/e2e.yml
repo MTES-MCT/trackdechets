@@ -43,9 +43,9 @@ jobs:
           sleep 5s
           npx nx run queues-webhooks:serve --verbose >> /tmp/td-queues-webhooks.log &
           sleep 5s
-          npx nx run queues-runner:serve --verbose >> /tmp/td-queues-runner:.log &
+          npx nx run queues-runner:serve --verbose >> /tmp/td-queues-runner.log &
           sleep 5s
-          npx nx run notifier:serve --verbose >> /tmp/td-notifier.log t&
+          npx nx run notifier:serve --verbose >> /tmp/td-notifier.log &
           sleep 5s
           npx nx run front:serve --verbose >> /tmp/td-front.log &
 
@@ -76,7 +76,12 @@ jobs:
       # Show logs
       - name: Show logs
         run: |
-          cat /tmp/trackdechets.log
+          cat /tmp/td-api.log
+          cat /tmp/td-queues-indexation.log
+          cat /tmp/td-queues-webhooks.log
+          cat /tmp/td-queues-runner.log
+          cat /tmp/td-notifier.log
+          cat /tmp/td-front.log
 
       # Playwright
       - name: Install Playwright Browsers
