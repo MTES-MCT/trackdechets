@@ -16,20 +16,11 @@ jobs:
           sudo echo "127.0.0.1 notifier.trackdechets.local" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 redis postgres elasticsearch mongodb" | sudo tee -a /etc/hosts
 
-      # Trackdéchets
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Debug ssh version
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
-        with:
-          ## limits ssh access and adds the ssh public key for the user which triggered the workflow
-          limit-access-to-actor: true
-          ## If no one connects after 5 minutes, shut down server.
-          # wait-timeout-minutes: 5
-
+      # Trackdéchets
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -76,6 +67,15 @@ jobs:
       - name: Show logs
         run: |
           cat /tmp/trackdechets.log
+
+      # Debug ssh version
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+        with:
+          ## limits ssh access and adds the ssh public key for the user which triggered the workflow
+          limit-access-to-actor: true
+          ## If no one connects after 5 minutes, shut down server.
+          # wait-timeout-minutes: 5
 
       # Playwright
       - name: Install Playwright Browsers
