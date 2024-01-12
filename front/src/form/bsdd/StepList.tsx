@@ -8,7 +8,8 @@ import {
   MutationUpdateFormArgs,
   MutationUpdateFormTransporterArgs,
   Query,
-  QueryFormArgs
+  QueryFormArgs,
+  TransportMode
 } from "@td/codegen-ui";
 import React, { ReactElement, useMemo, lazy } from "react";
 import { useNavigate } from "react-router-dom";
@@ -90,11 +91,16 @@ export default function StepsList(props: Props) {
   ): Promise<string> {
     const { id, takenOverAt, ...input } = transporterInput;
 
-    // S'assure que les données de récépissé transport sont nulles
-    // lorsque l'exemption est cochée ou que le transporteur est étranger
+    // S'assure que les données de récépissé transport sont nulles dans les
+    // cas suivants :
+    // - l'exemption est cochée
+    // - le transporteur est étranger
+    // - le transport ne se fait pas par la route
     const cleanInput = {
       ...input,
-      ...(input.isExemptedOfReceipt || isForeignVat(input?.company?.vatNumber)
+      ...(input.isExemptedOfReceipt ||
+      isForeignVat(input?.company?.vatNumber) ||
+      input.mode !== TransportMode.Road
         ? {
             receipt: null,
             validityLimit: null,

@@ -344,7 +344,8 @@ export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
   mail: yup.string().notRequired().nullable(),
   country: yup.string().notRequired().nullable(), // is ignored in db schema
   omiNumber: yup.string().notRequired().nullable(), // is ignored in db schema
-  orgId: yup.string().notRequired().nullable() // is ignored in db schema
+  orgId: yup.string().notRequired().nullable(), // is ignored in db schema
+  extraEuropeanId: yup.string().notRequired().nullable() // is ignored in db schema
 });
 
 /**

@@ -173,7 +173,7 @@ input NextDestinationInput {
   notificationNumber: String
 
   "Établissement de destination ultérieur"
-  company: InternationalCompanyInput
+  company: CompanyInput
 }
 
 "Payload de création d'un bordereau"
@@ -420,47 +420,6 @@ input DestinationInput {
   ou de reconditionnement qui a saisi les informations
   """
   isFilledByEmitter: Boolean
-}
-
-"""
-Payload d'un établissement pouvant se situer en France
-ou à l'étranger uniquement pour NextDestinationInput
-"""
-input InternationalCompanyInput {
-  "Un identifiant d'établissement hors EU"
-  extraEuropeanId: String
-
-  "SIRET de l'établissement, optionnel dans le cas d'un établissement à l'étranger"
-  siret: String
-
-  """
-  Numéro de TVA intra-communautaire de l'établissement.
-  """
-  vatNumber: String
-
-  "Nom de l'établissement"
-  name: String
-
-  "Adresse de l'établissement"
-  address: String
-
-  """
-  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
-  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
-
-  En l'absence de code, le pays est FR si un siret est donné, ou détecté depuis le numéro de TVA si vatNumber est donné.
-  Une incohérence du pays avec le siret ou le numéro pays détecté du numéro de TVA résultera en une erreur type BAD_USER_INPUT.
-  """
-  country: String
-
-  "Nom du contact dans l'établissement"
-  contact: String
-
-  "Email du contact dans l'établissement"
-  mail: String
-
-  "Numéro de téléphone de contact dans l'établissement"
-  phone: String
 }
 
 "Payload d'une adresse chantier"

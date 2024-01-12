@@ -3,7 +3,6 @@ import { useMutation, gql } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
 import { useNavigate } from "react-router-dom";
 import routes from "../Apps/routes";
-import { GET_ME } from "../dashboard/Dashboard";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 import RedErrorMessage from "../common/components/RedErrorMessage";
 import CompanyType from "../login/CompanyType";
@@ -35,6 +34,23 @@ import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+
+const GET_ME = gql`
+  {
+    me {
+      id
+      companies {
+        id
+        name
+        givenName
+        siret
+        orgId
+        companyTypes
+        userPermissions
+      }
+    }
+  }
+`;
 
 export const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {

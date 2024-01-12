@@ -1,5 +1,5 @@
 import React, { useContext, useState, useCallback } from "react";
-import { UserPermission } from "@td/codegen-ui";
+import { UserPermission, UserRole } from "@td/codegen-ui";
 
 interface InterfacePermissions {
   children: React.ReactNode;
@@ -8,7 +8,11 @@ interface InterfacePermissions {
 
 type PermissionsContextType = {
   permissions: UserPermission[];
-  updatePermissions: (newPermissions: UserPermission[]) => void;
+  role?: UserRole;
+  updatePermissions: (
+    newPermissions: UserPermission[],
+    newRole: UserRole
+  ) => void;
 };
 
 const PermissionsContext = React.createContext<PermissionsContextType | null>(
@@ -25,16 +29,20 @@ export function PermissionsProvider({
 }: InterfacePermissions) {
   const [permissions, setPermissions] =
     useState<UserPermission[]>(defaultPermissions);
+  const [role, setRole] = useState<UserRole>();
 
   const updatePermissions = useCallback(
-    (newPermissions: UserPermission[]) => {
+    (newPermissions: UserPermission[], newRole: UserRole) => {
       setPermissions(newPermissions);
+      setRole(newRole);
     },
-    [setPermissions]
+    [setPermissions, setRole]
   );
 
   return (
-    <PermissionsContext.Provider value={{ permissions, updatePermissions }}>
+    <PermissionsContext.Provider
+      value={{ permissions, role, updatePermissions }}
+    >
       {children}
     </PermissionsContext.Provider>
   );

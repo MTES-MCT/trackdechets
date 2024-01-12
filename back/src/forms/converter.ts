@@ -61,7 +61,6 @@ import { prisma } from "@td/prisma";
 import { extractPostalCode } from "../utils";
 import { getFirstTransporterSync } from "./database";
 import { FormForElastic } from "./elastic";
-import DataLoader from "dataloader";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput | null;
@@ -540,7 +539,7 @@ export function expandTransporterFromDb(
       transporter.transporterTransportMode === TransportMode.ROAD
         ? null
         : transporter.transporterTransportMode,
-    takenOverAt: transporter.takenOverAt,
+    takenOverAt: processDate(transporter.takenOverAt),
     takenOverBy: transporter.takenOverBy
   });
 }
@@ -734,6 +733,7 @@ export function expandFormFromDb(
             name: forwardedIn.nextDestinationCompanyName,
             siret: forwardedIn.nextDestinationCompanySiret,
             vatNumber: forwardedIn.nextDestinationCompanyVatNumber,
+            extraEuropeanId: forwardedIn.nextDestinationCompanyExtraEuropeanId,
             address: forwardedIn.nextDestinationCompanyAddress,
             country: forwardedIn.nextDestinationCompanyCountry,
             contact: forwardedIn.nextDestinationCompanyContact,
@@ -748,6 +748,7 @@ export function expandFormFromDb(
             name: form.nextDestinationCompanyName,
             siret: form.nextDestinationCompanySiret,
             vatNumber: form.nextDestinationCompanyVatNumber,
+            extraEuropeanId: form.nextDestinationCompanyExtraEuropeanId,
             address: form.nextDestinationCompanyAddress,
             country: form.nextDestinationCompanyCountry,
             contact: form.nextDestinationCompanyContact,
@@ -817,30 +818,33 @@ export function expandFormFromDb(
           // Deprecated: Remplacé par emittedBy
           signedBy: forwardedIn.emittedBy
         }
-      : null
+      : null,
+    metadata: undefined as any
   };
 }
 
-export async function expandFormFromElastic(
-  form: FormForElastic,
-  formLoader?: DataLoader<
-    string,
-    PrismaFormWithForwardedInAndTransporters | undefined,
-    string
-  >
-): Promise<GraphQLForm | null> {
-  const formWithInclude = await (formLoader
-    ? formLoader.load(form.id)
-    : prisma.form.findUniqueOrThrow({
-        where: { id: form.id },
-        include: expandableFormIncludes
-      }));
+export function expandFormFromElastic(form: FormForElastic): GraphQLForm {
+  const expandedForm = expandFormFromDb(form);
 
-  if (!formWithInclude) {
-    return null;
-  }
-
-  return expandFormFromDb(formWithInclude);
+  return {
+    ...expandedForm,
+    metadata: {
+      latestRevision:
+        form.bsddRevisionRequests?.length > 0
+          ? (form.bsddRevisionRequests.reduce(
+              (latestRevision, currentRevision) => {
+                if (
+                  !latestRevision ||
+                  currentRevision.updatedAt > latestRevision.updatedAt
+                ) {
+                  return currentRevision;
+                }
+                return latestRevision;
+              }
+            ) as any)
+          : null
+    }
+  };
 }
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;

@@ -136,6 +136,15 @@ describe("Mutation.deleteFormTransporter", () => {
         transporterCompanySiret: transporter4.siret
       })
     ]);
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(updatedForm.transportersSirets).toEqual([
+      transporter1.siret,
+      transporter3.siret,
+      transporter4.siret
+    ]);
   });
 
   it("should not allow a user to delete a transporter from a form he is not part of", async () => {

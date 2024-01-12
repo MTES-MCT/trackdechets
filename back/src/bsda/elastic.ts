@@ -256,6 +256,7 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     destinationOperationDate: bsda.destinationOperationDate?.getTime(),
     ...where,
     ...getBsdaRevisionOrgIds(bsda),
+    revisionRequests: bsda.bsdaRevisionRequests,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda),
     intermediaries: bsda.intermediaries,
@@ -299,5 +300,5 @@ export function indexBsda(bsda: BsdaForElastic, ctx?: GraphQLContext) {
 export function getBsdaRevisionOrgIds(
   bsda: BsdaForElastic
 ): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
-  return getRevisionOrgIds(bsda.BsdaRevisionRequest);
+  return getRevisionOrgIds(bsda.bsdaRevisionRequests);
 }

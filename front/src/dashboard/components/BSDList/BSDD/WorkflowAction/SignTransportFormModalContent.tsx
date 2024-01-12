@@ -112,6 +112,10 @@ export default function SignTransportFormModalContent({
   }
   const form = data?.form;
 
+  const signingTransporter = form.transporters.find(
+    t => !t.takenOverAt && t.company?.orgId === siret
+  );
+
   const TODAY = new Date();
 
   return (
@@ -120,7 +124,7 @@ export default function SignTransportFormModalContent({
         takenOverBy: "",
         takenOverAt: TODAY.toISOString(),
         securityCode: "",
-        transporterNumberPlate: form.stateSummary?.transporterNumberPlate ?? "",
+        transporterNumberPlate: signingTransporter!.numberPlate ?? "",
         emitter: { type: form?.emitter?.type },
         update: {
           quantity: form.wasteDetails?.quantity ?? 0,
@@ -179,7 +183,7 @@ export default function SignTransportFormModalContent({
           <FormWasteTransportSummary form={form} />
           <FormJourneySummary form={form} />
           {form.emitter?.type !== EmitterType.Appendix1Producer && (
-            <TransporterRecepisseWrapper transporter={form.transporter!} />
+            <TransporterRecepisseWrapper transporter={signingTransporter!} />
           )}
           <p>
             En qualité de <strong>transporteur du déchet</strong>, j'atteste que
@@ -217,7 +221,6 @@ export default function SignTransportFormModalContent({
           </div>
 
           {![
-            form.transporter?.company?.orgId,
             ...(form.transporters ?? []).map(t => t.company?.orgId),
             form.temporaryStorageDetail?.transporter?.company?.orgId
           ].includes(siret) && (

@@ -79,11 +79,24 @@ const Company = ({ company, label }: CompanyProps) => (
     <dt>{label}</dt> <dd>{company?.name}</dd>
     <dt>Siret</dt> <dd>{company?.siret}</dd>
     <dt>Numéro de TVA</dt> <dd>{company?.vatNumber}</dd>
-    <dt>
-      Numéro OMI <br />
-      (Organisation maritime internationale)
-    </dt>{" "}
-    <dd>{company?.omiNumber}</dd>
+    {company?.omiNumber && (
+      <>
+        <dt>
+          Numéro OMI <br />
+          (Organisation maritime internationale)
+        </dt>{" "}
+        <dd>{company?.omiNumber}</dd>
+      </>
+    )}
+    {company?.extraEuropeanId && (
+      <>
+        <dt>
+          Identifiant si hors Union Européenne <br />
+          (en l'absence de numéro de TVA)
+        </dt>{" "}
+        <dd>{company?.extraEuropeanId}</dd>
+      </>
+    )}
     <dt>Adresse</dt> <dd>{company?.address}</dd>
     <dt>Tél</dt> <dd>{company?.phone}</dd>
     <dt>Mél</dt> <dd>{company?.mail}</dd>
@@ -334,7 +347,6 @@ const Recipient = ({
   const recipient = hasTempStorage
     ? form.temporaryStorageDetail?.destination
     : form.recipient;
-
   return (
     <>
       {" "}
@@ -381,6 +393,24 @@ const Recipient = ({
             <GroupedIn form={form} key={form.id} />
           ))}
       </div>
+      {form.nextDestination?.company && (
+        <div className={styles.detailGrid}>
+          <DetailRow
+            value={form.nextDestination?.processingOperation}
+            label="Opération ultérieure prévue"
+          />
+          {form.nextDestination.notificationNumber && (
+            <DetailRow
+              value={form.nextDestination?.notificationNumber}
+              label="Numéro de notification"
+            />
+          )}
+          <Company
+            label="Destination ultérieure prévue"
+            company={form.nextDestination?.company}
+          />
+        </div>
+      )}
     </>
   );
 };
@@ -576,6 +606,20 @@ export default function BSDDetailContent({
   const isChapeau: boolean = form?.emitter?.type === EmitterType.Appendix1;
   const isAppendix1Producer: boolean =
     form?.emitter?.type === EmitterType.Appendix1Producer;
+
+  const canDelete =
+    [FormStatus.Draft, FormStatus.Sealed].includes(form.status) ||
+    (form.status === FormStatus.SignedByProducer &&
+      siret === form.emitter?.company?.orgId);
+
+  const canUpdate =
+    [
+      FormStatus.Draft,
+      FormStatus.Sealed,
+      FormStatus.SignedByProducer,
+      FormStatus.Sent
+    ].includes(form.status) &&
+    EmitterType.Appendix1Producer !== form.emitter?.type;
 
   return (
     <>
@@ -932,35 +976,27 @@ export default function BSDDetailContent({
             <IconDuplicateFile size="24px" color="blueLight" />
             <span>Dupliquer</span>
           </button>
-          {[
-            FormStatus.Draft,
-            FormStatus.Sealed,
-            FormStatus.SignedByProducer
-          ].includes(form.status) && (
-            <>
-              <button
-                className="btn btn--outline-primary"
-                onClick={() => setIsDeleting(true)}
-              >
-                <IconTrash color="blueLight" size="24px" />
-                <span>Supprimer</span>
-              </button>
-
-              {EmitterType.Appendix1Producer !== form.emitter?.type && (
-                <Link
-                  to={generatePath(routes.dashboard.bsdds.edit, {
-                    siret,
-                    id: form.id
-                  })}
-                  className="btn btn--outline-primary"
-                >
-                  <IconPaperWrite size="24px" color="blueLight" />
-                  <span>Modifier</span>
-                </Link>
-              )}
-            </>
+          {canDelete && (
+            <button
+              className="btn btn--outline-primary"
+              onClick={() => setIsDeleting(true)}
+            >
+              <IconTrash color="blueLight" size="24px" />
+              <span>Supprimer</span>
+            </button>
           )}
-
+          {canUpdate && (
+            <Link
+              to={generatePath(routes.dashboard.bsdds.edit, {
+                siret,
+                id: form.id
+              })}
+              className="btn btn--outline-primary"
+            >
+              <IconPaperWrite size="24px" color="blueLight" />
+              <span>Modifier</span>
+            </Link>
+          )}
           <WorkflowAction siret={siret!} form={form} />
           {children}
         </div>

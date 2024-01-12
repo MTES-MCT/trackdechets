@@ -21,6 +21,8 @@ Le rôle `ADMIN` a les mêmes permissions que le rôle `MEMBER` avec en plus :
 - Renouveler le code de signature
 """
 enum UserRole {
+  READER
+  DRIVER
   MEMBER
   ADMIN
 }

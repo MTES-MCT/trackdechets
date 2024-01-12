@@ -47,6 +47,7 @@ export const GET_ME = gql`
         id
         name
         givenName
+        userRole
         siret
         orgId
         companyTypes
@@ -57,7 +58,7 @@ export const GET_ME = gql`
 `;
 
 const toRelative = route => {
-  return getRelativeRoute(routes.dashboardv2.index, route);
+  return getRelativeRoute(routes.dashboard.index, route);
 };
 
 function DashboardRoutes() {
@@ -77,7 +78,7 @@ function DashboardRoutes() {
 
   const goToCollectDashboard = useCallback(() => {
     navigate(
-      generatePath(routes.dashboardv2.transport.toCollect, {
+      generatePath(routes.dashboard.transport.toCollect, {
         siret
       })
     );
@@ -85,7 +86,7 @@ function DashboardRoutes() {
 
   const goToActionDashboard = useCallback(() => {
     navigate(
-      generatePath(routes.dashboardv2.bsds.act, {
+      generatePath(routes.dashboard.bsds.act, {
         siret
       })
     );
@@ -96,7 +97,10 @@ function DashboardRoutes() {
       const companies = data.me.companies;
       const currentCompany = companies.find(company => company.orgId === siret);
       if (currentCompany) {
-        updatePermissions(currentCompany.userPermissions);
+        updatePermissions(
+          currentCompany.userPermissions,
+          currentCompany.userRole!
+        );
       }
     }
   }, [updatePermissions, data, siret]);
@@ -115,7 +119,7 @@ function DashboardRoutes() {
       <Navigate
         to={
           companies.length > 0
-            ? generatePath(routes.dashboardv2.bsds.index, {
+            ? generatePath(routes.dashboard.bsds.index, {
                 siret: companies[0].orgId
               })
             : routes.account.companies.list
@@ -140,12 +144,12 @@ function DashboardRoutes() {
           <Routes location={backgroundLocation ?? location}>
             <Route
               index
-              element={<Redirect path={routes.dashboardv2.bsds.index} />}
+              element={<Redirect path={routes.dashboard.bsds.index} />}
             />
 
             <Route
               path=":siret/slips/view/:id"
-              element={<Redirect path={routes.dashboardv2.bsdds.view} />}
+              element={<Redirect path={routes.dashboard.bsdds.view} />}
             />
 
             <Route
@@ -159,105 +163,105 @@ function DashboardRoutes() {
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsdds.view)}
+              path={toRelative(routes.dashboard.bsdds.view)}
               element={<RouteBSDDsView />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsdds.review)}
+              path={toRelative(routes.dashboard.bsdds.review)}
               element={<RouteBsddRequestRevision />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsdasris.view)}
+              path={toRelative(routes.dashboard.bsdasris.view)}
               element={<RouteBSDasrisView />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsvhus.view)}
+              path={toRelative(routes.dashboard.bsvhus.view)}
               element={<RouteBsvhusView />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsdas.view)}
+              path={toRelative(routes.dashboard.bsdas.view)}
               element={<RouteBSDasView />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsdas.review)}
+              path={toRelative(routes.dashboard.bsdas.review)}
               element={<RouteBsdaRequestRevision />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsffs.view)}
+              path={toRelative(routes.dashboard.bsffs.view)}
               element={<RouteBsffsView />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.exports)}
+              path={toRelative(routes.dashboard.exports)}
               element={<Exports companies={companies} />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsds.index)}
+              path={toRelative(routes.dashboard.bsds.index)}
               element={<DashboardPage />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsds.drafts)}
+              path={toRelative(routes.dashboard.bsds.drafts)}
               element={<DashboardPage />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsds.act)}
+              path={toRelative(routes.dashboard.bsds.act)}
               element={<DashboardPage />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsds.follow)}
+              path={toRelative(routes.dashboard.bsds.follow)}
               element={<DashboardPage />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsds.history)}
+              path={toRelative(routes.dashboard.bsds.history)}
               element={<DashboardPage />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsds.reviews)}
+              path={toRelative(routes.dashboard.bsds.reviews)}
               element={<DashboardPage key="reviewsPage" />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsds.toReviewed)}
+              path={toRelative(routes.dashboard.bsds.toReviewed)}
               element={<DashboardPage />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.bsds.reviewed)}
+              path={toRelative(routes.dashboard.bsds.reviewed)}
               element={<DashboardPage />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.transport.toCollect)}
+              path={toRelative(routes.dashboard.transport.toCollect)}
               element={<DashboardPage />}
             />
 
             <Route
-              path={toRelative(routes.dashboardv2.transport.collected)}
+              path={toRelative(routes.dashboard.transport.collected)}
               element={<DashboardPage />}
             />
 
             <Route
-              path={`${routes.dashboardv2.index}/*`}
-              element={<Redirect path={routes.dashboardv2.bsds.index} />}
+              path={`${routes.dashboard.index}/*`}
+              element={<Redirect path={routes.dashboard.bsds.index} />}
             />
           </Routes>
 
           {backgroundLocation && (
             <Routes location={location}>
               <Route
-                path={toRelative(routes.dashboardv2.bsdds.view)}
+                path={toRelative(routes.dashboard.bsdds.view)}
                 element={
                   <Modal
                     onClose={goBack}
@@ -272,7 +276,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(routes.dashboardv2.bsdds.review)}
+                path={toRelative(routes.dashboard.bsdds.review)}
                 element={
                   <Modal
                     onClose={goBack}
@@ -287,7 +291,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(routes.dashboardv2.roadControl)}
+                path={toRelative(routes.dashboard.roadControl)}
                 element={
                   <Modal onClose={goBack} ariaLabel="Contrôle routier" isOpen>
                     <RouteControlPdf />
@@ -296,7 +300,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(routes.dashboardv2.bsdasris.sign.publish)}
+                path={toRelative(routes.dashboard.bsdasris.sign.publish)}
                 element={
                   <Modal onClose={goBack} ariaLabel="Publier un dasri" isOpen>
                     <RoutePublishBsdasri />
@@ -306,7 +310,7 @@ function DashboardRoutes() {
 
               <Route
                 path={toRelative(
-                  routes.dashboardv2.bsdasris.sign.emissionSecretCode
+                  routes.dashboard.bsdasris.sign.emissionSecretCode
                 )}
                 element={
                   <Modal
@@ -320,9 +324,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(
-                  routes.dashboardv2.bsdasris.sign.directTakeover
-                )}
+                path={toRelative(routes.dashboard.bsdasris.sign.directTakeover)}
                 element={
                   <Modal
                     onClose={goToCollectDashboard}
@@ -338,7 +340,7 @@ function DashboardRoutes() {
 
               <Route
                 path={toRelative(
-                  routes.dashboardv2.bsdasris.sign.synthesisTakeover
+                  routes.dashboard.bsdasris.sign.synthesisTakeover
                 )}
                 element={
                   <Modal
@@ -354,7 +356,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(routes.dashboardv2.bsdasris.sign.transporter)}
+                path={toRelative(routes.dashboard.bsdasris.sign.transporter)}
                 element={
                   <Modal
                     onClose={goToActionDashboard}
@@ -369,7 +371,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(routes.dashboardv2.bsdasris.sign.emission)}
+                path={toRelative(routes.dashboard.bsdasris.sign.emission)}
                 element={
                   <Modal
                     onClose={goToActionDashboard}
@@ -384,7 +386,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(routes.dashboardv2.bsdasris.sign.reception)}
+                path={toRelative(routes.dashboard.bsdasris.sign.reception)}
                 element={
                   <Modal
                     onClose={goToActionDashboard}
@@ -399,7 +401,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(routes.dashboardv2.bsdasris.sign.operation)}
+                path={toRelative(routes.dashboard.bsdasris.sign.operation)}
                 element={
                   <Modal
                     onClose={goToActionDashboard}
@@ -414,7 +416,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(routes.dashboardv2.bsdasris.view)}
+                path={toRelative(routes.dashboard.bsdasris.view)}
                 element={
                   <Modal
                     onClose={goBack}
@@ -429,7 +431,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(routes.dashboardv2.bsvhus.view)}
+                path={toRelative(routes.dashboard.bsvhus.view)}
                 element={
                   <Modal
                     onClose={goBack}
@@ -444,7 +446,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(routes.dashboardv2.bsdas.view)}
+                path={toRelative(routes.dashboard.bsdas.view)}
                 element={
                   <Modal
                     onClose={goBack}
@@ -459,7 +461,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(routes.dashboardv2.bsdas.review)}
+                path={toRelative(routes.dashboard.bsdas.review)}
                 element={
                   <Modal
                     onClose={goBack}
@@ -474,7 +476,7 @@ function DashboardRoutes() {
               />
 
               <Route
-                path={toRelative(routes.dashboardv2.bsffs.view)}
+                path={toRelative(routes.dashboard.bsffs.view)}
                 element={
                   <Modal
                     onClose={goBack}

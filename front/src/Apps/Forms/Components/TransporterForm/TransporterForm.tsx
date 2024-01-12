@@ -9,6 +9,7 @@ import {
   CompanyType,
   FavoriteType,
   Transporter as FormTransporter,
+  TransportMode,
   Transporter
 } from "@td/codegen-ui";
 import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
@@ -154,13 +155,16 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
         )}
       </Field>
 
-      {!!transporterOrgId && !isForeign && !transporter.isExemptedOfReceipt && (
-        <TransporterRecepisse
-          number={transporter.receipt}
-          department={transporter.department}
-          validityLimit={transporter.validityLimit}
-        />
-      )}
+      {!!transporterOrgId &&
+        !isForeign &&
+        !transporter.isExemptedOfReceipt &&
+        transporter.mode === TransportMode.Road && (
+          <TransporterRecepisse
+            number={transporter.receipt}
+            department={transporter.department}
+            validityLimit={transporter.validityLimit}
+          />
+        )}
 
       <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
         <div className="fr-col-12 fr-col-md-3">

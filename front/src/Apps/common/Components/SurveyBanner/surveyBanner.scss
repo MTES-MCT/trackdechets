@@ -39,6 +39,10 @@
     align-self: center;
   }
 
+  &__link {
+    flex-shrink: 0;
+  }
+
   &__link a {
     display: flex;
     align-items: center;

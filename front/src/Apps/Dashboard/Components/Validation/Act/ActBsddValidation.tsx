@@ -312,6 +312,19 @@ const ActBsddValidation = ({
 
   const renderContentSent = () => {
     const isTempStorage = bsd.recipient?.isTempStorage;
+
+    // Renvoie la modale de signature transporteur en cas de transport
+    // multi-modal si l'établissement courant est le prochain transporter à devoir signer
+    const nextTransporter = (bsd.transporters ?? []).find(t => !t.takenOverAt);
+
+    if (nextTransporter && nextTransporter.company?.orgId === currentSiret) {
+      return renderSignTransportFormModal();
+    }
+
+    // Renvoie la modale de signature de la réception si l'établissement courant
+    // correspond à l'installation de destination. Si l'établissement courant est
+    // à la fois le prochain transporteur multi-modal et l'installation de destination
+    // on donne la priorité à la signature transporteur pour respecter le workflow.
     if (currentSiret === bsd.recipient?.company?.siret) {
       if (!!bsddGetLoading) {
         return <Loader />;
@@ -341,12 +354,6 @@ const ActBsddValidation = ({
           return renderAddAppendix1Modal();
         }
       }
-    }
-
-    const nextTransporter = (bsd.transporters ?? []).find(t => !t.takenOverAt);
-
-    if (nextTransporter && nextTransporter.company?.orgId === currentSiret) {
-      return renderSignTransportFormModal();
     }
   };
 

@@ -9,7 +9,7 @@ import {
   SignatureTypeInput
 } from "@td/codegen-ui";
 import React from "react";
-import { generatePath, Link, useMatch } from "react-router-dom";
+import { generatePath, Link } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
@@ -43,8 +43,6 @@ export function SignEmission({
   >(SIGN_BSVHU, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   const TODAY = new Date();
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
-  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
 
   return (
     <SignBsvhu
@@ -69,7 +67,7 @@ export function SignEmission({
               ))}
             </ul>
             <Link
-              to={generatePath(routes[dashboardRoutePrefix].bsvhus.edit, {
+              to={generatePath(routes.dashboard.bsvhus.edit, {
                 siret,
                 id: bsvhu.id
               })}

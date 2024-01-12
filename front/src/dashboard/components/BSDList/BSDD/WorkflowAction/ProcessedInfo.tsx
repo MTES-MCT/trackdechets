@@ -55,6 +55,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
        * Soon notificationNumber will be required for intra-european companies too
        */
       setFieldValue("nextDestination.company", initNextDestination.company);
+      setFieldValue("nextDestination.company.country", "");
       setFieldValue(
         "nextDestination.company.extraEuropeanId",
         !extraEuropeanCompany
@@ -209,27 +210,23 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
                 </option>
               ))}
             </Field>
-            <div className="form__row form__row--inline">
-              <input
-                type="checkbox"
-                checked={isExtraEuropeanCompany}
-                onChange={e => setIsExtraEuropeanCompany(e.target.checked)}
-                className="td-checkbox"
-              />
-
-              <label htmlFor="id_isExtraEuropeanId">
-                Destinataire hors U.E.
-              </label>
-            </div>
           </div>
-          {isExtraEuropeanCompany ? (
-            <ExtraEuropeanCompanyManualInput
-              name="nextDestination.company"
-              optional={noTraceability === true}
-              extraEuropeanCompanyId={extraEuropeanCompany}
-              onExtraEuropeanCompanyId={setExtraEuropeanCompany}
+          <div className="form__row form__row--inline">
+            <Field
+              type="checkbox"
+              name="isExtraEuropeanCompany"
+              id="id_isExtraEuropeanId"
+              className="td-checkbox"
+              checked={isExtraEuropeanCompany}
+              onChange={e => setIsExtraEuropeanCompany(e.target.checked)}
             />
-          ) : (
+            <label htmlFor="id_isExtraEuropeanId">
+              {" "}
+              Destinataire hors Union Européenne
+              <Tooltip msg="Si le numéro de TVA n'est pas reconnu, veuillez aussi cocher ce champ et indiquer manuellement le numéro" />
+            </label>
+          </div>
+          {!isExtraEuropeanCompany && (
             <CompanySelector
               name="nextDestination.company"
               allowForeignCompanies={true}
@@ -237,7 +234,6 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
               optional={noTraceability === true}
             />
           )}
-
           <div className="form__row">
             <label>
               Numéro de notification ou de document{" "}
@@ -251,6 +247,14 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
               placeholder="PPNNNN (PP: code pays, NNNN: numéro d'ordre)"
               required={isExtraEuropeanCompany}
             />
+            {isExtraEuropeanCompany && (
+              <ExtraEuropeanCompanyManualInput
+                name="nextDestination.company"
+                optional={noTraceability === true}
+                extraEuropeanCompanyId={extraEuropeanCompany}
+                onExtraEuropeanCompanyId={setExtraEuropeanCompany}
+              />
+            )}
           </div>
         </div>
       )}

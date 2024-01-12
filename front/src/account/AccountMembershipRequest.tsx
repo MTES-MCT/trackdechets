@@ -129,8 +129,10 @@ export default function AccountMembershipRequest() {
               value={userRole}
               onChange={e => setUserRole(e.target.value as UserRole)}
             >
-              <option value={UserRole.Member}>Collaborateur</option>
               <option value={UserRole.Admin}>Administrateur</option>
+              <option value={UserRole.Member}>Collaborateur</option>
+              <option value={UserRole.Reader}>Lecteur</option>
+              <option value={UserRole.Driver}>Chauffeur</option>
             </select>
           </div>
 
