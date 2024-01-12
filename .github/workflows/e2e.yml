@@ -16,11 +16,10 @@ jobs:
           sudo echo "127.0.0.1 notifier.trackdechets.local" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 redis postgres elasticsearch mongodb" | sudo tee -a /etc/hosts
 
+      # Trackdéchets
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      # Trackdéchets
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -37,51 +36,46 @@ jobs:
           TERM=xterm bash ./scripts/deploy-db.sh
       - name: Start TD applications
         run: |
-          npx nx run api:serve --verbose >> /tmp/td-api.log &
-          sleep 2s
-          npx nx run queues-indexation:serve --verbose >> /tmp/td-queues-indexation.log &
-          sleep 2s
-          npx nx run queues-webhooks:serve --verbose >> /tmp/td-queues-webhooks.log &
-          sleep 2s
-          npx nx run queues-runner:serve --verbose >> /tmp/td-queues-runner.log &
-          sleep 2s
-          npx nx run notifier:serve --verbose >> /tmp/td-notifier.log &
-          sleep 2s
-          npx nx run front:serve --verbose >> /tmp/td-front.log &
+          npx nx run api:serve >> /tmp/td-api.log &
+          npx nx run queues-indexation:serve >> /tmp/td-queues-indexation.log &
+          npx nx run queues-webhooks:serve >> /tmp/td-queues-webhooks.log &
+          npx nx run queues-runner:serve >> /tmp/td-queues-runner.log &
+          npx nx run notifier:serve >> /tmp/td-notifier.log &
+          npx nx run front:serve >> /tmp/td-front.log &
 
       # Wait
-      - name: Wait
-        run: |
-          sleep 60s
+      # - name: Wait
+      #   run: |
+      #     sleep 60s
 
       # Debug
-      - name: Testing API resolution
-        run: |
-          ping -c 2 api.trackdechets.local
-          curl api.trackdechets.local
-      - name: Testing UI resolution
-        run: |
-          ping -c 2 trackdechets.local
-          curl trackdechets.local/login
-          curl trackdechets.local/src/index.tsx
-      - name: Testing ES resolution
-        run: |
-          ping -c 2 es.trackdechets.local
-          curl es.trackdechets.local
-      - name: Testing Notifier resolution
-        run: |
-          ping -c 2 notifier.trackdechets.local
-          curl notifier.trackdechets.local
+      # - name: Testing API resolution
+      #   run: |
+      #     ping -c 2 api.trackdechets.local
+      #     curl api.trackdechets.local
+      # - name: Testing UI resolution
+      #   run: |
+      #     ping -c 2 trackdechets.local
+      #     curl trackdechets.local/login
+      #     curl trackdechets.local/src/index.tsx
+      # - name: Testing ES resolution
+      #   run: |
+      #     ping -c 2 es.trackdechets.local
+      #     curl es.trackdechets.local
+      # - name: Testing Notifier resolution
+      #   run: |
+      #     ping -c 2 notifier.trackdechets.local
+      #     curl notifier.trackdechets.local
 
       # Show logs
-      - name: Show logs
-        run: |
-          cat /tmp/td-api.log
-          cat /tmp/td-queues-indexation.log
-          cat /tmp/td-queues-webhooks.log
-          cat /tmp/td-queues-runner.log
-          cat /tmp/td-notifier.log
-          cat /tmp/td-front.log
+      # - name: Show logs
+      # run: |
+      #   cat /tmp/td-api.log
+      #   cat /tmp/td-queues-indexation.log
+      #   cat /tmp/td-queues-webhooks.log
+      #   cat /tmp/td-queues-runner.log
+      #   cat /tmp/td-notifier.log
+      #   cat /tmp/td-front.log
 
       # Playwright
       - name: Install Playwright Browsers
