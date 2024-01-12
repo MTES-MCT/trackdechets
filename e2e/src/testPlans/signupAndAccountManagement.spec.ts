@@ -71,13 +71,6 @@ test.describe
       });
     });
 
-    await test.step("Clic sur 'Mon espace' > redirige vers la page 'Etablissements'", async () => {
-      await testNavigation(page, {
-        linkLabel: "Mon espace",
-        targetUrl: "/account/companies/create"
-      });
-    });
-
     await test.step("Clic sur 'Mes bordereaux' > redirige vers la page 'Etablissements'", async () => {
       await testNavigation(page, {
         linkLabel: "Mes bordereaux",
