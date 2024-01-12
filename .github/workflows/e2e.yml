@@ -37,7 +37,17 @@ jobs:
           TERM=xterm bash ./scripts/deploy-db.sh
       - name: Start TD applications
         run: |
-          npx nx dev --verbose >> /tmp/trackdechets.log &
+          nx run api:serve --verbose >> /tmp/td-api.log &
+          sleep 5s
+          nx run queues-indexation:serve --verbose >> /tmp/td-queues-indexation.log &
+          sleep 5s
+          nx run queues-webhooks:serve --verbose >> /tmp/td-queues-webhooks.log &
+          sleep 5s
+          nx run queues-runner:serve --verbose >> /tmp/td-queues-runner:.log &
+          sleep 5s
+          nx run notifier:serve --verbose >> /tmp/td-notifier.log t&
+          sleep 5s
+          nx run front:serve --verbose >> /tmp/td-front.log &
 
       # Wait
       - name: Wait
