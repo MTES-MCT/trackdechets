@@ -37,7 +37,7 @@ jobs:
           TERM=xterm bash ./scripts/deploy-db.sh
       - name: Start TD applications
         run: |
-          npm run dev >> /tmp/trackdechets.log &
+          npx nx dev --verbose >> /tmp/trackdechets.log &
 
       # Wait
       - name: Wait
