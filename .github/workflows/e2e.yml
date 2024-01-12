@@ -38,15 +38,15 @@ jobs:
       - name: Start TD applications
         run: |
           npx nx run api:serve --verbose >> /tmp/td-api.log &
-          sleep 5s
+          sleep 2s
           npx nx run queues-indexation:serve --verbose >> /tmp/td-queues-indexation.log &
-          sleep 5s
+          sleep 2s
           npx nx run queues-webhooks:serve --verbose >> /tmp/td-queues-webhooks.log &
-          sleep 5s
+          sleep 2s
           npx nx run queues-runner:serve --verbose >> /tmp/td-queues-runner.log &
-          sleep 5s
+          sleep 2s
           npx nx run notifier:serve --verbose >> /tmp/td-notifier.log &
-          sleep 5s
+          sleep 2s
           npx nx run front:serve --verbose >> /tmp/td-front.log &
 
       # Wait
@@ -86,23 +86,23 @@ jobs:
       # Playwright
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
-      # - name: Run Playwright tests
-      #   run: npx nx run e2e:ci
-      # - uses: actions/upload-artifact@v3
-      #   if: always()
-      #   with:
-      #     name: playwright-report
-      #     path: playwright-report/
-      #     retention-days: 30
+      - name: Run Playwright tests
+        run: npx nx run e2e:ci
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
 
       # Debug ssh version
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
-        with:
-          ## limits ssh access and adds the ssh public key for the user which triggered the workflow
-          limit-access-to-actor: true
-          ## If no one connects after 5 minutes, shut down server.
-          # wait-timeout-minutes: 5
+      # - name: Setup upterm session
+      #   uses: lhotari/action-upterm@v1
+      #   with:
+      #     ## limits ssh access and adds the ssh public key for the user which triggered the workflow
+      #     limit-access-to-actor: true
+      #     ## If no one connects after 5 minutes, shut down server.
+      #     # wait-timeout-minutes: 5
 
 env:
   # API
