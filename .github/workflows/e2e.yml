@@ -36,23 +36,29 @@ jobs:
           TERM=xterm bash ./scripts/deploy-db.sh
       - name: Start TD applications
         run: |
-          npx nx run api:serve --verbose >> /tmp/td-api.log &
+          npx nx run api:serve >> /tmp/td-api.log &
           sleep 1s
-          npx nx run queues-indexation:serve --verbose >> /tmp/td-queues-indexation.log &
+          npx nx run queues-indexation:serve >> /tmp/td-queues-indexation.log &
           sleep 1s
-          npx nx run queues-webhooks:serve --verbose >> /tmp/td-queues-webhooks.log &
+          npx nx run queues-webhooks:serve >> /tmp/td-queues-webhooks.log &
           sleep 1s
-          npx nx run queues-runner:serve --verbose >> /tmp/td-queues-runner.log &
+          npx nx run queues-runner:serve >> /tmp/td-queues-runner.log &
           sleep 1s
-          npx nx run notifier:serve --verbose >> /tmp/td-notifier.log &
+          npx nx run notifier:serve >> /tmp/td-notifier.log &
           sleep 1s
-          npx nx run front:serve --verbose >> /tmp/td-front.log &
+          npx nx run front:serve >> /tmp/td-front.log &
           sleep 1s
 
       # Wait
-      - name: Wait
+      - name: Wait until the API starts
         run: |
-          sleep 30s
+          until [ \
+            "$(curl -s -w '%{http_code}' -o /dev/null "api.trackdechets.local")" \
+            -eq 400 ]
+          do
+            printf 'Waiting for the API to start...\n'
+            sleep 1
+          done
 
       # Debug
       # - name: Testing API resolution
