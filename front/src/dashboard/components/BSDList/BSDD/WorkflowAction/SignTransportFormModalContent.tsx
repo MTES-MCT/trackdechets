@@ -112,8 +112,15 @@ export default function SignTransportFormModalContent({
   }
   const form = data?.form;
 
-  const signingTransporter = form.transporters.find(
-    t => !t.takenOverAt && t.company?.orgId === siret
+  const signingTransporter = [
+    ...form.transporters,
+    form.temporaryStorageDetail?.transporter
+  ].find(
+    t =>
+      t !== null &&
+      t !== undefined &&
+      !t.takenOverAt &&
+      t.company?.orgId === siret
   );
 
   const TODAY = new Date();
