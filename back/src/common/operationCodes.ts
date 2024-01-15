@@ -11,6 +11,8 @@ export const FINAL_OPERATION_CODES = [
   "R9",
   "R10",
   "R11",
+  // "R12",
+  // "R13",
   "D1",
   "D2",
   "D3",
@@ -19,9 +21,11 @@ export const FINAL_OPERATION_CODES = [
   "D6",
   "D7",
   "D8",
+  // "D9",
   "D9F",
   "D10",
   "D12",
+  // "D13",
   "D15"
 ];
 

@@ -1068,10 +1068,9 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
   // TODO
   // TODO
   // TODO
-  // TODO: update status as well!
   // TODO: ré-indexer!
   // TODO: sql pour fix en prod notraceability=true
-  it("if operation code changes to final one > should reset noTraceability and nextDestination", async () => {
+  it("if operation code changes to final one > should reset status, noTraceability and nextDestination", async () => {
     // Given
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
