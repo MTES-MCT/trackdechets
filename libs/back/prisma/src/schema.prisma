@@ -322,108 +322,108 @@ model EcoOrganisme {
 }
 
 model Form {
-  id                                 String                  @id @default(cuid())
-  createdAt                          DateTime                @default(now()) @db.Timestamptz(6)
-  updatedAt                          DateTime                @updatedAt @db.Timestamptz(6)
-  emitterType                        EmitterType?
-  emitterPickupSite                  String?
-  emitterIsPrivateIndividual         Boolean?                @default(false)
-  emitterIsForeignShip               Boolean?                @default(false)
-  emitterCompanyName                 String?
-  emitterCompanySiret                String?
-  emitterCompanyAddress              String?
-  emitterCompanyContact              String?
-  emitterCompanyPhone                String?
-  emitterCompanyMail                 String?
-  emitterCompanyOmiNumber            String?
-  recipientCap                       String?
-  recipientProcessingOperation       String?
-  recipientCompanyName               String?
-  recipientCompanySiret              String?
-  recipientCompanyAddress            String?
-  recipientCompanyContact            String?
-  recipientCompanyPhone              String?
-  recipientCompanyMail               String?
-  wasteDetailsCode                   String?
-  wasteDetailsOnuCode                String?
-  wasteDetailsPackagingInfos         Json                    @default("[]")
-  wasteDetailsQuantity               Float?
-  wasteDetailsQuantityType           QuantityType?
-  wasteDetailsPop                    Boolean                 @default(false)
-  wasteDetailsIsDangerous            Boolean                 @default(false)
-  wasteDetailsParcelNumbers          Json                    @default("[]")
-  wasteDetailsAnalysisReferences     String[]
-  wasteDetailsLandIdentifiers        String[]
-  wasteDetailsSampleNumber           String?
-  readableId                         String                  @unique
-  status                             Status                  @default(DRAFT)
-  emittedBy                          String?
-  emittedAt                          DateTime?               @db.Timestamptz(6)
-  emittedByEcoOrganisme              Boolean?
-  takenOverBy                        String?
-  takenOverAt                        DateTime?               @db.Timestamptz(6)
-  sentAt                             DateTime?               @db.Timestamptz(6)
-  sentBy                             String?
-  isAccepted                         Boolean?                @default(false)
-  receivedAt                         DateTime?               @db.Timestamptz(6)
-  quantityReceived                   Float?
-  quantityReceivedType               QuantityType?
-  processingOperationDone            String?
-  destinationOperationMode           OperationMode?
-  wasteDetailsName                   String?
-  isDeleted                          Boolean?                @default(false)
-  receivedBy                         String?
-  wasteDetailsConsistence            Consistence?
-  processedBy                        String?
-  processedAt                        DateTime?               @db.Timestamptz(6)
-  nextDestinationProcessingOperation String?
-  traderCompanyName                  String?
-  traderCompanySiret                 String?
-  traderCompanyAddress               String?
-  traderCompanyContact               String?
-  traderCompanyPhone                 String?
-  traderCompanyMail                  String?
-  traderReceipt                      String?
-  traderDepartment                   String?
-  traderValidityLimit                DateTime?               @db.Timestamptz(6)
-  brokerCompanyName                  String?
-  brokerCompanySiret                 String?
-  brokerCompanyAddress               String?
-  brokerCompanyContact               String?
-  brokerCompanyPhone                 String?
-  brokerCompanyMail                  String?
-  brokerReceipt                      String?
-  brokerDepartment                   String?
-  brokerValidityLimit                DateTime?               @db.Timestamptz(6)
-  processingOperationDescription     String?
-  noTraceability                     Boolean?
-  signedByTransporter                Boolean?
-  customId                           String?
-  wasteAcceptationStatus             WasteAcceptationStatus?
-  wasteRefusalReason                 String?
-  nextDestinationCompanyName         String?
-  nextDestinationCompanySiret        String?
-  nextDestinationCompanyAddress      String?
-  nextDestinationCompanyContact      String?
-  nextDestinationCompanyPhone        String?
-  nextDestinationCompanyMail         String?
-  nextDestinationCompanyCountry      String?
-  nextDestinationCompanyVatNumber    String?
-  nextDestinationCompanyExtraEuropeanId  String?
-  nextDestinationNotificationNumber  String?
-  emitterWorkSiteName                String?
-  emitterWorkSiteAddress             String?
-  emitterWorkSiteCity                String?
-  emitterWorkSitePostalCode          String?
-  emitterWorkSiteInfos               String?
-  recipientIsTempStorage             Boolean?                @default(false)
-  signedAt                           DateTime?               @db.Timestamptz(6)
-  currentTransporterOrgId            String?
-  nextTransporterOrgId               String?
-  isImportedFromPaper                Boolean                 @default(false)
-  ecoOrganismeName                   String?
-  ecoOrganismeSiret                  String?
-  signedBy                           String?
+  id                                    String                  @id @default(cuid())
+  createdAt                             DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt                             DateTime                @updatedAt @db.Timestamptz(6)
+  emitterType                           EmitterType?
+  emitterPickupSite                     String?
+  emitterIsPrivateIndividual            Boolean?                @default(false)
+  emitterIsForeignShip                  Boolean?                @default(false)
+  emitterCompanyName                    String?
+  emitterCompanySiret                   String?
+  emitterCompanyAddress                 String?
+  emitterCompanyContact                 String?
+  emitterCompanyPhone                   String?
+  emitterCompanyMail                    String?
+  emitterCompanyOmiNumber               String?
+  recipientCap                          String?
+  recipientProcessingOperation          String?
+  recipientCompanyName                  String?
+  recipientCompanySiret                 String?
+  recipientCompanyAddress               String?
+  recipientCompanyContact               String?
+  recipientCompanyPhone                 String?
+  recipientCompanyMail                  String?
+  wasteDetailsCode                      String?
+  wasteDetailsOnuCode                   String?
+  wasteDetailsPackagingInfos            Json                    @default("[]")
+  wasteDetailsQuantity                  Float?
+  wasteDetailsQuantityType              QuantityType?
+  wasteDetailsPop                       Boolean                 @default(false)
+  wasteDetailsIsDangerous               Boolean                 @default(false)
+  wasteDetailsParcelNumbers             Json                    @default("[]")
+  wasteDetailsAnalysisReferences        String[]
+  wasteDetailsLandIdentifiers           String[]
+  wasteDetailsSampleNumber              String?
+  readableId                            String                  @unique
+  status                                Status                  @default(DRAFT)
+  emittedBy                             String?
+  emittedAt                             DateTime?               @db.Timestamptz(6)
+  emittedByEcoOrganisme                 Boolean?
+  takenOverBy                           String?
+  takenOverAt                           DateTime?               @db.Timestamptz(6)
+  sentAt                                DateTime?               @db.Timestamptz(6)
+  sentBy                                String?
+  isAccepted                            Boolean?                @default(false)
+  receivedAt                            DateTime?               @db.Timestamptz(6)
+  quantityReceived                      Float?
+  quantityReceivedType                  QuantityType?
+  processingOperationDone               String?
+  destinationOperationMode              OperationMode?
+  wasteDetailsName                      String?
+  isDeleted                             Boolean?                @default(false)
+  receivedBy                            String?
+  wasteDetailsConsistence               Consistence?
+  processedBy                           String?
+  processedAt                           DateTime?               @db.Timestamptz(6)
+  nextDestinationProcessingOperation    String?
+  traderCompanyName                     String?
+  traderCompanySiret                    String?
+  traderCompanyAddress                  String?
+  traderCompanyContact                  String?
+  traderCompanyPhone                    String?
+  traderCompanyMail                     String?
+  traderReceipt                         String?
+  traderDepartment                      String?
+  traderValidityLimit                   DateTime?               @db.Timestamptz(6)
+  brokerCompanyName                     String?
+  brokerCompanySiret                    String?
+  brokerCompanyAddress                  String?
+  brokerCompanyContact                  String?
+  brokerCompanyPhone                    String?
+  brokerCompanyMail                     String?
+  brokerReceipt                         String?
+  brokerDepartment                      String?
+  brokerValidityLimit                   DateTime?               @db.Timestamptz(6)
+  processingOperationDescription        String?
+  noTraceability                        Boolean?
+  signedByTransporter                   Boolean?
+  customId                              String?
+  wasteAcceptationStatus                WasteAcceptationStatus?
+  wasteRefusalReason                    String?
+  nextDestinationCompanyName            String?
+  nextDestinationCompanySiret           String?
+  nextDestinationCompanyAddress         String?
+  nextDestinationCompanyContact         String?
+  nextDestinationCompanyPhone           String?
+  nextDestinationCompanyMail            String?
+  nextDestinationCompanyCountry         String?
+  nextDestinationCompanyVatNumber       String?
+  nextDestinationCompanyExtraEuropeanId String?
+  nextDestinationNotificationNumber     String?
+  emitterWorkSiteName                   String?
+  emitterWorkSiteAddress                String?
+  emitterWorkSiteCity                   String?
+  emitterWorkSitePostalCode             String?
+  emitterWorkSiteInfos                  String?
+  recipientIsTempStorage                Boolean?                @default(false)
+  signedAt                              DateTime?               @db.Timestamptz(6)
+  currentTransporterOrgId               String?
+  nextTransporterOrgId                  String?
+  isImportedFromPaper                   Boolean                 @default(false)
+  ecoOrganismeName                      String?
+  ecoOrganismeSiret                     String?
+  signedBy                              String?
 
   transporters BsddTransporter[]
   groupedIn    FormGroupement[]  @relation("GroupedIn")
@@ -867,7 +867,7 @@ enum BsvhuIdentificationType {
   NUMERO_ORDRE_LOTS_SORTANTS
 }
 
-enum BsvhuRecipientType {
+enum BsvhuDestinationType {
   BROYEUR
   DEMOLISSEUR
 }
@@ -890,8 +890,8 @@ model Bsvhu {
   emitterCompanyMail    String?
   emitterCustomInfo     String?
 
-  destinationType                 BsvhuRecipientType?
-  destinationPlannedOperationCode String?             @default("R 4")
+  destinationType                 BsvhuDestinationType?
+  destinationPlannedOperationCode String?               @default("R 4")
   destinationAgrementNumber       String?
   destinationCompanyName          String?
   destinationCompanySiret         String?
