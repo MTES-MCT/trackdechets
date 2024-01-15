@@ -11,7 +11,7 @@ import Loader from "../Loader/Loaders";
 import Layout from "./Layout";
 import routes from "../../../routes";
 import { useQuery, gql } from "@apollo/client";
-import { Query } from "@td/codegen-ui";
+import { Query, UserRole } from "@td/codegen-ui";
 import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
@@ -298,9 +298,16 @@ export default function LayoutContainer() {
                 to={
                   data
                     ? data.me.companies.length > 0
-                      ? generatePath(routes.dashboard.index, {
-                          siret: data.me.companies[0].orgId
-                        })
+                      ? generatePath(
+                          data?.me.companies[0].userRole?.includes(
+                            UserRole.Driver
+                          )
+                            ? routes.dashboard.transport.toCollect
+                            : routes.dashboard.index,
+                          {
+                            siret: data.me.companies[0].orgId
+                          }
+                        )
                       : routes.account.companies.list
                     : routes.login
                 }
