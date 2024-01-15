@@ -4,7 +4,7 @@ import {
   BrokerReceipt,
   WorkerCertification
 } from "@prisma/client";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { VhuAgrement } from "../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../permissions";
 

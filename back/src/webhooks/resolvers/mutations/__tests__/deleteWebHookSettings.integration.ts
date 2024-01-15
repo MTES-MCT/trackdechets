@@ -12,7 +12,7 @@ import {
   getWebhookSettings,
   clearWebhookSetting
 } from "../../../../common/redis/webhooksettings";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 
 const DELETE_WEBHOOK_SETTING = gql`
   mutation DeleteWebhookSetting($id: ID!) {

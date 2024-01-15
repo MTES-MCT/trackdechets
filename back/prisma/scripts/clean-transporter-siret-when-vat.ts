@@ -1,5 +1,5 @@
 import { Updater, registerUpdater } from "./helper/helper";
-import prisma from "../../src/prisma";
+import { prisma } from "@td/prisma";
 
 @registerUpdater(
   "Clean Transporter SIRET when it's a copy of VAT",

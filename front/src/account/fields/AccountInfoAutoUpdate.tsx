@@ -3,12 +3,11 @@ import {
   CompanyPrivate,
   Mutation,
   MutationUpdateCompanyArgs
-} from "codegen-ui/src/generated/ui";
+} from "@td/codegen-ui";
 import { useMutation } from "@apollo/client";
 import gql from "graphql-tag";
 import React from "react";
-import { isSiret } from "shared/constants";
-import AccountCompanyInfo from "../AccountCompanyInfo";
+import { isSiret } from "@td/constants";
 import AccountFieldCompanyBrokerReceipt from "./AccountFieldCompanyBrokerReceipt";
 import AccountFieldCompanyGerepId from "./AccountFieldCompanyGerepId";
 import AccountFieldCompanyGivenName from "./AccountFieldCompanyGivenName";
@@ -22,7 +21,7 @@ import AccountFieldCompanyWorkerCertification from "./AccountFieldCompanyWorkerC
 
 AccountInfoAutoUpdate.fragments = {
   company: gql`
-    fragment AccountCompanyInfoFragment on CompanyPrivate {
+    fragment AccountInfoAutoUpdateFragment on CompanyPrivate {
       id
       orgId
       name
@@ -66,10 +65,10 @@ export default function AccountInfoAutoUpdate({ company }: Props) {
   const UPDATE_COMPANY_NAME_ADRESS = gql`
     mutation UpdateCompany($id: String!) {
       updateCompany(id: $id) {
-        ...AccountCompanyInfoFragment
+        ...AccountInfoAutoUpdateFragment
       }
     }
-    ${AccountCompanyInfo.fragments.company}
+    ${AccountInfoAutoUpdate.fragments.company}
   `;
 
   const [update, { loading, error }] = useMutation<

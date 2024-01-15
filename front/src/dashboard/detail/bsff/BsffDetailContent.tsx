@@ -15,7 +15,7 @@ import {
   FormCompany,
   OperationMode,
   WasteAcceptationStatus
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React, { useState } from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -39,9 +39,8 @@ import {
 } from "../../../common/components";
 import { formatDate } from "../../../common/datetime";
 import { PACKAGINGS_NAMES } from "../../../form/bsff/components/packagings/Packagings";
-import { isForeignVat } from "shared/constants";
 import { getOperationModeLabel } from "../../../common/operationModes";
-import { BSFF_VERBOSE_STATUSES } from "shared/constants";
+import { BSFF_VERBOSE_STATUSES, isForeignVat } from "@td/constants";
 
 type CompanyProps = {
   company?: FormCompany | null;

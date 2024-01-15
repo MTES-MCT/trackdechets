@@ -4,19 +4,11 @@
   "sourceRoot": "back/src",
   "projectType": "library",
   "targets": {
-    "prisma": {
-      "inputs": ["{projectRoot}/prisma/schema.prisma"],
-      "cache": true,
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx prisma generate --schema=back/prisma/schema.prisma"
-      }
-    },
     "types": {
       "command": "tsc -p back/tsconfig.lib.json --noEmit"
     },
     "codegen": {
-      "inputs": ["{projectRoot}/**/*.gql"],
+      "inputs": ["{projectRoot}/**/*.graphql"],
       "cache": true,
       "executor": "nx:run-commands",
       "options": {
@@ -35,9 +27,22 @@
         }
       }
     },
+    "integration-setup": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "prisma db push",
+          "npm --prefix back run reindex-all-bsds-bulk"
+        ],
+        "parallel": false
+      }
+    },
     "test": {
       "executor": "@nx/jest:jest",
-      "dependsOn": ["codegen", "prisma"],
+      "dependsOn": [
+        "codegen",
+        { "projects": ["@td/prisma"], "target": "generate" }
+      ],
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "back/jest.config.js",

@@ -10,7 +10,7 @@ import {
   UserRole,
   Mutation,
   MutationInviteUserToCompanyArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import toast from "react-hot-toast";
 import TdTooltip from "../../../common/components/Tooltip";
 import { TOAST_DURATION } from "../../../common/config";
@@ -48,13 +48,18 @@ const yupSchema = object().shape({
   email: string().email()
 });
 
-const roleTooltip =
-  "Collaborateur : A accès aux information de l'établissement" +
-  " Peut éditer et signer des bordereaux pour le compte de l'établissement." +
-  " Peut également exporter le registre de l'établissement\n" +
-  "Administrateur : Dispose des mêmes droits que le collaborateur." +
-  " Peut en plus modifier les informations de l'établissement et inviter" +
-  " de nouveaux collaborateurs.";
+const roleTooltip = role => {
+  switch (role) {
+    case UserRole.Admin:
+      return "Administrateur : a tous les droits liés à la gestion des bordereaux ainsi que la gestion de l'établissement dont l'ajout de nouveaux membres.";
+    case UserRole.Member:
+      return "Collaborateur : a tous les droits liés à la gestion des bordereaux uniquement, export du registre et peut consulter les informations de l'établissement.";
+    case UserRole.Driver:
+      return "Chauffeur : a uniquement la possibilité de consulter et de signer des bordereaux dans son onglet À collecter, et de voir les bordereaux dans son onglet Collecté (QR code contrôle routier).";
+    case UserRole.Reader:
+      return "Lecteur : a uniquement des droits de consultation sur les bordereaux ainsi que sur les informations de l'établissement.";
+  }
+};
 
 export default function AccountFormCompanyInviteNewUser({ company }: Props) {
   const [inviteUserToCompany, { loading }] = useMutation<
@@ -98,7 +103,7 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
       }}
       validationSchema={yupSchema}
     >
-      {({ isSubmitting }) => (
+      {({ isSubmitting, values }) => (
         <div className={styles.invite__form}>
           <Form>
             <Field
@@ -109,11 +114,13 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
             />
 
             <Field component="select" name="role" className="td-select">
-              <option value={UserRole.Member}>Collaborateur</option>
               <option value={UserRole.Admin}>Administrateur</option>
+              <option value={UserRole.Member}>Collaborateur</option>
+              <option value={UserRole.Reader}>Lecteur</option>
+              <option value={UserRole.Driver}>Chauffeur</option>
             </Field>
             <div className={styles.roleTooltip}>
-              <TdTooltip msg={roleTooltip} />
+              <TdTooltip msg={roleTooltip(values.role)} />
             </div>
             <button
               type="submit"

@@ -95,6 +95,7 @@
     },
     "build-storybook": {
       "executor": "@nx/storybook:build",
+      "dependsOn": ["^build", "dsfr", "generate-tw"],
       "outputs": ["{options.outputDir}"],
       "options": {
         "outputDir": "dist/storybook/front",

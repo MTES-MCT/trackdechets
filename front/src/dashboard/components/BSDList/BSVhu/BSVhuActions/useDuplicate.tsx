@@ -1,6 +1,6 @@
 import { gql, MutationHookOptions, useMutation } from "@apollo/client";
 import toast from "react-hot-toast";
-import { Mutation, MutationDuplicateBsvhuArgs } from "codegen-ui";
+import { Mutation, MutationDuplicateBsvhuArgs } from "@td/codegen-ui";
 import { vhuFragment } from "../../../../../Apps/common/queries/fragments";
 import { GET_BSDS } from "../../../../../Apps/common/queries";
 

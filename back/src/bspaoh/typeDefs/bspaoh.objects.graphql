@@ -1,0 +1,199 @@
+type BspaohConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [BspaohEdge!]!
+}
+
+type BspaohEdge {
+  cursor: String!
+  node: Bspaoh!
+}
+
+type BspaohWasteWeight {
+  "Poids en kilos"
+  value: Float!
+  "Type de quantité (réelle ou estimée)"
+  isEstimate: Boolean!
+}
+
+"Informations sur un poids de déchet estimé ou pesé"
+type BspaohWasteDetail {
+  "Informations sur le poids"
+  weight: BspaohWasteWeight
+  "Quantité"
+  quantity: Int
+}
+
+type BspaohMetadata {
+  errors: [BspaohError]
+  "Informations sur les champs"
+  fields: BspaohMetadataFields
+}
+
+type BspaohMetadataFields {
+  "Liste des champs scellés"
+  sealed: [BspaohMetadataField]
+}
+
+type BspaohMetadataField {
+  name: String!
+}
+
+type BspaohError {
+  message: String!
+  path: String!
+  requiredFor: BspaohSignatureType!
+}
+
+type BspaohRecepisse {
+  "Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement)"
+  isExempted: Boolean
+  "Numéro de récépissé"
+  number: String
+  "Département"
+  department: String
+  "Date limite de validité"
+  validityLimit: DateTime
+}
+
+type BspaohPackaging {
+  "Identifiant du packaging"
+  id: String
+  "Type de conditionnement"
+  type: BspaohPackagingType!
+  "Volume en litres"
+  volume: Int
+  "Numérotation"
+  containerNumber: String
+  "Nombre de colis associés à ce conditionnement"
+  quantity: Int!
+  "Codes d'identification utilisés par l'établissement"
+  identificationCodes: [String!]
+  "Consistance"
+  consistence: BspaohConsistence
+  "Accepté par le destinataire "
+  acceptation: BspaohPackagingAcceptationStatus
+}
+
+"Informations relatives à l'acceptation ou au refus du déchet (Bspaoh)"
+type BspaohWasteAcceptation {
+  status: WasteAcceptationStatus
+  refusalReason: String
+}
+
+type BspaohEmission {
+  "Quantité en nombre ou poids"
+  detail: BspaohWasteDetail
+  signature: Signature
+}
+type BspaohHandedOverToDestination {
+  "Date de remise à l'installation destinataire"
+  date: DateTime
+  signature: Signature
+}
+
+type BspaohTransport {
+  "Mode de transport"
+  mode: TransportMode
+  "Plaque(s) d'immatriculation"
+  plates: [String!]
+  "Date de prise en charge"
+  takenOverAt: DateTime
+  signature: Signature
+}
+
+type BspaohReception {
+  "Date de présentation sur site"
+  date: DateTime
+  detail: BspaohWasteDetail
+  acceptation: BspaohWasteAcceptation
+  "Signature"
+  signature: Signature
+}
+
+type BspaohOperation {
+  "Code de l'opération de traitement"
+  code: String
+  "Date de réalisation de l'opération"
+  date: DateTime
+  signature: Signature
+}
+
+type BspaohWaste {
+  "Type de déchet"
+  type: BspaohType!
+  "Rubrique Déchet"
+  code: String
+  "Mention ADR"
+  adr: String
+  "Conditionnements"
+  packagings: [BspaohPackaging!]
+}
+
+type BspaohEmitter {
+  "Établissement émetteur"
+  company: FormCompany
+  "Site d'emport du déchet, si différent de celle de l'émetteur"
+  pickupSite: PickupSite
+  "Champ libre"
+  customInfo: String
+  "Déclaration générale"
+  emission: BspaohEmission
+}
+
+type BspaohDestination {
+  "Établissement de destination"
+  company: FormCompany
+  "Champ libre"
+  customInfo: String
+  "N° de CAP (le cas échéant)"
+  cap: String
+  "Informations optionelles de remise à l'installation destinataire"
+  handedOverToDestination: BspaohHandedOverToDestination
+  "Expédition reçue à l'installation de destination"
+  reception: BspaohReception
+  "Réalisation de l'opération (case 11)"
+  operation: BspaohOperation
+}
+
+type BspaohTransporter {
+  id: ID
+  "Coordonnées de l'entreprise de transport"
+  company: FormCompany
+  "Champ libre"
+  customInfo: String
+  "Récépissé transporteur"
+  recepisse: BspaohRecepisse
+  "Déclaration générale"
+  transport: BspaohTransport
+}
+
+type Bspaoh {
+  "Bordereau n°"
+  id: ID!
+  "Date de création"
+  createdAt: DateTime!
+  "Date de dernière modification"
+  updatedAt: DateTime!
+  "Indique si le bordereau est à l'état de brouillon"
+  isDraft: Boolean!
+  "Statut du bordereau"
+  status: BspaohStatus!
+  "Description du déchet"
+  waste: BspaohWaste
+  "Détenteur du déchet"
+  emitter: BspaohEmitter
+  "Installation de destination"
+  destination: BspaohDestination
+  "Premier transporteur du déchet"
+  transporter: BspaohTransporter
+
+  """
+  Liste des transporteurs du déchet. Contient 1 seul transporteur en cas d'acheminement direct.
+  Peut contenir un maximum de 5 transporteurs différents en cas de transport multi-modal
+  """
+  transporters: [BspaohTransporter!]!
+
+  "Metadata associées au bordereau"
+  metadata: BspaohMetadata!
+}

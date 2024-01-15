@@ -5,7 +5,7 @@ import {
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   getCompanyAdminUsers,
   getCompanyOrCompanyNotFound

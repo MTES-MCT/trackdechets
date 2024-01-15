@@ -8,8 +8,9 @@ import {
   MutationUpdateFormArgs,
   MutationUpdateFormTransporterArgs,
   Query,
-  QueryFormArgs
-} from "codegen-ui";
+  QueryFormArgs,
+  TransportMode
+} from "@td/codegen-ui";
 import React, { ReactElement, useMemo, lazy } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -27,7 +28,7 @@ import {
   CREATE_FORM_TRANSPORTER,
   UPDATE_FORM_TRANSPORTER
 } from "../../Apps/Forms/Components/query";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (form: Form | undefined) => ReactElement;
@@ -88,13 +89,18 @@ export default function StepsList(props: Props) {
   async function saveFormTransporter(
     transporterInput: CreateOrUpdateTransporterInput
   ): Promise<string> {
-    const { id, ...input } = transporterInput;
+    const { id, takenOverAt, ...input } = transporterInput;
 
-    // S'assure que les données de récépissé transport sont nulles
-    // lorsque l'exemption est cochée ou que le transporteur est étranger
+    // S'assure que les données de récépissé transport sont nulles dans les
+    // cas suivants :
+    // - l'exemption est cochée
+    // - le transporteur est étranger
+    // - le transport ne se fait pas par la route
     const cleanInput = {
       ...input,
-      ...(input.isExemptedOfReceipt || isForeignVat(input?.company?.vatNumber)
+      ...(input.isExemptedOfReceipt ||
+      isForeignVat(input?.company?.vatNumber) ||
+      input.mode !== TransportMode.Road
         ? {
             receipt: null,
             validityLimit: null,
@@ -105,15 +111,18 @@ export default function StepsList(props: Props) {
 
     if (id) {
       // Le transporteur existe déjà en base de données, on met
-      // juste à jour les infos et on renvoie l'identifiant
-      const { errors } = await updateFormTransporter({
-        variables: { id, input: cleanInput },
-        onError: err => {
-          toastApolloError(err);
+      // à jour les infos (uniquement si le transporteur n'a pas encore
+      // pris en charge le déchet) et on renvoie l'identifiant
+      if (!takenOverAt) {
+        const { errors } = await updateFormTransporter({
+          variables: { id, input: cleanInput },
+          onError: err => {
+            toastApolloError(err);
+          }
+        });
+        if (errors) {
+          throw new Error(errors.map(e => e.message).join("\n"));
         }
-      });
-      if (errors) {
-        throw new Error(errors.map(e => e.message).join("\n"));
       }
       return id;
     } else {

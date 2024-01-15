@@ -1,4 +1,4 @@
-import { Bsda } from "codegen-ui";
+import { Bsda } from "@td/codegen-ui";
 
 /**
  * BSDA Edition permissions

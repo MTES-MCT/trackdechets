@@ -1,4 +1,5 @@
 import "@total-typescript/ts-reset";
+import "@td/tracer";
 import { envVariables } from "@td/env";
 import { z } from "zod";
 
@@ -9,13 +10,11 @@ declare global {
     interface ProcessEnv extends z.infer<typeof envVariables> {}
   }
 }
-import prisma from "./prisma";
 
 export { httpServer, server, startApolloServer } from "./server";
 export { closeQueues } from "./queue/producers";
 export { initSentry } from "./common/sentry";
 export * from "./utils";
-export { prisma };
 export { deleteBsd } from "./common/elastic";
 export { getCompaniesAndActiveAdminsByCompanyOrgIds } from "./companies/database";
 export { formatDate } from "./common/pdf";

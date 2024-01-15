@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import { formatDate } from "../../common/datetime";
 import AccountField from "./AccountField";
 import AccountFormCompanyTraderReceipt from "./forms/AccountFormCompanyTraderReceipt";
-import { CompanyPrivate, UserRole } from "codegen-ui";
+import { CompanyPrivate, UserRole } from "@td/codegen-ui";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
 type Props = {

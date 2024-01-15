@@ -1,7 +1,10 @@
 import { Prisma, Status, WasteAcceptationStatus } from "@prisma/client";
 import { Machine } from "xstate";
-import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "shared/constants";
-import { isForeignVat, isSiret } from "shared/constants";
+import {
+  isForeignVat,
+  isSiret,
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES
+} from "@td/constants";
 import { Event, EventType } from "./types";
 import { hasPipeline } from "../validation";
 
@@ -315,6 +318,9 @@ const machine = Machine<any, Event>(
  * Determine whether nextDestionation is foreign based on a priority guessing system
  */
 function isForeignNextDestination(update: Prisma.FormUpdateInput) {
+  if (update.nextDestinationCompanyExtraEuropeanId) {
+    return true;
+  }
   if (
     update.nextDestinationCompanyVatNumber &&
     isForeignVat(update.nextDestinationCompanyVatNumber as string)

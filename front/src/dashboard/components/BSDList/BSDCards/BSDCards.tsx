@@ -6,7 +6,7 @@ import {
   EmitterType,
   Query,
   QueryCompanyPrivateInfosArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import routes from "../../../../Apps/routes";
 import { IconView } from "../../../../Apps/common/Components/Icons/Icons";
 import { WorkflowAction } from "../BSDD/WorkflowAction";
@@ -21,6 +21,7 @@ import { BsffFragment } from "../BSFF";
 import { CardRoadControlButton } from "../RoadControlButton";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../../Apps/common/queries/company/query";
 import { useQuery } from "@apollo/client";
+
 interface BSDCardsProps {
   bsds: Bsd[];
   columns: Column[];
@@ -117,6 +118,7 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
             {form.__typename === "Bsda" ? (
               <BsdaWorkflowAction siret={siret!} form={form} />
             ) : null}
+            {form.__typename === "Bspaoh" && null}
           </div>
         </div>
       ))}

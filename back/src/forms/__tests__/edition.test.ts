@@ -30,7 +30,8 @@ describe("edition", () => {
       mail: "",
       phone: "",
       country: "",
-      omiNumber: ""
+      omiNumber: "",
+      extraEuropeanId: ""
     };
 
     const workSite: Required<WorkSiteInput> = {

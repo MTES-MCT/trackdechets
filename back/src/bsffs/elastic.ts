@@ -3,14 +3,14 @@ import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { toBsffDestination } from "./compat";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   BsffWithFicheInterventions,
   BsffWithPackagings,
   BsffWithPackagingsInclude,
   BsffWithFicheInterventionInclude
 } from "./types";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 
 export type BsffForElastic = Bsff &
   BsffWithPackagings &
@@ -116,7 +116,25 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
       ...bsff.detenteurCompanySirets
     ].filter(Boolean),
     ...getRegistryFields(bsff),
-    rawBsd: bsff
+    rawBsd: bsff,
+    revisionRequests: [],
+
+    // ALL actors from the BSFF, for quick search
+    companyNames: [
+      bsff.emitterCompanyName,
+      bsff.transporterCompanyName,
+      bsff.destinationCompanyName,
+      ...bsff.ficheInterventions.map(fiche => fiche.detenteurCompanyName)
+    ]
+      .filter(Boolean)
+      .join(" "),
+    companyOrgIds: [
+      bsff.emitterCompanySiret,
+      bsff.transporterCompanySiret,
+      bsff.transporterCompanyVatNumber,
+      bsff.destinationCompanySiret,
+      ...bsff.ficheInterventions.map(fiche => fiche.detenteurCompanySiret)
+    ].filter(Boolean)
   };
 
   const transporterCompanyOrgId = getTransporterCompanyOrgId(bsff);

@@ -34,7 +34,8 @@ describe("edition", () => {
       phone: "",
       country: "",
       omiNumber: "",
-      vatNumber: ""
+      vatNumber: "",
+      extraEuropeanId: ""
     };
 
     const recepisse: Required<

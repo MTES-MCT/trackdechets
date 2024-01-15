@@ -1,17 +1,18 @@
-import { Prisma } from "@prisma/client";
+import { BsddTransporter, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   expandTransporterFromDb,
   flattenTransporterInput
 } from "../../converter";
 import { transporterSchemaFn } from "../../validation";
-import { getFormTransporterOrNotFound } from "../../database";
-import { checkCanUpdate } from "../../permissions";
+import { getFormTransporterOrNotFound, getTransporters } from "../../database";
+import { checkCanUpdateFormTransporter } from "../../permissions";
 import { UserInputError } from "../../../common/errors";
 import { sirenifyTransporterInput } from "../../sirenify";
 import { recipifyTransporterInput } from "../../recipify";
+import { getFormRepository } from "../../repository";
 
 const updateFormTransporterResolver: MutationResolvers["updateFormTransporter"] =
   async (parent, { id, input }, context) => {
@@ -29,8 +30,8 @@ const updateFormTransporterResolver: MutationResolvers["updateFormTransporter"] 
         .findUniqueOrThrow({
           where: { id }
         })
-        .form({ include: { transporters: true } });
-      await checkCanUpdate(user, form!, { id: form!.id });
+        .form();
+      await checkCanUpdateFormTransporter(user, form!, id, input);
     }
     const isUpdatingCompany =
       input?.company?.siret || input?.company?.vatNumber;
@@ -58,11 +59,27 @@ const updateFormTransporterResolver: MutationResolvers["updateFormTransporter"] 
       { ...existingTransporter, ...data },
       { abortEarly: false }
     );
-    const transporter = await prisma.bsddTransporter.update({
-      where: { id },
-      data
-    });
-    return expandTransporterFromDb(transporter);
+
+    let updatedTransporter: BsddTransporter;
+
+    if (existingTransporter.formId) {
+      // Si le transporteur est déjà associé à un bordereau, on passe par l'update
+      // du form repository pour être certain que l'événement soit loggué, que le
+      // réindex ait lieu, et que `Form.transporterSirets` soit recalculé.
+      const { update: updateForm } = getFormRepository(user);
+      const updatedForm = await updateForm(
+        { id: existingTransporter.formId },
+        { transporters: { update: { where: { id }, data } } }
+      );
+      const updatedTransporters = await getTransporters(updatedForm);
+      updatedTransporter = updatedTransporters.find(t => t.id === id)!;
+    } else {
+      updatedTransporter = await prisma.bsddTransporter.update({
+        where: { id },
+        data
+      });
+    }
+    return expandTransporterFromDb(updatedTransporter);
   };
 
 export default updateFormTransporterResolver;

@@ -19,7 +19,7 @@ import {
   Query,
   QueryBsffArgs,
   WasteAcceptationStatus
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React from "react";
 import { Column, useFilters, useTable } from "react-table";
 import { BsffWasteSummary } from "./BsffWasteSummary";

@@ -11,9 +11,9 @@ import {
   MutationSignBsvhuArgs,
   MutationUpdateBsvhuArgs,
   SignatureTypeInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React from "react";
-import { generatePath, Link, useMatch } from "react-router-dom";
+import { generatePath, Link } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 import { subMonths } from "date-fns";
@@ -53,9 +53,6 @@ export function SignTransport({
 
   const loading = loadingUpdate || loadingSign;
 
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
-  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
-
   return (
     <SignBsvhu
       title="Signer l'enlèvement"
@@ -84,7 +81,7 @@ export function SignTransport({
               ))}
             </ul>
             <Link
-              to={generatePath(routes[dashboardRoutePrefix].bsvhus.edit, {
+              to={generatePath(routes.dashboard.bsvhus.edit, {
                 siret,
                 id: bsvhu.id
               })}

@@ -12,7 +12,7 @@ import {
   FormStatus,
   Form as TdForm,
   QuantityType
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { textConfig } from "./ReceivedInfo";
 import { RedErrorMessage } from "../../../../../common/components";
 import EstimatedQuantityTooltip from "../../../../../common/components/EstimatedQuantityTooltip";

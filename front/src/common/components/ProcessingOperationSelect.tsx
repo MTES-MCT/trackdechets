@@ -3,7 +3,7 @@ import classNames from "classnames";
 import {
   PROCESSING_OPERATIONS,
   PROCESSING_AND_REUSE_OPERATIONS
-} from "shared/constants";
+} from "@td/constants";
 import styles from "./ProcessingOperationSelect.module.scss";
 
 const ProcessingOperationSelect = ({

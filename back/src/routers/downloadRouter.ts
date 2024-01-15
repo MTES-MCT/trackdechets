@@ -3,6 +3,7 @@ import { bsdaPdfDownloadHandler } from "../bsda/resolvers/queries/bsdaPdf";
 import { bsdasriPdfDownloadHandler } from "../bsdasris/resolvers/queries/bsdasriPdf";
 import { bsffPdfDownloadHandler } from "../bsffs/resolvers/queries/bsffPdf";
 import { bsvhuPdfDownloadHandler } from "../bsvhu/resolvers/queries/bsvhuPdf";
+import { bspaohPdfDownloadHandler } from "../bspaoh/resolvers/queries/bspaohPdf";
 import { redisClient } from "../common/redis";
 import { formPdfDownloadHandler } from "../forms/resolvers/queries/formPdf";
 import { wastesRegistryCsvDownloadHandler } from "../registry/resolvers/queries/wastesRegistryCsv";
@@ -12,6 +13,7 @@ import {
   QueryBsdaPdfArgs,
   QueryBsdasriPdfArgs,
   QueryBsffPdfArgs,
+  QueryBspaohPdfArgs,
   QueryBsvhuPdfArgs,
   QueryFormPdfArgs,
   QueryFormsRegisterArgs,
@@ -28,6 +30,7 @@ type DownloadHandlerName = keyof Pick<
   | "bsdasriPdf"
   | "bsffPdf"
   | "bsvhuPdf"
+  | "bspaohPdf"
   | "wastesRegistryCsv"
   | "wastesRegistryXls"
 >;
@@ -39,6 +42,7 @@ type DownloadHandlerParams =
   | QueryBsdasriPdfArgs
   | QueryBsffPdfArgs
   | QueryBsvhuPdfArgs
+  | QueryBspaohPdfArgs
   | QueryFormsRegisterArgs
   | QueryWastesRegistryCsvArgs
   | QueryWastesRegistryXlsArgs;
@@ -71,6 +75,7 @@ const downloadHandlers: DownloadHandlers = [
   bsdasriPdfDownloadHandler,
   bsffPdfDownloadHandler,
   bsvhuPdfDownloadHandler,
+  bspaohPdfDownloadHandler,
   wastesRegistryCsvDownloadHandler,
   wastesRegistryXlsDownloadHandler
 ].reduce((acc, { name, handler }) => {

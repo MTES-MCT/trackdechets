@@ -1,4 +1,4 @@
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { Router, Request, Response } from "express";
 import passport from "passport";
 import { oauth2server } from "../oauth/oauth2";

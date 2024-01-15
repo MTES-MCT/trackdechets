@@ -1,3 +1,8 @@
+import {
+  StatutDiffusionEtablissement,
+  EtatAdministratif
+} from "../../../generated/graphql/types";
+
 export interface ViesResult {
   countryCode: string;
   vatNumber: string;
@@ -12,7 +17,8 @@ export interface CompanyVatSearchResult {
   address: string;
   name: string;
   codePaysEtrangerEtablissement: string;
-  // required to ensure compatibility with the common CompanySearchResult interface
-  statutDiffusionEtablissement: "O" | "N";
-  etatAdministratif: "A" | "F";
+  // fields below are required to ensure compatibility
+  // with the common CompanySearchResult interface
+  statutDiffusionEtablissement: StatutDiffusionEtablissement;
+  etatAdministratif: EtatAdministratif;
 }

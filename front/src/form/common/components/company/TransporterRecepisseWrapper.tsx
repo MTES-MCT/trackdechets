@@ -12,9 +12,10 @@ import {
   BsvhuTransporter,
   TransporterReceipt,
   Query,
-  QueryCompanyPrivateInfosArgs
-} from "codegen-ui";
-import { isForeignVat } from "shared/constants";
+  QueryCompanyPrivateInfosArgs,
+  TransportMode
+} from "@td/codegen-ui";
+import { isForeignVat } from "@td/constants";
 import { TRANSPORTER_RECEIPT } from "../../../../Apps/common/queries/company/query";
 import { useQuery } from "@apollo/client";
 import TransporterRecepisse from "../../../../Apps/Forms/Components/TransporterRecepisse/TransporterRecepisse";
@@ -64,6 +65,30 @@ export default function TransporterRecepisseWrapper({
     }
   }, [transporter]);
 
+  const isRoadTransport: boolean = useMemo(() => {
+    if ((transporter as Transporter)?.mode) {
+      return (transporter as Transporter).mode === TransportMode.Road;
+    } else if (
+      (
+        transporter as
+          | BsdaTransporter
+          | BsdasriTransporter
+          | BsffTransporterInput
+      )?.transport?.mode
+    ) {
+      return (
+        (
+          transporter as
+            | BsdaTransporter
+            | BsdasriTransporter
+            | BsffTransporterInput
+        )?.transport?.mode === TransportMode.Road
+      );
+    } else {
+      return true; // BSVHU has no transport mode, it's always road. And if we don't have a transport mode, we default to showing the alert
+    }
+  }, [transporter]);
+
   /**
    * CompanyPrivateInfos pour completer les informations
    */
@@ -83,6 +108,7 @@ export default function TransporterRecepisseWrapper({
 
   return !loading &&
     !isExemptedOfReceipt &&
+    isRoadTransport &&
     !isForeignVat(transporter.company?.vatNumber!) ? (
     <TransporterRecepisse
       number={receipt?.receiptNumber}

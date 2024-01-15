@@ -1,7 +1,9 @@
 import { cachedGet, generateKey } from "../redis";
 
-jest.mock("../../prisma", () => ({
-  foo: null
+jest.mock("@td/prisma", () => ({
+  prisma: {
+    foo: null
+  }
 }));
 
 const redisCache = {

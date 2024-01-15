@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import { Query, QueryBsffArgs } from "codegen-ui";
+import { Query, QueryBsffArgs } from "@td/codegen-ui";
 import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { GET_BSFF_FORM } from "../../../form/bsff/utils/queries";
 import { InlineError } from "../../../Apps/common/Components/Error/Error";

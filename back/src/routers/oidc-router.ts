@@ -1,4 +1,4 @@
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { Router, Request, Response } from "express";
 import { oidc, exchange } from "../oauth/oidc";
 import ensureLoggedIn from "../common/middlewares/ensureLoggedIn";

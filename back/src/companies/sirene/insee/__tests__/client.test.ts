@@ -120,7 +120,7 @@ describe("searchCompany", () => {
       data: {
         etablissement: {
           siret,
-          statutDiffusionEtablissement: "N",
+          statutDiffusionEtablissement: "P",
           uniteLegale: {
             denominationUniteLegale: "CODE EN STOCK",
             categorieJuridiqueUniteLegale: "",

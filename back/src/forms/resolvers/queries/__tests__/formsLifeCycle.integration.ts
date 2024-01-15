@@ -1,6 +1,5 @@
-import { UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { sendMail } from "../../../../mailer/mailing";
 import {
   companyFactory,
@@ -201,7 +200,7 @@ describe("Test formsLifeCycle query", () => {
     await prisma.companyAssociation.create({
       data: {
         user: { connect: { id: recipient.id } },
-        role: "MEMBER" as UserRole,
+        role: "MEMBER",
         company: { connect: { id: otherCompany.id } }
       }
     });

@@ -1,13 +1,14 @@
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   getFormOrFormNotFound,
   getFormTransporterOrNotFound,
   getTransporters
 } from "../../database";
 import { checkCanUpdate } from "../../permissions";
+import { getFormRepository } from "../../repository";
 
 const deleteFormTransporterResolver: MutationResolvers["deleteFormTransporter"] =
   async (parent, { id }, context) => {
@@ -28,18 +29,18 @@ const deleteFormTransporterResolver: MutationResolvers["deleteFormTransporter"] 
         id: form.id,
         transporters: transporters.map(t => t.id).filter(tid => tid !== id)
       });
-      for (const nextTransporter of transporters.filter(
-        t => t.number > transporter.number
-      )) {
-        // decrement next transporter numbering
-        await prisma.bsddTransporter.update({
-          where: { id: nextTransporter.id },
-          data: { number: nextTransporter.number - 1 }
-        });
-      }
-    }
 
-    await prisma.bsddTransporter.delete({ where: { id } });
+      const { update: updateForm } = getFormRepository(user);
+
+      // Passe par la méthode update du form repository pour logguer l'event, déclencher le
+      // réindex et recalculer le champ dénormalisé `transporterSirets`
+      await updateForm(
+        { id: transporter.formId },
+        { transporters: { delete: { id } } }
+      );
+    } else {
+      await prisma.bsddTransporter.delete({ where: { id } });
+    }
 
     return id;
   };

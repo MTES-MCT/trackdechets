@@ -1,8 +1,0 @@
-{
-  "extends": "../../back/tsconfig.lib.json",
-  "include": ["index.ts"],
-  "compilerOptions": {
-    "outDir": "build",
-    "esModuleInterop": true,
-  },
-}

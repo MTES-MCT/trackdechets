@@ -1,4 +1,4 @@
-import { EmitterType, TransportMode } from "codegen-ui";
+import { EmitterType, TransportMode } from "@td/codegen-ui";
 
 export const ITEMS_PER_PAGE = 50;
 
@@ -28,7 +28,13 @@ export function getTransportModeLabel(mode: string | null | undefined) {
   return transportModeLabels[mode];
 }
 
-export type BsdTypename = "Form" | "Bsdasri" | "Bsvhu" | "Bsda" | "Bsff";
+export type BsdTypename =
+  | "Form"
+  | "Bsdasri"
+  | "Bsvhu"
+  | "Bsda"
+  | "Bsff"
+  | "Bspaoh";
 
 export const emitterTypeLabels = {
   [EmitterType.Producer]: "Producteur du déchet",

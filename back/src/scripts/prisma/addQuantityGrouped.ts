@@ -1,5 +1,5 @@
 import { Decimal } from "decimal.js-light";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { processDbIdentifiersByChunk } from "../../bsds/indexation/bulkIndexBsds";
 
 export async function addQuantityGrouped() {

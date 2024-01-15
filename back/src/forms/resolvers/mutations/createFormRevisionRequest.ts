@@ -10,10 +10,11 @@ import {
 } from "@prisma/client";
 import * as yup from "yup";
 import {
+  isSiret,
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   BSDD_WASTE_CODES,
   BSDD_APPENDIX1_WASTE_CODES
-} from "shared/constants";
+} from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   FormRevisionRequestContentInput,
@@ -27,7 +28,6 @@ import { checkCanRequestRevision } from "../../permissions";
 import { getFormRepository } from "../../repository";
 import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import { packagingInfoFn } from "../../validation";
-import { isSiret } from "shared/constants";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../common/operationModes";
 

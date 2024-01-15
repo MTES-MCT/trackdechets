@@ -2,7 +2,7 @@ import { gql, useQuery } from "@apollo/client";
 import { RedErrorMessage } from "../../../../common/components";
 import { InlineError } from "../../../../Apps/common/Components/Error/Error";
 import { Field, useField, useFormikContext } from "formik";
-import { CompanyPrivate, CreateFormInput, Query } from "codegen-ui";
+import { CompanyPrivate, CreateFormInput, Query } from "@td/codegen-ui";
 import styles from "./CompanySelector.module.scss";
 import React, { useCallback, useMemo } from "react";
 import { getInitialCompany } from "../../../bsdd/utils/initial-state";

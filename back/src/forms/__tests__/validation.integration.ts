@@ -932,6 +932,28 @@ describe("beforeTransportSchema", () => {
     expect(isValid).toBeTruthy();
   });
 
+  it("transporter receipt is not required if transport mode is not ROAD", async () => {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
+      ...beforeTransportForm,
+      transporters: [
+        {
+          ...transporterData,
+          transporterTransportMode: "AIR",
+          transporterReceipt: "",
+          transporterDepartment: "",
+          transporterValidityLimit: null
+        }
+      ]
+    };
+    const isValid = beforeTransportSchemaFn({
+      signingTransporterOrgId: transporterData.transporterCompanySiret
+    }).isValid(testForm);
+
+    expect(isValid).toBeTruthy();
+  });
+
   it("should work if transport mode is ROAD & plates are defined", async () => {
     const testForm: Partial<Form> & {
       transporters: Partial<BsddTransporter>[];
@@ -1476,7 +1498,7 @@ describe("processedInfoSchema", () => {
     const validateFn = () => processedInfoSchema.validate(processedInfo);
 
     await expect(validateFn()).rejects.toThrow(
-      "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire"
+      "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant d'un pays hors Union Européenne)"
     );
   });
 
@@ -1521,6 +1543,72 @@ describe("processedInfoSchema", () => {
 
     await expect(validateFn()).rejects.toThrow(
       "Destination ultérieure : le code du pays de l'entreprise ne correspond pas au numéro de TVA entré"
+    );
+  });
+
+  it("nextDestinationCompany return an error when a foreign extraEuropeanId is given without notificationNumber", async () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 13",
+      processingOperationDescription: "Regroupement",
+      nextDestinationProcessingOperation: "D 8",
+      nextDestinationCompanyName: "Exutoire",
+      nextDestinationCompanyAddress: "4 rue du déchet",
+      nextDestinationCompanyCountry: "FR",
+      nextDestinationCompanyExtraEuropeanId: "BRU0541696005",
+      nextDestinationCompanyContact: "Arya Stark",
+      nextDestinationCompanyPhone: "06 XX XX XX XX",
+      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+    };
+    const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Destination ultérieure : le numéro de notification GISTRID est obligatoire"
+    );
+  });
+
+  it("nextDestinationCompany return an error when a foreign extraEuropeanId is given with a VAT number", async () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 13",
+      processingOperationDescription: "Regroupement",
+      nextDestinationProcessingOperation: "D 8",
+      nextDestinationCompanyName: "Exutoire",
+      nextDestinationCompanyAddress: "4 rue du déchet",
+      nextDestinationCompanyVatNumber: "BE0541696005",
+      nextDestinationCompanyExtraEuropeanId: "BRU0541696005",
+      nextDestinationCompanyContact: "Arya Stark",
+      nextDestinationCompanyPhone: "06 XX XX XX XX",
+      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+    };
+    const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant d'un pays hors Union Européenne)"
+    );
+  });
+
+  it("nextDestinationCompany return an error when a foreign extraEuropeanId is given with a SIRET number", async () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 13",
+      processingOperationDescription: "Regroupement",
+      nextDestinationProcessingOperation: "D 8",
+      nextDestinationCompanyName: "Exutoire",
+      nextDestinationCompanyAddress: "4 rue du déchet",
+      nextDestinationCompanySiret: siretify(1),
+      nextDestinationCompanyExtraEuropeanId: "BRU0541696005",
+      nextDestinationCompanyContact: "Arya Stark",
+      nextDestinationCompanyPhone: "06 XX XX XX XX",
+      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+    };
+    const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant d'un pays hors Union Européenne)"
     );
   });
 
@@ -1652,11 +1740,11 @@ describe("processedInfoSchema", () => {
       expect(err.errors).toEqual([
         "Destination ultérieure : L'opération de traitement est obligatoire",
         "Destination ultérieure : Le nom de l'entreprise est obligatoire",
-        "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire",
         "Destination ultérieure : L'adresse de l'entreprise est obligatoire",
         "Destination ultérieure : Le contact dans l'entreprise est obligatoire",
         "Destination ultérieure : Le téléphone de l'entreprise est obligatoire",
-        "Destination ultérieure : L'email de l'entreprise est obligatoire"
+        "Destination ultérieure : L'email de l'entreprise est obligatoire",
+        "Destination ultérieure : Le siret de l'entreprise est obligatoire (exactement un des identifiants obligatoire, un SIRET ou un numéro TVA intra-communautaire ou un identifiant d'un pays hors Union Européenne)"
       ]);
     }
   });
@@ -1721,7 +1809,7 @@ describe("processedInfoSchema", () => {
       expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
     });
 
-    it.only("should be valid if operationMode is missing but step is not process", async () => {
+    it("should be valid if operationMode is missing but step is not process", async () => {
       const receivedInfo: ReceivedFormInput = {
         wasteAcceptationStatus: "ACCEPTED",
         quantityReceived: 12.5,

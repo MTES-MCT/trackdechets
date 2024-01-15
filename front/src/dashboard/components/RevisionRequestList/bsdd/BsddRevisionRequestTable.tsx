@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { FormRevisionRequest } from "codegen-ui";
+import { FormRevisionRequest } from "@td/codegen-ui";
 import { useTable, useFilters, useSortBy } from "react-table";
 import {
   Table,

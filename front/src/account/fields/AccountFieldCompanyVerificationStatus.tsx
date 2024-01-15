@@ -1,7 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
-import { CompanyPrivate, CompanyVerificationStatus } from "codegen-ui";
+import { CompanyPrivate, CompanyVerificationStatus } from "@td/codegen-ui";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 import AccountFormVerifyCompany from "./forms/AccountFormVerifyCompany";
 

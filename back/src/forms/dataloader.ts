@@ -1,6 +1,6 @@
 import { FormGroupement } from "@prisma/client";
 import DataLoader from "dataloader";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { expandableFormIncludes } from "./converter";
 
 export function createFormDataLoaders() {

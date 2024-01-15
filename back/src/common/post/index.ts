@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import consoleBackend from "./backends/console";
 import { Company, UserRole } from "@prisma/client";
 import { searchCompany } from "../../companies/search";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 const backend =
   process.env.MY_SENDING_BOX_API_KEY &&

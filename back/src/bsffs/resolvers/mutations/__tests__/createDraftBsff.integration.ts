@@ -25,7 +25,7 @@ import {
   createBsffBeforeEmission,
   createFicheIntervention
 } from "../../../__tests__/factories";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { associateUserToCompany } from "../../../../users/database";
 import { getReadonlyBsffPackagingRepository } from "../../../repository";
 import { sirenifyBsffInput } from "../../../sirenify";

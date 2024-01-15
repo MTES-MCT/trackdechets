@@ -1,5 +1,5 @@
 import { logger } from "@td/logger";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { RepositoryFnBuilder, RepositoryTransaction } from "./types";
 
 type Callback = Parameters<RepositoryTransaction["addAfterCommitCallback"]>[0];

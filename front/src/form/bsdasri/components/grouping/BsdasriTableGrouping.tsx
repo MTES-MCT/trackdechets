@@ -9,7 +9,7 @@ import {
   BsdasriStatus,
   DestinationOperationCodeTypes,
   BsdasriPackaging
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { formatDate } from "../../../../common/datetime";
 import { RefreshButton } from "./Common";
 import { aggregatePackagings } from "./utils";

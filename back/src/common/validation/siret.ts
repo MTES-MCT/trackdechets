@@ -1,15 +1,16 @@
 import { z } from "zod";
-import { isForeignVat, isSiret, isVat } from "shared/constants";
+import { isForeignVat, isSiret, isVat } from "@td/constants";
 import {
   isCollector,
   isTransporter,
   isWasteCenter,
   isWasteProcessor,
   isWasteVehicles,
-  isWorker
+  isWorker,
+  isCrematorium
 } from "../../companies/validation";
 import { CompanyVerificationStatus } from "@prisma/client";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 const { VERIFY_COMPANY } = process.env;
 
@@ -114,6 +115,31 @@ export async function isDestinationRefinement(siret: string, ctx) {
   }
 }
 
+export async function isCrematoriumRefinement(siret: string, ctx) {
+  const company = await refineSiretAndGetCompany(siret, ctx);
+  if (company && !isCrematorium(company)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        `L'entreprise avec le SIRET "${siret}" n'est pas inscrite` +
+        ` sur Trackdéchets en tant que crématorium. Cette installation ne peut` +
+        ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
+        ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+    });
+  }
+  if (
+    company &&
+    VERIFY_COMPANY === "true" &&
+    company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        `Le compte de l'installation du crématorium` +
+        ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
+    });
+  }
+}
 async function refineSiretAndGetCompany(siret: string | null | undefined, ctx) {
   if (!siret) return null;
   const company = await prisma.company.findUnique({

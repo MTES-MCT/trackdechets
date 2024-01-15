@@ -8,7 +8,7 @@ import {
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { gql } from "graphql-tag";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { getFormRepository } from "../../../repository";
 import { AuthType } from "../../../../auth";
 

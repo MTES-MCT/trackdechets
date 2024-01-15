@@ -1,6 +1,6 @@
 import { ActionButton, Modal } from "../../../../../common/components";
 import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
-import { Bsff, BsffPackaging, WasteAcceptationStatus } from "codegen-ui";
+import { Bsff, BsffPackaging, WasteAcceptationStatus } from "@td/codegen-ui";
 import React from "react";
 import { SignBsffAcceptationOnePackagingModalContent } from "./SignAcceptation";
 import { SignBsffOperationOnePackagingModalContent } from "./SignOperation";

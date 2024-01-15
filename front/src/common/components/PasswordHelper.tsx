@@ -14,7 +14,7 @@ type PasswordHintResult = {
   message: string;
   hintType: "error" | "success";
 };
-const getPasswordHint = (password: string): PasswordHintResult => {
+export const getPasswordHint = (password: string): PasswordHintResult => {
   if (password.length < MIN_LENGTH)
     return {
       title: "Trop court",

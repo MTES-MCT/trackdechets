@@ -1,5 +1,5 @@
 import React from "react";
-import { FormStatus, Query, QueryFormArgs } from "codegen-ui";
+import { FormStatus, Query, QueryFormArgs } from "@td/codegen-ui";
 import { useLazyQuery } from "@apollo/client";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";

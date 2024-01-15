@@ -10,7 +10,7 @@ import {
 import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import { constantCase } from "constant-case";
 import { Field, useField, useFormikContext } from "formik";
-import { isFRVat, isVat, isForeignVat } from "shared/constants";
+import { isFRVat, isVat, isForeignVat } from "@td/constants";
 import React, {
   useCallback,
   useEffect,
@@ -35,8 +35,9 @@ import {
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs,
   TransporterInput,
-  BsffTransporterInput
-} from "codegen-ui";
+  BsffTransporterInput,
+  TransportMode
+} from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import CompanyResults from "./CompanyResults";
@@ -102,6 +103,15 @@ export default function CompanySelector({
         | Maybe<BsvhuTransporterInput>
         | Maybe<BsffTransporterInput>;
     }>();
+
+  const isRoadTransport =
+    (values.transporter as TransporterInput)?.mode === TransportMode.Road ||
+    (
+      values.transporter as
+        | BsdaTransporterInput
+        | BsdasriTransporterInput
+        | BsffTransporterInput
+    )?.transport?.mode === TransportMode.Road;
 
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
@@ -601,9 +611,12 @@ export default function CompanySelector({
           <RedErrorMessage name={`${field.name}.mail`} />
         </div>
 
-        {values.transporter && !!orgId && name === "transporter.company" && (
-          <TransporterRecepisseWrapper transporter={values.transporter!} />
-        )}
+        {values.transporter &&
+          !!orgId &&
+          name === "transporter.company" &&
+          isRoadTransport && (
+            <TransporterRecepisseWrapper transporter={values.transporter!} />
+          )}
       </div>
     </>
   );

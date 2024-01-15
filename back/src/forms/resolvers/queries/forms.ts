@@ -3,7 +3,7 @@ import { MissingSiret } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { Company, Status, Prisma } from "@prisma/client";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { getUserCompanies } from "../../../users/database";
 import { getFormsRightFilter } from "../../database";
 import { expandFormFromDb, expandableFormIncludes } from "../../converter";

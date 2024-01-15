@@ -13,7 +13,7 @@ import {
 } from "./stepper/steps";
 import { Type } from "./stepper/steps/Type";
 import { getBsdaEditionDisabledSteps } from "./utils/getBsdaEditionDisabledSteps";
-import { Bsda } from "codegen-ui";
+import { Bsda } from "@td/codegen-ui";
 
 export const BsdaContext = createContext<Bsda | undefined>(undefined);
 

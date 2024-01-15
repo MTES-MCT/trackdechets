@@ -13,7 +13,7 @@ import {
   QueryBsdsArgs,
   QueryCompanyPrivateInfosArgs,
   QueryFormRevisionRequestsArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import BsdCardList from "../Apps/Dashboard/Components/BsdCardList/BsdCardList";
 import {
   Blankslate,
@@ -34,7 +34,7 @@ import {
 } from "../Apps/Dashboard/dashboardUtils";
 import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
 import { usePermissions } from "../common/contexts/PermissionsContext";
-import { UserPermission } from "codegen-ui";
+import { UserPermission } from "@td/codegen-ui";
 import { GET_BSDA_REVISION_REQUESTS } from "../Apps/common/queries/reviews/BsdaReviewQuery";
 import { GET_FORM_REVISION_REQUESTS } from "../Apps/common/queries/reviews/BsddReviewsQuery";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../Apps/common/queries/company/query";
@@ -51,16 +51,16 @@ import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 
 const DashboardPage = () => {
   const { permissions } = usePermissions();
-  const isActTab = !!useMatch(routes.dashboardv2.bsds.act);
-  const isDraftTab = !!useMatch(routes.dashboardv2.bsds.drafts);
-  const isFollowTab = !!useMatch(routes.dashboardv2.bsds.follow);
-  const isArchivesTab = !!useMatch(routes.dashboardv2.bsds.history);
-  const isReviewsTab = !!useMatch(routes.dashboardv2.bsds.reviews);
-  // const isToReviewedTab = !!useMatch(routes.dashboardv2.bsds.toReviewed);
-  // const isReviewedTab = !!useMatch(routes.dashboardv2.bsds.reviewed);
-  const isToCollectTab = !!useMatch(routes.dashboardv2.transport.toCollect);
-  const isCollectedTab = !!useMatch(routes.dashboardv2.transport.collected);
-  const isAllBsdsTab = !!useMatch(routes.dashboardv2.bsds.index);
+  const isActTab = !!useMatch(routes.dashboard.bsds.act);
+  const isDraftTab = !!useMatch(routes.dashboard.bsds.drafts);
+  const isFollowTab = !!useMatch(routes.dashboard.bsds.follow);
+  const isArchivesTab = !!useMatch(routes.dashboard.bsds.history);
+  const isReviewsTab = !!useMatch(routes.dashboard.bsds.reviews);
+  // const isToReviewedTab = !!useMatch(routes.dashboard.bsds.toReviewed);
+  // const isReviewedTab = !!useMatch(routes.dashboard.bsds.reviewed);
+  const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
+  const isCollectedTab = !!useMatch(routes.dashboard.transport.collected);
+  const isAllBsdsTab = !!useMatch(routes.dashboard.bsds.index);
 
   const BSD_PER_PAGE = 25;
   const bsdCurrentTab = getBsdCurrentTab({

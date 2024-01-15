@@ -36,6 +36,10 @@ input BsdWhere {
 
   sirets: StringNullableListFilter
 
+  # Identifiants de tous les acteurs du BSD
+  companyNames: TextFilter
+  companyOrgIds: StringNullableListFilter
+
   _and: [BsdWhere!]
   _or: [BsdWhere!]
 }

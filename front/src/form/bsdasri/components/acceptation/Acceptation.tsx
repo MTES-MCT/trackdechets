@@ -1,6 +1,6 @@
 import NumberInput from "../../../common/components/custom-inputs/NumberInput";
 import { Field, FieldProps, useFormikContext } from "formik";
-import { BsdasriWasteAcceptation, Bsdasri } from "codegen-ui";
+import { BsdasriWasteAcceptation, Bsdasri } from "@td/codegen-ui";
 import { RadioButton } from "../../../common/components/custom-inputs/RadioButton";
 import React, { InputHTMLAttributes } from "react";
 import { Label, RedErrorMessage } from "../../../../common/components";

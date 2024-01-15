@@ -8,7 +8,7 @@ import {
   expandGroupingDasri,
   expandSynthesizingDasri
 } from "../converter";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { BsdasriPdf } from "./components/BsdasriPdf";
 
 const getAssociatedBsdasris = async (bsdasri: Bsdasri) => {

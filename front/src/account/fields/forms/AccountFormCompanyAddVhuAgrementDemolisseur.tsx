@@ -3,7 +3,7 @@ import { useMutation, gql } from "@apollo/client";
 import { Formik, FormikProps, Form, Field } from "formik";
 import RedErrorMessage from "../../../common/components/RedErrorMessage";
 import { NotificationError } from "../../../Apps/common/Components/Error/Error";
-import { CompanyPrivate } from "codegen-ui";
+import { CompanyPrivate } from "@td/codegen-ui";
 
 type Props = {
   company: Pick<CompanyPrivate, "id" | "siret" | "vhuAgrementDemolisseur">;

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Form, QuantityType } from "codegen-ui";
+import { Form, QuantityType } from "@td/codegen-ui";
 import {
   DataList,
   DataListDescription,

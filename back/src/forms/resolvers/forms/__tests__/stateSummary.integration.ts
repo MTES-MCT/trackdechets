@@ -2,7 +2,7 @@ import { Status } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query, QueryFormArgs } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   companyFactory,
   formWithTempStorageFactory,

@@ -1,5 +1,5 @@
 import { EmitterType, Prisma, TransportMode } from "@prisma/client";
-import { isDangerous, BSDD_WASTE_CODES } from "shared/constants";
+import { isDangerous, BSDD_WASTE_CODES } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationUpdateFormArgs,
@@ -27,7 +27,7 @@ import {
   sealedFormSchema,
   validateGroupement
 } from "../../validation";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
 import { sirenifyFormInput } from "../../sirenify";

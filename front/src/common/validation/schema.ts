@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import countries from "world-countries";
-import { isOmi, isVat } from "shared/constants";
+import { isOmi, isVat } from "@td/constants";
 
 /**
  * Company Schema for the general case (FR company)

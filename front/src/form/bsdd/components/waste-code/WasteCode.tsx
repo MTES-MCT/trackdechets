@@ -4,7 +4,7 @@ import {
   BSDD_WASTES,
   BSDD_APPENDIX1_WASTE_TREE,
   BSDD_WASTES_TREE
-} from "shared/constants";
+} from "@td/constants";
 import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import WasteTreeModal from "../../../../search/WasteTreeModal";
 import styles from "./WasteCode.module.scss";

@@ -24,7 +24,7 @@ export default function Admin() {
             <li className="tw-mb-1">
               <NavLink
                 to={routes.admin.verification}
-                className={isActive =>
+                className={({ isActive }) =>
                   isActive
                     ? "sidebar__link sidebar__link--active"
                     : "sidebar__link"
@@ -36,7 +36,7 @@ export default function Admin() {
             <li className="tw-mb-1">
               <NavLink
                 to={routes.admin.anonymousCompany}
-                className={isActive =>
+                className={({ isActive }) =>
                   isActive
                     ? "sidebar__link sidebar__link--active"
                     : "sidebar__link"
@@ -48,7 +48,7 @@ export default function Admin() {
             <li className="tw-mb-1">
               <NavLink
                 to={routes.admin.reindex}
-                className={isActive =>
+                className={({ isActive }) =>
                   isActive
                     ? "sidebar__link sidebar__link--active"
                     : "sidebar__link"
@@ -60,7 +60,7 @@ export default function Admin() {
             <li className="tw-mb-1">
               <NavLink
                 to={routes.admin.user}
-                className={isActive =>
+                className={({ isActive }) =>
                   isActive
                     ? "sidebar__link sidebar__link--active"
                     : "sidebar__link"

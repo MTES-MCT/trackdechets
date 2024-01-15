@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import axios from "axios";
 import { addContact } from "../../src/mailer/mailing";
-import prisma from "../../src/prisma";
+import { prisma } from "@td/prisma";
 import { Updater, registerUpdater } from "./helper/helper";
 
 type Contact = { Email: string; Name?: string };

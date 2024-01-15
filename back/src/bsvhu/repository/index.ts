@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { transactionWrapper } from "../../common/repository/helper";
 import { BsvhuActions } from "./types";
 import { buildFindUniqueBsvhu } from "./bsvhu/findUnique";

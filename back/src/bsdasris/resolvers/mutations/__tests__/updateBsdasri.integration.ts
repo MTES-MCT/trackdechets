@@ -12,7 +12,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";

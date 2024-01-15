@@ -1,4 +1,4 @@
-import { Bsff, Bsdasri, Bsvhu, BsdType } from "codegen-ui";
+import { Bsff, Bsdasri, Bsvhu, BsdType } from "@td/codegen-ui";
 import {
   BsdDisplay,
   BsdStatusCode,
@@ -75,6 +75,7 @@ export const mapBsdd = (bsdd: FormWithReview): BsdDisplay => {
     emitter: bsdd.emitter,
     destination: bsdd.recipient,
     transporter: bsdd.transporter,
+    transporters: bsdd.transporters,
     ecoOrganisme: bsdd.ecoOrganisme,
     updatedAt: bsdd.stateSummary?.lastActionOn,
     emittedByEcoOrganisme: bsdd.emittedByEcoOrganisme,
@@ -208,7 +209,7 @@ const mapBsff = (bsff: Bsff): BsdDisplay => {
     destination: bsff.destination || bsff["bsffDestination"],
     transporter: bsff.transporter || bsff["bsffTransporter"],
     updatedAt: bsff["bsffUpdatedAt"],
-    bsdWorkflowType: bsff.type,
+    bsdWorkflowType: bsff["bsffType"] || bsff.type,
     grouping: bsff.grouping,
     transporterCustomInfo: bsff["bsffTransporter"]?.customInfo,
     transporterNumberPlate: bsff["bsffTransporter"]?.transport?.plates,

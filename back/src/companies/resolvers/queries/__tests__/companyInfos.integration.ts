@@ -1,6 +1,6 @@
 import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { companyFactory, siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { AnonymousCompanyError } from "../../../sirene/errors";
@@ -353,7 +353,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       etatAdministratif: "A",
       installation: null,
       isRegistered: false,
-      statutDiffusionEtablissement: "N",
+      statutDiffusionEtablissement: "P",
       libelleNaf: null,
       naf: null,
       name: null,
@@ -403,7 +403,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       etatAdministratif: "A",
       installation: null,
       isRegistered: true,
-      statutDiffusionEtablissement: "N",
+      statutDiffusionEtablissement: "P",
       libelleNaf: null,
       naf: null,
       name: null,

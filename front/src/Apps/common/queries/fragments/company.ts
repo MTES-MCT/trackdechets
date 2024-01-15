@@ -12,6 +12,7 @@ export const companyFragment = gql`
     phone
     mail
     omiNumber
+    extraEuropeanId
   }
 `;
 

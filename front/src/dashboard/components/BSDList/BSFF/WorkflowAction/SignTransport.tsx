@@ -9,7 +9,7 @@ import {
   MutationSignBsffArgs,
   MutationUpdateBsffArgs,
   TransportMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { RedErrorMessage } from "../../../../../common/components";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import {

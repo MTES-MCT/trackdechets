@@ -11,15 +11,14 @@ import Loader from "../Loader/Loaders";
 import Layout from "./Layout";
 import routes from "../../../routes";
 import { useQuery, gql } from "@apollo/client";
-import { Query } from "codegen-ui";
+import { Query } from "@td/codegen-ui";
 import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
-const Dashboard = lazy(() => import("../../../../dashboard/Dashboard"));
-const DashboardV2Routes = lazy(
+const DashboardRoutes = lazy(
   () => import("../../../Dashboard/DashboardRoutes")
 );
 const Account = lazy(() => import("../../../../account/Account"));
@@ -80,23 +79,20 @@ export default function LayoutContainer() {
   const isAuthenticated = !loading && data != null;
   const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
 
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
-  const isDashboardRoutes = !!useMatch("/dashboard/*");
-
+  const isDashboard = !!useMatch("/dashboard/*");
   if (loading) {
     return <Loader />;
   }
 
-  const v2banner =
-    isV2Routes || isDashboardRoutes ? (
-      <SurveyBanner
-        message="« Mes bordereaux » vous permet de découvrir le nouveau tableau de bord. Découvrez-le et partagez-nous vos suggestions."
-        button={{
-          title: "Partagez vos suggestions",
-          href: "https://tally.so/r/3xDDy9"
-        }}
-      ></SurveyBanner>
-    ) : undefined;
+  const v2banner = isDashboard ? (
+    <SurveyBanner
+      message="Trackdéchets évolue ! L’onglet « Mon Espace » cède sa place au nouveau tableau de bord (« Mes bordereaux ») et de nouvelles fonctionnalités sont disponibles depuis la dernière mise à jour. Pour en savoir plus sur ces dernières évolutions, consultez notre FAQ."
+      button={{
+        title: "Voir la FAQ",
+        href: "https://faq.trackdechets.fr/pour-aller-plus-loin/les-dernieres-evolutions-de-trackdechets"
+      }}
+    ></SurveyBanner>
+  ) : undefined;
 
   return (
     <Suspense fallback={<Loader />}>
@@ -174,21 +170,7 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={"/v2/dashboard/:siret/bsds/edit/:id"}
-            element={<Redirect path={routes.dashboardv2.bsdds.edit} />}
-          />
-
-          <Route
             path={routes.dashboard.bsdds.edit}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <FormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboardv2.bsdds.edit}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <FormContainer />
@@ -202,21 +184,7 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={"/v2/dashboard/:siret/bsds/create"}
-            element={<Redirect path={routes.dashboardv2.bsdds.create} />}
-          />
-
-          <Route
             path={routes.dashboard.bsdds.create}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <FormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboardv2.bsdds.create}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <FormContainer />
@@ -234,25 +202,7 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes.dashboardv2.bsvhus.create}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <BsvhuFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
             path={routes.dashboard.bsvhus.edit}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <BsvhuFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboardv2.bsvhus.edit}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsvhuFormContainer />
@@ -270,25 +220,7 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes.dashboardv2.bsffs.create}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <BsffFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
             path={routes.dashboard.bsffs.edit}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <BsffFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboardv2.bsffs.edit}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsffFormContainer />
@@ -306,25 +238,7 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes.dashboardv2.bsdasris.create}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <BsdasriFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
             path={routes.dashboard.bsdasris.edit}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <BsdasriFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboardv2.bsdasris.edit}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsdasriFormContainer />
@@ -342,25 +256,7 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes.dashboardv2.bsdas.create}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <BsdaFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
             path={routes.dashboard.bsdas.edit}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <BsdaFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboardv2.bsdas.edit}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <BsdaFormContainer />
@@ -372,16 +268,7 @@ export default function LayoutContainer() {
             path={`${routes.dashboard.index}/*`}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
-                <Dashboard />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={`${routes.dashboardv2.index}/*`}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <DashboardV2Routes />
+                <DashboardRoutes />
               </RequireAuth>
             }
           />
@@ -411,7 +298,7 @@ export default function LayoutContainer() {
                 to={
                   data
                     ? data.me.companies.length > 0
-                      ? generatePath(routes.dashboardv2.index, {
+                      ? generatePath(routes.dashboard.index, {
                           siret: data.me.companies[0].orgId
                         })
                       : routes.account.companies.list

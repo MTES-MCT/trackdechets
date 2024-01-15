@@ -27,7 +27,7 @@ export interface SireneSearchResult {
   /** SIRET de l'établissement */
   siret?: string;
   /** Statut de diffusion des informations de l'établisement selon l'INSEE */
-  statutDiffusionEtablissement?: StatutDiffusionEtablissement;
+  statutDiffusionEtablissement: StatutDiffusionEtablissement;
 }
 
 interface PeriodeEtablissementInsee {
@@ -53,7 +53,7 @@ interface EtablissementInsee {
     codeCommuneEtablissement: string;
   };
   periodesEtablissement: PeriodeEtablissementInsee[];
-  statutDiffusionEtablissement: "O" | "N" | "P";
+  statutDiffusionEtablissement: StatutDiffusionEtablissement;
 }
 
 // Response from https://api.insee.fr/entreprises/siret/V3/siret/<VOTRE_SIRET>
@@ -64,34 +64,4 @@ export interface SearchResponseInsee {
 // Response from https://api.insee.fr/entreprises/siret/V3/siret/
 export interface FullTextSearchResponseInsee {
   etablissements: EtablissementInsee[];
-}
-
-// Response from https://search-recherche-entreprises.fabrique.social.gouv.fr/api/v1/etablissement/<VOTRE_SIRET>
-export interface SearchResponseSocialGouv {
-  siret: string;
-  activitePrincipale: string;
-  categorieJuridiqueUniteLegale: string;
-  etatAdministratifEtablissement: string;
-  address: string;
-  codeCommuneEtablissement: string;
-  label: string;
-  statutDiffusionEtablissement: "O" | "N";
-}
-
-export interface MatchingEtablissementSocialGouv {
-  siret: string;
-  address: string;
-  etatAdministratif: string;
-  statutDiffusionEtablissement: "O" | "N";
-}
-
-export interface MatchingEntrepriseSocialGouv {
-  activitePrincipale: string;
-  label: string;
-  categorieJuridiqueUniteLegale: string;
-  allMatchingEtablissements: MatchingEtablissementSocialGouv[];
-}
-// Response from https://search-recherche-entreprises.fabrique.social.gouv.fr/api/v1/search?query=<QUERY>
-export interface FullTextSearchResponseSocialGouv {
-  entreprises: MatchingEntrepriseSocialGouv[];
 }

@@ -2,7 +2,7 @@ import {
   resetCache,
   resetDatabase
 } from "../../../../integration-tests/helper";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { sirenify } from "../sirene";
 import { companyFactory, userFactory } from "../../../__tests__/factories";

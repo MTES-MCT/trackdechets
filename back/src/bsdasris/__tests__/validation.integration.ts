@@ -122,6 +122,20 @@ describe("Mutation.signBsdasri emission", () => {
       expect(validated).toBeDefined();
     });
 
+    it("transporter recepisse is not required if transport mode is not ROAD", async () => {
+      const data = {
+        ...bsdasri,
+        transporterTransportMode: "AIR",
+        transporterRecepisseDepartment: "",
+        transporterRecepisseNumber: "",
+        transporterRecepisseValidityLimit: null
+      };
+      const validated = await validateBsdasri(data as any, {
+        transportSignature: true
+      });
+      expect(validated).toBeDefined();
+    });
+
     it("should work if transport mode is ROAD & plates are defined", async () => {
       const data = {
         ...bsdasri,

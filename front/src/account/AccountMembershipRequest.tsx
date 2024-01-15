@@ -5,7 +5,12 @@ import {
   NotificationError
 } from "../Apps/common/Components/Error/Error";
 import Loader from "../Apps/common/Components/Loader/Loaders";
-import { MembershipRequestStatus, Mutation, Query, UserRole } from "codegen-ui";
+import {
+  MembershipRequestStatus,
+  Mutation,
+  Query,
+  UserRole
+} from "@td/codegen-ui";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { TOAST_DURATION } from "../common/config";
@@ -124,8 +129,10 @@ export default function AccountMembershipRequest() {
               value={userRole}
               onChange={e => setUserRole(e.target.value as UserRole)}
             >
-              <option value={UserRole.Member}>Collaborateur</option>
               <option value={UserRole.Admin}>Administrateur</option>
+              <option value={UserRole.Member}>Collaborateur</option>
+              <option value={UserRole.Reader}>Lecteur</option>
+              <option value={UserRole.Driver}>Chauffeur</option>
             </select>
           </div>
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import WasteDetails from "./WasteDetails";
-import { BsdType } from "codegen-ui";
+import { BsdType } from "@td/codegen-ui";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCard/Blocks/WasteDetails",

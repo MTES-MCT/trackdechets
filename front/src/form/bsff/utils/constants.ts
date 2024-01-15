@@ -1,4 +1,4 @@
-import { BsffOperationCode, BsffType } from "codegen-ui";
+import { BsffOperationCode, BsffType } from "@td/codegen-ui";
 
 export const OPERATION: Record<
   BsffOperationCode,

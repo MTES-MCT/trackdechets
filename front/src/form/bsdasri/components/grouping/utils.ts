@@ -1,4 +1,4 @@
-import { BsdasriPackaging } from "codegen-ui";
+import { BsdasriPackaging } from "@td/codegen-ui";
 
 export const aggregatePackagings = (packagingsArray: BsdasriPackaging[][]) => {
   return packagingsArray.reduce((prev, cur) => {

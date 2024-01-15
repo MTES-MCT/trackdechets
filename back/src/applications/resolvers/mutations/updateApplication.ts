@@ -3,7 +3,7 @@ import { removeEmptyKeys } from "../../../common/converter";
 import { ForbiddenError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { getApplicationOrApplicationNotFound } from "../../database";
 import { applicationSchema } from "../../validation";
 

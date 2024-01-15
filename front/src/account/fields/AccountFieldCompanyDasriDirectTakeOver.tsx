@@ -7,7 +7,7 @@ import {
   CompanyPrivate,
   UserRole,
   MutationUpdateCompanyArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 
 import AccountFormCheckboxInput from "./forms/AccountFormCheckboxInput";
 

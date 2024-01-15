@@ -9,7 +9,7 @@ import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { MEDIA_QUERIES } from "../../../common/config";
 import { usePersistedState } from "../../../Apps/common/hooks/usePersistedState";
 import { GET_BSDS } from "../../../Apps/common/queries";
-import { BsdWhere, Query, QueryBsdsArgs } from "codegen-ui";
+import { BsdWhere, Query, QueryBsdsArgs } from "@td/codegen-ui";
 import * as React from "react";
 import { useMedia } from "../../../common/use-media";
 import { BSDCards } from "./BSDCards";

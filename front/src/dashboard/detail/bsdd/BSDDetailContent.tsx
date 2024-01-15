@@ -13,7 +13,6 @@ import { useDuplicate } from "../../components/BSDList/BSDD/BSDDActions/useDupli
 import { DeleteModal } from "../../components/BSDList/BSDD/BSDDActions/DeleteModal";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
-  TransportSegment,
   Form,
   FormCompany,
   FormStatus,
@@ -22,7 +21,7 @@ import {
   Query,
   QueryCompanyPrivateInfosArgs,
   OperationMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { emitterTypeLabels, getTransportModeLabel } from "../../constants";
 import {
   IconWarehouseDelivery,
@@ -54,18 +53,20 @@ import {
   PackagingRow
 } from "../common/Components";
 import { WorkflowAction } from "../../components/BSDList";
-import EditSegment from "./EditSegment";
 import { Modal } from "../../../common/components";
 import { Loader } from "../../../Apps/common/Components";
-import { isDangerous } from "shared/constants";
 import { format } from "date-fns";
-import { isForeignVat, isSiret } from "shared/constants";
+import {
+  isForeignVat,
+  isSiret,
+  isDangerous,
+  STATUS_LABELS
+} from "@td/constants";
 import { Appendix1ProducerForm } from "../../../form/bsdd/appendix1Producer/form";
 import { useQuery } from "@apollo/client";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../Apps/common/queries/company/query";
 import { formTransportIsPipeline } from "../../../form/bsdd/utils/packagings";
 import { getOperationModeLabel } from "../../../common/operationModes";
-import { STATUS_LABELS } from "shared/constants";
 import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
 import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
 
@@ -78,76 +79,30 @@ const Company = ({ company, label }: CompanyProps) => (
     <dt>{label}</dt> <dd>{company?.name}</dd>
     <dt>Siret</dt> <dd>{company?.siret}</dd>
     <dt>Numéro de TVA</dt> <dd>{company?.vatNumber}</dd>
-    <dt>
-      Numéro OMI <br />
-      (Organisation maritime internationale)
-    </dt>{" "}
-    <dd>{company?.omiNumber}</dd>
+    {company?.omiNumber && (
+      <>
+        <dt>
+          Numéro OMI <br />
+          (Organisation maritime internationale)
+        </dt>{" "}
+        <dd>{company?.omiNumber}</dd>
+      </>
+    )}
+    {company?.extraEuropeanId && (
+      <>
+        <dt>
+          Identifiant si hors Union Européenne <br />
+          (en l'absence de numéro de TVA)
+        </dt>{" "}
+        <dd>{company?.extraEuropeanId}</dd>
+      </>
+    )}
     <dt>Adresse</dt> <dd>{company?.address}</dd>
     <dt>Tél</dt> <dd>{company?.phone}</dd>
     <dt>Mél</dt> <dd>{company?.mail}</dd>
     <dt>Contact</dt> <dd>{company?.contact}</dd>
   </>
 );
-
-type SegmentProps = {
-  segment: TransportSegment;
-  siret: string;
-};
-const TransportSegmentDetail = ({ segment, siret }: SegmentProps) => {
-  const label = !!segment.segmentNumber
-    ? `Transporteur N° ${segment.segmentNumber}`
-    : "";
-  return (
-    <>
-      <div className={styles.detailGrid}>
-        <Company label={label} company={segment?.transporter?.company} />
-      </div>
-
-      <div className={styles.detailGrid}>
-        <YesNoRow
-          value={segment?.transporter?.isExemptedOfReceipt}
-          label="Exemption de récépissé"
-        />
-        {!segment?.transporter?.isExemptedOfReceipt && (
-          <>
-            <DetailRow
-              value={segment?.transporter?.receipt}
-              label="Numéro de récépissé"
-              showEmpty={true}
-            />
-            <DetailRow
-              value={segment?.transporter?.department}
-              label="Département"
-              showEmpty={true}
-            />
-            <DateRow
-              value={segment?.transporter?.validityLimit}
-              label="Date de validité"
-            />
-          </>
-        )}
-        <DetailRow
-          value={segment?.transporter?.numberPlate}
-          label="Immatriculation"
-        />
-
-        <DateRow value={segment?.takenOverAt} label="Pris en charge le" />
-        <DetailRow value={segment?.takenOverBy} label="Pris en charge par" />
-
-        <DetailRow
-          value={getTransportModeLabel(segment?.mode)}
-          label="Mode de transport"
-        />
-      </div>
-      {!segment.readyToTakeOver &&
-        [
-          segment.transporter?.company?.orgId,
-          segment.previousTransporterCompanySiret
-        ].includes(siret) && <EditSegment segment={segment} siret={siret} />}
-    </>
-  );
-};
 
 const TempStorage = ({ form }) => {
   const { temporaryStorageDetail } = form;
@@ -259,6 +214,7 @@ const TempStorage = ({ form }) => {
     </>
   );
 };
+
 const Trader = ({ trader }) => (
   <div className={styles.detailColumns}>
     <div className={styles.detailGrid}>
@@ -391,7 +347,6 @@ const Recipient = ({
   const recipient = hasTempStorage
     ? form.temporaryStorageDetail?.destination
     : form.recipient;
-
   return (
     <>
       {" "}
@@ -438,6 +393,24 @@ const Recipient = ({
             <GroupedIn form={form} key={form.id} />
           ))}
       </div>
+      {form.nextDestination?.company && (
+        <div className={styles.detailGrid}>
+          <DetailRow
+            value={form.nextDestination?.processingOperation}
+            label="Opération ultérieure prévue"
+          />
+          {form.nextDestination.notificationNumber && (
+            <DetailRow
+              value={form.nextDestination?.notificationNumber}
+              label="Numéro de notification"
+            />
+          )}
+          <Company
+            label="Destination ultérieure prévue"
+            company={form.nextDestination?.company}
+          />
+        </div>
+      )}
     </>
   );
 };
@@ -627,12 +600,26 @@ export default function BSDDetailContent({
 
   const selectedTab = query.get("selectedTab");
 
-  const isMultiModal = !!form?.transportSegments?.length;
+  const isMultiModal = form?.transporters.length > 1;
   const hasTempStorage = !!form?.temporaryStorageDetail;
   const isRegroupement: boolean = form?.emitter?.type === EmitterType.Appendix2;
   const isChapeau: boolean = form?.emitter?.type === EmitterType.Appendix1;
   const isAppendix1Producer: boolean =
     form?.emitter?.type === EmitterType.Appendix1Producer;
+
+  const canDelete =
+    [FormStatus.Draft, FormStatus.Sealed].includes(form.status) ||
+    (form.status === FormStatus.SignedByProducer &&
+      siret === form.emitter?.company?.orgId);
+
+  const canUpdate =
+    [
+      FormStatus.Draft,
+      FormStatus.Sealed,
+      FormStatus.SignedByProducer,
+      FormStatus.Sent
+    ].includes(form.status) &&
+    EmitterType.Appendix1Producer !== form.emitter?.type;
 
   return (
     <>
@@ -768,18 +755,11 @@ export default function BSDDetailContent({
                 <span className={styles.detailTabCaption}>Courtier</span>
               </Tab>
             )}
-            <Tab className={styles.detailTab}>
-              <IconWarehouseDelivery size="25px" />
-              <span className={styles.detailTabCaption}>
-                <span> {isMultiModal ? "Transp. n°1" : "Transporteur"}</span>
-              </span>
-            </Tab>
-            {form.transportSegments?.map((segment, idx) => (
+            {form.transporters?.map((_, idx) => (
               <Tab className={styles.detailTab} key={idx}>
                 <IconWarehouseDelivery size="25px" />
                 <span className={styles.detailTabCaption}>
-                  Transp.
-                  {!!segment.segmentNumber && `N° ${segment.segmentNumber}`}
+                  {isMultiModal ? `Transp. n° ${idx + 1}` : "Transporteur"}
                 </span>
               </Tab>
             ))}
@@ -884,37 +864,41 @@ export default function BSDDetailContent({
               </TabPanel>
             )}
             {/* Transporter tab panel */}
-            <TabPanel className={styles.detailTabPanel}>
-              {!formTransportIsPipeline(form) ? (
-                <>
+            {!formTransportIsPipeline(form) ? (
+              (form.transporters ?? []).map((transporter, idx) => (
+                <TabPanel className={styles.detailTabPanel}>
                   <div className={`${styles.detailGrid} `}>
                     <Company
-                      label={`Transporteur ${isMultiModal ? "N°1" : ""}`}
-                      company={form.transporter?.company}
+                      label={
+                        isMultiModal
+                          ? `Transporteur n°${idx + 1}`
+                          : "Transporteur"
+                      }
+                      company={transporter?.company}
                     />
                   </div>
 
                   <div className={styles.detailGrid}>
-                    {!isForeignVat(form?.transporter?.company?.vatNumber!) && (
+                    {!isForeignVat(transporter?.company?.vatNumber!) && (
                       <>
                         <YesNoRow
-                          value={form?.transporter?.isExemptedOfReceipt}
+                          value={transporter?.isExemptedOfReceipt}
                           label="Exemption de récépissé"
                         />
-                        {!form?.transporter?.isExemptedOfReceipt && (
+                        {!transporter?.isExemptedOfReceipt && (
                           <>
                             <DetailRow
-                              value={form?.transporter?.receipt}
+                              value={transporter?.receipt}
                               label="Numéro de récépissé"
                               showEmpty={true}
                             />
                             <DetailRow
-                              value={form?.transporter?.department}
+                              value={transporter?.department}
                               label="Département"
                               showEmpty={true}
                             />
                             <DateRow
-                              value={form?.transporter?.validityLimit}
+                              value={transporter?.validityLimit}
                               label="Date de validité"
                             />
                           </>
@@ -922,42 +906,35 @@ export default function BSDDetailContent({
                       </>
                     )}
                     <DetailRow
-                      value={form?.transporter?.numberPlate}
+                      value={transporter?.numberPlate}
                       label="Immatriculation"
                     />
                     <YesNoRow
-                      value={form.signedByTransporter}
+                      value={transporter.takenOverBy}
                       label="Signé par le transporteur"
                     />
                     <DateRow
-                      value={form.takenOverAt}
+                      value={transporter.takenOverAt}
                       label="Date de prise en charge"
                     />
                     <DetailRow
-                      value={getTransportModeLabel(form.transporter?.mode)}
+                      value={getTransportModeLabel(transporter?.mode)}
                       label="Mode de transport"
                     />
                   </div>
-                </>
-              ) : (
+                </TabPanel>
+              ))
+            ) : (
+              <TabPanel className={styles.detailTabPanel}>
                 <div className={`${styles.detailGrid} `}>
                   <DetailRow
                     value="Conditionné pour Pipeline"
                     label="Transport"
                   />
                 </div>
-              )}
-            </TabPanel>
-            {/* Multimodal transporters tab panels */}
-            {form.transportSegments?.map((segment, idx) => (
-              <TabPanel className={styles.detailTabPanel} key={idx}>
-                <TransportSegmentDetail
-                  segment={segment}
-                  siret={siret!}
-                  key={segment.id}
-                />
               </TabPanel>
-            ))}
+            )}
+
             {/* Temp storage tab panel */}
             {hasTempStorage && (
               <TabPanel className={styles.detailTabPanel}>
@@ -999,35 +976,27 @@ export default function BSDDetailContent({
             <IconDuplicateFile size="24px" color="blueLight" />
             <span>Dupliquer</span>
           </button>
-          {[
-            FormStatus.Draft,
-            FormStatus.Sealed,
-            FormStatus.SignedByProducer
-          ].includes(form.status) && (
-            <>
-              <button
-                className="btn btn--outline-primary"
-                onClick={() => setIsDeleting(true)}
-              >
-                <IconTrash color="blueLight" size="24px" />
-                <span>Supprimer</span>
-              </button>
-
-              {EmitterType.Appendix1Producer !== form.emitter?.type && (
-                <Link
-                  to={generatePath(routes.dashboard.bsdds.edit, {
-                    siret,
-                    id: form.id
-                  })}
-                  className="btn btn--outline-primary"
-                >
-                  <IconPaperWrite size="24px" color="blueLight" />
-                  <span>Modifier</span>
-                </Link>
-              )}
-            </>
+          {canDelete && (
+            <button
+              className="btn btn--outline-primary"
+              onClick={() => setIsDeleting(true)}
+            >
+              <IconTrash color="blueLight" size="24px" />
+              <span>Supprimer</span>
+            </button>
           )}
-
+          {canUpdate && (
+            <Link
+              to={generatePath(routes.dashboard.bsdds.edit, {
+                siret,
+                id: form.id
+              })}
+              className="btn btn--outline-primary"
+            >
+              <IconPaperWrite size="24px" color="blueLight" />
+              <span>Modifier</span>
+            </Link>
+          )}
           <WorkflowAction siret={siret!} form={form} />
           {children}
         </div>

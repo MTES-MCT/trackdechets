@@ -15,7 +15,7 @@ import {
 } from "../../converter";
 import { Prisma } from "@prisma/client";
 import { getFormRepository } from "../../repository";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { sirenifyTransportSegmentInput } from "../../sirenify";
 import {
   recipifyTransportSegmentInput,
@@ -25,7 +25,7 @@ import { checkUserPermissions, Permission } from "../../../permissions";
 import {
   PartialTransporterCompany,
   getTransporterCompanyOrgId
-} from "shared/constants";
+} from "@td/constants";
 import { MISSING_COMPANY_SIRET_OR_VAT } from "../../errors";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getTransporters } from "../../database";

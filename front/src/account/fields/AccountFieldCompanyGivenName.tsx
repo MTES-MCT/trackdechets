@@ -6,7 +6,7 @@ import {
   CompanyPrivate,
   MutationUpdateCompanyArgs,
   UserRole
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
 type Props = {

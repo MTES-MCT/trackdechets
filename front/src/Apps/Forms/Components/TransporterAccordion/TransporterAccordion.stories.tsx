@@ -19,5 +19,7 @@ export const Primary = Template.bind({});
 
 Primary.args = {
   name: "Transport qui roule",
+  numero: 1,
+  expanded: true,
   children: <div>Contenu du formulaire</div>
 };

@@ -9,11 +9,12 @@ import {
   CompanyType,
   FavoriteType,
   Transporter as FormTransporter,
+  TransportMode,
   Transporter
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
 import TransporterRecepisse from "../TransporterRecepisse/TransporterRecepisse";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 
 type TransporterFormProps = {
   // SIRET ou VAT de l'établissement courant
@@ -116,7 +117,7 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
     <div className="fr-container">
       <CompanySelectorWrapper
         orgId={orgId}
-        formOrgId={transporterOrgId}
+        selectedCompanyOrgId={transporterOrgId}
         favoriteType={FavoriteType.Transporter}
         allowForeignCompanies={true}
         selectedCompanyError={selectedCompanyError}
@@ -154,13 +155,16 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
         )}
       </Field>
 
-      {!!transporterOrgId && !isForeign && !transporter.isExemptedOfReceipt && (
-        <TransporterRecepisse
-          number={transporter.receipt}
-          department={transporter.department}
-          validityLimit={transporter.validityLimit}
-        />
-      )}
+      {!!transporterOrgId &&
+        !isForeign &&
+        !transporter.isExemptedOfReceipt &&
+        transporter.mode === TransportMode.Road && (
+          <TransporterRecepisse
+            number={transporter.receipt}
+            department={transporter.department}
+            validityLimit={transporter.validityLimit}
+          />
+        )}
 
       <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
         <div className="fr-col-12 fr-col-md-3">

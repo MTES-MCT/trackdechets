@@ -18,7 +18,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import { Prisma } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { getFormReceiptField } from "./signTransportForm";
 import { UserInputError } from "../../../common/errors";
 

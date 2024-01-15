@@ -1,4 +1,4 @@
-import prisma from "../../src/prisma";
+import { prisma } from "@td/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 import { getUserCompanies } from "../../src/users/database";
 

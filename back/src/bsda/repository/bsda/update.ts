@@ -86,10 +86,7 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
       }
     }
 
-    if (
-      data.forwarding !== undefined &&
-      forwarding?.id !== updatedBsda.forwardingId
-    ) {
+    if (forwarding?.id !== updatedBsda.forwardingId) {
       // Identifiants des bordereaux qui doivent être réindexés pour que rawBsd.forwardedIn
       // ne soit pas désynchronisé
       const dirtyIds = [forwarding?.id, updatedBsda.forwardingId].filter(

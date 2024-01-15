@@ -10,7 +10,6 @@ import {
   SchemaOf
 } from "yup";
 
-import { isDangerous } from "shared/constants";
 import {
   PackagingInfo,
   Packagings,
@@ -18,10 +17,10 @@ import {
   WasteAcceptationStatus,
   CompanyType,
   CompanyInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import graphlClient from "../../../graphql-client";
 import { COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA } from "../../../Apps/common/queries/company/query";
-import { isVat, isFRVat, isSiret } from "shared/constants";
+import { isVat, isFRVat, isSiret, isDangerous } from "@td/constants";
 import {
   companySchema,
   transporterCompanySchema
@@ -136,7 +135,8 @@ const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
     mail: string().notRequired().nullable(),
     country: string().notRequired().nullable(), // ignored only for compat with CompanyInput
     omiNumber: string().notRequired().nullable(), // ignored only for compat with CompanyInput
-    orgId: string().notRequired().nullable() // ignored only for compat with CompanyInput
+    orgId: string().notRequired().nullable(), // ignored only for compat with CompanyInput
+    extraEuropeanId: string().notRequired().nullable() // ignored only for compat with CompanyInput
   });
 
 export const formSchema = object().shape({

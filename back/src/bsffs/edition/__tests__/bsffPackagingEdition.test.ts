@@ -24,7 +24,8 @@ describe("edition", () => {
       mail: "",
       vatNumber: "",
       omiNumber: "",
-      country: ""
+      country: "",
+      extraEuropeanId: ""
     };
 
     const acceptation: Required<BsffPackagingAcceptationInput> = {

@@ -4,7 +4,7 @@ import {
   Mutation,
   MutationSignTransportFormArgs
 } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   bsddTransporterFactory,
   formFactory,

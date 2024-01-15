@@ -1,0 +1,6 @@
+mutation SignBspaoh($id: ID!, $input: BspaohSignatureInput!) {
+  signBspaoh(id: $id, input: $input) {
+    id
+    status
+  }
+}

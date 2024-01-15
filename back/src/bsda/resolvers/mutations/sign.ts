@@ -5,10 +5,11 @@ import {
   Prisma,
   WasteAcceptationStatus
 } from "@prisma/client";
+
 import {
   BsdTransporterReceiptPart,
   getTransporterReceipt
-} from "../../../bsdasris/recipify";
+} from "../../../companies/recipify";
 import {
   AlreadySignedError,
   InvalidSignatureError

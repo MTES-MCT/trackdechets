@@ -1,14 +1,16 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getCompanyOrCompanyNotFound } from "../../database";
+import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
 import { updateCompanyFn } from "./updateCompanyService";
-import { isForeignVat, nafCodes } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import {
   NotCompanyAdminErrorMsg,
   UserInputError
 } from "../../../common/errors";
+import { libelleFromCodeNaf } from "../../sirene/utils";
+import { Company } from "@prisma/client";
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   parent,
@@ -63,11 +65,10 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
 
   const updatedCompany = await updateCompanyFn(args, company);
   // conversion to CompanyPrivate type
-  const naf = company.codeNaf;
-  const libelleNaf = naf && naf in nafCodes ? nafCodes[naf] : "";
-
+  const naf = (updatedCompany as Company).codeNaf ?? company.codeNaf;
+  const libelleNaf = libelleFromCodeNaf(naf!);
   return {
-    ...updatedCompany,
+    ...convertUrls(updatedCompany),
     naf,
     libelleNaf
   };

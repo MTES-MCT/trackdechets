@@ -3,7 +3,7 @@ import {
   BsdaRevisionRequest,
   RevisionRequestApprovalStatus,
   RevisionRequestStatus
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import { BsdaApproveRevision } from "./BsdaApproveRevision";
 import { BsdaCancelRevision } from "./BsdaCancelRevision";

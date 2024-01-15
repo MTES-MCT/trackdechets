@@ -11,7 +11,7 @@ import {
   MutationUpdateFormTransporterArgs
 } from "../../../../generated/graphql/types";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { getFirstTransporter } from "../../../database";
 import { AuthType } from "../../../../auth";
 
@@ -23,7 +23,7 @@ const UPDATE_FORM_TRANSPORTER = gql`
   }
 `;
 
-describe("Mutation.createFormTransporter", () => {
+describe("Mutation.updateFormTransporter", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
@@ -86,6 +86,42 @@ describe("Mutation.createFormTransporter", () => {
       });
 
     expect(updatedBsddTransporter.transporterTransportMode).toEqual("RAIL");
+  });
+
+  it("should be possible to update the siret of an existing transporter", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        status: "SEALED"
+      }
+    });
+    const bsddTransporter = await getFirstTransporter(form);
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateFormTransporter">,
+      MutationUpdateFormTransporterArgs
+    >(UPDATE_FORM_TRANSPORTER, {
+      variables: {
+        id: bsddTransporter!.id,
+        input: {
+          company: { siret: transporter.siret }
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    const updatedBsddTransporter = await getFirstTransporter(form);
+    expect(updatedBsddTransporter?.transporterCompanySiret).toEqual(
+      transporter.siret
+    );
+
+    // S'assure que le champ dé-normalisé `transporterSirets` soit bien à jour
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(updatedForm.transportersSirets).toEqual([transporter.siret]);
   });
 
   it("should throw error if data does not pass validation", async () => {
@@ -194,7 +230,48 @@ describe("Mutation.createFormTransporter", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Vous n'êtes pas autorisé à modifier ce bordereau"
+        message: "Vous n'êtes pas autorisé à modifier ce transporteur BSDD"
+      })
+    ]);
+  });
+
+  it("should not be possible for a transporter to remove himself from a BSDD", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
+    });
+    const anotherTransporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        status: "SENT",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
+          }
+        }
+      }
+    });
+    const bsddTransporter = await getFirstTransporter(form);
+    const { mutate } = makeClient(transporter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateFormTransporter">,
+      MutationUpdateFormTransporterArgs
+    >(UPDATE_FORM_TRANSPORTER, {
+      variables: {
+        id: bsddTransporter!.id,
+        input: {
+          company: { siret: anotherTransporter.siret }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous ne pouvez pas enlever votre établissement du bordereau"
       })
     ]);
   });

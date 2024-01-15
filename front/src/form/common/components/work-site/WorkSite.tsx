@@ -1,7 +1,7 @@
 import TdSwitch from "../../../../common/components/Switch";
 
 import { Field, useFormikContext } from "formik";
-import { Form } from "codegen-ui";
+import { Form } from "@td/codegen-ui";
 import React from "react";
 import WorkSiteAddress from "./WorkSiteAddress";
 

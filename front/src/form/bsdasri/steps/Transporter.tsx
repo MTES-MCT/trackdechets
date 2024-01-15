@@ -8,7 +8,7 @@ import {
   BsdasriType,
   Query,
   QueryCompanyInfosArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";

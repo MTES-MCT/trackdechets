@@ -1,0 +1,17 @@
+{
+  "name": "@td/codegen-ui",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/front/codegen-ui/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "inputs": ["{workspaceRoot}/back/src/**/*.graphql"],
+      "cache": true,
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "graphql-codegen --config {projectRoot}/codegen.yml"
+      }
+    }
+  },
+  "tags": []
+}

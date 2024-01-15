@@ -18,7 +18,7 @@ import { InvalidTransition } from "../../../forms/errors";
 import {
   BsdTransporterReceiptPart,
   getTransporterReceipt
-} from "../../../bsdasris/recipify";
+} from "../../../companies/recipify";
 
 export default async function sign(
   _,

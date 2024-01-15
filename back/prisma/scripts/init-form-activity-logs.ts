@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import prisma from "../../src/prisma";
+import { prisma } from "@td/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 
 const CHUNK_SIZE = 100;

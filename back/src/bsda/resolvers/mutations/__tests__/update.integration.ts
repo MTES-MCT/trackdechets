@@ -5,7 +5,7 @@ import {
   Mutation,
   MutationUpdateBsdaArgs
 } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   siretify,
   userWithCompanyFactory,
@@ -221,6 +221,9 @@ describe("Mutation.updateBsda", () => {
 
   it("should allow updating emitter if they didn't sign", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company: company2, user: _user2 } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
     const bsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: company.siret
@@ -232,7 +235,12 @@ describe("Mutation.updateBsda", () => {
     const input = {
       emitter: {
         company: {
-          name: "Another name"
+          siret: company2.orgId
+        }
+      },
+      destination: {
+        company: {
+          siret: company.orgId
         }
       }
     };
@@ -246,7 +254,20 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
-    expect(data.updateBsda).toEqual(expect.objectContaining(input));
+    expect(data.updateBsda).toEqual(
+      expect.objectContaining({
+        destination: {
+          company: {
+            name: company.name
+          }
+        },
+        emitter: {
+          company: {
+            name: company2.name
+          }
+        }
+      })
+    );
   });
 
   it("should not update emitter if they signed already", async () => {
@@ -733,7 +754,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le champ transporterCompanyName a été vérouillé via signature et ne peut pas être modifié."
+          "Le nom du transporteur a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1064,7 +1085,7 @@ describe("Mutation.updateBsda", () => {
 
     expect(errors.length).toBe(1);
     expect(errors[0].message).toBe(
-      "Le champ intermediaries a été vérouillé via signature et ne peut pas être modifié."
+      "Les intermédiaires a été vérouillé via signature et ne peut pas être modifié."
     );
   });
 
@@ -1107,7 +1128,7 @@ describe("Mutation.updateBsda", () => {
         }
       }
     };
-    const { data, errors } = await mutate<
+    const { data } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
     >(UPDATE_BSDA, {
@@ -1116,8 +1137,6 @@ describe("Mutation.updateBsda", () => {
         input
       }
     });
-
-    console.log(errors);
 
     const updatedBsda = await prisma.bsda.findUnique({
       where: { id: data.updateBsda.id }

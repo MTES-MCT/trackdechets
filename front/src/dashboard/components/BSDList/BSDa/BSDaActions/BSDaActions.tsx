@@ -9,7 +9,7 @@ import {
   IconTrash,
   IconQrCode
 } from "../../../../../Apps/common/Components/Icons/Icons";
-import { Bsda, BsdaStatus } from "codegen-ui";
+import { Bsda, BsdaStatus } from "@td/codegen-ui";
 import { DeleteBsdaModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
 import { useDuplicate } from "./useDuplicate";

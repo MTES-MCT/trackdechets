@@ -1,7 +1,7 @@
 import { redisClient } from "./redis";
 import { WebhookSetting } from "@prisma/client";
 
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 type WebhookInfo = { endpointUri: string; token: string };
 
 export const WEBHOOK_SETTING_CACHE_KEY = "webhooks_setting";

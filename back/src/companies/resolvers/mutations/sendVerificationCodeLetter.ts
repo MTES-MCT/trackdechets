@@ -6,7 +6,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { sendVerificationCodeLetter } from "../../../common/post";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { getCompanyOrCompanyNotFound } from "../../database";
 
 const sendVerificationCodeLetterResolver: MutationResolvers["sendVerificationCodeLetter"] =

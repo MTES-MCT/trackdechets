@@ -15,6 +15,9 @@ const bsdResolvers: BsdResolvers = {
     if (parent.id.startsWith(ReadableIdPrefix.FF)) {
       return "Bsff";
     }
+    if (parent.id.startsWith(ReadableIdPrefix.PAOH)) {
+      return "Bspaoh";
+    }
     return "Form";
   }
 };

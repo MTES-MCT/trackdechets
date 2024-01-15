@@ -2,7 +2,7 @@ import React from "react";
 import BsdaDetailContent from "./BsdaDetailContent";
 import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { useQuery } from "@apollo/client";
-import { Query, QueryBsdaArgs } from "codegen-ui";
+import { Query, QueryBsdaArgs } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import { InlineError } from "../../../Apps/common/Components/Error/Error";
 import EmptyDetail from "../common/EmptyDetailView";

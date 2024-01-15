@@ -5,12 +5,17 @@ import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import { logger } from "@td/logger";
 import { BsdType, FormCompany } from "../generated/graphql/types";
-import { OperationMode } from "@prisma/client";
+import {
+  BsdaRevisionRequest,
+  BsddRevisionRequest,
+  OperationMode
+} from "@prisma/client";
 import { FormForElastic } from "../forms/elastic";
 import { BsdaForElastic } from "../bsda/elastic";
 import { BsdasriForElastic } from "../bsdasris/elastic";
 import { BsvhuForElastic } from "../bsvhu/elastic";
 import { BsffForElastic } from "../bsffs/elastic";
+import { BspaohForElastic } from "../bspaoh/elastic";
 
 export interface BsdElastic {
   type: BsdType;
@@ -103,12 +108,19 @@ export interface BsdElastic {
 
   intermediaries?: FormCompany[] | null;
 
+  // List of all companies taking part in the BSD's lifecycle, for quick search
+  companyNames: string;
+  companyOrgIds: string[];
+
+  revisionRequests: BsdaRevisionRequest[] | BsddRevisionRequest[];
+
   rawBsd:
     | FormForElastic
     | BsdaForElastic
     | BsdasriForElastic
     | BsvhuForElastic
-    | BsffForElastic;
+    | BsffForElastic
+    | BspaohForElastic;
 }
 
 const textField = {
@@ -291,7 +303,11 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
     }
   },
 
-  rawBsd: rawField
+  revisionRequests: rawField,
+  rawBsd: rawField,
+
+  companyNames: textField,
+  companyOrgIds: stringField
 };
 
 export type BsdIndexationConfig = {
@@ -312,7 +328,7 @@ export const index: BsdIndexationConfig = {
   // increment when mapping has changed to trigger re-indexation on release
   // only use vX.Y.Z that matches regexp "v\d\.\d\.\d"
   // no special characters that are not supported by ES index names (like ":")
-  mappings_version: "v1.1.0",
+  mappings_version: "v1.1.2",
   mappings: {
     properties
   },
@@ -437,7 +453,7 @@ export function groupByBsdType(
       ...acc,
       [bsdElastic.type]: [...acc[bsdElastic.type], bsdElastic]
     }),
-    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
+    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [], BSPAOH: [] }
   );
 }
 
