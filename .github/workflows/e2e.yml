@@ -52,9 +52,7 @@ jobs:
       # Wait
       - name: Wait until the API starts
         run: |
-          until [ \
-            "$(curl -s -w '%{http_code}' -o /dev/null "api.trackdechets.local")" \
-            -eq 400 ]
+          until [ "$(curl -s -w '%{http_code}' -o /dev/null "api.trackdechets.local")" -eq 400 ]
           do
             printf 'Waiting for the API to start...\n'
             sleep 1

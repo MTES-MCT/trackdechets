@@ -5,14 +5,10 @@ import { envVariables } from "@td/env";
 envVariables.parse(process.env);
 
 async function start() {
-  console.log(">> Starting the API");
-  console.log("DATABASE", process.env.DATABASE_URL);
-
   await startApolloServer();
-  httpServer.listen(parseInt(process.env.API_PORT, 10), "0.0.0.0", () => {
-    console.info(`TD API server is running on port ${process.env.API_PORT}`);
-    console.log("DATABASE", process.env.DATABASE_URL);
-  });
+  httpServer.listen(parseInt(process.env.API_PORT, 10), "0.0.0.0", () =>
+    console.info(`TD API server is running on port ${process.env.API_PORT}`)
+  );
 
   function shutdown() {
     return closeQueues().finally(() => {
