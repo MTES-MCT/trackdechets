@@ -139,6 +139,7 @@ describe("Query.Bspaoh", () => {
     BspaohStatus.SIGNED_BY_PRODUCER,
     BspaohStatus.SENT,
     BspaohStatus.RECEIVED,
+    BspaohStatus.PROCESSED,
     BspaohStatus.REFUSED,
     BspaohStatus.PARTIALLY_REFUSED
   ])("should forbid access to a deleted bspaoh", async status => {

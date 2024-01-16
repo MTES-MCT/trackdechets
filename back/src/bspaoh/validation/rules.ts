@@ -5,7 +5,7 @@ import { capitalize } from "../../common/strings";
 import { ZodFullBspaoh } from "./schema";
 import { isForeignVat } from "@td/constants";
 import { UnparsedInputs } from ".";
-import { getUserFunctions } from "./helpers";
+import { getUserFunctions, getSignatureAncestors } from "./helpers";
 
 type EditableBspaohTransporterFields = Required<
   Omit<
@@ -589,8 +589,11 @@ export function getSealedFieldsForSignature(signature?: BspaohSignatureType) {
   if (!signature) {
     return res;
   }
+
+  const ancestors = getSignatureAncestors(signature);
+
   for (const [k, v] of Object.entries(editionRules)) {
-    if (v?.sealed?.from === signature) {
+    if (ancestors.includes(v?.sealed?.from)) {
       res.push(k);
     }
   }
