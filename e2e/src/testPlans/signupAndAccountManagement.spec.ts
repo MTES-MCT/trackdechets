@@ -54,7 +54,9 @@ test.describe
     });
   });
 
-  test("Connexion avec un compte existant mais une erreur dans l'email", async ({ page }) => {
+  test("Connexion avec un compte existant mais une erreur dans l'email", async ({
+    page
+  }) => {
     await failedLogin(page, {
       email: "e" + USER_EMAIL,
       password: USER_PASSWORD
@@ -118,9 +120,7 @@ test.describe
     });
   });
 
-  test("Connexion avec un nouveau mot de passe", async ({
-    page
-  }) => {
+  test("Connexion avec un nouveau mot de passe", async ({ page }) => {
     await successfulLogin(page, {
       email: USER_EMAIL,
       password: NEW_USER_PASSWORD
