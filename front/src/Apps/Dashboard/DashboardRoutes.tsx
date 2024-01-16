@@ -8,7 +8,7 @@ import { RoutePublishBsdasri } from "../../dashboard/components/BSDList/BSDasri/
 import { RouteSignBsdasri } from "../../dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
 import { RouteBSDasrisSignEmissionSecretCode } from "../../dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
 import { OnboardingSlideshow } from "../../dashboard/components/OnboardingSlideshow";
-import { BsdasriSignatureType, Query } from "@td/codegen-ui";
+import { BsdasriSignatureType, Query, UserRole } from "@td/codegen-ui";
 import DashboardPage from "../../Pages/Dashboard";
 import { Redirect } from "../utils/routerUtils";
 import {
@@ -119,9 +119,14 @@ function DashboardRoutes() {
       <Navigate
         to={
           companies.length > 0
-            ? generatePath(routes.dashboard.bsds.index, {
-                siret: companies[0].orgId
-              })
+            ? generatePath(
+                companies[0].userRole?.includes(UserRole.Driver)
+                  ? routes.dashboard.transport.toCollect
+                  : routes.dashboard.bsds.index,
+                {
+                  siret: companies[0].orgId
+                }
+              )
             : routes.account.companies.list
         }
       />
@@ -144,7 +149,15 @@ function DashboardRoutes() {
           <Routes location={backgroundLocation ?? location}>
             <Route
               index
-              element={<Redirect path={routes.dashboard.bsds.index} />}
+              element={
+                <Redirect
+                  path={
+                    currentCompany.userRole?.includes(UserRole.Driver)
+                      ? routes.dashboard.transport.toCollect
+                      : routes.dashboard.bsds.index
+                  }
+                />
+              }
             />
 
             <Route
@@ -254,7 +267,15 @@ function DashboardRoutes() {
 
             <Route
               path={`${routes.dashboard.index}/*`}
-              element={<Redirect path={routes.dashboard.bsds.index} />}
+              element={
+                <Redirect
+                  path={
+                    currentCompany.userRole?.includes(UserRole.Driver)
+                      ? routes.dashboard.transport.toCollect
+                      : routes.dashboard.bsds.index
+                  }
+                />
+              }
             />
           </Routes>
 
