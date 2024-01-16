@@ -5,6 +5,7 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+
 # [2024.1.1] 16/01/2024
 
 #### :rocket: Nouvelles fonctionnalités
