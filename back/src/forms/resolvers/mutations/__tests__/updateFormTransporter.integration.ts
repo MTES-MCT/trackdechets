@@ -122,6 +122,12 @@ describe("Mutation.updateFormTransporter", () => {
       where: { id: form.id }
     });
     expect(updatedForm.transportersSirets).toEqual([transporter.siret]);
+    /// TODO vérifier ici que :
+    // - transportersSirets est bien mis à jour
+    // - le BSDD est réindexé
+    // Le problème n'est pas très grave pour l'instant car depuis l'UI Trackdéchets l'update d'un
+    // transporteur BSDD est toujours suivi d'un update BSDD qui met à jour `transporterSiets` et
+    // réindexe le BSDD.
   });
 
   it("should throw error if data does not pass validation", async () => {

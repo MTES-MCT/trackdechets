@@ -1,11 +1,5 @@
 import React, { lazy, Suspense } from "react";
-import {
-  Route,
-  Routes,
-  Navigate,
-  generatePath,
-  useMatch
-} from "react-router-dom";
+import { Route, Routes, Navigate, generatePath } from "react-router-dom";
 import * as Sentry from "@sentry/browser";
 import Loader from "../Loader/Loaders";
 import Layout from "./Layout";
@@ -120,7 +114,6 @@ export default function LayoutContainer() {
             <Layout
               isAuthenticated={isAuthenticated}
               isAdmin={isAdmin}
-              v2banner={v2banner}
               defaultOrgId={data?.me.companies[0]?.orgId}
             />
           }
