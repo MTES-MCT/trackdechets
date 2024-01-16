@@ -45,7 +45,7 @@ test.describe
     await activateUser(page, { email: USER_EMAIL });
   });
 
-  test("Connexion avec un compte valide > Mauvais mot de passe", async ({
+  test("Connexion avec un compte existant mais un mot de passe erroné", async ({
     page
   }) => {
     await failedLogin(page, {
@@ -54,7 +54,7 @@ test.describe
     });
   });
 
-  test("Connexion avec un compte valide > Mauvais email", async ({ page }) => {
+  test("Connexion avec un compte existant mais une erreur dans l'email", async ({ page }) => {
     await failedLogin(page, {
       email: "e" + USER_EMAIL,
       password: USER_PASSWORD
