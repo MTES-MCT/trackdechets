@@ -86,30 +86,30 @@ test.describe
       });
     });
 
-    await test.step("Onglet'Mon compte' > les bonnes informations sont affichées", async () => {
+    await test.step("Onglet 'Mon compte' > les bonnes informations sont affichées", async () => {
       await testAccountInfo(page, {
         username: USER_NAME,
         email: USER_EMAIL
       });
     });
 
-    await test.step("Onglet'Mon compte' > Modification du numéro de téléphone", async () => {
+    await test.step("Onglet 'Mon compte' > Modification du numéro de téléphone", async () => {
       await testPhoneNbrUpdate(page);
     });
 
-    await test.step("Onglet'Mon compte' > Modification du mot de passe", async () => {
+    await test.step("Onglet 'Mon compte' > Modification du mot de passe", async () => {
       await testPasswordUpdate(page, {
         oldPassword: USER_PASSWORD,
         newPassword: NEW_USER_PASSWORD
       });
     });
 
-    await test.step("Onglet'Mon compte' > Logout", async () => {
+    await test.step("Logout", async () => {
       await logout(page);
     });
   });
 
-  test("Onglet'Mon compte' > Tentative de connexion avec l'ancien mot de passe", async ({
+  test("Tentative de connexion avec un ancien mot de passe", async ({
     page
   }) => {
     await failedLogin(page, {
@@ -118,7 +118,7 @@ test.describe
     });
   });
 
-  test("Onglet'Mon compte' > Connexion avec le nouveau mot de passe", async ({
+  test("Connexion avec un nouveau mot de passe", async ({
     page
   }) => {
     await successfulLogin(page, {
