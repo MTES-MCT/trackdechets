@@ -227,16 +227,16 @@ export const updateUsername = async (page, { username }) => {
   }
 
   // Modify
-  await page.getByPlaceholder('Nom utilisateur').fill(username);
+  await page.getByPlaceholder("Nom utilisateur").fill(username);
 
   // Validate
-  await page.getByRole('button', { name: 'Valider' }).click();
+  await page.getByRole("button", { name: "Valider" }).click();
 };
 
 /**
  * Tests the username input.
  */
-export const testUsernameUpdate = async (page) => {
+export const testUsernameUpdate = async page => {
   // Valid username
   await updateUsername(page, { username: "User e2e n°1 (modifié)" });
   await testAccountInfo(page, { username: "User e2e n°1 (modifié)" });
