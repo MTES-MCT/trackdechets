@@ -10,12 +10,12 @@ import {
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
   CompanySearchResult
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   CREATE_COMPANY,
   CREATE_COMPANY_HOOK_OPTIONS
 } from "./AccountCompanyAdd";
-import { isSiret, isVat } from "shared/constants";
+import { isSiret, isVat } from "@td/constants";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";

@@ -3,7 +3,6 @@ import { useMutation, gql } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
 import { useNavigate } from "react-router-dom";
 import routes from "../Apps/routes";
-import { GET_ME } from "../dashboard/Dashboard";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 import RedErrorMessage from "../common/components/RedErrorMessage";
 import CompanyType from "../login/CompanyType";
@@ -22,10 +21,10 @@ import {
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
   CompanySearchResult
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import classNames from "classnames";
 import { MY_COMPANIES } from "./AccountCompanyList";
-import { isFRVat, isSiret, isVat, isForeignVat } from "shared/constants";
+import { isFRVat, isSiret, isVat, isForeignVat } from "@td/constants";
 import {
   CREATE_WORKER_CERTIFICATION,
   UPDATE_COMPANY_WORKER_CERTIFICATION
@@ -35,6 +34,23 @@ import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+
+const GET_ME = gql`
+  {
+    me {
+      id
+      companies {
+        id
+        name
+        givenName
+        siret
+        orgId
+        companyTypes
+        userPermissions
+      }
+    }
+  }
+`;
 
 export const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {

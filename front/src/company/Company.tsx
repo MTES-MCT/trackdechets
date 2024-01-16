@@ -9,7 +9,7 @@ import CompanyDisclaimer from "./CompanyDisclaimer";
 import CompanyHeader from "./CompanyHeader";
 import CompanyMap from "./CompanyMap";
 import CompanyRegistration from "./CompanyRegistration";
-import { Query, QueryCompanyInfosArgs } from "codegen-ui";
+import { Query, QueryCompanyInfosArgs } from "@td/codegen-ui";
 
 const COMPANY_INFOS = gql`
   query CompanyInfos($clue: String!) {
@@ -70,7 +70,7 @@ export default function CompanyInfo() {
   // Retrieves geo information from api-adresse.data.gouv.fr
   useEffect(() => {
     if (
-      data?.companyInfos.statutDiffusionEtablissement === "N" ||
+      data?.companyInfos.statutDiffusionEtablissement === "P" ||
       data?.companyInfos.name === ""
     ) {
       setNonDiffusible(true);

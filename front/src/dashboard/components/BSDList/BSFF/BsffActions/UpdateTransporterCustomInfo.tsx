@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import { useMutation } from "@apollo/client";
-import { Mutation, MutationUpdateBsffArgs } from "codegen-ui";
+import { Mutation, MutationUpdateBsffArgs } from "@td/codegen-ui";
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 import { UPDATE_BSFF_FORM } from "../../../../../form/bsff/utils/queries";
 import { Field, Form, Formik } from "formik";
 import { BsffFragment } from "../types";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
-import { useMatch } from "react-router-dom";
 
 export function UpdateTransporterCustomInfo({
   bsff,
@@ -19,7 +18,6 @@ export function UpdateTransporterCustomInfo({
   onModalCloseFromParent?: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
 
   const isOpened = isOpen || isModalOpenFromParent!;
   const handleClose = () => {
@@ -32,7 +30,7 @@ export function UpdateTransporterCustomInfo({
 
   return (
     <>
-      {!isV2Routes && !isModalOpenFromParent && (
+      {!isModalOpenFromParent && (
         <button
           className="link__ icon__ btn--no-style"
           onClick={() => setIsOpen(true)}

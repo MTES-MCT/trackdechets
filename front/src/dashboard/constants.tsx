@@ -1,4 +1,4 @@
-import { EmitterType, TransportMode } from "codegen-ui";
+import { EmitterType, TransportMode } from "@td/codegen-ui";
 
 export const ITEMS_PER_PAGE = 50;
 
@@ -28,13 +28,19 @@ export function getTransportModeLabel(mode: string | null | undefined) {
   return transportModeLabels[mode];
 }
 
-export type BsdTypename = "Form" | "Bsdasri" | "Bsvhu" | "Bsda" | "Bsff";
+export type BsdTypename =
+  | "Form"
+  | "Bsdasri"
+  | "Bsvhu"
+  | "Bsda"
+  | "Bsff"
+  | "Bspaoh";
 
 export const emitterTypeLabels = {
   [EmitterType.Producer]: "Producteur du déchet",
   [EmitterType.Other]: "Autre détenteur",
   [EmitterType.Appendix2]:
-    "Personne ayant transformé ou réalisé un traitement dont la provenance reste identifiable",
+    "Personne ayant transformé ou réalisé un traitement dont la provenance reste identifiable (Annexe 2)",
   [EmitterType.Appendix1]:
     "Collecteur d'un bordereau de tournée dédiée (Annexe 1)"
 };

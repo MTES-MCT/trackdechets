@@ -4,7 +4,7 @@ import { statusChangeFragment } from "../../../../../Apps/common/queries/fragmen
 import { ActionButton } from "../../../../../common/components";
 import { Loader } from "../../../../../Apps/common/Components";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
-import { FormStatus, Mutation, MutationMarkAsSealedArgs } from "codegen-ui";
+import { FormStatus, Mutation, MutationMarkAsSealedArgs } from "@td/codegen-ui";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";

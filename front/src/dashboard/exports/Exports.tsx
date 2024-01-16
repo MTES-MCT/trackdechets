@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import React from "react";
-import { CompanyPrivate } from "codegen-ui";
+import { CompanyPrivate } from "@td/codegen-ui";
 import ExportsForm from "./ExportsForm";
 
 interface IProps {

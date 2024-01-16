@@ -4,7 +4,7 @@ import {
   isVat,
   isSiret,
   cleanClue
-} from "shared/constants";
+} from "@td/constants";
 import { FormCompanyResolvers } from "../../generated/graphql/types";
 
 const formCompanyResolvers: FormCompanyResolvers = {

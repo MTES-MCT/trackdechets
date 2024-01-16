@@ -1,5 +1,5 @@
 import { Bsda } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
@@ -26,6 +26,7 @@ const getOperationData = (bsda: Bsda) => ({
 });
 
 const getTransporterData = (bsda: Bsda) => ({
+  transporterTakenOverAt: bsda.transporterTransportTakenOverAt,
   transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted,
   transporterNumberPlates: bsda.transporterTransportPlates,
   transporterCompanyAddress: bsda.transporterCompanyAddress,

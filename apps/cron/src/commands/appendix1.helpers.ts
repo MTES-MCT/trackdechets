@@ -1,18 +1,19 @@
 import { AuthType, EmitterType, Status } from "@prisma/client";
 import { sub } from "date-fns";
-import { deleteBsd, prisma } from "back";
+import { deleteBsd } from "back";
+import { prisma } from "@td/prisma";
 
 /**
  * After you sign the first appendix1 on a container, you have 3 days to sign the rest.
- * We count 3 days starting from the day of the first signature at 00:00.
- * After those 3 days, the unsigned appendix1 are automatically deleted.
+ * We count 5 days starting from the day of the first signature at 00:00.
+ * After those 5 days, the unsigned appendix1 are automatically deleted.
  */
 export async function cleanUnusedAppendix1ProducerBsdds() {
   const now = new Date();
   // Take the current date at 00:00 and substract 2 days.
   // This is
   const limitDate = sub(now, {
-    days: 2,
+    days: 4,
     hours: now.getHours(),
     minutes: now.getMinutes()
   });

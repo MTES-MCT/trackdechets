@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node
 import prompts from "prompts";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import deleteUser from "../prisma/hardDeleteUser";
 
 (async () => {

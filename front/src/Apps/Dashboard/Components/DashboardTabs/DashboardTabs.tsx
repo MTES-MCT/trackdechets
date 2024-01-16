@@ -1,12 +1,11 @@
 import React, { useCallback, useState } from "react";
 import { NavLink, generatePath, useNavigate } from "react-router-dom";
-import { CompanyPrivate } from "codegen-ui";
+import { CompanyPrivate, UserPermission, UserRole } from "@td/codegen-ui";
 import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
 import routes from "../../../routes";
 
 import { useShowTransportTabs } from "../../hooks/useShowTransportTabs";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
-import { UserPermission } from "codegen-ui";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import {
   ACTS,
@@ -34,25 +33,33 @@ interface DashboardTabsProps {
 const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
   const [expanded, setExpanded] = useState(false);
 
-  const { permissions } = usePermissions();
+  const { permissions, role } = usePermissions();
   const navigate = useNavigate();
 
   const { showTransportTabs } = useShowTransportTabs(
     currentCompany.companyTypes,
     currentCompany.siret
   );
-  const showRegisterTab = permissions.includes(UserPermission.RegistryCanRead);
-  const showMyBsds = permissions.includes(UserPermission.BsdCanList);
+  const showRegisterTab =
+    permissions.includes(UserPermission.RegistryCanRead) &&
+    [UserRole.Admin, UserRole.Member].includes(role!);
+  const showMyBsds =
+    permissions.includes(UserPermission.BsdCanList) && role !== UserRole.Driver;
 
   const handleCompanyChange = useCallback(
     orgId => {
       navigate(
-        generatePath(routes.dashboardv2.bsds.index, {
-          siret: orgId
-        })
+        generatePath(
+          role?.includes(UserRole.Driver)
+            ? routes.dashboard.transport.toCollect
+            : routes.dashboard.bsds.index,
+          {
+            siret: orgId
+          }
+        )
       );
     },
-    [navigate]
+    [navigate, role]
   );
 
   const handleToggle = () => {
@@ -83,7 +90,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             <ul>
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboardv2.bsds.index, {
+                  to={generatePath(routes.dashboard.bsds.index, {
                     siret: currentCompany.orgId
                   })}
                   className={({ isActive }) =>
@@ -97,7 +104,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               </li>
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboardv2.bsds.drafts, {
+                  to={generatePath(routes.dashboard.bsds.drafts, {
                     siret: currentCompany.orgId
                   })}
                   className={({ isActive }) =>
@@ -112,7 +119,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
 
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboardv2.bsds.act, {
+                  to={generatePath(routes.dashboard.bsds.act, {
                     siret: currentCompany.orgId
                   })}
                   className={({ isActive }) =>
@@ -127,7 +134,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
 
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboardv2.bsds.follow, {
+                  to={generatePath(routes.dashboard.bsds.follow, {
                     siret: currentCompany.orgId
                   })}
                   className={({ isActive }) =>
@@ -141,7 +148,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               </li>
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboardv2.bsds.history, {
+                  to={generatePath(routes.dashboard.bsds.history, {
                     siret: currentCompany.orgId
                   })}
                   className={({ isActive }) =>
@@ -160,7 +167,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             <ul>
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboardv2.bsds.reviews, {
+                  to={generatePath(routes.dashboard.bsds.reviews, {
                     siret: currentCompany.orgId
                   })}
                   className={({ isActive }) =>
@@ -175,7 +182,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               {/* A remettre quand on pourra afficher les révisions avec la query bsds */}
               {/* <li>
                 <NavLink
-                  to={generatePath(routes.dashboardv2.bsds.toReviewed, {
+                  to={generatePath(routes.dashboard.bsds.toReviewed, {
                     siret: currentCompany.orgId,
                   })}
                   className={({isActive}) =>
@@ -189,7 +196,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               </li>
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboardv2.bsds.reviewed, {
+                  to={generatePath(routes.dashboard.bsds.reviewed, {
                     siret: currentCompany.orgId,
                   })}
                   className={({isActive}) =>
@@ -211,7 +218,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
           <ul>
             <li>
               <NavLink
-                to={generatePath(routes.dashboardv2.transport.toCollect, {
+                to={generatePath(routes.dashboard.transport.toCollect, {
                   siret: currentCompany.orgId
                 })}
                 className={({ isActive }) =>
@@ -225,7 +232,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             </li>
             <li>
               <NavLink
-                to={generatePath(routes.dashboardv2.transport.collected, {
+                to={generatePath(routes.dashboard.transport.collected, {
                   siret: currentCompany.orgId
                 })}
                 className={({ isActive }) =>
@@ -242,7 +249,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
       )}
       {showRegisterTab && (
         <NavLink
-          to={generatePath(routes.dashboardv2.exports, {
+          to={generatePath(routes.dashboard.exports, {
             siret: currentCompany.orgId
           })}
           className={({ isActive }) =>

@@ -1,5 +1,5 @@
 import { getInitialCompany } from "../../bsdd/utils/initial-state";
-import { BsdaConsistence, BsdaType, TransportMode } from "codegen-ui";
+import { BsdaConsistence, BsdaType, TransportMode } from "@td/codegen-ui";
 import { getInitialEmitterPickupSite } from "./steps/Emitter";
 
 const initialState = {

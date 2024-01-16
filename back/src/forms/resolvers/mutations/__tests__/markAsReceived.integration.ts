@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { CompanyType, EmitterType, Status, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { sendMail } from "../../../../mailer/mailing";
 import {
   companyFactory,
@@ -420,7 +420,7 @@ describe("Test Form reception", () => {
       companyAssociations: {
         create: {
           company: { connect: { id: randomUserCompany.id } },
-          role: "ADMIN" as UserRole
+          role: "ADMIN"
         }
       }
     });

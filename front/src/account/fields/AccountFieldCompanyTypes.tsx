@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
 import AccountFormCompanyTypes from "./forms/AccountFormCompanyTypes";
 import { COMPANY_CONSTANTS } from "../../login/CompanyType";
-import { CompanyPrivate, UserRole } from "codegen-ui";
+import { CompanyPrivate, UserRole } from "@td/codegen-ui";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
 type Props = {

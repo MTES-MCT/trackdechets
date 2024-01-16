@@ -17,7 +17,7 @@ import {
   Form,
   FormStatus,
   Bsdasri
-} from "codegen-ui";
+} from "@td/codegen-ui";
 
 import "./bsdCardList.scss";
 import {
@@ -66,7 +66,7 @@ function BsdCardList({
   const isActTab = bsdCurrentTab === "actTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
-  const isAllBsdsTab = !!useMatch(routes.dashboardv2.bsds.index);
+  const isAllBsdsTab = !!useMatch(routes.dashboard.bsds.index);
 
   const redirectToPath = useCallback(
     (path, id) => {
@@ -120,7 +120,7 @@ function BsdCardList({
       }
 
       if (bsd.__typename === "Bsdasri") {
-        const path = routes.dashboardv2.bsdasris.sign.publish;
+        const path = routes.dashboard.bsdasris.sign.publish;
         redirectToPath(path, bsd.id);
       }
     },
@@ -132,7 +132,7 @@ function BsdCardList({
       const status = bsd["bsdasriStatus"];
       if (status === BsdasriStatus.Initial) {
         if (isActTab || isAllBsdsTab) {
-          const path = routes.dashboardv2.bsdasris.sign.emission;
+          const path = routes.dashboard.bsdasris.sign.emission;
           redirectToPath(path, bsd.id);
           return;
         }
@@ -141,31 +141,31 @@ function BsdCardList({
           if (
             hasEmportDirect(formattedBsdAsBsdDisplay, siret, isToCollectTab)
           ) {
-            const path = routes.dashboardv2.bsdasris.sign.directTakeover;
+            const path = routes.dashboard.bsdasris.sign.directTakeover;
             redirectToPath(path, bsd.id);
             return;
           }
           if (
             isSynthesis(formattedBsdAsBsdDisplay.bsdWorkflowType?.toString())
           ) {
-            const path = routes.dashboardv2.bsdasris.sign.synthesisTakeover;
+            const path = routes.dashboard.bsdasris.sign.synthesisTakeover;
             redirectToPath(path, bsd.id);
           } else {
-            const path = routes.dashboardv2.bsdasris.sign.emissionSecretCode;
+            const path = routes.dashboard.bsdasris.sign.emissionSecretCode;
             redirectToPath(path, bsd.id);
           }
         }
       }
       if (status === BsdasriStatus.SignedByProducer) {
-        const path = routes.dashboardv2.bsdasris.sign.transporter;
+        const path = routes.dashboard.bsdasris.sign.transporter;
         redirectToPath(path, bsd.id);
       }
       if (status === BsdasriStatus.Sent) {
-        const path = routes.dashboardv2.bsdasris.sign.reception;
+        const path = routes.dashboard.bsdasris.sign.reception;
         redirectToPath(path, bsd.id);
       }
       if (status === BsdasriStatus.Received) {
-        const path = routes.dashboardv2.bsdasris.sign.operation;
+        const path = routes.dashboard.bsdasris.sign.operation;
         redirectToPath(path, bsd.id);
       }
     },
@@ -254,7 +254,7 @@ function BsdCardList({
           handleDraftValidation(bsd as Bsd);
         } else {
           if (hasRoadControlButton({ status } as BsdDisplay, isCollectedTab)) {
-            const path = routes.dashboardv2.roadControl;
+            const path = routes.dashboard.roadControl;
             redirectToPath(path, bsd.id);
           } else {
             handleActValidation(bsd as Bsd);
@@ -341,7 +341,7 @@ function BsdCardList({
 
   const onAppendix1 = useCallback(
     (bsd: BsdDisplay) => {
-      const path = routes.dashboardv2.bsdds.view;
+      const path = routes.dashboard.bsdds.view;
       redirectToPath(path, bsd.id);
     },
     [redirectToPath]
@@ -360,7 +360,7 @@ function BsdCardList({
 
   const onEmitterDasriSign = useCallback(
     (bsd: BsdDisplay) => {
-      const path = routes.dashboardv2.bsdasris.sign.emissionSecretCode;
+      const path = routes.dashboard.bsdasris.sign.emissionSecretCode;
       redirectToPath(path, bsd.id);
     },
     [redirectToPath]

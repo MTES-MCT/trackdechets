@@ -14,7 +14,7 @@ import {
   createBsff,
   createFicheIntervention
 } from "../../../__tests__/factories";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 
 const GET_BSFFS = gql`
   query GetBsffs(

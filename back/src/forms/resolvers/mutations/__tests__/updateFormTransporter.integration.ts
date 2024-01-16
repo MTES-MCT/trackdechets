@@ -11,7 +11,7 @@ import {
   MutationUpdateFormTransporterArgs
 } from "../../../../generated/graphql/types";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { getFirstTransporter } from "../../../database";
 import { AuthType } from "../../../../auth";
 
@@ -23,7 +23,7 @@ const UPDATE_FORM_TRANSPORTER = gql`
   }
 `;
 
-describe("Mutation.createFormTransporter", () => {
+describe("Mutation.updateFormTransporter", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
@@ -117,6 +117,11 @@ describe("Mutation.createFormTransporter", () => {
       transporter.siret
     );
 
+    // S'assure que le champ dé-normalisé `transporterSirets` soit bien à jour
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(updatedForm.transportersSirets).toEqual([transporter.siret]);
     /// TODO vérifier ici que :
     // - transportersSirets est bien mis à jour
     // - le BSDD est réindexé

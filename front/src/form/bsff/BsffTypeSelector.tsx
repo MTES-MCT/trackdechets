@@ -6,7 +6,7 @@ import {
   BsffPackagingInput,
   BsffWeightInput,
   BsffType
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import Tooltip from "../../common/components/Tooltip";
 import initialState from "./utils/initial-state";
 

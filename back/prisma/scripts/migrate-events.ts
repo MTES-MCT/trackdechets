@@ -1,5 +1,5 @@
 import { insertStreamEvents } from "../../src/events/mongodb";
-import prisma from "../../src/prisma";
+import { prisma } from "@td/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 
 const BATCH_SIZE = 1000;

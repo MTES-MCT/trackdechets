@@ -2,14 +2,14 @@ import { MockedProvider } from "@apollo/client/testing";
 import { screen } from "@testing-library/dom";
 import { render } from "@testing-library/react";
 import { SIGN_BSVHU } from "../../../../../dashboard/components/BSDList/BSVhu/WorkflowAction/SignBsvhu";
-import { Bsvhu, SignatureTypeInput } from "codegen-ui";
+import { Bsvhu, SignatureTypeInput } from "@td/codegen-ui";
 import React from "react";
 import ActBsvhuValidation from "./ActBsvhuValidation";
 import { MemoryRouter } from "react-router-dom";
 
 describe("ActBsvhuValidation", () => {
   const onClose = jest.fn();
-  const v2Route = "v2/dashboard";
+  const v2Route = "dashboard";
   const values = {
     author: ""
   };

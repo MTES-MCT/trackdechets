@@ -7,11 +7,10 @@ import {
   AnonymousCompanyInput,
   Mutation,
   MutationCreateAnonymousCompanyArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { InlineError } from "../../Apps/common/Components/Error/Error";
 import { RedErrorMessage } from "../../common/components";
-import { isFRVat, isSiret, isVat } from "shared/constants";
-import { nafCodes } from "shared/constants";
+import { isFRVat, isSiret, isVat, nafCodes } from "@td/constants";
 import { TOAST_DURATION } from "../../common/config";
 
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";

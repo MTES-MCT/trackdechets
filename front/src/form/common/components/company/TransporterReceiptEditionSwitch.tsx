@@ -1,11 +1,11 @@
 import React from "react";
 import TdSwitch from "../../../../common/components/Switch";
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 import {
   BsdaTransporterInput,
   BsdasriTransporterInput,
   BsvhuTransporterInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 
 /**
  * Switch for BSDA, BSVHU and BSDASRI

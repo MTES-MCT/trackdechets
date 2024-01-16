@@ -1,5 +1,5 @@
 import { sendMail } from "../mailer/mailing";
-import templateIds from "../mailer/templates/provider/templateIds";
+import { templateIds } from "@td/mail";
 
 /**
  * Send a test email to a given address from command line

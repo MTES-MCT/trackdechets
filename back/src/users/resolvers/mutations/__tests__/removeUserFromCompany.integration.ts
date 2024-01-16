@@ -2,7 +2,7 @@ import {
   userWithCompanyFactory,
   userFactory
 } from "../../../../__tests__/factories";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";

@@ -7,7 +7,7 @@ import {
   EmitterType,
   PackagingInfo,
   Packagings as PackagingsEnum
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   PACKAGINGS_NAMES,
   getPackagingInfosSummary

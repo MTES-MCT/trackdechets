@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  fireEvent,
-  getByText,
-  getByTitle,
-  render
-} from "@testing-library/react";
+import { fireEvent, getByTitle, render } from "@testing-library/react";
 import { TransporterAccordion } from "./TransporterAccordion";
 
 describe("TransporterAccordion", () => {
@@ -16,15 +11,18 @@ describe("TransporterAccordion", () => {
   const onTransporterDelete = jest.fn();
   const onTransporterShiftUp = jest.fn();
   const onTransporterShiftDown = jest.fn();
+  const onExpanded = jest.fn();
 
   const Component = (
     <TransporterAccordion
       name="Transporteur"
       numero={1}
+      expanded={true}
       onTransporterAdd={onTransporterAdd}
       onTransporterDelete={onTransporterDelete}
       onTransporterShiftUp={onTransporterShiftUp}
       onTransporterShiftDown={onTransporterShiftDown}
+      onExpanded={onExpanded}
     >
       {foldableContent}
     </TransporterAccordion>
@@ -33,9 +31,6 @@ describe("TransporterAccordion", () => {
   it("should renders the component", () => {
     const { container } = render(Component);
     expect(container).toBeTruthy();
-    const foldable = getByText(container, foldableContent);
-    // foldable content should be visible by default
-    expect(foldable).toBeVisible();
   });
 
   test("clicking the add button should call the `onTransporterAdd callback`", () => {
@@ -64,5 +59,12 @@ describe("TransporterAccordion", () => {
     const downButton = getByTitle(container, "Descendre");
     fireEvent.click(downButton);
     expect(onTransporterShiftDown).toHaveBeenCalledTimes(1);
+  });
+
+  test("clicking the caret should call the `onExpanded` callback`", () => {
+    const { container } = render(Component);
+    const caretButton = getByTitle(container, "Replier");
+    fireEvent.click(caretButton);
+    expect(onExpanded).toHaveBeenCalledTimes(1);
   });
 });

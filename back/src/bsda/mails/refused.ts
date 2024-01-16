@@ -1,8 +1,8 @@
 import { Bsda } from "@prisma/client";
 import { getCompanyAdminUsers } from "../../companies/database";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { buildPdfAsBase64 } from "../pdf/generator";
-import { Dreals } from "shared/constants";
+import { Dreals } from "@td/constants";
 import {
   Mail,
   renderMail,

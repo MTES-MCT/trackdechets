@@ -204,7 +204,7 @@ describe("query { formsRegister }", () => {
 
         await new Promise<void>(resolve => {
           req.on("end", async () => {
-            resolve();
+            writeStream.on("finish", () => resolve());
           });
         });
 

@@ -1,5 +1,5 @@
 import { insertStreamEvents } from "../../events/mongodb";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 
 const MAX_NB_OF_EVENTS_SYNCED = 100;
 

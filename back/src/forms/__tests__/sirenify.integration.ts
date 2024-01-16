@@ -3,7 +3,8 @@ import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import { searchCompany } from "../../companies/search";
 import {
   CreateFormInput,
-  ResealedFormInput
+  ResealedFormInput,
+  StatutDiffusionEtablissement
 } from "../../generated/graphql/types";
 import {
   sirenifyFormCreateInput,
@@ -303,17 +304,18 @@ describe("sirenifyFormInput", () => {
       orgId: "90398556200011"
     });
 
-    function searchResult(companyName: string) {
+    function searchResult(orgId: string, companyName: string) {
       return {
+        orgId,
         name: companyName,
         address: `Adresse ${companyName}`,
-        statutDiffusionEtablissement: "N",
+        statutDiffusionEtablissement: "P" as StatutDiffusionEtablissement,
         isRegistered: true
       } as CompanySearchResult;
     }
 
     const searchResults = {
-      [emitter.company.siret!]: searchResult("émetteur")
+      [emitter.company.orgId]: searchResult(emitter.company.orgId, "émetteur")
     };
 
     (searchCompany as jest.Mock).mockImplementation((clue: string) => {

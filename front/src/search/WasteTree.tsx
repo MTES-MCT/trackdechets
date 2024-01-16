@@ -1,6 +1,6 @@
 import React from "react";
 import Tree, { TreeNode } from "rc-tree";
-import { BSDD_WASTES_TREE, WasteNode } from "shared/constants";
+import { BSDD_WASTES_TREE, WasteNode } from "@td/constants";
 import "rc-tree/assets/index.css";
 
 const loop = (data: WasteNode[]) => {

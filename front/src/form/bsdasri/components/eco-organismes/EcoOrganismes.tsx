@@ -3,7 +3,12 @@ import { useField, useFormikContext } from "formik";
 import React from "react";
 import CompanyResults from "../../../common/components/company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
-import { Query, EcoOrganisme, Bsdasri, BsdasriEcoOrganisme } from "codegen-ui";
+import {
+  Query,
+  EcoOrganisme,
+  Bsdasri,
+  BsdasriEcoOrganisme
+} from "@td/codegen-ui";
 import TdSwitch from "../../../../common/components/Switch";
 
 const GET_ECO_ORGANISMES = gql`

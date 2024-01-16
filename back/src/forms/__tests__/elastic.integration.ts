@@ -1,7 +1,8 @@
-import { Status } from "@prisma/client";
+import { Company, Status } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import {
+  bsddTransporterData,
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
@@ -10,6 +11,8 @@ import {
 } from "../../__tests__/factories";
 import { getFirstTransporterSync, getFullForm } from "../database";
 import { getSiretsByTab } from "../elasticHelpers";
+import { getFormForElastic, toBsdElastic } from "../elastic";
+import { BsdElastic } from "../../common/elastic";
 
 describe("getSiretsByTab", () => {
   afterEach(resetDatabase);
@@ -43,12 +46,31 @@ describe("getSiretsByTab", () => {
     expect(isToCollectFor).toContain(transporter!.transporterCompanySiret);
   });
 
+  test("status SEALED emitterType=APPENDIX1_PRODUCER", async () => {
+    const user = await userFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: { status: Status.SEALED, emitterType: "APPENDIX1_PRODUCER" }
+    });
+    const fullForm = await getFullForm(form);
+    const transporter = getFirstTransporterSync(fullForm);
+    const { isToCollectFor, isForActionFor } = getSiretsByTab(fullForm);
+    expect(isForActionFor).toContain(form.emitterCompanySiret);
+    expect(isToCollectFor).toContain(transporter!.transporterCompanySiret);
+  });
+
   test("status SENT", async () => {
     const user = await userFactory();
     const form = await formFactory({
       ownerId: user.id,
-      opt: { status: Status.SENT }
+      opt: {
+        status: Status.SENT,
+        transporters: {
+          create: { ...bsddTransporterData, number: 1, takenOverAt: new Date() }
+        }
+      }
     });
+
     const fullForm = await getFullForm(form);
     const transporter = getFirstTransporterSync(fullForm);
     const { isFollowFor, isCollectedFor, isForActionFor } =
@@ -76,7 +98,10 @@ describe("getSiretsByTab", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        status: Status.SENT
+        status: Status.SENT,
+        transporters: {
+          create: { ...bsddTransporterData, number: 1, takenOverAt: new Date() }
+        }
       }
     });
 
@@ -173,9 +198,9 @@ describe("getSiretsByTab", () => {
     expect(isForActionFor).toContain(form.recipientCompanySiret);
     expect(isToCollectFor).toContain(transporter3.vatNumber);
 
-    // waste is taken over by transporter n°2. BSDD should
-    // be in transporter n°1 "Follow" tab and in transporter n°2
-    // "Collected" tab
+    // waste is taken over by transporter n°3. BSDD should
+    // be in transporter n°1 and transporter n°2 "Follow" tab and
+    // in transporter n°3 "Collected" tab
     await prisma.bsddTransporter.updateMany({
       where: {
         formId: form.id,
@@ -192,16 +217,52 @@ describe("getSiretsByTab", () => {
     isForActionFor = tabs.isForActionFor;
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(transporter!.transporterCompanySiret);
+    expect(isFollowFor).toContain(transporter2.siret);
     expect(isForActionFor).toContain(form.recipientCompanySiret);
     expect(isCollectedFor).toContain(transporter3.vatNumber);
-    expect(isCollectedFor).toContain(transporter2.siret);
+
+    // cas spécial où le transporteur N+1 est aussi le destinataire
+    // et où le bordereau ne doit pas apparaitre dans l'onglet
+    // "Pour Action" de l'installation de destination / transporteur N+1
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        transporters: {
+          create: {
+            transporterCompanySiret: form.recipientCompanySiret,
+            readyToTakeOver: true,
+            takenOverAt: null,
+            number: 4
+          }
+        }
+      }
+    });
+
+    fullForm = await getFullForm(form);
+    transporter = getFirstTransporterSync(fullForm);
+    tabs = getSiretsByTab(fullForm);
+    isFollowFor = tabs.isFollowFor;
+    isCollectedFor = tabs.isCollectedFor;
+    isToCollectFor = tabs.isToCollectFor;
+    isForActionFor = tabs.isForActionFor;
+    expect(isFollowFor).toContain(form.emitterCompanySiret);
+    expect(isFollowFor).toContain(transporter!.transporterCompanySiret);
+    expect(isFollowFor).toContain(transporter2.siret);
+    expect(isCollectedFor).toContain(transporter3.vatNumber);
+    expect(isForActionFor).not.toContain(form.recipientCompanySiret);
+    expect(isToCollectFor).toContain(form.recipientCompanySiret);
   });
 
   test("SENT with temporary storage", async () => {
     const user = await userFactory();
     const form = await formWithTempStorageFactory({
       ownerId: user.id,
-      opt: { status: Status.SENT }
+      opt: {
+        status: Status.SENT,
+        transporters: {
+          create: { ...bsddTransporterData, number: 1, takenOverAt: new Date() }
+        }
+      }
     });
     const fullForm = await getFullForm(form);
     const transporter = getFirstTransporterSync(fullForm);
@@ -305,6 +366,171 @@ describe("getSiretsByTab", () => {
     );
     expect(isCollectedFor).toContain(
       forwardedInTransporter!.transporterCompanySiret
+    );
+  });
+});
+
+describe("toBsdElastic > companies Names & OrgIds", () => {
+  afterEach(resetDatabase);
+
+  let emitter: Company;
+  let recipient: Company;
+  let intermediary1: Company;
+  let intermediary2: Company;
+  let transporter1: Company;
+  let transporter2: Company;
+  let nextDestination: Company;
+  let ecoOrganisme: Company;
+  let trader: Company;
+  let broker: Company;
+  let forwardedInNextDestination: Company;
+  let forwardedInTransporter: Company;
+  let form: any;
+  let elasticBsd: BsdElastic;
+
+  beforeAll(async () => {
+    // Given
+    const user = await userFactory();
+    emitter = await companyFactory({ name: "Emitter" });
+    recipient = await companyFactory({ name: "Recipient" });
+    intermediary1 = await companyFactory({ name: "Intermediaire 1" });
+    intermediary2 = await companyFactory({ name: "Intermediaire 2" });
+    transporter1 = await companyFactory({
+      name: "Transporter 1",
+      vatNumber: "VAT Transporter 1"
+    });
+    transporter2 = await companyFactory({
+      name: "Transporter 2",
+      vatNumber: "VAT Transporter 2"
+    });
+    nextDestination = await companyFactory({ name: "Next destination" });
+    ecoOrganisme = await companyFactory({ name: "Eco organisme" });
+    trader = await companyFactory({ name: "Trader" });
+    broker = await companyFactory({ name: "Broker" });
+    forwardedInNextDestination = await companyFactory({
+      name: "ForwardedIn next destination"
+    });
+    forwardedInTransporter = await companyFactory({
+      name: "Forwarded in transporter",
+      vatNumber: "VAT Transporter FwdIn"
+    });
+
+    form = await formWithTempStorageFactory({
+      opt: {
+        emitterCompanyName: emitter.name,
+        emitterCompanySiret: emitter.siret,
+        recipientCompanyName: recipient.name,
+        recipientCompanySiret: recipient.siret,
+        nextDestinationCompanyName: nextDestination.name,
+        nextDestinationCompanySiret: nextDestination.siret,
+        ecoOrganismeName: ecoOrganisme.name,
+        ecoOrganismeSiret: ecoOrganisme.siret,
+        traderCompanyName: trader.name,
+        traderCompanySiret: trader.siret,
+        brokerCompanyName: broker.name,
+        brokerCompanySiret: broker.siret
+      },
+      ownerId: user.id,
+      forwardedInOpts: {
+        recipientCompanyName: forwardedInNextDestination.name,
+        recipientCompanySiret: forwardedInNextDestination.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: forwardedInTransporter.siret,
+            transporterCompanyName: forwardedInTransporter.name,
+            transporterCompanyVatNumber: forwardedInTransporter.vatNumber,
+            transporterIsExemptedOfReceipt: false,
+            transporterNumberPlate: "",
+            number: 1
+          }
+        }
+      }
+    });
+
+    // Add transporters & intermediaries
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        transporters: {
+          createMany: {
+            data: [
+              {
+                transporterCompanySiret: transporter1.siret,
+                transporterCompanyName: transporter1.name,
+                transporterCompanyVatNumber: transporter1.vatNumber,
+                readyToTakeOver: false,
+                number: 2
+              },
+              {
+                transporterCompanySiret: transporter2.siret,
+                transporterCompanyName: transporter2.name,
+                transporterCompanyVatNumber: transporter2.vatNumber,
+                readyToTakeOver: false,
+                number: 3
+              }
+            ]
+          }
+        },
+        intermediaries: {
+          createMany: {
+            data: [
+              {
+                siret: intermediary1.siret!,
+                name: intermediary1.name!,
+                contact: intermediary1.contact!
+              },
+              {
+                siret: intermediary2.siret!,
+                name: intermediary2.name!,
+                contact: intermediary2.contact!
+              }
+            ]
+          }
+        }
+      }
+    });
+
+    const formForElastic = await getFormForElastic(form);
+
+    // When
+    elasticBsd = toBsdElastic(formForElastic);
+  });
+
+  test("companyNames > should contain the names of ALL BSD companies", async () => {
+    // Then
+    expect(elasticBsd.companyNames).toContain(emitter.name);
+    expect(elasticBsd.companyNames).toContain(nextDestination.name);
+    expect(elasticBsd.companyNames).toContain(trader.name);
+    expect(elasticBsd.companyNames).toContain(broker.name);
+    expect(elasticBsd.companyNames).toContain(ecoOrganisme.name);
+    expect(elasticBsd.companyNames).toContain(recipient.name);
+    expect(elasticBsd.companyNames).toContain(transporter1.name);
+    expect(elasticBsd.companyNames).toContain(transporter2.name);
+    expect(elasticBsd.companyNames).toContain(intermediary1.name);
+    expect(elasticBsd.companyNames).toContain(intermediary2.name);
+    expect(elasticBsd.companyNames).toContain(forwardedInNextDestination.name);
+  });
+
+  test("companyOrgIds > should contain the orgIds of ALL BSD companies", async () => {
+    // Then
+    expect(elasticBsd.companyOrgIds).toContain(emitter.siret);
+    expect(elasticBsd.companyOrgIds).toContain(nextDestination.siret);
+    expect(elasticBsd.companyOrgIds).toContain(trader.siret);
+    expect(elasticBsd.companyOrgIds).toContain(broker.siret);
+    expect(elasticBsd.companyOrgIds).toContain(ecoOrganisme.siret);
+    expect(elasticBsd.companyOrgIds).toContain(recipient.siret);
+    expect(elasticBsd.companyOrgIds).toContain(transporter1.siret);
+    expect(elasticBsd.companyOrgIds).toContain(transporter1.vatNumber);
+    expect(elasticBsd.companyOrgIds).toContain(transporter2.siret);
+    expect(elasticBsd.companyOrgIds).toContain(transporter2.vatNumber);
+    expect(elasticBsd.companyOrgIds).toContain(intermediary1.siret);
+    expect(elasticBsd.companyOrgIds).toContain(intermediary2.siret);
+    expect(elasticBsd.companyOrgIds).toContain(
+      forwardedInNextDestination.siret
+    );
+    expect(elasticBsd.companyOrgIds).toContain(forwardedInTransporter.siret);
+    expect(elasticBsd.companyOrgIds).toContain(
+      forwardedInTransporter.vatNumber
     );
   });
 });

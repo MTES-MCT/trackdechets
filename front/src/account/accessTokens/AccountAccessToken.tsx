@@ -1,4 +1,4 @@
-import { AccessToken } from "codegen-ui";
+import { AccessToken } from "@td/codegen-ui";
 import React, { useState } from "react";
 import { format } from "date-fns";
 import AccountAccessTokenRevoke from "./AccountAccessTokenRevoke";

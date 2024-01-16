@@ -2,12 +2,11 @@ import React from "react";
 import { Formik } from "formik";
 import { Loader } from "../../../../../Apps/common/Components";
 import {
-  CompanyInput,
   FormStatus,
   Mutation,
   MutationMarkAsProcessedArgs,
   ProcessedFormInput
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
 import ProcessedInfo from "./ProcessedInfo";
@@ -63,10 +62,6 @@ function MarkAsProcessedModalContent({ data, onClose }) {
               noTraceability: null
             }}
             onSubmit={async ({ nextDestination, ...values }) => {
-              if (nextDestination?.company) {
-                // Avoid crashing type InternationalCompanyInput
-                delete (nextDestination.company as CompanyInput).omiNumber;
-              }
               const { errors } = await markAsProcessed({
                 variables: {
                   id: data?.form.id,

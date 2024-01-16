@@ -10,7 +10,7 @@ import {
   MutationUpdateFormArgs,
   Query,
   QueryFormArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { GET_FORM, UPDATE_FORM } from "../../../../../form/bsdd/utils/queries";
 import { RedErrorMessage } from "../../../../../common/components";
 import { Loader } from "../../../../../Apps/common/Components";
@@ -112,6 +112,17 @@ export default function SignTransportFormModalContent({
   }
   const form = data?.form;
 
+  const signingTransporter = [
+    ...form.transporters,
+    form.temporaryStorageDetail?.transporter
+  ].find(
+    t =>
+      t !== null &&
+      t !== undefined &&
+      !t.takenOverAt &&
+      t.company?.orgId === siret
+  );
+
   const TODAY = new Date();
 
   return (
@@ -120,7 +131,7 @@ export default function SignTransportFormModalContent({
         takenOverBy: "",
         takenOverAt: TODAY.toISOString(),
         securityCode: "",
-        transporterNumberPlate: form.stateSummary?.transporterNumberPlate ?? "",
+        transporterNumberPlate: signingTransporter!.numberPlate ?? "",
         emitter: { type: form?.emitter?.type },
         update: {
           quantity: form.wasteDetails?.quantity ?? 0,
@@ -179,7 +190,7 @@ export default function SignTransportFormModalContent({
           <FormWasteTransportSummary form={form} />
           <FormJourneySummary form={form} />
           {form.emitter?.type !== EmitterType.Appendix1Producer && (
-            <TransporterRecepisseWrapper transporter={form.transporter!} />
+            <TransporterRecepisseWrapper transporter={signingTransporter!} />
           )}
           <p>
             En qualité de <strong>transporteur du déchet</strong>, j'atteste que
@@ -217,7 +228,7 @@ export default function SignTransportFormModalContent({
           </div>
 
           {![
-            form.transporter?.company?.orgId,
+            ...(form.transporters ?? []).map(t => t.company?.orgId),
             form.temporaryStorageDetail?.transporter?.company?.orgId
           ].includes(siret) && (
             <div className="form__row">

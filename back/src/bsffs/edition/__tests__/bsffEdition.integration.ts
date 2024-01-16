@@ -1,4 +1,4 @@
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   createBsff,
   createBsffAfterEmission,
@@ -15,10 +15,10 @@ describe("edition rules", () => {
 
   it("should be possible to update any fields when BSFF status is INITIAL", async () => {
     const bsff = await createBsff({}, { status: "INITIAL" });
-    const checked = await checkEditionRules(bsff, {
+    const updateFields = await checkEditionRules(bsff, {
       emitter: { company: { name: "ACME" } }
     });
-    expect(checked).toBe(true);
+    expect(updateFields).toEqual(["emitterCompanyName"]);
   });
 
   it("should not be possible to update a field sealed by emission signature", async () => {
@@ -37,7 +37,7 @@ describe("edition rules", () => {
   it("should be possible for the emitter to update a field sealed by emission signature", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const bsff = await createBsffAfterEmission({ emitter });
-    const checked = await checkEditionRules(
+    const updateFields = await checkEditionRules(
       bsff,
       {
         emitter: { company: { name: "ACME" } }
@@ -45,7 +45,7 @@ describe("edition rules", () => {
       emitter.user
     );
 
-    expect(checked).toBe(true);
+    expect(updateFields).toEqual(["emitterCompanyName"]);
   });
 
   it("should be possible to re-send same data on a field sealed by emission signature", async () => {
@@ -60,7 +60,7 @@ describe("edition rules", () => {
       where: { id: bsff.id },
       data: { ficheInterventions: { connect: { id: ficheIntervention.id } } }
     });
-    const checked = await checkEditionRules(bsff, {
+    const updateFields = await checkEditionRules(bsff, {
       emitter: { company: { siret: bsff.emitterCompanySiret } },
       packagings: bsff.packagings.map(p => ({
         type: p.type,
@@ -70,16 +70,16 @@ describe("edition rules", () => {
       })),
       ficheInterventions: [ficheIntervention.id]
     });
-    expect(checked).toBe(true);
+    expect(updateFields).toEqual([]);
   });
 
   it("should be possible to update a field not yet sealed by emission signature", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const bsff = await createBsffAfterEmission({ emitter });
-    const checked = await checkEditionRules(bsff, {
+    const updatedFields = await checkEditionRules(bsff, {
       transporter: { transport: { plates: ["AD-008-TS"] } }
     });
-    expect(checked).toBe(true);
+    expect(updatedFields).toEqual(["transporterTransportPlates"]);
   });
 
   it("should not be possible to update a field sealed by transporter signature", async () => {
@@ -105,20 +105,20 @@ describe("edition rules", () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporter = await userWithCompanyFactory("MEMBER");
     const bsff = await createBsffAfterTransport({ emitter, transporter });
-    const checked = await checkEditionRules(bsff, {
+    const updatedFields = await checkEditionRules(bsff, {
       transporter: { company: { siret: bsff.transporterCompanySiret } }
     });
-    expect(checked).toBe(true);
+    expect(updatedFields).toEqual([]);
   });
 
   it("should be possible to update a field not yet sealed by transport signature", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporter = await userWithCompanyFactory("MEMBER");
     const bsff = await createBsffAfterTransport({ emitter, transporter });
-    const checked = await checkEditionRules(bsff, {
+    const updatedFields = await checkEditionRules(bsff, {
       destination: { reception: { date: new Date("2021-01-01") } }
     });
-    expect(checked).toBe(true);
+    expect(updatedFields).toEqual(["destinationReceptionDate"]);
   });
 
   it("should not be possible to update a field sealed by reception signature", async () => {

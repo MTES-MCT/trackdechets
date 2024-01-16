@@ -11,7 +11,7 @@ import {
   IconTrash,
   IconView
 } from "../../../../../Apps/common/Components/Icons/Icons";
-import { EmitterType, Form, FormStatus } from "codegen-ui";
+import { EmitterType, Form, FormStatus } from "@td/codegen-ui";
 import { DeleteModal } from "./DeleteModal";
 import { useDuplicate } from "./useDuplicate";
 import { useDownloadPdf } from "./useDownloadPdf";

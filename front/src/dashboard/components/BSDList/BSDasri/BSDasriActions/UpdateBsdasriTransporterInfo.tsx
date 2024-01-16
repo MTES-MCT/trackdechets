@@ -6,8 +6,7 @@ import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icon
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 
 import { UPDATE_BSDASRI } from "../../../../../form/bsdasri/utils/queries";
-import { Bsdasri, Mutation, MutationUpdateBsdasriArgs } from "codegen-ui";
-import { useMatch } from "react-router-dom";
+import { Bsdasri, Mutation, MutationUpdateBsdasriArgs } from "@td/codegen-ui";
 
 type Props = {
   bsdasri: Bsdasri;
@@ -22,7 +21,6 @@ export function UpdateBsdasriTransporterInfo({
 }: Props) {
   console.log(bsdasri);
   const [isOpen, setIsOpen] = useState(false);
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
   const [updateBsdasri, { error }] = useMutation<
     Pick<Mutation, "updateBsdasri">,
     MutationUpdateBsdasriArgs
@@ -44,7 +42,7 @@ export function UpdateBsdasriTransporterInfo({
 
   return (
     <>
-      {!isV2Routes && !isModalOpenFromParent && (
+      {!isModalOpenFromParent && (
         <button
           className="link__ icon__ btn--no-style"
           onClick={() => setIsOpen(true)}

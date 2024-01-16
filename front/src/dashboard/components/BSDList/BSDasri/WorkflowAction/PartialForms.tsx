@@ -1,6 +1,11 @@
 import React, { useEffect } from "react";
 import { RedErrorMessage } from "../../../../../common/components";
-import { BsdasriSignatureType, BsdasriStatus } from "codegen-ui";
+import {
+  BsdasriSignatureType,
+  BsdasriStatus,
+  Bsdasri,
+  BsdasriType
+} from "@td/codegen-ui";
 import Packagings from "../../../../../form/bsdasri/components/packagings/Packagings";
 import WeightWidget from "../../../../../form/bsdasri/components/Weight";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
@@ -10,7 +15,6 @@ import { ExtraSignatureType, SignatureType } from "../types";
 import { Field, useFormikContext } from "formik";
 import omitDeep from "omit-deep-lodash";
 import { getInitialWeightFn } from "../../../../../form/bsdasri/utils/initial-state";
-import { Bsdasri, BsdasriType } from "codegen-ui";
 import Transport from "../../../../../form/bsdasri/steps/Transport";
 import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import { subMonths } from "date-fns";

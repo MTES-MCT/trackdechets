@@ -3,7 +3,7 @@ import {
   BsdaRevisionRequest,
   BsdaRevisionRequestResolvers
 } from "../../generated/graphql/types";
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import {
   expandBsdaRevisionRequestContent,
   expandBsdaFromDb

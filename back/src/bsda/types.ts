@@ -48,7 +48,7 @@ export type BsdaRevisionRequestWithApprovals =
 
 export const BsdaWithRevisionRequestsInclude =
   Prisma.validator<Prisma.BsdaInclude>()({
-    BsdaRevisionRequest: {
+    bsdaRevisionRequests: {
       include: {
         ...BsdaRevisionRequestWithAuthoringCompanyInclude,
         ...BsdaRevisionRequestWithApprovalsInclude

@@ -1,0 +1,249 @@
+"Filtres possibles pour la récupération de bordereaux."
+input BspaohWhere {
+  "Filtre sur l'ID"
+  id: IdFilter
+  "Filtre sur le statut de brouillon."
+  isDraft: Boolean
+  "Filtre sur le statut"
+  status: BspaohStatusFilter
+  "Filtre sur la date de création"
+  createdAt: DateFilter
+  "Filtre sur la date de dernière modification"
+  updatedAt: DateFilter
+  "Filtre sur le champ emitter."
+  emitter: BspaohEmitterWhere
+  "Filtre sur le champ transporter."
+  transporter: BspaohTransporterWhere
+  "Filtre sur le champ destination."
+  destination: BspaohDestinationWhere
+  "ET logique"
+  _and: [BspaohWhere!]
+  "OU logique"
+  _or: [BspaohWhere!]
+  "NON logique"
+  _not: BspaohWhere
+}
+
+"Filtre sur le statut"
+input BspaohStatusFilter {
+  _eq: BspaohStatus
+  _in: [BspaohStatus!]
+}
+
+"Champs possible pour le filtre sur l'émetteur."
+input BspaohEmitterWhere {
+  company: CompanyWhere
+  emission: BspaohEmissionWhere
+  customInfo: StringFilter
+}
+
+"Champs possibles pour le filtre sur l'émission"
+input BspaohEmissionWhere {
+  signature: SignatureWhere
+}
+
+"Champs possible pour le filtre sur le transporteur."
+input BspaohTransporterWhere {
+  company: CompanyWhere
+  transport: BspaohTransportWhere
+  customInfo: StringFilter
+}
+
+"Champs possible pour le filtre sur le transport."
+input BspaohTransportWhere {
+  signature: SignatureWhere
+  plates: StringNullableListFilter
+}
+
+"Champs possible pour le filtre sur la destination."
+input BspaohDestinationWhere {
+  company: CompanyWhere
+  reception: BspaohReceptionWhere
+  operation: BspaohOperationWhere
+  customInfo: StringFilter
+}
+
+"Champs possible pour le filtre sur le courtier."
+input BspaohBrokerWhere {
+  company: CompanyWhere
+}
+
+"Champs possibles pour le filtre sur la réception"
+input BspaohReceptionWhere {
+  date: DateFilter
+}
+
+"Champs possible pour le filtre sur l'opération."
+input BspaohOperationWhere {
+  code: StringFilter
+  signature: SignatureWhere
+}
+
+"Champs possible pour le filtre sur l'entreprise de travaux."
+input BspaohWorkerWhere {
+  company: CompanyWhere
+  work: BspaohWorkWhere
+}
+
+"Champs possible pour le filtre sur les travaux."
+input BspaohWorkWhere {
+  signature: SignatureWhere
+}
+
+input BspaohSignatureInput {
+  "Type de signature apposé"
+  type: BspaohSignatureType!
+  "Date de la signature"
+  date: DateTime
+  "Nom et prénom du signataire"
+  author: String!
+}
+
+input BspaohWasteWeightInput {
+  "Poids en kilos"
+  value: Float!
+  "Type de quantité (réelle ou estimée)"
+  isEstimate: Boolean!
+}
+
+input BspaohWasteDetailInput {
+  weight: BspaohWasteWeightInput
+  "Quantité en nombre"
+  quantity: Int
+}
+
+input BspaohPackagingAcceptationInput {
+  "Identifiant du packaging"
+  id: String
+  "Accepté par le destinataire "
+  acceptation: BspaohPackagingAcceptationStatus
+}
+
+input BspaohWasteAcceptationInput {
+  "Accepté, refusé ou refusé partiellement"
+  status: WasteAcceptationStatus
+  "Raison en cas de refus ou refus partiel"
+  refusalReason: String
+  "Acceptation détaillée des conditionnements"
+  packagings: [BspaohPackagingAcceptationInput!]
+}
+
+input BspaohPackagingInput {
+  "Type de conditionnement"
+  type: BspaohPackagingType!
+  "Volume en litres"
+  volume: Int
+  "Numérotation"
+  containerNumber: String!
+  "Nombre de colis associés à ce conditionnement"
+  quantity: Int!
+  "Codes d'identification utilisés par l'établissement"
+  identificationCodes: [String!]
+  "Consistance"
+  consistence: BspaohConsistence!
+}
+
+input PickupSiteInput {
+  name: String
+  address: String
+  city: String
+  postalCode: String
+  infos: String
+}
+
+input BspaohEmissionInput {
+  detail: BspaohWasteDetailInput
+}
+
+input BspaohRecepisseInput {
+  "Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement)"
+  isExempted: Boolean
+}
+
+input BspaohTransportInput {
+  "Mode de transport"
+  mode: TransportMode
+  "Plaque(s) d'immatriculation - maximum 2"
+  plates: [String!]
+  "Date de prise en charge"
+  takenOverAt: DateTime
+}
+
+input BspaohReceptionInput {
+  "Date de présentation sur site"
+  date: DateTime
+  detail: BspaohWasteDetailInput
+  acceptation: BspaohWasteAcceptationInput
+}
+
+input BspaohOperationInput {
+  "Code D/R"
+  code: String
+  "Qualification du traitement final"
+  mode: OperationMode
+  "Date de réalisation de l'opération"
+  date: DateTime
+}
+input BspaohHandedOverToDestinationInput {
+  date: DateTime
+}
+
+input BspaohWasteInput {
+  "Type de déchet"
+  type: BspaohType
+  "Rubrique Déchet"
+  code: String
+  "Mention ADR"
+  adr: String
+  "Conditionnements"
+  packagings: [BspaohPackagingInput!]
+}
+
+input BspaohEmitterInput {
+  "Établissement émetteur"
+  company: CompanyInput
+  "Adresse de collecte"
+  pickupSite: PickupSiteInput
+  "Champ libre émetteur"
+  customInfo: String
+  emission: BspaohEmissionInput
+}
+
+input BspaohTransporterInput {
+  "Entreprise de transport"
+  company: CompanyInput
+  "Champ libre"
+  customInfo: String
+  "Recepissé - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport "
+  recepisse: BspaohRecepisseInput
+  transport: BspaohTransportInput
+}
+
+input BspaohDestinationInput {
+  "Établissement de destination"
+  company: CompanyInput
+  "N° de CAP (le cas échéant)"
+  cap: String
+  "Informations optionelles de remise à l'installation destinataire"
+  handedOverToDestination: BspaohHandedOverToDestinationInput
+  "Expédition reçue à l'installation de destination"
+  reception: BspaohReceptionInput
+  "Réalisation de l'opération (case 11)"
+  operation: BspaohOperationInput
+  "Champ libre"
+  customInfo: String
+}
+
+input BspaohInput {
+  "Producteur du déchet"
+  emitter: BspaohEmitterInput
+
+  "Description du déchet"
+  waste: BspaohWasteInput
+
+  "Premier transporteur du déchet"
+  transporter: BspaohTransporterInput
+
+  "Installation de destination"
+  destination: BspaohDestinationInput
+}

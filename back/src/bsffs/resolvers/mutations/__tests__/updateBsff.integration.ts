@@ -6,13 +6,13 @@ import {
 } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { BSFF_WASTE_CODES } from "shared/constants";
+import { BSFF_WASTE_CODES } from "@td/constants";
 import {
   BsffOperationCode,
   Mutation,
   MutationUpdateBsffArgs
 } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { associateUserToCompany } from "../../../../users/database";
 import {
   companyFactory,
@@ -31,7 +31,8 @@ import {
   createBsffAfterTransport,
   createBsffBeforeEmission,
   createBsffAfterReception,
-  createFicheIntervention
+  createFicheIntervention,
+  createBsffAfterAcceptation
 } from "../../../__tests__/factories";
 import { sirenifyBsffInput } from "../../../sirenify";
 
@@ -478,6 +479,64 @@ describe("Mutation.updateBsff", () => {
       }
     });
     expect(errors).toBeUndefined();
+  });
+
+  it("[tra-13669] should not erase packaging signature when resending same packagings data after acceptation", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      transporterReceipt: {
+        create: {
+          receiptNumber: "rec",
+          department: "07",
+          validityLimit: new Date()
+        }
+      }
+    });
+
+    const bsff = await createBsffAfterAcceptation({
+      emitter,
+      destination,
+      transporter
+    });
+
+    const packagings = await prisma.bsff
+      .findUniqueOrThrow({ where: { id: bsff.id } })
+      .packagings();
+
+    expect(packagings.length).toEqual(1);
+
+    const packaging = packagings[0];
+
+    expect(packaging.acceptationSignatureDate).not.toBeNull();
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          packagings: [
+            {
+              type: packaging.type,
+              other: packaging.other,
+              weight: packaging.weight,
+              volume: packaging.volume,
+              numero: packaging.numero
+            }
+          ]
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+
+    const updatedPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
+      where: { id: packaging.id }
+    });
+
+    expect(updatedPackaging.acceptationSignatureDate).not.toBeNull();
   });
 
   it("should update fiche d'interventions", async () => {

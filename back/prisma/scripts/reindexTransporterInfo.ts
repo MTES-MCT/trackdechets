@@ -1,5 +1,5 @@
 import { Updater, registerUpdater } from "./helper/helper";
-import prisma from "../../src/prisma";
+import { prisma } from "@td/prisma";
 import { indexBsds, index } from "../../src/common/elastic";
 import {
   BsdaForElasticInclude,

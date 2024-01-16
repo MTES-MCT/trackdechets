@@ -1,4 +1,4 @@
-import { Bsda, BsdaStatus } from "codegen-ui";
+import { Bsda, BsdaStatus } from "@td/codegen-ui";
 import React from "react";
 import { Switch } from "../bsdd/request/Switch";
 

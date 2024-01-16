@@ -7,14 +7,8 @@ import {
   MutationSubmitFormRevisionRequestApprovalArgs,
   PackagingInfo,
   Trader
-} from "codegen-ui";
-import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
-import {
-  ActionButton,
-  Modal,
-  RedErrorMessage
-} from "../../../../../common/components";
-import { IconCogApproved } from "../../../../../Apps/common/Components/Icons/Icons";
+} from "@td/codegen-ui";
+import { Modal, RedErrorMessage } from "../../../../../common/components";
 import { RevisionField } from "./RevisionField";
 import { useMutation } from "@apollo/client";
 import { SUBMIT_FORM_REVISION_REQUEST_APPROVAL } from "../../../../../Apps/common/queries/reviews/BsddReviewsQuery";
@@ -22,7 +16,6 @@ import { Field, Form, Formik } from "formik";
 import { RadioButton } from "../../../../../form/common/components/custom-inputs/RadioButton";
 import { formatDate } from "../../../../../common/datetime";
 import { getPackagingInfosSummary } from "../../../../../form/bsdd/utils/packagings";
-import { useMatch } from "react-router-dom";
 import { getOperationModeLabel } from "../../../../../common/operationModes";
 
 type Props = {
@@ -40,14 +33,12 @@ export function BsddApproveRevision({
   isModalOpenFromParent,
   onModalCloseFromParent
 }: Props) {
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
-
   const [submitFormRevisionRequestApproval, { loading, error }] = useMutation<
     Pick<Mutation, "submitFormRevisionRequestApproval">,
     MutationSubmitFormRevisionRequestApprovalArgs
   >(SUBMIT_FORM_REVISION_REQUEST_APPROVAL);
   const title = "Acceptation d'une révision";
-  if (isV2Routes && isModalOpenFromParent) {
+  if (isModalOpenFromParent) {
     const formatRevisionAdapter = {
       ...review["review"],
       form: { ...review }
@@ -64,25 +55,8 @@ export function BsddApproveRevision({
       </Modal>
     );
   }
-  return !isV2Routes ? (
-    <TdModalTrigger
-      ariaLabel={title}
-      trigger={open => (
-        <ActionButton icon={<IconCogApproved size="24px" />} onClick={open}>
-          Approuver / Refuser
-        </ActionButton>
-      )}
-      modalContent={close => (
-        <DisplayModalContent
-          review={review}
-          close={close}
-          submitFormRevisionRequestApproval={submitFormRevisionRequestApproval}
-          error={error}
-          loading={loading}
-        />
-      )}
-    />
-  ) : null;
+
+  return null;
 }
 
 function DisplayModalContent({

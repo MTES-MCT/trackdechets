@@ -7,7 +7,7 @@ import {
   MutationPublishBsdaArgs,
   MutationPublishBsffArgs,
   MutationPublishBsvhuArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { statusChangeFragment } from "../../../../common/queries/fragments";
 import { GET_BSDS } from "../../../../common/queries";
 import toast from "react-hot-toast";
@@ -218,7 +218,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 apolloError={errorPublishBsda}
               />
               <Link
-                to={generatePath(routes.dashboardv2.bsdas.edit, {
+                to={generatePath(routes.dashboard.bsdas.edit, {
                   siret: currentSiret,
                   id: bsd.id
                 })}
@@ -292,7 +292,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 apolloError={errorBsvhu}
               />
               <Link
-                to={generatePath(routes.dashboardv2.bsvhus.edit, {
+                to={generatePath(routes.dashboard.bsvhus.edit, {
                   siret: currentSiret,
                   id: bsd.id
                 })}

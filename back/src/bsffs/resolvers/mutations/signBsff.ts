@@ -28,7 +28,7 @@ import {
   getBsffRepository
 } from "../../repository";
 import { checkCanSignFor } from "../../../permissions";
-import { getTransporterReceipt } from "../../../bsdasris/recipify";
+import { getTransporterReceipt } from "../../../companies/recipify";
 import { UserInputError } from "../../../common/errors";
 
 const signBsff: MutationResolvers["signBsff"] = async (

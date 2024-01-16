@@ -1,4 +1,4 @@
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../integration-tests/helper";
 import {
   companyFactory,
@@ -57,7 +57,8 @@ describe("Test Factories", () => {
       "TRANSPORTER",
       "WASTEPROCESSOR",
       "WORKER",
-      "WASTE_VEHICLES"
+      "WASTE_VEHICLES",
+      "CREMATORIUM"
     ]);
     expect(companyAssociations[0].company.siret).toBe(company.siret);
   });

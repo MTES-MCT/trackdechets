@@ -1,4 +1,4 @@
-import { isForeignVat } from "shared/constants";
+import { isForeignVat } from "@td/constants";
 import { Workflow } from "../common/workflow";
 import {
   userWithCompanyFactory,

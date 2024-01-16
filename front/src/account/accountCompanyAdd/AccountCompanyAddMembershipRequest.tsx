@@ -1,7 +1,7 @@
 import { useMutation, gql } from "@apollo/client";
 import { NotificationError } from "../../Apps/common/Components/Error/Error";
 import React from "react";
-import { cleanClue } from "shared/constants";
+import { cleanClue } from "@td/constants";
 
 const SEND_MEMBERSHIP_REQUEST = gql`
   mutation SendMembershipRequest($siret: String!) {

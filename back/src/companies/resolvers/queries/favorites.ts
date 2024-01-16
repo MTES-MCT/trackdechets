@@ -8,7 +8,7 @@ import {
   getIndexFavoritesId,
   indexConfig
 } from "../../../queue/jobs/indexFavorites";
-import { isFRVat, isForeignVat, isSiret } from "shared/constants";
+import { isFRVat, isForeignVat, isSiret } from "@td/constants";
 import { getCompanyOrCompanyNotFound } from "../../database";
 import { errors, estypes } from "@elastic/elasticsearch";
 

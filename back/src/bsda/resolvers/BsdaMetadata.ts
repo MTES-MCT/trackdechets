@@ -1,11 +1,12 @@
 import { ZodIssue } from "zod";
 import {
   BsdaMetadata,
-  BsdaMetadataResolvers,
-  BsdaStatus
+  BsdaMetadataResolvers
 } from "../../generated/graphql/types";
 import { getBsdaOrNotFound } from "../database";
 import { parseBsdaInContext } from "../validation";
+import { prisma } from "@td/prisma";
+import { computeLatestRevision } from "../converter";
 
 function getNextSignature(bsda) {
   if (bsda.destinationOperationSignatureAuthor != null) return "OPERATION";
@@ -15,9 +16,7 @@ function getNextSignature(bsda) {
 }
 
 export const Metadata: BsdaMetadataResolvers = {
-  errors: async (
-    metadata: BsdaMetadata & { id: string; status: BsdaStatus }
-  ) => {
+  errors: async (metadata: BsdaMetadata & { id: string }) => {
     const bsda = await getBsdaOrNotFound(metadata.id, {
       include: { intermediaries: true, grouping: true, forwarding: true }
     });
@@ -40,5 +39,18 @@ export const Metadata: BsdaMetadataResolvers = {
         };
       });
     }
+  },
+  latestRevision: async (metadata: BsdaMetadata & { id: string }) => {
+    // When loaded from ES, this field is already populated
+    // We check only for undefined as the field can be null
+    if (metadata.latestRevision !== undefined) {
+      return metadata.latestRevision;
+    }
+
+    const revisions = await prisma.bsda
+      .findUnique({ where: { id: metadata.id } })
+      .bsdaRevisionRequests();
+
+    return computeLatestRevision(revisions) as any; // Typing as any because some properties are loaded in sub resolvers. Hence the type is not complete.
   }
 };

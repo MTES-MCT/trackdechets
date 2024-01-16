@@ -1,6 +1,6 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { getConnection } from "../../../common/pagination";
 import { Prisma } from "@prisma/client";
 import {

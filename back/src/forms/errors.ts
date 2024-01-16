@@ -54,14 +54,6 @@ export class MissingIdOrReadableId extends UserInputError {
   }
 }
 
-export class CountryNotFound extends UserInputError {
-  constructor(code: string) {
-    super(
-      `Le code "${code}" n'est pas reconnu comme un code pays ISO 3166-1 alpha-2.`
-    );
-  }
-}
-
 export class TemporaryStorageCannotReceive extends UserInputError {
   constructor() {
     super(

@@ -2,7 +2,7 @@ import { BsdasriStatus, Bsdasri, BsdasriType, BsdType } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { buildAddress } from "../companies/sirene/utils";
 import {
   BsdasriWithGrouping,
@@ -10,7 +10,7 @@ import {
   BsdasriWithGroupingInclude,
   BsdasriWithSynthesizingInclude
 } from "./types";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 
 export type BsdasriForElastic = Bsdasri &
   BsdasriWithGrouping &
@@ -216,7 +216,25 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     isRevisedFor: [],
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),
-    rawBsd: bsdasri
+    rawBsd: bsdasri,
+    revisionRequests: [],
+
+    // ALL actors from the BSDASRI, for quick search
+    companyNames: [
+      bsdasri.emitterCompanyName,
+      bsdasri.ecoOrganismeName,
+      bsdasri.transporterCompanyName,
+      bsdasri.destinationCompanyName
+    ]
+      .filter(Boolean)
+      .join(" "),
+    companyOrgIds: [
+      bsdasri.emitterCompanySiret,
+      bsdasri.ecoOrganismeSiret,
+      bsdasri.transporterCompanySiret,
+      bsdasri.transporterCompanyVatNumber,
+      bsdasri.destinationCompanySiret
+    ].filter(Boolean)
   };
 }
 

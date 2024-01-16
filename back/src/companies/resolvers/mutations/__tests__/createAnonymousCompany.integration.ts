@@ -3,7 +3,7 @@ import {
   Mutation,
   MutationCreateAnonymousCompanyArgs
 } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import { siretify, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 

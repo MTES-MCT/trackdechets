@@ -44,7 +44,7 @@ import {
 } from "../common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
 import { BsdCurrentTab } from "../common/types/commonTypes";
-import { BsdType, BsdWhere, OrderBy } from "codegen-ui";
+import { BsdType, BsdWhere, OrderBy } from "@td/codegen-ui";
 
 export const MAX_FILTER = 5;
 
@@ -337,21 +337,8 @@ export const filterPredicates: {
       _and: [
         {
           _or: [
-            { emitter: { company: { name: { _match: value } } } },
-            { emitter: { company: { siret: { _contains: value } } } },
-            { emitter: { pickupSite: { name: { _match: value } } } },
-            { transporter: { company: { name: { _match: value } } } },
-            { transporter: { company: { siret: { _contains: value } } } },
-            { worker: { company: { name: { _match: value } } } },
-            { worker: { company: { siret: { _contains: value } } } },
-            { destination: { company: { name: { _match: value } } } },
-            { destination: { company: { siret: { _contains: value } } } },
-            { broker: { company: { name: { _match: value } } } },
-            { broker: { company: { siret: { _contains: value } } } },
-            { trader: { company: { name: { _match: value } } } },
-            { trader: { company: { siret: { _contains: value } } } },
-            { ecoOrganisme: { name: { _match: value } } },
-            { ecoOrganisme: { siret: { _contains: value } } }
+            { companyNames: { _match: value } },
+            { companyOrgIds: { _itemContains: value } }
           ]
         }
       ]
@@ -472,28 +459,28 @@ export const filterPredicates: {
 export const dropdownCreateLinks = siret => [
   {
     title: dropdown_create_bsdd,
-    route: generatePath(routes.dashboardv2.bsdds.create, { siret }),
+    route: generatePath(routes.dashboard.bsdds.create, { siret }),
     icon: <IconBSDD />
   },
   {
     title: dropdown_create_bsdasri,
-    route: generatePath(routes.dashboardv2.bsdasris.create, { siret }),
+    route: generatePath(routes.dashboard.bsdasris.create, { siret }),
     icon: <IconBSDasri />
   },
 
   {
     title: dropdown_create_bsvhu,
-    route: generatePath(routes.dashboardv2.bsvhus.create, { siret }),
+    route: generatePath(routes.dashboard.bsvhus.create, { siret }),
     icon: <IconBSVhu />
   },
   {
     title: dropdown_create_bsff,
-    route: generatePath(routes.dashboardv2.bsffs.create, { siret }),
+    route: generatePath(routes.dashboard.bsffs.create, { siret }),
     icon: <IconBSFF />
   },
   {
     title: dropdown_create_bsda,
-    route: generatePath(routes.dashboardv2.bsdas.create, { siret }),
+    route: generatePath(routes.dashboard.bsdas.create, { siret }),
     icon: <IconBSDa />
   }
 ];
@@ -501,15 +488,15 @@ export const dropdownCreateLinks = siret => [
 export const getOverviewPath = bsd => {
   switch (bsd.type) {
     case BsdType.Bsdd:
-      return routes.dashboardv2.bsdds.view;
+      return routes.dashboard.bsdds.view;
     case BsdType.Bsda:
-      return routes.dashboardv2.bsdas.view;
+      return routes.dashboard.bsdas.view;
     case BsdType.Bsdasri:
-      return routes.dashboardv2.bsdasris.view;
+      return routes.dashboard.bsdasris.view;
     case BsdType.Bsff:
-      return routes.dashboardv2.bsffs.view;
+      return routes.dashboard.bsffs.view;
     case BsdType.Bsvhu:
-      return routes.dashboardv2.bsvhus.view;
+      return routes.dashboard.bsvhus.view;
 
     default:
       break;
@@ -519,15 +506,15 @@ export const getOverviewPath = bsd => {
 export const getUpdatePath = bsd => {
   switch (bsd.type) {
     case BsdType.Bsdd:
-      return routes.dashboardv2.bsdds.edit;
+      return routes.dashboard.bsdds.edit;
     case BsdType.Bsda:
-      return routes.dashboardv2.bsdas.edit;
+      return routes.dashboard.bsdas.edit;
     case BsdType.Bsdasri:
-      return routes.dashboardv2.bsdasris.edit;
+      return routes.dashboard.bsdasris.edit;
     case BsdType.Bsff:
-      return routes.dashboardv2.bsffs.edit;
+      return routes.dashboard.bsffs.edit;
     case BsdType.Bsvhu:
-      return routes.dashboardv2.bsvhus.edit;
+      return routes.dashboard.bsvhus.edit;
 
     default:
       break;
@@ -537,9 +524,9 @@ export const getUpdatePath = bsd => {
 export const getRevisionPath = bsd => {
   switch (bsd.type) {
     case BsdType.Bsdd:
-      return routes.dashboardv2.bsdds.review;
+      return routes.dashboard.bsdds.review;
     case BsdType.Bsda:
-      return routes.dashboardv2.bsdas.review;
+      return routes.dashboard.bsdas.review;
 
     default:
       break;

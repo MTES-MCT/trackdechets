@@ -1,5 +1,6 @@
 import {
   cleanupSpecialChars,
+  sanitize,
   splitArrayIntoChunks,
   toFrFormat
 } from "../helpers";
@@ -47,5 +48,26 @@ describe("splitArrayIntoChunks", () => {
     const res = splitArrayIntoChunks(arr, 10);
 
     expect(res[0]).toEqual([1, 2, 3]);
+  });
+});
+
+describe.only("sanitize", () => {
+  // Base on the payloads at https://book.hacktricks.xyz/pentesting-web/ssti-server-side-template-injection
+  test.each`
+    input             | expected
+    ${"John Doe"}     | ${"John Doe"}
+    ${"John-Doe"}     | ${"John-Doe"}
+    ${"John_Doe"}     | ${"John_Doe"}
+    ${"john@doe.com"} | ${"john@doe.com"}
+    ${"Jöhn Dôe"}     | ${"Jöhn Dôe"}
+    ${"j0hn D03"}     | ${"j0hn D03"}
+    ${"{{7*7}}}}"}    | ${"77"}
+    ${"${7*7}"}       | ${"77"}
+    ${"<%=7*7%>"}     | ${"77"}
+    ${"${{7*7}}"}     | ${"77"}
+    ${"#{7*7}"}       | ${"77"}
+    ${"*{7*7}"}       | ${"77"}
+  `("$input should become $expected", ({ input, expected }) => {
+    expect(sanitize(input)).toEqual(expected);
   });
 });

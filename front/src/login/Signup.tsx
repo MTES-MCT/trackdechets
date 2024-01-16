@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
-import { Mutation, MutationSignupArgs } from "codegen-ui";
+import { Mutation, MutationSignupArgs } from "@td/codegen-ui";
 import { SIGNUP } from "./mutations";
-import PasswordHelper from "../common/components/PasswordHelper";
+import PasswordHelper, {
+  getPasswordHint
+} from "../common/components/PasswordHelper";
 
 import routes from "../Apps/routes";
 
@@ -69,8 +71,11 @@ export default function Signup() {
   };
 
   useEffect(() => {
+    const { hintType } = getPasswordHint(passwordValue);
+    const validPasswordValue = hintType !== "error" && !!passwordValue;
+
     const formFilled =
-      !!nameValue && !!emailValue && !!passwordValue && !!cguValue;
+      !!nameValue && !!emailValue && validPasswordValue && !!cguValue;
 
     setSubmittable(formFilled);
   }, [nameValue, emailValue, passwordValue, cguValue]);
@@ -123,7 +128,7 @@ export default function Signup() {
               nativeInputProps={{
                 required: true,
                 type: "email",
-                onBlur: handleEmailChange
+                onChange: handleEmailChange
               }}
             />
             <PasswordInput

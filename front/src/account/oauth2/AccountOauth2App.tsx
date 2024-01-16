@@ -3,7 +3,7 @@ import { List, ListItem } from "../../common/components";
 import styles from "./AccountOauth2App.module.scss";
 import { generatePath, useNavigate } from "react-router";
 import routes from "../../Apps/routes";
-import { Application, ApplicationGoal } from "codegen-ui";
+import { Application, ApplicationGoal } from "@td/codegen-ui";
 import AccountOauth2AppDelete from "./AccountOauth2AppDelete";
 
 type AccountOauth2AppProps = {

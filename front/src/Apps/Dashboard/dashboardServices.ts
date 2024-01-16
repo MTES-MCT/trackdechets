@@ -15,7 +15,7 @@ import {
   Form,
   Maybe,
   UserPermission
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   ACCEPTE,
   AJOUTER_ANNEXE_1,
@@ -203,6 +203,21 @@ export const isSameSiretTransporter = (
 ): boolean =>
   currentSiret === bsd.transporter?.company?.siret ||
   currentSiret === bsd.transporter?.company?.orgId;
+
+// Cas du transport multi-modal BSDD, vérifie si l'établissement
+// courant est le prochain transporteur dans la liste des transporteurs
+// multi-modaux à devoir prendre en charge le déchet.
+export const isSameSiretNextTransporter = (
+  currentSiret: string,
+  bsd: BsdDisplay
+): boolean => {
+  // Premier transporteur de la liste qui n'a pas encore pris en charge le déchet.
+  const nextTransporter = (bsd.transporters ?? []).find(t => !t.takenOverAt);
+  if (nextTransporter) {
+    return currentSiret === nextTransporter.company?.orgId;
+  }
+  return false;
+};
 
 export const isSynthesis = (bsdWorkflowType: string | undefined): boolean =>
   bsdWorkflowType === BsdasriType.Synthesis;
@@ -459,7 +474,8 @@ export const getSealedBtnLabel = (
 ): string => {
   if (
     isBsdd(bsd.type) &&
-    permissions.includes(UserPermission.BsdCanSignEmission)
+    (permissions.includes(UserPermission.BsdCanSignEmission) ||
+      permissions.includes(UserPermission.BsdCanSignTransport))
   ) {
     if (isAppendix1(bsd) && canAddAppendix1(bsd)) {
       return AJOUTER_ANNEXE_1;
@@ -505,6 +521,7 @@ export const getSentBtnLabel = (
 ): string => {
   const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
+  const isToCollectTab = bsdCurrentTab === "toCollectTab";
 
   if (hasRoadControlButton(bsd, isCollectedTab)) {
     return ROAD_CONTROL;
@@ -513,6 +530,10 @@ export const getSentBtnLabel = (
   if (isBsdd(bsd.type)) {
     if (isAppendix1Producer(bsd)) {
       return "";
+    }
+
+    if (isToCollectTab && isSameSiretNextTransporter(currentSiret, bsd)) {
+      return SIGNER;
     }
 
     if (isActTab) {
@@ -662,7 +683,9 @@ export const getSignByProducerBtnLabel = (
 
     if (
       currentSiret === bsd.worker?.company?.siret ||
-      currentSiret === bsd.transporter?.company?.orgId
+      (currentSiret === bsd.transporter?.company?.orgId &&
+        (permissions.includes(UserPermission.BsdCanSignTransport) ||
+          permissions.includes(UserPermission.BsdCanSignWork)))
     ) {
       return SIGNER;
     }
@@ -753,7 +776,8 @@ export const getResealedBtnLabel = (
   if (
     isBsdd(bsd.type) &&
     hasTemporaryStorage(currentSiret, bsd) &&
-    permissions.includes(UserPermission.BsdCanSignEmission)
+    (permissions.includes(UserPermission.BsdCanSignEmission) ||
+      permissions.includes(UserPermission.BsdCanSignTransport))
   ) {
     if (isSameSiretEmmiter(currentSiret, bsd)) {
       return SIGNER;
@@ -807,7 +831,8 @@ export const getSignTempStorerBtnLabel = (
   if (
     isBsdd(bsd.type) &&
     isSameSiretTemporaryStorageTransporter(currentSiret, bsd) &&
-    permissions.includes(UserPermission.BsdCanSignEmission)
+    (permissions.includes(UserPermission.BsdCanSignEmission) ||
+      permissions.includes(UserPermission.BsdCanSignTransport))
   ) {
     return SIGNER;
   }
@@ -997,6 +1022,8 @@ export const getWorkflowLabel = (
       return WorkflowDisplayType.GRP;
     case BsffType.Reexpedition:
       return WorkflowDisplayType.TRANSIT;
+    case BsffType.Reconditionnement:
+      return WorkflowDisplayType.RECONDITIONNEMENT;
 
     case EmitterType.Appendix2:
       return WorkflowDisplayType.ANNEXE_2;
@@ -1028,7 +1055,8 @@ const canUpdateBsdd = bsd =>
   [
     BsdStatusCode.Draft,
     BsdStatusCode.Sealed,
-    BsdStatusCode.SignedByProducer
+    BsdStatusCode.SignedByProducer,
+    BsdStatusCode.Sent
   ].includes(bsd.status);
 
 const canDeleteBsdd = bsd =>
@@ -1078,7 +1106,9 @@ export const canDuplicate = (bsd, siret) =>
 
 const canDeleteBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
-  bsd.status === BsdStatusCode.Initial &&
+  (bsd.status === BsdStatusCode.Initial ||
+    (isSameSiretEmmiter(siret, bsd) &&
+      bsd.status === BsdStatusCode.SignedByEmitter)) &&
   canDuplicateBsff(bsd, siret);
 
 export const canDeleteBsd = (bsd, siret) =>
@@ -1090,28 +1120,38 @@ export const canDeleteBsd = (bsd, siret) =>
 
 const canUpdateBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
-  ![BsdStatusCode.Processed, BsdStatusCode.Refused].includes(bsd.status) &&
+  [BsdStatusCode.Initial, BsdStatusCode.SignedByEmitter].includes(bsd.status) &&
   canDuplicateBsff(bsd, siret);
 
 const canReviewBsda = (bsd, siret) =>
   bsd.type === BsdType.Bsda && !canDeleteBsda(bsd, siret);
 
-export const canReviewBsdd = (bsd, siret) =>
-  bsd.type === BsdType.Bsdd &&
-  ![BsdStatusCode.Draft, BsdStatusCode.Sealed, BsdStatusCode.Refused].includes(
-    bsd.status
-  ) &&
-  bsd.emitterType !== EmitterType.Appendix1Producer &&
-  !(
-    bsd.emitterType === EmitterType.Producer &&
-    isSameSiretEmmiter(siret, bsd) &&
-    canUpdateBsd(bsd, siret)
-  ) &&
-  !(
-    bsd.emitterType === EmitterType.Appendix2 &&
-    isSameSiretDestination(siret, bsd) &&
-    canUpdateBsd(bsd, siret)
+export const canReviewBsdd = (bsd, siret) => {
+  return (
+    bsd.type === BsdType.Bsdd &&
+    ![
+      BsdStatusCode.Draft,
+      BsdStatusCode.Sealed,
+      BsdStatusCode.Refused
+    ].includes(bsd.status) &&
+    bsd.emitterType !== EmitterType.Appendix1Producer &&
+    !(
+      bsd.emitterType === EmitterType.Producer &&
+      isSameSiretEmmiter(siret, bsd) &&
+      canUpdateBsd(bsd, siret)
+    ) &&
+    !(
+      bsd.emitterType === EmitterType.Appendix2 &&
+      isSameSiretDestination(siret, bsd) &&
+      canUpdateBsd(bsd, siret)
+    ) &&
+    !(
+      bsd.emitterType === EmitterType.Appendix2 &&
+      isSameSiretEmmiter(siret, bsd) &&
+      canUpdateBsd(bsd, siret)
+    )
   );
+};
 
 export const canReviewBsd = (bsd, siret) => {
   const isTransporter = isSameSiretTransporter(siret, bsd);

@@ -22,7 +22,7 @@ import {
 
 import { buildAddress } from "../companies/sirene/utils";
 import { getFirstTransporterSync } from "./database";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 
 export type FormForElastic = Form &
   FormWithTransporters &
@@ -144,10 +144,49 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
         }
       : siretsByTab),
     ...getFormRevisionOrgIds(form),
+    revisionRequests: form.bsddRevisionRequests,
     sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form),
     intermediaries: form.intermediaries,
-    rawBsd: form
+    rawBsd: form,
+
+    // ALL actors from the BSDD, for quick search
+    companyNames: [
+      form.emitterCompanyName,
+      form.nextDestinationCompanyName,
+      form.traderCompanyName,
+      form.brokerCompanyName,
+      form.ecoOrganismeName,
+      form.recipientCompanyName,
+      ...form.intermediaries.map(intermediary => intermediary.name),
+      ...form.transporters.map(
+        transporter => transporter.transporterCompanyName
+      ),
+      form.forwardedIn?.recipientCompanyName,
+      form.forwardedIn?.transporters?.map(
+        transporter => transporter.transporterCompanyName
+      )
+    ]
+      .filter(Boolean)
+      .join(" "),
+    companyOrgIds: [
+      form.emitterCompanySiret,
+      form.nextDestinationCompanySiret,
+      form.traderCompanySiret,
+      form.brokerCompanySiret,
+      form.ecoOrganismeSiret,
+      form.recipientCompanySiret,
+      ...form.intermediaries.map(intermediary => intermediary.siret),
+      ...form.transporters.flatMap(transporter => [
+        transporter.transporterCompanySiret,
+        transporter.transporterCompanyVatNumber
+      ]),
+      form.forwardedIn?.recipientCompanySiret,
+      ...(form.forwardedIn?.transporters ?? []).flatMap(transporter => [
+        transporter.transporterCompanySiret,
+        transporter.transporterCompanyVatNumber
+      ])
+    ].filter(Boolean)
   };
 }
 

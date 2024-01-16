@@ -1,9 +1,9 @@
 import {
-  prisma,
   getCompaniesAndActiveAdminsByCompanyOrgIds,
   formatDate,
   sendMail
 } from "back";
+import { prisma } from "@td/prisma";
 import {
   CompanyType,
   MembershipRequestStatus,
@@ -16,7 +16,7 @@ import {
   RevisionRequestStatus,
   User
 } from "@prisma/client";
-import * as COMPANY_CONSTANTS from "shared/constants";
+import * as COMPANY_CONSTANTS from "@td/constants";
 import {
   renderMail,
   MessageVersion,

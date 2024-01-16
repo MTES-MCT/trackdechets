@@ -6,12 +6,7 @@ import {
 } from "../../../../../common/components";
 import Packagings from "../../../../../form/bsdasri/components/packagings/Packagings";
 import WeightWidget from "../../../../../form/bsdasri/components/Weight";
-import {
-  useParams,
-  useNavigate,
-  generatePath,
-  useMatch
-} from "react-router-dom";
+import { useParams, useNavigate, generatePath } from "react-router-dom";
 import { BdasriSummary } from "../Summary/BsdasriSummary";
 import Loader from "../../../../../Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
@@ -23,7 +18,7 @@ import {
   MutationSignBsdasriEmissionWithSecretCodeArgs,
   MutationUpdateBsdasriArgs,
   BsdasriSignatureType
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { getComputedState } from "../../../../../form/common/getComputedState";
 import getInitialState, {
   getInitialWeightFn
@@ -70,21 +65,16 @@ export function RouteBSDasrisSignEmissionSecretCode() {
     MutationSignBsdasriEmissionWithSecretCodeArgs
   >(SIGN_BSDASRI_EMISSION_WITH_SECRET_CODE);
 
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
-  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
   const toCollectDashboard = {
-    pathname: generatePath(routes[dashboardRoutePrefix].transport.toCollect, {
+    pathname: generatePath(routes.dashboard.transport.toCollect, {
       siret
     })
   };
   const signTransporterRedirection = {
-    pathname: generatePath(
-      routes[dashboardRoutePrefix].bsdasris.sign.transporter,
-      {
-        siret,
-        id: formId!
-      }
-    ),
+    pathname: generatePath(routes.dashboard.bsdasris.sign.transporter, {
+      siret,
+      id: formId!
+    }),
     state: { background: toCollectDashboard }
   };
 

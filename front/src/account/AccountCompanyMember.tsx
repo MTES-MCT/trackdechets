@@ -13,7 +13,7 @@ import {
   Mutation,
   MutationRemoveUserFromCompanyArgs,
   MutationDeleteInvitationArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { TOAST_DURATION } from "../common/config";
 
 type Props = {
@@ -77,6 +77,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
     Pick<Mutation, "removeUserFromCompany">,
     MutationRemoveUserFromCompanyArgs
   >(REMOVE_USER_FROM_COMPANY);
+
   const [deleteInvitation, { loading: deleteLoading }] = useMutation<
     Pick<Mutation, "deleteInvitation">,
     MutationDeleteInvitationArgs
@@ -90,6 +91,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
       });
     }
   });
+
   const [resendInvitation, { loading: resendLoading }] = useMutation(
     RESEND_INVITATION,
     {
@@ -106,15 +108,27 @@ export default function AccountCompanyMember({ company, user }: Props) {
       }
     }
   );
+
+  const userRole = role => {
+    switch (role) {
+      case UserRole.Admin:
+        return "Administrateur";
+      case UserRole.Member:
+        return "Collaborateur";
+      case UserRole.Driver:
+        return "Chauffeur";
+      case UserRole.Reader:
+        return "Lecteur";
+    }
+  };
+
   return (
     <tr key={user.id}>
       <td>
         {user.name} {user.isMe && <span>(vous)</span>}
       </td>
       <td>{user.email}</td>
-      <td>
-        {user.role === UserRole.Admin ? "Administrateur" : "Collaborateur"}
-      </td>
+      <td>{userRole(user.role)}</td>
       <td>
         {user.isPendingInvitation
           ? "Invitation en attente"

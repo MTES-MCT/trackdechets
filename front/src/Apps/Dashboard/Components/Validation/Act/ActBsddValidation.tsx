@@ -7,9 +7,6 @@ import { statusChangeFragment } from "../../../../common/queries/fragments";
 import { GET_BSDS } from "../../../../common/queries";
 import AcceptedInfo from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/AcceptedInfo";
 import ReceivedInfo from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/ReceivedInfo";
-import { MarkSegmentAsReadyToTakeOver } from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/segments/MarkSegmentAsReadyToTakeOver";
-import { PrepareSegment } from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/segments/PrepareSegment";
-import { TakeOverSegment } from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/segments/TakeOverSegment";
 import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import {
   EmitterType,
@@ -21,7 +18,7 @@ import {
   QuantityType,
   Query,
   QueryFormArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import {
   isAppendix1,
   isSignTransportCanSkipEmission
@@ -173,6 +170,12 @@ const ActBsddValidation = ({
     }
 
     if (bsd.status === FormStatus.Sent) {
+      const nextTransporter = (bsd.transporters ?? []).find(
+        t => !t.takenOverAt
+      );
+      if (nextTransporter && nextTransporter.company?.orgId === currentSiret) {
+        return "Signature transporteur";
+      }
       const isTempStorage = bsd.recipient?.isTempStorage;
       if (isTempStorage) {
         return "Valider l'entreposage provisoire";
@@ -303,22 +306,25 @@ const ActBsddValidation = ({
 
   const renderContentSignedByProducer = () => {
     if (bsd.transporter?.company?.orgId === currentSiret) {
-      return (
-        <TdModal isOpen={isOpen} onClose={onClose} ariaLabel={renderTitle()}>
-          <h2 className="td-modal-title">{renderTitle()}</h2>
-          <SignTransportFormModalContent
-            title={renderTitle()}
-            siret={currentSiret}
-            formId={bsd.id}
-            onClose={onClose}
-          />
-        </TdModal>
-      );
+      return renderSignTransportFormModal();
     }
   };
 
   const renderContentSent = () => {
     const isTempStorage = bsd.recipient?.isTempStorage;
+
+    // Renvoie la modale de signature transporteur en cas de transport
+    // multi-modal si l'établissement courant est le prochain transporter à devoir signer
+    const nextTransporter = (bsd.transporters ?? []).find(t => !t.takenOverAt);
+
+    if (nextTransporter && nextTransporter.company?.orgId === currentSiret) {
+      return renderSignTransportFormModal();
+    }
+
+    // Renvoie la modale de signature de la réception si l'établissement courant
+    // correspond à l'installation de destination. Si l'établissement courant est
+    // à la fois le prochain transporteur multi-modal et l'installation de destination
+    // on donne la priorité à la signature transporteur pour respecter le workflow.
     if (currentSiret === bsd.recipient?.company?.siret) {
       if (!!bsddGetLoading) {
         return <Loader />;
@@ -348,36 +354,6 @@ const ActBsddValidation = ({
           return renderAddAppendix1Modal();
         }
       }
-    }
-
-    const transportSegments = bsd.transportSegments ?? [];
-    const lastSegment = transportSegments[transportSegments.length - 1];
-
-    if (bsd.currentTransporterSiret === currentSiret) {
-      if (
-        // there are no segments yet, current transporter can create one
-        !lastSegment ||
-        // the last segment was taken over and current user is the current transporter
-        // which means there are no pending transfers so they can create a new segment
-        lastSegment.takenOverAt
-      ) {
-        return <PrepareSegment form={bsd} siret={currentSiret} />;
-      }
-      if (
-        // the last segment is still a draft
-        !lastSegment.readyToTakeOver &&
-        // that was created by the current user
-        lastSegment.previousTransporterCompanySiret === currentSiret
-      ) {
-        return <MarkSegmentAsReadyToTakeOver form={bsd} siret={currentSiret} />;
-      }
-    }
-
-    if (
-      bsd.nextTransporterSiret === currentSiret &&
-      lastSegment.readyToTakeOver
-    ) {
-      return <TakeOverSegment form={bsd} siret={currentSiret} />;
     }
   };
 

@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { AnyObject } from "yup/lib/types";
-import { SSTI_CHARS } from "shared/constants";
+import { SSTI_CHARS } from "@td/constants";
 /* eslint-disable */
 declare module "yup" {
   interface BaseSchema<TCast = any, TContext = AnyObject, TOutput = any> {

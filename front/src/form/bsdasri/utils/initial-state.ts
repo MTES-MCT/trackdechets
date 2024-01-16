@@ -1,6 +1,11 @@
 import { getInitialCompany } from "../../bsdd/utils/initial-state";
 
-import { BsdasriWeight, Bsdasri, PickupSite, BsdasriType } from "codegen-ui";
+import {
+  BsdasriWeight,
+  Bsdasri,
+  PickupSite,
+  BsdasriType
+} from "@td/codegen-ui";
 
 export function getInitialEmitterPickupSiteFn(pickupSite?: PickupSite | null) {
   return {

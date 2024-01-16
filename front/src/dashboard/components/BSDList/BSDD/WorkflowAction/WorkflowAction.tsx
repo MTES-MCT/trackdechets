@@ -1,5 +1,5 @@
 import React from "react";
-import { EmitterType, Form, FormStatus } from "codegen-ui";
+import { EmitterType, Form, FormStatus } from "@td/codegen-ui";
 import MarkAsSealed from "./MarkAsSealed";
 import MarkAsReceived from "./MarkAsReceived";
 import MarkAsAccepted from "./MarkAsAccepted";
@@ -11,12 +11,6 @@ import SignEmissionForm from "./SignEmissionForm";
 import SignTransportForm from "./SignTransportForm";
 import routes from "../../../../../Apps/routes";
 import { useMatch } from "react-router-dom";
-
-import {
-  PrepareSegment,
-  MarkSegmentAsReadyToTakeOver,
-  TakeOverSegment
-} from "./segments";
 
 export interface WorkflowActionProps {
   form: Form;
@@ -91,31 +85,14 @@ export function WorkflowAction(props: WorkflowActionProps) {
         return <MarkAsReceived {...props} />;
       }
 
-      const transportSegments = form.transportSegments ?? [];
-      const lastSegment = transportSegments[transportSegments.length - 1];
-
-      if (form.currentTransporterSiret === siret) {
-        if (
-          // there are no segments yet, current transporter can create one
-          !lastSegment ||
-          // the last segment was taken over and current user is the current transporter
-          // which means there are no pending transfers so they can create a new segment
-          lastSegment.takenOverAt
-        ) {
-          return <PrepareSegment {...props} />;
+      if (form.transporters?.length > 1) {
+        // Premier transporteur de la liste qui n'a pas encore pris en charge le déchet.
+        const nextTransporter = (form.transporters ?? []).find(
+          t => !t.takenOverAt
+        );
+        if (nextTransporter && siret === nextTransporter.company?.orgId) {
+          return <SignTransportForm {...props} />;
         }
-        if (
-          // the last segment is still a draft
-          !lastSegment.readyToTakeOver &&
-          // that was created by the current user
-          lastSegment.previousTransporterCompanySiret === siret
-        ) {
-          return <MarkSegmentAsReadyToTakeOver {...props} />;
-        }
-      }
-
-      if (form.nextTransporterSiret === siret && lastSegment.readyToTakeOver) {
-        return <TakeOverSegment {...props} />;
       }
 
       return null;

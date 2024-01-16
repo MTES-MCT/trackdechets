@@ -1,7 +1,8 @@
 import axios from "axios";
 import { resetDatabase } from "libs/back/tests-integration";
 import { CompanyType, MembershipRequestStatus } from "@prisma/client";
-import { addToMailQueue, prisma } from "back";
+import { addToMailQueue } from "back";
+import { prisma } from "@td/prisma";
 
 import {
   companyFactory,

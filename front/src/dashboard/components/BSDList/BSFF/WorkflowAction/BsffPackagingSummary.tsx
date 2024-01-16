@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Bsff, BsffPackaging } from "codegen-ui";
+import { Bsff, BsffPackaging } from "@td/codegen-ui";
 import {
   DataList,
   DataListItem,

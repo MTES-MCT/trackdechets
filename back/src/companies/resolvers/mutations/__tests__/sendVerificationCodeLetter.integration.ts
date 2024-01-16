@@ -2,7 +2,7 @@ import { CompanyVerificationStatus, UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { sendVerificationCodeLetter } from "../../../../common/post";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   siretify,
   userFactory,

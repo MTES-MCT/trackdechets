@@ -320,6 +320,8 @@ type BsdaBroker {
 
 type BsdaMetadata {
   errors: [BsdaError]
+  "EXPERIMENTAL, ne pas utiliser - Dernière révision du bordereau"
+  latestRevision: BsdaRevisionRequest
 }
 
 type BsdaError {

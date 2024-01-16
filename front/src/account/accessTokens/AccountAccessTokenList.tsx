@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { DEVELOPERS_DOCUMENTATION_URL } from "../../common/config";
 import { useQuery } from "@apollo/client";
-import { NewAccessToken, Query } from "codegen-ui";
+import { NewAccessToken, Query } from "@td/codegen-ui";
 import { Loader } from "../../Apps/common/Components";
 import { NotificationError } from "../../Apps/common/Components/Error/Error";
 import AccountContentWrapper from "../AccountContentWrapper";

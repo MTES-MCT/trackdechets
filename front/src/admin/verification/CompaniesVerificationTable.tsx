@@ -2,7 +2,7 @@ import {
   CompanyForVerification,
   CompanyVerificationStatus,
   CompanyVerificationMode
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React, { useMemo, useEffect } from "react";
 import { useTable, usePagination, useFilters } from "react-table";
 import { format } from "date-fns";

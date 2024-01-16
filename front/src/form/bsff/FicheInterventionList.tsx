@@ -13,7 +13,7 @@ import {
   CompanyInput,
   Mutation,
   MutationCreateFicheInterventionBsffArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import * as React from "react";
 import * as yup from "yup";
 import { FicheInterventionFragment } from "../../Apps/common/queries/fragments";
@@ -39,7 +39,8 @@ const companySchema: yup.SchemaOf<CompanyInput> = yup.object({
   vatNumber: yup.string().nullable(),
   country: yup.string().notRequired().nullable(),
   omiNumber: yup.string().nullable(),
-  orgId: yup.string().nullable()
+  orgId: yup.string().nullable(),
+  extraEuropeanId: yup.string().nullable()
 });
 const detenteurSchema: yup.SchemaOf<BsffFicheInterventionInput["detenteur"]> =
   yup.object({

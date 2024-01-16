@@ -5,7 +5,7 @@ import {
   IconSignBadgeCircle
 } from "../../../../Apps/common/Components/Icons/Icons";
 import styles from "./CompanyResult.module.scss";
-import { CompanySearchResult } from "codegen-ui";
+import { CompanySearchResult } from "@td/codegen-ui";
 import { generatePath } from "react-router-dom";
 import routes from "../../../../Apps/routes";
 import classNames from "classnames";

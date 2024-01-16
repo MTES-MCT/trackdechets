@@ -37,7 +37,8 @@ describe("rules", () => {
       mail: "",
       phone: "",
       country: "",
-      omiNumber: ""
+      omiNumber: "",
+      extraEuropeanId: ""
     };
 
     const recepisse: Required<

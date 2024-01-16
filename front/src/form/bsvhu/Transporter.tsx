@@ -1,7 +1,7 @@
 import React from "react";
 import { useFormikContext } from "formik";
 import CompanySelector from "../common/components/company/CompanySelector";
-import { Bsvhu } from "codegen-ui";
+import { Bsvhu } from "@td/codegen-ui";
 import TransporterReceiptEditionSwitch from "../common/components/company/TransporterReceiptEditionSwitch";
 
 export default function Transporter({ disabled }) {

@@ -5,7 +5,7 @@ import {
   AuthorizationError
 } from "oauth2orize";
 import { isExpired } from "./utils";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { getUid } from "../utils";
 import { buildIdToken } from "./token";
 import {

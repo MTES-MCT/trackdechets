@@ -8,7 +8,7 @@ import {
   Query,
   QueryAppendixFormsArgs,
   Packagings
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import React, { useEffect, useMemo, useState } from "react";
 import { Decimal } from "decimal.js-light";
 

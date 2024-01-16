@@ -4,7 +4,7 @@ import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
 import AccountFieldName from "./fields/AccountFieldName";
 import AccountFieldPhone from "./fields/AccountFieldPhone";
 import AccountFieldPassword from "./fields/AccountFieldPassword";
-import { User } from "codegen-ui";
+import { User } from "@td/codegen-ui";
 
 type Props = {
   me: User;

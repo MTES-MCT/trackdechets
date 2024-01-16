@@ -1,5 +1,5 @@
 import React from "react";
-import { CompanyPrivate } from "codegen-ui";
+import { CompanyPrivate } from "@td/codegen-ui";
 import { sortCompaniesByName } from "../common/helper";
 import { usePermissions } from "../common/contexts/PermissionsContext";
 
@@ -21,7 +21,10 @@ export default function DashboardCompanySelector({
   const handleChange = (orgId: string) => {
     const currentCompany = companies.find(company => company.orgId === orgId);
     if (currentCompany) {
-      updatePermissions(currentCompany?.userPermissions);
+      updatePermissions(
+        currentCompany?.userPermissions,
+        currentCompany.userRole!
+      );
     }
 
     handleCompanyChange(orgId);

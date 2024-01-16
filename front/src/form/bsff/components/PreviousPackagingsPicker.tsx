@@ -8,7 +8,7 @@ import {
   BsffType,
   Query,
   QueryBsffPackagingsArgs
-} from "codegen-ui";
+} from "@td/codegen-ui";
 import { GET_PREVIOUS_PACKAGINGS } from "../utils/queries";
 import {
   Table,

@@ -1,5 +1,5 @@
 import { gql } from "graphql-tag";
-import prisma from "../../../../prisma";
+import { prisma } from "@td/prisma";
 import {
   bsddTransporterFactory,
   companyFactory,
@@ -135,6 +135,15 @@ describe("Mutation.deleteFormTransporter", () => {
         number: 3, // ordering has been updated
         transporterCompanySiret: transporter4.siret
       })
+    ]);
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(updatedForm.transportersSirets).toEqual([
+      transporter1.siret,
+      transporter3.siret,
+      transporter4.siret
     ]);
   });
 

@@ -1,10 +1,7 @@
 import React from "react";
-import { ActionButton, Modal } from "../../../../../common/components";
-import { IconView } from "../../../../../Apps/common/Components/Icons/Icons";
-import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
-import { BsdaRevisionRequest } from "codegen-ui";
+import { Modal } from "../../../../../common/components";
+import { BsdaRevisionRequest } from "@td/codegen-ui";
 import { DisplayRevision } from "./BsdaApproveRevision";
-import { useMatch } from "react-router-dom";
 
 type Props = {
   review: BsdaRevisionRequest;
@@ -17,9 +14,7 @@ export function BsdaConsultRevision({
   isModalOpenFromParent,
   onModalCloseFromParent
 }: Props) {
-  const isV2Routes = !!useMatch("/v2/dashboard/*");
-
-  if (isV2Routes && isModalOpenFromParent) {
+  if (isModalOpenFromParent) {
     const formatRevisionAdapter = {
       ...review["review"],
       bsda: { ...review }
@@ -46,29 +41,6 @@ export function BsdaConsultRevision({
       </Modal>
     );
   }
-  return !isV2Routes ? (
-    <TdModalTrigger
-      ariaLabel="Consultation d'une révision"
-      trigger={open => (
-        <ActionButton icon={<IconView size="24px" />} onClick={open}>
-          Consulter
-        </ActionButton>
-      )}
-      modalContent={close => (
-        <div>
-          <DisplayRevision review={review} />
 
-          <div className="form__actions">
-            <button
-              type="button"
-              className="btn btn--outline-primary"
-              onClick={close}
-            >
-              Fermer
-            </button>
-          </div>
-        </div>
-      )}
-    />
-  ) : null;
+  return null;
 }

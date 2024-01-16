@@ -1,0 +1,43 @@
+type Mutation {
+  """
+  Expérimental
+  Crée un Bspaoh
+  """
+  createBspaoh(input: BspaohInput!): Bspaoh!
+
+  """
+  Expérimental
+  Crée un Bspaoh en brouillon
+  """
+  createDraftBspaoh(input: BspaohInput!): Bspaoh!
+
+  """
+  Expérimental
+  Met à jour un Bspaoh
+  """
+  updateBspaoh(id: ID!, input: BspaohInput!): Bspaoh!
+
+  """
+  Expérimental
+  Permet de publier un brouillon pour le marquer comme prêt à être envoyé
+  """
+  publishBspaoh(id: ID!): Bspaoh!
+
+  """
+  Expérimental
+  Signe un Bspaoh.
+  """
+  signBspaoh(id: ID!, input: BspaohSignatureInput!): Bspaoh!
+
+  """
+  Expérimental
+  Duplique un Bspaoh
+  """
+  duplicateBspaoh("ID d'un BSPAOH" id: ID!): Bspaoh!
+
+  """
+  Expérimental
+  Supprime un Bspaoh
+  """
+  deleteBspaoh("ID d'un BSPAOH" id: ID!): Bspaoh!
+}

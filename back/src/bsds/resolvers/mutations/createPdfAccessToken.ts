@@ -1,4 +1,4 @@
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { addMinutes } from "date-fns";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { ReadableIdPrefix } from "../../../forms/readableId";
@@ -20,7 +20,7 @@ import {
   BsdaStatus,
   Status
 } from "@prisma/client";
-import { ROAD_CONTROL_SLUG } from "shared/constants";
+import { ROAD_CONTROL_SLUG } from "@td/constants";
 import { checkCanRead as checkCanReadForm } from "../../../forms/permissions";
 import { checkCanRead as checkCanReadBsdasri } from "../../../bsdasris/permissions";
 import { ForbiddenError } from "../../../common/errors";

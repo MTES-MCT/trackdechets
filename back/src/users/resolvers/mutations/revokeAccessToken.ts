@@ -1,7 +1,7 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 const revokeAccessTokenResolver: MutationResolvers["revokeAccessToken"] =

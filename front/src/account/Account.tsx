@@ -13,7 +13,7 @@ import AccountCompanyAddProducer from "./AccountCompanyAddProducer";
 import AccountCompanyAddForeign from "./AccountCompanyAddForeign";
 import AccountOauth2AppList from "./oauth2/AccountOauth2AppList";
 import AccountOAuth2AppCreateUpdate from "./oauth2/AccountOauth2AppCreateUpdate";
-import { Query } from "codegen-ui";
+import { Query } from "@td/codegen-ui";
 import routes, { getRelativeRoute } from "../Apps/routes";
 import AccountAuthorizedAppList from "./apps/AccountAuthorizedAppList";
 import AccountCompanyOrientation from "./AccountCompanyOrientation";

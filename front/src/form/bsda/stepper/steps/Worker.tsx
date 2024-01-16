@@ -2,7 +2,12 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { formatDate } from "../../../../common/datetime";
 import CompanySelector from "../../../common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
-import { Bsda, BsdaType, CompanySearchPrivate, CompanyType } from "codegen-ui";
+import {
+  Bsda,
+  BsdaType,
+  CompanySearchPrivate,
+  CompanyType
+} from "@td/codegen-ui";
 import React, { useCallback, useState } from "react";
 import initialState from "../initial-state";
 

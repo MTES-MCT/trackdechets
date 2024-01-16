@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Mutation, MutationCreatePdfAccessTokenArgs } from "codegen-ui";
+import { Mutation, MutationCreatePdfAccessTokenArgs } from "@td/codegen-ui";
 import QRCodeIcon from "react-qr-code";
 import { useMutation, gql } from "@apollo/client";
 import { Loader } from "../../../../../Apps/common/Components";

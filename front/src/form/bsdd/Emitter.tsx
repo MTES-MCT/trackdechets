@@ -1,7 +1,7 @@
 import CompanySelector from "../common/components/company/CompanySelector";
 import { RadioButton } from "../common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
-import { CompanyType, EmitterType, Form } from "codegen-ui";
+import { CompanyType, EmitterType, Form } from "@td/codegen-ui";
 import React, { useEffect } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WorkSite from "../common/components/work-site/WorkSite";
@@ -12,7 +12,7 @@ import {
 import "./Emitter.scss";
 import MyCompanySelector from "../common/components/company/MyCompanySelector";
 import { emitterTypeLabels } from "../../dashboard/constants";
-import { isForeignVat, isOmi } from "shared/constants";
+import { isForeignVat, isOmi } from "@td/constants";
 import { RedErrorMessage } from "../../common/components";
 import Tooltip from "../../common/components/Tooltip";
 

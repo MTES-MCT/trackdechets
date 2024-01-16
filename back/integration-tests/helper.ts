@@ -1,5 +1,5 @@
 import { redisClient } from "../src/common/redis";
-import prisma from "../src/prisma";
+import { prisma } from "@td/prisma";
 import { client as elasticSearch, index } from "../src/common/elastic";
 import { indexQueue } from "../src/queue/producers/elastic";
 import { closeMongoClient } from "../src/events/mongodb";

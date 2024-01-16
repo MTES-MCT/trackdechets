@@ -29,10 +29,9 @@ import {
   isSignTransportCanSkipEmission,
   isSignEmission
 } from "../../dashboardServices";
-import { UserPermission } from "codegen-ui";
+import { BsdType, UserPermission } from "@td/codegen-ui";
 
 import "./bsdAdditionalActionsButton.scss";
-import { BsdType } from "codegen-ui";
 
 function BsdAdditionalActionsButton({
   bsd,

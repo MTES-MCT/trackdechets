@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
 
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { userWithCompanyFactory } from "../../../__tests__/factories";
 import deduplicateCompanyAssociations from "../deduplicateCompanyAssociations.helpers";
 describe("deduplicateCompanyAssociations script", () => {

@@ -1,5 +1,5 @@
 import { Bsda, BsdaStatus, BsdType } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "shared/constants";
+import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import { GraphQLContext } from "../types";
@@ -14,7 +14,7 @@ import {
   BsdaWithRevisionRequests,
   BsdaWithRevisionRequestsInclude
 } from "./types";
-import prisma from "../prisma";
+import { prisma } from "@td/prisma";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
 
 export type BsdaForElastic = Bsda &
@@ -256,10 +256,36 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     destinationOperationDate: bsda.destinationOperationDate?.getTime(),
     ...where,
     ...getBsdaRevisionOrgIds(bsda),
+    revisionRequests: bsda.bsdaRevisionRequests,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda),
     intermediaries: bsda.intermediaries,
-    rawBsd: bsda
+    rawBsd: bsda,
+
+    // ALL actors from the BSDA, for quick search
+    companyNames: [
+      bsda.emitterCompanyName,
+      bsda.workerCompanyName,
+      bsda.transporterCompanyName,
+      bsda.destinationCompanyName,
+      bsda.brokerCompanyName,
+      bsda.ecoOrganismeName,
+      bsda.destinationOperationNextDestinationCompanyName,
+      ...bsda.intermediaries.map(intermediary => intermediary.name)
+    ]
+      .filter(Boolean)
+      .join(" "),
+    companyOrgIds: [
+      bsda.emitterCompanySiret,
+      bsda.workerCompanySiret,
+      bsda.transporterCompanySiret,
+      bsda.transporterCompanyVatNumber,
+      bsda.destinationCompanySiret,
+      bsda.brokerCompanySiret,
+      bsda.ecoOrganismeSiret,
+      bsda.destinationOperationNextDestinationCompanySiret,
+      ...bsda.intermediaries.map(intermediary => intermediary.siret)
+    ].filter(Boolean)
   };
 }
 
@@ -274,5 +300,5 @@ export function indexBsda(bsda: BsdaForElastic, ctx?: GraphQLContext) {
 export function getBsdaRevisionOrgIds(
   bsda: BsdaForElastic
 ): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
-  return getRevisionOrgIds(bsda.BsdaRevisionRequest);
+  return getRevisionOrgIds(bsda.bsdaRevisionRequests);
 }

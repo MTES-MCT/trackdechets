@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import { prisma } from "@td/prisma";
 import { searchCompany } from "../../companies/sirene/insee/client";
 import { geocode } from "../../companies/geo/geocode";
 

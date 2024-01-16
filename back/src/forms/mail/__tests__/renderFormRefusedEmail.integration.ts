@@ -7,7 +7,7 @@ import {
 import { renderFormRefusedEmail } from "../renderFormRefusedEmail";
 import { generateBsddPdfToBase64 } from "../../pdf/generateBsddPdf";
 import { resetDatabase } from "../../../../integration-tests/helper";
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 
 jest.mock("../../pdf/generateBsddPdf");
 (generateBsddPdfToBase64 as jest.Mock).mockResolvedValue("");

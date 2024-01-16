@@ -4,12 +4,12 @@ import { MockedProvider } from "@apollo/client/testing";
 import { screen } from "@testing-library/dom";
 import { render } from "@testing-library/react";
 import { SIGN_BSDA } from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignBsda";
-import { Bsda, BsdaSignatureType } from "codegen-ui";
+import { Bsda, BsdaSignatureType } from "@td/codegen-ui";
 import { MemoryRouter } from "react-router-dom";
 
 describe("ActBsdaValidation", () => {
   const onClose = jest.fn();
-  const v2Route = "v2/dashboard";
+  const v2Route = "dashboard";
 
   const mocks = [
     {

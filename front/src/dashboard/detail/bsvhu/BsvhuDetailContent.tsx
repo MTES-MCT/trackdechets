@@ -4,7 +4,7 @@ import {
   IconWarehouseDelivery,
   IconWaterDam
 } from "../../../Apps/common/Components/Icons/Icons";
-import { Bsvhu, FormCompany, OperationMode } from "codegen-ui";
+import { Bsvhu, FormCompany, OperationMode } from "@td/codegen-ui";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -18,7 +18,7 @@ import {
 import styles from "../common/BSDDetailContent.module.scss";
 import { getVerboseAcceptationStatus } from "../common/utils";
 import { getOperationModeLabel } from "../../../common/operationModes";
-import { VHU_VERBOSE_STATUSES } from "shared/constants";
+import { VHU_VERBOSE_STATUSES } from "@td/constants";
 
 type CompanyProps = {
   company?: FormCompany | null;

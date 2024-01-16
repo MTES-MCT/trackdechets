@@ -1,4 +1,4 @@
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 
 import { sendMail } from "../../../mailer/mailing";
 
@@ -7,7 +7,7 @@ import { CompanyPrivate } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
 import { convertUrls, getCompanyActiveUsers } from "../../database";
 import { renderMail, securityCodeRenewal } from "@td/mail";
-import { isSiret, isVat } from "shared/constants";
+import { isSiret, isVat } from "@td/constants";
 import { UserInputError } from "../../../common/errors";
 
 /**

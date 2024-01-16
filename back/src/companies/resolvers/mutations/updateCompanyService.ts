@@ -1,4 +1,4 @@
-import prisma from "../../../prisma";
+import { prisma } from "@td/prisma";
 import { Company, Prisma } from "@prisma/client";
 import { MutationUpdateCompanyArgs } from "../../../generated/graphql/types";
 import * as yup from "yup";
