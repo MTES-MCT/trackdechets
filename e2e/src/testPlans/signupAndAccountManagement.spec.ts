@@ -8,7 +8,8 @@ import {
   testAccountInfo,
   testPasswordUpdate,
   testPhoneNbrUpdate,
-  testSignupPasswordPolicy
+  testSignupPasswordPolicy,
+  testUsernameUpdate
 } from "../utils/user";
 import { testNavigation } from "../utils/navigation";
 
@@ -93,6 +94,10 @@ test.describe
         username: USER_NAME,
         email: USER_EMAIL
       });
+    });
+
+    await test.step("Onglet 'Mon compte' > Modification du nom d'utilisateur", async () => {
+      await testUsernameUpdate(page);
     });
 
     await test.step("Onglet 'Mon compte' > Modification du numéro de téléphone", async () => {

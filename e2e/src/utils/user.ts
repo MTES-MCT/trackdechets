@@ -210,6 +210,39 @@ export const testAccountInfo = async (
 };
 
 /**
+ * Modifies the username on the account page. Does not make any assertion.
+ */
+export const updateUsername = async (page, { username }) => {
+  // Go to account page
+  await goTo(page, "/account/info");
+
+  const updateUsernameInput = page
+    .locator("text=Nom utilisateur")
+    .locator("..")
+    .locator('div:has-text("Modifier")');
+
+  // If we are not already editing the username, click on Modify
+  if (await updateUsernameInput.isVisible()) {
+    await updateUsernameInput.click();
+  }
+
+  // Modify
+  await page.getByPlaceholder('Nom utilisateur').fill(username);
+
+  // Validate
+  await page.getByRole('button', { name: 'Valider' }).click();
+};
+
+/**
+ * Tests the username input.
+ */
+export const testUsernameUpdate = async (page) => {
+  // Valid username
+  await updateUsername(page, { username: "User e2e n°1 (modifié)" });
+  await testAccountInfo(page, { username: "User e2e n°1 (modifié)" });
+};
+
+/**
  * Modifies the phone number on the account page. Does not make any assertion.
  */
 export const updatePhoneNbr = async (page, { phone }) => {
