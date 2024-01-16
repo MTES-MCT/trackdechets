@@ -1117,13 +1117,7 @@ export const canDeleteBsd = (bsd, siret) =>
 
 const canUpdateBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
-  ![
-    BsdStatusCode.Sent,
-    BsdStatusCode.Received,
-    BsdStatusCode.Accepted,
-    BsdStatusCode.Processed,
-    BsdStatusCode.Refused
-  ].includes(bsd.status) &&
+  [BsdStatusCode.Initial, BsdStatusCode.SignedByEmitter].includes(bsd.status) &&
   canDuplicateBsff(bsd, siret);
 
 const canReviewBsda = (bsd, siret) =>
