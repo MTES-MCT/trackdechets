@@ -230,7 +230,12 @@ function getFormSirets(form: FullForm) {
   if (form.emitterType === EmitterType.APPENDIX1_PRODUCER) {
     return {
       emitterCompanySiret: form.emitterCompanySiret,
-      transporterCompanySiret: getTransporterCompanyOrgId(transporter)
+      ...(transporter
+        ? {
+            [transporterCompanyOrgIdKey(transporter)]:
+              getTransporterCompanyOrgId(transporter)
+          }
+        : {})
     };
   }
 
