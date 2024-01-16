@@ -40,7 +40,7 @@ export const emitterTypeLabels = {
   [EmitterType.Producer]: "Producteur du déchet",
   [EmitterType.Other]: "Autre détenteur",
   [EmitterType.Appendix2]:
-    "Personne ayant transformé ou réalisé un traitement dont la provenance reste identifiable",
+    "Personne ayant transformé ou réalisé un traitement dont la provenance reste identifiable (Annexe 2)",
   [EmitterType.Appendix1]:
     "Collecteur d'un bordereau de tournée dédiée (Annexe 1)"
 };
