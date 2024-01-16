@@ -474,7 +474,8 @@ export const getSealedBtnLabel = (
 ): string => {
   if (
     isBsdd(bsd.type) &&
-    permissions.includes(UserPermission.BsdCanSignEmission)
+    (permissions.includes(UserPermission.BsdCanSignEmission) ||
+      permissions.includes(UserPermission.BsdCanSignTransport))
   ) {
     if (isAppendix1(bsd) && canAddAppendix1(bsd)) {
       return AJOUTER_ANNEXE_1;
@@ -775,7 +776,8 @@ export const getResealedBtnLabel = (
   if (
     isBsdd(bsd.type) &&
     hasTemporaryStorage(currentSiret, bsd) &&
-    permissions.includes(UserPermission.BsdCanSignEmission)
+    (permissions.includes(UserPermission.BsdCanSignEmission) ||
+      permissions.includes(UserPermission.BsdCanSignTransport))
   ) {
     if (isSameSiretEmmiter(currentSiret, bsd)) {
       return SIGNER;
@@ -829,7 +831,8 @@ export const getSignTempStorerBtnLabel = (
   if (
     isBsdd(bsd.type) &&
     isSameSiretTemporaryStorageTransporter(currentSiret, bsd) &&
-    permissions.includes(UserPermission.BsdCanSignEmission)
+    (permissions.includes(UserPermission.BsdCanSignEmission) ||
+      permissions.includes(UserPermission.BsdCanSignTransport))
   ) {
     return SIGNER;
   }
