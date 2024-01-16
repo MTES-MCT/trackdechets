@@ -24,6 +24,7 @@ const getOperationData = (bsvhu: Bsvhu) => ({
 });
 
 const getTransporterData = (bsvhu: Bsvhu) => ({
+  transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
   transporterRecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
   transporterNumberPlates: bsvhu.transporterTransportPlates,
   transporterCompanyName: bsvhu.transporterCompanyName,
