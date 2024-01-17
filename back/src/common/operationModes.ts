@@ -52,7 +52,7 @@ export const getOperationModesFromOperationCode = (
 export const getOperationModeLabel = (operationMode: OperationMode) => {
   switch (operationMode) {
     case OperationMode.ELIMINATION:
-      return "Elimination (incinération sans valorisation énergétique et stockage en décharge)";
+      return "Elimination";
     case OperationMode.RECYCLAGE:
       return "Recyclage et les autres formes de valorisation de la matière";
     case OperationMode.REUTILISATION:
