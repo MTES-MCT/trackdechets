@@ -1,7 +1,7 @@
 {
-  "name": "queues-bulk-indexation",
+  "name": "queues-bulk-indexation-master",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/queues-bulk-indexation/src",
+  "sourceRoot": "apps/queues-bulk-indexation-master/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -21,13 +21,13 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/apps/queues-bulk-indexation",
+        "outputPath": "dist/apps/queues-bulk-indexation-master",
         "format": [
           "cjs"
         ],
         "bundle": false,
-        "main": "apps/queues-bulk-indexation/src/main.ts",
-        "tsConfig": "apps/queues-bulk-indexation/tsconfig.app.json",
+        "main": "apps/queues-bulk-indexation-master/src/main.ts",
+        "tsConfig": "apps/queues-bulk-indexation-master/tsconfig.app.json",
         "assets": [
           {
             "input": "./libs/back/mail/src",
@@ -79,19 +79,19 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "queues-bulk-indexation:build",
+        "buildTarget": "queues-bulk-indexation-master:build",
         "inspect": false
       },
       "configurations": {
         "development": {
-          "buildTarget": "queues-bulk-indexation:build:development"
+          "buildTarget": "queues-bulk-indexation-master:build:development"
         },
         "integration": {
           "watch": false,
-          "buildTarget": "queues-bulk-indexation:build:integration"
+          "buildTarget": "queues-bulk-indexation-master:build:integration"
         },
         "production": {
-          "buildTarget": "queues-bulk-indexation:build:production"
+          "buildTarget": "queues-bulk-indexation-master:build:production"
         }
       }
     },
@@ -102,7 +102,7 @@
       ],
       "options": {
         "lintFilePatterns": [
-          "apps/queues-bulk-indexation/**/*.ts"
+          "apps/queues-bulk-indexation-master/**/*.ts"
         ]
       }
     },
@@ -112,7 +112,7 @@
         "{workspaceRoot}/coverage/{projectRoot}"
       ],
       "options": {
-        "jestConfig": "apps/queues-bulk-indexation/jest.config.ts",
+        "jestConfig": "apps/queues-bulk-indexation-master/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {

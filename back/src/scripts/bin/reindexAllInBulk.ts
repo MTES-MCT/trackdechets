@@ -1,7 +1,7 @@
-import { Job, JobOptions } from "bull";
+import { Job } from "bull";
 import { logger } from "@td/logger";
 import { index as defaultIndexConfig } from "../../common/elastic";
-import { indexQueue } from "../../queue/producers/elastic";
+import { bulkIndexMasterQueue } from "../../queue/producers/elastic";
 import { prisma } from "@td/prisma";
 import { closeQueues } from "../../queue/producers";
 import { reindexAllBsdsInBulk } from "../../bsds/indexation";
@@ -15,19 +15,12 @@ export async function addReindexAllInBulkJob(
   logger.info(
     `Enqueuing job indexAllInBulk to create a new index without downtime on server ${defaultIndexConfig.elasticSearchUrl}`
   );
-  // default options can be overwritten by the calling function
-  const jobOptions: JobOptions = {
-    lifo: true,
-    attempts: 1,
-    timeout: 36_000_000 // 10h
-  };
-  const job = await indexQueue.add(
+  const job = await bulkIndexMasterQueue.add(
     "indexAllInBulk",
     JSON.stringify({
       index: defaultIndexConfig,
       force
-    }),
-    jobOptions
+    })
   );
   const isActive = await job.isActive();
   logger.info(
