@@ -343,13 +343,7 @@ export async function indexAllBsdTypeConcurrentJobs({
         index,
         ids: chunk,
         elasticSearchUrl: indexConfig.elasticSearchUrl
-      }),
-      opts: {
-        lifo: true,
-        stackTraceLimit: 100,
-        attempts: 1,
-        timeout: 600_000 // 10 min
-      }
+      })
     });
   });
 

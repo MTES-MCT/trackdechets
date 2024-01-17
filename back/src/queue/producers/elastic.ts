@@ -37,9 +37,10 @@ export const bulkIndexQueue = new Queue<string>(
       // le dashboard bull
       attempts: 1,
       backoff: { type: "fixed", delay: 100 },
+      stackTraceLimit: 100,
       removeOnComplete: 10_000,
-      // timeout d'1 minute  pour prendre de la marge
-      timeout: 60000
+      // 10 minutes
+      timeout: 10 * 60 * 1000
     }
   }
 );
