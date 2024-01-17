@@ -406,10 +406,10 @@ Depuis un one-off container de taille XL
 
 ### Réindexation complète sans downtime lors d'une mise en production
 
-- Se rendre sur Scalingo pour augmenter la taille des workers "indexqueue" et leur nombre.
-- On peut retenir la configuration suivante :
-  - 4 workers indexqueue de taille 2XL
-  - BULK_INDEX_BATCH_SIZE=2500
+- Se rendre sur Scalingo pour ajouter 1 worker `bulkindexqueuemaster` (en charge d'ajouter les chunks) en 2XL et plusieurs workers `bulkindexqueue` (en charge de process les chunks).
+- On peut retenir la configuration suivante pour les workers `bulkindexqueue` :
+  - 4 workers de taille 2XL
+  - BULK_INDEX_BATCH_SIZE=1000
   - BULK_INDEX_JOB_CONCURRENCY=1
 - Se connecter à la prod avec un one-off container de taille XL
 - Lancer la commande `FORCE_LOGGER_CONSOLE=true npx nx run back:reindex-all-bsds-bulk -- --useQueue -f` (si la version de l'index a été bump, on peut omettre le `-f`)
@@ -418,6 +418,7 @@ Depuis un one-off container de taille XL
 - Relancer au besoin les "indexChunk" jobs qui ont failed (c'est possible si ES se retrouve momentanément surchargé).
 - Si les workers d'indexation crashent avec une erreur mémoire, ce sera visible dans les logs Scalingo. Il est possible alors que la taille des chunks soient trop importante. Diminuer alors la valeur BULK_INDEX_BATCH_SIZE, cleaner tous les jobs de la queue avant de relancer une réindexation complète. Il peut être opportun de de diminuer la taille des chunks.
 - Si ES est surchargé, il peut être opportun de diminuer le nombre de workers.
+- À la fin de la réindexation, set le nombre de workers `bulkindexqueuemaster` et `bulkindexqueue` à 0.
 
 ## Guides
 

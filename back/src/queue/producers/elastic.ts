@@ -22,6 +22,50 @@ export const indexQueue = new Queue<string>(INDEX_QUEUE_NAME, REDIS_URL!, {
   }
 });
 
+// On gère l'indexation en bulk dans une queue et un worker séparée afin de
+// ne pas bloquer les jobs d'indexation "courants" lors d'un réindex
+// global
+export const BULK_INDEX_QUEUE_NAME = `queue_bulk_index_elastic_${NODE_ENV}`;
+
+export const bulkIndexQueue = new Queue<string>(
+  BULK_INDEX_QUEUE_NAME,
+  REDIS_URL!,
+  {
+    defaultJobOptions: {
+      // un seul essai pour chaque chunk histoire de ne pas bloquer les autres trop longtemps
+      // s'il y a un problème avec une chunk, on garde la possibilité de retry à la mano depuis
+      // le dashboard bull
+      attempts: 1,
+      backoff: { type: "fixed", delay: 100 },
+      stackTraceLimit: 100,
+      removeOnComplete: 10_000,
+      // 10 minutes
+      timeout: 10 * 60 * 1000
+    }
+  }
+);
+
+// Cette queue permet de process le job qui enqueue toutes les chunks et attend qu'elles soient
+// toutes terminées pour lancer un rattrapage (Cf fonction indexAllBsdTypeConcurrentJobs).
+// Elle est également démarré sur un worker séparé pour l'isoler du reste et éviter que le job soit
+// relancé en cas de crash d'un worker de bulk indexation
+export const BULK_INDEX_MASTER_QUEUE_NAME = `queue_bulk_index_master_elastic_${NODE_ENV}`;
+
+export const bulkIndexMasterQueue = new Queue<string>(
+  BULK_INDEX_MASTER_QUEUE_NAME,
+  REDIS_URL!,
+  {
+    defaultJobOptions: {
+      attempts: 1,
+      backoff: { type: "fixed", delay: 100 },
+      removeOnComplete: 10_000,
+      // 24h pour prendre de la marge, les jobs de cette queue attendent que toutes les chunks
+      // soit process lors d'un reindex global
+      timeout: 24 * 3600 * 1000
+    }
+  }
+);
+
 indexQueue.on("completed", async job => {
   const id = job.data;
 

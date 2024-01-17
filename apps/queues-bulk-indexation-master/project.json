@@ -1,0 +1,115 @@
+{
+  "name": "queues-bulk-indexation-master",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/queues-bulk-indexation-master/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "dependsOn": [
+        "^codegen",
+        {
+          "projects": ["@td/prisma"],
+          "target": "generate"
+        }
+      ],
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/queues-bulk-indexation-master",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "apps/queues-bulk-indexation-master/src/main.ts",
+        "tsConfig": "apps/queues-bulk-indexation-master/tsconfig.app.json",
+        "assets": [
+          {
+            "input": "./libs/back/mail/src",
+            "glob": "**/*.html",
+            "output": "./libs/back/mail/src"
+          },
+          {
+            "input": "./back/src",
+            "glob": "**/*.{graphql,pdf,png,ttf,html,css,svg,wsdl,mp3}",
+            "output": "./back/src"
+          },
+          {
+            "input": "./back/src",
+            "glob": "**/assets/*.js",
+            "output": "./back/src"
+          },
+          {
+            "input": "./libs/back/prisma/src",
+            "glob": "**/*.{prisma,sql}",
+            "output": "./libs/back/prisma/src"
+          }
+        ],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {
+          "skipTypeCheck": true
+        },
+        "integration": {
+          "skipTypeCheck": true
+        },
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "queues-bulk-indexation-master:build",
+        "inspect": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "queues-bulk-indexation-master:build:development"
+        },
+        "integration": {
+          "watch": false,
+          "buildTarget": "queues-bulk-indexation-master:build:integration"
+        },
+        "production": {
+          "buildTarget": "queues-bulk-indexation-master:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/queues-bulk-indexation-master/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/queues-bulk-indexation-master/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    }
+  },
+  "tags": ["backend:queues"]
+}
