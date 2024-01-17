@@ -2,4 +2,5 @@ web: node dist/apps/api/main.js
 clock: node dist/apps/cron/main.js
 queue: node dist/apps/queues-runner/main.js
 indexqueue: node dist/apps/queues-indexation/main.js
+bulkindexqueue: node dist/apps/queues-bulk-indexation/main.js
 webhooksqueue: node dist/apps/queues-webhooks/main.js

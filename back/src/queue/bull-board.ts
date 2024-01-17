@@ -6,7 +6,7 @@ import {
   geocodeCompanyQueue,
   setCompanyDepartementQueue
 } from "./producers/company";
-import { indexQueue } from "./producers/elastic";
+import { indexQueue, bulkIndexQueue } from "./producers/elastic";
 import { updatesQueue } from "./producers/bsdUpdate";
 import { webhooksQueue } from "./producers/webhooks";
 import { syncEventsQueue } from "./producers/events";
@@ -19,6 +19,7 @@ createBullBoard({
   queues: [
     new BullAdapter(mailQueue),
     new BullAdapter(indexQueue),
+    new BullAdapter(bulkIndexQueue),
     new BullAdapter(updatesQueue),
     new BullAdapter(geocodeCompanyQueue),
     new BullAdapter(setCompanyDepartementQueue),
