@@ -49,7 +49,7 @@ const CompanySelector = ({
 
   useEffect(() => {
     // commence à rechercher à partir de trois caractères saisis
-    if (searchString?.length > 3) {
+    if (searchString?.length > 2) {
       debouncedSearch({
         searchString: searchString,
         postalCodeString: postalCodeString
