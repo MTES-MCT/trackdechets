@@ -124,7 +124,7 @@ export default function CompanySelectorWrapper({
     onSelectCompany
   ]);
 
-  const onSearchCompany = (searchClue, postalCodeClue) => {
+  const onSearchCompany = (searchClue: string, postalCodeClue: string) => {
     if (searchClue.length === 0 && postalCodeClue.length === 0 && orgId) {
       getFavoritesQuery({
         variables: {
@@ -135,7 +135,7 @@ export default function CompanySelectorWrapper({
           allowForeignCompanies
         }
       });
-    } else {
+    } else if (searchClue.length >= 3) {
       searchCompaniesFromTextSearch({
         variables: {
           clue: searchClue,
