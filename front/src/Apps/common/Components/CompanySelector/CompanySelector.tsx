@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { CompanySelectorProps } from "./companySelectorTypes";
 import CompanySelectorItem from "./CompanySelectorItem";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -46,6 +46,16 @@ const CompanySelector = ({
       }, 500),
     [onSearch]
   );
+
+  useEffect(() => {
+    // commence à rechercher à partir de trois caractères saisis
+    if (searchString?.length > 3) {
+      debouncedSearch({
+        searchString: searchString,
+        postalCodeString: postalCodeString
+      });
+    }
+  }, [searchString, postalCodeString, debouncedSearch]);
 
   const handleOnSelect = (company: CompanySearchResult) => {
     setShouldDisplayResults(false);
@@ -108,10 +118,6 @@ const CompanySelector = ({
               placeholder: "Rechercher",
               onFocus: handleOnFocus,
               onChange: e => {
-                debouncedSearch({
-                  searchString: e.target.value,
-                  postalCodeString: postalCodeString
-                });
                 setSearchString(e.target.value);
               }
             }}
@@ -127,18 +133,15 @@ const CompanySelector = ({
               placeholder: "Rechercher",
               onFocus: handleOnFocus,
               onChange: e => {
-                debouncedSearch({
-                  searchString: searchString,
-                  postalCodeString: e.target.value
-                });
                 setPostalCodeString(e.target.value);
               }
             }}
           />
         </div>
-        {(loading || shouldDisplayResults) && (
+        {loading && <InlineLoader></InlineLoader>}
+        {shouldDisplayResults && (
           <div className="company-selector-results fr-grid-row">
-            {loading ? <InlineLoader></InlineLoader> : displayResults()}
+            {displayResults()}
           </div>
         )}
       </div>
