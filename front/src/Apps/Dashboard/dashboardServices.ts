@@ -14,7 +14,8 @@ import {
   EmitterType,
   Form,
   Maybe,
-  UserPermission
+  UserPermission,
+  Transporter
 } from "@td/codegen-ui";
 import {
   ACCEPTE,
@@ -44,6 +45,7 @@ import {
   SIGNER_PAR_ENTREPRISE_TRAVAUX,
   SIGNE_PAR_EMETTEUR,
   SIGNE_PAR_TRANSPORTEUR,
+  SIGNE_PAR_TRANSPORTEUR_N,
   SUIVI_PAR_PNTTD,
   TRAITE,
   TRAITE_AVEC_RUPTURE_TRACABILITE,
@@ -68,7 +70,8 @@ export const getBsdStatusLabel = (
   isDraft: boolean | undefined,
   bsdType?: BsdType,
   operationCode?: string,
-  bsdaAnnexed?: boolean
+  bsdaAnnexed?: boolean,
+  transporters?: Transporter[]
 ) => {
   switch (status) {
     case BsdStatusCode.Draft:
@@ -76,6 +79,12 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.Sealed:
       return INITIAL;
     case BsdStatusCode.Sent:
+      if (transporters && transporters.length > 1) {
+        const lastTransporterNumero = transporters.filter(t =>
+          Boolean(t.takenOverAt)
+        ).length;
+        return SIGNE_PAR_TRANSPORTEUR_N(lastTransporterNumero);
+      }
       return SIGNE_PAR_TRANSPORTEUR;
     case BsdStatusCode.Received:
       if (bsdType === BsdType.Bsdasri) {

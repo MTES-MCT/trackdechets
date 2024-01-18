@@ -1,5 +1,5 @@
 import { TBsdStatusCode } from "../../../common/types/bsdTypes";
-import { BsdType } from "@td/codegen-ui";
+import { BsdType, Transporter } from "@td/codegen-ui";
 
 export interface BadgeProps {
   status: TBsdStatusCode;
@@ -8,4 +8,5 @@ export interface BadgeProps {
   reviewStatus?: TBsdStatusCode | null;
   operationCode?: string;
   bsdaAnnexed?: boolean;
+  transporters?: Transporter[];
 }

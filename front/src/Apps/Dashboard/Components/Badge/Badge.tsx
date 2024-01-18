@@ -14,7 +14,8 @@ function Badge({
   bsdType,
   reviewStatus,
   operationCode,
-  bsdaAnnexed
+  bsdaAnnexed,
+  transporters
 }: BadgeProps): JSX.Element {
   return (
     <>
@@ -35,7 +36,8 @@ function Badge({
           isDraft,
           bsdType,
           operationCode,
-          bsdaAnnexed
+          bsdaAnnexed,
+          transporters
         )}
       </p>
       {reviewStatus && (
