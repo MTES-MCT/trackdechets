@@ -224,15 +224,13 @@ export const createProducerWithDASRICompany = async (
 };
 
 /**
- * Enables to add a partner to a company that can use the auomatic signature feature.
+ * Enables to add a partner to a company that can use the automatic signature feature.
  * Will make assertions.
  */
 export const addAutomaticSignaturePartner = async (
   page,
   { siret, partnerSiret }
 ) => {
-  console.log("siret", siret, "partnerSiret", partnerSiret);
-
   // Go to companies creation page
   await goTo(page, "/account/companies");
 
