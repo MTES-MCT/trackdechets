@@ -7,7 +7,7 @@ import { TEST_COMPANY_PREFIX } from "@td/constants";
 /**
  * Generate a new test siret by incrementing last generated siret
  * The generated sequence will look like this:
- * 00000000000000, 00000000000001, 00000000000002, ..., 00000000000010
+ * 00000000000001, 00000000000002, ..., 00000000000010
  * Calling this function to create a new test company is not thread safe
  * as we may encounter a race condition where two users try to create a
  * test company with the same siret.
@@ -20,7 +20,7 @@ async function generateTestSiret() {
     where: { siret: { startsWith: TEST_COMPANY_PREFIX } }
   });
   if (testCompanies.length === 0) {
-    return "00000000000000";
+    return "00000000000001";
   }
   const last = testCompanies[0];
   return (Number(last.siret) + 1).toString().padStart(14, "0");
