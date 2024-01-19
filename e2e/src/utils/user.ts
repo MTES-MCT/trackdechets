@@ -1,7 +1,7 @@
 import { Page, expect } from "@playwright/test";
 import { prisma } from "@td/prisma";
 import { goTo } from "./navigation";
-import { setTimeout } from 'node:timers/promises';
+import { setTimeout } from "node:timers/promises";
 
 /**
  * Logs a user in with provided credentials. Makes no assertion.
