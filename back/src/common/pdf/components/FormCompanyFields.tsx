@@ -15,18 +15,23 @@ type FormCompanyFieldsProps = {
   company?: FormCompany | null;
   isForeignShip?: boolean;
   isPrivateIndividual?: boolean;
-  isEmailMandatory?: boolean;
 };
 
+/**
+ * Common PDF Company formatting
+ * @param company FormCompany
+ * @param isForeignShip boolean Emitter is a Foreign Ship
+ * @param isPrivateIndividual boolean Emitter is a private person not a company
+ * @returns
+ */
 export function FormCompanyFields({
   company,
   isForeignShip,
-  isPrivateIndividual,
-  isEmailMandatory = true
+  isPrivateIndividual
 }: FormCompanyFieldsProps) {
   const companyCountry = getcompanyCountry(company);
 
-  const isSiretCompany =
+  const isFrenchCompany =
     isSiret(company?.siret) &&
     !isForeignShip &&
     !isPrivateIndividual &&
@@ -38,7 +43,7 @@ export function FormCompanyFields({
   return (
     <>
       <p>
-        <input type="checkbox" checked={isSiretCompany} readOnly /> Entreprise
+        <input type="checkbox" checked={isFrenchCompany} readOnly /> Entreprise
         française
         <br />
         <input
@@ -53,7 +58,7 @@ export function FormCompanyFields({
         Entreprise étrangère
       </p>
       <p>
-        {isSiretCompany && (
+        {isFrenchCompany && (
           <div>
             N° SIRET : {company?.siret}
             <br />
@@ -89,12 +94,12 @@ export function FormCompanyFields({
         Pays (le cas échéant) :{" "}
         {!companyCountry || companyCountry?.cca2 === "FR"
           ? "France"
-          : companyCountry?.name?.common || companyCountry?.cca2}
+          : companyCountry?.name.common}
       </p>
       <p>
         Tel : {company?.phone}
         <br />
-        {`Mail ${isEmailMandatory ? "" : "(facultatif) "}: `}
+        {`Mail : `}
         {company?.mail}
         {!isPrivateIndividual && (
           <>
