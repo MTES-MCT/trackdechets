@@ -1,7 +1,7 @@
 import { Page, expect } from "@playwright/test";
 import { prisma } from "@td/prisma";
 import { goTo } from "./navigation";
-import { wait } from "./time";
+import { setTimeout } from 'node:timers/promises';
 
 /**
  * Logs a user in with provided credentials. Makes no assertion.
@@ -267,7 +267,7 @@ export const updatePhoneNbr = async (page, { phone }) => {
   await validatePhoneInput.click();
 
   // TODO: fix the bug! Sometimes we have to submit twice...
-  await wait(500);
+  await setTimeout(500);
   if (await validatePhoneInput.isVisible()) {
     await validatePhoneInput.click();
   }
@@ -356,7 +356,7 @@ export const updatePassword = async (
   await validatePasswordInput.click();
 
   // TODO: fix the bug! Sometimes we have to submit twice...
-  await wait(500);
+  await setTimeout(500);
   if (await validatePasswordInput.isVisible()) {
     await validatePasswordInput.click();
   }
