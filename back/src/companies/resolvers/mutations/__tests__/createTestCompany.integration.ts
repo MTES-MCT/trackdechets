@@ -28,8 +28,8 @@ describe("createTestCompany", () => {
       CREATE_TEST_COMPANY
     );
     const siret3 = data3.createTestCompany;
-    expect(siret1).toEqual("00000000000000");
-    expect(siret2).toEqual("00000000000001");
-    expect(siret3).toEqual("00000000000002");
+    expect(siret1).toEqual("00000000000001");
+    expect(siret2).toEqual("00000000000002");
+    expect(siret3).toEqual("00000000000003");
   });
 });
