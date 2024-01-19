@@ -26,66 +26,60 @@ export function FormCompanyFields({
 }: FormCompanyFieldsProps) {
   const companyCountry = getcompanyCountry(company);
 
+  const isSiretCompany =
+    isSiret(company?.siret) &&
+    !isForeignShip &&
+    !isPrivateIndividual &&
+    companyCountry?.cca2 === "FR";
+
+  const isEUCompany =
+    isVat(company?.vatNumber) && !isForeignShip && !isPrivateIndividual;
+
   return (
     <>
       <p>
-        <input
-          type="checkbox"
-          checked={
-            !!company?.siret?.length &&
-            !isForeignShip &&
-            companyCountry?.cca2 === "FR"
-          }
-          readOnly
-        />{" "}
-        Entreprise française
+        <input type="checkbox" checked={isSiretCompany} readOnly /> Entreprise
+        française
         <br />
         <input
           type="checkbox"
           checked={
-            !!company?.extraEuropeanId &&
-            company.extraEuropeanId.length > 0 &&
-            !!company?.vatNumber &&
-            company.vatNumber.length > 0 &&
-            companyCountry?.cca2 !== "FR"
+            Boolean(
+              company?.extraEuropeanId || company?.vatNumber || isForeignShip
+            ) && companyCountry?.cca2 !== "FR"
           }
           readOnly
         />{" "}
         Entreprise étrangère
       </p>
       <p>
-        {!isForeignShip &&
-          !isPrivateIndividual &&
-          !company?.vatNumber &&
-          !company?.extraEuropeanId && (
-            <div>
-              N° SIRET : {company?.siret}
-              <br />
-            </div>
-          )}
-        {!isForeignShip && !isPrivateIndividual && (
+        {isSiretCompany && (
+          <div>
+            N° SIRET : {company?.siret}
+            <br />
+          </div>
+        )}
+        {isEUCompany && (
           <div>
             N° TVA intracommunautaire (le cas échéant) : {company?.vatNumber}
             <br />
           </div>
         )}
-        {!!company?.extraEuropeanId &&
-          company.extraEuropeanId.length > 0 &&
-          !isForeignShip &&
-          !isPrivateIndividual && (
-            <div>
-              Identifiant d'entreprise extra-européenne :{" "}
-              {company?.extraEuropeanId}
-              <br />
-            </div>
-          )}
+        {company?.extraEuropeanId && (
+          <div>
+            Identifiant d'entreprise extra-européenne :{" "}
+            {company?.extraEuropeanId}
+            <br />
+          </div>
+        )}
         {company?.omiNumber && (
           <div>
             Numéro navire OMI : {company?.omiNumber}
             <br />
           </div>
         )}
-        {!company?.siret && !company?.vatNumber && !company?.extraEuropeanId
+        {isPrivateIndividual ||
+        (!company?.siret && !company?.vatNumber && !company?.extraEuropeanId)
           ? "Nom Prénom"
           : "RAISON SOCIALE"}{" "}
         : {company?.name}
@@ -93,9 +87,9 @@ export function FormCompanyFields({
         Adresse complète : {company?.address}
         <br />
         Pays (le cas échéant) :{" "}
-        {companyCountry === null || companyCountry?.cca2 === "FR"
-          ? null
-          : companyCountry?.cca2}
+        {!companyCountry || companyCountry?.cca2 === "FR"
+          ? "France"
+          : companyCountry?.name?.common || companyCountry?.cca2}
       </p>
       <p>
         Tel : {company?.phone}
