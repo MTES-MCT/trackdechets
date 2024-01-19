@@ -16,10 +16,10 @@ import { testNavigation } from "../utils/navigation";
 test.describe
   .serial("Cahier de recette Inscription / gestion de compte", async () => {
   // User credentials
-  const USER_NAME = "User e2e n°1";
-  const USER_EMAIL = "user.e2e.n1@mail.com";
-  const USER_PASSWORD = "Us3r_E2E_0ne$$$";
-  const NEW_USER_PASSWORD = "Us3r_E2E_0ne$$$Bis";
+  const USER_NAME = "User e2e Accounts";
+  const USER_EMAIL = "user.e2e.accounts@mail.com";
+  const USER_PASSWORD = "Us3r_E2E_AcC0unts$$";
+  const NEW_USER_PASSWORD = "Us3r_E2E_AcC0unts$$Bis";
 
   test("Tentative de connexion avec un compte non-existant", async ({
     page

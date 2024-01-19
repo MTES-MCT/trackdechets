@@ -53,3 +53,4 @@ export { Mutation, MutationDeleteCompanyArgs } from "./generated/graphql/types";
 export { redisClient } from "./common/redis";
 export { client as esClient, index as esIndex } from "./common/elastic";
 export { closeMongoClient } from "./events/mongodb";
+export { hashPassword, passwordVersion } from "./users/utils";
