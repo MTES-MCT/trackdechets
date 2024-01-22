@@ -37,7 +37,7 @@ test.describe
           phone: "+33 4 75 84 21 45",
           email: "transporteur001@transport.com"
         },
-        receipt: {
+        transporterReceipt: {
           number: "0123456789",
           validityLimit: new Date(),
           department: "75"
@@ -128,6 +128,28 @@ test.describe
           name: "Déchetterie 006",
           phone: "4521569854",
           email: "dechetterie006@installation.com"
+        }
+      });
+    });
+
+    await test.step("#007 - Installation de traitement de VHU (casse automobile et/ou broyeur agréé)", async () => {
+      await createWasteManagingCompany(page, {
+        company: {
+          name: "007 Installation de traitement de VHU",
+          role: "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
+        },
+        contact: {
+          name: "VHU 007",
+          phone: "4521256352",
+          email: "installationvhu@installation.com"
+        },
+        vhuAgrementBroyeur: {
+          number: "AGREMENTBROYEUR",
+          department: "75"
+        },
+        vhuAgrementDemolisseur: {
+          number: "AGREMENTDEMOLISSEUR",
+          department: "75"
         }
       });
     });

@@ -4,14 +4,15 @@ import { toYYYYMMDD, toDDMMYYYY } from "../utils/time";
 
 type CompanyRole =
   | "Transporteur"
-  | "Installation de collecte de déchets apportés par le producteur initial";
+  | "Installation de collecte de déchets apportés par le producteur initial"
+  | "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)";
 
 interface Company {
   name: string;
   role: CompanyRole;
 }
 
-interface Receipt {
+interface TransporterReceipt {
   number: string;
   validityLimit: Date;
   department: string;
@@ -24,17 +25,30 @@ interface Contact {
   website?: string;
 }
 
+interface VHUAgrement {
+  number: string;
+  department: string;
+}
+
 /**
  * Creates a waste managing company (like transporter or waste processor). Will make assertions.
  */
 interface CreateWasteManagingCompanyProps {
   company: Company;
   contact: Contact;
-  receipt?: Receipt;
+  transporterReceipt?: TransporterReceipt;
+  vhuAgrementBroyeur?: VHUAgrement;
+  vhuAgrementDemolisseur?: VHUAgrement;
 }
 export const createWasteManagingCompany = async (
   page: Page,
-  { company, contact, receipt }: CreateWasteManagingCompanyProps
+  {
+    company,
+    contact,
+    transporterReceipt,
+    vhuAgrementBroyeur,
+    vhuAgrementDemolisseur
+  }: CreateWasteManagingCompanyProps
 ) => {
   // Go to companies creation page
   await goTo(page, "/account/companies/create");
@@ -79,13 +93,33 @@ export const createWasteManagingCompany = async (
   // Select the role
   await page.getByText(company.role, { exact: true }).click();
 
-  // Receipt
-  if (receipt) {
-    await page.getByLabel("Numéro de récépissé").fill(receipt.number);
+  // Transporter receipt
+  if (transporterReceipt) {
+    await page
+      .getByLabel("Numéro de récépissé")
+      .fill(transporterReceipt.number);
     await page
       .getByLabel("Limite de validité")
-      .fill(toYYYYMMDD(receipt.validityLimit));
-    await page.getByPlaceholder("75").fill(receipt.department);
+      .fill(toYYYYMMDD(transporterReceipt.validityLimit));
+    await page.getByPlaceholder("75").fill(transporterReceipt.department);
+  }
+
+  // VHU
+  if (vhuAgrementBroyeur) {
+    await page
+      .locator('input[name="vhuAgrementBroyeurNumber"]')
+      .fill(vhuAgrementBroyeur.number);
+    await page
+      .locator('input[name="vhuAgrementBroyeurDepartment"]')
+      .fill(vhuAgrementBroyeur.department);
+  }
+  if (vhuAgrementDemolisseur) {
+    await page
+      .locator('input[name="vhuAgrementDemolisseurNumber"]')
+      .fill(vhuAgrementDemolisseur.number);
+    await page
+      .locator('input[name="vhuAgrementDemolisseurDepartment"]')
+      .fill(vhuAgrementDemolisseur.department);
   }
 
   // Try submitting wihout checking mandatory box. Should display error message
@@ -121,17 +155,35 @@ export const createWasteManagingCompany = async (
   await expect(companyDiv.getByText("AdresseAdresse test")).toBeVisible();
   await expect(companyDiv.getByText("Code NAFXXXXX -")).toBeVisible();
 
-  // Receipt info
-  if (receipt) {
+  // Transporter receipt info
+  if (transporterReceipt) {
     await expect(companyDiv.getByTestId("receiptNumber")).toHaveText(
-      receipt.number
+      transporterReceipt.number
     );
     await expect(companyDiv.getByTestId("receiptValidityLimit")).toHaveText(
-      toDDMMYYYY(receipt.validityLimit)
+      toDDMMYYYY(transporterReceipt.validityLimit)
     );
     await expect(companyDiv.getByTestId("receiptDepartment")).toHaveText(
-      receipt.department
+      transporterReceipt.department
     );
+  }
+
+  // VHU agrements info
+  if (vhuAgrementBroyeur) {
+    await expect(
+      companyDiv.getByTestId("vhuAgrementBroyeur_agrementNumber")
+    ).toHaveText(vhuAgrementBroyeur.number);
+    await expect(
+      companyDiv.getByTestId("vhuAgrementBroyeur_department")
+    ).toHaveText(vhuAgrementBroyeur.department);
+  }
+  if (vhuAgrementDemolisseur) {
+    await expect(
+      companyDiv.getByTestId("vhuAgrementDemolisseur_agrementNumber")
+    ).toHaveText(vhuAgrementDemolisseur.number);
+    await expect(
+      companyDiv.getByTestId("vhuAgrementDemolisseur_department")
+    ).toHaveText(vhuAgrementDemolisseur.department);
   }
 
   // Check contact infos are correct
