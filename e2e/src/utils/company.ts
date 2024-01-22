@@ -393,7 +393,7 @@ export const updateCompanyContactInfo = async (
     await infoDiv
       .getByRole("link", { name: "fiche entreprise" })
       .getAttribute("href")
-  ).toEqual(`http://trackdechets.beta.gouv.fr/company/${siret}`);
+  ).toEqual(`http://trackdechets.local/company/${siret}`);
 };
 
 /**
