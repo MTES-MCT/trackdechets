@@ -165,5 +165,19 @@ test.describe
         }
       });
     });
+
+    await test.step("#008 - Installation de traitement", async () => {
+      await createWasteManagingCompany(page, {
+        company: {
+          name: "008 - Installation de traitement",
+          role: "Installation de traitement"
+        },
+        contact: {
+          name: "Installation de traitement 008",
+          phone: "+33 4 75 84 85 78",
+          email: "installationdetraitement@installation.com"
+        }
+      });
+    });
   });
 });
