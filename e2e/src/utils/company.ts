@@ -6,7 +6,8 @@ type CompanyRole =
   | "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
   | "Transporteur"
   | "Installation de collecte de déchets apportés par le producteur initial"
-  | "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)";
+  | "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
+  | "Installation de Transit, regroupement ou tri de déchets";
 
 interface Company {
   name: string;
@@ -41,6 +42,7 @@ export const getCreateButtonIndex = (companyRole: CompanyRole) => {
     [
       "Installation de collecte de déchets apportés par le producteur initial",
       "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
+      "Installation de Transit, regroupement ou tri de déchets",
       "Transporteur"
     ].includes(companyRole)
   ) {

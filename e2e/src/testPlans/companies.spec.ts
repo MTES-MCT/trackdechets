@@ -116,9 +116,19 @@ test.describe
       });
     });
 
-    // await test.step("#005 - Installation de Transit, Regroupement ou Tri des déchets", async () => {
-    //   // TODO
-    // });
+    await test.step("#005 - Installation de Transit, Regroupement ou Tri des déchets", async () => {
+      await createWasteManagingCompany(page, {
+        company: {
+          name: "005 - Installation de Transit, Regroupement ou Tri des déchets",
+          role: "Installation de Transit, regroupement ou tri de déchets"
+        },
+        contact: {
+          name: "Installation TTR 005",
+          phone: "0721548578",
+          email: "installation005@ttr.com"
+        }
+      });
+    });
 
     await test.step("#006 - Installation de collecte de déchets apportés par le producteur initial (déchetterie)", async () => {
       await createWasteManagingCompany(page, {
