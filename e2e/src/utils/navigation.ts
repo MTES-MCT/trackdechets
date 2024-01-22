@@ -33,7 +33,6 @@ export const testNavigation = async (
  */
 export const goTo = async (page, path) => {
   const currentPath = new URL(page.url()).pathname;
-  console.log("currentPath", currentPath, "path", path);
   if (currentPath !== path) {
     await page.goto(path);
   }
