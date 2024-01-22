@@ -67,7 +67,8 @@ test.describe
       await test.step("Création du producteur", async () => {
         const { siret } = await createProducerWithDASRICompany(page, {
           company: {
-            name: "003 - Producteur avec signature et emport autorisé"
+            name: "003 - Producteur avec signature et emport autorisé",
+            role: "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
           }
         });
 
@@ -88,7 +89,8 @@ test.describe
       await test.step("Création du producteur", async () => {
         const { siret } = await createProducerWithDASRICompany(page, {
           company: {
-            name: "004 - Producteur avec informations de contact"
+            name: "004 - Producteur avec informations de contact",
+            role: "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
           }
         });
 

@@ -3,6 +3,7 @@ import { goTo } from "./navigation";
 import { toYYYYMMDD, toDDMMYYYY } from "../utils/time";
 
 type CompanyRole =
+  | "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
   | "Transporteur"
   | "Installation de collecte de déchets apportés par le producteur initial"
   | "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)";
@@ -31,6 +32,294 @@ interface VHUAgrement {
 }
 
 /**
+ * In the "/account/companies/create", returns the correct "Créer votre établissement" button index
+ * matchin company role.
+ */
+export const getCreateButtonIndex = (companyRole: CompanyRole) => {
+  // Waste manager
+  if (
+    [
+      "Installation de collecte de déchets apportés par le producteur initial",
+      "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
+      "Transporteur"
+    ].includes(companyRole)
+  ) {
+    return 1;
+  }
+
+  // Waste producer
+  if (
+    [
+      "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+    ].includes(companyRole)
+  ) {
+    return 0;
+  }
+};
+
+/**
+ * Will find the div corresponding to the targeted company, to be able to make assertions on
+ * this specific company. Also enables to select chosen tab.
+ */
+type CompanyTab = "Information" | "Contact" | "Signature";
+export const getCompanyDiv = async (
+  page,
+  { siret, tab = "Information" }: { siret: string; tab?: CompanyTab }
+) => {
+  // Go to companies creation page
+  // await goTo(page, "/account/companies");
+
+  // Use the search input to narrow down the results to the company only
+  // await page.getByLabel("Filtrer mes établissements par nom, SIRET ou n° de TVA").fill(siret);
+
+  // There can by multiple companies in the page. Select the correct one
+  const companyDiv = page
+    .locator(`text=Établissement de test (${siret})`)
+    .locator("..")
+    .locator("..");
+  await expect(companyDiv).toBeVisible();
+
+  // Select tab
+  await companyDiv.getByRole("button", { name: tab }).click();
+
+  return companyDiv;
+};
+
+/**
+ * Will initiate the company creation process, that is, go to the creation page,
+ * generate a test siret, and select the correct creation option. Will make assertions.
+ */
+export const generateSiretAndInitiateCompanyCreation = async (
+  page,
+  { companyRole }: { companyRole: CompanyRole }
+) => {
+  // Go to companies creation page
+  await goTo(page, "/account/companies/create");
+
+  // WARNING: page is different if one company has already been created
+  // One more click is needed
+  const createACompanyInput = page.getByRole("button", {
+    name: "Créer un établissement"
+  });
+  if (await createACompanyInput.isVisible()) {
+    await createACompanyInput.click();
+  }
+
+  // "Créer votre établissement" button. Select correct one regarding company activity.
+  const createButtonIndex = getCreateButtonIndex(companyRole);
+  await page
+    .getByRole("button", { name: "Créer votre établissement" })
+    .nth(createButtonIndex)
+    .click();
+
+  // For waste producers...
+  if (createButtonIndex === 0) {
+    // ...help message should be visible (and closable)
+    const helpMessage = page.getByRole("heading", {
+      name: "Vous rencontrez des difficultés dans la création d'un établissement ?"
+    });
+    await expect(helpMessage).toBeVisible();
+    await page.getByRole("button", { name: "Masquer le message" }).click();
+    await expect(helpMessage).not.toBeVisible();
+  }
+
+  // Test submitting wihout a SIRET. Should display error message
+  await page.getByRole("button", { name: "Valider" }).click();
+  await expect(
+    page.getByText("Vous devez entrer un SIRET composé de 14 chiffres")
+  ).toBeVisible();
+
+  // Generate a fake SIRET
+  await page
+    .getByRole("button", { name: "Obtenir un n° SIRET factice" })
+    .click();
+  // Catch the siret value
+  const siretInput = page.locator("[name=siret]");
+  await expect(siretInput).not.toBeEmpty(); // Wait for the input to be filled
+  const siret = await siretInput.inputValue();
+  await page.getByRole("button", { name: "Valider" }).click();
+
+  return { siret };
+};
+
+/**
+ * Fills in generic company info.
+ */
+export const fillInGenericCompanyInfo = async (
+  page,
+  { company, contact }: { company: Company; contact: Contact }
+) => {
+  // Fill in company info
+  await page.getByLabel("Nom usuel (optionnel)").fill(company.name);
+  await page.getByLabel("Personne à contacter").fill(contact.name);
+  await page.getByLabel("Téléphone").fill(contact.phone);
+  await page.getByLabel("E-mail").fill(contact.email);
+
+  // Select the role
+  await page.getByText(company.role, { exact: true }).click();
+};
+
+/**
+ * Fills in transporter receipt info
+ */
+export const fillInTransporterReceipt = async (
+  page,
+  { transporterReceipt }: { transporterReceipt: TransporterReceipt }
+) => {
+  await page.getByLabel("Numéro de récépissé").fill(transporterReceipt.number);
+  await page
+    .getByLabel("Limite de validité")
+    .fill(toYYYYMMDD(transporterReceipt.validityLimit));
+  await page.getByPlaceholder("75").fill(transporterReceipt.department);
+};
+
+/**
+ * Fills in VHU broyeur agrement info
+ */
+export const fillInVHUAgrementBroyeur = async (
+  page,
+  { vhuAgrementBroyeur }: { vhuAgrementBroyeur: VHUAgrement }
+) => {
+  await page
+    .locator('input[name="vhuAgrementBroyeurNumber"]')
+    .fill(vhuAgrementBroyeur.number);
+  await page
+    .locator('input[name="vhuAgrementBroyeurDepartment"]')
+    .fill(vhuAgrementBroyeur.department);
+};
+
+/**
+ * Fills in VHU demolisseur agrement info
+ */
+export const fillInVHUAgrementDemolisseur = async (
+  page,
+  { vhuAgrementDemolisseur }: { vhuAgrementDemolisseur: VHUAgrement }
+) => {
+  await page
+    .locator('input[name="vhuAgrementDemolisseurNumber"]')
+    .fill(vhuAgrementDemolisseur.number);
+  await page
+    .locator('input[name="vhuAgrementDemolisseurDepartment"]')
+    .fill(vhuAgrementDemolisseur.department);
+};
+
+/**
+ * Submits the company creation form, and verifies that generic data is correct.
+ */
+export const submitAndVerifyGenericInfo = async (
+  page,
+  {
+    company,
+    contact,
+    siret
+  }: { company: Company; contact?: Contact; siret: string }
+) => {
+  // Try submitting wihout checking mandatory box. Should display error message
+  await page.getByRole("button", { name: "Créer" }).click();
+  await expect(
+    page.getByText(
+      "Vous devez certifier être autorisé à créer ce compte pour votre entreprise"
+    )
+  ).toBeVisible();
+
+  // Check mandatory box then try again
+  await page
+    .getByText(
+      "Je certifie disposer du pouvoir pour créer un compte au nom de mon entreprise"
+    )
+    .click();
+  await page.getByRole("button", { name: "Créer" }).click();
+
+  // Check data
+  const companyDiv = await getCompanyDiv(page, { siret });
+
+  // Company info
+  await expect(companyDiv.getByText(`Numéro SIRET${siret}`)).toBeVisible();
+  await expect(
+    companyDiv.getByText(`Profil de l'entreprise${company.role}`)
+  ).toBeVisible();
+  await expect(companyDiv.getByText(`Nom Usuel${company.name}`)).toBeVisible();
+  await expect(companyDiv.getByText("AdresseAdresse test")).toBeVisible();
+  await expect(companyDiv.getByText("Code NAFXXXXX -")).toBeVisible();
+
+  // Contact info
+  if (contact) {
+    await companyDiv.getByRole("button", { name: "Contact" }).click();
+    await expect(
+      companyDiv.getByText(`Prénom et nom du contact${contact.name}`)
+    ).toBeVisible();
+    await expect(
+      companyDiv.getByText(`Email de contact${contact.email}`)
+    ).toBeVisible();
+    await expect(
+      companyDiv.getByText(`Téléphone de contact${contact.phone}`)
+    ).toBeVisible();
+  }
+
+  return { siret };
+};
+
+export const verifyTransporterReceipt = async (
+  page,
+  {
+    siret,
+    transporterReceipt
+  }: { siret: string; transporterReceipt: TransporterReceipt }
+) => {
+  // Select correct company & correct tab
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
+
+  // Check data
+  await expect(companyDiv.getByTestId("receiptNumber")).toHaveText(
+    transporterReceipt.number
+  );
+  await expect(companyDiv.getByTestId("receiptValidityLimit")).toHaveText(
+    toDDMMYYYY(transporterReceipt.validityLimit)
+  );
+  await expect(companyDiv.getByTestId("receiptDepartment")).toHaveText(
+    transporterReceipt.department
+  );
+};
+
+export const verifyVHUAgrementBroyeur = async (
+  page,
+  {
+    siret,
+    vhuAgrementBroyeur
+  }: { siret: string; vhuAgrementBroyeur: VHUAgrement }
+) => {
+  // Select correct company & correct tab
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
+
+  // Check data
+  await expect(
+    companyDiv.getByTestId("vhuAgrementBroyeur_agrementNumber")
+  ).toHaveText(vhuAgrementBroyeur.number);
+  await expect(
+    companyDiv.getByTestId("vhuAgrementBroyeur_department")
+  ).toHaveText(vhuAgrementBroyeur.department);
+};
+
+export const verifyVHUAgrementDemolisseur = async (
+  page,
+  {
+    siret,
+    vhuAgrementDemolisseur
+  }: { siret: string; vhuAgrementDemolisseur: VHUAgrement }
+) => {
+  // Select correct company & correct tab
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
+
+  // Check data
+  await expect(
+    companyDiv.getByTestId("vhuAgrementDemolisseur_agrementNumber")
+  ).toHaveText(vhuAgrementDemolisseur.number);
+  await expect(
+    companyDiv.getByTestId("vhuAgrementDemolisseur_department")
+  ).toHaveText(vhuAgrementDemolisseur.department);
+};
+
+/**
  * Creates a waste managing company (like transporter or waste processor). Will make assertions.
  */
 interface CreateWasteManagingCompanyProps {
@@ -50,153 +339,36 @@ export const createWasteManagingCompany = async (
     vhuAgrementDemolisseur
   }: CreateWasteManagingCompanyProps
 ) => {
-  // Go to companies creation page
-  await goTo(page, "/account/companies/create");
-
-  // WARNING: page is different if one company has already been created
-  // One more click is needed
-  const createACompanyInput = page.getByRole("button", {
-    name: "Créer un établissement"
+  // Initiate company creation
+  const { siret } = await generateSiretAndInitiateCompanyCreation(page, {
+    companyRole: company.role
   });
-  if (await createACompanyInput.isVisible()) {
-    await createACompanyInput.click();
-  }
-
-  // Button correponds to "La gestion des déchets fait partie de votre activité"
-  await page
-    .getByRole("button", { name: "Créer votre établissement" })
-    .nth(1)
-    .click();
-
-  // Test submitting wihout no SIRET. Should display error message
-  await page.getByRole("button", { name: "Valider" }).click();
-  await expect(
-    page.getByText("Vous devez entrer un SIRET composé de 14 chiffres")
-  ).toBeVisible();
-
-  // Generate a fake SIRET
-  await page
-    .getByRole("button", { name: "Obtenir un n° SIRET factice" })
-    .click();
-  // Catch the siret value
-  const siretInput = page.locator("[name=siret]");
-  await expect(siretInput).not.toBeEmpty(); // Wait for the input to be filled
-  const siret = await siretInput.inputValue();
-  await page.getByRole("button", { name: "Valider" }).click();
 
   // Fill in company info
-  await page.getByLabel("Nom usuel (optionnel)").fill(company.name);
-  await page.getByLabel("Personne à contacter").fill(contact.name);
-  await page.getByLabel("Téléphone").fill(contact.phone);
-  await page.getByLabel("E-mail").fill(contact.email);
-
-  // Select the role
-  await page.getByText(company.role, { exact: true }).click();
+  await fillInGenericCompanyInfo(page, { company, contact });
 
   // Transporter receipt
-  if (transporterReceipt) {
-    await page
-      .getByLabel("Numéro de récépissé")
-      .fill(transporterReceipt.number);
-    await page
-      .getByLabel("Limite de validité")
-      .fill(toYYYYMMDD(transporterReceipt.validityLimit));
-    await page.getByPlaceholder("75").fill(transporterReceipt.department);
-  }
+  if (transporterReceipt)
+    await fillInTransporterReceipt(page, { transporterReceipt });
 
   // VHU
-  if (vhuAgrementBroyeur) {
-    await page
-      .locator('input[name="vhuAgrementBroyeurNumber"]')
-      .fill(vhuAgrementBroyeur.number);
-    await page
-      .locator('input[name="vhuAgrementBroyeurDepartment"]')
-      .fill(vhuAgrementBroyeur.department);
-  }
-  if (vhuAgrementDemolisseur) {
-    await page
-      .locator('input[name="vhuAgrementDemolisseurNumber"]')
-      .fill(vhuAgrementDemolisseur.number);
-    await page
-      .locator('input[name="vhuAgrementDemolisseurDepartment"]')
-      .fill(vhuAgrementDemolisseur.department);
-  }
+  if (vhuAgrementBroyeur)
+    await fillInVHUAgrementBroyeur(page, { vhuAgrementBroyeur });
+  if (vhuAgrementDemolisseur)
+    await fillInVHUAgrementDemolisseur(page, { vhuAgrementDemolisseur });
 
-  // Try submitting wihout checking mandatory box. Should display error message
-  await page.getByRole("button", { name: "Créer" }).click();
-  await expect(
-    page.getByText(
-      "Vous devez certifier être autorisé à créer ce compte pour votre entreprise"
-    )
-  ).toBeVisible();
+  // Submit
+  await submitAndVerifyGenericInfo(page, { company, contact, siret });
 
-  // Check mandatory box then try again
-  await page
-    .getByText(
-      "Je certifie disposer du pouvoir pour créer un compte au nom de mon entreprise"
-    )
-    .click();
-  await page.getByRole("button", { name: "Créer" }).click();
+  // Verify transporter receipt
+  if (transporterReceipt)
+    await verifyTransporterReceipt(page, { siret, transporterReceipt });
 
-  // Check company infos are correct
-
-  // There can by multiple companies in the page. Select the correct one
-  const companyDiv = page
-    .locator(`text=Établissement de test (${siret})`)
-    .locator("..")
-    .locator("..");
-  await expect(companyDiv).toBeVisible();
-
-  await expect(companyDiv.getByText(`Numéro SIRET${siret}`)).toBeVisible();
-  await expect(
-    companyDiv.getByText(`Profil de l'entreprise${company.role}`)
-  ).toBeVisible();
-  await expect(companyDiv.getByText(`Nom Usuel${company.name}`)).toBeVisible();
-  await expect(companyDiv.getByText("AdresseAdresse test")).toBeVisible();
-  await expect(companyDiv.getByText("Code NAFXXXXX -")).toBeVisible();
-
-  // Transporter receipt info
-  if (transporterReceipt) {
-    await expect(companyDiv.getByTestId("receiptNumber")).toHaveText(
-      transporterReceipt.number
-    );
-    await expect(companyDiv.getByTestId("receiptValidityLimit")).toHaveText(
-      toDDMMYYYY(transporterReceipt.validityLimit)
-    );
-    await expect(companyDiv.getByTestId("receiptDepartment")).toHaveText(
-      transporterReceipt.department
-    );
-  }
-
-  // VHU agrements info
-  if (vhuAgrementBroyeur) {
-    await expect(
-      companyDiv.getByTestId("vhuAgrementBroyeur_agrementNumber")
-    ).toHaveText(vhuAgrementBroyeur.number);
-    await expect(
-      companyDiv.getByTestId("vhuAgrementBroyeur_department")
-    ).toHaveText(vhuAgrementBroyeur.department);
-  }
-  if (vhuAgrementDemolisseur) {
-    await expect(
-      companyDiv.getByTestId("vhuAgrementDemolisseur_agrementNumber")
-    ).toHaveText(vhuAgrementDemolisseur.number);
-    await expect(
-      companyDiv.getByTestId("vhuAgrementDemolisseur_department")
-    ).toHaveText(vhuAgrementDemolisseur.department);
-  }
-
-  // Check contact infos are correct
-  await companyDiv.getByRole("button", { name: "Contact" }).click();
-  await expect(
-    companyDiv.getByText(`Prénom et nom du contact${contact.name}`)
-  ).toBeVisible();
-  await expect(
-    companyDiv.getByText(`Email de contact${contact.email}`)
-  ).toBeVisible();
-  await expect(
-    companyDiv.getByText(`Téléphone de contact${contact.phone}`)
-  ).toBeVisible();
+  // Verify VHU agrements
+  if (vhuAgrementBroyeur)
+    await verifyVHUAgrementBroyeur(page, { siret, vhuAgrementBroyeur });
+  if (vhuAgrementDemolisseur)
+    await verifyVHUAgrementDemolisseur(page, { siret, vhuAgrementDemolisseur });
 
   return { siret };
 };
@@ -206,43 +378,12 @@ export const createWasteManagingCompany = async (
  */
 export const createProducerWithDASRICompany = async (
   page: Page,
-  { company }: { company: { name: string } }
+  { company }: { company: Company }
 ) => {
-  // Go to companies creation page
-  await goTo(page, "/account/companies/create");
-
-  // WARNING: page is different if one company has already been created
-  // One more click is needed
-  const createACompanyInput = page.getByRole("button", {
-    name: "Créer un établissement"
+  // Initiate company creation
+  const { siret } = await generateSiretAndInitiateCompanyCreation(page, {
+    companyRole: company.role
   });
-  if (await createACompanyInput.isVisible()) {
-    await createACompanyInput.click();
-  }
-
-  // Button correponds to "Vous produisez des déchets dans le cadre de votre activité"
-  await page
-    .getByRole("button", { name: "Créer votre établissement" })
-    .nth(0)
-    .click();
-
-  // Help message should be visible (and closable)
-  const helpMessage = page.getByRole("heading", {
-    name: "Vous rencontrez des difficultés dans la création d'un établissement ?"
-  });
-  await expect(helpMessage).toBeVisible();
-  await page.getByRole("button", { name: "Masquer le message" }).click();
-  await expect(helpMessage).not.toBeVisible();
-
-  // Generate a fake SIRET
-  await page
-    .getByRole("button", { name: "Obtenir un n° SIRET factice" })
-    .click();
-  // Catch the siret value
-  const siretInput = page.locator("[name=siret]");
-  await expect(siretInput).not.toBeEmpty(); // Wait for the input to be filled
-  const siret = await siretInput.inputValue();
-  await page.getByRole("button", { name: "Valider" }).click();
 
   // Fill in company info
   await page.getByLabel("Nom usuel").fill(company.name);
@@ -250,39 +391,8 @@ export const createProducerWithDASRICompany = async (
   // Company produces DASRI
   await page.getByText("Mon établissement produit des DASRI").click();
 
-  // Try submitting wihout checking mandatory box. Should display error message
-  await page.getByRole("button", { name: "Créer" }).click();
-  await expect(
-    page.getByText(
-      "Vous devez certifier être autorisé à créer ce compte pour votre entreprise"
-    )
-  ).toBeVisible();
-
-  // Check mandatory box then try again
-  await page
-    .getByText(
-      "Je certifie disposer du pouvoir pour créer un compte au nom de mon entreprise"
-    )
-    .click();
-  await page.getByRole("button", { name: "Créer" }).click();
-
-  // Check company infos are correct
-
-  // There can by multiple companies in the page. Select the correct one
-  const companyDiv = page
-    .locator(`text=Établissement de test (${siret})`)
-    .locator("..")
-    .locator("..");
-
-  await expect(companyDiv).toBeVisible();
-
-  await expect(companyDiv.getByText(`Numéro SIRET${siret}`)).toBeVisible();
-  await expect(
-    companyDiv.getByText(
-      "Profil de l'entrepriseProducteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
-    )
-  ).toBeVisible();
-  await expect(companyDiv.getByText(`Nom Usuel${company.name}`)).toBeVisible();
+  // Submit
+  await submitAndVerifyGenericInfo(page, { company, siret });
 
   return { siret };
 };
@@ -295,17 +405,8 @@ export const addAutomaticSignaturePartner = async (
   page,
   { siret, partnerSiret }
 ) => {
-  // Go to companies creation page
-  await goTo(page, "/account/companies");
-
-  // There can by multiple companies in the page. Select the correct one
-  const companyDiv = page
-    .locator(`text=Établissement de test (${siret})`)
-    .locator("..")
-    .locator("..");
-
-  // Click on signature tab
-  await companyDiv.getByRole("button", { name: "Signature" }).click();
+  // Click on company's signature tab
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Signature" });
 
   // Let's add a partner
   await companyDiv
@@ -341,17 +442,8 @@ export const updateCompanyContactInfo = async (
   page,
   { siret, contact }: { siret: string; contact: Contact }
 ) => {
-  // Go to companies creation page
-  await goTo(page, "/account/companies");
-
-  // There can by multiple companies in the page. Select the correct one
-  const companyDiv = page
-    .locator(`text=Établissement de test (${siret})`)
-    .locator("..")
-    .locator("..");
-
-  // Click on contact tab
-  await companyDiv.getByRole("button", { name: "Contact" }).click();
+  // Click on company's contact tab
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Contact" });
 
   // Update the name
   await companyDiv
@@ -435,34 +527,21 @@ export const updateCompanyContactInfo = async (
   await expect(
     infoDiv.getByRole("link", { name: "fiche entreprise" })
   ).toBeVisible();
-  console.log(
-    "href",
-    await infoDiv
-      .getByRole("link", { name: "fiche entreprise" })
-      .getAttribute("href")
-  );
   await expect(
     await infoDiv
       .getByRole("link", { name: "fiche entreprise" })
       .getAttribute("href")
-  ).toEqual(`http://trackdechets.local/company/${siret}`);
+  ).toEqual(
+    `${process.env.VITE_URL_SCHEME}://${process.env.VITE_HOSTNAME}/company/${siret}`
+  );
 };
 
 /**
  * Renews the signature code. Will make assertions.
  */
 export const renewCompanyAutomaticSignatureCode = async (page, { siret }) => {
-  // Go to companies creation page
-  await goTo(page, "/account/companies");
-
-  // There can by multiple companies in the page. Select the correct one
-  const companyDiv = page
-    .locator(`text=Établissement de test (${siret})`)
-    .locator("..")
-    .locator("..");
-
-  // Click on signature tab
-  await companyDiv.getByRole("button", { name: "Signature" }).click();
+  // Click on company's signature tab
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Signature" });
 
   // Current code
   const code = await companyDiv.locator("#securityCode").textContent();
@@ -481,12 +560,12 @@ export const renewCompanyAutomaticSignatureCode = async (page, { siret }) => {
     companyDiv.getByText("Renouvellement en cours")
   ).not.toBeVisible();
 
-  // Code should be fresh new
+  // Code should be brand new
   const newCode = await companyDiv.locator("#securityCode").textContent();
   expect(newCode).not.toEqual(code);
 
   await expect(
-    companyDiv.getByText(`Code de signature${newCode}Renouveler`)
+    companyDiv.getByText(`Code de signature${newCode}`)
   ).toBeVisible();
 
   return { code: newCode };
