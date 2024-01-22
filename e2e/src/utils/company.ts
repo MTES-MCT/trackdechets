@@ -2,11 +2,13 @@ import { Page, expect } from "@playwright/test";
 import { goTo } from "./navigation";
 import { toYYYYMMDD, toDDMMYYYY } from "../utils/time";
 
+type CompanyRole =
+  | "Transporteur"
+  | "Installation de collecte de déchets apportés par le producteur initial";
+
 interface Company {
   name: string;
-  email: string;
-  phone: string;
-  contact: string;
+  role: CompanyRole;
 }
 
 interface Receipt {
@@ -15,16 +17,24 @@ interface Receipt {
   department: string;
 }
 
+interface Contact {
+  name: string;
+  email: string;
+  phone: string;
+  website?: string;
+}
+
 /**
- * Creates a transporter company. Will make assertions.
+ * Creates a waste managing company (like transporter or waste processor). Will make assertions.
  */
-interface CreateTransporterCompanyProps {
+interface CreateWasteManagingCompanyProps {
   company: Company;
+  contact: Contact;
   receipt?: Receipt;
 }
-export const createTransporterCompany = async (
+export const createWasteManagingCompany = async (
   page: Page,
-  { company, receipt }: CreateTransporterCompanyProps
+  { company, contact, receipt }: CreateWasteManagingCompanyProps
 ) => {
   // Go to companies creation page
   await goTo(page, "/account/companies/create");
@@ -44,7 +54,7 @@ export const createTransporterCompany = async (
     .nth(1)
     .click();
 
-  // Test submitting wihout any SIRET
+  // Test submitting wihout no SIRET. Should display error message
   await page.getByRole("button", { name: "Valider" }).click();
   await expect(
     page.getByText("Vous devez entrer un SIRET composé de 14 chiffres")
@@ -62,10 +72,13 @@ export const createTransporterCompany = async (
 
   // Fill in company info
   await page.getByLabel("Nom usuel (optionnel)").fill(company.name);
-  await page.getByLabel("Personne à contacter").fill(company.contact);
-  await page.getByLabel("Téléphone").fill(company.phone);
-  await page.getByLabel("E-mail").fill(company.email);
-  await page.getByText("Transporteur", { exact: true }).click();
+  await page.getByLabel("Personne à contacter").fill(contact.name);
+  await page.getByLabel("Téléphone").fill(contact.phone);
+  await page.getByLabel("E-mail").fill(contact.email);
+
+  // Select the role
+  await page.getByText(company.role, { exact: true }).click();
+
   // Receipt
   if (receipt) {
     await page.getByLabel("Numéro de récépissé").fill(receipt.number);
@@ -75,7 +88,7 @@ export const createTransporterCompany = async (
     await page.getByPlaceholder("75").fill(receipt.department);
   }
 
-  // Try submitting wihout checking mandatory box
+  // Try submitting wihout checking mandatory box. Should display error message
   await page.getByRole("button", { name: "Créer" }).click();
   await expect(
     page.getByText(
@@ -83,7 +96,7 @@ export const createTransporterCompany = async (
     )
   ).toBeVisible();
 
-  // Check box then try again
+  // Check mandatory box then try again
   await page
     .getByText(
       "Je certifie disposer du pouvoir pour créer un compte au nom de mon entreprise"
@@ -98,12 +111,11 @@ export const createTransporterCompany = async (
     .locator(`text=Établissement de test (${siret})`)
     .locator("..")
     .locator("..");
-
   await expect(companyDiv).toBeVisible();
 
   await expect(companyDiv.getByText(`Numéro SIRET${siret}`)).toBeVisible();
   await expect(
-    companyDiv.getByText("Profil de l'entrepriseTransporteur")
+    companyDiv.getByText(`Profil de l'entreprise${company.role}`)
   ).toBeVisible();
   await expect(companyDiv.getByText(`Nom Usuel${company.name}`)).toBeVisible();
   await expect(companyDiv.getByText("AdresseAdresse test")).toBeVisible();
@@ -125,13 +137,13 @@ export const createTransporterCompany = async (
   // Check contact infos are correct
   await companyDiv.getByRole("button", { name: "Contact" }).click();
   await expect(
-    companyDiv.getByText(`Prénom et nom du contact${company.contact}`)
+    companyDiv.getByText(`Prénom et nom du contact${contact.name}`)
   ).toBeVisible();
   await expect(
-    companyDiv.getByText(`Email de contact${company.email}`)
+    companyDiv.getByText(`Email de contact${contact.email}`)
   ).toBeVisible();
   await expect(
-    companyDiv.getByText(`Téléphone de contact${company.phone}`)
+    companyDiv.getByText(`Téléphone de contact${contact.phone}`)
   ).toBeVisible();
 
   return { siret };
@@ -186,7 +198,7 @@ export const createProducerWithDASRICompany = async (
   // Company produces DASRI
   await page.getByText("Mon établissement produit des DASRI").click();
 
-  // Try submitting wihout checking mandatory box
+  // Try submitting wihout checking mandatory box. Should display error message
   await page.getByRole("button", { name: "Créer" }).click();
   await expect(
     page.getByText(
@@ -194,7 +206,7 @@ export const createProducerWithDASRICompany = async (
     )
   ).toBeVisible();
 
-  // Check box then try again
+  // Check mandatory box then try again
   await page
     .getByText(
       "Je certifie disposer du pouvoir pour créer un compte au nom de mon entreprise"
@@ -268,4 +280,162 @@ export const addAutomaticSignaturePartner = async (
       `Signature automatique (annexe 1)Établissement de test (${partnerSiret})Modifier`
     )
   ).toBeVisible();
+};
+
+/**
+ * Will update the company contact info. Will make assertions.
+ */
+export const updateCompanyContactInfo = async (
+  page,
+  { siret, contact }: { siret: string; contact: Contact }
+) => {
+  // Go to companies creation page
+  await goTo(page, "/account/companies");
+
+  // There can by multiple companies in the page. Select the correct one
+  const companyDiv = page
+    .locator(`text=Établissement de test (${siret})`)
+    .locator("..")
+    .locator("..");
+
+  // Click on contact tab
+  await companyDiv.getByRole("button", { name: "Contact" }).click();
+
+  // Update the name
+  await companyDiv
+    .locator("div")
+    .filter({ hasText: /^Prénom et nom du contactAjouter$/ })
+    .locator("div")
+    .nth(1)
+    .click();
+  await companyDiv
+    .getByPlaceholder("Prénom et nom du contact")
+    .fill(contact.name);
+  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await expect(
+    companyDiv.getByText(`Prénom et nom du contact${contact.name}`)
+  ).toBeVisible();
+
+  // Update the email
+  await companyDiv
+    .locator("div")
+    .filter({ hasText: /^Email de contactAjouter$/ })
+    .locator("div")
+    .nth(1)
+    .click();
+  // Test with invalid email. Should fail
+  await companyDiv.getByPlaceholder("Email de contact").fill("user@mail");
+  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await expect(companyDiv.getByText("Email invalide")).toBeVisible();
+  // Fill in correct email
+  await companyDiv.getByPlaceholder("Email de contact").fill(contact.email);
+  // TODO: bug: have to submit twice
+  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await expect(
+    companyDiv.getByText(`Email de contact${contact.email}`)
+  ).toBeVisible();
+
+  // Update the phone number
+  await companyDiv
+    .locator("div")
+    .filter({ hasText: /^Téléphone de contactAjouter$/ })
+    .locator("div")
+    .nth(1)
+    .click();
+  // Test with invalid phone number. Should fail
+  await companyDiv.getByPlaceholder("Téléphone de contact").fill("1245");
+  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await expect(
+    companyDiv.getByText("Merci de renseigner un numéro de téléphone valide")
+  ).toBeVisible();
+  // Fill in correct phone number
+  await companyDiv.getByPlaceholder("Téléphone de contact").fill(contact.phone);
+  // TODO: bug: have to submit twice
+  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await expect(
+    companyDiv.getByText(`Téléphone de contact${contact.phone}`)
+  ).toBeVisible();
+
+  // Update the website URL
+  await companyDiv
+    .locator("div")
+    .filter({ hasText: /^Site webAjouter$/ })
+    .locator("div")
+    .nth(1)
+    .click();
+  // Test with invalid URL. Should fail
+  await companyDiv.getByPlaceholder("Site web").fill("www.invalid.com");
+  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await expect(companyDiv.getByText("URL invalide")).toBeVisible();
+  // Fill in correct URL
+  await companyDiv.getByPlaceholder("Site web").fill(contact.website);
+  // TODO: bug: have to submit twice
+  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await expect(
+    companyDiv.getByText(`Site web${contact.website}`)
+  ).toBeVisible();
+
+  // Info message with company link should be visible
+  const infoDiv = page.getByText("Ces informations de contact");
+  await expect(
+    infoDiv.getByRole("link", { name: "fiche entreprise" })
+  ).toBeVisible();
+  console.log(
+    "href",
+    await infoDiv
+      .getByRole("link", { name: "fiche entreprise" })
+      .getAttribute("href")
+  );
+  await expect(
+    await infoDiv
+      .getByRole("link", { name: "fiche entreprise" })
+      .getAttribute("href")
+  ).toEqual(`http://trackdechets.beta.gouv.fr/company/${siret}`);
+};
+
+/**
+ * Renews the signature code. Will make assertions.
+ */
+export const renewCompanyAutomaticSignatureCode = async (page, { siret }) => {
+  // Go to companies creation page
+  await goTo(page, "/account/companies");
+
+  // There can by multiple companies in the page. Select the correct one
+  const companyDiv = page
+    .locator(`text=Établissement de test (${siret})`)
+    .locator("..")
+    .locator("..");
+
+  // Click on signature tab
+  await companyDiv.getByRole("button", { name: "Signature" }).click();
+
+  // Current code
+  const code = await companyDiv.locator("#securityCode").textContent();
+
+  // Renew
+  await companyDiv.getByText("Renouveler").click();
+  // Warning message should pop
+  await expect(
+    companyDiv.getByText(
+      "Attention, un nouveau code de signature va vous être attribué de façon aléatoire"
+    )
+  ).toBeVisible();
+  await companyDiv.getByRole("button", { name: "Renouveler" }).click();
+  // Wait for the loading to end
+  await expect(
+    companyDiv.getByText("Renouvellement en cours")
+  ).not.toBeVisible();
+
+  // Code should be fresh new
+  const newCode = await companyDiv.locator("#securityCode").textContent();
+  expect(newCode).not.toEqual(code);
+
+  await expect(
+    companyDiv.getByText(`Code de signature${newCode}Renouveler`)
+  ).toBeVisible();
+
+  return { code: newCode };
 };

@@ -3,7 +3,9 @@ import { signupActivateAndLogin } from "../utils/user";
 import {
   addAutomaticSignaturePartner,
   createProducerWithDASRICompany,
-  createTransporterCompany
+  createWasteManagingCompany,
+  renewCompanyAutomaticSignatureCode,
+  updateCompanyContactInfo
 } from "../utils/company";
 
 test.describe
@@ -24,12 +26,15 @@ test.describe
       });
     });
 
-    await test.step("Création d'une entreprise de transport avec récépissé", async () => {
-      const { siret } = await createTransporterCompany(page, {
+    await test.step("#001 - Transporteur avec récépissé de transport", async () => {
+      const { siret } = await createWasteManagingCompany(page, {
         company: {
           name: "001 - Transporteur avec récépissé",
+          role: "Transporteur"
+        },
+        contact: {
+          name: "Transporteur 001",
           phone: "+33 4 75 84 21 45",
-          contact: "Transporteur 001",
           email: "transporteur001@transport.com"
         },
         receipt: {
@@ -42,18 +47,21 @@ test.describe
       transporterWithReceiptSiret = siret;
     });
 
-    await test.step("Création d'une entreprise de transport sans récépissé", async () => {
-      await createTransporterCompany(page, {
+    await test.step("#002 - Transporteur sans récépissé de transport", async () => {
+      await createWasteManagingCompany(page, {
         company: {
           name: "002 - Transporteur sans récépissé",
+          role: "Transporteur"
+        },
+        contact: {
+          name: "Transporteur 002",
           phone: "0658954785",
-          contact: "Transporteur 002",
           email: "transporteur002@transport.com"
         }
       });
     });
 
-    await test.step("Création d'un producteur ayant autorisé la signature automatique (Annexe 1) ET l'emport direct de DASRI SANS informations de contact", async () => {
+    await test.step("#003 - Producteur ayant autorisé la signature automatique (Annexe 1) ET l'emport direct de DASRI SANS informations de contact", async () => {
       let producerSiret;
 
       await test.step("Création du producteur", async () => {
@@ -71,6 +79,56 @@ test.describe
           siret: producerSiret,
           partnerSiret: transporterWithReceiptSiret
         });
+      });
+    });
+
+    await test.step("#004 - Producteur avec informations de contact ", async () => {
+      let producerSiret;
+
+      await test.step("Création du producteur", async () => {
+        const { siret } = await createProducerWithDASRICompany(page, {
+          company: {
+            name: "004 - Producteur avec informations de contact"
+          }
+        });
+
+        producerSiret = siret;
+      });
+
+      await test.step("Mise à jour des informations de contact", async () => {
+        await updateCompanyContactInfo(page, {
+          siret: producerSiret,
+          contact: {
+            name: "Producteur 004",
+            email: "producteur004@producteur.com",
+            phone: "+336 895 478 56",
+            website: "http://www.app.trackdechets.com"
+          }
+        });
+      });
+
+      await test.step("Renouvellement du code de signature automatique", async () => {
+        await renewCompanyAutomaticSignatureCode(page, {
+          siret: producerSiret
+        });
+      });
+    });
+
+    // await test.step("#005 - Installation de Transit, Regroupement ou Tri des déchets", async () => {
+    //   // TODO
+    // });
+
+    await test.step("#006 - Installation de collecte de déchets apportés par le producteur initial (déchetterie)", async () => {
+      await createWasteManagingCompany(page, {
+        company: {
+          name: "006 - Déchetterie",
+          role: "Installation de collecte de déchets apportés par le producteur initial"
+        },
+        contact: {
+          name: "Déchetterie 006",
+          phone: "4521569854",
+          email: "dechetterie006@installation.com"
+        }
       });
     });
   });
