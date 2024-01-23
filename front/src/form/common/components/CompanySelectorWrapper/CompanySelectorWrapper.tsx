@@ -56,9 +56,6 @@ export default function CompanySelectorWrapper({
   const [selectedCompany, setSelectedCompany] =
     useState<CompanySearchResult | null>(null);
 
-  // Résultats de recherche
-  const [searchResults, setSearchResults] = useState<CompanySearchResult[]>();
-
   const [
     getFavoritesQuery,
     { loading: isLoadingFavorites, data: favoritesData, error: favoritesError }
@@ -66,10 +63,28 @@ export default function CompanySelectorWrapper({
     FAVORITES(favoriteType)
   );
 
-  const [searchCompaniesQuery, { loading: isLoadingSearch, data: _, error }] =
-    useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
-      SEARCH_COMPANIES
-    );
+  // Lazy query de search qui est appelée lors de la saisie de texte
+  // dans la barre de recherche du CompanySelector
+  const [
+    searchCompaniesFromTextSearch,
+    { loading: isLoadingSearch, data: searchCompaniesData, error }
+  ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
+    SEARCH_COMPANIES
+  );
+
+  // On limite l'affichage des résultats de recherche à 6 établissements
+  const searchResults = searchCompaniesData?.searchCompanies.slice(0, 6);
+
+  // Lazy query de search qui est utilisée pour mettre à jour
+  // `selectedCompany` à partir de `selectedCompanyOrgId`lors du render
+  // initial (Cf useEffect plus bas). On ne peut pas réutiliser la query du dessus car ces deux
+  // query peuvent être appelée simultanément (par exemple si je copie colle
+  // un numero SIRET dans la barre de recherche immédiatement après l'affichage
+  // lors d'une modification de bordereau). Les résultats seraient alors mixés.
+  const [searchCompaniesFromCompanyOrgId] = useLazyQuery<
+    Pick<Query, "searchCompanies">,
+    QuerySearchCompaniesArgs
+  >(SEARCH_COMPANIES);
 
   const onSelectCompany = useCallback(
     (company: CompanySearchResult) => {
@@ -90,7 +105,7 @@ export default function CompanySelectorWrapper({
       selectedCompanyOrgId &&
       selectedCompanyOrgId !== selectedCompany?.orgId
     ) {
-      searchCompaniesQuery({
+      searchCompaniesFromCompanyOrgId({
         variables: { clue: selectedCompanyOrgId },
         onCompleted: result => {
           if (result.searchCompanies?.length > 0) {
@@ -105,11 +120,11 @@ export default function CompanySelectorWrapper({
   }, [
     selectedCompany,
     selectedCompanyOrgId,
-    searchCompaniesQuery,
+    searchCompaniesFromCompanyOrgId,
     onSelectCompany
   ]);
 
-  const onSearchCompany = (searchClue, postalCodeClue) => {
+  const onSearchCompany = (searchClue: string, postalCodeClue: string) => {
     if (searchClue.length === 0 && postalCodeClue.length === 0 && orgId) {
       getFavoritesQuery({
         variables: {
@@ -120,15 +135,12 @@ export default function CompanySelectorWrapper({
           allowForeignCompanies
         }
       });
-    } else {
-      searchCompaniesQuery({
+    } else if (searchClue.length >= 3) {
+      searchCompaniesFromTextSearch({
         variables: {
           clue: searchClue,
           ...(postalCodeClue &&
             postalCodeClue.length >= 2 && { department: postalCodeClue })
-        },
-        onCompleted: data => {
-          setSearchResults(data?.searchCompanies.slice(0, 6));
         }
       });
     }

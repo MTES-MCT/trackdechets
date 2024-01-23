@@ -263,7 +263,7 @@ describe("expandFormFromDb", () => {
     });
     const transporter = await getFirstTransporter(form);
     const expanded = await expandFormFromDb(fullForm);
-    expect(expanded.transporter).toEqual({
+    expect(expanded.transporters[0]).toEqual({
       id: transporter!.id,
       mode: null,
       company: {
@@ -287,14 +287,16 @@ describe("expandFormFromDb", () => {
     });
   });
 
-  it("should expand a form not hiding the transporterTransportMode from db", async () => {
+  it("should not hide the transport mode from db if transporter siret is defined", async () => {
     const user = await userFactory();
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         transporters: {
           create: {
-            transporterTransportMode: "OTHER",
+            transporterCompanySiret: "11111111111111",
+            transporterCompanyVatNumber: null,
+            transporterTransportMode: "ROAD",
             number: 1
           }
         }
@@ -305,13 +307,58 @@ describe("expandFormFromDb", () => {
       include: expandableFormIncludes
     });
     const transporter = await getFirstTransporter(form);
-    const expanded = await expandFormFromDb(fullForm);
-    expect(expanded.transporter).toEqual({
+    const expanded = expandFormFromDb(fullForm);
+    expect(expanded.transporters[0]).toEqual({
       id: transporter!.id,
-      mode: "OTHER",
+      mode: "ROAD",
       company: {
         name: transporter!.transporterCompanyName,
         orgId: transporter!.transporterCompanySiret,
+        siret: transporter!.transporterCompanySiret,
+        vatNumber: transporter!.transporterCompanyVatNumber,
+        address: transporter!.transporterCompanyAddress,
+        contact: transporter!.transporterCompanyContact,
+        phone: transporter!.transporterCompanyPhone,
+        mail: transporter!.transporterCompanyMail
+      },
+      isExemptedOfReceipt: transporter!.transporterIsExemptedOfReceipt,
+      receipt: transporter!.transporterReceipt,
+      department: transporter!.transporterDepartment,
+      validityLimit: transporter!.transporterValidityLimit,
+      numberPlate: transporter!.transporterNumberPlate,
+      customInfo: transporter!.transporterCustomInfo,
+      takenOverAt: null,
+      takenOverBy: null
+    });
+  });
+
+  it("should not hide the transport mode from db if transporter vat number is defined", async () => {
+    const user = await userFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        transporters: {
+          create: {
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: "FRXXXXX",
+            transporterTransportMode: "ROAD",
+            number: 1
+          }
+        }
+      }
+    });
+    const fullForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: expandableFormIncludes
+    });
+    const transporter = await getFirstTransporter(form);
+    const expanded = expandFormFromDb(fullForm);
+    expect(expanded.transporters[0]).toEqual({
+      id: transporter!.id,
+      mode: "ROAD",
+      company: {
+        name: transporter!.transporterCompanyName,
+        orgId: transporter!.transporterCompanyVatNumber,
         siret: transporter!.transporterCompanySiret,
         vatNumber: transporter!.transporterCompanyVatNumber,
         address: transporter!.transporterCompanyAddress,
