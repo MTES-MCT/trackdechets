@@ -25,12 +25,16 @@
         },
         "production": {
           "mode": "production"
+        },
+        "integration": {
+          "mode": "development",
+          "skipTypeCheck": true
         }
       }
     },
     "serve": {
       "executor": "@nx/vite:dev-server",
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "dsfr", "generate-tw"],
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "front:build",
@@ -45,7 +49,8 @@
         "production": {
           "buildTarget": "front:build:production",
           "hmr": false
-        }
+        },
+        "integration": {}
       }
     },
     "preview": {
@@ -79,7 +84,10 @@
       }
     },
     "generate-tw": {
-      "command": "tailwindcss build front/src/tailwind.css -c front/tailwind.config.js -o front/src/generated/css/tailwind.generated.css"
+      "command": "tailwindcss build front/src/tailwind.css -c front/tailwind.config.js -o front/src/generated/css/tailwind.generated.css",
+      "configurations": {
+        "integration": {}
+      }
     },
     "storybook": {
       "executor": "@nx/storybook:storybook",

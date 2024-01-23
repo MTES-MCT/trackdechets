@@ -1,0 +1,24 @@
+{
+  "name": "e2e",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "e2e/src",
+  "projectType": "application",
+  "targets": {
+    "ci": {
+      "command": "cd e2e && xvfb-run npx playwright test"
+    },
+    "cli": {
+      "command": "cd e2e && npx playwright test && npx playwright show-report",
+      "configurations": {
+        "integration": {}
+      }
+    },
+    "ui": {
+      "command": "cd e2e && npx playwright test --ui",
+      "configurations": {
+        "integration": {}
+      }
+    }
+  },
+  "tags": []
+}

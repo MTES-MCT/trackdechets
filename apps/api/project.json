@@ -75,6 +75,9 @@
         },
         "production": {
           "buildTarget": "api:build:production"
+        },
+        "integration": {
+          "buildTarget": "api:build:development"
         }
       }
     },
