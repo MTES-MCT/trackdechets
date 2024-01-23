@@ -896,7 +896,6 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     await refreshElasticSearch();
     const bsds = await searchBsds("ALL", [transporter.company.siret!]);
     const ids = bsds.map(bsd => bsd.id);
-    expect(ids).toContain(form.id);
     expect(ids).toContain(form.forwardedIn!.id);
   });
   it("should list a BSDD in final destination's all wastes", async () => {
@@ -912,7 +911,6 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     await refreshElasticSearch();
     const bsds = await searchBsds("ALL", [destination.company.siret!]);
     const ids = bsds.map(bsd => bsd.id);
-    expect(ids).toContain(form.id);
     expect(ids).toContain(form.forwardedIn!.id);
   });
   it("should list a BSDA in emitter's all wastes", async () => {

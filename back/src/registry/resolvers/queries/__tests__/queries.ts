@@ -169,6 +169,9 @@ export const ALL_WASTES = gql`
         cursor
         node {
           id
+          emitterCompanySiret
+          transporterCompanySiret
+          destinationCompanySiret
         }
       }
     }
