@@ -313,5 +313,31 @@ test.describe
         }
       });
     });
+
+    await test.step("#015 - Entreprise de travaux amiante + Transporteur", async () => {
+      await createWasteManagingCompany(page, {
+        company: {
+          name: "015 - Entreprise de travaux amiante + transporteur",
+          roles: ["Entreprise de travaux amiante", "Transporteur"],
+          producesDASRI: true
+        },
+        contact: {
+          name: "Entreprise de travaux 015",
+          phone: "047365254512",
+          email: "entreprisedetravaux@amiante.com"
+        },
+        amianteCertification: {
+          number: "0123456789",
+          validityLimit: new Date(),
+          organisation: "QUALIBAT"
+        },
+        receipt: {
+          type: "transporter",
+          number: "0123456789",
+          validityLimit: new Date(),
+          department: "75"
+        }
+      });
+    });
   });
 });
