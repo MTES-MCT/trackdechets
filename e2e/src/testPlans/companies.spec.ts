@@ -1,4 +1,4 @@
-import { Page, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { test } from "@playwright/test";
 import { signupActivateAndLogin } from "../utils/user";
 import {
