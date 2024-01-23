@@ -82,7 +82,9 @@ export const getCompanyDiv = async (
   // await goTo(page, "/account/companies");
 
   // Use the search input to narrow down the results to the company only
-  await page.getByLabel("Filtrer mes établissements par nom, SIRET ou n° de TVA").fill(siret);
+  await page
+    .getByLabel("Filtrer mes établissements par nom, SIRET ou n° de TVA")
+    .fill(siret);
 
   // There can by multiple companies in the page. Select the correct one
   const companyDiv = page

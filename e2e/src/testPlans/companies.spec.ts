@@ -8,9 +8,8 @@ import {
   updateCompanyContactInfo
 } from "../utils/company";
 
-
 test.describe
-.serial("Cahier de recette de création d'établissements", async () => {
+  .serial("Cahier de recette de création d'établissements", async () => {
   // User credentials
   const USER_NAME = "User e2e Companies";
   const USER_EMAIL = "user.e2e.companies@mail.com";
@@ -167,7 +166,7 @@ test.describe
             type: "Broyeur",
             number: "AGREMENTBROYEUR",
             department: "75"
-          },
+          }
         ]
       });
     });
