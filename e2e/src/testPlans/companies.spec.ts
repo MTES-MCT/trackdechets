@@ -1,3 +1,4 @@
+import { Page, expect } from "@playwright/test";
 import { test } from "@playwright/test";
 import { signupActivateAndLogin } from "../utils/user";
 import {
@@ -221,6 +222,30 @@ test.describe
           number: "0123456789",
           validityLimit: new Date(),
           department: "75"
+        }
+      });
+    });
+
+    // TODO
+    await test.step("#011 - Éco-organisme (TODO)", async () => {
+      expect(true).toBeTruthy();
+    });
+
+    await test.step("#012 - Entreprise de travaux amiante", async () => {
+      await createWasteManagingCompany(page, {
+        company: {
+          name: "012 - Entreprise de travaux amiante",
+          role: "Entreprise de travaux amiante"
+        },
+        contact: {
+          name: "Entreprise de travaux 011",
+          phone: "047365254512",
+          email: "entreprisedetravaux@amiante.com"
+        },
+        amianteCertification: {
+          number: "0123456789",
+          validityLimit: new Date(),
+          organisation: "QUALIBAT"
         }
       });
     });

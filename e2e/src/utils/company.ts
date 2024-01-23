@@ -11,7 +11,8 @@ type CompanyRole =
   | "Installation de traitement"
   | "Négociant"
   | "Courtier"
-  | "Crématorium";
+  | "Crématorium"
+  | "Entreprise de travaux amiante";
 
 interface Company {
   name: string;
@@ -38,11 +39,26 @@ interface VHUAgrement {
   department: string;
 }
 
+interface AmianteCertification {
+  number: string;
+  validityLimit: Date;
+  organisation: "QUALIBAT" | "AFNOR Certification" | "GLOBAL CERTIFICATION";
+}
+
 /**
  * In the "/account/companies/create", returns the correct "Créer votre établissement" button index
  * matchin company role.
  */
 export const getCreateButtonIndex = (companyRole: CompanyRole) => {
+  // "Vous produisez des déchets dans le cadre de votre activité"
+  if (
+    [
+      "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+    ].includes(companyRole)
+  ) {
+    return 0;
+  }
+
   // "La gestion des déchets fait partie de votre activité"
   if (
     [
@@ -53,20 +69,15 @@ export const getCreateButtonIndex = (companyRole: CompanyRole) => {
       "Installation de traitement",
       "Négociant",
       "Courtier",
-      "Crématorium"
+      "Crématorium",
+      "Entreprise de travaux amiante"
     ].includes(companyRole)
   ) {
     return 1;
   }
 
-  // "Vous produisez des déchets dans le cadre de votre activité"
-  if (
-    [
-      "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
-    ].includes(companyRole)
-  ) {
-    return 0;
-  }
+  // "Transporteur hors France, Non-French carrier"
+  return 2;
 };
 
 /**
@@ -89,8 +100,7 @@ export const getCompanyDiv = async (
   // There can by multiple companies in the page. Select the correct one
   const companyDiv = page
     .locator(`text=Établissement de test (${siret})`)
-    .locator("..")
-    .locator("..");
+    .locator("../..");
   await expect(companyDiv).toBeVisible();
 
   // Select tab
@@ -185,6 +195,52 @@ export const fillInReceipt = async (
     .getByLabel("Limite de validité")
     .fill(toYYYYMMDD(receipt.validityLimit));
   await page.getByLabel("Département").fill(receipt.department);
+};
+
+/**
+ * Fills in amiante certification info. Will also try to submit the form without
+ * the certification info, to see if it fails correctly
+ */
+export const fillInAmianteCertification = async (
+  page,
+  { certification }: { certification: AmianteCertification }
+) => {
+  // Certifications inputs should appear
+  const certificationsDiv = page
+    .getByText("Entreprise de travaux amiante")
+    .locator("../../../../../..");
+  await expect(certificationsDiv).toBeVisible();
+
+  // Check amiante boxes
+  await certificationsDiv
+    .getByText("Travaux relevant de la sous-section 4")
+    .click();
+  await certificationsDiv
+    .getByText("Travaux relevant de la sous-section 3")
+    .click();
+
+  // Try to create the company. Should fail
+  await page.getByRole("button", { name: "Créer" }).click();
+  await expect(
+    certificationsDiv.getByText("Champ obligatoire").first()
+  ).toBeVisible();
+  await expect(
+    certificationsDiv.getByText("Champ obligatoire").nth(1)
+  ).toBeVisible();
+  await expect(
+    certificationsDiv.getByText("Champ obligatoire").nth(2)
+  ).toBeVisible();
+
+  // Fill in the info
+  await certificationsDiv
+    .getByLabel("N° certification")
+    .fill(certification.number);
+  await certificationsDiv
+    .getByLabel("Date de validité")
+    .fill(toYYYYMMDD(certification.validityLimit));
+  await certificationsDiv
+    .getByLabel("Organisme", { exact: true })
+    .selectOption(certification.organisation);
 };
 
 /**
@@ -283,6 +339,42 @@ export const verifyReceipt = async (
 };
 
 /**
+ * Will verify amiante info, that is, certifications info.
+ */
+export const verifyAmianteCertification = async (
+  page,
+  {
+    siret,
+    certification
+  }: { siret: string; certification: AmianteCertification }
+) => {
+  // Select correct company & correct tab
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
+
+  const amianteDiv = companyDiv
+    .getByText("Catégorie entreprise de travaux amiante")
+    .locator("..");
+  await expect(amianteDiv).toBeVisible();
+
+  // Check data
+  await expect(
+    amianteDiv.getByText("Travaux relevant de la sous-section 4")
+  ).toBeVisible();
+  await expect(
+    amianteDiv.getByText("Travaux relevant de la sous-section 3")
+  ).toBeVisible();
+  await expect(amianteDiv.getByTestId("certificationNumber")).toHaveText(
+    certification.number
+  );
+  await expect(amianteDiv.getByTestId("validityLimit")).toHaveText(
+    toDDMMYYYY(certification.validityLimit)
+  );
+  await expect(amianteDiv.getByTestId("organisation")).toHaveText(
+    certification.organisation
+  );
+};
+
+/**
  * Enables to verify VHU agrement data. Can be démolisseur, broyeur
  */
 export const verifyVHUAgrement = async (
@@ -309,10 +401,17 @@ interface CreateWasteManagingCompanyProps {
   contact: Contact;
   receipt?: Receipt;
   vhuAgrements?: VHUAgrement[];
+  amianteCertification?: AmianteCertification;
 }
 export const createWasteManagingCompany = async (
   page: Page,
-  { company, contact, receipt, vhuAgrements }: CreateWasteManagingCompanyProps
+  {
+    company,
+    contact,
+    receipt,
+    vhuAgrements,
+    amianteCertification
+  }: CreateWasteManagingCompanyProps
 ) => {
   // Initiate company creation
   const { siret } = await generateSiretAndInitiateCompanyCreation(page, {
@@ -331,6 +430,12 @@ export const createWasteManagingCompany = async (
   // Receipt
   if (receipt) await fillInReceipt(page, { receipt: receipt });
 
+  // Amiante
+  if (amianteCertification)
+    await fillInAmianteCertification(page, {
+      certification: amianteCertification
+    });
+
   // Submit
   await submitAndVerifyGenericInfo(page, { company, contact, siret });
 
@@ -342,6 +447,13 @@ export const createWasteManagingCompany = async (
 
   // Verify receipt
   if (receipt) await verifyReceipt(page, { siret, receipt });
+
+  // Verify amiante
+  if (amianteCertification)
+    await verifyAmianteCertification(page, {
+      siret,
+      certification: amianteCertification
+    });
 
   return { siret };
 };
