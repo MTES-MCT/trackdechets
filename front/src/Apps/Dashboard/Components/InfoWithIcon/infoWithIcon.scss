@@ -87,4 +87,15 @@
       flex-shrink: 0;
     }
   }
+  &__CustomId {
+    &:before {
+      display: inline-block;
+      content: "";
+      background-image: url("/icons/dashboard/icon-custom-id.svg");
+      width: 16px;
+      height: 16px;
+      margin-right: 5px;
+      flex-shrink: 0;
+    }
+  }
 }
