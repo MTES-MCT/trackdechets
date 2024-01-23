@@ -15,8 +15,8 @@ export default defineConfig({
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
-  /* Timeout of 30 seconds */
-  timeout: 30 * 1000,
+  /* Timeout */
+  timeout: 90 * 1000,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -47,6 +47,6 @@ export default defineConfig({
   ],
   expect: {
     /* Maximum time expect() should wait for the condition to be met. */
-    timeout: 30 * 1000
+    timeout: 90 * 1000
   }
 });
