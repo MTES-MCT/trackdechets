@@ -32,7 +32,7 @@ test.describe
       const { siret } = await createWasteManagingCompany(page, {
         company: {
           name: "001 - Transporteur avec récépissé",
-          role: "Transporteur"
+          roles: ["Transporteur"]
         },
         contact: {
           name: "Transporteur 001",
@@ -54,7 +54,7 @@ test.describe
       await createWasteManagingCompany(page, {
         company: {
           name: "002 - Transporteur sans récépissé",
-          role: "Transporteur"
+          roles: ["Transporteur"]
         },
         contact: {
           name: "Transporteur 002",
@@ -71,9 +71,11 @@ test.describe
         const { siret } = await createWasteProducerCompany(page, {
           company: {
             name: "003 - Producteur avec signature et emport autorisé",
-            role: "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
-          },
-          producesDASRI: true
+            roles: [
+              "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+            ],
+            producesDASRI: true
+          }
         });
 
         producerSiret = siret;
@@ -94,7 +96,9 @@ test.describe
         const { siret } = await createWasteProducerCompany(page, {
           company: {
             name: "004 - Producteur avec informations de contact",
-            role: "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+            roles: [
+              "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+            ]
           }
         });
 
@@ -124,7 +128,7 @@ test.describe
       await createWasteManagingCompany(page, {
         company: {
           name: "005 - Installation de Transit, Regroupement ou Tri des déchets",
-          role: "Installation de Transit, regroupement ou tri de déchets"
+          roles: ["Installation de Transit, regroupement ou tri de déchets"]
         },
         contact: {
           name: "Installation TTR 005",
@@ -138,7 +142,9 @@ test.describe
       await createWasteManagingCompany(page, {
         company: {
           name: "006 - Déchetterie",
-          role: "Installation de collecte de déchets apportés par le producteur initial"
+          roles: [
+            "Installation de collecte de déchets apportés par le producteur initial"
+          ]
         },
         contact: {
           name: "Déchetterie 006",
@@ -152,7 +158,9 @@ test.describe
       await createWasteManagingCompany(page, {
         company: {
           name: "007 Installation de traitement de VHU",
-          role: "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
+          roles: [
+            "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
+          ]
         },
         contact: {
           name: "VHU 007",
@@ -178,7 +186,7 @@ test.describe
       await createWasteManagingCompany(page, {
         company: {
           name: "008 - Installation de traitement",
-          role: "Installation de traitement"
+          roles: ["Installation de traitement"]
         },
         contact: {
           name: "Installation de traitement 008",
@@ -192,7 +200,7 @@ test.describe
       await createWasteManagingCompany(page, {
         company: {
           name: "009 - Négociant",
-          role: "Négociant"
+          roles: ["Négociant"]
         },
         contact: {
           name: "Monsieur Négociant",
@@ -212,7 +220,7 @@ test.describe
       await createWasteManagingCompany(page, {
         company: {
           name: "010 - Courtier",
-          role: "Courtier"
+          roles: ["Courtier"]
         },
         contact: {
           name: "Monsieur Courtier",
@@ -237,7 +245,7 @@ test.describe
       await createWasteManagingCompany(page, {
         company: {
           name: "012 - Entreprise de travaux amiante",
-          role: "Entreprise de travaux amiante"
+          roles: ["Entreprise de travaux amiante"]
         },
         contact: {
           name: "Entreprise de travaux 011",
@@ -256,7 +264,7 @@ test.describe
       await createWasteManagingCompany(page, {
         company: {
           name: "013 - Crématorium",
-          role: "Crématorium"
+          roles: ["Crématorium"]
         },
         contact: {
           name: "Crématorium 013",
@@ -273,7 +281,9 @@ test.describe
         const { siret } = await createWasteProducerCompany(page, {
           company: {
             name: "Établissement à supprimer",
-            role: "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+            roles: [
+              "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+            ]
           }
         });
 
@@ -282,6 +292,25 @@ test.describe
 
       await test.step("Suppression de l'établissement", async () => {
         await deleteCompany(page, { siret: producerSiret });
+      });
+    });
+
+    await test.step("#014 - Producteur + Transporteur avec signature DASRI", async () => {
+      await createWasteManagingCompany(page, {
+        company: {
+          name: "014 - Producteur + Transporteur",
+          roles: [
+            "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)",
+            "Transporteur"
+          ],
+          producesDASRI: true
+        },
+        receipt: {
+          type: "transporter",
+          number: "0123456789",
+          validityLimit: new Date(),
+          department: "75"
+        }
       });
     });
   });

@@ -16,7 +16,8 @@ type CompanyRole =
 
 interface Company {
   name: string;
-  role: CompanyRole;
+  roles: CompanyRole[];
+  producesDASRI?: boolean;
 }
 
 interface Receipt {
@@ -49,31 +50,35 @@ interface AmianteCertification {
  * In the "/account/companies/create", returns the correct "Créer votre établissement" button index
  * matchin company role.
  */
-export const getCreateButtonIndex = (companyRole: CompanyRole) => {
-  // "Vous produisez des déchets dans le cadre de votre activité"
-  if (
-    [
-      "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
-    ].includes(companyRole)
-  ) {
-    return 0;
+export const getCreateButtonIndex = (roles: CompanyRole[]) => {
+  // "La gestion des déchets fait partie de votre activité"
+  for (const role of roles) {
+    if (
+      [
+        "Installation de collecte de déchets apportés par le producteur initial",
+        "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
+        "Installation de Transit, regroupement ou tri de déchets",
+        "Transporteur",
+        "Installation de traitement",
+        "Négociant",
+        "Courtier",
+        "Crématorium",
+        "Entreprise de travaux amiante"
+      ].includes(role)
+    ) {
+      return 1;
+    }
   }
 
-  // "La gestion des déchets fait partie de votre activité"
-  if (
-    [
-      "Installation de collecte de déchets apportés par le producteur initial",
-      "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
-      "Installation de Transit, regroupement ou tri de déchets",
-      "Transporteur",
-      "Installation de traitement",
-      "Négociant",
-      "Courtier",
-      "Crématorium",
-      "Entreprise de travaux amiante"
-    ].includes(companyRole)
-  ) {
-    return 1;
+  // "Vous produisez des déchets dans le cadre de votre activité"
+  for (const role of roles) {
+    if (
+      [
+        "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+      ].includes(role)
+    ) {
+      return 0;
+    }
   }
 
   // "Transporteur hors France, Non-French carrier"
@@ -115,7 +120,7 @@ export const getCompanyDiv = async (
  */
 export const generateSiretAndInitiateCompanyCreation = async (
   page,
-  { companyRole }: { companyRole: CompanyRole }
+  { roles }: { roles: CompanyRole[] }
 ) => {
   // Go to companies creation page
   await goTo(page, "/account/companies/create");
@@ -130,7 +135,7 @@ export const generateSiretAndInitiateCompanyCreation = async (
   }
 
   // "Créer votre établissement" button. Select correct one regarding company activity.
-  const createButtonIndex = getCreateButtonIndex(companyRole);
+  const createButtonIndex = getCreateButtonIndex(roles);
   await page
     .getByRole("button", { name: "Créer votre établissement" })
     .nth(createButtonIndex)
@@ -171,16 +176,25 @@ export const generateSiretAndInitiateCompanyCreation = async (
  */
 export const fillInGenericCompanyInfo = async (
   page,
-  { company, contact }: { company: Company; contact: Contact }
+  { company, contact }: { company: Company; contact?: Contact }
 ) => {
   // Fill in company info
   await page.getByLabel("Nom usuel (optionnel)").fill(company.name);
-  await page.getByLabel("Personne à contacter").fill(contact.name);
-  await page.getByLabel("Téléphone").fill(contact.phone);
-  await page.getByLabel("E-mail").fill(contact.email);
+
+  // Company produces DASRI
+  if (company.producesDASRI)
+    await page.getByText("Mon établissement produit des DASRI").click();
+
+  // Contact info
+  if (contact) {
+    await page.getByLabel("Personne à contacter").fill(contact.name);
+    await page.getByLabel("Téléphone").fill(contact.phone);
+    await page.getByLabel("E-mail").fill(contact.email);
+  }
 
   // Select the role
-  await page.getByText(company.role, { exact: true }).click();
+  for (const role of company.roles)
+    await page.getByText(role, { exact: true }).click();
 };
 
 /**
@@ -290,9 +304,11 @@ export const submitAndVerifyGenericInfo = async (
 
   // Company info
   await expect(companyDiv.getByText(`Numéro SIRET${siret}`)).toBeVisible();
-  await expect(
-    companyDiv.getByText(`Profil de l'entreprise${company.role}`)
-  ).toBeVisible();
+  const rolesDiv = companyDiv.getByText("Profil de l'entreprise").locator("..");
+  await expect(rolesDiv).toBeVisible();
+  for (const role of company.roles) {
+    await expect(rolesDiv.getByText(role)).toBeVisible();
+  }
   await expect(companyDiv.getByText(`Nom Usuel${company.name}`)).toBeVisible();
   await expect(companyDiv.getByText("AdresseAdresse test")).toBeVisible();
   await expect(companyDiv.getByText("Code NAFXXXXX -")).toBeVisible();
@@ -398,7 +414,7 @@ export const verifyVHUAgrement = async (
  */
 interface CreateWasteManagingCompanyProps {
   company: Company;
-  contact: Contact;
+  contact?: Contact;
   receipt?: Receipt;
   vhuAgrements?: VHUAgrement[];
   amianteCertification?: AmianteCertification;
@@ -415,7 +431,7 @@ export const createWasteManagingCompany = async (
 ) => {
   // Initiate company creation
   const { siret } = await generateSiretAndInitiateCompanyCreation(page, {
-    companyRole: company.role
+    roles: company.roles
   });
 
   // Fill in company info
@@ -463,21 +479,18 @@ export const createWasteManagingCompany = async (
  */
 export const createWasteProducerCompany = async (
   page: Page,
-  {
-    company,
-    producesDASRI = false
-  }: { company: Company; producesDASRI?: boolean }
+  { company }: { company: Company }
 ) => {
   // Initiate company creation
   const { siret } = await generateSiretAndInitiateCompanyCreation(page, {
-    companyRole: company.role
+    roles: company.roles
   });
 
   // Fill in company info
   await page.getByLabel("Nom usuel").fill(company.name);
 
   // Company produces DASRI
-  if (producesDASRI)
+  if (company.producesDASRI)
     await page.getByText("Mon établissement produit des DASRI").click();
 
   // Submit
