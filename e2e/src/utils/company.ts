@@ -274,7 +274,11 @@ export const submitAndVerifyGenericInfo = async (
  */
 export const verifyReceipt = async (
   page,
-  { siret, receipt, receiptType }: { siret: string; receipt: Receipt, receiptType: ReceiptType }
+  {
+    siret,
+    receipt,
+    receiptType
+  }: { siret: string; receipt: Receipt; receiptType: ReceiptType }
 ) => {
   // Select correct company & correct tab
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
@@ -362,12 +366,12 @@ export const createWasteManagingCompany = async (
 
   // Fill in company info
   await fillInGenericCompanyInfo(page, { company, contact });
-  
+
   // VHU
   if (vhuAgrementBroyeur)
-  await fillInVHUAgrementBroyeur(page, { vhuAgrementBroyeur });
+    await fillInVHUAgrementBroyeur(page, { vhuAgrementBroyeur });
   if (vhuAgrementDemolisseur)
-  await fillInVHUAgrementDemolisseur(page, { vhuAgrementDemolisseur });
+    await fillInVHUAgrementDemolisseur(page, { vhuAgrementDemolisseur });
 
   // Transporter receipt
   if (transporterReceipt)
@@ -381,22 +385,36 @@ export const createWasteManagingCompany = async (
 
   // Submit
   await submitAndVerifyGenericInfo(page, { company, contact, siret });
-  
+
   // Verify VHU agrements
   if (vhuAgrementBroyeur)
-  await verifyVHUAgrementBroyeur(page, { siret, vhuAgrementBroyeur });
+    await verifyVHUAgrementBroyeur(page, { siret, vhuAgrementBroyeur });
   if (vhuAgrementDemolisseur)
-  await verifyVHUAgrementDemolisseur(page, { siret, vhuAgrementDemolisseur });
+    await verifyVHUAgrementDemolisseur(page, { siret, vhuAgrementDemolisseur });
 
   // Verify transporter receipt
   if (transporterReceipt)
-    await verifyReceipt(page, { siret, receipt: transporterReceipt, receiptType: "transporter" });
+    await verifyReceipt(page, {
+      siret,
+      receipt: transporterReceipt,
+      receiptType: "transporter"
+    });
 
   // Verify trader receipt
-  if (traderReceipt) await verifyReceipt(page, { siret, receipt: traderReceipt, receiptType: "trader" });
+  if (traderReceipt)
+    await verifyReceipt(page, {
+      siret,
+      receipt: traderReceipt,
+      receiptType: "trader"
+    });
 
   // Verify broker receipt
-  if (brokerReceipt) await verifyReceipt(page, { siret, receipt: brokerReceipt, receiptType: "broker" });
+  if (brokerReceipt)
+    await verifyReceipt(page, {
+      siret,
+      receipt: brokerReceipt,
+      receiptType: "broker"
+    });
 
   return { siret };
 };
