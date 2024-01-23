@@ -47,13 +47,6 @@ const CompanySelector = ({
     [onSearch]
   );
 
-  useEffect(() => {
-    debouncedSearch({
-      searchString: searchString,
-      postalCodeString: postalCodeString
-    });
-  }, [searchString, postalCodeString, debouncedSearch]);
-
   const handleOnSelect = (company: CompanySearchResult) => {
     setShouldDisplayResults(false);
     onSelect(company);
@@ -116,6 +109,10 @@ const CompanySelector = ({
               onFocus: handleOnFocus,
               onChange: e => {
                 setSearchString(e.target.value);
+                debouncedSearch({
+                  searchString: e.target.value,
+                  postalCodeString: postalCodeString
+                });
               }
             }}
           />
@@ -131,6 +128,10 @@ const CompanySelector = ({
               onFocus: handleOnFocus,
               onChange: e => {
                 setPostalCodeString(e.target.value);
+                debouncedSearch({
+                  searchString,
+                  postalCodeString: e.target.value
+                });
               }
             }}
           />
