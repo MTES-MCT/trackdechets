@@ -340,16 +340,18 @@ Les tests e2e utilisent Playwright ([documentation officielle ici](https://playw
 #### Installation
 
 Commencez par:
+
 ```
 npm i
 ```
 
 Puis il faut installer chromium pour playwright:
+
 ```
 npx playwright install chromium --with-deps
 ```
 
-####  Variables d'environnement
+#### Variables d'environnement
 
 Vu que les tests e2e fonctionnent comme les tests d'intégration, à savoir qu'ils repartent d'une base vierge à chaque fois, vous pouvez utiliser les `.env.integration` (back & front) pour les tests e2e.
 
@@ -357,8 +359,9 @@ Vu que les tests e2e fonctionnent comme les tests d'intégration, à savoir qu'i
 
 1. Lancer la DB, ES etc.
 2. Démarrer les services TD avec:
-`npx nx run-many -t serve --configuration=integration --projects=api,front,tag:backend:background --parallel=6`
+   `npx nx run-many -t serve --configuration=integration --projects=api,front,tag:backend:background --parallel=6`
 3. Lancer les tests:
+
 ```
 # Console seulement
 npx nx run e2e:cli --configuration=integration
@@ -372,6 +375,7 @@ npx nx run e2e:ui --configuration=integration
 Playwright vous permet de jouer votre cahier de recette dans un navigateur et d'enregistrer vos actions. Plusieurs outils sont disponibles pour par exemple faire des assertions sur les pages.
 
 Pour lancer le recorder:
+
 ```
 npx playwright codegen trackdechets.local --viewport-size=1920,1080
 ```
@@ -383,10 +387,13 @@ Le code généré apparaît dans une fenêtre à part. Vous pouvez le copier et 
 #### Débugguer visuellement
 
 Pour prendre un screenshot de la page qui pose problème, modifier playwright.config.ts pour changer le mode headless:
+
 ```
 headless: false
 ```
+
 Puis placer dans le code, à l'endroit problématique:
+
 ```
 const buffer = await page.screenshot();
 console.log(buffer.toString('base64'));
@@ -394,11 +401,13 @@ console.log(buffer.toString('base64'));
 // Ou alors, méthode toute faite dans debug.ts
 await logScreenshot(page);
 ```
+
 Puis utiliser un site comme [celui-ci](https://base64.guru/converter/decode/image) pour transformer le log en base64 en image.
 
 #### Débugguer le network
 
 Pour observer les requêtes, vous pouvez utiliser (doc [ici](https://playwright.dev/docs/network#network-events)):
+
 ```
 page.on('request', request => console.log('>>', request.method(), request.url()));
 page.on('response', response => console.log('<<', response.status(), response.url()));
