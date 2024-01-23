@@ -10,7 +10,8 @@ type CompanyRole =
   | "Installation de Transit, regroupement ou tri de déchets"
   | "Installation de traitement"
   | "Négociant"
-  | "Courtier";
+  | "Courtier"
+  | "Crématorium";
 
 interface Company {
   name: string;
@@ -18,12 +19,11 @@ interface Company {
 }
 
 interface Receipt {
+  type: "transporter" | "trader" | "broker";
   number: string;
   validityLimit: Date;
   department: string;
 }
-
-type ReceiptType = "transporter" | "trader" | "broker";
 
 interface Contact {
   name: string;
@@ -33,6 +33,7 @@ interface Contact {
 }
 
 interface VHUAgrement {
+  type: "Broyeur" | "Demolisseur";
   number: string;
   department: string;
 }
@@ -51,7 +52,8 @@ export const getCreateButtonIndex = (companyRole: CompanyRole) => {
       "Transporteur",
       "Installation de traitement",
       "Négociant",
-      "Courtier"
+      "Courtier",
+      "Crématorium"
     ].includes(companyRole)
   ) {
     return 1;
@@ -80,7 +82,7 @@ export const getCompanyDiv = async (
   // await goTo(page, "/account/companies");
 
   // Use the search input to narrow down the results to the company only
-  // await page.getByLabel("Filtrer mes établissements par nom, SIRET ou n° de TVA").fill(siret);
+  await page.getByLabel("Filtrer mes établissements par nom, SIRET ou n° de TVA").fill(siret);
 
   // There can by multiple companies in the page. Select the correct one
   const companyDiv = page
@@ -184,33 +186,18 @@ export const fillInReceipt = async (
 };
 
 /**
- * Fills in VHU broyeur agrement info
+ * Fills in VHU agrement info
  */
-export const fillInVHUAgrementBroyeur = async (
+export const fillInVHUAgrement = async (
   page,
-  { vhuAgrementBroyeur }: { vhuAgrementBroyeur: VHUAgrement }
+  { agrement }: { agrement: VHUAgrement }
 ) => {
   await page
-    .locator('input[name="vhuAgrementBroyeurNumber"]')
-    .fill(vhuAgrementBroyeur.number);
+    .locator(`input[name="vhuAgrement${agrement.type}Number"]`)
+    .fill(agrement.number);
   await page
-    .locator('input[name="vhuAgrementBroyeurDepartment"]')
-    .fill(vhuAgrementBroyeur.department);
-};
-
-/**
- * Fills in VHU demolisseur agrement info
- */
-export const fillInVHUAgrementDemolisseur = async (
-  page,
-  { vhuAgrementDemolisseur }: { vhuAgrementDemolisseur: VHUAgrement }
-) => {
-  await page
-    .locator('input[name="vhuAgrementDemolisseurNumber"]')
-    .fill(vhuAgrementDemolisseur.number);
-  await page
-    .locator('input[name="vhuAgrementDemolisseurDepartment"]')
-    .fill(vhuAgrementDemolisseur.department);
+    .locator(`input[name="vhuAgrement${agrement.type}Department"]`)
+    .fill(agrement.department);
 };
 
 /**
@@ -274,17 +261,13 @@ export const submitAndVerifyGenericInfo = async (
  */
 export const verifyReceipt = async (
   page,
-  {
-    siret,
-    receipt,
-    receiptType
-  }: { siret: string; receipt: Receipt; receiptType: ReceiptType }
+  { siret, receipt }: { siret: string; receipt: Receipt }
 ) => {
   // Select correct company & correct tab
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
 
   // Check data
-  const receiptDiv = companyDiv.locator(`#${receiptType}Receipt`);
+  const receiptDiv = companyDiv.locator(`#${receipt.type}Receipt`);
   await expect(receiptDiv).toBeVisible();
   await expect(receiptDiv.getByTestId("receiptNumber")).toHaveText(
     receipt.number
@@ -297,42 +280,23 @@ export const verifyReceipt = async (
   );
 };
 
-export const verifyVHUAgrementBroyeur = async (
+/**
+ * Enables to verify VHU agrement data. Can be démolisseur, broyeur
+ */
+export const verifyVHUAgrement = async (
   page,
-  {
-    siret,
-    vhuAgrementBroyeur
-  }: { siret: string; vhuAgrementBroyeur: VHUAgrement }
+  { siret, agrement }: { siret: string; agrement: VHUAgrement }
 ) => {
   // Select correct company & correct tab
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
 
   // Check data
   await expect(
-    companyDiv.getByTestId("vhuAgrementBroyeur_agrementNumber")
-  ).toHaveText(vhuAgrementBroyeur.number);
+    companyDiv.getByTestId(`vhuAgrement${agrement.type}_agrementNumber`)
+  ).toHaveText(agrement.number);
   await expect(
-    companyDiv.getByTestId("vhuAgrementBroyeur_department")
-  ).toHaveText(vhuAgrementBroyeur.department);
-};
-
-export const verifyVHUAgrementDemolisseur = async (
-  page,
-  {
-    siret,
-    vhuAgrementDemolisseur
-  }: { siret: string; vhuAgrementDemolisseur: VHUAgrement }
-) => {
-  // Select correct company & correct tab
-  const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
-
-  // Check data
-  await expect(
-    companyDiv.getByTestId("vhuAgrementDemolisseur_agrementNumber")
-  ).toHaveText(vhuAgrementDemolisseur.number);
-  await expect(
-    companyDiv.getByTestId("vhuAgrementDemolisseur_department")
-  ).toHaveText(vhuAgrementDemolisseur.department);
+    companyDiv.getByTestId(`vhuAgrement${agrement.type}_department`)
+  ).toHaveText(agrement.department);
 };
 
 /**
@@ -341,23 +305,12 @@ export const verifyVHUAgrementDemolisseur = async (
 interface CreateWasteManagingCompanyProps {
   company: Company;
   contact: Contact;
-  transporterReceipt?: Receipt;
-  vhuAgrementBroyeur?: VHUAgrement;
-  vhuAgrementDemolisseur?: VHUAgrement;
-  traderReceipt?: Receipt;
-  brokerReceipt?: Receipt;
+  receipt?: Receipt;
+  vhuAgrements?: VHUAgrement[];
 }
 export const createWasteManagingCompany = async (
   page: Page,
-  {
-    company,
-    contact,
-    transporterReceipt,
-    vhuAgrementBroyeur,
-    vhuAgrementDemolisseur,
-    traderReceipt,
-    brokerReceipt
-  }: CreateWasteManagingCompanyProps
+  { company, contact, receipt, vhuAgrements }: CreateWasteManagingCompanyProps
 ) => {
   // Initiate company creation
   const { siret } = await generateSiretAndInitiateCompanyCreation(page, {
@@ -368,53 +321,25 @@ export const createWasteManagingCompany = async (
   await fillInGenericCompanyInfo(page, { company, contact });
 
   // VHU
-  if (vhuAgrementBroyeur)
-    await fillInVHUAgrementBroyeur(page, { vhuAgrementBroyeur });
-  if (vhuAgrementDemolisseur)
-    await fillInVHUAgrementDemolisseur(page, { vhuAgrementDemolisseur });
+  if (vhuAgrements && vhuAgrements.length) {
+    for (const agrement of vhuAgrements)
+      await fillInVHUAgrement(page, { agrement });
+  }
 
-  // Transporter receipt
-  if (transporterReceipt)
-    await fillInReceipt(page, { receipt: transporterReceipt });
-
-  // Trader
-  if (traderReceipt) await fillInReceipt(page, { receipt: traderReceipt });
-
-  // Broker
-  if (brokerReceipt) await fillInReceipt(page, { receipt: brokerReceipt });
+  // Receipt
+  if (receipt) await fillInReceipt(page, { receipt: receipt });
 
   // Submit
   await submitAndVerifyGenericInfo(page, { company, contact, siret });
 
   // Verify VHU agrements
-  if (vhuAgrementBroyeur)
-    await verifyVHUAgrementBroyeur(page, { siret, vhuAgrementBroyeur });
-  if (vhuAgrementDemolisseur)
-    await verifyVHUAgrementDemolisseur(page, { siret, vhuAgrementDemolisseur });
+  if (vhuAgrements && vhuAgrements.length) {
+    for (const agrement of vhuAgrements)
+      await verifyVHUAgrement(page, { siret, agrement });
+  }
 
-  // Verify transporter receipt
-  if (transporterReceipt)
-    await verifyReceipt(page, {
-      siret,
-      receipt: transporterReceipt,
-      receiptType: "transporter"
-    });
-
-  // Verify trader receipt
-  if (traderReceipt)
-    await verifyReceipt(page, {
-      siret,
-      receipt: traderReceipt,
-      receiptType: "trader"
-    });
-
-  // Verify broker receipt
-  if (brokerReceipt)
-    await verifyReceipt(page, {
-      siret,
-      receipt: brokerReceipt,
-      receiptType: "broker"
-    });
+  // Verify receipt
+  if (receipt) await verifyReceipt(page, { siret, receipt });
 
   return { siret };
 };

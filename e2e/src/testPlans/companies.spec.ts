@@ -8,8 +8,9 @@ import {
   updateCompanyContactInfo
 } from "../utils/company";
 
+
 test.describe
-  .serial("Cahier de recette de création d'établissements", async () => {
+.serial("Cahier de recette de création d'établissements", async () => {
   // User credentials
   const USER_NAME = "User e2e Companies";
   const USER_EMAIL = "user.e2e.companies@mail.com";
@@ -37,7 +38,8 @@ test.describe
           phone: "+33 4 75 84 21 45",
           email: "transporteur001@transport.com"
         },
-        transporterReceipt: {
+        receipt: {
+          type: "transporter",
           number: "0123456789",
           validityLimit: new Date(),
           department: "75"
@@ -155,14 +157,18 @@ test.describe
           phone: "4521256352",
           email: "installationvhu@installation.com"
         },
-        vhuAgrementBroyeur: {
-          number: "AGREMENTBROYEUR",
-          department: "75"
-        },
-        vhuAgrementDemolisseur: {
-          number: "AGREMENTDEMOLISSEUR",
-          department: "75"
-        }
+        vhuAgrements: [
+          {
+            type: "Demolisseur",
+            number: "AGREMENTDEMOLISSEUR",
+            department: "75"
+          },
+          {
+            type: "Broyeur",
+            number: "AGREMENTBROYEUR",
+            department: "75"
+          },
+        ]
       });
     });
 
@@ -191,7 +197,8 @@ test.describe
           phone: "+33 5 84 87 85 84",
           email: "monsieur@negociant.com"
         },
-        traderReceipt: {
+        receipt: {
+          type: "trader",
           number: "0123456789",
           validityLimit: new Date(),
           department: "75"
@@ -210,10 +217,25 @@ test.describe
           phone: "+33 8 59 45 78 44",
           email: "monsieur@courtier.com"
         },
-        brokerReceipt: {
+        receipt: {
+          type: "broker",
           number: "0123456789",
           validityLimit: new Date(),
           department: "75"
+        }
+      });
+    });
+
+    await test.step("#013 - Crématorium", async () => {
+      await createWasteManagingCompany(page, {
+        company: {
+          name: "013 - Crématorium",
+          role: "Crématorium"
+        },
+        contact: {
+          name: "Crématorium 013",
+          phone: "+33 4 75 84 85 78",
+          email: "crematorium@installation.com"
         }
       });
     });

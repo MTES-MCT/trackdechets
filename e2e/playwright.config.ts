@@ -6,13 +6,13 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./src",
   /* Run tests in files in parallel */
-  fullyParallel: true,
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: true,
   /* Retry on CI only */
   retries: 0,
   /* Opt out of parallel tests on CI. */
-  workers: 2,
+  workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
   /* Timeout of 30 seconds */
@@ -44,5 +44,9 @@ export default defineConfig({
         ...devices["Desktop Chrome"]
       }
     }
-  ]
+  ],
+  expect: {
+    /* Maximum time expect() should wait for the condition to be met. */
+    timeout: 30 * 1000
+  }
 });

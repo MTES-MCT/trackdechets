@@ -18,6 +18,12 @@
       "configurations": {
         "integration": {}
       }
+    },
+    "debug": {
+      "command": "cd e2e && npx playwright test {args.file} --debug",
+      "configurations": {
+        "integration": {}
+      }
     }
   },
   "tags": []
