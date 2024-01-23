@@ -370,6 +370,22 @@ npx nx run e2e:cli --configuration=integration
 npx nx run e2e:ui --configuration=integration
 ```
 
+Pour tester un seul fichier:
+
+```
+# Console seulement
+npx nx run e2e:cli --file companies.spec.ts --configuration=integration
+
+# Avec l'UI
+npx nx run e2e:ui --file companies.spec.ts --configuration=integration
+```
+
+Il est aussi possible de débugguer pas à pas, avec l'UI:
+
+```
+npx nx run e2e:debug --file companies.spec.ts --configuration=integration
+```
+
 #### Recorder
 
 Playwright vous permet de jouer votre cahier de recette dans un navigateur et d'enregistrer vos actions. Plusieurs outils sont disponibles pour par exemple faire des assertions sur les pages.
