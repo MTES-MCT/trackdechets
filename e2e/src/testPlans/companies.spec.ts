@@ -179,5 +179,24 @@ test.describe
         }
       });
     });
+
+    await test.step("#009 - Négociant", async () => {
+      await createWasteManagingCompany(page, {
+        company: {
+          name: "009 - Négociant",
+          role: "Négociant"
+        },
+        contact: {
+          name: "Monsieur Négociant",
+          phone: "+33 5 84 87 85 84",
+          email: "monsieur@negociant.com"
+        },
+        traderReceipt: {
+          number: "0123456789",
+          validityLimit: new Date(),
+          department: "75"
+        }
+      });
+    });
   });
 });

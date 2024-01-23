@@ -8,14 +8,15 @@ type CompanyRole =
   | "Installation de collecte de déchets apportés par le producteur initial"
   | "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
   | "Installation de Transit, regroupement ou tri de déchets"
-  | "Installation de traitement";
+  | "Installation de traitement"
+  | "Négociant";
 
 interface Company {
   name: string;
   role: CompanyRole;
 }
 
-interface TransporterReceipt {
+interface Receipt {
   number: string;
   validityLimit: Date;
   department: string;
@@ -38,20 +39,21 @@ interface VHUAgrement {
  * matchin company role.
  */
 export const getCreateButtonIndex = (companyRole: CompanyRole) => {
-  // Waste manager
+  // "La gestion des déchets fait partie de votre activité"
   if (
     [
       "Installation de collecte de déchets apportés par le producteur initial",
       "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
       "Installation de Transit, regroupement ou tri de déchets",
       "Transporteur",
-      "Installation de traitement"
+      "Installation de traitement",
+      "Négociant"
     ].includes(companyRole)
   ) {
     return 1;
   }
 
-  // Waste producer
+  // "Vous produisez des déchets dans le cadre de votre activité"
   if (
     [
       "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
@@ -168,13 +170,27 @@ export const fillInGenericCompanyInfo = async (
  */
 export const fillInTransporterReceipt = async (
   page,
-  { transporterReceipt }: { transporterReceipt: TransporterReceipt }
+  { transporterReceipt }: { transporterReceipt: Receipt }
 ) => {
   await page.getByLabel("Numéro de récépissé").fill(transporterReceipt.number);
   await page
     .getByLabel("Limite de validité")
     .fill(toYYYYMMDD(transporterReceipt.validityLimit));
-  await page.getByPlaceholder("75").fill(transporterReceipt.department);
+  await page.getByLabel("Département").fill(transporterReceipt.department);
+};
+
+/**
+ * Fills in trader receipt info
+ */
+export const fillInTraderReceipt = async (
+  page,
+  { traderReceipt }: { traderReceipt: Receipt }
+) => {
+  await page.getByLabel("Numéro de récépissé").fill(traderReceipt.number);
+  await page
+    .getByLabel("Limite de validité")
+    .fill(toYYYYMMDD(traderReceipt.validityLimit));
+  await page.getByLabel("Département").fill(traderReceipt.department);
 };
 
 /**
@@ -265,23 +281,43 @@ export const submitAndVerifyGenericInfo = async (
 
 export const verifyTransporterReceipt = async (
   page,
-  {
-    siret,
-    transporterReceipt
-  }: { siret: string; transporterReceipt: TransporterReceipt }
+  { siret, transporterReceipt }: { siret: string; transporterReceipt: Receipt }
 ) => {
   // Select correct company & correct tab
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
 
   // Check data
-  await expect(companyDiv.getByTestId("receiptNumber")).toHaveText(
+  const receiptDiv = companyDiv.locator("#transporterReceipt");
+  await expect(receiptDiv).toBeVisible();
+  await expect(receiptDiv.getByTestId("receiptNumber")).toHaveText(
     transporterReceipt.number
   );
-  await expect(companyDiv.getByTestId("receiptValidityLimit")).toHaveText(
+  await expect(receiptDiv.getByTestId("receiptValidityLimit")).toHaveText(
     toDDMMYYYY(transporterReceipt.validityLimit)
   );
-  await expect(companyDiv.getByTestId("receiptDepartment")).toHaveText(
+  await expect(receiptDiv.getByTestId("receiptDepartment")).toHaveText(
     transporterReceipt.department
+  );
+};
+
+export const verifyTraderReceipt = async (
+  page,
+  { siret, traderReceipt }: { siret: string; traderReceipt: Receipt }
+) => {
+  // Select correct company & correct tab
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
+
+  // Check data
+  const receiptDiv = companyDiv.locator("#traderReceipt");
+  await expect(receiptDiv).toBeVisible();
+  await expect(receiptDiv.getByTestId("receiptNumber")).toHaveText(
+    traderReceipt.number
+  );
+  await expect(receiptDiv.getByTestId("receiptValidityLimit")).toHaveText(
+    toDDMMYYYY(traderReceipt.validityLimit)
+  );
+  await expect(receiptDiv.getByTestId("receiptDepartment")).toHaveText(
+    traderReceipt.department
   );
 };
 
@@ -329,9 +365,10 @@ export const verifyVHUAgrementDemolisseur = async (
 interface CreateWasteManagingCompanyProps {
   company: Company;
   contact: Contact;
-  transporterReceipt?: TransporterReceipt;
+  transporterReceipt?: Receipt;
   vhuAgrementBroyeur?: VHUAgrement;
   vhuAgrementDemolisseur?: VHUAgrement;
+  traderReceipt?: Receipt;
 }
 export const createWasteManagingCompany = async (
   page: Page,
@@ -340,7 +377,8 @@ export const createWasteManagingCompany = async (
     contact,
     transporterReceipt,
     vhuAgrementBroyeur,
-    vhuAgrementDemolisseur
+    vhuAgrementDemolisseur,
+    traderReceipt
   }: CreateWasteManagingCompanyProps
 ) => {
   // Initiate company creation
@@ -361,6 +399,9 @@ export const createWasteManagingCompany = async (
   if (vhuAgrementDemolisseur)
     await fillInVHUAgrementDemolisseur(page, { vhuAgrementDemolisseur });
 
+  // Trader
+  if (traderReceipt) await fillInTraderReceipt(page, { traderReceipt });
+
   // Submit
   await submitAndVerifyGenericInfo(page, { company, contact, siret });
 
@@ -373,6 +414,9 @@ export const createWasteManagingCompany = async (
     await verifyVHUAgrementBroyeur(page, { siret, vhuAgrementBroyeur });
   if (vhuAgrementDemolisseur)
     await verifyVHUAgrementDemolisseur(page, { siret, vhuAgrementDemolisseur });
+
+  // Verify trader receipt
+  if (traderReceipt) await verifyTraderReceipt(page, { siret, traderReceipt });
 
   return { siret };
 };
