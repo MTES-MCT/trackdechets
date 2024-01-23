@@ -3,10 +3,11 @@ import { test } from "@playwright/test";
 import { signupActivateAndLogin } from "../utils/user";
 import {
   addAutomaticSignaturePartner,
-  createProducerWithDASRICompany,
+  createWasteProducerCompany,
   createWasteManagingCompany,
   renewCompanyAutomaticSignatureCode,
-  updateCompanyContactInfo
+  updateCompanyContactInfo,
+  deleteCompany
 } from "../utils/company";
 
 test.describe
@@ -67,11 +68,12 @@ test.describe
       let producerSiret;
 
       await test.step("Création du producteur", async () => {
-        const { siret } = await createProducerWithDASRICompany(page, {
+        const { siret } = await createWasteProducerCompany(page, {
           company: {
             name: "003 - Producteur avec signature et emport autorisé",
             role: "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
-          }
+          },
+          producesDASRI: true
         });
 
         producerSiret = siret;
@@ -89,7 +91,7 @@ test.describe
       let producerSiret;
 
       await test.step("Création du producteur", async () => {
-        const { siret } = await createProducerWithDASRICompany(page, {
+        const { siret } = await createWasteProducerCompany(page, {
           company: {
             name: "004 - Producteur avec informations de contact",
             role: "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
@@ -261,6 +263,25 @@ test.describe
           phone: "+33 4 75 84 85 78",
           email: "crematorium@installation.com"
         }
+      });
+    });
+
+    await test.step("Établissement à supprimer", async () => {
+      let producerSiret;
+
+      await test.step("Création de l'établissement", async () => {
+        const { siret } = await createWasteProducerCompany(page, {
+          company: {
+            name: "Établissement à supprimer",
+            role: "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+          }
+        });
+
+        producerSiret = siret;
+      });
+
+      await test.step("Suppression de l'établissement", async () => {
+        await deleteCompany(page, { siret: producerSiret });
       });
     });
   });

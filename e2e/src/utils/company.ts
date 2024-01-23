@@ -84,7 +84,7 @@ export const getCreateButtonIndex = (companyRole: CompanyRole) => {
  * Will find the div corresponding to the targeted company, to be able to make assertions on
  * this specific company. Also enables to select chosen tab.
  */
-type CompanyTab = "Information" | "Contact" | "Signature";
+type CompanyTab = "Information" | "Contact" | "Signature" | "Avancé";
 export const getCompanyDiv = async (
   page,
   { siret, tab = "Information" }: { siret: string; tab?: CompanyTab }
@@ -459,11 +459,14 @@ export const createWasteManagingCompany = async (
 };
 
 /**
- * Creates a producer company that produces DASRI. Will make assertions.
+ * Creates a company that produces waste. Will make assertions.
  */
-export const createProducerWithDASRICompany = async (
+export const createWasteProducerCompany = async (
   page: Page,
-  { company }: { company: Company }
+  {
+    company,
+    producesDASRI = false
+  }: { company: Company; producesDASRI?: boolean }
 ) => {
   // Initiate company creation
   const { siret } = await generateSiretAndInitiateCompanyCreation(page, {
@@ -474,7 +477,8 @@ export const createProducerWithDASRICompany = async (
   await page.getByLabel("Nom usuel").fill(company.name);
 
   // Company produces DASRI
-  await page.getByText("Mon établissement produit des DASRI").click();
+  if (producesDASRI)
+    await page.getByText("Mon établissement produit des DASRI").click();
 
   // Submit
   await submitAndVerifyGenericInfo(page, { company, siret });
@@ -654,4 +658,33 @@ export const renewCompanyAutomaticSignatureCode = async (page, { siret }) => {
   ).toBeVisible();
 
   return { code: newCode };
+};
+
+/**
+ * Will delete a company. Will assert that the company has successfully been deleted.
+ */
+export const deleteCompany = async (page, { siret }) => {
+  // Click on company's signature tab
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Avancé" });
+
+  // Click once
+  const deletionDiv = companyDiv
+    .getByText("Supprimer l'établissement")
+    .locator("..");
+  await expect(deletionDiv).toBeVisible();
+  await deletionDiv.getByText("Supprimer", { exact: true }).click();
+
+  // Warning message should be visible
+  await expect(
+    page.getByText(
+      "En supprimant cet établissement, vous supprimez les accès de tous les administrateurs"
+    )
+  ).toBeVisible();
+
+  // Delete
+  await deletionDiv.getByRole("button", { name: "Supprimer" }).click();
+
+  // Verify that deletion succeeded
+  await expect(page.getByTestId("loader")).not.toBeVisible(); // Wait for loading to end
+  await expect(companyDiv).not.toBeVisible();
 };
