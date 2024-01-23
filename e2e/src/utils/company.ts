@@ -9,7 +9,8 @@ type CompanyRole =
   | "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
   | "Installation de Transit, regroupement ou tri de déchets"
   | "Installation de traitement"
-  | "Négociant";
+  | "Négociant"
+  | "Courtier";
 
 interface Company {
   name: string;
@@ -21,6 +22,8 @@ interface Receipt {
   validityLimit: Date;
   department: string;
 }
+
+type ReceiptType = "transporter" | "trader" | "broker";
 
 interface Contact {
   name: string;
@@ -47,7 +50,8 @@ export const getCreateButtonIndex = (companyRole: CompanyRole) => {
       "Installation de Transit, regroupement ou tri de déchets",
       "Transporteur",
       "Installation de traitement",
-      "Négociant"
+      "Négociant",
+      "Courtier"
     ].includes(companyRole)
   ) {
     return 1;
@@ -166,31 +170,17 @@ export const fillInGenericCompanyInfo = async (
 };
 
 /**
- * Fills in transporter receipt info
+ * Fills receipt info. Can be transporter, trader, broker etc.
  */
-export const fillInTransporterReceipt = async (
+export const fillInReceipt = async (
   page,
-  { transporterReceipt }: { transporterReceipt: Receipt }
+  { receipt }: { receipt: Receipt }
 ) => {
-  await page.getByLabel("Numéro de récépissé").fill(transporterReceipt.number);
+  await page.getByLabel("Numéro de récépissé").fill(receipt.number);
   await page
     .getByLabel("Limite de validité")
-    .fill(toYYYYMMDD(transporterReceipt.validityLimit));
-  await page.getByLabel("Département").fill(transporterReceipt.department);
-};
-
-/**
- * Fills in trader receipt info
- */
-export const fillInTraderReceipt = async (
-  page,
-  { traderReceipt }: { traderReceipt: Receipt }
-) => {
-  await page.getByLabel("Numéro de récépissé").fill(traderReceipt.number);
-  await page
-    .getByLabel("Limite de validité")
-    .fill(toYYYYMMDD(traderReceipt.validityLimit));
-  await page.getByLabel("Département").fill(traderReceipt.department);
+    .fill(toYYYYMMDD(receipt.validityLimit));
+  await page.getByLabel("Département").fill(receipt.department);
 };
 
 /**
@@ -279,45 +269,27 @@ export const submitAndVerifyGenericInfo = async (
   return { siret };
 };
 
-export const verifyTransporterReceipt = async (
+/**
+ * Enables to verify receipt data. Can be transporter, trader, broker etc.
+ */
+export const verifyReceipt = async (
   page,
-  { siret, transporterReceipt }: { siret: string; transporterReceipt: Receipt }
+  { siret, receipt, receiptType }: { siret: string; receipt: Receipt, receiptType: ReceiptType }
 ) => {
   // Select correct company & correct tab
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
 
   // Check data
-  const receiptDiv = companyDiv.locator("#transporterReceipt");
+  const receiptDiv = companyDiv.locator(`#${receiptType}Receipt`);
   await expect(receiptDiv).toBeVisible();
   await expect(receiptDiv.getByTestId("receiptNumber")).toHaveText(
-    transporterReceipt.number
+    receipt.number
   );
   await expect(receiptDiv.getByTestId("receiptValidityLimit")).toHaveText(
-    toDDMMYYYY(transporterReceipt.validityLimit)
+    toDDMMYYYY(receipt.validityLimit)
   );
   await expect(receiptDiv.getByTestId("receiptDepartment")).toHaveText(
-    transporterReceipt.department
-  );
-};
-
-export const verifyTraderReceipt = async (
-  page,
-  { siret, traderReceipt }: { siret: string; traderReceipt: Receipt }
-) => {
-  // Select correct company & correct tab
-  const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
-
-  // Check data
-  const receiptDiv = companyDiv.locator("#traderReceipt");
-  await expect(receiptDiv).toBeVisible();
-  await expect(receiptDiv.getByTestId("receiptNumber")).toHaveText(
-    traderReceipt.number
-  );
-  await expect(receiptDiv.getByTestId("receiptValidityLimit")).toHaveText(
-    toDDMMYYYY(traderReceipt.validityLimit)
-  );
-  await expect(receiptDiv.getByTestId("receiptDepartment")).toHaveText(
-    traderReceipt.department
+    receipt.department
   );
 };
 
@@ -369,6 +341,7 @@ interface CreateWasteManagingCompanyProps {
   vhuAgrementBroyeur?: VHUAgrement;
   vhuAgrementDemolisseur?: VHUAgrement;
   traderReceipt?: Receipt;
+  brokerReceipt?: Receipt;
 }
 export const createWasteManagingCompany = async (
   page: Page,
@@ -378,7 +351,8 @@ export const createWasteManagingCompany = async (
     transporterReceipt,
     vhuAgrementBroyeur,
     vhuAgrementDemolisseur,
-    traderReceipt
+    traderReceipt,
+    brokerReceipt
   }: CreateWasteManagingCompanyProps
 ) => {
   // Initiate company creation
@@ -388,35 +362,41 @@ export const createWasteManagingCompany = async (
 
   // Fill in company info
   await fillInGenericCompanyInfo(page, { company, contact });
+  
+  // VHU
+  if (vhuAgrementBroyeur)
+  await fillInVHUAgrementBroyeur(page, { vhuAgrementBroyeur });
+  if (vhuAgrementDemolisseur)
+  await fillInVHUAgrementDemolisseur(page, { vhuAgrementDemolisseur });
 
   // Transporter receipt
   if (transporterReceipt)
-    await fillInTransporterReceipt(page, { transporterReceipt });
-
-  // VHU
-  if (vhuAgrementBroyeur)
-    await fillInVHUAgrementBroyeur(page, { vhuAgrementBroyeur });
-  if (vhuAgrementDemolisseur)
-    await fillInVHUAgrementDemolisseur(page, { vhuAgrementDemolisseur });
+    await fillInReceipt(page, { receipt: transporterReceipt });
 
   // Trader
-  if (traderReceipt) await fillInTraderReceipt(page, { traderReceipt });
+  if (traderReceipt) await fillInReceipt(page, { receipt: traderReceipt });
+
+  // Broker
+  if (brokerReceipt) await fillInReceipt(page, { receipt: brokerReceipt });
 
   // Submit
   await submitAndVerifyGenericInfo(page, { company, contact, siret });
+  
+  // Verify VHU agrements
+  if (vhuAgrementBroyeur)
+  await verifyVHUAgrementBroyeur(page, { siret, vhuAgrementBroyeur });
+  if (vhuAgrementDemolisseur)
+  await verifyVHUAgrementDemolisseur(page, { siret, vhuAgrementDemolisseur });
 
   // Verify transporter receipt
   if (transporterReceipt)
-    await verifyTransporterReceipt(page, { siret, transporterReceipt });
-
-  // Verify VHU agrements
-  if (vhuAgrementBroyeur)
-    await verifyVHUAgrementBroyeur(page, { siret, vhuAgrementBroyeur });
-  if (vhuAgrementDemolisseur)
-    await verifyVHUAgrementDemolisseur(page, { siret, vhuAgrementDemolisseur });
+    await verifyReceipt(page, { siret, receipt: transporterReceipt, receiptType: "transporter" });
 
   // Verify trader receipt
-  if (traderReceipt) await verifyTraderReceipt(page, { siret, traderReceipt });
+  if (traderReceipt) await verifyReceipt(page, { siret, receipt: traderReceipt, receiptType: "trader" });
+
+  // Verify broker receipt
+  if (brokerReceipt) await verifyReceipt(page, { siret, receipt: brokerReceipt, receiptType: "broker" });
 
   return { siret };
 };

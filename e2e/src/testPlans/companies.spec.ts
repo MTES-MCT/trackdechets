@@ -198,5 +198,24 @@ test.describe
         }
       });
     });
+
+    await test.step("#010 - Courtier", async () => {
+      await createWasteManagingCompany(page, {
+        company: {
+          name: "010 - Courtier",
+          role: "Courtier"
+        },
+        contact: {
+          name: "Monsieur Courtier",
+          phone: "+33 8 59 45 78 44",
+          email: "monsieur@courtier.com"
+        },
+        brokerReceipt: {
+          number: "0123456789",
+          validityLimit: new Date(),
+          department: "75"
+        }
+      });
+    });
   });
 });
