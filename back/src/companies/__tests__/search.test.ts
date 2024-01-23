@@ -4,6 +4,7 @@ import { prisma } from "@td/prisma";
 import { siretify } from "../../__tests__/factories";
 import { SireneSearchResult } from "../sirene/types";
 import decoratedSearchCompanies from "../sirene/searchCompanies";
+import { ViesClientError } from "../vat/vies/client";
 
 const testSiret = siretify(3);
 const createInput = {
@@ -362,5 +363,23 @@ describe("searchCompanies", () => {
     const companies = await searchCompanies(vatNumber, null, true);
     expect(searchCompanyMock).toHaveBeenCalledWith(vatNumber);
     expect(companies).toStrictEqual([expected]);
+  });
+
+  it(`should return an empty [] if VAT VIES raises a random exception`, async () => {
+    const vatNumber = "ESB50629187";
+    searchCompanyMock.mockRejectedValueOnce(new Error("test"));
+    const companies = await searchCompanies(vatNumber, null, true);
+    expect(companies).toStrictEqual([]);
+  });
+
+  it(`should return a ViesClientError error if VAT VIES raises a ViesClientError exception`, async () => {
+    const vatNumber = "ESB50629187";
+    searchCompanyMock.mockRejectedValueOnce(new ViesClientError("test"));
+    expect.assertions(1);
+    try {
+      await searchCompanies(vatNumber, null, true);
+    } catch (e) {
+      expect(e.extensions.code).toEqual(ErrorCode.EXTERNAL_SERVICE_ERROR);
+    }
   });
 });
