@@ -29,7 +29,7 @@ jobs:
           TERM=xterm bash ./scripts/deploy-db.sh
       - name: Start queues
         run: |
-          npx nx run-many -t serve --projects=tag:backend:queues --configuration=integration &
+          npx nx run-many -t serve --projects=tag:backend:queues --parallel=6 --configuration=integration &
           sleep 5
       - name: Run integration tests
         run: |

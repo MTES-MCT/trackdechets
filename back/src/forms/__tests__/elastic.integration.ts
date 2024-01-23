@@ -46,6 +46,19 @@ describe("getSiretsByTab", () => {
     expect(isToCollectFor).toContain(transporter!.transporterCompanySiret);
   });
 
+  test("status SEALED emitterType=APPENDIX1_PRODUCER", async () => {
+    const user = await userFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: { status: Status.SEALED, emitterType: "APPENDIX1_PRODUCER" }
+    });
+    const fullForm = await getFullForm(form);
+    const transporter = getFirstTransporterSync(fullForm);
+    const { isToCollectFor, isForActionFor } = getSiretsByTab(fullForm);
+    expect(isForActionFor).toContain(form.emitterCompanySiret);
+    expect(isToCollectFor).toContain(transporter!.transporterCompanySiret);
+  });
+
   test("status SENT", async () => {
     const user = await userFactory();
     const form = await formFactory({

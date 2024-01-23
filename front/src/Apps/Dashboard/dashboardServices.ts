@@ -474,7 +474,8 @@ export const getSealedBtnLabel = (
 ): string => {
   if (
     isBsdd(bsd.type) &&
-    permissions.includes(UserPermission.BsdCanSignEmission)
+    (permissions.includes(UserPermission.BsdCanSignEmission) ||
+      permissions.includes(UserPermission.BsdCanSignTransport))
   ) {
     if (isAppendix1(bsd) && canAddAppendix1(bsd)) {
       return AJOUTER_ANNEXE_1;
@@ -775,7 +776,8 @@ export const getResealedBtnLabel = (
   if (
     isBsdd(bsd.type) &&
     hasTemporaryStorage(currentSiret, bsd) &&
-    permissions.includes(UserPermission.BsdCanSignEmission)
+    (permissions.includes(UserPermission.BsdCanSignEmission) ||
+      permissions.includes(UserPermission.BsdCanSignTransport))
   ) {
     if (isSameSiretEmmiter(currentSiret, bsd)) {
       return SIGNER;
@@ -829,7 +831,8 @@ export const getSignTempStorerBtnLabel = (
   if (
     isBsdd(bsd.type) &&
     isSameSiretTemporaryStorageTransporter(currentSiret, bsd) &&
-    permissions.includes(UserPermission.BsdCanSignEmission)
+    (permissions.includes(UserPermission.BsdCanSignEmission) ||
+      permissions.includes(UserPermission.BsdCanSignTransport))
   ) {
     return SIGNER;
   }
@@ -1117,7 +1120,7 @@ export const canDeleteBsd = (bsd, siret) =>
 
 const canUpdateBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
-  ![BsdStatusCode.Processed, BsdStatusCode.Refused].includes(bsd.status) &&
+  [BsdStatusCode.Initial, BsdStatusCode.SignedByEmitter].includes(bsd.status) &&
   canDuplicateBsff(bsd, siret);
 
 const canReviewBsda = (bsd, siret) =>

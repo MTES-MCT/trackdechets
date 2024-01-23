@@ -30,7 +30,6 @@ type EditableBsffFields = Required<
     | "destinationReceptionSignatureAuthor"
     | "destinationReceptionSignatureDate"
     | "detenteurCompanySirets"
-    | "packagings"
   >
 >;
 
@@ -85,7 +84,8 @@ export const editionRules: {
   ficheInterventions: "EMISSION",
   forwarding: "EMISSION",
   grouping: "EMISSION",
-  repackaging: "EMISSION"
+  repackaging: "EMISSION",
+  packagings: "EMISSION"
 };
 
 export async function checkEditionRules(
@@ -94,9 +94,11 @@ export async function checkEditionRules(
   },
   input: BsffInput,
   user?: User
-) {
+): Promise<string[]> {
+  const updatedFields = await getUpdatedFields(existingBsff, input);
+
   if (existingBsff.status === "INITIAL") {
-    return true;
+    return updatedFields;
   }
 
   const userSirets = user?.id ? Object.keys(await getUserRoles(user.id)) : [];
@@ -105,14 +107,12 @@ export async function checkEditionRules(
     userSirets.includes(existingBsff.emitterCompanySiret);
 
   if (existingBsff.status === "SIGNED_BY_EMITTER" && isEmitter) {
-    return true;
+    return updatedFields;
   }
 
   const { packagings, ...bsff } = existingBsff;
 
   const sealedFieldErrors: string[] = [];
-
-  const updatedFields = await getUpdatedFields(existingBsff, input);
 
   // Inner function used to recursively checks that the diff
   // does not contain any fields sealed by signature
@@ -154,7 +154,7 @@ export async function checkEditionRules(
     throw new SealedFieldError([...new Set(sealedFieldErrors)]);
   }
 
-  return true;
+  return updatedFields;
 }
 
 /**

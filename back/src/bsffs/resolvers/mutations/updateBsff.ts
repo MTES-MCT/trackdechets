@@ -66,13 +66,14 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       input.packagings?.map(toBsffPackagingWithType) ?? existingBsff.packagings
   };
 
-  await checkEditionRules(existingBsff, input, user);
+  const updatedFields = await checkEditionRules(existingBsff, input, user);
 
-  const packagingHasChanged =
-    !!input.forwarding ||
-    !!input.grouping ||
-    !!input.repackaging ||
-    !!input.packagings;
+  const packagingHasChanged = [
+    "forwarding",
+    "grouping",
+    "repackaging",
+    "packagings"
+  ].some(f => updatedFields.includes(f));
 
   await validateBsff(futureBsff, {
     isDraft: existingBsff.isDraft,

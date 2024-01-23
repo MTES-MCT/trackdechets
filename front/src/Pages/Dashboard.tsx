@@ -121,7 +121,10 @@ const DashboardPage = () => {
     (newSiret, newVariables, newTabs) => {
       const variables = { ...newVariables };
 
-      const routePredicate = getRoutePredicate({ ...newTabs, siret: newSiret });
+      const routePredicate = getRoutePredicate({
+        ...newTabs,
+        siret: newSiret
+      });
 
       if (routePredicate) {
         variables.where = { ...newVariables.where, ...routePredicate };
