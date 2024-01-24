@@ -37,3 +37,10 @@ export const goTo = async (page, path) => {
     await page.goto(path);
   }
 };
+
+/**
+ * Enables to test current URL
+ */
+export const checkCurrentURL = async (page, path) => {
+  await expect(new URL(page.url()).pathname).toEqual(path);
+};

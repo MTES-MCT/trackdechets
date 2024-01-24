@@ -4,7 +4,7 @@ import { generateTestSiret } from "back";
 export const seedCompany = async company => {
   const siret = await generateTestSiret();
 
-  const seededCompany = await prisma.company.create({
+  return prisma.company.create({
     data: {
       ...company,
       siret,
@@ -13,8 +13,6 @@ export const seedCompany = async company => {
       verificationCode: "1234"
     }
   });
-
-  return seededCompany;
 };
 
 export const seedCompanyAssociation = async (
@@ -22,7 +20,7 @@ export const seedCompanyAssociation = async (
   companyId: string,
   role
 ) => {
-  const association = await prisma.companyAssociation.create({
+  return prisma.companyAssociation.create({
     data: {
       user: { connect: { id: userId } },
       company: {
@@ -31,6 +29,16 @@ export const seedCompanyAssociation = async (
       role: role
     }
   });
+};
 
-  return association;
+export const getCompanyAssociation = async (
+  userId: string,
+  companyId: string
+) => {
+  return prisma.companyAssociation.findFirst({
+    where: {
+      userId,
+      companyId
+    }
+  });
 };

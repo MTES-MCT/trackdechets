@@ -109,6 +109,9 @@ export const getCompanyDiv = async (
     .getByLabel("Filtrer mes établissements par nom, SIRET ou n° de TVA")
     .fill(siret);
 
+  // Wait for loading to end
+  await expect(page.getByTestId("loader")).not.toBeVisible();
+
   // Select the company div
   const companyDiv = page.locator(`text=${name} (${siret})`).locator("../..");
   await expect(companyDiv).toBeVisible();
