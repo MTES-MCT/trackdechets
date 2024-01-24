@@ -35,11 +35,15 @@ export default function AccountFieldCompanyVhuAgrementDemolisseur({
       <tbody>
         <tr>
           <td> Numéro de récépissé </td>
-          <td>{company.vhuAgrementDemolisseur.agrementNumber} </td>
+          <td data-testid="vhuAgrementDemolisseur_agrementNumber">
+            {company.vhuAgrementDemolisseur.agrementNumber}
+          </td>
         </tr>
         <tr>
           <td> Département</td>
-          <td>{company.vhuAgrementDemolisseur.department} </td>
+          <td data-testid="vhuAgrementDemolisseur_department">
+            {company.vhuAgrementDemolisseur.department}
+          </td>
         </tr>
       </tbody>
     </table>

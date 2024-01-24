@@ -182,6 +182,18 @@ export const activateUser = async (page: Page, { email }) => {
 };
 
 /**
+ * Will create, activate and log a user in, all at once
+ */
+export const signupActivateAndLogin = async (
+  page: Page,
+  { username, email, password }
+) => {
+  await successfulSignup(page, { username, email, password });
+  await activateUser(page, { email });
+  await successfulLogin(page, { email, password });
+};
+
+/**
  * Will navigate to the account page and verify that account data is accurate.
  * You can pass any of the input params to check them separately.
  */
