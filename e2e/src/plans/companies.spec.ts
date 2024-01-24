@@ -10,7 +10,6 @@ import {
 } from "../utils/company";
 import { seedUser } from "../seed/user";
 
-
 test.describe
   .serial("Cahier de recette de création d'établissements", async () => {
   // User credentials
@@ -24,7 +23,7 @@ test.describe
     const user = await seedUser({
       name: USER_NAME,
       email: USER_EMAIL,
-      password: USER_PASSWORD,
+      password: USER_PASSWORD
     });
 
     expect(user).not.toBeUndefined();
