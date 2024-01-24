@@ -1,5 +1,5 @@
 import { logger } from "@td/logger";
-import { clearData } from "./utils/data";
+import { clearData } from "./data/reset";
 
 const teardown = async () => {
   logger.info("Playwright global-teardown");

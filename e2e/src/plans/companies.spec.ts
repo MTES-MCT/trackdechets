@@ -8,7 +8,7 @@ import {
   updateCompanyContactInfo,
   deleteCompany
 } from "../utils/company";
-import { seedUser } from "../seed/user";
+import { seedUser } from "../data/user";
 
 test.describe
   .serial("Cahier de recette de création d'établissements", async () => {

@@ -89,10 +89,19 @@ export const getCreateButtonIndex = (roles: CompanyRole[]) => {
  * Will find the div corresponding to the targeted company, to be able to make assertions on
  * this specific company. Also enables to select chosen company sub-tab.
  */
-type CompanyTab = "Information" | "Contact" | "Signature" | "Avancé";
+type CompanyTab =
+  | "Information"
+  | "Contact"
+  | "Signature"
+  | "Avancé"
+  | "Membres";
 export const getCompanyDiv = async (
   page,
-  { siret, tab = "Information" }: { siret: string; tab?: CompanyTab }
+  {
+    siret,
+    name = "Établissement de test",
+    tab = "Information"
+  }: { siret: string; name?: string; tab?: CompanyTab }
 ) => {
   // Use the search input to narrow down the results to the company only
   // (and avoid dealing with pagination)
@@ -101,9 +110,7 @@ export const getCompanyDiv = async (
     .fill(siret);
 
   // Select the company div
-  const companyDiv = page
-    .locator(`text=Établissement de test (${siret})`)
-    .locator("../..");
+  const companyDiv = page.locator(`text=${name} (${siret})`).locator("../..");
   await expect(companyDiv).toBeVisible();
 
   // Select tab
