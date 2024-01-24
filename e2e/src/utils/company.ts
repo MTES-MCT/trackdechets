@@ -48,7 +48,7 @@ interface AmianteCertification {
 
 /**
  * In the "/account/companies/create", returns the correct "Créer votre établissement" button index
- * matchin company role.
+ * matching company role.
  */
 export const getCreateButtonIndex = (roles: CompanyRole[]) => {
   // "La gestion des déchets fait partie de votre activité"
@@ -87,22 +87,20 @@ export const getCreateButtonIndex = (roles: CompanyRole[]) => {
 
 /**
  * Will find the div corresponding to the targeted company, to be able to make assertions on
- * this specific company. Also enables to select chosen tab.
+ * this specific company. Also enables to select chosen company sub-tab.
  */
 type CompanyTab = "Information" | "Contact" | "Signature" | "Avancé";
 export const getCompanyDiv = async (
   page,
   { siret, tab = "Information" }: { siret: string; tab?: CompanyTab }
 ) => {
-  // Go to companies creation page
-  // await goTo(page, "/account/companies");
-
   // Use the search input to narrow down the results to the company only
+  // (and avoid dealing with pagination)
   await page
     .getByLabel("Filtrer mes établissements par nom, SIRET ou n° de TVA")
     .fill(siret);
 
-  // There can by multiple companies in the page. Select the correct one
+  // Select the company div
   const companyDiv = page
     .locator(`text=Établissement de test (${siret})`)
     .locator("../..");
