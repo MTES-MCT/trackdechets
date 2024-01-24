@@ -22,7 +22,6 @@ type FormCompanyFieldsProps = {
  * @param company FormCompany
  * @param isForeignShip boolean Emitter is a Foreign Ship
  * @param isPrivateIndividual boolean Emitter is a private person not a company
- * @returns
  */
 export function FormCompanyFields({
   company,
