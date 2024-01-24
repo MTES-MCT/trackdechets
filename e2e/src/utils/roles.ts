@@ -7,15 +7,15 @@ import { prisma } from "@td/prisma";
  * Enables to invite a user to a company
  */
 type Role = "Collaborateur" | "Administrateur" | "Lecteur" | "Chauffeur";
-export const sendMembershipRequest = async (
+export const inviteUserToCompany = async (
   page,
   {
     company,
     user,
     role
   }: {
-    company: { id: string; siret: string; name: string };
-    user: { id?: string; email: string };
+    company: { siret: string; name: string };
+    user: { email: string };
     role: Role;
   }
 ) => {
@@ -48,20 +48,79 @@ export const sendMembershipRequest = async (
   await expect(memberDiv.getByText("Invité")).toBeVisible();
   await expect(memberDiv.getByText("Invitation en attente")).toBeVisible();
 
-  // If user has an ID, he has an account in TD.
-  // Let's find the membership request data in the DB
-  if (user.id) {
-    const request = await prisma.membershipRequest.findFirst({
-      where: {
-        userId: user.id,
-        companyId: company.id
-      },
-      orderBy: {
-        createdAt: "desc"
-      }
-    });
-    expect(request).not.toBeUndefined();
+  // Let's find the membership request hash in the DB
+  const hash = await prisma.userAccountHash.findFirst({
+    where: {
+      email: user.email,
+      companySiret: company.siret
+    },
+    orderBy: {
+      createdAt: "desc"
+    }
+  });
 
-    return request;
+  expect(hash).not.toBeNull();
+
+  return hash;
+};
+
+/**
+ * Deletes an invitation
+ */
+export const deleteInvitation = async (
+  page,
+  {
+    company,
+    user
+  }: {
+    company: { siret: string; name: string };
+    user: { email: string };
   }
+) => {
+  // Go to companies page
+  await goTo(page, "/account/companies");
+
+  // Select correct company & correct tab
+  const companyDiv = await getCompanyDiv(page, {
+    siret: company.siret,
+    name: company.name,
+    tab: "Membres"
+  });
+
+  // Delete user invitation
+  const memberDiv = companyDiv
+    .getByRole("cell", { name: user.email })
+    .locator("..");
+  await memberDiv
+    .getByRole("button", { name: "Supprimer l'invitation" })
+    .click();
+
+  // Toast should confirm success
+  await expect(page.getByText("Invitation supprimée")).toBeVisible();
+
+  // Hash should be removed from DB
+  const hash = await prisma.userAccountHash.findFirst({
+    where: {
+      email: user.email,
+      companySiret: company.siret
+    },
+    orderBy: {
+      createdAt: "desc"
+    }
+  });
+
+  expect(hash).toBeNull();
+};
+
+/**
+ * Visits an invitation a link and will assert that it results in an error
+ */
+export const visitExpiredInvitationLink = async (page, { hash }) => {
+  // Go to link
+  goTo(page, `/invite?hash=${encodeURIComponent(hash)}`);
+
+  // Assert error
+  await expect(
+    page.getByText("ErreurCette invitation n'existe pas")
+  ).toBeVisible();
 };

@@ -1,7 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { seedCompany, seedCompanyAssociation } from "../data/company";
 import { successfulLogin } from "../utils/user";
-import { sendMembershipRequest } from "../utils/roles";
+import {
+  deleteInvitation,
+  inviteUserToCompany,
+  visitExpiredInvitationLink
+} from "../utils/roles";
 import { seedUser } from "../data/user";
 
 test.describe.serial("Cahier de recette de gestion des membres", async () => {
@@ -50,14 +54,29 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       });
     });
 
+    let userAccountHash;
+
     await test.step("Invitation d'un utilisateur non inscrit sur TD", async () => {
-      await sendMembershipRequest(page, {
+      userAccountHash = await inviteUserToCompany(page, {
         company,
         user: {
           email: "utilisateurnoninscrit@yopmail.com"
         },
         role: "Administrateur"
       });
+    });
+
+    await test.step("Suppression de l'invitation", async () => {
+      await deleteInvitation(page, {
+        company,
+        user: {
+          email: "utilisateurnoninscrit@yopmail.com"
+        }
+      });
+    });
+
+    await test.step("L'utilisateur invité tente d'utiliser le lien et reçoit une erreur", async () => {
+      await visitExpiredInvitationLink(page, { hash: userAccountHash.hash });
     });
   });
 });
