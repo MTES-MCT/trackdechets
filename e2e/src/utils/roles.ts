@@ -2,6 +2,7 @@ import { goTo } from "./navigation";
 import { getCompanyDiv } from "./company";
 import { expect } from "@playwright/test";
 import { prisma } from "@td/prisma";
+import { getHash } from "../data/userAccountHash";
 
 /**
  * Enables to invite a user to a company
@@ -49,16 +50,7 @@ export const inviteUserToCompany = async (
   await expect(memberDiv.getByText("Invitation en attente")).toBeVisible();
 
   // Let's find the membership request hash in the DB
-  const hash = await prisma.userAccountHash.findFirst({
-    where: {
-      email: user.email,
-      companySiret: company.siret
-    },
-    orderBy: {
-      createdAt: "desc"
-    }
-  });
-
+  const hash = await getHash(company.siret, user.email);
   expect(hash).not.toBeNull();
 
   return hash;
@@ -99,16 +91,7 @@ export const deleteInvitation = async (
   await expect(page.getByText("Invitation supprimée")).toBeVisible();
 
   // Hash should be removed from DB
-  const hash = await prisma.userAccountHash.findFirst({
-    where: {
-      email: user.email,
-      companySiret: company.siret
-    },
-    orderBy: {
-      createdAt: "desc"
-    }
-  });
-
+  const hash = await getHash(company.siret, user.email);
   expect(hash).toBeNull();
 };
 
@@ -123,4 +106,60 @@ export const visitExpiredInvitationLink = async (page, { hash }) => {
   await expect(
     page.getByText("ErreurCette invitation n'existe pas")
   ).toBeVisible();
+};
+
+/**
+ * Visits an invitation link as a non-registered user
+ */
+export const visitInvitationLinkAsNonRegisteredUser = async (
+  page,
+  { hash, email }
+) => {
+  // Go to link
+  goTo(page, `/invite?hash=${encodeURIComponent(hash)}`);
+
+  // Email field should already be filled
+  const emailInputValue = await page.getByLabel("Email").inputValue();
+  expect(emailInputValue).toEqual(email);
+};
+
+/**
+ * Re-sends an invitation to a pending company member
+ */
+export const resendInvitation = async (
+  page,
+  {
+    company,
+    user
+  }: {
+    company: { siret: string; name: string };
+    user: { email: string };
+  }
+) => {
+  // Go to companies page
+  await goTo(page, "/account/companies");
+
+  // Select correct company & correct tab
+  const companyDiv = await getCompanyDiv(page, {
+    siret: company.siret,
+    name: company.name,
+    tab: "Membres"
+  });
+
+  // Re-send invitation
+  const memberDiv = companyDiv
+    .getByRole("cell", { name: user.email })
+    .locator("..");
+  await memberDiv
+    .getByRole("button", { name: "Renvoyer l'invitation" })
+    .click();
+
+  // Toast should confirm success
+  await expect(page.getByText("Invitation renvoyée")).toBeVisible();
+
+  // Return the membership request hash in the DB
+  const hash = await getHash(company.siret, user.email);
+  expect(hash).not.toBeNull();
+
+  return hash;
 };
