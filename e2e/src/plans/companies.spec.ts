@@ -1,6 +1,5 @@
-import { expect } from "@playwright/test";
-import { test } from "@playwright/test";
-import { signupActivateAndLogin } from "../utils/user";
+import { expect, test } from "@playwright/test";
+import { successfulLogin } from "../utils/user";
 import {
   addAutomaticSignaturePartner,
   createWasteProducerCompany,
@@ -9,6 +8,8 @@ import {
   updateCompanyContactInfo,
   deleteCompany
 } from "../utils/company";
+import { seedUser } from "../seed/user";
+
 
 test.describe
   .serial("Cahier de recette de création d'établissements", async () => {
@@ -19,12 +20,21 @@ test.describe
 
   let transporterWithReceiptSiret;
 
+  test("Seed user", async () => {
+    const user = await seedUser({
+      name: USER_NAME,
+      email: USER_EMAIL,
+      password: USER_PASSWORD,
+    });
+
+    expect(user).not.toBeUndefined();
+  });
+
   test("Utilisateur connecté", async ({ page }) => {
-    await test.step("Création de compte & connexion", async () => {
-      await signupActivateAndLogin(page, {
+    await test.step("Log in", async () => {
+      await successfulLogin(page, {
         email: USER_EMAIL,
-        password: USER_PASSWORD,
-        username: USER_NAME
+        password: USER_PASSWORD
       });
     });
 

@@ -14,7 +14,7 @@ import { TEST_COMPANY_PREFIX } from "@td/constants";
  * In the worst case scenario, one of the user will get an error, retry,
  * and get a valid siret
  */
-async function generateTestSiret() {
+export async function generateTestSiret() {
   const testCompanies = await prisma.anonymousCompany.findMany({
     orderBy: { siret: "desc" },
     where: { siret: { startsWith: TEST_COMPANY_PREFIX } }

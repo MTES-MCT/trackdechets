@@ -51,8 +51,7 @@ export const successfulLogin = async (page: Page, { email, password }) => {
   // Login
   await login(page, { email, password });
 
-  // Make sure we are redirected to the account page & Disconnect button is visible
-  await page.waitForURL("/account/companies/create");
+  // Disconnect button should be visible
   await expect(
     page.getByRole("button", { name: "Se déconnecter" })
   ).toBeVisible();
