@@ -188,7 +188,6 @@ export const resendInvitation = async (
  * Verifies that a user has the expected access to a company,
  * with the correct role
  */
-// TODO: use everywhere!
 export const verifyCompanyAccess = async (
   page,
   {
