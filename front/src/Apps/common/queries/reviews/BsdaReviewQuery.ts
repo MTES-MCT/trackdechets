@@ -4,6 +4,7 @@ import { companyFragment } from "../fragments";
 const reviewFragment = gql`
   fragment BsdaRevisionRequestFragment on BsdaRevisionRequest {
     id
+    createdAt
     bsda {
       id
       status
@@ -130,8 +131,12 @@ const reviewFragment = gql`
 `;
 
 export const GET_BSDA_REVISION_REQUESTS = gql`
-  query BsdaRevisionRequests($siret: String!, $after: String) {
-    bsdaRevisionRequests(siret: $siret, after: $after) {
+  query BsdaRevisionRequests(
+    $siret: String!
+    $where: BsdaRevisionRequestWhere
+    $after: String
+  ) {
+    bsdaRevisionRequests(siret: $siret, where: $where, after: $after) {
       edges {
         node {
           ...BsdaRevisionRequestFragment

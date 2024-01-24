@@ -4,6 +4,7 @@ import { companyFragment } from "../fragments";
 const reviewFragment = gql`
   fragment FormRevisionRequestFragment on FormRevisionRequest {
     id
+    createdAt
     form {
       id
       status
@@ -137,8 +138,12 @@ const reviewFragment = gql`
 `;
 
 export const GET_FORM_REVISION_REQUESTS = gql`
-  query FormRevisionRequests($siret: String!, $after: String) {
-    formRevisionRequests(siret: $siret, after: $after) {
+  query FormRevisionRequests(
+    $siret: String!
+    $where: FormRevisionRequestWhere
+    $after: String
+  ) {
+    formRevisionRequests(siret: $siret, where: $where, after: $after) {
       edges {
         node {
           ...FormRevisionRequestFragment

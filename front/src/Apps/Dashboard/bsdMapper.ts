@@ -1,11 +1,8 @@
-import { Bsff, Bsdasri, Bsvhu, BsdType } from "@td/codegen-ui";
+import { Bsff, Bsdasri, Bsvhu, BsdType, Form, Bsd, Bsda } from "@td/codegen-ui";
 import {
   BsdDisplay,
   BsdStatusCode,
   BsdTypename,
-  BsdWithReview,
-  BsdaWithReview,
-  FormWithReview,
   TBsdStatusCode
 } from "../common/types/bsdTypes";
 
@@ -36,7 +33,7 @@ const mapBsdTypeNameToBsdType = (
   }
 };
 
-export const formatBsd = (bsd: BsdWithReview): BsdDisplay | null => {
+export const formatBsd = (bsd: Bsd): BsdDisplay | null => {
   switch (bsd.__typename) {
     case BsdTypename.Bsdd:
       return mapBsdd(bsd);
@@ -54,7 +51,7 @@ export const formatBsd = (bsd: BsdWithReview): BsdDisplay | null => {
   }
 };
 
-export const mapBsdd = (bsdd: FormWithReview): BsdDisplay => {
+export const mapBsdd = (bsdd: Form): BsdDisplay => {
   const bsddFormatted: BsdDisplay = {
     id: bsdd.id,
     readableid: bsdd.readableId,
@@ -67,7 +64,6 @@ export const mapBsdd = (bsdd: FormWithReview): BsdDisplay => {
       code: bsdd.wasteDetails?.code,
       name: bsdd.wasteDetails?.name,
       weight:
-        bsdd.review?.["content"]?.quantityReceived ||
         bsdd.quantityReceived ||
         bsdd.temporaryStorageDetail?.wasteDetails?.quantity ||
         bsdd.wasteDetails?.quantity
@@ -83,14 +79,14 @@ export const mapBsdd = (bsdd: FormWithReview): BsdDisplay => {
     grouping: bsdd.grouping,
     temporaryStorageDetail: bsdd.temporaryStorageDetail,
     bsdWorkflowType: bsdd.emitter?.type,
-    review: bsdd?.review,
     transporterCustomInfo: bsdd.stateSummary?.transporterCustomInfo,
-    transporterNumberPlate: bsdd.stateSummary?.transporterNumberPlate
+    transporterNumberPlate: bsdd.stateSummary?.transporterNumberPlate,
+    metadata: bsdd.metadata
   } as BsdDisplay;
   return bsddFormatted;
 };
 
-const mapBsda = (bsda: BsdaWithReview): BsdDisplay => {
+const mapBsda = (bsda: Bsda): BsdDisplay => {
   const statusCode = bsda?.status || bsda["bsdaStatus"];
   const bsdaFormatted: BsdDisplay = {
     id: bsda.id,
@@ -101,10 +97,7 @@ const mapBsda = (bsda: BsdaWithReview): BsdDisplay => {
     wasteDetails: {
       code: bsda.waste?.code || bsda.waste?.["bsdaCode"],
       name: bsda.waste?.materialName,
-      weight:
-        bsda.review?.["content"]?.destination?.reception?.weight ||
-        bsda?.destination?.reception?.weight ||
-        bsda?.weight?.value
+      weight: bsda?.destination?.reception?.weight || bsda?.weight?.value
     },
     emitter: bsda.emitter || bsda["bsdaEmitter"],
     destination: bsda.destination || bsda["bsdaDestination"],
@@ -117,12 +110,12 @@ const mapBsda = (bsda: BsdaWithReview): BsdDisplay => {
     groupedIn: bsda.groupedIn,
     forwardedIn: bsda.forwardedIn,
     grouping: bsda.grouping,
-    review: bsda?.review,
     transporterCustomInfo:
       bsda.transporter?.customInfo || bsda["bsdaTransporter"]?.customInfo,
     transporterNumberPlate:
       bsda.transporter?.transport?.plates ||
-      bsda["bsdaTransporter"]?.transport?.plates
+      bsda["bsdaTransporter"]?.transport?.plates,
+    metadata: bsda.metadata
   };
   return bsdaFormatted;
 };

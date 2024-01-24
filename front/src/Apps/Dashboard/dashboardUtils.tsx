@@ -538,11 +538,10 @@ export const getBsdCurrentTab = ({
   isActTab,
   isFollowTab,
   isArchivesTab,
-  isReviewsTab,
   isToCollectTab,
-  isCollectedTab
-  // isReviewedTab,
-  // isToReviewedTab,
+  isCollectedTab,
+  isReviewedTab,
+  isToReviewTab
 }): BsdCurrentTab => {
   if (isDraftTab) {
     return "draftTab";
@@ -556,15 +555,12 @@ export const getBsdCurrentTab = ({
   if (isArchivesTab) {
     return "archivesTab";
   }
-  if (isReviewsTab) {
-    return "reviewsTab";
+  if (isReviewedTab) {
+    return "reviewedTab";
   }
-  // if (isReviewedTab) {
-  //   return "reviewedTab";
-  // }
-  // if (isToReviewedTab) {
-  //   return "toReviewedTab";
-  // }
+  if (isToReviewTab) {
+    return "toReviewTab";
+  }
   if (isToCollectTab) {
     return "toCollectTab";
   }

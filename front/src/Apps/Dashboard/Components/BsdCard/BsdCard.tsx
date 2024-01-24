@@ -26,7 +26,7 @@ import {
   useBsffDownloadPdf,
   useBsvhuDownloadPdf
 } from "../Pdf/useDownloadPdf";
-import { BsdType, UserPermission } from "@td/codegen-ui";
+import { BsdType, RevisionRequestStatus, UserPermission } from "@td/codegen-ui";
 import {
   useBsdaDuplicate,
   useBsdasriDuplicate,
@@ -55,14 +55,15 @@ function BsdCard({
     onRevision,
     onBsdSuite,
     onAppendix1,
-    onDeleteReview,
+    onConsultReview,
     onEmitterDasriSign,
     onEmitterBsddSign
   },
   hasAutomaticSignature
 }: BsdCardProps) {
   const { permissions } = usePermissions();
-  const isReviewsTab = bsdCurrentTab === "reviewsTab";
+  const isReviewsTab =
+    bsdCurrentTab === "reviewedTab" || bsdCurrentTab === "toReviewTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
   const bsdDisplay = getBsdView(bsd);
@@ -231,6 +232,13 @@ function BsdCard({
   const pickupSiteName =
     bsdDisplay?.emitter?.pickupSite?.name ||
     bsdDisplay?.emitter?.workSite?.name;
+
+  const latestRevision = bsdDisplay?.metadata?.latestRevision;
+  const reviewStatus = isReviewsTab
+    ? latestRevision?.status
+    : latestRevision?.status === RevisionRequestStatus.Pending
+    ? latestRevision?.status
+    : null;
   return (
     <>
       <div className="bsd-card" tabIndex={0}>
@@ -329,7 +337,7 @@ function BsdCard({
                     status={bsdDisplay.status}
                     isDraft={bsdDisplay.isDraft}
                     bsdType={bsdDisplay.type}
-                    reviewStatus={bsdDisplay?.review?.status}
+                    reviewStatus={reviewStatus}
                     operationCode={
                       bsdDisplay?.destination?.["operation"]?.["code"] ||
                       bsdDisplay?.destination?.["plannedOperationCode"]
@@ -389,7 +397,7 @@ function BsdCard({
                     onPdf,
                     onAppendix1,
                     onBsdSuite,
-                    onDeleteReview,
+                    onConsultReview,
                     onEmitterDasriSign,
                     onEmitterBsddSign
                   }}

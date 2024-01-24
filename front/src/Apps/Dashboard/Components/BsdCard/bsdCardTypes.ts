@@ -29,7 +29,7 @@ export interface BsdCardProps {
     onRevision?: Function;
     onBsdSuite?: Function;
     onAppendix1?: Function;
-    onDeleteReview?: Function;
+    onConsultReview?: Function;
     onEmitterDasriSign?: Function;
     onEmitterBsddSign?: Function;
   };
