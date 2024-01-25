@@ -115,5 +115,4 @@ ALTER TABLE
     DROP COLUMN "transporterTransportMode",
     DROP COLUMN "transporterTransportPlates",
     DROP COLUMN "transporterTransportSignatureAuthor",
-    DROP COLUMN "transporterTransportSignatureDate",
     DROP COLUMN "transporterTransportTakenOverAt";

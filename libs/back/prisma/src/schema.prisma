@@ -1388,6 +1388,11 @@ model Bsda {
   brokerRecepisseDepartment    String?
   brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
+  // Date de signature du premier transporteur 
+  // Cette valeur est dupliqué entre le modèle Bsda et BsdaTransporter[0]
+  // pour optimiser certains calculs
+  transporterTransportSignatureDate DateTime? @db.Timestamptz(6)
+
   destinationCompanyName          String?
   destinationCompanySiret         String?
   destinationCompanyAddress       String?

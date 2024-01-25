@@ -20,12 +20,41 @@ export default async function duplicate(
   const prismaBsda = await getBsdaOrNotFound(id, {
     include: { intermediaries: true, transporters: true }
   });
+  const transporter = getFirstTransporterSync(prismaBsda)!;
 
   await checkCanDuplicate(user, prismaBsda);
 
-  const sirenified = (await sirenify(prismaBsda, [])) as typeof prismaBsda;
+  // FIXME - En attente d'une meilleure solution lors de l'implémentation du
+  // multi-modal.
+  // Sirenify s'applique normalement sur les données transporteur "à plat"
+  // dans le contact de la validation Zod. Pour pouvoir l'utiliser ici on
+  // doit remettre les données à plat puis reconstruire une version de `transporters`
+  // avec les données transporteurs "sirenified".
+  const {
+    transporterCompanySiret,
+    transporterCompanyName,
+    transporterCompanyAddress,
+    ...sirenifiedBsda
+  } = await sirenify(
+    {
+      ...prismaBsda,
+      transporterCompanySiret: transporter.transporterCompanySiret,
+      transporterCompanyName: transporter.transporterCompanyName,
+      transporterCompanyAddress: transporter.transporterCompanyAddress
+    },
+    []
+  );
 
-  const data = await duplicateBsda(sirenified);
+  const sirenifiedTransporter = {
+    ...transporter,
+    transporterCompanyName,
+    transporterCompanyAddress
+  };
+
+  const data = await duplicateBsda({
+    ...sirenifiedBsda,
+    transporters: [sirenifiedTransporter]
+  });
 
   const newBsda = await getBsdaRepository(user).create(data);
 
@@ -65,15 +94,29 @@ async function duplicateBsda({
   groupedInId,
   intermediaries,
   intermediariesOrgIds,
+  transporters,
   // values that should be duplicated
   ...bsda
 }: BsdaForDuplicate): Promise<Prisma.BsdaCreateInput> {
-  const transporter = getFirstTransporterSync(bsda);
+  const {
+    id: transporterId,
+    createdAt: transporterCreatedAt,
+    updatedAt: transporterUpdatedAt,
+    bsdaId,
+    transporterTransportPlates,
+    number,
+    transporterTransportTakenOverAt,
+    transporterTransportSignatureAuthor,
+    transporterTransportSignatureDate,
+    transporterCustomInfo,
+    // transporter values that should be duplicated
+    ...transporter
+  } = getFirstTransporterSync({ transporters })!;
 
   const companiesOrgIds: string[] = [
     bsda.emitterCompanySiret,
-    transporter?.transporterCompanySiret,
-    transporter?.transporterCompanyVatNumber,
+    transporter.transporterCompanySiret,
+    transporter.transporterCompanyVatNumber,
     bsda.brokerCompanySiret,
     bsda.workerCompanySiret,
     bsda.destinationCompanySiret
@@ -104,8 +147,8 @@ async function duplicateBsda({
   );
   const transporterCompany = companies.find(
     company =>
-      company.orgId === transporter?.transporterCompanySiret ||
-      company.orgId === transporter?.transporterCompanyVatNumber
+      company.orgId === transporter.transporterCompanySiret ||
+      company.orgId === transporter.transporterCompanyVatNumber
   );
   const worker = companies.find(
     company => company.orgId === bsda.workerCompanySiret
@@ -178,15 +221,16 @@ async function duplicateBsda({
     transporters: {
       create: {
         number: 1,
+        ...transporter,
         // Transporter company info
         transporterCompanyMail:
           transporterCompany?.contactEmail ??
-          transporter?.transporterCompanyMail,
+          transporter.transporterCompanyMail,
         transporterCompanyPhone:
           transporterCompany?.contactPhone ??
-          transporter?.transporterCompanyPhone,
+          transporter.transporterCompanyPhone,
         transporterCompanyContact:
-          transporterCompany?.contact ?? transporter?.transporterCompanyContact,
+          transporterCompany?.contact ?? transporter.transporterCompanyContact,
         // Transporter recepisse
         transporterRecepisseNumber:
           transporterCompany?.transporterReceipt?.receiptNumber ?? null,
