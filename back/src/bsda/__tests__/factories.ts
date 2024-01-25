@@ -12,6 +12,15 @@ export const bsdaFactory = async ({
 }) => {
   const bsdaObject = getBsdaObject();
 
+  await upsertBaseSiret(
+    (
+      bsdaObject.transporters!
+        .create! as Prisma.BsdaTransporterCreateWithoutBsdaInput
+    ).transporterCompanySiret // Prisma.BsdaTransporterCreateWithoutBsdaInput[] is wrongly infered
+  );
+  await upsertBaseSiret(bsdaObject.destinationCompanySiret);
+  await upsertBaseSiret(bsdaObject.workerCompanySiret);
+
   const data: Prisma.BsdaCreateInput = {
     ...bsdaObject,
     ...opt,
@@ -19,13 +28,6 @@ export const bsdaFactory = async ({
       create: { ...bsdaObject.transporters!.create!, ...transporterOpt }
     }
   };
-
-  await upsertBaseSiret(
-    (data.transporters!.create! as Prisma.BsdaTransporterCreateWithoutBsdaInput) // Prisma.BsdaTransporterCreateWithoutBsdaInput[] is wrongly infered
-      .transporterCompanySiret
-  );
-  await upsertBaseSiret(data.destinationCompanySiret);
-  await upsertBaseSiret(data.workerCompanySiret);
 
   const created = await prisma.bsda.create({
     data: data,

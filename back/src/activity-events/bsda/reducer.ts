@@ -70,7 +70,6 @@ function fixMissTypings(
   const patch = {
     ...update,
     wasteSealNumbers: update.wasteSealNumbers as string[],
-    transporterTransportPlates: "",
     packagings: update.packagings as Prisma.JsonValue,
     emitterEmissionSignatureDate: update.emitterEmissionSignatureDate
       ? new Date(update.emitterEmissionSignatureDate.toString())
