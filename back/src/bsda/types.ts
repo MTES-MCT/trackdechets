@@ -1,5 +1,14 @@
 import { Prisma } from "@prisma/client";
 
+export const BsdaWithTransportersInclude =
+  Prisma.validator<Prisma.BsdaInclude>()({
+    transporters: true
+  });
+
+export type BsdaWithTransporters = Prisma.BsdaGetPayload<{
+  include: typeof BsdaWithTransportersInclude;
+}>;
+
 export const BsdaWithIntermediariesInclude =
   Prisma.validator<Prisma.BsdaInclude>()({
     intermediaries: true

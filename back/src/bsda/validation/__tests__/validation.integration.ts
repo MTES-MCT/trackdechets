@@ -9,9 +9,11 @@ import { bsdaFactory } from "../../__tests__/factories";
 import { bsdaSchema } from "../schema";
 import { parseBsdaInContext } from "../index";
 import { prisma } from "@td/prisma";
+import { getFirstTransporterSync } from "../../database";
+import { BsdaWithTransporters } from "../../types";
 
 describe("BSDA validation", () => {
-  let bsda: Bsda;
+  let bsda: BsdaWithTransporters;
 
   beforeEach(async () => {
     bsda = await bsdaFactory({});
@@ -188,7 +190,12 @@ describe("BSDA validation", () => {
     test("when transporter is not registered in Trackdéchets", async () => {
       const data = {
         ...bsda,
-        transporterCompanySiret: "85001946400021"
+        transporters: [
+          {
+            ...bsda.transporters[0],
+            transporterCompanySiret: "85001946400021"
+          }
+        ]
       };
 
       expect.assertions(1);
@@ -208,7 +215,12 @@ describe("BSDA validation", () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
       const data = {
         ...bsda,
-        transporterCompanySiret: company.siret
+        transporters: [
+          {
+            ...bsda.transporters[0],
+            transporterCompanySiret: company.siret
+          }
+        ]
       };
 
       expect.assertions(1);
@@ -324,11 +336,16 @@ describe("BSDA validation", () => {
       const data = {
         ...bsda,
         type: BsdaType.OTHER_COLLECTIONS,
-        transporterCompanySiret: transporterCompany.siret,
-        transporterCompanyVatNumber: null,
-        transporterRecepisseIsExempted: false,
-        transporterRecepisseNumber: null,
-        transporterRecepisseDepartment: null
+        transporters: [
+          {
+            ...bsda.transporters[0],
+            transporterCompanySiret: transporterCompany.siret,
+            transporterCompanyVatNumber: null,
+            transporterRecepisseIsExempted: false,
+            transporterRecepisseNumber: null,
+            transporterRecepisseDepartment: null
+          }
+        ]
       };
 
       try {
@@ -355,8 +372,13 @@ describe("BSDA validation", () => {
     it("transporter plate is required if transporter mode is ROAD", async () => {
       const data = {
         ...bsda,
-        transporterTransportMode: "ROAD",
-        transporterTransportPlates: undefined
+        transporters: [
+          {
+            ...bsda.transporters[0],
+            transporterTransportMode: "ROAD",
+            transporterTransportPlates: undefined
+          }
+        ]
       };
       expect.assertions(1);
 
@@ -468,8 +490,13 @@ describe("BSDA validation", () => {
       const data = {
         ...bsda,
         emittedCompanySiret: emitterAndTransporter.siret,
-        transporterCompanySiret: emitterAndTransporter.siret,
-        transporterRecepisseIsExempted: false
+        transporters: [
+          {
+            ...bsda.transporters[0],
+            transporterCompanySiret: emitterAndTransporter.siret,
+            transporterRecepisseIsExempted: false
+          }
+        ]
       };
 
       expect.assertions(1);
@@ -632,10 +659,12 @@ describe("BSDA Sealed rules checks", () => {
       opt: {
         workerCompanySiret: company.siret,
         destinationCompanySiret: company.siret,
-        transporterCompanySiret: company.siret,
         destinationOperationNextDestinationCompanySiret:
           nextDestinationCompany.siret,
         status: "SIGNED_BY_PRODUCER"
+      },
+      transporterOpt: {
+        transporterCompanySiret: company.siret
       }
     });
 
@@ -853,7 +882,9 @@ describe("BSDA Sealed rules checks", () => {
       opt: {
         status: "SENT",
         emitterEmissionSignatureDate: new Date(),
-        workerWorkSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
+      },
+      transporterOpt: {
         transporterTransportSignatureDate: new Date()
       }
     });
@@ -869,7 +900,7 @@ describe("BSDA Sealed rules checks", () => {
               }
             }
           },
-          persisted: bsda as any
+          persisted: bsda
         },
         { currentSignatureType: "OPERATION" }
       );
@@ -898,10 +929,13 @@ describe("BSDA Sealed rules checks", () => {
       }
     });
 
+    const transporter = getFirstTransporterSync(bsda)!;
     await parseBsdaInContext(
       {
         input: {
-          transporter: { company: { siret: bsda.transporterCompanySiret } },
+          transporter: {
+            company: { siret: transporter.transporterCompanySiret }
+          },
           intermediaries: [
             {
               siret: intermediary.siret,
@@ -911,7 +945,7 @@ describe("BSDA Sealed rules checks", () => {
             }
           ]
         },
-        persisted: bsda as any
+        persisted: bsda
       },
       {}
     );

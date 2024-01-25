@@ -42,7 +42,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     );
   }
 
-  const bsda = await parseBsdaInContext(
+  const { bsda, transporter } = await parseBsdaInContext(
     { input, isDraft },
     {
       enableCompletionTransformers: true,
@@ -67,12 +67,18 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
         }
       : undefined;
 
+  // On crée un premier transporteur par défaut (même si tous les champs sont nuls)
+  // Cela permet dans un premier temps d'être raccord avec le modèle "à plat"
+  // en attendant l'implémentation du multi-modal
+  const transporters = { create: { ...transporter, number: 1 } };
+
   const bsdaRepository = getBsdaRepository(user);
   const newBsda = await bsdaRepository.create({
     ...bsda,
     forwarding,
     grouping,
-    intermediaries
+    intermediaries,
+    transporters
   });
 
   return expandBsdaFromDb(newBsda);

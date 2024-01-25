@@ -10,11 +10,15 @@ import {
   formPartiallyRefused
 } from "@td/mail";
 import { Decimal } from "decimal.js-light";
+import { BsdaWithTransporters } from "../types";
+import { getFirstTransporterSync } from "../database";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
+type BsdaForRenderRefusal = Bsda & BsdaWithTransporters;
+
 export async function renderBsdaRefusedEmail(
-  bsda: Bsda,
+  bsda: BsdaForRenderRefusal,
   notifyDreal = NOTIFY_DREAL_WHEN_FORM_DECLINED === "true"
 ): Promise<Mail | undefined> {
   const attachmentData = {
@@ -71,6 +75,8 @@ export async function renderBsdaRefusedEmail(
     PARTIALLY_REFUSED: formPartiallyRefused
   }[bsda.destinationReceptionAcceptationStatus!];
 
+  const transporter = getFirstTransporterSync(bsda);
+
   return renderMail(mailTemplate, {
     to,
     cc,
@@ -86,10 +92,11 @@ export async function renderBsdaRefusedEmail(
         recipientCompanyName: bsda.destinationCompanyName,
         recipientCompanySiret: bsda.destinationCompanySiret,
         wasteRefusalReason: bsda.destinationReceptionRefusalReason,
-        transporterIsExemptedOfReceipt: bsda.transporterRecepisseIsExempted,
-        transporterCompanyName: bsda.transporterCompanyName,
-        transporterCompanySiret: bsda.transporterCompanySiret,
-        transporterReceipt: bsda.transporterRecepisseNumber,
+        transporterIsExemptedOfReceipt:
+          transporter?.transporterRecepisseIsExempted,
+        transporterCompanyName: transporter?.transporterCompanyName,
+        transporterCompanySiret: transporter?.transporterCompanySiret,
+        transporterReceipt: transporter?.transporterRecepisseNumber,
         sentBy: bsda.emitterEmissionSignatureAuthor,
         quantityReceived: bsda.destinationReceptionWeight
           ? new Decimal(bsda.destinationReceptionWeight)

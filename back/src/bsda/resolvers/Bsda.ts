@@ -12,14 +12,14 @@ export const Bsda: BsdaResolvers = {
     }
     const forwardingBsda = await getReadonlyBsdaRepository()
       .findRelatedEntity({ id: bsda.id })
-      .forwardedIn();
+      .forwardedIn({ include: { transporters: true } });
 
     return forwardingBsda ? expandBsdaFromDb(forwardingBsda) : null;
   },
   forwarding: async ({ id }) => {
     const forwardedBsda = await getReadonlyBsdaRepository()
       .findRelatedEntity({ id })
-      .forwarding();
+      .forwarding({ include: { transporters: true } });
     return forwardedBsda
       ? toInitialBsda(expandBsdaFromDb(forwardedBsda))
       : null;
@@ -27,7 +27,7 @@ export const Bsda: BsdaResolvers = {
   grouping: async ({ id }) => {
     const grouping = await getReadonlyBsdaRepository()
       .findRelatedEntity({ id })
-      .grouping();
+      .grouping({ include: { transporters: true } });
     return grouping?.map(bsda => toInitialBsda(expandBsdaFromDb(bsda))) ?? [];
   },
   groupedIn: async (bsda, _, ctx) => {
@@ -37,7 +37,7 @@ export const Bsda: BsdaResolvers = {
     }
     const groupedIn = await getReadonlyBsdaRepository()
       .findRelatedEntity({ id: bsda.id })
-      .groupedIn();
+      .groupedIn({ include: { transporters: true } });
     return groupedIn ? expandBsdaFromDb(groupedIn) : null;
   },
   intermediaries: async bsda => {

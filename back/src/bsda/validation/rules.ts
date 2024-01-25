@@ -1,7 +1,6 @@
 import {
   BsdaType,
   TransportMode,
-  Prisma,
   WasteAcceptationStatus
 } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
@@ -15,26 +14,18 @@ import { UnparsedInputs } from ".";
 
 export type EditableBsdaFields = Required<
   Omit<
-    Prisma.BsdaCreateInput,
+    ZodBsda,
     | "id"
-    | "createdAt"
-    | "updatedAt"
     | "isDraft"
     | "isDeleted"
-    | "status"
-    | "emitterEmissionSignatureDate"
     | "emitterEmissionSignatureAuthor"
+    | "emitterEmissionSignatureDate"
+    | "destinationOperationSignatureAuthor"
+    | "destinationOperationSignatureDate"
     | "transporterTransportSignatureAuthor"
     | "transporterTransportSignatureDate"
     | "workerWorkSignatureAuthor"
     | "workerWorkSignatureDate"
-    | "destinationOperationSignatureAuthor"
-    | "destinationOperationSignatureDate"
-    | "groupedInId"
-    | "forwardingId"
-    | "groupedIn"
-    | "forwardedIn"
-    | "bsdaRevisionRequests"
     | "intermediariesOrgIds"
   >
 >;

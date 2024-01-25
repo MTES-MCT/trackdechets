@@ -8,7 +8,7 @@ import {
   getUserFunctions
 } from "./helpers";
 import { checkSealedAndRequiredFields, getSealedFields } from "./rules";
-import { bsdaSchema } from "./schema";
+import { ZodBsda, bsdaSchema } from "./schema";
 import { runTransformers } from "./transformers";
 
 export type BsdaValidationContext = {
@@ -18,14 +18,15 @@ export type BsdaValidationContext = {
   user?: User;
 };
 
-const existingBsdaForParsing = Prisma.validator<Prisma.BsdaInclude>()({
+export const BsdaForParsingInclude = Prisma.validator<Prisma.BsdaInclude>()({
   intermediaries: true,
   grouping: true,
-  forwarding: true
+  forwarding: true,
+  transporters: true
 });
 
 type BsdaForParsing = Prisma.BsdaGetPayload<{
-  include: typeof existingBsdaForParsing;
+  include: typeof BsdaForParsingInclude;
 }>;
 
 export type UnparsedInputs = {
@@ -78,5 +79,49 @@ export async function parseBsdaInContext(
       await applyDynamicRefinement(val, validationContext, ctx);
     });
 
-  return contextualSchema.parseAsync(unparsedBsda);
+  const zodBsda = await contextualSchema.parseAsync(unparsedBsda);
+
+  const {
+    transporterCompanySiret,
+    transporterCompanyName,
+    transporterCompanyVatNumber,
+    transporterCompanyAddress,
+    transporterCompanyContact,
+    transporterCompanyPhone,
+    transporterCompanyMail,
+    transporterCustomInfo,
+    transporterRecepisseIsExempted,
+    transporterRecepisseNumber,
+    transporterRecepisseDepartment,
+    transporterRecepisseValidityLimit,
+    transporterTransportMode,
+    transporterTransportPlates,
+    transporterTransportTakenOverAt,
+    ...bsda
+  } = zodBsda;
+
+  // Au niveau du schéma Zod, tout se passe comme si les données de transport
+  // était encore "à plat" avec un seul transporteur (en attendant l'implémentation du multi-modal)
+  // On renvoie séparement les données du bsda et les données du transporteur
+  // car elles font ensuite l'objet de traitement séparé pour construire les payloads de création / update
+  return {
+    bsda,
+    transporter: {
+      transporterCompanySiret,
+      transporterCompanyName,
+      transporterCompanyVatNumber,
+      transporterCompanyAddress,
+      transporterCompanyContact,
+      transporterCompanyPhone,
+      transporterCompanyMail,
+      transporterCustomInfo,
+      transporterRecepisseIsExempted,
+      transporterRecepisseNumber,
+      transporterRecepisseDepartment,
+      transporterRecepisseValidityLimit,
+      transporterTransportMode,
+      transporterTransportPlates,
+      transporterTransportTakenOverAt
+    }
+  };
 }

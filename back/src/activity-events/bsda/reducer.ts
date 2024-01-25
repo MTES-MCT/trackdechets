@@ -68,7 +68,6 @@ function fixMissTypings(
   const patch = {
     ...update,
     wasteSealNumbers: update.wasteSealNumbers as string[],
-    transporterTransportPlates: update.transporterTransportPlates as string[],
     packagings: update.packagings as Prisma.JsonValue,
     emitterEmissionSignatureDate: update.emitterEmissionSignatureDate
       ? new Date(update.emitterEmissionSignatureDate.toString())
@@ -84,15 +83,6 @@ function fixMissTypings(
       : undefined,
     destinationOperationSignatureDate: update.destinationOperationSignatureDate
       ? new Date(update.destinationOperationSignatureDate.toString())
-      : undefined,
-    transporterRecepisseValidityLimit: update.transporterRecepisseValidityLimit
-      ? new Date(update.transporterRecepisseValidityLimit.toString())
-      : undefined,
-    transporterTransportTakenOverAt: update.transporterTransportTakenOverAt
-      ? new Date(update.transporterTransportTakenOverAt.toString())
-      : undefined,
-    transporterTransportSignatureDate: update.transporterTransportSignatureDate
-      ? new Date(update.transporterTransportSignatureDate.toString())
       : undefined,
     workerWorkSignatureDate: update.workerWorkSignatureDate
       ? new Date(update.workerWorkSignatureDate.toString())

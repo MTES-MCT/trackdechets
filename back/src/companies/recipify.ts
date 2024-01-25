@@ -3,7 +3,14 @@ import {
   BsdasriRecepisseInput
 } from "../generated/graphql/types";
 import { prisma } from "@td/prisma";
-import { Bsda, Bsdasri, Bsff, Bsvhu, BspaohTransporter } from "@prisma/client";
+import {
+  Bsda,
+  Bsdasri,
+  Bsff,
+  Bsvhu,
+  BspaohTransporter,
+  BsdaTransporter
+} from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 
 type RecipifyOutput = {
@@ -105,7 +112,7 @@ export interface BsdTransporterReceiptPart {
 }
 
 export async function getTransporterReceipt(
-  existingBsd: Bsdasri | Bsvhu | Bsda | Bsff | BspaohTransporter
+  existingBsd: Bsdasri | Bsvhu | BsdaTransporter | Bsff | BspaohTransporter
 ): Promise<BsdTransporterReceiptPart> {
   // fetch TransporterReceipt
   const orgId = getTransporterCompanyOrgId(existingBsd);

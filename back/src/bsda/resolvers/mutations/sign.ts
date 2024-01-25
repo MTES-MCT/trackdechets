@@ -29,11 +29,16 @@ import { Mail, finalDestinationModified, renderMail } from "@td/mail";
 import { checkCanSignFor } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
-import { getBsdaHistory, getBsdaOrNotFound } from "../../database";
+import {
+  getBsdaHistory,
+  getBsdaOrNotFound,
+  getFirstTransporterSync
+} from "../../database";
 import { machine } from "../../machine";
 import { renderBsdaRefusedEmail } from "../../mails/refused";
 import { BsdaRepository, getBsdaRepository } from "../../repository";
 import { parseBsdaInContext } from "../../validation";
+import { BsdaWithTransporters } from "../../types";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,
@@ -43,7 +48,12 @@ const signBsda: MutationResolvers["signBsda"] = async (
   const user = checkIsAuthenticated(context);
 
   const bsda = await getBsdaOrNotFound(id, {
-    include: { intermediaries: true, grouping: true, forwarding: true }
+    include: {
+      intermediaries: true,
+      grouping: true,
+      forwarding: true,
+      transporters: true
+    }
   });
 
   const authorizedOrgIds = getAuthorizedOrgIds(bsda, input.type);
@@ -59,7 +69,7 @@ const signBsda: MutationResolvers["signBsda"] = async (
   // transporter receipt is set on the profile
   let transporterReceipt = {};
   if (input.type === "TRANSPORT") {
-    transporterReceipt = await getTransporterReceipt(bsda);
+    transporterReceipt = await getTransporterReceipt(bsda.transporters[0]);
   }
 
   // Check that all necessary fields are filled
@@ -89,7 +99,7 @@ export default signBsda;
  * @returns a list of organisation identifiers
  */
 export function getAuthorizedOrgIds(
-  bsda: Bsda,
+  bsda: BsdaForSignature,
   signatureType: BsdaSignatureType
 ): string[] {
   const signatureTypeToFn: {
@@ -97,10 +107,13 @@ export function getAuthorizedOrgIds(
   } = {
     EMISSION: (bsda: Bsda) => [bsda.emitterCompanySiret],
     WORK: (bsda: Bsda) => [bsda.workerCompanySiret],
-    TRANSPORT: (bsda: Bsda) => [
-      bsda.transporterCompanySiret,
-      bsda.transporterCompanyVatNumber
-    ],
+    TRANSPORT: (bsda: BsdaForSignature) => {
+      const transporter = getFirstTransporterSync(bsda)!;
+      return [
+        transporter.transporterCompanySiret,
+        transporter.transporterCompanyVatNumber
+      ];
+    },
     OPERATION: (bsda: Bsda) => [bsda.destinationCompanySiret]
   };
 
@@ -109,10 +122,16 @@ export function getAuthorizedOrgIds(
   return getAuthorizedSiretsFn(bsda).filter(Boolean);
 }
 
+type BsdaForSignature = Bsda & BsdaWithTransporters;
+
 // Defines different signature function based on signature type
 const signatures: Record<
   BsdaSignatureType,
-  (user: Express.User, bsda: Bsda, input: BsdaSignatureInput) => Promise<Bsda>
+  (
+    user: Express.User,
+    bsda: BsdaForSignature,
+    input: BsdaSignatureInput
+  ) => Promise<BsdaWithTransporters>
 > = {
   EMISSION: signEmission,
   WORK: signWork,
@@ -167,23 +186,36 @@ async function signWork(
 
 async function signTransport(
   user: Express.User,
-  bsda: Bsda,
+  bsda: BsdaForSignature,
   input: BsdaSignatureInput & BsdTransporterReceiptPart
 ) {
-  if (bsda.transporterTransportSignatureDate !== null) {
+  const transporter = getFirstTransporterSync(bsda)!;
+
+  if (transporter.transporterTransportSignatureDate !== null) {
     throw new AlreadySignedError();
   }
 
   const nextStatus = await getNextStatus(bsda, input.type);
 
+  const signatureDate = new Date(input.date ?? Date.now());
+
   const updateInput: Prisma.BsdaUpdateInput = {
-    transporterTransportSignatureAuthor: input.author,
-    transporterTransportSignatureDate: new Date(input.date ?? Date.now()),
     status: nextStatus,
-    // auto-complete transporter receipt
-    transporterRecepisseDepartment: input.transporterRecepisseDepartment,
-    transporterRecepisseNumber: input.transporterRecepisseNumber,
-    transporterRecepisseValidityLimit: input.transporterRecepisseValidityLimit
+    transporterTransportSignatureDate: signatureDate,
+    transporters: {
+      update: {
+        where: { id: transporter.id },
+        data: {
+          transporterTransportSignatureAuthor: input.author,
+          transporterTransportSignatureDate: signatureDate,
+          // auto-complete transporter receipt
+          transporterRecepisseDepartment: input.transporterRecepisseDepartment,
+          transporterRecepisseNumber: input.transporterRecepisseNumber,
+          transporterRecepisseValidityLimit:
+            input.transporterRecepisseValidityLimit
+        }
+      }
+    }
   };
 
   return updateBsda(user, bsda, updateInput);
@@ -191,7 +223,7 @@ async function signTransport(
 
 async function signOperation(
   user: Express.User,
-  bsda: Bsda,
+  bsda: BsdaForSignature,
   input: BsdaSignatureInput
 ) {
   if (bsda.destinationOperationSignatureDate !== null) {

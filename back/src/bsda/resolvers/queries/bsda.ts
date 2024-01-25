@@ -12,7 +12,8 @@ export default async function bsda(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const bsda = await getBsdaOrNotFound(id);
+  const bsda = await getBsdaOrNotFound(id, { include: { transporters: true } });
+
   await checkCanRead(user, bsda);
 
   return expandBsdaFromDb(bsda);
