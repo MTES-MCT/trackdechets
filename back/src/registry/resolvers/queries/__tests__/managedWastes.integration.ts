@@ -95,7 +95,6 @@ describe("Managed wastes registry", () => {
     bsd2 = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         destinationCompanySiret: destination.company.siret,
         brokerCompanySiret: broker.company.siret,
         wasteCode: "08 01 17*",
@@ -104,10 +103,14 @@ describe("Managed wastes registry", () => {
         destinationReceptionWeight: 500,
         emitterEmissionSignatureDate: new Date("2021-05-01"),
         transporterTransportSignatureDate: new Date("2021-05-01"),
-        transporterTransportTakenOverAt: new Date("2021-05-01"),
         destinationReceptionDate: new Date("2021-05-01"),
         destinationOperationDate: new Date("2021-05-01"),
         destinationOperationCode: "D 5"
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret,
+        transporterTransportSignatureDate: new Date("2021-05-01"),
+        transporterTransportTakenOverAt: new Date("2021-05-01")
       }
     });
 
