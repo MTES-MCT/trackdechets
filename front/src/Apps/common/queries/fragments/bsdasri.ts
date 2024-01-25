@@ -276,3 +276,6 @@ export const fullDasriFragment = gql`
   ${wasteAcceptationFragment}
   ${initialDasriFragment}
 `;
+
+
+

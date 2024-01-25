@@ -156,7 +156,7 @@ export const bsvhuPublishDraft = `Cette action aura pour effet de démarrer le c
             <strong>“Pour action”</strong> du tableau de bord de l'émetteur. Le
             bordereau pourra toujours être modifié ou supprimé tant qu'aucune
             signature n'a été apposée.`;
-
+export const bpaohPublishDraft = bsvhuPublishDraft;
 // tabs
 export const ALL_BSDS = "Tous les bordereaux";
 export const ALL_REVIEWS = "Toutes les révisions";

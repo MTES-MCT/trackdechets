@@ -4,7 +4,8 @@ import {
   dashboardVhuFragment,
   dashboardBsdaFragment,
   dashboardBsffFragment,
-  dashboardFormFragment
+  dashboardFormFragment,
+  dashboardBspaohFragment
 } from "../fragments";
 
 export const GET_BSDS = gql`
@@ -39,6 +40,9 @@ export const GET_BSDS = gql`
           ... on Bsda {
             ...DashboardBsdaFragment
           }
+          ... on Bspaoh {
+            ...DashboardBspaohFragment
+          }
         }
       }
       pageInfo {
@@ -53,4 +57,5 @@ export const GET_BSDS = gql`
   ${dashboardBsffFragment}
   ${dashboardVhuFragment}
   ${dashboardBsdaFragment}
+  ${dashboardBspaohFragment}
 `;

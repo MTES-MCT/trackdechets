@@ -70,11 +70,23 @@ export const BSFF_VERBOSE_STATUSES: Record<string, string> = {
   PARTIALLY_REFUSED: "Refusé partiellement, en attente de traitement"
 };
 
+export const BSPAOH_VERBOSE_STATUSES: Record<string, string> = {
+  ...STATUS_LABELS,
+  INITIAL: "Initial",
+  SIGNED_BY_PRODUCER: "Signé par l'émetteur",
+  SENT: "Envoyé",
+  RECEIVED: "Reçu",
+  PROCESSED: "Traité",
+  REFUSED: "Refusé",
+
+};
+
 export const formatStatusLabel = (_, bsd) => {
   if (bsd.bsdType === "BSDD") return STATUS_LABELS[bsd.status];
   if (bsd.bsdType === "BSVHU") return VHU_VERBOSE_STATUSES[bsd.status];
   if (bsd.bsdType === "BSFF") return BSFF_VERBOSE_STATUSES[bsd.status];
   if (bsd.bsdType === "BSDASRI") return DASRI_VERBOSE_STATUSES[bsd.status];
   if (bsd.bsdType === "BSDA") return BSDA_VERBOSE_STATUSES[bsd.status];
+  if (bsd.bsdType === "BSPAOH") return BSPAOH_VERBOSE_STATUSES[bsd.status];
   return "";
 };

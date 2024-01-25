@@ -28,7 +28,8 @@ import {
   RouteBSDasView,
   RouteBSDDsView,
   RouteBsffsView,
-  RouteBsvhusView
+  RouteBsvhusView,
+  RouteBspaohsView
 } from "../../dashboard/detail";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
 import { usePermissions } from "../../common/contexts/PermissionsContext";
@@ -196,6 +197,11 @@ function DashboardRoutes() {
           <Route
             path={toRelative(routes.dashboard.bsdas.view)}
             element={<RouteBSDasView />}
+          />
+
+          <Route
+            path={toRelative(routes.dashboard.bspaohs.view)}
+            element={<RouteBspaohsView />}
           />
 
           <Route
@@ -470,6 +476,20 @@ function DashboardRoutes() {
                   wide={true}
                 >
                   <RouteBSDasView />
+                </Modal>
+              }
+            />
+            <Route
+              path={toRelative(routes.dashboard.bspaohs.view)}
+              element={
+                <Modal
+                  onClose={goBack}
+                  ariaLabel="Aperçu du bordereau"
+                  isOpen
+                  padding={false}
+                  wide={true}
+                >
+                  <RouteBspaohsView />
                 </Modal>
               }
             />

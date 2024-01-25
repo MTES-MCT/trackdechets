@@ -48,7 +48,8 @@ export enum BsdTypename {
   Bsda = "Bsda",
   Bsdasri = "Bsdasri",
   Bsvhu = "Bsvhu",
-  Bsff = "Bsff"
+  Bsff = "Bsff",
+  Bspaoh = "Bspaoh"
 }
 
 export const BsdStatusCode = {
