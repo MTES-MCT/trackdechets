@@ -6,7 +6,8 @@ import {
   MutationMarkAsSealedArgs,
   MutationPublishBsdaArgs,
   MutationPublishBsffArgs,
-  MutationPublishBsvhuArgs
+  MutationPublishBsvhuArgs,
+  MutationPublishBspaohArgs
 } from "@td/codegen-ui";
 import { statusChangeFragment } from "../../../../common/queries/fragments";
 import toast from "react-hot-toast";
@@ -17,7 +18,8 @@ import {
   bsdaPublishDraft,
   bsddValidationDraftText,
   bsffPublishDraft,
-  bsvhuPublishDraft
+  bsvhuPublishDraft,
+  bpaohPublishDraft
 } from "../../../../common/wordings/dashboard/wordingsDashboard";
 import { generatePath, Link } from "react-router-dom";
 import routes from "../../../../routes";
@@ -52,6 +54,14 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
   const PUBLISH_BSVHU = gql`
     mutation PublishBsvhu($id: ID!) {
       publishBsvhu(id: $id) {
+        id
+        isDraft
+      }
+    }
+  `;
+  const PUBLISH_BSPAOH = gql`
+    mutation PublishBsvpaoh($id: ID!) {
+      publishBspaoh(id: $id) {
         id
         isDraft
       }
@@ -111,6 +121,25 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
       PUBLISH_BSVHU,
       {
         variables: { id: bsd.id },
+        onCompleted: () => {
+          toast.success(`Bordereau ${bsd.id} publié`, {
+            duration: TOAST_DURATION
+          });
+        },
+        onError: () =>
+          toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
+            duration: TOAST_DURATION
+          })
+      }
+    );
+
+  const [publishBspaoh, { loading: loadingBspaoh, error: errorBspaoh }] =
+    useMutation<Pick<Mutation, "publishBspaoh">, MutationPublishBspaohArgs>(
+      PUBLISH_BSPAOH,
+      {
+        variables: { id: bsd.id },
+        refetchQueries: [GET_BSDS],
+        awaitRefetchQueries: true,
         onCompleted: () => {
           toast.success(`Bordereau ${bsd.id} publié`, {
             duration: TOAST_DURATION
@@ -297,11 +326,60 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
         </div>
       );
     }
+
+    if (bsd.__typename === "Bspaoh") {
+      return (
+        <div>
+          <p dangerouslySetInnerHTML={{ __html: bpaohPublishDraft }} />
+
+          <div className="td-modal-actions">
+            <button className="btn btn--outline-primary" onClick={onClose}>
+              Annuler
+            </button>
+            <button
+              className="btn btn--primary"
+              onClick={async () => {
+                const res = await publishBspaoh({
+                  variables: {
+                    id: bsd.id
+                  }
+                });
+                if (!res.errors) {
+                  onClose();
+                }
+              }}
+            >
+              <span>Publier le bordereau</span>
+            </button>
+          </div>
+
+          {errorBspaoh && (
+            <>
+              <NotificationError
+                className="action-error"
+                apolloError={errorBspaoh}
+              />
+              <Link
+                to={generatePath(routes.dashboard.bsvhus.edit, {
+                  siret: currentSiret,
+                  id: bsd.id
+                })}
+                className="btn btn--primary"
+              >
+                Mettre le bordereau à jour pour le publier
+              </Link>
+            </>
+          )}
+          {loadingBspaoh && <Loader />}
+        </div>
+      );
+    }
   };
 
   return (
     <TdModal isOpen={isOpen} onClose={onClose} ariaLabel={renderTitle()}>
       <h2 className="td-modal-title">{renderTitle()}</h2>
+
       {renderContent()}
     </TdModal>
   );

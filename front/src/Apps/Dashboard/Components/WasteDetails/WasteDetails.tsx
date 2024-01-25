@@ -5,6 +5,7 @@ import {
   IconBSVhuThin as IconBSVhu,
   IconBSDDThin as IconBSDD,
   IconBSDasriThin as IconBSDasri,
+  IconBSPaohThin as IconBSPaoh,
   IconWeight
 } from "../../../common/Components/Icons/Icons";
 import { WasteDetailsProps } from "./wasteTypes";
@@ -29,6 +30,8 @@ function WasteDetails({
         return <IconBSDasri />;
       case BsdType.Bsff:
         return <IconBSFF />;
+        case BsdType.Bspaoh:
+          return <IconBSPaoh />;
       default:
         break;
     }

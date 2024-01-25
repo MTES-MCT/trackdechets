@@ -494,6 +494,8 @@ export const getOverviewPath = bsd => {
       return routes.dashboard.bsffs.view;
     case BsdType.Bsvhu:
       return routes.dashboard.bsvhus.view;
+    case BsdType.Bspaoh:
+      return routes.dashboard.bspaohs.view;
 
     default:
       break;

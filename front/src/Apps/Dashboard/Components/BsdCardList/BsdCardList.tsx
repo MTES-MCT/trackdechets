@@ -117,7 +117,8 @@ function BsdCardList({
       if (
         bsd.__typename === "Bsda" ||
         bsd.__typename === "Bsff" ||
-        bsd.__typename === "Bsvhu"
+        bsd.__typename === "Bsvhu" ||
+        bsd.__typename === "Bspaoh"
       ) {
         setValidationWorkflowType("INITIAL_DRAFT");
         setBsdClicked(bsd);
@@ -262,7 +263,8 @@ function BsdCardList({
           bsd["bsdaStatus"] ||
           bsd["bsffStatus"] ||
           bsd["bsdasriStatus"] ||
-          bsd["bsvhuStatus"];
+          bsd["bsvhuStatus"] ||
+          bsd["bspaohStatus"];
         if (status === FormStatus.Draft || bsd["isDraft"]) {
           handleDraftValidation(bsd as Bsd);
         } else {
