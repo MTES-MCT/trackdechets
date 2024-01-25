@@ -16,11 +16,14 @@ const createInput = {
   codeCommune: "00000"
 };
 
+const mockCreateAnonymous = jest.fn();
+const mockFindAnonymous = jest.fn();
+
 jest.mock("@td/prisma", () => ({
   prisma: {
     anonymousCompany: {
-      create: jest.fn(() => Promise.resolve(createInput)),
-      findUnique: jest.fn(() => Promise.resolve(createInput))
+      create: jest.fn((...args) => mockCreateAnonymous(...args)),
+      findUnique: jest.fn((...args) => mockFindAnonymous(...args))
     },
     company: {
       findUnique: jest.fn(() => Promise.resolve(null)),
@@ -36,6 +39,16 @@ jest.mock("../sirene/searchCompanies", () => ({
 }));
 
 describe("searchCompany by org identifier", () => {
+  beforeEach(() => {
+    mockCreateAnonymous.mockImplementation(() => Promise.resolve(createInput));
+    mockFindAnonymous.mockImplementation(() => Promise.resolve(createInput));
+  });
+
+  afterEach(() => {
+    mockCreateAnonymous.mockReset();
+    mockFindAnonymous.mockReset();
+  });
+
   it(`should throw BAD_USER_INPUT error if
     the clue is not a valid VAT number`, async () => {
     expect.assertions(1);
@@ -107,6 +120,33 @@ describe("searchCompany by org identifier", () => {
     const testCompany = await searchCompany(siret!);
     expect(siret).toEqual(testCompany.siret);
     expect("FR").toEqual(testCompany.codePaysEtrangerEtablissement);
+  });
+
+  it(`should allow searching foreign anonymous company`, async () => {
+    const createInputForeign = {
+      siret: "",
+      orgId: "IT00818740151",
+      name: "Établissement de test",
+      address: "Adresse test",
+      codeNaf: "XXXXX",
+      libelleNaf: "Entreprise de test",
+      codeCommune: "00000",
+      vatNumber: "IT00818740151"
+    };
+    mockCreateAnonymous.mockImplementation(() =>
+      Promise.resolve(createInputForeign)
+    );
+    mockFindAnonymous.mockImplementation(() =>
+      Promise.resolve(createInputForeign)
+    );
+    await prisma.anonymousCompany.create({
+      data: {
+        ...createInputForeign
+      }
+    });
+    const testCompany = await searchCompany(createInputForeign.vatNumber!);
+    expect(createInputForeign.vatNumber).toEqual(testCompany.orgId);
+    expect("IT").toEqual(testCompany.codePaysEtrangerEtablissement);
   });
 });
 
