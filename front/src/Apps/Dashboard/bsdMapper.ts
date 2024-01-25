@@ -58,6 +58,7 @@ export const mapBsdd = (bsdd: FormWithReview): BsdDisplay => {
   const bsddFormatted: BsdDisplay = {
     id: bsdd.id,
     readableid: bsdd.readableId,
+    customId: bsdd.customId,
     type: mapBsdTypeNameToBsdType(bsdd.__typename) || BsdType.Bsdd,
     isDraft: bsdd.status === BsdStatusCode.Draft,
     emitterType: bsdd.emitter?.type,

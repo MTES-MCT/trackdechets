@@ -76,6 +76,7 @@ export type TBsdStatusCode = (typeof BsdStatusCode)[TBsdStatusCodeKeys];
 export interface BsdDisplay {
   id: string;
   readableid: string;
+  customId?: string;
   type: BsdType;
   isDraft: boolean;
   status: TBsdStatusCode;
