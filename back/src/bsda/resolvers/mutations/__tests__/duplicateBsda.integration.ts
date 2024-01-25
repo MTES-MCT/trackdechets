@@ -91,15 +91,6 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
       workerCertificationHasSubSectionThree:
         workerCertification.hasSubSectionThree,
       workerCertificationValidityLimit: workerCertification.validityLimit,
-      transporterCompanySiret: transporter.company.siret,
-      transporterCompanyName: transporter.company.name,
-      transporterCompanyAddress: transporter.company.address,
-      transporterCompanyContact: transporter.company.contact,
-      transporterCompanyPhone: transporter.company.contactPhone,
-      transporterCompanyMail: transporter.company.contactEmail,
-      transporterRecepisseNumber: transporterReceipt.receiptNumber,
-      transporterRecepisseDepartment: transporterReceipt.department,
-      transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
       destinationCompanySiret: destination.company.siret,
       destinationCompanyName: destination.company.name,
       destinationCompanyAddress: destination.company.address,
@@ -116,6 +107,17 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
       brokerRecepisseDepartment: brokerReceipt.department,
       brokerRecepisseValidityLimit: brokerReceipt.validityLimit,
       ...opt
+    },
+    transporterOpt: {
+      transporterCompanySiret: transporter.company.siret,
+      transporterCompanyName: transporter.company.name,
+      transporterCompanyAddress: transporter.company.address,
+      transporterCompanyContact: transporter.company.contact,
+      transporterCompanyPhone: transporter.company.contactPhone,
+      transporterCompanyMail: transporter.company.contactEmail,
+      transporterRecepisseNumber: transporterReceipt.receiptNumber,
+      transporterRecepisseDepartment: transporterReceipt.department,
+      transporterRecepisseValidityLimit: transporterReceipt.validityLimit
     }
   });
 

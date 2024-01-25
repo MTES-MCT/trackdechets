@@ -87,7 +87,7 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
 
   const transporter = getFirstTransporterSync(bsda);
 
-  const formSirets: Partial<
+  const bsdaSirets: Partial<
     Record<keyof Bsda | "transporterCompanySiret", string | null | undefined>
   > = {
     emitterCompanySiret: bsda.emitterCompanySiret,
@@ -101,7 +101,7 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
   };
 
   const siretsFilters = new Map<string, keyof typeof where>(
-    Object.entries(formSirets)
+    Object.entries(bsdaSirets)
       .filter(([_, siret]) => Boolean(siret))
       .map(([actor, _]) => [actor, "isFollowFor"])
   );
@@ -176,7 +176,7 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
 
   for (const [fieldName, filter] of siretsFilters.entries()) {
     if (fieldName) {
-      where[filter].push(formSirets[fieldName]);
+      where[filter].push(bsdaSirets[fieldName]);
     }
   }
 

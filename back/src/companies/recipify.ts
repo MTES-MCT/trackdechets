@@ -4,7 +4,6 @@ import {
 } from "../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
-  Bsda,
   Bsdasri,
   Bsff,
   Bsvhu,

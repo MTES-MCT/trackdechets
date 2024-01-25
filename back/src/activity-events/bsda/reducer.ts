@@ -14,6 +14,7 @@ export function bsdaReducer(
         intermediaries,
         wasteSealNumbers,
         intermediariesOrgIds,
+        transporters,
         ...bsda
       } = event.data;
 
@@ -30,6 +31,7 @@ export function bsdaReducer(
         grouping,
         intermediaries,
         intermediariesOrgIds,
+        transporters,
         ...bsda
       } = event.data;
 
@@ -68,6 +70,7 @@ function fixMissTypings(
   const patch = {
     ...update,
     wasteSealNumbers: update.wasteSealNumbers as string[],
+    transporterTransportPlates: "",
     packagings: update.packagings as Prisma.JsonValue,
     emitterEmissionSignatureDate: update.emitterEmissionSignatureDate
       ? new Date(update.emitterEmissionSignatureDate.toString())

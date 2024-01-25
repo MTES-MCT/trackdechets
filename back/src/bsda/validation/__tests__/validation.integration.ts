@@ -1,4 +1,4 @@
-import { Bsda, BsdaType, UserRole } from "@prisma/client";
+import { BsdaType, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   companyFactory,

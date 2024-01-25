@@ -196,7 +196,9 @@ describe("Mutation.Bsda.sign", () => {
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const bsda = await bsdaFactory({
         opt: {
-          emitterCompanySiret: emitter.company.siret,
+          emitterCompanySiret: emitter.company.siret
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret
         }
       });
@@ -224,7 +226,9 @@ describe("Mutation.Bsda.sign", () => {
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const bsda = await bsdaFactory({
         opt: {
-          emitterCompanySiret: emitter.company.siret,
+          emitterCompanySiret: emitter.company.siret
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret
         }
       });
@@ -257,7 +261,9 @@ describe("Mutation.Bsda.sign", () => {
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const bsda = await bsdaFactory({
         opt: {
-          emitterCompanySiret: emitter.company.siret,
+          emitterCompanySiret: emitter.company.siret
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret
         }
       });
@@ -323,7 +329,9 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           emitterCompanySiret: emitter.company.siret,
           emitterEmissionSignatureDate: null,
-          emitterEmissionSignatureAuthor: null,
+          emitterEmissionSignatureAuthor: null
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret
         }
       });
@@ -454,7 +462,9 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureAuthor: "Emétteur",
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "worker",
-          workerWorkSignatureDate: new Date(),
+          workerWorkSignatureDate: new Date()
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret,
           transporterRecepisseIsExempted: true,
           transporterTransportMode: "ROAD",
@@ -491,7 +501,9 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureAuthor: "Emétteur",
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "worker",
-          workerWorkSignatureDate: new Date(),
+          workerWorkSignatureDate: new Date()
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret,
           transporterRecepisseIsExempted: true,
           transporterTransportMode: "ROAD",
@@ -534,7 +546,9 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureAuthor: "Emétteur",
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "worker",
-          workerWorkSignatureDate: new Date(),
+          workerWorkSignatureDate: new Date()
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret,
           transporterTransportMode: "ROAD",
           transporterTransportPlates: ["AA-00-XX"],
@@ -576,7 +590,9 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureAuthor: "Emétteur",
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "worker",
-          workerWorkSignatureDate: new Date(),
+          workerWorkSignatureDate: new Date()
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret,
           transporterRecepisseNumber: null // Missing recepisse
         }
@@ -618,7 +634,9 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureAuthor: "Emétteur",
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "worker",
-          workerWorkSignatureDate: new Date(),
+          workerWorkSignatureDate: new Date()
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret,
           transporterRecepisseNumber: transporterReceipt.receiptNumber,
           transporterRecepisseDepartment: transporterReceipt.department,
@@ -660,7 +678,9 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureDate: new Date(),
           workerIsDisabled: true,
           workerCompanySiret: null,
-          workerCompanyName: null,
+          workerCompanyName: null
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret,
           transporterRecepisseNumber: transporterReceipt.receiptNumber,
           transporterRecepisseDepartment: transporterReceipt.department,
@@ -699,7 +719,9 @@ describe("Mutation.Bsda.sign", () => {
           emitterCompanySiret: null,
           workerIsDisabled: true,
           workerCompanySiret: null,
-          workerCompanyName: null,
+          workerCompanyName: null
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret,
           transporterRecepisseNumber: transporterReceipt.receiptNumber,
           transporterRecepisseDepartment: transporterReceipt.department,
@@ -741,13 +763,15 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "Worker",
           workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret,
           transporterTransportSignatureAuthor: "Transporter",
           transporterTransportSignatureDate: new Date(),
           transporterRecepisseNumber: transporterReceipt.receiptNumber,
           transporterRecepisseDepartment: transporterReceipt.department,
-          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
-          destinationCompanySiret: company.siret
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
         }
       });
 
@@ -781,15 +805,17 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "Worker",
           workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "D 15",
+          destinationOperationMode: undefined
+        },
+        transporterOpt: {
           transporterCompanySiret: transporter.company.siret,
           transporterTransportSignatureAuthor: "Transporter",
           transporterTransportSignatureDate: new Date(),
           transporterRecepisseNumber: transporterReceipt.receiptNumber,
           transporterRecepisseDepartment: transporterReceipt.department,
-          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
-          destinationCompanySiret: company.siret,
-          destinationOperationCode: "D 15",
-          destinationOperationMode: undefined
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
         }
       });
 
@@ -819,10 +845,12 @@ describe("Mutation.Bsda.sign", () => {
           status: "INITIAL",
           type: "COLLECTION_2710",
           destinationCompanySiret: company.siret,
-          transporterCompanyName: null,
-          transporterCompanySiret: null,
           workerCompanyName: null,
           workerCompanySiret: null
+        },
+        transporterOpt: {
+          transporterCompanyName: null,
+          transporterCompanySiret: null
         }
       });
 
@@ -853,10 +881,12 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "Worker",
           workerWorkSignatureDate: new Date(),
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
           destinationCompanySiret: company.siret,
           destinationOperationCode: null // Missing operation code
+        },
+        transporterOpt: {
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date()
         }
       });
 
@@ -900,14 +930,16 @@ describe("Mutation.Bsda.sign", () => {
       const bsda1 = await bsdaFactory({
         opt: {
           emitterCompanySiret: emitter.siret,
-          transporterCompanySiret: transporter.siret,
-          transporterRecepisseNumber: transporterReceipt.receiptNumber,
-          transporterRecepisseDepartment: transporterReceipt.department,
-          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr1.siret,
           status: BsdaStatus.AWAITING_CHILD,
           destinationOperationCode: "D 9",
           destinationOperationMode: "ELIMINATION"
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
         }
       });
 
@@ -915,15 +947,17 @@ describe("Mutation.Bsda.sign", () => {
       const bsda2 = await bsdaFactory({
         opt: {
           emitterCompanySiret: emitter.siret,
-          transporterCompanySiret: transporter.siret,
-          transporterRecepisseNumber: transporterReceipt.receiptNumber,
-          transporterRecepisseDepartment: transporterReceipt.department,
-          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr2.siret,
           destinationOperationCode: "D 9",
           destinationOperationMode: "ELIMINATION",
           status: BsdaStatus.AWAITING_CHILD,
           forwarding: { connect: { id: bsda1.id } }
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
         }
       });
       // bsda1 => bsda2 => bsda3
@@ -931,14 +965,16 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           status: BsdaStatus.SENT,
           emitterCompanySiret: ttr2.siret,
-          transporterCompanySiret: transporter.siret,
-          transporterRecepisseNumber: transporterReceipt.receiptNumber,
-          transporterRecepisseDepartment: transporterReceipt.department,
-          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: destination.siret,
           destinationOperationCode: "D 9",
           destinationOperationMode: "ELIMINATION",
           forwarding: { connect: { id: bsda2.id } }
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
         }
       });
 
@@ -976,10 +1012,12 @@ describe("Mutation.Bsda.sign", () => {
           emitterCompanySiret: company.siret,
           status: "INITIAL",
           type: "COLLECTION_2710",
-          transporterCompanyName: null,
-          transporterCompanySiret: null,
           workerCompanyName: null,
           workerCompanySiret: null
+        },
+        transporterOpt: {
+          transporterCompanyName: null,
+          transporterCompanySiret: null
         }
       });
 
@@ -1054,43 +1092,49 @@ describe("Mutation.Bsda.sign", () => {
       const bsda = await bsdaFactory({
         opt: {
           emitterCompanySiret: ttr1.siret,
-          transporterCompanySiret: transporter.siret,
-          transporterRecepisseNumber: transporterReceipt.receiptNumber,
-          transporterRecepisseDepartment: transporterReceipt.department,
-          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: destination.siret,
           status: BsdaStatus.SENT,
           destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
           destinationReceptionRefusalReason: "Invalid bsda, cant accept",
           destinationReceptionWeight: 0,
           destinationOperationCode: null
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
         }
       });
 
       const grouped1 = await bsdaFactory({
         opt: {
           emitterCompanySiret: emitter.siret,
-          transporterCompanySiret: transporter.siret,
-          transporterRecepisseNumber: transporterReceipt.receiptNumber,
-          transporterRecepisseDepartment: transporterReceipt.department,
-          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr1.siret,
           destinationOperationCode: "R 13",
           status: BsdaStatus.AWAITING_CHILD,
           groupedIn: { connect: { id: bsda.id } }
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
         }
       });
       const grouped2 = await bsdaFactory({
         opt: {
           status: BsdaStatus.AWAITING_CHILD,
           emitterCompanySiret: emitter.siret,
-          transporterCompanySiret: transporter.siret,
-          transporterRecepisseNumber: transporterReceipt.receiptNumber,
-          transporterRecepisseDepartment: transporterReceipt.department,
-          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr1.siret,
           destinationOperationCode: "R 13",
           groupedIn: { connect: { id: bsda.id } }
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
         }
       });
 
@@ -1140,23 +1184,21 @@ describe("Mutation.Bsda.sign", () => {
       const forwarded = await bsdaFactory({
         opt: {
           emitterCompanySiret: emitter.siret,
-          transporterCompanySiret: transporter.siret,
-          transporterRecepisseNumber: transporterReceipt.receiptNumber,
-          transporterRecepisseDepartment: transporterReceipt.department,
-          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: ttr1.siret,
           status: BsdaStatus.AWAITING_CHILD,
           destinationOperationCode: "R 13"
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
         }
       });
 
       const forwarding = await bsdaFactory({
         opt: {
           emitterCompanySiret: emitter.siret,
-          transporterCompanySiret: transporter.siret,
-          transporterRecepisseNumber: transporterReceipt.receiptNumber,
-          transporterRecepisseDepartment: transporterReceipt.department,
-          transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
           destinationCompanySiret: destination.siret,
           destinationReceptionWeight: 0,
           destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
@@ -1164,6 +1206,12 @@ describe("Mutation.Bsda.sign", () => {
           destinationOperationCode: null,
           status: BsdaStatus.SENT,
           forwarding: { connect: { id: forwarded.id } }
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.siret,
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
         }
       });
 

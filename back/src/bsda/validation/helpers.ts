@@ -6,7 +6,6 @@ import { SIGNATURES_HIERARCHY } from "./constants";
 import { UnparsedInputs } from "./index";
 import { getUserCompanies } from "../../users/database";
 import { getFirstTransporterSync } from "../database";
-import { ZodBsda } from "./schema";
 
 /**
  * Computes an unparsed BSDA by merging the GQL input and

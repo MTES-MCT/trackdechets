@@ -8,7 +8,7 @@ import {
   getUserFunctions
 } from "./helpers";
 import { checkSealedAndRequiredFields, getSealedFields } from "./rules";
-import { ZodBsda, bsdaSchema } from "./schema";
+import { bsdaSchema } from "./schema";
 import { runTransformers } from "./transformers";
 
 export type BsdaValidationContext = {
