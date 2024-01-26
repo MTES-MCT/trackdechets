@@ -1,4 +1,5 @@
 import { Page, expect } from "@playwright/test";
+import { logScreenshot } from "./debug";
 
 /**
  * Tests that clicking on a link redirects to the expected page, testing both URL & page label
@@ -16,6 +17,7 @@ export const testNavigation = async (
   await page.getByRole("link", { name: linkLabel }).click();
 
   // Check redirection
+  await logScreenshot(page);
   await page.waitForURL(targetUrl);
 
   // Check page label
