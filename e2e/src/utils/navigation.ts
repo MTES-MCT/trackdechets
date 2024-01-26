@@ -13,14 +13,10 @@ export const testNavigation = async (
   page: Page,
   { linkLabel, targetUrl, targetPageLabel }: TestNavigationProps
 ) => {
-  console.log("before ====================================")
-  await logScreenshot(page);
   // Click on button
   await page.getByRole("link", { name: linkLabel }).click();
 
   // Check redirection
-  console.log("after ====================================")
-  await logScreenshot(page);
   await page.waitForURL(targetUrl);
 
   // Check page label
@@ -41,11 +37,4 @@ export const goTo = async (page, path) => {
   if (currentPath !== path) {
     await page.goto(path);
   }
-};
-
-/**
- * Enables to test current URL
- */
-export const checkCurrentURL = async (page, path) => {
-  await expect(new URL(page.url()).pathname).toEqual(path);
 };

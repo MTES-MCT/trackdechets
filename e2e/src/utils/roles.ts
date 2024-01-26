@@ -1,7 +1,7 @@
 import { goTo } from "./navigation";
 import { getCompanyDiv } from "./company";
 import { expect } from "@playwright/test";
-import { getHash } from "../data/userAccountHash";
+import { getUserAccountHash } from "../data/userAccountHash";
 import { getCompanyAssociation } from "../data/company";
 
 /**
@@ -69,7 +69,7 @@ export const inviteUserToCompany = async (
     return association;
   } else {
     // Let's find the userAccountHash hash in the DB
-    const hash = await getHash(company.siret, user.email);
+    const hash = await getUserAccountHash(company.siret, user.email);
     expect(hash).not.toBeNull();
 
     return hash;
@@ -111,7 +111,7 @@ export const deleteInvitation = async (
   await expect(page.getByText("Invitation supprimée")).toBeVisible();
 
   // Hash should be removed from DB
-  const hash = await getHash(company.siret, user.email);
+  const hash = await getUserAccountHash(company.siret, user.email);
   expect(hash).toBeNull();
 };
 
@@ -178,7 +178,7 @@ export const resendInvitation = async (
   await expect(page.getByText("Invitation renvoyée")).toBeVisible();
 
   // Return the membership request hash in the DB
-  const hash = await getHash(company.siret, user.email);
+  const hash = await getUserAccountHash(company.siret, user.email);
   expect(hash).not.toBeNull();
 
   return hash;
