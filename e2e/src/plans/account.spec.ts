@@ -77,14 +77,14 @@ test.describe
     await test.step("Clic sur 'Mes bordereaux' > redirige vers la page 'Etablissements'", async () => {
       await testNavigation(page, {
         linkLabel: "Mes bordereaux",
-        targetUrl: "/account/companies/create"
+        targetUrl: "**/account/companies/create"
       });
     });
 
     await test.step("Clic sur 'Mon compte' > redirige vers la page 'Informations générales'", async () => {
       await testNavigation(page, {
         linkLabel: "Mon compte",
-        targetUrl: "/account/info",
+        targetUrl: "**/account/info",
         targetPageLabel: "Informations générales"
       });
     });
