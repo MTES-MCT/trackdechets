@@ -16,6 +16,9 @@ export const testNavigation = async (
   // Click on button
   await page.getByRole("link", { name: linkLabel }).click();
 
+  // Wait for loading to end
+  await expect(page.getByTestId("loader")).not.toBeVisible();
+
   // Check redirection
   await page.waitForURL(targetUrl);
 
@@ -37,4 +40,11 @@ export const goTo = async (page, path) => {
   if (currentPath !== path) {
     await page.goto(path);
   }
+};
+
+/**
+ * Enables to test current URL
+ */
+export const checkCurrentURL = async (page, path) => {
+  await expect(new URL(page.url()).pathname).toEqual(path);
 };
