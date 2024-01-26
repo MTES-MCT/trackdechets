@@ -242,6 +242,12 @@ function BsdCard({
 
                 {isMobile && <div className="bsd-card-border" />}
                 <div className="bsd-card__header__infos">
+                  {bsdDisplay.customId && (
+                    <InfoWithIcon
+                      labelCode={InfoIconCode.CustomId}
+                      info={bsdDisplay.customId}
+                    />
+                  )}
                   {bsdDisplay?.isTempStorage && (
                     <InfoWithIcon labelCode={InfoIconCode.TempStorage} />
                   )}

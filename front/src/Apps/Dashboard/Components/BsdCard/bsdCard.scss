@@ -21,7 +21,7 @@
     display: flex;
     flex-direction: column;
     color: #161616;
-    padding: 2px 8px;
+    padding: 2px 15px;
 
     p {
       font-size: 0.875rem; //14px
@@ -32,7 +32,7 @@
       flex-wrap: wrap;
 
       p {
-        padding: 0 5px;
+        padding: 0 5px 0 0;
       }
     }
 
@@ -49,12 +49,22 @@
         p {
           padding: 0 10px;
         }
+        .label-icon-editable {
+          p {
+            padding: 0 0 0 10px;
+          }
+          span {
+            padding-right: 10px;
+          }
+        }
       }
     }
 
-    .bsd-number {
+    .bsd-number,
+    .bsd-custom-id {
       font-size: 0.875rem; //14px
       color: #161616;
+      width: 240px;
     }
     .workflow-type {
       display: flex;
@@ -65,6 +75,11 @@
         background-image: url("/icons/dashboard/icon-bsd-workflow-type.svg");
         width: 24px;
         height: 24px;
+        margin-left: -4px;
+
+        @include desktop {
+          margin-left: 0;
+        }
       }
     }
   }
@@ -72,7 +87,7 @@
   &__content {
     display: flex;
     flex-direction: column;
-    padding: 2px 8px;
+    padding: 2px 15px;
     flex-wrap: wrap;
 
     @include desktop {
@@ -84,6 +99,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      width: 100%;
 
       &__status {
         width: 100%;
@@ -92,8 +108,13 @@
           margin: 5px 0;
           width: fit-content;
         }
+
+        @include desktop {
+          width: 90%;
+          padding: 0 10px;
+        }
       }
-      .waste-details,
+
       .actors {
         width: 100%;
       }
@@ -101,7 +122,7 @@
       @include desktop {
         flex-direction: row;
         align-items: center;
-        flex: 2;
+        width: 80%;
       }
     }
 
@@ -110,12 +131,14 @@
       justify-content: flex-end;
       align-items: center;
 
-      .fr-btn {
-        margin: 10px 2px;
+      > div {
+        .fr-btn {
+          margin-left: 2px;
+        }
       }
 
       @include desktop {
-        flex: 1;
+        width: 20%;
       }
     }
   }

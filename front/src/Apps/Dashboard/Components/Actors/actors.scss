@@ -16,9 +16,12 @@
 
     & > span {
       display: inline-block;
-      width: 150px;
+      width: 210px;
       @include desktop {
-        width: 170px;
+        width: 140px;
+      }
+      @include lg-desktop {
+        width: 250px;
       }
       white-space: nowrap;
       overflow: hidden;
@@ -28,9 +31,12 @@
     &:after {
       position: absolute;
       content: attr(data-truncate);
-      left: 175px;
+      left: 230px;
       @include desktop {
-        left: 190px;
+        left: 160px;
+      }
+      @include lg-desktop {
+        left: 270px;
       }
       white-space: nowrap;
     }
