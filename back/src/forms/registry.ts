@@ -184,7 +184,9 @@ export function toIncomingWaste(
 }
 
 export function toOutgoingWaste(
-  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
+  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] } & {
+    forwardedIn: Bsdd;
+  }
 ): Required<OutgoingWaste> {
   const initialEmitter: Record<string, string | string[] | null> = {
     initialEmitterCompanyAddress: null,
@@ -237,7 +239,11 @@ export function toOutgoingWaste(
     weight: bsdd.weightValue,
     emitterCustomInfo: null,
     destinationCompanyMail: bsdd.destinationCompanyMail,
-    ...getOperationData(bsdd)
+    ...getOperationData(bsdd),
+    destinationForwardedInReceptionOperationCode:
+      bsdd.forwardedIn?.destinationOperationCode ?? null,
+    destinationForwardedInReceptionWeight:
+      bsdd.forwardedIn?.destinationReceptionWeight ?? null
   };
 }
 

@@ -93,14 +93,28 @@ export async function searchBsds(
   return body.hits;
 }
 
-export const RegistryFormInclude = {
+type RegistryFormIncludeType = {
+  forwarding: { include: { transporters: boolean } };
+  forwardedIn?: { include: { transporters?: boolean } };
+  grouping: {
+    include: {
+      initialForm: {
+        include: { transporters: boolean };
+      };
+    };
+  };
+  transporters: boolean;
+};
+
+export const RegistryFormInclude: RegistryFormIncludeType = {
   forwarding: { include: { transporters: true } },
+  forwardedIn: { include: { transporters: true } },
   grouping: { include: { initialForm: { include: { transporters: true } } } },
   transporters: true
 };
 
 export type RegistryForm = Prisma.FormGetPayload<{
-  include: typeof RegistryFormInclude;
+  include: RegistryFormIncludeType;
 }>;
 
 export const RegistryBsdaInclude = Prisma.validator<Prisma.BsdaInclude>()({

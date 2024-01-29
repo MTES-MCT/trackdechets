@@ -211,3 +211,40 @@ export const WASTES_REGISTRY_XLS = gql`
     }
   }
 `;
+
+export const OUTGOING_WASTES_TTR = gql`
+  query OutgoingWastes(
+    $sirets: [String!]!
+    $where: WasteRegistryWhere
+    $first: Int
+    $after: ID
+    $last: Int
+    $before: ID
+  ) {
+    outgoingWastes(
+      sirets: $sirets
+      where: $where
+      first: $first
+      after: $after
+      last: $last
+      before: $before
+    ) {
+      totalCount
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      edges {
+        cursor
+        node {
+          id
+          emitterCompanySiret
+          destinationForwardedInReceptionWeight
+          destinationForwardedInReceptionOperationCode
+        }
+      }
+    }
+  }
+`;

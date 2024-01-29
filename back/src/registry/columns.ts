@@ -188,6 +188,16 @@ export const columns: Column[] = [
     format: formatBoolean
   },
   {
+    field: "destinationForwardedInReceptionOperationCode",
+    label: "Opération finale réalisée par la traçabilité suite",
+    format: formatOperationCode
+  },
+  {
+    field: "destinationForwardedInReceptionWeight",
+    label: "Quantité liée",
+    format: formatNumber
+  },
+  {
     field: "transporter2CompanyName",
     label: "Transporteur n°2 raison sociale"
   },
