@@ -78,7 +78,7 @@ export const BSPAOH_VERBOSE_STATUSES: Record<string, string> = {
   RECEIVED: "Reçu",
   PROCESSED: "Traité",
   REFUSED: "Refusé",
-
+  PARTIALLY_REFUSED: "Refus partiel"
 };
 
 export const formatStatusLabel = (_, bsd) => {

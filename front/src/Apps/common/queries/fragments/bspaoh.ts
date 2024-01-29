@@ -58,12 +58,25 @@ export const dashboardBspaohFragment = gql`
 
 export const fullBspaohFragment = gql`
   fragment BspaohFragment on Bspaoh {
+    createdAt
+    updatedAt
     id
     bspaohStatus: status
     isDraft
-    bspaohWaste: waste {
+    waste {
       code
+      adr
       type
+      packagings {
+        id
+        type
+        volume
+        containerNumber
+        identificationCodes
+        consistence
+        quantity
+        acceptation
+      }
     }
     emitter {
       company {
@@ -71,6 +84,23 @@ export const fullBspaohFragment = gql`
       }
       pickupSite {
         name
+        address
+        postalCode
+        city
+      }
+      customInfo
+      emission {
+        detail {
+          quantity
+          weight {
+            value
+            isEstimate
+          }
+        }
+        signature {
+          date
+          author
+        }
       }
     }
 
@@ -88,20 +118,54 @@ export const fullBspaohFragment = gql`
         validityLimit
         isExempted
       }
+      transport {
+        mode
+        plates
+        takenOverAt
+        signature {
+          date
+          author
+        }
+      }
     }
     destination {
       company {
         ...DashboardCompanyFragment
       }
+      customInfo
+      cap
+      handedOverToDestination {
+        date
+        signature {
+          date
+          author
+        }
+      }
       reception {
         detail {
+          quantity
+
           weight {
             value
+            isEstimate
           }
+        }
+        acceptation {
+          status
+          refusalReason
+        }
+        signature {
+          date
+          author
         }
       }
       operation {
         code
+        date
+        signature {
+          date
+          author
+        }
       }
     }
   }
