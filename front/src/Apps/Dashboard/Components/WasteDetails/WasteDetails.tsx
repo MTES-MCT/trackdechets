@@ -30,8 +30,8 @@ function WasteDetails({
         return <IconBSDasri />;
       case BsdType.Bsff:
         return <IconBSFF />;
-        case BsdType.Bspaoh:
-          return <IconBSPaoh />;
+      case BsdType.Bspaoh:
+        return <IconBSPaoh />;
       default:
         break;
     }
