@@ -238,6 +238,7 @@ async function getUpdateFromFormRevisionRequest(
     bsddUpdate.nextDestinationCompanyCountry = "";
     bsddUpdate.nextDestinationCompanyVatNumber = "";
     bsddUpdate.nextDestinationNotificationNumber = "";
+    bsddUpdate.nextDestinationProcessingOperation = "";
 
     if (bsddUpdate.status === Status.NO_TRACEABILITY) {
       bsddUpdate.status = Status.PROCESSED;

@@ -1,4 +1,5 @@
 import { OperationMode } from "@prisma/client";
+import { trim } from "./strings";
 
 export const getOperationModesFromOperationCode = (
   operationCode: string
@@ -7,7 +8,7 @@ export const getOperationModesFromOperationCode = (
 
   // Remove all spaces in the operation code
   // In some places we use "X 0", in some other "X0"
-  const trimmed = operationCode.replace(/ /g, "").toString();
+  const trimmed = trim(operationCode);
 
   if (
     [

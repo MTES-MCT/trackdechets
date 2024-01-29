@@ -1064,12 +1064,6 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(updatedBsdd?.wasteDetailsIsDangerous).toBeTruthy();
   });
 
-  // TODO
-  // TODO
-  // TODO
-  // TODO
-  // TODO: ré-indexer!
-  // TODO: sql pour fix en prod notraceability=true
   it("if operation code changes to final one > should reset status, noTraceability and nextDestination", async () => {
     // Given
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
@@ -1104,7 +1098,8 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
         nextDestinationCompanyPhone: nextDestination.contactPhone,
         nextDestinationCompanySiret: nextDestination.siret,
         nextDestinationCompanyVatNumber: nextDestination.vatNumber,
-        nextDestinationNotificationNumber: nextDestination.contactPhone
+        nextDestinationNotificationNumber: nextDestination.contactPhone,
+        nextDestinationProcessingOperation: "D9"
       }
     });
 
@@ -1152,5 +1147,6 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(updatedBsdd?.nextDestinationCompanyCountry).toBe("");
     expect(updatedBsdd?.nextDestinationCompanyVatNumber).toBe("");
     expect(updatedBsdd?.nextDestinationNotificationNumber).toBe("");
+    expect(updatedBsdd?.nextDestinationProcessingOperation).toBe("");
   });
 });
