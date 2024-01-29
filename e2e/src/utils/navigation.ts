@@ -16,11 +16,11 @@ export const testNavigation = async (
   // Click on button
   await page.getByRole("link", { name: linkLabel }).click();
 
-  // Wait for loading to end
-  await expect(page.getByTestId("loader")).not.toBeVisible();
-
   // Check redirection
   await page.waitForURL(targetUrl);
+
+  // Wait for loading to end
+  await expect(page.getByTestId("loader")).not.toBeVisible();
 
   // Check page label
   if (targetPageLabel) {
