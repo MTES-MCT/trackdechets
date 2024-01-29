@@ -90,8 +90,10 @@ jobs:
       # Playwright
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
+      - name: Run Playwright tests
+        run: npx nx run e2e:ci
 
-      # # Debug ssh version
+      # Debug ssh version
       # - name: Setup upterm session
       #   uses: lhotari/action-upterm@v1
       #   with:
@@ -99,10 +101,6 @@ jobs:
       #     limit-access-to-actor: true
       #     ## If no one connects after 5 minutes, shut down server.
       #     # wait-timeout-minutes: 5
-
-      - name: Run Playwright tests
-        run: npx nx run e2e:ci
-
 
 env:
   # API

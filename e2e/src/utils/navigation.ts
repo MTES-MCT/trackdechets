@@ -16,10 +16,6 @@ export const testNavigation = async (
   // Click on button
   await page.getByRole("link", { name: linkLabel }).click();
 
-  // Check redirection
-  // TODO: Unstable?
-  // await page.waitForURL(targetUrl);
-
   // Wait for loading to end
   await expect(page.getByTestId("loader")).not.toBeVisible();
 
