@@ -14,6 +14,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- ETQ installation de destination je ne peux pas signer l'opération/le traitement du BSFF [PR 3026](https://github.com/MTES-MCT/trackdechets/pull/3026)
+
 #### :boom: Breaking changes
 
 - Modifier les variables INSEE sur statutDiffusionEtablissement / Répercuter les changements INSEE dans notre API[PR 2973](https://github.com/MTES-MCT/trackdechets/pull/2973)

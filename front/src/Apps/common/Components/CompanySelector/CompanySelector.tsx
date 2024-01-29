@@ -108,11 +108,11 @@ const CompanySelector = ({
               placeholder: "Rechercher",
               onFocus: handleOnFocus,
               onChange: e => {
+                setSearchString(e.target.value);
                 debouncedSearch({
                   searchString: e.target.value,
                   postalCodeString: postalCodeString
                 });
-                setSearchString(e.target.value);
               }
             }}
           />
@@ -127,18 +127,19 @@ const CompanySelector = ({
               placeholder: "Rechercher",
               onFocus: handleOnFocus,
               onChange: e => {
+                setPostalCodeString(e.target.value);
                 debouncedSearch({
-                  searchString: searchString,
+                  searchString,
                   postalCodeString: e.target.value
                 });
-                setPostalCodeString(e.target.value);
               }
             }}
           />
         </div>
-        {(loading || shouldDisplayResults) && (
+        {loading && <InlineLoader></InlineLoader>}
+        {shouldDisplayResults && (
           <div className="company-selector-results fr-grid-row">
-            {loading ? <InlineLoader></InlineLoader> : displayResults()}
+            {displayResults()}
           </div>
         )}
       </div>

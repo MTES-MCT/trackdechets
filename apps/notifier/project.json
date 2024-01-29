@@ -76,6 +76,9 @@
         },
         "production": {
           "buildTarget": "notifier:build:production"
+        },
+        "integration": {
+          "buildTarget": "notifier:build:development"
         }
       }
     },

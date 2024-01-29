@@ -21,6 +21,7 @@ import { UserInputError } from "../common/errors";
 import { SearchOptions } from "./sirene/trackdechets/types";
 import { Company } from "@prisma/client";
 import { StatutDiffusionEtablissement } from "../generated/graphql/types";
+import { ViesClientError } from "./vat/vies/client";
 
 interface SearchCompaniesDeps {
   injectedSearchCompany: (clue: string) => Promise<CompanySearchResult>;
@@ -204,7 +205,13 @@ export const makeSearchCompanies =
               .filter(c => c.etatAdministratif && c.etatAdministratif === "A")
           );
         })
-        .catch(_ => []);
+        .catch(err => {
+          if (err instanceof ViesClientError) {
+            throw err;
+          } else {
+            return [];
+          }
+        });
     }
     // fuzzy searching only for French companies
     return injectedSearchCompanies(clue, department).then(

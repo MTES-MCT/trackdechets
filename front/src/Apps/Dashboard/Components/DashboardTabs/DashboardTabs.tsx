@@ -49,12 +49,17 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
   const handleCompanyChange = useCallback(
     orgId => {
       navigate(
-        generatePath(routes.dashboard.bsds.index, {
-          siret: orgId
-        })
+        generatePath(
+          role?.includes(UserRole.Driver)
+            ? routes.dashboard.transport.toCollect
+            : routes.dashboard.bsds.index,
+          {
+            siret: orgId
+          }
+        )
       );
     },
-    [navigate]
+    [navigate, role]
   );
 
   const handleToggle = () => {

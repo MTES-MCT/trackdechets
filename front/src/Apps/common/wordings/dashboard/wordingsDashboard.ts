@@ -179,3 +179,5 @@ export const SUPRIMER_REVISION = "Supprimer la révision";
 export const EMPORT_DIRECT_LABEL = "Signer directement";
 export const VALIDER_SYNTHESE_LABEL = "Valider la synthèse";
 export const ROAD_CONTROL = "Contrôle routier";
+
+export const NON_RENSEIGNE = "Non renseigné";

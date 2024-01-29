@@ -179,6 +179,7 @@
     "@nx/storybook": "17.0.1",
     "@nx/vite": "17.0.1",
     "@nx/web": "17.0.1",
+    "@playwright/test": "^1.40.1",
     "@storybook/addon-a11y": "^7.0.17",
     "@storybook/addon-actions": "^7.0.17",
     "@storybook/addon-essentials": "7.4.5",

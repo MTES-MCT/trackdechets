@@ -51,15 +51,21 @@ export default function AccountFieldCompanyWorkerCertification({
           <>
             <tr>
               <td>Numéro de certification</td>
-              <td>{company.workerCertification.certificationNumber}</td>
+              <td data-testid="certificationNumber">
+                {company.workerCertification.certificationNumber}
+              </td>
             </tr>
             <tr>
               <td>Date de validité</td>
-              <td>{formatDate(company.workerCertification.validityLimit!)}</td>
+              <td data-testid="validityLimit">
+                {formatDate(company.workerCertification.validityLimit!)}
+              </td>
             </tr>
             <tr>
               <td>Organisme</td>
-              <td>{company.workerCertification.organisation}</td>
+              <td data-testid="organisation">
+                {company.workerCertification.organisation}
+              </td>
             </tr>
           </>
         )}

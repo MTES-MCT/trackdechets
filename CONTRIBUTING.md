@@ -331,6 +331,107 @@ Il est également possible de faire tourner chaque test de façon indépendante:
 npx nx run back:test:integration --testFile workflow.integration.ts
 ```
 
+## Tests end-to-end (e2e)
+
+Les tests e2e utilisent Playwright ([documentation officielle ici](https://playwright.dev/docs/intro)).
+
+### Local
+
+#### Installation
+
+Commencez par:
+
+```
+npm i
+```
+
+Puis il faut installer chromium pour playwright:
+
+```
+npx playwright install chromium --with-deps
+```
+
+#### Variables d'environnement
+
+Vu que les tests e2e fonctionnent comme les tests d'intégration, à savoir qu'ils repartent d'une base vierge à chaque fois, vous pouvez utiliser les `.env.integration` (back & front) pour les tests e2e.
+
+#### Lancer les tests e2e en local
+
+1. Lancer la DB, ES etc.
+2. Démarrer les services TD avec:
+   `npx nx run-many -t serve --configuration=integration --projects=api,front,tag:backend:background --parallel=6`
+3. Lancer les tests:
+
+```
+# Console seulement
+npx nx run e2e:cli --configuration=integration
+
+# Avec l'UI
+npx nx run e2e:ui --configuration=integration
+```
+
+Pour tester un seul fichier:
+
+```
+# Console seulement
+npx nx run e2e:cli --file companies.spec.ts --configuration=integration
+
+# Avec l'UI
+npx nx run e2e:ui --file companies.spec.ts --configuration=integration
+```
+
+Il est aussi possible de débugguer pas à pas, avec l'UI:
+
+```
+npx nx run e2e:debug --file companies.spec.ts --configuration=integration
+```
+
+#### Recorder
+
+Playwright vous permet de jouer votre cahier de recette dans un navigateur et d'enregistrer vos actions. Plusieurs outils sont disponibles pour par exemple faire des assertions sur les pages.
+
+Pour lancer le recorder:
+
+```
+npx playwright codegen trackdechets.local --viewport-size=1920,1080
+```
+
+Le code généré apparaît dans une fenêtre à part. Vous pouvez le copier et le coller dans des fichiers de specs.
+
+### CI
+
+#### Débugguer visuellement
+
+Pour prendre un screenshot de la page qui pose problème, modifier playwright.config.ts pour changer le mode headless:
+
+```
+headless: false
+```
+
+Puis placer dans le code, à l'endroit problématique:
+
+```
+const buffer = await page.screenshot();
+console.log(buffer.toString('base64'));
+
+// Ou alors, méthode toute faite dans debug.ts
+await logScreenshot(page);
+```
+
+Puis utiliser un site comme [celui-ci](https://base64.guru/converter/decode/image) pour transformer le log en base64 en image.
+
+#### Débugguer le network
+
+Pour observer les requêtes, vous pouvez utiliser (doc [ici](https://playwright.dev/docs/network#network-events)):
+
+```
+page.on('request', request => console.log('>>', request.method(), request.url()));
+page.on('response', response => console.log('<<', response.status(), response.url()));
+
+// Ou alors, méthode toute faite dans debug.ts pour capturer uniquement les calls d'API
+debugApiCalls(page);
+```
+
 ## Créer une PR
 
 1. Créer une nouvelle branche à partir et à destination de la branche `dev`.
@@ -406,10 +507,10 @@ Depuis un one-off container de taille XL
 
 ### Réindexation complète sans downtime lors d'une mise en production
 
-- Se rendre sur Scalingo pour augmenter la taille des workers "indexqueue" et leur nombre.
-- On peut retenir la configuration suivante :
-  - 4 workers indexqueue de taille 2XL
-  - BULK_INDEX_BATCH_SIZE=2500
+- Se rendre sur Scalingo pour ajouter 1 worker `bulkindexqueuemaster` (en charge d'ajouter les chunks) en 2XL et plusieurs workers `bulkindexqueue` (en charge de process les chunks).
+- On peut retenir la configuration suivante pour les workers `bulkindexqueue` :
+  - 4 workers de taille 2XL
+  - BULK_INDEX_BATCH_SIZE=1000
   - BULK_INDEX_JOB_CONCURRENCY=1
 - Se connecter à la prod avec un one-off container de taille XL
 - Lancer la commande `FORCE_LOGGER_CONSOLE=true npx nx run back:reindex-all-bsds-bulk -- --useQueue -f` (si la version de l'index a été bump, on peut omettre le `-f`)
@@ -418,6 +519,7 @@ Depuis un one-off container de taille XL
 - Relancer au besoin les "indexChunk" jobs qui ont failed (c'est possible si ES se retrouve momentanément surchargé).
 - Si les workers d'indexation crashent avec une erreur mémoire, ce sera visible dans les logs Scalingo. Il est possible alors que la taille des chunks soient trop importante. Diminuer alors la valeur BULK_INDEX_BATCH_SIZE, cleaner tous les jobs de la queue avant de relancer une réindexation complète. Il peut être opportun de de diminuer la taille des chunks.
 - Si ES est surchargé, il peut être opportun de diminuer le nombre de workers.
+- À la fin de la réindexation, set le nombre de workers `bulkindexqueuemaster` et `bulkindexqueue` à 0.
 
 ## Guides
 

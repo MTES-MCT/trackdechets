@@ -37,15 +37,21 @@ export default function AccountFieldCompanyTransporterReceipt({
       <tbody>
         <tr>
           <td> Numéro de récépissé </td>
-          <td>{company.transporterReceipt.receiptNumber} </td>
+          <td data-testid="receiptNumber">
+            {company.transporterReceipt.receiptNumber}{" "}
+          </td>
         </tr>
         <tr>
           <td> Limite de validité </td>
-          <td>{formatDate(company.transporterReceipt.validityLimit)}</td>
+          <td data-testid="receiptValidityLimit">
+            {formatDate(company.transporterReceipt.validityLimit)}
+          </td>
         </tr>
         <tr>
           <td> Département</td>
-          <td>{company.transporterReceipt.department} </td>
+          <td data-testid="receiptDepartment">
+            {company.transporterReceipt.department}{" "}
+          </td>
         </tr>
       </tbody>
     </table>

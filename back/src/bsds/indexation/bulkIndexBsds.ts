@@ -26,7 +26,7 @@ import {
   toBsdElastic as formToBsdElastic
 } from "../../forms/elastic";
 import { toBsdElastic as bsvhuToBsdElastic } from "../../bsvhu/elastic";
-import { indexQueue } from "../../queue/producers/elastic";
+import { bulkIndexQueue } from "../../queue/producers/elastic";
 import { IndexAllFnSignature, FindManyAndIndexBsdsFnSignature } from "./types";
 
 /**
@@ -343,13 +343,7 @@ export async function indexAllBsdTypeConcurrentJobs({
         index,
         ids: chunk,
         elasticSearchUrl: indexConfig.elasticSearchUrl
-      }),
-      opts: {
-        lifo: true,
-        stackTraceLimit: 100,
-        attempts: 1,
-        timeout: 600_000 // 10 min
-      }
+      })
     });
   });
 
@@ -358,7 +352,7 @@ export async function indexAllBsdTypeConcurrentJobs({
   for (let i = 0; i < data.length; i += chunkSize) {
     const chunk = data.slice(i, i + chunkSize);
     // all jobs are succesfully added in bulk or all jobs will fail
-    const bulkJobs = await indexQueue.addBulk(chunk);
+    const bulkJobs = await bulkIndexQueue.addBulk(chunk);
     jobs.push(...bulkJobs);
   }
 

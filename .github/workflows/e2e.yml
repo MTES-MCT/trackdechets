@@ -1,0 +1,266 @@
+name: Tests e2e
+
+on: pull_request
+
+jobs:
+  back:
+    runs-on: ubuntu-latest
+    name: Tests e2e
+    steps:
+      # Hosts
+      - name: Add hosts to /etc/hosts
+        run: |
+          sudo echo "127.0.0.1 api.trackdechets.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 trackdechets.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 es.trackdechets.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 notifier.trackdechets.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 redis postgres elasticsearch mongodb" | sudo tee -a /etc/hosts
+
+      # Trackdéchets
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Start containers with docker
+        run: docker-compose up -d
+      - name: Init DB & ES index
+        run: |
+          npx nx run back:codegen
+          npx nx run @td/prisma:generate
+          npx nx run @td/codegen-ui:build
+          TERM=xterm bash ./scripts/deploy-db.sh
+      - name: Start TD applications
+        run: |
+          npx nx run api:serve >> /tmp/td-api.log &
+          sleep 1s
+          npx nx run queues-indexation:serve >> /tmp/td-queues-indexation.log &
+          sleep 1s
+          npx nx run queues-webhooks:serve >> /tmp/td-queues-webhooks.log &
+          sleep 1s
+          npx nx run queues-runner:serve >> /tmp/td-queues-runner.log &
+          sleep 1s
+          npx nx run notifier:serve >> /tmp/td-notifier.log &
+          sleep 1s
+          npx nx run front:serve >> /tmp/td-front.log &
+          sleep 1s
+
+      # Wait
+      - name: Wait until the API starts
+        run: |
+          until [ "$(curl -s -w '%{http_code}' -o /dev/null "api.trackdechets.local")" -eq 400 ]
+          do
+            printf 'Waiting for the API to start...\n'
+            sleep 1
+          done
+
+      # Debug
+      # - name: Testing API resolution
+      #   run: |
+      #     ping -c 2 api.trackdechets.local
+      #     curl api.trackdechets.local
+      # - name: Testing UI resolution
+      #   run: |
+      #     ping -c 2 trackdechets.local
+      #     curl trackdechets.local/login
+      #     curl trackdechets.local/src/index.tsx
+      # - name: Testing ES resolution
+      #   run: |
+      #     ping -c 2 es.trackdechets.local
+      #     curl es.trackdechets.local
+      # - name: Testing Notifier resolution
+      #   run: |
+      #     ping -c 2 notifier.trackdechets.local
+      #     curl notifier.trackdechets.local
+
+      # Show logs
+      # - name: Show logs
+      # run: |
+      #   cat /tmp/td-api.log
+      #   cat /tmp/td-queues-indexation.log
+      #   cat /tmp/td-queues-webhooks.log
+      #   cat /tmp/td-queues-runner.log
+      #   cat /tmp/td-notifier.log
+      #   cat /tmp/td-front.log
+
+      # Playwright
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+      - name: Run Playwright tests
+        run: npx nx run e2e:ci
+
+      # Debug ssh version
+      # - name: Setup upterm session
+      #   uses: lhotari/action-upterm@v1
+      #   with:
+      #     ## limits ssh access and adds the ssh public key for the user which triggered the workflow
+      #     limit-access-to-actor: true
+      #     ## If no one connects after 5 minutes, shut down server.
+      #     # wait-timeout-minutes: 5
+
+env:
+  # API
+  API_HOST: api.trackdechets.local
+  API_PORT: 4000
+  API_URL_SCHEME: http
+  USE_XFF_HEADER: true
+  SESSION_COOKIE_SECURE: false
+  QUEUE_MONITOR_TOKEN: token
+  DATABASE_URL: "postgresql://trackdechets:password@postgres:5432/e2e?schema=default$default"
+  API_TOKEN_SECRET: any_secret
+  INSEE_SECRET: unset
+  SESSION_SECRET: any_secret
+  SESSION_NAME: connect.sid
+  SESSION_COOKIE_HOST: trackdechets.local
+
+  # Notifier
+  NOTIFIER_PORT: 4001
+  NOTIFIER_HOST: notifier.trackdechets.local
+
+  # UI
+  UI_HOST: trackdechets.local
+  UI_URL_SCHEME: http
+
+  DEVELOPERS_HOST: developers.trackdechets.local
+  DEVELOPERS_URL_SCHEME: http
+
+  # Emailing
+  QUEUE_NAME_SENDMAIL: td-e2e-tests-queue
+  EMAIL_BACKEND: console
+  SENDER_EMAIL_ADDRESS: hello@trackdechets.beta.gouv.fr
+  SENDER_NAME: Trackdéchets
+  SIB_APIKEY: unset
+  SIB_BASE_URL: "http://mailservice"
+  MAIN_TEMPLATE_ID: 1
+  PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID: 22
+  PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID: 33
+  SECURITY_CODE_RENEWAL_TEMPLATE_ID: 33
+  FIRST_ONBOARDING_TEMPLATE_ID: 246
+  PROFESIONAL_SECOND_ONBOARDING_TEMPLATE_ID: 250
+  VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID: 247
+  NOTIFY_DREAL_WHEN_FORM_DECLINED: false
+  TZ: Europe/Paris
+
+  # Trello
+  TRELLO_API_KEY: unset
+  TRELLO_TOKEN: unset
+  TRELLO_ALERTS_LIST_ID: unset
+
+  # S3
+  S3_ENDPOINT: unset
+  S3_REGION: unset
+  S3_ACCESS_KEY_ID: unset
+  S3_SECRET_ACCESS_KEY: unset
+  S3_BUCKET: unset
+
+  # Nginx
+  NGINX_PROXY_HOST: 172.17.0.1
+  NGINX_NETWORK_MODE: bridge
+
+  # Elastic Search
+  ELASTIC_SEARCH_URL: http://elasticsearch:9200
+  ELASTICSEARCH_BSDS_ALIAS_NAME: bsds-e2e
+  ELASTIC_SEARCH_HOST: es.trackdechets.local
+  TD_COMPANY_ELASTICSEARCH_IGNORE_SSL: false
+  TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
+  TD_COMPANY_ELASTICSEARCH_INDEX: stocketablissement-production
+  TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
+
+  # Docker
+  DOCKER_RESTART_POLICY: unless-stopped
+
+  # Gotenberg
+  GOTENBERG_TOKEN: unset
+  GOTENBERG_URL: unset
+
+  # Scalingo
+  SCALINGO_TOKEN: unset
+  BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING: unset
+  BULK_INDEX_SCALINGO_CONTAINER_NAME: unset
+  BULK_INDEX_SCALINGO_CONTAINER_SIZE_UP: unset
+  BULK_INDEX_SCALINGO_CONTAINER_SIZE_DOWN: unset
+  SCALINGO_API_URL: unset
+  SCALINGO_APP_NAME: unset
+  SCALINGO_CERT: unset
+
+  # Redis
+  REDIS_URL: redis://redis:6379
+  BULK_INDEX_BATCH_SIZE: 100
+
+  # Mongo
+  MONGO_URL: mongodb://trackdechets:password@mongodb:27017
+
+  # Storybook
+  STORYBOOK_HOST: sb.trackdechets.local
+
+  # Vite
+  VITE_API_ENDPOINT: http://api.trackdechets.local
+  VITE_NOTIFIER_ENDPOINT: http://notifier.trackdechets.local
+  VITE_URL_SCHEME: http
+  VITE_HOSTNAME: trackdechets.local
+
+  # Misc
+  CRON_ONBOARDING_SCHEDULE: false
+  VERIFY_COMPANY: false
+  ALLOW_TEST_COMPANY: true
+  VITE_ALLOW_TEST_COMPANY: true
+  STARTUP_FILE: unset
+  TRUST_PROXY_HOPS: 1
+  CONTAINER: unset
+  DD_ENV: unset
+  DD_API_KEY: unset
+  DD_APP_NAME: unset
+  QUEUE_NAME_COMPANY: unset
+  DD_TRACE_ENABLED: false
+  MAX_REQUESTS_PER_WINDOW: unset
+  NODE_ENV: test
+  VIRTUAL_HOST: $API_HOST
+  LETSENCRYPT_HOST: $API_HOST
+  POST_BACKEND: console
+  REGISTRY_WHITE_LIST_IP: "11.11.11.11"
+  OIDC_PRIVATE_KEY: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDCFg4UrY5xtulv
+    /NXKmL1J4qI1SopAfTNMo3X7p+kJO7plqUYjzaztcre1qfh0m33Sm1Q8oPbO/GpP
+    MU1/HgcceytgJ/b4UwufVVMl9BrMDYG8moDBylbVupFQS3Ly1L9i/iFG9Z9A9xzY
+    Zzf799A45bnvNXL6s2glzvjiRvfQ2NDF0anTcnZLcYtC7ugq1IMM+ihAcPfw8Qw2
+    chN/SmP4qAM+PKaQwagmU7doqmmyN9u38AfoYZ1GCFhEs5TBBT6H6h9YdHeVtiIq
+    1c+fl03biSIfLrV7dUBD39gBmXBcL/30Ya3D82mCEUC4zg/UkOfQOmkmV3Lc8YUL
+    QZ8EJkBLAgMBAAECggEAVuVE/KEP6323WjpbBdAIv7HGahGrgGANvbxZsIhm34ls
+    VOPK0XDegZkhAybMZHjRhp+gwVxX5ChC+J3cUpOBH5FNxElgW6HizD2Jcq6t6LoL
+    YgPSrfEHm71iHg8JsgrqfUnGYFzMJmv88C6WdCtpgG/qJV1K00/Ly1G1QKoBffEs
+    +v4fAMJrCbUdCz1qWto+PU+HLMEo+krfEpGgcmtZeRlDADh8cETMQlgQfQX2VWq/
+    aAP4a1SXmo+j0cvRU4W5Fj0RVwNesIpetX2ZFz4p/JmB5sWFEj/fC7h5z2lq+6Bm
+    e2T3BHtXkIxoBW0/pYVnASC8P2puO5FnVxDmWuHDYQKBgQDTuuBd3+0tSFVEX+DU
+    5qpFmHm5nyGItZRJTS+71yg5pBxq1KqNCUjAtbxR0q//fwauakh+BwRVCPOrqsUG
+    jBSb3NYE70Srp6elqxgkE54PwQx4Mr6exJPnseM9U4K+hULllf5yjM9edreJE1nV
+    NVgFjeyafQhrHKwgr7PERJ/ikwKBgQDqqsT1M+EJLmI1HtCspOG6cu7q3gf/wKRh
+    E8tu84i3YyBnI8uJkKy92RNVI5fvpBARe3tjSdM25rr2rcrcmF/5g6Q9ImxZPGCt
+    86eOgO9ErNtbc4TEgybsP319UE4O41aKeNiBTAZKoYCxv/dMqG0j4avmWzd+foHq
+    gSNUvR2maQKBgQCYeqOsV2B6VPY7KIVFLd0AA9/dwvEmgAYLiA/RShDI+hwQ/5jX
+    uxDu37KAhqeC65sHLrmIMUt4Zdr+DRyZK3aIDNEAesPMjw/X6lCXYp1ZISD2yyym
+    MFGH8X8CIkstI9Faf9vf6PJKSFrC1/HA7wq17VCwrUzLvrljTMW8meM/CwKBgCpo
+    2leGHLFQFKeM/iF1WuYbR1pi7gcmhY6VyTowARFDdOOu8GXYI5/bz0afvCGvAMho
+    DJCREv7lC/zww6zCTPYG+HOj+PjXlJFba3ixjIxYwPvyEJiDK1Ge18sB7Fl8dHNq
+    C5ayaqCqN1voWYUdGzxU2IA1E/5kVo5O8FesJeOhAoGBAImJbZFf+D5kA32Xxhac
+    59lLWBCsocvvbd1cvDMNlRywAAyhsCb1SuX4nEAK9mrSBdfmoF2Nm3eilfsOds0f
+    K5mX069IKG82CMqh3Mzptd7e7lyb9lsoGO0BAtjho3cWtha/UZ70vfaMzGuZ6JmQ
+    ak6k+8+UFd93M4z0Qo74OhXB
+    -----END PRIVATE KEY----
+  # Public key only for testing purposes
+  OIDC_PUBLIC_KEY: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwhYOFK2Ocbbpb/zVypi9
+    SeKiNUqKQH0zTKN1+6fpCTu6ZalGI82s7XK3tan4dJt90ptUPKD2zvxqTzFNfx4H
+    HHsrYCf2+FMLn1VTJfQazA2BvJqAwcpW1bqRUEty8tS/Yv4hRvWfQPcc2Gc3+/fQ
+    OOW57zVy+rNoJc744kb30NjQxdGp03J2S3GLQu7oKtSDDPooQHD38PEMNnITf0pj
+    +KgDPjymkMGoJlO3aKppsjfbt/AH6GGdRghYRLOUwQU+h+ofWHR3lbYiKtXPn5dN
+    24kiHy61e3VAQ9/YAZlwXC/99GGtw/NpghFAuM4P1JDn0DppJldy3PGFC0GfBCZA
+    SwIDAQAB
+    -----END PUBLIC KEY-----
+  WEBHOOK_TOKEN_ENCRYPTION_KEY: abcdefgh12345678abcdefgh12345678
+  FLAG_PAOH_ACTIVATED: true
