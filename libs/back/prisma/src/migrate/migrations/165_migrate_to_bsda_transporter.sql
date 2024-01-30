@@ -1,11 +1,11 @@
 -- DropIndex
-DROP INDEX "_BsdaTransporterCompanySiretIdx";
+DROP INDEX IF EXISTS "default$default"."_BsdaTransporterCompanySiretIdx";
 
 -- DropIndex
-DROP INDEX "_BsdaTransporterCompanyVatNumberIdx";
+DROP INDEX IF EXISTS "default$default"."_BsdaTransporterCompanyVatNumberIdx";
 
 -- CreateTable
-CREATE TABLE "BsdaTransporter" (
+CREATE TABLE "default$default"."BsdaTransporter" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(6) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE "BsdaTransporter" (
     "transporterRecepisseNumber" TEXT,
     "transporterRecepisseDepartment" TEXT,
     "transporterRecepisseValidityLimit" TIMESTAMPTZ(6),
-    "transporterTransportMode" "TransportMode" DEFAULT 'ROAD',
+    "transporterTransportMode" "default$default"."TransportMode" DEFAULT 'ROAD',
     "transporterTransportPlates" TEXT [],
     "transporterTransportTakenOverAt" TIMESTAMPTZ(6),
     "transporterTransportSignatureAuthor" TEXT,
@@ -32,19 +32,19 @@ CREATE TABLE "BsdaTransporter" (
 );
 
 -- CreateIndex
-CREATE INDEX "_BsdaTransporterFormIdIdx" ON "BsdaTransporter"("bsdaId");
+CREATE INDEX "_BsdaTransporterFormIdIdx" ON "default$default"."BsdaTransporter"("bsdaId");
 
 -- CreateIndex
-CREATE INDEX "_BsdaTransporterCompanySiretIdx" ON "BsdaTransporter"("transporterCompanySiret");
+CREATE INDEX "_BsdaTransporterCompanySiretIdx" ON "default$default"."BsdaTransporter"("transporterCompanySiret");
 
 -- CreateIndex
-CREATE INDEX "_BsdaTransporterCompanyVatNumberIdx" ON "BsdaTransporter"("transporterCompanyVatNumber");
+CREATE INDEX "_BsdaTransporterCompanyVatNumberIdx" ON "default$default"."BsdaTransporter"("transporterCompanyVatNumber");
 
 -- AddForeignKey
 ALTER TABLE
-    "BsdaTransporter"
+    "default$default"."BsdaTransporter"
 ADD
-    CONSTRAINT "BsdaTransporter_bsdaId_fkey" FOREIGN KEY ("bsdaId") REFERENCES "Bsda"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    CONSTRAINT "BsdaTransporter_bsdaId_fkey" FOREIGN KEY ("bsdaId") REFERENCES "default$default"."Bsda"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Migrate first transporter from Bsda table to BsdaTransporter table
 INSERT INTO
@@ -70,7 +70,7 @@ INSERT INTO
         "transporterTransportPlates",
         "transporterTransportTakenOverAt",
         "transporterTransportSignatureAuthor",
-        "transporterTransportSignatureDate",
+        "transporterTransportSignatureDate"
     )
 SELECT
     "id",
@@ -94,13 +94,13 @@ SELECT
     "transporterTransportPlates",
     "transporterTransportTakenOverAt",
     "transporterTransportSignatureAuthor",
-    "transporterTransportSignatureDate",
+    "transporterTransportSignatureDate"
 FROM
     "default$default"."Bsda";
 
 -- AlterTable
 ALTER TABLE
-    "Bsda" DROP COLUMN "transporterCompanyAddress",
+    "default$default"."Bsda" DROP COLUMN "transporterCompanyAddress",
     DROP COLUMN "transporterCompanyContact",
     DROP COLUMN "transporterCompanyMail",
     DROP COLUMN "transporterCompanyName",
