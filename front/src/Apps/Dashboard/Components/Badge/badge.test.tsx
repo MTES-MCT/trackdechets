@@ -54,6 +54,20 @@ describe("Bsd Badge status", () => {
     expect(screen.getByText(/Signé par le transporteur/i));
   });
 
+  test("SENT multi-modal", () => {
+    const transporter1 = { id: "t1", takenOverAt: new Date().toISOString() };
+    const transporter2 = { id: "t2", takenOverAt: new Date().toISOString() };
+    const transporter3 = { id: "t3", takenOverAt: null };
+
+    render(
+      <Badge
+        status={BsdStatusCode.Sent}
+        transporters={[transporter1, transporter2, transporter3]}
+      />
+    );
+    expect(screen.getByText(/Signé par le transporteur n°2/i));
+  });
+
   test("RECEIVED", () => {
     render(<Badge status={BsdStatusCode.Received} />);
     expect(screen.getByText(/Reçu, en attente d'acceptation/i));
