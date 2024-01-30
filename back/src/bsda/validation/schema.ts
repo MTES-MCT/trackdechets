@@ -130,6 +130,7 @@ export const rawBsdaSchema = z.object({
   destinationOperationNextDestinationCompanyMail: z.string().nullish(),
   destinationOperationNextDestinationCap: z.string().nullish(),
   destinationOperationNextDestinationPlannedOperationCode: z.string().nullish(),
+  transporterId: z.string().nullish(),
   transporterCompanyName: z.string().nullish(),
   transporterCompanySiret: siretSchema.nullish(), // Further verifications done here under in superRefine
   transporterCompanyAddress: z.string().nullish(),

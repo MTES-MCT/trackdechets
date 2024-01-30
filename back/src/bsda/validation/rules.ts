@@ -27,6 +27,7 @@ export type EditableBsdaFields = Required<
     | "workerWorkSignatureAuthor"
     | "workerWorkSignatureDate"
     | "intermediariesOrgIds"
+    | "transporterId"
   >
 >;
 

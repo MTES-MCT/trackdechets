@@ -16,7 +16,7 @@ export function getUnparsedBsda({ input, persisted, isDraft }: UnparsedInputs) {
 
   const { transporters, ...persistedData } = persisted ?? {};
 
-  const transporter = {
+  const { id: transporterId, ...transporter } = {
     ...transporters?.[0],
     ...(input ? flattenBsdaTransporterInput(input) : {})
   };
@@ -28,7 +28,8 @@ export function getUnparsedBsda({ input, persisted, isDraft }: UnparsedInputs) {
     intermediaries: input?.intermediaries ?? persisted?.intermediaries,
     grouping: input?.grouping ?? persisted?.grouping.map(bsda => bsda.id),
     forwarding: input?.forwarding ?? persisted?.forwarding?.id,
-    ...transporter
+    ...transporter,
+    transporterId
   };
 }
 

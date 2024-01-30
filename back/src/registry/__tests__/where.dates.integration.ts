@@ -90,7 +90,6 @@ describe("toElasticFilter", () => {
 
   it.each([
     "createdAt",
-    "transporterTakenOverAt",
     "destinationReceptionDate",
     "destinationOperationDate"
   ])("should filter BSDAs between two %p dates (strict)", async date => {
@@ -99,7 +98,6 @@ describe("toElasticFilter", () => {
       [P in keyof WasteRegistryWhere]?: keyof Bsda;
     } = {
       createdAt: "createdAt",
-      transporterTakenOverAt: "transporterTransportTakenOverAt",
       destinationReceptionDate: "destinationReceptionDate",
       destinationOperationDate: "destinationOperationDate"
     };
@@ -130,6 +128,51 @@ describe("toElasticFilter", () => {
 
     const where: WasteRegistryWhere = {
       [date]: {
+        _gt: new Date("2021-01-01"),
+        _lt: new Date("2021-01-04")
+      }
+    };
+
+    const bsds = await searchBsds(where);
+
+    expect(bsds.map(bsd => bsd.id)).toEqual([bsda2.id, bsda3.id]);
+  });
+
+  it("should filter BSDAs between two transporterTakenOverAt dates (strict)", async () => {
+    const bsda1 = await bsdaFactory({
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date("2021-01-01")
+      }
+    });
+
+    const bsda2 = await bsdaFactory({
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date("2021-01-02")
+      }
+    });
+
+    const bsda3 = await bsdaFactory({
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date("2021-01-03")
+      }
+    });
+
+    const bsda4 = await bsdaFactory({
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date("2021-01-04")
+      }
+    });
+
+    await Promise.all(
+      [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
+      })
+    );
+    await refreshElasticSearch();
+
+    const where: WasteRegistryWhere = {
+      transporterTakenOverAt: {
         _gt: new Date("2021-01-01"),
         _lt: new Date("2021-01-04")
       }
@@ -419,7 +462,6 @@ describe("toElasticFilter", () => {
 
   it.each([
     "createdAt",
-    "transporterTakenOverAt",
     "destinationReceptionDate",
     "destinationOperationDate"
   ])("should filter BSDAs between two %p dates (not strict)", async date => {
@@ -428,7 +470,6 @@ describe("toElasticFilter", () => {
       [P in keyof WasteRegistryWhere]?: keyof Bsda;
     } = {
       createdAt: "createdAt",
-      transporterTakenOverAt: "transporterTransportTakenOverAt",
       destinationReceptionDate: "destinationReceptionDate",
       destinationOperationDate: "destinationOperationDate"
     };
@@ -459,6 +500,51 @@ describe("toElasticFilter", () => {
 
     const where: WasteRegistryWhere = {
       [date]: {
+        _gte: new Date("2021-01-02"),
+        _lte: new Date("2021-01-04")
+      }
+    };
+
+    const bsds = await searchBsds(where);
+
+    expect(bsds.map(bsd => bsd.id)).toEqual([bsda2.id, bsda3.id, bsda4.id]);
+  });
+
+  it("should filter BSDAs between two transporterTakenOverAt dates (not strict)", async () => {
+    const bsda1 = await bsdaFactory({
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date("2021-01-01")
+      }
+    });
+
+    const bsda2 = await bsdaFactory({
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date("2021-01-02")
+      }
+    });
+
+    const bsda3 = await bsdaFactory({
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date("2021-01-03")
+      }
+    });
+
+    const bsda4 = await bsdaFactory({
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date("2021-01-04")
+      }
+    });
+
+    await Promise.all(
+      [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
+      })
+    );
+    await refreshElasticSearch();
+
+    const where: WasteRegistryWhere = {
+      transporterTakenOverAt: {
         _gte: new Date("2021-01-02"),
         _lte: new Date("2021-01-04")
       }
@@ -806,7 +892,6 @@ describe("toElasticFilter", () => {
 
   it.each([
     "createdAt",
-    "transporterTakenOverAt",
     "destinationReceptionDate",
     "destinationOperationDate"
   ])("should filter BSDAs on %p (exact date)", async date => {
@@ -815,7 +900,6 @@ describe("toElasticFilter", () => {
       [P in keyof WasteRegistryWhere]?: keyof Bsda;
     } = {
       createdAt: "createdAt",
-      transporterTakenOverAt: "transporterTransportTakenOverAt",
       destinationReceptionDate: "destinationReceptionDate",
       destinationOperationDate: "destinationOperationDate"
     };
@@ -846,6 +930,50 @@ describe("toElasticFilter", () => {
 
     const where: WasteRegistryWhere = {
       [date]: {
+        _eq: new Date("2021-01-02")
+      }
+    };
+
+    const bsds = await searchBsds(where);
+
+    expect(bsds.map(bsd => bsd.id)).toEqual([bsda2.id]);
+  });
+
+  it("should filter BSDAs on transporterTakenOverAt (exact date)", async () => {
+    const bsda1 = await bsdaFactory({
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date("2021-01-01")
+      }
+    });
+
+    const bsda2 = await bsdaFactory({
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date("2021-01-02")
+      }
+    });
+
+    const bsda3 = await bsdaFactory({
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date("2021-01-03")
+      }
+    });
+
+    const bsda4 = await bsdaFactory({
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date("2021-01-04")
+      }
+    });
+
+    await Promise.all(
+      [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        return indexBsda(bsdaForElastic);
+      })
+    );
+    await refreshElasticSearch();
+
+    const where: WasteRegistryWhere = {
+      transporterTakenOverAt: {
         _eq: new Date("2021-01-02")
       }
     };

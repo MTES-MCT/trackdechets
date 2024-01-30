@@ -3,6 +3,17 @@ import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { prisma } from "@td/prisma";
 import { siretify, upsertBaseSiret } from "../../__tests__/factories";
 
+/**
+ * Permet de créer un BSDA avec des données par défaut et
+ * un premier trnsporteur. Les données du BSDA et du premier
+ * transporteur peuvent être modifiées grâce aux paramètres
+ * `opt` et `transporterOpt`.
+ *
+ * Pour créer un BSDA avec des transporteurs multi-modaux, on
+ * commence par créer un BSDA avec un premier transporteur
+ * grâce à `bsdaFactory` puis on ajoute les transporteur suivants
+ * grâce à `bsdaTransporterFactory`
+ */
 export const bsdaFactory = async ({
   opt = {},
   transporterOpt = {}
@@ -56,6 +67,41 @@ export const bsdaFactory = async ({
   }
 
   return created;
+};
+
+export const bsdaTransporterFactory = async ({
+  bsdaId,
+  opts
+}: {
+  bsdaId: string;
+  opts: Omit<Prisma.BsdaTransporterCreateWithoutBsdaInput, "number">;
+}) => {
+  const count = await prisma.bsdaTransporter.count({ where: { bsdaId } });
+  return prisma.bsdaTransporter.create({
+    data: {
+      bsda: { connect: { id: bsdaId } },
+      ...bsdaTransporterData,
+      number: count + 1,
+      ...opts
+    }
+  });
+};
+
+const bsdaTransporterData: Omit<
+  Prisma.BsdaTransporterCreateWithoutBsdaInput,
+  "number"
+> = {
+  transporterCompanyName: "Transport facile",
+  transporterCompanySiret: siretify(3),
+  transporterCompanyAddress: "12 route du Transporter, Transporter City",
+  transporterCompanyContact: "Henri Transport",
+  transporterCompanyPhone: "06 06 06 06 06",
+  transporterCompanyMail: "transporter@td.io",
+  transporterRecepisseNumber: "a receipt",
+  transporterRecepisseDepartment: "83",
+  transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
+  transporterTransportMode: "ROAD",
+  transporterTransportPlates: ["AA-00-XX"]
 };
 
 const getBsdaObject = (): Prisma.BsdaCreateInput => ({
@@ -112,19 +158,6 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   workerCompanyMail: "travaux@td.io",
 
   transporters: {
-    create: {
-      transporterCompanyName: "Transport facile",
-      transporterCompanySiret: siretify(3),
-      transporterCompanyAddress: "12 route du Transporter, Transporter City",
-      transporterCompanyContact: "Henri Transport",
-      transporterCompanyPhone: "06 06 06 06 06",
-      transporterCompanyMail: "transporter@td.io",
-      transporterRecepisseNumber: "a receipt",
-      transporterRecepisseDepartment: "83",
-      transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
-      transporterTransportMode: "ROAD",
-      transporterTransportPlates: ["AA-00-XX"],
-      number: 1
-    }
+    create: { ...bsdaTransporterData, number: 1 }
   }
 });

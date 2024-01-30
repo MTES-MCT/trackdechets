@@ -385,8 +385,13 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSDA in emitter's outgoing wastes once it has been sent", async () => {
     const bsda = await bsdaFactory({
       opt: {
+        status: "SENT",
         emitterCompanySiret: emitter.company.siret,
         emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date(),
         transporterTransportSignatureDate: new Date()
       }
     });
@@ -413,8 +418,13 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSDA in worker's outgoing wastes once it has been sent", async () => {
     const bsda = await bsdaFactory({
       opt: {
+        status: "SENT",
         workerCompanySiret: worker.company.siret,
         emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date(),
         transporterTransportSignatureDate: new Date()
       }
     });
@@ -611,8 +621,11 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSDA in transporter's transported wastes once it has been taken over", async () => {
     const bsda = await bsdaFactory({
       opt: {
-        transporterCompanySiret: transporter.company.siret,
         emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret,
         transporterTransportSignatureDate: new Date()
       }
     });
@@ -625,8 +638,11 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should not list a BSDA in transporter'transported wastes before it has been taken over", async () => {
     const bsda = await bsdaFactory({
       opt: {
-        transporterCompanySiret: transporter.company.siret,
         emitterEmissionSignatureDate: null,
+        transporterTransportSignatureDate: null
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret,
         transporterTransportSignatureDate: null
       }
     });
@@ -767,8 +783,13 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSDA in broker's managed wastes after it has been sent", async () => {
     const bsda = await bsdaFactory({
       opt: {
+        status: "SENT",
         brokerCompanySiret: broker.company.siret,
         emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date(),
         transporterTransportSignatureDate: new Date()
       }
     });
@@ -930,8 +951,11 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSDA in transporter's all wastes", async () => {
     const bsda = await bsdaFactory({
       opt: {
-        transporterCompanySiret: transporter.company.siret,
         emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret,
         transporterTransportSignatureDate: new Date()
       }
     });

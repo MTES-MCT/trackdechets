@@ -50,7 +50,7 @@ const SUBMIT_BSDA_REVISION_REQUEST_APPROVAL = `
 describe("ActivityEvent.Bsda", () => {
   afterEach(resetDatabase);
 
-  it.only("should create events during the workflow", async () => {
+  it("should create events during the workflow", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER",

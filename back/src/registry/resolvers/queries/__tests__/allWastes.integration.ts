@@ -103,18 +103,21 @@ describe("All wastes registry", () => {
     bsd2 = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         destinationCompanySiret: destination.company.siret,
         wasteCode: "08 01 17*",
         status: BsdaStatus.PROCESSED,
         createdAt: new Date("2021-05-01"),
         destinationReceptionWeight: 500,
-        transporterTransportTakenOverAt: new Date("2021-05-01"),
-        transporterTransportSignatureDate: new Date(),
         destinationReceptionDate: new Date("2021-05-01"),
         destinationOperationSignatureDate: new Date("2021-05-01"),
         destinationOperationDate: new Date("2021-05-01"),
-        destinationOperationCode: "D 5"
+        destinationOperationCode: "D 5",
+        transporterTransportSignatureDate: new Date("2021-05-01")
+      },
+      transporterOpt: {
+        transporterTransportSignatureDate: new Date("2021-05-01"),
+        transporterTransportTakenOverAt: new Date("2021-05-01"),
+        transporterCompanySiret: transporter.company.siret
       }
     });
     bsd3 = await bsdasriFactory({

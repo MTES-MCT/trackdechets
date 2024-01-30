@@ -97,6 +97,9 @@ export async function parseBsdaInContext(
     transporterTransportMode,
     transporterTransportPlates,
     transporterTransportTakenOverAt,
+    transporterTransportSignatureAuthor,
+    transporterTransportSignatureDate,
+    transporterId,
     ...bsda
   } = zodBsda;
 
@@ -105,8 +108,9 @@ export async function parseBsdaInContext(
   // On renvoie séparement les données du bsda et les données du transporteur
   // car elles font ensuite l'objet de traitement séparé pour construire les payloads de création / update
   return {
-    bsda,
+    bsda: { ...bsda, transporterTransportSignatureDate },
     transporter: {
+      id: transporterId,
       transporterCompanySiret,
       transporterCompanyName,
       transporterCompanyVatNumber,
@@ -121,7 +125,9 @@ export async function parseBsdaInContext(
       transporterRecepisseValidityLimit,
       transporterTransportMode,
       transporterTransportPlates,
-      transporterTransportTakenOverAt
+      transporterTransportTakenOverAt,
+      transporterTransportSignatureAuthor,
+      transporterTransportSignatureDate
     }
   };
 }
