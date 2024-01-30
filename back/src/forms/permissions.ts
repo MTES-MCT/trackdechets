@@ -15,6 +15,7 @@ import {
 import {
   Permission,
   checkUserPermissions,
+  syncCheckUserPermissions,
   getUserRoles,
   can
 } from "../permissions";
@@ -200,8 +201,22 @@ type FormForReadCheck = Prisma.FormGetPayload<{
   };
 }>;
 
-export function isFormReader(user: User, form: FormForReadCheck) {
-  return checkCanRead(user, form).catch(_ => false);
+export function isFormReader(
+  userRoles: Parameters<typeof syncCheckUserPermissions>["0"],
+  form: FormForReadCheck
+) {
+  const authorizedOrgIds = formReaders(form);
+
+  try {
+    return syncCheckUserPermissions(
+      userRoles,
+      authorizedOrgIds,
+      Permission.BsdCanRead,
+      "Vous n'êtes pas autorisé à accéder à ce bordereau"
+    );
+  } catch (_) {
+    return false;
+  }
 }
 
 export async function checkCanRead(user: User, form: FormForReadCheck) {

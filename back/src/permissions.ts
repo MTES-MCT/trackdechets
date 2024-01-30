@@ -190,6 +190,15 @@ export async function checkUserPermissions(
   }
 
   const userRoles = await getUserRoles(user.id);
+  return syncCheckUserPermissions(userRoles, orgIds, permission, errorMsg);
+}
+
+export function syncCheckUserPermissions(
+  userRoles: Awaited<ReturnType<typeof getUserRoles>>,
+  orgIds: string[],
+  permission: Permission,
+  errorMsg = "Vous n'êtes pas autorisé à effectuer cette action"
+) {
   for (const orgId of orgIds.filter(Boolean)) {
     if (
       Object.keys(userRoles).includes(orgId) &&
