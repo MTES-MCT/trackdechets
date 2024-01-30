@@ -26,8 +26,8 @@ export default async function duplicate(
 
   // FIXME - En attente d'une meilleure solution lors de l'implémentation du
   // multi-modal.
-  // Sirenify s'applique normalement sur les données transporteur "à plat"
-  // dans le contact de la validation Zod. Pour pouvoir l'utiliser ici on
+  // Sirenify s'applique sur les données transporteur "à plat"
+  // dans le contexte de la validation Zod. Pour pouvoir l'utiliser ici on
   // doit remettre les données à plat puis reconstruire une version de `transporters`
   // avec les données transporteurs "sirenified".
   const {

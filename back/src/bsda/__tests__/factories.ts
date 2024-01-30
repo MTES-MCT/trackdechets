@@ -5,7 +5,7 @@ import { siretify, upsertBaseSiret } from "../../__tests__/factories";
 
 /**
  * Permet de créer un BSDA avec des données par défaut et
- * un premier trnsporteur. Les données du BSDA et du premier
+ * un premier transporteur. Les données du BSDA et du premier
  * transporteur peuvent être modifiées grâce aux paramètres
  * `opt` et `transporterOpt`.
  *
