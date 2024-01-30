@@ -1,18 +1,9 @@
 import { InitialFormResolvers } from "../../generated/graphql/types";
-import { prisma } from "@td/prisma";
 import { isFormReader } from "../permissions";
 
 const initialFormResolvers: InitialFormResolvers = {
-  emitter: async (parent, _, { user }) => {
-    const form = await prisma.form.findUnique({
-      where: { id: parent.id },
-      include: {
-        forwardedIn: { include: { transporters: true } },
-        transporters: true,
-        grouping: { include: { initialForm: true } },
-        intermediaries: true
-      }
-    });
+  emitter: async (parent, _, { user, dataloaders }) => {
+    const form = await dataloaders.formsForReadCheck.load(parent.id);
     if (!form || !(await isFormReader(user!, form))) {
       return null;
     }

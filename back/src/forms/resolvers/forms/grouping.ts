@@ -12,8 +12,11 @@ const groupingResolver: FormResolvers["grouping"] = async (
 
   const groupements = await dataloaders.nextFormGoupements.load(form.id);
   const initialFormIds = groupements.map(g => g.initialFormId);
+   // Expandable fields are enough here, but the emitter sub-resolver requires the full form.
+   // And because the dashboard uses this field, we use the formsForReadCheck dataloader instead of forms.
+   // So this overfetches for forms required without the emitter.
   const initialForms = await Promise.all(
-    initialFormIds.map(id => dataloaders.forms.load(id))
+    initialFormIds.map(id => dataloaders.formsForReadCheck.load(id))
   );
 
   return groupements.map(({ quantity, initialFormId }) => {
