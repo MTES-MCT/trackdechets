@@ -940,6 +940,10 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         emitterCompanySiret: emitter.company.siret,
         emitterEmissionSignatureDate: new Date(),
         transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterTransportSignatureDate: new Date(),
+        transporterTransportTakenOverAt: new Date()
       }
     });
     const bsdaForElastic = await getBsdaForElastic(bsda);
@@ -986,6 +990,10 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         brokerCompanySiret: broker.company.siret,
         emitterEmissionSignatureDate: new Date(),
         transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterTransportSignatureDate: new Date(),
+        transporterTransportTakenOverAt: new Date()
       }
     });
     const bsdaForElastic = await getBsdaForElastic(bsda);

@@ -58,10 +58,12 @@ export default async function edit(
       }
     : undefined;
 
+  const { id: transporterId, ...transporterData } = transporter;
+
   const transporters = {
     update: {
       where: { id: existingTransporter.id },
-      data: transporter
+      data: transporterData
     }
   };
 
