@@ -21,7 +21,7 @@ export function simpleFormToBsdd(
   const [transporter, transporter2, transporter3] = transporters;
 
   return {
-    id: tov1ReadableId(form.readableId),
+    id: form.readableId,
     customId: form.customId,
     createdAt: form.createdAt,
     updatedAt: form.updatedAt,
@@ -191,13 +191,6 @@ export function formToBsdd(form: RegistryForm): Bsdd & {
       : { forwarding: null }),
     grouping
   };
-}
-
-/**
- * Do not expose BSD suite id (ex : BSD-20220603-PDTKKH7W2-suite) to end user
- */
-export function tov1ReadableId(readableId: string) {
-  return readableId.replace("-suite", "");
 }
 
 export function appendix2toFormFractions(
