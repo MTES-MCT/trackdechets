@@ -13,8 +13,8 @@ export const FINAL_OPERATION_CODES = [
   "R 9",
   "R 10",
   "R 11",
-  // "R12",
-  // "R13",
+  // "R 12",
+  // "R 13",
   "D 1",
   "D 2",
   "D 3",
@@ -23,12 +23,13 @@ export const FINAL_OPERATION_CODES = [
   "D 6",
   "D 7",
   "D 8",
-  // "D9",
+  // "D 9",
   "D 9 F",
   "D 10",
-  "D 12",
-  // "D13",
-  "D 15"
+  "D 12"
+  // "D 13",
+  // "D 14",
+  // "D 15"
 ];
 const TRIMMED_FINAL_OPERATION_CODES = FINAL_OPERATION_CODES.map(trim);
 
