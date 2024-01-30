@@ -34,15 +34,13 @@ interface PeriodeEtablissementInsee {
   etatAdministratifEtablissement: string;
   activitePrincipaleEtablissement: string;
 }
-
-export interface EtablissementInsee {
+interface EtablissementInsee {
   siret: string;
   uniteLegale: {
     denominationUniteLegale: string;
     categorieJuridiqueUniteLegale: string;
     prenom1UniteLegale: string;
     nomUniteLegale: string;
-    sigleUniteLegale: string;
   };
   adresseEtablissement: {
     numeroVoieEtablissement: string;
@@ -56,10 +54,6 @@ export interface EtablissementInsee {
   };
   periodesEtablissement: PeriodeEtablissementInsee[];
   statutDiffusionEtablissement: StatutDiffusionEtablissement;
-  denominationUsuelleEtablissement: string;
-  enseigne1Etablissement: string;
-  enseigne2Etablissement: string;
-  enseigne3Etablissement: string;
 }
 
 // Response from https://api.insee.fr/entreprises/siret/V3/siret/<VOTRE_SIRET>
