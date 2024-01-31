@@ -319,6 +319,7 @@ model EcoOrganisme {
   name          String
   address       String
   handleBsdasri Boolean @default(false)
+  handleBsda    Boolean @default(false)
 }
 
 model Form {
