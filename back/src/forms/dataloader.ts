@@ -45,7 +45,9 @@ async function getFormsForReadCheck(formIds: string[]) {
     }
   });
 
-  return formIds.map(formId => forms.find(form => form.id === formId));
+  const dict = Object.fromEntries(forms.map(form => [form.id, form]));
+
+  return formIds.map(formId => dict[formId]);
 }
 
 async function getForwardedIns(formIds: string[]) {

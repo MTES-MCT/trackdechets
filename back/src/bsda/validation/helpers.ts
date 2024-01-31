@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { Company, User } from "@prisma/client";
 import { objectDiff } from "../../forms/workflow/diff";
 import { BsdaSignatureType } from "../../generated/graphql/types";
 import { flattenBsdaInput, flattenBsdaTransporterInput } from "../converter";
@@ -102,6 +102,36 @@ export async function getUserFunctions(
   unparsedBsda: UnparsedBsda
 ) {
   const companies = user ? await getUserCompanies(user.id) : [];
+  const orgIds = companies.map(c => c.orgId);
+
+  return {
+    isEcoOrganisme:
+      unparsedBsda.ecoOrganismeSiret != null &&
+      orgIds.includes(unparsedBsda.ecoOrganismeSiret),
+    isBroker:
+      unparsedBsda.brokerCompanySiret != null &&
+      orgIds.includes(unparsedBsda.brokerCompanySiret),
+    isWorker:
+      unparsedBsda.workerCompanySiret != null &&
+      orgIds.includes(unparsedBsda.workerCompanySiret),
+    isEmitter:
+      unparsedBsda.emitterCompanySiret != null &&
+      orgIds.includes(unparsedBsda.emitterCompanySiret),
+    isDestination:
+      unparsedBsda.destinationCompanySiret != null &&
+      orgIds.includes(unparsedBsda.destinationCompanySiret),
+    isTransporter:
+      (unparsedBsda.transporterCompanySiret != null &&
+        orgIds.includes(unparsedBsda.transporterCompanySiret)) ||
+      (unparsedBsda.transporterCompanyVatNumber != null &&
+        orgIds.includes(unparsedBsda.transporterCompanyVatNumber))
+  };
+}
+
+export function getCompaniesFunctions(
+  companies: Company[],
+  unparsedBsda: UnparsedBsda
+) {
   const orgIds = companies.map(c => c.orgId);
 
   return {
