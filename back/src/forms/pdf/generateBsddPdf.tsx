@@ -27,12 +27,7 @@ import {
   Transporter,
   TransportSegment
 } from "../../generated/graphql/types";
-import {
-  expandInitialFormFromDb,
-  expandFormFromDb,
-  expandTransportSegmentFromDb,
-  expandableFormIncludes
-} from "../converter";
+import { expandFormFromDb, expandableFormIncludes } from "../converter";
 import { prisma } from "@td/prisma";
 import { buildAddress } from "../../companies/sirene/utils";
 import { packagingsEqual } from "@td/constants";

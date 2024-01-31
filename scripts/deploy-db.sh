@@ -63,10 +63,6 @@ until curl -XGET "$ELASTIC_SEARCH_URL" 2> /dev/null; do
 done
 
 echo "3/3 - Create tables & index";
-if [ "$USING_ENV_FILE" = true ] ; then
-  escapedDatabaseUrl="${DATABASE_URL//$/\\$}"
-else
-  escapedDatabaseUrl=$DATABASE_URL
-fi
+escapedDatabaseUrl="${DATABASE_URL%%\?*}?schema=default\$default"
 
 DATABASE_URL=$escapedDatabaseUrl npx nx run back:integration-setup
