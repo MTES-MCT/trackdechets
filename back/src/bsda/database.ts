@@ -65,10 +65,10 @@ export async function getBsdaHistory<Args extends Prisma.BsdaDefaultArgs>(
 }
 
 export async function getTransporters(
-  form: Pick<Bsda, "id">
+  bsda: Pick<Bsda, "id">
 ): Promise<BsdaTransporter[]> {
   const transporters = await prisma.bsda
-    .findUnique({ where: { id: form.id } })
+    .findUnique({ where: { id: bsda.id } })
     .transporters({ orderBy: { number: "asc" } });
   return transporters ?? [];
 }
@@ -82,9 +82,13 @@ export function getTransportersSync(bsda: {
 export async function getFirstTransporter(
   bsda: Pick<Bsda, "id">
 ): Promise<BsdaTransporter | null> {
-  const transporters = await getTransporters(bsda);
-  const firstTransporter = transporters.find(t => t.number === 1);
-  return firstTransporter ?? null;
+  const transporters = await prisma.bsda
+    .findUnique({ where: { id: bsda.id } })
+    .transporters({ where: { number: 1 } });
+  if (transporters && transporters.length > 0) {
+    return transporters[0];
+  }
+  return null;
 }
 
 export function getFirstTransporterSync(bsda: {
@@ -93,15 +97,4 @@ export function getFirstTransporterSync(bsda: {
   const transporters = getTransportersSync(bsda);
   const firstTransporter = transporters.find(t => t.number === 1);
   return firstTransporter ?? null;
-}
-
-// Renvoie le premier transporteur qui n'a pas encore signé
-export function getNextTransporterSync(bsda: {
-  transporters: BsdaTransporter[] | null;
-}): BsdaTransporter | null {
-  const transporters = getTransportersSync(bsda);
-  const nextTransporter = transporters.find(
-    t => !t.transporterTransportSignatureDate
-  );
-  return nextTransporter ?? null;
 }
