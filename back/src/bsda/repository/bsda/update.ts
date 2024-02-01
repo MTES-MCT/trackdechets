@@ -1,16 +1,17 @@
-import { Bsda, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdaEventTypes } from "./eventTypes";
+import { BsdaWithTransporters } from "../../types";
 
 export type UpdateBsdaFn = (
   where: Prisma.BsdaWhereUniqueInput,
   data: Prisma.XOR<Prisma.BsdaUpdateInput, Prisma.BsdaUncheckedUpdateInput>,
   logMetadata?: LogMetadata
-) => Promise<Bsda>;
+) => Promise<BsdaWithTransporters>;
 
 export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
   return async (where, data, logMetadata?) => {
@@ -35,7 +36,7 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
     const updatedBsda = await prisma.bsda.update({
       where,
       data,
-      include: previousBsdaInclude
+      include: { ...previousBsdaInclude, transporters: true }
     });
 
     await prisma.event.create({

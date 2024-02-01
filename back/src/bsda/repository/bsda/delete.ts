@@ -1,4 +1,4 @@
-import { Bsda, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
@@ -8,11 +8,12 @@ import {
   enqueueUpdatedBsdToIndex
 } from "../../../queue/producers/elastic";
 import { bsdaEventTypes } from "./eventTypes";
+import { BsdaWithTransporters } from "../../types";
 
 export type DeleteBsdaFn = (
   where: Prisma.BsdaWhereUniqueInput,
   logMetadata?: LogMetadata
-) => Promise<Bsda>;
+) => Promise<BsdaWithTransporters>;
 
 export function buildDeleteBsda(deps: RepositoryFnDeps): DeleteBsdaFn {
   return async (where, logMetadata) => {
@@ -25,7 +26,8 @@ export function buildDeleteBsda(deps: RepositoryFnDeps): DeleteBsdaFn {
 
     const deletedBsda = await prisma.bsda.update({
       where,
-      data: { isDeleted: true, forwardingId: null }
+      data: { isDeleted: true, forwardingId: null },
+      include: { transporters: true }
     });
 
     await prisma.bsda.updateMany({

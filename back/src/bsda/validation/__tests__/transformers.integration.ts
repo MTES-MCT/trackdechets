@@ -4,6 +4,7 @@ import {
   transporterReceiptFactory
 } from "../../../__tests__/factories";
 import { bsdaFactory } from "../../__tests__/factories";
+import { getUnparsedBsda } from "../helpers";
 
 describe("BSDA Zod transformers", () => {
   describe("recipisseTransporterTransformer", () => {
@@ -11,7 +12,7 @@ describe("BSDA Zod transformers", () => {
       const company = await companyFactory();
       const receipt = await transporterReceiptFactory({ company });
       const bsda = await bsdaFactory({
-        opt: {
+        transporterOpt: {
           transporterCompanySiret: company.siret,
           transporterCompanyVatNumber: company.vatNumber,
           transporterRecepisseIsExempted: false,
@@ -20,8 +21,12 @@ describe("BSDA Zod transformers", () => {
           transporterRecepisseValidityLimit: null
         }
       });
+      const beforeParsingBsda = getUnparsedBsda({ persisted: bsda });
 
-      const completedInput = await runTransformers(bsda as any, []);
+      const completedInput = await runTransformers(
+        beforeParsingBsda as any,
+        []
+      );
       expect(completedInput).toMatchObject({
         transporterRecepisseIsExempted: false,
         transporterRecepisseNumber: receipt.receiptNumber,
@@ -33,7 +38,7 @@ describe("BSDA Zod transformers", () => {
     it("runTransformers should remove receipt from BSDA when TransporterReceipt does not exist", async () => {
       const company = await companyFactory();
       const bsda = await bsdaFactory({
-        opt: {
+        transporterOpt: {
           transporterCompanySiret: company.siret,
           transporterCompanyVatNumber: company.vatNumber,
           transporterRecepisseIsExempted: false,
@@ -43,7 +48,12 @@ describe("BSDA Zod transformers", () => {
         }
       });
 
-      const completedInput = await runTransformers(bsda as any, []);
+      const beforeParsingBsda = getUnparsedBsda({ persisted: bsda });
+
+      const completedInput = await runTransformers(
+        beforeParsingBsda as any,
+        []
+      );
       expect(completedInput).toMatchObject({
         transporterRecepisseIsExempted: false,
         transporterRecepisseNumber: null,
@@ -54,7 +64,7 @@ describe("BSDA Zod transformers", () => {
     it("runTransformers should correctly process Input with isExempted true and return completedInput without transporter recepisse", async () => {
       const company = await companyFactory();
       const bsda = await bsdaFactory({
-        opt: {
+        transporterOpt: {
           transporterCompanySiret: company.siret,
           transporterCompanyVatNumber: company.vatNumber,
           transporterRecepisseIsExempted: true,
@@ -63,8 +73,12 @@ describe("BSDA Zod transformers", () => {
           transporterRecepisseValidityLimit: null
         }
       });
+      const beforeParsingBsda = getUnparsedBsda({ persisted: bsda });
 
-      const completedInput = await runTransformers(bsda as any, []);
+      const completedInput = await runTransformers(
+        beforeParsingBsda as any,
+        []
+      );
       expect(completedInput).toMatchObject({
         transporterRecepisseIsExempted: true,
         transporterRecepisseNumber: null,

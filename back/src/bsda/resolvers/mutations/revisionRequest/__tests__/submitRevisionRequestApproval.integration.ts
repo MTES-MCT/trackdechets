@@ -571,30 +571,36 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
     const bsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: ttr1.siret,
-        transporterCompanySiret: transporter.siret,
         destinationCompanySiret: destination.siret,
         status: BsdaStatus.SENT
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.siret
       }
     });
 
     const grouped1 = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.siret,
-        transporterCompanySiret: transporter.siret,
         destinationCompanySiret: ttr1.siret,
         destinationOperationCode: "R 13",
         status: BsdaStatus.SENT,
         groupedIn: { connect: { id: bsda.id } }
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.siret
       }
     });
     const grouped2 = await bsdaFactory({
       opt: {
         status: BsdaStatus.SENT,
         emitterCompanySiret: emitter.siret,
-        transporterCompanySiret: transporter.siret,
         destinationCompanySiret: ttr1.siret,
         destinationOperationCode: "R 13",
         groupedIn: { connect: { id: bsda.id } }
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.siret
       }
     });
 
@@ -726,10 +732,12 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       const bsda = await bsdaFactory({
         opt: {
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: transporterCompany.siret,
           workerCompanySiret: workCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
           status: "SENT"
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporterCompany.siret
         }
       });
 

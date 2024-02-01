@@ -103,9 +103,13 @@ export type RegistryForm = Prisma.FormGetPayload<{
   include: typeof RegistryFormInclude;
 }>;
 
-const RegistryBsdaInclude = { grouping: true, forwarding: true };
+export const RegistryBsdaInclude = Prisma.validator<Prisma.BsdaInclude>()({
+  grouping: true,
+  forwarding: true,
+  transporters: true
+});
 
-type RegistryBsda = Prisma.BsdaGetPayload<{
+export type RegistryBsda = Prisma.BsdaGetPayload<{
   include: typeof RegistryBsdaInclude;
 }>;
 

@@ -12,18 +12,23 @@ import {
   BsdaWithIntermediaries,
   BsdaWithIntermediariesInclude,
   BsdaWithRevisionRequests,
-  BsdaWithRevisionRequestsInclude
+  BsdaWithRevisionRequestsInclude,
+  BsdaWithTransporters,
+  BsdaWithTransportersInclude
 } from "./types";
 import { prisma } from "@td/prisma";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
+import { getFirstTransporterSync } from "./database";
 
 export type BsdaForElastic = Bsda &
+  BsdaWithTransporters &
   BsdaWithIntermediaries &
   BsdaWithForwardedIn &
   BsdaWithGroupedIn &
   BsdaWithRevisionRequests;
 
 export const BsdaForElasticInclude = {
+  ...BsdaWithTransportersInclude,
   ...BsdaWithIntermediariesInclude,
   ...BsdaWithForwardedInInclude,
   ...BsdaWithGroupedInInclude,
@@ -80,11 +85,15 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
     {}
   );
 
-  const formSirets: Partial<Record<keyof Bsda, string | null | undefined>> = {
+  const transporter = getFirstTransporterSync(bsda);
+
+  const bsdaSirets: Partial<
+    Record<keyof Bsda | "transporterCompanySiret", string | null | undefined>
+  > = {
     emitterCompanySiret: bsda.emitterCompanySiret,
     workerCompanySiret: bsda.workerCompanySiret,
     destinationCompanySiret: bsda.destinationCompanySiret,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
+    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     brokerCompanySiret: bsda.brokerCompanySiret,
     destinationOperationNextDestinationCompanySiret:
       bsda.destinationOperationNextDestinationCompanySiret,
@@ -92,7 +101,7 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
   };
 
   const siretsFilters = new Map<string, keyof typeof where>(
-    Object.entries(formSirets)
+    Object.entries(bsdaSirets)
       .filter(([_, siret]) => Boolean(siret))
       .map(([actor, _]) => [actor, "isFollowFor"])
   );
@@ -167,7 +176,7 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
 
   for (const [fieldName, filter] of siretsFilters.entries()) {
     if (fieldName) {
-      where[filter].push(formSirets[fieldName]);
+      where[filter].push(bsdaSirets[fieldName]);
     }
   }
 
@@ -176,6 +185,8 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
 
 export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
   const where = getWhere(bsda);
+
+  const transporter = getFirstTransporterSync(bsda);
 
   return {
     type: BsdType.BSDA,
@@ -208,14 +219,14 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     workerCompanySiret: bsda.workerCompanySiret ?? "",
     workerCompanyAddress: bsda.workerCompanyAddress ?? "",
 
-    transporterCompanyName: bsda.transporterCompanyName ?? "",
-    transporterCompanySiret: bsda.transporterCompanySiret ?? "",
-    transporterCompanyVatNumber: bsda.transporterCompanyVatNumber ?? "",
+    transporterCompanyName: transporter?.transporterCompanyName ?? "",
+    transporterCompanySiret: transporter?.transporterCompanySiret ?? "",
+    transporterCompanyVatNumber: transporter?.transporterCompanyVatNumber ?? "",
 
-    transporterCompanyAddress: bsda.transporterCompanyAddress ?? "",
-    transporterCustomInfo: bsda.transporterCustomInfo ?? "",
+    transporterCompanyAddress: transporter?.transporterCompanyAddress ?? "",
+    transporterCustomInfo: transporter?.transporterCustomInfo ?? "",
     transporterTransportPlates:
-      bsda.transporterTransportPlates.map(transportPlateFilter) ?? [],
+      transporter?.transporterTransportPlates.map(transportPlateFilter) ?? [],
 
     destinationCompanyName: bsda.destinationCompanyName ?? "",
     destinationCompanySiret: bsda.destinationCompanySiret ?? "",
@@ -248,8 +259,8 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     emitterEmissionDate: bsda.emitterEmissionSignatureDate?.getTime(),
     workerWorkDate: bsda.workerWorkSignatureDate?.getTime(),
     transporterTransportTakenOverAt:
-      bsda.transporterTransportTakenOverAt?.getTime() ??
-      bsda.transporterTransportSignatureDate?.getTime(),
+      transporter?.transporterTransportTakenOverAt?.getTime() ??
+      transporter?.transporterTransportSignatureDate?.getTime(),
     destinationReceptionDate: bsda.destinationReceptionDate?.getTime(),
     destinationAcceptationDate: bsda.destinationReceptionDate?.getTime(),
     destinationAcceptationWeight: bsda.destinationReceptionWeight,
@@ -266,7 +277,7 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     companyNames: [
       bsda.emitterCompanyName,
       bsda.workerCompanyName,
-      bsda.transporterCompanyName,
+      ...bsda.transporters.map(b => b.transporterCompanyName),
       bsda.destinationCompanyName,
       bsda.brokerCompanyName,
       bsda.ecoOrganismeName,
@@ -278,8 +289,10 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     companyOrgIds: [
       bsda.emitterCompanySiret,
       bsda.workerCompanySiret,
-      bsda.transporterCompanySiret,
-      bsda.transporterCompanyVatNumber,
+      ...bsda.transporters.flatMap(transporter => [
+        transporter.transporterCompanySiret,
+        transporter.transporterCompanyVatNumber
+      ]),
       bsda.destinationCompanySiret,
       bsda.brokerCompanySiret,
       bsda.ecoOrganismeSiret,
