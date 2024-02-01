@@ -53,7 +53,7 @@ export const successfulLogin = async (page: Page, { email, password }) => {
 
   // Disconnect button should be visible
   await expect(
-    page.getByRole("button", { name: "Se déconnecter" })
+    page.getByRole("button", { title: "Se déconnecter" })
   ).toBeVisible();
 
   return { email, password };

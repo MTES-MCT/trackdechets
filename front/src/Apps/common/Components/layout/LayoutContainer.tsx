@@ -21,6 +21,9 @@ const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
   () => import("../../../Dashboard/DashboardRoutes")
 );
+const CompaniesRoutes = lazy(
+  () => import("../../../../account/CompaniesRoutes")
+);
 const Account = lazy(() => import("../../../../account/Account"));
 const AccountMembershipRequest = lazy(
   () => import("../../../../account/AccountMembershipRequest")
@@ -282,6 +285,15 @@ export default function LayoutContainer() {
           />
 
           <Route
+            path={`${routes.companies.index}/*`}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <CompaniesRoutes />
+              </RequireAuth>
+            }
+          />
+
+          <Route
             path={routes.membershipRequest}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
@@ -307,7 +319,7 @@ export default function LayoutContainer() {
                             siret: data.me.companies[0].orgId
                           }
                         )
-                      : routes.account.companies.list
+                      : routes.companies.index
                     : routes.login
                 }
                 replace

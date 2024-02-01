@@ -97,7 +97,7 @@ export default function Dashboard() {
             ? generatePath(routes.dashboard.bsds.drafts, {
                 siret: companies[0].orgId
               })
-            : routes.account.companies.list
+            : routes.companies.index
         }
       />
     );

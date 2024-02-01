@@ -4,19 +4,19 @@ import AccountMenu from "./AccountMenu";
 import { Route, Navigate, Routes, Link } from "react-router-dom";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import { InlineError } from "../Apps/common/Components/Error/Error";
+import { Redirect } from "../Apps/utils/routerUtils";
 import AccountInfo from "./AccountInfo";
 import AccountAccessTokenList from "./accessTokens/AccountAccessTokenList";
-import AccountCompanyList from "./AccountCompanyList";
 import AccountContentWrapper from "./AccountContentWrapper";
-import AccountCompanyAdd from "./AccountCompanyAdd";
-import AccountCompanyAddProducer from "./AccountCompanyAddProducer";
-import AccountCompanyAddForeign from "./AccountCompanyAddForeign";
 import AccountOauth2AppList from "./oauth2/AccountOauth2AppList";
 import AccountOAuth2AppCreateUpdate from "./oauth2/AccountOauth2AppCreateUpdate";
 import { Query } from "@td/codegen-ui";
 import routes, { getRelativeRoute } from "../Apps/routes";
 import AccountAuthorizedAppList from "./apps/AccountAuthorizedAppList";
-import AccountCompanyOrientation from "./AccountCompanyOrientation";
+
+import "../Apps/Dashboard/dashboard.scss";
+import { useMedia } from "../common/use-media";
+import { MEDIA_QUERIES } from "../common/config";
 
 export const GET_ME = gql`
   {
@@ -34,6 +34,8 @@ const toRelative = route => {
 export default function Account() {
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME);
 
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
+
   if (loading) return <Loader />;
 
   if (error) return <InlineError apolloError={error} />;
@@ -41,9 +43,11 @@ export default function Account() {
   if (data) {
     return (
       <div id="account" className="account dashboard">
-        <AccountMenu />
+        {!isMobile && <AccountMenu />}
         <div className="dashboard-content">
           <Routes>
+            <Route index element={<Redirect path={routes.account.info} />} />
+
             <Route
               path={toRelative(routes.account.info)}
               element={
@@ -106,57 +110,27 @@ export default function Account() {
 
             <Route
               path={toRelative(routes.account.companies.orientation)}
-              element={
-                <AccountContentWrapper title="">
-                  <AccountCompanyOrientation />
-                </AccountContentWrapper>
-              }
+              element={<Redirect path={routes.companies.orientation} />}
             />
 
             <Route
               path={toRelative(routes.account.companies.list)}
-              element={
-                <AccountContentWrapper
-                  title="Établissements"
-                  button={
-                    <Link
-                      className="btn btn--primary"
-                      to={routes.account.companies.orientation}
-                    >
-                      Créer un établissement
-                    </Link>
-                  }
-                >
-                  <AccountCompanyList />
-                </AccountContentWrapper>
-              }
+              element={<Redirect path={routes.companies.index} />}
             />
 
             <Route
               path={toRelative(routes.account.companies.create.simple)}
-              element={
-                <AccountContentWrapper title="Créer un établissement">
-                  <AccountCompanyAddProducer />
-                </AccountContentWrapper>
-              }
+              element={<Redirect path={routes.companies.create.simple} />}
             />
 
             <Route
               path={toRelative(routes.account.companies.create.pro)}
-              element={
-                <AccountContentWrapper title="Créer un établissement">
-                  <AccountCompanyAdd />
-                </AccountContentWrapper>
-              }
+              element={<Redirect path={routes.companies.create.pro} />}
             />
 
             <Route
               path={toRelative(routes.account.companies.create.foreign)}
-              element={
-                <AccountContentWrapper title="Créer un transporteur étranger">
-                  <AccountCompanyAddForeign />
-                </AccountContentWrapper>
-              }
+              element={<Redirect path={routes.companies.create.foreign} />}
             />
 
             <Route
