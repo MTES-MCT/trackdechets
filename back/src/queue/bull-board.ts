@@ -11,7 +11,7 @@ import {
   bulkIndexQueue,
   bulkIndexMasterQueue
 } from "./producers/elastic";
-import { updatesQueue } from "./producers/bsdUpdate";
+import { operationHooksQueue, updatesQueue } from "./producers/bsdUpdate";
 import { webhooksQueue } from "./producers/webhooks";
 import { syncEventsQueue } from "./producers/events";
 import { mailQueue } from "./producers/mail";
@@ -30,7 +30,8 @@ createBullBoard({
     new BullAdapter(setCompanyDepartementQueue),
     new BullAdapter(favoritesCompanyQueue),
     new BullAdapter(syncEventsQueue),
-    new BullAdapter(webhooksQueue)
+    new BullAdapter(webhooksQueue),
+    new BullAdapter(operationHooksQueue)
   ],
   serverAdapter: serverAdapter
 });

@@ -7,7 +7,7 @@ import {
   INDEX_UPDATED_JOB_NAME,
   DELETE_JOB_NAME
 } from "./jobNames";
-import { updatesQueue } from "./bsdUpdate";
+import { updatesQueue, operationHooksQueue } from "./bsdUpdate";
 import { updateFavorites } from "../../companies/database";
 
 const { REDIS_URL, NODE_ENV } = process.env;
@@ -138,5 +138,5 @@ export async function enqueueBsdToDelete(
 }
 
 export function closeIndexAndUpdatesQueue() {
-  return Promise.all([indexQueue.close(), updatesQueue.close()]);
+  return Promise.all([indexQueue.close(), updatesQueue.close(), operationHooksQueue.close()]);
 }

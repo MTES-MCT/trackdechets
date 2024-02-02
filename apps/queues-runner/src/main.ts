@@ -6,7 +6,9 @@ import {
   setCompanyDepartementQueue,
   geocodeJob,
   setDepartementJob,
-  syncEventsJob
+  syncEventsJob,
+  operationHooksQueue,
+  operationHookJob
 } from "back";
 
 import { schema } from "@td/env";
@@ -27,6 +29,7 @@ function startConsumers() {
   geocodeCompanyQueue.process(geocodeJob);
   setCompanyDepartementQueue.process(setDepartementJob);
   syncEventsQueue.process(syncEventsJob);
+  operationHooksQueue.process(operationHookJob);
 }
 
 startConsumers();
