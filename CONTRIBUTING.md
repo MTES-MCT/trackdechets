@@ -450,11 +450,11 @@ Chaque update de la branche `dev` déclenche un déploiement sur l'environnement
 2. Balayer le tableau [Favro "Recette du xx/xx/xx"](https://favro.com/organization/ab14a4f0460a99a9d64d4945/02f1ec52bd91efc0adb3c38b) pour vérifier que l'étiquette "Recette OK --> EN PROD" a bien été ajoutée sur toutes les cartes.
 3. Mettre à jour le [Changelog.md](./Changelog.md) avec un nouveau numéro de version (versionnage calendaire)
 4. Créer une PR `dev` -> `master`
-5. Au besoin résoudre les conflits entre `master` et `dev` en fusionnant `master` dans `dev`
+5. Au besoin résoudre les conflits entre `master` et `dev` en fusionnant `master` dans `dev` (**Éviter de Squash & Merge**)
 6. Faire une relecture des différents changements apportés aux modèles de données et scripts de migration.
 7. Si possible faire tourner les migrations sur une copie de la base de prod en local.
 8. S'assurer que les nouvelles variables d'environnement (Cf `.env.model`) ont bien été ajoutée sur Scalingo dans les environnements sandbox et prod respectivement pour les applications `front` et `api`
-9. Merger la PR et suivre l'avancement de la CI github.
+9. Merger la PR (**Éviter de Squash & Merge**) et suivre l'avancement de la CI github.
 10. Suivre l'avancement du déploiement sur Scalingo respectivement pour le front, l'api et la doc.
 
 ## Migrations

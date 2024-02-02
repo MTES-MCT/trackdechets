@@ -1389,11 +1389,13 @@ describe("Mutation.Bsda.create", () => {
     const bsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.siret,
-        transporterCompanySiret: transporter.siret,
         destinationCompanySiret: ttr.siret,
         status: BsdaStatus.AWAITING_CHILD,
         destinationOperationCode: "D 15",
         wasteConsistence: "PULVERULENT"
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.siret
       }
     });
 
@@ -1478,11 +1480,13 @@ describe("Mutation.Bsda.create", () => {
     const bsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.siret,
-        transporterCompanySiret: transporter.siret,
         destinationCompanySiret: ttr.siret,
         status: BsdaStatus.AWAITING_CHILD,
         destinationOperationCode: "D 15",
         wasteConsistence: "SOLIDE"
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.siret
       }
     });
 

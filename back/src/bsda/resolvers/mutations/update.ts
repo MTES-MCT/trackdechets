@@ -2,7 +2,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateBsdaArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { companyToIntermediaryInput, expandBsdaFromDb } from "../../converter";
-import { getBsdaOrNotFound } from "../../database";
+import { getBsdaOrNotFound, getFirstTransporterSync } from "../../database";
 import { checkCanUpdate } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
 import { parseBsdaInContext } from "../../validation";
@@ -14,12 +14,21 @@ export default async function edit(
 ) {
   const user = checkIsAuthenticated(context);
   const existingBsda = await getBsdaOrNotFound(id, {
-    include: { intermediaries: true, grouping: true, forwarding: true }
+    include: {
+      intermediaries: true,
+      grouping: true,
+      forwarding: true,
+      transporters: true
+    }
   });
+
+  // Un premier transporteur est initialisé dans la mutation `createBsda`
+  // ce qui permet d'être certain que `transporter` est défini
+  const existingTransporter = getFirstTransporterSync(existingBsda)!;
 
   await checkCanUpdate(user, existingBsda, input);
 
-  const bsda = await parseBsdaInContext(
+  const { bsda, transporter } = await parseBsdaInContext(
     { input, persisted: existingBsda },
     {
       enableCompletionTransformers: true,
@@ -49,6 +58,15 @@ export default async function edit(
       }
     : undefined;
 
+  const { id: transporterId, ...transporterData } = transporter;
+
+  const transporters = {
+    update: {
+      where: { id: existingTransporter.id },
+      data: transporterData
+    }
+  };
+
   const bsdaRepository = getBsdaRepository(user);
   const updatedBsda = await bsdaRepository.update(
     { id },
@@ -56,7 +74,8 @@ export default async function edit(
       ...bsda,
       forwarding,
       grouping,
-      intermediaries
+      intermediaries,
+      transporters
     }
   );
 

@@ -42,185 +42,195 @@ import {
 } from "../generated/graphql/types";
 import {
   Prisma,
-  Bsda as PrismaBsda,
+  BsdaTransporter as PrismaBsdaTransporter,
   BsdaRevisionRequest
 } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { Decimal } from "decimal.js-light";
 import { BsdaForElastic } from "./elastic";
+import { BsdaWithTransporters } from "./types";
+import { getFirstTransporterSync } from "./database";
 
-export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
+export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
+  const transporter = getFirstTransporterSync(bsda);
   return {
-    id: form.id,
-    createdAt: processDate(form.createdAt),
-    updatedAt: processDate(form.updatedAt),
-    isDraft: form.isDraft,
-    status: form.status,
-    type: form.type,
+    id: bsda.id,
+    createdAt: processDate(bsda.createdAt),
+    updatedAt: processDate(bsda.updatedAt),
+    isDraft: bsda.isDraft,
+    status: bsda.status,
+    type: bsda.type,
     emitter: nullIfNoValues<BsdaEmitter>({
-      isPrivateIndividual: form.emitterIsPrivateIndividual,
+      isPrivateIndividual: bsda.emitterIsPrivateIndividual,
       company: nullIfNoValues<FormCompany>({
-        name: form.emitterCompanyName,
-        siret: form.emitterCompanySiret,
-        address: form.emitterCompanyAddress,
-        contact: form.emitterCompanyContact,
-        phone: form.emitterCompanyPhone,
-        mail: form.emitterCompanyMail
+        name: bsda.emitterCompanyName,
+        siret: bsda.emitterCompanySiret,
+        address: bsda.emitterCompanyAddress,
+        contact: bsda.emitterCompanyContact,
+        phone: bsda.emitterCompanyPhone,
+        mail: bsda.emitterCompanyMail
       }),
-      customInfo: form.emitterCustomInfo,
+      customInfo: bsda.emitterCustomInfo,
       emission: nullIfNoValues<BsdaEmission>({
         signature: nullIfNoValues<Signature>({
-          author: form.emitterEmissionSignatureAuthor,
-          date: processDate(form.emitterEmissionSignatureDate)
+          author: bsda.emitterEmissionSignatureAuthor,
+          date: processDate(bsda.emitterEmissionSignatureDate)
         })
       }),
       pickupSite: nullIfNoValues<BsdaPickupSite>({
-        address: form.emitterPickupSiteAddress,
-        city: form.emitterPickupSiteCity,
-        infos: form.emitterPickupSiteInfos,
-        name: form.emitterPickupSiteName,
-        postalCode: form.emitterPickupSitePostalCode
+        address: bsda.emitterPickupSiteAddress,
+        city: bsda.emitterPickupSiteCity,
+        infos: bsda.emitterPickupSiteInfos,
+        name: bsda.emitterPickupSiteName,
+        postalCode: bsda.emitterPickupSitePostalCode
       })
     }),
     ecoOrganisme: nullIfNoValues<BsdaEcoOrganisme>({
-      name: form.ecoOrganismeName,
-      siret: form.ecoOrganismeSiret
+      name: bsda.ecoOrganismeName,
+      siret: bsda.ecoOrganismeSiret
     }),
-    packagings: form.packagings as BsdaPackaging[],
+    packagings: bsda.packagings as BsdaPackaging[],
     waste: nullIfNoValues<BsdaWaste>({
-      code: form.wasteCode,
-      name: form.wasteMaterialName, // TODO To remove - keeps support for `name` for now
-      consistence: form.wasteConsistence,
-      familyCode: form.wasteFamilyCode,
-      materialName: form.wasteMaterialName,
-      sealNumbers: form.wasteSealNumbers,
-      adr: form.wasteAdr,
-      pop: form.wastePop
+      code: bsda.wasteCode,
+      name: bsda.wasteMaterialName, // TODO To remove - keeps support for `name` for now
+      consistence: bsda.wasteConsistence,
+      familyCode: bsda.wasteFamilyCode,
+      materialName: bsda.wasteMaterialName,
+      sealNumbers: bsda.wasteSealNumbers,
+      adr: bsda.wasteAdr,
+      pop: bsda.wastePop
     }),
     weight: nullIfNoValues<BsdaWeight>({
-      isEstimate: form.weightIsEstimate,
-      value: form.weightValue
-        ? new Decimal(form.weightValue).dividedBy(1000).toNumber()
-        : form.weightValue
+      isEstimate: bsda.weightIsEstimate,
+      value: bsda.weightValue
+        ? new Decimal(bsda.weightValue).dividedBy(1000).toNumber()
+        : bsda.weightValue
     }),
     destination: nullIfNoValues<BsdaDestination>({
       company: nullIfNoValues<FormCompany>({
-        name: form.destinationCompanyName,
-        siret: form.destinationCompanySiret,
-        address: form.destinationCompanyAddress,
-        contact: form.destinationCompanyContact,
-        phone: form.destinationCompanyPhone,
-        mail: form.destinationCompanyMail
+        name: bsda.destinationCompanyName,
+        siret: bsda.destinationCompanySiret,
+        address: bsda.destinationCompanyAddress,
+        contact: bsda.destinationCompanyContact,
+        phone: bsda.destinationCompanyPhone,
+        mail: bsda.destinationCompanyMail
       }),
-      customInfo: form.destinationCustomInfo,
-      cap: form.destinationCap,
-      plannedOperationCode: form.destinationPlannedOperationCode,
+      customInfo: bsda.destinationCustomInfo,
+      cap: bsda.destinationCap,
+      plannedOperationCode: bsda.destinationPlannedOperationCode,
       reception: nullIfNoValues<BsdaReception>({
-        acceptationStatus: form.destinationReceptionAcceptationStatus,
-        refusalReason: form.destinationReceptionRefusalReason,
-        date: processDate(form.destinationReceptionDate),
-        weight: form.destinationReceptionWeight
-          ? new Decimal(form.destinationReceptionWeight)
+        acceptationStatus: bsda.destinationReceptionAcceptationStatus,
+        refusalReason: bsda.destinationReceptionRefusalReason,
+        date: processDate(bsda.destinationReceptionDate),
+        weight: bsda.destinationReceptionWeight
+          ? new Decimal(bsda.destinationReceptionWeight)
               .dividedBy(1000)
               .toNumber()
-          : form.destinationReceptionWeight
+          : bsda.destinationReceptionWeight
       }),
       operation: nullIfNoValues<BsdaOperation>({
-        code: form.destinationOperationCode,
-        mode: form.destinationOperationMode,
-        description: form.destinationOperationDescription,
-        date: form.destinationOperationDate,
+        code: bsda.destinationOperationCode,
+        mode: bsda.destinationOperationMode,
+        description: bsda.destinationOperationDescription,
+        date: bsda.destinationOperationDate,
         signature: nullIfNoValues<Signature>({
-          author: form.destinationOperationSignatureAuthor,
-          date: processDate(form.destinationOperationSignatureDate)
+          author: bsda.destinationOperationSignatureAuthor,
+          date: processDate(bsda.destinationOperationSignatureDate)
         }),
         nextDestination: nullIfNoValues<BsdaNextDestination>({
           company: nullIfNoValues<FormCompany>({
-            name: form.destinationOperationNextDestinationCompanyName,
-            siret: form.destinationOperationNextDestinationCompanySiret,
-            address: form.destinationOperationNextDestinationCompanyAddress,
-            contact: form.destinationOperationNextDestinationCompanyContact,
-            phone: form.destinationOperationNextDestinationCompanyPhone,
-            mail: form.destinationOperationNextDestinationCompanyMail
+            name: bsda.destinationOperationNextDestinationCompanyName,
+            siret: bsda.destinationOperationNextDestinationCompanySiret,
+            address: bsda.destinationOperationNextDestinationCompanyAddress,
+            contact: bsda.destinationOperationNextDestinationCompanyContact,
+            phone: bsda.destinationOperationNextDestinationCompanyPhone,
+            mail: bsda.destinationOperationNextDestinationCompanyMail
           }),
-          cap: form.destinationOperationNextDestinationCap,
+          cap: bsda.destinationOperationNextDestinationCap,
           plannedOperationCode:
-            form.destinationOperationNextDestinationPlannedOperationCode
+            bsda.destinationOperationNextDestinationPlannedOperationCode
         })
       })
     }),
     worker: nullIfNoValues<BsdaWorker>({
-      isDisabled: Boolean(form.workerIsDisabled),
+      isDisabled: Boolean(bsda.workerIsDisabled),
       company: nullIfNoValues<FormCompany>({
-        name: form.workerCompanyName,
-        siret: form.workerCompanySiret,
-        address: form.workerCompanyAddress,
-        contact: form.workerCompanyContact,
-        phone: form.workerCompanyPhone,
-        mail: form.workerCompanyMail
+        name: bsda.workerCompanyName,
+        siret: bsda.workerCompanySiret,
+        address: bsda.workerCompanyAddress,
+        contact: bsda.workerCompanyContact,
+        phone: bsda.workerCompanyPhone,
+        mail: bsda.workerCompanyMail
       }),
       certification: nullIfNoValues<BsdaWorkerCertification>({
-        hasSubSectionFour: form.workerCertificationHasSubSectionFour,
-        hasSubSectionThree: form.workerCertificationHasSubSectionThree,
-        certificationNumber: form.workerCertificationCertificationNumber,
-        validityLimit: form.workerCertificationValidityLimit,
-        organisation: form.workerCertificationOrganisation
+        hasSubSectionFour: bsda.workerCertificationHasSubSectionFour,
+        hasSubSectionThree: bsda.workerCertificationHasSubSectionThree,
+        certificationNumber: bsda.workerCertificationCertificationNumber,
+        validityLimit: bsda.workerCertificationValidityLimit,
+        organisation: bsda.workerCertificationOrganisation
       }),
       work: nullIfNoValues<BsdaWork>({
-        hasEmitterPaperSignature: form.workerWorkHasEmitterPaperSignature,
+        hasEmitterPaperSignature: bsda.workerWorkHasEmitterPaperSignature,
         signature: nullIfNoValues<Signature>({
-          author: form.workerWorkSignatureAuthor,
-          date: processDate(form.workerWorkSignatureDate)
+          author: bsda.workerWorkSignatureAuthor,
+          date: processDate(bsda.workerWorkSignatureDate)
         })
       })
     }),
     broker: nullIfNoValues<BsdaBroker>({
       company: nullIfNoValues<FormCompany>({
-        name: form.brokerCompanyName,
-        siret: form.brokerCompanySiret,
-        address: form.brokerCompanyAddress,
-        contact: form.brokerCompanyContact,
-        phone: form.brokerCompanyPhone,
-        mail: form.brokerCompanyMail
+        name: bsda.brokerCompanyName,
+        siret: bsda.brokerCompanySiret,
+        address: bsda.brokerCompanyAddress,
+        contact: bsda.brokerCompanyContact,
+        phone: bsda.brokerCompanyPhone,
+        mail: bsda.brokerCompanyMail
       }),
       recepisse: nullIfNoValues<BsdaRecepisse>({
-        department: form.brokerRecepisseDepartment,
-        number: form.brokerRecepisseNumber,
-        validityLimit: processDate(form.brokerRecepisseValidityLimit)
+        department: bsda.brokerRecepisseDepartment,
+        number: bsda.brokerRecepisseNumber,
+        validityLimit: processDate(bsda.brokerRecepisseValidityLimit)
       })
     }),
-    transporter: nullIfNoValues<BsdaTransporter>({
-      company: nullIfNoValues<FormCompany>({
-        name: form.transporterCompanyName,
-        orgId: getTransporterCompanyOrgId(form),
-        siret: form.transporterCompanySiret,
-        vatNumber: form.transporterCompanyVatNumber,
-        address: form.transporterCompanyAddress,
-        contact: form.transporterCompanyContact,
-        phone: form.transporterCompanyPhone,
-        mail: form.transporterCompanyMail
-      }),
-      customInfo: form.transporterCustomInfo,
-      recepisse: nullIfNoValues<BsdaRecepisse>({
-        department: form.transporterRecepisseDepartment,
-        number: form.transporterRecepisseNumber,
-        validityLimit: processDate(form.transporterRecepisseValidityLimit),
-        isExempted: form.transporterRecepisseIsExempted
-      }),
-      transport: nullIfNoValues<BsdaTransport>({
-        mode: form.transporterTransportMode,
-        plates: form.transporterTransportPlates,
-        takenOverAt: processDate(form.transporterTransportTakenOverAt),
-        signature: nullIfNoValues<Signature>({
-          author: form.transporterTransportSignatureAuthor,
-          date: processDate(form.transporterTransportSignatureDate)
-        })
-      })
-    }),
+    transporter: transporter ? expandTransporterFromDb(transporter) : null,
     grouping: [],
     metadata: undefined as any
   };
 }
+
+export function expandTransporterFromDb(
+  transporter: PrismaBsdaTransporter
+): BsdaTransporter | null {
+  return nullIfNoValues<BsdaTransporter>({
+    company: nullIfNoValues<FormCompany>({
+      name: transporter.transporterCompanyName,
+      orgId: getTransporterCompanyOrgId(transporter),
+      siret: transporter.transporterCompanySiret,
+      vatNumber: transporter.transporterCompanyVatNumber,
+      address: transporter.transporterCompanyAddress,
+      contact: transporter.transporterCompanyContact,
+      phone: transporter.transporterCompanyPhone,
+      mail: transporter.transporterCompanyMail
+    }),
+    customInfo: transporter.transporterCustomInfo,
+    recepisse: nullIfNoValues<BsdaRecepisse>({
+      department: transporter.transporterRecepisseDepartment,
+      number: transporter.transporterRecepisseNumber,
+      validityLimit: processDate(transporter.transporterRecepisseValidityLimit),
+      isExempted: transporter.transporterRecepisseIsExempted
+    }),
+    transport: nullIfNoValues<BsdaTransport>({
+      mode: transporter.transporterTransportMode,
+      plates: transporter.transporterTransportPlates,
+      takenOverAt: processDate(transporter.transporterTransportTakenOverAt),
+      signature: nullIfNoValues<Signature>({
+        author: transporter.transporterTransportSignatureAuthor,
+        date: processDate(transporter.transporterTransportSignatureDate)
+      })
+    })
+  });
+}
+
 export function expandBsdaFromElastic(bsda: BsdaForElastic): GraphqlBsda {
   const expanded = expandBsdaFromDb(bsda);
 
@@ -274,7 +284,6 @@ export function flattenBsdaInput(formInput: BsdaInput) {
     ...flattenBsdaEmitterInput(formInput),
     ...flattenBsdaEcoOrganismeInput(formInput),
     ...flattenBsdaDestinationInput(formInput),
-    ...flattenBsdaTransporterInput(formInput),
     ...flattenBsdaWorkerInput(formInput),
     ...flattenBsdaBrokerInput(formInput),
     ...flattenBsdaWasteInput(formInput),
@@ -432,10 +441,10 @@ function flattenBsdaDestinationInput({
   };
 }
 
-function flattenBsdaTransporterInput({
+export function flattenBsdaTransporterInput({
   transporter
 }: Pick<BsdaInput, "transporter">) {
-  return {
+  return safeInput({
     transporterCompanyName: chain(transporter, t =>
       chain(t.company, c => c.name)
     ),
@@ -480,7 +489,7 @@ function flattenBsdaTransporterInput({
     transporterTransportTakenOverAt: chain(transporter, t =>
       chain(t.transport, tr => tr.takenOverAt)
     )
-  };
+  });
 }
 
 function flattenBsdaWorkerInput({ worker }: Pick<BsdaInput, "worker">) {

@@ -1388,6 +1388,11 @@ model Bsda {
   brokerRecepisseDepartment    String?
   brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
+  // Date de signature du premier transporteur 
+  // Cette valeur est dupliquée entre le modèle Bsda et BsdaTransporter[0]
+  // pour optimiser certains calculs
+  transporterTransportSignatureDate DateTime? @db.Timestamptz(6)
+
   destinationCompanyName          String?
   destinationCompanySiret         String?
   destinationCompanyAddress       String?
@@ -1420,26 +1425,7 @@ model Bsda {
   destinationOperationNextDestinationCap                  String?
   destinationOperationNextDestinationPlannedOperationCode String?
 
-  transporterCompanyName      String?
-  transporterCompanySiret     String?
-  transporterCompanyAddress   String?
-  transporterCompanyContact   String?
-  transporterCompanyPhone     String?
-  transporterCompanyMail      String?
-  transporterCompanyVatNumber String?
-
-  transporterCustomInfo String?
-
-  transporterRecepisseIsExempted    Boolean?
-  transporterRecepisseNumber        String?
-  transporterRecepisseDepartment    String?
-  transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
-
-  transporterTransportMode            TransportMode? @default(ROAD)
-  transporterTransportPlates          String[]
-  transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
-  transporterTransportSignatureAuthor String?
-  transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)
+  transporters BsdaTransporter[]
 
   workerIsDisabled Boolean?
 
@@ -1479,13 +1465,42 @@ model Bsda {
   @@index([emitterCompanySiret], map: "_BsdaEmitterCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_BsdaBrokerCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdaDestinationCompanySiretIdx")
-  @@index([transporterCompanySiret], map: "_BsdaTransporterCompanySiretIdx")
-  @@index([transporterCompanyVatNumber], map: "_BsdaTransporterCompanyVatNumberIdx")
   @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
   @@index([destinationOperationNextDestinationCompanySiret], map: "_BsdaDestinationOperationNextDestinationCompanySiretIdx")
   @@index([status], map: "_BsdaStatusIdx")
   @@index([groupedInId], map: "_BsdaGroupedInIdIdx")
   @@index([updatedAt], map: "_BsdaUpdatedAtIdx")
+}
+
+model BsdaTransporter {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  number    Int
+  bsdaId    String?
+  bsda      Bsda?    @relation(fields: [bsdaId], references: [id], onDelete: Cascade)
+
+  transporterCompanySiret             String?
+  transporterCompanyName              String?
+  transporterCompanyVatNumber         String?
+  transporterCompanyAddress           String?
+  transporterCompanyContact           String?
+  transporterCompanyPhone             String?
+  transporterCompanyMail              String?
+  transporterCustomInfo               String?
+  transporterRecepisseIsExempted      Boolean?
+  transporterRecepisseNumber          String?
+  transporterRecepisseDepartment      String?
+  transporterRecepisseValidityLimit   DateTime?      @db.Timestamptz(6)
+  transporterTransportMode            TransportMode? @default(ROAD)
+  transporterTransportPlates          String[]
+  transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
+  transporterTransportSignatureAuthor String?
+  transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)
+
+  @@index([bsdaId], map: "_BsdaTransporterFormIdIdx")
+  @@index([transporterCompanySiret], map: "_BsdaTransporterCompanySiretIdx")
+  @@index([transporterCompanyVatNumber], map: "_BsdaTransporterCompanyVatNumberIdx")
 }
 
 model BsdaRevisionRequest {

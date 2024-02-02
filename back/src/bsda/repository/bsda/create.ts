@@ -1,15 +1,16 @@
-import { Bsda, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdaEventTypes } from "./eventTypes";
+import { BsdaWithTransporters } from "../../types";
 
 export type CreateBsdaFn = (
   data: Prisma.BsdaCreateInput,
   logMetadata?: LogMetadata
-) => Promise<Bsda>;
+) => Promise<BsdaWithTransporters>;
 
 export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
   return async (data, logMetadata?) => {
@@ -18,7 +19,8 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
     const bsda = await prisma.bsda.create({
       data,
       include: {
-        grouping: { select: { id: true } }
+        grouping: { select: { id: true } },
+        transporters: true
       }
     });
 

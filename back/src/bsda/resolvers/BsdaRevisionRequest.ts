@@ -8,6 +8,7 @@ import {
   expandBsdaRevisionRequestContent,
   expandBsdaFromDb
 } from "../converter";
+import { BsdaWithTransporters } from "../types";
 
 const bsdaRevisionRequestResolvers: BsdaRevisionRequestResolvers = {
   approvals: async parent => {
@@ -38,12 +39,15 @@ const bsdaRevisionRequestResolvers: BsdaRevisionRequestResolvers = {
   ) => {
     const actualBsda = await prisma.bsdaRevisionRequest
       .findUnique({ where: { id: parent.id } })
-      .bsda();
+      .bsda({ include: { transporters: true } });
     const bsdaFromEvents = await getBsdaFromActivityEvents(
       { bsdaId: parent.bsdaId, at: parent.createdAt },
       { dataloader: dataloaders.events }
     );
-    return expandBsdaFromDb({ ...actualBsda, ...bsdaFromEvents });
+    return expandBsdaFromDb({
+      ...actualBsda,
+      ...bsdaFromEvents
+    } as BsdaWithTransporters);
   }
 };
 

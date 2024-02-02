@@ -17,7 +17,7 @@ export enum InfoIconValue {
   CustomInfo = "Champ libre",
   TransporterNumberPlate = "Plaque d'immatriculation",
   PickupSite = "",
-  CustomId = "N° libre: ",
+  CustomId = "N° libre : ",
   default = ""
 }
 

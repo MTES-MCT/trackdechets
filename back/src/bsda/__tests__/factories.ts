@@ -3,23 +3,51 @@ import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { prisma } from "@td/prisma";
 import { siretify, upsertBaseSiret } from "../../__tests__/factories";
 
+/**
+ * Permet de créer un BSDA avec des données par défaut et
+ * un premier transporteur. Les données du BSDA et du premier
+ * transporteur peuvent être modifiées grâce aux paramètres
+ * `opt` et `transporterOpt`.
+ *
+ * Pour créer un BSDA avec des transporteurs multi-modaux, on
+ * commence par créer un BSDA avec un premier transporteur
+ * grâce à `bsdaFactory` puis on ajoute les transporteur suivants
+ * grâce à `bsdaTransporterFactory`
+ */
 export const bsdaFactory = async ({
-  opt = {}
+  opt = {},
+  transporterOpt = {}
 }: {
   opt?: Partial<Prisma.BsdaCreateInput>;
+  transporterOpt?: Partial<Prisma.BsdaTransporterCreateInput>;
 }) => {
   const bsdaObject = getBsdaObject();
 
-  await upsertBaseSiret(bsdaObject.transporterCompanySiret);
+  await upsertBaseSiret(
+    (
+      bsdaObject.transporters!
+        .create! as Prisma.BsdaTransporterCreateWithoutBsdaInput
+    ).transporterCompanySiret // Prisma.BsdaTransporterCreateWithoutBsdaInput[] is wrongly infered
+  );
   await upsertBaseSiret(bsdaObject.destinationCompanySiret);
   await upsertBaseSiret(bsdaObject.workerCompanySiret);
 
-  const formParams = { ...bsdaObject, ...opt };
+  const data: Prisma.BsdaCreateInput = {
+    ...bsdaObject,
+    ...opt,
+    transporters: {
+      create: { ...bsdaObject.transporters!.create!, ...transporterOpt }
+    }
+  };
+
   const created = await prisma.bsda.create({
-    data: {
-      ...formParams
-    },
-    include: { intermediaries: true, grouping: true, forwarding: true }
+    data: data,
+    include: {
+      intermediaries: true,
+      grouping: true,
+      forwarding: true,
+      transporters: true
+    }
   });
   if (created?.intermediaries) {
     return prisma.bsda.update({
@@ -29,11 +57,51 @@ export const bsdaFactory = async ({
           .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
           .filter(Boolean)
       },
-      include: { intermediaries: true, grouping: true, forwarding: true }
+      include: {
+        intermediaries: true,
+        grouping: true,
+        forwarding: true,
+        transporters: true
+      }
     });
   }
 
   return created;
+};
+
+export const bsdaTransporterFactory = async ({
+  bsdaId,
+  opts
+}: {
+  bsdaId: string;
+  opts: Omit<Prisma.BsdaTransporterCreateWithoutBsdaInput, "number">;
+}) => {
+  const count = await prisma.bsdaTransporter.count({ where: { bsdaId } });
+  return prisma.bsdaTransporter.create({
+    data: {
+      bsda: { connect: { id: bsdaId } },
+      ...bsdaTransporterData,
+      number: count + 1,
+      ...opts
+    }
+  });
+};
+
+const bsdaTransporterData: Omit<
+  Prisma.BsdaTransporterCreateWithoutBsdaInput,
+  "number"
+> = {
+  transporterCompanyName: "Transport facile",
+  transporterCompanySiret: siretify(3),
+  transporterCompanyAddress: "12 route du Transporter, Transporter City",
+  transporterCompanyContact: "Henri Transport",
+  transporterCompanyPhone: "06 06 06 06 06",
+  transporterCompanyMail: "transporter@td.io",
+  transporterRecepisseNumber: "a receipt",
+  transporterRecepisseDepartment: "83",
+  transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
+  transporterTransportMode: "ROAD",
+  transporterTransportPlates: ["AA-00-XX"]
 };
 
 const getBsdaObject = (): Prisma.BsdaCreateInput => ({
@@ -73,18 +141,6 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   destinationCompanyMail: "recipient@td.io",
   destinationCap: "CAP",
 
-  transporterCompanyName: "Transport facile",
-  transporterCompanySiret: siretify(3),
-  transporterCompanyAddress: "12 route du Transporter, Transporter City",
-  transporterCompanyContact: "Henri Transport",
-  transporterCompanyPhone: "06 06 06 06 06",
-  transporterCompanyMail: "transporter@td.io",
-  transporterRecepisseNumber: "a receipt",
-  transporterRecepisseDepartment: "83",
-  transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
-  transporterTransportMode: "ROAD",
-  transporterTransportPlates: ["AA-00-XX"],
-
   destinationReceptionDate: "2019-11-27T00:00:00.000Z",
   destinationReceptionWeight: 1.2,
   destinationReceptionAcceptationStatus: "ACCEPTED",
@@ -99,5 +155,9 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   workerCompanyAddress: "1 route du travail, Travaux city",
   workerCompanyContact: "Jack Travaux",
   workerCompanyPhone: "05 05 05 05 05",
-  workerCompanyMail: "travaux@td.io"
+  workerCompanyMail: "travaux@td.io",
+
+  transporters: {
+    create: { ...bsdaTransporterData, number: 1 }
+  }
 });

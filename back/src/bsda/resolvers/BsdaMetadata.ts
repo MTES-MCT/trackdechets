@@ -18,7 +18,12 @@ function getNextSignature(bsda) {
 export const Metadata: BsdaMetadataResolvers = {
   errors: async (metadata: BsdaMetadata & { id: string }) => {
     const bsda = await getBsdaOrNotFound(metadata.id, {
-      include: { intermediaries: true, grouping: true, forwarding: true }
+      include: {
+        intermediaries: true,
+        grouping: true,
+        forwarding: true,
+        transporters: true
+      }
     });
 
     const currentSignatureType = getNextSignature(bsda);

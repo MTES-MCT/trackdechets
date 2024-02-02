@@ -7,12 +7,20 @@ import { expandBsdaFromDb } from "../converter";
 import { getBsdaHistory } from "../database";
 import { BsdaPdf } from "./components/BsdaPdf";
 import concatStream from "concat-stream";
+import { BsdaWithTransporters, BsdaWithTransportersInclude } from "../types";
 
-export async function buildPdf(bsda: Bsda) {
+export type BsdaForPDF = Bsda & BsdaWithTransporters;
+
+export const BsdaForPDFInclude = BsdaWithTransportersInclude;
+
+export async function buildPdf(bsda: BsdaForPDF) {
   const qrCode = await QRCode.toString(bsda.id, { type: "svg" });
+
   const expandedBsda = expandBsdaFromDb(bsda);
 
-  const previousDbBsdas = await getBsdaHistory(bsda);
+  const previousDbBsdas = await getBsdaHistory(bsda, {
+    include: BsdaForPDFInclude
+  });
   const previousBsdas = previousDbBsdas.map(bsda => expandBsdaFromDb(bsda));
 
   const html = ReactDOMServer.renderToStaticMarkup(
@@ -25,7 +33,7 @@ export async function buildPdf(bsda: Bsda) {
   return generatePdf(html);
 }
 
-export async function buildPdfAsBase64(bsda: Bsda): Promise<string> {
+export async function buildPdfAsBase64(bsda: BsdaForPDF): Promise<string> {
   const readableStream = await buildPdf(bsda);
 
   return new Promise((resolve, reject) => {

@@ -7,6 +7,7 @@ import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
 import { getBsdaRepository } from "../../repository";
 import { Permission, can, getUserRoles } from "../../../permissions";
+import { Prisma } from "@prisma/client";
 
 export default async function bsdas(
   _,
@@ -20,13 +21,21 @@ export default async function bsdas(
     can(roles[orgId], Permission.BsdCanList)
   );
 
-  const mask = {
+  const mask: Prisma.BsdaWhereInput = {
     OR: [
       { emitterCompanySiret: { in: orgIdsWithListPermission } },
       { destinationCompanySiret: { in: orgIdsWithListPermission } },
-      { transporterCompanySiret: { in: orgIdsWithListPermission } },
-      { transporterCompanyVatNumber: { in: orgIdsWithListPermission } },
       { workerCompanySiret: { in: orgIdsWithListPermission } },
+      {
+        transporters: {
+          some: {
+            OR: [
+              { transporterCompanySiret: { in: orgIdsWithListPermission } },
+              { transporterCompanyVatNumber: { in: orgIdsWithListPermission } }
+            ]
+          }
+        }
+      },
       { brokerCompanySiret: { in: orgIdsWithListPermission } },
       {
         destinationOperationNextDestinationCompanySiret: {
@@ -42,7 +51,7 @@ export default async function bsdas(
     isDeleted: false
   };
 
-  const where = applyMask(prismaWhere, mask);
+  const where = applyMask<Prisma.BsdaWhereInput>(prismaWhere, mask);
   const bsdaRepository = getBsdaRepository(user);
   const totalCount = await bsdaRepository.count(where);
 
