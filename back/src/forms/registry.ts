@@ -240,10 +240,9 @@ export function toOutgoingWaste(
     emitterCustomInfo: null,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     ...getOperationData(bsdd),
-    finalOperationCodes:
-      bsdd.finalOperations?.map(ope  => ope.operationCode),
-    finalReceptionWeights:
-      bsdd.finalOperations?.map(ope  => ope.quantity),
+    // TODO maintain order
+    finalOperationCodes: bsdd.finalOperations?.map(ope => ope.operationCode),
+    finalReceptionWeights: bsdd.finalOperations?.map(ope => ope.quantity)
   };
 }
 
@@ -418,6 +417,9 @@ export function toAllWaste(
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
-    ...getOperationData(bsdd)
+    ...getOperationData(bsdd),
+    // TODO maintain order
+    finalOperationCodes: bsdd.finalOperations?.map(ope => ope.operationCode),
+    finalReceptionWeights: bsdd.finalOperations?.map(ope => ope.quantity)
   };
 }
