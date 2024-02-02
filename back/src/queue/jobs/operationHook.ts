@@ -25,18 +25,20 @@ export async function operationHookJob(
 ): Promise<void> {
   await operationHook(job.data);
 }
+
+// Codes de traitement finaux
+const finalOperationCodes = PROCESSING_OPERATIONS.filter(
+  p =>
+    p.type === ProcessingOperationType.Eliminiation ||
+    p.type === ProcessingOperationType.Valorisation
+).map(p => p.code);
+
 /*
  * Hook qui est appelé à chaque fois qu'un applique une opération
  * de traitement sur un bordereau
  */
 export async function operationHook(args: OperationHookArgs) {
   const { operation, formId } = args;
-  // Codes de traitement finaux
-  const finalOperationCodes = PROCESSING_OPERATIONS.filter(
-    p =>
-      p.type === ProcessingOperationType.Eliminiation ||
-      p.type === ProcessingOperationType.Valorisation
-  ).map(p => p.code);
   if (
     // Le code n'est appelé qu'en cas de traitement final ou de rupture de traçabilité
     finalOperationCodes.includes(operation.processingOperationDone!) ||

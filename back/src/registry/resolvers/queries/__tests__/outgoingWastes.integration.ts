@@ -44,6 +44,7 @@ import { OUTGOING_WASTES, OUTGOING_WASTES_TTR } from "./queries";
 import supertest from "supertest";
 import { app } from "../../../../server";
 import { faker } from "@faker-js/faker";
+import { operationHook } from "../../../../queue/jobs/operationHook";
 
 describe("Outgoing wastes registry", () => {
   let emitter: { user: User; company: Company };
@@ -492,8 +493,17 @@ describe("Outgoing wastes registry", () => {
     const formWithTempStorageFullForm = await getFormForElastic(
       formWithTempStorage
     );
+    const forwardedInithTempStorageFullForm = await getFormForElastic(
+      formWithTempStorage.forwardedIn!
+    );
     await indexForm(formWithTempStorageFullForm);
+    await indexForm(forwardedInithTempStorageFullForm);
     await refreshElasticSearch();
+    // Manually execute operationHook to simulate markAsProcessed
+    await operationHook({
+      operation: forwardedInithTempStorageFullForm,
+      formId: forwardedInithTempStorageFullForm.id
+    });
 
     const { data } = await query<Pick<Query, "outgoingWastes">>(
       OUTGOING_WASTES_TTR,
@@ -505,12 +515,10 @@ describe("Outgoing wastes registry", () => {
       }
     );
     expect(data.outgoingWastes.edges).toHaveLength(2);
-    const outgoingWastes = data.outgoingWastes.edges.map(e => e.node)[0];
+    const outgoingWastes = data.outgoingWastes.edges.map(e => e.node)[1];
     expect(outgoingWastes.emitterCompanySiret).toEqual(emitter.company.siret);
     // destinationReceptionWeight doit être celui de la destination finale et no pas de l'installation de transit
-    expect(outgoingWastes.finalReceptionWeights).toBe(["100"]);
-    expect(outgoingWastes.finalOperationCodes).toBe([
-      "R1"
-    ]);
+    expect(outgoingWastes.finalReceptionWeights).toBe([100]);
+    expect(outgoingWastes.finalOperationCodes).toBe(["R1"]);
   });
 });
