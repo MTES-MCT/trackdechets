@@ -241,8 +241,8 @@ export const OUTGOING_WASTES_TTR = gql`
         node {
           id
           emitterCompanySiret
-          destinationForwardedInReceptionWeight
-          destinationForwardedInReceptionOperationCode
+          finalReceptionWeights
+          finalOperationCodes
         }
       }
     }

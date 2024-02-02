@@ -1,4 +1,4 @@
-import { Form, BsddTransporter } from "@prisma/client";
+import { Form, BsddTransporter, FinalOperation } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
@@ -185,7 +185,7 @@ export function toIncomingWaste(
 
 export function toOutgoingWaste(
   bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] } & {
-    forwardedIn: Bsdd;
+    finalOperations: FinalOperation[];
   }
 ): Required<OutgoingWaste> {
   const initialEmitter: Record<string, string | string[] | null> = {
@@ -240,10 +240,10 @@ export function toOutgoingWaste(
     emitterCustomInfo: null,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     ...getOperationData(bsdd),
-    destinationForwardedInReceptionOperationCode:
-      bsdd.forwardedIn?.destinationOperationCode ?? null,
-    destinationForwardedInReceptionWeight:
-      bsdd.forwardedIn?.destinationReceptionWeight ?? null
+    finalOperationCodes:
+      bsdd.finalOperations?.map(ope  => ope.operationCode),
+    finalReceptionWeights:
+      bsdd.finalOperations?.map(ope  => ope.quantity),
   };
 }
 

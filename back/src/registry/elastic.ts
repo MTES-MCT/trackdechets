@@ -95,7 +95,7 @@ export async function searchBsds(
 
 type RegistryFormIncludeType = {
   forwarding: { include: { transporters: boolean } };
-  forwardedIn?: { include: { transporters?: boolean } };
+  finalOperations?: boolean;
   grouping: {
     include: {
       initialForm: {
@@ -108,7 +108,7 @@ type RegistryFormIncludeType = {
 
 export const RegistryFormInclude: RegistryFormIncludeType = {
   forwarding: { include: { transporters: true } },
-  forwardedIn: { include: { transporters: true } },
+  finalOperations: true,
   grouping: { include: { initialForm: { include: { transporters: true } } } },
   transporters: true
 };

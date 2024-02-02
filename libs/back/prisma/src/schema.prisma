@@ -324,6 +324,20 @@ model EcoOrganisme {
   handleBsda    Boolean @default(false)
 }
 
+// Modèle qui peut être partagé entre tous les
+// bordereaux pour calculcer la traçabilité finale
+model FinalOperation {
+  id                      String  @id @default(cuid())
+  finalBsdReadableId      String  @unique
+  operationCode           String
+  quantity                Float
+  destinationCompanySiret String
+  destinationCompanyName  String
+  // Champs spécifiques pour Form
+  Form                    Form?   @relation(fields: [formId], references: [id])
+  formId                  String? @unique
+}
+
 model Form {
   id                                    String                  @id @default(cuid())
   createdAt                             DateTime                @default(now()) @db.Timestamptz(6)
@@ -451,6 +465,11 @@ model Form {
   // Fraction du bordereau regroupée dans des bordereaux de regroupement
   // La quantité restante à regrouper s'obtient en faisant quantityReceived - quantityGrouped
   quantityGrouped Float @default(0)
+
+  // Relation vers les infos de traçabilité finales
+  // Cas particulier sur le BSDD avec la ventilation des quantités en plusieurs groupement
+  // il peut y avoir plusieurs traitements en bout de chaîne
+  finalOperations   FinalOperation[]
 
   // partial index _FormIsDeletedIdx see migration82_missing_indices.sql
   // partial index _FormRecipientIsTempStorageIdx see 99_add_form_indices.sql
@@ -1638,7 +1657,7 @@ model Bspaoh {
   wastePackagings Json       @default("[]")
   wasteType       BspaohType @default(PAOH)
 
-  //emitter 
+  //emitter
   emitterCompanyName    String?
   emitterCompanySiret   String?
   emitterCompanyAddress String?
@@ -1679,7 +1698,7 @@ model Bspaoh {
   handedOverToDestinationSignatureAuthor String?
 
   // reception
-  // reception waste details              
+  // reception waste details
   destinationReceptionWasteWeightValue           Float? // kg
   destinationReceptionWasteWeightIsEstimate      Boolean?
   destinationReceptionWasteQuantityValue         Int?

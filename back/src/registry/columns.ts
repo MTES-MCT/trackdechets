@@ -38,6 +38,14 @@ const formatNumber = (n: number) => (!!n ? parseFloat(n.toFixed(3)) : null); // 
 const formatArray = (arr: any[]) => (Array.isArray(arr) ? arr.join(",") : "");
 const formatOperationCode = (code?: string) =>
   code ? code.replace(/ /g, "") : ""; // be consistent and remove all white spaces
+/**
+ * Clean Final Operation lists
+ */
+const formatFinalOperations = (val?: string[]) =>
+  val ? val.map(quant => quant.replace(/ /g, "")).join("; ") : ""; // be consistent and remove all white spaces
+const formatFinalReceptionWeights = (val?: number[]) =>
+  val ? val.map(quant => quant.toFixed(6)).join("; ") : "";
+
 
 export const columns: Column[] = [
   // Dénomination, nature et quantité :
@@ -188,14 +196,14 @@ export const columns: Column[] = [
     format: formatBoolean
   },
   {
-    field: "destinationForwardedInReceptionOperationCode",
-    label: "Opération finale réalisée par la traçabilité suite",
-    format: formatOperationCode
+    field: "finalOperationCodes",
+    label: "Opération(s) finale(s) réalisée(s) par la traçabilité suite, c'est à dire le(s) code(s) de traitement renseigné(s) par l'exutoire",
+    format: formatFinalOperations
   },
   {
-    field: "destinationForwardedInReceptionWeight",
-    label: "Quantité liée",
-    format: formatNumber
+    field: "finalReceptionWeights",
+    label: "Quantité(s) liée(s)",
+    format: formatFinalReceptionWeights
   },
   {
     field: "transporter2CompanyName",

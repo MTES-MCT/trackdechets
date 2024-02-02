@@ -339,10 +339,10 @@ type OutgoingWaste {
   destinationCompanyAddress: String
   "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
   destinationOperationCode: String
-  "Extra - Opération finale réalisée par la traçabilité suite, c'est à dire le(s) code(s) de traitement renseigné(s) par l'exutoire"
-  destinationForwardedInReceptionOperationCode: String
-  "Extra - Quantité liée traitée par la traçabilité suite, c'est à dire par l'exutoire"
-  destinationForwardedInReceptionWeight: Float
+  "Extra - Opération(s) finale(s) réalisée(s) par la traçabilité suite, c'est à dire le(s) code(s) de traitement renseigné(s) par l'exutoire"
+  finalOperationCodes: [String]
+  "Extra - Quantité(s) liée(s) traitée(s) par la traçabilité suite, c'est à dire par l'exutoire"
+  finalReceptionWeights: [Float]
   "Qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
   destinationOperationMode: OperationMode
 
