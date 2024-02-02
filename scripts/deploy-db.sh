@@ -39,6 +39,8 @@ if echo "$DATABASE_URL" | grep -E "$regex" > /dev/null; then
     echo "Database name: $database"
 else
     echo "Error: Unable to extract the database name from the DATABASE_URL env."
+    echo "may be you need to run this : export DATABASE_URL='postgresql://trackdechets:password@postgres:5432/prisma_test?schema=default$default'"
+    echo "don't forget the simple quote to be sure that 'default$default' schema name is right"
     exit 1
 fi
 

@@ -8,10 +8,20 @@
     - [Conventions](#conventions)
   - [Tests unitaires](#tests-unitaires)
   - [Tests d'intégration](#tests-dintégration)
+  - [Tests end-to-end (e2e)](#tests-end-to-end-e2e)
+    - [Local](#local)
+      - [Installation](#installation-1)
+      - [Variables d'environnement](#variables-denvironnement)
+      - [Lancer les tests e2e en local](#lancer-les-tests-e2e-en-local)
+      - [Recorder](#recorder)
+    - [CI](#ci)
+      - [Débugguer visuellement](#débugguer-visuellement)
+      - [Débugguer le network](#débugguer-le-network)
   - [Créer une PR](#créer-une-pr)
   - [Déploiement](#déploiement)
   - [Migrations](#migrations)
   - [Réindexation Elasticsearch des BSDs](#réindexation-elasticsearch-des-bsds)
+    - [Réindexation complète sans downtime lors d'une mise en production](#réindexation-complète-sans-downtime-lors-dune-mise-en-production)
   - [Guides](#guides)
     - [Mettre à jour le changelog](#mettre-à-jour-le-changelog)
     - [Mettre à jour la documentation](#mettre-à-jour-la-documentation)
@@ -330,6 +340,8 @@ Il est également possible de faire tourner chaque test de façon indépendante:
 ```bash
 npx nx run back:test:integration --testFile workflow.integration.ts
 ```
+
+Si besoin, 
 
 ## Tests end-to-end (e2e)
 
