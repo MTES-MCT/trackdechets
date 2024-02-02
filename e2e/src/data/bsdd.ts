@@ -1,4 +1,4 @@
-import { Status, EmitterType, Company, Form } from "@prisma/client";
+import { Status, EmitterType, Company, Form, Prisma } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { getReadableId, reindex } from "back";
 
@@ -6,7 +6,7 @@ export interface BsddOpt {
   ownerId: string;
   customId?: string;
   status?: Status;
-  emitterPickupSite?: string;
+  emitterWorkSiteName?: string;
   emitterType?: EmitterType;
   recipientCap?: string;
   grouping?: Form[];
@@ -17,18 +17,17 @@ export interface BsddOpt {
   emitter: Company;
   transporters?: Company[];
   recipient?: Company;
-  broker?: Company;
   trader?: Company;
   ecoOrganisme?: Company;
 }
 
-const optToFormCreateInput = (opt: BsddOpt) => {
+const optToFormCreateInput = (opt: BsddOpt): Prisma.FormCreateInput => {
   return {
     owner: { connect: { id: opt.ownerId } },
     readableId: getReadableId(),
     status: opt.status ?? Status.PROCESSED,
     customId: opt.customId,
-    emitterPickupSite: opt.emitterPickupSite,
+    emitterWorkSiteName: opt.emitterWorkSiteName,
     emitterType: opt.emitterType ?? EmitterType.PRODUCER,
     wasteDetailsCode: opt.wasteDetailsCode,
     recipientCap: opt.recipientCap,
@@ -44,12 +43,15 @@ const optToFormCreateInput = (opt: BsddOpt) => {
     ecoOrganismeName: opt.ecoOrganisme?.orgId,
     ...(opt.transporters
       ? {
+          transportersSirets: opt.transporters.map(
+            transporter => transporter.orgId
+          ),
           transporters: {
             createMany: {
               data:
                 opt.transporters?.map((transporter, index) => ({
                   number: index + 1,
-                  transporterCompanySiret: transporter.orgId,
+                  transporterCompanySiret: transporter.siret,
                   transporterCompanyVatNumber: transporter.vatNumber,
                   transporterCompanyName: transporter.name
                 })) ?? []

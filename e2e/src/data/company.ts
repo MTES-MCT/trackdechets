@@ -3,7 +3,7 @@ import { generateTestSiret } from "back";
 import { CompanyType } from "@prisma/client";
 
 export const seedCompany = async company => {
-  let siret;
+  let siret: string | null = null;
   if (!company.vatNumber) siret = await generateTestSiret();
 
   // Need to create an anonymous company so that fakeSirets increment
@@ -92,6 +92,11 @@ export const seedDefaultCompanies = async () => {
     companyTypes: [CompanyType.TRANSPORTER, CompanyType.WASTEPROCESSOR]
   });
 
+  const companyM = await seedCompany({
+    name: "M - Installation de traitement",
+    companyTypes: [CompanyType.WASTEPROCESSOR]
+  });
+
   return {
     companyA,
     companyB,
@@ -104,7 +109,8 @@ export const seedDefaultCompanies = async () => {
     companyI,
     companyJ,
     companyK,
-    companyL
+    companyL,
+    companyM
   };
 };
 

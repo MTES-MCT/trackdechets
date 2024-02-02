@@ -45,3 +45,26 @@ export const goTo = async (page, path) => {
 export const checkCurrentURL = async (page, path) => {
   await expect(new URL(page.url()).pathname).toEqual(path);
 };
+
+/**
+ * On the dashboard page, select a company.
+ */
+export const selectCompany = async (page, siret) => {
+  await page.getByRole("combobox").selectOption(siret);
+};
+
+/**
+ * Select a BSD menu
+ */
+type BsdMenu =
+  | "Tous les bordereaux"
+  | "Brouillons"
+  | "Pour action"
+  | "Suivi"
+  | "Archives"
+  | "Toutes les révisions"
+  | "À collecter"
+  | "Collecté";
+export const selectBsdMenu = async (page, menu: BsdMenu) => {
+  await page.getByRole("link", { name: menu }).click();
+};
