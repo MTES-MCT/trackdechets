@@ -91,9 +91,14 @@ export const fullBspaoh = gql`
         date
         detail {
           quantity
-          weight {
+          receivedWeight {
             value
-            isEstimate
+          }
+          refusedWeight {
+            value
+          }
+          acceptedWeight {
+            value
           }
         }
         acceptation {

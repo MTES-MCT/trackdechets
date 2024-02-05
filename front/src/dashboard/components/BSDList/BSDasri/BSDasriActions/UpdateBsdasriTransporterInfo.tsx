@@ -19,7 +19,6 @@ export function UpdateBsdasriTransporterInfo({
   isModalOpenFromParent,
   onModalCloseFromParent
 }: Props) {
-  console.log(bsdasri);
   const [isOpen, setIsOpen] = useState(false);
   const [updateBsdasri, { error }] = useMutation<
     Pick<Mutation, "updateBsdasri">,

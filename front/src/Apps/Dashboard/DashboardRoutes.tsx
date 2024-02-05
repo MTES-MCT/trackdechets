@@ -33,7 +33,8 @@ import {
 } from "../../dashboard/detail";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
 import { usePermissions } from "../../common/contexts/PermissionsContext";
-
+import { DsfrModal } from "../common/Components/Modal/DsfrModal";
+import BspaohFormContainer from "../../form/bspaoh/FormContainer";
 import "./dashboard.scss";
 import { useMedia } from "../../common/use-media";
 import { MEDIA_QUERIES } from "../../common/config";
@@ -482,15 +483,9 @@ function DashboardRoutes() {
             <Route
               path={toRelative(routes.dashboard.bspaohs.view)}
               element={
-                <Modal
-                  onClose={goBack}
-                  ariaLabel="Aperçu du bordereau"
-                  isOpen
-                  padding={false}
-                  wide={true}
-                >
+                <DsfrModal onClose={goBack} size="XL" padding={false}>
                   <RouteBspaohsView />
-                </Modal>
+                </DsfrModal>
               }
             />
 
@@ -522,6 +517,16 @@ function DashboardRoutes() {
                   <RouteBsffsView />
                 </Modal>
               }
+            />
+
+            {/** PAOH Form modals */}
+            <Route
+              path={toRelative(routes.dashboard.bspaohs.create)}
+              element={<BspaohFormContainer />}
+            />
+            <Route
+              path={toRelative(routes.dashboard.bspaohs.edit)}
+              element={<BspaohFormContainer />}
             />
           </Routes>
         )}

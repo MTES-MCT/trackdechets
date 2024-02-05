@@ -18,7 +18,6 @@ const DropdownMenu = ({
   const { targetRef } = useOnClickOutsideRefTarget({
     onClickOutside: () => closeMenu()
   });
-
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };

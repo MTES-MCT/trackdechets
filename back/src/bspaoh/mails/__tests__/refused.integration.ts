@@ -76,7 +76,7 @@ describe("renderBspaohRefusedEmail", () => {
         destinationReceptionAcceptationStatus:
           WasteAcceptationStatus.PARTIALLY_REFUSED,
         destinationReceptionWasteRefusalReason: "Parce que !!",
-        destinationReceptionWasteWeightValue: 10
+        destinationReceptionWasteAcceptedWeightValue: 10
       }
     });
     const email = await renderBspaohRefusedEmail(bspaoh);

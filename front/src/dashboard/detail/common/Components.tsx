@@ -1,12 +1,13 @@
 import React, { ReactNode, useMemo } from "react";
-import { formatDate } from "../../../common/datetime";
+import { formatDate, formatDateTime } from "../../../common/datetime";
 import styles from "./BSDDetailContent.module.scss";
 
 import {
   PackagingInfo,
   BsvhuTransporter,
   BsdaTransporter,
-  BsdasriTransporter
+  BsdasriTransporter,
+  BspaohTransporter
 } from "@td/codegen-ui";
 import { getPackagingInfosSummary } from "../../../form/bsdd/utils/packagings";
 import { isForeignVat } from "@td/constants";
@@ -61,6 +62,17 @@ export const DateRow = ({ value, label }) => {
     </>
   );
 };
+export const DateTimeRow = ({ value, label }) => {
+  if (!value) {
+    return null;
+  }
+  return (
+    <>
+      <dt>{label}</dt>
+      <dd>{formatDateTime(value)}</dd>
+    </>
+  );
+};
 export const PackagingRow = ({
   packagingInfos
 }: {
@@ -85,7 +97,12 @@ export const PackagingRow = ({
 export const TransporterReceiptDetails = ({
   transporter
 }: {
-  transporter?: BsvhuTransporter | BsdaTransporter | BsdasriTransporter | null;
+  transporter?:
+    | BsvhuTransporter
+    | BsdaTransporter
+    | BsdasriTransporter
+    | BspaohTransporter
+    | null;
 }) => {
   return !isForeignVat(transporter?.company?.vatNumber!) ? (
     <div className={styles.detailGrid}>

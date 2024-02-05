@@ -106,6 +106,10 @@ input BspaohWasteWeightInput {
   isEstimate: Boolean!
 }
 
+input BspaohReceptionWasteWeightInput {
+  "Poids en kilos"
+  value: Float!
+}
 input BspaohWasteDetailInput {
   weight: BspaohWasteWeightInput
   "Quantité en nombre"
@@ -169,10 +173,17 @@ input BspaohTransportInput {
   takenOverAt: DateTime
 }
 
+input BspaohReceptionWasteDetailInput {
+  receivedWeight: BspaohReceptionWasteWeightInput
+  refusedWeight: BspaohReceptionWasteWeightInput
+  "Quantité en nombre"
+  quantity: Int
+}
+
 input BspaohReceptionInput {
   "Date de présentation sur site"
   date: DateTime
-  detail: BspaohWasteDetailInput
+  detail: BspaohReceptionWasteDetailInput
   acceptation: BspaohWasteAcceptationInput
 }
 
@@ -182,9 +193,6 @@ input BspaohOperationInput {
   "Qualification du traitement final"
   mode: OperationMode
   "Date de réalisation de l'opération"
-  date: DateTime
-}
-input BspaohHandedOverToDestinationInput {
   date: DateTime
 }
 
@@ -224,8 +232,6 @@ input BspaohDestinationInput {
   company: CompanyInput
   "N° de CAP (le cas échéant)"
   cap: String
-  "Informations optionelles de remise à l'installation destinataire"
-  handedOverToDestination: BspaohHandedOverToDestinationInput
   "Expédition reçue à l'installation de destination"
   reception: BspaohReceptionInput
   "Réalisation de l'opération (case 11)"

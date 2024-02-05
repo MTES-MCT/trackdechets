@@ -6,7 +6,8 @@ import {
   Form,
   Bsd,
   Bsda,
-  Bspaoh
+  Bspaoh,
+  BsdasriType
 } from "@td/codegen-ui";
 
 import {
@@ -242,7 +243,9 @@ export const mapBspaoh = (bspaoh: Bspaoh): BsdDisplay => {
     status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
       code: wasteCode,
-      weight: bspaoh.destination?.reception?.detail?.weight?.value,
+      weight:
+        bspaoh.destination?.reception?.detail?.acceptedWeight?.value ??
+        bspaoh.emitter?.emission?.detail?.weight?.value,
       name: wasteName
     },
     emitter: bspaoh.emitter || bspaoh["bsdasriEmitter"],
@@ -251,7 +254,7 @@ export const mapBspaoh = (bspaoh: Bspaoh): BsdDisplay => {
 
     updatedAt: bspaoh.updatedAt,
 
-    bsdWorkflowType: bspaoh?.type,
+    bsdWorkflowType: BsdasriType.Simple, // currently there is no specific type on PAOH
 
     transporterCustomInfo: truncateTransporterInfo(
       bspaoh.transporter?.customInfo || bspaoh["bsdasriTransporter"]?.customInfo

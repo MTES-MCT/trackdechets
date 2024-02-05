@@ -37,7 +37,6 @@ describe("Mutation.Bspaoh.sign", () => {
           status: BspaohStatus.SENT,
           emitterEmissionSignatureAuthor: "Emetteur",
           emitterEmissionSignatureDate: new Date(),
-          handedOverToDestinationDate: new Date(),
           transporters: {
             create: {
               transporterCompanySiret: transporter.company.siret,
@@ -67,51 +66,6 @@ describe("Mutation.Bspaoh.sign", () => {
       expect(data.signBspaoh.id).toBeTruthy();
     });
 
-    it("should disallow transporter to sign transport when required data is missing", async () => {
-      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-
-      const bspaoh = await bspaohFactory({
-        opt: {
-          status: BspaohStatus.SENT,
-          emitterEmissionSignatureAuthor: "Emetteur",
-          emitterEmissionSignatureDate: new Date(),
-
-          transporters: {
-            create: {
-              transporterRecepisseIsExempted: null,
-              transporterCompanySiret: transporter.company.siret,
-              transporterTransportMode: "ROAD",
-              transporterTransportPlates: ["AA-00-XX"],
-              transporterTakenOverAt: new Date(),
-              number: 1
-            }
-          }
-        }
-      });
-
-      const { mutate } = makeClient(transporter.user);
-      const { errors } = await mutate<
-        Pick<Mutation, "signBspaoh">,
-        MutationSignBspaohArgs
-      >(SIGN_BSPAOH, {
-        variables: {
-          id: bspaoh.id,
-          input: {
-            type: "DELIVERY",
-            author: transporter.user.name
-          }
-        }
-      });
-
-      expect(errors).toEqual([
-        expect.objectContaining({
-          extensions: expect.objectContaining({
-            code: "BAD_USER_INPUT"
-          })
-        })
-      ]);
-    });
-
     it("should disallow transporter to sign transport when bspaoh is not SENT", async () => {
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
@@ -121,7 +75,6 @@ describe("Mutation.Bspaoh.sign", () => {
       const bspaoh = await bspaohFactory({
         opt: {
           status: BspaohStatus.SIGNED_BY_PRODUCER,
-          handedOverToDestinationDate: new Date(),
           transporters: {
             create: {
               transporterRecepisseIsExempted: null,

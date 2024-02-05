@@ -131,10 +131,9 @@ export default function AccountOauth2AppCreateUpdate() {
               }
             });
           } else {
-            const res = await createApplication({
+            await createApplication({
               variables: { input: values }
             });
-            console.log(res);
           }
           navigate(routes.account.oauth2.list);
         }}

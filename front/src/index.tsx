@@ -12,7 +12,6 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import * as Sentry from "@sentry/browser";
 import "./scss/index.scss";
-
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa";
 startReactDsfr({ defaultColorScheme: "light" });
 

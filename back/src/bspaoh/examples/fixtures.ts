@@ -100,14 +100,10 @@ function destinationInput(siret: string) {
   };
 }
 
-const handedOverToDestinationInput = {
-  handedOverToDestination: { date: "2022-12-03T15:44:00" }
-};
-
 const receptionInput = {
   date: "2020-12-03T15:44:00",
   detail: {
-    weight: { value: 22, isEstimate: false }
+    receivedWeight: { value: 22 }
   },
   acceptation: {
     status: "ACCEPTED",
@@ -134,7 +130,6 @@ export default {
   transportInput,
   transportUpdateInput,
 
-  handedOverToDestinationInput,
   destinationCompanyInput,
   destinationInput,
   receptionInput,

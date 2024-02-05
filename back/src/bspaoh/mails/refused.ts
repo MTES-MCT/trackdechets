@@ -73,11 +73,11 @@ export async function renderBspaohRefusedEmail(
           ? transporter.transporterRecepisseNumber
           : "",
         sentBy: bspaoh.emitterEmissionSignatureAuthor,
-        quantityReceived: bspaoh.destinationReceptionWasteWeightValue
-          ? new Decimal(bspaoh.destinationReceptionWasteWeightValue)
+        quantityReceived: bspaoh.destinationReceptionWasteAcceptedWeightValue
+          ? new Decimal(bspaoh.destinationReceptionWasteAcceptedWeightValue)
               .dividedBy(1000)
               .toNumber()
-          : bspaoh.destinationReceptionWasteQuantityValue
+          : "non précisé"
       }
     },
     attachment: attachmentData

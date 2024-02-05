@@ -1,5 +1,7 @@
 import React from "react";
 import { useBspaohDuplicate } from "../../components/BSDList/BSPaoh/BSPaohActions/useDuplicate";
+import { useDownloadPdf } from "../../components/BSDList/BSPaoh/BSPaohActions/useDownloadPdf";
+
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { getTransportModeLabel } from "../../constants";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
@@ -7,9 +9,9 @@ import {
   Bspaoh,
   FormCompany,
   BspaohPackaging,
-  BspaohConsistence,
-  BspaohPackagingAcceptationStatus
+  UserPermission
 } from "@td/codegen-ui";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import routes from "../../../Apps/routes";
 import {
   Table,
@@ -24,16 +26,26 @@ import {
   IconWaterDam,
   IconRenewableEnergyEarth,
   IconBSPaohThin,
-  IconDuplicateFile
+  IconDuplicateFile,
+  IconPdf
 } from "../../../Apps/common/Components/Icons/Icons";
-import { getVerboseAcceptationStatus } from "../common/utils";
+import {
+  getVerboseAcceptationStatus,
+  getVerboseWeightType
+} from "../common/utils";
+import {
+  getVerbosePackagingType,
+  getVerbosePaohPackagingsAcceptationStatus,
+  getVerboseConsistence
+} from "../../components/BSDList/BSPaoh/paohUtils";
 import QRCodeIcon from "react-qr-code";
+import { usePermissions } from "../../../common/contexts/PermissionsContext";
 
 import styles from "../common/BSDDetailContent.module.scss";
 
-import { getVerboseWeightType } from "../common/utils";
 import {
   DateRow,
+  DateTimeRow,
   DetailRow,
   TransporterReceiptDetails
 } from "../common/Components";
@@ -60,8 +72,6 @@ const Company = ({ company, label }: CompanyProps) => (
 
 type BspaohDetailContentProps = {
   form: Bspaoh;
-  children?: React.ReactNode;
-  refetch?: () => void;
 };
 
 const Emitter = ({ form }: { form: Bspaoh }) => {
@@ -113,6 +123,7 @@ const Emitter = ({ form }: { form: Bspaoh }) => {
 };
 const Transporter = ({ form }: { form: Bspaoh }) => {
   const { transporter } = form;
+
   return (
     <>
       <div className={styles.detailGrid}>
@@ -134,7 +145,7 @@ const Transporter = ({ form }: { form: Bspaoh }) => {
         />
       </div>
       <div className={`${styles.detailGrid} `}>
-        <DateRow
+        <DateTimeRow
           value={transporter?.transport?.takenOverAt}
           label="Emporté le"
         />
@@ -187,15 +198,24 @@ const Recipient = ({ form }: { form: Bspaoh }) => {
           label="Réception signée le"
         />
         <DetailRow
-          value={destination?.reception?.detail?.weight?.value}
-          label="Poids"
+          value={destination?.reception?.detail?.receivedWeight?.value}
+          label="Poids reçu"
           units="kg"
         />
         <DetailRow
-          value={getVerboseWeightType(
-            destination?.reception?.detail?.weight?.isEstimate
-          )}
-          label="Poids"
+          value={destination?.reception?.detail?.refusedWeight?.value}
+          label="Poids refusé"
+          units="kg"
+        />
+        <DetailRow
+          value={destination?.reception?.detail?.acceptedWeight?.value}
+          label="Poids accepté"
+          units="kg"
+        />
+
+        <DetailRow
+          value={destination?.reception?.detail?.quantity}
+          label="Quantité"
         />
       </div>
       <div className={styles.detailGrid}>
@@ -228,10 +248,11 @@ const Recipient = ({ form }: { form: Bspaoh }) => {
 
 export default function BspaohDetailContent({
   form
-}: BspaohDetailContentProps) {
+}: Readonly<BspaohDetailContentProps>) {
   const { siret } = useParams<{ siret: string }>();
   const navigate = useNavigate();
-
+  const { permissions } = usePermissions();
+  const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
   const [duplicate] = useBspaohDuplicate({
     variables: { id: form.id },
     onCompleted: () => {
@@ -245,7 +266,7 @@ export default function BspaohDetailContent({
 
   return (
     <div className={styles.detail}>
-      <div className={styles.detailSummary}>
+      <div className={styles.detailSummaryDsfr}>
         <h4 className={styles.detailTitle}>
           <IconBSPaohThin className="tw-mr-2" />
 
@@ -340,13 +361,22 @@ export default function BspaohDetailContent({
       </Tabs>
 
       <div className={styles.detailActions}>
-        <button
-          className="btn btn--outline-primary"
-          onClick={() => duplicate()}
-        >
-          <IconDuplicateFile size="24px" color="blueLight" />
-          <span>Dupliquer</span>
-        </button>
+        {!form.isDraft && (
+          <button
+            type="button"
+            className="btn btn--outline-primary"
+            onClick={() => downloadPdf()}
+          >
+            <IconPdf size="24px" color="blueLight" />
+            <span>Pdf</span>
+          </button>
+        )}
+        {permissions.includes(UserPermission.BsdCanCreate) && (
+          <Button priority="secondary" onClick={() => duplicate()}>
+            <IconDuplicateFile size="24px" color="blueLight" />
+            <span>Dupliquer</span>
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -354,7 +384,7 @@ export default function BspaohDetailContent({
 
 const Waste = ({ form }: { form: Bspaoh }) => {
   const { waste } = form;
-  // console.log(waste)
+
   return (
     <div>
       <Packagings packagings={waste?.packagings} />
@@ -384,12 +414,12 @@ const Packagings = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {packagings.map((row, idx) => (
-            <TableRow className="TableCell-table__tr" key={idx}>
+          {packagings.map(row => (
+            <TableRow className="TableCell-table__tr" key={row.id}>
               <TableCell>{getVerbosePackagingType(row.type)}</TableCell>
               <TableCell>{row.volume}</TableCell>
               <TableCell>{row.containerNumber}</TableCell>
-              <TableCell>{row.identificationCodes}</TableCell>
+              <TableCell>{row.identificationCodes?.join(", ")}</TableCell>
               <TableCell>{getVerboseConsistence(row.consistence)}</TableCell>
               <TableCell>
                 {getVerbosePaohPackagingsAcceptationStatus(row.acceptation)}
@@ -400,40 +430,4 @@ const Packagings = ({
       </Table>
     </div>
   );
-};
-
-// Verbose Utils
-
-const verbosePackagings = {
-  RELIQUAIRE: "Reliquaire",
-  LITTLE_BOX: "Petite boîte",
-  BIG_BOX: "Grosse boîte"
-};
-const getVerbosePackagingType = (type: string) => verbosePackagings[type];
-
-const getVerboseConsistence = (
-  consistence: BspaohConsistence | null | undefined
-) => {
-  if (!consistence) {
-    return "";
-  }
-  return consistence === "SOLIDE" ? "Solide" : "Siquide";
-};
-
-export const getVerbosePaohPackagingsAcceptationStatus = (
-  acceptationStatus:
-    | BspaohPackagingAcceptationStatus
-    | null
-    | undefined
-    | string
-): string => {
-  if (!acceptationStatus) {
-    return "";
-  }
-  const verbose = {
-    ACCEPTED: "Accepté",
-    REFUSED: "Refusé",
-    PENDING: "En attente"
-  };
-  return verbose[acceptationStatus];
 };

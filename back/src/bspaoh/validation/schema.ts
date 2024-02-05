@@ -14,7 +14,7 @@ export const BSPAOH_OPERATIONS = ["R 1", "D 10"] as const;
 const bspaohPackagingSchema = z.object({
   id: z.string(),
   type: z.enum(["LITTLE_BOX", "BIG_BOX", "RELIQUAIRE"]),
-  volume: z.number(),
+  volume: z.number().nonnegative(),
   containerNumber: z.string(),
   quantity: z.number().positive().lte(1),
   identificationCodes: z.array(z.string()).default([]),
@@ -55,8 +55,8 @@ const rawBspaohSchema = z.object({
   emitterPickupSitePostalCode: z.string().nullish(),
   emitterPickupSiteInfos: z.string().nullish(),
 
-  emitterWasteQuantityValue: z.number().nullish(),
-  emitterWasteWeightValue: z.number().nullish(),
+  emitterWasteQuantityValue: z.number().nonnegative().nullish(),
+  emitterWasteWeightValue: z.number().nonnegative().nullish(),
   emitterWasteWeightIsEstimate: z.boolean().nullish(),
 
   // emitter signature
@@ -76,14 +76,25 @@ const rawBspaohSchema = z.object({
   destinationCap: z.string().nullish(),
 
   // reception
-  handedOverToDestinationDate: z.coerce.date().nullish(),
+
   handedOverToDestinationSignatureDate: z.coerce.date().nullish(),
   handedOverToDestinationSignatureAuthor: z.string().nullish(),
   destinationReceptionDate: z.coerce.date().nullish(),
 
-  destinationReceptionWasteWeightValue: z.number().nullish(),
-  destinationReceptionWasteWeightIsEstimate: z.boolean().nullish(),
-  destinationReceptionWasteQuantityValue: z.number().nullish(),
+  destinationReceptionWasteReceivedWeightValue: z
+    .number()
+    .nonnegative()
+    .nullish(),
+  destinationReceptionWasteAcceptedWeightValue: z
+    .number()
+    .nonnegative()
+    .nullish(),
+  destinationReceptionWasteRefusedWeightValue: z
+    .number()
+    .nonnegative()
+    .nullish(),
+
+  destinationReceptionWasteQuantityValue: z.number().nonnegative().nullish(),
   destinationReceptionAcceptationStatus: z
     .nativeEnum(WasteAcceptationStatus)
     .nullish(),
@@ -94,8 +105,8 @@ const rawBspaohSchema = z.object({
     .transform(val => val ?? []),
   destinationReceptionSignatureDate: z.coerce.date().nullish(),
   destinationReceptionSignatureAuthor: z.string().nullish(),
-  //operation
 
+  //operation
   destinationOperationCode: z.enum(BSPAOH_OPERATIONS).nullish(),
 
   destinationOperationDescription: z.string().nullish(),
@@ -157,7 +168,7 @@ export const fullBspaohSchema = rawFullBspaohSchema
         message: `La date d'opération doit être postérieure à la date de réception`
       });
     }
-    // refine packagings
+    // refine packagings consistence
     if (
       val.wasteType == "FOETUS" &&
       val.wastePackagings.map(p => p.consistence).includes("LIQUIDE")
@@ -167,8 +178,6 @@ export const fullBspaohSchema = rawFullBspaohSchema
         message: `La consistance ne peut être liquide pour ce type de déchet`
       });
     }
-
-    // refine acceptation status
   })
   .transform(val => {
     return val;

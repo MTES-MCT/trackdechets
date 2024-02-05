@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
-import { useParams, useMatch } from "react-router-dom";
+import { useParams, useMatch, useLocation } from "react-router-dom";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import * as Sentry from "@sentry/browser";
 import routes from "../Apps/routes";
@@ -54,6 +54,7 @@ const DashboardPage = () => {
   const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
   const isCollectedTab = !!useMatch(routes.dashboard.transport.collected);
   const isAllBsdsTab = !!useMatch(routes.dashboard.bsds.index);
+  const location = useLocation();
 
   const BSD_PER_PAGE = 25;
   const bsdCurrentTab = getBsdCurrentTab({
@@ -204,7 +205,7 @@ const DashboardPage = () => {
         {permissions.includes(UserPermission.BsdCanCreate) && (
           <div className="create-btn">
             <BsdCreateDropdown
-              links={dropdownCreateLinks(siret)}
+              links={dropdownCreateLinks(siret, location)}
               isDisabled={loading}
               menuTitle={dropdown_create_btn}
               primary

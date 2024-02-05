@@ -33,7 +33,9 @@ import {
   InputMaybe,
   BspaohHandedOverToDestination,
   BspaohWasteAcceptation,
-  BspaohPackagingAcceptationStatus
+  BspaohPackagingAcceptationStatus,
+  BspaohReceptionWasteDetail,
+  BspaohReceptionWasteWeight
 } from "../generated/graphql/types";
 import {
   BspaohTransporter as PrismaBspaohTransporter,
@@ -144,7 +146,6 @@ export function expandBspaohFromDb(
       cap: bspaoh.destinationCap,
       customInfo: bspaoh.destinationCustomInfo,
       handedOverToDestination: nullIfNoValues<BspaohHandedOverToDestination>({
-        date: bspaoh.handedOverToDestinationDate,
         signature: nullIfNoValues<Signature>({
           author: bspaoh.handedOverToDestinationSignatureAuthor,
           date: processDate(bspaoh.handedOverToDestinationSignatureDate)
@@ -156,11 +157,17 @@ export function expandBspaohFromDb(
           refusalReason: bspaoh.destinationReceptionWasteRefusalReason
         }),
         date: processDate(bspaoh.destinationReceptionDate),
-        detail: nullIfNoValues<BspaohWasteDetail>({
+        detail: nullIfNoValues<BspaohReceptionWasteDetail>({
           quantity: bspaoh.destinationReceptionWasteQuantityValue,
-          weight: nullIfNoValues<BspaohWasteWeight>({
-            value: bspaoh.destinationReceptionWasteWeightValue,
-            isEstimate: bspaoh.destinationReceptionWasteWeightIsEstimate
+
+          receivedWeight: nullIfNoValues<BspaohReceptionWasteWeight>({
+            value: bspaoh.destinationReceptionWasteReceivedWeightValue
+          }),
+          refusedWeight: nullIfNoValues<BspaohReceptionWasteWeight>({
+            value: bspaoh.destinationReceptionWasteRefusedWeightValue
+          }),
+          acceptedWeight: nullIfNoValues<BspaohReceptionWasteWeight>({
+            value: bspaoh.destinationReceptionWasteAcceptedWeightValue
           })
         }),
         signature: nullIfNoValues<Signature>({
@@ -376,12 +383,13 @@ function flattenReceptionInput(
     destinationReceptionWasteRefusalReason: chain(input.reception, r =>
       chain(r.acceptation, a => a.refusalReason)
     ),
-    destinationReceptionWasteWeightValue: chain(input.reception, r =>
-      chain(r.detail, d => chain(d.weight, w => w.value))
+    destinationReceptionWasteReceivedWeightValue: chain(input.reception, r =>
+      chain(r.detail, d => chain(d.receivedWeight, w => w.value))
     ),
-    destinationReceptionWasteWeightIsEstimate: chain(input.reception, r =>
-      chain(r.detail, d => chain(d.weight, w => w.isEstimate))
+    destinationReceptionWasteRefusedWeightValue: chain(input.reception, r =>
+      chain(r.detail, d => chain(d.refusedWeight, w => w.value))
     ),
+
     destinationReceptionWasteQuantityValue: chain(input.reception, r =>
       chain(r.detail, d => d.quantity)
     )
@@ -431,11 +439,6 @@ function flattenDestinationInput(input: {
 
     destinationCustomInfo: chain(input.destination, e => e.customInfo),
 
-    handedOverToDestinationDate: chain(input.destination, d =>
-      chain(d.handedOverToDestination, h =>
-        h.date ? new Date(h.date) : h.date
-      )
-    ),
     ...flattenReceptionInput(input.destination),
     ...flattenOperationInput(input.destination)
   };

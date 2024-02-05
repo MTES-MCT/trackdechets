@@ -20,7 +20,7 @@ export function RouteBspaohsView() {
     skip: !formId,
     fetchPolicy: "no-cache"
   });
-  console.log(error, data, loading);
+
   if (error) {
     return <InlineError apolloError={error} />;
   }

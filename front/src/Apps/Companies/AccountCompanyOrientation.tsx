@@ -60,12 +60,12 @@ export default function AccountCompanyOrientation() {
               }
             }}
           >
-            Votre entreprise gère une grande quantité de déchets. Vous souhaitez
-            créer un établissement avec les diverses options possibles : profils
-            de l'entreprise, récépissés, agréments, GEREP, etc.
-            <br />
-            Exemples : transporteur, incinérateur, déchetterie, casse
-            automobile, collecteur de déchets, etc.
+            Vous exploitez une entreprise de collecte et/ou tri et/ou transit
+            et/ou regroupement et/ou traitement de déchets. Vous êtes négociant
+            et/ou courtier de déchets et/ou eco-organisme. Exemples:
+            Déchetterie, collecteur de déchets, casse automobile, entreprise de
+            travaux amiante, transporteur, centre d'enfouissement, installation
+            de traitement de déchets, incinérateur, crématorium.
           </CallOut>
         </div>
         <div className="fr-col-12">

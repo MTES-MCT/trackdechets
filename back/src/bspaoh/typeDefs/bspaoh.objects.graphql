@@ -24,6 +24,19 @@ type BspaohWasteDetail {
   quantity: Int
 }
 
+type BspaohReceptionWasteWeight {
+  "Poids en kilos"
+  value: Float!
+}
+type BspaohReceptionWasteDetail {
+  "Informations sur le poids"
+  receivedWeight: BspaohReceptionWasteWeight
+  acceptedWeight: BspaohReceptionWasteWeight
+  refusedWeight: BspaohReceptionWasteWeight
+  "Quantité"
+  quantity: Int
+}
+
 type BspaohMetadata {
   errors: [BspaohError]
   "Informations sur les champs"
@@ -105,7 +118,7 @@ type BspaohTransport {
 type BspaohReception {
   "Date de présentation sur site"
   date: DateTime
-  detail: BspaohWasteDetail
+  detail: BspaohReceptionWasteDetail
   acceptation: BspaohWasteAcceptation
   "Signature"
   signature: Signature

@@ -1645,12 +1645,13 @@ model Bspaoh {
   destinationCompanyMail                         String?
   destinationCustomInfo                          String?
   destinationCap                                 String?
-  handedOverToDestinationDate                    DateTime?               @db.Timestamptz(6)
+
   handedOverToDestinationSignatureDate           DateTime?               @db.Timestamptz(6)
   handedOverToDestinationSignatureAuthor         String?
-  destinationReceptionWasteWeightValue           Float?
   destinationReceptionWasteQuantityValue         Int?
-  destinationReceptionWasteWeightIsEstimate      Boolean?
+  destinationReceptionWasteReceivedWeightValue   Float?
+  destinationReceptionWasteAcceptedWeightValue   Float?
+  destinationReceptionWasteRefusedWeightValue    Float?
   destinationReceptionAcceptationStatus          WasteAcceptationStatus?
   destinationReceptionWasteRefusalReason         String?
   destinationReceptionWastePackagingsAcceptation Json?                   @default("[]")

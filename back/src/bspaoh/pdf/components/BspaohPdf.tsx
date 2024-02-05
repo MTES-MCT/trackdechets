@@ -268,7 +268,15 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
                 ))}
               <Quantity
                 label="Quantité réceptionnée"
-                weight={bspaoh?.destination?.reception?.detail?.weight}
+                weight={bspaoh?.destination?.reception?.detail?.receivedWeight}
+              />
+              <Quantity
+                label="Quantité refusée"
+                weight={bspaoh?.destination?.reception?.detail?.refusedWeight}
+              />
+              <Quantity
+                label="Quantité acceptée"
+                weight={bspaoh?.destination?.reception?.detail?.acceptedWeight}
               />
               <p>
                 Date et heure de réception/acceptation/refus:{" "}

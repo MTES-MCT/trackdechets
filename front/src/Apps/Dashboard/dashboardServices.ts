@@ -59,6 +59,7 @@ import {
   VALIDER_RECEPTION,
   VALIDER_SYNTHESE_LABEL,
   VALIDER_TRAITEMENT,
+  FIN_DE_MISSION,
   completer_bsd_suite
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { BsdCurrentTab } from "../common/types/commonTypes";
@@ -102,6 +103,9 @@ export const getBsdStatusLabel = (
       return SIGNE_PAR_TRANSPORTEUR;
     case BsdStatusCode.Received:
       if (bsdType === BsdType.Bsdasri) {
+        return ACCEPTE;
+      }
+      if (bsdType === BsdType.Bspaoh) {
         return ACCEPTE;
       }
       return RECU;
@@ -196,6 +200,7 @@ const isBsda = (type: BsdType): boolean => type === BsdType.Bsda;
 export const isBsff = (type: BsdType): boolean => type === BsdType.Bsff;
 const isBsdd = (type: BsdType): boolean => type === BsdType.Bsdd;
 export const isBsdasri = (type: BsdType): boolean => type === BsdType.Bsdasri;
+export const isBspaoh = (type: BsdType): boolean => type === BsdType.Bspaoh;
 
 const hasEmitterTransporterAndEcoOrgSiret = (
   bsd: BsdDisplay,
@@ -576,7 +581,7 @@ export const getSentBtnLabel = (
   if (hasRoadControlButton(bsd, isCollectedTab)) {
     return ROAD_CONTROL;
   }
-
+  // BSDD
   if (isBsdd(bsd.type)) {
     if (isAppendix1Producer(bsd)) {
       return "";
@@ -613,6 +618,7 @@ export const getSentBtnLabel = (
 
     return "";
   }
+  //BSDASRI
   if (
     isBsdasri(bsd.type) &&
     currentSiret === bsd.destination?.company?.siret &&
@@ -622,7 +628,7 @@ export const getSentBtnLabel = (
   ) {
     return VALIDER_RECEPTION;
   }
-
+  // BSFF
   if (
     isBsff(bsd.type) &&
     isActTab &&
@@ -631,7 +637,7 @@ export const getSentBtnLabel = (
   ) {
     return VALIDER_RECEPTION;
   }
-
+  // BSDA
   if (
     isToCollectTab &&
     isBsda(bsd.type) &&
@@ -640,7 +646,7 @@ export const getSentBtnLabel = (
   ) {
     return SIGNER;
   }
-
+  // VHU
   if (
     isSameSiretDestination(currentSiret, bsd) &&
     (isBsvhu(bsd.type) || isBsda(bsd.type)) &&
@@ -648,7 +654,24 @@ export const getSentBtnLabel = (
   ) {
     return VALIDER_TRAITEMENT;
   }
-
+  // PAOH
+  if (isBspaoh(bsd.type)) {
+    if (
+      currentSiret === bsd.transporter?.company?.siret &&
+      isCollectedTab &&
+      permissions.includes(UserPermission.BsdCanSignDelivery) &&
+      !bsd.destination?.["handedOverToDestination"]?.signature
+    ) {
+      return FIN_DE_MISSION;
+    }
+    if (
+      currentSiret === bsd.destination?.company?.siret &&
+      isActTab &&
+      permissions.includes(UserPermission.BsdCanSignAcceptation)
+    ) {
+      return VALIDER_RECEPTION;
+    }
+  }
   return "";
 };
 
@@ -698,6 +721,13 @@ export const getReceivedBtnLabel = (
     return VALIDER_TRAITEMENT;
   }
   if (
+    isBspaoh(bsd.type) &&
+    isSameSiretDestination(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignOperation)
+  ) {
+    return VALIDER_TRAITEMENT;
+  }
+  if (
     isBsff(bsd.type) &&
     isActTab &&
     isSameSiretDestination(currentSiret, bsd) &&
@@ -733,7 +763,13 @@ export const getSignByProducerBtnLabel = (
         return SIGNER;
       }
     }
-
+    if (
+      isBspaoh(bsd.type) &&
+      isToCollectTab &&
+      permissions.includes(UserPermission.BsdCanSignTransport)
+    ) {
+      return SIGNER;
+    }
     if (
       (isBsda(bsd.type) &&
         (isGathering(bsd.bsdWorkflowType?.toString()) ||
@@ -1167,6 +1203,8 @@ const canDuplicateBsda = bsd => bsd.type === BsdType.Bsda;
 
 const canDuplicateBsvhu = bsd => bsd.type === BsdType.Bsvhu;
 
+const canDuplicateBspaoh = bsd => bsd.type === BsdType.Bspaoh;
+
 const canDuplicateBsdd = bsd =>
   bsd.type === BsdType.Bsdd &&
   bsd.emitterType !== EmitterType.Appendix1Producer;
@@ -1186,7 +1224,8 @@ export const canDuplicate = (bsd, siret) =>
   canDuplicateBsdasri(bsd) ||
   canDuplicateBsff(bsd, siret) ||
   canDuplicateBsda(bsd) ||
-  canDuplicateBsvhu(bsd);
+  canDuplicateBsvhu(bsd) ||
+  canDuplicateBspaoh(bsd);
 
 const canDeleteBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
@@ -1293,12 +1332,17 @@ const canUpdateBsvhu = bsd =>
   bsd.type === BsdType.Bsvhu &&
   ![BsdStatusCode.Processed, BsdStatusCode.Refused].includes(bsd.status);
 
+const canUpdateBspaoh = bsd =>
+  bsd.type === BsdType.Bspaoh &&
+  ![BsdStatusCode.Processed, BsdStatusCode.Refused].includes(bsd.status);
+
 export const canUpdateBsd = (bsd, siret) =>
   canUpdateBsdd(bsd) ||
   canUpdateBsda(bsd) ||
   canUpdateBsdasri(bsd, siret) ||
   canUpdateBsff(bsd, siret) ||
-  canUpdateBsvhu(bsd);
+  canUpdateBsvhu(bsd) ||
+  canUpdateBspaoh(bsd);
 
 export const canGeneratePdf = bsd => bsd.type === BsdType.Bsff || !bsd.isDraft;
 
@@ -1347,6 +1391,10 @@ export const hasRoadControlButton = (
   bsd: BsdDisplay,
   isCollectedTab: boolean
 ) => {
+  // L'action principale sur le paoh collecté est la déclaration de dépôt par le transporteur
+  if (bsd.type === BsdType.Bspaoh) {
+    return false;
+  }
   return ["SENT", "RESENT"].includes(bsd.status) && isCollectedTab;
 };
 

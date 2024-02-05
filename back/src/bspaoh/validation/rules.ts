@@ -77,7 +77,6 @@ export type BspaohEditionRules = {
 export const editionRules: BspaohEditionRules = {
   wasteAdr: {
     sealed: { from: "EMISSION" },
-    required: { from: "EMISSION" },
     readableFieldName: "le code adr"
   },
   wasteType: {
@@ -248,39 +247,26 @@ export const editionRules: BspaohEditionRules = {
   },
   destinationCap: {
     readableFieldName: "le CAP du destinataire",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "EMISSION"
-    }
-  },
-  handedOverToDestinationDate: {
-    readableFieldName: "la date de remise à l'entreprise de destination",
-    sealed: { from: "DELIVERY" }
+    sealed: { from: "TRANSPORT" }
   },
 
-  destinationReceptionWasteWeightValue: {
+  destinationReceptionWasteReceivedWeightValue: {
     readableFieldName: "le poids du déchet reçu",
-    sealed: { from: "RECEPTION" },
-    required: {
-      from: "RECEPTION",
-      when: bspaoh =>
-        !bspaoh.destinationReceptionWasteQuantityValue ||
-        !!bspaoh.destinationReceptionWasteWeightIsEstimate
-    }
+    sealed: { from: "RECEPTION" }
   },
-  destinationReceptionWasteWeightIsEstimate: {
-    readableFieldName: "la quantité reçue (estimée ou non)",
-    sealed: { from: "RECEPTION" },
-    required: {
-      from: "RECEPTION",
-      when: bspaoh => !!bspaoh.destinationReceptionWasteWeightValue
-    }
+  destinationReceptionWasteAcceptedWeightValue: {
+    readableFieldName: "le poids du déchet accepté",
+    sealed: { from: "RECEPTION" }
   },
+  destinationReceptionWasteRefusedWeightValue: {
+    readableFieldName: "le poids du déchet refusé",
+    sealed: { from: "RECEPTION" }
+  },
+
   destinationReceptionWasteQuantityValue: {
     readableFieldName: "la quantité remise (nombre)",
     sealed: {
-      from: "RECEPTION",
-      when: bspaoh => !!bspaoh.destinationReceptionWasteWeightValue
+      from: "RECEPTION"
     }
   },
 
@@ -648,18 +634,18 @@ export const prismaFieldsToGqlPaths = {
   ...CompanyFieldToGqlPath("destination"),
   ...prismaFieldToGqlPath("destinationCap"),
 
-  handedOverToDestinationDate: "destination.handedOverToDestination.date",
   ...prismaFieldToGqlPath("destinationReceptionAcceptationStatus"),
   destinationReceptionWasteRefusalReason: "destination.reception.refusalReason",
 
   ...prismaFieldToGqlPath("destinationReceptionWasteQuantityValue"),
-  ...prismaFieldToGqlPath("destinationReceptionWasteWeightValue"),
+  ...prismaFieldToGqlPath("destinationReceptionWasteReceivedWeightValue"),
+  ...prismaFieldToGqlPath("destinationReceptionWasteAcceptedWeightValue"),
+  ...prismaFieldToGqlPath("destinationReceptionWasteRefusedWeightValue"),
   ...prismaFieldToGqlPath("destinationReceptionDate"),
 
   destinationReceptionWasteWeightValue:
     "destination.reception.detail.weight.value",
-  destinationReceptionWasteWeightIsEstimate:
-    "destination.reception.detail.weight.isEstimate",
+
   destinationReceptionWasteQuantityValue:
     "destination.reception.detail.quantity",
 
@@ -669,7 +655,7 @@ export const prismaFieldsToGqlPaths = {
   ...prismaFieldToGqlPath("destinationOperationCode"),
   ...prismaFieldToGqlPath("destinationOperationDate"),
 
-  ...prismaFieldToGqlPath("destinationCustomInfo"),
+  destinationCustomInfo: "destination.customInfo",
 
   ...CompanyFieldToGqlPath("transporter"),
   transporterCompanyVatNumber: "transporter.company.vatNumber",
@@ -683,5 +669,6 @@ export const prismaFieldsToGqlPaths = {
   ...prismaFieldToGqlPath("transporterTransportPlates"),
 
   transporterTakenOverAt: "transporter.takenOverAt",
-  ...prismaFieldToGqlPath("transporterCustomInfo")
+
+  transporterCustomInfo: "transporter.customInfo"
 };
