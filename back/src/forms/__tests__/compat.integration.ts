@@ -553,7 +553,8 @@ describe("simpleFormToBsdd", () => {
         destinationOperationNextDestinationCompanyContact: null,
         destinationOperationNextDestinationCompanyPhone: null,
         destinationOperationNextDestinationCompanyMail: null,
-        grouping: []      }
+        grouping: []
+      }
     });
   });
 });
