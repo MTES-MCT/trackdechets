@@ -1,5 +1,6 @@
 import { OperationMode } from "@prisma/client";
 import { getOperationModesFromOperationCode } from "../operationModes";
+import { trim } from "../strings";
 
 const test = (code: string, expectedModes: OperationMode[]) => {
   // With spaces
@@ -7,9 +8,7 @@ const test = (code: string, expectedModes: OperationMode[]) => {
   expect(mode).toEqual(expectedModes);
 
   // Without spaces
-  const modeTrimmed = getOperationModesFromOperationCode(
-    code.replace(/ /g, "").toString()
-  );
+  const modeTrimmed = getOperationModesFromOperationCode(trim(code));
   expect(modeTrimmed).toEqual(expectedModes);
 };
 

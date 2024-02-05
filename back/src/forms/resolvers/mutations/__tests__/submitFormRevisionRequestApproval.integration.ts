@@ -6,6 +6,7 @@ import {
 } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
+  companyFactory,
   destinationFactory,
   formFactory,
   formWithTempStorageFactory,
@@ -1061,5 +1062,91 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
 
     const updatedBsdd = await prisma.form.findFirst({ where: { id: bsdd.id } });
     expect(updatedBsdd?.wasteDetailsIsDangerous).toBeTruthy();
+  });
+
+  it("if operation code changes to final one > should reset status, noTraceability and nextDestination", async () => {
+    // Given
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const nextDestination = await companyFactory({
+      address: "Address",
+      contact: "Contact",
+      contactEmail: "contact@mail.com",
+      name: "Name",
+      contactPhone: "0600000000",
+      vatNumber: "VAT"
+    });
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.NO_TRACEABILITY,
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        wasteDetailsCode: "19 08 10*",
+        wasteDetailsIsDangerous: true,
+        processingOperationDone: "D9",
+        destinationOperationMode: "ELIMINATION",
+        noTraceability: true,
+        nextDestinationCompanyAddress: nextDestination.address,
+        nextDestinationCompanyContact: nextDestination.contact,
+        nextDestinationCompanyCountry: "FR",
+        nextDestinationCompanyMail: nextDestination.contactEmail,
+        nextDestinationCompanyName: nextDestination.name,
+        nextDestinationCompanyPhone: nextDestination.contactPhone,
+        nextDestinationCompanySiret: nextDestination.siret,
+        nextDestinationCompanyVatNumber: nextDestination.vatNumber,
+        nextDestinationNotificationNumber: nextDestination.contactPhone,
+        nextDestinationProcessingOperation: "D9"
+      }
+    });
+
+    // When
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        processingOperationDone: "D9F", // final
+        destinationOperationMode: "ELIMINATION",
+        comment: "Yolo"
+      }
+    });
+    const { data, errors } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
+
+    const updatedBsdd = await prisma.form.findFirst({ where: { id: bsdd.id } });
+
+    expect(updatedBsdd?.processingOperationDone).toBe("D9F");
+
+    // Status
+    expect(updatedBsdd?.status).toBe(Status.PROCESSED);
+
+    // No treaceability should be false
+    expect(updatedBsdd?.noTraceability).toBe(false);
+
+    // Next destination should be null
+    expect(updatedBsdd?.nextDestinationCompanyName).toBe("");
+    expect(updatedBsdd?.nextDestinationCompanySiret).toBe("");
+    expect(updatedBsdd?.nextDestinationCompanyAddress).toBe("");
+    expect(updatedBsdd?.nextDestinationCompanyContact).toBe("");
+    expect(updatedBsdd?.nextDestinationCompanyPhone).toBe("");
+    expect(updatedBsdd?.nextDestinationCompanyMail).toBe("");
+    expect(updatedBsdd?.nextDestinationCompanyCountry).toBe("");
+    expect(updatedBsdd?.nextDestinationCompanyVatNumber).toBe("");
+    expect(updatedBsdd?.nextDestinationNotificationNumber).toBe("");
+    expect(updatedBsdd?.nextDestinationProcessingOperation).toBe("");
   });
 });

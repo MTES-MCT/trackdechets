@@ -24,6 +24,7 @@ import { NON_CANCELLABLE_BSDD_STATUSES } from "../../resolvers/mutations/createF
 import buildRemoveAppendix2 from "../form/removeAppendix2";
 import { distinct } from "../../../common/arrays";
 import { ForbiddenError } from "../../../common/errors";
+import { isFinalOperationCode } from "../../../common/operationCodes";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -222,6 +223,27 @@ async function getUpdateFromFormRevisionRequest(
           revisionRequest.temporaryStorageTemporaryStorerQuantityReceived
       }
     : {};
+
+  if (isFinalOperationCode(revisionRequest.processingOperationDone)) {
+    // No traceability must be false
+    bsddUpdate.noTraceability = false;
+
+    // Next destination must be null
+    bsddUpdate.nextDestinationCompanyName = "";
+    bsddUpdate.nextDestinationCompanySiret = "";
+    bsddUpdate.nextDestinationCompanyAddress = "";
+    bsddUpdate.nextDestinationCompanyContact = "";
+    bsddUpdate.nextDestinationCompanyPhone = "";
+    bsddUpdate.nextDestinationCompanyMail = "";
+    bsddUpdate.nextDestinationCompanyCountry = "";
+    bsddUpdate.nextDestinationCompanyVatNumber = "";
+    bsddUpdate.nextDestinationNotificationNumber = "";
+    bsddUpdate.nextDestinationProcessingOperation = "";
+
+    if (bsddUpdate.status === Status.NO_TRACEABILITY) {
+      bsddUpdate.status = Status.PROCESSED;
+    }
+  }
 
   return [removeEmpty(bsddUpdate), removeEmpty(forwardedInUpdate)];
 }
