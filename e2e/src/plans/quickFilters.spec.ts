@@ -7,36 +7,12 @@ import { seedBsff } from "../data/bsff";
 import { seedBsvhu } from "../data/bsvhu";
 import { seedBsdasri } from "../data/bsdasri";
 import { successfulLogin } from "../utils/user";
-import { selectCompany, selectBsdMenu } from "../utils/navigation";
+import { selectCompany, selectBsdMenu, BsdMenu } from "../utils/navigation";
 import {
   expectFilteredResults,
   quickFilter,
   QuickFilterLabel
 } from "../utils/dashboardFilters";
-
-interface Scenario {
-  desc: string;
-  in: string;
-  out: any[];
-}
-const testScenario = async (
-  page: Page,
-  label: QuickFilterLabel,
-  scenario: Scenario,
-  defaultResults: any[]
-) => {
-  await test.step(scenario.desc, async () => {
-    await quickFilter(page, {
-      label,
-      value: scenario.in
-    });
-    await expectFilteredResults(page, scenario.out);
-
-    // Reset
-    await quickFilter(page, { label, value: "" });
-    await expectFilteredResults(page, defaultResults);
-  });
-};
 
 test.describe.serial("Cahier de recette de gestion des membres", async () => {
   // Credentials
@@ -198,6 +174,37 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
     });
   });
 
+  interface Scenario {
+    siret?: string;
+    bsdMenu?: BsdMenu;
+    desc: string;
+    in: string;
+    out: any[];
+  }
+  const testScenario = async (
+    page: Page,
+    label: QuickFilterLabel,
+    scenario: Scenario,
+    defaultResults: any[]
+  ) => {
+    await test.step(scenario.desc, async () => {
+      // Select correct company & bsd menu
+      await selectCompany(page, scenario.siret ?? companies.companyA.siret);
+      await selectBsdMenu(page, "Tous les bordereaux");
+
+      // Test scenario
+      await quickFilter(page, {
+        label,
+        value: scenario.in
+      });
+      await expectFilteredResults(page, scenario.out);
+
+      // Test reset
+      await quickFilter(page, { label, value: "" });
+      await expectFilteredResults(page, defaultResults);
+    });
+  };
+
   test("Utilisateur connecté", async ({ page }) => {
     await test.step("Log in", async () => {
       await successfulLogin(page, {
@@ -207,7 +214,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
     });
 
     // Default results for this company, for this menu
-    const DEFAULT_COMPANYA_RESULTS = [
+    const DEFAULT_COMPANY_A_RESULTS = [
       bsdd1,
       bsdd3,
       bsda1,
@@ -215,19 +222,16 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       bsff1,
       bsdasri1
     ];
+    const DEFAULT_COMPANY_I_RESULTS = [bsvhu1];
 
     await test.step("N° de BSD / contenant (et numéro libre)", async () => {
       await test.step("Entreprise A > 'Tous les bordereaux'", async () => {
-        await test.step("Navigation", async () => {
-          // On CompanyA's page
-          await selectCompany(page, companies.companyA.siret);
-          // BSD menu
-          await selectBsdMenu(page, "Tous les bordereaux");
-        });
-
-        // Build & test scenarios
         const scenarios = [
-          { desc: "Etat initial", in: "", out: DEFAULT_COMPANYA_RESULTS },
+          {
+            desc: "Etat initial",
+            in: "",
+            out: DEFAULT_COMPANY_A_RESULTS
+          },
           {
             desc: "'NUM-LIBRE01' > bsdd1 devrait remonter",
             in: "NUM-LIBRE01",
@@ -267,6 +271,13 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
             desc: "'BSDA-' > bsda1 & 2 devraient remonter",
             in: "BSDA-",
             out: [bsda1, bsda2]
+          },
+          {
+            siret: companies.companyI.siret,
+            desc: "Entreprise I > bsvhu1 devrait remonter",
+            in: "",
+            out: DEFAULT_COMPANY_I_RESULTS,
+            resetResults: DEFAULT_COMPANY_I_RESULTS
           }
         ];
 
@@ -275,7 +286,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
             page,
             "N° de BSD / contenant",
             scenario,
-            DEFAULT_COMPANYA_RESULTS
+            scenario.resetResults ?? DEFAULT_COMPANY_A_RESULTS
           );
         }
       });
@@ -283,16 +294,8 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
 
     await test.step("N° de déchet / nom usuel", async () => {
       await test.step("Entreprise A > 'Tous les bordereaux'", async () => {
-        await test.step("Navigation", async () => {
-          // On CompanyA's page
-          await selectCompany(page, companies.companyA.siret);
-          // BSD menu
-          await selectBsdMenu(page, "Tous les bordereaux");
-        });
-
-        // Build & test scenarios
         const scenarios = [
-          { desc: "Etat initial", in: "", out: DEFAULT_COMPANYA_RESULTS },
+          { desc: "Etat initial", in: "", out: DEFAULT_COMPANY_A_RESULTS },
           {
             desc: "'02 01 01' > bsdd1 devrait remonter",
             in: "02 01 01",
@@ -320,7 +323,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
             page,
             "N° de déchet / nom usuel",
             scenario,
-            DEFAULT_COMPANYA_RESULTS
+            DEFAULT_COMPANY_A_RESULTS
           );
         }
       });
@@ -328,16 +331,8 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
 
     await test.step("Raison sociale / SIRET", async () => {
       await test.step("Entreprise A > 'Tous les bordereaux'", async () => {
-        await test.step("Navigation", async () => {
-          // On CompanyA's page
-          await selectCompany(page, companies.companyA.siret);
-          // BSD menu
-          await selectBsdMenu(page, "Tous les bordereaux");
-        });
-
-        // Build & test scenarios
         const scenarios = [
-          { desc: "Etat initial", in: "", out: DEFAULT_COMPANYA_RESULTS },
+          { desc: "Etat initial", in: "", out: DEFAULT_COMPANY_A_RESULTS },
           {
             desc: "Siret companyA > bsdd1, bsdd3, bsda1, bsda2, bsff1 & bsdasri1 devraient remonter",
             in: companies.companyA.siret,
@@ -389,7 +384,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
             page,
             "Raison sociale / SIRET",
             scenario,
-            DEFAULT_COMPANYA_RESULTS
+            DEFAULT_COMPANY_A_RESULTS
           );
         }
       });

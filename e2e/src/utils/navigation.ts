@@ -47,16 +47,21 @@ export const checkCurrentURL = async (page, path) => {
 };
 
 /**
- * On the dashboard page, select a company.
+ * On the dashboard page, select a company, if not already selected
  */
 export const selectCompany = async (page, siret) => {
-  await page.getByRole("combobox").selectOption(siret);
+  const companySelector = page.locator(".company-select").getByRole("combobox");
+
+  const currentCompany = await companySelector.inputValue();
+  if (!currentCompany.includes(siret)) {
+    await companySelector.selectOption(siret);
+  }
 };
 
 /**
  * Select a BSD menu
  */
-type BsdMenu =
+export type BsdMenu =
   | "Tous les bordereaux"
   | "Brouillons"
   | "Pour action"
@@ -66,5 +71,12 @@ type BsdMenu =
   | "À collecter"
   | "Collecté";
 export const selectBsdMenu = async (page, menu: BsdMenu) => {
-  await page.getByRole("link", { name: menu }).click();
+  const targetedTab = page
+    .locator(".dashboard-tabs")
+    .getByRole("link", { name: menu });
+  const ariaCurrent = await targetedTab.getAttribute("aria-current");
+
+  if (ariaCurrent !== "page") {
+    await targetedTab.click();
+  }
 };

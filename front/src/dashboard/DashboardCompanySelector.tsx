@@ -39,7 +39,7 @@ export default function DashboardCompanySelector({
       onChange={e => handleChange(e.target.value)}
     >
       {sortedCompanies.map(c => (
-        <option key={c.orgId} value={c.orgId}>
+        <option key={c.orgId} value={c.orgId} selected={orgId === c.orgId}>
           {c.givenName || c.name} ({c.orgId})
         </option>
       ))}
