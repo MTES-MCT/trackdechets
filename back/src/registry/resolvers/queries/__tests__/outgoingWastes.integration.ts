@@ -518,7 +518,7 @@ describe("Outgoing wastes registry", () => {
     const outgoingWastes = data.outgoingWastes.edges.map(e => e.node)[1];
     expect(outgoingWastes.emitterCompanySiret).toEqual(emitter.company.siret);
     // destinationReceptionWeight doit être celui de la destination finale et no pas de l'installation de transit
-    expect(outgoingWastes.finalReceptionWeights).toBe([100]);
-    expect(outgoingWastes.finalOperationCodes).toBe(["R1"]);
+    expect(outgoingWastes.finalReceptionWeights).toStrictEqual([100]);
+    expect(outgoingWastes.finalOperationCodes).toStrictEqual(["R 1"]);
   });
 });

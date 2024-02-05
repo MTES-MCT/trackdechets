@@ -193,8 +193,8 @@ export function formToBsdd(form: RegistryForm): Bsdd & {
       : { forwarding: null }),
     ...(form.finalOperations?.length
       ? {
-        finalOperations: form.finalOperations
-      }
+          finalOperations: form.finalOperations
+        }
       : { finalOperations: [] }),
     grouping
   };

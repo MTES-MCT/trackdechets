@@ -163,7 +163,8 @@ describe("simpleFormToBsdd", () => {
       destinationOperationNextDestinationCompanyPhone: null,
       destinationOperationNextDestinationCompanyMail: null,
       forwarding: null,
-      grouping: []
+      grouping: [],
+      finalOperations: []
     });
   });
 
@@ -411,6 +412,7 @@ describe("simpleFormToBsdd", () => {
       destinationOperationNextDestinationCompanyPhone: null,
       destinationOperationNextDestinationCompanyMail: null,
       grouping: [],
+      finalOperations: [],
       forwarding: {
         id: form.readableId,
         customId: form.customId,
@@ -551,8 +553,7 @@ describe("simpleFormToBsdd", () => {
         destinationOperationNextDestinationCompanyContact: null,
         destinationOperationNextDestinationCompanyPhone: null,
         destinationOperationNextDestinationCompanyMail: null,
-        grouping: []
-      }
+        grouping: []      }
     });
   });
 });

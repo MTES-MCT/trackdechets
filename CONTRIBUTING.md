@@ -341,7 +341,7 @@ Il est également possible de faire tourner chaque test de façon indépendante:
 npx nx run back:test:integration --testFile workflow.integration.ts
 ```
 
-Si besoin, 
+Si besoin,
 
 ## Tests end-to-end (e2e)
 

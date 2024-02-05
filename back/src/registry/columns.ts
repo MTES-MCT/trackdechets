@@ -46,7 +46,6 @@ const formatFinalOperations = (val?: string[]) =>
 const formatFinalReceptionWeights = (val?: number[]) =>
   val ? val.map(quant => quant.toFixed(6)).join("; ") : "";
 
-
 export const columns: Column[] = [
   // Dénomination, nature et quantité :
   { field: "id", label: "N° de bordereau" },
@@ -197,7 +196,8 @@ export const columns: Column[] = [
   },
   {
     field: "finalOperationCodes",
-    label: "Opération(s) finale(s) réalisée(s) par la traçabilité suite, c'est à dire le(s) code(s) de traitement renseigné(s) par l'exutoire",
+    label:
+      "Opération(s) finale(s) réalisée(s) par la traçabilité suite, c'est à dire le(s) code(s) de traitement renseigné(s) par l'exutoire",
     format: formatFinalOperations
   },
   {
