@@ -60,7 +60,6 @@ export default function CompaniesRoutes() {
                   }
                 >
                   <AccountCompanyList />
-                  <div>Coucou</div>
                 </AccountContentWrapper>
               }
             />

@@ -103,7 +103,7 @@ function DashboardSubNav({ currentCompany }) {
               aria-expanded={!!matchDashboard}
               aria-controls="menu-bordereaux"
             >
-              Mes bordereaux
+              Bordereaux
             </button>
             <div className="fr-collapse fr-menu" id="menu-bordereaux">
               <ul className="fr-menu__list">
@@ -474,7 +474,7 @@ export default function Header({
   const { data } = useQuery<Pick<Query, "me">>(GET_ME);
 
   useEffect(() => {
-    if (data && currentSiret) {
+    if (isAuthenticated && data && currentSiret) {
       const companies = data.me.companies;
       const currentCompany = companies.find(
         company => company.orgId === currentSiret
@@ -486,7 +486,7 @@ export default function Header({
         );
       }
     }
-  }, [updatePermissions, data, currentSiret]);
+  }, [updatePermissions, data, currentSiret, isAuthenticated]);
 
   const handleCompanyChange = useCallback(
     orgId => {
@@ -504,7 +504,7 @@ export default function Header({
     [navigate, role]
   );
 
-  if (data?.me == null) {
+  if (isAuthenticated && data?.me == null) {
     return <Loader />;
   }
   const companies = data?.me.companies;
@@ -642,7 +642,7 @@ export default function Header({
       </div>
 
       {/* Company switcher on top of the page */}
-      {!!matchDashboard && currentCompany && (
+      {!!matchDashboard && companies && currentCompany && (
         <div className={styles.companySelector}>
           {companies.length > 1 ? (
             <div className="company-select">

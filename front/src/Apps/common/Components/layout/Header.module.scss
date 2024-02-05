@@ -76,6 +76,7 @@
 
 .companySelector {
   display: block;
+  padding: 16px;
 
   @include desktop {
     display: none;
