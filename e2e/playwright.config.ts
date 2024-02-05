@@ -6,13 +6,13 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./src",
   /* Run tests in files in parallel */
-  fullyParallel: true,
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: true,
   /* Retry on CI only */
   retries: 0,
   /* Opt out of parallel tests on CI. */
-  workers: 2,
+  workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
   /* Timeout */
@@ -30,7 +30,9 @@ export default defineConfig({
     viewport: {
       height: 1080,
       width: 1920
-    }
+    },
+    // Take a screenshot when tests fail
+    screenshot: "only-on-failure"
   },
   /* Run before all tests */
   globalSetup: require.resolve("./src/global-setup"),
