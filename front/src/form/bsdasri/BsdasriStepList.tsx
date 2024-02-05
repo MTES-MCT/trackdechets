@@ -166,7 +166,6 @@ export default function BsdasriStepsList(props: Props) {
         // synthesis bsdasri are  never created in draft state
         const { grouping, emitter, ecoOrganisme, ...cleanedInput } = input;
 
-        console.log(input);
         return updateBsdasri({
           variables: {
             id: formState.id,

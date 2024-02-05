@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { dashboardCompanyFragment } from "./company";
+import { dashboardCompanyFragment, companyFragment } from "./company";
 
 // This fragment query only the fields required for dashboard and workflow action button
 // Would you need to query more fields, pay attention sub resolvers which
@@ -80,7 +80,7 @@ export const fullBspaohFragment = gql`
     }
     emitter {
       company {
-        ...DashboardCompanyFragment
+        ...CompanyFragment
       }
       pickupSite {
         name
@@ -106,7 +106,7 @@ export const fullBspaohFragment = gql`
 
     transporter {
       company {
-        ...DashboardCompanyFragment
+        ...CompanyFragment
       }
       customInfo
       transport {
@@ -130,7 +130,7 @@ export const fullBspaohFragment = gql`
     }
     destination {
       company {
-        ...DashboardCompanyFragment
+        ...CompanyFragment
       }
       customInfo
       cap
@@ -169,5 +169,5 @@ export const fullBspaohFragment = gql`
       }
     }
   }
-  ${dashboardCompanyFragment}
+  ${companyFragment}
 `;

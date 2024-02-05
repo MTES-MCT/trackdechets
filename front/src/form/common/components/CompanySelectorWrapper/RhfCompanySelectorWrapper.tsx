@@ -1,5 +1,4 @@
-// Wrapper CompanySelectorWrapper cloned in RhfCompanySelectorWrapper cloen for react-hook-forms
-
+// CompanySelectorWrapper clone for react-hook-forms
 import { useLazyQuery, ApolloError } from "@apollo/client";
 import React, { useCallback, useEffect, useState } from "react";
 import CompanySelector from "../../../../Apps/common/Components/CompanySelector/CompanySelector";
@@ -45,6 +44,7 @@ interface CompanySelectorWrapperProps {
  * - Il propage l'événement de sélection d'un établissement au parent pour modifier.
  * les données du store (Formik)
  */
+
 export default function CompanySelectorWrapper({
   selectedCompanyOrgId,
   favoriteType = FavoriteType.Emitter,
@@ -54,12 +54,9 @@ export default function CompanySelectorWrapper({
   disabled = false,
   onCompanySelected
 }: CompanySelectorWrapperProps) {
-  console.log("render");
   // Établissement sélectionné
   const [selectedCompany, setSelectedCompany] =
     useState<CompanySearchResult | null>(null);
-
-  console.log("--", selectedCompanyOrgId);
 
   const [
     getFavoritesQuery,
@@ -197,6 +194,7 @@ export default function CompanySelectorWrapper({
           }}
         />
       )}
+
       <CompanySelector
         loading={isLoadingFavorites || isLoadingSearch}
         onSelect={onSelectCompany}

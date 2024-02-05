@@ -16,7 +16,8 @@ import {
   Bsvhu,
   Form,
   FormStatus,
-  Bsdasri
+  Bsdasri,
+  Bspaoh
 } from "@td/codegen-ui";
 
 import "./bsdCardList.scss";
@@ -32,6 +33,7 @@ import ActBsdSuiteValidation from "../Validation/Act/ActBsdSuiteValidation";
 import ActBsdaValidation from "../Validation/Act/ActBsdaValidation";
 import ActBsffValidation from "../Validation/Act/ActBsffValidation";
 import ActBsvhuValidation from "../Validation/Act/ActBsvhuValidation";
+import ActBspaohValidation from "../Validation/Act/ActBspaohValidation";
 import { BsdDisplay } from "../../../common/types/bsdTypes";
 import {
   canApproveOrRefuseReview,
@@ -202,6 +204,11 @@ function BsdCardList({
       }
       if (bsd.__typename === "Bsvhu") {
         setValidationWorkflowType("ACT_BSVHU");
+        setBsdClicked(bsd);
+        setIsModalOpen(true);
+      }
+      if (bsd.__typename === "Bspaoh") {
+        setValidationWorkflowType("ACT_BSPAOH");
         setBsdClicked(bsd);
         setIsModalOpen(true);
       }
@@ -465,6 +472,14 @@ function BsdCardList({
         />
       )}
 
+      {validationWorkflowType === "ACT_BSPAOH" && (
+        <ActBspaohValidation
+          bsd={bsdClicked as Bspaoh}
+          currentSiret={siret}
+          isOpen={isModalOpen}
+          onClose={onClose}
+        />
+      )}
       {validationWorkflowType === "REVIEW_BSDD_DELETE" && isModalOpen && (
         <RevisionModal
           bsdId={bsdClicked?.id!}

@@ -33,6 +33,7 @@ import {
 } from "../../dashboard/detail";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
 import { usePermissions } from "../../common/contexts/PermissionsContext";
+import { DsfrModal } from "../common/Components/Modal/DsfrModal";
 
 import "./dashboard.scss";
 import { useMedia } from "../../common/use-media";
@@ -482,15 +483,14 @@ function DashboardRoutes() {
             <Route
               path={toRelative(routes.dashboard.bspaohs.view)}
               element={
-                <Modal
+                <DsfrModal
                   onClose={goBack}
-                  ariaLabel="Aperçu du bordereau"
-                  isOpen
+                  title="Aperçu du bordereau"
+                  size="XL"
                   padding={false}
-                  wide={true}
                 >
                   <RouteBspaohsView />
-                </Modal>
+                </DsfrModal>
               }
             />
 

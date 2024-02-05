@@ -12,6 +12,7 @@ import {
   dropdown_create_bsdd,
   dropdown_create_bsff,
   dropdown_create_bsvhu,
+  dropdown_create_bspaoh,
   filter_acceptation_sign_date,
   filter_bsd_number,
   filter_bsd_type,
@@ -40,7 +41,8 @@ import {
   IconBSDa,
   IconBSVhu,
   IconBSDD,
-  IconBSDasri
+  IconBSDasri,
+  IconBSPaohThin
 } from "../common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
 import { BsdCurrentTab } from "../common/types/commonTypes";
@@ -482,6 +484,11 @@ export const dropdownCreateLinks = siret => [
     title: dropdown_create_bsda,
     route: generatePath(routes.dashboard.bsdas.create, { siret }),
     icon: <IconBSDa />
+  },
+  {
+    title: dropdown_create_bspaoh,
+    route: generatePath(routes.dashboard.bspaohs.create, { siret }),
+    icon: <IconBSPaohThin />
   }
 ];
 
@@ -517,7 +524,8 @@ export const getUpdatePath = bsd => {
       return routes.dashboard.bsffs.edit;
     case BsdType.Bsvhu:
       return routes.dashboard.bsvhus.edit;
-
+    case BsdType.Bspaoh:
+      return routes.dashboard.bspaohs.edit;
     default:
       break;
   }

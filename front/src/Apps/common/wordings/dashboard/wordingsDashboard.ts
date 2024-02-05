@@ -132,6 +132,7 @@ export const dropdown_create_bsda = "Amiante";
 export const dropdown_create_bsdasri = "DASRI";
 export const dropdown_create_bsvhu = "Véhicule Hors d’Usage";
 export const dropdown_create_bsff = "Fluide Frigorigène";
+export const dropdown_create_bspaoh = "PAOH";
 
 export const bsddValidationDraftText = `Cette action aura pour effet de valider les données du bordereau et
             de le faire apparaitre dans l'onglet "Pour action" de l'émetteur
@@ -156,7 +157,11 @@ export const bsvhuPublishDraft = `Cette action aura pour effet de démarrer le c
             <strong>“Pour action”</strong> du tableau de bord de l'émetteur. Le
             bordereau pourra toujours être modifié ou supprimé tant qu'aucune
             signature n'a été apposée.`;
-export const bpaohPublishDraft = bsvhuPublishDraft;
+export const bpaohPublishDraft = `Cette action aura pour effet de démarrer le cycle de vie du
+            bordereau en le faisant apparaître dans l'onglet
+            <strong>“Pour action”</strong> du tableau de bord de l'émetteur. Le
+            bordereau pourra toujours être modifié ou supprimé tant qu'aucune
+            signature n'a été apposée.`;
 // tabs
 export const ALL_BSDS = "Tous les bordereaux";
 export const ALL_REVIEWS = "Toutes les révisions";

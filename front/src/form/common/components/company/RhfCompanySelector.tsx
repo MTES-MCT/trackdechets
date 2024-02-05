@@ -1,4 +1,5 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
+//todo:  delete
 import {
   NotificationError,
   SimpleNotificationError
@@ -9,7 +10,10 @@ import {
 } from "../../../../Apps/common/Components/Icons/Icons";
 import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import { constantCase } from "constant-case";
-import { Field, useField, useFormikContext } from "formik";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+
+import { useFormContext } from "react-hook-form";
+
 import { isFRVat, isVat, isForeignVat } from "@td/constants";
 import React, {
   useCallback,
@@ -85,30 +89,30 @@ export default function CompanySelector({
   initialAutoSelectFirstCompany = true,
   onCompanyPrivateInfos = undefined
 }: CompanySelectorProps) {
+  const { register, setValue, setError, getValues, getFieldState } =
+    useFormContext();
+  // const setFieldTouched = fieldName => setValue(fieldName, getValues(fieldName));
   // siret is the current active company
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
-  const [field] = useField<FormCompany>({ name });
+  // full rhf form
+  const formValues = getValues();
+  const company = getValues(name) ?? {};
+
+  const fieldName = name;
 
   const [hasAutoselected, setHasAutoselected] = useState(false);
   const [selectedCompanyDetails, setSelectedCompanyDetails] = useState({
-    name: field.value?.name,
-    address: field.value?.address
+    name: company?.name,
+    address: company?.address
   });
-  const { setFieldError, setFieldValue, setFieldTouched, values } =
-    useFormikContext<{
-      transporter:
-        | Maybe<TransporterInput>
-        | Maybe<BsdaTransporterInput>
-        | Maybe<BsdasriTransporterInput>
-        | Maybe<BsvhuTransporterInput>
-        | Maybe<BsffTransporterInput>;
-    }>();
+  // todo: setFieldTouched
 
   const isRoadTransport =
-    (values.transporter as TransporterInput)?.mode === TransportMode.Road ||
+    (formValues?.transporter as TransporterInput)?.mode ===
+      TransportMode.Road ||
     (
-      values.transporter as
+      formValues?.transporter as
         | BsdaTransporterInput
         | BsdasriTransporterInput
         | BsffTransporterInput
@@ -116,8 +120,8 @@ export default function CompanySelector({
 
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
-    (field.value?.country && field.value?.country !== "FR") ||
-      isForeignVat(field.value?.vatNumber!)
+    (company?.country && company?.country !== "FR") ||
+      isForeignVat(company?.vatNumber!)
   );
   // this 2 input ref are to cross-link the value of the input in both search input and department input
   const departmentInputRef = useRef<HTMLInputElement>(null);
@@ -129,14 +133,14 @@ export default function CompanySelector({
     setDisplayForeignCompanyWithUnknownInfos
   ] = useState<boolean>(false);
 
-  // Memoize for changes in field.value.siret and field.value.orgId
+  // Memoize for changes in company.siret and company.orgId
   // To support both FormCompany and Intermediary (which doesn't have orgId)
   const orgId = useMemo(
-    () => field.value?.orgId ?? field.value?.siret ?? null,
-    [field.value?.siret, field.value?.orgId]
+    () => company?.orgId ?? company?.siret ?? null,
+    [company?.siret, company?.orgId]
   );
   // Favorite type is deduced from the field prefix (transporter, emitter, etc)
-  const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
+  const favoriteType = constantCase(fieldName.split(".")[0]) as FavoriteType;
   const {
     loading: isLoadingFavorites,
     data: favoritesData,
@@ -226,13 +230,13 @@ export default function CompanySelector({
       onCompanyPrivateInfos?.(savedCompanyInfos);
       // hack to auto-complete the country
       if (savedCompanyInfos?.codePaysEtrangerEtablissement) {
-        setFieldValue(
-          `${field.name}.country`,
+        setValue(
+          `${fieldName}.country`,
           savedCompanyInfos.codePaysEtrangerEtablissement
         );
       }
     }
-  }, [savedCompanyInfos, field.name, onCompanyPrivateInfos, setFieldValue]);
+  }, [savedCompanyInfos, fieldName, onCompanyPrivateInfos, setValue]);
 
   /**
    * Selection d'un établissement dans le formulaire
@@ -247,8 +251,9 @@ export default function CompanySelector({
       if (disabled) return;
       // empty the fields
       if (!company) {
-        setFieldValue(field.name, getInitialCompany());
-        setFieldTouched(`${field.name}`, true, true);
+        setValue(fieldName, getInitialCompany());
+        // setFieldTouched(`${fieldName}`, true, true);
+        setValue(fieldName, getValues(fieldName));
         onCompanySelected?.();
         return;
       }
@@ -282,9 +287,10 @@ export default function CompanySelector({
       };
 
       Object.keys(fields).forEach(key => {
-        setFieldValue(`${field.name}.${key}`, fields[key]);
+        setValue(`${fieldName}.${key}`, fields[key]);
       });
-      setFieldTouched(`${field.name}`, true, true);
+      // setFieldTouched(`${fieldName}`, true, true);
+      setValue(fieldName, getValues(fieldName));
       onCompanySelected?.(company);
 
       setSelectedCompanyDetails({
@@ -296,12 +302,12 @@ export default function CompanySelector({
       setSelectedCompanyDetails,
       onCompanySelected,
       setFieldTouched,
-      setFieldValue,
+      setValue,
       setIsForeignCompany,
       setDisplayForeignCompanyWithUnknownInfos,
       setMustBeRegistered,
       disabled,
-      field.name,
+      fieldName,
       registeredOnlyCompanies
     ]
   );
@@ -338,16 +344,16 @@ export default function CompanySelector({
 
       if (isValidVat) {
         if (isFRVat(clue)) {
-          setFieldTouched(`${field.name}.siret`);
-          return setFieldError(
-            `${field.name}.siret`,
+          setFieldTouched(`${fieldName}.siret`);
+          return setError(
+            `${fieldName}.siret`,
             "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et pas par son numéro de TVA"
           );
         }
         if (!allowForeignCompanies) {
-          setFieldTouched(`${field.name}.siret`);
-          return setFieldError(
-            `${field.name}.siret`,
+          setFieldTouched(`${fieldName}.siret`);
+          return setError(
+            `${fieldName}.siret`,
             "Vous ne pouvez pas chercher un établissement par son numéro de TVA, mais seulement par nom ou numéro de SIRET"
           );
         }
@@ -362,10 +368,10 @@ export default function CompanySelector({
 
     return debounce(triggerSearch, DEBOUNCE_DELAY);
   }, [
-    setFieldError,
+    setError,
     setFieldTouched,
     searchCompaniesQuery,
-    field.name,
+    fieldName,
     allowForeignCompanies
   ]);
 
@@ -509,7 +515,7 @@ export default function CompanySelector({
         {searchData?.searchCompanies.length === 0 && !isLoadingSearch && (
           <span>Aucun établissement ne correspond à cette recherche...</span>
         )}
-        <RedErrorMessage name={`${field.name}.siret`} />
+        {/* <RedErrorMessage name={`${fieldName}.siret`} /> */}
         {!isLoadingCompanyPrivateData && (
           <CompanyResults<CompanySearchResult>
             onSelect={company => selectCompany(company)}
@@ -518,11 +524,11 @@ export default function CompanySelector({
             selectedItem={
               {
                 orgId,
-                siret: field.value?.siret,
-                vatNumber: field.value?.vatNumber,
-                name: field.value?.name,
-                address: field.value?.address,
-                codePaysEtrangerEtablissement: field.value?.country,
+                siret: company?.siret,
+                vatNumber: company?.vatNumber,
+                name: company?.name,
+                address: company?.address,
+                codePaysEtrangerEtablissement: company?.country,
                 // complete with companyPrivateInfos data
                 ...(savedCompanyInfos && {
                   ...savedCompanyInfos
@@ -534,90 +540,84 @@ export default function CompanySelector({
         <div className="form__row">
           {allowForeignCompanies && isForeignCompany && (
             <>
-              <label>
-                Nom de l'entreprise
-                <Field
-                  type="text"
-                  className="td-input"
-                  name={`${field.name}.name`}
-                  placeholder="Nom"
-                  disabled={disableNameField}
-                />
-              </label>
+              <Input
+                label="Nom de l'entreprise"
+                nativeInputProps={{
+                  ...register(`${fieldName}.name`, {
+                    disabled: disableNameField
+                  })
+                }}
+              />
 
-              <RedErrorMessage name={`${field.name}.name`} />
+              {/* <RedErrorMessage name={`${fieldName}.name`} /> */}
 
               <label>
                 Adresse de l'entreprise
-                <Field
+                {/* <Field
                   type="text"
                   className="td-input"
-                  name={`${field.name}.address`}
+                  name={`${fieldName}.address`}
                   placeholder="Adresse"
                   disabled={disableAddressField}
-                />
+                /> */}
               </label>
+              <Input
+                label="Adresse de l'entreprise"
+                nativeInputProps={{
+                  ...register(`${fieldName}.address`, {
+                    disabled: disableAddressField
+                  })
+                }}
+              />
+              {/* <RedErrorMessage name={`${fieldName}.address`} /> */}
 
-              <RedErrorMessage name={`${field.name}.address`} />
-              <label>
-                Pays de l'entreprise
-                <Field
-                  type="text"
-                  className="td-input"
-                  name={`${field.name}.country`}
-                  disabled={true}
-                />
-              </label>
-
-              <RedErrorMessage name={`${field.name}.country`} />
+              <Input
+                label="Pays de l'entreprise"
+                nativeInputProps={{
+                  ...register(`${fieldName}.country`, {
+                    disabled: true
+                  })
+                }}
+              />
+              {/* <RedErrorMessage name={`${fieldName}.country`} /> */}
             </>
           )}
-          <label>
-            Personne à contacter
-            <Field
-              type="text"
-              name={`${field.name}.contact`}
-              placeholder="NOM Prénom"
-              className="td-input"
-              disabled={disabled}
-            />
-          </label>
-          <RedErrorMessage name={`${field.name}.contact`} />
+
+          <Input
+            label="Personne à contacter"
+            nativeInputProps={{
+              ...register(`${fieldName}.contact`)
+            }}
+          />
+
+          {/* <RedErrorMessage name={`${fieldName}.contact`} /> */}
         </div>
         <div className="form__row">
-          <label>
-            Téléphone ou Fax
-            <Field
-              type="text"
-              name={`${field.name}.phone`}
-              placeholder="Numéro"
-              className={`td-input ${styles.companySelectorSearchPhone}`}
-              disabled={disabled}
-            />
-          </label>
+          <Input
+            label="Téléphone ou Fax"
+            nativeInputProps={{
+              placeholder: "Numéro",
+              ...register(`${fieldName}.phone`)
+            }}
+          />
 
-          <RedErrorMessage name={`${field.name}.phone`} />
+          {/* <RedErrorMessage name={`${fieldName}.phone`} /> */}
         </div>
         <div className="form__row">
-          <label>
-            Mail {optionalMail ? "(optionnel)" : null}
-            <Field
-              type="email"
-              name={`${field.name}.mail`}
-              className={`td-input ${styles.companySelectorSearchEmail}`}
-              disabled={disabled}
-            />
-          </label>
+          <Input
+            label={`Mail todo`}
+            nativeInputProps={{
+              type: "email",
+              ...register(`${fieldName}.mail`)
+            }}
+          />
 
-          <RedErrorMessage name={`${field.name}.mail`} />
+          {/* <RedErrorMessage name={`${fieldName}.mail`} /> */}
         </div>
 
-        {values.transporter &&
-          !!orgId &&
-          name === "transporter.company" &&
-          isRoadTransport && (
-            <TransporterRecepisseWrapper transporter={values.transporter!} />
-          )}
+        {!!orgId && name === "transporter.company" && isRoadTransport && (
+          <TransporterRecepisseWrapper transporter={formValues.transporter!} />
+        )}
       </div>
     </>
   );

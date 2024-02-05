@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { NotificationError } from "../../../../common/Components/Error/Error";
 import { Loader } from "../../../../common/Components";
 import TdModal from "../../../../common/Components/Modal/Modal";
+import { DsfrModal } from "../../../../common/Components/Modal/DsfrModal";
 import {
   bsdaPublishDraft,
   bsddValidationDraftText,
@@ -24,6 +25,7 @@ import {
 import { generatePath, Link } from "react-router-dom";
 import routes from "../../../../routes";
 import { TOAST_DURATION } from "../../../../../common/config";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
   const MARK_AS_SEALED = gql`
@@ -138,8 +140,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
       PUBLISH_BSPAOH,
       {
         variables: { id: bsd.id },
-        refetchQueries: [GET_BSDS],
-        awaitRefetchQueries: true,
+
         onCompleted: () => {
           toast.success(`Bordereau ${bsd.id} publié`, {
             duration: TOAST_DURATION
@@ -160,7 +161,8 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
     if (
       bsd.__typename === "Bsda" ||
       bsd.__typename === "Bsff" ||
-      bsd.__typename === "Bsvhu"
+      bsd.__typename === "Bsvhu" ||
+      bsd.__typename === "Bspaoh"
     ) {
       return "Publier le bordereau";
     }
@@ -333,11 +335,11 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
           <p dangerouslySetInnerHTML={{ __html: bpaohPublishDraft }} />
 
           <div className="td-modal-actions">
-            <button className="btn btn--outline-primary" onClick={onClose}>
+            <Button onClick={onClose} priority="secondary">
               Annuler
-            </button>
-            <button
-              className="btn btn--primary"
+            </Button>
+            <Button
+              priority="primary"
               onClick={async () => {
                 const res = await publishBspaoh({
                   variables: {
@@ -350,7 +352,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
               }}
             >
               <span>Publier le bordereau</span>
-            </button>
+            </Button>
           </div>
 
           {errorBspaoh && (
@@ -360,7 +362,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 apolloError={errorBspaoh}
               />
               <Link
-                to={generatePath(routes.dashboard.bsvhus.edit, {
+                to={generatePath(routes.dashboard.bspaohs.edit, {
                   siret: currentSiret,
                   id: bsd.id
                 })}
@@ -375,8 +377,11 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
       );
     }
   };
-
-  return (
+  return bsd.__typename === "Bspaoh" ? (
+    <DsfrModal title={renderTitle()} onClose={onClose}>
+      {renderContent()}
+    </DsfrModal>
+  ) : (
     <TdModal isOpen={isOpen} onClose={onClose} ariaLabel={renderTitle()}>
       <h2 className="td-modal-title">{renderTitle()}</h2>
 

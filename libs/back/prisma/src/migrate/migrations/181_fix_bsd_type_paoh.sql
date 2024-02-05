@@ -1,0 +1,1 @@
+ALTER TYPE "default$default"."BsdType" ADD VALUE 'BSPAOH';

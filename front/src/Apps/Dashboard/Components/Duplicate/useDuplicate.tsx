@@ -5,13 +5,15 @@ import {
   MutationDuplicateBsdaArgs,
   MutationDuplicateBsdasriArgs,
   MutationDuplicateBsvhuArgs,
-  MutationDuplicateFormArgs
+  MutationDuplicateFormArgs,
+  MutationDuplicateBspaohArgs
 } from "@td/codegen-ui";
 import {
   bsdaFragment,
   fullDasriFragment,
   fullFormFragment,
-  vhuFragment
+  vhuFragment,
+  fullBspaohFragment
 } from "../../../common/queries/fragments";
 import { toastApolloError } from "../../../../form/common/stepper/toaster";
 
@@ -57,6 +59,15 @@ const DUPLICATE_BSVHU = gql`
     }
   }
   ${vhuFragment}
+`;
+
+const DUPLICATE_BSPAOH = gql`
+  mutation DuplicateBspaoh($id: ID!) {
+    duplicateBspaoh(id: $id) {
+      ...BspaohFragment
+    }
+  }
+  ${fullBspaohFragment}
 `;
 
 const message = `Le bordereau a été dupliqué, il est disponible dans l'onglet "Brouillons"`;
@@ -167,6 +178,30 @@ export function useBsvhuDuplicate(
     Pick<Mutation, "duplicateBsvhu">,
     MutationDuplicateBsvhuArgs
   >(DUPLICATE_BSVHU, {
+    ...options,
+    onCompleted: (...args) => {
+      toast.success(message);
+
+      if (options.onCompleted) {
+        options.onCompleted(...args);
+      }
+    },
+    onError: err => {
+      toastApolloError(err, startErrorMessage);
+    }
+  });
+}
+
+export function useBspaohDuplicate(
+  options: MutationHookOptions<
+    Pick<Mutation, "duplicateBspaoh">,
+    MutationDuplicateBspaohArgs
+  >
+) {
+  return useMutation<
+    Pick<Mutation, "duplicateBspaoh">,
+    MutationDuplicateBspaohArgs
+  >(DUPLICATE_BSPAOH, {
     ...options,
     onCompleted: (...args) => {
       toast.success(message);

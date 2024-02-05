@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 import { Mutation, MutationCreatePdfAccessTokenArgs } from "@td/codegen-ui";
 import QRCodeIcon from "react-qr-code";
@@ -36,7 +37,7 @@ export function RouteControlPdf() {
 
   return (
     <div>
-      <h2 className="td-modal-title">QR Code contrôle routier</h2>
+      <h2 className="fr-h2">QR Code contrôle routier</h2>
 
       <p>
         Ce QR code est à présenter au forces de l'ordre en cas de contrôle
@@ -54,16 +55,16 @@ export function RouteControlPdf() {
       )}
 
       <div className="td-modal-actions">
-        <button
-          className="btn btn--outline-primary"
+        <Button
+          priority="secondary"
           onClick={() => {
             navigate(-1);
           }}
         >
           Annuler
-        </button>
-        <button
-          className="btn btn--primary"
+        </Button>
+
+        <Button
           disabled={loading || !!data}
           onClick={() =>
             createPdfAccessToken({
@@ -73,8 +74,8 @@ export function RouteControlPdf() {
             })
           }
         >
-          <span>Afficher le QR code</span>
-        </button>
+          Afficher le QR code
+        </Button>
       </div>
     </div>
   );

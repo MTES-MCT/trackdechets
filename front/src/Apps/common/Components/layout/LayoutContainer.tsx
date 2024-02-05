@@ -38,6 +38,10 @@ const BsdasriFormContainer = lazy(
 const BsdaFormContainer = lazy(
   () => import("../../../../form/bsda/FormContainer")
 );
+
+const BspaohFormContainer = lazy(
+  () => import("../../../../form/bspaoh/FormContainer")
+);
 const WasteSelector = lazy(() => import("../../../../login/WasteSelector"));
 
 const Invite = lazy(() => import("../../../../login/Invite"));
@@ -265,7 +269,23 @@ export default function LayoutContainer() {
               </RequireAuth>
             }
           />
+          <Route
+            path={routes.dashboard.bspaohs.create}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BspaohFormContainer />
+              </RequireAuth>
+            }
+          />
 
+          <Route
+            path={routes.dashboard.bspaohs.edit}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <BspaohFormContainer />
+              </RequireAuth>
+            }
+          />
           <Route
             path={`${routes.dashboard.index}/*`}
             element={

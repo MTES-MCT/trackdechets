@@ -7,17 +7,20 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanRead as checkCanReadBsda } from "../../../bsda/permissions";
 import { checkCanRead as checkCanReadBsff } from "../../../bsffs/permissions";
 import { checkCanRead as checkCanReadBsvhu } from "../../../bsvhu/permissions";
+import { checkCanRead as checkCanReadBspaoh } from "../../../bspaoh/permissions";
 import { getFormOrFormNotFound } from "../../../forms/database";
 import { getBsdasriOrNotFound } from "../../../bsdasris/database";
 import { getBsdaOrNotFound } from "../../../bsda/database";
 import { getBsffOrNotFound } from "../../../bsffs/database";
 import { getBsvhuOrNotFound } from "../../../bsvhu/database";
+import { getBspaohOrNotFound } from "../../../bspaoh/database";
 import {
   BsdType,
   BsdasriStatus,
   BsffStatus,
   BsvhuStatus,
   BsdaStatus,
+  BspaohStatus,
   Status
 } from "@prisma/client";
 import { ROAD_CONTROL_SLUG } from "@td/constants";
@@ -40,7 +43,8 @@ const accessors = {
     getBsdaOrNotFound(id, { include: { transporters: true } }),
   [BsdType.BSDASRI]: id => getBsdasriOrNotFound({ id }),
   [BsdType.BSFF]: id => getBsffOrNotFound({ id }),
-  [BsdType.BSVHU]: id => getBsvhuOrNotFound(id)
+  [BsdType.BSVHU]: id => getBsvhuOrNotFound(id),
+  [BsdType.BSPAOH]: id => getBspaohOrNotFound({ id })
 };
 
 const checkStatus = {
@@ -48,7 +52,8 @@ const checkStatus = {
   [BsdType.BSDA]: bsd => bsd.status === BsdaStatus.SENT,
   [BsdType.BSDASRI]: bsd => bsd.status === BsdasriStatus.SENT,
   [BsdType.BSFF]: bsd => bsd.status === BsffStatus.SENT,
-  [BsdType.BSVHU]: bsd => bsd.status === BsvhuStatus.SENT
+  [BsdType.BSVHU]: bsd => bsd.status === BsvhuStatus.SENT,
+  [BsdType.BSPAOH]: bsd => bsd.status === BspaohStatus.SENT
 };
 
 const permissions = {
@@ -56,7 +61,8 @@ const permissions = {
   [BsdType.BSDA]: (user, bsda) => checkCanReadBsda(user, bsda),
   [BsdType.BSDASRI]: (user, bsdasri) => checkCanReadBsdasri(user, bsdasri),
   [BsdType.BSFF]: (user, bsff) => checkCanReadBsff(user, bsff),
-  [BsdType.BSVHU]: (user, bsvhu) => checkCanReadBsvhu(user, bsvhu)
+  [BsdType.BSVHU]: (user, bsvhu) => checkCanReadBsvhu(user, bsvhu),
+  [BsdType.BSPAOH]: (user, bspaoh) => checkCanReadBspaoh(user, bspaoh)
 };
 
 const getBsdType = (id: string): BsdType => {
@@ -72,6 +78,9 @@ const getBsdType = (id: string): BsdType => {
   if (id.startsWith(ReadableIdPrefix.VHU)) {
     return BsdType.BSVHU;
   }
+  if (id.startsWith(ReadableIdPrefix.PAOH)) {
+    return BsdType.BSPAOH;
+  }
 
   return BsdType.BSDD;
 };
@@ -82,8 +91,8 @@ const createPdfAccessToken: MutationResolvers["createPdfAccessToken"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  // find bsd
 
+  // find bsd
   const bsdType = getBsdType(input.bsdId);
 
   const bsd = await accessors[bsdType](input.bsdId);

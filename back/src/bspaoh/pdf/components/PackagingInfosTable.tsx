@@ -4,7 +4,7 @@ import { BspaohPackaging } from "../../../generated/graphql/types";
 const PACKAGINGS_NAMES = {
   RELIQUAIRE: "Reliquaire",
   LITTLE_BOX: "Petite boîte",
-  BIG_BOX: "Grosse boîte"
+  BIG_BOX: "Grande boîte"
 };
 const VERBOSE_PACKAGINGS_STATUSES = {
   ACCEPTED: "Accepté",

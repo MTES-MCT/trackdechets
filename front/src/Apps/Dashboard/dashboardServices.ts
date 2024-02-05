@@ -93,6 +93,9 @@ export const getBsdStatusLabel = (
       if (bsdType === BsdType.Bsdasri) {
         return ACCEPTE;
       }
+      if (bsdType === BsdType.Bspaoh) {
+        return ACCEPTE;
+      }
       return RECU;
     case BsdStatusCode.Accepted:
       return ACCEPTE;
@@ -273,6 +276,7 @@ const isBsda = (type: BsdType): boolean => type === BsdType.Bsda;
 export const isBsff = (type: BsdType): boolean => type === BsdType.Bsff;
 const isBsdd = (type: BsdType): boolean => type === BsdType.Bsdd;
 export const isBsdasri = (type: BsdType): boolean => type === BsdType.Bsdasri;
+export const isBspaoh = (type: BsdType): boolean => type === BsdType.Bspaoh;
 
 export const isBsdaSign = (bsd: BsdDisplay, currentSiret: string) => {
   if (isBsda(bsd.type)) {
@@ -613,6 +617,14 @@ export const getSentBtnLabel = (
   ) {
     return VALIDER_TRAITEMENT;
   }
+  if (
+    isBspaoh(bsd.type) &&
+    currentSiret === bsd.destination?.company?.siret &&
+    isActTab &&
+    permissions.includes(UserPermission.BsdCanSignAcceptation)
+  ) {
+    return VALIDER_RECEPTION;
+  }
   return "";
 };
 
@@ -656,7 +668,7 @@ export const getReceivedBtnLabel = (
   }
 
   if (
-    (isBsda(bsd.type) || isBsvhu(bsd.type)) &&
+    (isBsda(bsd.type) || isBsvhu(bsd.type) || isBspaoh(bsd.type)) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
     return VALIDER_TRAITEMENT;
@@ -697,7 +709,13 @@ export const getSignByProducerBtnLabel = (
         return SIGNER;
       }
     }
-
+    if (
+      isBspaoh(bsd.type) &&
+      isToCollectTab &&
+      permissions.includes(UserPermission.BsdCanSignTransport)
+    ) {
+      return SIGNER;
+    }
     if (
       (isBsda(bsd.type) &&
         (isGathering(bsd.bsdWorkflowType?.toString()) ||
@@ -1131,6 +1149,8 @@ const canDuplicateBsda = bsd => bsd.type === BsdType.Bsda;
 
 const canDuplicateBsvhu = bsd => bsd.type === BsdType.Bsvhu;
 
+const canDuplicateBspaoh = bsd => bsd.type === BsdType.Bspaoh;
+
 const canDuplicateBsdd = bsd =>
   bsd.type === BsdType.Bsdd &&
   bsd.emitterType !== EmitterType.Appendix1Producer;
@@ -1150,7 +1170,8 @@ export const canDuplicate = (bsd, siret) =>
   canDuplicateBsdasri(bsd) ||
   canDuplicateBsff(bsd, siret) ||
   canDuplicateBsda(bsd) ||
-  canDuplicateBsvhu(bsd);
+  canDuplicateBsvhu(bsd) ||
+  canDuplicateBspaoh(bsd);
 
 const canDeleteBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
@@ -1234,12 +1255,17 @@ const canUpdateBsvhu = bsd =>
   bsd.type === BsdType.Bsvhu &&
   ![BsdStatusCode.Processed, BsdStatusCode.Refused].includes(bsd.status);
 
+const canUpdateBspaoh = bsd =>
+  bsd.type === BsdType.Bspaoh &&
+  ![BsdStatusCode.Processed, BsdStatusCode.Refused].includes(bsd.status);
+
 export const canUpdateBsd = (bsd, siret) =>
   canUpdateBsdd(bsd) ||
   canUpdateBsda(bsd) ||
   canUpdateBsdasri(bsd) ||
   canUpdateBsff(bsd, siret) ||
-  canUpdateBsvhu(bsd);
+  canUpdateBsvhu(bsd) ||
+  canUpdateBspaoh(bsd);
 
 export const canGeneratePdf = bsd => bsd.type === BsdType.Bsff || !bsd.isDraft;
 
