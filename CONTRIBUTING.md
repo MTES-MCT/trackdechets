@@ -341,8 +341,6 @@ Il est également possible de faire tourner chaque test de façon indépendante:
 npx nx run back:test:integration --testFile workflow.integration.ts
 ```
 
-Si besoin,
-
 ## Tests end-to-end (e2e)
 
 Les tests e2e utilisent Playwright ([documentation officielle ici](https://playwright.dev/docs/intro)).
