@@ -69,7 +69,7 @@ export const seedDefaultCompanies = async () => {
 
   const companyH = await seedCompany({
     name: "H - Déchetterie",
-    companyTypes: [CompanyType.WASTEPROCESSOR]
+    companyTypes: [CompanyType.WASTE_CENTER]
   });
 
   const companyI = await seedCompany({
@@ -79,7 +79,7 @@ export const seedDefaultCompanies = async () => {
 
   const companyJ = await seedCompany({
     name: "J - Installation TTR",
-    companyTypes: [CompanyType.WASTE_CENTER]
+    companyTypes: [CompanyType.COLLECTOR]
   });
 
   const companyK = await seedCompany({

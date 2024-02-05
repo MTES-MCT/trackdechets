@@ -377,7 +377,11 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
           out: [bsda1]
         },
         // TODO: fix
-        // {  desc: "Siret companyJ > bsdd1, bsda1 & bsff1 devraient remonter", in: companies.companyJ.siret, out: [bsdd1, bsda1, bsff1] },
+        // {
+        //   desc: "Siret companyJ > bsdd1, bsda1 & bsff1 devraient remonter",
+        //   in: companies.companyJ.siret,
+        //   out: [bsdd1, bsda1, bsff1]
+        // },
         // TODO: ne peut pas marcher, on est sur le profil de l'entreprise A
         // {  desc: "Siret companyD > bsdd1, bsda1 & bsff1 devraient remonter", in: companies.companyD.siret, out: [bsdd1, bsda1, bsff1] },
         {
