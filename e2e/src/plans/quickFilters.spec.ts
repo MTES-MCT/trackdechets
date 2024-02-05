@@ -1,4 +1,5 @@
 import { test, Page } from "@playwright/test";
+import { Company } from "@prisma/client";
 import { seedUser } from "../data/user";
 import { seedCompanyAssociations, seedDefaultCompanies } from "../data/company";
 import { seedBsdd } from "../data/bsdd";
@@ -146,7 +147,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       destinationCap: "L326548",
       packagings: [{ numero: "CONT-202401-AB" }],
       wasteCode: "14 06 01*",
-      operateur: companies.companyD,
+      emitter: companies.companyD,
       detenteur: companies.companyA,
       transporter: companies.companyB,
       destination: companies.companyJ
@@ -175,7 +176,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
   });
 
   interface Scenario {
-    siret?: string;
+    company?: Company;
     bsdMenu?: BsdMenu;
     desc: string;
     in: string;
@@ -185,12 +186,15 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
     page: Page,
     label: QuickFilterLabel,
     scenario: Scenario,
-    defaultResults: any[]
+    defaultCompanyResults: any[]
   ) => {
-    await test.step(scenario.desc, async () => {
+    const bsdMenu = scenario.bsdMenu ?? "Tous les bordereaux";
+    const company = scenario.company ?? companies.companyA;
+
+    await test.step(`[Entreprise "${company.name}" | Onglet "${bsdMenu}"] ${scenario.desc}`, async () => {
       // Select correct company & bsd menu
-      await selectCompany(page, scenario.siret ?? companies.companyA.siret);
-      await selectBsdMenu(page, "Tous les bordereaux");
+      await selectCompany(page, company.siret ?? company.vatNumber);
+      await selectBsdMenu(page, bsdMenu);
 
       // Test scenario
       await quickFilter(page, {
@@ -201,7 +205,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
 
       // Test reset
       await quickFilter(page, { label, value: "" });
-      await expectFilteredResults(page, defaultResults);
+      await expectFilteredResults(page, defaultCompanyResults);
     });
   };
 
@@ -222,171 +226,299 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       bsff1,
       bsdasri1
     ];
+    const DEFAULT_COMPANY_D_RESULTS = [
+      bsdd1,
+      bsdd4,
+      bsda1,
+      bsda3,
+      bsff1,
+      bsdasri2
+    ];
+    const DEFAULT_COMPANY_F_RESULTS = [bsdd1, bsdd2];
     const DEFAULT_COMPANY_I_RESULTS = [bsvhu1];
 
     await test.step("N° de BSD / contenant (et numéro libre)", async () => {
-      await test.step("Entreprise A > 'Tous les bordereaux'", async () => {
-        const scenarios = [
-          {
-            desc: "Etat initial",
-            in: "",
-            out: DEFAULT_COMPANY_A_RESULTS
-          },
-          {
-            desc: "'NUM-LIBRE01' > bsdd1 devrait remonter",
-            in: "NUM-LIBRE01",
-            out: [bsdd1]
-          },
-          {
-            desc: "ID du bsdd1 > bsdd1 devrait remonter",
-            in: bsdd1.readableId,
-            out: [bsdd1]
-          },
-          {
-            desc: "ID du bsda1 > bsda1 devrait remonter",
-            in: bsda1.id,
-            out: [bsda1]
-          },
-          {
-            desc: "ID du bsff1 > bsff1 devrait remonter",
-            in: bsff1.id,
-            out: [bsff1]
-          },
-          {
-            desc: "ID du bsdasri1 > bsdasri1 devrait remonter",
-            in: bsdasri1.id,
-            out: [bsdasri1]
-          },
-          {
-            desc: "Numéro de contenant 'CONT-202401-AB' > bsff1 devrait remonter",
-            in: "CONT-202401-AB",
-            out: [bsff1]
-          },
-          {
-            desc: "'AZERTYAZERTYAZERTY' > aucun résultat",
-            in: "AZERTYAZERTYAZERTY",
-            out: []
-          },
-          {
-            desc: "'BSDA-' > bsda1 & 2 devraient remonter",
-            in: "BSDA-",
-            out: [bsda1, bsda2]
-          },
-          {
-            siret: companies.companyI.siret,
-            desc: "Entreprise I > bsvhu1 devrait remonter",
-            in: "",
-            out: DEFAULT_COMPANY_I_RESULTS,
-            resetResults: DEFAULT_COMPANY_I_RESULTS
-          }
-        ];
-
-        for (const scenario of scenarios) {
-          await testScenario(
-            page,
-            "N° de BSD / contenant",
-            scenario,
-            scenario.resetResults ?? DEFAULT_COMPANY_A_RESULTS
-          );
+      const scenarios = [
+        {
+          desc: "Etat initial",
+          in: "",
+          out: DEFAULT_COMPANY_A_RESULTS
+        },
+        {
+          desc: "'NUM-LIBRE01' > bsdd1 devrait remonter",
+          in: "NUM-LIBRE01",
+          out: [bsdd1]
+        },
+        {
+          desc: "ID du bsdd1 > bsdd1 devrait remonter",
+          in: bsdd1.readableId,
+          out: [bsdd1]
+        },
+        {
+          desc: "ID du bsda1 > bsda1 devrait remonter",
+          in: bsda1.id,
+          out: [bsda1]
+        },
+        {
+          desc: "ID du bsff1 > bsff1 devrait remonter",
+          in: bsff1.id,
+          out: [bsff1]
+        },
+        {
+          desc: "ID du bsdasri1 > bsdasri1 devrait remonter",
+          in: bsdasri1.id,
+          out: [bsdasri1]
+        },
+        {
+          desc: "Numéro de contenant 'CONT-202401-AB' > bsff1 devrait remonter",
+          in: "CONT-202401-AB",
+          out: [bsff1]
+        },
+        {
+          desc: "'AZERTYAZERTYAZERTY' > aucun résultat",
+          in: "AZERTYAZERTYAZERTY",
+          out: []
+        },
+        {
+          desc: "'BSDA-' > bsda1 & 2 devraient remonter",
+          in: "BSDA-",
+          out: [bsda1, bsda2]
+        },
+        {
+          company: companies.companyI,
+          desc: "Entreprise I > bsvhu1 devrait remonter",
+          in: "",
+          out: DEFAULT_COMPANY_I_RESULTS,
+          resetResults: DEFAULT_COMPANY_I_RESULTS
         }
-      });
+      ];
+
+      for (const scenario of scenarios) {
+        await testScenario(
+          page,
+          "N° de BSD / contenant",
+          scenario,
+          scenario.resetResults ?? DEFAULT_COMPANY_A_RESULTS
+        );
+      }
     });
 
     await test.step("N° de déchet / nom usuel", async () => {
-      await test.step("Entreprise A > 'Tous les bordereaux'", async () => {
-        const scenarios = [
-          { desc: "Etat initial", in: "", out: DEFAULT_COMPANY_A_RESULTS },
-          {
-            desc: "'02 01 01' > bsdd1 devrait remonter",
-            in: "02 01 01",
-            out: [bsdd1]
-          },
-          {
-            desc: "'06 13 04*' > bsda1 devrait remonter",
-            in: "06 13 04*",
-            out: [bsda1]
-          },
-          {
-            desc: "'06' > bsda1 et bsff1 devraient remonter",
-            in: "06",
-            out: [bsda1, bsff1]
-          },
-          {
-            desc: "'Amiante' > bsda1 devrait remonter",
-            in: "Amiante",
-            out: [bsda1]
-          }
-        ];
-
-        for (const scenario of scenarios) {
-          await testScenario(
-            page,
-            "N° de déchet / nom usuel",
-            scenario,
-            DEFAULT_COMPANY_A_RESULTS
-          );
+      const scenarios = [
+        { desc: "Etat initial", in: "", out: DEFAULT_COMPANY_A_RESULTS },
+        {
+          desc: "'02 01 01' > bsdd1 devrait remonter",
+          in: "02 01 01",
+          out: [bsdd1]
+        },
+        {
+          desc: "'06 13 04*' > bsda1 devrait remonter",
+          in: "06 13 04*",
+          out: [bsda1]
+        },
+        {
+          desc: "'06' > bsda1 et bsff1 devraient remonter",
+          in: "06",
+          out: [bsda1, bsff1]
+        },
+        {
+          desc: "'Amiante' > bsda1 devrait remonter",
+          in: "Amiante",
+          out: [bsda1]
         }
-      });
+      ];
+
+      for (const scenario of scenarios) {
+        await testScenario(
+          page,
+          "N° de déchet / nom usuel",
+          scenario,
+          DEFAULT_COMPANY_A_RESULTS
+        );
+      }
     });
 
     await test.step("Raison sociale / SIRET", async () => {
-      await test.step("Entreprise A > 'Tous les bordereaux'", async () => {
-        const scenarios = [
-          { desc: "Etat initial", in: "", out: DEFAULT_COMPANY_A_RESULTS },
-          {
-            desc: "Siret companyA > bsdd1, bsdd3, bsda1, bsda2, bsff1 & bsdasri1 devraient remonter",
-            in: companies.companyA.siret,
-            out: [bsdd1, bsdd3, bsda1, bsda2, bsff1, bsdasri1]
-          },
-          {
-            desc: "Siret companyB > bsdd1 & bsff1 devraient remonter",
-            in: companies.companyB.siret,
-            out: [bsdd1, bsff1]
-          },
-          {
-            desc: "N° de TVA companyC > bsdd1 devrait remonter",
-            in: companies.companyC.vatNumber,
-            out: [bsdd1]
-          },
-          {
-            desc: "Siret companyE > bsdd1 devrait remonter",
-            in: companies.companyE.siret,
-            out: [bsdd1]
-          },
-          {
-            desc: "Siret companyF > bsdd1 devrait remonter",
-            in: companies.companyF.siret,
-            out: [bsdd1]
-          },
-          {
-            desc: "Siret companyK > bsda1 devrait remonter",
-            in: companies.companyK.siret,
-            out: [bsda1]
-          },
-          {
-            desc: "Siret companyG > bsda1 devrait remonter",
-            in: companies.companyG.siret,
-            out: [bsda1]
-          },
-          // TODO: fix
-          // {  desc: "Siret companyJ > bsdd1, bsda1 & bsff1 devraient remonter", in: companies.companyJ.siret, out: [bsdd1, bsda1, bsff1] },
-          // TODO: ne peut pas marcher, on est sur le profil de l'entreprise A
-          // {  desc: "Siret companyD > bsdd1, bsda1 & bsff1 devraient remonter", in: companies.companyD.siret, out: [bsdd1, bsda1, bsff1] },
-          {
-            desc: "Siret companyH > bsda2 devrait remonter",
-            in: companies.companyH.siret,
-            out: [bsda2]
-          }
-        ];
-
-        for (const scenario of scenarios) {
-          await testScenario(
-            page,
-            "Raison sociale / SIRET",
-            scenario,
-            DEFAULT_COMPANY_A_RESULTS
-          );
+      const scenarios = [
+        { desc: "Etat initial", in: "", out: DEFAULT_COMPANY_A_RESULTS },
+        {
+          desc: "Siret companyA > bsdd1, bsdd3, bsda1, bsda2, bsff1 & bsdasri1 devraient remonter",
+          in: companies.companyA.siret,
+          out: [bsdd1, bsdd3, bsda1, bsda2, bsff1, bsdasri1]
+        },
+        {
+          desc: "Siret companyB > bsdd1 & bsff1 devraient remonter",
+          in: companies.companyB.siret,
+          out: [bsdd1, bsff1]
+        },
+        {
+          desc: "N° de TVA companyC > bsdd1 devrait remonter",
+          in: companies.companyC.vatNumber,
+          out: [bsdd1]
+        },
+        {
+          desc: "Siret companyE > bsdd1 devrait remonter",
+          in: companies.companyE.siret,
+          out: [bsdd1]
+        },
+        {
+          desc: "Siret companyF > bsdd1 devrait remonter",
+          in: companies.companyF.siret,
+          out: [bsdd1]
+        },
+        {
+          desc: "Siret companyK > bsda1 devrait remonter",
+          in: companies.companyK.siret,
+          out: [bsda1]
+        },
+        {
+          desc: "Siret companyG > bsda1 devrait remonter",
+          in: companies.companyG.siret,
+          out: [bsda1]
+        },
+        // TODO: fix
+        // {  desc: "Siret companyJ > bsdd1, bsda1 & bsff1 devraient remonter", in: companies.companyJ.siret, out: [bsdd1, bsda1, bsff1] },
+        // TODO: ne peut pas marcher, on est sur le profil de l'entreprise A
+        // {  desc: "Siret companyD > bsdd1, bsda1 & bsff1 devraient remonter", in: companies.companyD.siret, out: [bsdd1, bsda1, bsff1] },
+        {
+          desc: "Siret companyH > bsda2 devrait remonter",
+          in: companies.companyH.siret,
+          out: [bsda2]
+        },
+        {
+          company: companies.companyI,
+          desc: "N° de TVA companyC > bsvhu1 devrait remonter",
+          in: companies.companyC.vatNumber,
+          out: [bsvhu1],
+          resetResults: DEFAULT_COMPANY_I_RESULTS
+        },
+        {
+          company: companies.companyI,
+          desc: "Siret companyI > bsvhu1 devrait remonter",
+          in: companies.companyI.siret,
+          out: [bsvhu1],
+          resetResults: DEFAULT_COMPANY_I_RESULTS
+        },
+        {
+          company: companies.companyF,
+          desc: "Siret companyL > bsdd2 devrait remonter",
+          in: companies.companyL.siret,
+          out: [bsdd2],
+          resetResults: DEFAULT_COMPANY_F_RESULTS
+        },
+        {
+          company: companies.companyD,
+          desc: "Siret companyM > bsdd4 devrait remonter",
+          in: companies.companyM.siret,
+          out: [bsdd4],
+          resetResults: DEFAULT_COMPANY_D_RESULTS
+        },
+        {
+          company: companies.companyD,
+          desc: "Siret companyD > bsdd4 devrait remonter",
+          in: companies.companyD.siret,
+          out: DEFAULT_COMPANY_D_RESULTS,
+          resetResults: DEFAULT_COMPANY_D_RESULTS
         }
+      ];
+
+      for (const scenario of scenarios) {
+        await testScenario(
+          page,
+          "Raison sociale / SIRET",
+          scenario,
+          scenario.resetResults ?? DEFAULT_COMPANY_A_RESULTS
+        );
+      }
+    });
+
+    await test.step("Numéro de CAP", async () => {
+      const scenarios = [
+        { desc: "Etat initial", in: "", out: DEFAULT_COMPANY_A_RESULTS },
+        {
+          desc: '"PAC20241520" > bsdd1 devrait remonter',
+          in: "PAC20241520",
+          out: [bsdd1]
+        },
+        { desc: '"L" > bsff1 devrait remonter', in: "L", out: [bsff1] },
+        {
+          desc: '"AZERTYAZERTYAZERTY" > aucun bsd ne devrait remonter',
+          in: "AZERTYAZERTYAZERTY",
+          out: []
+        }
+      ];
+
+      for (const scenario of scenarios) {
+        await testScenario(
+          page,
+          "Numéro de CAP",
+          scenario,
+          DEFAULT_COMPANY_A_RESULTS
+        );
+      }
+    });
+
+    await test.step("Nom de chantier", async () => {
+      const scenarios = [
+        { desc: "Etat initial", in: "", out: DEFAULT_COMPANY_A_RESULTS },
+        {
+          desc: '"Chantier du parc" > bsda1 devrait remonter',
+          in: "Chantier du parc",
+          out: [bsda1]
+        },
+        {
+          desc: '"Supermarché" > bsdd3 devrait remonter',
+          in: "Supermarché",
+          out: [bsdd3]
+        },
+        {
+          desc: '"Parking" > bsdd1 devrait remonter',
+          in: "Parking",
+          out: [bsdd1]
+        },
+        {
+          desc: '"N" > bsdd1 & bsda1 devrait remonter',
+          in: "N",
+          out: [bsdd1, bsda1]
+        }
+      ];
+
+      for (const scenario of scenarios) {
+        await testScenario(
+          page,
+          "Nom de chantier",
+          scenario,
+          DEFAULT_COMPANY_A_RESULTS
+        );
+      }
+    });
+
+    await test.step("Filtres rapides multiples", async () => {
+      await test.step(`[Entreprise "${companies.companyA.name}" | Onglet "Tous les bordereaux"] Filtre 'BSDA-' + Nom de chantier 'parc' > bsda1 devrait remonter`, async () => {
+        // Select correct company & bsd menu
+        await selectCompany(page, companies.companyA.siret);
+        await selectBsdMenu(page, "Tous les bordereaux");
+
+        await expectFilteredResults(page, DEFAULT_COMPANY_A_RESULTS);
+
+        // User 1st filter
+        await quickFilter(page, {
+          label: "N° de BSD / contenant",
+          value: "BSDA-"
+        });
+        await expectFilteredResults(page, [bsda1, bsda2]);
+
+        // Combine with 2nd filter
+        await quickFilter(page, {
+          label: "Nom de chantier",
+          value: "parc"
+        });
+        await expectFilteredResults(page, [bsda1]);
+
+        // Test reset
+        await quickFilter(page, { label: "Nom de chantier", value: "" });
+        await quickFilter(page, { label: "N° de BSD / contenant", value: "" });
+        await expectFilteredResults(page, DEFAULT_COMPANY_A_RESULTS);
       });
     });
   });

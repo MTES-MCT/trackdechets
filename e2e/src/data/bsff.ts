@@ -15,7 +15,7 @@ interface BsffOpt {
   wasteCode?: string;
   type?: BsffType;
   // Companies
-  operateur?: Company;
+  emitter: Company;
   detenteur?: Company;
   destination?: Company;
   transporter?: Company;
@@ -33,6 +33,8 @@ const optToBsffCreateInput = (opt: BsffOpt): Prisma.BsffCreateInput => {
     // Companies
     destinationCompanySiret: opt.destination?.siret,
     destinationCompanyName: opt.destination?.name,
+    emitterCompanyName: opt.emitter?.name,
+    emitterCompanySiret: opt.emitter?.siret,
     transporterCompanySiret: opt.transporter?.siret,
     transporterCompanyName: opt.transporter?.name,
     detenteurCompanySirets: opt.detenteur ? [opt.detenteur.siret!] : [],
@@ -60,15 +62,15 @@ export const seedBsff = async (opt: BsffOpt) => {
     data: optToBsffCreateInput(opt)
   });
 
-  if (opt.operateur && opt.detenteur) {
+  if (opt.detenteur) {
     const data: Prisma.BsffFicheInterventionCreateInput = {
       // Operateur
-      operateurCompanyName: opt.operateur.name,
-      operateurCompanySiret: opt.operateur.siret!,
-      operateurCompanyAddress: opt.operateur.address ?? "",
-      operateurCompanyContact: opt.operateur.contact ?? "",
-      operateurCompanyPhone: opt.operateur.contactPhone ?? "",
-      operateurCompanyMail: opt.operateur.contactEmail ?? "",
+      operateurCompanyName: opt.emitter.name,
+      operateurCompanySiret: opt.emitter.siret!,
+      operateurCompanyAddress: opt.emitter.address ?? "",
+      operateurCompanyContact: opt.emitter.contact ?? "",
+      operateurCompanyPhone: opt.emitter.contactPhone ?? "",
+      operateurCompanyMail: opt.emitter.contactEmail ?? "",
       // Detenteur
       detenteurCompanyName: opt.detenteur.name,
       detenteurCompanySiret: opt.detenteur.siret,
