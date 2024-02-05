@@ -80,6 +80,12 @@ const buildDeleteForm: (deps: RepositoryFnDeps) => DeleteFormFn =
       await removeAppendix2(deletedForm.id);
     }
 
+    await prisma.finalOperation.deleteMany({
+      where: {
+        formId: deletedForm.id
+      },
+    })
+
     return deletedForm;
   };
 

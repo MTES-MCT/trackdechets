@@ -10,12 +10,14 @@ CREATE TABLE "default$default"."FinalOperation" (
     "quantity" DOUBLE PRECISION NOT NULL,
     "destinationCompanySiret" TEXT NOT NULL,
     "destinationCompanyName" TEXT NOT NULL,
-    "formId" text REFERENCES "default$default"."Form" (id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-    PRIMARY KEY ("id")
+    "formId" text REFERENCES "default$default"."Form" (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY ("id"),
+
+    CONSTRAINT "FinalOperation_pkey_unique_together" UNIQUE ("formId", "finalBsdReadableId")
 );
 
 -- Indices -------------------------------------------------------
 CREATE UNIQUE INDEX IF NOT EXISTS "_FinalOperation_pkey" ON "default$default"."FinalOperation" ("id");
-CREATE UNIQUE INDEX IF NOT EXISTS "_FinalOperation_unique_finalBsdReadableId" ON "default$default"."FinalOperation" ("finalBsdReadableId");
+CREATE UNIQUE INDEX IF NOT EXISTS "_FinalOperation_finalBsdReadableId" ON "default$default"."FinalOperation" ("finalBsdReadableId");
 CREATE INDEX IF NOT EXISTS "_FinalOperationdestinationCompanySiretIdx" ON "default$default"."FinalOperation" ("destinationCompanySiret");
 CREATE INDEX IF NOT EXISTS "_FinalOperationFormIdIdx" ON "default$default"."FinalOperation" ("formId");

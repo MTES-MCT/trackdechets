@@ -327,15 +327,19 @@ model EcoOrganisme {
 // Modèle qui peut être partagé entre tous les
 // bordereaux pour calculcer la traçabilité finale
 model FinalOperation {
-  id                      String  @id @default(cuid())
-  finalBsdReadableId      String  @unique
+  id                      String    @id @default(cuid())
+  createdAt               DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt               DateTime  @updatedAt @db.Timestamptz(6)
+  isDeleted               Boolean?  @default(false)
+  finalBsdReadableId      String
   operationCode           String
   quantity                Float
   destinationCompanySiret String
   destinationCompanyName  String
   // Champs spécifiques pour Form
-  Form                    Form?   @relation(fields: [formId], references: [id])
-  formId                  String? @unique
+  Form                    Form?     @relation(fields: [formId], references: [id])
+  formId                  String?
+  @@unique([formId, finalBsdReadableId])
 }
 
 model Form {
@@ -1410,7 +1414,7 @@ model Bsda {
   brokerRecepisseDepartment    String?
   brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
-  // Date de signature du premier transporteur 
+  // Date de signature du premier transporteur
   // Cette valeur est dupliquée entre le modèle Bsda et BsdaTransporter[0]
   // pour optimiser certains calculs
   transporterTransportSignatureDate DateTime? @db.Timestamptz(6)
