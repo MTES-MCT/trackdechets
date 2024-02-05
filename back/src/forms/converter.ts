@@ -399,7 +399,6 @@ export function flattenFormInput(
     | "customId"
     | "emitter"
     | "recipient"
-    | "transporter"
     | "wasteDetails"
     | "trader"
     | "broker"

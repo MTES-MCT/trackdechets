@@ -338,6 +338,7 @@ function BsdCard({
                       !!bsdDisplay?.forwardedIn?.id ||
                       !!bsdDisplay?.groupedIn?.id
                     }
+                    transporters={bsdDisplay.transporters}
                   />
                 </div>
                 {isMobile && <div className="bsd-card-border" />}

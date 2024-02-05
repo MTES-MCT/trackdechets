@@ -36,7 +36,8 @@ const accessors = {
         intermediaries: true
       }
     ),
-  [BsdType.BSDA]: id => getBsdaOrNotFound(id),
+  [BsdType.BSDA]: id =>
+    getBsdaOrNotFound(id, { include: { transporters: true } }),
   [BsdType.BSDASRI]: id => getBsdasriOrNotFound({ id }),
   [BsdType.BSFF]: id => getBsffOrNotFound({ id }),
   [BsdType.BSVHU]: id => getBsvhuOrNotFound(id)

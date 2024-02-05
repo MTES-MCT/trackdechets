@@ -1,4 +1,4 @@
-import { Bsda } from "@prisma/client";
+import { Bsda, BsdaTransporter } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
@@ -18,6 +18,9 @@ import {
   emptyTransportedWaste
 } from "../registry/types";
 import { extractPostalCode } from "../utils";
+import { BsdaWithTransporters } from "./types";
+import { getFirstTransporterSync } from "./database";
+import { RegistryBsda } from "../registry/elastic";
 
 const getOperationData = (bsda: Bsda) => ({
   destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
@@ -25,16 +28,16 @@ const getOperationData = (bsda: Bsda) => ({
   destinationOperationMode: bsda.destinationOperationMode
 });
 
-const getTransporterData = (bsda: Bsda) => ({
-  transporterTakenOverAt: bsda.transporterTransportTakenOverAt,
-  transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted,
-  transporterNumberPlates: bsda.transporterTransportPlates,
-  transporterCompanyAddress: bsda.transporterCompanyAddress,
-  transporterCompanyName: bsda.transporterCompanyName,
-  transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-  transporterRecepisseNumber: bsda.transporterRecepisseNumber,
-  transporterCompanyMail: bsda.transporterCompanyMail,
-  transporterCustomInfo: bsda.transporterCustomInfo
+const getTransporterData = (transporter: BsdaTransporter) => ({
+  transporterTakenOverAt: transporter.transporterTransportTakenOverAt,
+  transporterRecepisseIsExempted: transporter.transporterRecepisseIsExempted,
+  transporterNumberPlates: transporter.transporterTransportPlates,
+  transporterCompanyAddress: transporter.transporterCompanyAddress,
+  transporterCompanyName: transporter.transporterCompanyName,
+  transporterCompanySiret: getTransporterCompanyOrgId(transporter),
+  transporterRecepisseNumber: transporter.transporterRecepisseNumber,
+  transporterCompanyMail: transporter.transporterCompanyMail,
+  transporterCustomInfo: transporter.transporterCustomInfo
 });
 
 type RegistryFields =
@@ -43,7 +46,7 @@ type RegistryFields =
   | "isTransportedWasteFor"
   | "isManagedWasteFor";
 export function getRegistryFields(
-  bsda: Bsda
+  bsda: BsdaWithTransporters
 ): Pick<BsdElastic, RegistryFields> {
   const registryFields: Record<RegistryFields, string[]> = {
     isIncomingWasteFor: [],
@@ -52,7 +55,9 @@ export function getRegistryFields(
     isManagedWasteFor: []
   };
 
-  if (bsda.transporterTransportSignatureDate) {
+  const transporter = getFirstTransporterSync(bsda);
+
+  if (transporter?.transporterTransportSignatureDate) {
     if (bsda.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsda.emitterCompanySiret);
     }
@@ -60,7 +65,8 @@ export function getRegistryFields(
       registryFields.isOutgoingWasteFor.push(bsda.workerCompanySiret);
     }
 
-    const transporterCompanyOrgId = getTransporterCompanyOrgId(bsda);
+    const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+
     if (transporterCompanyOrgId) {
       registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
     }
@@ -77,7 +83,9 @@ export function getRegistryFields(
   return registryFields;
 }
 
-function toGenericWaste(bsda: Bsda): GenericWaste {
+function toGenericWaste(bsda: RegistryBsda): GenericWaste {
+  const transporter = getFirstTransporterSync(bsda);
+
   return {
     wasteDescription: bsda.wasteMaterialName,
     wasteCode: bsda.wasteCode,
@@ -104,13 +112,11 @@ function toGenericWaste(bsda: Bsda): GenericWaste {
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
     workerCompanyAddress: bsda.workerCompanyAddress,
-    ...getTransporterData(bsda)
+    ...(transporter ? getTransporterData(transporter) : {})
   };
 }
 
-export function toIncomingWaste(
-  bsda: Bsda & { forwarding: Bsda; grouping: Bsda[] }
-): Required<IncomingWaste> {
+export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
   const initialEmitter: Pick<
     IncomingWaste,
     | "initialEmitterCompanyAddress"
@@ -173,9 +179,7 @@ export function toIncomingWaste(
   };
 }
 
-export function toOutgoingWaste(
-  bsda: Bsda & { forwarding: Bsda; grouping: Bsda[] }
-): Required<OutgoingWaste> {
+export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
   const initialEmitter: Pick<
     OutgoingWaste,
     | "initialEmitterCompanyAddress"
@@ -240,7 +244,7 @@ export function toOutgoingWaste(
 }
 
 export function toTransportedWaste(
-  bsda: Bsda & { forwarding: Bsda; grouping: Bsda[] }
+  bsda: RegistryBsda
 ): Required<TransportedWaste> {
   const initialEmitter: Pick<
     TransportedWaste,
@@ -304,9 +308,7 @@ export function toTransportedWaste(
   };
 }
 
-export function toManagedWaste(
-  bsda: Bsda & { forwarding: Bsda; grouping: Bsda[] }
-): Required<ManagedWaste> {
+export function toManagedWaste(bsda: RegistryBsda): Required<ManagedWaste> {
   const initialEmitter: Pick<
     ManagedWaste,
     | "initialEmitterCompanyAddress"
@@ -368,9 +370,7 @@ export function toManagedWaste(
   };
 }
 
-export function toAllWaste(
-  bsda: Bsda & { forwarding: Bsda; grouping: Bsda[] }
-): Required<AllWaste> {
+export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
   const initialEmitter: Pick<
     AllWaste,
     | "initialEmitterCompanyAddress"

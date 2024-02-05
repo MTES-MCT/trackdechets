@@ -1,6 +1,6 @@
 import { hash } from "bcrypt";
 import { faker } from "@faker-js/faker";
-import getReadableId from "../forms/readableId";
+import getReadableId, { ReadableIdPrefix } from "../forms/readableId";
 import {
   CompanyType,
   Consistence,
@@ -454,13 +454,16 @@ export const formWithTempStorageFactory = async ({
     }
   };
 
+  const readableId = getReadableId(ReadableIdPrefix.BSD);
+
   return formFactory({
     ownerId,
     opt: {
+      readableId,
       recipientIsTempStorage: true,
       forwardedIn: {
         create: {
-          readableId: getReadableId(),
+          readableId: `${readableId}-suite`,
           owner: { connect: { id: ownerId } },
           ...forwardedCreateInput
         }

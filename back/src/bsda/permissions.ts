@@ -1,17 +1,20 @@
 import { Bsda, BsdaStatus, User } from "@prisma/client";
 import { BsdaInput } from "../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../permissions";
-import { getPreviousBsdas } from "./database";
+import { getFirstTransporterSync, getPreviousBsdas } from "./database";
+import { BsdaWithTransporters } from "./types";
 
 /**
  * Retrieves organisations allowed to read a BSDA
  */
-function readers(bsda: Bsda): string[] {
+function readers(bsda: BsdaWithTransporters): string[] {
   return [
     bsda.emitterCompanySiret,
     bsda.destinationCompanySiret,
-    bsda.transporterCompanySiret,
-    bsda.transporterCompanyVatNumber,
+    ...bsda.transporters.flatMap(t => [
+      t.transporterCompanySiret,
+      t.transporterCompanyVatNumber
+    ]),
     bsda.workerCompanySiret,
     bsda.brokerCompanySiret,
     bsda.destinationOperationNextDestinationCompanySiret,
@@ -25,7 +28,7 @@ function readers(bsda: Bsda): string[] {
  * parameter to pre-compute the form contributors after the update, hence verifying
  * a user is not removing his own company from the BSDA
  */
-function contributors(bsda: Bsda, input?: BsdaInput): string[] {
+function contributors(bsda: BsdaWithTransporters, input?: BsdaInput): string[] {
   const updateEmitterCompanySiret = input?.emitter?.company?.siret;
   const updateDestinationCompanySiret = input?.destination?.company?.siret;
   const updateTransporterCompanySiret = input?.transporter?.company?.siret;
@@ -40,6 +43,8 @@ function contributors(bsda: Bsda, input?: BsdaInput): string[] {
     i.vatNumber
   ]);
 
+  const transporter = getFirstTransporterSync(bsda);
+
   const emitterCompanySiret =
     updateEmitterCompanySiret !== undefined
       ? updateEmitterCompanySiret
@@ -53,12 +58,12 @@ function contributors(bsda: Bsda, input?: BsdaInput): string[] {
   const transporterCompanySiret =
     updateTransporterCompanySiret !== undefined
       ? updateTransporterCompanySiret
-      : bsda.transporterCompanySiret;
+      : transporter?.transporterCompanySiret;
 
   const transporterCompanyVatNumber =
     updateTransporterCompanyVatNumber !== undefined
       ? updateTransporterCompanyVatNumber
-      : bsda.transporterCompanyVatNumber;
+      : transporter?.transporterCompanyVatNumber;
 
   const workerCompanySiret =
     updateWorkerCompanySiret !== undefined
@@ -107,7 +112,7 @@ function creators(input: BsdaInput) {
   ].filter(Boolean);
 }
 
-export async function checkCanRead(user: User, bsda: Bsda) {
+export async function checkCanRead(user: User, bsda: BsdaWithTransporters) {
   const authorizedOrgIds = readers(bsda);
 
   return checkUserPermissions(
@@ -118,8 +123,10 @@ export async function checkCanRead(user: User, bsda: Bsda) {
   );
 }
 
-export async function checkCanReadPdf(user: User, bsda: Bsda) {
-  const previousBsdas = await getPreviousBsdas(bsda);
+export async function checkCanReadPdf(user: User, bsda: BsdaWithTransporters) {
+  const previousBsdas = await getPreviousBsdas(bsda, {
+    include: { intermediaries: true, transporters: true }
+  });
 
   const authorizedOrgIds: string[] = [
     ...readers(bsda),
@@ -146,7 +153,7 @@ export async function checkCanCreate(user: User, bsdaInput: BsdaInput) {
 
 export async function checkCanUpdate(
   user: User,
-  bsda: Bsda,
+  bsda: BsdaWithTransporters,
   input?: BsdaInput
 ) {
   const authorizedOrgIds = contributors(bsda);
@@ -170,7 +177,7 @@ export async function checkCanUpdate(
   return true;
 }
 
-export async function checkCanDelete(user: User, bsda: Bsda) {
+export async function checkCanDelete(user: User, bsda: BsdaWithTransporters) {
   const authorizedOrgIds =
     bsda.status === BsdaStatus.INITIAL
       ? contributors(bsda)
@@ -191,7 +198,10 @@ export async function checkCanDelete(user: User, bsda: Bsda) {
   );
 }
 
-export async function checkCanDuplicate(user: User, bsda: Bsda) {
+export async function checkCanDuplicate(
+  user: User,
+  bsda: BsdaWithTransporters
+) {
   const authorizedOrgIds = contributors(bsda);
 
   return checkUserPermissions(

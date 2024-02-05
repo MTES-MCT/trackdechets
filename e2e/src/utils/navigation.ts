@@ -1,5 +1,4 @@
 import { Page, expect } from "@playwright/test";
-import { logScreenshot } from "./debug";
 
 /**
  * Tests that clicking on a link redirects to the expected page, testing both URL & page label

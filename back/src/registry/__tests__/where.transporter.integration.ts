@@ -83,15 +83,15 @@ describe("toElasticFilter", () => {
   it("should filter BSDAs on transporterCompanySiret (exact)", async () => {
     const testInput = { transporterCompanySiret: siretify(1) };
     const bsda1 = await bsdaFactory({
-      opt: testInput
+      transporterOpt: testInput
     });
 
     const bsda2 = await bsdaFactory({
-      opt: { transporterCompanySiret: siretify(2) }
+      transporterOpt: { transporterCompanySiret: siretify(2) }
     });
 
     const bsda3 = await bsdaFactory({
-      opt: { transporterCompanySiret: siretify(3) }
+      transporterOpt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -293,16 +293,16 @@ describe("toElasticFilter", () => {
   it("should filter BSDAs on a list of transporterCompanySiret", async () => {
     const testInput_2 = { transporterCompanySiret: siretify(1) };
     const bsda1 = await bsdaFactory({
-      opt: testInput_2
+      transporterOpt: testInput_2
     });
 
     const testInput = { transporterCompanySiret: siretify(2) };
     const bsda2 = await bsdaFactory({
-      opt: testInput
+      transporterOpt: testInput
     });
 
     const bsda3 = await bsdaFactory({
-      opt: { transporterCompanySiret: siretify(3) }
+      transporterOpt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -516,15 +516,15 @@ describe("toElasticFilter", () => {
   it("should filter BSDAs on a substring of transporterCompanySiret", async () => {
     const testInput = { transporterCompanySiret: siretify(1) };
     const bsda1 = await bsdaFactory({
-      opt: testInput
+      transporterOpt: testInput
     });
 
     const bsda2 = await bsdaFactory({
-      opt: { transporterCompanySiret: siretify(2) }
+      transporterOpt: { transporterCompanySiret: siretify(2) }
     });
 
     const bsda3 = await bsdaFactory({
-      opt: { transporterCompanySiret: siretify(3) }
+      transporterOpt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(

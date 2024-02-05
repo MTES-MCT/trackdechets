@@ -5,6 +5,24 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.2.1] 13/02/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Registre exhaustif du BSDD suite entreposage provisoire : les informations relatives à la destination finale et au 2e transporteur n'apparaissent pas + lignes en double [PR 3051](https://github.com/MTES-MCT/trackdechets/pull/3051)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Mise à jour des labels en cas de transport multimodal [PR 3046](https://github.com/MTES-MCT/trackdechets/pull/3046)
+
+#### :house: Interne
+
+- [BSDA] Migrer les données transporteur dans une table à part (refacto interne du code) [PR 3055](https://github.com/MTES-MCT/trackdechets/pull/3055)
+
 # [2024.1.1] 16/01/2024
 
 #### :rocket: Nouvelles fonctionnalités

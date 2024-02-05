@@ -191,15 +191,18 @@ describe("query { wastesRegistryXls }", () => {
           createdAt: new Date(),
           destinationCompanySiret: company.siret,
           emitterCompanySiret: company.siret,
-          transporterCompanySiret: company.siret,
           destinationReceptionWeight: 500,
           emitterEmissionSignatureDate: new Date(),
           transporterTransportSignatureDate: new Date(),
-          transporterTransportTakenOverAt: new Date(),
           destinationReceptionDate: new Date(),
           destinationOperationSignatureDate: new Date(),
           destinationOperationDate: new Date(),
           destinationOperationCode: "D 5"
+        },
+        transporterOpt: {
+          transporterCompanySiret: company.siret,
+          transporterTransportTakenOverAt: new Date(),
+          transporterTransportSignatureDate: new Date()
         }
       });
       await indexBsda(await getBsdaForElastic(bsda));

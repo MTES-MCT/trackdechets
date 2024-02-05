@@ -37,7 +37,7 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
 
   await checkCanMarkAsResent(user, form);
 
-  const { destination, transporter, wasteDetails } = resentInfos;
+  const { destination, wasteDetails } = resentInfos;
 
   // copy basic info from initial BSD and overwrite it with resealedInfos
   const updateInput: Prisma.FormUpdateInput = {
@@ -54,7 +54,7 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
     wasteDetailsName: form.wasteDetailsName,
     wasteDetailsOnuCode: form.wasteDetailsOnuCode,
     wasteDetailsPop: form.wasteDetailsPop,
-    ...flattenFormInput({ transporter, wasteDetails, recipient: destination })
+    ...flattenFormInput({ wasteDetails, recipient: destination })
   };
 
   // validate input

@@ -14,22 +14,39 @@ export function buildQuery(
   sirets: string[],
   where: WasteRegistryWhere | undefined | null
 ): estypes.QueryContainer {
-  const elasticKey: { [key in WasteRegistryType]: keyof BsdElastic } = {
+  // Associe un type de registre au champ ES permettant de stocker
+  // la liste des établissements concerné par ce type de registre sur un
+  // BSD donnée
+  const elasticKey: { [key in WasteRegistryType]?: keyof BsdElastic } = {
     OUTGOING: "isOutgoingWasteFor",
     INCOMING: "isIncomingWasteFor",
     TRANSPORTED: "isTransportedWasteFor",
-    MANAGED: "isManagedWasteFor",
-    ALL: "sirets"
+    MANAGED: "isManagedWasteFor"
   };
+
+  // Fonction permettant de construire le filtre ES pour un type de registre donné.
+  // On considère qu'un BSD doit apparaitre dans le registre exhaustif d'un établissement
+  // s'il apparait dans au moins un des registres classiques (entrants, sortants, transportés, gérés)
+  function registryTypeFilter(type: WasteRegistryType): estypes.QueryContainer {
+    if (type === "ALL") {
+      return {
+        bool: {
+          should: [
+            registryTypeFilter("OUTGOING"),
+            registryTypeFilter("INCOMING"),
+            registryTypeFilter("TRANSPORTED"),
+            registryTypeFilter("MANAGED")
+          ]
+        }
+      };
+    }
+    return { terms: { [elasticKey[type]!]: sirets } };
+  }
 
   return {
     bool: {
       filter: [
-        {
-          terms: {
-            [elasticKey[registryType]]: sirets
-          }
-        },
+        registryTypeFilter(registryType),
         ...(where ? toElasticFilter(where) : [])
       ]
     }
@@ -86,9 +103,13 @@ export type RegistryForm = Prisma.FormGetPayload<{
   include: typeof RegistryFormInclude;
 }>;
 
-const RegistryBsdaInclude = { grouping: true, forwarding: true };
+export const RegistryBsdaInclude = Prisma.validator<Prisma.BsdaInclude>()({
+  grouping: true,
+  forwarding: true,
+  transporters: true
+});
 
-type RegistryBsda = Prisma.BsdaGetPayload<{
+export type RegistryBsda = Prisma.BsdaGetPayload<{
   include: typeof RegistryBsdaInclude;
 }>;
 

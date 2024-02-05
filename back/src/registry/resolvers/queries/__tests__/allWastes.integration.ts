@@ -32,6 +32,7 @@ import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 import { Query } from "../../../../generated/graphql/types";
 import {
   formFactory,
+  formWithTempStorageFactory,
   userWithAccessTokenFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -102,16 +103,21 @@ describe("All wastes registry", () => {
     bsd2 = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         destinationCompanySiret: destination.company.siret,
         wasteCode: "08 01 17*",
         status: BsdaStatus.PROCESSED,
         createdAt: new Date("2021-05-01"),
         destinationReceptionWeight: 500,
-        transporterTransportTakenOverAt: new Date("2021-05-01"),
         destinationReceptionDate: new Date("2021-05-01"),
+        destinationOperationSignatureDate: new Date("2021-05-01"),
         destinationOperationDate: new Date("2021-05-01"),
-        destinationOperationCode: "D 5"
+        destinationOperationCode: "D 5",
+        transporterTransportSignatureDate: new Date("2021-05-01")
+      },
+      transporterOpt: {
+        transporterTransportSignatureDate: new Date("2021-05-01"),
+        transporterTransportTakenOverAt: new Date("2021-05-01"),
+        transporterCompanySiret: transporter.company.siret
       }
     });
     bsd3 = await bsdasriFactory({
@@ -124,7 +130,9 @@ describe("All wastes registry", () => {
         createdAt: new Date("2021-06-01"),
         destinationReceptionWasteWeightValue: 10,
         transporterTakenOverAt: new Date("2021-06-01"),
+        transporterTransportSignatureDate: new Date("2021-06-01"),
         destinationReceptionDate: new Date("2021-06-01"),
+        destinationReceptionSignatureDate: new Date("2021-06-01"),
         destinationOperationDate: new Date("2021-06-01"),
         destinationOperationCode: "R 13"
       }
@@ -133,6 +141,7 @@ describe("All wastes registry", () => {
       opt: {
         emitterCompanySiret: emitter.company.siret,
         transporterCompanySiret: transporter.company.siret,
+        transporterTransportSignatureDate: new Date("2021-07-01"),
         destinationCompanySiret: destination.company.siret,
         wasteCode: "16 01 04*",
         status: BsvhuStatus.PROCESSED,
@@ -140,6 +149,7 @@ describe("All wastes registry", () => {
         destinationReceptionWeight: 3000,
         transporterTransportTakenOverAt: new Date("2021-07-01"),
         destinationReceptionDate: new Date("2021-07-01"),
+        destinationOperationSignatureDate: new Date("2021-07-01"),
         destinationOperationDate: new Date("2021-07-01"),
         destinationOperationCode: "R 8"
       }
@@ -316,5 +326,191 @@ describe("All wastes registry", () => {
     expect(page3.allWastes.totalCount).toEqual(5);
     expect(page3.allWastes.pageInfo.startCursor).toEqual(bsd1.id);
     expect(page3.allWastes.pageInfo.hasPreviousPage).toEqual(false);
+  });
+});
+
+describe("Registre exhaustif > BSDD avec entreposage provisoire", () => {
+  let emitter: { user: User; company: Company };
+  let transporter: { user: User; company: Company };
+  let transporter2: { user: User; company: Company };
+  let destination: { user: User; company: Company };
+  let ttr: { user: User; company: Company };
+  let bsdd: Form;
+
+  beforeAll(async () => {
+    emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      }
+    });
+
+    transporter2 = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      }
+    });
+
+    destination = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["WASTEPROCESSOR"]
+      }
+    });
+
+    ttr = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["WASTEPROCESSOR"]
+      }
+    });
+    bsdd = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "PROCESSED",
+        emittedAt: new Date(),
+        sentAt: new Date(),
+        takenOverAt: new Date(),
+        receivedAt: new Date(),
+        processedAt: new Date(),
+        emitterCompanySiret: emitter.company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            takenOverAt: new Date(),
+            number: 1
+          }
+        },
+        recipientCompanySiret: ttr.company.siret
+      },
+      forwardedInOpts: {
+        status: "PROCESSED",
+        emittedAt: new Date(),
+        sentAt: new Date(),
+        takenOverAt: new Date(),
+        receivedAt: new Date(),
+        processedAt: new Date(),
+        emitterCompanySiret: ttr.company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter2.company.siret,
+            takenOverAt: new Date(),
+            number: 1
+          }
+        },
+        recipientCompanySiret: destination.company.siret
+      }
+    });
+
+    await indexForm(await getFormForElastic(bsdd));
+    await refreshElasticSearch();
+  });
+
+  afterAll(resetDatabase);
+
+  test("BSDD should appear once in emitter's all waste registry", async () => {
+    const { query } = makeClient(emitter.user);
+    const { data, errors } = await query<Pick<Query, "allWastes">>(ALL_WASTES, {
+      variables: { sirets: [emitter.company.siret] }
+    });
+    expect(errors).toBeUndefined();
+    const wastes = data.allWastes.edges.map(edge => edge.node);
+    expect(wastes).toHaveLength(1);
+    expect(wastes).toEqual([
+      // une ligne avec la première partie du trajet
+      expect.objectContaining({
+        id: bsdd.readableId,
+        emitterCompanySiret: emitter.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        destinationCompanySiret: ttr.company.siret
+      })
+    ]);
+  });
+
+  test("BSDD should appear once in transporter's all waste registry", async () => {
+    const { query } = makeClient(transporter.user);
+    const { data, errors } = await query<Pick<Query, "allWastes">>(ALL_WASTES, {
+      variables: { sirets: [transporter.company.siret] }
+    });
+    expect(errors).toBeUndefined();
+    const wastes = data.allWastes.edges.map(edge => edge.node);
+    expect(wastes).toHaveLength(1);
+    expect(wastes).toEqual([
+      // une ligne avec la première partie du trajet
+      expect.objectContaining({
+        id: bsdd.readableId,
+        emitterCompanySiret: emitter.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        destinationCompanySiret: ttr.company.siret
+      })
+    ]);
+  });
+
+  test("BSDD should appear twice in ttr's all waste registry", async () => {
+    const { query } = makeClient(ttr.user);
+    const { data, errors } = await query<Pick<Query, "allWastes">>(ALL_WASTES, {
+      variables: { sirets: [ttr.company.siret] }
+    });
+    expect(errors).toBeUndefined();
+    const wastes = data.allWastes.edges.map(edge => edge.node);
+    expect(wastes).toHaveLength(2);
+
+    expect(wastes).toEqual([
+      // une ligne avec la deuxième partie du trajet
+      expect.objectContaining({
+        id: `${bsdd.readableId}-suite`,
+        emitterCompanySiret: ttr.company.siret,
+        transporterCompanySiret: transporter2.company.siret,
+        destinationCompanySiret: destination.company.siret
+      }),
+      // une ligne avec la première partie du trajet
+      expect.objectContaining({
+        id: bsdd.readableId,
+        emitterCompanySiret: emitter.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        destinationCompanySiret: ttr.company.siret
+      })
+    ]);
+  });
+
+  test("BSDD should appear once in destination all waste registry", async () => {
+    const { query } = makeClient(destination.user);
+    const { data, errors } = await query<Pick<Query, "allWastes">>(ALL_WASTES, {
+      variables: { sirets: [destination.company.siret] }
+    });
+    expect(errors).toBeUndefined();
+    const wastes = data.allWastes.edges.map(edge => edge.node);
+    expect(wastes).toHaveLength(1);
+    expect(wastes).toEqual([
+      // une ligne avec la deuxième partie du trajet
+      expect.objectContaining({
+        id: `${bsdd.readableId}-suite`,
+        emitterCompanySiret: ttr.company.siret,
+        transporterCompanySiret: transporter2.company.siret,
+        destinationCompanySiret: destination.company.siret
+      })
+    ]);
+  });
+
+  test("BSDD should appear once in transporter after temp storage's all waste registry", async () => {
+    const { query } = makeClient(transporter2.user);
+    const { data, errors } = await query<Pick<Query, "allWastes">>(ALL_WASTES, {
+      variables: { sirets: [transporter2.company.siret] }
+    });
+    expect(errors).toBeUndefined();
+    const wastes = data.allWastes.edges.map(edge => edge.node);
+    expect(wastes).toHaveLength(1);
+    expect(wastes).toEqual([
+      // une ligne avec la deuxième partie du trajet
+      expect.objectContaining({
+        id: `${bsdd.readableId}-suite`,
+        emitterCompanySiret: ttr.company.siret,
+        transporterCompanySiret: transporter2.company.siret,
+        destinationCompanySiret: destination.company.siret
+      })
+    ]);
   });
 });

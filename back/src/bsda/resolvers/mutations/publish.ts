@@ -16,7 +16,12 @@ export default async function publish(
   const user = checkIsAuthenticated(context);
 
   const bsda = await getBsdaOrNotFound(id, {
-    include: { intermediaries: true, grouping: true, forwarding: true }
+    include: {
+      intermediaries: true,
+      grouping: true,
+      forwarding: true,
+      transporters: true
+    }
   });
 
   await checkCanUpdate(user, bsda);
