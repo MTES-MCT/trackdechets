@@ -11,9 +11,11 @@ import { successfulLogin } from "../utils/user";
 import { selectCompany, selectBsdMenu, BsdMenu } from "../utils/navigation";
 import {
   expectFilteredResults,
+  expectQuickFilterValue,
   quickFilter,
   QuickFilterLabel
 } from "../utils/dashboardFilters";
+import bsda from "../../../back/src/bsda/resolvers/queries/bsda";
 
 test.describe.serial("Cahier de recette de gestion des membres", async () => {
   // Credentials
@@ -286,9 +288,16 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
         },
         {
           company: companies.companyI,
-          desc: "Entreprise I > bsvhu1 devrait remonter",
+          desc: "Pas de filtre > bsvhu1 devrait remonter",
           in: "",
           out: DEFAULT_COMPANY_I_RESULTS,
+          resetResults: DEFAULT_COMPANY_I_RESULTS
+        },
+        {
+          company: companies.companyI,
+          desc: "ID du bsda1 > aucun résultat ne devrait remonter",
+          in: bsda1.id,
+          out: [],
           resetResults: DEFAULT_COMPANY_I_RESULTS
         }
       ];
@@ -377,13 +386,17 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
           out: [bsda1]
         },
         // TODO: fix
+        // à cause du forwarded in?
         // {
         //   desc: "Siret companyJ > bsdd1, bsda1 & bsff1 devraient remonter",
         //   in: companies.companyJ.siret,
         //   out: [bsdd1, bsda1, bsff1]
         // },
-        // TODO: ne peut pas marcher, on est sur le profil de l'entreprise A
-        // {  desc: "Siret companyD > bsdd1, bsda1 & bsff1 devraient remonter", in: companies.companyD.siret, out: [bsdd1, bsda1, bsff1] },
+        {
+          desc: "Siret companyD > bsdd1, bsda1 & bsff1 devraient remonter",
+          in: companies.companyD.siret,
+          out: [bsdd1, bsda1, bsff1]
+        },
         {
           desc: "Siret companyH > bsda2 devrait remonter",
           in: companies.companyH.siret,
@@ -523,6 +536,49 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
         await quickFilter(page, { label: "Nom de chantier", value: "" });
         await quickFilter(page, { label: "N° de BSD / contenant", value: "" });
         await expectFilteredResults(page, DEFAULT_COMPANY_A_RESULTS);
+      });
+    });
+
+    await test.step("Filtres rapides à travers les différents menus & entreprises", async () => {
+      await test.step(`[Entreprise "${companies.companyA.name}"] Changement d'onglet et d'entreprise > le filtre est toujours présent`, async () => {
+        // Select correct company & bsd menu
+        await selectCompany(page, companies.companyA.siret);
+        await selectBsdMenu(page, "Tous les bordereaux");
+
+        await expectFilteredResults(page, DEFAULT_COMPANY_A_RESULTS);
+
+        // User 1st filter
+        await quickFilter(page, {
+          label: "N° de BSD / contenant",
+          value: "BSDA-"
+        });
+        await expectFilteredResults(page, [bsda1, bsda2]);
+
+        // Change to another menu. Filter should still be filled, and results
+        // filtered accordingly
+        await selectBsdMenu(page, "Suivi");
+        await expectQuickFilterValue(page, {
+          label: "N° de BSD / contenant",
+          value: "BSDA-"
+        });
+        await expectFilteredResults(page, []);
+
+        // And another one
+        await selectBsdMenu(page, "Archives");
+        await expectQuickFilterValue(page, {
+          label: "N° de BSD / contenant",
+          value: "BSDA-"
+        });
+        await expectFilteredResults(page, [bsda1, bsda2]);
+
+        // Change to another company. Filter should still be filled, and results
+        // filtered accordingly
+        await selectCompany(page, companies.companyJ.siret);
+        await expectQuickFilterValue(page, {
+          label: "N° de BSD / contenant",
+          value: "BSDA-"
+        });
+        await expectFilteredResults(page, []);
       });
     });
   });

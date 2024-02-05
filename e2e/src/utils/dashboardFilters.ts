@@ -17,6 +17,17 @@ export const quickFilter = async (
 };
 
 /**
+ * Assert the value of a given filter
+ */
+export const expectQuickFilterValue = async (
+  page: Page,
+  { label, value }: { label: QuickFilterLabel; value: string }
+) => {
+  const filterValue = await page.getByLabel(label).inputValue();
+  expect(filterValue).toEqual(value);
+};
+
+/**
  * Assertions on the visible bsds in the dashboard page. Order is not checked.
  */
 export const expectFilteredResults = async (
