@@ -178,6 +178,42 @@ export const ALL_WASTES = gql`
   }
 `;
 
+export const ALL_WASTES_TTR = gql`
+  query AllWastes(
+    $sirets: [String!]!
+    $where: WasteRegistryWhere
+    $first: Int
+    $after: ID
+    $last: Int
+    $before: ID
+  ) {
+    allWastes(
+      sirets: $sirets
+      where: $where
+      first: $first
+      after: $after
+      last: $last
+      before: $before
+    ) {
+      totalCount
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      edges {
+        cursor
+        node {
+          id
+          finalReceptionWeights
+          finalOperationCodes
+        }
+      }
+    }
+  }
+`;
+
 export const WASTES_REGISTRY_CSV = gql`
   query WastesRegistryCsv(
     $registryType: WasteRegistryType!

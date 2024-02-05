@@ -360,7 +360,9 @@ export function toManagedWaste(
 }
 
 export function toAllWaste(
-  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
+  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] } & {
+    finalOperations: FinalOperation[];
+  }
 ): Required<AllWaste> {
   const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
