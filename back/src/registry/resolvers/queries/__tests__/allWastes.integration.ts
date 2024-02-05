@@ -388,7 +388,7 @@ describe("All wastes registry", () => {
     });
 
     const { data } = await query<Pick<Query, "allWastes">>(ALL_WASTES_TTR, {
-      variables: { sirets: [emitter.company.siret,], first: 2 }
+      variables: { sirets: [emitter.company.siret], first: 2 }
     });
     expect(data.allWastes.edges).toHaveLength(2);
     const allWastes = data.allWastes.edges.map(e => e.node)[1];
