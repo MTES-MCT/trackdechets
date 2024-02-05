@@ -97,6 +97,36 @@ export function getRegistryFields(
   return registryFields;
 }
 
+/**
+ * Return finalOperations
+ * maintaining the order
+ */
+const getFinalOperationsData = (
+  bsdd: Bsdd & {
+    finalOperations: FinalOperation[];
+  }
+) => {
+  let result = {};
+  // Initialize empty arrays for codes and weights
+  const finalOperationCodes: string[] = [];
+  const finalReceptionWeights: number[] = [];
+  // Check if finalOperations is defined and has elements
+  if (bsdd.finalOperations && bsdd.finalOperations.length > 0) {
+    // Iterate through each operation once and fill both arrays
+    bsdd.finalOperations.forEach(ope => {
+      finalOperationCodes.push(ope.operationCode);
+      finalReceptionWeights.push(ope.quantity);
+    });
+
+    // Build the object with both arrays
+    result = {
+      finalOperationCodes,
+      finalReceptionWeights
+    };
+  }
+  return result;
+};
+
 function toGenericWaste(bsdd: Bsdd): GenericWaste {
   return {
     wasteDescription: bsdd.wasteDescription,
@@ -240,9 +270,7 @@ export function toOutgoingWaste(
     emitterCustomInfo: null,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     ...getOperationData(bsdd),
-    // TODO maintain order
-    finalOperationCodes: bsdd.finalOperations?.map(ope => ope.operationCode),
-    finalReceptionWeights: bsdd.finalOperations?.map(ope => ope.quantity)
+    ...getFinalOperationsData(bsdd)
   };
 }
 
@@ -420,8 +448,6 @@ export function toAllWaste(
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     ...getOperationData(bsdd),
-    // TODO maintain order
-    finalOperationCodes: bsdd.finalOperations?.map(ope => ope.operationCode),
-    finalReceptionWeights: bsdd.finalOperations?.map(ope => ope.quantity)
+    ...getFinalOperationsData(bsdd)
   };
 }
