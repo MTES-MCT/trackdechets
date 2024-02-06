@@ -26,7 +26,9 @@ import {
   FOLLOWS,
   REVIEWS,
   TO_COLLECT,
-  TRANSPORT
+  TRANSPORT,
+  TO_REVIEW,
+  REVIEWED
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import routes from "../../../routes";
@@ -81,6 +83,48 @@ function DashboardSubNav({ currentCompany }) {
     location.pathname
   );
 
+  const matchTransportToCollect = matchPath(
+    {
+      path: routes.dashboard.transport.toCollect,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+
+  const matchTransportCollected = matchPath(
+    {
+      path: routes.dashboard.transport.collected,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+
+  const matchReviewsToReview = matchPath(
+    {
+      path: routes.dashboard.bsds.toReview,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+
+  const matchReviewsReviewed = matchPath(
+    {
+      path: routes.dashboard.bsds.reviewed,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+
+  const matchReviewsTab = !!matchReviewsReviewed || !!matchReviewsToReview;
+  const matchTransportTab =
+    !!matchTransportCollected || !!matchTransportToCollect;
+  const matchDashboardTab =
+    !!matchDashboard && !matchReviewsTab && !matchTransportTab;
+
   const { showTransportTabs } = useShowTransportTabs(
     currentCompany.companyTypes,
     currentCompany.siret
@@ -100,7 +144,8 @@ function DashboardSubNav({ currentCompany }) {
           <li className="fr-nav__item">
             <button
               className="fr-nav__btn"
-              aria-expanded={!!matchDashboard}
+              aria-expanded={matchDashboardTab}
+              aria-current={matchDashboardTab}
               aria-controls="menu-bordereaux"
             >
               Bordereaux
@@ -168,7 +213,8 @@ function DashboardSubNav({ currentCompany }) {
           <li className="fr-nav__item">
             <button
               className="fr-nav__btn"
-              aria-expanded="false"
+              aria-expanded={matchReviewsTab}
+              aria-current={matchReviewsTab}
               aria-controls="menu-revisions"
             >
               {REVIEWS}
@@ -176,14 +222,26 @@ function DashboardSubNav({ currentCompany }) {
             <div className="fr-collapse fr-menu" id="menu-revisions">
               <ul className="fr-menu__list">
                 <li>
-                  <a className="fr-nav__link" href="#" target="_self">
-                    En cours
-                  </a>
+                  <MenuLink
+                    entry={{
+                      navlink: true,
+                      caption: TO_REVIEW,
+                      href: generatePath(routes.dashboard.bsds.toReview, {
+                        siret: currentCompany.orgId
+                      })
+                    }}
+                  />
                 </li>
                 <li>
-                  <a className="fr-nav__link" href="#" target="_self">
-                    Révisés
-                  </a>
+                  <MenuLink
+                    entry={{
+                      navlink: true,
+                      caption: REVIEWED,
+                      href: generatePath(routes.dashboard.bsds.reviewed, {
+                        siret: currentCompany.orgId
+                      })
+                    }}
+                  />
                 </li>
               </ul>
             </div>
@@ -194,7 +252,8 @@ function DashboardSubNav({ currentCompany }) {
         <li className="fr-nav__item">
           <button
             className="fr-nav__btn"
-            aria-expanded="false"
+            aria-expanded={matchTransportTab}
+            aria-current={matchTransportTab}
             aria-controls="menu-transport"
           >
             {TRANSPORT}
@@ -314,6 +373,7 @@ function MobileSubNav({ currentCompany }) {
               <button
                 className="fr-nav__btn"
                 aria-expanded={!!matchAccount}
+                aria-current={!!matchAccount}
                 aria-controls="menu-compte"
               >
                 Mon compte
