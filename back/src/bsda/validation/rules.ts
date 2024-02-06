@@ -84,7 +84,7 @@ export const editionRules: EditionRules = {
   },
   emitterCompanyContact: {
     readableFieldName: "le nom de contact de l'entreprise émettrice",
-    sealed: { from: "EMISSION" },
+    sealed: { from: "EMISSION", when: isSealedForEmitter },
     required: {
       from: "EMISSION",
       when: bsda => !bsda.emitterIsPrivateIndividual
@@ -92,7 +92,7 @@ export const editionRules: EditionRules = {
   },
   emitterCompanyPhone: {
     readableFieldName: "le téléphone de l'entreprise émettrice",
-    sealed: { from: "EMISSION" },
+    sealed: { from: "EMISSION", when: isSealedForEmitter },
     required: {
       from: "EMISSION",
       when: bsda => !bsda.emitterIsPrivateIndividual
@@ -100,7 +100,7 @@ export const editionRules: EditionRules = {
   },
   emitterCompanyMail: {
     readableFieldName: "l'email de l'entreprise émettrice",
-    sealed: { from: "EMISSION" },
+    sealed: { from: "EMISSION", when: isSealedForEmitter },
     required: {
       from: "EMISSION",
       when: bsda => !bsda.emitterIsPrivateIndividual
@@ -109,27 +109,27 @@ export const editionRules: EditionRules = {
   emitterCustomInfo: {
     readableFieldName:
       "les champs d'informations complémentaires de l'entreprise émettrice",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION", when: isSealedForEmitter }
   },
   emitterPickupSiteName: {
     readableFieldName: "le nom de l'adresse de chantier ou de collecte",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION", when: isSealedForEmitter }
   },
   emitterPickupSiteAddress: {
     readableFieldName: "l'adresse de collecte ou de chantier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION", when: isSealedForEmitter }
   },
   emitterPickupSiteCity: {
     readableFieldName: "la ville de l'adresse de collecte ou de chantier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION", when: isSealedForEmitter }
   },
   emitterPickupSitePostalCode: {
     readableFieldName: "le code postal de l'adresse de collecte ou de chantier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION", when: isSealedForEmitter }
   },
   emitterPickupSiteInfos: {
     readableFieldName: "les informations de l'adresse de collecte",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION", when: isSealedForEmitter }
   },
   ecoOrganismeName: {
     readableFieldName: "le nom de l'éco-organisme",
@@ -169,17 +169,17 @@ export const editionRules: EditionRules = {
   },
   destinationCompanyContact: {
     readableFieldName: "le nom de contact de l'entreprise de destination",
-    sealed: { from: "TRANSPORT" },
+    sealed: { from: "OPERATION" },
     required: { from: "EMISSION" }
   },
   destinationCompanyPhone: {
     readableFieldName: "le téléphone de l'entreprise de destination",
-    sealed: { from: "TRANSPORT" },
+    sealed: { from: "OPERATION" },
     required: { from: "EMISSION" }
   },
   destinationCompanyMail: {
     readableFieldName: "l'email de l'entreprise de destination",
-    sealed: { from: "TRANSPORT" },
+    sealed: { from: "OPERATION" },
     required: { from: "EMISSION" }
   },
   destinationCustomInfo: {
@@ -482,7 +482,7 @@ export const editionRules: EditionRules = {
   },
   workerCompanyName: {
     readableFieldName: "le nom de l'entreprise de travaux",
-    sealed: { from: "EMISSION" },
+    sealed: { from: "EMISSION", when: isSealedForEmitter },
     required: {
       from: "EMISSION",
       when: hasWorker
@@ -490,7 +490,7 @@ export const editionRules: EditionRules = {
   },
   workerCompanySiret: {
     readableFieldName: "le SIRET de l'entreprise de travaux",
-    sealed: { from: "EMISSION" },
+    sealed: { from: "EMISSION", when: isSealedForEmitter },
     required: {
       from: "EMISSION",
       when: hasWorker
@@ -498,7 +498,7 @@ export const editionRules: EditionRules = {
   },
   workerCompanyAddress: {
     readableFieldName: "l'adresse de l'entreprise de travaux",
-    sealed: { from: "EMISSION" },
+    sealed: { from: "EMISSION", when: isSealedForEmitter },
     required: {
       from: "EMISSION",
       when: hasWorker
@@ -506,7 +506,7 @@ export const editionRules: EditionRules = {
   },
   workerCompanyContact: {
     readableFieldName: "le nom de contact de l'entreprise de travaux",
-    sealed: { from: "EMISSION" },
+    sealed: { from: "WORK" },
     required: {
       from: "EMISSION",
       when: hasWorker
@@ -514,7 +514,7 @@ export const editionRules: EditionRules = {
   },
   workerCompanyPhone: {
     readableFieldName: "le téléphone de l'entreprise de travaux",
-    sealed: { from: "EMISSION" },
+    sealed: { from: "WORK" },
     required: {
       from: "EMISSION",
       when: hasWorker
@@ -522,7 +522,7 @@ export const editionRules: EditionRules = {
   },
   workerCompanyMail: {
     readableFieldName: "l'email de l'entreprise de travaux",
-    sealed: { from: "EMISSION" },
+    sealed: { from: "WORK" },
     required: {
       from: "EMISSION",
       when: hasWorker
@@ -567,43 +567,43 @@ export const editionRules: EditionRules = {
   },
   brokerCompanyName: {
     readableFieldName: "le nom du courtier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "OPERATION" }
   },
   brokerCompanySiret: {
     readableFieldName: "le SIRET du courtier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "OPERATION" }
   },
   brokerCompanyAddress: {
     readableFieldName: "l'adresse du courtier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "OPERATION" }
   },
   brokerCompanyContact: {
     readableFieldName: "le nom de contact du courtier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "OPERATION" }
   },
   brokerCompanyPhone: {
     readableFieldName: "le téléphone du courtier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "OPERATION" }
   },
   brokerCompanyMail: {
     readableFieldName: "le mail du courtier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "OPERATION" }
   },
   brokerRecepisseNumber: {
     readableFieldName: "le numéro de récépissé du courtier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "OPERATION" }
   },
   brokerRecepisseDepartment: {
     readableFieldName: "le département du récépissé du courtier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "OPERATION" }
   },
   brokerRecepisseValidityLimit: {
     readableFieldName:
       "la date de validité de la certification de l'entreprise de travaux",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "OPERATION" }
   },
   wasteCode: {
-    sealed: { from: "EMISSION" },
+    sealed: { from: "EMISSION", when: isSealedForEmitter },
     required: { from: "EMISSION" },
     readableFieldName: "le code déchet"
   },
@@ -703,7 +703,11 @@ function isNotRefused(bsda: ZodBsda) {
   );
 }
 
-function isDestinationSealed(
+/**
+ * The emitter has special rights to edit several fields after he signed,
+ * and until other signatures are applied.
+ */
+function isSealedForEmitter(
   val: ZodBsda,
   persistedBsda: PersistedBsda,
   userFunctions: UserFunctions
@@ -713,6 +717,18 @@ function isDestinationSealed(
     : val.transporterTransportSignatureDate != null;
 
   if (userFunctions.isEmitter && !isSealedForEmitter) {
+    return false;
+  }
+
+  return true;
+}
+
+function isDestinationSealed(
+  val: ZodBsda,
+  persistedBsda: PersistedBsda,
+  userFunctions: UserFunctions
+) {
+  if (!isSealedForEmitter(val, persistedBsda, userFunctions)) {
     return false;
   }
 

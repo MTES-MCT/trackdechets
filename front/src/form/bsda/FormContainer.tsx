@@ -61,11 +61,7 @@ export default function FormContainer() {
                     title="Transporteur"
                     disabled={transporterSigned}
                   />
-                  <StepContainer
-                    component={Destination}
-                    title="Destination"
-                    disabled={transporterSigned}
-                  />
+                  <StepContainer component={Destination} title="Destination" />
                 </>
               );
             }}
