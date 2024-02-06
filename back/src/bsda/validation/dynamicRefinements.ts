@@ -1,8 +1,11 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
 import {
+  isDestinationRefinement,
+  isRegisteredVatNumberRefinement,
   isBsdaEcoOrganismeRefinement,
-  isTransporterRefinement
+  isTransporterRefinement,
+  isWorkerRefinement
 } from "../../common/validation/siret";
 import { getReadonlyBsdaRepository } from "../repository";
 import { PARTIAL_OPERATIONS } from "./constants";
@@ -15,7 +18,36 @@ export async function applyDynamicRefinement(
   validationContext: BsdaValidationContext,
   ctx: RefinementCtx
 ) {
-  await isBsdaEcoOrganismeRefinement(bsda.ecoOrganismeSiret, ctx);
+  await applyFieldRefinement(
+    isDestinationRefinement,
+    "destinationCompanySiret",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isDestinationRefinement,
+    "destinationOperationNextDestinationCompanySiret",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isRegisteredVatNumberRefinement,
+    "transporterCompanyVatNumber",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isWorkerRefinement,
+    "workerCompanySiret",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isBsdaEcoOrganismeRefinement,
+    "ecoOrganismeSiret",
+    bsda,
+    ctx
+  );
 
   await isTransporterRefinement(
     {
@@ -30,6 +62,18 @@ export async function applyDynamicRefinement(
   }
 
   await validateDestination(bsda, validationContext.currentSignatureType, ctx);
+}
+
+function applyFieldRefinement<T extends (value, ctx: RefinementCtx) => any>(
+  refinement: T,
+  field: keyof ZodBsda,
+  bsda: ZodBsda,
+  ctx: RefinementCtx
+) {
+  return refinement(bsda[field]!, {
+    ...ctx,
+    path: [...ctx.path, field]
+  });
 }
 
 async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {

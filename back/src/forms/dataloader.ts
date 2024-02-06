@@ -6,6 +6,9 @@ import { expandableFormIncludes } from "./converter";
 export function createFormDataLoaders() {
   return {
     forms: new DataLoader((formIds: string[]) => getForms(formIds)),
+    formsForReadCheck: new DataLoader((formIds: string[]) =>
+      getFormsForReadCheck(formIds)
+    ),
     forwardedIns: new DataLoader((formIds: string[]) =>
       getForwardedIns(formIds)
     ),
@@ -27,6 +30,24 @@ async function getForms(formIds: string[]) {
   });
 
   return formIds.map(formId => forms.find(form => form.id === formId));
+}
+
+async function getFormsForReadCheck(formIds: string[]) {
+  const forms = await prisma.form.findMany({
+    where: {
+      id: { in: formIds }
+    },
+    include: {
+      forwardedIn: { include: { transporters: true } },
+      transporters: true,
+      grouping: { include: { initialForm: true } },
+      intermediaries: true
+    }
+  });
+
+  const dict = Object.fromEntries(forms.map(form => [form.id, form]));
+
+  return formIds.map(formId => dict[formId]);
 }
 
 async function getForwardedIns(formIds: string[]) {

@@ -27,12 +27,7 @@ import {
   Transporter,
   TransportSegment
 } from "../../generated/graphql/types";
-import {
-  expandInitialFormFromDb,
-  expandFormFromDb,
-  expandTransportSegmentFromDb,
-  expandableFormIncludes
-} from "../converter";
+import { expandFormFromDb, expandableFormIncludes } from "../converter";
 import { prisma } from "@td/prisma";
 import { buildAddress } from "../../companies/sirene/utils";
 import { packagingsEqual } from "@td/constants";
@@ -285,18 +280,15 @@ function TransporterFormCompanyFields({
   );
 }
 
-export async function generateBsddPdf(prismaForm: PrismaForm) {
+export async function generateBsddPdf(id: PrismaForm["id"]) {
   const fullPrismaForm = await prisma.form.findUniqueOrThrow({
-    where: { id: prismaForm.id },
-    include: { ...expandableFormIncludes, intermediaries: true }
+    where: { id },
+    include: {
+      ...expandableFormIncludes,
+      intermediaries: true,
+      grouping: { include: { initialForm: true } }
+    }
   });
-
-  const grouping = (
-    await prisma.formGroupement.findMany({
-      where: { nextFormId: fullPrismaForm.id },
-      include: { initialForm: { include: expandableFormIncludes } }
-    })
-  ).map(g => ({ form: g.initialForm, quantity: g.quantity }));
 
   const groupedIn = (
     await prisma.formGroupement.findMany({
@@ -305,20 +297,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
     })
   ).map(g => ({ readableId: g.nextForm.readableId }));
 
-  const form: GraphQLForm = {
-    ...(await expandFormFromDb(fullPrismaForm)),
-    transportSegments: fullPrismaForm.transporters
-      ?.filter(transporter => transporter.number >= 2)
-      .map(expandTransportSegmentFromDb),
-    grouping: await Promise.all(
-      grouping.map(async ({ form, quantity }) => ({
-        form: await expandInitialFormFromDb(form),
-        quantity
-      }))
-    ),
-
-    intermediaries: fullPrismaForm.intermediaries ?? []
-  };
+  const form = expandFormFromDb(fullPrismaForm);
   const isRepackging =
     form.recipient?.isTempStorage &&
     !!form.temporaryStorageDetail?.wasteDetails?.packagingInfos &&
@@ -1105,18 +1084,21 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
       )}
     </Document>
   );
+  const stream = await generatePdf(html);
 
-  return generatePdf(html);
+  return { filename: `${form.readableId}.pdf`, stream };
 }
 
 export async function generateBsddPdfToBase64(
   prismaForm: PrismaForm
-): Promise<string> {
-  const readableStream = await generateBsddPdf(prismaForm);
+): Promise<{ filename: string; data: string }> {
+  const { filename, stream: readableStream } = await generateBsddPdf(
+    prismaForm.id
+  );
 
   return new Promise((resolve, reject) => {
     const convertToBase64 = concatStream(buffer =>
-      resolve(buffer.toString("base64"))
+      resolve({ filename, data: buffer.toString("base64") })
     );
 
     readableStream.on("error", reject);

@@ -241,18 +241,27 @@ describe("BSDA validation", () => {
     test("when foreign transporter is not registered in Trackdéchets", async () => {
       const data = {
         ...bsda,
-        trasnporterCompanySiret: null,
-        transporterCompanyVatNumber: "IT13029381004"
+        transporters: [
+          {
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: "IT13029381004"
+          }
+        ]
       };
-      const result = await bsdaSchema.safeParseAsync(data);
 
-      if (result.success) {
+      try {
+        await parseBsdaInContext(
+          {
+            persisted: data as any
+          },
+          {}
+        );
         throw new Error("Expected error.");
+      } catch (error) {
+        expect(error.issues[0].message).toBe(
+          "Le transporteur avec le n°de TVA IT13029381004 n'est pas inscrit sur Trackdéchets"
+        );
       }
-
-      expect(result.error.issues[0].message).toBe(
-        "Le transporteur avec le n°de TVA IT13029381004 n'est pas inscrit sur Trackdéchets"
-      );
     });
 
     test("when foreign transporter is registered with wrong profile", async () => {
@@ -263,19 +272,29 @@ describe("BSDA validation", () => {
       });
       const data = {
         ...bsda,
-        transporterCompanyVatNumber: company.vatNumber
+        transporters: [
+          {
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: company.vatNumber
+          }
+        ]
       };
-      const result = await bsdaSchema.safeParseAsync(data);
 
-      if (result.success) {
+      try {
+        await parseBsdaInContext(
+          {
+            persisted: data as any
+          },
+          {}
+        );
         throw new Error("Expected error.");
+      } catch (error) {
+        expect(error.issues[0].message).toBe(
+          `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
+            " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        );
       }
-
-      expect(result.error.issues[0].message).toBe(
-        `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
-          " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
-          " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
-      );
     });
 
     test("when destination siret is not valid", async () => {
@@ -299,14 +318,20 @@ describe("BSDA validation", () => {
         ...bsda,
         destinationCompanySiret: "85001946400021"
       };
-      const result = await bsdaSchema.safeParseAsync(data);
-      if (result.success) {
-        throw new Error("Expected error.");
-      }
 
-      expect(result.error.issues[0].message).toBe(
-        "L'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
-      );
+      try {
+        await parseBsdaInContext(
+          {
+            persisted: data as any
+          },
+          {}
+        );
+        throw new Error("Expected error.");
+      } catch (error) {
+        expect(error.issues[0].message).toBe(
+          "L'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+        );
+      }
     });
 
     test("when destination is registered with wrong profile", async () => {
@@ -315,17 +340,23 @@ describe("BSDA validation", () => {
         ...bsda,
         destinationCompanySiret: company.siret
       };
-      const result = await bsdaSchema.safeParseAsync(data);
-      if (result.success) {
-        throw new Error("Expected error.");
-      }
 
-      expect(result.error.issues[0].message).toBe(
-        `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est pas inscrite` +
-          " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc" +
-          " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il" +
-          " modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
-      );
+      try {
+        await parseBsdaInContext(
+          {
+            persisted: data as any
+          },
+          {}
+        );
+        throw new Error("Expected error.");
+      } catch (error) {
+        expect(error.issues[0].message).toBe(
+          `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est pas inscrite` +
+            " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc" +
+            " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il" +
+            " modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        );
+      }
     });
 
     test("when there is a french transporter and recepisse fields are null", async () => {
