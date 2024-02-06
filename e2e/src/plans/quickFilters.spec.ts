@@ -183,6 +183,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
     desc: string;
     in: string;
     out: any[];
+    resetResults?: any[];
   }
   const testScenario = async (
     page: Page,
@@ -209,6 +210,22 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       await quickFilter(page, { label, value: "" });
       await expectFilteredResults(page, defaultCompanyResults);
     });
+  };
+
+  const testScenarios = async (
+    page: Page,
+    scenarios: Scenario[],
+    label: QuickFilterLabel,
+    resetResults: any[]
+  ) => {
+    for (const scenario of scenarios) {
+      await testScenario(
+        page,
+        label,
+        scenario,
+        scenario.resetResults ?? resetResults
+      );
+    }
   };
 
   test("Utilisateur connecté", async ({ page }) => {
@@ -302,14 +319,12 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
         }
       ];
 
-      for (const scenario of scenarios) {
-        await testScenario(
-          page,
-          "N° de BSD / contenant",
-          scenario,
-          scenario.resetResults ?? DEFAULT_COMPANY_A_RESULTS
-        );
-      }
+      await testScenarios(
+        page,
+        scenarios,
+        "N° de BSD / contenant",
+        DEFAULT_COMPANY_A_RESULTS
+      );
     });
 
     await test.step("N° de déchet / nom usuel", async () => {
@@ -337,14 +352,12 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
         }
       ];
 
-      for (const scenario of scenarios) {
-        await testScenario(
-          page,
-          "N° de déchet / nom usuel",
-          scenario,
-          DEFAULT_COMPANY_A_RESULTS
-        );
-      }
+      await testScenarios(
+        page,
+        scenarios,
+        "N° de déchet / nom usuel",
+        DEFAULT_COMPANY_A_RESULTS
+      );
     });
 
     await test.step("Raison sociale / SIRET", async () => {
@@ -439,14 +452,12 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
         }
       ];
 
-      for (const scenario of scenarios) {
-        await testScenario(
-          page,
-          "Raison sociale / SIRET",
-          scenario,
-          scenario.resetResults ?? DEFAULT_COMPANY_A_RESULTS
-        );
-      }
+      await testScenarios(
+        page,
+        scenarios,
+        "Raison sociale / SIRET",
+        DEFAULT_COMPANY_A_RESULTS
+      );
     });
 
     await test.step("Numéro de CAP", async () => {
@@ -465,14 +476,12 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
         }
       ];
 
-      for (const scenario of scenarios) {
-        await testScenario(
-          page,
-          "Numéro de CAP",
-          scenario,
-          DEFAULT_COMPANY_A_RESULTS
-        );
-      }
+      await testScenarios(
+        page,
+        scenarios,
+        "Numéro de CAP",
+        DEFAULT_COMPANY_A_RESULTS
+      );
     });
 
     await test.step("Nom de chantier", async () => {
@@ -500,14 +509,12 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
         }
       ];
 
-      for (const scenario of scenarios) {
-        await testScenario(
-          page,
-          "Nom de chantier",
-          scenario,
-          DEFAULT_COMPANY_A_RESULTS
-        );
-      }
+      await testScenarios(
+        page,
+        scenarios,
+        "Nom de chantier",
+        DEFAULT_COMPANY_A_RESULTS
+      );
     });
 
     await test.step("Filtres rapides multiples", async () => {
