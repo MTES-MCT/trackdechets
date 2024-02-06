@@ -126,7 +126,7 @@ function DashboardRoutes() {
                   siret: companies[0].orgId
                 }
               )
-            : routes.account.companies.list
+            : routes.companies.index
         }
       />
     );

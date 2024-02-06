@@ -1,4 +1,5 @@
-import SideMenu from "../common/components/SideMenu";
+import SideBar from "../Apps/common/Components/SideBar/SideBar";
+import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import routes, { getRelativeRoute } from "../Apps/routes";
 import React from "react";
 import { NavLink, Routes, Route, Navigate } from "react-router-dom";
@@ -17,17 +18,16 @@ const toRelative = route => {
 export default function Admin() {
   return (
     <div id="admin" className="admin dashboard">
-      <SideMenu>
-        <>
-          <h5 className="tw-font-bold tw-m-4">Administration</h5>
+      <SideBar>
+        <Accordion defaultExpanded label="Administration" className="fr-mt-4w">
           <ul>
             <li className="tw-mb-1">
               <NavLink
                 to={routes.admin.verification}
                 className={({ isActive }) =>
                   isActive
-                    ? "sidebar__link sidebar__link--active"
-                    : "sidebar__link"
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
                 }
               >
                 Vérification
@@ -38,8 +38,8 @@ export default function Admin() {
                 to={routes.admin.anonymousCompany}
                 className={({ isActive }) =>
                   isActive
-                    ? "sidebar__link sidebar__link--active"
-                    : "sidebar__link"
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
                 }
               >
                 Entreprise anonyme
@@ -50,8 +50,8 @@ export default function Admin() {
                 to={routes.admin.reindex}
                 className={({ isActive }) =>
                   isActive
-                    ? "sidebar__link sidebar__link--active"
-                    : "sidebar__link"
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
                 }
               >
                 Réindexation
@@ -62,16 +62,17 @@ export default function Admin() {
                 to={routes.admin.user}
                 className={({ isActive }) =>
                   isActive
-                    ? "sidebar__link sidebar__link--active"
-                    : "sidebar__link"
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
                 }
               >
                 Comptes utilisateurs
               </NavLink>
             </li>
           </ul>
-        </>
-      </SideMenu>
+        </Accordion>
+      </SideBar>
+
       <div className="dashboard-content">
         <Routes>
           <Route

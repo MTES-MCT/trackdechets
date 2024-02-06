@@ -9,6 +9,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Nouvelle navigation sur Trackdéchets : la navigation principale et le menu latéral ont été mis en conformité avec le DSFR [PR 3066](https://github.com/MTES-MCT/trackdechets/pull/3066)
+- La gestion des établissements devient désormais un onglet principal de Trackdéchets, à retrouver dans "Mes établissements" [PR 3066](https://github.com/MTES-MCT/trackdechets/pull/3066)
+
 #### :bug: Corrections de bugs
 
 - Registre exhaustif du BSDD suite entreposage provisoire : les informations relatives à la destination finale et au 2e transporteur n'apparaissent pas + lignes en double [PR 3051](https://github.com/MTES-MCT/trackdechets/pull/3051)
