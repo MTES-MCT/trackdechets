@@ -144,7 +144,7 @@ function DashboardSubNav({ currentCompany }) {
           <li className="fr-nav__item">
             <button
               className="fr-nav__btn"
-              aria-expanded={matchDashboardTab}
+              aria-expanded={false}
               aria-current={matchDashboardTab}
               aria-controls="menu-bordereaux"
             >
@@ -213,7 +213,7 @@ function DashboardSubNav({ currentCompany }) {
           <li className="fr-nav__item">
             <button
               className="fr-nav__btn"
-              aria-expanded={matchReviewsTab}
+              aria-expanded={false}
               aria-current={matchReviewsTab}
               aria-controls="menu-revisions"
             >
@@ -252,7 +252,7 @@ function DashboardSubNav({ currentCompany }) {
         <li className="fr-nav__item">
           <button
             className="fr-nav__btn"
-            aria-expanded={matchTransportTab}
+            aria-expanded={false}
             aria-current={matchTransportTab}
             aria-controls="menu-transport"
           >
@@ -372,7 +372,7 @@ function MobileSubNav({ currentCompany }) {
             <li className="fr-nav__item">
               <button
                 className="fr-nav__btn"
-                aria-expanded={!!matchAccount}
+                aria-expanded={false}
                 aria-current={!!matchAccount}
                 aria-controls="menu-compte"
               >
@@ -597,7 +597,7 @@ export default function Header({
       id="fr-header-with-horizontal-operator-logo"
       operatorLogo={{
         alt: "Trackdéchets",
-        imgUrl: "./public/trackdechets-small.png",
+        imgUrl: "./trackdechets-small.png",
         orientation: "horizontal"
       }}
       quickAccessItems={[
