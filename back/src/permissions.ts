@@ -194,7 +194,7 @@ export async function checkUserPermissions(
 }
 
 export function syncCheckUserPermissions(
-  userRoles: Awaited<ReturnType<typeof getUserRoles>>,
+  userRoles: { [key: string]: UserRole },
   orgIds: string[],
   permission: Permission,
   errorMsg = "Vous n'êtes pas autorisé à effectuer cette action"
