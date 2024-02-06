@@ -12,12 +12,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Registre exhaustif du BSDD suite entreposage provisoire : les informations relatives à la destination finale et au 2e transporteur n'apparaissent pas + lignes en double [PR 3051](https://github.com/MTES-MCT/trackdechets/pull/3051)
+- En cas de révision vers un code de traitement final, les données du BSD sont mises à jour correctement [PR 2986](https://github.com/MTES-MCT/trackdechets/pull/2986)
 
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
 
 - Mise à jour des labels en cas de transport multimodal [PR 3046](https://github.com/MTES-MCT/trackdechets/pull/3046)
+- Le mode de traitement "Elimination (incinération sans valorisation énergétique et stockage en décharge)" a été renommé "Elimination" [PR 3044](https://github.com/MTES-MCT/trackdechets/pull/3044)
 
 #### :house: Interne
 
