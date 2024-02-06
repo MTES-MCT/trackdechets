@@ -540,5 +540,19 @@ export const dashboardFormFragment = gql`
     }
     currentTransporterSiret
     nextTransporterSiret
+    metadata {
+      latestRevision {
+        id
+        status
+        authoringCompany {
+          siret
+          name
+        }
+        approvals {
+          approverSiret
+          status
+        }
+      }
+    }
   }
 `;

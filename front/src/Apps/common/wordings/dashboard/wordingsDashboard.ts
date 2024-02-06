@@ -169,13 +169,13 @@ export const TRANSPORT = "Transport";
 export const TO_COLLECT = "À collecter";
 export const COLLECTED = "Collecté";
 export const REGISTER = "Registre";
-export const TO_REVIEWED = "À Réviser";
+export const TO_REVIEW = "En cours";
 export const REVIEWED = "Révisé";
 
 // Reviews
-export const APPROUVER_REFUSER_REVISION = "Approuver / Refuser";
-export const CONSULTER_REVISION = "Consulter";
-export const SUPRIMER_REVISION = "Supprimer la révision";
+export const GERER_REVISION = "Gérer la révision";
+export const CONSULTER_REVISION = "Consulter la révision";
+export const SUPRIMER_REVISION = "Annuler la révision";
 
 // Transport
 export const EMPORT_DIRECT_LABEL = "Signer directement";

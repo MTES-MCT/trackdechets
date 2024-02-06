@@ -238,12 +238,12 @@ function DashboardRoutes() {
           />
 
           <Route
-            path={toRelative(routes.dashboard.bsds.reviews)}
-            element={<DashboardPage key="reviewsPage" />}
+            path={toRelative(routes.dashboard.bsds.reviewed)}
+            element={<DashboardPage />}
           />
 
           <Route
-            path={toRelative(routes.dashboard.bsds.toReviewed)}
+            path={toRelative(routes.dashboard.bsds.toReview)}
             element={<DashboardPage />}
           />
 

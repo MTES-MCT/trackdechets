@@ -30,8 +30,7 @@ const routes = {
       act: "/dashboard/:siret/bsds/act",
       follow: "/dashboard/:siret/bsds/follow",
       history: "/dashboard/:siret/bsds/history",
-      reviews: "/dashboard/:siret/bsds/review",
-      toReviewed: "/dashboard/:siret/bsds/to-review",
+      toReview: "/dashboard/:siret/bsds/to-review",
       reviewed: "/dashboard/:siret/bsds/reviewed"
     },
     bsdds: {

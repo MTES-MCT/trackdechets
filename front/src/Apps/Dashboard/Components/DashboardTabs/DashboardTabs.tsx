@@ -10,16 +10,15 @@ import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import {
   ACTS,
   ALL_BSDS,
-  ALL_REVIEWS,
   ARCHIVES,
   COLLECTED,
   DRAFTS,
   FOLLOWS,
   REGISTER,
-  // REVIEWED,
+  REVIEWED,
   REVIEWS,
   TO_COLLECT,
-  // TO_REVIEWED,
+  TO_REVIEW,
   TRANSPORT
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 
@@ -167,7 +166,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             <ul>
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboard.bsds.reviews, {
+                  to={generatePath(routes.dashboard.bsds.toReview, {
                     siret: currentCompany.orgId
                   })}
                   className={({ isActive }) =>
@@ -176,30 +175,15 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                       : "sidebarv2__item sidebarv2__item--indented"
                   }
                 >
-                  {ALL_REVIEWS}
-                </NavLink>
-              </li>
-              {/* A remettre quand on pourra afficher les révisions avec la query bsds */}
-              {/* <li>
-                <NavLink
-                  to={generatePath(routes.dashboard.bsds.toReviewed, {
-                    siret: currentCompany.orgId,
-                  })}
-                  className={({isActive}) =>
-                    isActive
-                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
-                      : "sidebarv2__item sidebarv2__item--indented"
-                  }
-                >
-                  {TO_REVIEWED}
+                  {TO_REVIEW}
                 </NavLink>
               </li>
               <li>
                 <NavLink
                   to={generatePath(routes.dashboard.bsds.reviewed, {
-                    siret: currentCompany.orgId,
+                    siret: currentCompany.orgId
                   })}
-                  className={({isActive}) =>
+                  className={({ isActive }) =>
                     isActive
                       ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
                       : "sidebarv2__item sidebarv2__item--indented"
@@ -207,7 +191,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 >
                   {REVIEWED}
                 </NavLink>
-              </li> */}
+              </li>
             </ul>
           </Accordion>
         </>

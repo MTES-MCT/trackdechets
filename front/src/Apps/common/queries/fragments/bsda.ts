@@ -73,6 +73,20 @@ export const bsdaFragment = gql`
       value
     }
     bsdaUpdatedAt: updatedAt
+    metadata {
+      latestRevision {
+        id
+        status
+        authoringCompany {
+          siret
+          name
+        }
+        approvals {
+          approverSiret
+          status
+        }
+      }
+    }
   }
 `;
 

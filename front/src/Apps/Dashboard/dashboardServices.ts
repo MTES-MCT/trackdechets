@@ -1,12 +1,12 @@
 import {
   BsdDisplay,
   BsdStatusCode,
-  BsdWithReview,
   ReviewStatusLabel,
   WorkflowDisplayType
 } from "../common/types/bsdTypes";
 import { formatBsd } from "./bsdMapper";
 import {
+  Bsda,
   BsdasriType,
   BsdaType,
   BsdType,
@@ -14,6 +14,8 @@ import {
   EmitterType,
   Form,
   Maybe,
+  RevisionRequestApprovalStatus,
+  RevisionRequestStatus,
   UserPermission,
   Transporter
 } from "@td/codegen-ui";
@@ -22,7 +24,6 @@ import {
   AJOUTER_ANNEXE_1,
   ANNEXE_BORDEREAU_SUITE,
   ANNULE,
-  APPROUVER_REFUSER_REVISION,
   ARRIVE_ENTREPOS_PROVISOIRE,
   BROUILLON,
   BSD_SUITE_PREPARE,
@@ -32,6 +33,7 @@ import {
   EN_ATTENTE_BSD_SUITE,
   EN_ATTENTE_TRAITEMENT,
   FAIRE_SIGNER,
+  GERER_REVISION,
   INITIAL,
   PARTIELLEMENT_REFUSE,
   PUBLIER,
@@ -47,6 +49,7 @@ import {
   SIGNE_PAR_TRANSPORTEUR,
   SIGNE_PAR_TRANSPORTEUR_N,
   SUIVI_PAR_PNTTD,
+  SUPRIMER_REVISION,
   TRAITE,
   TRAITE_AVEC_RUPTURE_TRACABILITE,
   VALIDER_ACCEPTATION,
@@ -849,24 +852,23 @@ export const getSignTempStorerBtnLabel = (
 };
 
 const getReviewCurrentApproval = (
-  bsd: BsdDisplay | BsdWithReview,
+  bsd: BsdDisplay | Form | Bsda,
   siret: string
 ) => {
-  const { review } = bsd;
-
-  return review?.approvals?.find(approval => approval.approverSiret === siret);
+  return bsd?.metadata?.latestRevision?.approvals?.find(
+    approval => approval.approverSiret === siret
+  );
 };
 
 export const canApproveOrRefuseReview = (
-  bsd: BsdDisplay | BsdWithReview,
+  bsd: BsdDisplay | Form | Bsda,
   siret: string
 ) => {
-  const { review } = bsd;
   const currentApproval = getReviewCurrentApproval(bsd, siret);
 
   return (
-    review?.status === BsdStatusCode.Pending &&
-    currentApproval?.status === BsdStatusCode.Pending
+    bsd.metadata?.latestRevision?.status === RevisionRequestStatus.Pending &&
+    currentApproval?.status === RevisionRequestApprovalStatus.Pending
   );
 };
 
@@ -875,17 +877,20 @@ export const getPrimaryActionsReviewsLabel = (
   currentSiret: string
 ) => {
   if (canApproveOrRefuseReview(bsd, currentSiret)) {
-    return APPROUVER_REFUSER_REVISION;
+    return GERER_REVISION;
+  }
+
+  if (canDeleteReview(bsd, currentSiret)) {
+    return SUPRIMER_REVISION;
   }
 
   return CONSULTER_REVISION;
 };
 
 export const canDeleteReview = (bsd: BsdDisplay, currentSiret: string) => {
-  const { review } = bsd;
   return (
-    review?.authoringCompany.siret === currentSiret &&
-    review?.status === BsdStatusCode.Pending
+    bsd.metadata?.latestRevision?.authoringCompany?.siret === currentSiret &&
+    bsd.metadata?.latestRevision?.status === RevisionRequestStatus.Pending
   );
 };
 

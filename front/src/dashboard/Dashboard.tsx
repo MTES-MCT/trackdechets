@@ -36,7 +36,6 @@ import {
   RouteBSDasView
 } from "./detail";
 import { RouteTransportToCollect, RouteTransportCollected } from "./transport";
-import { RouteBsdsReview } from "./bsds/review";
 import { RouteBsddRequestRevision } from "./components/RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
 import { DashboardTabs } from "./DashboardTabs";
 import SideMenu from "../common/components/SideMenu";
@@ -62,7 +61,7 @@ export const GET_ME = gql`
 const toRelative = route => {
   return getRelativeRoute(routes.dashboard.index, route);
 };
-
+//file to remove not used anymore
 export default function Dashboard() {
   const { siret } = useParams<{ siret: string; id: string }>();
   const { data } = useQuery<Pick<Query, "me">>(GET_ME);
@@ -185,11 +184,6 @@ export default function Dashboard() {
           <Route
             path={toRelative(routes.dashboard.bsds.history)}
             element={<RouteBsdsHistory />}
-          />
-
-          <Route
-            path={toRelative(routes.dashboard.bsds.reviews)}
-            element={<RouteBsdsReview />}
           />
 
           <Route

@@ -25,7 +25,8 @@ export type Tabs = {
   isToCollectTab;
   isCollectedTab;
   isAllBsdsTab;
-  isReviewsTab;
+  isToReviewTab;
+  isReviewedTab;
 };
 
 export const getRoutePredicate = (props: Tabs & { siret }) => {
@@ -37,7 +38,9 @@ export const getRoutePredicate = (props: Tabs & { siret }) => {
     isArchivesTab,
     isToCollectTab,
     isCollectedTab,
-    isAllBsdsTab
+    isAllBsdsTab,
+    isToReviewTab,
+    isReviewedTab
   } = props;
 
   if (isActTab) {
@@ -78,27 +81,27 @@ export const getRoutePredicate = (props: Tabs & { siret }) => {
       isArchivedFor: [siret]
     };
   }
-  // if (isReviewsTab) {
-  //   return {
-  //     isRevisedFor: [siret],
-  //     isInRevisionFor: [siret],
-  //   };
-  // }
-  // if (isToReviewedTab) {
-  //   return {
-  //     isInRevisionFor: [siret],
-  //   };
-  // }
-  // if (isReviewedTab) {
-  //   return {
-  //     isRevisedFor: [siret],
-  //   };
-  // }
+  if (isToReviewTab) {
+    return {
+      isInRevisionFor: [siret]
+    };
+  }
+  if (isReviewedTab) {
+    return {
+      isRevisedFor: [siret]
+    };
+  }
 };
 
 export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
-  const { isActTab, isDraftTab, isFollowTab, isArchivesTab, isReviewsTab } =
-    tabs;
+  const {
+    isActTab,
+    isDraftTab,
+    isFollowTab,
+    isArchivesTab,
+    isReviewedTab,
+    isToReviewTab
+  } = tabs;
 
   if (isActTab) {
     return blankstate_action_title;
@@ -112,7 +115,7 @@ export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
   if (isArchivesTab) {
     return blankstate_history_title;
   }
-  if (isReviewsTab) {
+  if (isReviewedTab || isToReviewTab) {
     return blankstate_reviews_title;
   }
   return blankstate_default_title;
@@ -123,8 +126,9 @@ export const getBlankslateDescription = ({
   isDraftTab,
   isFollowTab,
   isArchivesTab,
-  isReviewsTab
-}) => {
+  isReviewedTab,
+  isToReviewTab
+}: Tabs) => {
   if (isActTab) {
     return blankstate_action_desc;
   }
@@ -144,7 +148,7 @@ export const getBlankslateDescription = ({
   if (isArchivesTab) {
     return blankstate_history_desc;
   }
-  if (isReviewsTab) {
+  if (isReviewedTab || isToReviewTab) {
     return blankstate_reviews_desc;
   }
   return blankstate_default_desc;

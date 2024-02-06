@@ -1,3 +1,4 @@
+//file to remove not used anymore
 import React from "react";
 import { generatePath, NavLink, useNavigate } from "react-router-dom";
 import { CompanyPrivate } from "@td/codegen-ui";
@@ -105,7 +106,7 @@ export function DashboardTabs({
           </li>
           <li>
             <NavLink
-              to={generatePath(routes.dashboard.bsds.reviews, {
+              to={generatePath(routes.dashboard.bsds.toReview, {
                 siret: currentCompany.orgId
               })}
               className={({ isActive }) =>
