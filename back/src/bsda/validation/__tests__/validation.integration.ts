@@ -241,8 +241,12 @@ describe("BSDA validation", () => {
     test("when foreign transporter is not registered in Trackdéchets", async () => {
       const data = {
         ...bsda,
-        trasnporterCompanySiret: null,
-        transporterCompanyVatNumber: "IT13029381004"
+        transporters: [
+          {
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: "IT13029381004"
+          }
+        ]
       };
 
       try {
@@ -268,7 +272,12 @@ describe("BSDA validation", () => {
       });
       const data = {
         ...bsda,
-        transporterCompanyVatNumber: company.vatNumber
+        transporters: [
+          {
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: company.vatNumber
+          }
+        ]
       };
 
       try {
