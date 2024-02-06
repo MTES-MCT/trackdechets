@@ -225,6 +225,10 @@ export const FullBsdaFragment = gql`
         }
       }
     }
+    ecoOrganisme {
+      name
+      siret
+    }
     metadata {
       errors {
         message

@@ -1,6 +1,9 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
-import { isTransporterRefinement } from "../../common/validation/siret";
+import {
+  isBsdaEcoOrganismeRefinement,
+  isTransporterRefinement
+} from "../../common/validation/siret";
 import { getReadonlyBsdaRepository } from "../repository";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { BsdaValidationContext } from "./index";
@@ -12,6 +15,8 @@ export async function applyDynamicRefinement(
   validationContext: BsdaValidationContext,
   ctx: RefinementCtx
 ) {
+  await isBsdaEcoOrganismeRefinement(bsda.ecoOrganismeSiret, ctx);
+
   await isTransporterRefinement(
     {
       siret: bsda.transporterCompanySiret,
@@ -180,7 +185,6 @@ async function validateDestination(
   currentSignatureType: BsdaSignatureType | undefined,
   ctx: RefinementCtx
 ) {
-
   // Destination is freely editable until EMISSION signature.
   // Once transported, destination is not editable for anyone.
   // This is enforced by the sealing rules

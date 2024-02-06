@@ -60,7 +60,7 @@ type SlipDetailContentProps = {
 };
 
 const Emitter = ({ form }: { form: Bsda }) => {
-  const { emitter } = form;
+  const { emitter, ecoOrganisme } = form;
   return (
     <div className={styles.detailColumns}>
       <div className={styles.detailGrid}>
@@ -105,6 +105,12 @@ const Emitter = ({ form }: { form: Bsda }) => {
         />
       </div>
       <div className={styles.detailGrid}>
+        <DetailRow
+          value={
+            ecoOrganisme?.name && `${ecoOrganisme.name} (${ecoOrganisme.siret})`
+          }
+          label="Eco-organisme"
+        />
         <DetailRow value={emitter?.customInfo} label="Champ libre émetteur" />
         <DateRow value={emitter?.emission?.signature?.date} label="Signé le" />
         <DetailRow
