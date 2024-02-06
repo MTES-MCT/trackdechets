@@ -82,6 +82,7 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
 
   const formSirets: Partial<Record<keyof Bsda, string | null | undefined>> = {
     emitterCompanySiret: bsda.emitterCompanySiret,
+    ecoOrganismeSiret: bsda.ecoOrganismeSiret,
     workerCompanySiret: bsda.workerCompanySiret,
     destinationCompanySiret: bsda.destinationCompanySiret,
     transporterCompanySiret: getTransporterCompanyOrgId(bsda),
