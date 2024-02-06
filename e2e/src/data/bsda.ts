@@ -8,13 +8,14 @@ interface BsdaOpt {
   wasteCode?: string;
   wasteMaterialName?: string;
   type?: BsdaType;
-  forwardedIn?: BsdaOpt;
+  groupedIn?: BsdaOpt;
   grouping?: Bsda[];
   // Companies
   emitter?: Company;
   destination?: Company;
   broker?: Company;
   worker?: Company;
+  destinationOperationNextDestination?: Company;
 }
 
 const optToBsdaCreateInput = (opt: BsdaOpt): Prisma.BsdaCreateInput => {
@@ -34,6 +35,10 @@ const optToBsdaCreateInput = (opt: BsdaOpt): Prisma.BsdaCreateInput => {
     workerCompanySiret: opt.worker?.siret,
     brokerCompanyName: opt.broker?.name,
     brokerCompanySiret: opt.broker?.siret,
+    destinationOperationNextDestinationCompanySiret:
+      opt.destinationOperationNextDestination?.siret,
+    destinationOperationNextDestinationCompanyName:
+      opt.destinationOperationNextDestination?.name,
     ...(opt.grouping
       ? {
           grouping: {
@@ -41,11 +46,11 @@ const optToBsdaCreateInput = (opt: BsdaOpt): Prisma.BsdaCreateInput => {
           }
         }
       : {}),
-    ...(opt.forwardedIn
+    ...(opt.groupedIn
       ? {
-          forwardedIn: {
+          groupedIn: {
             create: {
-              ...optToBsdaCreateInput(opt.forwardedIn)
+              ...optToBsdaCreateInput(opt.groupedIn)
             }
           }
         }

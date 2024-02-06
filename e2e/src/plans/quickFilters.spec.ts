@@ -2,7 +2,7 @@ import { test, Page } from "@playwright/test";
 import { Company } from "@prisma/client";
 import { seedUser } from "../data/user";
 import { seedCompanyAssociations, seedDefaultCompanies } from "../data/company";
-import { seedBsdd } from "../data/bsdd";
+import { seedBsdd, seedFormGroupment } from "../data/bsdd";
 import { seedBsda } from "../data/bsda";
 import { seedBsff } from "../data/bsff";
 import { seedBsvhu } from "../data/bsvhu";
@@ -15,7 +15,6 @@ import {
   quickFilter,
   QuickFilterLabel
 } from "../utils/dashboardFilters";
-import bsda from "../../../back/src/bsda/resolvers/queries/bsda";
 
 test.describe.serial("Cahier de recette de gestion des membres", async () => {
   // Credentials
@@ -69,26 +68,21 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       // Companies
       emitter: companies.companyA,
       transporters: [companies.companyB, companies.companyC],
-      recipientIsTempStorage: true,
       recipient: companies.companyJ,
       trader: companies.companyE,
       ecoOrganisme: companies.companyF,
-      forwardedIn: {
-        ownerId: user.id,
-        status: "GROUPED",
-        emitter: companies.companyJ,
-        recipient: companies.companyD
-      }
+      nextDestination: companies.companyD
     });
 
     bsdd4 = await seedBsdd({
       ownerId: user.id,
       status: "SIGNED_BY_PRODUCER",
       emitterType: "APPENDIX2",
-      emitter: companies.companyD,
-      recipient: companies.companyM,
-      grouping: [bsdd1]
+      emitter: companies.companyJ,
+      recipient: companies.companyM
     });
+
+    await seedFormGroupment(bsdd1, bsdd4);
 
     bsdd3 = await seedBsdd({
       ownerId: user.id,
@@ -106,22 +100,22 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       emitter: companies.companyL,
       recipient: companies.companyL,
       ecoOrganisme: companies.companyF,
-      transporters: [companies.companyL],
-      grouping: [bsdd3]
+      transporters: [companies.companyL]
     });
 
     // BSDAs
 
     bsda1 = await seedBsda({
-      status: "PROCESSED",
+      status: "AWAITING_CHILD",
       emitterPickupSiteName: "Chantier du parc",
       wasteCode: "06 13 04*",
       wasteMaterialName: "Amiante",
       emitter: companies.companyA,
       worker: companies.companyK,
       broker: companies.companyG,
-      destination: companies.companyD,
-      forwardedIn: {
+      destination: companies.companyJ,
+      destinationOperationNextDestination: companies.companyD,
+      groupedIn: {
         emitter: companies.companyJ,
         destination: companies.companyD
       }
@@ -130,6 +124,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
     bsda3 = await seedBsda({
       status: "SIGNED_BY_PRODUCER",
       type: "GATHERING",
+      emitter: companies.companyJ,
       destination: companies.companyD,
       grouping: [bsda1]
     });
@@ -245,16 +240,10 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       bsff1,
       bsdasri1
     ];
-    const DEFAULT_COMPANY_D_RESULTS = [
-      bsdd1,
-      bsdd4,
-      bsda1,
-      bsda3,
-      bsff1,
-      bsdasri2
-    ];
+    const DEFAULT_COMPANY_D_RESULTS = [bsda1, bsda3, bsff1, bsdasri2];
     const DEFAULT_COMPANY_F_RESULTS = [bsdd1, bsdd2];
     const DEFAULT_COMPANY_I_RESULTS = [bsvhu1];
+    const DEFAULT_COMPANY_J_RESULTS = [bsdd1, bsdd4, bsda1, bsda3, bsff1];
 
     await test.step("N° de BSD / contenant (et numéro libre)", async () => {
       const scenarios = [
@@ -398,13 +387,11 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
           in: companies.companyG.siret,
           out: [bsda1]
         },
-        // TODO: fix
-        // à cause du forwarded in?
-        // {
-        //   desc: "Siret companyJ > bsdd1, bsda1 & bsff1 devraient remonter",
-        //   in: companies.companyJ.siret,
-        //   out: [bsdd1, bsda1, bsff1]
-        // },
+        {
+          desc: "Siret companyJ > bsdd1, bsda1 & bsff1 devraient remonter",
+          in: companies.companyJ.siret,
+          out: [bsdd1, bsda1, bsff1]
+        },
         {
           desc: "Siret companyD > bsdd1, bsda1 & bsff1 devraient remonter",
           in: companies.companyD.siret,
@@ -437,11 +424,11 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
           resetResults: DEFAULT_COMPANY_F_RESULTS
         },
         {
-          company: companies.companyD,
+          company: companies.companyJ,
           desc: "Siret companyM > bsdd4 devrait remonter",
           in: companies.companyM.siret,
           out: [bsdd4],
-          resetResults: DEFAULT_COMPANY_D_RESULTS
+          resetResults: DEFAULT_COMPANY_J_RESULTS
         },
         {
           company: companies.companyD,
@@ -568,7 +555,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
           label: "N° de BSD / contenant",
           value: "BSDA-"
         });
-        await expectFilteredResults(page, []);
+        await expectFilteredResults(page, [bsda1]);
 
         // And another one
         await selectBsdMenu(page, "Archives");
@@ -576,7 +563,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
           label: "N° de BSD / contenant",
           value: "BSDA-"
         });
-        await expectFilteredResults(page, [bsda1, bsda2]);
+        await expectFilteredResults(page, [bsda2]);
 
         // Change to another company. Filter should still be filled, and results
         // filtered accordingly
@@ -585,7 +572,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
           label: "N° de BSD / contenant",
           value: "BSDA-"
         });
-        await expectFilteredResults(page, []);
+        await expectFilteredResults(page, [bsda1, bsda3]);
       });
     });
   });

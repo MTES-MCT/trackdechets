@@ -9,16 +9,15 @@ export interface BsddOpt {
   emitterWorkSiteName?: string;
   emitterType?: EmitterType;
   recipientCap?: string;
-  grouping?: Form[];
   wasteDetailsCode?: string;
   recipientIsTempStorage?: boolean;
-  forwardedIn?: BsddOpt;
   // Companies
   emitter: Company;
   transporters?: Company[];
   recipient?: Company;
   trader?: Company;
   ecoOrganisme?: Company;
+  nextDestination?: Company;
 }
 
 const optToFormCreateInput = (opt: BsddOpt): Prisma.FormCreateInput => {
@@ -39,8 +38,10 @@ const optToFormCreateInput = (opt: BsddOpt): Prisma.FormCreateInput => {
     recipientCompanyName: opt.recipient?.name,
     traderCompanySiret: opt.trader?.siret,
     traderCompanyName: opt.trader?.name,
-    ecoOrganismeSiret: opt.ecoOrganisme?.orgId,
-    ecoOrganismeName: opt.ecoOrganisme?.orgId,
+    ecoOrganismeSiret: opt.ecoOrganisme?.siret,
+    ecoOrganismeName: opt.ecoOrganisme?.name,
+    nextDestinationCompanySiret: opt.nextDestination?.siret,
+    nextDestinationCompanyName: opt.nextDestination?.name,
     ...(opt.transporters
       ? {
           transportersSirets: opt.transporters.map(
@@ -55,27 +56,6 @@ const optToFormCreateInput = (opt: BsddOpt): Prisma.FormCreateInput => {
                   transporterCompanyVatNumber: transporter.vatNumber,
                   transporterCompanyName: transporter.name
                 })) ?? []
-            }
-          }
-        }
-      : {}),
-    ...(opt.grouping
-      ? {
-          grouping: {
-            createMany: {
-              data: opt.grouping?.map(bsdd => ({
-                initialFormId: bsdd.id,
-                quantity: 0
-              }))
-            }
-          }
-        }
-      : {}),
-    ...(opt.forwardedIn
-      ? {
-          forwardedIn: {
-            create: {
-              ...optToFormCreateInput(opt.forwardedIn)
             }
           }
         }
@@ -98,4 +78,20 @@ export const getBsdd = async (id: string): Promise<Form> => {
   return prisma.form.findFirstOrThrow({
     where: { id }
   });
+};
+
+export const seedFormGroupment = async (initial, next) => {
+  const bsdd = await prisma.formGroupement.create({
+    data: {
+      initialFormId: initial.id,
+      nextFormId: next.id,
+      quantity: 1
+    }
+  });
+
+  // Add the bsdd to ES
+  await reindex(initial.readableId, () => {});
+  await reindex(next.readableId, () => {});
+
+  return bsdd;
 };
