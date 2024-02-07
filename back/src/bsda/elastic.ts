@@ -91,6 +91,7 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
     Record<keyof Bsda | "transporterCompanySiret", string | null | undefined>
   > = {
     emitterCompanySiret: bsda.emitterCompanySiret,
+    ecoOrganismeSiret: bsda.ecoOrganismeSiret,
     workerCompanySiret: bsda.workerCompanySiret,
     destinationCompanySiret: bsda.destinationCompanySiret,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),

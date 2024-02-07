@@ -1,13 +1,12 @@
 import { EmitterType, Form, Prisma } from "@prisma/client";
-import { deleteBsd } from "../../../common/elastic";
 import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { GraphQLContext } from "../../../types";
 import buildRemoveAppendix2 from "./removeAppendix2";
 import buildUpdateManyForms from "./updateMany";
 import { enqueueDeletedFormWebhook } from "../../../queue/producers/webhooks";
+import { enqueueBsdToDelete } from "../../../queue/producers/elastic";
 
 export type DeleteFormFn = (
   where: Prisma.FormWhereUniqueInput,
@@ -42,11 +41,11 @@ const buildDeleteForm: (deps: RepositoryFnDeps) => DeleteFormFn =
         appendix1.map(form => form.initialFormId),
         { isDeleted: true }
       );
-      await Promise.all(
-        appendix1.map(({ initialFormId }) =>
-          deleteBsd({ id: initialFormId }, { user } as GraphQLContext)
-        )
-      );
+      prisma.addAfterCommitCallback(() => {
+        for (const { initialFormId } of appendix1) {
+          enqueueBsdToDelete(initialFormId);
+        }
+      });
     }
 
     // Removing an appendix1 unlinks it with its container
@@ -66,22 +65,21 @@ const buildDeleteForm: (deps: RepositoryFnDeps) => DeleteFormFn =
       }
     });
 
-    await deleteBsd({ id: deletedForm.id }, { user } as GraphQLContext);
+    prisma.addAfterCommitCallback(() => {
+      enqueueBsdToDelete(deletedForm.id);
+      if (deletedForm.forwardedInId) {
+        enqueueBsdToDelete(deletedForm.forwardedInId);
+      }
 
-    if (deletedForm.forwardedInId) {
-      await deleteBsd({ id: deletedForm.forwardedInId }, {
-        user
-      } as GraphQLContext);
-    }
+      enqueueDeletedFormWebhook(deletedForm.id);
+    });
 
     if (deletedForm.emitterType === EmitterType.APPENDIX2) {
       // disconnect appendix2 forms if any
       const removeAppendix2 = buildRemoveAppendix2({ prisma, user });
       await removeAppendix2(deletedForm.id);
     }
-    prisma.addAfterCommitCallback(() =>
-      enqueueDeletedFormWebhook(deletedForm.id)
-    );
+
     return deletedForm;
   };
 

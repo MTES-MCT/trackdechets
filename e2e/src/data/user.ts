@@ -5,7 +5,8 @@ export const seedUser = async user => {
     data: {
       ...user,
       password: await hashPassword(user.password),
-      isActive: true
+      isActive: true,
+      activatedAt: new Date()
     }
   });
 

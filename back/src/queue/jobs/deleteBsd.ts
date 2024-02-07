@@ -1,5 +1,9 @@
 import { Job } from "bull";
 import {
+  FormForElasticInclude,
+  toBsdElastic as toBsddElastic
+} from "../../forms/elastic";
+import {
   BsdaForElasticInclude,
   toBsdElastic as toBsdaElastic
 } from "../../bsda/elastic";
@@ -65,6 +69,15 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
       include: BspaohForElasticInclude
     });
     return toBspaohElastic(bspaoh);
+  }
+
+  // For Bsdds the id is a random uuid.
+  const bsdd = await prisma.form.findUniqueOrThrow({
+    where: { id: bsdId },
+    include: FormForElasticInclude
+  });
+  if (bsdd) {
+    return toBsddElastic(bsdd);
   }
 
   throw new Error("Indexing this type of BSD is not handled by this worker.");

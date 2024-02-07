@@ -9,6 +9,7 @@ const initialState = {
     isPrivateIndividual: false,
     pickupSite: getInitialEmitterPickupSite()
   },
+  ecoOrganisme: null,
   waste: {
     code: "",
     familyCode: "",

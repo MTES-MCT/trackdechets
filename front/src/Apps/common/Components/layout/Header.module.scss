@@ -4,234 +4,81 @@
 .header {
   background-color: #fff;
   width: 100%;
-  border-bottom: 1px solid rgba(203, 213, 224, 1);
+  height: 56px;
+  border-bottom: 1px solid rgb(246, 246, 246);
   display: flex;
-  justify-content: space-between;
-}
-.headerToggle {
-  background-color: $blue-dark;
-  height: 100px;
-  display: flex;
-  padding: 0 0.75rem;
-  align-items: center;
-  button {
-    display: flex;
-    flex-direction: column;
-    padding: 0.75rem 0.5rem;
-    appearance: none;
-    align-items: center;
-    color: $grey-light;
-    width: 36px;
-    border-style: none;
-    background-color: transparent;
-    svg {
-      fill: currentColor;
+  box-shadow: 0px 2px 6px 0px rgba(0, 0, 12, 0.16);
+
+  &.headerLogin {
+    .headerContent {
+      max-width: 78rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      margin: 0 auto;
     }
   }
-  &Text {
-    font-size: 12px;
-  }
+}
 
-  @include desktop {
-    display: none;
+.headerBranding {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  margin-right: 36px;
+
+  a {
+    display: flex;
   }
 }
 
 .headerContent {
   width: 100%;
   display: flex;
-  justify-content: center;
   align-items: center;
   position: relative;
+  justify-content: space-between;
   flex-wrap: wrap;
+  padding: 0 36px;
 
   @include desktop {
     justify-content: flex-start;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
   }
-}
-.headerBranding {
-  padding-left: 1rem;
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-}
-.headerNav {
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  background-color: #fff;
-  margin-left: auto;
 
-  z-index: 20;
-  overflow-y: auto;
-
-  top: 0;
-  bottom: 0;
-
-  width: 85vw;
-  min-height: 100vh;
-  padding-right: 0.5rem;
-  position: fixed;
-  left: 0;
-  border-right: 1px solid $grey-light;
-
-  box-shadow: 10px 5px 5px rgba(0, 0, 0, 0.1);
-  &Hidden {
+  .headerNav {
     display: none;
-  }
-  @include desktop {
-    z-index: 0;
-    width: auto;
-    justify-content: flex-end;
-    margin-top: 0;
-    position: static;
-    border-left: none;
-    box-shadow: none;
-    height: 100px;
-    min-height: 100px;
-  }
-}
-.headerClose {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  color: $blue;
-  button {
-    padding: 2rem;
-  }
-  span {
-    font-size: 1.5rem;
-  }
 
-  @include desktop {
-    display: none;
-  }
-}
-.headerNavItems {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding-bottom: 100px;
-  margin: auto 0 0;
-
-  @include desktop {
-    height: 100px;
-    position: relative;
-    justify-content: flex-end;
-    padding-right: 0.5rem;
-    width: 100%;
-    flex-direction: row;
-
-    box-shadow: none;
-    padding-bottom: 0;
-    border: none;
-  }
-}
-.headerNavItem {
-  display: flex;
-  flex-direction: row;
-  margin-right: 0.5rem;
-  margin-left: 0.25rem;
-  align-items: center;
-  border-bottom: 1px solid $grey-light;
-  padding-bottom: 0;
-  &NoBorder {
-    border-bottom: none;
-  }
-  @include desktop {
-    flex-direction: column;
-    border: none;
-    justify-content: center;
-  }
-  @include lg-desktop {
-    margin-right: 0.75rem;
-    margin-left: 1rem;
-  }
-}
-
-.headerNavLink {
-  text-decoration: none;
-  color: $blue;
-  padding: 1rem 0 1rem 1rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  span {
-    margin-left: 1rem;
-  }
-
-  &:after {
-    display: none !important;
-  }
-
-  @include desktop {
-    padding: 0;
-    color: $black;
-    font-weight: bold;
-
-    svg {
-      display: none;
+    @include desktop {
+      display: flex;
     }
+  }
 
-    span {
-      margin: 0;
+  .headerActions {
+    margin-left: auto;
+    display: none;
+    align-items: center;
+
+    @include desktop {
+      display: flex;
     }
   }
 }
 
-.headerNavLinkActive {
-  font-weight: bold;
-  svg {
-    transform: rotate(180deg);
+.headerToggle {
+  @include desktop {
+    display: none;
   }
 }
 
-.headerNavLinkActive + .headerNavActive {
+.headerMobile {
   @include desktop {
-    border-color: $black;
+    display: none;
   }
 }
-.headerNavActive {
-  margin-top: 3px;
-  border-bottom: 4px solid transparent;
-  width: 3rem;
+
+.companySelector {
   display: block;
-}
-.headerNavItem:hover .headerNavActive {
-  @include desktop {
-    border-color: $black;
-  }
-}
-.headerConnexion,
-.headerSignup {
-  display: flex;
-  margin: 1rem auto 0.5rem;
+  padding: 16px;
 
   @include desktop {
-    margin: 0;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    display: none;
   }
-
-  @include lg-desktop {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-  }
-  & span {
-    white-space: nowrap;
-    font-weight: bold;
-    font-size: 1rem;
-    text-transform: Capitalize;
-  }
-}
-
-.headerConnexion {
-  & span {
-    color: #fff;
-  }
-}
-a:hover {
-  border-radius: none !important;
 }

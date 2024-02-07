@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { Company, User } from "@prisma/client";
 import { objectDiff } from "../../forms/workflow/diff";
 import { BsdaSignatureType } from "../../generated/graphql/types";
 import { flattenBsdaInput, flattenBsdaTransporterInput } from "../converter";
@@ -102,6 +102,13 @@ export async function getUserFunctions(
   unparsedBsda: UnparsedBsda
 ) {
   const companies = user ? await getUserCompanies(user.id) : [];
+  return getCompaniesFunctions(companies, unparsedBsda);
+}
+
+export function getCompaniesFunctions(
+  companies: Company[],
+  unparsedBsda: UnparsedBsda
+) {
   const orgIds = companies.map(c => c.orgId);
 
   return {

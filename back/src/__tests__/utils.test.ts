@@ -5,7 +5,8 @@ import {
   base32Encode,
   hashToken,
   extractPostalCode,
-  xDaysAgo
+  xDaysAgo,
+  randomNbrChain
 } from "../utils";
 
 test("getUid returns a unique identifier of fixed length", () => {
@@ -74,5 +75,20 @@ describe("xDaysAgo", () => {
     const someDate = new Date("2019-10-03T00:00:00.000Z");
     const threeDaysBefore = xDaysAgo(someDate, 3);
     expect(threeDaysBefore).toEqual(new Date("2019-09-30T00:00:00.000Z"));
+  });
+});
+
+describe("randomNbrChain", () => {
+  it("should generate random chain of numbers", async () => {
+    // Given
+    const length = 10;
+
+    // When
+    const chain = randomNbrChain(length);
+
+    // Then
+    expect(chain.length).toEqual(length);
+    // Numbers only
+    expect(new RegExp(/^\d+$/).test(chain)).toBeTruthy();
   });
 });

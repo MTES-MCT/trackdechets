@@ -192,3 +192,14 @@ export const aesDecrypt = encrypted => {
   decrypted += decipher.final("utf8");
   return decrypted;
 };
+
+/**
+ * Generates a random chain of numbers, like "012082"
+ */
+export const randomNbrChain = (length: number) => {
+  return "0"
+    .repeat(length)
+    .split("")
+    .map(_ => Math.floor(Math.random() * 10))
+    .join("");
+};

@@ -29,8 +29,6 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       email: ADMIN_EMAIL,
       password: ADMIN_PASSWORD
     });
-
-    expect(admin).not.toBeUndefined();
   });
 
   test("Seed de l'entreprise", async () => {
@@ -40,15 +38,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       companyTypes: ["PRODUCER"]
     });
 
-    expect(company).not.toBeUndefined();
-
-    const association = await seedCompanyAssociation(
-      admin.id,
-      company.id,
-      "ADMIN"
-    );
-
-    expect(association).not.toBeUndefined();
+    await seedCompanyAssociation(admin.id, company.id, "ADMIN");
   });
 
   test("Administrateur et utilisateur non inscrit sur TD", async ({ page }) => {
@@ -186,7 +176,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       await userPage.reload();
 
       // Because user has no company, he should be redirected
-      await checkCurrentURL(userPage, "/account/companies");
+      await checkCurrentURL(userPage, "/companies");
     });
   });
 });

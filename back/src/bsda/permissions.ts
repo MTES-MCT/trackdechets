@@ -10,6 +10,7 @@ import { BsdaWithTransporters } from "./types";
 function readers(bsda: BsdaWithTransporters): string[] {
   return [
     bsda.emitterCompanySiret,
+    bsda.ecoOrganismeSiret,
     bsda.destinationCompanySiret,
     ...bsda.transporters.flatMap(t => [
       t.transporterCompanySiret,
@@ -30,6 +31,7 @@ function readers(bsda: BsdaWithTransporters): string[] {
  */
 function contributors(bsda: BsdaWithTransporters, input?: BsdaInput): string[] {
   const updateEmitterCompanySiret = input?.emitter?.company?.siret;
+  const updateEcoOrganismeCompanySiret = input?.ecoOrganisme?.siret;
   const updateDestinationCompanySiret = input?.destination?.company?.siret;
   const updateTransporterCompanySiret = input?.transporter?.company?.siret;
   const updateTransporterCompanyVatNumber =
@@ -49,6 +51,11 @@ function contributors(bsda: BsdaWithTransporters, input?: BsdaInput): string[] {
     updateEmitterCompanySiret !== undefined
       ? updateEmitterCompanySiret
       : bsda.emitterCompanySiret;
+
+  const ecoOrganismeCompanySiret =
+    updateEcoOrganismeCompanySiret !== undefined
+      ? updateEcoOrganismeCompanySiret
+      : bsda.ecoOrganismeSiret;
 
   const destinationCompanySiret =
     updateDestinationCompanySiret !== undefined
@@ -87,6 +94,7 @@ function contributors(bsda: BsdaWithTransporters, input?: BsdaInput): string[] {
 
   return [
     emitterCompanySiret,
+    ecoOrganismeCompanySiret,
     destinationCompanySiret,
     transporterCompanySiret,
     transporterCompanyVatNumber,
@@ -103,6 +111,7 @@ function contributors(bsda: BsdaWithTransporters, input?: BsdaInput): string[] {
 function creators(input: BsdaInput) {
   return [
     input.emitter?.company?.siret,
+    input.ecoOrganisme?.siret,
     input.transporter?.company?.siret,
     input.transporter?.company?.vatNumber,
     input.destination?.company?.siret,

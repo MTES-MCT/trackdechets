@@ -1,79 +1,79 @@
 import React from "react";
-import SideMenu from "../common/components/SideMenu";
+import SideBar from "../Apps/common/Components/SideBar/SideBar";
 import { NavLink } from "react-router-dom";
-import styles from "./AccountMenu.module.scss";
 import routes from "../Apps/routes";
-import Tooltip from "../common/components/Tooltip";
+import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 
 export const AccountMenuContent = () => (
   <>
-    <h5 className={styles.title}>Paramètres du compte</h5>
-    <ul>
-      <li className="tw-mb-1">
-        <NavLink
-          to={routes.account.info}
-          className={({ isActive }) =>
-            isActive ? "sidebar__link sidebar__link--active" : "sidebar__link"
-          }
-        >
-          Informations générales
-        </NavLink>
-      </li>
-      <li className="tw-mb-1">
-        <NavLink
-          to={routes.account.companies.list}
-          className={({ isActive }) =>
-            isActive ? "sidebar__link sidebar__link--active" : "sidebar__link"
-          }
-        >
-          Établissements
-        </NavLink>
-      </li>
-    </ul>
-    <h5 className={styles.title}>
-      Intégration API
-      <Tooltip msg="L'API Trackdéchets permet de se connecter à un compte Trackdéchets à partir de systèmes informatiques tiers" />
-    </h5>
+    <Accordion
+      defaultExpanded
+      label="Paramètres du compte"
+      className="fr-mt-4w"
+    >
+      <ul>
+        <li className="tw-mb-1">
+          <NavLink
+            to={routes.account.info}
+            className={({ isActive }) =>
+              isActive
+                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                : "sidebarv2__item sidebarv2__item--indented"
+            }
+          >
+            Informations générales
+          </NavLink>
+        </li>
+      </ul>
+    </Accordion>
 
-    <ul>
-      <li>
-        <NavLink
-          to={routes.account.tokens.list}
-          className={({ isActive }) =>
-            isActive ? "sidebar__link sidebar__link--active" : "sidebar__link"
-          }
-        >
-          Jetons d'accès API
-        </NavLink>
-      </li>
-      <li className="tw-mb-1">
-        <NavLink
-          to={routes.account.authorizedApplications}
-          className={({ isActive }) =>
-            isActive ? "sidebar__link sidebar__link--active" : "sidebar__link"
-          }
-        >
-          Applications autorisées
-        </NavLink>
-      </li>
-      <li>
-        <NavLink
-          to={routes.account.oauth2.list}
-          className={({ isActive }) =>
-            isActive ? "sidebar__link sidebar__link--active" : "sidebar__link"
-          }
-        >
-          Mes applications
-        </NavLink>
-      </li>
-    </ul>
+    <Accordion defaultExpanded label="Intégration API">
+      <ul>
+        <li>
+          <NavLink
+            to={routes.account.tokens.list}
+            className={({ isActive }) =>
+              isActive
+                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                : "sidebarv2__item sidebarv2__item--indented"
+            }
+          >
+            Jetons d'accès API
+          </NavLink>
+        </li>
+        <li className="tw-mb-1">
+          <NavLink
+            to={routes.account.authorizedApplications}
+            className={({ isActive }) =>
+              isActive
+                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                : "sidebarv2__item sidebarv2__item--indented"
+            }
+          >
+            Applications autorisées
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to={routes.account.oauth2.list}
+            className={({ isActive }) =>
+              isActive
+                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                : "sidebarv2__item sidebarv2__item--indented"
+            }
+          >
+            Mes applications
+          </NavLink>
+        </li>
+      </ul>
+    </Accordion>
   </>
 );
 
 export default function AccountMenu() {
   return (
-    <SideMenu>
+    <SideBar>
       <AccountMenuContent />
-    </SideMenu>
+    </SideBar>
   );
 }
