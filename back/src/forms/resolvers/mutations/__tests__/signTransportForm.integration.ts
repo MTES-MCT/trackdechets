@@ -1230,5 +1230,50 @@ describe("signTransportForm", () => {
         "TRANSPORTER-PLATE-2"
       );
     });
+
+    it("should disallow signing the appendix1 item if there is no quantity & packaging infos", async () => {
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      await transporterReceiptFactory({ company });
+
+      const appendix1Item = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SIGNED_BY_PRODUCER,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          wasteDetailsPackagingInfos: [], // No packaging infos
+          wasteDetailsQuantity: null, // No quantity
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signTransportForm">,
+        MutationSignTransportFormArgs
+      >(SIGN_TRANSPORT_FORM, {
+        variables: {
+          id: appendix1Item.id,
+          input: {
+            takenOverAt: new Date().toISOString() as unknown as Date,
+            takenOverBy: "Collecteur annexe 1"
+          }
+        }
+      });
+
+      expect(errors.length).toBe(1);
+      expect(errors[0].message).toContain(
+        "Le nombre de contenants doit être supérieur à 0"
+      );
+      expect(errors[0].message).toContain("Le poids doit être supérieur à 0");
+    });
   });
 });
