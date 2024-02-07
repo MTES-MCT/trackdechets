@@ -126,11 +126,12 @@ export const mapRevision = (
           ? BOOLEAN_TRUE_LABEL
           : BOOLEAN_FALSE_LABEL
         : "",
-      dataNewValue: review?.bsda?.waste?.pop
-        ? review?.content?.waste?.code
-          ? BOOLEAN_TRUE_LABEL
-          : BOOLEAN_FALSE_LABEL
-        : ""
+      dataNewValue:
+        review?.content?.waste?.pop != null
+          ? review?.content?.waste?.code
+            ? BOOLEAN_TRUE_LABEL
+            : BOOLEAN_FALSE_LABEL
+          : ""
     },
     {
       dataName: DataNameEnum.WASTE_DESC,
@@ -176,11 +177,12 @@ export const mapRevision = (
           ? BOOLEAN_TRUE_LABEL
           : BOOLEAN_FALSE_LABEL
         : "",
-      dataNewValue: review?.form?.wasteDetails?.pop
-        ? review?.content?.wasteDetails?.pop
-          ? BOOLEAN_TRUE_LABEL
-          : BOOLEAN_FALSE_LABEL
-        : ""
+      dataNewValue:
+        review?.content?.wasteDetails?.pop != null
+          ? review?.content?.wasteDetails?.pop
+            ? BOOLEAN_TRUE_LABEL
+            : BOOLEAN_FALSE_LABEL
+          : ""
     },
     {
       dataName: DataNameEnum.CAP_FINAL_DEST,

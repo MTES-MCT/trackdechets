@@ -1,4 +1,8 @@
-import { RevisionRequestApprovalStatus } from "@td/codegen-ui";
+import {
+  BsdaRevisionRequestApproval,
+  FormRevisionRequestApproval,
+  RevisionRequestApprovalStatus
+} from "@td/codegen-ui";
 import React from "react";
 import { getActorName } from "../revisionServices";
 import {
@@ -7,11 +11,22 @@ import {
   IconDemandeur,
   IconRefuse
 } from "../../../../common/Components/Icons/Icons";
+import { ReviewInterface } from "../revisionMapper";
 
-const ActorStatus = ({ review }) => {
-  const approvals = review?.approvals
-    ?.map(approval => getActorName(review?.bsdContent, approval?.approverSiret))
-    ?.join(" ");
+const ActorStatus = ({ review }: { review: ReviewInterface }) => {
+  const approvalsGroupedByStatus = review?.approvals?.reduce(
+    (acc, approval) => {
+      acc[approval.status] ??= [];
+      acc[approval.status].push(approval as any);
+      return acc;
+    },
+    {} as {
+      [status: string]:
+        | BsdaRevisionRequestApproval[]
+        | FormRevisionRequestApproval[];
+    }
+  );
+
   return (
     <div className="revision-list__actors">
       <p className="revision-list__actors__title">Statut</p>
@@ -24,42 +39,33 @@ const ActorStatus = ({ review }) => {
           {`${review.authoringCompany?.name} - ${review.authoringCompany?.siret}`}
         </p>
       </div>
-      <div>
-        {review?.approvals?.[0].status ===
-          RevisionRequestApprovalStatus.Pending && (
-          <>
+      {Object.entries(approvalsGroupedByStatus).map(([status, approvals]) => (
+        <div key={status}>
+          {status === RevisionRequestApprovalStatus.Pending ? (
             <p className="actor-label">
               <IconAApprouver />
               &nbsp;A&nbsp;approuver
             </p>
-            <p className="actor-name">{approvals}</p>
-          </>
-        )}
-      </div>
-      <div>
-        {review?.approvals?.[0].status ===
-          RevisionRequestApprovalStatus.Refused && (
-          <>
+          ) : status === RevisionRequestApprovalStatus.Refused ? (
             <p className="actor-label">
               <IconRefuse />
               &nbsp; Refusée
             </p>
-            <p className="actor-name">{approvals}</p>
-          </>
-        )}
-      </div>
-      <div>
-        {review?.approvals?.[0].status ===
-          RevisionRequestApprovalStatus.Accepted && (
-          <>
+          ) : (
             <p className="actor-label">
               <IconApprouve />
               &nbsp; Approuvée
             </p>
-            <p className="actor-name">{approvals}</p>
-          </>
-        )}
-      </div>
+          )}
+          <p className="actor-name">
+            {approvals
+              .map(approval =>
+                getActorName(review?.bsdContent, approval?.approverSiret)
+              )
+              ?.join(" ")}
+          </p>
+        </div>
+      ))}
     </div>
   );
 };
