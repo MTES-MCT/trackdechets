@@ -30,8 +30,7 @@ const routes = {
       act: "/dashboard/:siret/bsds/act",
       follow: "/dashboard/:siret/bsds/follow",
       history: "/dashboard/:siret/bsds/history",
-      reviews: "/dashboard/:siret/bsds/review",
-      toReviewed: "/dashboard/:siret/bsds/to-review",
+      toReview: "/dashboard/:siret/bsds/to-review",
       reviewed: "/dashboard/:siret/bsds/reviewed"
     },
     bsdds: {
@@ -83,6 +82,7 @@ const routes = {
   account: {
     index: "/account",
     info: "/account/info",
+    // Old routes to keep integrations from breaking
     companies: {
       create: {
         simple: "/account/companies/new",
@@ -100,6 +100,16 @@ const routes = {
       edit: "/account/oauth2/edit/:id",
       list: "/account/oauth2/list"
     }
+  },
+  companies: {
+    index: "/companies",
+    create: {
+      simple: "/companies/new",
+      pro: "/companies/professional",
+      foreign: "/companies/foreign"
+    },
+    join: "/companies/join",
+    orientation: "/companies/create"
   }
 };
 

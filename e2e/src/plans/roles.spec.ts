@@ -176,7 +176,7 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       await userPage.reload();
 
       // Because user has no company, he should be redirected
-      await checkCurrentURL(userPage, "/account/companies");
+      await checkCurrentURL(userPage, "/companies");
     });
   });
 });

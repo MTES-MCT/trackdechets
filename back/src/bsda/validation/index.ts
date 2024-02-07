@@ -1,7 +1,8 @@
-import { Prisma, User } from "@prisma/client";
+import { Company, Prisma, User } from "@prisma/client";
 import { BsdaInput, BsdaSignatureType } from "../../generated/graphql/types";
 import { applyDynamicRefinement } from "./dynamicRefinements";
 import {
+  getCompaniesFunctions,
   getSignatureAncestors,
   getUnparsedBsda,
   getUpdatedFields,
@@ -17,6 +18,11 @@ export type BsdaValidationContext = {
   currentSignatureType?: BsdaSignatureType;
   user?: User;
 };
+
+export type SyncBsdaValidationContext = { userCompanies: Company[] } & Pick<
+  BsdaValidationContext,
+  "currentSignatureType"
+>;
 
 export const BsdaForParsingInclude = Prisma.validator<Prisma.BsdaInclude>()({
   intermediaries: true,
@@ -130,4 +136,45 @@ export async function parseBsdaInContext(
       transporterTransportSignatureDate
     }
   };
+}
+
+/**
+ * This is a sync equivalent of parseBsdaInContext.
+ * Being sync obviously means that dynamic parsing & transformation cannot be applied.
+ * This is for use cases where we need to validate a batch of bsdas quickly.
+ *
+ * @param unparsedInputs
+ * @param validationContext
+ * @param userCompanies
+ * @returns
+ */
+export function syncParseBsdaInContext(
+  unparsedInputs: UnparsedInputs,
+  validationContext: SyncBsdaValidationContext
+) {
+  const unparsedBsda = getUnparsedBsda(unparsedInputs);
+  const updatedFields = getUpdatedFields(unparsedInputs);
+  // Some signatures may be skipped, so always check all the hierarchy
+  const signaturesToCheck = getSignatureAncestors(
+    validationContext.currentSignatureType
+  );
+  const userFunctions = getCompaniesFunctions(
+    validationContext.userCompanies,
+    unparsedBsda
+  );
+
+  const contextualSchema = bsdaSchema.superRefine((val, ctx) => {
+    checkSealedAndRequiredFields(
+      {
+        bsda: val,
+        persistedBsda: unparsedInputs.persisted,
+        updatedFields,
+        userFunctions,
+        signaturesToCheck
+      },
+      ctx
+    );
+  });
+
+  return contextualSchema.parse(unparsedBsda);
 }

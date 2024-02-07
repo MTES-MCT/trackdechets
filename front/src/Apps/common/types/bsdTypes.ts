@@ -1,10 +1,9 @@
 import {
-  Bsd,
   Bsda,
   BsdaDestination,
   BsdaEcoOrganisme,
   BsdaEmitter,
-  BsdaRevisionRequestApproval,
+  BsdaMetadata,
   Bsdasri,
   BsdasriDestination,
   BsdasriEcoOrganisme,
@@ -29,10 +28,8 @@ import {
   BsvhuTransporter,
   Emitter,
   EmitterType,
-  Form,
-  FormCompany,
   FormEcoOrganisme,
-  FormRevisionRequestApproval,
+  FormMetadata,
   FormStatus,
   InitialBsda,
   InitialBsdasri,
@@ -126,43 +123,13 @@ export interface BsdDisplay {
   forwardedIn?: Maybe<Bsda>;
   synthesizing?: Maybe<Array<InitialBsdasri>>;
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;
-  review?: {
-    approvals: FormRevisionRequestApproval[] & BsdaRevisionRequestApproval[];
-    authoringCompany: FormCompany;
-    status: TBsdStatusCode;
-    id: string;
-  };
   allowDirectTakeOver?: Maybe<Scalars["Boolean"]>;
   transporterCustomInfo?: string | Maybe<string[]>;
   transporterNumberPlate?: string | Maybe<string[]>;
   packagings?: Array<BsffPackaging>;
   synthesizedIn?: Maybe<Bsdasri>;
+  metadata?: FormMetadata | BsdaMetadata;
 }
-
-export type BsdWithReview = Bsd & {
-  review: {
-    approvals: FormRevisionRequestApproval[] & BsdaRevisionRequestApproval[];
-    authoringCompany: FormCompany;
-    status: TBsdStatusCode;
-    id: string;
-  };
-};
-export type FormWithReview = Form & {
-  review?: {
-    approvals: FormRevisionRequestApproval[] & BsdaRevisionRequestApproval[];
-    authoringCompany: FormCompany;
-    status: TBsdStatusCode;
-    id: string;
-  };
-};
-export type BsdaWithReview = Bsda & {
-  review: {
-    approvals: FormRevisionRequestApproval[] & BsdaRevisionRequestApproval[];
-    authoringCompany: FormCompany;
-    status: TBsdStatusCode;
-    id: string;
-  };
-};
 
 export enum WorkflowDisplayType {
   GRP = "Regroupement",

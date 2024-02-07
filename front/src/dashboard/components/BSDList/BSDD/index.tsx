@@ -8,7 +8,6 @@ import {
 } from "@td/codegen-ui";
 import { CellProps, CellValue } from "react-table";
 import { ActionButtonContext } from "../../../../common/components/ActionButton";
-import { BSDDActions } from "./BSDDActions/BSDDActions";
 import { IconBSDD } from "../../../../Apps/common/Components/Icons/Icons";
 import TransporterInfoEdit from "./TransporterInfoEdit";
 import { WorkflowAction } from "./WorkflowAction";
@@ -139,9 +138,5 @@ export const COLUMNS: Record<
         </ActionButtonContext.Provider>
       );
     }
-  },
-  actions: {
-    accessor: () => null,
-    Cell: ({ row }) => <BSDDActions form={row.original} />
   }
 };

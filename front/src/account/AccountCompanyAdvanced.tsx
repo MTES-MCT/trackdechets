@@ -44,7 +44,7 @@ export default function AccountCompanyAdvanced({
     refetchQueries: [GET_ME, { query: MY_COMPANIES, variables: { first: 10 } }],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      navigate(routes.account.companies.list);
+      navigate(routes.companies.index);
     }
   });
 

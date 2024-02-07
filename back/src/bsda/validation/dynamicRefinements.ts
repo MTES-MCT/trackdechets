@@ -1,6 +1,12 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
-import { isTransporterRefinement } from "../../common/validation/siret";
+import {
+  isDestinationRefinement,
+  isRegisteredVatNumberRefinement,
+  isBsdaEcoOrganismeRefinement,
+  isTransporterRefinement,
+  isWorkerRefinement
+} from "../../common/validation/siret";
 import { getReadonlyBsdaRepository } from "../repository";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { BsdaValidationContext } from "./index";
@@ -12,6 +18,37 @@ export async function applyDynamicRefinement(
   validationContext: BsdaValidationContext,
   ctx: RefinementCtx
 ) {
+  await applyFieldRefinement(
+    isDestinationRefinement,
+    "destinationCompanySiret",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isDestinationRefinement,
+    "destinationOperationNextDestinationCompanySiret",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isRegisteredVatNumberRefinement,
+    "transporterCompanyVatNumber",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isWorkerRefinement,
+    "workerCompanySiret",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isBsdaEcoOrganismeRefinement,
+    "ecoOrganismeSiret",
+    bsda,
+    ctx
+  );
+
   await isTransporterRefinement(
     {
       siret: bsda.transporterCompanySiret,
@@ -25,6 +62,18 @@ export async function applyDynamicRefinement(
   }
 
   await validateDestination(bsda, validationContext.currentSignatureType, ctx);
+}
+
+function applyFieldRefinement<T extends (value, ctx: RefinementCtx) => any>(
+  refinement: T,
+  field: keyof ZodBsda,
+  bsda: ZodBsda,
+  ctx: RefinementCtx
+) {
+  return refinement(bsda[field]!, {
+    ...ctx,
+    path: [...ctx.path, field]
+  });
 }
 
 async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
@@ -180,7 +229,6 @@ async function validateDestination(
   currentSignatureType: BsdaSignatureType | undefined,
   ctx: RefinementCtx
 ) {
-
   // Destination is freely editable until EMISSION signature.
   // Once transported, destination is not editable for anyone.
   // This is enforced by the sealing rules

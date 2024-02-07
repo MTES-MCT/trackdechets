@@ -14,7 +14,7 @@ export interface BsdAdditionalActionsButtonProps {
     onRevision?: Function;
     onAppendix1?: Function;
     onBsdSuite?: Function;
-    onDeleteReview?: Function;
+    onConsultReview?: Function;
     onEmitterDasriSign?: Function;
     onEmitterBsddSign?: Function;
   };

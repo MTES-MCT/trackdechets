@@ -88,7 +88,7 @@ export default function AccountCompanyList() {
       if (!companies || totalCount === 0) {
         if (!isFiltered) {
           // No results and we're not filtering, redirect to the create company screen
-          navigate(routes.account.companies.orientation);
+          navigate(routes.companies.orientation);
         }
       }
     }

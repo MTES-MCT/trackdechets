@@ -22,7 +22,7 @@ export const login = async (page: Page, { email, password }) => {
  * Logs a user out.
  */
 export const logout = async (page: Page) => {
-  await page.getByRole("button", { name: "Se déconnecter" }).click();
+  await page.getByTitle("Se déconnecter", { exact: true }).click();
 };
 
 /**
@@ -53,7 +53,7 @@ export const successfulLogin = async (page: Page, { email, password }) => {
 
   // Disconnect button should be visible
   await expect(
-    page.getByRole("button", { name: "Se déconnecter" })
+    page.getByTitle("Se déconnecter", { exact: true })
   ).toBeVisible();
 
   return { email, password };

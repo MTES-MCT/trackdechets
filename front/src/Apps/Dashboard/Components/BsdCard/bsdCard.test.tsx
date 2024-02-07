@@ -12,7 +12,6 @@ import {
 } from "@td/codegen-ui";
 import { BsdCurrentTab } from "../../../common/types/commonTypes";
 import { MockedProvider } from "@apollo/client/testing";
-import { BsdaWithReview, FormWithReview } from "../../../common/types/bsdTypes";
 import { MemoryRouter } from "react-router-dom";
 import { PermissionsProvider } from "../../../../common/contexts/PermissionsContext";
 
@@ -148,7 +147,7 @@ describe("Bsd card primary action label", () => {
       currentTransporterSiret: null,
       nextTransporterSiret: null,
       __typename: "Form"
-    } as unknown as FormWithReview;
+    } as unknown as Form;
 
     test("Bsdd", async () => {
       const onValidate = functionMock;
@@ -283,7 +282,7 @@ describe("Bsd card primary action label", () => {
         forwardedIn: null,
         groupedIn: null,
         __typename: "Bsda"
-      } as unknown as BsdaWithReview;
+      } as unknown as Bsda;
       const onValidate = functionMock;
       const { queryByTestId } = render(
         <PermissionsProvider
@@ -1360,7 +1359,7 @@ describe("Bsd card primary action label", () => {
         currentTransporterSiret: "",
         nextTransporterSiret: null,
         __typename: "Form"
-      } as unknown as FormWithReview;
+      } as unknown as Form;
 
       render(
         <PermissionsProvider

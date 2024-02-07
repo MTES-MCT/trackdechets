@@ -19,7 +19,7 @@ export default function AccountCompanyOrientation() {
               iconId: "ri-arrow-right-line",
               iconPosition: "right",
               onClick: () => {
-                navigate(routes.account.companies.create.simple);
+                navigate(routes.companies.create.simple);
               }
             }}
           >
@@ -43,7 +43,7 @@ export default function AccountCompanyOrientation() {
               iconId: "ri-arrow-right-line",
               iconPosition: "right",
               onClick: () => {
-                navigate(routes.account.companies.join);
+                navigate(routes.companies.join);
               },
             }}
           >
@@ -60,7 +60,7 @@ export default function AccountCompanyOrientation() {
               iconId: "ri-arrow-right-line",
               iconPosition: "right",
               onClick: () => {
-                navigate(routes.account.companies.create.pro);
+                navigate(routes.companies.create.pro);
               }
             }}
           >
@@ -81,7 +81,7 @@ export default function AccountCompanyOrientation() {
               iconId: "ri-arrow-right-line",
               iconPosition: "right",
               onClick: () => {
-                navigate(routes.account.companies.create.foreign);
+                navigate(routes.companies.create.foreign);
               }
             }}
           >

@@ -4,6 +4,7 @@ import CompanySelector from "../../../common/components/company/CompanySelector"
 import { Bsda, BsdaType, BsdaPickupSite } from "@td/codegen-ui";
 import WorkSite from "../../../common/components/work-site/WorkSite";
 import { getInitialCompany } from "../../../bsdd/utils/initial-state";
+import BsdaEcoOrganismes from "../../components/eco-organismes/EcoOrganismes";
 
 export function Emitter({ disabled }) {
   const { values, handleChange, setFieldValue } = useFormikContext<Bsda>();
@@ -141,6 +142,8 @@ export function Emitter({ disabled }) {
           modelKey="pickupSite"
         />
       )}
+
+      <BsdaEcoOrganismes name="ecoOrganisme" />
     </>
   );
 }

@@ -1,0 +1,66 @@
+.revision-list {
+  color: #161616;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 24px;
+
+  &__title {
+    font-size: 1.5rem; //24px
+    font-weight: 700;
+    line-height: 32px;
+    margin-bottom: 16px;
+  }
+  &__status {
+    display: flex;
+    align-items: center;
+
+    h3 {
+      color: #000;
+      font-weight: 700;
+      margin-right: 20px;
+    }
+  }
+  &__detail {
+    font-size: 0.75rem;
+    margin: 16px 0;
+    &__title {
+      font-weight: 700;
+    }
+  }
+  &__comments {
+    p {
+      font-weight: 700;
+    }
+    ul {
+      list-style: disc;
+      padding: 0 0 0 1rem;
+    }
+  }
+
+  &__actors {
+    margin: 16px 0;
+
+    &__title {
+      font-weight: 700;
+    }
+    div {
+      display: flex;
+      align-items: center;
+      .actor-label {
+        display: flex;
+        align-items: center;
+        width: 120px;
+        margin: 5px 12px 5px 0;
+      }
+      .actor-name {
+        text-transform: lowercase;
+      }
+      .actor-name:first-letter {
+        text-transform: capitalize;
+      }
+    }
+  }
+  .fr-btn {
+    justify-self: flex-end;
+  }
+}

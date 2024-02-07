@@ -32,19 +32,14 @@ import ActBsdSuiteValidation from "../Validation/Act/ActBsdSuiteValidation";
 import ActBsdaValidation from "../Validation/Act/ActBsdaValidation";
 import ActBsffValidation from "../Validation/Act/ActBsffValidation";
 import ActBsvhuValidation from "../Validation/Act/ActBsvhuValidation";
-import { BsdDisplay, BsdWithReview } from "../../../common/types/bsdTypes";
-import { BsddCancelRevision } from "../../../../dashboard/components/RevisionRequestList/bsdd/approve/BsddCancelRevision";
-import { BsdaCancelRevision } from "../../../../dashboard/components/RevisionRequestList/bsda/approve/BsdaCancelRevision";
+import { BsdDisplay } from "../../../common/types/bsdTypes";
 import {
   canApproveOrRefuseReview,
+  canDeleteReview,
   hasEmportDirect,
   hasRoadControlButton,
   isSynthesis
 } from "../../dashboardServices";
-import { BsddApproveRevision } from "../../../../dashboard/components/RevisionRequestList/bsdd/approve";
-import { BsdaApproveRevision } from "../../../../dashboard/components/RevisionRequestList/bsda/approve/BsdaApproveRevision";
-import { BsddConsultRevision } from "../../../../dashboard/components/RevisionRequestList/bsdd/approve/BsddConsultRevision";
-import { BsdaConsultRevision } from "../../../../dashboard/components/RevisionRequestList/bsda/approve/BsdaConsultRevision";
 import { default as TransporterInfoEditBsdd } from "../../../../dashboard/components/BSDList/BSDD/TransporterInfoEdit";
 import { TransporterInfoEdit as TransporterInfoEditBsda } from "../../../../dashboard/components/BSDList/BSDa/WorkflowAction/TransporterInfoEdit";
 import { UpdateTransporterCustomInfo } from "../../../../dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterCustomInfo";
@@ -52,7 +47,8 @@ import { BsffFragment } from "../../../../dashboard/components/BSDList/BSFF";
 import { UpdateTransporterPlates } from "../../../../dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterPlates";
 import { UpdateBsdasriTransporterPlates } from "../../../../dashboard/components/BSDList/BSDasri/BSDasriActions/UpdateBsdasriTransporterPlates";
 import { UpdateBsdasriTransporterInfo } from "../../../../dashboard/components/BSDList/BSDasri/BSDasriActions/UpdateBsdasriTransporterInfo";
-import { mapBsdasri } from "../../bsdMapper";
+import { formatBsd, mapBsdasri } from "../../bsdMapper";
+import RevisionModal, { ActionType } from "../Revision/RevisionModal";
 
 function BsdCardList({
   siret,
@@ -62,7 +58,8 @@ function BsdCardList({
 }: BsdCardListProps): JSX.Element {
   const navigate = useNavigate();
   const location = useLocation();
-  const isReviewsTab = bsdCurrentTab === "reviewsTab";
+  const isReviewsTab =
+    bsdCurrentTab === "reviewedTab" || bsdCurrentTab === "toReviewTab";
   const isActTab = bsdCurrentTab === "actTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
@@ -212,8 +209,7 @@ function BsdCardList({
   );
 
   const handleReviewsValidation = useCallback(
-    (bsd: Bsd | BsdWithReview, siret: string) => {
-      //@ts-ignore
+    (bsd: Form | Bsda, siret: string) => {
       if (canApproveOrRefuseReview(bsd, siret)) {
         setBsdClicked(bsd);
         if (bsd.__typename === "Form") {
@@ -226,12 +222,21 @@ function BsdCardList({
         }
       } else {
         setBsdClicked(bsd);
+        const bsdDisplay = formatBsd(bsd);
         if (bsd.__typename === "Form") {
-          setValidationWorkflowType("REVIEW_BSDD_CONSULT");
+          if (canDeleteReview(bsdDisplay!, siret)) {
+            setValidationWorkflowType("REVIEW_BSDD_DELETE");
+          } else {
+            setValidationWorkflowType("REVIEW_BSDD_CONSULT");
+          }
           setIsModalOpen(true);
         }
         if (bsd.__typename === "Bsda") {
-          setValidationWorkflowType("REVIEW_BSDA_CONSULT");
+          if (canDeleteReview(bsdDisplay!, siret)) {
+            setValidationWorkflowType("REVIEW_BSDA_DELETE");
+          } else {
+            setValidationWorkflowType("REVIEW_BSDA_CONSULT");
+          }
           setIsModalOpen(true);
         }
       }
@@ -240,9 +245,9 @@ function BsdCardList({
   );
 
   const onBsdValidation = useCallback(
-    (bsd: Bsd | BsdWithReview) => {
+    (bsd: Bsd) => {
       if (isReviewsTab) {
-        handleReviewsValidation(bsd, siret);
+        handleReviewsValidation(bsd as Form | Bsda, siret);
       } else {
         const status =
           bsd.status ||
@@ -347,12 +352,12 @@ function BsdCardList({
     [redirectToPath]
   );
 
-  const onDeleteReview = useCallback((bsd: BsdDisplay) => {
+  const onConsultReview = useCallback((bsd: BsdDisplay) => {
     if (bsd.type === BsdType.Bsdd) {
-      setValidationWorkflowType("REVIEW_BSDD_DELETE");
+      setValidationWorkflowType("REVIEW_BSDD_CONSULT");
     }
     if (bsd.type === BsdType.Bsda) {
-      setValidationWorkflowType("REVIEW_BSDA_DELETE");
+      setValidationWorkflowType("REVIEW_BSDA_CONSULT");
     }
     setBsdClicked(bsd);
     setIsModalOpen(true);
@@ -376,34 +381,15 @@ function BsdCardList({
   return (
     <>
       <ul className="bsd-card-list">
-        {bsds?.map(({ node }, index) => {
-          let bsdNode = node;
-          let key = `${node.id}${node.status}`;
-          // A supprimer le block isReviewsTab quand on pourra afficher une révision avec la requete bsds
-          if (isReviewsTab) {
-            // format reviews from bsdd and bsda in one list
-            // BSDD
-            const newBsddNode = { ...node?.form };
-            const reviewBsdd = { ...node };
-            delete reviewBsdd?.form;
-            newBsddNode.review = reviewBsdd;
-            // BSDA
-            const newBsdaNode = { ...node?.bsda };
-            const reviewBsda = { ...node };
-            delete reviewBsda?.bsda;
-            newBsddNode.review = reviewBsdd;
-            bsdNode = { ...newBsddNode, ...newBsdaNode };
-            key = `${node.id}${node.status}${index}`;
-          }
-
+        {bsds?.map(({ node }) => {
+          const key = `${node.id}${node.status}`;
           const hasAutomaticSignature = siretsWithAutomaticSignature?.includes(
-            bsdNode?.emitter?.company?.siret
+            node?.emitter?.company?.siret
           );
-
           return (
             <li className="bsd-card-list__item" key={key}>
               <BsdCard
-                bsd={bsdNode}
+                bsd={node}
                 currentSiret={siret}
                 bsdCurrentTab={bsdCurrentTab}
                 onValidate={onBsdValidation}
@@ -414,7 +400,7 @@ function BsdCardList({
                   onRevision: onBsdRevision,
                   onBsdSuite,
                   onAppendix1,
-                  onDeleteReview,
+                  onConsultReview,
                   onEmitterDasriSign,
                   onEmitterBsddSign
                 }}
@@ -477,52 +463,52 @@ function BsdCardList({
         />
       )}
 
-      {validationWorkflowType === "REVIEW_BSDD_DELETE" && (
-        <BsddCancelRevision
-          // @ts-ignore
-          review={bsdClicked?.review}
-          isModalOpenFromParent={isModalOpen}
+      {validationWorkflowType === "REVIEW_BSDD_DELETE" && isModalOpen && (
+        <RevisionModal
+          bsdId={bsdClicked?.id!}
+          bsdType={BsdType.Bsdd}
           onModalCloseFromParent={onClose}
+          actionType={ActionType.DELETE}
         />
       )}
-      {validationWorkflowType === "REVIEW_BSDA_DELETE" && (
-        <BsdaCancelRevision
-          // @ts-ignore
-          review={bsdClicked?.review}
-          isModalOpenFromParent={isModalOpen}
+      {validationWorkflowType === "REVIEW_BSDA_DELETE" && isModalOpen && (
+        <RevisionModal
+          bsdId={bsdClicked?.id!}
+          bsdType={BsdType.Bsda}
           onModalCloseFromParent={onClose}
+          actionType={ActionType.DELETE}
         />
       )}
-      {validationWorkflowType === "REVIEW_BSDD_APPROVE" && (
-        <BsddApproveRevision
-          // @ts-ignore
-          review={bsdClicked}
-          isModalOpenFromParent={isModalOpen}
+      {validationWorkflowType === "REVIEW_BSDD_APPROVE" && isModalOpen && (
+        <RevisionModal
+          bsdId={bsdClicked?.id!}
+          bsdType={BsdType.Bsdd}
           onModalCloseFromParent={onClose}
+          actionType={ActionType.UPDATE}
         />
       )}
-      {validationWorkflowType === "REVIEW_BSDA_APPROVE" && (
-        <BsdaApproveRevision
-          // @ts-ignore
-          review={bsdClicked}
-          isModalOpenFromParent={isModalOpen}
+      {validationWorkflowType === "REVIEW_BSDA_APPROVE" && isModalOpen && (
+        <RevisionModal
+          bsdId={bsdClicked?.id!}
+          bsdType={BsdType.Bsda}
           onModalCloseFromParent={onClose}
+          actionType={ActionType.UPDATE}
         />
       )}
-      {validationWorkflowType === "REVIEW_BSDD_CONSULT" && (
-        <BsddConsultRevision
-          // @ts-ignore
-          review={bsdClicked}
-          isModalOpenFromParent={isModalOpen}
+      {validationWorkflowType === "REVIEW_BSDD_CONSULT" && isModalOpen && (
+        <RevisionModal
+          bsdId={bsdClicked?.id!}
+          bsdType={BsdType.Bsdd}
           onModalCloseFromParent={onClose}
+          actionType={ActionType.CONSUlT}
         />
       )}
-      {validationWorkflowType === "REVIEW_BSDA_CONSULT" && (
-        <BsdaConsultRevision
-          // @ts-ignore
-          review={bsdClicked}
-          isModalOpenFromParent={isModalOpen}
+      {validationWorkflowType === "REVIEW_BSDA_CONSULT" && isModalOpen && (
+        <RevisionModal
+          bsdId={bsdClicked?.id!}
+          bsdType={BsdType.Bsda}
           onModalCloseFromParent={onClose}
+          actionType={ActionType.CONSUlT}
         />
       )}
       {validationWorkflowType === "UPDATE_CUSTOM_INFO_BSDD" && (

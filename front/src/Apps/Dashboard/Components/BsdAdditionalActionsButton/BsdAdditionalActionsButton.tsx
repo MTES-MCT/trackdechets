@@ -2,8 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import classnames from "classnames";
 import FocusTrap from "focus-trap-react";
 import {
+  CONSULTER_REVISION,
   FAIRE_SIGNER,
-  SUPRIMER_REVISION,
   VALIDER_TRAITEMENT,
   annexe1,
   apercu_action_label,
@@ -46,7 +46,7 @@ function BsdAdditionalActionsButton({
     onRevision,
     onAppendix1,
     onBsdSuite,
-    onDeleteReview,
+    onConsultReview,
     onEmitterDasriSign,
     onEmitterBsddSign
   },
@@ -122,9 +122,9 @@ function BsdAdditionalActionsButton({
     onAppendix1!(bsd);
   };
 
-  const handleReviewDelete = () => {
+  const handleReviewConsult = () => {
     closeMenu();
-    onDeleteReview!(bsd);
+    onConsultReview!(bsd);
   };
 
   const handleDasriEmitterSign = () => {
@@ -198,9 +198,9 @@ function BsdAdditionalActionsButton({
                   data-testid="review-btn"
                   className="fr-btn fr-btn--tertiary-no-outline"
                   tabIndex={tabIndex}
-                  onClick={handleReviewDelete}
+                  onClick={handleReviewConsult}
                 >
-                  {SUPRIMER_REVISION}
+                  {CONSULTER_REVISION}
                 </button>
               </li>
             )}
