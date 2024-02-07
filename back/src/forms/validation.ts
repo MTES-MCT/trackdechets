@@ -1621,17 +1621,20 @@ export async function validateBeforeTransport(
     abortEarly: false
   });
 
-  if (form.emitterType !== "APPENDIX1_PRODUCER") {
-    // Vérifie qu'au moins un packaging a été déini sauf dans le cas
-    // d'un bordereau d'annexe 1 pour lequel il est possible de ne pas définir
-    // de packaging
-    const wasteDetailsBeforeTransportSchema = yup.object({
-      wasteDetailsPackagingInfos: yup
-        .array()
-        .min(1, "Le nombre de contenants doit être supérieur à 0")
-    });
-    await wasteDetailsBeforeTransportSchema.validate(form);
-  }
+  const wasteDetailsBeforeTransportSchema = yup.object({
+    wasteDetailsPackagingInfos: yup
+      .array()
+      .min(1, "Le nombre de contenants doit être supérieur à 0"),
+    // wasteDetailsQuantity is usually required for the producer signature
+    // But for APPENDIX1_PRODUCER, it's only for the transporter signature
+    wasteDetailsQuantity: weight(WeightUnits.Tonne).test(
+      "is-not-zero",
+      "Le poids doit être supérieur à 0",
+      value => value != null && value > 0
+    )
+  });
+  await wasteDetailsBeforeTransportSchema.validate(form, { abortEarly: false });
+
   return form;
 }
 

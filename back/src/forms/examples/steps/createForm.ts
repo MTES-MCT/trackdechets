@@ -197,6 +197,10 @@ export function createAppendix1ProducerForm(
           emitter: {
             type: "APPENDIX1_PRODUCER",
             company: fixtures.emitterCompanyInput(producteur.siret)
+          },
+          wasteDetails: {
+            packagingInfos: [{ type: "CITERNE", quantity: 1 }],
+            quantity: 1
           }
         }
       };
