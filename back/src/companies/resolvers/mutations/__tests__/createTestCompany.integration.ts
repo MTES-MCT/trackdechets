@@ -6,11 +6,10 @@ import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { generateTestSiret } from "../createTestCompany";
 import * as utils from "../../../../utils";
-import { TEST_COMPANY_PREFIX } from "../../../../../../libs/shared/constants/src";
+import { TEST_COMPANY_PREFIX } from "@td/constants";
 
 jest.mock("../../../../utils", () => ({
   __esModule: true,
-  // @ts-ignore
   ...jest.requireActual("../../../../utils")
 }));
 
