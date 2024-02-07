@@ -2,34 +2,41 @@ import * as React from "react";
 import { Formik, Form, Field } from "formik";
 import toast from "react-hot-toast";
 import { gql, useMutation } from "@apollo/client";
-import { Mutation, MutationReindexBsdArgs } from "@td/codegen-ui";
+import { Mutation, MutationReindexBsdsArgs } from "@td/codegen-ui";
 import { InlineError } from "../../Apps/common/Components/Error/Error";
 import { TOAST_DURATION } from "../../common/config";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
-const REINDEX_BSD = gql`
-  mutation reindexBsd($id: ID!) {
-    reindexBsd(id: $id)
+const REINDEX_BSDS = gql`
+  mutation reindexBsds($ids: String!) {
+    reindexBsds(ids: $ids)
   }
 `;
 function Reindex() {
   const [reindexBsd, { loading, error }] = useMutation<
-    Pick<Mutation, "reindexBsd">,
-    MutationReindexBsdArgs
-  >(REINDEX_BSD);
+    Pick<Mutation, "reindexBsds">,
+    MutationReindexBsdsArgs
+  >(REINDEX_BSDS);
+
+  // TODO: bigger input!
 
   return (
-    <div className="tw-mx-2">
+    <div className="fr-m-4w">
       <Formik
         initialValues={{
-          bsdid: ""
+          ids: ""
         }}
         onSubmit={async (values, { resetForm }) => {
-          const res = await reindexBsd({ variables: { id: values.bsdid } });
+          const res = await reindexBsd({ variables: { ids: values.ids } });
           resetForm();
-          !!res?.data?.reindexBsd
-            ? toast.success(`Réindexation effectuée`, {
-                duration: TOAST_DURATION
-              })
+          !!res?.data?.reindexBsds
+            ? toast.success(
+                `Réindexation effectuée: ${res.data.reindexBsds.join(", ")}`,
+                {
+                  duration: TOAST_DURATION
+                }
+              )
             : toast.error(`Cet identifiant ne correspond pas à un bordereau`, {
                 duration: TOAST_DURATION
               });
@@ -37,7 +44,26 @@ function Reindex() {
       >
         {() => (
           <Form>
-            <div className="form__row">
+            <Field name="ids">
+              {({ field }) => {
+                return (
+                  <Input
+                    textArea
+                    label="ID du ou des BSD à réindexer:"
+                    state={error ? "error" : "default"}
+                    stateRelatedMessage={<>{error}</>}
+                    disabled={loading}
+                    nativeTextAreaProps={field}
+                  />
+                );
+              }}
+            </Field>
+
+            <Button size="medium" type="submit" disabled={loading}>
+              Réindexer
+            </Button>
+
+            {/* <div className="form__row">
               <label>
                 ID du bsd à réindexer
                 <Field
@@ -54,7 +80,7 @@ function Reindex() {
               disabled={loading}
             >
               {loading ? "Réindexation..." : "Réindexer"}
-            </button>
+            </button> */}
           </Form>
         )}
       </Formik>
