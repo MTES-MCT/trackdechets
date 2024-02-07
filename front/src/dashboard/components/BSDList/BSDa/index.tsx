@@ -3,10 +3,6 @@ import { CellProps, CellValue } from "react-table";
 
 import { Bsda, BsdaStatus, BsdaType } from "@td/codegen-ui";
 import { IconBSDa } from "../../../../Apps/common/Components/Icons/Icons";
-import { BSDaActions } from "./BSDaActions/BSDaActions";
-import { useParams } from "react-router-dom";
-import { ActionButtonContext } from "../../../../common/components/ActionButton";
-import { WorkflowAction } from "./WorkflowAction/WorkflowAction";
 import { TransporterInfoEdit } from "./WorkflowAction/TransporterInfoEdit";
 
 const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
@@ -98,20 +94,5 @@ export const COLUMNS: Record<
         return "Annexé à un bordereau suite.";
       return bsdaVerboseStatuses[status];
     }
-  },
-  workflow: {
-    accessor: () => null,
-    Cell: ({ row }) => {
-      const { siret } = useParams<{ siret: string }>();
-      return (
-        <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret!} form={row.original} />
-        </ActionButtonContext.Provider>
-      );
-    }
-  },
-  actions: {
-    accessor: () => null,
-    Cell: ({ row }) => <BSDaActions form={row.original} />
   }
 };

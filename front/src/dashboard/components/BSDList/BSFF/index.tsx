@@ -1,7 +1,6 @@
 import * as React from "react";
 import { CellProps, CellValue } from "react-table";
 import { IconBSFF } from "../../../../Apps/common/Components/Icons/Icons";
-import { BsffActions } from "./BsffActions/BsffActions";
 import { BsffFragment } from "./types";
 import { ActionButtonContext } from "../../../../common/components/ActionButton";
 import { WorkflowAction } from "./WorkflowAction";
@@ -95,12 +94,6 @@ export const COLUMNS: Record<
           <WorkflowAction form={row.original} />
         </ActionButtonContext.Provider>
       );
-    }
-  },
-  actions: {
-    accessor: () => null,
-    Cell: ({ row }) => {
-      return <BsffActions form={row.original} />;
     }
   }
 };

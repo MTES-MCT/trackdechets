@@ -2,10 +2,6 @@ import * as React from "react";
 import { CellProps, CellValue } from "react-table";
 import { IconBSVhu } from "../../../../Apps/common/Components/Icons/Icons";
 import { Bsvhu, BsvhuStatus } from "@td/codegen-ui";
-import { BSVhuActions } from "./BSVhuActions/BSVhuActions";
-import { useParams } from "react-router-dom";
-import { ActionButtonContext } from "../../../../common/components/ActionButton";
-import { WorkflowAction } from "./WorkflowAction";
 
 const vhuVerboseStatuses: Record<BsvhuStatus, string> = {
   INITIAL: "Initial",
@@ -60,20 +56,5 @@ export const COLUMNS: Record<
   status: {
     accessor: vhu =>
       vhu.isDraft ? "Brouillon" : vhuVerboseStatuses[vhu["bsvhuStatus"]] // unable to use dot notation because of conflicting status fields
-  },
-  workflow: {
-    accessor: () => null,
-    Cell: ({ row }) => {
-      const { siret } = useParams<{ siret: string }>();
-      return (
-        <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret!} form={row.original} />
-        </ActionButtonContext.Provider>
-      );
-    }
-  },
-  actions: {
-    accessor: () => null,
-    Cell: ({ row }) => <BSVhuActions form={row.original} />
   }
 };
