@@ -60,3 +60,5 @@ export { closeMongoClient } from "./events/mongodb";
 export { hashPassword } from "./users/utils";
 export { generateTestSiret } from "./companies/resolvers/mutations/createTestCompany";
 export { createUser } from "./users/database";
+export { default as getReadableId, ReadableIdPrefix } from "./forms/readableId";
+export { reindex } from "./bsds/indexation/reindexBsdHelpers";
