@@ -10,8 +10,6 @@ interface BsdasriOpt {
   destination?: Company;
 }
 
-[{ emissionNumero: "", type: "BOUTEILLE", weight: 1, numero: "" }];
-
 const optToBsdasriCreateInput = (
   opt: BsdasriOpt
 ): Prisma.BsdasriCreateInput => {

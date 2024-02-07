@@ -21,8 +21,6 @@ interface BsffOpt {
   transporter?: Company;
 }
 
-[{ emissionNumero: "", type: "BOUTEILLE", weight: 1, numero: "" }];
-
 const optToBsffCreateInput = (opt: BsffOpt): Prisma.BsffCreateInput => {
   return {
     id: getReadableId(ReadableIdPrefix.FF),

@@ -16,7 +16,7 @@ import {
   QuickFilterLabel
 } from "../utils/dashboardFilters";
 
-test.describe.serial("Cahier de recette de gestion des membres", async () => {
+test.describe.serial("Cahier des filtres rapides", async () => {
   // Credentials
   const USER_NAME = "User e2e Filtres rapides";
   const USER_EMAIL = "user.e2e.quickfilters@mail.com";
@@ -231,7 +231,6 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
       });
     });
 
-    // Default results for this company, for this menu
     const DEFAULT_COMPANY_A_RESULTS = [
       bsdd1,
       bsdd3,
@@ -509,7 +508,6 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
         // Select correct company & bsd menu
         await selectCompany(page, companies.companyA.siret);
         await selectBsdMenu(page, "Tous les bordereaux");
-
         await expectFilteredResults(page, DEFAULT_COMPANY_A_RESULTS);
 
         // User 1st filter
@@ -538,10 +536,9 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
         // Select correct company & bsd menu
         await selectCompany(page, companies.companyA.siret);
         await selectBsdMenu(page, "Tous les bordereaux");
-
         await expectFilteredResults(page, DEFAULT_COMPANY_A_RESULTS);
 
-        // User 1st filter
+        // User filter
         await quickFilter(page, {
           label: "N° de BSD / contenant",
           value: "BSDA-"

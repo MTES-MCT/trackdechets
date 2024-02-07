@@ -9,8 +9,6 @@ interface BsvhuOpt {
   transporter?: Company;
 }
 
-[{ emissionNumero: "", type: "BOUTEILLE", weight: 1, numero: "" }];
-
 const optToBsvhuCreateInput = (opt: BsvhuOpt): Prisma.BsvhuCreateInput => {
   return {
     id: getReadableId(ReadableIdPrefix.VHU),
