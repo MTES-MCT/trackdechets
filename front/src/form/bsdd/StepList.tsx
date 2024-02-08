@@ -20,7 +20,6 @@ import {
 } from "./utils/initial-state";
 import { formSchema } from "./utils/schema";
 import { CREATE_FORM, GET_FORM, UPDATE_FORM } from "./utils/queries";
-import { GET_BSDS } from "../../Apps/common/queries";
 import { Loader } from "../../Apps/common/Components";
 import { toastApolloError } from "../common/stepper/toaster";
 import { IStepContainerProps } from "../common/stepper/Step";
@@ -55,12 +54,12 @@ export default function StepsList(props: Props) {
   const [createForm, { loading: creating }] = useMutation<
     Pick<Mutation, "createForm">,
     MutationCreateFormArgs
-  >(CREATE_FORM, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+  >(CREATE_FORM);
 
   const [updateForm, { loading: updating }] = useMutation<
     Pick<Mutation, "updateForm">,
     MutationUpdateFormArgs
-  >(UPDATE_FORM, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+  >(UPDATE_FORM);
 
   const [createFormTransporter, { loading: creatingFormTransporter }] =
     useMutation<

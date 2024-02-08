@@ -12,7 +12,6 @@ import { RedErrorMessage } from "../../../../../common/components";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import { SIGN_BSFF } from "../../../../../form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 
@@ -33,7 +32,7 @@ function SignEmissionForm({ bsff, onCancel }: SignEmissionFormProps) {
   const [signBsff, signBsffResult] = useMutation<
     Pick<Mutation, "signBsff">,
     MutationSignBsffArgs
-  >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+  >(SIGN_BSFF);
 
   const TODAY = new Date();
 

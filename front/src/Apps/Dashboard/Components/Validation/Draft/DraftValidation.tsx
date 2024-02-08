@@ -9,7 +9,6 @@ import {
   MutationPublishBsvhuArgs
 } from "@td/codegen-ui";
 import { statusChangeFragment } from "../../../../common/queries/fragments";
-import { GET_BSDS } from "../../../../common/queries";
 import toast from "react-hot-toast";
 import { NotificationError } from "../../../../common/Components/Error/Error";
 import { Loader } from "../../../../common/Components";
@@ -66,8 +65,6 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
     MARK_AS_SEALED,
     {
       variables: { id: bsd.id },
-      refetchQueries: [GET_BSDS],
-      awaitRefetchQueries: true,
       onCompleted: data => {
         if (data.markAsSealed) {
           const sealedForm = data.markAsSealed;
@@ -90,8 +87,6 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
     PUBLISH_BSDA,
     {
       variables: { id: bsd.id },
-      refetchQueries: [GET_BSDS],
-      awaitRefetchQueries: true,
       onCompleted: () => {
         toast.success(`Bordereau ${bsd.id} publié`, {
           duration: TOAST_DURATION
@@ -108,9 +103,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
     Pick<Mutation, "publishBsff">,
     MutationPublishBsffArgs
   >(PUBLISH_BSFF, {
-    variables: { id: bsd.id },
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true
+    variables: { id: bsd.id }
   });
 
   const [publishBsvhu, { loading: loadingBsvhu, error: errorBsvhu }] =
@@ -118,8 +111,6 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
       PUBLISH_BSVHU,
       {
         variables: { id: bsd.id },
-        refetchQueries: [GET_BSDS],
-        awaitRefetchQueries: true,
         onCompleted: () => {
           toast.success(`Bordereau ${bsd.id} publié`, {
             duration: TOAST_DURATION

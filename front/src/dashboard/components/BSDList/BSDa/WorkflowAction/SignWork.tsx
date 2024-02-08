@@ -1,6 +1,5 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import routes from "../../../../../Apps/routes";
 import { UPDATE_BSDA } from "../../../../../form/bsda/stepper/queries";
 import { WasteInfoWorker } from "../../../../../form/bsda/stepper/steps/WasteInfo";
@@ -50,7 +49,7 @@ export function SignWork({
   const [signBsda, { loading, error: signatureError }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
-  >(SIGN_BSDA, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+  >(SIGN_BSDA);
 
   const TODAY = new Date();
 

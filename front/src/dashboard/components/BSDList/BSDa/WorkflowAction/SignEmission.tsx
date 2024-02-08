@@ -1,6 +1,5 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import routes from "../../../../../Apps/routes";
 import { Field, Form, Formik } from "formik";
 import {
@@ -41,10 +40,7 @@ export function SignEmission({
   const [signBsda, { loading, error }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
-  >(SIGN_BSDA, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true
-  });
+  >(SIGN_BSDA, {});
 
   const TODAY = new Date();
 

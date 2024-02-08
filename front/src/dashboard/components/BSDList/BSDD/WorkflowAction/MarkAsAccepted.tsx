@@ -14,7 +14,6 @@ import { Loader } from "../../../../../Apps/common/Components";
 import { IconWaterDam } from "../../../../../Apps/common/Components/Icons/Icons";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import AcceptedInfo from "./AcceptedInfo";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 
 const MARK_AS_ACCEPTED = gql`
@@ -39,8 +38,6 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
     Pick<Mutation, "markAsAccepted">,
     MutationMarkAsAcceptedArgs
   >(MARK_AS_ACCEPTED, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onError: () => {
       // The error is handled in the UI
     }

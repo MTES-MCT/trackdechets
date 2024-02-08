@@ -2,7 +2,6 @@ import { useMutation, useQuery } from "@apollo/client";
 import React, { lazy, ReactElement, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "../../../Apps/common/Components";
-import { GET_BSDS } from "../../../Apps/common/queries";
 import { getComputedState } from "../../common/getComputedState";
 
 import { IStepContainerProps } from "../../common/stepper/Step";
@@ -83,18 +82,12 @@ export default function BsdaStepsList(props: Props) {
   const [createBsda, { loading: creating }] = useMutation<
     Pick<Mutation, "createBsda">,
     MutationCreateBsdaArgs
-  >(CREATE_BSDA, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true
-  });
+  >(CREATE_BSDA);
 
   const [updateBsda, { loading: updating }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
-  >(UPDATE_BSDA, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true
-  });
+  >(UPDATE_BSDA);
 
   const cleanupFields = (input: BsdaInput): BsdaInput => {
     // When created through api, this field might be null in db

@@ -29,7 +29,6 @@ import {
   SIGN_BSFF,
   UPDATE_BSFF_PACKAGING
 } from "../../../../../form/bsff/utils/queries";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
 import { BsffSummary } from "./BsffSummary";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";
@@ -269,7 +268,7 @@ export function SignBsffOperationOnePackagingModalContent({
   const [signBsff, signBsffResult] = useMutation<
     Pick<Mutation, "signBsff">,
     MutationSignBsffArgs
-  >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+  >(SIGN_BSFF);
 
   const TODAY = new Date();
 
