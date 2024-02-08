@@ -170,7 +170,7 @@ export const TO_COLLECT = "À collecter";
 export const COLLECTED = "Collectés";
 export const REGISTER = "Registre";
 export const TO_REVIEW = "En cours";
-export const REVIEWED = "Révisé";
+export const REVIEWED = "Révisés";
 
 // Reviews
 export const GERER_REVISION = "Gérer la révision";

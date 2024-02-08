@@ -4,6 +4,11 @@ import { formatDate } from "../../../../../common/datetime";
 const TraderAndBrokerDetail = ({ detail }) => {
   if (!detail?.company?.name) return null;
 
+  const number = detail.receipt ?? detail?.recepisse?.number;
+  const department = detail.department ?? detail?.recepisse?.department;
+  const validityLimit =
+    detail.validityLimit ?? detail?.recepisse?.validityLimit;
+
   return (
     <>
       <div>
@@ -11,9 +16,8 @@ const TraderAndBrokerDetail = ({ detail }) => {
         {detail.company?.address}
       </div>
       <div>
-        Récepissé: {detail.receipt} - Département: {detail.department} - Date
-        limite de validité:{" "}
-        {detail.validityLimit ? formatDate(detail.validityLimit) : ""}
+        Récepissé: {number} - Département: {department} - Date limite de
+        validité: {validityLimit ? formatDate(validityLimit) : ""}
       </div>
     </>
   );
