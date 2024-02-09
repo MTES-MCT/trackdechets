@@ -1,6 +1,6 @@
-import { splitIntoBsdIds } from "../reindexBsdHelpers";
+import { splitIntoBsdIds } from "../reindexBsdsUtils";
 
-describe("reindexBsdHelpers", () => {
+describe("reindexBsdsUtils", () => {
   describe("splitIntoBsdIds", () => {
     test.each`
       input                                                                        | expected

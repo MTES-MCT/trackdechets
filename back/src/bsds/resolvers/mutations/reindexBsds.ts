@@ -2,7 +2,8 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 
 import { checkIsAdmin } from "../../../common/permissions";
 import { applyAuthStrategies, AuthType } from "../../../auth";
-import { reindex, splitIntoBsdIds } from "../../indexation/reindexBsdHelpers";
+import { reindex } from "../../indexation/reindexBsdHelpers";
+import { splitIntoBsdIds } from "../../indexation/reindexBsdsUtils";
 
 const reindexBsdsResolver: MutationResolvers["reindexBsds"] = async (
   _,
