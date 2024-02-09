@@ -27,6 +27,8 @@ import {
   addToSetCompanyDepartementQueue
 } from "../../../queue/producers/company";
 import { UserInputError } from "../../../common/errors";
+import { isForeignTransporter } from "../../validation";
+import { sendPostVerificationFirstOnboardingEmail } from "./verifyCompany";
 
 /**
  * Create a new company and associate it to a user
@@ -44,6 +46,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
+
+  console.log(JSON.stringify(companyInput, null, 4));
 
   const {
     codeNaf,
@@ -181,6 +185,13 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     };
   }
 
+  // Foreign transporter: automatically verify (no action needed)
+  if (isForeignTransporter({ companyTypes, vatNumber })) {
+    companyCreateInput.verificationMode = "AUTO";
+    companyCreateInput.verificationStatus = "VERIFIED";
+    companyCreateInput.verifiedAt = new Date();
+  }
+
   const companyAssociation = await prisma.companyAssociation.create({
     data: {
       user: { connect: { id: user.id } },
@@ -200,11 +211,12 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     data: { firstAssociationDate: new Date() }
   });
 
+  const isProfessional = company.companyTypes.some(ct => {
+    return PROFESSIONALS.includes(ct);
+  });
+
   if (VERIFY_COMPANY === "true") {
-    const isProfessional = company.companyTypes.some(ct => {
-      return PROFESSIONALS.includes(ct);
-    });
-    if (isProfessional) {
+    if (isProfessional && !isForeignTransporter({ companyTypes, vatNumber })) {
       await sendMail(
         renderMail(verificationProcessInfo, {
           to: [{ email: user.email, name: user.name }],
@@ -225,15 +237,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     });
   }
 
-  // If the company is NOT professional, send onboarding email
+  // If the company is NOT professional or is foreign transporter, send onboarding email
   // (professional onboarding mail is sent on verify)
-  if (![...company.companyTypes].some(ct => PROFESSIONALS.includes(ct))) {
-    await sendMail(
-      renderMail(onboardingFirstStep, {
-        to: [{ email: user.email, name: user.name }],
-        variables: { company }
-      })
-    );
+  if (!isProfessional || isForeignTransporter({ companyTypes, vatNumber })) {
+    await sendPostVerificationFirstOnboardingEmail(companyInput, user);
   }
 
   return convertUrls(company);

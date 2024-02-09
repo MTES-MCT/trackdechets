@@ -87,7 +87,9 @@ export default function CompaniesVerificationTable({
           } else {
             const verificationMode = row.original.verificationMode;
             if (verificationMode === CompanyVerificationMode.Letter) {
-              return <>Vérifié par code de sécurité"</>;
+              return <>Vérifié par code de sécurité</>;
+            } else if (verificationMode === CompanyVerificationMode.Auto) {
+              return <>Vérifié automatiquement</>;
             } else {
               const comment = row.original.verificationComment;
               const hasComment = comment && comment.length > 0;

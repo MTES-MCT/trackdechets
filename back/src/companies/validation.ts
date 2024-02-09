@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import { Company, CompanyType } from "@prisma/client";
+import { isForeignVat } from "@td/constants";
 
 export const receiptSchema = yup.object().shape({
   validityLimit: yup.date().required()
@@ -21,8 +22,22 @@ export function isWasteVehicles(company: Company) {
   return company.companyTypes.includes(CompanyType.WASTE_VEHICLES);
 }
 
-export function isTransporter(company: Company) {
-  return company.companyTypes.includes(CompanyType.TRANSPORTER);
+export function isTransporter({
+  companyTypes
+}: {
+  companyTypes: CompanyType[];
+}) {
+  return companyTypes.includes(CompanyType.TRANSPORTER);
+}
+
+export function isForeignTransporter({
+  companyTypes,
+  vatNumber
+}: {
+  companyTypes: CompanyType[];
+  vatNumber?: string | null;
+}) {
+  return isTransporter({ companyTypes }) && isForeignVat(vatNumber);
 }
 
 export function isWorker(company: Company) {
