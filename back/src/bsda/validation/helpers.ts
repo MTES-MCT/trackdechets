@@ -74,7 +74,7 @@ export function getUpdatedFields({
       : {})
   };
 
-  const diff = objectDiff(flatInput, compareTo);
+  const diff = objectDiff({ ...flatInput, ...flatTransporterInput }, compareTo);
 
   return Object.keys(diff);
 }
