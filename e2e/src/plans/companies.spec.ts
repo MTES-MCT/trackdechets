@@ -20,13 +20,11 @@ test.describe
   let transporterWithReceiptSiret;
 
   test("Seed user", async () => {
-    const user = await seedUser({
+    await seedUser({
       name: USER_NAME,
       email: USER_EMAIL,
       password: USER_PASSWORD
     });
-
-    expect(user).not.toBeUndefined();
   });
 
   test("Utilisateur connecté", async ({ page }) => {

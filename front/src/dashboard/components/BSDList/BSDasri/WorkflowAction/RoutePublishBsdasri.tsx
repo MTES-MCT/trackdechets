@@ -15,10 +15,7 @@ import Loader from "../../../../../Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation, gql } from "@apollo/client";
 import routes from "../../../../../Apps/routes";
 import { useParams, useNavigate, generatePath, Link } from "react-router-dom";
-import {
-  GET_DETAIL_DASRI_WITH_METADATA,
-  GET_BSDS
-} from "../../../../../Apps/common/queries";
+import { GET_DETAIL_DASRI_WITH_METADATA } from "../../../../../Apps/common/queries";
 import { TOAST_DURATION } from "../../../../../common/config";
 
 import EmptyDetail from "../../../../detail/common/EmptyDetailView";
@@ -54,8 +51,6 @@ export function RoutePublishBsdasri() {
       PUBLISH_BSDASRI,
       {
         variables: { id: formId! },
-        refetchQueries: [GET_BSDS],
-        awaitRefetchQueries: true,
         onCompleted: () => {
           toast.success(`Bordereau ${formId} publié`, {
             duration: TOAST_DURATION

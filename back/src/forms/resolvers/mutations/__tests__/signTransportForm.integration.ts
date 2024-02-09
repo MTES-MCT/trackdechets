@@ -1,4 +1,4 @@
-import { EmitterType, Status } from "@prisma/client";
+import { CompanyType, EmitterType, Status } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -1016,9 +1016,10 @@ describe("signTransportForm", () => {
       expect(appendix1Container.status).toBe(Status.SENT);
     });
 
-    it("should allow marking an unsigned appendix1 item as sent when there is an eco organisme", async () => {
+    it("should allow marking an unsigned appendix1 item as sent when there is an eco organisme and the emitter is a producer", async () => {
       const { company: producerCompany } = await userWithCompanyFactory(
-        "MEMBER"
+        "MEMBER",
+        { companyTypes: { set: [CompanyType.PRODUCER] } }
       );
       const { user, company } = await userWithCompanyFactory("MEMBER");
       await transporterReceiptFactory({ company });
@@ -1081,6 +1082,50 @@ describe("signTransportForm", () => {
         where: { id: container.id }
       });
       expect(appendix1Container.status).toBe(Status.SENT);
+    });
+
+    it("should not allow marking an unsigned appendix1 item as sent when there is an eco organisme but the emitter is a waste processor", async () => {
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER",
+        { companyTypes: { set: [CompanyType.WASTEPROCESSOR] } }
+      );
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      await transporterReceiptFactory({ company });
+
+      const appendix1Item = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SEALED, // Item is SEALED, not SIGNED_BY_PRODUCER
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          ecoOrganismeSiret: "49337909300039", // Container has an eco organisme (copied here)
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signTransportForm">,
+        MutationSignTransportFormArgs
+      >(SIGN_TRANSPORT_FORM, {
+        variables: {
+          id: appendix1Item.id,
+          input: {
+            takenOverAt: new Date().toISOString() as unknown as Date,
+            takenOverBy: "Collecteur annexe 1"
+          }
+        }
+      });
+
+      expect(errors.length).toBe(1);
+      expect(errors[0].message).toBe(
+        "Vous n'êtes pas autorisé à signer ce bordereau"
+      );
     });
 
     it("should update all forms with plate number", async () => {
@@ -1229,6 +1274,51 @@ describe("signTransportForm", () => {
       expect(parentTransportersBis?.transporterNumberPlate).toBe(
         "TRANSPORTER-PLATE-2"
       );
+    });
+
+    it("should disallow signing the appendix1 item if there is no quantity & packaging infos", async () => {
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      await transporterReceiptFactory({ company });
+
+      const appendix1Item = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SIGNED_BY_PRODUCER,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          wasteDetailsPackagingInfos: [], // No packaging infos
+          wasteDetailsQuantity: null, // No quantity
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret,
+              number: 1
+            }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signTransportForm">,
+        MutationSignTransportFormArgs
+      >(SIGN_TRANSPORT_FORM, {
+        variables: {
+          id: appendix1Item.id,
+          input: {
+            takenOverAt: new Date().toISOString() as unknown as Date,
+            takenOverBy: "Collecteur annexe 1"
+          }
+        }
+      });
+
+      expect(errors.length).toBe(1);
+      expect(errors[0].message).toContain(
+        "Le nombre de contenants doit être supérieur à 0"
+      );
+      expect(errors[0].message).toContain("Le poids doit être supérieur à 0");
     });
   });
 });

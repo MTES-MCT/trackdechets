@@ -11,7 +11,6 @@ import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
 import ProcessedInfo from "./ProcessedInfo";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import toast from "react-hot-toast";
 
 const MARK_AS_PROCESSED = gql`
@@ -28,8 +27,6 @@ function MarkAsProcessedModalContent({ data, onClose }) {
     Pick<Mutation, "markAsProcessed">,
     MutationMarkAsProcessedArgs
   >(MARK_AS_PROCESSED, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: data => {
       if (
         data.markAsProcessed &&

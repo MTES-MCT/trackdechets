@@ -13,7 +13,6 @@ import {
   fullFormFragment,
   vhuFragment
 } from "../../../common/queries/fragments";
-import { GET_BSDS } from "../../../common/queries";
 import { toastApolloError } from "../../../../form/common/stepper/toaster";
 
 const DUPLICATE_BSDASRI = gql`
@@ -73,8 +72,6 @@ export function useBsdasriDuplicate(
     MutationDuplicateBsdasriArgs
   >(DUPLICATE_BSDASRI, {
     ...options,
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: (...args) => {
       toast.success(message);
 
@@ -99,8 +96,6 @@ export function useBsdaDuplicate(
     MutationDuplicateBsdaArgs
   >(DUPLICATE_BSDA, {
     ...options,
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: (...args) => {
       toast.success(message);
 
@@ -125,8 +120,6 @@ export function useBsddDuplicate(
     MutationDuplicateFormArgs
   >(DUPLICATE_FORM, {
     ...options,
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: (...args) => {
       toast.success(message);
 
@@ -151,8 +144,6 @@ export function useBsffDuplicate(
     MutationDuplicateBsdaArgs
   >(DUPLICATE_BSFF, {
     ...options,
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: (...args) => {
       toast.success(message);
 
@@ -177,8 +168,6 @@ export function useBsvhuDuplicate(
     MutationDuplicateBsvhuArgs
   >(DUPLICATE_BSVHU, {
     ...options,
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: (...args) => {
       toast.success(message);
 

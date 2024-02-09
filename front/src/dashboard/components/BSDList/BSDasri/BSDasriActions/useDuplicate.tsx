@@ -2,7 +2,6 @@ import { gql, MutationHookOptions, useMutation } from "@apollo/client";
 import toast from "react-hot-toast";
 import { Mutation, MutationDuplicateBsdasriArgs } from "@td/codegen-ui";
 import { fullDasriFragment } from "../../../../../Apps/common/queries/fragments";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 
 const DUPLICATE_BSDASRI = gql`
   mutation DuplicateBsdasri($id: ID!) {
@@ -24,8 +23,6 @@ export function useBsdasriDuplicate(
     MutationDuplicateBsdasriArgs
   >(DUPLICATE_BSDASRI, {
     ...options,
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: (...args) => {
       toast.success(
         `Le bordereau a été dupliqué, il est disponible dans l'onglet "Brouillons"`

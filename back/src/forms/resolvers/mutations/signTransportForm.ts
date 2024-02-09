@@ -1,4 +1,4 @@
-import { EmitterType, Form, Prisma, Status } from "@prisma/client";
+import { CompanyType, EmitterType, Form, Prisma, Status } from "@prisma/client";
 import {
   MutationResolvers,
   Form as GraphQLForm,
@@ -26,6 +26,7 @@ import { Permission } from "../../../permissions";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { recipifyFormInput } from "../../recipify";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
+import { prisma } from "@td/prisma";
 
 export async function getFormReceiptField(transporter) {
   const recipifiedTransporter = await recipifyFormInput({
@@ -297,26 +298,14 @@ const signatures: Partial<
     const isForeignShip =
       existingForm.emitterIsForeignShip === true &&
       existingForm.emitterCompanyOmiNumber;
-    const transporter = await getFirstTransporter(existingForm);
-    const isAppendix1WithAutomaticSignature =
-      existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER &&
-      (existingForm.ecoOrganismeSiret ||
-        (transporter?.transporterCompanySiret &&
-          existingForm.emitterCompanySiret &&
-          (await hasSignatureAutomation({
-            signedBy: transporter?.transporterCompanySiret,
-            signedFor: existingForm.emitterCompanySiret
-          }))));
+    const hasSkippableEmitterSignature =
+      await canTransporterSignWithoutEmitterSignature(existingForm);
 
     // no signature needed for
     // - individuals
     // - foreign ships
-    // - appendix1 when signatureAutomation is enabled for the transporter, or the form has an eco organisme
-    if (
-      isPrivateIndividual ||
-      isForeignShip ||
-      isAppendix1WithAutomaticSignature
-    ) {
+    // - and sometimes with appendix1
+    if (isPrivateIndividual || isForeignShip || hasSkippableEmitterSignature) {
       return signTransportFn(user, args, existingForm);
     } else {
       throw new ForbiddenError(
@@ -397,5 +386,39 @@ const signTransportForm: MutationResolvers["signTransportForm"] = async (
 
   return sign(user, args, form);
 };
+
+async function canTransporterSignWithoutEmitterSignature(existingForm: Form) {
+  if (existingForm.emitterType !== EmitterType.APPENDIX1_PRODUCER) {
+    return false;
+  }
+
+  if (existingForm.ecoOrganismeSiret && existingForm.emitterCompanySiret) {
+    const emitterProfile = await prisma.company.findUnique({
+      where: { siret: existingForm.emitterCompanySiret }
+    });
+
+    if (
+      emitterProfile &&
+      [CompanyType.WASTEPROCESSOR, CompanyType.COLLECTOR].every(
+        profile => !emitterProfile.companyTypes.includes(profile)
+      )
+    ) {
+      return true;
+    }
+  }
+
+  const transporter = await getFirstTransporter(existingForm);
+  if (
+    transporter?.transporterCompanySiret &&
+    existingForm.emitterCompanySiret
+  ) {
+    return hasSignatureAutomation({
+      signedBy: transporter?.transporterCompanySiret,
+      signedFor: existingForm.emitterCompanySiret
+    });
+  }
+
+  return false;
+}
 
 export default signTransportForm;

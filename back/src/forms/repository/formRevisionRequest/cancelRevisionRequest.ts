@@ -3,6 +3,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 
 export type CancelRevisionRequestFn = (
   where: Prisma.BsddRevisionRequestWhereUniqueInput,
@@ -27,6 +28,16 @@ const buildCancelRevisionRequest: (
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+
+    const bsdd = await prisma.form.findUniqueOrThrow({
+      where: { id: deletedRevisionRequest.bsddId },
+      select: { readableId: true }
+    });
+
+    prisma.addAfterCommitCallback(() =>
+      enqueueUpdatedBsdToIndex(bsdd.readableId)
+    );
+
     return deletedRevisionRequest;
   };
 

@@ -14,7 +14,5 @@ export const getActorName = (bsd: Form | Bsda, siret: string): string => {
 
   const actor = actors.find(actor => actor?.company?.siret === siret);
 
-  return actor?.company?.name
-    ? `${actor?.company?.name} - ${actor?.company?.siret}`
-    : "";
+  return [actor?.company?.name, siret].filter(Boolean).join(" - ");
 };

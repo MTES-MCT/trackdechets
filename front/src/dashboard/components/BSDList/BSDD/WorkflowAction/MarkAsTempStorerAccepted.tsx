@@ -16,7 +16,6 @@ import { Loader } from "../../../../../Apps/common/Components";
 import { IconWarehouseStorage } from "../../../../../Apps/common/Components/Icons/Icons";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import AcceptedInfo from "./AcceptedInfo";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 
 const MARK_TEMP_STORER_ACCEPTED = gql`
@@ -49,8 +48,6 @@ export default function MarkAsTempStorerAccepted({
     Pick<Mutation, "markAsTempStorerAccepted">,
     MutationMarkAsTempStorerAcceptedArgs
   >(MARK_TEMP_STORER_ACCEPTED, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onError: () => {
       // The error is handled in the UI
     }

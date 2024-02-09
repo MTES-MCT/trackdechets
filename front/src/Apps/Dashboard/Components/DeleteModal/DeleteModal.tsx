@@ -13,7 +13,6 @@ import {
 } from "@td/codegen-ui";
 import toast from "react-hot-toast";
 import TdModal from "../../../common/Components/Modal/Modal";
-import { GET_BSDS } from "../../../common/queries";
 import { Loader } from "../../../common/Components";
 
 const DELETE_BSDA = gql`
@@ -68,8 +67,6 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     MutationDeleteBsdaArgs
   >(DELETE_BSDA, {
     variables: { id: bsdId },
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: () => {
       toast.success(messageSuccess, { duration: TOAST_DURATION });
       !!onClose && onClose();
@@ -84,8 +81,6 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     MutationDeleteBsdasriArgs
   >(DELETE_BSDASRI, {
     variables: { id: bsdId },
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: () => {
       toast.success(messageSuccess, { duration: TOAST_DURATION });
       !!onClose && onClose();
@@ -101,8 +96,6 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     MutationDeleteFormArgs
   >(DELETE_FORM, {
     variables: { id: bsdId },
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: () => {
       toast.success(messageSuccess, { duration: TOAST_DURATION });
       !!onClose && onClose();
@@ -118,8 +111,6 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     MutationDeleteBsffArgs
   >(DELETE_BSFF, {
     variables: { id: bsdId },
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: () => {
       toast.success(messageSuccess, { duration: TOAST_DURATION });
       !!onClose && onClose();
@@ -135,8 +126,6 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     MutationDeleteBsvhuArgs
   >(DELETE_BSVHU, {
     variables: { id: bsdId },
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: () => {
       toast.success(messageSuccess, { duration: TOAST_DURATION });
       !!onClose && onClose();

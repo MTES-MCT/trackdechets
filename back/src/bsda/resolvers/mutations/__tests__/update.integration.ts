@@ -1328,4 +1328,38 @@ describe("Mutation.updateBsda", () => {
     expect(updatedBsda?.workerCertificationValidityLimit).toBeNull();
     expect(updatedBsda?.workerCertificationOrganisation).toBeNull();
   });
+
+  it("should be possible to re-send same transporter data after transporter signature", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SENT",
+        transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterTransportSignatureDate: new Date(),
+        transporterTransportTakenOverAt: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          transporter: {
+            company: {
+              siret: bsda.transporters[0].transporterCompanySiret
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+  });
 });
