@@ -9,6 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout du code déchet 16 03 05\* sur les BSDA [PR 3061](https://github.com/MTES-MCT/trackdechets/pull/3061)
+- Ajout de la possibilité de sélectionner un éco-organisme sur le BSDA [PR 3062](https://github.com/MTES-MCT/trackdechets/pull/3062)
 - Nouvelle navigation sur Trackdéchets : la navigation principale et le menu latéral ont été mis en conformité avec le DSFR [PR 3066](https://github.com/MTES-MCT/trackdechets/pull/3066)
 - La gestion des établissements devient désormais un onglet principal de Trackdéchets, à retrouver dans "Mes établissements" [PR 3066](https://github.com/MTES-MCT/trackdechets/pull/3066)
 
@@ -25,6 +27,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Mise à jour des labels en cas de transport multimodal [PR 3046](https://github.com/MTES-MCT/trackdechets/pull/3046)
 - Le mode de traitement "Elimination (incinération sans valorisation énergétique et stockage en décharge)" a été renommé "Elimination" [PR 3044](https://github.com/MTES-MCT/trackdechets/pull/3044)
+- Flexibilisation de certaines règles de validation du BSDA pour pouvoir modifier les champs de contact plus longtemps [PR 3060](https://github.com/MTES-MCT/trackdechets/pull/3060)
 - Retirer la possibilité de faire du multimodal pour le BSD de tournée dédiée [PR 3057](https://github.com/MTES-MCT/trackdechets/pull/3057)
 
 #### :house: Interne
