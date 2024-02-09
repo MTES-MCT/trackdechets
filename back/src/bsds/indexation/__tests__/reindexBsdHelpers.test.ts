@@ -10,6 +10,8 @@ describe("reindexBsdHelpers", () => {
       ${"    "}                                                                    | ${[]}
       ${"FF-20231128-KFAYQC3M0-suite"}                                             | ${["FF-20231128-KFAYQC3M0-suite"]}
       ${"VHU-20220128-1HXF2PPPR"}                                                  | ${["VHU-20220128-1HXF2PPPR"]}
+      ${"PAOH-20220128-1HXF2PPPR"}                                                 | ${["PAOH-20220128-1HXF2PPPR"]}
+      ${"DASRI-20220128-1HXF2PPPR"}                                                | ${["DASRI-20220128-1HXF2PPPR"]}
       ${"BSD-20230316-FPF4Z6QPY"}                                                  | ${["BSD-20230316-FPF4Z6QPY"]}
       ${"BSD-20230316-FPF4Z6QPY-suite"}                                            | ${["BSD-20230316-FPF4Z6QPY-suite"]}
       ${"BSD-20230316-FPF4Z6QPYsuite"}                                             | ${["BSD-20230316-FPF4Z6QPY-suite"]}
@@ -25,6 +27,8 @@ describe("reindexBsdHelpers", () => {
       ${"'dasRI20211220-Xxs4Skcz6'"}                                               | ${["DASRI-20211220-XXS4SKCZ6"]}
       ${'"dasRI20211220-Xxs4Skcz6"'}                                               | ${["DASRI-20211220-XXS4SKCZ6"]}
       ${"BSDA-20221109-9B4SV145H FF-20231128-KFAYQC3M0"}                           | ${["BSDA-20221109-9B4SV145H", "FF-20231128-KFAYQC3M0"]}
+      ${"BSDA-20221109-9B4SV145H,FF-20231128-KFAYQC3M0"}                           | ${["BSDA-20221109-9B4SV145H", "FF-20231128-KFAYQC3M0"]}
+      ${"BSDA-20221109-9B4SV145H BSDA-20221109-9B4SV145H"}                         | ${["BSDA-20221109-9B4SV145H"]}
       ${"BSDA-20221109-9B4SV145H, FF-20231128-KFAYQC3M0"}                          | ${["BSDA-20221109-9B4SV145H", "FF-20231128-KFAYQC3M0"]}
       ${"BSDA-20221109-9B4SV145H\nFF-20231128-KFAYQC3M0"}                          | ${["BSDA-20221109-9B4SV145H", "FF-20231128-KFAYQC3M0"]}
       ${"BSDA-20221109-9B4SV145H    FF-20231128-KFAYQC3M0"}                        | ${["BSDA-20221109-9B4SV145H", "FF-20231128-KFAYQC3M0"]}
@@ -54,7 +58,7 @@ describe("reindexBsdHelpers", () => {
         splitIntoBsdIds(input);
       } catch (e) {
         expect(e.message).toEqual(
-          `${input} n'est pas un identifiant de bordereau valide`
+          `"${input}" n'est pas un identifiant de bordereau valide`
         );
       }
     });

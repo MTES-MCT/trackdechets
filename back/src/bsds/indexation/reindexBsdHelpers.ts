@@ -10,7 +10,6 @@ import { getReadonlyBsvhuRepository } from "../../bsvhu/repository";
 import { getReadonlyBsdasriRepository } from "../../bsdasris/repository";
 
 export async function reindex(bsdId, exitFn) {
-  console.log("bsdId", bsdId);
   if (bsdId.startsWith("BSDA-")) {
     const bsda = await getReadonlyBsdaRepository().findUnique(
       { id: bsdId },
@@ -81,7 +80,7 @@ export async function reindex(bsdId, exitFn) {
 }
 
 export const extractPrefix = (chunk: string) => {
-  const VALID_PREFIXES = ["BSDA", "DASRI", "FF", "VHU", "BSD", "TD"];
+  const VALID_PREFIXES = ["BSDA", "DASRI", "FF", "VHU", "BSD", "TD", "PAOH"];
 
   for (const prefix of VALID_PREFIXES) {
     if (chunk.startsWith(prefix)) {
@@ -124,7 +123,7 @@ export const extractSuffix = (chunk: string) => {
 export const toBsdId = (chunk: string) => {
   try {
     // To upper case + remove hyphens
-    const sanitized = chunk.toUpperCase().replace(/-/g, "");
+    const sanitized = chunk.replace(/-/g, "").toUpperCase();
 
     const { prefix, rest } = extractPrefix(sanitized);
 
@@ -134,7 +133,7 @@ export const toBsdId = (chunk: string) => {
 
     return `${prefix}-${date}-${suffix}`;
   } catch (e) {
-    throw new Error(`${chunk} n'est pas un identifiant de bordereau valide`);
+    throw new Error(`"${chunk}" n'est pas un identifiant de bordereau valide`);
   }
 };
 
@@ -152,5 +151,8 @@ export const splitIntoBsdIds = (blob: string) => {
   const chunks = blob.split(" ").filter(Boolean);
 
   // Convert chunks into actual BSD ids
-  return chunks.map(toBsdId);
+  const ids = chunks.map(toBsdId);
+
+  // Remove duplicates
+  return [...new Set(ids)];
 };

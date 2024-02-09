@@ -15,8 +15,26 @@ const reindexBsdsResolver: MutationResolvers["reindexBsds"] = async (
   // Convert the input into actual BSD ids
   const bsdIds = splitIntoBsdIds(ids);
 
-  await Promise.all(bsdIds.map(bsdId => reindex(bsdId, success => success)));
+  // Re-index all the BSD. Do not stop if one is faulty
+  const results = await Promise.allSettled(
+    bsdIds.map(async bsdId => {
+      try {
+        await reindex(bsdId, success => success);
+      } catch (e) {
+        throw new Error(bsdId);
+      }
+    })
+  );
 
-  return bsdIds;
+  // If there are errors
+  const rejected = results
+    .filter(res => res.status === "rejected")
+    .map(res =>
+      (res as PromiseRejectedResult).reason.toString().replace("Error: ", "")
+    );
+
+  const accepted = bsdIds.filter(id => !rejected.includes(id));
+
+  return { accepted, rejected };
 };
 export default reindexBsdsResolver;
