@@ -1,7 +1,7 @@
 import { MutationResolvers } from "../../generated/graphql/types";
 import createPdfAccessTokenResolver from "./mutations/createPdfAccessToken";
-import reindexBsd from "./mutations/reindexBsd";
+import reindexBsds from "./mutations/reindexBsds";
 export const Mutation: MutationResolvers = {
   createPdfAccessToken: createPdfAccessTokenResolver,
-  reindexBsd: reindexBsd
+  reindexBsds: reindexBsds
 };
