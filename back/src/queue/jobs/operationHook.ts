@@ -36,25 +36,26 @@ export async function operationHook(args: OperationHookArgs) {
       noTraceability: true
     }
   });
+
+  // On va chercher tous les bordereaux initiaux
+  const formWithInitialForms = await prisma.form.findUniqueOrThrow({
+    where: { id: formId, isDeleted: false },
+    include: {
+      forwarding: true,
+      grouping: { include: { initialForm: true } }
+    }
+  });
+
+  const initialForms = [
+    formWithInitialForms.forwarding,
+    ...(formWithInitialForms.grouping ?? []).map(g => g.initialForm)
+  ].filter(Boolean);
+
   if (
     // Le code n'est appelé qu'en cas de traitement final ou de rupture de traçabilité
     isFinalOperationCode(operation.processingOperationDone!) ||
     operation.noTraceability
   ) {
-    // On va chercher tous les bordereaux initiaux
-    const formWithInitialForms = await prisma.form.findUniqueOrThrow({
-      where: { id: formId, isDeleted: false },
-      include: {
-        forwarding: true,
-        grouping: { include: { initialForm: true } }
-      }
-    });
-
-    const initialForms = [
-      formWithInitialForms.forwarding,
-      ...(formWithInitialForms.grouping ?? []).map(g => g.initialForm)
-    ].filter(Boolean);
-
     for (const initialForm of initialForms) {
       if (
         await prisma.finalOperation.count({
@@ -114,6 +115,15 @@ export async function operationHook(args: OperationHookArgs) {
         operationId: operation.id,
         formId: initialForm.id
       });
+    }
+  } else {
+    for (const initialForm of initialForms) {
+        await prisma.form.update({
+          where: { id: initialForm.id },
+          data: {
+            finalOperations: { deleteMany: {} }
+          }
+        });
     }
   }
 }

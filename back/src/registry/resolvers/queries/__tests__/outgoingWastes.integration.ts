@@ -501,7 +501,7 @@ describe("Outgoing wastes registry", () => {
     await refreshElasticSearch();
     // Manually execute operationHook to simulate markAsProcessed
     await operationHook({
-      operation: forwardedInithTempStorageFullForm,
+      operationId: forwardedInithTempStorageFullForm.id,
       formId: forwardedInithTempStorageFullForm.id
     });
 

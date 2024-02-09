@@ -981,6 +981,113 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(updatedBsdd.destinationOperationMode).toBe("RECYCLAGE");
   });
 
+  it("should create the finalOperations rows when changing operation code from a final to a non-final code", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        processingOperationDone: "R 0",
+        destinationOperationMode: "VALORISATION_ENERGETIQUE"
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        processingOperationDone: "R 12",
+        destinationOperationMode: "RECYCLAGE",
+        comment: ""
+      }
+    });
+
+    const { data } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
+
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: { finalOperations: true }
+    });
+
+    expect(updatedBsdd.processingOperationDone).toBe("R 4");
+    expect(updatedBsdd.destinationOperationMode).toBe("RECYCLAGE");
+
+    expect(updatedBsdd.finalOperations.length).toStrictEqual(0);
+  });
+
+  it("should delete the finalOperations rows when changing operation code  to a final operation code", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        processingOperationDone: "R 12",
+        destinationOperationMode: "VALORISATION_ENERGETIQUE"
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        processingOperationDone: "R 1",
+        destinationOperationMode: "RECYCLAGE",
+        comment: ""
+      }
+    });
+
+    const { data } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
+
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: { finalOperations: true }
+    });
+
+    expect(updatedBsdd.processingOperationDone).toBe("R 1");
+    expect(updatedBsdd.destinationOperationMode).toBe("RECYCLAGE");
+    expect(updatedBsdd.finalOperations).toBe([
+      {
+        finalBsdReadableId: updatedBsdd.readableId,
+        quantity: updatedBsdd.quantityReceived!,
+        operationCode: updatedBsdd.processingOperationDone!,
+        destinationCompanySiret: updatedBsdd.recipientCompanySiret!,
+        destinationCompanyName: updatedBsdd.recipientCompanyName!
+      }
+    ]);
+  });
+
   it("if the waste code changes from dangerous to non-dangerous, wasteDetailsIsDangerous should be updated", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"

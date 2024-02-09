@@ -25,6 +25,7 @@ import buildRemoveAppendix2 from "../form/removeAppendix2";
 import { distinct } from "../../../common/arrays";
 import { ForbiddenError } from "../../../common/errors";
 import { isFinalOperationCode } from "../../../common/operationCodes";
+import { operationHooksQueue } from "../../../queue/producers/bsdUpdate";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -313,6 +314,7 @@ export async function approveAndApplyRevisionRequest(
       })
     },
     select: {
+      id: true,
       readableId: true,
       emitterType: true,
       grouping: {
@@ -320,7 +322,11 @@ export async function approveAndApplyRevisionRequest(
       }
     }
   });
-
+  // this update or delete  FinalOperations eventually  attached
+  await operationHooksQueue.add({
+    operationId: updatedBsdd.id,
+    formId: updatedBsdd.id
+  });
   if (updatedBsdd.emitterType === EmitterType.APPENDIX1) {
     const { wasteDetailsCode, wasteDetailsName, wasteDetailsPop } =
       revisionRequest;

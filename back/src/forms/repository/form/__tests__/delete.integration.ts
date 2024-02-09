@@ -98,7 +98,7 @@ describe("formRepository.delete", () => {
     await refreshElasticSearch();
     // Manually execute operationHook to simulate markAsProcessed
     await operationHook({
-      operation: fullForm,
+      operationId: fullForm.id,
       formId: fullForm.id
     });
     const hits = await searchBsds();
