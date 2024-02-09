@@ -1,10 +1,24 @@
-import { CompanyForVerification, Mutation } from "@td/codegen-ui";
-import React, { useState } from "react";
-import CompanyVerifyModal from "./CompanyVerifyModal";
+import {
+  CompanyForVerification,
+  Mutation,
+  MutationVerifyCompanyByAdminArgs
+} from "@td/codegen-ui";
+import React from "react";
 import { isSiret } from "@td/constants";
 import { gql, useMutation } from "@apollo/client";
 import toast from "react-hot-toast";
 import { TOAST_DURATION } from "../../../common/config";
+
+const VERIFY_COMPANY_BY_ADMIN = gql`
+  mutation VerifyCompanyByAdmin($input: VerifyCompanyByAdminInput!) {
+    verifyCompanyByAdmin(input: $input) {
+      id
+      verificationStatus
+      verificationComment
+      verificationMode
+    }
+  }
+`;
 
 const SEND_VERIFICATION_CODE_LETTER = gql`
   mutation SendVerificationCodeLetter(
@@ -25,14 +39,23 @@ type VerificationActionsProps = {
 export default function CompanyVerificationActions({
   company
 }: VerificationActionsProps) {
-  const [showVerifyModal, setShowVerifyModal] = useState(false);
-  const openVerifyModal = () => setShowVerifyModal(true);
-  const closeVerifyModal = () => setShowVerifyModal(false);
-
-  const [sendVerificationCodeLetter, { error, loading }] = useMutation<
+  const [sendVerificationCodeLetter, { loading: loadingLetter }] = useMutation<
     Pick<Mutation, "sendVerificationCodeLetter">,
     any
   >(SEND_VERIFICATION_CODE_LETTER, {
+    onCompleted: () => {
+      toast.success("Verification envoyée", { duration: TOAST_DURATION });
+    },
+    onError: () => {
+      toast.error("La vérification n'a pas pu être envoyée", {
+        duration: TOAST_DURATION
+      });
+    }
+  });
+  const [verifyCompanyByAdmin, { loading: loadingVerify }] = useMutation<
+    Pick<Mutation, "verifyCompanyByAdmin">,
+    MutationVerifyCompanyByAdminArgs
+  >(VERIFY_COMPANY_BY_ADMIN, {
     onCompleted: () => {
       toast.success("Verification envoyée", { duration: TOAST_DURATION });
     },
@@ -62,27 +85,34 @@ export default function CompanyVerificationActions({
     }
   }
 
+  function onVerify() {
+    return verifyCompanyByAdmin({
+      variables: {
+        input: {
+          siret: company.orgId!,
+          verificationComment: ""
+        }
+      }
+    });
+  }
+
   return (
     <div className="tw-flex tw-flex-col ">
-      <button className="btn btn--primary" onClick={() => openVerifyModal()}>
+      <button
+        className="btn btn--primary"
+        disabled={loadingVerify}
+        onClick={onVerify}
+      >
         Vérifier
       </button>
       {isSiret(company.orgId) && (
         <button
-          disabled={loading}
+          disabled={loadingLetter}
           className="btn btn--primary tw-mt-1"
           onClick={onSendVerificationCodeLetter}
         >
           Envoyer un courrier
         </button>
-      )}
-
-      {showVerifyModal && (
-        <CompanyVerifyModal
-          isOpen={showVerifyModal}
-          onClose={() => closeVerifyModal()}
-          company={company}
-        />
       )}
     </div>
   );
