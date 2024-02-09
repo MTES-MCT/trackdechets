@@ -28,7 +28,7 @@ export const operationHooksQueue = new Queue<OperationHookArgs>(
   REDIS_URL!,
   {
     defaultJobOptions: {
-      removeOnComplete: 100
+      removeOnComplete: 10_000
     }
   }
 );

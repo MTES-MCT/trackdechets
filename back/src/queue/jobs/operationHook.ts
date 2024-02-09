@@ -1,4 +1,3 @@
-import { Form } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { Job } from "bull";
 import { operationHooksQueue } from "../producers/bsdUpdate";
@@ -6,19 +5,9 @@ import { isFinalOperationCode } from "../../common/operationCodes";
 
 export type OperationHookArgs = {
   // Informations sur le traitement final
-  operation: Pick<
-    Form,
-    | "readableId"
-    | "quantityReceived"
-    | "processingOperationDone"
-    | "recipientCompanySiret"
-    | "recipientCompanyName"
-    | "noTraceability"
-  >;
+  operationId: string;
   formId: string;
 };
-
-export const OPERATION_HOOKS_JOB_NAME = "";
 
 export async function operationHookJob(
   job: Job<OperationHookArgs>
@@ -31,7 +20,22 @@ export async function operationHookJob(
  * de traitement sur un bordereau
  */
 export async function operationHook(args: OperationHookArgs) {
-  const { operation, formId } = args;
+  const { operationId, formId } = args;
+  const operation = await prisma.form.findUniqueOrThrow({
+    where: {
+      id: operationId,
+      isDeleted: false
+    },
+    select: {
+      id: true,
+      readableId: true,
+      quantityReceived: true,
+      processingOperationDone: true,
+      recipientCompanySiret: true,
+      recipientCompanyName: true,
+      noTraceability: true
+    }
+  });
   if (
     // Le code n'est appelé qu'en cas de traitement final ou de rupture de traçabilité
     isFinalOperationCode(operation.processingOperationDone!) ||
@@ -52,12 +56,14 @@ export async function operationHook(args: OperationHookArgs) {
     ].filter(Boolean);
 
     for (const initialForm of initialForms) {
-      if (await prisma.finalOperation.count({
-        where: {
-          formId: initialForm.id,
-          finalBsdReadableId: operation.readableId
-        }
-      })) {
+      if (
+        await prisma.finalOperation.count({
+          where: {
+            formId: initialForm.id,
+            finalBsdReadableId: operation.readableId
+          }
+        })
+      ) {
         await prisma.form.update({
           where: { id: initialForm.id },
           data: {
@@ -105,7 +111,7 @@ export async function operationHook(args: OperationHookArgs) {
 
       // Applique le hook de façon récursive sur les bordereaux initiaux
       await operationHooksQueue.add({
-        operation,
+        operationId: operation.id,
         formId: initialForm.id
       });
     }

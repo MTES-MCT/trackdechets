@@ -127,7 +127,7 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   });
 
   await operationHooksQueue.add({
-    operation: processedForm,
+    operationId: processedForm.id,
     formId: processedForm.id
   });
 
