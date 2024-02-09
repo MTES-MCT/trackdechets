@@ -6,11 +6,7 @@ import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
-import {
-  renderMail,
-  onboardingFirstStep,
-  verificationProcessInfo
-} from "@td/mail";
+import { renderMail, verificationProcessInfo } from "@td/mail";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
   cleanClue,
@@ -46,9 +42,6 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-
-  console.log(JSON.stringify(companyInput, null, 4));
-
   const {
     codeNaf,
     gerepId,
@@ -211,9 +204,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     data: { firstAssociationDate: new Date() }
   });
 
-  const isProfessional = company.companyTypes.some(ct => {
-    return PROFESSIONALS.includes(ct);
-  });
+  const isProfessional = companyTypes.some(ct => PROFESSIONALS.includes(ct));
 
   if (VERIFY_COMPANY === "true") {
     if (isProfessional && !isForeignTransporter({ companyTypes, vatNumber })) {
