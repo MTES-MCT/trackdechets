@@ -1,14 +1,15 @@
-import { Bsda, BsdaStatus, Prisma } from "@prisma/client";
+import { BsdaStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsdaArgs } from "../../../generated/graphql/types";
 import { expandBsdaFromDb } from "../../converter";
-import { getBsdaOrNotFound, getFirstTransporterSync } from "../../database";
+import { getBsdaOrNotFound } from "../../database";
 import { getBsdaRepository } from "../../repository";
 import { checkCanDuplicate } from "../../permissions";
 import { prisma } from "@td/prisma";
-import { sirenify } from "../../validation/sirenify";
-import { BsdaWithIntermediaries, BsdaWithTransporters } from "../../types";
+import { parseBsdaAsync } from "../../validation";
+import { prismaToZodBsda } from "../../validation/helpers";
+import { BsdaForParsingInclude } from "../../validation/types";
 
 export default async function duplicate(
   _,
@@ -18,101 +19,53 @@ export default async function duplicate(
   const user = checkIsAuthenticated(context);
 
   const prismaBsda = await getBsdaOrNotFound(id, {
-    include: { intermediaries: true, transporters: true }
+    include: BsdaForParsingInclude
   });
-  const transporter = getFirstTransporterSync(prismaBsda)!;
 
   await checkCanDuplicate(user, prismaBsda);
 
-  // FIXME - En attente d'une meilleure solution lors de l'implémentation du
-  // multi-modal.
-  // Sirenify s'applique sur les données transporteur "à plat"
-  // dans le contexte de la validation Zod. Pour pouvoir l'utiliser ici on
-  // doit remettre les données à plat puis reconstruire une version de `transporters`
-  // avec les données transporteurs "sirenified".
   const {
-    transporterCompanySiret,
-    transporterCompanyName,
-    transporterCompanyAddress,
-    ...sirenifiedBsda
-  } = await sirenify(
-    {
-      ...prismaBsda,
-      transporterCompanySiret: transporter.transporterCompanySiret,
-      transporterCompanyName: transporter.transporterCompanyName,
-      transporterCompanyAddress: transporter.transporterCompanyAddress
-    },
-    []
-  );
+    // values that should not be duplicated
+    id: bsdaId,
+    isDraft,
+    isDeleted,
+    emitterEmissionSignatureAuthor,
+    emitterEmissionSignatureDate,
+    emitterCustomInfo,
+    workerWorkHasEmitterPaperSignature,
+    workerWorkSignatureAuthor,
+    workerWorkSignatureDate,
+    destinationCustomInfo,
+    destinationReceptionWeight,
+    destinationReceptionDate,
+    destinationReceptionAcceptationStatus,
+    destinationReceptionRefusalReason,
+    destinationOperationCode,
+    destinationOperationMode,
+    destinationOperationSignatureAuthor,
+    destinationOperationSignatureDate,
+    destinationOperationDate,
+    transporterTransportSignatureDate,
+    wasteSealNumbers,
+    packagings,
+    weightValue,
+    forwarding,
+    grouping,
+    intermediariesOrgIds,
+    // values that should be duplicated
+    ...zodBsda
+  } = prismaToZodBsda(prismaBsda);
 
-  const sirenifiedTransporter = {
-    ...transporter,
-    transporterCompanyName,
-    transporterCompanyAddress
-  };
-
-  const data = await duplicateBsda({
-    ...sirenifiedBsda,
-    transporters: [sirenifiedTransporter]
+  const { transporter, bsda: parsedBsda } = await parseBsdaAsync(zodBsda, {
+    user,
+    // Permet d'appliquer l'auto-complétion SIRENE
+    // TODO : on pourrait gérer aussi l'auto-complétion des récépissés et certifications
+    // entreprise de travaux / courtier dans le parsing Zod.
+    enableCompletionTransformers: true
   });
 
-  const newBsda = await getBsdaRepository(user).create(data);
-
-  return expandBsdaFromDb(newBsda);
-}
-
-type BsdaForDuplicate = Bsda & BsdaWithTransporters & BsdaWithIntermediaries;
-
-async function duplicateBsda({
-  // values that should not be duplicated
-  id,
-  createdAt,
-  updatedAt,
-  isDraft,
-  isDeleted,
-  status,
-  emitterEmissionSignatureAuthor,
-  emitterEmissionSignatureDate,
-  emitterCustomInfo,
-  workerWorkHasEmitterPaperSignature,
-  workerWorkSignatureAuthor,
-  workerWorkSignatureDate,
-  destinationCustomInfo,
-  destinationReceptionWeight,
-  destinationReceptionDate,
-  destinationReceptionAcceptationStatus,
-  destinationReceptionRefusalReason,
-  destinationOperationCode,
-  destinationOperationMode,
-  destinationOperationSignatureAuthor,
-  destinationOperationSignatureDate,
-  destinationOperationDate,
-  transporterTransportSignatureDate,
-  wasteSealNumbers,
-  packagings,
-  weightValue,
-  forwardingId,
-  groupedInId,
-  intermediaries,
-  intermediariesOrgIds,
-  transporters,
-  // values that should be duplicated
-  ...bsda
-}: BsdaForDuplicate): Promise<Prisma.BsdaCreateInput> {
-  const {
-    id: transporterId,
-    createdAt: transporterCreatedAt,
-    updatedAt: transporterUpdatedAt,
-    bsdaId,
-    transporterTransportPlates,
-    number,
-    transporterTransportTakenOverAt,
-    transporterTransportSignatureAuthor,
-    transporterTransportSignatureDate: _,
-    transporterCustomInfo,
-    // transporter values that should be duplicated
-    ...transporter
-  } = getFirstTransporterSync({ transporters })!;
+  const { id: transporterId, ...transporterData } = transporter;
+  const { intermediaries, ...bsda } = parsedBsda;
 
   const companiesOrgIds: string[] = [
     bsda.emitterCompanySiret,
@@ -155,27 +108,11 @@ async function duplicateBsda({
     company => company.orgId === bsda.workerCompanySiret
   );
 
-  return {
+  const data = {
     ...bsda,
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
     isDraft: true,
-    ...(intermediaries && {
-      intermediaries: {
-        createMany: {
-          data: intermediaries.map(intermediary => ({
-            siret: intermediary.siret,
-            address: intermediary.address,
-            vatNumber: intermediary.vatNumber,
-            name: intermediary.name,
-            contact: intermediary.contact,
-            phone: intermediary.phone,
-            mail: intermediary.mail
-          }))
-        }
-      },
-      intermediariesOrgIds
-    }),
     // Emitter company info
     emitterCompanyMail: emitter?.contactEmail ?? bsda.emitterCompanyMail,
     emitterCompanyPhone: emitter?.contactPhone ?? bsda.emitterCompanyPhone,
@@ -222,7 +159,7 @@ async function duplicateBsda({
     transporters: {
       create: {
         number: 1,
-        ...transporter,
+        ...transporterData,
         // Transporter company info
         transporterCompanyMail:
           transporterCompany?.contactEmail ??
@@ -240,6 +177,28 @@ async function duplicateBsda({
         transporterRecepisseDepartment:
           transporterCompany?.transporterReceipt?.department ?? null
       }
-    }
+    },
+    ...(intermediaries && {
+      intermediaries: {
+        createMany: {
+          data: intermediaries.map(intermediary => ({
+            siret: intermediary.siret!,
+            address: intermediary.address,
+            vatNumber: intermediary.vatNumber,
+            name: intermediary.name!,
+            contact: intermediary.contact!,
+            phone: intermediary.phone,
+            mail: intermediary.mail
+          }))
+        }
+      },
+      intermediariesOrgIds
+    }),
+    grouping: undefined,
+    forwarding: undefined
   };
+
+  const newBsda = await getBsdaRepository(user).create(data);
+
+  return expandBsdaFromDb(newBsda);
 }

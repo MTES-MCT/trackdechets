@@ -3,9 +3,10 @@ import {
   BsdaMetadata,
   BsdaMetadataResolvers
 } from "../../generated/graphql/types";
-import { syncParseBsdaInContext } from "../validation";
 import { prisma } from "@td/prisma";
 import { computeLatestRevision } from "../converter";
+import { parseBsda } from "../validation";
+import { prismaToZodBsda } from "../validation/helpers";
 
 function getNextSignature(bsda) {
   if (bsda.destinationOperationSignatureAuthor != null) return "OPERATION";
@@ -17,19 +18,13 @@ function getNextSignature(bsda) {
 export const Metadata: BsdaMetadataResolvers = {
   errors: async (metadata: BsdaMetadata & { id: string }, _, context) => {
     const bsda = await context.dataloaders.bsdas.load(metadata.id);
-    const userCompanies = await context.dataloaders.userCompanies.load(
-      context.user!.id
-    );
 
     const currentSignatureType = getNextSignature(bsda);
+    const zodBsda = prismaToZodBsda(bsda);
     try {
-      syncParseBsdaInContext(
-        { persisted: bsda },
-        {
-          currentSignatureType,
-          userCompanies
-        }
-      );
+      parseBsda(zodBsda, {
+        currentSignatureType
+      });
       return [];
     } catch (errors) {
       return errors.issues?.map((e: ZodIssue) => {

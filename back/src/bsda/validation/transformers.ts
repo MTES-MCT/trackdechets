@@ -1,60 +1,58 @@
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { prisma } from "@td/prisma";
-import { EditionRules } from "./rules";
-import { ZodBsda } from "./schema";
-import { sirenify } from "./sirenify";
+import { ZodBsdaTransformer } from "./types";
 
-/**
- *
- * @param val Runs a bunch function to enrich bsda input with computed values
- * @returns
- */
-export const runTransformers = async (
-  val: ZodBsda,
-  sealedFields: Array<keyof EditionRules> // Tranformations should not be run on sealed fields
-): Promise<ZodBsda> => {
-  const transformers = [
-    reshipmentBsdaTransformer,
-    sirenify,
-    recipisseTransporterTransformer,
-    workerTransformer
-  ];
-  for (const transformer of transformers) {
-    val = await transformer(val, sealedFields);
-  }
-  return val;
+export const fillIntermediariesOrgIds: ZodBsdaTransformer = bsda => {
+  bsda.intermediariesOrgIds = bsda.intermediaries
+    ? bsda.intermediaries
+        .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
+        .filter(Boolean)
+    : undefined;
+
+  return bsda;
 };
 
-async function reshipmentBsdaTransformer(val: ZodBsda): Promise<ZodBsda> {
-  if (
-    val.type === "RESHIPMENT" &&
-    !val?.wasteConsistence &&
-    !!val?.forwarding
-  ) {
-    const forwarding = await prisma.bsda.findUnique({
-      where: { id: val.forwarding }
-    });
-    if (!!forwarding) {
-      val = { ...val, wasteConsistence: forwarding.wasteConsistence };
-    }
-  }
-  return val;
-}
+export const fillTransportersOrgIds: ZodBsdaTransformer = bsda => {
+  bsda.transportersOrgIds = [
+    bsda.transporterCompanySiret,
+    bsda.transporterCompanyVatNumber
+  ]
+    .filter(Boolean)
+    .filter(orgId => orgId.length > 0);
 
-async function recipisseTransporterTransformer(
-  val: ZodBsda,
-  sealedFields: Array<keyof EditionRules>
-): Promise<ZodBsda> {
-  if (sealedFields.includes("transporterCompanySiret")) {
-    return val;
+  return bsda;
+};
+
+export const fillWasteConsistenceWhenForwarding: ZodBsdaTransformer =
+  async bsda => {
+    if (
+      bsda.type === "RESHIPMENT" &&
+      !bsda?.wasteConsistence &&
+      !!bsda?.forwarding
+    ) {
+      const forwarding = await prisma.bsda.findUnique({
+        where: { id: bsda.forwarding }
+      });
+      if (!!forwarding) {
+        bsda = { ...bsda, wasteConsistence: forwarding.wasteConsistence };
+      }
+    }
+    return bsda;
+  };
+
+export const updateTransporterRecepisee: ZodBsdaTransformer = async bsda => {
+  // Évite de modifier les données transporteur après
+  // la signature de celui-ci
+  if (bsda.transporterTransportSignatureDate) {
+    return bsda;
   }
 
   const orgId = getTransporterCompanyOrgId({
-    transporterCompanySiret: val.transporterCompanySiret ?? null,
-    transporterCompanyVatNumber: val.transporterCompanyVatNumber ?? null
+    transporterCompanySiret: bsda.transporterCompanySiret ?? null,
+    transporterCompanyVatNumber: bsda.transporterCompanyVatNumber ?? null
   });
 
-  if (!val.transporterRecepisseIsExempted && orgId) {
+  if (!bsda.transporterRecepisseIsExempted && orgId) {
     const transporterReceipt = await prisma.company
       .findUnique({
         where: {
@@ -63,23 +61,25 @@ async function recipisseTransporterTransformer(
       })
       .transporterReceipt();
 
-    val.transporterRecepisseNumber = transporterReceipt?.receiptNumber ?? null;
-    val.transporterRecepisseValidityLimit =
+    bsda.transporterRecepisseNumber = transporterReceipt?.receiptNumber ?? null;
+    bsda.transporterRecepisseValidityLimit =
       transporterReceipt?.validityLimit ?? null;
-    val.transporterRecepisseDepartment = transporterReceipt?.department ?? null;
+    bsda.transporterRecepisseDepartment =
+      transporterReceipt?.department ?? null;
   }
 
-  return val;
-}
+  return bsda;
+};
 
-async function workerTransformer(val: ZodBsda): Promise<ZodBsda> {
-  if (val.workerIsDisabled) {
-    val.workerCertificationHasSubSectionFour = false;
-    val.workerCertificationHasSubSectionThree = false;
-    val.workerCertificationCertificationNumber = null;
-    val.workerCertificationValidityLimit = null;
-    val.workerCertificationOrganisation = null;
-  }
+export const emptyWorkerCertificationWhenWorkerIsDisabled: ZodBsdaTransformer =
+  bsda => {
+    if (bsda.workerIsDisabled) {
+      bsda.workerCertificationHasSubSectionFour = false;
+      bsda.workerCertificationHasSubSectionThree = false;
+      bsda.workerCertificationCertificationNumber = null;
+      bsda.workerCertificationValidityLimit = null;
+      bsda.workerCertificationOrganisation = null;
+    }
 
-  return val;
-}
+    return bsda;
+  };

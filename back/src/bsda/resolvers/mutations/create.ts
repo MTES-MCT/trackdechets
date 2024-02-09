@@ -8,8 +8,9 @@ import { getUserCompanies } from "../../../users/database";
 import { companyToIntermediaryInput, expandBsdaFromDb } from "../../converter";
 import { getBsdaRepository } from "../../repository";
 import { checkCanCreate } from "../../permissions";
-import { parseBsdaInContext } from "../../validation";
 import { UserInputError } from "../../../common/errors";
+import { parseBsdaAsync } from "../../validation";
+import { graphQlInputToZodBsda } from "../../validation/helpers";
 
 type CreateBsda = {
   isDraft: boolean;
@@ -42,14 +43,13 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     );
   }
 
-  const { bsda, transporter } = await parseBsdaInContext(
-    { input, isDraft },
-    {
-      enableCompletionTransformers: true,
-      enablePreviousBsdasChecks: true,
-      currentSignatureType: !isDraft ? "EMISSION" : undefined
-    }
-  );
+  const zodBsda = { ...graphQlInputToZodBsda(input), isDraft };
+  const { bsda, transporter } = await parseBsdaAsync(zodBsda, {
+    user,
+    enableCompletionTransformers: true,
+    enablePreviousBsdasChecks: true,
+    currentSignatureType: !isDraft ? "EMISSION" : undefined
+  });
 
   const forwarding = !!bsda.forwarding
     ? { connect: { id: bsda.forwarding } }

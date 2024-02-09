@@ -1,80 +1,123 @@
-import { Company, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { objectDiff } from "../../forms/workflow/diff";
-import { BsdaSignatureType } from "../../generated/graphql/types";
+import {
+  BsdaInput,
+  BsdaPackaging,
+  BsdaSignatureType
+} from "../../generated/graphql/types";
 import { flattenBsdaInput, flattenBsdaTransporterInput } from "../converter";
 import { SIGNATURES_HIERARCHY } from "./constants";
-import { UnparsedInputs } from "./index";
 import { getUserCompanies } from "../../users/database";
-import { getFirstTransporterSync } from "../database";
+import {
+  ZodBsda,
+  ZodOperationEnum,
+  ZodWasteCodeEnum,
+  ZodWorkerCertificationOrganismEnum
+} from "./schema";
+import { PrismaBsdaForParsing } from "./types";
+import { safeInput } from "../../common/converter";
 
 /**
- * Computes an unparsed BSDA by merging the GQL input and
- * the currently persisted BSDA in the database
+ * Cette fonction permet de convertir les données d'input GraphQL
+ * vers le format attendu par le parsing Zod. Certains champs sont
+ * typés en string côté GraphQL mais en enum côté Zod ce qui nous oblige
+ * à faire un casting de type.
  */
-export function getUnparsedBsda({ input, persisted, isDraft }: UnparsedInputs) {
-  const flattenedInput = input ? flattenBsdaInput(input) : null;
+export function graphQlInputToZodBsda(
+  input: BsdaInput,
+  isDraft = false
+): ZodBsda {
+  const {
+    wasteCode,
+    destinationPlannedOperationCode,
+    destinationOperationCode,
+    workerCertificationOrganisation,
+    intermediaries,
+    ...flattenedBsdaInput
+  } = flattenBsdaInput(input);
+  const flattenedBsdaTransporter = flattenBsdaTransporterInput(input);
 
-  const { transporters, ...persistedData } = persisted ?? {};
+  return safeInput({
+    isDraft,
+    ...flattenedBsdaInput,
+    ...flattenedBsdaTransporter,
+    wasteCode: wasteCode as ZodWasteCodeEnum,
+    destinationPlannedOperationCode:
+      destinationPlannedOperationCode as ZodOperationEnum,
+    destinationOperationCode: destinationOperationCode as ZodOperationEnum,
+    workerCertificationOrganisation:
+      workerCertificationOrganisation as ZodWorkerCertificationOrganismEnum,
+    intermediaries: intermediaries?.map(i =>
+      safeInput({
+        // FIXME : Les règles d'édition (fichier rules.ts) ne permettent
+        // pas à ce jour de définir les règles de champ requis pour les intermédiaire.
+        // Le schéma zod des intermédiaires enforce donc des champs requis dès le début
+        // (contrairement aux autres champs du BSDA), ce qui est incohérent avec le typage
+        // côté input GraphQL. On force donc le typage ici, quitte à lever des erreurs
+        // de validation Zod dans le process de parsing.
+        siret: i.siret!,
+        vatNumber: i.vatNumber,
+        address: i.address!,
+        name: i.name!,
+        contact: i.contact!,
+        phone: i.phone,
+        mail: i.mail
+      })
+    )
+  });
+}
 
-  const { id: transporterId, ...transporter } = {
-    ...transporters?.[0],
-    ...(input ? flattenBsdaTransporterInput(input) : {})
-  };
+/**
+ * Cette fonction permet de convertir les données prisma
+ * vers le format attendu par le parsing Zod. Certains champs sont
+ * typés en string côté Prisma mais en enum côté Zod ce qui nous oblige
+ * à faire un casting de type.
+ */
+export function prismaToZodBsda(bsda: PrismaBsdaForParsing): ZodBsda {
+  const {
+    transporters,
+    wasteCode,
+    destinationPlannedOperationCode,
+    destinationOperationCode,
+    workerCertificationOrganisation,
+    packagings,
+    grouping,
+    forwardingId,
+    intermediaries,
+    ...data
+  } = bsda;
+  const { id, ...transporter } = transporters[0];
 
   return {
-    ...persistedData,
-    ...flattenedInput,
-    isDraft: isDraft ?? Boolean(persisted?.isDraft),
-    intermediaries: input?.intermediaries ?? persisted?.intermediaries,
-    grouping: input?.grouping ?? persisted?.grouping.map(bsda => bsda.id),
-    forwarding: input?.forwarding ?? persisted?.forwarding?.id,
+    ...data,
     ...transporter,
-    transporterId
+    transporterId: id,
+    wasteCode: wasteCode as ZodWasteCodeEnum,
+    destinationPlannedOperationCode:
+      destinationPlannedOperationCode as ZodOperationEnum,
+    destinationOperationCode: destinationOperationCode as ZodOperationEnum,
+    workerCertificationOrganisation:
+      workerCertificationOrganisation as ZodWorkerCertificationOrganismEnum,
+    packagings: packagings as BsdaPackaging[],
+    grouping: grouping.map(bsda => bsda.id),
+    forwarding: forwardingId,
+    intermediaries: intermediaries.map(i => {
+      const { bsdaId, id, createdAt, ...intermediaryData } = i;
+      return { ...intermediaryData, address: intermediaryData.address! };
+    })
   };
 }
 
-type UnparsedBsda = ReturnType<typeof getUnparsedBsda>;
-
-/**
- * Computes all the fields that will be updated
- * If a field is present in the input but has the same value as the
- * data present in the DB, we do not return it as we want to
- * allow reposting fields if they are not modified
- */
-export function getUpdatedFields({
-  input,
-  persisted
-}: UnparsedInputs): string[] {
-  if (!input || !persisted) {
-    return [];
-  }
-
-  const flatInput = flattenBsdaInput(input);
-  const flatTransporterInput = flattenBsdaTransporterInput(input);
-  const persistedTransporter = getFirstTransporterSync(persisted);
-
+export function getUpdatedFields(bsda: ZodBsda, update: ZodBsda) {
   // only pick keys present in the input to compute the diff between
   // the input and the data in DB
   const compareTo = {
-    ...Object.keys(flatInput).reduce((acc, field) => {
-      return { ...acc, [field]: persisted[field] };
-    }, {}),
-    ...Object.keys(flatTransporterInput).reduce((acc, field) => {
-      return { ...acc, [field]: persistedTransporter?.[field] };
-    }, {}),
-    ...(input.grouping ? { grouping: persisted.grouping?.map(g => g.id) } : {}),
-    ...(input.forwarding ? { forwarding: persisted.forwarding?.id } : {}),
-    ...(input.intermediaries
-      ? {
-          intermediaries: persisted.intermediaries?.map(inter => {
-            const { bsdaId, id, createdAt, ...input } = inter; // To match the input, we remove some internal fields
-            return input;
-          })
-        }
-      : {})
+    ...Object.keys(update).reduce((acc, field) => {
+      return { ...acc, [field]: bsda[field] };
+    }, {})
   };
 
-  const diff = objectDiff({ ...flatInput, ...flatTransporterInput }, compareTo);
+  const diff = objectDiff(update, compareTo);
 
   return Object.keys(diff);
 }
@@ -83,7 +126,7 @@ export function getUpdatedFields({
  * Gets all the signatures prior to the target signature in the signature hierarchy.
  */
 export function getSignatureAncestors(
-  targetSignature: BsdaSignatureType | undefined
+  targetSignature: BsdaSignatureType | undefined | null
 ): BsdaSignatureType[] {
   if (!targetSignature) return [];
 
@@ -97,40 +140,69 @@ export function getSignatureAncestors(
   ];
 }
 
-export async function getUserFunctions(
-  user: User | undefined,
-  unparsedBsda: UnparsedBsda
-) {
-  const companies = user ? await getUserCompanies(user.id) : [];
-  return getCompaniesFunctions(companies, unparsedBsda);
-}
+export type BsdaUserFunctions = {
+  isEcoOrganisme: boolean;
+  isBroker: boolean;
+  isWorker: boolean;
+  isEmitter: boolean;
+  isDestination: boolean;
+  isTransporter: boolean;
+};
 
-export function getCompaniesFunctions(
-  companies: Company[],
-  unparsedBsda: UnparsedBsda
-) {
+export async function getBsdaUserFunctions(
+  user: User | undefined,
+  bsda: ZodBsda
+): Promise<BsdaUserFunctions> {
+  const companies = user ? await getUserCompanies(user.id) : [];
   const orgIds = companies.map(c => c.orgId);
 
   return {
     isEcoOrganisme:
-      unparsedBsda.ecoOrganismeSiret != null &&
-      orgIds.includes(unparsedBsda.ecoOrganismeSiret),
+      bsda.ecoOrganismeSiret != null && orgIds.includes(bsda.ecoOrganismeSiret),
     isBroker:
-      unparsedBsda.brokerCompanySiret != null &&
-      orgIds.includes(unparsedBsda.brokerCompanySiret),
+      bsda.brokerCompanySiret != null &&
+      orgIds.includes(bsda.brokerCompanySiret),
     isWorker:
-      unparsedBsda.workerCompanySiret != null &&
-      orgIds.includes(unparsedBsda.workerCompanySiret),
+      bsda.workerCompanySiret != null &&
+      orgIds.includes(bsda.workerCompanySiret),
     isEmitter:
-      unparsedBsda.emitterCompanySiret != null &&
-      orgIds.includes(unparsedBsda.emitterCompanySiret),
+      bsda.emitterCompanySiret != null &&
+      orgIds.includes(bsda.emitterCompanySiret),
     isDestination:
-      unparsedBsda.destinationCompanySiret != null &&
-      orgIds.includes(unparsedBsda.destinationCompanySiret),
+      bsda.destinationCompanySiret != null &&
+      orgIds.includes(bsda.destinationCompanySiret),
     isTransporter:
-      (unparsedBsda.transporterCompanySiret != null &&
-        orgIds.includes(unparsedBsda.transporterCompanySiret)) ||
-      (unparsedBsda.transporterCompanyVatNumber != null &&
-        orgIds.includes(unparsedBsda.transporterCompanyVatNumber))
+      (bsda.transporterCompanySiret != null &&
+        orgIds.includes(bsda.transporterCompanySiret)) ||
+      (bsda.transporterCompanyVatNumber != null &&
+        orgIds.includes(bsda.transporterCompanyVatNumber))
   };
+}
+
+/**
+ * Renvoie la dernière signature en date sur un BSDA
+ */
+export function getCurrentSignatureType(
+  bsda: ZodBsda
+): BsdaSignatureType | undefined {
+  /**
+   * Fonction interne récursive qui parcourt la hiérarchie des signatures et
+   * renvoie les signatures présentes sur le bordereau
+   */
+  function getSignatures(current: BsdaSignatureType, acc: BsdaSignatureType[]) {
+    const signature = SIGNATURES_HIERARCHY[current];
+    const hasCurrentSignature = Boolean(bsda[signature.field]);
+    const signatures = [...(hasCurrentSignature ? [current] : []), ...acc];
+    if (signature.next) {
+      return getSignatures(signature.next, signatures);
+    }
+    return signatures;
+  }
+  const signatures = getSignatures("EMISSION", []);
+
+  if (signatures.length > 0) {
+    return signatures[0];
+  }
+
+  return undefined;
 }

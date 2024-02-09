@@ -5,7 +5,7 @@ import { companyToIntermediaryInput, expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound, getFirstTransporterSync } from "../../database";
 import { checkCanUpdate } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
-import { parseBsdaInContext } from "../../validation";
+import { mergeInputAndParseBsdaAsync } from "../../validation";
 
 export default async function edit(
   _,
@@ -28,13 +28,13 @@ export default async function edit(
 
   await checkCanUpdate(user, existingBsda, input);
 
-  const { bsda, transporter } = await parseBsdaInContext(
-    { input, persisted: existingBsda },
+  const { bsda, transporter } = await mergeInputAndParseBsdaAsync(
+    existingBsda,
+    input,
     {
+      user,
       enableCompletionTransformers: true,
-      enablePreviousBsdasChecks: true,
-      currentSignatureType: getCurrentSignatureType(existingBsda),
-      user
+      enablePreviousBsdasChecks: true
     }
   );
 
@@ -80,13 +80,4 @@ export default async function edit(
   );
 
   return expandBsdaFromDb(updatedBsda);
-}
-
-function getCurrentSignatureType(bsda) {
-  // TODO calculate from SIGNATURES_HIERARCHY
-  if (bsda.destinationOperationSignatureDate != null) return "OPERATION";
-  if (bsda.transporterTransportSignatureDate != null) return "TRANSPORT";
-  if (bsda.workerWorkSignatureDate != null) return "WORK";
-  if (bsda.emitterEmissionSignatureDate != null) return "EMISSION";
-  return undefined;
 }

@@ -1071,7 +1071,7 @@ describe("Mutation.Bsda.sign", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: "Le conditionnement est obligatoire"
+          message: "Le conditionnement est obligatoire."
         })
       ]);
     });
