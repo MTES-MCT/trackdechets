@@ -12,7 +12,6 @@ import makeClient from "../../../../__tests__/testClient";
 import { geocode } from "../../../geo/geocode";
 import { CompanyType } from "@prisma/client";
 import {
-  onboardingFirstStep,
   renderMail,
   verificationProcessInfo,
   verifiedForeignTransporterCompany
