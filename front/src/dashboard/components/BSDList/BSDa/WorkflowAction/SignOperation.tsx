@@ -1,6 +1,5 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import routes from "../../../../../Apps/routes";
 import { format, subMonths } from "date-fns";
 import { UPDATE_BSDA } from "../../../../../form/bsda/stepper/queries";
@@ -50,10 +49,7 @@ export function SignOperation({
   const [signBsda, { loading, error: signatureError }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
-  >(SIGN_BSDA, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true
-  });
+  >(SIGN_BSDA);
 
   const TODAY = new Date();
 

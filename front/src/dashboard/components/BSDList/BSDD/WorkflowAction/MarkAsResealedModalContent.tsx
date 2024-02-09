@@ -5,7 +5,6 @@ import { NotificationError } from "../../../../../Apps/common/Components/Error/E
 import ProcessingOperationSelect from "../../../../../common/components/ProcessingOperationSelect";
 import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
 import { mergeDefaults } from "../../../../../common/helper";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 import CompanySelector from "../../../../../form/common/components/company/CompanySelector";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
@@ -96,8 +95,6 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
   const [markAsResealed, { error, loading }] = useMutation<
     Pick<Mutation, "markAsResealed">
   >(MARK_RESEALED, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onError: () => {
       // The error is handled in the UI
     }

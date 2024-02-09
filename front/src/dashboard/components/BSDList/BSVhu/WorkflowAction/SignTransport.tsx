@@ -1,6 +1,5 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import routes from "../../../../../Apps/routes";
 import { UPDATE_VHU_FORM } from "../../../../../form/bsvhu/utils/queries";
 import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
@@ -46,10 +45,7 @@ export function SignTransport({
     );
 
   const [signBsvhu, { loading: loadingSign, error: signatureError }] =
-    useMutation<Pick<Mutation, "signBsvhu">, MutationSignBsvhuArgs>(
-      SIGN_BSVHU,
-      { refetchQueries: [GET_BSDS], awaitRefetchQueries: true }
-    );
+    useMutation<Pick<Mutation, "signBsvhu">, MutationSignBsvhuArgs>(SIGN_BSVHU);
 
   const loading = loadingUpdate || loadingSign;
 

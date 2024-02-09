@@ -4,7 +4,6 @@ import { Loader } from "../../../../common/Components";
 import { NotificationError } from "../../../../common/Components/Error/Error";
 import TdModal from "../../../../common/Components/Modal/Modal";
 import { statusChangeFragment } from "../../../../common/queries/fragments";
-import { GET_BSDS } from "../../../../common/queries";
 import AcceptedInfo from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/AcceptedInfo";
 import ReceivedInfo from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/ReceivedInfo";
 import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
@@ -84,8 +83,6 @@ const ActBsddValidation = ({
     Pick<Mutation, "markAsTempStorerAccepted">,
     MutationMarkAsTempStorerAcceptedArgs
   >(MARK_TEMP_STORER_ACCEPTED, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onError: () => {
       // The error is handled in the UI
     }
@@ -94,8 +91,6 @@ const ActBsddValidation = ({
     useMutation<Pick<Mutation, "markAsAccepted">, MutationMarkAsAcceptedArgs>(
       MARK_AS_ACCEPTED,
       {
-        refetchQueries: [GET_BSDS],
-        awaitRefetchQueries: true,
         onError: () => {
           // The error is handled in the UI
         }

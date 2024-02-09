@@ -1,6 +1,5 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import { getInitialCompany } from "../../../../../form/bsdd/utils/initial-state";
 import Operation from "../../../../../form/bsvhu/Operation";
 import { UPDATE_VHU_FORM } from "../../../../../form/bsvhu/utils/queries";
@@ -46,7 +45,7 @@ export function SignOperation({
   const [signBsvhu, { loading, error: signError }] = useMutation<
     Pick<Mutation, "signBsvhu">,
     MutationSignBsvhuArgs
-  >(SIGN_BSVHU, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+  >(SIGN_BSVHU);
 
   const TODAY = new Date();
 

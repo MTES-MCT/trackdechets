@@ -17,7 +17,6 @@ import {
   UPDATE_BSFF_FORM
 } from "../../../../../form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import { subMonths } from "date-fns";
@@ -45,7 +44,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
   const [signBsff, signBsffResult] = useMutation<
     Pick<Mutation, "signBsff">,
     MutationSignBsffArgs
-  >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+  >(SIGN_BSFF);
 
   const TODAY = new Date();
 

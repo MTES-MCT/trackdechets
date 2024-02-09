@@ -4,7 +4,6 @@ import { gql, useMutation } from "@apollo/client";
 import { Mutation, MutationDeleteFormArgs } from "@td/codegen-ui";
 import toast from "react-hot-toast";
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import { Loader } from "../../../../../Apps/common/Components";
 import { TOAST_DURATION } from "../../../../../common/config";
 
@@ -31,8 +30,6 @@ export function DeleteModal({
     MutationDeleteFormArgs
   >(DELETE_FORM, {
     variables: { id: formId },
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: () => {
       toast.success("Bordereau supprimé", { duration: TOAST_DURATION });
       !!onClose && onClose();
