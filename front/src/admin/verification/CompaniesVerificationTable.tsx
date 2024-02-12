@@ -121,7 +121,16 @@ export default function CompaniesVerificationTable({
     {
       columns,
       data,
-      initialState: { pageIndex: 0, pageSize },
+      initialState: {
+        pageIndex: 0,
+        pageSize,
+        filters: [
+          {
+            id: "verificationStatus",
+            value: CompanyVerificationStatus.ToBeVerified
+          }
+        ]
+      },
       manualPagination: true,
       manualFilters: true,
       pageCount,
