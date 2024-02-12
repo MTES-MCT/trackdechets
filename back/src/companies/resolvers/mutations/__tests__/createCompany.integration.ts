@@ -647,7 +647,7 @@ describe("Mutation.createCompany", () => {
     ]);
   });
 
-  it("non-profesional > should not send verification email and send onboarding email", async () => {
+  it("non-professional > should not send verification email and send onboarding email", async () => {
     // Given
     const user = await userFactory();
     const siret = siretify(8);
@@ -702,7 +702,7 @@ describe("Mutation.createCompany", () => {
     );
   });
 
-  it("profesional > should send verification email and not onboarding email", async () => {
+  it("professional > should send verification email and not onboarding email", async () => {
     // Given
     const user = await userFactory();
     const siret = siretify(8);
