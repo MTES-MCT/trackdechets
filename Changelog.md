@@ -13,6 +13,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout de la possibilité de sélectionner un éco-organisme sur le BSDA [PR 3062](https://github.com/MTES-MCT/trackdechets/pull/3062)
 - Nouvelle navigation sur Trackdéchets : la navigation principale et le menu latéral ont été mis en conformité avec le DSFR [PR 3066](https://github.com/MTES-MCT/trackdechets/pull/3066)
 - La gestion des établissements devient désormais un onglet principal de Trackdéchets, à retrouver dans "Mes établissements" [PR 3066](https://github.com/MTES-MCT/trackdechets/pull/3066)
+-  Ajouter le numéro libre BSDD sur le tableau de bord "V2" [PR 3035]([#](https://github.com/MTES-MCT/trackdechets/pull/)3050)
+- Implémenter les Révisions dans le Front "V2" [PR 3054](https://github.com/MTES-MCT/trackdechets/pull/3054)
+- Suppression Dashboard "v1" [PR 3064](https://github.com/MTES-MCT/trackdechets/pull/3064)
 
 #### :bug: Corrections de bugs
 
@@ -30,10 +33,13 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Le mode de traitement "Elimination (incinération sans valorisation énergétique et stockage en décharge)" a été renommé "Elimination" [PR 3044](https://github.com/MTES-MCT/trackdechets/pull/3044)
 - Flexibilisation de certaines règles de validation du BSDA pour pouvoir modifier les champs de contact plus longtemps [PR 3060](https://github.com/MTES-MCT/trackdechets/pull/3060)
 - Retirer la possibilité de faire du multimodal pour le BSD de tournée dédiée [PR 3057](https://github.com/MTES-MCT/trackdechets/pull/3057)
-
+-  Signature eco-organisme plus stricte [PR 3074](https://github.com/MTES-MCT/trackdechets/pull/3074)
+- Ajout de champs obligatoires sur l'annexe 1 [PR 3073](https://github.com/MTES-MCT/trackdechets/pull/3073)
 #### :house: Interne
 
 - [BSDA] Migrer les données transporteur dans une table à part (refacto interne du code) [PR 3055](https://github.com/MTES-MCT/trackdechets/pull/3055)
+- Ajout aide dans CONTRIBUTING.md [PR 3043}(https://github.com/MTES-MCT/trackdechets/pull/3043/files)
+- DIVERS - Améliorations de performance [PR 3059](https://github.com/MTES-MCT/trackdechets/pull/3059)
 
 # [2024.1.1] 16/01/2024
 
