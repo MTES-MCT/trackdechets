@@ -2,15 +2,27 @@ import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { TEST_COMPANY_PREFIX } from "@td/constants";
+import { luhnCheckSum, TEST_COMPANY_PREFIX } from "@td/constants";
 import { randomNbrChain } from "../../../utils";
 
 /**
- * Generates a new test siret. Will create a random siret with a test prefix,
- * then check in the DB if such siret already exists. In that case, will try again.
+ * Generates a new test siret. Will create a random, VALID siret with a test prefix,.
  */
-export async function generateTestSiret() {
-  const randomSiret = `${TEST_COMPANY_PREFIX}${randomNbrChain(8)}`;
+export const generateRandomTestSiret = () => {
+  // https://github.com/MathieuDerelle/vat-siren-siret/blob/master/lib/vss.rb#L119
+  const chain = `${TEST_COMPANY_PREFIX}${randomNbrChain(6)}`;
+  const rest = 10 - (luhnCheckSum(chain) % 10);
+  const a = Math.round(rest / 3);
+  const b = rest > 2 ? rest - 2 * a : rest;
+
+  return `${chain}${a}${b}`;
+};
+
+/**
+ * Generates a unique test siret. Will check in the DB if such siret already exists.
+ */
+export async function generateUniqueTestSiret() {
+  const randomSiret = generateRandomTestSiret();
 
   const testCompany = await prisma.anonymousCompany.findFirst({
     where: { siret: randomSiret }
@@ -19,7 +31,7 @@ export async function generateTestSiret() {
   // There's already a a company with this random siret.
   // Try again.
   if (testCompany) {
-    return generateTestSiret();
+    return generateUniqueTestSiret();
   }
 
   return randomSiret;
@@ -42,7 +54,7 @@ const createTestCompany: MutationResolvers["createTestCompany"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   checkIsAuthenticated(context);
   const createInput = {
-    siret: await generateTestSiret(),
+    siret: await generateUniqueTestSiret(),
     ...fixtures
   };
   const company = await prisma.anonymousCompany.create({

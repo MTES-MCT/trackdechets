@@ -79,10 +79,7 @@ const ALLOW_TEST_COMPANY = process?.env?.["ALLOW_TEST_COMPANY"] === "true";
 
 export const BAD_CHARACTERS_REGEXP = /[\W_]/gim;
 
-/**
- * Implements the Luhn Algorithm used to validate SIRET or SIREN of identification numbers
- */
-export const luhnCheck = (num: string | number, modulo = 10): boolean => {
+export const luhnCheckSum = (num: string | number): number => {
   const arr = (num + "")
     .split("")
     .reverse()
@@ -94,7 +91,14 @@ export const luhnCheck = (num: string | number, modulo = 10): boolean => {
     0
   );
   sum += lastDigit ?? 0;
-  return sum % modulo === 0;
+  return sum;
+};
+
+/**
+ * Implements the Luhn Algorithm used to validate SIRET or SIREN of identification numbers
+ */
+export const luhnCheck = (num: string | number, modulo = 10): boolean => {
+  return luhnCheckSum(num) % modulo === 0;
 };
 
 export const cleanClue = (clue: string): string =>
