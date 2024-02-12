@@ -4,7 +4,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Mutation } from "../../../../generated/graphql/types";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { generateTestSiret } from "../createTestCompany";
+import { generateUniqueTestSiret } from "../createTestCompany";
 import * as utils from "../../../../utils";
 import { TEST_COMPANY_PREFIX } from "@td/constants";
 
@@ -26,12 +26,12 @@ describe("createTestCompany", () => {
     jest.restoreAllMocks();
   });
 
-  describe("generateTestSiret", () => {
+  describe("generateUniqueTestSiret", () => {
     it("should generate a random siret with 14 characters, and the first 6 should be the test prefix", async () => {
       // Given
 
       // When
-      const randomSiret = await generateTestSiret();
+      const randomSiret = await generateUniqueTestSiret();
 
       // Then
       expect(randomSiret.length).toEqual(14);
@@ -72,7 +72,7 @@ describe("createTestCompany", () => {
       .mockReturnValueOnce("00000003");
 
     // When
-    const testSiret = await generateTestSiret();
+    const testSiret = await generateUniqueTestSiret();
 
     // Then
     expect(randomNbrChainSpy).toHaveBeenCalledTimes(3);
