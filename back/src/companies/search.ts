@@ -134,6 +134,14 @@ export async function searchCompany(
   });
   // Anonymous Company search by-pass SIRENE or VAT search
   if (anonymousCompany) {
+    let codePaysEtrangerEtablissement = "FR";
+    if (isForeignVat(cleanedClue)) {
+      const { country } = checkVAT(cleanedClue, countries);
+      if (country) {
+        codePaysEtrangerEtablissement = country.isoCode.short;
+      }
+    }
+
     const companyInfo: SireneSearchResult = {
       ...removeEmptyKeys(anonymousCompany),
       statutDiffusionEtablissement: cleanedClue.startsWith(TEST_COMPANY_PREFIX)
@@ -141,7 +149,7 @@ export async function searchCompany(
         : ("P" as StatutDiffusionEtablissement),
       etatAdministratif: "A",
       naf: anonymousCompany.codeNaf,
-      codePaysEtrangerEtablissement: "FR"
+      codePaysEtrangerEtablissement
     };
     return findCompanyAndMergeInfos(cleanedClue, companyInfo);
   } else if (isTestCompany) {

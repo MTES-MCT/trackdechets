@@ -1,9 +1,12 @@
 @import "../../../../scss/Breakpoints.scss";
 
 .actors {
+  min-width: 0;
+
   &__item {
     display: flex;
     align-items: center;
+    max-width: 100;
   }
   position: relative;
 
@@ -13,32 +16,17 @@
     margin: 0 0 0 5px;
     color: #3a3a3a;
     height: 25px;
+    display: flex;
+    min-width: 0;
 
-    & > span {
-      display: inline-block;
-      width: 210px;
-      @include desktop {
-        width: 140px;
-      }
-      @include lg-desktop {
-        width: 250px;
-      }
+    &--first {
+      text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
     }
 
-    &:after {
-      position: absolute;
-      content: attr(data-truncate);
-      left: 230px;
-      @include desktop {
-        left: 160px;
-      }
-      @include lg-desktop {
-        left: 270px;
-      }
-      white-space: nowrap;
+    &--second {
+      flex-shrink: 0;
     }
   }
   &__label:first-letter {
@@ -50,20 +38,24 @@
   }
 
   &__emitter-icon {
+    flex-shrink: 0;
     width: 19px;
     height: 17px;
   }
 
   &__transporter-icon {
+    flex-shrink: 0;
     width: 19px;
     height: 19px;
   }
 
   &__destination-icon {
+    flex-shrink: 0;
     width: 19px;
     height: 19px;
   }
   &__worker-icon {
+    flex-shrink: 0;
     width: 19px;
     height: 19px;
   }
