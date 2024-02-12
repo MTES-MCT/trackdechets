@@ -10,7 +10,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { isTrustedEmail, randomNumber } from "../../../utils";
+import { isGenericEmail, randomNumber } from "../../../utils";
 import { renderMail, verificationProcessInfo } from "@td/mail";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
@@ -216,8 +216,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       isProfessional(companyTypes) &&
       !isForeignTransporter({ companyTypes, vatNumber })
     ) {
-      // Email is sus. Automatically send a verification email
-      if (!isTrustedEmail(user.email)) {
+      // Email is too generic. Automatically send a verification letter
+      if (isGenericEmail(user.email, company.name)) {
         await sendVerificationCodeLetter(company);
         await prisma.company.update({
           where: { orgId: company.orgId },

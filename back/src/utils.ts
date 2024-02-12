@@ -204,12 +204,18 @@ export const randomNbrChain = (length: number) => {
     .join("");
 };
 
-export const UNTRUSTED_EMAIL_DOMAINS = [
-  "gmail.com",
-  "outlook.com",
-  "hotmail.com",
-  "live.com",
-  "free.fr"
+export const GENERIC_EMAIL_DOMAINS = [
+  "gmail",
+  "outlook",
+  "hotmail",
+  "live",
+  "free",
+  "orange",
+  "icloud",
+  "neuf",
+  "wanadoo",
+  "laposte",
+  "yahoo"
 ];
 
 export const isEmail = (email: string): boolean => {
@@ -218,10 +224,27 @@ export const isEmail = (email: string): boolean => {
   ).test(email);
 };
 
-export const isTrustedEmail = (email: string): boolean => {
+export const isGenericEmail = (
+  email: string,
+  companyName: string = ""
+): boolean => {
   if (!isEmail(email)) return false;
 
-  const domain = email.split("@")[1];
+  // Extract domain name & split on dots and hyphens and remove domain extension
+  const suffixes = email.split("@")[1].split(/[.-]/).slice(0, -1);
 
-  return !UNTRUSTED_EMAIL_DOMAINS.includes(domain.toLowerCase());
+  // Weird domain, don't bother
+  if (suffixes.length !== 1) {
+    return false;
+  }
+
+  const suffix = suffixes[0];
+
+  // Email domain seems to match the company name
+  if (companyName.toLowerCase().includes(suffix)) {
+    return false;
+  }
+
+  // Else, check if domain is generic
+  return GENERIC_EMAIL_DOMAINS.includes(suffix.toLowerCase());
 };

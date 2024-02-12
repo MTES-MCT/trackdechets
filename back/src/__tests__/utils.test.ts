@@ -8,8 +8,8 @@ import {
   xDaysAgo,
   randomNbrChain,
   isEmail,
-  isTrustedEmail,
-  UNTRUSTED_EMAIL_DOMAINS
+  isGenericEmail,
+  GENERIC_EMAIL_DOMAINS
 } from "../utils";
 
 test("getUid returns a unique identifier of fixed length", () => {
@@ -96,7 +96,7 @@ describe("randomNbrChain", () => {
   });
 });
 
-describe("isEmail", () => {
+describe("isGenericEmail", () => {
   test.each`
     input                         | expected
     ${"abc..def@mail.com"}        | ${false}
@@ -117,21 +117,54 @@ describe("isEmail", () => {
   });
 });
 
-describe("isTrustedEmail", () => {
+describe("isGenericEmail", () => {
   test.each([
-    ...UNTRUSTED_EMAIL_DOMAINS.map(domain => `giovanni.giorgio@${domain}`),
-    ...UNTRUSTED_EMAIL_DOMAINS.map(domain =>
-      `giovanni.giorgio@${domain}`.toUpperCase()
+    ...GENERIC_EMAIL_DOMAINS.map(domain => `giovanni.giorgio@${domain}.fr`),
+    ...GENERIC_EMAIL_DOMAINS.map(domain => `giovanni.giorgio@${domain}.com`),
+    ...GENERIC_EMAIL_DOMAINS.map(domain =>
+      `giovanni.giorgio@${domain}.de`.toUpperCase()
     )
-  ])(`"%p" shouldn't be trusted`, input => {
-    expect(isTrustedEmail(input)).toEqual(false);
+  ])(`%p is generic because domain belongs to the generic list`, email => {
+    expect(isGenericEmail(email)).toEqual(true);
   });
 
   test.each([
     "giovanni.giorgio@veolia.fr",
     "jeff@dechets.com",
     "jack.sparrow@entreprise-btp.be"
-  ])(`"%p" should be trusted`, input => {
-    expect(isTrustedEmail(input)).toEqual(true);
+  ])(`%p is NOT generic because domain is not in the generic list`, email => {
+    expect(isGenericEmail(email)).toEqual(false);
+  });
+
+  test.each([
+    "giovanni.giorgio@orange.orange.fr",
+    "giovanni.giorgio@orange.laposte.fr",
+    "giovanni.giorgio@orangelaposte.fr"
+  ])(`%p is NOT generic - edge cases`, email => {
+    expect(isGenericEmail(email)).toEqual(false);
+  });
+
+  test.each([
+    ["giovanni.giorgio@orange.fr", "L'orange niçoise"],
+    ["jeff@gmail.com", "Gmail déchetterie"],
+    ["jack.sparrow@yahoo.be", "Yahoo on kiffe les déchets SAS"]
+  ])(
+    `%p is NOT generic because email domain, even though generic, refers to company name %p`,
+    (email, companyName) => {
+      expect(isGenericEmail(email, companyName)).toEqual(false);
+    }
+  );
+
+  test.each([
+    // Hyphens
+    ["giovanni.giorgio@orange-nicoise.fr"],
+    ["jeff@gmail-dechetterie.com"],
+    ["jack.sparrow@kiff-yahoo-dechets.be"],
+    // Dots
+    ["giovanni.giorgio@orange.nicoise.fr"],
+    ["jeff@gmail.dechetterie.com"],
+    ["jack.sparrow@kiff.yahoo.dechets.be"]
+  ])(`%p is NOT generic because of complex domain`, email => {
+    expect(isGenericEmail(email)).toEqual(false);
   });
 });
