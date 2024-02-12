@@ -1,4 +1,4 @@
-import { RefinementCtx, z } from "zod";
+import { z } from "zod";
 import { isForeignVat, isSiret, isVat } from "@td/constants";
 import {
   isCollector,
@@ -179,33 +179,3 @@ export const isRegisteredVatNumberRefinement = async (vatNumber, ctx) => {
     });
   }
 };
-
-async function refineAndGetEcoOrganisme(siret: string | null | undefined, ctx) {
-  if (!siret) return null;
-  const ecoOrganisme = await prisma.ecoOrganisme.findUnique({
-    where: { siret }
-  });
-
-  if (ecoOrganisme === null) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `L'éco-organisme avec le SIRET ${siret} n'est pas référencé sur Trackdéchets`
-    });
-  }
-
-  return ecoOrganisme;
-}
-
-export async function isBsdaEcoOrganismeRefinement(
-  siret: string | null | undefined,
-  ctx: RefinementCtx
-) {
-  const ecoOrganisme = await refineAndGetEcoOrganisme(siret, ctx);
-
-  if (ecoOrganisme && !ecoOrganisme?.handleBsda) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSDA`
-    });
-  }
-}
