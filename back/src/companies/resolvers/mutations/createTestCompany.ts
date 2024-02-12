@@ -12,7 +12,7 @@ export const generateRandomTestSiret = () => {
   // https://github.com/MathieuDerelle/vat-siren-siret/blob/master/lib/vss.rb#L119
   const chain = `${TEST_COMPANY_PREFIX}${randomNbrChain(6)}`;
   const rest = 10 - (luhnCheckSum(chain) % 10);
-  const a = Math.round(rest / 3);
+  const a = Math.floor(rest / 3);
   const b = rest > 2 ? rest - 2 * a : rest;
 
   return `${chain}${a}${b}`;

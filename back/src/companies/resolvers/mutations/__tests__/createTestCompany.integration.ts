@@ -44,8 +44,8 @@ describe("createTestCompany", () => {
     await prisma.anonymousCompany.create({
       data: {
         name: "Test company",
-        siret: "00000000000001",
-        orgId: "00000000000001",
+        siret: "00000000000133", // 000001 + luhn
+        orgId: "00000000000133",
         address: "",
         codeNaf: "",
         libelleNaf: "",
@@ -55,8 +55,8 @@ describe("createTestCompany", () => {
     await prisma.anonymousCompany.create({
       data: {
         name: "Test company",
-        siret: "00000000000002",
-        orgId: "00000000000002",
+        siret: "00000000000224", // 000002 + luhn
+        orgId: "00000000000224",
         address: "",
         codeNaf: "",
         libelleNaf: "",
@@ -67,16 +67,16 @@ describe("createTestCompany", () => {
     // https://github.com/aelbore/esbuild-jest/issues/26#issuecomment-968853688
     const randomNbrChainSpy = jest.spyOn(utils, "randomNbrChain");
     (randomNbrChainSpy as jest.Mock)
-      .mockReturnValueOnce("00000001")
-      .mockReturnValueOnce("00000002")
-      .mockReturnValueOnce("00000003");
+      .mockReturnValueOnce("000001")
+      .mockReturnValueOnce("000002")
+      .mockReturnValueOnce("000003");
 
     // When
     const testSiret = await generateUniqueTestSiret();
 
     // Then
     expect(randomNbrChainSpy).toHaveBeenCalledTimes(3);
-    expect(testSiret).toEqual("00000000000003");
+    expect(testSiret).toEqual("00000000000323"); // 000003 + luhn
   });
 });
 

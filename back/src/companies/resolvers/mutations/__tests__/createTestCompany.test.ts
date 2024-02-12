@@ -20,6 +20,6 @@ describe("generateRandomTestSiret", () => {
     const randomSiret = await generateRandomTestSiret();
 
     // Then
-    expect(isSiret(randomSiret)).toBeTruthy();
+    expect(isSiret(randomSiret, false)).toBeTruthy();
   });
 });
