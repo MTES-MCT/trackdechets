@@ -16,7 +16,6 @@ import {
 } from "@td/mail";
 import { prisma } from "@td/prisma";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
-import { PROFESSIONALS } from "@td/constants";
 import { isForeignTransporter } from "../../validation";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import {
@@ -24,7 +23,7 @@ import {
   UserInputError
 } from "../../../common/errors";
 
-export const sendPostVerificationFirstOnboardingEmail = async (
+export const sendFirstOnboardingEmail = async (
   {
     companyTypes,
     vatNumber
@@ -34,7 +33,6 @@ export const sendPostVerificationFirstOnboardingEmail = async (
   },
   admin: { email: string; name?: string | null }
 ) => {
-  // If foreign transporter company
   if (isForeignTransporter({ companyTypes, vatNumber })) {
     await sendMail(
       renderMail(verifiedForeignTransporterCompany, {
@@ -45,14 +43,11 @@ export const sendPostVerificationFirstOnboardingEmail = async (
     return;
   }
 
-  // If professional company
-  if ([...companyTypes].some(ct => PROFESSIONALS.includes(ct))) {
-    await sendMail(
-      renderMail(onboardingFirstStep, {
-        to: [{ email: admin.email, name: admin.name ?? "" }]
-      })
-    );
-  }
+  await sendMail(
+    renderMail(onboardingFirstStep, {
+      to: [{ email: admin.email, name: admin.name ?? "" }]
+    })
+  );
 };
 
 /**
@@ -97,7 +92,7 @@ const verifyCompanyResolver: MutationResolvers["verifyCompany"] = async (
   );
 
   // Potential onboarding email
-  await sendPostVerificationFirstOnboardingEmail(verifiedCompany, user);
+  await sendFirstOnboardingEmail(verifiedCompany, user);
 
   return convertUrls(verifiedCompany);
 };

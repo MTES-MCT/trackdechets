@@ -12,6 +12,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { geocode } from "../../../geo/geocode";
 import { CompanyType } from "@prisma/client";
 import {
+  onboardingFirstStep,
   renderMail,
   verificationProcessInfo,
   verifiedForeignTransporterCompany
@@ -646,7 +647,7 @@ describe("Mutation.createCompany", () => {
     ]);
   });
 
-  it("non-profesional > should not send verification email and no onboarding email", async () => {
+  it("non-profesional > should not send verification email and send onboarding email", async () => {
     // Given
     const user = await userFactory();
     const siret = siretify(8);
@@ -691,7 +692,14 @@ describe("Mutation.createCompany", () => {
     jest.mock("../../../../mailer/mailing");
     (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
-    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+
+    // Onboarding email
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+      renderMail(onboardingFirstStep, {
+        to: [{ email: user.email, name: user.name }]
+      })
+    );
   });
 
   it("profesional > should send verification email and not onboarding email", async () => {

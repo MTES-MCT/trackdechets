@@ -15,7 +15,7 @@ import {
   isSiret,
   isVat,
   CLOSED_COMPANY_ERROR,
-  PROFESSIONALS
+  isProfessional
 } from "@td/constants";
 import { searchCompany } from "../../search";
 import {
@@ -24,7 +24,7 @@ import {
 } from "../../../queue/producers/company";
 import { UserInputError } from "../../../common/errors";
 import { isForeignTransporter } from "../../validation";
-import { sendPostVerificationFirstOnboardingEmail } from "./verifyCompany";
+import { sendFirstOnboardingEmail } from "./verifyCompany";
 
 /**
  * Create a new company and associate it to a user
@@ -204,10 +204,11 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     data: { firstAssociationDate: new Date() }
   });
 
-  const isProfessional = companyTypes.some(ct => PROFESSIONALS.includes(ct));
-
   if (VERIFY_COMPANY === "true") {
-    if (isProfessional && !isForeignTransporter({ companyTypes, vatNumber })) {
+    if (
+      isProfessional(companyTypes) &&
+      !isForeignTransporter({ companyTypes, vatNumber })
+    ) {
       await sendMail(
         renderMail(verificationProcessInfo, {
           to: [{ email: user.email, name: user.name }],
@@ -230,8 +231,11 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   // If the company is NOT professional or is foreign transporter, send onboarding email
   // (professional onboarding mail is sent on verify)
-  if (!isProfessional || isForeignTransporter({ companyTypes, vatNumber })) {
-    await sendPostVerificationFirstOnboardingEmail(companyInput, user);
+  if (
+    !isProfessional(companyTypes) ||
+    isForeignTransporter({ companyTypes, vatNumber })
+  ) {
+    await sendFirstOnboardingEmail(companyInput, user);
   }
 
   return convertUrls(company);
