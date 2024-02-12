@@ -22,9 +22,13 @@ import {
   StatutDiffusionEtablissement
 } from "../../../../generated/graphql/types";
 import { searchCompany } from "../../../search";
+import { sendVerificationCodeLetter } from "../../../../common/post";
 
 // Mock external search services
 jest.mock("../../../search");
+
+// Mock email sending service
+jest.mock("../../../../common/post");
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -816,5 +820,119 @@ describe("Mutation.createCompany", () => {
         to: [{ email: user.email, name: user.name }]
       })
     );
+  });
+
+  it("professional with sus email > should auto send email verification email", async () => {
+    // Given
+    const user = await userFactory({ email: "sus@gmail.com" });
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Transporteur",
+      address: "une adresse",
+      companyTypes: [CompanyType.TRANSPORTER]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    jest.mock("../../../../common/post");
+    (sendVerificationCodeLetter as jest.Mock).mockImplementation(() =>
+      Promise.resolve()
+    );
+
+    // Verification e-mail
+    expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(1);
+  });
+
+  it("professional with pro email > should not send email verification email", async () => {
+    // Given
+    const user = await userFactory({ email: "sus@dechets.com" });
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Transporteur",
+      address: "une adresse",
+      companyTypes: [CompanyType.TRANSPORTER]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    jest.mock("../../../../common/post");
+    (sendVerificationCodeLetter as jest.Mock).mockImplementation(() =>
+      Promise.resolve()
+    );
+
+    // Verification e-mail
+    expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(0);
+  });
+
+  it("non-professional > should not send email verification email", async () => {
+    // Given
+    const user = await userFactory({ email: "sus@gmail.com" });
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Transporteur",
+      address: "une adresse",
+      companyTypes: [CompanyType.PRODUCER]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    jest.mock("../../../../common/post");
+    (sendVerificationCodeLetter as jest.Mock).mockImplementation(() =>
+      Promise.resolve()
+    );
+
+    // Verification e-mail
+    expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(0);
   });
 });

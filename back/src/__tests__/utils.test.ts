@@ -6,7 +6,10 @@ import {
   hashToken,
   extractPostalCode,
   xDaysAgo,
-  randomNbrChain
+  randomNbrChain,
+  isEmail,
+  isTrustedEmail,
+  UNTRUSTED_EMAIL_DOMAINS
 } from "../utils";
 
 test("getUid returns a unique identifier of fixed length", () => {
@@ -90,5 +93,45 @@ describe("randomNbrChain", () => {
     expect(chain.length).toEqual(length);
     // Numbers only
     expect(new RegExp(/^\d+$/).test(chain)).toBeTruthy();
+  });
+});
+
+describe("isEmail", () => {
+  test.each`
+    input                         | expected
+    ${"abc..def@mail.com"}        | ${false}
+    ${"abc.def@mail.c"}           | ${false}
+    ${"abc.def@mail#archive.com"} | ${false}
+    ${"abc.def@mail"}             | ${false}
+    ${"abc.def@mail..com"}        | ${false}
+    ${"abc-d@mail.com"}           | ${true}
+    ${"abc.def@mail.com"}         | ${true}
+    ${"abc@mail.com"}             | ${true}
+    ${"abc_def@mail.com"}         | ${true}
+    ${"abc.def@mail.cc"}          | ${true}
+    ${"abc.def@mail-archive.com"} | ${true}
+    ${"abc.def@mail.org"}         | ${true}
+    ${"abc.def@mail.com"}         | ${true}
+  `('"$input" should return $expected', ({ input, expected }) => {
+    expect(isEmail(input)).toEqual(expected);
+  });
+});
+
+describe("isTrustedEmail", () => {
+  test.each([
+    ...UNTRUSTED_EMAIL_DOMAINS.map(domain => `giovanni.giorgio@${domain}`),
+    ...UNTRUSTED_EMAIL_DOMAINS.map(domain =>
+      `giovanni.giorgio@${domain}`.toUpperCase()
+    )
+  ])(`"%p" shouldn't be trusted`, input => {
+    expect(isTrustedEmail(input)).toEqual(false);
+  });
+
+  test.each([
+    "giovanni.giorgio@veolia.fr",
+    "jeff@dechets.com",
+    "jack.sparrow@entreprise-btp.be"
+  ])(`"%p" should be trusted`, input => {
+    expect(isTrustedEmail(input)).toEqual(true);
   });
 });

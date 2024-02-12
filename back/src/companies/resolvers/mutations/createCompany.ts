@@ -1,11 +1,16 @@
-import { CompanyType, Prisma } from "@prisma/client";
+import {
+  CompanyType,
+  CompanyVerificationMode,
+  CompanyVerificationStatus,
+  Prisma
+} from "@prisma/client";
 import { convertUrls } from "../../database";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { randomNumber } from "../../../utils";
+import { isTrustedEmail, randomNumber } from "../../../utils";
 import { renderMail, verificationProcessInfo } from "@td/mail";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
@@ -25,6 +30,7 @@ import {
 import { UserInputError } from "../../../common/errors";
 import { isForeignTransporter } from "../../validation";
 import { sendFirstOnboardingEmail } from "./verifyCompany";
+import { sendVerificationCodeLetter } from "../../../common/post";
 
 /**
  * Create a new company and associate it to a user
@@ -204,17 +210,32 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     data: { firstAssociationDate: new Date() }
   });
 
+  // Company needs to be verified
   if (VERIFY_COMPANY === "true") {
     if (
       isProfessional(companyTypes) &&
       !isForeignTransporter({ companyTypes, vatNumber })
     ) {
-      await sendMail(
-        renderMail(verificationProcessInfo, {
-          to: [{ email: user.email, name: user.name }],
-          variables: { company }
-        })
-      );
+      // Email is sus. Automatically send a verification email
+      if (!isTrustedEmail(user.email)) {
+        await sendVerificationCodeLetter(company);
+        await prisma.company.update({
+          where: { orgId: company.orgId },
+          data: {
+            verificationStatus: CompanyVerificationStatus.LETTER_SENT,
+            verificationMode: CompanyVerificationMode.LETTER
+          }
+        });
+      }
+      // Verify manually by admin
+      else {
+        await sendMail(
+          renderMail(verificationProcessInfo, {
+            to: [{ email: user.email, name: user.name }],
+            variables: { company }
+          })
+        );
+      }
     }
   }
   if (company.siret && company.address && companyInfo.codeCommune) {

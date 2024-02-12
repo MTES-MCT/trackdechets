@@ -203,3 +203,25 @@ export const randomNbrChain = (length: number) => {
     .map(_ => Math.floor(Math.random() * 10))
     .join("");
 };
+
+export const UNTRUSTED_EMAIL_DOMAINS = [
+  "gmail.com",
+  "outlook.com",
+  "hotmail.com",
+  "live.com",
+  "free.fr"
+];
+
+export const isEmail = (email: string): boolean => {
+  return new RegExp(
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  ).test(email);
+};
+
+export const isTrustedEmail = (email: string): boolean => {
+  if (!isEmail(email)) return false;
+
+  const domain = email.split("@")[1];
+
+  return !UNTRUSTED_EMAIL_DOMAINS.includes(domain.toLowerCase());
+};
