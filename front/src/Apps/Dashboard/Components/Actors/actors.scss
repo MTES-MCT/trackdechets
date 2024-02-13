@@ -2,11 +2,12 @@
 
 .actors {
   min-width: 0;
+  padding-right: 10px;
 
   &__item {
     display: flex;
     align-items: center;
-    max-width: 100;
+    max-width: 100%;
   }
   position: relative;
 
