@@ -32,9 +32,6 @@ import { sendFirstOnboardingEmail } from "./verifyCompany";
  * @param companyInput
  * @param userId
  */
-
-const { VERIFY_COMPANY } = process.env;
-
 const createCompanyResolver: MutationResolvers["createCompany"] = async (
   parent,
   { companyInput },
@@ -204,7 +201,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     data: { firstAssociationDate: new Date() }
   });
 
-  if (VERIFY_COMPANY === "true") {
+  if (process.env.VERIFY_COMPANY === "true") {
     if (
       isProfessional(companyTypes) &&
       !isForeignTransporter({ companyTypes, vatNumber })

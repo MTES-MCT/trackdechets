@@ -64,9 +64,17 @@ const CREATE_COMPANY = `
 `;
 
 describe("Mutation.createCompany", () => {
+  const OLD_ENV = process.env;
+
+  beforeEach(() => {
+    jest.resetModules();
+    process.env = { ...OLD_ENV };
+  });
+
   afterEach(async () => {
     await resetDatabase();
     jest.resetAllMocks();
+    process.env = OLD_ENV; // Restore old environment
   });
 
   it.each([
@@ -704,6 +712,7 @@ describe("Mutation.createCompany", () => {
 
   it("professional > should send verification email and not onboarding email", async () => {
     // Given
+    process.env.VERIFY_COMPANY = "true";
     const user = await userFactory();
     const siret = siretify(8);
     const orgId = siret;
