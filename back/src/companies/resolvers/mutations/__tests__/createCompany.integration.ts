@@ -833,6 +833,7 @@ describe("Mutation.createCompany", () => {
 
   it("professional with generic email > should auto send verification letter", async () => {
     // Given
+    process.env.VERIFY_COMPANY = "true";
     const user = await userFactory({ email: "user@gmail.com" });
     const siret = siretify(8);
     const orgId = siret;
@@ -871,6 +872,7 @@ describe("Mutation.createCompany", () => {
 
   it("professional with pro email > should not send email verification letter", async () => {
     // Given
+    process.env.VERIFY_COMPANY = "true";
     const user = await userFactory({ email: "user@dechets.com" });
     const siret = siretify(8);
     const orgId = siret;
@@ -909,6 +911,7 @@ describe("Mutation.createCompany", () => {
 
   it("non-professional > should not send email verification letter", async () => {
     // Given
+    process.env.VERIFY_COMPANY = "true";
     const user = await userFactory({ email: "user@gmail.com" });
     const siret = siretify(8);
     const orgId = siret;
