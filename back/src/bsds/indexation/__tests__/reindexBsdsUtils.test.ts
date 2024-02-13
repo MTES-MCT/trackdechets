@@ -8,6 +8,7 @@ describe("reindexBsdsUtils", () => {
       ${"FF-20231128-KFAYQC3M0"}                                                   | ${["FF-20231128-KFAYQC3M0"]}
       ${"TD-20-TCG03421"}                                                          | ${["TD-20-TCG03421"]}
       ${"TD-21-AAA00792"}                                                          | ${["TD-21-AAA00792"]}
+      ${"td21aaa00792"}                                                            | ${["TD-21-AAA00792"]}
       ${""}                                                                        | ${[]}
       ${"    "}                                                                    | ${[]}
       ${"FF-20231128-KFAYQC3M0-suite"}                                             | ${["FF-20231128-KFAYQC3M0-suite"]}
@@ -57,7 +58,8 @@ describe("reindexBsdsUtils", () => {
       "TD-22-TCG03420",
       "TD-19-TCG03420",
       "TD-20-TCG034201",
-      "TD-20-TCG0342"
+      "TD-20-TCG0342",
+      "TB-20-TCG03421"
     ])("%p should throw error", input => {
       expect.assertions(1);
 
