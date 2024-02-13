@@ -96,7 +96,7 @@ describe("randomNbrChain", () => {
   });
 });
 
-describe("isGenericEmail", () => {
+describe("isEmail", () => {
   test.each`
     input                         | expected
     ${"abc..def@mail.com"}        | ${false}
@@ -139,7 +139,8 @@ describe("isGenericEmail", () => {
   test.each([
     "giovanni.giorgio@orange.orange.fr",
     "giovanni.giorgio@orange.laposte.fr",
-    "giovanni.giorgio@orangelaposte.fr"
+    "giovanni.giorgio@orangelaposte.fr",
+    "giovanni.giorgio@orangeraie.fr"
   ])(`%p is NOT generic - edge cases`, email => {
     expect(isGenericEmail(email)).toEqual(false);
   });

@@ -822,9 +822,9 @@ describe("Mutation.createCompany", () => {
     );
   });
 
-  it("professional with sus email > should auto send email verification email", async () => {
+  it("professional with generic email > should auto send verification letter", async () => {
     // Given
-    const user = await userFactory({ email: "sus@gmail.com" });
+    const user = await userFactory({ email: "user@gmail.com" });
     const siret = siretify(8);
     const orgId = siret;
     (searchCompany as jest.Mock).mockResolvedValueOnce({
@@ -856,13 +856,13 @@ describe("Mutation.createCompany", () => {
       Promise.resolve()
     );
 
-    // Verification e-mail
+    // Verification letter
     expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(1);
   });
 
-  it("professional with pro email > should not send email verification email", async () => {
+  it("professional with pro email > should not send email verification letter", async () => {
     // Given
-    const user = await userFactory({ email: "sus@dechets.com" });
+    const user = await userFactory({ email: "user@dechets.com" });
     const siret = siretify(8);
     const orgId = siret;
     (searchCompany as jest.Mock).mockResolvedValueOnce({
@@ -894,13 +894,13 @@ describe("Mutation.createCompany", () => {
       Promise.resolve()
     );
 
-    // Verification e-mail
+    // Verification letter
     expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(0);
   });
 
-  it("non-professional > should not send email verification email", async () => {
+  it("non-professional > should not send email verification letter", async () => {
     // Given
-    const user = await userFactory({ email: "sus@gmail.com" });
+    const user = await userFactory({ email: "user@gmail.com" });
     const siret = siretify(8);
     const orgId = siret;
     (searchCompany as jest.Mock).mockResolvedValueOnce({
@@ -932,7 +932,7 @@ describe("Mutation.createCompany", () => {
       Promise.resolve()
     );
 
-    // Verification e-mail
+    // Verification letter
     expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(0);
   });
 });

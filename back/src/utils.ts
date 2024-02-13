@@ -224,10 +224,7 @@ export const isEmail = (email: string): boolean => {
   ).test(email);
 };
 
-export const isGenericEmail = (
-  email: string,
-  companyName: string = ""
-): boolean => {
+export const isGenericEmail = (email: string, companyName = ""): boolean => {
   if (!isEmail(email)) return false;
 
   // Extract domain name & split on dots and hyphens and remove domain extension
