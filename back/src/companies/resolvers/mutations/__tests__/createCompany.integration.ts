@@ -657,6 +657,7 @@ describe("Mutation.createCompany", () => {
 
   it("non-professional > should not send verification email and send onboarding email", async () => {
     // Given
+    process.env.VERIFY_COMPANY = "true";
     const user = await userFactory();
     const siret = siretify(8);
     const orgId = siret;
@@ -769,6 +770,7 @@ describe("Mutation.createCompany", () => {
 
   it("foreign transporter > should auto validate and send onboarding email", async () => {
     // Given
+    process.env.VERIFY_COMPANY = "true";
     const user = await userFactory();
     const vatNumber = "BE0406750197";
     const orgId = vatNumber;
