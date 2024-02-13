@@ -87,6 +87,7 @@ async function duplicateBsda({
   destinationOperationSignatureAuthor,
   destinationOperationSignatureDate,
   destinationOperationDate,
+  transporterTransportSignatureDate,
   wasteSealNumbers,
   packagings,
   weightValue,
@@ -107,7 +108,7 @@ async function duplicateBsda({
     number,
     transporterTransportTakenOverAt,
     transporterTransportSignatureAuthor,
-    transporterTransportSignatureDate,
+    transporterTransportSignatureDate: _,
     transporterCustomInfo,
     // transporter values that should be duplicated
     ...transporter

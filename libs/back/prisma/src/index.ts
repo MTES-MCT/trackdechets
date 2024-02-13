@@ -1,4 +1,6 @@
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
+import { Resource } from "@opentelemetry/resources";
+import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import {
   BasicTracerProvider,
   BatchSpanProcessor
@@ -28,7 +30,11 @@ if (NODE_ENV === "production") {
 }
 
 if (DD_TRACE_ENABLED !== "false") {
-  const provider = new BasicTracerProvider();
+  const provider = new BasicTracerProvider({
+    resource: new Resource({
+      [SemanticResourceAttributes.SERVICE_NAME]: "prisma"
+    })
+  });
   provider.addSpanProcessor(new BatchSpanProcessor(new OTLPTraceExporter()));
   provider.register({
     contextManager: new DatadogContextManager()

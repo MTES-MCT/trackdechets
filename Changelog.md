@@ -39,6 +39,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - [BSDA] Migrer les données transporteur dans une table à part (refacto interne du code) [PR 3055](https://github.com/MTES-MCT/trackdechets/pull/3055)
+- Tests e2e: cahier de recette d'ajout des membres [PR 3053](https://github.com/MTES-MCT/trackdechets/pull/3053)
+- Tests e2e: cahier de recette des filtres rapides [PR 3065](https://github.com/MTES-MCT/trackdechets/pull/3065)
+- Améliorations de la réindexation des bordereaux dans la section Admin [PR 3075](https://github.com/MTES-MCT/trackdechets/pull/3075)
+- Correction de la génération de SIRET de test [PR 3084](https://github.com/MTES-MCT/trackdechets/pull/3084)
 - Ajout aide dans CONTRIBUTING.md [PR 3043}(https://github.com/MTES-MCT/trackdechets/pull/3043/files)
 - DIVERS - Améliorations de performance [PR 3059](https://github.com/MTES-MCT/trackdechets/pull/3059)
 
