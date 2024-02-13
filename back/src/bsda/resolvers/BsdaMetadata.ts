@@ -3,8 +3,7 @@ import {
   BsdaMetadata,
   BsdaMetadataResolvers
 } from "../../generated/graphql/types";
-import { getBsdaOrNotFound } from "../database";
-import { parseBsdaInContext } from "../validation";
+import { syncParseBsdaInContext } from "../validation";
 import { prisma } from "@td/prisma";
 import { computeLatestRevision } from "../converter";
 
@@ -16,17 +15,19 @@ function getNextSignature(bsda) {
 }
 
 export const Metadata: BsdaMetadataResolvers = {
-  errors: async (metadata: BsdaMetadata & { id: string }) => {
-    const bsda = await getBsdaOrNotFound(metadata.id, {
-      include: { intermediaries: true, grouping: true, forwarding: true }
-    });
+  errors: async (metadata: BsdaMetadata & { id: string }, _, context) => {
+    const bsda = await context.dataloaders.bsdas.load(metadata.id);
+    const userCompanies = await context.dataloaders.userCompanies.load(
+      context.user!.id
+    );
 
     const currentSignatureType = getNextSignature(bsda);
     try {
-      await parseBsdaInContext(
+      syncParseBsdaInContext(
         { persisted: bsda },
         {
-          currentSignatureType
+          currentSignatureType,
+          userCompanies
         }
       );
       return [];

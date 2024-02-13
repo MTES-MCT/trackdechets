@@ -32,15 +32,21 @@ export default function AccountFieldCompanyTraderReceipt({ company }: Props) {
       <tbody>
         <tr>
           <td> Numéro de récépissé </td>
-          <td>{company.traderReceipt.receiptNumber} </td>
+          <td data-testid="receiptNumber">
+            {company.traderReceipt.receiptNumber}{" "}
+          </td>
         </tr>
         <tr>
           <td> Limite de validité </td>
-          <td>{formatDate(company.traderReceipt.validityLimit)}</td>
+          <td data-testid="receiptValidityLimit">
+            {formatDate(company.traderReceipt.validityLimit)}
+          </td>
         </tr>
         <tr>
           <td> Département</td>
-          <td>{company.traderReceipt.department} </td>
+          <td data-testid="receiptDepartment">
+            {company.traderReceipt.department}{" "}
+          </td>
         </tr>
       </tbody>
     </table>

@@ -1,3 +1,8 @@
+type ReindexBsds {
+  accepted: [ID!]!
+  rejected: [ID!]!
+}
+
 type Mutation {
-  reindexBsd(id: ID!): Boolean!
+  reindexBsds(ids: String!): ReindexBsds!
 }

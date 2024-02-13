@@ -14,30 +14,34 @@ function Badge({
   bsdType,
   reviewStatus,
   operationCode,
-  bsdaAnnexed
+  bsdaAnnexed,
+  transporters
 }: BadgeProps): JSX.Element {
   return (
     <>
-      <p
-        className={classnames(`fr-badge fr-badge--sm fr-badge--${status}`, {
-          "fr-badge--success":
-            status === BsdStatusCode.Processed ||
-            status === BsdStatusCode.FollowedWithPnttd ||
-            status === BsdStatusCode.NoTraceability,
-          "fr-badge--error":
-            status === BsdStatusCode.Refused ||
-            status === BsdStatusCode.Canceled,
-          "fr-badge--canceled": status === BsdStatusCode.Canceled
-        })}
-      >
-        {getBsdStatusLabel(
-          status,
-          isDraft,
-          bsdType,
-          operationCode,
-          bsdaAnnexed
-        )}
-      </p>
+      {status && (
+        <p
+          className={classnames(`fr-badge fr-badge--sm fr-badge--${status}`, {
+            "fr-badge--success":
+              status === BsdStatusCode.Processed ||
+              status === BsdStatusCode.FollowedWithPnttd ||
+              status === BsdStatusCode.NoTraceability,
+            "fr-badge--error":
+              status === BsdStatusCode.Refused ||
+              status === BsdStatusCode.Canceled,
+            "fr-badge--canceled": status === BsdStatusCode.Canceled
+          })}
+        >
+          {getBsdStatusLabel(
+            status,
+            isDraft,
+            bsdType,
+            operationCode,
+            bsdaAnnexed,
+            transporters
+          )}
+        </p>
+      )}
       {reviewStatus && (
         <>
           <br />

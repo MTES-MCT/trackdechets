@@ -1,13 +1,7 @@
 import * as React from "react";
-
 import { Bsdasri, BsdasriStatus } from "@td/codegen-ui";
-import { ActionButtonContext } from "../../../../common/components/ActionButton";
-import { useParams } from "react-router";
-
 import { IconBSDasri } from "../../../../Apps/common/Components/Icons/Icons";
 import { CellProps, CellValue } from "react-table";
-import { BSDAsriActions } from "./BSDasriActions/BSDasriActions";
-import { WorkflowAction } from "./WorkflowAction";
 
 const dasriVerboseStatuses: Record<BsdasriStatus, string> = {
   INITIAL: "Initial",
@@ -80,21 +74,5 @@ export const COLUMNS: Record<
   },
   status: {
     accessor: dasri => getDasriVerboseStatus(dasri)
-  },
-
-  workflow: {
-    accessor: () => null,
-    Cell: ({ row }) => {
-      const { siret } = useParams<{ siret: string }>();
-      return (
-        <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret!} form={row.original} />
-        </ActionButtonContext.Provider>
-      );
-    }
-  },
-  actions: {
-    accessor: () => null,
-    Cell: ({ row }) => <BSDAsriActions form={row.original} />
   }
 };

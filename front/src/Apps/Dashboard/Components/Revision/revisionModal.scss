@@ -1,0 +1,9 @@
+.revision-modal {
+  &__btn {
+    display: flex;
+    justify-content: flex-end;
+    .fr-btn {
+      margin: 0 5px;
+    }
+  }
+}

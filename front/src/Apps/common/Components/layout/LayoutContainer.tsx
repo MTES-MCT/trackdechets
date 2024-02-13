@@ -1,11 +1,5 @@
 import React, { lazy, Suspense } from "react";
-import {
-  Route,
-  Routes,
-  Navigate,
-  generatePath,
-  useMatch
-} from "react-router-dom";
+import { Route, Routes, Navigate, generatePath } from "react-router-dom";
 import * as Sentry from "@sentry/browser";
 import Loader from "../Loader/Loaders";
 import Layout from "./Layout";
@@ -20,6 +14,9 @@ import { RequireAuth, Redirect } from "../../../utils/routerUtils";
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
   () => import("../../../Dashboard/DashboardRoutes")
+);
+const CompaniesRoutes = lazy(
+  () => import("../../../../account/CompaniesRoutes")
 );
 const Account = lazy(() => import("../../../../account/Account"));
 const AccountMembershipRequest = lazy(
@@ -79,20 +76,9 @@ export default function LayoutContainer() {
   const isAuthenticated = !loading && data != null;
   const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
 
-  const isDashboard = !!useMatch("/dashboard/*");
   if (loading) {
     return <Loader />;
   }
-
-  const v2banner = isDashboard ? (
-    <SurveyBanner
-      message="Trackdéchets évolue ! L’onglet « Mon Espace » cède sa place au nouveau tableau de bord (« Mes bordereaux ») et de nouvelles fonctionnalités sont disponibles depuis la dernière mise à jour. Pour en savoir plus sur ces dernières évolutions, consultez notre FAQ."
-      button={{
-        title: "Voir la FAQ",
-        href: "https://faq.trackdechets.fr/pour-aller-plus-loin/les-dernieres-evolutions-de-trackdechets"
-      }}
-    ></SurveyBanner>
-  ) : undefined;
 
   return (
     <Suspense fallback={<Loader />}>
@@ -119,7 +105,16 @@ export default function LayoutContainer() {
             <Layout
               isAuthenticated={isAuthenticated}
               isAdmin={isAdmin}
-              v2banner={v2banner}
+              v2banner={
+                <SurveyBanner
+                  message="Trackdéchets évolue ! Découvrez dès à présent vos révisions filtrées dans les nouveaux onglets En cours et Révisés. Pour en savoir plus sur cette dernière évolution, consultez notre FAQ."
+                  button={{
+                    title: "Voir la FAQ",
+                    href: "https://faq.trackdechets.fr/pour-aller-plus-loin/les-dernieres-evolutions-de-trackdechets"
+                  }}
+                  persistedSurveyName="td-20240213"
+                />
+              }
               defaultOrgId={data?.me.companies[0]?.orgId}
             />
           }
@@ -282,6 +277,15 @@ export default function LayoutContainer() {
           />
 
           <Route
+            path={`${routes.companies.index}/*`}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <CompaniesRoutes />
+              </RequireAuth>
+            }
+          />
+
+          <Route
             path={routes.membershipRequest}
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
@@ -307,7 +311,7 @@ export default function LayoutContainer() {
                             siret: data.me.companies[0].orgId
                           }
                         )
-                      : routes.account.companies.list
+                      : routes.companies.index
                     : routes.login
                 }
                 replace

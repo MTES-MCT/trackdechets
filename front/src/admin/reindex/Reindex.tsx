@@ -2,59 +2,107 @@ import * as React from "react";
 import { Formik, Form, Field } from "formik";
 import toast from "react-hot-toast";
 import { gql, useMutation } from "@apollo/client";
-import { Mutation, MutationReindexBsdArgs } from "@td/codegen-ui";
-import { InlineError } from "../../Apps/common/Components/Error/Error";
+import { Mutation, MutationReindexBsdsArgs } from "@td/codegen-ui";
 import { TOAST_DURATION } from "../../common/config";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
-const REINDEX_BSD = gql`
-  mutation reindexBsd($id: ID!) {
-    reindexBsd(id: $id)
+const REINDEX_BSDS = gql`
+  mutation reindexBsds($ids: String!) {
+    reindexBsds(ids: $ids) {
+      accepted
+      rejected
+    }
   }
 `;
+
+const getSuccessMessage = ({
+  accepted = [],
+  rejected = []
+}: {
+  accepted?: string[];
+  rejected?: string[];
+}) => {
+  let msg = "";
+
+  if (accepted.length) {
+    msg += `BSD ré-indexé(s) avec succès: \n${accepted.join("\n")}\n\n`;
+  }
+
+  if (rejected.length) {
+    msg += `BSD non ré-indexé(s): \n${rejected.join("\n")}`;
+  }
+
+  return msg;
+};
+
 function Reindex() {
   const [reindexBsd, { loading, error }] = useMutation<
-    Pick<Mutation, "reindexBsd">,
-    MutationReindexBsdArgs
-  >(REINDEX_BSD);
+    Pick<Mutation, "reindexBsds">,
+    MutationReindexBsdsArgs
+  >(REINDEX_BSDS);
+  const textAreaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  // https://codesandbox.io/s/autosize-textarea-owwtu?from-embed=&file=/src/App.tsx
+  const resizeTextArea = () => {
+    if (textAreaRef && textAreaRef.current) {
+      textAreaRef.current.style.height = "0px";
+      const scrollHeight = textAreaRef.current.scrollHeight;
+      textAreaRef.current.style.height = scrollHeight + "px";
+    }
+  };
 
   return (
-    <div className="tw-mx-2">
+    <div className="fr-px-4w fr-py-2w">
       <Formik
         initialValues={{
-          bsdid: ""
+          ids: ""
         }}
+        onReset={resizeTextArea}
         onSubmit={async (values, { resetForm }) => {
-          const res = await reindexBsd({ variables: { id: values.bsdid } });
-          resetForm();
-          !!res?.data?.reindexBsd
-            ? toast.success(`Réindexation effectuée`, {
-                duration: TOAST_DURATION
-              })
-            : toast.error(`Cet identifiant ne correspond pas à un bordereau`, {
-                duration: TOAST_DURATION
-              });
+          const res = await reindexBsd({ variables: { ids: values.ids } });
+
+          if (!!res?.data?.reindexBsds) {
+            toast.success(getSuccessMessage(res.data.reindexBsds), {
+              duration: TOAST_DURATION
+            });
+
+            resetForm();
+          }
         }}
       >
-        {() => (
+        {values => (
           <Form>
-            <div className="form__row">
-              <label>
-                ID du bsd à réindexer
-                <Field
-                  name="bsdid"
-                  placeholder="BSD-20211215-12GH0E6TR"
-                  className="td-input"
-                />
-              </label>
-            </div>
-            {error && <InlineError apolloError={error} />}
-            <button
+            <Field name="ids">
+              {({ field }) => {
+                return (
+                  <Input
+                    textArea
+                    label="ID du ou des BSD à réindexer:"
+                    state={error ? "error" : "default"}
+                    stateRelatedMessage={<>{error?.message}</>}
+                    disabled={loading}
+                    nativeTextAreaProps={{
+                      ...field,
+                      ref: textAreaRef,
+                      onEmptied: resizeTextArea,
+                      onChange: e => {
+                        resizeTextArea();
+                        field.onChange(e);
+                      }
+                    }}
+                  />
+                );
+              }}
+            </Field>
+
+            <Button
+              size="medium"
               type="submit"
-              className="btn btn--primary tw-mt-1"
-              disabled={loading}
+              disabled={loading || !values.values.ids}
             >
-              {loading ? "Réindexation..." : "Réindexer"}
-            </button>
+              Réindexer
+            </Button>
           </Form>
         )}
       </Formik>

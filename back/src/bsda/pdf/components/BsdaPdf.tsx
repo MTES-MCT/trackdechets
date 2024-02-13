@@ -112,6 +112,13 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
           <div className="BoxCol">
             <CompanyContact company={bsda?.emitter?.company} />
             <PickupSite pickupSite={bsda?.emitter?.pickupSite} />
+
+            {bsda?.ecoOrganisme?.siret && (
+              <p>
+                <strong>Eco-organisme désigné :</strong>{" "}
+                {bsda.ecoOrganisme?.name} ({bsda.ecoOrganisme.siret})
+              </p>
+            )}
           </div>
         </div>
 

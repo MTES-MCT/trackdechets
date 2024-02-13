@@ -142,7 +142,6 @@ describe("Query.bsdas", () => {
   const contributorsFields = {
     emitter: "emitterCompanySiret",
     destination: "destinationCompanySiret",
-    transporter: "transporterCompanySiret",
     worker: "workerCompanySiret",
     broker: "brokerCompanySiret"
   };
@@ -179,6 +178,34 @@ describe("Query.bsdas", () => {
       expect(data.bsdas.edges.length).toBe(1);
     }
   );
+
+  it("should filter bsdas where user appears as transporter", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+
+    await bsdaFactory({
+      transporterOpt: {
+        transporterCompanySiret: company.siret
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
+      GET_BSDAS,
+      {
+        variables: {
+          where: {
+            transporter: {
+              company: {
+                siret: { _eq: company.siret }
+              }
+            }
+          }
+        }
+      }
+    );
+
+    expect(data.bsdas.edges.length).toBe(1);
+  });
 
   it("should not return deleted bsdas", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);

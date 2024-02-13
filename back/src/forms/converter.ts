@@ -399,7 +399,6 @@ export function flattenFormInput(
     | "customId"
     | "emitter"
     | "recipient"
-    | "transporter"
     | "wasteDetails"
     | "trader"
     | "broker"
@@ -514,6 +513,8 @@ export function flattenTransportSegmentInput(
 export function expandTransporterFromDb(
   transporter: BsddTransporter
 ): Transporter | null {
+  const transporterOrgId = getTransporterCompanyOrgId(transporter);
+
   return nullIfNoValues<Transporter>({
     id: transporter.id,
     company: nullIfNoValues<FormCompany>({
@@ -535,7 +536,7 @@ export function expandTransporterFromDb(
     // transportMode has default value in DB but we do not want to return anything
     // if the transporter siret is not defined
     mode:
-      !transporter.transporterCompanySiret &&
+      !transporterOrgId &&
       transporter.transporterTransportMode === TransportMode.ROAD
         ? null
         : transporter.transporterTransportMode,

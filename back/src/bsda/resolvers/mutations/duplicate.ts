@@ -1,18 +1,14 @@
-import {
-  Bsda,
-  BsdaStatus,
-  IntermediaryBsdaAssociation,
-  Prisma
-} from "@prisma/client";
+import { Bsda, BsdaStatus, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsdaArgs } from "../../../generated/graphql/types";
 import { expandBsdaFromDb } from "../../converter";
-import { getBsdaOrNotFound } from "../../database";
+import { getBsdaOrNotFound, getFirstTransporterSync } from "../../database";
 import { getBsdaRepository } from "../../repository";
 import { checkCanDuplicate } from "../../permissions";
 import { prisma } from "@td/prisma";
 import { sirenify } from "../../validation/sirenify";
+import { BsdaWithIntermediaries, BsdaWithTransporters } from "../../types";
 
 export default async function duplicate(
   _,
@@ -22,19 +18,50 @@ export default async function duplicate(
   const user = checkIsAuthenticated(context);
 
   const prismaBsda = await getBsdaOrNotFound(id, {
-    include: { intermediaries: true }
+    include: { intermediaries: true, transporters: true }
   });
+  const transporter = getFirstTransporterSync(prismaBsda)!;
 
   await checkCanDuplicate(user, prismaBsda);
 
-  const sirenified = await sirenify(prismaBsda, []);
+  // FIXME - En attente d'une meilleure solution lors de l'implémentation du
+  // multi-modal.
+  // Sirenify s'applique sur les données transporteur "à plat"
+  // dans le contexte de la validation Zod. Pour pouvoir l'utiliser ici on
+  // doit remettre les données à plat puis reconstruire une version de `transporters`
+  // avec les données transporteurs "sirenified".
+  const {
+    transporterCompanySiret,
+    transporterCompanyName,
+    transporterCompanyAddress,
+    ...sirenifiedBsda
+  } = await sirenify(
+    {
+      ...prismaBsda,
+      transporterCompanySiret: transporter.transporterCompanySiret,
+      transporterCompanyName: transporter.transporterCompanyName,
+      transporterCompanyAddress: transporter.transporterCompanyAddress
+    },
+    []
+  );
 
-  const data = await duplicateBsda(sirenified);
+  const sirenifiedTransporter = {
+    ...transporter,
+    transporterCompanyName,
+    transporterCompanyAddress
+  };
+
+  const data = await duplicateBsda({
+    ...sirenifiedBsda,
+    transporters: [sirenifiedTransporter]
+  });
 
   const newBsda = await getBsdaRepository(user).create(data);
 
   return expandBsdaFromDb(newBsda);
 }
+
+type BsdaForDuplicate = Bsda & BsdaWithTransporters & BsdaWithIntermediaries;
 
 async function duplicateBsda({
   // values that should not be duplicated
@@ -50,11 +77,6 @@ async function duplicateBsda({
   workerWorkHasEmitterPaperSignature,
   workerWorkSignatureAuthor,
   workerWorkSignatureDate,
-  transporterTransportPlates,
-  transporterCustomInfo,
-  transporterTransportTakenOverAt,
-  transporterTransportSignatureAuthor,
-  transporterTransportSignatureDate,
   destinationCustomInfo,
   destinationReceptionWeight,
   destinationReceptionDate,
@@ -65,6 +87,7 @@ async function duplicateBsda({
   destinationOperationSignatureAuthor,
   destinationOperationSignatureDate,
   destinationOperationDate,
+  transporterTransportSignatureDate,
   wasteSealNumbers,
   packagings,
   weightValue,
@@ -72,15 +95,29 @@ async function duplicateBsda({
   groupedInId,
   intermediaries,
   intermediariesOrgIds,
+  transporters,
   // values that should be duplicated
   ...bsda
-}: Bsda & {
-  intermediaries: IntermediaryBsdaAssociation[];
-}): Promise<Prisma.BsdaCreateInput> {
+}: BsdaForDuplicate): Promise<Prisma.BsdaCreateInput> {
+  const {
+    id: transporterId,
+    createdAt: transporterCreatedAt,
+    updatedAt: transporterUpdatedAt,
+    bsdaId,
+    transporterTransportPlates,
+    number,
+    transporterTransportTakenOverAt,
+    transporterTransportSignatureAuthor,
+    transporterTransportSignatureDate: _,
+    transporterCustomInfo,
+    // transporter values that should be duplicated
+    ...transporter
+  } = getFirstTransporterSync({ transporters })!;
+
   const companiesOrgIds: string[] = [
     bsda.emitterCompanySiret,
-    bsda.transporterCompanySiret,
-    bsda.transporterCompanyVatNumber,
+    transporter.transporterCompanySiret,
+    transporter.transporterCompanyVatNumber,
     bsda.brokerCompanySiret,
     bsda.workerCompanySiret,
     bsda.destinationCompanySiret
@@ -109,10 +146,10 @@ async function duplicateBsda({
   const broker = companies.find(
     company => company.orgId === bsda.brokerCompanySiret
   );
-  const transporter = companies.find(
+  const transporterCompany = companies.find(
     company =>
-      company.orgId === bsda.transporterCompanySiret ||
-      company.orgId === bsda.transporterCompanyVatNumber
+      company.orgId === transporter.transporterCompanySiret ||
+      company.orgId === transporter.transporterCompanyVatNumber
   );
   const worker = companies.find(
     company => company.orgId === bsda.workerCompanySiret
@@ -150,20 +187,7 @@ async function duplicateBsda({
       destination?.contactPhone ?? bsda.destinationCompanyPhone,
     destinationCompanyContact:
       destination?.contact ?? bsda.destinationCompanyContact,
-    // Transporter company info
-    transporterCompanyMail:
-      transporter?.contactEmail ?? bsda.transporterCompanyMail,
-    transporterCompanyPhone:
-      transporter?.contactPhone ?? bsda.transporterCompanyPhone,
-    transporterCompanyContact:
-      transporter?.contact ?? bsda.transporterCompanyContact,
-    // Transporter recepisse
-    transporterRecepisseNumber:
-      transporter?.transporterReceipt?.receiptNumber ?? null,
-    transporterRecepisseValidityLimit:
-      transporter?.transporterReceipt?.validityLimit ?? null,
-    transporterRecepisseDepartment:
-      transporter?.transporterReceipt?.department ?? null,
+
     // Broker company info
     brokerCompanyMail: broker?.contactEmail ?? bsda.brokerCompanyMail,
     brokerCompanyPhone: broker?.contactPhone ?? bsda.brokerCompanyPhone,
@@ -194,6 +218,28 @@ async function duplicateBsda({
       bsda.workerCertificationOrganisation,
     workerCertificationCertificationNumber:
       worker?.workerCertification?.certificationNumber ??
-      bsda.workerCertificationCertificationNumber
+      bsda.workerCertificationCertificationNumber,
+    transporters: {
+      create: {
+        number: 1,
+        ...transporter,
+        // Transporter company info
+        transporterCompanyMail:
+          transporterCompany?.contactEmail ??
+          transporter.transporterCompanyMail,
+        transporterCompanyPhone:
+          transporterCompany?.contactPhone ??
+          transporter.transporterCompanyPhone,
+        transporterCompanyContact:
+          transporterCompany?.contact ?? transporter.transporterCompanyContact,
+        // Transporter recepisse
+        transporterRecepisseNumber:
+          transporterCompany?.transporterReceipt?.receiptNumber ?? null,
+        transporterRecepisseValidityLimit:
+          transporterCompany?.transporterReceipt?.validityLimit ?? null,
+        transporterRecepisseDepartment:
+          transporterCompany?.transporterReceipt?.department ?? null
+      }
+    }
   };
 }

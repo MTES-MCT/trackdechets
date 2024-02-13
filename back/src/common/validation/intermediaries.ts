@@ -29,7 +29,7 @@ export const intermediarySchema = z.object({
   orgId: z.string().nullish() // is ignored in db schema
 });
 
-export async function intermediariesRefinement(
+export function intermediariesRefinement(
   intermediaries: z.infer<typeof intermediarySchema>[] | null | undefined,
   ctx: RefinementCtx
 ) {

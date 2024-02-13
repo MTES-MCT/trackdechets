@@ -331,6 +331,107 @@ Il est également possible de faire tourner chaque test de façon indépendante:
 npx nx run back:test:integration --testFile workflow.integration.ts
 ```
 
+## Tests end-to-end (e2e)
+
+Les tests e2e utilisent Playwright ([documentation officielle ici](https://playwright.dev/docs/intro)).
+
+### Local
+
+#### Installation
+
+Commencez par:
+
+```
+npm i
+```
+
+Puis il faut installer chromium pour playwright:
+
+```
+npx playwright install chromium --with-deps
+```
+
+#### Variables d'environnement
+
+Vu que les tests e2e fonctionnent comme les tests d'intégration, à savoir qu'ils repartent d'une base vierge à chaque fois, vous pouvez utiliser les `.env.integration` (back & front) pour les tests e2e.
+
+#### Lancer les tests e2e en local
+
+1. Lancer la DB, ES etc.
+2. Démarrer les services TD avec:
+   `npx nx run-many -t serve --configuration=integration --projects=api,front,tag:backend:background --parallel=6`
+3. Lancer les tests:
+
+```
+# Console seulement
+npx nx run e2e:cli --configuration=integration
+
+# Avec l'UI
+npx nx run e2e:ui --configuration=integration
+```
+
+Pour tester un seul fichier:
+
+```
+# Console seulement
+npx nx run e2e:cli --file companies.spec.ts --configuration=integration
+
+# Avec l'UI
+npx nx run e2e:ui --file companies.spec.ts --configuration=integration
+```
+
+Il est aussi possible de débugguer pas à pas, avec l'UI:
+
+```
+npx nx run e2e:debug --file companies.spec.ts --configuration=integration
+```
+
+#### Recorder
+
+Playwright vous permet de jouer votre cahier de recette dans un navigateur et d'enregistrer vos actions. Plusieurs outils sont disponibles pour par exemple faire des assertions sur les pages.
+
+Pour lancer le recorder:
+
+```
+npx playwright codegen trackdechets.local --viewport-size=1920,1080
+```
+
+Le code généré apparaît dans une fenêtre à part. Vous pouvez le copier et le coller dans des fichiers de specs.
+
+### CI
+
+#### Débugguer visuellement
+
+Pour prendre un screenshot de la page qui pose problème, modifier playwright.config.ts pour changer le mode headless:
+
+```
+headless: false
+```
+
+Puis placer dans le code, à l'endroit problématique:
+
+```
+const buffer = await page.screenshot();
+console.log(buffer.toString('base64'));
+
+// Ou alors, méthode toute faite dans debug.ts
+await logScreenshot(page);
+```
+
+Puis utiliser un site comme [celui-ci](https://base64.guru/converter/decode/image) pour transformer le log en base64 en image.
+
+#### Débugguer le network
+
+Pour observer les requêtes, vous pouvez utiliser (doc [ici](https://playwright.dev/docs/network#network-events)):
+
+```
+page.on('request', request => console.log('>>', request.method(), request.url()));
+page.on('response', response => console.log('<<', response.status(), response.url()));
+
+// Ou alors, méthode toute faite dans debug.ts pour capturer uniquement les calls d'API
+debugApiCalls(page);
+```
+
 ## Créer une PR
 
 1. Créer une nouvelle branche à partir et à destination de la branche `dev`.
@@ -349,11 +450,11 @@ Chaque update de la branche `dev` déclenche un déploiement sur l'environnement
 2. Balayer le tableau [Favro "Recette du xx/xx/xx"](https://favro.com/organization/ab14a4f0460a99a9d64d4945/02f1ec52bd91efc0adb3c38b) pour vérifier que l'étiquette "Recette OK --> EN PROD" a bien été ajoutée sur toutes les cartes.
 3. Mettre à jour le [Changelog.md](./Changelog.md) avec un nouveau numéro de version (versionnage calendaire)
 4. Créer une PR `dev` -> `master`
-5. Au besoin résoudre les conflits entre `master` et `dev` en fusionnant `master` dans `dev`
+5. Au besoin résoudre les conflits entre `master` et `dev` en fusionnant `master` dans `dev` (**Éviter de Squash & Merge**)
 6. Faire une relecture des différents changements apportés aux modèles de données et scripts de migration.
 7. Si possible faire tourner les migrations sur une copie de la base de prod en local.
 8. S'assurer que les nouvelles variables d'environnement (Cf `.env.model`) ont bien été ajoutée sur Scalingo dans les environnements sandbox et prod respectivement pour les applications `front` et `api`
-9. Merger la PR et suivre l'avancement de la CI github.
+9. Merger la PR (**Éviter de Squash & Merge**) et suivre l'avancement de la CI github.
 10. Suivre l'avancement du déploiement sur Scalingo respectivement pour le front, l'api et la doc.
 
 ## Migrations

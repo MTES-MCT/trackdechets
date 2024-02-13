@@ -42,9 +42,6 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         emitterCompanySiret: emitter.siret,
         workerCompanyName: worker.name,
         workerCompanySiret: worker.siret,
-        transporterCompanyName: transporter.name,
-        transporterCompanySiret: transporter.siret,
-        transporterCompanyVatNumber: transporter.vatNumber,
         destinationCompanyName: destination.name,
         destinationCompanySiret: destination.siret,
         destinationOperationNextDestinationCompanyName: nextDestination.name,
@@ -53,6 +50,11 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         ecoOrganismeSiret: ecoOrganisme.siret,
         brokerCompanyName: broker.name,
         brokerCompanySiret: broker.siret
+      },
+      transporterOpt: {
+        transporterCompanyName: transporter.name,
+        transporterCompanySiret: transporter.siret,
+        transporterCompanyVatNumber: transporter.vatNumber
       }
     });
 

@@ -12,7 +12,7 @@ import { wasteFormatter, wastesReader } from "../../streams";
 import { getXlsxHeaders } from "../../columns";
 import { searchBsds } from "../../elastic";
 import { GraphQLContext } from "../../../types";
-import { Permission, checkUserPermissions } from "../../../permissions";
+import { Permission, syncCheckUserPermissions } from "../../../permissions";
 import { UserInputError } from "../../../common/errors";
 import { TotalHits } from "@elastic/elasticsearch/api/types";
 
@@ -60,9 +60,10 @@ export async function wastesRegistryXlsResolverFn(
   context: GraphQLContext
 ): Promise<FileDownload> {
   const user = checkIsAuthenticated(context);
+  const userRoles = await context.dataloaders.userRoles.load(user.id);
   for (const siret of args.sirets) {
-    await checkUserPermissions(
-      user,
+    syncCheckUserPermissions(
+      userRoles,
       [siret].filter(Boolean),
       Permission.RegistryCanRead,
       `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${siret}`

@@ -5,6 +5,47 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.2.1] 13/02/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout du code déchet 16 03 05\* sur les BSDA [PR 3061](https://github.com/MTES-MCT/trackdechets/pull/3061)
+- Ajout de la possibilité de sélectionner un éco-organisme sur le BSDA [PR 3062](https://github.com/MTES-MCT/trackdechets/pull/3062)
+- Nouvelle navigation sur Trackdéchets : la navigation principale et le menu latéral ont été mis en conformité avec le DSFR [PR 3066](https://github.com/MTES-MCT/trackdechets/pull/3066)
+- La gestion des établissements devient désormais un onglet principal de Trackdéchets, à retrouver dans "Mes établissements" [PR 3066](https://github.com/MTES-MCT/trackdechets/pull/3066)
+- Ajouter le numéro libre BSDD sur le tableau de bord "V2" [PR 3035](<[#](https://github.com/MTES-MCT/trackdechets/pull/)3050>)
+- Implémenter les Révisions dans le Front "V2" [PR 3054](https://github.com/MTES-MCT/trackdechets/pull/3054)
+- Suppression Dashboard "v1" [PR 3064](https://github.com/MTES-MCT/trackdechets/pull/3064)
+
+#### :bug: Corrections de bugs
+
+- Registre exhaustif du BSDD suite entreposage provisoire : les informations relatives à la destination finale et au 2e transporteur n'apparaissent pas + lignes en double [PR 3051](https://github.com/MTES-MCT/trackdechets/pull/3051)
+- En cas de révision vers un code de traitement final, les données du BSD sont mises à jour correctement [PR 2986](https://github.com/MTES-MCT/trackdechets/pull/2986)
+- Corriger l'auto-sélection du transporteur et la liste vide des transporteurs proposés [PR 3045](https://github.com/MTES-MCT/trackdechets/pull/3045)
+- Le mode de transport d'un transporteur étranger disparait après sauvegarde d'une modification [PR 3045](https://github.com/MTES-MCT/trackdechets/pull/3045) 
+- Correction de la valeur "pays" et "entreprise étrangère" dans les PDFs BSD (entreprise étrangère + nom pays)[PR 3047](#3047)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Mise à jour des labels en cas de transport multimodal [PR 3046](https://github.com/MTES-MCT/trackdechets/pull/3046)
+- Le mode de traitement "Elimination (incinération sans valorisation énergétique et stockage en décharge)" a été renommé "Elimination" [PR 3044](https://github.com/MTES-MCT/trackdechets/pull/3044)
+- Flexibilisation de certaines règles de validation du BSDA pour pouvoir modifier les champs de contact plus longtemps [PR 3060](https://github.com/MTES-MCT/trackdechets/pull/3060)
+- Retirer la possibilité de faire du multimodal pour le BSD de tournée dédiée [PR 3057](https://github.com/MTES-MCT/trackdechets/pull/3057)
+- Signature eco-organisme plus stricte [PR 3074](https://github.com/MTES-MCT/trackdechets/pull/3074)
+- Ajout de champs obligatoires sur l'annexe 1 [PR 3073](https://github.com/MTES-MCT/trackdechets/pull/3073)
+
+#### :house: Interne
+
+- [BSDA] Migrer les données transporteur dans une table à part (refacto interne du code) [PR 3055](https://github.com/MTES-MCT/trackdechets/pull/3055)
+- Tests e2e: cahier de recette d'ajout des membres [PR 3053](https://github.com/MTES-MCT/trackdechets/pull/3053)
+- Tests e2e: cahier de recette des filtres rapides [PR 3065](https://github.com/MTES-MCT/trackdechets/pull/3065)
+- Améliorations de la réindexation des bordereaux dans la section Admin [PR 3075](https://github.com/MTES-MCT/trackdechets/pull/3075)
+- Correction de la génération de SIRET de test [PR 3084](https://github.com/MTES-MCT/trackdechets/pull/3084)
+- Ajout d'aide dans le CONTRIBUTING.md [PR 3043](https://github.com/MTES-MCT/trackdechets/pull/3043/files)
+- DIVERS - Améliorations de performance [PR 3059](https://github.com/MTES-MCT/trackdechets/pull/3059)
+
 # [2024.1.1] 16/01/2024
 
 #### :rocket: Nouvelles fonctionnalités

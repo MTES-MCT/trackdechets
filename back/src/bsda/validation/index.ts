@@ -1,7 +1,8 @@
-import { Prisma, User } from "@prisma/client";
+import { Company, Prisma, User } from "@prisma/client";
 import { BsdaInput, BsdaSignatureType } from "../../generated/graphql/types";
 import { applyDynamicRefinement } from "./dynamicRefinements";
 import {
+  getCompaniesFunctions,
   getSignatureAncestors,
   getUnparsedBsda,
   getUpdatedFields,
@@ -18,14 +19,20 @@ export type BsdaValidationContext = {
   user?: User;
 };
 
-const existingBsdaForParsing = Prisma.validator<Prisma.BsdaInclude>()({
+export type SyncBsdaValidationContext = { userCompanies: Company[] } & Pick<
+  BsdaValidationContext,
+  "currentSignatureType"
+>;
+
+export const BsdaForParsingInclude = Prisma.validator<Prisma.BsdaInclude>()({
   intermediaries: true,
   grouping: true,
-  forwarding: true
+  forwarding: true,
+  transporters: true
 });
 
 type BsdaForParsing = Prisma.BsdaGetPayload<{
-  include: typeof existingBsdaForParsing;
+  include: typeof BsdaForParsingInclude;
 }>;
 
 export type UnparsedInputs = {
@@ -78,5 +85,96 @@ export async function parseBsdaInContext(
       await applyDynamicRefinement(val, validationContext, ctx);
     });
 
-  return contextualSchema.parseAsync(unparsedBsda);
+  const zodBsda = await contextualSchema.parseAsync(unparsedBsda);
+
+  const {
+    transporterCompanySiret,
+    transporterCompanyName,
+    transporterCompanyVatNumber,
+    transporterCompanyAddress,
+    transporterCompanyContact,
+    transporterCompanyPhone,
+    transporterCompanyMail,
+    transporterCustomInfo,
+    transporterRecepisseIsExempted,
+    transporterRecepisseNumber,
+    transporterRecepisseDepartment,
+    transporterRecepisseValidityLimit,
+    transporterTransportMode,
+    transporterTransportPlates,
+    transporterTransportTakenOverAt,
+    transporterTransportSignatureAuthor,
+    transporterTransportSignatureDate,
+    transporterId,
+    ...bsda
+  } = zodBsda;
+
+  // Au niveau du schéma Zod, tout se passe comme si les données de transport
+  // était encore "à plat" avec un seul transporteur (en attendant l'implémentation du multi-modal)
+  // On renvoie séparement les données du bsda et les données du transporteur
+  // car elles font ensuite l'objet de traitement séparé pour construire les payloads de création / update
+  return {
+    bsda: { ...bsda, transporterTransportSignatureDate },
+    transporter: {
+      id: transporterId,
+      transporterCompanySiret,
+      transporterCompanyName,
+      transporterCompanyVatNumber,
+      transporterCompanyAddress,
+      transporterCompanyContact,
+      transporterCompanyPhone,
+      transporterCompanyMail,
+      transporterCustomInfo,
+      transporterRecepisseIsExempted,
+      transporterRecepisseNumber,
+      transporterRecepisseDepartment,
+      transporterRecepisseValidityLimit,
+      transporterTransportMode,
+      transporterTransportPlates,
+      transporterTransportTakenOverAt,
+      transporterTransportSignatureAuthor,
+      transporterTransportSignatureDate
+    }
+  };
+}
+
+/**
+ * This is a sync equivalent of parseBsdaInContext.
+ * Being sync obviously means that dynamic parsing & transformation cannot be applied.
+ * This is for use cases where we need to validate a batch of bsdas quickly.
+ *
+ * @param unparsedInputs
+ * @param validationContext
+ * @param userCompanies
+ * @returns
+ */
+export function syncParseBsdaInContext(
+  unparsedInputs: UnparsedInputs,
+  validationContext: SyncBsdaValidationContext
+) {
+  const unparsedBsda = getUnparsedBsda(unparsedInputs);
+  const updatedFields = getUpdatedFields(unparsedInputs);
+  // Some signatures may be skipped, so always check all the hierarchy
+  const signaturesToCheck = getSignatureAncestors(
+    validationContext.currentSignatureType
+  );
+  const userFunctions = getCompaniesFunctions(
+    validationContext.userCompanies,
+    unparsedBsda
+  );
+
+  const contextualSchema = bsdaSchema.superRefine((val, ctx) => {
+    checkSealedAndRequiredFields(
+      {
+        bsda: val,
+        persistedBsda: unparsedInputs.persisted,
+        updatedFields,
+        userFunctions,
+        signaturesToCheck
+      },
+      ctx
+    );
+  });
+
+  return contextualSchema.parse(unparsedBsda);
 }

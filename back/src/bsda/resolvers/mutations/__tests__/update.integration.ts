@@ -398,9 +398,12 @@ describe("Mutation.updateBsda", () => {
         status: "SENT",
         destinationCompanySiret: destination.siret,
         emitterCompanySiret: emitter.siret,
-        transporterCompanySiret: transporter.siret,
         emitterEmissionSignatureDate: new Date(),
         workerWorkSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.siret,
         transporterTransportSignatureDate: new Date()
       }
     });
@@ -562,7 +565,9 @@ describe("Mutation.updateBsda", () => {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureDate: new Date(),
         workerCompanySiret: company2.siret,
-        destinationCompanySiret: company2.siret,
+        destinationCompanySiret: company2.siret
+      },
+      transporterOpt: {
         transporterCompanySiret: company2.siret
       }
     });
@@ -601,7 +606,9 @@ describe("Mutation.updateBsda", () => {
       opt: {
         status: "SIGNED_BY_PRODUCER",
         emitterCompanySiret: company.siret,
-        emitterEmissionSignatureDate: new Date(),
+        emitterEmissionSignatureDate: new Date()
+      },
+      transporterOpt: {
         transporterCompanySiret: company.siret
       }
     });
@@ -684,7 +691,9 @@ describe("Mutation.updateBsda", () => {
       opt: {
         status: "SIGNED_BY_PRODUCER",
         emitterCompanySiret: company.siret,
-        emitterEmissionSignatureDate: new Date(),
+        emitterEmissionSignatureDate: new Date()
+      },
+      transporterOpt: {
         transporterCompanySiret: company.siret
       }
     });
@@ -726,8 +735,11 @@ describe("Mutation.updateBsda", () => {
       opt: {
         status: "SENT",
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret,
         transporterTransportSignatureDate: new Date()
       }
     });
@@ -769,8 +781,10 @@ describe("Mutation.updateBsda", () => {
         status: "AWAITING_CHILD",
         emitterCompanySiret: emitter.company.siret,
         destinationCompanySiret: destination.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         destinationOperationCode: "D 15"
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret
       }
     });
     const bsdaToGroup = await bsdaFactory({
@@ -779,8 +793,10 @@ describe("Mutation.updateBsda", () => {
         status: "AWAITING_CHILD",
         emitterCompanySiret: emitter.company.siret,
         destinationCompanySiret: destination.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         destinationOperationCode: "D 15"
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret
       }
     });
 
@@ -825,9 +841,11 @@ describe("Mutation.updateBsda", () => {
         status: "AWAITING_CHILD",
         emitterCompanySiret: emitter.company.siret,
         destinationCompanySiret: destination.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         destinationOperationCode: "D 15",
         destinationOperationMode: undefined
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret
       }
     });
 
@@ -836,10 +854,12 @@ describe("Mutation.updateBsda", () => {
         status: "INITIAL",
         emitterCompanySiret: ttr.company.siret,
         destinationCompanySiret: destination.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         destinationOperationCode: "D 15",
         destinationOperationMode: undefined,
         forwarding: { connect: { id: oldForwarded.id } }
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret
       }
     });
 
@@ -848,9 +868,11 @@ describe("Mutation.updateBsda", () => {
         status: "AWAITING_CHILD",
         emitterCompanySiret: emitter.company.siret,
         destinationCompanySiret: ttr.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         destinationOperationCode: "D 15",
         destinationOperationMode: undefined
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret
       }
     });
 
@@ -886,9 +908,11 @@ describe("Mutation.updateBsda", () => {
         status: "AWAITING_CHILD",
         emitterCompanySiret: emitter.company.siret,
         destinationCompanySiret: destination.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         destinationOperationCode: "D 15",
         destinationOperationMode: undefined
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret
       }
     });
     const associatedBsda2 = await bsdaFactory({
@@ -896,9 +920,11 @@ describe("Mutation.updateBsda", () => {
         status: "AWAITING_CHILD",
         emitterCompanySiret: emitter.company.siret,
         destinationCompanySiret: destination.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         destinationOperationCode: "D 15",
         destinationOperationMode: undefined
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret
       }
     });
 
@@ -1099,10 +1125,12 @@ describe("Mutation.updateBsda", () => {
       opt: {
         status: "SIGNED_BY_WORKER",
         destinationCompanySiret: destination.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         workerCompanySiret: worker.siret,
         emitterEmissionSignatureDate: new Date(),
         workerWorkSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret
       }
     });
 
@@ -1155,9 +1183,11 @@ describe("Mutation.updateBsda", () => {
       opt: {
         status: "SIGNED_BY_WORKER",
         destinationCompanySiret: destination.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         emitterEmissionSignatureDate: new Date(),
         workerWorkSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret
       }
     });
 
@@ -1206,11 +1236,13 @@ describe("Mutation.updateBsda", () => {
       opt: {
         status: "SIGNED_BY_WORKER",
         destinationCompanySiret: transporter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         destinationOperationNextDestinationCompanySiret:
           destination.company.siret,
         emitterEmissionSignatureDate: new Date(),
         workerWorkSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterCompanySiret: transporter.company.siret
       }
     });
 
@@ -1295,5 +1327,39 @@ describe("Mutation.updateBsda", () => {
     expect(updatedBsda?.workerCertificationCertificationNumber).toBeNull();
     expect(updatedBsda?.workerCertificationValidityLimit).toBeNull();
     expect(updatedBsda?.workerCertificationOrganisation).toBeNull();
+  });
+
+  it("should be possible to re-send same transporter data after transporter signature", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SENT",
+        transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterTransportSignatureDate: new Date(),
+        transporterTransportTakenOverAt: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          transporter: {
+            company: {
+              siret: bsda.transporters[0].transporterCompanySiret
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
   });
 });

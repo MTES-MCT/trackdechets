@@ -28,6 +28,8 @@ export const ENTREPOS_TEMPORAIREMENT =
   "entreposé temporairement ou en reconditionnement";
 export const BSD_SUITE_PREPARE = "BSD suite préparé";
 export const SIGNE_PAR_TRANSPORTEUR = "signé par le transporteur";
+export const SIGNE_PAR_TRANSPORTEUR_N = (n: number) =>
+  `signé par le transporteur n°${n}`;
 export const INITIAL = "publié";
 export const SIGNE_PAR_EMETTEUR = "signé par l’émetteur";
 export const SIGNER_PAR_ENTREPOS_PROVISOIRE =
@@ -160,22 +162,24 @@ export const ALL_BSDS = "Tous les bordereaux";
 export const ALL_REVIEWS = "Toutes les révisions";
 export const DRAFTS = "Brouillons";
 export const ACTS = "Pour action";
-export const FOLLOWS = "Suivi";
+export const FOLLOWS = "Suivis";
 export const ARCHIVES = "Archives";
 export const REVIEWS = "Révisions";
 export const TRANSPORT = "Transport";
 export const TO_COLLECT = "À collecter";
-export const COLLECTED = "Collecté";
+export const COLLECTED = "Collectés";
 export const REGISTER = "Registre";
-export const TO_REVIEWED = "À Réviser";
-export const REVIEWED = "Révisé";
+export const TO_REVIEW = "En cours";
+export const REVIEWED = "Révisés";
 
 // Reviews
-export const APPROUVER_REFUSER_REVISION = "Approuver / Refuser";
-export const CONSULTER_REVISION = "Consulter";
-export const SUPRIMER_REVISION = "Supprimer la révision";
+export const GERER_REVISION = "Gérer la révision";
+export const CONSULTER_REVISION = "Consulter la révision";
+export const SUPRIMER_REVISION = "Annuler la révision";
 
 // Transport
 export const EMPORT_DIRECT_LABEL = "Signer directement";
 export const VALIDER_SYNTHESE_LABEL = "Valider la synthèse";
 export const ROAD_CONTROL = "Contrôle routier";
+
+export const NON_RENSEIGNE = "Non renseigné";

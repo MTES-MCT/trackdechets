@@ -5,7 +5,6 @@ import { ActionButton } from "../../../../../common/components";
 import { Loader } from "../../../../../Apps/common/Components";
 import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 
 const PUBLISH_BSFF = gql`
@@ -26,9 +25,7 @@ export function PublishBsff({ bsffId }: PublishBsffProps) {
     Pick<Mutation, "publishBsff">,
     MutationPublishBsffArgs
   >(PUBLISH_BSFF, {
-    variables: { id: bsffId },
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true
+    variables: { id: bsffId }
   });
 
   const actionLabel = "Publier le bordereau";

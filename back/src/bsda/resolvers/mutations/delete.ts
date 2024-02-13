@@ -5,6 +5,7 @@ import { getBsdaOrNotFound } from "../../database";
 import { GraphQLContext } from "../../../types";
 import { getBsdaRepository } from "../../repository";
 import { checkCanDelete } from "../../permissions";
+import { getBsdaForElastic } from "../../elastic";
 
 export default async function deleteBsda(
   _,
@@ -14,11 +15,11 @@ export default async function deleteBsda(
   const user = checkIsAuthenticated(context);
 
   const bsda = await getBsdaOrNotFound(id, {
-    include: { intermediaries: true }
+    include: { intermediaries: true, transporters: true }
   });
   await checkCanDelete(user, bsda);
 
   const bsdaRepository = getBsdaRepository(user);
   const deletedBsda = await bsdaRepository.delete({ id });
-  return expandBsdaFromDb(deletedBsda);
+  return expandBsdaFromDb(await getBsdaForElastic(deletedBsda));
 }

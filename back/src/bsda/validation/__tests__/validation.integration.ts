@@ -1,4 +1,4 @@
-import { Bsda, BsdaType, UserRole } from "@prisma/client";
+import { BsdaType, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   companyFactory,
@@ -9,9 +9,11 @@ import { bsdaFactory } from "../../__tests__/factories";
 import { bsdaSchema } from "../schema";
 import { parseBsdaInContext } from "../index";
 import { prisma } from "@td/prisma";
+import { getFirstTransporterSync } from "../../database";
+import { BsdaWithTransporters } from "../../types";
 
 describe("BSDA validation", () => {
-  let bsda: Bsda;
+  let bsda: BsdaWithTransporters;
 
   beforeEach(async () => {
     bsda = await bsdaFactory({});
@@ -188,7 +190,12 @@ describe("BSDA validation", () => {
     test("when transporter is not registered in Trackdéchets", async () => {
       const data = {
         ...bsda,
-        transporterCompanySiret: "85001946400021"
+        transporters: [
+          {
+            ...bsda.transporters[0],
+            transporterCompanySiret: "85001946400021"
+          }
+        ]
       };
 
       expect.assertions(1);
@@ -208,7 +215,12 @@ describe("BSDA validation", () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
       const data = {
         ...bsda,
-        transporterCompanySiret: company.siret
+        transporters: [
+          {
+            ...bsda.transporters[0],
+            transporterCompanySiret: company.siret
+          }
+        ]
       };
 
       expect.assertions(1);
@@ -229,18 +241,27 @@ describe("BSDA validation", () => {
     test("when foreign transporter is not registered in Trackdéchets", async () => {
       const data = {
         ...bsda,
-        trasnporterCompanySiret: null,
-        transporterCompanyVatNumber: "IT13029381004"
+        transporters: [
+          {
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: "IT13029381004"
+          }
+        ]
       };
-      const result = await bsdaSchema.safeParseAsync(data);
 
-      if (result.success) {
+      try {
+        await parseBsdaInContext(
+          {
+            persisted: data as any
+          },
+          {}
+        );
         throw new Error("Expected error.");
+      } catch (error) {
+        expect(error.issues[0].message).toBe(
+          "Le transporteur avec le n°de TVA IT13029381004 n'est pas inscrit sur Trackdéchets"
+        );
       }
-
-      expect(result.error.issues[0].message).toBe(
-        "Le transporteur avec le n°de TVA IT13029381004 n'est pas inscrit sur Trackdéchets"
-      );
     });
 
     test("when foreign transporter is registered with wrong profile", async () => {
@@ -251,19 +272,29 @@ describe("BSDA validation", () => {
       });
       const data = {
         ...bsda,
-        transporterCompanyVatNumber: company.vatNumber
+        transporters: [
+          {
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: company.vatNumber
+          }
+        ]
       };
-      const result = await bsdaSchema.safeParseAsync(data);
 
-      if (result.success) {
+      try {
+        await parseBsdaInContext(
+          {
+            persisted: data as any
+          },
+          {}
+        );
         throw new Error("Expected error.");
+      } catch (error) {
+        expect(error.issues[0].message).toBe(
+          `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
+            " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        );
       }
-
-      expect(result.error.issues[0].message).toBe(
-        `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
-          " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
-          " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
-      );
     });
 
     test("when destination siret is not valid", async () => {
@@ -287,14 +318,20 @@ describe("BSDA validation", () => {
         ...bsda,
         destinationCompanySiret: "85001946400021"
       };
-      const result = await bsdaSchema.safeParseAsync(data);
-      if (result.success) {
-        throw new Error("Expected error.");
-      }
 
-      expect(result.error.issues[0].message).toBe(
-        "L'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
-      );
+      try {
+        await parseBsdaInContext(
+          {
+            persisted: data as any
+          },
+          {}
+        );
+        throw new Error("Expected error.");
+      } catch (error) {
+        expect(error.issues[0].message).toBe(
+          "L'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+        );
+      }
     });
 
     test("when destination is registered with wrong profile", async () => {
@@ -303,17 +340,23 @@ describe("BSDA validation", () => {
         ...bsda,
         destinationCompanySiret: company.siret
       };
-      const result = await bsdaSchema.safeParseAsync(data);
-      if (result.success) {
-        throw new Error("Expected error.");
-      }
 
-      expect(result.error.issues[0].message).toBe(
-        `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est pas inscrite` +
-          " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc" +
-          " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il" +
-          " modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
-      );
+      try {
+        await parseBsdaInContext(
+          {
+            persisted: data as any
+          },
+          {}
+        );
+        throw new Error("Expected error.");
+      } catch (error) {
+        expect(error.issues[0].message).toBe(
+          `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est pas inscrite` +
+            " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc" +
+            " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il" +
+            " modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        );
+      }
     });
 
     test("when there is a french transporter and recepisse fields are null", async () => {
@@ -324,11 +367,16 @@ describe("BSDA validation", () => {
       const data = {
         ...bsda,
         type: BsdaType.OTHER_COLLECTIONS,
-        transporterCompanySiret: transporterCompany.siret,
-        transporterCompanyVatNumber: null,
-        transporterRecepisseIsExempted: false,
-        transporterRecepisseNumber: null,
-        transporterRecepisseDepartment: null
+        transporters: [
+          {
+            ...bsda.transporters[0],
+            transporterCompanySiret: transporterCompany.siret,
+            transporterCompanyVatNumber: null,
+            transporterRecepisseIsExempted: false,
+            transporterRecepisseNumber: null,
+            transporterRecepisseDepartment: null
+          }
+        ]
       };
 
       try {
@@ -355,8 +403,13 @@ describe("BSDA validation", () => {
     it("transporter plate is required if transporter mode is ROAD", async () => {
       const data = {
         ...bsda,
-        transporterTransportMode: "ROAD",
-        transporterTransportPlates: undefined
+        transporters: [
+          {
+            ...bsda.transporters[0],
+            transporterTransportMode: "ROAD",
+            transporterTransportPlates: undefined
+          }
+        ]
       };
       expect.assertions(1);
 
@@ -468,8 +521,13 @@ describe("BSDA validation", () => {
       const data = {
         ...bsda,
         emittedCompanySiret: emitterAndTransporter.siret,
-        transporterCompanySiret: emitterAndTransporter.siret,
-        transporterRecepisseIsExempted: false
+        transporters: [
+          {
+            ...bsda.transporters[0],
+            transporterCompanySiret: emitterAndTransporter.siret,
+            transporterRecepisseIsExempted: false
+          }
+        ]
       };
 
       expect.assertions(1);
@@ -632,10 +690,12 @@ describe("BSDA Sealed rules checks", () => {
       opt: {
         workerCompanySiret: company.siret,
         destinationCompanySiret: company.siret,
-        transporterCompanySiret: company.siret,
         destinationOperationNextDestinationCompanySiret:
           nextDestinationCompany.siret,
         status: "SIGNED_BY_PRODUCER"
+      },
+      transporterOpt: {
+        transporterCompanySiret: company.siret
       }
     });
 
@@ -853,7 +913,9 @@ describe("BSDA Sealed rules checks", () => {
       opt: {
         status: "SENT",
         emitterEmissionSignatureDate: new Date(),
-        workerWorkSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
+      },
+      transporterOpt: {
         transporterTransportSignatureDate: new Date()
       }
     });
@@ -869,7 +931,7 @@ describe("BSDA Sealed rules checks", () => {
               }
             }
           },
-          persisted: bsda as any
+          persisted: bsda
         },
         { currentSignatureType: "OPERATION" }
       );
@@ -898,10 +960,13 @@ describe("BSDA Sealed rules checks", () => {
       }
     });
 
+    const transporter = getFirstTransporterSync(bsda)!;
     await parseBsdaInContext(
       {
         input: {
-          transporter: { company: { siret: bsda.transporterCompanySiret } },
+          transporter: {
+            company: { siret: transporter.transporterCompanySiret }
+          },
           intermediaries: [
             {
               siret: intermediary.siret,
@@ -911,7 +976,7 @@ describe("BSDA Sealed rules checks", () => {
             }
           ]
         },
-        persisted: bsda as any
+        persisted: bsda
       },
       {}
     );

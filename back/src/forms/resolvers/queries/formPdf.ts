@@ -14,10 +14,9 @@ import { createPDFResponse } from "../../../common/pdf";
 export const formPdfDownloadHandler: DownloadHandler<QueryFormPdfArgs> = {
   name: "formPdf",
   handler: async (req: Request, res: Response, { id }: { id: string }) => {
-    const form = await getFormOrFormNotFound({ id });
-    const readableStream = await generateBsddPdf(form);
+    const { filename, stream: readableStream } = await generateBsddPdf(id);
 
-    readableStream.pipe(createPDFResponse(res, form.readableId));
+    readableStream.pipe(createPDFResponse(res, filename));
   }
 };
 

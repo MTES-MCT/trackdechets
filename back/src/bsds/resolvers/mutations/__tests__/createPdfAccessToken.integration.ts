@@ -162,8 +162,10 @@ describe("Mutation.creatPdfAccessToken", () => {
     const user = await userFactory();
     const bsda = await bsdaFactory({
       opt: {
-        transporterCompanySiret: company.siret,
         status: BsdaStatus.SENT
+      },
+      transporterOpt: {
+        transporterCompanySiret: company.siret
       }
     });
     const { mutate } = makeClient(user);
@@ -189,8 +191,10 @@ describe("Mutation.creatPdfAccessToken", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const bsda = await bsdaFactory({
       opt: {
-        transporterCompanySiret: company.siret,
         status: BsdaStatus.PROCESSED
+      },
+      transporterOpt: {
+        transporterCompanySiret: company.siret
       }
     });
     const { mutate } = makeClient(user);
@@ -218,8 +222,10 @@ describe("Mutation.creatPdfAccessToken", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const bsda = await bsdaFactory({
       opt: {
-        transporterCompanySiret: company.siret,
         status: BsdaStatus.SENT
+      },
+      transporterOpt: {
+        transporterCompanySiret: company.siret
       }
     });
     const { mutate } = makeClient(user);

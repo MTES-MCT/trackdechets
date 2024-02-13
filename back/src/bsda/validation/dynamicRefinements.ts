@@ -1,17 +1,60 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
+import { prisma } from "@td/prisma";
 import { RefinementCtx, z } from "zod";
-import { isTransporterRefinement } from "../../common/validation/siret";
+import {
+  isDestinationRefinement,
+  isRegisteredVatNumberRefinement,
+  isTransporterRefinement,
+  isWorkerRefinement
+} from "../../common/validation/siret";
+import { BsdaSignatureType } from "../../generated/graphql/types";
 import { getReadonlyBsdaRepository } from "../repository";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { BsdaValidationContext } from "./index";
 import { ZodBsda } from "./schema";
-import { BsdaSignatureType } from "../../generated/graphql/types";
 
 export async function applyDynamicRefinement(
   bsda: ZodBsda,
   validationContext: BsdaValidationContext,
   ctx: RefinementCtx
 ) {
+  await applyFieldRefinement(
+    isDestinationRefinement,
+    "destinationCompanySiret",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isDestinationRefinement,
+    "destinationOperationNextDestinationCompanySiret",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isRegisteredVatNumberRefinement,
+    "transporterCompanyVatNumber",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isWorkerRefinement,
+    "workerCompanySiret",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isBsdaEcoOrganismeRefinement,
+    "ecoOrganismeSiret",
+    bsda,
+    ctx
+  );
+  await applyFieldRefinement(
+    isNotEcoOrganismeRefinement,
+    "emitterCompanySiret",
+    bsda,
+    ctx
+  );
+
   await isTransporterRefinement(
     {
       siret: bsda.transporterCompanySiret,
@@ -25,6 +68,18 @@ export async function applyDynamicRefinement(
   }
 
   await validateDestination(bsda, validationContext.currentSignatureType, ctx);
+}
+
+function applyFieldRefinement<T extends (value, ctx: RefinementCtx) => any>(
+  refinement: T,
+  field: keyof ZodBsda,
+  bsda: ZodBsda,
+  ctx: RefinementCtx
+) {
+  return refinement(bsda[field]!, {
+    ...ctx,
+    path: [...ctx.path, field]
+  });
 }
 
 async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {
@@ -180,7 +235,6 @@ async function validateDestination(
   currentSignatureType: BsdaSignatureType | undefined,
   ctx: RefinementCtx
 ) {
-
   // Destination is freely editable until EMISSION signature.
   // Once transported, destination is not editable for anyone.
   // This is enforced by the sealing rules
@@ -223,6 +277,55 @@ async function validateDestination(
       code: z.ZodIssueCode.custom,
       message: `Impossible de retirer un intermédiaire d'entreposage provisoire sans indiquer la destination finale prévue initialement comme destination.`,
       fatal: true
+    });
+  }
+}
+
+async function refineAndGetEcoOrganisme(siret: string | null | undefined, ctx) {
+  if (!siret) return null;
+  const ecoOrganisme = await prisma.ecoOrganisme.findUnique({
+    where: { siret }
+  });
+
+  if (ecoOrganisme === null) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `L'éco-organisme avec le SIRET ${siret} n'est pas référencé sur Trackdéchets`
+    });
+  }
+
+  return ecoOrganisme;
+}
+
+async function isBsdaEcoOrganismeRefinement(
+  siret: string | null | undefined,
+  ctx: RefinementCtx
+) {
+  const ecoOrganisme = await refineAndGetEcoOrganisme(siret, ctx);
+
+  if (ecoOrganisme && !ecoOrganisme?.handleBsda) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSDA`
+    });
+  }
+}
+
+async function isNotEcoOrganismeRefinement(
+  siret: string | null | undefined,
+  ctx: RefinementCtx
+) {
+  if (!siret) return null;
+
+  const ecoOrganisme = await prisma.ecoOrganisme.findFirst({
+    where: { siret },
+    select: { id: true }
+  });
+
+  if (ecoOrganisme) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `"L'émetteur ne peut pas être un éco-organisme. Merci de bien vouloir renseigner l'émetteur effectif de ce déchet (ex: déchetterie, producteur, TTR...). Un autre champ dédié existe et doit être utilisé pour viser l'éco-organisme concerné : https://faq.trackdechets.fr/dechets-dangereux-classiques/les-eco-organismes-sur-trackdechets#ou-etre-vise-en-tant-queco-organisme",`
     });
   }
 }

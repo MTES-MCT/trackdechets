@@ -17,10 +17,7 @@ import { ExtraSignatureType, SignatureType } from "../types";
 import Loader from "../../../../../Apps/common/Components/Loader/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
 import { useParams, useNavigate, generatePath } from "react-router-dom";
-import {
-  GET_DETAIL_DASRI_WITH_METADATA,
-  GET_BSDS
-} from "../../../../../Apps/common/queries";
+import { GET_DETAIL_DASRI_WITH_METADATA } from "../../../../../Apps/common/queries";
 
 import EmptyDetail from "../../../../detail/common/EmptyDetailView";
 import { Formik, Field, Form } from "formik";
@@ -196,9 +193,7 @@ export function RouteSignBsdasri({
             variables: {
               id: bsdasri.id,
               input: { ...signature, type: config.signatureType }
-            },
-            refetchQueries: [GET_BSDS],
-            awaitRefetchQueries: true
+            }
           });
           nextPage();
         }}

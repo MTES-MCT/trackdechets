@@ -9,7 +9,6 @@ import { WorkflowActionProps } from "./WorkflowAction";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
 import toast from "react-hot-toast";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 
 const MARK_AS_SEALED = gql`
   mutation MarkAsSealed($id: ID!) {
@@ -27,8 +26,6 @@ export default function MarkAsSealed({ form }: WorkflowActionProps) {
     MutationMarkAsSealedArgs
   >(MARK_AS_SEALED, {
     variables: { id: form.id },
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onCompleted: data => {
       if (data.markAsSealed) {
         const sealedForm = data.markAsSealed;

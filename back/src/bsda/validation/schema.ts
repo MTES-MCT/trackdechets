@@ -12,11 +12,8 @@ import {
   intermediarySchema
 } from "../../common/validation/intermediaries";
 import {
-  isRegisteredVatNumberRefinement,
   siretSchema,
-  foreignVatNumberSchema,
-  isDestinationRefinement,
-  isWorkerRefinement
+  foreignVatNumberSchema
 } from "../../common/validation/siret";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { OPERATIONS, WORKER_CERTIFICATION_ORGANISM } from "./constants";
@@ -91,9 +88,7 @@ export const rawBsdaSchema = z.object({
   brokerRecepisseDepartment: z.string().nullish(),
   brokerRecepisseValidityLimit: z.coerce.date().nullish(),
   destinationCompanyName: z.string().nullish(),
-  destinationCompanySiret: siretSchema
-    .nullish()
-    .superRefine(isDestinationRefinement),
+  destinationCompanySiret: siretSchema.nullish(),
   destinationCompanyAddress: z.string().nullish(),
   destinationCompanyContact: z.string().nullish(),
   destinationCompanyPhone: z.string().nullish(),
@@ -118,9 +113,7 @@ export const rawBsdaSchema = z.object({
     }),
   destinationOperationSignatureAuthor: z.string().nullish(),
   destinationOperationSignatureDate: z.coerce.date().nullish(),
-  destinationOperationNextDestinationCompanySiret: siretSchema
-    .nullish()
-    .superRefine(isDestinationRefinement),
+  destinationOperationNextDestinationCompanySiret: siretSchema.nullish(),
   destinationOperationNextDestinationCompanyVatNumber:
     foreignVatNumberSchema.nullish(),
   destinationOperationNextDestinationCompanyName: z.string().nullish(),
@@ -130,15 +123,14 @@ export const rawBsdaSchema = z.object({
   destinationOperationNextDestinationCompanyMail: z.string().nullish(),
   destinationOperationNextDestinationCap: z.string().nullish(),
   destinationOperationNextDestinationPlannedOperationCode: z.string().nullish(),
+  transporterId: z.string().nullish(),
   transporterCompanyName: z.string().nullish(),
   transporterCompanySiret: siretSchema.nullish(), // Further verifications done here under in superRefine
   transporterCompanyAddress: z.string().nullish(),
   transporterCompanyContact: z.string().nullish(),
   transporterCompanyPhone: z.string().nullish(),
   transporterCompanyMail: z.string().nullish(),
-  transporterCompanyVatNumber: foreignVatNumberSchema
-    .nullish()
-    .superRefine(isRegisteredVatNumberRefinement),
+  transporterCompanyVatNumber: foreignVatNumberSchema.nullish(),
   transporterCustomInfo: z.string().nullish(),
   transporterRecepisseIsExempted: z.coerce
     .boolean()
@@ -161,7 +153,7 @@ export const rawBsdaSchema = z.object({
     .nullish()
     .transform(v => Boolean(v)),
   workerCompanyName: z.string().nullish(),
-  workerCompanySiret: siretSchema.nullish().superRefine(isWorkerRefinement),
+  workerCompanySiret: siretSchema.nullish(),
   workerCompanyAddress: z.string().nullish(),
   workerCompanyContact: z.string().nullish(),
   workerCompanyPhone: z.string().nullish(),

@@ -22,7 +22,6 @@ import {
 } from "@td/codegen-ui";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
-import { GET_BSDS } from "../../../../../Apps/common/queries";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import EstimatedQuantityTooltip from "../../../../../common/components/EstimatedQuantityTooltip";
 
@@ -137,8 +136,6 @@ export default function ReceivedInfo({
   ] = useMutation<Pick<Mutation, "markAsReceived">, MutationMarkAsReceivedArgs>(
     MARK_AS_RECEIVED,
     {
-      refetchQueries: [GET_BSDS],
-      awaitRefetchQueries: true,
       onError: () => {
         // The error is handled in the UI
       },
@@ -153,8 +150,6 @@ export default function ReceivedInfo({
     Pick<Mutation, "markAsTempStored">,
     MutationMarkAsTempStoredArgs
   >(MARK_AS_TEMP_STORED, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
     onError: () => {
       // The error is handled in the UI
     }

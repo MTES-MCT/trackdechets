@@ -1,6 +1,6 @@
 import { nextBuildSirenify } from "../../companies/sirenify";
 import { CompanyInput } from "../../generated/graphql/types";
-import { flattenBsdaInput } from "../converter";
+import { ZodBsda } from "./schema";
 
 type SiretInfos = {
   name: string | null | undefined;
@@ -8,7 +8,7 @@ type SiretInfos = {
 };
 
 const accessors = (
-  input: ReturnType<typeof flattenBsdaInput>,
+  input: ZodBsda,
   sealedFields: string[] // Tranformations should not be run on sealed fields
 ) => [
   {

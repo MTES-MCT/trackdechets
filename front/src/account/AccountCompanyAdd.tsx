@@ -72,7 +72,7 @@ export const CREATE_COMPANY_HOOK_OPTIONS = navigate => ({
   ],
   awaitRefetchQueries: true,
   onCompleted: () => {
-    navigate(routes.account.companies.list);
+    navigate(routes.companies.index);
   }
 });
 
@@ -446,7 +446,7 @@ export default function AccountCompanyAdd() {
               <Button
                 priority="tertiary"
                 onClick={() => {
-                  navigate(routes.account.companies.create.foreign, {
+                  navigate(routes.companies.create.foreign, {
                     state: { vatNumber: companyInfos.vatNumber }
                   });
                 }}

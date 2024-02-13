@@ -3,6 +3,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 
 export type CancelRevisionRequestFn = (
   where: Prisma.BsdaRevisionRequestWhereUniqueInput,
@@ -31,6 +32,11 @@ export function buildCancelRevisionRequest(
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+
+    prisma.addAfterCommitCallback(() =>
+      enqueueUpdatedBsdToIndex(deletedRevisionRequest.bsdaId)
+    );
+
     return deletedRevisionRequest;
   };
 }

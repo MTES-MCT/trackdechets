@@ -1,9 +1,9 @@
 import * as React from "react";
 import { formatDate, SignatureStamp } from "../../../common/pdf";
-import { Signature } from "../../../generated/graphql/types";
+import { Signature as SignatureType } from "../../../generated/graphql/types";
 
 type Props = {
-  signature: Signature | null | undefined;
+  signature: SignatureType | null | undefined;
 };
 export function Signature({ signature }: Props) {
   return (

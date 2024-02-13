@@ -35,9 +35,10 @@ export async function renderFormRefusedEmail(
     ? forwardedIn.wasteAcceptationStatus!
     : form.wasteAcceptationStatus!;
 
+  const { filename, data } = await generateBsddPdfToBase64(form);
   const attachmentData = {
-    file: await generateBsddPdfToBase64(form),
-    name: `${form.readableId}.pdf`
+    file: data,
+    name: filename
   };
 
   const emitterCompanyAdmins = await getCompanyAdminUsers(

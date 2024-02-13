@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { SurveyBannerProps } from "./surveyBannerTypes";
 
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -134,8 +134,23 @@ const iconSurvey = (
   </svg>
 );
 
-const SurveyBanner = ({ message, button, onClickClose }: SurveyBannerProps) => {
-  return (
+const SurveyBanner = ({
+  message,
+  button,
+  persistedSurveyName
+}: SurveyBannerProps) => {
+  const localStorage = window.localStorage;
+  const storedItem =
+    persistedSurveyName && localStorage.getItem(persistedSurveyName);
+  const surveyStatus: boolean = storedItem ? JSON.parse(storedItem) : true;
+  const [showSurveyBanner, setShowSurveyBanner] = useState(surveyStatus);
+
+  const onClickClose = () => {
+    localStorage.setItem(persistedSurveyName!, JSON.stringify(false));
+    setShowSurveyBanner(false);
+  };
+
+  return showSurveyBanner ? (
     <div className="survey-banner">
       <div className="survey-banner__container">
         <div className="survey-banner__group">
@@ -158,23 +173,21 @@ const SurveyBanner = ({ message, button, onClickClose }: SurveyBannerProps) => {
             </Button>
           </div>
         </div>
-        {onClickClose && (
+        {!!persistedSurveyName && (
           <div className="survey-banner__group">
             <div className="survey-banner__close">
               <Button
-                priority="tertiary"
+                priority="tertiary no outline"
                 iconId={"ri-close-line"}
-                iconPosition="right"
                 onClick={onClickClose}
-              >
-                Fermer
-              </Button>
+                title="Fermer"
+              />
             </div>
           </div>
         )}
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export default SurveyBanner;

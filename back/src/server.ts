@@ -36,6 +36,7 @@ import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { createFormDataLoaders } from "./forms/dataloader";
+import { createBsdaDataLoaders } from "./bsda/dataloader";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
@@ -337,6 +338,7 @@ export const getServerDataloaders = () => ({
   ...createUserDataLoaders(),
   ...createCompanyDataLoaders(),
   ...createFormDataLoaders(),
+  ...createBsdaDataLoaders(),
   ...createEventsDataLoaders()
 });
 

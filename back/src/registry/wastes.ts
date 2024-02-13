@@ -1,5 +1,4 @@
 import { TotalHits } from "@elastic/elasticsearch/api/types";
-import { tov1ReadableId } from "../forms/compat";
 import { WasteRegistryType } from "../generated/graphql/types";
 import { toWastes } from "./converters";
 import { searchBsds, toPrismaBsds } from "./elastic";
@@ -62,9 +61,7 @@ async function getWasteConnection<WasteType extends GenericWaste>(
       }
       const { type, id, readableId } = bsd;
       const waste = wastes[type].find(waste =>
-        type === "BSDD"
-          ? waste.id === tov1ReadableId(readableId)
-          : waste.id === id
+        type === "BSDD" ? waste.id === readableId : waste.id === id
       );
 
       if (waste) {

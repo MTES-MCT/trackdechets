@@ -140,6 +140,7 @@ export async function isCrematoriumRefinement(siret: string, ctx) {
     });
   }
 }
+
 async function refineSiretAndGetCompany(siret: string | null | undefined, ctx) {
   if (!siret) return null;
   const company = await prisma.company.findUnique({

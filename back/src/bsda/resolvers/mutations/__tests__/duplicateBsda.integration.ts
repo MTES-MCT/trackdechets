@@ -11,6 +11,7 @@ import { prisma } from "@td/prisma";
 import { xDaysAgo } from "../../../../utils";
 import { bsdaFactory } from "../../../__tests__/factories";
 import { searchCompany } from "../../../../companies/search";
+import { getFirstTransporterSync } from "../../../database";
 
 jest.mock("../../../../companies/search");
 
@@ -91,15 +92,6 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
       workerCertificationHasSubSectionThree:
         workerCertification.hasSubSectionThree,
       workerCertificationValidityLimit: workerCertification.validityLimit,
-      transporterCompanySiret: transporter.company.siret,
-      transporterCompanyName: transporter.company.name,
-      transporterCompanyAddress: transporter.company.address,
-      transporterCompanyContact: transporter.company.contact,
-      transporterCompanyPhone: transporter.company.contactPhone,
-      transporterCompanyMail: transporter.company.contactEmail,
-      transporterRecepisseNumber: transporterReceipt.receiptNumber,
-      transporterRecepisseDepartment: transporterReceipt.department,
-      transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
       destinationCompanySiret: destination.company.siret,
       destinationCompanyName: destination.company.name,
       destinationCompanyAddress: destination.company.address,
@@ -116,6 +108,17 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
       brokerRecepisseDepartment: brokerReceipt.department,
       brokerRecepisseValidityLimit: brokerReceipt.validityLimit,
       ...opt
+    },
+    transporterOpt: {
+      transporterCompanySiret: transporter.company.siret,
+      transporterCompanyName: transporter.company.name,
+      transporterCompanyAddress: transporter.company.address,
+      transporterCompanyContact: transporter.company.contact,
+      transporterCompanyPhone: transporter.company.contactPhone,
+      transporterCompanyMail: transporter.company.contactEmail,
+      transporterRecepisseNumber: transporterReceipt.receiptNumber,
+      transporterRecepisseDepartment: transporterReceipt.department,
+      transporterRecepisseValidityLimit: transporterReceipt.validityLimit
     }
   });
 
@@ -142,8 +145,11 @@ describe("Mutation.Bsda.duplicate", () => {
     // Then
     expect(errors).toBeUndefined();
     const duplicatedBsda = await prisma.bsda.findUniqueOrThrow({
-      where: { id: data.duplicateBsda.id }
+      where: { id: data.duplicateBsda.id },
+      include: { transporters: true }
     });
+
+    const duplicatedTransporter = getFirstTransporterSync(duplicatedBsda);
 
     const {
       type,
@@ -177,6 +183,7 @@ describe("Mutation.Bsda.duplicate", () => {
       brokerRecepisseNumber,
       brokerRecepisseDepartment,
       brokerRecepisseValidityLimit,
+      transporterTransportSignatureDate,
       destinationCompanyName,
       destinationCompanySiret,
       destinationCompanyAddress,
@@ -194,18 +201,6 @@ describe("Mutation.Bsda.duplicate", () => {
       destinationOperationNextDestinationCompanyMail,
       destinationOperationNextDestinationCap,
       destinationOperationNextDestinationPlannedOperationCode,
-      transporterCompanyName,
-      transporterCompanySiret,
-      transporterCompanyAddress,
-      transporterCompanyContact,
-      transporterCompanyPhone,
-      transporterCompanyMail,
-      transporterCompanyVatNumber,
-      transporterRecepisseIsExempted,
-      transporterRecepisseNumber,
-      transporterRecepisseDepartment,
-      transporterRecepisseValidityLimit,
-      transporterTransportMode,
       workerIsDisabled,
       workerCompanyName,
       workerCompanySiret,
@@ -221,6 +216,24 @@ describe("Mutation.Bsda.duplicate", () => {
       ...rest
     } = bsda;
 
+    const transporter = getFirstTransporterSync(bsda)!;
+
+    const {
+      transporterCompanySiret,
+      transporterCompanyName,
+      transporterCompanyVatNumber,
+      transporterCompanyAddress,
+      transporterCompanyContact,
+      transporterCompanyPhone,
+      transporterCompanyMail,
+      transporterRecepisseIsExempted,
+      transporterRecepisseNumber,
+      transporterRecepisseDepartment,
+      transporterRecepisseValidityLimit,
+      transporterTransportMode,
+      ...restTransporter
+    } = transporter;
+
     const expectedSkipped = [
       "id",
       "createdAt",
@@ -234,11 +247,6 @@ describe("Mutation.Bsda.duplicate", () => {
       "workerWorkHasEmitterPaperSignature",
       "workerWorkSignatureAuthor",
       "workerWorkSignatureDate",
-      "transporterTransportPlates",
-      "transporterCustomInfo",
-      "transporterTransportTakenOverAt",
-      "transporterTransportSignatureAuthor",
-      "transporterTransportSignatureDate",
       "destinationCustomInfo",
       "destinationReceptionWeight",
       "destinationReceptionDate",
@@ -258,7 +266,21 @@ describe("Mutation.Bsda.duplicate", () => {
       "grouping",
       "groupedInId",
       "intermediaries",
-      "intermediariesOrgIds"
+      "intermediariesOrgIds",
+      "transporters"
+    ];
+
+    const expectedSkippedTransporter = [
+      "id",
+      "createdAt",
+      "updatedAt",
+      "bsdaId",
+      "transporterTransportPlates",
+      "number",
+      "transporterTransportTakenOverAt",
+      "transporterTransportSignatureAuthor",
+      "transporterTransportSignatureDate",
+      "transporterCustomInfo"
     ];
 
     expect(duplicatedBsda.status).toBe("INITIAL");
@@ -313,18 +335,6 @@ describe("Mutation.Bsda.duplicate", () => {
       destinationOperationNextDestinationCompanyMail,
       destinationOperationNextDestinationCap,
       destinationOperationNextDestinationPlannedOperationCode,
-      transporterCompanyName,
-      transporterCompanySiret,
-      transporterCompanyAddress,
-      transporterCompanyContact,
-      transporterCompanyPhone,
-      transporterCompanyMail,
-      transporterCompanyVatNumber,
-      transporterRecepisseIsExempted,
-      transporterRecepisseNumber,
-      transporterRecepisseDepartment,
-      transporterRecepisseValidityLimit,
-      transporterTransportMode,
       workerIsDisabled,
       workerCompanyName,
       workerCompanySiret,
@@ -339,11 +349,31 @@ describe("Mutation.Bsda.duplicate", () => {
       workerCertificationOrganisation
     });
 
+    expect(duplicatedTransporter).toMatchObject({
+      number: 1,
+      transporterCompanySiret,
+      transporterCompanyName,
+      transporterCompanyVatNumber,
+      transporterCompanyAddress,
+      transporterCompanyContact,
+      transporterCompanyPhone,
+      transporterCompanyMail,
+      transporterRecepisseIsExempted,
+      transporterRecepisseNumber,
+      transporterRecepisseDepartment,
+      transporterRecepisseValidityLimit,
+      transporterTransportMode
+    });
+
     // make sure this test breaks when a new field is added to the Bsda model
     // it will ensure we think of adding necessary fields to the duplicate input
     const sortFn = (a: string, b: string) => a.localeCompare(b);
     expect(Object.keys(rest).sort(sortFn)).toEqual(
       expectedSkipped.sort(sortFn)
+    );
+
+    expect(Object.keys(restTransporter).sort(sortFn)).toEqual(
+      expectedSkippedTransporter.sort(sortFn)
     );
   });
 
@@ -468,32 +498,35 @@ describe("Mutation.Bsda.duplicate", () => {
     expect(errors).toBeUndefined();
 
     const duplicatedBsda = await prisma.bsda.findUniqueOrThrow({
-      where: { id: data.duplicateBsda.id }
+      where: { id: data.duplicateBsda.id },
+      include: { transporters: true }
     });
 
+    const duplicatedTransporter = getFirstTransporterSync(duplicatedBsda)!;
+
     // Check transporter info is updated
-    expect(duplicatedBsda.transporterCompanyName).toEqual(
+    expect(duplicatedTransporter.transporterCompanyName).toEqual(
       "UPDATED-TRANSPORTER-NAME"
     );
-    expect(duplicatedBsda.transporterCompanyAddress).toEqual(
+    expect(duplicatedTransporter.transporterCompanyAddress).toEqual(
       "UPDATED-TRANSPORTER-ADRESS"
     );
-    expect(duplicatedBsda.transporterCompanyContact).toEqual(
+    expect(duplicatedTransporter.transporterCompanyContact).toEqual(
       "UPDATED-TRANSPORTER-CONTACT"
     );
-    expect(duplicatedBsda.transporterCompanyPhone).toEqual(
+    expect(duplicatedTransporter.transporterCompanyPhone).toEqual(
       "UPDATED-TRANSPORTER-PHONE"
     );
-    expect(duplicatedBsda.transporterCompanyMail).toEqual(
+    expect(duplicatedTransporter.transporterCompanyMail).toEqual(
       "UPDATED-TRANSPORTER-MAIL"
     );
-    expect(duplicatedBsda.transporterRecepisseDepartment).toEqual(
+    expect(duplicatedTransporter.transporterRecepisseDepartment).toEqual(
       "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
     );
-    expect(duplicatedBsda.transporterRecepisseValidityLimit).toEqual(
+    expect(duplicatedTransporter.transporterRecepisseValidityLimit).toEqual(
       FOUR_DAYS_AGO
     );
-    expect(duplicatedBsda.transporterRecepisseNumber).toEqual(
+    expect(duplicatedTransporter.transporterRecepisseNumber).toEqual(
       "UPDATED-TRANSPORTER-RECEIPT-NUMBER"
     );
 
@@ -564,11 +597,14 @@ describe("Mutation.Bsda.duplicate", () => {
     expect(err3).toBeUndefined();
 
     const duplicatedBsda2 = await prisma.bsda.findUniqueOrThrow({
-      where: { id: data2.duplicateBsda.id }
+      where: { id: data2.duplicateBsda.id },
+      include: { transporters: true }
     });
-    expect(duplicatedBsda2.transporterRecepisseNumber).toBeNull();
-    expect(duplicatedBsda2.transporterRecepisseValidityLimit).toBeNull();
-    expect(duplicatedBsda2.transporterRecepisseDepartment).toBeNull();
+    const duplicatedTransporter2 = getFirstTransporterSync(duplicatedBsda2)!;
+
+    expect(duplicatedTransporter2.transporterRecepisseNumber).toBeNull();
+    expect(duplicatedTransporter2.transporterRecepisseValidityLimit).toBeNull();
+    expect(duplicatedTransporter2.transporterRecepisseDepartment).toBeNull();
   });
 
   test("duplicated BSDA should have the sirenified data when company info changes", async () => {
@@ -635,14 +671,16 @@ describe("Mutation.Bsda.duplicate", () => {
 
     const duplicatedBsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: data.duplicateBsda.id },
-      include: { intermediaries: true }
+      include: { intermediaries: true, transporters: true }
     });
 
+    const duplicatedTransporter = getFirstTransporterSync(duplicatedBsda)!;
+
     // Check transporter info is updated
-    expect(duplicatedBsda.transporterCompanyName).toEqual(
+    expect(duplicatedTransporter.transporterCompanyName).toEqual(
       "updated transporter name"
     );
-    expect(duplicatedBsda.transporterCompanyAddress).toEqual(
+    expect(duplicatedTransporter.transporterCompanyAddress).toEqual(
       "updated transporter address"
     );
 

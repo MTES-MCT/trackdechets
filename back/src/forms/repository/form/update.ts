@@ -73,16 +73,13 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
           const deletedTransporter = oldForm.transporters.find(
             t => t.id === deletedTransporterId
           )!;
-          await Promise.all(
-            updatedForm.transporters
-              .filter(t => t.number > deletedTransporter.number)
-              .map(t =>
-                prisma.bsddTransporter.update({
-                  where: { id: t.id },
-                  data: { number: t.number - 1 }
-                })
-              )
-          );
+          const transporterIdsToDecrement = updatedForm.transporters
+            .filter(t => t.number > deletedTransporter.number)
+            .map(t => t.id);
+          await prisma.bsddTransporter.updateMany({
+            where: { id: { in: transporterIdsToDecrement } },
+            data: { number: { decrement: 1 } }
+          });
         }
       }
     }

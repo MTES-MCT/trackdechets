@@ -54,18 +54,14 @@ export default function FormContainer() {
                   <StepContainer
                     component={Worker}
                     title="Entreprise de travaux"
-                    disabled={disabledAfterEmission}
+                    disabled={workerSigned}
                   />
                   <StepContainer
                     component={Transporter}
                     title="Transporteur"
                     disabled={transporterSigned}
                   />
-                  <StepContainer
-                    component={Destination}
-                    title="Destination"
-                    disabled={transporterSigned}
-                  />
+                  <StepContainer component={Destination} title="Destination" />
                 </>
               );
             }}

@@ -33,6 +33,9 @@ export default function Emitter({ disabled }) {
   const lockEmitterProducer =
     disabled || hasInitialGrouping || isForeignShipOrPrivateIndividual;
 
+  // TRA-13753 - Un seul transporteur est autorisé en cas de bordereau de tournée dédiée
+  const lockAppendix1 = (values.transporters ?? []).length > 1;
+
   useEffect(() => {
     if (values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual) {
       setFieldValue("emitter.type", "PRODUCER");
@@ -126,12 +129,21 @@ export default function Emitter({ disabled }) {
             label={
               <div className="tw-flex tw-items-start">
                 <span>{emitterTypeLabels["APPENDIX1"]}</span>
-                <Tooltip msg="La collecte de tournée dédiée permet une collecte plus facile (ancienne annexe 1), mais son usage est conditionné à certains déchets et certains acteurs." />
+                <Tooltip
+                  msg={
+                    "La collecte de tournée dédiée permet une collecte plus facile (ancienne annexe 1)," +
+                    " mais son usage est conditionné à certains déchets et certains acteurs.\n" +
+                    (lockAppendix1
+                      ? "Impossible de sélectionner ce type de bordereau lorsque plusieurs transporteurs" +
+                        " sont sélectionnés (multi-modal)."
+                      : "")
+                  }
+                />
               </div>
             }
             component={RadioButton}
             onChange={onChangeEmitterType}
-            disabled={lockEmitterProducer}
+            disabled={lockEmitterProducer || lockAppendix1}
           />
         </fieldset>
       </div>
