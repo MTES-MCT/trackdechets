@@ -73,6 +73,7 @@ async function createIndexes() {
   try {
     await eventsCollection.createIndex({ streamId: 1, createdAt: 1 });
     await eventsCollection.createIndex({ actor: 1 });
+    await eventsCollection.createIndex({ createdAt: -1 });
   } catch (err) {
     logger.error("Error while creating indexes", err);
   }
