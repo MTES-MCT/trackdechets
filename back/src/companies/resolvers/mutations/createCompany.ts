@@ -38,9 +38,6 @@ import { sendVerificationCodeLetter } from "../../../common/post";
  * @param companyInput
  * @param userId
  */
-
-const { VERIFY_COMPANY } = process.env;
-
 const createCompanyResolver: MutationResolvers["createCompany"] = async (
   parent,
   { companyInput },
@@ -211,7 +208,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   });
 
   // Company needs to be verified
-  if (VERIFY_COMPANY === "true") {
+  if (process.env.VERIFY_COMPANY === "true") {
     if (
       isProfessional(companyTypes) &&
       !isForeignTransporter({ companyTypes, vatNumber })

@@ -1,10 +1,10 @@
 import { prisma } from "@td/prisma";
-import { generateTestSiret } from "back";
+import { generateUniqueTestSiret } from "back";
 import { CompanyType } from "@prisma/client";
 
 export const seedCompany = async company => {
   let siret: string | null = null;
-  if (!company.vatNumber) siret = await generateTestSiret();
+  if (!company.vatNumber) siret = await generateUniqueTestSiret();
 
   // Need to create an anonymous company so that fakeSirets increment
   await prisma.anonymousCompany.create({

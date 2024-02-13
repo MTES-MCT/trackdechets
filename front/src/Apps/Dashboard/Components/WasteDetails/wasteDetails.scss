@@ -4,7 +4,17 @@
   display: flex;
   box-sizing: border-box;
   padding: 5px 0;
-  width: 100%;
+  width: auto;
+  flex-shrink: 0;
+
+  @include lg-desktop {
+    width: 250px;
+  }
+
+  @include xl-desktop {
+    width: 350px;
+  }
+
   &__infos {
     display: flex;
     flex-direction: column;
