@@ -19,7 +19,7 @@ export const extractDate = (prefix: string, chunk: string) => {
   // Legacy
   if (prefix === "TD") {
     expectedLength = 2;
-    expectedRegex = new RegExp(/20|21/);
+    expectedRegex = new RegExp(/19|20|21/);
   }
 
   if (chunk.length < expectedLength) {

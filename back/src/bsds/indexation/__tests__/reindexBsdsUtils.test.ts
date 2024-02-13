@@ -7,6 +7,7 @@ describe("reindexBsdsUtils", () => {
       ${"BSDA-20221109-9B4SV145H"}                                                 | ${["BSDA-20221109-9B4SV145H"]}
       ${"FF-20231128-KFAYQC3M0"}                                                   | ${["FF-20231128-KFAYQC3M0"]}
       ${"TD-20-TCG03421"}                                                          | ${["TD-20-TCG03421"]}
+      ${"TD-19-TCG03421"}                                                          | ${["TD-19-TCG03421"]}
       ${"TD-21-AAA00792"}                                                          | ${["TD-21-AAA00792"]}
       ${"td21aaa00792"}                                                            | ${["TD-21-AAA00792"]}
       ${""}                                                                        | ${[]}
@@ -56,10 +57,12 @@ describe("reindexBsdsUtils", () => {
       "BSDA-20221109-9B4SV1457-ste",
       "BSDA-20221109-9B4SV1457-ste",
       "TD-22-TCG03420",
-      "TD-19-TCG03420",
+      "TD-18-TCG03420",
       "TD-20-TCG034201",
       "TD-20-TCG0342",
-      "TB-20-TCG03421"
+      "TB-20-TCG03421",
+      "TD-2000-TCG03421",
+      "TD-2021-TCG03421"
     ])("%p should throw error", input => {
       expect.assertions(1);
 
