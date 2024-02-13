@@ -10,28 +10,39 @@ export const extractPrefix = (chunk: string) => {
   throw new Error();
 };
 
-export const extractDate = (chunk: string) => {
-  if (chunk.length < 8) {
+export const extractDate = (prefix: string, chunk: string) => {
+  let expectedLength = 8;
+  let expectedRegex = new RegExp(
+    /((19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01]))/
+  );
+
+  // Legacy
+  if (prefix === "TD") {
+    expectedLength = 2;
+    expectedRegex = new RegExp(/20|21/);
+  }
+
+  if (chunk.length < expectedLength) {
     throw new Error();
   }
 
-  const date = chunk.substring(0, 8);
+  const date = chunk.substring(0, expectedLength);
 
-  if (
-    !new RegExp(/((19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01]))/).test(date)
-  ) {
+  if (!expectedRegex.test(date)) {
     throw new Error();
   }
 
   return { date, rest: chunk.replace(date, "") };
 };
 
-export const extractSuffix = (chunk: string) => {
+export const extractSuffix = (prefix: string, chunk: string) => {
   const isSuite = chunk.endsWith("SUITE");
 
   chunk = chunk.replace(/suite/gi, "");
 
-  if (chunk.length !== 9) {
+  const expectedLength = prefix === "TD" ? 8 : 9;
+
+  if (chunk.length !== expectedLength) {
     throw new Error();
   }
 
@@ -46,9 +57,9 @@ export const toBsdId = (chunk: string) => {
 
     const { prefix, rest } = extractPrefix(sanitized);
 
-    const { date, rest: rest2 } = extractDate(rest);
+    const { date, rest: rest2 } = extractDate(prefix, rest);
 
-    const suffix = extractSuffix(rest2);
+    const suffix = extractSuffix(prefix, rest2);
 
     return `${prefix}-${date}-${suffix}`;
   } catch (e) {

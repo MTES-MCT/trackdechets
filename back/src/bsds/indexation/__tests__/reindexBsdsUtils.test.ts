@@ -6,6 +6,8 @@ describe("reindexBsdsUtils", () => {
       input                                                                        | expected
       ${"BSDA-20221109-9B4SV145H"}                                                 | ${["BSDA-20221109-9B4SV145H"]}
       ${"FF-20231128-KFAYQC3M0"}                                                   | ${["FF-20231128-KFAYQC3M0"]}
+      ${"TD-20-TCG03421"}                                                          | ${["TD-20-TCG03421"]}
+      ${"TD-21-AAA00792"}                                                          | ${["TD-21-AAA00792"]}
       ${""}                                                                        | ${[]}
       ${"    "}                                                                    | ${[]}
       ${"FF-20231128-KFAYQC3M0-suite"}                                             | ${["FF-20231128-KFAYQC3M0-suite"]}
@@ -34,6 +36,7 @@ describe("reindexBsdsUtils", () => {
       ${"BSDA-20221109-9B4SV145H    FF-20231128-KFAYQC3M0"}                        | ${["BSDA-20221109-9B4SV145H", "FF-20231128-KFAYQC3M0"]}
       ${"BSDA-20221109-9B4SV145H    FF-20231128-KFAYQC3M0 VHU-20220128-1HXF2PPPR"} | ${["BSDA-20221109-9B4SV145H", "FF-20231128-KFAYQC3M0", "VHU-20220128-1HXF2PPPR"]}
       ${"BSDA-202211099B4SV145H,    fF-20231128-kFayQC3M0 , vhu202201281HXF2pppr"} | ${["BSDA-20221109-9B4SV145H", "FF-20231128-KFAYQC3M0", "VHU-20220128-1HXF2PPPR"]}
+      ${"TD-20-TCG03420,    td-21-aaa00346 , vhu202201281HXF2pppr"}                | ${["TD-20-TCG03420", "TD-21-AAA00346", "VHU-20220128-1HXF2PPPR"]}
     `('"$input" should become $expected', ({ input, expected }) => {
       expect(splitIntoBsdIds(input)).toEqual(expected);
     });
@@ -50,7 +53,11 @@ describe("reindexBsdsUtils", () => {
       "BSDA-20221109-9B4SV14577",
       "BSDA-20221109-9B4SV1457-souite",
       "BSDA-20221109-9B4SV1457-ste",
-      "BSDA-20221109-9B4SV1457-ste"
+      "BSDA-20221109-9B4SV1457-ste",
+      "TD-22-TCG03420",
+      "TD-19-TCG03420",
+      "TD-20-TCG034201",
+      "TD-20-TCG0342"
     ])("%p should throw error", input => {
       expect.assertions(1);
 
