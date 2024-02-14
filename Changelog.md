@@ -22,7 +22,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Registre exhaustif du BSDD suite entreposage provisoire : les informations relatives à la destination finale et au 2e transporteur n'apparaissent pas + lignes en double [PR 3051](https://github.com/MTES-MCT/trackdechets/pull/3051)
 - En cas de révision vers un code de traitement final, les données du BSD sont mises à jour correctement [PR 2986](https://github.com/MTES-MCT/trackdechets/pull/2986)
 - Corriger l'auto-sélection du transporteur et la liste vide des transporteurs proposés [PR 3045](https://github.com/MTES-MCT/trackdechets/pull/3045)
-- Le mode de transport d'un transporteur étranger disparait après sauvegarde d'une modification [PR 3045](https://github.com/MTES-MCT/trackdechets/pull/3045)
+- Le mode de transport d'un transporteur étranger disparait après sauvegarde d'une modification [PR 3045](https://github.com/MTES-MCT/trackdechets/pull/3045) 
 - Correction de la valeur "pays" et "entreprise étrangère" dans les PDFs BSD (entreprise étrangère + nom pays)[PR 3047](#3047)
 
 #### :boom: Breaking changes
