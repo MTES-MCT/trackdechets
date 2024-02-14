@@ -4,7 +4,7 @@ import { Page, expect } from "@playwright/test";
  * Fill targeted quick filter
  */
 export type QuickFilterLabel =
-  | "N° de BSD / contenant"
+  | "N° libre / BSD / contenant"
   | "N° de déchet / nom usuel"
   | "Raison sociale / SIRET"
   | "Numéro de CAP"
