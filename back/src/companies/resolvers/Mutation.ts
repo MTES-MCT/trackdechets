@@ -25,6 +25,7 @@ import deleteCompany from "./mutations/deleteCompany";
 import createAnonymousCompany from "./mutations/createAnonymousCompany";
 import { addSignatureAutomation } from "./mutations/addSignatureAutomation";
 import { removeSignatureAutomation } from "./mutations/removeSignatureAutomation";
+import standbyCompanyByAdmin from "./mutations/standbyCompanyByAdmin";
 
 const Mutation: MutationResolvers = {
   createCompany,
@@ -47,6 +48,7 @@ const Mutation: MutationResolvers = {
   updateWorkerCertification,
   deleteWorkerCertification,
   verifyCompanyByAdmin,
+  standbyCompanyByAdmin,
   sendVerificationCodeLetter,
   createTestCompany,
   deleteCompany,

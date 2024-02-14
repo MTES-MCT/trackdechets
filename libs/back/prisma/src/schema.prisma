@@ -32,6 +32,7 @@ enum CompanyVerificationStatus {
   TO_BE_VERIFIED
   LETTER_SENT
   VERIFIED
+  STANDBY
 }
 
 enum Seveso {

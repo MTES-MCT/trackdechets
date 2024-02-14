@@ -85,6 +85,8 @@ export default function CompaniesVerificationTable({
             verificationStatus === CompanyVerificationStatus.LetterSent
           ) {
             return <>Courrier envoyé</>;
+          } else if (verificationStatus === CompanyVerificationStatus.Standby) {
+            return <>En standby</>;
           } else {
             const verificationMode = row.original.verificationMode;
             if (verificationMode === CompanyVerificationMode.Letter) {
@@ -169,10 +171,7 @@ export default function CompaniesVerificationTable({
     prepareRow(row);
     return [
       ...row.cells.map(cell => cell.render("Cell")),
-      row.values.verificationStatus ===
-        CompanyVerificationStatus.ToBeVerified && (
-        <CompanyVerificationActions company={row.original} />
-      )
+      <CompanyVerificationActions company={row.original} />
     ];
   });
 
@@ -211,7 +210,8 @@ function VerificationStatusFilter({ column: { filterValue, setFilter } }) {
       label: "Vérifié"
     },
     { value: CompanyVerificationStatus.ToBeVerified, label: "À vérifier" },
-    { value: CompanyVerificationStatus.LetterSent, label: "Courrier envoyé" }
+    { value: CompanyVerificationStatus.LetterSent, label: "Courrier envoyé" },
+    { value: CompanyVerificationStatus.Standby, label: "En standby" }
   ];
 
   return (

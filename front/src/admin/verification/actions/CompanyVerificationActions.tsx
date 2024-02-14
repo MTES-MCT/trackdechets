@@ -1,6 +1,8 @@
 import {
   CompanyForVerification,
+  CompanyVerificationStatus,
   Mutation,
+  MutationStandbyCompanyByAdminArgs,
   MutationVerifyCompanyByAdminArgs
 } from "@td/codegen-ui";
 import React from "react";
@@ -28,6 +30,17 @@ const SEND_VERIFICATION_CODE_LETTER = gql`
     sendVerificationCodeLetter(input: $input) {
       id
       verificationStatus
+      verificationMode
+    }
+  }
+`;
+
+const STANDBY_COMPANY_BY_ADMIN = gql`
+  mutation StandbyCompanyByAdmin($input: StandbyCompanyByAdminInput!) {
+    standbyCompanyByAdmin(input: $input) {
+      id
+      verificationStatus
+      verificationComment
       verificationMode
     }
   }
@@ -66,6 +79,19 @@ export default function CompanyVerificationActions({
       });
     }
   });
+  const [standbyCompanyByAdmin, { loading: loadingStandby }] = useMutation<
+    Pick<Mutation, "standbyCompanyByAdmin">,
+    MutationStandbyCompanyByAdminArgs
+  >(STANDBY_COMPANY_BY_ADMIN, {
+    onCompleted: () => {
+      toast.success("Statut mis à jour", { duration: TOAST_DURATION });
+    },
+    onError: () => {
+      toast.error("La requête n'a pas pu aboutir", {
+        duration: TOAST_DURATION
+      });
+    }
+  });
 
   function onSendVerificationCodeLetter() {
     if (isSiret(company.siret!)) {
@@ -97,8 +123,19 @@ export default function CompanyVerificationActions({
     });
   }
 
-  return (
-    <div className="tw-flex" style={{ justifyContent: "center" }}>
+  function onStandbyCompanyByAdmin(standby = true) {
+    return standbyCompanyByAdmin({
+      variables: {
+        input: {
+          orgId: company.orgId!,
+          standby
+        }
+      }
+    });
+  }
+
+  const unverifiedCompanyActions = (
+    <>
       {isSiret(company.orgId) && (
         <Button
           priority="secondary"
@@ -120,6 +157,42 @@ export default function CompanyVerificationActions({
         size="large"
         className="fr-mx-1w"
       />
+    </>
+  );
+
+  return (
+    <div className="tw-flex" style={{ justifyContent: "center" }}>
+      {company.verificationStatus === CompanyVerificationStatus.Standby && (
+        <Button
+          priority="secondary"
+          iconId="fr-icon-play-circle-line"
+          onClick={() => {
+            onStandbyCompanyByAdmin(false);
+          }}
+          title="Mettre en standby"
+          size="large"
+          className="fr-mx-1w"
+          disabled={loadingStandby}
+        />
+      )}
+
+      {company.verificationStatus ===
+        CompanyVerificationStatus.ToBeVerified && (
+        <Button
+          priority="secondary"
+          iconId="fr-icon-pause-circle-line"
+          onClick={() => {
+            onStandbyCompanyByAdmin(true);
+          }}
+          title="Rétablir"
+          size="large"
+          className="fr-mx-1w"
+          disabled={loadingStandby}
+        />
+      )}
+
+      {company.verificationStatus === CompanyVerificationStatus.ToBeVerified &&
+        unverifiedCompanyActions}
     </div>
   );
 }
