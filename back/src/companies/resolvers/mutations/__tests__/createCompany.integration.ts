@@ -63,7 +63,6 @@ const CREATE_COMPANY = `
         department
       }
       allowBsdasriTakeOverWithoutSignature
-      verificationMode
       verificationStatus
     }
   }
@@ -808,9 +807,16 @@ describe("Mutation.createCompany", () => {
       orgId: companyInput.vatNumber,
       name: companyInput.companyName,
       companyTypes: companyInput.companyTypes,
-      verificationMode: "AUTO",
       verificationStatus: "VERIFIED"
     });
+
+    const company = await prisma.company.findFirst({
+      where: {
+        orgId: companyInput.vatNumber
+      }
+    });
+
+    expect(company?.verificationMode).toEqual("AUTO");
 
     jest.mock("../../../../mailer/mailing");
     (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
@@ -894,9 +900,16 @@ describe("Mutation.createCompany", () => {
     // Then
     expect(errors).toBeUndefined();
     expect(data.createCompany).toMatchObject({
-      verificationStatus: "LETTER_SENT",
-      verificationMode: "LETTER"
+      verificationStatus: "LETTER_SENT"
     });
+
+    const company = await prisma.company.findFirst({
+      where: {
+        orgId: siret
+      }
+    });
+
+    expect(company?.verificationMode).toEqual("LETTER");
 
     jest.mock("../../../../common/post");
     (sendVerificationCodeLetter as jest.Mock).mockImplementation(() =>
