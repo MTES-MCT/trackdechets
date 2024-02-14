@@ -53,7 +53,7 @@ function Reindex() {
   };
 
   return (
-    <div className="fr-px-4w fr-py-2w">
+    <div>
       <Formik
         initialValues={{
           ids: ""

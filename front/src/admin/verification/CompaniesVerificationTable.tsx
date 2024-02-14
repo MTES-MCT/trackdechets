@@ -8,6 +8,8 @@ import { useTable, usePagination, useFilters } from "react-table";
 import { format } from "date-fns";
 import "./CompaniesVerificationTable.scss";
 import CompanyVerificationActions from "./actions/CompanyVerificationActions";
+import { Table } from "@codegouvfr/react-dsfr/Table";
+import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 
 type Props = {
   data: CompanyForVerification[];
@@ -20,7 +22,6 @@ type Props = {
 export default function CompaniesVerificationTable({
   data,
   fetchData,
-  loading,
   totalCount,
   pageSize
 }: Props) {
@@ -31,7 +32,7 @@ export default function CompaniesVerificationTable({
         accessor: "createdAt" as const,
         disableFilters: true,
         Cell: ({ value: createdAt }) =>
-          createdAt && format(new Date(createdAt), "yyyy-MM-dd")
+          createdAt && format(new Date(createdAt), "yyyy-MM-dd à HH:mm")
       },
       {
         Header: "Établissement",
@@ -141,17 +142,10 @@ export default function CompaniesVerificationTable({
   );
 
   const {
-    getTableProps,
-    getTableBodyProps,
     headerGroups,
     prepareRow,
     page,
-    canPreviousPage,
-    canNextPage,
-    pageOptions,
     gotoPage,
-    nextPage,
-    previousPage,
     // Get the state from the instance
     state: { pageIndex, filters }
   } = tableInstance;
@@ -161,119 +155,51 @@ export default function CompaniesVerificationTable({
     fetchData({ pageIndex, pageSize, filters });
   }, [fetchData, pageIndex, pageSize, filters]);
 
+  const tableHeaders = [
+    ...headerGroups[0].headers.map(column => (
+      <>
+        {column.render("Header")}
+        <div>{column.canFilter ? column.render("Filter") : null}</div>
+      </>
+    )),
+    "Actions"
+  ];
+
+  const tableData = page.map(row => {
+    prepareRow(row);
+    return [
+      ...row.cells.map(cell => cell.render("Cell")),
+      row.values.verificationStatus ===
+        CompanyVerificationStatus.ToBeVerified && (
+        <CompanyVerificationActions company={row.original} />
+      )
+    ];
+  });
+
   return (
-    // apply the table props
-    <div className="companiesVerificationTable">
-      <table {...getTableProps()}>
-        <thead>
-          {
-            // Loop over the header rows
-            headerGroups.map(headerGroup => (
-              // Apply the header row props
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {
-                  // Loop over the headers in each row
-                  headerGroup.headers.map(column => (
-                    // Apply the header cell props
-                    <th {...column.getHeaderProps()}>
-                      {
-                        // Render the header
-                        column.render("Header")
-                      }
-                      {/* Render the columns filter UI */}
-                      <div>
-                        {column.canFilter ? column.render("Filter") : null}
-                      </div>
-                    </th>
-                  ))
-                }
-                <th>Actions</th>
-              </tr>
-            ))
-          }
-        </thead>
+    <>
+      <Table
+        caption={`Établissements (${page.length} sur ${totalCount})`}
+        data={tableData}
+        headers={tableHeaders}
+        fixed
+      />
 
-        {/* Apply the table body props */}
-        <tbody {...getTableBodyProps()}>
-          {
-            // Loop over the table rows
-            page.map(row => {
-              // Prepare the row for display
-              prepareRow(row);
-              return (
-                // Apply the row props
-                <tr {...row.getRowProps()}>
-                  {
-                    // Loop over the rows cells
-                    row.cells.map(cell => {
-                      // Apply the cell props
-                      return (
-                        <td {...cell.getCellProps()}>
-                          {
-                            // Render the cell contents
-                            cell.render("Cell")
-                          }
-                        </td>
-                      );
-                    })
-                  }
-
-                  <td>
-                    {row.values.verificationStatus ===
-                      CompanyVerificationStatus.ToBeVerified && (
-                      <CompanyVerificationActions company={row.original} />
-                    )}
-                  </td>
-                </tr>
-              );
-            })
-          }
-          <tr>
-            {loading ? (
-              // Use our custom loading state to show a loading indicator
-              <td>Chargement...</td>
-            ) : (
-              <td>
-                Affichage de {page.length} établissements sur {totalCount}
-              </td>
-            )}
-          </tr>
-        </tbody>
-      </table>
-
-      <div className="pagination">
-        <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-          {"<<"}
-        </button>{" "}
-        <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-          {"<"}
-        </button>{" "}
-        <button onClick={() => nextPage()} disabled={!canNextPage}>
-          {">"}
-        </button>{" "}
-        <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-          {">>"}
-        </button>{" "}
-        <span>
-          Page{" "}
-          <strong>
-            {pageIndex + 1} sur {pageOptions.length}
-          </strong>{" "}
-        </span>
-        <span>
-          | Aller à la page:{" "}
-          <input
-            type="number"
-            defaultValue={pageIndex + 1}
-            onChange={e => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0;
-              gotoPage(page);
-            }}
-            style={{ width: "100px" }}
-          />
-        </span>{" "}
-      </div>
-    </div>
+      <Pagination
+        showFirstLast
+        count={pageCount}
+        defaultPage={pageIndex + 1}
+        getPageLinkProps={pageNumber => ({
+          onClick: event => {
+            event.preventDefault();
+            gotoPage(pageNumber - 1);
+          },
+          href: "#",
+          key: `pagination-link-${pageNumber}`
+        })}
+        className={"fr-mt-1w"}
+      />
+    </>
   );
 }
 
