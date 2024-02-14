@@ -80,7 +80,7 @@ export default function AccountCompany({ company }: Props) {
 
   const links = isAdmin
     ? [Link.Info, Link.Signature, Link.Members, Link.Contact, Link.Advanced]
-    : [Link.Info, Link.Signature, Link.Contact];
+    : [Link.Info, Link.Signature, Link.Members, Link.Contact];
 
   return (
     <div className={["panel", styles.company].join(" ")}>
