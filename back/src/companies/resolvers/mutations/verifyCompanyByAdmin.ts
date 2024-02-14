@@ -10,7 +10,7 @@ import {
   getCompanyAdminUsers,
   getCompanyOrCompanyNotFound
 } from "../../database";
-import { sendPostVerificationFirstOnboardingEmail } from "./verifyCompany";
+import { sendFirstOnboardingEmail } from "./verifyCompany";
 
 const verifyCompanyByAdminResolver: MutationResolvers["verifyCompanyByAdmin"] =
   async (parent, { input: { siret, verificationComment } }, context) => {
@@ -30,10 +30,7 @@ const verifyCompanyByAdminResolver: MutationResolvers["verifyCompanyByAdmin"] =
 
     const companyAdmins = await getCompanyAdminUsers(verifiedCompany.orgId);
 
-    await sendPostVerificationFirstOnboardingEmail(
-      verifiedCompany,
-      companyAdmins[0]
-    );
+    await sendFirstOnboardingEmail(verifiedCompany, companyAdmins[0]);
 
     return verifiedCompany;
   };

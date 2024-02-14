@@ -12,6 +12,7 @@ enum FavoriteType {
 }
 
 enum CompanyVerificationMode {
+  AUTO
   LETTER
   MANUAL
 }

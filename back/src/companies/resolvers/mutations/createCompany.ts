@@ -6,11 +6,7 @@ import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
-import {
-  renderMail,
-  onboardingFirstStep,
-  verificationProcessInfo
-} from "@td/mail";
+import { renderMail, verificationProcessInfo } from "@td/mail";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
   cleanClue,
@@ -19,7 +15,7 @@ import {
   isSiret,
   isVat,
   CLOSED_COMPANY_ERROR,
-  PROFESSIONALS
+  isProfessional
 } from "@td/constants";
 import { searchCompany } from "../../search";
 import {
@@ -27,6 +23,8 @@ import {
   addToSetCompanyDepartementQueue
 } from "../../../queue/producers/company";
 import { UserInputError } from "../../../common/errors";
+import { isForeignTransporter } from "../../validation";
+import { sendFirstOnboardingEmail } from "./verifyCompany";
 
 /**
  * Create a new company and associate it to a user
@@ -34,9 +32,6 @@ import { UserInputError } from "../../../common/errors";
  * @param companyInput
  * @param userId
  */
-
-const { VERIFY_COMPANY } = process.env;
-
 const createCompanyResolver: MutationResolvers["createCompany"] = async (
   parent,
   { companyInput },
@@ -44,7 +39,6 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-
   const {
     codeNaf,
     gerepId,
@@ -181,6 +175,13 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     };
   }
 
+  // Foreign transporter: automatically verify (no action needed)
+  if (isForeignTransporter({ companyTypes, vatNumber })) {
+    companyCreateInput.verificationMode = "AUTO";
+    companyCreateInput.verificationStatus = "VERIFIED";
+    companyCreateInput.verifiedAt = new Date();
+  }
+
   const companyAssociation = await prisma.companyAssociation.create({
     data: {
       user: { connect: { id: user.id } },
@@ -200,11 +201,11 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     data: { firstAssociationDate: new Date() }
   });
 
-  if (VERIFY_COMPANY === "true") {
-    const isProfessional = company.companyTypes.some(ct => {
-      return PROFESSIONALS.includes(ct);
-    });
-    if (isProfessional) {
+  if (process.env.VERIFY_COMPANY === "true") {
+    if (
+      isProfessional(companyTypes) &&
+      !isForeignTransporter({ companyTypes, vatNumber })
+    ) {
       await sendMail(
         renderMail(verificationProcessInfo, {
           to: [{ email: user.email, name: user.name }],
@@ -225,15 +226,13 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     });
   }
 
-  // If the company is NOT professional, send onboarding email
+  // If the company is NOT professional or is foreign transporter, send onboarding email
   // (professional onboarding mail is sent on verify)
-  if (![...company.companyTypes].some(ct => PROFESSIONALS.includes(ct))) {
-    await sendMail(
-      renderMail(onboardingFirstStep, {
-        to: [{ email: user.email, name: user.name }],
-        variables: { company }
-      })
-    );
+  if (
+    !isProfessional(companyTypes) ||
+    isForeignTransporter({ companyTypes, vatNumber })
+  ) {
+    await sendFirstOnboardingEmail(companyInput, user);
   }
 
   return convertUrls(company);

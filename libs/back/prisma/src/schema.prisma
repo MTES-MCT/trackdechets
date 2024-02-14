@@ -23,6 +23,7 @@ enum CompanyType {
 }
 
 enum CompanyVerificationMode {
+  AUTO
   MANUAL
   LETTER
 }

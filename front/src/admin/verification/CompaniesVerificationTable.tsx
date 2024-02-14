@@ -87,7 +87,9 @@ export default function CompaniesVerificationTable({
           } else {
             const verificationMode = row.original.verificationMode;
             if (verificationMode === CompanyVerificationMode.Letter) {
-              return <>Vérifié par code de sécurité"</>;
+              return <>Vérifié par code de sécurité</>;
+            } else if (verificationMode === CompanyVerificationMode.Auto) {
+              return <>Vérifié automatiquement</>;
             } else {
               const comment = row.original.verificationComment;
               const hasComment = comment && comment.length > 0;
@@ -119,7 +121,16 @@ export default function CompaniesVerificationTable({
     {
       columns,
       data,
-      initialState: { pageIndex: 0, pageSize },
+      initialState: {
+        pageIndex: 0,
+        pageSize,
+        filters: [
+          {
+            id: "verificationStatus",
+            value: CompanyVerificationStatus.ToBeVerified
+          }
+        ]
+      },
       manualPagination: true,
       manualFilters: true,
       pageCount,

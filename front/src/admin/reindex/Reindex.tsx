@@ -80,7 +80,7 @@ function Reindex() {
                     textArea
                     label="ID du ou des BSD à réindexer:"
                     state={error ? "error" : "default"}
-                    stateRelatedMessage={<>{error?.message}</>}
+                    stateRelatedMessage={error?.message}
                     disabled={loading}
                     nativeTextAreaProps={{
                       ...field,
