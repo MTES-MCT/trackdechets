@@ -184,7 +184,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   // Foreign transporter: automatically verify (no action needed)
   if (isForeignTransporter({ companyTypes, vatNumber })) {
     companyCreateInput.verificationMode = CompanyVerificationMode.AUTO;
-    companyCreateInput.verificationStatus = CompanyVerificationMode.VERIFIED;
+    companyCreateInput.verificationStatus = CompanyVerificationStatus.VERIFIED;
     companyCreateInput.verifiedAt = new Date();
   }
 
