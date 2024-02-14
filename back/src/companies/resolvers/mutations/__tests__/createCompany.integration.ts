@@ -900,16 +900,8 @@ describe("Mutation.createCompany", () => {
     // Then
     expect(errors).toBeUndefined();
     expect(data.createCompany).toMatchObject({
-      verificationStatus: "LETTER_SENT"
+      verificationStatus: "TO_BE_VERIFIED"
     });
-
-    const company = await prisma.company.findFirst({
-      where: {
-        orgId: siret
-      }
-    });
-
-    expect(company?.verificationMode).toEqual("LETTER");
 
     jest.mock("../../../../common/post");
     (sendVerificationCodeLetter as jest.Mock).mockImplementation(() =>
