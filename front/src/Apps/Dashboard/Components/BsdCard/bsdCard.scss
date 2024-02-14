@@ -39,6 +39,23 @@
       p {
         padding: 0 5px 0 0;
       }
+
+      .label-icon-editable {
+        padding-right: 5px;
+        height: 24px;
+
+        p {
+          height: 24px;
+          display: flex;
+          align-items: center;
+        }
+
+        span {
+          &:before {
+            vertical-align: initial;
+          }
+        }
+      }
     }
 
     @include desktop {
@@ -54,11 +71,10 @@
           padding: 0 10px;
         }
         .label-icon-editable {
+          padding-right: 10px;
+
           p {
-            padding: 0 0 0 10px;
-          }
-          span {
-            padding-right: 10px;
+            padding: 0 10px;
           }
         }
       }
@@ -97,6 +113,7 @@
     @include desktop {
       flex-direction: row;
       align-items: center;
+      flex-wrap: nowrap;
     }
 
     &__infos {
@@ -134,7 +151,7 @@
       @include desktop {
         flex-direction: row;
         align-items: center;
-        width: 80%;
+        min-width: 75%;
       }
     }
 
@@ -150,7 +167,7 @@
       }
 
       @include desktop {
-        width: 20%;
+        flex: 1 1 25%;
       }
     }
   }
