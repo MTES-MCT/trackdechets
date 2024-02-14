@@ -163,7 +163,7 @@ export default function CompaniesVerificationTable({
       </>
     )),
     "Actions"
-  ];
+  ].map(c => <div className="textCenter fr-text--lg">{c}</div>);
 
   const tableData = page.map(row => {
     prepareRow(row);
@@ -179,10 +179,11 @@ export default function CompaniesVerificationTable({
   return (
     <>
       <Table
-        caption={`Établissements (${page.length} sur ${totalCount})`}
+        caption={`Affichage de ${page.length} établissements sur ${totalCount}`}
         data={tableData}
         headers={tableHeaders}
         fixed
+        bottomCaption
       />
 
       <Pagination

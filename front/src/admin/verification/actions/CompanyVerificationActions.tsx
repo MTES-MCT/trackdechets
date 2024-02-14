@@ -8,6 +8,7 @@ import { isSiret } from "@td/constants";
 import { gql, useMutation } from "@apollo/client";
 import toast from "react-hot-toast";
 import { TOAST_DURATION } from "../../../common/config";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 const VERIFY_COMPANY_BY_ADMIN = gql`
   mutation VerifyCompanyByAdmin($input: VerifyCompanyByAdminInput!) {
@@ -97,23 +98,28 @@ export default function CompanyVerificationActions({
   }
 
   return (
-    <div className="tw-flex tw-flex-col ">
-      <button
-        className="btn btn--primary"
-        disabled={loadingVerify}
-        onClick={onVerify}
-      >
-        Vérifier
-      </button>
+    <div className="tw-flex" style={{ justifyContent: "center" }}>
       {isSiret(company.orgId) && (
-        <button
-          disabled={loadingLetter}
-          className="btn btn--primary tw-mt-1"
+        <Button
+          priority="secondary"
+          iconId="fr-icon-mail-line"
           onClick={onSendVerificationCodeLetter}
-        >
-          Envoyer un courrier
-        </button>
+          title="Envoyer un courrier"
+          size="large"
+          className="fr-mx-1w"
+          disabled={loadingLetter}
+        />
       )}
+
+      <Button
+        priority="primary"
+        iconId="fr-icon-success-line"
+        onClick={onVerify}
+        disabled={loadingVerify}
+        title="Vérifier"
+        size="large"
+        className="fr-mx-1w"
+      />
     </div>
   );
 }
