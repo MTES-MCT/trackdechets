@@ -183,8 +183,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   // Foreign transporter: automatically verify (no action needed)
   if (isForeignTransporter({ companyTypes, vatNumber })) {
-    companyCreateInput.verificationMode = "AUTO";
-    companyCreateInput.verificationStatus = "VERIFIED";
+    companyCreateInput.verificationMode = CompanyVerificationMode.AUTO;
+    companyCreateInput.verificationStatus = CompanyVerificationMode.VERIFIED;
     companyCreateInput.verifiedAt = new Date();
   }
 
@@ -199,7 +199,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     include: { company: true }
   });
   await deleteCachedUserRoles(user.id);
-  const company = companyAssociation.company;
+  let company = companyAssociation.company;
 
   // fill firstAssociationDate field if null (no need to update it if user was previously already associated)
   await prisma.user.updateMany({
@@ -216,7 +216,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       // Email is too generic. Automatically send a verification letter
       if (isGenericEmail(user.email, company.name)) {
         await sendVerificationCodeLetter(company);
-        await prisma.company.update({
+        company = await prisma.company.update({
           where: { orgId: company.orgId },
           data: {
             verificationStatus: CompanyVerificationStatus.LETTER_SENT,

@@ -63,6 +63,8 @@ const CREATE_COMPANY = `
         department
       }
       allowBsdasriTakeOverWithoutSignature
+      verificationMode
+      verificationStatus
     }
   }
 `;
@@ -805,20 +807,10 @@ describe("Mutation.createCompany", () => {
       vatNumber: companyInput.vatNumber,
       orgId: companyInput.vatNumber,
       name: companyInput.companyName,
-      companyTypes: companyInput.companyTypes
+      companyTypes: companyInput.companyTypes,
+      verificationMode: "AUTO",
+      verificationStatus: "VERIFIED"
     });
-
-    const newCompany = await prisma.company.findFirst({
-      where: {
-        orgId: companyInput.vatNumber
-      }
-    });
-    expect(newCompany).not.toBeUndefined();
-
-    // Company should be verified
-    expect(newCompany?.verificationMode).toBe("AUTO");
-    expect(newCompany?.verifiedAt).not.toBeUndefined();
-    expect(newCompany?.verificationStatus).toBe("VERIFIED");
 
     jest.mock("../../../../mailer/mailing");
     (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
@@ -893,7 +885,7 @@ describe("Mutation.createCompany", () => {
 
     // When
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { errors } = await mutate(CREATE_COMPANY, {
+    const { data, errors } = await mutate(CREATE_COMPANY, {
       variables: {
         companyInput
       }
@@ -901,6 +893,10 @@ describe("Mutation.createCompany", () => {
 
     // Then
     expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      verificationStatus: "LETTER_SENT",
+      verificationMode: "LETTER"
+    });
 
     jest.mock("../../../../common/post");
     (sendVerificationCodeLetter as jest.Mock).mockImplementation(() =>
