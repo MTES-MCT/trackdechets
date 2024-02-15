@@ -60,7 +60,8 @@ export default async function bsdas(
     findMany: prismaPaginationArgs =>
       bsdaRepository.findMany(where, {
         ...prismaPaginationArgs,
-        orderBy: { createdAt: "desc" }
+        orderBy: { createdAt: "desc" },
+        include: { transporters: true }
       }),
     formatNode: expandBsdaFromDb,
     ...gqlPaginationArgs
