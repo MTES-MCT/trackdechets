@@ -169,7 +169,7 @@ export default function CompanyVerificationActions({
           onClick={() => {
             onStandbyCompanyByAdmin(false);
           }}
-          title="Mettre en standby"
+          title="Rétablir"
           size="large"
           className="fr-mx-1w"
           disabled={loadingStandby}
@@ -184,7 +184,7 @@ export default function CompanyVerificationActions({
           onClick={() => {
             onStandbyCompanyByAdmin(true);
           }}
-          title="Rétablir"
+          title="Mettre en standby"
           size="large"
           className="fr-mx-1w"
           disabled={loadingStandby}
