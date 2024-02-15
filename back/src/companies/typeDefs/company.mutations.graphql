@@ -54,4 +54,10 @@ type Mutation {
   updateTransporterReceipt(
     input: UpdateTransporterReceiptInput!
   ): TransporterReceipt!
+
+  """
+  Permet de convertir un avis de répertoire SIRENE en données entreprise.
+  Prend un PDF standardisé (en base 64) en entrée, retourne les données entreprise au format JSON
+  """
+  extractDataFromSirene(pdfInBase64: String!): SireneCompanyData!
 }

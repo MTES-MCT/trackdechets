@@ -16,6 +16,7 @@ import {
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import AccountCompanyAddAnonymousCompany from "./AccountCompanyAddAnonymousCompany";
 
 type IProps = {
   onCompanyInfos: (companyInfos) => void;
@@ -74,41 +75,6 @@ const closedCompanyError = (
               https://entreprendre.service-public.fr/vosdroits/F31479
             </a>
           </p>
-        </>
-      }
-    />
-  </div>
-);
-
-const nonDiffusibleError = (
-  <div className={styles.alertWrapper}>
-    <Alert
-      title="Etablissement non diffusible"
-      severity="error"
-      description={
-        <>
-          <span>
-            Nous n'avons pas pu récupérer les informations de cet établissement
-            car il n'est pas diffusible. Veuillez nous contacter via{" "}
-            <a
-              href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
-              target="_blank"
-              rel="noreferrer"
-            >
-              la FAQ
-            </a>{" "}
-            <b>avec</b> votre certificat d'inscription au répertoire des
-            Entreprises et des Établissements (SIRENE) pour pouvoir procéder à
-            la création de l'établissement. Pour télécharger votre certificat,
-            RDV sur{" "}
-          </span>
-          <a
-            href="https://avis-situation-sirene.insee.fr/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            https://avis-situation-sirene.insee.fr/
-          </a>
         </>
       }
     />
@@ -208,7 +174,8 @@ export default function AccountCompanyAddSiret({
             />
           )}
           <Formik
-            initialValues={{ siret: defaultQuery }}
+            // TODO: rollback
+            initialValues={{ siret: "82535358400022" }}
             validate={values => {
               const isValidSiret = isSiret(
                 values.siret,
@@ -341,7 +308,7 @@ export default function AccountCompanyAddSiret({
               </Form>
             )}
           </Formik>
-          {isNonDiffusible && nonDiffusibleError}
+          {isNonDiffusible && <AccountCompanyAddAnonymousCompany />}
           {isClosed && closedCompanyError}
           {showIndividualInfo && !isDisabled && individualInfo}
         </div>

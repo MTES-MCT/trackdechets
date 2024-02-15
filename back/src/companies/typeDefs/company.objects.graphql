@@ -452,6 +452,24 @@ type TransporterReceipt {
 }
 
 """
+Données entreprise extraites de l'avis de situation SIRENE
+"""
+type SireneCompanyData {
+  createdAt: DateTime
+
+  siret: String
+
+  """
+  Nom de l'entreprise. Si pas de raison sociale, le nom de la personne
+  """
+  name: String
+
+  codeNaf: String
+
+  address: String
+}
+
+"""
 Récépissé négociant
 """
 type TraderReceipt {
