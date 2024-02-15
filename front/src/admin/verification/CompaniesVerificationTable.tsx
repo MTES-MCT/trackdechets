@@ -211,7 +211,7 @@ function VerificationStatusFilter({ column: { filterValue, setFilter } }) {
     },
     { value: CompanyVerificationStatus.ToBeVerified, label: "À vérifier" },
     { value: CompanyVerificationStatus.LetterSent, label: "Courrier envoyé" },
-    { value: CompanyVerificationStatus.Standby, label: "En standby" }
+    { value: CompanyVerificationStatus.Standby, label: "Stand by" }
   ];
 
   return (
