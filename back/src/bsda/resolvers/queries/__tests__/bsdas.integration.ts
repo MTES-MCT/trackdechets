@@ -55,6 +55,21 @@ describe("Query.bsdas", () => {
     expect(data.bsdas.edges.length).toBe(1);
   });
 
+  it("should return bsdas associated with the user company if he is transporter", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    await bsdaFactory({
+      opt: { transportersOrgIds: [company.siret!] },
+      transporterOpt: { transporterCompanySiret: company.siret }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
+      GET_BSDAS
+    );
+
+    expect(data.bsdas.edges.length).toBe(1);
+  });
+
   it("should return bsdas where user company is an intermediary", async () => {
     const otherCompany = await companyFactory();
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
@@ -183,6 +198,7 @@ describe("Query.bsdas", () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
 
     await bsdaFactory({
+      opt: { transportersOrgIds: [company.siret!] },
       transporterOpt: {
         transporterCompanySiret: company.siret
       }

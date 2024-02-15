@@ -26,16 +26,7 @@ export default async function bsdas(
       { emitterCompanySiret: { in: orgIdsWithListPermission } },
       { destinationCompanySiret: { in: orgIdsWithListPermission } },
       { workerCompanySiret: { in: orgIdsWithListPermission } },
-      {
-        transporters: {
-          some: {
-            OR: [
-              { transporterCompanySiret: { in: orgIdsWithListPermission } },
-              { transporterCompanyVatNumber: { in: orgIdsWithListPermission } }
-            ]
-          }
-        }
-      },
+      { transportersOrgIds: { hasSome: orgIdsWithListPermission } },
       { brokerCompanySiret: { in: orgIdsWithListPermission } },
       {
         destinationOperationNextDestinationCompanySiret: {

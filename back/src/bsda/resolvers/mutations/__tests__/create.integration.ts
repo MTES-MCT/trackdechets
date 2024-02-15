@@ -97,6 +97,7 @@ describe("Mutation.Bsda.create", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const transporter = await companyFactory();
     const worker = await companyFactory();
 
     const input: BsdaInput = {
@@ -121,6 +122,9 @@ describe("Mutation.Bsda.create", () => {
           phone: "contactPhone",
           mail: "contactEmail@mail.com"
         }
+      },
+      transporter: {
+        company: { siret: transporter.siret }
       },
       waste: {
         code: "06 07 01*",
@@ -160,6 +164,12 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.destination!.company!.siret).toBe(
       input.destination!.company!.siret
     );
+
+    const createdBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: data.createBsda.id }
+    });
+    // le champ dénormalisé `transportersOrgIds`doit être rempli
+    expect(createdBsda.transportersOrgIds).toEqual([transporter.siret]);
   });
 
   it("should allow creating a valid form with null sealNumbers field", async () => {

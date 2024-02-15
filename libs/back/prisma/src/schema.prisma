@@ -1457,8 +1457,9 @@ model Bsda {
   bsdaRevisionRequests BsdaRevisionRequest[]
   intermediaries       IntermediaryBsdaAssociation[]
 
-  // denormalization - sirets and vats from intermediaries
+  // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
+  transportersOrgIds   String[] @default([])
 
   // partial indices _BsdaIsDeletedIdx, _BsdaIsDraftIdx see migration82_missing_indices.sql
   // array index _BsdaIntermediariesOrgIdsIdx: see 119_denormalize_bsdas_sirets.sql

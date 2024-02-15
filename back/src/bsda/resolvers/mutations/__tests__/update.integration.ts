@@ -521,6 +521,7 @@ describe("Mutation.updateBsda", () => {
 
   it("should allow updating transporter if they didn't sign", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await companyFactory();
     const bsda = await bsdaFactory({
       opt: {
         status: "SIGNED_BY_PRODUCER",
@@ -533,6 +534,7 @@ describe("Mutation.updateBsda", () => {
 
     const input = {
       transporter: {
+        company: { siret: transporter.siret },
         transport: {
           mode: TransportMode.AIR
         }
@@ -551,6 +553,12 @@ describe("Mutation.updateBsda", () => {
     expect(data.updateBsda.transporter!.transport!.mode).toEqual(
       TransportMode.AIR
     );
+
+    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id }
+    });
+    // le champ dénormalisé `transporterOrgIds` doit être mis à jour
+    expect(updatedBsda.transportersOrgIds).toEqual([transporter.siret]);
   });
 
   it("should not allow the transporter to update the worker if already signed by the producer", async () => {
