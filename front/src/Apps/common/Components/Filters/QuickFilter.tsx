@@ -1,6 +1,7 @@
 import Input from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { QuickFilterProps } from "./filtersTypes";
+import "./quickFilter.scss";
 
 const QuickFilter = ({
   label,
@@ -9,7 +10,11 @@ const QuickFilter = ({
   onChange
 }: QuickFilterProps) => {
   return (
-    <Input label={label} nativeInputProps={{ onChange, placeholder, value }} />
+    <Input
+      label={label}
+      nativeInputProps={{ onChange, placeholder, value }}
+      className="quickFilter"
+    />
   );
 };
 
