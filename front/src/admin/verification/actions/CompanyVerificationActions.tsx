@@ -184,7 +184,7 @@ export default function CompanyVerificationActions({
           onClick={() => {
             onStandbyCompanyByAdmin(true);
           }}
-          title="Mettre en standby"
+          title="Mettre en stand by"
           size="large"
           className="fr-mx-1w"
           disabled={loadingStandby}

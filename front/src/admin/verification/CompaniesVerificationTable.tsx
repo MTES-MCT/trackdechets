@@ -86,7 +86,7 @@ export default function CompaniesVerificationTable({
           ) {
             return <>Courrier envoyé</>;
           } else if (verificationStatus === CompanyVerificationStatus.Standby) {
-            return <>En standby</>;
+            return <>Stand by</>;
           } else {
             const verificationMode = row.original.verificationMode;
             if (verificationMode === CompanyVerificationMode.Letter) {
