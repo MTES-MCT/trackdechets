@@ -49,7 +49,7 @@ describe("mutation standbyCompanyByAdmin", () => {
 
   it("should put the company in standby", async () => {
     // Given
-    const admin = await userFactory({ isAdmin: false });
+    const admin = await userFactory({ isAdmin: true });
 
     const { user: _, company } = await userWithCompanyFactory(UserRole.ADMIN, {
       verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED
@@ -75,7 +75,7 @@ describe("mutation standbyCompanyByAdmin", () => {
 
   it("should get the company out of standby", async () => {
     // Given
-    const admin = await userFactory({ isAdmin: false });
+    const admin = await userFactory({ isAdmin: true });
 
     const { user: _, company } = await userWithCompanyFactory(UserRole.ADMIN, {
       verificationStatus: CompanyVerificationStatus.STANDBY
