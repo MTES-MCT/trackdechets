@@ -109,6 +109,8 @@ export default function AccountCompanyMember({ company, user }: Props) {
     }
   );
 
+  const isAdmin = company.userRole === UserRole.Admin;
+
   const userRole = role => {
     switch (role) {
       case UserRole.Admin:
@@ -136,7 +138,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
           ? "Utilisateur actif"
           : "Email non confirmé"}
       </td>
-      {!user.isMe && !user.isPendingInvitation && (
+      {isAdmin && !user.isMe && !user.isPendingInvitation && (
         <td className={styles["right-column"]}>
           <button
             className="btn btn--primary"
@@ -150,7 +152,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
           </button>
         </td>
       )}
-      {user.isPendingInvitation && (
+      {isAdmin && user.isPendingInvitation && (
         <>
           <td className={styles["right-column"]}>
             <button
