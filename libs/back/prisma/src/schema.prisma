@@ -330,7 +330,6 @@ model FinalOperation {
   id                      String    @id @default(cuid())
   createdAt               DateTime  @default(now()) @db.Timestamptz(6)
   updatedAt               DateTime  @updatedAt @db.Timestamptz(6)
-  isDeleted               Boolean?  @default(false)
   finalBsdReadableId      String
   operationCode           String
   quantity                Float

@@ -4,7 +4,6 @@ CREATE TABLE "default$default"."FinalOperation" (
     "id" text NOT NULL,
     "createdAt" timestamptz  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" timestamptz  NOT NULL,
-    "isDeleted" boolean NOT NULL DEFAULT FALSE,
     "finalBsdReadableId" text NOT NULL,
     "operationCode" text NOT NULL,
     "quantity" DOUBLE PRECISION NOT NULL,

@@ -57,6 +57,22 @@ export async function operationHook(args: OperationHookArgs) {
     operation.noTraceability
   ) {
     for (const initialForm of initialForms) {
+      if (initialForm.emitterType === "APPENDIX2") {
+        // TODO affect only a fraction of operation.quantityReceived to quantity.
+      }
+
+      const data = {
+        finalBsdReadableId: operation.readableId,
+        quantity: operation.quantityReceived!,
+        operationCode: operation.processingOperationDone!,
+        destinationCompanySiret: operation.recipientCompanySiret!,
+        destinationCompanyName: operation.recipientCompanyName!
+      };
+
+      if (Object.values(data).some(value => value === null)) {
+        continue;
+      }
+
       if (
         await prisma.finalOperation.count({
           where: {
@@ -79,13 +95,7 @@ export async function operationHook(args: OperationHookArgs) {
                     formId: initialForm.id
                   }
                 },
-                data: {
-                  finalBsdReadableId: operation.readableId,
-                  quantity: operation.quantityReceived!,
-                  operationCode: operation.processingOperationDone!,
-                  destinationCompanySiret: operation.recipientCompanySiret!,
-                  destinationCompanyName: operation.recipientCompanyName!
-                }
+                data
               }
             }
           }
@@ -98,13 +108,7 @@ export async function operationHook(args: OperationHookArgs) {
               // s'il y a eu scission puis regroupement
               // le hook pourrait être appelé plusieurs fois,
               // il faut donc respecter l'unicité de finalBsdReadableId
-              create: {
-                finalBsdReadableId: operation.readableId,
-                quantity: operation.quantityReceived!,
-                operationCode: operation.processingOperationDone!,
-                destinationCompanySiret: operation.recipientCompanySiret!,
-                destinationCompanyName: operation.recipientCompanyName!
-              }
+              create: data
             }
           }
         });
