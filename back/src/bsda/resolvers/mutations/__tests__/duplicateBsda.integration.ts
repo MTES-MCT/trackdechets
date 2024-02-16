@@ -213,6 +213,7 @@ describe("Mutation.Bsda.duplicate", () => {
       workerCertificationCertificationNumber,
       workerCertificationValidityLimit,
       workerCertificationOrganisation,
+      transportersOrgIds,
       ...rest
     } = bsda;
 
@@ -346,7 +347,8 @@ describe("Mutation.Bsda.duplicate", () => {
       workerCertificationHasSubSectionThree,
       workerCertificationCertificationNumber,
       workerCertificationValidityLimit,
-      workerCertificationOrganisation
+      workerCertificationOrganisation,
+      transportersOrgIds
     });
 
     expect(duplicatedTransporter).toMatchObject({

@@ -183,7 +183,8 @@ export const rawBsdaSchema = z.object({
     .array(intermediarySchema)
     .nullish()
     .superRefine(intermediariesRefinement),
-  intermediariesOrgIds: z.array(z.string()).optional()
+  intermediariesOrgIds: z.array(z.string()).optional(),
+  transportersOrgIds: z.array(z.string()).optional()
 });
 
 export const bsdaSchema = rawBsdaSchema
@@ -286,6 +287,16 @@ export const bsdaSchema = rawBsdaSchema
           .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
           .filter(Boolean)
       : undefined;
+
+    return val;
+  })
+  .transform(val => {
+    val.transportersOrgIds = [
+      val.transporterCompanySiret,
+      val.transporterCompanyVatNumber
+    ]
+      .filter(Boolean)
+      .filter(orgId => orgId.length > 0);
 
     return val;
   });
