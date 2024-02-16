@@ -1054,4 +1054,14 @@ describe("BSDA Sealed rules checks", () => {
       {}
     );
   });
+
+  it("should auto-complete transportersOrgIds", async () => {
+    const transporter = await companyFactory();
+    const bsda = await bsdaFactory({
+      opt: { transportersOrgIds: [] },
+      transporterOpt: { transporterCompanySiret: transporter.siret }
+    });
+    const parsed = await parseBsdaInContext({ persisted: bsda }, {});
+    expect(parsed.bsda.transportersOrgIds).toEqual([transporter.siret]);
+  });
 });

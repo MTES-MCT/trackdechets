@@ -27,26 +27,30 @@ function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
     workerWorkSignatureDate: toPrismaDateFilter(
       where.worker?.work?.signature?.date
     ),
-    transporters: {
-      some: {
-        transporterCompanySiret: toPrismaStringFilter(
-          where.transporter?.company?.siret
-        ),
-        transporterCompanyVatNumber: toPrismaStringFilter(
-          where.transporter?.company?.vatNumber
-        ),
-        transporterTransportSignatureDate: toPrismaDateFilter(
-          where.transporter?.transport?.signature?.date
-        ),
-        transporterCustomInfo: toPrismaStringFilter(
-          where.transporter?.customInfo
-        ),
+    ...(where.transporter
+      ? {
+          transporters: {
+            some: {
+              transporterCompanySiret: toPrismaStringFilter(
+                where.transporter?.company?.siret
+              ),
+              transporterCompanyVatNumber: toPrismaStringFilter(
+                where.transporter?.company?.vatNumber
+              ),
+              transporterTransportSignatureDate: toPrismaDateFilter(
+                where.transporter?.transport?.signature?.date
+              ),
+              transporterCustomInfo: toPrismaStringFilter(
+                where.transporter?.customInfo
+              ),
 
-        transporterTransportPlates: toPrismaStringNullableListFilter(
-          where.transporter?.transport?.plates
-        )
-      }
-    },
+              transporterTransportPlates: toPrismaStringNullableListFilter(
+                where.transporter?.transport?.plates
+              )
+            }
+          }
+        }
+      : {}),
     destinationCompanySiret: toPrismaStringFilter(
       where.destination?.company?.siret
     ),
