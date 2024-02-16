@@ -118,12 +118,12 @@ export async function operationHook(args: OperationHookArgs) {
     }
   } else {
     for (const initialForm of initialForms) {
-        await prisma.form.update({
-          where: { id: initialForm.id },
-          data: {
-            finalOperations: { deleteMany: {} }
-          }
-        });
+      await prisma.form.update({
+        where: { id: initialForm.id },
+        data: {
+          finalOperations: { deleteMany: {} }
+        }
+      });
     }
   }
 }

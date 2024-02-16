@@ -33,18 +33,22 @@ async function exitScript() {
         id: true
       },
       take: PAGE_SIZE,
-      skip: pageNumber * PAGE_SIZE,
+      skip: pageNumber * PAGE_SIZE
     });
 
     if (finalOperationCodeForms.length > 0) {
-      logger.info(`Processing page ${pageNumber + 1} with ${finalOperationCodeForms.length} Companies`);
+      logger.info(
+        `Processing page ${pageNumber + 1} with ${
+          finalOperationCodeForms.length
+        } Companies`
+      );
 
       const jobs = finalOperationCodeForms.map(processedForm => ({
-        name: 'operationHook', // Optional
+        name: "operationHook", // Optional
         data: {
           operationId: processedForm.id,
-          formId: processedForm.id,
-        },
+          formId: processedForm.id
+        }
       }));
 
       await operationHooksQueue.addBulk(jobs);
@@ -53,7 +57,10 @@ async function exitScript() {
     }
 
     pageNumber++;
-  } while (finalOperationCodeForms && finalOperationCodeForms.length === PAGE_SIZE);
+  } while (
+    finalOperationCodeForms &&
+    finalOperationCodeForms.length === PAGE_SIZE
+  );
 
   logger.info(`Completed operationHook for ${processed} BSDD`);
 

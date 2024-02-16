@@ -83,8 +83,8 @@ const buildDeleteForm: (deps: RepositoryFnDeps) => DeleteFormFn =
     await prisma.finalOperation.deleteMany({
       where: {
         formId: deletedForm.id
-      },
-    })
+      }
+    });
 
     return deletedForm;
   };
