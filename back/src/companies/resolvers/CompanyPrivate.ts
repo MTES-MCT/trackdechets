@@ -6,18 +6,6 @@ import { getUserRole, grants, toGraphQLPermission } from "../../permissions";
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: async (parent, _, context) => {
     const userId = context.user!.id;
-    const userRole = await getUserRole(userId, parent.orgId);
-
-    if (userRole !== "ADMIN") {
-      return [
-        {
-          ...context.user!,
-          role: userRole,
-          isPendingInvitation: false
-        }
-      ];
-    }
-
     return getCompanyUsers(parent.orgId, context.dataloaders, userId);
   },
   userRole: async (parent, _, context) => {
