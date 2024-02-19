@@ -50,8 +50,7 @@ export const bsdaRevisionRequests: QueryResolvers["bsdaRevisionRequests"] =
       findMany: prismaPaginationArgs =>
         bsdaRepository.findManyBsdaRevisionRequest(prismaWhere, {
           ...prismaPaginationArgs,
-
-          orderBy: { createdAt: "desc" }
+          orderBy: [{ id: "desc" }, { createdAt: "desc" }]
         }),
       formatNode: node => ({
         ...node,

@@ -44,7 +44,7 @@ export default async function bsvhus(
     findMany: prismaPaginationArgs =>
       bsvhuRepository.findMany(where, {
         ...prismaPaginationArgs,
-        orderBy: { createdAt: "desc" }
+        orderBy: [{ id: "desc" }, { createdAt: "desc" }]
       }),
     formatNode: expandVhuFormFromDb,
     ...gqlPaginationArgs

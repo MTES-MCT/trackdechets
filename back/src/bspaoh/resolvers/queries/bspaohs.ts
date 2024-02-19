@@ -53,7 +53,7 @@ export default async function bspaohs(
       bspaohRepository.findMany(where, {
         include: { transporters: true },
         ...prismaPaginationArgs,
-        orderBy: { createdAt: "desc" }
+        orderBy: [{ id: "desc" }, { createdAt: "desc" }]
       }),
     formatNode: expandBspaohFromDb,
     ...gqlPaginationArgs

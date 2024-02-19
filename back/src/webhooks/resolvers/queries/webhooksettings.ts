@@ -28,7 +28,7 @@ const webhookSettingsResolver: QueryResolvers["webhooksettings"] = async (
     findMany: prismaPaginationArgs =>
       webhookSettingRepository.findMany(where, {
         ...prismaPaginationArgs,
-        orderBy: { createdAt: "desc" }
+        orderBy: [{ id: "desc" }, { createdAt: "desc" }]
       }),
     formatNode: formatWebhookSettingFromDB,
     ...gqlPaginationArgs

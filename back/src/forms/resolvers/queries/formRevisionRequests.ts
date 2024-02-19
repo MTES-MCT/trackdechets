@@ -51,7 +51,7 @@ const formRevisionRequestResolver: QueryResolvers["formRevisionRequests"] =
         prisma.bsddRevisionRequest.findMany({
           where: prismaWhere,
           ...prismaPaginationArgs,
-          orderBy: { createdAt: "desc" }
+          orderBy: [{ id: "desc" }, { createdAt: "desc" }]
         }),
       formatNode: node => ({
         ...node,

@@ -53,7 +53,7 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
 
   const queriedForms = await prisma.form.findMany({
     ...paginationArgs,
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ id: "desc" }, { createdAt: "desc" }],
     where: {
       ...(rest.updatedAfter && {
         updatedAt: { gte: new Date(rest.updatedAfter) }
