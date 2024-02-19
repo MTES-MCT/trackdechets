@@ -5,7 +5,8 @@ import { prisma } from "@td/prisma";
 import {
   userWithCompanyFactory,
   companyFactory,
-  formWithTempStorageFactory
+  formWithTempStorageFactory,
+  formFactory
 } from "../../../__tests__/factories";
 
 describe("Test Form OperationHook job", () => {
@@ -154,6 +155,94 @@ describe("Test Form OperationHook job", () => {
       operationCode: updatedForm.forwardedIn!.processingOperationDone!,
       destinationCompanySiret: updatedForm.forwardedIn!.recipientCompanySiret!,
       destinationCompanyName: updatedForm.forwardedIn!.recipientCompanyName!
+    });
+  });
+
+  it("updates final operations of an appendix2", async () => {
+    const { user: emitter, company: emitterCompany } =
+      await userWithCompanyFactory(UserRole.MEMBER);
+
+    const { user: collector, company: collectorCompany } =
+      await userWithCompanyFactory(UserRole.MEMBER);
+
+    const { user: _ttrUser, company: ttr } = await userWithCompanyFactory(
+      UserRole.MEMBER,
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const appendix2 = await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        emitterCompanyAddress: "40 boulevard Voltaire 13001 Marseille",
+        recipientCompanySiret: collectorCompany.siret,
+        quantityReceived: 100,
+        processingOperationDone: "R 1",
+      }
+    });
+
+    const regroupementForm = await formFactory({
+      ownerId: collector.id,
+      opt: {
+        emitterCompanySiret: collectorCompany.siret,
+        recipientCompanySiret: ttr.siret,
+        emitterType: "APPENDIX2",
+        wasteDetailsCode: "05 01 02*",
+        status: Status.PROCESSED,
+        quantityReceived: 1000,
+        createdAt: new Date("2021-04-01"),
+        sentAt: new Date("2021-04-01"),
+        receivedAt: new Date("2021-04-01"),
+        processedAt: new Date("2021-04-01"),
+        processingOperationDone: "R 1",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
+          }
+        },
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: 10
+          }
+        }
+      }
+    });
+    // Manually execute operationHook to simulate nothing happens
+    await operationHook({
+      operationId: appendix2.id,
+      formId: appendix2.id
+    });
+
+    const notUpdatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: regroupementForm.id },
+      include: { finalOperations: true, grouping: true }
+    });
+
+    expect(notUpdatedForm.finalOperations.length).toStrictEqual(0)
+
+    // Manually execute operationHook to simulate markAsProcessed
+    await operationHook({
+      operationId: regroupementForm.id,
+      formId: regroupementForm.id
+    });
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: regroupementForm.id },
+      include: { finalOperations: true, grouping: true }
+    });
+    const groupedInitialForm = updatedForm.grouping.find(group => group.initialFormId === appendix2.id);
+    expect(updatedForm.finalOperations.length).toStrictEqual(1)
+
+    expect(updatedForm.finalOperations[0]).toMatchObject({
+      formId: updatedForm.id,
+      finalBsdReadableId: groupedInitialForm!.initialFormId,
+      quantity: groupedInitialForm!.quantity!,
+      operationCode: appendix2.processingOperationDone!,
+      destinationCompanySiret: appendix2.recipientCompanySiret!,
+      destinationCompanyName: appendix2.recipientCompanyName!
     });
   });
 });

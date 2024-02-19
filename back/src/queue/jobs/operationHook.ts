@@ -36,10 +36,12 @@ export async function operationHook(args: OperationHookArgs) {
       noTraceability: true
     }
   });
-
-  // On va chercher tous les bordereaux initiaux
+  // On récupère tous les bordereaux initiaux
   const formWithInitialForms = await prisma.form.findUniqueOrThrow({
-    where: { id: formId, isDeleted: false },
+    where: {
+      id: formId,
+      isDeleted: false
+    },
     include: {
       forwarding: true,
       grouping: { include: { initialForm: true } }
@@ -57,13 +59,20 @@ export async function operationHook(args: OperationHookArgs) {
     operation.noTraceability
   ) {
     for (const initialForm of initialForms) {
-      if (initialForm.emitterType === "APPENDIX2") {
-        // TODO affect only a fraction of operation.quantityReceived to quantity.
+      let quantityReceived = operation.quantityReceived;
+      if (formWithInitialForms.emitterType === "APPENDIX2") {
+        // affect only the fraction grouped of initialForm to quantity.
+        const groupedInitialForm = formWithInitialForms.grouping.find(
+          group => group.initialFormId === initialForm.id
+        );
+        if (groupedInitialForm) {
+          quantityReceived = groupedInitialForm.quantity;
+        }
       }
 
       const data = {
         finalBsdReadableId: operation.readableId,
-        quantity: operation.quantityReceived!,
+        quantity: quantityReceived!,
         operationCode: operation.processingOperationDone!,
         destinationCompanySiret: operation.recipientCompanySiret!,
         destinationCompanyName: operation.recipientCompanyName!
@@ -73,14 +82,14 @@ export async function operationHook(args: OperationHookArgs) {
         continue;
       }
 
-      if (
-        await prisma.finalOperation.count({
-          where: {
-            formId: initialForm.id,
-            finalBsdReadableId: operation.readableId
-          }
-        })
-      ) {
+      const countFinaloperations = await prisma.finalOperation.count({
+        where: {
+          formId: initialForm.id,
+          finalBsdReadableId: operation.readableId
+        }
+      });
+
+      if (countFinaloperations) {
         await prisma.form.update({
           where: { id: initialForm.id },
           data: {
