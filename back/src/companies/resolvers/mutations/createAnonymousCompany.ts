@@ -4,20 +4,42 @@ import {
   MutationResolvers
 } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
-import {
-  checkIsAdmin,
-  checkIsAuthenticated
-} from "../../../common/permissions";
+import { checkIsAdmin } from "../../../common/permissions";
 import { prisma } from "@td/prisma";
 import { isForeignVat, nafCodes } from "@td/constants";
+import {
+  foreignVatNumber,
+  siret,
+  siretConditions
+} from "../../../common/validation";
 import { UserInputError } from "../../../common/errors";
 import { libelleFromCodeNaf } from "../../sirene/utils";
-import { anonymousCompanyInputSchema } from "./createAnonymousCompanyByAdmin";
+
+export const anonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
+  yup.object({
+    address: yup.string().required(),
+    codeCommune: yup.string().required(),
+    codeNaf: yup
+      .string()
+      .oneOf(
+        Object.keys(nafCodes),
+        "Le code NAF ne fait pas partie de la liste reconnue."
+      )
+      .required(),
+    name: yup.string().required(),
+    vatNumber: foreignVatNumber,
+
+    siret: siret
+      .required(
+        "La sélection d'une entreprise par SIRET ou numéro de TVA (si l'entreprise n'est pas française) est obligatoire"
+      )
+      .when("vatNumber", siretConditions.companyVatNumber as any)
+  });
 
 const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"] =
-  async (_, { input }, context) => {
+  async (parent, { input }, context) => {
     applyAuthStrategies(context, [AuthType.Session]);
-    checkIsAuthenticated(context);
+    checkIsAdmin(context);
 
     await anonymousCompanyInputSchema.validate(input);
 

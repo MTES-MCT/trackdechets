@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import {
   AnonymousCompanyInput,
   Mutation,
-  MutationCreateAnonymousCompanyByAdminArgs
+  MutationCreateAnonymousCompanyArgs
 } from "@td/codegen-ui";
 import { InlineError } from "../../Apps/common/Components/Error/Error";
 import { RedErrorMessage } from "../../common/components";
@@ -17,8 +17,8 @@ export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 export const MISSING_COMPANY_VAT =
   "Le numéro de TVA de l'entreprise est obligatoire";
 
-const CREATE_ANONYMOUS_COMPANY_BY_ADMIN = gql`
-  mutation CreateAnonymousCompanyByAdmin($input: AnonymousCompanyInput!) {
+const CREATE_ANONYMOUS_COMPANY = gql`
+  mutation createAnonymousCompany($input: AnonymousCompanyInput!) {
     createAnonymousCompanyByAdmin(input: $input) {
       orgId
     }
@@ -67,11 +67,11 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       )
   });
 
-export function CreateAnonymousCompany() {
+export function createAnonymousCompany() {
   const [createAnonymousCompanyByAdmin, { loading, error }] = useMutation<
     Pick<Mutation, "createAnonymousCompanyByAdmin">,
-    MutationCreateAnonymousCompanyByAdminArgs
-  >(CREATE_ANONYMOUS_COMPANY_BY_ADMIN);
+    MutationCreateAnonymousCompanyArgs
+  >(CREATE_ANONYMOUS_COMPANY);
 
   return (
     <Formik

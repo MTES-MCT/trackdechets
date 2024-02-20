@@ -1,15 +1,15 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
-  MutationCreateAnonymousCompanyByAdminArgs
+  MutationCreateAnonymousCompanyArgs
 } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import { siretify, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-const CREATE_ANONYMOUS_COMPANY_BY_ADMIN = `
-  mutation CreateAnonymousCompanyByAdmin($input: AnonymousCompanyInput!) {
-    createAnonymousCompanyByAdmin(input: $input) {
+const CREATE_ANONYMOUS_COMPANY = `
+  mutation createAnonymousCompany($input: AnonymousCompanyInput!) {
+    createAnonymousCompany(input: $input) {
       id
     }
   }
@@ -23,7 +23,7 @@ const validInput = {
   siret: siretify(6)
 };
 
-describe("createAnonymousCompanyByAdmin", () => {
+describe("createAnonymousCompany", () => {
   afterEach(resetDatabase);
 
   it("should create an anonymous company", async () => {
@@ -31,9 +31,9 @@ describe("createAnonymousCompanyByAdmin", () => {
     const { mutate } = makeClient(user);
 
     await mutate<
-      Pick<Mutation, "createAnonymousCompanyByAdmin">,
-      MutationCreateAnonymousCompanyByAdminArgs
-    >(CREATE_ANONYMOUS_COMPANY_BY_ADMIN, { variables: { input: validInput } });
+      Pick<Mutation, "createAnonymousCompany">,
+      MutationCreateAnonymousCompanyArgs
+    >(CREATE_ANONYMOUS_COMPANY, { variables: { input: validInput } });
 
     const anonymousCompany = await prisma.anonymousCompany.findUnique({
       where: { siret: validInput.siret }
@@ -46,9 +46,9 @@ describe("createAnonymousCompanyByAdmin", () => {
     const { mutate } = makeClient(user);
 
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyByAdmin">,
-      MutationCreateAnonymousCompanyByAdminArgs
-    >(CREATE_ANONYMOUS_COMPANY_BY_ADMIN, { variables: { input: validInput } });
+      Pick<Mutation, "createAnonymousCompany">,
+      MutationCreateAnonymousCompanyArgs
+    >(CREATE_ANONYMOUS_COMPANY, { variables: { input: validInput } });
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -62,9 +62,9 @@ describe("createAnonymousCompanyByAdmin", () => {
     const { mutate } = makeClient(user);
 
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyByAdmin">,
-      MutationCreateAnonymousCompanyByAdminArgs
-    >(CREATE_ANONYMOUS_COMPANY_BY_ADMIN, {
+      Pick<Mutation, "createAnonymousCompany">,
+      MutationCreateAnonymousCompanyArgs
+    >(CREATE_ANONYMOUS_COMPANY, {
       variables: { input: { ...validInput, codeNaf: "abc" } }
     });
 
@@ -88,9 +88,9 @@ describe("createAnonymousCompanyByAdmin", () => {
     });
 
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyByAdmin">,
-      MutationCreateAnonymousCompanyByAdminArgs
-    >(CREATE_ANONYMOUS_COMPANY_BY_ADMIN, {
+      Pick<Mutation, "createAnonymousCompany">,
+      MutationCreateAnonymousCompanyArgs
+    >(CREATE_ANONYMOUS_COMPANY, {
       variables: { input: validInput }
     });
 

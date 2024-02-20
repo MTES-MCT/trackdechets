@@ -60,9 +60,4 @@ type Mutation {
   Prend un PDF standardisé (en base 64) en entrée, retourne les données entreprise au format JSON
   """
   extractDataFromSirene(pdfInBase64: String!): SireneCompanyData!
-
-  """
-  Permet de créer une entreprise non-diffusible
-  """
-  createAnonymousCompany(input: AnonymousCompanyInput!): AnonymousCompany!
 }
