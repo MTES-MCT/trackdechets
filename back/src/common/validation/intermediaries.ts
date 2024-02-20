@@ -23,10 +23,7 @@ export const intermediarySchema = z.object({
       "Intermédiaires : la raison sociale de l'établissement est obligatoire"
   }), // should be auto-completed through sirenify
   phone: z.string().nullish(),
-  mail: z.string().nullish(),
-  country: z.string().nullish(), // is ignored in db schema
-  omiNumber: z.string().nullish(), // is ignored in db schema
-  orgId: z.string().nullish() // is ignored in db schema
+  mail: z.string().nullish()
 });
 
 export function intermediariesRefinement(

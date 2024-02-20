@@ -17,26 +17,76 @@ import {
 } from "../../common/validation/siret";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { OPERATIONS, WORKER_CERTIFICATION_ORGANISM } from "./constants";
-import { getOperationModesFromOperationCode } from "../../common/operationModes";
+import { BsdaValidationContext } from "./types";
+import {
+  checkCompanies,
+  checkNoBothGroupingAndForwarding,
+  checkNoEmitterWhenPrivateIndividual,
+  checkNoTransporterWhenCollection2710,
+  checkNoWorkerWhenCollection2710,
+  checkNoWorkerWhenWorkerIsDisabled,
+  checkOperationIsAfterReception,
+  checkOperationMode,
+  checkRequiredFields,
+  checkWorkerSubSectionThree,
+  validateDestination,
+  validatePreviousBsdas
+} from "./refinements";
+import {
+  fillIntermediariesOrgIds,
+  updateTransporterRecepisee,
+  fillWasteConsistenceWhenForwarding,
+  emptyWorkerCertificationWhenWorkerIsDisabled,
+  fillTransportersOrgIds
+} from "./transformers";
+import { sirenify } from "./sirenify";
+
+const ZodBsdaPackagingEnum = z.enum([
+  "BIG_BAG",
+  "CONTENEUR_BAG",
+  "DEPOT_BAG",
+  "OTHER",
+  "PALETTE_FILME",
+  "SAC_RENFORCE"
+]);
+
+export type ZodBsdaPackagingEnum = z.infer<typeof ZodBsdaPackagingEnum>;
+
+const ZodWasteCodeEnum = z.enum(BSDA_WASTE_CODES).nullish();
+
+export type ZodWasteCodeEnum = z.infer<typeof ZodWasteCodeEnum>;
+
+const ZodOperationEnum = z.enum(OPERATIONS).nullish();
+
+export type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
+
+const ZodWorkerCertificationOrganismEnum = z
+  .enum(WORKER_CERTIFICATION_ORGANISM)
+  .nullish();
+
+export type ZodWorkerCertificationOrganismEnum = z.infer<
+  typeof ZodWorkerCertificationOrganismEnum
+>;
 
 export const bsdaPackagingSchema = z
   .object({
-    type: z.enum([
-      "BIG_BAG",
-      "CONTENEUR_BAG",
-      "DEPOT_BAG",
-      "OTHER",
-      "PALETTE_FILME",
-      "SAC_RENFORCE"
-    ]),
+    type: ZodBsdaPackagingEnum.nullish(),
     other: z.string().nullish(),
-    quantity: z.number()
+    quantity: z.number().nullish()
   })
   .refine(val => val.type !== "OTHER" || !!val.other, {
     message:
       "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
   });
 
+/**
+ * Schéma de validation Zod de base permettant pour chaque champ de :
+ * - définir le typage attendu
+ * - définir des règles de validation
+ * - fournir des valeurs par défaut
+ * - appliquer des transformations et des refinements
+ * dont le calcul se fait sur un seul champ.
+ */
 export const rawBsdaSchema = z.object({
   id: z.string().default(() => getReadableId(ReadableIdPrefix.BSDA)),
   isDraft: z.boolean().default(false),
@@ -62,15 +112,19 @@ export const rawBsdaSchema = z.object({
   emitterEmissionSignatureDate: z.coerce.date().nullish(),
   ecoOrganismeName: z.string().nullish(),
   ecoOrganismeSiret: siretSchema.nullish(),
-  wasteCode: z.enum(BSDA_WASTE_CODES).nullish(),
+  wasteCode: ZodWasteCodeEnum,
   wasteFamilyCode: z.string().nullish(),
   wasteMaterialName: z.string().nullish(),
   wasteConsistence: z.nativeEnum(BsdaConsistence).nullish(),
   wasteSealNumbers: z.array(z.string()).default([]),
   wasteAdr: z.string().nullish(),
-  wastePop: z.coerce.boolean().transform(v => Boolean(v)),
+  wastePop: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
   packagings: z
     .array(bsdaPackagingSchema)
+    .nullish()
     .default([])
     .transform(val => (val == null ? [] : val)),
   weightIsEstimate: z.coerce
@@ -94,7 +148,7 @@ export const rawBsdaSchema = z.object({
   destinationCompanyPhone: z.string().nullish(),
   destinationCompanyMail: z.string().nullish(),
   destinationCap: z.string().nullish(),
-  destinationPlannedOperationCode: z.enum(OPERATIONS).nullish(),
+  destinationPlannedOperationCode: ZodOperationEnum,
   destinationCustomInfo: z.string().nullish(),
   destinationReceptionDate: z.coerce.date().nullish(),
   destinationReceptionWeight: z.number().nullish(),
@@ -102,7 +156,7 @@ export const rawBsdaSchema = z.object({
     .nativeEnum(WasteAcceptationStatus)
     .nullish(),
   destinationReceptionRefusalReason: z.string().nullish(),
-  destinationOperationCode: z.enum(OPERATIONS).nullish(),
+  destinationOperationCode: ZodOperationEnum.nullish(),
   destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
   destinationOperationDescription: z.string().nullish(),
   destinationOperationDate: z.coerce
@@ -125,7 +179,7 @@ export const rawBsdaSchema = z.object({
   destinationOperationNextDestinationPlannedOperationCode: z.string().nullish(),
   transporterId: z.string().nullish(),
   transporterCompanyName: z.string().nullish(),
-  transporterCompanySiret: siretSchema.nullish(), // Further verifications done here under in superRefine
+  transporterCompanySiret: siretSchema.nullish(),
   transporterCompanyAddress: z.string().nullish(),
   transporterCompanyContact: z.string().nullish(),
   transporterCompanyPhone: z.string().nullish(),
@@ -168,16 +222,14 @@ export const rawBsdaSchema = z.object({
     .transform(v => Boolean(v)),
   workerCertificationCertificationNumber: z.string().nullish(),
   workerCertificationValidityLimit: z.coerce.date().nullish(),
-  workerCertificationOrganisation: z
-    .enum(WORKER_CERTIFICATION_ORGANISM)
-    .nullish(),
+  workerCertificationOrganisation: ZodWorkerCertificationOrganismEnum,
   workerWorkHasEmitterPaperSignature: z.coerce
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
   workerWorkSignatureAuthor: z.string().nullish(),
   workerWorkSignatureDate: z.coerce.date().nullish(),
-  grouping: z.array(z.string()).optional(),
+  grouping: z.array(z.string()).optional().nullish(),
   forwarding: z.string().nullish(),
   intermediaries: z
     .array(intermediarySchema)
@@ -187,118 +239,83 @@ export const rawBsdaSchema = z.object({
   transportersOrgIds: z.array(z.string()).optional()
 });
 
-export const bsdaSchema = rawBsdaSchema
-  .superRefine((val, ctx) => {
-    if (
-      val.destinationReceptionDate &&
-      val.destinationOperationDate &&
-      val.destinationOperationDate < val.destinationReceptionDate
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `La date d'opération doit être postérieure à la date de réception`
-      });
-    }
+// Type inféré par Zod - avant parsing
+// Voir https://zod.dev/?id=type-inference
+export type ZodBsda = z.input<typeof rawBsdaSchema>;
 
-    const { destinationOperationCode, destinationOperationMode } = val;
-    if (destinationOperationCode) {
-      const modes = getOperationModesFromOperationCode(
-        destinationOperationCode
-      );
+// Type inféré par Zod - après parsing par le schéma "brut".
+// On pourra utiliser ce type en entrée et en sortie dans les refinements et
+// les transformers qui arrivent après le parsing initial (on fait pour cela
+// la supposition que les transformers n'apportent pas de modification au typage)
+// Voir https://zod.dev/?id=type-inference
+export type ParsedZodBsda = z.output<typeof rawBsdaSchema>;
 
-      if (
-        (modes.length &&
-          destinationOperationMode &&
-          !modes.includes(destinationOperationMode)) ||
-        (!modes.length && destinationOperationMode)
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message:
-            "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
-        });
-      }
-    }
+/**
+ * Modification du schéma Zod pour appliquer des règles de validation
+ * et des vérifications **synchrones** dont le contrôle se fait sur plusieurs champs
+ *
+ * Exemple: vérifier que la date de l'opération est postérieure à la date de
+ * la réception.
+ */
+export const refinedSchema = rawBsdaSchema
+  .superRefine(checkOperationIsAfterReception)
+  .superRefine(checkOperationMode)
+  .superRefine(checkNoEmitterWhenPrivateIndividual)
+  .superRefine(checkNoWorkerWhenWorkerIsDisabled)
+  .superRefine(checkWorkerSubSectionThree)
+  .superRefine(checkNoTransporterWhenCollection2710)
+  .superRefine(checkNoWorkerWhenCollection2710)
+  .superRefine(checkNoBothGroupingAndForwarding);
 
-    if (val.emitterIsPrivateIndividual && val.emitterCompanySiret) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `L'émetteur est un particulier, impossible de saisir un SIRET émetteur`
-      });
-    }
+// Transformations synchrones qui sont toujours
+// joués même si `enableCompletionTransformers=false`
+const transformedSyncSchema = refinedSchema
+  // FIXME le calcul des champs dénormalisés `intermediariesOrgIds` et `transporterOrgIds`
+  // devrait se faire dans le repository pour s'assurer que les données restent synchro
+  .transform(fillIntermediariesOrgIds)
+  .transform(fillTransportersOrgIds)
+  .transform(emptyWorkerCertificationWhenWorkerIsDisabled);
 
-    if (
-      val.workerIsDisabled &&
-      (val.workerCompanyName || val.workerCompanySiret)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Il n'y a pas d'entreprise de travaux, impossible de saisir le SIRET ou le nom de l'entreprise de travaux.`
-      });
-    }
+/**
+ * Modification du schéma Zod pour appliquer des tranformations et
+ * des vérifications **synchrones** qui nécessite de connaitre le contexte d'appel.
+ *
+ * Exemple : pour valider les champs requis dans une mutation de signature,
+ * je dois connaitre le type de signature.
+ */
+export const contextualSchema = (context: BsdaValidationContext) => {
+  return transformedSyncSchema.superRefine(
+    // run le check sur les champs requis après les transformations
+    // au cas où des transformations auto-complète certains champs
+    checkRequiredFields(context)
+  );
+};
 
-    if (
-      !val.workerCertificationHasSubSectionThree &&
-      (val.workerCertificationCertificationNumber ||
-        val.workerCertificationValidityLimit ||
-        val.workerCertificationOrganisation)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Il n'y a pas de certification sous-section 3 amiante déclarée. Impossible de remplir les champs de la sous-section 3.`
-      });
-    }
+/**
+ * Modification du schéma Zod pour appliquer des tranformations et
+ * des vérifications **asynchrones** qui nécessite de connaitre le contexte d'appel.
+ */
+export const contextualSchemaAsync = (context: BsdaValidationContext) => {
+  const schema = context.enableCompletionTransformers
+    ? // Transformations asynchrones qui ne sont pas
+      // `enableCompletionTransformers=false`;
+      transformedSyncSchema
+        .transform(sirenify(context))
+        .transform(updateTransporterRecepisee)
+        .transform(fillWasteConsistenceWhenForwarding)
+    : transformedSyncSchema;
 
-    if (
-      val.type === BsdaType.COLLECTION_2710 &&
-      (val.transporterCompanyName != null ||
-        val.transporterCompanySiret != null)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Impossible de saisir un transporteur pour un bordereau de collecte en déchetterie.`
-      });
-    }
+  // refinement asynchrones
+  const refinedAsyncSchema = schema
+    .superRefine(checkCompanies)
+    .superRefine(validateDestination(context))
+    .superRefine(
+      // run le check sur les champs requis après les transformations
+      // au cas où une des transformations auto-complète certains champs
+      checkRequiredFields(context)
+    );
 
-    if (
-      val.type === BsdaType.COLLECTION_2710 &&
-      (val.workerCompanyName != null || val.workerCompanySiret != null)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Impossible de saisir une entreprise de travaux pour un bordereau de collecte en déchetterie.`
-      });
-    }
-
-    const isForwarding = Boolean(val.forwarding);
-    const isGrouping = Boolean(val.grouping?.length);
-
-    if ([isForwarding, isGrouping].filter(b => b).length > 1) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          "Les opérations d'entreposage provisoire et groupement ne sont pas compatibles entre elles"
-      });
-    }
-  })
-  .transform(val => {
-    val.intermediariesOrgIds = val.intermediaries
-      ? val.intermediaries
-          .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
-          .filter(Boolean)
-      : undefined;
-
-    return val;
-  })
-  .transform(val => {
-    val.transportersOrgIds = [
-      val.transporterCompanySiret,
-      val.transporterCompanyVatNumber
-    ]
-      .filter(Boolean)
-      .filter(orgId => orgId.length > 0);
-
-    return val;
-  });
-
-export type ZodBsda = z.infer<typeof rawBsdaSchema>;
+  return context.enablePreviousBsdasChecks
+    ? refinedAsyncSchema.superRefine(validatePreviousBsdas)
+    : refinedAsyncSchema;
+};

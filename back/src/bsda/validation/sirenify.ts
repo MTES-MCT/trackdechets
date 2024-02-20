@@ -1,18 +1,20 @@
-import { nextBuildSirenify } from "../../companies/sirenify";
+import { ParsedZodBsda } from "./schema";
 import { CompanyInput } from "../../generated/graphql/types";
-import { ZodBsda } from "./schema";
+import { nextBuildSirenify } from "../../companies/sirenify";
+import { getSealedFields } from "./rules";
+import { BsdaValidationContext, ZodBsdaTransformer } from "./types";
 
 type SiretInfos = {
   name: string | null | undefined;
   address: string | null | undefined;
 };
 
-const accessors = (
-  input: ZodBsda,
+const sirenifyAccessors = (
+  bsda: ParsedZodBsda,
   sealedFields: string[] // Tranformations should not be run on sealed fields
 ) => [
   {
-    siret: input?.emitterCompanySiret,
+    siret: bsda?.emitterCompanySiret,
     skip: sealedFields.includes("emitterCompanySiret"),
     setter: (input, companyInput: SiretInfos) => {
       input.emitterCompanyName = companyInput.name;
@@ -20,7 +22,7 @@ const accessors = (
     }
   },
   {
-    siret: input?.transporterCompanySiret,
+    siret: bsda?.transporterCompanySiret,
     skip: sealedFields.includes("transporterCompanySiret"),
     setter: (input, companyInput: CompanyInput) => {
       input.transporterCompanyName = companyInput.name;
@@ -28,7 +30,7 @@ const accessors = (
     }
   },
   {
-    siret: input?.destinationCompanySiret,
+    siret: bsda?.destinationCompanySiret,
     skip: sealedFields.includes("destinationCompanySiret"),
     setter: (input, companyInput: CompanyInput) => {
       input.destinationCompanyName = companyInput.name;
@@ -36,7 +38,7 @@ const accessors = (
     }
   },
   {
-    siret: input?.workerCompanySiret,
+    siret: bsda?.workerCompanySiret,
     skip: sealedFields.includes("workerCompanySiret"),
     setter: (input, companyInput: CompanyInput) => {
       input.workerCompanyName = companyInput.name;
@@ -44,23 +46,32 @@ const accessors = (
     }
   },
   {
-    siret: input?.brokerCompanySiret,
+    siret: bsda?.brokerCompanySiret,
     skip: sealedFields.includes("brokerCompanySiret"),
     setter: (input, companyInput: CompanyInput) => {
       input.brokerCompanyName = companyInput.name;
       input.brokerCompanyAddress = companyInput.address;
     }
   },
-  ...(input.intermediaries ?? []).map((_, idx) => ({
-    siret: input.intermediaries![idx].siret,
+  ...(bsda.intermediaries ?? []).map((_, idx) => ({
+    siret: bsda.intermediaries![idx].siret,
     skip: sealedFields.includes("intermediaries"),
     setter: (input, companyInput: CompanyInput) => {
       const intermediary = input.intermediaries[idx];
-
       intermediary.name = companyInput.name;
       intermediary.address = companyInput.address;
     }
   }))
 ];
 
-export const sirenify = nextBuildSirenify(accessors);
+export const sirenify: (
+  context: BsdaValidationContext
+) => ZodBsdaTransformer = context => {
+  return async bsda => {
+    const sealedFields = await getSealedFields(bsda, context);
+    return nextBuildSirenify<ParsedZodBsda>(sirenifyAccessors)(
+      bsda,
+      sealedFields
+    );
+  };
+};

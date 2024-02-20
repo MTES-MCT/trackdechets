@@ -67,7 +67,10 @@ export async function isTransporterRefinement(
   }
 }
 
-export async function isWorkerRefinement(siret: string, ctx) {
+export async function isWorkerRefinement(
+  siret: string | null | undefined,
+  ctx
+) {
   const company = await refineSiretAndGetCompany(siret, ctx);
 
   if (company && !isWorker(company)) {
@@ -82,7 +85,10 @@ export async function isWorkerRefinement(siret: string, ctx) {
   }
 }
 
-export async function isDestinationRefinement(siret: string, ctx) {
+export async function isDestinationRefinement(
+  siret: string | null | undefined,
+  ctx
+) {
   const company = await refineSiretAndGetCompany(siret, ctx);
 
   if (
