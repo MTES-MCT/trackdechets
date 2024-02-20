@@ -331,6 +331,16 @@ export const getIsNonDraftLabel = (
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
 
   if (
+    isBsda(bsd.type) &&
+    isCollection_2710(bsd.bsdWorkflowType?.toString()) &&
+    isSameSiretEmmiter(currentSiret, bsd) &&
+    !isSameSiretDestination(currentSiret, bsd) &&
+    bsd.ecoOrganisme?.siret !== currentSiret
+  ) {
+    return "";
+  }
+
+  if (
     !isFollowTab &&
     (isBsvhuSign(bsd, currentSiret) ||
       isBsffSign(bsd, currentSiret, bsdCurrentTab) ||
