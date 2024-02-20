@@ -83,6 +83,7 @@ module.exports = {
                 "tutoriels/examples/bsda/collecte-chantier",
                 "tutoriels/examples/bsda/collecte-chantier-particulier",
                 "tutoriels/examples/bsda/groupement",
+                "tutoriels/examples/bsda/multi-modal",
               ],
               BSPAOH: [
                 "tutoriels/examples/bspaoh/acheminement-direct",

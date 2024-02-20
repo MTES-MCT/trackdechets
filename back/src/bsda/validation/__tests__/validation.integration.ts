@@ -1,6 +1,12 @@
-import { BsdaType, OperationMode, TransportMode } from "@prisma/client";
+import {
+  BsdaStatus,
+  BsdaType,
+  OperationMode,
+  TransportMode
+} from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
+  UserWithCompany,
   companyFactory,
   transporterReceiptFactory,
   userWithCompanyFactory
@@ -12,11 +18,17 @@ import {
   ZodWorkerCertificationOrganismEnum
 } from "../schema";
 import { prismaToZodBsda } from "../helpers";
-import { BsdaValidationContext } from "../types";
+import {
+  BsdaForParsingInclude,
+  BsdaValidationContext,
+  PrismaBsdaForParsing
+} from "../types";
 import { ZodError } from "zod";
 import { CompanySearchResult } from "../../../companies/types";
 import { searchCompany } from "../../../companies/search";
-import { parseBsda, parseBsdaAsync } from "..";
+import { mergeInputAndParseBsdaAsync, parseBsda, parseBsdaAsync } from "..";
+import { BsdaInput } from "../../../generated/graphql/types";
+import { prisma } from "@td/prisma";
 
 jest.mock("../../../companies/search");
 
@@ -42,23 +54,6 @@ describe("BSDA parsing", () => {
       expect(parsed).toBeDefined();
     });
 
-    test("when type is COLLECTION_2710 and unused company fields are nulls", () => {
-      // on COLLECTION_2710 Bsdas worker and trasporter fields are not used
-      const parsed = parseBsda(
-        {
-          ...bsda,
-          type: BsdaType.COLLECTION_2710,
-          transporterCompanySiret: null,
-          transporterCompanyName: null,
-          workerCompanyName: null,
-          workerCompanySiret: null
-        },
-        context
-      );
-
-      expect(parsed).toBeDefined();
-    });
-
     test("when there is a foreign transporter and recepisse fields are null", async () => {
       const foreignTransporter = await companyFactory({
         orgId: "BE0541696005",
@@ -67,11 +62,15 @@ describe("BSDA parsing", () => {
       const parsed = parseBsda(
         {
           ...bsda,
-          transporterCompanyVatNumber: foreignTransporter.vatNumber,
-          transporterCompanyName: "transporteur BE",
-          transporterRecepisseDepartment: null,
-          transporterRecepisseNumber: null,
-          transporterRecepisseIsExempted: null
+          transporters: [
+            {
+              transporterCompanyVatNumber: foreignTransporter.vatNumber,
+              transporterCompanyName: "transporteur BE",
+              transporterRecepisseDepartment: null,
+              transporterRecepisseNumber: null,
+              transporterRecepisseIsExempted: null
+            }
+          ]
         },
         context
       );
@@ -213,9 +212,13 @@ describe("BSDA parsing", () => {
     });
 
     test("when transporter siret is not valid", () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        transporterCompanySiret: "1"
+        transporters: [
+          {
+            transporterCompanySiret: "1"
+          }
+        ]
       };
 
       const parseFn = () =>
@@ -228,9 +231,13 @@ describe("BSDA parsing", () => {
     });
 
     test("when transporter VAT number is FR", () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        transporterCompanyVatNumber: "FR35552049447"
+        transporters: [
+          {
+            transporterCompanyVatNumber: "FR35552049447"
+          }
+        ]
       };
 
       const parseFn = () =>
@@ -245,9 +252,13 @@ describe("BSDA parsing", () => {
     });
 
     test("when transporter is not registered in Trackdéchets", async () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        transporterCompanySiret: "85001946400021"
+        transporters: [
+          {
+            transporterCompanySiret: "85001946400021"
+          }
+        ]
       };
 
       const parseFn = () => parseBsdaAsync(data, context);
@@ -259,9 +270,13 @@ describe("BSDA parsing", () => {
 
     test("when transporter is registered with wrong profile", async () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        transporterCompanySiret: company.siret
+        transporters: [
+          {
+            transporterCompanySiret: company.siret
+          }
+        ]
       };
 
       const parseFn = () => parseBsdaAsync(data, context);
@@ -274,10 +289,14 @@ describe("BSDA parsing", () => {
     });
 
     test("when foreign transporter is not registered in Trackdéchets", async () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        trasnporterCompanySiret: null,
-        transporterCompanyVatNumber: "IT13029381004"
+        transporters: [
+          {
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: "IT13029381004"
+          }
+        ]
       };
 
       const parseFn = () => parseBsdaAsync(data, context);
@@ -293,9 +312,13 @@ describe("BSDA parsing", () => {
         orgId: "IT13029381004",
         vatNumber: "IT13029381004"
       });
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        transporterCompanyVatNumber: company.vatNumber
+        transporters: [
+          {
+            transporterCompanyVatNumber: company.vatNumber
+          }
+        ]
       };
 
       const parseFn = () => parseBsdaAsync(data, context);
@@ -308,7 +331,7 @@ describe("BSDA parsing", () => {
     });
 
     test("when destination siret is not valid", () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         destinationCompanySiret: "1"
       };
@@ -358,14 +381,25 @@ describe("BSDA parsing", () => {
       const transporterCompany = await companyFactory({
         companyTypes: ["TRANSPORTER"]
       });
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         type: BsdaType.OTHER_COLLECTIONS,
-        transporterCompanySiret: transporterCompany.siret,
-        transporterCompanyVatNumber: null,
-        transporterRecepisseIsExempted: false,
-        transporterRecepisseNumber: null,
-        transporterRecepisseDepartment: null
+        transporters: [
+          {
+            transporterCompanySiret: transporterCompany.siret,
+            transporterCompanyName: transporterCompany.name,
+            transporterCompanyAddress: transporterCompany.address,
+            transporterCompanyContact: transporterCompany.contact,
+            transporterCompanyMail: transporterCompany.contactEmail,
+            transporterCompanyPhone: transporterCompany.contactPhone,
+            transporterTransportPlates: ["AD-008-TS"],
+            transporterCompanyVatNumber: null,
+            transporterRecepisseIsExempted: false,
+            transporterRecepisseNumber: null,
+            transporterRecepisseDepartment: null,
+            transporterTransportMode: "ROAD"
+          }
+        ]
       };
 
       expect.assertions(1);
@@ -379,11 +413,15 @@ describe("BSDA parsing", () => {
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
             message:
-              "Le numéro de récépissé du transporteur est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+              "Le numéro de récépissé du transporteur n° 1 est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
           }),
           expect.objectContaining({
             message:
-              "Le département de récépissé du transporteur est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+              "Le département de récépissé du transporteur n° 1 est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+          }),
+          expect.objectContaining({
+            message:
+              "La date de validité du récépissé du transporteur n° 1 est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
           })
         ]);
       }
@@ -587,21 +625,25 @@ describe("BSDA parsing", () => {
       const company = await companyFactory();
       const receipt = await transporterReceiptFactory({ company });
 
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        transporterCompanySiret: company.siret,
-        transporterCompanyVatNumber: company.vatNumber,
-        transporterRecepisseIsExempted: false,
-        transporterRecepisseNumber: null,
-        transporterRecepisseDepartment: null,
-        transporterRecepisseValidityLimit: null
+        transporters: [
+          {
+            transporterCompanySiret: company.siret,
+            transporterCompanyVatNumber: company.vatNumber,
+            transporterRecepisseIsExempted: false,
+            transporterRecepisseNumber: null,
+            transporterRecepisseDepartment: null,
+            transporterRecepisseValidityLimit: null
+          }
+        ]
       };
 
       const parsed = await parseBsdaAsync(data, {
         ...context,
         enableCompletionTransformers: true
       });
-      expect(parsed.transporter).toMatchObject({
+      expect(parsed.transporters![0]).toMatchObject({
         transporterRecepisseIsExempted: false,
         transporterRecepisseNumber: receipt.receiptNumber,
         transporterRecepisseDepartment: receipt.department,
@@ -612,21 +654,25 @@ describe("BSDA parsing", () => {
     it("should remove transporter receipt when it does not exist in Company table", async () => {
       const company = await companyFactory();
 
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        transporterCompanySiret: company.siret,
-        transporterCompanyVatNumber: company.vatNumber,
-        transporterRecepisseIsExempted: false,
-        transporterRecepisseNumber: "null",
-        transporterRecepisseDepartment: "42",
-        transporterRecepisseValidityLimit: new Date()
+        transporters: [
+          {
+            transporterCompanySiret: company.siret,
+            transporterCompanyVatNumber: company.vatNumber,
+            transporterRecepisseIsExempted: false,
+            transporterRecepisseNumber: "null",
+            transporterRecepisseDepartment: "42",
+            transporterRecepisseValidityLimit: new Date()
+          }
+        ]
       };
 
       const parsed = await parseBsdaAsync(data, {
         ...context,
         enableCompletionTransformers: true
       });
-      expect(parsed.transporter).toMatchObject({
+      expect(parsed.transporters![0]).toMatchObject({
         transporterRecepisseIsExempted: false,
         transporterRecepisseNumber: null,
         transporterRecepisseDepartment: null,
@@ -651,24 +697,13 @@ describe("BSDA parsing", () => {
         ...context,
         enableCompletionTransformers: true
       });
-      expect(parsed.bsda).toMatchObject({
+      expect(parsed).toMatchObject({
         workerCertificationHasSubSectionFour: false,
         workerCertificationHasSubSectionThree: false,
         workerCertificationCertificationNumber: null,
         workerCertificationValidityLimit: null,
         workerCertificationOrganisation: null
       });
-    });
-
-    it("should auto-complete transportersOrgIds", async () => {
-      const transporter = await companyFactory();
-      const data = {
-        ...bsda,
-        transportersOrgIds: [],
-        transporterCompanySiret: transporter.siret
-      };
-      const parsed = await parseBsdaAsync(data, context);
-      expect(parsed.bsda.transportersOrgIds).toEqual([transporter.siret]);
     });
   });
 
@@ -704,14 +739,11 @@ describe("BSDA parsing", () => {
         return Promise.resolve(searchResults[clue]);
       });
 
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         emitterCompanySiret: emitter.company.siret,
         emitterCompanyName: "N'importe",
         emitterCompanyAddress: "Nawak",
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyName: "N'importe",
-        transporterCompanyAddress: "Nawak",
         destinationCompanySiret: destination.company.siret,
         destinationCompanyName: "N'importe",
         destinationCompanyAddress: "Nawak",
@@ -721,6 +753,13 @@ describe("BSDA parsing", () => {
         brokerCompanySiret: broker.company.siret,
         brokerCompanyName: "N'importe",
         brokerCompanyAddress: "Nawak",
+        transporters: [
+          {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: "N'importe",
+            transporterCompanyAddress: "Nawak"
+          }
+        ],
         intermediaries: [
           {
             siret: intermediary1.company.siret!,
@@ -737,52 +776,51 @@ describe("BSDA parsing", () => {
         ]
       };
 
-      const { bsda: sirenified, transporter: sirenifiedTransporter } =
-        await parseBsdaAsync(data, {
-          ...context,
-          enableCompletionTransformers: true
-        });
+      const parsed = await parseBsdaAsync(data, {
+        ...context,
+        enableCompletionTransformers: true
+      });
 
-      expect(sirenified.emitterCompanyName).toEqual(
+      expect(parsed.emitterCompanyName).toEqual(
         searchResults[emitter.company.siret!].name
       );
-      expect(sirenified.emitterCompanyAddress).toEqual(
+      expect(parsed.emitterCompanyAddress).toEqual(
         searchResults[emitter.company.siret!].address
       );
-      expect(sirenifiedTransporter.transporterCompanyName).toEqual(
+      expect(parsed.transporters![0].transporterCompanyName).toEqual(
         searchResults[transporter.company.siret!].name
       );
-      expect(sirenifiedTransporter.transporterCompanyAddress).toEqual(
+      expect(parsed.transporters![0].transporterCompanyAddress).toEqual(
         searchResults[transporter.company.siret!].address
       );
-      expect(sirenified.destinationCompanyName).toEqual(
+      expect(parsed.destinationCompanyName).toEqual(
         searchResults[destination.company.siret!].name
       );
-      expect(sirenified.destinationCompanyAddress).toEqual(
+      expect(parsed.destinationCompanyAddress).toEqual(
         searchResults[destination.company.siret!].address
       );
-      expect(sirenified.workerCompanyName).toEqual(
+      expect(parsed.workerCompanyName).toEqual(
         searchResults[worker.company.siret!].name
       );
-      expect(sirenified.workerCompanyAddress).toEqual(
+      expect(parsed.workerCompanyAddress).toEqual(
         searchResults[worker.company.siret!].address
       );
-      expect(sirenified.brokerCompanyName).toEqual(
+      expect(parsed.brokerCompanyName).toEqual(
         searchResults[broker.company.siret!].name
       );
-      expect(sirenified.brokerCompanyAddress).toEqual(
+      expect(parsed.brokerCompanyAddress).toEqual(
         searchResults[broker.company.siret!].address
       );
-      expect(sirenified.intermediaries![0].name).toEqual(
+      expect(parsed.intermediaries![0].name).toEqual(
         searchResults[intermediary1.company.siret!].name
       );
-      expect(sirenified.intermediaries![0].address).toEqual(
+      expect(parsed.intermediaries![0].address).toEqual(
         searchResults[intermediary1.company.siret!].address
       );
-      expect(sirenified.intermediaries![1].name).toEqual(
+      expect(parsed.intermediaries![1].name).toEqual(
         searchResults[intermediary2.company.siret!].name
       );
-      expect(sirenified.intermediaries![1].address).toEqual(
+      expect(parsed.intermediaries![1].address).toEqual(
         searchResults[intermediary2.company.siret!].address
       );
     });
@@ -818,13 +856,17 @@ describe("BSDA parsing", () => {
         return Promise.resolve(searchResults[clue]);
       });
 
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         destinationCompanySiret: destination.company.siret,
         workerCompanySiret: worker.company.siret,
-        brokerCompanySiret: broker.company.siret
+        brokerCompanySiret: broker.company.siret,
+        transporters: [
+          {
+            transporterCompanySiret: transporter.company.siret
+          }
+        ]
         // FIXME suite PR 3087 - Ce cas n'est en fait jamais possible puisque
         // le schéma Zod impose de saisir les champs name, address et contact
         // dès le début, il faudrait implémenter des rules d'édition pour les
@@ -840,39 +882,38 @@ describe("BSDA parsing", () => {
         // ]
       };
 
-      const { bsda: sirenified, transporter: sirenifiedTransporter } =
-        await parseBsdaAsync(data, {
-          enableCompletionTransformers: true
-        });
+      const parsed = await parseBsdaAsync(data, {
+        enableCompletionTransformers: true
+      });
 
-      expect(sirenified.emitterCompanyName).toEqual(
+      expect(parsed.emitterCompanyName).toEqual(
         searchResults[emitter.company.siret!].name
       );
-      expect(sirenified.emitterCompanyAddress).toEqual(
+      expect(parsed.emitterCompanyAddress).toEqual(
         searchResults[emitter.company.siret!].address
       );
-      expect(sirenifiedTransporter.transporterCompanyName).toEqual(
+      expect(parsed.transporters![0].transporterCompanyName).toEqual(
         searchResults[transporter.company.siret!].name
       );
-      expect(sirenifiedTransporter.transporterCompanyAddress).toEqual(
+      expect(parsed.transporters![0].transporterCompanyAddress).toEqual(
         searchResults[transporter.company.siret!].address
       );
-      expect(sirenified.destinationCompanyName).toEqual(
+      expect(parsed.destinationCompanyName).toEqual(
         searchResults[destination.company.siret!].name
       );
-      expect(sirenified.destinationCompanyAddress).toEqual(
+      expect(parsed.destinationCompanyAddress).toEqual(
         searchResults[destination.company.siret!].address
       );
-      expect(sirenified.workerCompanyName).toEqual(
+      expect(parsed.workerCompanyName).toEqual(
         searchResults[worker.company.siret!].name
       );
-      expect(sirenified.workerCompanyAddress).toEqual(
+      expect(parsed.workerCompanyAddress).toEqual(
         searchResults[worker.company.siret!].address
       );
-      expect(sirenified.brokerCompanyName).toEqual(
+      expect(parsed.brokerCompanyName).toEqual(
         searchResults[broker.company.siret!].name
       );
-      expect(sirenified.brokerCompanyAddress).toEqual(
+      expect(parsed.brokerCompanyAddress).toEqual(
         searchResults[broker.company.siret!].address
       );
       // FIXME voir explication plus haut
@@ -923,15 +964,12 @@ describe("BSDA parsing", () => {
       });
 
       // BSDA signé par l'émetteur
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         emitterCompanySiret: emitter.company.siret,
         emitterCompanyName: "N'importe",
         emitterCompanyAddress: "Nawak",
         emitterEmissionSignatureDate: new Date(),
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyName: "N'importe",
-        transporterCompanyAddress: "Nawak",
         destinationCompanySiret: destination.company.siret,
         destinationCompanyName: "N'importe",
         destinationCompanyAddress: "Nawak",
@@ -941,6 +979,13 @@ describe("BSDA parsing", () => {
         brokerCompanySiret: broker.company.siret,
         brokerCompanyName: "N'importe",
         brokerCompanyAddress: "Nawak",
+        transporters: [
+          {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: "N'importe",
+            transporterCompanyAddress: "Nawak"
+          }
+        ],
         intermediaries: [
           {
             siret: intermediary1.company.siret!,
@@ -957,54 +1002,528 @@ describe("BSDA parsing", () => {
         ]
       };
 
-      const { bsda: sirenified, transporter: sirenifiedTransporter } =
-        await parseBsdaAsync(data, {
-          ...context,
-          enableCompletionTransformers: true
-        });
+      const parsed = await parseBsdaAsync(data, {
+        ...context,
+        enableCompletionTransformers: true
+      });
 
       // Unchanged
-      expect(sirenified.emitterCompanyName).toEqual(data.emitterCompanyName);
-      expect(sirenified.emitterCompanyAddress).toEqual(
-        data.emitterCompanyAddress
-      );
+      expect(parsed.emitterCompanyName).toEqual(data.emitterCompanyName);
+      expect(parsed.emitterCompanyAddress).toEqual(data.emitterCompanyAddress);
 
-      expect(sirenified.destinationCompanyName).toEqual(
+      expect(parsed.destinationCompanyName).toEqual(
         data.destinationCompanyName
       );
-      expect(sirenified.destinationCompanyAddress).toEqual(
+      expect(parsed.destinationCompanyAddress).toEqual(
         data.destinationCompanyAddress
       );
-      expect(sirenified.workerCompanyName).toEqual(data.workerCompanyName);
-      expect(sirenified.workerCompanyAddress).toEqual(
-        data.workerCompanyAddress
-      );
+      expect(parsed.workerCompanyName).toEqual(data.workerCompanyName);
+      expect(parsed.workerCompanyAddress).toEqual(data.workerCompanyAddress);
 
       // Changed
-      expect(sirenifiedTransporter.transporterCompanyName).toEqual(
+      expect(parsed.transporters![0].transporterCompanyName).toEqual(
         searchResults[transporter.company.siret!].name
       );
-      expect(sirenifiedTransporter.transporterCompanyAddress).toEqual(
+      expect(parsed.transporters![0].transporterCompanyAddress).toEqual(
         searchResults[transporter.company.siret!].address
       );
-      expect(sirenified.brokerCompanyName).toEqual(
+      expect(parsed.brokerCompanyName).toEqual(
         searchResults[broker.company.siret!].name
       );
-      expect(sirenified.brokerCompanyAddress).toEqual(
+      expect(parsed.brokerCompanyAddress).toEqual(
         searchResults[broker.company.siret!].address
       );
-      expect(sirenified.intermediaries![0].name).toEqual(
+      expect(parsed.intermediaries![0].name).toEqual(
         searchResults[intermediary1.company.siret!].name
       );
-      expect(sirenified.intermediaries![0].address).toEqual(
+      expect(parsed.intermediaries![0].address).toEqual(
         searchResults[intermediary1.company.siret!].address
       );
-      expect(sirenified.intermediaries![1].name).toEqual(
+      expect(parsed.intermediaries![1].name).toEqual(
         searchResults[intermediary2.company.siret!].name
       );
-      expect(sirenified.intermediaries![1].address).toEqual(
+      expect(parsed.intermediaries![1].address).toEqual(
         searchResults[intermediary2.company.siret!].address
       );
     });
+  });
+});
+
+describe("mergeInputAndParseBsdaAsync", () => {
+  let bsda: PrismaBsdaForParsing;
+  let context: BsdaValidationContext;
+  let emitter: UserWithCompany;
+  let worker: UserWithCompany;
+  let destination: UserWithCompany;
+  let transporter: UserWithCompany;
+  let transporter2: UserWithCompany;
+
+  beforeEach(async () => {
+    emitter = await userWithCompanyFactory("MEMBER");
+    worker = await userWithCompanyFactory("MEMBER");
+    transporter = await userWithCompanyFactory("MEMBER");
+    transporter2 = await userWithCompanyFactory("MEMBER");
+
+    destination = await userWithCompanyFactory("MEMBER");
+
+    const bsdaFromFactory = await bsdaFactory({
+      opt: {
+        status: "INITIAL",
+        emitterCompanySiret: emitter.company.siret,
+        workerCompanySiret: worker.company.siret,
+        destinationCompanySiret: destination.company.siret
+      },
+      transporterOpt: { transporterCompanySiret: transporter.company.siret }
+    });
+    bsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsdaFromFactory.id },
+      include: BsdaForParsingInclude
+    });
+
+    context = {
+      enableCompletionTransformers: false,
+      enablePreviousBsdasChecks: false,
+      currentSignatureType: undefined,
+      user: emitter.user
+    };
+  });
+
+  afterAll(resetDatabase);
+
+  it("should be possible to update any fields when bsda status is INITIAL", async () => {
+    const persisted: PrismaBsdaForParsing = {
+      ...bsda,
+      status: BsdaStatus.INITIAL
+    };
+
+    const input: BsdaInput = {
+      waste: { code: "10 13 09*" }
+    };
+
+    const { updatedFields } = await mergeInputAndParseBsdaAsync(
+      persisted,
+      input,
+      context
+    );
+
+    expect(updatedFields).toEqual(["wasteCode"]);
+  });
+
+  it("should be possible for the emitter to update worker when bsda status is SIGNED_BY_PRODUCER", async () => {
+    const persisted: PrismaBsdaForParsing = {
+      ...bsda,
+      status: "SIGNED_BY_PRODUCER",
+      emitterEmissionSignatureDate: new Date()
+    };
+
+    const worker = await companyFactory();
+
+    const input: BsdaInput = {
+      worker: { company: { name: worker.name, siret: worker.siret } }
+    };
+
+    const { updatedFields } = await mergeInputAndParseBsdaAsync(
+      persisted,
+      input,
+      context
+    );
+
+    expect(updatedFields).toEqual(["workerCompanyName", "workerCompanySiret"]);
+  });
+
+  it("should not be possible to update a field sealed by emission signature", async () => {
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date(),
+        destinationCompanySiret: destination.company.siret
+      }
+    });
+    const persisted: PrismaBsdaForParsing = {
+      ...bsda,
+      status: "SIGNED_BY_PRODUCER",
+      emitterEmissionSignatureDate: new Date()
+    };
+    const input: BsdaInput = { emitter: { company: { name: "ACME" } } };
+
+    await expect(() =>
+      mergeInputAndParseBsdaAsync(persisted, input, {
+        ...context,
+        user: destination.user
+      })
+    ).rejects.toThrow(
+      "Le nom de l'entreprise émettrice a été vérouillé via signature et ne peut pas être modifié."
+    );
+  });
+
+  it("should be possible to set a sealed field to null if it was empty", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date(),
+        emitterPickupSiteAddress: "",
+        destinationCompanySiret: destination.company.siret
+      }
+    });
+
+    const persisted: PrismaBsdaForParsing = {
+      ...bsda,
+      status: "SIGNED_BY_PRODUCER",
+      emitterEmissionSignatureDate: new Date(),
+      emitterPickupSiteAddress: ""
+    };
+
+    const input: BsdaInput = { emitter: { pickupSite: { address: null } } };
+
+    const { updatedFields } = await mergeInputAndParseBsdaAsync(
+      persisted,
+      input,
+      {
+        ...context,
+        user: destination.user
+      }
+    );
+
+    expect(updatedFields).toEqual([]);
+  });
+
+  it("should be possible to set a sealed field to an empty string if it was null", async () => {
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date(),
+        emitterPickupSiteAddress: null,
+        destinationCompanySiret: destination.company.siret
+      }
+    });
+
+    const persisted: PrismaBsdaForParsing = {
+      ...bsda,
+      status: "SIGNED_BY_PRODUCER",
+      emitterEmissionSignatureDate: new Date(),
+      emitterPickupSiteAddress: null
+    };
+
+    const input: BsdaInput = { emitter: { pickupSite: { address: "" } } };
+
+    const { updatedFields } = await mergeInputAndParseBsdaAsync(
+      persisted,
+      input,
+      {
+        ...context,
+        user: destination.user
+      }
+    );
+
+    expect(updatedFields).toEqual([]);
+  });
+
+  it("should be possible for the emitter to update a field sealed by emission signature", async () => {
+    const persisted: PrismaBsdaForParsing = {
+      ...bsda,
+      status: "SIGNED_BY_PRODUCER",
+      emitterEmissionSignatureDate: new Date()
+    };
+
+    const input: BsdaInput = {
+      emitter: { company: { phone: "02 05 68 45 98" } }
+    };
+
+    const { updatedFields } = await mergeInputAndParseBsdaAsync(
+      persisted,
+      input,
+      context
+    );
+
+    expect(updatedFields).toEqual(["emitterCompanyPhone"]);
+  });
+
+  it("should be possible to re-send same data on a field sealed by emission signature", async () => {
+    const destination = await userWithCompanyFactory("MEMBER");
+    const grouping = [await bsdaFactory({})];
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date(),
+        grouping: { connect: grouping.map(bsda => ({ id: bsda.id })) },
+        destinationCompanySiret: destination.company.siret
+      }
+    });
+
+    const persisted: PrismaBsdaForParsing = await prisma.bsda.update({
+      where: { id: bsda.id },
+      data: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date(),
+        grouping: { connect: grouping.map(bsda => ({ id: bsda.id })) }
+      },
+      include: BsdaForParsingInclude
+    });
+
+    const input: BsdaInput = {
+      grouping: grouping.map(bsda => bsda.id),
+      emitter: { company: { phone: persisted.emitterCompanyPhone } }
+    };
+
+    const { updatedFields } = await mergeInputAndParseBsdaAsync(
+      persisted,
+      input,
+      context
+    );
+
+    expect(updatedFields).toEqual([]);
+  });
+
+  it("should be possible to update a field not yet sealed by emission signature", async () => {
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date(),
+        destinationCompanySiret: destination.company.siret
+      }
+    });
+
+    const persisted: PrismaBsdaForParsing = {
+      ...bsda,
+      status: "SIGNED_BY_PRODUCER",
+      emitterEmissionSignatureDate: new Date()
+    };
+
+    const input: BsdaInput = {
+      transporter: { transport: { plates: ["new-plates"] } }
+    };
+
+    const { updatedFields } = await mergeInputAndParseBsdaAsync(
+      persisted,
+      input,
+      context
+    );
+
+    expect(updatedFields).toEqual(["transporters"]);
+  });
+  it("should not be possible to update a field sealed by worker signature", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_WORKER",
+        emitterCompanySiret: emitter.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
+      }
+    });
+
+    const persisted: PrismaBsdaForParsing = {
+      ...bsda,
+      status: "SIGNED_BY_WORKER",
+      emitterEmissionSignatureDate: new Date(),
+      workerWorkSignatureDate: new Date()
+    };
+
+    const input: BsdaInput = {
+      worker: {
+        work: {
+          hasEmitterPaperSignature: !bsda.workerWorkHasEmitterPaperSignature
+        }
+      }
+    };
+
+    await expect(() =>
+      mergeInputAndParseBsdaAsync(persisted, input, context)
+    ).rejects.toThrow(
+      "Le champ workerWorkHasEmitterPaperSignature a été vérouillé via signature et ne peut pas être modifié."
+    );
+  });
+
+  it("should be possible to update a field not yet sealed by worker signature", async () => {
+    const persisted: PrismaBsdaForParsing = {
+      ...bsda,
+      status: "SIGNED_BY_WORKER",
+      emitterEmissionSignatureDate: new Date(),
+      workerWorkSignatureDate: new Date()
+    };
+
+    const input: BsdaInput = {
+      transporter: { transport: { plates: ["new-plate"] } }
+    };
+
+    const { updatedFields } = await mergeInputAndParseBsdaAsync(
+      persisted,
+      input,
+      context
+    );
+    expect(updatedFields).toEqual(["transporters"]);
+  });
+
+  it("should not be possible to update a field sealed by transporter signature", async () => {
+    const persisted: PrismaBsdaForParsing = await prisma.bsda.update({
+      where: { id: bsda.id },
+      data: {
+        status: "SENT",
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date(),
+        transporters: {
+          update: {
+            where: { id: bsda.transporters![0].id },
+            data: { transporterTransportSignatureDate: new Date() }
+          }
+        }
+      },
+      include: BsdaForParsingInclude
+    });
+
+    const input: BsdaInput = {
+      transporter: { transport: { plates: ["new-plate"] } }
+    };
+    await expect(() =>
+      mergeInputAndParseBsdaAsync(persisted, input, context)
+    ).rejects.toThrow(
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+        " L'immatriculation du transporteur n°1 a été vérouillé via signature et ne peut pas être modifié."
+    );
+  });
+
+  it("should be possible to re-send same data on a field sealed by transporter signature", async () => {
+    const persisted: PrismaBsdaForParsing = await prisma.bsda.update({
+      where: { id: bsda.id },
+      data: {
+        status: "SENT",
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date(),
+        transporters: {
+          update: {
+            where: { id: bsda.transporters![0].id },
+            data: { transporterTransportSignatureDate: new Date() }
+          }
+        }
+      },
+      include: BsdaForParsingInclude
+    });
+
+    const input: BsdaInput = {
+      transporter: {
+        company: { siret: bsda.transporters![0].transporterCompanySiret }
+      }
+    };
+    const { updatedFields } = await mergeInputAndParseBsdaAsync(
+      persisted,
+      input,
+      context
+    );
+
+    expect(updatedFields).toEqual([]);
+  });
+
+  it("should be possible to update a field not yet sealed by transport signature", async () => {
+    const persisted: PrismaBsdaForParsing = await prisma.bsda.update({
+      where: { id: bsda.id },
+      data: {
+        status: "SENT",
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date(),
+        transporters: {
+          update: {
+            where: { id: bsda.transporters![0].id },
+            data: { transporterTransportSignatureDate: new Date() }
+          }
+        }
+      },
+      include: BsdaForParsingInclude
+    });
+
+    const input: BsdaInput = { destination: { reception: { weight: 300 } } };
+    const { updatedFields } = await mergeInputAndParseBsdaAsync(
+      persisted,
+      input,
+      context
+    );
+
+    expect(updatedFields).toEqual(["destinationReceptionWeight"]);
+  });
+
+  it("should be possible to add transporter N+1 when transporter N has signed", async () => {
+    const bsdaTransporter2 = await prisma.bsdaTransporter.create({
+      data: { number: 0, transporterCompanySiret: transporter2.company.siret }
+    });
+    const persisted: PrismaBsdaForParsing = await prisma.bsda.update({
+      where: { id: bsda.id },
+      data: {
+        status: "SENT",
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date(),
+        transporters: {
+          update: {
+            where: { id: bsda.transporters![0].id },
+            data: { transporterTransportSignatureDate: new Date() }
+          }
+        }
+      },
+      include: BsdaForParsingInclude
+    });
+
+    const input: BsdaInput = {
+      transporters: [bsda.transporters![0].id, bsdaTransporter2.id]
+    };
+    const { updatedFields } = await mergeInputAndParseBsdaAsync(
+      persisted,
+      input,
+      context
+    );
+
+    expect(updatedFields).toEqual(["transporters"]);
+  });
+
+  it("should not be possible to update a field sealed by operation signature", async () => {
+    const persisted: PrismaBsdaForParsing = {
+      ...bsda,
+      status: "PROCESSED",
+      emitterEmissionSignatureDate: new Date(),
+      workerWorkSignatureDate: new Date(),
+      destinationOperationSignatureDate: new Date()
+    };
+
+    const input: BsdaInput = { destination: { reception: { weight: 300 } } };
+    await expect(() =>
+      mergeInputAndParseBsdaAsync(persisted, input, context)
+    ).rejects.toThrow(
+      "Le poids du déchet a été vérouillé via signature et ne peut pas être modifié."
+    );
+  });
+
+  it("should be possible to update the destination contact & mail fields when the bsda status is signed by the emitter", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date(),
+        destinationCompanySiret: destination.company.siret
+      }
+    });
+
+    const persisted: PrismaBsdaForParsing = {
+      ...bsda,
+      status: "SIGNED_BY_PRODUCER",
+      emitterEmissionSignatureDate: new Date()
+    };
+    const input: BsdaInput = {
+      destination: {
+        company: {
+          contact: "New John",
+          phone: "0101010199",
+          mail: "new@mail.com"
+        }
+      }
+    };
+    const { updatedFields } = await mergeInputAndParseBsdaAsync(
+      persisted,
+      input,
+      context
+    );
+    expect(updatedFields).toEqual([
+      "destinationCompanyContact",
+      "destinationCompanyPhone",
+      "destinationCompanyMail"
+    ]);
   });
 });

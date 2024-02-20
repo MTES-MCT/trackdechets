@@ -3080,7 +3080,6 @@ describe("Mutation.updateForm", () => {
 
     const { mutate } = makeClient(emitter.user);
 
-    // update first transporter with deprecated field `transporter`
     const updateFormInput: UpdateFormInput = {
       id: form.id,
       transporters: []
@@ -3111,7 +3110,6 @@ describe("Mutation.updateForm", () => {
     });
     const { mutate } = makeClient(emitter.user);
 
-    // update first transporter with deprecated field `transporter`
     const updateFormInput: UpdateFormInput = {
       id: form.id,
       transporters: ["ID1", "ID2"]

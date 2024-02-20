@@ -1,6 +1,13 @@
 import { Refinement, RefinementCtx, z } from "zod";
 import { BsdaValidationContext } from "./types";
-import { RulesEntries, editionRules } from "./rules";
+import {
+  bsdaTransporterEditionRules,
+  bsdaEditionRules,
+  isBsdaFieldRequired,
+  isBsdaTransporterFieldRequired,
+  BsdaEditableFields,
+  BsdaTransporterEditableFields
+} from "./rules";
 import { getSignatureAncestors } from "./helpers";
 import { capitalize } from "../../common/strings";
 import { isArray } from "../../forms/workflow/diff";
@@ -106,8 +113,8 @@ export const checkNoTransporterWhenCollection2710: Refinement<ParsedZodBsda> = (
 ) => {
   if (
     bsda.type === BsdaType.COLLECTION_2710 &&
-    (bsda.transporterCompanyName != null ||
-      bsda.transporterCompanySiret != null)
+    bsda.transporters &&
+    bsda.transporters.length > 0
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
@@ -156,33 +163,81 @@ export const checkRequiredFields: (
   );
 
   return (bsda, { addIssue }) => {
-    for (const [field, { required, readableFieldName }] of Object.entries(
-      editionRules
-    ) as RulesEntries) {
-      const isRequired =
-        required &&
-        signaturesToCheck.includes(required.from) &&
-        (!required.when || required.when(bsda));
+    for (const bsdaField of Object.keys(bsdaEditionRules)) {
+      const { required, readableFieldName } =
+        bsdaEditionRules[bsdaField as keyof BsdaEditableFields];
 
-      if (isRequired) {
-        if (
-          bsda[field] == null ||
-          (isArray(bsda[field]) && (bsda[field] as any[]).length === 0)
-        ) {
-          const fieldDescription = readableFieldName
-            ? capitalize(readableFieldName)
-            : `Le champ ${field}`;
+      if (required) {
+        const isRequired = isBsdaFieldRequired(
+          required,
+          bsda,
+          signaturesToCheck
+        );
+        if (isRequired) {
+          if (
+            bsda[bsdaField] == null ||
+            (isArray(bsda[bsdaField]) &&
+              (bsda[bsdaField] as any[]).length === 0)
+          ) {
+            const fieldDescription = readableFieldName
+              ? capitalize(readableFieldName)
+              : `Le champ ${bsdaField}`;
 
-          addIssue({
-            code: z.ZodIssueCode.custom,
-            path: [field],
-            message: [`${fieldDescription} est obligatoire.`, required.suffix]
-              .filter(Boolean)
-              .join(" ")
-          });
+            addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [bsdaField],
+              message: [
+                `${fieldDescription} est obligatoire.`,
+                required.customErrorMessage
+              ]
+                .filter(Boolean)
+                .join(" ")
+            });
+          }
         }
       }
     }
+
+    (bsda.transporters ?? []).forEach((transporter, idx) => {
+      for (const bsdaTransporterField of Object.keys(
+        bsdaTransporterEditionRules
+      )) {
+        const { required, readableFieldName } =
+          bsdaTransporterEditionRules[
+            bsdaTransporterField as keyof BsdaTransporterEditableFields
+          ];
+
+        if (required) {
+          const isRequired = isBsdaTransporterFieldRequired(
+            required,
+            { ...transporter, number: idx + 1 },
+            signaturesToCheck
+          );
+          if (isRequired) {
+            if (
+              transporter[bsdaTransporterField] == null ||
+              (isArray(transporter[bsdaTransporterField]) &&
+                (transporter[bsdaTransporterField] as any[]).length === 0)
+            ) {
+              const fieldDescription = readableFieldName
+                ? capitalize(readableFieldName)
+                : `Le champ ${bsdaTransporterField}`;
+
+              addIssue({
+                code: z.ZodIssueCode.custom,
+                path: [`transporters[${idx}]${bsdaTransporterField}`],
+                message: [
+                  `${fieldDescription} n° ${idx + 1} est obligatoire.`,
+                  required.customErrorMessage
+                ]
+                  .filter(Boolean)
+                  .join(" ")
+              });
+            }
+          }
+        }
+      }
+    });
   };
 };
 
@@ -248,18 +303,20 @@ export const checkCompanies: Refinement<ParsedZodBsda> = async (
     bsda.destinationOperationNextDestinationCompanySiret,
     zodContext
   );
-  await isTransporterRefinement(
-    {
-      siret: bsda.transporterCompanySiret,
-      transporterRecepisseIsExempted:
-        bsda.transporterRecepisseIsExempted ?? false
-    },
-    zodContext
-  );
-  await isRegisteredVatNumberRefinement(
-    bsda.transporterCompanyVatNumber,
-    zodContext
-  );
+  for (const transporter of bsda.transporters ?? []) {
+    await isTransporterRefinement(
+      {
+        siret: transporter.transporterCompanySiret,
+        transporterRecepisseIsExempted:
+          transporter.transporterRecepisseIsExempted ?? false
+      },
+      zodContext
+    );
+    await isRegisteredVatNumberRefinement(
+      transporter.transporterCompanyVatNumber,
+      zodContext
+    );
+  }
   await isWorkerRefinement(bsda.workerCompanySiret, zodContext);
   await isBsdaEcoOrganismeRefinement(bsda.ecoOrganismeSiret, zodContext);
   await checkEmitterIsNotEcoOrganisme(bsda.emitterCompanySiret, zodContext);

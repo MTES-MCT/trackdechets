@@ -9,5 +9,7 @@ export default {
   createBsda: loadMutation("createBsda"),
   updateBsda: loadMutation("updateBsda"),
   publishBsda: loadMutation("publishBsda"),
-  signBsda: loadMutation("signBsda")
+  signBsda: loadMutation("signBsda"),
+  createBsdaTransporter: loadMutation("createBsdaTransporter"),
+  updateBsdaTransporter: loadMutation("updateBsdaTransporter")
 };

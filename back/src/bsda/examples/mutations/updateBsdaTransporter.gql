@@ -1,0 +1,5 @@
+mutation UpdateBsdaTransporter($id: ID!, $input: BsdaTransporterInput!) {
+  updateBsdaTransporter(id: $id, input: $input) {
+    id
+  }
+}
