@@ -7,8 +7,9 @@ import { validateAndExtractSireneDataFromPDFInBase64 } from "./createAnonymousCo
 const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousCompanyRequest"] =
   async (_, { pdf }, context) => {
     applyAuthStrategies(context, [AuthType.Session]);
-    checkIsAuthenticated(context);
+    const user = checkIsAuthenticated(context);
 
+    // Run verifications & extract data from PDF
     const data = await validateAndExtractSireneDataFromPDFInBase64(pdf);
 
     // Verify company is not already created
@@ -27,6 +28,26 @@ const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousC
     }
 
     // Verify creation request does not already exist
+    const request = await prisma.anonymousCompanyRequest.findFirst({
+      where: {
+        siret: data.siret
+      }
+    });
+    if (request) {
+      throw new Error(
+        `Une demande pour l'entreprise ${data.siret} est déjà en cours`
+      );
+    }
+
+    // Create the request
+    const { pdfEmittedAt, ...rest } = data;
+    await prisma.anonymousCompanyRequest.create({
+      data: {
+        ...rest,
+        userId: user.id,
+        pdf
+      }
+    });
 
     return true;
   };

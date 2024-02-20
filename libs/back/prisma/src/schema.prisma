@@ -273,6 +273,21 @@ model AnonymousCompany {
   codeCommune String
 }
 
+// Un utilisateur peut demander la création de son entreprise non-diffusible,
+// à condition de fournir un avis de situation SIRENE de moins de 3 mois.
+// Un admin vérifiera manuellement la demande.
+model AnonymousCompanyRequest {
+  id          String  @id @default(cuid())
+  siret       String  @unique
+  pdf         String
+  createdAt   DateTime   @default(now()) @db.Timestamptz(6)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  codeNaf     String
+  address     String
+}
+
 model CompanyAssociation {
   id                    String    @id @default(cuid())
   role                  UserRole
@@ -770,6 +785,7 @@ model User {
   UserResetPasswordHash UserResetPasswordHash[]
   PdfAccessToken        PdfAccessToken[]
   featureFlags          FeatureFlag[]
+  AnonymousCompanyRequest AnonymousCompanyRequest[]
 
   bsdasriEmissionSignatures  Bsdasri[] @relation("BsdasriEmissionSignature")
   bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
