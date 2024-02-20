@@ -1076,7 +1076,11 @@ const canUpdateBsdd = bsd =>
 const canDeleteBsdd = bsd =>
   bsd.type === BsdType.Bsdd &&
   bsd.emitterType !== EmitterType.Appendix1Producer &&
-  [BsdStatusCode.Draft, BsdStatusCode.Sealed].includes(bsd.status);
+  [
+    BsdStatusCode.Draft,
+    BsdStatusCode.Sealed,
+    BsdStatusCode.SignedByProducer
+  ].includes(bsd.status);
 
 const canDeleteBsda = (bsd, siret) =>
   bsd.type === BsdType.Bsda &&
@@ -1141,6 +1145,7 @@ const canReviewBsda = (bsd, siret) =>
   bsd.type === BsdType.Bsda && !canDeleteBsda(bsd, siret);
 
 export const canReviewBsdd = (bsd, siret) => {
+  const isSentStatus = BsdStatusCode.Sent === bsd.status;
   return (
     bsd.type === BsdType.Bsdd &&
     ![
@@ -1151,11 +1156,13 @@ export const canReviewBsdd = (bsd, siret) => {
     bsd.emitterType !== EmitterType.Appendix1Producer &&
     !(
       bsd.emitterType === EmitterType.Producer &&
+      !isSentStatus &&
       isSameSiretEmmiter(siret, bsd) &&
       canUpdateBsd(bsd, siret)
     ) &&
     !(
       bsd.emitterType === EmitterType.Appendix2 &&
+      !isSentStatus &&
       isSameSiretDestination(siret, bsd) &&
       canUpdateBsd(bsd, siret)
     ) &&
