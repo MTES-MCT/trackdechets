@@ -216,12 +216,12 @@ describe("Test Form OperationHook job", () => {
       formId: appendix2.id
     });
 
-    const notUpdatedForm = await prisma.form.findUniqueOrThrow({
+    const notUpdatedInitialForm = await prisma.form.findUniqueOrThrow({
       where: { id: regroupementForm.id },
-      include: { finalOperations: true, grouping: true }
+      include: { finalOperations: true }
     });
 
-    expect(notUpdatedForm.finalOperations.length).toStrictEqual(0)
+    expect(notUpdatedInitialForm.finalOperations.length).toStrictEqual(0)
 
     // Manually execute operationHook to simulate markAsProcessed
     await operationHook({
@@ -229,20 +229,25 @@ describe("Test Form OperationHook job", () => {
       formId: regroupementForm.id
     });
 
-    const updatedForm = await prisma.form.findUniqueOrThrow({
+    const updatedRegroupementForm = await prisma.form.findUniqueOrThrow({
       where: { id: regroupementForm.id },
-      include: { finalOperations: true, grouping: true }
+      include: { grouping: true }
     });
-    const groupedInitialForm = updatedForm.grouping.find(group => group.initialFormId === appendix2.id);
-    expect(updatedForm.finalOperations.length).toStrictEqual(1)
 
-    expect(updatedForm.finalOperations[0]).toMatchObject({
-      formId: updatedForm.id,
-      finalBsdReadableId: groupedInitialForm!.initialFormId,
+    const updatedInitialForm = await prisma.form.findUniqueOrThrow({
+      where: { id: appendix2.id },
+      include: { finalOperations: true }
+    });
+    const groupedInitialForm = updatedRegroupementForm.grouping.find(group => group.initialFormId === appendix2.id);
+    expect(updatedInitialForm.finalOperations.length).toStrictEqual(1)
+
+    expect(updatedInitialForm.finalOperations[0]).toMatchObject({
+      formId: updatedInitialForm.id,
+      finalBsdReadableId: updatedRegroupementForm!.readableId,
       quantity: groupedInitialForm!.quantity!,
-      operationCode: appendix2.processingOperationDone!,
-      destinationCompanySiret: appendix2.recipientCompanySiret!,
-      destinationCompanyName: appendix2.recipientCompanyName!
+      operationCode: updatedRegroupementForm.processingOperationDone!,
+      destinationCompanySiret: updatedRegroupementForm.recipientCompanySiret!,
+      destinationCompanyName: updatedRegroupementForm.recipientCompanyName!
     });
   });
 });
