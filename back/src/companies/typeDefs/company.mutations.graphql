@@ -56,8 +56,8 @@ type Mutation {
   ): TransporterReceipt!
 
   """
-  Permet de convertir un avis de répertoire SIRENE en données entreprise.
-  Prend un PDF standardisé (en base 64) en entrée, retourne les données entreprise au format JSON
+  Permet de créer une requête de création d'entreprise anonyme (qui devra être validée par un admin)
+  Prend un PDF d'avis de répertoire SIRENE de moins de 3 mois en entrée, en base64.
   """
-  extractDataFromSirene(pdfInBase64: String!): SireneCompanyData!
+  createAnonymousCompanyRequest(pdf: String!): Boolean
 }

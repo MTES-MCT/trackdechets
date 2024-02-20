@@ -6,16 +6,9 @@ import { Mutation } from "@td/codegen-ui";
 import InvalidSirenePDFError from "./InvalidSirenePDFError";
 import SirenePDFInfo from "./SirenePDFInfo";
 
-const EXTRACT_DATA_FROM_SIRENE = gql`
-  mutation ExtractDataFromSirene($pdfInBase64: String!) {
-    extractDataFromSirene(pdfInBase64: $pdfInBase64) {
-      siret
-      name
-      codeNaf
-      address
-      codeCommune
-      city
-    }
+const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
+  mutation CreationAnonymousCompanyRequest($pdf: String!) {
+    createAnonymousCompanyRequest(pdf: $pdf)
   }
 `;
 
@@ -36,10 +29,10 @@ const convertToBase64 = async (file: File): Promise<string> => {
 };
 
 const AccountCompanyAddAnonymousCompany = () => {
-  const [extractDataFromSirene, { error, loading }] = useMutation<
-    Pick<Mutation, "extractDataFromSirene">,
+  const [creationAnonymousCompanyRequest, { error, loading }] = useMutation<
+    Pick<Mutation, "createAnonymousCompanyRequest">,
     any
-  >(EXTRACT_DATA_FROM_SIRENE);
+  >(CREATE_ANONYMOUS_COMPANY_REQUEST);
 
   return (
     <div className={styles.alertWrapper}>
@@ -59,8 +52,8 @@ const AccountCompanyAddAnonymousCompany = () => {
               const base64 = await convertToBase64(file);
 
               // Send to backend for data extraction
-              const res = await extractDataFromSirene({
-                variables: { pdfInBase64: base64 }
+              const res = await creationAnonymousCompanyRequest({
+                variables: { pdf: base64 }
               });
             }
           }

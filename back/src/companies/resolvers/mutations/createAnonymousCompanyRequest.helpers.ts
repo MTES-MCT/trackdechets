@@ -1,3 +1,4 @@
+import pdfParser from "pdf-parse";
 import { isSiret } from "../../../../../libs/shared/constants/src";
 
 export interface Info {
@@ -89,7 +90,10 @@ export const extractBetween = (
     });
   }
 
-  return res.map(r => r.trim()).filter(Boolean);
+  return res
+    .map(r => r.trim())
+    .filter(Boolean)
+    .join(" ");
 };
 
 export const toDate = (ddMMyyy: string) => {
@@ -139,58 +143,23 @@ export const extractCodeNaf = (texts: string[]) => {
     throw new Error("Invalid codeNaf");
   }
 
-  return codeNaf.split("-")[0];
+  return codeNaf.split("-")[0].replace(".", "").trim();
 };
 
-export const extractAddress = (
-  texts: string[]
-): { address: string; codeCommune: string; city: string } => {
-  try {
-    const addressLines: string[] = extractBetween(
-      texts,
-      "Adresse",
-      "Activité Principale"
-    );
+export const extractAddress = (texts: string[]) => {
+  const address = extractBetween(texts, "Adresse", "Activité Principale");
 
-    if (!addressLines || !addressLines.length) {
-      throw new Error("Invalid addressLines");
-    }
+  if (!address) throw new Error("Invalid address");
 
-    const codeCommuneAndCity = addressLines.pop()?.split(" ");
-
-    if (!codeCommuneAndCity || !codeCommuneAndCity.length) {
-      throw new Error("Invalid codeCommuneAndCity");
-    }
-
-    const res = {
-      address: addressLines.splice(0, addressLines.length).join(" ").trim(),
-      codeCommune: codeCommuneAndCity.shift()!.trim(),
-      city: codeCommuneAndCity.join(" ").trim()
-    };
-
-    if (!res.codeCommune) {
-      throw new Error("Invalid codeCommune");
-    }
-
-    if (!res.city) {
-      throw new Error("Invalid city");
-    }
-
-    return res;
-  } catch (e) {
-    throw new Error("Invalid address");
-  }
+  return address;
 };
 
 export interface ExtractedData {
   pdfEmittedAt?: Date;
-  createdAt?: Date;
   siret: string;
   name: string;
   codeNaf: string;
   address: string;
-  codeCommune: string;
-  city: string;
 }
 
 export const extractData = (text: string): ExtractedData => {
@@ -201,10 +170,59 @@ export const extractData = (text: string): ExtractedData => {
 
   return {
     pdfEmittedAt: extractEmittedAt(splitted),
-    createdAt: extractCreatedAt(splitted),
     siret: extractSiret(splitted),
     name: extractName(splitted),
     codeNaf: extractCodeNaf(splitted),
-    ...extractAddress(splitted)
+    address: extractAddress(splitted)
   };
+};
+
+export const parseBase64 = async (pdf: string): Promise<ParsedPdf> => {
+  // Convert PDF from base64 to buffer, then parse
+  const buffer = Buffer.from(pdf, "base64");
+  const data = await new Promise<ParsedPdf>((resolve, reject) => {
+    pdfParser(buffer)
+      .then(function (data) {
+        resolve({
+          text: data.text,
+          info: data.info,
+          metadata: data.metadata?._metadata
+        });
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+
+  return data;
+};
+
+export const validateAndExtractSireneDataFromPDFInBase64 = async (
+  pdf: string
+): Promise<ExtractedData> => {
+  const { text, info, metadata } = await parseBase64(pdf);
+
+  let data: ExtractedData;
+  try {
+    // Try to validate that the PDF is indeed a SIRENE-emitted "avis de situation"
+    validateInfo(info);
+    validateMetadata(metadata);
+
+    // Get data
+    data = extractData(text);
+  } catch (e) {
+    throw new Error("PDF non valide");
+  }
+
+  // PDF should not be more than 3 months old
+  const now = new Date();
+  const threeMonthsAgo = new Date(now.setMonth(now.getMonth() - 3));
+  if (
+    !data.pdfEmittedAt ||
+    data.pdfEmittedAt.getTime() < threeMonthsAgo.getTime()
+  ) {
+    throw new Error("Le PDF doit avoir moins de 3 mois");
+  }
+
+  return data;
 };
