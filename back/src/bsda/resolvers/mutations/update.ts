@@ -28,15 +28,21 @@ export default async function edit(
 
   await checkCanUpdate(user, existingBsda, input);
 
-  const { bsda, transporter } = await mergeInputAndParseBsdaAsync(
-    existingBsda,
-    input,
-    {
-      user,
-      enableCompletionTransformers: true,
-      enablePreviousBsdasChecks: true
-    }
-  );
+  const {
+    parsedBsda: { bsda, transporter },
+    updatedFields
+  } = await mergeInputAndParseBsdaAsync(existingBsda, input, {
+    user,
+    enableCompletionTransformers: true,
+    enablePreviousBsdasChecks: true
+  });
+
+  if (updatedFields.length === 0) {
+    // Évite de faire un update "à blanc" si l'input
+    // ne modifie pas les données. Cela permet de limiter
+    // le nombre d'évenements crées dans Mongo.
+    return expandBsdaFromDb(existingBsda);
+  }
 
   const forwarding = !!bsda.forwarding
     ? { connect: { id: bsda.forwarding } }

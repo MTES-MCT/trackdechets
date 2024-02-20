@@ -852,7 +852,7 @@ export async function checkSealedFields(
     throw new SealedFieldError([...new Set(sealedFieldErrors)]);
   }
 
-  return Promise.resolve(true);
+  return Promise.resolve(updatedFields);
 }
 
 export async function getSealedFields(

@@ -21,11 +21,15 @@ describe("checkSealedFields", () => {
       wasteCode: "10 13 09*"
     };
 
-    const checked = await checkSealedFields(prismaToZodBsda(bsda), update, {
-      user: emitter.user
-    });
+    const updatedFields = await checkSealedFields(
+      prismaToZodBsda(bsda),
+      update,
+      {
+        user: emitter.user
+      }
+    );
 
-    expect(checked).toEqual(true);
+    expect(updatedFields).toEqual(["wasteCode"]);
   });
 
   it("should be possible to update worker when bsda status is SIGNED_BY_PRODUCER", async () => {
@@ -45,11 +49,15 @@ describe("checkSealedFields", () => {
       workerCompanySiret: workerCompany.siret
     };
 
-    const checked = await checkSealedFields(prismaToZodBsda(bsda), update, {
-      user
-    });
+    const updatedFields = await checkSealedFields(
+      prismaToZodBsda(bsda),
+      update,
+      {
+        user
+      }
+    );
 
-    expect(checked).toEqual(true);
+    expect(updatedFields).toEqual(["workerCompanyName", "workerCompanySiret"]);
   });
   it("should not be possible to update a field sealed by emission signature", async () => {
     const destination = await userWithCompanyFactory("MEMBER");
@@ -84,11 +92,15 @@ describe("checkSealedFields", () => {
 
     const update = { emitterPickupSiteAddress: null };
 
-    const checked = await checkSealedFields(prismaToZodBsda(bsda), update, {
-      user: destination.user
-    });
+    const updatedField = await checkSealedFields(
+      prismaToZodBsda(bsda),
+      update,
+      {
+        user: destination.user
+      }
+    );
 
-    expect(checked).toEqual(true);
+    expect(updatedField).toEqual([]);
   });
 
   it("should be possible to set a sealed field to an empty string if it was null", async () => {
@@ -104,11 +116,15 @@ describe("checkSealedFields", () => {
 
     const update = { emitterPickupSiteAddress: "" };
 
-    const checked = await checkSealedFields(prismaToZodBsda(bsda), update, {
-      user: destination.user
-    });
+    const updatedField = await checkSealedFields(
+      prismaToZodBsda(bsda),
+      update,
+      {
+        user: destination.user
+      }
+    );
 
-    expect(checked).toEqual(true);
+    expect(updatedField).toEqual([]);
   });
 
   it("should be possible for the emitter to update a field sealed by emission signature", async () => {
@@ -123,11 +139,15 @@ describe("checkSealedFields", () => {
 
     const update = { emitterCompanyPhone: "02 05 68 45 98" };
 
-    const checked = await checkSealedFields(prismaToZodBsda(bsda), update, {
-      user
-    });
+    const updatedFields = await checkSealedFields(
+      prismaToZodBsda(bsda),
+      update,
+      {
+        user
+      }
+    );
 
-    expect(checked).toEqual(true);
+    expect(updatedFields).toEqual(["emitterCompanyPhone"]);
   });
 
   it("should be possible to re-send same data on a field sealed by emission signature", async () => {
@@ -147,11 +167,15 @@ describe("checkSealedFields", () => {
       emitterCompanyName: bsda.emitterCompanyName
     };
 
-    const checked = await checkSealedFields(prismaToZodBsda(bsda), update, {
-      user: destination.user
-    });
+    const updatedFields = await checkSealedFields(
+      prismaToZodBsda(bsda),
+      update,
+      {
+        user: destination.user
+      }
+    );
 
-    expect(checked).toEqual(true);
+    expect(updatedFields).toEqual([]);
   });
   it("should be possible to update a field not yet sealed by emission signature", async () => {
     const destination = await userWithCompanyFactory("MEMBER");
@@ -166,10 +190,14 @@ describe("checkSealedFields", () => {
     const update = {
       transporterTransportPlates: ["AD-008-TS"]
     };
-    const checked = await checkSealedFields(prismaToZodBsda(bsda), update, {
-      user: destination.user
-    });
-    expect(checked).toEqual(true);
+    const updatedFields = await checkSealedFields(
+      prismaToZodBsda(bsda),
+      update,
+      {
+        user: destination.user
+      }
+    );
+    expect(updatedFields).toEqual(["transporterTransportPlates"]);
   });
   it("should not be possible to update a field sealed by worker signature", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
@@ -206,10 +234,14 @@ describe("checkSealedFields", () => {
       }
     });
     const update = { transporterTransportPlates: ["AD-008-TS"] };
-    const checked = await checkSealedFields(prismaToZodBsda(bsda), update, {
-      user: emitter.user
-    });
-    expect(checked).toEqual(true);
+    const updatedFields = await checkSealedFields(
+      prismaToZodBsda(bsda),
+      update,
+      {
+        user: emitter.user
+      }
+    );
+    expect(updatedFields).toEqual(["transporterTransportPlates"]);
   });
 
   it("should not be possible to update a field sealed by transporter signature", async () => {
@@ -250,11 +282,11 @@ describe("checkSealedFields", () => {
     const update = {
       transporterCompanySiret: zodBsda.transporterCompanySiret
     };
-    const checked = await checkSealedFields(zodBsda, update, {
+    const updatedFields = await checkSealedFields(zodBsda, update, {
       user: emitter.user
     });
 
-    expect(checked).toEqual(true);
+    expect(updatedFields).toEqual([]);
   });
 
   it("should be possible to update a field not yet sealed by transport signature", async () => {
@@ -270,11 +302,15 @@ describe("checkSealedFields", () => {
     });
 
     const update = { destinationReceptionWeight: 300 };
-    const checked = await checkSealedFields(prismaToZodBsda(bsda), update, {
-      user: emitter.user
-    });
+    const updatedFields = await checkSealedFields(
+      prismaToZodBsda(bsda),
+      update,
+      {
+        user: emitter.user
+      }
+    );
 
-    expect(checked).toEqual(true);
+    expect(updatedFields).toEqual(["destinationReceptionWeight"]);
   });
 
   it("should not be possible to update a field sealed by operation signature", async () => {
@@ -311,9 +347,17 @@ describe("checkSealedFields", () => {
       destinationCompanyPhone: "0101010199",
       destinationCompanyMail: "new@mail.com"
     };
-    const checked = await checkSealedFields(prismaToZodBsda(bsda), update, {
-      user: destination.user
-    });
-    expect(checked).toEqual(true);
+    const updatedFields = await checkSealedFields(
+      prismaToZodBsda(bsda),
+      update,
+      {
+        user: destination.user
+      }
+    );
+    expect(updatedFields).toEqual([
+      "destinationCompanyContact",
+      "destinationCompanyPhone",
+      "destinationCompanyMail"
+    ]);
   });
 });

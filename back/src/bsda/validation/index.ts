@@ -26,12 +26,12 @@ export async function mergeInputAndParseBsdaAsync(
   input: BsdaInput,
   context: BsdaValidationContext
 ) {
-  const zodPersisted = persisted ? prismaToZodBsda(persisted) : null;
-  const zodInput = input ? graphQlInputToZodBsda(input) : null;
+  const zodPersisted = prismaToZodBsda(persisted);
+  const zodInput = graphQlInputToZodBsda(input);
 
   const bsda: ZodBsda = {
-    ...(zodPersisted ?? {}),
-    ...(zodInput ?? {})
+    ...zodPersisted,
+    ...zodInput
   };
 
   // Calcule la signature courante à partir des données si elle n'est
@@ -44,13 +44,17 @@ export async function mergeInputAndParseBsdaAsync(
     currentSignatureType
   };
 
-  if (zodInput && zodPersisted) {
-    // Vérifie que l'on n'est pas en train de modifier des données
-    // vérrouillées par signature.
-    await checkSealedFields(zodPersisted, zodInput, contextWithSignature);
-  }
+  // Vérifie que l'on n'est pas en train de modifier des données
+  // vérrouillées par signature.
+  const updatedFields = await checkSealedFields(
+    zodPersisted,
+    zodInput,
+    contextWithSignature
+  );
 
-  return parseBsdaAsync(bsda, contextWithSignature);
+  const parsedBsda = await parseBsdaAsync(bsda, contextWithSignature);
+
+  return { parsedBsda, updatedFields };
 }
 
 /**
