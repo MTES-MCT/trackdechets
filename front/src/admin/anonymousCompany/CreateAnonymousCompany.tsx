@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import {
   AnonymousCompanyInput,
   Mutation,
-  MutationCreateAnonymousCompanyArgs
+  MutationCreateAnonymousCompanyByAdminArgs
 } from "@td/codegen-ui";
 import { InlineError } from "../../Apps/common/Components/Error/Error";
 import { RedErrorMessage } from "../../common/components";
@@ -17,9 +17,9 @@ export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 export const MISSING_COMPANY_VAT =
   "Le numéro de TVA de l'entreprise est obligatoire";
 
-const CREATE_ANONYMOUS_COMPANY = gql`
-  mutation CreateAnonymousCompany($input: AnonymousCompanyInput!) {
-    createAnonymousCompany(input: $input) {
+const CREATE_ANONYMOUS_COMPANY_BY_ADMIN = gql`
+  mutation CreateAnonymousCompanyByAdmin($input: AnonymousCompanyInput!) {
+    createAnonymousCompanyByAdmin(input: $input) {
       orgId
     }
   }
@@ -68,10 +68,10 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
   });
 
 export function CreateAnonymousCompany() {
-  const [createAnonymousCompany, { loading, error }] = useMutation<
-    Pick<Mutation, "createAnonymousCompany">,
-    MutationCreateAnonymousCompanyArgs
-  >(CREATE_ANONYMOUS_COMPANY);
+  const [createAnonymousCompanyByAdmin, { loading, error }] = useMutation<
+    Pick<Mutation, "createAnonymousCompanyByAdmin">,
+    MutationCreateAnonymousCompanyByAdminArgs
+  >(CREATE_ANONYMOUS_COMPANY_BY_ADMIN);
 
   return (
     <Formik
@@ -85,13 +85,13 @@ export function CreateAnonymousCompany() {
       }}
       validationSchema={AnonymousCompanyInputSchema}
       onSubmit={async (values, { resetForm }) => {
-        const { data } = await createAnonymousCompany({
+        const { data } = await createAnonymousCompanyByAdmin({
           variables: { input: values }
         });
         resetForm();
         if (data) {
           toast.success(
-            `L'entreprise "${data?.createAnonymousCompany.orgId}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
+            `L'entreprise "${data?.createAnonymousCompanyByAdmin.orgId}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
             { duration: TOAST_DURATION }
           );
         }

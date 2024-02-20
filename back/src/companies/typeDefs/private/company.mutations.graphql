@@ -123,7 +123,13 @@ type Mutation {
 
   deleteCompany(id: ID!): CompanyPrivate!
 
-  createAnonymousCompany(input: AnonymousCompanyInput!): AnonymousCompany!
+  """
+  USAGE INTERNE
+  Création d'une entreprise non diffusible par les admins
+  """
+  createAnonymousCompanyByAdmin(
+    input: AnonymousCompanyInput!
+  ): AnonymousCompany!
 
   addSignatureAutomation(input: SignatureAutomationInput!): SignatureAutomation!
   removeSignatureAutomation(id: ID!): SignatureAutomation!

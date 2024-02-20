@@ -455,8 +455,6 @@ type TransporterReceipt {
 Données entreprise extraites de l'avis de situation SIRENE
 """
 type SireneCompanyData {
-  createdAt: DateTime
-
   siret: String
 
   """
@@ -467,6 +465,10 @@ type SireneCompanyData {
   codeNaf: String
 
   address: String
+
+  codeCommune: String
+
+  city: String
 }
 
 """
