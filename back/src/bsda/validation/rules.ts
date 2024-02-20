@@ -818,8 +818,8 @@ export async function checkSealedFields(
 
   const userFunctions = await getBsdaUserFunctions(context.user, bsda);
 
-  for (const [field, rule] of Object.entries(editionRules) as RulesEntries) {
-    // Apply default values to rules
+  for (const field of updatedFields) {
+    const rule = editionRules[field as keyof EditableBsdaFields];
     const sealedRule = {
       from: rule.sealed.from,
       when: rule.sealed.when ?? (() => true), // Default to true
@@ -835,16 +835,14 @@ export async function checkSealedFields(
       sealedRule.when({ ...bsda, ...update }, bsda, userFunctions);
 
     if (isSealed) {
-      if (updatedFields.includes(field)) {
-        sealedFieldErrors.push(
-          [
-            `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
-            sealedRule.suffix
-          ]
-            .filter(Boolean)
-            .join(" ")
-        );
-      }
+      sealedFieldErrors.push(
+        [
+          `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
+          sealedRule.suffix
+        ]
+          .filter(Boolean)
+          .join(" ")
+      );
     }
   }
 
