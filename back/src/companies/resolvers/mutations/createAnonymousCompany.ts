@@ -15,7 +15,7 @@ import {
 import { UserInputError } from "../../../common/errors";
 import { libelleFromCodeNaf } from "../../sirene/utils";
 
-export const anonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
+const anonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
   yup.object({
     address: yup.string().required(),
     codeCommune: yup.string().required(),

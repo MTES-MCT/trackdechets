@@ -18,8 +18,8 @@ export const MISSING_COMPANY_VAT =
   "Le numéro de TVA de l'entreprise est obligatoire";
 
 const CREATE_ANONYMOUS_COMPANY = gql`
-  mutation createAnonymousCompany($input: AnonymousCompanyInput!) {
-    createAnonymousCompanyByAdmin(input: $input) {
+  mutation CreateAnonymousCompany($input: AnonymousCompanyInput!) {
+    createAnonymousCompany(input: $input) {
       orgId
     }
   }
@@ -67,9 +67,9 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       )
   });
 
-export function createAnonymousCompany() {
-  const [createAnonymousCompanyByAdmin, { loading, error }] = useMutation<
-    Pick<Mutation, "createAnonymousCompanyByAdmin">,
+export function CreateAnonymousCompany() {
+  const [createAnonymousCompany, { loading, error }] = useMutation<
+    Pick<Mutation, "createAnonymousCompany">,
     MutationCreateAnonymousCompanyArgs
   >(CREATE_ANONYMOUS_COMPANY);
 
@@ -85,13 +85,13 @@ export function createAnonymousCompany() {
       }}
       validationSchema={AnonymousCompanyInputSchema}
       onSubmit={async (values, { resetForm }) => {
-        const { data } = await createAnonymousCompanyByAdmin({
+        const { data } = await createAnonymousCompany({
           variables: { input: values }
         });
         resetForm();
         if (data) {
           toast.success(
-            `L'entreprise "${data?.createAnonymousCompanyByAdmin.orgId}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
+            `L'entreprise "${data?.createAnonymousCompany.orgId}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
             { duration: TOAST_DURATION }
           );
         }

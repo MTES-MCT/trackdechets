@@ -8,7 +8,7 @@ import { siretify, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
 const CREATE_ANONYMOUS_COMPANY = `
-  mutation createAnonymousCompany($input: AnonymousCompanyInput!) {
+  mutation CreateAnonymousCompany($input: AnonymousCompanyInput!) {
     createAnonymousCompany(input: $input) {
       id
     }
