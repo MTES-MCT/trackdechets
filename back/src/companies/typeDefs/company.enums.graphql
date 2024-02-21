@@ -45,4 +45,8 @@ enum CompanyVerificationStatus {
   auprès du registre du commerce et des sociétés
   """
   LETTER_SENT
+  """
+  Vérification mise en pause / archivée
+  """
+  STANDBY
 }

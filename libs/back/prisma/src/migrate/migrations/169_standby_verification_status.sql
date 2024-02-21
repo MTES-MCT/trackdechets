@@ -1,0 +1,1 @@
+ALTER TYPE "default$default"."CompanyVerificationStatus" ADD VALUE 'STANDBY';
