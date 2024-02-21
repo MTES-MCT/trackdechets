@@ -100,4 +100,36 @@ describe("createAnonymousCompany", () => {
       })
     ]);
   });
+
+  it("should delete any associated anonymousCompanyRequest", async () => {
+    // Given
+    const user = await userFactory({ isAdmin: true });
+    const { mutate } = makeClient(user);
+
+    await prisma.anonymousCompanyRequest.create({
+      data: {
+        userId: user.id,
+        address: "4 BD PASTEUR 44100 NANTES",
+        codeNaf: "6202A",
+        name: "ACME CORP",
+        pdf: "[pdf1 in base64]",
+        siret: validInput.siret
+      }
+    });
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompany">,
+      MutationCreateAnonymousCompanyArgs
+    >(CREATE_ANONYMOUS_COMPANY, { variables: { input: validInput } });
+
+    // Then
+    expect(errors).toBeUndefined();
+    const res = await prisma.anonymousCompanyRequest.findFirst({
+      where: {
+        siret: validInput.siret
+      }
+    });
+    expect(res).toBeNull();
+  });
 });

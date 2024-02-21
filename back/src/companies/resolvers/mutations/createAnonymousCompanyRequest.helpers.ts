@@ -1,5 +1,5 @@
 import pdfParser from "pdf-parse";
-import { isSiret } from "../../../../../libs/shared/constants/src";
+import { isSiret, nafCodes } from "../../../../../libs/shared/constants/src";
 
 export interface Info {
   PDFFormatVersion: string;
@@ -199,7 +199,13 @@ export const extractCodeNaf = (texts: string[]) => {
     throw new Error("Invalid codeNaf");
   }
 
-  return codeNaf.split("-")[0].replace(".", "").toUpperCase().trim();
+  const formatted = codeNaf.split("-")[0].replace(".", "").toUpperCase().trim();
+
+  if (!Object.keys(nafCodes).includes(formatted)) {
+    throw new Error("Invalid codeNaf");
+  }
+
+  return formatted;
 };
 
 export const extractAddress = (texts: string[]) => {

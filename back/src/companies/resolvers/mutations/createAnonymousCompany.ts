@@ -65,6 +65,15 @@ const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"
       }
     });
 
+    // If there was an anonymousCompanyRequest associated, delete it
+    if (input.siret) {
+      await prisma.anonymousCompanyRequest.deleteMany({
+        where: {
+          siret: input.siret
+        }
+      });
+    }
+
     return anonymousCompany;
   };
 
