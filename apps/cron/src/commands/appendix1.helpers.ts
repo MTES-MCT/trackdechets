@@ -4,7 +4,7 @@ import { deleteBsd } from "back";
 import { prisma } from "@td/prisma";
 
 /**
- * After you sign the first appendix1 on a container, you have 3 days to sign the rest.
+ * After you sign the first appendix1 on a container, you have 5 days to sign the rest.
  * We count 5 days starting from the day of the first signature at 00:00.
  * After those 5 days, the unsigned appendix1 are automatically deleted.
  */

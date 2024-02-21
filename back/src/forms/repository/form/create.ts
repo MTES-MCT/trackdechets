@@ -93,9 +93,13 @@ const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
       }
     });
 
-    prisma.addAfterCommitCallback(() =>
-      enqueueCreatedBsdToIndex(form.readableId)
-    );
+    // Do not index an APPENDIX1_PRODUCER on creation.
+    // It will be indexed when the appendix1 is attached to its container.
+    if (form.emitterType !== "APPENDIX1_PRODUCER") {
+      prisma.addAfterCommitCallback(() =>
+        enqueueCreatedBsdToIndex(form.readableId)
+      );
+    }
 
     return form;
   };

@@ -354,18 +354,24 @@ const updateFormResolver = async (
       transaction
     );
     const updatedForm = await update({ id }, formUpdateInput);
-    if (isGroupementUpdated) {
-      updatedForm.emitterType === EmitterType.APPENDIX1
-        ? await setAppendix1({
-            form: updatedForm,
-            appendix1: formFractions!,
-            currentAppendix1Forms: existingAppendixForms
-          })
-        : await setAppendix2({
-            form: updatedForm,
-            appendix2: formFractions!,
-            currentAppendix2Forms: existingAppendixForms
-          });
+
+    if (updatedForm.emitterType === EmitterType.APPENDIX1) {
+      await setAppendix1({
+        form: updatedForm,
+        newAppendix1Fractions: formFractions,
+        currentAppendix1Forms: existingAppendixForms
+      });
+    }
+
+    if (
+      updatedForm.emitterType !== EmitterType.APPENDIX1 &&
+      isGroupementUpdated
+    ) {
+      await setAppendix2({
+        form: updatedForm,
+        appendix2: formFractions!,
+        currentAppendix2Forms: existingAppendixForms
+      });
     }
     return updatedForm;
   });

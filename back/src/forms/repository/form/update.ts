@@ -158,9 +158,20 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
       });
     }
 
-    prisma.addAfterCommitCallback(() =>
-      enqueueUpdatedBsdToIndex(updatedForm.readableId)
-    );
+    let needsReindex = true;
+    // APPENDIX1_PRODUCER forms are not indexed if they don't belong to a container
+    if (updatedForm.emitterType === "APPENDIX1_PRODUCER") {
+      const count = await prisma.formGroupement.count({
+        where: { initialFormId: updatedForm.id }
+      });
+      needsReindex = count > 0;
+    }
+
+    if (needsReindex) {
+      prisma.addAfterCommitCallback(() =>
+        enqueueUpdatedBsdToIndex(updatedForm.readableId)
+      );
+    }
 
     return updatedForm;
   };

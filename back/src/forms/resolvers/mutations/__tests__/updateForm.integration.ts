@@ -2689,7 +2689,7 @@ describe("Mutation.updateForm", () => {
 
     expect(errors.length).toBe(1);
     expect(errors[0].message).toContain(
-      "Impossible d'ajouter une annexe 1. Un bordereau de tournée ne peut être utilisé que durant 3 jours consécutifs à partir du moment où la première collecte"
+      "Impossible d'ajouter une annexe 1. Un bordereau de tournée ne peut être utilisé que durant 5 jours consécutifs à partir du moment où la première collecte"
     );
   });
 

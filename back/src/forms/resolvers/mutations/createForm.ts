@@ -230,7 +230,7 @@ const createFormResolver = async (
       newForm.emitterType === EmitterType.APPENDIX1
         ? await setAppendix1({
             form: newForm,
-            appendix1: formFractions!,
+            newAppendix1Fractions: formFractions!,
             currentAppendix1Forms: []
           })
         : await setAppendix2({
