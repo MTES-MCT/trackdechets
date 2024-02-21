@@ -95,7 +95,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   ]);
 
   const TODAY = new Date();
-  const isFRCompany = nextDestination?.company?.siret ? true : false;
+  const isFRCompany = Boolean(nextDestination?.company?.siret);
   const showNotificationNumber =
     (!isFRCompany && noTraceability) || isExtraEuropeanCompany;
 
