@@ -1099,7 +1099,9 @@ const canDeleteBsda = (bsd, siret) =>
       bsd.emitter?.company?.siret === siret));
 
 const canDeleteBsdasri = bsd =>
-  bsd.type === BsdType.Bsdasri && bsd.status === BsdStatusCode.Initial;
+  bsd.type === BsdType.Bsdasri &&
+  (bsd.status === BsdStatusCode.Initial ||
+    bsd.status === BsdStatusCode.SignedByProducer);
 
 const canDeleteBsvhu = bsd =>
   bsd.type === BsdType.Bsvhu && bsd.status === BsdStatusCode.Initial;
