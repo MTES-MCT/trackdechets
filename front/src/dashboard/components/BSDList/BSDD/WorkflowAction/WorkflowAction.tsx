@@ -1,5 +1,5 @@
 import React from "react";
-import { EmitterType, Form, FormStatus } from "@td/codegen-ui";
+import { EmitterType, Form, FormStatus, UserPermission } from "@td/codegen-ui";
 import MarkAsSealed from "./MarkAsSealed";
 import MarkAsReceived from "./MarkAsReceived";
 import MarkAsAccepted from "./MarkAsAccepted";
@@ -11,6 +11,7 @@ import SignEmissionForm from "./SignEmissionForm";
 import SignTransportForm from "./SignTransportForm";
 import routes from "../../../../../Apps/routes";
 import { useMatch } from "react-router-dom";
+import { usePermissions } from "../../../../../common/contexts/PermissionsContext";
 
 export interface WorkflowActionProps {
   form: Form;
@@ -22,6 +23,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
   // siret prop contains either SIRET or a VAT number
   const { form, siret } = props;
   const isActTab = !!useMatch(routes.dashboard.bsds.act);
+  const { permissions } = usePermissions();
 
   const isTempStorage = form.recipient?.isTempStorage;
   const isAppendix1 = form.emitter?.type === EmitterType.Appendix1;
@@ -30,11 +32,13 @@ export function WorkflowAction(props: WorkflowActionProps) {
 
   switch (form.status) {
     case FormStatus.Draft:
+      if (!permissions.includes(UserPermission.BsdCanUpdate)) return null;
       return <MarkAsSealed {...props} />;
     case FormStatus.Sealed: {
       if (isAppendix1) {
         return null;
       }
+      if (!permissions.includes(UserPermission.BsdCanSignEmission)) return null;
 
       if (isAppendix1Producer) {
         return (
@@ -68,6 +72,9 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.SignedByProducer: {
+      if (!permissions.includes(UserPermission.BsdCanSignTransport))
+        return null;
+
       if (form.transporter?.company?.orgId === siret) {
         return <SignTransportForm {...props} />;
       }
@@ -79,6 +86,9 @@ export function WorkflowAction(props: WorkflowActionProps) {
       }
 
       if (siret === form.recipient?.company?.siret && isActTab) {
+        if (!permissions.includes(UserPermission.BsdCanSignAcceptation))
+          return null;
+
         if (isTempStorage) {
           return <MarkAsTempStored {...props} />;
         }
@@ -90,7 +100,11 @@ export function WorkflowAction(props: WorkflowActionProps) {
         const nextTransporter = (form.transporters ?? []).find(
           t => !t.takenOverAt
         );
-        if (nextTransporter && siret === nextTransporter.company?.orgId) {
+        if (
+          nextTransporter &&
+          siret === nextTransporter.company?.orgId &&
+          permissions.includes(UserPermission.BsdCanSignTransport)
+        ) {
           return <SignTransportForm {...props} />;
         }
       }
@@ -98,13 +112,19 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.TempStored: {
-      if (siret === form.recipient?.company?.siret) {
+      if (
+        siret === form.recipient?.company?.siret &&
+        permissions.includes(UserPermission.BsdCanSignAcceptation)
+      ) {
         return <MarkAsTempStorerAccepted {...props} />;
       }
       return null;
     }
     case FormStatus.TempStorerAccepted: {
-      if (siret === form.recipient?.company?.siret) {
+      if (
+        siret === form.recipient?.company?.siret &&
+        permissions.includes(UserPermission.BsdCanSignOperation)
+      ) {
         return (
           <div className="tw-flex tw-space-x-2">
             <MarkAsProcessed {...props} />
@@ -119,20 +139,27 @@ export function WorkflowAction(props: WorkflowActionProps) {
         [
           form.recipient?.company?.siret,
           form.temporaryStorageDetail?.transporter?.company?.orgId
-        ].includes(siret)
+        ].includes(siret) &&
+        permissions.includes(UserPermission.BsdCanSignEmission)
       ) {
         return <SignEmissionForm {...props} />;
       }
       return null;
     }
     case FormStatus.SignedByTempStorer: {
-      if (siret === form.temporaryStorageDetail?.transporter?.company?.orgId) {
+      if (
+        siret === form.temporaryStorageDetail?.transporter?.company?.orgId &&
+        permissions.includes(UserPermission.BsdCanSignTransport)
+      ) {
         return <SignTransportForm {...props} />;
       }
       return null;
     }
     case FormStatus.Resent: {
-      if (siret === form.temporaryStorageDetail?.destination?.company?.siret) {
+      if (
+        siret === form.temporaryStorageDetail?.destination?.company?.siret &&
+        permissions.includes(UserPermission.BsdCanSignAcceptation)
+      ) {
         return <MarkAsReceived {...props} />;
       }
       return null;
@@ -143,9 +170,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
       }
 
       if (
-        (isTempStorage &&
+        ((isTempStorage &&
           siret === form.temporaryStorageDetail?.destination?.company?.siret) ||
-        (!isTempStorage && siret === form.recipient?.company?.siret)
+          (!isTempStorage && siret === form.recipient?.company?.siret)) &&
+        permissions.includes(UserPermission.BsdCanSignAcceptation)
       ) {
         return <MarkAsAccepted {...props} />;
       }
@@ -156,7 +184,11 @@ export function WorkflowAction(props: WorkflowActionProps) {
         return null;
       }
 
-      if (!isTempStorage && siret === form.recipient?.company?.siret) {
+      if (
+        !isTempStorage &&
+        siret === form.recipient?.company?.siret &&
+        permissions.includes(UserPermission.BsdCanSignOperation)
+      ) {
         return (
           <div className="tw-flex tw-space-x-2">
             {!isAppendix1 && <MarkAsResealed {...props} />}
@@ -165,7 +197,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
         );
       } else if (
         isTempStorage &&
-        siret === form.temporaryStorageDetail?.destination?.company?.siret
+        siret === form.temporaryStorageDetail?.destination?.company?.siret &&
+        permissions.includes(UserPermission.BsdCanSignOperation)
       ) {
         return <MarkAsProcessed {...props} />;
       }

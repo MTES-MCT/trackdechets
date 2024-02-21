@@ -8,7 +8,8 @@ import {
   FormCompany,
   BsdasriPackaging,
   BsdasriType,
-  OperationMode
+  OperationMode,
+  UserPermission
 } from "@td/codegen-ui";
 import routes from "../../../Apps/routes";
 import { useDownloadPdf } from "../../components/BSDList/BSDasri/BSDasriActions/useDownloadPdf";
@@ -39,6 +40,7 @@ import {
 import classNames from "classnames";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { DASRI_VERBOSE_STATUSES } from "@td/constants";
+import { usePermissions } from "../../../common/contexts/PermissionsContext";
 
 const getVerboseWasteName = (code: string): string => {
   const desc = {
@@ -300,6 +302,7 @@ const Recipient = ({ form }: { form: Bsdasri }) => {
 export default function BsdasriDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const navigate = useNavigate();
+  const { permissions } = usePermissions();
 
   const [duplicate] = useBsdasriDuplicate({
     variables: { id: form.id },
@@ -445,15 +448,16 @@ export default function BsdasriDetailContent({ form }: SlipDetailContentProps) {
         identificationNumbers={form?.identification?.numbers}
       />
       <div className={styles.detailActions}>
-        {form.type === BsdasriType.Simple && (
-          <button
-            className="btn btn--outline-primary"
-            onClick={() => duplicate()}
-          >
-            <IconDuplicateFile size="24px" color="blueLight" />
-            <span>Dupliquer</span>
-          </button>
-        )}
+        {form.type === BsdasriType.Simple &&
+          permissions.includes(UserPermission.BsdCanCreate) && (
+            <button
+              className="btn btn--outline-primary"
+              onClick={() => duplicate()}
+            >
+              <IconDuplicateFile size="24px" color="blueLight" />
+              <span>Dupliquer</span>
+            </button>
+          )}
       </div>
     </div>
   );

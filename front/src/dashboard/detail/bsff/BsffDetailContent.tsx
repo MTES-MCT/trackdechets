@@ -14,7 +14,8 @@ import {
   BsffType,
   FormCompany,
   OperationMode,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  UserPermission
 } from "@td/codegen-ui";
 import React, { useState } from "react";
 import QRCodeIcon from "react-qr-code";
@@ -22,6 +23,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 import { DateRow, DetailRow, YesNoRow } from "../common/Components";
 
+import { usePermissions } from "../../../common/contexts/PermissionsContext";
 import styles from "../common/BSDDetailContent.module.scss";
 import { generatePath, Link, useParams } from "react-router-dom";
 import routes from "../../../Apps/routes";
@@ -53,6 +55,7 @@ export function BsffDetailContent({ form: bsff }: Props) {
   const { siret } = useParams<{ siret: string }>();
   const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: bsff.id } });
+  const { permissions } = usePermissions();
 
   const emitterLabel =
     bsff.type === BsffType.CollectePetitesQuantites
@@ -200,24 +203,28 @@ export function BsffDetailContent({ form: bsff }: Props) {
           </button>
           {[BsffStatus.Initial].includes(bsff.status) && isBsffContributor && (
             <>
-              <button
-                className="btn btn--outline-primary"
-                onClick={() => setIsDeleting(true)}
-              >
-                <IconTrash color="blueLight" size="24px" />
-                <span>Supprimer</span>
-              </button>
+              {permissions.includes(UserPermission.BsdCanDelete) && (
+                <button
+                  className="btn btn--outline-primary"
+                  onClick={() => setIsDeleting(true)}
+                >
+                  <IconTrash color="blueLight" size="24px" />
+                  <span>Supprimer</span>
+                </button>
+              )}
 
-              <Link
-                to={generatePath(routes.dashboard.bsffs.edit, {
-                  siret,
-                  id: bsff.id
-                })}
-                className="btn btn--outline-primary"
-              >
-                <IconPaperWrite size="24px" color="blueLight" />
-                <span>Modifier</span>
-              </Link>
+              {permissions.includes(UserPermission.BsdCanUpdate) && (
+                <Link
+                  to={generatePath(routes.dashboard.bsffs.edit, {
+                    siret,
+                    id: bsff.id
+                  })}
+                  className="btn btn--outline-primary"
+                >
+                  <IconPaperWrite size="24px" color="blueLight" />
+                  <span>Modifier</span>
+                </Link>
+              )}
             </>
           )}
           <WorkflowAction
