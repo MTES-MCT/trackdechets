@@ -34,6 +34,9 @@ type Query {
     skip: Int
   ): AnonymousCompanyRequestConnection!
 
+  "Fetch a specific anonymousCompanyRequest (admin panel)"
+  anonymousCompanyRequest(id: ID!): AnonymousCompanyRequest!
+
   """
   Renvoie des informations restreintes sur un établissement
   selon la même recherche par siret ou TVA que companyInfos

@@ -2,9 +2,9 @@ import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Query,
-  QueryAnonymousCompanyRequestsArgs} from "../../../../generated/graphql/types";
-import {
-  userFactory} from "../../../../__tests__/factories";
+  QueryAnonymousCompanyRequestsArgs
+} from "../../../../generated/graphql/types";
+import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "../../../../../../libs/back/prisma/src";
 
