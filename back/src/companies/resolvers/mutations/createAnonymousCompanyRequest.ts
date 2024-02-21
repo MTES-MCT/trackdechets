@@ -40,10 +40,9 @@ const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousC
     }
 
     // Create the request
-    const { pdfEmittedAt, ...rest } = data;
     await prisma.anonymousCompanyRequest.create({
       data: {
-        ...rest,
+        ...data,
         userId: user.id,
         pdf
       }

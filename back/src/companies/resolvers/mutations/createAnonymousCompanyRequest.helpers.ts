@@ -14,21 +14,11 @@ export interface Info {
   ModDate: string;
 }
 
-export interface Metadata {
-  "dc:creator": string;
-  "dc:subject": string;
-  "dc:description": string;
-  "dc:title": string;
-  "pdfuaid:part": string;
-}
-
-export interface ParsedPdf {
-  text: string;
-  info: Info;
-  metadata: Metadata;
-}
-
-export const validateInfo = (info: any) => {
+/**
+ * Basic validation on the PDF's info. We can't verify much as there
+ * are discrepencies between different "Avis de situation".
+ */
+export const validateInfoOrThrow = (info: any) => {
   if (!info) {
     throw new Error("Invalid info");
   }
@@ -43,9 +33,23 @@ export const validateInfo = (info: any) => {
   ) {
     throw new Error("Invalid info author");
   }
+
+  return true;
 };
 
-export const validateMetadata = (metadata: any) => {
+export interface Metadata {
+  "dc:creator": string;
+  "dc:subject": string;
+  "dc:description": string;
+  "dc:title": string;
+  "pdfuaid:part": string;
+}
+
+/**
+ * Basic validation on the PDF's metadata. We can't verify much as there
+ * are discrepencies between different "Avis de situation".
+ */
+export const validateMetadataOrThrow = (metadata: any) => {
   if (!metadata) {
     throw new Error("Invalid metadata");
   }
@@ -60,8 +64,19 @@ export const validateMetadata = (metadata: any) => {
   if (metadata["dc:title"] !== "Avis de situation au répertoire Sirene") {
     throw new Error("Invalid metadata title");
   }
+
+  return true;
 };
 
+/**
+ * Extract data from a line, given its label. For instance if:
+ * texts = [
+ *   ...
+ *   "Siret90000000000000"
+ *   ...
+ * ];
+ * Then extractLine(texts, "Siret") = "90000000000000"
+ */
 export const extractLine = (texts: string[], label: string) => {
   return texts
     .find(s => s.includes(label))
@@ -69,6 +84,22 @@ export const extractLine = (texts: string[], label: string) => {
     .trim();
 };
 
+/**
+ * Data extraction can sometimes be tricky, because not all line are labelled.
+ *
+ * For instance:
+ * texts = [
+ *   ...
+ *   "Adresse4 Boulevard Pasteur",
+ *   "44100 Nantes",
+ *   "Code Naf60.13A",
+ *   ...
+ * ];
+ *
+ * Here the address is on 2 separate lines, and the second one isn't labelled.
+ * So we can extract it with extractBetween(texts, "Adresse", "Code Naf"),
+ * which will return "4 Boulevard Pasteur 44100 Nantes"
+ */
 export const extractBetween = (
   texts: string[],
   label1: string,
@@ -83,11 +114,15 @@ export const extractBetween = (
     .filter(Boolean)
     .pop();
 
-  if (startIndex && endIndex) {
+  if (startIndex !== -1 && endIndex && endIndex !== -1) {
     texts.forEach((text, i) => {
       if (i === startIndex) res.push(text.replace(label1, ""));
       else if (i > startIndex && i < endIndex) res.push(text);
     });
+  }
+
+  if (!res.length) {
+    return undefined;
   }
 
   return res
@@ -96,7 +131,18 @@ export const extractBetween = (
     .join(" ");
 };
 
+/**
+ * Converts a french-formatted date string (dd/MM/yyyy) into a JS Date object
+ */
 export const toDate = (ddMMyyy: string) => {
+  if (
+    !RegExp(/^(0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[012])[\/\-]\d{4}$/).test(
+      ddMMyyy
+    )
+  ) {
+    return undefined;
+  }
+
   const splitted = ddMMyyy.split("/");
 
   return new Date(+splitted[2], parseInt(splitted[1]) - 1, +splitted[0]);
@@ -105,16 +151,12 @@ export const toDate = (ddMMyyy: string) => {
 export const extractEmittedAt = (texts: string[]) => {
   const emittedAt =
     extractLine(texts, "À la date du ") ?? extractLine(texts, "A la date du ");
-  return emittedAt ? toDate(emittedAt) : undefined;
-};
 
-export const extractCreatedAt = (texts: string[]) => {
-  const createdAt =
-    extractLine(
-      texts,
-      "Description de l'entrepriseEntreprise active depuis le "
-    ) ?? extractLine(texts, "Entreprise active depuis le");
-  return createdAt ? toDate(createdAt) : undefined;
+  if (!emittedAt) {
+    throw new Error("Invalid emittedAt");
+  }
+
+  return toDate(emittedAt);
 };
 
 export const extractSiret = (texts: string[]) => {
@@ -123,19 +165,33 @@ export const extractSiret = (texts: string[]) => {
     ""
   );
 
-  if (!siret || !isSiret(siret)) {
+  if (!siret || !siret.length || !isSiret(siret)) {
     throw new Error("Invalid siret");
   }
 
   return siret;
 };
 
+/**
+ * Get the name of the company. If the company doesn't have a name
+ * (ie: auto-entrepreneurs), then return the name of the founder
+ */
 export const extractName = (texts: string[]) => {
   const lastName = extractLine(texts, "Nom");
   const firstNames = extractLine(texts, "Prénoms");
-  return extractLine(texts, "Dénomination") ?? `${firstNames} ${lastName}`;
+  const denomination = extractLine(texts, "Dénomination");
+
+  if (!lastName && !firstNames && !denomination) {
+    throw new Error("Invalid name");
+  }
+
+  return denomination ?? `${firstNames} ${lastName}`;
 };
 
+/**
+ * Return the codeNaf, without its label, and in a TD-standardized fashion,
+ * ie: 90.3A => 903A
+ */
 export const extractCodeNaf = (texts: string[]) => {
   const codeNaf = extractLine(texts, "Activité Principale Exercée (APE)");
 
@@ -143,25 +199,31 @@ export const extractCodeNaf = (texts: string[]) => {
     throw new Error("Invalid codeNaf");
   }
 
-  return codeNaf.split("-")[0].replace(".", "").trim();
+  return codeNaf.split("-")[0].replace(".", "").toUpperCase().trim();
 };
 
 export const extractAddress = (texts: string[]) => {
   const address = extractBetween(texts, "Adresse", "Activité Principale");
 
-  if (!address) throw new Error("Invalid address");
+  if (!address || !address.length) {
+    throw new Error("Invalid address");
+  }
 
   return address;
 };
 
 export interface ExtractedData {
-  pdfEmittedAt?: Date;
   siret: string;
   name: string;
   codeNaf: string;
   address: string;
+  pdfEmittedAt?: Date;
 }
 
+/**
+ * Make some sense out of the PDF-extracted text. Return only
+ * relevant fields.
+ */
 export const extractData = (text: string): ExtractedData => {
   const splitted = text
     .split("\n")
@@ -177,12 +239,22 @@ export const extractData = (text: string): ExtractedData => {
   };
 };
 
+export interface ParsedPdf {
+  text: string;
+  info: Info;
+  metadata: Metadata;
+}
+
+/**
+ * Parse a base64 PDF into a string[], using the pdf-parse library
+ */
 export const parseBase64 = async (pdf: string): Promise<ParsedPdf> => {
-  // Convert PDF from base64 to buffer, then parse
+  // Convert PDF from base64 to buffer...
   const buffer = Buffer.from(pdf, "base64");
+  // ...Then parse it
   const data = await new Promise<ParsedPdf>((resolve, reject) => {
     pdfParser(buffer)
-      .then(function (data) {
+      .then(data => {
         resolve({
           text: data.text,
           info: data.info,
@@ -197,16 +269,21 @@ export const parseBase64 = async (pdf: string): Promise<ParsedPdf> => {
   return data;
 };
 
+/**
+ * Extract relevant company info from an "Avis de situation SIRENE"'s PDF,
+ * converted to base64. Will make as much assertions as possible to guarantee
+ * the legitness of the PDF. PDF must not be older than 3 months.
+ */
 export const validateAndExtractSireneDataFromPDFInBase64 = async (
   pdf: string
-): Promise<ExtractedData> => {
+): Promise<Omit<ExtractedData, "pdfEmittedAt">> => {
   const { text, info, metadata } = await parseBase64(pdf);
 
   let data: ExtractedData;
   try {
     // Try to validate that the PDF is indeed a SIRENE-emitted "avis de situation"
-    validateInfo(info);
-    validateMetadata(metadata);
+    validateInfoOrThrow(info);
+    validateMetadataOrThrow(metadata);
 
     // Get data
     data = extractData(text);
@@ -217,12 +294,10 @@ export const validateAndExtractSireneDataFromPDFInBase64 = async (
   // PDF should not be more than 3 months old
   const now = new Date();
   const threeMonthsAgo = new Date(now.setMonth(now.getMonth() - 3));
-  if (
-    !data.pdfEmittedAt ||
-    data.pdfEmittedAt.getTime() < threeMonthsAgo.getTime()
-  ) {
+  const { pdfEmittedAt, ...rest } = data;
+  if (!pdfEmittedAt || pdfEmittedAt.getTime() < threeMonthsAgo.getTime()) {
     throw new Error("Le PDF doit avoir moins de 3 mois");
   }
 
-  return data;
+  return rest;
 };

@@ -67,22 +67,22 @@ export async function resetDatabase() {
   // We need a longer than 5sec timeout...
   jest.setTimeout(10000);
 
-  await refreshElasticSearch();
-  await elasticSearch.deleteByQuery(
-    {
-      index: index.alias,
-      body: {
-        query: {
-          match_all: {}
-        }
-      },
-      refresh: true
-    },
-    {
-      // do not throw an error if a document has been updated during delete operation
-      ignore: [409]
-    }
-  );
+  // await refreshElasticSearch();
+  // await elasticSearch.deleteByQuery(
+  //   {
+  //     index: index.alias,
+  //     body: {
+  //       query: {
+  //         match_all: {}
+  //       }
+  //     },
+  //     refresh: true
+  //   },
+  //   {
+  //     // do not throw an error if a document has been updated during delete operation
+  //     ignore: [409]
+  //   }
+  // );
   await truncateDatabase();
 }
 
