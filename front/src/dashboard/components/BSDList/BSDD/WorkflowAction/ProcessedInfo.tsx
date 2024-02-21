@@ -95,6 +95,9 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   ]);
 
   const TODAY = new Date();
+  const isFRCompany = Boolean(nextDestination?.company?.siret);
+  const showNotificationNumber =
+    (!isFRCompany && noTraceability) || isExtraEuropeanCompany;
 
   return (
     <Form>
@@ -235,18 +238,22 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
             />
           )}
           <div className="form__row">
-            <label>
-              Numéro de notification ou de document{" "}
-              {!isExtraEuropeanCompany ? "(optionnel)" : ""}{" "}
-              <Tooltip msg="En cas d'export, indiquer ici le N° du document prévu ou le numéro de notification prévue à l'annexe I-B du règlement N°1013/2006 - Format PPNNNN (PP: code pays NNNN: numéro d'ordre)" />
-            </label>
-            <Field
-              type="text"
-              name="nextDestination.notificationNumber"
-              className="td-input"
-              placeholder="PPNNNN (PP: code pays, NNNN: numéro d'ordre)"
-              required={isExtraEuropeanCompany}
-            />
+            {showNotificationNumber && (
+              <>
+                <label>
+                  Numéro de notification ou de document{" "}
+                  {!isExtraEuropeanCompany ? "(optionnel)" : ""}{" "}
+                  <Tooltip msg="En cas d'export, indiquer ici le N° du document prévu ou le numéro de notification prévue à l'annexe I-B du règlement N°1013/2006 - Format PPNNNN (PP: code pays NNNN: numéro d'ordre)" />
+                </label>
+                <Field
+                  type="text"
+                  name="nextDestination.notificationNumber"
+                  className="td-input"
+                  placeholder="PPNNNN (PP: code pays, NNNN: numéro d'ordre)"
+                  required={isExtraEuropeanCompany}
+                />
+              </>
+            )}
             {isExtraEuropeanCompany && (
               <ExtraEuropeanCompanyManualInput
                 name="nextDestination.company"
