@@ -27,6 +27,13 @@ type Query {
     where: CompanyForVerificationWhere
   ): CompanyForVerificationConnection!
 
+  "List all anonymousCompanyRequests for verification on the admin panel"
+  anonymousCompanyRequests(
+    first: Int
+    last: Int
+    skip: Int
+  ): AnonymousCompanyRequestConnection!
+
   """
   Renvoie des informations restreintes sur un établissement
   selon la même recherche par siret ou TVA que companyInfos

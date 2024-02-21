@@ -5,6 +5,7 @@ import searchCompanies from "./queries/searchCompanies";
 import favorites from "./queries/favorites";
 import ecoOrganismes from "./queries/ecoOrganismes";
 import companiesForVerification from "./queries/companiesForVerification";
+import anonymousCompanyRequests from "./queries/anonymousCompanyRequests";
 
 const Query: QueryResolvers = {
   companyInfos,
@@ -12,7 +13,8 @@ const Query: QueryResolvers = {
   searchCompanies,
   favorites,
   ecoOrganismes,
-  companiesForVerification
+  companiesForVerification,
+  anonymousCompanyRequests
 };
 
 export default Query;
