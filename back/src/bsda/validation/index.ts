@@ -1,92 +1,94 @@
-import { Company, Prisma, User } from "@prisma/client";
-import { BsdaInput, BsdaSignatureType } from "../../generated/graphql/types";
-import { applyDynamicRefinement } from "./dynamicRefinements";
+import { BsdaInput } from "../../generated/graphql/types";
 import {
-  getCompaniesFunctions,
-  getSignatureAncestors,
-  getUnparsedBsda,
-  getUpdatedFields,
-  getUserFunctions
+  getCurrentSignatureType,
+  graphQlInputToZodBsda,
+  prismaToZodBsda
 } from "./helpers";
-import { checkSealedAndRequiredFields, getSealedFields } from "./rules";
-import { bsdaSchema } from "./schema";
-import { runTransformers } from "./transformers";
+import { checkSealedFields } from "./rules";
+import { contextualSchema } from "./schema";
+import { ParsedZodBsda } from "./schema";
+import { ZodBsda, contextualSchemaAsync } from "./schema";
+import { BsdaValidationContext, PrismaBsdaForParsing } from "./types";
 
-export type BsdaValidationContext = {
-  enablePreviousBsdasChecks?: boolean;
-  enableCompletionTransformers?: boolean;
-  currentSignatureType?: BsdaSignatureType;
-  user?: User;
-};
-
-export type SyncBsdaValidationContext = { userCompanies: Company[] } & Pick<
-  BsdaValidationContext,
-  "currentSignatureType"
->;
-
-export const BsdaForParsingInclude = Prisma.validator<Prisma.BsdaInclude>()({
-  intermediaries: true,
-  grouping: true,
-  forwarding: true,
-  transporters: true
-});
-
-type BsdaForParsing = Prisma.BsdaGetPayload<{
-  include: typeof BsdaForParsingInclude;
-}>;
-
-export type UnparsedInputs = {
-  input?: BsdaInput | undefined;
-  persisted?: BsdaForParsing | undefined;
-  isDraft?: boolean;
-};
-
-export async function parseBsdaInContext(
-  unparsedInputs: UnparsedInputs,
-  validationContext: BsdaValidationContext
+/**
+ * Wrapper autour de `parseBsdaAsync` qui peut être appelé
+ * dans la mutation updateBsda pour fusionner les données stockées
+ * en base et les données de l'input. Un check additionnel permet
+ * de vérifier qu'on n'est pas en train de modifier des données verrouillées
+ * par signature.
+ */
+export async function mergeInputAndParseBsdaAsync(
+  // BSDA déjà stockée en base de données.
+  // Sera undefined dans le cas d'une création.
+  persisted: PrismaBsdaForParsing,
+  // Données entrantes provenant de la couche GraphQL.
+  // Sera undefined dans le cas d'une signature, duplication, publication.
+  input: BsdaInput,
+  context: BsdaValidationContext
 ) {
-  const unparsedBsda = getUnparsedBsda(unparsedInputs);
-  const updatedFields = getUpdatedFields(unparsedInputs);
-  // Some signatures may be skipped, so always check all the hierarchy
-  const signaturesToCheck = getSignatureAncestors(
-    validationContext.currentSignatureType
+  const zodPersisted = prismaToZodBsda(persisted);
+  const zodInput = graphQlInputToZodBsda(input);
+
+  const bsda: ZodBsda = {
+    ...zodPersisted,
+    ...zodInput
+  };
+
+  // Calcule la signature courante à partir des données si elle n'est
+  // pas fourni via le contexte
+  const currentSignatureType =
+    context.currentSignatureType ?? getCurrentSignatureType(bsda);
+
+  const contextWithSignature = {
+    ...context,
+    currentSignatureType
+  };
+
+  // Vérifie que l'on n'est pas en train de modifier des données
+  // vérrouillées par signature.
+  const updatedFields = await checkSealedFields(
+    zodPersisted,
+    zodInput,
+    contextWithSignature
   );
-  const userFunctions = await getUserFunctions(
-    validationContext.user,
-    unparsedBsda
-  );
 
-  const contextualSchema = bsdaSchema
-    .transform(async val => {
-      const sealedFields = getSealedFields({
-        bsda: val,
-        persistedBsda: unparsedInputs.persisted,
-        userFunctions,
-        signaturesToCheck
-      });
-      if (validationContext.enableCompletionTransformers) {
-        val = await runTransformers(val, sealedFields);
-      }
+  const parsedBsda = await parseBsdaAsync(bsda, contextWithSignature);
 
-      return val;
-    })
-    .superRefine(async (val, ctx) => {
-      checkSealedAndRequiredFields(
-        {
-          bsda: val,
-          persistedBsda: unparsedInputs.persisted,
-          updatedFields,
-          userFunctions,
-          signaturesToCheck
-        },
-        ctx
-      );
+  return { parsedBsda, updatedFields };
+}
 
-      await applyDynamicRefinement(val, validationContext, ctx);
-    });
+/**
+ * Fonction permettant de valider et parser un BSDA dans son contexte d'appel.
+ * Les données provenant d'un input GraphQL et / ou de la base de données
+ * doivent être converties au préalable au format attendu par zod (`ZodBsda`).
+ * La fonction `parseBsdaInContext` permet de gérer cette conversion.
+ */
 
-  const zodBsda = await contextualSchema.parseAsync(unparsedBsda);
+export async function parseBsdaAsync(
+  bsda: ZodBsda,
+  context: BsdaValidationContext
+) {
+  const schema = contextualSchemaAsync(context);
+  const parsedBsda = await schema.parseAsync(bsda);
+  return toMultiModalBsda(parsedBsda);
+}
+/**
+ * Version synchrone de `parseBsdaAsync` qui ne prend pas en compte les
+ * refinements et transformers qui se jouent en asynchrone (sirenify, etc).
+ */
 
+export function parseBsda(bsda: ZodBsda, context: BsdaValidationContext) {
+  const schema = contextualSchema(context);
+  const parsedBsda = schema.parse(bsda);
+  return toMultiModalBsda(parsedBsda);
+}
+/**
+ * Couche de compatibilité temporaire entre les données transporteurs
+ * Zod ("à plat") et les données transporteurs en base de données (table séparée).
+ * Va disparaitre avec l'implémentation du multi-modal
+ */
+
+export function toMultiModalBsda(parsedBsda: ParsedZodBsda) {
   const {
     transporterCompanySiret,
     transporterCompanyName,
@@ -106,15 +108,16 @@ export async function parseBsdaInContext(
     transporterTransportSignatureAuthor,
     transporterTransportSignatureDate,
     transporterId,
-    ...bsda
-  } = zodBsda;
+    ...rest
+  } = parsedBsda;
 
   // Au niveau du schéma Zod, tout se passe comme si les données de transport
   // était encore "à plat" avec un seul transporteur (en attendant l'implémentation du multi-modal)
   // On renvoie séparement les données du bsda et les données du transporteur
   // car elles font ensuite l'objet de traitement séparé pour construire les payloads de création / update
+  // en base de données
   return {
-    bsda: { ...bsda, transporterTransportSignatureDate },
+    bsda: { ...rest, transporterTransportSignatureDate },
     transporter: {
       id: transporterId,
       transporterCompanySiret,
@@ -136,45 +139,4 @@ export async function parseBsdaInContext(
       transporterTransportSignatureDate
     }
   };
-}
-
-/**
- * This is a sync equivalent of parseBsdaInContext.
- * Being sync obviously means that dynamic parsing & transformation cannot be applied.
- * This is for use cases where we need to validate a batch of bsdas quickly.
- *
- * @param unparsedInputs
- * @param validationContext
- * @param userCompanies
- * @returns
- */
-export function syncParseBsdaInContext(
-  unparsedInputs: UnparsedInputs,
-  validationContext: SyncBsdaValidationContext
-) {
-  const unparsedBsda = getUnparsedBsda(unparsedInputs);
-  const updatedFields = getUpdatedFields(unparsedInputs);
-  // Some signatures may be skipped, so always check all the hierarchy
-  const signaturesToCheck = getSignatureAncestors(
-    validationContext.currentSignatureType
-  );
-  const userFunctions = getCompaniesFunctions(
-    validationContext.userCompanies,
-    unparsedBsda
-  );
-
-  const contextualSchema = bsdaSchema.superRefine((val, ctx) => {
-    checkSealedAndRequiredFields(
-      {
-        bsda: val,
-        persistedBsda: unparsedInputs.persisted,
-        updatedFields,
-        userFunctions,
-        signaturesToCheck
-      },
-      ctx
-    );
-  });
-
-  return contextualSchema.parse(unparsedBsda);
 }

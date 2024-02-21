@@ -318,6 +318,11 @@ input VerifyCompanyByAdminInput {
   verificationComment: String
 }
 
+input StandbyCompanyByAdminInput {
+  orgId: String!
+  standby: Boolean!
+}
+
 input SendVerificationCodeLetterInput {
   siret: String!
 }

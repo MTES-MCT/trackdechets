@@ -5,8 +5,9 @@ import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { getBsdaRepository } from "../../repository";
 import { checkCanUpdate } from "../../permissions";
-import { parseBsdaInContext } from "../../validation";
 import { ForbiddenError } from "../../../common/errors";
+import { parseBsdaAsync } from "../../validation";
+import { prismaToZodBsda } from "../../validation/helpers";
 
 export default async function publish(
   _,
@@ -19,7 +20,6 @@ export default async function publish(
     include: {
       intermediaries: true,
       grouping: true,
-      forwarding: true,
       transporters: true
     }
   });
@@ -32,10 +32,10 @@ export default async function publish(
     );
   }
 
-  await parseBsdaInContext(
-    { persisted: bsda },
-    { currentSignatureType: "EMISSION" }
-  );
+  await parseBsdaAsync(prismaToZodBsda(bsda), {
+    user,
+    currentSignatureType: "EMISSION"
+  });
 
   const updatedBsda = await getBsdaRepository(user).update(
     { id },

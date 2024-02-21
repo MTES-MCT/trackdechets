@@ -1,5 +1,5 @@
 import React from "react";
-import { BsffStatus } from "@td/codegen-ui";
+import { BsffStatus, UserPermission } from "@td/codegen-ui";
 import { BsffFragment } from "../types";
 import { PublishBsff } from "./PublishBsff";
 import { SignEmission } from "./SignEmission";
@@ -10,6 +10,7 @@ import { SignBsffAcceptationOnePackaging } from "./SignAcceptation";
 import { SignPackagings } from "./SignPackagings";
 import { useParams, useMatch } from "react-router-dom";
 import routes from "../../../../../Apps/routes";
+import { usePermissions } from "../../../../../common/contexts/PermissionsContext";
 
 export interface WorkflowActionProps {
   form: BsffFragment;
@@ -18,6 +19,7 @@ export interface WorkflowActionProps {
 export function WorkflowAction(props: WorkflowActionProps) {
   const { siret } = useParams<{ siret: string }>();
   const { form } = props;
+  const { permissions } = usePermissions();
 
   const isActTab = !!useMatch(routes.dashboard.bsds.act);
   const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
@@ -27,7 +29,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
 
   if (
     form.isDraft &&
-    [emitterSiret, transporterSiret, destinationSiret].includes(siret)
+    [emitterSiret, transporterSiret, destinationSiret].includes(siret) &&
+    permissions.includes(UserPermission.BsdCanUpdate)
   ) {
     return <PublishBsff bsffId={form.id} />;
   }
@@ -35,6 +38,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
   switch (form.bsffStatus) {
     case BsffStatus.Initial:
       if (siret !== emitterSiret || !isActTab) return null;
+      if (!permissions.includes(UserPermission.BsdCanSignEmission)) return null;
       return <SignEmission bsffId={form.id} />;
 
     case BsffStatus.SignedByEmitter:
@@ -44,14 +48,20 @@ export function WorkflowAction(props: WorkflowActionProps) {
         }
         return null;
       }
+      if (!permissions.includes(UserPermission.BsdCanSignTransport))
+        return null;
       return <SignTransport bsffId={form.id} />;
 
     case BsffStatus.Sent:
       if (siret !== destinationSiret || !isActTab) return null;
+      if (!permissions.includes(UserPermission.BsdCanSignAcceptation))
+        return null;
       return <SignReception bsffId={form.id} />;
 
     case BsffStatus.Received:
       if (siret !== destinationSiret || !isActTab) return null;
+      if (!permissions.includes(UserPermission.BsdCanSignOperation))
+        return null;
       if (form.packagings?.length === 1) {
         return <SignBsffAcceptationOnePackaging bsffId={form.id} />;
       }
@@ -59,6 +69,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
 
     case BsffStatus.Accepted:
       if (siret !== destinationSiret) return null;
+      if (!permissions.includes(UserPermission.BsdCanSignOperation))
+        return null;
       if (form.packagings?.length === 1) {
         return <SignBsffOperationOnePackaging bsffId={form.id} />;
       }
@@ -66,6 +78,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
 
     case BsffStatus.PartiallyRefused:
       if (siret !== destinationSiret) return null;
+      if (!permissions.includes(UserPermission.BsdCanSignOperation))
+        return null;
       return <SignPackagings bsffId={form.id} />;
 
     default:

@@ -302,7 +302,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le nom de l'entreprise émettrice a été vérouillé via signature et ne peut pas être modifié."
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Le nom de l'entreprise émettrice a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -382,6 +382,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
           "Le SIRET de l'entreprise de destination a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
@@ -430,6 +431,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
           "Le SIRET de l'entreprise de destination a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
@@ -514,6 +516,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
           "Le SIRET de l'entreprise de destination a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
@@ -602,6 +605,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
           "Le SIRET de l'entreprise de travaux a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
@@ -774,6 +778,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
           "Le nom du transporteur a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
@@ -1041,6 +1046,9 @@ describe("Mutation.updateBsda", () => {
             contact: "John Doe"
           }
         }
+      },
+      transporterOpt: {
+        transporterTransportSignatureDate: new Date()
       }
     });
 
@@ -1058,7 +1066,7 @@ describe("Mutation.updateBsda", () => {
         }
       ]
     };
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
     >(UPDATE_BSDA, {
@@ -1068,18 +1076,21 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
+    expect(errors).toBeUndefined();
+
     expect(data.updateBsda.intermediaries!.length).toBe(1);
   });
 
   it("should reject if updating intermediaries when its value is locked", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+
     const { company: otherCompany } = await userWithCompanyFactory(
       UserRole.ADMIN
     );
 
     const bsda = await bsdaFactory({
       opt: {
-        emitterCompanySiret: company.siret,
+        destinationCompanySiret: company.siret,
         status: "SENT", // Bsda is sent => intermediaries cannot be updated anymore
         transporterTransportSignatureDate: new Date(),
         intermediaries: {
@@ -1090,6 +1101,9 @@ describe("Mutation.updateBsda", () => {
             contact: "John Doe"
           }
         }
+      },
+      transporterOpt: {
+        transporterTransportSignatureDate: new Date()
       }
     });
 
@@ -1119,7 +1133,8 @@ describe("Mutation.updateBsda", () => {
 
     expect(errors.length).toBe(1);
     expect(errors[0].message).toBe(
-      "Les intermédiaires a été vérouillé via signature et ne peut pas être modifié."
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
+        "Les intermédiaires a été vérouillé via signature et ne peut pas être modifié."
     );
   });
 
