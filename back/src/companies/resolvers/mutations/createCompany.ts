@@ -10,7 +10,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { isGenericEmail, randomNumber } from "../../../utils";
+import { randomNumber } from "../../../utils";
 import { renderMail, verificationProcessInfo } from "@td/mail";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
@@ -31,6 +31,7 @@ import { UserInputError } from "../../../common/errors";
 import { isForeignTransporter } from "../../validation";
 import { sendFirstOnboardingEmail } from "./verifyCompany";
 import { sendVerificationCodeLetter } from "../../../common/post";
+import { isGenericEmail } from "@td/constants";
 
 /**
  * Create a new company and associate it to a user
