@@ -10,7 +10,11 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { geocode } from "../../../geo/geocode";
-import { CompanyType } from "@prisma/client";
+import {
+  CompanyType,
+  CompanyVerificationMode,
+  CompanyVerificationStatus
+} from "@prisma/client";
 import {
   onboardingFirstStep,
   renderMail,
@@ -807,7 +811,7 @@ describe("Mutation.createCompany", () => {
       orgId: companyInput.vatNumber,
       name: companyInput.companyName,
       companyTypes: companyInput.companyTypes,
-      verificationStatus: "VERIFIED"
+      verificationStatus: CompanyVerificationStatus.VERIFIED
     });
 
     const company = await prisma.company.findFirst({
@@ -868,6 +872,17 @@ describe("Mutation.createCompany", () => {
 
     // Verification letter
     expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(1);
+
+    const company = await prisma.company.findFirst({
+      where: {
+        siret
+      }
+    });
+
+    expect(company?.verificationStatus).toEqual(
+      CompanyVerificationStatus.LETTER_SENT
+    );
+    expect(company?.verificationMode).toEqual(CompanyVerificationMode.LETTER);
   });
 
   it("professional with pro email > should not send email verification letter", async () => {
