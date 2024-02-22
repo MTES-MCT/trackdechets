@@ -40,11 +40,10 @@ async function exitScript() {
       logger.info(
         `Processing page ${pageNumber + 1} with ${
           finalOperationCodeForms.length
-        } Companies`
+        } BSDD`
       );
 
       const jobs = finalOperationCodeForms.map(processedForm => ({
-        name: "operationHook", // Optional
         data: {
           operationId: processedForm.id,
           formId: processedForm.id
