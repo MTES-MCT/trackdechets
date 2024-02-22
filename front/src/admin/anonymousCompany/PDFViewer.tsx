@@ -12,7 +12,7 @@ export const PDFViewer = ({ pdf }) => {
       width="100%"
       height="100%"
       style={{ minHeight: "400px" }}
-      data={`data:application/pdf;base64,${pdf}#zoom=95`}
+      data={`data:application/pdf;base64,${pdf}#zoom=95&navpanes=0`}
       type="application/pdf"
     ></object>
   );
