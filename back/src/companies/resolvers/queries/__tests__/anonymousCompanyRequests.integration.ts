@@ -121,7 +121,7 @@ describe("anonymousCompanyRequests", () => {
 
   it("should return an empty list", async () => {
     // Given
-    const user = await userFactory();
+    await userFactory();
     const admin = await userFactory({ isAdmin: true });
 
     // When

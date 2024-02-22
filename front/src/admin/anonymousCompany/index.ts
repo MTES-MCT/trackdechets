@@ -1,2 +1,2 @@
 export * from "./CreateAnonymousCompany";
-export * from "./AnonymousCompanies";
+export * from "./AnonymousCompaniesRequests";
