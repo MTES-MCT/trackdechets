@@ -91,7 +91,6 @@ export function CreateAnonymousCompanyForm({
         <Form className="fr-my-3w">
           <Field name="siret">
             {({ field, error }) => {
-              <>{JSON.stringify(field, null, 4)}</>;
               return (
                 <Input
                   label="SIRET"
