@@ -12,3 +12,4 @@ export * from "./ROAD_CONTROL";
 export * from "./statuses";
 export * from "./VALIDATION";
 export * from "./WASTES";
+export * from "./emailHelpers";

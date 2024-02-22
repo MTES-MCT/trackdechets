@@ -1,4 +1,9 @@
-import { CompanyType, Prisma } from "@prisma/client";
+import {
+  CompanyType,
+  CompanyVerificationMode,
+  CompanyVerificationStatus,
+  Prisma
+} from "@prisma/client";
 import { convertUrls } from "../../database";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
@@ -25,6 +30,8 @@ import {
 import { UserInputError } from "../../../common/errors";
 import { isForeignTransporter } from "../../validation";
 import { sendFirstOnboardingEmail } from "./verifyCompany";
+import { sendVerificationCodeLetter } from "../../../common/post";
+import { isGenericEmail } from "@td/constants";
 
 /**
  * Create a new company and associate it to a user
@@ -177,8 +184,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   // Foreign transporter: automatically verify (no action needed)
   if (isForeignTransporter({ companyTypes, vatNumber })) {
-    companyCreateInput.verificationMode = "AUTO";
-    companyCreateInput.verificationStatus = "VERIFIED";
+    companyCreateInput.verificationMode = CompanyVerificationMode.AUTO;
+    companyCreateInput.verificationStatus = CompanyVerificationStatus.VERIFIED;
     companyCreateInput.verifiedAt = new Date();
   }
 
@@ -193,7 +200,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     include: { company: true }
   });
   await deleteCachedUserRoles(user.id);
-  const company = companyAssociation.company;
+  let company = companyAssociation.company;
 
   // fill firstAssociationDate field if null (no need to update it if user was previously already associated)
   await prisma.user.updateMany({
@@ -201,17 +208,32 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     data: { firstAssociationDate: new Date() }
   });
 
+  // Company needs to be verified
   if (process.env.VERIFY_COMPANY === "true") {
     if (
       isProfessional(companyTypes) &&
       !isForeignTransporter({ companyTypes, vatNumber })
     ) {
-      await sendMail(
-        renderMail(verificationProcessInfo, {
-          to: [{ email: user.email, name: user.name }],
-          variables: { company }
-        })
-      );
+      // Email is too generic. Automatically send a verification letter
+      if (isGenericEmail(user.email, company.name)) {
+        await sendVerificationCodeLetter(company);
+        company = await prisma.company.update({
+          where: { orgId: company.orgId },
+          data: {
+            verificationStatus: CompanyVerificationStatus.LETTER_SENT,
+            verificationMode: CompanyVerificationMode.LETTER
+          }
+        });
+      }
+      // Verify manually by admin
+      else {
+        await sendMail(
+          renderMail(verificationProcessInfo, {
+            to: [{ email: user.email, name: user.name }],
+            variables: { company }
+          })
+        );
+      }
     }
   }
   if (company.siret && company.address && companyInfo.codeCommune) {

@@ -10,7 +10,11 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { geocode } from "../../../geo/geocode";
-import { CompanyType } from "@prisma/client";
+import {
+  CompanyType,
+  CompanyVerificationMode,
+  CompanyVerificationStatus
+} from "@prisma/client";
 import {
   onboardingFirstStep,
   renderMail,
@@ -22,9 +26,13 @@ import {
   StatutDiffusionEtablissement
 } from "../../../../generated/graphql/types";
 import { searchCompany } from "../../../search";
+import { sendVerificationCodeLetter } from "../../../../common/post";
 
 // Mock external search services
 jest.mock("../../../search");
+
+// Mock email sending service
+jest.mock("../../../../common/post");
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -59,6 +67,7 @@ const CREATE_COMPANY = `
         department
       }
       allowBsdasriTakeOverWithoutSignature
+      verificationStatus
     }
   }
 `;
@@ -801,20 +810,17 @@ describe("Mutation.createCompany", () => {
       vatNumber: companyInput.vatNumber,
       orgId: companyInput.vatNumber,
       name: companyInput.companyName,
-      companyTypes: companyInput.companyTypes
+      companyTypes: companyInput.companyTypes,
+      verificationStatus: CompanyVerificationStatus.VERIFIED
     });
 
-    const newCompany = await prisma.company.findFirst({
+    const company = await prisma.company.findFirst({
       where: {
         orgId: companyInput.vatNumber
       }
     });
-    expect(newCompany).not.toBeUndefined();
 
-    // Company should be verified
-    expect(newCompany?.verificationMode).toBe("AUTO");
-    expect(newCompany?.verifiedAt).not.toBeUndefined();
-    expect(newCompany?.verificationStatus).toBe("VERIFIED");
+    expect(company?.verificationMode).toEqual("AUTO");
 
     jest.mock("../../../../mailer/mailing");
     (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
@@ -827,5 +833,136 @@ describe("Mutation.createCompany", () => {
         to: [{ email: user.email, name: user.name }]
       })
     );
+  });
+
+  it("professional with generic email > should auto send verification letter", async () => {
+    // Given
+    process.env.VERIFY_COMPANY = "true";
+    const user = await userFactory({ email: "user@gmail.com" });
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Transporteur",
+      address: "une adresse",
+      companyTypes: [CompanyType.TRANSPORTER]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    jest.mock("../../../../common/post");
+    (sendVerificationCodeLetter as jest.Mock).mockImplementation(() =>
+      Promise.resolve()
+    );
+
+    // Verification letter
+    expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(1);
+
+    const company = await prisma.company.findFirst({
+      where: {
+        siret
+      }
+    });
+
+    expect(company?.verificationStatus).toEqual(
+      CompanyVerificationStatus.LETTER_SENT
+    );
+    expect(company?.verificationMode).toEqual(CompanyVerificationMode.LETTER);
+  });
+
+  it("professional with pro email > should not send email verification letter", async () => {
+    // Given
+    process.env.VERIFY_COMPANY = "true";
+    const user = await userFactory({ email: "user@dechets.com" });
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Transporteur",
+      address: "une adresse",
+      companyTypes: [CompanyType.TRANSPORTER]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      verificationStatus: "TO_BE_VERIFIED"
+    });
+
+    jest.mock("../../../../common/post");
+    (sendVerificationCodeLetter as jest.Mock).mockImplementation(() =>
+      Promise.resolve()
+    );
+
+    // Verification letter
+    expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(0);
+  });
+
+  it("non-professional > should not send email verification letter", async () => {
+    // Given
+    process.env.VERIFY_COMPANY = "true";
+    const user = await userFactory({ email: "user@gmail.com" });
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Transporteur",
+      address: "une adresse",
+      companyTypes: [CompanyType.PRODUCER]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    jest.mock("../../../../common/post");
+    (sendVerificationCodeLetter as jest.Mock).mockImplementation(() =>
+      Promise.resolve()
+    );
+
+    // Verification letter
+    expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(0);
   });
 });
