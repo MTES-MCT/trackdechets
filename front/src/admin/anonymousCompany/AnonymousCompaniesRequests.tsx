@@ -4,6 +4,7 @@ import Table from "@codegouvfr/react-dsfr/Table";
 import React from "react";
 import { Query } from "@td/codegen-ui";
 import { AnonymousCompaniesRequestsPagination } from "./AnonymousCompaniesRequestsPagination";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 const ANONYMOUS_COMPANY_REQUESTS = gql`
   query AnonymousCompanyRequests($first: Int, $last: Int, $skip: Int) {
@@ -25,11 +26,45 @@ const ANONYMOUS_COMPANY_REQUESTS = gql`
 const REQUESTS_PER_PAGE = 10;
 
 export const AnonymousCompaniesRequests = () => {
-  const { loading, error, data, refetch } = useQuery<
+  const { error, data, refetch } = useQuery<
     Pick<Query, "anonymousCompanyRequests">
   >(ANONYMOUS_COMPANY_REQUESTS, {
     variables: { first: REQUESTS_PER_PAGE, skip: 0 }
   });
+
+  const tableData =
+    data?.anonymousCompanyRequests.anonymousCompanyRequests.map(request => [
+      request.siret,
+      request.name,
+      request.address,
+      request.codeNaf,
+      "",
+      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+        <Button onClick={function noRefCheck() {}} priority="primary">
+          Vérifier
+        </Button>
+      </div>
+    ]) ?? [];
+
+  const tableHeaders = [
+    "SIRET",
+    "Raison sociale",
+    "Adresse",
+    "Code NAF",
+    "Mail",
+    "Action"
+  ];
+
+  if (error) {
+    return (
+      <Alert
+        closable
+        title={"Une erreur inattendue s'est produite"}
+        description={error.message}
+        severity="error"
+      />
+    );
+  }
 
   return (
     <>
@@ -51,16 +86,8 @@ export const AnonymousCompaniesRequests = () => {
           </Button>
         </div>
       </div>
-      <Table
-        data={
-          data?.anonymousCompanyRequests.anonymousCompanyRequests.map(
-            request => [request.siret, request.name, "", ""]
-          ) ?? []
-        }
-        headers={["SIRET", "Raison sociale", "Mail", "Action"]}
-        fixed
-        noCaption
-      />
+
+      <Table data={tableData} headers={tableHeaders} fixed noCaption />
 
       <AnonymousCompaniesRequestsPagination
         totalCount={data?.anonymousCompanyRequests.totalCount}
