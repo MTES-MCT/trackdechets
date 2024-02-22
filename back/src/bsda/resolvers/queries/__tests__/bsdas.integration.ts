@@ -22,6 +22,11 @@ const GET_BSDAS = `
           forwarding {
             id
           }
+          transporter {
+            company {
+              siret
+            }
+          }
           metadata {
             latestRevision {
               authoringCompany {
@@ -45,6 +50,21 @@ describe("Query.bsdas", () => {
       opt: {
         emitterCompanySiret: company.siret
       }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
+      GET_BSDAS
+    );
+
+    expect(data.bsdas.edges.length).toBe(1);
+  });
+
+  it("should return bsdas associated with the user company if he is transporter", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    await bsdaFactory({
+      opt: { transportersOrgIds: [company.siret!] },
+      transporterOpt: { transporterCompanySiret: company.siret }
     });
 
     const { query } = makeClient(user);
@@ -183,6 +203,7 @@ describe("Query.bsdas", () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
 
     await bsdaFactory({
+      opt: { transportersOrgIds: [company.siret!] },
       transporterOpt: {
         transporterCompanySiret: company.siret
       }
@@ -370,5 +391,24 @@ describe("Query.bsdas", () => {
     expect(
       data.bsdas.edges[0].node.metadata.latestRevision?.authoringCompany?.siret
     ).toBe(emitter.company.siret);
+  });
+
+  it("should return transporter of bsdas associated with the user company", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
+      GET_BSDAS
+    );
+
+    expect(data.bsdas.edges.length).toBe(1);
+    expect(data.bsdas.edges[0].node.transporter?.company?.siret).toBe(
+      bsda.transporters[0].transporterCompanySiret
+    );
   });
 });

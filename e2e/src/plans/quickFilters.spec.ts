@@ -244,7 +244,7 @@ test.describe.serial("Cahier des filtres rapides", async () => {
     const DEFAULT_COMPANY_I_RESULTS = [bsvhu1];
     const DEFAULT_COMPANY_J_RESULTS = [bsdd1, bsdd4, bsda1, bsda3, bsff1];
 
-    await test.step("N° de BSD / contenant (et numéro libre)", async () => {
+    await test.step("N° libre / BSD / contenant (et numéro libre)", async () => {
       const scenarios = [
         {
           desc: "Etat initial",
@@ -310,7 +310,7 @@ test.describe.serial("Cahier des filtres rapides", async () => {
       await testScenarios(
         page,
         scenarios,
-        "N° de BSD / contenant",
+        "N° libre / BSD / contenant",
         DEFAULT_COMPANY_A_RESULTS
       );
     });
@@ -512,7 +512,7 @@ test.describe.serial("Cahier des filtres rapides", async () => {
 
         // User 1st filter
         await quickFilter(page, {
-          label: "N° de BSD / contenant",
+          label: "N° libre / BSD / contenant",
           value: "BSDA-"
         });
         await expectFilteredResults(page, [bsda1, bsda2]);
@@ -526,7 +526,10 @@ test.describe.serial("Cahier des filtres rapides", async () => {
 
         // Test reset
         await quickFilter(page, { label: "Nom de chantier", value: "" });
-        await quickFilter(page, { label: "N° de BSD / contenant", value: "" });
+        await quickFilter(page, {
+          label: "N° libre / BSD / contenant",
+          value: ""
+        });
         await expectFilteredResults(page, DEFAULT_COMPANY_A_RESULTS);
       });
     });
@@ -540,7 +543,7 @@ test.describe.serial("Cahier des filtres rapides", async () => {
 
         // User filter
         await quickFilter(page, {
-          label: "N° de BSD / contenant",
+          label: "N° libre / BSD / contenant",
           value: "BSDA-"
         });
         await expectFilteredResults(page, [bsda1, bsda2]);
@@ -549,7 +552,7 @@ test.describe.serial("Cahier des filtres rapides", async () => {
         // filtered accordingly
         await selectBsdMenu(page, "Suivi");
         await expectQuickFilterValue(page, {
-          label: "N° de BSD / contenant",
+          label: "N° libre / BSD / contenant",
           value: "BSDA-"
         });
         await expectFilteredResults(page, [bsda1]);
@@ -557,7 +560,7 @@ test.describe.serial("Cahier des filtres rapides", async () => {
         // And another one
         await selectBsdMenu(page, "Archives");
         await expectQuickFilterValue(page, {
-          label: "N° de BSD / contenant",
+          label: "N° libre / BSD / contenant",
           value: "BSDA-"
         });
         await expectFilteredResults(page, [bsda2]);
@@ -566,7 +569,7 @@ test.describe.serial("Cahier des filtres rapides", async () => {
         // filtered accordingly
         await selectCompany(page, companies.companyJ.siret);
         await expectQuickFilterValue(page, {
-          label: "N° de BSD / contenant",
+          label: "N° libre / BSD / contenant",
           value: "BSDA-"
         });
         await expectFilteredResults(page, [bsda1, bsda3]);

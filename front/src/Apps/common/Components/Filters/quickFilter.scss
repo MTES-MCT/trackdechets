@@ -1,0 +1,9 @@
+.quickFilter {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.quickFilter > * {
+  flex: 1;
+}

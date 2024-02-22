@@ -449,15 +449,6 @@ function MobileSubNav({ currentCompany }) {
 }
 
 const getDesktopMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
-  const common = [
-    {
-      caption: "Aide",
-      href: "https://faq.trackdechets.fr/",
-      navlink: null,
-      target: "_blank"
-    }
-  ];
-
   const admin = [
     {
       caption: "Admin",
@@ -491,11 +482,7 @@ const getDesktopMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
     }
   ];
 
-  return [
-    ...(isAuthenticated ? connected : []),
-    ...common,
-    ...(isAdmin ? admin : [])
-  ];
+  return [...(isAuthenticated ? connected : []), ...(isAdmin ? admin : [])];
 };
 
 type HeaderProps = {
@@ -623,11 +610,33 @@ export default function Header({
         <MainNavigation
           items={[
             {
-              linkProps: {
-                href: "https://faq.trackdechets.fr/",
-                target: "_blank"
-              },
-              text: "Aide"
+              text: "Aide",
+              menuLinks: [
+                {
+                  linkProps: {
+                    href: "https://faq.trackdechets.fr/",
+                    target: "_blank",
+                    rel: "noreferrer"
+                  },
+                  text: "Foire aux questions"
+                },
+                {
+                  linkProps: {
+                    href: "https://sandbox.trackdechets.beta.gouv.fr/",
+                    target: "_blank",
+                    rel: "noreferrer"
+                  },
+                  text: "Site de démonstration"
+                },
+                {
+                  linkProps: {
+                    href: "https://trackdechets.beta.gouv.fr/",
+                    target: "_blank",
+                    rel: "noreferrer"
+                  },
+                  text: "Page d'accueil / Formations"
+                }
+              ]
             }
           ]}
         />
@@ -663,6 +672,50 @@ export default function Header({
                   <MenuLink entry={e} />
                 </li>
               ))}
+
+              <li className="fr-nav__item">
+                <button
+                  className="fr-nav__btn"
+                  aria-expanded="false"
+                  aria-controls="aidemenu"
+                >
+                  Aide
+                </button>
+                <div className="fr-collapse fr-menu" id="aidemenu">
+                  <ul className="fr-menu__list">
+                    <li>
+                      <a
+                        className="fr-nav__link"
+                        href="https://faq.trackdechets.fr/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Foire aux questions
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="fr-nav__link"
+                        href="https://sandbox.trackdechets.beta.gouv.fr/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Site de démonstration
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="fr-nav__link"
+                        href="https://trackdechets.beta.gouv.fr/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Page d'accueil / Formations
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
             </ul>
           </nav>
 

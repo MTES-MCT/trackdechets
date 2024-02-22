@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Field, Form, useFormikContext } from "formik";
 import {
   PROCESSING_AND_REUSE_OPERATIONS,
-  PROCESSING_OPERATIONS_GROUPEMENT_CODES
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
+  isDangerous
 } from "@td/constants";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import CompanySelector from "../../../../../form/common/components/company/CompanySelector";
@@ -95,6 +96,21 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   ]);
 
   const TODAY = new Date();
+  const isFRCompany = Boolean(nextDestination?.company?.siret);
+  const showNotificationNumber =
+    (!isFRCompany && noTraceability) || isExtraEuropeanCompany;
+  const isDangerousWaste = isDangerous(form.wasteDetails?.code ?? "");
+  const isPop = form?.wasteDetails?.pop;
+  const notificationNumberPlaceHolder =
+    isDangerousWaste || isPop ? "PP AAAA DDDRRR" : "A7E AAAA DDDRRR";
+  const notificationNumberLabel =
+    isDangerousWaste || isPop
+      ? "Numéro de notification"
+      : "Numéro de déclaration Annexe 7 (optionnel)";
+  const notificationNumberTooltip =
+    isDangerousWaste || isPop
+      ? "En cas d'export, indiquer ici le N° de notification prévu à l'annexe 1-B du règlement N°1013/2006, au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre."
+      : "En cas d'export, indiquer ici le N° de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export (ou A7I pour Annexe 7 Import), AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre. ";
 
   return (
     <Form>
@@ -235,18 +251,21 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
             />
           )}
           <div className="form__row">
-            <label>
-              Numéro de notification ou de document{" "}
-              {!isExtraEuropeanCompany ? "(optionnel)" : ""}{" "}
-              <Tooltip msg="En cas d'export, indiquer ici le N° du document prévu ou le numéro de notification prévue à l'annexe I-B du règlement N°1013/2006 - Format PPNNNN (PP: code pays NNNN: numéro d'ordre)" />
-            </label>
-            <Field
-              type="text"
-              name="nextDestination.notificationNumber"
-              className="td-input"
-              placeholder="PPNNNN (PP: code pays, NNNN: numéro d'ordre)"
-              required={isExtraEuropeanCompany}
-            />
+            {showNotificationNumber && (
+              <>
+                <label>
+                  {notificationNumberLabel}
+                  <Tooltip msg={notificationNumberTooltip} />
+                </label>
+                <Field
+                  type="text"
+                  name="nextDestination.notificationNumber"
+                  className="td-input"
+                  placeholder={notificationNumberPlaceHolder}
+                  required={isExtraEuropeanCompany}
+                />
+              </>
+            )}
             {isExtraEuropeanCompany && (
               <ExtraEuropeanCompanyManualInput
                 name="nextDestination.company"

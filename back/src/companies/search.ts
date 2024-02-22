@@ -194,11 +194,22 @@ export async function searchCompany(
 // used for dependency injection in tests to easily mock `searchCompany`
 export const makeSearchCompanies =
   ({ injectedSearchCompany, injectedSearchCompanies }: SearchCompaniesDeps) =>
-  (
+  async (
     clue: string,
     department?: string | null,
     allowForeignCompanies?: boolean | null
   ): Promise<CompanySearchResult[]> => {
+    // Special case to handle "siret1,siret2,siret3"
+    const splittedClue = clue.split(",").map(cleanClue);
+    if (splittedClue.length > 1 && splittedClue.every(c => isSiret(c))) {
+      const searchResults = await Promise.all(
+        splittedClue.map(injectedSearchCompany)
+      );
+      return searchResults.filter(
+        c => c.etatAdministratif && c.etatAdministratif === "A"
+      );
+    }
+
     const cleanedClue = cleanClue(clue);
     // clue can be formatted like a SIRET or a VAT number
     if (isSiret(cleanedClue) || isVat(cleanedClue)) {

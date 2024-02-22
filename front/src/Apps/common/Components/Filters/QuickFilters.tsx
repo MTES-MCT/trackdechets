@@ -5,6 +5,7 @@ import { useMedia } from "../../../../common/use-media";
 import { MEDIA_QUERIES } from "../../../../common/config";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { debounce } from "../../../../common/helper";
+import "./quickFilters.scss";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -44,7 +45,9 @@ const QuickFilters = ({ onApplyFilters, filters }: QuickFiltersProp) => {
         .filter(filter => filter.isActive)
         .map(filter => (
           <div
-            className={"fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl"}
+            className={
+              "fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl quickFilters"
+            }
             key={`quickFilter-${filter.name}`}
           >
             <QuickFilter

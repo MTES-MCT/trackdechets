@@ -1,0 +1,1 @@
+ALTER TYPE "default$default"."CompanyVerificationMode" ADD VALUE 'AUTO';

@@ -107,6 +107,7 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
       brokerRecepisseNumber: brokerReceipt.receiptNumber,
       brokerRecepisseDepartment: brokerReceipt.department,
       brokerRecepisseValidityLimit: brokerReceipt.validityLimit,
+      transportersOrgIds: [transporter.company.siret!],
       ...opt
     },
     transporterOpt: {
@@ -213,6 +214,7 @@ describe("Mutation.Bsda.duplicate", () => {
       workerCertificationCertificationNumber,
       workerCertificationValidityLimit,
       workerCertificationOrganisation,
+      transportersOrgIds,
       ...rest
     } = bsda;
 
@@ -346,7 +348,8 @@ describe("Mutation.Bsda.duplicate", () => {
       workerCertificationHasSubSectionThree,
       workerCertificationCertificationNumber,
       workerCertificationValidityLimit,
-      workerCertificationOrganisation
+      workerCertificationOrganisation,
+      transportersOrgIds
     });
 
     expect(duplicatedTransporter).toMatchObject({

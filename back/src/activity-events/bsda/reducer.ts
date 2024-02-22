@@ -32,6 +32,7 @@ export function bsdaReducer(
         intermediaries,
         intermediariesOrgIds,
         transporters,
+        forwarding,
         ...bsda
       } = event.data;
 

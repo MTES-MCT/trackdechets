@@ -20,7 +20,10 @@ import {
   InitialFormFraction,
   Query,
   QueryCompanyPrivateInfosArgs,
-  OperationMode
+  OperationMode,
+  QuerySearchCompaniesArgs,
+  CompanyType,
+  UserPermission
 } from "@td/codegen-ui";
 import { emitterTypeLabels, getTransportModeLabel } from "../../constants";
 import {
@@ -64,11 +67,15 @@ import {
 } from "@td/constants";
 import { Appendix1ProducerForm } from "../../../form/bsdd/appendix1Producer/form";
 import { useQuery } from "@apollo/client";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../Apps/common/queries/company/query";
+import {
+  COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS,
+  SEARCH_COMPANIES
+} from "../../../Apps/common/queries/company/query";
 import { formTransportIsPipeline } from "../../../form/bsdd/utils/packagings";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
 import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
+import { usePermissions } from "../../../common/contexts/PermissionsContext";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -471,6 +478,7 @@ const Appendix1 = ({
   container: Form;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { permissions } = usePermissions();
 
   const { data } = useQuery<
     Pick<Query, "companyPrivateInfos">,
@@ -485,6 +493,40 @@ const Appendix1 = ({
     : [];
 
   const formToBsdDisplay = mapBsdd(container);
+
+  const hasEcoOrganisme = Boolean(container.ecoOrganisme?.siret);
+  const { data: companiesInfos } = useQuery<
+    Pick<Query, "searchCompanies">,
+    QuerySearchCompaniesArgs
+  >(SEARCH_COMPANIES, {
+    variables: {
+      clue:
+        container?.grouping
+          ?.map(g => g.form.emitter?.company?.siret)
+          .filter(Boolean)
+          .join(",") ?? ""
+    },
+    skip: !container?.grouping?.length || !hasEcoOrganisme
+  });
+
+  const canSkipEmission =
+    container?.grouping?.reduce((dic, { form }) => {
+      const emitterSiret = form.emitter?.company?.siret;
+      const siretIsExutoire =
+        emitterSiret != null &&
+        [CompanyType.Wasteprocessor, CompanyType.Collector].every(
+          profile =>
+            !companiesInfos?.searchCompanies
+              ?.find(sc => sc.siret === emitterSiret)
+              ?.companyTypes?.includes(profile as CompanyType)
+        );
+      dic[form.readableId] =
+        (hasEcoOrganisme && !siretIsExutoire) ||
+        siretsWithAutomaticSignature.includes(emitterSiret) ||
+        Boolean(form.emitter?.isPrivateIndividual);
+      return dic;
+    }, {}) ?? {};
+
   return (
     <div className="tw-w-full">
       {container.status === FormStatus.Draft && (
@@ -497,7 +539,8 @@ const Appendix1 = ({
       {[FormStatus.Sealed, FormStatus.Sent].some(
         status => status === container.status
       ) &&
-        canAddAppendix1(formToBsdDisplay) && (
+        canAddAppendix1(formToBsdDisplay) &&
+        permissions.includes(UserPermission.BsdCanUpdate) && (
           <div className="tw-pb-2 tw-flex tw-justify-end">
             <button
               type="button"
@@ -540,12 +583,7 @@ const Appendix1 = ({
                     siret={siret}
                     form={form as any}
                     options={{
-                      canSkipEmission:
-                        Boolean(container.ecoOrganisme?.siret) ||
-                        siretsWithAutomaticSignature.includes(
-                          form.emitter?.company?.siret
-                        ) ||
-                        Boolean(form.emitter?.isPrivateIndividual)
+                      canSkipEmission: canSkipEmission[form.readableId]
                     }}
                   />
                 </td>
@@ -585,6 +623,7 @@ export default function BSDDetailContent({
   const { siret } = useParams<{ siret: string }>();
   const query = useQueryString();
   const navigate = useNavigate();
+  const { permissions } = usePermissions();
   const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
   const [duplicate, { loading: isDuplicating }] = useDuplicate({
@@ -608,9 +647,10 @@ export default function BSDDetailContent({
     form?.emitter?.type === EmitterType.Appendix1Producer;
 
   const canDelete =
-    [FormStatus.Draft, FormStatus.Sealed].includes(form.status) ||
-    (form.status === FormStatus.SignedByProducer &&
-      siret === form.emitter?.company?.orgId);
+    ([FormStatus.Draft, FormStatus.Sealed].includes(form.status) ||
+      (form.status === FormStatus.SignedByProducer &&
+        siret === form.emitter?.company?.orgId)) &&
+    permissions.includes(UserPermission.BsdCanDelete);
 
   const canUpdate =
     [
@@ -619,7 +659,8 @@ export default function BSDDetailContent({
       FormStatus.SignedByProducer,
       FormStatus.Sent
     ].includes(form.status) &&
-    EmitterType.Appendix1Producer !== form.emitter?.type;
+    EmitterType.Appendix1Producer !== form.emitter?.type &&
+    permissions.includes(UserPermission.BsdCanUpdate);
 
   return (
     <>

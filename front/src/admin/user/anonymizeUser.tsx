@@ -19,7 +19,7 @@ function AnonymizeUser() {
   >(ANONYMIZE_USER);
 
   return (
-    <div className="tw-mx-2">
+    <div>
       <Formik
         initialValues={{
           id: ""

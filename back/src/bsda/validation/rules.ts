@@ -3,14 +3,20 @@ import {
   TransportMode,
   WasteAcceptationStatus
 } from "@prisma/client";
-import { RefinementCtx, z } from "zod";
 import { BsdaSignatureType } from "../../generated/graphql/types";
-import { ZodBsda } from "./schema";
+import { ParsedZodBsda, ZodBsda } from "./schema";
 import { isForeignVat } from "@td/constants";
-import { capitalize } from "../../common/strings";
-import { getUserFunctions } from "./helpers";
+import {
+  getCurrentSignatureType,
+  getSignatureAncestors,
+  getUpdatedFields,
+  getBsdaUserFunctions,
+  BsdaUserFunctions
+} from "./helpers";
 import { getOperationModesFromOperationCode } from "../../common/operationModes";
-import { UnparsedInputs } from ".";
+import { capitalize } from "../../common/strings";
+import { SealedFieldError } from "../../common/errors";
+import { BsdaValidationContext } from "./types";
 
 export type EditableBsdaFields = Required<
   Omit<
@@ -27,30 +33,44 @@ export type EditableBsdaFields = Required<
     | "workerWorkSignatureAuthor"
     | "workerWorkSignatureDate"
     | "intermediariesOrgIds"
+    | "transportersOrgIds"
     | "transporterId"
   >
 >;
 
-type PersistedBsda = Pick<UnparsedInputs, "persisted">["persisted"];
-export type CheckFn = (
-  val: ZodBsda,
-  persistedBsda: PersistedBsda,
-  userFunctions: UserFunctions
+export type RequiredCheckFn = (
+  // BSDA sur lequel s'applique le parsing Zod
+  bsda: ZodBsda
 ) => boolean;
 
-export type FieldCheck<Key extends keyof EditableBsdaFields> = {
+export type SealedCheckFn = (
+  // BSDA modifié, résultant de la fusion entre les données en base et les données de l'input
+  bsda: ZodBsda,
+  // BSDA persisté en base - avant modification
+  persisted: ZodBsda,
+  // Liste des "rôles" que l'utilisateur a sur le BSDA (ex: émetteur, transporteur, etc).
+  // Permet de conditionner un check a un rôle. Ex: "Ce champ est modifiable mais uniquement par l'émetteur"
+  userFunctions: BsdaUserFunctions
+) => boolean;
+
+// Permet de définir d'une même façon deux types de règles d'édition :
+// - Vérification sur le vérrouillage des champs.
+// - Vérification sur la présence requise des champs.
+export type EditionRule<CheckFn> = {
+  // Signature à partir de laquelle le champ est verrouillé / requis.
   from: BsdaSignatureType;
+  // Condition supplémentaire à vérifier pour que le champ soit verrouillé / requis.
   when?: CheckFn;
-  superRefine?: (val: ZodBsda[Key], ctx: RefinementCtx) => void; // For state specific validation rules. eg array must have length > 0 when the field is required
-  suffix?: string; // A custom message at the end of the error
+  // A custom message at the end of the error
+  suffix?: string;
 };
 
 export type EditionRules = {
   [Key in keyof EditableBsdaFields]: {
     // At what signature the field is sealed, and under which circumstances
-    sealed: FieldCheck<Key>;
+    sealed: EditionRule<SealedCheckFn>;
     // At what signature the field is required, and under which circumstances. If absent, field is never required
-    required?: FieldCheck<Key>;
+    required?: EditionRule<RequiredCheckFn>;
     readableFieldName?: string; // A custom field name for errors
   };
 };
@@ -84,7 +104,10 @@ export const editionRules: EditionRules = {
   },
   emitterCompanyContact: {
     readableFieldName: "le nom de contact de l'entreprise émettrice",
-    sealed: { from: "EMISSION", when: isSealedForEmitter },
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    },
     required: {
       from: "EMISSION",
       when: bsda => !bsda.emitterIsPrivateIndividual
@@ -92,7 +115,10 @@ export const editionRules: EditionRules = {
   },
   emitterCompanyPhone: {
     readableFieldName: "le téléphone de l'entreprise émettrice",
-    sealed: { from: "EMISSION", when: isSealedForEmitter },
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    },
     required: {
       from: "EMISSION",
       when: bsda => !bsda.emitterIsPrivateIndividual
@@ -100,7 +126,10 @@ export const editionRules: EditionRules = {
   },
   emitterCompanyMail: {
     readableFieldName: "l'email de l'entreprise émettrice",
-    sealed: { from: "EMISSION", when: isSealedForEmitter },
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    },
     required: {
       from: "EMISSION",
       when: bsda => !bsda.emitterIsPrivateIndividual
@@ -109,27 +138,45 @@ export const editionRules: EditionRules = {
   emitterCustomInfo: {
     readableFieldName:
       "les champs d'informations complémentaires de l'entreprise émettrice",
-    sealed: { from: "EMISSION", when: isSealedForEmitter }
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    }
   },
   emitterPickupSiteName: {
     readableFieldName: "le nom de l'adresse de chantier ou de collecte",
-    sealed: { from: "EMISSION", when: isSealedForEmitter }
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    }
   },
   emitterPickupSiteAddress: {
     readableFieldName: "l'adresse de collecte ou de chantier",
-    sealed: { from: "EMISSION", when: isSealedForEmitter }
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    }
   },
   emitterPickupSiteCity: {
     readableFieldName: "la ville de l'adresse de collecte ou de chantier",
-    sealed: { from: "EMISSION", when: isSealedForEmitter }
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    }
   },
   emitterPickupSitePostalCode: {
     readableFieldName: "le code postal de l'adresse de collecte ou de chantier",
-    sealed: { from: "EMISSION", when: isSealedForEmitter }
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    }
   },
   emitterPickupSiteInfos: {
     readableFieldName: "les informations de l'adresse de collecte",
-    sealed: { from: "EMISSION", when: isSealedForEmitter }
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    }
   },
   ecoOrganismeName: {
     readableFieldName: "le nom de l'éco-organisme",
@@ -457,16 +504,7 @@ export const editionRules: EditionRules = {
     required: {
       from: "TRANSPORT",
       when: bsda =>
-        hasTransporter(bsda) && bsda.transporterTransportMode === "ROAD",
-      superRefine(val, ctx) {
-        if (val.filter(Boolean).length === 0) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "La plaque d'immatriculation est requise",
-            path: ["transporterTransportPlates"]
-          });
-        }
-      }
+        hasTransporter(bsda) && bsda.transporterTransportMode === "ROAD"
     }
   },
   transporterTransportTakenOverAt: {
@@ -482,7 +520,10 @@ export const editionRules: EditionRules = {
   },
   workerCompanyName: {
     readableFieldName: "le nom de l'entreprise de travaux",
-    sealed: { from: "EMISSION", when: isSealedForEmitter },
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    },
     required: {
       from: "EMISSION",
       when: hasWorker
@@ -490,7 +531,10 @@ export const editionRules: EditionRules = {
   },
   workerCompanySiret: {
     readableFieldName: "le SIRET de l'entreprise de travaux",
-    sealed: { from: "EMISSION", when: isSealedForEmitter },
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    },
     required: {
       from: "EMISSION",
       when: hasWorker
@@ -498,7 +542,10 @@ export const editionRules: EditionRules = {
   },
   workerCompanyAddress: {
     readableFieldName: "l'adresse de l'entreprise de travaux",
-    sealed: { from: "EMISSION", when: isSealedForEmitter },
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    },
     required: {
       from: "EMISSION",
       when: hasWorker
@@ -603,7 +650,10 @@ export const editionRules: EditionRules = {
     sealed: { from: "OPERATION" }
   },
   wasteCode: {
-    sealed: { from: "EMISSION", when: isSealedForEmitter },
+    sealed: {
+      from: "EMISSION",
+      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+    },
     required: { from: "EMISSION" },
     readableFieldName: "le code déchet"
   },
@@ -636,18 +686,7 @@ export const editionRules: EditionRules = {
   packagings: {
     sealed: { from: "WORK" },
     required: {
-      from: "WORK",
-      superRefine(val, ctx) {
-        if (val.length === 0) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.too_small,
-            type: "array",
-            minimum: 1,
-            inclusive: true,
-            message: "Le conditionnement est obligatoire"
-          });
-        }
-      }
+      from: "WORK"
     },
     readableFieldName: "le conditionnement"
   },
@@ -707,16 +746,12 @@ function isNotRefused(bsda: ZodBsda) {
  * The emitter has special rights to edit several fields after he signed,
  * and until other signatures are applied.
  */
-function isSealedForEmitter(
-  val: ZodBsda,
-  persistedBsda: PersistedBsda,
-  userFunctions: UserFunctions
-) {
-  const isSealedForEmitter = hasWorker(val)
-    ? val.workerWorkSignatureDate != null
-    : val.transporterTransportSignatureDate != null;
+function isSealedForEmitter(bsda: ZodBsda, { isEmitter }: BsdaUserFunctions) {
+  const isSealedForEmitter = hasWorker(bsda)
+    ? bsda.workerWorkSignatureDate != null
+    : bsda.transporterTransportSignatureDate != null;
 
-  if (userFunctions.isEmitter && !isSealedForEmitter) {
+  if (isEmitter && !isSealedForEmitter) {
     return false;
   }
 
@@ -724,28 +759,28 @@ function isSealedForEmitter(
 }
 
 function isDestinationSealed(
-  val: ZodBsda,
-  persistedBsda: PersistedBsda,
-  userFunctions: UserFunctions
+  bsda: ZodBsda,
+  persisted: ZodBsda,
+  userFunctions: BsdaUserFunctions
 ) {
-  if (!isSealedForEmitter(val, persistedBsda, userFunctions)) {
+  if (!isSealedForEmitter(bsda, userFunctions)) {
     return false;
   }
 
   // If I am worker, transporter or destination and the transporter hasn't signed,
   // then I can either add or remove a nextDestination. To do so I need to edit the destination.
   const isAddingNextDestination =
-    !persistedBsda?.destinationOperationNextDestinationCompanySiret &&
-    val.destinationOperationNextDestinationCompanySiret;
+    !persisted?.destinationOperationNextDestinationCompanySiret &&
+    bsda.destinationOperationNextDestinationCompanySiret;
   const isRemovingNextDestination =
-    persistedBsda?.destinationOperationNextDestinationCompanySiret &&
-    !val.destinationOperationNextDestinationCompanySiret;
+    persisted?.destinationOperationNextDestinationCompanySiret &&
+    !bsda.destinationOperationNextDestinationCompanySiret;
   if (
     (userFunctions.isEmitter ||
       userFunctions.isWorker ||
       userFunctions.isTransporter ||
       userFunctions.isDestination) &&
-    val.transporterTransportSignatureDate == null &&
+    bsda.transporterTransportSignatureDate == null &&
     (isAddingNextDestination || isRemovingNextDestination)
   ) {
     return false;
@@ -754,46 +789,41 @@ function isDestinationSealed(
   return true;
 }
 
-function noop() {
-  // do nothing.
-}
-
-type UserFunctions = Awaited<ReturnType<typeof getUserFunctions>>;
-type CheckParams = {
-  bsda: ZodBsda;
-  persistedBsda: PersistedBsda;
-  updatedFields: string[];
-  userFunctions: UserFunctions;
-  signaturesToCheck: BsdaSignatureType[];
-};
-
-type RulesEntries = {
+export type RulesEntries = {
   [K in keyof EditionRules]: [K, EditionRules[K]];
 }[keyof EditionRules][];
 
-export function checkSealedAndRequiredFields(
-  {
-    bsda,
-    persistedBsda,
-    updatedFields,
-    userFunctions,
-    signaturesToCheck
-  }: CheckParams,
-  ctx: RefinementCtx
+/**
+ * Cette fonction permet de vérifier qu'un utilisateur n'est pas
+ * en train d'essayer de modifier des données qui ont été verrouillée
+ * par une signature
+ * @param bsda BSDA persisté en base
+ * @param update Modifications qui sont apportées par l'input
+ * @param user Utilisateur qui effectue la modification
+ */
+export async function checkSealedFields(
+  bsda: ZodBsda,
+  update: ZodBsda,
+  context: BsdaValidationContext
 ) {
-  for (const [field, rule] of Object.entries(editionRules) as RulesEntries) {
-    // Apply default values to rules
+  const sealedFieldErrors: string[] = [];
+
+  const updatedFields = getUpdatedFields(bsda, update);
+
+  const currentSignatureType =
+    context.currentSignatureType ?? getCurrentSignatureType(bsda);
+
+  // Some signatures may be skipped, so always check all the hierarchy
+  const signaturesToCheck = getSignatureAncestors(currentSignatureType);
+
+  const userFunctions = await getBsdaUserFunctions(context.user, bsda);
+
+  for (const field of updatedFields) {
+    const rule = editionRules[field as keyof EditableBsdaFields];
     const sealedRule = {
       from: rule.sealed.from,
       when: rule.sealed.when ?? (() => true), // Default to true
-      superRefine: rule.sealed.superRefine ?? noop, // Default to no-op
       suffix: rule.sealed.suffix
-    };
-    const requiredRule = {
-      from: rule.required?.from ?? "NO_CHECK_RULE",
-      when: rule.required?.when ?? (() => true), // Default to true
-      superRefine: rule.required?.superRefine ?? noop, // Default to no-op
-      suffix: rule.required?.suffix
     };
 
     const fieldDescription = rule.readableFieldName
@@ -802,55 +832,45 @@ export function checkSealedAndRequiredFields(
 
     const isSealed =
       signaturesToCheck.includes(sealedRule.from) &&
-      sealedRule.when(bsda, persistedBsda, userFunctions);
-    if (isSealed) {
-      if (updatedFields.includes(field)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: [field],
-          message: [
-            `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
-            sealedRule.suffix
-          ]
-            .filter(Boolean)
-            .join(" ")
-        });
-      }
-      // @ts-expect-error TODO: superRefineWhenSealed first param is inferred as never ?
-      sealedRule.superRefine(bsda[field], ctx);
-    }
+      sealedRule.when({ ...bsda, ...update }, bsda, userFunctions);
 
-    const isRequired =
-      signaturesToCheck.includes(requiredRule.from) &&
-      requiredRule.when(bsda, persistedBsda, userFunctions);
-    if (isRequired) {
-      if (bsda[field] == null) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: [field],
-          message: [`${fieldDescription} est obligatoire.`, requiredRule.suffix]
-            .filter(Boolean)
-            .join(" ")
-        });
-      }
-      // @ts-expect-error TODO: superRefineWhenSealed first param is inferred as never ?
-      requiredRule.superRefine(bsda[field], ctx);
+    if (isSealed) {
+      sealedFieldErrors.push(
+        [
+          `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
+          sealedRule.suffix
+        ]
+          .filter(Boolean)
+          .join(" ")
+      );
     }
   }
+
+  if (sealedFieldErrors?.length > 0) {
+    throw new SealedFieldError([...new Set(sealedFieldErrors)]);
+  }
+
+  return Promise.resolve(updatedFields);
 }
 
-export function getSealedFields({
-  bsda,
-  persistedBsda,
-  userFunctions,
-  signaturesToCheck
-}: Omit<CheckParams, "updatedFields">) {
-  return Object.entries(editionRules)
+export async function getSealedFields(
+  bsda: ParsedZodBsda,
+  context: BsdaValidationContext
+) {
+  const currentSignatureType =
+    context.currentSignatureType ?? getCurrentSignatureType(bsda);
+  // Some signatures may be skipped, so always check all the hierarchy
+  const signaturesToCheck = getSignatureAncestors(currentSignatureType);
+
+  const userFunctions = await getBsdaUserFunctions(context.user, bsda);
+
+  const sealedFields = Object.entries(editionRules)
     .filter(
       ([_, rule]) =>
         signaturesToCheck.includes(rule.sealed.from) &&
-        (!rule.sealed.when ||
-          rule.sealed.when(bsda, persistedBsda, userFunctions))
+        (!rule.sealed.when || rule.sealed.when(bsda, bsda, userFunctions))
     )
     .map(([field]) => field as keyof EditionRules);
+
+  return sealedFields;
 }
