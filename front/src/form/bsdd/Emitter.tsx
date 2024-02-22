@@ -157,13 +157,7 @@ export default function Emitter({ disabled }) {
               className="td-checkbox"
               onChange={e => {
                 handleChange(e);
-                setFieldValue("emitter.company.siret", null);
-                setFieldValue("emitter.company.vatNumber", null);
-                setFieldValue("emitter.company.omiNumber", null);
-                setFieldValue("emitter.company.contact", null);
-                setFieldValue("emitter.company.name", null);
-                setFieldValue("emitter.company.address", null);
-                setFieldValue("emitter.company.country", null);
+                setFieldValue("emitter.company", null);
                 setFieldValue("emitter.isForeignShip", false);
               }}
             />
@@ -177,12 +171,7 @@ export default function Emitter({ disabled }) {
               className="td-checkbox"
               onChange={e => {
                 handleChange(e);
-                setFieldValue("emitter.company.siret", null);
-                setFieldValue("emitter.company.vatNumber", null);
-                setFieldValue("emitter.company.contact", null);
-                setFieldValue("emitter.company.name", null);
-                setFieldValue("emitter.company.address", null);
-                setFieldValue("emitter.company.country", null);
+                setFieldValue("emitter.company", null);
                 setFieldValue("emitter.isPrivateIndividual", false);
               }}
             />
