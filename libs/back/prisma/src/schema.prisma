@@ -288,6 +288,7 @@ model AnonymousCompanyRequest {
   name        String
   codeNaf     String
   address     String
+  codeCommune String
 }
 
 model CompanyAssociation {

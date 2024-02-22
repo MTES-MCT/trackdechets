@@ -18,14 +18,15 @@ const ANONYMOUS_COMPANY_REQUESTS = gql`
         name
         codeNaf
         address
+        codeCommune
       }
     }
   }
 `;
 
-const REQUESTS_PER_PAGE = 10;
+const REQUESTS_PER_PAGE = 50;
 
-export const AnonymousCompaniesRequests = () => {
+export const AnonymousCompaniesRequests = ({ onCreateAnonymousCompany }) => {
   const { error, data, refetch } = useQuery<
     Pick<Query, "anonymousCompanyRequests">
   >(ANONYMOUS_COMPANY_REQUESTS, {
@@ -38,9 +39,13 @@ export const AnonymousCompaniesRequests = () => {
       request.name,
       request.address,
       request.codeNaf,
+      request.codeCommune,
       "",
       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-        <Button onClick={function noRefCheck() {}} priority="primary">
+        <Button
+          onClick={() => onCreateAnonymousCompany(request.id)}
+          priority="primary"
+        >
           Vérifier
         </Button>
       </div>
@@ -51,6 +56,7 @@ export const AnonymousCompaniesRequests = () => {
     "Raison sociale",
     "Adresse",
     "Code NAF",
+    "Code commune",
     "Mail",
     "Action"
   ];
@@ -58,7 +64,6 @@ export const AnonymousCompaniesRequests = () => {
   if (error) {
     return (
       <Alert
-        closable
         title={"Une erreur inattendue s'est produite"}
         description={error.message}
         severity="error"
@@ -79,7 +84,7 @@ export const AnonymousCompaniesRequests = () => {
         <div>
           <Button
             iconId="fr-icon-add-line"
-            onClick={function noRefCheck() {}}
+            onClick={() => onCreateAnonymousCompany()}
             priority="secondary"
           >
             Créer une entreprise
