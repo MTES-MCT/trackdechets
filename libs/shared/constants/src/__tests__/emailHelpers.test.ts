@@ -52,7 +52,8 @@ describe("emailHelpers", () => {
       "giovanni.giorgio@orange.orange.fr",
       "giovanni.giorgio@orange.laposte.fr",
       "giovanni.giorgio@orangelaposte.fr",
-      "giovanni.giorgio@orangeraie.fr"
+      "giovanni.giorgio@orangeraie.fr",
+      "giovanni.giorgio@orange"
     ])(`%p is NOT generic - edge cases`, email => {
       expect(isGenericEmail(email)).toEqual(false);
     });
