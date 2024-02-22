@@ -32,6 +32,7 @@ export const AnonymousCompaniesDashboard = () => {
 
       <div style={{ height: "100%" }}>
         <CreateAnonymousCompany
+          onCompanyCreated={() => setCreateAnonymousCompany(false)}
           anonymousCompanyRequestId={
             typeof createAnonymousCompany == "boolean"
               ? undefined

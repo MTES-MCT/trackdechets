@@ -57,7 +57,10 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       )
   });
 
-export function CreateAnonymousCompanyForm({ anonymousCompanyRequest }) {
+export function CreateAnonymousCompanyForm({
+  anonymousCompanyRequest,
+  onCompanyCreated
+}) {
   const [createAnonymousCompany, { loading, error }] = useMutation<
     Pick<Mutation, "createAnonymousCompany">,
     MutationCreateAnonymousCompanyArgs
@@ -83,6 +86,8 @@ export function CreateAnonymousCompanyForm({ anonymousCompanyRequest }) {
             `L'entreprise "${data?.createAnonymousCompany.orgId}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
             { duration: TOAST_DURATION }
           );
+
+          onCompanyCreated();
         }
       }}
     >

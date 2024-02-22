@@ -25,7 +25,10 @@ const ANONYMOUS_COMPANY_REQUEST = gql`
   }
 `;
 
-export function CreateAnonymousCompany({ anonymousCompanyRequestId }) {
+export function CreateAnonymousCompany({
+  anonymousCompanyRequestId,
+  onCompanyCreated
+}) {
   const { data, error, loading, refetch } = useQuery<
     Pick<Query, "anonymousCompanyRequest">,
     QueryAnonymousCompanyRequestArgs
@@ -72,6 +75,7 @@ export function CreateAnonymousCompany({ anonymousCompanyRequestId }) {
 
         <div className="fr-col-12 fr-col-lg-6">
           <CreateAnonymousCompanyForm
+            onCompanyCreated={onCompanyCreated}
             anonymousCompanyRequest={data?.anonymousCompanyRequest}
           />
         </div>
