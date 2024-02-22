@@ -17,7 +17,7 @@ import { PasswordInput } from "@codegouvfr/react-dsfr/blocks/PasswordInput";
 import styles from "./Login.module.scss";
 
 import { SENDER_EMAIL } from "../common/config";
-import { isGenericEmail } from "../../../libs/shared/constants/src";
+import { isGenericEmail } from "@td/constants";
 
 export default function Signup() {
   const [submittable, setSubmittable] = useState(false);
