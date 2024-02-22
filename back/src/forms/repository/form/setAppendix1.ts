@@ -3,11 +3,11 @@ import { RepositoryFnDeps } from "../../../common/repository/types";
 import { checkCanBeSealed } from "../../validation";
 import buildUpdateForm from "./update";
 import buildUpdateManyForms from "./updateMany";
-import { getFirstTransporter } from "../../database";
 import {
   enqueueUpdatedBsdToIndex,
   enqueueBsdToDelete
 } from "../../../queue/producers/elastic";
+import { FormWithTransporters } from "../../types";
 
 class FormFraction {
   form: Form;
@@ -15,7 +15,7 @@ class FormFraction {
 }
 
 class SetAppendix1Args {
-  form: Form;
+  form: Form & FormWithTransporters;
   newAppendix1Fractions: FormFraction[] | null;
   currentAppendix1Forms: Form[];
 }
@@ -113,12 +113,13 @@ async function sealAllNewDrafts(
 }
 
 async function setAppendix1AutomaticValues(
-  container: Form,
+  container: Form & FormWithTransporters,
   appendix1FormIds: string[],
   { prisma, user }: RepositoryFnDeps
 ) {
   const updateForm = buildUpdateForm({ prisma, user });
-  const transporter = await getFirstTransporter(container);
+
+  const transporter = container.transporters[0];
 
   // No batched update because we have to create / destroy transporters.
   await Promise.all(

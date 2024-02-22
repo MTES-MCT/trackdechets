@@ -2581,6 +2581,77 @@ describe("Mutation.updateForm", () => {
     ]);
   });
 
+  it("should update appendix1 infos even if the grouping doesnt change", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
+    const { company: newTransporter } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const appendix1_1 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.DRAFT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        emitterCompanyName: "ProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        wasteDetailsCode: "16 06 01*",
+        owner: { connect: { id: user.id } }
+      }
+    });
+
+    // Group with appendix1_1
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        wasteDetailsCode: "16 06 01*",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX1,
+        grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }
+      }
+    });
+
+    // Update container
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          transporter: { company: { siret: newTransporter.siret } },
+          recipient: {
+            company: {
+              contact: "New contact"
+            }
+          }
+        }
+      }
+    });
+
+    expect(data.updateForm.grouping!.length).toBe(1);
+    expect(data.updateForm.grouping!.map(g => g.form.id)).toEqual([
+      appendix1_1.id
+    ]);
+    expect(data.updateForm.transporter?.company?.siret).toBe(
+      newTransporter.siret
+    );
+
+    const updatedAppendix1 = await prisma.form.findUniqueOrThrow({
+      where: { id: appendix1_1.id },
+      include: { transporters: true }
+    });
+    expect(updatedAppendix1.recipientCompanyContact).toEqual("New contact");
+    expect(updatedAppendix1.transporters.length).toBe(1);
+    expect(updatedAppendix1.transporters[0].transporterCompanySiret).toBe(
+      newTransporter.siret
+    );
+  });
+
   it(
     "should be possible to update a form where transport is ROAD and wasteDetailsQuantity is > 40T " +
       "if it was created before (<=) process.env.MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER",

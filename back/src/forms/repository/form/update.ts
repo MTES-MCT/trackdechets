@@ -7,12 +7,13 @@ import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { formDiff } from "../../workflow/diff";
 import { getUserCompanies } from "../../../users/database";
+import { FormWithTransporters } from "../../types";
 
 export type UpdateFormFn = (
   where: Prisma.FormWhereUniqueInput,
   data: Prisma.FormUpdateInput,
   logMetadata?: LogMetadata
-) => Promise<Form>;
+) => Promise<Form & FormWithTransporters>;
 
 const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
   deps => async (where, data, logMetadata) => {

@@ -6,11 +6,12 @@ import {
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { getUserCompanies } from "../../../users/database";
+import { FormWithTransporters } from "../../types";
 
 export type CreateFormFn = (
   data: Prisma.FormCreateInput,
   logMetadata?: LogMetadata
-) => Promise<Form>;
+) => Promise<Form & FormWithTransporters>;
 
 const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
   deps => async (data, logMetadata?) => {
