@@ -113,7 +113,8 @@ describe("createAnonymousCompany", () => {
         codeNaf: "6202A",
         name: "ACME CORP",
         pdf: "[pdf1 in base64]",
-        siret: validInput.siret
+        siret: validInput.siret,
+        codeCommune: "44100"
       }
     });
 

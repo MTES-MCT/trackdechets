@@ -6,12 +6,8 @@ import {
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { prisma } from "@td/prisma";
-import { isForeignVat, nafCodes } from "@td/constants";
-import {
-  foreignVatNumber,
-  siret,
-  siretConditions
-} from "../../../common/validation";
+import { nafCodes } from "@td/constants";
+import { siret } from "../../../common/validation";
 import { UserInputError } from "../../../common/errors";
 import { libelleFromCodeNaf } from "../../sirene/utils";
 
@@ -27,13 +23,7 @@ const anonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       )
       .required(),
     name: yup.string().required(),
-    vatNumber: foreignVatNumber,
-
-    siret: siret
-      .required(
-        "La sélection d'une entreprise par SIRET ou numéro de TVA (si l'entreprise n'est pas française) est obligatoire"
-      )
-      .when("vatNumber", siretConditions.companyVatNumber as any)
+    siret: siret.required()
   });
 
 const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"] =
@@ -43,13 +33,8 @@ const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"
 
     await anonymousCompanyInputSchema.validate(input);
 
-    // ignore SIRET in this case
-    if (isForeignVat(input.vatNumber)) {
-      delete input.siret;
-    }
-
     const existingAnonymousCompany = await prisma.anonymousCompany.findUnique({
-      where: { orgId: input.siret ?? input.vatNumber! }
+      where: { orgId: input.siret }
     });
     if (existingAnonymousCompany) {
       throw new UserInputError(
@@ -59,7 +44,7 @@ const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"
 
     const anonymousCompany = await prisma.anonymousCompany.create({
       data: {
-        orgId: input.siret ?? input.vatNumber!,
+        orgId: input.siret,
         ...input,
         libelleNaf: libelleFromCodeNaf(input.codeNaf)
       }

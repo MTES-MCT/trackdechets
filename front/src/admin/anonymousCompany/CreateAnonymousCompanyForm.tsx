@@ -43,11 +43,7 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
     name: yup.string().required(),
     siret: yup
       .string()
-      .when("vatNumber", {
-        is: vatNumber => !vatNumber,
-        then: schema => schema.required(),
-        otherwise: schema => schema.ensure()
-      })
+      .required()
       .test(
         "is-siret",
         "n°SIRET invalide",
