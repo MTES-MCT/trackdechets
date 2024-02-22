@@ -17,6 +17,7 @@ import { PasswordInput } from "@codegouvfr/react-dsfr/blocks/PasswordInput";
 import styles from "./Login.module.scss";
 
 import { SENDER_EMAIL } from "../common/config";
+import { isGenericEmail } from "../../../libs/shared/constants/src";
 
 export default function Signup() {
   const [submittable, setSubmittable] = useState(false);
@@ -109,7 +110,7 @@ export default function Signup() {
         <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
           <div className="fr-col fr-m-auto">
             <h1 className="fr-h3 fr-mb-1w">Créer mon compte Trackdéchets</h1>
-            <p className="fr-text--md fr-mb-1w">
+            <p className="fr-text--md fr-mb-3w">
               Vous vous apprêtez à créer votre compte utilisateur. Cette étape
               est préalable à l'enregistrement ou au rattachement d'une
               entreprise dans Trackdéchets.
@@ -131,6 +132,16 @@ export default function Signup() {
                 onChange: handleEmailChange
               }}
             />
+            {Boolean(emailValue) && isGenericEmail(emailValue) && (
+              <Alert
+                className="fr-mb-3w"
+                description="Dans le cas où vous posséderiez une adresse e-mail professionnelle avec un nom de domaine d'entreprise (ex: nom@votre-entreprise.fr), nous vous recommandons de l'utiliser pour la création de votre compte, afin de faciliter le processus de vérification de rattachement à votre établissement."
+                severity="info"
+                closable={false}
+                small
+              />
+            )}
+
             <PasswordInput
               label="Mot de passe"
               nativeInputProps={{
