@@ -2,7 +2,8 @@ import { GENERIC_EMAIL_DOMAINS } from "./GENERIC_EMAIL_DOMAINS";
 
 export const isEmail = (email: string): boolean => {
   return new RegExp(
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    // Taken from HTML spec: https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
   ).test(email);
 };
 

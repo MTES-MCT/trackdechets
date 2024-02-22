@@ -17,7 +17,7 @@ import { PasswordInput } from "@codegouvfr/react-dsfr/blocks/PasswordInput";
 import styles from "./Login.module.scss";
 
 import { SENDER_EMAIL } from "../common/config";
-import { isGenericEmail } from "@td/constants";
+import { isEmail, isGenericEmail } from "@td/constants";
 
 export default function Signup() {
   const [submittable, setSubmittable] = useState(false);
@@ -90,11 +90,9 @@ export default function Signup() {
 
   const handleEmailChange = e => {
     const { value } = e.target;
-    // Taken from HTML spec: https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
-    const mailRegex =
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    if (value.match(mailRegex)) {
-      setEmailValue(e.target.value);
+
+    if (isEmail(value)) {
+      setEmailValue(value);
       setErrorMessage("");
     } else {
       setErrorMessage("Format de l'email invalide");

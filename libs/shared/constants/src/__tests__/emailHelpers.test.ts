@@ -5,11 +5,17 @@ describe("emailHelpers", () => {
   describe("isEmail", () => {
     test.each`
       input                         | expected
-      ${"abc..def@mail.com"}        | ${false}
-      ${"abc.def@mail.c"}           | ${false}
-      ${"abc.def@mail#archive.com"} | ${false}
-      ${"abc.def@mail"}             | ${false}
+      ${""}                         | ${false}
+      ${null}                       | ${false}
+      ${undefined}                  | ${false}
+      ${"test"}                     | ${false}
+      ${"testmail.com"}             | ${false}
+      ${"test@@mail.com"}           | ${false}
       ${"abc.def@mail..com"}        | ${false}
+      ${"abc.def@mail#archive.com"} | ${false}
+      ${"abc..def@mail.com"}        | ${true}
+      ${"abc.def@mail.c"}           | ${true}
+      ${"abc.def@mail"}             | ${true}
       ${"abc-d@mail.com"}           | ${true}
       ${"abc.def@mail.com"}         | ${true}
       ${"abc@mail.com"}             | ${true}
