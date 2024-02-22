@@ -31,7 +31,7 @@ export default function CompaniesVerificationTable({
         accessor: "createdAt" as const,
         disableFilters: true,
         Cell: ({ value: createdAt }) =>
-          createdAt && format(new Date(createdAt), "yyyy-MM-dd à HH:mm")
+          createdAt && format(new Date(createdAt), "yyyy-MM-dd")
       },
       {
         Header: "Établissement",
