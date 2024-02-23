@@ -1,5 +1,5 @@
 import { renderMail, createAnonymousCompanyRequestEmail } from "@td/mail";
-import { prisma } from "../../../../../libs/back/prisma/src";
+import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
