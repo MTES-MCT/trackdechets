@@ -1,23 +1,18 @@
 import * as React from "react";
 import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import toast from "react-hot-toast";
 import {
   AnonymousCompanyInput,
   Mutation,
-  MutationCreateAnonymousCompanyArgs,
-  Query,
-  QueryAnonymousCompanyRequestArgs
+  MutationCreateAnonymousCompanyArgs
 } from "@td/codegen-ui";
 import { isSiret, nafCodes } from "@td/constants";
 import { TOAST_DURATION } from "../../common/config";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { Loader } from "../../Apps/common/Components";
-import { useEffect } from "react";
-import { PDFViewer } from "./PDFViewer";
 
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 

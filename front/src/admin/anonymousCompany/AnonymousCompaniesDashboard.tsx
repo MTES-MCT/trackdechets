@@ -8,6 +8,7 @@ export const AnonymousCompaniesDashboard = () => {
     string | boolean
   >(false);
 
+  // Either display the table of all anonymous company requests...
   if (!createAnonymousCompany) {
     return (
       <AnonymousCompaniesRequests
@@ -18,6 +19,7 @@ export const AnonymousCompaniesDashboard = () => {
     );
   }
 
+  // ...or the form to create an anonymous company
   return (
     <div style={{ height: "100%" }}>
       <div>

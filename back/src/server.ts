@@ -146,6 +146,11 @@ export const server = new ApolloServer<GraphQLContext>({
         // Hacker might massively generate new codes to spam
         windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
         maxRequestsPerWindow: 10 // 10 requests each 3 minutes
+      },
+      createAnonymousCompanyRequest: {
+        // Prevent user from creating a huge number of requests
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+        maxRequestsPerWindow: 10 // 10 requests each 3 minutes
       }
     }),
     gqlRegenerateSessionPlugin(["changePassword"]),
