@@ -16,7 +16,7 @@ import {
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import AccountCompanyAddAnonymousCompany from "./AccountCompanyAddAnonymousCompany";
+import AccountCompanyAddAnonymousCompany from "./anonymous/AccountCompanyAddAnonymousCompany";
 
 type IProps = {
   onCompanyInfos: (companyInfos) => void;

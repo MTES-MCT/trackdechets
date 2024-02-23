@@ -1,10 +1,11 @@
 import React from "react";
-import styles from "../AccountCompanyAdd.module.scss";
+import styles from "../../AccountCompanyAdd.module.scss";
 import { gql, useMutation } from "@apollo/client";
 import { Upload } from "@codegouvfr/react-dsfr/Upload";
 import { Mutation } from "@td/codegen-ui";
 import InvalidSirenePDFError from "./InvalidSirenePDFError";
 import SirenePDFInfo from "./SirenePDFInfo";
+import { SirenePDFFallbackError } from "./SirenePDFFallbackError";
 
 const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
   mutation CreationAnonymousCompanyRequest($pdf: String!) {
@@ -34,6 +35,13 @@ const AccountCompanyAddAnonymousCompany = () => {
     any
   >(CREATE_ANONYMOUS_COMPANY_REQUEST);
 
+  // Because we rely on SIRENE's PDF formats, which may change and break
+  // the feature, we keep a fallback to the old-fashioned way, going through
+  // the support for each request
+  if (import.meta.env.VITE_DISABLE_SIRENE_PDF_UPLOAD == "true") {
+    return <SirenePDFFallbackError />;
+  }
+
   return (
     <div className={styles.alertWrapper}>
       <SirenePDFInfo />
@@ -43,6 +51,7 @@ const AccountCompanyAddAnonymousCompany = () => {
         label="Avis de situation au répertoire SIRENE"
         hint="au format PDF"
         state="default"
+        disabled={loading}
         stateRelatedMessage="Text de validation / d'explication de l'erreur"
         nativeInputProps={{
           onChange: async e => {
@@ -52,7 +61,7 @@ const AccountCompanyAddAnonymousCompany = () => {
               const base64 = await convertToBase64(file);
 
               // Send to backend for data extraction
-              const res = await creationAnonymousCompanyRequest({
+              await creationAnonymousCompanyRequest({
                 variables: { pdf: base64 }
               });
             }
@@ -61,37 +70,6 @@ const AccountCompanyAddAnonymousCompany = () => {
       />
 
       {error && <InvalidSirenePDFError errorMessage={error.message} />}
-
-      {/* <Alert
-                title="Etablissement non diffusible"
-                severity="error"
-                description={
-                    <>
-                        <span>
-                            Nous n'avons pas pu récupérer les informations de cet établissement
-                            car il n'est pas diffusible. Veuillez nous contacter via{" "}
-                            <a
-                                href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                la FAQ
-                            </a>{" "}
-                            <b>avec</b> votre certificat d'inscription au répertoire des
-                            Entreprises et des Établissements (SIRENE) pour pouvoir procéder à
-                            la création de l'établissement. Pour télécharger votre certificat,
-                            RDV sur{" "}
-                        </span>
-                        <a
-                            href="https://avis-situation-sirene.insee.fr/"
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            https://avis-situation-sirene.insee.fr/
-                        </a>
-                    </>
-                }
-            /> */}
     </div>
   );
 };
