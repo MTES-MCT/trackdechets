@@ -82,15 +82,15 @@ export function CreateAnonymousCompanyForm({
         }
       }}
     >
-      {() => (
+      {({ errors }) => (
         <Form className="fr-my-3w">
           <Field name="siret">
-            {({ field, error }) => {
+            {({ field }) => {
               return (
                 <Input
                   label="SIRET"
-                  state={error ? "error" : "default"}
-                  stateRelatedMessage={error?.message}
+                  state={errors.siret ? "error" : "default"}
+                  stateRelatedMessage={errors.siret as string}
                   disabled={loading}
                   nativeInputProps={field}
                 />
@@ -99,12 +99,12 @@ export function CreateAnonymousCompanyForm({
           </Field>
 
           <Field name="name">
-            {({ field, error }) => {
+            {({ field }) => {
               return (
                 <Input
                   label="Nom de l'entreprise"
-                  state={error ? "error" : "default"}
-                  stateRelatedMessage={error?.message}
+                  state={errors.name ? "error" : "default"}
+                  stateRelatedMessage={errors.name as string}
                   disabled={loading}
                   nativeInputProps={field}
                 />
@@ -113,12 +113,12 @@ export function CreateAnonymousCompanyForm({
           </Field>
 
           <Field name="address">
-            {({ field, error }) => {
+            {({ field }) => {
               return (
                 <Input
                   label="Adresse"
-                  state={error ? "error" : "default"}
-                  stateRelatedMessage={error?.message}
+                  state={errors.address ? "error" : "default"}
+                  stateRelatedMessage={errors.address as string}
                   disabled={loading}
                   nativeInputProps={field}
                 />
@@ -127,12 +127,12 @@ export function CreateAnonymousCompanyForm({
           </Field>
 
           <Field name="codeNaf">
-            {({ field, error }) => {
+            {({ field }) => {
               return (
                 <Input
                   label="Code NAF"
-                  state={error ? "error" : "default"}
-                  stateRelatedMessage={error?.message}
+                  state={errors.codeNaf ? "error" : "default"}
+                  stateRelatedMessage={errors.codeNaf as string}
                   disabled={loading}
                   nativeInputProps={field}
                 />
@@ -141,12 +141,12 @@ export function CreateAnonymousCompanyForm({
           </Field>
 
           <Field name="codeCommune">
-            {({ field, error }) => {
+            {({ field }) => {
               return (
                 <Input
                   label="Code commune"
-                  state={error ? "error" : "default"}
-                  stateRelatedMessage={error?.message}
+                  state={errors.codeCommune ? "error" : "default"}
+                  stateRelatedMessage={errors.codeCommune as string}
                   disabled={loading}
                   nativeInputProps={field}
                 />
@@ -163,7 +163,13 @@ export function CreateAnonymousCompanyForm({
             />
           )}
 
-          <Button type="submit" priority="primary" disabled={loading}>
+          <Button
+            type="submit"
+            priority="primary"
+            disabled={
+              loading || Object.values(errors).filter(Boolean).length !== 0
+            }
+          >
             Valider
           </Button>
         </Form>
