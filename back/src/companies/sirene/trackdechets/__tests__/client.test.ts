@@ -1,4 +1,3 @@
-import { ApiResponse, errors } from "@elastic/elasticsearch";
 import { searchCompany, searchCompanies } from "../client";
 import { ErrorCode } from "../../../../common/errors";
 import client from "../esClient";
@@ -6,35 +5,39 @@ import { SearchHit } from "../types";
 import { siretify } from "../../../../__tests__/factories";
 import { SiretNotFoundError } from "../../errors";
 
-const { ResponseError } = errors;
-
 jest.mock("../esClient");
 
 describe("searchCompany", () => {
   afterEach(() => {
-    (client.get as jest.Mock).mockReset();
+    (client.search as jest.Mock).mockReset();
   });
 
   it("should retrieve a company by siret", async () => {
     const siret = siretify(6);
 
-    (client.get as jest.Mock).mockResolvedValueOnce({
+    (client.search as jest.Mock).mockResolvedValueOnce({
       body: {
-        _source: {
-          siret,
-          statutDiffusionEtablissement: "O",
-          etatAdministratifEtablissement: "A",
-          numeroVoieEtablissement: "4",
-          indiceRepetitionEtablissement: "bis",
-          typeVoieEtablissement: "BD",
-          libelleVoieEtablissement: "LONGCHAMP",
-          complementAdresseEtablissement: "Bat G",
-          codePostalEtablissement: "13001",
-          codeCommuneEtablissement: "13201",
-          libelleCommuneEtablissement: "MARSEILLE",
-          activitePrincipaleEtablissement: "62.01Z",
-          denominationUniteLegale: "CODE EN STOCK",
-          codePaysEtrangerEtablissement: ""
+        hits: {
+          hits: [
+            {
+              _source: {
+                siret,
+                statutDiffusionEtablissement: "O",
+                etatAdministratifEtablissement: "A",
+                numeroVoieEtablissement: "4",
+                indiceRepetitionEtablissement: "bis",
+                typeVoieEtablissement: "BD",
+                libelleVoieEtablissement: "LONGCHAMP",
+                complementAdresseEtablissement: "Bat G",
+                codePostalEtablissement: "13001",
+                codeCommuneEtablissement: "13201",
+                libelleCommuneEtablissement: "MARSEILLE",
+                activitePrincipaleEtablissement: "62.01Z",
+                denominationUniteLegale: "CODE EN STOCK",
+                codePaysEtrangerEtablissement: ""
+              }
+            }
+          ]
         }
       }
     });
@@ -59,11 +62,17 @@ describe("searchCompany", () => {
   it("should raise AnonymousCompanyError if partially diffusible", async () => {
     const siret = siretify(6);
 
-    (client.get as jest.Mock).mockResolvedValueOnce({
+    (client.search as jest.Mock).mockResolvedValueOnce({
       body: {
-        _source: {
-          siret,
-          statutDiffusionEtablissement: "P"
+        hits: {
+          hits: [
+            {
+              _source: {
+                siret,
+                statutDiffusionEtablissement: "P"
+              }
+            }
+          ]
         }
       }
     });
@@ -78,11 +87,17 @@ describe("searchCompany", () => {
   it("should raise AnonymousCompanyError if non diffusible", async () => {
     const siret = siretify(6);
 
-    (client.get as jest.Mock).mockResolvedValueOnce({
+    (client.search as jest.Mock).mockResolvedValueOnce({
       body: {
-        _source: {
-          siret,
-          statutDiffusionEtablissement: "P"
+        hits: {
+          hits: [
+            {
+              _source: {
+                siret,
+                statutDiffusionEtablissement: "P"
+              }
+            }
+          ]
         }
       }
     });
@@ -98,22 +113,28 @@ describe("searchCompany", () => {
       by concatenating first and last name`, async () => {
     const siret = siretify(6);
 
-    (client.get as jest.Mock).mockResolvedValueOnce({
+    (client.search as jest.Mock).mockResolvedValueOnce({
       body: {
-        _source: {
-          siret,
-          etatAdministratifEtablissement: "A",
-          numeroVoieEtablissement: "4",
-          typeVoieEtablissement: "RUE",
-          libelleVoieEtablissement: "DES ROSIERS",
-          codePostalEtablissement: "13001",
-          codeCommuneEtablissement: "13201",
-          libelleCommuneEtablissement: "MARSEILLE",
-          activitePrincipaleEtablissement: "86.21Z",
-          denominationUniteLegale: null,
-          prenom1UniteLegale: "JOHN",
-          nomUniteLegale: "SNOW",
-          categorieJuridiqueUniteLegale: "1000"
+        hits: {
+          hits: [
+            {
+              _source: {
+                siret,
+                etatAdministratifEtablissement: "A",
+                numeroVoieEtablissement: "4",
+                typeVoieEtablissement: "RUE",
+                libelleVoieEtablissement: "DES ROSIERS",
+                codePostalEtablissement: "13001",
+                codeCommuneEtablissement: "13201",
+                libelleCommuneEtablissement: "MARSEILLE",
+                activitePrincipaleEtablissement: "86.21Z",
+                denominationUniteLegale: null,
+                prenom1UniteLegale: "JOHN",
+                nomUniteLegale: "SNOW",
+                categorieJuridiqueUniteLegale: "1000"
+              }
+            }
+          ]
         }
       }
     });
@@ -133,24 +154,30 @@ describe("searchCompany", () => {
   ])("should add %p in parenthsis if present", async field => {
     const siret = siretify(6);
 
-    (client.get as jest.Mock).mockResolvedValueOnce({
+    (client.search as jest.Mock).mockResolvedValueOnce({
       body: {
-        _source: {
-          siret,
-          statutDiffusionEtablissement: "O",
-          etatAdministratifEtablissement: "A",
-          numeroVoieEtablissement: "4",
-          indiceRepetitionEtablissement: "bis",
-          typeVoieEtablissement: "BD",
-          libelleVoieEtablissement: "LONGCHAMP",
-          complementAdresseEtablissement: "Bat G",
-          codePostalEtablissement: "13001",
-          codeCommuneEtablissement: "13201",
-          libelleCommuneEtablissement: "MARSEILLE",
-          activitePrincipaleEtablissement: "62.01Z",
-          denominationUniteLegale: "CODE EN STOCK",
-          codePaysEtrangerEtablissement: "",
-          [field]: "CES"
+        hits: {
+          hits: [
+            {
+              _source: {
+                siret,
+                statutDiffusionEtablissement: "O",
+                etatAdministratifEtablissement: "A",
+                numeroVoieEtablissement: "4",
+                indiceRepetitionEtablissement: "bis",
+                typeVoieEtablissement: "BD",
+                libelleVoieEtablissement: "LONGCHAMP",
+                complementAdresseEtablissement: "Bat G",
+                codePostalEtablissement: "13001",
+                codeCommuneEtablissement: "13201",
+                libelleCommuneEtablissement: "MARSEILLE",
+                activitePrincipaleEtablissement: "62.01Z",
+                denominationUniteLegale: "CODE EN STOCK",
+                codePaysEtrangerEtablissement: "",
+                [field]: "CES"
+              }
+            }
+          ]
         }
       }
     });
@@ -161,25 +188,31 @@ describe("searchCompany", () => {
   it("should set only one secondary name in parenthesis", async () => {
     const siret = siretify(6);
 
-    (client.get as jest.Mock).mockResolvedValueOnce({
+    (client.search as jest.Mock).mockResolvedValueOnce({
       body: {
-        _source: {
-          siret,
-          statutDiffusionEtablissement: "O",
-          etatAdministratifEtablissement: "A",
-          numeroVoieEtablissement: "4",
-          indiceRepetitionEtablissement: "bis",
-          typeVoieEtablissement: "BD",
-          libelleVoieEtablissement: "LONGCHAMP",
-          complementAdresseEtablissement: "Bat G",
-          codePostalEtablissement: "13001",
-          codeCommuneEtablissement: "13201",
-          libelleCommuneEtablissement: "MARSEILLE",
-          activitePrincipaleEtablissement: "62.01Z",
-          denominationUniteLegale: "CODE EN STOCK",
-          codePaysEtrangerEtablissement: "",
-          denominationUsuelleEtablissement: "The awesome company",
-          enseigne1Etablissement: "CES"
+        hits: {
+          hits: [
+            {
+              _source: {
+                siret,
+                statutDiffusionEtablissement: "O",
+                etatAdministratifEtablissement: "A",
+                numeroVoieEtablissement: "4",
+                indiceRepetitionEtablissement: "bis",
+                typeVoieEtablissement: "BD",
+                libelleVoieEtablissement: "LONGCHAMP",
+                complementAdresseEtablissement: "Bat G",
+                codePostalEtablissement: "13001",
+                codeCommuneEtablissement: "13201",
+                libelleCommuneEtablissement: "MARSEILLE",
+                activitePrincipaleEtablissement: "62.01Z",
+                denominationUniteLegale: "CODE EN STOCK",
+                codePaysEtrangerEtablissement: "",
+                denominationUsuelleEtablissement: "The awesome company",
+                enseigne1Etablissement: "CES"
+              }
+            }
+          ]
         }
       }
     });
@@ -190,24 +223,30 @@ describe("searchCompany", () => {
   it("should not set secondary name in parenthesis if it is equal to company name", async () => {
     const siret = siretify(6);
 
-    (client.get as jest.Mock).mockResolvedValueOnce({
+    (client.search as jest.Mock).mockResolvedValueOnce({
       body: {
-        _source: {
-          siret,
-          statutDiffusionEtablissement: "O",
-          etatAdministratifEtablissement: "A",
-          numeroVoieEtablissement: "4",
-          indiceRepetitionEtablissement: "bis",
-          typeVoieEtablissement: "BD",
-          libelleVoieEtablissement: "LONGCHAMP",
-          complementAdresseEtablissement: "Bat G",
-          codePostalEtablissement: "13001",
-          codeCommuneEtablissement: "13201",
-          libelleCommuneEtablissement: "MARSEILLE",
-          activitePrincipaleEtablissement: "62.01Z",
-          denominationUniteLegale: "CODE EN STOCK",
-          codePaysEtrangerEtablissement: "",
-          denominationUsuelleEtablissement: "CODE EN STOCK"
+        hits: {
+          hits: [
+            {
+              _source: {
+                siret,
+                statutDiffusionEtablissement: "O",
+                etatAdministratifEtablissement: "A",
+                numeroVoieEtablissement: "4",
+                indiceRepetitionEtablissement: "bis",
+                typeVoieEtablissement: "BD",
+                libelleVoieEtablissement: "LONGCHAMP",
+                complementAdresseEtablissement: "Bat G",
+                codePostalEtablissement: "13001",
+                codeCommuneEtablissement: "13201",
+                libelleCommuneEtablissement: "MARSEILLE",
+                activitePrincipaleEtablissement: "62.01Z",
+                denominationUniteLegale: "CODE EN STOCK",
+                codePaysEtrangerEtablissement: "",
+                denominationUsuelleEtablissement: "CODE EN STOCK"
+              }
+            }
+          ]
         }
       }
     });
@@ -216,19 +255,21 @@ describe("searchCompany", () => {
   });
 
   it("should raise SiretNotFound if error 404 (siret not found)", async () => {
-    (client.get as jest.Mock).mockRejectedValueOnce(
-      new ResponseError({
-        statusCode: 404
-      } as unknown as ApiResponse)
-    );
+    (client.search as jest.Mock).mockResolvedValueOnce({
+      body: {
+        hits: {
+          hits: []
+        }
+      }
+    });
     expect(searchCompany("xxxxxxxxxxxxxx")).rejects.toThrow(SiretNotFoundError);
   });
 
-  it(`should escalate other types of errors
+  it(`should re-throw other types of errors
           (network, internal server error, etc)`, async () => {
     const siret = siretify(6);
 
-    (client.get as jest.Mock).mockRejectedValueOnce({
+    (client.search as jest.Mock).mockRejectedValueOnce({
       message: "Erreur inconnue"
     });
     expect.assertions(1);

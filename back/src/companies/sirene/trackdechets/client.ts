@@ -83,7 +83,7 @@ export const searchCompany = async (
         }
       }
     });
-    if (!response.body.hits.hits || response.body.hits.hits[0]._source) {
+    if (!response.body.hits.hits || !response.body.hits.hits[0]?._source) {
       throw new SiretNotFoundError();
     }
     const company = searchResponseToCompany(response.body.hits.hits[0]._source);
