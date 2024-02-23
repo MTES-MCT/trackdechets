@@ -33,7 +33,7 @@ program
       deleteSiret: string
     ) {
       if (!bsdReadableId || !addSiret || !deleteSiret) {
-        logger.log(`missing data, skipping BSDD ${bsdReadableId}`)
+        logger.log(`missing data, skipping BSDD ${bsdReadableId}`);
         return;
       }
       let form;
@@ -48,35 +48,37 @@ program
         logger.error(`BSDD ${bsdReadableId} was not found`, err);
         throw err;
       }
-        const [formIntermediary] =
-          await prisma.intermediaryFormAssociation.findMany({
-            where: {
-              formId: form.id,
-              siret: deleteSiret
-            }
-          });
-        if (!formIntermediary) {
-          logger.log(`FormIntermediary NOT found, skipping BSDD ${bsdReadableId}`)
-          return;
-        }
-        const newFormInput: Prisma.FormUpdateInput = {
-          intermediaries: {
-            delete: { id: formIntermediary.id },
-            create: [
-              {
-                name: "CYCLEVIA",
-                contact: "directeur CYCLEVIA",
-                siret: addSiret,
-                address:
-                  "4 RUE JACQUES DAGUERRE IMMEUBLE CONCORDE 92500 RUEIL-MALMAISON"
-              }
-            ]
+      const [formIntermediary] =
+        await prisma.intermediaryFormAssociation.findMany({
+          where: {
+            formId: form.id,
+            siret: deleteSiret
           }
-        };
-        // Passe par la méthode update du form repository pour logguer l'event, déclencher le
-        // réindex et recalculer le champ dénormalisé `transporterSirets`
-        const user = { id: "support-td", authType: "script" };
-        const { update } = getFormRepository(user as any);
+        });
+      if (!formIntermediary) {
+        logger.log(
+          `FormIntermediary NOT found, skipping BSDD ${bsdReadableId}`
+        );
+        return;
+      }
+      const newFormInput: Prisma.FormUpdateInput = {
+        intermediaries: {
+          delete: { id: formIntermediary.id },
+          create: [
+            {
+              name: "CYCLEVIA",
+              contact: "directeur CYCLEVIA",
+              siret: addSiret,
+              address:
+                "4 RUE JACQUES DAGUERRE IMMEUBLE CONCORDE 92500 RUEIL-MALMAISON"
+            }
+          ]
+        }
+      };
+      // Passe par la méthode update du form repository pour logguer l'event, déclencher le
+      // réindex et recalculer le champ dénormalisé `transporterSirets`
+      const user = { id: "support-td", authType: "script" };
+      const { update } = getFormRepository(user as any);
       try {
         await update({ id: form.id }, newFormInput);
         logger.log(
