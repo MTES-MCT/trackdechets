@@ -1,5 +1,6 @@
 import pdfParser from "pdf-parse";
-import { isSiret, nafCodes } from "../../../../../libs/shared/constants/src";
+import { isSiret, nafCodes } from "@td/constants";
+import { isBase64, looksHacky } from "../../../utils";
 
 export interface Info {
   PDFFormatVersion: string;
@@ -255,24 +256,33 @@ export interface ParsedPdf {
  * Parse a base64 PDF into a string[], using the pdf-parse library
  */
 export const parseBase64 = async (pdf: string): Promise<ParsedPdf> => {
-  // Convert PDF from base64 to buffer...
-  const buffer = Buffer.from(pdf, "base64");
-  // ...Then parse it
-  const data = await new Promise<ParsedPdf>((resolve, reject) => {
-    pdfParser(buffer)
-      .then(data => {
-        resolve({
-          text: data.text,
-          info: data.info,
-          metadata: data.metadata?._metadata
-        });
-      })
-      .catch(error => {
-        reject(error);
-      });
-  });
+  if (!isBase64(pdf)) {
+    throw new Error(`PDF non valide`);
+  }
 
-  return data;
+  try {
+    // Convert PDF from base64 to buffer...
+    const buffer = Buffer.from(pdf, "base64");
+
+    // ...then parse it
+    const data = await new Promise<ParsedPdf>((resolve, reject) => {
+      pdfParser(buffer)
+        .then(data => {
+          resolve({
+            text: data.text,
+            info: data.info,
+            metadata: data.metadata?._metadata
+          });
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+
+    return data;
+  } catch (e) {
+    throw new Error("PDF non valide");
+  }
 };
 
 /**
@@ -284,6 +294,11 @@ export const validateAndExtractSireneDataFromPDFInBase64 = async (
   pdf: string
 ): Promise<Omit<ExtractedData, "pdfEmittedAt">> => {
   const { text, info, metadata } = await parseBase64(pdf);
+
+  // If it looks fishy, don't even go further. Not storing dangerous stuff
+  if (looksHacky(JSON.stringify({ text, info, metadata }))) {
+    throw new Error("PDF non valide");
+  }
 
   let data: ExtractedData;
   try {

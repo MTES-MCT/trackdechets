@@ -510,9 +510,7 @@ describe("createAnonymousCompanyRequest.helpers", () => {
       );
 
       // When
-      const res = await validateAndExtractSireneDataFromPDFInBase64(
-        "[pdf in base64]"
-      );
+      const res = await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
 
       // Then
       expect(res).toEqual({
@@ -539,7 +537,7 @@ describe("createAnonymousCompanyRequest.helpers", () => {
       // When
       expect.assertions(1);
       try {
-        await validateAndExtractSireneDataFromPDFInBase64("[pdf in base64]");
+        await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
       } catch (e) {
         // Then
         expect(e.message).toEqual("PDF non valide");
@@ -562,7 +560,7 @@ describe("createAnonymousCompanyRequest.helpers", () => {
       // When
       expect.assertions(1);
       try {
-        await validateAndExtractSireneDataFromPDFInBase64("[pdf in base64]");
+        await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
       } catch (e) {
         // Then
         expect(e.message).toEqual("PDF non valide");
@@ -585,10 +583,100 @@ describe("createAnonymousCompanyRequest.helpers", () => {
       // When
       expect.assertions(1);
       try {
-        await validateAndExtractSireneDataFromPDFInBase64("[pdf in base64]");
+        await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
       } catch (e) {
         // Then
         expect(e.message).toEqual("Le PDF doit avoir moins de 3 mois");
+      }
+    });
+
+    it("metadata looks hacky > should throw", async () => {
+      // Given
+      pdfParser.mockImplementation(
+        () =>
+          new Promise(res =>
+            res({
+              metadata: {
+                _metadata: {
+                  ...METADATA,
+                  "dc:description": "Situation au répertoire Sirene${{7*7}}"
+                }
+              },
+              info: INFO,
+              text: EXTRACTED_STRINGS.join("\n")
+            })
+          )
+      );
+
+      // When
+      expect.assertions(1);
+      try {
+        await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
+      } catch (e) {
+        // Then
+        expect(e.message).toEqual("PDF non valide");
+      }
+    });
+
+    it("info looks hacky > should throw", async () => {
+      // Given
+      pdfParser.mockImplementation(
+        () =>
+          new Promise(res =>
+            res({
+              metadata: { _metadata: METADATA },
+              info: {
+                ...INFO,
+                Keywords: "Insee, Avis de situation, sirene${{7*7}}"
+              },
+              text: EXTRACTED_STRINGS.join("\n")
+            })
+          )
+      );
+
+      // When
+      expect.assertions(1);
+      try {
+        await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
+      } catch (e) {
+        // Then
+        expect(e.message).toEqual("PDF non valide");
+      }
+    });
+
+    it("text looks hacky > should throw", async () => {
+      // Given
+      pdfParser.mockImplementation(
+        () =>
+          new Promise(res =>
+            res({
+              metadata: { _metadata: METADATA },
+              info: INFO,
+              text: [...EXTRACTED_STRINGS, "${{7*7}}"].join("\n")
+            })
+          )
+      );
+
+      // When
+      expect.assertions(1);
+      try {
+        await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
+      } catch (e) {
+        // Then
+        expect(e.message).toEqual("PDF non valide");
+      }
+    });
+
+    it("pdf is not base64 > should throw", async () => {
+      // Given
+
+      // When
+      expect.assertions(1);
+      try {
+        await validateAndExtractSireneDataFromPDFInBase64("pdf not in base64");
+      } catch (e) {
+        // Then
+        expect(e.message).toEqual("PDF non valide");
       }
     });
   });

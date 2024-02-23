@@ -203,3 +203,31 @@ export const randomNbrChain = (length: number) => {
     .map(_ => Math.floor(Math.random() * 10))
     .join("");
 };
+
+/**
+ * Naïve method to detect obvious usage of fishy characters within a string
+ */
+export const looksHacky = (str: string): boolean => {
+  const low = str.toLowerCase();
+
+  return (
+    [
+      "javascript",
+      "alert",
+      "script",
+      "iframe",
+      "onerror",
+      "onfocus",
+      "onload",
+      "onanimationstart",
+      "onanimationend"
+    ].includes(low) || new RegExp(/[`~#$%^*|?;<>[\]]/).test(str)
+  );
+};
+
+// https://stackoverflow.com/questions/475074/regex-to-parse-or-validate-base64-data
+export const isBase64 = (str: string): boolean => {
+  return new RegExp(
+    /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/
+  ).test(str);
+};

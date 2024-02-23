@@ -61,7 +61,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "[pdf in base64]"
+        pdf: "dGVzdAo="
       }
     });
 
@@ -81,7 +81,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
       address: "4 BD PASTEUR 44100 NANTES",
       codeNaf: "6202A",
       name: "ACME CORP",
-      pdf: "[pdf in base64]",
+      pdf: "dGVzdAo=",
       siret: "98254982600013"
     });
   });
@@ -113,7 +113,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "[pdf in base64]"
+        pdf: "dGVzdAo="
       }
     });
 
@@ -154,7 +154,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "[pdf in base64]"
+        pdf: "dGVzdAo="
       }
     });
 
@@ -198,7 +198,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "[pdf in base64]"
+        pdf: "dGVzdAo="
       }
     });
 
@@ -211,6 +211,25 @@ describe("mutation createAnonymousCompanyRequest", () => {
         variables: { siret: "98254982600013" }
       })
     );
+  });
+
+  it("should fail because pdf is not base64", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompanyRequest">
+    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      variables: {
+        pdf: "not base64"
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toEqual("PDF non valide");
   });
 
   it("should fail because pdf is invalid", async () => {
@@ -233,7 +252,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "[pdf in base64]"
+        pdf: "dGVzdAo="
       }
     });
 
@@ -275,7 +294,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "[pdf in base64]"
+        pdf: "dGVzdAo="
       }
     });
 
@@ -319,7 +338,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "[pdf in base64]"
+        pdf: "dGVzdAo="
       }
     });
 
@@ -352,7 +371,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
         codeNaf: "6202A",
         name: "ACME CORP",
         siret: "98254982600013",
-        pdf: "[pdf in base64]",
+        pdf: "dGVzdAo=",
         codeCommune: "44109",
         userId: user.id
       }
@@ -363,7 +382,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "[pdf in base64]"
+        pdf: "dGVzdAo="
       }
     });
 
