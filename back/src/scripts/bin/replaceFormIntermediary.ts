@@ -1,6 +1,7 @@
 import * as xlsx from "xlsx";
 import { program } from "commander";
 import { prisma } from "@td/prisma";
+import { logger } from "@td/logger";
 import { Prisma } from "@prisma/client";
 import { getFormRepository } from "../../forms/repository";
 
@@ -16,7 +17,7 @@ function readXlsxFile(
       nextFormId: row["BSDD / BSD Annexe 1"] // column C contains nextForm readableId
     }));
   } catch (err) {
-    console.error(`Error reading XLSX file: ${err}`);
+    logger.error(`Error reading XLSX file: ${err}`);
     throw err;
   }
 }
@@ -32,7 +33,7 @@ program
       deleteSiret: string
     ) {
       if (!bsdReadableId || !addSiret || !deleteSiret) {
-        console.log(`missing data, skipping BSDD ${bsdReadableId}`)
+        logger.log(`missing data, skipping BSDD ${bsdReadableId}`)
         return;
       }
       let form;
@@ -44,7 +45,7 @@ program
           select: { id: true }
         });
       } catch (err) {
-        console.error(`BSDD ${bsdReadableId} was not found`, err);
+        logger.error(`BSDD ${bsdReadableId} was not found`, err);
         throw err;
       }
         const [formIntermediary] =
@@ -55,7 +56,7 @@ program
             }
           });
         if (!formIntermediary) {
-          console.log(`FormIntermediary NOT found, skipping BSDD ${bsdReadableId}`)
+          logger.log(`FormIntermediary NOT found, skipping BSDD ${bsdReadableId}`)
           return;
         }
         const newFormInput: Prisma.FormUpdateInput = {
@@ -78,12 +79,16 @@ program
         const { update } = getFormRepository(user as any);
       try {
         await update({ id: form.id }, newFormInput);
+        logger.log(
+          `Mis à jour terminée du BSDD ${bsdReadableId["initialFormId"]}, suppression ${options.delete} et ajout ${options.add}`
+        );
       } catch (err) {
-        console.error(`Error during update`, err);
+        logger.error(`Error during update`, err);
         throw err;
       }
     }
-    console.log(`Starting script`);
+    console.log(`Starting script, logging with @td/logger`);
+    logger.log(`Starting script`);
     const rows = readXlsxFile(options.file);
     for (const bsdReadableId of rows) {
       try {
@@ -92,11 +97,8 @@ program
           options.add,
           options.delete
         );
-        console.log(
-          `Mis à jour BSDD ${bsdReadableId["initialFormId"]}, suppression ${options.delete} et ajout ${options.add}`
-        );
       } catch (err) {
-        console.error(err);
+        logger.error(err);
       }
       try {
         await updateFormIntermediaries(
@@ -104,11 +106,8 @@ program
           options.add,
           options.delete
         );
-        console.log(
-          `Mis à jour BSDD ${bsdReadableId["nextFormId"]}, suppression ${options.delete} et ajout ${options.add}`
-        );
       } catch (err) {
-        console.error(err);
+        logger.error(err);
       }
     }
   });
