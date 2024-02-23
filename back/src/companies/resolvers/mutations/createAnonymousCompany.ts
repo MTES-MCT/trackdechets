@@ -10,6 +10,11 @@ import { nafCodes } from "@td/constants";
 import { siret } from "../../../common/validation";
 import { UserInputError } from "../../../common/errors";
 import { libelleFromCodeNaf } from "../../sirene/utils";
+import {
+  renderMail,
+  anonymousCompanyCreatedEmail
+} from "../../../../../libs/back/mail/src";
+import { sendMail } from "../../../mailer/mailing";
 
 const anonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
   yup.object({
@@ -50,13 +55,34 @@ const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"
       }
     });
 
-    // If there was an anonymousCompanyRequest associated, delete it
-    if (input.siret) {
-      await prisma.anonymousCompanyRequest.deleteMany({
+    // If there was an anonymousCompanyRequest associated, delete it and warn the user
+    try {
+      const request = await prisma.anonymousCompanyRequest.delete({
         where: {
           siret: input.siret
         }
       });
+
+      if (request) {
+        // Send an email to the user
+        const user = await prisma.user.findFirst({
+          where: {
+            id: request.userId
+          }
+        });
+
+        if (user) {
+          await sendMail(
+            renderMail(anonymousCompanyCreatedEmail, {
+              to: [{ name: user.name ?? "", email: user.email }],
+              variables: { siret: input.siret }
+            })
+          );
+        }
+      }
+    } catch (e) {
+      // Request wasn't found - do nothing
+      // https://github.com/prisma/prisma/issues/4072
     }
 
     return anonymousCompany;

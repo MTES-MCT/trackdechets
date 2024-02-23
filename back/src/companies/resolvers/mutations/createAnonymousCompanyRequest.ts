@@ -1,7 +1,12 @@
+import {
+  renderMail,
+  createAnonymousCompanyRequestEmail
+} from "../../../../../libs/back/mail/src";
 import { prisma } from "../../../../../libs/back/prisma/src";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
+import { sendMail } from "../../../mailer/mailing";
 import { validateAndExtractSireneDataFromPDFInBase64 } from "./createAnonymousCompanyRequest.helpers";
 
 const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousCompanyRequest"] =
@@ -48,6 +53,14 @@ const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousC
         pdf
       }
     });
+
+    // Send an email
+    await sendMail(
+      renderMail(createAnonymousCompanyRequestEmail, {
+        to: [{ name: user.name ?? "", email: user.email }],
+        variables: { siret: data.siret }
+      })
+    );
 
     return true;
   };

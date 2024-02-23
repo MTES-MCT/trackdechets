@@ -239,3 +239,20 @@ export const pendingRevisionRequestAdminDetailsEmail: MailTemplate<{
   body: mustacheRenderer("pending-revision-request-admin-details.html"),
   templateId: templateIds.LAYOUT
 };
+
+export const createAnonymousCompanyRequestEmail: MailTemplate<{
+  siret: string;
+}> = {
+  subject: ({ siret }) => `Demande de création pour l'établissement ${siret}`,
+  body: mustacheRenderer("create-anonymous-company-request.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const anonymousCompanyCreatedEmail: MailTemplate<{
+  siret: string;
+}> = {
+  subject: ({ siret }) =>
+    `Validation de la demande de création pour l'établissement ${siret}`,
+  body: mustacheRenderer("anonymous-company-created-request.html"),
+  templateId: templateIds.LAYOUT
+};

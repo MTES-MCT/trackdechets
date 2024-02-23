@@ -4,6 +4,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Mutation } from "../../../../generated/graphql/types";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { sendMail } from "../../../../mailer/mailing";
 
 import pdfParser from "pdf-parse";
 import {
@@ -11,7 +12,15 @@ import {
   INFO,
   EXTRACTED_STRINGS
 } from "./createAnonymousCompanyRequest.helpers.test";
+import {
+  renderMail,
+  createAnonymousCompanyRequestEmail
+} from "../../../../../../libs/back/mail/src";
 jest.mock("pdf-parse", () => jest.fn());
+
+// Mock emails
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
   mutation CreationAnonymousCompanyRequest($pdf: String!) {
@@ -72,6 +81,45 @@ describe("createAnonymousCompanyRequest", () => {
         siret: "98254982600013"
       });
     });
+  });
+
+  it("should send an email to the user", async () => {
+    // Given
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+
+    pdfParser.mockImplementation(
+      () =>
+        new Promise(res =>
+          res({
+            metadata: { _metadata: METADATA },
+            info: INFO,
+            text: EXTRACTED_STRINGS.join("\n")
+          })
+        )
+    );
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompanyRequest">
+    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      variables: {
+        pdf: "[pdf in base64]"
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+      renderMail(createAnonymousCompanyRequestEmail, {
+        to: [{ email: user.email, name: user.name }],
+        variables: { siret: "98254982600013" }
+      })
+    );
   });
 
   it("should fail because pdf is invalid", async () => {
@@ -214,6 +262,7 @@ describe("createAnonymousCompanyRequest", () => {
         name: "ACME CORP",
         siret: "98254982600013",
         pdf: "[pdf in base64]",
+        codeCommune: "44100",
         userId: user.id
       }
     });
