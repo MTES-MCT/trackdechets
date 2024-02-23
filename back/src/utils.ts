@@ -214,7 +214,6 @@ export const looksHacky = (str: string): boolean => {
     [
       "javascript",
       "alert",
-      "script",
       "iframe",
       "onerror",
       "onfocus",

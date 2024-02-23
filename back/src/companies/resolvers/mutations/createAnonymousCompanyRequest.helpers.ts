@@ -297,6 +297,7 @@ export const validateAndExtractSireneDataFromPDFInBase64 = async (
 
   // If it looks fishy, don't even go further. Not storing dangerous stuff
   if (looksHacky(JSON.stringify({ text, info, metadata }))) {
+    console.log(JSON.stringify({ text, info, metadata }));
     throw new Error("PDF non valide");
   }
 
