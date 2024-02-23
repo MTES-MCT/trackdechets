@@ -58,122 +58,128 @@ export function CreateAnonymousCompanyForm({
   >(CREATE_ANONYMOUS_COMPANY);
 
   return (
-    <Formik
-      initialValues={{
-        address: anonymousCompanyRequest?.address ?? "",
-        codeCommune: anonymousCompanyRequest?.codeCommune ?? "",
-        codeNaf: anonymousCompanyRequest?.codeNaf ?? "",
-        name: anonymousCompanyRequest?.name ?? "",
-        siret: anonymousCompanyRequest?.siret ?? ""
-      }}
-      validationSchema={AnonymousCompanyInputSchema}
-      onSubmit={async (values, { resetForm }) => {
-        const { data } = await createAnonymousCompany({
-          variables: { input: values }
-        });
-        resetForm();
-        if (data) {
-          toast.success(
-            `L'entreprise "${data?.createAnonymousCompany.orgId}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
-            { duration: TOAST_DURATION }
-          );
+    <>
+      <h3 className="fr-h3 fr-mt-2w">
+        {anonymousCompanyRequest ? "Vérifier" : "Créer"} une entreprise
+      </h3>
 
-          onCompanyCreated();
-        }
-      }}
-    >
-      {({ errors }) => (
-        <Form className="fr-my-3w">
-          <Field name="siret">
-            {({ field }) => {
-              return (
-                <Input
-                  label="SIRET"
-                  state={errors.siret ? "error" : "default"}
-                  stateRelatedMessage={errors.siret as string}
-                  disabled={loading}
-                  nativeInputProps={field}
-                />
-              );
-            }}
-          </Field>
+      <Formik
+        initialValues={{
+          address: anonymousCompanyRequest?.address ?? "",
+          codeCommune: anonymousCompanyRequest?.codeCommune ?? "",
+          codeNaf: anonymousCompanyRequest?.codeNaf ?? "",
+          name: anonymousCompanyRequest?.name ?? "",
+          siret: anonymousCompanyRequest?.siret ?? ""
+        }}
+        validationSchema={AnonymousCompanyInputSchema}
+        onSubmit={async (values, { resetForm }) => {
+          const { data } = await createAnonymousCompany({
+            variables: { input: values }
+          });
+          resetForm();
+          if (data) {
+            toast.success(
+              `L'entreprise "${data?.createAnonymousCompany.orgId}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
+              { duration: TOAST_DURATION }
+            );
 
-          <Field name="name">
-            {({ field }) => {
-              return (
-                <Input
-                  label="Nom de l'entreprise"
-                  state={errors.name ? "error" : "default"}
-                  stateRelatedMessage={errors.name as string}
-                  disabled={loading}
-                  nativeInputProps={field}
-                />
-              );
-            }}
-          </Field>
+            onCompanyCreated();
+          }
+        }}
+      >
+        {({ errors }) => (
+          <Form className="fr-my-3w">
+            <Field name="siret">
+              {({ field }) => {
+                return (
+                  <Input
+                    label="SIRET"
+                    state={errors.siret ? "error" : "default"}
+                    stateRelatedMessage={errors.siret as string}
+                    disabled={loading}
+                    nativeInputProps={field}
+                  />
+                );
+              }}
+            </Field>
 
-          <Field name="address">
-            {({ field }) => {
-              return (
-                <Input
-                  label="Adresse"
-                  state={errors.address ? "error" : "default"}
-                  stateRelatedMessage={errors.address as string}
-                  disabled={loading}
-                  nativeInputProps={field}
-                />
-              );
-            }}
-          </Field>
+            <Field name="name">
+              {({ field }) => {
+                return (
+                  <Input
+                    label="Nom de l'entreprise"
+                    state={errors.name ? "error" : "default"}
+                    stateRelatedMessage={errors.name as string}
+                    disabled={loading}
+                    nativeInputProps={field}
+                  />
+                );
+              }}
+            </Field>
 
-          <Field name="codeNaf">
-            {({ field }) => {
-              return (
-                <Input
-                  label="Code NAF"
-                  state={errors.codeNaf ? "error" : "default"}
-                  stateRelatedMessage={errors.codeNaf as string}
-                  disabled={loading}
-                  nativeInputProps={field}
-                />
-              );
-            }}
-          </Field>
+            <Field name="address">
+              {({ field }) => {
+                return (
+                  <Input
+                    label="Adresse"
+                    state={errors.address ? "error" : "default"}
+                    stateRelatedMessage={errors.address as string}
+                    disabled={loading}
+                    nativeInputProps={field}
+                  />
+                );
+              }}
+            </Field>
 
-          <Field name="codeCommune">
-            {({ field }) => {
-              return (
-                <Input
-                  label="Code commune"
-                  state={errors.codeCommune ? "error" : "default"}
-                  stateRelatedMessage={errors.codeCommune as string}
-                  disabled={loading}
-                  nativeInputProps={field}
-                />
-              );
-            }}
-          </Field>
+            <Field name="codeNaf">
+              {({ field }) => {
+                return (
+                  <Input
+                    label="Code NAF"
+                    state={errors.codeNaf ? "error" : "default"}
+                    stateRelatedMessage={errors.codeNaf as string}
+                    disabled={loading}
+                    nativeInputProps={field}
+                  />
+                );
+              }}
+            </Field>
 
-          {error && (
-            <Alert
-              className="fr-mb-3w"
-              small
-              description={"test"}
-              severity="error"
-            />
-          )}
+            <Field name="codeCommune">
+              {({ field }) => {
+                return (
+                  <Input
+                    label="Code commune"
+                    state={errors.codeCommune ? "error" : "default"}
+                    stateRelatedMessage={errors.codeCommune as string}
+                    disabled={loading}
+                    nativeInputProps={field}
+                  />
+                );
+              }}
+            </Field>
 
-          <Button
-            type="submit"
-            priority="primary"
-            disabled={
-              loading || Object.values(errors).filter(Boolean).length !== 0
-            }
-          >
-            Valider
-          </Button>
-        </Form>
-      )}
-    </Formik>
+            {error && (
+              <Alert
+                className="fr-mb-3w"
+                small
+                description={"test"}
+                severity="error"
+              />
+            )}
+
+            <Button
+              type="submit"
+              priority="primary"
+              disabled={
+                loading || Object.values(errors).filter(Boolean).length !== 0
+              }
+            >
+              Valider
+            </Button>
+          </Form>
+        )}
+      </Formik>
+    </>
   );
 }

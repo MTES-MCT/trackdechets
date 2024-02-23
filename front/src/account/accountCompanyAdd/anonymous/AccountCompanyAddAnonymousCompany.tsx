@@ -14,7 +14,7 @@ const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
 `;
 
 // https://stackoverflow.com/questions/13538832/convert-pdf-to-a-base64-encoded-string-in-javascript
-const convertToBase64 = async (file: File): Promise<string> => {
+const convertFileToBase64 = async (file: File): Promise<string> => {
   return new Promise(res => {
     const fileReader = new FileReader();
 
@@ -58,7 +58,7 @@ const AccountCompanyAddAnonymousCompany = () => {
             if (e.target && e.target.files && e.target.files.length) {
               // Convert to base64
               const file = e.target.files[0];
-              const base64 = await convertToBase64(file);
+              const base64 = await convertFileToBase64(file);
 
               // Send to backend for data extraction
               await creationAnonymousCompanyRequest({

@@ -2,6 +2,7 @@ import { AnonymousCompaniesRequests } from "./AnonymousCompaniesRequests";
 import React, { useState } from "react";
 import { CreateAnonymousCompany } from "./CreateAnonymousCompany";
 import Button from "@codegouvfr/react-dsfr/Button";
+import styles from "./AnonymousCompany.module.scss";
 
 export const AnonymousCompaniesDashboard = () => {
   const [createAnonymousCompany, setCreateAnonymousCompany] = useState<
@@ -21,7 +22,7 @@ export const AnonymousCompaniesDashboard = () => {
 
   // ...or the form to create an anonymous company
   return (
-    <div style={{ height: "100%" }}>
+    <div className={styles.h100}>
       <div>
         <Button
           iconId="fr-icon-arrow-left-line"
@@ -32,7 +33,7 @@ export const AnonymousCompaniesDashboard = () => {
         </Button>
       </div>
 
-      <div style={{ height: "100%" }}>
+      <div className={styles.h100}>
         <CreateAnonymousCompany
           onCompanyCreated={() => setCreateAnonymousCompany(false)}
           anonymousCompanyRequestId={

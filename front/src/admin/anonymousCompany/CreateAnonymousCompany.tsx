@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { PDFViewer } from "./PDFViewer";
 import { CreateAnonymousCompanyForm } from "./CreateAnonymousCompanyForm";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import styles from "./AnonymousCompany.module.scss";
 
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 
@@ -45,7 +46,7 @@ export function CreateAnonymousCompany({
 
   if (loading) {
     return (
-      <div style={{ minHeight: "30vh" }}>
+      <div className={styles.minHeight30vh}>
         <Loader />
       </div>
     );
@@ -62,11 +63,8 @@ export function CreateAnonymousCompany({
   }
 
   return (
-    <div className="fr-container--fluid" style={{ height: "100%" }}>
-      <div
-        className="fr-grid-row fr-grid-row--gutters"
-        style={{ height: "100%" }}
-      >
+    <div className={`fr-container--fluid ${styles.h100}`}>
+      <div className={`fr-grid-row fr-grid-row--gutters ${styles.h100}`}>
         {data?.anonymousCompanyRequest && (
           <div className="fr-col-12 fr-col-lg-6">
             <PDFViewer pdf={data?.anonymousCompanyRequest.pdf} />

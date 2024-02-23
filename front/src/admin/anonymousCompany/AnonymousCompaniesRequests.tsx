@@ -5,6 +5,7 @@ import React from "react";
 import { Query } from "@td/codegen-ui";
 import { AnonymousCompaniesRequestsPagination } from "./AnonymousCompaniesRequestsPagination";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import styles from "./AnonymousCompany.module.scss";
 
 const ANONYMOUS_COMPANY_REQUESTS = gql`
   query AnonymousCompanyRequests($first: Int, $last: Int, $skip: Int) {
@@ -41,7 +42,7 @@ export const AnonymousCompaniesRequests = ({ onCreateAnonymousCompany }) => {
       request.codeNaf,
       request.codeCommune,
       "",
-      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+      <div className={styles.actionButton}>
         <Button
           onClick={() => onCreateAnonymousCompany(request.id)}
           priority="primary"
@@ -73,12 +74,7 @@ export const AnonymousCompaniesRequests = ({ onCreateAnonymousCompany }) => {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between"
-        }}
-      >
+      <div className={styles.tableHeader}>
         <h3 className="fr-h3">Entreprises anonymes</h3>
 
         <div>
