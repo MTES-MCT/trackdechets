@@ -8,7 +8,7 @@ import {
   sendPendingRevisionRequestToAdminDetailsEmail,
   sendSecondOnboardingEmail
 } from "./commands/onboarding.helpers";
-import { cleanUnusedAppendix1ProducerBsdds } from "./commands/appendix1.helpers";
+import { cleanAppendix1 } from "./commands/appendix1.helpers";
 
 const { CRON_ONBOARDING_SCHEDULE, TZ } = process.env;
 
@@ -16,7 +16,7 @@ let jobs: cron.CronJob[] = [
   new cron.CronJob({
     cronTime: "30 0 * * *", // Every day at 00:30
     onTick: async () => {
-      await cleanUnusedAppendix1ProducerBsdds();
+      await cleanAppendix1();
     },
     timeZone: TZ
   })
