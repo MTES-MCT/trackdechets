@@ -297,6 +297,10 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
     })
   ).map(g => ({ readableId: g.nextForm.readableId }));
 
+  const appendix1ProducerPlaceholder = `En cas de contrôle, les informations relatives à ce cadre sont celle du BSD de tournée dédié associé n° ${groupedIn.map(
+    bsd => bsd.readableId
+  )}`;
+
   const form = expandFormFromDb(fullPrismaForm);
   const isRepackging =
     form.recipient?.isTempStorage &&
@@ -621,16 +625,22 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
                 Courtier
               </strong>
             </p>
-            <div className="Row">
-              <div className="Col">
-                <FormCompanyFields
-                  company={form.trader?.company ?? form.broker?.company}
-                />
-              </div>
-              <div className="Col">
-                <ReceiptFields {...(form.trader ?? form.broker ?? {})} />
-              </div>
-            </div>
+            {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER ? (
+              appendix1ProducerPlaceholder
+            ) : (
+              <>
+                <div className="Row">
+                  <div className="Col">
+                    <FormCompanyFields
+                      company={form.trader?.company ?? form.broker?.company}
+                    />
+                  </div>
+                  <div className="Col">
+                    <ReceiptFields {...(form.trader ?? form.broker ?? {})} />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
         {form.intermediaries?.length ? (
@@ -710,52 +720,65 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
                 10. Réception par l’installation visée au cadre 2 (ou 14)
               </strong>
             </p>
-            <p>
-              Quantité réelle présentée : {form.quantityReceived} tonne(s)
-              <br />
-              Date de présentation : {formatDate(form.receivedAt)}
-            </p>
-            <AcceptationFields {...form} />
+            {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER ? (
+              appendix1ProducerPlaceholder
+            ) : (
+              <>
+                <p>
+                  Quantité réelle présentée : {form.quantityReceived} tonne(s)
+                  <br />
+                  Date de présentation : {formatDate(form.receivedAt)}
+                </p>
+                <AcceptationFields {...form} />
 
-            <p>
-              Nom : {form.receivedBy}
-              <br />
-              Signature :
-            </p>
-            {form.receivedAt && <SignatureStamp />}
+                <p>
+                  Nom : {form.receivedBy}
+                  <br />
+                  Signature :
+                </p>
+                {form.receivedAt && <SignatureStamp />}
+              </>
+            )}
           </div>
           <div className="BoxCol">
             <p>
               <strong>11. Réalisation de l’opération</strong>
             </p>
-            <p>
-              Code D/R de l’opération : {form.processingOperationDone}
-              <br />
-              Mode de traitement :{" "}
-              {getOperationModeLabel(
-                form?.destinationOperationMode as OperationMode
-              )}
-              <br />
-              Description : {form.processingOperationDescription}
-              <br />
-              Date de l’opération : {formatDate(form.processedAt)}
-              <br />
-              <input
-                type="checkbox"
-                checked={Boolean(form.noTraceability)}
-                readOnly
-              />{" "}
-              Autorisation par arrêté préfectoral, à une rupture de traçabilité
-              pour ce déchet.
-            </p>
-            <p>
-              Je soussigné certifie que l’opération ci-dessus a été effectuée.
-              <br />
-              Nom : {form.processedBy}
-              <br />
-              Signature :
-            </p>
-            {form.processedAt && <SignatureStamp />}
+            {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER ? (
+              appendix1ProducerPlaceholder
+            ) : (
+              <>
+                <p>
+                  Code D/R de l’opération : {form.processingOperationDone}
+                  <br />
+                  Mode de traitement :{" "}
+                  {getOperationModeLabel(
+                    form?.destinationOperationMode as OperationMode
+                  )}
+                  <br />
+                  Description : {form.processingOperationDescription}
+                  <br />
+                  Date de l’opération : {formatDate(form.processedAt)}
+                  <br />
+                  <input
+                    type="checkbox"
+                    checked={Boolean(form.noTraceability)}
+                    readOnly
+                  />{" "}
+                  Autorisation par arrêté préfectoral, à une rupture de
+                  traçabilité pour ce déchet.
+                </p>
+                <p>
+                  Je soussigné certifie que l’opération ci-dessus a été
+                  effectuée.
+                  <br />
+                  Nom : {form.processedBy}
+                  <br />
+                  Signature :
+                </p>
+                {form.processedAt && <SignatureStamp />}
+              </>
+            )}
           </div>
         </div>
 
@@ -764,23 +787,27 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
             <p>
               <strong>12. Destination prévue</strong>
             </p>
-            <div className="Row">
-              <div className="Col">
-                <FormCompanyFields company={form.nextDestination?.company} />
+            {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER ? (
+              appendix1ProducerPlaceholder
+            ) : (
+              <div className="Row">
+                <div className="Col">
+                  <FormCompanyFields company={form.nextDestination?.company} />
+                </div>
+                <div className="Col">
+                  <p>
+                    CODE D/R de traitement prévu :{" "}
+                    {form.nextDestination?.processingOperation}
+                  </p>
+                  <p>
+                    N° du document prévu à l'annexe I-B du règlement n°1013/2006
+                    ou le numéro de notification et numéro de saisie du document
+                    prévue à l'annexe I-B du règlement N°1013/2006 (si connu) :{" "}
+                    {form.nextDestination?.notificationNumber}
+                  </p>
+                </div>
               </div>
-              <div className="Col">
-                <p>
-                  CODE D/R de traitement prévu :{" "}
-                  {form.nextDestination?.processingOperation}
-                </p>
-                <p>
-                  N° du document prévu à l'annexe I-B du règlement n°1013/2006
-                  ou le numéro de notification et numéro de saisie du document
-                  prévue à l'annexe I-B du règlement N°1013/2006 (si connu) :{" "}
-                  {form.nextDestination?.notificationNumber}
-                </p>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -1080,6 +1107,33 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
               </table>
             </div>
           </div>
+          {form.emitter?.type === EmitterType.APPENDIX1 && (
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  Les informations suivantes doivent figurer sur le document de
+                  transport conformément au 5.4.1.1 de l'ADR :
+                </p>
+                <ul>
+                  <li>N° UN + Désignation officielle de transport</li>
+                  <li>Coordonnées de l'expéditeur</li>
+                  <li>Coordonnées du destinataire</li>
+                </ul>
+                <p>
+                  Le présent bordereau de tournée dédiée cumule automatiquement
+                  les informations des collectes effectuées pour un déchet
+                  identifié. Pour des raisons de confidentialité, les
+                  coordonnées des producteurs n'apparaissent pas dans le tableau
+                  ci-dessus. Aussi, en cas de contrôle des dispositions 5.4.1.1
+                  de l'ADR par les autorités, les annexes 1 listées ci-dessus
+                  pourront être présentées séparément par le transporteur, de
+                  façon à disposer des coordonnées des producteurs. Chaque
+                  annexe 1 est identifiable par son numéro et doit comporter les
+                  coordonnées du producteur initial.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </Document>
