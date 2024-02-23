@@ -77,7 +77,7 @@ export const searchCompany = async (
         query: {
           term: {
             siret: {
-              value: siret,
+              value: siret
             }
           }
         }
