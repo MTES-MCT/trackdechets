@@ -71,16 +71,22 @@ export const searchCompany = async (
   siret: string
 ): Promise<SireneSearchResult> => {
   try {
-    const response = await client.get<
-      estypes.GetResponse<SearchStockEtablissement>
-    >({
-      id: siret,
-      index
+    const response = await client.search<SearchResponse>({
+      index,
+      body: {
+        query: {
+          term: {
+            siret: {
+              value: siret
+            }
+          }
+        }
+      }
     });
-    if (!response.body._source) {
-      throw new Error(`No _source in ES body for id ${siret} & index ${index}`);
+    if (!response.body.hits.hits || response.body.hits.hits[0]._source) {
+      throw new SiretNotFoundError();
     }
-    const company = searchResponseToCompany(response.body._source);
+    const company = searchResponseToCompany(response.body.hits.hits[0]._source);
     if (
       company.statutDiffusionEtablissement ===
       ("P" as StatutDiffusionEtablissement)
