@@ -2,7 +2,7 @@ import React from "react";
 import styles from "../../AccountCompanyAdd.module.scss";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 
-export const SirenePDFFallbackError = () => (
+export const SirenePDFUploadDisabledFallbackError = () => (
   <div className={styles.alertWrapper}>
     <Alert
       title="Etablissement non diffusible"

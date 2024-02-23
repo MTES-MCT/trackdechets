@@ -3,9 +3,9 @@ import styles from "../../AccountCompanyAdd.module.scss";
 import { gql, useMutation } from "@apollo/client";
 import { Upload } from "@codegouvfr/react-dsfr/Upload";
 import { Mutation } from "@td/codegen-ui";
-import InvalidSirenePDFError from "./InvalidSirenePDFError";
-import SirenePDFInfo from "./SirenePDFInfo";
-import { SirenePDFFallbackError } from "./SirenePDFFallbackError";
+import { InvalidSirenePDFError } from "./InvalidSirenePDFError";
+import { UploadYourSirenePDFInfo } from "./UploadYourSirenePDFInfo";
+import { SirenePDFUploadDisabledFallbackError } from "./SirenePDFUploadDisabledFallbackError";
 
 const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
   mutation CreationAnonymousCompanyRequest($pdf: String!) {
@@ -39,12 +39,12 @@ const AccountCompanyAddAnonymousCompany = () => {
   // the feature, we keep a fallback to the old-fashioned way, going through
   // the support for each request
   if (import.meta.env.VITE_DISABLE_SIRENE_PDF_UPLOAD == "true") {
-    return <SirenePDFFallbackError />;
+    return <SirenePDFUploadDisabledFallbackError />;
   }
 
   return (
     <div className={styles.alertWrapper}>
-      <SirenePDFInfo />
+      <UploadYourSirenePDFInfo />
 
       <Upload
         className="fr-my-4w"

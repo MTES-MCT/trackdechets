@@ -1,7 +1,11 @@
 import React from "react";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 
-const InvalidSirenePDFError = ({ errorMessage }: { errorMessage: string }) => {
+export const InvalidSirenePDFError = ({
+  errorMessage
+}: {
+  errorMessage: string;
+}) => {
   return (
     <Alert
       title={errorMessage}
@@ -34,5 +38,3 @@ const InvalidSirenePDFError = ({ errorMessage }: { errorMessage: string }) => {
     />
   );
 };
-
-export default InvalidSirenePDFError;

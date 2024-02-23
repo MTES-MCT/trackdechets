@@ -1,7 +1,7 @@
 import React from "react";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 
-const SirenePDFInfo = () => {
+export const UploadYourSirenePDFInfo = () => {
   return (
     <Alert
       title="Etablissement non diffusible"
@@ -27,5 +27,3 @@ const SirenePDFInfo = () => {
     />
   );
 };
-
-export default SirenePDFInfo;
