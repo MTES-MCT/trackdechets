@@ -6,7 +6,7 @@ import {
 } from "../../../../generated/graphql/types";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { prisma } from "../../../../../../libs/back/prisma/src";
+import { prisma } from "@td/prisma";
 
 const ANONYMOUS_COMPANY_REQUESTS = gql`
   query AnonymousCompanyRequests($first: Int, $last: Int, $skip: Int) {

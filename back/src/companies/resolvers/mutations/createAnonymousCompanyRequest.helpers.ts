@@ -106,7 +106,7 @@ export const extractBetween = (
   label1: string,
   label2: string
 ) => {
-  let res: string[] = [];
+  const res: string[] = [];
 
   const startIndex = texts.indexOf(texts.find(s => s.includes(label1)) || "");
   // Careful! There can be multiple lines with the same label. Use the last one
@@ -137,7 +137,7 @@ export const extractBetween = (
  */
 export const toDate = (ddMMyyy: string) => {
   if (
-    !RegExp(/^(0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[012])[\/\-]\d{4}$/).test(
+    !RegExp(/^(0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[012])[/-]\d{4}$/).test(
       ddMMyyy
     )
   ) {

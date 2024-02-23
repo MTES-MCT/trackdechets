@@ -7,10 +7,7 @@ import { prisma } from "@td/prisma";
 import { siretify, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
-import {
-  anonymousCompanyCreatedEmail,
-  renderMail
-} from "../../../../../../libs/back/mail/src";
+import { anonymousCompanyCreatedEmail, renderMail } from "@td/mail";
 
 // Mock emails
 jest.mock("../../../../mailer/mailing");

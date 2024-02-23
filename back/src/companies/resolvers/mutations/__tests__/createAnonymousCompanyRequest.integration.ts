@@ -12,10 +12,7 @@ import {
   INFO,
   EXTRACTED_STRINGS
 } from "./createAnonymousCompanyRequest.helpers.test";
-import {
-  renderMail,
-  createAnonymousCompanyRequestEmail
-} from "../../../../../../libs/back/mail/src";
+import { renderMail, createAnonymousCompanyRequestEmail } from "@td/mail";
 import { getCodeCommune } from "../../../geo/getCodeCommune";
 
 jest.mock("pdf-parse", () => jest.fn());

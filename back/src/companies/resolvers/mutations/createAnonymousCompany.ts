@@ -10,10 +10,7 @@ import { nafCodes } from "@td/constants";
 import { siret } from "../../../common/validation";
 import { UserInputError } from "../../../common/errors";
 import { libelleFromCodeNaf } from "../../sirene/utils";
-import {
-  renderMail,
-  anonymousCompanyCreatedEmail
-} from "../../../../../libs/back/mail/src";
+import { renderMail, anonymousCompanyCreatedEmail } from "@td/mail";
 import { sendMail } from "../../../mailer/mailing";
 
 const anonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =

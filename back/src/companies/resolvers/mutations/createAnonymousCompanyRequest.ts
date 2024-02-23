@@ -1,7 +1,4 @@
-import {
-  renderMail,
-  createAnonymousCompanyRequestEmail
-} from "../../../../../libs/back/mail/src";
+import { renderMail, createAnonymousCompanyRequestEmail } from "@td/mail";
 import { prisma } from "../../../../../libs/back/prisma/src";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
