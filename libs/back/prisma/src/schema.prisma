@@ -343,6 +343,7 @@ model FinalOperation {
 
 model Form {
   id                                    String                  @id @default(cuid())
+  rowNumber                             Int                     @default(autoincrement()) @unique
   createdAt                             DateTime                @default(now()) @db.Timestamptz(6)
   updatedAt                             DateTime                @updatedAt @db.Timestamptz(6)
   emitterType                           EmitterType?
@@ -899,6 +900,7 @@ enum BsvhuDestinationType {
 
 model Bsvhu {
   id        String   @id
+  rowNumber Int      @default(autoincrement()) @unique
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
   isDraft   Boolean  @default(false)
@@ -1013,6 +1015,7 @@ model Bsdasri {
   id                                  String                  @unique
   type                                BsdasriType             @default(SIMPLE)
   status                              BsdasriStatus           @default(INITIAL)
+  rowNumber                           Int                     @default(autoincrement()) @unique
   createdAt                           DateTime                @default(now()) @db.Timestamptz(6)
   updatedAt                           DateTime                @updatedAt @db.Timestamptz(6)
   isDeleted                           Boolean?                @default(false)
@@ -1142,6 +1145,7 @@ model Bsdasri {
 
 model Bsff {
   id        String     @id
+  rowNumber Int        @default(autoincrement()) @unique
   createdAt DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt DateTime   @updatedAt @db.Timestamptz(6)
   isDeleted Boolean    @default(false)
@@ -1364,6 +1368,7 @@ enum BsdaConsistence {
 
 model Bsda {
   id        String   @id
+  rowNumber Int      @default(autoincrement()) @unique
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
   isDraft   Boolean  @default(false)
@@ -1649,6 +1654,7 @@ enum BspaohType {
 model Bspaoh {
   id String @id
 
+  rowNumber Int          @default(autoincrement()) @unique
   createdAt DateTime     @default(now()) @db.Timestamptz(6)
   updatedAt DateTime     @updatedAt @db.Timestamptz(6)
   isDeleted Boolean      @default(false)
