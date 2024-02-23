@@ -7,6 +7,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { sendMail } from "../../../mailer/mailing";
+import { getCodeCommune } from "../../geo/getCodeCommune";
 import { validateAndExtractSireneDataFromPDFInBase64 } from "./createAnonymousCompanyRequest.helpers";
 
 const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousCompanyRequest"] =
@@ -44,11 +45,14 @@ const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousC
       );
     }
 
+    // Retrieve the codeCommune
+    const codeCommune = await getCodeCommune(data.address);
+
     // Create the request
     await prisma.anonymousCompanyRequest.create({
       data: {
         ...data,
-        codeCommune: "TODO",
+        codeCommune: codeCommune,
         userId: user.id,
         pdf
       }

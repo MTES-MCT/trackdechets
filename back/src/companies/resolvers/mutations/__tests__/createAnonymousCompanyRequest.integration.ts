@@ -16,11 +16,16 @@ import {
   renderMail,
   createAnonymousCompanyRequestEmail
 } from "../../../../../../libs/back/mail/src";
+import { getCodeCommune } from "../../../geo/getCodeCommune";
+
 jest.mock("pdf-parse", () => jest.fn());
 
 // Mock emails
 jest.mock("../../../../mailer/mailing");
 (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+// Mock getCodeCommune
+jest.mock("../../../geo/getCodeCommune");
 
 const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
   mutation CreationAnonymousCompanyRequest($pdf: String!) {
@@ -28,59 +33,145 @@ const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
   }
 `;
 
-describe("createAnonymousCompanyRequest", () => {
+describe("mutation createAnonymousCompanyRequest", () => {
   afterEach(async () => {
     await resetDatabase();
     jest.resetAllMocks();
     jest.restoreAllMocks();
   });
 
-  describe("mutation CREATE_ANONYMOUS_COMPANY_REQUEST", () => {
-    it("should create the AnonymousCompanyRequest", async () => {
-      // Given
-      const user = await userFactory();
-      const { mutate } = makeClient(user);
+  it("should create the AnonymousCompanyRequest", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
 
-      pdfParser.mockImplementation(
-        () =>
-          new Promise(res =>
-            res({
-              metadata: { _metadata: METADATA },
-              info: INFO,
-              text: EXTRACTED_STRINGS.join("\n")
-            })
-          )
-      );
+    pdfParser.mockImplementation(
+      () =>
+        new Promise(res =>
+          res({
+            metadata: { _metadata: METADATA },
+            info: INFO,
+            text: EXTRACTED_STRINGS.join("\n")
+          })
+        )
+    );
 
-      // When
-      const { errors } = await mutate<
-        Pick<Mutation, "createAnonymousCompanyRequest">
-      >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
-        variables: {
-          pdf: "[pdf in base64]"
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompanyRequest">
+    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      variables: {
+        pdf: "[pdf in base64]"
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const anonymousCompanyRequest =
+      await prisma.anonymousCompanyRequest.findFirst({
+        where: {
+          siret: "98254982600013"
         }
       });
 
-      // Then
-      expect(errors).toBeUndefined();
-
-      const anonymousCompanyRequest =
-        await prisma.anonymousCompanyRequest.findFirst({
-          where: {
-            siret: "98254982600013"
-          }
-        });
-
-      expect(anonymousCompanyRequest).not.toBeUndefined();
-      expect(anonymousCompanyRequest).toMatchObject({
-        userId: user.id,
-        address: "4 BD PASTEUR 44100 NANTES",
-        codeNaf: "6202A",
-        name: "ACME CORP",
-        pdf: "[pdf in base64]",
-        siret: "98254982600013"
-      });
+    expect(anonymousCompanyRequest).not.toBeUndefined();
+    expect(anonymousCompanyRequest).toMatchObject({
+      userId: user.id,
+      address: "4 BD PASTEUR 44100 NANTES",
+      codeNaf: "6202A",
+      name: "ACME CORP",
+      pdf: "[pdf in base64]",
+      siret: "98254982600013"
     });
+  });
+
+  it("should call getCodeCommune and persist returned value", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+
+    (getCodeCommune as jest.Mock).mockImplementation((address: string) => {
+      if (address === "4 BD PASTEUR 44100 NANTES")
+        return Promise.resolve("44109");
+      return Promise.resolve();
+    });
+
+    pdfParser.mockImplementation(
+      () =>
+        new Promise(res =>
+          res({
+            metadata: { _metadata: METADATA },
+            info: INFO,
+            text: EXTRACTED_STRINGS.join("\n")
+          })
+        )
+    );
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompanyRequest">
+    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      variables: {
+        pdf: "[pdf in base64]"
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const anonymousCompanyRequest =
+      await prisma.anonymousCompanyRequest.findFirst({
+        where: {
+          siret: "98254982600013"
+        }
+      });
+
+    expect(anonymousCompanyRequest).not.toBeUndefined();
+    expect(anonymousCompanyRequest?.codeCommune).toEqual("44109");
+    expect(getCodeCommune).toBeCalledTimes(1);
+    expect(getCodeCommune).toBeCalledWith("4 BD PASTEUR 44100 NANTES");
+  });
+
+  it("if getCodeCommune doesn't return anything, should persist null", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+
+    pdfParser.mockImplementation(
+      () =>
+        new Promise(res =>
+          res({
+            metadata: { _metadata: METADATA },
+            info: INFO,
+            text: EXTRACTED_STRINGS.join("\n")
+          })
+        )
+    );
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompanyRequest">
+    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      variables: {
+        pdf: "[pdf in base64]"
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const anonymousCompanyRequest =
+      await prisma.anonymousCompanyRequest.findFirst({
+        where: {
+          siret: "98254982600013"
+        }
+      });
+
+    expect(anonymousCompanyRequest).not.toBeUndefined();
+    expect(anonymousCompanyRequest?.codeCommune).toEqual(null);
+    expect(getCodeCommune).toBeCalledTimes(1);
+    expect(getCodeCommune).toBeCalledWith("4 BD PASTEUR 44100 NANTES");
   });
 
   it("should send an email to the user", async () => {
@@ -175,7 +266,7 @@ describe("createAnonymousCompanyRequest", () => {
         name: "ACME CORP",
         siret: "98254982600013",
         libelleNaf: "Informatique",
-        codeCommune: "44100"
+        codeCommune: "44109"
       }
     });
 
@@ -262,7 +353,7 @@ describe("createAnonymousCompanyRequest", () => {
         name: "ACME CORP",
         siret: "98254982600013",
         pdf: "[pdf in base64]",
-        codeCommune: "44100",
+        codeCommune: "44109",
         userId: user.id
       }
     });

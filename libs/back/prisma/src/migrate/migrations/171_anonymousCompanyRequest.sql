@@ -7,7 +7,7 @@ CREATE TABLE "default$default"."AnonymousCompanyRequest" (
     "name" TEXT NOT NULL,
     "codeNaf" TEXT NOT NULL,
     "address" TEXT NOT NULL,
-    "codeCommune" TEXT NOT NULL,
+    "codeCommune" TEXT,
     PRIMARY KEY ("id")
 );
 

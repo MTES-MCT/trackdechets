@@ -23,7 +23,7 @@ type AnonymousCompanyRequest {
   name: String!
   codeNaf: String!
   address: String!
-  codeCommune: String!
+  codeCommune: String
 }
 
 type AdminForVerification {
