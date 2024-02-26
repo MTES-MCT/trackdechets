@@ -135,7 +135,7 @@ export const extractBetween = (
 /**
  * Converts a french-formatted date string (dd/MM/yyyy) into a JS Date object
  */
-export const toDate = (ddMMyyy: string) => {
+export const toDate = (ddMMyyy: string): Date | undefined => {
   if (
     !RegExp(/^(0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[012])[/-]\d{4}$/).test(
       ddMMyyy
@@ -146,7 +146,11 @@ export const toDate = (ddMMyyy: string) => {
 
   const splitted = ddMMyyy.split("/");
 
-  return new Date(+splitted[2], parseInt(splitted[1]) - 1, +splitted[0]);
+  const date = new Date(+splitted[2], parseInt(splitted[1]) - 1, +splitted[0]);
+  // Fix potential timezone issues: https://stackoverflow.com/questions/32469269/javascript-date-give-wrong-date-off-by-one-hour
+  date.setTime(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
+
+  return date;
 };
 
 export const extractEmittedAt = (texts: string[]) => {

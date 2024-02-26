@@ -279,7 +279,7 @@ describe("createAnonymousCompanyRequest.helpers", () => {
       const res = toDate("30/04/2015");
 
       // Then
-      expect(res?.toISOString()).toEqual("2015-04-29T22:00:00.000Z");
+      expect(res?.toISOString()).toEqual("2015-04-30T00:00:00.000Z");
     });
 
     it.each(["", "test", "30-04-1990"])(
@@ -304,7 +304,7 @@ describe("createAnonymousCompanyRequest.helpers", () => {
       const res = extractEmittedAt(EXTRACTED_STRINGS);
 
       // Then
-      expect(res?.toISOString()).toEqual("2024-02-13T23:00:00.000Z");
+      expect(res?.toISOString()).toEqual("2024-02-14T00:00:00.000Z");
     });
 
     it.each([[["À la date du"]], [["A la date du"]], [[""]], [[]]])(
@@ -332,7 +332,7 @@ describe("createAnonymousCompanyRequest.helpers", () => {
         const res = extractEmittedAt(input);
 
         // Then
-        expect(res?.toISOString()).toEqual("2024-02-13T23:00:00.000Z");
+        expect(res?.toISOString()).toEqual("2024-02-14T00:00:00.000Z");
       }
     );
   });
@@ -485,7 +485,7 @@ describe("createAnonymousCompanyRequest.helpers", () => {
         address: "4 BD PASTEUR 44100 NANTES",
         codeNaf: "6202A",
         name: "ACME CORP",
-        pdfEmittedAt: new Date("2024-02-13T23:00:00.000Z"),
+        pdfEmittedAt: new Date("2024-02-14T00:00:00.000Z"),
         siret: "98254982600013"
       });
     });
