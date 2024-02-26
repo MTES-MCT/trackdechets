@@ -69,7 +69,6 @@ export function CreateAnonymousCompanyForm({
   const postalCode = extractPostalCodeFromAddress(
     anonymousCompanyRequest?.address
   );
-  console.log("postalCode", postalCode);
 
   return (
     <>
