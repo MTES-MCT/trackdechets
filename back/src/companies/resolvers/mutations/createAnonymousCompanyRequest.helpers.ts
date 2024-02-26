@@ -191,8 +191,8 @@ export const extractName = (texts: string[]) => {
     throw new Error("Invalid name");
   }
 
-  if(denomination) return denomination;
-  if(enseigne) return enseigne;
+  if (denomination) return denomination;
+  if (enseigne) return enseigne;
   return `${firstNames} ${lastName}`;
 };
 

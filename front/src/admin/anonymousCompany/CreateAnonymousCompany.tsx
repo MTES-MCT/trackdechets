@@ -11,8 +11,8 @@ import styles from "./AnonymousCompany.module.scss";
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 
 const ANONYMOUS_COMPANY_REQUEST = gql`
-  query AnonymousCompanyRequest($id: ID!) {
-    anonymousCompanyRequest(id: $id) {
+  query AnonymousCompanyRequest($siret: String!) {
+    anonymousCompanyRequest(siret: $siret) {
       id
       siret
       pdf
@@ -27,22 +27,18 @@ const ANONYMOUS_COMPANY_REQUEST = gql`
 `;
 
 export function CreateAnonymousCompany({
-  anonymousCompanyRequestId,
+  anonymousCompanyRequestSiret,
   onCompanyCreated
 }) {
-  const { data, error, loading, refetch } = useQuery<
+  const { data, error, loading } = useQuery<
     Pick<Query, "anonymousCompanyRequest">,
     QueryAnonymousCompanyRequestArgs
   >(ANONYMOUS_COMPANY_REQUEST, {
     variables: {
-      id: anonymousCompanyRequestId
+      siret: anonymousCompanyRequestSiret
     },
-    skip: !Boolean(anonymousCompanyRequestId)
+    skip: !Boolean(anonymousCompanyRequestSiret)
   });
-
-  useEffect(() => {
-    refetch({ id: anonymousCompanyRequestId });
-  }, [anonymousCompanyRequestId, refetch]);
 
   if (loading) {
     return (

@@ -5,16 +5,14 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import styles from "./AnonymousCompany.module.scss";
 
 export const AnonymousCompaniesDashboard = () => {
-  const [createAnonymousCompany, setCreateAnonymousCompany] = useState<
-    string | boolean
-  >(false);
+  const [requestSiret, setRequestSiret] = useState<string | boolean>(false);
 
   // Either display the table of all anonymous company requests...
-  if (!createAnonymousCompany) {
+  if (!requestSiret) {
     return (
       <AnonymousCompaniesRequests
-        onCreateAnonymousCompany={(requestId?: string) => {
-          setCreateAnonymousCompany(requestId ?? true);
+        onCreateAnonymousCompany={(siret?: string) => {
+          setRequestSiret(siret ?? true);
         }}
       />
     );
@@ -26,7 +24,7 @@ export const AnonymousCompaniesDashboard = () => {
       <div>
         <Button
           iconId="fr-icon-arrow-left-line"
-          onClick={() => setCreateAnonymousCompany(false)}
+          onClick={() => setRequestSiret(false)}
           priority="tertiary no outline"
         >
           Précédent
@@ -35,11 +33,9 @@ export const AnonymousCompaniesDashboard = () => {
 
       <div className={styles.h100}>
         <CreateAnonymousCompany
-          onCompanyCreated={() => setCreateAnonymousCompany(false)}
-          anonymousCompanyRequestId={
-            typeof createAnonymousCompany == "boolean"
-              ? undefined
-              : createAnonymousCompany
+          onCompanyCreated={() => setRequestSiret(false)}
+          anonymousCompanyRequestSiret={
+            typeof requestSiret == "boolean" ? undefined : requestSiret
           }
         />
       </div>

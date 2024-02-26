@@ -35,7 +35,7 @@ type Query {
   ): AnonymousCompanyRequestConnection!
 
   "Fetch a specific anonymousCompanyRequest (admin panel)"
-  anonymousCompanyRequest(id: ID!): AnonymousCompanyRequest!
+  anonymousCompanyRequest(siret: String!): AnonymousCompanyRequest!
 
   """
   Renvoie des informations restreintes sur un établissement

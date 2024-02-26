@@ -9,8 +9,8 @@ import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "@td/prisma";
 
 const ANONYMOUS_COMPANY_REQUEST = gql`
-  query AnonymousCompanyRequest($id: ID!) {
-    anonymousCompanyRequest(id: $id) {
+  query AnonymousCompanyRequest($siret: String!) {
+    anonymousCompanyRequest(siret: $siret) {
       id
       siret
       pdf
@@ -47,7 +47,7 @@ describe("anonymousCompanyRequest", () => {
     const { query } = makeClient(user);
     const { errors } = await query(ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        id: "1"
+        siret: "98254982600013"
       }
     });
 
@@ -55,6 +55,38 @@ describe("anonymousCompanyRequest", () => {
     expect(errors).toEqual([
       expect.objectContaining({ message: "Vous n'êtes pas administrateur" })
     ]);
+  });
+
+  it("should throw if invalid SIRET", async () => {
+    // Given
+    const user = await userFactory({ isAdmin: true });
+
+    // When
+    const { query } = makeClient(user);
+    const { errors } = await query(ANONYMOUS_COMPANY_REQUEST, {
+      variables: {
+        siret: "not a siret"
+      }
+    });
+
+    // Then
+    expect(errors[0].message).toEqual(`"not a siret" is not a valid SIRET`);
+  });
+
+  it("should throw if empty SIRET", async () => {
+    // Given
+    const user = await userFactory({ isAdmin: true });
+
+    // When
+    const { query } = makeClient(user);
+    const { errors } = await query(ANONYMOUS_COMPANY_REQUEST, {
+      variables: {
+        siret: ""
+      }
+    });
+
+    // Then
+    expect(errors[0].message).toEqual(`"" is not a valid SIRET`);
   });
 
   it("should return targeted anonymousCompanyRequest", async () => {
@@ -73,7 +105,7 @@ describe("anonymousCompanyRequest", () => {
       QueryAnonymousCompanyRequestArgs
     >(ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        id: request1.id
+        siret: request1.siret
       }
     });
 
@@ -98,7 +130,7 @@ describe("anonymousCompanyRequest", () => {
       QueryAnonymousCompanyRequestArgs
     >(ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        id: "1"
+        siret: "98254982600013"
       }
     });
 

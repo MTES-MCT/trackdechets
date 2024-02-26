@@ -1,12 +1,26 @@
 import React, { useState } from "react";
 import styles from "../../AccountCompanyAdd.module.scss";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Upload } from "@codegouvfr/react-dsfr/Upload";
-import { Mutation } from "@td/codegen-ui";
+import {
+  Mutation,
+  Query,
+  QueryAnonymousCompanyRequestArgs
+} from "@td/codegen-ui";
 import { InvalidSirenePDFError } from "./InvalidSirenePDFError";
 import { UploadYourSirenePDFInfo } from "./UploadYourSirenePDFInfo";
 import { SirenePDFUploadDisabledFallbackError } from "./SirenePDFUploadDisabledFallbackError";
 import { convertFileToBase64 } from "../../../Apps/utils/fileUtils";
+import { Loader } from "../../../Apps/common/Components";
+import { AlreadyPendingAnonymousCompanyRequestError } from "./AlreadyPendingAnonymousCompanyRequestError";
+
+const ANONYMOUS_COMPANY_REQUEST = gql`
+  query AnonymousCompanyRequest($siret: String!) {
+    anonymousCompanyRequest(siret: $siret) {
+      id
+    }
+  }
+`;
 
 const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
   mutation CreateAnonymousCompanyRequest(
@@ -18,16 +32,35 @@ const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
 
 const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
   const [formatError, setFormatError] = useState<string>();
-  const [createAnonymousCompanyRequest, { error, loading }] = useMutation<
-    Pick<Mutation, "createAnonymousCompanyRequest">,
-    any
-  >(CREATE_ANONYMOUS_COMPANY_REQUEST);
+  const { data, loading: getLoading } = useQuery<
+    Pick<Query, "anonymousCompanyRequest">,
+    QueryAnonymousCompanyRequestArgs
+  >(ANONYMOUS_COMPANY_REQUEST, {
+    variables: {
+      siret
+    },
+    skip: import.meta.env.VITE_DISABLE_SIRENE_PDF_UPLOAD == "true"
+  });
+  const [
+    createAnonymousCompanyRequest,
+    { error: createError, loading: createLoading }
+  ] = useMutation<Pick<Mutation, "createAnonymousCompanyRequest">, any>(
+    CREATE_ANONYMOUS_COMPANY_REQUEST
+  );
 
   // Because we rely on SIRENE's PDF formats, which may change and break
   // the feature, we keep a fallback to the old-fashioned way, going through
   // the support for each request
   if (import.meta.env.VITE_DISABLE_SIRENE_PDF_UPLOAD == "true") {
     return <SirenePDFUploadDisabledFallbackError />;
+  }
+
+  if (getLoading) {
+    return <Loader />;
+  }
+
+  if (data?.anonymousCompanyRequest.id) {
+    return <AlreadyPendingAnonymousCompanyRequestError />;
   }
 
   return (
@@ -39,7 +72,7 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
         label="Avis de situation au répertoire SIRENE de moins de 3 mois"
         hint="au format PDF"
         state={formatError ? "error" : "default"}
-        disabled={loading}
+        disabled={createLoading}
         stateRelatedMessage={formatError}
         nativeInputProps={{
           type: "file",
@@ -68,7 +101,9 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
         }}
       />
 
-      {error && <InvalidSirenePDFError errorMessage={error.message} />}
+      {createError && (
+        <InvalidSirenePDFError errorMessage={createError.message} />
+      )}
     </div>
   );
 };

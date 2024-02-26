@@ -49,7 +49,7 @@ export const AnonymousCompaniesRequests = ({ onCreateAnonymousCompany }) => {
       </a>,
       <div className={styles.actionButton}>
         <Button
-          onClick={() => onCreateAnonymousCompany(request.id)}
+          onClick={() => onCreateAnonymousCompany(request.siret)}
           priority="primary"
         >
           Vérifier
