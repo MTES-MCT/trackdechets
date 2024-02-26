@@ -19,13 +19,8 @@ export { deleteBsd } from "./common/elastic";
 export { getCompaniesAndActiveAdminsByCompanyOrgIds } from "./companies/database";
 export { formatDate } from "./common/pdf";
 export { sendMail } from "./mailer/mailing";
-export {
-  BsdUpdateQueueItem,
-  updatesQueue
-} from "./queue/producers/bsdUpdate";
-export {
-  operationHooksQueue
-} from "./queue/producers/operationHook";
+export { BsdUpdateQueueItem, updatesQueue } from "./queue/producers/bsdUpdate";
+export { operationHooksQueue } from "./queue/producers/operationHook";
 export { indexBsdJob, operationHookJob, sendMailJob } from "./queue/jobs";
 export {
   indexQueue,

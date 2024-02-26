@@ -1,4 +1,5 @@
 import Queue from "bull";
+
 const { REDIS_URL, NODE_ENV } = process.env;
 
 export type BsdUpdateQueueItem = {
