@@ -97,8 +97,9 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
 
   const TODAY = new Date();
   const isFRCompany = Boolean(nextDestination?.company?.siret);
+  const hasVatNumber = Boolean(nextDestination?.company?.vatNumber);
   const showNotificationNumber =
-    (!isFRCompany && noTraceability) || isExtraEuropeanCompany;
+    isExtraEuropeanCompany || (!isFRCompany && noTraceability) || hasVatNumber;
   const isDangerousWaste = isDangerous(form.wasteDetails?.code ?? "");
   const isPop = form?.wasteDetails?.pop;
   const notificationNumberPlaceHolder =
@@ -251,6 +252,14 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
             />
           )}
           <div className="form__row">
+            {isExtraEuropeanCompany && (
+              <ExtraEuropeanCompanyManualInput
+                name="nextDestination.company"
+                optional={noTraceability === true}
+                extraEuropeanCompanyId={extraEuropeanCompany}
+                onExtraEuropeanCompanyId={setExtraEuropeanCompany}
+              />
+            )}
             {showNotificationNumber && (
               <>
                 <label>
@@ -265,14 +274,6 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
                   required={isExtraEuropeanCompany}
                 />
               </>
-            )}
-            {isExtraEuropeanCompany && (
-              <ExtraEuropeanCompanyManualInput
-                name="nextDestination.company"
-                optional={noTraceability === true}
-                extraEuropeanCompanyId={extraEuropeanCompany}
-                onExtraEuropeanCompanyId={setExtraEuropeanCompany}
-              />
             )}
           </div>
         </div>
