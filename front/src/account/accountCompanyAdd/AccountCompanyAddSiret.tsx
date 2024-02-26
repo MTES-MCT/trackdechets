@@ -176,8 +176,7 @@ export default function AccountCompanyAddSiret({
             />
           )}
           <Formik
-            // TODO: rollback
-            initialValues={{ siret: "82535358400022" }}
+            initialValues={{ siret: "" }}
             validate={values => {
               const isValidSiret = isSiret(
                 values.siret,

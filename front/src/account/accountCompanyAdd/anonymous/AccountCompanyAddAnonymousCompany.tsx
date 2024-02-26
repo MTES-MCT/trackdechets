@@ -14,6 +14,7 @@ import { convertFileToBase64 } from "../../../Apps/utils/fileUtils";
 import { Loader } from "../../../Apps/common/Components";
 import { AlreadyPendingAnonymousCompanyRequestError } from "./AlreadyPendingAnonymousCompanyRequestError";
 import { InvalidSirenePDFFormatError } from "./InvalidSirenePDFFormatError";
+import { AnonymousCompanyRequestCreationSuccess } from "./AnonymousCompanyRequestCreationSuccess";
 
 const ANONYMOUS_COMPANY_REQUEST = gql`
   query AnonymousCompanyRequest($siret: String!) {
@@ -51,7 +52,7 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
   });
   const [
     createAnonymousCompanyRequest,
-    { error: createError, loading: createLoading }
+    { data: createData, error: createError, loading: createLoading }
   ] = useMutation<Pick<Mutation, "createAnonymousCompanyRequest">, any>(
     CREATE_ANONYMOUS_COMPANY_REQUEST
   );
@@ -64,7 +65,11 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
     return <Loader />;
   }
 
-  if (data?.anonymousCompanyRequest.id) {
+  if (createData?.createAnonymousCompanyRequest) {
+    return <AnonymousCompanyRequestCreationSuccess />;
+  }
+
+  if (data?.anonymousCompanyRequest) {
     return <AlreadyPendingAnonymousCompanyRequestError />;
   }
 
