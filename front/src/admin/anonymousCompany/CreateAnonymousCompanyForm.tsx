@@ -13,8 +13,17 @@ import { TOAST_DURATION } from "../../common/config";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { extractPostalCodeFromAddress } from "../../Apps/utils/utils";
 
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
+
+const openDataSoftUrl = (postalCode: string) => {
+  return `https://public.opendatasoft.com/explore/dataset/correspondance-code-insee-code-postal/table/?flg=fr-fr&q=${postalCode}`;
+};
+
+const googleUrl = (postalCode: string) => {
+  return `https://www.google.com/search?q=%22code+commune%22+${postalCode}`;
+};
 
 const CREATE_ANONYMOUS_COMPANY = gql`
   mutation CreateAnonymousCompany($input: AnonymousCompanyInput!) {
@@ -56,6 +65,11 @@ export function CreateAnonymousCompanyForm({
     Pick<Mutation, "createAnonymousCompany">,
     MutationCreateAnonymousCompanyArgs
   >(CREATE_ANONYMOUS_COMPANY);
+
+  const postalCode = extractPostalCodeFromAddress(
+    anonymousCompanyRequest?.address
+  );
+  console.log("postalCode", postalCode);
 
   return (
     <>
@@ -150,6 +164,20 @@ export function CreateAnonymousCompanyForm({
                 return (
                   <Input
                     label="Code commune"
+                    hintText={
+                      postalCode ? (
+                        <>
+                          Vérifier sur{" "}
+                          <a href={openDataSoftUrl(postalCode)} target="_blank">
+                            OpenDataSoft
+                          </a>{" "}
+                          ou sur{" "}
+                          <a href={googleUrl(postalCode)} target="_blank">
+                            Google
+                          </a>
+                        </>
+                      ) : null
+                    }
                     state={errors.codeCommune ? "error" : "default"}
                     stateRelatedMessage={errors.codeCommune as string}
                     disabled={loading}
