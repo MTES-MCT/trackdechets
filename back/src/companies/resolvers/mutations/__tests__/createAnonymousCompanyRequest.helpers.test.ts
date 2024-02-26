@@ -378,6 +378,16 @@ describe("createAnonymousCompanyRequest.helpers", () => {
       expect(res).toEqual("ACME CORP");
     });
 
+    it("should return enseigne", async () => {
+      // Given
+
+      // When
+      const res = extractName(["EnseigneGRINGOT"]);
+
+      // Then
+      expect(res).toEqual("GRINGOT");
+    });
+
     it("should return nom + prénom", async () => {
       // Given
 

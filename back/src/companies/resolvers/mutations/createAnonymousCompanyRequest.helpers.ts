@@ -185,12 +185,15 @@ export const extractName = (texts: string[]) => {
   const lastName = extractLine(texts, "Nom");
   const firstNames = extractLine(texts, "Prénoms");
   const denomination = extractLine(texts, "Dénomination");
+  const enseigne = extractLine(texts, "Enseigne");
 
-  if (!lastName && !firstNames && !denomination) {
+  if (!lastName && !firstNames && !denomination && !enseigne) {
     throw new Error("Invalid name");
   }
 
-  return denomination ?? `${firstNames} ${lastName}`;
+  if(denomination) return denomination;
+  if(enseigne) return enseigne;
+  return `${firstNames} ${lastName}`;
 };
 
 /**
