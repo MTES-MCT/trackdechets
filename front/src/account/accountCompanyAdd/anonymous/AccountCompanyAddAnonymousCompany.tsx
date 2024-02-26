@@ -36,7 +36,7 @@ const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
 // the feature, we keep a fallback to the old-fashioned way, going through
 // the support for each request
 const DISABLE_FILE_UPLOAD =
-  import.meta.env.VITE_DISABLE_SIRENE_PDF_UPLOAD == "true";
+  import.meta.env.VITE_DISABLE_SIRENE_PDF_UPLOAD === "true";
 
 const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
   const [fileHasInvalidFormat, setFileHasInvalidFormat] =

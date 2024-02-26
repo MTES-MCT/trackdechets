@@ -14,6 +14,7 @@ export const PDFViewer = ({ pdf }) => {
       style={{ minHeight: "400px" }}
       data={`data:application/pdf;base64,${pdf}#zoom=95&navpanes=0`}
       type="application/pdf"
+      aria-label="Avis de situation"
     ></object>
   );
 };

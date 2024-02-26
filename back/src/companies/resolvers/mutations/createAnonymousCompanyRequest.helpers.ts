@@ -1,6 +1,6 @@
 import pdfParser from "pdf-parse";
 import { isSiret, nafCodes } from "@td/constants";
-import { isBase64, looksHacky } from "../../../utils";
+import { looksHacky } from "../../../utils";
 
 export interface Info {
   PDFFormatVersion: string;

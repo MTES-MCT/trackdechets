@@ -2,7 +2,6 @@ import * as React from "react";
 import { gql, useQuery } from "@apollo/client";
 import { Query, QueryAnonymousCompanyRequestArgs } from "@td/codegen-ui";
 import { Loader } from "../../Apps/common/Components";
-import { useEffect } from "react";
 import { PDFViewer } from "./PDFViewer";
 import { CreateAnonymousCompanyForm } from "./CreateAnonymousCompanyForm";
 import Alert from "@codegouvfr/react-dsfr/Alert";
