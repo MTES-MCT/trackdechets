@@ -58,10 +58,10 @@ export default function CompanyVerificationActions({
     any
   >(SEND_VERIFICATION_CODE_LETTER, {
     onCompleted: () => {
-      toast.success("Verification envoyée", { duration: TOAST_DURATION });
+      toast.success("Courrier envoyé", { duration: TOAST_DURATION });
     },
     onError: () => {
-      toast.error("La vérification n'a pas pu être envoyée", {
+      toast.error("Le courrier n'a pas pu être envoyé", {
         duration: TOAST_DURATION
       });
     }
@@ -71,10 +71,10 @@ export default function CompanyVerificationActions({
     MutationVerifyCompanyByAdminArgs
   >(VERIFY_COMPANY_BY_ADMIN, {
     onCompleted: () => {
-      toast.success("Verification envoyée", { duration: TOAST_DURATION });
+      toast.success("Verification validée", { duration: TOAST_DURATION });
     },
     onError: () => {
-      toast.error("La vérification n'a pas pu être envoyée", {
+      toast.error("La vérification n'a pas pu être validée", {
         duration: TOAST_DURATION
       });
     }
