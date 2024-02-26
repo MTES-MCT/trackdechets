@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "../../AccountCompanyAdd.module.scss";
 import { gql, useMutation } from "@apollo/client";
 import { Upload } from "@codegouvfr/react-dsfr/Upload";
@@ -6,6 +6,7 @@ import { Mutation } from "@td/codegen-ui";
 import { InvalidSirenePDFError } from "./InvalidSirenePDFError";
 import { UploadYourSirenePDFInfo } from "./UploadYourSirenePDFInfo";
 import { SirenePDFUploadDisabledFallbackError } from "./SirenePDFUploadDisabledFallbackError";
+import { convertFileToBase64 } from "../../../Apps/utils/fileUtils";
 
 const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
   mutation CreationAnonymousCompanyRequest($pdf: String!) {
@@ -13,23 +14,8 @@ const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
   }
 `;
 
-// https://stackoverflow.com/questions/13538832/convert-pdf-to-a-base64-encoded-string-in-javascript
-const convertFileToBase64 = async (file: File): Promise<string> => {
-  return new Promise(res => {
-    const fileReader = new FileReader();
-
-    let base64;
-    fileReader.onload = function (fileLoadedEvent) {
-      base64 = fileLoadedEvent?.target?.result;
-      // Remove corrupting leading declaration
-      res(base64.replace("data:application/pdf;base64,", ""));
-    };
-
-    fileReader.readAsDataURL(file);
-  });
-};
-
 const AccountCompanyAddAnonymousCompany = () => {
+  const [formatError, setFormatError] = useState<string>();
   const [creationAnonymousCompanyRequest, { error, loading }] = useMutation<
     Pick<Mutation, "createAnonymousCompanyRequest">,
     any
@@ -48,16 +34,27 @@ const AccountCompanyAddAnonymousCompany = () => {
 
       <Upload
         className="fr-my-4w"
-        label="Avis de situation au répertoire SIRENE"
+        label="Avis de situation au répertoire SIRENE de moins de 3 mois"
         hint="au format PDF"
-        state="default"
+        state={formatError ? "error" : "default"}
         disabled={loading}
-        stateRelatedMessage="Text de validation / d'explication de l'erreur"
+        stateRelatedMessage={formatError}
         nativeInputProps={{
+          type: "file",
+          accept: ".pdf",
           onChange: async e => {
             if (e.target && e.target.files && e.target.files.length) {
               // Convert to base64
               const file = e.target.files[0];
+
+              // Make sure the file is a PDF
+              if (file.name.split(".").pop()?.toLowerCase() !== "pdf") {
+                setFormatError("Le fichier doit être au format PDF");
+                return;
+              }
+
+              setFormatError(undefined);
+
               const base64 = await convertFileToBase64(file);
 
               // Send to backend for data extraction
