@@ -23,6 +23,13 @@ export const anonymousCompanyRequestsResolver: QueryResolvers["anonymousCompanyR
         ...paginationArgs,
         orderBy: {
           createdAt: Prisma.SortOrder.desc
+        },
+        include: {
+          user: {
+            select: {
+              email: true
+            }
+          }
         }
       });
 

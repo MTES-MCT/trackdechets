@@ -20,6 +20,9 @@ const ANONYMOUS_COMPANY_REQUEST = gql`
       codeNaf
       address
       codeCommune
+      user {
+        email
+      }
     }
   }
 `;
@@ -77,7 +80,10 @@ describe("anonymousCompanyRequest", () => {
     // Then
     expect(data.anonymousCompanyRequest).toMatchObject({
       ...request1,
-      createdAt: request1.createdAt.toISOString()
+      createdAt: request1.createdAt.toISOString(),
+      user: {
+        email: user.email
+      }
     });
   });
 

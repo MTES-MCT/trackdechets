@@ -20,6 +20,9 @@ const ANONYMOUS_COMPANY_REQUESTS = gql`
         codeNaf
         address
         codeCommune
+        user {
+          email
+        }
       }
     }
   }
@@ -41,7 +44,9 @@ export const AnonymousCompaniesRequests = ({ onCreateAnonymousCompany }) => {
       request.address,
       request.codeNaf,
       request.codeCommune,
-      "",
+      <a className={styles.blueFrance} href={`mailto:${request.user.email}`}>
+        {request.user.email}
+      </a>,
       <div className={styles.actionButton}>
         <Button
           onClick={() => onCreateAnonymousCompany(request.id)}

@@ -21,6 +21,9 @@ const ANONYMOUS_COMPANY_REQUESTS = gql`
         name
         codeNaf
         address
+        user {
+          email
+        }
       }
     }
   }
@@ -60,10 +63,11 @@ describe("anonymousCompanyRequests", () => {
 
   it("should return the list of anonymousCompanyRequests ordered by createdAt desc", async () => {
     // Given
-    const user = await userFactory();
+    const user1 = await userFactory();
+    const user2 = await userFactory();
     const admin = await userFactory({ isAdmin: true });
-    const request1 = { userId: user.id, ...REQUEST_1 };
-    const request2 = { userId: user.id, ...REQUEST_2 };
+    const request1 = { userId: user1.id, ...REQUEST_1 };
+    const request2 = { userId: user2.id, ...REQUEST_2 };
 
     await prisma.anonymousCompanyRequest.create({
       data: request1
@@ -83,15 +87,19 @@ describe("anonymousCompanyRequests", () => {
     expect(data.anonymousCompanyRequests.totalCount).toEqual(2);
     expect(
       data.anonymousCompanyRequests.anonymousCompanyRequests
-    ).toMatchObject([request2, request1]);
+    ).toMatchObject([
+      { ...request2, user: { email: user2.email } },
+      { ...request1, user: { email: user1.email } }
+    ]);
   });
 
   it("should return the list of anonymousCompanyRequests paginated", async () => {
     // Given
-    const user = await userFactory();
+    const user1 = await userFactory();
+    const user2 = await userFactory();
     const admin = await userFactory({ isAdmin: true });
-    const request1 = { userId: user.id, ...REQUEST_1 };
-    const request2 = { userId: user.id, ...REQUEST_2 };
+    const request1 = { userId: user1.id, ...REQUEST_1 };
+    const request2 = { userId: user2.id, ...REQUEST_2 };
 
     await prisma.anonymousCompanyRequest.create({
       data: request1
@@ -116,7 +124,7 @@ describe("anonymousCompanyRequests", () => {
     expect(data.anonymousCompanyRequests.totalCount).toEqual(2);
     expect(
       data.anonymousCompanyRequests.anonymousCompanyRequests
-    ).toMatchObject([request1]);
+    ).toMatchObject([{ ...request1, user: { email: user1.email } }]);
   });
 
   it("should return an empty list", async () => {

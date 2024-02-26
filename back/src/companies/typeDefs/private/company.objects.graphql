@@ -14,6 +14,10 @@ type CompanyForVerification {
   admin: AdminForVerification
 }
 
+type AnonymousCompanyRequestUser {
+  email: String!
+}
+
 type AnonymousCompanyRequest {
   id: ID!
   siret: String!
@@ -24,6 +28,7 @@ type AnonymousCompanyRequest {
   codeNaf: String!
   address: String!
   codeCommune: String
+  user: AnonymousCompanyRequestUser!
 }
 
 type AdminForVerification {

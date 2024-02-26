@@ -10,7 +10,14 @@ export const anonymousCompanyRequestResolver: QueryResolvers["anonymousCompanyRe
 
     const anonymousCompanyRequest =
       await prisma.anonymousCompanyRequest.findFirstOrThrow({
-        where: { id }
+        where: { id },
+        include: {
+          user: {
+            select: {
+              email: true
+            }
+          }
+        }
       });
 
     return anonymousCompanyRequest;
