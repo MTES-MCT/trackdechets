@@ -1,6 +1,6 @@
 
 -- Table Definition ----------------------------------------------
-CREATE TABLE "default$default"."FinalOperation" (
+CREATE TABLE IF NOT EXISTS "default$default"."FinalOperation" (
     "id" text NOT NULL,
     "createdAt" timestamptz  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" timestamptz  NOT NULL,
@@ -17,6 +17,6 @@ CREATE TABLE "default$default"."FinalOperation" (
 
 -- Indices -------------------------------------------------------
 CREATE UNIQUE INDEX IF NOT EXISTS "_FinalOperation_pkey" ON "default$default"."FinalOperation" ("id");
-CREATE UNIQUE INDEX IF NOT EXISTS "_FinalOperation_finalBsdReadableId" ON "default$default"."FinalOperation" ("finalBsdReadableId");
+CREATE UNIQUE INDEX IF NOT EXISTS "_FinalOperation_finalBsdReadableId" ON "default$default"."FinalOperation" ("finalBsdReadableId", "formId");
 CREATE INDEX IF NOT EXISTS "_FinalOperationdestinationCompanySiretIdx" ON "default$default"."FinalOperation" ("destinationCompanySiret");
 CREATE INDEX IF NOT EXISTS "_FinalOperationFormIdIdx" ON "default$default"."FinalOperation" ("formId");
