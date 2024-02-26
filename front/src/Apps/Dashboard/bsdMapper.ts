@@ -79,8 +79,11 @@ export const mapBsdd = (bsdd: Form): BsdDisplay => {
     grouping: bsdd.grouping,
     temporaryStorageDetail: bsdd.temporaryStorageDetail,
     bsdWorkflowType: bsdd.emitter?.type,
-    transporterCustomInfo: bsdd.stateSummary?.transporterCustomInfo,
-    transporterNumberPlate: bsdd.stateSummary?.transporterNumberPlate,
+    transporterCustomInfo:
+      bsdd.transporter?.customInfo || bsdd.stateSummary?.transporterCustomInfo,
+    transporterNumberPlate:
+      bsdd.transporter?.numberPlate ||
+      bsdd.stateSummary?.transporterNumberPlate,
     metadata: bsdd.metadata
   } as BsdDisplay;
   return bsddFormatted;

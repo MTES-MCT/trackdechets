@@ -1,5 +1,5 @@
 export const isBsddTransporterFieldEditable = status =>
-  ["SEALED", "SIGNED_BY_PRODUCER"].includes(status);
+  ["SEALED", "RESEALED", "SIGNED_BY_PRODUCER"].includes(status);
 
 export const objectsEqual = (o1, o2) => {
   return isObject(o1) && isObject(o2)
