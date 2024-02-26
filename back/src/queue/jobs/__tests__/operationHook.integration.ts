@@ -178,7 +178,7 @@ describe("Test Form OperationHook job", () => {
         emitterCompanyAddress: "40 boulevard Voltaire 13001 Marseille",
         recipientCompanySiret: collectorCompany.siret,
         quantityReceived: 100,
-        processingOperationDone: "R 1",
+        processingOperationDone: "R 1"
       }
     });
 
@@ -221,7 +221,7 @@ describe("Test Form OperationHook job", () => {
       include: { finalOperations: true }
     });
 
-    expect(notUpdatedInitialForm.finalOperations.length).toStrictEqual(0)
+    expect(notUpdatedInitialForm.finalOperations.length).toStrictEqual(0);
 
     // Manually execute operationHook to simulate markAsProcessed
     await operationHook({
@@ -238,8 +238,10 @@ describe("Test Form OperationHook job", () => {
       where: { id: appendix2.id },
       include: { finalOperations: true }
     });
-    const groupedInitialForm = updatedRegroupementForm.grouping.find(group => group.initialFormId === appendix2.id);
-    expect(updatedInitialForm.finalOperations.length).toStrictEqual(1)
+    const groupedInitialForm = updatedRegroupementForm.grouping.find(
+      group => group.initialFormId === appendix2.id
+    );
+    expect(updatedInitialForm.finalOperations.length).toStrictEqual(1);
 
     expect(updatedInitialForm.finalOperations[0]).toMatchObject({
       formId: updatedInitialForm.id,
