@@ -13,6 +13,7 @@ import { SirenePDFUploadDisabledFallbackError } from "./SirenePDFUploadDisabledF
 import { convertFileToBase64 } from "../../../Apps/utils/fileUtils";
 import { Loader } from "../../../Apps/common/Components";
 import { AlreadyPendingAnonymousCompanyRequestError } from "./AlreadyPendingAnonymousCompanyRequestError";
+import { InvalidSirenePDFFormatError } from "./InvalidSirenePDFFormatError";
 
 const ANONYMOUS_COMPANY_REQUEST = gql`
   query AnonymousCompanyRequest($siret: String!) {
@@ -30,8 +31,15 @@ const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
   }
 `;
 
+// Because we rely on SIRENE's PDF formats, which may change and break
+// the feature, we keep a fallback to the old-fashioned way, going through
+// the support for each request
+const DISABLE_FILE_UPLOAD =
+  import.meta.env.VITE_DISABLE_SIRENE_PDF_UPLOAD == "true";
+
 const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
-  const [formatError, setFormatError] = useState<string>();
+  const [fileHasInvalidFormat, setFileHasInvalidFormat] =
+    useState<boolean>(false);
   const { data, loading: getLoading } = useQuery<
     Pick<Query, "anonymousCompanyRequest">,
     QueryAnonymousCompanyRequestArgs
@@ -39,7 +47,7 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
     variables: {
       siret
     },
-    skip: import.meta.env.VITE_DISABLE_SIRENE_PDF_UPLOAD == "true"
+    skip: DISABLE_FILE_UPLOAD
   });
   const [
     createAnonymousCompanyRequest,
@@ -48,10 +56,7 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
     CREATE_ANONYMOUS_COMPANY_REQUEST
   );
 
-  // Because we rely on SIRENE's PDF formats, which may change and break
-  // the feature, we keep a fallback to the old-fashioned way, going through
-  // the support for each request
-  if (import.meta.env.VITE_DISABLE_SIRENE_PDF_UPLOAD == "true") {
+  if (DISABLE_FILE_UPLOAD) {
     return <SirenePDFUploadDisabledFallbackError />;
   }
 
@@ -71,9 +76,8 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
         className="fr-my-4w"
         label="Avis de situation au répertoire SIRENE de moins de 3 mois"
         hint="au format PDF"
-        state={formatError ? "error" : "default"}
+        state="default"
         disabled={createLoading}
-        stateRelatedMessage={formatError}
         nativeInputProps={{
           type: "file",
           accept: ".pdf",
@@ -84,11 +88,11 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
 
               // Make sure the file is a PDF
               if (file.name.split(".").pop()?.toLowerCase() !== "pdf") {
-                setFormatError("Le fichier doit être au format PDF");
+                setFileHasInvalidFormat(true);
                 return;
               }
 
-              setFormatError(undefined);
+              setFileHasInvalidFormat(false);
 
               const base64 = await convertFileToBase64(file);
 
@@ -100,6 +104,8 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
           }
         }}
       />
+
+      {fileHasInvalidFormat && <InvalidSirenePDFFormatError />}
 
       {createError && (
         <InvalidSirenePDFError errorMessage={createError.message} />
