@@ -14,6 +14,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { extractPostalCodeFromAddress } from "../../Apps/utils/utils";
+import styles from "./AnonymousCompany.module.scss";
 
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 
@@ -23,6 +24,19 @@ const openDataSoftUrl = (postalCode: string) => {
 
 const googleUrl = (postalCode: string) => {
   return `https://www.google.com/search?q=%22code+commune%22+${postalCode}`;
+};
+
+const buildLink = (href, label) => {
+  return (
+    <a
+      className={styles.blueFrance}
+      rel="noopener noreferrer"
+      href={href}
+      target="_blank"
+    >
+      {label}
+    </a>
+  );
 };
 
 const CREATE_ANONYMOUS_COMPANY = gql`
@@ -167,13 +181,11 @@ export function CreateAnonymousCompanyForm({
                       postalCode ? (
                         <>
                           Vérifier sur{" "}
-                          <a href={openDataSoftUrl(postalCode)} target="_blank">
-                            OpenDataSoft
-                          </a>{" "}
-                          ou sur{" "}
-                          <a href={googleUrl(postalCode)} target="_blank">
-                            Google
-                          </a>
+                          {buildLink(
+                            openDataSoftUrl(postalCode),
+                            "OpenDataSoft"
+                          )}{" "}
+                          ou sur {buildLink(googleUrl(postalCode), "Google")}
                         </>
                       ) : null
                     }
