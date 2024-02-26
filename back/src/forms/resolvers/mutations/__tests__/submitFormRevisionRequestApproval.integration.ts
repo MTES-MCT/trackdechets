@@ -999,23 +999,67 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const { mutate } = makeClient(user);
 
-    const bsdd = await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: companyOfSomeoneElse.siret,
-        processingOperationDone: "R 0",
-        destinationOperationMode: "VALORISATION_ENERGETIQUE"
+    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
+      UserRole.MEMBER,
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const { mutate } = makeClient(ttrUser);
+
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
       }
     });
 
+    const formWithTempStorage = await formWithTempStorageFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        wasteDetailsCode: "05 01 02*",
+        status: Status.PROCESSED,
+        quantityReceived: 1000,
+        createdAt: new Date("2021-04-01"),
+        sentAt: new Date("2021-04-01"),
+        receivedAt: new Date("2021-04-01"),
+        processedAt: new Date("2021-04-01"),
+        processingOperationDone: "R 0",
+        destinationOperationMode: "VALORISATION_ENERGETIQUE",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
+          }
+        },
+        recipientCompanySiret: ttr.siret
+      },
+      forwardedInOpts: {
+        emitterCompanySiret: ttr.siret,
+        emitterCompanyName: ttr.name,
+        quantityReceived: 100,
+        receivedAt: new Date(),
+        processingOperationDone: "R 12"
+      }
+    });
+    // Manually execute operationHook to simulate markAsProcessed
+    await operationHook({
+      operationId: formWithTempStorage.forwardedInId!,
+      formId: formWithTempStorage.forwardedInId!
+    });
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
+      where: { id: formWithTempStorage.id },
+      include: { finalOperations: true }
+    });
+    // empty because of the non final operation code
+    expect(updatedBsdd.finalOperations.length).toStrictEqual(0);
+
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
-        bsddId: bsdd.id,
-        authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret! } },
+        bsddId: formWithTempStorage.forwardedInId!,
+        authoringCompanyId: ttr.id,
+        approvals: { create: { approverSiret: ttr.siret! } },
         processingOperationDone: "R 12",
         destinationOperationMode: "RECYCLAGE",
         comment: ""
@@ -1034,15 +1078,15 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
 
     expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
 
-    const updatedBsdd = await prisma.form.findUniqueOrThrow({
-      where: { id: bsdd.id },
+    const cleandUpdatedBsdd = await prisma.form.findUniqueOrThrow({
+      where: { id: formWithTempStorage.forwardedInId! },
       include: { finalOperations: true }
     });
 
-    expect(updatedBsdd.processingOperationDone).toBe("R 12");
-    expect(updatedBsdd.destinationOperationMode).toBe("RECYCLAGE");
+    expect(cleandUpdatedBsdd.processingOperationDone).toBe("R 12");
+    expect(cleandUpdatedBsdd.destinationOperationMode).toBe("RECYCLAGE");
 
-    expect(updatedBsdd.finalOperations.length).toStrictEqual(0);
+    expect(cleandUpdatedBsdd.finalOperations.length).toStrictEqual(0);
   });
 
   it("should create the finalOperations using the job queue when changing operation code to a final one", async () => {
@@ -1136,7 +1180,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(updatedBsdd.processingOperationDone).toBe("R 11");
     expect(updatedBsdd.forwardedIn?.processingOperationDone).toBe("R 1");
     expect(updatedBsdd.finalOperations[0]).toMatchObject({
-      finalBsdReadableId: updatedBsdd.forwardedIn!.readableId,
+      finalBsdReadableId: formWithTempStorage.forwardedIn!.readableId,
       quantity: 100,
       operationCode: "R 1",
       destinationCompanySiret:
