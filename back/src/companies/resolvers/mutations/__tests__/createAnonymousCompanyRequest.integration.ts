@@ -25,8 +25,10 @@ jest.mock("../../../../mailer/mailing");
 jest.mock("../../../geo/getCodeCommune");
 
 const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
-  mutation CreationAnonymousCompanyRequest($pdf: String!) {
-    createAnonymousCompanyRequest(pdf: $pdf)
+  mutation CreateAnonymousCompanyRequest(
+    $input: CreateAnonymousCompanyRequestInput!
+  ) {
+    createAnonymousCompanyRequest(input: $input)
   }
 `;
 
@@ -58,7 +60,10 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "dGVzdAo="
+        input: {
+          siret: "98254982600013",
+          pdf: "dGVzdAo="
+        }
       }
     });
 
@@ -81,6 +86,89 @@ describe("mutation createAnonymousCompanyRequest", () => {
       pdf: "dGVzdAo=",
       siret: "98254982600013"
     });
+  });
+
+  it("should not allow empty siret", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompanyRequest">
+    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      variables: {
+        input: {
+          siret: "",
+          pdf: "dGVzdAo="
+        }
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "siret est un champ requis et doit avoir une valeur"
+    );
+  });
+
+  it("should not allow invalid siret", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompanyRequest">
+    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      variables: {
+        input: {
+          siret: "siret",
+          pdf: "dGVzdAo="
+        }
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "siret: siret n'est pas un numéro de SIRET valide"
+    );
+  });
+
+  it("should throw if siret and PDF's siret are different", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+
+    pdfParser.mockImplementation(
+      () =>
+        new Promise(res =>
+          res({
+            metadata: { _metadata: METADATA },
+            info: INFO,
+            text: EXTRACTED_STRINGS.join("\n")
+          })
+        )
+    );
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompanyRequest">
+    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      variables: {
+        input: {
+          siret: "95207811100012",
+          pdf: "dGVzdAo="
+        }
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Le PDF ne correspond pas à l'entreprise '95207811100012'"
+    );
   });
 
   it("should call getCodeCommune and persist returned value", async () => {
@@ -110,7 +198,10 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "dGVzdAo="
+        input: {
+          siret: "98254982600013",
+          pdf: "dGVzdAo="
+        }
       }
     });
 
@@ -151,7 +242,10 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "dGVzdAo="
+        input: {
+          siret: "98254982600013",
+          pdf: "dGVzdAo="
+        }
       }
     });
 
@@ -195,7 +289,10 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "dGVzdAo="
+        input: {
+          siret: "98254982600013",
+          pdf: "dGVzdAo="
+        }
       }
     });
 
@@ -220,16 +317,43 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "not base64"
+        input: {
+          siret: "98254982600013",
+          pdf: "not base64"
+        }
       }
     });
 
     // Then
     expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual("PDF non valide");
+    expect(errors[0].message).toEqual("'pdf' n'est pas encodé en base 64");
   });
 
-  it("should fail because pdf is invalid", async () => {
+  it("should fail because pdf is empty", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompanyRequest">
+    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      variables: {
+        input: {
+          siret: "98254982600013",
+          pdf: ""
+        }
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toEqual(
+      "pdf est un champ requis et doit avoir une valeur"
+    );
+  });
+
+  it("should fail because parsed pdf is invalid", async () => {
     // Given
     const user = await userFactory();
     const { mutate } = makeClient(user);
@@ -249,7 +373,10 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "dGVzdAo="
+        input: {
+          siret: "98254982600013",
+          pdf: "dGVzdAo="
+        }
       }
     });
 
@@ -291,7 +418,10 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "dGVzdAo="
+        input: {
+          siret: "98254982600013",
+          pdf: "dGVzdAo="
+        }
       }
     });
 
@@ -335,7 +465,10 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "dGVzdAo="
+        input: {
+          siret: "98254982600013",
+          pdf: "dGVzdAo="
+        }
       }
     });
 
@@ -379,7 +512,10 @@ describe("mutation createAnonymousCompanyRequest", () => {
       Pick<Mutation, "createAnonymousCompanyRequest">
     >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
       variables: {
-        pdf: "dGVzdAo="
+        input: {
+          siret: "98254982600013",
+          pdf: "dGVzdAo="
+        }
       }
     });
 

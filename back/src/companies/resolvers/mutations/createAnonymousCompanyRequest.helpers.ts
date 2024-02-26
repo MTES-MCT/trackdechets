@@ -260,10 +260,6 @@ export interface ParsedPdf {
  * Parse a base64 PDF into a string[], using the pdf-parse library
  */
 export const parseBase64 = async (pdf: string): Promise<ParsedPdf> => {
-  if (!isBase64(pdf)) {
-    throw new Error(`PDF non valide`);
-  }
-
   try {
     // Convert PDF from base64 to buffer...
     const buffer = Buffer.from(pdf, "base64");

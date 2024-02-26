@@ -59,5 +59,7 @@ type Mutation {
   Permet de créer une requête de création d'entreprise anonyme (qui devra être validée par un admin)
   Prend un PDF d'avis de répertoire SIRENE de moins de 3 mois en entrée, en base64.
   """
-  createAnonymousCompanyRequest(pdf: String!): Boolean
+  createAnonymousCompanyRequest(
+    input: CreateAnonymousCompanyRequestInput!
+  ): Boolean
 }

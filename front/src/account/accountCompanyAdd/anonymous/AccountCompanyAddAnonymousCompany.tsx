@@ -9,14 +9,16 @@ import { SirenePDFUploadDisabledFallbackError } from "./SirenePDFUploadDisabledF
 import { convertFileToBase64 } from "../../../Apps/utils/fileUtils";
 
 const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
-  mutation CreationAnonymousCompanyRequest($pdf: String!) {
-    createAnonymousCompanyRequest(pdf: $pdf)
+  mutation CreateAnonymousCompanyRequest(
+    $input: CreateAnonymousCompanyRequestInput!
+  ) {
+    createAnonymousCompanyRequest(input: $input)
   }
 `;
 
-const AccountCompanyAddAnonymousCompany = () => {
+const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
   const [formatError, setFormatError] = useState<string>();
-  const [creationAnonymousCompanyRequest, { error, loading }] = useMutation<
+  const [createAnonymousCompanyRequest, { error, loading }] = useMutation<
     Pick<Mutation, "createAnonymousCompanyRequest">,
     any
   >(CREATE_ANONYMOUS_COMPANY_REQUEST);
@@ -58,8 +60,8 @@ const AccountCompanyAddAnonymousCompany = () => {
               const base64 = await convertFileToBase64(file);
 
               // Send to backend for data extraction
-              await creationAnonymousCompanyRequest({
-                variables: { pdf: base64 }
+              await createAnonymousCompanyRequest({
+                variables: { input: { siret, pdf: base64 } }
               });
             }
           }

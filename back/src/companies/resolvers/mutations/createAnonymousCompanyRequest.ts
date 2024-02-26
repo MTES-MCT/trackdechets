@@ -1,19 +1,39 @@
+import * as yup from "yup";
 import { renderMail, createAnonymousCompanyRequestEmail } from "@td/mail";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import {
+  CreateAnonymousCompanyRequestInput,
+  MutationResolvers
+} from "../../../generated/graphql/types";
 import { sendMail } from "../../../mailer/mailing";
 import { getCodeCommune } from "../../geo/getCodeCommune";
 import { validateAndExtractSireneDataFromPDFInBase64 } from "./createAnonymousCompanyRequest.helpers";
+import { base64, siret } from "../../../common/validation";
+
+const anonymousCompanyRequestInputSchema: yup.SchemaOf<CreateAnonymousCompanyRequestInput> =
+  yup.object({
+    siret: siret.required(),
+    pdf: base64.required()
+  });
 
 const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousCompanyRequest"] =
-  async (_, { pdf }, context) => {
+  async (_, { input }, context) => {
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
 
+    // Yup validation
+    await anonymousCompanyRequestInputSchema.validate(input);
+
+    const { siret, pdf } = input;
+
     // Run verifications & extract data from PDF
     const data = await validateAndExtractSireneDataFromPDFInBase64(pdf);
+
+    if (data.siret !== siret) {
+      throw new Error(`Le PDF ne correspond pas à l'entreprise '${siret}'`);
+    }
 
     // Verify company is not already created
     const anonymousCompany = await prisma.anonymousCompany.findFirst({
@@ -42,7 +62,7 @@ const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousC
       );
     }
 
-    // Retrieve the codeCommune
+    // Retrieve the codeCommune (can be null, admins will complete)
     const codeCommune = await getCodeCommune(data.address);
 
     // Create the request

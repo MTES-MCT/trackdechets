@@ -112,7 +112,9 @@ export default function AccountCompanyAddSiret({
 }: IProps) {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
-  const [isNonDiffusible, setIsNonDiffusible] = useState(false);
+  const [nonDiffusibleCompanySiret, setNonDiffusibleCompanySiret] = useState<
+    string | null
+  >();
   const [isClosed, setIsClosed] = useState(false);
   const [isPreloaded, setIsPreloaded] = useState(false);
 
@@ -128,7 +130,7 @@ export default function AccountCompanyAddSiret({
             companyInfos?.statutDiffusionEtablissement === "P" &&
             !companyInfos?.isAnonymousCompany
           ) {
-            setIsNonDiffusible(true);
+            setNonDiffusibleCompanySiret(data.companyPrivateInfos.siret);
             onCompanyInfos(null);
           } else {
             onCompanyInfos(companyInfos);
@@ -308,7 +310,11 @@ export default function AccountCompanyAddSiret({
               </Form>
             )}
           </Formik>
-          {isNonDiffusible && <AccountCompanyAddAnonymousCompany />}
+          {nonDiffusibleCompanySiret && (
+            <AccountCompanyAddAnonymousCompany
+              siret={nonDiffusibleCompanySiret}
+            />
+          )}
           {isClosed && closedCompanyError}
           {showIndividualInfo && !isDisabled && individualInfo}
         </div>
