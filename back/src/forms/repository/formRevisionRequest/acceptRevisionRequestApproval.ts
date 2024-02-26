@@ -25,7 +25,7 @@ import buildRemoveAppendix2 from "../form/removeAppendix2";
 import { distinct } from "../../../common/arrays";
 import { ForbiddenError } from "../../../common/errors";
 import { isFinalOperationCode } from "../../../common/operationCodes";
-import { operationHooksQueue } from "../../../queue/producers/bsdUpdate";
+import { operationHooksQueue } from "../../../queue/producers/operationHook";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,

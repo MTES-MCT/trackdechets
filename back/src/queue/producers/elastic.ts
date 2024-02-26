@@ -7,7 +7,8 @@ import {
   INDEX_UPDATED_JOB_NAME,
   DELETE_JOB_NAME
 } from "./jobNames";
-import { updatesQueue, operationHooksQueue } from "./bsdUpdate";
+import { updatesQueue } from "./bsdUpdate";
+import { operationHooksQueue } from "./operationHook";
 import { updateFavorites } from "../../companies/database";
 
 const { REDIS_URL, NODE_ENV } = process.env;

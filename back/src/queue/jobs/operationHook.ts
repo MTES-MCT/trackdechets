@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { Job } from "bull";
-import { operationHooksQueue } from "../producers/bsdUpdate";
+import { operationHooksQueue } from "../producers/operationHook";
 import { isFinalOperationCode } from "../../common/operationCodes";
 
 export type OperationHookArgs = {

@@ -11,7 +11,8 @@ import {
   bulkIndexQueue,
   bulkIndexMasterQueue
 } from "./producers/elastic";
-import { operationHooksQueue, updatesQueue } from "./producers/bsdUpdate";
+import { updatesQueue } from "./producers/bsdUpdate";
+import { operationHooksQueue } from "./producers/operationHook";
 import { webhooksQueue } from "./producers/webhooks";
 import { syncEventsQueue } from "./producers/events";
 import { mailQueue } from "./producers/mail";

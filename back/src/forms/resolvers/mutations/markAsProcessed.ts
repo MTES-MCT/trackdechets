@@ -22,7 +22,7 @@ import {
   isVat,
   PROCESSING_OPERATIONS
 } from "@td/constants";
-import { operationHooksQueue } from "../../../queue/producers/bsdUpdate";
+import { operationHooksQueue } from "../../../queue/producers/operationHook";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,

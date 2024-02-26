@@ -13,9 +13,12 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { EmitterType, Status } from "@prisma/client";
+import { CompanyType, EmitterType, Status, UserRole } from "@prisma/client";
 import { NON_CANCELLABLE_BSDD_STATUSES } from "../createFormRevisionRequest";
 import { MARK_AS_SEALED, SIGN_EMISSION_FORM } from "./mutations";
+import { operationHooksQueue } from "../../../../queue/producers/operationHook";
+import { operationHook } from "../../../../queue/jobs/operationHook";
+
 import getReadableId from "../../../readableId";
 
 const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
@@ -37,8 +40,19 @@ const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
   }
 `;
 
+// Intercept operationHooksQueue job creation
+jest.mock("../../../../queue/producers/operationHook");
+
+// Mocking the module or object containing `operationHooksQueue`
+jest.mock("../../../../queue/producers/operationHook", () => ({
+  operationHooksQueue: { add: jest.fn(), close: jest.fn() }
+}));
+
 describe("Mutation.submitFormRevisionRequestApproval", () => {
   afterEach(resetDatabase);
+  beforeEach(() => {
+    (operationHooksQueue.add as jest.Mock).mockClear();
+  });
 
   it("should fail if revisionRequest doesnt exist", async () => {
     const { user } = await userWithCompanyFactory("ADMIN");
@@ -981,7 +995,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(updatedBsdd.destinationOperationMode).toBe("RECYCLAGE");
   });
 
-  it("should create the finalOperations rows when changing operation code from a final to a non-final code", async () => {
+  it("should delete the finalOperations rows when changing operation code from a final to a non-final code", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -1025,33 +1039,71 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       include: { finalOperations: true }
     });
 
-    expect(updatedBsdd.processingOperationDone).toBe("R 4");
+    expect(updatedBsdd.processingOperationDone).toBe("R 12");
     expect(updatedBsdd.destinationOperationMode).toBe("RECYCLAGE");
 
     expect(updatedBsdd.finalOperations.length).toStrictEqual(0);
   });
 
-  it("should delete the finalOperations rows when changing operation code  to a final operation code", async () => {
+  it("should create the finalOperations using the job queue when changing operation code to a final one", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const { mutate } = makeClient(user);
 
-    const bsdd = await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: companyOfSomeoneElse.siret,
-        processingOperationDone: "R 12",
-        destinationOperationMode: "VALORISATION_ENERGETIQUE"
+    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
+      UserRole.MEMBER,
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const { mutate } = makeClient(ttrUser);
+
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
       }
     });
 
+    const formWithTempStorage = await formWithTempStorageFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        wasteDetailsCode: "05 01 02*",
+        status: Status.PROCESSED,
+        quantityReceived: 1000,
+        createdAt: new Date("2021-04-01"),
+        sentAt: new Date("2021-04-01"),
+        receivedAt: new Date("2021-04-01"),
+        processedAt: new Date("2021-04-01"),
+        processingOperationDone: "R 11",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
+          }
+        },
+        recipientCompanySiret: ttr.siret
+      },
+      forwardedInOpts: {
+        emitterCompanySiret: ttr.siret,
+        emitterCompanyName: ttr.name,
+        quantityReceived: 100,
+        receivedAt: new Date(),
+        processingOperationDone: "R 12"
+      }
+    });
+
+    const notUpdatedBsdd = await prisma.form.findUniqueOrThrow({
+      where: { id: formWithTempStorage.forwardedInId! },
+      include: { finalOperations: true }
+    });
+    expect(notUpdatedBsdd.finalOperations.length).toStrictEqual(0);
+
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
-        bsddId: bsdd.id,
-        authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret! } },
+        bsddId: formWithTempStorage.forwardedInId!,
+        authoringCompanyId: ttr.id,
+        approvals: { create: { approverSiret: ttr.siret! } },
         processingOperationDone: "R 1",
         destinationOperationMode: "RECYCLAGE",
         comment: ""
@@ -1067,25 +1119,31 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
         isApproved: true
       }
     });
+    // Check that the job was added to the queue
+    expect(operationHooksQueue.add as jest.Mock).toHaveBeenCalledTimes(1);
 
     expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
-
+    // Manually execute operationHook to simulate markAsProcessed
+    await operationHook({
+      operationId: formWithTempStorage.forwardedInId!,
+      formId: formWithTempStorage.forwardedInId!
+    });
     const updatedBsdd = await prisma.form.findUniqueOrThrow({
-      where: { id: bsdd.id },
-      include: { finalOperations: true }
+      where: { id: formWithTempStorage.id },
+      include: { finalOperations: true, forwardedIn: true }
     });
 
-    expect(updatedBsdd.processingOperationDone).toBe("R 1");
-    expect(updatedBsdd.destinationOperationMode).toBe("RECYCLAGE");
-    expect(updatedBsdd.finalOperations).toBe([
-      {
-        finalBsdReadableId: updatedBsdd.readableId,
-        quantity: updatedBsdd.quantityReceived!,
-        operationCode: updatedBsdd.processingOperationDone!,
-        destinationCompanySiret: updatedBsdd.recipientCompanySiret!,
-        destinationCompanyName: updatedBsdd.recipientCompanyName!
-      }
-    ]);
+    expect(updatedBsdd.processingOperationDone).toBe("R 11");
+    expect(updatedBsdd.forwardedIn?.processingOperationDone).toBe("R 1");
+    expect(updatedBsdd.finalOperations[0]).toMatchObject({
+      finalBsdReadableId: updatedBsdd.forwardedIn!.readableId,
+      quantity: 100,
+      operationCode: "R 1",
+      destinationCompanySiret:
+        formWithTempStorage.forwardedIn!.recipientCompanySiret!,
+      destinationCompanyName:
+        formWithTempStorage.forwardedIn!.recipientCompanyName!
+    });
   });
 
   it("if the waste code changes from dangerous to non-dangerous, wasteDetailsIsDangerous should be updated", async () => {

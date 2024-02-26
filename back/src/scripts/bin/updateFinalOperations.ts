@@ -4,7 +4,7 @@ import { Form } from "@prisma/client";
 import { closeQueues } from "../../queue/producers";
 import { logger } from "@td/logger";
 import { FINAL_OPERATION_CODES } from "../../common/operationCodes";
-import { operationHooksQueue } from "../../queue/producers/bsdUpdate";
+import { operationHooksQueue } from "../../queue/producers/operationHook";
 
 /**
  * Process all FinalOperations of Forms with a FINAL_OPERATION_CODES

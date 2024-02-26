@@ -21,9 +21,11 @@ export { formatDate } from "./common/pdf";
 export { sendMail } from "./mailer/mailing";
 export {
   BsdUpdateQueueItem,
-  updatesQueue,
-  operationHooksQueue
+  updatesQueue
 } from "./queue/producers/bsdUpdate";
+export {
+  operationHooksQueue
+} from "./queue/producers/operationHook";
 export { indexBsdJob, operationHookJob, sendMailJob } from "./queue/jobs";
 export {
   indexQueue,

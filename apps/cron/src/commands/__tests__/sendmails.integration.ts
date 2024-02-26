@@ -30,7 +30,6 @@ jest.mock("back");
 );
 // Integration tests EMAIL_BACKEND is supposed to use axios.
 jest.mock("axios");
-// (axios.post as jest.Mock).mockResolvedValue(null);
 
 const TODAY = new Date();
 const ONE_DAY_AGO = xDaysAgo(TODAY, 1);
