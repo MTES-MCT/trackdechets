@@ -219,7 +219,8 @@ export const looksHacky = (str: string): boolean => {
       "onfocus",
       "onload",
       "onanimationstart",
-      "onanimationend"
+      "onanimationend",
+      "http"
     ].some(s => low.includes(s)) || new RegExp(/[`~#$%^*|?;<>[\]]/).test(str)
   );
 };

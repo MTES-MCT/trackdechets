@@ -19,6 +19,7 @@ const ANONYMOUS_COMPANY_REQUEST = gql`
       name
       codeNaf
       address
+      codeCommune
     }
   }
 `;
@@ -28,7 +29,8 @@ const REQUEST_1 = {
   codeNaf: "6202A",
   name: "ACME CORP",
   pdf: "[pdf1 in base64]",
-  siret: "98254982600013"
+  siret: "98254982600013",
+  codeCommune: "44109"
 };
 
 describe("anonymousCompanyRequest", () => {

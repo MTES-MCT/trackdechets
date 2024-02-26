@@ -240,6 +240,7 @@ export const sess: session.SessionOptions = {
   saveUninitialized: false,
   cookie: {
     secure: false,
+    httpOnly: true,
     domain: SESSION_COOKIE_HOST || UI_HOST,
     maxAge: 24 * 3600 * 1000
   }
