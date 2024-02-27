@@ -14,7 +14,7 @@ export const anonymousCompanyRequestResolver: QueryResolvers["anonymousCompanyRe
     }
 
     const anonymousCompanyRequest =
-      await prisma.anonymousCompanyRequest.findFirstOrThrow({
+      await prisma.anonymousCompanyRequest.findFirst({
         where: { siret },
         include: {
           user: {

@@ -119,13 +119,13 @@ describe("anonymousCompanyRequest", () => {
     });
   });
 
-  it("should return error if id matches no anonymousCompanyRequest", async () => {
+  it("should return null if id matches no anonymousCompanyRequest", async () => {
     // Given
     const admin = await userFactory({ isAdmin: true });
 
     // When
     const { query } = makeClient(admin);
-    const { errors } = await query<
+    const { data, errors } = await query<
       Pick<Query, "anonymousCompanyRequest">,
       QueryAnonymousCompanyRequestArgs
     >(ANONYMOUS_COMPANY_REQUEST, {
@@ -135,7 +135,7 @@ describe("anonymousCompanyRequest", () => {
     });
 
     // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual("No AnonymousCompanyRequest found");
+    expect(errors).toBeUndefined();
+    expect(data.anonymousCompanyRequest).toBeNull();
   });
 });
