@@ -18,7 +18,7 @@ async function exitScript() {
 }
 
 (async function () {
-  const PAGE_SIZE = 100;
+  const PAGE_SIZE = 10_000;
   let pageNumber = 0;
   let processed = 0;
   let finalOperationCodeForms: Pick<Form, "id">[] = [];
