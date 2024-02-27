@@ -176,7 +176,7 @@ export default function AccountCompanyAddSiret({
             />
           )}
           <Formik
-            initialValues={{ siret: "" }}
+            initialValues={{ siret: defaultQuery }}
             validate={values => {
               const isValidSiret = isSiret(
                 values.siret,
