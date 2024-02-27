@@ -1,6 +1,6 @@
 import React from "react";
 
-// Probably has bad compatibility with all browsers, but for admin use anyways
+// Probably has bad compatibility with old browsers, but for admin use anyways
 export const PDFViewer = ({ pdf }) => {
   if (!pdf) {
     return null;

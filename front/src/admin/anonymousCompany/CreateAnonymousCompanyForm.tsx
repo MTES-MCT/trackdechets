@@ -13,31 +13,9 @@ import { TOAST_DURATION } from "../../common/config";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { extractPostalCodeFromAddress } from "../../Apps/utils/utils";
-import styles from "./AnonymousCompany.module.scss";
+import { CodeCommuneLinks } from "./CodeCommuneLinks";
 
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
-
-const openDataSoftUrl = (postalCode: string) => {
-  return `https://public.opendatasoft.com/explore/dataset/correspondance-code-insee-code-postal/table/?flg=fr-fr&q=${postalCode}`;
-};
-
-const googleUrl = (postalCode: string) => {
-  return `https://www.google.com/search?q=%22code+commune%22+${postalCode}`;
-};
-
-const buildLink = (href, label) => {
-  return (
-    <a
-      className={styles.blueFrance}
-      rel="noopener noreferrer"
-      href={href}
-      target="_blank"
-    >
-      {label}
-    </a>
-  );
-};
 
 const CREATE_ANONYMOUS_COMPANY = gql`
   mutation CreateAnonymousCompany($input: AnonymousCompanyInput!) {
@@ -80,10 +58,6 @@ export function CreateAnonymousCompanyForm({
     MutationCreateAnonymousCompanyArgs
   >(CREATE_ANONYMOUS_COMPANY);
 
-  const postalCode = extractPostalCodeFromAddress(
-    anonymousCompanyRequest?.address
-  );
-
   return (
     <>
       <h3 className="fr-h3 fr-mt-2w">
@@ -114,7 +88,7 @@ export function CreateAnonymousCompanyForm({
           }
         }}
       >
-        {({ errors }) => (
+        {({ errors, values }) => (
           <Form className="fr-my-3w">
             <Field name="siret">
               {({ field }) => {
@@ -178,16 +152,11 @@ export function CreateAnonymousCompanyForm({
                   <Input
                     label="Code commune"
                     hintText={
-                      postalCode ? (
-                        <>
-                          Vérifier sur{" "}
-                          {buildLink(
-                            openDataSoftUrl(postalCode),
-                            "OpenDataSoft"
-                          )}{" "}
-                          ou sur {buildLink(googleUrl(postalCode), "Google")}
-                        </>
-                      ) : null
+                      <CodeCommuneLinks
+                        address={
+                          anonymousCompanyRequest?.address || values.address
+                        }
+                      />
                     }
                     state={errors.codeCommune ? "error" : "default"}
                     stateRelatedMessage={errors.codeCommune as string}
