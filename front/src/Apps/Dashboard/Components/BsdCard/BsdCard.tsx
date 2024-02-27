@@ -241,6 +241,7 @@ function BsdCard({
     : null;
 
   const isNoTraceability = (bsd: BsdDisplay) =>
+    bsd.packagings?.length &&
     bsd.packagings?.every(packaging => packaging.operation?.noTraceability);
 
   return (
