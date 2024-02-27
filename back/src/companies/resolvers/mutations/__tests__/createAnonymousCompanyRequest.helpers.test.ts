@@ -1,6 +1,7 @@
 import {
   extractAddress,
   extractBetween,
+  extractClosedAt,
   extractCodeNaf,
   extractData,
   extractEmittedAt,
@@ -483,6 +484,45 @@ describe("createAnonymousCompanyRequest.helpers", () => {
     );
   });
 
+  describe("extractClosedAt", () => {
+    it("should return closedAt", async () => {
+      // Given
+
+      // When
+      const res = extractClosedAt([
+        "Description de l'établissementEtablissement fermé depuis le 25/07/2022"
+      ]);
+
+      // Then
+      expect(res?.toISOString()).toEqual("2022-07-25T00:00:00.000Z");
+    });
+
+    it("no date > should return undefined", async () => {
+      // Given
+
+      // When
+      const res = extractClosedAt([]);
+
+      // Then
+      expect(res).toBeUndefined();
+    });
+
+    it.each([[["Etablissement"]], [["Établissement"]]])(
+      "testing wording %p > should return emittedAt",
+      async input => {
+        // Given
+
+        // When
+        const res = extractClosedAt([
+          `Description de l'établissement${input} fermé depuis le 25/07/2022`
+        ]);
+
+        // Then
+        expect(res?.toISOString()).toEqual("2022-07-25T00:00:00.000Z");
+      }
+    );
+  });
+
   describe("extractData", () => {
     it("should return extracted data", async () => {
       // Given
@@ -597,6 +637,34 @@ describe("createAnonymousCompanyRequest.helpers", () => {
       } catch (e) {
         // Then
         expect(e.message).toEqual("Le PDF doit avoir moins de 3 mois");
+      }
+    });
+
+    it("company is closed > should throw", async () => {
+      // Given
+      pdfParser.mockImplementation(
+        () =>
+          new Promise(res =>
+            res({
+              metadata: { _metadata: METADATA },
+              info: INFO,
+              text: [
+                "Description de l'établissementEtablissement fermé depuis le 25/07/2022",
+                ...EXTRACTED_STRINGS
+              ].join("\n")
+            })
+          )
+      );
+
+      // When
+      expect.assertions(1);
+      try {
+        await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
+      } catch (e) {
+        // Then
+        expect(e.message).toEqual(
+          "Cet établissement est fermé depuis le 25/07/2022"
+        );
       }
     });
 

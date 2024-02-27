@@ -226,12 +226,31 @@ export const extractAddress = (texts: string[]) => {
   return address;
 };
 
+export const extractClosedAt = (texts: string[]): Date | undefined => {
+  const closedAt =
+    extractLine(
+      texts,
+      "Description de l'établissementEtablissement fermé depuis le "
+    ) ??
+    extractLine(
+      texts,
+      "Description de l'établissementÉtablissement fermé depuis le"
+    );
+
+  if (!closedAt) {
+    return;
+  }
+
+  return toDate(closedAt);
+};
+
 export interface ExtractedData {
   siret: string;
   name: string;
   codeNaf: string;
   address: string;
   pdfEmittedAt?: Date;
+  closedAt?: Date;
 }
 
 /**
@@ -249,7 +268,8 @@ export const extractData = (text: string): ExtractedData => {
     siret: extractSiret(splitted),
     name: extractName(splitted),
     codeNaf: extractCodeNaf(splitted),
-    address: extractAddress(splitted)
+    address: extractAddress(splitted),
+    closedAt: extractClosedAt(splitted)
   };
 };
 
@@ -315,10 +335,20 @@ export const validateAndExtractSireneDataFromPDFInBase64 = async (
     throw new Error("PDF non valide");
   }
 
+  const { pdfEmittedAt, closedAt, ...rest } = data;
+
+  // Company should not be closed
+  if (closedAt) {
+    throw new Error(
+      `Cet établissement est fermé depuis le ${closedAt.toLocaleDateString(
+        "fr-FR"
+      )}`
+    );
+  }
+
   // PDF should not be more than 3 months old
   const now = new Date();
   const threeMonthsAgo = new Date(now.setMonth(now.getMonth() - 3));
-  const { pdfEmittedAt, ...rest } = data;
   if (!pdfEmittedAt || pdfEmittedAt.getTime() < threeMonthsAgo.getTime()) {
     throw new Error("Le PDF doit avoir moins de 3 mois");
   }
