@@ -131,7 +131,7 @@ export async function operationHook(args: OperationHookArgs) {
       await prisma.form.update({
         where: { id: initialForm.id },
         data: {
-          finalOperations: { deleteMany: {} }
+          finalOperations: { deleteMany: { where: { finalBsdReadableId: operation.readableId } }
         }
       });
     }
