@@ -1107,10 +1107,11 @@ const canDeleteBsda = (bsd, siret) =>
     (bsd.status === BsdStatusCode.SignedByProducer &&
       bsd.emitter?.company?.siret === siret));
 
-const canDeleteBsdasri = bsd =>
+const canDeleteBsdasri = (bsd, siret) =>
   bsd.type === BsdType.Bsdasri &&
   (bsd.status === BsdStatusCode.Initial ||
-    bsd.status === BsdStatusCode.SignedByProducer);
+    (isSameSiretEmmiter(siret, bsd) &&
+      bsd.status === BsdStatusCode.SignedByProducer));
 
 const canDeleteBsvhu = bsd =>
   bsd.type === BsdType.Bsvhu && bsd.status === BsdStatusCode.Initial;
@@ -1153,7 +1154,7 @@ const canDeleteBsff = (bsd, siret) =>
 export const canDeleteBsd = (bsd, siret) =>
   canDeleteBsdd(bsd) ||
   canDeleteBsda(bsd, siret) ||
-  canDeleteBsdasri(bsd) ||
+  canDeleteBsdasri(bsd, siret) ||
   canDeleteBsff(bsd, siret) ||
   canDeleteBsvhu(bsd);
 
@@ -1269,7 +1270,9 @@ export const hasBsdasriEmitterSign = (
     isBsdasri(bsd.type) &&
     hasEmportDirect(bsd, currentSiret, isToCollectTab) &&
     isToCollectTab &&
-    isEmetteurSign(bsd, isTransporter)
+    isEmetteurSign(bsd, isTransporter) &&
+    !bsd.isDraft &&
+    bsd.status === BsdStatusCode.Initial
   );
 };
 
