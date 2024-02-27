@@ -114,9 +114,6 @@ export async function operationHook(args: OperationHookArgs) {
           where: { id: initialForm.id },
           data: {
             finalOperations: {
-              // s'il y a eu scission puis regroupement
-              // le hook pourrait être appelé plusieurs fois,
-              // il faut donc respecter l'unicité de finalBsdReadableId
               create: data
             }
           }
