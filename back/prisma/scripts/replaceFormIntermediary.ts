@@ -80,7 +80,9 @@ export class LoadAnonymousCompaniesUpdater implements Updater {
       // so TypeScript loses track of what's being imported
       data = await import(path.join(__dirname, "replaceFormIntermediary.json"));
     } catch (err) {
-      console.error("Missing file ./replaceFormIntermediary.json, aborting script");
+      console.error(
+        "Missing file ./replaceFormIntermediary.json, aborting script"
+      );
       process.exit(1);
     }
     const options = {
