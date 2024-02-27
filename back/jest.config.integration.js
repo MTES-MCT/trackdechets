@@ -5,6 +5,5 @@ module.exports = {
     "^.+\\.(t|j)sx?$": ["@swc/jest"]
   },
   testEnvironment: "node",
-  testMatch: ["**/__tests__/**/?(*.)+(integration).[jt]s?(x)"],
-  testTimeout: 10000
+  testMatch: ["**/__tests__/**/?(*.)+(integration).[jt]s?(x)"]
 };
