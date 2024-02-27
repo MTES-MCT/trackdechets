@@ -82,43 +82,18 @@ export async function operationHook(args: OperationHookArgs) {
         continue;
       }
 
-      const countFinaloperations = await prisma.finalOperation.count({
+      await prisma.finalOperation.upsert({
         where: {
-          formId: initialForm.id,
-          finalBsdReadableId: operation.readableId
-        }
+          formId_finalBsdReadableId: {
+            finalBsdReadableId: operation.readableId,
+            formId: initialForm.id
+          }
+        },
+        update : {
+          data: { quantity: { increment: data.quantityReceived } }
+        },
+        create: data
       });
-
-      if (countFinaloperations) {
-        await prisma.form.update({
-          where: { id: initialForm.id },
-          data: {
-            finalOperations: {
-              // s'il y a eu scission puis regroupement
-              // le hook pourrait être appelé plusieurs fois,
-              // il faut donc respecter l'unicité de finalBsdReadableId
-              update: {
-                where: {
-                  formId_finalBsdReadableId: {
-                    finalBsdReadableId: operation.readableId,
-                    formId: initialForm.id
-                  }
-                },
-                data
-              }
-            }
-          }
-        });
-      } else {
-        await prisma.form.update({
-          where: { id: initialForm.id },
-          data: {
-            finalOperations: {
-              create: data
-            }
-          }
-        });
-      }
 
       // Applique le hook de façon récursive sur les bordereaux initiaux
       await operationHooksQueue.add({
