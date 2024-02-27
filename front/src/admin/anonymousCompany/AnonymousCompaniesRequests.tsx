@@ -1,11 +1,17 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Table from "@codegouvfr/react-dsfr/Table";
 import React from "react";
-import { Query } from "@td/codegen-ui";
+import {
+  Mutation,
+  MutationDeleteAnonymousCompanyRequestArgs,
+  Query
+} from "@td/codegen-ui";
 import { AnonymousCompaniesRequestsPagination } from "./AnonymousCompaniesRequestsPagination";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import styles from "./AnonymousCompany.module.scss";
+import toast from "react-hot-toast";
+import { TOAST_DURATION } from "../../common/config";
 
 const ANONYMOUS_COMPANY_REQUESTS = gql`
   query AnonymousCompanyRequests($first: Int, $last: Int, $skip: Int) {
@@ -28,6 +34,12 @@ const ANONYMOUS_COMPANY_REQUESTS = gql`
   }
 `;
 
+const DELETE_ANONYMOUS_COMPANY_REQUEST = gql`
+  mutation DeleteAnonymousCompanyRequest($siret: String!) {
+    deleteAnonymousCompanyRequest(siret: $siret)
+  }
+`;
+
 const REQUESTS_PER_PAGE = 50;
 
 export const AnonymousCompaniesRequests = ({ onCreateAnonymousCompany }) => {
@@ -35,6 +47,20 @@ export const AnonymousCompaniesRequests = ({ onCreateAnonymousCompany }) => {
     Pick<Query, "anonymousCompanyRequests">
   >(ANONYMOUS_COMPANY_REQUESTS, {
     variables: { first: REQUESTS_PER_PAGE, skip: 0 }
+  });
+  const [deleteAnonymousCompanyRequest, { loading }] = useMutation<
+    Pick<Mutation, "deleteAnonymousCompanyRequest">,
+    MutationDeleteAnonymousCompanyRequestArgs
+  >(DELETE_ANONYMOUS_COMPANY_REQUEST, {
+    onCompleted: () => {
+      toast.success("Demande supprimée", { duration: TOAST_DURATION });
+      refetch();
+    },
+    onError: () => {
+      toast.error("La demande n'a pas pu être supprimée", {
+        duration: TOAST_DURATION
+      });
+    }
   });
 
   const tableData =
@@ -48,6 +74,19 @@ export const AnonymousCompaniesRequests = ({ onCreateAnonymousCompany }) => {
         {request.user.email}
       </a>,
       <div className={styles.actionButton}>
+        <Button
+          priority="secondary"
+          iconId="fr-icon-delete-bin-line"
+          onClick={() =>
+            deleteAnonymousCompanyRequest({
+              variables: { siret: request.siret }
+            })
+          }
+          title="Supprimer"
+          size="large"
+          className="fr-mx-1w"
+          disabled={loading}
+        />{" "}
         <Button
           onClick={() => onCreateAnonymousCompany(request.siret)}
           priority="primary"
