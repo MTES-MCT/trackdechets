@@ -548,7 +548,11 @@ export const getSentBtnLabel = (
       return "";
     }
 
-    if (isToCollectTab && isSameSiretNextTransporter(currentSiret, bsd)) {
+    if (
+      isToCollectTab &&
+      isSameSiretNextTransporter(currentSiret, bsd) &&
+      permissions.includes(UserPermission.BsdCanSignTransport)
+    ) {
       return SIGNER;
     }
 
@@ -564,7 +568,11 @@ export const getSentBtnLabel = (
         return VALIDER_RECEPTION;
       }
 
-      if (isAppendix1(bsd) && canAddAppendix1(bsd)) {
+      if (
+        isAppendix1(bsd) &&
+        canAddAppendix1(bsd) &&
+        permissions.includes(UserPermission.BsdCanUpdate)
+      ) {
         return AJOUTER_ANNEXE_1;
       }
     }
@@ -687,13 +695,20 @@ export const getSignByProducerBtnLabel = (
         (isGathering(bsd.bsdWorkflowType?.toString()) ||
           isReshipment(bsd.bsdWorkflowType?.toString()) ||
           isOtherCollection(bsd.bsdWorkflowType?.toString()) ||
-          bsd.worker?.isDisabled)) ||
+          bsd.worker?.isDisabled) &&
+        (permissions.includes(UserPermission.BsdCanSignTransport) ||
+          permissions.includes(UserPermission.BsdCanSignWork))) ||
       isBsvhu(bsd.type)
     ) {
       return SIGNER;
     }
   } else {
-    if (isBsdasri(bsd.type) && !isToCollectTab) {
+    if (
+      isBsdasri(bsd.type) &&
+      !isToCollectTab &&
+      (permissions.includes(UserPermission.BsdCanSignTransport) ||
+        permissions.includes(UserPermission.BsdCanSignAcceptation))
+    ) {
       return "";
     }
 
