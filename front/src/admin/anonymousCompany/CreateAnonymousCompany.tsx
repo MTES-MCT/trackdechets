@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { Query, QueryAnonymousCompanyRequestArgs } from "@td/codegen-ui";
 import { Loader } from "../../Apps/common/Components";
@@ -29,7 +29,7 @@ export function CreateAnonymousCompany({
   anonymousCompanyRequestSiret,
   onCompanyCreated
 }) {
-  const { data, error, loading } = useQuery<
+  const { data, error, loading, refetch } = useQuery<
     Pick<Query, "anonymousCompanyRequest">,
     QueryAnonymousCompanyRequestArgs
   >(ANONYMOUS_COMPANY_REQUEST, {
@@ -38,6 +38,10 @@ export function CreateAnonymousCompany({
     },
     skip: !Boolean(anonymousCompanyRequestSiret)
   });
+
+  useEffect(() => {
+    refetch(anonymousCompanyRequestSiret);
+  }, [anonymousCompanyRequestSiret, refetch]);
 
   if (loading) {
     return (
