@@ -32,7 +32,9 @@ const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousC
     const data = await validateAndExtractSireneDataFromPDFInBase64(pdf);
 
     if (data.siret !== siret) {
-      throw new Error(`Le PDF ne correspond pas à l'entreprise '${siret}'`);
+      throw new Error(
+        `Le certificat d'inscription ne correspond pas au SIRET renseigné`
+      );
     }
 
     // Verify company is not already created

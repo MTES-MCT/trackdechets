@@ -590,7 +590,9 @@ describe("createAnonymousCompanyRequest.helpers", () => {
         await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
       } catch (e) {
         // Then
-        expect(e.message).toEqual("PDF non valide");
+        expect(e.message).toEqual(
+          "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
+        );
       }
     });
 
@@ -613,7 +615,9 @@ describe("createAnonymousCompanyRequest.helpers", () => {
         await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
       } catch (e) {
         // Then
-        expect(e.message).toEqual("PDF non valide");
+        expect(e.message).toEqual(
+          "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
+        );
       }
     });
 
@@ -636,7 +640,9 @@ describe("createAnonymousCompanyRequest.helpers", () => {
         await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
       } catch (e) {
         // Then
-        expect(e.message).toEqual("Le PDF doit avoir moins de 3 mois");
+        expect(e.message).toEqual(
+          "Le certificat d'inscription n'est pas daté de moins de trois mois"
+        );
       }
     });
 
@@ -692,7 +698,9 @@ describe("createAnonymousCompanyRequest.helpers", () => {
         await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
       } catch (e) {
         // Then
-        expect(e.message).toEqual("PDF non valide");
+        expect(e.message).toEqual(
+          "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
+        );
       }
     });
 
@@ -718,7 +726,9 @@ describe("createAnonymousCompanyRequest.helpers", () => {
         await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
       } catch (e) {
         // Then
-        expect(e.message).toEqual("PDF non valide");
+        expect(e.message).toEqual(
+          "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
+        );
       }
     });
 
@@ -741,7 +751,9 @@ describe("createAnonymousCompanyRequest.helpers", () => {
         await validateAndExtractSireneDataFromPDFInBase64("dGVzdAo=");
       } catch (e) {
         // Then
-        expect(e.message).toEqual("PDF non valide");
+        expect(e.message).toEqual(
+          "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
+        );
       }
     });
 
@@ -754,7 +766,9 @@ describe("createAnonymousCompanyRequest.helpers", () => {
         await validateAndExtractSireneDataFromPDFInBase64("pdf not in base64");
       } catch (e) {
         // Then
-        expect(e.message).toEqual("PDF non valide");
+        expect(e.message).toEqual(
+          "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
+        );
       }
     });
   });

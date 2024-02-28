@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../../AccountCompanyAdd.module.scss";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Upload } from "@codegouvfr/react-dsfr/Upload";
@@ -12,7 +12,7 @@ import { UploadYourSirenePDFInfo } from "./UploadYourSirenePDFInfo";
 import { SirenePDFUploadDisabledFallbackError } from "./SirenePDFUploadDisabledFallbackError";
 import { convertFileToBase64 } from "../../../Apps/utils/fileUtils";
 import { Loader } from "../../../Apps/common/Components";
-import { AlreadyPendingAnonymousCompanyRequestError } from "./AlreadyPendingAnonymousCompanyRequestError";
+import { AlreadyPendingAnonymousCompanyRequestInfo } from "./AlreadyPendingAnonymousCompanyRequestInfo";
 import { InvalidSirenePDFFormatError } from "./InvalidSirenePDFFormatError";
 import { AnonymousCompanyRequestCreationSuccess } from "./AnonymousCompanyRequestCreationSuccess";
 
@@ -41,7 +41,11 @@ const DISABLE_FILE_UPLOAD =
 const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
   const [fileHasInvalidFormat, setFileHasInvalidFormat] =
     useState<boolean>(false);
-  const { data, loading: getLoading } = useQuery<
+  const {
+    data,
+    loading: getLoading,
+    refetch
+  } = useQuery<
     Pick<Query, "anonymousCompanyRequest">,
     QueryAnonymousCompanyRequestArgs
   >(ANONYMOUS_COMPANY_REQUEST, {
@@ -57,6 +61,10 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
     CREATE_ANONYMOUS_COMPANY_REQUEST
   );
 
+  useEffect(() => {
+    refetch({ siret });
+  }, [siret, refetch]);
+
   if (DISABLE_FILE_UPLOAD) {
     return <SirenePDFUploadDisabledFallbackError />;
   }
@@ -70,7 +78,7 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
   }
 
   if (data?.anonymousCompanyRequest) {
-    return <AlreadyPendingAnonymousCompanyRequestError />;
+    return <AlreadyPendingAnonymousCompanyRequestInfo />;
   }
 
   return (

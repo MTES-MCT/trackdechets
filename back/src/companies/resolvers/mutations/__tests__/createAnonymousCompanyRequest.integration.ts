@@ -167,7 +167,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "Le PDF ne correspond pas à l'entreprise '95207811100012'"
+      "Le certificat d'inscription ne correspond pas au SIRET renseigné"
     );
   });
 
@@ -382,7 +382,9 @@ describe("mutation createAnonymousCompanyRequest", () => {
 
     // Then
     expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual("PDF non valide");
+    expect(errors[0].message).toEqual(
+      "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
+    );
   });
 
   it("should fail because anonymous company already exists", async () => {

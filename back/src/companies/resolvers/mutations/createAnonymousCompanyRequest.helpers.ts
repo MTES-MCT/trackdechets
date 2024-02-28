@@ -304,7 +304,9 @@ export const parseBase64 = async (pdf: string): Promise<ParsedPdf> => {
 
     return data;
   } catch (e) {
-    throw new Error("PDF non valide");
+    throw new Error(
+      "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
+    );
   }
 };
 
@@ -320,7 +322,9 @@ export const validateAndExtractSireneDataFromPDFInBase64 = async (
 
   // If it looks fishy, don't even go further. Not storing dangerous stuff
   if (looksHacky(JSON.stringify({ text, info, metadata }))) {
-    throw new Error("PDF non valide");
+    throw new Error(
+      "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
+    );
   }
 
   let data: ExtractedData;
@@ -332,7 +336,9 @@ export const validateAndExtractSireneDataFromPDFInBase64 = async (
     // Get data
     data = extractData(text);
   } catch (e) {
-    throw new Error("PDF non valide");
+    throw new Error(
+      "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
+    );
   }
 
   const { pdfEmittedAt, closedAt, ...rest } = data;
@@ -350,7 +356,9 @@ export const validateAndExtractSireneDataFromPDFInBase64 = async (
   const now = new Date();
   const threeMonthsAgo = new Date(now.setMonth(now.getMonth() - 3));
   if (!pdfEmittedAt || pdfEmittedAt.getTime() < threeMonthsAgo.getTime()) {
-    throw new Error("Le PDF doit avoir moins de 3 mois");
+    throw new Error(
+      "Le certificat d'inscription n'est pas daté de moins de trois mois"
+    );
   }
 
   return rest;
