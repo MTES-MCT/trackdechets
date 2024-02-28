@@ -646,6 +646,8 @@ export default function BSDDetailContent({
   const isAppendix1Producer: boolean =
     form?.emitter?.type === EmitterType.Appendix1Producer;
 
+  const canDuplicate = permissions.includes(UserPermission.BsdCanCreate);
+
   const canDelete =
     ([FormStatus.Draft, FormStatus.Sealed].includes(form.status) ||
       (form.status === FormStatus.SignedByProducer &&
@@ -1010,13 +1012,15 @@ export default function BSDDetailContent({
               <span>Pdf</span>
             </button>
           )}
-          <button
-            className="btn btn--outline-primary"
-            onClick={() => duplicate()}
-          >
-            <IconDuplicateFile size="24px" color="blueLight" />
-            <span>Dupliquer</span>
-          </button>
+          {canDuplicate && (
+            <button
+              className="btn btn--outline-primary"
+              onClick={() => duplicate()}
+            >
+              <IconDuplicateFile size="24px" color="blueLight" />
+              <span>Dupliquer</span>
+            </button>
+          )}
           {canDelete && (
             <button
               className="btn btn--outline-primary"
