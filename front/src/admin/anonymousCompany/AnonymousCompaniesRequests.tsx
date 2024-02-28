@@ -78,7 +78,9 @@ export const AnonymousCompaniesRequests = ({ onCreateAnonymousCompany }) => {
             onClick={async () => {
               try {
                 await copyToClipboard(request.user.email);
-                toast.success("Adresse mail copiée", { duration: TOAST_DURATION });
+                toast.success("Adresse mail copiée", {
+                  duration: TOAST_DURATION
+                });
               } catch (e: any) {
                 toast.error(e, { duration: TOAST_DURATION });
               }
