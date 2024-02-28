@@ -14,6 +14,7 @@ import { convertFileToBase64 } from "../../../Apps/utils/fileUtils";
 import { Loader } from "../../../Apps/common/Components";
 import { AlreadyPendingAnonymousCompanyRequestInfo } from "./AlreadyPendingAnonymousCompanyRequestInfo";
 import { InvalidSirenePDFFormatError } from "./InvalidSirenePDFFormatError";
+import { InvalidSirenePDFSizeError } from "./InvalidSirenePDFSizeError";
 import { AnonymousCompanyRequestCreationSuccess } from "./AnonymousCompanyRequestCreationSuccess";
 
 const ANONYMOUS_COMPANY_REQUEST = gql`
@@ -41,6 +42,7 @@ const DISABLE_FILE_UPLOAD =
 const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
   const [fileHasInvalidFormat, setFileHasInvalidFormat] =
     useState<boolean>(false);
+  const [fileHasInvalidSize, setFileHasInvalidSize] = useState<boolean>(false);
   const {
     data,
     loading: getLoading,
@@ -87,8 +89,8 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
 
       <Upload
         className="fr-my-4w"
-        label="Avis de situation au répertoire SIRENE de moins de 3 mois"
-        hint="au format PDF"
+        label="Certificat d'inscription au répertoire des entreprises"
+        hint="Chargez votre fichier au format PDF uniquement, taille maximum : 500Ko"
         state="default"
         disabled={createLoading}
         nativeInputProps={{
@@ -99,6 +101,12 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
               // Convert to base64
               const file = e.target.files[0];
 
+              // 500ko max
+              if (file.size > 500000) {
+                setFileHasInvalidSize(true);
+                return;
+              }
+
               // Make sure the file is a PDF
               if (file.name.split(".").pop()?.toLowerCase() !== "pdf") {
                 setFileHasInvalidFormat(true);
@@ -106,6 +114,7 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
               }
 
               setFileHasInvalidFormat(false);
+              setFileHasInvalidSize(false);
 
               const base64 = await convertFileToBase64(file);
 
@@ -119,6 +128,7 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
       />
 
       {fileHasInvalidFormat && <InvalidSirenePDFFormatError />}
+      {fileHasInvalidSize && <InvalidSirenePDFSizeError />}
 
       {createError && (
         <InvalidSirenePDFError errorMessage={createError.message} />
