@@ -12,6 +12,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import styles from "./AnonymousCompany.module.scss";
 import toast from "react-hot-toast";
 import { TOAST_DURATION } from "../../common/config";
+import { copyToClipboard } from "../../Apps/utils/utils";
 
 const ANONYMOUS_COMPANY_REQUESTS = gql`
   query AnonymousCompanyRequests($first: Int, $last: Int, $skip: Int) {
@@ -70,9 +71,35 @@ export const AnonymousCompaniesRequests = ({ onCreateAnonymousCompany }) => {
       request.address,
       request.codeNaf,
       request.codeCommune,
-      <a className={styles.blueFrance} href={`mailto:${request.user.email}`}>
-        {request.user.email}
-      </a>,
+      <div className={styles.textCenter}>
+        <div>{request.user.email}</div>
+        <div>
+          <span
+            onClick={async () => {
+              try {
+                await copyToClipboard(request.user.email);
+                toast.success("Adresse mail copiée", { duration: TOAST_DURATION });
+              } catch (e: any) {
+                toast.error(e, { duration: TOAST_DURATION });
+              }
+            }}
+            title="Copier"
+            className={`fr-icon--sm fr-icon-edit-box-line fr-mx-1w ${styles.pointer}`}
+            aria-hidden="true"
+          ></span>
+          <a
+            href="https://trackdechets.zammad.com/#ticket/create"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <span
+              title="Ouvrir un ticket Zammad"
+              className="fr-icon--sm fr-icon-external-link-line"
+              aria-hidden="true"
+            ></span>
+          </a>
+        </div>
+      </div>,
       <div className={styles.actionButton}>
         <Button
           priority="secondary"
