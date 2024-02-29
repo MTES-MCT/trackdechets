@@ -11,7 +11,6 @@ async function updateFormIntermediaries(
   deleteSiret: string
 ) {
   if (!bsdReadableId || !addSiret || !deleteSiret) {
-    logger.warn(`missing data, skipping BSDD ${bsdReadableId}`);
     return;
   }
   let form;
@@ -23,8 +22,7 @@ async function updateFormIntermediaries(
       select: { id: true }
     });
   } catch (err) {
-    logger.error(`BSDD ${bsdReadableId} was not found`, err);
-    throw err;
+    return;
   }
   const [formIntermediary] = await prisma.intermediaryFormAssociation.findMany({
     where: {
@@ -33,7 +31,6 @@ async function updateFormIntermediaries(
     }
   });
   if (!formIntermediary) {
-    logger.warn(`FormIntermediary NOT found, skipping BSDD ${bsdReadableId}`);
     return;
   }
   const newFormInput: Prisma.FormUpdateInput = {
@@ -50,14 +47,13 @@ async function updateFormIntermediaries(
       ]
     }
   };
-  // Passe par la méthode update du form repository pour logguer l'event, déclencher le
-  // réindex et recalculer le champ dénormalisé `transporterSirets`
+  // Passe par la méthode update du form repository pour logguer l'event, déclencher le réindex
   const user = { id: "support-td", authType: "script" };
   const { update } = getFormRepository(user as any);
   try {
     await update({ id: form.id }, newFormInput);
-    logger.debug(
-      `Mis à jour terminée du BSDD ${bsdReadableId["initialFormId"]}, suppression ${deleteSiret} et ajout ${addSiret}`
+    logger.info(
+      `Mis à jour terminée du BSDD ${form.id}, suppression ${deleteSiret} et ajout ${addSiret}`
     );
   } catch (err) {
     logger.error(`Error during update`, err);
@@ -67,7 +63,7 @@ async function updateFormIntermediaries(
 
 @registerUpdater(
   "Update Chimirec CYCLEVIA intermediary",
-  "The script replace an intermediary for ACCEPTED Bsdd",
+  "The script replace an intermediary for a list of BSDD",
   true
 )
 export class LoadAnonymousCompaniesUpdater implements Updater {
@@ -80,7 +76,7 @@ export class LoadAnonymousCompaniesUpdater implements Updater {
       // so TypeScript loses track of what's being imported
       data = await import(path.join(__dirname, "replaceFormIntermediary.json"));
     } catch (err) {
-      console.error(
+      logger.error(
         "Missing file ./replaceFormIntermediary.json, aborting script"
       );
       process.exit(1);
@@ -89,27 +85,19 @@ export class LoadAnonymousCompaniesUpdater implements Updater {
       add: "90377711800022",
       delete: "50951435200046"
     };
-    console.log(`Starting script, logging with @td/logger`);
-    logger.debug(`Starting script`);
-    for (const bsdReadableId of data) {
-      try {
-        await updateFormIntermediaries(
+    for (const bsdReadableId of data.default) {
+      await Promise.allSettled([
+        updateFormIntermediaries(
           bsdReadableId["initialFormId"],
           options.add,
           options.delete
-        );
-      } catch (err) {
-        logger.error(err);
-      }
-      try {
-        await updateFormIntermediaries(
+        ),
+        updateFormIntermediaries(
           bsdReadableId["nextFormId"],
           options.add,
           options.delete
-        );
-      } catch (err) {
-        logger.error(err);
-      }
+        )
+      ]);
     }
   }
 }
