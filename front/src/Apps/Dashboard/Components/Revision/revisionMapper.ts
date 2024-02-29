@@ -86,6 +86,17 @@ const PACKAGINGS_NAMES = {
   [BsdaPackagingType.Other]: OTHER
 };
 
+const formatPackagingName = packaging => {
+  const formattedName =
+    packaging.type === BsdaPackagingType.Other
+      ? `${packaging.quantity} ${PACKAGINGS_NAMES[packaging.type]} ${
+          packaging.other ? `(${packaging.other})` : ""
+        }`
+      : `${packaging.quantity} ${PACKAGINGS_NAMES[packaging.type]}`;
+
+  return formattedName;
+};
+
 export const mapRevision = (
   review: FormRevisionRequest & BsdaRevisionRequest,
   bsdName: string
@@ -164,10 +175,10 @@ export const mapRevision = (
     {
       dataName: DataNameEnum.PACKAGING,
       dataOldValue: review?.[bsdName]?.packagings
-        ?.map(p => `${p.quantity} ${PACKAGINGS_NAMES[p.type]}`)
+        ?.map(p => formatPackagingName(p))
         .join(", "),
       dataNewValue: review?.content?.packagings
-        ?.map(p => `${p.quantity} ${PACKAGINGS_NAMES[p.type]}`)
+        ?.map(p => formatPackagingName(p))
         .join(", ")
     },
     {
