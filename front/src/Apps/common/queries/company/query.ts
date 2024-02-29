@@ -124,6 +124,7 @@ export const FAVORITES = (favType: FavoriteType) => {
         traderReceiptCompanySearchString
       );
       break;
+    case FavoriteType.Emitter:
     case FavoriteType.Destination:
     case FavoriteType.Recipient:
     case FavoriteType.NextDestination:
