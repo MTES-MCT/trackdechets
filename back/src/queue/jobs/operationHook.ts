@@ -3,10 +3,17 @@ import { Job } from "bull";
 import { operationHooksQueue } from "../producers/operationHook";
 import { isFinalOperationCode } from "../../common/operationCodes";
 
+// `operationHook` est appelé en récursif en "remontant" la traçabilité du bordereau final vers les
+// bordereaux initiaux. Étant donné qu'on passe par la queue et qu'on ne peut pas sérialiser
+// les données du bordereau final, on doit passer l'identifiant du bordereau final à
+// chaque appel récursif.
 export type OperationHookArgs = {
-  // Informations sur le traitement final
-  operationId: string;
-  formId: string;
+  // Identifiant du bordereau ayant reçu un traitement final
+  finalFormId: string;
+  // Identifiant d'un bordereau intermédiaire dont le déchet a subi une réexpédition, reconditionnement
+  //  (entreposage provisoire) ou un regroupement (annexe 2) et dont le bordereau final
+  // porte l'identifiant `finalFormId`
+  initialFormId: string;
 };
 
 export async function operationHookJob(
@@ -20,10 +27,10 @@ export async function operationHookJob(
  * de traitement sur un bordereau
  */
 export async function operationHook(args: OperationHookArgs) {
-  const { operationId, formId } = args;
+  const { finalFormId, initialFormId } = args;
   const operation = await prisma.form.findUniqueOrThrow({
     where: {
-      id: operationId,
+      id: finalFormId,
       isDeleted: false
     },
     select: {
@@ -39,7 +46,7 @@ export async function operationHook(args: OperationHookArgs) {
   // On récupère tous les bordereaux initiaux
   const formWithInitialForms = await prisma.form.findUniqueOrThrow({
     where: {
-      id: formId,
+      id: initialFormId,
       isDeleted: false
     },
     include: {
@@ -56,7 +63,7 @@ export async function operationHook(args: OperationHookArgs) {
   if (
     // Le code n'est appelé qu'en cas de traitement final ou de rupture de traçabilité
     isFinalOperationCode(operation.processingOperationDone!) ||
-    operation.noTraceability
+    !operation.noTraceability
   ) {
     for (const initialForm of initialForms) {
       let quantityReceived = operation.quantityReceived;
@@ -89,26 +96,28 @@ export async function operationHook(args: OperationHookArgs) {
             formId: initialForm.id
           }
         },
-        update : {
-          data: { quantity: { increment: data.quantityReceived } }
+        update: {
+          quantity: {
+            increment: data.quantity
+          }
         },
         create: data
       });
 
       // Applique le hook de façon récursive sur les bordereaux initiaux
       await operationHooksQueue.add({
-        operationId: operation.id,
-        formId: initialForm.id
+        finalFormId: operation.id,
+        initialFormId: initialForm.id
       });
     }
   } else {
-    for (const initialForm of initialForms) {
-      await prisma.form.update({
-        where: { id: initialForm.id },
-        data: {
-          finalOperations: { deleteMany: { where: { finalBsdReadableId: operation.readableId } }
-        }
-      });
-    }
+    await prisma.finalOperation.deleteMany({
+      where: {
+        formId: {
+          in: initialForms.map(form => form.id)
+        },
+        finalBsdReadableId: operation.readableId
+      }
+    });
   }
 }

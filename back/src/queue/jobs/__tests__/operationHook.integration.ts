@@ -76,8 +76,8 @@ describe("Test Form OperationHook job", () => {
     expect(formWithTempStorage.forwardedIn).toBeDefined();
     // Manually execute operationHook to simulate markAsProcessed
     await operationHook({
-      operationId: formWithTempStorage.forwardedIn!.id,
-      formId: formWithTempStorage.forwardedIn!.id
+      finalFormId: formWithTempStorage.forwardedIn!.id,
+      initialFormId: formWithTempStorage.forwardedIn!.id
     });
     const updatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: formWithTempStorage.id },
@@ -139,8 +139,8 @@ describe("Test Form OperationHook job", () => {
     expect(formWithTempStorage.forwardedIn).toBeDefined();
     // Manually execute operationHook to simulate markAsProcessed
     await operationHook({
-      operationId: formWithTempStorage.forwardedIn!.id,
-      formId: formWithTempStorage.forwardedIn!.id
+      finalFormId: formWithTempStorage.forwardedIn!.id,
+      initialFormId: formWithTempStorage.forwardedIn!.id
     });
 
     const updatedForm = await prisma.form.findUniqueOrThrow({
@@ -212,8 +212,8 @@ describe("Test Form OperationHook job", () => {
     });
     // Manually execute operationHook to simulate nothing happens
     await operationHook({
-      operationId: appendix2.id,
-      formId: appendix2.id
+      finalFormId: appendix2.id,
+      initialFormId: appendix2.id
     });
 
     const notUpdatedInitialForm = await prisma.form.findUniqueOrThrow({
@@ -225,8 +225,8 @@ describe("Test Form OperationHook job", () => {
 
     // Manually execute operationHook to simulate markAsProcessed
     await operationHook({
-      operationId: regroupementForm.id,
-      formId: regroupementForm.id
+      finalFormId: regroupementForm.id,
+      initialFormId: regroupementForm.id
     });
 
     const updatedRegroupementForm = await prisma.form.findUniqueOrThrow({

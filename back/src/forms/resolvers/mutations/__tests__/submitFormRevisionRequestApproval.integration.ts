@@ -1045,8 +1045,8 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     });
     // Manually execute operationHook to simulate markAsProcessed
     await operationHook({
-      operationId: formWithTempStorage.forwardedInId!,
-      formId: formWithTempStorage.forwardedInId!
+      finalFormId: formWithTempStorage.forwardedInId!,
+      initialFormId: formWithTempStorage.forwardedInId!
     });
     const updatedBsdd = await prisma.form.findUniqueOrThrow({
       where: { id: formWithTempStorage.id },
@@ -1169,8 +1169,8 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
     // Manually execute operationHook to simulate markAsProcessed
     await operationHook({
-      operationId: formWithTempStorage.forwardedInId!,
-      formId: formWithTempStorage.forwardedInId!
+      finalFormId: formWithTempStorage.forwardedInId!,
+      initialFormId: formWithTempStorage.forwardedInId!
     });
     const updatedBsdd = await prisma.form.findUniqueOrThrow({
       where: { id: formWithTempStorage.id },

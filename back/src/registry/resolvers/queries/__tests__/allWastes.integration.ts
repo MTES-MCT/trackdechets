@@ -383,8 +383,8 @@ describe("All wastes registry", () => {
     await refreshElasticSearch();
     // Manually execute operationHook to simulate markAsProcessed
     await operationHook({
-      operationId: forwardedInithTempStorageFullForm.id,
-      formId: forwardedInithTempStorageFullForm.id
+      finalFormId: forwardedInithTempStorageFullForm.id,
+      initialFormId: forwardedInithTempStorageFullForm.id
     });
 
     const { data } = await query<Pick<Query, "allWastes">>(ALL_WASTES_TTR, {
