@@ -6,7 +6,7 @@ import {
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { prisma } from "@td/prisma";
-import { nafCodes, isForeignVat } from "@td/constants";
+import { nafCodes } from "@td/constants";
 import { UserInputError } from "../../../common/errors";
 import { libelleFromCodeNaf } from "../../sirene/utils";
 import { renderMail, anonymousCompanyCreatedEmail } from "@td/mail";
