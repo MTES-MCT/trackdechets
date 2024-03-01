@@ -28,7 +28,7 @@ export async function operationHookJob(
  */
 export async function operationHook(args: OperationHookArgs) {
   const { finalFormId, initialFormId } = args;
-  const operation = await prisma.form.findUniqueOrThrow({
+  const finalForm = await prisma.form.findUniqueOrThrow({
     where: {
       id: finalFormId,
       isDeleted: false
@@ -60,13 +60,23 @@ export async function operationHook(args: OperationHookArgs) {
     ...(formWithInitialForms.grouping ?? []).map(g => g.initialForm)
   ].filter(Boolean);
 
+  // L'upsert FinalOperation n'est appelé qu'en cas de traitement final ou de rupture de traçabilité
+  // Sinon on supprime les FinalOperations liés
   if (
-    // Le code n'est appelé qu'en cas de traitement final ou de rupture de traçabilité
-    isFinalOperationCode(operation.processingOperationDone!) ||
-    !operation.noTraceability
+    !isFinalOperationCode(finalForm.processingOperationDone!) ||
+    finalForm.noTraceability === true
   ) {
     for (const initialForm of initialForms) {
-      let quantityReceived = operation.quantityReceived;
+      await prisma.form.update({
+        where: { id: initialForm.id },
+        data: {
+          finalOperations: { deleteMany: {} }
+        }
+      });
+    }
+  } else {
+    for (const initialForm of initialForms) {
+      let quantityReceived = finalForm.quantityReceived;
       if (formWithInitialForms.emitterType === "APPENDIX2") {
         // affect only the fraction grouped of initialForm to quantity.
         const groupedInitialForm = formWithInitialForms.grouping.find(
@@ -78,11 +88,11 @@ export async function operationHook(args: OperationHookArgs) {
       }
 
       const data = {
-        finalBsdReadableId: operation.readableId,
+        finalBsdReadableId: finalForm.readableId,
         quantity: quantityReceived!,
-        operationCode: operation.processingOperationDone!,
-        destinationCompanySiret: operation.recipientCompanySiret!,
-        destinationCompanyName: operation.recipientCompanyName!,
+        operationCode: finalForm.processingOperationDone!,
+        destinationCompanySiret: finalForm.recipientCompanySiret!,
+        destinationCompanyName: finalForm.recipientCompanyName!,
         formId: initialForm.id
       };
 
@@ -93,7 +103,7 @@ export async function operationHook(args: OperationHookArgs) {
       await prisma.finalOperation.upsert({
         where: {
           formId_finalBsdReadableId: {
-            finalBsdReadableId: operation.readableId,
+            finalBsdReadableId: finalForm.readableId,
             formId: initialForm.id
           }
         },
@@ -101,27 +111,18 @@ export async function operationHook(args: OperationHookArgs) {
           quantity: {
             increment: data.quantity
           },
-          operationCode: operation.processingOperationDone!,
-          destinationCompanySiret: operation.recipientCompanySiret!,
-          destinationCompanyName: operation.recipientCompanyName!,
+          operationCode: finalForm.processingOperationDone!,
+          destinationCompanySiret: finalForm.recipientCompanySiret!,
+          destinationCompanyName: finalForm.recipientCompanyName!
         },
         create: data
       });
 
       // Applique le hook de façon récursive sur les bordereaux initiaux
       await operationHooksQueue.add({
-        finalFormId: operation.id,
+        finalFormId: finalForm.id,
         initialFormId: initialForm.id
       });
     }
-  } else {
-    await prisma.finalOperation.deleteMany({
-      where: {
-        formId: {
-          in: initialForms.map(form => form.id)
-        },
-        finalBsdReadableId: operation.readableId
-      }
-    });
   }
 }
