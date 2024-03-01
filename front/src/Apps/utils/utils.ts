@@ -32,8 +32,6 @@ export const copyToClipboard = async (textToCopy: string) => {
 
     try {
       document.execCommand("copy");
-    } catch (error) {
-      throw error;
     } finally {
       textArea.remove();
     }
