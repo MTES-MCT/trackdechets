@@ -220,9 +220,19 @@ export const looksHacky = (str: string): boolean => {
       "onload",
       "onanimationstart",
       "onanimationend",
-      "http"
+      "http",
+      "ws:",
+      "wss:",
+      "//"
     ].some(s => low.includes(s)) || new RegExp(/[`~#$%^*|?;<>[\]]/).test(str)
   );
+};
+
+/**
+ * Remove all special chars for sanitization
+ */
+export const removeSpecialChars = (str: string): string => {
+  return str.replace(/[~`!@#$%^&*()+={}\[\];:\'\"<>.,\/\\\?_]/g, "");
 };
 
 // https://stackoverflow.com/questions/475074/regex-to-parse-or-validate-base64-data

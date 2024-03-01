@@ -1,5 +1,6 @@
 import axios from "axios";
 import { logger } from "@td/logger";
+import { removeSpecialChars } from "../../utils";
 
 // https://adresse.data.gouv.fr/api-doc/adresse
 const ADRESSE_DATA_GOUV_FR_URL = "https://api-adresse.data.gouv.fr";
@@ -38,7 +39,12 @@ interface ApiResponse {
  */
 export async function getCodeCommune(address: string) {
   try {
-    const addr = address.replace(/ /g, "+");
+    // Field is vulnerable to injection. Sanitize first
+    const sanitizedAddress = removeSpecialChars(address);
+
+    // Addr will be URL param, so change "2 rue des.." to "2+rue+des..."
+    const addr = sanitizedAddress.replace(/ /g, "+");
+
     const fullUrl = `${ADRESSE_DATA_GOUV_FR_URL}/search/?q=${addr}`;
 
     const res = await axios.get<ApiResponse>(fullUrl);
