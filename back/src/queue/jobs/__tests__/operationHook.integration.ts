@@ -94,7 +94,7 @@ describe("Test Form OperationHook job", () => {
     });
   });
 
-  it("updates final operations for noTraceability", async () => {
+  it("empties final operations for noTraceability", async () => {
     const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
       UserRole.MEMBER,
       {
@@ -132,6 +132,7 @@ describe("Test Form OperationHook job", () => {
         quantityReceived: 100,
         receivedAt: new Date(),
         processingOperationDone: "NOT_APPLICABLE",
+        // TRUE
         noTraceability: true
       }
     });
@@ -148,14 +149,7 @@ describe("Test Form OperationHook job", () => {
       include: { finalOperations: true, forwardedIn: true }
     });
 
-    expect(updatedForm?.finalOperations[0]).toMatchObject({
-      formId: updatedForm.id,
-      finalBsdReadableId: updatedForm.forwardedIn!.readableId,
-      quantity: updatedForm.forwardedIn!.quantityReceived!,
-      operationCode: updatedForm.forwardedIn!.processingOperationDone!,
-      destinationCompanySiret: updatedForm.forwardedIn!.recipientCompanySiret!,
-      destinationCompanyName: updatedForm.forwardedIn!.recipientCompanyName!
-    });
+    expect(updatedForm?.finalOperations).toEqual([]);
   });
 
   it("updates final operations of an appendix2", async () => {

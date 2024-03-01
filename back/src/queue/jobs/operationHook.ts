@@ -82,7 +82,8 @@ export async function operationHook(args: OperationHookArgs) {
         quantity: quantityReceived!,
         operationCode: operation.processingOperationDone!,
         destinationCompanySiret: operation.recipientCompanySiret!,
-        destinationCompanyName: operation.recipientCompanyName!
+        destinationCompanyName: operation.recipientCompanyName!,
+        formId: initialForm.id
       };
 
       if (Object.values(data).some(value => value === null)) {
@@ -99,7 +100,10 @@ export async function operationHook(args: OperationHookArgs) {
         update: {
           quantity: {
             increment: data.quantity
-          }
+          },
+          operationCode: operation.processingOperationDone!,
+          destinationCompanySiret: operation.recipientCompanySiret!,
+          destinationCompanyName: operation.recipientCompanyName!,
         },
         create: data
       });
