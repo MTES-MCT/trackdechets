@@ -45,8 +45,8 @@ async function exitScript() {
 
       const jobs = finalOperationCodeForms.map(processedForm => ({
         data: {
-          operationId: processedForm.id,
-          formId: processedForm.id
+          finalFormId: processedForm.id,
+          initialFormId: processedForm.id
         }
       }));
 

@@ -324,8 +324,8 @@ export async function approveAndApplyRevisionRequest(
   });
   // this update or delete  FinalOperations eventually  attached
   await operationHooksQueue.add({
-    operationId: updatedBsdd.id,
-    formId: updatedBsdd.id
+    finalFormId: updatedBsdd.id,
+    initialFormId: updatedBsdd.id
   });
   if (updatedBsdd.emitterType === EmitterType.APPENDIX1) {
     const { wasteDetailsCode, wasteDetailsName, wasteDetailsPop } =
