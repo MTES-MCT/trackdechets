@@ -328,7 +328,8 @@ input SendVerificationCodeLetterInput {
 }
 
 input AnonymousCompanyInput {
-  siret: String!
+  siret: String
+  vatNumber: String
   name: String!
   codeNaf: String!
   address: String!

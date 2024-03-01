@@ -8,12 +8,12 @@ import {
   Mutation,
   MutationCreateAnonymousCompanyArgs
 } from "@td/codegen-ui";
-import { isSiret, nafCodes } from "@td/constants";
 import { TOAST_DURATION } from "../../common/config";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { CodeCommuneLinks } from "./CodeCommuneLinks";
+import { isFRVat, isSiret, isVat, nafCodes } from "@td/constants";
 
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 
@@ -37,9 +37,27 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       )
       .required(),
     name: yup.string().required(),
+    vatNumber: yup
+      .string()
+      .nullable()
+      .test(
+        "is-vat",
+        ({ originalValue }) =>
+          `AnonymousCompany: ${originalValue} n'est pas un numéro de TVA valide`,
+        value => !value || isVat(value)
+      )
+      .test(
+        "is-not-fr-vat",
+        "AnonymousCompany: impossible de soumettre un numéro de TVA français, seul le SIRET est autorisé",
+        value => !value || !isFRVat(value)
+      ),
     siret: yup
       .string()
-      .required()
+      .when("vatNumber", {
+        is: vatNumber => !vatNumber,
+        then: schema => schema.required(),
+        otherwise: schema => schema.ensure()
+      })
       .test(
         "is-siret",
         "n°SIRET invalide",
@@ -70,7 +88,8 @@ export function CreateAnonymousCompanyForm({
           codeCommune: anonymousCompanyRequest?.codeCommune ?? "",
           codeNaf: anonymousCompanyRequest?.codeNaf ?? "",
           name: anonymousCompanyRequest?.name ?? "",
-          siret: anonymousCompanyRequest?.siret ?? ""
+          siret: anonymousCompanyRequest?.siret ?? "",
+          vatNumber: ""
         }}
         validationSchema={AnonymousCompanyInputSchema}
         onSubmit={async (values, { resetForm }) => {
@@ -97,6 +116,20 @@ export function CreateAnonymousCompanyForm({
                     label="SIRET"
                     state={errors.siret ? "error" : "default"}
                     stateRelatedMessage={errors.siret as string}
+                    disabled={loading}
+                    nativeInputProps={field}
+                  />
+                );
+              }}
+            </Field>
+
+            <Field name="vatNumber">
+              {({ field }) => {
+                return (
+                  <Input
+                    label="Numéro de TVA (étranger)"
+                    state={errors.vatNumber ? "error" : "default"}
+                    stateRelatedMessage={errors.vatNumber as string}
                     disabled={loading}
                     nativeInputProps={field}
                   />
@@ -171,7 +204,7 @@ export function CreateAnonymousCompanyForm({
               <Alert
                 className="fr-mb-3w"
                 small
-                description={"test"}
+                description={error.message}
                 severity="error"
               />
             )}

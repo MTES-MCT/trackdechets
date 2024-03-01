@@ -51,6 +51,75 @@ describe("createAnonymousCompany", () => {
     expect(anonymousCompany).toBeTruthy();
   });
 
+  it("should create an anonymous company using a VAT number", async () => {
+    // Given
+    const user = await userFactory({ isAdmin: true });
+    const { mutate } = makeClient(user);
+    const input = {
+      ...validInput,
+      vatNumber: "BE0541696005",
+      siret: undefined
+    };
+
+    // When
+    await mutate<
+      Pick<Mutation, "createAnonymousCompany">,
+      MutationCreateAnonymousCompanyArgs
+    >(CREATE_ANONYMOUS_COMPANY, { variables: { input } });
+
+    // Then
+    const anonymousCompany = await prisma.anonymousCompany.findUnique({
+      where: { vatNumber: input.vatNumber }
+    });
+    expect(anonymousCompany).toBeTruthy();
+    expect(anonymousCompany?.orgId).toEqual(input.vatNumber);
+  });
+
+  it("should crash if no siret nor VAT number is given", async () => {
+    // Given
+    const user = await userFactory({ isAdmin: true });
+    const { mutate } = makeClient(user);
+    const input = {
+      ...validInput,
+      vatNumber: undefined,
+      siret: undefined
+    };
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompany">,
+      MutationCreateAnonymousCompanyArgs
+    >(CREATE_ANONYMOUS_COMPANY, { variables: { input } });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "La sélection d'une entreprise par SIRET ou numéro de TVA (si l'entreprise n'est pas française) est obligatoire"
+    );
+  });
+
+  it("should crash if both SIRET & VAT number are given", async () => {
+    // Given
+    const user = await userFactory({ isAdmin: true });
+    const { mutate } = makeClient(user);
+    const input = {
+      ...validInput,
+      vatNumber: "BE0541696005"
+    };
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompany">,
+      MutationCreateAnonymousCompanyArgs
+    >(CREATE_ANONYMOUS_COMPANY, { variables: { input } });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Vous ne pouvez pas préciser un numéro de TVA ET un SIRET: les deux champs sont mutuellement exclusifs"
+    );
+  });
+
   it("should prevent non-admin from creating an anonymous company", async () => {
     const user = await userFactory({ isAdmin: false });
     const { mutate } = makeClient(user);
@@ -85,7 +154,7 @@ describe("createAnonymousCompany", () => {
     ]);
   });
 
-  it("should prevent creating an anonymous company that already exists", async () => {
+  it("should prevent creating an anonymous company that already exists (siret)", async () => {
     const user = await userFactory({ isAdmin: true });
     const { mutate } = makeClient(user);
 
@@ -106,7 +175,42 @@ describe("createAnonymousCompany", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'entreprise au SIRET "${validInput.siret}" est déjà connue de notre répertoire privé.`
+        message: `L'entreprise "${validInput.siret}" est déjà connue de notre répertoire privé.`
+      })
+    ]);
+  });
+
+  it("should prevent creating an anonymous company that already exists (vatNumber)", async () => {
+    // Given
+    const user = await userFactory({ isAdmin: true });
+    const { mutate } = makeClient(user);
+
+    const input = {
+      ...validInput,
+      siret: undefined,
+      vatNumber: "BE0541696005"
+    };
+
+    await prisma.anonymousCompany.create({
+      data: {
+        ...input,
+        orgId: input.vatNumber,
+        libelleNaf: "Libellé NAF"
+      }
+    });
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompany">,
+      MutationCreateAnonymousCompanyArgs
+    >(CREATE_ANONYMOUS_COMPANY, {
+      variables: { input }
+    });
+
+    // Then
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `L'entreprise "${input.vatNumber}" est déjà connue de notre répertoire privé.`
       })
     ]);
   });
