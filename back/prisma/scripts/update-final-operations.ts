@@ -30,12 +30,14 @@ export class UpdateFinalOperationUpdater implements Updater {
         orderBy: {
           id: "asc"
         },
-        ...(cursor ? {
-          skip: 1,
-          cursor: {
-            id: cursor
-          }
-        } : {})
+        ...(cursor
+          ? {
+              skip: 1,
+              cursor: {
+                id: cursor
+              }
+            }
+          : {})
       });
 
       if (finalOperationCodeForms.length > 0) {
@@ -54,7 +56,6 @@ export class UpdateFinalOperationUpdater implements Updater {
         cursor = finalOperationCodeForms[finalOperationCodeForms.length - 1].id;
         processed += finalOperationCodeForms.length;
       }
-
     } while (
       finalOperationCodeForms &&
       finalOperationCodeForms.length === PAGE_SIZE
