@@ -232,7 +232,7 @@ export const looksHacky = (str: string): boolean => {
  * Remove all special chars for sanitization
  */
 export const removeSpecialChars = (str: string): string => {
-  return str.replace(/[~`!@#$%^&*()+={}\[\];:\'\"<>.,\/\\\?_]/g, "");
+  return str.replace(/[~`!@#$%^&*()+={}[\];:'"<>.,/\\?_]/g, "");
 };
 
 // https://stackoverflow.com/questions/475074/regex-to-parse-or-validate-base64-data
