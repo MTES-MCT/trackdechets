@@ -1,4 +1,8 @@
-// https://stackoverflow.com/questions/13538832/convert-pdf-to-a-base64-encoded-string-in-javascript
+/**
+ * Converts a file to a base64-encoded string
+ *
+ * SO thread: https://stackoverflow.com/questions/13538832/convert-pdf-to-a-base64-encoded-string-in-javascript
+ */
 export const convertFileToBase64 = async (file: File): Promise<string> => {
   return new Promise(res => {
     const fileReader = new FileReader();

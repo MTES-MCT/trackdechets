@@ -13,7 +13,12 @@ export const extractPostalCodeFromAddress = (
   return clean.find(s => s.match(POSTAL_CODE_REGEX));
 };
 
-// https://stackoverflow.com/questions/51805395/navigator-clipboard-is-undefined
+/**
+ * Copy some text to the clipboards. Contains fallbacks for unsafe origins or old
+ * browers
+ *
+ * SO thread: https://stackoverflow.com/questions/51805395/navigator-clipboard-is-undefined
+ */
 export const copyToClipboard = async (textToCopy: string) => {
   // Navigator clipboard api needs a secure context (https)
   if (navigator.clipboard && window.isSecureContext) {
