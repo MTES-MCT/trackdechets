@@ -1,4 +1,5 @@
 import { EmitterType, Prisma, Status } from "@prisma/client";
+
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
@@ -21,6 +22,7 @@ import {
   isVat,
   PROCESSING_OPERATIONS
 } from "@td/constants";
+import { operationHooksQueue } from "../../../queue/producers/operationHook";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -122,6 +124,11 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     }
 
     return processedForm;
+  });
+
+  await operationHooksQueue.add({
+    finalFormId: processedForm.id,
+    initialFormId: processedForm.id
   });
 
   return getAndExpandFormFromDb(processedForm.id);
