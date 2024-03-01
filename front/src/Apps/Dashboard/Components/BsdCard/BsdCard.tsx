@@ -35,7 +35,7 @@ import {
   useBsvhuDuplicate
 } from "../Duplicate/useDuplicate";
 import { Loader } from "../../../common/Components";
-import { BsdDisplay } from "../../../common/types/bsdTypes";
+import { BsdDisplay, BsdStatusCode } from "../../../common/types/bsdTypes";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import { useMedia } from "../../../../common/use-media";
 import { MEDIA_QUERIES } from "../../../../common/config";
@@ -239,6 +239,11 @@ function BsdCard({
     : latestRevision?.status === RevisionRequestStatus.Pending
     ? latestRevision?.status
     : null;
+
+  const isNoTraceability = (bsd: BsdDisplay) =>
+    bsd.packagings?.length &&
+    bsd.packagings?.every(packaging => packaging.operation?.noTraceability);
+
   return (
     <>
       <div className="bsd-card" tabIndex={0}>
@@ -334,7 +339,11 @@ function BsdCard({
                 />
                 <div className="bsd-card__content__infos__status">
                   <Badge
-                    status={bsdDisplay.status}
+                    status={
+                      isNoTraceability(bsdDisplay)
+                        ? BsdStatusCode.NoTraceability
+                        : bsdDisplay.status
+                    }
                     isDraft={bsdDisplay.isDraft}
                     bsdType={bsdDisplay.type}
                     reviewStatus={reviewStatus}

@@ -861,7 +861,7 @@ describe("Mutation.updateForm", () => {
     expect(data.updateForm.ecoOrganisme).toBeNull();
   });
 
-  it("should add the first intermediary on an existing ", async () => {
+  it("should add the first intermediary on an existing draft", async () => {
     const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
     const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
 

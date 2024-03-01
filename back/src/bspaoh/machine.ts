@@ -21,7 +21,6 @@ export const machine = createMachine<Record<string, never>, Event>(
     // cf. https://xstate.js.org/docs/guides/actions.html
     predictableActionArguments: true,
     states: {
-      [BspaohStatus.CANCELED]: { type: "final" },
       [BspaohStatus.INITIAL]: {
         on: {
           EMISSION: {

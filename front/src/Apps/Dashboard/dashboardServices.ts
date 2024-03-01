@@ -97,12 +97,6 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.Accepted:
       return ACCEPTE;
     case BsdStatusCode.Processed:
-      if (
-        bsdType === BsdType.Bsff &&
-        (operationCode === "R12" || operationCode === "D13")
-      ) {
-        return TRAITE_AVEC_RUPTURE_TRACABILITE;
-      }
       return TRAITE;
     case BsdStatusCode.AwaitingChild:
     case BsdStatusCode.Grouped:
@@ -554,7 +548,11 @@ export const getSentBtnLabel = (
       return "";
     }
 
-    if (isToCollectTab && isSameSiretNextTransporter(currentSiret, bsd)) {
+    if (
+      isToCollectTab &&
+      isSameSiretNextTransporter(currentSiret, bsd) &&
+      permissions.includes(UserPermission.BsdCanSignTransport)
+    ) {
       return SIGNER;
     }
 
@@ -570,7 +568,11 @@ export const getSentBtnLabel = (
         return VALIDER_RECEPTION;
       }
 
-      if (isAppendix1(bsd) && canAddAppendix1(bsd)) {
+      if (
+        isAppendix1(bsd) &&
+        canAddAppendix1(bsd) &&
+        permissions.includes(UserPermission.BsdCanUpdate)
+      ) {
         return AJOUTER_ANNEXE_1;
       }
     }
@@ -693,13 +695,20 @@ export const getSignByProducerBtnLabel = (
         (isGathering(bsd.bsdWorkflowType?.toString()) ||
           isReshipment(bsd.bsdWorkflowType?.toString()) ||
           isOtherCollection(bsd.bsdWorkflowType?.toString()) ||
-          bsd.worker?.isDisabled)) ||
+          bsd.worker?.isDisabled) &&
+        (permissions.includes(UserPermission.BsdCanSignTransport) ||
+          permissions.includes(UserPermission.BsdCanSignWork))) ||
       isBsvhu(bsd.type)
     ) {
       return SIGNER;
     }
   } else {
-    if (isBsdasri(bsd.type) && !isToCollectTab) {
+    if (
+      isBsdasri(bsd.type) &&
+      !isToCollectTab &&
+      (permissions.includes(UserPermission.BsdCanSignTransport) ||
+        permissions.includes(UserPermission.BsdCanSignAcceptation))
+    ) {
       return "";
     }
 
@@ -1098,8 +1107,11 @@ const canDeleteBsda = (bsd, siret) =>
     (bsd.status === BsdStatusCode.SignedByProducer &&
       bsd.emitter?.company?.siret === siret));
 
-const canDeleteBsdasri = bsd =>
-  bsd.type === BsdType.Bsdasri && bsd.status === BsdStatusCode.Initial;
+const canDeleteBsdasri = (bsd, siret) =>
+  bsd.type === BsdType.Bsdasri &&
+  (bsd.status === BsdStatusCode.Initial ||
+    (isSameSiretEmmiter(siret, bsd) &&
+      bsd.status === BsdStatusCode.SignedByProducer));
 
 const canDeleteBsvhu = bsd =>
   bsd.type === BsdType.Bsvhu && bsd.status === BsdStatusCode.Initial;
@@ -1142,7 +1154,7 @@ const canDeleteBsff = (bsd, siret) =>
 export const canDeleteBsd = (bsd, siret) =>
   canDeleteBsdd(bsd) ||
   canDeleteBsda(bsd, siret) ||
-  canDeleteBsdasri(bsd) ||
+  canDeleteBsdasri(bsd, siret) ||
   canDeleteBsff(bsd, siret) ||
   canDeleteBsvhu(bsd);
 
@@ -1258,7 +1270,9 @@ export const hasBsdasriEmitterSign = (
     isBsdasri(bsd.type) &&
     hasEmportDirect(bsd, currentSiret, isToCollectTab) &&
     isToCollectTab &&
-    isEmetteurSign(bsd, isTransporter)
+    isEmetteurSign(bsd, isTransporter) &&
+    !bsd.isDraft &&
+    bsd.status === BsdStatusCode.Initial
   );
 };
 
@@ -1273,7 +1287,7 @@ export const canEditCustomInfoOrTransporterNumberPlate = (
   bsd: BsdDisplay
 ): boolean => {
   if (isBsdd(bsd.type)) {
-    return ["SEALED", "SIGNED_BY_PRODUCER"].includes(bsd.status);
+    return ["SEALED", "RESEALED", "SIGNED_BY_PRODUCER"].includes(bsd.status);
   }
 
   if (isBsda(bsd.type)) {
