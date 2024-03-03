@@ -242,6 +242,7 @@ describe("Mutation.duplicateForm", () => {
     const expectedSkipped = [
       "createdAt",
       "updatedAt",
+      "rowNumber",
       "readableId",
       "status",
       "emittedBy",
@@ -528,6 +529,7 @@ describe("Mutation.duplicateForm", () => {
       "id",
       "createdAt",
       "updatedAt",
+      "rowNumber",
       "readableId",
       "status",
       "recipientIsTempStorage",

@@ -20,6 +20,7 @@ type EditableBsffFields = Required<
     | "id"
     | "createdAt"
     | "updatedAt"
+    | "rowNumber"
     | "isDraft"
     | "isDeleted"
     | "status"

@@ -19,6 +19,7 @@ type EditableBsddFields = Required<
     | "id"
     | "createdAt"
     | "updatedAt"
+    | "rowNumber"
     | "readableId"
     | "status"
     | "emittedBy"

@@ -11,6 +11,7 @@ type EditableBsvhuFields = Required<
     | "id"
     | "createdAt"
     | "updatedAt"
+    | "rowNumber"
     | "isDraft"
     | "isDeleted"
     | "status"
