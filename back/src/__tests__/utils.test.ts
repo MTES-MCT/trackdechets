@@ -7,7 +7,7 @@ import {
   extractPostalCode,
   xDaysAgo,
   randomNbrChain,
-  removeSpecialChars
+  removeSpecialCharsExceptHyphens
 } from "../utils";
 
 test("getUid returns a unique identifier of fixed length", () => {
@@ -94,7 +94,7 @@ describe("randomNbrChain", () => {
   });
 });
 
-describe("removeSpecialChars", () => {
+describe("removeSpecialCharsExceptHyphens", () => {
   test.each`
     input                                                                   | expected
     ${""}                                                                   | ${""}
@@ -106,6 +106,6 @@ describe("removeSpecialChars", () => {
     ${"/[~`!@#$%^&*()+={}[];:'\"<>.,/?_]/[~`!@#$%^&*()+={}[];:'\"<>.,/?_]"} | ${""}
     ${"/[~`!@#$%^and some&*()+={}[];:'\" text in between<>.,/?_]"}          | ${"and some text in between"}
   `('"$input" should return $expected', ({ input, expected }) => {
-    expect(removeSpecialChars(input)).toEqual(expected);
+    expect(removeSpecialCharsExceptHyphens(input)).toEqual(expected);
   });
 });
