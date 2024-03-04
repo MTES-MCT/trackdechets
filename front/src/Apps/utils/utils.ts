@@ -2,7 +2,7 @@
  * Extract postalCode from address, ie:
  * extractPostalCodeFromAddress("37 RUE JEAN JACQUES NEUFER 57230 BITCHE") = 57230
  */
-const POSTAL_CODE_REGEX = new RegExp(/^(?:[0-8]\d|9[0-8])\d{3}$/);
+const POSTAL_CODE_REGEX = new RegExp(/^(?:0[1-9]|[1-8]\d|9[0-8])\d{3}$/);
 export const extractPostalCodeFromAddress = (
   address?: string
 ): string | undefined => {
@@ -10,7 +10,9 @@ export const extractPostalCodeFromAddress = (
 
   const clean = address.replace(/,/g, "").split(" ");
 
-  return clean.find(s => s.match(POSTAL_CODE_REGEX));
+  // Technically the postalCode is likely to be the last code in the address,
+  // so reverse (in case the street number is huge, for instace: "4100 rue du moulin...")
+  return clean.reverse().find(s => s.match(POSTAL_CODE_REGEX));
 };
 
 /**
