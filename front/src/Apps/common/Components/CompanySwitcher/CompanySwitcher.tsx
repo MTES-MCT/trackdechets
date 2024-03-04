@@ -1,18 +1,46 @@
 import React, { useState, useMemo } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery, gql } from "@apollo/client";
 import { Query, CompanyPrivate } from "@td/codegen-ui";
 import { CompanySwitcherProps } from "./companySwitcherTypes";
-import "./companySwitcher.scss";
 import { debounce } from "../../../../common/helper";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 import {
-  MY_COMPANIES,
-  isSearchClueValid
-} from "../../../../account/AccountCompanyList";
+  MIN_MY_COMPANIES_SEARCH,
+  MAX_MY_COMPANIES_SEARCH
+} from "@td/constants";
 import { InlineLoader } from "../Loader/Loaders";
 import useOnClickOutsideRefTarget from "../../hooks/useOnClickOutsideRefTarget";
+import "./companySwitcher.scss";
 
 export const SIRET_STORAGE_KEY = "td-siret";
+
+const MY_COMPANIES = gql`
+  query MyCompanies($first: Int, $after: ID, $search: String) {
+    myCompanies(first: $first, after: $after, search: $search) {
+      totalCount
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        cursor
+        node {
+          id
+          name
+          orgId
+          siret
+          givenName
+          securityCode
+        }
+      }
+    }
+  }
+`;
+
+// Prevent to short and long clues
+const isSearchClueValid = clue =>
+  clue.length >= MIN_MY_COMPANIES_SEARCH &&
+  clue.length <= MAX_MY_COMPANIES_SEARCH;
 
 const getLocalStorageOrgId = () => {
   const storedItem = window.localStorage.getItem(SIRET_STORAGE_KEY);
@@ -23,9 +51,8 @@ const saveOrgIdToLocalStorage = orgId => {
   window.localStorage.setItem(SIRET_STORAGE_KEY, JSON.stringify(orgId));
 };
 
-export const getDefaultOrgId = (companies: CompanyPrivate[]) => {
-  return getLocalStorageOrgId() || companies[0].orgId;
-};
+export const getDefaultOrgId = (companies: CompanyPrivate[]) =>
+  getLocalStorageOrgId() ?? (companies.length > 0 && companies[0].orgId) ?? "";
 
 const CompanySwitcher = ({
   currentOrgId,
@@ -102,7 +129,9 @@ const CompanySwitcher = ({
     return (
       <div
         key={company.orgId}
-        className="company-switcher-item"
+        className={`company-switcher-item ${
+          current ? "company-switcher-item--current" : ""
+        }`}
         onClick={onClick}
         tabIndex={0}
         onKeyDown={onKeyDown}
