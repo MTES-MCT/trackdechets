@@ -235,7 +235,11 @@ export const removeSpecialCharsExceptHyphens = (str: string): string => {
   return str.replace(/[~`!@#$%^&*()+={}[\];:'"<>.,/\\?_]/g, "");
 };
 
-// https://stackoverflow.com/questions/475074/regex-to-parse-or-validate-base64-data
+/**
+ * Checks whether a string is base64 or not
+ *
+ * SO thread:https://stackoverflow.com/questions/475074/regex-to-parse-or-validate-base64-data
+ */
 export const isBase64 = (str: string): boolean => {
   return new RegExp(
     /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/
