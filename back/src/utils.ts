@@ -229,9 +229,9 @@ export const looksHacky = (str: string): boolean => {
 };
 
 /**
- * Remove all special chars for sanitization
+ * Remove all special chars except "-" for sanitization
  */
-export const removeSpecialChars = (str: string): string => {
+export const removeSpecialCharsExceptHyphens = (str: string): string => {
   return str.replace(/[~`!@#$%^&*()+={}[\];:'"<>.,/\\?_]/g, "");
 };
 

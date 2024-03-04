@@ -1,9 +1,9 @@
 import axios from "axios";
 import { logger } from "@td/logger";
-import { removeSpecialChars } from "../../utils";
+import { removeSpecialCharsExceptHyphens } from "../../utils";
 
 // https://adresse.data.gouv.fr/api-doc/adresse
-const ADRESSE_DATA_GOUV_FR_URL = "https://api-adresse.data.gouv.fr";
+export const ADRESSE_DATA_GOUV_FR_URL = "https://api-adresse.data.gouv.fr";
 
 interface Properties {
   label?: string;
@@ -38,12 +38,21 @@ interface ApiResponse {
  * Retrieves the codeCommune of an address
  */
 export async function getCodeCommune(address: string) {
+  if (!Boolean(address)) {
+    return null;
+  }
+
   try {
     // Field is vulnerable to injection. Sanitize first
-    const sanitizedAddress = removeSpecialChars(address);
+    const sanitizedAddress = removeSpecialCharsExceptHyphens(address).trim();
 
     // Addr will be URL param, so change "2 rue des.." to "2+rue+des..."
-    const addr = sanitizedAddress.replace(/ /g, "+");
+    // Also limit payload size to prevent hacks or DOS
+    const addr = sanitizedAddress.replace(/ /g, "+").substring(0, 150);
+
+    if (!Boolean(addr)) {
+      return null;
+    }
 
     const fullUrl = `${ADRESSE_DATA_GOUV_FR_URL}/search/?q=${addr}`;
 
@@ -53,6 +62,7 @@ export async function getCodeCommune(address: string) {
       const cityCodes = res.data.features
         ?.map(feature => feature?.properties?.citycode)
         ?.filter(Boolean);
+
       if (cityCodes.length) return cityCodes.shift();
     }
 
