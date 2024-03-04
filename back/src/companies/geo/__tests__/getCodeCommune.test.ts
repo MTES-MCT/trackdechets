@@ -124,7 +124,7 @@ describe("getCodeCommune", () => {
       );
 
       // When
-      const res = await getCodeCommune(input);
+      await getCodeCommune(input);
 
       // Then
       expect(axios.get as jest.Mock).toHaveBeenCalledWith(
