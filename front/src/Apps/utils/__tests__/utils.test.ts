@@ -3,6 +3,8 @@ import { extractPostalCodeFromAddress } from "../utils";
 describe("extractPostalCodeFromAddress", () => {
   test.each`
     input                                     | expected
+    ${null}                                   | ${undefined}
+    ${undefined}                              | ${undefined}
     ${""}                                     | ${undefined}
     ${"4 boulevard pasteur 44100 NANTES"}     | ${"44100"}
     ${"4 boulevard pasteur 44-100 NANTES"}    | ${undefined}
