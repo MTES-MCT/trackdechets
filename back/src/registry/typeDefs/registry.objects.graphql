@@ -339,7 +339,7 @@ type OutgoingWaste {
   destinationCompanyAddress: String
   "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
   destinationOperationCode: String
-  "Extra - Opération(s) finale(s) réalisée(s) par la traçabilité suite, c'est à dire le(s) code(s) de traitement renseigné(s) par l'exutoire"
+  "Extra - Opération(s) finale(s) réalisée(s) par la traçabilité suite (le(s) code(s) de traitement renseigné(s) par l'exutoire)"
   finalOperationCodes: [String]
   "Extra - Quantité(s) liée(s) traitée(s) par la traçabilité suite, c'est à dire par l'exutoire"
   finalReceptionWeights: [Float]
@@ -793,7 +793,7 @@ type ManagedWaste {
   "Extra - Autorisation par arrêté préfectoral, à la perte d'identification de la provenance à l'origine"
   destinationOperationNoTraceability: Boolean
 
-  "Extra - Opération(s) finale(s) réalisée(s) par la traçabilité suite, c'est à dire le(s) code(s) de traitement renseigné(s) par l'exutoire"
+  "Extra - Opération(s) finale(s) réalisée(s) par la traçabilité suite (le(s) code(s) de traitement renseigné(s) par l'exutoire)"
   finalOperationCodes: [String]
   "Extra - Quantité(s) liée(s) traitée(s) par la traçabilité suite, c'est à dire par l'exutoire"
   finalReceptionWeights: [Float]
@@ -1050,7 +1050,7 @@ type AllWaste {
   "Extra - Autorisation par arrêté préfectoral, à la perte d'identification de la provenance à l'origine"
   destinationOperationNoTraceability: Boolean
 
-  "Extra - Opération(s) finale(s) réalisée(s) par la traçabilité suite, c'est à dire le(s) code(s) de traitement renseigné(s) par l'exutoire"
+  "Extra - Opération(s) finale(s) réalisée(s) par la traçabilité suite (le(s) code(s) de traitement renseigné(s) par l'exutoire)"
   finalOperationCodes: [String]
   "Extra - Quantité(s) liée(s) traitée(s) par la traçabilité suite, c'est à dire par l'exutoire"
   finalReceptionWeights: [Float]

@@ -197,7 +197,7 @@ export const columns: Column[] = [
   {
     field: "finalOperationCodes",
     label:
-      "Opération(s) finale(s) réalisée(s) par la traçabilité suite, c'est à dire le(s) code(s) de traitement renseigné(s) par l'exutoire",
+      "Opération(s) finale(s) réalisée(s) par la traçabilité suite (le(s) code(s) de traitement renseigné(s) par l'exutoire)",
     format: formatFinalOperations
   },
   {
