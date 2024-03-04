@@ -16,6 +16,7 @@ import { EmitterType, Form, Status } from "@prisma/client";
 import { FormRepository, getFormRepository } from "../../repository";
 import { prisma } from "@td/prisma";
 import { runInTransaction } from "../../../common/repository/helper";
+import { UserInputError } from "back/src/common/errors";
 
 const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   parent,
@@ -74,6 +75,11 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
 
     if (sealedForm.emitterType === EmitterType.APPENDIX2) {
       const groupedForms = await formRepository.findGroupedFormsById(form.id);
+      if (groupedForms.length === 0) {
+        throw new UserInputError(
+          "Veuillez sélectionner des bordereaux à regrouper afin de pouvoir publier ce bordereau de regroupement (Annexe 2)."
+        );
+      }
       // mark appendix2Forms as GROUPED if all its grouping forms are sealed
       // and quantityGrouped is equal to quantityReceived
       await formRepository.updateAppendix2Forms(groupedForms);
