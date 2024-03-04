@@ -51,6 +51,7 @@ export const GET_ME = gql`
         orgId
         companyTypes
         userPermissions
+        securityCode
       }
     }
   }
@@ -98,7 +99,8 @@ function DashboardRoutes() {
       if (currentCompany) {
         updatePermissions(
           currentCompany.userPermissions,
-          currentCompany.userRole!
+          currentCompany.userRole!,
+          siret
         );
       }
     }

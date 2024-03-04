@@ -15,7 +15,6 @@ import { Query, UserPermission, UserRole } from "@td/codegen-ui";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 import { useShowTransportTabs } from "../../../Dashboard/hooks/useShowTransportTabs";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
 
 import {
   ACTS,
@@ -35,6 +34,7 @@ import routes from "../../../routes";
 import styles from "./Header.module.scss";
 import { Header as HeaderDSFR } from "@codegouvfr/react-dsfr/Header";
 import { MainNavigation } from "@codegouvfr/react-dsfr/MainNavigation";
+import CompanySwitcher from "../CompanySwitcher/CompanySwitcher";
 
 export const GET_ME = gql`
   {
@@ -46,6 +46,7 @@ export const GET_ME = gql`
         givenName
         userRole
         orgId
+        securityCode
         companyTypes
         userPermissions
       }
@@ -529,7 +530,8 @@ export default function Header({
       if (currentCompany) {
         updatePermissions(
           currentCompany.userPermissions,
-          currentCompany.userRole!
+          currentCompany.userRole!,
+          currentSiret
         );
       }
     }
@@ -757,17 +759,13 @@ export default function Header({
       {/* Company switcher on top of the page */}
       {!!matchDashboard && companies && currentCompany && (
         <div className={styles.companySelector}>
-          {companies.length > 1 ? (
-            <div className="company-select">
-              <DashboardCompanySelector
-                orgId={currentCompany.orgId}
-                companies={companies}
-                handleCompanyChange={handleCompanyChange}
-              />
-            </div>
-          ) : (
-            <div className="company-title">{currentCompany.name}</div>
-          )}
+          <div className="company-select">
+            <CompanySwitcher
+              currentOrgId={currentCompany.orgId}
+              companies={companies}
+              handleCompanyChange={handleCompanyChange}
+            />
+          </div>
         </div>
       )}
     </>

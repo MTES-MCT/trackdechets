@@ -34,7 +34,7 @@ export const MY_COMPANIES = gql`
 `;
 
 // Prevent to short and long clues
-const isSearchClueValid = clue =>
+export const isSearchClueValid = clue =>
   clue.length >= MIN_MY_COMPANIES_SEARCH &&
   clue.length <= MAX_MY_COMPANIES_SEARCH;
 

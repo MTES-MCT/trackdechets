@@ -5,15 +5,19 @@
   margin: 0 auto;
 
   .company-select {
-    margin: 30px 10px;
+    margin: 16px 0px;
+
     h3 {
       font-size: 1.2em;
     }
+
     p {
       font-size: 0.9em;
     }
+
     & select {
       width: 100%;
+
       @media (min-width: 749px) {
         max-width: 280px;
       }

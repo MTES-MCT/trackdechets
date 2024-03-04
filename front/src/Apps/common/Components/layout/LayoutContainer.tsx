@@ -10,6 +10,8 @@ import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
+import { getDefaultOrgId } from "../CompanySwitcher/CompanySwitcher";
+import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
@@ -58,6 +60,7 @@ const GET_ME = gql`
       companies {
         orgId
         siret
+        securityCode
       }
       featureFlags
     }
@@ -65,6 +68,7 @@ const GET_ME = gql`
 `;
 
 export default function LayoutContainer() {
+  const { orgId } = usePermissions();
   const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME, {
     onCompleted: ({ me }) => {
       if (import.meta.env.VITE_SENTRY_DSN && me.email) {
@@ -79,6 +83,9 @@ export default function LayoutContainer() {
   if (loading) {
     return <Loader />;
   }
+
+  const defaultOrgId =
+    isAuthenticated && data && (orgId ?? getDefaultOrgId(data.me.companies));
 
   return (
     <Suspense fallback={<Loader />}>
@@ -115,7 +122,7 @@ export default function LayoutContainer() {
                   persistedSurveyName="td-20240213"
                 />
               }
-              defaultOrgId={data?.me.companies[0]?.orgId}
+              defaultOrgId={defaultOrgId}
             />
           }
         >
@@ -308,7 +315,7 @@ export default function LayoutContainer() {
                             ? routes.dashboard.transport.toCollect
                             : routes.dashboard.index,
                           {
-                            siret: data.me.companies[0].orgId
+                            siret: defaultOrgId
                           }
                         )
                       : routes.companies.index

@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { NavLink, generatePath, useNavigate } from "react-router-dom";
 import { CompanyPrivate, UserPermission, UserRole } from "@td/codegen-ui";
-import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
 import routes from "../../../routes";
 
 import { useShowTransportTabs } from "../../hooks/useShowTransportTabs";
@@ -23,6 +22,7 @@ import {
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import "./DashboardTabs.scss";
+import CompanySwitcher from "../../../common/Components/CompanySwitcher/CompanySwitcher";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;
@@ -67,17 +67,13 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
 
   return (
     <div className="dashboard-tabs">
-      {companies.length > 1 ? (
-        <div className="company-select">
-          <DashboardCompanySelector
-            orgId={currentCompany.orgId}
-            companies={companies}
-            handleCompanyChange={handleCompanyChange}
-          />
-        </div>
-      ) : (
-        <div className="company-title">{currentCompany.name}</div>
-      )}
+      <div className="company-select">
+        <CompanySwitcher
+          currentOrgId={currentCompany.orgId}
+          companies={companies}
+          handleCompanyChange={handleCompanyChange}
+        />
+      </div>
 
       {showMyBsds && (
         <>
