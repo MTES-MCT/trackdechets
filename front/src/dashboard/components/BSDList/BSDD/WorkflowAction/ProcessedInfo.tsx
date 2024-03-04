@@ -100,7 +100,9 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   const hasVatNumber = Boolean(nextDestination?.company?.vatNumber);
   const showNotificationNumber =
     isExtraEuropeanCompany || (!isFRCompany && noTraceability) || hasVatNumber;
-  const isDangerousWaste = isDangerous(form.wasteDetails?.code ?? "");
+  const isDangerousWaste =
+    isDangerous(form.wasteDetails?.code ?? "") ||
+    (form.wasteDetails?.isDangerous && " (dangereux)");
   const isPop = form?.wasteDetails?.pop;
   const notificationNumberPlaceHolder =
     isDangerousWaste || isPop ? "PP AAAA DDDRRR" : "A7E AAAA DDDRRR";
