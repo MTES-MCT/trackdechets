@@ -7,9 +7,24 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2024.3.1] 12/03/2024
 
+#### :rocket: Nouvelles fonctionnalités
+
+#### :nail_care: Améliorations
+
+- Le filtre rapide "N° de BSD / contenant" a été renommé "N° libre / BSD / contenant" [PR 3092](https://github.com/MTES-MCT/trackdechets/pull/3092)
+- Les utilisateurs peuvent désormais solliciter la création d'entreprise anonyme directement dans l'application en uploadant un avis de situation au répertoire SIRENE [PR 3096](https://github.com/MTES-MCT/trackdechets/pull/3096)
+
 #### :house: Interne
 
 - Refacto & documentation validation BSDA [PR 3087](https://github.com/MTES-MCT/trackdechets/pull/3087)
+- Améliorations diverses pour la vérification des entreprises côté admin [PR 3079](https://github.com/MTES-MCT/trackdechets/pull/3079)
+- Les admins peuvent désormais mettre une demande de création d'établissement en stand by [PR 3094](https://github.com/MTES-MCT/trackdechets/pull/3094)
+- Automatisation de l'envoi d'un courrier de vérification aux adresses mails génériques [PR 3080](https://github.com/MTES-MCT/trackdechets/pull/3080)
+- Les transporteurs étrangers sont désormais automatiquement vérifiés [PR 3079](https://github.com/MTES-MCT/trackdechets/pull/3079)
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
 
 # [2024.2.1] 13/02/2024
 

@@ -42,3 +42,19 @@ input UpdateTransporterReceiptInput {
   """
   department: String
 }
+
+"""
+Payload pour créer une demande de création d'entreprise non-diffusible
+"""
+input CreateAnonymousCompanyRequestInput {
+  """
+  Le SIRET de l'entreprise
+  """
+  siret: String!
+
+  """
+  L'avis de situation au répertoire SIRENE de moins de trois mois, de l'entreprise
+  dont le SIRET est spécifié. Au format base64
+  """
+  pdf: String!
+}

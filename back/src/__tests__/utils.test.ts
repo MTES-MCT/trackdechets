@@ -6,7 +6,8 @@ import {
   hashToken,
   extractPostalCode,
   xDaysAgo,
-  randomNbrChain
+  randomNbrChain,
+  removeSpecialCharsExceptHyphens
 } from "../utils";
 
 test("getUid returns a unique identifier of fixed length", () => {
@@ -90,5 +91,21 @@ describe("randomNbrChain", () => {
     expect(chain.length).toEqual(length);
     // Numbers only
     expect(new RegExp(/^\d+$/).test(chain)).toBeTruthy();
+  });
+});
+
+describe("removeSpecialCharsExceptHyphens", () => {
+  test.each`
+    input                                                                   | expected
+    ${""}                                                                   | ${""}
+    ${"text"}                                                               | ${"text"}
+    ${"text with spaces"}                                                   | ${"text with spaces"}
+    ${"text with accents éèàçùÉ"}                                           | ${"text with accents éèàçùÉ"}
+    ${"text-with-hyphens"}                                                  | ${"text-with-hyphens"}
+    ${"/[~`!@#$%^&*()+={}[];:'\"<>.,/?_]"}                                  | ${""}
+    ${"/[~`!@#$%^&*()+={}[];:'\"<>.,/?_]/[~`!@#$%^&*()+={}[];:'\"<>.,/?_]"} | ${""}
+    ${"/[~`!@#$%^and some&*()+={}[];:'\" text in between<>.,/?_]"}          | ${"and some text in between"}
+  `('"$input" should return $expected', ({ input, expected }) => {
+    expect(removeSpecialCharsExceptHyphens(input)).toEqual(expected);
   });
 });

@@ -146,6 +146,11 @@ export const server = new ApolloServer<GraphQLContext>({
         // Hacker might massively generate new codes to spam
         windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
         maxRequestsPerWindow: 10 // 10 requests each 3 minutes
+      },
+      createAnonymousCompanyRequest: {
+        // Prevent user from creating a huge number of requests
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+        maxRequestsPerWindow: 10 // 10 requests each 3 minutes
       }
     }),
     gqlRegenerateSessionPlugin(["changePassword"]),
@@ -213,7 +218,7 @@ app.use(
  */
 app.use(urlencoded({ extended: false }));
 
-app.use(json());
+app.use(json({ limit: "1mb" }));
 
 // allow application/graphql header
 app.use(graphQLPath, graphqlBodyParser);
@@ -235,6 +240,7 @@ export const sess: session.SessionOptions = {
   saveUninitialized: false,
   cookie: {
     secure: false,
+    httpOnly: true,
     domain: SESSION_COOKIE_HOST || UI_HOST,
     maxAge: 24 * 3600 * 1000
   }

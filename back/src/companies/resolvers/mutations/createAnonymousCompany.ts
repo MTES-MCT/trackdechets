@@ -6,19 +6,22 @@ import {
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { prisma } from "@td/prisma";
-import { isForeignVat, nafCodes } from "@td/constants";
+import { nafCodes } from "@td/constants";
+import { UserInputError } from "../../../common/errors";
+import { libelleFromCodeNaf } from "../../sirene/utils";
+import { renderMail, anonymousCompanyCreatedEmail } from "@td/mail";
+import { sendMail } from "../../../mailer/mailing";
 import {
   foreignVatNumber,
   siret,
   siretConditions
 } from "../../../common/validation";
-import { UserInputError } from "../../../common/errors";
-import { libelleFromCodeNaf } from "../../sirene/utils";
 
 const anonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
   yup.object({
     address: yup.string().required(),
     codeCommune: yup.string().required(),
+    vatNumber: foreignVatNumber,
     codeNaf: yup
       .string()
       .oneOf(
@@ -27,8 +30,6 @@ const anonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       )
       .required(),
     name: yup.string().required(),
-    vatNumber: foreignVatNumber,
-
     siret: siret
       .required(
         "La sélection d'une entreprise par SIRET ou numéro de TVA (si l'entreprise n'est pas française) est obligatoire"
@@ -43,27 +44,62 @@ const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"
 
     await anonymousCompanyInputSchema.validate(input);
 
-    // ignore SIRET in this case
-    if (isForeignVat(input.vatNumber)) {
-      delete input.siret;
+    if (Boolean(input.siret) && Boolean(input.vatNumber)) {
+      throw new UserInputError(
+        `Vous ne pouvez pas préciser un numéro de TVA ET un SIRET: les deux champs sont mutuellement exclusifs`
+      );
     }
 
+    const orgId = Boolean(input.siret) ? input.siret! : input.vatNumber!;
+
     const existingAnonymousCompany = await prisma.anonymousCompany.findUnique({
-      where: { orgId: input.siret ?? input.vatNumber! }
+      where: { orgId }
     });
     if (existingAnonymousCompany) {
       throw new UserInputError(
-        `L'entreprise au SIRET "${input.siret}" est déjà connue de notre répertoire privé.`
+        `L'entreprise "${orgId}" est déjà connue de notre répertoire privé.`
       );
     }
 
     const anonymousCompany = await prisma.anonymousCompany.create({
       data: {
-        orgId: input.siret ?? input.vatNumber!,
+        orgId,
         ...input,
         libelleNaf: libelleFromCodeNaf(input.codeNaf)
       }
     });
+
+    // If there was an anonymousCompanyRequest associated, delete it and warn the user
+    if (input.siret) {
+      try {
+        const request = await prisma.anonymousCompanyRequest.delete({
+          where: {
+            siret: input.siret
+          }
+        });
+
+        if (request) {
+          // Send an email to the user
+          const user = await prisma.user.findFirst({
+            where: {
+              id: request.userId
+            }
+          });
+
+          if (user) {
+            await sendMail(
+              renderMail(anonymousCompanyCreatedEmail, {
+                to: [{ name: user.name ?? "", email: user.email }],
+                variables: { siret: input.siret }
+              })
+            );
+          }
+        }
+      } catch (e) {
+        // Request wasn't found - do nothing
+        // https://github.com/prisma/prisma/issues/4072
+      }
+    }
 
     return anonymousCompany;
   };

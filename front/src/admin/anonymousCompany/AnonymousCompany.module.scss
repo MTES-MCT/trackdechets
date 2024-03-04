@@ -1,0 +1,30 @@
+.h100 {
+  height: 100%;
+}
+
+.actionButton {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.minHeight30vh {
+  min-height: 30vh;
+}
+
+.blueFrance {
+  color: var(--text-action-high-blue-france);
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.textCenter {
+  text-align: center;
+}

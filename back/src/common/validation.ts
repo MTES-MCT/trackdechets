@@ -16,6 +16,7 @@ import { CompanyInput } from "../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import { isForeignVat, isFRVat, isSiret, isVat } from "@td/constants";
 import { UserInputError } from "./errors";
+import { isBase64 } from "../utils";
 
 // Poids maximum en tonnes tout mode de transport confondu
 const MAX_WEIGHT_TONNES = 50000;
@@ -127,6 +128,15 @@ export const siret = yup
     "is-siret",
     "${path}: ${originalValue} n'est pas un numéro de SIRET valide",
     value => !value || isSiret(value)
+  );
+
+export const base64 = yup
+  .string()
+  .nullable()
+  .test(
+    "is-base-64",
+    "'${path}' n'est pas encodé en base 64",
+    value => !value || isBase64(value)
   );
 
 // Differents conditions than can be applied to a siret number based on the

@@ -16,6 +16,7 @@ import {
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import AccountCompanyAddAnonymousCompany from "./anonymous/AccountCompanyAddAnonymousCompany";
 
 type IProps = {
   onCompanyInfos: (companyInfos) => void;
@@ -80,41 +81,6 @@ const closedCompanyError = (
   </div>
 );
 
-const nonDiffusibleError = (
-  <div className={styles.alertWrapper}>
-    <Alert
-      title="Etablissement non diffusible"
-      severity="error"
-      description={
-        <>
-          <span>
-            Nous n'avons pas pu récupérer les informations de cet établissement
-            car il n'est pas diffusible. Veuillez nous contacter via{" "}
-            <a
-              href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
-              target="_blank"
-              rel="noreferrer"
-            >
-              la FAQ
-            </a>{" "}
-            <b>avec</b> votre certificat d'inscription au répertoire des
-            Entreprises et des Établissements (SIRENE) pour pouvoir procéder à
-            la création de l'établissement. Pour télécharger votre certificat,
-            RDV sur{" "}
-          </span>
-          <a
-            href="https://avis-situation-sirene.insee.fr/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            https://avis-situation-sirene.insee.fr/
-          </a>
-        </>
-      }
-    />
-  </div>
-);
-
 const AutoSubmitSiret = ({ defaultSiret, didAutoSubmit }) => {
   const { submitForm, values } = useFormikContext<any>();
 
@@ -146,7 +112,9 @@ export default function AccountCompanyAddSiret({
 }: IProps) {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
-  const [isNonDiffusible, setIsNonDiffusible] = useState(false);
+  const [nonDiffusibleCompanySiret, setNonDiffusibleCompanySiret] = useState<
+    string | null
+  >();
   const [isClosed, setIsClosed] = useState(false);
   const [isPreloaded, setIsPreloaded] = useState(false);
 
@@ -162,7 +130,7 @@ export default function AccountCompanyAddSiret({
             companyInfos?.statutDiffusionEtablissement === "P" &&
             !companyInfos?.isAnonymousCompany
           ) {
-            setIsNonDiffusible(true);
+            setNonDiffusibleCompanySiret(data.companyPrivateInfos.siret);
             onCompanyInfos(null);
           } else {
             onCompanyInfos(companyInfos);
@@ -341,7 +309,11 @@ export default function AccountCompanyAddSiret({
               </Form>
             )}
           </Formik>
-          {isNonDiffusible && nonDiffusibleError}
+          {nonDiffusibleCompanySiret && (
+            <AccountCompanyAddAnonymousCompany
+              siret={nonDiffusibleCompanySiret}
+            />
+          )}
           {isClosed && closedCompanyError}
           {showIndividualInfo && !isDisabled && individualInfo}
         </div>
