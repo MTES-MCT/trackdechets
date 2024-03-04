@@ -20,7 +20,8 @@ export { getCompaniesAndActiveAdminsByCompanyOrgIds } from "./companies/database
 export { formatDate } from "./common/pdf";
 export { sendMail } from "./mailer/mailing";
 export { BsdUpdateQueueItem, updatesQueue } from "./queue/producers/bsdUpdate";
-export { sendMailJob } from "./queue/jobs";
+export { operationHooksQueue } from "./queue/producers/operationHook";
+export { indexBsdJob, operationHookJob, sendMailJob } from "./queue/jobs";
 export {
   indexQueue,
   bulkIndexQueue,
@@ -36,7 +37,6 @@ export { addToMailQueue } from "./queue/producers/mail";
 export { geocodeJob } from "./queue/jobs/geocode";
 export { setDepartementJob } from "./queue/jobs/setDepartement";
 export { syncEventsJob } from "./queue/jobs/syncEvents";
-export { indexBsdJob } from "./queue/jobs";
 export { favoritesCompanyQueue } from "./queue/producers/company";
 export {
   DELETE_JOB_NAME,
