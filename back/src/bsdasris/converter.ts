@@ -38,7 +38,7 @@ import {
   chain,
   undefinedOrDefault
 } from "../common/converter";
-import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
+import { Bsdasri, BsdasriStatus } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdasriForElastic } from "./elastic";
