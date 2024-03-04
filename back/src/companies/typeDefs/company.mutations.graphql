@@ -62,9 +62,4 @@ type Mutation {
   createAnonymousCompanyRequest(
     input: CreateAnonymousCompanyRequestInput!
   ): Boolean
-
-  """
-  Permet de supprimer une demande de création d'entreprise anonyme. Pour les admins
-  """
-  deleteAnonymousCompanyRequest(siret: String!): Boolean
 }
