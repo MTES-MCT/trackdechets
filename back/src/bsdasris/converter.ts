@@ -554,7 +554,7 @@ export function flattenBsdasriInput(
     | "grouping"
     | "synthesizing"
   >
-): Partial<Prisma.BsdasriCreateInput> {
+) {
   return safeInput({
     ...flattenWasteInput(formInput),
 
