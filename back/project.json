@@ -44,11 +44,11 @@
       ],
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "back/jest.config.js"
+        "jestConfig": "back/jest.config.ts"
       },
       "configurations": {
         "integration": {
-          "jestConfig": "back/jest.config.integration.js",
+          "jestConfig": "back/jest.config.integration.ts",
           "runInBand": true,
           "forceExit": true,
           "codeCoverage": false
