@@ -283,6 +283,11 @@ describe("Mutation.markAsSealed", () => {
       }
     });
 
+    const groupedForm1 = await formFactory({
+      ownerId: user.id,
+      opt: { status: "AWAITING_GROUP", quantityReceived: 1 }
+    });
+
     let form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -291,7 +296,15 @@ describe("Mutation.markAsSealed", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
         ecoOrganismeSiret: eo.siret,
-        ecoOrganismeName: eo.name
+        ecoOrganismeName: eo.name,
+        grouping: {
+          create: [
+            {
+              initialFormId: groupedForm1.id,
+              quantity: groupedForm1.quantityReceived!
+            }
+          ]
+        }
       }
     });
 
@@ -308,6 +321,33 @@ describe("Mutation.markAsSealed", () => {
     });
 
     expect(form.status).toEqual("SEALED");
+  });
+
+  it("should not be sealed with the APPENDIX2 emitterType when 0 form are grouped", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await destinationFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterType: "APPENDIX2",
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
+        grouping: undefined
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "Veuillez sélectionner des bordereaux à regrouper afin de pouvoir publier ce bordereau de regroupement (Annexe 2)."
+    );
   });
 
   it("should fail if user is not authorized", async () => {
