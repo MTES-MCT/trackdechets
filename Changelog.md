@@ -37,7 +37,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajouter le numéro libre BSDD sur le tableau de bord "V2" [PR 3035](<[#](https://github.com/MTES-MCT/trackdechets/pull/)3050>)
 - Implémenter les Révisions dans le Front "V2" [PR 3054](https://github.com/MTES-MCT/trackdechets/pull/3054)
 - Suppression Dashboard "v1" [PR 3064](https://github.com/MTES-MCT/trackdechets/pull/3064)
-- Registres sortant et exhaistif : ajout poids et code destination finale [PR3058](https://github.com/MTES-MCT/trackdechets/pull/3058)
+- Registres sortant et exhaustif : ajout poids et code destination finale en cas d'entreposage provisoire ou annexe 2 [PR 3058](https://github.com/MTES-MCT/trackdechets/pull/3058)
 
 #### :bug: Corrections de bugs
 
