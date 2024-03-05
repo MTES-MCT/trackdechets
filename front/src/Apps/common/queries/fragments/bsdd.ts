@@ -342,6 +342,10 @@ export const detailFormFragment = gql`
         takenOverAt
         emitter {
           type
+          workSite {
+            name
+            infos
+          }
         }
         wasteDetails {
           code
