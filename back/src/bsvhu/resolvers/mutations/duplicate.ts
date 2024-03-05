@@ -37,6 +37,7 @@ async function getDuplicateData(
     id,
     createdAt,
     updatedAt,
+    rowNumber,
     emitterEmissionSignatureAuthor,
     emitterEmissionSignatureDate,
     transporterTransportSignatureAuthor,

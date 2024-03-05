@@ -343,22 +343,24 @@ model EcoOrganisme {
 // Modèle qui peut être partagé entre tous les
 // bordereaux pour calculcer la traçabilité finale
 model FinalOperation {
-  id                      String    @id @default(cuid())
-  createdAt               DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt               DateTime  @updatedAt @db.Timestamptz(6)
+  id                      String   @id @default(cuid())
+  createdAt               DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt               DateTime @updatedAt @db.Timestamptz(6)
   finalBsdReadableId      String
   operationCode           String
   quantity                Float
   destinationCompanySiret String
   destinationCompanyName  String
   // Champs spécifiques pour Form
-  Form                    Form?     @relation(fields: [formId], references: [id])
+  Form                    Form?    @relation(fields: [formId], references: [id])
   formId                  String?
+
   @@unique([formId, finalBsdReadableId])
 }
 
 model Form {
   id                                    String                  @id @default(cuid())
+  rowNumber                             Int                     @unique @default(autoincrement())
   createdAt                             DateTime                @default(now()) @db.Timestamptz(6)
   updatedAt                             DateTime                @updatedAt @db.Timestamptz(6)
   emitterType                           EmitterType?
@@ -488,7 +490,7 @@ model Form {
   // Relation vers les infos de traçabilité finales
   // Cas particulier sur le BSDD avec la ventilation des quantités en plusieurs groupement
   // il peut y avoir plusieurs traitements en bout de chaîne
-  finalOperations   FinalOperation[]
+  finalOperations FinalOperation[]
 
   // partial index _FormIsDeletedIdx see migration82_missing_indices.sql
   // partial index _FormRecipientIsTempStorageIdx see 99_add_form_indices.sql
@@ -916,6 +918,7 @@ enum BsvhuDestinationType {
 
 model Bsvhu {
   id        String   @id
+  rowNumber Int      @unique @default(autoincrement())
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
   isDraft   Boolean  @default(false)
@@ -1030,6 +1033,7 @@ model Bsdasri {
   id                                  String                  @unique
   type                                BsdasriType             @default(SIMPLE)
   status                              BsdasriStatus           @default(INITIAL)
+  rowNumber                           Int                     @unique @default(autoincrement())
   createdAt                           DateTime                @default(now()) @db.Timestamptz(6)
   updatedAt                           DateTime                @updatedAt @db.Timestamptz(6)
   isDeleted                           Boolean?                @default(false)
@@ -1159,6 +1163,7 @@ model Bsdasri {
 
 model Bsff {
   id        String     @id
+  rowNumber Int        @unique @default(autoincrement())
   createdAt DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt DateTime   @updatedAt @db.Timestamptz(6)
   isDeleted Boolean    @default(false)
@@ -1381,6 +1386,7 @@ enum BsdaConsistence {
 
 model Bsda {
   id        String   @id
+  rowNumber Int      @unique @default(autoincrement())
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
   isDraft   Boolean  @default(false)
@@ -1666,6 +1672,7 @@ enum BspaohType {
 model Bspaoh {
   id String @id
 
+  rowNumber Int          @unique @default(autoincrement())
   createdAt DateTime     @default(now()) @db.Timestamptz(6)
   updatedAt DateTime     @updatedAt @db.Timestamptz(6)
   isDeleted Boolean      @default(false)

@@ -50,7 +50,7 @@ const bsdasrisResolver: QueryResolvers["bsdasris"] = async (
     findMany: prismaPaginationArgs =>
       bsdasriRepository.findMany(where, {
         ...prismaPaginationArgs,
-        orderBy: { createdAt: "desc" }
+        orderBy: { rowNumber: "desc" }
       }),
     formatNode: expandBsdasriFromDB,
     ...gqlPaginationArgs
