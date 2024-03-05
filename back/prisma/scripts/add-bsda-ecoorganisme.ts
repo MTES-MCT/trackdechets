@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Add new eco-organismes for the BSDA",
   "Add new eco-organismes for the BSDA (and 1 for BSDD)",
-  true
+  false
 )
 export class AddBsdaEcoOrganisme implements Updater {
   async run() {
