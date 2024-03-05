@@ -6,16 +6,16 @@
   "targets": {
     "build": {
       "dependsOn": ["gql-docs"],
-      "executor": "@nx-plus/docusaurus:browser",
+      "executor": "nx:run-commands",
       "options": {
-        "outputPath": "dist/apps/doc"
+        "command": "npx docusaurus build {projectRoot} --out-dir ../../dist/apps/doc"
       }
     },
     "serve": {
       "dependsOn": ["gql-docs"],
-      "executor": "@nx-plus/docusaurus:dev-server",
+      "executor": "nx:run-commands",
       "options": {
-        "port": 3000
+        "command": "npx docusaurus serve {projectRoot} --port 3000 --dir ../../dist/apps/doc"
       }
     },
     "build-workflows": {

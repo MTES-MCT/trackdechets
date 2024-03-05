@@ -3,18 +3,29 @@
     "defaultBase": "dev"
   },
   "targetDefaults": {
-    "test": {
-      "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"]
+    "build-storybook": {
+      "cache": true
     },
-    "lint": {
+    "@nx/jest:jest": {
+      "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],
+      "cache": true,
+      "options": {
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "@nx/eslint:lint": {
       "inputs": [
         "default",
         "{workspaceRoot}/.eslintrc.json",
         "{workspaceRoot}/.eslintignore",
         "{workspaceRoot}/eslint.config.js"
-      ]
-    },
-    "build-storybook": {
+      ],
       "cache": true
     }
   },

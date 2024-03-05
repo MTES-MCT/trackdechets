@@ -1,4 +1,5 @@
-module.exports = {
+/* eslint-disable */
+export default {
   displayName: "back-integration",
   preset: "../jest.preset.js",
   transform: {

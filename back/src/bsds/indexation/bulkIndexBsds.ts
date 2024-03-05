@@ -241,7 +241,7 @@ export async function isIndexMappingsVersionChanged(
     });
 
   if (!aliases?.body.length) {
-    logger.warning(`No aliases found during mapping change detection`);
+    logger.warn(`No aliases found during mapping change detection`);
     return true;
   }
 

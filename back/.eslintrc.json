@@ -1,6 +1,13 @@
 {
   "extends": ["../.eslintrc.json"],
-  "ignorePatterns": ["!**/*", "src/generated/**"],
+  "ignorePatterns": [
+    "!**/*",
+    "src/generated/**",
+    "prisma/seed*.ts",
+    "src/common/plugins/graphiql/**",
+    "graphql-markdown-plugin.js",
+    "jest.config.integration.ts"
+  ],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
