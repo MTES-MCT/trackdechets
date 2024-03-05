@@ -171,7 +171,6 @@
     "@graphql-codegen/typescript": "^3.0.2",
     "@graphql-codegen/typescript-operations": "^3.0.2",
     "@graphql-codegen/typescript-resolvers": "^3.1.1",
-    "@nx-plus/docusaurus": "^15.0.0-rc.0",
     "@nx/esbuild": "18.0.7",
     "@nx/eslint": "18.0.7",
     "@nx/eslint-plugin": "18.0.7",
@@ -283,5 +282,8 @@
     "vite": "5.1.4",
     "vite-plugin-svgr": "4.2.0",
     "ws": "^8.2.3"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-darwin-arm64": "^4.12.0"
   }
 }
