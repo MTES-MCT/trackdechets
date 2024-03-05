@@ -335,12 +335,12 @@ export const sendPendingMembershipRequestToAdminDetailsEmail = async (
   await prisma.$disconnect();
 };
 
-export interface BsddRevisionRequestWithReadableId extends BsddRevisionRequest {
-  bsdd: { readableId: string };
+export interface BsddRevisionRequestWithBsddIds extends BsddRevisionRequest {
+  bsdd: { id: string; readableId: string };
 }
 
 type RequestWithApprovals =
-  | (BsddRevisionRequestWithReadableId & {
+  | (BsddRevisionRequestWithBsddIds & {
       approvals: BsddRevisionRequestApproval[];
     })
   | (BsdaRevisionRequest & {
@@ -348,7 +348,7 @@ type RequestWithApprovals =
     });
 
 type RequestWithWrappedApprovals =
-  | (BsddRevisionRequestWithReadableId & {
+  | (BsddRevisionRequestWithBsddIds & {
       approvals: (BsddRevisionRequestApproval & {
         admins: User[];
         company: Company;
@@ -416,7 +416,10 @@ export const getPendingBSDDRevisionRequestsWithAdmins = async (
       createdAt: { gte: requestDateGt, lt: requestDateLt },
       status: RevisionRequestStatus.PENDING
     },
-    include: { approvals: true, bsdd: { select: { readableId: true } } }
+    include: {
+      approvals: true,
+      bsdd: { select: { id: true, readableId: true } }
+    }
   });
 
   // Add admins to requests
@@ -469,7 +472,10 @@ export const sendPendingRevisionRequestToAdminDetailsEmail = async (
           const variables = {
             requestCreatedAt: formatDate(request.createdAt),
             bsdReadableId:
-              (request as BsddRevisionRequestWithReadableId).bsdd?.readableId ??
+              (request as BsddRevisionRequestWithBsddIds).bsdd?.readableId ??
+              (request as BsdaRevisionRequest).bsdaId,
+            bsdId:
+              (request as BsddRevisionRequestWithBsddIds).bsdd?.id ??
               (request as BsdaRevisionRequest).bsdaId,
             companyName: approval.company.name,
             companyOrgId: approval.company.orgId
