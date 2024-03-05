@@ -9,11 +9,28 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajouter la possibilité de Réviser le BSDD après signature du transporteur / Ajouter la possibilité de Supprimer le BSDD après signature de l'émetteur, pour le producteur [PR 3109](https://github.com/MTES-MCT/trackdechets/pull/3109) et [PR 3110](https://github.com/MTES-MCT/trackdechets/pull/3111)
+- Nouveau statut STANDBY pour les entreprises qui n'ont pas pu être vérifiées [PR 3094](https://github.com/MTES-MCT/trackdechets/pull/3094)
+- Afficher le statut avec rupture de traçabilité lorsque mentionné lors du traitement [PR 3120](https://github.com/MTES-MCT/trackdechets/pull/3120)
+- Ajouter la possibilité de Supprimer le BSDASRI pour l'émetteur lorsqu'il est Signé par l'émetteur [PR 3115](https://github.com/MTES-MCT/trackdechets/pull/3115)
+- Permettre au transporteur de modifier son champs libre / immatriculation après signature de l'entreposage provisoire depuis le tableau de bord [PR 3114](https://github.com/MTES-MCT/trackdechets/pull/3114)
+- Registres sortant et exhaistif : ajout poids et code destination finale [PR 3058](https://github.com/MTES-MCT/trackdechets/pull/3058)
+
 #### :nail_care: Améliorations
 
 - Le filtre rapide "N° de BSD / contenant" a été renommé "N° libre / BSD / contenant" [PR 3092](https://github.com/MTES-MCT/trackdechets/pull/3092)
-- Les utilisateurs peuvent désormais solliciter la création d'entreprise anonyme directement dans l'application en uploadant un avis de situation au répertoire SIRENE [PR 3096](https://github.com/MTES-MCT/trackdechets/pull/3096)
-
+- Les utilisateurs peuvent désormais solliciter la création d'entreprise anonyme directement dans l'application en téléversant un avis de situation au répertoire SIRENE [PR 3096](https://github.com/MTES-MCT/trackdechets/pull/3096)
+- Ajout de la possibilité des non-administrateurs de voir les autres memebres d'un établissement [PR 3093](https://github.com/MTES-MCT/trackdechets/pull/3093)
+- Ajout d'une section d'aide dans un menu [PR 3105](https://github.com/MTES-MCT/trackdechets/pull/3105)
+- Retirer le champ "numéro de notification" lorsque que l'entreprise est française [PR 3101](https://github.com/MTES-MCT/trackdechets/pull/3101)
+- Revoir le format du champ 'Numéro de notification et de document' lors d'un envoi à l'étranger [PR 3107](https://github.com/MTES-MCT/trackdechets/pull/3107)
+- Déplacer le champs en dessous de email, afficher le champ lorsqu'un vatNumber est saisi [PR 3121](https://github.com/MTES-MCT/trackdechets/pull/3121)
+- Vider les champs Tél & Mail de l'émetteur lorsque je sélectionne Particulier sur un BSDD [PR 3116](https://github.com/MTES-MCT/trackdechets/pull/3116)
+- Correction du wording dans les toasts admins de vérification d'entreprise & envoi de courrier [PR 3122](https://github.com/MTES-MCT/trackdechets/pull/3122)
+- ETQ lecteur, je ne dois pas avoir accès aux boutons Signer de l'entreprise de travaux et du transport multimodal ainsi que ceux présents dans l'Aperçu [PR 3123](https://github.com/MTES-MCT/trackdechets/pull/3123)
+- Remonter le numéro d'agrément démolisseur lors de la sélection de l'émetteur à la création d'un BSVHU [PR 3127](https://github.com/MTES-MCT/trackdechets/pull/3127)
+- Afficher le conditionnement précisé dans la révision lorsque le conditionnement Autres est sélectionné [PR 3129](https://github.com/MTES-MCT/trackdechets/pull/3129)
+- 
 #### :house: Interne
 
 - Refacto & documentation validation BSDA [PR 3087](https://github.com/MTES-MCT/trackdechets/pull/3087)
@@ -21,9 +38,19 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Les admins peuvent désormais mettre une demande de création d'établissement en stand by [PR 3094](https://github.com/MTES-MCT/trackdechets/pull/3094)
 - Automatisation de l'envoi d'un courrier de vérification aux adresses mails génériques [PR 3080](https://github.com/MTES-MCT/trackdechets/pull/3080)
 - Les transporteurs étrangers sont désormais automatiquement vérifiés [PR 3079](https://github.com/MTES-MCT/trackdechets/pull/3079)
+- Augmentation time-out tests JEST [PR 3140](https://github.com/MTES-MCT/trackdechets/pull/3140)
+ - Ajout de vérifications de permissions sur la vue details [PR 3140](https://github.com/MTES-MCT/trackdechets/pull/3140/)
+-  Changement de requête par SIRET sur ElasticSearch "stocketablissement" dans `searchCompany` [PR 3118](https://github.com/MTES-MCT/trackdechets/pull/3118)
 
 #### :bug: Corrections de bugs
 
+- Corrections requête `bsdas` (transporters) [PR 3099](https://github.com/MTES-MCT/trackdechets/pull/3099)
+- Correction UI bouton Annexe 1 [PR 3100](https://github.com/MTES-MCT/trackdechets/pull/3100)
+- Correction `myCompanies` ne retournant pas tous les membres [PR 3102](https://github.com/MTES-MCT/trackdechets/pull/3102)
+- Suppression bouton signature pour le producteur BSDA [PR 3110](https://github.com/MTES-MCT/trackdechets/pull/3140)
+- Correction bouton supprimer uniquement pour producteur + bouton secondaire faire signer [PR 3126](https://github.com/MTES-MCT/trackdechets/pull/3126)
+- Correction affichage code déchet "dangereux" ou non [PR 3131](https://github.com/MTES-MCT/trackdechets/pull/3131)
+- 
 #### :boom: Breaking changes
 
 # [2024.2.1] 13/02/2024
@@ -37,7 +64,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajouter le numéro libre BSDD sur le tableau de bord "V2" [PR 3035](<[#](https://github.com/MTES-MCT/trackdechets/pull/)3050>)
 - Implémenter les Révisions dans le Front "V2" [PR 3054](https://github.com/MTES-MCT/trackdechets/pull/3054)
 - Suppression Dashboard "v1" [PR 3064](https://github.com/MTES-MCT/trackdechets/pull/3064)
-- Registres sortant et exhaustif : ajout poids et code destination finale en cas d'entreposage provisoire ou annexe 2 [PR 3058](https://github.com/MTES-MCT/trackdechets/pull/3058)
 
 #### :bug: Corrections de bugs
 
