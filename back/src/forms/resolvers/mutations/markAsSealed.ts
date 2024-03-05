@@ -1,21 +1,22 @@
+import { EmitterType, Form, Status } from "@prisma/client";
+import { contentAwaitsGuest, renderMail } from "@td/mail";
+import { prisma } from "@td/prisma";
+import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { runInTransaction } from "../../../common/repository/helper";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
+import { sendMail } from "../../../mailer/mailing";
 import { getAndExpandFormFromDb } from "../../converter";
+import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import { checkCanMarkAsSealed } from "../../permissions";
+import { FormRepository, getFormRepository } from "../../repository";
 import {
   checkCanBeSealed,
-  validateForwardedInCompanies,
-  validateBeforeEmission
+  validateBeforeEmission,
+  validateForwardedInCompanies
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
-import { sendMail } from "../../../mailer/mailing";
-import { renderMail, contentAwaitsGuest } from "@td/mail";
-import { EmitterType, Form, Status } from "@prisma/client";
-import { FormRepository, getFormRepository } from "../../repository";
-import { prisma } from "@td/prisma";
-import { runInTransaction } from "../../../common/repository/helper";
 
 const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   parent,
@@ -74,6 +75,11 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
 
     if (sealedForm.emitterType === EmitterType.APPENDIX2) {
       const groupedForms = await formRepository.findGroupedFormsById(form.id);
+      if (groupedForms.length === 0) {
+        throw new UserInputError(
+          "Veuillez sélectionner des bordereaux à regrouper afin de pouvoir publier ce bordereau de regroupement (Annexe 2)."
+        );
+      }
       // mark appendix2Forms as GROUPED if all its grouping forms are sealed
       // and quantityGrouped is equal to quantityReceived
       await formRepository.updateAppendix2Forms(groupedForms);
