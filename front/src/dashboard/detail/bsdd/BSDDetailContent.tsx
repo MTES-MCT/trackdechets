@@ -558,6 +558,7 @@ const Appendix1 = ({
             <tr className="td-table__head-tr">
               <th>N° Bordereau</th>
               <th>Emetteur</th>
+              <th>Chantier</th>
               <th>Statut</th>
               <th>Action</th>
             </tr>
@@ -570,6 +571,9 @@ const Appendix1 = ({
                   {form.emitter?.company?.name}
                   <br />
                   {form.emitter?.company?.siret}
+                </td>
+                <td>
+                  {form.emitter?.workSite?.name} {form.emitter?.workSite?.infos}
                 </td>
                 <td>
                   {form.status

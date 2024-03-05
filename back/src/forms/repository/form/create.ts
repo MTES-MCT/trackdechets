@@ -6,11 +6,12 @@ import {
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { getUserCompanies } from "../../../users/database";
+import { FormWithTransporters } from "../../types";
 
 export type CreateFormFn = (
   data: Prisma.FormCreateInput,
   logMetadata?: LogMetadata
-) => Promise<Form>;
+) => Promise<Form & FormWithTransporters>;
 
 const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
   deps => async (data, logMetadata?) => {
@@ -93,9 +94,13 @@ const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
       }
     });
 
-    prisma.addAfterCommitCallback(() =>
-      enqueueCreatedBsdToIndex(form.readableId)
-    );
+    // Do not index an APPENDIX1_PRODUCER on creation.
+    // It will be indexed when the appendix1 is attached to its container.
+    if (form.emitterType !== "APPENDIX1_PRODUCER") {
+      prisma.addAfterCommitCallback(() =>
+        enqueueCreatedBsdToIndex(form.readableId)
+      );
+    }
 
     return form;
   };

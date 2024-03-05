@@ -7,12 +7,13 @@ import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { formDiff } from "../../workflow/diff";
 import { getUserCompanies } from "../../../users/database";
+import { FormWithTransporters } from "../../types";
 
 export type UpdateFormFn = (
   where: Prisma.FormWhereUniqueInput,
   data: Prisma.FormUpdateInput,
   logMetadata?: LogMetadata
-) => Promise<Form>;
+) => Promise<Form & FormWithTransporters>;
 
 const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
   deps => async (where, data, logMetadata) => {
@@ -158,9 +159,20 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
       });
     }
 
-    prisma.addAfterCommitCallback(() =>
-      enqueueUpdatedBsdToIndex(updatedForm.readableId)
-    );
+    let needsReindex = true;
+    // APPENDIX1_PRODUCER forms are not indexed if they don't belong to a container
+    if (updatedForm.emitterType === "APPENDIX1_PRODUCER") {
+      const count = await prisma.formGroupement.count({
+        where: { initialFormId: updatedForm.id }
+      });
+      needsReindex = count > 0;
+    }
+
+    if (needsReindex) {
+      prisma.addAfterCommitCallback(() =>
+        enqueueUpdatedBsdToIndex(updatedForm.readableId)
+      );
+    }
 
     return updatedForm;
   };
