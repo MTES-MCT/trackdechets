@@ -72,16 +72,12 @@
       "executor": "@nx/jest:jest",
       "dependsOn": ["^build", "generate-tw"],
       "options": {
-        "passWithNoTests": true,
         "jestConfig": "front/jest.config.js"
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["front/**/*.{ts,tsx,js,jsx}"]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "generate-tw": {
       "command": "tailwindcss build front/src/tailwind.css -c front/tailwind.config.js -o front/src/generated/css/tailwind.generated.css",
