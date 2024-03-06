@@ -25,6 +25,10 @@ import {
   MODAL_TITLE_DELETE,
   MODAL_TITLE_UPDATE
 } from "./wordingsRevision";
+import {
+  InlineLoader,
+  ModalLoader
+} from "../../../common/Components/Loader/Loaders";
 
 const hasBeenUpdated = revision => {
   return (
@@ -154,7 +158,13 @@ const RevisionModal = ({
   return (
     <Modal onClose={onModalCloseFromParent!} ariaLabel={ariaLabel} isOpen>
       <div className="revision-modal">
-        {(loadingFormRevision || loadingBsdaRevision) && <Loader />}
+        {(loadingFormRevision || loadingBsdaRevision) && (
+          <div className="revision-modal-loader">
+            <div>
+              <InlineLoader />
+            </div>
+          </div>
+        )}
 
         {reviewList && (
           <RevisionList reviews={reviews} title={getModalTitlePrefix()} />
