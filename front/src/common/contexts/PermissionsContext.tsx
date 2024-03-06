@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback } from "react";
+import React, { useContext, useState, useCallback, useMemo } from "react";
 import { UserPermission, UserRole } from "@td/codegen-ui";
 
 interface InterfacePermissions {
@@ -9,9 +9,11 @@ interface InterfacePermissions {
 type PermissionsContextType = {
   permissions: UserPermission[];
   role?: UserRole;
+  orgId?: string;
   updatePermissions: (
     newPermissions: UserPermission[],
-    newRole: UserRole
+    newRole: UserRole,
+    orgId: string
   ) => void;
 };
 
@@ -30,19 +32,23 @@ export function PermissionsProvider({
   const [permissions, setPermissions] =
     useState<UserPermission[]>(defaultPermissions);
   const [role, setRole] = useState<UserRole>();
+  const [orgId, setOrgId] = useState<string>();
 
   const updatePermissions = useCallback(
-    (newPermissions: UserPermission[], newRole: UserRole) => {
+    (newPermissions: UserPermission[], newRole: UserRole, orgId: string) => {
       setPermissions(newPermissions);
       setRole(newRole);
+      setOrgId(orgId);
     },
-    [setPermissions, setRole]
+    [setPermissions, setRole, setOrgId]
   );
 
+  const permissionsObject = useMemo(() => {
+    return { permissions, role, orgId, updatePermissions };
+  }, [permissions, role, orgId, updatePermissions]);
+
   return (
-    <PermissionsContext.Provider
-      value={{ permissions, role, updatePermissions }}
-    >
+    <PermissionsContext.Provider value={permissionsObject}>
       {children}
     </PermissionsContext.Provider>
   );
