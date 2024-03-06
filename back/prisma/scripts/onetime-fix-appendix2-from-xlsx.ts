@@ -1,25 +1,39 @@
+import fs from "fs";
+import path from "path";
 import { prisma } from "@td/prisma";
+import { logger } from "@td/logger";
 import { registerUpdater, Updater } from "./helper/helper";
-import buildUpdateAppendix2Forms from "../../src/forms/repository/form/updateAppendix2Forms";
 import * as ExcelJS from "exceljs";
+import { getFormRepository } from "../../src/forms/repository";
+import { FormForUpdateAppendix2FormsInclude } from "../../src/forms/repository/form/updateAppendix2Forms";
 
 async function loadExcelData(filePath: string) {
   const workbook = new ExcelJS.Workbook();
   try {
-      await workbook.xlsx.readFile(filePath);
+    await workbook.xlsx.readFile(filePath);
   } catch (error) {
-      console.error(`Erreur lors de la lecture du fichier Excel : ${error.message}`);
-      process.exit(1); // Sortir du script avec un code d'erreur
+    logger.error(
+      `Erreur lors de la lecture du fichier Excel : ${error.message}`
+    );
+    process.exit(1);
   }
   const worksheet = workbook.worksheets[0];
-  const rows = [];
+  const rows: Array<{
+    nextFormId: string;
+    initialFormIds: string[];
+    quantities: number[];
+  }> = [];
   worksheet.eachRow((row, rowNumber) => {
-      if (rowNumber > 1) { // Ignorer l'en-tête
-          const nextFormId = row.getCell(1).value as string;
-          const initialFormIds = (row.getCell(2).value as string).split(',');
-          const quantities = (row.getCell(3).value as string).split(',').map(q => parseFloat(q));
-          rows.push({ nextFormId, initialFormIds, quantities });
-      }
+    // Ignorer l'en-tête
+    if (rowNumber > 1 && row?.cellCount) {
+      const cell2 = row.getCell(2) as unknown as string;
+      const cell3 = row.getCell(3) as unknown as string;
+      const nextFormId = row.getCell(1) as unknown as string;
+      const initialFormIds = cell2.split ? cell2.split(",") : [];
+      const quantities = (cell3.split ? cell3.split(",") : [])
+        .map(q => parseFloat(q));
+      rows.push({ nextFormId, initialFormIds, quantities });
+    }
   });
   return rows;
 }
@@ -31,52 +45,53 @@ async function insertFormGroupements(
     quantities: number[];
   }>
 ) {
-  let allInitialFormIds: string[] = [];
   for (const row of rows) {
-    allInitialFormIds = [...allInitialFormIds, ...row.initialFormIds]; // Collecter tous les initialFormIds
-    for (let i = 0; i < row.initialFormIds.length; i++) {
-      const initialFormId = row.initialFormIds[i];
+    const initialFormIdsSet = [...new Set(row.initialFormIds)];
+    for (let i = 0; i < initialFormIdsSet.length; i++) {
+      const initialFormId = initialFormIdsSet[i];
       const quantity = row.quantities[i];
+      logger.info(`Creating FormGroupement for nextFormId ${row.nextFormId} and initialFormId ${initialFormId} with quantity ${quantity}`);
       await prisma.formGroupement.create({
         data: {
           nextFormId: row.nextFormId,
           initialFormId,
-          quantity,
-          id: `${row.nextFormId}-${initialFormId}` // Générer un ID unique pour chaque entrée
+          quantity
         }
       });
     }
+    await updateDirtyForms(initialFormIdsSet);
   }
-  return allInitialFormIds;
 }
-// Supposons que `FormForUpdateAppendix2FormsInclude` et `buildUpdateAppendix2Forms` sont définis ailleurs dans votre code
+
 async function updateDirtyForms(dirtyFormIds: string[]) {
   const dirtyForms = await prisma.form.findMany({
     where: { id: { in: dirtyFormIds } },
-    include: {
-      forwardedIn: true
-    }
+    include: FormForUpdateAppendix2FormsInclude
   });
   const user = { id: "support-td", authType: "script" };
-  const updateAppendix2Forms = buildUpdateAppendix2Forms({ prisma, user });
-  await updateAppendix2Forms(dirtyForms);
-}
-
-@registerUpdater(
-  "Update FinalOperation table",
-  "Update the list of final operation code and quantity in the database",
-  true
-)
-export class UpdateFinalOperationUpdater implements Updater {
-  async run() {
-
-
-
-    const filePath = "chemin/vers/votre/fichier.xlsx";
-    const rows = await loadExcelData(filePath);
-    const dirtyFormIds = await insertFormGroupements(rows);
-    await updateDirtyForms(dirtyFormIds);
-    console.log("Insertion et mise à jour terminées.");
+  const formRepository = getFormRepository(user as any);
+  try {
+    logger.info(`Updating ${dirtyForms.length} BSDD`);
+    await formRepository.updateAppendix2Forms(dirtyForms);
+  } catch (err) {
+    logger.error(err);
   }
 }
 
+@registerUpdater(
+  "Update Grouped BSDD for Caktus",
+  "Add forgotten appendix2 BSDD in the database",
+  true
+)
+export class UpdateCaktusGroupingOperationUpdater implements Updater {
+  async run() {
+    const pathXlsx = path.join(__dirname, "fix-appendix2-caktus-042024.xlsx");
+    if (!fs.existsSync(pathXlsx)) {
+      logger.info(`Missing file ${pathXlsx}, aborting script`);
+    } else {
+      const rows = await loadExcelData(pathXlsx);
+      await insertFormGroupements(rows);
+      console.log("Insertion et mise à jour terminées.");
+    }
+  }
+}

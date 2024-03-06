@@ -6,7 +6,7 @@ import { enqueueBsdToDelete } from "../../src/queue/producers/elastic";
 @registerUpdater(
   "Remove orphans APPENDIX1_PRODUCER from ES",
   "An orphan APPENDIX1_PRODUCER should not appear in the dashboard",
-  true
+  false
 )
 export class UnindexOrphanAppendix1 implements Updater {
   async run() {
