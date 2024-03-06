@@ -5,6 +5,14 @@ import svgrPlugin from "vite-plugin-svgr";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  root: __dirname,
+  build: {
+    outDir: "../dist/front",
+    reportCompressedSize: true,
+    commonjsOptions: {
+      transformMixedEsModules: true
+    }
+  },
   cacheDir: "../node_modules/.vite/front",
   plugins: [
     react(),

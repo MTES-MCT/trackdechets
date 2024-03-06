@@ -15,6 +15,7 @@ export class SetContactsUpdater implements Updater {
       console.info(`🧮 There are ${totalNumberOfEvents} events to migrate`);
       console.info(`ℹ️ Batch size is ${BATCH_SIZE}\n`);
 
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         const events = await prisma.event.findMany({
           take: BATCH_SIZE

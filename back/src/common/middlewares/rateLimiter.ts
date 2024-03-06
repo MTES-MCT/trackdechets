@@ -27,7 +27,7 @@ export function rateLimiterMiddleware(options: Options) {
     max: options.maxRequestsPerWindow,
     store,
     keyGenerator: (request: Request) => {
-      return keyGenerator(request.ip, request);
+      return keyGenerator(request.ip ?? "no-ip", request);
     }
   });
 }

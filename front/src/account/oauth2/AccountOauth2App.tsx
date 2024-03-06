@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { List, ListItem } from "../../common/components";
 import styles from "./AccountOauth2App.module.scss";
-import { generatePath, useNavigate } from "react-router";
+import { generatePath, useNavigate } from "react-router-dom";
 import routes from "../../Apps/routes";
 import { Application, ApplicationGoal } from "@td/codegen-ui";
 import AccountOauth2AppDelete from "./AccountOauth2AppDelete";

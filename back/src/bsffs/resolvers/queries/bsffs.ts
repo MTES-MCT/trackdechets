@@ -48,7 +48,7 @@ const bsffs: QueryResolvers["bsffs"] = async (
       findManyBsff({
         where,
         ...prismaPaginationArgs,
-        orderBy: { createdAt: "desc" }
+        orderBy: { rowNumber: "desc" }
       }),
     formatNode: expandBsffFromDB,
     ...gqlPaginationArgs

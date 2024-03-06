@@ -64,7 +64,17 @@ import { FormForElastic } from "./elastic";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput | null;
-}): Partial<Prisma.FormCreateInput> {
+}): Pick<
+  Prisma.FormCreateInput,
+  | "recipientCompanyName"
+  | "recipientCompanySiret"
+  | "recipientCompanyAddress"
+  | "recipientCompanyContact"
+  | "recipientCompanyPhone"
+  | "recipientCompanyMail"
+  | "recipientCap"
+  | "recipientProcessingOperation"
+> {
   return {
     recipientCompanyName: chain(input.destination, d =>
       chain(d.company, c => c.name)
@@ -457,7 +467,7 @@ function flattenReceivedInfo(receivedInfo: ReceivedFormInput) {
 
 export function flattenTemporaryStorageDetailInput(
   tempStorageInput: TemporaryStorageDetailInput
-): Partial<Prisma.FormCreateInput> {
+) {
   return safeInput(flattenDestinationInput(tempStorageInput));
 }
 

@@ -26,6 +26,7 @@ type EditableBspaohFields = Required<
     | "id"
     | "createdAt"
     | "updatedAt"
+    | "rowNumber"
     | "isDeleted"
     | "status"
     | "emitterEmissionSignatureDate"
