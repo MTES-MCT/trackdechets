@@ -95,7 +95,7 @@ function BsdCardList({
 
   // If URL specifies a BSD id, directly open the associated revision modal
   useEffect(() => {
-    if (Boolean(bsdId)) {
+    if (bsdId) {
       setIsModalOpen(true);
       setBsdClicked({ id: bsdId ?? "" } as unknown as Bsd);
       if (bsdId?.startsWith("BSDA-")) {

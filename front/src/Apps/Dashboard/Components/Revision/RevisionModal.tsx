@@ -29,7 +29,7 @@ import { InlineLoader } from "../../../common/Components/Loader/Loaders";
 const hasBeenUpdated = revision => {
   return (
     revision.status === RevisionRequestStatus.Accepted ||
-    revision.status === RevisionRequestStatus.Accepted
+    revision.status === RevisionRequestStatus.Refused
   );
 };
 
