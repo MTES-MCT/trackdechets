@@ -17,6 +17,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import AccountCompanyAddAnonymousCompany from "./anonymous/AccountCompanyAddAnonymousCompany";
+import AccountCompanyAddSiretError from "./AccountCompanyAddSiretError";
 
 type IProps = {
   onCompanyInfos: (companyInfos) => void;
@@ -168,13 +169,6 @@ export default function AccountCompanyAddSiret({
     <div className="fr-container-fluid">
       <div className="fr-grid-row">
         <div className="fr-col-12">
-          {error && (
-            <Alert
-              severity="error"
-              title="Erreur"
-              description={error.message}
-            />
-          )}
           <Formik
             initialValues={{ siret: defaultQuery }}
             validate={values => {
@@ -316,6 +310,8 @@ export default function AccountCompanyAddSiret({
           )}
           {isClosed && closedCompanyError}
           {showIndividualInfo && !isDisabled && individualInfo}
+
+          {error && <AccountCompanyAddSiretError errorMsg={error.message} />}
         </div>
       </div>
     </div>

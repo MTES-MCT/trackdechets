@@ -16,3 +16,9 @@ export class SiretNotFoundError extends UserInputError {
     });
   }
 }
+
+export class ClosedCompanyError extends Error {
+  constructor() {
+    super("Cet établissement est fermé");
+  }
+}
