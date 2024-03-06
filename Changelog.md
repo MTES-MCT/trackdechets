@@ -14,7 +14,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Afficher le statut avec rupture de traçabilité lorsque mentionné lors du traitement [PR 3120](https://github.com/MTES-MCT/trackdechets/pull/3120)
 - Ajouter la possibilité de Supprimer le BSDASRI pour l'émetteur lorsqu'il est Signé par l'émetteur [PR 3115](https://github.com/MTES-MCT/trackdechets/pull/3115)
 - Permettre au transporteur de modifier son champs libre / immatriculation après signature de l'entreposage provisoire depuis le tableau de bord [PR 3114](https://github.com/MTES-MCT/trackdechets/pull/3114)
-- Registres sortant et exhaistif : ajout poids et code destination finale [PR 3058](https://github.com/MTES-MCT/trackdechets/pull/3058)
+- Registres sortant et exhaustif : ajout poids et code destination finale [PR 3058](https://github.com/MTES-MCT/trackdechets/pull/3058)
+- Nouveau composant de sélection d'entreprise sur le dashboard [PR 3134](https://github.com/MTES-MCT/trackdechets/pull/3134)
 
 #### :nail_care: Améliorations
 
@@ -30,7 +31,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - ETQ lecteur, je ne dois pas avoir accès aux boutons Signer de l'entreprise de travaux et du transport multimodal ainsi que ceux présents dans l'Aperçu [PR 3123](https://github.com/MTES-MCT/trackdechets/pull/3123)
 - Remonter le numéro d'agrément démolisseur lors de la sélection de l'émetteur à la création d'un BSVHU [PR 3127](https://github.com/MTES-MCT/trackdechets/pull/3127)
 - Afficher le conditionnement précisé dans la révision lorsque le conditionnement Autres est sélectionné [PR 3129](https://github.com/MTES-MCT/trackdechets/pull/3129)
-- 
+
 #### :house: Interne
 
 - Refacto & documentation validation BSDA [PR 3087](https://github.com/MTES-MCT/trackdechets/pull/3087)
@@ -39,8 +40,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Automatisation de l'envoi d'un courrier de vérification aux adresses mails génériques [PR 3080](https://github.com/MTES-MCT/trackdechets/pull/3080)
 - Les transporteurs étrangers sont désormais automatiquement vérifiés [PR 3079](https://github.com/MTES-MCT/trackdechets/pull/3079)
 - Augmentation time-out tests JEST [PR 3140](https://github.com/MTES-MCT/trackdechets/pull/3140)
- - Ajout de vérifications de permissions sur la vue details [PR 3140](https://github.com/MTES-MCT/trackdechets/pull/3140/)
--  Changement de requête par SIRET sur ElasticSearch "stocketablissement" dans `searchCompany` [PR 3118](https://github.com/MTES-MCT/trackdechets/pull/3118)
+- Ajout de vérifications de permissions sur la vue details [PR 3140](https://github.com/MTES-MCT/trackdechets/pull/3140/)
+- Changement de requête par SIRET sur ElasticSearch "stocketablissement" dans `searchCompany` [PR 3118](https://github.com/MTES-MCT/trackdechets/pull/3118)
 
 #### :bug: Corrections de bugs
 
@@ -50,7 +51,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Suppression bouton signature pour le producteur BSDA [PR 3110](https://github.com/MTES-MCT/trackdechets/pull/3140)
 - Correction bouton supprimer uniquement pour producteur + bouton secondaire faire signer [PR 3126](https://github.com/MTES-MCT/trackdechets/pull/3126)
 - Correction affichage code déchet "dangereux" ou non [PR 3131](https://github.com/MTES-MCT/trackdechets/pull/3131)
-- 
+
 #### :boom: Breaking changes
 
 # [2024.2.1] 13/02/2024
