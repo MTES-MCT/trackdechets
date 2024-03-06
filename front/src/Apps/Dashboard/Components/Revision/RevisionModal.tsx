@@ -14,7 +14,6 @@ import { ReviewInterface, mapRevision } from "./revisionMapper";
 import RevisionList from "./RevisionList/RevisionList";
 import { Modal } from "../../../../common/components";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { Loader } from "../../../common/Components";
 import RevisionApproveFragment from "./RevisionApproveFragment";
 import "./revisionModal.scss";
 import RevisionCancelFragment from "./RevisionCancelFragment";
@@ -25,10 +24,7 @@ import {
   MODAL_TITLE_DELETE,
   MODAL_TITLE_UPDATE
 } from "./wordingsRevision";
-import {
-  InlineLoader,
-  ModalLoader
-} from "../../../common/Components/Loader/Loaders";
+import { InlineLoader } from "../../../common/Components/Loader/Loaders";
 
 const hasBeenUpdated = revision => {
   return (
@@ -135,7 +131,7 @@ const RevisionModal = ({
     ) {
       if (onModalCloseFromParent) onModalCloseFromParent();
     }
-  }, [reviews, dataForm, dataBsda]);
+  }, [reviews, dataForm, dataBsda, onModalCloseFromParent]);
 
   const ariaLabel =
     actualActionType === ActionType.CONSUlT
