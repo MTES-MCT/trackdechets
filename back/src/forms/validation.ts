@@ -1347,10 +1347,6 @@ const withNextDestination = (required: boolean) =>
       nextDestinationCompanyExtraEuropeanId: yup.string().nullable(),
       nextDestinationNotificationNumber: yup
         .string()
-        .matches(
-          /^[a-zA-Z]{2}[0-9]{4}$|^$/,
-          "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
-        )
         .when("nextDestinationCompanyExtraEuropeanId", {
           is: nextDestinationCompanyExtraEuropeanId =>
             !!nextDestinationCompanyExtraEuropeanId,

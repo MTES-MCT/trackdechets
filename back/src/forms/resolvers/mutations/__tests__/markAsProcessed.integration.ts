@@ -1043,49 +1043,6 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  test("NotificationNumber should have the right format (country-code + 4 numbers) and should be mandatory when noTraceability is true", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "ACCEPTED",
-        recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
-      }
-    });
-
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<
-      Pick<Mutation, "markAsProcessed">,
-      MutationMarkAsProcessedArgs
-    >(MARK_AS_PROCESSED, {
-      variables: {
-        id: form.id,
-        processedInfo: {
-          processingOperationDescription: "Une description",
-          processingOperationDone: "D 14",
-          processedBy: "A simple bot",
-          processedAt: "2018-12-11T00:00:00.000Z" as any,
-          noTraceability: true,
-          nextDestination: {
-            processingOperation: "D 1",
-            company: {
-              extraEuropeanId: "AZERTY"
-            },
-            notificationNumber: "123456AZERTY" // required if extra-EU
-          }
-        }
-      }
-    });
-
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
-      })
-    ]);
-  });
-
   test("notificationNumber should be mandatory when nextDestination.company is foreign when noTraceability is true", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
