@@ -713,10 +713,10 @@ export const getSignByProducerBtnLabel = (
     }
 
     if (
-      currentSiret === bsd.worker?.company?.siret ||
+      (currentSiret === bsd.worker?.company?.siret &&
+        permissions.includes(UserPermission.BsdCanSignWork)) ||
       (currentSiret === bsd.transporter?.company?.orgId &&
-        (permissions.includes(UserPermission.BsdCanSignTransport) ||
-          permissions.includes(UserPermission.BsdCanSignWork)))
+        permissions.includes(UserPermission.BsdCanSignTransport))
     ) {
       return SIGNER;
     }
