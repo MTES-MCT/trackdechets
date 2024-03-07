@@ -96,7 +96,7 @@ describe("mutation inviteUserToCompany", () => {
     );
 
     const addJobArgs: any = (addToMailQueue as jest.Mock).mock.calls[0];
-    console.log(addJobArgs[0]);
+
     // the right payload
     expect(addJobArgs[0]).toMatchObject({
       subject: "Vous avez été invité à rejoindre Trackdéchets",
