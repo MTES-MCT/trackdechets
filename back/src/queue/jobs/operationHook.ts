@@ -61,17 +61,20 @@ export async function operationHook(args: OperationHookArgs) {
   ].filter(Boolean);
 
   // L'upsert FinalOperation n'est appelé qu'en cas de traitement final ou de rupture de traçabilité
-  // Sinon on supprime les FinalOperations liés
+  // Sinon on supprime les FinalOperations liés à finalForm et aux initialForms
   if (
     !isFinalOperationCode(finalForm.processingOperationDone!) ||
     finalForm.noTraceability === true
   ) {
     for (const initialForm of initialForms) {
-      await prisma.form.update({
-        where: { id: initialForm.id },
-        data: {
-          finalOperations: { deleteMany: {} }
-        }
+      await prisma.finalOperation.delete({
+        where: {
+          formId_finalBsdReadableId: {
+            formId: initialForm.id,
+            finalBsdReadableId: finalForm.readableId
+          }
+        },
+
       });
     }
   } else {
@@ -87,18 +90,18 @@ export async function operationHook(args: OperationHookArgs) {
         }
       }
 
-      const data = {
-        finalBsdReadableId: finalForm.readableId,
-        quantity: quantityReceived!,
-        operationCode: finalForm.processingOperationDone!,
-        destinationCompanySiret: finalForm.recipientCompanySiret!,
-        destinationCompanyName: finalForm.recipientCompanyName!,
-        formId: initialForm.id
-      };
-
-      if (Object.values(data).some(value => value === null)) {
+      if (quantityReceived === null || finalForm.processingOperationDone === null) {
         continue;
       }
+
+      const data = {
+        finalBsdReadableId: finalForm.readableId,
+        quantity: quantityReceived,
+        operationCode: finalForm.processingOperationDone,
+        destinationCompanySiret: finalForm.recipientCompanySiret || "",
+        destinationCompanyName: finalForm.recipientCompanyName || "",
+        formId: initialForm.id
+      };
 
       await prisma.finalOperation.upsert({
         where: {
