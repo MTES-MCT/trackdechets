@@ -5,6 +5,8 @@ import {
   seedDefaultCompanies,
   seedCompanyAssociations
 } from "../../data/company";
+import { selectCompany } from "../../utils/navigation";
+import { createBsvhu } from "../../utils/bsvhu";
 
 test.describe.serial("Cahier de recette de création des BSVHU", async () => {
   // User credentials
@@ -37,6 +39,15 @@ test.describe.serial("Cahier de recette de création des BSVHU", async () => {
       await successfulLogin(page, {
         email: USER_EMAIL,
         password: USER_PASSWORD
+      });
+    });
+
+    await test.step("Création d'un BSVHU", async () => {
+      await selectCompany(page, companies.companyN.siret);
+
+      await createBsvhu(page, {
+        emitter: companies.companyN,
+        transporter: companies.companyB
       });
     });
   });

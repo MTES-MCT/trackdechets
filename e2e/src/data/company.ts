@@ -94,7 +94,14 @@ export const seedCompany = async (
     });
   }
 
-  return company;
+  return prisma.company.findFirst({
+    where: { id: company.id },
+    include: {
+      transporterReceipt: true,
+      vhuAgrementBroyeur: true,
+      vhuAgrementDemolisseur: true
+    }
+  });
 };
 
 export const seedDefaultCompanies = async () => {
