@@ -1546,7 +1546,7 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  it("nextDestinationCompany return an error when a foreign extraEuropeanId is given without notificationNumber", async () => {
+  it("nextDestinationCompany return an error when waste is not dangerous with a foreign extraEuropeanId is given without notificationNumber", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1559,13 +1559,37 @@ describe("processedInfoSchema", () => {
       nextDestinationCompanyExtraEuropeanId: "BRU0541696005",
       nextDestinationCompanyContact: "Arya Stark",
       nextDestinationCompanyPhone: "06 XX XX XX XX",
-      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+      nextDestinationCompanyMail: "arya.stark@trackdechets.fr",
+      wasteDetailsCode: "07 07 07*"
     };
     const validateFn = () => processedInfoSchema.validate(processedInfo);
 
     await expect(validateFn()).rejects.toThrow(
       "Destination ultérieure : le numéro de notification est obligatoire"
     );
+  });
+
+  it("nextDestinationCompany not return an error when waste is not dangerous with a foreign extraEuropeanId", async () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 13",
+      processingOperationDescription: "Regroupement",
+      nextDestinationProcessingOperation: "D 8",
+      nextDestinationCompanyName: "Exutoire",
+      nextDestinationCompanyAddress: "4 rue du déchet",
+      nextDestinationCompanyCountry: "FR",
+      nextDestinationCompanyExtraEuropeanId: "BRU0541696005",
+      nextDestinationCompanyContact: "Arya Stark",
+      nextDestinationCompanyPhone: "06 XX XX XX XX",
+      nextDestinationCompanyMail: "arya.stark@trackdechets.fr",
+      wasteDetailsCode: "07 07 07"
+    };
+    const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+    await expect(validateFn()).resolves.toMatchObject({
+
+    });
   });
 
   it("nextDestinationCompany return an error when a foreign extraEuropeanId is given with a VAT number", async () => {
