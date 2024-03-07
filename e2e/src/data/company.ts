@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { generateUniqueTestSiret } from "back";
+import { generateUniqueTestSiret, randomNbrChain } from "back";
 import { CompanyType, Prisma } from "@prisma/client";
 
 interface VhuAgrement {
@@ -18,6 +18,10 @@ interface Opt {
   vhuAgrementDemolisseur?: VhuAgrement;
   vhuAgrementBroyeur?: VhuAgrement;
 }
+
+const generateRandomVatNumber = countryPrefix => {
+  return `${countryPrefix}${randomNbrChain(8)}`;
+};
 
 export const seedCompany = async (
   companyInput: Partial<Prisma.CompanyCreateInput>,
@@ -119,7 +123,7 @@ export const seedDefaultCompanies = async () => {
   const companyC = await seedCompany({
     name: "C - Transporteur étranger",
     companyTypes: [CompanyType.TRANSPORTER],
-    vatNumber: "DE00000001"
+    vatNumber: generateRandomVatNumber("DE")
   });
 
   const companyD = await seedCompany({
