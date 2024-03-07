@@ -13,7 +13,6 @@ import {
   COLLECTED,
   DRAFTS,
   FOLLOWS,
-  REGISTER,
   REVIEWED,
   REVIEWS,
   TO_COLLECT,
@@ -39,9 +38,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
     currentCompany.companyTypes,
     currentCompany.siret
   );
-  const showRegisterTab =
-    permissions.includes(UserPermission.RegistryCanRead) &&
-    [UserRole.Admin, UserRole.Member].includes(role!);
+
   const showMyBsds =
     permissions.includes(UserPermission.BsdCanList) && role !== UserRole.Driver;
 
@@ -226,20 +223,6 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             </li>
           </ul>
         </Accordion>
-      )}
-      {showRegisterTab && (
-        <NavLink
-          to={generatePath(routes.dashboard.exports, {
-            siret: currentCompany.orgId
-          })}
-          className={({ isActive }) =>
-            isActive
-              ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
-              : "sidebarv2__item sidebarv2__item--indented"
-          }
-        >
-          {REGISTER}
-        </NavLink>
       )}
     </div>
   );

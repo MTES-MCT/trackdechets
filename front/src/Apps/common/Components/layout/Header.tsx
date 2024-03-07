@@ -134,7 +134,7 @@ function DashboardSubNav({ currentCompany }) {
   const showMyBsds =
     permissions.includes(UserPermission.BsdCanList) && role !== UserRole.Driver;
 
-  const showRegisterTab =
+  const showRegistryTab =
     permissions.includes(UserPermission.RegistryCanRead) &&
     [UserRole.Admin, UserRole.Member].includes(role!);
 
@@ -287,15 +287,13 @@ function DashboardSubNav({ currentCompany }) {
           </div>
         </li>
       )}
-      {showRegisterTab && (
+      {showRegistryTab && (
         <li className="fr-nav__item">
           <MenuLink
             entry={{
               navlink: true,
               caption: "Mes registres",
-              href: generatePath(routes.dashboard.exports, {
-                siret: currentCompany.orgId
-              })
+              href: routes.registry
             }}
           />
         </li>
@@ -449,11 +447,24 @@ function MobileSubNav({ currentCompany }) {
   );
 }
 
-const getDesktopMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
+const getDesktopMenuEntries = (
+  isAuthenticated,
+  isAdmin,
+  showRegistry,
+  currentSiret
+) => {
   const admin = [
     {
       caption: "Admin",
       href: routes.admin.verification,
+      navlink: true
+    }
+  ];
+
+  const registry = [
+    {
+      caption: "Mes registres",
+      href: routes.registry,
       navlink: true
     }
   ];
@@ -475,6 +486,7 @@ const getDesktopMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
 
       navlink: true
     },
+    ...(showRegistry ? registry : []),
     {
       caption: "Mon compte",
       href: routes.account.index,
@@ -504,7 +516,7 @@ export default function Header({
 }: HeaderProps) {
   const { VITE_API_ENDPOINT } = import.meta.env;
   const location = useLocation();
-  const { updatePermissions, role } = usePermissions();
+  const { updatePermissions, role, permissions } = usePermissions();
   const navigate = useNavigate();
 
   const matchDashboard = matchPath(
@@ -553,6 +565,10 @@ export default function Header({
     [navigate, role]
   );
 
+  const showRegistry =
+    permissions.includes(UserPermission.RegistryCanRead) &&
+    [UserRole.Admin, UserRole.Member].includes(role!);
+
   if (isAuthenticated && data?.me == null) {
     return <Loader />;
   }
@@ -565,6 +581,7 @@ export default function Header({
   const menuEntries = getDesktopMenuEntries(
     isAuthenticated,
     isAdmin,
+    showRegistry,
     currentSiret
   );
 
