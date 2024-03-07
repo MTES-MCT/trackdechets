@@ -12,6 +12,7 @@ import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
 import { getDefaultOrgId } from "../CompanySwitcher/CompanySwitcher";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
+import Exports from "../../../../dashboard/exports/Registry";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
@@ -297,6 +298,15 @@ export default function LayoutContainer() {
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <AccountMembershipRequest />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.registry}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <Exports />
               </RequireAuth>
             }
           />
