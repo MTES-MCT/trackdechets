@@ -67,7 +67,7 @@ export async function operationHook(args: OperationHookArgs) {
     finalForm.noTraceability === true
   ) {
     for (const initialForm of initialForms) {
-      try  {
+      try {
         await prisma.finalOperation.delete({
           where: {
             formId_finalBsdReadableId: {
@@ -94,7 +94,10 @@ export async function operationHook(args: OperationHookArgs) {
         }
       }
 
-      if (quantityReceived === null || finalForm.processingOperationDone === null) {
+      if (
+        quantityReceived === null ||
+        finalForm.processingOperationDone === null
+      ) {
         continue;
       }
 
