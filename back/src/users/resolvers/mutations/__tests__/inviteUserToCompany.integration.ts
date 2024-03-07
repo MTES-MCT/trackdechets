@@ -96,7 +96,7 @@ describe("mutation inviteUserToCompany", () => {
     );
 
     const addJobArgs: any = (addToMailQueue as jest.Mock).mock.calls[0];
-
+    console.log(addJobArgs[0]);
     // the right payload
     expect(addJobArgs[0]).toMatchObject({
       subject: "Vous avez été invité à rejoindre Trackdéchets",
@@ -106,10 +106,13 @@ describe("mutation inviteUserToCompany", () => {
         API_URL: "http://api.trackdechets.local",
         UI_URL: "http://trackdechets.local",
         companyName: "company_2",
+        companyOrgId: company.siret,
         hash: encodeURIComponent(hashValue)
       }
     });
-    expect(addJobArgs[0].body).toContain(`invité à rejoindre Trackdéchets.`);
+    expect(addJobArgs[0].body).toContain(
+      `vous a invité à rejoindre\n  Trackdéchets`
+    );
     expect(addJobArgs[0].body).toContain(
       `<a href=\"http://trackdechets.local/invite?hash=${encodeURIComponent(
         hashValue

@@ -13,18 +13,23 @@ export const onSignup: MailTemplate<{ activationHash: string }> = {
 export const inviteUserToJoin: MailTemplate<{
   hash: string;
   companyName: string;
+  companyOrgId: string;
 }> = {
   subject: "Vous avez été invité à rejoindre Trackdéchets",
   body: mustacheRenderer("invitation-par-administrateur.html"),
   templateId: templateIds.LAYOUT,
-  prepareVariables: ({ hash, companyName }) => ({
-    companyName,
-    hash: encodeURIComponent(hash)
-  })
+  prepareVariables: ({ hash, companyName, companyOrgId }) => {
+    return {
+      companyName,
+      companyOrgId,
+      hash: encodeURIComponent(hash)
+    };
+  }
 };
 
 export const notifyUserOfInvite: MailTemplate<{
   companyName: string;
+  companyOrgId: string;
 }> = {
   subject: "Vous avez été invité sur Trackdéchets",
   body: mustacheRenderer("notification-invitation.html"),

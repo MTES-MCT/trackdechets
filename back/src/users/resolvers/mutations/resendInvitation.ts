@@ -38,7 +38,11 @@ const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
 
   const mail = renderMail(inviteUserToJoin, {
     to: [{ email, name: email }],
-    variables: { hash: invitation.hash, companyName: company.name }
+    variables: {
+      hash: invitation.hash,
+      companyName: company.name,
+      companyOrgId: siret
+    }
   });
   await sendMail(mail);
   return true;
