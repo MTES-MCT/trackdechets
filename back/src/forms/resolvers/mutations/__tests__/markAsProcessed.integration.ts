@@ -1073,7 +1073,7 @@ describe("mutation.markAsProcessed", () => {
             processingOperation: "D 1",
             company: {
               extraEuropeanId: "AZERTY"
-            },
+            }
           }
         }
       }

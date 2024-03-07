@@ -1451,7 +1451,7 @@ const traceabilityBreakForbidden = yup.object({
 
 // 11 - Réalisation de l’opération :
 const processedInfoSchemaFn: (
-  value: ProcessedInfo & { wasteDetailscode: string; }
+  value: ProcessedInfo & { wasteDetailscode: string }
 ) => yup.SchemaOf<ProcessedInfo> = value => {
   const base = yup.object({
     processedBy: yup
