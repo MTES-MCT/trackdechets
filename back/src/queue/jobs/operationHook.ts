@@ -67,15 +67,19 @@ export async function operationHook(args: OperationHookArgs) {
     finalForm.noTraceability === true
   ) {
     for (const initialForm of initialForms) {
-      await prisma.finalOperation.delete({
-        where: {
-          formId_finalBsdReadableId: {
-            formId: initialForm.id,
-            finalBsdReadableId: finalForm.readableId
+      try  {
+        await prisma.finalOperation.delete({
+          where: {
+            formId_finalBsdReadableId: {
+              formId: initialForm.id,
+              finalBsdReadableId: finalForm.readableId
+            }
           }
-        },
-
-      });
+        });
+      } catch (e) {
+        // if does not exists, ignore and continue
+        continue;
+      }
     }
   } else {
     for (const initialForm of initialForms) {
