@@ -1348,8 +1348,12 @@ const withNextDestination = (required: boolean) =>
       nextDestinationNotificationNumber: yup
         .string()
         .when(["wasteDetailsCode", "nextDestinationCompanyExtraEuropeanId"], {
-          is: (wasteDetailsCode: string, nextDestinationCompanyExtraEuropeanId: string) =>
-            nextDestinationCompanyExtraEuropeanId && isDangerous(wasteDetailsCode),
+          is: (
+            wasteDetailsCode: string,
+            nextDestinationCompanyExtraEuropeanId: string
+          ) =>
+            nextDestinationCompanyExtraEuropeanId &&
+            isDangerous(wasteDetailsCode),
           then: schema =>
             schema
               .matches(
@@ -1366,9 +1370,9 @@ const withNextDestination = (required: boolean) =>
                 /^[\w\s]{15}$|^$/,
                 "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
               )
-              .notRequired().nullable()
+              .notRequired()
+              .nullable()
         })
-
     })
     .test(
       "XORIdRequired",
