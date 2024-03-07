@@ -39,7 +39,14 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
   let formUpdateInput: Prisma.FormUpdateInput =
     flattenProcessedFormInput(processedInfo);
-  processedInfoSchema.validateSync(formUpdateInput, { abortEarly: false });
+  processedInfoSchema.validateSync(
+    {
+      // required for nextDestination validation
+      wasteDetailsCode: form.wasteDetailsCode,
+      ...formUpdateInput
+    },
+    { abortEarly: false }
+  );
 
   // set default value for processingOperationDescription
   const operation = PROCESSING_OPERATIONS.find(
