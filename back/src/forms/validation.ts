@@ -1347,19 +1347,28 @@ const withNextDestination = (required: boolean) =>
       nextDestinationCompanyExtraEuropeanId: yup.string().nullable(),
       nextDestinationNotificationNumber: yup
         .string()
-        .matches(
-          /^[a-zA-Z]{2}[0-9]{4}$|^$/,
-          "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
-        )
-        .when("nextDestinationCompanyExtraEuropeanId", {
-          is: nextDestinationCompanyExtraEuropeanId =>
-            !!nextDestinationCompanyExtraEuropeanId,
+        .when(["wasteDetailsCode", "nextDestinationCompanyExtraEuropeanId"], {
+          is: (wasteDetailsCode: string, nextDestinationCompanyExtraEuropeanId: string) =>
+            nextDestinationCompanyExtraEuropeanId && isDangerous(wasteDetailsCode),
           then: schema =>
-            schema.required(
-              `Destination ultérieure : le numéro de notification GISTRID est obligatoire`
-            ),
-          otherwise: schema => schema.notRequired().nullable()
+            schema
+              .matches(
+                /^[\w\s]{15}$/,
+                "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+              )
+              .requiredIf(
+                required,
+                "Destination ultérieure : le numéro de notification est obligatoire"
+              ),
+          otherwise: schema =>
+            schema
+              .matches(
+                /^[\w\s]{15}$|^$/,
+                "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+              )
+              .notRequired().nullable()
         })
+
     })
     .test(
       "XORIdRequired",

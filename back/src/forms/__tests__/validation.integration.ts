@@ -1564,7 +1564,7 @@ describe("processedInfoSchema", () => {
     const validateFn = () => processedInfoSchema.validate(processedInfo);
 
     await expect(validateFn()).rejects.toThrow(
-      "Destination ultérieure : le numéro de notification GISTRID est obligatoire"
+      "Destination ultérieure : le numéro de notification est obligatoire"
     );
   });
 
