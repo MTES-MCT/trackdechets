@@ -196,7 +196,7 @@ app.use(
         fontSrc: ["'self'", "https:", "data:"],
         frameAncestors: ["'self'"],
         imgSrc: ["'self'"],
-        objectSrc: [process.env.API_HOST, process.env.UI_HOST],
+        objectSrc: ["'self'", "data:"],
         scriptSrc: ["'self'"],
         scriptSrcAttr: ["'none'"],
         styleSrc: [
