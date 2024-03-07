@@ -1587,9 +1587,7 @@ describe("processedInfoSchema", () => {
     };
     const validateFn = () => processedInfoSchema.validate(processedInfo);
 
-    await expect(validateFn()).resolves.toMatchObject({
-
-    });
+    await expect(validateFn()).resolves.toMatchObject({});
   });
 
   it("nextDestinationCompany return an error when a foreign extraEuropeanId is given with a VAT number", async () => {
