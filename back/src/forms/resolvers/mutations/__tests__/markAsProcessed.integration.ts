@@ -500,7 +500,7 @@ describe("mutation.markAsProcessed", () => {
     });
 
     const { mutate } = makeClient(user);
-    await mutate(MARK_AS_PROCESSED, {
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
         processedInfo: {
@@ -520,6 +520,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
+    expect(errors).toBeUndefined();
     const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
@@ -1073,7 +1074,6 @@ describe("mutation.markAsProcessed", () => {
             company: {
               extraEuropeanId: "AZERTY"
             },
-            notificationNumber: "123456AZERTY" // required if extra-EU
           }
         }
       }
@@ -1082,7 +1082,7 @@ describe("mutation.markAsProcessed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
+          "Destination ultérieure : le numéro de notification est obligatoire"
       })
     ]);
   });
@@ -1117,7 +1117,7 @@ describe("mutation.markAsProcessed", () => {
             company: {
               extraEuropeanId: "AZERTY"
             },
-            notificationNumber: "123456AZERTY" // required if extra-EU
+            notificationNumber: "123456AZERTY1234" // too long
           }
         }
       }
@@ -1126,7 +1126,7 @@ describe("mutation.markAsProcessed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Destination ultérieure : Le numéro d'identification ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
+          "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
       })
     ]);
   });
@@ -1144,7 +1144,7 @@ describe("mutation.markAsProcessed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "markAsProcessed">,
       MutationMarkAsProcessedArgs
     >(MARK_AS_PROCESSED, {
@@ -1169,7 +1169,7 @@ describe("mutation.markAsProcessed", () => {
     expect(errors).toBeUndefined();
   });
 
-  test("nextDestinationNotificationNumber should be mandatory when nextDestination.company is foreign when noTraceability is true", async () => {
+  test("nextDestinationNotificationNumber should not be mandatory when nextDestination.company is foreign when noTraceability is false", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,

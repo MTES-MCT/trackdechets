@@ -1352,22 +1352,21 @@ const withNextDestination = (required: boolean) =>
             wasteDetailsCode: string,
             nextDestinationCompanyExtraEuropeanId: string
           ) =>
-            nextDestinationCompanyExtraEuropeanId &&
+            !!nextDestinationCompanyExtraEuropeanId &&
             isDangerous(wasteDetailsCode),
           then: schema =>
             schema
-              .matches(
-                /^[\w\s]{15}$/,
+              .max(
+                15,
                 "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
               )
-              .requiredIf(
-                required,
+              .required(
                 "Destination ultérieure : le numéro de notification est obligatoire"
               ),
           otherwise: schema =>
             schema
-              .matches(
-                /^[\w\s]{15}$|^$/,
+              .max(
+                15,
                 "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
               )
               .notRequired()
@@ -1452,7 +1451,7 @@ const traceabilityBreakForbidden = yup.object({
 
 // 11 - Réalisation de l’opération :
 const processedInfoSchemaFn: (
-  value: any
+  value: ProcessedInfo & { wasteDetailscode: string; }
 ) => yup.SchemaOf<ProcessedInfo> = value => {
   const base = yup.object({
     processedBy: yup
@@ -1505,6 +1504,7 @@ const processedInfoSchemaFn: (
   });
 
   if (
+    value?.processingOperationDone &&
     PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
       value?.processingOperationDone
     )
