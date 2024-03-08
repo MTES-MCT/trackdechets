@@ -70,12 +70,13 @@ export async function operationHook(args: OperationHookArgs) {
       let quantityReceived = finalForm.quantityReceived;
       if (formWithInitialForms.emitterType === "APPENDIX2") {
         // affect only the fraction grouped of initialForm to quantity.
-        const groupedInitialForm = formWithInitialForms.grouping.find(
-          group => group.initialFormId === initialForm.id
+        formWithInitialForms.grouping.map(
+          ({ initialForm: initialFormGrouped, quantity }) => {
+            if (initialFormGrouped.id === initialForm.id) {
+              quantityReceived = quantity;
+            }
+          }
         );
-        if (groupedInitialForm) {
-          quantityReceived = groupedInitialForm.quantity;
-        }
       }
 
       if (

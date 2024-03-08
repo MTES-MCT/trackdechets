@@ -247,6 +247,7 @@ describe("Test Form OperationHook job", () => {
         emitterCompanyAddress: "40 boulevard Voltaire 13001 Marseille",
         recipientCompanySiret: collectorCompany.siret,
         quantityReceived: 100,
+        quantityGrouped: 99,
         processingOperationDone: "R 1"
       }
     });
@@ -257,6 +258,7 @@ describe("Test Form OperationHook job", () => {
         emitterCompanyAddress: "40 boulevard Voltaire 13001 Marseille",
         recipientCompanySiret: collectorCompany.siret,
         quantityReceived: 30,
+        quantityGrouped: 29,
         processingOperationDone: "R 2"
       }
     });
