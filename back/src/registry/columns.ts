@@ -44,7 +44,7 @@ const formatOperationCode = (code?: string) =>
 const formatFinalOperations = (val?: string[]) =>
   val ? val.map(quant => quant.replace(/ /g, "")).join("; ") : ""; // be consistent and remove all white spaces
 const formatFinalReceptionWeights = (val?: number[]) =>
-  val ? val.map(quant => quant.toFixed(6)).join("; ") : "";
+  val ? val.map(quant => quant.toFixed(2)).join("; ") : "";
 
 export const columns: Column[] = [
   // Dénomination, nature et quantité :

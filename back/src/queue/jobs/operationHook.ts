@@ -63,25 +63,9 @@ export async function operationHook(args: OperationHookArgs) {
   // L'upsert FinalOperation n'est appelé qu'en cas de traitement final ou de rupture de traçabilité
   // Sinon on supprime les FinalOperations liés à finalForm et aux initialForms
   if (
-    !isFinalOperationCode(finalForm.processingOperationDone!) ||
+    isFinalOperationCode(finalForm.processingOperationDone!) ||
     finalForm.noTraceability === true
   ) {
-    for (const initialForm of initialForms) {
-      try {
-        await prisma.finalOperation.delete({
-          where: {
-            formId_finalBsdReadableId: {
-              formId: initialForm.id,
-              finalBsdReadableId: finalForm.readableId
-            }
-          }
-        });
-      } catch (e) {
-        // if does not exists, ignore and continue
-        continue;
-      }
-    }
-  } else {
     for (const initialForm of initialForms) {
       let quantityReceived = finalForm.quantityReceived;
       if (formWithInitialForms.emitterType === "APPENDIX2") {
@@ -118,9 +102,7 @@ export async function operationHook(args: OperationHookArgs) {
           }
         },
         update: {
-          quantity: {
-            increment: data.quantity
-          },
+          quantity: data.quantity,
           operationCode: finalForm.processingOperationDone!,
           destinationCompanySiret: finalForm.recipientCompanySiret!,
           destinationCompanyName: finalForm.recipientCompanyName!
@@ -134,5 +116,22 @@ export async function operationHook(args: OperationHookArgs) {
         initialFormId: initialForm.id
       });
     }
+  } else {
+    for (const initialForm of initialForms) {
+      try {
+        await prisma.finalOperation.delete({
+          where: {
+            formId_finalBsdReadableId: {
+              formId: initialForm.id,
+              finalBsdReadableId: finalForm.readableId
+            }
+          }
+        });
+      } catch (e) {
+        // if does not exists, ignore and continue
+        continue;
+      }
+    }
+
   }
 }
