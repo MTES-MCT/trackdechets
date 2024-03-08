@@ -8,6 +8,7 @@ import {
   formWithTempStorageFactory,
   formFactory
 } from "../../../__tests__/factories";
+import getReadableId from "../../../forms/readableId";
 
 describe("Test Form OperationHook job", () => {
   let emitter: { user: User; company: Company };
@@ -35,7 +36,7 @@ describe("Test Form OperationHook job", () => {
     });
   });
 
-  it("updates final operations for final operation code", async () => {
+  it("updates final operations for temporary storages of 2 levels with a final operation code", async () => {
     const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
       UserRole.MEMBER,
       {
@@ -92,9 +93,77 @@ describe("Test Form OperationHook job", () => {
       destinationCompanySiret: updatedForm.forwardedIn!.recipientCompanySiret!,
       destinationCompanyName: updatedForm.forwardedIn!.recipientCompanyName!
     });
+
+    // forward another time from formWithTempStorage.forwardedInId
+    const forwardedInBis = await prisma.form.update({
+      where: { id: formWithTempStorage.forwardedInId! },
+      include: { forwardedIn: true },
+      data: {
+        forwardedIn: {
+          create: {
+            emitterCompanySiret: ttr.siret,
+            emitterCompanyName: ttr.name,
+            recipientCompanySiret: destination.company.siret,
+            recipientCompanyName: destination.company.name,
+            quantityReceived: 100,
+            receivedAt: new Date(),
+            processingOperationDone: "R 1",
+            ownerId: ttrUser.id,
+            readableId: getReadableId()
+          }
+        }
+      }
+    });
+    // Manually execute operationHook to simulate markAsProcessed
+    await operationHook({
+      finalFormId: forwardedInBis.forwardedInId!,
+      initialFormId: forwardedInBis.forwardedInId!
+    });
+
+    const level2Form = await prisma.form.findUniqueOrThrow({
+      where: { id: forwardedInBis.id },
+      include: { finalOperations: true, forwardedIn: true }
+    });
+
+    // the in-between BSD has 1 final operation
+    expect(level2Form.finalOperations.length).toStrictEqual(1);
+
+    expect(level2Form?.finalOperations[0]).toMatchObject({
+      formId: level2Form.id,
+      finalBsdReadableId: level2Form.forwardedIn!.readableId,
+      quantity: level2Form.forwardedIn!.quantityReceived!,
+      operationCode: level2Form.forwardedIn!.processingOperationDone!,
+      destinationCompanySiret: level2Form.forwardedIn!.recipientCompanySiret!,
+      destinationCompanyName: level2Form.forwardedIn!.recipientCompanyName!
+    });
+
+    // The original BSD has 2 final operations
+    const updatedFormBis = await prisma.form.findUniqueOrThrow({
+      where: { id: formWithTempStorage.id },
+      include: { finalOperations: true, forwardedIn: true }
+    });
+    expect(updatedFormBis.finalOperations.length).toStrictEqual(2);
+
+    expect(updatedFormBis?.finalOperations[0]).toMatchObject({
+      formId: updatedForm.id,
+      finalBsdReadableId: updatedForm.forwardedIn!.readableId,
+      quantity: updatedForm.forwardedIn!.quantityReceived!,
+      operationCode: updatedForm.forwardedIn!.processingOperationDone!,
+      destinationCompanySiret: updatedForm.forwardedIn!.recipientCompanySiret!,
+      destinationCompanyName: updatedForm.forwardedIn!.recipientCompanyName!
+    });
+
+    expect(updatedFormBis?.finalOperations[1]).toMatchObject({
+      formId: level2Form.id,
+      finalBsdReadableId: level2Form.forwardedIn!.readableId,
+      quantity: level2Form.forwardedIn!.quantityReceived!,
+      operationCode: level2Form.forwardedIn!.processingOperationDone!,
+      destinationCompanySiret: level2Form.forwardedIn!.recipientCompanySiret!,
+      destinationCompanyName: level2Form.forwardedIn!.recipientCompanyName!
+    });
   });
 
-  it("empties final operations for noTraceability", async () => {
+  it("updates final operations for noTraceability = true", async () => {
     const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
       UserRole.MEMBER,
       {
@@ -131,7 +200,7 @@ describe("Test Form OperationHook job", () => {
         recipientCompanySiret: destination.siret,
         quantityReceived: 100,
         receivedAt: new Date(),
-        processingOperationDone: "NOT_APPLICABLE",
+        processingOperationDone: "D 13",
         // TRUE
         noTraceability: true
       }
@@ -149,7 +218,13 @@ describe("Test Form OperationHook job", () => {
       include: { finalOperations: true, forwardedIn: true }
     });
 
-    expect(updatedForm?.finalOperations).toEqual([]);
+    expect(updatedForm?.finalOperations[0]).toMatchObject({
+      destinationCompanyName: "Incinérateur du Grand Est",
+      destinationCompanySiret: destination.siret,
+      finalBsdReadableId: formWithTempStorage.forwardedIn!.readableId,
+      operationCode: "D 13",
+      quantity: 100
+    });
   });
 
   it("updates final operations of an appendix2", async () => {
@@ -175,6 +250,16 @@ describe("Test Form OperationHook job", () => {
         processingOperationDone: "R 1"
       }
     });
+    const appendix2Bis = await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        emitterCompanyAddress: "40 boulevard Voltaire 13001 Marseille",
+        recipientCompanySiret: collectorCompany.siret,
+        quantityReceived: 30,
+        processingOperationDone: "R 2"
+      }
+    });
 
     const regroupementForm = await formFactory({
       ownerId: collector.id,
@@ -197,17 +282,30 @@ describe("Test Form OperationHook job", () => {
           }
         },
         grouping: {
-          create: {
-            initialFormId: appendix2.id,
-            quantity: 10
+          createMany: {
+            data: [
+              {
+                initialFormId: appendix2.id,
+                quantity: 10
+              },
+              {
+                initialFormId: appendix2Bis.id,
+                quantity: 20
+              }
+            ]
           }
         }
       }
     });
+
     // Manually execute operationHook to simulate nothing happens
     await operationHook({
       finalFormId: appendix2.id,
       initialFormId: appendix2.id
+    });
+    await operationHook({
+      finalFormId: appendix2Bis.id,
+      initialFormId: appendix2Bis.id
     });
 
     const notUpdatedInitialForm = await prisma.form.findUniqueOrThrow({
@@ -232,15 +330,32 @@ describe("Test Form OperationHook job", () => {
       where: { id: appendix2.id },
       include: { finalOperations: true }
     });
-    const groupedInitialForm = updatedRegroupementForm.grouping.find(
+    const groupedInitialForm1 = updatedRegroupementForm.grouping.find(
       group => group.initialFormId === appendix2.id
     );
+    const groupedInitialForm2 = updatedRegroupementForm.grouping.find(
+      group => group.initialFormId === appendix2Bis.id
+    );
+
     expect(updatedInitialForm.finalOperations.length).toStrictEqual(1);
 
     expect(updatedInitialForm.finalOperations[0]).toMatchObject({
       formId: updatedInitialForm.id,
       finalBsdReadableId: updatedRegroupementForm!.readableId,
-      quantity: groupedInitialForm!.quantity!,
+      quantity: groupedInitialForm1!.quantity!,
+      operationCode: updatedRegroupementForm.processingOperationDone!,
+      destinationCompanySiret: updatedRegroupementForm.recipientCompanySiret!,
+      destinationCompanyName: updatedRegroupementForm.recipientCompanyName!
+    });
+
+    const updatedInitialFormBis = await prisma.form.findUniqueOrThrow({
+      where: { id: appendix2Bis.id },
+      include: { finalOperations: true }
+    });
+    expect(updatedInitialFormBis.finalOperations[0]).toMatchObject({
+      formId: updatedInitialFormBis.id,
+      finalBsdReadableId: updatedRegroupementForm!.readableId,
+      quantity: groupedInitialForm2!.quantity!,
       operationCode: updatedRegroupementForm.processingOperationDone!,
       destinationCompanySiret: updatedRegroupementForm.recipientCompanySiret!,
       destinationCompanyName: updatedRegroupementForm.recipientCompanyName!
