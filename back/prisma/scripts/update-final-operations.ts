@@ -19,13 +19,16 @@ export class UpdateFinalOperationUpdater implements Updater {
     do {
       finalOperationCodeForms = await prisma.form.findMany({
         where: {
-          OR: [{
-            processingOperationDone: {
-              in: FINAL_OPERATION_CODES
+          OR: [
+            {
+              processingOperationDone: {
+                in: FINAL_OPERATION_CODES
+              }
+            },
+            {
+              noTraceability: true
             }
-          }, {
-            noTraceability: true
-          }]
+          ]
         },
         select: {
           id: true

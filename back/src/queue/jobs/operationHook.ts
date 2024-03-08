@@ -132,6 +132,5 @@ export async function operationHook(args: OperationHookArgs) {
         continue;
       }
     }
-
   }
 }

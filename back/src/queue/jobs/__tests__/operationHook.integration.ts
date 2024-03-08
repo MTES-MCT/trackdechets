@@ -131,7 +131,7 @@ describe("Test Form OperationHook job", () => {
         recipientCompanySiret: destination.siret,
         quantityReceived: 100,
         receivedAt: new Date(),
-        processingOperationDone: "NOT_APPLICABLE",
+        processingOperationDone: "D 13",
         // TRUE
         noTraceability: true
       }
@@ -149,7 +149,13 @@ describe("Test Form OperationHook job", () => {
       include: { finalOperations: true, forwardedIn: true }
     });
 
-    expect(updatedForm?.finalOperations).toEqual([]);
+    expect(updatedForm?.finalOperations[0]).toMatchObject({
+      destinationCompanyName: "Incinérateur du Grand Est",
+      destinationCompanySiret: destination.siret,
+      finalBsdReadableId: formWithTempStorage.forwardedIn!.readableId,
+      operationCode: "D 13",
+      quantity: 100
+    });
   });
 
   it("updates final operations of an appendix2", async () => {
