@@ -1287,12 +1287,7 @@ export const canEditCustomInfoOrTransporterNumberPlate = (
   bsd: BsdDisplay
 ): boolean => {
   if (isBsdd(bsd.type)) {
-    return [
-      "SEALED",
-      "RESEALED",
-      "SIGNED_BY_PRODUCER",
-      "SIGNED_BY_TEMP_STORER"
-    ].includes(bsd.status);
+    return ["SEALED", "RESEALED", "SIGNED_BY_PRODUCER"].includes(bsd.status);
   }
 
   if (isBsda(bsd.type)) {
