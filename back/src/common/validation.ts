@@ -17,6 +17,7 @@ import { prisma } from "@td/prisma";
 import { isForeignVat, isFRVat, isSiret, isVat } from "@td/constants";
 import { UserInputError } from "./errors";
 import { isBase64 } from "../utils";
+import { Decimal } from "decimal.js";
 
 // Poids maximum en tonnes tout mode de transport confondu
 const MAX_WEIGHT_TONNES = 50000;
@@ -42,6 +43,9 @@ export enum WeightUnits {
 export const weight = (unit = WeightUnits.Kilogramme) =>
   yup
     .number()
+    .transform(value => {
+      return Decimal.isDecimal(value) ? value.toNumber() : value;
+    })
     .nullable()
     .min(0, "${path} : le poids doit être supérieur ou égal à 0")
     .max(

@@ -2,7 +2,6 @@ import { prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { expandableFormIncludes, expandFormFromDb } from "../../converter";
-import { Decimal } from "decimal.js-light";
 import { checkCanList } from "../../permissions";
 
 const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
@@ -38,9 +37,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
         : f.quantityReceived;
 
       return (
-        quantityReceived &&
-        quantityReceived > 0 &&
-        new Decimal(quantityReceived).greaterThan(f.quantityGrouped)
+        quantityReceived && quantityReceived.greaterThan(f.quantityGrouped)
       );
     })
     .map(f => expandFormFromDb(f));

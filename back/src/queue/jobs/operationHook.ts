@@ -67,7 +67,7 @@ export async function operationHook(args: OperationHookArgs) {
       isFinalOperationCode(finalForm.processingOperationDone!) ||
       finalForm.noTraceability === true
     ) {
-      let quantityReceived = finalForm.quantityReceived;
+      let quantityReceived = finalForm.quantityReceived?.toNumber();
       if (formWithChainedForms.emitterType === "APPENDIX2") {
         // affect only the fraction grouped of initialForm to quantity.
         formWithChainedForms.grouping.map(
@@ -80,7 +80,7 @@ export async function operationHook(args: OperationHookArgs) {
       }
 
       if (
-        quantityReceived === null ||
+        quantityReceived == null ||
         finalForm.processingOperationDone === null
       ) {
         continue;

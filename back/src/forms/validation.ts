@@ -9,7 +9,7 @@ import {
   WasteAcceptationStatus,
   OperationMode
 } from "@prisma/client";
-import { Decimal } from "decimal.js-light";
+import { Decimal } from "decimal.js";
 import { checkVAT } from "jsvat";
 import countries from "world-countries";
 import * as yup from "yup";
@@ -1962,7 +1962,7 @@ export async function validateAppendix1Groupement(
 
     return {
       form: initialForm,
-      quantity: initialForm.quantityReceived ?? 0
+      quantity: initialForm.quantityReceived?.toNumber() ?? 0
     };
   });
 

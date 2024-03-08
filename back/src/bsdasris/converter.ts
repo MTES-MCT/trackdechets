@@ -29,7 +29,8 @@ import {
   BsdasriEcoOrganisme,
   BsdasriEcoOrganismeInput,
   BsdasriIdentification,
-  BsdasriIdentificationInput
+  BsdasriIdentificationInput,
+  BsdasriStatus
 } from "../generated/graphql/types";
 import {
   nullIfNoValues,
@@ -38,8 +39,8 @@ import {
   chain,
   undefinedOrDefault
 } from "../common/converter";
-import { Bsdasri, BsdasriStatus } from "@prisma/client";
-import { Decimal } from "decimal.js-light";
+import { Bsdasri } from "@prisma/client";
+import { Decimal } from "decimal.js";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdasriForElastic } from "./elastic";
 
@@ -83,7 +84,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
         }),
 
         weight: nullIfNoValues<BsdasriWeight>({
-          value: bsdasri.emitterWasteWeightValue,
+          value: bsdasri.emitterWasteWeightValue?.toNumber(),
           // due to a previous validation bug we might have null weigh value and not null isEstimate, thus breaking gql required return type
 
           isEstimate: !!bsdasri.emitterWasteWeightValue
@@ -122,7 +123,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
         plates: bsdasri.transporterTransportPlates,
 
         weight: nullIfNoValues<BsdasriWeight>({
-          value: bsdasri.transporterWasteWeightValue,
+          value: bsdasri.transporterWasteWeightValue?.toNumber(),
           // due to a previous validation bug we might have null weigh value and not null isEstimate, thus breaking gql required return type
           isEstimate: !!bsdasri.transporterWasteWeightValue
             ? bsdasri.transporterWasteWeightIsEstimate
@@ -135,7 +136,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
         acceptation: nullIfNoValues<BsdasriWasteAcceptation>({
           status: bsdasri.transporterAcceptationStatus,
           refusalReason: bsdasri.transporterWasteRefusalReason,
-          refusedWeight: bsdasri.transporterWasteRefusedWeightValue
+          refusedWeight: bsdasri.transporterWasteRefusedWeightValue?.toNumber()
         }),
         takenOverAt: processDate(bsdasri.transporterTakenOverAt),
         handedOverAt: bsdasri.handedOverToRecipientAt,
@@ -163,7 +164,8 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
         acceptation: nullIfNoValues<BsdasriWasteAcceptation>({
           status: bsdasri.destinationReceptionAcceptationStatus,
           refusalReason: bsdasri.destinationReceptionWasteRefusalReason,
-          refusedWeight: bsdasri.destinationReceptionWasteRefusedWeightValue
+          refusedWeight:
+            bsdasri.destinationReceptionWasteRefusedWeightValue?.toNumber()
         }),
         date: processDate(bsdasri.destinationReceptionDate),
         signature: nullIfNoValues<BsdasriSignature>({
@@ -173,7 +175,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
       }),
       operation: nullIfNoValues<BsdasriOperation>({
         weight: nullIfNoValues<BsdasriOperationWeight>({
-          value: bsdasri.destinationReceptionWasteWeightValue
+          value: bsdasri.destinationReceptionWasteWeightValue?.toNumber()
         }),
         code: bsdasri.destinationOperationCode,
         mode: bsdasri.destinationOperationMode,
@@ -234,7 +236,7 @@ export const expandGroupingDasri = (dasri: Bsdasri): InitialBsdasri => ({
 
   volume: dasri.destinationReceptionWasteVolume,
 
-  weight: dasri.destinationReceptionWasteWeightValue,
+  weight: dasri.destinationReceptionWasteWeightValue?.toNumber(),
 
   takenOverAt: processDate(dasri.transporterTakenOverAt),
 
@@ -250,7 +252,7 @@ export const expandSynthesizingDasri = (dasri: Bsdasri): InitialBsdasri => ({
 
   volume: dasri.emitterWasteVolume ?? 0,
 
-  weight: dasri?.emitterWasteWeightValue ?? 0,
+  weight: dasri?.emitterWasteWeightValue?.toNumber() ?? 0,
 
   takenOverAt: dasri.transporterTakenOverAt,
 

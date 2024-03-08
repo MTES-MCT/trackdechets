@@ -656,7 +656,7 @@ export function expandFormFromDb(
       ...getDeprecatedPackagingApiFields(
         form.wasteDetailsPackagingInfos as PackagingInfo[]
       ),
-      quantity: form.wasteDetailsQuantity,
+      quantity: form.wasteDetailsQuantity?.toNumber(),
       quantityType: form.wasteDetailsQuantityType,
       consistence: form.wasteDetailsConsistence,
       pop: form.wasteDetailsPop,
@@ -719,8 +719,8 @@ export function expandFormFromDb(
     ),
     signedAt: processDate(forwardedIn ? forwardedIn.signedAt : form.signedAt),
     quantityReceived: forwardedIn
-      ? forwardedIn.quantityReceived
-      : form.quantityReceived,
+      ? forwardedIn.quantityReceived?.toNumber()
+      : form.quantityReceived?.toNumber(),
     quantityGrouped: form.quantityGrouped,
     processingOperationDone: forwardedIn
       ? forwardedIn.processingOperationDone
@@ -782,7 +782,7 @@ export function expandFormFromDb(
       ? {
           temporaryStorer: {
             quantityType: form.quantityReceivedType,
-            quantityReceived: form.quantityReceived,
+            quantityReceived: form.quantityReceived?.toNumber(),
             wasteAcceptationStatus: form.wasteAcceptationStatus,
             wasteRefusalReason: form.wasteRefusalReason,
             receivedAt: processDate(form.receivedAt),
@@ -814,7 +814,7 @@ export function expandFormFromDb(
             ...getDeprecatedPackagingApiFields(
               forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[]
             ),
-            quantity: forwardedIn.wasteDetailsQuantity,
+            quantity: forwardedIn.wasteDetailsQuantity?.toNumber(),
             quantityType: forwardedIn.wasteDetailsQuantityType,
             consistence: forwardedIn.wasteDetailsConsistence,
             pop: forwardedIn.wasteDetailsPop,
