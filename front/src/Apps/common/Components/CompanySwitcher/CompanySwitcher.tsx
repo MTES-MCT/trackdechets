@@ -180,8 +180,13 @@ const CompanySwitcher = ({
     const searchCompanies = data?.myCompanies?.edges.map(({ node }) => node);
 
     if (searchCompanies && searchCompanies.length > 0)
-      return searchCompanies?.map(company =>
-        displayedItem(company, () => handleOnClickCompany(company.orgId))
+      return (
+        <>
+          <div className="company-switcher-count">{`${searchCompanies.length} sur ${companies.length} établissements`}</div>
+          {searchCompanies?.map(company =>
+            displayedItem(company, () => handleOnClickCompany(company.orgId))
+          )}
+        </>
       );
 
     return <div className="company-switcher-message">Aucun résultat</div>;
