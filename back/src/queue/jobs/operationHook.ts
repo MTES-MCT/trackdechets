@@ -130,9 +130,5 @@ export async function operationHook(args: OperationHookArgs) {
       finalFormId: finalForm.id,
       initialFormId: initialForm.id
     });
-    await operationHooksQueue.add({
-      finalFormId: initialForm.id,
-      initialFormId: finalForm.id
-    });
   }
 }
