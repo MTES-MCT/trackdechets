@@ -94,22 +94,18 @@ export async function operationHook(args: OperationHookArgs) {
         destinationCompanyName: finalForm.recipientCompanyName || "",
         formId: initialForm.id
       };
-
-      await prisma.finalOperation.upsert({
-        where: {
-          formId_finalBsdReadableId: {
+      if (
+        await prisma.finalOperation.count({
+          where: {
             finalBsdReadableId: finalForm.readableId,
             formId: initialForm.id
           }
-        },
-        update: {
-          quantity: data.quantity,
-          operationCode: finalForm.processingOperationDone!,
-          destinationCompanySiret: finalForm.recipientCompanySiret!,
-          destinationCompanyName: finalForm.recipientCompanyName!
-        },
-        create: data
-      });
+        }) === 0
+      ) {
+        await prisma.finalOperation.create({
+          data
+        });
+      }
     } else {
       try {
         await prisma.finalOperation.delete({
@@ -121,7 +117,7 @@ export async function operationHook(args: OperationHookArgs) {
           }
         });
       } catch (e) {
-        // if does not exists, ignore and continue
+        // ignore and continue
         continue;
       }
     }
