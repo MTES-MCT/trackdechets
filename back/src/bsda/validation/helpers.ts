@@ -23,10 +23,7 @@ import { safeInput } from "../../common/converter";
  * typés en string côté GraphQL mais en enum côté Zod ce qui nous oblige
  * à faire un casting de type.
  */
-export function graphQlInputToZodBsda(
-  input: BsdaInput,
-  isDraft = false
-): ZodBsda {
+export function graphQlInputToZodBsda(input: BsdaInput): ZodBsda {
   const {
     wasteCode,
     destinationPlannedOperationCode,
@@ -38,7 +35,6 @@ export function graphQlInputToZodBsda(
   const flattenedBsdaTransporter = flattenBsdaTransporterInput(input);
 
   return safeInput({
-    isDraft,
     ...flattenedBsdaInput,
     ...flattenedBsdaTransporter,
     wasteCode: wasteCode as ZodWasteCodeEnum,
