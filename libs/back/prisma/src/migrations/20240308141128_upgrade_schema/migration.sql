@@ -43,6 +43,9 @@ ALTER TABLE "BsddRevisionRequest" ALTER COLUMN "status" SET NOT NULL;
 ALTER TABLE "BsddRevisionRequestApproval" ALTER COLUMN "status" SET NOT NULL;
 
 -- AlterTable
+ALTER TABLE "Bsff" ALTER COLUMN "transporterRecepisseIsExempted" DROP DEFAULT;
+
+-- AlterTable
 ALTER TABLE "Company" ALTER COLUMN "allowBsdasriTakeOverWithoutSignature" SET NOT NULL;
 
 -- AlterTable

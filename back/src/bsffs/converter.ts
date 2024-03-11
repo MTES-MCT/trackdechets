@@ -4,7 +4,8 @@ import {
   safeInput,
   processDate,
   chain,
-  undefinedOrDefault
+  undefinedOrDefault,
+  processDecimal
 } from "../common/converter";
 import * as GraphQL from "../generated/graphql/types";
 import { BsffPackaging, BsffPackagingType } from "@prisma/client";
@@ -200,7 +201,9 @@ export function expandBsffFromDB(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       adr: prismaBsff.wasteAdr
     }),
     weight: nullIfNoValues<GraphQL.BsffWeight>({
-      value: prismaBsff.weightValue?.toNumber(),
+      value: prismaBsff.weightValue
+        ? processDecimal(prismaBsff.weightValue).toNumber()
+        : null,
       isEstimate: prismaBsff.weightIsEstimate
     }),
     transporter: nullIfNoValues<GraphQL.BsffTransporter>({
@@ -432,7 +435,7 @@ export function expandFicheInterventionBsffFromDB(
   return {
     id: prismaFicheIntervention.id,
     numero: prismaFicheIntervention.numero,
-    weight: prismaFicheIntervention.weight?.toNumber(),
+    weight: processDecimal(prismaFicheIntervention.weight).toNumber(),
     postalCode: prismaFicheIntervention.postalCode,
     detenteur: nullIfNoValues<GraphQL.BsffDetenteur>({
       company: nullIfNoValues<GraphQL.FormCompany>({

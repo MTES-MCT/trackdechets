@@ -348,7 +348,7 @@ CREATE TABLE "Form" (
     "nextDestinationCompanyMail" TEXT,
     "nextDestinationCompanyCountry" TEXT,
     "nextDestinationCompanyVatNumber" VARCHAR(30),
-    "nextDestinationNotificationNumber" VARCHAR(6),
+    "nextDestinationNotificationNumber" TEXT,
     "nextDestinationCompanyExtraEuropeanId" TEXT,
     "nextTransporterOrgId" VARCHAR(30),
     "emittedAt" TIMESTAMPTZ(6),

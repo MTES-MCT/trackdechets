@@ -437,7 +437,7 @@ model Form {
   nextDestinationCompanyMail            String?
   nextDestinationCompanyCountry         String?
   nextDestinationCompanyVatNumber       String?                 @db.VarChar(30)
-  nextDestinationNotificationNumber     String?                 @db.VarChar(6)
+  nextDestinationNotificationNumber     String?
   nextDestinationCompanyExtraEuropeanId String?
   nextTransporterOrgId                  String?                 @db.VarChar(30)
   emittedAt                             DateTime?               @db.Timestamptz(6)
@@ -1115,7 +1115,7 @@ model Bsff {
   transporterCustomInfo               String?
   transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
   transporterTransportPlates          String[]
-  transporterRecepisseIsExempted      Boolean?       @default(false)
+  transporterRecepisseIsExempted      Boolean?
   transporterRecepisseNumber          String?
   transporterRecepisseDepartment      String?
   transporterRecepisseValidityLimit   DateTime?      @db.Timestamptz(6)

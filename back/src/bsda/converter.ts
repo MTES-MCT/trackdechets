@@ -3,7 +3,8 @@ import {
   safeInput,
   processDate,
   chain,
-  undefinedOrDefault
+  undefinedOrDefault,
+  processDecimal
 } from "../common/converter";
 
 import {
@@ -104,7 +105,7 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
     weight: nullIfNoValues<BsdaWeight>({
       isEstimate: bsda.weightIsEstimate,
       value: bsda.weightValue
-        ? bsda.weightValue.dividedBy(1000).toNumber()
+        ? processDecimal(bsda.weightValue)!.dividedBy(1000).toNumber()
         : null
     }),
     destination: nullIfNoValues<BsdaDestination>({
@@ -124,7 +125,9 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
         refusalReason: bsda.destinationReceptionRefusalReason,
         date: processDate(bsda.destinationReceptionDate),
         weight: bsda.destinationReceptionWeight
-          ? bsda.destinationReceptionWeight.dividedBy(1000).toNumber()
+          ? processDecimal(bsda.destinationReceptionWeight)
+              .dividedBy(1000)
+              .toNumber()
           : null
       }),
       operation: nullIfNoValues<BsdaOperation>({
