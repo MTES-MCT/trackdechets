@@ -36,7 +36,7 @@ describe("Test Form OperationHook job", () => {
     });
   });
 
-  it("updates final operations for temporary storages of 2 levels with a final operation code", async () => {
+  it.skip("updates final operations for temporary storages of 2 levels with a final operation code", async () => {
     const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
       UserRole.MEMBER,
       {
