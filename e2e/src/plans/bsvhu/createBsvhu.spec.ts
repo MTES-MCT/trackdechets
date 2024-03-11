@@ -47,7 +47,9 @@ test.describe.serial("Cahier de recette de création des BSVHU", async () => {
 
       await createBsvhu(page, {
         emitter: companies.companyN,
-        transporter: companies.companyB
+        transporter: companies.companyB,
+        destination: companies.companyI,
+        broyeur: companies.companyO
       });
     });
   });
