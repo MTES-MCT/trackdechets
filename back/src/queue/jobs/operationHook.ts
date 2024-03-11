@@ -43,8 +43,8 @@ export async function operationHook(args: OperationHookArgs) {
       noTraceability: true
     }
   });
-  // On récupère tous les bordereaux initiaux
-  const formWithInitialForms = await prisma.form.findUniqueOrThrow({
+  // On récupère tous les bordereaux liés
+  const formWithChainedForms = await prisma.form.findUniqueOrThrow({
     where: {
       id: initialFormId,
       isDeleted: false
@@ -56,21 +56,21 @@ export async function operationHook(args: OperationHookArgs) {
   });
 
   const initialForms = [
-    formWithInitialForms.forwarding,
-    ...(formWithInitialForms.grouping ?? []).map(g => g.initialForm)
+    formWithChainedForms.forwarding,
+    ...(formWithChainedForms.grouping ?? []).map(g => g.initialForm)
   ].filter(Boolean);
 
-  // L'upsert FinalOperation n'est appelé qu'en cas de traitement final ou de rupture de traçabilité
-  // Sinon on supprime les FinalOperations liés à finalForm et aux initialForms
-  if (
-    isFinalOperationCode(finalForm.processingOperationDone!) ||
-    finalForm.noTraceability === true
-  ) {
-    for (const initialForm of initialForms) {
+  for (const initialForm of initialForms) {
+    // L'upsert FinalOperation n'est appelé qu'en cas de traitement final ou de rupture de traçabilité
+    // Sinon on supprime les FinalOperations liés à finalForm et aux initialForms
+    if (
+      isFinalOperationCode(finalForm.processingOperationDone!) ||
+      finalForm.noTraceability === true
+    ) {
       let quantityReceived = finalForm.quantityReceived;
-      if (formWithInitialForms.emitterType === "APPENDIX2") {
+      if (formWithChainedForms.emitterType === "APPENDIX2") {
         // affect only the fraction grouped of initialForm to quantity.
-        formWithInitialForms.grouping.map(
+        formWithChainedForms.grouping.map(
           ({ initialForm: initialFormGrouped, quantity }) => {
             if (initialFormGrouped.id === initialForm.id) {
               quantityReceived = quantity;
@@ -110,15 +110,7 @@ export async function operationHook(args: OperationHookArgs) {
         },
         create: data
       });
-
-      // Applique le hook de façon récursive sur les bordereaux initiaux
-      await operationHooksQueue.add({
-        finalFormId: finalForm.id,
-        initialFormId: initialForm.id
-      });
-    }
-  } else {
-    for (const initialForm of initialForms) {
+    } else {
       try {
         await prisma.finalOperation.delete({
           where: {
@@ -133,5 +125,10 @@ export async function operationHook(args: OperationHookArgs) {
         continue;
       }
     }
+    // Applique l'operation de façon récursive sur les bordereaux initiaux
+    await operationHooksQueue.add({
+      finalFormId: finalForm.id,
+      initialFormId: initialForm.id
+    });
   }
 }

@@ -36,7 +36,7 @@ describe("Test Form OperationHook job", () => {
     });
   });
 
-  it.skip("updates final operations for temporary storages of 2 levels with a final operation code", async () => {
+  it("updates final operations for two temporary storages with a final operation code", async () => {
     const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
       UserRole.MEMBER,
       {
@@ -44,18 +44,19 @@ describe("Test Form OperationHook job", () => {
       }
     );
 
-    const formWithTempStorage = await formWithTempStorageFactory({
+    // original BSDD with forwarded
+    const { id, forwardedInId } = await formWithTempStorageFactory({
       ownerId: ttrUser.id,
       opt: {
         emitterCompanySiret: emitter.company.siret,
         wasteDetailsCode: "05 01 02*",
-        status: Status.PROCESSED,
+        status: Status.TEMP_STORER_ACCEPTED,
         quantityReceived: 1000,
         createdAt: new Date("2021-04-01"),
         sentAt: new Date("2021-04-01"),
         receivedAt: new Date("2021-04-01"),
         processedAt: new Date("2021-04-01"),
-        processingOperationDone: "R 1",
+        processingOperationDone: "D 13",
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
@@ -74,17 +75,26 @@ describe("Test Form OperationHook job", () => {
       }
     });
 
-    expect(formWithTempStorage.forwardedIn).toBeDefined();
-    // Manually execute operationHook to simulate markAsProcessed
+    // Manually execute operationHook to simulate the chain
     await operationHook({
-      finalFormId: formWithTempStorage.forwardedIn!.id,
-      initialFormId: formWithTempStorage.forwardedIn!.id
+      finalFormId: id,
+      initialFormId: id
     });
-    const updatedForm = await prisma.form.findUniqueOrThrow({
-      where: { id: formWithTempStorage.id },
-      include: { finalOperations: true, forwardedIn: true }
+    await operationHook({
+      finalFormId: id,
+      initialFormId: forwardedInId!
+    });
+    await operationHook({
+      finalFormId: forwardedInId!,
+      initialFormId: forwardedInId!
     });
 
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id },
+      include: { finalOperations: true, forwardedIn: true }
+    });
+    // the original form has 1 final operation of the forwardedInId
+    expect(updatedForm.finalOperations.length).toStrictEqual(1);
     expect(updatedForm?.finalOperations[0]).toMatchObject({
       formId: updatedForm.id,
       finalBsdReadableId: updatedForm.forwardedIn!.readableId,
@@ -93,12 +103,12 @@ describe("Test Form OperationHook job", () => {
       destinationCompanySiret: updatedForm.forwardedIn!.recipientCompanySiret!,
       destinationCompanyName: updatedForm.forwardedIn!.recipientCompanyName!
     });
-
-    // forward another time from formWithTempStorage.forwardedInId
+    // change to D 13 and forward another time from formWithTempStorage.forwardedInId
     const forwardedInBis = await prisma.form.update({
-      where: { id: formWithTempStorage.forwardedInId! },
+      where: { id: forwardedInId! },
       include: { forwardedIn: true },
       data: {
+        processingOperationDone: "D 13",
         forwardedIn: {
           create: {
             emitterCompanySiret: ttr.siret,
@@ -114,20 +124,51 @@ describe("Test Form OperationHook job", () => {
         }
       }
     });
-    // Manually execute operationHook to simulate markAsProcessed
+    // Manually execute all possible operationHooks to simulate the chain
+    await operationHook({
+      finalFormId: id,
+      initialFormId: id
+    });
+    await operationHook({
+      finalFormId: id,
+      initialFormId: forwardedInId!
+    });
+    await operationHook({
+      finalFormId: forwardedInId!,
+      initialFormId: id
+    });
+    await operationHook({
+      finalFormId: id,
+      initialFormId: forwardedInBis.forwardedInId!
+    });
+    await operationHook({
+      finalFormId: forwardedInBis.forwardedInId!,
+      initialFormId: id
+    });
+    await operationHook({
+      finalFormId: forwardedInId!,
+      initialFormId: forwardedInId!
+    });
+    await operationHook({
+      finalFormId: forwardedInId!,
+      initialFormId: forwardedInBis.forwardedInId!
+    });
+    await operationHook({
+      finalFormId: forwardedInBis.forwardedInId!,
+      initialFormId: forwardedInId!
+    });
     await operationHook({
       finalFormId: forwardedInBis.forwardedInId!,
       initialFormId: forwardedInBis.forwardedInId!
     });
 
     const level2Form = await prisma.form.findUniqueOrThrow({
-      where: { id: forwardedInBis.id },
+      where: { id: forwardedInId! },
       include: { finalOperations: true, forwardedIn: true }
     });
 
-    // the in-between BSD has 1 final operation
+    // the intermediary BSD has 1 final operation of the level2Form.forwardedIn.id
     expect(level2Form.finalOperations.length).toStrictEqual(1);
-
     expect(level2Form?.finalOperations[0]).toMatchObject({
       formId: level2Form.id,
       finalBsdReadableId: level2Form.forwardedIn!.readableId,
@@ -137,29 +178,101 @@ describe("Test Form OperationHook job", () => {
       destinationCompanyName: level2Form.forwardedIn!.recipientCompanyName!
     });
 
-    // The original BSD has 2 final operations
-    const updatedFormBis = await prisma.form.findUniqueOrThrow({
-      where: { id: formWithTempStorage.id },
+    // The original BSD has 1 final operation of the level2Form.forwardedIn
+    const formWithTempStorage = await prisma.form.findUniqueOrThrow({
+      where: { id },
       include: { finalOperations: true, forwardedIn: true }
     });
-    expect(updatedFormBis.finalOperations.length).toStrictEqual(2);
-
-    expect(updatedFormBis?.finalOperations[0]).toMatchObject({
-      formId: updatedForm.id,
-      finalBsdReadableId: updatedForm.forwardedIn!.readableId,
-      quantity: updatedForm.forwardedIn!.quantityReceived!,
-      operationCode: updatedForm.forwardedIn!.processingOperationDone!,
-      destinationCompanySiret: updatedForm.forwardedIn!.recipientCompanySiret!,
-      destinationCompanyName: updatedForm.forwardedIn!.recipientCompanyName!
-    });
-
-    expect(updatedFormBis?.finalOperations[1]).toMatchObject({
-      formId: level2Form.id,
+    expect(formWithTempStorage.finalOperations?.length).toStrictEqual(1);
+    expect(formWithTempStorage.finalOperations[0]).toMatchObject({
+      formId: formWithTempStorage.id,
       finalBsdReadableId: level2Form.forwardedIn!.readableId,
       quantity: level2Form.forwardedIn!.quantityReceived!,
       operationCode: level2Form.forwardedIn!.processingOperationDone!,
       destinationCompanySiret: level2Form.forwardedIn!.recipientCompanySiret!,
       destinationCompanyName: level2Form.forwardedIn!.recipientCompanyName!
+    });
+  });
+
+  it("updates final operations for temporary storage of 1 level with a final operation code only at the end", async () => {
+    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
+      UserRole.MEMBER,
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+
+    // original BSDD with forwarded
+    const { id, forwardedInId } = await formWithTempStorageFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        wasteDetailsCode: "05 01 02*",
+        status: Status.TEMP_STORER_ACCEPTED,
+        quantityReceived: 1000,
+        createdAt: new Date("2021-04-01"),
+        sentAt: new Date("2021-04-01"),
+        receivedAt: new Date("2021-04-01"),
+        processedAt: new Date("2021-04-01"),
+        processingOperationDone: "D 13",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
+          }
+        },
+        recipientCompanySiret: ttr.siret
+      },
+      forwardedInOpts: {
+        emitterCompanySiret: ttr.siret,
+        emitterCompanyName: ttr.name,
+        recipientCompanySiret: destination.company.siret,
+        quantityReceived: 100,
+        receivedAt: new Date(),
+        processingOperationDone: "R 1"
+      }
+    });
+
+    // Manually execute operationHook to simulate the chain
+    await operationHook({
+      finalFormId: id,
+      initialFormId: id
+    });
+    await operationHook({
+      finalFormId: forwardedInId!,
+      initialFormId: id
+    });
+    await operationHook({
+      finalFormId: id,
+      initialFormId: forwardedInId!
+    });
+    await operationHook({
+      finalFormId: forwardedInId!,
+      initialFormId: forwardedInId!
+    });
+
+    const forwardedInForm = await prisma.form.findUniqueOrThrow({
+      where: { id: forwardedInId! },
+      include: { finalOperations: true, forwardedIn: true }
+    });
+
+    // the in-between BSD has 0 final operation
+    expect(forwardedInForm.finalOperations.length).toStrictEqual(0);
+
+    // The original BSD has 2 final operations
+    const formWithTempStorage = await prisma.form.findUniqueOrThrow({
+      where: { id },
+      include: { finalOperations: true, forwardedIn: true }
+    });
+
+    expect(formWithTempStorage.finalOperations?.length).toStrictEqual(1);
+    expect(formWithTempStorage.finalOperations[0]).toMatchObject({
+      formId: formWithTempStorage.id,
+      finalBsdReadableId: forwardedInForm.readableId,
+      quantity: forwardedInForm.quantityReceived,
+      operationCode: forwardedInForm.processingOperationDone,
+      destinationCompanySiret: forwardedInForm.recipientCompanySiret!,
+      destinationCompanyName: forwardedInForm.recipientCompanyName!
     });
   });
 
@@ -179,7 +292,7 @@ describe("Test Form OperationHook job", () => {
       opt: {
         emitterCompanySiret: emitter.company.siret,
         wasteDetailsCode: "05 01 02*",
-        status: Status.PROCESSED,
+        status: Status.ACCEPTED,
         quantityReceived: 1000,
         createdAt: new Date("2021-04-01"),
         sentAt: new Date("2021-04-01"),
@@ -248,7 +361,7 @@ describe("Test Form OperationHook job", () => {
         recipientCompanySiret: collectorCompany.siret,
         quantityReceived: 100,
         quantityGrouped: 99,
-        processingOperationDone: "R 1"
+        processingOperationDone: "D 13"
       }
     });
     const appendix2Bis = await formFactory({
@@ -259,7 +372,7 @@ describe("Test Form OperationHook job", () => {
         recipientCompanySiret: collectorCompany.siret,
         quantityReceived: 30,
         quantityGrouped: 29,
-        processingOperationDone: "R 2"
+        processingOperationDone: "D 13"
       }
     });
 
@@ -317,7 +430,7 @@ describe("Test Form OperationHook job", () => {
 
     expect(notUpdatedInitialForm.finalOperations.length).toStrictEqual(0);
 
-    // Manually execute operationHook to simulate markAsProcessed
+    // Manually execute operationHook to simulate the good process
     await operationHook({
       finalFormId: regroupementForm.id,
       initialFormId: regroupementForm.id
