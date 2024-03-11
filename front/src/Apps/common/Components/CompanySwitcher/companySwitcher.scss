@@ -44,7 +44,7 @@
 .company-switcher-item {
   display: flex;
   justify-content: space-between;
-  height: 64px;
+  flex-direction: column;
   padding: 8px;
   cursor: pointer;
 
@@ -54,16 +54,22 @@
 
   &__content {
     display: flex;
-    flex-direction: column;
+    align-items: end;
     min-width: 0;
+    height: 100%;
+    justify-content: space-between;
+    margin-bottom: 4px;
   }
 
   &__name {
     color: #161616;
     font-size: 14px;
+    height: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    word-break: break-all;
   }
 
   &__infos {
