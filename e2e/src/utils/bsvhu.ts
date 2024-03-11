@@ -1,5 +1,6 @@
 import { Page, expect } from "@playwright/test";
 import { expectInputValue } from "./utils";
+import { toDDMMYYYY } from "./time";
 
 /**
  * Click on create bsd button, and select VHU
@@ -258,6 +259,51 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   await page.getByRole("button", { name: "Créer" }).click();
 };
 
+/**
+ * Verify BSD overview data
+ */
+const verifyOverviewData = async (page, emitter, transporter, destination) => {
+  // Producteur
+  await page.getByRole("tab", { name: "Producteur" }).click();
+  const modalContent = page.getByRole("tabpanel");
+  await expect(await modalContent.getByText(emitter.orgId)).toBeVisible();
+  await expect(await modalContent.getByText(emitter.contact)).toBeVisible();
+  await expect(
+    await modalContent.getByText(emitter.contactPhone)
+  ).toBeVisible();
+  await expect(
+    await modalContent.getByText(emitter.contactEmail)
+  ).toBeVisible();
+
+  // Transporter
+  await page.getByRole("tab", { name: "Transporteur" }).click();
+  await expect(modalContent.getByText(transporter.orgId)).toBeVisible();
+  await expect(modalContent.getByText(transporter.contact)).toBeVisible();
+  await expect(modalContent.getByText(transporter.contactPhone)).toBeVisible();
+  await expect(modalContent.getByText(transporter.contactEmail)).toBeVisible();
+  await expect(
+    modalContent.getByText(transporter.transporterReceipt.receiptNumber)
+  ).toBeVisible();
+  await expect(
+    modalContent.getByText(transporter.transporterReceipt.department)
+  ).toBeVisible();
+  await expect(
+    modalContent.getByText(
+      toDDMMYYYY(transporter.transporterReceipt.validityLimit)
+    )
+  ).toBeVisible();
+
+  // Destination
+  await page.getByRole("tab", { name: "Destinataire" }).click();
+  await expect(modalContent.getByText(destination.orgId)).toBeVisible();
+  await expect(modalContent.getByText(destination.contact)).toBeVisible();
+  await expect(modalContent.getByText(destination.contactPhone)).toBeVisible();
+  await expect(modalContent.getByText(destination.contactEmail)).toBeVisible();
+  await expect(
+    modalContent.getByText(destination.vhuAgrementDemolisseur.agrementNumber)
+  ).toBeVisible();
+};
+
 export const createBsvhu = async (
   page: Page,
   { emitter, transporter, destination, broyeur }
@@ -271,8 +317,39 @@ export const createBsvhu = async (
   await fillTransporterTab(page, transporter);
   await fillDestinationTab(page, destination, broyeur);
 
-  // Make sure VHU pops out in results list
+  // Navigate to BSDs view
   await page.getByRole("link", { name: "Tous les bordereaux" }).click();
-  // (we can't check the ID as we don't know it. Check the waste code)
-  await expect(page.getByText("16 01 06VHU dépollués")).toBeVisible();
+
+  // Make sure VHU pops out in results list
+  const vhuDiv = page.locator(".bsd-card-list li").first();
+  await expect(vhuDiv).toBeVisible();
+
+  // Verify card info
+  await expect(vhuDiv.getByText("16 01 06")).toBeVisible();
+  await expect(vhuDiv.getByText("Brouillon")).toBeVisible();
+  await expect(vhuDiv.getByText("VHU dépollués")).toBeVisible();
+  // Companies names
+  await expect(
+    page.locator("div").filter({ hasText: emitter.name }).first()
+  ).toBeVisible();
+  await expect(
+    page.locator("div").filter({ hasText: transporter.name }).nth(1)
+  ).toBeVisible();
+  await expect(
+    page.locator("div").filter({ hasText: destination.name }).nth(2)
+  ).toBeVisible();
+
+  // Primary button
+  await expect(vhuDiv.getByRole("button").getByText("Publier")).toBeVisible();
+
+  // Secondary buttons
+  await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
+  await expect(vhuDiv.getByRole("button").getByText("Aperçu")).toBeVisible();
+  await expect(vhuDiv.getByRole("button").getByText("Dupliquer")).toBeVisible();
+  await expect(vhuDiv.getByRole("button").getByText("Modifier")).toBeVisible();
+  await expect(vhuDiv.getByRole("button").getByText("Supprimer")).toBeVisible();
+
+  // Open overview and verify data
+  await vhuDiv.getByRole("button").getByText("Aperçu").click();
+  await verifyOverviewData(page, emitter, transporter, destination);
 };
