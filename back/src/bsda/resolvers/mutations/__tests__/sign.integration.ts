@@ -846,7 +846,10 @@ describe("Mutation.Bsda.sign", () => {
           type: "COLLECTION_2710",
           destinationCompanySiret: company.siret,
           workerCompanyName: null,
-          workerCompanySiret: null
+          workerCompanySiret: null,
+          // permet de vérifier que les numéros de scellés ne sont pas
+          //  obligatoires dans le cadre d'un BSDA de collecte en déchetterie
+          wasteSealNumbers: []
         },
         transporterOpt: {
           transporterCompanyName: null,
