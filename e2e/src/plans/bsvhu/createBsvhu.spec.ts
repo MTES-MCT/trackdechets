@@ -8,8 +8,12 @@ import {
 import { selectCompany } from "../../utils/navigation";
 import {
   createBsvhu,
+  duplicateBsvhu,
+  fixAndPublishBsvhu,
+  publishBsvhu,
   verifyCardData,
-  verifyOverviewData
+  verifyOverviewData,
+  deleteBsvhu
 } from "../../utils/bsvhu";
 
 test.describe.serial("Cahier de recette de création des BSVHU", async () => {
@@ -46,7 +50,7 @@ test.describe.serial("Cahier de recette de création des BSVHU", async () => {
       });
     });
 
-    let vhuId;
+    let vhuId, duplicatedVhuId;
 
     await test.step("Création d'un BSVHU", async () => {
       await selectCompany(page, companies.companyN.siret);
@@ -76,6 +80,32 @@ test.describe.serial("Cahier de recette de création des BSVHU", async () => {
         emitter: companies.companyN,
         transporter: companies.companyB,
         destination: companies.companyI
+      });
+    });
+
+    await test.step("Publication du bordereau", async () => {
+      await fixAndPublishBsvhu(page, {
+        id: vhuId
+      });
+    });
+
+    await test.step("Duplication du bordereau", async () => {
+      const { id } = await duplicateBsvhu(page, {
+        id: vhuId
+      });
+
+      duplicatedVhuId = id;
+    });
+
+    await test.step("Publication du bordereau dupliqué", async () => {
+      await publishBsvhu(page, {
+        id: duplicatedVhuId
+      });
+    });
+
+    await test.step("Suppression du bordereau dupliqué", async () => {
+      await deleteBsvhu(page, {
+        id: duplicatedVhuId
       });
     });
   });

@@ -3,6 +3,16 @@ import { expectInputValue } from "./utils";
 import { toDDMMYYYY } from "./time";
 
 /**
+ * In the bsd card list, get the one corresponding to target bsd
+ */
+const getVHUCardDiv = (page: Page, id: string) => {
+  return page
+    .locator(".bsd-card-list li")
+    .filter({ hasText: `N°: ${id}` })
+    .first();
+};
+
+/**
  * Click on create bsd button, and select VHU
  */
 const clickCreateVhuButton = async (page: Page) => {
@@ -296,10 +306,7 @@ export const verifyCardData = async (
   page: Page,
   { id, emitter, transporter, destination }
 ) => {
-  const vhuDiv = page
-    .locator(".bsd-card-list li")
-    .filter({ hasText: `N°: ${id}` })
-    .first();
+  const vhuDiv = getVHUCardDiv(page, id);
 
   // Verify card info
   await expect(vhuDiv.getByText("16 01 06")).toBeVisible();
@@ -335,10 +342,7 @@ export const verifyOverviewData = async (
   { id, emitter, transporter, destination }
 ) => {
   // Open overview and verify data
-  const vhuDiv = page
-    .locator(".bsd-card-list li")
-    .filter({ hasText: `N°: ${id}` })
-    .first();
+  const vhuDiv = getVHUCardDiv(page, id);
   await vhuDiv.getByRole("button").getByText("Aperçu").click();
 
   // Producteur
@@ -380,4 +384,109 @@ export const verifyOverviewData = async (
   await expect(
     modalContent.getByText(destination.vhuAgrementDemolisseur.agrementNumber)
   ).toBeVisible();
+
+  // Close the modal
+  await page.getByLabel("Close").click();
+};
+
+/**
+ * Publish a VHU
+ */
+export const publishBsvhu = async (page: Page, { id }) => {
+  await page.getByRole("link", { name: "Brouillons" }).click();
+
+  const vhuDiv = getVHUCardDiv(page, id);
+
+  // Try to publish
+  await vhuDiv.getByRole("button").getByText("Publier").click();
+  // Confirm publication in modal
+  await page.getByRole("button", { name: "Publier le bordereau" }).click();
+
+  await page.getByRole("link", { name: "Tous les bordereaux" }).click();
+  await expect(vhuDiv).toBeVisible();
+
+  // Status should be updated
+  await expect(vhuDiv.getByText("publié")).toBeVisible();
+
+  // Secondary buttons
+  await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
+  await expect(vhuDiv.getByRole("button").getByText("Aperçu")).toBeVisible();
+  await expect(vhuDiv.getByRole("button").getByText("PDF")).toBeVisible();
+  await expect(vhuDiv.getByRole("button").getByText("Dupliquer")).toBeVisible();
+  await expect(vhuDiv.getByRole("button").getByText("Modifier")).toBeVisible();
+  await expect(vhuDiv.getByRole("button").getByText("Supprimer")).toBeVisible();
+};
+
+/**
+ * Fix VHU adding missing data, then publish
+ */
+export const fixAndPublishBsvhu = async (page: Page, { id }) => {
+  await page.getByRole("link", { name: "Brouillons" }).click();
+
+  const vhuDiv = getVHUCardDiv(page, id);
+
+  // Try to publish
+  await vhuDiv.getByRole("button").getByText("Publier").click();
+  // Confirm publication in modal
+  await page.getByRole("button", { name: "Publier le bordereau" }).click();
+
+  // Weight is missing
+  await expect(
+    page.getByText("Déchet: le poids est obligatoire")
+  ).toBeVisible();
+
+  // Edit VHU and add weight
+  await page.getByRole("link", { name: "Mettre le bordereau à jour" }).click();
+  await page.getByRole("button", { name: "Détail du déchet" }).click();
+  await page.getByLabel("En tonnes").fill("10");
+  await page.getByRole("button", { name: "Destination du déchet" }).click();
+  await page.getByRole("button", { name: "Enregistrer" }).click();
+
+  // Weight should appear on VHU card
+  await expect(vhuDiv.getByText("10 t")).toBeVisible();
+
+  // Try to publish again
+  await publishBsvhu(page, { id });
+};
+
+/**
+ * Duplicate a VHU
+ */
+export const duplicateBsvhu = async (page: Page, { id }) => {
+  await page.getByRole("link", { name: "Tous les bordereaux" }).click();
+
+  const vhuDiv = getVHUCardDiv(page, id);
+
+  // Duplicate
+  await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
+  await vhuDiv.getByRole("button").getByText("Dupliquer").click();
+
+  // Check in drafts
+  await page.getByRole("link", { name: "Brouillons" }).click();
+
+  // Make sure VHU pops out in results list
+  const duplicatedVhuDiv = page.locator(".bsd-card-list li").first();
+  await expect(duplicatedVhuDiv).toBeVisible();
+
+  // Extract VHU id
+  const duplicatedIdDiv = duplicatedVhuDiv.getByText("N°: ");
+  const duplicatedId = (await duplicatedIdDiv.innerText()).replace("N°: ", "");
+
+  return { id: duplicatedId };
+};
+
+/**
+ * Delete a VHU
+ */
+export const deleteBsvhu = async (page: Page, { id }) => {
+  await page.getByRole("link", { name: "Tous les bordereaux" }).click();
+
+  const vhuDiv = getVHUCardDiv(page, id);
+
+  // Delete
+  await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
+  await vhuDiv.getByRole("button").getByText("Supprimer").click();
+  await page.getByRole("button", { name: "Supprimer" }).click();
+
+  await expect(vhuDiv).not.toBeVisible();
 };
