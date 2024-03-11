@@ -141,21 +141,21 @@ const CompanySwitcher = ({
           <div className="company-switcher-item__name">
             {company.givenName || company.name}
           </div>
-          <div className="company-switcher-item__infos">
-            <div className="company-switcher-item__siret">{company.orgId}</div>
-            {current && (
-              <p className="fr-tag fr-tag--sm fr-icon-pen-nib-line fr-tag--icon-left">
-                {company.securityCode}
-              </p>
-            )}
-          </div>
+          {current && companies.length > 1 && (
+            <span
+              className="fr-icon-arrow-down-s-line company-switcher-item__arrow"
+              aria-hidden="true"
+            ></span>
+          )}
         </div>
-        {current && companies.length > 1 && (
-          <span
-            className="fr-icon-arrow-down-s-line company-switcher-item__arrow"
-            aria-hidden="true"
-          ></span>
-        )}
+        <div className="company-switcher-item__infos">
+          <div className="company-switcher-item__siret">{company.orgId}</div>
+          {current && (
+            <p className="fr-tag fr-tag--sm fr-icon-pen-nib-line fr-tag--icon-left">
+              {company.securityCode}
+            </p>
+          )}
+        </div>
       </div>
     );
   };
