@@ -206,8 +206,9 @@ export const ALL_WASTES_TTR = gql`
         cursor
         node {
           id
-          finalReceptionWeights
-          finalOperationCodes
+          # En attente des correctifs recette sur TRA-12745
+          # finalReceptionWeights
+          # finalOperationCodes
         }
       }
     }

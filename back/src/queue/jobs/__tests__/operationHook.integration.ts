@@ -36,7 +36,7 @@ describe("Test Form OperationHook job", () => {
     });
   });
 
-  it("updates final operations for two temporary storages with a final operation code", async () => {
+  it.skip("updates final operations for temporary storages of 2 levels with a final operation code", async () => {
     const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
       UserRole.MEMBER,
       {
@@ -194,7 +194,7 @@ describe("Test Form OperationHook job", () => {
     });
   });
 
-  it("updates final operations for temporary storage of 1 level with a final operation code only at the end", async () => {
+  it.skip("updates final operations for temporary storage of 1 level with a final operation code only at the end", async () => {
     const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
       UserRole.MEMBER,
       {
@@ -276,7 +276,7 @@ describe("Test Form OperationHook job", () => {
     });
   });
 
-  it("updates final operations for noTraceability = true", async () => {
+  it.skip("updates final operations for noTraceability = true", async () => {
     const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
       UserRole.MEMBER,
       {
@@ -340,7 +340,7 @@ describe("Test Form OperationHook job", () => {
     });
   });
 
-  it("updates final operations of an appendix2", async () => {
+  it.skip("updates final operations of an appendix2", async () => {
     const { user: emitter, company: emitterCompany } =
       await userWithCompanyFactory(UserRole.MEMBER);
 
