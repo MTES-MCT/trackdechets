@@ -12,7 +12,6 @@ import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import { EmitterType, Prisma, Status } from "@prisma/client";
 import { UserInputError } from "../../../common/errors";
-import { operationHooksQueue } from "../../../queue/producers/operationHook";
 
 const markAsResentResolver: MutationResolvers["markAsResent"] = async (
   parent,
@@ -82,12 +81,6 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
       ...formUpdateInput
     }
   );
-
-  await operationHooksQueue.add({
-    finalFormId: resentForm.id,
-    initialFormId: resentForm.id
-  });
-
   return getAndExpandFormFromDb(resentForm.id);
 };
 

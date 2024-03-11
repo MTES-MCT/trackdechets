@@ -50,13 +50,13 @@ export async function operationHook(args: OperationHookArgs) {
       isDeleted: false
     },
     include: {
-      forwardedIn: true,
+      forwarding: true,
       grouping: { include: { initialForm: true } }
     }
   });
 
   const initialForms = [
-    formWithChainedForms.forwardedIn,
+    formWithChainedForms.forwarding,
     ...(formWithChainedForms.grouping ?? []).map(g => g.initialForm)
   ].filter(Boolean);
 
@@ -129,6 +129,10 @@ export async function operationHook(args: OperationHookArgs) {
     await operationHooksQueue.add({
       finalFormId: finalForm.id,
       initialFormId: initialForm.id
+    });
+    await operationHooksQueue.add({
+      finalFormId: initialForm.id,
+      initialFormId: finalForm.id
     });
   }
 }
