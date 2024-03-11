@@ -14,7 +14,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Afficher le statut avec rupture de traçabilité lorsque mentionné lors du traitement [PR 3120](https://github.com/MTES-MCT/trackdechets/pull/3120)
 - Ajouter la possibilité de Supprimer le BSDASRI pour l'émetteur lorsqu'il est Signé par l'émetteur [PR 3115](https://github.com/MTES-MCT/trackdechets/pull/3115)
 - Permettre au transporteur de modifier son champs libre / immatriculation après signature de l'entreposage provisoire depuis le tableau de bord [PR 3114](https://github.com/MTES-MCT/trackdechets/pull/3114)
-- Registres sortant et exhaustif : ajout poids et code destination finale [PR 3058](https://github.com/MTES-MCT/trackdechets/pull/3058)
 - Nouveau composant de sélection d'entreprise sur le dashboard [PR 3134](https://github.com/MTES-MCT/trackdechets/pull/3134)
 
 #### :nail_care: Améliorations
