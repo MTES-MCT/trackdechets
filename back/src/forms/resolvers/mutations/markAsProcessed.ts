@@ -22,7 +22,6 @@ import {
   isVat,
   PROCESSING_OPERATIONS
 } from "@td/constants";
-import { operationHooksQueue } from "../../../queue/producers/operationHook";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -133,10 +132,12 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     return processedForm;
   });
 
-  await operationHooksQueue.add({
-    finalFormId: processedForm.id,
-    initialFormId: processedForm.id
-  });
+  // En attente des correctifs recette sur TRA-12745
+  //
+  // await operationHooksQueue.add({
+  //   finalFormId: processedForm.id,
+  //   initialFormId: processedForm.id
+  // });
 
   return getAndExpandFormFromDb(processedForm.id);
 };

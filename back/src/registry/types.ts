@@ -176,9 +176,10 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   wasteIsDangerous: null,
   workerCompanyName: null,
   workerCompanySiret: null,
-  workerCompanyAddress: null,
-  finalOperationCodes: null,
-  finalReceptionWeights: null
+  workerCompanyAddress: null
+  // En attente des correctifs recette sur TRA-12745
+  // finalOperationCodes: null,
+  // finalReceptionWeights: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -305,9 +306,10 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   wasteIsDangerous: null,
   workerCompanyName: null,
   workerCompanySiret: null,
-  workerCompanyAddress: null,
-  finalOperationCodes: null,
-  finalReceptionWeights: null
+  workerCompanyAddress: null
+  // En attente des correctifs recette sur TRA-12745
+  // finalOperationCodes: null,
+  // finalReceptionWeights: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -382,7 +384,8 @@ export const emptyAllWaste: Required<AllWaste> = {
   transporter3RecepisseIsExempted: null,
   workerCompanyName: null,
   workerCompanySiret: null,
-  workerCompanyAddress: null,
-  finalOperationCodes: null,
-  finalReceptionWeights: null
+  workerCompanyAddress: null
+  // En attente des correctifs recette sur TRA-12745
+  // finalOperationCodes: null,
+  // finalReceptionWeights: null
 };

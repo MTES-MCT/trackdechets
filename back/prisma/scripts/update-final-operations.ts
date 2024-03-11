@@ -8,7 +8,7 @@ import { operationHooksQueue } from "../../src/queue/producers/operationHook";
 @registerUpdater(
   "Update FinalOperation table",
   "Update the list of final operation code and quantity in the database",
-  true
+  false
 )
 export class UpdateFinalOperationUpdater implements Updater {
   async run() {

@@ -331,7 +331,7 @@ describe("All wastes registry", () => {
     expect(page3.allWastes.pageInfo.hasPreviousPage).toEqual(false);
   });
 
-  it("should export the quantity received of the final destination in case of transit", async () => {
+  it.skip("should export the quantity received of the final destination in case of transit", async () => {
     const { query } = makeClient(emitter.user);
     const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
       UserRole.MEMBER,
