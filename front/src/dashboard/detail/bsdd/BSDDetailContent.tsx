@@ -512,14 +512,27 @@ const Appendix1 = ({
   const canSkipEmission =
     container?.grouping?.reduce((dic, { form }) => {
       const emitterSiret = form.emitter?.company?.siret;
-      const siretIsExutoire =
-        emitterSiret != null &&
-        [CompanyType.Wasteprocessor, CompanyType.Collector].every(
-          profile =>
-            !companiesInfos?.searchCompanies
-              ?.find(sc => sc.siret === emitterSiret)
-              ?.companyTypes?.includes(profile as CompanyType)
+      let siretIsExutoire = false;
+      if (emitterSiret) {
+        const emitterCompany = companiesInfos?.searchCompanies?.find(
+          c => c.siret === emitterSiret
         );
+        if (
+          emitterCompany &&
+          emitterCompany.companyTypes?.some(profile =>
+            [CompanyType.Wasteprocessor, CompanyType.Collector].includes(
+              profile
+            )
+          )
+        ) {
+          siretIsExutoire = true;
+        }
+      }
+
+      // We can skip emission if
+      // - there is an eco-organisme on the bsd && the emitter is NOT an exutoire
+      // - the emitter is in the list of companies with automatic signature
+      // - the emitter is a private individual
       dic[form.readableId] =
         (hasEcoOrganisme && !siretIsExutoire) ||
         siretsWithAutomaticSignature.includes(emitterSiret) ||
