@@ -32,10 +32,13 @@ export default async function publish(
     );
   }
 
-  await parseBsdaAsync(prismaToZodBsda(bsda), {
-    user,
-    currentSignatureType: "EMISSION"
-  });
+  await parseBsdaAsync(
+    { ...prismaToZodBsda(bsda), isDraft: false },
+    {
+      user,
+      currentSignatureType: "EMISSION"
+    }
+  );
 
   const updatedBsda = await getBsdaRepository(user).update(
     { id },

@@ -87,6 +87,36 @@ describe("Mutation.updateBsda", () => {
     expect(data.updateBsda.id).toBeTruthy();
   });
 
+  it("should allow user to update a draft BSDA", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          waste: { materialName: "new name" }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    const updatedBsda = await prisma.bsda.findFirstOrThrow({
+      where: { id: bsda.id }
+    });
+    expect(updatedBsda.wasteMaterialName).toEqual("new name");
+  });
+
   it("should disallow unauthenticated user from updating a bsda", async () => {
     const { mutate } = makeClient();
     const { errors } = await mutate<

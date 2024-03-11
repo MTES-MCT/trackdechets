@@ -10,8 +10,8 @@ export const InvalidSirenePDFSizeError = () => {
         <span>
           Le fichier que vous tentez de charger est trop lourd. Veuillez
           réessayer avec un fichier PDF conforme. Pour plus d'informations,
-          veuillez contacter l'assistance Trackdéchets :
-          contact@trackdechets.beta.gouv.fr
+          veuillez consulter cet article :
+          https://faq.trackdechets.fr/inscription-et-gestion-de-compte/questions-frequentes#lors-de-la-creation-de-mon-etablissement-non-diffusible-mon-fichier-na-pas-ete-valide.-que-faire
         </span>
       }
     />
