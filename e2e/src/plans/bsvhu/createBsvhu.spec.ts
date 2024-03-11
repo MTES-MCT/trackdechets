@@ -6,7 +6,11 @@ import {
   seedCompanyAssociations
 } from "../../data/company";
 import { selectCompany } from "../../utils/navigation";
-import { createBsvhu } from "../../utils/bsvhu";
+import {
+  createBsvhu,
+  verifyCardData,
+  verifyOverviewData
+} from "../../utils/bsvhu";
 
 test.describe.serial("Cahier de recette de création des BSVHU", async () => {
   // User credentials
@@ -42,14 +46,36 @@ test.describe.serial("Cahier de recette de création des BSVHU", async () => {
       });
     });
 
+    let vhuId;
+
     await test.step("Création d'un BSVHU", async () => {
       await selectCompany(page, companies.companyN.siret);
 
-      await createBsvhu(page, {
+      const { id } = await createBsvhu(page, {
         emitter: companies.companyN,
         transporter: companies.companyB,
         destination: companies.companyI,
         broyeur: companies.companyO
+      });
+
+      vhuId = id;
+    });
+
+    await test.step("Vérification des informations du bordereau sur la bsd card", async () => {
+      await verifyCardData(page, {
+        id: vhuId,
+        emitter: companies.companyN,
+        transporter: companies.companyB,
+        destination: companies.companyI
+      });
+    });
+
+    await test.step("Vérification des informations du bordereau dans l'Aperçu", async () => {
+      await verifyOverviewData(page, {
+        id: vhuId,
+        emitter: companies.companyN,
+        transporter: companies.companyB,
+        destination: companies.companyI
       });
     });
   });

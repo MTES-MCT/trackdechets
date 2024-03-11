@@ -260,9 +260,87 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
 };
 
 /**
+ * Creates a BSVHU and returns its id
+ */
+export const createBsvhu = async (
+  page: Page,
+  { emitter, transporter, destination, broyeur }
+) => {
+  // Click create button
+  await clickCreateVhuButton(page);
+
+  // Fill the steps
+  await fillEmitterTab(page, emitter);
+  await fillWasteTab(page);
+  await fillTransporterTab(page, transporter);
+  await fillDestinationTab(page, destination, broyeur);
+
+  // Navigate to BSDs view
+  await page.getByRole("link", { name: "Tous les bordereaux" }).click();
+
+  // Make sure VHU pops out in results list
+  const vhuDiv = page.locator(".bsd-card-list li").first();
+  await expect(vhuDiv).toBeVisible();
+
+  // Extract VHU id
+  const idDiv = vhuDiv.getByText("N°: ");
+  const id = (await idDiv.innerText()).replace("N°: ", "");
+
+  return { id };
+};
+
+/**
+ * Verify BSVHU info, whether in the card list or overview
+ */
+export const verifyCardData = async (
+  page: Page,
+  { id, emitter, transporter, destination }
+) => {
+  const vhuDiv = page
+    .locator(".bsd-card-list li")
+    .filter({ hasText: `N°: ${id}` })
+    .first();
+
+  // Verify card info
+  await expect(vhuDiv.getByText("16 01 06")).toBeVisible();
+  await expect(vhuDiv.getByText("Brouillon")).toBeVisible();
+  await expect(vhuDiv.getByText("VHU dépollués")).toBeVisible();
+  // Companies names
+  await expect(
+    page.locator("div").filter({ hasText: emitter.name }).first()
+  ).toBeVisible();
+  await expect(
+    page.locator("div").filter({ hasText: transporter.name }).nth(1)
+  ).toBeVisible();
+  await expect(
+    page.locator("div").filter({ hasText: destination.name }).nth(2)
+  ).toBeVisible();
+
+  // Primary button
+  await expect(vhuDiv.getByRole("button").getByText("Publier")).toBeVisible();
+
+  // Secondary buttons
+  await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
+  await expect(vhuDiv.getByRole("button").getByText("Aperçu")).toBeVisible();
+  await expect(vhuDiv.getByRole("button").getByText("Dupliquer")).toBeVisible();
+  await expect(vhuDiv.getByRole("button").getByText("Modifier")).toBeVisible();
+  await expect(vhuDiv.getByRole("button").getByText("Supprimer")).toBeVisible();
+};
+
+/**
  * Verify BSD overview data
  */
-const verifyOverviewData = async (page, emitter, transporter, destination) => {
+export const verifyOverviewData = async (
+  page: Page,
+  { id, emitter, transporter, destination }
+) => {
+  // Open overview and verify data
+  const vhuDiv = page
+    .locator(".bsd-card-list li")
+    .filter({ hasText: `N°: ${id}` })
+    .first();
+  await vhuDiv.getByRole("button").getByText("Aperçu").click();
+
   // Producteur
   await page.getByRole("tab", { name: "Producteur" }).click();
   const modalContent = page.getByRole("tabpanel");
@@ -302,54 +380,4 @@ const verifyOverviewData = async (page, emitter, transporter, destination) => {
   await expect(
     modalContent.getByText(destination.vhuAgrementDemolisseur.agrementNumber)
   ).toBeVisible();
-};
-
-export const createBsvhu = async (
-  page: Page,
-  { emitter, transporter, destination, broyeur }
-) => {
-  // Click create button
-  await clickCreateVhuButton(page);
-
-  // Fill the steps
-  await fillEmitterTab(page, emitter);
-  await fillWasteTab(page);
-  await fillTransporterTab(page, transporter);
-  await fillDestinationTab(page, destination, broyeur);
-
-  // Navigate to BSDs view
-  await page.getByRole("link", { name: "Tous les bordereaux" }).click();
-
-  // Make sure VHU pops out in results list
-  const vhuDiv = page.locator(".bsd-card-list li").first();
-  await expect(vhuDiv).toBeVisible();
-
-  // Verify card info
-  await expect(vhuDiv.getByText("16 01 06")).toBeVisible();
-  await expect(vhuDiv.getByText("Brouillon")).toBeVisible();
-  await expect(vhuDiv.getByText("VHU dépollués")).toBeVisible();
-  // Companies names
-  await expect(
-    page.locator("div").filter({ hasText: emitter.name }).first()
-  ).toBeVisible();
-  await expect(
-    page.locator("div").filter({ hasText: transporter.name }).nth(1)
-  ).toBeVisible();
-  await expect(
-    page.locator("div").filter({ hasText: destination.name }).nth(2)
-  ).toBeVisible();
-
-  // Primary button
-  await expect(vhuDiv.getByRole("button").getByText("Publier")).toBeVisible();
-
-  // Secondary buttons
-  await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
-  await expect(vhuDiv.getByRole("button").getByText("Aperçu")).toBeVisible();
-  await expect(vhuDiv.getByRole("button").getByText("Dupliquer")).toBeVisible();
-  await expect(vhuDiv.getByRole("button").getByText("Modifier")).toBeVisible();
-  await expect(vhuDiv.getByRole("button").getByText("Supprimer")).toBeVisible();
-
-  // Open overview and verify data
-  await vhuDiv.getByRole("button").getByText("Aperçu").click();
-  await verifyOverviewData(page, emitter, transporter, destination);
 };
