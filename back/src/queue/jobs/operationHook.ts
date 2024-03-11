@@ -95,12 +95,12 @@ export async function operationHook(args: OperationHookArgs) {
         formId: initialForm.id
       };
       if (
-        await prisma.finalOperation.count({
+        (await prisma.finalOperation.count({
           where: {
             finalBsdReadableId: finalForm.readableId,
             formId: initialForm.id
           }
-        }) === 0
+        })) === 0
       ) {
         await prisma.finalOperation.create({
           data
