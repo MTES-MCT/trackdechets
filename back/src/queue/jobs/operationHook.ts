@@ -43,21 +43,21 @@ export async function operationHook(args: OperationHookArgs) {
       noTraceability: true
     }
   });
-  // On récupère tous les bordereaux initiaux
-  const formWithInitialForms = await prisma.form.findUniqueOrThrow({
+  // On récupère tous les bordereaux liés
+  const formWithChainedForms = await prisma.form.findUniqueOrThrow({
     where: {
       id: initialFormId,
       isDeleted: false
     },
     include: {
-      forwarding: true,
+      forwardedIn: true,
       grouping: { include: { initialForm: true } }
     }
   });
 
   const initialForms = [
-    formWithInitialForms.forwarding,
-    ...(formWithInitialForms.grouping ?? []).map(g => g.initialForm)
+    formWithChainedForms.forwardedIn,
+    ...(formWithChainedForms.grouping ?? []).map(g => g.initialForm)
   ].filter(Boolean);
 
   for (const initialForm of initialForms) {
@@ -68,9 +68,9 @@ export async function operationHook(args: OperationHookArgs) {
       finalForm.noTraceability === true
     ) {
       let quantityReceived = finalForm.quantityReceived;
-      if (formWithInitialForms.emitterType === "APPENDIX2") {
+      if (formWithChainedForms.emitterType === "APPENDIX2") {
         // affect only the fraction grouped of initialForm to quantity.
-        formWithInitialForms.grouping.map(
+        formWithChainedForms.grouping.map(
           ({ initialForm: initialFormGrouped, quantity }) => {
             if (initialFormGrouped.id === initialForm.id) {
               quantityReceived = quantity;
@@ -125,7 +125,7 @@ export async function operationHook(args: OperationHookArgs) {
         continue;
       }
     }
-    // Applique l'operation de façon récursive sur les bordereaux initiauxzZZZZZZZ  
+    // Applique l'operation de façon récursive sur les bordereaux initiaux
     await operationHooksQueue.add({
       finalFormId: finalForm.id,
       initialFormId: initialForm.id
