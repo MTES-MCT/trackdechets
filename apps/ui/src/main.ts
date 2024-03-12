@@ -38,6 +38,7 @@ app.use(
         baseUri: "'self'",
         formAction: ["http:"], // allow external redirects for oauth workflow
         fontSrc: ["'self'", "https:", "data:"],
+        objectSrc: ["'self'", "data:"],
         frameAncestors: "'none'",
         frameSrc: ["'self'"],
         imgSrc: ["'self'", "data:", "http:"], // allow oauth applications logos
