@@ -15,7 +15,7 @@ jest.mock("@td/prisma", () => ({
   }
 }));
 
-const randomNumberMock = jest.spyOn(utils, "randomNumber");
+jest.mock("../../../../utils");
 
 const sendMailMock = jest.fn();
 
@@ -34,7 +34,7 @@ describe("renewSecurityCode", () => {
   beforeEach(() => {
     companyMock.mockReset();
     updateCompanyMock.mockReset();
-    randomNumberMock.mockReset();
+    (utils.randomNumber as jest.Mock).mockReset();
     sendMailMock.mockReset();
     getCompanyActiveUsersMock.mockReset();
   });
@@ -63,12 +63,14 @@ describe("renewSecurityCode", () => {
     });
 
     updateCompanyMock.mockReturnValueOnce({});
-    randomNumberMock.mockReturnValueOnce(1234).mockReturnValueOnce(2345);
+    (utils.randomNumber as jest.Mock)
+      .mockReturnValueOnce(1234)
+      .mockReturnValueOnce(2345);
 
     getCompanyActiveUsersMock.mockReturnValueOnce([]);
     await renewSecurityCode("85001946400013");
 
-    expect(randomNumberMock).toHaveBeenCalledTimes(2);
+    expect(utils.randomNumber as jest.Mock).toHaveBeenCalledTimes(2);
   });
   it("should send a notification email to all users and return updated company", async () => {
     const siret = siretify(2);
@@ -77,7 +79,7 @@ describe("renewSecurityCode", () => {
       name: "Code en stock",
       orgId: siret
     });
-    randomNumberMock.mockReturnValueOnce(4567);
+    (utils.randomNumber as jest.Mock).mockReturnValueOnce(4567);
 
     updateCompanyMock.mockReturnValueOnce({
       orgId: siret,

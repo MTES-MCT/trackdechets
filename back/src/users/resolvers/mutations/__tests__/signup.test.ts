@@ -39,12 +39,9 @@ jest.mock("../../../../mailer/mailing", () => ({
   sendMail: () => null
 }));
 
-const deletedCachedUserRolesSpy = jest.spyOn(
-  redisUser,
-  "deleteCachedUserRoles"
-);
+jest.mock("../../../../common/redis/users");
 
-deletedCachedUserRolesSpy.mockResolvedValue();
+(redisUser.deleteCachedUserRoles as jest.Mock).mockResolvedValue(null);
 
 describe("signup", () => {
   beforeEach(() => {
@@ -77,6 +74,8 @@ describe("signup", () => {
       hashes.length
     );
     expect(prisma.userAccountHash.updateMany).toHaveBeenCalledTimes(1);
-    expect(deletedCachedUserRolesSpy).toHaveBeenCalledTimes(1);
+    expect(redisUser.deleteCachedUserRoles as jest.Mock).toHaveBeenCalledTimes(
+      1
+    );
   });
 });
