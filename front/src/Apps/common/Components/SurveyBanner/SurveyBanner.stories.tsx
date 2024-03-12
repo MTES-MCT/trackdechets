@@ -1,8 +1,14 @@
-import { Meta } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react";
 import SurveyBanner from "./SurveyBanner";
 
 const meta: Meta<typeof SurveyBanner> = {
-  component: SurveyBanner,
+  component: SurveyBanner
+};
+export default meta;
+
+type Story = StoryObj<typeof SurveyBanner>;
+
+export const Primary: Story = {
   args: {
     message:
       "Afin de mesurer votre ressenti vis à vis de l'application Trackdéchets, nous vous invitons à répondre à ce questionnaire.",
@@ -12,4 +18,3 @@ const meta: Meta<typeof SurveyBanner> = {
     }
   }
 };
-export default meta;
