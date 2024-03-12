@@ -213,6 +213,7 @@ export const COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS = gql`
   query CompanyPrivateInfos($clue: String!) {
     companyPrivateInfos(clue: $clue) {
       siret
+      companyTypes
       receivedSignatureAutomations {
         from {
           siret

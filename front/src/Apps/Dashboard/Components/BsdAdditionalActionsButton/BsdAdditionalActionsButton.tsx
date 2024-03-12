@@ -52,7 +52,8 @@ function BsdAdditionalActionsButton({
   },
   hideReviewCta,
   isToCollectTab = false,
-  hasAutomaticSignature = false
+  hasAutomaticSignature = false,
+  emitterIsExutoireOrTtr = false
 }: BsdAdditionalActionsButtonProps) {
   const [isOpen, setisOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLElement>(null);
@@ -225,7 +226,8 @@ function BsdAdditionalActionsButton({
             isSignTransportCanSkipEmission(
               currentSiret,
               bsd,
-              hasAutomaticSignature
+              hasAutomaticSignature,
+              emitterIsExutoireOrTtr
             ) && (
               <li>
                 <button

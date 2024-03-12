@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { gql, useLazyQuery, useMutation } from "@apollo/client";
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { Loader } from "../../../../common/Components";
 import { NotificationError } from "../../../../common/Components/Error/Error";
 import TdModal from "../../../../common/Components/Modal/Modal";
@@ -8,6 +8,7 @@ import AcceptedInfo from "../../../../../dashboard/components/BSDList/BSDD/Workf
 import ReceivedInfo from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/ReceivedInfo";
 import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import {
+  CompanyType,
   EmitterType,
   Form,
   FormStatus,
@@ -16,6 +17,7 @@ import {
   MutationMarkAsTempStorerAcceptedArgs,
   QuantityType,
   Query,
+  QueryCompanyPrivateInfosArgs,
   QueryFormArgs
 } from "@td/codegen-ui";
 import {
@@ -27,6 +29,7 @@ import MarkAsProcessedModalContent from "../../../../../dashboard/components/BSD
 import SignEmissionFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignEmissionFormModalContent";
 import SignTransportFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignTransportFormModalContent";
 import { mapBsdd } from "../../../bsdMapper";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../../common/queries/company/query";
 
 const MARK_TEMP_STORER_ACCEPTED = gql`
   mutation MarkAsTempStorerAccepted(
@@ -75,6 +78,22 @@ const ActBsddValidation = ({
       },
       fetchPolicy: "network-only"
     });
+
+  const { data: emitterCompanyData } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
+    variables: { clue: bsd.emitter?.company?.siret! },
+    skip:
+      !data ||
+      data.form.emitter?.type !== EmitterType.Appendix1Producer ||
+      data.form.transporter?.company?.siret !== currentSiret
+  });
+  const emitterIsExutoireOrTtr = Boolean(
+    emitterCompanyData?.companyPrivateInfos.companyTypes.filter(type =>
+      [CompanyType.Wasteprocessor, CompanyType.Collector].includes(type)
+    )?.length
+  );
 
   const [
     markAsTempStorerAccepted,
@@ -145,7 +164,8 @@ const ActBsddValidation = ({
         isSignTransportCanSkipEmission(
           currentSiret,
           bsdDisplay,
-          hasAutomaticSignature
+          hasAutomaticSignature,
+          emitterIsExutoireOrTtr
         )
       ) {
         return "Signature transporteur";
@@ -286,7 +306,8 @@ const ActBsddValidation = ({
       isSignTransportCanSkipEmission(
         currentSiret,
         bsdDisplay,
-        hasAutomaticSignature
+        hasAutomaticSignature,
+        emitterIsExutoireOrTtr
       )
     ) {
       return renderSignTransportFormModal();
