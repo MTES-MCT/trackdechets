@@ -3,7 +3,7 @@ import { ErrorCode } from "../../../../common/errors";
 import * as token from "../token";
 import { siretify } from "../../../../__tests__/factories";
 
-const axiosGet = jest.spyOn(token, "authorizedAxiosGet");
+jest.mock("../token");
 
 const axiosResponseDefault = {
   statusText: "",
@@ -13,13 +13,13 @@ const axiosResponseDefault = {
 
 describe("searchCompany", () => {
   afterEach(() => {
-    axiosGet.mockReset();
+    (token.authorizedAxiosGet as jest.Mock).mockReset();
   });
 
   it("should retrieve a company by siret", async () => {
     const siret = siretify(1);
 
-    axiosGet.mockResolvedValueOnce({
+    (token.authorizedAxiosGet as jest.Mock).mockResolvedValueOnce({
       ...axiosResponseDefault,
       status: 200,
       data: {
@@ -70,7 +70,7 @@ describe("searchCompany", () => {
   it("should raise AnonymousCompanyError if partially diffusible", async () => {
     const siret = siretify(6);
 
-    axiosGet.mockResolvedValueOnce({
+    (token.authorizedAxiosGet as jest.Mock).mockResolvedValueOnce({
       ...axiosResponseDefault,
       status: 200,
       data: {
@@ -114,7 +114,7 @@ describe("searchCompany", () => {
   it("should raise AnonymousCompanyError if non diffusible", async () => {
     const siret = siretify(6);
 
-    axiosGet.mockResolvedValueOnce({
+    (token.authorizedAxiosGet as jest.Mock).mockResolvedValueOnce({
       ...axiosResponseDefault,
       status: 200,
       data: {
@@ -157,7 +157,7 @@ describe("searchCompany", () => {
 
   it(`should set name for an individual enterprise
       by concatenating first and last name`, async () => {
-    axiosGet.mockResolvedValueOnce({
+    (token.authorizedAxiosGet as jest.Mock).mockResolvedValueOnce({
       ...axiosResponseDefault,
       status: 200,
       data: {
@@ -191,7 +191,7 @@ describe("searchCompany", () => {
   });
 
   it("should raise BAD_USER_INPUT if error 404 (siret not found)", async () => {
-    axiosGet.mockRejectedValueOnce({
+    (token.authorizedAxiosGet as jest.Mock).mockRejectedValueOnce({
       response: {
         status: 404
       }
@@ -207,7 +207,7 @@ describe("searchCompany", () => {
   it(`should escalate other types of errors
   (network, internal server error, etc)`, async () => {
     const siret = siretify(1);
-    axiosGet.mockRejectedValueOnce({
+    (token.authorizedAxiosGet as jest.Mock).mockRejectedValueOnce({
       message: "Erreur inconnue"
     });
     expect.assertions(1);
@@ -221,13 +221,13 @@ describe("searchCompany", () => {
 
 describe("searchCompanies", () => {
   afterEach(() => {
-    axiosGet.mockReset();
+    (token.authorizedAxiosGet as jest.Mock).mockReset();
   });
 
   it("perform a full text search based on a clue", async () => {
     const siret = siretify(1);
 
-    axiosGet.mockResolvedValueOnce({
+    (token.authorizedAxiosGet as jest.Mock).mockResolvedValueOnce({
       ...axiosResponseDefault,
       status: 200,
       data: {
@@ -276,7 +276,7 @@ describe("searchCompanies", () => {
   });
 
   it("should return empty array if no results", async () => {
-    axiosGet.mockRejectedValueOnce({
+    (token.authorizedAxiosGet as jest.Mock).mockRejectedValueOnce({
       response: {
         status: 404
       }
@@ -287,7 +287,7 @@ describe("searchCompanies", () => {
 
   it(`should escalate other types of errors
       (network, internal server error, etc)`, async () => {
-    axiosGet.mockRejectedValueOnce({
+    (token.authorizedAxiosGet as jest.Mock).mockRejectedValueOnce({
       message: "Erreur inconnue"
     });
     expect.assertions(1);
@@ -300,7 +300,7 @@ describe("searchCompanies", () => {
 
   it("should filter results by departement", async () => {
     const siret = siretify(1);
-    axiosGet.mockResolvedValueOnce({
+    (token.authorizedAxiosGet as jest.Mock).mockResolvedValueOnce({
       ...axiosResponseDefault,
       status: 200,
       data: {
@@ -348,7 +348,7 @@ describe("searchCompanies", () => {
         "Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé"
     };
     expect(companies[0]).toEqual(expected);
-    const callUrl = axiosGet.mock.calls[0][0];
+    const callUrl = (token.authorizedAxiosGet as jest.Mock).mock.calls[0][0];
     expect(callUrl).toContain("codePostalEtablissement:07*");
   });
 });

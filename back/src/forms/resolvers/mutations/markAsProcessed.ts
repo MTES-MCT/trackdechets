@@ -1,4 +1,5 @@
 import { EmitterType, Prisma, Status } from "@prisma/client";
+
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
@@ -37,7 +38,14 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
   let formUpdateInput: Prisma.FormUpdateInput =
     flattenProcessedFormInput(processedInfo);
-  processedInfoSchema.validateSync(formUpdateInput, { abortEarly: false });
+  processedInfoSchema.validateSync(
+    {
+      // required for nextDestination validation
+      wasteDetailsCode: form.wasteDetailsCode,
+      ...formUpdateInput
+    },
+    { abortEarly: false }
+  );
 
   // set default value for processingOperationDescription
   const operation = PROCESSING_OPERATIONS.find(
@@ -123,6 +131,13 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
     return processedForm;
   });
+
+  // En attente des correctifs recette sur TRA-12745
+  //
+  // await operationHooksQueue.add({
+  //   finalFormId: processedForm.id,
+  //   initialFormId: processedForm.id
+  // });
 
   return getAndExpandFormFromDb(processedForm.id);
 };

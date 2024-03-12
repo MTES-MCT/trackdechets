@@ -10,6 +10,9 @@ import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
+import { getDefaultOrgId } from "../CompanySwitcher/CompanySwitcher";
+import { usePermissions } from "../../../../common/contexts/PermissionsContext";
+import Exports from "../../../../dashboard/exports/Registry";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
@@ -58,6 +61,7 @@ const GET_ME = gql`
       companies {
         orgId
         siret
+        securityCode
       }
       featureFlags
     }
@@ -65,6 +69,7 @@ const GET_ME = gql`
 `;
 
 export default function LayoutContainer() {
+  const { orgId } = usePermissions();
   const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME, {
     onCompleted: ({ me }) => {
       if (import.meta.env.VITE_SENTRY_DSN && me.email) {
@@ -79,6 +84,9 @@ export default function LayoutContainer() {
   if (loading) {
     return <Loader />;
   }
+
+  const defaultOrgId =
+    isAuthenticated && data && (orgId ?? getDefaultOrgId(data.me.companies));
 
   return (
     <Suspense fallback={<Loader />}>
@@ -107,15 +115,15 @@ export default function LayoutContainer() {
               isAdmin={isAdmin}
               v2banner={
                 <SurveyBanner
-                  message="Trackdéchets évolue ! Découvrez dès à présent vos révisions filtrées dans les nouveaux onglets En cours et Révisés. Pour en savoir plus sur cette dernière évolution, consultez notre FAQ."
+                  message="Pour en savoir plus sur les dernières évolutions de Trackdéchets, consultez notre FAQ."
                   button={{
                     title: "Voir la FAQ",
                     href: "https://faq.trackdechets.fr/pour-aller-plus-loin/les-dernieres-evolutions-de-trackdechets"
                   }}
-                  persistedSurveyName="td-20240213"
+                  persistedSurveyName="td-20240312"
                 />
               }
-              defaultOrgId={data?.me.companies[0]?.orgId}
+              defaultOrgId={defaultOrgId}
             />
           }
         >
@@ -295,6 +303,15 @@ export default function LayoutContainer() {
           />
 
           <Route
+            path={routes.registry}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <Exports />
+              </RequireAuth>
+            }
+          />
+
+          <Route
             path="*"
             element={
               <Navigate
@@ -308,7 +325,7 @@ export default function LayoutContainer() {
                             ? routes.dashboard.transport.toCollect
                             : routes.dashboard.index,
                           {
-                            siret: data.me.companies[0].orgId
+                            siret: defaultOrgId
                           }
                         )
                       : routes.companies.index

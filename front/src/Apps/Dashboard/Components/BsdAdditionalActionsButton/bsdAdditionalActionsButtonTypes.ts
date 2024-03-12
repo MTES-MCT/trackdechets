@@ -21,4 +21,5 @@ export interface BsdAdditionalActionsButtonProps {
   hideReviewCta?: boolean;
   isToCollectTab?: boolean;
   hasAutomaticSignature?: boolean;
+  emitterIsExutoireOrTtr?: boolean;
 }

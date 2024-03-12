@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { NavLink, generatePath, useNavigate } from "react-router-dom";
 import { CompanyPrivate, UserPermission, UserRole } from "@td/codegen-ui";
-import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
 import routes from "../../../routes";
 
 import { useShowTransportTabs } from "../../hooks/useShowTransportTabs";
@@ -14,7 +13,6 @@ import {
   COLLECTED,
   DRAFTS,
   FOLLOWS,
-  REGISTER,
   REVIEWED,
   REVIEWS,
   TO_COLLECT,
@@ -23,6 +21,7 @@ import {
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import "./DashboardTabs.scss";
+import CompanySwitcher from "../../../common/Components/CompanySwitcher/CompanySwitcher";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;
@@ -39,9 +38,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
     currentCompany.companyTypes,
     currentCompany.siret
   );
-  const showRegisterTab =
-    permissions.includes(UserPermission.RegistryCanRead) &&
-    [UserRole.Admin, UserRole.Member].includes(role!);
+
   const showMyBsds =
     permissions.includes(UserPermission.BsdCanList) && role !== UserRole.Driver;
 
@@ -67,17 +64,13 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
 
   return (
     <div className="dashboard-tabs">
-      {companies.length > 1 ? (
-        <div className="company-select">
-          <DashboardCompanySelector
-            orgId={currentCompany.orgId}
-            companies={companies}
-            handleCompanyChange={handleCompanyChange}
-          />
-        </div>
-      ) : (
-        <div className="company-title">{currentCompany.name}</div>
-      )}
+      <div className="company-select">
+        <CompanySwitcher
+          currentOrgId={currentCompany.orgId}
+          companies={companies}
+          handleCompanyChange={handleCompanyChange}
+        />
+      </div>
 
       {showMyBsds && (
         <>
@@ -230,20 +223,6 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             </li>
           </ul>
         </Accordion>
-      )}
-      {showRegisterTab && (
-        <NavLink
-          to={generatePath(routes.dashboard.exports, {
-            siret: currentCompany.orgId
-          })}
-          className={({ isActive }) =>
-            isActive
-              ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
-              : "sidebarv2__item sidebarv2__item--indented"
-          }
-        >
-          {REGISTER}
-        </NavLink>
       )}
     </div>
   );

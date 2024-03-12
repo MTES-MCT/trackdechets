@@ -1,5 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
 import CompanySelectorItem from "./CompanySelectorItem";
+import { fn } from "@storybook/test";
 
 const meta: Meta<typeof CompanySelectorItem> = {
   component: CompanySelectorItem
@@ -8,8 +9,15 @@ export default meta;
 
 type Story = StoryObj<typeof CompanySelectorItem>;
 
-export const Default: Story = {
+export const Primary: Story = {
   args: {
-    selected: false
+    onSelect: fn(),
+    company: {
+      siret: "11111111111111",
+      orgId: "11111111111111",
+      address: "rue de Kronstadt",
+      name: "Entreprise test",
+      isRegistered: true
+    }
   }
 };

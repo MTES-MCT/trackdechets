@@ -10,13 +10,15 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
+      - run: npm ci
       - uses: nrwl/nx-set-shas@v3
         with:
           main-branch-name: 'dev'
-      - run: npm ci
+      - run: git branch --track dev origin/dev
 
       - run: npx nx format:check
       - run: npx nx affected -t lint --parallel=3

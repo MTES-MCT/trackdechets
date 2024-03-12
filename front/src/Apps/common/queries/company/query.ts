@@ -124,6 +124,7 @@ export const FAVORITES = (favType: FavoriteType) => {
         traderReceiptCompanySearchString
       );
       break;
+    case FavoriteType.Emitter:
     case FavoriteType.Destination:
     case FavoriteType.Recipient:
     case FavoriteType.NextDestination:
@@ -212,6 +213,7 @@ export const COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS = gql`
   query CompanyPrivateInfos($clue: String!) {
     companyPrivateInfos(clue: $clue) {
       siret
+      companyTypes
       receivedSignatureAutomations {
         from {
           siret

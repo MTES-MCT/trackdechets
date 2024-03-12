@@ -1,4 +1,4 @@
-import { Form, BsddTransporter } from "@prisma/client";
+import { Form, BsddTransporter, FinalOperation } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
@@ -97,6 +97,36 @@ export function getRegistryFields(
   return registryFields;
 }
 
+/**
+ * Return finalOperations
+ * maintaining the order
+ */
+const getFinalOperationsData = (
+  bsdd: Bsdd & {
+    finalOperations: FinalOperation[];
+  }
+) => {
+  let result = {};
+  // Initialize empty arrays for codes and weights
+  const finalOperationCodes: string[] = [];
+  const finalReceptionWeights: number[] = [];
+  // Check if finalOperations is defined and has elements
+  if (bsdd.finalOperations && bsdd.finalOperations.length > 0) {
+    // Iterate through each operation once and fill both arrays
+    bsdd.finalOperations.forEach(ope => {
+      finalOperationCodes.push(ope.operationCode);
+      finalReceptionWeights.push(ope.quantity);
+    });
+
+    // Build the object with both arrays
+    result = {
+      finalOperationCodes,
+      finalReceptionWeights
+    };
+  }
+  return result;
+};
+
 function toGenericWaste(bsdd: Bsdd): GenericWaste {
   return {
     wasteDescription: bsdd.wasteDescription,
@@ -184,7 +214,9 @@ export function toIncomingWaste(
 }
 
 export function toOutgoingWaste(
-  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
+  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] } & {
+    finalOperations: FinalOperation[];
+  }
 ): Required<OutgoingWaste> {
   const initialEmitter: Record<string, string | string[] | null> = {
     initialEmitterCompanyAddress: null,
@@ -237,7 +269,8 @@ export function toOutgoingWaste(
     weight: bsdd.weightValue,
     emitterCustomInfo: null,
     destinationCompanyMail: bsdd.destinationCompanyMail,
-    ...getOperationData(bsdd)
+    ...getOperationData(bsdd),
+    ...getFinalOperationsData(bsdd)
   };
 }
 
@@ -355,7 +388,9 @@ export function toManagedWaste(
 }
 
 export function toAllWaste(
-  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
+  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] } & {
+    finalOperations: FinalOperation[];
+  }
 ): Required<AllWaste> {
   const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
@@ -412,6 +447,7 @@ export function toAllWaste(
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
-    ...getOperationData(bsdd)
+    ...getOperationData(bsdd),
+    ...getFinalOperationsData(bsdd)
   };
 }

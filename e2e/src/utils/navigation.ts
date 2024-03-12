@@ -49,11 +49,21 @@ export const checkCurrentURL = async (page, path) => {
  * On the dashboard page, select a company, if not already selected
  */
 export const selectCompany = async (page, siret) => {
-  const companySelector = page.locator(".company-select").getByRole("combobox");
+  const companySwitcher = page
+    .locator(".dashboard-tabs")
+    .locator(".company-switcher");
+  const currentCompany = companySwitcher.locator(
+    ".company-switcher-item--current"
+  );
 
-  const currentCompany = await companySelector.inputValue();
-  if (!currentCompany.includes(siret)) {
-    await companySelector.selectOption(siret);
+  const currentCompanySiret = await currentCompany.textContent();
+  if (!currentCompanySiret.includes(siret)) {
+    await companySwitcher.click();
+    const newCompany = companySwitcher
+      .locator(".company-switcher-item")
+      .filter({ hasText: siret });
+
+    await newCompany.click();
   }
 };
 

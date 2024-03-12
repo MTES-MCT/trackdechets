@@ -18,6 +18,16 @@ export type BsdaWithIntermediaries = Prisma.BsdaGetPayload<{
   include: typeof BsdaWithIntermediariesInclude;
 }>;
 
+export const BsdaWithForwardingInclude = Prisma.validator<Prisma.BsdaInclude>()(
+  {
+    forwarding: true
+  }
+);
+
+export type BsdaWithForwarding = Prisma.BsdaGetPayload<{
+  include: typeof BsdaWithForwardingInclude;
+}>;
+
 export const BsdaWithForwardedInInclude =
   Prisma.validator<Prisma.BsdaInclude>()({
     forwardedIn: { select: { id: true } }
@@ -25,6 +35,14 @@ export const BsdaWithForwardedInInclude =
 
 export type BsdaWithForwardedIn = Prisma.BsdaGetPayload<{
   include: typeof BsdaWithForwardedInInclude;
+}>;
+
+export const BsdaWithGroupingInclude = Prisma.validator<Prisma.BsdaInclude>()({
+  grouping: true
+});
+
+export type BsdaWithGrouping = Prisma.BsdaGetPayload<{
+  include: typeof BsdaWithGroupingInclude;
 }>;
 
 export const BsdaWithGroupedInInclude = Prisma.validator<Prisma.BsdaInclude>()({

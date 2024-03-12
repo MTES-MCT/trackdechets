@@ -23,7 +23,7 @@ export const CompaniesMenuContent = () => (
   </Accordion>
 );
 
-export default function AccountMenu() {
+export default function CompaniesMenu() {
   return (
     <SideBar>
       <CompaniesMenuContent />

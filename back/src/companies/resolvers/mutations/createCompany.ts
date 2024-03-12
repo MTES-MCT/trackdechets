@@ -1,4 +1,9 @@
-import { CompanyType, Prisma } from "@prisma/client";
+import {
+  CompanyType,
+  CompanyVerificationMode,
+  CompanyVerificationStatus,
+  Prisma
+} from "@prisma/client";
 import { convertUrls } from "../../database";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
@@ -6,11 +11,7 @@ import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
-import {
-  renderMail,
-  onboardingFirstStep,
-  verificationProcessInfo
-} from "@td/mail";
+import { renderMail, verificationProcessInfo } from "@td/mail";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
   cleanClue,
@@ -19,7 +20,7 @@ import {
   isSiret,
   isVat,
   CLOSED_COMPANY_ERROR,
-  PROFESSIONALS
+  isProfessional
 } from "@td/constants";
 import { searchCompany } from "../../search";
 import {
@@ -27,6 +28,10 @@ import {
   addToSetCompanyDepartementQueue
 } from "../../../queue/producers/company";
 import { UserInputError } from "../../../common/errors";
+import { isForeignTransporter } from "../../validation";
+import { sendFirstOnboardingEmail } from "./verifyCompany";
+import { sendVerificationCodeLetter } from "../../../common/post";
+import { isGenericEmail } from "@td/constants";
 
 /**
  * Create a new company and associate it to a user
@@ -34,9 +39,6 @@ import { UserInputError } from "../../../common/errors";
  * @param companyInput
  * @param userId
  */
-
-const { VERIFY_COMPANY } = process.env;
-
 const createCompanyResolver: MutationResolvers["createCompany"] = async (
   parent,
   { companyInput },
@@ -44,7 +46,6 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-
   const {
     codeNaf,
     gerepId,
@@ -181,6 +182,13 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     };
   }
 
+  // Foreign transporter: automatically verify (no action needed)
+  if (isForeignTransporter({ companyTypes, vatNumber })) {
+    companyCreateInput.verificationMode = CompanyVerificationMode.AUTO;
+    companyCreateInput.verificationStatus = CompanyVerificationStatus.VERIFIED;
+    companyCreateInput.verifiedAt = new Date();
+  }
+
   const companyAssociation = await prisma.companyAssociation.create({
     data: {
       user: { connect: { id: user.id } },
@@ -192,7 +200,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     include: { company: true }
   });
   await deleteCachedUserRoles(user.id);
-  const company = companyAssociation.company;
+  let company = companyAssociation.company;
 
   // fill firstAssociationDate field if null (no need to update it if user was previously already associated)
   await prisma.user.updateMany({
@@ -200,17 +208,32 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     data: { firstAssociationDate: new Date() }
   });
 
-  if (VERIFY_COMPANY === "true") {
-    const isProfessional = company.companyTypes.some(ct => {
-      return PROFESSIONALS.includes(ct);
-    });
-    if (isProfessional) {
-      await sendMail(
-        renderMail(verificationProcessInfo, {
-          to: [{ email: user.email, name: user.name }],
-          variables: { company }
-        })
-      );
+  // Company needs to be verified
+  if (process.env.VERIFY_COMPANY === "true") {
+    if (
+      isProfessional(companyTypes) &&
+      !isForeignTransporter({ companyTypes, vatNumber })
+    ) {
+      // Email is too generic. Automatically send a verification letter
+      if (isGenericEmail(user.email, company.name)) {
+        await sendVerificationCodeLetter(company);
+        company = await prisma.company.update({
+          where: { orgId: company.orgId },
+          data: {
+            verificationStatus: CompanyVerificationStatus.LETTER_SENT,
+            verificationMode: CompanyVerificationMode.LETTER
+          }
+        });
+      }
+      // Verify manually by admin
+      else {
+        await sendMail(
+          renderMail(verificationProcessInfo, {
+            to: [{ email: user.email, name: user.name }],
+            variables: { company }
+          })
+        );
+      }
     }
   }
   if (company.siret && company.address && companyInfo.codeCommune) {
@@ -225,15 +248,13 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     });
   }
 
-  // If the company is NOT professional, send onboarding email
+  // If the company is NOT professional or is foreign transporter, send onboarding email
   // (professional onboarding mail is sent on verify)
-  if (![...company.companyTypes].some(ct => PROFESSIONALS.includes(ct))) {
-    await sendMail(
-      renderMail(onboardingFirstStep, {
-        to: [{ email: user.email, name: user.name }],
-        variables: { company }
-      })
-    );
+  if (
+    !isProfessional(companyTypes) ||
+    isForeignTransporter({ companyTypes, vatNumber })
+  ) {
+    await sendFirstOnboardingEmail(companyInput, user);
   }
 
   return convertUrls(company);

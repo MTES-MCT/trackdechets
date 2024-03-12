@@ -16,7 +16,7 @@ export enum InfoIconValue {
   LastModificationDate = "Modifié le",
   CustomInfo = "Champ libre",
   TransporterNumberPlate = "Plaque d'immatriculation",
-  PickupSite = "",
+  PickupSite = "Adresse chantier",
   CustomId = "N° libre : ",
   default = ""
 }

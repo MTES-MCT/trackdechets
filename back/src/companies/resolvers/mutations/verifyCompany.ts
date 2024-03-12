@@ -1,5 +1,6 @@
 import {
   Company,
+  CompanyType,
   CompanyVerificationMode,
   CompanyVerificationStatus
 } from "@prisma/client";
@@ -15,39 +16,38 @@ import {
 } from "@td/mail";
 import { prisma } from "@td/prisma";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
-import { isForeignVat, PROFESSIONALS } from "@td/constants";
-import { isTransporter } from "../../validation";
+import { isForeignTransporter } from "../../validation";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import {
   NotCompanyAdminErrorMsg,
   UserInputError
 } from "../../../common/errors";
 
-export const sendPostVerificationFirstOnboardingEmail = async (
-  company: Company,
+export const sendFirstOnboardingEmail = async (
+  {
+    companyTypes,
+    vatNumber
+  }: {
+    companyTypes: CompanyType[];
+    vatNumber?: string | null;
+  },
   admin: { email: string; name?: string | null }
 ) => {
-  // If foreign transporter company
-  if (isTransporter(company) && isForeignVat(company.vatNumber)) {
+  if (isForeignTransporter({ companyTypes, vatNumber })) {
     await sendMail(
       renderMail(verifiedForeignTransporterCompany, {
-        to: [{ name: admin.name ?? "", email: admin.email }],
-        variables: { company: company }
+        to: [{ name: admin.name ?? "", email: admin.email }]
       })
     );
 
     return;
   }
 
-  // If professional company
-  if ([...company.companyTypes].some(ct => PROFESSIONALS.includes(ct))) {
-    await sendMail(
-      renderMail(onboardingFirstStep, {
-        to: [{ email: admin.email, name: admin.name ?? "" }],
-        variables: { company }
-      })
-    );
-  }
+  await sendMail(
+    renderMail(onboardingFirstStep, {
+      to: [{ email: admin.email, name: admin.name ?? "" }]
+    })
+  );
 };
 
 /**
@@ -92,7 +92,7 @@ const verifyCompanyResolver: MutationResolvers["verifyCompany"] = async (
   );
 
   // Potential onboarding email
-  await sendPostVerificationFirstOnboardingEmail(verifiedCompany, user);
+  await sendFirstOnboardingEmail(verifiedCompany, user);
 
   return convertUrls(verifiedCompany);
 };

@@ -3,10 +3,11 @@ import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import routes, { getRelativeRoute } from "../Apps/routes";
 import React from "react";
 import { NavLink, Routes, Route, Navigate } from "react-router-dom";
-import { CreateAnonymousCompany } from "./anonymousCompany";
+import { AnonymousCompaniesDashboard } from "./anonymousCompany";
 import Reindex from "./reindex/Reindex";
 import AnonymizeUser from "./user/anonymizeUser";
 import CompaniesVerification from "./verification/CompaniesVerification";
+import "../Apps/Dashboard/dashboard.scss";
 
 const toRelative = route => {
   return getRelativeRoute(routes.admin.index, route);
@@ -35,14 +36,14 @@ export default function Admin() {
             </li>
             <li className="tw-mb-1">
               <NavLink
-                to={routes.admin.anonymousCompany}
+                to={routes.admin.anonymousCompanies}
                 className={({ isActive }) =>
                   isActive
                     ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
                     : "sidebarv2__item sidebarv2__item--indented"
                 }
               >
-                Entreprise anonyme
+                Entreprises anonymes
               </NavLink>
             </li>
             <li className="tw-mb-1">
@@ -73,7 +74,7 @@ export default function Admin() {
         </Accordion>
       </SideBar>
 
-      <div className="dashboard-content">
+      <div className="dashboard-content fr-p-4w">
         <Routes>
           <Route
             path={toRelative(routes.admin.verification)}
@@ -81,8 +82,8 @@ export default function Admin() {
           />
 
           <Route
-            path={toRelative(routes.admin.anonymousCompany)}
-            element={<CreateAnonymousCompany />}
+            path={toRelative(routes.admin.anonymousCompanies)}
+            element={<AnonymousCompaniesDashboard />}
           />
 
           <Route

@@ -101,7 +101,8 @@ const bsdaTransporterData: Omit<
   transporterRecepisseDepartment: "83",
   transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
   transporterTransportMode: "ROAD",
-  transporterTransportPlates: ["AA-00-XX"]
+  transporterTransportPlates: ["AA-00-XX"],
+  transporterRecepisseIsExempted: false
 };
 
 const getBsdaObject = (): Prisma.BsdaCreateInput => ({

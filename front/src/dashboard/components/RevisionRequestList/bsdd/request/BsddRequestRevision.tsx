@@ -22,7 +22,7 @@ import {
   MutationCreateFormRevisionRequestArgs
 } from "@td/codegen-ui";
 import React from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import * as yup from "yup";
 import { removeEmptyKeys } from "../../../../../common/helper";

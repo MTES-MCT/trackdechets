@@ -20,7 +20,10 @@ import {
   InitialFormFraction,
   Query,
   QueryCompanyPrivateInfosArgs,
-  OperationMode
+  OperationMode,
+  QuerySearchCompaniesArgs,
+  CompanyType,
+  UserPermission
 } from "@td/codegen-ui";
 import { emitterTypeLabels, getTransportModeLabel } from "../../constants";
 import {
@@ -64,11 +67,15 @@ import {
 } from "@td/constants";
 import { Appendix1ProducerForm } from "../../../form/bsdd/appendix1Producer/form";
 import { useQuery } from "@apollo/client";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../Apps/common/queries/company/query";
+import {
+  COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS,
+  SEARCH_COMPANIES
+} from "../../../Apps/common/queries/company/query";
 import { formTransportIsPipeline } from "../../../form/bsdd/utils/packagings";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
 import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
+import { usePermissions } from "../../../common/contexts/PermissionsContext";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -471,6 +478,7 @@ const Appendix1 = ({
   container: Form;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { permissions } = usePermissions();
 
   const { data } = useQuery<
     Pick<Query, "companyPrivateInfos">,
@@ -485,6 +493,53 @@ const Appendix1 = ({
     : [];
 
   const formToBsdDisplay = mapBsdd(container);
+
+  const hasEcoOrganisme = Boolean(container.ecoOrganisme?.siret);
+  const { data: companiesInfos } = useQuery<
+    Pick<Query, "searchCompanies">,
+    QuerySearchCompaniesArgs
+  >(SEARCH_COMPANIES, {
+    variables: {
+      clue:
+        container?.grouping
+          ?.map(g => g.form.emitter?.company?.siret)
+          .filter(Boolean)
+          .join(",") ?? ""
+    },
+    skip: !container?.grouping?.length || !hasEcoOrganisme
+  });
+
+  const canSkipEmission =
+    container?.grouping?.reduce((dic, { form }) => {
+      const emitterSiret = form.emitter?.company?.siret;
+      let siretIsExutoire = false;
+      if (emitterSiret) {
+        const emitterCompany = companiesInfos?.searchCompanies?.find(
+          c => c.siret === emitterSiret
+        );
+        if (
+          emitterCompany &&
+          emitterCompany.companyTypes?.some(profile =>
+            [CompanyType.Wasteprocessor, CompanyType.Collector].includes(
+              profile
+            )
+          )
+        ) {
+          siretIsExutoire = true;
+        }
+      }
+
+      // We can skip emission if
+      // - there is an eco-organisme on the bsd && the emitter is NOT an exutoire
+      // - the emitter is in the list of companies with automatic signature
+      // - the emitter is a private individual
+      dic[form.readableId] =
+        (hasEcoOrganisme && !siretIsExutoire) ||
+        siretsWithAutomaticSignature.includes(emitterSiret) ||
+        Boolean(form.emitter?.isPrivateIndividual);
+      return dic;
+    }, {}) ?? {};
+
   return (
     <div className="tw-w-full">
       {container.status === FormStatus.Draft && (
@@ -497,7 +552,8 @@ const Appendix1 = ({
       {[FormStatus.Sealed, FormStatus.Sent].some(
         status => status === container.status
       ) &&
-        canAddAppendix1(formToBsdDisplay) && (
+        canAddAppendix1(formToBsdDisplay) &&
+        permissions.includes(UserPermission.BsdCanUpdate) && (
           <div className="tw-pb-2 tw-flex tw-justify-end">
             <button
               type="button"
@@ -515,6 +571,7 @@ const Appendix1 = ({
             <tr className="td-table__head-tr">
               <th>N° Bordereau</th>
               <th>Emetteur</th>
+              <th>Chantier</th>
               <th>Statut</th>
               <th>Action</th>
             </tr>
@@ -529,6 +586,9 @@ const Appendix1 = ({
                   {form.emitter?.company?.siret}
                 </td>
                 <td>
+                  {form.emitter?.workSite?.name} {form.emitter?.workSite?.infos}
+                </td>
+                <td>
                   {form.status
                     ? !Boolean(form.emitter?.isPrivateIndividual)
                       ? STATUS_LABELS[form.status]
@@ -540,12 +600,7 @@ const Appendix1 = ({
                     siret={siret}
                     form={form as any}
                     options={{
-                      canSkipEmission:
-                        Boolean(container.ecoOrganisme?.siret) ||
-                        siretsWithAutomaticSignature.includes(
-                          form.emitter?.company?.siret
-                        ) ||
-                        Boolean(form.emitter?.isPrivateIndividual)
+                      canSkipEmission: canSkipEmission[form.readableId]
                     }}
                   />
                 </td>
@@ -585,6 +640,7 @@ export default function BSDDetailContent({
   const { siret } = useParams<{ siret: string }>();
   const query = useQueryString();
   const navigate = useNavigate();
+  const { permissions } = usePermissions();
   const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
   const [duplicate, { loading: isDuplicating }] = useDuplicate({
@@ -607,10 +663,13 @@ export default function BSDDetailContent({
   const isAppendix1Producer: boolean =
     form?.emitter?.type === EmitterType.Appendix1Producer;
 
+  const canDuplicate = permissions.includes(UserPermission.BsdCanCreate);
+
   const canDelete =
-    [FormStatus.Draft, FormStatus.Sealed].includes(form.status) ||
-    (form.status === FormStatus.SignedByProducer &&
-      siret === form.emitter?.company?.orgId);
+    ([FormStatus.Draft, FormStatus.Sealed].includes(form.status) ||
+      (form.status === FormStatus.SignedByProducer &&
+        siret === form.emitter?.company?.orgId)) &&
+    permissions.includes(UserPermission.BsdCanDelete);
 
   const canUpdate =
     [
@@ -619,7 +678,8 @@ export default function BSDDetailContent({
       FormStatus.SignedByProducer,
       FormStatus.Sent
     ].includes(form.status) &&
-    EmitterType.Appendix1Producer !== form.emitter?.type;
+    EmitterType.Appendix1Producer !== form.emitter?.type &&
+    permissions.includes(UserPermission.BsdCanUpdate);
 
   return (
     <>
@@ -969,13 +1029,15 @@ export default function BSDDetailContent({
               <span>Pdf</span>
             </button>
           )}
-          <button
-            className="btn btn--outline-primary"
-            onClick={() => duplicate()}
-          >
-            <IconDuplicateFile size="24px" color="blueLight" />
-            <span>Dupliquer</span>
-          </button>
+          {canDuplicate && (
+            <button
+              className="btn btn--outline-primary"
+              onClick={() => duplicate()}
+            >
+              <IconDuplicateFile size="24px" color="blueLight" />
+              <span>Dupliquer</span>
+            </button>
+          )}
           {canDelete && (
             <button
               className="btn btn--outline-primary"

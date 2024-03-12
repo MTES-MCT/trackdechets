@@ -107,6 +107,7 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
       brokerRecepisseNumber: brokerReceipt.receiptNumber,
       brokerRecepisseDepartment: brokerReceipt.department,
       brokerRecepisseValidityLimit: brokerReceipt.validityLimit,
+      transportersOrgIds: [transporter.company.siret!],
       ...opt
     },
     transporterOpt: {
@@ -239,6 +240,7 @@ describe("Mutation.Bsda.duplicate", () => {
       "id",
       "createdAt",
       "updatedAt",
+      "rowNumber",
       "isDraft",
       "isDeleted",
       "status",

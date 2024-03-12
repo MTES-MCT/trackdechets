@@ -1,7 +1,9 @@
 import { Meta, StoryObj } from "@storybook/react";
 import SurveyBanner from "./SurveyBanner";
 
-const meta: Meta<typeof SurveyBanner> = { component: SurveyBanner };
+const meta: Meta<typeof SurveyBanner> = {
+  component: SurveyBanner
+};
 export default meta;
 
 type Story = StoryObj<typeof SurveyBanner>;
@@ -13,9 +15,6 @@ export const Primary: Story = {
     button: {
       title: "Répondre au questionnaire",
       href: "https://trackdechets.beta.gouv.fr"
-    },
-    onClickClose: () => {
-      console.log("Fermer la fenêtre");
     }
   }
 };

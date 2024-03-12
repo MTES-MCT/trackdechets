@@ -19,6 +19,7 @@ type EditableBsddFields = Required<
     | "id"
     | "createdAt"
     | "updatedAt"
+    | "rowNumber"
     | "readableId"
     | "status"
     | "emittedBy"
@@ -72,6 +73,7 @@ type EditableBsddFields = Required<
     | "canAccessDraftSirets"
     | "forwarding"
     | "quantityGrouped"
+    | "finalOperations"
   >
 >;
 

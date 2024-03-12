@@ -337,8 +337,9 @@ type OutgoingWaste {
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
   destinationCompanyAddress: String
-    "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
+  "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
   destinationOperationCode: String
+
   "Qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
   destinationOperationMode: OperationMode
 

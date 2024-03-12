@@ -25,7 +25,8 @@ import {
   BsdaNextDestination,
   BsdaType,
   FormCompany,
-  OperationMode
+  OperationMode,
+  UserPermission
 } from "@td/codegen-ui";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
@@ -36,6 +37,7 @@ import { getOperationModeLabel } from "../../../common/operationModes";
 import EstimatedQuantityTooltip from "../../../common/components/EstimatedQuantityTooltip";
 import { BSDA_VERBOSE_STATUSES } from "@td/constants";
 import ExpandableList from "./ExpandableList";
+import { usePermissions } from "../../../common/contexts/PermissionsContext";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -425,6 +427,7 @@ const Intermediaries = ({ intermediaries }) => (
 export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const navigate = useNavigate();
+  const { permissions } = usePermissions();
 
   const [duplicate] = useDuplicate({
     variables: { id: form.id },
@@ -681,13 +684,15 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <span>Pdf</span>
           </button>
         )}
-        <button
-          className="btn btn--outline-primary"
-          onClick={() => duplicate()}
-        >
-          <IconDuplicateFile size="24px" color="blueLight" />
-          <span>Dupliquer</span>
-        </button>
+        {permissions.includes(UserPermission.BsdCanCreate) && (
+          <button
+            className="btn btn--outline-primary"
+            onClick={() => duplicate()}
+          >
+            <IconDuplicateFile size="24px" color="blueLight" />
+            <span>Dupliquer</span>
+          </button>
+        )}
       </div>
     </div>
   );

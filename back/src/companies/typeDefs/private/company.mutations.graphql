@@ -114,6 +114,10 @@ type Mutation {
     input: SendVerificationCodeLetterInput!
   ): CompanyForVerification!
 
+  standbyCompanyByAdmin(
+    input: StandbyCompanyByAdminInput!
+  ): CompanyForVerification!
+
   """
   USAGE INTERNE
   Génère un N°SIRET factice pouvant être utilisé pour le
@@ -127,4 +131,9 @@ type Mutation {
 
   addSignatureAutomation(input: SignatureAutomationInput!): SignatureAutomation!
   removeSignatureAutomation(id: ID!): SignatureAutomation!
+
+  """
+  Permet de supprimer une demande de création d'entreprise anonyme. Pour les admins
+  """
+  deleteAnonymousCompanyRequest(siret: String!): Boolean
 }

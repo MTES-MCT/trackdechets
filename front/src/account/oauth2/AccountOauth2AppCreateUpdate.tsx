@@ -14,7 +14,7 @@ import {
   Query
 } from "@td/codegen-ui";
 import styles from "./AccountOauth2AppCreateUpdate.module.scss";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router-dom";
 import routes from "../../Apps/routes";
 import {
   NotificationError,

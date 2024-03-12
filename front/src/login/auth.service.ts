@@ -1,5 +1,5 @@
 import client from "../graphql-client";
-import { SIRET_STORAGE_KEY } from "../dashboard/DashboardCompanySelector";
+import { SIRET_STORAGE_KEY } from "../Apps/common/Components/CompanySwitcher/CompanySwitcher";
 
 export const localAuthService = {
   locallySignOut() {

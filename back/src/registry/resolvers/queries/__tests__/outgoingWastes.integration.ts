@@ -11,7 +11,8 @@ import {
   Status,
   User,
   UserRole,
-  GovernmentPermission
+  GovernmentPermission,
+  CompanyType
 } from "@prisma/client";
 import {
   refreshElasticSearch,
@@ -31,16 +32,19 @@ import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 import { Query } from "../../../../generated/graphql/types";
 import {
+  companyFactory,
   formFactory,
+  formWithTempStorageFactory,
   siretify,
   userWithAccessTokenFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OUTGOING_WASTES } from "./queries";
+import { OUTGOING_WASTES, OUTGOING_WASTES_TTR } from "./queries";
 import supertest from "supertest";
 import { app } from "../../../../server";
 import { faker } from "@faker-js/faker";
+import { operationHook } from "../../../../queue/jobs/operationHook";
 
 describe("Outgoing wastes registry", () => {
   let emitter: { user: User; company: Company };
@@ -443,5 +447,78 @@ describe("Outgoing wastes registry", () => {
         })
       ]
     });
+  });
+
+  it.skip("should export the quantity received of the final destination in case of transit", async () => {
+    const { query } = makeClient(emitter.user);
+    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
+      UserRole.MEMBER,
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const destination = await companyFactory({
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+    });
+
+    const formWithTempStorage = await formWithTempStorageFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        wasteDetailsCode: "05 01 02*",
+        status: Status.PROCESSED,
+        quantityReceived: 1000,
+        createdAt: new Date("2021-04-01"),
+        sentAt: new Date("2021-04-01"),
+        receivedAt: new Date("2021-04-01"),
+        processedAt: new Date("2021-04-01"),
+        processingOperationDone: "R 1",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            number: 1
+          }
+        },
+        recipientCompanySiret: ttr.siret
+      },
+      forwardedInOpts: {
+        emitterCompanySiret: ttr.siret,
+        emitterCompanyName: ttr.name,
+        recipientCompanySiret: destination.siret,
+        quantityReceived: 100,
+        receivedAt: new Date(),
+        processingOperationDone: "R 1"
+      }
+    });
+    const formWithTempStorageFullForm = await getFormForElastic(
+      formWithTempStorage
+    );
+    const forwardedInithTempStorageFullForm = await getFormForElastic(
+      formWithTempStorage.forwardedIn!
+    );
+    await indexForm(formWithTempStorageFullForm);
+    await indexForm(forwardedInithTempStorageFullForm);
+    await refreshElasticSearch();
+    // Manually execute operationHook to simulate markAsProcessed
+    await operationHook({
+      finalFormId: forwardedInithTempStorageFullForm.id,
+      initialFormId: forwardedInithTempStorageFullForm.id
+    });
+
+    const { data } = await query<Pick<Query, "outgoingWastes">>(
+      OUTGOING_WASTES_TTR,
+      {
+        variables: {
+          sirets: [emitter.company.siret],
+          first: 2
+        }
+      }
+    );
+    expect(data.outgoingWastes.edges).toHaveLength(2);
+    const outgoingWastes = data.outgoingWastes.edges.map(e => e.node)[1];
+    expect(outgoingWastes.emitterCompanySiret).toEqual(emitter.company.siret);
+    // destinationReceptionWeight doit être celui de la destination finale et no pas de l'installation de transit
+    expect(outgoingWastes.finalReceptionWeights).toStrictEqual([100]);
+    expect(outgoingWastes.finalOperationCodes).toStrictEqual(["R 1"]);
   });
 });

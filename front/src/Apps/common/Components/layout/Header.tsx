@@ -15,7 +15,6 @@ import { Query, UserPermission, UserRole } from "@td/codegen-ui";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 import { useShowTransportTabs } from "../../../Dashboard/hooks/useShowTransportTabs";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
 
 import {
   ACTS,
@@ -35,6 +34,7 @@ import routes from "../../../routes";
 import styles from "./Header.module.scss";
 import { Header as HeaderDSFR } from "@codegouvfr/react-dsfr/Header";
 import { MainNavigation } from "@codegouvfr/react-dsfr/MainNavigation";
+import CompanySwitcher from "../CompanySwitcher/CompanySwitcher";
 
 export const GET_ME = gql`
   {
@@ -46,6 +46,7 @@ export const GET_ME = gql`
         givenName
         userRole
         orgId
+        securityCode
         companyTypes
         userPermissions
       }
@@ -133,7 +134,7 @@ function DashboardSubNav({ currentCompany }) {
   const showMyBsds =
     permissions.includes(UserPermission.BsdCanList) && role !== UserRole.Driver;
 
-  const showRegisterTab =
+  const showRegistryTab =
     permissions.includes(UserPermission.RegistryCanRead) &&
     [UserRole.Admin, UserRole.Member].includes(role!);
 
@@ -286,15 +287,13 @@ function DashboardSubNav({ currentCompany }) {
           </div>
         </li>
       )}
-      {showRegisterTab && (
+      {showRegistryTab && (
         <li className="fr-nav__item">
           <MenuLink
             entry={{
               navlink: true,
               caption: "Mes registres",
-              href: generatePath(routes.dashboard.exports, {
-                siret: currentCompany.orgId
-              })
+              href: routes.registry
             }}
           />
         </li>
@@ -448,20 +447,24 @@ function MobileSubNav({ currentCompany }) {
   );
 }
 
-const getDesktopMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
-  const common = [
-    {
-      caption: "Aide",
-      href: "https://faq.trackdechets.fr/",
-      navlink: null,
-      target: "_blank"
-    }
-  ];
-
+const getDesktopMenuEntries = (
+  isAuthenticated,
+  isAdmin,
+  showRegistry,
+  currentSiret
+) => {
   const admin = [
     {
       caption: "Admin",
       href: routes.admin.verification,
+      navlink: true
+    }
+  ];
+
+  const registry = [
+    {
+      caption: "Mes registres",
+      href: routes.registry,
       navlink: true
     }
   ];
@@ -483,6 +486,7 @@ const getDesktopMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
 
       navlink: true
     },
+    ...(showRegistry ? registry : []),
     {
       caption: "Mon compte",
       href: routes.account.index,
@@ -491,11 +495,7 @@ const getDesktopMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
     }
   ];
 
-  return [
-    ...(isAuthenticated ? connected : []),
-    ...common,
-    ...(isAdmin ? admin : [])
-  ];
+  return [...(isAuthenticated ? connected : []), ...(isAdmin ? admin : [])];
 };
 
 type HeaderProps = {
@@ -516,7 +516,7 @@ export default function Header({
 }: HeaderProps) {
   const { VITE_API_ENDPOINT } = import.meta.env;
   const location = useLocation();
-  const { updatePermissions, role } = usePermissions();
+  const { updatePermissions, role, permissions } = usePermissions();
   const navigate = useNavigate();
 
   const matchDashboard = matchPath(
@@ -542,7 +542,8 @@ export default function Header({
       if (currentCompany) {
         updatePermissions(
           currentCompany.userPermissions,
-          currentCompany.userRole!
+          currentCompany.userRole!,
+          currentSiret
         );
       }
     }
@@ -564,6 +565,10 @@ export default function Header({
     [navigate, role]
   );
 
+  const showRegistry =
+    permissions.includes(UserPermission.RegistryCanRead) &&
+    [UserRole.Admin, UserRole.Member].includes(role!);
+
   if (isAuthenticated && data?.me == null) {
     return <Loader />;
   }
@@ -576,6 +581,7 @@ export default function Header({
   const menuEntries = getDesktopMenuEntries(
     isAuthenticated,
     isAdmin,
+    showRegistry,
     currentSiret
   );
 
@@ -623,11 +629,33 @@ export default function Header({
         <MainNavigation
           items={[
             {
-              linkProps: {
-                href: "https://faq.trackdechets.fr/",
-                target: "_blank"
-              },
-              text: "Aide"
+              text: "Aide",
+              menuLinks: [
+                {
+                  linkProps: {
+                    href: "https://faq.trackdechets.fr/",
+                    target: "_blank",
+                    rel: "noreferrer"
+                  },
+                  text: "Foire aux questions"
+                },
+                {
+                  linkProps: {
+                    href: "https://sandbox.trackdechets.beta.gouv.fr/",
+                    target: "_blank",
+                    rel: "noreferrer"
+                  },
+                  text: "Site de démonstration"
+                },
+                {
+                  linkProps: {
+                    href: "https://trackdechets.beta.gouv.fr/",
+                    target: "_blank",
+                    rel: "noreferrer"
+                  },
+                  text: "Page d'accueil / Formations"
+                }
+              ]
             }
           ]}
         />
@@ -663,6 +691,50 @@ export default function Header({
                   <MenuLink entry={e} />
                 </li>
               ))}
+
+              <li className="fr-nav__item">
+                <button
+                  className="fr-nav__btn"
+                  aria-expanded="false"
+                  aria-controls="aidemenu"
+                >
+                  Aide
+                </button>
+                <div className="fr-collapse fr-menu" id="aidemenu">
+                  <ul className="fr-menu__list">
+                    <li>
+                      <a
+                        className="fr-nav__link"
+                        href="https://faq.trackdechets.fr/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Foire aux questions
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="fr-nav__link"
+                        href="https://sandbox.trackdechets.beta.gouv.fr/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Site de démonstration
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="fr-nav__link"
+                        href="https://trackdechets.beta.gouv.fr/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Page d'accueil / Formations
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
             </ul>
           </nav>
 
@@ -704,17 +776,13 @@ export default function Header({
       {/* Company switcher on top of the page */}
       {!!matchDashboard && companies && currentCompany && (
         <div className={styles.companySelector}>
-          {companies.length > 1 ? (
-            <div className="company-select">
-              <DashboardCompanySelector
-                orgId={currentCompany.orgId}
-                companies={companies}
-                handleCompanyChange={handleCompanyChange}
-              />
-            </div>
-          ) : (
-            <div className="company-title">{currentCompany.name}</div>
-          )}
+          <div className="company-select">
+            <CompanySwitcher
+              currentOrgId={currentCompany.orgId}
+              companies={companies}
+              handleCompanyChange={handleCompanyChange}
+            />
+          </div>
         </div>
       )}
     </>

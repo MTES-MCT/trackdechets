@@ -2,7 +2,7 @@ const routes = {
   admin: {
     index: "/admin",
     verification: "/admin/verification",
-    anonymousCompany: "/admin/anonymous-company",
+    anonymousCompanies: "/admin/anonymous-companies",
     reindex: "/admin/reindex",
     user: "/admin/user"
   },
@@ -22,7 +22,6 @@ const routes = {
   wasteTree: "/wasteTree",
   dashboard: {
     index: "/dashboard/:siret",
-    exports: "/dashboard/:siret/exports",
     roadControl: "/dashboard/:siret/road-control/:id",
     bsds: {
       index: "/dashboard/:siret/bsds/all",
@@ -110,7 +109,8 @@ const routes = {
     },
     join: "/companies/join",
     orientation: "/companies/create"
-  }
+  },
+  registry: "/registre"
 };
 
 export function getRelativeRoute(index, route) {

@@ -3,10 +3,9 @@ import { FormNotFound } from "../forms/errors";
 import { getReadonlyBsdaRepository } from "./repository";
 import { prisma } from "@td/prisma";
 
-export async function getBsdaOrNotFound<Args extends Prisma.BsdaDefaultArgs>(
-  id: string,
-  args?: Args
-): Promise<Prisma.BsdaGetPayload<Args>> {
+export async function getBsdaOrNotFound<
+  Args extends Omit<Prisma.BsdaDefaultArgs, "where">
+>(id: string, args?: Args): Promise<Prisma.BsdaGetPayload<Args>> {
   const bsda = await getReadonlyBsdaRepository().findUnique({ id }, args);
   if (bsda == null || bsda.isDeleted) {
     throw new FormNotFound(id.toString());
@@ -17,10 +16,9 @@ export async function getBsdaOrNotFound<Args extends Prisma.BsdaDefaultArgs>(
 /**
  * Returns direct parents of a BSDA
  */
-export async function getPreviousBsdas<Args extends Prisma.BsdaDefaultArgs>(
-  bsda: Pick<Bsda, "id" | "forwardingId">,
-  args?: Args
-) {
+export async function getPreviousBsdas<
+  Args extends Omit<Prisma.BsdaDefaultArgs, "where">
+>(bsda: Pick<Bsda, "id" | "forwardingId">, args?: Args) {
   const bsdaRepository = getReadonlyBsdaRepository();
   const forwardedBsda = bsda.forwardingId
     ? await bsdaRepository.findUnique({ id: bsda.forwardingId }, args)
@@ -38,10 +36,9 @@ export async function getPreviousBsdas<Args extends Prisma.BsdaDefaultArgs>(
 /**
  * Return all the BSDAs in the traceability history of this one
  */
-export async function getBsdaHistory<Args extends Prisma.BsdaDefaultArgs>(
-  bsda: Bsda,
-  args?: Args
-): Promise<Prisma.BsdaGetPayload<Args>[]> {
+export async function getBsdaHistory<
+  Args extends Omit<Prisma.BsdaDefaultArgs, "where">
+>(bsda: Bsda, args?: Args): Promise<Prisma.BsdaGetPayload<Args>[]> {
   async function recursiveGetBsdaHistory(
     bsdas: Bsda[],
     history: Prisma.BsdaGetPayload<Args>[]

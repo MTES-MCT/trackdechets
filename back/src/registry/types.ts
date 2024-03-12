@@ -177,6 +177,9 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   workerCompanyName: null,
   workerCompanySiret: null,
   workerCompanyAddress: null
+  // En attente des correctifs recette sur TRA-12745
+  // finalOperationCodes: null,
+  // finalReceptionWeights: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -304,6 +307,9 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   workerCompanyName: null,
   workerCompanySiret: null,
   workerCompanyAddress: null
+  // En attente des correctifs recette sur TRA-12745
+  // finalOperationCodes: null,
+  // finalReceptionWeights: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -379,4 +385,7 @@ export const emptyAllWaste: Required<AllWaste> = {
   workerCompanyName: null,
   workerCompanySiret: null,
   workerCompanyAddress: null
+  // En attente des correctifs recette sur TRA-12745
+  // finalOperationCodes: null,
+  // finalReceptionWeights: null
 };

@@ -30,7 +30,6 @@ import {
   RouteBsffsView,
   RouteBsvhusView
 } from "../../dashboard/detail";
-import Exports from "../../dashboard/exports/Exports";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
 import { usePermissions } from "../../common/contexts/PermissionsContext";
 
@@ -51,6 +50,7 @@ export const GET_ME = gql`
         orgId
         companyTypes
         userPermissions
+        securityCode
       }
     }
   }
@@ -98,7 +98,8 @@ function DashboardRoutes() {
       if (currentCompany) {
         updatePermissions(
           currentCompany.userPermissions,
-          currentCompany.userRole!
+          currentCompany.userRole!,
+          siret
         );
       }
     }
@@ -205,11 +206,6 @@ function DashboardRoutes() {
           <Route
             path={toRelative(routes.dashboard.bsffs.view)}
             element={<RouteBsffsView />}
-          />
-
-          <Route
-            path={toRelative(routes.dashboard.exports)}
-            element={<Exports companies={companies} />}
           />
 
           <Route

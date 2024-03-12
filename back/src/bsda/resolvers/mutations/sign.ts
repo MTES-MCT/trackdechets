@@ -37,8 +37,9 @@ import {
 import { machine } from "../../machine";
 import { renderBsdaRefusedEmail } from "../../mails/refused";
 import { BsdaRepository, getBsdaRepository } from "../../repository";
-import { parseBsdaInContext } from "../../validation";
 import { BsdaWithTransporters } from "../../types";
+import { parseBsdaAsync } from "../../validation";
+import { prismaToZodBsda } from "../../validation/helpers";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,
@@ -51,7 +52,6 @@ const signBsda: MutationResolvers["signBsda"] = async (
     include: {
       intermediaries: true,
       grouping: true,
-      forwarding: true,
       transporters: true
     }
   });
@@ -72,10 +72,13 @@ const signBsda: MutationResolvers["signBsda"] = async (
     transporterReceipt = await getTransporterReceipt(bsda.transporters[0]);
   }
 
+  const zodBsda = prismaToZodBsda(bsda);
+
   // Check that all necessary fields are filled
-  await parseBsdaInContext(
-    { persisted: { ...bsda, ...transporterReceipt } },
+  await parseBsdaAsync(
+    { ...zodBsda, ...transporterReceipt },
     {
+      user,
       currentSignatureType: input.type
     }
   );

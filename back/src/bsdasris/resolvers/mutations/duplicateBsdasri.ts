@@ -50,6 +50,7 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     id,
     createdAt,
     updatedAt,
+    rowNumber,
 
     emissionSignatoryId,
     emitterEmissionSignatureDate,
