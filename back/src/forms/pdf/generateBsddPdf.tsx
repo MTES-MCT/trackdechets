@@ -33,6 +33,8 @@ import { buildAddress } from "../../companies/sirene/utils";
 import { packagingsEqual } from "@td/constants";
 import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../common/operationModes";
+import { FormCompanyDetails } from "../../common/pdf/components/FormCompanyDetails";
+import { isFrenchCompany } from "../../companies/validation";
 
 type ReceiptFieldsProps = Partial<
   Pick<
@@ -400,6 +402,20 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
             <p>
               <input
                 type="checkbox"
+                checked={isFrenchCompany({
+                  company: form.emitter?.company,
+                  isForeignShip: Boolean(form.emitter?.isForeignShip),
+                  isPrivateIndividual: Boolean(
+                    form.emitter?.isPrivateIndividual
+                  )
+                })}
+                readOnly
+              />{" "}
+              L'émetteur est un établissement français
+            </p>
+            <p>
+              <input
+                type="checkbox"
                 checked={Boolean(form.emitter?.isPrivateIndividual)}
                 readOnly
               />{" "}
@@ -413,7 +429,7 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
               />{" "}
               L'émetteur est un navire étranger
             </p>
-            <FormCompanyFields
+            <FormCompanyDetails
               company={form.emitter?.company}
               isPrivateIndividual={Boolean(form.emitter?.isPrivateIndividual)}
               isForeignShip={Boolean(form.emitter?.isForeignShip)}
