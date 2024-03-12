@@ -1,3 +1,5 @@
+import { UserInputError } from "../../common/errors";
+
 export const extractPrefix = (chunk: string) => {
   const VALID_PREFIXES = ["BSDA", "DASRI", "FF", "VHU", "BSD", "TD", "PAOH"];
 
@@ -63,7 +65,9 @@ export const toBsdId = (chunk: string) => {
 
     return `${prefix}-${date}-${suffix}`;
   } catch (e) {
-    throw new Error(`"${chunk}" n'est pas un identifiant de bordereau valide`);
+    throw new UserInputError(
+      `"${chunk}" n'est pas un identifiant de bordereau valide`
+    );
   }
 };
 

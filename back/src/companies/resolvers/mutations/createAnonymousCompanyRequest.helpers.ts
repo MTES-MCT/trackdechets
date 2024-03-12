@@ -1,6 +1,7 @@
 import pdfParser from "pdf-parse";
 import { isSiret, nafCodes } from "@td/constants";
 import { looksHacky } from "../../../utils";
+import { UserInputError } from "../../../common/errors";
 
 export interface Info {
   PDFFormatVersion: string;
@@ -304,7 +305,7 @@ export const parseBase64 = async (pdf: string): Promise<ParsedPdf> => {
 
     return data;
   } catch (e) {
-    throw new Error(
+    throw new UserInputError(
       "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
     );
   }
@@ -322,7 +323,7 @@ export const validateAndExtractSireneDataFromPDFInBase64 = async (
 
   // If it looks fishy, don't even go further. Not storing dangerous stuff
   if (looksHacky(JSON.stringify({ text, info, metadata }))) {
-    throw new Error(
+    throw new UserInputError(
       "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
     );
   }
@@ -336,7 +337,7 @@ export const validateAndExtractSireneDataFromPDFInBase64 = async (
     // Get data
     data = extractData(text);
   } catch (e) {
-    throw new Error(
+    throw new UserInputError(
       "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
     );
   }
@@ -345,7 +346,7 @@ export const validateAndExtractSireneDataFromPDFInBase64 = async (
 
   // Company should not be closed
   if (closedAt) {
-    throw new Error(
+    throw new UserInputError(
       `Cet établissement est fermé depuis le ${closedAt.toLocaleDateString(
         "fr-FR"
       )}`
@@ -356,7 +357,7 @@ export const validateAndExtractSireneDataFromPDFInBase64 = async (
   const now = new Date();
   const threeMonthsAgo = new Date(now.setMonth(now.getMonth() - 3));
   if (!pdfEmittedAt || pdfEmittedAt.getTime() < threeMonthsAgo.getTime()) {
-    throw new Error(
+    throw new UserInputError(
       "Le certificat d'inscription n'est pas daté de moins de trois mois"
     );
   }

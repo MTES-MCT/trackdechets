@@ -11,6 +11,7 @@ import { sendMail } from "../../../mailer/mailing";
 import { getCodeCommune } from "../../geo/getCodeCommune";
 import { validateAndExtractSireneDataFromPDFInBase64 } from "./createAnonymousCompanyRequest.helpers";
 import { base64, siret } from "../../../common/validation";
+import { UserInputError } from "../../../common/errors";
 
 const anonymousCompanyRequestInputSchema: yup.SchemaOf<CreateAnonymousCompanyRequestInput> =
   yup.object({
@@ -32,7 +33,7 @@ const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousC
     const data = await validateAndExtractSireneDataFromPDFInBase64(pdf);
 
     if (data.siret !== siret) {
-      throw new Error(
+      throw new UserInputError(
         `Le certificat d'inscription ne correspond pas au SIRET renseigné`
       );
     }
@@ -49,7 +50,9 @@ const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousC
       }
     });
     if (anonymousCompany || company) {
-      throw new Error(`L'entreprise avec le SIRET ${data.siret} existe déjà`);
+      throw new UserInputError(
+        `L'entreprise avec le SIRET ${data.siret} existe déjà`
+      );
     }
 
     // Verify creation request does not already exist
@@ -59,7 +62,7 @@ const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousC
       }
     });
     if (request) {
-      throw new Error(
+      throw new UserInputError(
         `Une demande pour l'entreprise ${data.siret} est déjà en cours`
       );
     }
