@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
+import { useQuery } from "@apollo/client";
 
 import { formatDate } from "../../../../common/datetime";
 import Badge from "../Badge/Badge";
@@ -26,7 +27,15 @@ import {
   useBsffDownloadPdf,
   useBsvhuDownloadPdf
 } from "../Pdf/useDownloadPdf";
-import { BsdType, RevisionRequestStatus, UserPermission } from "@td/codegen-ui";
+import {
+  BsdType,
+  CompanyType,
+  EmitterType,
+  Query,
+  QueryCompanyPrivateInfosArgs,
+  RevisionRequestStatus,
+  UserPermission
+} from "@td/codegen-ui";
 import {
   useBsdaDuplicate,
   useBsdasriDuplicate,
@@ -34,6 +43,7 @@ import {
   useBsffDuplicate,
   useBsvhuDuplicate
 } from "../Duplicate/useDuplicate";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../common/queries/company/query";
 import { Loader } from "../../../common/Components";
 import { BsdDisplay, BsdStatusCode } from "../../../common/types/bsdTypes";
 import DeleteModal from "../DeleteModal/DeleteModal";
@@ -117,6 +127,23 @@ function BsdCard({
     ? formatDate(bsdDisplay.updatedAt)
     : "";
 
+  const { data: emitterCompanyData } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
+    variables: { clue: bsd.emitter?.company?.siret! },
+    skip:
+      !bsdDisplay ||
+      bsdDisplay.emitterType !== EmitterType.Appendix1Producer ||
+      bsdDisplay.transporter?.company?.siret !== currentSiret
+  });
+
+  const emitterIsExutoireOrTtr = Boolean(
+    emitterCompanyData?.companyPrivateInfos.companyTypes.filter(type =>
+      [CompanyType.Wasteprocessor, CompanyType.Collector].includes(type)
+    )?.length
+  );
+
   const actionsLabel = useMemo(
     () =>
       getPrimaryActionsLabelFromBsdStatus(
@@ -124,14 +151,16 @@ function BsdCard({
         currentSiret,
         permissions,
         bsdCurrentTab,
-        hasAutomaticSignature
+        hasAutomaticSignature,
+        emitterIsExutoireOrTtr
       ),
     [
       bsdCurrentTab,
       bsdDisplay,
       currentSiret,
       hasAutomaticSignature,
-      permissions
+      permissions,
+      emitterIsExutoireOrTtr
     ]
   );
   const ctaPrimaryLabel = bsdDisplay?.type ? actionsLabel : "";
@@ -413,6 +442,7 @@ function BsdCard({
                   hideReviewCta={isReviewsTab}
                   isToCollectTab={isToCollectTab}
                   hasAutomaticSignature={hasAutomaticSignature}
+                  emitterIsExutoireOrTtr={emitterIsExutoireOrTtr}
                 />
               </div>
             </div>

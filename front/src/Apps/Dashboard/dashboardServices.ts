@@ -424,9 +424,10 @@ const isAppendix1Producer = (bsd: BsdDisplay): boolean =>
 
 export const canSkipEmission = (
   bsd: BsdDisplay,
-  hasAutomaticSignature: boolean | undefined
+  hasAutomaticSignature: boolean | undefined,
+  emitterIsExutoireOrTtr: boolean | undefined
 ): boolean =>
-  (Boolean(bsd.ecoOrganisme?.siret) ||
+  ((Boolean(bsd.ecoOrganisme?.siret) && !emitterIsExutoireOrTtr) ||
     hasAutomaticSignature ||
     Boolean(bsd.emitter?.isPrivateIndividual)) &&
   isAppendix1Producer(bsd);
@@ -434,10 +435,11 @@ export const canSkipEmission = (
 export const isSignTransportCanSkipEmission = (
   currentSiret: string,
   bsd: BsdDisplay,
-  hasAutomaticSignature: boolean | undefined
+  hasAutomaticSignature: boolean | undefined,
+  emitterIsExutoireOrTtr: boolean | undefined
 ) => {
   return (
-    canSkipEmission(bsd, hasAutomaticSignature) &&
+    canSkipEmission(bsd, hasAutomaticSignature, emitterIsExutoireOrTtr) &&
     isSameSiretTransporter(currentSiret, bsd)
   );
 };
@@ -486,7 +488,8 @@ export const getSealedBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
   permissions: UserPermission[],
-  hasAutomaticSignature?: boolean
+  hasAutomaticSignature?: boolean,
+  emitterIsExutoireOrTtr?: boolean
 ): string => {
   if (
     isBsdd(bsd.type) &&
@@ -498,7 +501,12 @@ export const getSealedBtnLabel = (
     }
 
     if (
-      isSignTransportCanSkipEmission(currentSiret, bsd, hasAutomaticSignature)
+      isSignTransportCanSkipEmission(
+        currentSiret,
+        bsd,
+        hasAutomaticSignature,
+        emitterIsExutoireOrTtr
+      )
     ) {
       return SIGNER;
     }
@@ -918,7 +926,8 @@ export const getPrimaryActionsLabelFromBsdStatus = (
   currentSiret: string,
   permissions: UserPermission[],
   bsdCurrentTab?: BsdCurrentTab,
-  hasAutomaticSignature?: boolean
+  hasAutomaticSignature?: boolean,
+  emitterIsExutoireOrTtr?: boolean
 ) => {
   switch (bsd.status) {
     case BsdStatusCode.Draft:
@@ -934,7 +943,8 @@ export const getPrimaryActionsLabelFromBsdStatus = (
         currentSiret,
         bsd,
         permissions,
-        hasAutomaticSignature
+        hasAutomaticSignature,
+        emitterIsExutoireOrTtr
       );
 
     case BsdStatusCode.Sent:
