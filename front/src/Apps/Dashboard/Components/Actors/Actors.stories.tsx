@@ -1,23 +1,17 @@
-import React from "react";
-import { ComponentMeta, ComponentStory } from "@storybook/react";
-
+import { Meta, StoryObj } from "@storybook/react";
 import Actors from "./Actors";
 
-export default {
-  title: "COMPONENTS/DASHBOARD/BsdCard/Blocks/Actors",
-  component: Actors,
-  design: {
-    type: "figma",
-    url: "https://www.figma.com/file/tyefue5qFChEpujrFU1Jiz/Librairie-TD-dashboard?node-id=1%3A2420&t=0tYb1cF2o4m4Id2g-4"
+const meta: Meta<typeof Actors> = {
+  component: Actors
+};
+export default meta;
+
+type Story = StoryObj<typeof Actors>;
+
+export const Primary: Story = {
+  args: {
+    emitterName: "BOULANGERIE AU 148",
+    transporterName:
+      "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE"
   }
-} as ComponentMeta<typeof Actors>;
-
-const Template: ComponentStory<typeof Actors> = args => <Actors {...args} />;
-
-export const List = Template.bind({});
-
-List.args = {
-  emitterName: "BOULANGERIE AU 148",
-  transporterName:
-    "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE"
 };
