@@ -2,8 +2,9 @@ import { faker } from "@faker-js/faker";
 import { AuthType } from "@prisma/client";
 import { CompanyInput } from "../../generated/graphql/types";
 import buildSirenify, { searchCompanyFailFast } from "../sirenify";
+import { searchCompany } from "../search";
 
-const searchCompanySpy = jest.spyOn(require("../search"), "searchCompany");
+jest.mock("../search");
 
 type Input = { company: CompanyInput };
 
@@ -36,7 +37,7 @@ const sirenify = buildSirenify(accessors);
 
 describe("sirenify", () => {
   it("should throw exception on closed company", async () => {
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       ...searchResult,
       etatAdministratif: "F"
     });
@@ -76,7 +77,7 @@ describe("sirenify", () => {
   });
 
   it("should by pass auto-completion of name and address if company is non diffusible", async () => {
-    searchCompanySpy.mockResolvedValueOnce({
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
       ...searchResult,
       statutDiffusionEtablissement: "P"
     });
@@ -137,7 +138,7 @@ describe("sirenify", () => {
 describe("searchCompanyFailFast", () => {
   it("should timeout and return null if searchCompany takes more than 1 second to respond", async () => {
     const searchCompanyMock = jest.fn().mockReturnValue(searchResult);
-    searchCompanySpy.mockImplementation(
+    (searchCompany as jest.Mock).mockImplementation(
       () =>
         new Promise(resolve =>
           setTimeout(() => resolve(searchCompanyMock()), 1200)
@@ -149,7 +150,7 @@ describe("searchCompanyFailFast", () => {
   });
 
   it("should return result if searchCompany takes less than 1 second to respond", async () => {
-    searchCompanySpy.mockResolvedValue(searchResult);
+    (searchCompany as jest.Mock).mockResolvedValue(searchResult);
     const r = await searchCompanyFailFast("85001946400021");
     expect(r!.name).toEqual("CODE EN STOCK");
   });

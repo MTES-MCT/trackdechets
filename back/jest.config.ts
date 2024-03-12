@@ -4,7 +4,7 @@ export default {
   preset: "../jest.preset.js",
   testEnvironment: "node",
   transform: {
-    "^.+\\.[tj]sx?$": ["ts-jest", { tsconfig: "<rootDir>/tsconfig.spec.json" }]
+    "^.+\\.(t|j)sx?$": ["@swc/jest"]
   },
   testPathIgnorePatterns: ["<rootDir>/dist/"],
   testMatch: ["**/__tests__/**/?(*.)+(spec|test).[jt]s?(x)"],

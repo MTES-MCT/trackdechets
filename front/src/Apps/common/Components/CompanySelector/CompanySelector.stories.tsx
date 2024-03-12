@@ -1,20 +1,13 @@
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta } from "@storybook/react";
 import CompanySelector from "./CompanySelector";
+import { fn } from "@storybook/test";
 
-const meta: Meta<typeof CompanySelector> = { component: CompanySelector };
-export default meta;
-
-type Story = StoryObj<typeof CompanySelector>;
-
-export const Primary: Story = {
-  args: {}
-};
-
-export const SearchResults: Story = {
+const meta: Meta<typeof CompanySelector> = {
+  component: CompanySelector,
   args: {
     loading: false,
-    onSearch: () => {},
-    onSelect: () => {},
+    onSearch: fn(),
+    onSelect: fn(),
     companies: [
       {
         siret: "11111111111111",
@@ -47,7 +40,4 @@ export const SearchResults: Story = {
     ]
   }
 };
-
-export const Selected: Story = {
-  args: {}
-};
+export default meta;
