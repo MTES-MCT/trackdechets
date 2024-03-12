@@ -196,7 +196,7 @@ app.use(
         fontSrc: ["'self'", "https:", "data:"],
         frameAncestors: ["'self'"],
         imgSrc: ["'self'"],
-        objectSrc: ["'self'", "data:"],
+        objectSrc: ["'none'"],
         scriptSrc: ["'self'"],
         scriptSrcAttr: ["'none'"],
         styleSrc: [
