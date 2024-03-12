@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useParams, useMatch } from "react-router-dom";
 import { useLazyQuery, useQuery } from "@apollo/client";
+import * as Sentry from "@sentry/browser";
 import routes from "../Apps/routes";
 import { GET_BSDS } from "../Apps/common/queries";
 import {
@@ -38,6 +39,7 @@ import {
   Tabs
 } from "./Dashboard.utils";
 import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
+import { NotificationError } from "../Apps/common/Components/Error/Error";
 
 import "./dashboard.scss";
 
@@ -71,7 +73,7 @@ const DashboardPage = () => {
     first: BSD_PER_PAGE
   });
 
-  const [lazyFetchBsds, { data, loading, fetchMore }] = useLazyQuery<
+  const [lazyFetchBsds, { data, loading, error, fetchMore }] = useLazyQuery<
     Pick<Query, "bsds">,
     QueryBsdsArgs
   >(GET_BSDS, {
@@ -142,6 +144,12 @@ const DashboardPage = () => {
   useEffect(() => {
     fetchBsds(siret, bsdsVariables, tabs);
   }, [bsdsVariables, siret, tabs, fetchBsds]);
+
+  useEffect(() => {
+    if (error) {
+      Sentry.captureException(error);
+    }
+  }, [error]);
 
   const { data: companyData } = useQuery<
     Pick<Query, "companyPrivateInfos">,
@@ -218,7 +226,9 @@ const DashboardPage = () => {
       />
 
       {isLoadingBsds && <Loader />}
-      {!Boolean(bsdsTotalCount) && !isLoadingBsds && (
+      {error && <NotificationError apolloError={error} />}
+
+      {!error && !Boolean(bsdsTotalCount) && !isLoadingBsds && (
         <div className="dashboard-page__blankstate">
           <Blankslate>
             {getBlankslateTitle(tabs) && (
