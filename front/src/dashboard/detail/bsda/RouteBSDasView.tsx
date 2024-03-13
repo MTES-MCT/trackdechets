@@ -17,7 +17,7 @@ export function RouteBSDasView() {
         id: formId!
       },
       skip: !formId,
-      fetchPolicy: "network-only"
+      fetchPolicy: "no-cache"
     }
   );
 
