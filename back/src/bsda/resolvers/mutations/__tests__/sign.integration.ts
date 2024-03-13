@@ -1402,10 +1402,10 @@ describe("Mutation.Bsda.sign", () => {
       });
 
       // Crée un second transporteur qui n'a pas encore signé
-      // await bsdaTransporterFactory({
-      //   bsdaId: bsda.id,
-      //   opts: { transporterTransportSignatureDate: null }
-      // });
+      await bsdaTransporterFactory({
+        bsdaId: bsda.id,
+        opts: { transporterTransportSignatureDate: null }
+      });
 
       const { mutate } = makeClient(user);
 
