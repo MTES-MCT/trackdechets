@@ -79,7 +79,9 @@ export async function getZodTransporters(
  * typés en string côté GraphQL mais en enum côté Zod ce qui nous oblige
  * à faire un casting de type.
  */
-export function graphQlInputToZodBsda(input: BsdaInput): ZodBsda {
+export async function graphQlInputToZodBsda(
+  input: BsdaInput
+): Promise<ZodBsda> {
   const {
     wasteCode,
     destinationPlannedOperationCode,
@@ -89,6 +91,8 @@ export function graphQlInputToZodBsda(input: BsdaInput): ZodBsda {
     ...flattenedBsdaInput
   } = flattenBsdaInput(input);
 
+  const transporters = await getZodTransporters(input);
+
   return safeInput({
     ...flattenedBsdaInput,
     wasteCode: wasteCode as ZodWasteCodeEnum,
@@ -97,6 +101,7 @@ export function graphQlInputToZodBsda(input: BsdaInput): ZodBsda {
     destinationOperationCode: destinationOperationCode as ZodOperationEnum,
     workerCertificationOrganisation:
       workerCertificationOrganisation as ZodWorkerCertificationOrganismEnum,
+    transporters,
     intermediaries: intermediaries?.map(i =>
       safeInput({
         // FIXME : Les règles d'édition (fichier rules.ts) ne permettent
