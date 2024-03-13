@@ -675,11 +675,7 @@ export const editionRules: EditionRules = {
   },
   wasteSealNumbers: {
     readableFieldName: "le(s) numéro(s) de scellés",
-    sealed: { from: "WORK" },
-    required: {
-      from: "WORK",
-      when: bsda => bsda.type !== BsdaType.COLLECTION_2710
-    }
+    sealed: { from: "WORK" }
   },
   wastePop: {
     readableFieldName: "le champ sur les polluants organiques persistants",
