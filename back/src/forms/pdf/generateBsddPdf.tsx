@@ -30,7 +30,7 @@ import {
 import { expandFormFromDb, expandableFormIncludes } from "../converter";
 import { prisma } from "@td/prisma";
 import { buildAddress } from "../../companies/sirene/utils";
-import { packagingsEqual } from "@td/constants";
+import { isDangerous, packagingsEqual } from "@td/constants";
 import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../common/operationModes";
 
@@ -310,6 +310,12 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
       form.wasteDetails?.packagingInfos
     );
   const qrCode = await QRCode.toString(form.readableId, { type: "svg" });
+
+  const wasteIsDangerous =
+    Boolean(form.wasteDetails?.isDangerous) ||
+    isDangerous(form.wasteDetails?.code) ||
+    Boolean(form.wasteDetails?.pop);
+
   const html = ReactDOMServer.renderToStaticMarkup(
     <Document title={form.readableId}>
       <div className="Page">
@@ -320,7 +326,13 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
           </div>
           <div className="BoxCol TextAlignCenter">
             <p>Ministère de la Transition Ecologique</p>
-            <h1>Bordereau de suivi de déchets dangereux</h1>
+            <h1>Bordereau de suivi de déchets</h1>
+            <p>
+              <input type="checkbox" checked={wasteIsDangerous} readOnly />{" "}
+              dangereux{" "}
+              <input type="checkbox" checked={!wasteIsDangerous} readOnly /> non
+              dangereux{" "}
+            </p>
             <p>Récépissé Trackdéchets</p>
           </div>
           <div className="BoxCol TextAlignCenter">

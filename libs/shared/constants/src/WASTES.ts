@@ -5646,9 +5646,10 @@ export function toWasteTree(
     });
 }
 
-export function isDangerous(wasteCode: string): boolean {
+export function isDangerous(wasteCode?: string | null): boolean {
   if (!wasteCode) {
     return false;
   }
+
   return wasteCode.endsWith("*");
 }
