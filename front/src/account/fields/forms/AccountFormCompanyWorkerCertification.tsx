@@ -15,7 +15,7 @@ type V = {
   hasSubSectionFour: boolean;
   hasSubSectionThree: boolean;
   certificationNumber?: string | null;
-  validityLimit?: Date | null;
+  validityLimit?: string | null;
   organisation?: string | null;
 };
 
@@ -114,9 +114,7 @@ export default function AccountFormCompanyAddWorkerCertification({
         hasSubSectionFour: workerCertification.hasSubSectionFour,
         hasSubSectionThree: workerCertification.hasSubSectionThree,
         certificationNumber: workerCertification.certificationNumber,
-        validityLimit: workerCertification.validityLimit
-          ? new Date(workerCertification.validityLimit)
-          : null,
+        validityLimit: workerCertification.validityLimit ?? null,
         organisation: workerCertification.organisation
       }
     : {
