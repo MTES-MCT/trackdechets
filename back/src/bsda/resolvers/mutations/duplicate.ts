@@ -45,7 +45,7 @@ export default async function duplicate(
     destinationOperationSignatureAuthor,
     destinationOperationSignatureDate,
     destinationOperationDate,
-    transporterTransportSignatureDate,
+    transporterTransportSignatureDate: bsdaTransporterSignatureDate,
     wasteSealNumbers,
     packagings,
     weightValue,
@@ -64,7 +64,17 @@ export default async function duplicate(
     enableCompletionTransformers: true
   });
 
-  const { id: transporterId, ...transporterData } = transporter;
+  const {
+    id: transporterId,
+    transporterTransportPlates,
+    transporterTransportTakenOverAt,
+    transporterTransportSignatureAuthor,
+    transporterTransportSignatureDate,
+    transporterCustomInfo,
+    // transporter values that should be duplicated
+    ...transporterData
+  } = transporter;
+
   const { intermediaries, ...bsda } = parsedBsda;
 
   const companiesOrgIds: string[] = [
