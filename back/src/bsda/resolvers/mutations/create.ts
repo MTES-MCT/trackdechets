@@ -11,6 +11,7 @@ import { checkCanCreate } from "../../permissions";
 import { UserInputError } from "../../../common/errors";
 import { parseBsdaAsync } from "../../validation";
 import { graphQlInputToZodBsda } from "../../validation/helpers";
+import { Prisma } from "@prisma/client";
 
 type CreateBsda = {
   isDraft: boolean;
@@ -43,13 +44,17 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     );
   }
 
-  const zodBsda = { ...graphQlInputToZodBsda(input), isDraft };
-  const { bsda, transporter } = await parseBsdaAsync(zodBsda, {
-    user,
-    enableCompletionTransformers: true,
-    enablePreviousBsdasChecks: true,
-    currentSignatureType: !isDraft ? "EMISSION" : undefined
-  });
+  const zodBsda = await graphQlInputToZodBsda(input);
+
+  const bsda = await parseBsdaAsync(
+    { ...zodBsda, isDraft },
+    {
+      user,
+      enableCompletionTransformers: true,
+      enablePreviousBsdasChecks: true,
+      currentSignatureType: !isDraft ? "EMISSION" : undefined
+    }
+  );
 
   const forwarding = !!bsda.forwarding
     ? { connect: { id: bsda.forwarding } }
@@ -67,12 +72,25 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
         }
       : undefined;
 
-  const { id: transporterId, ...transporterData } = transporter;
+  let transporters:
+    | Prisma.BsdaTransporterCreateNestedManyWithoutBsdaInput
+    | undefined = undefined;
 
-  // On crée un premier transporteur par défaut (même si tous les champs sont nuls)
-  // Cela permet dans un premier temps d'être raccord avec le modèle "à plat"
-  // en attendant l'implémentation du multi-modal
-  const transporters = { create: { ...transporterData, number: 1 } };
+  if (input.transporter) {
+    transporters = {
+      createMany: {
+        // un seul transporteur dans le tableau normalement
+        data: bsda.transporters!.map((t, idx) => {
+          const { id, bsdaId, ...data } = t;
+          return { ...data, number: idx + 1 };
+        })
+      }
+    };
+  } else if (input.transporters && input.transporters.length > 0) {
+    transporters = {
+      connect: bsda.transporters!.map(t => ({ id: t.id! }))
+    };
+  }
 
   const bsdaRepository = getBsdaRepository(user);
   const newBsda = await bsdaRepository.create({

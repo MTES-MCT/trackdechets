@@ -18,3 +18,23 @@ export function updateBsda(
     setContext: (ctx, data) => ({ ...ctx, bsda: data })
   };
 }
+
+export function updateBsdaTransporters(company: string): WorkflowStep {
+  return {
+    description: "Un transporteur est ajouté",
+    mutation: mutations.updateBsda,
+    variables: ({ bsda, updatedBsdaTransporters }) => ({
+      id: bsda.id,
+      input: {
+        transporters: updatedBsdaTransporters
+      }
+    }),
+    data: response => response.updateBsda,
+    company,
+    setContext: ctx => ({
+      ...ctx,
+      bsdaTransporters: ctx.updatedBsdaTransporters,
+      updatedBsdaTransporters: undefined
+    })
+  };
+}

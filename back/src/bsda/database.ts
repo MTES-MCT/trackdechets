@@ -2,6 +2,8 @@ import { Bsda, BsdaTransporter, Prisma } from "@prisma/client";
 import { FormNotFound } from "../forms/errors";
 import { getReadonlyBsdaRepository } from "./repository";
 import { prisma } from "@td/prisma";
+import { UserInputError } from "../common/errors";
+import { BsdaWithTransporters } from "./types";
 
 export async function getBsdaOrNotFound<
   Args extends Omit<Prisma.BsdaDefaultArgs, "where">
@@ -11,6 +13,26 @@ export async function getBsdaOrNotFound<
     throw new FormNotFound(id.toString());
   }
   return bsda;
+}
+
+export async function getBsdaTransporterOrNotFound({ id }: { id: string }) {
+  if (!id) {
+    throw new UserInputError(
+      "Vous devez préciser un identifiant de transporteur"
+    );
+  }
+
+  const transporter = await prisma.bsdaTransporter.findUnique({
+    where: { id }
+  });
+
+  if (transporter === null) {
+    throw new UserInputError(
+      `Le transporteur BSDA avec l'identifiant "${id}" n'existe pas.`
+    );
+  }
+
+  return transporter;
 }
 
 /**
@@ -94,4 +116,22 @@ export function getFirstTransporterSync(bsda: {
   const transporters = getTransportersSync(bsda);
   const firstTransporter = transporters.find(t => t.number === 1);
   return firstTransporter ?? null;
+}
+
+export function getNthTransporterSync(
+  bsda: BsdaWithTransporters,
+  n: number
+): BsdaTransporter | null {
+  return (bsda.transporters ?? []).find(t => t.number === n) ?? null;
+}
+
+// Renvoie le premier transporteur qui n'a pas encore signé
+export function getNextTransporterSync(bsda: {
+  transporters: BsdaTransporter[] | null;
+}): BsdaTransporter | null {
+  const transporters = getTransportersSync(bsda);
+  const nextTransporter = transporters.find(
+    t => !t.transporterTransportSignatureDate
+  );
+  return nextTransporter ?? null;
 }

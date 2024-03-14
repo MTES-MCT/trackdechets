@@ -6,6 +6,7 @@ import { getBsdaOrNotFound, getFirstTransporterSync } from "../../database";
 import { checkCanUpdate } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
 import { mergeInputAndParseBsdaAsync } from "../../validation";
+import { Prisma } from "@prisma/client";
 
 export default async function edit(
   _,
@@ -22,20 +23,19 @@ export default async function edit(
     }
   });
 
-  // Un premier transporteur est initialisé dans la mutation `createBsda`
-  // ce qui permet d'être certain que `transporter` est défini
-  const existingTransporter = getFirstTransporterSync(existingBsda)!;
+  const existingFirstTransporter = getFirstTransporterSync(existingBsda)!;
 
   await checkCanUpdate(user, existingBsda, input);
 
-  const {
-    parsedBsda: { bsda, transporter },
-    updatedFields
-  } = await mergeInputAndParseBsdaAsync(existingBsda, input, {
-    user,
-    enableCompletionTransformers: true,
-    enablePreviousBsdasChecks: true
-  });
+  const { parsedBsda: bsda, updatedFields } = await mergeInputAndParseBsdaAsync(
+    existingBsda,
+    input,
+    {
+      user,
+      enableCompletionTransformers: true,
+      enablePreviousBsdasChecks: true
+    }
+  );
 
   if (updatedFields.length === 0) {
     // Évite de faire un update "à blanc" si l'input
@@ -64,14 +64,32 @@ export default async function edit(
       }
     : undefined;
 
-  const { id: transporterId, ...transporterData } = transporter;
+  let transporters:
+    | Prisma.BsdaTransporterUpdateManyWithoutBsdaNestedInput
+    | undefined = undefined;
 
-  const transporters = {
-    update: {
-      where: { id: existingTransporter.id },
-      data: transporterData
+  if (updatedFields.includes("transporters")) {
+    if (input.transporter) {
+      if (existingFirstTransporter) {
+        // on met à jour le premier transporteur existant
+        const { id, number, bsdaId, ...data } = bsda.transporters![0];
+        transporters = { update: { where: { id: id! }, data } };
+      } else {
+        // on crée le premier transporteur
+        const { id, bsdaId, ...data } = bsda.transporters![0];
+        transporters = { create: { ...data, number: 1 } };
+      }
+    } else {
+      // Cas où l'update est fait via `BsdaInput.transporters`. On déconnecte tous les transporteurs qui étaient
+      // précédement associés et on connecte les nouveaux transporteurs de la table `BsdaTransporter`
+      // avec ce bordereau. La fonction `update` du repository s'assure que la numérotation des
+      // transporteurs correspond à l'ordre du tableau d'identifiants.
+      transporters = {
+        set: [],
+        connect: bsda.transporters!.map(t => ({ id: t.id! }))
+      };
     }
-  };
+  }
 
   const bsdaRepository = getBsdaRepository(user);
   const updatedBsda = await bsdaRepository.update(

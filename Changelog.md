@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.4.1] 09/04/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+- ETQ utilisateur je peux faire du multi-modal sur le BSDA par API [PR 3108](https://github.com/MTES-MCT/trackdechets/pull/3108)
+
 # [2024.3.1] 12/03/2024
 
 #### :rocket: Nouvelles fonctionnalités

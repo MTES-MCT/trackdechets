@@ -60,4 +60,28 @@ describe("Query.Bsda", () => {
     });
     expect(data.bsda.id).toBe(bsda.id);
   });
+
+  it("should allow a foreign multi-modal transporter N>1 to read their BSDA", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      siret: null,
+      vatNumber: "IT13029381004"
+    });
+    const form = await bsdaFactory({
+      transporterOpt: {
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: company.vatNumber
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data, errors } = await query<Pick<Query, "bsda">>(GET_BSDA, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    expect(data.bsda.id).toBe(form.id);
+  });
 });

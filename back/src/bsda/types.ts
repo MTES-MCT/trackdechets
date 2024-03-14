@@ -1,4 +1,6 @@
 import { Prisma } from "@prisma/client";
+import { BsdaSignatureType } from "../generated/graphql/types";
+import { MultiModalSignatureType } from "../common/types";
 
 export const BsdaWithTransportersInclude =
   Prisma.validator<Prisma.BsdaInclude>()({
@@ -86,3 +88,5 @@ export const BsdaWithRevisionRequestsInclude =
 export type BsdaWithRevisionRequests = Prisma.BsdaGetPayload<{
   include: typeof BsdaWithRevisionRequestsInclude;
 }>;
+
+export type AllBsdaSignatureType = BsdaSignatureType | MultiModalSignatureType;

@@ -34,6 +34,38 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
       }
     });
 
+    // update transporters ordering when connecting transporters records
+    if (
+      data.transporters?.connect &&
+      Array.isArray(data.transporters.connect)
+    ) {
+      await Promise.all(
+        data.transporters.connect.map(({ id: transporterId }, idx) =>
+          prisma.bsdaTransporter.update({
+            where: { id: transporterId },
+            data: {
+              number: idx + 1
+            }
+          })
+        )
+      );
+    }
+
+    if (data.transporters) {
+      // compute transporterOrgIds
+      await prisma.bsda.update({
+        where: { id: bsda.id },
+        data: {
+          transportersOrgIds: bsda.transporters
+            .flatMap(t => [
+              t.transporterCompanySiret,
+              t.transporterCompanyVatNumber
+            ])
+            .filter(Boolean)
+        }
+      });
+    }
+
     prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsda.id));
 
     // Une optimisation est en place sur le calcul des champs

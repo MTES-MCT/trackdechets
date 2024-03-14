@@ -71,6 +71,7 @@ export default function plugin(): Plugin<any> {
             bsdaWorkflows.collecteChantierParticulier
           ),
           groupement: parseWorkflow(bsdaWorkflows.groupement),
+          multiModal: parseWorkflow(bsdaWorkflows.multiModal)
         },
         bspaoh: {
           acheminementDirect: parseWorkflow(

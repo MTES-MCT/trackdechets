@@ -10,10 +10,7 @@ import {
   BsdTransporterReceiptPart,
   getTransporterReceipt
 } from "../../../companies/recipify";
-import {
-  AlreadySignedError,
-  InvalidSignatureError
-} from "../../../bsvhu/errors";
+
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { runInTransaction } from "../../../common/repository/helper";
@@ -32,14 +29,17 @@ import { expandBsdaFromDb } from "../../converter";
 import {
   getBsdaHistory,
   getBsdaOrNotFound,
-  getFirstTransporterSync
+  getNextTransporterSync,
+  getNthTransporterSync,
+  getTransportersSync
 } from "../../database";
 import { machine } from "../../machine";
 import { renderBsdaRefusedEmail } from "../../mails/refused";
 import { BsdaRepository, getBsdaRepository } from "../../repository";
-import { BsdaWithTransporters } from "../../types";
+import { AllBsdaSignatureType, BsdaWithTransporters } from "../../types";
 import { parseBsdaAsync } from "../../validation";
 import { prismaToZodBsda } from "../../validation/helpers";
+import { AlreadySignedError } from "../../../bsvhu/errors";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,
@@ -56,12 +56,19 @@ const signBsda: MutationResolvers["signBsda"] = async (
     }
   });
 
-  const authorizedOrgIds = getAuthorizedOrgIds(bsda, input.type);
+  const signatureType = getBsdaSignatureType(input.type, bsda);
+
+  const authorizedOrgIds = getAuthorizedOrgIds(bsda, signatureType);
 
   // To sign a form for a company, you must either:
   // - be part of that company
   // - provide the company security code
-  await checkCanSignFor(user, input.type, authorizedOrgIds, input.securityCode);
+  await checkCanSignFor(
+    user,
+    signatureType,
+    authorizedOrgIds,
+    input.securityCode
+  );
 
   checkSignatureTypeSpecificRules(bsda, input);
 
@@ -79,7 +86,7 @@ const signBsda: MutationResolvers["signBsda"] = async (
     { ...zodBsda, ...transporterReceipt },
     {
       user,
-      currentSignatureType: input.type
+      currentSignatureType: signatureType
     }
   );
 
@@ -103,20 +110,31 @@ export default signBsda;
  */
 export function getAuthorizedOrgIds(
   bsda: BsdaForSignature,
-  signatureType: BsdaSignatureType
+  signatureType: AllBsdaSignatureType
 ): string[] {
+  const transportNthAuthorizedOrgIds = (bsda: BsdaForSignature, n: number) => {
+    const transporterN = getNthTransporterSync(bsda, n);
+    return [
+      transporterN?.transporterCompanySiret,
+      transporterN?.transporterCompanyVatNumber
+    ].filter(Boolean);
+  };
+
   const signatureTypeToFn: {
-    [Key in BsdaSignatureType]: (bsda: Bsda) => (string | null)[];
+    [Key in AllBsdaSignatureType]: (bsda: Bsda) => (string | null)[];
   } = {
     EMISSION: (bsda: Bsda) => [bsda.emitterCompanySiret],
     WORK: (bsda: Bsda) => [bsda.workerCompanySiret],
-    TRANSPORT: (bsda: BsdaForSignature) => {
-      const transporter = getFirstTransporterSync(bsda)!;
-      return [
-        transporter.transporterCompanySiret,
-        transporter.transporterCompanyVatNumber
-      ];
-    },
+    TRANSPORT: (bsda: BsdaForSignature) =>
+      transportNthAuthorizedOrgIds(bsda, 1),
+    TRANSPORT_2: (bsda: BsdaForSignature) =>
+      transportNthAuthorizedOrgIds(bsda, 2),
+    TRANSPORT_3: (bsda: BsdaForSignature) =>
+      transportNthAuthorizedOrgIds(bsda, 3),
+    TRANSPORT_4: (bsda: BsdaForSignature) =>
+      transportNthAuthorizedOrgIds(bsda, 4),
+    TRANSPORT_5: (bsda: BsdaForSignature) =>
+      transportNthAuthorizedOrgIds(bsda, 5),
     OPERATION: (bsda: Bsda) => [bsda.destinationCompanySiret]
   };
 
@@ -192,9 +210,13 @@ async function signTransport(
   bsda: BsdaForSignature,
   input: BsdaSignatureInput & BsdTransporterReceiptPart
 ) {
-  const transporter = getFirstTransporterSync(bsda)!;
+  if (bsda.transporters.length === 0) {
+    throw new UserInputError("Aucun transporteur n'est renseigné sur ce BSDA.");
+  }
 
-  if (transporter.transporterTransportSignatureDate !== null) {
+  const transporter = getNextTransporterSync(bsda);
+
+  if (!transporter) {
     throw new AlreadySignedError();
   }
 
@@ -204,7 +226,6 @@ async function signTransport(
 
   const updateInput: Prisma.BsdaUpdateInput = {
     status: nextStatus,
-    transporterTransportSignatureDate: signatureDate,
     transporters: {
       update: {
         where: { id: transporter.id },
@@ -220,6 +241,12 @@ async function signTransport(
       }
     }
   };
+
+  if (transporter.number === 1) {
+    // champ dénormalisé permettant de stocker la date de la première signature
+    // transporteur sur le BSDA
+    updateInput.transporterTransportSignatureDate = signatureDate;
+  }
 
   return updateBsda(user, bsda, updateInput);
 }
@@ -239,7 +266,12 @@ async function signOperation(
     destinationOperationSignatureAuthor: input.author,
     destinationOperationSignatureDate: new Date(input.date ?? Date.now()),
     status: await getNextStatus(bsda, input.type),
-    ...(nextStatus === BsdaStatus.REFUSED && { forwardingId: null })
+    ...(nextStatus === BsdaStatus.REFUSED && { forwardingId: null }),
+    // on autorise l'installation de destination à signer même si le ou les
+    // derniers transporteurs multi-modaux n'ont pas signé dans le cas où le
+    // premier transporteur ait finalement décidé d'aller directement à destination.
+    // Dans ce cas on supprime les transporteurs multi-modaux qui n'ont pas signé.
+    transporters: { deleteMany: { transporterTransportSignatureDate: null } }
   };
 
   let refusedEmail: Mail | undefined = undefined;
@@ -288,10 +320,10 @@ export async function getNextStatus(
   });
 
   // This transition is not possible
-  if (!nextState.changed) {
-    throw new InvalidSignatureError();
+  if (nextState.transitions.length === 0) {
+    // This transition is not possible
+    throw new InvalidTransition();
   }
-
   const nextStatus = nextState.value as BsdaStatus;
 
   return nextStatus;
@@ -412,4 +444,38 @@ function checkSignatureTypeSpecificRules(
       "Ce type de bordereau ne peut être signé qu'à la réception par la déchetterie."
     );
   }
+}
+
+/**
+ * Renvoie le numéro de la signature de transport en cas de signature d'un transporteur
+ * mulit-modal. Renvoie la signature GraphQL dans les autres cas
+ * @param signatureType
+ * @param bsda
+ * @returns
+ */
+function getBsdaSignatureType(
+  signatureType: BsdaSignatureType,
+  bsda: BsdaWithTransporters
+): AllBsdaSignatureType {
+  if (signatureType === "TRANSPORT") {
+    if (bsda.transporters && bsda.transporters.length > 1) {
+      const transporters = getTransportersSync(bsda);
+      const nextTransporter = transporters.find(
+        t => !t.transporterTransportSignatureDate
+      );
+      if (!nextTransporter) {
+        throw new UserInputError(
+          "Impossible d'appliquer une signature TRANSPORT. Tous les transporteurs ont déjà signé"
+        );
+      }
+      const number = nextTransporter.number;
+      if (!number || number === 1) {
+        return "TRANSPORT";
+      }
+      return `TRANSPORT_${number}` as AllBsdaSignatureType;
+    }
+    return "TRANSPORT";
+  }
+
+  return signatureType;
 }

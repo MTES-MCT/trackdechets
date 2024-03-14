@@ -1,4 +1,4 @@
-import { BsdaStatus } from "@prisma/client";
+import { BsdaStatus, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsdaArgs } from "../../../generated/graphql/types";
@@ -26,7 +26,6 @@ export default async function duplicate(
 
   const {
     // values that should not be duplicated
-    id: bsdaId,
     isDraft,
     isDeleted,
     emitterEmissionSignatureAuthor,
@@ -45,7 +44,6 @@ export default async function duplicate(
     destinationOperationSignatureAuthor,
     destinationOperationSignatureDate,
     destinationOperationDate,
-    transporterTransportSignatureDate: bsdaTransporterSignatureDate,
     wasteSealNumbers,
     packagings,
     weightValue,
@@ -56,7 +54,7 @@ export default async function duplicate(
     ...zodBsda
   } = prismaToZodBsda(prismaBsda);
 
-  const { transporter, bsda: parsedBsda } = await parseBsdaAsync(zodBsda, {
+  const parsedBsda = await parseBsdaAsync(zodBsda, {
     user,
     // Permet d'appliquer l'auto-complétion SIRENE
     // TODO : on pourrait gérer aussi l'auto-complétion des récépissés et certifications
@@ -64,8 +62,11 @@ export default async function duplicate(
     enableCompletionTransformers: true
   });
 
+  // FIXME gérer le cas où il n'y a aucun transporteur
+  const firstTransporter = parsedBsda.transporters![0];
   const {
     id: transporterId,
+    bsdaId: transporterBsdaId,
     transporterTransportPlates,
     transporterTransportTakenOverAt,
     transporterTransportSignatureAuthor,
@@ -73,14 +74,13 @@ export default async function duplicate(
     transporterCustomInfo,
     // transporter values that should be duplicated
     ...transporterData
-  } = transporter;
-
-  const { intermediaries, ...bsda } = parsedBsda;
+  } = firstTransporter;
+  const { id: bsdaId, intermediaries, ...bsda } = parsedBsda;
 
   const companiesOrgIds: string[] = [
     bsda.emitterCompanySiret,
-    transporter.transporterCompanySiret,
-    transporter.transporterCompanyVatNumber,
+    firstTransporter.transporterCompanySiret,
+    firstTransporter.transporterCompanyVatNumber,
     bsda.brokerCompanySiret,
     bsda.workerCompanySiret,
     bsda.destinationCompanySiret
@@ -111,14 +111,14 @@ export default async function duplicate(
   );
   const transporterCompany = companies.find(
     company =>
-      company.orgId === transporter.transporterCompanySiret ||
-      company.orgId === transporter.transporterCompanyVatNumber
+      company.orgId === firstTransporter.transporterCompanySiret ||
+      company.orgId === firstTransporter.transporterCompanyVatNumber
   );
   const worker = companies.find(
     company => company.orgId === bsda.workerCompanySiret
   );
 
-  const data = {
+  const data: Prisma.BsdaCreateInput = {
     ...bsda,
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
@@ -168,17 +168,18 @@ export default async function duplicate(
       bsda.workerCertificationCertificationNumber,
     transporters: {
       create: {
-        number: 1,
         ...transporterData,
+        number: 1,
         // Transporter company info
         transporterCompanyMail:
           transporterCompany?.contactEmail ??
-          transporter.transporterCompanyMail,
+          firstTransporter.transporterCompanyMail,
         transporterCompanyPhone:
           transporterCompany?.contactPhone ??
-          transporter.transporterCompanyPhone,
+          firstTransporter.transporterCompanyPhone,
         transporterCompanyContact:
-          transporterCompany?.contact ?? transporter.transporterCompanyContact,
+          transporterCompany?.contact ??
+          firstTransporter.transporterCompanyContact,
         // Transporter recepisse
         transporterRecepisseNumber:
           transporterCompany?.transporterReceipt?.receiptNumber ?? null,

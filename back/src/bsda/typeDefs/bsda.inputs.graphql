@@ -130,8 +130,17 @@ input BsdaInput {
 
   "Entreprise de travaux"
   worker: BsdaWorkerInput
-  "Entreprise de transport"
+
+  "Entreprise de transport - Premier transporteur (en cas de transport multi-modal)"
   transporter: BsdaTransporterInput
+
+  """
+  Liste des différents transporteurs, dans l'ordre de prise en charge du déchet.
+  Contient un seul identifiant en cas d'acheminement direct. Peut contenir au maximum
+  5 identifiants en cas de transport multi-modal. Les transporteurs peuvent être crées, modifiés,
+  supprimés à l'aide des mutations createBsdaTransporter, updateBsdaTransporter, deleteBsdaTransporter.
+  """
+  transporters: [ID!]
 
   "Bordereau que celui-ci reéxpédie"
   forwarding: ID

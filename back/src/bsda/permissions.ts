@@ -1,8 +1,10 @@
-import { Bsda, BsdaStatus, User } from "@prisma/client";
-import { BsdaInput } from "../generated/graphql/types";
+import { Bsda, BsdaStatus, BsdaTransporter, User } from "@prisma/client";
+import { BsdaInput, BsdaTransporterInput } from "../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../permissions";
 import { getFirstTransporterSync, getPreviousBsdas } from "./database";
 import { BsdaWithTransporters } from "./types";
+import { flattenBsdaTransporterInput } from "./converter";
+import { prisma } from "@td/prisma";
 
 /**
  * Retrieves organisations allowed to read a BSDA
@@ -29,7 +31,10 @@ function readers(bsda: BsdaWithTransporters): string[] {
  * parameter to pre-compute the form contributors after the update, hence verifying
  * a user is not removing his own company from the BSDA
  */
-function contributors(bsda: BsdaWithTransporters, input?: BsdaInput): string[] {
+async function contributors(
+  bsda: BsdaWithTransporters,
+  input?: BsdaInput
+): Promise<string[]> {
   const updateEmitterCompanySiret = input?.emitter?.company?.siret;
   const updateEcoOrganismeCompanySiret = input?.ecoOrganisme?.siret;
   const updateDestinationCompanySiret = input?.destination?.company?.siret;
@@ -45,7 +50,10 @@ function contributors(bsda: BsdaWithTransporters, input?: BsdaInput): string[] {
     i.vatNumber
   ]);
 
-  const transporter = getFirstTransporterSync(bsda);
+  let transporters: Pick<
+    BsdaTransporter,
+    "transporterCompanySiret" | "transporterCompanyVatNumber"
+  >[] = bsda.transporters;
 
   const emitterCompanySiret =
     updateEmitterCompanySiret !== undefined
@@ -61,16 +69,6 @@ function contributors(bsda: BsdaWithTransporters, input?: BsdaInput): string[] {
     updateDestinationCompanySiret !== undefined
       ? updateDestinationCompanySiret
       : bsda.destinationCompanySiret;
-
-  const transporterCompanySiret =
-    updateTransporterCompanySiret !== undefined
-      ? updateTransporterCompanySiret
-      : transporter?.transporterCompanySiret;
-
-  const transporterCompanyVatNumber =
-    updateTransporterCompanyVatNumber !== undefined
-      ? updateTransporterCompanyVatNumber
-      : transporter?.transporterCompanyVatNumber;
 
   const workerCompanySiret =
     updateWorkerCompanySiret !== undefined
@@ -92,15 +90,54 @@ function contributors(bsda: BsdaWithTransporters, input?: BsdaInput): string[] {
       ? updateIntermediaries
       : bsda.intermediariesOrgIds;
 
+  if (input?.transporters) {
+    // on prend en compte la nouvelle liste de tranporteurs fournit
+    transporters = await prisma.bsdaTransporter.findMany({
+      where: { id: { in: input.transporters } }
+    });
+  } else if (input?.transporter) {
+    const firstTransporter = getFirstTransporterSync(bsda);
+    if (!firstTransporter) {
+      transporters = [
+        {
+          transporterCompanySiret: input?.transporter?.company?.siret ?? null,
+          transporterCompanyVatNumber:
+            input?.transporter?.company?.vatNumber ?? null
+        }
+      ];
+    } else {
+      // on met à jour le transporteur 1 s'il existe ou on l'ajoute à la liste s'il n'existe pas
+      const transporterCompanySiret =
+        updateTransporterCompanySiret !== undefined
+          ? updateTransporterCompanySiret
+          : firstTransporter.transporterCompanySiret;
+      const transporterCompanyVatNumber =
+        updateTransporterCompanyVatNumber !== undefined
+          ? updateTransporterCompanyVatNumber
+          : firstTransporter.transporterCompanyVatNumber;
+
+      const updatedFirstTransporter = {
+        ...firstTransporter,
+        transporterCompanySiret,
+        transporterCompanyVatNumber
+      };
+
+      transporters = [updatedFirstTransporter, ...transporters.slice(1)];
+    }
+  }
+
+  const transportersOrgIds = transporters
+    .flatMap(t => [t.transporterCompanySiret, t.transporterCompanyVatNumber])
+    .filter(Boolean);
+
   return [
     emitterCompanySiret,
     ecoOrganismeCompanySiret,
     destinationCompanySiret,
-    transporterCompanySiret,
-    transporterCompanyVatNumber,
     workerCompanySiret,
     brokerCompanySiret,
     nextDestinationCompanySiret,
+    ...transportersOrgIds,
     ...intermediariesOrgIds
   ].filter(Boolean);
 }
@@ -165,7 +202,7 @@ export async function checkCanUpdate(
   bsda: BsdaWithTransporters,
   input?: BsdaInput
 ) {
-  const authorizedOrgIds = contributors(bsda);
+  const authorizedOrgIds = await contributors(bsda);
 
   await checkUserPermissions(
     user,
@@ -174,7 +211,7 @@ export async function checkCanUpdate(
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
   if (input) {
-    const authorizedOrgIdsAfterUpdate = contributors(bsda, input);
+    const authorizedOrgIdsAfterUpdate = await contributors(bsda, input);
 
     return checkUserPermissions(
       user,
@@ -186,10 +223,50 @@ export async function checkCanUpdate(
   return true;
 }
 
+export async function checkCanUpdateBsdaTransporter(
+  user: User,
+  bsda: BsdaWithTransporters,
+  transporterId: string,
+  input: BsdaTransporterInput
+) {
+  const authorizedOrgIds = await contributors(bsda);
+
+  await checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanUpdate,
+    "Vous n'êtes pas autorisé à modifier ce transporteur BSDA"
+  );
+
+  if (input) {
+    const futureTransporters = bsda.transporters.map(transporter => {
+      if (transporter.id === transporterId) {
+        return {
+          ...transporter,
+          ...flattenBsdaTransporterInput(input)
+        };
+      }
+      return transporter;
+    });
+
+    const futureContributors = await contributors({
+      ...bsda,
+      transporters: futureTransporters
+    });
+
+    return checkUserPermissions(
+      user,
+      futureContributors,
+      Permission.BsdCanUpdate,
+      "Vous ne pouvez pas enlever votre établissement du bordereau"
+    );
+  }
+}
+
 export async function checkCanDelete(user: User, bsda: BsdaWithTransporters) {
   const authorizedOrgIds =
     bsda.status === BsdaStatus.INITIAL
-      ? contributors(bsda)
+      ? await contributors(bsda)
       : bsda.status === BsdaStatus.SIGNED_BY_PRODUCER &&
         bsda.emitterCompanySiret
       ? [bsda.emitterCompanySiret]
@@ -211,7 +288,7 @@ export async function checkCanDuplicate(
   user: User,
   bsda: BsdaWithTransporters
 ) {
-  const authorizedOrgIds = contributors(bsda);
+  const authorizedOrgIds = await contributors(bsda);
 
   return checkUserPermissions(
     user,

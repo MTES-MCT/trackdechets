@@ -13,6 +13,9 @@ import signBsda from "./mutations/sign";
 import duplicateBsda from "./mutations/duplicate";
 import publishBsda from "./mutations/publish";
 import deleteBsda from "./mutations/delete";
+import createBsdaTransporter from "./mutations/createBsdaTransporter";
+import updateBsdaTransporter from "./mutations/updateBsdaTransporter";
+import deleteBsdaTransporter from "./mutations/deleteBsdaTransporter";
 import { Metadata as BsdaMetadata } from "./BsdaMetadata";
 import { Bsda } from "./Bsda";
 import BsdaRevisionRequest from "./BsdaRevisionRequest";
@@ -35,6 +38,9 @@ const Mutation: MutationResolvers = {
   duplicateBsda,
   publishBsda,
   deleteBsda,
+  createBsdaTransporter,
+  updateBsdaTransporter,
+  deleteBsdaTransporter,
   createBsdaRevisionRequest: createBsdaRevisionRequest as any,
   cancelBsdaRevisionRequest,
   submitBsdaRevisionRequestApproval: submitBsdaRevisionRequestApproval as any

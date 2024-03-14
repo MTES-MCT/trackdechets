@@ -12,36 +12,37 @@ import makeClient from "../../../../__tests__/testClient";
 import { BsdaStatus } from "@prisma/client";
 import { bsdaFactory } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
+import { gql } from "graphql-tag";
 
-const CREATE_BSDA = `
-mutation CreateBsda($input: BsdaInput!) {
-  createBsda(input: $input) {
-    id
-    destination {
-      company {
+const CREATE_BSDA = gql`
+  mutation CreateBsda($input: BsdaInput!) {
+    createBsda(input: $input) {
+      id
+      destination {
+        company {
           siret
+        }
       }
-    }
-    emitter {
-      company {
+      emitter {
+        company {
           siret
+        }
       }
-    }
-    transporter {
-      transport {
-        plates
+      transporter {
+        transport {
+          plates
+        }
+        recepisse {
+          number
+          department
+          validityLimit
+        }
       }
-      recepisse {
-        number
-        department
-        validityLimit
+      intermediaries {
+        siret
       }
-    }
-    intermediaries {
-      siret
     }
   }
-}
 `;
 
 describe("Mutation.Bsda.create", () => {
@@ -776,16 +777,20 @@ describe("Mutation.Bsda.create", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
-      variables: {
-        input
+    const { data, errors } = await mutate<Pick<Mutation, "createBsda">>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input
+        }
       }
-    });
+    );
+    expect(errors).toBeUndefined();
 
     expect(data.createBsda.id).toBeDefined();
   });
 
-  it("should allow creating the bsda with type COLLECTION_2710 even if transporter and worker have empty strings as siret", async () => {
+  it("should allow creating the bsda with type COLLECTION_2710 even if worker have empty strings as siret", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: { set: ["WASTE_CENTER"] }
     });
@@ -793,19 +798,6 @@ describe("Mutation.Bsda.create", () => {
     const input: BsdaInput = {
       type: "COLLECTION_2710",
       worker: {
-        company: {
-          address: "",
-          contact: "",
-          country: "",
-          mail: "",
-          name: "",
-          omiNumber: "",
-          phone: "",
-          siret: "",
-          vatNumber: ""
-        }
-      },
-      transporter: {
         company: {
           address: "",
           contact: "",
