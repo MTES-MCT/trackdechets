@@ -64,7 +64,7 @@ export async function getZodTransporters(
 
     // garde le même ordre
     return input.transporters.map(transporterId => {
-      const { createdAt, updatedAt, bsdaId, number, ...transporterData } =
+      const { createdAt, updatedAt, number, ...transporterData } =
         dbTransporters.find(t => t.id === transporterId)!;
       return transporterData;
     });
@@ -161,7 +161,7 @@ export function prismaToZodBsda(bsda: PrismaBsdaForParsing): ZodBsda {
       return { ...intermediaryData, address: intermediaryData.address! };
     }),
     transporters: getTransportersSync({ transporters }).map(t => {
-      const { createdAt, updatedAt, bsdaId, number, ...transporterData } = t;
+      const { createdAt, updatedAt, number, ...transporterData } = t;
       return transporterData;
     })
   };

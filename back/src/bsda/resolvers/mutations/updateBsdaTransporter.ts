@@ -40,6 +40,7 @@ const updateBsdaTransporterResolver: MutationResolvers["updateBsdaTransporter"] 
     const {
       id: parsedId,
       number,
+      bsdaId,
       ...parsed
     } = await parseBsdaTransporterAsync(zodTransporter);
 

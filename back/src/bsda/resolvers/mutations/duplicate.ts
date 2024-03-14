@@ -26,7 +26,6 @@ export default async function duplicate(
 
   const {
     // values that should not be duplicated
-    id: bsdaId,
     isDraft,
     isDeleted,
     emitterEmissionSignatureAuthor,
@@ -67,6 +66,7 @@ export default async function duplicate(
   const firstTransporter = parsedBsda.transporters![0];
   const {
     id: transporterId,
+    bsdaId: transporterBsdaId,
     transporterTransportPlates,
     transporterTransportTakenOverAt,
     transporterTransportSignatureAuthor,
@@ -75,7 +75,7 @@ export default async function duplicate(
     // transporter values that should be duplicated
     ...transporterData
   } = firstTransporter;
-  const { intermediaries, ...bsda } = parsedBsda;
+  const { id: bsdaId, intermediaries, ...bsda } = parsedBsda;
 
   const companiesOrgIds: string[] = [
     bsda.emitterCompanySiret,

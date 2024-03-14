@@ -11,7 +11,9 @@ const createBsdaTransporterResolver: MutationResolvers["createBsdaTransporter"] 
     checkIsAuthenticated(context);
     const zodTransporter = graphqlInputToZodBsdaTransporter(input);
     // run validation, sirenify et recipify
-    const { id, ...parsed } = await parseBsdaTransporterAsync(zodTransporter);
+    const { id, bsdaId, ...parsed } = await parseBsdaTransporterAsync(
+      zodTransporter
+    );
 
     const data: Prisma.BsdaTransporterCreateInput = {
       ...parsed,

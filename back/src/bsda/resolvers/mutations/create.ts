@@ -81,7 +81,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
       createMany: {
         // un seul transporteur dans le tableau normalement
         data: bsda.transporters!.map((t, idx) => {
-          const { id, ...data } = t;
+          const { id, bsdaId, ...data } = t;
           return { ...data, number: idx + 1 };
         })
       }

@@ -72,11 +72,11 @@ export default async function edit(
     if (input.transporter) {
       if (existingFirstTransporter) {
         // on met à jour le premier transporteur existant
-        const { id, number, ...data } = bsda.transporters![0];
+        const { id, number, bsdaId, ...data } = bsda.transporters![0];
         transporters = { update: { where: { id: id! }, data } };
       } else {
         // on crée le premier transporteur
-        const { id, ...data } = bsda.transporters![0];
+        const { id, bsdaId, ...data } = bsda.transporters![0];
         transporters = { create: { ...data, number: 1 } };
       }
     } else {

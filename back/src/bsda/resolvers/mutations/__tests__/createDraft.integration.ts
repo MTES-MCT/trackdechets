@@ -14,6 +14,8 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "@td/prisma";
 import { gql } from "graphql-tag";
+import { bsdaFactory } from "../../../__tests__/factories";
+import { getFirstTransporterSync } from "../../../database";
 
 const CREATE_BSDA = gql`
   mutation CreateDraftBsda($input: BsdaInput!) {
@@ -290,6 +292,37 @@ describe("Mutation.Bsda.createDraft", () => {
       expect.objectContaining({
         message:
           "Aucun transporteur ne possède le ou les identifiants suivants : ID1, ID2"
+      })
+    ]);
+  });
+
+  it("should throw an error when trying to connect a transporter already associated to a BSDA", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const anotherBsda = await bsdaFactory({});
+
+    const transporter1 = getFirstTransporterSync(anotherBsda)!;
+    const transporter2 = await prisma.bsdaTransporter.create({
+      data: { number: 0 }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createDraftBsda">,
+      MutationCreateDraftBsdaArgs
+    >(CREATE_BSDA, {
+      variables: {
+        input: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporters: [transporter1.id, transporter2.id]
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le transporteur BSDA ${transporter1.id} est déjà associé à un autre BSDA`
       })
     ]);
   });

@@ -578,7 +578,7 @@ describe("Mutation.updateBsda", () => {
         }
       }
     };
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
     >(UPDATE_BSDA, {
@@ -587,6 +587,8 @@ describe("Mutation.updateBsda", () => {
         input
       }
     });
+
+    expect(errors).toBeUndefined();
 
     expect(data.updateBsda.transporter!.transport!.mode).toEqual(
       TransportMode.AIR

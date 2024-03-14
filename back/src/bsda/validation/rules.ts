@@ -156,6 +156,10 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
     readableFieldName: "le transporteur",
     sealed: { from: transporterSignature }
   },
+  bsdaId: {
+    readableFieldName: "le BSDA associé au transporteur",
+    sealed: { from: transporterSignature }
+  },
   transporterCompanyName: {
     readableFieldName: "le nom du transporteur",
     sealed: {

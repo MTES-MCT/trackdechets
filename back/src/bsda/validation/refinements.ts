@@ -520,3 +520,20 @@ export const validateDestination: (
     }
   };
 };
+
+export const checkTransporters: Refinement<ParsedZodBsda> = (
+  bsda,
+  { addIssue }
+) => {
+  if (bsda.id) {
+    const alreadyPartOfAnotherBsda = bsda.transporters?.find(
+      t => Boolean(t.bsdaId) && t.bsdaId !== bsda.id
+    );
+    if (alreadyPartOfAnotherBsda) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Le transporteur BSDA ${alreadyPartOfAnotherBsda.id} est déjà associé à un autre BSDA`
+      });
+    }
+  }
+};

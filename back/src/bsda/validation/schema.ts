@@ -28,6 +28,7 @@ import {
   checkOperationIsAfterReception,
   checkOperationMode,
   checkRequiredFields,
+  checkTransporters,
   checkWorkerSubSectionThree,
   validateDestination,
   validatePreviousBsdas
@@ -82,6 +83,7 @@ export const bsdaPackagingSchema = z
 const rawBsdaTransporterSchema = z.object({
   id: z.string().nullish(),
   number: z.number().nullish(),
+  bsdaId: z.string().nullish(),
   transporterCompanyName: z.string().nullish(),
   transporterCompanySiret: siretSchema.nullish(),
   transporterCompanyAddress: z.string().nullish(),
@@ -273,7 +275,8 @@ export const refinedSchema = rawBsdaSchema
   .superRefine(checkWorkerSubSectionThree)
   .superRefine(checkNoTransporterWhenCollection2710)
   .superRefine(checkNoWorkerWhenCollection2710)
-  .superRefine(checkNoBothGroupingAndForwarding);
+  .superRefine(checkNoBothGroupingAndForwarding)
+  .superRefine(checkTransporters);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`
