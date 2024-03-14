@@ -368,7 +368,12 @@ describe("Mutation.Bsda.sign", () => {
           status: "SIGNED_BY_PRODUCER",
           emitterEmissionSignatureAuthor: "Emétteur",
           emitterEmissionSignatureDate: new Date(),
-          workerCompanySiret: worker.company.siret
+          workerCompanySiret: worker.company.siret,
+          // vérifie que les numéros de scellés ne sont pas obligatoires
+          // > selon l'exutoire, le numéro est obligatoire ou pas (ISDD oui, ISDND non)
+          // > et comme on ne sait pas si il va dans l'un ou l'autre, du moins auj.
+          // > on ne peut pas le rendre obligatoire"
+          wasteSealNumbers: []
         }
       });
 
