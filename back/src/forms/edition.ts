@@ -121,7 +121,7 @@ export const editionRules: {
   wasteDetailsParcelNumbers: "EMISSION",
   wasteDetailsAnalysisReferences: "EMISSION",
   wasteDetailsLandIdentifiers: "EMISSION",
-  wasteDetailsSampleNumber: "EMISSION",
+  wasteDetailsSampleNumber: "TRANSPORT",
   traderCompanyName: "EMISSION",
   traderCompanySiret: "EMISSION",
   traderCompanyAddress: "EMISSION",
