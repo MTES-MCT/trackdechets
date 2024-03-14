@@ -403,8 +403,24 @@ describe("Mutation.Bsda.duplicate", () => {
 
   test("duplicated BSDA should have the updated data when company info changes", async () => {
     // Given
-
     const { bsda, transporter, emitter, worker, broker } = await createBsda();
+
+    // On s'assure que toutes les signatures sont nulles pour ne pas que l'auto-complétion
+    // soit sautée pour cause de champ vérouillé
+    await prisma.bsda.update({
+      where: { id: bsda.id },
+      data: {
+        emitterEmissionSignatureDate: null,
+        workerWorkSignatureDate: null,
+        destinationOperationSignatureDate: null,
+        transporters: {
+          updateMany: {
+            data: { transporterTransportSignatureDate: null },
+            where: {}
+          }
+        }
+      }
+    });
 
     await prisma.company.update({
       where: {
@@ -656,6 +672,23 @@ describe("Mutation.Bsda.duplicate", () => {
           }
         }
       });
+
+    // On s'assure que toutes les signatures sont nulles pour ne pas que l'auto-complétion
+    // soit sautée pour cause de champ vérouillé
+    await prisma.bsda.update({
+      where: { id: bsda.id },
+      data: {
+        emitterEmissionSignatureDate: null,
+        workerWorkSignatureDate: null,
+        destinationOperationSignatureDate: null,
+        transporters: {
+          updateMany: {
+            data: { transporterTransportSignatureDate: null },
+            where: {}
+          }
+        }
+      }
+    });
 
     function searchResult(companyName: string) {
       return {
