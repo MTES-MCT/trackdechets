@@ -26,6 +26,9 @@ ALTER TYPE "BsdType" ADD VALUE 'BSPAOH';
 ALTER TABLE "Bsda" DROP COLUMN "repackagedInId";
 
 -- AlterTable
+ALTER TABLE "Bsda" ALTER COLUMN "packagings" SET DEFAULT '[]';
+
+-- AlterTable
 ALTER TABLE "BsdaRevisionRequest" ALTER COLUMN "status" SET NOT NULL;
 
 -- AlterTable
