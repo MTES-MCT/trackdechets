@@ -1,6 +1,6 @@
 import * as React from "react";
-import { getcompanyCountry } from "../../../common/pdf/components/FormCompanyFields";
 import { FormCompany } from "../../../generated/graphql/types";
+import { getcompanyCountry } from "../../../companies/validation";
 
 type FormCompanyFieldsProps = {
   readonly company?: FormCompany | null;
