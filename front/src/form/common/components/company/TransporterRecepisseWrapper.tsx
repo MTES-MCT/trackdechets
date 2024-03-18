@@ -98,9 +98,9 @@ export default function TransporterRecepisseWrapper({
   >(TRANSPORTER_RECEIPT, {
     variables: {
       // Compatibility with intermediaries that don't have orgId
-      clue: transporter.company?.siret!
+      clue: transporter?.company?.siret!
     },
-    skip: !transporter.company?.siret
+    skip: !transporter?.company?.siret
   });
 
   const receipt: TransporterReceipt | null =
@@ -109,7 +109,7 @@ export default function TransporterRecepisseWrapper({
   return !loading &&
     !isExemptedOfReceipt &&
     isRoadTransport &&
-    !isForeignVat(transporter.company?.vatNumber!) ? (
+    !isForeignVat(transporter?.company?.vatNumber!) ? (
     <TransporterRecepisse
       number={receipt?.receiptNumber}
       department={receipt?.department}
