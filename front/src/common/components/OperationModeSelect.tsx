@@ -19,7 +19,6 @@ const OperationModeSelect = ({ operationCode, name }) => {
     // No mode possible. Still, explicitely set to null
     if (!modes.length) {
       setFieldValue(name, null);
-      return;
     }
     // If the available modes change, and only ONE option is available,
     // select it by default. Else, reset the selection
