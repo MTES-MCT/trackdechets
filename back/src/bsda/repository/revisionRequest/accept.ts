@@ -94,12 +94,25 @@ async function getUpdateFromRevisionRequest(
     isCanceled
   );
 
-  return removeEmpty({
+  const result = removeEmpty({
     ...bsdaUpdate,
     status: newStatus,
     brokerRecepisseValidityLimit:
       bsdaUpdate.brokerRecepisseValidityLimit?.toISOString()
   });
+
+  // Careful. Some operation codes explicitely need a null operation mode (ex: D15)
+  if (
+    bsdaUpdate.destinationOperationCode &&
+    !bsdaUpdate.destinationOperationMode
+  ) {
+    return {
+      ...result,
+      destinationOperationMode: null
+    };
+  }
+
+  return result;
 }
 
 function getNewStatus(
