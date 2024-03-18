@@ -17,7 +17,7 @@ const OperationModeSelect = ({ operationCode, name }) => {
 
   useEffect(() => {
     // No mode possible. Still, explicitely set to null
-    if(!modes.length){
+    if (!modes.length) {
       setFieldValue(name, null);
       return;
     }
