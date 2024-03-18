@@ -825,7 +825,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
     expect(updatedBsda.destinationOperationMode).toBe("RECYCLAGE");
   });
 
-  it("should nullify the operation mode", async () => {
+  it.each([null, undefined])("should nullify the operation mode", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
