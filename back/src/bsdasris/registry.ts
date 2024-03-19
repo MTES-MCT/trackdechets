@@ -61,6 +61,9 @@ export function getRegistryFields(
     if (bsdasri.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsdasri.emitterCompanySiret);
     }
+    if (bsdasri.ecoOrganismeSiret) {
+      registryFields.isOutgoingWasteFor.push(bsdasri.ecoOrganismeSiret);
+    }
     const transporterCompanyOrgId = getTransporterCompanyOrgId(bsdasri);
     if (transporterCompanyOrgId) {
       registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
