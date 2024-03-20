@@ -5,7 +5,7 @@ module.exports = async ({ github, context, core }) => {
     state: "open"
   });
 
-  const prsReadyToReview = prs.filter(pr =>
+  const prsReadyToReview = prs.data.filter(pr =>
     pr.labels.some(label => label.name === "ready for review")
   );
 
