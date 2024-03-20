@@ -12,7 +12,7 @@ module.exports = async ({ github, context, core }) => {
   const output = prsReadyToReview
     .map(
       pr =>
-        `- ${pr.title} by ${pr.user.login} | [PR ${pr.number}](${pr.html_url})`
+        `- ${pr.title} | [PR ${pr.number}](${pr.html_url}) by ${pr.user.login}`
     )
     .join("\n");
 
