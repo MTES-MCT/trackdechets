@@ -10,8 +10,8 @@ module.exports = async ({ github, context, core }) => {
   );
 
   const output = prsReadyToReview
-  .map(pr => `- ${pr.title} | [PR ${pr.number}](${pr.html_url})`)
-  .join("\n");
+    .map(pr => `- ${pr.title} | [PR ${pr.number}](${pr.html_url})`)
+    .join("\n");
 
-  core.setOutput('prs', output);
+  core.setOutput("prs", output);
 };
