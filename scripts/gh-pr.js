@@ -13,5 +13,5 @@ module.exports = async ({ github, context, core }) => {
     .map(pr => `- ${pr.title} (${pr.html_url})`)
     .join("\n");
 
-  core.setOutput(output);
+  core.setOutput('result', output);
 };
