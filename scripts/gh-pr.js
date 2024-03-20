@@ -16,5 +16,5 @@ module.exports = async ({ github, context, core }) => {
   .join("\n");
   console.log(output)
 
-  core.setOutput('result', output);
+  core.setOutput('prs', output);
 };
