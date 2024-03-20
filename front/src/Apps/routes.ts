@@ -4,7 +4,8 @@ const routes = {
     verification: "/admin/verification",
     anonymousCompanies: "/admin/anonymous-companies",
     reindex: "/admin/reindex",
-    user: "/admin/user"
+    user: "/admin/user",
+    impersonate: "/admin/impersonate"
   },
   login: "/login",
   invite: "/invite",

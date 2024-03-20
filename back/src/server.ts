@@ -23,6 +23,7 @@ import { ErrorCode, UserInputError } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
 import { graphqlBodyParser } from "./common/middlewares/graphqlBodyParser";
+import { impersonateMiddleware } from "./common/middlewares/impersonate";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
 import { rateLimiterMiddleware } from "./common/middlewares/rateLimiter";
 import { timeoutMiddleware } from "./common/middlewares/timeout";
@@ -266,6 +267,8 @@ app.use(passport.session());
 app.use(authRouter);
 app.use(oauth2Router);
 app.use(oidcRouter);
+
+app.use(impersonateMiddleware);
 
 app.get("/ping", (_, res) => res.send("Pong!"));
 
