@@ -1,0 +1,25 @@
+name: Send reviewable PRs to Mattermost
+
+on: push
+  #schedule:
+  #  - cron:  '0 9 * * *'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/github-script@v7
+        id: list
+        with:
+          script: |
+            const script = require('./scripts/gh-pr.js')
+            await script({github, context, core})
+      - name: Create the Mattermost Message
+        run: |
+          echo "{\"text\":\"'${{ steps.list.outputs.result }}'\"}" > mattermost.json
+      - name: Send to Mattermost
+        uses: mattermost/action-mattermost-notify@master
+        env:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}

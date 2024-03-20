@@ -1,0 +1,17 @@
+module.exports = async ({ github, context, core }) => {
+  const prs = await github.rest.pulls.list({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    state: "open"
+  });
+
+  const prsReadyToReview = prs.filter(pr =>
+    pr.labels.some(label => label.name === "ready for review")
+  );
+
+  const output = prsReadyToReview
+    .map(pr => `- ${pr.title} (${pr.html_url})`)
+    .join("\n");
+
+  core.setOutput(output);
+};
