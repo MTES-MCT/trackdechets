@@ -18,7 +18,7 @@ jobs:
             await script({github, context, core})
       - name: Create the Mattermost Message
         run: |
-          echo "{\"text\":\"'${{ steps.list.outputs.prs }}'\"}" > mattermost.json
+          echo "{\"text\":\"## PRs à review \n ${{ steps.list.outputs.prs }} \"}" > mattermost.json
       - name: Send to Mattermost
         uses: mattermost/action-mattermost-notify@master
         env:
