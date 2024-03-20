@@ -19,7 +19,7 @@ jobs:
       - name: Create the Mattermost Message
         run: |
           echo "{\"text\":\"'${{ steps.list.outputs.result }}'\"}" > mattermost.json
-      - name: Send to Mattermost
-        uses: mattermost/action-mattermost-notify@master
-        env:
-          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
+      #- name: Send to Mattermost
+      #  uses: mattermost/action-mattermost-notify@master
+      #  env:
+      #    MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
