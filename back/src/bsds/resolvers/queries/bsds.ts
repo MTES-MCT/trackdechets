@@ -229,7 +229,7 @@ function getFieldNameFromKeyword(keywordFieldName: string): keyof BsdElastic {
 
 function buildSort({ orderBy = {} }: QueryBsdsArgs) {
   const sort: Array<Record<string, OrderType>> = [
-    { createdAt: "DESC" },
+    { updatedAt: "DESC" },
     // id is used as last sort to deal with ties
     // (for documents whose sorting result is equal)
     { id: "ASC" }
