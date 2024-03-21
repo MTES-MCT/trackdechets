@@ -249,8 +249,7 @@ export const filterPredicates: {
 }[] = [
   {
     filterName: FilterName.types,
-    where: value => ({ type: { _in: value } }),
-    orderBy: "type"
+    where: value => ({ type: { _in: value } })
   },
   {
     filterName: FilterName.waste,
