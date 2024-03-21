@@ -128,15 +128,17 @@ async function setAppendix1AutomaticValues(
         { id },
         {
           // Most data are copied from the container form and not editable:
+          // - the container custom id
           // - waste infos
           // - transporter
           // - recipient
           // - if its emitted by an eco organisme or not
+          customId: container.customId,
           wasteDetailsCode: container.wasteDetailsCode,
           wasteDetailsIsDangerous: container.wasteDetailsIsDangerous,
           wasteDetailsName: container.wasteDetailsName,
           wasteDetailsQuantityType: "ESTIMATED",
-
+          wasteDetailsConsistence: container.wasteDetailsConsistence,
           recipientCompanySiret: container.recipientCompanySiret,
           recipientCompanyName: container.recipientCompanyName,
           recipientCompanyAddress: container.recipientCompanyAddress,
