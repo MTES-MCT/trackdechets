@@ -2325,5 +2325,36 @@ describe("Mutation.createForm", () => {
       });
       expect(newAppendix1_2.status).toBe(Status.SEALED);
     });
+
+    it("should not allow to create a APPENDIX1_PRODUCER form with an intermediary", async () => {
+      const emitter = await userWithCompanyFactory(UserRole.MEMBER);
+      const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+      const { mutate } = makeClient(emitter.user);
+      const intermediaryCreation = toIntermediaryCompany(intermediary.company);
+      const { errors } = await mutate<Pick<Mutation, "createForm">>(
+        CREATE_FORM,
+        {
+          variables: {
+            createFormInput: {
+              emitter: {
+                type: "APPENDIX1_PRODUCER",
+                company: {
+                  siret: emitter.company.siret
+                }
+              },
+              intermediaries: [intermediaryCreation]
+            }
+          }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: "Impossible d'ajouter des intermédiaires sur une annexe 1",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    });
   });
 });

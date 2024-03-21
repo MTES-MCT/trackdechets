@@ -363,9 +363,9 @@ export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
  */
 export async function validateIntermediariesInput(
   intermediaries: CompanyInput[] | null | undefined
-): Promise<CompanyInput[]> {
+): Promise<void> {
   if (!intermediaries || intermediaries.length === 0) {
-    return [];
+    return;
   }
 
   if (intermediaries.length > 3) {
@@ -390,8 +390,6 @@ export async function validateIntermediariesInput(
     // ensure a SIRET number is present
     await intermediarySchema.validate(companyInput, { abortEarly: false });
   }
-
-  return intermediaries;
 }
 
 /**

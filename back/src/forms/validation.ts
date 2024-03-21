@@ -35,6 +35,7 @@ import {
   siret,
   siretConditions,
   siretTests,
+  validateIntermediariesInput,
   vatNumber,
   vatNumberTests,
   weight,
@@ -43,6 +44,7 @@ import {
 } from "../common/validation";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
+  CompanyInput,
   InitialFormFractionInput,
   PackagingInfo,
   Packagings
@@ -68,6 +70,7 @@ import { getFirstTransporterSync } from "./database";
 import { UserInputError } from "../common/errors";
 import { ConditionConfig } from "yup/lib/Condition";
 import { getOperationModesFromOperationCode } from "../common/operationModes";
+import { flattenFormInput } from "./converter";
 // set yup default error messages
 configureYup();
 
@@ -1988,4 +1991,21 @@ export async function validateAppendix1Groupement(
   }
 
   return formFractions;
+}
+
+export async function validateIntermediaries(
+  intermediaries: CompanyInput[] | null | undefined,
+  formContent: ReturnType<typeof flattenFormInput>
+) {
+  if (
+    formContent.emitterType === "APPENDIX1_PRODUCER" &&
+    intermediaries?.length &&
+    intermediaries.length > 0
+  ) {
+    throw new UserInputError(
+      "Impossible d'ajouter des intermédiaires sur une annexe 1"
+    );
+  }
+
+  await validateIntermediariesInput(intermediaries);
 }
