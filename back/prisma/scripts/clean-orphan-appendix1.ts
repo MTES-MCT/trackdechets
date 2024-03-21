@@ -15,7 +15,7 @@ export class UnindexOrphanAppendix1 implements Updater {
 
       const where: Prisma.FormWhereInput = {
         emitterType: EmitterType.APPENDIX1_PRODUCER,
-        grouping: { none: { nextForm: {} } }
+        groupedIn: { none: {} }
       };
 
       const orphansCount = await prisma.form.count({ where });
