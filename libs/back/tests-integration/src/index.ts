@@ -4,8 +4,7 @@ import {
   esIndex,
   indexQueue,
   closeMongoClient,
-  closeQueues,
-  server
+  closeQueues
 } from "back";
 import { prisma } from "@td/prisma";
 
@@ -15,8 +14,7 @@ afterAll(async () => {
     closeQueues(),
     esClient.close(),
     redisClient.disconnect(),
-    prisma.$disconnect(),
-    server.stop()
+    prisma.$disconnect()
   ]);
 });
 
