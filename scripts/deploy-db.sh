@@ -65,4 +65,4 @@ done
 echo "3/3 - Create tables & index";
 
 npx prisma db push
-npx nx run back:reindex-all-bsds-bulk
+npx nx run back:reindex-all-bsds-bulk --configuration=integration 

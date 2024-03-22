@@ -3,6 +3,7 @@ import { getCompanyDiv } from "./company";
 import { expect } from "@playwright/test";
 import { getUserAccountHash } from "../data/userAccountHash";
 import { getCompanyAssociation } from "../data/company";
+import { expectInputValue } from "./utils";
 
 /**
  * Enables to invite a user to a company. Specify user.id & company.id
@@ -139,8 +140,7 @@ export const visitInvitationLinkAsNonRegisteredUser = async (
   goTo(page, `/invite?hash=${encodeURIComponent(hash)}`);
 
   // Email field should already be filled
-  const emailInputValue = await page.getByLabel("Email").inputValue();
-  expect(emailInputValue).toEqual(email);
+  await expectInputValue(page, "Email", email);
 };
 
 /**

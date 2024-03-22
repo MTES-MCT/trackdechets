@@ -11,10 +11,10 @@ import { successfulLogin } from "../utils/user";
 import { selectCompany, selectBsdMenu, BsdMenu } from "../utils/navigation";
 import {
   expectFilteredResults,
-  expectQuickFilterValue,
   quickFilter,
   QuickFilterLabel
 } from "../utils/dashboardFilters";
+import { expectInputValue } from "../utils/utils";
 
 test.describe.serial("Cahier des filtres rapides", async () => {
   // Credentials
@@ -551,27 +551,18 @@ test.describe.serial("Cahier des filtres rapides", async () => {
         // Change to another menu. Filter should still be filled, and results
         // filtered accordingly
         await selectBsdMenu(page, "Suivi");
-        await expectQuickFilterValue(page, {
-          label: "N° libre / BSD / contenant",
-          value: "BSDA-"
-        });
+        await expectInputValue(page, "N° libre / BSD / contenant", "BSDA-");
         await expectFilteredResults(page, [bsda1]);
 
         // And another one
         await selectBsdMenu(page, "Archives");
-        await expectQuickFilterValue(page, {
-          label: "N° libre / BSD / contenant",
-          value: "BSDA-"
-        });
+        await expectInputValue(page, "N° libre / BSD / contenant", "BSDA-");
         await expectFilteredResults(page, [bsda2]);
 
         // Change to another company. Filter should still be filled, and results
         // filtered accordingly
         await selectCompany(page, companies.companyJ.siret);
-        await expectQuickFilterValue(page, {
-          label: "N° libre / BSD / contenant",
-          value: "BSDA-"
-        });
+        await expectInputValue(page, "N° libre / BSD / contenant", "BSDA-");
         await expectFilteredResults(page, [bsda1, bsda3]);
       });
     });
