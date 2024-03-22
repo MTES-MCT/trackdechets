@@ -1,4 +1,4 @@
-import { CompanyType, UserRole } from "@prisma/client";
+import { CollectorType, CompanyType, UserRole } from "@prisma/client";
 import * as yup from "yup";
 import { prisma } from "@td/prisma";
 import { CompanyRow } from "./types";
@@ -51,6 +51,48 @@ export const companyValidationSchema = yup.object({
     .compact()
     .required()
     .min(1),
+  collectorTypes: yup
+    .array()
+    .of(yup.string().oneOf(Object.values(CollectorType)))
+    .ensure()
+    .compact()
+    .test(
+      "collectorTypes",
+      "Your company needs to be a Collector to have collectorTypes",
+      async (collectorTypes, ctx) => {
+        const { companyTypes } = ctx.parent;
+
+        if (
+          collectorTypes?.length &&
+          !companyTypes.includes(CompanyType.COLLECTOR)
+        ) {
+          return false;
+        }
+
+        return true;
+      }
+    ),
+  wasteProcessorTypes: yup
+    .array()
+    .of(yup.string().oneOf(Object.values(CollectorType)))
+    .ensure()
+    .compact()
+    .test(
+      "wasteProcessorTypes",
+      "Your company needs to be a WasteProcessor to have wasteProcessorTypes",
+      async (wasteProcessorTypes, ctx) => {
+        const { companyTypes } = ctx.parent;
+
+        if (
+          wasteProcessorTypes?.length &&
+          !companyTypes.includes(CompanyType.WASTEPROCESSOR)
+        ) {
+          return false;
+        }
+
+        return true;
+      }
+    ),
   givenName: yup.string().notRequired(),
   contactEmail: yup.string().notRequired().email(),
   contactPhone: yup

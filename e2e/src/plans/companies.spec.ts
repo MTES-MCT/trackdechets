@@ -79,7 +79,7 @@ test.describe
           company: {
             name: "003 - Producteur avec signature et emport autorisé",
             roles: [
-              "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+              "Producteur de déchets : producteurs de déchets, y compris T&S"
             ],
             producesDASRI: true
           }
@@ -104,7 +104,7 @@ test.describe
           company: {
             name: "004 - Producteur avec informations de contact",
             roles: [
-              "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+              "Producteur de déchets : producteurs de déchets, y compris T&S"
             ]
           }
         });
@@ -134,8 +134,8 @@ test.describe
     await test.step("#005 - Installation de Transit, Regroupement ou Tri des déchets", async () => {
       await createWasteManagingCompany(page, {
         company: {
-          name: "005 - Installation de Transit, Regroupement ou Tri des déchets",
-          roles: ["Installation de Transit, regroupement ou tri de déchets"]
+          name: "005 - Installation de Tri, transit regroupement de déchets",
+          roles: ["Installation de Tri, transit regroupement de déchets"]
         },
         contact: {
           name: "Installation TTR 005",
@@ -289,7 +289,7 @@ test.describe
           company: {
             name: "Établissement à supprimer",
             roles: [
-              "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+              "Producteur de déchets : producteurs de déchets, y compris T&S"
             ]
           }
         });
@@ -307,7 +307,7 @@ test.describe
         company: {
           name: "014 - Producteur + Transporteur",
           roles: [
-            "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)",
+            "Producteur de déchets : producteurs de déchets, y compris T&S",
             "Transporteur"
           ],
           producesDASRI: true

@@ -3,7 +3,7 @@ enum CompanyType {
   "Producteur de déchet"
   PRODUCER
 
-  "Installation de Transit, regroupement ou tri de déchets"
+  "Installation de Tri, transit regroupement de déchets"
   COLLECTOR
 
   "Installation de traitement"
@@ -32,6 +32,15 @@ enum CompanyType {
 
   "Crématorium"
   CREMATORIUM
+
+  "Intermédiaire : établissement qui peut être ajouté à une traçabilité, sans responsabilité réglementaire (y compris entreprises de travaux hors amiante)"
+  INTERMEDIARY
+
+  "Installation de valorisation de T&S"
+  DISPOSAL_FACILITY
+
+  "Installation dans laquelle les déchets perdent leur statut de déchet"
+  RECOVERY_FACILITY
 }
 
 "État du processus de vérification de l'établissement"
@@ -49,4 +58,47 @@ enum CompanyVerificationStatus {
   Vérification mise en pause / archivée
   """
   STANDBY
+}
+
+enum CollectorType {
+  "Déchets non Dangereux (Rubriques 2713, 2714, 2715, 2716)"
+  NON_DANGEROUS_WASTES
+
+  "Déchets Dangereux (Rubrique 2718)"
+  DANGEROUS_WASTES
+
+  "Déchets DEEE (Rubrique 2711)"
+  DEEE_WASTES
+
+  "Autres cas déchets non dangereux (Rubrique 2731)"
+  OTHER_NON_DANGEROUS_WASTES
+
+  "Autres cas déchets dangereux (Rubriques 2719, 2792-1, 2793-1, 2793-2, 2797-1, 2798)"
+  OTHER_DANGEROUS_WASTES
+}
+
+enum WasteProcessorType {
+  "Incinération de déchets dangereux"
+  DANGEROUS_WASTES_INCINERATION
+
+  "Incinération de déchets non dangereux"
+  NON_DANGEROUS_WASTES_INCINERATION
+
+  "Crémation"
+  CREMATION
+
+  "Installation de stockage de déchets dangereux"
+  DANGEROUS_WASTES_STORAGE
+
+  "Installation de stockage de déchets non dangereux (y compris casiers dédiés amiante, plâtre)"
+  NON_DANGEROUS_WASTES_STORAGE
+
+  "Installation de stockage de déchets inertes"
+  INERT_WASTES_STORAGE
+
+  "Autres traitements de déchets dangereux"
+  OTHER_DANGEROUS_WASTES
+
+  "Autres traitement de déchets non dangereux"
+  OTHER_NON_DANGEROUS_WASTES
 }

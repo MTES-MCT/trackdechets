@@ -9,14 +9,13 @@ import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 export const COMPANY_CONSTANTS = [
   {
     value: CompanyType.Producer,
-    label:
-      "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)",
+    label: "Producteur de déchets : producteurs de déchets, y compris T&S",
     helpText:
       "Tous les établissements produisant des déchets et producteurs subséquents. Exemples: Ateliers de réparation véhicules, laboratoires, ateliers de traitement de surfaces, détenteurs d'équipements contenant des fluides frigorigènes et les opérateurs, producteurs de DASRI (hôpitaux, EHPAD, médecin, infirmier(e), tatoueurs, dentiste, etc.), maitre ouvrage amiante, etc. Les ménages sont exclus de la traçabilité. Un intermédiaire est un établissement qui a besoin d'avoir accès au bordereau, avec l'accord des parties prenantes dudit BSD (exemple : un maître d'oeuvre ou un intervenant tiers)."
   },
   {
     value: CompanyType.Collector,
-    label: "Installation de Transit, regroupement ou tri de déchets",
+    label: "Installation de Tri, transit regroupement de déchets",
     helpText:
       "Installations sur lesquelles sont regroupés, triés ou en transit les déchets dangereux et/ou non dangereux - installations relevant des rubriques suivantes de la nomenclature ICPE:  2711, 2713, 2714, 2715, 2716, 2718, 2719, 2731, 2792-1, 2793-1, 2793-2, 2797-1, 2798."
   },
