@@ -3,16 +3,19 @@ import { goTo } from "./navigation";
 import { toYYYYMMDD, toDDMMYYYY } from "../utils/time";
 
 type CompanyRole =
-  | "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+  | "Producteur de déchets : producteurs de déchets, y compris T&S"
   | "Transporteur"
   | "Installation de collecte de déchets apportés par le producteur initial"
   | "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
-  | "Installation de Transit, regroupement ou tri de déchets"
+  | "Installation de Tri, transit regroupement de déchets"
   | "Installation de traitement"
   | "Négociant"
   | "Courtier"
   | "Crématorium"
-  | "Entreprise de travaux amiante";
+  | "Entreprise de travaux amiante"
+  | "Intermédiaire : établissement qui peut être ajouté à une traçabilité, sans responsabilité réglementaire (y compris entreprises de travaux hors amiante)"
+  | "Installation de valorisation de T&S"
+  | "Installation dans laquelle les déchets perdent leur statut de déchet";
 
 interface Company {
   name: string;
@@ -57,7 +60,7 @@ export const getCreateButtonIndex = (roles: CompanyRole[]) => {
       [
         "Installation de collecte de déchets apportés par le producteur initial",
         "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
-        "Installation de Transit, regroupement ou tri de déchets",
+        "Installation de Tri, transit regroupement de déchets",
         "Transporteur",
         "Installation de traitement",
         "Négociant",
@@ -74,7 +77,7 @@ export const getCreateButtonIndex = (roles: CompanyRole[]) => {
   for (const role of roles) {
     if (
       [
-        "Producteur de déchets (ou intermédiaire souhaitant avoir accès au bordereau)"
+        "Producteur de déchets : producteurs de déchets, y compris T&S"
       ].includes(role)
     ) {
       return 0;
