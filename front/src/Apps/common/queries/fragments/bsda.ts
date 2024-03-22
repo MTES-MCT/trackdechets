@@ -225,6 +225,27 @@ export const FullBsdaFragment = gql`
         }
       }
     }
+    transporters {
+      company {
+        ...CompanyFragment
+      }
+      customInfo
+      recepisse {
+        number
+        department
+        validityLimit
+        isExempted
+      }
+      transport {
+        mode
+        plates
+        takenOverAt
+        signature {
+          author
+          date
+        }
+      }
+    }
     ecoOrganisme {
       name
       siret
