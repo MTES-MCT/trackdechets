@@ -2,8 +2,6 @@ import { useMutation, useQuery } from "@apollo/client";
 import React, { lazy, ReactElement, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "../../../Apps/common/Components";
-import { getComputedState } from "../../common/getComputedState";
-
 import { IStepContainerProps } from "../../common/stepper/Step";
 import {
   Mutation,
@@ -15,7 +13,7 @@ import {
   BsdaInput,
   BsdaType
 } from "@td/codegen-ui";
-import initialState from "./initial-state";
+import { getInitialState } from "./initial-state";
 import { CREATE_BSDA, UPDATE_BSDA, GET_BSDA } from "./queries";
 import omitDeep from "omit-deep-lodash";
 import { toastApolloError } from "../../common/stepper/toaster";
@@ -30,18 +28,11 @@ interface Props {
   formId?: string;
   initialStep: number;
 }
-const prefillTransportMode = state => {
-  if (!state?.transporter?.transport?.mode) {
-    state.transporter.transport.mode = "ROAD";
-  }
-
-  return state;
-};
 
 export default function BsdaStepsList(props: Props) {
   const navigate = useNavigate();
 
-  const formQuery = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
+  const bsdaQuery = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
     variables: {
       id: props.formId!
     },
@@ -49,36 +40,10 @@ export default function BsdaStepsList(props: Props) {
     fetchPolicy: "network-only"
   });
 
-  const formState = useMemo(() => {
-    const existingBsda = formQuery.data?.bsda;
-
-    const computedState = prefillTransportMode(
-      getComputedState(initialState, existingBsda)
-    );
-
-    if (existingBsda?.grouping) {
-      computedState.grouping = existingBsda.grouping.map(bsda => bsda.id);
-    }
-    if (existingBsda?.forwarding) {
-      computedState.forwarding = existingBsda.forwarding.id;
-    }
-
-    if (
-      computedState.emitter?.pickupSite &&
-      existingBsda?.emitter?.pickupSite === null
-    ) {
-      computedState.emitter.pickupSite = null;
-    }
-
-    if (
-      computedState.worker?.certification &&
-      existingBsda?.worker?.certification === null
-    ) {
-      computedState.worker.certification = null;
-    }
-
-    return computedState;
-  }, [formQuery.data]);
+  const bsdaState = useMemo(() => {
+    const existingBsda = bsdaQuery.data?.bsda;
+    return getInitialState(existingBsda);
+  }, [bsdaQuery.data]);
 
   const [createBsda, { loading: creating }] = useMutation<
     Pick<Mutation, "createBsda">,
@@ -110,9 +75,9 @@ export default function BsdaStepsList(props: Props) {
           { ...input, transporter: null }
         : input;
 
-    return formState.id
+    return bsdaState.id
       ? updateBsda({
-          variables: { id: formState.id, input: cleanupFields(cleanInput) }
+          variables: { id: bsdaState.id, input: cleanupFields(cleanInput) }
         })
       : createBsda({ variables: { input: cleanInput } });
   }
@@ -128,7 +93,7 @@ export default function BsdaStepsList(props: Props) {
 
   // As it's a render function, the steps are nested into a `<></>` block
   // So we render then unwrap to get the steps
-  const parentOfSteps = props.children(formQuery.data?.bsda);
+  const parentOfSteps = props.children(bsdaQuery.data?.bsda);
   const steps = parentOfSteps.props
     .children as ReactElement<IStepContainerProps>[];
 
@@ -137,9 +102,9 @@ export default function BsdaStepsList(props: Props) {
       <GenericStepList
         children={steps}
         formId={props.formId}
-        formQuery={formQuery}
+        formQuery={bsdaQuery}
         onSubmit={onSubmit}
-        initialValues={formState}
+        initialValues={bsdaState}
         validationSchema={bsdaValidationSchema}
         initialStep={props.initialStep}
       />

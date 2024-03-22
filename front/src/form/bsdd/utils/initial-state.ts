@@ -142,8 +142,8 @@ export const initialFormTransporter: TransporterInput = {
 // besoin de connaitre la valeur de `takenOverAt` pour l'affichage des infos transporteur
 // en mode formulaire ou statique dans la liste.
 export type CreateOrUpdateTransporterInput = TransporterInput & {
-  id?: string;
-  takenOverAt?: string;
+  id?: string | null;
+  takenOverAt?: string | null;
 };
 
 export type FormFormikValues = Omit<FormInput, "transporters"> & {
