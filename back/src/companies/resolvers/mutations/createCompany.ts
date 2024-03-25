@@ -28,7 +28,10 @@ import {
   addToSetCompanyDepartementQueue
 } from "../../../queue/producers/company";
 import { UserInputError } from "../../../common/errors";
-import { isForeignTransporter } from "../../validation";
+import {
+  companyTypesValidationSchema,
+  isForeignTransporter
+} from "../../validation";
 import { sendFirstOnboardingEmail } from "./verifyCompany";
 import { sendVerificationCodeLetter } from "../../../common/post";
 import { isGenericEmail } from "@td/constants";
@@ -46,13 +49,16 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
+
+  const { companyTypes, collectorTypes, wasteProcessorTypes } =
+    await companyTypesValidationSchema.validate(companyInput);
+
   const {
     codeNaf,
     gerepId,
     companyName: name,
     givenName,
     address,
-    companyTypes,
     transporterReceiptId,
     traderReceiptId,
     brokerReceiptId,
@@ -139,6 +145,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     givenName,
     address: companyInfo?.address ?? address,
     companyTypes: { set: companyTypes },
+    collectorTypes: collectorTypes ? { set: collectorTypes } : undefined,
+    wasteProcessorTypes: wasteProcessorTypes
+      ? { set: wasteProcessorTypes }
+      : undefined,
     securityCode: randomNumber(4),
     verificationCode: randomNumber(5).toString(),
     ecoOrganismeAgreements: {

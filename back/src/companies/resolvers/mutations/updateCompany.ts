@@ -1,4 +1,8 @@
-import { MutationResolvers } from "../../../generated/graphql/types";
+import {
+  MutationResolvers,
+  MutationUpdateCompanyArgs,
+  RequireFields
+} from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
@@ -10,7 +14,45 @@ import {
   UserInputError
 } from "../../../common/errors";
 import { libelleFromCodeNaf } from "../../sirene/utils";
-import { Company } from "@prisma/client";
+import {
+  CollectorType,
+  Company,
+  CompanyType,
+  WasteProcessorType
+} from "@prisma/client";
+import { companyTypesValidationSchema } from "../../validation";
+
+const validateCompanyTypes = (
+  company: Company,
+  args: RequireFields<MutationUpdateCompanyArgs, "id">
+) => {
+  let { companyTypes, collectorTypes, wasteProcessorTypes } = {
+    ...company,
+    ...args
+  };
+
+  // Nullify sub-types automatically
+  if (args?.companyTypes?.length) {
+    if (
+      company.companyTypes?.includes(CompanyType.COLLECTOR) &&
+      !args?.companyTypes?.includes(CompanyType.COLLECTOR)
+    ) {
+      collectorTypes = [];
+    }
+    if (
+      company.companyTypes?.includes(CompanyType.WASTEPROCESSOR) &&
+      !args?.companyTypes?.includes(CompanyType.WASTEPROCESSOR)
+    ) {
+      wasteProcessorTypes = [];
+    }
+  }
+
+  return companyTypesValidationSchema.validate({
+    companyTypes,
+    collectorTypes,
+    wasteProcessorTypes
+  });
+};
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   parent,
@@ -33,7 +75,10 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     NotCompanyAdminErrorMsg(company.orgId)
   );
 
-  const companyTypes = args.companyTypes || company.companyTypes;
+  // Validate & transform company types & sub-types
+  const { companyTypes, collectorTypes, wasteProcessorTypes } =
+    await validateCompanyTypes(company, args);
+
   const { ecoOrganismeAgreements } = args;
   // update to anything else than ony a TRANSPORTER
   const updateOtherThanTransporter = args.companyTypes?.some(
@@ -63,7 +108,16 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     );
   }
 
-  const updatedCompany = await updateCompanyFn(args, company);
+  const updatedCompany = await updateCompanyFn(
+    {
+      ...args,
+      companyTypes: companyTypes as CompanyType[],
+      collectorTypes: collectorTypes as CollectorType[],
+      wasteProcessorTypes: wasteProcessorTypes as WasteProcessorType[]
+    },
+    company
+  );
+
   // conversion to CompanyPrivate type
   const naf = (updatedCompany as Company).codeNaf ?? company.codeNaf;
   const libelleNaf = libelleFromCodeNaf(naf!);
