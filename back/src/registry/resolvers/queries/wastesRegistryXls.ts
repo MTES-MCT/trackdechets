@@ -15,6 +15,7 @@ import { GraphQLContext } from "../../../types";
 import { Permission, syncCheckUserPermissions } from "../../../permissions";
 import { UserInputError } from "../../../common/errors";
 import { TotalHits } from "@elastic/elasticsearch/api/types";
+import { hasGovernmentRegistryPerm } from "../../permissions";
 
 export const wastesRegistryXlsDownloadHandler: DownloadHandler<QueryWastesRegistryXlsArgs> =
   {
@@ -60,14 +61,23 @@ export async function wastesRegistryXlsResolverFn(
   context: GraphQLContext
 ): Promise<FileDownload> {
   const user = checkIsAuthenticated(context);
+  const hasGovernmentPermission = await hasGovernmentRegistryPerm(
+    user,
+    args.sirets
+  );
+
   const userRoles = await context.dataloaders.userRoles.load(user.id);
-  for (const siret of args.sirets) {
-    syncCheckUserPermissions(
-      userRoles,
-      [siret].filter(Boolean),
-      Permission.RegistryCanRead,
-      `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${siret}`
-    );
+
+  // bypass authorization if the user is authenticated from a service account
+  if (!hasGovernmentPermission) {
+    for (const siret of args.sirets) {
+      syncCheckUserPermissions(
+        userRoles,
+        [siret].filter(Boolean),
+        Permission.RegistryCanRead,
+        `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${siret}`
+      );
+    }
   }
   const hits = await searchBsds(args.registryType, args.sirets, args.where, {
     size: 1,

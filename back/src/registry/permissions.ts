@@ -34,7 +34,7 @@ export async function hasGovernmentRegistryPerm(
     } else {
       if (authorizedOrgIds.length === 1 && authorizedOrgIds.includes("ALL")) {
         // Si la valeur de orgIds est ["ALL"], on considère que le compte
-        // gouvernementale a accès à l'ensemble des établissements
+        // gouvernemental a accès à l'ensemble des établissements
         return true;
       } else {
         return sirets.every(siret => authorizedOrgIds.includes(siret));
