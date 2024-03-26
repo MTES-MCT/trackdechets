@@ -9,6 +9,7 @@ import TransporterDisplay from "../TransporterDisplay/TransporterDisplay";
 import { AnyTransporterInput } from "../../types";
 import { useTransporters } from "../../hooks/useTransporters";
 import { useDeleteTransporter } from "../../hooks/useDeleteTransporter";
+import { initialBsdaTransporter } from "../../../../form/bsda/stepper/initial-state";
 
 type TransporterListProps = {
   // SIRET ou VAT de l'établissement courant
@@ -41,6 +42,14 @@ export function TransporterList<TransporterInput extends AnyTransporterInput>({
     transporters.length === 1 ? 0 : null
   );
 
+  const initialTransporterData = React.useMemo(
+    () =>
+      bsdType === BsdType.Bsdd
+        ? initialFormTransporter
+        : initialBsdaTransporter,
+    [bsdType]
+  );
+
   return (
     <>
       <FieldArray
@@ -49,7 +58,7 @@ export function TransporterList<TransporterInput extends AnyTransporterInput>({
           <>
             {transporters.map((t, idx) => {
               const onTransporterAdd = () => {
-                arrayHelpers.insert(idx + 1, initialFormTransporter);
+                arrayHelpers.insert(idx + 1, initialTransporterData);
                 // replie tous les formulaire sauf celui du nouveau
                 // transporteur qui vient d'être crée
                 setExpandedIdx(idx + 1);

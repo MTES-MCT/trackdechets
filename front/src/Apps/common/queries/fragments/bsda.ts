@@ -226,6 +226,7 @@ export const FullBsdaFragment = gql`
       }
     }
     transporters {
+      id
       company {
         ...CompanyFragment
       }

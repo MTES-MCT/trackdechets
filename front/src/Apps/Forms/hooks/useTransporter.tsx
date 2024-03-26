@@ -7,7 +7,7 @@ import { mapBsdTransporter } from "../bsdTransporterMapper";
 
 // Hook multi-bordereaux qui appelle `useField` et qui renvoie les helpers et
 // champs nécessaires pour read / update les infos d'un transporteur
-// dans Formik
+// dans Formik en fonction du type de bordereau.
 export function useTransporter<T extends AnyTransporterInput>(
   fieldName: string,
   bsdType: BsdType
@@ -65,6 +65,7 @@ export function useTransporter<T extends AnyTransporterInput>(
             }
           })
     };
+    console.log(updatedTransporter);
     setValue(updatedTransporter);
   };
 
