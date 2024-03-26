@@ -78,7 +78,10 @@ const DashboardPage = () => {
     QueryBsdsArgs
   >(GET_BSDS, {
     fetchPolicy: "cache-and-network",
-    notifyOnNetworkStatusChange: true
+    notifyOnNetworkStatusChange: true,
+    // permet d'afficher les bordereaux (en plus de l'erreur)
+    // en cas de réponse partielle
+    errorPolicy: "all"
   });
 
   const tabs: Tabs = useMemo(
