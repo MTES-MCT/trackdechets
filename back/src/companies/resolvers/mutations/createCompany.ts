@@ -1,8 +1,10 @@
 import {
+  CollectorType,
   CompanyType,
   CompanyVerificationMode,
   CompanyVerificationStatus,
-  Prisma
+  Prisma,
+  WasteProcessorType
 } from "@prisma/client";
 import { convertUrls } from "../../database";
 import { prisma } from "@td/prisma";
@@ -144,10 +146,12 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     name: companyInfo?.name ?? name,
     givenName,
     address: companyInfo?.address ?? address,
-    companyTypes: { set: companyTypes },
-    collectorTypes: collectorTypes ? { set: collectorTypes } : undefined,
+    companyTypes: { set: companyTypes as CompanyType[] },
+    collectorTypes: collectorTypes
+      ? { set: collectorTypes as CollectorType[] }
+      : undefined,
     wasteProcessorTypes: wasteProcessorTypes
-      ? { set: wasteProcessorTypes }
+      ? { set: wasteProcessorTypes as WasteProcessorType[] }
       : undefined,
     securityCode: randomNumber(4),
     verificationCode: randomNumber(5).toString(),
@@ -193,7 +197,12 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   }
 
   // Foreign transporter: automatically verify (no action needed)
-  if (isForeignTransporter({ companyTypes, vatNumber })) {
+  if (
+    isForeignTransporter({
+      companyTypes: companyTypes as CompanyType[],
+      vatNumber
+    })
+  ) {
     companyCreateInput.verificationMode = CompanyVerificationMode.AUTO;
     companyCreateInput.verificationStatus = CompanyVerificationStatus.VERIFIED;
     companyCreateInput.verifiedAt = new Date();
@@ -222,7 +231,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   if (process.env.VERIFY_COMPANY === "true") {
     if (
       isProfessional(companyTypes) &&
-      !isForeignTransporter({ companyTypes, vatNumber })
+      !isForeignTransporter({
+        companyTypes: companyTypes as CompanyType[],
+        vatNumber
+      })
     ) {
       // Email is too generic. Automatically send a verification letter
       if (isGenericEmail(user.email, company.name)) {
@@ -262,7 +274,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   // (professional onboarding mail is sent on verify)
   if (
     !isProfessional(companyTypes) ||
-    isForeignTransporter({ companyTypes, vatNumber })
+    isForeignTransporter({
+      companyTypes: companyTypes as CompanyType[],
+      vatNumber
+    })
   ) {
     await sendFirstOnboardingEmail(companyInput, user);
   }
