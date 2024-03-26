@@ -1,13 +1,8 @@
 import * as React from "react";
-import {
-  Document,
-  formatDate,
-  TRANSPORT_MODE_LABELS
-} from "../../../common/pdf";
+import { Document, formatDate } from "../../../common/pdf";
 import { Bsda } from "../../../generated/graphql/types";
 import { CompanyContact, CompanyDescription } from "./Company";
 import { PickupSite } from "./PickupSite";
-import { Recepisse } from "./Recepisse";
 import { Signature } from "./Signature";
 import { TraceabilityTable } from "./TraceabilityTable";
 import { WasteDescription } from "./WasteDescription";
@@ -15,6 +10,7 @@ import { WasteDetails } from "./WasteDetails";
 import { BsdaStatus, OperationMode } from "@prisma/client";
 import { CancelationStamp } from "../../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../../common/operationModes";
+import Transporter from "./Transporter";
 
 const PACKAGINGS_NAMES = {
   BIG_BAG: "Big-bag / GRV",
@@ -294,38 +290,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
           </div>
         </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>6. Transporteur</strong>
-            </p>
-            <CompanyDescription company={bsda?.transporter?.company} />
-            <CompanyContact company={bsda?.transporter?.company} />
-          </div>
-          <div className="BoxCol">
-            {bsda?.transporter?.recepisse?.isExempted ? (
-              <p>
-                Le transporteur déclare être exempté de récépissé conformément
-                aux dispositions de l'article R.541-50 du code de
-                l'environnement.
-              </p>
-            ) : (
-              <Recepisse recepisse={bsda?.transporter?.recepisse} />
-            )}
-            <br />
-            Mode de transport :{" "}
-            {bsda?.transporter?.transport?.mode
-              ? TRANSPORT_MODE_LABELS[bsda?.transporter?.transport?.mode]
-              : ""}
-            <br />
-            Immatriculations: {bsda?.transporter?.transport?.plates?.join(", ")}
-            <br />
-            Date de prise en charge:{" "}
-            {formatDate(bsda?.transporter?.transport?.takenOverAt)}
-            <br />
-            <Signature signature={bsda?.transporter?.transport?.signature} />
-          </div>
-        </div>
+        {bsda?.transporter && <Transporter transporter={bsda?.transporter} />}
 
         <div className="BoxRow">
           <div className="BoxCol">
@@ -389,6 +354,22 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
           </div>
         </div>
       </div>
+      {bsda?.transporters?.length > 1 && (
+        <div className="Page">
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>A REMPLIR EN CAS DE TRANSPORT MULTIMODAL</strong>
+              </p>
+            </div>
+          </div>
+          {bsda.transporters
+            .filter((_, idx) => idx > 0)
+            .map(t => (
+              <Transporter transporter={t} />
+            ))}
+        </div>
+      )}
       {previousBsdas?.length > 0 ? (
         <div className="Page">
           <h3 className="TextAlignCenter">
