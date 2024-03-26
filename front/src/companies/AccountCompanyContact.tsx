@@ -1,10 +1,10 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import AccountFieldCompanyContact from "./fields/AccountFieldCompanyContact";
-import AccountFieldCompanyContactEmail from "./fields/AccountFieldCompanyContactEmail";
-import AccountFieldCompanyContactPhone from "./fields/AccountFieldCompanyContactPhone";
-import AccountFieldCompanyWebsite from "./fields/AccountFieldCompanyWebsite";
-import AccountFieldCompanyAgreements from "./fields/AccountFieldCompanyAgreements";
+import AccountFieldCompanyContact from "../account/fields/AccountFieldCompanyContact";
+import AccountFieldCompanyContactEmail from "../account/fields/AccountFieldCompanyContactEmail";
+import AccountFieldCompanyContactPhone from "../account/fields/AccountFieldCompanyContactPhone";
+import AccountFieldCompanyWebsite from "../account/fields/AccountFieldCompanyWebsite";
+import AccountFieldCompanyAgreements from "../account/fields/AccountFieldCompanyAgreements";
 import { CompanyPrivate, CompanyType } from "@td/codegen-ui";
 import { generatePath } from "react-router-dom";
 import routes from "../Apps/routes";

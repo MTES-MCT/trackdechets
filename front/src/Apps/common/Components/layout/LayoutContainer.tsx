@@ -19,7 +19,7 @@ const DashboardRoutes = lazy(
   () => import("../../../Dashboard/DashboardRoutes")
 );
 const CompaniesRoutes = lazy(
-  () => import("../../../../account/CompaniesRoutes")
+  () => import("../../../../companies/CompaniesRoutes")
 );
 const Account = lazy(() => import("../../../../account/Account"));
 const AccountMembershipRequest = lazy(

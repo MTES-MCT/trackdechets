@@ -1,15 +1,16 @@
 import React from "react";
 import { useQuery, gql } from "@apollo/client";
 import CompaniesMenu from "./CompaniesMenu";
-import { Route, Navigate, Routes, Link } from "react-router-dom";
+import { Route, Navigate, Routes } from "react-router-dom";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import { InlineError } from "../Apps/common/Components/Error/Error";
-import AccountInfo from "./AccountInfo";
-import AccountCompanyList from "./AccountCompanyList";
-import AccountContentWrapper from "./AccountContentWrapper";
+import AccountInfo from "../account/AccountInfo";
+import CompaniesList from "./CompaniesList";
+import AccountContentWrapper from "../account/AccountContentWrapper";
 import AccountCompanyAdd from "./AccountCompanyAdd";
 import AccountCompanyAddProducer from "./AccountCompanyAddProducer";
 import AccountCompanyAddForeign from "./AccountCompanyAddForeign";
+import CompanyDetails from "./CompanyDetails";
 import { Query } from "@td/codegen-ui";
 import routes, { getRelativeRoute } from "../Apps/routes";
 import AccountCompanyOrientation from "./AccountCompanyOrientation";
@@ -45,23 +46,11 @@ export default function CompaniesRoutes() {
         {!isMobile && <CompaniesMenu />}
         <div className="dashboard-content">
           <Routes>
+            <Route index element={<CompaniesList />} />
+
             <Route
-              index
-              element={
-                <AccountContentWrapper
-                  title="Mes établissements"
-                  button={
-                    <Link
-                      className="btn btn--primary"
-                      to={routes.companies.orientation}
-                    >
-                      Créer un établissement
-                    </Link>
-                  }
-                >
-                  <AccountCompanyList />
-                </AccountContentWrapper>
-              }
+              path={toRelative(routes.companies.details)}
+              element={<CompanyDetails />}
             />
 
             <Route

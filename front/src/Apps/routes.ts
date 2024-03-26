@@ -103,6 +103,7 @@ const routes = {
   },
   companies: {
     index: "/companies",
+    details: "/companies/:siret",
     create: {
       simple: "/companies/new",
       pro: "/companies/professional",

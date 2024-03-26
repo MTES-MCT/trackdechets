@@ -6,7 +6,7 @@ import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Tooltip from "../../common/components/Tooltip";
 
-import { Values } from "../AccountCompanyAdd";
+import { Values } from "../../companies/AccountCompanyAdd";
 
 /**
  * Broker receipt Formik fields for company creation

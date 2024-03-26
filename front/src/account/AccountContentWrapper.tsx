@@ -3,7 +3,8 @@ import styles from "./AccountContentWrapper.module.scss";
 
 type Props = {
   title: string;
-  button?: ReactNode;
+  subtitle?: string;
+  additional?: ReactNode;
   children: ReactNode;
 };
 
@@ -12,14 +13,18 @@ type Props = {
  */
 export default function AccountContentWrapper({
   title,
-  button,
+  subtitle,
+  additional,
   children
 }: Props) {
   return (
-    <div className={styles.content}>
-      <div className={styles.panelTitle}>
-        <h5 className="h3 tw-font-bold tw-mb-8">{title}</h5>
-        {button || null}
+    <div className={`fr-container--fluid ${styles.content}`}>
+      <div className={`fr-mb-4w ${styles.panelTitle}`}>
+        <div className={styles.titles}>
+          <h3 className="fr-h3 fr-mb-n0-5v">{title}</h3>
+          {subtitle && <p className="fr-text">{subtitle}</p>}
+        </div>
+        <div className={styles.additional}>{additional || null}</div>{" "}
       </div>
       <div>{children}</div>
     </div>

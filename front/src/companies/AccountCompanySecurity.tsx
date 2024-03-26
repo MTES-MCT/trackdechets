@@ -1,9 +1,9 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import AccountCompanySecurityCodeField from "./fields/AccountFieldCompanySecurityCode";
-import AccountFieldCompanyDasriDirectTakeOver from "./fields/AccountFieldCompanyDasriDirectTakeOver";
+import AccountCompanySecurityCodeField from "../account/fields/AccountFieldCompanySecurityCode";
+import AccountFieldCompanyDasriDirectTakeOver from "../account/fields/AccountFieldCompanyDasriDirectTakeOver";
 import { CompanyPrivate } from "@td/codegen-ui";
-import { AccountFieldCompanySignatureAutomation } from "./fields/AccountFieldCompanySignatureAutomation";
+import { AccountFieldCompanySignatureAutomation } from "../account/fields/AccountFieldCompanySignatureAutomation";
 
 type Props = { company: CompanyPrivate };
 

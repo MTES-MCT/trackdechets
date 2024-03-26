@@ -1,22 +1,22 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import AccountFieldCompanyTypes from "./fields/AccountFieldCompanyTypes";
-import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
-import AccountFieldCompanyGerepId from "./fields/AccountFieldCompanyGerepId";
+import AccountFieldCompanyTypes from "../account/fields/AccountFieldCompanyTypes";
+import AccountFieldNotEditable from "../account/fields/AccountFieldNotEditable";
+import AccountFieldCompanyGerepId from "../account/fields/AccountFieldCompanyGerepId";
 import AccountFieldCompanyGivenName, {
   tooltip as givenNameTooltip
-} from "./fields/AccountFieldCompanyGivenName";
+} from "../account/fields/AccountFieldCompanyGivenName";
 import { CompanyPrivate, UserRole, CompanyType } from "@td/codegen-ui";
 
-import AccountFieldCompanyTransporterReceipt from "./fields/AccountFieldCompanyTransporterReceipt";
-import AccountFieldCompanyTraderReceipt from "./fields/AccountFieldCompanyTraderReceipt";
-import AccountFieldCompanyBrokerReceipt from "./fields/AccountFieldCompanyBrokerReceipt";
-import AccountFieldCompanyVerificationStatus from "./fields/AccountFieldCompanyVerificationStatus";
-import AccountFieldCompanyVhuAgrementBroyeur from "./fields/AccountFieldCompanyVhuAgrementBroyeur";
-import AccountFieldCompanyVhuAgrementDemolisseur from "./fields/AccountFieldCompanyVhuAgrementDemolisseur";
-import AccountFieldCompanyWorkerCertification from "./fields/AccountFieldCompanyWorkerCertification";
+import AccountFieldCompanyTransporterReceipt from "../account/fields/AccountFieldCompanyTransporterReceipt";
+import AccountFieldCompanyTraderReceipt from "../account/fields/AccountFieldCompanyTraderReceipt";
+import AccountFieldCompanyBrokerReceipt from "../account/fields/AccountFieldCompanyBrokerReceipt";
+import AccountFieldCompanyVerificationStatus from "../account/fields/AccountFieldCompanyVerificationStatus";
+import AccountFieldCompanyVhuAgrementBroyeur from "../account/fields/AccountFieldCompanyVhuAgrementBroyeur";
+import AccountFieldCompanyVhuAgrementDemolisseur from "../account/fields/AccountFieldCompanyVhuAgrementDemolisseur";
+import AccountFieldCompanyWorkerCertification from "../account/fields/AccountFieldCompanyWorkerCertification";
 import { isSiret, isVat, PROFESSIONALS } from "@td/constants";
-import AccountInfoAutoUpdate from "./fields/AccountInfoAutoUpdate";
+import AccountInfoAutoUpdate from "../account/fields/AccountInfoAutoUpdate";
 
 type Props = { company: CompanyPrivate };
 
