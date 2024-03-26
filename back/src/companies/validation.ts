@@ -66,7 +66,7 @@ export const companyTypesValidationSchema = yup.object({
   collectorTypes: yup
     .array()
     .of(yup.string().oneOf(Object.values(CollectorType)))
-    .ensure()
+    // .ensure()
     .compact()
     .transform(toSet)
     .test(
@@ -88,7 +88,7 @@ export const companyTypesValidationSchema = yup.object({
   wasteProcessorTypes: yup
     .array()
     .of(yup.string().oneOf(Object.values(WasteProcessorType)))
-    .ensure()
+    // .ensure()
     .compact()
     .transform(toSet)
     .test(
