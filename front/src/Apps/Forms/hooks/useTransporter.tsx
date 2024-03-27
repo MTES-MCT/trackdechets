@@ -65,7 +65,6 @@ export function useTransporter<T extends AnyTransporterInput>(
             }
           })
     };
-    console.log(updatedTransporter);
     setValue(updatedTransporter);
   };
 
