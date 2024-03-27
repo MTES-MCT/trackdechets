@@ -66,6 +66,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
     } else {
       setIsExtraEuropeanCompany(false);
       setFieldValue("nextDestination.company.extraEuropeanId", "");
+      setExtraEuropeanCompany("");
     }
   }, [
     isExtraEuropeanCompany,
