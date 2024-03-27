@@ -11,6 +11,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - ETQ utilisateur je peux faire du multi-modal sur le BSDA par API [PR 3108](https://github.com/MTES-MCT/trackdechets/pull/3108)
 
+#### :nail_care: Améliorations
+
+- Le siret de l'établissement est précisé dans les emails d'invitation [PR 3151](https://github.com/MTES-MCT/trackdechets/pull/3151)
+
 #### :house: Interne
 
 - Permettre au comptes de service de télécharger les registres csv and xls de tous les sirets P[R 3207](https://github.com/MTES-MCT/trackdechets/pull/3207)

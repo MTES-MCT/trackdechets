@@ -43,21 +43,25 @@ describe("templates", () => {
   test("inviteUserToJoin", () => {
     const hash = "abcd";
     const companyName = "ACME";
+    const companyOrgId = "12345";
     const rendered = renderMail(inviteUserToJoin, {
-      variables: { hash, companyName },
+      variables: { hash, companyName, companyOrgId },
       to
     });
     expect(rendered.body).toContain(hash);
     expect(rendered.body).toContain(companyName);
+    expect(rendered.body).toContain(companyOrgId);
   });
 
   test("notifyUserOfInvite", () => {
     const companyName = "ACME";
+    const companyOrgId = "12345";
     const rendered = renderMail(notifyUserOfInvite, {
-      variables: { companyName },
+      variables: { companyName, companyOrgId },
       to
     });
     expect(rendered.body).toContain(companyName);
+    expect(rendered.body).toContain(companyOrgId);
   });
 
   test("createPasswordResetRequest", () => {

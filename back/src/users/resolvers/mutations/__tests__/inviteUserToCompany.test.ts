@@ -61,7 +61,7 @@ describe("inviteUserToCompany", () => {
     expect(sendMailMock).toHaveBeenCalledWith(
       renderMail(notifyUserOfInvite, {
         to: [{ email: "arya.stark@trackdechets.fr", name: "Arya Stark" }],
-        variables: { companyName: "Code en Stock" }
+        variables: { companyName: "Code en Stock", companyOrgId: siret }
       })
     );
   });
@@ -100,7 +100,11 @@ describe("inviteUserToCompany", () => {
             email: "arya.stark@trackdechets.fr"
           }
         ],
-        variables: { companyName: "Code en Stock", hash: "hash" }
+        variables: {
+          companyName: "Code en Stock",
+          hash: "hash",
+          companyOrgId: siret
+        }
       })
     );
   });

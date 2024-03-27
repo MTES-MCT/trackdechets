@@ -42,7 +42,11 @@ describe("mutation resendInvitation", () => {
     expect((sendMail as jest.Mock).mock.calls[0][0]).toEqual(
       renderMail(inviteUserToJoin, {
         to: [{ name: usrToInvite, email: usrToInvite }],
-        variables: { companyName: company.name, hash: invitation.hash }
+        variables: {
+          companyName: company.name,
+          hash: invitation.hash,
+          companyOrgId: company.siret
+        }
       })
     );
   });
