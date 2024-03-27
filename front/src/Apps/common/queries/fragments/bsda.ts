@@ -53,6 +53,28 @@ export const bsdaFragment = gql`
         isExempted
       }
     }
+    transporters {
+      company {
+        name
+        siret
+        orgId
+      }
+      customInfo
+      transport {
+        plates
+      }
+      recepisse {
+        number
+        department
+        validityLimit
+        isExempted
+      }
+      transport {
+        signature {
+          date
+        }
+      }
+    }
     waste {
       materialName
       bsdaCode: code
