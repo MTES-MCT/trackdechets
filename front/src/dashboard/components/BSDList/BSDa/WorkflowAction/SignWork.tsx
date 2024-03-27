@@ -63,7 +63,7 @@ export function SignWork({
     >
       {({ bsda, onClose }) =>
         bsda.metadata?.errors?.some(
-          error => error.requiredFor === SignatureTypeInput.Emission
+          error => error?.requiredFor === BsdaSignatureType.Work
         ) ? (
           <>
             <p className="tw-mt-2 tw-text-red-700">
