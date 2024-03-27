@@ -17,6 +17,6 @@ export function useTransporters<T extends AnyTransporterInput>(
   const transporters = field.value;
 
   return transporters
-    .map(transporter => mapBsdTransporter(transporter, bsdType))
+    .map(transporter => mapBsdTransporter(transporter, bsdType)!)
     .filter(Boolean);
 }
