@@ -1,7 +1,11 @@
 import { errors, estypes } from "@elastic/elasticsearch";
 import { logger } from "@td/logger";
 import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
-import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
+import {
+  AnonymousCompanyError,
+  ClosedCompanyError,
+  SiretNotFoundError
+} from "../errors";
 import { SireneSearchResult } from "../types";
 import {
   SearchHit,
@@ -11,7 +15,10 @@ import {
 } from "./types";
 import client from "./esClient";
 import { SEARCH_COMPANIES_MAX_SIZE } from "../insee/client";
-import { StatutDiffusionEtablissement } from "../../../generated/graphql/types";
+import {
+  EtatAdministratif,
+  StatutDiffusionEtablissement
+} from "../../../generated/graphql/types";
 
 const { ResponseError } = errors;
 /**
@@ -87,6 +94,11 @@ export const searchCompany = async (
       throw new SiretNotFoundError();
     }
     const company = searchResponseToCompany(response.body.hits.hits[0]._source);
+
+    if (company.etatAdministratif === ("F" as EtatAdministratif)) {
+      throw new ClosedCompanyError();
+    }
+
     if (
       company.statutDiffusionEtablissement ===
       ("P" as StatutDiffusionEtablissement)
