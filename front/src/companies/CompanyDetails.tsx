@@ -40,7 +40,10 @@ export default function CompanyDetails() {
   const { data, loading, error } = useQuery<
     Pick<Query, "myCompanies">,
     QueryMyCompaniesArgs
-  >(MY_COMPANIES, { variables: { search: siret } });
+  >(MY_COMPANIES, {
+    fetchPolicy: "network-only",
+    variables: { search: siret }
+  });
 
   if (error) {
     return <NotificationError apolloError={error} />;
@@ -67,7 +70,7 @@ export default function CompanyDetails() {
       subtitle={company.orgId}
       additional={userRole(company.userRole!)}
     >
-      <div className="fr-tabs">
+      <div className="fr-tabs" data-testid="company-details">
         <ul
           className="fr-tabs__list"
           role="tablist"
@@ -82,7 +85,7 @@ export default function CompanyDetails() {
               aria-selected="true"
               aria-controls="tabpanel-404-panel"
             >
-              Information
+              Informations
             </button>
           </li>
           <li role="presentation">

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
-import { useNavigate } from "react-router-dom";
+import { generatePath, useNavigate } from "react-router-dom";
 import routes from "../Apps/routes";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 import RedErrorMessage from "../common/components/RedErrorMessage";
@@ -71,8 +71,12 @@ export const CREATE_COMPANY_HOOK_OPTIONS = navigate => ({
     { query: MY_COMPANIES, variables: { first: 10 } }
   ],
   awaitRefetchQueries: true,
-  onCompleted: () => {
-    navigate(routes.companies.index);
+  onCompleted: data => {
+    navigate(
+      generatePath(routes.companies.details, {
+        siret: data.createCompany.siret
+      })
+    );
   }
 });
 

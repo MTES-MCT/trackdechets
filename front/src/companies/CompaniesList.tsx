@@ -77,7 +77,7 @@ export default function CompaniesList() {
 
   const { data, loading, error, refetch, fetchMore } = useQuery<
     Pick<Query, "myCompanies">
-  >(MY_COMPANIES, { variables: { first: 10 } });
+  >(MY_COMPANIES, { fetchPolicy: "network-only", variables: { first: 10 } });
 
   const debouncedSearch = useMemo(
     () =>
@@ -230,7 +230,7 @@ export default function CompaniesList() {
           className={styles.item}
           key={company.orgId}
         >
-          <div>
+          <div data-testid="companies-list">
             <p className={`fr-text ${styles.name}`}>
               {company.name}
               {company.givenName && ` - ${company.givenName}`}

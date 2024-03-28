@@ -22,7 +22,11 @@ export default function AccountContentWrapper({
       <div className={`fr-mb-4w ${styles.panelTitle}`}>
         <div className={styles.titles}>
           <h3 className="fr-h3 fr-mb-n0-5v">{title}</h3>
-          {subtitle && <p className="fr-text">{subtitle}</p>}
+          {subtitle && (
+            <p data-testid="page-subtitle" className="fr-text">
+              {subtitle}
+            </p>
+          )}
         </div>
         <div className={styles.additional}>{additional || null}</div>{" "}
       </div>
