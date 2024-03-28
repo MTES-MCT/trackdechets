@@ -1,6 +1,6 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import AccountFormCompanyInviteNewUser from "./fields/forms/AccountFormCompanyInviteNewUser";
+import AccountFormCompanyInviteNewUser from "../account/fields/forms/AccountFormCompanyInviteNewUser";
 import AccountCompanyMember from "./AccountCompanyMember";
 import {
   CompanyPrivate,

@@ -76,7 +76,7 @@ export default function Account() {
               element={
                 <AccountContentWrapper
                   title="Mes applications tierces"
-                  button={
+                  additional={
                     <Link
                       className="btn btn--primary"
                       to={routes.account.oauth2.create}

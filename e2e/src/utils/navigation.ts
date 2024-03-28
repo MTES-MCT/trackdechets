@@ -42,6 +42,7 @@ export const goTo = async (page, path) => {
  * Enables to test current URL
  */
 export const checkCurrentURL = async (page, path) => {
+  await page.waitForURL(`**${path}`);
   await expect(new URL(page.url()).pathname).toEqual(path);
 };
 

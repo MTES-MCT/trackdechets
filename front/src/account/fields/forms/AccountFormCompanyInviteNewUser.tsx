@@ -3,7 +3,7 @@ import { Formik, Form, Field } from "formik";
 import RedErrorMessage from "../../../common/components/RedErrorMessage";
 import styles from "./AccountCompanyInviteNewUser.module.scss";
 import { useMutation, gql } from "@apollo/client";
-import AccountCompanyMember from "../../AccountCompanyMember";
+import AccountCompanyMember from "../../../companies/AccountCompanyMember";
 import { object, string } from "yup";
 import {
   CompanyPrivate,

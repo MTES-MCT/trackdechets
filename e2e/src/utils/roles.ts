@@ -1,5 +1,5 @@
 import { goTo } from "./navigation";
-import { getCompanyDiv } from "./company";
+import { getCompanyDiv, switchCompany } from "./company";
 import { expect } from "@playwright/test";
 import { getUserAccountHash } from "../data/userAccountHash";
 import { getCompanyAssociation } from "../data/company";
@@ -23,12 +23,12 @@ export const inviteUserToCompany = async (
   }
 ) => {
   // Go to companies page
-  await goTo(page, "/account/companies");
+  await goTo(page, "/companies");
 
   // Select correct company & correct tab
+  await switchCompany(page, { siret: company.siret });
   const companyDiv = await getCompanyDiv(page, {
     siret: company.siret,
-    name: company.name,
     tab: "Membres"
   });
 
@@ -91,12 +91,12 @@ export const deleteInvitation = async (
   }
 ) => {
   // Go to companies page
-  await goTo(page, "/account/companies");
+  await goTo(page, "/companies");
 
   // Select correct company & correct tab
+  await switchCompany(page, { siret: company.siret });
   const companyDiv = await getCompanyDiv(page, {
     siret: company.siret,
-    name: company.name,
     tab: "Membres"
   });
 
@@ -157,12 +157,12 @@ export const resendInvitation = async (
   }
 ) => {
   // Go to companies page
-  await goTo(page, "/account/companies");
+  await goTo(page, "/companies");
 
   // Select correct company & correct tab
+  await switchCompany(page, { siret: company.siret });
   const companyDiv = await getCompanyDiv(page, {
     siret: company.siret,
-    name: company.name,
     tab: "Membres"
   });
 
@@ -201,12 +201,12 @@ export const verifyCompanyAccess = async (
   }
 ) => {
   // Go to companies page
-  await goTo(page, "/account/companies");
+  await goTo(page, "/companies");
 
   // User should see the company
+  await switchCompany(page, { siret: company.siret });
   const companyDiv = await getCompanyDiv(page, {
     siret: company.siret,
-    name: company.name,
     tab: "Membres"
   });
 
@@ -232,12 +232,12 @@ export const revokeAccess = async (
   }
 ) => {
   // Go to companies page
-  await goTo(page, "/account/companies");
+  await goTo(page, "/companies");
 
   // User should see the company
+  await switchCompany(page, { siret: company.siret });
   const companyDiv = await getCompanyDiv(page, {
     siret: company.siret,
-    name: company.name,
     tab: "Membres"
   });
 

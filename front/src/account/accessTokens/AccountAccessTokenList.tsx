@@ -21,7 +21,7 @@ export default function AccountAccessTokenList() {
   return (
     <AccountContentWrapper
       title="Mes jetons d'accès personnels"
-      button={
+      additional={
         <div className="tw-flex">
           <button
             className="btn btn--primary"

@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
 import { useNavigate } from "react-router-dom";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
-import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
+import AccountCompanyAddSiret from "./companyAdd/AccountCompanyAddSiret";
 import styles from "./AccountCompanyAdd.module.scss";
 import {
   Mutation,

@@ -174,7 +174,6 @@ test.describe.serial("Cahier de recette de gestion des membres", async () => {
     await test.step("L'utilisateur n'a plus accès à l'entreprise", async () => {
       // Refresh the page
       await userPage.reload();
-
       // Because user has no company, he should be redirected
       await checkCurrentURL(userPage, "/companies");
     });

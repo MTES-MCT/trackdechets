@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
-import { useNavigate } from "react-router-dom";
+import { generatePath, useNavigate } from "react-router-dom";
 import routes from "../Apps/routes";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 import RedErrorMessage from "../common/components/RedErrorMessage";
 import CompanyType from "../login/CompanyType";
-import AccountCompanyAddTransporterReceipt from "./accountCompanyAdd/AccountCompanyAddTransporterReceipt";
-import AccountCompanyAddTraderReceipt from "./accountCompanyAdd/AccountCompanyAddTraderReceipt";
-import AccountCompanyAddBrokerReceipt from "./accountCompanyAdd/AccountCompanyAddBrokerReceipt";
-import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
-import AccountCompanyAddEcoOrganisme from "./accountCompanyAdd/AccountCompanyAddEcoOrganisme";
-import AccountCompanyAddWorker from "./accountCompanyAdd/AccountCompanyAddWorker";
-import AccountCompanyAddVhuAgrement from "./accountCompanyAdd/AccountCompanyAddVhuAgrement";
+import AccountCompanyAddTransporterReceipt from "./companyAdd/AccountCompanyAddTransporterReceipt";
+import AccountCompanyAddTraderReceipt from "./companyAdd/AccountCompanyAddTraderReceipt";
+import AccountCompanyAddBrokerReceipt from "./companyAdd/AccountCompanyAddBrokerReceipt";
+import AccountCompanyAddSiret from "./companyAdd/AccountCompanyAddSiret";
+import AccountCompanyAddEcoOrganisme from "./companyAdd/AccountCompanyAddEcoOrganisme";
+import AccountCompanyAddWorker from "./companyAdd/AccountCompanyAddWorker";
+import AccountCompanyAddVhuAgrement from "./companyAdd/AccountCompanyAddVhuAgrement";
 
 import styles from "./AccountCompanyAdd.module.scss";
 
@@ -23,12 +23,12 @@ import {
   CompanySearchResult
 } from "@td/codegen-ui";
 import classNames from "classnames";
-import { MY_COMPANIES } from "./AccountCompanyList";
+import { MY_COMPANIES } from "./CompaniesList";
 import { isFRVat, isSiret, isVat, isForeignVat } from "@td/constants";
 import {
   CREATE_WORKER_CERTIFICATION,
   UPDATE_COMPANY_WORKER_CERTIFICATION
-} from "./fields/forms/AccountFormCompanyWorkerCertification";
+} from "../account/fields/forms/AccountFormCompanyWorkerCertification";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
@@ -71,8 +71,12 @@ export const CREATE_COMPANY_HOOK_OPTIONS = navigate => ({
     { query: MY_COMPANIES, variables: { first: 10 } }
   ],
   awaitRefetchQueries: true,
-  onCompleted: () => {
-    navigate(routes.companies.index);
+  onCompleted: data => {
+    navigate(
+      generatePath(routes.companies.details, {
+        siret: data.createCompany.siret
+      })
+    );
   }
 });
 

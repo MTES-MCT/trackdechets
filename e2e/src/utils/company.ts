@@ -47,7 +47,7 @@ interface AmianteCertification {
 }
 
 /**
- * In the "/account/companies/create", returns the correct "Créer votre établissement" button index
+ * In the "/companies/create", returns the correct "Créer votre établissement" button index
  * matching company role.
  */
 export const getCreateButtonIndex = (roles: CompanyRole[]) => {
@@ -86,40 +86,47 @@ export const getCreateButtonIndex = (roles: CompanyRole[]) => {
 };
 
 /**
+ * Will select the correct company and redirect to its details page
+ */
+export const switchCompany = async (page, { siret }: { siret: string }) => {
+  // Use the search input to narrow down the results to the company only
+  // (and avoid dealing with pagination)
+  await page.getByPlaceholder("Rechercher un établissement").fill(siret);
+
+  // Wait for loading to end
+  await expect(page.getByTestId("loader")).not.toBeVisible();
+
+  // Select the company div
+  const companyDiv = page
+    .getByTestId("companies-list")
+    .locator(`text=${siret}`)
+    .locator("../..");
+  await expect(companyDiv).toBeVisible();
+
+  // Go to company details
+  await companyDiv.click();
+};
+
+/**
  * Will find the div corresponding to the targeted company, to be able to make assertions on
  * this specific company. Also enables to select chosen company sub-tab.
  */
 type CompanyTab =
-  | "Information"
+  | "Informations"
   | "Contact"
   | "Signature"
   | "Avancé"
   | "Membres";
 export const getCompanyDiv = async (
   page,
-  {
-    siret,
-    name = "Établissement de test",
-    tab = "Information"
-  }: { siret: string; name?: string; tab?: CompanyTab }
+  { siret, tab = "Informations" }: { siret: string; tab?: CompanyTab }
 ) => {
-  // Use the search input to narrow down the results to the company only
-  // (and avoid dealing with pagination)
-  await page
-    .getByLabel("Filtrer mes établissements par nom, SIRET ou n° de TVA")
-    .fill(siret);
-
-  // Wait for loading to end
-  await expect(page.getByTestId("loader")).not.toBeVisible();
-
-  // Select the company div
-  const companyDiv = page.locator(`text=${name} (${siret})`).locator("../..");
-  await expect(companyDiv).toBeVisible();
+  await page.getByTestId("page-subtitle", { name: siret });
 
   // Select tab
-  await companyDiv.getByRole("button", { name: tab }).click();
+  await page.getByRole("tab", { name: tab }).click();
 
-  return companyDiv;
+  return page.getByTestId("company-details");
 };
 
 /**
@@ -131,7 +138,7 @@ export const generateSiretAndInitiateCompanyCreation = async (
   { roles }: { roles: CompanyRole[] }
 ) => {
   // Go to companies creation page
-  await goTo(page, "/account/companies/create");
+  await goTo(page, "/companies/create");
 
   // WARNING: page is different if one company has already been created
   // One more click is needed
@@ -308,7 +315,7 @@ export const submitAndVerifyGenericInfo = async (
   await page.getByRole("button", { name: "Créer" }).click();
 
   // Check data
-  const companyDiv = await getCompanyDiv(page, { siret });
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Informations" });
 
   // Company info
   await expect(companyDiv.getByText(`Numéro SIRET${siret}`)).toBeVisible();
@@ -323,7 +330,7 @@ export const submitAndVerifyGenericInfo = async (
 
   // Contact info
   if (contact) {
-    await companyDiv.getByRole("button", { name: "Contact" }).click();
+    await companyDiv.getByRole("tab", { name: "Contact" }).click();
     await expect(
       companyDiv.getByText(`Prénom et nom du contact${contact.name}`)
     ).toBeVisible();
@@ -346,7 +353,7 @@ export const verifyReceipt = async (
   { siret, receipt }: { siret: string; receipt: Receipt }
 ) => {
   // Select correct company & correct tab
-  const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Informations" });
 
   // Check data
   const receiptDiv = companyDiv.locator(`#${receipt.type}Receipt`);
@@ -373,7 +380,7 @@ export const verifyAmianteCertification = async (
   }: { siret: string; certification: AmianteCertification }
 ) => {
   // Select correct company & correct tab
-  const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Informations" });
 
   const amianteDiv = companyDiv
     .getByText("Catégorie entreprise de travaux amiante")
@@ -406,7 +413,7 @@ export const verifyVHUAgrement = async (
   { siret, agrement }: { siret: string; agrement: VHUAgrement }
 ) => {
   // Select correct company & correct tab
-  const companyDiv = await getCompanyDiv(page, { siret, tab: "Information" });
+  const companyDiv = await getCompanyDiv(page, { siret, tab: "Informations" });
 
   // Check data
   await expect(
@@ -519,29 +526,25 @@ export const addAutomaticSignaturePartner = async (
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Signature" });
 
   // Let's add a partner
-  await companyDiv
-    .locator("div")
-    .filter({ hasText: "Signature automatique (annexe 1)" })
-    .locator("div")
-    .nth(1)
-    .click();
-  await companyDiv.getByPlaceholder("SIRET").fill(partnerSiret);
-  await companyDiv.getByRole("button", { name: "Rechercher" }).click();
+  const signatureDiv = await companyDiv
+    .getByText("Signature automatique (annexe 1)")
+    .locator("..");
+  await signatureDiv.getByText("Modifier").click();
+  await signatureDiv.getByPlaceholder("SIRET").fill(partnerSiret);
+  await signatureDiv.getByRole("button", { name: "Rechercher" }).click();
   // Partner company should pop in the results
   await expect(
-    companyDiv.getByText(`Établissement de test - ${partnerSiret}Ajouter`)
+    signatureDiv.getByText(`Établissement de test - ${partnerSiret}Ajouter`)
   ).toBeVisible();
-  await companyDiv.getByRole("button", { name: "Ajouter" }).click();
+  await signatureDiv.getByRole("button", { name: "Ajouter" }).click();
 
   // Click on other tab, then come back
-  await companyDiv.getByRole("button", { name: "Membres" }).click();
-  await companyDiv.getByRole("button", { name: "Signature" }).click();
+  await companyDiv.getByRole("tab", { name: "Membres" }).click();
+  await companyDiv.getByRole("tab", { name: "Signature" }).click();
 
   // We should see the partner company
   await expect(
-    companyDiv.getByText(
-      `Signature automatique (annexe 1)Établissement de test (${partnerSiret})Modifier`
-    )
+    signatureDiv.getByText(`Établissement de test (${partnerSiret})`)
   ).toBeVisible();
 };
 

@@ -1,13 +1,13 @@
 import React from "react";
 import { gql, useMutation } from "@apollo/client";
-import { GET_ME } from "./Account";
+import { GET_ME } from "../account/Account";
 import {
   CompanyPrivate,
   Mutation,
   MutationDeleteCompanyArgs
 } from "@td/codegen-ui";
-import AccountField from "./fields/AccountField";
-import { MY_COMPANIES } from "./AccountCompanyList";
+import AccountField from "../account/fields/AccountField";
+import { MY_COMPANIES } from "./CompaniesList";
 import routes from "../Apps/routes";
 import { useNavigate } from "react-router-dom";
 
