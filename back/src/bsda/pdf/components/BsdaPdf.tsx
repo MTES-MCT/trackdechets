@@ -365,8 +365,8 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
           </div>
           {bsda.transporters
             .filter((_, idx) => idx > 0)
-            .map(t => (
-              <Transporter transporter={t} />
+            .map((t, idx) => (
+              <Transporter transporter={t} key={idx} />
             ))}
         </div>
       )}
