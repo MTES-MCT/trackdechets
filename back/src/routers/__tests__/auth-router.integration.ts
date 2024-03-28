@@ -34,7 +34,7 @@ describe("Auth Router", () => {
       expect(response.status).toBe(404);
     });
 
-    it("should return 500 if user is admin and impersonated user is not found", async () => {
+    it("should return 400 if user is admin and impersonated user is not found", async () => {
       const user = await userFactory({ isAdmin: true });
       const { sessionCookie } = await logIn(app, user.email, "pass");
 
