@@ -130,7 +130,7 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
         if (transporter.takenOverAt) {
           // `handedOver` permet de savoir si le transporteur
           // N+1 a également pris en charge le déchet, si c'est le
-          // cas le bordereau ne doit pas apparaitre dans l'onglet "À collecter"
+          // cas le bordereau ne doit pas apparaitre dans l'onglet "Collecté"
           // du transporteur N
           const handedOver = transporters.find(
             t => t.number > transporter.number && t.takenOverAt

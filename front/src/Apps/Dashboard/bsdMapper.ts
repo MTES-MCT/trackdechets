@@ -105,6 +105,7 @@ const mapBsda = (bsda: Bsda): BsdDisplay => {
     emitter: bsda.emitter || bsda["bsdaEmitter"],
     destination: bsda.destination || bsda["bsdaDestination"],
     transporter: bsda.transporter || bsda["bsdaTransporter"],
+    transporters: bsda.transporters,
     ecoOrganisme: bsda.ecoOrganisme,
     updatedAt: bsda.updatedAt || bsda["bsdaUpdatedAt"],
     emittedByEcoOrganisme: bsda.ecoOrganisme,

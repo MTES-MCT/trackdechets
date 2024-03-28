@@ -4,7 +4,10 @@ import {
   resetDatabase
 } from "../../../../../integration-tests/helper";
 import { getBsdaForElastic, indexBsda } from "../../../../bsda/elastic";
-import { bsdaFactory } from "../../../../bsda/__tests__/factories";
+import {
+  bsdaFactory,
+  bsdaTransporterFactory
+} from "../../../../bsda/__tests__/factories";
 import { ErrorCode } from "../../../../common/errors";
 import {
   Mutation,
@@ -23,7 +26,8 @@ import {
 import { prisma } from "@td/prisma";
 import {
   userWithCompanyFactory,
-  transporterReceiptFactory
+  transporterReceiptFactory,
+  UserWithCompany
 } from "../../../../__tests__/factories";
 import { buildPdfAsBase64 } from "../../../../bsda/pdf/generator";
 import makeClient from "../../../../__tests__/testClient";
@@ -32,32 +36,47 @@ import { gql } from "graphql-tag";
 jest.mock("../../../../bsda/pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
 
-const CREATE_DRAFT_BSDA = `
-mutation CreateDraftBsda($input: BsdaInput!) {
-  createDraftBsda(input: $input)  {
-    id
+const CREATE_DRAFT_BSDA = gql`
+  mutation CreateDraftBsda($input: BsdaInput!) {
+    createDraftBsda(input: $input) {
+      id
+    }
   }
-}
 `;
 
-const PUBLISH_BSDA = `
-mutation PublishBsda($id: ID!){
-  publishBsda(id: $id)  {
-    id
-    status
-    isDraft
+const CREATE_BSDA = gql`
+  mutation CreateBsda($input: BsdaInput!) {
+    createBsda(input: $input) {
+      id
+    }
   }
-}
 `;
-export const SIGN_BSDA = `
-mutation SignBsda($id: ID!, $input: BsdaSignatureInput
-!) {
-  signBsda(id: $id, input: $input	) {
-    id
+
+const UPDATE_BSDA = gql`
+  mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
+    updateBsda(id: $id, input: $input) {
+      id
+    }
   }
-}
 `;
-const GET_BSDS = `
+
+const PUBLISH_BSDA = gql`
+  mutation PublishBsda($id: ID!) {
+    publishBsda(id: $id) {
+      id
+      status
+      isDraft
+    }
+  }
+`;
+export const SIGN_BSDA = gql`
+  mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
+    signBsda(id: $id, input: $input) {
+      id
+    }
+  }
+`;
+const GET_BSDS = gql`
   query GetBsds($where: BsdWhere) {
     bsds(where: $where) {
       edges {
@@ -1127,6 +1146,326 @@ describe("Query.bsds.bsda base workflow", () => {
   });
 });
 
+describe("Query.bsds.bsdas multi-modal workflow", () => {
+  let emitter: UserWithCompany;
+  let worker: UserWithCompany;
+  let transporter1: UserWithCompany;
+  let transporter2: UserWithCompany;
+  let transporter3: UserWithCompany;
+  let destination: UserWithCompany;
+  let bsdaId: string;
+
+  beforeAll(async () => {
+    emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    worker = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["PRODUCER", "WORKER"]
+      }
+    });
+    transporter1 = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      }
+    });
+    await transporterReceiptFactory({ company: transporter1.company });
+    transporter2 = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      }
+    });
+    await transporterReceiptFactory({ company: transporter2.company });
+    transporter3 = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      }
+    });
+    await transporterReceiptFactory({ company: transporter3.company });
+    destination = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["WASTEPROCESSOR"]
+      }
+    });
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_WORKER",
+        emitterCompanySiret: emitter.company.siret,
+        workerCompanySiret: worker.company.siret,
+        destinationCompanySiret: destination.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        workerWorkSignatureDate: new Date()
+      },
+      transporterOpt: { transporterCompanySiret: transporter1.company.siret }
+    });
+    bsdaId = bsda.id;
+    await bsdaTransporterFactory({
+      bsdaId,
+      opts: { transporterCompanySiret: transporter2.company.siret }
+    });
+    await bsdaTransporterFactory({
+      bsdaId,
+      opts: { transporterCompanySiret: transporter3.company.siret }
+    });
+    await indexBsda(await getBsdaForElastic(bsda));
+    await refreshElasticSearch();
+  });
+
+  afterAll(resetDatabase);
+
+  async function isToCollectFor({ user, company }: UserWithCompany) {
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
+      variables: {
+        where: {
+          isToCollectFor: [company.siret!]
+        }
+      }
+    });
+    return data.bsds.edges.map(e => e.node);
+  }
+
+  async function isCollectedFor({ user, company }: UserWithCompany) {
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
+      variables: {
+        where: {
+          isCollectedFor: [company.siret!]
+        }
+      }
+    });
+    return data.bsds.edges.map(e => e.node);
+  }
+
+  async function isFollowFor({ user, company }: UserWithCompany) {
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
+      variables: {
+        where: {
+          isFollowFor: [company.siret!]
+        }
+      }
+    });
+    return data.bsds.edges.map(e => e.node);
+  }
+
+  async function isForActionFor({ user, company }: UserWithCompany) {
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
+      variables: {
+        where: {
+          isForActionFor: [company.siret!]
+        }
+      }
+    });
+    return data.bsds.edges.map(e => e.node);
+  }
+
+  async function isArchivedFor({ user, company }: UserWithCompany) {
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
+      variables: {
+        where: {
+          isArchivedFor: [company.siret!]
+        }
+      }
+    });
+    return data.bsds.edges.map(e => e.node);
+  }
+
+  function signTransport({ user }: UserWithCompany) {
+    const { mutate } = makeClient(user);
+    return mutate<Pick<Mutation, "signBsda">, MutationSignBsdaArgs>(SIGN_BSDA, {
+      variables: {
+        id: bsdaId,
+        input: {
+          type: "TRANSPORT",
+          author: "Transporteur",
+          date: new Date().toISOString() as any
+        }
+      }
+    });
+  }
+
+  function signOperation({ user }: UserWithCompany) {
+    const { mutate } = makeClient(user);
+    return mutate<Pick<Mutation, "signBsda">, MutationSignBsdaArgs>(SIGN_BSDA, {
+      variables: {
+        id: bsdaId,
+        input: {
+          type: "OPERATION",
+          author: "Destination",
+          date: new Date().toISOString() as any
+        }
+      }
+    });
+  }
+
+  describe("when the BSDA is signed by worker", () => {
+    // Expected tabs before first transporter signature
+    // - Transporter 1 => "À collecter"
+    // - Transporter 2 => "Suivi"
+    // - Transporter 3 => "Suivi"
+    // - Destination => "Suivi"
+    it("should be in first transporter toCollect tab", async () => {
+      expect(await isToCollectFor(transporter1)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in second transporter follow tab", async () => {
+      expect(await isFollowFor(transporter2)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in third transporter follow tab", async () => {
+      expect(await isFollowFor(transporter3)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the destination follow tab", async () => {
+      expect(await isFollowFor(transporter3)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+  });
+
+  describe("when the BSDA is signed by first transporter", () => {
+    beforeAll(async () => {
+      await signTransport(transporter1);
+      await refreshElasticSearch();
+    });
+    // Expected tabs after first transporter signature
+    // - Transporter 1 => "Collecté"
+    // - Transporter 2 => "À collecter"
+    // - Transporter 3 => "Suivi"
+    // - Destination => "Pour Action"
+
+    it("should be in first transporter collected tab", async () => {
+      expect(await isCollectedFor(transporter1)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the second transporter toCollect tab", async () => {
+      expect(await isToCollectFor(transporter2)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the third transporter follow tab", async () => {
+      expect(await isFollowFor(transporter3)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the destination forAction tab", async () => {
+      // permet une réception anticipée
+      expect(await isForActionFor(destination)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+  });
+
+  describe("when the BSDA is signed by the second transporter", () => {
+    beforeAll(async () => {
+      await signTransport(transporter2);
+      await refreshElasticSearch();
+    });
+    // Expected tabs after second transporter signature
+    // - Transporter 1 => "Suivi"
+    // - Transporter 2 => "Collecté"
+    // - Transporter 3 => "À Collecter"
+    // - Destination => "Pour Action"
+
+    it("should be in first transporter follow tab", async () => {
+      expect(await isFollowFor(transporter1)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the second transporter collected tab", async () => {
+      expect(await isCollectedFor(transporter2)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the third transporter toCollect tab", async () => {
+      expect(await isToCollectFor(transporter3)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the destination forAction tab", async () => {
+      // permet une réception anticipée
+      expect(await isForActionFor(destination)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+  });
+
+  describe("when the BSDA is signed by the third transporter", () => {
+    beforeAll(async () => {
+      await signTransport(transporter3);
+      await refreshElasticSearch();
+    });
+    // Expected tabs after third transporter signature
+    // - Transporter 1 => "Suivi"
+    // - Transporter 2 => "Suivi"
+    // - Transporter 3 => "Collecté"
+    // - Destination => "Pour Action"
+
+    it("should be in first transporter follow tab", async () => {
+      expect(await isFollowFor(transporter1)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the second transporter follow tab", async () => {
+      expect(await isFollowFor(transporter2)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the third transporter collected tab", async () => {
+      expect(await isCollectedFor(transporter3)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the destination forAction tab", async () => {
+      expect(await isForActionFor(destination)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+  });
+
+  describe("when the BSDA is signed by the destination", () => {
+    beforeAll(async () => {
+      await signOperation(destination);
+      await refreshElasticSearch();
+    });
+    // Expected tabs after destination signature
+    // - Transporter 1 => "Archives"
+    // - Transporter 2 => "Archives"
+    // - Transporter 3 => "Archives"
+    // - Destination => "Archives"
+
+    it("should be in first transporter archived tab", async () => {
+      expect(await isArchivedFor(transporter1)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the second transporter archived tab", async () => {
+      expect(await isArchivedFor(transporter2)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the third transporter archived tab", async () => {
+      expect(await isArchivedFor(transporter3)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+    it("should be in the destination archived tab", async () => {
+      expect(await isArchivedFor(destination)).toEqual([
+        expect.objectContaining({ id: bsdaId })
+      ]);
+    });
+  });
+});
+
 describe("Query.bsds.bsdas mutations", () => {
   afterAll(resetDatabase);
 
@@ -1264,22 +1603,6 @@ describe("Bsda sub-resolvers in query bsds", () => {
             }
           }
         }
-      }
-    }
-  `;
-
-  const CREATE_BSDA = gql`
-    mutation CreateBsda($input: BsdaInput!) {
-      createBsda(input: $input) {
-        id
-      }
-    }
-  `;
-
-  const UPDATE_BSDA = gql`
-    mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
-      updateBsda(id: $id, input: $input) {
-        id
       }
     }
   `;

@@ -23,6 +23,7 @@ import { PACKAGINGS_NAMES } from "../../../form/bsda/components/packagings/Packa
 import {
   Bsda,
   BsdaNextDestination,
+  BsdaTransporter,
   BsdaType,
   FormCompany,
   OperationMode,
@@ -167,12 +168,18 @@ const Worker = ({ form }: { form: Bsda }) => {
   );
 };
 
-const Transporter = ({ form }: { form: Bsda }) => {
-  const { transporter } = form;
+const Transporter: React.FC<{
+  transporter: BsdaTransporter;
+  isMultiModal: boolean;
+  numero: number;
+}> = ({ transporter, isMultiModal, numero }) => {
   return (
     <>
       <div className={styles.detailGrid}>
-        <Company label="Transporteur" company={transporter?.company} />
+        <Company
+          label={isMultiModal ? `Transporteur n°${numero}` : "Transporteur"}
+          company={transporter?.company}
+        />
       </div>
       <TransporterReceiptDetails transporter={transporter} />
       <div className={`${styles.detailGrid} `}>
@@ -441,6 +448,7 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   });
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
   const initialBsdas = form.forwarding ? [form.forwarding] : form.grouping;
+  const isMultiModal = form?.transporters.length > 1;
 
   return (
     <div className={styles.detail}>
@@ -559,14 +567,14 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             </Tab>
           )}
 
-          {!!form?.transporter?.company?.name && (
-            <Tab className={styles.detailTab}>
+          {form.transporters?.map((_, idx) => (
+            <Tab className={styles.detailTab} key={idx}>
               <IconWarehouseDelivery size="25px" />
               <span className={styles.detailTabCaption}>
-                <span>Transporteur</span>
+                {isMultiModal ? `Transp. n° ${idx + 1}` : "Transporteur"}
               </span>
             </Tab>
-          )}
+          ))}
 
           <Tab className={styles.detailTab}>
             <IconRenewableEnergyEarth size="25px" />
@@ -628,12 +636,17 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             </TabPanel>
           )}
 
-          {/* Transporter tab panel */}
-          {!!form?.transporter?.company?.name && (
+          {/* Transporters tab panels */}
+
+          {form.transporters?.map((transporter, idx) => (
             <TabPanel className={styles.detailTabPanel}>
-              <Transporter form={form} />
+              <Transporter
+                transporter={transporter}
+                numero={idx + 1}
+                isMultiModal={isMultiModal}
+              />
             </TabPanel>
-          )}
+          ))}
 
           {/* Recipient  tab panel */}
           <TabPanel className={styles.detailTabPanel}>

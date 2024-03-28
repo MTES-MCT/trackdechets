@@ -54,19 +54,38 @@ describe("Bsd Badge status", () => {
     expect(screen.getByText(/Signé par le transporteur/i));
   });
 
-  test("SENT multi-modal", () => {
-    const transporter1 = { id: "t1", takenOverAt: new Date().toISOString() };
-    const transporter2 = { id: "t2", takenOverAt: new Date().toISOString() };
-    const transporter3 = { id: "t3", takenOverAt: null };
+  test.each([BsdType.Bsdd, BsdType.Bsda])(
+    "SENT multi-modal when bsdType is %p",
+    bsdType => {
+      const transporter1 = {
+        id: "t1",
+        ...(bsdType === BsdType.Bsdd
+          ? { takenOverAt: new Date().toISOString() }
+          : { transport: { signature: { date: new Date().toISOString() } } })
+      };
+      const transporter2 = {
+        id: "t2",
+        ...(bsdType === BsdType.Bsdd
+          ? { takenOverAt: new Date().toISOString() }
+          : { transport: { signature: { date: new Date().toISOString() } } })
+      };
+      const transporter3 = {
+        id: "t3",
+        ...(bsdType === BsdType.Bsdd
+          ? { takenOverAt: null }
+          : { transport: { signature: { date: null } } })
+      };
 
-    render(
-      <Badge
-        status={BsdStatusCode.Sent}
-        transporters={[transporter1, transporter2, transporter3]}
-      />
-    );
-    expect(screen.getByText(/Signé par le transporteur n°2/i));
-  });
+      render(
+        <Badge
+          status={BsdStatusCode.Sent}
+          transporters={[transporter1, transporter2, transporter3]}
+          bsdType={bsdType}
+        />
+      );
+      expect(screen.getByText(/Signé par le transporteur n°2/i));
+    }
+  );
 
   test("RECEIVED", () => {
     render(<Badge status={BsdStatusCode.Received} />);

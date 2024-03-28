@@ -43,11 +43,11 @@ async function transporterFormFactory(ownerId: string, siret: string) {
   const form = await formFactory({
     ownerId,
     opt: {
-      sentAt: new Date(),
       transporters: {
         create: {
           transporterCompanySiret: siret,
-          number: 1
+          number: 1,
+          takenOverAt: new Date()
         }
       }
     }

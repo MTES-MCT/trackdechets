@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - ETQ utilisateur je peux faire du multi-modal sur le BSDA par API [PR 3108](https://github.com/MTES-MCT/trackdechets/pull/3108)
+- ETQ utilisateur je peux faire du multi-modal sur le BSDA via l'interface Trackdéchets [PR 3205](https://github.com/MTES-MCT/trackdechets/pull/3205)
 
 #### :nail_care: Améliorations
 

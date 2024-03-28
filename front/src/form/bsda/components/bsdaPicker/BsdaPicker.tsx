@@ -22,7 +22,7 @@ import {
 } from "@td/codegen-ui";
 import React from "react";
 import { useParams } from "react-router-dom";
-import initialState from "../../stepper/initial-state";
+import { getInitialState } from "../../stepper/initial-state";
 
 type Props = { name: string; bsdaId: string };
 
@@ -55,6 +55,8 @@ export function BsdaPicker({ name, bsdaId }: Props) {
 
   const isForwardingPicker = name === "forwarding";
 
+  const initialState = getInitialState();
+
   function onGroupingChange(groupedBsdas: Bsda[]) {
     setFieldValue("waste.code", groupedBsdas?.[0]?.waste?.code ?? "");
     setFieldValue(
@@ -69,7 +71,7 @@ export function BsdaPicker({ name, bsdaId }: Props) {
       groupedBsdas?.reduce(
         (prev, cur) => prev.concat(cur.waste?.sealNumbers ?? []),
         [] as string[]
-      ) ?? initialState.waste.sealNumbers
+      ) ?? initialState!.waste!.sealNumbers
     );
     setFieldValue(
       "packagings",
@@ -88,9 +90,9 @@ export function BsdaPicker({ name, bsdaId }: Props) {
       }, [] as BsdaPackaging[]) ?? initialState.packagings
     );
 
-    const { country, ...emitterCompany } =
+    const emitterCompany =
       groupedBsdas?.[0]?.destination?.company ??
-      initialState.destination.company;
+      initialState!.destination!.company;
     setFieldValue("emitter.company", emitterCompany);
 
     const { country: _, ...nextDestinationCompany } =
@@ -103,22 +105,22 @@ export function BsdaPicker({ name, bsdaId }: Props) {
     setFieldValue("weight.value", bsda?.destination?.reception?.weight ?? 0);
     setFieldValue(
       "waste.sealNumbers",
-      bsda?.waste?.sealNumbers ?? initialState.waste.sealNumbers
+      bsda?.waste?.sealNumbers ?? initialState!.waste!.sealNumbers
     );
     setFieldValue(
       "waste.materialName",
-      bsda?.waste?.materialName ?? initialState.waste.materialName
+      bsda?.waste?.materialName ?? initialState!.waste!.materialName
     );
-    setFieldValue("waste.code", bsda?.waste?.code ?? initialState.waste.code);
-    setFieldValue("waste.adr", bsda?.waste?.adr ?? initialState.waste.adr);
+    setFieldValue("waste.code", bsda?.waste?.code ?? initialState!.waste!.code);
+    setFieldValue("waste.adr", bsda?.waste?.adr ?? initialState!.waste!.adr);
     setFieldValue(
       "waste.familyCode",
-      bsda?.waste?.familyCode ?? initialState.waste.familyCode
+      bsda?.waste?.familyCode ?? initialState!.waste!.familyCode
     );
     setFieldValue("packagings", bsda?.packagings ?? initialState.packagings);
 
-    const { country, ...emitterCcompany } =
-      bsda?.destination?.company ?? initialState.destination.company;
+    const emitterCcompany =
+      bsda?.destination?.company ?? initialState!.destination!.company;
     setFieldValue("emitter.company", emitterCcompany);
 
     const { country: _, ...nextDestinationCompany } =

@@ -9,9 +9,11 @@ import {
   CompanyType
 } from "@td/codegen-ui";
 import React, { useCallback, useState } from "react";
-import initialState from "../initial-state";
+import { getInitialState } from "../initial-state";
 
 export function Worker({ disabled }) {
+  const initialState = getInitialState();
+
   const { setFieldValue, values, handleChange } = useFormikContext<Bsda>();
 
   const isGroupement = values?.type === BsdaType.Gathering;
@@ -89,10 +91,10 @@ export function Worker({ disabled }) {
             className="td-checkbox"
             onChange={e => {
               handleChange(e);
-              setFieldValue("worker.company", initialState.worker.company);
+              setFieldValue("worker.company", initialState!.worker!.company);
               setFieldValue(
                 "worker.certification",
-                initialState.worker.certification
+                initialState!.worker!.certification
               );
             }}
           />
