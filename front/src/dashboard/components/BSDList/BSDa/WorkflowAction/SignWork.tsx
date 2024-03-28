@@ -10,8 +10,7 @@ import {
   BsdaSignatureType,
   Mutation,
   MutationSignBsdaArgs,
-  MutationUpdateBsdaArgs,
-  SignatureTypeInput
+  MutationUpdateBsdaArgs
 } from "@td/codegen-ui";
 import React from "react";
 import { generatePath, Link } from "react-router-dom";
