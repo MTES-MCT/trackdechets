@@ -1,0 +1,26 @@
+receivers:
+  postgresql/prod:
+    endpoint: ${env:OTEL_DB_ENDPOINT}
+    username: ${env:OTEL_DB_USER}
+    password: ${env:OTEL_DB_PWD}
+
+exporters:
+  datadog:
+    api:
+      site: datadoghq.eu
+      key: ${env:DD_API_KEY}
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, memory_limiter]
+      exporters: [datadog]
+    metrics:
+      receivers: [otlp, postgresql/prod]
+      processors: [batch, memory_limiter]
+      exporters: [datadog]
+    logs:
+      receivers: [otlp]
+      processors: [batch, memory_limiter]
+      exporters: [datadog]

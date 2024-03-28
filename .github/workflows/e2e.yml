@@ -213,11 +213,8 @@ env:
   STARTUP_FILE: unset
   TRUST_PROXY_HOPS: 1
   CONTAINER: unset
-  DD_ENV: unset
-  DD_API_KEY: unset
-  DD_APP_NAME: unset
   QUEUE_NAME_COMPANY: unset
-  DD_TRACE_ENABLED: false
+  OTEL_SDK_DISABLED: true
   MAX_REQUESTS_PER_WINDOW: unset
   NODE_ENV: test
   VIRTUAL_HOST: $API_HOST

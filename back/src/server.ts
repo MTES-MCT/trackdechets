@@ -327,7 +327,7 @@ app.use(function checkBlacklist(req, res, next) {
 });
 
 // Returns 404 Not Found for every routes not handled by apollo
-app.use((req, res, next) => {
+app.use(function checkGqlPath(req, res, next) {
   if (req.path !== graphQLPath) {
     return res.status(404).send("Not found");
   }

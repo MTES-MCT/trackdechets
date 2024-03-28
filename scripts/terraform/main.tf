@@ -2,7 +2,7 @@ terraform {
   required_providers {
     scalingo = {
       source = "Scalingo/scalingo"
-      version = "1.0.1"
+      version = "2.2.0"
     }
   }
 }
@@ -36,7 +36,7 @@ resource "scalingo_app" "front" {
   name = "trackdechets-${var.scalingo_app_name}-front"
 
   environment = {
-    PROCFILE="apps/Procfile.front"
+    PROCFILE="apps/Procfile.ui"
     NO_INDEX="true"
     BUILD_ENV="recette"
     VITE_ALLOW_TEST_COMPANY="true"
@@ -61,11 +61,10 @@ resource "scalingo_app" "api" {
     API_PORT="$PORT"
     API_HOST="api.${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
     UI_HOST="${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
-    NODE_ENV="demo"
+    NODE_ENV="production"
     REDIS_URL="$SCALINGO_REDIS_URL"
     ELASTIC_SEARCH_URL="$SCALINGO_ELASTICSEARCH_URL"
     DATABASE_URL="$SCALINGO_POSTGRESQL_URL"
-    NPM_CONFIG_PRODUCTION="false"
     TZ="Europe/Paris"
     API_URL_SCHEME="https"
     UI_URL_SCHEME="https"
@@ -77,6 +76,7 @@ resource "scalingo_app" "api" {
     SESSION_COOKIE_HOST="trackdechets.beta.gouv.fr"
     SESSION_COOKIE_SECURE="true"
     SESSION_NAME="${var.scalingo_app_name}.trackdechets.connect.sid"
+    TD_COMPANY_ELASTICSEARCH_IGNORE_SSL="false"
   }, var.api_environment_secrets)
 
   force_https = true
