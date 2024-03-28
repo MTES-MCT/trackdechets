@@ -1,5 +1,6 @@
 import React from "react";
 import { gql, useQuery } from "@apollo/client";
+import Button from "@codegouvfr/react-dsfr/Button";
 import { Query } from "@td/codegen-ui";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
@@ -12,7 +13,8 @@ interface AuthProps {
   isAdmin: boolean;
   defaultOrgId?: string;
 }
-const { VITE_WARNING_MESSAGE, VITE_DOWNTIME_MESSAGE } = import.meta.env;
+const { VITE_WARNING_MESSAGE, VITE_DOWNTIME_MESSAGE, VITE_API_ENDPOINT } =
+  import.meta.env;
 
 const GET_WARNING_MESSAGE = gql`
   query GetWarningMessage {
@@ -84,7 +86,19 @@ export default function Layout({
             fontWeight: "bold"
           }}
         >
-          {data.warningMessage}
+          {data.warningMessage}{" "}
+          <Button
+            onClick={() => {
+              fetch(`${VITE_API_ENDPOINT}/impersonate`, {
+                credentials: "include",
+                method: "DELETE"
+              }).then(() => {
+                document.location = "/admin/impersonate"; // Force reload
+              });
+            }}
+          >
+            Stopper
+          </Button>
         </div>
       )}
       <Header

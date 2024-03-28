@@ -79,8 +79,6 @@ export const getLoginError = (username: string) => ({
   }
 });
 
-export const ADMIN_IS_PERSONIFYING = "ADMIN_IS_PERSONIFYING";
-
 // apart from logging the user in, we perform captcha verifications:
 // - if user as performed less than FAILED_ATTEMPTS_BEFORE_CAPTCHA in the last FAILED_LOGIN_EXPIRATION seconds, perform as usual
 // - if user as performed more failed attemps, check if captcha is correct
@@ -134,14 +132,6 @@ passport.use(
       if (passwordValid) {
         await clearUserLoginNeedsCaptcha(user.email);
         return done(null, { ...user, auth: AuthType.Session });
-      }
-
-      if (req.user?.isAdmin) {
-        return done(
-          null,
-          { ...user, auth: AuthType.Session },
-          { message: ADMIN_IS_PERSONIFYING }
-        );
       }
 
       // if password is not valid and user is not admin, set a redis count to require captcha after several failed login attemps

@@ -55,7 +55,23 @@ const companySearchPrivateResolvers: CompanySearchPrivateResolvers = {
       .findUnique({
         where: whereSiretOrVatNumber(parent as CompanyBaseIdentifiers)
       })
-      .workerCertification()
+      .workerCertification(),
+  users: async (parent, _, ctx) => {
+    // Only admins can retrieve users through this API. This is used for impersonation
+    if (!ctx.user?.isAdmin || !parent.trackdechetsId) {
+      return [];
+    }
+
+    const associations = await prisma.companyAssociation.findMany({
+      where: { companyId: parent.trackdechetsId },
+      include: { user: true }
+    });
+
+    return associations.map(association => ({
+      ...association.user,
+      role: association.role
+    }));
+  }
 };
 
 export default companySearchPrivateResolvers;
