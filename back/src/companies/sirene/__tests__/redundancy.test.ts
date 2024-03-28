@@ -1,6 +1,10 @@
 import { redundant } from "../redundancy";
 import { ErrorCode } from "../../../common/errors";
-import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
+import {
+  AnonymousCompanyError,
+  ClosedCompanyError,
+  SiretNotFoundError
+} from "../errors";
 
 const fn1 = jest.fn();
 const fn2 = jest.fn();
@@ -34,6 +38,22 @@ describe("redundant", () => {
       await fn("foo");
     } catch (err) {
       expect(err).toBeInstanceOf(AnonymousCompanyError);
+    }
+    // fn2 should not be called
+    expect(fn1).toHaveBeenCalled();
+    expect(fn2).not.toHaveBeenCalled();
+  });
+
+  it("should not call fallback function when the first function throws ClosedCompanyError", async () => {
+    const fn = redundant(fn1, fn2);
+
+    // test fn1 throws ClosedCompanyError
+    fn1.mockRejectedValueOnce(new ClosedCompanyError());
+
+    try {
+      await fn("foo");
+    } catch (err) {
+      expect(err).toBeInstanceOf(ClosedCompanyError);
     }
     // fn2 should not be called
     expect(fn1).toHaveBeenCalled();
