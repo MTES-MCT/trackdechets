@@ -15,6 +15,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Le siret de l'établissement est précisé dans les emails d'invitation [PR 3151](https://github.com/MTES-MCT/trackdechets/pull/3151)
 
+#### :bug: Corrections de bugs
+
+- Correction des registres éco-organisme et intermédiaires [PR 3196](https://github.com/MTES-MCT/trackdechets/pull/3196/)
+
 #### :house: Interne
 
 - Permettre au comptes de service de télécharger les registres csv and xls de tous les sirets P[R 3207](https://github.com/MTES-MCT/trackdechets/pull/3207)
