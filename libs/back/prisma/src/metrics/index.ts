@@ -1,11 +1,14 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import * as ddMetrics from "datadog-metrics";
+import { metrics } from "@opentelemetry/api";
 
 export function collectMetrics(prisma: PrismaClient) {
   if (!process.env.DD_API_KEY) return;
 
   const flushIntervalSeconds = 15;
   const refreshRate = 1000 * flushIntervalSeconds;
+
+  const meter = metrics.getMeter("prisma");
 
   ddMetrics.init({
     host: process.env.API_HOST,
@@ -20,20 +23,20 @@ export function collectMetrics(prisma: PrismaClient) {
 
   let previousHistograms: Prisma.Metric<Prisma.MetricHistogram>[] | null = null;
   setInterval(async () => {
-    const metrics = await prisma.$metrics.json();
+    const prismaMetrics = await prisma.$metrics.json();
 
-    for (const counter of metrics.counters) {
+    for (const counter of prismaMetrics.counters) {
       ddMetrics.gauge(counter.key, counter.value);
     }
-    for (const gauge of metrics.gauges) {
+    for (const gauge of prismaMetrics.gauges) {
       ddMetrics.gauge(gauge.key, gauge.value);
     }
 
     if (previousHistograms === null) {
-      previousHistograms = diffMetrics(metrics.histograms);
+      previousHistograms = diffMetrics(prismaMetrics.histograms);
       return;
     }
-    const diffHistograms = diffMetrics(metrics.histograms);
+    const diffHistograms = diffMetrics(prismaMetrics.histograms);
     for (const [histogramIndex, histogram] of diffHistograms.entries()) {
       for (const [bucketIndex, values] of histogram.value.buckets.entries()) {
         const [bucket, count] = values;
