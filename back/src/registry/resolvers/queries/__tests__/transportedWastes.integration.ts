@@ -94,7 +94,8 @@ describe("Transported wastes registry", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
-            number: 1
+            number: 1,
+            takenOverAt: new Date()
           }
         }
       }

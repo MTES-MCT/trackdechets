@@ -61,7 +61,8 @@ function transporterFormFactory(ownerId: string, siret: string) {
       transporters: {
         create: {
           transporterCompanySiret: siret,
-          number: 1
+          number: 1,
+          takenOverAt: new Date()
         }
       }
     }
