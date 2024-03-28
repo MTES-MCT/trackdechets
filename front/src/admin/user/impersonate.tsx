@@ -45,6 +45,24 @@ export function Impersonate() {
   return (
     <div>
       <div>
+        <h3 className="fr-h3">Impersonation par email</h3>
+        <form action={`${VITE_API_ENDPOINT}/impersonate`} method="post">
+          <div className="fr-grid-row fr-grid-row--bottom">
+            <div className="fr-col-8">
+              <Input
+                label="Email"
+                nativeInputProps={{
+                  required: true,
+                  name: "email"
+                }}
+              />
+            </div>
+            <div className="fr-col-4">
+              <Button priority="primary">Impersonner</Button>
+            </div>
+          </div>
+        </form>
+        <h3 className="fr-h3">Recherche par entreprise</h3>
         <form
           onSubmit={e => {
             e.preventDefault();
@@ -53,24 +71,6 @@ export function Impersonate() {
             search({ variables: { clue: formData.get("clue") } });
           }}
         >
-          <h3 className="fr-h3">Impersonation par email</h3>
-          <form action={`${VITE_API_ENDPOINT}/impersonate`} method="post">
-            <div className="fr-grid-row fr-grid-row--bottom">
-              <div className="fr-col-8">
-                <Input
-                  label="Email"
-                  nativeInputProps={{
-                    required: true,
-                    name: "email"
-                  }}
-                />
-              </div>
-              <div className="fr-col-4">
-                <Button priority="primary">Impersonner</Button>
-              </div>
-            </div>
-          </form>
-          <h3 className="fr-h3">Recherche par entreprise</h3>
           <div className="fr-grid-row fr-grid-row--bottom">
             <div className="fr-col-8">
               <Input
