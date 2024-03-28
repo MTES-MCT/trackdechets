@@ -29,13 +29,13 @@ import {
 } from "@td/constants";
 import {
   foreignVatNumber,
+  intermediarySchema,
   REQUIRED_RECEIPT_DEPARTMENT,
   REQUIRED_RECEIPT_NUMBER,
   REQUIRED_RECEIPT_VALIDITYLIMIT,
   siret,
   siretConditions,
   siretTests,
-  validateIntermediariesInput,
   vatNumber,
   vatNumberTests,
   weight,
@@ -1997,15 +1997,36 @@ export async function validateIntermediaries(
   intermediaries: CompanyInput[] | null | undefined,
   formContent: ReturnType<typeof flattenFormInput>
 ) {
-  if (
-    formContent.emitterType === "APPENDIX1_PRODUCER" &&
-    intermediaries?.length &&
-    intermediaries.length > 0
-  ) {
+  if (!intermediaries || intermediaries.length === 0) {
+    return;
+  }
+
+  if (formContent.emitterType === "APPENDIX1_PRODUCER") {
     throw new UserInputError(
       "Impossible d'ajouter des intermédiaires sur une annexe 1"
     );
   }
 
-  await validateIntermediariesInput(intermediaries);
+  if (intermediaries.length > 3) {
+    throw new UserInputError(
+      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires"
+    );
+  }
+
+  // check we do not add the same SIRET twice
+  const intermediarySirets = intermediaries.map(c => c.siret);
+
+  const hasDuplicate =
+    new Set(intermediarySirets).size !== intermediarySirets.length;
+
+  if (hasDuplicate) {
+    throw new UserInputError(
+      "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois"
+    );
+  }
+
+  for (const companyInput of intermediaries) {
+    // ensure a SIRET number is present
+    await intermediarySchema.validate(companyInput, { abortEarly: false });
+  }
 }
