@@ -1037,7 +1037,7 @@ export function validateBeforeOperation(
 
 export const ficheInterventionSchema: yup.SchemaOf<
   Pick<
-    BsffFicheIntervention,
+    Prisma.BsffFicheInterventionUpdateInput,
     | "numero"
     | "weight"
     | "postalCode"
@@ -1161,7 +1161,6 @@ export const ficheInterventionSchema: yup.SchemaOf<
 
 export function validateFicheIntervention(
   ficheIntervention:
-    | BsffFicheIntervention
     | Prisma.BsffFicheInterventionCreateInput
     | Prisma.BsffFicheInterventionUpdateInput
 ) {

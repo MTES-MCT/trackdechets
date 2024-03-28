@@ -621,13 +621,15 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
 
     expect(updatedBsdd.recipientCap).toEqual("TTR CAP");
     expect(updatedBsdd.forwardedIn!.recipientCap).toEqual("EXUTOIRE CAP");
-    expect(updatedBsdd.quantityReceived).toEqual(40);
+    expect(updatedBsdd.quantityReceived?.toNumber()).toEqual(40);
     expect(updatedBsdd.forwardedIn!.processingOperationDone).toBe("R 3");
     expect(updatedBsdd.forwardedIn!.processingOperationDescription).toBe(
       "Recyclage"
     );
-    expect(updatedBsdd.forwardedIn!.wasteDetailsQuantity).toEqual(40);
-    expect(updatedBsdd.forwardedIn!.quantityReceived).toBe(50);
+    expect(updatedBsdd.forwardedIn!.wasteDetailsQuantity?.toNumber()).toEqual(
+      40
+    );
+    expect(updatedBsdd.forwardedIn!.quantityReceived?.toNumber()).toBe(50);
   });
 
   it("should not edit bsdd when refused", async () => {
@@ -773,7 +775,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
         grouping: {
           create: {
             initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived!
+            quantity: appendix2.quantityReceived!.toNumber()
           }
         }
       }

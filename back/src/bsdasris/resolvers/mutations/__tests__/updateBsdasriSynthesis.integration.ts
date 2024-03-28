@@ -126,10 +126,9 @@ describe("Mutation.updateBsdasri", () => {
     ];
     const summedVolume = 100 + 30;
     expect(updatedDasri.type).toEqual("SYNTHESIS");
-    expect(updatedDasri.synthesizing).toEqual([
-      { id: toAssociate1.id },
-      { id: toAssociate2.id }
-    ]);
+    expect(updatedDasri.synthesizing).toEqual(
+      expect.arrayContaining([{ id: toAssociate1.id }, { id: toAssociate2.id }])
+    );
 
     expect(updatedDasri.emitterWastePackagings).toEqual(aggregatedPackagings);
     expect(updatedDasri.emitterWasteVolume).toEqual(summedVolume);

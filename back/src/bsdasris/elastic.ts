@@ -209,7 +209,9 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     transporterTransportTakenOverAt: bsdasri.transporterTakenOverAt?.getTime(),
     destinationReceptionDate: bsdasri.destinationReceptionDate?.getTime(),
     destinationAcceptationDate: bsdasri.destinationReceptionDate?.getTime(),
-    destinationAcceptationWeight: bsdasri.destinationReceptionWasteWeightValue,
+    destinationAcceptationWeight: bsdasri.destinationReceptionWasteWeightValue
+      ? bsdasri.destinationReceptionWasteWeightValue.toNumber()
+      : null,
     destinationOperationDate: bsdasri.destinationOperationDate?.getTime(),
     ...where,
     isInRevisionFor: [],

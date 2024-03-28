@@ -15,7 +15,8 @@ describe("ActivityEvent.Bsda", () => {
       type: "BsdaCreated",
       data: {
         id: bsdaId,
-        emitterCompanyName: "Test company"
+        emitterCompanyName: "Test company",
+        packagings: []
       }
     };
     const emitterCompanySiret = siretify(5);

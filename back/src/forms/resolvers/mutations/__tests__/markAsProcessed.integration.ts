@@ -819,11 +819,11 @@ describe("mutation.markAsProcessed", () => {
           create: [
             {
               initialFormId: groupedForm1.id,
-              quantity: groupedForm1.quantityReceived!
+              quantity: groupedForm1.quantityReceived!.toNumber()
             },
             {
               initialFormId: groupedForm2.id,
-              quantity: groupedForm2.forwardedIn!.quantityReceived!
+              quantity: groupedForm2.forwardedIn!.quantityReceived!.toNumber()
             }
           ]
         }

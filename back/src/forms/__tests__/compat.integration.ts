@@ -71,7 +71,7 @@ describe("simpleFormToBsdd", () => {
       emitterEmissionSignatureAuthor: form.sentBy,
       emitterEmissionSignatureDate: form.sentAt,
       packagings: form.wasteDetailsPackagingInfos,
-      weightValue: form.wasteDetailsQuantity,
+      weightValue: form.wasteDetailsQuantity?.toNumber(),
       wasteAdr: form.wasteDetailsOnuCode,
       weightIsEstimate: true,
       transporterCompanyName: fullForm.transporters[0].transporterCompanyName,
@@ -313,7 +313,7 @@ describe("simpleFormToBsdd", () => {
       emitterEmissionSignatureAuthor: fullForwardedInForm.sentBy,
       emitterEmissionSignatureDate: fullForwardedInForm.sentAt,
       packagings: fullForwardedInForm.wasteDetailsPackagingInfos,
-      weightValue: fullForwardedInForm.wasteDetailsQuantity,
+      weightValue: fullForwardedInForm.wasteDetailsQuantity?.toNumber(),
       wasteAdr: fullForwardedInForm.wasteDetailsOnuCode,
       weightIsEstimate: true,
       transporterCompanyName:
@@ -389,7 +389,8 @@ describe("simpleFormToBsdd", () => {
       destinationCompanyMail: fullForwardedInForm.recipientCompanyMail,
       destinationCustomInfo: null,
       destinationReceptionDate: fullForwardedInForm.receivedAt,
-      destinationReceptionWeight: fullForwardedInForm.quantityReceived,
+      destinationReceptionWeight:
+        fullForwardedInForm.quantityReceived?.toNumber(),
       destinationReceptionAcceptationStatus:
         fullForwardedInForm.wasteAcceptationStatus,
       destinationReceptionRefusalReason: null,
@@ -460,7 +461,7 @@ describe("simpleFormToBsdd", () => {
         emitterEmissionSignatureAuthor: form.sentBy,
         emitterEmissionSignatureDate: form.sentAt,
         packagings: form.wasteDetailsPackagingInfos,
-        weightValue: form.wasteDetailsQuantity,
+        weightValue: form.wasteDetailsQuantity?.toNumber(),
         wasteAdr: form.wasteDetailsOnuCode,
         weightIsEstimate: true,
         transporterCompanyName: fullForm.transporters[0].transporterCompanyName,

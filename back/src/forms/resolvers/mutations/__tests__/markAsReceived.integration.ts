@@ -164,7 +164,7 @@ describe("Test Form reception", () => {
     expect(frm.status).toBe("ACCEPTED");
     expect(frm.wasteAcceptationStatus).toBe("ACCEPTED");
     expect(frm.receivedBy).toBe("Bill");
-    expect(frm.quantityReceived).toBe(11);
+    expect(frm.quantityReceived?.toNumber()).toBe(11);
 
     // when form is received, we clean up currentTransporterOrgId
     expect(frm.currentTransporterOrgId).toEqual("");
@@ -269,7 +269,7 @@ describe("Test Form reception", () => {
     expect(frm.wasteAcceptationStatus).toBe("REFUSED");
     expect(frm.receivedBy).toBe("Holden");
     expect(frm.wasteRefusalReason).toBe("Lorem ipsum");
-    expect(frm.quantityReceived).toBe(0); // quantityReceived is set to 0
+    expect(frm.quantityReceived?.toNumber()).toBe(0); // quantityReceived is set to 0
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -353,7 +353,7 @@ describe("Test Form reception", () => {
     expect(frm.wasteAcceptationStatus).toBe("PARTIALLY_REFUSED");
     expect(frm.receivedBy).toBe("Carol");
     expect(frm.wasteRefusalReason).toBe("Dolor sit amet");
-    expect(frm.quantityReceived).toBe(12.5);
+    expect(frm.quantityReceived?.toNumber()).toBe(12.5);
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -406,7 +406,7 @@ describe("Test Form reception", () => {
     expect(frm.wasteAcceptationStatus).toBe("ACCEPTED");
     expect(frm.receivedBy).toBe("Hugo");
     expect(frm.wasteRefusalReason).toBe(null);
-    expect(frm.quantityReceived).toBe(22.7);
+    expect(frm.quantityReceived?.toNumber()).toBe(22.7);
   });
 
   it("should not allow users whose siret is not on the form", async () => {
@@ -495,7 +495,7 @@ describe("Test Form reception", () => {
     expect(frm.status).toBe("ACCEPTED");
     expect(frm.wasteAcceptationStatus).toBe("ACCEPTED");
     expect(frm.receivedBy).toBe("Bill");
-    expect(frm.quantityReceived).toBe(11);
+    expect(frm.quantityReceived?.toNumber()).toBe(11);
 
     // when form is received, we clean up currentTransporterOrgId
     expect(frm.currentTransporterOrgId).toEqual("");
@@ -686,8 +686,14 @@ describe("Test Form reception", () => {
         grouping: {
           createMany: {
             data: [
-              { initialFormId: form1.id, quantity: form1.quantityReceived! },
-              { initialFormId: form2.id, quantity: form2.quantityReceived! }
+              {
+                initialFormId: form1.id,
+                quantity: form1.quantityReceived!.toNumber()
+              },
+              {
+                initialFormId: form2.id,
+                quantity: form2.quantityReceived!.toNumber()
+              }
             ]
           }
         }

@@ -1296,7 +1296,7 @@ describe("Mutation.createForm", () => {
     });
 
     expect(updatedAppendix2.quantityGrouped).toEqual(
-      updatedAppendix2.quantityReceived
+      updatedAppendix2.quantityReceived?.toNumber()
     );
   });
 
@@ -1454,7 +1454,7 @@ describe("Mutation.createForm", () => {
           grouping: {
             create: {
               initialFormId: appendix2.id,
-              quantity: appendix2.quantityReceived!
+              quantity: appendix2.quantityReceived!.toNumber()
             }
           }
         }
@@ -1644,7 +1644,10 @@ describe("Mutation.createForm", () => {
           }
         },
         grouping: [
-          { form: { id: appendix2.id }, quantity: appendix2.quantityReceived }
+          {
+            form: { id: appendix2.id },
+            quantity: appendix2.quantityReceived?.toNumber()
+          }
         ]
       };
       const { mutate } = makeClient(user);
@@ -1708,7 +1711,10 @@ describe("Mutation.createForm", () => {
         }
       },
       grouping: [
-        { form: { id: appendix2.id }, quantity: appendix2.quantityReceived }
+        {
+          form: { id: appendix2.id },
+          quantity: appendix2.quantityReceived?.toNumber()
+        }
       ]
     };
     const { mutate } = makeClient(user);
@@ -1769,7 +1775,10 @@ describe("Mutation.createForm", () => {
         }
       },
       grouping: [
-        { form: { id: appendix2.id }, quantity: appendix2.quantityReceived }
+        {
+          form: { id: appendix2.id },
+          quantity: appendix2.quantityReceived?.toNumber()
+        }
       ]
     };
     const { mutate } = makeClient(user);
@@ -1803,7 +1812,10 @@ describe("Mutation.createForm", () => {
         }
       },
       grouping: [
-        { form: { id: appendix2.id }, quantity: appendix2.quantityReceived }
+        {
+          form: { id: appendix2.id },
+          quantity: appendix2.quantityReceived?.toNumber()
+        }
       ],
       appendix2Forms: [{ id: appendix2.id }]
     };

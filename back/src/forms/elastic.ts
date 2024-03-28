@@ -129,7 +129,9 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
       form.takenOverAt?.getTime() ?? form.sentAt?.getTime(),
     destinationReceptionDate: form.receivedAt?.getTime(),
     destinationAcceptationDate: form.signedAt?.getTime(),
-    destinationAcceptationWeight: form.quantityReceived,
+    destinationAcceptationWeight: form.quantityReceived
+      ? form.quantityReceived.toNumber()
+      : null,
     destinationOperationDate: form.processedAt?.getTime(),
     ...(form.forwarding
       ? {

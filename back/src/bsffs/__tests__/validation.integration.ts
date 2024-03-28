@@ -1,4 +1,8 @@
-import { WasteAcceptationStatus, BsffFicheIntervention } from "@prisma/client";
+import {
+  WasteAcceptationStatus,
+  BsffFicheIntervention,
+  Prisma
+} from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory, siretify } from "../../__tests__/factories";
 import {
@@ -908,7 +912,7 @@ describe("ficheInterventionSchema", () => {
 
     ficheInteventionData = {
       numero: "FI-1",
-      weight: 1,
+      weight: new Prisma.Decimal(1),
       postalCode: "13001",
 
       operateurCompanyName: "Operateur",

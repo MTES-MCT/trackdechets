@@ -9,7 +9,6 @@ import {
   formNotAccepted,
   formPartiallyRefused
 } from "@td/mail";
-import { Decimal } from "decimal.js-light";
 import { BsdaWithTransporters } from "../types";
 import { getFirstTransporterSync } from "../database";
 
@@ -99,10 +98,8 @@ export async function renderBsdaRefusedEmail(
         transporterReceipt: transporter?.transporterRecepisseNumber,
         sentBy: bsda.emitterEmissionSignatureAuthor,
         quantityReceived: bsda.destinationReceptionWeight
-          ? new Decimal(bsda.destinationReceptionWeight)
-              .dividedBy(1000)
-              .toNumber()
-          : bsda.destinationReceptionWeight
+          ? bsda.destinationReceptionWeight.dividedBy(1000).toNumber()
+          : null
       }
     },
     attachment: attachmentData

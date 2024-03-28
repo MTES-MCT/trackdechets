@@ -68,7 +68,7 @@ describe("Mutation.signedByTransporter", () => {
               type: string;
             }[]
           ).map(p => p.type),
-          quantity: form.wasteDetailsQuantity,
+          quantity: form.wasteDetailsQuantity?.toNumber(),
           onuCode: "Code ONU"
         }
       }
@@ -113,7 +113,7 @@ describe("Mutation.signedByTransporter", () => {
           sentBy: emitter.user.name,
           signedByProducer: true,
           packagingInfos: form.wasteDetailsPackagingInfos,
-          quantity: form.wasteDetailsQuantity,
+          quantity: form.wasteDetailsQuantity?.toNumber(),
           onuCode: "Code ONU"
         }
       }
@@ -171,7 +171,7 @@ describe("Mutation.signedByTransporter", () => {
           sentBy: emitter.user.name,
           signedByProducer: true,
           packagingInfos: form.wasteDetailsPackagingInfos,
-          quantity: form.wasteDetailsQuantity,
+          quantity: form.wasteDetailsQuantity?.toNumber(),
           onuCode: "Code ONU"
         }
       }
@@ -232,7 +232,7 @@ describe("Mutation.signedByTransporter", () => {
             sentBy: "Roger Lapince",
             signedByProducer: true,
             packagingInfos: form.wasteDetailsPackagingInfos,
-            quantity: form.wasteDetailsQuantity,
+            quantity: form.wasteDetailsQuantity?.toNumber(),
             onuCode: ""
           }
         }
@@ -283,7 +283,7 @@ describe("Mutation.signedByTransporter", () => {
             sentBy: "Roger Lapince",
             signedByProducer: true,
             packagingInfos: form.wasteDetailsPackagingInfos,
-            quantity: form.wasteDetailsQuantity,
+            quantity: form.wasteDetailsQuantity?.toNumber(),
             onuCode: ""
           }
         }
@@ -339,7 +339,7 @@ describe("Mutation.signedByTransporter", () => {
           sentBy: "Roger Lapince",
           signedByProducer: true,
           packagingInfos: form.wasteDetailsPackagingInfos,
-          quantity: form.wasteDetailsQuantity,
+          quantity: form.wasteDetailsQuantity?.toNumber(),
           onuCode: ""
         }
       }
@@ -384,7 +384,7 @@ describe("Mutation.signedByTransporter", () => {
             sentBy: "Roger Lapince",
             signedByProducer: true,
             packagingInfos: form.wasteDetailsPackagingInfos,
-            quantity: form.wasteDetailsQuantity
+            quantity: form.wasteDetailsQuantity?.toNumber()
           }
         }
       }
@@ -433,7 +433,7 @@ describe("Mutation.signedByTransporter", () => {
             sentBy: "Roger Lapince",
             signedByProducer: false,
             packagingInfos: form.wasteDetailsPackagingInfos,
-            quantity: form.wasteDetailsQuantity
+            quantity: form.wasteDetailsQuantity?.toNumber()
           }
         }
       }
@@ -482,7 +482,7 @@ describe("Mutation.signedByTransporter", () => {
             sentBy: "Roger Lapince",
             signedByProducer: true,
             packagingInfos: form.wasteDetailsPackagingInfos,
-            quantity: form.wasteDetailsQuantity
+            quantity: form.wasteDetailsQuantity?.toNumber()
           }
         }
       }
@@ -535,7 +535,7 @@ describe("Mutation.signedByTransporter", () => {
             sentBy: "Roger Lapince",
             signedByProducer: true,
             packagingInfos: form.wasteDetailsPackagingInfos,
-            quantity: form.wasteDetailsQuantity
+            quantity: form.wasteDetailsQuantity?.toNumber()
           }
         }
       }
@@ -596,7 +596,7 @@ describe("Mutation.signedByTransporter", () => {
           sentBy: "Roger Lapince",
           signedByProducer: true,
           packagingInfos: form.wasteDetailsPackagingInfos,
-          quantity: form.wasteDetailsQuantity
+          quantity: form.wasteDetailsQuantity?.toNumber()
         }
       }
     });
@@ -668,7 +668,7 @@ describe("Mutation.signedByTransporter", () => {
           sentBy: temporaryStorage.user.name,
           signedByProducer: true,
           packagingInfos: form.wasteDetailsPackagingInfos,
-          quantity: form.wasteDetailsQuantity,
+          quantity: form.wasteDetailsQuantity?.toNumber(),
           onuCode: "Code ONU"
         }
       }
@@ -735,7 +735,7 @@ describe("Mutation.signedByTransporter", () => {
               sentBy: "Roger Lapince",
               signedByProducer: true,
               packagingInfos: form.wasteDetailsPackagingInfos,
-              quantity: form.wasteDetailsQuantity,
+              quantity: form.wasteDetailsQuantity?.toNumber(),
               onuCode: "Code ONU"
             }
           }
@@ -832,7 +832,7 @@ describe("Mutation.signedByTransporter", () => {
           id: form.id,
           signingInfo: {
             packagingInfos: form.wasteDetailsPackagingInfos,
-            quantity: form.wasteDetailsQuantity,
+            quantity: form.wasteDetailsQuantity?.toNumber(),
             onuCode: "Code ONU",
             sentAt: "2018-12-11T00:00:00.000Z",
             signedByTransporter: true,

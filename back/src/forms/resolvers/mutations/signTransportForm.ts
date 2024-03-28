@@ -243,7 +243,7 @@ const signTransportFn = async (
             wasteDetailsPackagingInfos
           ),
           wasteDetailsQuantity: appendix1Forms
-            .map(form => form.wasteDetailsQuantity ?? 0)
+            .map(form => form.wasteDetailsQuantity?.toNumber() ?? 0)
             .reduce((sum, quantity) => sum + quantity, 0)
         }
       );

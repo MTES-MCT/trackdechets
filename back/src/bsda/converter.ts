@@ -3,7 +3,8 @@ import {
   safeInput,
   processDate,
   chain,
-  undefinedOrDefault
+  undefinedOrDefault,
+  processDecimal
 } from "../common/converter";
 
 import {
@@ -47,7 +48,7 @@ import {
   BsdaRevisionRequest
 } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
-import { Decimal } from "decimal.js-light";
+import { Decimal } from "decimal.js";
 import { BsdaForElastic } from "./elastic";
 import { BsdaWithTransporters } from "./types";
 import { getFirstTransporterSync } from "./database";
@@ -104,8 +105,8 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
     weight: nullIfNoValues<BsdaWeight>({
       isEstimate: bsda.weightIsEstimate,
       value: bsda.weightValue
-        ? new Decimal(bsda.weightValue).dividedBy(1000).toNumber()
-        : bsda.weightValue
+        ? processDecimal(bsda.weightValue)!.dividedBy(1000).toNumber()
+        : null
     }),
     destination: nullIfNoValues<BsdaDestination>({
       company: nullIfNoValues<FormCompany>({
@@ -124,10 +125,10 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
         refusalReason: bsda.destinationReceptionRefusalReason,
         date: processDate(bsda.destinationReceptionDate),
         weight: bsda.destinationReceptionWeight
-          ? new Decimal(bsda.destinationReceptionWeight)
+          ? processDecimal(bsda.destinationReceptionWeight)
               .dividedBy(1000)
               .toNumber()
-          : bsda.destinationReceptionWeight
+          : null
       }),
       operation: nullIfNoValues<BsdaOperation>({
         code: bsda.destinationOperationCode,

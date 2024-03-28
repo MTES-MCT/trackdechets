@@ -477,7 +477,7 @@ describe("mutation / importPaperForm", () => {
       expect(updatedForm.wasteAcceptationStatus).toEqual(
         importedData.receivedInfo.wasteAcceptationStatus
       );
-      expect(updatedForm.quantityReceived).toEqual(
+      expect(updatedForm.quantityReceived?.toNumber()).toEqual(
         importedData.receivedInfo.quantityReceived
       );
       expect(updatedForm.processedAt).toEqual(

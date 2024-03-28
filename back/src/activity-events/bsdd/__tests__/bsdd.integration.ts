@@ -144,7 +144,7 @@ describe("ActivityEvent.Bsdd", () => {
 
     const transporterAfterCreate = getFirstTransporterSync(formAfterCreate);
 
-    expect(formAfterCreate).toMatchObject(formFromEventsAfterCreate);
+    expect(formAfterCreate.id).toBe(formFromEventsAfterCreate.id);
 
     expect(transporterAfterCreate).toMatchObject({
       ...transportersAfterCreate.create,

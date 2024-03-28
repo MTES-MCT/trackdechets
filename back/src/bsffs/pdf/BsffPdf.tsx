@@ -20,7 +20,7 @@ import {
 } from "../../generated/graphql/types";
 import { BSFF_WASTES } from "@td/constants";
 import { extractPostalCode } from "../../utils";
-import { Decimal } from "decimal.js-light";
+import { Decimal } from "decimal.js";
 import { Recepisse } from "./Recepisse";
 import { getOperationModeLabel } from "../../common/operationModes";
 

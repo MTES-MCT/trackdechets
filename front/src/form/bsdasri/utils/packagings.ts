@@ -1,5 +1,5 @@
 import { BsdasriPackaging, BsdasriPackagingType } from "@td/codegen-ui";
-import { Decimal } from "decimal.js-light";
+import { Decimal } from "decimal.js";
 
 export const PACKAGINGS_NAMES = {
   [BsdasriPackagingType.BoiteCarton]:

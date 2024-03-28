@@ -87,7 +87,7 @@ describe("Test Form reception", () => {
     expect(acceptedForm.status).toBe("ACCEPTED");
     expect(acceptedForm.wasteAcceptationStatus).toBe("ACCEPTED");
     expect(acceptedForm.signedBy).toBe("Bill");
-    expect(acceptedForm.quantityReceived).toBe(11);
+    expect(acceptedForm.quantityReceived?.toNumber()).toBe(11);
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -212,7 +212,7 @@ describe("Test Form reception", () => {
     expect(frm.wasteAcceptationStatus).toBe("REFUSED");
     expect(frm.signedBy).toBe("Holden");
     expect(frm.wasteRefusalReason).toBe("Lorem ipsum");
-    expect(frm.quantityReceived).toBe(0); // quantityReceived is set to 0
+    expect(frm.quantityReceived?.toNumber()).toBe(0); // quantityReceived is set to 0
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -311,7 +311,7 @@ describe("Test Form reception", () => {
     expect(frm.wasteAcceptationStatus).toBe("PARTIALLY_REFUSED");
     expect(frm.signedBy).toBe("Carol");
     expect(frm.wasteRefusalReason).toBe("Dolor sit amet");
-    expect(frm.quantityReceived).toBe(12.5);
+    expect(frm.quantityReceived?.toNumber()).toBe(12.5);
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -418,8 +418,14 @@ describe("Test Form reception", () => {
         grouping: {
           createMany: {
             data: [
-              { initialFormId: form1.id, quantity: form1.quantityReceived! },
-              { initialFormId: form2.id, quantity: form2.quantityReceived! }
+              {
+                initialFormId: form1.id,
+                quantity: form1.quantityReceived!.toNumber()
+              },
+              {
+                initialFormId: form2.id,
+                quantity: form2.quantityReceived!.toNumber()
+              }
             ]
           }
         }

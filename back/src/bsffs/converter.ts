@@ -4,12 +4,14 @@ import {
   safeInput,
   processDate,
   chain,
-  undefinedOrDefault
+  undefinedOrDefault,
+  processDecimal
 } from "../common/converter";
 import * as GraphQL from "../generated/graphql/types";
 import { BsffPackaging, BsffPackagingType } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsffForElastic } from "./elastic";
+import { Decimal } from "decimal.js";
 
 function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter | null }) {
   return {
@@ -129,7 +131,7 @@ function flattenWasteDetailsInput(input: {
     wasteCode: chain(input.waste, w => w.code),
     wasteDescription: chain(input.waste, w => w.description),
     wasteAdr: chain(input.waste, w => w.adr),
-    weightValue: chain(input.weight, w => w.value),
+    weightValue: chain(input.weight, w => new Decimal(w.value)),
     weightIsEstimate: chain(input.weight, w => w.isEstimate)
   };
 }
@@ -199,7 +201,9 @@ export function expandBsffFromDB(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       adr: prismaBsff.wasteAdr
     }),
     weight: nullIfNoValues<GraphQL.BsffWeight>({
-      value: prismaBsff.weightValue,
+      value: prismaBsff.weightValue
+        ? processDecimal(prismaBsff.weightValue).toNumber()
+        : null,
       isEstimate: prismaBsff.weightIsEstimate
     }),
     transporter: nullIfNoValues<GraphQL.BsffTransporter>({
@@ -431,7 +435,7 @@ export function expandFicheInterventionBsffFromDB(
   return {
     id: prismaFicheIntervention.id,
     numero: prismaFicheIntervention.numero,
-    weight: prismaFicheIntervention.weight,
+    weight: processDecimal(prismaFicheIntervention.weight).toNumber(),
     postalCode: prismaFicheIntervention.postalCode,
     detenteur: nullIfNoValues<GraphQL.BsffDetenteur>({
       company: nullIfNoValues<GraphQL.FormCompany>({

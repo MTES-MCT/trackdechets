@@ -1,5 +1,5 @@
 import { Form, Prisma, Status } from "@prisma/client";
-import { Decimal } from "decimal.js-light";
+import { Decimal } from "decimal.js";
 import { RepositoryFnDeps } from "../../../common/repository/types";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";

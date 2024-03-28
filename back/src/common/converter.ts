@@ -117,3 +117,18 @@ export function processDate(maybeDate: MaybeDateParam): Date | null {
   if (!maybeDate) return null;
   return maybeDate instanceof Date ? maybeDate : new Date(maybeDate);
 }
+
+export function processDecimal(
+  maybeDecimal: Prisma.Decimal | string
+): Prisma.Decimal;
+export function processDecimal(
+  maybeDecimal: Prisma.Decimal | string | null
+): Prisma.Decimal | null;
+export function processDecimal(
+  maybeDecimal: Prisma.Decimal | string | null
+): Prisma.Decimal | null {
+  if (!maybeDecimal) return null;
+  return maybeDecimal instanceof Prisma.Decimal
+    ? maybeDecimal
+    : new Prisma.Decimal(maybeDecimal);
+}

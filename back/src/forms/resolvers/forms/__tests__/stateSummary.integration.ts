@@ -105,7 +105,9 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
       variables: { id: form.id }
     });
 
-    expect(stateSummary!.quantity).toEqual(form.wasteDetailsQuantity);
+    expect(stateSummary!.quantity).toEqual(
+      form.wasteDetailsQuantity.toNumber()
+    );
     expect(stateSummary!.packagingInfos).toEqual([
       { type: "BENNE", quantity: 1 }
     ]);
@@ -183,7 +185,7 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
       variables: { id: form.id }
     });
     expect(stateSummary!.quantity).toEqual(
-      updatedForm.forwardedIn!.wasteDetailsQuantity
+      updatedForm.forwardedIn!.wasteDetailsQuantity?.toNumber()
     );
     expect(stateSummary!.packagingInfos).toEqual([
       { type: "FUT", quantity: 2 }
