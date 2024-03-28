@@ -76,10 +76,14 @@ authRouter.post<{ email: string }>("/impersonate", async (req, res) => {
     })
     .parse(req.body);
 
-  const impersonatedUser = await prisma.user.findUniqueOrThrow({
+  const impersonatedUser = await prisma.user.findUnique({
     where: { email: parsedBody.email },
     select: { id: true }
   });
+
+  if (!impersonatedUser) {
+    return res.status(400).send("Unknown email");
+  }
 
   req.session.impersonatedUserId = impersonatedUser.id;
   req.session.impersonationStartsAt = Date.now();
