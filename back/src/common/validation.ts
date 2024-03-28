@@ -15,7 +15,6 @@ import {
 import { CompanyInput } from "../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import { isForeignVat, isFRVat, isSiret, isVat } from "@td/constants";
-import { UserInputError } from "./errors";
 import { isBase64 } from "../utils";
 
 // Poids maximum en tonnes tout mode de transport confondu
@@ -357,42 +356,6 @@ export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
   orgId: yup.string().notRequired().nullable(), // is ignored in db schema
   extraEuropeanId: yup.string().notRequired().nullable() // is ignored in db schema
 });
-
-/**
- * Validate Intermediary Input
- */
-export async function validateIntermediariesInput(
-  intermediaries: CompanyInput[] | null | undefined
-): Promise<CompanyInput[]> {
-  if (!intermediaries || intermediaries.length === 0) {
-    return [];
-  }
-
-  if (intermediaries.length > 3) {
-    throw new UserInputError(
-      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires"
-    );
-  }
-
-  // check we do not add the same SIRET twice
-  const intermediarySirets = intermediaries.map(c => c.siret);
-
-  const hasDuplicate =
-    new Set(intermediarySirets).size !== intermediarySirets.length;
-
-  if (hasDuplicate) {
-    throw new UserInputError(
-      "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois"
-    );
-  }
-
-  for (const companyInput of intermediaries) {
-    // ensure a SIRET number is present
-    await intermediarySchema.validate(companyInput, { abortEarly: false });
-  }
-
-  return intermediaries;
-}
 
 /**
  * Common transporter receipt error message

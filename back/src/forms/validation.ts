@@ -29,6 +29,7 @@ import {
 } from "@td/constants";
 import {
   foreignVatNumber,
+  intermediarySchema,
   REQUIRED_RECEIPT_DEPARTMENT,
   REQUIRED_RECEIPT_NUMBER,
   REQUIRED_RECEIPT_VALIDITYLIMIT,
@@ -43,6 +44,7 @@ import {
 } from "../common/validation";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
+  CompanyInput,
   InitialFormFractionInput,
   PackagingInfo,
   Packagings
@@ -68,6 +70,7 @@ import { getFirstTransporterSync } from "./database";
 import { UserInputError } from "../common/errors";
 import { ConditionConfig } from "yup/lib/Condition";
 import { getOperationModesFromOperationCode } from "../common/operationModes";
+import { flattenFormInput } from "./converter";
 // set yup default error messages
 configureYup();
 
@@ -1988,4 +1991,42 @@ export async function validateAppendix1Groupement(
   }
 
   return formFractions;
+}
+
+export async function validateIntermediaries(
+  intermediaries: CompanyInput[] | null | undefined,
+  formContent: ReturnType<typeof flattenFormInput>
+) {
+  if (!intermediaries || intermediaries.length === 0) {
+    return;
+  }
+
+  if (formContent.emitterType === "APPENDIX1_PRODUCER") {
+    throw new UserInputError(
+      "Impossible d'ajouter des intermédiaires sur une annexe 1"
+    );
+  }
+
+  if (intermediaries.length > 3) {
+    throw new UserInputError(
+      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires"
+    );
+  }
+
+  // check we do not add the same SIRET twice
+  const intermediarySirets = intermediaries.map(c => c.siret);
+
+  const hasDuplicate =
+    new Set(intermediarySirets).size !== intermediarySirets.length;
+
+  if (hasDuplicate) {
+    throw new UserInputError(
+      "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois"
+    );
+  }
+
+  for (const companyInput of intermediaries) {
+    // ensure a SIRET number is present
+    await intermediarySchema.validate(companyInput, { abortEarly: false });
+  }
 }
