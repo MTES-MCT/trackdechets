@@ -237,6 +237,7 @@ export const producersSecondOnboardingEmail: MailTemplate = {
 export const pendingRevisionRequestAdminDetailsEmail: MailTemplate<{
   requestCreatedAt: string;
   bsdReadableId: string;
+  bsdId: string;
   companyName: string;
   companyOrgId: string;
 }> = {

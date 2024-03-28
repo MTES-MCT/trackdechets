@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   generatePath,
   useNavigate,
   useLocation,
-  useMatch
+  useMatch,
+  useParams
 } from "react-router-dom";
 import { BsdCardListProps } from "./bsdCardListTypes";
 import BsdCard from "../BsdCard/BsdCard";
@@ -57,6 +58,7 @@ function BsdCardList({
   siretsWithAutomaticSignature
 }: BsdCardListProps): JSX.Element {
   const navigate = useNavigate();
+  const { bsdId } = useParams();
   const location = useLocation();
   const isReviewsTab =
     bsdCurrentTab === "reviewedTab" || bsdCurrentTab === "toReviewTab";
@@ -90,6 +92,19 @@ function BsdCardList({
 
   const [hasEmitterSignSecondaryCta, setHasEmitterSignSecondaryCta] =
     useState(false);
+
+  // If URL specifies a BSD id, directly open the associated revision modal
+  useEffect(() => {
+    if (bsdId) {
+      setIsModalOpen(true);
+      setBsdClicked({ id: bsdId ?? "" } as unknown as Bsd);
+      if (bsdId?.startsWith("BSDA-")) {
+        setValidationWorkflowType("REVIEW_BSDA_APPROVE");
+      } else {
+        setValidationWorkflowType("REVIEW_BSDD_APPROVE");
+      }
+    }
+  }, [bsdId]);
 
   const onClose = () => {
     setIsModalOpen(false);
