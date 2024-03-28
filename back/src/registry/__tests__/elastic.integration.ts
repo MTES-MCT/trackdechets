@@ -37,6 +37,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   let trader: { user: User; company: Company };
   let broker: { user: User; company: Company };
   let worker: { user: User; company: Company };
+  let ecoOrganisme: { user: User; company: Company };
+  let intermediary: { user: User; company: Company };
 
   beforeEach(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -77,6 +79,16 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     worker = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["PRODUCER"]
+      }
+    });
+    ecoOrganisme = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["ECO_ORGANISME"]
+      }
+    });
+    intermediary = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["TRADER"]
       }
     });
   });
@@ -340,6 +352,21 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
+
+  it("should list a BSDD in eco-organisme's outgoing wastes once it has been sent", async () => {
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        ecoOrganismeSiret: ecoOrganisme.company.siret,
+        sentAt: new Date()
+      }
+    });
+    await indexForm(await getFormForElastic(form));
+    await refreshElasticSearch();
+    const bsds = await searchBsds("OUTGOING", [ecoOrganisme.company.siret!]);
+    expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
+  });
+
   it("should not list a BSDD in emitter's outgoing wastes before it has been sent", async () => {
     const form = await formFactory({
       ownerId: emitter.user.id,
@@ -401,6 +428,27 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
   });
+
+  it("should list a BSDA in ecoOrganisme's outgoing wastes once it has been sent", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SENT",
+        ecoOrganismeSiret: ecoOrganisme.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date(),
+        transporterTransportSignatureDate: new Date()
+      }
+    });
+    const bsdaForElastic = await getBsdaForElastic(bsda);
+    await indexBsda(bsdaForElastic);
+    await refreshElasticSearch();
+    const bsds = await searchBsds("OUTGOING", [ecoOrganisme.company.siret!]);
+    expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
+  });
+
   it("should not list a BSDA in emitter's outgoing wastes before it has been sent", async () => {
     const bsda = await bsdaFactory({
       opt: {
@@ -461,6 +509,21 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
   });
+
+  it("should list a BSDASRI in ecoOrganisme's outgoing wastes once it has been sent", async () => {
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        ecoOrganismeSiret: ecoOrganisme.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      }
+    });
+    await indexBsdasri(await getBsdasriForElastic(bsdasri));
+    await refreshElasticSearch();
+    const bsds = await searchBsds("OUTGOING", [ecoOrganisme.company.siret!]);
+    expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
+  });
+
   it("should not list a BSDASRI in emitter's outgoing wastes before it has been sent", async () => {
     const bsdasri = await bsdasriFactory({
       opt: {
@@ -754,6 +817,27 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const bsds = await searchBsds("MANAGED", [broker.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
+
+  it("should list a BSDD in intermediary's managed wastes before it has been sent", async () => {
+    const form = await formFactory({
+      ownerId: broker.user.id,
+      opt: {
+        intermediaries: {
+          create: {
+            siret: intermediary!.company!.siret!,
+            name: "Intermédiaire",
+            contact: "M Intermédiaire"
+          }
+        },
+        sentAt: new Date()
+      }
+    });
+    await indexForm(await getFormForElastic(form));
+    await refreshElasticSearch();
+    const bsds = await searchBsds("MANAGED", [intermediary.company.siret!]);
+    expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
+  });
+
   it("should not list a BSDD in trader's managed wastes before it has been sent", async () => {
     const form = await formFactory({
       ownerId: trader.user.id,
@@ -799,6 +883,33 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const bsds = await searchBsds("MANAGED", [broker.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
   });
+
+  it("should list a BSDA in intermediary's managed wastes after it has been sent", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SENT",
+        intermediaries: {
+          create: {
+            siret: intermediary!.company!.siret!,
+            name: "Intermédiaire",
+            contact: "M Intermédiaire"
+          }
+        },
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterTransportTakenOverAt: new Date(),
+        transporterTransportSignatureDate: new Date()
+      }
+    });
+    const bsdaForElastic = await getBsdaForElastic(bsda);
+    await indexBsda(bsdaForElastic);
+    await refreshElasticSearch();
+    const bsds = await searchBsds("MANAGED", [intermediary.company.siret!]);
+    expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
+  });
+
   it("should not list a BSDA in broker's managed wastes before it has been sent", async () => {
     const bsda = await bsdaFactory({
       opt: {

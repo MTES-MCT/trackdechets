@@ -18,9 +18,9 @@ import {
   emptyTransportedWaste
 } from "../registry/types";
 import { extractPostalCode } from "../utils";
-import { BsdaWithTransporters } from "./types";
 import { getFirstTransporterSync } from "./database";
 import { RegistryBsda } from "../registry/elastic";
+import { BsdaForElastic } from "./elastic";
 
 const getOperationData = (bsda: Bsda) => ({
   destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
@@ -46,7 +46,7 @@ type RegistryFields =
   | "isTransportedWasteFor"
   | "isManagedWasteFor";
 export function getRegistryFields(
-  bsda: BsdaWithTransporters
+  bsda: BsdaForElastic
 ): Pick<BsdElastic, RegistryFields> {
   const registryFields: Record<RegistryFields, string[]> = {
     isIncomingWasteFor: [],
@@ -61,17 +61,29 @@ export function getRegistryFields(
     if (bsda.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsda.emitterCompanySiret);
     }
+    if (bsda.ecoOrganismeSiret) {
+      registryFields.isOutgoingWasteFor.push(bsda.ecoOrganismeSiret);
+    }
+
     if (bsda.workerCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsda.workerCompanySiret);
+    }
+    if (bsda.brokerCompanySiret) {
+      registryFields.isManagedWasteFor.push(bsda.brokerCompanySiret);
+    }
+    if (bsda.intermediaries?.length) {
+      for (const intermediary of bsda.intermediaries) {
+        const intermediaryOrgId = intermediary.siret ?? intermediary.vatNumber;
+        if (intermediaryOrgId) {
+          registryFields.isManagedWasteFor.push(intermediaryOrgId);
+        }
+      }
     }
 
     const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
 
     if (transporterCompanyOrgId) {
       registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
-    }
-    if (bsda.brokerCompanySiret) {
-      registryFields.isManagedWasteFor.push(bsda.brokerCompanySiret);
     }
   }
 
