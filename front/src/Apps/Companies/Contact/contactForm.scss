@@ -1,0 +1,35 @@
+.contactForm {
+  &__topActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 16px;
+
+    h4 {
+      font-size: 1.5rem; //24px;
+      font-weight: 700;
+      margin: 0;
+      padding: 0;
+    }
+    &__formCTA {
+      display: flex;
+      justify-content: end;
+      button {
+        margin: 0 3px;
+      }
+    }
+  }
+  &__title-field {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  &__value-field {
+    font-size: 16px;
+    margin-bottom: 24px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
