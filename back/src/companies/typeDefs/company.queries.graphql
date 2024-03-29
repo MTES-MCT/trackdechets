@@ -17,6 +17,17 @@ type Query {
   ): CompanyPublic!
 
   """
+  Même requête que companyInfos, mais en batch. Renvoie des informations autorisées à la diffusion publique
+  sur des établissements
+  """
+  companiesInfos(
+    """
+    Les identifiants d'entreprises (SIRET ou TVA)
+    """
+    orgIds: [String]!
+  ): [CompanyPublic!]!
+
+  """
   Effectue une recherche floue sur la base SIRENE et enrichie
   avec des informations provenant de Trackdéchets
   Si vous envoyez un numéro de SIRET ou de TVA la recherche renverra un seul item

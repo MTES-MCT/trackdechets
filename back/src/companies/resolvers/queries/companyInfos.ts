@@ -56,24 +56,10 @@ export async function getCompanyInfos(
   };
 }
 
-/**
- * Public Query
- */
-const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
-  _,
-  args
-) => {
-  if (!args.siret && !args.clue) {
-    throw new UserInputError(
-      "Paramètre siret et clue absents. Un numéro SIRET ou de TVA intracommunautaire valide est requis",
-      {
-        invalidArgs: ["clue", "siret"]
-      }
-    );
-  }
-  const companyInfos = (await getCompanyInfos(
-    !!args.siret ? args.siret : args.clue!
-  )) as CompanyPublic;
+export const getPublicCompanyInfos = async (
+  orgId: string
+): Promise<CompanyPublic> => {
+  const companyInfos = (await getCompanyInfos(orgId)) as CompanyPublic;
   if (!["P", "N"].includes(companyInfos.statutDiffusionEtablissement!)) {
     return companyInfos;
   } else {
@@ -89,6 +75,29 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
       etatAdministratif: companyInfos.etatAdministratif
     };
   }
+};
+
+/**
+ * Public Query
+ */
+const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
+  _,
+  args
+) => {
+  if (!args.siret && !args.clue) {
+    throw new UserInputError(
+      "Paramètre siret et clue absents. Un numéro SIRET ou de TVA intracommunautaire valide est requis",
+      {
+        invalidArgs: ["clue", "siret"]
+      }
+    );
+  }
+
+  const companyInfos = await getPublicCompanyInfos(
+    !!args.siret ? args.siret : args.clue!
+  );
+
+  return companyInfos;
 };
 
 export default companyInfosResolvers;

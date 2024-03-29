@@ -1,5 +1,6 @@
 import { QueryResolvers } from "../../generated/graphql/types";
 import companyInfos from "./queries/companyInfos";
+import companiesInfos from "./queries/companiesInfos";
 import companyPrivateInfos from "./queries/companyPrivateInfos";
 import searchCompanies from "./queries/searchCompanies";
 import favorites from "./queries/favorites";
@@ -10,6 +11,7 @@ import anonymousCompanyRequest from "./queries/anonymousCompanyRequest";
 
 const Query: QueryResolvers = {
   companyInfos,
+  companiesInfos,
   companyPrivateInfos,
   searchCompanies,
   favorites,

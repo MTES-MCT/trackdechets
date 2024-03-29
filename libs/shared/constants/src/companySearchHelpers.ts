@@ -143,6 +143,13 @@ export const isVat = (clue: string | null | undefined): boolean => {
 };
 
 /**
+ * Checks if clue is a valid orgId, that is, a valid SIRET or a valid VAT nbr
+ */
+export const isOrgId = (clue: string | null | undefined): boolean => {
+  return isSiret(clue) || isVat(clue);
+};
+
+/**
  * Return the french VAT key for a SIREN (first 2 numbers of the VAT)
  */
 const sirenToVatKey = (siren: string): number =>
