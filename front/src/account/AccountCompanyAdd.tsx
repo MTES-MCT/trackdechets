@@ -23,7 +23,7 @@ import {
   CompanySearchResult
 } from "@td/codegen-ui";
 import classNames from "classnames";
-import { MY_COMPANIES } from "./AccountCompanyList";
+import { MY_COMPANIES } from "../Apps/Companies/common/queries";
 import { isFRVat, isSiret, isVat, isForeignVat } from "@td/constants";
 import {
   CREATE_WORKER_CERTIFICATION,
