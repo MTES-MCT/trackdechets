@@ -423,7 +423,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   destinationCap: {
     readableFieldName: "le CAP du destinataire",
-    sealed: { from: "TRANSPORT" },
+    sealed: { from: sealedFromEmissionExceptAddOrRemoveNextDestination },
     required: {
       from: "EMISSION",
       when: bsda =>
@@ -433,7 +433,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   destinationPlannedOperationCode: {
     readableFieldName: "le code d'opération prévu",
-    sealed: { from: "TRANSPORT" },
+    sealed: { from: sealedFromEmissionExceptAddOrRemoveNextDestination },
     required: { from: "EMISSION" }
   },
   destinationReceptionDate: {
