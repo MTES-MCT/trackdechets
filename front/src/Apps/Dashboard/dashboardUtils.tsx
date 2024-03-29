@@ -249,8 +249,7 @@ export const filterPredicates: {
 }[] = [
   {
     filterName: FilterName.types,
-    where: value => ({ type: { _in: value } }),
-    orderBy: "type"
+    where: value => ({ type: { _in: value } })
   },
   {
     filterName: FilterName.waste,
@@ -263,8 +262,7 @@ export const filterPredicates: {
           ]
         }
       ]
-    }),
-    orderBy: "wasteCode"
+    })
   },
   {
     filterName: FilterName.readableId,
@@ -281,8 +279,7 @@ export const filterPredicates: {
           ]
         }
       ]
-    }),
-    orderBy: "readableId"
+    })
   },
   {
     filterName: FilterName.transporterNumberPlate,

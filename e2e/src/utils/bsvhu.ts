@@ -1,5 +1,5 @@
 import { Page, expect } from "@playwright/test";
-import { expectInputValue } from "./utils";
+import { expectInputValue, navigateInDashboard } from "./utils";
 import { toDDMMYYYY } from "./time";
 
 /**
@@ -393,16 +393,18 @@ export const verifyOverviewData = async (
  * Publish a VHU
  */
 export const publishBsvhu = async (page: Page, { id }) => {
-  await page.getByRole("link", { name: "Brouillons" }).click();
+  await navigateInDashboard(page, "Brouillons", "**/bsds/drafts");
 
-  const vhuDiv = getVHUCardDiv(page, id);
+  let vhuDiv = getVHUCardDiv(page, id);
 
   // Try to publish
   await vhuDiv.getByRole("button").getByText("Publier").click();
   // Confirm publication in modal
   await page.getByRole("button", { name: "Publier le bordereau" }).click();
 
-  await page.getByRole("link", { name: "Tous les bordereaux" }).click();
+  await navigateInDashboard(page, "Tous les bordereaux", "**/bsds/all");
+  vhuDiv = getVHUCardDiv(page, id);
+
   await expect(vhuDiv).toBeVisible();
 
   // Status should be updated
@@ -421,7 +423,7 @@ export const publishBsvhu = async (page: Page, { id }) => {
  * Fix VHU adding missing data, then publish
  */
 export const fixAndPublishBsvhu = async (page: Page, { id }) => {
-  await page.getByRole("link", { name: "Brouillons" }).click();
+  await navigateInDashboard(page, "Brouillons", "**/bsds/drafts");
 
   const vhuDiv = getVHUCardDiv(page, id);
 
@@ -453,7 +455,7 @@ export const fixAndPublishBsvhu = async (page: Page, { id }) => {
  * Duplicate a VHU
  */
 export const duplicateBsvhu = async (page: Page, { id }) => {
-  await page.getByRole("link", { name: "Tous les bordereaux" }).click();
+  await navigateInDashboard(page, "Tous les bordereaux", "**/bsds/all");
 
   const vhuDiv = getVHUCardDiv(page, id);
 
@@ -462,7 +464,7 @@ export const duplicateBsvhu = async (page: Page, { id }) => {
   await vhuDiv.getByRole("button").getByText("Dupliquer").click();
 
   // Check in drafts
-  await page.getByRole("link", { name: "Brouillons" }).click();
+  await navigateInDashboard(page, "Brouillons", "**/bsds/drafts");
 
   // Make sure VHU pops out in results list
   const duplicatedVhuDiv = page.locator(".bsd-card-list li").first();
@@ -479,7 +481,7 @@ export const duplicateBsvhu = async (page: Page, { id }) => {
  * Delete a VHU
  */
 export const deleteBsvhu = async (page: Page, { id }) => {
-  await page.getByRole("link", { name: "Tous les bordereaux" }).click();
+  await navigateInDashboard(page, "Tous les bordereaux", "**/bsds/all");
 
   const vhuDiv = getVHUCardDiv(page, id);
 
