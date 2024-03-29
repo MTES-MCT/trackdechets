@@ -477,7 +477,7 @@ Pour les migrations scriptées, c'est dans `back/prisma/scripts`. Les migrations
 Attention, contrairement aux scripts SQL ces migrations ne sont pas jouées une seules fois. Il faut donc s'assurer qu'elles sont idempotentes, ou les désactiver après chaque mise en production.
 
 Les scripts sont joués avec la commande `npx nx run back:update`.
-Les migrations SQL sont joués avec la commande `npx nx run @td/prisma:migrate`.
+Les migrations SQL sont joués avec Prisma migrate `npx prisma migrate dev`.
 
 ## Réindexation Elasticsearch des BSDs
 

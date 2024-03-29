@@ -177,6 +177,14 @@ describe("ActivityEvent.Bsdd", () => {
       bsddId: formId
     });
     delete formFromEventsAfterUpdate["transporters"];
+
+    // Cannot use toMatchObject() when hydrating Decimal from events
+    expect(formAfterUpdate?.wasteDetailsQuantity?.toString()).toEqual(
+      formFromEventsAfterUpdate?.wasteDetailsQuantity?.toString()
+    );
+    formAfterUpdate!.wasteDetailsQuantity = null;
+    formFromEventsAfterUpdate.wasteDetailsQuantity = null;
+
     expect(formAfterUpdate).toMatchObject(formFromEventsAfterUpdate);
     expect(formFromEventsAfterUpdate.wasteDetailsCode).toBe("01 01 01");
 
@@ -197,6 +205,13 @@ describe("ActivityEvent.Bsdd", () => {
       bsddId: formId
     });
     delete formFromEventsAfterSealed["transporters"];
+    // Cannot use toMatchObject() when hydrating Decimal from events
+    expect(formAfterSealed?.wasteDetailsQuantity?.toString()).toEqual(
+      formFromEventsAfterSealed?.wasteDetailsQuantity?.toString()
+    );
+    formAfterSealed!.wasteDetailsQuantity = null;
+    formFromEventsAfterSealed.wasteDetailsQuantity = null;
+
     expect(formAfterSealed).toMatchObject(formFromEventsAfterSealed);
     expect(formFromEventsAfterSealed.status).toBe("SEALED");
 
