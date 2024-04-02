@@ -786,7 +786,7 @@ model User {
   activatedAt             DateTime?                 @db.Timestamptz(6)
   firstAssociationDate    DateTime?                 @db.Timestamptz(6)
   isActive                Boolean?                  @default(false)
-  isAdmin                 Boolean?                  @default(false)
+  isAdmin                 Boolean                   @default(false)
   // TODO champ à supprimer suite à la création des comptes gouvernementaux
   isRegistreNational      Boolean                   @default(false)
   governmentAccountId     String?                   @unique
@@ -956,6 +956,7 @@ model Bsvhu {
   @@index([emitterCompanySiret], map: "_BvhuEmitterCompanySirettIdx")
   @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
+  @@index([transporterCompanyVatNumber], map: "_BsvhuTransporterCompanyVatNumberIdx")
   @@index([status], map: "_BsvhuStatusIdx")
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
 }
@@ -1070,6 +1071,7 @@ model Bsdasri {
 
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdasriTransporterCompanySiretIdx")
+  @@index([transporterCompanyVatNumber], map: "_BsdasriTransporterCompanyVatNumberIdx")
   @@index([destinationCompanySiret], map: "_BsdasriDestinationCompanySiretIdx")
   @@index([ecoOrganismeSiret], map: "_BsdasriEcoOrganismeSiretIdx")
   @@index([synthesizedInId], map: "_BsdasriSynthesizedInIdIdx")
@@ -1144,6 +1146,7 @@ model Bsff {
 
   @@index([emitterCompanySiret], map: "_BsffEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsffTransporterCompanySiretIdx")
+  @@index([transporterCompanyVatNumber], map: "_BsffTransporterCompanyVatNumberIdx")
   @@index([destinationCompanySiret], map: "_BsffDestinationCompanySiretIdx")
   @@index([status], map: "_BsffStatusIdx")
   @@index([updatedAt], map: "_BsffUpdatedAtIdx")
@@ -1739,9 +1742,4 @@ enum BspaohStatus {
 enum BspaohType {
   PAOH
   FOETUS
-}
-
-enum BsvhuRecipientType {
-  BROYEUR
-  DEMOLISSEUR
 }
